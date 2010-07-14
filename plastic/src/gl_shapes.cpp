@@ -226,7 +226,7 @@ CA_FUNCTION(gl_circle)
 
     glVertexPointer(3, GL_FLOAT, 0, buffer.get());
     glEnableClientState(GL_VERTEX_ARRAY);
-    glDrawArrays(GL_TRIANGLE_FAN, 0, control_points);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 1 + control_points*2);
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
