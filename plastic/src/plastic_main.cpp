@@ -100,25 +100,8 @@ bool reload_runtime()
         return false;
 
     // Write window width & height
-    set_int(app::runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
-    set_int(app::runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
-
-    return true;
-}
-
-bool evaluate_main_script()
-{
-    EvalContext context;
-    evaluate_branch(&context, app::runtime_branch());
-
-    if (context.errorOccurred) {
-        std::cout << "Runtime error:" << std::endl;
-        print_runtime_error_formatted(context, std::cout);
-        std::cout << std::endl;
-
-        app::pause(PauseStatus::RUNTIME_ERROR);
-        return false;
-    }
+    set_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
+    set_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
 
     return true;
 }
@@ -208,7 +191,7 @@ int plastic_main(std::vector<std::string> args)
         }
 
         for (int i=0; i < 5; i++)
-            if (!evaluate_main_script())
+            if (!app::evaluate_main_script())
                 return 1;
 
         return 0;

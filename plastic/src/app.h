@@ -23,12 +23,17 @@ struct App {
 
     long _ticksElapsed;
 
+    int _windowWidth;
+    int _windowHeight;
+
     App()
       : _runtimeBranch(NULL),
         _usersBranch(NULL),
         _continueMainLoop(true),
         _targetFps(60),
-        _ticksElapsed(0)
+        _ticksElapsed(0),
+        _windowWidth(0),
+        _windowHeight(0)
     {
     }
 };
@@ -43,8 +48,13 @@ bool continue_main_loop();
 
 void pause(PauseStatus::Reason reason);
 void unpause();
+void update_window_dimensions(int width, int height);
 
 // Logging
+void info(std::string const& msg);
 void error(std::string const& msg);
+
+bool evaluate_main_script();
+//bool reload_runtime();
 
 } // namespace app

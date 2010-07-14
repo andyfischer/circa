@@ -14,8 +14,6 @@ using namespace circa;
 
 SDL_Surface* SCREEN = NULL;
 const int SCREEN_BPP = 32;
-int WINDOW_WIDTH = 0;
-int WINDOW_HEIGHT = 0;
 
 bool initialize_display()
 {
@@ -55,10 +53,9 @@ bool initialize_display()
 
 bool resize_display(int width, int height)
 {
-    WINDOW_WIDTH = width;
-    WINDOW_HEIGHT = height;
+    app::update_window_dimensions(width, height);
 
-    SCREEN = SDL_SetVideoMode(WINDOW_WIDTH, WINDOW_HEIGHT, 16,
+    SCREEN = SDL_SetVideoMode(width, height, 16,
             SDL_OPENGL | SDL_SWSURFACE | SDL_RESIZABLE);
             //SDL_OPENGL | SDL_SWSURFACE | SDL_FULLSCREEN);
 
@@ -75,8 +72,8 @@ bool resize_display(int width, int height)
     }
 
     // Write window width & height
-    set_int(app::runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
-    set_int(app::runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
+    set_int(app::runtime_branch()["window"]->getField("width"), width);
+    set_int(app::runtime_branch()["window"]->getField("height"), height);
 
     // Set window caption
     std::string windowTitle;
@@ -124,7 +121,7 @@ void render_frame()
     glClear(GL_DEPTH_BUFFER_BIT);
     glUseProgram(0);
 
-    evaluate_main_script();
+    app::evaluate_main_script();
 
     // Check for uncaught GL error
     const char* err = gl_check_error();

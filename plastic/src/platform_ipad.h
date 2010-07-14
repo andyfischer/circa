@@ -5,5 +5,6 @@
 namespace platform_ipad {
 
 void setup_gl();
+void render();
 
-} // namespace platform_ipad
+} // platform_ipad
