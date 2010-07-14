@@ -4,6 +4,7 @@
 
 #include "plastic_common_headers.h"
 
+#include "app.h"
 #include "display.h"
 #include "docs.h"
 #include "gl_shapes.h"
@@ -20,43 +21,22 @@
 
 using namespace circa;
 
-// the filename of this binary, passed in as args[0]
-std::string BINARY_NAME;
-
-Branch* RUNTIME_BRANCH = NULL;
-Branch* USERS_BRANCH = NULL;
-
-bool CONTINUE_MAIN_LOOP = true;
-
 Term* TIME = NULL;
 Term* TIME_DELTA = NULL;
 Term* RENDER_DURATION = NULL;
 long PREV_SDL_TICKS = 0;
 int TARGET_FPS = 60;
 
-bool PAUSED = false;
-PauseReason PAUSE_REASON;
-
 void error(std::string const& msg)
 {
     std::cout << "error: " << msg << std::endl;
-}
-
-circa::Branch& runtime_branch()
-{
-    return *RUNTIME_BRANCH;
-}
-
-circa::Branch& users_branch()
-{
-    return *USERS_BRANCH;
 }
 
 std::string get_home_directory()
 {
     char* circa_home = getenv("CIRCA_HOME");
     if (circa_home == NULL) {
-        return get_directory_for_filename(BINARY_NAME);
+        return get_directory_for_filename(app::singleton()._binaryFilename);
     } else {
         return std::string(circa_home) + "/plastic";
     }
@@ -75,7 +55,7 @@ std::string find_asset_file(std::string const& filename)
 bool load_runtime()
 {
     // Pre-setup
-    text::pre_setup(runtime_branch());
+    text::pre_setup(app::runtime_branch());
 
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
@@ -84,40 +64,42 @@ bool load_runtime()
             << runtime_ca_path << ")" << std::endl;
         return false;
     }
-    parse_script(runtime_branch(), runtime_ca_path);
+    parse_script(app::runtime_branch(), runtime_ca_path);
 
-    assert(branch_check_invariants(runtime_branch(), &std::cout));
+    assert(branch_check_invariants(app::runtime_branch(), &std::cout));
 
     // Fetch constants
-    TIME = procure_value(runtime_branch(), FLOAT_TYPE, "time");
-    TIME_DELTA = procure_value(runtime_branch(), FLOAT_TYPE, "time_delta");
-    RENDER_DURATION = procure_value(runtime_branch(), FLOAT_TYPE, "render_duration");
+    TIME = procure_value(app::runtime_branch(), FLOAT_TYPE, "time");
+    TIME_DELTA = procure_value(app::runtime_branch(), FLOAT_TYPE, "time_delta");
+    RENDER_DURATION = procure_value(app::runtime_branch(), FLOAT_TYPE, "render_duration");
 
     return true;
 }
 
 bool initialize_plastic()
 {
-    RUNTIME_BRANCH = &create_branch(*circa::KERNEL, "plastic_main");
+    app::singleton()._runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
     return load_runtime();
 }
 
 bool setup_builtin_functions()
 {
-    ide::setup(runtime_branch());
-    gl_shapes::setup(runtime_branch());
+    Branch& branch = app::runtime_branch();
+
+    ide::setup(branch);
+    gl_shapes::setup(branch);
 
 #ifdef PLASTIC_USE_SDL
-    postprocess_functions::setup(runtime_branch());
-    image::setup(runtime_branch());
-    input::setup(runtime_branch());
-    mesh::setup(runtime_branch());
-    textures::setup(runtime_branch());
-    text::setup(runtime_branch());
+    postprocess_functions::setup(branch);
+    image::setup(branch);
+    input::setup(branch);
+    mesh::setup(branch);
+    textures::setup(branch);
+    text::setup(branch);
 #endif
 
-    if (has_static_errors(runtime_branch())) {
-        print_static_errors_formatted(runtime_branch(), std::cout);
+    if (has_static_errors(branch)) {
+        print_static_errors_formatted(branch, std::cout);
         std::cout << std::endl;
         return false;
     }
@@ -127,15 +109,15 @@ bool setup_builtin_functions()
 
 bool reload_runtime()
 {
-    runtime_branch().clear();
+    app::runtime_branch().clear();
     if (!load_runtime())
         return false;
     if (!setup_builtin_functions())
         return false;
 
     // Write window width & height
-    set_int(runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
-    set_int(runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
+    set_int(app::runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
+    set_int(app::runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
 
     return true;
 }
@@ -143,14 +125,14 @@ bool reload_runtime()
 bool evaluate_main_script()
 {
     EvalContext context;
-    evaluate_branch(&context, runtime_branch());
+    evaluate_branch(&context, app::runtime_branch());
 
     if (context.errorOccurred) {
         std::cout << "Runtime error:" << std::endl;
         print_runtime_error_formatted(context, std::cout);
         std::cout << std::endl;
-        PAUSED = true;
-        PAUSE_REASON = RUNTIME_ERROR;
+
+        app::pause(PauseStatus::RUNTIME_ERROR);
         return false;
     }
 
@@ -159,13 +141,13 @@ bool evaluate_main_script()
 
 bool load_user_script_filename(std::string const& _filename)
 {
-    Term* users_branch = runtime_branch()["users_branch"];
-    USERS_BRANCH = &users_branch->asBranch();
+    Term* users_branch = app::runtime_branch()["users_branch"];
+    app::singleton()._usersBranch = &users_branch->asBranch();
 
     if (_filename != "") {
         std::string filename = get_absolute_path(_filename);
 
-        Term* user_script_filename = runtime_branch().findFirstBinding("user_script_filename");
+        Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");
         set_str(user_script_filename, filename);
         mark_stateful_value_assigned(user_script_filename);
         std::cout << "Loading script: " << filename << std::endl;
@@ -183,7 +165,7 @@ void main_loop()
     gl_clear_error();
 
     // Evaluate script
-    if (PAUSED) {
+    if (app::paused()) {
         set_float(TIME_DELTA, 0.0f);
     } else {
         set_float(TIME, ticks / 1000.0f);
@@ -228,9 +210,9 @@ int plastic_main(std::vector<std::string> args)
             return 1;
 
         EvalContext cxt;
-        include_function::preload_script(&cxt, users_branch().owningTerm);
+        include_function::preload_script(&cxt, app::users_branch().owningTerm);
 
-        print_branch_raw(std::cout, users_branch());
+        print_branch_raw(std::cout, app::users_branch());
         return 0;
     }
 
@@ -239,8 +221,8 @@ int plastic_main(std::vector<std::string> args)
         if (!load_user_script_filename(args[1]))
             return 1;
 
-        if (has_static_errors(users_branch())) {
-            print_static_errors_formatted(users_branch(), std::cout);
+        if (has_static_errors(app::users_branch())) {
+            print_static_errors_formatted(app::users_branch(), std::cout);
             return 1;
         }
 
@@ -257,8 +239,8 @@ int plastic_main(std::vector<std::string> args)
     if (!load_user_script_filename(filename))
         return 1;
 
-    if (has_static_errors(users_branch())) {
-        print_static_errors_formatted(users_branch(), std::cout);
+    if (has_static_errors(app::users_branch())) {
+        print_static_errors_formatted(app::users_branch(), std::cout);
         return 1;
     }
 
@@ -268,7 +250,7 @@ int plastic_main(std::vector<std::string> args)
     PREV_SDL_TICKS = SDL_GetTicks();
 
     // Main loop
-    while (CONTINUE_MAIN_LOOP)
+    while (app::continue_main_loop())
         main_loop();
 
     // Quit SDL

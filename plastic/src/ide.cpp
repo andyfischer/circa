@@ -4,6 +4,8 @@
 #include <importing_macros.h>
 
 #include "plastic_common_headers.h"
+
+#include "app.h"
 #include "plastic_main.h"
 
 using namespace circa;
@@ -12,14 +14,14 @@ namespace ide {
 
 CA_FUNCTION(quit)
 {
-    CONTINUE_MAIN_LOOP = false;
+    app::singleton()._continueMainLoop = false;
 }
 
 CA_FUNCTION(reset_state)
 {
-    reset_state(users_branch());
-    if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-        PAUSED = false;
+    reset_state(app::users_branch());
+    if (app::paused() && app::pause_reason() == PauseStatus::RUNTIME_ERROR)
+        app::unpause();
 }
 
 CA_FUNCTION(hosted_reload_runtime)
@@ -29,7 +31,7 @@ CA_FUNCTION(hosted_reload_runtime)
 
 CA_FUNCTION(paused)
 {
-    set_bool(OUTPUT, PAUSED);
+    set_bool(OUTPUT, app::paused());
 }
 
 void setup(circa::Branch& branch)

@@ -1,10 +1,11 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "app.h"
 #include "plastic_main.h"
 
 int main( int argc, char* args[] )
 {
-    BINARY_NAME = args[0];
+    app::singleton()._binaryFilename = args[0];
 
     std::vector<std::string> argv;
 

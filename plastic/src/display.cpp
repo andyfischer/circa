@@ -4,6 +4,7 @@
 
 #include "plastic_common_headers.h"
 
+#include "app.h"
 #include "gl_util.h"
 #include "plastic_main.h"
 
@@ -30,9 +31,9 @@ bool initialize_display()
     int desiredWidth = 1024;
     int desiredHeight = 768;
 
-    if (users_branch().contains("desired_window_size")) {
-        desiredWidth = users_branch()["desired_window_size"]->asBranch()[0]->asInt();
-        desiredHeight = users_branch()["desired_window_size"]->asBranch()[1]->asInt();
+    if (app::users_branch().contains("desired_window_size")) {
+        desiredWidth = app::users_branch()["desired_window_size"]->asBranch()[0]->asInt();
+        desiredHeight = app::users_branch()["desired_window_size"]->asBranch()[1]->asInt();
     }
 
     if (!resize_display(desiredWidth, desiredHeight))
@@ -74,15 +75,15 @@ bool resize_display(int width, int height)
     }
 
     // Write window width & height
-    set_int(runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
-    set_int(runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
+    set_int(app::runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
+    set_int(app::runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
 
     // Set window caption
     std::string windowTitle;
-    if (users_branch().contains("desired_window_title"))
-        windowTitle = users_branch()["desired_window_title"]->asString();
+    if (app::users_branch().contains("desired_window_title"))
+        windowTitle = app::users_branch()["desired_window_title"]->asString();
     else
-        windowTitle = get_branch_source_filename(users_branch());
+        windowTitle = get_branch_source_filename(app::users_branch());
 
     SDL_WM_SetCaption(windowTitle.c_str(), NULL);
 

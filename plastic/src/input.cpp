@@ -5,9 +5,11 @@
 
 #include "plastic_common_headers.h"
 
+#include "app.h"
 #include "display.h"
 #include "gl_util.h"
 #include "plastic_main.h"
+#include "pause_status.h"
 
 #include "input.h"
 
@@ -79,7 +81,7 @@ void capture_events()
 
         switch (event.type) {
         case SDL_QUIT:
-            CONTINUE_MAIN_LOOP = false;
+            app::singleton()._continueMainLoop = false;
             break;
 
         case SDL_VIDEORESIZE:
@@ -137,7 +139,7 @@ void handle_key_press(SDL_Event &event, int key)
     if (!controlPressed) {
         switch (key) {
         case SDLK_ESCAPE:
-            CONTINUE_MAIN_LOOP = false;
+            app::singleton()._continueMainLoop = false;
             break;
         default: break;
         }
@@ -147,14 +149,14 @@ void handle_key_press(SDL_Event &event, int key)
     if (controlPressed) {
         switch (event.key.keysym.sym) {
         case SDLK_s:
-            persist_branch_to_file(users_branch());
-            std::cout << "saved to " << get_branch_source_filename(users_branch()) << std::endl;
+            persist_branch_to_file(app::users_branch());
+            std::cout << "saved to " << get_branch_source_filename(app::users_branch()) << std::endl;
             break;
 
         case SDLK_e:
-            reset_state(users_branch());
-            if (PAUSED && PAUSE_REASON == RUNTIME_ERROR)
-                PAUSED = false;
+            reset_state(app::users_branch());
+            if (app::paused() && app::pause_reason() == PauseStatus::RUNTIME_ERROR)
+                app::unpause();
             break;
 
         case SDLK_r:
@@ -162,13 +164,12 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         case SDLK_p:
-            if (PAUSED) {
+            if (app::paused()) {
                 std::cout << "Unpaused" << std::endl;
-                PAUSED = false;
+                app::unpause();
             } else {
                 std::cout << "Paused" << std::endl;
-                PAUSED = true;
-                PAUSE_REASON = USER_REQUEST;
+                app::pause(PauseStatus::USER_REQUEST);
             }
             break;
 

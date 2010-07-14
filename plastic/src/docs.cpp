@@ -2,6 +2,7 @@
 
 #include "circa.h"
 
+#include "app.h"
 #include "plastic_main.h"
 
 using namespace circa;
@@ -13,17 +14,19 @@ void generate_plastic_docs(std::stringstream &out)
     out << "  \"headers\": { \"title\": \"Circa+Plastic\" },\n";
     out << "  \"packages\": [\n";
 
+    Branch& runtimeBranch = app::runtime_branch();
+
     append_package_docs(out, *KERNEL, "Circa builtins");
     out << ",";
-    append_package_docs(out, runtime_branch(), "Plastic top level");
+    append_package_docs(out, runtimeBranch, "Plastic top level");
     out << ",";
-    append_package_docs(out, runtime_branch()["gl"]->asBranch(), "gl namespace");
+    append_package_docs(out, runtimeBranch["gl"]->asBranch(), "gl namespace");
     out << ",";
-    append_package_docs(out, runtime_branch()["image"]->asBranch(), "image namespace");
+    append_package_docs(out, runtimeBranch["image"]->asBranch(), "image namespace");
     out << ",";
-    append_package_docs(out, runtime_branch()["text"]->asBranch(), "text namespace");
+    append_package_docs(out, runtimeBranch["text"]->asBranch(), "text namespace");
     out << ",";
-    append_package_docs(out, runtime_branch()["tweak"]->asBranch(), "tweak namespace");
+    append_package_docs(out, runtimeBranch["tweak"]->asBranch(), "tweak namespace");
 
     out << "]\n";
     out << "}\n";
