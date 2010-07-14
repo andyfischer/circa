@@ -1,9 +1,22 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "plastic.h"
+#include <circa.h>
 
+#include "plastic_common_headers.h"
+
+#include "display.h"
+#include "docs.h"
+#include "gl_shapes.h"
+#include "gl_util.h"
 #include "ide.h"
+#include "image.h"
+#include "input.h"
+#include "mesh.h"
+#include "postprocess.h"
 #include "text.h"
+#include "textures.h"
+
+#include "plastic_main.h"
 
 using namespace circa;
 
@@ -91,14 +104,17 @@ bool initialize_plastic()
 
 bool setup_builtin_functions()
 {
-    postprocess_functions::setup(runtime_branch());
     ide::setup(runtime_branch());
+    gl_shapes::setup(runtime_branch());
+
+#ifdef PLASTIC_USE_SDL
+    postprocess_functions::setup(runtime_branch());
     image::setup(runtime_branch());
     input::setup(runtime_branch());
     mesh::setup(runtime_branch());
-    gl_shapes::setup(runtime_branch());
     textures::setup(runtime_branch());
     text::setup(runtime_branch());
+#endif
 
     if (has_static_errors(runtime_branch())) {
         print_static_errors_formatted(runtime_branch(), std::cout);

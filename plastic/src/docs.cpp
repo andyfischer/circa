@@ -2,7 +2,7 @@
 
 #include "circa.h"
 
-#include "plastic.h"
+#include "plastic_main.h"
 
 using namespace circa;
 

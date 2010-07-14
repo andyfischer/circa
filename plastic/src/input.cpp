@@ -1,9 +1,15 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include <importing_macros.h>
-#include "circa.h"
+#include <circa.h>
 
-#include "plastic.h"
+#include "plastic_common_headers.h"
+
+#include "display.h"
+#include "gl_util.h"
+#include "plastic_main.h"
+
+#include "input.h"
 
 using namespace circa;
 

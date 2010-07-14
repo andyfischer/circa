@@ -1,9 +1,16 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-// With thanks to Philip Rideout for example code. See: http://prideout.net/bloom/index.php
+// Some code segments are based on example code from Philip Rideout for example code.
+// See: http://prideout.net/bloom/index.php
 
-#include "importing_macros.h"
-#include "plastic.h"
+#include <circa.h>
+#include <importing_macros.h>
+
+#include "plastic_common_headers.h"
+
+#include "gl_util.h"
+
+#include "postprocess.h"
 
 using namespace circa;
 

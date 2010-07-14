@@ -49,15 +49,37 @@ struct ReferenceMap;
 
 } // namespace circa
 
-#define NO_SDL_GLEXT
+#ifdef PLASTIC_OSX
+    #define PLASTIC_USE_SDL
+#endif
 
-#include <SDL.h>
-#include <SDL_opengl.h>
-#include <SDL_image.h>
 
-#ifdef __APPLE__
+#ifdef PLASTIC_USE_SDL
+    #define NO_SDL_GLEXT
 
-#include <OpenGL/glu.h>
-#include <OpenGL/glext.h>
+    #include <SDL.h>
+    #include <SDL_opengl.h>
+    #include <SDL_image.h>
+
+#endif // PLASTIC_USE_SDL
+
+#ifdef PLASTIC_OSX
+
+    #include <OpenGL/glu.h>
+    #include <OpenGL/glext.h>
+
+#endif
+
+#ifdef PLASTIC_IPAD
+
+    #define PLASTIC_OGL_ES
+
+    #include <OpenGLES/ES1/gl.h>
+    #include <OpenGLES/ES1/glext.h>
+
+    // TODO: Add a flag that disables ES2 compilation so that it's easy to check that the
+    // app is ES1 compatible.
+    #include <OpenGLES/ES2/gl.h>
+    #include <OpenGLES/ES2/glext.h>
 
 #endif

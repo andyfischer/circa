@@ -1,6 +1,10 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "plastic.h"
+#include <circa.h>
+
+#include "plastic_common_headers.h"
+
+#include "plastic_main.h"
 
 GLuint load_shader(std::string const& vertFilename, std::string const& fragFilename)
 {

@@ -13,15 +13,20 @@ circa-web
 *.exe
 *.dll
 
-# project file artifacts:
-*.mode1v3
-*.pbxuser
+# visual studio artifacts:
 *.ilk
 *.idb
 *.exp
 *.exe.manifest
 *.pdb
 *.suo
+
+# xcode artifacts:
+*.mode1v3
+*.pbxuser
+*.perspectivev3
+
+# miscellaneous artifacts:
 .sconsign.dblite
 tags
 

@@ -3,7 +3,11 @@
 #include <importing_macros.h>
 #include <circa.h>
 
-#include "plastic.h"
+#include "plastic_common_headers.h"
+
+#include "image.h"
+#include "sdl_util.h"
+#include "gl_util.h"
 
 using namespace circa;
 

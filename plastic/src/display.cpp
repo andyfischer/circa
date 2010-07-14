@@ -2,7 +2,12 @@
 
 #include <circa.h>
 
-#include "plastic.h"
+#include "plastic_common_headers.h"
+
+#include "gl_util.h"
+#include "plastic_main.h"
+
+#include "display.h"
 
 using namespace circa;
 

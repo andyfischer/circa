@@ -132,6 +132,8 @@ def build_plastic(env):
 
     source_files = list_source_files('plastic/src')
 
+    env.Append(CPPDEFINES=['PLASTIC_USE_SDL'])
+
     result = env.Program('#build/bin/plas',
         source = ['build/plastic/src/'+f for f in source_files])
 

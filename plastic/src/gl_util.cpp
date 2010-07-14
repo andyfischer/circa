@@ -1,6 +1,9 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "plastic.h"
+#include <circa.h>
+
+#include "gl_util.h"
+#include "plastic_common_headers.h"
 
 void gl_clear_error()
 {
@@ -39,8 +42,11 @@ const char* gl_to_string(GLenum glenum)
         case GL_OUT_OF_MEMORY: return "GL_OUT_OF_MEMORY";
         case GL_RGBA: return "GL_RGBA";
         case GL_BGRA: return "GL_BGRA";
+
+        #ifndef PLASTIC_OGL_ES
         case GL_RGB: return "GL_RGB";
         case GL_BGR: return "GL_BGR";
+        #endif
     }
     return "";
 }
