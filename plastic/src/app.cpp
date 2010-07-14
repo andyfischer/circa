@@ -49,4 +49,9 @@ void unpause()
     singleton()._pauseStatus.reason = PauseStatus::NONE;
 }
 
+void error(std::string const& msg)
+{
+    std::cout << "error: " << msg << std::endl;
+}
+
 } // namespace app

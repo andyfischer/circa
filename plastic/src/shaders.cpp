@@ -4,6 +4,7 @@
 
 #include "plastic_common_headers.h"
 
+#include "app.h"
 #include "plastic_main.h"
 
 GLuint load_shader(std::string const& vertFilename, std::string const& fragFilename)
@@ -25,7 +26,7 @@ GLuint load_shader(std::string const& vertFilename, std::string const& fragFilen
     if (!success)
     {
         glGetShaderInfoLog(vertShader, sizeof(buf), 0, buf);
-        error("Unable to compile vertex shader.");
+        app::error("Unable to compile vertex shader.");
     }
 
     fragShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -35,7 +36,7 @@ GLuint load_shader(std::string const& vertFilename, std::string const& fragFilen
     if (!success)
     {
         glGetShaderInfoLog(fragShader, sizeof(buf), 0, buf);
-        error("Unable to compile fragment shader.");
+        app::error("Unable to compile fragment shader.");
     }
 
     program = glCreateProgram();
@@ -47,7 +48,7 @@ GLuint load_shader(std::string const& vertFilename, std::string const& fragFilen
     if (!success)
     {
         glGetProgramInfoLog(program, sizeof(buf), 0, buf);
-        error("Unable to link shaders.\n");
+        app::error("Unable to link shaders.\n");
     }
 
     return program;

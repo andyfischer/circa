@@ -175,11 +175,11 @@ void handle_key_press(SDL_Event &event, int key)
 
         // toggle low-power mode
         case SDLK_l: {
-            if (TARGET_FPS == 6)
-                TARGET_FPS = 60;
+            if (app::singleton()._targetFps == 6)
+                app::singleton()._targetFps = 60;
             else
-                TARGET_FPS = 6;
-            std::cout << "target FPS = " << TARGET_FPS << std::endl;
+                app::singleton()._targetFps = 6;
+            std::cout << "target FPS = " << app::singleton()._targetFps << std::endl;
             break;
         }
 

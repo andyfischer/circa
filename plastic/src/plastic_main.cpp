@@ -25,12 +25,6 @@ Term* TIME = NULL;
 Term* TIME_DELTA = NULL;
 Term* RENDER_DURATION = NULL;
 long PREV_SDL_TICKS = 0;
-int TARGET_FPS = 60;
-
-void error(std::string const& msg)
-{
-    std::cout << "error: " << msg << std::endl;
-}
 
 std::string get_home_directory()
 {
@@ -180,7 +174,7 @@ void main_loop()
     set_float(RENDER_DURATION, (new_ticks - ticks));
 
     // Delay to limit framerate
-    const long ticks_per_second = long(1.0 / TARGET_FPS * 1000);
+    const long ticks_per_second = long(1.0 / app::singleton()._targetFps * 1000);
     if ((new_ticks - ticks) < ticks_per_second) {
         long delay = ticks_per_second - (new_ticks - ticks);
         SDL_Delay(delay);

@@ -18,10 +18,14 @@ struct App {
 
     bool _continueMainLoop;
 
+    // The FPS that we are trying to maintain
+    int _targetFps;
+
     App()
       : _runtimeBranch(NULL),
         _usersBranch(NULL),
-        _continueMainLoop(true)
+        _continueMainLoop(true),
+        _targetFps(60)
     {
     }
 };
@@ -36,5 +40,8 @@ bool continue_main_loop();
 
 void pause(PauseStatus::Reason reason);
 void unpause();
+
+// Logging
+void error(std::string const& msg);
 
 } // namespace app
