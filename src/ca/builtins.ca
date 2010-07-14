@@ -107,3 +107,10 @@ end
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
 end
+
+def delta(number val) -> number
+    state number prev = val
+    result = val - prev
+    prev = val
+    return result
+end

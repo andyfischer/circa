@@ -34,6 +34,11 @@ CA_FUNCTION(paused)
     set_bool(OUTPUT, app::paused());
 }
 
+CA_FUNCTION(get_time)
+{
+    set_float(OUTPUT, app::singleton()._ticksElapsed / 1000.0);
+}
+
 void setup(circa::Branch& branch)
 {
     Branch& ide_ns = branch["ide"]->asBranch();
@@ -41,6 +46,7 @@ void setup(circa::Branch& branch)
     install_function(ide_ns["reset_state"], reset_state);
     install_function(ide_ns["reload_runtime"], hosted_reload_runtime);
     install_function(ide_ns["paused"], paused);
+    install_function(ide_ns["get_time"], get_time);
 }
 
 } // namespace ide

@@ -1,10 +1,3 @@
-
--- These values are passed in from main.cpp
-time = 0.0
-time_delta = 0.0
-render_duration = 0.0
-td = time_delta -- shorthand
-
 -- Wrap up mouse position into a point (values are passed in from input.cpp)
 state Point mouse
 
@@ -35,7 +28,13 @@ namespace ide
     def reset_state(): "Reset state for the current script"
     def reload_runtime(): "Reload the builtin runtime"
     def paused() -> bool : "Returns whether the current script is paused"
+    def get_time() -> number {}
 end
+
+time = ide:get_time()
+time_delta = delta(time)
+render_duration = 0.0
+td = time_delta -- shorthand
 
 -- Input
 type Keypress {

@@ -21,11 +21,6 @@
 
 using namespace circa;
 
-Term* TIME = NULL;
-Term* TIME_DELTA = NULL;
-Term* RENDER_DURATION = NULL;
-long PREV_SDL_TICKS = 0;
-
 std::string get_home_directory()
 {
     char* circa_home = getenv("CIRCA_HOME");
@@ -61,11 +56,6 @@ bool load_runtime()
     parse_script(app::runtime_branch(), runtime_ca_path);
 
     assert(branch_check_invariants(app::runtime_branch(), &std::cout));
-
-    // Fetch constants
-    TIME = procure_value(app::runtime_branch(), FLOAT_TYPE, "time");
-    TIME_DELTA = procure_value(app::runtime_branch(), FLOAT_TYPE, "time_delta");
-    RENDER_DURATION = procure_value(app::runtime_branch(), FLOAT_TYPE, "render_duration");
 
     return true;
 }
@@ -146,7 +136,7 @@ bool load_user_script_filename(std::string const& _filename)
         mark_stateful_value_assigned(user_script_filename);
         std::cout << "Loading script: " << filename << std::endl;
     }
-        
+
     return true;
 }
 
@@ -155,23 +145,20 @@ void main_loop()
     input::capture_events();
 
     long ticks = SDL_GetTicks();
-
-    gl_clear_error();
+    static long previousTicks = SDL_GetTicks();
+    long ticksAdvanced = ticks - previousTicks;
+    previousTicks = ticks;
 
     // Evaluate script
-    if (app::paused()) {
-        set_float(TIME_DELTA, 0.0f);
-    } else {
-        set_float(TIME, ticks / 1000.0f);
-        set_float(TIME_DELTA, (ticks - PREV_SDL_TICKS) / 1000.0f);
+    if (!app::paused()) {
+        app::singleton()._ticksElapsed += ticksAdvanced;
     }
-    PREV_SDL_TICKS = ticks;
+
+    gl_clear_error();
 
     render_frame();
 
     long new_ticks = SDL_GetTicks();
-
-    set_float(RENDER_DURATION, (new_ticks - ticks));
 
     // Delay to limit framerate
     const long ticks_per_second = long(1.0 / app::singleton()._targetFps * 1000);
@@ -240,8 +227,6 @@ int plastic_main(std::vector<std::string> args)
 
     if (!setup_builtin_functions()) return 1;
     if (!initialize_display()) return 1;
-
-    PREV_SDL_TICKS = SDL_GetTicks();
 
     // Main loop
     while (app::continue_main_loop())

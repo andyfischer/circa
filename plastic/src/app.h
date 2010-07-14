@@ -21,11 +21,14 @@ struct App {
     // The FPS that we are trying to maintain
     int _targetFps;
 
+    long _ticksElapsed;
+
     App()
       : _runtimeBranch(NULL),
         _usersBranch(NULL),
         _continueMainLoop(true),
-        _targetFps(60)
+        _targetFps(60),
+        _ticksElapsed(0)
     {
     }
 };
