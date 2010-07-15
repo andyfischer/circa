@@ -108,7 +108,7 @@ std::string get_home_directory()
 std::string find_runtime_file()
 {
 #ifdef PLASTIC_IPAD
-    return get_home_directory() + "/runtime/main_ipad.ca";
+    return "main_ipad.ca";
 #else
     return get_home_directory() + "/runtime/main.ca";
 #endif
@@ -128,6 +128,8 @@ bool load_runtime()
 
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
+    info(std::string("loading runtime: ") + runtime_ca_path);
+
     if (!circa::file_exists(runtime_ca_path)) {
         std::cerr << "fatal: Couldn't find runtime.ca file. (expected at "
             << runtime_ca_path << ")" << std::endl;
@@ -192,14 +194,12 @@ bool reload_runtime()
     return true;
 }
 
-bool load_user_script_filename(std::string const& _filename)
+bool load_user_script_filename(std::string const& filename)
 {
     circa::Term* users_branch = app::runtime_branch()["users_branch"];
     app::singleton()._usersBranch = &users_branch->asBranch();
 
-    if (_filename != "") {
-        std::string filename = circa::get_absolute_path(_filename);
-
+    if (filename != "") {
         circa::Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");
         circa::set_str(user_script_filename, filename);
         circa::mark_stateful_value_assigned(user_script_filename);

@@ -107,7 +107,7 @@ namespace gl begin
 end
 
 -- Drawing utils
-include('vector_drawing.ca')
+include('runtime/vector_drawing.ca')
 
 -- Time-based stateful functions
 def alternate_over_time(number period) -> bool
@@ -230,10 +230,6 @@ namespace postprocess begin
 
     def bind_main_surface(): bind_surface(main_surface)
 end
-
--- Include other runtime scripts
-include('text_input.ca')
-include('ui_widgets.ca')
 
 -- Load the user's script
 state string user_script_filename = path("../demos/demo_browser.ca")
