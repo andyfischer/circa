@@ -4,6 +4,7 @@
 
 namespace platform_ipad {
 
+void initialize();
 void setup_gl();
 void render();
 

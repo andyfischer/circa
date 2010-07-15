@@ -51,8 +51,11 @@ typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \
-    void fname(EvalContext* _circa_cxt, Term* _circa_caller, Term* _circa_func, \
-            RefList const& _circa_inputs, TaggedValue* _circa_output)
+    void fname(circa::EvalContext* _circa_cxt, \
+            circa::Term* _circa_caller, \
+            circa::Term* _circa_func, \
+            circa::RefList const& _circa_inputs, \
+            circa::TaggedValue* _circa_output)
 
 typedef void (*EvaluateFunc)(EvalContext* cxt, Term* term, Term* func,
         RefList const& inputs, TaggedValue* output);

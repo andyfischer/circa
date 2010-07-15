@@ -2,6 +2,8 @@
 
 #pragma once
 
+#ifdef PLASTIC_USE_SDL
+
 GLuint load_image_to_texture(circa::EvalContext* cxt, circa::Term* term, const char* filename);
 
 bool has_indexed_color(SDL_Surface* surface);
@@ -14,3 +16,5 @@ namespace image {
 void setup(circa::Branch& branch);
 
 } // namespace image
+
+#endif

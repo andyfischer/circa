@@ -4,6 +4,13 @@
 #include "gl_util.h"
 
 namespace platform_ipad {
+
+void initialize()
+{
+    app::info("platform_ipad::initialize()");
+    app::initialize();
+    app::load_user_script_filename("demos/ipad_home.ca");
+}
     
 void setup_gl()
 {
@@ -11,6 +18,8 @@ void setup_gl()
 
 void render()
 {
+    app::info("platform_ipad::render()");
+
     gl_clear_error();
     app::evaluate_main_script();
 

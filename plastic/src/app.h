@@ -14,6 +14,9 @@ struct App {
     // the filename of the running binary, passed in as args[0]
     std::string _binaryFilename;
 
+    // the script filename that we should start with
+    std::string _initialScriptFilename;
+
     PauseStatus _pauseStatus;
 
     bool _continueMainLoop;

@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include <circa.h>
+#include <importing_macros.h>
 
 #include "app.h"
 #include "gl_shapes.h"
@@ -82,6 +83,18 @@ void error(std::string const& msg)
 #endif
 }
 
+CA_FUNCTION(trace)
+{
+    std::stringstream out;
+    for (int i = 0; i < NUM_INPUTS; i++) {
+        if (INPUT(i)->value_type == circa::type_contents(circa::STRING_TYPE))
+            out << circa::as_string(INPUT(i));
+        else
+            out << INPUT(i)->toString();
+    }
+    info(out.str());
+}
+
 std::string get_home_directory()
 {
     char* circa_home = getenv("CIRCA_HOME");
@@ -105,7 +118,9 @@ std::string find_asset_file(std::string const& filename)
 bool load_runtime()
 {
     // Pre-setup
+#ifndef PLASTIC_IPAD
     text::pre_setup(app::runtime_branch());
+#endif
 
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
@@ -124,6 +139,10 @@ bool load_runtime()
 bool initialize()
 {
     circa::initialize();
+
+    // Patch the trace() function to use our logging
+    install_function(circa::get_global("print"), trace);
+    install_function(circa::get_global("trace"), trace);
 
     app::singleton()._runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
     return load_runtime();

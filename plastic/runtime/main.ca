@@ -295,17 +295,18 @@ end
 include('text_input.ca')
 include('ui_widgets.ca')
 
-
 -- Load the user's script
 state string user_script_filename = path("../demos/demo_browser.ca")
 
 -- Function to specify a different script
 load_user_script_request = inbox()
 def load_user_script(string filename):
-    print('load_user_script:', filename)
+    trace('load_user_script:', filename)
     send(load_user_script_request, filename)
 for filename in load_user_script_request:
     user_script_filename = filename
+
+trace("Running script: " user_script_filename)
 
 users_branch = include(user_script_filename)
 

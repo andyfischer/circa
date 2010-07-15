@@ -9,6 +9,8 @@
 #import "circaAppDelegate.h"
 #import "EAGLView.h"
 
+#import "platform_ipad.h"
+
 @implementation circaAppDelegate
 
 @synthesize window;
@@ -16,6 +18,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions   
 {
+    platform_ipad::initialize();
+    
     [glView startAnimation];
     return YES;
 }
