@@ -158,7 +158,6 @@ CA_FUNCTION(draw_rendered_text)
 
 void pre_setup(Branch& branch)
 {
-    info("text::pre_setup");
     TTF_Font_t = Type::create();
     initialize_simple_pointer_type(TTF_Font_t);
     TTF_Font_t->name = "TTF_Font";

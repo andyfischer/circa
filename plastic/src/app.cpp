@@ -107,7 +107,11 @@ std::string get_home_directory()
 
 std::string find_runtime_file()
 {
+#ifdef PLASTIC_IPAD
+    return get_home_directory() + "/runtime/main_ipad.ca";
+#else
     return get_home_directory() + "/runtime/main.ca";
+#endif
 }
 
 std::string find_asset_file(std::string const& filename)

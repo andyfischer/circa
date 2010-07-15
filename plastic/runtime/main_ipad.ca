@@ -72,31 +72,6 @@ namespace key
     escape = 0
 end
 
--- Text rendering functions
-namespace text begin
-    type RenderedText { int texid, int width, int height, Color color, string text }
-    def load_font(state TTF_Font, string filename, int size) -> TTF_Font:
-        "Load the given font"
-    def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText
-        "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
-    end
-    def draw_rendered_text(RenderedText, Point loc)
-        "Draw a sprite created with render_text."
-    end
-end
-
-def draw_text(TTF_Font font, string str, Color color, Point location) -> Rect
-    "Render and draw a string."
-    sprite = text:render_text(font, str, color)
-    text:draw_rendered_text(sprite, location)
-    return to_rect(location, [sprite.width sprite.height])
-end
-
-def draw_text_centered(TTF_Font font, string str, Color color, Point location)
-    sprite = text:render_text(font, str, color)
-    text:draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
-end
-
 -- GL functions
 def background(Color)
     "Fill the screen with the given color."
@@ -131,47 +106,15 @@ namespace gl begin
     def set_uniform(string name, any value) {}
 end
 
-namespace image begin
-    type Image {
-        string filename
-        int texid
-        int width
-        int height
-    }
-
-    def _load(string filename) -> Image {}
-
-    def load(string filename) -> Image:
-        state Image existing
-        if file_changed(filename)
-            existing = _load(filename)
-        end
-        return existing
-    def draw(Image image, Point destination) {}
-    def draw_clip_p(Image image, Rect clip, Point destination) {}
-    def draw_clip_resized(Image image, Rect clip, Rect destination) {}
-
-    draw_clip = overloaded_function(draw_clip_p draw_clip_resized)
-end
-
-def load_texture(state int, string) -> int {}
-
-def draw_image(state int texid, string filename, number x, number y, number width, number height):
-    "Draw an image."
-
-def load_mesh(string filename) -> int:
-    "(experimental) Load a 3d mesh from an .obj file."
-def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation):
-    "(experimental) Draw a 3d mesh to the screen."
-
 -- Drawing utils
 include('vector_drawing.ca')
 
 -- Time-based stateful functions
-def alternate_over_time(number period) -> bool:
+def alternate_over_time(number period) -> bool
     "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
     return round((time - time_started) / period) % 2 == 0
+end
 
 def linear_fadein(number total_time) -> number
     <<<
@@ -205,9 +148,6 @@ def draggable_rect(Point initial_location, Point size) -> Point
     end
     return location
 end
-
-ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 16)
-coding_font = text:load_font("../assets/inconsolata.otf", 16)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -243,7 +183,7 @@ namespace tweak begin
         color = #ee3399
         if mouse_in(rect) color = #ff44aa end
         fill_rect(rect, color)
-        text:draw_rendered_text(text_sprite, [loc.x loc.y])
+        --text:draw_rendered_text(text_sprite, [loc.x loc.y])
 
         -- mouse wheel
         if mouse_wheel_up(rect)
@@ -306,6 +246,8 @@ def load_user_script(string filename):
 for filename in load_user_script_request:
     user_script_filename = filename
 
+trace("Running script: " user_script_filename)
+
 users_branch = include(user_script_filename)
 
 def post_game_stuff()
@@ -318,13 +260,13 @@ def post_game_stuff()
     -- Draw fpses
     draw_fps = false
     if draw_fps
-        text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
-        text:draw_rendered_text(text_sprite, [10 window.height - 40])
+        --text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
+        --text:draw_rendered_text(text_sprite, [10 window.height - 40])
     end
 
     -- Draw pause indicator
     if ide:paused()
-        draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
+        --draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
     end
 
     -- Name selector
