@@ -9,8 +9,8 @@
 
 GLuint load_shader(std::string const& vertFilename, std::string const& fragFilename)
 {
-    std::string vertText = circa::read_text_file(find_asset_file(vertFilename));
-    std::string fragText = circa::read_text_file(find_asset_file(fragFilename));
+    std::string vertText = circa::read_text_file(app::find_asset_file(vertFilename));
+    std::string fragText = circa::read_text_file(app::find_asset_file(fragFilename));
 
     const char* vert = vertText.c_str();
     const char* frag = fragText.c_str();

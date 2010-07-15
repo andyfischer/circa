@@ -160,7 +160,7 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         case SDLK_r:
-            reload_runtime();
+            app::reload_runtime();
             break;
 
         case SDLK_p:

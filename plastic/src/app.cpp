@@ -3,6 +3,14 @@
 #include <circa.h>
 
 #include "app.h"
+#include "gl_shapes.h"
+#include "ide.h"
+#include "image.h"
+#include "input.h"
+#include "mesh.h"
+#include "postprocess.h"
+#include "text.h"
+#include "textures.h"
 
 namespace app {
 
@@ -74,6 +82,113 @@ void error(std::string const& msg)
 #endif
 }
 
+std::string get_home_directory()
+{
+    char* circa_home = getenv("CIRCA_HOME");
+    if (circa_home == NULL) {
+        return circa::get_directory_for_filename(app::singleton()._binaryFilename);
+    } else {
+        return std::string(circa_home) + "/plastic";
+    }
+}
+
+std::string find_runtime_file()
+{
+    return get_home_directory() + "/runtime/main.ca";
+}
+
+std::string find_asset_file(std::string const& filename)
+{
+    return get_home_directory() + "/" + filename;
+}
+
+bool load_runtime()
+{
+    // Pre-setup
+    text::pre_setup(app::runtime_branch());
+
+    // Load runtime.ca
+    std::string runtime_ca_path = find_runtime_file();
+    if (!circa::file_exists(runtime_ca_path)) {
+        std::cerr << "fatal: Couldn't find runtime.ca file. (expected at "
+            << runtime_ca_path << ")" << std::endl;
+        return false;
+    }
+    parse_script(app::runtime_branch(), runtime_ca_path);
+
+    assert(branch_check_invariants(app::runtime_branch(), &std::cout));
+
+    return true;
+}
+
+bool initialize()
+{
+    circa::initialize();
+
+    app::singleton()._runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
+    return load_runtime();
+}
+
+bool setup_builtin_functions()
+{
+    circa::Branch& branch = app::runtime_branch();
+
+    ide::setup(branch);
+    gl_shapes::setup(branch);
+
+#ifdef PLASTIC_USE_SDL
+    postprocess_functions::setup(branch);
+    image::setup(branch);
+    input::setup(branch);
+    mesh::setup(branch);
+    textures::setup(branch);
+    text::setup(branch);
+#endif
+
+    if (circa::has_static_errors(branch)) {
+        circa::print_static_errors_formatted(branch, std::cout);
+        std::cout << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool reload_runtime()
+{
+    app::runtime_branch().clear();
+    if (!load_runtime())
+        return false;
+    if (!setup_builtin_functions())
+        return false;
+
+    // Write window width & height
+    set_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
+    set_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
+
+    return true;
+}
+
+bool load_user_script_filename(std::string const& _filename)
+{
+    circa::Term* users_branch = app::runtime_branch()["users_branch"];
+    app::singleton()._usersBranch = &users_branch->asBranch();
+
+    if (_filename != "") {
+        std::string filename = circa::get_absolute_path(_filename);
+
+        circa::Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");
+        circa::set_str(user_script_filename, filename);
+        circa::mark_stateful_value_assigned(user_script_filename);
+
+        std::stringstream msg;
+        msg << "Loading script: " << filename;
+        info(msg.str());
+    }
+
+    return true;
+}
+
 bool evaluate_main_script()
 {
     circa::EvalContext context;
@@ -91,22 +206,5 @@ bool evaluate_main_script()
 
     return true;
 }
-
-#if 0
-bool reload_runtime()
-{
-    app::runtime_branch().clear();
-    if (!load_runtime())
-        return false;
-    if (!setup_builtin_functions())
-        return false;
-
-    // Write window width & height
-    set_int(app::runtime_branch()["window"]->getField("width"), WINDOW_WIDTH);
-    set_int(app::runtime_branch()["window"]->getField("height"), WINDOW_HEIGHT);
-
-    return true;
-}
-#endif
 
 } // namespace app

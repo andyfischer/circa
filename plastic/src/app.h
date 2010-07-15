@@ -54,6 +54,13 @@ void update_window_dimensions(int width, int height);
 void info(std::string const& msg);
 void error(std::string const& msg);
 
+std::string find_runtime_file();
+std::string find_asset_file(std::string const& filename);
+bool load_user_script_filename(std::string const& _filename);
+bool setup_builtin_functions();
+bool reload_runtime();
+
+bool initialize();
 bool evaluate_main_script();
 //bool reload_runtime();
 

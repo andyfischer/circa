@@ -26,10 +26,7 @@ CA_FUNCTION(reset_state)
 
 CA_FUNCTION(hosted_reload_runtime)
 {
-    // temporarily disable for ipad
-#ifndef PLASTIC_IPAD
-    reload_runtime();
-#endif
+    app::reload_runtime();
 }
 
 CA_FUNCTION(paused)
