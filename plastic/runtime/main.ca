@@ -72,6 +72,8 @@ namespace key
     escape = 0
 end
 
+type TTF_Font {}
+
 -- Text rendering functions
 namespace text begin
     type RenderedText { int texid, int width, int height, Color color, string text }
@@ -90,6 +92,7 @@ def draw_text(TTF_Font font, string str, Color color, Point location) -> Rect
     sprite = text:render_text(font, str, color)
     text:draw_rendered_text(sprite, location)
     return to_rect(location, [sprite.width sprite.height])
+    end
 end
 
 def draw_text_centered(TTF_Font font, string str, Color color, Point location)

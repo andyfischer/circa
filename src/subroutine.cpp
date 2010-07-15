@@ -49,6 +49,12 @@ namespace subroutine_t {
         // saved then this function will reset this function's stateful values.
         Term* hiddenState = get_hidden_state_for_call(CALLER);
 
+        // Subroutines only support Branches as state, if this state has a non-Branch type
+        // then it was meant to execute as a builtin. As a workaround, we'll ignore a
+        // non-Branch state so that we don't crash.
+        if (hiddenState && !is_branch(hiddenState))
+            hiddenState = NULL;
+
         if (hiddenState != NULL)
             load_state_into_branch(as_branch(hiddenState), functionBranch);
 

@@ -505,6 +505,12 @@ void test_type_check_functions()
     test_snippet("", "not(is_list(1.0))");
 }
 
+void test_state_in_subroutine()
+{
+    // make sure this doesn't crash:
+    test_snippet("def func(state int i) end; func()", "");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -538,6 +544,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
+    REGISTER_TEST_CASE(test_snippets::test_state_in_subroutine);
 }
 
 } // namespace test_snippets
