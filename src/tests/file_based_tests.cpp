@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
+#include <circa.h>
+#include "fake_filesystem.h"
 
 using namespace circa::storage;
 

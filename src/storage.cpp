@@ -14,20 +14,20 @@
 namespace circa {
 namespace storage {
 
-StorageInterface* g_storageInterface = NULL;
+StorageInterface g_storageInterface;
 
 std::string read_text_file(std::string const& filename)
 {
-    if (g_storageInterface == NULL)
+    if (g_storageInterface.readTextFile == NULL)
         return "";
-    return g_storageInterface->read_text_file(filename);
+    return g_storageInterface.readTextFile(filename);
 }
 
 void write_text_file(std::string const& filename, std::string const& contents)
 {
-    if (g_storageInterface == NULL)
+    if (g_storageInterface.writeTextFile == NULL)
         return;
-    return g_storageInterface->write_text_file(filename, contents);
+    return g_storageInterface.writeTextFile(filename, contents);
 }
 
 time_t get_modified_time(std::string const& filename)
@@ -35,24 +35,22 @@ time_t get_modified_time(std::string const& filename)
     if (filename == "")
         return 0;
 
-    if (g_storageInterface == NULL)
+    if (g_storageInterface.getModifiedTime == NULL)
         return 0;
 
-    return g_storageInterface->get_modified_time(filename);
+    return g_storageInterface.getModifiedTime(filename);
 }
-
 
 bool file_exists(std::string const& filename)
 {
-    if (g_storageInterface == NULL)
+    if (g_storageInterface.fileExists == NULL)
         return false;
-    return g_storageInterface->file_exists(filename);
+    return g_storageInterface.fileExists(filename);
 }
 
-// This class handles storage using stdlib file IO.
-struct FilesystemStorage : StorageInterface
+namespace filesystem_storage
 {
-    virtual std::string read_text_file(std::string const& filename)
+    std::string read_text_file(std::string const& filename)
     {
         std::ifstream file;
         file.open(filename.c_str(), std::ios::in);
@@ -69,7 +67,7 @@ struct FilesystemStorage : StorageInterface
         return contents.str();
     }
 
-    virtual void write_text_file(std::string const& filename, std::string const& contents)
+    void write_text_file(std::string const& filename, std::string const& contents)
     {
         std::ofstream file;
         file.open(filename.c_str(), std::ios::out | std::ios::binary);
@@ -77,7 +75,7 @@ struct FilesystemStorage : StorageInterface
         file.close();
     }
 
-    virtual time_t get_modified_time(std::string const& filename)
+    time_t get_modified_time(std::string const& filename)
     {
         struct stat s;
         s.st_mtime = 0;
@@ -87,7 +85,7 @@ struct FilesystemStorage : StorageInterface
         return s.st_mtime;
     }
 
-    virtual bool file_exists(std::string const& filename)
+    bool file_exists(std::string const& filename)
     {
         // This could also be replaced by boost::path
         FILE* fp = fopen(filename.c_str(), "r");
@@ -103,54 +101,20 @@ struct FilesystemStorage : StorageInterface
 
 void install_storage_interface(StorageInterface* interface)
 {
-    g_storageInterface = interface;
+    g_storageInterface = *interface;
+}
+
+void get_current_storage_interface(StorageInterface* interface)
+{
+    *interface = g_storageInterface;
 }
 
 void use_filesystem()
 {
-    static FilesystemStorage *interface = new FilesystemStorage();
-    install_storage_interface(interface);
-}
-
-FakeFileSystem::FakeFileSystem()
-{
-    _previousInterface = g_storageInterface;
-    install_storage_interface(this);
-}
-
-FakeFileSystem::~FakeFileSystem()
-{
-    install_storage_interface(_previousInterface);
-}
-
-std::string& FakeFileSystem::operator [] (std::string const& filename)
-{
-    return _files[filename].contents;
-}
-
-time_t& FakeFileSystem::last_modified(std::string const& filename)
-{
-    return _files[filename].last_modified;
-}
-
-std::string FakeFileSystem::read_text_file(std::string const& filename)
-{
-    return _files[filename].contents;
-}
-
-void FakeFileSystem::write_text_file(std::string const& filename, std::string const& contents)
-{
-    _files[filename].contents = contents;
-}
-
-time_t FakeFileSystem::get_modified_time(std::string const& filename)
-{
-    return _files[filename].last_modified;
-}
-
-bool FakeFileSystem::file_exists(std::string const& filename)
-{
-    return _files.find(filename) != _files.end();
+    g_storageInterface.readTextFile = filesystem_storage::read_text_file;
+    g_storageInterface.writeTextFile = filesystem_storage::write_text_file;
+    g_storageInterface.getModifiedTime = filesystem_storage::get_modified_time;
+    g_storageInterface.fileExists = filesystem_storage::file_exists;
 }
 
 } // namespace storage
