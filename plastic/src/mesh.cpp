@@ -84,7 +84,7 @@ void parse_face(Mesh& mesh, TokenStream& tokens)
 
 void load_obj_file(std::string const& filename, Mesh& mesh)
 {
-    std::string fileContents = read_text_file(filename);
+    std::string fileContents = circa::storage::read_text_file(filename);
 
     TokenStream tokens(fileContents);
 

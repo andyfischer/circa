@@ -295,16 +295,16 @@ CA_FUNCTION(load_program)
     std::string fragFilename =
         get_path_relative_to_source(CALLER, INPUT(1)->asString());
 
-    if (!file_exists(vertFilename)) {
+    if (!circa::storage::file_exists(vertFilename)) {
         error_occurred(CONTEXT_AND_CALLER, "File not found: " + vertFilename);
         return;
     }
-    if (!file_exists(fragFilename)) {
+    if (!circa::storage::file_exists(fragFilename)) {
         error_occurred(CONTEXT_AND_CALLER, "File not found: " + fragFilename);
         return;
     }
 
-    std::string vertContents = read_text_file(vertFilename);
+    std::string vertContents = circa::storage::read_text_file(vertFilename);
     const char* vertContentsCStr = vertContents.c_str();
 
     GLuint vertShader = glCreateShader(GL_VERTEX_SHADER);
@@ -320,7 +320,7 @@ CA_FUNCTION(load_program)
         return;
     }
 
-    std::string fragContents = read_text_file(fragFilename);
+    std::string fragContents = circa::storage::read_text_file(fragFilename);
     const char* fragContentsCStr = fragContents.c_str();
 
     GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
