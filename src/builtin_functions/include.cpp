@@ -5,42 +5,30 @@
 namespace circa {
 namespace include_function {
 
-    std::string find_file(Term* term, std::string const& filename)
-    {
-        // Look for it relative to this source
-        std::string relativePath = get_path_relative_to_source(term, filename);
-        if (storage::file_exists(relativePath))
-            return relativePath;
-
-        if (storage::file_exists(filename))
-            return filename;
-
-        return "";
-    }
-
     void preload_script(EvalContext* cxt, Term* term)
     {
         TaggedValue* fileSignature = term->input(0);
         Branch& contents = as_branch(term);
 
-        std::string filename = term->input(1)->asString();
+        std::string requested_filename = term->input(1)->asString();
+
+        std::string actual_filename =
+            get_path_relative_to_source(term, requested_filename);
 
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(cxt, term, fileSignature, filename))
+        if (file_changed_function::check(cxt, term, fileSignature, actual_filename))
         {
             Branch previous_contents;
             duplicate_branch(contents, previous_contents);
 
             contents.clear();
 
-            std::string foundFilename = find_file(term, filename);
-
-            if (!storage::file_exists(foundFilename)) {
-                error_occurred(cxt, term, "File not found: "+filename);
+            if (!storage::file_exists(actual_filename)) {
+                error_occurred(cxt, term, "File not found: "+actual_filename);
                 return;
             }
 
-            parse_script(contents, foundFilename);
+            parse_script(contents, actual_filename);
 
             if (has_static_errors(contents)) {
                 error_occurred(cxt, term, get_static_errors_formatted(contents));
