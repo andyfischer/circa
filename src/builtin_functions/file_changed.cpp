@@ -8,7 +8,7 @@ namespace file_changed_function {
     bool check(EvalContext* cxt, Term* caller, TaggedValue* fileSignature,
             std::string const& filename)
     {
-        if (!file_exists(filename) && filename != "") {
+        if (!storage::file_exists(filename) && filename != "") {
             error_occurred(cxt, caller, "File not found: " + filename);
             return false;
         }
@@ -16,7 +16,7 @@ namespace file_changed_function {
         TaggedValue* sigFilename = fileSignature->getIndex(0);
         TaggedValue* sigModified = fileSignature->getIndex(1);
 
-        time_t modifiedTime = get_modified_time(filename);
+        time_t modifiedTime = storage::get_modified_time(filename);
 
         if (modifiedTime != as_int(sigModified)
                 || filename != as_string(sigFilename)) {

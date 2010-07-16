@@ -743,9 +743,7 @@ void parse_script(Branch& branch, std::string const& filename)
     // Record the filename
     create_string(branch, filename, "#attr:source-file");
 
-    std::string fileContents = read_text_file(filename);
-
-    //std::cout << "File contents = " << fileContents << std::endl;
+    std::string fileContents = storage::read_text_file(filename);
 
     parser::compile(&branch, parser::statement_list, fileContents);
 }
@@ -759,7 +757,7 @@ void evaluate_script(Branch& branch, std::string const& filename)
 void persist_branch_to_file(Branch& branch)
 {
     std::string filename = get_branch_source_filename(branch);
-    write_text_file(filename, get_branch_source_text(branch) + "\n");
+    storage::write_text_file(filename, get_branch_source_text(branch) + "\n");
 }
 
 std::string get_source_file_location(Branch& branch)

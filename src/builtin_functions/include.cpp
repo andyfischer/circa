@@ -9,10 +9,10 @@ namespace include_function {
     {
         // Look for it relative to this source
         std::string relativePath = get_path_relative_to_source(term, filename);
-        if (file_exists(relativePath))
+        if (storage::file_exists(relativePath))
             return relativePath;
 
-        if (file_exists(filename))
+        if (storage::file_exists(filename))
             return filename;
 
         return "";
@@ -35,7 +35,7 @@ namespace include_function {
 
             std::string foundFilename = find_file(term, filename);
 
-            if (!file_exists(foundFilename)) {
+            if (!storage::file_exists(foundFilename)) {
                 error_occurred(cxt, term, "File not found: "+filename);
                 return;
             }

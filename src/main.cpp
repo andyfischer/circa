@@ -11,6 +11,8 @@ int main(int argc, const char * args[])
 
     circa::initialize();
 
+    circa::storage::use_filesystem();
+
     //circa::temp_test();
 
     int result = 0;

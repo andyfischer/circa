@@ -2,6 +2,8 @@
 
 #include "circa.h"
 
+using namespace circa::storage;
+
 namespace circa {
 namespace file_based_tests {
 
