@@ -14,15 +14,17 @@ std::string get_absolute_path(std::string const& path);
 
 namespace storage {
 
-typedef std::string (*ReadTextFile)(std::string const& filename);
-typedef void (*WriteTextFile)(std::string const& filename, std::string const& contents);
-typedef time_t (*GetModifiedTime)(std::string const& filename);
-typedef bool (*FileExists)(std::string const& filename);
+typedef void (*FileReceiveFunc)(void* context, const char* contents);
+typedef void (*ReadTextFile)(const char* filename, FileReceiveFunc receiveFile, void* context);
+typedef void (*WriteTextFile)(const char* filename, const char* contents);
+typedef time_t (*GetModifiedTime)(const char* filename);
+typedef bool (*FileExists)(const char* filename);
 
-std::string read_text_file(std::string const& filename);
-void write_text_file(std::string const& filename, std::string const& contents);
-time_t get_modified_time(std::string const& filename);
-bool file_exists(std::string const& filename);
+void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context);
+std::string read_text_file_as_str(const char* filename);
+void write_text_file(const char* filename, const char* contents);
+time_t get_modified_time(const char* filename);
+bool file_exists(const char* filename);
 
 struct StorageInterface {
     ReadTextFile readTextFile;

@@ -14,10 +14,10 @@ void test_the_test()
     FakeFileSystem files;
 
     files["a.txt"] = "hello";
-    test_assert(read_text_file("a.txt") == "hello");
+    test_assert(read_text_file_as_str("a.txt") == "hello");
 
     write_text_file("a.txt", "goodbye");
-    test_assert(read_text_file("a.txt") == "goodbye");
+    test_assert(read_text_file_as_str("a.txt") == "goodbye");
     test_assert(files["a.txt"] == "goodbye");
 }
 

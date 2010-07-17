@@ -23,7 +23,7 @@ namespace include_function {
 
             contents.clear();
 
-            if (!storage::file_exists(actual_filename)) {
+            if (!storage::file_exists(actual_filename.c_str())) {
                 error_occurred(cxt, term, "File not found: "+actual_filename);
                 return;
             }

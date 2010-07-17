@@ -16,23 +16,36 @@ namespace storage {
 
 StorageInterface g_storageInterface;
 
-std::string read_text_file(std::string const& filename)
+void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
 {
     if (g_storageInterface.readTextFile == NULL)
-        return "";
-    return g_storageInterface.readTextFile(filename);
+        return;
+    return g_storageInterface.readTextFile(filename, receiveFile, context);
 }
 
-void write_text_file(std::string const& filename, std::string const& contents)
+std::string read_text_file_as_str(const char* filename)
+{
+    struct ReceiveFile {
+        static void Func(void* context, const char* contents) {
+            *((std::string*) context) = contents;
+        }
+    };
+
+    std::string out;
+    read_text_file(filename, ReceiveFile::Func, &out);
+    return out;
+}
+
+void write_text_file(const char* filename, const char* contents)
 {
     if (g_storageInterface.writeTextFile == NULL)
         return;
     return g_storageInterface.writeTextFile(filename, contents);
 }
 
-time_t get_modified_time(std::string const& filename)
+time_t get_modified_time(const char* filename)
 {
-    if (filename == "")
+    if (filename[0] == 0)
         return 0;
 
     if (g_storageInterface.getModifiedTime == NULL)
@@ -41,7 +54,7 @@ time_t get_modified_time(std::string const& filename)
     return g_storageInterface.getModifiedTime(filename);
 }
 
-bool file_exists(std::string const& filename)
+bool file_exists(const char* filename)
 {
     if (g_storageInterface.fileExists == NULL)
         return false;
@@ -50,10 +63,10 @@ bool file_exists(std::string const& filename)
 
 namespace filesystem_storage
 {
-    std::string read_text_file(std::string const& filename)
+    void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
     {
         std::ifstream file;
-        file.open(filename.c_str(), std::ios::in);
+        file.open(filename, std::ios::in);
         std::stringstream contents;
         std::string line;
         bool firstLine = true;
@@ -64,31 +77,32 @@ namespace filesystem_storage
             firstLine = false;
         }
         file.close();
-        return contents.str();
+
+        receiveFile(context, contents.str().c_str());
     }
 
-    void write_text_file(std::string const& filename, std::string const& contents)
+    void write_text_file(const char* filename, const char* contents)
     {
         std::ofstream file;
-        file.open(filename.c_str(), std::ios::out | std::ios::binary);
+        file.open(filename, std::ios::out | std::ios::binary);
         file << contents;
         file.close();
     }
 
-    time_t get_modified_time(std::string const& filename)
+    time_t get_modified_time(const char* filename)
     {
         struct stat s;
         s.st_mtime = 0;
 
-        stat(filename.c_str(), &s);
+        stat(filename, &s);
 
         return s.st_mtime;
     }
 
-    bool file_exists(std::string const& filename)
+    bool file_exists(const char* filename)
     {
         // This could also be replaced by boost::path
-        FILE* fp = fopen(filename.c_str(), "r");
+        FILE* fp = fopen(filename, "r");
         if (fp) {
             // file exists
             fclose(fp);

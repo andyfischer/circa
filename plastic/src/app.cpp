@@ -130,7 +130,7 @@ bool load_runtime()
     std::string runtime_ca_path = find_runtime_file();
     info(std::string("loading runtime: ") + runtime_ca_path);
 
-    if (!circa::storage::file_exists(runtime_ca_path)) {
+    if (!circa::storage::file_exists(runtime_ca_path.c_str())) {
         std::cerr << "fatal: Couldn't find runtime.ca file. (expected at "
             << runtime_ca_path << ")" << std::endl;
         return false;

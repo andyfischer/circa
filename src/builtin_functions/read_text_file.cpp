@@ -8,7 +8,7 @@ namespace read_text_file_function {
     CA_FUNCTION(evaluate)
     {
         std::string filename = as_string(INPUT(0));
-        set_str(OUTPUT, storage::read_text_file(filename));
+        set_str(OUTPUT, storage::read_text_file_as_str(filename.c_str()));
     }
 
     void setup(Branch& kernel)
