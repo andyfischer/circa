@@ -21,10 +21,11 @@ typedef time_t (*GetModifiedTime)(const char* filename);
 typedef bool (*FileExists)(const char* filename);
 
 void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context);
-std::string read_text_file_as_str(const char* filename);
 void write_text_file(const char* filename, const char* contents);
 time_t get_modified_time(const char* filename);
 bool file_exists(const char* filename);
+
+std::string read_text_file_as_str(const char* filename);
 
 struct StorageInterface {
     ReadTextFile readTextFile;

@@ -3,6 +3,7 @@
 #include <circa.h>
 #include <importing_macros.h>
 
+#include "app.h"
 #include "gl_util.h"
 #include "plastic_common_headers.h"
 

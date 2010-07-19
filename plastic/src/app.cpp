@@ -131,13 +131,15 @@ bool load_runtime()
     info(std::string("loading runtime: ") + runtime_ca_path);
 
     if (!circa::storage::file_exists(runtime_ca_path.c_str())) {
-        std::cerr << "fatal: Couldn't find runtime.ca file. (expected at "
+        std::cerr << "fatal: Couldn't find runtime file. (expected at "
             << runtime_ca_path << ")" << std::endl;
         return false;
     }
     parse_script(app::runtime_branch(), runtime_ca_path);
 
     assert(branch_check_invariants(app::runtime_branch(), &std::cout));
+
+    setup_builtin_functions();
 
     return true;
 }

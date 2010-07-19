@@ -1,2 +1,6 @@
 
 background(#00f)
+
+load_font("Sansation_Regular.ttf", 16)
+
+draw_string("Hello world", [20 40], #fff)

@@ -67,7 +67,6 @@
 		B6AA007011EB81CE0094A6E9 /* evaluation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFE611EB81CE0094A6E9 /* evaluation.cpp */; };
 		B6AA007111EB81CE0094A6E9 /* external_api.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFE811EB81CE0094A6E9 /* external_api.cpp */; };
 		B6AA007211EB81CE0094A6E9 /* feedback.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFEA11EB81CE0094A6E9 /* feedback.cpp */; };
-		B6AA007311EB81CE0094A6E9 /* file_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFEC11EB81CE0094A6E9 /* file_io.cpp */; };
 		B6AA007411EB81CE0094A6E9 /* for_loops.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFEE11EB81CE0094A6E9 /* for_loops.cpp */; };
 		B6AA007511EB81CE0094A6E9 /* function.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFF011EB81CE0094A6E9 /* function.cpp */; };
 		B6AA007711EB81CE0094A6E9 /* all_builtin_functions.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AAFFF411EB81CE0094A6E9 /* all_builtin_functions.cpp */; };
@@ -106,7 +105,19 @@
 		B6AA00F211EB8AB40094A6E9 /* gl_shapes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AA00D511EB8AB40094A6E9 /* gl_shapes.cpp */; };
 		B6AA00F311EB8AB40094A6E9 /* gl_util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AA00D711EB8AB40094A6E9 /* gl_util.cpp */; };
 		B6AA00F411EB8AB40094A6E9 /* ide.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6AA00D911EB8AB40094A6E9 /* ide.cpp */; };
+		B6C07FE411F187DC0098103A /* storage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C07FE211F187DC0098103A /* storage.cpp */; };
+		B6C07FE911F187FE0098103A /* fake_filesystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B6C07FE711F187FE0098103A /* fake_filesystem.cpp */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B62B3CE011F3AC3D00E21F49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B62B3CDC11F3AC3D00E21F49 /* iPhone+OF Lib.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BB24DED610DA7A3F00E9C588;
+			remoteInfo = "iPhone+OF Static Library";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -158,6 +169,7 @@
 		B6270B5411EF79A90016AB56 /* text_input.ca */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = text_input.ca; sourceTree = "<group>"; };
 		B6270B5511EF79A90016AB56 /* ui_widgets.ca */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ui_widgets.ca; sourceTree = "<group>"; };
 		B6270B5611EF79A90016AB56 /* vector_drawing.ca */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vector_drawing.ca; sourceTree = "<group>"; };
+		B62B3CDC11F3AC3D00E21F49 /* iPhone+OF Lib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = "iPhone+OF Lib.xcodeproj"; path = "../../../openFrameworks/libs/openFrameworksCompiled/project/iphone/iPhone+OF Lib.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		B645650411EE256500325D54 /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = app.cpp; sourceTree = "<group>"; };
 		B645650511EE256500325D54 /* app.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = app.h; sourceTree = "<group>"; };
 		B645650611EE256500325D54 /* platform_ipad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = platform_ipad.cpp; sourceTree = "<group>"; };
@@ -261,8 +273,6 @@
 		B6AAFFE911EB81CE0094A6E9 /* external_api.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = external_api.h; path = ../../src/external_api.h; sourceTree = SOURCE_ROOT; };
 		B6AAFFEA11EB81CE0094A6E9 /* feedback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = feedback.cpp; path = ../../src/feedback.cpp; sourceTree = SOURCE_ROOT; };
 		B6AAFFEB11EB81CE0094A6E9 /* feedback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = feedback.h; path = ../../src/feedback.h; sourceTree = SOURCE_ROOT; };
-		B6AAFFEC11EB81CE0094A6E9 /* file_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = file_io.cpp; path = ../../src/file_io.cpp; sourceTree = SOURCE_ROOT; };
-		B6AAFFED11EB81CE0094A6E9 /* file_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file_io.h; path = ../../src/file_io.h; sourceTree = SOURCE_ROOT; };
 		B6AAFFEE11EB81CE0094A6E9 /* for_loops.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = for_loops.cpp; path = ../../src/for_loops.cpp; sourceTree = SOURCE_ROOT; };
 		B6AAFFEF11EB81CE0094A6E9 /* for_loops.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = for_loops.h; path = ../../src/for_loops.h; sourceTree = SOURCE_ROOT; };
 		B6AAFFF011EB81CE0094A6E9 /* function.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = function.cpp; path = ../../src/function.cpp; sourceTree = SOURCE_ROOT; };
@@ -279,6 +289,10 @@
 		B6AAFFFD11EB81CE0094A6E9 /* importing_macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = importing_macros.h; path = ../../src/importing_macros.h; sourceTree = SOURCE_ROOT; };
 		B6AAFFFE11EB81CE0094A6E9 /* importing.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = importing.cpp; path = ../../src/importing.cpp; sourceTree = SOURCE_ROOT; };
 		B6AAFFFF11EB81CE0094A6E9 /* importing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = importing.h; path = ../../src/importing.h; sourceTree = SOURCE_ROOT; };
+		B6C07FE211F187DC0098103A /* storage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = storage.cpp; path = ../../src/storage.cpp; sourceTree = SOURCE_ROOT; };
+		B6C07FE311F187DC0098103A /* storage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = storage.h; path = ../../src/storage.h; sourceTree = SOURCE_ROOT; };
+		B6C07FE711F187FE0098103A /* fake_filesystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fake_filesystem.cpp; path = ../../src/fake_filesystem.cpp; sourceTree = SOURCE_ROOT; };
+		B6C07FE811F187FE0098103A /* fake_filesystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fake_filesystem.h; path = ../../src/fake_filesystem.h; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -332,6 +346,7 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				B62B3CDC11F3AC3D00E21F49 /* iPhone+OF Lib.xcodeproj */,
 				B6270B3811EF79A80016AB56 /* demos */,
 				B6270B5011EF79A90016AB56 /* runtime */,
 				B6AA00D011EB8AB40094A6E9 /* plastic */,
@@ -420,6 +435,14 @@
 			path = ../../plastic/runtime;
 			sourceTree = SOURCE_ROOT;
 		};
+		B62B3CDD11F3AC3D00E21F49 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B62B3CE111F3AC3D00E21F49 /* libofxiPhoneOFLib_iphoneos _Debug.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		B6AA00D011EB8AB40094A6E9 /* plastic */ = {
 			isa = PBXGroup;
 			children = (
@@ -444,6 +467,10 @@
 		B6AAFFC611EB819D0094A6E9 /* circa */ = {
 			isa = PBXGroup;
 			children = (
+				B6C07FE711F187FE0098103A /* fake_filesystem.cpp */,
+				B6C07FE811F187FE0098103A /* fake_filesystem.h */,
+				B6C07FE211F187DC0098103A /* storage.cpp */,
+				B6C07FE311F187DC0098103A /* storage.h */,
 				B6AAFFC711EB81CE0094A6E9 /* branch_iterator.cpp */,
 				B6AAFFC811EB81CE0094A6E9 /* branch_iterator.h */,
 				B6AAFFC911EB81CE0094A6E9 /* branch.cpp */,
@@ -481,8 +508,6 @@
 				B6AAFFE911EB81CE0094A6E9 /* external_api.h */,
 				B6AAFFEA11EB81CE0094A6E9 /* feedback.cpp */,
 				B6AAFFEB11EB81CE0094A6E9 /* feedback.h */,
-				B6AAFFEC11EB81CE0094A6E9 /* file_io.cpp */,
-				B6AAFFED11EB81CE0094A6E9 /* file_io.h */,
 				B6AAFFEE11EB81CE0094A6E9 /* for_loops.cpp */,
 				B6AAFFEF11EB81CE0094A6E9 /* for_loops.h */,
 				B6AAFFF011EB81CE0094A6E9 /* function.cpp */,
@@ -595,12 +620,28 @@
 			hasScannedForEncodings = 1;
 			mainGroup = 29B97314FDCFA39411CA2CEA /* CustomTemplate */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = B62B3CDD11F3AC3D00E21F49 /* Products */;
+					ProjectRef = B62B3CDC11F3AC3D00E21F49 /* iPhone+OF Lib.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				1D6058900D05DD3D006BFB54 /* circa */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		B62B3CE111F3AC3D00E21F49 /* libofxiPhoneOFLib_iphoneos _Debug.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = "libofxiPhoneOFLib_iphoneos _Debug.a";
+			remoteRef = B62B3CE011F3AC3D00E21F49 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		1D60588D0D05DD3D006BFB54 /* Resources */ = {
@@ -671,7 +712,6 @@
 				B6AA007011EB81CE0094A6E9 /* evaluation.cpp in Sources */,
 				B6AA007111EB81CE0094A6E9 /* external_api.cpp in Sources */,
 				B6AA007211EB81CE0094A6E9 /* feedback.cpp in Sources */,
-				B6AA007311EB81CE0094A6E9 /* file_io.cpp in Sources */,
 				B6AA007411EB81CE0094A6E9 /* for_loops.cpp in Sources */,
 				B6AA007511EB81CE0094A6E9 /* function.cpp in Sources */,
 				B6AA007711EB81CE0094A6E9 /* all_builtin_functions.cpp in Sources */,
@@ -712,6 +752,8 @@
 				B6AA00F411EB8AB40094A6E9 /* ide.cpp in Sources */,
 				B645650811EE256500325D54 /* app.cpp in Sources */,
 				B645650911EE256500325D54 /* platform_ipad.cpp in Sources */,
+				B6C07FE411F187DC0098103A /* storage.cpp in Sources */,
+				B6C07FE911F187FE0098103A /* fake_filesystem.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -759,7 +801,7 @@
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../src;
+				HEADER_SEARCH_PATHS = $CIRCA_HOME/src;
 				PREBINDING = NO;
 				SDKROOT = iphoneos3.2;
 				TARGETED_DEVICE_FAMILY = 2;
@@ -775,7 +817,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = PLASTIC_IPAD;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = ../../src;
+				HEADER_SEARCH_PATHS = $CIRCA_HOME/src;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
 				SDKROOT = iphoneos3.2;

@@ -106,8 +106,11 @@ namespace gl begin
     def set_uniform(string name, any value) {}
 end
 
+def load_font(string filename, int size) {}
+def draw_string(string str, Point loc, Color color) {}
+
 -- Drawing utils
-include('runtime/vector_drawing.ca')
+include('vector_drawing.ca')
 
 -- Time-based stateful functions
 def alternate_over_time(number period) -> bool

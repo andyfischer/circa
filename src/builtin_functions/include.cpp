@@ -12,8 +12,9 @@ namespace include_function {
 
         std::string requested_filename = term->input(1)->asString();
 
-        std::string actual_filename =
-            get_path_relative_to_source(term, requested_filename);
+        std::string actual_filename = requested_filename;
+
+        //std::string actual_filename = get_path_relative_to_source(term, requested_filename);
 
         // Reload if the filename or modified-time has changed
         if (file_changed_function::check(cxt, term, fileSignature, actual_filename))

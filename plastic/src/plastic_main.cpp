@@ -105,7 +105,6 @@ int plastic_main(std::vector<std::string> args)
         return 1;
     }
 
-    if (!app::setup_builtin_functions()) return 1;
     if (!initialize_display()) return 1;
 
     // Main loop
