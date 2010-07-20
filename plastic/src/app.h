@@ -65,6 +65,7 @@ bool reload_runtime();
 
 bool initialize();
 bool evaluate_main_script();
+void update_time_from_elapsed_millis(int elapsed_millis);
 //bool reload_runtime();
 
 } // namespace app

@@ -232,4 +232,15 @@ bool evaluate_main_script()
     return true;
 }
 
+void update_time_from_elapsed_millis(int elapsed_millis)
+{
+    static long previousMillis = elapsed_millis;
+    int ticksAdvanced = elapsed_millis - previousMillis;
+    previousMillis = elapsed_millis;
+
+    if (!app::paused()) {
+        app::singleton()._ticksElapsed += ticksAdvanced;
+    }
+}
+
 } // namespace app

@@ -36,6 +36,30 @@ time_delta = delta(time)
 render_duration = 0.0
 td = time_delta -- shorthand
 
+int TouchEvent_down = 1
+int TouchEvent_moved = 2
+int TouchEvent_up = 3
+int TouchEvent_doubleTap = 4
+
+type TouchEvent {
+    int id
+    int time
+    int eventType
+    Point loc
+    int numTouches
+    Point size
+    number angle
+    number minoraxis
+    number majoraxis
+    number pressure
+    Point speed
+    Point accel
+}
+
+state List incoming_touch_events = []
+
+trace('incoming_touch_events: ' incoming_touch_events)
+
 -- Input
 type Keypress {
     string character

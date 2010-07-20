@@ -1,6 +1,120 @@
 
-background(#00f)
+background(#003)
 
 load_font("Sansation_Regular.ttf", 16)
 
 draw_string("Hello world", [20 40], #fff)
+
+-- Draw a console where old messages fade out
+namespace console
+    type Item {
+        number createdAt
+        string str
+    }
+
+    number max_lifetime = 10.0
+    state List items = []
+
+    incoming_items = inbox()
+
+    for incoming_item in incoming_items
+        items.append(incoming_item)
+    end
+
+    -- draw
+    for item in items
+        @item -> Item
+
+        trace(item)
+    end
+end
+
+for event in incoming_touch_events
+    send(console:incoming_items, [time() to_string(event)]
+end
+
+type Star {
+    Point loc
+    number rot
+    number size
+}
+
+star_color = #f39
+state global_scale = 1.0
+
+def draw_star(Star star)
+  radius = star.size * global_scale -> number
+  num_points = 5
+
+  rot = star.rot + time/5
+
+  def draw_tip(int index)
+    angle = index / num_points + rot
+    l_angle = (index+.5) / num_points + rot
+    r_angle = (index-.5) / num_points + rot
+    outer_point = polar(angle)*radius + star.loc
+    l_point = polar(l_angle)*(radius / 2) + star.loc
+    r_point = polar(r_angle)*(radius / 2) + star.loc
+
+    gl:triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
+  end
+
+  for t in 0..num_points
+    draw_tip(t)
+  end
+end
+
+state stars = []
+
+-- Draw a black background
+
+-- Draw an X where the mouse is
+begin
+  def draw_quad(List points, Color color)
+      gl:triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
+  end
+
+  cross_color = #f396
+  cross_thickness = 4.0
+  cross_length = 12.0
+
+  def draw_arm(number rot) -> List
+      near_center = polar(rot) * cross_thickness + mouse
+      near_l = polar(rot - .25) * (cross_thickness/2) + near_center
+      near_r = polar(rot + .25) * (cross_thickness/2) + near_center
+      far_center = polar(rot) * cross_length + mouse
+      far_l = polar(rot - .25) * (cross_thickness/2) + far_center
+      far_r = polar(rot + .25) * (cross_thickness/2) + far_center
+      draw_quad([near_l far_l far_r near_r] cross_color)
+  end
+
+  for rot in [.25 .5 .75 1]
+      draw_arm(rot + -time)
+  end
+end
+
+-- Clicking will create a new spinning star
+if mouse_clicked()
+  -- Check if we clicked on an existing star
+  stars.append([mouse rand() 40])
+end
+
+-- Adjust the size of stars with the mouse wheel
+if mouse_wheel_up()
+    global_scale *= 1.1
+elif mouse_wheel_down()
+    global_scale *= 0.9
+end
+
+-- Draw each star
+for star in stars
+  draw_star(star)
+end
+
+-- Draw some text showing the mouse position
+draw_string(concat("Mouse location: " mouse.x ' ' mouse.y) [10 window.height - 40], #fff)
+draw_string(concat("Pressed: " mouse_pressed()) [10 window.height - 20] #fff)
+
+
+
+

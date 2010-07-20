@@ -1,5 +1,5 @@
 desired_window_size = [400 400]
-desired_window_title = 'tweak.ca'
+desired_window_title = 'mouse.ca'
 
 type Star {
     Point loc
