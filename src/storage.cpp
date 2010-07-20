@@ -173,7 +173,7 @@ std::string get_path_relative_to_source(Term* relativeTo, std::string const& pat
 
     std::string scriptLocation = get_source_file_location(*relativeTo->owningBranch);
 
-    if (scriptLocation == "")
+    if (scriptLocation == "" || scriptLocation == ".")
         return path;
 
     return scriptLocation + "/" + path;

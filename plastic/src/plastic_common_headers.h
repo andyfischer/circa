@@ -73,6 +73,7 @@ struct ReferenceMap;
 #ifdef PLASTIC_IPAD
 
     #define PLASTIC_OGL_ES
+    #define USE_OPENFRAMEWORKS
 
     #include <OpenGLES/ES1/gl.h>
     #include <OpenGLES/ES1/glext.h>

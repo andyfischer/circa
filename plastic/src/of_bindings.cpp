@@ -1,5 +1,7 @@
 // Copyright (c) 2010 Paul Hodge. All rights reserved.
 
+#include "plastic_common_headers.h"
+
 #ifdef USE_OPENFRAMEWORKS
 
 #include "ofMain.h"
