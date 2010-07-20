@@ -1,5 +1,7 @@
 // Copyright (c) 2010 Paul Hodge. All rights reserved.
 
+#ifdef USE_OPENFRAMEWORKS
+
 #include "ofMain.h"
 #include "ofGraphics.h"
 #include "ofTrueTypeFont.h"
@@ -55,3 +57,6 @@ void setup()
 }
 
 } // namespace of_bindings
+
+#endif
+;

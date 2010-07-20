@@ -164,7 +164,7 @@ CA_FUNCTION(gl_lines)
     
     glVertexPointer(3, GL_FLOAT, 0, buffer.get());
     glEnableClientState(GL_VERTEX_ARRAY);
-    glDrawArrays(GL_LINE_LOOP, 0, numElements);
+    glDrawArrays(GL_LINES, 0, numElements);
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
