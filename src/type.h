@@ -102,6 +102,9 @@ struct Type
     // argument.
     Branch memberFunctions;
 
+    // Default value
+    TaggedValue defaultValue;
+
     int refCount;
     bool permanent;
 
@@ -186,11 +189,9 @@ namespace type_t {
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);
     Branch& get_prototype(Term* type);
+    Branch& get_prototype(Type* type);
     Branch& get_attributes(Term* type);
-    Term* get_default_value(Term* type);
     TaggedValue* get_default_value(Type* type);
-
-    void enable_default_value(Term* type);
 }
 
 Type& as_type(Term* term);

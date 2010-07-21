@@ -192,8 +192,7 @@ void reset(TaggedValue* value)
 
     // Check if there is a default value defined
     TaggedValue* defaultValue = type_t::get_default_value(type);
-    if (defaultValue != NULL
-            && defaultValue->value_type != VOID_T) {
+    if (defaultValue != NULL && !is_null(defaultValue)) {
         copy(defaultValue, value);
         return;
     }

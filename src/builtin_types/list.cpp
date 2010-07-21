@@ -45,7 +45,7 @@ void tv_initialize(Type* type, TaggedValue* value)
     assert(value->value_data.ptr == NULL);
 
     // If type has a prototype then initialize to that.
-    Branch& prototype = type->prototype;
+    Branch& prototype = type_t::get_prototype(type);
     if (prototype.length() > 0) {
         List* list = List::checkCast(value);
         list->resize(prototype.length());

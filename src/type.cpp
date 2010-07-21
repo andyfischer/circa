@@ -108,27 +108,17 @@ namespace type_t {
     {
         return as_type(type).prototype;
     }
+    Branch& get_prototype(Type* type)
+    {
+        return type->prototype;
+    }
     Branch& get_attributes(Term* type)
     {
         return as_type(type).attributes;
     }
-    Term* get_default_value(Term* type)
-    {
-        Branch& attributes = as_type(type).attributes;
-        if (attributes.length() < 1) return NULL;
-        return attributes[0];
-    }
     TaggedValue* get_default_value(Type* type)
     {
-        Branch& attributes = type->attributes;
-        if (attributes.length() < 1) return NULL;
-        return attributes[0];
-    }
-    void enable_default_value(Term* type)
-    {
-        if (get_default_value(type) == NULL)
-            create_value(type_t::get_attributes(type), VOID_TYPE, "defaultValue");
-        change_type(get_default_value(type), type);
+        return &type->defaultValue;
     }
 
 } // namespace type_t

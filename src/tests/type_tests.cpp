@@ -127,19 +127,6 @@ void test_is_native_type()
     test_assert(is_native_type(TYPE_TYPE));
 }
 
-void test_to_string()
-{
-    // Test on some native types
-    // FIXME
-    //test_equals(to_string(INT_TYPE), "<NativeType int>");
-    //test_equals(to_string(FLOAT_TYPE), "<NativeType number>");
-    //test_equals(to_string(BOOL_TYPE), "<NativeType bool>");
-    //test_equals(to_string(STRING_TYPE), "<NativeType string>");
-    //test_equals(to_string(TYPE_TYPE), "<NativeType Type>");
-
-    // to_string for compound types is handled in source_repro_tests.cpp
-}
-
 void test_default_values()
 {
     Branch branch;
@@ -312,7 +299,6 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
-    REGISTER_TEST_CASE(type_tests::test_to_string);
     REGISTER_TEST_CASE(type_tests::test_default_values);
     REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
