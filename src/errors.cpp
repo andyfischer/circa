@@ -6,7 +6,7 @@
 
 namespace circa {
 
-const bool ASSERT_INTERNAL_ERROR = true;
+const bool ASSERT_INTERNAL_ERROR = false;
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
@@ -32,6 +32,15 @@ void internal_error(const char* message)
         assert(false);
     } else {
         throw std::runtime_error(message);
+    }
+}
+
+void circa_assert_unmacro(bool expr, const char* exprStr, int line, const char* file)
+{
+    if (!expr) {
+        std::stringstream msg;
+        msg << "circa_assert(" << exprStr << ") failed in " << file << " line " << line;
+        internal_error(msg.str().c_str());
     }
 }
 

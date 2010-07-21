@@ -53,8 +53,6 @@ void update()
     
 void render()
 {
-    app::info("platform_ipad::render()");
-
     gl_clear_error();
     app::evaluate_main_script();
 

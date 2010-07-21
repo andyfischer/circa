@@ -1,9 +1,10 @@
 
-background(#003)
+bg_color = #003
+background(bg_color)
 
 load_font("Sansation_Regular.ttf", 16)
 
-draw_string("Hello world", [20 40], #fff)
+state Point last_touch_position
 
 -- Draw a console where old messages fade out
 namespace console
@@ -12,7 +13,7 @@ namespace console
         string str
     }
 
-    number max_lifetime = 10.0
+    number max_lifetime = 5.0
     state List items = []
 
     incoming_items = inbox()
@@ -22,15 +23,35 @@ namespace console
     end
 
     -- draw
-    for item in items
+    index = 0
+    for item in @items
         @item -> Item
 
-        trace(item)
+        lifetime = time - item.createdAt
+        lifespan = lifetime / max_lifetime
+
+        fade = 1.0
+        if lifespan > .8
+            fade = (1.0 - lifespan) / .2
+        end
+
+        y = 40 + index * 30
+
+        color = #fff + (bg_color - #fff) * (1.0 - fade)
+        color[3] = 1.0
+        draw_string(item.str, [10 y] color)
+
+        if lifetime > max_lifetime
+            discard
+        end
+        index += 1
     end
 end
 
 for event in incoming_touch_events
-    send(console:incoming_items, [time() to_string(event)]
+    send(console:incoming_items, [time to_string(event)])
+
+    last_touch_position = event.loc
 end
 
 type Star {
@@ -41,6 +62,8 @@ type Star {
 
 star_color = #f39
 state global_scale = 1.0
+
+global_scale = 1.0
 
 def draw_star(Star star)
   radius = star.size * global_scale -> number
@@ -69,6 +92,9 @@ state stars = []
 -- Draw a black background
 
 -- Draw an X where the mouse is
+--   (unnecessary cast to Point, probably means bug in type inferrence)
+mouse = last_touch_position -> Point
+
 begin
   def draw_quad(List points, Color color)
       gl:triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
@@ -114,7 +140,3 @@ end
 -- Draw some text showing the mouse position
 draw_string(concat("Mouse location: " mouse.x ' ' mouse.y) [10 window.height - 40], #fff)
 draw_string(concat("Pressed: " mouse_pressed()) [10 window.height - 20] #fff)
-
-
-
-

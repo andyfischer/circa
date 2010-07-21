@@ -58,8 +58,6 @@ type TouchEvent {
 
 state List incoming_touch_events = []
 
-trace('incoming_touch_events: ' incoming_touch_events)
-
 -- Input
 type Keypress {
     string character
@@ -197,67 +195,6 @@ end
 fps = fps_counter:lastRecoredFps
 
 
-namespace tweak begin
-    def button(Ref r, Point loc, string name)
-        "Draw a button which displays the value of 'r', allowing the user to tweak that value using mouse input."
-        str = concat(name ' = ' r.to_string())
-
-        text_sprite = text:render_text(ui_font_medium, str, #000)
-        padding = 3.0
-        rect = [loc.x - padding, loc.y - padding,
-            loc.x + text_sprite.width + padding,
-            loc.y + text_sprite.height + padding]
-        color = #ee3399
-        if mouse_in(rect) color = #ff44aa end
-        fill_rect(rect, color)
-        --text:draw_rendered_text(text_sprite, [loc.x loc.y])
-
-        -- mouse wheel
-        if mouse_wheel_up(rect)
-            r.tweak(-1)
-        elif mouse_wheel_down(rect)
-            r.tweak(1)
-        end
-
-        -- click and drag
-        state mouse_dragging = false
-        state Point mouse_drag_previous_point = [0 0]
-        if mouse_clicked(rect)
-            mouse_dragging = true
-            mouse_drag_previous_point = mouse
-        elif not(mouse_pressed())
-            mouse_dragging = false
-        end
-
-        if mouse_dragging
-            delta = (mouse - mouse_drag_previous_point) -> Point
-            mouse_drag_previous_point = mouse
-            steps = round(delta.y)
-            r.tweak(steps)
-        end
-    end
-end
-
--- Support for postprocess operations using FBOs
-namespace postprocess begin
-    type Surface {
-        int tex_id
-        int fbo_id
-        int width
-        int height
-    }
-
-    def make_surface(state Surface _state, Point size) -> Surface {}
-    def bind_surface(Surface surface) {}
-    def draw_surface(Surface source) {}
-    def draw_surface_at(Surface source, Rect rect) {}
-    def copy_surface(Surface source, Surface dest) {}
-
-    main_surface = [0 0 window.width window.height] -> Surface
-
-    def bind_main_surface(): bind_surface(main_surface)
-end
-
 -- Load the user's script
 state string user_script_filename = path("../demos/demo_browser.ca")
 
@@ -269,37 +206,6 @@ def load_user_script(string filename):
 for filename in load_user_script_request:
     user_script_filename = filename
 
-trace("Running script: " user_script_filename)
+--trace("Running script: " user_script_filename)
 
 users_branch = include(user_script_filename)
-
-def post_game_stuff()
-    -- Draw HUD
-    draw_main_menu = false
-    if draw_main_menu
-      include('mainmenu.ca')
-    end
-
-    -- Draw fpses
-    draw_fps = false
-    if draw_fps
-        --text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
-        --text:draw_rendered_text(text_sprite, [10 window.height - 40])
-    end
-
-    -- Draw pause indicator
-    if ide:paused()
-        --draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
-    end
-
-    -- Name selector
-    if toggle(key_pressed('b'))
-        br = branch_ref(users_branch)
-        x = 10, y = 10
-        for r in br.get_configs_nested()
-            tweak:button(r, [x y], br.get_relative_name(r))
-            y += 24
-        end
-    end
-end
-post_game_stuff()

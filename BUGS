@@ -1,2 +1,9 @@
 
 BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
+
+This syntax error isn't handled well:
+ function( end
+It should throw an error on encountering the unexpected 'end'
+
+
+Color math is kind of weird and has lots of pitfalls, perhaps we just need blend_color().

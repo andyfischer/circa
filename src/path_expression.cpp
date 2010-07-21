@@ -66,8 +66,8 @@ TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
     
 void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValue* newValue)
 {
-    assert(path.length() > 0);
-    assert(head != newValue);
+    circa_assert(path.length() > 0);
+    circa_assert(head != newValue);
 
     int numElements = path._elements.size();
     for (int i=0; i < numElements; i++) {
