@@ -130,6 +130,7 @@ end
 
 def load_font(string filename, int size) {}
 def draw_string(string str, Point loc, Color color) {}
+def get_string_dimensions(string str) -> Point {}
 
 -- Drawing utils
 include('vector_drawing.ca')

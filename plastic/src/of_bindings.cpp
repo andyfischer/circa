@@ -45,9 +45,23 @@ CA_FUNCTION(draw_string)
         color->getIndex(2)->toFloat() * 255,
         color->getIndex(3)->toFloat() * 255);
 
-    mainFont->drawString(STRING_INPUT(0),
-            loc->getIndex(0)->toFloat(),
-            loc->getIndex(1)->toFloat());
+    float x = loc->getIndex(0)->toFloat();
+    float y = loc->getIndex(1)->toFloat();
+
+    y += mainFont->getLineHeight();
+
+    mainFont->drawString(STRING_INPUT(0), x, y);
+}
+
+CA_FUNCTION(get_string_dimensions)
+{
+    if (mainFont == NULL)
+        return error_occurred(CONTEXT, CALLER, "no font loaded");
+        
+    float width = mainFont->stringWidth(STRING_INPUT(0));
+    
+    set_float(OUTPUT->getIndex(0), width);
+    set_float(OUTPUT->getIndex(1), mainFont->getLineHeight());
 }
 
 void setup()
@@ -56,6 +70,7 @@ void setup()
 
     install_function(branch["load_font"], load_font);
     install_function(branch["draw_string"], draw_string);
+    install_function(branch["get_string_dimensions"], get_string_dimensions);
 }
 
 } // namespace of_bindings

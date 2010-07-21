@@ -1,8 +1,8 @@
 
-bg_color = #003
+bg_color = #fff
 background(bg_color)
 
-load_font("Sansation_Regular.ttf", 16)
+load_font("SVBasicManual.ttf", 12)
 
 state Point last_touch_position
 
@@ -35,7 +35,7 @@ namespace console
             fade = (1.0 - lifespan) / .2
         end
 
-        y = 40 + index * 30
+        y = 40 + index * 20
 
         color = #fff + (bg_color - #fff) * (1.0 - fade)
         color[3] = 1.0
@@ -62,8 +62,6 @@ type Star {
 
 star_color = #f39
 state global_scale = 1.0
-
-global_scale = 1.0
 
 def draw_star(Star star)
   radius = star.size * global_scale -> number
@@ -137,6 +135,89 @@ for star in stars
   draw_star(star)
 end
 
--- Draw some text showing the mouse position
-draw_string(concat("Mouse location: " mouse.x ' ' mouse.y) [10 window.height - 40], #fff)
-draw_string(concat("Pressed: " mouse_pressed()) [10 window.height - 20] #fff)
+-- Draw code browser
+namespace editor
+
+    def get_highlight_color(int highlight_type) -> Color
+        if highlight_type == styled_source:literal_string
+            return #884c03
+        elif highlight_type == styled_source:literal_number
+            return #2f2be2
+        elif highlight_type == styled_source:paren
+            return #003366
+        elif highlight_type == styled_source:comment
+            return #505050
+        elif highlight_type == styled_source:name
+            return #003366
+        elif highlight_type == styled_source:type_name
+            return #003366
+        elif highlight_type == styled_source:function_name
+            return #aa3366
+        elif highlight_type == styled_source:infix_operator
+            return #aa3366
+        elif highlight_type == styled_source:keyword
+            return #000000
+        else
+            return #003366
+        end
+    end
+end
+
+def draw_code_editor(Point topleft, BranchRef branch)
+    source = format_source(branch)
+
+    letter_width = 8
+    letter_height = 17
+
+    current_line = 0
+    current_col = 0
+    i = 0
+    for phrase in source
+        s = phrase[0] -> string
+        r = phrase[1] -> Ref
+        t = phrase[2] -> int
+
+        loc = [current_col*letter_width current_line*letter_height] -> Point
+        loc += topleft
+
+        color = editor:get_highlight_color(t)
+
+        -- don't draw newline characters
+        visable_s = cond(s == '\n', "", s)
+        text_sprite_size = get_string_dimensions(visable_s)
+        rect = to_rect(loc, [text_sprite_size.x text_sprite_size.y])
+
+        bg_color = #fff0
+        cond(mouse_over(rect) #ffe @bg_color)
+
+        draw_highlight_rect = t != styled_source:whitespace
+
+        if draw_highlight_rect
+            fill_rect(rect, bg_color)
+        end
+
+        draw_string(visable_s loc color)
+
+        if mouse_wheel_up(rect)
+            r.tweak(-1)
+        elif mouse_wheel_down(rect)
+            r.tweak(1)
+        end
+
+        i += 1
+        current_col += s.length()
+        if (s == '\n')
+            current_col = 0
+            current_line += 1
+        end
+    end
+end
+
+sample_code = begin
+    a = 1
+    b = 2
+    c = a + b
+    d = c * 5
+end
+
+draw_code_editor([10 10] draw_code_editor -> branch_ref)

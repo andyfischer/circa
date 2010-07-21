@@ -12,6 +12,9 @@ namespace assign_function {
         PathExpression path = get_lexpr_path_expression(root);
         root = path._head;
         TaggedValue* value = INPUT(1);
+        
+        if (path.length() <= 0)
+            return error_occurred(CONTEXT, CALLER, "Empty path expression");
 
         copy(root, OUTPUT);
         touch(OUTPUT);
