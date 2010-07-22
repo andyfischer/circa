@@ -30,9 +30,7 @@ namespace file_changed_function {
 
     CA_FUNCTION(evaluate)
     {
-        std::string actual_filename = get_path_relative_to_source(CALLER,
-            INPUT(1)->asString());
-        set_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), actual_filename));
+        set_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), INPUT(1)->asString()));
     }
 
     void setup(Branch& kernel)

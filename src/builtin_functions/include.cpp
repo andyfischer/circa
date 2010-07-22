@@ -10,24 +10,22 @@ namespace include_function {
         TaggedValue* fileSignature = term->input(0);
         Branch& contents = as_branch(term);
 
-        std::string requested_filename = term->input(1)->asString();
-
-        std::string actual_filename = get_path_relative_to_source(term, requested_filename);
+        std::string filename = term->input(1)->asString();
 
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(cxt, term, fileSignature, actual_filename))
+        if (file_changed_function::check(cxt, term, fileSignature, filename))
         {
             Branch previous_contents;
             duplicate_branch(contents, previous_contents);
 
             contents.clear();
 
-            if (!storage::file_exists(actual_filename.c_str())) {
-                error_occurred(cxt, term, "File not found: "+actual_filename);
+            if (!storage::file_exists(filename.c_str())) {
+                error_occurred(cxt, term, "File not found: "+filename);
                 return;
             }
 
-            parse_script(contents, actual_filename);
+            parse_script(contents, filename);
 
             if (has_static_errors(contents)) {
                 error_occurred(cxt, term, get_static_errors_formatted(contents));

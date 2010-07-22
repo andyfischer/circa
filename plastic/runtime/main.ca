@@ -165,7 +165,7 @@ def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rot
     "(experimental) Draw a 3d mesh to the screen."
 
 -- Drawing utils
-include('vector_drawing.ca')
+include(path('vector_drawing.ca'))
 
 -- Time-based stateful functions
 def alternate_over_time(number period) -> bool:
@@ -206,8 +206,8 @@ def draggable_rect(Point initial_location, Point size) -> Point
     return location
 end
 
-ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 16)
-coding_font = text:load_font("../assets/inconsolata.otf", 16)
+ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->path, 16)
+coding_font = text:load_font("../assets/inconsolata.otf"->path, 16)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -292,8 +292,8 @@ namespace postprocess begin
 end
 
 -- Include other runtime scripts
-include('text_input.ca')
-include('ui_widgets.ca')
+include('text_input.ca' -> path)
+include('ui_widgets.ca' -> path)
 
 -- Load the user's script
 state string user_script_filename = path("../demos/demo_browser.ca")
@@ -312,7 +312,7 @@ def post_game_stuff()
     -- Draw HUD
     draw_main_menu = false
     if draw_main_menu
-      include('mainmenu.ca')
+      include('mainmenu.ca' -> path)
     end
 
     -- Draw fpses

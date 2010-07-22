@@ -940,6 +940,8 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
     Term* filenameTerm = create_string(branch, filename);
     set_source_hidden(filenameTerm, true);
 
+    evaluate_without_side_effects(filenameTerm);
+
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
     include_function::preload_script(NULL, result);
@@ -1249,10 +1251,9 @@ Term* function_call(Branch& branch, Term* function, std::string const& nameUsed,
     inputHints.apply(result);
 
     // Special case for include() function: expand the contents immediately.
-    if (result->function == INCLUDE_FUNC
-            && is_string(result->input(1))
-            && result->input(1)->asString() != "") {
+    if (result->function == INCLUDE_FUNC) {
         EvalContext cxt;
+        evaluate_without_side_effects(result->input(1));
         include_function::preload_script(&cxt, result);
 
     // Special case for overloaded_function, evaluate this immediately

@@ -49,10 +49,8 @@ CA_FUNCTION(load_font)
         return;
     }
 
-    std::string path = as_string(INPUT(1));
+    std::string path = STRING_INPUT(1);
     int pointSize = INT_INPUT(2);
-
-    path = get_path_relative_to_source(CALLER, path.c_str());
 
     TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
     if (result == NULL) {

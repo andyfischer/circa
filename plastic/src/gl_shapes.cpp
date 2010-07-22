@@ -291,10 +291,8 @@ CA_FUNCTION(gl_pie)
 
 CA_FUNCTION(load_program)
 {
-    std::string vertFilename =
-        get_path_relative_to_source(CALLER, INPUT(0)->asString());
-    std::string fragFilename =
-        get_path_relative_to_source(CALLER, INPUT(1)->asString());
+    std::string vertFilename = STRING_INPUT(0);
+    std::string fragFilename = STRING_INPUT(1);
 
     if (!circa::storage::file_exists(vertFilename.c_str())) {
         error_occurred(CONTEXT_AND_CALLER, "File not found: " + vertFilename);

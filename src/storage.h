@@ -8,8 +8,8 @@
 
 namespace circa {
 
-std::string get_path_relative_to_source(Term* relativeTo, std::string const& path);
 std::string get_directory_for_filename(std::string const& filename);
+bool is_absolute_path(std::string const& path);
 std::string get_absolute_path(std::string const& path);
 
 namespace storage {

@@ -158,27 +158,6 @@ bool is_absolute_path(std::string const& path)
     return false;
 }
 
-std::string get_path_relative_to_source(Term* relativeTo, std::string const& path)
-{
-    // Don't modify a blank path
-    if (path == "")
-        return "";
-
-    if (relativeTo->owningBranch == NULL)
-        return path;
-
-    // Don't modify absolute paths
-    if (is_absolute_path(path))
-        return path;
-
-    std::string scriptLocation = get_source_file_location(*relativeTo->owningBranch);
-
-    if (scriptLocation == "" || scriptLocation == ".")
-        return path;
-
-    return scriptLocation + "/" + path;
-}
-
 std::string get_absolute_path(std::string const& path)
 {
     if (is_absolute_path(path))
