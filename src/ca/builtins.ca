@@ -2,7 +2,7 @@
 def toggle(bool tog) -> bool
     <<<
     Stateful function, returns a boolean status. Every frame the function is called
-    with (true), the status flips. Starts out false.
+    with (true), the result flips. Starts out false.
     >>>
     state bool on = false
     if tog; on = not(on); end
@@ -11,8 +11,8 @@ end
 
 def approach(number target, number maximum_change) -> number
     <<<
-    Stateful function, returns a result which approaches 'target'. Each frame, this function
-    will change at most by 'maximum_change'
+    Stateful function, returns a result which approaches 'target'. Each frame, this
+    result will change at most by 'maximum_change'
     >>>
     state current = target
     if target > current
@@ -31,19 +31,6 @@ def once() -> bool
     result = s
     s = false
     return result
-end
-
-namespace styled_source
-    literal_string = 1
-    literal_number = 4
-    paren = 2
-    comment = 3
-    name = 5
-    keyword = 205
-    type_name = 203
-    function_name = 202
-    infix_operator = 201
-    whitespace = 206
 end
 
 -- Math utility functions
@@ -108,9 +95,29 @@ def random_color() -> Color
     return [rand() rand() rand() 1.0]
 end
 
+def color_blend(Color a, Color b, number ratio) -> Color
+    result = a + (b - a) * ratio
+    -- hack to preserve alpha:
+    result[3] = 1.0
+    return result
+end
+
 def delta(number val) -> number
     state number prev = val
     result = val - prev
     prev = val
     return result
+end
+
+namespace styled_source
+    literal_string = 1
+    literal_number = 4
+    paren = 2
+    comment = 3
+    name = 5
+    keyword = 205
+    type_name = 203
+    function_name = 202
+    infix_operator = 201
+    whitespace = 206
 end

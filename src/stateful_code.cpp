@@ -35,6 +35,11 @@ void load_state_into_branch(Branch& state, Branch& branch)
         if (read >= state.length())
             break;
 
+        if (!cast_possible(state[read]->value_type, destTerm)) {
+            reset(destTerm);
+            break;
+        }
+
         cast(state[read], destTerm);
 
         read++;

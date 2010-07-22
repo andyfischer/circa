@@ -6,7 +6,7 @@
 
 namespace circa {
 
-const bool ASSERT_INTERNAL_ERROR = false;
+const bool ASSERT_INTERNAL_ERROR = true;
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {

@@ -21,10 +21,11 @@ def wrap_around(Point p) -> Point
     return [mod(p.x, window.width) mod(p.y, window.height)]
 end
 
-def reset_ship() -> Ship
+def new_ship() -> Ship
     return [[window.width/2 window.height/2] [0 0] 0]
 end
-state Ship ship = reset_ship()
+
+state Ship ship = new_ship()
 state List bullets = []
 
 accelration_per_s = 5.0
@@ -40,6 +41,8 @@ ship_back = 6.4
 ship_wing_size = 11.4
 ship_wing_rot = .40
 ship_radius = ship_size * ship_front
+
+asteroid_speed_modifier = 10.0
 
 draw_intersection_circles = false
 
@@ -219,8 +222,8 @@ end
 -- move asteroids
 for asteroid in @asteroids
     asteroid = asteroid -> Asteroid
-    asteroid.location = asteroid.location + asteroid.vel * time_delta
-    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta
+    asteroid.location = asteroid.location + asteroid.vel * time_delta * asteroid_speed_modifier
+    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta * asteroid_speed_modifier
     asteroid.location = wrap_around(asteroid.location)
     asteroid.age = asteroid.age + time_delta
 end
@@ -292,7 +295,7 @@ if gstate == game_state:dying
 
     if death_time > 3.0
         gstate = game_state:playing
-        ship = reset_ship()
+        ship = new_ship()
     end
 end
 
@@ -315,5 +318,25 @@ for particle in @particles
     if particle.age > max_particle_age
         discard
     end
+end
+
+def asteroid()
+    state asteroid = generate_asteroid(asteroid_starting_size)
+
+    -- move asteroid
+    asteroid.location = asteroid.location + asteroid.vel * time_delta * asteroid_speed_modifier
+    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta * asteroid_speed_modifier
+    asteroid.location = wrap_around(asteroid.location)
+    asteroid.age = asteroid.age + time_delta
+
+    -- draw asteroid
+    def pos_edge(Point p) -> Point
+        p = rotate_point(p, asteroid.rotation)
+        p = p + asteroid.location
+        return p
+    end
+
+    edges = map(pos_edge, asteroid.edges)
+    gl:line_loop(edges, #fff)
 end
 
