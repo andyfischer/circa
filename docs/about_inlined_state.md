@@ -50,15 +50,11 @@ Every time this script is run, if `button_pressed()` is true then the `button_pr
 
 State can be nested in function definitions. An example:
 
-    def my_counting_func(bool trigger) -> int
-        state int count
-        if trigger
-            count += 1
-        end
-        return count
+    def my_func_with_state()
+        state int i
     end
 
-    def function_that_has_three_counts()
+    def function_that_has_three_integers()
         my_counting_func()
         my_counting_func()
         my_counting_func()
@@ -66,8 +62,9 @@ State can be nested in function definitions. An example:
 
 If a piece of code calls a function with inlined state, that code also becomes stateful. Also,
 there is a separate piece of state for each call to a stateful function. In the above example,
-`function_that_has_three_counts` has three different ints in its state, one for each call.
-(So, don't confuse this feature with C's static local variables).
+`function_that_has_three_integers` has three different copies of the state of `my_func_with_state`,
+which includes one integer each. (So, don't confuse this with C's static local variables, as
+data is not shared across separate calls to the same function)
 
 The structure of state data can have many levels of nesting, if the function call graph is nested.
 It's also possible to have a recursive function with inlined state (although this doesn't
