@@ -1,5 +1,3 @@
-# 1.359, 1.105, 1.162, 1.101
-
 import os, sys, ConfigParser, SCons
 
 def fatal(msg):
@@ -22,9 +20,6 @@ RELEASE = Environment(tools = ["default"], toolpath=".")
 DEBUG['variant_name'] = 'debug'
 RELEASE['variant_name'] = 'release'
 ALL = [DEBUG, RELEASE]
-
-if not os.path.exists('build'):
-    os.mkdir('build')
 
 # Common build flags
 if POSIX:
@@ -83,7 +78,9 @@ def circa_command_line_app(env):
     return result
     
 # Default build target is debug command-line binary.
-Default(circa_command_line_app(DEBUG))
+circa_cl = circa_command_line_app(DEBUG)
+Default(circa_cl)
+Alias('circa', circa_cl)
 
 ########################### SDL-based targets ###############################
 
@@ -106,17 +103,13 @@ def sdl_env(env):
 
         env.Append(LIBS=['opengl32.lib'])
 
-        env.Append(CPPPATH=['#SDL_deps/SDL-1.2.13/include'])
-        env.Append(CPPPATH=['#SDL_deps/SDL_image-1.2.7/include'])
-        env.Append(CPPPATH=['#SDL_deps/SDL_mixer-2.0.9/include'])
-        env.Append(CPPPATH=['#SDL_deps/SDL_ttf-2.0.9/include'])
-        env.Append(CPPPATH=['#plastic/deps/include'])
-        env.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDL.lib'])
-        env.Append(LIBS=['SDL_deps/SDL-1.2.13/lib/SDLmain.lib'])
-        env.Append(LIBS=['SDL_deps/SDL_image-1.2.7/lib/SDL_image.lib'])
-        env.Append(LIBS=['SDL_deps/SDL_mixer-1.2.8/lib/SDL_mixer.lib'])
-        env.Append(LIBS=['SDL_deps/SDL_ttf-2.0.9/lib/SDL_ttf.lib'])
-        env.Append(LIBS=['plastic/deps/lib/glew32.lib'])
+        env.Append(CPPPATH=['build/deps/include'])
+        env.Append(LIBS=['build/deps/lib/SDL.lib'])
+        env.Append(LIBS=['build/deps/lib/SDLmain.lib'])
+        env.Append(LIBS=['build/deps/lib/SDL_image.lib'])
+        env.Append(LIBS=['build/deps/lib/SDL_mixer.lib'])
+        env.Append(LIBS=['build/deps/lib/SDL_ttf.lib'])
+        env.Append(LIBS=['build/deps/lib/glew32.lib'])
 
     env.Append(CPPPATH=['#src'])
 

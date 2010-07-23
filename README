@@ -29,5 +29,7 @@ Some implementation details:
  - Plastic uses SDL and OpenGL for graphics
  - Currently supported on XP and OSX. A Linux port would probably not be hard.
 
+For instructions on how to build from source, see docs/building.md
+
 This project is Copyright (c) 2007-2010 Paul Hodge. The contents are freely available to the
 public under the MIT licence. See the LICENSE file for more information.
