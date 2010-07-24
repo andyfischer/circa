@@ -14,17 +14,17 @@ which has more instructions below.
      sudo port install scons
 4. In Terminal, from the Circa project folder, enter the command: 'scons'
 
-## WINDOWS ##
+## Windows ##
 
 1. Install Visual Studio
 2. Install Python 2.6 from www.python.org
-3  Install SCons from here: www.scons.org
+3.  Install SCons from here: www.scons.org
 4. Install Ruby from: http://www.ruby-lang.org/en/downloads/
 5. Open a command prompt, navigate to the Circa project folder, and run 'scons'
 
 Note, currently we have only tested building with VS 2005
 
-## LINUX ##
+## Linux ##
 
 1. Using your package manager, install GCC, Python, Ruby and SCons
 2. In a terminal, from the Circa project folder, run the command: 'scons'
@@ -41,7 +41,7 @@ and depends on the SDL library.
      sudo port install SDL-devel SDL_gfx SDL_image
 3. In Terminal, from the Circa project folder, enter the command: 'scons plastic'
 
-## WINDOWS ##
+## Windows ##
 
 Warning, there is a known problem where the Microsoft CRT dll is not copied to the bin
 folder, this will be fixed soon.
@@ -50,7 +50,7 @@ folder, this will be fixed soon.
 2. Run the script: tools/wrangle_deps.py
 3. Open a command prompt in this folder and run 'scons plastic'
 
-## LINUX ##
+## Linux ##
 
 1. Follow the instructions above for building the command-line app
 2. Install the following packages with your package manager:
