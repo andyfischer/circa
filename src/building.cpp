@@ -128,7 +128,7 @@ void clear_all_users(Term* term)
 
 Term* create_duplicate(Branch& branch, Term* original, std::string const& name, bool copyBranches)
 {
-    assert(original != NULL);
+    circa_assert(original != NULL);
 
     Term* term = apply(branch, original->function, original->inputs, name);
     change_type(term, original->type);
@@ -136,6 +136,9 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
 
     if (copyBranches || !is_branch(original))
         copy(original, term);
+
+    if (copyBranches)
+        duplicate_branch(original->nestedContents, term->nestedContents);
 
     term->sourceLoc = original->sourceLoc;
     duplicate_branch(original->properties, term->properties);

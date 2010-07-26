@@ -49,10 +49,41 @@ void remove_user_reference_on_delete()
     test_assert(ref2->owningBranch == NULL);
 }
 
+void duplicate_nested_contents()
+{
+    Branch branch;
+    Term* a = branch.eval("a = branch()");
+
+    Term* x = create_int(a->nestedContents, 5);
+
+    // Try duplicating branch
+    Branch branch2;
+    duplicate_branch(branch, branch2);
+
+    test_assert(branch2.length() == 1);
+    test_assert(branch2[0]->name == "a");
+    test_assert(branch2[0]->nestedContents.length() == 1);
+    test_assert(branch2[0]->nestedContents[0]->asInt() == 5);
+
+    branch2.clear();
+
+    // Now try duplicating, check that internal references are updated
+    apply(a->nestedContents, "add", RefList(x, x));
+    duplicate_branch(branch, branch2);
+
+    test_assert(branch2.length() == 1);
+    test_assert(branch2[0]->name == "a");
+    test_assert(branch2[0]->nestedContents.length() == 2);
+    test_assert(branch2[0]->nestedContents[0]->asInt() == 5);
+    test_assert(branch2[0]->nestedContents[1]->input(0) == branch2[0]->nestedContents[0]);
+    test_assert(branch2[0]->nestedContents[1]->input(1) == branch2[0]->nestedContents[0]);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(term_tests::simple_refcounting);
     REGISTER_TEST_CASE(term_tests::remove_user_reference_on_delete);
+    REGISTER_TEST_CASE(term_tests::duplicate_nested_contents);
 }
 
 } // namespace term_tests

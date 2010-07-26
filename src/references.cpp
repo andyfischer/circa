@@ -75,6 +75,9 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     // Remap inside properties
     for (int i=0; i < term->properties.length(); i++)
         remap_pointers(term->properties[i], map);
+
+    // Remap inside nestedContents
+    term->nestedContents.remapPointers(map);
 }
 
 void remap_pointers(Term* term, Term* original, Term* replacement)

@@ -718,6 +718,10 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
             as_branch(dest_term).clear();
             duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
         }
+
+        // new style: nestedContents
+        duplicate_branch_nested(newTermMap,
+                source_term->nestedContents, dest_term->nestedContents);
     }
 }
 
