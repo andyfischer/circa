@@ -1,44 +1,19 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "debug_valid_objects.h"
 #include "importing_macros.h"
 
 namespace circa {
 
-#define DEBUG_CHECK_VALID_BRANCH_POINTERS 0
-
-#if DEBUG_CHECK_VALID_BRANCH_POINTERS
-
-std::set<Branch const*> gValidBranches;
-
-static void debug_register_branch_pointer(Branch const* branch)
+static void assert_valid_branch(Branch const* obj)
 {
-    assert(gValidBranches.find(branch) == gValidBranches.end());
-    gValidBranches.insert(branch);
+    debug_assert_valid_object((void*) obj, BRANCH_OBJECT);
 }
-
-static void debug_unregister_branch_pointer(Branch const* branch)
-{
-    assert(gValidBranches.find(branch) != gValidBranches.end());
-    gValidBranches.erase(branch);
-}
-
-static void assert_valid_branch(Branch const* branch)
-{
-    assert(gValidBranches.find(branch) != gValidBranches.end());
-}
-
-#else
-
-#define debug_register_branch_pointer(x)
-#define debug_unregister_branch_pointer(x)
-#define assert_valid_branch(x)
-
-#endif
 
 Branch::Branch() : owningTerm(NULL), _refCount(0)
 {
-    debug_register_branch_pointer(this);
+    debug_register_valid_object((void*) this, BRANCH_OBJECT);
 }
 
 Branch::~Branch()
@@ -54,7 +29,7 @@ Branch::~Branch()
     }
 
     _terms.clear();
-    debug_unregister_branch_pointer(this);
+    debug_unregister_valid_object(this);
 }
 
 int Branch::length() const

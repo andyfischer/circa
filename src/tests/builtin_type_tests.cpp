@@ -2,7 +2,8 @@
 
 #include "common_headers.h"
 
-#include <circa.h>
+#include "circa.h"
+#include "debug_valid_objects.h"
 
 namespace circa {
 namespace builtin_type_tests {

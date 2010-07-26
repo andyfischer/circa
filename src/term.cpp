@@ -6,39 +6,11 @@
 #include <stdexcept>
 
 #include "circa.h"
+#include "debug_valid_objects.h"
 
 namespace circa {
 
 static unsigned int gNextGlobalID = 1;
-
-#if DEBUG_CHECK_VALID_TERM_POINTERS
-std::set<Term*> DEBUG_GOOD_POINTER_SET;
-#endif
-
-void debug_register_term_pointer(Term* term)
-{
-#if DEBUG_CHECK_VALID_TERM_POINTERS
-    assert(DEBUG_GOOD_POINTER_SET.find(term) == DEBUG_GOOD_POINTER_SET.end());
-    DEBUG_GOOD_POINTER_SET.insert(term);
-#endif
-}
-
-void debug_unregister_term_pointer(Term* term)
-{
-#if DEBUG_CHECK_VALID_TERM_POINTERS
-    assert(DEBUG_GOOD_POINTER_SET.find(term) != DEBUG_GOOD_POINTER_SET.end());
-    DEBUG_GOOD_POINTER_SET.erase(term);
-#endif
-}
-
-bool debug_is_term_pointer_valid(Term* term)
-{
-#if DEBUG_CHECK_VALID_TERM_POINTERS
-    return DEBUG_GOOD_POINTER_SET.find(term) != DEBUG_GOOD_POINTER_SET.end();
-#else
-    return true;
-#endif
-}
 
 Term::Term()
   : owningBranch(NULL),
@@ -49,13 +21,13 @@ Term::Term()
     globalID = gNextGlobalID++;
 
     METRIC_TERMS_CREATED++;
-    debug_register_term_pointer(this);
+    debug_register_valid_object(this, TERM_OBJECT);
 }
 
 Term::~Term()
 {
     METRIC_TERMS_DESTROYED++;
-    debug_unregister_term_pointer(this);
+    debug_unregister_valid_object(this);
 }
 
 Term*

@@ -9,11 +9,6 @@ namespace circa {
 bool DEBUG_TRAP_NAME_LOOKUP = false;
 bool DEBUG_TRAP_ERROR_OCCURRED = false;
 
-void assert_valid_term(Term* term)
-{
-    assert(debug_is_term_pointer_valid(term));
-}
-
 void dump_branch(Branch& branch)
 {
     print_branch_raw(std::cout, branch);

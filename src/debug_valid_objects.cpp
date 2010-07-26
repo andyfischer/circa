@@ -2,13 +2,17 @@
 
 #include <cassert>
 
+#if ENABLE_VALID_OBJECT_CHECKING
+#include <map>
+#endif
+
 #include "build_options.h"
 #include "debug_valid_objects.h"
+#include "term.h"
+
+namespace circa {
 
 #if ENABLE_VALID_OBJECT_CHECKING
-
-#include <map>
-
 std::map<void*, int> g_addressToType;
 
 void debug_register_valid_object(void* obj, int type)
@@ -34,8 +38,30 @@ void debug_assert_valid_object(void* obj, int type)
     assert(type == existingType);
 }
 
-#else
-
-void empty_function_so_that_linker_doesnt_complain() {}
-
 #endif
+
+bool debug_is_object_valid(void* obj, int type)
+{
+    #if ENABLE_VALID_OBJECT_CHECKING
+        if (obj == NULL) return false;
+        bool valid = g_addressToType.find(obj) != g_addressToType.end();
+        if (!valid) return false;
+        int existingType = g_addressToType[obj];
+        if (type != existingType) return false;
+        return true;
+    #else
+        return true;
+    #endif
+}
+
+void assert_valid_term(Term* term)
+{
+    debug_assert_valid_object(term, TERM_OBJECT);
+}
+
+bool debug_is_term_pointer_valid(Term* term)
+{
+    return debug_is_object_valid(term, TERM_OBJECT);
+}
+
+} // namespace circa
