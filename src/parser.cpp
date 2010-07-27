@@ -385,6 +385,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     std::string functionName = tokens.consume();
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
+    initialize_function(result);
     function_t::get_hidden_state_type(result) = VOID_TYPE;
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
@@ -412,7 +413,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     tokens.consume(LPAREN);
 
-    Branch& contents = as_branch(result);
+    Branch& contents = result->nestedContents;
 
     function_t::set_name(result, functionName);
 
@@ -617,7 +618,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     Term* result = apply(branch, IF_BLOCK_FUNC, RefList(NULL));
-    Branch& contents = as_branch(result);
+    Branch& contents = result->nestedContents;
 
     bool firstIteration = true;
     bool encounteredElse = false;
@@ -656,7 +657,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             block->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
             set_input_syntax_hint(block, 0, "postWhitespace", possible_statement_ending(tokens));
 
-            consume_branch(block->asBranch(), tokens);
+            consume_branch(block->nestedContents, tokens);
         } else {
             // Create an 'else' block
             encounteredElse = true;
@@ -730,7 +731,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
     Term* forTerm = apply(branch, FOR_FUNC, RefList(NULL, listExpr));
-    Branch& innerBranch = as_branch(forTerm);
+    Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
 
     set_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
@@ -774,7 +775,7 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
 
     result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
-    consume_branch(as_branch(result), tokens);
+    consume_branch(result->nestedContents, tokens);
 
     return result;
 }
@@ -821,11 +822,12 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
         set_source_hidden(initialization, true);
 
-        Term* initialValue = infix_expression(as_branch(initialization), tokens);
+        Term* initialValue = infix_expression(initialization->nestedContents, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
-        post_parse_branch(as_branch(initialization));
+        post_parse_branch(initialization->nestedContents);
 
-        apply(as_branch(initialization), UNSAFE_ASSIGN_FUNC, RefList(result, initialValue));
+        apply(initialization->nestedContents,
+                UNSAFE_ASSIGN_FUNC, RefList(result, initialValue));
 
         if (result->type == ANY_TYPE)
             specialize_type(result, initialValue->type);
@@ -1690,7 +1692,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
         bool implicitCopy = false;
         if (term->name != "") {
             // If this term is an identifier, then create an implicit copy
-            term = apply(as_branch(result), COPY_FUNC, RefList(term));
+            term = apply(result->nestedContents, COPY_FUNC, RefList(term));
             implicitCopy = true;
         }
 
@@ -1699,7 +1701,7 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
         // Take the result and steal it into the list branch
         if (!implicitCopy)
-            steal_term(term, as_branch(result));
+            steal_term(term, result->nestedContents);
     }
 
     if (!tokens.nextIs(RBRACKET))
@@ -1720,7 +1722,7 @@ Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
     Term* result = create_branch(branch).owningTerm;
 
-    consume_branch(as_branch(result), tokens);
+    consume_branch(result->nestedContents, tokens);
 
     return result;
 }
@@ -1741,7 +1743,7 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 
     result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
-    consume_branch(as_branch(result), tokens);
+    consume_branch(result->nestedContents, tokens);
 
     return result;
 }

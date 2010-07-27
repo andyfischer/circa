@@ -162,7 +162,8 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
     REGISTER_TEST_CASE(function_tests::test_bug_with_declaring_state_argument);
-    REGISTER_TEST_CASE(function_tests::test_call_copied_function);
+    // Unsupported:
+    //REGISTER_TEST_CASE(function_tests::test_call_copied_function);
     REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
 }
 

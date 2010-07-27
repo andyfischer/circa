@@ -36,6 +36,7 @@ Term* FEEDBACK_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
 Term* FOR_FUNC = NULL;
 Term* GET_INDEX_FUNC = NULL;
+Term* GET_INDEX_FROM_BRANCH_FUNC = NULL;
 Term* GET_FIELD_FUNC = NULL;
 Term* IF_FUNC = NULL;
 Term* IF_BLOCK_FUNC = NULL;
@@ -200,11 +201,8 @@ void bootstrap_kernel()
 
 void post_initialize_primitive_types(Branch& kernel)
 {
-    // Initialize a proper prototype for Function type
-    initialize_function_prototype(type_t::get_prototype(FUNCTION_TYPE));
-
-    // Value function was created before we had a prototype
-    initialize_function_prototype(as_branch(VALUE_FUNC));
+    // Properly setup value() func
+    initialize_function(VALUE_FUNC);
     function_t::get_attrs(VALUE_FUNC).outputType = ANY_TYPE;
 
     assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
@@ -250,7 +248,7 @@ void post_setup_builtin_functions(Branch& kernel)
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
-    Branch& div_overloads = as_branch(DIV_FUNC);
+    Branch& div_overloads = DIV_FUNC->nestedContents;
     Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
     make_ref(function_t::get_parameters(div_s), DIV_FUNC);
 

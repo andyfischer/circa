@@ -227,7 +227,7 @@ Branch& default_training_branch(Branch& branch)
     if (!branch.contains(TRAINING_BRANCH_NAME))
         create_branch(branch, TRAINING_BRANCH_NAME);
 
-    return as_branch(branch[TRAINING_BRANCH_NAME]);
+    return branch[TRAINING_BRANCH_NAME]->nestedContents;
 }
 
 float get_feedback_weight(Term* term)

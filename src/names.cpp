@@ -66,7 +66,7 @@ Term* get_named(Branch const& branch, std::string const& name)
     // a new string.
     std::string suffix = name.substr(nameEnd+1, name.length());
     
-    return get_named(as_branch(prefix), suffix);
+    return get_named(prefix->nestedContents, suffix);
 }
 
 Branch* get_parent_branch(Branch& branch)

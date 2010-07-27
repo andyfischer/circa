@@ -12,7 +12,7 @@ namespace if_block_function {
 
     void formatSource(StyledSource* source, Term* term)
     {
-        Branch& contents = as_branch(term);
+        Branch& contents = term->nestedContents;
 
         for (int branch_index=0; branch_index < contents.length(); branch_index++) {
             Term* branch_term = contents[branch_index];
@@ -34,7 +34,7 @@ namespace if_block_function {
             else
                 append_phrase(source, "else", branch_term, phrase_type::UNDEFINED);
 
-            format_branch_source(source, as_branch(branch_term), NULL);
+            format_branch_source(source, branch_term->nestedContents, NULL);
         }
 
         append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),

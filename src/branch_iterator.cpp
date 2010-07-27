@@ -44,10 +44,10 @@ void BranchIterator::advance()
     Term* term = current();
 
     // Check to start an inner branch.
-    if (term != NULL && is_branch(term)
-            && (as_branch(term).length() > 0)) {
-        int firstIndex = _backwards ? as_branch(term).length() - 1 : 0;
-        _stack.push_back(Frame(&as_branch(term), firstIndex));
+    Branch& contents = term->nestedContents;
+    if (term != NULL && contents.length() > 0) {
+        int firstIndex = _backwards ? contents.length() - 1 : 0;
+        _stack.push_back(Frame(&contents, firstIndex));
         return;
     }
 

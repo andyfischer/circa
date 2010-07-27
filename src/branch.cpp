@@ -584,6 +584,12 @@ Branch& as_branch(TaggedValue* value)
     return *((Branch*) value->value_data.ptr);
 }
 
+Branch& as_branch(Term* term)
+{
+    circa_assert(term->nestedContents.length() == 0); // <- Temp while things are refactored
+    return as_branch((TaggedValue*) term);
+}
+
 std::string compound_type_to_string(TaggedValue* value)
 {
     std::stringstream out;
@@ -687,14 +693,8 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
 
         newTermMap[source_term] = dest_term;
 
-        // if output is a branch, duplicate it
-        if (is_branch(source_term)) {
-            assert(is_branch(dest_term));
-            as_branch(dest_term).clear();
-            duplicate_branch_nested(newTermMap, as_branch(source_term), as_branch(dest_term));
-        }
-
-        // new style: nestedContents
+        // duplicate nested contents
+        dest_term->nestedContents.clear();
         duplicate_branch_nested(newTermMap,
                 source_term->nestedContents, dest_term->nestedContents);
     }

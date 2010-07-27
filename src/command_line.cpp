@@ -130,7 +130,7 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         parse_script(branch, args[1]);
 
-        Branch &trainable_names = branch["_trainable"]->asBranch();
+        Branch &trainable_names = branch["_trainable"]->nestedContents;
         for (int i=0; i < trainable_names.length(); i++)
             set_trainable(branch[trainable_names[i]->asString()], true);
         refresh_training_branch(branch);

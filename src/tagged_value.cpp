@@ -120,11 +120,6 @@ Ref& TaggedValue::asRef()
     return as_ref(this);
 }
 
-Branch& TaggedValue::asBranch()
-{
-    return as_branch(this);
-}
-
 bool cast_possible(Type* type, TaggedValue* value)
 {
     Type::CastPossible castPossible = type->castPossible;

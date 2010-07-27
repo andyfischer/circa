@@ -8,8 +8,7 @@ namespace branch_function {
 
     CA_FUNCTION(branch_evaluate)
     {
-        Branch& branch = as_branch(OUTPUT);
-        evaluate_branch(CONTEXT, branch);
+        evaluate_branch(CONTEXT, CALLER->nestedContents);
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -17,7 +16,7 @@ namespace branch_function {
         if (term->boolPropOptional("syntax:literal-list", false)) {
             format_name_binding(source, term);
             append_phrase(source, "[", term, token::LBRACKET);
-            Branch& contents = as_branch(term);
+            Branch& contents = term->nestedContents;
 
             for (int i=0; i < contents.length(); i++) {
                 Term* term = contents[i];
@@ -30,7 +29,7 @@ namespace branch_function {
             append_phrase(source, term->name, term, phrase_type::TERM_NAME);
             append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
                     term, token::WHITESPACE);
-            format_branch_source(source, as_branch(term), NULL);
+            format_branch_source(source, term->nestedContents, NULL);
             append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                     term, token::WHITESPACE);
                     
@@ -38,13 +37,13 @@ namespace branch_function {
             
         } else {
             format_name_binding(source, term);
-            format_branch_source(source, as_branch(term), term);
+            format_branch_source(source, term->nestedContents, term);
         }
     }
 
     void setup(Branch& kernel)
     {
-        BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch() -> Branch");
+        BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         function_t::get_attrs(BRANCH_FUNC).formatSource = format_source;
     }
 }

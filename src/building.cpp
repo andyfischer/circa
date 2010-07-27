@@ -251,13 +251,12 @@ Term* create_list(Branch& branch, std::string const& name)
 
 Branch& create_branch(Branch& owner, std::string const& name)
 {
-    Term* term = apply(owner, BRANCH_FUNC, RefList(), name);
-    return as_branch(term);
+    return apply(owner, BRANCH_FUNC, RefList(), name)->nestedContents;
 }
 
 Branch& create_namespace(Branch& branch, std::string const& name)
 {
-    return as_branch(create_value(branch, NAMESPACE_TYPE, name));
+    return create_value(branch, NAMESPACE_TYPE, name)->nestedContents;
 }
 
 Term* create_type(Branch& branch, std::string name)

@@ -401,10 +401,12 @@ void test_color_arithmetic()
 
 void test_branch_value()
 {
+#if 0
+    disabled, code segments no longer act like values
     test_snippet("b = { 1 2 3 }", "b[0] == 1, b[1] == 2, b[2] == 3");
     test_snippet("", "{ 1 } != 1"); // once caused a crash
-    //test_snippet("b = { apple = 1, bees = 2 }", "b.apple == 1, b.bees == 2");
     test_snippet("br = { 1 2 3 }; sum = 0; for i in br; sum += i end", "sum == 6");
+#endif
 }
 
 void test_rebinding_operators()

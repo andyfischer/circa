@@ -33,13 +33,13 @@ void test_simple()
     it.advance();
     test_assert(it.current() == sub);
     it.advance();
-    test_assert(it.current() == sub->asBranch()[0]);
+    test_assert(it.current() == sub->nestedContents[0]);
     it.advanceSkippingBranch(); // skip over 'attributes'
     test_assert(it.current()->name == "c");
     it.advance();
     test_assert(it.current()->name == "d");
     it.advance();
-    test_assert(it.current() == sub->asBranch()[3]); // output type
+    test_assert(it.current() == sub->nestedContents[3]); // output type
     it.advance();
     test_assert(it.finished());
 }

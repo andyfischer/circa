@@ -17,13 +17,13 @@ namespace subroutine_t {
                 term, token::WHITESPACE);
 
         if (!is_native_function(term))
-            format_branch_source(source, as_branch(term), term);
+            format_branch_source(source, term->nestedContents, term);
     }
 
     CA_FUNCTION(evaluate)
     {
         Term* function = FUNCTION;
-        Branch& functionBranch = as_branch(function);
+        Branch& functionBranch = function->nestedContents;
 
         bool varArgs = function_t::get_variable_args(function);
         int num_inputs = function_t::num_inputs(function);
@@ -112,7 +112,7 @@ bool is_subroutine(Term* term)
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
-    Branch& contents = as_branch(sub);
+    Branch& contents = sub->nestedContents;
 
     // If there is an #out term, then it needs to be the last term. If #out is a
     // name binding into an inner branch then this might not be the case
@@ -149,7 +149,7 @@ void subroutine_update_hidden_state_type_from_contents(Term* func)
     }
 
     bool hasState = false;
-    Branch& contents = as_branch(func);
+    Branch& contents = func->nestedContents;
     for (int i=0; i < contents.length(); i++) {
         if (contents[i] == NULL)
             continue;
@@ -170,7 +170,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
     if (previousType == newType)
         return;
 
-    Branch& contents = as_branch(func);
+    Branch& contents = func->nestedContents;
     function_t::get_attrs(func).hiddenStateType = newType;
 
     bool hasStateInput = (function_t::num_inputs(func) > 0)
@@ -219,7 +219,7 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
 {
     assert(is_subroutine(call->function));
     assert(state != NULL);
-    duplicate_branch(as_branch(call->function), as_branch(state));
+    duplicate_branch(function_contents(call->function), as_branch(state));
 }
 
 void store_locals(Branch& branch, TaggedValue* storageTv)
@@ -237,7 +237,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
             continue;
 
         if (is_branch(term))
-            store_locals(as_branch(term), storage->get(i));
+            store_locals(term->nestedContents, storage->get(i));
         else
             copy(term, storage->get(i));
     }
@@ -261,7 +261,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
             continue;
 
         if (is_branch(term))
-            restore_locals(storage->get(i), as_branch(term));
+            restore_locals(storage->get(i), term->nestedContents);
         else
             copy(storage->get(i), term);
     }

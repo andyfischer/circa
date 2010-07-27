@@ -136,7 +136,7 @@ namespace function_t {
         // it will be the first thing defined in the function, and it'll be
         // anonymous and be a statement.
         int expected_index = function_t::num_inputs(term) + 1;
-        Branch& contents = as_branch(term);
+        Branch& contents = term->nestedContents;
 
         if (expected_index >= contents.length()) return "";
         Term* possibleDocString = contents[expected_index];
@@ -152,7 +152,7 @@ namespace function_t {
         if (!is_subroutine(func))
             return true;
 
-        Branch& contents = as_branch(func);
+        Branch& contents = func->nestedContents;
 
         // If the subroutine has an #out term, then it must be the last one
         if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
@@ -167,7 +167,9 @@ namespace function_t {
 
     FunctionAttrs& get_attrs(Term* function)
     {
-        return as_function_attrs(function->asBranch()[0]);
+        circa_assert(function->nestedContents.length() > 0);
+        circa_assert(function->nestedContents[0]->type == FUNCTION_ATTRS_TYPE);
+        return as_function_attrs(function->nestedContents[0]);
     }
 
     std::string const& get_name(Term* function)
@@ -205,7 +207,7 @@ namespace function_t {
 
     int num_inputs(Term* function)
     {
-        Branch& contents = as_branch(function);
+        Branch& contents = function->nestedContents;
         int i = 1;
 
         while (i < contents.length()
@@ -217,7 +219,7 @@ namespace function_t {
 
     Term* get_input_placeholder(Term* func, int index)
     {
-        return as_branch(func)[index + 1];
+        return func->nestedContents[index + 1];
     }
 
     std::string const& get_input_name(Term* func, int index)
@@ -293,6 +295,11 @@ FunctionAttrs& as_function_attrs(Term* term)
     return *((FunctionAttrs*) get_pointer(term));
 }
 
+Branch& function_contents(Term* func)
+{
+    return func->nestedContents;
+}
+
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;
@@ -300,9 +307,9 @@ std::string get_placeholder_name_for_index(int index)
     return sstream.str();
 }
 
-void initialize_function_prototype(Branch& contents)
+void initialize_function(Term* func)
 {
-    /* A function is a branch with the following structures:
+    /* A function has a branch with the following structures:
       {
         [0] FunctionAttrs #attributes
         [1..num_inputs] input terms
@@ -312,7 +319,7 @@ void initialize_function_prototype(Branch& contents)
       }
     */
 
-    Term* attributesTerm = create_value(contents, FUNCTION_ATTRS_TYPE, "#attributes");
+    Term* attributesTerm = create_value(func->nestedContents, FUNCTION_ATTRS_TYPE, "#attributes");
     set_source_hidden(attributesTerm, true);
 }
 

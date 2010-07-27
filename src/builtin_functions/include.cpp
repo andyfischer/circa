@@ -8,7 +8,7 @@ namespace include_function {
     void preload_script(EvalContext* cxt, Term* term)
     {
         TaggedValue* fileSignature = term->input(0);
-        Branch& contents = as_branch(term);
+        Branch& contents = term->nestedContents;
 
         std::string filename = term->input(1)->asString();
 
@@ -59,7 +59,7 @@ namespace include_function {
         if (CONTEXT->errorOccurred)
             return;
 
-        Branch& contents = as_branch(CALLER);
+        Branch& contents = CALLER->nestedContents;
         evaluate_branch(CONTEXT, contents);
     }
 

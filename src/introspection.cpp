@@ -78,11 +78,8 @@ void print_term_raw_string(std::ostream& out, Term* term)
     }
 
     out << ")";
-
     out << " -> " << typeName;
-
-    if (!is_branch(term))
-        out << " == " << term->toString();
+    out << " == " << term->toString();
 }
 
 std::string term_to_raw_string(Term* term)
@@ -284,8 +281,7 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
         }
         out << "]";
     }
-    if (!is_branch(term))
-        out << " " << to_string(term);
+    out << " " << to_string(term);
 
     if (prefs->showProperties)
         out << " " << dict_t::to_string(term->properties);

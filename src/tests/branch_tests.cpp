@@ -172,15 +172,15 @@ void test_duplicate_nested()
 {
     Branch branch;
     branch.eval("a = 1.0");
-    Branch& inner = branch.eval("inner = branch()")->asBranch();
+    Branch& inner = branch.eval("inner = branch()")->nestedContents;
     inner.eval("i = 2.0");
     inner.eval("j = add(a,i)");
 
     Branch dupe;
     duplicate_branch(branch, dupe);
 
-    Term* inner_i = dupe["inner"]->asBranch()["i"];
-    Term* inner_j = dupe["inner"]->asBranch()["j"];
+    Term* inner_i = dupe["inner"]->nestedContents["i"];
+    Term* inner_j = dupe["inner"]->nestedContents["j"];
 
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);
@@ -202,13 +202,13 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = as_branch(orig.eval("inner = branch()"));
+    Branch& inner = orig.eval("inner = branch()")->nestedContents;
     inner.eval("i = 2");
 
     Branch dupe;
     duplicate_branch(orig, dupe);
 
-    test_assert(dupe["inner"]->asBranch().length() == 1);
+    test_assert(dupe["inner"]->nestedContents.length() == 1);
 
     test_assert(orig);
     test_assert(dupe);
@@ -234,11 +234,11 @@ void test_duplicate_subroutine()
 
     test_assert(is_branch(dupedFunc));
 
-    test_assert(as_branch(func).length() == as_branch(dupedFunc).length());
-    test_assert(as_branch(func)[1]->function == as_branch(dupedFunc)[1]->function);
-    test_assert(as_branch(func)[1]->type == as_branch(dupedFunc)[1]->type);
-    test_assert(as_branch(func)[1]->asInt() == as_branch(dupedFunc)[1]->asInt());
-    test_assert(as_branch(dupedFunc)[1] == as_branch(dupedFunc)["a"]);
+    test_assert(func->nestedContents.length() == dupedFunc->nestedContents.length());
+    test_assert(func->nestedContents[1]->function == dupedFunc->nestedContents[1]->function);
+    test_assert(func->nestedContents[1]->type == dupedFunc->nestedContents[1]->type);
+    test_assert(func->nestedContents[1]->asInt() == dupedFunc->nestedContents[1]->asInt());
+    test_assert(dupedFunc->nestedContents[1] == dupedFunc->nestedContents["a"]);
 
     test_assert(branch);
     test_assert(dupe);
@@ -279,11 +279,11 @@ void find_name_in_outer_branch()
     Branch branch;
     Term* outer_branch = branch.eval("Branch()");
 
-    Term* a = as_branch(outer_branch).eval("a = 1");
+    Term* a = outer_branch->nestedContents.eval("a = 1");
 
-    Term* inner_branch = as_branch(outer_branch).eval("branch()");
+    Term* inner_branch = outer_branch->nestedContents.eval("branch()");
 
-    test_assert(find_named(as_branch(inner_branch), "a") == a);
+    test_assert(find_named(inner_branch->nestedContents, "a") == a);
 
     test_assert(branch);
 }

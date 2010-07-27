@@ -256,7 +256,7 @@ Term* create_implicit_tuple_type(RefList const& types)
     }
     typeName << ">";
 
-    Term* result = create_type(as_branch(IMPLICIT_TYPES), typeName.str());
+    Term* result = create_type(IMPLICIT_TYPES->nestedContents, typeName.str());
     list_t::setup_type(type_contents(result));
     Branch& prototype = type_contents(result)->prototype;
     type_contents(result)->parent = type_contents(LIST_TYPE);

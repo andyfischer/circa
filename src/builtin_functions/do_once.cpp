@@ -10,7 +10,7 @@ namespace do_once_function {
         TaggedValue* done = INPUT(0);
 
         if (!as_bool(done)) {
-            evaluate_branch(CONTEXT, OUTPUT->asBranch());
+            evaluate_branch(CONTEXT, CALLER->nestedContents);
             set_bool(done, true);
         }
     }
@@ -20,7 +20,7 @@ namespace do_once_function {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
         append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
                 term, token::WHITESPACE);
-        format_branch_source(source, as_branch(term), NULL);
+        format_branch_source(source, term->nestedContents, NULL);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, token::WHITESPACE);
                 

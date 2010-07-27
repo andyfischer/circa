@@ -7,16 +7,13 @@ namespace if_function {
 
     CA_FUNCTION(evaluate)
     {
-        Branch& contents = CALLER->asBranch();
-        bool cond = BOOL_INPUT(0);
-
-        if (cond)
-            evaluate_branch(CONTEXT, contents);
+        if (BOOL_INPUT(0))
+            evaluate_branch(CONTEXT, CALLER->nestedContents);
     }
 
     void setup(Branch& kernel)
     {
-        IF_FUNC = import_function(kernel, evaluate, "if(bool) -> Code");
+        IF_FUNC = import_function(kernel, evaluate, "if(bool) -> any");
     }
 }
 }

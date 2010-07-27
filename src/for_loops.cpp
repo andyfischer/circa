@@ -23,7 +23,7 @@ Branch* get_for_loop_state(Term* forTerm)
     if (get_for_loop_state_type(forTerm) == VOID_TYPE)
         return NULL;
 
-    return &forTerm->input(0)->asBranch();
+    return &as_branch(forTerm->input(0));
 }
 
 bool for_loop_has_state(Term* forTerm)
@@ -33,54 +33,54 @@ bool for_loop_has_state(Term* forTerm)
 
 Branch& get_for_loop_iteration_state(Term* forTerm, int index)
 {
-    return get_for_loop_state(forTerm)->get(index)->asBranch();
+    return as_branch(get_for_loop_state(forTerm)->get(index));
 }
 
 Branch& get_for_loop_rebinds(Term* forTerm)
 {
-    Branch& contents = as_branch(forTerm);
-    return contents[1]->asBranch();
+    Branch& contents = forTerm->nestedContents;
+    return contents[1]->nestedContents;
 }
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return as_branch(forTerm)[2];
+    return forTerm->nestedContents[2];
 }
 
 Term* get_for_loop_is_first_iteration(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[0];
+    return forTerm->nestedContents[0]->nestedContents[0];
 }
 
 Term* get_for_loop_any_iterations(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[1];
+    return forTerm->nestedContents[0]->nestedContents[1];
 }
 
 Term* get_for_loop_modify_list(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[2];
+    return forTerm->nestedContents[0]->nestedContents[2];
 }
 
 Term* get_for_loop_discard_called(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[3];
+    return forTerm->nestedContents[0]->nestedContents[3];
 }
 
 Ref& get_for_loop_state_type(Term* forTerm)
 {
-    return as_branch(forTerm)[0]->asBranch()[4]->asRef();
+    return forTerm->nestedContents[0]->nestedContents[4]->asRef();
 }
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
 {
-    Branch& contents = as_branch(forTerm);
-    return contents[contents.length()-1]->asBranch();
+    Branch& contents = forTerm->nestedContents;
+    return contents[contents.length()-1]->nestedContents;
 }
 
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    Branch& forContents = as_branch(forTerm);
+    Branch& forContents = forTerm->nestedContents;
     Branch& attributes = create_branch(forContents, "#attributes");
     create_bool(attributes, false, "#is_first_iteration");
     create_bool(attributes, false, "#any_iterations");
@@ -92,7 +92,7 @@ void setup_for_loop_pre_code(Term* forTerm)
 
 void setup_for_loop_post_code(Term* forTerm)
 {
-    Branch& forContents = as_branch(forTerm);
+    Branch& forContents = forTerm->nestedContents;
     std::string listName = forTerm->input(1)->name;
     Branch& outerScope = *forTerm->owningBranch;
 
@@ -173,7 +173,7 @@ void setup_for_loop_post_code(Term* forTerm)
 CA_FUNCTION(evaluate_for_loop)
 {
     Term* listTerm = INPUT_TERM(1);
-    Branch& codeBranch = as_branch(OUTPUT);
+    Branch& codeBranch = CALLER->nestedContents;
     Branch* stateBranch = get_for_loop_state(CALLER);
 
     int numIterations = listTerm->numElements();
@@ -223,7 +223,7 @@ CA_FUNCTION(evaluate_for_loop)
 
         // Inject stateful terms
         if (stateBranch != NULL)
-            load_state_into_branch(stateBranch->get(i)->asBranch(), codeBranch);
+            load_state_into_branch(as_branch(stateBranch->get(i)), codeBranch);
 
         //std::cout << "pre evaluate = " << std::endl;
         //dump_branch(codeBranch);
@@ -241,7 +241,7 @@ CA_FUNCTION(evaluate_for_loop)
 
         // Persist stateful terms
         if (stateBranch != NULL) {
-            persist_state_from_branch(codeBranch, stateBranch->get(i)->asBranch());
+            persist_state_from_branch(codeBranch, as_branch(stateBranch->get(i)));
 
             //std::cout << "Persisted = " << std::endl;
             //dump_branch(*stateBranch);

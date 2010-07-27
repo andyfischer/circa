@@ -70,8 +70,8 @@ void test_equals_branch()
     Branch branch;
 
     Term* a = create_branch(branch).owningTerm;
-    create_int(as_branch(a), 4);
-    create_string(as_branch(a), "hello");
+    create_int(a->nestedContents, 4);
+    create_string(a->nestedContents, "hello");
 
     Term* b = branch.eval("[4 'hello']");
     Term* c = branch.eval("[4 'bye']");
@@ -102,7 +102,8 @@ void test_tagged_value()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(list_tests::test_equals_branch);
+    // Unsupported:
+    //REGISTER_TEST_CASE(list_tests::test_equals_branch);
     REGISTER_TEST_CASE(list_tests::test_tagged_value);
     REGISTER_TEST_CASE(list_tests::memory_management_for_each_operation::run_all);
 }

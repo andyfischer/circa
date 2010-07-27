@@ -22,6 +22,7 @@ Term::Term()
 
     METRIC_TERMS_CREATED++;
     debug_register_valid_object(this, TERM_OBJECT);
+    nestedContents.owningTerm = this;
 }
 
 Term::~Term()

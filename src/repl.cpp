@@ -88,8 +88,8 @@ void start_repl()
         if (displayRaw) {
             for (int i=previousHead; i < replState.length(); i++) {
                 std::cout << get_term_to_string_extended(replState[i]) << std::endl;
-                if (is_branch(replState[i]))
-                    print_branch_raw(std::cout, as_branch(replState[i]));
+                if (replState[i]->nestedContents.length() > 0)
+                    print_branch_raw(std::cout, replState[i]->nestedContents);
             }
         }
     }

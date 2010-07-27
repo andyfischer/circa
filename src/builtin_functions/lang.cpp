@@ -7,12 +7,12 @@ namespace lang_function {
 
     CA_FUNCTION(field)
     {
-        set_ref(OUTPUT, as_branch(INPUT(0))[INPUT(1)->asInt()]);
+        set_ref(OUTPUT, INPUT_TERM(0)->nestedContents[INPUT(1)->asInt()]);
     }
 
     CA_FUNCTION(num_fields)
     {
-        set_int(OUTPUT, as_branch(INPUT(0)).length());
+        set_int(OUTPUT, INPUT_TERM(0)->nestedContents.length());
     }
 
     void setup(Branch& kernel)

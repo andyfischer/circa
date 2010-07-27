@@ -13,7 +13,7 @@ namespace branch_ref_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, branch_ref,
-            "def branch_ref(Branch branch +ignore_error) -> BranchRef");
+            "def branch_ref(void branch +ignore_error) -> BranchRef");
     }
 }
 }

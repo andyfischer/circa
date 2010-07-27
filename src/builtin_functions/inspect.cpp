@@ -20,7 +20,7 @@ namespace inspect_function {
 
     CA_FUNCTION(get_raw)
     {
-        set_str(OUTPUT, get_branch_raw(as_branch(INPUT(0))));
+        set_str(OUTPUT, get_branch_raw(INPUT_TERM(0)->nestedContents));
     }
 
     void setup(Branch& kernel)

@@ -152,7 +152,7 @@ void mark_stateful_value_assigned(Term* term)
     Term* secondTerm = branch->get(term->index+2);
     if (followingTerm->function != STATEFUL_VALUE_FUNC) return;
     if (secondTerm->function != DO_ONCE_FUNC) return;
-    Branch& doOnceBranch = as_branch(secondTerm);
+    Branch& doOnceBranch = secondTerm->nestedContents;
     if (doOnceBranch.length() == 0) return;
     Term* assignTerm = doOnceBranch[doOnceBranch.length()-1];
     if (assignTerm->function != UNSAFE_ASSIGN_FUNC) return;
@@ -212,9 +212,10 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         }
 
         // Migrate inner branches (but not branches that should be treated as values)
-        if (is_branch(sourceTerm) && !is_stateful(sourceTerm)
-                && is_branch(destTerm)) {
-            migrate_stateful_values(as_branch(sourceTerm), as_branch(destTerm));
+        if (sourceTerm->nestedContents.length() > 0
+                && destTerm->nestedContents.length() > 0
+                && !is_stateful(sourceTerm)) {
+            migrate_stateful_values(sourceTerm->nestedContents, destTerm->nestedContents);
         } 
         
         // Stateful value migration

@@ -106,7 +106,7 @@ void subroutine_stateful_term()
     test_assert(is_function_stateful(branch["mysub"]));
     test_assert(get_hidden_state_for_call(call) != NULL);
     
-    Term* a_inside_first_call = get_hidden_state_for_call(call)->asBranch()[0];
+    Term* a_inside_first_call = as_branch(get_hidden_state_for_call(call))[0];
     test_equals(as_float(a_inside_first_call), 1);
     evaluate_term(call);
     test_equals(as_float(a_inside_first_call), 2);
@@ -117,7 +117,7 @@ void subroutine_stateful_term()
     // the same stateful value.
     Term* another_call = branch.eval("another_call = mysub()");
 
-    Term* a_inside_another_call = get_hidden_state_for_call(another_call)->asBranch()[0];
+    Term* a_inside_another_call = as_branch(get_hidden_state_for_call(another_call))[0];
 
     test_assert(a_inside_first_call != a_inside_another_call);
     test_equals(as_float(a_inside_first_call), 3);
@@ -133,7 +133,7 @@ void subroutine_stateful_term()
         Term* state = get_hidden_state_for_call(call);
         test_assert(state);
         test_assert(!is_subroutine_state_expanded(state));
-        Branch& stateContents = state->asBranch();
+        Branch& stateContents = as_branch(state);
         test_assert(stateContents.length() == 0);
         
         expand_subroutines_hidden_state(call, state);

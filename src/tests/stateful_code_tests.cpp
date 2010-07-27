@@ -74,7 +74,7 @@ void subroutine_expansion_during_migrate()
     test_assert(is_subroutine_state_expanded(sourceCallState));
     test_assert(!is_subroutine_state_expanded(destCallState));
 
-    set_int(sourceCallState->asBranch()[0], 111);
+    set_int(as_branch(sourceCallState)[0], 111);
 
     migrate_stateful_values(source, dest);
 
@@ -370,7 +370,7 @@ void test_load_state_into_branch()
     // Dirty up f() with leftover state
     branch.eval("f(5)");
 
-    Branch& f_contents = as_branch(f);
+    Branch& f_contents = f->nestedContents;
     test_assert(f_contents["s"]->asInt() == 5);
 
     Branch myState;

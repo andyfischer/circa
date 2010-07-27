@@ -20,12 +20,14 @@ namespace branch_ref_t {
             return false;
         }
         
+#if 0
         Term* target = as_ref(ref);
 
         if (!is_branch(target)) {
             error_occurred(cxt, caller, "Input is not a BranchRef (target is not Branch)");
             return false;
         }
+#endif
         
         return true;
     }
@@ -55,7 +57,7 @@ namespace branch_ref_t {
     Branch& get_target_branch(TaggedValue* value)
     {
         List* list = List::checkCast(value);
-        return as_branch(list->get(0)->asRef());
+        return list->get(0)->asRef()->nestedContents;
     }
 
     CA_FUNCTION(get_configs)
@@ -128,7 +130,7 @@ namespace branch_ref_t {
     CA_FUNCTION(get_visible)
     {
         Branch& target_branch = get_target_branch(INPUT(0));
-        Branch& output = OUTPUT->asBranch();
+        Branch& output = as_branch(OUTPUT);
 
         int write = 0;
         for (int i=0; i < target_branch.length(); i++) {
@@ -180,7 +182,7 @@ namespace branch_ref_t {
     CA_FUNCTION(append_code)
     {
         Branch& target_branch = get_target_branch(INPUT(0));
-        Branch& input = as_branch(INPUT(1));
+        Branch& input = INPUT_TERM(1)->nestedContents;
 
         if (input.length() == 0)
             return;

@@ -89,10 +89,11 @@ namespace function_t {
 bool is_function(Term* term);
 bool is_function_attrs(Term* term);
 FunctionAttrs& as_function_attrs(Term* term);
+Branch& function_contents(Term* func);
 
 std::string get_placeholder_name_for_index(int index);
 
-void initialize_function_prototype(Branch& contents);
+void initialize_function(Term* func);
 
 bool is_callable(Term* term);
 bool inputs_fit_function(Term* function, RefList const& inputs);

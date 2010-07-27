@@ -166,6 +166,7 @@ Term* find_function(Branch& branch, std::string const& name)
 
 void set_source_hidden(Term* term, bool hidden)
 {
+    circa_assert(term != NULL);
     term->setBoolProp("syntax:hidden", hidden);
 }
 

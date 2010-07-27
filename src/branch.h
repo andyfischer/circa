@@ -106,6 +106,7 @@ namespace branch_t {
 
 bool is_branch(TaggedValue* term);
 Branch& as_branch(TaggedValue* term);
+Branch& as_branch(Term* term);
 
 bool is_branch_based_type(Term* type);
 bool is_branch_based_type(Type* type);

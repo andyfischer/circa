@@ -75,6 +75,9 @@ namespace overloaded_function {
     void setup_overloaded_function(Term* term, std::string const& name,
             RefList const& overloads)
     {
+        term->nestedContents.clear();
+        initialize_function(term);
+
         function_t::set_name(term, name);
         function_t::get_attrs(term).evaluate = evaluate_overloaded;
 
@@ -98,7 +101,7 @@ namespace overloaded_function {
         }
 
 
-        Branch& result = as_branch(term);
+        Branch& result = term->nestedContents;
         result.shorten(1);
         for (int i=0; i < argumentCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());

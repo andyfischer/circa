@@ -19,7 +19,7 @@ namespace for_function {
         format_heading(source, term);
         append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
             term, token::WHITESPACE);
-        format_branch_source(source, as_branch(term), term);
+        format_branch_source(source, term->nestedContents, term);
         append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
             term, token::WHITESPACE);
     }

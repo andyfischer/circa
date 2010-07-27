@@ -20,13 +20,13 @@ namespace circa {
 
 void update_if_block_joining_branch(Term* ifCall)
 {
-    Branch& contents = ifCall->asBranch();
+    Branch& contents = ifCall->nestedContents;
 
     // Create the joining contents if necessary
     if (!contents.contains("#joining"))
         create_branch(contents, "#joining");
 
-    Branch& joining = contents["#joining"]->asBranch();
+    Branch& joining = contents["#joining"]->nestedContents;
     joining.clear();
 
     // This is used later.
@@ -37,7 +37,8 @@ void update_if_block_joining_branch(Term* ifCall)
 
     {
         for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            Branch& branch = contents[branch_index]->asBranch();
+            Term* term = contents[branch_index];
+            Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
 
             TermNamespace::const_iterator it;
             for (it = branch.names.begin(); it != branch.names.end(); ++it)
@@ -68,7 +69,9 @@ void update_if_block_joining_branch(Term* ifCall)
         bool boundInEveryBranch = true;
 
         for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            if (contents[branch_index]->asBranch().contains(name))
+            Term* term = contents[branch_index];
+            Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
+            if (branch.contains(name))
                 numberOfBranchesWithThisName++;
             else
                 boundInEveryBranch = false;
@@ -89,10 +92,11 @@ void update_if_block_joining_branch(Term* ifCall)
 
         // Make a list where we find the corresponding term for this name in each branch.
         Term* selections = apply(joining, BRANCH_FUNC, RefList());
-        Branch& selectionsBranch = as_branch(selections);
+        Branch& selectionsBranch = selections->nestedContents;
 
         for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            Branch& branch = contents[branch_index]->asBranch();
+            Term* term = contents[branch_index];
+            Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
 
             Term* selection = NULL;
             if (branch.contains(name))
@@ -103,7 +107,7 @@ void update_if_block_joining_branch(Term* ifCall)
             apply(selectionsBranch, COPY_FUNC, RefList(selection));
         }
 
-        apply(joining, GET_INDEX_FUNC, RefList(selections, satisfiedIndex), name);
+        apply(joining, GET_INDEX_FROM_BRANCH_FUNC, RefList(selections, satisfiedIndex), name);
     }
 
     // Expose all names in 'joining' branch.
@@ -113,17 +117,17 @@ void update_if_block_joining_branch(Term* ifCall)
 Branch* get_if_condition_block(Term* ifCall, int index)
 {
     assert(ifCall->function = IF_BLOCK_FUNC);
-    Branch& callContents = as_branch(ifCall);
+    Branch& callContents = ifCall->nestedContents;
     assert(index < callContents.length());
-    return (&as_branch(callContents[index]));
+    return &(callContents[index]->nestedContents);
 }
 
 Branch* get_if_block_else_block(Term* ifCall)
 {
     assert(ifCall->function = IF_BLOCK_FUNC);
-    Branch& callContents = as_branch(ifCall);
+    Branch& callContents = ifCall->nestedContents;
     assert(callContents.length() >= 2);
-    return (&as_branch(callContents[callContents.length()-2]));
+    return &(callContents[callContents.length()-2]->nestedContents);
 }
 
 List* get_if_block_state(Term* ifCall)
@@ -136,9 +140,9 @@ List* get_if_block_state(Term* ifCall)
 
 bool if_block_contains_state(Term* ifCall)
 {
-    Branch& contents = as_branch(ifCall);
+    Branch& contents = ifCall->nestedContents;
     for (int cond=0; cond < contents.length(); cond++) {
-        Branch& condContents = as_branch(contents[cond]);
+        Branch& condContents = contents[cond]->nestedContents;
         for (int i=0; i < condContents.length(); i++) {
             if (is_stateful(condContents[i]))
                 return true;
@@ -149,7 +153,7 @@ bool if_block_contains_state(Term* ifCall)
 
 void evaluate_if_block(EvalContext* cxt, Term* caller)
 {
-    Branch& contents = as_branch(caller);
+    Branch& contents = caller->nestedContents;
     List* state = get_if_block_state(caller);
 
     if (state != NULL) {
@@ -183,7 +187,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
             // Load state, if it's found
             if (stateElement != NULL) {
                 stateElement = state->get(i);
-                load_state_into_branch(as_branch(stateElement), as_branch(call));
+                load_state_into_branch(as_branch(stateElement), call->nestedContents);
             }
 
             evaluate_term(cxt, call);
@@ -193,7 +197,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
                 // State elements may have moved during evaluate_term,
                 // so call state->get again.
                 stateElement = state->get(i);
-                persist_state_from_branch(as_branch(call), as_branch(stateElement));
+                persist_state_from_branch(call->nestedContents, as_branch(stateElement));
             }
 
             break;
@@ -202,7 +206,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
             // This condition wasn't executed, reset state.
             if (stateElement != NULL) {
                 as_branch(stateElement).clear();
-                reset_state(as_branch(call));
+                reset_state(call->nestedContents);
             }
         }
     }
@@ -216,13 +220,13 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
         if (stateElement != NULL) {
             as_branch(stateElement).clear();
             Term* call = contents[i];
-            reset_state(as_branch(call));
+            reset_state(call->nestedContents);
         }
     }
 
     // Update the #joining branch
     assert(contents[contents.length()-1]->name == "#joining");
-    Branch& joining = as_branch(contents[contents.length()-1]);
+    Branch& joining = contents[contents.length()-1]->nestedContents;
     set_int(joining["#satisfiedIndex"], satisfiedIndex);
     evaluate_branch(cxt, joining);
 }

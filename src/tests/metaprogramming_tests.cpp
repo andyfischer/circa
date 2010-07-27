@@ -35,19 +35,19 @@ void save_code_generated_with_reflection()
 
     Branch branch;
     Term* b = branch.eval("b = include('included.ca')");
-    test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
+    test_equals(b->nestedContents["#attr:source-file"]->asString(), "included.ca");
 
     branch.eval("bm = branch_ref(b)");
     branch.eval("def my_function() end");
 
-    test_assert(b->asBranch().contains("#attr:source-file"));
-    test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
+    test_assert(b->nestedContents.contains("#attr:source-file"));
+    test_equals(b->nestedContents["#attr:source-file"]->asString(), "included.ca");
 
     branch.eval("bm.append_code({my_function()})");
 
     // there was once a bug here:
-    test_assert(b->asBranch().contains("#attr:source-file"));
-    test_equals(b->asBranch()["#attr:source-file"]->asString(), "included.ca");
+    test_assert(b->nestedContents.contains("#attr:source-file"));
+    test_equals(b->nestedContents["#attr:source-file"]->asString(), "included.ca");
 
     branch.eval("bm.append_code({my_function()})");
     branch.eval("bm.append_code({my_function()})");

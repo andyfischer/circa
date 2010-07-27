@@ -41,7 +41,6 @@ struct TaggedValue
     std::string const& asString();
     bool asBool();
     Ref& asRef();
-    Branch& asBranch();
 };
 
 bool cast_possible(Type* type, TaggedValue* dest);

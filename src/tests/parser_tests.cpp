@@ -170,7 +170,7 @@ void test_function_decl()
     test_assert(function_t::get_input_name(func, 2) == "yo");
     test_assert(function_t::get_output_type(func) == BOOL_TYPE);
 
-    Branch& funcbranch = as_branch(func);
+    Branch& funcbranch = function_contents(func);
 
     // index 0 has the function definition
     test_equals(funcbranch[1]->name, "what");
@@ -448,8 +448,8 @@ void test_namespace()
 
     test_assert(branch);
     test_assert(ns->type == NAMESPACE_TYPE);
-    test_assert(as_branch(ns).contains("a"));
-    test_assert(as_branch(ns).contains("b"));
+    test_assert(ns->nestedContents.contains("a"));
+    test_assert(ns->nestedContents.contains("b"));
 
     Term* a = branch.eval("ns:a");
     test_assert(a->asInt() == 1);
@@ -521,7 +521,7 @@ void test_significant_indentation()
                 "  b = a + 1\n"
                 "c = 3 + 4");
 
-    Branch& funcBranch = as_branch(branch["func"]);
+    Branch& funcBranch = function_contents(branch["func"]);
 
     test_assert(funcBranch[1]->function == COMMENT_FUNC);
     test_assert(funcBranch[2]->asInt() == 1);
@@ -571,7 +571,7 @@ void test_significant_indentation2()
                 "  b = 2\n");
     test_assert(branch);
 
-    Branch& func = as_branch(branch["func"]);
+    Branch& func = function_contents(branch["func"]);
     test_assert(func[1]->function == COMMENT_FUNC);
     test_equals(func[2]->name, "a");
     test_assert(func[3]->function == COMMENT_FUNC);
@@ -582,14 +582,14 @@ void test_sig_indent_one_liner()
 {
     Branch branch;
     branch.eval("def f(): 'avacado'\n  'burrito'\n'cheese'");
-    Branch& f_contents = as_branch(branch["f"]);
+    Branch& f_contents = function_contents(branch["f"]);
     test_equals(f_contents[1]->asString(), "avacado");
     test_assert(branch[1]->asString() == "burrito");
     test_assert(branch[2]->asString() == "cheese");
 
     branch.clear();
     branch.eval("def g(): 1 2 3\n  4");
-    Branch& g_contents = as_branch(branch["g"]);
+    Branch& g_contents = function_contents(branch["g"]);
     test_equals(g_contents[1]->asInt(), 1);
     test_equals(g_contents[2]->asInt(), 2);
     test_equals(g_contents[3]->asInt(), 3);
