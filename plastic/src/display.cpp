@@ -30,8 +30,8 @@ bool initialize_display()
     int desiredHeight = 600;
 
     if (app::users_branch().contains("desired_window_size")) {
-        desiredWidth = app::users_branch()["desired_window_size"]->asBranch()[0]->asInt();
-        desiredHeight = app::users_branch()["desired_window_size"]->asBranch()[1]->asInt();
+        desiredWidth = app::users_branch()["desired_window_size"]->nestedContents[0]->asInt();
+        desiredHeight = app::users_branch()["desired_window_size"]->nestedContents[1]->asInt();
     }
 
     if (!resize_display(desiredWidth, desiredHeight))

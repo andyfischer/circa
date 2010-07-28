@@ -174,8 +174,7 @@ void setup(Branch& branch)
     //TTF_Font_t = &as_type(branch["TTF_Font"]);
     //initialize_simple_pointer_type(TTF_Font_t);
 
-    Branch& text_ns = branch["text"]->asBranch();
-
+    Branch& text_ns = branch["text"]->nestedContents;
     install_function(text_ns["load_font"], load_font);
     install_function(text_ns["render_text"], render_text);
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);

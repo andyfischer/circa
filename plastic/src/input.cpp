@@ -277,7 +277,7 @@ void setup(Branch& branch)
     install_function(branch["mouse_wheel_down_region"], mouse_wheel_down);
 
     // Initialize key constants
-    Branch& key = as_branch(branch["key"]);
+    Branch& key = branch["key"]->nestedContents;
     assert(is_namespace(key));
 
     set_int(key["up"], SDLK_UP);

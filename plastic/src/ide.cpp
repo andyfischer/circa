@@ -41,7 +41,7 @@ CA_FUNCTION(get_time)
 
 void setup(circa::Branch& branch)
 {
-    Branch& ide_ns = branch["ide"]->asBranch();
+    Branch& ide_ns = branch["ide"]->nestedContents;
     install_function(ide_ns["quit"], quit);
     install_function(ide_ns["reset_state"], reset_state);
     install_function(ide_ns["reload_runtime"], hosted_reload_runtime);

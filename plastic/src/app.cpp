@@ -199,7 +199,7 @@ bool reload_runtime()
 bool load_user_script_filename(std::string const& filename)
 {
     circa::Term* users_branch = app::runtime_branch()["users_branch"];
-    app::singleton()._usersBranch = &users_branch->asBranch();
+    app::singleton()._usersBranch = &users_branch->nestedContents;
 
     if (filename != "") {
         circa::Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");

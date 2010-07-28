@@ -370,10 +370,13 @@ CA_FUNCTION(set_uniform)
     if (gl_check_error(CONTEXT_AND_CALLER))
         return;
 
-    if (is_int(input))
+    if (is_int(input)) {
         glUniform1i(loc, as_int(input));
-    else if (is_float(input))
+    }
+    else if (is_float(input)) {
         glUniform1f(loc, as_float(input));
+    }
+#if 0
     else if (is_branch(input)) {
 
         Branch& contents = as_branch(input);
@@ -406,8 +409,9 @@ CA_FUNCTION(set_uniform)
 
             delete[] values;
         }
-
-    } else {
+    }
+#endif
+    else {
         error_occurred(CONTEXT_AND_CALLER, "Unsupported type: " + input->value_type->name);
         return;
     }
@@ -418,7 +422,7 @@ CA_FUNCTION(set_uniform)
 void setup(Branch& branch)
 {
     install_function(branch["background"], background);
-    Branch& gl_ns = branch["gl"]->asBranch();
+    Branch& gl_ns = branch["gl"]->nestedContents;
     install_function(gl_ns["triangles"], gl_triangles);
     install_function(gl_ns["line_strip"], gl_line_strip);
     install_function(gl_ns["line_loop"], gl_line_loop);

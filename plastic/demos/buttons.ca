@@ -30,7 +30,6 @@ def draggable_box(Point initial_location)
 
     color = normal_color
     highlight = cond(mouse_over(rect), 1.0, 0.0)
-    highlight = approach(highlight, time_delta)
     color = color_blend(normal_color highlight_color highlight)
 
     fill_rect(rect color)
@@ -41,6 +40,5 @@ def draggable_box(Point initial_location)
 end
 
 
-for i in 0..10
-draggable_box([100 40 + i*40])
-end
+draggable_box([100 50])
+draggable_box([100 100])

@@ -150,6 +150,7 @@ CA_FUNCTION(draw_image)
 
 CA_FUNCTION(draw_image_clip)
 {
+#if 0
     TaggedValue* image = INPUT(0);
     TaggedValue* clip = INPUT(1);
 
@@ -195,13 +196,14 @@ CA_FUNCTION(draw_image_clip)
     glBindTexture(GL_TEXTURE_2D, 0);
 
     gl_check_error(CONTEXT_AND_CALLER);
+#endif
 }
 
 namespace image {
 
 void setup(circa::Branch& branch)
 {
-    Branch& image_ns = branch["image"]->asBranch();
+    Branch& image_ns = branch["image"]->nestedContents;
     install_function(image_ns["_load"], load_image);
     install_function(image_ns["draw"], draw_image);
     install_function(image_ns["draw_clip_p"], draw_image_clip);

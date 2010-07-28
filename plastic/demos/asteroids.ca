@@ -42,7 +42,7 @@ ship_wing_size = 11.4
 ship_wing_rot = .40
 ship_radius = ship_size * ship_front
 
-asteroid_speed_modifier = 10.0
+asteroid_speed_modifier = 1.0
 
 draw_intersection_circles = false
 

@@ -192,7 +192,7 @@ namespace postprocess_functions
 
     void setup(Branch& kernel)
     {
-        Branch& postprocess_ns = kernel["postprocess"]->asBranch();
+        Branch& postprocess_ns = kernel["postprocess"]->nestedContents;
         install_function(postprocess_ns["make_surface"], make_surface);
         install_function(postprocess_ns["draw_surface"], draw_surface);
         install_function(postprocess_ns["draw_surface_at"], draw_surface_at);

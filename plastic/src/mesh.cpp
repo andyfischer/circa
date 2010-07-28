@@ -145,6 +145,7 @@ CA_FUNCTION(hosted_load_mesh)
 
 CA_FUNCTION(hosted_draw_mesh)
 {
+#if 0
     GLuint list = INT_INPUT(0);
     GLuint tex = INT_INPUT(1);
     glBindTexture(GL_TEXTURE_2D, tex);
@@ -160,6 +161,7 @@ CA_FUNCTION(hosted_draw_mesh)
     // Z is todo, need better maths
     glCallList(list);
     glPopMatrix();
+#endif
 }
 
 void setup(circa::Branch& branch)

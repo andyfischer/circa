@@ -20,13 +20,13 @@ void generate_plastic_docs(std::stringstream &out)
     out << ",";
     append_package_docs(out, runtimeBranch, "Plastic top level");
     out << ",";
-    append_package_docs(out, runtimeBranch["gl"]->asBranch(), "gl namespace");
+    append_package_docs(out, runtimeBranch["gl"]->nestedContents, "gl namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["image"]->asBranch(), "image namespace");
+    append_package_docs(out, runtimeBranch["image"]->nestedContents, "image namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["text"]->asBranch(), "text namespace");
+    append_package_docs(out, runtimeBranch["text"]->nestedContents, "text namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["tweak"]->asBranch(), "tweak namespace");
+    append_package_docs(out, runtimeBranch["tweak"]->nestedContents, "tweak namespace");
 
     out << "]\n";
     out << "}\n";
