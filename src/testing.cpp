@@ -16,7 +16,7 @@ void register_all_tests();
 
 void post_test_sanity_check();
 
-void _test_assert_function(bool condition, int line, const char* file)
+void test_assert_function(bool condition, int line, const char* file)
 {
     if (!condition) {
         std::stringstream msg;
@@ -25,7 +25,7 @@ void _test_assert_function(bool condition, int line, const char* file)
     }
 }
 
-void _test_assert_function(Term* term, int line, const char* file)
+void test_assert_function(Term* term, int line, const char* file)
 {
     if (term == NULL) {
         std::stringstream msg;
@@ -56,7 +56,7 @@ void _test_assert_function(Term* term, int line, const char* file)
     }
 }
 
-void _test_assert_function(Branch& branch, int line, const char* file)
+void test_assert_function(Branch& branch, int line, const char* file)
 {
     if (!branch_check_invariants(branch, &std::cout)) {
         declare_current_test_failed();
@@ -90,7 +90,7 @@ void _test_assert_function(Branch& branch, int line, const char* file)
     }
 }
 
-void _test_assert_function(EvalContext& context, int line, const char* file)
+void test_assert_function(EvalContext& context, int line, const char* file)
 {
     if (context.errorOccurred) {
         std::stringstream msg;
@@ -100,14 +100,14 @@ void _test_assert_function(EvalContext& context, int line, const char* file)
     }
 }
 
-void _test_fail_function(int line, const char* file)
+void test_fail_function(int line, const char* file)
 {
     std::stringstream msg;
     msg << "Test fail in " << file << ", line " << line;
     throw std::runtime_error(msg.str());
 }
 
-void _test_equals_function(RefList const& a, RefList const& b,
+void test_equals_function(RefList const& a, RefList const& b,
         const char* aText, const char* bText, int line, const char* file)
 {
     std::stringstream msg;
@@ -128,7 +128,7 @@ void _test_equals_function(RefList const& a, RefList const& b,
     }
 }
 
-void _test_equals_function(float a, float b,
+void test_equals_function(float a, float b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
@@ -142,7 +142,7 @@ void _test_equals_function(float a, float b,
     }
 }
 
-void _test_equals_function(std::string a, std::string b,
+void test_equals_function(std::string a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
@@ -270,6 +270,59 @@ void declare_current_test_failed()
 bool current_test_has_failed()
 {
     return gCurrentTestCase.failed;
+}
+
+void test_branch_as_assertions_list(Branch& branch, std::string const& contextStr)
+{
+    if (has_static_errors(branch)) {
+        std::cout << "Static error " << contextStr << ":" << std::endl;
+        print_static_errors_formatted(branch, std::cout);
+        declare_current_test_failed();
+        return;
+    }
+
+    std::stringstream checkInvariantsOutput;
+    if (!branch_check_invariants(branch, &checkInvariantsOutput)) {
+        std::cout << "Failed invariant " << contextStr << std::endl;
+        std::cout << checkInvariantsOutput.str() << std::endl;
+        declare_current_test_failed();
+        return;
+    }
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    if (context.errorOccurred) {
+        std::cout << "Runtime error " << contextStr << std::endl;
+        print_runtime_error_formatted(context, std::cout);
+        declare_current_test_failed();
+        return;
+    }
+
+    int boolean_statements_found = 0;
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (!is_statement(term))
+            continue;
+
+        if (!is_bool(term))
+            continue;
+
+        boolean_statements_found++;
+
+        if (!as_bool(term)) {
+            std::cout << "Assertion failed " << contextStr << std::endl;
+            std::cout << "failed: " << get_term_source_text(term) << std::endl;
+            declare_current_test_failed();
+            return;
+        }
+    }
+
+    if (boolean_statements_found == 0) {
+        std::cout << "No boolean statements found " << contextStr << std::endl;
+        declare_current_test_failed();
+        return;
+    }
 }
 
 }

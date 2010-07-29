@@ -152,6 +152,9 @@ std::string get_relative_name(Branch& branch, Term* term)
 
 std::string get_relative_name(Term* location, Term* term)
 {
+    if (location == NULL)
+        return get_relative_name(*KERNEL, term);
+
     if (location->owningBranch == NULL)
         return term->name;
     else

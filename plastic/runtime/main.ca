@@ -300,11 +300,13 @@ state string user_script_filename = path("../demos/demo_browser.ca")
 
 -- Function to specify a different script
 load_user_script_request = inbox()
-def load_user_script(string filename):
+def load_user_script(string filename)
     trace('load_user_script:', filename)
     send(load_user_script_request, filename)
-for filename in load_user_script_request:
+end
+for filename in load_user_script_request
     user_script_filename = filename
+end
 
 users_branch = include(user_script_filename)
 
@@ -312,7 +314,7 @@ def post_game_stuff()
     -- Draw HUD
     draw_main_menu = false
     if draw_main_menu
-      include('mainmenu.ca' -> path)
+        include('mainmenu.ca' -> path)
     end
 
     -- Draw fpses
