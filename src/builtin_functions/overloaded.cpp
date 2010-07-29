@@ -48,7 +48,7 @@ namespace overloaded_function {
 
     bool is_overloaded_function(Term* func)
     {
-        assert(is_function(func));
+        ca_assert(is_function(func));
         return function_t::get_attrs(func).evaluate == evaluate_overloaded;
     }
 
@@ -85,7 +85,7 @@ namespace overloaded_function {
         parameters.clear();
         parameters.resize(overloads.length());
 
-        assert(overloads.length() > 0);
+        ca_assert(overloads.length() > 0);
         int argumentCount = function_t::num_inputs(overloads[0]);
         bool variableArgs = false;
         RefList outputTypes;
@@ -128,7 +128,7 @@ namespace overloaded_function {
 
     void append_overload(Term* overloadedFunction, Term* overload)
     {
-        assert(is_overloaded_function(overloadedFunction));
+        ca_assert(is_overloaded_function(overloadedFunction));
 
         List& parameters = function_t::get_attrs(overloadedFunction).parameters;
         make_ref(parameters.append(), overload);

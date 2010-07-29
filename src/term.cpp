@@ -165,14 +165,14 @@ Term* alloc_term()
     return term;
 }
 
-void assert_term_invariants(Term* t)
+void ca_assert_term_invariants(Term* t)
 {
     // Make sure the value type matches the declared type.
     if (t->type == INT_TYPE)
-        assert(is_int(t));
+        ca_assert(is_int(t));
 
     if (t->type != INT_TYPE)
-        assert(!is_int(t));
+        ca_assert(!is_int(t));
 }
 
 } // namespace circa

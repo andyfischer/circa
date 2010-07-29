@@ -278,7 +278,7 @@ void setup(Branch& branch)
 
     // Initialize key constants
     Branch& key = branch["key"]->nestedContents;
-    assert(is_namespace(key));
+    ca_assert(is_namespace(key));
 
     set_int(key["up"], SDLK_UP);
     set_int(key["down"], SDLK_DOWN);

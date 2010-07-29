@@ -85,7 +85,7 @@ namespace branch_ref_t {
             if (!is_considered_config(t))
                 continue;
 
-            assert(write < count);
+            ca_assert(write < count);
             make_ref(output->get(write++), t);
         }
     }

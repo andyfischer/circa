@@ -10,13 +10,13 @@ const size_t MAX_REF_LIST_LENGTH = 10000000;
 
 void RefList::append(Term* term)
 {
-    assert(_items.size() < MAX_REF_LIST_LENGTH);
+    ca_assert(_items.size() < MAX_REF_LIST_LENGTH);
     _items.push_back(term);
 }
 
 void RefList::prepend(Term* term)
 {
-    assert(_items.size() < MAX_REF_LIST_LENGTH);
+    ca_assert(_items.size() < MAX_REF_LIST_LENGTH);
     _items.insert(_items.begin(), term);
 }
 
@@ -36,13 +36,13 @@ void RefList::appendUnique(Term* term)
 
 int RefList::length() const
 {
-    assert(_items.size() < MAX_REF_LIST_LENGTH);
+    ca_assert(_items.size() < MAX_REF_LIST_LENGTH);
     return (int) _items.size();
 }
 
 Term* RefList::get(unsigned int index) const
 {
-    assert(index < MAX_REF_LIST_LENGTH);
+    ca_assert(index < MAX_REF_LIST_LENGTH);
     if (index >= _items.size())
         return NULL;
     return _items[index];
@@ -50,19 +50,19 @@ Term* RefList::get(unsigned int index) const
 
 Term* RefList::operator[](unsigned int index) const
 {
-    assert(index < MAX_REF_LIST_LENGTH);
+    ca_assert(index < MAX_REF_LIST_LENGTH);
     return get(index);
 }
 
 Ref& RefList::operator[](unsigned int index)
 {
-    assert(index < MAX_REF_LIST_LENGTH);
+    ca_assert(index < MAX_REF_LIST_LENGTH);
     return _items[index];
 }
 
 void RefList::appendAll(RefList const& list)
 {
-    assert(&list != this);
+    ca_assert(&list != this);
 
     for (int i=0; i < list.length(); i++)
         append(list[i]);
@@ -70,7 +70,7 @@ void RefList::appendAll(RefList const& list)
 
 void RefList::setAt(unsigned int index, Term* term)
 {
-    assert(index < MAX_REF_LIST_LENGTH);
+    ca_assert(index < MAX_REF_LIST_LENGTH);
 
     // Make sure there are enough blank elements in the list
     while (_items.size() <= index) {
@@ -101,7 +101,7 @@ void RefList::remove(int index)
 
 void RefList::resize(unsigned int newLength)
 {
-    assert(newLength < MAX_REF_LIST_LENGTH);
+    ca_assert(newLength < MAX_REF_LIST_LENGTH);
     _items.resize(newLength);
 }
 

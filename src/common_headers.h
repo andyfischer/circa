@@ -14,7 +14,6 @@
 #endif // WINDOWS
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -62,5 +61,11 @@ typedef void (*EvaluateFunc)(EvalContext* cxt, Term* term, Term* func,
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
+
+// ca_assert results in a call to internal_error. On failure, this function may throw
+// an exception or trigger a debugger breakpoint. But either way, execution will
+// be interrupted.
+#define ca_assert(x) ca_assert_function((x), #x, __LINE__, __FILE__)
+void ca_assert_function(bool expr, const char* expr, int line, const char* file);
 
 } // namespace circa

@@ -105,7 +105,7 @@ void normalize_feedback_branch(Branch& branch)
 
             for (index_it = it->second.begin(); index_it != it->second.end(); ++index_it) {
                 int index = *index_it;
-                assert(branch[index] != NULL);
+                ca_assert(branch[index] != NULL);
                 accumulatorInputs.append(branch[index]->input(0));
                 branch.set(index, NULL);
             }

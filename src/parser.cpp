@@ -257,7 +257,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)
         || (foundWhitespace && (tokens.nextIs(RBRACE) || tokens.nextIs(END) || tokens.finished()))) {
         result = comment(branch, tokens);
-        assert(result != NULL);
+        ca_assert(result != NULL);
     }
 
     // Function decl
@@ -308,7 +308,7 @@ Term* statement(Branch& branch, TokenStream& tokens)
     // Otherwise, expression statement
     else {
         result = expression_statement(branch, tokens);
-        assert(result != NULL);
+        ca_assert(result != NULL);
     }
 
     prepend_whitespace(result, preWhitespace);
@@ -497,7 +497,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
 
         outputType = type_identifier_or_anonymous_type(branch, tokens);
-        assert(outputType != NULL);
+        ca_assert(outputType != NULL);
     }
 
     if (!is_type(outputType))
@@ -520,8 +520,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     finish_building_subroutine(result, outputType);
 
-    assert(is_value(result));
-    assert(is_subroutine(result));
+    ca_assert(is_value(result));
+    ca_assert(is_subroutine(result));
 
     set_source_location(result, startPosition, tokens);
 
@@ -635,9 +635,9 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
         // First iteration should always be 'if'
         if (firstIteration)
-            assert(leadingToken == IF);
+            ca_assert(leadingToken == IF);
         else
-            assert(leadingToken != IF);
+            ca_assert(leadingToken != IF);
 
         // Otherwise expect 'elif' or 'else'
         if (leadingToken != IF && leadingToken != ELIF && leadingToken != ELSE)
@@ -650,7 +650,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         if (expectCondition) {
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens);
-            assert(condition != NULL);
+            ca_assert(condition != NULL);
             recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
@@ -858,7 +858,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     int originalBranchLength = branch.length();
 
     Term* expr = infix_expression(branch, tokens);
-    assert(expr != NULL);
+    ca_assert(expr != NULL);
 
     bool expr_is_new = branch.length() != originalBranchLength;
 
@@ -1094,7 +1094,7 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, int precedenc
 
             std::string functionName = get_function_for_infix(operatorStr);
 
-            assert(functionName != "#unrecognized");
+            ca_assert(functionName != "#unrecognized");
 
             bool isRebinding = is_infix_operator_rebinding(operatorStr);
 

@@ -38,7 +38,7 @@ struct TermNamespace
     Term* operator[](std::string const& name) const
     {
         if (DEBUG_TRAP_NAME_LOOKUP)
-            assert(false);
+            ca_assert(false);
 
         METRIC_NAMESPACE_LOOKUPS++;
 

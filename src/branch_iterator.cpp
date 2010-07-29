@@ -33,7 +33,7 @@ Term* BranchIterator::current()
 
 void BranchIterator::advance()
 {
-    assert(!finished());
+    ca_assert(!finished());
 
     if (_skipNextBranch) {
         _skipNextBranch = false;

@@ -183,7 +183,7 @@ void bootstrap_kernel()
     as_type(FUNCTION_ATTRS_TYPE).copy = function_attrs_t::copy;
     as_type(FUNCTION_ATTRS_TYPE).release = function_attrs_t::release;
     KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
-    assert(is_type(FUNCTION_ATTRS_TYPE));
+    ca_assert(is_type(FUNCTION_ATTRS_TYPE));
 
     // Create Function type
     FUNCTION_TYPE = create_branch_based_type(*KERNEL, "Function");
@@ -205,7 +205,7 @@ void post_initialize_primitive_types(Branch& kernel)
     initialize_function(VALUE_FUNC);
     function_t::get_attrs(VALUE_FUNC).outputType = ANY_TYPE;
 
-    assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
+    ca_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }
 
 void pre_initialize_builtin_types(Branch& kernel)

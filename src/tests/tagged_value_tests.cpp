@@ -27,13 +27,13 @@ namespace toy_refcounted_pool {
                 return;
             }
         }
-        assert(false);
+        ca_assert(false);
     }
 
     void release(TaggedValue* value)
     {
         int index = value->value_data.asint;
-        assert(refcount[index] > 0);
+        ca_assert(refcount[index] > 0);
         refcount[index]--;
     }
 
@@ -192,13 +192,13 @@ namespace manual_memory_management_test {
                 return i;
             }
         }
-        assert(false);
+        ca_assert(false);
         return -1;
     }
 
     void pool_deallocate(int index)
     {
-        assert(pool_allocated[index]);
+        ca_assert(pool_allocated[index]);
         pool_allocated[index] = false;
     }
 

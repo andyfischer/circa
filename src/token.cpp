@@ -167,12 +167,12 @@ struct TokenizeContext
             instance.colEnd = this->charPosition;
         }
 
-        assert(instance.lineStart >= 0);
-        assert(instance.lineEnd >= 0);
-        assert(instance.colStart >= 0);
-        assert(instance.colEnd >= 0);
-        assert(instance.lineStart <= instance.lineEnd);
-        assert((instance.colEnd > instance.colStart) ||
+        ca_assert(instance.lineStart >= 0);
+        ca_assert(instance.lineEnd >= 0);
+        ca_assert(instance.colStart >= 0);
+        ca_assert(instance.colEnd >= 0);
+        ca_assert(instance.lineStart <= instance.lineEnd);
+        ca_assert((instance.colEnd > instance.colStart) ||
                 instance.lineStart < instance.lineEnd);
 
         results.push_back(instance);

@@ -47,7 +47,7 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 
     Branch* outerScope = ifCall->owningBranch;
-    assert(outerScope != NULL);
+    ca_assert(outerScope != NULL);
 
     // Filter out some names from boundNames.
     for (std::set<std::string>::iterator it = boundNames.begin(); it != boundNames.end();)
@@ -116,17 +116,17 @@ void update_if_block_joining_branch(Term* ifCall)
 
 Branch* get_if_condition_block(Term* ifCall, int index)
 {
-    assert(ifCall->function = IF_BLOCK_FUNC);
+    ca_assert(ifCall->function = IF_BLOCK_FUNC);
     Branch& callContents = ifCall->nestedContents;
-    assert(index < callContents.length());
+    ca_assert(index < callContents.length());
     return &(callContents[index]->nestedContents);
 }
 
 Branch* get_if_block_else_block(Term* ifCall)
 {
-    assert(ifCall->function = IF_BLOCK_FUNC);
+    ca_assert(ifCall->function = IF_BLOCK_FUNC);
     Branch& callContents = ifCall->nestedContents;
-    assert(callContents.length() >= 2);
+    ca_assert(callContents.length() >= 2);
     return &(callContents[callContents.length()-2]->nestedContents);
 }
 
@@ -225,7 +225,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
     }
 
     // Update the #joining branch
-    assert(contents[contents.length()-1]->name == "#joining");
+    ca_assert(contents[contents.length()-1]->name == "#joining");
     Branch& joining = contents[contents.length()-1]->nestedContents;
     set_int(joining["#satisfiedIndex"], satisfiedIndex);
     evaluate_branch(cxt, joining);

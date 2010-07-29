@@ -137,7 +137,7 @@ bool load_runtime()
     }
     parse_script(app::runtime_branch(), runtime_ca_path);
 
-    assert(branch_check_invariants(app::runtime_branch(), &std::cout));
+    ca_assert(branch_check_invariants(app::runtime_branch(), &std::cout));
 
     setup_builtin_functions();
 

@@ -22,8 +22,8 @@ void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const
 
 inline void evaluate_term(EvalContext* cxt, Term* term)
 {
-    assert(cxt != NULL);
-    assert(term != NULL);
+    ca_assert(cxt != NULL);
+    ca_assert(term != NULL);
 
     EvaluateFunc evaluate = function_t::get_evaluate(term->function);
 
@@ -48,7 +48,7 @@ void evaluate_term(Term* term)
 
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
-    assert(context != NULL);
+    ca_assert(context != NULL);
 
     for (int index=0; index < branch.length(); index++) {
 		Term* term = branch.get(index);

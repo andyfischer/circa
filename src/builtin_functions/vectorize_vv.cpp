@@ -48,8 +48,8 @@ namespace vectorize_vv_function {
             }
         }
         
-        assert(leftTerm.refCount == 1);
-        assert(rightTerm.refCount == 1);
+        ca_assert(leftTerm.refCount == 1);
+        ca_assert(rightTerm.refCount == 1);
 
 #if 0
         Branch evaluationBranch;

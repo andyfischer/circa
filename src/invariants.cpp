@@ -12,7 +12,7 @@ bool check_invariants(Term* term, std::string& result)
 {
     if (term->value_type == NULL) {
         result = "TaggedValue has null type";
-        assert(false);
+        ca_assert(false);
         return false;
     }
 
@@ -22,7 +22,7 @@ bool check_invariants(Term* term, std::string& result)
             && !is_branch(term)) {
         result = "Value has wrong type: term->type is " + term->type->name + ", tag is "
             + term->value_type->name;
-        assert(false);
+        ca_assert(false);
         return false;
     }
 

@@ -200,7 +200,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     Term* isFirstIteration = get_for_loop_is_first_iteration(CALLER);
-    assert(isFirstIteration->name == "#is_first_iteration");
+    ca_assert(isFirstIteration->name == "#is_first_iteration");
     Term* iterator = get_for_loop_iterator(CALLER);
     set_bool(get_for_loop_any_iterations(CALLER), numIterations > 0);
 

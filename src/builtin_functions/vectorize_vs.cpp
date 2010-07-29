@@ -26,7 +26,7 @@ namespace vectorize_vs_function {
         output->resize(numInputs);
         Term leftTerm;
         leftTerm.refCount++;
-        assert(leftTerm.refCount == 1);
+        ca_assert(leftTerm.refCount == 1);
 
         {
             RefList inputs(&leftTerm, right);
@@ -40,7 +40,7 @@ namespace vectorize_vs_function {
             }
         }
 
-        assert(leftTerm.refCount == 1);
+        ca_assert(leftTerm.refCount == 1);
     }
 
     void setup(Branch& kernel)

@@ -27,7 +27,7 @@ Term* import_member_function(Term* type, EvaluateFunc evaluate, std::string cons
 
 void install_function(Term* function, EvaluateFunc evaluate)
 {
-    assert(is_function(function));
+    ca_assert(is_function(function));
     function_t::get_evaluate(function) = evaluate;
 }
 

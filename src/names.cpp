@@ -6,8 +6,8 @@ namespace circa {
 
 Term* find_named(Branch const& branch, std::string const& name)
 {
-    assert(name != "");
-    assert(name == "#out" || name[0] != '#'); // We shouldn't ever lookup hidden names
+    ca_assert(name != "");
+    ca_assert(name == "#out" || name[0] != '#'); // We shouldn't ever lookup hidden names
 
     Term* result = get_named(branch, name);
     if (result != NULL)
@@ -137,7 +137,7 @@ bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& 
 
 std::string get_relative_name(Branch& branch, Term* term)
 {
-    assert(term != NULL);
+    ca_assert(term != NULL);
 
     if (name_is_reachable_from(term, branch))
         return term->name;

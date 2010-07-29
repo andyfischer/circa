@@ -11,9 +11,9 @@ const bool ASSERT_INTERNAL_ERROR = true;
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
     if (DEBUG_TRAP_ERROR_OCCURRED)
-        assert(false);
+        ca_assert(false);
 
-    assert(errorTerm != NULL);
+    ca_assert(errorTerm != NULL);
 
     if (context == NULL)
         throw std::runtime_error(message);
@@ -29,22 +29,22 @@ void internal_error(const char* message)
 {
     if (ASSERT_INTERNAL_ERROR) {
         std::cerr << "internal error: " << message << std::endl;
-        assert(false);
+        ca_assert(false);
     } else {
         throw std::runtime_error(message);
     }
 }
 
-void circa_assert_unmacro(bool expr, const char* exprStr, int line, const char* file)
+void ca_assert_function(bool expr, const char* exprStr, int line, const char* file)
 {
     if (!expr) {
         std::stringstream msg;
-        msg << "circa_assert(" << exprStr << ") failed in " << file << " line " << line;
+        msg << "ca_assert(" << exprStr << ") failed in " << file << " line " << line;
         internal_error(msg.str().c_str());
     }
 }
 
-void assert_type(Term* term, Term* type)
+void ca_assert_type(Term* term, Term* type)
 {
     if (term->type != type) {
         std::stringstream msg;
@@ -197,7 +197,7 @@ std::string get_static_error_message(Term* term)
         return out.str();
     }
     
-    assert(false);
+    ca_assert(false);
     return "";
 }
 

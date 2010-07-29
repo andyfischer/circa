@@ -6,7 +6,7 @@
 
 GLenum get_texture_format(SDL_Surface *surface)
 {
-    assert(surface);
+    ca_assert(surface);
     int nColors = surface->format->BytesPerPixel;
     if (nColors == 4) {
         // Contains alpha channel

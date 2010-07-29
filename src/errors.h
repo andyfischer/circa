@@ -7,19 +7,15 @@ namespace circa {
 // Puts 'errorTerm' into an error state, with the given message.
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 
-// Signal that an unexpected Circa error has occurred. Depending on debug settings, these
-// will either throw an exception or trigger an assert.
+// Signal that an unexpected error has occurred. Depending on debug settings, this
+// will either throw an exception or trigger an assert().
 void internal_error(const char* message);
-
-// Trigger internal_error() with a string that describes the current line of code
-#define circa_assert(x) circa_assert_unmacro((x), #x, __LINE__, __FILE__)
-void circa_assert_unmacro(bool expr, const char* exprStr, int line, const char* file);
 
 // Signal that a type mismatch has occurred in native code.
 void native_type_mismatch(std::string const& message);
 
 // Check if term has the given type, calls native_type_mismatch if not.
-void assert_type(Term* term, Term* type);
+void ca_assert_type(Term* term, Term* type);
 
 bool has_static_error(Term* term);
 bool has_static_errors(Branch& branch);

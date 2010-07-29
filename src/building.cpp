@@ -7,7 +7,7 @@ namespace circa {
 
 Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string const& name)
 {
-    assert(function != NULL);
+    ca_assert(function != NULL);
 
     evaluate_without_side_effects(function);
 
@@ -61,8 +61,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     Term* outputType = function_get_specialized_output_type(function, result);
 
-    assert(outputType != NULL);
-    assert(is_type(outputType));
+    ca_assert(outputType != NULL);
+    ca_assert(is_type(outputType));
 
     change_type(result, outputType);
 
@@ -129,7 +129,7 @@ void clear_all_users(Term* term)
 
 Term* create_duplicate(Branch& branch, Term* original, std::string const& name, bool copyBranches)
 {
-    circa_assert(original != NULL);
+    ca_assert(original != NULL);
 
     Term* term = apply(branch, original->function, original->inputs, name);
     change_type(term, original->type);
@@ -169,8 +169,8 @@ Term* apply(Branch& branch, std::string const& functionName, RefList const& inpu
 Term* create_value(Branch& branch, Term* type, std::string const& name)
 {
     // This function is safe to call while bootstrapping.
-    assert(type != NULL);
-    assert(is_type(type));
+    ca_assert(type != NULL);
+    ca_assert(is_type(type));
 
     Term *term = branch.appendNew();
 
@@ -318,7 +318,7 @@ Term* procure_bool(Branch& branch, std::string const& name)
 
 void resize_list(Branch& list, int numElements, Term* type)
 {
-    assert(numElements >= 0);
+    ca_assert(numElements >= 0);
 
     // Add terms if necessary
     for (int i=list.length(); i < numElements; i++)

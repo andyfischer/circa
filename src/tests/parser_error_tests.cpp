@@ -6,7 +6,7 @@
 // The goal of this test is to make sure that for every error: 1) no exception
 // is thrown, and 2) it's detected as an error. 
 //
-// (1) is a pretty common bug, since the parsing code makes liberal use of assert()
+// (1) is a pretty common bug, since the parsing code makes liberal use of ca_assert()
 //
 
 #include <circa.h>

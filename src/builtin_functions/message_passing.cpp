@@ -18,7 +18,7 @@ namespace message_passing_function {
         Term* inbox = INPUT_TERM(0);
         Term* input = INPUT_TERM(1);
 
-        assert(inbox->function == INBOX_FUNC);
+        ca_assert(inbox->function == INBOX_FUNC);
 
         List* inboxState = List::checkCast(get_hidden_state_for_call(inbox));
         copy(input, inboxState->append());

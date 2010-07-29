@@ -32,8 +32,8 @@ void append_whitespace(Term* term, std::string const& whitespace)
 
 void set_source_location(Term* term, int start, TokenStream& tokens)
 {
-    assert(term != NULL);
-    assert(tokens.length() != 0);
+    ca_assert(term != NULL);
+    ca_assert(tokens.length() != 0);
 
     TermSourceLocation loc;
 
@@ -122,7 +122,7 @@ Term* find_and_apply(Branch& branch,
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
 {
-    assert(term != NULL);
+    ca_assert(term != NULL);
 
     if (term->name != "")
         return;
@@ -145,7 +145,7 @@ Term* find_type(Branch& branch, std::string const& name)
 
     if (result == NULL) {
         result = apply(branch, UNKNOWN_TYPE_FUNC, RefList(), name);
-        assert(result->type == TYPE_TYPE);
+        ca_assert(result->type == TYPE_TYPE);
     }   
 
     return result;
@@ -166,13 +166,13 @@ Term* find_function(Branch& branch, std::string const& name)
 
 void set_source_hidden(Term* term, bool hidden)
 {
-    circa_assert(term != NULL);
+    ca_assert(term != NULL);
     term->setBoolProp("syntax:hidden", hidden);
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)
 {
-    assert(start <= tokens.getPosition());
+    ca_assert(start <= tokens.getPosition());
 
     int originalPosition = tokens.getPosition();
 
@@ -194,7 +194,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
         tokens.consume();
 
     // make sure we passed our original position
-    assert(tokens.getPosition() >= originalPosition);
+    ca_assert(tokens.getPosition() >= originalPosition);
 
     if (positionRecepient != NULL)
         set_source_location(positionRecepient, start, tokens);
@@ -230,7 +230,7 @@ Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
     else
         existing->setStringProp("message", message);
 
-    assert(has_static_error(existing));
+    ca_assert(has_static_error(existing));
 
     return existing;
 }

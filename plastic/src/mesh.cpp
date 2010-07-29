@@ -116,7 +116,7 @@ void draw_mesh_immediate(Mesh& mesh)
         Face const& face = *it;
         glColor3f(1,1,1);
         for (int i=0; i < 4; i++) {
-            assert(face.vertex_index[i] >= 0);
+            ca_assert(face.vertex_index[i] >= 0);
             Vertex3f const& vert = mesh.vertices[face.vertex_index[i]];
             Vertex2f const& tex = mesh.uvs[face.uv_index[i]];
             if (face.uv_index[i] != -1)

@@ -60,14 +60,14 @@ TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
             result = obj->getIndex(fieldIndex);
         }
     }
-    assert(result != obj);
+    ca_assert(result != obj);
     return result;
 }
     
 void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValue* newValue)
 {
-    circa_assert(path.length() > 0);
-    circa_assert(head != newValue);
+    ca_assert(path.length() > 0);
+    ca_assert(head != newValue);
 
     int numElements = path._elements.size();
     for (int i=0; i < numElements; i++) {
@@ -75,7 +75,7 @@ void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValu
 
         TaggedValue* next = step_path(head, element);
         touch(next);
-        assert(head != newValue);
+        ca_assert(head != newValue);
 
         if (i == (numElements-1)) {
             if (element.isIndex()) {

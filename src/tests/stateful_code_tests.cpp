@@ -349,13 +349,13 @@ void bug_where_stateful_function_wouldnt_update_inputs()
 void bug_where_state_wasnt_preserved_after_error()
 {
     Branch branch;
-    branch.eval("def hi() state int i; i = 4; assert(false) end");
+    branch.eval("def hi() state int i; i = 4; ca_assert(false) end");
 
     Term* t = branch.eval("t = hi()");
 
     test_assert(get_hidden_state_for_call(t) != NULL);
 
-    // not working because assert() prevents us from reaching the part where the
+    // not working because ca_assert() prevents us from reaching the part where the
     // stateful value is assigned back.
     //test_assert(get_hidden_state_for_call(t)->asBranch()[0]->asInt() == 4);
 }

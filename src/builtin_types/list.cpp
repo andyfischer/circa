@@ -24,25 +24,25 @@ void tv_touch(TaggedValue* value);
 
 void resize(TaggedValue* list, int newSize)
 {
-    assert(is_list(list));
+    ca_assert(is_list(list));
     set_pointer(list, resize((ListData*) get_pointer(list), newSize));
 }
 
 void clear(TaggedValue* list)
 {
-    assert(is_list(list));
+    ca_assert(is_list(list));
     clear((ListData**) &list->value_data);
 }
 
 TaggedValue* append(TaggedValue* list)
 {
-    assert(is_list(list));
+    ca_assert(is_list(list));
     return append((ListData**) &list->value_data);
 }
 
 void tv_initialize(Type* type, TaggedValue* value)
 {
-    assert(value->value_data.ptr == NULL);
+    ca_assert(value->value_data.ptr == NULL);
 
     // If type has a prototype then initialize to that.
     Branch& prototype = type_t::get_prototype(type);
@@ -57,7 +57,7 @@ void tv_initialize(Type* type, TaggedValue* value)
 
 void tv_release(TaggedValue* value)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
     if (data == NULL) return;
     decref(data);
@@ -65,8 +65,8 @@ void tv_release(TaggedValue* value)
 
 void tv_copy(TaggedValue* source, TaggedValue* dest)
 {
-    assert(is_list(source));
-    assert(is_list(dest));
+    ca_assert(is_list(source));
+    ca_assert(is_list(dest));
     ListData* s = (ListData*) get_pointer(source);
     ListData* d = (ListData*) get_pointer(dest);
 
@@ -82,7 +82,7 @@ void tv_copy(TaggedValue* source, TaggedValue* dest)
 
 bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
 {
-    assert(is_list(leftValue));
+    ca_assert(is_list(leftValue));
     Type* rhsType = right->value_type;
     if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
         return false;
@@ -129,14 +129,14 @@ void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
 
 TaggedValue* tv_get_index(TaggedValue* value, int index)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
     return get_index(s, index);
 }
 
 void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
     set_index(&s, index, element);
     set_pointer(value, s);
@@ -152,20 +152,20 @@ TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
 
 int tv_num_elements(TaggedValue* value)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     ListData* s = (ListData*) get_pointer(value);
     return num_elements(s);
 }
 
 std::string tv_to_string(TaggedValue* value)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     return to_string((ListData*) get_pointer(value));
 }
 
 void tv_touch(TaggedValue* value)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
     set_pointer(value, touch(data));
 }
@@ -249,7 +249,7 @@ bool tv_value_fits_type(Type* type, TaggedValue* value)
 
 void remove_and_replace_with_back(TaggedValue* value, int index)
 {
-    assert(is_list(value));
+    ca_assert(is_list(value));
     ListData* data = (ListData*) get_pointer(value);
     remove_and_replace_with_back(&data, index);
     set_pointer(value, data);

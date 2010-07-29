@@ -63,13 +63,13 @@ namespace subroutine_t {
 
             std::string inputName = function_t::get_input_name(function, input);
             if (inputName == "#state") {
-                assert(input == 0);
+                ca_assert(input == 0);
                 continue;
             }
 
             Term* term = function_t::get_input_placeholder(function, input);
 
-            assert(term->function == INPUT_PLACEHOLDER_FUNC);
+            ca_assert(term->function == INPUT_PLACEHOLDER_FUNC);
 
             Term* incomingTerm = INPUT_TERM(input);
             if (term->type == ANY_TYPE)
@@ -211,14 +211,14 @@ void subroutine_change_state_type(Term* func, Term* newType)
 
 bool is_subroutine_state_expanded(Term* term)
 {
-    assert(term != NULL);
+    ca_assert(term != NULL);
     return as_branch(term).length() > 0;
 }
 
 void expand_subroutines_hidden_state(Term* call, Term* state)
 {
-    assert(is_subroutine(call->function));
-    assert(state != NULL);
+    ca_assert(is_subroutine(call->function));
+    ca_assert(state != NULL);
     duplicate_branch(function_contents(call->function), as_branch(state));
 }
 

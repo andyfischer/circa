@@ -24,7 +24,7 @@ struct ListData {
 void assert_valid_list(ListData* list)
 {
     if (list == NULL) return;
-    assert(list->refCount > 0);
+    ca_assert(list->refCount > 0);
     debug_assert_valid_object(list, LIST_OBJECT);
 }
 
@@ -37,7 +37,7 @@ void incref(ListData* data)
 void decref(ListData* data)
 {
     assert_valid_list(data);
-    assert(data->refCount > 0);
+    ca_assert(data->refCount > 0);
     data->refCount--;
 
     if (data->refCount == 0) {
@@ -152,7 +152,7 @@ ListData* touch(ListData* original)
 {
     if (original == NULL)
         return NULL;
-    assert(original->refCount > 0);
+    ca_assert(original->refCount > 0);
     if (original->refCount == 1)
         return original;
 
@@ -207,7 +207,7 @@ int refcount(ListData* value)
 void remove_and_replace_with_back(ListData** data, int index)
 {
     *data = touch(*data);
-    assert(index < (*data)->count);
+    ca_assert(index < (*data)->count);
 
     make_null(&(*data)->items[index]);
 

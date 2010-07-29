@@ -35,7 +35,7 @@ bool debug_is_object_valid(void* obj, int type);
 
 
 // Checks if term is a valid pointer according to our map, and triggers
-// an assert if not.
+// an ca_assert if not.
 void assert_valid_term(Term* term);
 
 // Returns whether this pointer is valid according to our map. 

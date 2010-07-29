@@ -305,7 +305,7 @@ void change_type(TaggedValue* v, Type* type)
 
 bool equals(TaggedValue* lhs, TaggedValue* rhs)
 {
-    assert(lhs->value_type != NULL);
+    ca_assert(lhs->value_type != NULL);
 
     Type::Equals equals = lhs->value_type->equals;
 
@@ -384,13 +384,13 @@ void set_float(TaggedValue* value, float f)
 
 void set_bool(TaggedValue* value, bool b)
 {
-    assert(is_bool(value));
+    ca_assert(is_bool(value));
     value->value_data.asbool = b;
 }
 
 void set_str(TaggedValue* value, const char* s)
 {
-    assert(is_string(value));
+    ca_assert(is_string(value));
     *((std::string*) value->value_data.ptr) = s;
 }
 
@@ -401,7 +401,7 @@ void set_str(TaggedValue* value, std::string const& s)
 
 void set_ref(TaggedValue* value, Term* t)
 {
-    assert(is_ref(value));
+    ca_assert(is_ref(value));
     *((Ref*) value->value_data.ptr) = t;
 }
 
@@ -418,37 +418,37 @@ void set_pointer(TaggedValue* value, Type* type, void* p)
 
 int as_int(TaggedValue* value)
 {
-    assert(is_int(value));
+    ca_assert(is_int(value));
     return value->value_data.asint;
 }
 
 float as_float(TaggedValue* value)
 {
-    assert(is_float(value));
+    ca_assert(is_float(value));
     return value->value_data.asfloat;
 }
 
 bool as_bool(TaggedValue* value)
 {
-    assert(is_bool(value));
+    ca_assert(is_bool(value));
     return value->value_data.asbool;
 }
 
 Ref& as_ref(TaggedValue* value)
 {
-    assert(is_ref(value));
+    ca_assert(is_ref(value));
     return *((Ref*) value->value_data.ptr);
 }
 
 Type& as_type(TaggedValue* value)
 {
-    assert(is_type(value));
+    ca_assert(is_type(value));
     return *((Type*) value->value_data.ptr);
 }
 
 std::string const& as_string(TaggedValue* value)
 {
-    assert(is_string(value));
+    ca_assert(is_string(value));
     return *((std::string*) value->value_data.ptr);
 }
 

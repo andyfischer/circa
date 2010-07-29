@@ -34,7 +34,7 @@ void delete_term(Term* term)
 {
     assert_valid_term(term);
 
-    assert(term->refCount == 0);
+    ca_assert(term->refCount == 0);
 
     term->inputs.clear();
     term->type = NULL;
@@ -49,7 +49,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
 
     // make sure this map doesn't try to remap NULL, because such a thing
     // would almost definitely lead to errors.
-    assert(!map.contains(NULL));
+    ca_assert(!map.contains(NULL));
 
     for (int i=0; i < term->numInputs(); i++)
         set_input(term, i, map.getRemapped(term->input(i)));
@@ -84,7 +84,7 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
 {
     assert_valid_term(term);
     assert_valid_term(original);
-    assert(original != NULL);
+    ca_assert(original != NULL);
 
     ReferenceMap map;
     map[original] = replacement;

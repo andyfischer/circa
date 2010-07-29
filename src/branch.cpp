@@ -59,8 +59,8 @@ Term* Branch::last() const
 
 int Branch::getIndex(Term* term) const
 {
-    assert(term != NULL);
-    assert(term->owningBranch == this);
+    ca_assert(term != NULL);
+    ca_assert(term->owningBranch == this);
     assert_valid_term(term);
 
     //assert(term->index == debugFindIndex(term));
@@ -90,7 +90,7 @@ int Branch::findIndex(std::string const& name) const
 void Branch::set(int index, Term* term)
 {
     assert_valid_branch(this);
-    assert(index <= length());
+    ca_assert(index <= length());
 
     // No-op if this is the same term. Need to check this because otherwise
     // we decrement refcount on term.
@@ -101,7 +101,7 @@ void Branch::set(int index, Term* term)
     _terms[index] = term;
     if (term != NULL) {
         assert_valid_term(term);
-        assert(term->owningBranch == NULL || term->owningBranch == this);
+        ca_assert(term->owningBranch == NULL || term->owningBranch == this);
         term->owningBranch = this;
         term->index = index;
     }
@@ -112,7 +112,7 @@ void Branch::set(int index, Term* term)
 void Branch::setNull(int index)
 {
     assert_valid_branch(this);
-    assert(index <= length());
+    ca_assert(index <= length());
     Term* term = _terms[index];
     if (term != NULL) {
         // remove name binding if necessary
@@ -131,7 +131,7 @@ void Branch::append(Term* term)
     _terms.append(term);
     if (term != NULL) {
         assert_valid_term(term);
-        assert(term->owningBranch == NULL);
+        ca_assert(term->owningBranch == NULL);
         term->owningBranch = this;
         term->index = _terms.length()-1;
     }
@@ -141,7 +141,7 @@ Term* Branch::appendNew()
 {
     assert_valid_branch(this);
     Term* term = alloc_term();
-    assert(term != NULL);
+    ca_assert(term != NULL);
     _terms.append(term);
     term->owningBranch = this;
     term->index = _terms.length()-1;
@@ -152,8 +152,8 @@ void Branch::insert(int index, Term* term)
 {
     assert_valid_term(term);
     assert_valid_branch(this);
-    assert(index >= 0);
-    assert(index <= _terms.length());
+    ca_assert(index >= 0);
+    ca_assert(index <= _terms.length());
 
     _terms.append(NULL);
     for (int i=_terms.length()-1; i > index; i--) {
@@ -163,7 +163,7 @@ void Branch::insert(int index, Term* term)
     _terms[index] = term;
 
     if (term != NULL) {
-        assert(term->owningBranch == NULL);
+        ca_assert(term->owningBranch == NULL);
         term->owningBranch = this;
         term->index = index;
     }
@@ -172,9 +172,9 @@ void Branch::insert(int index, Term* term)
 void Branch::moveToEnd(Term* term)
 {
     assert_valid_term(term);
-    assert(term != NULL);
-    assert(term->owningBranch == this);
-    assert(term->index >= 0);
+    ca_assert(term != NULL);
+    ca_assert(term->owningBranch == this);
+    ca_assert(term->index >= 0);
     int index = getIndex(term);
     _terms.append(term); // do this first so that the term doesn't lose references
     _terms[index] = NULL;
@@ -184,7 +184,7 @@ void Branch::moveToEnd(Term* term)
 void Branch::remove(Term* term)
 {
     assert_valid_term(term);
-    assert(term != NULL);
+    ca_assert(term != NULL);
     remove(getIndex(term));
 }
 
@@ -467,7 +467,7 @@ namespace branch_t {
 
     void set_index(TaggedValue* value, int index, TaggedValue* element)
     {
-        assert(value != element);
+        ca_assert(value != element);
         circa::copy(element, as_branch(value)[index]);
     }
 
@@ -482,7 +482,7 @@ namespace branch_t {
         TaggedValue* destination = as_branch(value)[name];
         if (destination == NULL)
             return;
-        assert(destination != value);
+        ca_assert(destination != value);
         circa::copy(element, as_branch(value)[name]);
     }
 
@@ -512,7 +512,7 @@ namespace branch_t {
 
         // Add terms if necessary
         for (int i=dest.length(); i < source.length(); i++) {
-            assert(source[i] != NULL);
+            ca_assert(source[i] != NULL);
             assert_valid_term(source[i]);
 
             Term* t = create_duplicate(dest, source[i]);
@@ -579,14 +579,14 @@ bool is_branch(TaggedValue* value)
 
 Branch& as_branch(TaggedValue* value)
 {
-    assert(value != NULL);
-    assert(is_branch(value));
+    ca_assert(value != NULL);
+    ca_assert(is_branch(value));
     return *((Branch*) value->value_data.ptr);
 }
 
 Branch& as_branch(Term* term)
 {
-    circa_assert(term->nestedContents.length() == 0); // <- Temp while things are refactored
+    ca_assert(term->nestedContents.length() == 0); // <- Temp while things are refactored
     return as_branch((TaggedValue*) term);
 }
 
@@ -609,14 +609,14 @@ std::string compound_type_to_string(TaggedValue* value)
 
 bool is_branch_based_type(Term* type)
 {
-    assert(type != NULL);
-    assert(type_contents(type) != NULL);
+    ca_assert(type != NULL);
+    ca_assert(type_contents(type) != NULL);
     return type_contents(type)->initialize == branch_t::initialize;
 }
 
 bool is_branch_based_type(Type* type)
 {
-    assert(type != NULL);
+    ca_assert(type != NULL);
     return type->initialize == branch_t::initialize;
 }
 

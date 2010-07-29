@@ -104,7 +104,7 @@ std::string unformat_rich_source(StyledSource* source)
 
 void format_term_source(StyledSource* source, Term* term)
 {
-    assert(term != NULL);
+    ca_assert(term != NULL);
 
     // Pre whitespace
     append_phrase(source, term->stringPropOptional("syntax:preWhitespace", ""),

@@ -27,7 +27,7 @@ void incref(StringData* data)
 
 void decref(StringData* data)
 {
-    assert(data->refCount > 0);
+    ca_assert(data->refCount > 0);
     data->refCount--;
     if (data->refCount == 0)
         free(data);
@@ -36,7 +36,7 @@ void decref(StringData* data)
 // Create a new blank string with the given length. Starts off with 1 ref.
 StringData* create_str(int length)
 {
-    assert(length > 0);
+    ca_assert(length > 0);
     StringData* result = (StringData*) malloc(sizeof(StringData) + length);
     result->refCount = 1;
     result->length = length;
@@ -60,7 +60,7 @@ StringData* duplicate(StringData* original)
 // multiple references, we'll return a new copy (and decref the original).
 StringData* touch(StringData* original)
 {
-    assert(original->refCount > 0);
+    ca_assert(original->refCount > 0);
     if (original->refCount == 1)
         return original;
     StringData* dup = duplicate(original);

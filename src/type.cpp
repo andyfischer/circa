@@ -16,7 +16,7 @@ namespace type_t {
     {
         if (type->permanent)
             return;
-        assert(type->refCount > 0);
+        ca_assert(type->refCount > 0);
         type->refCount--;
         if (type->refCount == 0)
             delete type;
@@ -30,12 +30,12 @@ namespace type_t {
     }
     void release(TaggedValue* value)
     {
-        assert(is_type(value));
+        ca_assert(is_type(value));
         decref((Type*) get_pointer(value));
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
-        assert(is_type(source));
+        ca_assert(is_type(source));
         copy((Type*) get_pointer(source), dest);
     }
 
@@ -53,7 +53,7 @@ namespace type_t {
 
         for (int i=0; i < prototype.length(); i++) {
             Term* field = prototype[i];
-            assert(field != NULL);
+            ca_assert(field != NULL);
             append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
                     term, token::WHITESPACE);
             append_phrase(source, field->type->name, term, phrase_type::TYPE_NAME);
@@ -136,10 +136,10 @@ Type* declared_type(Term* term)
 
 Type& as_type(Term *term)
 {
-    assert(get_type_value(term) != NULL);
+    ca_assert(get_type_value(term) != NULL);
 
-    // don't use assert_type here because assert_type uses as_type
-    assert(term->type == TYPE_TYPE);
+    // don't use ca_assert_type here because ca_assert_type uses as_type
+    ca_assert(term->type == TYPE_TYPE);
 
     return *get_type_value(term);
 }
@@ -262,7 +262,7 @@ Term* create_implicit_tuple_type(RefList const& types)
     type_contents(result)->parent = type_contents(LIST_TYPE);
 
     for (int i=0; i < types.length(); i++) {
-        assert(is_type(types[i]));
+        ca_assert(is_type(types[i]));
         create_value(prototype, types[i]);
     }
     

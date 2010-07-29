@@ -32,16 +32,16 @@ void change_function(Term* term, Term* function)
 
 void unsafe_change_type(Term *term, Term *type)
 {
-    assert(type != NULL);
+    ca_assert(type != NULL);
 
     term->type = type;
 }
 
 void change_type(Term *term, Term *typeTerm)
 {
-    assert(term != NULL);
-    assert(typeTerm != NULL);
-    assert_type(typeTerm, TYPE_TYPE);
+    ca_assert(term != NULL);
+    ca_assert(typeTerm != NULL);
+    ca_assert_type(typeTerm, TYPE_TYPE);
 
     Term* oldType = term->type;
 
@@ -62,7 +62,7 @@ void specialize_type(Term *term, Term *type)
     if (term->type == type)
         return;
 
-    assert_type(term, ANY_TYPE);
+    ca_assert_type(term, ANY_TYPE);
 
     change_type(term, type);
 }

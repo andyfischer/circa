@@ -95,6 +95,6 @@ struct Term : TaggedValue
 // Allocate a new Term object.
 Term* alloc_term();
 
-void assert_term_invariants(Term* t);
+void ca_assert_term_invariants(Term* t);
 
 } // namespace circa

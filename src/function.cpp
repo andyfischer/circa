@@ -167,8 +167,8 @@ namespace function_t {
 
     FunctionAttrs& get_attrs(Term* function)
     {
-        circa_assert(function->nestedContents.length() > 0);
-        circa_assert(function->nestedContents[0]->type == FUNCTION_ATTRS_TYPE);
+        ca_assert(function->nestedContents.length() > 0);
+        ca_assert(function->nestedContents[0]->type == FUNCTION_ATTRS_TYPE);
         return as_function_attrs(function->nestedContents[0]);
     }
 
@@ -291,7 +291,7 @@ bool is_function_attrs(Term* term)
 
 FunctionAttrs& as_function_attrs(Term* term)
 {
-    assert(is_function_attrs(term));
+    ca_assert(is_function_attrs(term));
     return *((FunctionAttrs*) get_pointer(term));
 }
 
