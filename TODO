@@ -7,10 +7,6 @@ Bugs/tasks:
      function( end
     It should throw an error on encountering the unexpected 'end'
 
- - Color math is kind of weird and has lots of pitfalls, perhaps we just need blend_color().
-
- - List syntax [] should just call list(), shouldn't try to create a branch
-
  - Remaining things using branch-based types should use list_t
 
  - Add dictionary_t and map_t
@@ -35,6 +31,5 @@ Bugs/tasks:
 
 Big tasks:
  - Parametrized/generic types
- - Recursion
  - JIT compilation
  - C reproduction
