@@ -265,7 +265,7 @@ void test_state_in_function()
     Branch branch;
 
     branch.compile(
-    "def my_func() -> int; if true; state i = 0; i += 1; return i; else return 0 end end");
+    "def my_func() -> int; if true; state i = 0; i += 1; return(i); else return(0) end end");
 
     Term* call1 = branch.compile("my_func()");
     Term* call2 = branch.compile("my_func()");

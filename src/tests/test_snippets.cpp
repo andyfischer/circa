@@ -332,7 +332,7 @@ void test_for_loops()
 void test_subscripting()
 {
     test_snippet("l = [[[1]]]", "l[0][0][0] == 1");
-    test_snippet("def return_point() -> Point return [8 9] end", "return_point().x == 8");
+    test_snippet("def return_point() -> Point return([8 9]) end", "return_point().x == 8");
 }
 
 void test_set()
@@ -351,7 +351,7 @@ void test_map()
     test_snippet("m = Map(); m.add('a','b')",
         "m.contains('a'); m.remove('a'); not(m.contains('a'))");
 
-    test_snippet("def f(int i) -> int for i in [] return 0 end end; map(f, [0])", "");
+    test_snippet("def f(int i) -> int for i in [] return(0) end end; map(f, [0])", "");
 }
 
 void test_field_syntax()

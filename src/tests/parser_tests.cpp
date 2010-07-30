@@ -156,7 +156,7 @@ void test_function_decl()
     Term* func = parser::compile(&branch, parser::statement,
             "def Myfunc(string what, string hey, int yo) -> bool\n"
             "  whathey = concat(what,hey)\n"
-            "  return yo > 3\n"
+            "  return(yo > 3)\n"
             "end");
 
     test_equals(func->name, "Myfunc");
@@ -455,7 +455,7 @@ void test_namespace()
     test_assert(a->asInt() == 1);
 
     branch.clear();
-    ns = branch.eval("namespace ns; def myfunc(int a) -> int; return a+1; end; end");
+    ns = branch.eval("namespace ns; def myfunc(int a) -> int; return(a+1); end; end");
     Term* c = branch.eval("c = ns:myfunc(4)");
     test_assert(branch);
     test_assert(c->asInt() == 5);
@@ -541,7 +541,7 @@ void test_significant_indentation()
                 "\n"
                 "  \n"
                 "    a = 2\n"
-                "    return a\n"
+                "    return(a)\n"
                 "b = func()");
     test_assert(branch);
     test_assert(branch["b"]->asInt() == 2);
@@ -552,7 +552,7 @@ void test_significant_indentation()
     branch.eval("def func() -> int:\n"
                 "  a = 5\n"
                 "\n"          // <-- Blank line doesn't have same indent
-                "  return a\n"
+                "  return(a)\n"
                 "b = func()");
     test_assert(branch);
     test_assert(branch["b"]->asInt() == 5);

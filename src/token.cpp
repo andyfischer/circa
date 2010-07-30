@@ -70,7 +70,6 @@ const char* get_token_text(int match)
         case STATE: return "state";
         case DEF: return "def";
         case TYPE: return "type";
-        case RETURN: return "return";
         case IN_TOKEN: return "in";
         case TRUE_TOKEN: return "true";
         case FALSE_TOKEN: return "false";
@@ -271,7 +270,6 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, ELIF)) return;
         if (try_to_consume_keyword(context, FOR)) return;
         if (try_to_consume_keyword(context, STATE)) return;
-        if (try_to_consume_keyword(context, RETURN)) return;
         if (try_to_consume_keyword(context, IN_TOKEN)) return;
         if (try_to_consume_keyword(context, TRUE_TOKEN)) return;
         if (try_to_consume_keyword(context, FALSE_TOKEN)) return;

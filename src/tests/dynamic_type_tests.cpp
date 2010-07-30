@@ -23,7 +23,7 @@ void test_copy()
 void test_subroutine()
 {
     Branch branch;
-    branch.compile("def f(any v) -> any return v end");
+    branch.compile("def f(any v) -> any return(v) end");
     test_assert(branch);
 
     Term* a = branch.eval("f('test')");
@@ -32,7 +32,7 @@ void test_subroutine()
     test_assert(as_string(a) == "test");
 
     branch.clear();
-    branch.compile("def f(bool b, any v) -> any; if b return v else return 5 end end");
+    branch.compile("def f(bool b, any v) -> any; if b return(v) else return(5) end end");
 
     Term* b = branch.eval("f(true, 'test')");
     test_assert(is_string(b));
@@ -47,7 +47,7 @@ void test_field_access()
     Branch branch;
 
     Term* T = branch.compile("type T { int a, string b }");
-    branch.compile("def f() -> any; return T([4, 's']); end");
+    branch.compile("def f() -> any; return(T([4, 's'])); end");
     Term* r = branch.compile("r = f()");
     evaluate_branch(branch);
     branch.compile("r.a");
@@ -73,7 +73,7 @@ void test_subroutine_input_and_output()
     evaluate_branch(branch);
     test_assert(branch);
 
-    branch.compile("def f() -> any; return [1 1] -> Point end");
+    branch.compile("def f() -> any; return([1 1]) -> Point end");
     branch.compile("a = f()");
     branch.compile("a.x");
     branch.compile("f().y");

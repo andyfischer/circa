@@ -290,11 +290,6 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = stateful_value_decl(branch, tokens);
     }
 
-    // Return statement
-    else if (tokens.nextIs(RETURN)) {
-        result = return_statement(branch, tokens);
-    }
-
     // Discard statement
     else if (tokens.nextIs(DISCARD)) {
         result = discard_statement(branch, tokens);
@@ -901,25 +896,6 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     set_source_location(expr, startPosition, tokens);
 
     return expr;
-}
-
-Term* return_statement(Branch& branch, TokenStream& tokens)
-{
-    tokens.consume(RETURN);
-    possible_whitespace(tokens);
-
-    Term* result = infix_expression(branch, tokens);
-
-    for (int i=0; i < result->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
-
-    // If we're returning an identifier, then we need to insert a copy() term
-    if (result->name != "")
-        result = apply(branch, COPY_FUNC, RefList(result));
-
-    branch.bindName(result, "#out");
-    
-    return result;
 }
 
 Term* include_statement(Branch& branch, TokenStream& tokens)

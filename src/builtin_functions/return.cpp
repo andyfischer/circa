@@ -8,7 +8,7 @@ namespace return_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(return_func, "return_func(any)")
+    CA_DEFINE_FUNCTION(return_func, "return(any)")
     {
         // Find the enclosing subroutine
         Term* parent = get_parent_term(CALLER);

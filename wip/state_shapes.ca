@@ -1,0 +1,20 @@
+
+background(#fff)
+
+def rect_center(Rect rect) -> Point
+    return [(rect.x2 - rect.x1) / 2, (rect.y2 - rect.y1) / 2]
+end
+
+code_example_1 = {
+  def draw_button(Rect rect, string text)
+      fill_rect(rect #c80)
+      draw_text_centered(ui_font_medium, text, #fff, rect_center(rect))
+  end
+  draw_button([10 10 100 30] 'Button')
+}
+
+code_example_2 = {
+  state my_state = 4
+  a = 1
+  b = a + 2
+}
