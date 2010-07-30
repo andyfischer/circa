@@ -10,6 +10,7 @@ Term* find_named(Branch const& branch, std::string const& name);
 
 Term* get_named(Branch const& branch, std::string const& qualifiedName);
 
+Term* get_parent_term(Term* term);
 bool name_is_reachable_from(Term* term, Branch& branch);
 
 // Get a name of 'term' which is valid in 'branch'. This might simply return term's name,

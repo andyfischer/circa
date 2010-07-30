@@ -80,11 +80,16 @@ namespace subroutine_t {
 
         evaluate_branch(CONTEXT, functionBranch);
 
+        // Clear interruptSubroutine flag
+        bool returnCalled = CONTEXT->interruptSubroutine;
+        CONTEXT->interruptSubroutine = false;
+
         // Hold a copy of output for now
         TaggedValue outputValue;
 
         // Copy output if no error occurred
-        if (!CONTEXT->errorOccurred && functionBranch.length() > 0) {
+        if (!CONTEXT->errorOccurred
+                && functionBranch.length() > 0) {
             Term* output = functionBranch[functionBranch.length()-1];
             copy(output, &outputValue);
         }
@@ -100,7 +105,10 @@ namespace subroutine_t {
             restore_locals(&previousLocals, functionBranch);
         }
 
-        copy(&outputValue, OUTPUT);
+        if (returnCalled)
+            copy(&CONTEXT->subroutineOutput, OUTPUT);
+        else
+            copy(&outputValue, OUTPUT);
     }
 }
 

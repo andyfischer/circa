@@ -3,19 +3,21 @@
 #pragma once
 
 #include "common_headers.h"
+#include "tagged_value.h"
 
 namespace circa {
 
 struct EvalContext
 {
-    bool interruptBranch;
+    bool interruptSubroutine;
+    TaggedValue subroutineOutput;
 
     // Error information:
     bool errorOccurred;
     Ref errorTerm;
     std::string errorMessage;
 
-    EvalContext() : interruptBranch(false), errorOccurred(false) {}
+    EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 };
 
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output);

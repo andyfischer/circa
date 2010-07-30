@@ -72,6 +72,7 @@ circa_cl_apps = {}
 
 def circa_command_line_app(env):
     variant_name = env['variant_name']
+    env.Append(CPPPATH = ['src'])
     result = env.Program('build/bin/circa',
         'build/'+variant_name+'/src/main.cpp', LIBS=[circa_static_libs[variant_name]])
     circa_cl_apps[variant_name] = result

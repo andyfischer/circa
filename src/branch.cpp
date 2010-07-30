@@ -768,7 +768,7 @@ bool branch_check_invariants(Branch& branch, std::ostream* output)
         if (term == NULL) continue;
         
         // Check that the term's index is correct
-        if (term->index != (unsigned) i) {
+        if (term->index != i) {
             success = false;
             if (output != NULL) {
                 *output << get_short_location(term) << " has wrong index: found "<<term->index

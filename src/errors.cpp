@@ -29,7 +29,7 @@ void internal_error(const char* message)
 {
     if (ASSERT_INTERNAL_ERROR) {
         std::cerr << "internal error: " << message << std::endl;
-        ca_assert(false);
+        assert(false);
     } else {
         throw std::runtime_error(message);
     }

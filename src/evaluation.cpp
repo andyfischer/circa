@@ -54,7 +54,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
 		Term* term = branch.get(index);
         evaluate_term(context, term);
 
-        if (context->errorOccurred)
+        if (context->errorOccurred || context->interruptSubroutine)
             break;
     }
 }

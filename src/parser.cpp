@@ -1194,7 +1194,7 @@ void function_call_inputs(Branch& branch, TokenStream& tokens,
     while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
         inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
-        int origBranchLength = branch.length();
+        //int origBranchLength = branch.length();
         Term* term = infix_expression(branch, tokens);
 
         // Check if we just parsed a qualified identifier. If so, record the actual

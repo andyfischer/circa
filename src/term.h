@@ -34,7 +34,7 @@ struct Term : TaggedValue
     Branch* owningBranch;
 
     // The index that this term currently holds inside owningBranch
-    unsigned index;
+    int index;
 
     // Code which is nested inside this term. Usually this is empty.
     // This is a new construct, code is still being refactored to use

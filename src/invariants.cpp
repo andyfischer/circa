@@ -26,6 +26,20 @@ bool check_invariants(Term* term, std::string& result)
         return false;
     }
 
+    if (term->nestedContents.owningTerm != term) {
+        result = "Term.nestedContents has wrong owningTerm";
+        return false;
+    }
+
+    if (term->owningBranch != NULL) {
+        Branch& branch = *term->owningBranch;
+        if ((term->index >= branch.length())
+                || (branch[term->index] != term)) {
+            result = "Term.index doesn't resolve to this term in owningBranch";
+            return false;
+        }
+    }
+
     return true;
 }
 
