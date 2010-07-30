@@ -237,9 +237,14 @@ namespace function_t {
         function_t::get_input_placeholder(func, index)->setBoolProp("meta", value);
     }
 
-    bool get_input_modified(Term* func, int index)
+    bool get_input_optional(Term* func, int index)
     {
-        return function_t::get_input_placeholder(func, index)->boolPropOptional("modified", false);
+        return function_t::get_input_placeholder(func, index)->boolPropOptional("optional", false);
+    }
+
+    bool get_input_allow_null(Term* func, int index)
+    {
+
     }
 
     Term* get_input_type(Term* func, int index)

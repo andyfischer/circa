@@ -91,22 +91,20 @@ void post_parse_branch(Branch& branch)
     // Remove NULLs
     branch.removeNulls();
 
-    for (int i=0; i < branch.length(); i++) {
-        // For every stateful value, create assign() terms that persist the results
-        // onto the next iteration.
-        if (is_stateful(branch[i])) {
-            Term* term = branch[i];
-
-            if (term->name == "") continue;
-            if (term->name[0] == '#') continue;
+    // For every stateful value, hook up the 'result' of this value as its input.
+    // The 'result' is the last term in this branch with the same name.
+    for (int index=0; index < branch.length(); index++) {
+        Term* term = branch[index];
+        if (is_stateful(term)
+                && term->name != ""
+                && term->name[0] != '#') {
 
             Term* result = branch[term->name];
 
             if (result == term)
-                continue;
-
-            Term* assign = apply(branch, UNSAFE_ASSIGN_FUNC, RefList(term, result));
-            set_source_hidden(assign, true);
+                set_input(term, 0, NULL);
+            else
+                set_input(term, 0, result);
         }
     }
 }
@@ -122,7 +120,8 @@ Term* find_and_apply(Branch& branch,
 
 void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
 {
-    ca_assert(term != NULL);
+    if (term == NULL)
+        return;
 
     if (term->name != "")
         return;

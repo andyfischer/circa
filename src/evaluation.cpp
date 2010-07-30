@@ -57,6 +57,13 @@ void evaluate_branch(EvalContext* context, Branch& branch)
         if (context->errorOccurred || context->interruptSubroutine)
             break;
     }
+
+    // Copy the results of state vars
+    for (int index=0; index < branch.length(); index++) {
+        Term* term = branch[index];
+        if (is_stateful(term) && term->input(0) != NULL)
+            copy(term->input(0), term);
+    }
 }
 
 EvalContext evaluate_branch(Branch& branch)

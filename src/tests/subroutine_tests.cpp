@@ -10,9 +10,9 @@ void test_return_from_conditional()
     Branch branch;
     branch.eval("def my_max(number a, number b) -> number\n"
                 "  if (a < b)\n"
-                "    return b\n"
+                "    return(b)\n"
                 "  else\n"
-                "    return a\n"
+                "    return(a)\n"
                 "  end\n"
                 "end\n");
 
@@ -39,10 +39,10 @@ void test_recursion()
     // Factorial
     branch.eval("def factorial(int n) -> int\n"
                 "  if (n < 2)\n"
-                "    return 1\n"
+                "    return(1)\n"
                 "  else\n"
                 "    next_i = add_i(n, -1)\n"
-                "    return mult_i(n, factorial(next_i))\n"
+                "    return(mult_i(n, factorial(next_i)))\n"
                 "  end\n"
                 "end");
 
@@ -64,9 +64,9 @@ void test_recursion()
 
     branch.eval("def recr(int n) -> int\n"
                 "  if (n == 1)\n"
-                "    return 1\n"
+                "    return(1)\n"
                 "  else\n"
-                "    return recr(n - 1) + 1\n"
+                "    return(recr(n - 1) + 1)\n"
                 "  end\n"
                 "end\n");
     
@@ -82,9 +82,9 @@ void test_recursion_with_state()
     branch.eval("def recr(int i) -> int\n"
                 "  state s\n"
                 "  if i == 1\n"
-                "    return 1\n"
+                "    return(1)\n"
                 "  else\n"
-                "    return recr(i - 1) + 1\n"
+                "    return(recr(i - 1) + 1)\n"
                 "  end\n"
                 "end\n");
 
@@ -145,7 +145,7 @@ void initialize_state_type()
 {
     Branch branch;
 
-    Term* a = branch.eval("def a() -> number\nreturn 1 + 1\nend");
+    Term* a = branch.eval("def a() -> number\nreturn(1 + 1)\nend");
     test_assert(function_t::get_hidden_state_type(a) == VOID_TYPE);
 
     Term* b = branch.eval("def b()\nstate i\nend");
@@ -157,7 +157,7 @@ void shadow_input()
     Branch branch;
 
     // Try having a name that shadows an input. This had a bug at one point
-    branch.eval("def f(int i) -> int\ni = 2\nreturn i\nend");
+    branch.eval("def f(int i) -> int\ni = 2\nreturn(i)\nend");
 
     Term* a = branch.eval("f(1)");
 
@@ -170,7 +170,7 @@ void specialization_to_output_type()
     // than the implicit output type, then make sure that it uses the
     // declared type. This code once had a bug.
     Branch branch;
-    Term* a = branch.eval("def a() -> Point\nreturn [1 2]\nend");
+    Term* a = branch.eval("def a() -> Point\nreturn([1 2])\nend");
 
     test_assert(function_t::get_output_type(a)->name == "Point");
 
@@ -185,7 +185,7 @@ void stateful_function_with_arguments()
 {
     // This code once had a bug
     Branch branch;
-    branch.eval("def myfunc(int i) -> int\nstate s\nreturn i\nend");
+    branch.eval("def myfunc(int i) -> int\nstate s\nreturn(i)\nend");
     Term* call = branch.eval("myfunc(5)");
     test_assert(call->asInt() == 5);
 }

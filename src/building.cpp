@@ -80,7 +80,7 @@ void set_input(Term* term, int index, Term* input)
     term->inputs.setAt(index, input);
 
     // Add 'term' to the user list of input
-    if (input != NULL)
+    if (input != NULL && term != input)
         input->users.appendUnique(term);
 
     // Check if we should remove 'term' from the user list of previousInput
@@ -199,8 +199,16 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
 
 Term* create_stateful_value(Branch& branch, Term* type, std::string const& name)
 {
+    // temp:
     Term* t = create_value(branch, type, name);
     t->function = STATEFUL_VALUE_FUNC;
+    set_input(t, 0, NULL);
+#if 0
+    Term* t = apply(branch, STATEFUL_VALUE_FUNC, RefList(NULL), name);
+    t->type = type;
+    change_type(t, type);
+    reset(t);
+#endif
     return t;
 }
 

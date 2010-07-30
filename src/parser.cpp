@@ -464,6 +464,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             // TODO: store syntax hint
             if (qualifierName == "ignore_error") {
                 input->setBoolProp("ignore_error", true);
+            } else if (qualifierName == "optional") {
+                input->setBoolProp("optional", true);
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);

@@ -105,10 +105,20 @@ namespace subroutine_t {
             restore_locals(&previousLocals, functionBranch);
         }
 
-        if (returnCalled)
-            copy(&CONTEXT->subroutineOutput, OUTPUT);
-        else
-            copy(&outputValue, OUTPUT);
+        TaggedValue* output;
+
+        if (!CONTEXT->errorOccurred) {
+            if (returnCalled)
+                output = &CONTEXT->subroutineOutput;
+            else
+                output = &outputValue;
+
+            Type* output_type = type_contents(function_t::get_output_type(function));
+            if (output_type != output->value_type && output_type != type_contents(ANY_TYPE))
+                cast(output_type, output, OUTPUT);
+            else
+                copy(output, OUTPUT);
+        }
     }
 }
 

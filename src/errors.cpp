@@ -78,13 +78,14 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
 
     Term* input = term->inputs[index];
     bool meta = function_t::get_input_meta(term->function, effectiveIndex);
+    bool optional = function_t::get_input_optional(term->function, effectiveIndex);
     Term* type = function_t::get_input_type(term->function, effectiveIndex);
      
     if (input == NULL) {
-        if (!meta)
-            return SERROR_NULL_INPUT_TERM;
-        else
+        if (meta || optional)
             return SERROR_NO_ERROR;
+        else
+            return SERROR_NULL_INPUT_TERM;
     }
 
     // Check type

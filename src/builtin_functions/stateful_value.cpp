@@ -34,7 +34,8 @@ namespace stateful_value_function {
 
     void setup(Branch& kernel)
     {
-        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate, "stateful_value() -> any");
+        STATEFUL_VALUE_FUNC = import_function(kernel, evaluate,
+                "stateful_value(any next_val +optional) -> any");
         function_t::get_attrs(STATEFUL_VALUE_FUNC).formatSource = formatSource;
     }
 }

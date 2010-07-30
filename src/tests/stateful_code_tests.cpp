@@ -331,7 +331,7 @@ void bug_where_stateful_function_wouldnt_update_inputs()
     Branch branch;
 
     branch.eval("def a() state i end");
-    branch.eval("def b(int i) -> int; a(); return i; end");
+    branch.eval("def b(int i) -> int; a(); return(i); end");
 
     test_assert(branch);
 
@@ -383,7 +383,6 @@ void test_terms_match_for_migration()
     Branch branch;
     branch.eval("def f1() state int i end");
     branch.eval("def f2() state int i end");
-    branch.eval("def f3() state number i end");
 
     Term* call1 = branch.eval("f1()");
     Term* call2 = branch.eval("f2()");
@@ -395,6 +394,34 @@ void test_terms_match_for_migration()
     test_assert(is_stateful(state2));
 
     test_assert(!terms_match_for_migration(state1, state2));
+}
+
+void test_terms_match_for_migration_2()
+{
+    Branch branch_left;
+
+    Term* stateval_left = branch_left.compile("state List asteroids = []");
+    branch_left.compile("asteroids = [[[3.0 2.9] [[true false] 1 0 2]]]");
+    evaluate_branch(branch_left);
+
+    Branch branch_right;
+    Term* stateval_right = branch_right.compile("state List asteroids = []");
+    branch_right.compile("asteroids = [[[3.0 2.9] [[true false] 1 0 2]]]");
+
+#if 0
+    std::cout << "left: " << std::endl;
+    dump_branch(branch_left);
+    std::cout << "right: " << std::endl;
+    dump_branch(branch_right);
+
+    std::cout << "left value_type = " << stateval_left->value_type->name << std::endl;
+    std::cout << "left type = " << stateval_left->type->name << std::endl;
+    std::cout << "right value_type = " << stateval_right->value_type->name << std::endl;
+    std::cout << "right type = " << stateval_right->type->name << std::endl;
+#endif
+
+    test_assert(is_subtype(type_contents(stateval_right->type), stateval_left->value_type));
+    test_assert(terms_match_for_migration(stateval_left, stateval_right));
 }
 
 void test_changing_stateful_value_externally()
@@ -431,6 +458,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::bug_where_state_wasnt_preserved_after_error);
     REGISTER_TEST_CASE(stateful_code_tests::test_load_state_into_branch);
     REGISTER_TEST_CASE(stateful_code_tests::test_terms_match_for_migration);
+    REGISTER_TEST_CASE(stateful_code_tests::test_terms_match_for_migration_2);
     REGISTER_TEST_CASE(stateful_code_tests::test_changing_stateful_value_externally);
 }
 

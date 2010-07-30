@@ -36,7 +36,6 @@ Term* for_block(Branch& branch, TokenStream& tokens);
 Term* do_once_block(Branch& branch, TokenStream& tokens);
 Term* stateful_value_decl(Branch& branch, TokenStream& tokens);
 Term* expression_statement(Branch& branch, TokenStream& tokens);
-Term* return_statement(Branch& branch, TokenStream& tokens);
 Term* include_statement(Branch& branch, TokenStream& tokens);
 Term* discard_statement(Branch& branch, TokenStream& tokens);
 Term* infix_expression(Branch& branch, TokenStream& tokens);

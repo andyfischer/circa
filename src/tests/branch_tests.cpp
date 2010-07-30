@@ -294,6 +294,8 @@ void test_migrate()
 
     Term* a = dest.eval("state a = 1");
     source.eval("state a = 2");
+    post_parse_branch(source);
+    post_parse_branch(dest);
 
     migrate_stateful_values(source, dest);
 

@@ -5,6 +5,7 @@
 namespace circa {
 
 #define VERBOSE_LOG(f, ...) ; // disabled
+//#define VERBOSE_LOG printf
 
 bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc);
 
@@ -110,6 +111,20 @@ Term* find_call_for_hidden_state(Term* term)
     return adjacent;
 }
 
+bool term_types_match_for_migration(Term* left, Term* right)
+{
+    //if (list_t::is_list_based_type(type_contents(left->type))
+    //        && list_t::is_list_based_type(type_contents(right->type)))
+    //    return true;
+
+    if (!is_subtype(type_contents(right->type), left->value_type)) {
+        VERBOSE_LOG("reject, types aren't equal\n");
+        return false;
+    }
+
+    return true;
+}
+
 bool functions_match_for_migration(Term* left, Term* right)
 {
     if (left->function->name != right->function->name)
@@ -121,21 +136,19 @@ bool functions_match_for_migration(Term* left, Term* right)
 bool terms_match_for_migration(Term* left, Term* right)
 {
     if (left->name != right->name) {
-        VERBOSE_LOG("reject, names don't match");
+        VERBOSE_LOG("reject, names don't match\n");
         return false;
     }
 
-    if (!is_subtype(left->value_type, right->value_type)) {
-        VERBOSE_LOG("reject, types aren't equal");
+    if (!term_types_match_for_migration(left, right))
         return false;
-    }
 
     Term* leftCall = find_call_for_hidden_state(left);
     Term* rightCall = find_call_for_hidden_state(right);
 
     if (leftCall != NULL && rightCall != NULL
             && !functions_match_for_migration(leftCall, rightCall)) {
-        VERBOSE_LOG("reject, assoiciated calls have mismatched functions");
+        VERBOSE_LOG("reject, assoiciated calls have mismatched functions\n");
         return false;
     }
 
@@ -179,7 +192,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
     // iterate and check matching indexes.
     
     for (int index=0; index < source.length(); index++) {
-        VERBOSE_LOG("checking index: %d", index);
+        VERBOSE_LOG("checking index: %d\n", index);
 
         if (index >= dest.length())
             break;
@@ -222,11 +235,11 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         else if (is_stateful(sourceTerm)
                     && is_stateful(destTerm)) {
 
-            VERBOSE_LOG("assigning value of %s", to_string(sourceTerm).c_str());
+            VERBOSE_LOG("assigning value of %s\n", to_string(sourceTerm).c_str());
 
             cast(sourceTerm, destTerm);
         } else {
-            VERBOSE_LOG("nothing to do");
+            VERBOSE_LOG("nothing to do\n");
         }
     }
 }
