@@ -2,7 +2,7 @@
 background(#eef)
 
 def interp(number progress, number e) -> number
-  return min(progress / e, 1.0)
+  return(min(progress / e, 1.0))
 end
 
 desired_window_size = [480 600]

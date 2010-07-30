@@ -14,7 +14,7 @@ def generate_particle_burst(List particles, Point loc, Point vel) -> List
         a = rand()
         particles.append([0 loc vel + [cos(a) sin(a)] * 100*rand() ] -> Particle)
     end
-    return particles
+    return(particles)
 end
 
 max_particle_age = 3.0

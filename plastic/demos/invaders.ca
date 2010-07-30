@@ -86,7 +86,7 @@ def initialize_enemies() -> List
             result.append([x y] -> Enemy)
         end
     end
-    return result
+    return(result)
 end
 
 state enemies = initialize_enemies()

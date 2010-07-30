@@ -64,8 +64,8 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
 // ca_assert results in a call to internal_error. On failure, this function may throw
 // an exception or trigger a debugger breakpoint. But either way, execution will
-// be interrupted.
-#define ca_assert(x) ca_assert_function((x), #x, __LINE__, __FILE__)
+// be interrupted. ca_assert_function is defined in errors.cpp
+#define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
 void ca_assert_function(bool expr, const char* expr, int line, const char* file);
 
 } // namespace circa

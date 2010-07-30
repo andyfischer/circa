@@ -13,7 +13,7 @@ WINDOWS = os.name == 'nt'
 
 # Check for a Mac-like environment. On Macs, 'POSIX' is true, but there is
 # a little bit of special behavior for using frameworks.
-MAC = os.path.exists('/Library/Frameworks')
+OSX = os.path.exists('/Library/Frameworks')
 
 DEBUG = Environment(tools = ["default"], toolpath=".")
 RELEASE = Environment(tools = ["default"], toolpath=".")
@@ -96,8 +96,11 @@ def sdl_env(env):
             pass
         env.Append(LIBS = ['SDL_gfx','SDL_image','SDL_ttf'])
 
-        if MAC: env['FRAMEWORKS'] = ['OpenGL']
-        else:   env.Append(LIBS = ['libGL'])
+        if OSX:
+            env['FRAMEWORKS'] = ['OpenGL']
+            env.Append(CPPDEFINES = ['PLASTIC_OSX'])
+        else:
+            env.Append(LIBS = ['libGL'])
 
     if WINDOWS:
         env.Append(LIBS=['opengl32.lib'])

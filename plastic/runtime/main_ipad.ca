@@ -3,7 +3,7 @@ state Point mouse
 
 def mouse_in(Rect b) -> bool
   "Return whether the mouse is currently inside the given rect."
-  return (b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y)
+  return((b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y))
 end
 
 -- Information about the current window (passed in from main.cpp)
@@ -18,7 +18,7 @@ window_size = [window.width window.height]->Point
 
 def random_location() -> Point
     "Return a random point that is inside the boundaries of the window."
-    return [rand() * window.width, rand() * window.height]
+    return([rand() * window.width, rand() * window.height])
 end
 
 
@@ -139,7 +139,7 @@ include('vector_drawing.ca')
 def alternate_over_time(number period) -> bool
     "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
-    return round((time - time_started) / period) % 2 == 0
+    return(round((time - time_started) / period) % 2 == 0)
 end
 
 def linear_fadein(number total_time) -> number
@@ -149,13 +149,13 @@ def linear_fadein(number total_time) -> number
     >>>
     state number time_started = time
     elapsed = (time - time_started) / total_time
-    return min(elapsed, 1.0)
+    return(min(elapsed, 1.0))
 end
 
 def elapsed() -> number
     "Stateful function, returns the number of seconds that has passed since this function was first called"
     state number time_started = time
-    return time - time_started
+    return(time - time_started)
 end
 
 def draggable_rect(Point initial_location, Point size) -> Point
@@ -172,7 +172,7 @@ def draggable_rect(Point initial_location, Point size) -> Point
         currently_dragging = true
         mouse_offset = location - mouse
     end
-    return location
+    return(location)
 end
 
 namespace fps_counter

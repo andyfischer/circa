@@ -7,7 +7,7 @@ axis_center = [200 200] -> Point
 def map_point(number x) -> Point
   x = x - 200
   y = sin(x/100) * 100
-  return [x y] + axis_center
+  return([x y] + axis_center)
 end
 
 -- draw the axis

@@ -5,14 +5,14 @@ background(#042304)
 
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) -> bool
     -- lazy
-    return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
+    return(rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius)))
 end
 
 def random_initial_direction() -> Point
     if rand() > .5 serve = 1 else serve = -1 end
     angle = rand() * .4 - .2
     result = [cos(angle) * serve, sin(angle)]
-    return result
+    return(result)
 end
 
 state Point ball_loc = [window.width/2, window.height/2]
@@ -62,7 +62,7 @@ def get_collision_vector(Rect paddle, Point point) -> Point
     collision_loc_on_paddle = (point.y - paddle_center_y) / paddle_size
     angle = collision_loc_on_paddle * .3
     v = [cos(angle) sin(angle)] -> Point
-    return v
+    return(v)
 end
 
 -- bounce ball off of paddles

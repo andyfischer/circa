@@ -19,7 +19,7 @@ namespace text_input
                 text.slice(st.cursor, text.length()))
             st.cursor = st.cursor + 1
         end
-        return st
+        return(st)
     end
 
     def get_input() -> string
@@ -27,7 +27,7 @@ namespace text_input
         for key in recent_key_presses()
             input_character(@tis, key)
         end
-        return tis.text
+        return(tis.text)
     end
 
     def draw_input(TTF_Font font, Color color, Point loc) -> string
@@ -37,6 +37,6 @@ namespace text_input
         end
         draw_text(font, tis.text, color, loc)
         fill_rect(to_rect([loc.x + tis.cursor loc.y] [2 15]), color)
-        return tis.text
+        return(tis.text)
     end
 end

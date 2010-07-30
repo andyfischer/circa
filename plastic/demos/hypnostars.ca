@@ -7,7 +7,7 @@ type Star {
 background(#000)
 
 def random_star() -> Star
-    return [rand()*8 random_location()]
+    return([rand()*8 random_location()])
 end
 
 num_stars = 500

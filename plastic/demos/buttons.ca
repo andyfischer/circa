@@ -20,7 +20,7 @@ def draggable_rect(Point initial_location, Point size) -> Point
         currently_dragging = true
         mouse_offset = location - mouse
     end
-    return location
+    return(location)
 end
 
 def draggable_box(Point initial_location)

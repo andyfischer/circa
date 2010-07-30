@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "plastic_common_headers.h"
+
 #ifdef PLASTIC_USE_SDL
 
 GLuint load_image_to_texture(circa::EvalContext* cxt, circa::Term* term, const char* filename);

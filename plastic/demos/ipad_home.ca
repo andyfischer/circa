@@ -140,25 +140,25 @@ namespace editor
 
     def get_highlight_color(int highlight_type) -> Color
         if highlight_type == styled_source:literal_string
-            return #884c03
+            return(#884c03)
         elif highlight_type == styled_source:literal_number
-            return #2f2be2
+            return(#2f2be2)
         elif highlight_type == styled_source:paren
-            return #003366
+            return(#003366)
         elif highlight_type == styled_source:comment
-            return #505050
+            return(#505050)
         elif highlight_type == styled_source:name
-            return #003366
+            return(#003366)
         elif highlight_type == styled_source:type_name
-            return #003366
+            return(#003366)
         elif highlight_type == styled_source:function_name
-            return #aa3366
+            return(#aa3366)
         elif highlight_type == styled_source:infix_operator
-            return #aa3366
+            return(#aa3366)
         elif highlight_type == styled_source:keyword
-            return #000000
+            return(#000000)
         else
-            return #003366
+            return(#003366)
         end
     end
 end

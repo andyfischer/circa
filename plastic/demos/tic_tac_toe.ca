@@ -56,7 +56,7 @@ def initialize_board_spaces() -> List
                 [board_left + (x+.5) * square_size, board_top + (y+.5) * square_size]])
         end
     end
-    return board_spaces
+    return(board_spaces)
 end
 
 state board_spaces = initialize_board_spaces()
@@ -64,14 +64,14 @@ state board_spaces = initialize_board_spaces()
 state int current_player = player:x
 
 def player_name(int p) -> string
-    if p == player:x return "X"
-    elif p == player:o return "O"
-    else return "none" end
+    if p == player:x return("X")
+    elif p == player:o return("O")
+    else return("none") end
 end
 
 def other_player(int p) -> int
-    if p == player:x return player:o
-    else return player:x end
+    if p == player:x return(player:o)
+    else return(player:x) end
 end
 
 type WinnerInformation {
@@ -82,7 +82,7 @@ type WinnerInformation {
 
 def get_winner(List board_spaces) -> WinnerInformation
     def get_space(int x, int y) -> BoardSpace
-        return board_spaces[x * 3 + y]
+        return(board_spaces[x * 3 + y])
     end
 
     def is_winner_across_line(List positions) -> int
@@ -98,9 +98,9 @@ def get_winner(List board_spaces) -> WinnerInformation
             end
         end
         if all_match
-            return this_player
+            return(this_player)
         else
-            return player:none
+            return(player:none)
         end
     end
 
@@ -129,7 +129,7 @@ def get_winner(List board_spaces) -> WinnerInformation
         result = [diagonal_winner_tr [board_left board_bot] [board_right board_top]]
     end
 
-    return result
+    return(result)
 end
 
 chosen_space = []
@@ -173,7 +173,7 @@ if chosen_space != []
         if space.x == chosen_space.x and space.y == chosen_space.y
             space.owner = current_player
         end
-        return space
+        return(space)
     end
     board_spaces = map(update_board_spaces, board_spaces)
     chosen_space = chosen_space -> BoardSpace

@@ -18,11 +18,11 @@ type Bullet {
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Point p) -> Point
-    return [mod(p.x, window.width) mod(p.y, window.height)]
+    return([mod(p.x, window.width) mod(p.y, window.height)])
 end
 
 def new_ship() -> Ship
-    return [[window.width/2 window.height/2] [0 0] 0]
+    return([[window.width/2 window.height/2] [0 0] 0])
 end
 
 state Ship ship = new_ship()
@@ -55,12 +55,12 @@ state int gstate = game_state:playing
 
 def srand() -> number
     state value = rand()
-    return value
+    return(value)
 end
 
 def draw_ship(Point loc, number facing)
     def ship_point(number rot, number dist) -> Point
-        return polar(rot + facing) * dist*ship_size + loc
+        return(polar(rot + facing) * dist*ship_size + loc)
     end
 
     points = [ship_point(0 ship_front)
@@ -134,7 +134,7 @@ ship.loc = wrap_around(ship.loc)
 def move_bullet(Bullet bullet) -> Bullet
     loc = bullet.loc + bullet.direction * bullet_speed * time_delta
     loc = wrap_around(loc)
-    return [bullet.lifespan+time_delta, loc, bullet.direction]
+    return([bullet.lifespan+time_delta, loc, bullet.direction])
 end
 
 bullets = map(move_bullet, bullets)
@@ -183,29 +183,29 @@ asteroid_num_edges = 10
 def generate_asteroid(number size) -> Asteroid
     def get_edge(int index) -> Point
         angle = index / asteroid_num_edges
-        return polar(angle) * (rand() * size + size/3)
+        return(polar(angle) * (rand() * size + size/3))
     end
 
     rotation = rand() * .2 - .1
-    return [map(get_edge, 0..10), random_location(), random_norm_vector()*10, 0, rotation size 0]
+    return([map(get_edge, 0..10), random_location(), random_norm_vector()*10, 0, rotation size 0])
 end
 
 def generate_child_asteroid(Asteroid parent) -> Asteroid
     size = parent.size / 2
     def get_edge(int index) -> Point
         angle = index / asteroid_num_edges
-        return polar(angle) * rand() * size + size/3
+        return(polar(angle) * rand() * size + size/3)
     end
     rotation = rand() * .2 - .1
     speed = rand()*20 + 20.0
-    return [map(get_edge, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
+    return([map(get_edge, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0])
 end
 
 def generate_particle_burst(List particles, Point loc, Point vel) -> List
     for i in 0..6
         particles.append([0.0 loc vel*[rand() rand()] + [(rand()-.5)*100 (rand()-.5)*100]] -> Particle)
     end
-    return particles
+    return(particles)
 end
 
 state List asteroids = []
@@ -235,7 +235,7 @@ for asteroid in asteroids
     def pos_edge(Point p) -> Point
         p = rotate_point(p, asteroid.rotation)
         p = p + asteroid.location
-        return p
+        return(p)
     end
     edges = map(pos_edge, asteroid.edges)
 
@@ -333,7 +333,7 @@ def asteroid()
     def pos_edge(Point p) -> Point
         p = rotate_point(p, asteroid.rotation)
         p = p + asteroid.location
-        return p
+        return(p)
     end
 
     edges = map(pos_edge, asteroid.edges)

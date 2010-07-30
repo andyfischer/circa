@@ -11,13 +11,13 @@ SW = 3
 
 def rotations_opposite(int x, int y) -> bool do
   if x == NW
-    return y == SE
+    return(y == SE)
   elif x == NE
-    return y == SW
+    return(y == SW)
   elif x == SE
-    return y == NW
+    return(y == NW)
   else
-    return y == NE
+    return(y == NE)
   end
 end
 
@@ -64,7 +64,7 @@ def rotate_points_around(List points, Point center, number rot) -> List
         point = [point.x*cos(rot) - point.y*sin(rot), point.x*sin(rot)+point.y*cos(rot)]
         point = point + center
     end
-    return points
+    return(points)
 end
 
 def rotate_around_i(Point_i point, Point_i center, int rotation) -> Point_i
@@ -86,7 +86,7 @@ def rotate_around_i(Point_i point, Point_i center, int rotation) -> Point_i
     result = [point.y, -point.x]
   end
   
-  return result + center
+  return(result + center)
 end
 
 type Piece { int x, int y, int rot }
@@ -107,19 +107,19 @@ def draw_piece(Piece piece)
 end
 
 def board_index_to_loc(int index) -> Point_i
-  return [index // num_tiles_y, index % num_tiles_y]
+  return([index // num_tiles_y, index % num_tiles_y])
 end
 
 def board_loc_to_index(Point_i point) -> int
-  return point.x * num_tiles_y + point.y
+  return(point.x * num_tiles_y + point.y)
 end
 
 def initialize_board_piece(int index) -> BoardPiece
   loc = board_index_to_loc(index)
   if loc.y < 12
-    return [0 false false]
+    return([0 false false])
   else
-    return [rand_i()%4 true rand_i()%10 > 8]
+    return([rand_i()%4 true rand_i()%10 > 8])
   end
 end
 
@@ -132,7 +132,7 @@ piece_types = [
 
 def get_random_piece_type() -> List
   i = rand_i() % length(piece_types)
-  return piece_types[i]
+  return(piece_types[i])
 end
 
 type FallingGroupPosition {
@@ -154,7 +154,7 @@ def rotate_falling_group(List group, int rot) -> List
         pos = rotate_around_i([piece.x piece.y] [1 1] rot)
         piece = [pos.x pos.y (piece.rot + rot)%4]
     end
-    return group
+    return(group)
 end
 
 
@@ -162,10 +162,10 @@ def position_falling_pieces(List group, FallingGroupPosition pos) -> List
   group = rotate_falling_group(group, pos.rot)
   def position_piece(Piece piece) -> Piece
       pos = [piece.x + pos.x, piece.y + pos.y] -> Point_i
-      return [pos.x pos.y piece.rot]
+      return([pos.x pos.y piece.rot])
   end
   out = map(position_piece, group)
-  return out
+  return(out)
 end
 
 
@@ -173,22 +173,22 @@ def falling_pieces_collide(List group) -> bool
   def piece_collides(Piece piece) -> bool
     board_piece = board[board_loc_to_index([piece.x piece.y])] -> BoardPiece
     if board_piece.square_filled
-      return true
+      return(true)
     else
       if board_piece.filled
         ro = rotations_opposite(piece.rot board_piece.rot)
-        return not(ro)
+        return(not(ro))
       else
-        return false
+        return(false)
       end
     end
   end
 
-  return any_true(map(piece_collides, group))
+  return(any_true(map(piece_collides, group)))
 end
 
 def falling_group_collides(List group, FallingGroupPosition pos) -> bool
-    return falling_pieces_collide(position_falling_pieces(group, pos))
+    return(falling_pieces_collide(position_falling_pieces(group, pos)))
 end
 
 -- User's movement of falling group
@@ -274,9 +274,9 @@ def repeating_signal(number period) -> bool
     time_till_next -= time_delta
     if time_till_next < 0
         time_till_next = period
-        return true
+        return(true)
     else
-        return false
+        return(false)
     end
 end
 
@@ -289,7 +289,7 @@ def find_highest_tile_for_x(int tile_x) -> int
             found = i
         end
     end
-    return found
+    return(found)
 end
 
 state List creatures = []
@@ -331,7 +331,7 @@ def get_path_segment(int tile_x) -> PathSegment
         result = [[x1, (tile_y+1)*tile_size], [x2, tile_y*tile_size]]
     end
 
-    return result
+    return(result)
 end
 
 path = map(get_path_segment, 0..num_tiles_x)
@@ -391,7 +391,7 @@ def position_creature(Creature creature) -> Point
     path_segment = path[creature.tile_x] -> PathSegment
 
     track_pos = path_segment.l + (path_segment.r - path_segment.l) * creature.tile_x_progress
-    return track_pos + [0 -tile_size/2]
+    return(track_pos + [0 -tile_size/2])
 end
 
 creature_radius = 15.0

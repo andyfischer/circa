@@ -22,7 +22,7 @@ def draggable_rect(Point initial_location, Point size) -> Point
         currently_dragging = true
         mouse_offset = location - mouse
     end
-    return location
+    return(location)
 end
 
 box_size = [100 20] -> Point
@@ -30,7 +30,7 @@ box_size = [100 20] -> Point
 def initial_box_location(Ref ref) -> Point
     source_loc = ref.source_location()
     --print(ref ' location: ' source_loc)
-    return [source_loc.x*5, source_loc.y*10]
+    return([source_loc.x*5, source_loc.y*10])
 end
 
 -- Get locations for each box
@@ -69,7 +69,7 @@ end
 def expand_rect_tl(Point tl, Point size) -> Rect:
     "Return a rectangle with the given center, width, and height."
     br = tl + size
-    return [tl.x tl.y br.x br.y]
+    return([tl.x tl.y br.x br.y])
 
 -- Draw each box
 for ref in contents

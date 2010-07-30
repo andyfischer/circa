@@ -242,11 +242,6 @@ namespace function_t {
         return function_t::get_input_placeholder(func, index)->boolPropOptional("optional", false);
     }
 
-    bool get_input_allow_null(Term* func, int index)
-    {
-
-    }
-
     Term* get_input_type(Term* func, int index)
     {
         if (function_t::get_variable_args(func))

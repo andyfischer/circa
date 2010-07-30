@@ -4,14 +4,11 @@
 
 #ifdef WINDOWS
 
-// Prevent warnings on getenv()
-#define _CRT_SECURE_NO_WARNINGS 1
-
+#define _CRT_SECURE_NO_WARNINGS 1 // Prevent warnings on getenv()
 #define NOMINMAX // Don't use windows' versions of min() and max()
-
 #define _USE_MATH_DEFINES
-#include <math.h>
 
+#include <math.h>
 #include <GL/glew.h>
 
 #endif
@@ -69,9 +66,6 @@ struct ReferenceMap;
 
     #include <OpenGLES/ES1/gl.h>
     #include <OpenGLES/ES1/glext.h>
-
-    // TODO: Add a flag that disables ES2 compilation so that it's easy to check that the
-    // app is ES1 compatible.
     #include <OpenGLES/ES2/gl.h>
     #include <OpenGLES/ES2/glext.h>
 

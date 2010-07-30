@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 
+#include "common_headers.h"
 #include "gl_util.h"
 
 GLenum get_texture_format(SDL_Surface *surface)

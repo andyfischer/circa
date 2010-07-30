@@ -60,7 +60,7 @@ def draw_vmenu(Point topleft, List items) -> any
         index += 1
     end
 
-    return result
+    return(result)
 end
 
 def draw_hmenu(Point topleft, List items) -> any
@@ -90,7 +90,7 @@ def draw_hmenu(Point topleft, List items) -> any
         text:draw_rendered_text(label [x+h_gutter, y+v_gutter])
     end
 
-    return 0
+    return(0)
 end
 
 } -- namespace ui_widgets
