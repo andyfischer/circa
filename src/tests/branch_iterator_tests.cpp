@@ -39,8 +39,6 @@ void test_simple()
     it.advance();
     test_assert(it.current()->name == "d");
     it.advance();
-    test_assert(it.current() == sub->nestedContents[3]); // output type
-    it.advance();
     test_assert(it.finished());
 }
 

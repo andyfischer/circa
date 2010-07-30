@@ -185,7 +185,6 @@ void test_function_decl()
     test_equals(funcbranch[6]->function->name, "greater_than_i");
     test_assert(funcbranch[6]->input(0) == funcbranch[3]);
     test_assert(funcbranch[6]->input(1) == funcbranch[5]);
-    //test_equals(funcbranch[6]->name, "#out");
     //test_assert(funcbranch.length() == 7);
 
     // This string once caused an error
@@ -528,7 +527,6 @@ void test_significant_indentation()
     test_assert(funcBranch[3]->asInt() == 2);
     test_assert(funcBranch[4]->name == "a");
     test_assert(funcBranch[6]->name == "b");
-    test_assert(funcBranch.length() == 8);
 
     test_assert(branch[1]->asInt() == 3);
     test_assert(branch[2]->asInt() == 4);

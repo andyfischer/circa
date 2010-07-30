@@ -280,9 +280,7 @@ bool has_implicit_name_binding(Term* term)
 
 void format_name_binding(StyledSource* source, Term* term)
 {
-    if (term->name == "#out")
-        append_phrase(source, "return ", term, phrase_type::UNDEFINED);
-    else if (term->name == "")
+    if (term->name == "")
         return;
     else if (has_implicit_name_binding(term))
         return;
@@ -361,7 +359,7 @@ bool is_hidden(Term* term)
     if (term->name == "")
         return false;
 
-    if (term->name[0] == '#' && term->name != "#out")
+    if (term->name[0] == '#')
         return true;
 
     return false;

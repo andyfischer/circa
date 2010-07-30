@@ -506,11 +506,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     // If we're out of tokens, then stop here. This behavior is used when defining builtins.
-    if (tokens.finished()) {
-        // Add a term to hold our output type
-        create_value(contents, outputType, "#out");
+    if (tokens.finished())
         return result;
-    }
 
     // Parse this as a subroutine call
     consume_branch(contents, tokens);

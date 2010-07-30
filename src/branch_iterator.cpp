@@ -27,6 +27,7 @@ bool BranchIterator::finished()
 
 Term* BranchIterator::current()
 {
+    ca_assert(!finished());
     Frame& frame = _stack.back();
     return frame.branch->get(frame.index);
 }
@@ -34,7 +35,6 @@ Term* BranchIterator::current()
 void BranchIterator::advance()
 {
     ca_assert(!finished());
-
     if (_skipNextBranch) {
         _skipNextBranch = false;
         advanceSkippingBranch();

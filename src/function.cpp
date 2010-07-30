@@ -152,15 +152,9 @@ namespace function_t {
         if (!is_subroutine(func))
             return true;
 
-        Branch& contents = func->nestedContents;
+        //Branch& contents = func->nestedContents;
 
-        // If the subroutine has an #out term, then it must be the last one
-        if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
-
-            if (failureMessage != NULL)
-                *failureMessage = "#out is bound, but the last term isn't named #out";
-            return false;
-        }
+        // There was once stuff here
 
         return true;
     }

@@ -84,6 +84,7 @@ namespace subroutine_t {
         bool returnCalled = CONTEXT->interruptSubroutine;
         CONTEXT->interruptSubroutine = false;
 
+#if 0
         // Hold a copy of output for now
         TaggedValue outputValue;
 
@@ -93,6 +94,7 @@ namespace subroutine_t {
             Term* output = functionBranch[functionBranch.length()-1];
             copy(output, &outputValue);
         }
+#endif
 
         // Store state
         if (hiddenState != NULL)
@@ -105,13 +107,8 @@ namespace subroutine_t {
             restore_locals(&previousLocals, functionBranch);
         }
 
-        TaggedValue* output;
-
-        if (!CONTEXT->errorOccurred) {
-            if (returnCalled)
-                output = &CONTEXT->subroutineOutput;
-            else
-                output = &outputValue;
+        if (!CONTEXT->errorOccurred && returnCalled) {
+            TaggedValue* output = &CONTEXT->subroutineOutput;
 
             Type* output_type = type_contents(function_t::get_output_type(function));
             if (output_type != output->value_type && output_type != type_contents(ANY_TYPE))
@@ -130,8 +127,10 @@ bool is_subroutine(Term* term)
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
+#if 0
     Branch& contents = sub->nestedContents;
 
+    Obsolete with new-style return
     // If there is an #out term, then it needs to be the last term. If #out is a
     // name binding into an inner branch then this might not be the case
     if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
@@ -150,6 +149,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
         change_type(outTerm, outputType);
         set_source_hidden(outTerm, true);
     }
+#endif
 
     // Install evaluate function
     function_t::get_evaluate(sub) = subroutine_t::evaluate;
