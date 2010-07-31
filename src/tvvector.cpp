@@ -1,6 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "builtin_types/list.h"
+#include "types/list.h"
 #include "build_options.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"

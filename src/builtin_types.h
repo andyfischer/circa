@@ -65,8 +65,8 @@ namespace point_t {
 
 void initialize_primitive_types(Branch& kernel);
 
-void setup_builtin_types(Branch& kernel);
-void parse_builtin_types(Branch& kernel);
-void post_setup_builtin_types();
+void setup_types(Branch& kernel);
+void parse_types(Branch& kernel);
+void post_setup_types();
 
 }

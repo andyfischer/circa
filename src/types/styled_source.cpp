@@ -1,7 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "common_headers.h"
-#include "builtin_types/list.h"
+#include "types/list.h"
 #include "type.h"
 
 namespace circa {

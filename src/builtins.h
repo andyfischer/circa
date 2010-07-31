@@ -89,7 +89,7 @@ void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 
-// this is implemented in builtin_functions/include.cpp
+// this is implemented in functions/include.cpp
 namespace include_function {
     void preload_script(EvalContext*, Term* term);
 }

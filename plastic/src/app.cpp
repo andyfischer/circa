@@ -139,7 +139,7 @@ bool load_runtime()
 
     ca_assert(branch_check_invariants(app::runtime_branch(), &std::cout));
 
-    setup_builtin_functions();
+    setup_functions();
 
     return true;
 }
@@ -156,7 +156,7 @@ bool initialize()
     return load_runtime();
 }
 
-bool setup_builtin_functions()
+bool setup_functions()
 {
     circa::Branch& branch = app::runtime_branch();
 
@@ -186,7 +186,7 @@ bool reload_runtime()
     app::runtime_branch().clear();
     if (!load_runtime())
         return false;
-    if (!setup_builtin_functions())
+    if (!setup_functions())
         return false;
 
     // Write window width & height

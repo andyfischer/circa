@@ -1,3 +1,2 @@
 cd $CIRCA_HOME
-tools/prebuild.rb
 scons && circa -test

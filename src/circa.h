@@ -50,4 +50,4 @@
 #include "type.h"
 #include "type_inference.h"
 
-#include "builtin_types/list.h"
+#include "types/list.h"

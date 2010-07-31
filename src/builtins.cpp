@@ -11,7 +11,7 @@
 
 namespace circa {
 
-// setup_builtin_functions is defined in generated/setup_builtin_functions.cpp
+// setup_functions is defined in generated/setup_builtin_functions.cpp
 void setup_builtin_functions(Branch&);
 
 // BUILTIN_SCRIPT_TEXT is defined in generated/builtin_script_text.cpp
@@ -106,7 +106,7 @@ Term* get_global(std::string name)
 
 CA_FUNCTION(empty_evaluate_function) {}
 
-void create_builtin_types()
+void create_types()
 {
     NULL_T = Type::create();
     NULL_T->name = "null";
@@ -208,7 +208,7 @@ void post_initialize_primitive_types(Branch& kernel)
     ca_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }
 
-void pre_initialize_builtin_types(Branch& kernel)
+void pre_initialize_types(Branch& kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
@@ -218,7 +218,7 @@ void pre_initialize_builtin_types(Branch& kernel)
     parse_type(kernel, "type FileSignature { string filename, int time_modified }");
 }
 
-void post_setup_builtin_functions(Branch& kernel)
+void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
@@ -264,17 +264,17 @@ void parse_builtin_script(Branch& kernel)
 
 void initialize()
 {
-    create_builtin_types();
+    create_types();
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
     post_initialize_primitive_types(*KERNEL);
-    pre_initialize_builtin_types(*KERNEL);
-    setup_builtin_types(*KERNEL);
+    pre_initialize_types(*KERNEL);
+    setup_types(*KERNEL);
     feedback_register_constants(*KERNEL);
     setup_builtin_functions(*KERNEL);
-    post_setup_builtin_functions(*KERNEL);
-    parse_builtin_types(*KERNEL);
-    post_setup_builtin_types();
+    post_setup_functions(*KERNEL);
+    parse_types(*KERNEL);
+    post_setup_types();
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
     parse_builtin_script(*KERNEL);

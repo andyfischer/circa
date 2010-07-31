@@ -359,7 +359,7 @@ void initialize_primitive_types(Branch& kernel)
     // ANY_TYPE was created in bootstrap_kernel
 }
 
-void setup_builtin_types(Branch& kernel)
+void setup_types(Branch& kernel)
 {
     branch_t::setup_type(BRANCH_TYPE);
     type_t::setup_type(TYPE_TYPE);
@@ -388,7 +388,7 @@ void setup_builtin_types(Branch& kernel)
     callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
 }
 
-void parse_builtin_types(Branch& kernel)
+void parse_types(Branch& kernel)
 {
     parse_type(kernel, "type Point { number x, number y }");
     parse_type(kernel, "type Point_i { int x, int y }");
@@ -399,7 +399,7 @@ void parse_builtin_types(Branch& kernel)
     color_t::setup_type(&as_type(COLOR_TYPE));
 }
 
-void post_setup_builtin_types()
+void post_setup_types()
 {
     string_t::postponed_setup_type(&as_type(STRING_TYPE));
     ref_t::postponed_setup_type(&as_type(REF_TYPE));

@@ -2,6 +2,13 @@
 
 import os
 
+def mkdir(dir):
+    if os.path.exists(dir):
+        return
+    (parent, _) = os.path.split(dir)
+    mkdir(parent)
+    os.path.mkdir(dir)
+    
 def read_text_file(path):
     if not os.path.exists(path):
         return ""
@@ -18,85 +25,150 @@ def write_text_file(path, contents):
     f.write(contents)
     f.write("\n")
     
-def download_file_from_the_internets(url, filename):
-    print "Downloading "+url
-    import urllib
-    webFile = urllib.urlopen(url)
-    localFile = open(filename, 'wb')
-    localFile.write(webFile.read())
-    webFile.close()
-    localFile.close()
+def get_cpp_files_in_dir(dir):
+    files = []
+    for file in os.listdir(dir):
+        if file.endswith('.cpp'):
+            files.append(file)
+    return files
 
-def unzip_file(filename, dir):
-    print "Unzipping "+filename+" to "+dir
-    import os, zipfile
+def get_cpp_file_names(dir):
+    return map(lambda s: s[:-4], get_cpp_files_in_dir(dir))
 
-    if not os.path.exists(dir): os.mkdir(dir)
+def setup_builtin_functions():
+    dir = 'src/functions'
 
-    zf = zipfile.ZipFile(filename)
-    for name in zf.namelist():
-        path = os.path.join(dir, name)
-        if name.endswith('/'):
-            if not os.path.exists(path): os.mkdir(path)
-        else:
-            f = open(path, 'wb')
-            f.write(zf.read(name))
-            f.close()
+    namespaces = map(lambda s: s+'_function', get_cpp_file_names(dir))
+    function_decls = '\n'.join(
+            map(lambda n: 'namespace '+n+' { void setup(Branch& kernel); }',
+            namespaces))
+    function_calls = '\n    '.join(
+            map(lambda n: n+'::setup(kernel);', namespaces))
 
-def sync_windows_sdl_deps():
-    if not os.path.exists('SDL_deps'):
-        download_file_from_the_internets(
-            'http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip',
-            'SDL_deps.zip')
+    return """
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-        unzip_file('SDL_deps.zip', '.')
+// This file is generated during the build process by prebuild.py .
+// You should probably not edit this file manually.
 
+#include "common_headers.h"
 
-def main():
-    if not os.path.exists('src/generated'):
-        os.mkdir('src/generated')
+#include "branch.h"
 
-    # generate setup_builtin_functions.cpp and register_all_tests.cpp
-    import generate_cpp_registration
-    write_text_file('src/generated/setup_builtin_functions.cpp',
-            generate_cpp_registration.do_builtin_functions('src/builtin_functions'))
-    write_text_file('src/generated/register_all_tests.cpp',
-            generate_cpp_registration.do_register_all_tests('src/tests'))
+namespace circa {
 
-    # generate builtin_script_text.cpp
-    import text_file_to_c
-    write_text_file('src/generated/builtin_script_text.cpp',
-            text_file_to_c.generate("src/ca/builtins.ca", "BUILTIN_SCRIPT_TEXT"))
+%s
 
-    # generate all_tests.cpp, all_builtin_functions.cpp, and all_builtin_types.cpp
-    def source_files(dir):
-        for path in os.listdir(dir):
-            if not os.path.isfile(os.path.join(dir,path)): continue
-            if not path.endswith('.cpp'): continue
-            yield path
-    def builtin_function_cpps():
-        for file in source_files('src/builtin_functions'):
-            yield "builtin_functions/"+file
-    def test_cpps():
-        for file in source_files('src/tests'):
-            yield "tests/"+file
-    def library_sources():
-        for file in source_files('src'):
-            if file == 'main.cpp': continue
-            yield file
+void setup_builtin_functions(Branch& kernel)
+{
+    %s
+}
 
-    def include_list(items):
-        generated_cpp = []
-        for item in items:
-            generated_cpp.append('#include "'+item+'"')
-        return "\n".join(generated_cpp)
+} // namespace circa""" % (function_decls, function_calls)
+# end of setup_builtin_functions
+    
+def register_all_tests():
+    dir = 'src/tests'
+    #print "cpp file names = " + str(get_cpp_file_names(dir))
 
-    write_text_file('src/generated/all_tests.cpp', include_list(test_cpps()))
-    write_text_file('src/generated/all_builtin_functions.cpp',
-            include_list(builtin_function_cpps()))
-    write_text_file('src/generated/all_builtin_types.cpp',
-        include_list(['builtin_types/'+file for file in source_files('src/builtin_types')]))
-            
+    namespaces = get_cpp_file_names(dir)#map(lambda s: s+'_function', get_cpp_file_names(dir))
+    function_decls = '\n'.join(
+            map(lambda n: 'namespace '+n+' { void register_tests(); }',
+            namespaces))
+    function_calls = '\n    '.join(
+            map(lambda n: n+'::register_tests();', namespaces))
 
-if __name__ == '__main__':
-    main()
+    return """\
+// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
+
+// This file is generated during the build process by prebuild.py .
+// You should probably not edit this file manually.
+
+#include "common_headers.h"
+
+#include "testing.h"
+
+namespace circa {
+
+%s
+
+void register_all_tests()
+{
+    gTestCases.clear();
+
+    %s
+}
+
+} // namespace circa""" % (function_decls, function_calls)
+# end of register_all_tests
+
+def text_file_to_c_string(sourceFile, variableName):
+    source = open(sourceFile)
+    out = []
+
+    out.append("// This file was autogenerated from "+sourceFile)
+    out.append("")
+    out.append("namespace circa {")
+    out.append("")
+    out.append("extern const char* "+variableName+" = ")
+
+    def escape_line(line):
+        out = []
+        for c in line:
+            if c == '"': out.append('\\"')
+            elif c == '\\': out.append('\\\\')
+            else: out.append(c)
+        return "".join(out)
+
+    while source:
+        line = source.readline()
+        if line == "": break
+        line = line[:-1]
+        line = escape_line(line)
+        out.append('    "' + line + '\\n"')
+
+    out[-1] += ";"
+    out.append("")
+    out.append("} // namespace circa")
+    out.append("")
+
+    return "\n".join(out)
+
+mkdir('src/generated')
+
+# generate setup_builtin_functions.cpp and register_all_tests.cpp
+import generate_cpp_registration
+write_text_file('src/generated/setup_builtin_functions.cpp', setup_builtin_functions())
+write_text_file('src/generated/register_all_tests.cpp', register_all_tests())
+
+# generate builtin_script_text.cpp
+write_text_file('src/generated/builtin_script_text.cpp',
+        text_file_to_c_string("src/ca/builtins.ca", "BUILTIN_SCRIPT_TEXT"))
+
+# generate all_tests.cpp, all_builtin_functions.cpp, and all_builtin_types.cpp
+def source_files(dir):
+    for path in os.listdir(dir):
+        if not os.path.isfile(os.path.join(dir,path)): continue
+        if not path.endswith('.cpp'): continue
+        yield path
+def builtin_function_cpps():
+    for file in get_cpp_files_in_dir('src/functions'):
+        yield "functions/"+file
+def test_cpps():
+    for file in get_cpp_files_in_dir('src/tests'):
+        yield "tests/"+file
+def library_sources():
+    for file in get_cpp_files_in_dir('src'):
+        if file == 'main.cpp': continue
+        yield file
+def include_list(items):
+    generated_cpp = []
+    for item in items:
+        generated_cpp.append('#include "'+item+'"')
+    return "\n".join(generated_cpp)
+
+write_text_file('src/generated/all_tests.cpp', include_list(test_cpps()))
+write_text_file('src/generated/all_builtin_functions.cpp',
+    include_list(builtin_function_cpps()))
+write_text_file('src/generated/all_builtin_types.cpp',
+    include_list(['types/'+file for file in source_files('src/types')]))
