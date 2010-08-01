@@ -62,17 +62,23 @@ If this function isn't implemented, the default behavior is to do a copy()
 ## isSubtype ##
 
 Returns whether every value of `otherType` can be cast to the current type. This is used
-for static type checking.
+for static and dynamic type checking.
+
+The subtype relationship isn't necessarily strict: two types can be subtypes of each other.
 
 ## staticTypeQuery ##
 
 This checks if the given term can be cast to a value of this type. This function
 may return a result of "always", "never", or "unable to statically determine".
 If the answer can't be statically determined, we'll call valueFitsType at runtime.
+This is only used for static checking, so this function has access to the Term object
+(isSubtype doesn't get access to that). This is optional.
 
 ## valueFitsType ##
 
 Returns whether the given value fits this type. This is used for dynamic type checking.
+Unlike isSubtype, this function gets access to the actual value that is about to be cast.
+So unlike `isSubtype`, this function can check against the value. This is optional.
 
 ## toString ##
 
@@ -104,6 +110,10 @@ Access a value by name. This is used for dictionary-like objects.
 ## setField ##
 
 Set a value by name.
+
+## numElements ##
+
+Return the number of elements in a list-like object.
 
 ## remapPointers ##
 

@@ -43,19 +43,19 @@ struct Type
     typedef void (*Reset)(TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
-    typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
+    typedef bool (*IsSubtype)(Type* type, Type* otherType);
+    typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
+    typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef std::string (*ToString)(TaggedValue* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
-    typedef bool (*CheckInvariants)(Term* term, std::string* output);
-    typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
-    typedef bool (*TypeMatches)(Type* type, Type* otherType);
-    typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef void (*Mutate)(TaggedValue* value);
     typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
     typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
     typedef TaggedValue* (*GetField)(TaggedValue* value, const char* field);
     typedef void (*SetField)(TaggedValue* value, const char* field, TaggedValue* element);
     typedef int (*NumElements)(TaggedValue* value);
+    typedef bool (*CheckInvariants)(Term* term, std::string* output);
+    typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
 
     std::string name;
 
@@ -68,21 +68,21 @@ struct Type
     Release release;
     Copy copy;
     Reset reset;
-    Cast cast;
     Equals equals;
-    RemapPointers remapPointers;
+    Cast cast;
+    IsSubtype isSubtype;
+    StaticTypeQueryFunc staticTypeQuery;
+    ValueFitsType valueFitsType;
     ToString toString;
     FormatSource formatSource;
-    CheckInvariants checkInvariants;
-    ValueFitsType valueFitsType;
-    TypeMatches isSubtype;
-    StaticTypeQueryFunc staticTypeQuery;
     Mutate touch;
     GetIndex getIndex;
     SetIndex setIndex;
     GetField getField;
     SetField setField;
     NumElements numElements;
+    CheckInvariants checkInvariants;
+    RemapPointers remapPointers;
 
     // Parent type, may be null.
     TypeRef parent;
@@ -114,21 +114,21 @@ private:
         release(NULL),
         copy(NULL),
         reset(NULL),
-        cast(NULL),
         equals(NULL),
-        remapPointers(NULL),
-        toString(NULL),
-        formatSource(NULL),
-        checkInvariants(NULL),
-        valueFitsType(NULL),
+        cast(NULL),
         isSubtype(NULL),
         staticTypeQuery(NULL),
+        valueFitsType(NULL),
+        toString(NULL),
+        formatSource(NULL),
         touch(NULL),
         getIndex(NULL),
         setIndex(NULL),
         getField(NULL),
         setField(NULL),
         numElements(NULL),
+        checkInvariants(NULL),
+        remapPointers(NULL),
         refCount(0),
         permanent(false)
     {

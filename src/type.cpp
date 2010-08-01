@@ -205,7 +205,7 @@ bool is_subtype(Type* type, Type* subType)
     if (type == subType)
         return true;
 
-    Type::TypeMatches isSubtype = type->isSubtype;
+    Type::IsSubtype isSubtype = type->isSubtype;
     if (isSubtype == NULL)
         return false;
 
