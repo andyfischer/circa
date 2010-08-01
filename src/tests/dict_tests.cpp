@@ -18,6 +18,7 @@ void test_simple()
 
     test_assert(dict_t::get_value(data, "a")->asInt() == 5);
     test_assert(dict_t::get_value(data, "b")->asInt() == 10);
+    test_equals(dict_t::to_string(data), "[a: 5, b: 10]");
     dict_t::free_dict(data);
 }
 

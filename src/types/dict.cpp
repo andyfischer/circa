@@ -43,6 +43,7 @@ DictData* create_dict(int capacity)
 {
     DictData* result = (DictData*) malloc(sizeof(DictData) + capacity * sizeof(Slot));
     result->capacity = capacity;
+    result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
     for (int s=0; s < capacity; s++)
         result->slots[s].value.init();
@@ -100,6 +101,7 @@ int insert(DictData** dataPtr, const char* key)
     Slot* slot = &data->slots[index];
     slot->key = strdup(key);
     data->count++;
+
     return index;
 }
 
@@ -212,6 +214,64 @@ void grow(DictData** dataPtr)
 int count(DictData* data)
 {
     return data->count;
+}
+
+// Warning, C++ crap ahead:
+
+struct SortedVisitItem {
+    char* key;
+    TaggedValue* value;
+    SortedVisitItem(char* k, TaggedValue* v) : key(k), value(v) {}
+};
+
+struct SortedVisitItemCompare {
+    bool operator()(SortedVisitItem const& left, SortedVisitItem const& right) {
+        return strcmp(left.key, right.key) < 0;
+    }
+};
+
+void visit_sorted(DictData* data, DictVisitor visitor, void* context)
+{
+    // This function isn't efficient, currently it does a full sort on every
+    // key every time this is called. I'm not sure how frequently this function
+    // will be used, if it's often then it will be revisited.
+
+    std::set<SortedVisitItem, SortedVisitItemCompare> set;
+
+    for (int i=0; i < data->capacity; i++) {
+        Slot* slot = &data->slots[i];
+        if (slot->key == NULL)
+            continue;
+
+        set.insert(SortedVisitItem(slot->key, &slot->value));
+    }
+
+    std::set<SortedVisitItem>::const_iterator it;
+    for (it = set.begin(); it != set.end(); it++)
+        visitor(context, it->key, it->value);
+}
+
+std::string to_string(DictData* data)
+{
+    struct Visitor {
+        std::stringstream strm;
+        bool first;
+        Visitor() : first(true) {}
+        static void visit(void* context, const char* key, TaggedValue* value)
+        {
+            Visitor& obj = *((Visitor*) context);
+            if (!obj.first)
+                obj.strm << ", ";
+            obj.first = false;
+            obj.strm << key << ": " << to_string(value);
+        }
+    };
+
+    Visitor visitor;
+    visitor.strm << "[";
+    visit_sorted(data, Visitor::visit, &visitor);
+    visitor.strm << "]";
+    return visitor.strm.str();
 }
 
 void debug_print(DictData* data)

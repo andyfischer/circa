@@ -10,6 +10,8 @@ namespace dict_t {
 
     struct DictData;
 
+    typedef void (*DictVisitor)(void* context, const char* key, TaggedValue* value);
+
     DictData* create_dict(int capacity);
     DictData* create_dict();
     void free_dict(DictData* data);
@@ -22,6 +24,8 @@ namespace dict_t {
     DictData* grow(DictData* data, int new_capacity);
     void grow(DictData** dataPtr);
     int count(DictData* data);
+    void visit_sorted(DictData* data, DictVisitor visitor, void* context);
+    std::string to_string(DictData* data);
     void debug_print(DictData* data);
 
     void setup_type(Type*);
