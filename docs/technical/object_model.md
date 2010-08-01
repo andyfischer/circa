@@ -61,23 +61,18 @@ If this function isn't implemented, the default behavior is to do a copy()
 
 ## isSubtype ##
 
-Returns whether values of the given type can always be cast to this type.
-
-Can get rid of this.
-
-## valueFitsType ##
-
-Returns whether the given value fits this type. This is used for dynamic type checking.
-
-## typeMatches ##
-
-TODO: Is this used?
+Returns whether every value of `otherType` can be cast to the current type. This is used
+for static type checking.
 
 ## staticTypeQuery ##
 
 This checks if the given term can be cast to a value of this type. This function
 may return a result of "always", "never", or "unable to statically determine".
 If the answer can't be statically determined, we'll call valueFitsType at runtime.
+
+## valueFitsType ##
+
+Returns whether the given value fits this type. This is used for dynamic type checking.
 
 ## toString ##
 
@@ -88,10 +83,6 @@ output.
 
 Returns the value as a snippet of Circa source code. This is used for values which can
 be typed as literals in source code.
-
-## checkInvariants ##
-
-Not used yet
 
 ## touch ##
 

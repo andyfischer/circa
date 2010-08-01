@@ -93,7 +93,6 @@ namespace branch_t {
     void release(TaggedValue* value);
     void assign(TaggedValue*, TaggedValue*);
     void cast(Type*, TaggedValue* source, TaggedValue* dest);
-    bool cast_possible(Type*, TaggedValue* value);
     bool equals(TaggedValue*, TaggedValue*);
     TaggedValue* get_index(TaggedValue* value, int index);
     int num_elements(TaggedValue* value);
