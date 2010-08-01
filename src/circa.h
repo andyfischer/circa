@@ -50,4 +50,5 @@
 #include "type.h"
 #include "type_inference.h"
 
+#include "types/dict.h"
 #include "types/list.h"

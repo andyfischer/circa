@@ -72,6 +72,7 @@ extern Term* VOID_TYPE;
 
 extern TypeRef TYPE_T;
 extern TypeRef BOOL_T;
+extern TypeRef DICT_T;
 extern TypeRef FLOAT_T;
 extern TypeRef INT_T;
 extern TypeRef NULL_T;

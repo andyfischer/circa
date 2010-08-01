@@ -8,6 +8,8 @@
 #include <fstream>
 
 #include "circa.h"
+#include "types/dict.h"
+#include "types/list.h"
 
 namespace circa {
 
@@ -83,6 +85,7 @@ Term* VOID_TYPE = NULL;
 
 TypeRef TYPE_T;
 TypeRef BOOL_T;
+TypeRef DICT_T;
 TypeRef FLOAT_T;
 TypeRef INT_T;
 TypeRef NULL_T;
@@ -110,6 +113,9 @@ void create_types()
 {
     NULL_T = Type::create();
     NULL_T->name = "null";
+
+    DICT_T = Type::create();
+    dict_t::setup_type(DICT_T);
 
     STRING_T = Type::create();
     string_t::setup_type(STRING_T);

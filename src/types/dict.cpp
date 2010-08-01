@@ -317,12 +317,53 @@ namespace tagged_value_wrap {
     {
         free_dict((DictData*) value->value_data.ptr);
     }
-    void copy(TaggedValue* value)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
-
+        dest->value_data.ptr = duplicate((DictData*) source->value_data.ptr);
     }
-
+    std::string to_string(TaggedValue* value)
+    {
+        return to_string((DictData*) value->value_data.ptr);
+    }
 } // namespace tagged_value_wrap
 
+void setup_type(Type* type)
+{
+    type->initialize = tagged_value_wrap::initialize;
+    type->release = tagged_value_wrap::release;
+    type->copy = tagged_value_wrap::copy;
+    type->toString = tagged_value_wrap::to_string;
+    type->name = "Dict";
+}
+
 } // namespace dict_t
+
+Dict* Dict::checkCast(TaggedValue* value)
+{
+    if (value->value_type->initialize == dict_t::tagged_value_wrap::initialize)
+        return (Dict*) value;
+    else
+        return NULL;
+}
+
+std::string Dict::toString()
+{
+    return dict_t::to_string((dict_t::DictData*) this->value_data.ptr);
+}
+
+TaggedValue* Dict::get(const char* key)
+{
+    return dict_t::get_value((dict_t::DictData*) this->value_data.ptr, key);
+}
+TaggedValue* Dict::operator[](const char* key)
+{
+    return get(key);
+}
+void Dict::set(const char* key, TaggedValue* value)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::insert_value(&data, key, value);
+    this->value_data.ptr = data;
+}
+
 } // namespace circa

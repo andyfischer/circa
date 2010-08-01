@@ -32,4 +32,15 @@ namespace dict_t {
     void setup_type(Type*);
 } // namespace dict_t
 
+// C++ wrapper
+struct Dict : TaggedValue
+{
+    static Dict* checkCast(TaggedValue* value);
+
+    std::string toString();
+    TaggedValue* get(const char* key);
+    TaggedValue* operator[](const char* key);
+    void set(const char* key, TaggedValue* value);
+};
+
 } // namespace circa
