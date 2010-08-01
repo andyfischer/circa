@@ -181,7 +181,8 @@ void subroutine_change_state_type(Term* func, Term* newType)
         contents.bindName(contents[1], "#state");
     }
 
-    // Find all the recursive calls to this function and insert a state argument.
+    // If state was added, find all the recursive calls to this function and
+    // insert a state argument.
     if (previousType == VOID_TYPE && newType != VOID_TYPE) {
         for (BranchIterator it(contents); !it.finished(); ++it) {
             Term* term = *it;

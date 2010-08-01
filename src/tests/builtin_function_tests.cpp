@@ -242,8 +242,6 @@ void test_changed()
     Term* x = branch.compile("x = 5");
     Term* changed = branch.compile("changed(x)");
 
-    dump_branch(branch);
-
     evaluate_branch(branch);
     test_assert(changed->asBool() == true);
 

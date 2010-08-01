@@ -379,6 +379,14 @@ void make_branch(TaggedValue* value)
     change_type(value, type_contents(BRANCH_TYPE));
 }
 
+void make_type(TaggedValue* value, Type* type)
+{
+    reset(value);
+    change_type(value, TYPE_T);
+    type->refCount++;
+    value->value_data.ptr = type;
+}
+
 void make_null(TaggedValue* value)
 {
     change_type(value, NULL_T);

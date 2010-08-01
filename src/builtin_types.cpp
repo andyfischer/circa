@@ -336,28 +336,28 @@ namespace point_t {
 void initialize_primitive_types(Branch& kernel)
 {
     STRING_TYPE = create_type(kernel, "string");
-    set_pointer(STRING_TYPE, STRING_T);
+    make_type(STRING_TYPE, STRING_T);
 
     INT_TYPE = create_type(kernel, "int");
-    set_pointer(INT_TYPE, INT_T);
+    make_type(INT_TYPE, INT_T);
 
     FLOAT_TYPE = create_type(kernel, "number");
-    set_pointer(FLOAT_TYPE, FLOAT_T);
+    make_type(FLOAT_TYPE, FLOAT_T);
 
     DICT_TYPE = create_type(kernel, "Dict");
-    set_pointer(DICT_TYPE, DICT_T);
+    make_type(DICT_TYPE, DICT_T);
 
     BOOL_TYPE = create_type(kernel, "bool");
-    set_pointer(BOOL_TYPE, BOOL_T);
+    make_type(BOOL_TYPE, BOOL_T);
 
     REF_TYPE = create_type(kernel, "Ref");
-    set_pointer(REF_TYPE, REF_T);
+    make_type(REF_TYPE, REF_T);
 
     VOID_TYPE = create_type(kernel, "void");
-    set_pointer(VOID_TYPE, VOID_T);
+    make_type(VOID_TYPE, VOID_T);
 
     LIST_TYPE = create_type(kernel, "List");
-    set_pointer(LIST_TYPE, LIST_T);
+    make_type(LIST_TYPE, LIST_T);
 
     // ANY_TYPE was created in bootstrap_kernel
 }

@@ -17,9 +17,13 @@ namespace type_t {
         if (type->permanent)
             return;
         ca_assert(type->refCount > 0);
+        //std::cout << "decref: " << type->name << std::endl;
         type->refCount--;
-        if (type->refCount == 0)
+        if (type->refCount == 0) {
+            //std::cout << "deleted: " << type->name << std::endl;
+            //ca_assert(type->name != "Dict");
             delete type;
+        }
     }
 
     void initialize(Type*, TaggedValue* value)
@@ -31,7 +35,9 @@ namespace type_t {
     void release(TaggedValue* value)
     {
         ca_assert(is_type(value));
-        decref((Type*) get_pointer(value));
+        Type* type = (Type*) get_pointer(value);
+        if (type != NULL)
+            decref(type);
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {

@@ -73,6 +73,7 @@ void make_bool(TaggedValue* value, bool b);
 void make_ref(TaggedValue* value, Term* t);
 TaggedValue* make_list(TaggedValue* value);
 void make_branch(TaggedValue* value);
+void make_type(TaggedValue* value, Type* type);
 void make_null(TaggedValue* value);
 
 void set_int(TaggedValue* value, int i);
