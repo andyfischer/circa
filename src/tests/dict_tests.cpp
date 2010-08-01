@@ -134,6 +134,34 @@ void many_items()
     }
 }
 
+void test_duplicate()
+{
+    TaggedValue eleven = TaggedValue::fromInt(11);
+    TaggedValue one_and_change = TaggedValue::fromFloat(1.2);
+    TaggedValue t = TaggedValue::fromBool(true);
+    TaggedValue hello = TaggedValue::fromString("hello");
+
+    dict_t::DictData* data = dict_t::create_dict();
+    dict_t::insert_value(&data, "a", &eleven);
+    dict_t::insert_value(&data, "b", &one_and_change);
+    dict_t::insert_value(&data, "c", &t);
+
+    test_equals(dict_t::to_string(data), "[a: 11, b: 1.2, c: true]");
+
+    dict_t::DictData* dupe = dict_t::duplicate(data);
+
+    test_equals(dict_t::to_string(dupe), "[a: 11, b: 1.2, c: true]");
+
+    // Modify original, make sure that dupe is unaffected
+    dict_t::remove(data, "b");
+    dict_t::insert_value(&data, "d", &hello);
+    test_equals(dict_t::to_string(data), "[a: 11, c: true, d: 'hello']");
+    test_equals(dict_t::to_string(dupe), "[a: 11, b: 1.2, c: true]");
+
+    dict_t::free_dict(data);
+    dict_t::free_dict(dupe);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(dict_tests::test_simple);
@@ -141,6 +169,7 @@ void register_tests()
     REGISTER_TEST_CASE(dict_tests::handle_missing_keys);
     REGISTER_TEST_CASE(dict_tests::hash_collision);
     REGISTER_TEST_CASE(dict_tests::many_items);
+    REGISTER_TEST_CASE(dict_tests::test_duplicate);
 }
 
 }

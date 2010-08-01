@@ -41,6 +41,12 @@ struct TaggedValue
     std::string const& asString();
     bool asBool();
     Ref& asRef();
+
+    // Convenient constructors
+    static TaggedValue fromInt(int i);
+    static TaggedValue fromFloat(float f);
+    static TaggedValue fromString(const char* s);
+    static TaggedValue fromBool(bool b);
 };
 
 void cast(Type* type, TaggedValue* source, TaggedValue* dest);

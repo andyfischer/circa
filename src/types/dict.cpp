@@ -64,6 +64,51 @@ void free_dict(DictData* data)
     free(data);
 }
 
+DictData* grow(DictData* data, int new_capacity)
+{
+    DictData* new_data = create_dict(new_capacity);
+
+    // Move all the keys & values over.
+    for (int i=0; i < data->capacity; i++) {
+        Slot* old_slot = &data->slots[i];
+
+        if (old_slot->key == NULL)
+            continue;
+
+        int index = insert(&new_data, old_slot->key);
+        swap(&old_slot->value, &new_data->slots[index].value);
+    }
+    return new_data;
+}
+
+// Grow this dictionary by the default growth rate. This will result in
+// a new DictData* object, don't use the old one after calling this.
+void grow(DictData** dataPtr)
+{
+    int new_capacity = int((*dataPtr)->count / INITIAL_LOAD_FACTOR);
+    DictData* oldData = *dataPtr;
+    *dataPtr = grow(*dataPtr, new_capacity);
+    free_dict(oldData);
+}
+
+DictData* duplicate(DictData* original)
+{
+    int new_capacity = int(original->count / INITIAL_LOAD_FACTOR);
+    DictData* dupe = create_dict(new_capacity);
+
+    // Copy all items
+    for (int i=0; i < original->capacity; i++) {
+        Slot* slot = &original->slots[i];
+
+        if (slot->key == NULL)
+            continue;
+
+        int index = insert(&dupe, slot->key);
+        copy(&slot->value, &dupe->slots[index].value);
+    }
+    return dupe;
+}
+
 // Get the 'ideal' slot index, the place we would put this string if
 // there is no collision.
 int find_ideal_slot_index(DictData* data, const char* str)
@@ -186,30 +231,6 @@ void remove(DictData* data, const char* key)
     }
 }
 
-DictData* grow(DictData* data, int new_capacity)
-{
-    DictData* new_data = create_dict(new_capacity);
-
-    // Move all the keys & values over.
-    for (int i=0; i < data->capacity; i++) {
-        Slot* old_slot = &data->slots[i];
-
-        if (old_slot->key == NULL)
-            continue;
-
-        int index = insert(&new_data, old_slot->key);
-        swap(&old_slot->value, &new_data->slots[index].value);
-    }
-    return new_data;
-}
-
-void grow(DictData** dataPtr)
-{
-    int new_capacity = int((*dataPtr)->count / INITIAL_LOAD_FACTOR);
-    DictData* oldData = *dataPtr;
-    *dataPtr = grow(*dataPtr, new_capacity);
-    free_dict(oldData);
-}
 
 int count(DictData* data)
 {
@@ -290,6 +311,15 @@ namespace tagged_value_wrap {
 
     void initialize(Type* type, TaggedValue* value)
     {
+        value->value_data.ptr = create_dict();
+    }
+    void release(TaggedValue* value)
+    {
+        free_dict((DictData*) value->value_data.ptr);
+    }
+    void copy(TaggedValue* value)
+    {
+
     }
 
 } // namespace tagged_value_wrap

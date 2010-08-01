@@ -120,6 +120,33 @@ Ref& TaggedValue::asRef()
     return as_ref(this);
 }
 
+TaggedValue TaggedValue::fromInt(int i)
+{
+    TaggedValue tv;
+    make_int(&tv, i);
+    return tv;
+}
+
+TaggedValue TaggedValue::fromFloat(float f)
+{
+    TaggedValue tv;
+    make_float(&tv, f);
+    return tv;
+}
+TaggedValue TaggedValue::fromString(const char* s)
+{
+    TaggedValue tv;
+    make_string(&tv, s);
+    return tv;
+}
+
+TaggedValue TaggedValue::fromBool(bool b)
+{
+    TaggedValue tv;
+    make_bool(&tv, b);
+    return tv;
+}
+
 void cast(Type* type, TaggedValue* source, TaggedValue* dest)
 {
     if (type->cast == NULL) {
