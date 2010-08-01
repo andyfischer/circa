@@ -127,37 +127,13 @@ bool is_subroutine(Term* term)
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
-#if 0
-    Branch& contents = sub->nestedContents;
-
-    Obsolete with new-style return
-    // If there is an #out term, then it needs to be the last term. If #out is a
-    // name binding into an inner branch then this might not be the case
-    if (contents.contains("#out") && contents[contents.length()-1]->name != "#out") {
-        Term* copy = apply(contents, COPY_FUNC, RefList(contents["#out"]), "#out");
-        set_source_hidden(copy, true);
-    } else if (!contents.contains("#out")) {
-        // If there's no #out term, then create an extra term to hold the output type
-        Term* term = create_value(contents, outputType, "#out");
-        set_source_hidden(term, true);
-    }
-
-    // If the #out term doesn't have the same type as the declared type, then cast it
-    Term* outTerm = contents[contents.length()-1];
-    if (outTerm->type != outputType) {
-        outTerm = apply(contents, CAST_FUNC, RefList(outTerm), "#out");
-        change_type(outTerm, outputType);
-        set_source_hidden(outTerm, true);
-    }
-#endif
-
     // Install evaluate function
     function_t::get_evaluate(sub) = subroutine_t::evaluate;
 
-    subroutine_update_hidden_state_type_from_contents(sub);
+    subroutine_update_state_type_from_contents(sub);
 }
 
-void subroutine_update_hidden_state_type_from_contents(Term* func)
+void subroutine_update_state_type_from_contents(Term* func)
 {
     // Check if a stateful argument was declared
     Term* firstInput = function_t::get_input_placeholder(func, 0);
@@ -171,11 +147,15 @@ void subroutine_update_hidden_state_type_from_contents(Term* func)
     for (int i=0; i < contents.length(); i++) {
         if (contents[i] == NULL)
             continue;
-        if (is_stateful(contents[i]))
+        if (is_stateful(contents[i])) {
             hasState = true;
+            break;
+        }
         if (is_subroutine(contents[i]->function))
-            if (is_function_stateful(contents[i]->function))
+            if (is_function_stateful(contents[i]->function)) {
                 hasState = true;
+                //break;
+            }
     }
 
     if (hasState)
@@ -184,12 +164,12 @@ void subroutine_update_hidden_state_type_from_contents(Term* func)
 
 void subroutine_change_state_type(Term* func, Term* newType)
 {
-    Term* previousType = function_t::get_hidden_state_type(func);
+    Term* previousType = function_t::get_implicit_state_type(func);
     if (previousType == newType)
         return;
 
     Branch& contents = func->nestedContents;
-    function_t::get_attrs(func).hiddenStateType = newType;
+    function_t::get_attrs(func).implicitStateType = newType;
 
     bool hasStateInput = (function_t::num_inputs(func) > 0)
         && (function_t::get_input_name(func, 0) == "#state");
@@ -201,8 +181,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
         contents.bindName(contents[1], "#state");
     }
 
-    // If state was added, find all the calls to this function and insert
-    // a state argument.
+    // Find all the recursive calls to this function and insert a state argument.
     if (previousType == VOID_TYPE && newType != VOID_TYPE) {
         for (BranchIterator it(contents); !it.finished(); ++it) {
             Term* term = *it;
@@ -211,7 +190,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
                 Branch* branch = term->owningBranch;
                 Term* stateContainer = alloc_term();
                 branch->insert(term->index, stateContainer);
-                change_type(stateContainer, function_t::get_hidden_state_type(func));
+                change_type(stateContainer, function_t::get_implicit_state_type(func));
                 change_function(stateContainer, STATEFUL_VALUE_FUNC);
                 branch->bindName(stateContainer, default_name_for_hidden_state(term->name));
 

@@ -8,7 +8,8 @@ namespace function_attrs_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
-        set_pointer(value, type, new FunctionAttrs());
+        FunctionAttrs* attrs = new FunctionAttrs();
+        set_pointer(value, type, attrs);
     }
 
     void release(TaggedValue* value)
@@ -184,9 +185,9 @@ namespace function_t {
         get_attrs(function).outputType = type;
     }
 
-    Ref& get_hidden_state_type(Term* function)
+    Ref& get_implicit_state_type(Term* function)
     {
-        return get_attrs(function).hiddenStateType;
+        return get_attrs(function).implicitStateType;
     }
 
     bool get_variable_args(Term* function)

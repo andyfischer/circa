@@ -344,6 +344,9 @@ void initialize_primitive_types(Branch& kernel)
     FLOAT_TYPE = create_type(kernel, "number");
     set_pointer(FLOAT_TYPE, FLOAT_T);
 
+    DICT_TYPE = create_type(kernel, "Dict");
+    set_pointer(DICT_TYPE, DICT_T);
+
     BOOL_TYPE = create_type(kernel, "bool");
     set_pointer(BOOL_TYPE, BOOL_T);
 

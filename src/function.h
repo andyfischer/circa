@@ -16,7 +16,7 @@ struct FunctionAttrs
 
     std::string name;
     Ref outputType;
-    Ref hiddenStateType;
+    Ref implicitStateType;
     bool variableArgs;
     std::string exposedNamePath;
     Ref feedbackFunc;
@@ -65,7 +65,7 @@ namespace function_t {
     void set_name(Term* function, std::string const& name);
     Term* get_output_type(Term* function);
     void set_output_type(Term* funciton, Term* type);
-    Ref& get_hidden_state_type(Term* function);
+    Ref& get_implicit_state_type(Term* function);
     bool get_variable_args(Term* function);
     void set_variable_args(Term* function, bool value);
     Term* get_input_placeholder(Term* function, int index);

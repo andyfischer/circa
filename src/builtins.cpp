@@ -69,6 +69,7 @@ Term* VALUE_FUNC = NULL;
 
 Term* ANY_TYPE = NULL;
 Term* BOOL_TYPE = NULL;
+Term* DICT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
 Term* REF_TYPE = NULL;

@@ -15,8 +15,8 @@ bool is_subroutine(Term* term);
 // Perform various steps to finish creating a subroutine
 void finish_building_subroutine(Term* sub, Term* outputType);
 
-void subroutine_update_hidden_state_type_from_contents(Term* sub);
-void subroutine_change_state_type(Term* func, Term* newType);
+void subroutine_update_state_type_from_contents(Term* sub);
+void subroutine_change_state_type(Term* func, Term* type);
 bool is_subroutine_state_expanded(Term* term);
 void expand_subroutines_hidden_state(Term* call, Term* state);
 

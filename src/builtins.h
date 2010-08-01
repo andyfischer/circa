@@ -55,6 +55,7 @@ extern Term* VALUE_FUNC;
 
 extern Term* ANY_TYPE;
 extern Term* BOOL_TYPE;
+extern Term* DICT_TYPE;
 extern Term* FLOAT_TYPE;
 extern Term* INT_TYPE;
 extern Term* REF_TYPE;

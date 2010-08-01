@@ -37,7 +37,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
             && (inputs.length() < function_t::num_inputs(function)))
     {
         Term* stateContainer = create_stateful_value(branch,
-                function_t::get_hidden_state_type(function),
+                function_t::get_implicit_state_type(function),
                 default_name_for_hidden_state(name));
 
         RefList newInputs(stateContainer);

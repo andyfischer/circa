@@ -381,7 +381,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function(result);
-    function_t::get_hidden_state_type(result) = VOID_TYPE;
+    function_t::get_implicit_state_type(result) = VOID_TYPE;
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
@@ -448,7 +448,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
-            function_t::get_hidden_state_type(result) = typeTerm;
+            function_t::get_implicit_state_type(result) = typeTerm;
         }
 
         // Variable args when ... is appended
