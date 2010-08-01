@@ -218,9 +218,8 @@ void reset_type(Type* type)
     type->release = NULL;
     type->copy = NULL;
     type->reset = NULL;
-    type->cast = NULL;
-    type->castPossible = NULL;
     type->equals = NULL;
+    type->cast = NULL;
     type->remapPointers = NULL;
     type->toString = NULL;
     type->formatSource = NULL;

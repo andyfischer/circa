@@ -381,11 +381,6 @@ namespace branch_t {
         }
     }
 
-    bool cast_possible(Type*, TaggedValue* value)
-    {
-        return is_branch(value) || list_t::is_list(value);
-    }
-
     void static_type_query(Type* type, StaticTypeQuery* result)
     {
         Term* term = result->targetTerm;
@@ -631,7 +626,6 @@ void initialize_branch_based_type(Term* term)
     type->copy = branch_t::copy;
     type->reset = branch_t::reset_to_prototype;
     type->cast = branch_t::cast;
-    type->castPossible = branch_t::cast_possible;
     type->equals = branch_t::equals;
     type->staticTypeQuery = branch_t::static_type_query;
     type->isSubtype = branch_t::is_subtype;

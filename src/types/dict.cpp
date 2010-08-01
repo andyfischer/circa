@@ -286,5 +286,13 @@ void debug_print(DictData* data)
     }
 }
 
+namespace tagged_value_wrap {
+
+    void initialize(Type* type, TaggedValue* value)
+    {
+    }
+
+} // namespace tagged_value_wrap
+
 } // namespace dict_t
 } // namespace circa

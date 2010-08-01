@@ -43,7 +43,6 @@ struct TaggedValue
     Ref& asRef();
 };
 
-bool cast_possible(Type* type, TaggedValue* dest);
 void cast(Type* type, TaggedValue* source, TaggedValue* dest);
 void cast(TaggedValue* source, TaggedValue* dest);
 void copy(TaggedValue* source, TaggedValue* dest);

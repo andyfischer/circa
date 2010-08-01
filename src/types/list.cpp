@@ -101,11 +101,6 @@ bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
     return true;
 }
 
-bool tv_cast_possible(Type*, TaggedValue* value)
-{
-    return is_list(value);
-}
-
 void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
 {
     if (!is_list(source)) return;
@@ -273,7 +268,6 @@ void setup_type(Type* type)
     type->copy = tv_copy;
     type->toString = tv_to_string;
     type->equals = tv_equals;
-    type->castPossible = tv_cast_possible;
     type->cast = tv_cast;
     type->getIndex = tv_get_index;
     type->setIndex = tv_set_index;

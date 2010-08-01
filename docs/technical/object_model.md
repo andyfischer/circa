@@ -42,19 +42,6 @@ Reset an existing value to its 'initial' value. This should have the same effect
 If this function isn't implemented, the default behavior is to call release() and then
 initialize().
 
-## cast ##
-
-Attempt to convert a value of this type to a value of a different type. The type can assume
-that this will only be called if cast_possible returns true;
-
-If this function isn't implemented, the default behavior is to do a copy()
-
-## castPossible ##
-
-Returns whether it's possible to convert a value of this type to the given type.
-
-If this function isn't implemented, the default behavior is to always say no.
-
 ## equals ##
 
 Returns whether the given values are equal. The right-hand-side value might be of a
@@ -63,6 +50,34 @@ different type, so this function should check the types.
 If this function isn't implemented, the default behavior is: when the values have
 the same type, do a shallow comparison of `value_data`, and if they have different
 types, always return false.
+
+## cast ##
+
+Attempt to convert a value of this type to a value of a different type. The type can assume
+that this will only be called if valueFitsType or staticTypeQuery have indicated that
+this cast is possible.
+
+If this function isn't implemented, the default behavior is to do a copy()
+
+## isSubtype ##
+
+Returns whether values of the given type can always be cast to this type.
+
+Can get rid of this.
+
+## valueFitsType ##
+
+Returns whether the given value fits this type. This is used for dynamic type checking.
+
+## typeMatches ##
+
+TODO: Is this used?
+
+## staticTypeQuery ##
+
+This checks if the given term can be cast to a value of this type. This function
+may return a result of "always", "never", or "unable to statically determine".
+If the answer can't be statically determined, we'll call valueFitsType at runtime.
 
 ## toString ##
 

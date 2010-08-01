@@ -13,7 +13,7 @@ namespace cast_function {
             return copy(source, OUTPUT);
 
         Type* type = &as_type(CALLER->type);
-        if (!cast_possible(type, source)) {
+        if (!value_fits_type(source, type)) {
             std::stringstream message;
             message << "Can't cast from type " << source->value_type->name
                 << " to type " << type->name;

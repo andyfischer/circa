@@ -17,11 +17,6 @@ namespace float_t {
         set_float(dest, to_float(source));
     }
 
-    bool cast_possible(Type* source, TaggedValue* value)
-    {
-        return is_int(value) || is_float(value);
-    }
-
     bool equals(TaggedValue* a, TaggedValue* b)
     {
         return to_float(a) == to_float(b);
@@ -95,7 +90,6 @@ namespace float_t {
         type->name = "number";
         type->reset = reset;
         type->cast = cast;
-        type->castPossible = cast_possible;
         type->equals = equals;
         type->isSubtype = is_subtype;
         type->toString = to_string;

@@ -42,7 +42,6 @@ struct Type
     typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
     typedef void (*Reset)(TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
-    typedef bool (*CastPossible)(Type* type, TaggedValue* value);
     typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
     typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
     typedef std::string (*ToString)(TaggedValue* value);
@@ -70,7 +69,6 @@ struct Type
     Copy copy;
     Reset reset;
     Cast cast;
-    CastPossible castPossible;
     Equals equals;
     RemapPointers remapPointers;
     ToString toString;
@@ -117,7 +115,6 @@ private:
         copy(NULL),
         reset(NULL),
         cast(NULL),
-        castPossible(NULL),
         equals(NULL),
         remapPointers(NULL),
         toString(NULL),

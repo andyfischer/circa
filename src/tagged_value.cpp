@@ -120,17 +120,6 @@ Ref& TaggedValue::asRef()
     return as_ref(this);
 }
 
-bool cast_possible(Type* type, TaggedValue* value)
-{
-    Type::CastPossible castPossible = type->castPossible;
-
-    if (castPossible != NULL)
-        return castPossible(type, value);
-
-    // Default behavior, only allow if types are exactly the same.
-    return type == value->value_type;
-}
-
 void cast(Type* type, TaggedValue* source, TaggedValue* dest)
 {
     if (type->cast == NULL) {
