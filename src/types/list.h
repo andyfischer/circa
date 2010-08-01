@@ -15,6 +15,7 @@ namespace list_t {
     void remove_and_replace_with_back(TaggedValue* list, int index);
 }
 
+// Wrapper type to use a TaggedValue as a List.
 struct List : TaggedValue
 {
     List();

@@ -18,7 +18,7 @@ struct ListData {
     int count;
     int capacity;
     TaggedValue items[0];
-    // List of TaggedValues will follow in memory.
+    // items has size [capacity].
 };
 
 void assert_valid_list(ListData* list)
@@ -57,6 +57,7 @@ ListData* create_list(int capacity)
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
+    memset(result->items, 0, capacity * sizeof(TaggedValue));
     for (int i=0; i < capacity; i++)
         result->items[i].init();
     return result;
