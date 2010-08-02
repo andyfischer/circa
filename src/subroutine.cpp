@@ -207,6 +207,19 @@ void subroutine_change_state_type(Term* func, Term* newType)
     }
 }
 
+#if DICT_STATE
+bool is_subroutine_state_expanded(Dict* state)
+{
+    return !state.empty();
+}
+
+void expand_subroutines_hidden_state(Term* call, Dict* state)
+{
+    ca_assert(is_subroutine(call->function));
+    ca_assert(state != NULL);
+    duplicate_branch(function_contents(call->function), as_branch(state));
+}
+#else
 bool is_subroutine_state_expanded(Term* term)
 {
     ca_assert(term != NULL);
@@ -219,6 +232,7 @@ void expand_subroutines_hidden_state(Term* call, Term* state)
     ca_assert(state != NULL);
     duplicate_branch(function_contents(call->function), as_branch(state));
 }
+#endif
 
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {

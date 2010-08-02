@@ -231,10 +231,22 @@ void remove(DictData* data, const char* key)
     }
 }
 
-
 int count(DictData* data)
 {
     return data->count;
+}
+
+void clear(DictData* data)
+{
+    for (int i=0; i < data->capacity; i++) {
+        Slot* slot = &data->slots[i];
+        if (slot->key == NULL)
+            continue;
+        free(slot->key);
+        slot->key = NULL;
+        make_null(&slot->value);
+    }
+    data->count = 0;
 }
 
 // Warning, C++ crap ahead:
@@ -364,6 +376,16 @@ void Dict::set(const char* key, TaggedValue* value)
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::insert_value(&data, key, value);
     this->value_data.ptr = data;
+}
+void Dict::clear()
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::clear(data);
+}
+bool Dict::empty()
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    return dict_t::count(data) == 0;
 }
 
 } // namespace circa

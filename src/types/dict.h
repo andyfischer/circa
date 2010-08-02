@@ -41,6 +41,8 @@ struct Dict : TaggedValue
     TaggedValue* get(const char* key);
     TaggedValue* operator[](const char* key);
     void set(const char* key, TaggedValue* value);
+    void clear();
+    bool empty();
 };
 
 } // namespace circa
