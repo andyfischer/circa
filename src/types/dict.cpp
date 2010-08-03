@@ -371,6 +371,12 @@ TaggedValue* Dict::operator[](const char* key)
 {
     return get(key);
 }
+void Dict::insert(const char* key)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::insert(&data, key);
+    this->value_data.ptr = data;
+}
 void Dict::set(const char* key, TaggedValue* value)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;

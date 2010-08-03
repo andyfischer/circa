@@ -18,13 +18,8 @@ void finish_building_subroutine(Term* sub, Term* outputType);
 void subroutine_update_state_type_from_contents(Term* sub);
 void subroutine_change_state_type(Term* func, Term* type);
 
-#if DICT_STATE
-bool is_subroutine_state_expanded(Dict* state);
-void expand_subroutines_hidden_state(Term* call, Dict* state);
-#else
 bool is_subroutine_state_expanded(Term* term);
 void expand_subroutines_hidden_state(Term* call, Term* state);
-#endif
 
 void store_locals(Branch& branch, TaggedValue* storage);
 void restore_locals(TaggedValue* storageTv, Branch& branch);

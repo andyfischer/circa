@@ -22,10 +22,12 @@ bool is_function_stateful(Term* func)
     return (stateType != NULL && stateType != VOID_TYPE);
 }
 
-void load_state_into_branch(Branch& state, Branch& branch)
+void load_state_into_branch(TaggedValue* stateTv, Branch& branch)
 {
     int read = 0;
     int write = 0;
+
+    List* state = List::checkCast(stateTv);
 
     for (write = 0; write < branch.length(); write++) {
         Term* destTerm = branch[write];
@@ -33,15 +35,15 @@ void load_state_into_branch(Branch& state, Branch& branch)
         if (!is_stateful(destTerm))
             continue;
 
-        if (read >= state.length())
+        if (read >= state->length())
             break;
 
-        if (!value_fits_type(state[read], type_contents(destTerm->type))) {
+        if (!value_fits_type(state->get(read), type_contents(destTerm->type))) {
             reset(destTerm);
             break;
         }
 
-        cast(state[read], destTerm);
+        cast(state->get(read), destTerm);
 
         read++;
     }
@@ -55,8 +57,11 @@ void load_state_into_branch(Branch& state, Branch& branch)
     }
 }
 
-void persist_state_from_branch(Branch& branch, Branch& state)
+void persist_state_from_branch(Branch& branch, TaggedValue* stateTv)
 {
+    List* state = List::checkCast(stateTv);
+    touch(state);
+
     int write = 0;
     for (int read=0; read < branch.length(); read++) {
         Term* term = branch[read];
@@ -64,16 +69,16 @@ void persist_state_from_branch(Branch& branch, Branch& state)
         if (!is_stateful(term))
             continue;
 
-        rewrite_as_value(state, write, term->type);
-        rename(state[write], term->name);
+        //rewrite_as_value(state, write, term->type);
+        //rename(state[write], term->name);
 
-        copy(term, state[write]);
+        copy(term, state->get(write));
 
         write++;
     }
 
     if (write > state.length())
-        state.shorten(write);
+        state->resize(write);
 }
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)

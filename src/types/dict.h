@@ -40,6 +40,7 @@ struct Dict : TaggedValue
     std::string toString();
     TaggedValue* get(const char* key);
     TaggedValue* operator[](const char* key);
+    void insert(const char* key);
     void set(const char* key, TaggedValue* value);
     void clear();
     bool empty();

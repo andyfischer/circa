@@ -49,14 +49,8 @@ namespace subroutine_t {
         // saved then this function will reset this function's stateful values.
         Term* hiddenState = get_hidden_state_for_call(CALLER);
 
-        // Subroutines only support Branches as state, if this state has a non-Branch type
-        // then it was meant to execute as a builtin. As a workaround, we'll ignore a
-        // non-Branch state so that we don't crash.
-        if (hiddenState && !is_branch(hiddenState))
-            hiddenState = NULL;
-
         if (hiddenState != NULL)
-            load_state_into_branch(as_branch(hiddenState), functionBranch);
+            load_state_into_branch(hiddenState, functionBranch);
 
         // Load inputs into input placeholders.
         for (int input=0; input < num_inputs; input++) {
@@ -159,7 +153,11 @@ void subroutine_update_state_type_from_contents(Term* func)
     }
 
     if (hasState)
+#if DICT_STATE
+        subroutine_change_state_type(func, DICT_TYPE);
+#else
         subroutine_change_state_type(func, BRANCH_TYPE);
+#endif
 }
 
 void subroutine_change_state_type(Term* func, Term* newType)
@@ -207,32 +205,32 @@ void subroutine_change_state_type(Term* func, Term* newType)
     }
 }
 
-#if DICT_STATE
-bool is_subroutine_state_expanded(Dict* state)
-{
-    return !state.empty();
-}
-
-void expand_subroutines_hidden_state(Term* call, Dict* state)
-{
-    ca_assert(is_subroutine(call->function));
-    ca_assert(state != NULL);
-    duplicate_branch(function_contents(call->function), as_branch(state));
-}
-#else
 bool is_subroutine_state_expanded(Term* term)
 {
     ca_assert(term != NULL);
-    return as_branch(term).length() > 0;
+    Dict* dict = Dict::checkCast(term);
+    ca_assert(dict != NULL);
+    return !dict->empty();
 }
 
 void expand_subroutines_hidden_state(Term* call, Term* state)
 {
     ca_assert(is_subroutine(call->function));
     ca_assert(state != NULL);
-    duplicate_branch(function_contents(call->function), as_branch(state));
+
+    Dict* dict = Dict::checkCast(state);
+    ca_assert(state != NULL);
+
+    Branch& contents = function_contents(call->function);
+    for (int i=0; i < contents.length(); i++) {
+        Term* term = contents[i];
+        if (term == NULL) continue;
+        if (is_stateful(term) && term->name != "")
+            dict->insert(term->name.c_str());
+    }
+
+    //duplicate_branch(function_contents(call->function), as_branch(state));
 }
-#endif
 
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {
