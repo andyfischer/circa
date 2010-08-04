@@ -201,34 +201,6 @@ void subroutine_change_state_type(Term* func, Term* newType)
     }
 }
 
-bool is_subroutine_state_expanded(TaggedValue* state)
-{
-    ca_assert(state != NULL);
-    List* list = List::checkCast(state);
-    ca_assert(list != NULL);
-    return !list->empty();
-}
-
-void expand_subroutines_hidden_state(Term* call, TaggedValue* state)
-{
-    ca_assert(is_subroutine(call->function));
-    ca_assert(state != NULL);
-
-    Dict* dict = Dict::checkCast(state);
-    if (dict == NULL) return;
-    ca_assert(dict != NULL);
-
-    Branch& contents = function_contents(call->function);
-    for (int i=0; i < contents.length(); i++) {
-        Term* term = contents[i];
-        if (term == NULL) continue;
-        if (is_stateful(term) && term->name != "")
-            dict->insert(term->name.c_str());
-    }
-
-    //duplicate_branch(function_contents(call->function), as_branch(state));
-}
-
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {
     touch(storageTv);

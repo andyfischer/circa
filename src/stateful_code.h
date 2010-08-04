@@ -18,8 +18,6 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
 
 TaggedValue* get_hidden_state_for_call(Term* term);
 Term* find_call_for_hidden_state(Term* term);
-bool term_types_match_for_migration(Term* left, Term* right);
-bool terms_match_for_migration(Term* left, Term* right);
 void mark_stateful_value_assigned(Term* term);
 
 void reset_state(Branch& branch);

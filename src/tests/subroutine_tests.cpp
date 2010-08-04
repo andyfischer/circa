@@ -126,20 +126,6 @@ void subroutine_stateful_term()
     evaluate_term(another_call);
     test_equals(as_float(a_inside_another_call), 2);
     test_equals(as_float(a_inside_first_call), 3);
-
-    // Test accessing the subroutine's state in various ways
-    {
-        Term* call = branch.compile("mysub()");
-        TaggedValue* state = get_hidden_state_for_call(call);
-        test_assert(state);
-        test_assert(!is_subroutine_state_expanded(state));
-        List* list = List::checkCast(state);
-        test_assert(list->length() == 0);
-        
-        // I think expand_subroutines_hidden_state is obsolete..
-        //expand_subroutines_hidden_state(call, state);
-        //test_assert(is_subroutine_state_expanded(state));
-    }
 }
 
 void initialize_state_type()

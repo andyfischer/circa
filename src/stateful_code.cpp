@@ -118,50 +118,6 @@ Term* find_call_for_hidden_state(Term* term)
     return adjacent;
 }
 
-bool term_types_match_for_migration(Term* left, Term* right)
-{
-    //if (list_t::is_list_based_type(type_contents(left->type))
-    //        && list_t::is_list_based_type(type_contents(right->type)))
-    //    return true;
-
-    if (!is_subtype(type_contents(right->type), left->value_type)) {
-        VERBOSE_LOG("reject, types aren't equal\n");
-        return false;
-    }
-
-    return true;
-}
-
-bool functions_match_for_migration(Term* left, Term* right)
-{
-    if (left->function->name != right->function->name)
-        return false;
-
-    return true;
-}
-
-bool terms_match_for_migration(Term* left, Term* right)
-{
-    if (left->name != right->name) {
-        VERBOSE_LOG("reject, names don't match\n");
-        return false;
-    }
-
-    if (!term_types_match_for_migration(left, right))
-        return false;
-
-    Term* leftCall = find_call_for_hidden_state(left);
-    Term* rightCall = find_call_for_hidden_state(right);
-
-    if (leftCall != NULL && rightCall != NULL
-            && !functions_match_for_migration(leftCall, rightCall)) {
-        VERBOSE_LOG("reject, assoiciated calls have mismatched functions\n");
-        return false;
-    }
-
-    return true;
-}
-
 void mark_stateful_value_assigned(Term* term)
 {
     // Check if this term has a "do once" block for assigning
@@ -200,72 +156,11 @@ void migrate_stateful_values(Branch& source, Branch& dest)
     load_state_into_branch(&state, dest);
 }
 
-#if 0
-void migrate_stateful_values(Branch& source, Branch& dest)
-{
-    // There are a lot of fancy algorithms we could do here. But for now, just
-    // iterate and check matching indexes.
-    
-    for (int index=0; index < source.length(); index++) {
-        VERBOSE_LOG("checking index: %d\n", index);
-
-        if (index >= dest.length())
-            break;
-
-        Term* sourceTerm = source[index];
-        Term* destTerm = dest[index];
-
-        if (sourceTerm == NULL || destTerm == NULL)
-            continue;
-
-        if (!terms_match_for_migration(sourceTerm, destTerm))
-            continue;
-
-        // At this point, they match
-        
-        // If both terms are subroutine calls, and the source call is expanded, then
-        // expand the dest call as well.
-        if (subroutines_match_for_migration(sourceTerm->function, destTerm->function))
-        {
-            TaggedValue* sourceCallState = get_hidden_state_for_call(sourceTerm);
-            TaggedValue* destCallState = get_hidden_state_for_call(destTerm);
-            if (sourceCallState != NULL && destCallState != NULL) {
-                if (is_subroutine_state_expanded(sourceCallState)
-                    && !is_subroutine_state_expanded(destCallState))
-                    expand_subroutines_hidden_state(destTerm, destCallState);
-
-                // The loop just passed over these terms, so call migrate on them again.
-                migrate_stateful_values(as_branch(sourceCallState), as_branch(destCallState));
-            }
-        }
-
-        // Migrate inner branches (but not branches that should be treated as values)
-        if (sourceTerm->nestedContents.length() > 0
-                && destTerm->nestedContents.length() > 0
-                && !is_stateful(sourceTerm)) {
-            migrate_stateful_values(sourceTerm->nestedContents, destTerm->nestedContents);
-        } 
-        
-        // Stateful value migration
-        else if (is_stateful(sourceTerm)
-                    && is_stateful(destTerm)) {
-
-            VERBOSE_LOG("assigning value of %s\n", to_string(sourceTerm).c_str());
-
-            cast(sourceTerm, destTerm);
-        } else {
-            VERBOSE_LOG("nothing to do\n");
-        }
-    }
-}
-#endif
-
 void reset_state(Branch& branch)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
-        if (is_stateful(*it)) {
+        if (is_stateful(*it))
             reset(*it);
-        }
     }
 }
 
