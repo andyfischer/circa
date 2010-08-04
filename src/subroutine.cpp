@@ -145,11 +145,12 @@ void subroutine_update_state_type_from_contents(Term* func)
             hasState = true;
             break;
         }
-        if (is_subroutine(contents[i]->function))
+        if (is_subroutine(contents[i]->function)) {
             if (is_function_stateful(contents[i]->function)) {
                 hasState = true;
-                //break;
+                break;
             }
+        }
     }
 
     if (hasState)
