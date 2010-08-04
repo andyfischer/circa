@@ -43,9 +43,9 @@ void test_state()
 
     evaluate_term(loop);
 
-    Term* s_iter0 = get_for_loop_iteration_state(loop, 0)["s"];
-    Term* s_iter1 = get_for_loop_iteration_state(loop, 1)["s"];
-    Term* s_iter2 = get_for_loop_iteration_state(loop, 2)["s"];
+    TaggedValue* s_iter0 = get_for_loop_iteration_state(loop, 0)->getIndex(0);
+    TaggedValue* s_iter1 = get_for_loop_iteration_state(loop, 1)->getIndex(0);
+    TaggedValue* s_iter2 = get_for_loop_iteration_state(loop, 2)->getIndex(0);
     test_assert(s_iter0 != NULL);
     test_assert(s_iter1 != NULL);
     test_assert(s_iter2 != NULL);
@@ -98,10 +98,10 @@ void test_migrate_state()
     Branch branch;
     branch.eval("for i in 0..3; state int s = i; end");
 
-    Branch state;
-    persist_state_from_branch(branch, state);
+    TaggedValue state;
+    persist_state_from_branch(branch, &state);
 
-    test_assert(state.length() > 0);
+    test_assert(state.numElements() > 0);
 }
 
 void register_tests()

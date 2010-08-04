@@ -47,7 +47,7 @@ namespace subroutine_t {
 
         // Load values into this function's stateful values. If this state has never been
         // saved then this function will reset this function's stateful values.
-        Term* hiddenState = get_hidden_state_for_call(CALLER);
+        TaggedValue* hiddenState = get_hidden_state_for_call(CALLER);
 
         if (hiddenState != NULL)
             load_state_into_branch(hiddenState, functionBranch);
@@ -92,7 +92,7 @@ namespace subroutine_t {
 
         // Store state
         if (hiddenState != NULL)
-            persist_state_from_branch(functionBranch, as_branch(hiddenState));
+            persist_state_from_branch(functionBranch, hiddenState);
 
         // Restore locals, if needed
         if (is_null(&previousLocals)) {
@@ -153,11 +153,7 @@ void subroutine_update_state_type_from_contents(Term* func)
     }
 
     if (hasState)
-#if DICT_STATE
-        subroutine_change_state_type(func, DICT_TYPE);
-#else
-        subroutine_change_state_type(func, BRANCH_TYPE);
-#endif
+        subroutine_change_state_type(func, LIST_TYPE);
 }
 
 void subroutine_change_state_type(Term* func, Term* newType)
@@ -205,21 +201,22 @@ void subroutine_change_state_type(Term* func, Term* newType)
     }
 }
 
-bool is_subroutine_state_expanded(Term* term)
+bool is_subroutine_state_expanded(TaggedValue* state)
 {
-    ca_assert(term != NULL);
-    Dict* dict = Dict::checkCast(term);
-    ca_assert(dict != NULL);
-    return !dict->empty();
+    ca_assert(state != NULL);
+    List* list = List::checkCast(state);
+    ca_assert(list != NULL);
+    return !list->empty();
 }
 
-void expand_subroutines_hidden_state(Term* call, Term* state)
+void expand_subroutines_hidden_state(Term* call, TaggedValue* state)
 {
     ca_assert(is_subroutine(call->function));
     ca_assert(state != NULL);
 
     Dict* dict = Dict::checkCast(state);
-    ca_assert(state != NULL);
+    if (dict == NULL) return;
+    ca_assert(dict != NULL);
 
     Branch& contents = function_contents(call->function);
     for (int i=0; i < contents.length(); i++) {

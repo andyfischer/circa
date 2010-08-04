@@ -327,6 +327,12 @@ List::length()
     return list_t::tv_num_elements((TaggedValue*) this);
 }
 
+bool
+List::empty()
+{
+    return length() == 0;
+}
+
 TaggedValue*
 List::get(int index)
 {

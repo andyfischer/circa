@@ -8,12 +8,11 @@ namespace inspect_function {
     CA_FUNCTION(get_state)
     {
         Term* input = INPUT_TERM(0);
-        Term* hidden_state = get_hidden_state_for_call(input);
+        TaggedValue* hidden_state = get_hidden_state_for_call(input);
 
         if (hidden_state == NULL)
             change_type(CALLER, VOID_TYPE);
         else {
-            change_type(CALLER, hidden_state->type);
             copy(hidden_state, OUTPUT);
         }
     }

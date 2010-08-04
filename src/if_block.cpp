@@ -161,7 +161,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
         int actualElements = state->numElements();
         state->resize(numElements);
         for (int i=actualElements; i < numElements; i++)
-            make_branch(state->get(i));
+            make_list(state->get(i));
     }
 
     // Find the first if() call whose condition is true
@@ -186,8 +186,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
         if (satisfied) {
             // Load state, if it's found
             if (stateElement != NULL) {
-                stateElement = state->get(i);
-                load_state_into_branch(as_branch(stateElement), call->nestedContents);
+                load_state_into_branch(stateElement, call->nestedContents);
             }
 
             evaluate_term(cxt, call);
@@ -197,7 +196,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
                 // State elements may have moved during evaluate_term,
                 // so call state->get again.
                 stateElement = state->get(i);
-                persist_state_from_branch(call->nestedContents, as_branch(stateElement));
+                persist_state_from_branch(call->nestedContents, stateElement);
             }
 
             break;
@@ -205,7 +204,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
         } else {
             // This condition wasn't executed, reset state.
             if (stateElement != NULL) {
-                as_branch(stateElement).clear();
+                reset(stateElement);
                 reset_state(call->nestedContents);
             }
         }
@@ -218,7 +217,7 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
             stateElement = state->get(i);
         }
         if (stateElement != NULL) {
-            as_branch(stateElement).clear();
+            reset(stateElement);
             Term* call = contents[i];
             reset_state(call->nestedContents);
         }

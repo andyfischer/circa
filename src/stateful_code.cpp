@@ -29,23 +29,25 @@ void load_state_into_branch(TaggedValue* stateTv, Branch& branch)
 
     List* state = List::checkCast(stateTv);
 
-    for (write = 0; write < branch.length(); write++) {
-        Term* destTerm = branch[write];
+    if (state != NULL) {
+        for (write = 0; write < branch.length(); write++) {
+            Term* destTerm = branch[write];
 
-        if (!is_stateful(destTerm))
-            continue;
+            if (!is_stateful(destTerm))
+                continue;
 
-        if (read >= state->length())
-            break;
+            if (read >= state->length())
+                break;
 
-        if (!value_fits_type(state->get(read), type_contents(destTerm->type))) {
-            reset(destTerm);
-            break;
+            if (!value_fits_type(state->get(read), type_contents(destTerm->type))) {
+                reset(destTerm);
+                break;
+            }
+
+            cast(state->get(read), destTerm);
+
+            read++;
         }
-
-        cast(state->get(read), destTerm);
-
-        read++;
     }
 
     // if there are remaining stateful terms in 'branch' which didn't get
@@ -59,8 +61,16 @@ void load_state_into_branch(TaggedValue* stateTv, Branch& branch)
 
 void persist_state_from_branch(Branch& branch, TaggedValue* stateTv)
 {
+    make_list(stateTv);
     List* state = List::checkCast(stateTv);
-    touch(state);
+
+    // Count the # of stateful terms in branch
+    int statefulTerms = 0;
+    for (int i=0; i < branch.length(); i++)
+        if (is_stateful(branch[i]))
+            statefulTerms++;
+
+    state->resize(statefulTerms);
 
     int write = 0;
     for (int read=0; read < branch.length(); read++) {
@@ -69,16 +79,8 @@ void persist_state_from_branch(Branch& branch, TaggedValue* stateTv)
         if (!is_stateful(term))
             continue;
 
-        //rewrite_as_value(state, write, term->type);
-        //rename(state[write], term->name);
-
-        copy(term, state->get(write));
-
-        write++;
+        copy(term, state->get(write++));
     }
-
-    if (write > state.length())
-        state->resize(write);
 }
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
@@ -93,7 +95,7 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
     }
 }
 
-Term* get_hidden_state_for_call(Term* term)
+TaggedValue* get_hidden_state_for_call(Term* term)
 {
     if (term->input(0) == NULL)
         return NULL;
@@ -193,6 +195,14 @@ bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc)
 
 void migrate_stateful_values(Branch& source, Branch& dest)
 {
+    TaggedValue state;
+    persist_state_from_branch(source, &state);
+    load_state_into_branch(&state, dest);
+}
+
+#if 0
+void migrate_stateful_values(Branch& source, Branch& dest)
+{
     // There are a lot of fancy algorithms we could do here. But for now, just
     // iterate and check matching indexes.
     
@@ -217,8 +227,8 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         // expand the dest call as well.
         if (subroutines_match_for_migration(sourceTerm->function, destTerm->function))
         {
-            Term* sourceCallState = get_hidden_state_for_call(sourceTerm);
-            Term* destCallState = get_hidden_state_for_call(destTerm);
+            TaggedValue* sourceCallState = get_hidden_state_for_call(sourceTerm);
+            TaggedValue* destCallState = get_hidden_state_for_call(destTerm);
             if (sourceCallState != NULL && destCallState != NULL) {
                 if (is_subroutine_state_expanded(sourceCallState)
                     && !is_subroutine_state_expanded(destCallState))
@@ -248,6 +258,7 @@ void migrate_stateful_values(Branch& source, Branch& dest)
         }
     }
 }
+#endif
 
 void reset_state(Branch& branch)
 {

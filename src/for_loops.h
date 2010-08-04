@@ -6,9 +6,8 @@
 
 namespace circa {
 
-//Branch* get_for_loop_state(Term* forTerm, int index);
 bool for_loop_has_state(Term* forTerm);
-Branch& get_for_loop_iteration_state(Term* forTerm, int index);
+TaggedValue* get_for_loop_iteration_state(Term* forTerm, int index);
 Term* get_for_loop_iterator(Term* forTerm);
 Term* get_for_loop_modify_list(Term* forTerm);
 Term* get_for_loop_discard_called(Term* forTerm);

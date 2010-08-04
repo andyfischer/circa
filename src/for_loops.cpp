@@ -18,12 +18,13 @@ namespace circa {
    [n-1] #rebinds_for_outer
 */
 
-Branch* get_for_loop_state(Term* forTerm)
+List* get_for_loop_state(Term* forTerm)
 {
     if (get_for_loop_state_type(forTerm) == VOID_TYPE)
         return NULL;
 
-    return &as_branch(forTerm->input(0));
+    Term* term = forTerm->input(0);
+    return List::checkCast(term);
 }
 
 bool for_loop_has_state(Term* forTerm)
@@ -31,9 +32,9 @@ bool for_loop_has_state(Term* forTerm)
     return get_for_loop_state_type(forTerm) != VOID_TYPE;
 }
 
-Branch& get_for_loop_iteration_state(Term* forTerm, int index)
+TaggedValue* get_for_loop_iteration_state(Term* forTerm, int index)
 {
-    return as_branch(get_for_loop_state(forTerm)->get(index));
+    return get_for_loop_state(forTerm)->get(index);
 }
 
 Branch& get_for_loop_rebinds(Term* forTerm)
@@ -167,14 +168,14 @@ void setup_for_loop_post_code(Term* forTerm)
         }
     }
 
-    get_for_loop_state_type(forTerm) = hasState ? BRANCH_TYPE : VOID_TYPE;
+    get_for_loop_state_type(forTerm) = hasState ? LIST_TYPE : VOID_TYPE;
 }
 
 CA_FUNCTION(evaluate_for_loop)
 {
     Term* listTerm = INPUT_TERM(1);
     Branch& codeBranch = CALLER->nestedContents;
-    Branch* stateBranch = get_for_loop_state(CALLER);
+    List* state = get_for_loop_state(CALLER);
 
     int numIterations = listTerm->numElements();
     bool modifyList = get_for_loop_modify_list(CALLER)->asBool();
@@ -186,17 +187,19 @@ CA_FUNCTION(evaluate_for_loop)
     if (modifyList)
         listOutput = get_for_loop_rebinds_for_outer(CALLER)[listTerm->name];
 
-    if (stateBranch != NULL) {
-        resize_list(*stateBranch, numIterations, BRANCH_TYPE);
+    if (state) {
+        state->resize(numIterations);
 
         // Initialize state for any uninitialized slots
+#if 0
         for (int i=0; i < numIterations; i++) {
 
-            Branch& iterationBranch = get_for_loop_iteration_state(CALLER, i);
+            TaggedValue* iterationState = get_for_loop_iteration_state(CALLER, i);
             
-            if (iterationBranch.length() == 0)
-                get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
+            //if (iterationBranch.length() == 0)
+            //    get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
         }
+#endif
     }
 
     Term* isFirstIteration = get_for_loop_is_first_iteration(CALLER);
@@ -207,9 +210,8 @@ CA_FUNCTION(evaluate_for_loop)
     if (numIterations == 0)
         evaluate_branch(CONTEXT, get_for_loop_rebinds_for_outer(CALLER));
 
-    if (stateBranch != NULL) {
+    if (state != NULL) {
         //std::cout << "state branch = " << std::endl;
-        //dump_branch(*stateBranch);
     }
 
     //std::cout << "Num iterations = " << numIterations << std::endl;
@@ -222,8 +224,8 @@ CA_FUNCTION(evaluate_for_loop)
         copy((*listTerm)[i], iterator);
 
         // Inject stateful terms
-        if (stateBranch != NULL)
-            load_state_into_branch(as_branch(stateBranch->get(i)), codeBranch);
+        if (state != NULL)
+            load_state_into_branch(state->get(i), codeBranch);
 
         //std::cout << "pre evaluate = " << std::endl;
         //dump_branch(codeBranch);
@@ -240,11 +242,10 @@ CA_FUNCTION(evaluate_for_loop)
         }
 
         // Persist stateful terms
-        if (stateBranch != NULL) {
-            persist_state_from_branch(codeBranch, as_branch(stateBranch->get(i)));
+        if (state != NULL) {
+            persist_state_from_branch(codeBranch, state->get(i));
 
             //std::cout << "Persisted = " << std::endl;
-            //dump_branch(*stateBranch);
         }
 
         // Possibly use this value to modify the list
