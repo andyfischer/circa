@@ -1,13 +1,25 @@
 
 Circa's object model uses a pluggable type system and tagged pointers. A type is defined
 by creating a Type object, and adding functions to its slots to control its behavior.
-The type system is meant to be pluggable and flat. There's no (currently) no inheritance
-or type hierarchies.
+The type system is meant to be pluggable and flat; inheritance and complex type hierarchies
+are discouraged. (There is some limited support for metaclasses)
 
-Values are held by TaggedValue objects, each TaggedValue has a pointer to the type
-used, and a word-sized slot (called `value_data`) where the actual value is held.
-The type can use this space
-to hold the actual value, or it can hold a pointer to an allocated object.
+Values are held by TaggedValue objects, which look like this:
+
+    struct TaggedValue {
+        Type* value_type;
+        void* value_data;
+    };
+
+
+Each TaggedValue has a pointer to its original type, and a 32-bit slot to hold the actual
+data. The type can use `value_data` to hold the actual value, or it can store a pointer
+to an allocated object. Builtin types such as int, float, and bool will store their
+entire payload in `value_data`.
+
+The object system has enough hooks to support a variety of memory-management strategies,
+including reference counting or memory pools. Each type can have its own strategy.
+Circa doesn't have a global garbage collector.
 
 # Type slots #
 
