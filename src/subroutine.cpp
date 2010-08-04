@@ -158,7 +158,7 @@ void subroutine_update_state_type_from_contents(Term* func)
 
 void subroutine_change_state_type(Term* func, Term* newType)
 {
-    Term* previousType = function_t::get_implicit_state_type(func);
+    Term* previousType = function_t::get_inline_state_type(func);
     if (previousType == newType)
         return;
 
@@ -185,7 +185,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
                 Branch* branch = term->owningBranch;
                 Term* stateContainer = alloc_term();
                 branch->insert(term->index, stateContainer);
-                change_type(stateContainer, function_t::get_implicit_state_type(func));
+                change_type(stateContainer, function_t::get_inline_state_type(func));
                 change_function(stateContainer, STATEFUL_VALUE_FUNC);
                 branch->bindName(stateContainer, default_name_for_hidden_state(term->name));
 

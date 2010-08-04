@@ -185,7 +185,7 @@ namespace function_t {
         get_attrs(function).outputType = type;
     }
 
-    Ref& get_implicit_state_type(Term* function)
+    Ref& get_inline_state_type(Term* function)
     {
         return get_attrs(function).implicitStateType;
     }

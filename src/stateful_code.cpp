@@ -18,7 +18,7 @@ bool is_function_stateful(Term* func)
 {
     if (!is_function(func))
         return false;
-    Term* stateType = function_t::get_implicit_state_type(func);
+    Term* stateType = function_t::get_inline_state_type(func);
     return (stateType != NULL && stateType != VOID_TYPE);
 }
 

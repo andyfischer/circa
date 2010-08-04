@@ -104,7 +104,7 @@ void test_bug_with_declaring_state_argument()
     Branch branch;
     Term* f = branch.eval("def f(state int) end");
 
-    test_assert(function_t::get_implicit_state_type(f) == INT_TYPE);
+    test_assert(function_t::get_inline_state_type(f) == INT_TYPE);
 }
 
 void test_call_copied_function()
