@@ -4,6 +4,7 @@
 
 #include "common_headers.h"
 
+#include "bytecode.h"
 #include "names.h"
 #include "ref_list.h"
 #include "term_namespace.h"
@@ -20,6 +21,8 @@ struct Branch
     Term* owningTerm;
 
     int _refCount;
+
+    bytecode::BytecodeData _bytecode;
 
     Branch();
     ~Branch();

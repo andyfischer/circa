@@ -25,6 +25,7 @@ namespace return_function {
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
+        RETURN_FUNC = kernel["return"];
     }
 }
 }

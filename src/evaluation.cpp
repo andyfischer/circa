@@ -1,6 +1,13 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
+#include "building.h"
+#include "branch.h"
+#include "bytecode.h"
+#include "errors.h"
+#include "evaluation.h"
+#include "function.h"
+#include "stateful_code.h"
+#include "term.h"
 
 namespace circa {
 
@@ -106,6 +113,11 @@ bool has_been_evaluated(Term* term)
 {
     // TODO
     return true;
+}
+
+void evaluate_bytecode(bytecode::BytecodeData* data)
+{
+
 }
 
 } // namespace circa

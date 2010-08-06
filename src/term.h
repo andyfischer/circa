@@ -41,6 +41,9 @@ struct Term : TaggedValue
     // this.
     Branch nestedContents;
 
+    // Index of where on the stack to put this term's output. May be -1
+    int stackIndex;
+
     // A set of boolean flags
     unsigned flags;
 

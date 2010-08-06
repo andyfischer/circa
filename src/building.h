@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "common_headers.h"
+
 namespace circa {
 
 // Examine 'function' and 'inputs' and returns a result term.
