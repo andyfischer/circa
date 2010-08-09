@@ -45,6 +45,7 @@ namespace bytecode {
 enum OpId {
     OP_STACK_SIZE = 1,
     OP_CALL,
+    OP_PUSH_VALUE,
     OP_RETURN
 };
 
@@ -67,7 +68,14 @@ struct CallOperation {
     Term* caller;
     Term* function;
     int numInputs;
+    int outputIndex;
     Input inputs[0];
+};
+
+struct PushValueOperation {
+    OpId opid;
+    Term* source;
+    int outputIndex;
 };
 
 struct ReturnOperation {
@@ -95,17 +103,21 @@ void update_bytecode(Branch& branch);
 void print_bytecode(std::ostream& out, BytecodeData* data);
 void print_bytecode(std::ostream& out, Branch& branch);
 void print_operation(std::ostream& out, Operation* op);
+void print_bytecode_raw(std::ostream& out, BytecodeData* data);
 
 struct Iterator {
-    BytecodeData* data;
     Operation* pos;
+    Operation* end;
 
-    Iterator(BytecodeData* data) : data(data), pos((Operation*) data->opdata) {}
+    Iterator(BytecodeData* data)
+      : pos((Operation*) data->opdata),
+        end((Operation*) (data->opdata + data->size)) {}
 
     bool finished();
     Operation* current();
     void advance();
     Operation* operator*() { return current(); }
+    Operation* operator->() { return current(); }
     void operator++() { advance(); }
 };
 

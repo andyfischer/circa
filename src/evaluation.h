@@ -24,6 +24,7 @@ void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const
 void evaluate_term(EvalContext* cxt, Term* term);
 void evaluate_term(Term* term);
 void evaluate_branch(EvalContext* context, Branch& branch);
+void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack);
 
 // Shorthand to call evaluate_branch with a new EvalContext:
 EvalContext evaluate_branch(Branch& branch);

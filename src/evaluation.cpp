@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "building.h"
+#include "builtins.h"
 #include "branch.h"
 #include "bytecode.h"
 #include "errors.h"
@@ -8,6 +9,7 @@
 #include "function.h"
 #include "stateful_code.h"
 #include "term.h"
+#include "type.h"
 
 namespace circa {
 
@@ -115,9 +117,64 @@ bool has_been_evaluated(Term* term)
     return true;
 }
 
-void evaluate_bytecode(bytecode::BytecodeData* data)
+void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack)
 {
+    char* pos = data->opdata;
+    char* end = data->opdata + data->size;
 
+    while (pos != end) {
+        bytecode::Operation* op = (bytecode::Operation*) pos;
+
+        // todo: this could be inlined into the switch statement below
+        pos += bytecode::get_operation_size(op);
+
+        switch (op->opid) {
+            case bytecode::OP_STACK_SIZE: {
+                bytecode::StackSizeOperation *ssop = (bytecode::StackSizeOperation*) op;
+                stack->resize(ssop->numElements);
+                continue;
+            }
+
+            case bytecode::OP_RETURN: {
+                // todo
+                return;
+            }
+
+            case bytecode::OP_CALL: {
+                bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
+
+                // Temp: Assemble arguments for compatibility with old-style
+                // evaluation func. This involves a bunch of wasteful copying
+                // which will be removed later.
+                RefList inputs;
+                inputs.resize(callop->numInputs);
+                for (int i=0; i < callop->numInputs; i++) {
+                    inputs[i] = alloc_term();
+                    TaggedValue* stackInput = stack->get(callop->inputs[i].stackIndex);
+                    change_type(inputs[i], stackInput->value_type);
+                    copy(stackInput, inputs[i]);
+                }
+                TaggedValue* output = NULL;
+                if (callop->outputIndex != -1) {
+                    output = stack->get(callop->outputIndex);
+                    change_type(output, type_contents(callop->caller->type));
+                }
+
+                evaluate_term(cxt, callop->caller, callop->function, inputs, output);
+                continue;
+            }
+
+            case bytecode::OP_PUSH_VALUE: {
+                bytecode::PushValueOperation *callop = (bytecode::PushValueOperation*) op;
+
+                TaggedValue* output = stack->get(callop->outputIndex);
+                change_type(output, type_contents(callop->source->type));
+                copy(callop->source, output);
+                continue;
+            }
+
+        }
+    }
 }
 
 } // namespace circa

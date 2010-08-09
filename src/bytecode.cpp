@@ -3,6 +3,7 @@
 #include "builtins.h"
 #include "bytecode.h"
 #include "debug.h"
+#include "introspection.h"
 #include "term.h"
 
 namespace circa {
@@ -16,6 +17,7 @@ size_t get_operation_size(Operation* op)
             CallOperation *callOp = (CallOperation*) op;
             return sizeof(CallOperation) + sizeof(CallOperation::Input)*callOp->numInputs;
         }
+        case OP_PUSH_VALUE: return sizeof(PushValueOperation);
         case OP_RETURN: return sizeof(ReturnOperation);
     }
     ca_assert(false);
@@ -50,20 +52,36 @@ size_t write_stack_size_op(char* opdata, int stacksize)
 
 size_t write_call_op(Term* term, char* data)
 {
-    size_t size = sizeof(CallOperation) + sizeof(CallOperation::Input)*term->numInputs();
+    int numInputs = term->numInputs();
+    size_t size = sizeof(CallOperation) + sizeof(CallOperation::Input)*numInputs;
 
     if (data != NULL) {
         CallOperation* op = (CallOperation*) data;
         op->opid = OP_CALL;
         op->caller = term;
         op->function = term->function;
-        op->numInputs = term->numInputs();
+        op->numInputs = numInputs;
+        op->outputIndex = term->stackIndex;
 
-        for (int i=0; i < term->numInputs(); i++) {
+        for (int i=0; i < numInputs; i++) {
             Term* input = term->input(i);
             ca_assert(input->stackIndex != -1);
             op->inputs[i].stackIndex = input->stackIndex;
+
+            ca_assert(&op->outputIndex < &op->inputs[i].stackIndex);
         }
+    }
+    return size;
+}
+
+size_t write_push_value_op(Term* term, char* data)
+{
+    size_t size = sizeof(PushValueOperation);
+    if (data != NULL) {
+        PushValueOperation* op = (PushValueOperation*) data;
+        op->opid = OP_PUSH_VALUE;
+        op->outputIndex = term->stackIndex;
+        op->source = term;
     }
     return size;
 }
@@ -84,6 +102,9 @@ size_t write_op(Term* term, char* data)
 {
     if (term->function == RETURN_FUNC)
         return write_return_op(term, data);
+
+    if (term->function == VALUE_FUNC)
+        return write_push_value_op(term, data);
 
     return write_call_op(term, data);
 }
@@ -170,9 +191,14 @@ void print_operation(std::ostream& out, Operation* op)
                 out << callOp->inputs[i].stackIndex;
             }
             out << ")";
-            int outputIndex = callOp->caller->stackIndex;
-            if (outputIndex != -1)
-                out << " -> " << outputIndex;
+            if (callOp->outputIndex != -1)
+                out << " -> " << callOp->outputIndex;
+            break;
+        }
+        case OP_PUSH_VALUE: {
+            PushValueOperation *pushOp = (PushValueOperation*) op;
+            out << "push " << pushOp->source->toString();
+            out << " -> " << pushOp->outputIndex;
             break;
         }
         case OP_RETURN:
@@ -181,6 +207,19 @@ void print_operation(std::ostream& out, Operation* op)
     }
 }
 
+void print_bytecode_raw(std::ostream& out, BytecodeData* data)
+{
+    for (Iterator it(data); !it.finished(); ++it) {
+        char* pos = (char*) *it;
+        char* op_end = pos + get_operation_size(*it);
+        char buf[10];
+        for (; pos != op_end; pos++) {
+            sprintf(buf, "%02X", *pos);
+            out << buf;
+        }
+        out << std::endl;
+    }
+}
 
 bool Iterator::finished()
 {
@@ -193,8 +232,9 @@ Operation* Iterator::current()
 void Iterator::advance()
 {
     pos = (Operation*) (((char*) pos) + get_operation_size(pos));
-    if (size_t(((char*)pos) - data->opdata) >= data->size)
+    if (pos == end)
         pos = NULL;
+    ca_assert(pos < end);
 }
 
 } // namespace bytecode

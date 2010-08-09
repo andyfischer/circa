@@ -1,5 +1,9 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <vector>
+
+#include "common_headers.h"
+
 #pragma once
 
 // introspection.h
