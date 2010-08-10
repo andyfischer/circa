@@ -125,21 +125,21 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
     while (pos != end) {
         bytecode::Operation* op = (bytecode::Operation*) pos;
 
-        // todo: this could be inlined into the switch statement below
-        pos += bytecode::get_operation_size(op);
-
         switch (op->opid) {
             case bytecode::OP_STACK_SIZE: {
                 bytecode::StackSizeOperation *ssop = (bytecode::StackSizeOperation*) op;
                 stack->resize(ssop->numElements);
+                pos += sizeof(bytecode::StackSizeOperation);
                 continue;
             }
-
-            case bytecode::OP_RETURN: {
-                // todo
-                return;
+            case bytecode::OP_PUSH_VALUE: {
+                bytecode::PushValueOperation *callop = (bytecode::PushValueOperation*) op;
+                TaggedValue* output = stack->get(callop->outputIndex);
+                change_type(output, type_contents(callop->source->type));
+                copy(callop->source, output);
+                pos += sizeof(bytecode::PushValueOperation);
+                continue;
             }
-
             case bytecode::OP_CALL: {
                 bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
 
@@ -161,20 +161,70 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 }
 
                 evaluate_term(cxt, callop->caller, callop->function, inputs, output);
+                pos += sizeof(bytecode::CallOperation)
+                    + sizeof(bytecode::CallOperation::Input)*callop->numInputs;
+                continue;
+            }
+            case bytecode::OP_JUMP: {
+                bytecode::JumpOperation *jumpop = (bytecode::JumpOperation*) op;
+                pos += jumpop->offset;
+                continue;
+            }
+            case bytecode::OP_JUMP_IF: {
+                bytecode::JumpIfOperation *jumpop = (bytecode::JumpIfOperation*) op;
+                if (as_bool(stack->get(jumpop->conditionIndex)))
+                    pos += jumpop->offset;
+                else
+                    pos += sizeof(bytecode::JumpIfOperation);
+                continue;
+            }
+            case bytecode::OP_JUMP_IF_NOT: {
+                bytecode::JumpIfNotOperation *jumpop = (bytecode::JumpIfNotOperation*) op;
+                if (!as_bool(stack->get(jumpop->conditionIndex)))
+                    pos += jumpop->offset;
+                else
+                    pos += sizeof(bytecode::JumpIfNotOperation);
                 continue;
             }
 
-            case bytecode::OP_PUSH_VALUE: {
-                bytecode::PushValueOperation *callop = (bytecode::PushValueOperation*) op;
+            case bytecode::OP_RETURN: {
 
-                TaggedValue* output = stack->get(callop->outputIndex);
-                change_type(output, type_contents(callop->source->type));
-                copy(callop->source, output);
+                // todo
+                return;
+            }
+            case bytecode::OP_PUSH_INT: {
+                bytecode::PushIntOperation *pushop = (bytecode::PushIntOperation*) op;
+                make_int(stack->get(pushop->outputIndex), pushop->value);
                 continue;
             }
-
+            case bytecode::OP_INCREMENT: {
+                bytecode::IncrementOperation *incop = (bytecode::IncrementOperation*) op;
+                TaggedValue* value = stack->get(incop->stackIndex);
+                set_int(value, as_int(value) + 1);
+                continue;
+            }
+            case bytecode::OP_GET_INDEX: {
+                bytecode::GetIndexOperation *getop = (bytecode::GetIndexOperation*) op;
+                TaggedValue *item = stack->get(getop->listIndex)->getIndex(getop->indexInList);
+                copy(item, stack->get(getop->outputIndex));
+                continue;
+            }
+            case bytecode::OP_APPEND: {
+                bytecode::AppendOperation *appendop = (bytecode::AppendOperation*) appendop;
+                TaggedValue *item = stack->get(appendop->itemIndex);
+                copy(item, ((List*) stack->get(appendop->outputIndex))->append());
+                continue;
+            }
         }
     }
+}
+
+void evaluate_bytecode(Branch& branch)
+{
+    EvalContext context;
+    List stack;
+    bytecode::update_bytecode(branch);
+    evaluate_bytecode(&context, &branch._bytecode, &stack);
 }
 
 } // namespace circa

@@ -5,15 +5,24 @@
 namespace circa {
 namespace if_function {
 
-    CA_FUNCTION(evaluate)
+    CA_START_FUNCTIONS;
+
+    CA_DEFINE_FUNCTION(evaluate, "if(bool) -> any")
     {
         if (BOOL_INPUT(0))
             evaluate_branch(CONTEXT, CALLER->nestedContents);
     }
 
+    CA_DEFINE_FUNCTION(join_function, "join() -> any")
+    {
+        // Compilation placeholder
+    }
+
     void setup(Branch& kernel)
     {
-        IF_FUNC = import_function(kernel, evaluate, "if(bool) -> any");
+        CA_SETUP_FUNCTIONS(kernel);
+        IF_FUNC = kernel["if"];
+        JOIN_FUNC = kernel["join"];
     }
 }
 }

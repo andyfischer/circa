@@ -7,14 +7,10 @@ namespace circa {
 
 /* Organization of for loop contents:
    [0] #attributes
-     [0] #is_first_iteration
-     [1] #any_iterations
-     [2] #modify_list
-     [3] #discard_called
-     [4] #state_type
-   [1] #rebinds
-   [2] iterator
-   [3 .. n-2] user's code
+     [0] #modify_list
+     [1] #state_type
+   [1] iterator
+   [2 .. n-2] user's code
    [n-1] #rebinds_for_outer
 */
 
@@ -48,6 +44,7 @@ Term* get_for_loop_iterator(Term* forTerm)
     return forTerm->nestedContents[2];
 }
 
+#ifndef BYTECODE
 Term* get_for_loop_is_first_iteration(Term* forTerm)
 {
     return forTerm->nestedContents[0]->nestedContents[0];
@@ -57,10 +54,15 @@ Term* get_for_loop_any_iterations(Term* forTerm)
 {
     return forTerm->nestedContents[0]->nestedContents[1];
 }
+#endif
 
 Term* get_for_loop_modify_list(Term* forTerm)
 {
+    #ifdef BYTECODE
+    return forTerm->nestedContents[0]->nestedContents[0];
+    #else
     return forTerm->nestedContents[0]->nestedContents[2];
+    #endif
 }
 
 Term* get_for_loop_discard_called(Term* forTerm)
@@ -70,7 +72,11 @@ Term* get_for_loop_discard_called(Term* forTerm)
 
 Ref& get_for_loop_state_type(Term* forTerm)
 {
+#ifdef BYTECODE
+    return forTerm->nestedContents[0]->nestedContents[1]->asRef();
+#else
     return forTerm->nestedContents[0]->nestedContents[4]->asRef();
+#endif
 }
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
@@ -83,17 +89,23 @@ void setup_for_loop_pre_code(Term* forTerm)
 {
     Branch& forContents = forTerm->nestedContents;
     Branch& attributes = create_branch(forContents, "#attributes");
+#ifdef BYTECODE
+    create_bool(attributes, false, "#modify_list");
+    create_ref(attributes, VOID_TYPE, "#state_type");
+#else
     create_bool(attributes, false, "#is_first_iteration");
     create_bool(attributes, false, "#any_iterations");
     create_bool(attributes, false, "#modify_list");
     create_bool(attributes, false, "#discard_called");
     create_ref(attributes, VOID_TYPE, "#state_type");
     create_branch(forContents, "#rebinds");
+#endif
 }
 
 void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = forTerm->nestedContents;
+#ifndef BYTECODE
     std::string listName = forTerm->input(1)->name;
     Branch& outerScope = *forTerm->owningBranch;
 
@@ -158,6 +170,7 @@ void setup_for_loop_post_code(Term* forTerm)
         create_value(rebindsForOuter, LIST_TYPE, listName);
 
     expose_all_names(rebindsForOuter, outerScope);
+#endif
 
     // Figure out if this loop has any state
     bool hasState = false;
@@ -173,6 +186,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
 CA_FUNCTION(evaluate_for_loop)
 {
+#ifndef BYTECODE
     Term* listTerm = INPUT_TERM(1);
     Branch& codeBranch = CALLER->nestedContents;
     List* state = get_for_loop_state(CALLER);
@@ -189,17 +203,6 @@ CA_FUNCTION(evaluate_for_loop)
 
     if (state) {
         state->resize(numIterations);
-
-        // Initialize state for any uninitialized slots
-#if 0
-        for (int i=0; i < numIterations; i++) {
-
-            TaggedValue* iterationState = get_for_loop_iteration_state(CALLER, i);
-            
-            //if (iterationBranch.length() == 0)
-            //    get_type_from_branches_stateful_terms(codeBranch, iterationBranch);
-        }
-#endif
     }
 
     Term* isFirstIteration = get_for_loop_is_first_iteration(CALLER);
@@ -262,6 +265,7 @@ CA_FUNCTION(evaluate_for_loop)
 
     if (listOutput != NULL && listOutput->numElements() > listOutputWriteHead)
         (List::checkCast(listOutput))->resize(listOutputWriteHead);
+#endif
 }
 
 Term* find_enclosing_for_loop(Term* term)
@@ -277,6 +281,64 @@ Term* find_enclosing_for_loop(Term* term)
         return NULL;
 
     return find_enclosing_for_loop(branch->owningTerm);
+}
+
+void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
+{
+    // -- Simple version --
+    // push 0 -> index
+    // loop_start:
+    // get_index input_list index -> iterator
+    // .. loop contents ..
+    // inc index
+    // index < input_list->numElements
+    // jump_if to: loop_start
+    //
+    // -- Modify list --
+    // push 0 -> index
+    // push [] -> output_list
+    // loop_start:
+    // get_index input_list index -> iterator
+    // .. loop contents ..
+    // (for a discard statement, jump to end_of_loop)
+    // dont_discard:
+    // append modified_iterator output_list
+    // end_of_loop:
+    // inc index
+    // index < input_list->numElements
+    // jump_if to: loop_start
+    //
+    // Assign stack positions to #rebinds first (similar to inside if block)
+
+
+    int iteratorIndex = context->nextStackIndex++;
+    
+    // push 0 -> iterator_index
+    bytecode::write_push_int(context, 0, iteratorIndex);
+
+    char* loopStartPos = context->writePos;
+
+    // get_index(input_list iterator_index) -> iterator
+    Term* iteratorTerm = get_for_loop_iterator(forTerm);
+    if (iteratorTerm->stackIndex == -1)
+        iteratorTerm->stackIndex = context->nextStackIndex++;
+
+    bytecode::write_get_index(context, forTerm->input(0)->stackIndex, iteratorIndex,
+            iteratorTerm->stackIndex);
+
+    // loop contents
+    Branch& forContents = forTerm->nestedContents;
+    for (int i=1; i < forContents.length(); i++) {
+        Term* term = forContents[i];
+        bytecode::write_op(context, term);
+    }
+
+    // inc iterator_index
+    bytecode::write_increment(context, iteratorIndex);
+
+    // index < input_list->numElements
+    int numElementsOutput = context->nextStackIndex++;
+
 }
 
 } // namespace circa

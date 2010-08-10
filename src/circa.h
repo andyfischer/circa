@@ -20,7 +20,7 @@
 #include "evaluation.h"
 #include "external_api.h"
 #include "feedback.h"
-#include "for_loops.h"
+#include "for_loop.h"
 #include "function.h"
 #include "hosted_types.h"
 #include "if_block.h"

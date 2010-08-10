@@ -1,9 +1,12 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "branch_iterator.h"
 #include "builtins.h"
 #include "bytecode.h"
 #include "debug.h"
+#include "if_block.h"
 #include "introspection.h"
+#include "for_loop.h"
 #include "term.h"
 
 namespace circa {
@@ -18,7 +21,14 @@ size_t get_operation_size(Operation* op)
             return sizeof(CallOperation) + sizeof(CallOperation::Input)*callOp->numInputs;
         }
         case OP_PUSH_VALUE: return sizeof(PushValueOperation);
+        case OP_JUMP: return sizeof(JumpOperation);
+        case OP_JUMP_IF: return sizeof(JumpIfOperation);
+        case OP_JUMP_IF_NOT: return sizeof(JumpIfNotOperation);
         case OP_RETURN: return sizeof(ReturnOperation);
+        case OP_PUSH_INT: return sizeof(PushIntOperation);
+        case OP_INCREMENT: return sizeof(IncrementOperation);
+        case OP_GET_INDEX: return sizeof(GetIndexOperation);
+        case OP_APPEND: return sizeof(AppendOperation);
     }
     ca_assert(false);
     return 0;
@@ -42,94 +52,178 @@ bool should_term_generate_call(Term* term)
     return true;
 }
 
-size_t write_stack_size_op(char* opdata, int stacksize)
+void write_stack_size_op(WriteContext* context, int stacksize)
 {
-    StackSizeOperation* op = (StackSizeOperation*) opdata;
-    op->opid = OP_STACK_SIZE;
-    op->numElements = stacksize;
-    return sizeof(StackSizeOperation);
+    if (context->writePos) {
+        StackSizeOperation* op = (StackSizeOperation*) context->writePos;
+        op->opid = OP_STACK_SIZE;
+        op->numElements = stacksize;
+    }
+    context->advance(sizeof(StackSizeOperation));
 }
 
-size_t write_call_op(Term* term, char* data)
+void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex)
+{
+    if (context->writePos) {
+        CallOperation* op = (CallOperation*) context->writePos;
+        op->opid = OP_CALL;
+        op->caller = caller;
+        op->function = function;
+        op->numInputs = numInputs;
+        op->outputIndex = outputIndex;
+
+        for (int i=0; i < numInputs; i++)
+            op->inputs[i].stackIndex = inputIndexes[i];
+    }
+    context->advance(sizeof(CallOperation) + sizeof(CallOperation::Input)*numInputs);
+}
+
+void write_call_op(WriteContext* context, Term* term)
 {
     int numInputs = term->numInputs();
-    size_t size = sizeof(CallOperation) + sizeof(CallOperation::Input)*numInputs;
 
-    if (data != NULL) {
-        CallOperation* op = (CallOperation*) data;
-        op->opid = OP_CALL;
-        op->caller = term;
-        op->function = term->function;
-        op->numInputs = numInputs;
-        op->outputIndex = term->stackIndex;
+    if (context && should_term_output_go_on_stack(term)
+            && term->stackIndex == -1)
+        term->stackIndex = context->nextStackIndex++;
 
-        for (int i=0; i < numInputs; i++) {
-            Term* input = term->input(i);
-            ca_assert(input->stackIndex != -1);
-            op->inputs[i].stackIndex = input->stackIndex;
+    const int MAX_INPUTS_EVER = 1000;
+    int inputIndexes[MAX_INPUTS_EVER];
 
-            ca_assert(&op->outputIndex < &op->inputs[i].stackIndex);
-        }
+    for (int i=0; i < numInputs; i++) {
+        Term* input = term->input(i);
+        ca_assert(input->stackIndex != -1);
+        inputIndexes[i] = input->stackIndex;
     }
-    return size;
+
+    write_call_op(context, term, term->function, numInputs, inputIndexes, term->stackIndex);
 }
 
-size_t write_push_value_op(Term* term, char* data)
+void write_push_value_op(WriteContext* context, Term* term)
 {
-    size_t size = sizeof(PushValueOperation);
-    if (data != NULL) {
-        PushValueOperation* op = (PushValueOperation*) data;
+    if (context && term->stackIndex == -1) {
+        term->stackIndex = context->nextStackIndex++;
+    }
+
+    if (context->writePos) {
+        PushValueOperation* op = (PushValueOperation*) context->writePos;
         op->opid = OP_PUSH_VALUE;
         op->outputIndex = term->stackIndex;
         op->source = term;
     }
-    return size;
+    context->advance(sizeof(PushValueOperation));
 }
 
-size_t write_return_op(Term* term, char* data)
+void write_jump_op(WriteContext* context, size_t offset)
 {
-    size_t size = sizeof(ReturnOperation);
-    if (data != NULL) {
-        ReturnOperation* op = (ReturnOperation*) data;
+    if (context->writePos) {
+        JumpOperation* op = (JumpOperation*) context->writePos;
+        op->opid = OP_JUMP;
+        op->offset = offset;
+    }
+    context->advance(sizeof(JumpOperation));
+}
+
+void write_jump_if_op(WriteContext* context, int conditionIndex, size_t offset)
+{
+    if (context->writePos) {
+        JumpIfOperation* op = (JumpIfOperation*) context->writePos;
+        op->opid = OP_JUMP_IF;
+        op->conditionIndex = conditionIndex;
+        op->offset = offset;
+    }
+    context->advance(sizeof(JumpIfOperation));
+}
+void write_jump_if_not_op(WriteContext* context, int conditionIndex, size_t offset)
+{
+    if (context->writePos) {
+        JumpIfNotOperation* op = (JumpIfNotOperation*) context->writePos;
+        op->opid = OP_JUMP_IF_NOT;
+        op->conditionIndex = conditionIndex;
+        op->offset = offset;
+    }
+    context->advance(sizeof(JumpIfNotOperation));
+}
+void write_push_int(WriteContext* context, int value, int outputIndex)
+{
+    if (context->writePos) {
+        PushIntOperation* op = (PushIntOperation*) context->writePos;
+        op->opid = OP_PUSH_INT;
+        op->value = value;
+        op->outputIndex = outputIndex;
+    }
+    context->advance(sizeof(PushIntOperation));
+}
+void write_get_index(WriteContext* context, int listIndex, int indexInList, int outputIndex)
+{
+    if (context->writePos) {
+        GetIndexOperation* op = (GetIndexOperation*) context->writePos;
+        op->opid = OP_GET_INDEX;
+        op->listIndex = listIndex;
+        op->indexInList = indexInList;
+        op->outputIndex = outputIndex;
+    }
+    context->advance(sizeof(GetIndexOperation));
+}
+void write_increment(WriteContext* context, int intIndex)
+{
+    if (context->writePos) {
+        IncrementOperation* op = (IncrementOperation*) context->writePos;
+        op->opid = OP_INCREMENT;
+        op->stackIndex = intIndex;
+    }
+    context->advance(sizeof(IncrementOperation));
+}
+
+void write_return_op(WriteContext* context, Term* term)
+{
+    if (context->writePos) {
+        ReturnOperation* op = (ReturnOperation*) context->writePos;
         op->opid = OP_RETURN;
         op->caller = term;
     }
-    return size;
+    context->advance(sizeof(ReturnOperation));
 }
 
-
-size_t write_op(Term* term, char* data)
+void write_op(WriteContext* context, Term* term)
 {
     if (term->function == RETURN_FUNC)
-        return write_return_op(term, data);
+        return write_return_op(context, term);
 
     if (term->function == VALUE_FUNC)
-        return write_push_value_op(term, data);
+        return write_push_value_op(context, term);
 
-    return write_call_op(term, data);
+    if (term->function == IF_BLOCK_FUNC)
+        return write_if_block_bytecode(context, term);
+
+    if (term->function == FOR_FUNC)
+        return write_for_loop_bytecode(context, term);
+
+    return write_call_op(context, term);
 }
 
 void update_bytecode(Branch& branch, BytecodeData* bytecode)
 {
+    // Clear stack indexes for all terms
+    for (BranchIterator it(branch); !it.finished(); ++it)
+        it->stackIndex = -1;
+
     // First pass: Figure out the size of generated bytecode, update stack
     // indexes of terms, and count the # of elements on the stack.
-    size_t size = 0;
-    int stackElements = 0;
+    WriteContext context;
+    context.nextStackIndex = 0;
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
-        term->stackIndex = -1;
 
         if (!should_term_generate_call(term))
             continue;
 
-        size += write_op(term, NULL);
-
-        if (should_term_output_go_on_stack(term))
-            term->stackIndex = stackElements++;
+        write_op(&context, term);
     }
 
     // Add space for a STACK_SIZE op
-    size += sizeof(StackSizeOperation);
+    context.advance(sizeof(StackSizeOperation));
+
+    size_t size = context.sizeWritten;
 
     // Check to reallocate opdata
     if (size > bytecode->capacity) {
@@ -142,10 +236,12 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
     ca_assert(bytecode->size <= bytecode->capacity);
 
     // Start writing operations
+    context.writePos = bytecode->opdata;
+    context.sizeWritten = 0;
     
     // First add a STACK_SIZE op
-    char* writePtr = bytecode->opdata;
-    writePtr += write_stack_size_op(writePtr, stackElements);
+    int stackElements = context.nextStackIndex;
+    write_stack_size_op(&context, stackElements);
 
     // Write remaining ops
     for (int i=0; i < branch.length(); i++) {
@@ -153,8 +249,8 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
         if (!should_term_generate_call(term))
             continue;
 
-        writePtr += write_op(term, writePtr);
-        ca_assert(size_t(writePtr - bytecode->opdata) <= bytecode->size);
+        write_op(&context, term);
+        ca_assert(size_t(context.writePos - bytecode->opdata) <= bytecode->size);
     }
 }
 
@@ -201,8 +297,44 @@ void print_operation(std::ostream& out, Operation* op)
             out << " -> " << pushOp->outputIndex;
             break;
         }
+        case OP_JUMP: {
+            JumpOperation *jumpOp = (JumpOperation*) op;
+            out << "jump offset:" << jumpOp->offset;
+            break;
+        }
+        case OP_JUMP_IF: {
+            JumpIfOperation *jumpOp = (JumpIfOperation*) op;
+            out << "jump_if(" << jumpOp->conditionIndex << ") offset:" << jumpOp->offset;
+            break;
+        }
+        case OP_JUMP_IF_NOT: {
+            JumpIfNotOperation *jumpOp = (JumpIfNotOperation*) op;
+            out << "jump_if_not(" << jumpOp->conditionIndex << ") offset:" << jumpOp->offset;
+            break;
+        }
         case OP_RETURN:
             break;
+        case OP_PUSH_INT: {
+            PushIntOperation *pushOp = (PushIntOperation*) op;
+            out << "push_int " << pushOp->value << " -> " << pushOp->outputIndex;
+            break;
+        }
+        case OP_INCREMENT: {
+            IncrementOperation *incOp = (IncrementOperation*) op;
+            out << "increment " << incOp->stackIndex;
+            break;
+        }
+        case OP_GET_INDEX: {
+            GetIndexOperation *getOp = (GetIndexOperation*) op;
+            out << "get_index(" << getOp->listIndex << "," << getOp->indexInList
+                << ") -> " << getOp->outputIndex;
+            break;
+        }
+        case OP_APPEND: {
+            AppendOperation *appendOp = (AppendOperation*) op;
+            out << "append(" << appendOp->itemIndex << ") -> " << appendOp->outputIndex;
+            break;
+        }
         default: ca_assert(false);
     }
 }

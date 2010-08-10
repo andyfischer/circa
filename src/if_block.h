@@ -14,4 +14,6 @@ bool if_block_contains_state(Term* ifCall);
 
 void evaluate_if_block(EvalContext*, Term* caller);
 
+void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock);
+
 } // namespace circa

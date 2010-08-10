@@ -221,6 +221,9 @@ void reset(TaggedValue* value)
 
 std::string to_string(TaggedValue* value)
 {
+    if (value->value_type == NULL)
+        return "<type is NULL>";
+
     Type::ToString toString = value->value_type->toString;
     if (toString == NULL) {
         std::stringstream out;

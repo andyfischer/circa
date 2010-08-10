@@ -46,7 +46,14 @@ enum OpId {
     OP_STACK_SIZE = 1,
     OP_CALL,
     OP_PUSH_VALUE,
-    OP_RETURN
+    OP_JUMP,
+    OP_JUMP_IF,
+    OP_JUMP_IF_NOT,
+    OP_RETURN,
+    OP_PUSH_INT,
+    OP_INCREMENT,
+    OP_GET_INDEX,
+    OP_APPEND
 };
 
 struct Operation {
@@ -83,6 +90,59 @@ struct ReturnOperation {
     Term* caller;
 };
 
+struct JumpOperation {
+    OpId opid;
+    size_t offset;
+};
+
+struct JumpIfOperation {
+    OpId opid;
+    int conditionIndex;
+    size_t offset;
+};
+
+struct JumpIfNotOperation {
+    OpId opid;
+    int conditionIndex;
+    size_t offset;
+};
+
+struct PushIntOperation {
+    OpId opid;
+    int value;
+    int outputIndex;
+};
+struct IncrementOperation {
+    OpId opid;
+    int stackIndex;
+};
+struct GetIndexOperation {
+    OpId opid;
+    int listIndex;
+    int indexInList;
+    int outputIndex;
+};
+struct AppendOperation {
+    OpId opid;
+    int itemIndex;
+    int outputIndex;
+};
+
+
+struct WriteContext {
+    int nextStackIndex;
+    size_t sizeWritten;
+    char* writePos;
+
+    WriteContext() : nextStackIndex(0), sizeWritten(0), writePos(NULL) {}
+
+    void advance(size_t bytes) {
+        if (writePos)
+            writePos += bytes;
+        sizeWritten += bytes;
+    }
+};
+
 struct BytecodeData {
     bool needsUpdate;
     size_t size;
@@ -96,6 +156,17 @@ struct BytecodeData {
 size_t get_operation_size(Operation* op);
 bool should_term_output_go_on_stack(Term* term);
 bool should_term_generate_call(Term* term);
+
+void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex);
+void write_call_op(WriteContext* context, Term* term);
+void write_jump_op(WriteContext* context, size_t offset);
+void write_jump_if_op(WriteContext* context, int conditionIndex, size_t offset);
+void write_jump_if_not_op(WriteContext* context, int conditionIndex, size_t offset);
+void write_push_int(WriteContext* context, int value, int stackIndex);
+void write_get_index(WriteContext* context, int listIndex, int indexInList, int outputIndex);
+void write_increment(WriteContext* context, int intIndex);
+
+void write_op(WriteContext* context, Term* term);
 
 void update_bytecode(Branch& branch, BytecodeData* bytecode);
 void update_bytecode(Branch& branch);

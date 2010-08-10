@@ -17,6 +17,32 @@ namespace circa {
 //   [N-2] branch()  (this corresponds to the 'else' block)
 //   [N-1] #joining = branch() 
 //
+//
+// Bytecode:
+//
+// if <expr0>
+//   ..branch A..
+//   name = x
+// elif <expr1>
+//   ..branch B..
+//   name = y
+// else
+//   ..branch Z..
+// end
+// name = join()
+//
+// 0: expr0
+// 1: jump_if_not(0) to 2
+// .. branch A
+// .. jump to End
+// 2: expr1
+//    jump_if_not(2) to
+// .. branch B
+// ..
+// End
+//
+// Algorithm:
+//   Figure out stack positions for exported names
 
 void update_if_block_joining_branch(Term* ifCall)
 {
@@ -30,7 +56,9 @@ void update_if_block_joining_branch(Term* ifCall)
     joining.clear();
 
     // This is used later.
+#ifndef BYTECODE
     Term* satisfiedIndex = create_int(joining, 0, "#satisfiedIndex");
+#endif
 
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
@@ -90,6 +118,10 @@ void update_if_block_joining_branch(Term* ifCall)
     {
         std::string const& name = *it;
 
+#ifdef BYTECODE
+        apply(joining, JOIN_FUNC, RefList(), name);
+#else
+
         // Make a list where we find the corresponding term for this name in each branch.
         Term* selections = apply(joining, BRANCH_FUNC, RefList());
         Branch& selectionsBranch = selections->nestedContents;
@@ -108,6 +140,7 @@ void update_if_block_joining_branch(Term* ifCall)
         }
 
         apply(joining, GET_INDEX_FROM_BRANCH_FUNC, RefList(selections, satisfiedIndex), name);
+#endif
     }
 
     // Expose all names in 'joining' branch.
@@ -228,6 +261,69 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
     Branch& joining = contents[contents.length()-1]->nestedContents;
     set_int(joining["#satisfiedIndex"], satisfiedIndex);
     evaluate_branch(cxt, joining);
+}
+
+void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
+{
+    Branch& blockContents = ifBlock->nestedContents;
+    Branch& joining = blockContents["#joining"]->nestedContents;
+
+    int numBranches = blockContents.length() - 1;
+    bool assignStackIndexes = context != NULL;
+
+    if (assignStackIndexes) {
+        // For each name in #joining, we want corresponding variables (across the
+        // branches in this if-block) to have the same stack indexes.
+        for (int i=0; i < joining.length(); i++) {
+            if (joining[i]->stackIndex == -1)
+                joining[i]->stackIndex = context->nextStackIndex++;
+            std::string& name = joining[i]->name;
+            ca_assert(name != "");
+
+            // Find the corresponding term in each branch, give it this stack index.
+            for (int b=0; b < numBranches; b++) {
+                Term* term = blockContents[b]->nestedContents[name];
+                term->stackIndex = joining[i]->stackIndex;
+            }
+        }
+    }
+    
+    // Go through each branch
+    bytecode::JumpIfNotOperation *lastBranchJumpOp = NULL;
+    std::vector<bytecode::JumpOperation*> jumpsToEnd;
+    for (int branch=0; branch < numBranches; branch++) {
+        Term* term = blockContents[branch];
+
+        // Check if we need to write the address for the previous branch's jump
+        if (lastBranchJumpOp) {
+            lastBranchJumpOp->offset = context->writePos - (char*) lastBranchJumpOp;
+            lastBranchJumpOp = NULL;
+        }
+
+        // Jump check, for 'if' and 'elsif'. Don't know offset yet, will write it later.
+        if (term->function == IF_FUNC) {
+            lastBranchJumpOp = (bytecode::JumpIfNotOperation*) context->writePos;
+            bytecode::write_jump_if_not_op(context, term->input(0)->stackIndex, 0);
+        }
+
+        // Write each instruction in this branch
+        Branch& branchContents = term->nestedContents;
+        for (int i=0; i < branchContents.length(); i++) {
+            bytecode::write_op(context, branchContents[i]);
+        }
+        
+        // Jump past remaining branches. But, don't need to do this for last branch.
+        if (branch+1 < numBranches) {
+            if (context->writePos)
+                jumpsToEnd.push_back((bytecode::JumpOperation*) context->writePos);
+            bytecode::write_jump_op(context, 0);
+        }
+    }
+
+    if (context->writePos) {
+        for (size_t i=0; i < jumpsToEnd.size(); i++)
+            jumpsToEnd[i]->offset = (context->writePos - (char*) jumpsToEnd[i]);
+    }
 }
 
 } // namespace circa
