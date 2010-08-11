@@ -119,6 +119,27 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
+    // Show bytecode
+    if (args[0] == "-b") {
+        Branch branch;
+        parse_script(branch, args[1]);
+        bytecode::update_bytecode(branch);
+        bytecode::print_bytecode(std::cout, branch);
+        std::cout << std::endl;
+        return 0;
+    }
+
+    // Evaluate bytecode
+    if (args[0] == "-eb") {
+        Branch branch;
+        parse_script(branch, args[1]);
+        bytecode::update_bytecode(branch);
+        EvalContext context;
+        List stack;
+        evaluate_bytecode(&context, &branch._bytecode, &stack);
+        return 0;
+    }
+
     // Start repl
     if (args[0] == "-repl") {
         start_repl();

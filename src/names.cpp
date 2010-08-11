@@ -69,6 +69,17 @@ Term* get_named(Branch const& branch, std::string const& name)
     return get_named(prefix->nestedContents, suffix);
 }
 
+Term* get_named_at(Branch& branch, int index, std::string const& name)
+{
+    for (int i=index; i >= 0; i--) {
+        Term* term = branch[i];
+        if (term == NULL) continue;
+        if (term->name == name)
+            return term;
+    }
+    return NULL;
+}
+
 Branch* get_parent_branch(Branch& branch)
 {
     if (&branch == KERNEL)

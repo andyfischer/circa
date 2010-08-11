@@ -5,6 +5,8 @@
 namespace circa {
 namespace list_function {
 
+    CA_START_FUNCTIONS;
+
     Term* specializeType(Term* term)
     {
         RefList inputTypes;
@@ -14,7 +16,7 @@ namespace list_function {
         return create_implicit_tuple_type(inputTypes);
     }
 
-    CA_FUNCTION(evaluate)
+    CA_DEFINE_FUNCTION(evaluate, "list(any...) -> List")
     {
         List* result = List::checkCast(OUTPUT);
 
@@ -33,7 +35,7 @@ namespace list_function {
         append_phrase(source, "]", caller, token::LBRACKET);
     }
 
-    CA_FUNCTION(evaluate_repeat)
+    CA_DEFINE_FUNCTION(repeat, "repeat(any, int) -> List")
     {
         List* result = List::checkCast(OUTPUT);
         TaggedValue* source = INPUT(0);
@@ -45,13 +47,21 @@ namespace list_function {
             copy(source, result->get(i));
     }
 
+    CA_DEFINE_FUNCTION(blank_list, "blank_list(int) -> List")
+    {
+        List* result = List::checkCast(OUTPUT);
+        result->resize(0);
+        result->resize(INT_INPUT(0));
+    }
+
     void setup(Branch& kernel)
     {
-        LIST_FUNC = import_function(kernel, evaluate, "list(any...) -> List");
+        CA_SETUP_FUNCTIONS(kernel);
+
+        LIST_FUNC = kernel["list"];
+
         function_t::get_attrs(LIST_FUNC).specializeType = specializeType;
         function_t::get_attrs(LIST_FUNC).formatSource = list_formatSource;
-
-        import_function(kernel, evaluate_repeat, "repeat(any, int) -> List");
     }
 }
 }

@@ -10,7 +10,7 @@ namespace set_index_function {
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
         int index = INPUT(1)->asInt();
-        cast(INPUT(2), OUTPUT->getIndex(index));
+        copy(INPUT(2), OUTPUT->getIndex(index));
     }
 
     Term* specializeType(Term* caller)

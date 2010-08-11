@@ -42,10 +42,10 @@ void print_if_block()
             "push 2 -> 0\n"
             "push 1 -> 1\n"
             "call less_than_i(0 1) -> 2\n"
-            "jump_if_not(2) offset:92\n"
+            "jump_if_not(2) offset:80\n"
             "push 1 -> 3\n"
             "call trace(3)\n"
-            "jump offset:76\n"
+            "jump offset:68\n"
             "push 2 -> 4\n"
             "call trace(4)\n");
 }
@@ -87,12 +87,24 @@ void test_evaluate()
     test_assert(stack[4]->asInt() == 4);
 }
 
+void for_loop()
+{
+    Branch branch;
+    branch.compile("for i in [1 2 3] trace(i) end");
+    update_bytecode(branch);
+
+    EvalContext cxt;
+    List stack;
+    evaluate_bytecode(&cxt, &branch._bytecode, &stack);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(bytecode_tests::test_print_simple);
     REGISTER_TEST_CASE(bytecode_tests::print_if_block);
     REGISTER_TEST_CASE(bytecode_tests::if_block_name_joining);
     REGISTER_TEST_CASE(bytecode_tests::test_evaluate);
+    REGISTER_TEST_CASE(bytecode_tests::for_loop);
 }
 
 }

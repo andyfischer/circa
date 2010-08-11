@@ -157,7 +157,8 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 TaggedValue* output = NULL;
                 if (callop->outputIndex != -1) {
                     output = stack->get(callop->outputIndex);
-                    change_type(output, type_contents(callop->caller->type));
+                    Type* type = type_contents(function_t::get_output_type(callop->function));
+                    change_type(output, type);
                 }
 
                 evaluate_term(cxt, callop->caller, callop->function, inputs, output);
@@ -167,13 +168,13 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
             case bytecode::OP_JUMP: {
                 bytecode::JumpOperation *jumpop = (bytecode::JumpOperation*) op;
-                pos += jumpop->offset;
+                pos = data->opdata + jumpop->offset;
                 continue;
             }
             case bytecode::OP_JUMP_IF: {
                 bytecode::JumpIfOperation *jumpop = (bytecode::JumpIfOperation*) op;
                 if (as_bool(stack->get(jumpop->conditionIndex)))
-                    pos += jumpop->offset;
+                    pos = data->opdata + jumpop->offset;
                 else
                     pos += sizeof(bytecode::JumpIfOperation);
                 continue;
@@ -181,7 +182,7 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             case bytecode::OP_JUMP_IF_NOT: {
                 bytecode::JumpIfNotOperation *jumpop = (bytecode::JumpIfNotOperation*) op;
                 if (!as_bool(stack->get(jumpop->conditionIndex)))
-                    pos += jumpop->offset;
+                    pos = data->opdata + jumpop->offset;
                 else
                     pos += sizeof(bytecode::JumpIfNotOperation);
                 continue;
@@ -195,24 +196,43 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             case bytecode::OP_PUSH_INT: {
                 bytecode::PushIntOperation *pushop = (bytecode::PushIntOperation*) op;
                 make_int(stack->get(pushop->outputIndex), pushop->value);
+                pos += sizeof(bytecode::PushIntOperation);
                 continue;
             }
             case bytecode::OP_INCREMENT: {
                 bytecode::IncrementOperation *incop = (bytecode::IncrementOperation*) op;
                 TaggedValue* value = stack->get(incop->stackIndex);
                 set_int(value, as_int(value) + 1);
+                pos += sizeof(bytecode::IncrementOperation);
                 continue;
             }
             case bytecode::OP_GET_INDEX: {
                 bytecode::GetIndexOperation *getop = (bytecode::GetIndexOperation*) op;
-                TaggedValue *item = stack->get(getop->listIndex)->getIndex(getop->indexInList);
+                TaggedValue *list = stack->get(getop->listIndex);
+                TaggedValue *listIndex = stack->get(getop->indexInList);
+                TaggedValue *item = list->getIndex(as_int(listIndex));
                 copy(item, stack->get(getop->outputIndex));
+                pos += sizeof(bytecode::GetIndexOperation);
                 continue;
             }
             case bytecode::OP_APPEND: {
-                bytecode::AppendOperation *appendop = (bytecode::AppendOperation*) appendop;
+                bytecode::AppendOperation *appendop = (bytecode::AppendOperation*) op;
                 TaggedValue *item = stack->get(appendop->itemIndex);
                 copy(item, ((List*) stack->get(appendop->outputIndex))->append());
+                pos += sizeof(bytecode::AppendOperation);
+                continue;
+            }
+            case bytecode::OP_NUM_ELEMENTS: {
+                bytecode::NumElementsOperation *neop = (bytecode::NumElementsOperation*) op;
+                TaggedValue *list = stack->get(neop->listIndex);
+                make_int(stack->get(neop->outputIndex), list->numElements());
+                pos += sizeof(bytecode::NumElementsOperation);
+                continue;
+            }
+            case bytecode::OP_COPY: {
+                bytecode::CopyOperation *copyop = (bytecode::CopyOperation*) op;
+                copy(stack->get(copyop->fromIndex), stack->get(copyop->toIndex));
+                pos += sizeof(bytecode::CopyOperation);
                 continue;
             }
         }

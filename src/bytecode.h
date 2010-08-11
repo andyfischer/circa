@@ -53,7 +53,9 @@ enum OpId {
     OP_PUSH_INT,
     OP_INCREMENT,
     OP_GET_INDEX,
-    OP_APPEND
+    OP_APPEND,
+    OP_NUM_ELEMENTS,
+    OP_COPY
 };
 
 struct Operation {
@@ -92,19 +94,19 @@ struct ReturnOperation {
 
 struct JumpOperation {
     OpId opid;
-    size_t offset;
+    int offset;
 };
 
 struct JumpIfOperation {
     OpId opid;
     int conditionIndex;
-    size_t offset;
+    int offset;
 };
 
 struct JumpIfNotOperation {
     OpId opid;
     int conditionIndex;
-    size_t offset;
+    int offset;
 };
 
 struct PushIntOperation {
@@ -127,7 +129,16 @@ struct AppendOperation {
     int itemIndex;
     int outputIndex;
 };
-
+struct NumElementsOperation {
+    OpId opid;
+    int listIndex;
+    int outputIndex;
+};
+struct CopyOperation {
+    OpId opid;
+    int fromIndex;
+    int toIndex;
+};
 
 struct WriteContext {
     int nextStackIndex;
@@ -141,6 +152,8 @@ struct WriteContext {
             writePos += bytes;
         sizeWritten += bytes;
     }
+
+    int getOffset() { return int(sizeWritten); }
 };
 
 struct BytecodeData {
@@ -159,12 +172,14 @@ bool should_term_generate_call(Term* term);
 
 void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex);
 void write_call_op(WriteContext* context, Term* term);
-void write_jump_op(WriteContext* context, size_t offset);
-void write_jump_if_op(WriteContext* context, int conditionIndex, size_t offset);
-void write_jump_if_not_op(WriteContext* context, int conditionIndex, size_t offset);
+void write_jump(WriteContext* context, int offset);
+void write_jump_if(WriteContext* context, int conditionIndex, int offset);
+void write_jump_if_not(WriteContext* context, int conditionIndex, int offset);
 void write_push_int(WriteContext* context, int value, int stackIndex);
 void write_get_index(WriteContext* context, int listIndex, int indexInList, int outputIndex);
 void write_increment(WriteContext* context, int intIndex);
+void write_num_elements(WriteContext* context, int listIndex, int outputIndex);
+void write_copy(WriteContext* context, int fromIndex, int toIndex);
 
 void write_op(WriteContext* context, Term* term);
 

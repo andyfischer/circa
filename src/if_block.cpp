@@ -269,7 +269,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     Branch& joining = blockContents["#joining"]->nestedContents;
 
     int numBranches = blockContents.length() - 1;
-    bool assignStackIndexes = context != NULL;
+    bool assignStackIndexes = context->writePos != NULL;
 
     if (assignStackIndexes) {
         // For each name in #joining, we want corresponding variables (across the
@@ -296,14 +296,14 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 
         // Check if we need to write the address for the previous branch's jump
         if (lastBranchJumpOp) {
-            lastBranchJumpOp->offset = context->writePos - (char*) lastBranchJumpOp;
+            lastBranchJumpOp->offset = context->getOffset();
             lastBranchJumpOp = NULL;
         }
 
         // Jump check, for 'if' and 'elsif'. Don't know offset yet, will write it later.
         if (term->function == IF_FUNC) {
             lastBranchJumpOp = (bytecode::JumpIfNotOperation*) context->writePos;
-            bytecode::write_jump_if_not_op(context, term->input(0)->stackIndex, 0);
+            bytecode::write_jump_if_not(context, term->input(0)->stackIndex, 0);
         }
 
         // Write each instruction in this branch
@@ -316,13 +316,13 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         if (branch+1 < numBranches) {
             if (context->writePos)
                 jumpsToEnd.push_back((bytecode::JumpOperation*) context->writePos);
-            bytecode::write_jump_op(context, 0);
+            bytecode::write_jump(context, 0);
         }
     }
 
     if (context->writePos) {
         for (size_t i=0; i < jumpsToEnd.size(); i++)
-            jumpsToEnd[i]->offset = (context->writePos - (char*) jumpsToEnd[i]);
+            jumpsToEnd[i]->offset = context->getOffset();
     }
 }
 

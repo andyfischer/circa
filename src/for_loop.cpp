@@ -11,7 +11,7 @@ namespace circa {
      [1] #state_type
    [1] iterator
    [2 .. n-2] user's code
-   [n-1] #rebinds_for_outer
+   [n-1] #outer_rebinds
 */
 
 List* get_for_loop_state(Term* forTerm)
@@ -41,7 +41,7 @@ Branch& get_for_loop_rebinds(Term* forTerm)
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return forTerm->nestedContents[2];
+    return forTerm->nestedContents[1];
 }
 
 #ifndef BYTECODE
@@ -105,9 +105,9 @@ void setup_for_loop_pre_code(Term* forTerm)
 void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = forTerm->nestedContents;
-#ifndef BYTECODE
-    std::string listName = forTerm->input(1)->name;
     Branch& outerScope = *forTerm->owningBranch;
+    std::string listName = forTerm->input(1)->name;
+#ifndef BYTECODE
 
     // Rebind any names that are used inside this for loop, using their
     // looped version.
@@ -144,7 +144,7 @@ void setup_for_loop_post_code(Term* forTerm)
     // Now do another rebinding, this one has copies that we expose outside of this branch.
     // If the for loop isn't executed at all then we use outer versions, similar to an if()
     // rebinding.
-    Branch& rebindsForOuter = create_branch(forContents, "#rebinds_for_outer");
+    Branch& rebindsForOuter = create_branch(forContents, "#outer_rebinds");
     Term* anyIterations = get_for_loop_any_iterations(forTerm);
 
     {
@@ -170,6 +170,29 @@ void setup_for_loop_post_code(Term* forTerm)
         create_value(rebindsForOuter, LIST_TYPE, listName);
 
     expose_all_names(rebindsForOuter, outerScope);
+#endif
+
+#ifdef BYTECODE
+    // Create a branch that has all the names which are rebound in this loop
+    Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
+
+    std::vector<std::string> reboundNames;
+    list_names_that_this_branch_rebinds(forContents, reboundNames);
+
+    for (size_t i=0; i < reboundNames.size(); i++) {
+        if (reboundNames[i] == listName)
+            continue;
+
+        apply(outerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+    }
+
+    bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
+
+    if (modifyList)
+        apply(outerRebinds, JOIN_FUNC, RefList(), listName);
+
+    expose_all_names(outerRebinds, outerScope);
+
 #endif
 
     // Figure out if this loop has any state
@@ -296,49 +319,140 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     //
     // -- Modify list --
     // push 0 -> index
-    // push [] -> output_list
+    //>> push [] -> output_list
     // loop_start:
     // get_index input_list index -> iterator
     // .. loop contents ..
-    // (for a discard statement, jump to end_of_loop)
-    // dont_discard:
-    // append modified_iterator output_list
+    //>> (for a discard statement, jump to end_of_loop)
+    //>> dont_discard:
+    //>> append modified_iterator output_list
     // end_of_loop:
     // inc index
     // index < input_list->numElements
     // jump_if to: loop_start
-    //
+    
     // Assign stack positions to #rebinds first (similar to inside if block)
+    Branch& forContents = forTerm->nestedContents;
+    Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
+    Branch& outerScope = *forTerm->owningBranch;
+    bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
+    std::string const& listName = forTerm->input(1)->name;
+    int modifiedList = -1;
 
+    bool assignStackIndexes = context->writePos != NULL;
+    if (assignStackIndexes) {
+        // For names in #outer_rebinds, the join terms should have the same stack
+        // indices as the term's output.
+        for (int i=0; i < outerRebinds.length(); i++) {
+            int stackIndex = context->nextStackIndex++;
+            outerRebinds[i]->stackIndex = stackIndex;
 
+            // Don't try to share the stack index of the list name rebind.
+            if (outerRebinds[i]->name == listName)
+                continue;
+
+            forContents[outerRebinds[i]->name]->stackIndex = stackIndex;
+        }
+    }
+
+    if (modifyList)
+        modifiedList = outerRebinds[listName]->stackIndex;
+
+    int inputList = forTerm->input(1)->stackIndex;
     int iteratorIndex = context->nextStackIndex++;
     
     // push 0 -> iterator_index
     bytecode::write_push_int(context, 0, iteratorIndex);
 
-    char* loopStartPos = context->writePos;
+    int numElementsOutput = context->nextStackIndex++;
+    int compareIndexOutput = context->nextStackIndex++;
 
-    // get_index(input_list iterator_index) -> iterator
+    // Do an initial check of iterator vs length, if they fail this check then
+    // the loop is never run, and we'll need to copy values for outer rebinds.
+
+    // length(input_list) -> numElementsOutput
+    bytecode::write_num_elements(context, inputList, numElementsOutput);
+
+    // less_than_i(iterator, numElementsOutput) -> compareIndexOutput
+    {
+        int inputs[2];
+        inputs[0] = iteratorIndex;
+        inputs[1] = numElementsOutput;
+        bytecode::write_call_op(context, NULL,
+                get_global("less_than_i"), 2, inputs, compareIndexOutput);
+    }
+
+    // If we're modifying a list, then create the blank output list here.
+    if (modifyList) {
+        int inputs[1];
+        inputs[0] = numElementsOutput;
+        bytecode::write_call_op(context, NULL,
+                get_global("blank_list"), 1, inputs, modifiedList);
+    }
+
+    bytecode::JumpIfNotOperation* jumpToLoopNeverRun = (bytecode::JumpIfNotOperation*)
+        context->writePos;
+
+    bytecode::write_jump_if_not(context, compareIndexOutput, 0);
+
+    // loop_start: Check if index < length(input_list)
+    int loopStartPos = context->getOffset();
+
+    // (this code is duplicated above)
+    // length(input_list) -> numElementsOutput
+    bytecode::write_num_elements(context, inputList, numElementsOutput);
+
+    // less_than_i(iterator, numElementsOutput) -> compareIndexOutput
+    {
+        int inputs[2];
+        inputs[0] = iteratorIndex;
+        inputs[1] = numElementsOutput;
+        bytecode::write_call_op(context, NULL,
+                get_global("less_than_i"), 2, inputs, compareIndexOutput);
+    }
+
+    // jump_if_not(compareIndexOutput) offset:end
+    bytecode::JumpIfNotOperation *jumpToEnd = (bytecode::JumpIfNotOperation*) context->writePos;
+    bytecode::write_jump_if_not(context, compareIndexOutput, 0);
+
     Term* iteratorTerm = get_for_loop_iterator(forTerm);
     if (iteratorTerm->stackIndex == -1)
         iteratorTerm->stackIndex = context->nextStackIndex++;
 
-    bytecode::write_get_index(context, forTerm->input(0)->stackIndex, iteratorIndex,
+    // get_index(inputList, iteratorIndex) -> iterator
+    bytecode::write_get_index(context, inputList, iteratorIndex,
             iteratorTerm->stackIndex);
 
     // loop contents
-    Branch& forContents = forTerm->nestedContents;
-    for (int i=1; i < forContents.length(); i++) {
-        Term* term = forContents[i];
-        bytecode::write_op(context, term);
+    for (int i=2; i < forContents.length()-1; i++)
+        bytecode::write_op(context, forContents[i]);
+
+    // if we're modifying the list, then save the modified variable here.
+    if (modifyList) {
+        Term* modifiedIterator = forContents[iteratorTerm->name];
+        int inputs[] = { modifiedList, iteratorIndex, modifiedIterator->stackIndex };
+        bytecode::write_call_op(context, NULL, get_global("set_index"), 3, inputs, modifiedList);
     }
 
-    // inc iterator_index
+    // increment(iterator_index)
     bytecode::write_increment(context, iteratorIndex);
 
-    // index < input_list->numElements
-    int numElementsOutput = context->nextStackIndex++;
+    // jump back to loop_start
+    bytecode::write_jump(context, loopStartPos);
 
+    // Here we insert a block of code that is called when there are 0 iterations.
+    if (jumpToLoopNeverRun)
+        jumpToLoopNeverRun->offset = context->getOffset();
+
+    for (int i=0; i < outerRebinds.length(); i++) {
+        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
+        ca_assert(outerVersion != NULL);
+        bytecode::write_copy(context, outerVersion->stackIndex, outerRebinds[i]->stackIndex);
+    }
+
+    // complete the above jumpToEnd
+    if (jumpToEnd)
+        jumpToEnd->offset = context->getOffset();
 }
 
 } // namespace circa
