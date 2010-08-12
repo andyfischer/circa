@@ -41,7 +41,11 @@ Branch& get_for_loop_rebinds(Term* forTerm)
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
+#ifdef BYTECODE
     return forTerm->nestedContents[1];
+#else
+    return forTerm->nestedContents[2];
+#endif
 }
 
 #ifndef BYTECODE

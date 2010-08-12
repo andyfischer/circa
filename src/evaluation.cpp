@@ -13,6 +13,7 @@
 
 namespace circa {
 
+#ifndef BYTECODE
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
 {
     EvaluateFunc evaluate = function_t::get_evaluate(function);
@@ -55,8 +56,30 @@ void evaluate_term(Term* term)
     evaluate_term(&context, term);
 }
 
+#endif
+
+#ifdef BYTECODE
+void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
+{
+    // FIXME
+}
+void evaluate_term(EvalContext* cxt, Term* term)
+{
+    // FIXME
+}
+void evaluate_term(Term* term)
+{
+    // FIXME
+}
+#endif
+
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
+#ifdef BYTECODE
+    bytecode::update_bytecode(branch);
+    List stack;
+    evaluate_bytecode(context, &branch._bytecode, &stack);
+#else
     ca_assert(context != NULL);
 
     for (int index=0; index < branch.length(); index++) {
@@ -73,6 +96,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
         if (is_stateful(term) && term->input(0) != NULL)
             copy(term->input(0), term);
     }
+#endif
 }
 
 EvalContext evaluate_branch(Branch& branch)
@@ -85,7 +109,10 @@ EvalContext evaluate_branch(Branch& branch)
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
 {
     Term* result = apply(branch, function, inputs);
+    // FIXME
+#ifndef BYTECODE
     evaluate_term(result);
+#endif
     return result;
 }
 
@@ -101,6 +128,8 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
 
 void evaluate_without_side_effects(Term* term)
 {
+//FIXME
+#ifndef BYTECODE
     // TODO: Should actually check if the function has side effects.
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);
@@ -109,11 +138,12 @@ void evaluate_without_side_effects(Term* term)
     }
 
     evaluate_term(term);
+#endif
 }
 
 bool has_been_evaluated(Term* term)
 {
-    // TODO
+    // TODO: Remove this
     return true;
 }
 

@@ -100,11 +100,13 @@ void for_loop()
 
 void register_tests()
 {
+#ifdef BYTECODE
     REGISTER_TEST_CASE(bytecode_tests::test_print_simple);
     REGISTER_TEST_CASE(bytecode_tests::print_if_block);
     REGISTER_TEST_CASE(bytecode_tests::if_block_name_joining);
     REGISTER_TEST_CASE(bytecode_tests::test_evaluate);
     REGISTER_TEST_CASE(bytecode_tests::for_loop);
+#endif
 }
 
 }
