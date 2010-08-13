@@ -145,7 +145,19 @@ struct WriteContext {
     size_t sizeWritten;
     char* writePos;
 
-    WriteContext() : nextStackIndex(0), sizeWritten(0), writePos(NULL) {}
+    // Stack index of top level state
+    int topLevelState;
+
+    // Stack index of state object for the current branch
+    int inlineState;
+
+    WriteContext()
+      : nextStackIndex(0),
+        sizeWritten(0),
+        writePos(NULL),
+        topLevelState(-1),
+        inlineState(-1)
+    {}
 
     void advance(size_t bytes) {
         if (writePos)

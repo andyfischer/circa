@@ -46,4 +46,7 @@ struct Dict : TaggedValue
     bool empty();
 };
 
+void make_dict(TaggedValue* value);
+bool is_dict(TaggedValue* value);
+
 } // namespace circa

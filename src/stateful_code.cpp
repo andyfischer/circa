@@ -11,7 +11,7 @@ bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc);
 
 bool is_stateful(Term* term)
 {
-    return term->function == STATEFUL_VALUE_FUNC;
+    return term->function->name == "get_state_field";
 }
 
 bool is_function_stateful(Term* func)
@@ -20,6 +20,14 @@ bool is_function_stateful(Term* func)
         return false;
     Term* stateType = function_t::get_inline_state_type(func);
     return (stateType != NULL && stateType != VOID_TYPE);
+}
+
+bool has_any_inlined_state(Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++)
+        if (is_stateful(branch[i]))
+            return true;
+    return false;
 }
 
 void load_state_into_branch(TaggedValue* stateTv, Branch& branch)

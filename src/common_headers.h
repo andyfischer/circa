@@ -69,4 +69,6 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 #define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
 void ca_assert_function(bool expr, const char* expr, int line, const char* file);
 
+#define BYTECODE
+
 } // namespace circa

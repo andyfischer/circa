@@ -3,6 +3,7 @@
 #include "building.h"
 #include "builtins.h"
 #include "branch.h"
+#include "branch_iterator.h"
 #include "bytecode.h"
 #include "errors.h"
 #include "evaluation.h"
@@ -13,7 +14,6 @@
 
 namespace circa {
 
-#ifndef BYTECODE
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
 {
     EvaluateFunc evaluate = function_t::get_evaluate(function);
@@ -56,23 +56,6 @@ void evaluate_term(Term* term)
     evaluate_term(&context, term);
 }
 
-#endif
-
-#ifdef BYTECODE
-void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
-{
-    // FIXME
-}
-void evaluate_term(EvalContext* cxt, Term* term)
-{
-    // FIXME
-}
-void evaluate_term(Term* term)
-{
-    // FIXME
-}
-#endif
-
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
 #ifdef BYTECODE
@@ -80,6 +63,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     List stack;
     evaluate_bytecode(context, &branch._bytecode, &stack);
 #else
+
     ca_assert(context != NULL);
 
     for (int index=0; index < branch.length(); index++) {
@@ -109,10 +93,7 @@ EvalContext evaluate_branch(Branch& branch)
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
 {
     Term* result = apply(branch, function, inputs);
-    // FIXME
-#ifndef BYTECODE
     evaluate_term(result);
-#endif
     return result;
 }
 
@@ -128,8 +109,6 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
 
 void evaluate_without_side_effects(Term* term)
 {
-//FIXME
-#ifndef BYTECODE
     // TODO: Should actually check if the function has side effects.
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);
@@ -138,17 +117,13 @@ void evaluate_without_side_effects(Term* term)
     }
 
     evaluate_term(term);
-#endif
-}
-
-bool has_been_evaluated(Term* term)
-{
-    // TODO: Remove this
-    return true;
 }
 
 void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack)
 {
+    //std::cout << "running bytecode:" << std::endl;
+    //print_bytecode(std::cout, data);
+
     char* pos = data->opdata;
     char* end = data->opdata + data->size;
 
@@ -180,9 +155,15 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 inputs.resize(callop->numInputs);
                 for (int i=0; i < callop->numInputs; i++) {
                     inputs[i] = alloc_term();
-                    TaggedValue* stackInput = stack->get(callop->inputs[i].stackIndex);
-                    change_type(inputs[i], stackInput->value_type);
-                    copy(stackInput, inputs[i]);
+                    TaggedValue* stackInput = NULL;
+                    int stackIndex = callop->inputs[i].stackIndex;
+                    if (stackIndex == -1) {
+                        inputs[i] = NULL;
+                    } else {
+                        stackInput = stack->get(stackIndex);
+                        change_type(inputs[i], stackInput->value_type);
+                        copy(stackInput, inputs[i]);
+                    }
                 }
                 TaggedValue* output = NULL;
                 if (callop->outputIndex != -1) {
@@ -275,6 +256,21 @@ void evaluate_bytecode(Branch& branch)
     List stack;
     bytecode::update_bytecode(branch);
     evaluate_bytecode(&context, &branch._bytecode, &stack);
+}
+
+void copy_stack_back_to_terms(Branch& branch, List* stack)
+{
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        Term* term = *it;
+        if (term->stackIndex == -1)
+            continue;
+
+        TaggedValue* value = stack->get(term->stackIndex);
+        if (value == NULL)
+            continue;
+
+        copy(value, term);
+    }
 }
 
 } // namespace circa

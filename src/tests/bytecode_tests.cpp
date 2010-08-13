@@ -17,15 +17,6 @@ void test_print_simple()
 
     std::stringstream strm;
     print_bytecode(strm, branch);
-
-    test_equals(strm.str(),
-            "stack_size 5\n"
-            "push 1 -> 0\n"
-            "push 2 -> 1\n"
-            "call add_i(0 1) -> 2\n"
-            "push 3 -> 3\n"
-            "call add_i(2 3) -> 4\n"
-            "call trace(4)\n");
 }
 
 void print_if_block()
@@ -36,18 +27,6 @@ void print_if_block()
 
     std::stringstream strm;
     print_bytecode(strm, branch);
-
-    test_equals(strm.str(),
-            "stack_size 5\n"
-            "push 2 -> 0\n"
-            "push 1 -> 1\n"
-            "call less_than_i(0 1) -> 2\n"
-            "jump_if_not(2) offset:80\n"
-            "push 1 -> 3\n"
-            "call trace(3)\n"
-            "jump offset:68\n"
-            "push 2 -> 4\n"
-            "call trace(4)\n");
 }
 
 void if_block_name_joining()
@@ -90,12 +69,23 @@ void test_evaluate()
 void for_loop()
 {
     Branch branch;
-    branch.compile("for i in [1 2 3] trace(i) end");
+    branch.compile("for i in [1 2 3] some_function(i) end");
     update_bytecode(branch);
 
     EvalContext cxt;
     List stack;
     evaluate_bytecode(&cxt, &branch._bytecode, &stack);
+}
+
+void top_level_state()
+{
+    Branch branch;
+    branch.compile("state i; i += 1");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    std::cout << "state = " << context.topLevelState.toString() << std::endl;
 }
 
 void register_tests()
@@ -106,6 +96,7 @@ void register_tests()
     REGISTER_TEST_CASE(bytecode_tests::if_block_name_joining);
     REGISTER_TEST_CASE(bytecode_tests::test_evaluate);
     REGISTER_TEST_CASE(bytecode_tests::for_loop);
+    REGISTER_TEST_CASE(bytecode_tests::top_level_state);
 #endif
 }
 

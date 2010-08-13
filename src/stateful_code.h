@@ -9,6 +9,7 @@ namespace circa {
 // Returns whether this term is 'stateful'. The value of these terms should be persisted
 // across a reload.
 bool is_stateful(Term* term);
+bool has_any_inlined_state(Branch& branch);
 
 bool is_function_stateful(Term* func);
 

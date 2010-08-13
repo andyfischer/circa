@@ -394,4 +394,13 @@ bool Dict::empty()
     return dict_t::count(data) == 0;
 }
 
+bool is_dict(TaggedValue* value)
+{
+    return value->value_type == DICT_T;
+}
+void make_dict(TaggedValue* value)
+{
+    change_type(value, DICT_T);
+}
+
 } // namespace circa

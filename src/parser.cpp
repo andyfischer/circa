@@ -33,13 +33,23 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 
 Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 {
+#ifndef BYTECODE
     int previousLastIndex = branch.length();
+#endif
 
     Term* result = compile(&branch, step, input);
 
+#ifdef BYTECODE
+    EvalContext* context;
+    List stack;
+    bytecode::update_bytecode(branch);
+    evaluate_bytecode(context, &branch._bytecode, &stack);
+    copy_stack_back_to_terms(branch, &stack);
+#else
     // Evaluate all terms that were just created
     for (int i=previousLastIndex; i < branch.length(); i++)
         evaluate_term(branch[i]);
+#endif
 
     return result;
 }

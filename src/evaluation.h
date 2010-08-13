@@ -17,6 +17,9 @@ struct EvalContext
     Ref errorTerm;
     std::string errorMessage;
 
+    // Top-level inlined state
+    TaggedValue topLevelState;
+
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 };
 
@@ -43,6 +46,6 @@ Term* apply_and_eval(Branch& branch,
 // of the current branch.
 void evaluate_without_side_effects(Term* term);
 
-bool has_been_evaluated(Term* term);
+void copy_stack_back_to_terms(Branch& branch, List* stack);
 
 } // namespace circa
