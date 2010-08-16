@@ -162,6 +162,23 @@ void test_duplicate()
     dict_t::free_dict(dupe);
 }
 
+void test_reset()
+{
+    TaggedValue value;
+    make_dict(&value);
+    Dict *dict = Dict::checkCast(&value);
+
+    TaggedValue a;
+    make_int(&a, 4);
+    dict->set("a", &a);
+
+    test_equals(value.toString(), "[a: 4]");
+    reset(&value);
+    test_equals(value.toString(), "[]");
+    dict->set("a", &a);
+    test_equals(value.toString(), "[a: 4]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(dict_tests::test_simple);
@@ -170,6 +187,7 @@ void register_tests()
     REGISTER_TEST_CASE(dict_tests::hash_collision);
     REGISTER_TEST_CASE(dict_tests::many_items);
     REGISTER_TEST_CASE(dict_tests::test_duplicate);
+    REGISTER_TEST_CASE(dict_tests::test_reset);
 }
 
 }

@@ -54,6 +54,13 @@ namespace list_function {
         result->resize(INT_INPUT(0));
     }
 
+    CA_DEFINE_FUNCTION(resize, "resize(List, int) -> List")
+    {
+        copy(INPUT(0), OUTPUT);
+        List* result = List::checkCast(OUTPUT);
+        result->resize(INT_INPUT(1));
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

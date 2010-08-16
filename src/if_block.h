@@ -12,7 +12,9 @@ Branch* get_if_block_else_block(Term* ifCall);
 List* get_if_block_state(Term* ifCall);
 bool if_block_contains_state(Term* ifCall);
 
+#ifndef BYTECODE
 void evaluate_if_block(EvalContext*, Term* caller);
+#endif
 
 void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock);
 

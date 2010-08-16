@@ -257,6 +257,7 @@ void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inline
         Term* term = branch[i];
         if (is_stateful(term)) {
             Term* modifiedResult = branch[term->name];
+            ca_assert(term->name != "");
             ca_assert(modifiedResult != NULL);
             ca_assert(modifiedResult->stackIndex != -1);
             int inputs[] = { context->inlineState, term->input(1)->stackIndex,

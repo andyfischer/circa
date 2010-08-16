@@ -14,7 +14,7 @@ namespace inline_state_function {
     {
         copy(&CONTEXT->topLevelState, OUTPUT);
     }
-    CA_DEFINE_FUNCTION(set_top_level_state, "set_top_level_state() -> any")
+    CA_DEFINE_FUNCTION(set_top_level_state, "set_top_level_state(any)")
     {
         copy(INPUT(0), &CONTEXT->topLevelState);
     }

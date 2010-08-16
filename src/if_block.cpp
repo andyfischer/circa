@@ -55,8 +55,8 @@ void update_if_block_joining_branch(Term* ifCall)
     Branch& joining = contents["#joining"]->nestedContents;
     joining.clear();
 
-    // This is used later.
 #ifndef BYTECODE
+    // This is used later.
     Term* satisfiedIndex = create_int(joining, 0, "#satisfiedIndex");
 #endif
 
@@ -176,14 +176,13 @@ bool if_block_contains_state(Term* ifCall)
     Branch& contents = ifCall->nestedContents;
     for (int cond=0; cond < contents.length(); cond++) {
         Branch& condContents = contents[cond]->nestedContents;
-        for (int i=0; i < condContents.length(); i++) {
-            if (is_stateful(condContents[i]))
-                return true;
-        }
+        if (has_any_inlined_state(condContents))
+            return true;
     }
     return false;
 }
 
+#ifndef BYTECODE
 void evaluate_if_block(EvalContext* cxt, Term* caller)
 {
     Branch& contents = caller->nestedContents;
@@ -262,14 +261,31 @@ void evaluate_if_block(EvalContext* cxt, Term* caller)
     set_int(joining["#satisfiedIndex"], satisfiedIndex);
     evaluate_branch(cxt, joining);
 }
+#endif
 
 void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 {
     Branch& blockContents = ifBlock->nestedContents;
     Branch& joining = blockContents["#joining"]->nestedContents;
+    bool hasState = if_block_contains_state(ifBlock);
 
     int numBranches = blockContents.length() - 1;
+    int numBranchesStack = -1;
     bool assignStackIndexes = context->writePos != NULL;
+
+    // Fetch a list container for the state in this block.
+    int stateContainer = -1;
+    if (hasState) {
+        Term* getState = ifBlock->owningBranch->get(ifBlock->index-1);
+        ca_assert(getState != NULL);
+        ca_assert(getState->function->name == "get_state_field");
+        numBranchesStack = context->nextStackIndex++;
+        bytecode::write_push_int(context, numBranches, numBranchesStack);
+        stateContainer = getState->stackIndex;
+        int resizeInputs[] = { stateContainer, numBranchesStack };
+        bytecode::write_call_op(context, NULL, get_global("resize"), 2, resizeInputs,
+            stateContainer);
+    }
 
     if (assignStackIndexes) {
         // For each name in #joining, we want corresponding variables (across the
@@ -291,6 +307,15 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     // Go through each branch
     bytecode::JumpIfNotOperation *lastBranchJumpOp = NULL;
     std::vector<bytecode::JumpOperation*> jumpsToEnd;
+
+    // Stack position for condition-specific state.
+    int conditionLocalState = -1;
+    int branchIndexStack = -1;
+    if (hasState) {
+        conditionLocalState = context->nextStackIndex++;
+        branchIndexStack = context->nextStackIndex++;
+    }
+
     for (int branch=0; branch < numBranches; branch++) {
         Term* term = blockContents[branch];
 
@@ -306,10 +331,32 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
             bytecode::write_jump_if_not(context, term->input(0)->stackIndex, 0);
         }
 
+        // If there's state, then pull out the state for this branch.
+        if (hasState) {
+            bytecode::write_push_int(context, branch, branchIndexStack);
+            bytecode::write_get_index(context, stateContainer,
+                    branchIndexStack, conditionLocalState);
+        }
+
         // Write each instruction in this branch
         Branch& branchContents = term->nestedContents;
-        for (int i=0; i < branchContents.length(); i++) {
-            bytecode::write_op(context, branchContents[i]);
+        bytecode::write_bytecode_for_branch(context, branchContents, conditionLocalState);
+
+        if (hasState) {
+            // For all the branches which did not get evaluated, reset state. An
+            // easy way to do this is to just reset state to an empty list.
+            {
+                int inputs[] = { numBranchesStack };
+                bytecode::write_call_op(context, NULL, get_global("blank_list"),
+                        1, inputs, stateContainer);
+            }
+
+            // Save condition-local state into list-wide container
+            {
+                int inputs[] = { stateContainer, branchIndexStack, conditionLocalState };
+                bytecode::write_call_op(context, NULL, get_global("set_index"), 3, inputs,
+                    stateContainer);
+            }
         }
         
         // Jump past remaining branches. But, don't need to do this for last branch.

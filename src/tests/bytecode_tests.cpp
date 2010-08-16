@@ -80,12 +80,38 @@ void for_loop()
 void top_level_state()
 {
     Branch branch;
-    branch.compile("state i; i += 1");
+    branch.compile("state i; i = 1");
 
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    std::cout << "state = " << context.topLevelState.toString() << std::endl;
+    Dict* state = Dict::checkCast(&context.topLevelState);
+    test_equals(state->toString(), "[i: 1]");
+
+    branch.clear();
+    reset(&context.topLevelState);
+    branch.compile("state i; i += 1");
+
+    for (int i = 0; i < 4; i++)
+        evaluate_branch(&context, branch);
+
+    test_equals(state->toString(), "[i: 3.0]");
+}
+
+void if_block_state()
+{
+    Branch branch;
+
+    branch.compile("if true state i; i = 4 else state j; j = 3; end");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_equals(context.topLevelState.toString(), "[#if_block: [[i: 4], <null 0>]]");
+
+    branch.clear();
+    branch.compile("if false state i; i = 4 else state j; j = 3; end");
+    evaluate_branch(&context, branch);
+    test_equals(context.topLevelState.toString(), "[#if_block: [<null 0>, [j: 3]]]");
 }
 
 void register_tests()
@@ -97,6 +123,7 @@ void register_tests()
     REGISTER_TEST_CASE(bytecode_tests::test_evaluate);
     REGISTER_TEST_CASE(bytecode_tests::for_loop);
     REGISTER_TEST_CASE(bytecode_tests::top_level_state);
+    REGISTER_TEST_CASE(bytecode_tests::if_block_state);
 #endif
 }
 

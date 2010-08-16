@@ -192,8 +192,8 @@ void write_get_index(WriteContext* context, int listIndex, int indexInList, int 
 void write_increment(WriteContext* context, int intIndex);
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex);
 void write_copy(WriteContext* context, int fromIndex, int toIndex);
-
 void write_op(WriteContext* context, Term* term);
+void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState);
 
 void update_bytecode(Branch& branch, BytecodeData* bytecode);
 void update_bytecode(Branch& branch);

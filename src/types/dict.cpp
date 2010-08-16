@@ -41,6 +41,7 @@ int hash_string(const char* str)
 
 DictData* create_dict(int capacity)
 {
+    ca_assert(capacity > 0);
     DictData* result = (DictData*) malloc(sizeof(DictData) + capacity * sizeof(Slot));
     result->capacity = capacity;
     result->count = 0;
@@ -94,6 +95,7 @@ void grow(DictData** dataPtr)
 DictData* duplicate(DictData* original)
 {
     int new_capacity = int(original->count / INITIAL_LOAD_FACTOR);
+    if (new_capacity < INITIAL_SIZE) new_capacity = INITIAL_SIZE;
     DictData* dupe = create_dict(new_capacity);
 
     // Copy all items
@@ -113,6 +115,7 @@ DictData* duplicate(DictData* original)
 // there is no collision.
 int find_ideal_slot_index(DictData* data, const char* str)
 {
+    ca_assert(data->capacity > 0);
     unsigned int hash = hash_string(str);
     return int(hash % data->capacity);
 }
