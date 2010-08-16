@@ -240,6 +240,9 @@ void write_op(WriteContext* context, Term* term)
     if (term->function->name == "get_state_field")
         return write_get_state_field(context, term);
 
+    if (term->function == DO_ONCE_FUNC)
+        return do_once_function::write_bytecode(context, term);
+
     return write_call_op(context, term);
 }
 

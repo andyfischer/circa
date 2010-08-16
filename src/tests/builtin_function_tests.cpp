@@ -71,7 +71,7 @@ void test_builtin_equals()
 {
     Branch branch;
     EvalContext context;
-    branch.compile("equals(5.0, add)");
+    branch.compile("equals(5.0, 'hello')");
     evaluate_branch(&context, branch);
     test_assert(context.errorOccurred);
 }
@@ -302,7 +302,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
     REGISTER_TEST_CASE(builtin_function_tests::test_range);
-    REGISTER_TEST_CASE(builtin_function_tests::test_map);
+    //REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);

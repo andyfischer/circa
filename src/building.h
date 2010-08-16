@@ -35,7 +35,8 @@ void clear_all_users(Term* term);
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");
 
-Term* create_stateful_value(Branch& branch, Term* type, std::string const& name="");
+Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
+        std::string const& name);
 
 // Create values with a specified value.
 Term* create_string(Branch& branch, std::string const& s, std::string const& name="");

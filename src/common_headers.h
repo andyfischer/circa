@@ -46,6 +46,8 @@ struct Term;
 struct Type;
 struct TypeRef;
 
+namespace bytecode { struct WriteContext; }
+
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
 // Function-related typedefs:

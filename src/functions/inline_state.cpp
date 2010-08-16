@@ -19,7 +19,8 @@ namespace inline_state_function {
         copy(INPUT(0), &CONTEXT->topLevelState);
     }
 
-    CA_DEFINE_FUNCTION(get_state_field, "get_state_field(any, string name) -> any")
+    CA_DEFINE_FUNCTION(get_state_field,
+            "get_state_field(any +optional, string name, any default_value +optional) -> any")
     {
         TaggedValue *container = INPUT(0);
         if (!is_dict(container)) make_dict(container);
@@ -29,8 +30,15 @@ namespace inline_state_function {
         if (value) {
             // todo: check if we need to cast this value
             copy(value, OUTPUT);
+
+        // If we didn't find the value, see if they provided a default
+        } else if (INPUT(2) != NULL) {
+            copy(INPUT(2), OUTPUT);
+
+        // Otherwise, reset to default value of type
         } else {
             change_type(OUTPUT, type_contents(CALLER->type));
+            reset(OUTPUT);
         }
     }
 

@@ -40,10 +40,10 @@ Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
     Term* result = compile(&branch, step, input);
 
 #ifdef BYTECODE
-    EvalContext* context;
+    EvalContext context;
     List stack;
     bytecode::update_bytecode(branch);
-    evaluate_bytecode(context, &branch._bytecode, &stack);
+    evaluate_bytecode(&context, &branch._bytecode, &stack);
     copy_stack_back_to_terms(branch, &stack);
 #else
     // Evaluate all terms that were just created
@@ -694,7 +694,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     if (if_block_contains_state(result)) {
         // FIXME: make sure this name is unique
         std::string hiddenStateName = "#if_block";
-        Term* stateTerm = create_stateful_value(branch, LIST_TYPE, hiddenStateName);
+        Term* stateTerm = create_stateful_value(branch, LIST_TYPE, NULL, hiddenStateName);
         set_input(result, 0, stateTerm);
     }
 
@@ -758,7 +758,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     // Check to create a state container
     if (has_any_inlined_state(forTerm->nestedContents)) {
-        Term* state = create_stateful_value(branch, LIST_TYPE, "#hidden_state_for_for_loop");
+        Term* state = create_stateful_value(branch, LIST_TYPE, NULL, "#hidden_state_for_for_loop");
 
         set_input(forTerm, 0, state);
 
@@ -815,6 +815,26 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (!is_type(type))
         return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
+#ifdef BYTECODE
+    Term* initialValue = NULL;
+
+    if (tokens.nextIs(EQUALS)) {
+        tokens.consume();
+        possible_whitespace(tokens);
+
+        Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
+        set_source_hidden(initialization, true);
+
+        initialValue = infix_expression(initialization->nestedContents, tokens);
+        recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
+        post_parse_branch(initialization->nestedContents);
+    }
+
+    Term* result = create_stateful_value(branch, type, initialValue, name);
+
+    if (typeName != "")
+        result->setStringProp("syntax:explicitType", typeName);
+#else
     Term* result = create_stateful_value(branch, type, name);
 
     if (typeName != "")
@@ -831,6 +851,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
         post_parse_branch(initialization->nestedContents);
 
+
         apply(initialization->nestedContents,
                 UNSAFE_ASSIGN_FUNC, RefList(result, initialValue));
 
@@ -839,6 +860,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
         result->setRefProp("initializedBy", initialValue);
     }
+#endif
 
     set_source_location(result, startPosition, tokens);
     return result;

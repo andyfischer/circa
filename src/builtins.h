@@ -93,7 +93,10 @@ void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 
-// this is implemented in functions/include.cpp
+namespace do_once_function {
+    void write_bytecode(bytecode::WriteContext* context, Term* term);
+}
+
 namespace include_function {
     void preload_script(EvalContext*, Term* term);
 }

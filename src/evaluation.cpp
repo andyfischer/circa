@@ -130,6 +130,11 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
     while (pos != end) {
         bytecode::Operation* op = (bytecode::Operation*) pos;
 
+        //std::cout << "next op: ";
+        //print_operation(std::cout, op);
+        //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+        //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+
         switch (op->opid) {
             case bytecode::OP_STACK_SIZE: {
                 bytecode::StackSizeOperation *ssop = (bytecode::StackSizeOperation*) op;

@@ -37,7 +37,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
             && (inputs.length() < function_t::num_inputs(function)))
     {
         Term* stateContainer = create_stateful_value(branch,
-                function_t::get_inline_state_type(function),
+                function_t::get_inline_state_type(function), NULL,
                 default_name_for_hidden_state(name));
 
         RefList newInputs(stateContainer);
@@ -72,7 +72,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 void set_input(Term* term, int index, Term* input)
 {
     assert_valid_term(term);
-    ca_assert(term->function->name != "stateful_value");
 
     Ref previousInput = NULL;
     if (index < term->numInputs())
@@ -198,12 +197,13 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     return create_value(branch, type, name);
 }
 
-Term* create_stateful_value(Branch& branch, Term* type, std::string const& name)
+Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
+        std::string const& name)
 {
 #ifdef BYTECODE
     Term* fieldName = create_string(branch, name);
     Term* result = apply(branch, get_global("get_state_field"),
-            RefList(NULL, fieldName), name);
+            RefList(NULL, fieldName, defaultValue), name);
     change_type(result, type);
     return result;
 

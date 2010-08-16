@@ -112,10 +112,15 @@ Term* get_global(std::string name)
 
 CA_FUNCTION(empty_evaluate_function) {}
 
+namespace null_t {
+    std::string toString(TaggedValue* value) { return "null";}
+}
+
 void create_types()
 {
     NULL_T = Type::create();
     NULL_T->name = "null";
+    NULL_T->toString = null_t::toString;
 
     DICT_T = Type::create();
     dict_t::setup_type(DICT_T);

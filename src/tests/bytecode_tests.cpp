@@ -106,12 +106,12 @@ void if_block_state()
 
     EvalContext context;
     evaluate_branch(&context, branch);
-    test_equals(context.topLevelState.toString(), "[#if_block: [[i: 4], <null 0>]]");
+    test_equals(context.topLevelState.toString(), "[#if_block: [[i: 4], null]]");
 
     branch.clear();
     branch.compile("if false state i; i = 4 else state j; j = 3; end");
     evaluate_branch(&context, branch);
-    test_equals(context.topLevelState.toString(), "[#if_block: [<null 0>, [j: 3]]]");
+    test_equals(context.topLevelState.toString(), "[#if_block: [null, [j: 3]]]");
 }
 
 void for_block_state()
@@ -122,8 +122,20 @@ void for_block_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(context.topLevelState.toString(), "[#hidden_state_for_for_loop: [[s: 1], [s: 1], [s: 1], [s: 1], [s: 1]]]");
+    test_equals(context.topLevelState.toString(),
+            "[#hidden_state_for_for_loop: [[s: 1], [s: 1], [s: 1], [s: 1], [s: 1]]]");
 }
+
+void test_do_once()
+{
+    Branch branch;
+    branch.compile("do once print('hi') end");
+    EvalContext context;
+    for (int i=0; i < 5; i++)
+    evaluate_branch(&context, branch);
+
+}
+
 
 void register_tests()
 {
@@ -136,6 +148,7 @@ void register_tests()
     REGISTER_TEST_CASE(bytecode_tests::top_level_state);
     REGISTER_TEST_CASE(bytecode_tests::if_block_state);
     REGISTER_TEST_CASE(bytecode_tests::for_block_state);
+    REGISTER_TEST_CASE(bytecode_tests::test_do_once);
 #endif
 }
 
