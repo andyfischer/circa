@@ -43,6 +43,13 @@ namespace vectorize_vs_function {
         ca_assert(leftTerm.refCount == 1);
     }
 
+    void write_bytecode(bytecode::WriteContext* context, Term* term)
+    {
+        Term* list = term->input(0);
+        Branch branch;
+        Term* forTerm = apply(branch, FOR_FUNC, RefList(list));
+    }
+
     void setup(Branch& kernel)
     {
         Term* func = import_function(kernel, evaluate,

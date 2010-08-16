@@ -51,6 +51,7 @@ namespace do_once_function {
     {
 #ifdef BYTECODE
         DO_ONCE_FUNC = import_function(kernel, empty_evaluate, "do_once(state bool)");
+        function_t::get_attrs(DO_ONCE_FUNC).writeBytecode = write_bytecode;
 #else
         DO_ONCE_FUNC = import_function(kernel, evaluate, "do_once(state bool) -> Code");
 #endif

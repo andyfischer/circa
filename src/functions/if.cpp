@@ -9,8 +9,10 @@ namespace if_function {
 
     CA_DEFINE_FUNCTION(evaluate, "if(bool) -> any")
     {
+#ifndef BYTECODE
         if (BOOL_INPUT(0))
             evaluate_branch(CONTEXT, CALLER->nestedContents);
+#endif
     }
 
     CA_DEFINE_FUNCTION(join_function, "join() -> any")

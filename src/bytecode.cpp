@@ -4,6 +4,7 @@
 #include "builtins.h"
 #include "bytecode.h"
 #include "debug.h"
+#include "function.h"
 #include "if_block.h"
 #include "introspection.h"
 #include "for_loop.h"
@@ -212,15 +213,6 @@ void write_return_op(WriteContext* context, Term* term)
     context->advance(sizeof(ReturnOperation));
 }
 
-void write_get_state_field(WriteContext* context, Term* term)
-{
-    ca_assert(context->topLevelState != -1);
-    int inputs[] = { context->inlineState, term->input(1)->stackIndex };
-    if (term->stackIndex == -1)
-        term->stackIndex = context->nextStackIndex++;
-    write_call_op(context, term, term->function, 2, inputs, term->stackIndex);
-}
-
 void write_op(WriteContext* context, Term* term)
 {
     if (!should_term_generate_call(term))
@@ -237,11 +229,10 @@ void write_op(WriteContext* context, Term* term)
     if (term->function == FOR_FUNC)
         return write_for_loop_bytecode(context, term);
 
-    if (term->function->name == "get_state_field")
-        return write_get_state_field(context, term);
-
-    if (term->function == DO_ONCE_FUNC)
-        return do_once_function::write_bytecode(context, term);
+    FunctionAttrs::WriteBytecode writeBytecode
+        = function_t::get_attrs(term->function).writeBytecode;
+    if (writeBytecode)
+        return writeBytecode(context, term);
 
     return write_call_op(context, term);
 }

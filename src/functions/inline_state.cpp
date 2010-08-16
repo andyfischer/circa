@@ -42,6 +42,15 @@ namespace inline_state_function {
         }
     }
 
+    void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
+    {
+        ca_assert(context->topLevelState != -1);
+        int inputs[] = { context->inlineState, term->input(1)->stackIndex };
+        if (term->stackIndex == -1)
+            term->stackIndex = context->nextStackIndex++;
+        bytecode::write_call_op(context, term, term->function, 2, inputs, term->stackIndex);
+    }
+
     CA_DEFINE_FUNCTION(set_state_field,
             "set_state_field(any container, string name, any field) -> any")
     {
@@ -86,6 +95,8 @@ namespace inline_state_function {
     {
 #ifdef BYTECODE
         CA_SETUP_FUNCTIONS(kernel);
+        function_t::get_attrs(kernel["get_state_field"]).writeBytecode =
+            get_state_field_write_bytecode;
 #else
         STATEFUL_VALUE_FUNC = import_function(kernel, empty_evaluate,
                 "stateful_value(any next_val +optional) -> any");
