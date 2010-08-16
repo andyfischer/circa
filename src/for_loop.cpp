@@ -94,7 +94,6 @@ void setup_for_loop_pre_code(Term* forTerm)
     Branch& attributes = create_branch(forContents, "#attributes");
 #ifdef BYTECODE
     create_bool(attributes, false, "#modify_list");
-    create_ref(attributes, VOID_TYPE, "#state_type");
 #else
     create_bool(attributes, false, "#is_first_iteration");
     create_bool(attributes, false, "#any_iterations");
@@ -109,7 +108,11 @@ void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = forTerm->nestedContents;
     Branch& outerScope = *forTerm->owningBranch;
+#ifdef BYTECODE
+    std::string listName = forTerm->input(0)->name;
+#else
     std::string listName = forTerm->input(1)->name;
+#endif
 #ifndef BYTECODE
 
     // Rebind any names that are used inside this for loop, using their
@@ -341,9 +344,13 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     Branch& outerScope = *forTerm->owningBranch;
     bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
-    std::string const& listName = forTerm->input(1)->name;
-    int modifiedList = -1;
+    std::string const& listName = forTerm->input(0)->name;
     bool hasState = has_any_inlined_state(forContents);
+
+    forTerm->stackIndex = context->nextStackIndex++;
+    int outputList = forTerm->stackIndex;
+    ca_assert(outputList != -1);
+    bool writingOutputList = true;
 
     bool assignStackIndexes = context->writePos != NULL;
     if (assignStackIndexes) {
@@ -361,10 +368,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         }
     }
 
-    if (modifyList)
-        modifiedList = outerRebinds[listName]->stackIndex;
-
-    int inputList = forTerm->input(1)->stackIndex;
+    int inputList = forTerm->input(0)->stackIndex;
     int iteratorIndex = context->nextStackIndex++;
 
     // length(input_list) -> listLength
@@ -404,12 +408,12 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
                 get_global("less_than_i"), 2, inputs, compareIndexOutput);
     }
 
-    // If we're modifying a list, then create the blank output list here.
-    if (modifyList) {
+    // If we're outputing a list, then initialize a blank list output here.
+    if (writingOutputList) {
         int inputs[1];
         inputs[0] = listLength;
         bytecode::write_call_op(context, NULL,
-                get_global("blank_list"), 1, inputs, modifiedList);
+                get_global("blank_list"), 1, inputs, outputList);
     }
 
     bytecode::JumpIfNotOperation* jumpToLoopNeverRun = (bytecode::JumpIfNotOperation*)
@@ -451,7 +455,8 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     }
 
     // loop contents
-    bytecode::write_bytecode_for_branch(context, forContents, iterationLocalState,
+    int branchOutput = bytecode::write_bytecode_for_branch(context,
+            forContents, iterationLocalState,
             2, forContents.length()-1);
 
     // Save iteration-local state
@@ -461,11 +466,23 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
                 stateContainer);
     }
 
-    // If we're modifying the list, then save the modified variable here.
-    if (modifyList) {
-        Term* modifiedIterator = forContents[iteratorTerm->name];
-        int inputs[] = { modifiedList, iteratorIndex, modifiedIterator->stackIndex };
-        bytecode::write_call_op(context, NULL, get_global("set_index"), 3, inputs, modifiedList);
+    // Save the list output. If we're rewriting the input list, then the output
+    // comes from whatever is bound to the iterator name. Otherwise, the output
+    // comes from the last expression inside forContents.
+    if (writingOutputList) {
+        int result = -1;
+        if (modifyList) {
+            Term* modifiedIterator = forContents[iteratorTerm->name];
+            result = modifiedIterator->stackIndex;
+        } else {
+            result = branchOutput;
+        }
+
+        if (result != -1) {
+            int inputs[] = { outputList, iteratorIndex, result };
+            bytecode::write_call_op(context, NULL, get_global("set_index"), 3,
+                inputs, outputList);
+        }
     }
 
     // increment(iterator_index)

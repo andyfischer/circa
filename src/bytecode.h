@@ -193,7 +193,12 @@ void write_increment(WriteContext* context, int intIndex);
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex);
 void write_copy(WriteContext* context, int fromIndex, int toIndex);
 void write_op(WriteContext* context, Term* term);
-void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
+
+// Writes operations inside the given branch (with optional first & last index boundaries).
+// If there are any state vars, we'll pull them out of the container with stack index
+// 'inlineState'. Returns the stack index of the last expression (this is sometimes
+// used as a return value).
+int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
         int firstIndex=0, int lastIndex=-1);
 
 void update_bytecode(Branch& branch, BytecodeData* bytecode);

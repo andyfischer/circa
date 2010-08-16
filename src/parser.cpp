@@ -280,16 +280,6 @@ Term* statement(Branch& branch, TokenStream& tokens)
         result = type_decl(branch, tokens);
     }
 
-    // If block
-    else if (tokens.nextIs(IF)) {
-        result = if_block(branch, tokens);
-    }
-
-    // For block
-    else if (tokens.nextIs(FOR)) {
-        result = for_block(branch, tokens);
-    }
-
     // Do_once block
     else if (tokens.nextIs(DO_ONCE)) {
         result = do_once_block(branch, tokens);
@@ -736,7 +726,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
-    Term* forTerm = apply(branch, FOR_FUNC, RefList(NULL, listExpr));
+    Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
     Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
 
@@ -884,7 +874,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     // Parse an infix expression
     int originalBranchLength = branch.length();
 
-    Term* expr = infix_expression(branch, tokens);
+    Term* expr = bindable_expression(branch, tokens);
     ca_assert(expr != NULL);
 
     bool expr_is_new = branch.length() != originalBranchLength;
@@ -975,6 +965,16 @@ Term* discard_statement(Branch& branch, TokenStream& tokens)
 
     set_source_location(result, startPosition, tokens);
     return result;
+}
+
+Term* bindable_expression(Branch& branch, TokenStream& tokens)
+{
+    if (tokens.nextIs(IF))
+        return if_block(branch, tokens);
+    else if (tokens.nextIs(FOR))
+        return for_block(branch, tokens);
+    else
+        return infix_expression(branch, tokens);
 }
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;

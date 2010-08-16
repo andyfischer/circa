@@ -50,6 +50,8 @@ bool should_term_output_go_on_stack(Term* term)
 
 bool should_term_generate_call(Term* term)
 {
+    if (term == NULL)
+        return false;
     if (term->function == COMMENT_FUNC)
         return false;
 
@@ -237,7 +239,7 @@ void write_op(WriteContext* context, Term* term)
     return write_call_op(context, term);
 }
 
-void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
+int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
         int firstIndex, int lastIndex)
 {
     int prevInlineState = context->inlineState;
@@ -247,8 +249,18 @@ void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inline
     if (lastIndex == -1)
         lastIndex = branch.length();
 
+    int lastStackIndex = -1;
+
     for (int i=firstIndex; i < lastIndex; i++)
         write_op(context, branch[i]);
+
+    // Find stack index of last expression
+    for (int i=lastIndex-1; i >= 0; i--) {
+        if (should_term_generate_call(branch[i])) {
+            lastStackIndex = branch[i]->stackIndex;
+            break;
+        }
+    }
 
     // Wrap up any state vars that were declared in this branch.
     for (int i=0; i < branch.length(); i++) {
@@ -266,6 +278,7 @@ void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inline
     }
 
     context->inlineState = prevInlineState;
+    return lastStackIndex;
 }
 
 void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
@@ -327,6 +340,8 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
     context.nextStackIndex = 0;
 
     write_bytecode_for_top_level_branch(&context, branch);
+
+    bytecode->size = context.sizeWritten;
 }
 
 void update_bytecode(Branch& branch)

@@ -47,7 +47,7 @@ namespace for_function {
     void setup(Branch& kernel)
     {
 #ifdef BYTECODE
-        FOR_FUNC = import_function(kernel, empty_evaluate, "for(Indexable)");
+        FOR_FUNC = import_function(kernel, empty_evaluate, "for(Indexable) -> List");
 #else
         FOR_FUNC = import_function(kernel, evaluate_for_loop,
                 "for(List _state, Indexable) -> Branch");
