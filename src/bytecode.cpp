@@ -243,13 +243,17 @@ void write_op(WriteContext* context, Term* term)
     return write_call_op(context, term);
 }
 
-void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState)
+void write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
+        int firstIndex, int lastIndex)
 {
     int prevInlineState = context->inlineState;
 
     context->inlineState = inlineState;
 
-    for (int i=0; i < branch.length(); i++)
+    if (lastIndex == -1)
+        lastIndex = branch.length();
+
+    for (int i=firstIndex; i < lastIndex; i++)
         write_op(context, branch[i]);
 
     // Wrap up any state vars that were declared in this branch.

@@ -6,13 +6,19 @@
 
 namespace circa {
 
+#ifndef BYTECODE
 bool for_loop_has_state(Term* forTerm);
 TaggedValue* get_for_loop_iteration_state(Term* forTerm, int index);
+#endif
 Term* get_for_loop_iterator(Term* forTerm);
 Term* get_for_loop_modify_list(Term* forTerm);
+#ifndef BYTECODE
 Term* get_for_loop_discard_called(Term* forTerm);
 Ref& get_for_loop_state_type(Term* forTerm);
+#endif
+#ifndef BYTECODE
 CA_FUNCTION(evaluate_for_loop);
+#endif
 void setup_for_loop_pre_code(Term* forTerm);
 void setup_for_loop_post_code(Term* forTerm);
 

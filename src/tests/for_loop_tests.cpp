@@ -34,26 +34,6 @@ void test_simple()
     test_assert(gSpyResults[4] == 4);
 }
 
-void test_state()
-{
-    Branch branch;
-
-    // Make sure that each iteration of the loop has a different copy of stateful values
-    Term* loop = branch.compile("for i in [1 2 3]\nstate s = unique_id()\nend");
-
-    evaluate_term(loop);
-
-    TaggedValue* s_iter0 = get_for_loop_iteration_state(loop, 0)->getIndex(0);
-    TaggedValue* s_iter1 = get_for_loop_iteration_state(loop, 1)->getIndex(0);
-    TaggedValue* s_iter2 = get_for_loop_iteration_state(loop, 2)->getIndex(0);
-    test_assert(s_iter0 != NULL);
-    test_assert(s_iter1 != NULL);
-    test_assert(s_iter2 != NULL);
-    test_assert(as_int(s_iter0) != as_int(s_iter1));
-    test_assert(as_int(s_iter1) != as_int(s_iter2));
-    test_assert(as_int(s_iter0) != as_int(s_iter2));
-}
-
 void type_inference_for_iterator()
 {
     Branch branch;

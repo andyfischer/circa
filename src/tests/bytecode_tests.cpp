@@ -114,6 +114,17 @@ void if_block_state()
     test_equals(context.topLevelState.toString(), "[#if_block: [<null 0>, [j: 3]]]");
 }
 
+void for_block_state()
+{
+    Branch branch;
+    branch.compile("for i in 0..5 state s; s = 1 end");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    test_equals(context.topLevelState.toString(), "[#hidden_state_for_for_loop: [[s: 1], [s: 1], [s: 1], [s: 1], [s: 1]]]");
+}
+
 void register_tests()
 {
 #ifdef BYTECODE
@@ -124,6 +135,7 @@ void register_tests()
     REGISTER_TEST_CASE(bytecode_tests::for_loop);
     REGISTER_TEST_CASE(bytecode_tests::top_level_state);
     REGISTER_TEST_CASE(bytecode_tests::if_block_state);
+    REGISTER_TEST_CASE(bytecode_tests::for_block_state);
 #endif
 }
 

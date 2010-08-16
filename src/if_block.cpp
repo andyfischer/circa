@@ -282,9 +282,13 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         numBranchesStack = context->nextStackIndex++;
         bytecode::write_push_int(context, numBranches, numBranchesStack);
         stateContainer = getState->stackIndex;
-        int resizeInputs[] = { stateContainer, numBranchesStack };
-        bytecode::write_call_op(context, NULL, get_global("resize"), 2, resizeInputs,
-            stateContainer);
+
+        // Resize state list
+        {
+            int inputs[] = { stateContainer, numBranchesStack };
+            bytecode::write_call_op(context, NULL, get_global("resize"), 2, inputs,
+                stateContainer);
+        }
     }
 
     if (assignStackIndexes) {

@@ -757,9 +757,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     set_source_location(forTerm, startPosition, tokens);
 
     // Check to create a state container
-    if (for_loop_has_state(forTerm)) {
-        Term* state = create_stateful_value(branch, get_for_loop_state_type(forTerm),
-                "#hidden_state_for_for_loop");
+    if (has_any_inlined_state(forTerm->nestedContents)) {
+        Term* state = create_stateful_value(branch, LIST_TYPE, "#hidden_state_for_for_loop");
 
         set_input(forTerm, 0, state);
 
