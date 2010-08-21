@@ -62,6 +62,8 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     bytecode::update_bytecode(branch);
     List stack;
     evaluate_bytecode(context, &branch._bytecode, &stack);
+    copy_stack_back_to_terms(branch, &stack);
+    //std::cout << "stack = " << stack.toString() << std::endl;
 #else
 
     ca_assert(context != NULL);

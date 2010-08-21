@@ -57,7 +57,10 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
-    EvalContext result = evaluate_branch(code);
+    EvalContext result;
+    evaluate_branch(&result, code);
+
+    //bytecode::print_bytecode(std::cout, code);
 
     if (result.errorOccurred) {
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
@@ -147,7 +150,8 @@ void test_snippet_runtime_error(std::string const& str)
         return;
     }
 
-    EvalContext result = evaluate_branch(code);
+    EvalContext result;
+    evaluate_branch(&result, code);
 
     if (!result.errorOccurred) {
         std::cout << "No runtime error occured: " << get_current_test_name() << std::endl;

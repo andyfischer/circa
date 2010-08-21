@@ -8,7 +8,14 @@ namespace branch_function {
 
     CA_FUNCTION(branch_evaluate)
     {
+#ifndef BYTECODE
         evaluate_branch(CONTEXT, CALLER->nestedContents);
+#endif
+    }
+
+    void writeBytecode(bytecode::WriteContext* context, Term* term)
+    {
+        bytecode::write_bytecode_for_branch(context, term->nestedContents, -1);
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -45,6 +52,7 @@ namespace branch_function {
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         function_t::get_attrs(BRANCH_FUNC).formatSource = format_source;
+        function_t::get_attrs(BRANCH_FUNC).writeBytecode = writeBytecode;
     }
 }
 }
