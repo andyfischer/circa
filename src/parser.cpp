@@ -749,13 +749,10 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     // Check to create a state container
     if (has_any_inlined_state(forTerm->nestedContents)) {
         Term* state = create_stateful_value(branch, LIST_TYPE, NULL, "#hidden_state_for_for_loop");
-
-        set_input(forTerm, 0, state);
-
+        //set_input(forTerm, 0, state);
+        //set_input_syntax_hint(forTerm, 0, "hidden", "true");
         branch.moveToEnd(forTerm);
     }
-
-    set_input_syntax_hint(forTerm, 0, "hidden", "true");
     
     return forTerm;
 }

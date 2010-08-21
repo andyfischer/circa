@@ -251,6 +251,16 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 pos += sizeof(bytecode::CopyOperation);
                 continue;
             }
+            case bytecode::OP_COMMENT: {
+                bytecode::CommentOperation *commentop = (bytecode::CommentOperation*) op;
+                pos += commentop->size;
+                continue;
+            }
+            case bytecode::OP_VAR_NAME: {
+                bytecode::VarNameOperation *nameop = (bytecode::VarNameOperation*) op;
+                pos += nameop->size;
+                continue;
+            }
         }
     }
 }

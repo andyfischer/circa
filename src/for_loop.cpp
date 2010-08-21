@@ -344,7 +344,8 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     Branch& outerScope = *forTerm->owningBranch;
     bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
-    std::string const& listName = forTerm->input(0)->name;
+    Term* inputTerm = forTerm->input(0);
+    std::string const& listName = inputTerm->name;
     bool hasState = has_any_inlined_state(forContents);
 
     forTerm->stackIndex = context->nextStackIndex++;
@@ -368,11 +369,11 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         }
     }
 
-    int inputList = forTerm->input(0)->stackIndex;
+    int inputList = inputTerm->stackIndex;
     int iteratorIndex = context->nextStackIndex++;
 
-    // length(input_list) -> listLength
     int listLength = context->nextStackIndex++;
+    bytecode::write_comment(context, "length(input_list) -> listLength");
     bytecode::write_num_elements(context, inputList, listLength);
 
     // Fetch state container
@@ -386,12 +387,13 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         // Resize state list
         {
             int inputs[]  = { stateContainer, listLength };
+            bytecode::write_comment(context, "resize state list");
             bytecode::write_call_op(context, NULL, get_global("resize"), 2, inputs,
                     stateContainer);
         }
     }
     
-    // push 0 -> iterator_index
+    bytecode::write_comment(context, "push 0 -> iteratorIndex");
     bytecode::write_push_int(context, 0, iteratorIndex);
 
     int compareIndexOutput = context->nextStackIndex++;
@@ -404,6 +406,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         int inputs[2];
         inputs[0] = iteratorIndex;
         inputs[1] = listLength;
+        bytecode::write_comment(context, "iterator < listLength -> compareIndexOutput");
         bytecode::write_call_op(context, NULL,
                 get_global("less_than_i"), 2, inputs, compareIndexOutput);
     }
@@ -412,13 +415,14 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     if (writingOutputList) {
         int inputs[1];
         inputs[0] = listLength;
+        bytecode::write_comment(context, "blank_list -> outputList");
         bytecode::write_call_op(context, NULL,
                 get_global("blank_list"), 1, inputs, outputList);
     }
 
+    bytecode::write_comment(context, "jump when there are zero iterations");
     bytecode::JumpIfNotOperation* jumpToLoopNeverRun = (bytecode::JumpIfNotOperation*)
         context->writePos;
-
     bytecode::write_jump_if_not(context, compareIndexOutput, 0);
 
     // loop_start: Check if index < length(input_list)
@@ -430,11 +434,13 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         int inputs[2];
         inputs[0] = iteratorIndex;
         inputs[1] = listLength;
+        bytecode::write_comment(context, "iterator < listLength -> compareIndexOutput");
         bytecode::write_call_op(context, NULL,
                 get_global("less_than_i"), 2, inputs, compareIndexOutput);
     }
 
     // jump_if_not(compareIndexOutput) offset:end
+    bytecode::write_comment(context, "jump to end if iterator >= listLength");
     bytecode::JumpIfNotOperation *jumpToEnd = (bytecode::JumpIfNotOperation*) context->writePos;
     bytecode::write_jump_if_not(context, compareIndexOutput, 0);
 
@@ -443,6 +449,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         iteratorTerm->stackIndex = context->nextStackIndex++;
 
     // get_index(inputList, iteratorIndex) -> iterator
+    bytecode::write_comment(context, "inputList[iteratorIndex] -> iterator");
     bytecode::write_get_index(context, inputList, iteratorIndex,
             iteratorTerm->stackIndex);
 
@@ -450,17 +457,20 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     int iterationLocalState = -1;
     if (hasState) {
         iterationLocalState = context->nextStackIndex++;
+        bytecode::write_comment(context, "fetch iteration-local state");
         bytecode::write_get_index(context, stateContainer, iteratorIndex,
                 iterationLocalState);
     }
 
     // loop contents
+    bytecode::write_comment(context, "loop body:");
     int branchOutput = bytecode::write_bytecode_for_branch(context,
             forContents, iterationLocalState,
             2, forContents.length()-1);
 
     // Save iteration-local state
     if (hasState) {
+        bytecode::write_comment(context, "save iteration-local state");
         int inputs[] = { stateContainer, iteratorIndex, iterationLocalState };
         bytecode::write_call_op(context, NULL, get_global("set_index"), 3, inputs,
                 stateContainer);
@@ -480,15 +490,18 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
         if (result != -1) {
             int inputs[] = { outputList, iteratorIndex, result };
+            bytecode::write_comment(context, "save list output");
             bytecode::write_call_op(context, NULL, get_global("set_index"), 3,
                 inputs, outputList);
         }
     }
 
     // increment(iterator_index)
+    bytecode::write_comment(context, "increment iterator");
     bytecode::write_increment(context, iteratorIndex);
 
     // jump back to loop_start
+    bytecode::write_comment(context, "jump back to loop start");
     bytecode::write_jump(context, loopStartPos);
 
     // Here we insert a block of code that is called when there are 0 iterations.
@@ -504,9 +517,6 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     // complete the above jumpToEnd
     if (jumpToEnd)
         jumpToEnd->offset = context->getOffset();
-
-    // Save inlined state
-
 }
 
 } // namespace circa

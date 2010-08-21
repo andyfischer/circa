@@ -119,6 +119,8 @@ void for_block_state()
     Branch branch;
     branch.compile("for i in 0..5 state s; s = 1 end");
 
+    update_bytecode(branch);
+
     EvalContext context;
     evaluate_branch(&context, branch);
 

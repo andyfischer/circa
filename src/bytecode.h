@@ -55,7 +55,9 @@ enum OpId {
     OP_GET_INDEX,
     OP_APPEND,
     OP_NUM_ELEMENTS,
-    OP_COPY
+    OP_COPY,
+    OP_COMMENT,
+    OP_VAR_NAME
 };
 
 struct Operation {
@@ -139,6 +141,17 @@ struct CopyOperation {
     int fromIndex;
     int toIndex;
 };
+struct CommentOperation {
+    OpId opid;
+    int size;
+    char text[0];
+};
+struct VarNameOperation {
+    OpId opid;
+    int size;
+    int stackIndex;
+    char name[0];
+};
 
 struct WriteContext {
     int nextStackIndex;
@@ -192,6 +205,8 @@ void write_get_index(WriteContext* context, int listIndex, int indexInList, int 
 void write_increment(WriteContext* context, int intIndex);
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex);
 void write_copy(WriteContext* context, int fromIndex, int toIndex);
+void write_comment(WriteContext* context, const char* str);
+void write_var_name(WriteContext* context, int stackIndex, const char* name);
 void write_op(WriteContext* context, Term* term);
 
 // Writes operations inside the given branch (with optional first & last index boundaries).

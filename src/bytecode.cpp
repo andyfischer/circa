@@ -33,6 +33,14 @@ size_t get_operation_size(Operation* op)
         case OP_APPEND: return sizeof(AppendOperation);
         case OP_NUM_ELEMENTS: return sizeof(NumElementsOperation);
         case OP_COPY: return sizeof(CopyOperation);
+        case OP_COMMENT: {
+            CommentOperation *commentop = (CommentOperation*) op;
+            return commentop->size;
+        }
+        case OP_VAR_NAME: {
+            VarNameOperation *nameop = (VarNameOperation*) op;
+            return nameop->size;
+        }
     }
     ca_assert(false);
     return 0;
@@ -203,6 +211,26 @@ void write_copy(WriteContext* context, int fromIndex, int toIndex)
         op->toIndex = toIndex;
     }
     context->advance(sizeof(CopyOperation));
+}
+
+void write_comment(WriteContext* context, const char* str)
+{
+    // TODO: Compiler or runtime switch that can turn off comments
+
+    size_t size = sizeof(CommentOperation) + strlen(str) + 1;
+    // Round up size to multiple of 4 bytes
+    size = (size + 3) & ~0x3;
+    if (context->writePos) {
+        CommentOperation* op = (CommentOperation*) context->writePos;
+        op->opid = OP_COMMENT;
+        op->size = size;
+        strcpy(op->text, str);
+    }
+    context->advance(size);
+}
+void write_var_name(WriteContext* context, int stackIndex, const char* name)
+{
+    // todo
 }
 
 void write_return_op(WriteContext* context, Term* term)
@@ -434,6 +462,16 @@ void print_operation(std::ostream& out, Operation* op)
         case OP_COPY: {
             CopyOperation *copyop = (CopyOperation*) op;
             out << "copy(" << copyop->fromIndex << ") -> " << copyop->toIndex;
+            break;
+        }
+        case OP_COMMENT: {
+            CommentOperation *commentop = (CommentOperation*) op;
+            out << "# " << commentop->text;
+            break;
+        }
+        case OP_VAR_NAME: {
+            VarNameOperation *nameop = (VarNameOperation*) op;
+            out << nameop->name << ": " << nameop->stackIndex;
             break;
         }
         default: ca_assert(false);
