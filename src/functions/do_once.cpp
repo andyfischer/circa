@@ -16,7 +16,7 @@ namespace do_once_function {
 
         if (!as_bool(done)) {
             evaluate_branch(CONTEXT, CALLER->nestedContents);
-            set_bool(done, true);
+            make_bool(done, true);
         }
     }
 #endif

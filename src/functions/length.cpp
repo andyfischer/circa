@@ -10,7 +10,7 @@ namespace length_function {
     CA_DEFINE_FUNCTION(length,  "length(List) -> int;"
             "'Return the number of items in the given list' end")
     {
-        set_int(OUTPUT, num_elements(INPUT(0)));
+        make_int(OUTPUT, num_elements(INPUT(0)));
     }
 
     void setup(Branch& kernel)

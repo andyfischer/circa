@@ -7,12 +7,12 @@ namespace sub_function {
 
     CA_FUNCTION(evaluate_i)
     {
-        set_int(OUTPUT, INT_INPUT(0) - INT_INPUT(1));
+        make_int(OUTPUT, INT_INPUT(0) - INT_INPUT(1));
     }
 
     CA_FUNCTION(evaluate_f)
     {
-        set_float(OUTPUT, FLOAT_INPUT(0) - FLOAT_INPUT(1));
+        make_float(OUTPUT, FLOAT_INPUT(0) - FLOAT_INPUT(1));
     }
 
     void setup(Branch& kernel)

@@ -19,6 +19,8 @@ namespace float_t {
 
     bool equals(TaggedValue* a, TaggedValue* b)
     {
+        if (!is_float(b))
+            return false;
         return to_float(a) == to_float(b);
     }
     std::string to_string(TaggedValue* value)

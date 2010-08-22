@@ -18,6 +18,7 @@ namespace list_function {
 
     CA_DEFINE_FUNCTION(evaluate, "list(any...) -> List")
     {
+        make_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
 
         result->resize(NUM_INPUTS);
@@ -37,6 +38,7 @@ namespace list_function {
 
     CA_DEFINE_FUNCTION(repeat, "repeat(any, int) -> List")
     {
+        make_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
         TaggedValue* source = INPUT(0);
         int repeatCount = INT_INPUT(1);
@@ -49,6 +51,7 @@ namespace list_function {
 
     CA_DEFINE_FUNCTION(blank_list, "blank_list(int) -> List")
     {
+        make_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
         result->resize(0);
         result->resize(INT_INPUT(0));

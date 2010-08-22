@@ -60,6 +60,13 @@ namespace inline_state_function {
         if (!is_dict(container)) make_dict(container);
         Dict* dict = Dict::checkCast(container);
         dict->set(STRING_INPUT(1), INPUT(2));
+        #if 0
+        std::cout << "set_state_field("
+            << INPUT(0)->toString() << ","
+            << INPUT(1)->toString() << ","
+            << INPUT(2)->toString() << ")" << std::endl;
+        std::cout << "result = " << OUTPUT->toString() << std::endl;
+        #endif
     }
 
 #ifndef BYTECODE

@@ -11,7 +11,7 @@ namespace abs_function {
     CA_DEFINE_FUNCTION(abs, "abs(number n) -> number;"
                 "'Absolute value' end")
     {
-        set_float(OUTPUT, std::abs(FLOAT_INPUT(0)));
+        make_float(OUTPUT, std::abs(FLOAT_INPUT(0)));
     }
 
     void setup(Branch& kernel)

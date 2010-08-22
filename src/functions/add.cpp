@@ -10,7 +10,7 @@ namespace add_function {
         int result = 0;
         for (int i=0; i < NUM_INPUTS; i++)
             result += INT_INPUT(i);
-        set_int(OUTPUT, result);
+        make_int(OUTPUT, result);
     }
 
     CA_FUNCTION(add_f_evaluate)
@@ -18,7 +18,7 @@ namespace add_function {
         float result = 0.0;
         for (int i=0; i < NUM_INPUTS; i++)
             result += FLOAT_INPUT(i);
-        set_float(OUTPUT, result);
+        make_float(OUTPUT, result);
     }
 
     CA_FUNCTION(add_feedback)
@@ -33,7 +33,7 @@ namespace add_function {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
             float balanced_delta = delta * get_feedback_weight(output);
-            set_float(output, to_float(outputTarget) + balanced_delta);
+            make_float(output, to_float(outputTarget) + balanced_delta);
         }
     }
 

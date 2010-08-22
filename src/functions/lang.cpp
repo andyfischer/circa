@@ -12,7 +12,7 @@ namespace lang_function {
 
     CA_FUNCTION(num_fields)
     {
-        set_int(OUTPUT, INPUT_TERM(0)->nestedContents.length());
+        make_int(OUTPUT, INPUT_TERM(0)->nestedContents.length());
     }
 
     void setup(Branch& kernel)

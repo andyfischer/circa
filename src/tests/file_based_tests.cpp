@@ -83,30 +83,35 @@ void test_file_changed()
     files["x"] = "1";
     files["y"] = "2";
 
-    Term* filename = branch.eval("filename = 'x'");
-    Term* changed = branch.eval("file_changed(filename)");
+    Term* filename = branch.compile("filename = 'x'");
+    Term* changed = branch.compile("file_changed(filename)");
 
     // First time through should always return true
+    EvalContext context;
+    evaluate_branch(&context, branch);
     test_assert(as_bool(changed));
 
     // Subsequent call should return false
-    evaluate_term(changed);
+    evaluate_branch(&context, branch);
+    dump_branch(branch);
+    std::cout << context.topLevelState.toString();
+    bytecode::print_bytecode(std::cout, branch);
     test_assert(!as_bool(changed));
-    evaluate_term(changed);
+    evaluate_branch(&context, branch);
     test_assert(!as_bool(changed));
 
     // Change the modified time
     files.last_modified("x")++;
-    evaluate_term(changed);
+    evaluate_branch(&context, branch);
     test_assert(as_bool(changed));
-    evaluate_term(changed);
+    evaluate_branch(&context, branch);
     test_assert(!as_bool(changed));
 
     // Change the filename
     set_str(filename, "y");
-    evaluate_term(changed);
+    evaluate_branch(&context, branch);
     test_assert(as_bool(changed));
-    evaluate_term(changed);
+    evaluate_branch(&context, branch);
     test_assert(!as_bool(changed));
 }
 

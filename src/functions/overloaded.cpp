@@ -12,21 +12,23 @@ namespace overloaded_function {
         Term* func = FUNCTION;
         List& overloads = function_t::get_attrs(func).parameters;
 
-#ifdef BYTECODE
-        // FIXME
-        return;
-#else
+//#ifdef BYTECODE
+//#else
         // Dynamically find the right overload.
+
+        List inputs;
+        CAPTURE_INPUTS(&inputs);
+
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
 
-            if (inputs_fit_function_dynamic(overload, INPUTS)) {
+            if (values_fit_function_dynamic(overload, &inputs)) {
                 change_type(OUTPUT, type_contents(function_t::get_output_type(overload)));
-                evaluate_term(CONTEXT, CALLER, overload, INPUTS, OUTPUT);
+                evaluate_single_term(CONTEXT, CALLER, overload, &inputs, OUTPUT);
                 return;
             }
         }
-#endif
+//#endif
 
         error_occurred(CONTEXT, CALLER, "No usable overload found");
     }
@@ -120,7 +122,7 @@ namespace overloaded_function {
         if (NUM_INPUTS == 0)
             return error_occurred(CONTEXT, CALLER, "Number of inputs must be >0");
 
-        setup_overloaded_function(CALLER, CALLER->name, INPUTS);
+        setup_overloaded_function(CALLER, CALLER->name, CALLER->inputs);
     }
 
     Term* create_overloaded_function(Branch& branch, std::string const& name,

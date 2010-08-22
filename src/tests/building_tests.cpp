@@ -31,7 +31,7 @@ void test_create_duplicate()
 {
     Branch branch;
 
-    Term* a = branch.eval("state int a = 5");
+    Term* a = branch.compile("state int a = 5");
 
     Term* b = create_duplicate(branch, a);
 

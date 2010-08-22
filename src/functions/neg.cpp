@@ -7,12 +7,12 @@ namespace neg_function  {
 
     CA_FUNCTION(evaluate_f)
     {
-        set_float(OUTPUT, -FLOAT_INPUT(0));
+        make_float(OUTPUT, -FLOAT_INPUT(0));
     }
 
     CA_FUNCTION(evaluate_i)
     {
-        set_int(OUTPUT, -INT_INPUT(0));
+        make_int(OUTPUT, -INT_INPUT(0));
     }
 
     void formatSource(StyledSource* source, Term* term)

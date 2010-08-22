@@ -46,7 +46,10 @@ struct Term;
 struct Type;
 struct TypeRef;
 
-namespace bytecode { struct WriteContext; }
+namespace bytecode {
+    struct CallOperation;
+    struct WriteContext;
+}
 
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
@@ -54,13 +57,11 @@ typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
 #define CA_FUNCTION(fname) \
     void fname(circa::EvalContext* _circa_cxt, \
-            circa::Term* _circa_caller, \
-            circa::Term* _circa_func, \
-            circa::RefList const& _circa_inputs, \
-            circa::TaggedValue* _circa_output)
+            List* _circa_stack, \
+            bytecode::CallOperation* _circa_op)
 
-typedef void (*EvaluateFunc)(EvalContext* cxt, Term* term, Term* func,
-        RefList const& inputs, TaggedValue* output);
+typedef void (*EvaluateFunc)(EvalContext* cxt, List* stack,
+        bytecode::CallOperation* call);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);

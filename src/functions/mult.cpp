@@ -7,12 +7,12 @@ namespace mult_function {
 
     CA_FUNCTION(evaluate_f)
     {
-        set_float(OUTPUT, FLOAT_INPUT(0) * FLOAT_INPUT(1));
+        make_float(OUTPUT, FLOAT_INPUT(0) * FLOAT_INPUT(1));
     }
 
     CA_FUNCTION(evaluate_i)
     {
-        set_int(OUTPUT, INT_INPUT(0) * INT_INPUT(1));
+        make_int(OUTPUT, INT_INPUT(0) * INT_INPUT(1));
     }
 
     CA_FUNCTION(feedback_evaluate)
@@ -34,12 +34,12 @@ namespace mult_function {
 
             // If this product is too close to 0 then give up. We can't solve x = a * 0
             if (fabs(divisor) < 0.0001) {
-                set_float(output, to_float(outputTarget));
+                make_float(output, to_float(outputTarget));
                 continue;
             }
 
             // Otherwise, to solve for x = a * b, tell a that it should be closer to x / b
-            set_float(output, to_float(outputTarget) + balanced_delta / divisor);
+            make_float(output, to_float(outputTarget) + balanced_delta / divisor);
         }
     }
 

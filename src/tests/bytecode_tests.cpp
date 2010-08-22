@@ -74,6 +74,7 @@ void for_loop()
 
     EvalContext cxt;
     List stack;
+    print_bytecode(std::cout, branch);
     evaluate_bytecode(&cxt, &branch._bytecode, &stack);
 }
 

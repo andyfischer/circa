@@ -9,7 +9,7 @@ namespace one_time_assign_function {
     {
         if (!BOOL_INPUT(0)) {
             cast(INPUT(1), OUTPUT);
-            set_bool(INPUT(0), true);
+            make_bool(INPUT(0), true);
         }
     }
 

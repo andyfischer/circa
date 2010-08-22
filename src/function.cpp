@@ -388,6 +388,25 @@ bool inputs_fit_function_dynamic(Term* func, RefList const& inputs)
     return true;
 }
 
+bool values_fit_function_dynamic(Term* func, List* list)
+{
+    bool varArgs = function_t::get_variable_args(func);
+
+    // Fail if wrong # of inputs
+    if (!varArgs && (function_t::num_inputs(func) != list->length()))
+        return false;
+
+    for (int i=0; i < list->length(); i++) {
+        Type* type = type_contents(function_t::get_input_type(func, i));
+        TaggedValue* value = list->get(i);
+        if (value == NULL)
+            continue;
+        if (!value_fits_type(value, type))
+            return false;
+    }
+    return true;
+}
+
 Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads)
 {

@@ -24,19 +24,20 @@
 
 #define EVALUATION_ARGS _circa_cxt, _circa_caller, _circa_func, _circa_inputs, _circa_output
 
-#define INPUT(index) ((circa::TaggedValue*) _circa_inputs[index])
+#define INPUT(index) (_circa_stack->getIndex(_circa_op->inputs[index].stackIndex))
 #define FLOAT_INPUT(index) circa::to_float(INPUT(index))
 #define BOOL_INPUT(index) circa::as_bool(INPUT(index))
 #define STRING_INPUT(index) circa::as_string(INPUT(index)).c_str()
 #define INT_INPUT(index) circa::as_int(INPUT(index))
-#define NUM_INPUTS (_circa_inputs.length())
-#define INPUT_TERM(index) (_circa_caller->input(index))
-#define INPUTS (_circa_inputs)
-#define OUTPUT ((circa::TaggedValue*) _circa_output)
+#define NUM_INPUTS (_circa_op->numInputs)
+#define CALLER (_circa_op->caller)
+#define INPUT_TERM(index) (CALLER->input(index))
+#define CAPTURE_INPUTS(list) (capture_inputs(_circa_stack, _circa_op, (list)))
+//#define INPUTS (_circa_inputs)
+#define OUTPUT (_circa_stack->getIndex(_circa_op->outputIndex))
 #define CONTEXT (_circa_cxt)
-#define FUNCTION (_circa_func)
-#define CALLER (_circa_caller)
-#define CONTEXT_AND_CALLER _circa_cxt, _circa_caller
+#define FUNCTION (_circa_op->function)
+#define CONTEXT_AND_CALLER CONTEXT, CALLER
 
 
 #define CA_SETUP_FUNCTIONS(branch) {\

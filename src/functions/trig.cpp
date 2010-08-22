@@ -10,39 +10,39 @@ namespace trig_function {
         float input = FLOAT_INPUT(0);
 
         // Convert input from 0..1 to 0..2pi
-        set_float(OUTPUT, sin(float(input * 2 * M_PI)));
+        make_float(OUTPUT, sin(float(input * 2 * M_PI)));
     }
     CA_FUNCTION(evaluate_cos)
     {
         float input = FLOAT_INPUT(0);
 
         // Convert input from 0..1 to 0..2pi
-        set_float(OUTPUT, cos(float(input * 2 * M_PI)));
+        make_float(OUTPUT, cos(float(input * 2 * M_PI)));
     }
     CA_FUNCTION(evaluate_tan)
     {
         float input = FLOAT_INPUT(0);
 
         // Convert input from 0..1 to 0..2pi
-        set_float(OUTPUT, tan(float(input * 2 * M_PI)));
+        make_float(OUTPUT, tan(float(input * 2 * M_PI)));
     }
     CA_FUNCTION(evaluate_arcsin)
     {
         float input = FLOAT_INPUT(0);
         float result = asin(input);
-        set_float(OUTPUT, result / float(2 * M_PI));
+        make_float(OUTPUT, result / float(2 * M_PI));
     }
     CA_FUNCTION(evaluate_arccos)
     {
         float input = FLOAT_INPUT(0);
         float result = acos(input);
-        set_float(OUTPUT, result / float(2 * M_PI));
+        make_float(OUTPUT, result / float(2 * M_PI));
     }
     CA_FUNCTION(evaluate_arctan)
     {
         float input = FLOAT_INPUT(0);
         float result = atan(input);
-        set_float(OUTPUT, result / float(2 * M_PI));
+        make_float(OUTPUT, result / float(2 * M_PI));
     }
 
     CA_FUNCTION(feedback_evaluate_sin)
@@ -59,7 +59,7 @@ namespace trig_function {
         float result = std::asin(desired);
 
         // Map result from radians into range of 0..1
-        set_float(OUTPUT, result / float(2 * M_PI));
+        make_float(OUTPUT, result / float(2 * M_PI));
     }
 
     CA_FUNCTION(feedback_evaluate_cos)
@@ -76,7 +76,7 @@ namespace trig_function {
         float result = std::acos(desired);
 
         // Map result from radians into range of 0..1
-        set_float(OUTPUT, result / float(2 * M_PI));
+        make_float(OUTPUT, result / float(2 * M_PI));
     }
 
     void setup(Branch& kernel)

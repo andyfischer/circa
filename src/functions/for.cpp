@@ -35,7 +35,7 @@ namespace for_function {
 #ifndef BYTECODE
         Term* forTerm = INPUT_TERM(0);
         Term* discardCalled = get_for_loop_discard_called(forTerm);
-        set_bool(discardCalled, true);
+        make_bool(discardCalled, true);
 #endif
     }
 

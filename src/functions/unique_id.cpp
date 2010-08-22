@@ -8,7 +8,7 @@ namespace unique_id_function {
     CA_FUNCTION(evaluate)
     {
         static int nextId = 1;
-        set_int(OUTPUT, nextId++);
+        make_int(OUTPUT, nextId++);
     }
 
     void setup(Branch& kernel)

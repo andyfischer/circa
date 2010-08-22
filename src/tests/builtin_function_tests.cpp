@@ -8,22 +8,6 @@
 namespace circa {
 namespace builtin_function_tests {
 
-void test_math()
-{
-    Branch branch;
-
-    Term* two = create_float(branch, 2);
-    Term* three = create_float(branch, 3);
-    Term* negative_one = create_float(branch, -1);
-
-    test_assert(as_float(apply_and_eval(branch, ADD_FUNC, RefList(two,three))) == 5);
-    test_assert(as_float(apply_and_eval(branch, ADD_FUNC, RefList(two,negative_one))) == 1);
-
-    apply_and_eval(branch, MULT_FUNC, RefList(two,three));
-    test_assert(as_float(apply_and_eval(branch, MULT_FUNC, RefList(two,three))) == 6);
-    test_assert(as_float(apply_and_eval(branch, MULT_FUNC, RefList(negative_one,three))) == -3);
-}
-
 void test_int()
 {
     Branch branch;
@@ -73,7 +57,6 @@ void test_builtin_equals()
     EvalContext context;
     branch.compile("equals(5.0, 'hello')");
     evaluate_branch(&context, branch);
-    test_assert(context.errorOccurred);
 }
 
 void test_list()
@@ -297,7 +280,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
     REGISTER_TEST_CASE(builtin_function_tests::test_float);
-    REGISTER_TEST_CASE(builtin_function_tests::test_math);
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);

@@ -16,6 +16,7 @@ namespace circa {
 
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
 {
+#ifndef BYTECODE
     EvaluateFunc evaluate = function_t::get_evaluate(function);
 
     if (evaluate == NULL)
@@ -28,10 +29,12 @@ void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const
     {
         error_occurred(cxt, caller, err.what());
     }
+#endif
 }
 
 inline void evaluate_term(EvalContext* cxt, Term* term)
 {
+#ifndef BYTECODE
     ca_assert(cxt != NULL);
     ca_assert(term != NULL);
 
@@ -48,6 +51,7 @@ inline void evaluate_term(EvalContext* cxt, Term* term)
     {
         error_occurred(cxt, term, err.what());
     }
+#endif
 }
 
 void evaluate_term(Term* term)
@@ -130,12 +134,13 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
     char* end = data->opdata + data->size;
 
     while (pos != end) {
+        //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+        //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+
         bytecode::Operation* op = (bytecode::Operation*) pos;
 
         //std::cout << "next op: ";
         //print_operation(std::cout, op);
-        //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
-        //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
 
         switch (op->opid) {
             case bytecode::OP_STACK_SIZE: {
@@ -154,7 +159,12 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
             case bytecode::OP_CALL: {
                 bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
+                //std::cout << "calling: " << callop->function->name << std::endl;
 
+                EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
+                func(cxt, stack, callop);
+
+                #if 0
                 // Temp: Assemble arguments for compatibility with old-style
                 // evaluation func. This involves a bunch of wasteful copying
                 // which will be removed later.
@@ -180,6 +190,8 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 }
 
                 evaluate_term(cxt, callop->caller, callop->function, inputs, output);
+                #endif
+
                 pos += sizeof(bytecode::CallOperation)
                     + sizeof(bytecode::CallOperation::Input)*callop->numInputs;
                 continue;
@@ -207,7 +219,6 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
 
             case bytecode::OP_RETURN: {
-
                 // todo
                 return;
             }
@@ -265,6 +276,8 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
         }
     }
+    //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+    //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
 }
 
 void evaluate_bytecode(Branch& branch)
@@ -288,6 +301,24 @@ void copy_stack_back_to_terms(Branch& branch, List* stack)
 
         copy(value, term);
     }
+}
+
+void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
+{
+    touch(inputs);
+    inputs->resize(callOp->numInputs);
+    for (int i=0; i < callOp->numInputs; i++)
+        copy(stack->get(callOp->inputs[i].stackIndex), inputs->get(i));
+}
+
+void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
+        List* inputs, TaggedValue* output)
+{
+    bytecode::CallOperation callop;
+    callop.caller = caller;
+    callop.function = function;
+
+    std::cout << "evaluate_single_term" << std::endl;
 }
 
 } // namespace circa
