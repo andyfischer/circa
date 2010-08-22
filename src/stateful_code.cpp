@@ -24,9 +24,12 @@ bool is_function_stateful(Term* func)
 
 bool has_any_inlined_state(Branch& branch)
 {
-    for (int i=0; i < branch.length(); i++)
+    for (int i=0; i < branch.length(); i++) {
         if (is_stateful(branch[i]))
             return true;
+        if (has_any_inlined_state(branch[i]->nestedContents))
+            return true;
+    }
     return false;
 }
 

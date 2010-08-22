@@ -12,6 +12,10 @@ namespace overloaded_function {
         Term* func = FUNCTION;
         List& overloads = function_t::get_attrs(func).parameters;
 
+#ifdef BYTECODE
+        // FIXME
+        return;
+#else
         // Dynamically find the right overload.
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
@@ -22,6 +26,7 @@ namespace overloaded_function {
                 return;
             }
         }
+#endif
 
         error_occurred(CONTEXT, CALLER, "No usable overload found");
     }

@@ -25,12 +25,16 @@ namespace map_function {
         List* list = List::checkCast(OUTPUT);
         list->resize(numInputs);
 
+#ifdef BYTECODE
+        // FIXME
+#else
         for (int i=0; i < numInputs; i++) {
             copy(inputs->getIndex(i), evalInput);
             evaluate_branch(evaluationBranch);
 
             copy(evalResult, list->get(i));
         }
+#endif
     }
 
     void setup(Branch& kernel)

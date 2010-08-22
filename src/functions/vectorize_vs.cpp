@@ -31,6 +31,7 @@ namespace vectorize_vs_function {
         {
             RefList inputs(&leftTerm, right);
 
+#ifndef BYTECODE
             for (int i=0; i < numInputs; i++) {
                 TaggedValue* item = output->getIndex(i);
                 change_type(item, funcOutputType);
@@ -38,6 +39,7 @@ namespace vectorize_vs_function {
                 copy(left->get(i), &leftTerm);
                 evaluate_term(CONTEXT, CALLER, func, inputs, item);
             }
+#endif
         }
 
         ca_assert(leftTerm.refCount == 1);

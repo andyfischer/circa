@@ -57,6 +57,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
+    //dump_branch(code);
+
     EvalContext result;
     evaluate_branch(&result, code);
 
