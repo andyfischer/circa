@@ -216,6 +216,8 @@ void write_op(WriteContext* context, Term* term);
 int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
         int firstIndex=0, int lastIndex=-1);
 
+int write_bytecode_for_branch_inline(WriteContext* context, Branch& branch);
+
 void update_bytecode(Branch& branch, BytecodeData* bytecode);
 void update_bytecode(Branch& branch);
 

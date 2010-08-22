@@ -3,6 +3,7 @@
 #include "types/list.h"
 #include "build_options.h"
 #include "debug_valid_objects.h"
+#include "errors.h"
 #include "tagged_value.h"
 #include "tvvector.h"
 
@@ -24,14 +25,21 @@ struct ListData {
 void assert_valid_list(ListData* list)
 {
     if (list == NULL) return;
-    ca_assert(list->refCount > 0);
     debug_assert_valid_object(list, LIST_OBJECT);
+    if (list->refCount == 0) {
+        std::stringstream err;
+        err << "list has zero refs: " << list;
+        internal_error(err.str().c_str());
+    }
+    ca_assert(list->refCount > 0);
 }
 
 void incref(ListData* data)
 {
     assert_valid_list(data);
     data->refCount++;
+
+    //std::cout << "incref " << data << " to " << data->refCount << std::endl;
 }
 
 void decref(ListData* data)
@@ -47,6 +55,8 @@ void decref(ListData* data)
         free(data);
         debug_unregister_valid_object(data);
     }
+
+    //std::cout << "decref " << data << " to " << data->refCount << std::endl;
 }
 
 ListData* create_list(int capacity)
@@ -60,6 +70,9 @@ ListData* create_list(int capacity)
     memset(result->items, 0, capacity * sizeof(TaggedValue));
     for (int i=0; i < capacity; i++)
         result->items[i].init();
+
+    //std::cout << "created list " << result << std::endl;
+
     return result;
 }
 

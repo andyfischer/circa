@@ -309,6 +309,12 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     return lastStackIndex;
 }
 
+int write_bytecode_for_branch_inline(WriteContext* context, Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++)
+        write_op(context, branch[i]);
+}
+
 void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
 {
     // Clear stack indexes for all terms, these will be reassigned inside write_op.

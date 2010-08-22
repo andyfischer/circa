@@ -737,9 +737,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
-    Term* iterator_type = find_type_of_get_index(listExpr);
-    Term* iterator = create_value(innerBranch, iterator_type, iterator_name);
-    set_source_hidden(iterator, true);
+    /*Term* iterator = */ setup_for_loop_iterator(forTerm, iterator_name.c_str());
 
     consume_branch(innerBranch, tokens);
 

@@ -15,6 +15,7 @@ static unsigned int gNextGlobalID = 1;
 Term::Term()
   : owningBranch(NULL),
     index(0),
+    stackIndex(-1),
     flags(0),
     refCount(0)
 {

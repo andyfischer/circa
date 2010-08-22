@@ -13,8 +13,33 @@ namespace vectorize_vv_function {
         return LIST_TYPE;
     }
 
+    void writeBytecode(bytecode::WriteContext* context, Term* term)
+    {
+        // we have: inputs = (left, right) and func()
+        // turn this into: for i in length { func(left[i], right[i]) }
+
+        Branch &branch = term->nestedContents;
+        branch.clear();
+        Term* left = term->input(0);
+        Term* right = term->input(1);
+        Term* zero = create_int(branch, 0);
+        Term* length = apply(branch, get_global("length"), RefList(left));
+        Term* range = apply(branch, get_global("range"), RefList(zero, length));
+        Term* forTerm = apply(branch, FOR_FUNC, RefList(range));
+        setup_for_loop_pre_code(forTerm);
+        Term* iterator = setup_for_loop_iterator(forTerm, "i");
+        Term* func = as_ref(function_t::get_parameters(term->function));
+        Term* left_i = apply(forTerm->nestedContents, get_global("get_index"), RefList(left, iterator));
+        Term* right_i = apply(forTerm->nestedContents, get_global("get_index"), RefList(right, iterator));
+        apply(forTerm->nestedContents, func, RefList(left_i, right_i));
+        setup_for_loop_post_code(forTerm);
+        //forTerm->stackIndex = term->stackIndex;
+        write_bytecode_for_branch_inline(context, branch);
+    }
+
     CA_FUNCTION(evaluate)
     {
+#ifndef BYTECODE
         Term* func = as_ref(function_t::get_parameters(FUNCTION));
 
         List* left = List::checkCast(INPUT(0));
@@ -40,7 +65,6 @@ namespace vectorize_vv_function {
         {
             RefList inputs(&leftTerm, &rightTerm);
 
-#ifndef BYTECODE
             for (int i=0; i < numInputs; i++) {
                 TaggedValue* item = output->getIndex(i);
                 change_type(item, funcOutputType);
@@ -48,29 +72,10 @@ namespace vectorize_vv_function {
                 copy(right->get(i), &rightTerm);
                 evaluate_term(CONTEXT, CALLER, func, inputs, item);
             }
-#endif
         }
         
         ca_assert(leftTerm.refCount == 1);
         ca_assert(rightTerm.refCount == 1);
-
-#if 0
-        Branch evaluationBranch;
-        Term* input0 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
-        Term* input1 = apply(evaluationBranch, INPUT_PLACEHOLDER_FUNC, RefList());
-
-        Term* evalResult = apply(evaluationBranch, func, RefList(input0, input1));
-
-        output->resize(numInputs);
-        touch(output);
-
-        for (int i=0; i < numInputs; i++) {
-            copy(left->getIndex(i), input0);
-            copy(right->getIndex(i), input1);
-            evaluate_branch(evaluationBranch);
-
-            copy(evalResult, output->get(i));
-        }
 #endif
     }
 
@@ -79,6 +84,7 @@ namespace vectorize_vv_function {
         Term* func = import_function(kernel, evaluate,
                 "vectorize_vv(List,List) -> List");
         function_t::get_specialize_type(func) = specializeType;
+        function_t::get_attrs(func).writeBytecode = writeBytecode;
     }
 }
 } // namespace circa

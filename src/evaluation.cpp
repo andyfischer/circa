@@ -152,6 +152,7 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             case bytecode::OP_PUSH_VALUE: {
                 bytecode::PushValueOperation *callop = (bytecode::PushValueOperation*) op;
                 TaggedValue* output = stack->get(callop->outputIndex);
+                ca_assert(output != NULL);
                 change_type(output, type_contents(callop->source->type));
                 copy(callop->source, output);
                 pos += sizeof(bytecode::PushValueOperation);

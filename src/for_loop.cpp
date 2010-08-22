@@ -64,7 +64,9 @@ Term* get_for_loop_any_iterations(Term* forTerm)
 Term* get_for_loop_modify_list(Term* forTerm)
 {
     #ifdef BYTECODE
-    return forTerm->nestedContents[0]->nestedContents[0];
+    Term* term = forTerm->nestedContents[0]->nestedContents[0];
+    ca_assert(term != NULL);
+    return term;
     #else
     return forTerm->nestedContents[0]->nestedContents[2];
     #endif
@@ -102,6 +104,14 @@ void setup_for_loop_pre_code(Term* forTerm)
     create_ref(attributes, VOID_TYPE, "#state_type");
     create_branch(forContents, "#rebinds");
 #endif
+}
+
+Term* setup_for_loop_iterator(Term* forTerm, const char* name)
+{
+    Term* iteratorType = find_type_of_get_index(forTerm->input(0));
+    Term* result = create_value(forTerm->nestedContents, iteratorType, name);
+    set_source_hidden(result, true);
+    return result;
 }
 
 void setup_for_loop_post_code(Term* forTerm)

@@ -170,6 +170,9 @@ void cast(TaggedValue* source, TaggedValue* dest)
 
 void copy(TaggedValue* source, TaggedValue* dest)
 {
+    if (source == dest)
+        return;
+
     change_type(dest, source->value_type);
     Type::Copy copyFunc = source->value_type->copy;
 
@@ -299,6 +302,9 @@ void touch(TaggedValue* value)
 
 void change_type(TaggedValue* v, Type* type)
 {
+    ca_assert(v != NULL);
+    // type may be null
+
     if (v->value_type == type)
         return;
 

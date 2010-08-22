@@ -20,6 +20,7 @@ Ref& get_for_loop_state_type(Term* forTerm);
 CA_FUNCTION(evaluate_for_loop);
 #endif
 void setup_for_loop_pre_code(Term* forTerm);
+Term* setup_for_loop_iterator(Term* forTerm, const char* name);
 void setup_for_loop_post_code(Term* forTerm);
 
 Term* find_enclosing_for_loop(Term* term);
