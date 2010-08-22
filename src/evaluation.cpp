@@ -312,6 +312,14 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
         copy(stack->get(callOp->inputs[i].stackIndex), inputs->get(i));
 }
 
+TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index)
+{
+    ca_assert(index < callOp->numInputs);
+    int stackIndex = callOp->inputs[index].stackIndex;
+    ca_assert(stackIndex != -1);
+    return stack->get(stackIndex);
+}
+
 void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
         List* inputs, TaggedValue* output)
 {

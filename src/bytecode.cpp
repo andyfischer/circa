@@ -267,6 +267,12 @@ void write_op(WriteContext* context, Term* term)
     return write_call_op(context, term);
 }
 
+void assign_stack_index(WriteContext* context, Term* term)
+{
+    if (term->stackIndex == -1)
+        term->stackIndex = context->nextStackIndex++;
+}
+
 int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
         int firstIndex, int lastIndex)
 {

@@ -18,6 +18,14 @@ namespace vectorize_vv_function {
         // we have: inputs = (left, right) and func()
         // turn this into: for i in length { func(left[i], right[i]) }
 
+        Term* func = as_ref(function_t::get_parameters(term->function));
+
+        {
+            std::stringstream comment;
+            comment << "begin vectorize_vv(" << func->name << ")";
+            bytecode::write_comment(context, comment.str().c_str());
+        }
+
         Branch &branch = term->nestedContents;
         branch.clear();
         Term* left = term->input(0);
@@ -28,13 +36,21 @@ namespace vectorize_vv_function {
         Term* forTerm = apply(branch, FOR_FUNC, RefList(range));
         setup_for_loop_pre_code(forTerm);
         Term* iterator = setup_for_loop_iterator(forTerm, "i");
-        Term* func = as_ref(function_t::get_parameters(term->function));
         Term* left_i = apply(forTerm->nestedContents, get_global("get_index"), RefList(left, iterator));
         Term* right_i = apply(forTerm->nestedContents, get_global("get_index"), RefList(right, iterator));
         apply(forTerm->nestedContents, func, RefList(left_i, right_i));
         setup_for_loop_post_code(forTerm);
-        //forTerm->stackIndex = term->stackIndex;
+
+        bytecode::assign_stack_index(context, term);
+        forTerm->stackIndex = term->stackIndex;
+
         write_bytecode_for_branch_inline(context, branch);
+
+        {
+            std::stringstream comment;
+            comment << "finish vectorize_vv(" << func->name << ")";
+            bytecode::write_comment(context, comment.str().c_str());
+        }
     }
 
     CA_FUNCTION(evaluate)

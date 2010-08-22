@@ -24,7 +24,7 @@
 
 #define EVALUATION_ARGS _circa_cxt, _circa_caller, _circa_func, _circa_inputs, _circa_output
 
-#define INPUT(index) (_circa_stack->getIndex(_circa_op->inputs[index].stackIndex))
+#define INPUT(index) (get_input(_circa_stack, _circa_op, (index)))
 #define FLOAT_INPUT(index) circa::to_float(INPUT(index))
 #define BOOL_INPUT(index) circa::as_bool(INPUT(index))
 #define STRING_INPUT(index) circa::as_string(INPUT(index)).c_str()

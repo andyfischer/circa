@@ -48,6 +48,7 @@ void evaluate_without_side_effects(Term* term);
 
 void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
+TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index);
 void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
         List* inputs, TaggedValue* output);
 

@@ -357,8 +357,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     Term* inputTerm = forTerm->input(0);
     std::string const& listName = inputTerm->name;
     bool hasState = has_any_inlined_state(forContents);
-
-    forTerm->stackIndex = context->nextStackIndex++;
+    bytecode::assign_stack_index(context, forTerm);
     int outputList = forTerm->stackIndex;
     ca_assert(outputList != -1);
     bool writingOutputList = true;
@@ -368,14 +367,14 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         // For names in #outer_rebinds, the join terms should have the same stack
         // indices as the term's output.
         for (int i=0; i < outerRebinds.length(); i++) {
-            int stackIndex = context->nextStackIndex++;
-            outerRebinds[i]->stackIndex = stackIndex;
+            Term* outerRebind = outerRebinds[i];
+            bytecode::assign_stack_index(context, outerRebind);
 
             // Don't treat the list name as a name to join, this is handled differently
-            if (outerRebinds[i]->name == listName)
+            if (outerRebind->name == listName)
                 continue;
 
-            forContents[outerRebinds[i]->name]->stackIndex = stackIndex;
+            forContents[outerRebinds[i]->name]->stackIndex = outerRebind->stackIndex;
         }
     }
 
