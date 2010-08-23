@@ -47,6 +47,7 @@ struct Type;
 struct TypeRef;
 
 namespace bytecode {
+    struct BytecodeData;
     struct CallOperation;
     struct WriteContext;
 }

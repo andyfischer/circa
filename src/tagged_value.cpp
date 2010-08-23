@@ -202,11 +202,15 @@ void swap(TaggedValue* left, TaggedValue* right)
 
 void reset(TaggedValue* value)
 {
+    // Check for NULL, not all TaggedValue functions do this.
+    if (value->value_type == NULL)
+        return make_null(value);
+
     Type* type = value->value_type;
 
     // Check if there is a default value defined
     TaggedValue* defaultValue = type_t::get_default_value(type);
-    if (defaultValue != NULL && !is_null(defaultValue)) {
+    if (defaultValue != NULL && !is_null(defaultValue) && defaultValue->value_type) {
         copy(defaultValue, value);
         return;
     }

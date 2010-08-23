@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
+#include "references.h"
 #include "tagged_value.h"
 
 namespace circa {
@@ -10,6 +11,7 @@ namespace circa {
 struct EvalContext
 {
     bool interruptSubroutine;
+
     TaggedValue subroutineOutput;
 
     // Error information:

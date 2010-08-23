@@ -45,10 +45,14 @@ namespace inline_state_function {
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
     {
         ca_assert(context->topLevelState != -1);
-        int inputs[] = { context->inlineState, term->input(1)->stackIndex };
+        int inputs[] = { context->inlineState,
+            term->input(1)->stackIndex,
+            -1 };
+        if (term->input(2) != NULL)
+            inputs[2] = term->input(2)->stackIndex;
         if (term->stackIndex == -1)
             term->stackIndex = context->nextStackIndex++;
-        bytecode::write_call_op(context, term, term->function, 2, inputs, term->stackIndex);
+        bytecode::write_call_op(context, term, term->function, 3, inputs, term->stackIndex);
     }
 
     CA_DEFINE_FUNCTION(set_state_field,

@@ -281,6 +281,7 @@ void setup_type(Type* type)
 
 CA_FUNCTION(append)
 {
+    make_list(OUTPUT);
     List* result = List::checkCast(OUTPUT);
     copy(INPUT(0), OUTPUT);
     TaggedValue* value = INPUT(1);

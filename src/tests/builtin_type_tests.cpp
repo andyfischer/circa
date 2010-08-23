@@ -78,12 +78,14 @@ void test_list()
 {
     Branch branch;
 
-    Term* l = branch.eval("l = List()");
+    Term* l = branch.compile("l = List()");
 
+    evaluate_branch(branch);
     test_assert(list_t::is_list(l));
     test_assert(l->numElements() == 0);
 
-    l = branch.eval("l.append(2)");
+    l = branch.compile("l.append(2)");
+    evaluate_branch(branch);
     test_assert(l->numElements() == 1);
     test_assert(l->getIndex(0)->asInt() == 2);
 }

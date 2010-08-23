@@ -7,6 +7,7 @@ namespace map_function {
 
     CA_FUNCTION(evaluate)
     {
+#ifndef BYTECODE
         Term* func = INPUT_TERM(0);
         List* inputs = List::checkCast(INPUT(1));
 
@@ -25,9 +26,6 @@ namespace map_function {
         List* list = List::checkCast(OUTPUT);
         list->resize(numInputs);
 
-#ifdef BYTECODE
-        // FIXME
-#else
         for (int i=0; i < numInputs; i++) {
             copy(inputs->getIndex(i), evalInput);
             evaluate_branch(evaluationBranch);

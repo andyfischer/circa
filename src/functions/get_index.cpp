@@ -21,6 +21,10 @@ namespace get_index_function {
         copy(result, OUTPUT);
     }
 
+    void get_index_writeBytecode(bytecode::WriteContext* context, Term* term)
+    {
+    }
+
     CA_DEFINE_FUNCTION(get_index_from_branch, "get_index_from_branch(any, int) -> any")
     {
         // Not sure if this function will be permanent

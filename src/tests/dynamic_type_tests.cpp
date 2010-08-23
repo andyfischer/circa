@@ -26,7 +26,8 @@ void test_subroutine()
     branch.compile("def f(any v) -> any return(v) end");
     test_assert(branch);
 
-    Term* a = branch.eval("f('test')");
+    Term* a = branch.compile("f('test')");
+    evaluate_branch(branch);
 
     test_assert(is_string(a));
     test_assert(as_string(a) == "test");

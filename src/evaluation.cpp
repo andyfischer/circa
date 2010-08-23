@@ -130,15 +130,17 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
     //std::cout << "running bytecode:" << std::endl;
     //print_bytecode(std::cout, data);
 
+    data->inuse = true;
+
     char* pos = data->opdata;
     char* end = data->opdata + data->size;
 
     while (pos != end) {
-        //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
-        //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
 
         bytecode::Operation* op = (bytecode::Operation*) pos;
 
+        //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+        //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
         //std::cout << "next op: ";
         //print_operation(std::cout, op);
 
@@ -220,7 +222,9 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
 
             case bytecode::OP_RETURN: {
-                // todo
+                bytecode::ReturnOperation *retop = (bytecode::ReturnOperation*) op;
+                if (retop->stackIndex != -1)
+                    copy(stack->get(retop->stackIndex), &cxt->subroutineOutput);
                 return;
             }
             case bytecode::OP_PUSH_INT: {
@@ -265,6 +269,11 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 pos += sizeof(bytecode::CopyOperation);
                 continue;
             }
+            case bytecode::OP_RAISE: {
+                //bytecode::RaiseOperation *raiseop = (bytecode::RaiseOperation*) op;
+                cxt->errorOccurred = true;
+                continue;
+            }
             case bytecode::OP_COMMENT: {
                 bytecode::CommentOperation *commentop = (bytecode::CommentOperation*) op;
                 pos += commentop->size;
@@ -277,6 +286,8 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
         }
     }
+
+    data->inuse = false;
     //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
     //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
 }
@@ -316,7 +327,8 @@ TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index)
 {
     ca_assert(index < callOp->numInputs);
     int stackIndex = callOp->inputs[index].stackIndex;
-    ca_assert(stackIndex != -1);
+    if (stackIndex == -1)
+        return NULL;
     return stack->get(stackIndex);
 }
 

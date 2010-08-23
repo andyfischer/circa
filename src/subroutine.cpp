@@ -1,5 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "evaluation.h"
 #include "circa.h"
 #include "importing_macros.h"
 
@@ -22,6 +23,26 @@ namespace subroutine_t {
 
     CA_FUNCTION(evaluate)
     {
+#ifdef BYTECODE
+        // Copy inputs to a new stack
+        List stack;
+        stack.resize(NUM_INPUTS);
+        for (int i=0; i < NUM_INPUTS; i++) {
+            TaggedValue* input = INPUT(i);
+            if (input != NULL)
+                copy(input, stack.get(i));
+        }
+
+        reset(&CONTEXT->subroutineOutput);
+
+        Term* function = FUNCTION;
+        Branch& functionBranch = function->nestedContents;
+        bytecode::update_bytecode(functionBranch);
+        evaluate_bytecode(CONTEXT, &functionBranch._bytecode, &stack);
+
+        swap(&CONTEXT->subroutineOutput, OUTPUT);
+        reset(&CONTEXT->subroutineOutput);
+#else
         Term* function = FUNCTION;
         Branch& functionBranch = function->nestedContents;
 
@@ -78,18 +99,6 @@ namespace subroutine_t {
         bool returnCalled = CONTEXT->interruptSubroutine;
         CONTEXT->interruptSubroutine = false;
 
-#if 0
-        // Hold a copy of output for now
-        TaggedValue outputValue;
-
-        // Copy output if no error occurred
-        if (!CONTEXT->errorOccurred
-                && functionBranch.length() > 0) {
-            Term* output = functionBranch[functionBranch.length()-1];
-            copy(output, &outputValue);
-        }
-#endif
-
         // Store state
         if (hiddenState != NULL)
             persist_state_from_branch(functionBranch, hiddenState);
@@ -110,6 +119,11 @@ namespace subroutine_t {
             else
                 copy(output, OUTPUT);
         }
+#endif
+    }
+    void write_bytecode(bytecode::WriteContext* context, Term* term)
+    {
+        // todo?
     }
 }
 
@@ -123,6 +137,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
 {
     // Install evaluate function
     function_t::get_evaluate(sub) = subroutine_t::evaluate;
+    //function_t::get_attrs(sub).writeBytecode = subroutine_t::write_bytecode;
 
     subroutine_update_state_type_from_contents(sub);
 }

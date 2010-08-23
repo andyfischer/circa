@@ -56,6 +56,7 @@ enum OpId {
     OP_APPEND,
     OP_NUM_ELEMENTS,
     OP_COPY,
+    OP_RAISE,
     OP_COMMENT,
     OP_VAR_NAME
 };
@@ -92,6 +93,7 @@ struct PushValueOperation {
 struct ReturnOperation {
     OpId opid;
     Term* caller;
+    int stackIndex;
 };
 
 struct JumpOperation {
@@ -141,6 +143,10 @@ struct CopyOperation {
     int fromIndex;
     int toIndex;
 };
+struct RaiseOperation {
+    OpId opid;
+    int value;
+};
 struct CommentOperation {
     OpId opid;
     int size;
@@ -186,8 +192,9 @@ struct BytecodeData {
     size_t size;
     size_t capacity;
     char* opdata;
+    bool inuse;
 
-    BytecodeData(): needsUpdate(true), size(0), capacity(0), opdata(NULL) {}
+    BytecodeData(): needsUpdate(true), size(0), capacity(0), opdata(NULL), inuse(false) {}
 };
 
 // The size of the operation, in words.
@@ -205,6 +212,7 @@ void write_get_index(WriteContext* context, int listIndex, int indexInList, int 
 void write_increment(WriteContext* context, int intIndex);
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex);
 void write_copy(WriteContext* context, int fromIndex, int toIndex);
+void write_raise(WriteContext* context);
 void write_comment(WriteContext* context, const char* str);
 void write_var_name(WriteContext* context, int stackIndex, const char* name);
 void write_op(WriteContext* context, Term* term);
@@ -219,7 +227,8 @@ void assign_stack_index(WriteContext* context, Term* term);
 int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
         int firstIndex=0, int lastIndex=-1);
 
-int write_bytecode_for_branch_inline(WriteContext* context, Branch& branch);
+void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch);
+void write_raise_if(WriteContext* context, Term* errorCondition);
 
 void update_bytecode(Branch& branch, BytecodeData* bytecode);
 void update_bytecode(Branch& branch);
