@@ -35,10 +35,13 @@ void test_subroutine()
     branch.clear();
     branch.compile("def f(bool b, any v) -> any; if b return(v) else return(5) end end");
 
-    Term* b = branch.eval("f(true, 'test')");
+    Term* b = branch.compile("f(true, 'test')");
+    Term* c = branch.compile("f(false, 'test')");
+
+    evaluate_branch(branch);
+
     test_assert(is_string(b));
     test_assert(as_string(b) == "test");
-    Term* c = branch.eval("f(false, 'test')");
     test_assert(is_int(c));
     test_assert(as_int(c) == 5);
 }
@@ -50,17 +53,24 @@ void test_field_access()
     Term* T = branch.compile("type T { int a, string b }");
     branch.compile("def f() -> any; return(T([4, 's'])); end");
     Term* r = branch.compile("r = f()");
-    evaluate_branch(branch);
-    branch.compile("r.a");
 
+    evaluate_branch(branch);
+    bytecode::print_bytecode(std::cout, branch["f"]->nestedContents);
+
+    branch.compile("r.a");
     test_assert(branch);
-    test_assert(branch.eval("r.a == 4"));
-    test_assert(branch.eval("r.b == 's'"));
+    Term* eq1 = branch.compile("r.a == 4");
+    Term* eq2 = branch.compile("r.b == 's'");
+    evaluate_branch(branch);
+    dump_branch(branch);
+
+    test_assert(as_bool(eq1));
+    test_assert(as_bool(eq2));
 
     test_assert(r->type == ANY_TYPE);
     test_assert(r->value_type == get_pointer(T));
 
-    branch.eval("r.b = 's2'");
+    branch.compile("r.b = 's2'");
     test_assert(branch);
 }
 

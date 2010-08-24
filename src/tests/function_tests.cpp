@@ -141,7 +141,7 @@ void test_call_copied_function()
 void test_calling_manual_overloaded_function()
 {
     Branch branch;
-    Term* my_add = branch.eval("my_add = overloaded_function(add_f add_i)");
+    Term* my_add = branch.compile("my_add = overloaded_function(add_f add_i)");
 
     Term* two = branch.compile("2");
     RefList inputs(two, two);
@@ -151,6 +151,14 @@ void test_calling_manual_overloaded_function()
     test_assert(branch);
     test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);
     test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
+}
+
+void test_bug_where_a_mysterious_copy_term_was_added()
+{
+    Branch branch;
+    branch.compile("def f()->int return 1 end");
+    for (BranchIterator it(branch); !it.finished(); ++it)
+        test_assert(it->function->name != "copy");
 }
 
 void register_tests()
@@ -165,6 +173,7 @@ void register_tests()
     // Unsupported:
     //REGISTER_TEST_CASE(function_tests::test_call_copied_function);
     REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
+    REGISTER_TEST_CASE(function_tests::test_bug_where_a_mysterious_copy_term_was_added);
 }
 
 } // namespace function_tests

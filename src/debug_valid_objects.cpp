@@ -5,6 +5,7 @@
 #endif
 
 #include "build_options.h"
+#include "errors.h"
 #include "debug_valid_objects.h"
 #include "term.h"
 
@@ -15,15 +16,23 @@ std::map<void*, int> g_addressToType;
 
 void debug_register_valid_object(void* obj, int type)
 {
-    bool valid = g_addressToType.find(obj) != g_addressToType.end();
-    ca_assert(!valid);
+    bool alreadyValid = g_addressToType.find(obj) != g_addressToType.end();
+    if (alreadyValid) {
+        std::stringstream err;
+        err << "Double register at address: " << size_t(obj);
+        internal_error(err.str().c_str());
+    }
     g_addressToType[obj] = type;
 }
 
 void debug_unregister_valid_object(void* obj)
 {
     bool valid = g_addressToType.find(obj) != g_addressToType.end();
-    ca_assert(valid);
+    if (!valid) {
+        std::stringstream err;
+        err << "Freed unregistered address: " << size_t(obj);
+        internal_error(err.str().c_str());
+    }
     g_addressToType.erase(obj);
 }
 
@@ -31,9 +40,18 @@ void debug_assert_valid_object(void* obj, int type)
 {
     if (obj == NULL) return;
     bool valid = g_addressToType.find(obj) != g_addressToType.end();
-    ca_assert(valid);
+    if (!valid) {
+        std::stringstream err;
+        err << "assert_valid_object failed, nothing registered at addr " << size_t(obj);
+        internal_error(err.str().c_str());
+    }
     int existingType = g_addressToType[obj];
-    ca_assert(type == existingType);
+    if (type != existingType) {
+        std::stringstream err;
+        err << "assert_valid_object failed, type mismatch (expected " << type
+            << ", found " << existingType << ")";
+        internal_error(err.str().c_str());
+    }
 }
 
 #endif

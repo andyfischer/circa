@@ -289,6 +289,10 @@ Term* statement(Branch& branch, TokenStream& tokens)
     else if (tokens.nextIs(STATE)) {
         result = stateful_value_decl(branch, tokens);
     }
+    // Return statement
+    else if (tokens.nextIs(RETURN)) {
+        result = return_statement(branch, tokens);
+    }
 
     // Discard statement
     else if (tokens.nextIs(DISCARD)) {
@@ -945,6 +949,21 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
     return result;
 }
 
+Term* return_statement(Branch& branch, TokenStream& tokens)
+{
+    tokens.consume(RETURN);
+    possible_whitespace(tokens);
+
+    Term* result = infix_expression(branch, tokens);
+
+    for (int i=0; i < result->numInputs(); i++)
+        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
+
+    result = apply(branch, RETURN_FUNC, RefList(result));
+    
+    return result;
+}
+
 Term* discard_statement(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1247,6 +1266,8 @@ Term* function_call(Branch& branch, Term* function, std::string const& nameUsed,
 
         if (!is_callable(function))
             function = UNKNOWN_FUNCTION;
+
+        //overloaded_function::is_overloaded_function(function);
        
         result = apply(branch, function, arguments);
 

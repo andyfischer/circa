@@ -62,6 +62,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     Term* outputType = function_get_specialized_output_type(function, result);
 
     ca_assert(outputType != NULL);
+    ca_assert(size_t(outputType) > 10);
     ca_assert(is_type(outputType));
 
     change_type(result, outputType);

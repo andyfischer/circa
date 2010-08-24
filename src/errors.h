@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "common_headers.h"
+
 namespace circa {
 
 // Puts 'errorTerm' into an error state, with the given message.

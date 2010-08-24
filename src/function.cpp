@@ -1,8 +1,27 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "debug_valid_objects.h"
 
 namespace circa {
+
+FunctionAttrs::FunctionAttrs()
+  : variableArgs(false),
+    currentlyEvaluating(false),
+    evaluate(NULL),
+    specializeType(NULL),
+    formatSource(NULL),
+    checkInvariants(NULL),
+    staticTypeQuery(NULL),
+    writeBytecode(NULL)
+{
+    debug_register_valid_object(this, FUNCTION_ATTRS_OBJECT);
+}
+
+FunctionAttrs::~FunctionAttrs()
+{
+    debug_unregister_valid_object(this);
+}
 
 namespace function_attrs_t {
 
@@ -164,7 +183,9 @@ namespace function_t {
     {
         ca_assert(function->nestedContents.length() > 0);
         ca_assert(function->nestedContents[0]->type == FUNCTION_ATTRS_TYPE);
-        return as_function_attrs(function->nestedContents[0]);
+        FunctionAttrs* attrs= &as_function_attrs(function->nestedContents[0]);
+        debug_assert_valid_object(attrs, FUNCTION_ATTRS_OBJECT);
+        return *attrs;
     }
 
     std::string const& get_name(Term* function)
@@ -287,6 +308,7 @@ bool is_function_attrs(Term* term)
 FunctionAttrs& as_function_attrs(Term* term)
 {
     ca_assert(is_function_attrs(term));
+    ca_assert(get_pointer(term) != NULL);
     return *((FunctionAttrs*) get_pointer(term));
 }
 

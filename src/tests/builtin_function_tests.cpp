@@ -153,9 +153,6 @@ void test_vectorized_funcs_with_points()
     branch.compile("print('b = ' b)");
 
     evaluate_branch(branch);
-    bytecode::print_bytecode(std::cout, branch);
-    dump_branch(branch);
-    //std::cout << "stack = " << b->stackIndex << std::endl;
 
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);

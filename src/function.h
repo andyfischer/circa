@@ -35,16 +35,8 @@ struct FunctionAttrs
 
     List parameters;
 
-    FunctionAttrs()
-      : variableArgs(false),
-        currentlyEvaluating(false),
-        evaluate(NULL),
-        specializeType(NULL),
-        formatSource(NULL),
-        checkInvariants(NULL),
-        staticTypeQuery(NULL),
-        writeBytecode(NULL)
-    {}
+    FunctionAttrs();
+    ~FunctionAttrs();
 };
 
 namespace function_attrs_t {

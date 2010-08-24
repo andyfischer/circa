@@ -12,6 +12,8 @@
 #include "term.h"
 #include "type.h"
 
+#define VERBOSE_PRINT_VM 0
+
 namespace circa {
 
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
@@ -67,7 +69,6 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     List stack;
     evaluate_bytecode(context, &branch._bytecode, &stack);
     copy_stack_back_to_terms(branch, &stack);
-    //std::cout << "stack = " << stack.toString() << std::endl;
 #else
 
     ca_assert(context != NULL);
@@ -139,10 +140,12 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
 
         bytecode::Operation* op = (bytecode::Operation*) pos;
 
-        //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
-        //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
-        //std::cout << "next op: ";
-        //print_operation(std::cout, op);
+        #if VERBOSE_PRINT_VM
+            std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+            std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+            std::cout << "next op: ";
+            print_operation(std::cout, op);
+        #endif
 
         switch (op->opid) {
             case bytecode::OP_STACK_SIZE: {
@@ -223,9 +226,10 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
 
             case bytecode::OP_RETURN: {
                 bytecode::ReturnOperation *retop = (bytecode::ReturnOperation*) op;
-                if (retop->stackIndex != -1)
+                if (retop->stackIndex != -1) {
                     copy(stack->get(retop->stackIndex), &cxt->subroutineOutput);
-                return;
+                }
+                goto loop_end;
             }
             case bytecode::OP_PUSH_INT: {
                 bytecode::PushIntOperation *pushop = (bytecode::PushIntOperation*) op;
@@ -287,9 +291,12 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
         }
     }
 
+loop_end:
     data->inuse = false;
-    //std::cout << std::endl << "stack: " << stack->toString() << std::endl;
-    //std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+    #if VERBOSE_PRINT_VM
+        std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+        std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+    #endif
 }
 
 void evaluate_bytecode(Branch& branch)

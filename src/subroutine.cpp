@@ -37,11 +37,14 @@ namespace subroutine_t {
 
         Term* function = FUNCTION;
         Branch& functionBranch = function->nestedContents;
-        bytecode::update_bytecode(functionBranch);
+        if (!functionBranch._bytecode.inuse)
+            bytecode::update_bytecode(functionBranch);
         evaluate_bytecode(CONTEXT, &functionBranch._bytecode, &stack);
 
         swap(&CONTEXT->subroutineOutput, OUTPUT);
         reset(&CONTEXT->subroutineOutput);
+        std::cout << "sub returned: " << OUTPUT->toString() << std::endl;
+
 #else
         Term* function = FUNCTION;
         Branch& functionBranch = function->nestedContents;
@@ -121,23 +124,23 @@ namespace subroutine_t {
         }
 #endif
     }
-    void write_bytecode(bytecode::WriteContext* context, Term* term)
-    {
-        // todo?
-    }
 }
 
 bool is_subroutine(Term* term)
 {
-    return (term->type == FUNCTION_TYPE)
-        && function_t::get_evaluate(term) == subroutine_t::evaluate;
+    if (term->type != FUNCTION_TYPE)
+        return false;
+    if (term->nestedContents.length() < 1)
+        return false;
+    if (term->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
+        return false;
+    return function_t::get_evaluate(term) == subroutine_t::evaluate;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
     // Install evaluate function
     function_t::get_evaluate(sub) = subroutine_t::evaluate;
-    //function_t::get_attrs(sub).writeBytecode = subroutine_t::write_bytecode;
 
     subroutine_update_state_type_from_contents(sub);
 }

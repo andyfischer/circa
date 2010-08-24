@@ -66,6 +66,12 @@ bool should_term_generate_call(Term* term)
         return false;
     if (term->boolPropOptional("no-bytecode", false))
         return false;
+    if (is_function(term))
+        return false;
+    if (is_type(term))
+        return false;
+    if (is_function_attrs(term))
+        return false;
 
     return true;
 }
@@ -287,6 +293,25 @@ void assign_stack_index(WriteContext* context, Term* term)
         term->stackIndex = context->nextStackIndex++;
 }
 
+void assign_stack_for_major_branch(WriteContext* context, Branch& branch)
+{
+    // Clean up existing stack indices
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        // Don't touch major branches
+        if (is_subroutine(*it)) {
+            it.skipNextBranch();
+        }
+        it->stackIndex = -1;
+    }
+
+    // Scan for input() terms, these must get certain stack indexes.
+    ca_assert(context->nextStackIndex == 0);
+    for (int i=0; i < branch.length(); i++) {
+        if (branch[i]->function == INPUT_PLACEHOLDER_FUNC)
+            branch[i]->stackIndex = context->nextStackIndex++;
+    }
+}
+
 int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState)
 {
     int prevInlineState = context->inlineState;
@@ -294,9 +319,6 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     context->inlineState = inlineState;
 
     int lastStackIndex = -1;
-
-    // First, look for input() terms, these must get certain stack indexes.
-    // (todo)
 
     for (int i=0; i < branch.length(); i++)
         write_op(context, branch[i]);
@@ -344,11 +366,8 @@ void write_raise_if(WriteContext* context, Term* errorCondition)
 
 void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
 {
-    // Clear stack indexes for all terms, these will be reassigned inside write_op.
-    // Don't bother doing this if we aren't yet writing data.
-    if (context->writePos) 
-        for (BranchIterator it(branch); !it.finished(); ++it)
-            it->stackIndex = -1;
+    if (context->writePos)
+        assign_stack_for_major_branch(context, branch);
 
     // First add a STACK_SIZE op. Will fill in the actual size later.
     StackSizeOperation *stackSizeOperation = (StackSizeOperation*) context->writePos;

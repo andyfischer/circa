@@ -96,8 +96,7 @@ void setup_for_loop_pre_code(Term* forTerm)
     Branch& attributes = create_branch(forContents, "#attributes");
     attributes.owningTerm->setBoolProp("no-bytecode", true);
 #ifdef BYTECODE
-    Term* modifyList = create_bool(attributes, false, "#modify_list");
-    modifyList->setBoolProp("no-bytecode", true);
+    create_bool(attributes, false, "#modify_list");
 #else
     create_bool(attributes, false, "#is_first_iteration");
     create_bool(attributes, false, "#any_iterations");
@@ -113,6 +112,7 @@ Term* setup_for_loop_iterator(Term* forTerm, const char* name)
     Term* iteratorType = find_type_of_get_index(forTerm->input(0));
     Term* result = create_value(forTerm->nestedContents, iteratorType, name);
     set_source_hidden(result, true);
+    result->setBoolProp("no-bytecode", true);
     return result;
 }
 
@@ -194,6 +194,7 @@ void setup_for_loop_post_code(Term* forTerm)
 #ifdef BYTECODE
     // Create a branch that has all the names which are rebound in this loop
     Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
+    outerRebinds.owningTerm->setBoolProp("no-bytecode", true);
 
     std::vector<std::string> reboundNames;
     list_names_that_this_branch_rebinds(forContents, reboundNames);
@@ -476,6 +477,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     // loop contents
     bytecode::write_comment(context, "loop body:");
+    //forContents[forContents.length()-1]->setBoolProp("no-bytecode", true);
     int branchOutput = bytecode::write_bytecode_for_branch(context,
             forContents, iterationLocalState);
 

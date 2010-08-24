@@ -170,6 +170,9 @@ void cast(TaggedValue* source, TaggedValue* dest)
 
 void copy(TaggedValue* source, TaggedValue* dest)
 {
+    ca_assert(source);
+    ca_assert(dest);
+
     if (source == dest)
         return;
 

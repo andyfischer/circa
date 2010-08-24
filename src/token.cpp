@@ -70,6 +70,7 @@ const char* get_token_text(int match)
         case STATE: return "state";
         case DEF: return "def";
         case TYPE: return "type";
+        case RETURN: return "return";
         case IN_TOKEN: return "in";
         case TRUE_TOKEN: return "true";
         case FALSE_TOKEN: return "false";
