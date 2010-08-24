@@ -94,8 +94,10 @@ void setup_for_loop_pre_code(Term* forTerm)
 {
     Branch& forContents = forTerm->nestedContents;
     Branch& attributes = create_branch(forContents, "#attributes");
+    attributes.owningTerm->setBoolProp("no-bytecode", true);
 #ifdef BYTECODE
-    create_bool(attributes, false, "#modify_list");
+    Term* modifyList = create_bool(attributes, false, "#modify_list");
+    modifyList->setBoolProp("no-bytecode", true);
 #else
     create_bool(attributes, false, "#is_first_iteration");
     create_bool(attributes, false, "#any_iterations");
@@ -161,6 +163,7 @@ void setup_for_loop_post_code(Term* forTerm)
     // If the for loop isn't executed at all then we use outer versions, similar to an if()
     // rebinding.
     Branch& rebindsForOuter = create_branch(forContents, "#outer_rebinds");
+    rebindsForOuter.owningTerm->setBoolProp("no-bytecode", true);
     Term* anyIterations = get_for_loop_any_iterations(forTerm);
 
     {
@@ -474,8 +477,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     // loop contents
     bytecode::write_comment(context, "loop body:");
     int branchOutput = bytecode::write_bytecode_for_branch(context,
-            forContents, iterationLocalState,
-            2, forContents.length()-1);
+            forContents, iterationLocalState);
 
     // Save iteration-local state
     if (hasState) {

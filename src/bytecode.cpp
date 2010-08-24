@@ -64,6 +64,8 @@ bool should_term_generate_call(Term* term)
         return false;
     if (term->function == COMMENT_FUNC)
         return false;
+    if (term->boolPropOptional("no-bytecode", false))
+        return false;
 
     return true;
 }
@@ -285,26 +287,22 @@ void assign_stack_index(WriteContext* context, Term* term)
         term->stackIndex = context->nextStackIndex++;
 }
 
-int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
-        int firstIndex, int lastIndex)
+int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState)
 {
     int prevInlineState = context->inlineState;
 
     context->inlineState = inlineState;
-
-    if (lastIndex == -1)
-        lastIndex = branch.length();
 
     int lastStackIndex = -1;
 
     // First, look for input() terms, these must get certain stack indexes.
     // (todo)
 
-    for (int i=firstIndex; i < lastIndex; i++)
+    for (int i=0; i < branch.length(); i++)
         write_op(context, branch[i]);
 
     // Find stack index of last expression
-    for (int i=lastIndex-1; i >= 0; i--) {
+    for (int i=branch.length()-1; i >= 0; i--) {
         if (should_term_generate_call(branch[i])) {
             lastStackIndex = branch[i]->stackIndex;
             break;

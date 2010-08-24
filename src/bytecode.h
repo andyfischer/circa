@@ -220,12 +220,10 @@ void write_op(WriteContext* context, Term* term);
 // Give this term the next available stack index, if it doesn't already have one.
 void assign_stack_index(WriteContext* context, Term* term);
 
-// Writes operations inside the given branch (with optional first & last index boundaries).
-// If there are any state vars, we'll pull them out of the container with stack index
-// 'inlineState'. Returns the stack index of the last expression (this is sometimes
-// used as a return value).
-int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState,
-        int firstIndex=0, int lastIndex=-1);
+// Writes operations inside the given branch. If there are any state vars, we'll pull
+// them out of the container with stack index 'inlineState'. Returns the stack index of
+// the last expression (this is sometimes used as a return value).
+int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineState);
 
 void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch);
 void write_raise_if(WriteContext* context, Term* errorCondition);
