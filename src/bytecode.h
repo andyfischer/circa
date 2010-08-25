@@ -57,6 +57,7 @@ enum OpId {
     OP_NUM_ELEMENTS,
     OP_COPY,
     OP_RAISE,
+    OP_CHECK_ERROR,
     OP_COMMENT,
     OP_VAR_NAME
 };
@@ -146,6 +147,9 @@ struct CopyOperation {
 struct RaiseOperation {
     OpId opid;
     int value;
+};
+struct CheckErrorOperation {
+    OpId opid;
 };
 struct CommentOperation {
     OpId opid;

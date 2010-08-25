@@ -274,8 +274,16 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
                 continue;
             }
             case bytecode::OP_RAISE: {
+                //TODO
                 //bytecode::RaiseOperation *raiseop = (bytecode::RaiseOperation*) op;
                 cxt->errorOccurred = true;
+                pos += sizeof(bytecode::RaiseOperation);
+                continue;
+            }
+            case bytecode::OP_CHECK_ERROR: {
+                if (cxt->errorOccurred)
+                    goto loop_end;
+                pos += sizeof(bytecode::CheckErrorOperation);
                 continue;
             }
             case bytecode::OP_COMMENT: {

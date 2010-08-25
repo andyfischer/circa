@@ -35,6 +35,7 @@ size_t get_operation_size(Operation* op)
         case OP_NUM_ELEMENTS: return sizeof(NumElementsOperation);
         case OP_COPY: return sizeof(CopyOperation);
         case OP_RAISE: return sizeof(RaiseOperation);
+        case OP_CHECK_ERROR: return sizeof(CheckErrorOperation);
         case OP_COMMENT: {
             CommentOperation *commentop = (CommentOperation*) op;
             return commentop->size;
@@ -525,6 +526,10 @@ void print_operation(std::ostream& out, Operation* op)
         case OP_RAISE: {
             RaiseOperation *raiseop = (RaiseOperation*) op;
             out << "raise(" << raiseop->value << ")";
+            break;
+        }
+        case OP_CHECK_ERROR: {
+            out << "check_error";
             break;
         }
         case OP_COMMENT: {
