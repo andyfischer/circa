@@ -25,7 +25,7 @@ namespace cast_function {
 
     void setup(Branch& kernel)
     {
-        CAST_FUNC = import_function(kernel, cast_evaluate, "cast(any) -> any");
+        CAST_FUNC = import_function(kernel, cast_evaluate, "cast +throws (any) -> any");
     }
 }
 }

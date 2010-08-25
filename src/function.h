@@ -23,7 +23,8 @@ struct FunctionAttrs
     Ref feedbackFunc;
     std::string description;
     TaggedValue parameter;
-    bool currentlyEvaluating; // for subroutines
+    bool throws;
+    bool currentlyEvaluating; // deprecated
 
     // Functions
     EvaluateFunc evaluate;

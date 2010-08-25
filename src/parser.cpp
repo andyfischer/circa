@@ -397,6 +397,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         std::string qualifierName = tokens.consume(IDENTIFIER);
         if (qualifierName == "native")
             isNative = true;
+        else if (qualifierName == "throws")
+            function_t::get_attrs(result).throws = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);

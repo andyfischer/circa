@@ -7,6 +7,7 @@ namespace circa {
 
 FunctionAttrs::FunctionAttrs()
   : variableArgs(false),
+    throws(false),
     currentlyEvaluating(false),
     evaluate(NULL),
     specializeType(NULL),

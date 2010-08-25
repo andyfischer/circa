@@ -87,6 +87,15 @@ void write_stack_size_op(WriteContext* context, int stacksize)
     context->advance(sizeof(StackSizeOperation));
 }
 
+void write_check_error(WriteContext* context)
+{
+    if (context->writePos) {
+        CheckErrorOperation* op = (CheckErrorOperation*) context->writePos;
+        op->opid = OP_CHECK_ERROR;
+    }
+    context->advance(sizeof(CheckErrorOperation));
+}
+
 void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex)
 {
     if (context->writePos) {
@@ -101,6 +110,10 @@ void write_call_op(WriteContext* context, Term* caller, Term* function, int numI
             op->inputs[i].stackIndex = inputIndexes[i];
     }
     context->advance(sizeof(CallOperation) + sizeof(CallOperation::Input)*numInputs);
+
+    // If this call can throw error, add a check_error op
+    if (function_t::get_attrs(function).throws)
+        write_check_error(context);
 }
 
 void write_call_op(WriteContext* context, Term* term)
