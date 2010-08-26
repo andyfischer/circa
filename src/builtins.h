@@ -93,6 +93,8 @@ void empty_evaluate_function(Term* caller);
 void initialize();
 void shutdown();
 
+bool is_value(Term* term);
+
 namespace do_once_function {
     void write_bytecode(bytecode::WriteContext* context, Term* term);
 }

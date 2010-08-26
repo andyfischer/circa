@@ -7,12 +7,6 @@
 
 namespace circa {
 
-bool is_value(Term* term)
-{
-    assert_valid_term(term);
-
-    return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
-}
 
 void set_is_statement(Term* term, bool value)
 {

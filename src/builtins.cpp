@@ -8,6 +8,7 @@
 #include <fstream>
 
 #include "circa.h"
+#include "debug_valid_objects.h"
 #include "types/dict.h"
 #include "types/list.h"
 
@@ -298,6 +299,13 @@ void shutdown()
 {
     delete KERNEL;
     KERNEL = NULL;
+}
+
+bool is_value(Term* term)
+{
+    assert_valid_term(term);
+
+    return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
 }
 
 } // namespace circa

@@ -19,8 +19,6 @@ struct RawOutputPrefs
     RawOutputPrefs() : showAllIDs(false), showProperties(false) {}
 };
 
-bool is_value(Term* term);
-
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.
 bool is_actually_using(Term* user, Term* usee);

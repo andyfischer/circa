@@ -325,6 +325,10 @@ void copy_stack_back_to_terms(Branch& branch, List* stack)
         if (term->stackIndex == -1)
             continue;
 
+        // Don't modify value terms
+        if (is_value(term))
+            continue;
+
         TaggedValue* value = stack->get(term->stackIndex);
         if (value == NULL)
             continue;

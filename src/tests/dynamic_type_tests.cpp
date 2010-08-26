@@ -53,11 +53,14 @@ void test_field_access()
 
     Term* T = branch.compile("type T { int a, string b }");
     branch.compile("def f() -> any; return(T([4, 's'])); end");
+    Branch& f = branch["f"]->nestedContents;
     Term* r = branch.compile("r = f()");
+
+    Term* four = f[1];
+    test_assert(as_int(four) == 4);
 
     evaluate_branch(&context, branch);
     test_assert(context);
-    //bytecode::print_bytecode(std::cout, branch["f"]->nestedContents);
 
     branch.compile("r.a");
     Term* eq1 = branch.compile("r.a == 4");
