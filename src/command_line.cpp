@@ -223,7 +223,8 @@ int run_command_line(std::vector<std::string> args)
 
         Term error_listener;
 
-        EvalContext result = evaluate_branch(main_branch);
+        EvalContext result;
+        evaluate_branch(&result, main_branch);
 
         if (result.errorOccurred) {
             std::cout << "Error occurred:\n";

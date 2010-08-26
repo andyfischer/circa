@@ -335,6 +335,14 @@ void list_memory_management()
     test_assert(toy_refcounted_pool::nothing_allocated());
 }
 
+void reset_null()
+{
+    TaggedValue value;
+    make_null(&value);
+    reset(&value);
+    debug_assert_valid_object(value.value_type, TYPE_OBJECT);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
@@ -348,6 +356,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
     REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
+    REGISTER_TEST_CASE(tagged_value_tests::reset_null);
 }
 
 }

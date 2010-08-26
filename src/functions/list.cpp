@@ -18,13 +18,16 @@ namespace list_function {
 
     CA_DEFINE_FUNCTION(evaluate, "list(any...) -> List")
     {
+        std::cout << "list, num inputs = " << NUM_INPUTS << std::endl;
         make_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
 
         result->resize(NUM_INPUTS);
 
-        for (int i=0; i < NUM_INPUTS; i++)
+        for (int i=0; i < NUM_INPUTS; i++) {
+            std::cout << "copied: " << INPUT(i)->toString() << std::endl;
             copy(INPUT(i), (*result)[i]);
+        }
     }
 
     void list_formatSource(StyledSource* source, Term* caller)

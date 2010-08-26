@@ -107,34 +107,11 @@ struct Type
     bool permanent;
 
 private:
-    Type() :
-        name(""),
-        cppTypeInfo(NULL),
-        initialize(NULL),
-        release(NULL),
-        copy(NULL),
-        reset(NULL),
-        equals(NULL),
-        cast(NULL),
-        isSubtype(NULL),
-        staticTypeQuery(NULL),
-        valueFitsType(NULL),
-        toString(NULL),
-        formatSource(NULL),
-        touch(NULL),
-        getIndex(NULL),
-        setIndex(NULL),
-        getField(NULL),
-        setField(NULL),
-        numElements(NULL),
-        checkInvariants(NULL),
-        remapPointers(NULL),
-        refCount(0),
-        permanent(false)
-    {
-    }
+    Type();
 
 public:
+    ~Type();
+
     int findFieldIndex(std::string const& name)
     {
         return prototype.findIndex(name);

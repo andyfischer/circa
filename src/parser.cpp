@@ -1671,7 +1671,6 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
     return resultTerm;
 }
 
-#if 1
 Term* literal_list(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
@@ -1695,55 +1694,6 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
     return result;
 }
-
-#else
-
-Term* literal_list(Branch& branch, TokenStream& tokens)
-{
-    int startPosition = tokens.getPosition();
-
-    tokens.consume(LBRACKET);
-
-    Term* result = apply(branch, BRANCH_FUNC, RefList());
-
-    while (!tokens.nextIs(RBRACKET) && !tokens.finished()) {
-
-        std::string preWhitespace = possible_whitespace_or_newline(tokens);
-
-        // Use the parent branch as the home for this statement. This way,
-        // if the statement creates extra terms, they aren't added to our list.
-        Term* term = infix_expression(branch, tokens);
-        for (int i=0; i < term->numInputs(); i++)
-            recursively_mark_terms_as_occuring_inside_an_expression(term->input(i));
-
-        bool implicitCopy = false;
-        if (term->name != "") {
-            // If this term is an identifier, then create an implicit copy
-            term = apply(result->nestedContents, COPY_FUNC, RefList(term));
-            implicitCopy = true;
-        }
-
-        prepend_whitespace(term, preWhitespace);
-        append_whitespace(term, possible_statement_ending(tokens));
-
-        // Take the result and steal it into the list branch
-        if (!implicitCopy)
-            steal_term(term, result->nestedContents);
-    }
-
-    if (!tokens.nextIs(RBRACKET))
-        return compile_error_for_line(result, tokens, startPosition);
-
-    tokens.consume(RBRACKET);
-
-    result->setBoolProp("syntax:literal-list", true);
-
-    branch.moveToEnd(result);
-    set_source_location(result, startPosition, tokens);
-    return result;
-}
-#endif
-
 
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {

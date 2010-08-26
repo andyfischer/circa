@@ -49,20 +49,22 @@ void test_subroutine()
 void test_field_access()
 {
     Branch branch;
+    EvalContext context;
 
     Term* T = branch.compile("type T { int a, string b }");
     branch.compile("def f() -> any; return(T([4, 's'])); end");
     Term* r = branch.compile("r = f()");
 
-    evaluate_branch(branch);
-    bytecode::print_bytecode(std::cout, branch["f"]->nestedContents);
+    evaluate_branch(&context, branch);
+    test_assert(context);
+    //bytecode::print_bytecode(std::cout, branch["f"]->nestedContents);
 
     branch.compile("r.a");
-    test_assert(branch);
     Term* eq1 = branch.compile("r.a == 4");
     Term* eq2 = branch.compile("r.b == 's'");
-    evaluate_branch(branch);
-    dump_branch(branch);
+    evaluate_branch(&context, branch);
+    test_assert(context);
+    //dump_branch(branch);
 
     test_assert(as_bool(eq1));
     test_assert(as_bool(eq2));

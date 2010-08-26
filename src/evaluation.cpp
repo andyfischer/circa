@@ -69,6 +69,8 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     List stack;
     evaluate_bytecode(context, &branch._bytecode, &stack);
     copy_stack_back_to_terms(branch, &stack);
+    
+    reset(&context->subroutineOutput);
 #else
 
     ca_assert(context != NULL);
@@ -131,6 +133,7 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
     //std::cout << "running bytecode:" << std::endl;
     //print_bytecode(std::cout, data);
 
+    //cxt->clearError();
     data->inuse = true;
 
     char* pos = data->opdata;
@@ -345,6 +348,13 @@ TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index)
     if (stackIndex == -1)
         return NULL;
     return stack->get(stackIndex);
+}
+
+TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp)
+{
+    if (callOp->outputIndex == -1)
+        return NULL;
+    return stack->get(callOp->outputIndex);
 }
 
 void evaluate_single_term(EvalContext* context, Term* caller, Term* function,

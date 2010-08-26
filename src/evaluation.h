@@ -23,6 +23,13 @@ struct EvalContext
     TaggedValue topLevelState;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
+
+    void clearError() {
+        errorOccurred = false;
+        errorTerm = NULL;
+        errorMessage = "";
+    }
+
 };
 
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output);
@@ -51,6 +58,7 @@ void evaluate_without_side_effects(Term* term);
 void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
 TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index);
+TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp);
 void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
         List* inputs, TaggedValue* output);
 

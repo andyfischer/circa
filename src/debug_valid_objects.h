@@ -11,6 +11,7 @@ const int TERM_OBJECT = 1;
 const int LIST_OBJECT = 2;
 const int BRANCH_OBJECT = 3;
 const int FUNCTION_ATTRS_OBJECT = 4;
+const int TYPE_OBJECT = 5;
 
 #if ENABLE_VALID_OBJECT_CHECKING
 

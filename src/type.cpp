@@ -130,6 +130,39 @@ namespace type_t {
 
 } // namespace type_t
 
+Type::Type() :
+    name(""),
+    cppTypeInfo(NULL),
+    initialize(NULL),
+    release(NULL),
+    copy(NULL),
+    reset(NULL),
+    equals(NULL),
+    cast(NULL),
+    isSubtype(NULL),
+    staticTypeQuery(NULL),
+    valueFitsType(NULL),
+    toString(NULL),
+    formatSource(NULL),
+    touch(NULL),
+    getIndex(NULL),
+    setIndex(NULL),
+    getField(NULL),
+    setField(NULL),
+    numElements(NULL),
+    checkInvariants(NULL),
+    remapPointers(NULL),
+    refCount(0),
+    permanent(false)
+{
+    debug_register_valid_object(this, TYPE_OBJECT);
+}
+
+Type::~Type()
+{
+    debug_unregister_valid_object(this);
+}
+
 bool is_native_type(Term* type)
 {
     return !is_branch_based_type(type);

@@ -33,8 +33,7 @@
 #define CALLER (_circa_op->caller)
 #define INPUT_TERM(index) (CALLER->input(index))
 #define CAPTURE_INPUTS(list) (capture_inputs(_circa_stack, _circa_op, (list)))
-//#define INPUTS (_circa_inputs)
-#define OUTPUT (_circa_stack->getIndex(_circa_op->outputIndex))
+#define OUTPUT (get_output(_circa_stack, _circa_op))
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_op->function)
 #define CONTEXT_AND_CALLER CONTEXT, CALLER

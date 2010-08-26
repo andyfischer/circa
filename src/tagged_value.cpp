@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "debug_valid_objects.h"
 #include "errors.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -28,8 +29,7 @@ TaggedValue::~TaggedValue()
 
 TaggedValue::TaggedValue(TaggedValue const& original)
 {
-    value_type = NULL_T;
-    value_data.ptr = 0;
+    init();
 
     Term* source = (Term*) &original;
     copy(source, this);
@@ -205,7 +205,8 @@ void swap(TaggedValue* left, TaggedValue* right)
 
 void reset(TaggedValue* value)
 {
-    // Check for NULL, not all TaggedValue functions do this.
+    // Check for NULL. Most TaggedValue functions don't do this, but reset() is
+    // a convenient special case.
     if (value->value_type == NULL)
         return make_null(value);
 
@@ -309,8 +310,10 @@ void touch(TaggedValue* value)
 
 void change_type(TaggedValue* v, Type* type)
 {
-    ca_assert(v != NULL);
     // type may be null
+    ca_assert(v != NULL);
+    debug_assert_valid_object(type, TYPE_OBJECT);
+    debug_assert_valid_object(v->value_type, TYPE_OBJECT);
 
     if (v->value_type == type)
         return;
