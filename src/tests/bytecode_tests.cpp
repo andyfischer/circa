@@ -138,7 +138,6 @@ void test_do_once()
     //    evaluate_branch(&context, branch);
 }
 
-
 void register_tests()
 {
 #ifdef BYTECODE

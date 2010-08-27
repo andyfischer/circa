@@ -230,7 +230,8 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             case bytecode::OP_RETURN: {
                 bytecode::ReturnOperation *retop = (bytecode::ReturnOperation*) op;
                 if (retop->stackIndex != -1) {
-                    copy(stack->get(retop->stackIndex), &cxt->subroutineOutput);
+                    TaggedValue* v = stack->get(retop->stackIndex);
+                    copy(v, &cxt->subroutineOutput);
                 }
                 goto loop_end;
             }

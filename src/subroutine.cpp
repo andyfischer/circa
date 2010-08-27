@@ -41,10 +41,10 @@ namespace subroutine_t {
             bytecode::update_bytecode(functionBranch);
         evaluate_bytecode(CONTEXT, &functionBranch._bytecode, &stack);
 
-        if (OUTPUT != NULL)
+        if (OUTPUT != NULL) {
             swap(&CONTEXT->subroutineOutput, OUTPUT);
+        }
         reset(&CONTEXT->subroutineOutput);
-        //std::cout << "sub returned: " << OUTPUT->toString() << std::endl;
 
 #else
         Term* function = FUNCTION;

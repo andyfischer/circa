@@ -67,7 +67,6 @@ void test_field_access()
     Term* eq2 = branch.compile("r.b == 's'");
     evaluate_branch(&context, branch);
     test_assert(context);
-    //dump_branch(branch);
 
     test_assert(as_bool(eq1));
     test_assert(as_bool(eq2));

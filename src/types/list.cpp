@@ -103,6 +103,7 @@ bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
 
 void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
 {
+    // FIXME: should these be asserts?
     if (!is_list(source)) return;
     if (!is_list(dest)) return;
 

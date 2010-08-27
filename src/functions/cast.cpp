@@ -20,6 +20,7 @@ namespace cast_function {
             return error_occurred(CONTEXT, CALLER, message.str());
         }
 
+        change_type(OUTPUT, type);
         cast(type, source, OUTPUT);
     }
 
