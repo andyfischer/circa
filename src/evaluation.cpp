@@ -168,38 +168,9 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             }
             case bytecode::OP_CALL: {
                 bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
-                //std::cout << "calling: " << callop->function->name << std::endl;
 
                 EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
                 func(cxt, stack, callop);
-
-                #if 0
-                // Temp: Assemble arguments for compatibility with old-style
-                // evaluation func. This involves a bunch of wasteful copying
-                // which will be removed later.
-                RefList inputs;
-                inputs.resize(callop->numInputs);
-                for (int i=0; i < callop->numInputs; i++) {
-                    inputs[i] = alloc_term();
-                    TaggedValue* stackInput = NULL;
-                    int stackIndex = callop->inputs[i].stackIndex;
-                    if (stackIndex == -1) {
-                        inputs[i] = NULL;
-                    } else {
-                        stackInput = stack->get(stackIndex);
-                        change_type(inputs[i], stackInput->value_type);
-                        copy(stackInput, inputs[i]);
-                    }
-                }
-                TaggedValue* output = NULL;
-                if (callop->outputIndex != -1) {
-                    output = stack->get(callop->outputIndex);
-                    Type* type = type_contents(function_t::get_output_type(callop->function));
-                    change_type(output, type);
-                }
-
-                evaluate_term(cxt, callop->caller, callop->function, inputs, output);
-                #endif
 
                 pos += sizeof(bytecode::CallOperation)
                     + sizeof(bytecode::CallOperation::Input)*callop->numInputs;

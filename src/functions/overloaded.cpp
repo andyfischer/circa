@@ -7,30 +7,30 @@ namespace overloaded_function {
 
     bool is_overloaded_function(Term* func);
 
+    Term* dynamically_specialize_func(List* overloadRefs, List* inputs)
+    {
+        for (int i=0; i < overloadRefs->length(); i++) {
+            Term* overload = as_ref(overloadRefs->get(i));
+
+            if (values_fit_function_dynamic(overload, inputs))
+                return overload;
+        }
+        return NULL;
+    }
+
     CA_FUNCTION(evaluate_overloaded)
     {
         Term* func = FUNCTION;
         List& overloads = function_t::get_attrs(func).parameters;
 
-//#ifdef BYTECODE
-//#else
         // Dynamically find the right overload.
 
         List inputs;
         CAPTURE_INPUTS(&inputs);
+        Term* overload = dynamically_specialize_func(&overloads, &inputs);
 
-        for (int i=0; i < overloads.length(); i++) {
-            Term* overload = as_ref(overloads[i]);
-
-            if (values_fit_function_dynamic(overload, &inputs)) {
-                change_type(OUTPUT, type_contents(function_t::get_output_type(overload)));
-                evaluate_single_term(CONTEXT, CALLER, overload, &inputs, OUTPUT);
-                return;
-            }
-        }
-//#endif
-
-        error_occurred(CONTEXT, CALLER, "No usable overload found");
+        if (overload == NULL)
+            return error_occurred(CONTEXT, CALLER, "No usable overload found");
     }
 
     Term* statically_specialize_function(Term* func, RefList const& inputs)
