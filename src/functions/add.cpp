@@ -28,7 +28,7 @@ namespace add_function {
 
         float delta = desired - to_float(target);
 
-        Branch& outputList = as_branch(OUTPUT);
+        Branch& outputList = feedback_output(CALLER);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
@@ -43,7 +43,7 @@ namespace add_function {
         Term* add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
 
         function_t::get_feedback_func(add_f) =
-            import_function(kernel, add_feedback, "add_feedback(any, number) -> Branch");
+            import_function(kernel, add_feedback, "add_feedback(any, number)");
 
         ADD_FUNC = create_overloaded_function(kernel, "add", RefList(add_i, add_f));
     }

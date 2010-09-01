@@ -48,7 +48,7 @@ namespace trig_function {
     CA_FUNCTION(feedback_evaluate_sin)
     {
         // Term* target = INPUT(0);
-        float desired = FLOAT_INPUT( 1);
+        float desired = FLOAT_INPUT(1);
 
         // restrict input to -1..1
         if (desired > 1)
@@ -65,7 +65,7 @@ namespace trig_function {
     CA_FUNCTION(feedback_evaluate_cos)
     {
         // Term* target = INPUT(0);
-        float desired = INPUT(1)->toFloat();
+        float desired = FLOAT_INPUT(1);
 
         // restrict input to -1..1
         if (desired > 1)

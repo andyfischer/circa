@@ -21,7 +21,7 @@ namespace cond_function {
     {
         Term* target = INPUT_TERM(0);
         Term* desired = INPUT_TERM(1);
-        Branch& output = as_branch(OUTPUT);
+        Branch& output = feedback_output(CALLER);
 
         // cond(condition, pos, neg)
         //

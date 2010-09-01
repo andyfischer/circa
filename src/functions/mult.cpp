@@ -23,7 +23,7 @@ namespace mult_function {
         float delta = desired - to_float(target);
 
         // for each input, send a delta divided by the product of all other inputs
-        Branch& outputList = as_branch(OUTPUT);
+        Branch& outputList = feedback_output(CALLER);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);

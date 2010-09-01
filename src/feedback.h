@@ -46,4 +46,6 @@ void feedback_register_constants(Branch& kernel);
 float get_feedback_weight(Term* term);
 void set_feedback_weight(Term* term, float weight);
 
+Branch& feedback_output(Term* term);
+
 } // namespace circa

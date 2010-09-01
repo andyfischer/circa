@@ -192,13 +192,13 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 
             Term* feedback = apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
             // Resize the output of 'feedback' so that there is one output term per input
-            resize_list(as_branch(feedback), term->numInputs(), ANY_TYPE);
+            resize_list(feedback_output(feedback), term->numInputs(), ANY_TYPE);
 
             // For each input which is trainable, send this feedback to it
             for (int i=0; i < term->numInputs(); i++) {
                 Term* input = term->input(i);
 
-                Term* outgoingFeedback = as_branch(feedback)[i];
+                Term* outgoingFeedback = feedback_output(feedback)[i];
 
                 // Initialize this field
                 specialize_type(outgoingFeedback,
@@ -244,6 +244,12 @@ void feedback_register_constants(Branch& kernel)
 {
     FEEDBACK_TYPE = create_empty_type(kernel, "FeedbackType");
     DESIRED_VALUE_FEEDBACK = create_value(kernel, FEEDBACK_TYPE, "desired_value");
+}
+
+Branch& feedback_output(Term* term)
+{
+    // might refactor this:
+    return term->nestedContents;
 }
 
 } // namespace circa
