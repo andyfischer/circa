@@ -37,6 +37,7 @@ void evaluate_term(EvalContext* cxt, Term* term);
 void evaluate_term(Term* term);
 void evaluate_branch(EvalContext* context, Branch& branch);
 void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack);
+void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack);
 void evaluate_bytecode(Branch& branch);
 
 // Shorthand to call evaluate_branch with a new EvalContext:

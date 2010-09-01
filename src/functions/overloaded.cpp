@@ -31,6 +31,16 @@ namespace overloaded_function {
 
         if (overload == NULL)
             return error_occurred(CONTEXT, CALLER, "No usable overload found");
+
+        bytecode::CallOperation* op = bytecode::create_orphan_call_operation(CALLER, overload,
+                NUM_INPUTS);
+        for (int i=0; i < NUM_INPUTS; i++)
+            op->inputs[i] = _circa_op->inputs[i];
+        op->outputIndex = _circa_op->outputIndex;
+
+        evaluate_single_call_op(CONTEXT, op, _circa_stack);
+
+        free_orphan_call_operation(op);
     }
 
     Term* statically_specialize_function(Term* func, RefList const& inputs)

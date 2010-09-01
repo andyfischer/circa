@@ -99,6 +99,7 @@ void test_subroutine_input_and_output()
 
 void test_dynamic_overload()
 {
+    EvalContext context;
     Branch branch;
     Term* a = create_value(branch, ANY_TYPE, "a");
     Term* b = create_value(branch, ANY_TYPE, "b");
@@ -115,11 +116,13 @@ void test_dynamic_overload()
     RefList inputs(a,b);
     test_assert(inputs_fit_function_dynamic(add_i, inputs));
 
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
+    test_assert(context);
     test_assert(result->asInt() == 8);
 
     make_float(b, 3.0);
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
+    test_assert(context);
     test_assert(result->asFloat() == 8.0);
 }
 

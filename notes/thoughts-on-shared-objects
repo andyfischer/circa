@@ -1,0 +1,24 @@
+
+Right now there is support for shared immutable objects. We use copy-on-write, where
+if an object is written to, we first make a copy of that object, then modify the
+copy (so that anyone using the existing value is not affected).
+
+As an optimization to prevent constantly creating new objects, we can check the
+refcount of the value, if it only has 1 ref then we can assume that the writer
+is the only user, and they can just modify the existing value.
+
+But this is a bad check for nested objects. Say we have value A and composite value
+B = [A]. B has two refs, and A only has one ref (its reference from B). Then one
+of the users wants to modify A. Even though A has one ref, we'll need to make a copy,
+because A is part of the shared value B.
+
+Ways to prevent this:
+
+1) Don't do this? Since the only users of A are holders of B, the code manipulating B
+could know whether it is going to modify this data. If it is going to modify then it
+needs to create a separate copy of B anyway.
+
+2) 'Freeze' flag. As soon as a value (possibly nested) can be exposed to multiple
+consumers, a flag is set that marks it as frozen. A frozen value can't be modified
+in place. So, as soon as B is shared to two people, it would get frozen, and all of
+its contents would be frozen.

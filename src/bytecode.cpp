@@ -573,6 +573,21 @@ void print_bytecode_raw(std::ostream& out, BytecodeData* data)
     }
 }
 
+CallOperation* create_orphan_call_operation(Term* caller, Term* function, int numInputs)
+{
+    CallOperation* op = (CallOperation*) malloc(sizeof(CallOperation)
+            + sizeof(CallOperation::Input) * numInputs);
+    op->opid = OP_CALL;
+    op->caller = caller;
+    op->function = function;
+    op->numInputs = numInputs;
+    return op;
+}
+void free_orphan_call_operation(CallOperation* op)
+{
+    free(op);
+}
+
 bool Iterator::finished()
 {
     return pos == NULL;

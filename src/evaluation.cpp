@@ -128,6 +128,7 @@ void evaluate_without_side_effects(Term* term)
     evaluate_term(term);
 }
 
+
 void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack)
 {
     //std::cout << "running bytecode:" << std::endl;
@@ -280,6 +281,12 @@ loop_end:
         std::cout << std::endl << "stack: " << stack->toString() << std::endl;
         std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
     #endif
+}
+
+void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack)
+{
+    EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
+    func(cxt, stack, callop);
 }
 
 void evaluate_bytecode(Branch& branch)
