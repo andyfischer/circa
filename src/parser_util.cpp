@@ -91,24 +91,6 @@ void post_parse_branch(Branch& branch)
     // Remove NULLs
     branch.removeNulls();
 
-#ifndef BYTECODE
-    // For every stateful value, hook up the 'result' of this value as its input.
-    // The 'result' is the last term in this branch with the same name.
-    for (int index=0; index < branch.length(); index++) {
-        Term* term = branch[index];
-        if (is_stateful(term)
-                && term->name != ""
-                && term->name[0] != '#') {
-
-            Term* result = branch[term->name];
-
-            if (result == term)
-                set_input(term, 0, NULL);
-            else
-                set_input(term, 0, result);
-        }
-    }
-#endif
 }
 
 Term* find_and_apply(Branch& branch,

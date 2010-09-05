@@ -18,42 +18,10 @@ namespace circa {
 
 void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
 {
-#ifndef BYTECODE
-    EvaluateFunc evaluate = function_t::get_evaluate(function);
-
-    if (evaluate == NULL)
-        return;
-
-    try {
-        evaluate(cxt, caller, function, inputs, output);
-    }
-    catch (std::exception const& err)
-    {
-        error_occurred(cxt, caller, err.what());
-    }
-#endif
 }
 
 inline void evaluate_term(EvalContext* cxt, Term* term)
 {
-#ifndef BYTECODE
-    ca_assert(cxt != NULL);
-    ca_assert(term != NULL);
-
-    EvaluateFunc evaluate = function_t::get_evaluate(term->function);
-
-    if (evaluate == NULL)
-        return;
-
-    // Execute the function
-    try {
-        evaluate(cxt, term, term->function, term->inputs, term);
-    }
-    catch (std::exception const& err)
-    {
-        error_occurred(cxt, term, err.what());
-    }
-#endif
 }
 
 void evaluate_term(Term* term)
@@ -64,32 +32,12 @@ void evaluate_term(Term* term)
 
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
-#ifdef BYTECODE
     bytecode::update_bytecode(branch);
     List stack;
     evaluate_bytecode(context, &branch._bytecode, &stack);
     copy_stack_back_to_terms(branch, &stack);
     
     reset(&context->subroutineOutput);
-#else
-
-    ca_assert(context != NULL);
-
-    for (int index=0; index < branch.length(); index++) {
-		Term* term = branch.get(index);
-        evaluate_term(context, term);
-
-        if (context->errorOccurred || context->interruptSubroutine)
-            break;
-    }
-
-    // Copy the results of state vars
-    for (int index=0; index < branch.length(); index++) {
-        Term* term = branch[index];
-        if (is_stateful(term) && term->input(0) != NULL)
-            copy(term->input(0), term);
-    }
-#endif
 }
 
 EvalContext evaluate_branch(Branch& branch)

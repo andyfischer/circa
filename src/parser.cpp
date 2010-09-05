@@ -33,23 +33,14 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 
 Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 {
-#ifndef BYTECODE
-    int previousLastIndex = branch.length();
-#endif
 
     Term* result = compile(&branch, step, input);
 
-#ifdef BYTECODE
     EvalContext context;
     List stack;
     bytecode::update_bytecode(branch);
     evaluate_bytecode(&context, &branch._bytecode, &stack);
     copy_stack_back_to_terms(branch, &stack);
-#else
-    // Evaluate all terms that were just created
-    for (int i=previousLastIndex; i < branch.length(); i++)
-        evaluate_term(branch[i]);
-#endif
 
     return result;
 }
@@ -807,7 +798,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
     if (!is_type(type))
         return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
-#ifdef BYTECODE
     Term* initialValue = NULL;
 
     if (tokens.nextIs(EQUALS)) {
@@ -826,33 +816,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
 
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);
-#else
-    Term* result = create_stateful_value(branch, type, name);
-
-    if (typeName != "")
-        result->setStringProp("syntax:explicitType", typeName);
-
-    if (tokens.nextIs(EQUALS)) {
-        tokens.consume();
-        possible_whitespace(tokens);
-
-        Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
-        set_source_hidden(initialization, true);
-
-        Term* initialValue = infix_expression(initialization->nestedContents, tokens);
-        recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
-        post_parse_branch(initialization->nestedContents);
-
-
-        apply(initialization->nestedContents,
-                UNSAFE_ASSIGN_FUNC, RefList(result, initialValue));
-
-        if (result->type == ANY_TYPE)
-            specialize_type(result, initialValue->type);
-
-        result->setRefProp("initializedBy", initialValue);
-    }
-#endif
 
     set_source_location(result, startPosition, tokens);
     return result;

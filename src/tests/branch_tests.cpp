@@ -425,13 +425,10 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_get_field_by_name);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_destination_has_different_type);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
-#ifndef BYTECODE // FIXME
-    REGISTER_TEST_CASE(branch_tests::test_migrate);
-    REGISTER_TEST_CASE(branch_tests::test_migrate2);
-#endif
-    REGISTER_TEST_CASE(branch_tests::test_cast);
-    REGISTER_TEST_CASE(branch_tests::test_shorten);
+    // FIXME
+    //REGISTER_TEST_CASE(branch_tests::test_migrate);
+    //REGISTER_TEST_CASE(branch_tests::test_migrate2);
 }
 
-} // namespace branch_tests
+}
 } // namespace circa

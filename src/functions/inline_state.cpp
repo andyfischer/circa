@@ -73,11 +73,6 @@ namespace inline_state_function {
         #endif
     }
 
-#ifndef BYTECODE
-    CA_FUNCTION(empty_evaluate)
-    {
-    }
-#endif
 
     void formatSource(StyledSource* source, Term* term)
     {
@@ -104,15 +99,9 @@ namespace inline_state_function {
 
     void setup(Branch& kernel)
     {
-#ifdef BYTECODE
         CA_SETUP_FUNCTIONS(kernel);
         function_t::get_attrs(kernel["get_state_field"]).writeBytecode =
             get_state_field_write_bytecode;
-#else
-        STATEFUL_VALUE_FUNC = import_function(kernel, empty_evaluate,
-                "stateful_value(any next_val +optional) -> any");
-        function_t::get_attrs(STATEFUL_VALUE_FUNC).formatSource = formatSource;
-#endif
     }
 }
 }

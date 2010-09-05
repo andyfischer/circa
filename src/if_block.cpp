@@ -55,10 +55,6 @@ void update_if_block_joining_branch(Term* ifCall)
     Branch& joining = contents["#joining"]->nestedContents;
     joining.clear();
 
-#ifndef BYTECODE
-    // This is used later.
-    Term* satisfiedIndex = create_int(joining, 0, "#satisfiedIndex");
-#endif
 
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
@@ -118,29 +114,7 @@ void update_if_block_joining_branch(Term* ifCall)
     {
         std::string const& name = *it;
 
-#ifdef BYTECODE
         apply(joining, JOIN_FUNC, RefList(), name);
-#else
-
-        // Make a list where we find the corresponding term for this name in each branch.
-        Term* selections = apply(joining, BRANCH_FUNC, RefList());
-        Branch& selectionsBranch = selections->nestedContents;
-
-        for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            Term* term = contents[branch_index];
-            Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
-
-            Term* selection = NULL;
-            if (branch.contains(name))
-                selection = branch[name];
-            else
-                selection = find_named(*outerScope, name);
-
-            apply(selectionsBranch, COPY_FUNC, RefList(selection));
-        }
-
-        apply(joining, GET_INDEX_FROM_BRANCH_FUNC, RefList(selections, satisfiedIndex), name);
-#endif
     }
 
     // Expose all names in 'joining' branch.
@@ -182,86 +156,6 @@ bool if_block_contains_state(Term* ifCall)
     return false;
 }
 
-#ifndef BYTECODE
-void evaluate_if_block(EvalContext* cxt, Term* caller)
-{
-    Branch& contents = caller->nestedContents;
-    List* state = get_if_block_state(caller);
-
-    if (state != NULL) {
-        int numElements = contents.length() - 1;
-        int actualElements = state->numElements();
-        state->resize(numElements);
-        for (int i=actualElements; i < numElements; i++)
-            make_list(state->get(i));
-    }
-
-    // Find the first if() call whose condition is true
-    int satisfiedIndex = 0;
-    for (int i=0; i < contents.length()-1; i++) {
-        Term* call = contents[i];
-
-        TaggedValue* stateElement = NULL;
-        if (state != NULL)
-            stateElement = state->get(i);
-
-        bool satisfied = false;
-
-        if (call->function == BRANCH_FUNC) {
-            satisfied = true;
-        } else {
-            Term* cond = call->input(0);
-            if (cond->asBool())
-                satisfied = true;
-        }
-
-        if (satisfied) {
-            // Load state, if it's found
-            if (stateElement != NULL) {
-                load_state_into_branch(stateElement, call->nestedContents);
-            }
-
-            evaluate_term(cxt, call);
-            satisfiedIndex = i;
-
-            if (stateElement != NULL) {
-                // State elements may have moved during evaluate_term,
-                // so call state->get again.
-                stateElement = state->get(i);
-                persist_state_from_branch(call->nestedContents, stateElement);
-            }
-
-            break;
-
-        } else {
-            // This condition wasn't executed, reset state.
-            if (stateElement != NULL) {
-                reset(stateElement);
-                reset_state(call->nestedContents);
-            }
-        }
-    }
-
-    // For any conditions after the successful one, reset state.
-    for (int i=satisfiedIndex+1; i < contents.length()-1; i++) {
-        TaggedValue* stateElement = NULL;
-        if (state != NULL) {
-            stateElement = state->get(i);
-        }
-        if (stateElement != NULL) {
-            reset(stateElement);
-            Term* call = contents[i];
-            reset_state(call->nestedContents);
-        }
-    }
-
-    // Update the #joining branch
-    ca_assert(contents[contents.length()-1]->name == "#joining");
-    Branch& joining = contents[contents.length()-1]->nestedContents;
-    set_int(joining["#satisfiedIndex"], satisfiedIndex);
-    evaluate_branch(cxt, joining);
-}
-#endif
 
 void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 {

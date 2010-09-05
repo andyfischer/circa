@@ -153,7 +153,7 @@ end
 
 $parser = StateBasedParser.new
 $tostdout = false
-$debug_output = true
+$debug_output = false
 
 optparse = OptionParser.new do |opts|
     #opts.banner =  "Usage.."

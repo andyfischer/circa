@@ -140,7 +140,6 @@ void test_do_once()
 
 void register_tests()
 {
-#ifdef BYTECODE
     REGISTER_TEST_CASE(bytecode_tests::test_print_simple);
     REGISTER_TEST_CASE(bytecode_tests::print_if_block);
     REGISTER_TEST_CASE(bytecode_tests::if_block_name_joining);
@@ -150,7 +149,6 @@ void register_tests()
     REGISTER_TEST_CASE(bytecode_tests::if_block_state);
     REGISTER_TEST_CASE(bytecode_tests::for_block_state);
     REGISTER_TEST_CASE(bytecode_tests::test_do_once);
-#endif
 }
 
 }

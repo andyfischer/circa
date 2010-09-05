@@ -201,19 +201,12 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
 Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
         std::string const& name)
 {
-#ifdef BYTECODE
     Term* fieldName = create_string(branch, name);
     Term* result = apply(branch, get_global("get_state_field"),
             RefList(NULL, fieldName, defaultValue), name);
     change_type(result, type);
     return result;
 
-#else
-    Term* t = create_value(branch, type, name);
-    t->function = STATEFUL_VALUE_FUNC;
-    set_input(t, 0, NULL);
-    return t;
-#endif
 }
 
 Term* create_string(Branch& branch, std::string const& s, std::string const& name)

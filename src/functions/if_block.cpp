@@ -7,9 +7,6 @@ namespace if_block_function {
 
     CA_FUNCTION(evaluate)
     {
-#ifndef BYTECODE
-        evaluate_if_block(CONTEXT, CALLER);
-#endif
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -46,12 +43,7 @@ namespace if_block_function {
 
     void setup(Branch& kernel)
     {
-#ifdef BYTECODE
         IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block()");
-#else
-        IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block(List _state) -> Branch");
-        function_t::set_input_meta(IF_BLOCK_FUNC, 0, true); // allow _state to be NULL
-#endif
         function_t::get_attrs(IF_BLOCK_FUNC).formatSource = formatSource;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
     }

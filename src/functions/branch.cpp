@@ -8,9 +8,6 @@ namespace branch_function {
 
     CA_FUNCTION(branch_evaluate)
     {
-#ifndef BYTECODE
-        evaluate_branch(CONTEXT, CALLER->nestedContents);
-#endif
     }
 
     void writeBytecode(bytecode::WriteContext* context, Term* term)

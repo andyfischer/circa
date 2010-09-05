@@ -5,21 +5,9 @@
 namespace circa {
 namespace do_once_function {
 
-#ifdef BYTECODE
     CA_FUNCTION(empty_evaluate)
     {
     }
-#else
-    CA_FUNCTION(evaluate)
-    {
-        TaggedValue* done = INPUT(0);
-
-        if (!as_bool(done)) {
-            evaluate_branch(CONTEXT, CALLER->nestedContents);
-            make_bool(done, true);
-        }
-    }
-#endif
 
     void write_bytecode(bytecode::WriteContext* context, Term* term)
     {
@@ -49,12 +37,8 @@ namespace do_once_function {
 
     void setup(Branch& kernel)
     {
-#ifdef BYTECODE
         DO_ONCE_FUNC = import_function(kernel, empty_evaluate, "do_once(state bool)");
         function_t::get_attrs(DO_ONCE_FUNC).writeBytecode = write_bytecode;
-#else
-        DO_ONCE_FUNC = import_function(kernel, evaluate, "do_once(state bool) -> Code");
-#endif
         function_t::get_attrs(DO_ONCE_FUNC).formatSource = formatSource;
     }
 }

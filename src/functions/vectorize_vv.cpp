@@ -55,44 +55,6 @@ namespace vectorize_vv_function {
 
     CA_FUNCTION(evaluate)
     {
-#ifndef BYTECODE
-        Term* func = as_ref(function_t::get_parameters(FUNCTION));
-
-        List* left = List::checkCast(INPUT(0));
-        List* right = List::checkCast(INPUT(1));
-        make_list(OUTPUT);
-        List* output = List::checkCast(OUTPUT);
-        Type* funcOutputType = type_contents(function_t::get_output_type(func));
-        int numInputs = left->numElements();
-
-        if (numInputs != right->numElements()) {
-            std::stringstream msg;
-            msg << "Input lists have different lengths (left has " << numInputs;
-            msg << ", right has " << right->numElements() << ")";
-            return error_occurred(CONTEXT, CALLER, msg.str());
-        }
-
-        output->resize(numInputs);
-
-        Term leftTerm, rightTerm;
-        leftTerm.refCount++;
-        rightTerm.refCount++;
-
-        {
-            RefList inputs(&leftTerm, &rightTerm);
-
-            for (int i=0; i < numInputs; i++) {
-                TaggedValue* item = output->getIndex(i);
-                change_type(item, funcOutputType);
-                copy(left->get(i), &leftTerm);
-                copy(right->get(i), &rightTerm);
-                evaluate_term(CONTEXT, CALLER, func, inputs, item);
-            }
-        }
-        
-        ca_assert(leftTerm.refCount == 1);
-        ca_assert(rightTerm.refCount == 1);
-#endif
     }
 
     void setup(Branch& kernel)

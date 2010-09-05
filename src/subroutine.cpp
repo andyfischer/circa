@@ -23,7 +23,6 @@ namespace subroutine_t {
 
     CA_FUNCTION(evaluate)
     {
-#ifdef BYTECODE
         // Copy inputs to a new stack
         List stack;
         stack.resize(NUM_INPUTS);
@@ -46,84 +45,6 @@ namespace subroutine_t {
         }
         reset(&CONTEXT->subroutineOutput);
 
-#else
-        Term* function = FUNCTION;
-        Branch& functionBranch = function->nestedContents;
-
-        bool varArgs = function_t::get_variable_args(function);
-        int num_inputs = function_t::num_inputs(function);
-
-        if (!varArgs && (num_inputs != NUM_INPUTS)) {
-            std::stringstream msg;
-            msg << "Wrong number of inputs, expected: " << num_inputs
-                << ", found: " << NUM_INPUTS;
-            error_occurred(CONTEXT, CALLER, msg.str());
-            return;
-        }
-
-        // If the subroutine is currently being evaluated, temporarily store all the
-        // existing local values, so that we can restore them later.
-        TaggedValue previousLocals;
-        if (function_t::get_attrs(function).currentlyEvaluating) {
-            store_locals(functionBranch, &previousLocals);
-        }
-
-        function_t::get_attrs(function).currentlyEvaluating = true;
-
-        // Load values into this function's stateful values. If this state has never been
-        // saved then this function will reset this function's stateful values.
-        TaggedValue* hiddenState = get_hidden_state_for_call(CALLER);
-
-        if (hiddenState != NULL)
-            load_state_into_branch(hiddenState, functionBranch);
-
-        // Load inputs into input placeholders.
-        for (int input=0; input < num_inputs; input++) {
-
-            std::string inputName = function_t::get_input_name(function, input);
-            if (inputName == "#state") {
-                ca_assert(input == 0);
-                continue;
-            }
-
-            Term* term = function_t::get_input_placeholder(function, input);
-
-            ca_assert(term->function == INPUT_PLACEHOLDER_FUNC);
-
-            Term* incomingTerm = INPUT_TERM(input);
-            if (term->type == ANY_TYPE)
-                copy(incomingTerm, term);
-            else
-                cast(incomingTerm, term);
-        }
-
-        evaluate_branch(CONTEXT, functionBranch);
-
-        // Clear interruptSubroutine flag
-        bool returnCalled = CONTEXT->interruptSubroutine;
-        CONTEXT->interruptSubroutine = false;
-
-        // Store state
-        if (hiddenState != NULL)
-            persist_state_from_branch(functionBranch, hiddenState);
-
-        // Restore locals, if needed
-        if (is_null(&previousLocals)) {
-            function_t::get_attrs(function).currentlyEvaluating = false;
-        } else {
-            restore_locals(&previousLocals, functionBranch);
-        }
-
-        if (!CONTEXT->errorOccurred && returnCalled) {
-            TaggedValue* output = &CONTEXT->subroutineOutput;
-
-            Type* output_type = type_contents(function_t::get_output_type(function));
-            if (output_type != output->value_type && output_type != type_contents(ANY_TYPE))
-                cast(output_type, output, OUTPUT);
-            else
-                copy(output, OUTPUT);
-        }
-#endif
     }
 }
 
