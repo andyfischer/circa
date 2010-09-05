@@ -5,15 +5,13 @@
 namespace circa {
 namespace include_function {
 
-    void preload_script(EvalContext* cxt, Term* term)
+    void preload_script(EvalContext* cxt, Term* caller,
+            TaggedValue* fileSignature, const std::string& filename)
     {
-        TaggedValue* fileSignature = term->input(0);
-        Branch& contents = term->nestedContents;
-
-        std::string filename = term->input(1)->asString();
+        Branch& contents = caller->nestedContents;
 
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(cxt, term, fileSignature, filename))
+        if (file_changed_function::check(cxt, caller, fileSignature, filename))
         {
             Branch previous_contents;
             duplicate_branch(contents, previous_contents);
@@ -21,14 +19,14 @@ namespace include_function {
             contents.clear();
 
             if (!storage::file_exists(filename.c_str())) {
-                error_occurred(cxt, term, "File not found: "+filename);
+                error_occurred(cxt, caller, "File not found: "+filename);
                 return;
             }
 
             parse_script(contents, filename);
 
             if (has_static_errors(contents)) {
-                error_occurred(cxt, term, get_static_errors_formatted(contents));
+                error_occurred(cxt, caller, get_static_errors_formatted(contents));
 
                 // New script has errors. If we have an existing script, then revert
                 // to that.
@@ -47,14 +45,20 @@ namespace include_function {
             if (previous_contents.length() > 0)
                 migrate_stateful_values(previous_contents, contents);
 
-            if (term->owningBranch != NULL)
-                expose_all_names(contents, *term->owningBranch);
+            if (caller->owningBranch != NULL)
+                expose_all_names(contents, *caller->owningBranch);
         }
+    }
+    void preload_script(EvalContext* cxt, Term* term)
+    {
+        TaggedValue* fileSignature = term->input(0);
+        std::string filename = term->input(1)->asString();
+        return preload_script(cxt, term, fileSignature, filename);
     }
 
     CA_FUNCTION(evaluate_include)
     {
-        preload_script(CONTEXT, CALLER);
+        preload_script(CONTEXT, CALLER, INPUT(0), STRING_INPUT(1));
 
         if (CONTEXT->errorOccurred)
             return;

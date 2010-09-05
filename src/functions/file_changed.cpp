@@ -31,9 +31,6 @@ namespace file_changed_function {
     CA_FUNCTION(evaluate)
     {
         make_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), INPUT(1)->asString()));
-        std::cout << "file_changed: "
-            << INPUT(0)->toString() << ","
-            << INPUT(1)->toString() << std::endl;
     }
 
     void setup(Branch& kernel)

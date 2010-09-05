@@ -466,6 +466,9 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     bytecode::write_get_index(context, inputList, iteratorIndex,
             iteratorTerm->stackIndex);
 
+    // Copy local rebinds to their output slots
+
+
     // Fetch state for this iteration
     int iterationLocalState = -1;
     if (hasState) {

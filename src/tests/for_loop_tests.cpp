@@ -59,17 +59,20 @@ void test_rebind_external()
 void test_rebind_internally()
 {
     Branch branch;
-    branch.eval("a = 0");
-    branch.eval("for i in [0 0 0]; a += 1; end");
+    branch.compile("a = 0");
+    branch.compile("for i in [0 0 0]; a += 1; end");
+    evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 3);
 
-    branch.eval("found_3 = false");
-    branch.eval("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end");
+    branch.compile("found_3 = false");
+    branch.compile("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end");
+    evaluate_branch(branch);
     test_assert(branch["found_3"]->asBool());
 
-    branch.eval("found_3 = false");
-    branch.eval("for n in [2 4 6 8]; if n == 3; found_3 = true; end; end");
+    branch.compile("found_3 = false");
+    branch.compile("for n in [2 4 6 8]; if n == 3; found_3 = true; end; end");
+    evaluate_branch(branch);
     test_assert(branch["found_3"]->asBool() == false);
 }
 
