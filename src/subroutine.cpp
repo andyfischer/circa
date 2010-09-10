@@ -23,19 +23,23 @@ namespace subroutine_t {
 
     CA_FUNCTION(evaluate)
     {
+        Term* function = FUNCTION;
+        Branch& functionBranch = function->nestedContents;
+
         // Copy inputs to a new stack
         List stack;
         stack.resize(NUM_INPUTS);
         for (int i=0; i < NUM_INPUTS; i++) {
             TaggedValue* input = INPUT(i);
-            if (input != NULL)
+            if (input != NULL) {
+                Type *inputType = type_contents(function_t::get_input_type(function, i));
                 copy(input, stack.get(i));
+                change_type(stack.get(i), inputType);
+            }
         }
 
         reset(&CONTEXT->subroutineOutput);
 
-        Term* function = FUNCTION;
-        Branch& functionBranch = function->nestedContents;
         if (!functionBranch._bytecode.inuse)
             bytecode::update_bytecode(functionBranch);
         evaluate_bytecode(CONTEXT, &functionBranch._bytecode, &stack);
