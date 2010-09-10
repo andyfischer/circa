@@ -9,10 +9,10 @@ namespace circa {
    [0] #attributes
      [0] #modify_list
    [1] iterator
-   [2 .. n-2] user's code
+   [2] #inner_rebinds
+   [...] contents
    [n-1] #outer_rebinds
 */
-
 
 Branch& get_for_loop_rebinds(Term* forTerm)
 {
@@ -25,14 +25,12 @@ Term* get_for_loop_iterator(Term* forTerm)
     return forTerm->nestedContents[1];
 }
 
-
 Term* get_for_loop_modify_list(Term* forTerm)
 {
     Term* term = forTerm->nestedContents[0]->nestedContents[0];
     ca_assert(term != NULL);
     return term;
 }
-
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
 {
@@ -46,6 +44,9 @@ void setup_for_loop_pre_code(Term* forTerm)
     Branch& attributes = create_branch(forContents, "#attributes");
     attributes.owningTerm->setBoolProp("no-bytecode", true);
     create_bool(attributes, false, "#modify_list");
+
+    Branch& innerRebinds = create_branch(forContents, "#inner_rebinds");
+    innerRebinds.owningTerm->setBoolProp("no-bytecode", true);
 }
 
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
@@ -74,7 +75,11 @@ void setup_for_loop_post_code(Term* forTerm)
         if (reboundNames[i] == listName)
             continue;
 
-        apply(outerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+        Term* join = apply(outerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+        Term* original = outerScope[reboundNames[i]];
+
+        // Rewrite the loop code to use our local copies of these rebound variables.
+        remap_pointers(forContents, original, join);
     }
 
     bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
@@ -83,10 +88,7 @@ void setup_for_loop_post_code(Term* forTerm)
         apply(outerRebinds, JOIN_FUNC, RefList(), listName);
 
     expose_all_names(outerRebinds, outerScope);
-
-
 }
-
 
 Term* find_enclosing_for_loop(Term* term)
 {
@@ -242,7 +244,11 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
             iteratorTerm->stackIndex);
 
     // Copy local rebinds to their output slots
-
+    for (int i=0; i < outerRebinds.length(); i++) {
+        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
+        ca_assert(outerVersion != NULL);
+        bytecode::write_copy(context, outerVersion->stackIndex, outerRebinds[i]->stackIndex);
+    }
 
     // Fetch state for this iteration
     int iterationLocalState = -1;
