@@ -65,6 +65,7 @@ void setup_for_loop_post_code(Term* forTerm)
     std::string listName = forTerm->input(0)->name;
 
     // Create a branch that has all the names which are rebound in this loop
+    Branch& innerRebinds = forContents["#inner_rebinds"]->nestedContents;
     Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
     outerRebinds.owningTerm->setBoolProp("no-bytecode", true);
 
@@ -75,11 +76,14 @@ void setup_for_loop_post_code(Term* forTerm)
         if (reboundNames[i] == listName)
             continue;
 
-        Term* join = apply(outerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
         Term* original = outerScope[reboundNames[i]];
 
+        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+        change_type(innerRebind, original->type);
+        apply(outerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+
         // Rewrite the loop code to use our local copies of these rebound variables.
-        remap_pointers(forContents, original, join);
+        remap_pointers(forContents, original, innerRebind);
     }
 
     bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
@@ -132,7 +136,8 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     
     // Assign stack positions to #rebinds first (similar to inside if block)
     Branch& forContents = forTerm->nestedContents;
-    Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
+    Branch& innerRebinds = forContents["#inner_rebinds"]->nestedContents;
+    Branch& outerRebinds = forContents["#outer_rebinds"]->nestedContents;
     Branch& outerScope = *forTerm->owningBranch;
     bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
     Term* inputTerm = forTerm->input(0);
@@ -145,6 +150,12 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     bool assignStackIndexes = context->writePos != NULL;
     if (assignStackIndexes) {
+        for (int i=0; i < innerRebinds.length(); i++) {
+            Term* term = innerRebinds[i];
+            if (term->stackIndex == -1)
+                term->stackIndex = context->nextStackIndex++;
+        }
+
         // For names in #outer_rebinds, the join terms should have the same stack
         // indices as the term's output.
         for (int i=0; i < outerRebinds.length(); i++) {
@@ -188,19 +199,6 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     int compareIndexOutput = context->nextStackIndex++;
 
-    // Do an initial check of iterator vs length, if they fail this check then
-    // the loop is never run, and we'll need to copy values for outer rebinds.
-
-    // less_than_i(iterator, listLength) -> compareIndexOutput
-    {
-        int inputs[2];
-        inputs[0] = iteratorIndex;
-        inputs[1] = listLength;
-        bytecode::write_comment(context, "iterator < listLength -> compareIndexOutput");
-        bytecode::write_call_op(context, NULL,
-                get_global("less_than_i"), 2, inputs, compareIndexOutput);
-    }
-
     // If we're outputing a list, then initialize a blank list output here.
     if (writingOutputList) {
         int inputs[1];
@@ -210,15 +208,28 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
                 get_global("blank_list"), 1, inputs, outputList);
     }
 
-    bytecode::write_comment(context, "jump when there are zero iterations");
-    bytecode::JumpIfNotOperation* jumpToLoopNeverRun = (bytecode::JumpIfNotOperation*)
-        context->writePos;
-    bytecode::write_jump_if_not(context, compareIndexOutput, 0);
+    // Copy values for any rebinds
+    bytecode::write_comment(context, "Copy local rebinds");
+    for (int i=0; i < innerRebinds.length(); i++) {
+        Term* term = innerRebinds[i];
+        if (term->stackIndex == -1)
+            term->stackIndex = context->nextStackIndex++;
+        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
+        bytecode::write_copy(context, outerVersion->stackIndex, term->stackIndex);
+    }
+
+    // Do another copy for rebind output, in case the loop has 0 iterations. This could be 
+    // optimized but we'll optimize later.
+    bytecode::write_comment(context, "Copy outer rebinds, in case loop has 0 iterations");
+    for (int i=0; i < outerRebinds.length(); i++) {
+        Term* rebind = outerRebinds[i];
+        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
+        bytecode::write_copy(context, outerVersion->stackIndex, rebind->stackIndex);
+    }
 
     // loop_start: Check if index < length(input_list)
     int loopStartPos = context->getOffset();
 
-    // (this code is duplicated above)
     // less_than_i(iterator, listLength) -> compareIndexOutput
     {
         int inputs[2];
@@ -293,6 +304,13 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         }
     }
 
+    bytecode::write_comment(context, "Copy locals back to innerRebinds");
+    for (int i=0; i < innerRebinds.length(); i++) {
+        Term* original = innerRebinds[i];
+        Term* modified = outerRebinds[i];
+        bytecode::write_copy(context, modified->stackIndex, original->stackIndex);
+    }
+
     // increment(iterator_index)
     bytecode::write_comment(context, "increment iterator");
     bytecode::write_increment(context, iteratorIndex);
@@ -300,16 +318,6 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     // jump back to loop_start
     bytecode::write_comment(context, "jump back to loop start");
     bytecode::write_jump(context, loopStartPos);
-
-    // Here we insert a block of code that is called when there are 0 iterations.
-    if (jumpToLoopNeverRun)
-        jumpToLoopNeverRun->offset = context->getOffset();
-
-    for (int i=0; i < outerRebinds.length(); i++) {
-        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
-        ca_assert(outerVersion != NULL);
-        bytecode::write_copy(context, outerVersion->stackIndex, outerRebinds[i]->stackIndex);
-    }
 
     // complete the above jumpToEnd
     if (jumpToEnd)

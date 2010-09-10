@@ -6,13 +6,14 @@
 #include "builtins.h"
 #include "circa.h"
 #include "importing.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace importing_tests {
 
 CA_FUNCTION(my_imported_function)
 {
-    set_int(OUTPUT, as_int(INPUT(0)) + as_int(INPUT(1)));
+    make_int(OUTPUT, as_int(INPUT(0)) + as_int(INPUT(1)));
 }
 
 void test_import_c()
@@ -24,7 +25,8 @@ void test_import_c()
 
     test_assert(function_t::get_output_type(func) == INT_TYPE);
 
-    Term* result = branch.eval("my_imported_func(4,5)");
+    Term* result = branch.compile("my_imported_func(4,5)");
+    evaluate_branch(branch);
 
     test_assert(as_int(result) == 9);
 }

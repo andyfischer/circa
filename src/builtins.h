@@ -95,6 +95,10 @@ void shutdown();
 
 bool is_value(Term* term);
 
+namespace copy_function {
+    CA_FUNCTION(evaluate);
+}
+
 namespace do_once_function {
     void write_bytecode(bytecode::WriteContext* context, Term* term);
 }

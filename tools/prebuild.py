@@ -137,7 +137,6 @@ def text_file_to_c_string(sourceFile, variableName):
 mkdir('src/generated')
 
 # generate setup_builtin_functions.cpp and register_all_tests.cpp
-import generate_cpp_registration
 write_text_file('src/generated/setup_builtin_functions.cpp', setup_builtin_functions())
 write_text_file('src/generated/register_all_tests.cpp', register_all_tests())
 

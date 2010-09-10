@@ -3,6 +3,8 @@
 #include "common_headers.h"
 
 #include <circa.h>
+#include "fake_filesystem.h"
+#include "importing_macros.h"
 
 namespace circa {
 namespace script_reload_tests {

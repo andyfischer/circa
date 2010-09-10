@@ -71,6 +71,6 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 // an exception or trigger a debugger breakpoint. But either way, execution will
 // be interrupted. ca_assert_function is defined in errors.cpp
 #define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
-void ca_assert_function(bool expr, const char* expr, int line, const char* file);
+void ca_assert_function(bool result, const char* expr, int line, const char* file);
 
 } // namespace circa
