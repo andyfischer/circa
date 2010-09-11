@@ -71,15 +71,19 @@ Term* get_named(Branch const& branch, std::string const& name)
 
 Term* get_named_at(Branch& branch, int index, std::string const& name)
 {
-    // FIXME: This needs to search inside branches which expose names, and also
-    // search upwards to parent branches.
-    for (int i=index; i >= 0; i--) {
+    // FIXME: This needs to search inside branches which expose names.
+    for (int i=index - 1; i >= 0; i--) {
         Term* term = branch[i];
         if (term == NULL) continue;
         if (term->name == name)
             return term;
     }
-    return NULL;
+
+    // Look in outer scopes
+    if (branch.owningTerm == NULL)
+        return NULL;
+
+    return get_named_at(branch.owningTerm, name);
 }
 Term* get_named_at(Term* location, std::string const& name)
 {
