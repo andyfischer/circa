@@ -47,6 +47,7 @@ void setup_for_loop_pre_code(Term* forTerm)
 
     Branch& innerRebinds = create_branch(forContents, "#inner_rebinds");
     innerRebinds.owningTerm->setBoolProp("no-bytecode", true);
+    innerRebinds.owningTerm->setBoolProp("exposesNames", true);
 }
 
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
@@ -259,11 +260,11 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
             iteratorTerm->stackIndex);
 
     // Copy local rebinds to their output slots
-    for (int i=0; i < outerRebinds.length(); i++) {
+    /*for (int i=0; i < outerRebinds.length(); i++) {
         Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
         ca_assert(outerVersion != NULL);
         bytecode::write_copy(context, outerVersion->stackIndex, outerRebinds[i]->stackIndex);
-    }
+    }*/
 
     // Fetch state for this iteration
     int iterationLocalState = -1;

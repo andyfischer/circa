@@ -71,12 +71,19 @@ Term* get_named(Branch const& branch, std::string const& name)
 
 Term* get_named_at(Branch& branch, int index, std::string const& name)
 {
-    // FIXME: This needs to search inside branches which expose names.
     for (int i=index - 1; i >= 0; i--) {
         Term* term = branch[i];
         if (term == NULL) continue;
         if (term->name == name)
             return term;
+
+        if (term->nestedContents.length() > 0
+                && term->boolPropOptional("exposesNames", false))
+        {
+            Term* nested = term->nestedContents[name];
+            if (nested != NULL)
+                return nested;
+        }
     }
 
     // Look in outer scopes

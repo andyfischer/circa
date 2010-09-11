@@ -92,6 +92,16 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
+    // Show compiled code and bytecode
+    if (args[0] == "-pb") {
+        Branch branch;
+        parse_script(branch, args[1]);
+        bytecode::update_bytecode(branch);
+        print_branch_raw(std::cout, branch);
+        bytecode::print_bytecode(std::cout, branch);
+        return 0;
+    }
+
     // Evaluate and show compiled code
     if (args[0] == "-ep") {
         Branch branch;
