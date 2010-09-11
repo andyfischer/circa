@@ -1,6 +1,8 @@
 
 
 Bugs/tasks:
+ - return keyword no worky?
+
  - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
 
  - This syntax error isn't handled well:

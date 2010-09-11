@@ -156,7 +156,7 @@ void test_calling_manual_overloaded_function()
 void test_bug_where_a_mysterious_copy_term_was_added()
 {
     Branch branch;
-    branch.compile("def f()->int return 1 end");
+    branch.compile("def f()->int return(1) end");
     for (BranchIterator it(branch); !it.finished(); ++it)
         test_assert(it->function->name != "copy");
 }
