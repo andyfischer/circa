@@ -36,6 +36,7 @@ namespace vectorize_vv_function {
         Term* forTerm = apply(branch, FOR_FUNC, RefList(range));
         setup_for_loop_pre_code(forTerm);
         Term* iterator = setup_for_loop_iterator(forTerm, "i");
+        ca_assert(iterator == get_for_loop_iterator(forTerm));
         Term* left_i = apply(forTerm->nestedContents, get_global("get_index"), RefList(left, iterator));
         Term* right_i = apply(forTerm->nestedContents, get_global("get_index"), RefList(right, iterator));
         apply(forTerm->nestedContents, func, RefList(left_i, right_i));

@@ -32,9 +32,12 @@ namespace subroutine_t {
         for (int i=0; i < NUM_INPUTS; i++) {
             TaggedValue* input = INPUT(i);
             if (input != NULL) {
-                Type *inputType = type_contents(function_t::get_input_type(function, i));
                 copy(input, stack.get(i));
-                change_type(stack.get(i), inputType);
+
+                Term* inputTypeTerm = function_t::get_input_type(function, i);
+                Type* inputType = type_contents(inputTypeTerm);
+                if (inputTypeTerm != ANY_TYPE)
+                    change_type(stack.get(i), inputType);
             }
         }
 

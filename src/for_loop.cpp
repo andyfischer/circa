@@ -22,7 +22,7 @@ Branch& get_for_loop_rebinds(Term* forTerm)
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return forTerm->nestedContents[1];
+    return forTerm->nestedContents[2];
 }
 
 Term* get_for_loop_modify_list(Term* forTerm)

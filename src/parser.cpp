@@ -608,7 +608,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = apply(branch, IF_BLOCK_FUNC, RefList(NULL));
+    Term* result = apply(branch, IF_BLOCK_FUNC, RefList());
     Branch& contents = result->nestedContents;
 
     bool firstIteration = true;

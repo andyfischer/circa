@@ -55,7 +55,6 @@ void update_if_block_joining_branch(Term* ifCall)
     Branch& joining = contents["#joining"]->nestedContents;
     joining.clear();
 
-
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
 
@@ -189,15 +188,17 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         // For each name in #joining, we want corresponding variables (across the
         // branches in this if-block) to have the same stack indexes.
         for (int i=0; i < joining.length(); i++) {
+            ca_assert(joining[i] != NULL);
             if (joining[i]->stackIndex == -1)
                 joining[i]->stackIndex = context->nextStackIndex++;
-            std::string& name = joining[i]->name;
+            std::string const& name = joining[i]->name;
             ca_assert(name != "");
 
             // Find the corresponding term in each branch, give it this stack index.
             for (int b=0; b < numBranches; b++) {
                 Term* term = blockContents[b]->nestedContents[name];
-                term->stackIndex = joining[i]->stackIndex;
+                if (term != NULL)
+                    term->stackIndex = joining[i]->stackIndex;
             }
         }
     }
@@ -239,6 +240,18 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         // Write each instruction in this branch
         Branch& branchContents = term->nestedContents;
         bytecode::write_bytecode_for_branch(context, branchContents, conditionLocalState);
+
+        // For each local rebind, make sure that the branch writes to its stack position.
+        // If one branch doesn't mention a local rebind, then insert a copy term.
+        for (int i=0; i < joining.length(); i++) {
+            std::string const& name = joining[i]->name;
+            if (branchContents[name] == NULL) {
+                Term* outerVersion = get_named_at(ifBlock, name);
+                ca_assert(outerVersion != NULL);
+                bytecode::write_copy(context, outerVersion->stackIndex,
+                        joining[i]->stackIndex);
+            }
+        }
 
         if (hasState) {
             // For all the branches which did not get evaluated, reset state. An

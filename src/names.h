@@ -12,6 +12,7 @@ Term* get_named(Branch const& branch, std::string const& qualifiedName);
 
 // Find the name binding that is active at the given branch index.
 Term* get_named_at(Branch& branch, int index, std::string const& name);
+Term* get_named_at(Term* location, std::string const& name);
 
 Term* get_parent_term(Term* term);
 bool name_is_reachable_from(Term* term, Branch& branch);
