@@ -63,6 +63,7 @@ void setup_for_loop_post_code(Term* forTerm)
     Branch& forContents = forTerm->nestedContents;
     Branch& outerScope = *forTerm->owningBranch;
     std::string listName = forTerm->input(0)->name;
+    std::string iteratorName = get_for_loop_iterator(forTerm)->name;
 
     // Create a branch that has all the names which are rebound in this loop
     Branch& innerRebinds = forContents["#inner_rebinds"]->nestedContents;
@@ -73,14 +74,17 @@ void setup_for_loop_post_code(Term* forTerm)
     list_names_that_this_branch_rebinds(forContents, reboundNames);
 
     for (size_t i=0; i < reboundNames.size(); i++) {
-        if (reboundNames[i] == listName)
+        std::string const& name = reboundNames[i];
+        if (name == listName)
+            continue;
+        if (name == iteratorName)
             continue;
 
-        Term* original = outerScope[reboundNames[i]];
+        Term* original = outerScope[name];
 
-        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, RefList(), name);
         change_type(innerRebind, original->type);
-        apply(outerRebinds, JOIN_FUNC, RefList(), reboundNames[i]);
+        apply(outerRebinds, JOIN_FUNC, RefList(), name);
 
         // Rewrite the loop code to use our local copies of these rebound variables.
         remap_pointers(forContents, original, innerRebind);
