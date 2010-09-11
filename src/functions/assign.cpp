@@ -32,26 +32,49 @@ namespace assign_function {
         return parser::find_lexpr_root(term->input(0))->type;
     }
 
+    Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredValue)
+    {
+        Term* set = NULL;
+
+        if (term->function == GET_INDEX_FUNC) {
+            set = SET_INDEX_FUNC;
+        } else if (term->function == GET_FIELD_FUNC) {
+            set = SET_FIELD_FUNC;
+        }
+
+        return apply(branch, set, RefList(term->input(0), term->input(1), desiredValue));
+    }
+
     void update_assign_contents(Term* term)
     {
         Branch& contents = term->nestedContents;
         contents.clear();
 
-        PathExpression path = get_lexpr_path_expression(root);
-        int numElements = path._elements.size();
-        for (int i=0; i < numElements; i++) {
-            PathExpression::Element const& element = path._elements[i];
+        // The left-expression might be represented by a chain of get_xxx terms.
+        // Walk upwards and append a series of set_terms.
+        Term* getter = term->input(0);
+        Term* desired = term->input(1);
 
-            if (element.isIndex()) {
-            } else if (element.isField()) {
-            } else {
-            }
+        while (true) {
+            Term* result = write_setter_from_getter(contents, getter, desired);
+
+            desired = result;
+            getter = getter->input(0);
+
+            if (getter->name != "")
+                break;
+            if (getter->function != GET_INDEX_FUNC && getter->function != GET_FIELD_FUNC)
+                break;
         }
     }
 
     void writeBytecode(bytecode::WriteContext* context, Term* term)
     {
-        bytecode::write_bytecode_for_branch_inline(context, term);
+        Branch& contents = term->nestedContents;
+        if (term->stackIndex == -1)
+            term->stackIndex = context->nextStackIndex++;
+        contents[contents.length()-1]->stackIndex = term->stackIndex;
+        bytecode::write_bytecode_for_branch_inline(context, contents);
     }
 
     void setup(Branch& kernel)

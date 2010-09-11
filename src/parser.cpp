@@ -878,6 +878,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
         if (lexprRoot != NULL && lexprRoot->name != "") {
             branch.bindName(expr, lexprRoot->name);
         }
+        assign_function::update_assign_contents(expr);
     }
 
     set_source_location(expr, startPosition, tokens);

@@ -95,6 +95,10 @@ void shutdown();
 
 bool is_value(Term* term);
 
+namespace assign_function {
+    void update_assign_contents(Term* term);
+}
+
 namespace copy_function {
     CA_FUNCTION(evaluate);
 }
