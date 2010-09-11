@@ -64,6 +64,7 @@ TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
     return result;
 }
     
+// TODO: Get rid of this
 void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValue* newValue)
 {
     ca_assert(path.length() > 0);
