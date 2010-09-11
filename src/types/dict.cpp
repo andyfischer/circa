@@ -340,6 +340,11 @@ namespace tagged_value_wrap {
     {
         return to_string((DictData*) value->value_data.ptr);
     }
+    TaggedValue* get_field(TaggedValue* value, const char* field)
+    {
+        return dict_t::get_value((DictData*) value->value_data.ptr, field);
+
+    }
 } // namespace tagged_value_wrap
 
 void setup_type(Type* type)
@@ -348,6 +353,7 @@ void setup_type(Type* type)
     type->release = tagged_value_wrap::release;
     type->copy = tagged_value_wrap::copy;
     type->toString = tagged_value_wrap::to_string;
+    type->getField = tagged_value_wrap::get_field;
     type->name = "Dict";
 }
 
