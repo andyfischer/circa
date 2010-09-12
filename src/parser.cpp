@@ -682,7 +682,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         // FIXME: make sure this name is unique
         std::string hiddenStateName = "#if_block";
         Term* stateTerm = create_stateful_value(branch, LIST_TYPE, NULL, hiddenStateName);
-        set_input(result, 0, stateTerm);
+        //set_input(result, 0, stateTerm);
     }
 
     // Move the if_block term to be after the condition and state terms

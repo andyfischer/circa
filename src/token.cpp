@@ -282,6 +282,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, AND)) return;
         if (try_to_consume_keyword(context, OR)) return;
         if (try_to_consume_keyword(context, DISCARD)) return;
+        if (try_to_consume_keyword(context, RETURN)) return;
 
         consume_identifier(context);
         return;
