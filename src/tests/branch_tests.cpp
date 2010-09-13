@@ -411,6 +411,56 @@ void test_shorten()
     test_assert(branch);
 }
 
+void test_move()
+{
+    Branch branch;
+    Term* one = create_int(branch, 1, "1");
+    Term* two = create_int(branch, 2, "2");
+    Term* three = create_int(branch, 3, "3");
+    Term* four = create_int(branch, 4, "4");
+
+    test_assert(branch.length() == 4);
+    test_assert(one->index == 0);
+    test_assert(two->index == 1);
+    test_assert(three->index == 2);
+    test_assert(four->index == 3);
+
+    branch.move(one, 3);
+    test_assert(branch.length() == 4);
+    test_assert(one->index == 3);
+    test_assert(two->index == 0);
+    test_assert(three->index == 1);
+    test_assert(four->index == 2);
+
+    branch.move(one, 0);
+    test_assert(branch.length() == 4);
+    test_assert(one->index == 0);
+    test_assert(two->index == 1);
+    test_assert(three->index == 2);
+    test_assert(four->index == 3);
+
+    branch.move(two, 1);
+    test_assert(branch.length() == 4);
+    test_assert(one->index == 0);
+    test_assert(two->index == 1);
+    test_assert(three->index == 2);
+    test_assert(four->index == 3);
+
+    branch.move(two, 2);
+    test_assert(branch.length() == 4);
+    test_assert(one->index == 0);
+    test_assert(two->index == 2);
+    test_assert(three->index == 1);
+    test_assert(four->index == 3);
+    
+    branch.move(four, 2);
+    test_assert(branch.length() == 4);
+    test_assert(one->index == 0);
+    test_assert(two->index == 3);
+    test_assert(three->index == 1);
+    test_assert(four->index == 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_insert);
@@ -425,6 +475,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_get_field_by_name);
     REGISTER_TEST_CASE(branch_tests::test_duplicate_destination_has_different_type);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
+    REGISTER_TEST_CASE(branch_tests::test_move);
     // FIXME
     //REGISTER_TEST_CASE(branch_tests::test_migrate);
     //REGISTER_TEST_CASE(branch_tests::test_migrate2);

@@ -61,6 +61,7 @@ struct Branch
     void append(Term* term);
     Term* appendNew();
 
+    void move(Term* term, int index);
     void moveToEnd(Term* term);
 
     void remove(Term* term);

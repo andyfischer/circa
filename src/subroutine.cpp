@@ -128,12 +128,10 @@ void subroutine_change_state_type(Term* func, Term* newType)
 
             if (term->function == func) {
                 Branch* branch = term->owningBranch;
-                Term* stateContainer = alloc_term();
+                Term* stateType = function_t::get_inline_state_type(func);
+                std::string name = default_name_for_hidden_state(term->name);
+                Term* stateContainer = create_stateful_value(*branch, stateType, NULL, name);
                 branch->insert(term->index, stateContainer);
-                change_type(stateContainer, function_t::get_inline_state_type(func));
-                //FIXME
-                //change_function(stateContainer, STATEFUL_VALUE_FUNC);
-                branch->bindName(stateContainer, default_name_for_hidden_state(term->name));
 
                 RefList inputs = term->inputs;
                 inputs.prepend(stateContainer);

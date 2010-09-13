@@ -169,6 +169,25 @@ void Branch::insert(int index, Term* term)
     }
 }
 
+void Branch::move(Term* term, int index)
+{
+    ca_assert(term->owningBranch == this);
+
+    if (term->index == index)
+        return;
+
+    int dir = term->index < index ? 1 : -1;
+
+    Ref ref = term;
+
+    for (int i=term->index; i != index; i += dir) {
+        _terms[i] = _terms[i+dir];
+        _terms[i]->index = i;
+    }
+    _terms[index] = term;
+    term->index = index;
+}
+
 void Branch::moveToEnd(Term* term)
 {
     assert_valid_term(term);

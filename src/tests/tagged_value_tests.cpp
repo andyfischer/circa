@@ -132,7 +132,8 @@ namespace subroutine_call_test_helper {
     CA_FUNCTION(assert_ints)
     {
         test_assert(is_int(INPUT(0)));
-        test_assert(is_int(OUTPUT));
+        
+        // Disabled: function output is no longer automatically initialized to the type.
     }
 }
 
@@ -141,18 +142,6 @@ void subroutine_call_test()
     Branch branch;
     import_function(branch, subroutine_call_test_helper::assert_ints, "f(int) -> int");
     branch.eval("f(1)");
-}
-
-void test_float()
-{
-#if 0
-    TaggedValue f = tag_float(5);
-    TaggedValue i = tag_int(5);
-    test_assert(is_int(&i));
-    test_assert(is_float(&f));
-    copy(&i, &f);
-    test_assert(is_float(&f));
-#endif
 }
 
 void test_reset()
@@ -352,7 +341,6 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::test_polymorphic);
     REGISTER_TEST_CASE(tagged_value_tests::test_term_value);
     REGISTER_TEST_CASE(tagged_value_tests::subroutine_call_test);
-    REGISTER_TEST_CASE(tagged_value_tests::test_float);
     REGISTER_TEST_CASE(tagged_value_tests::test_reset);
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
