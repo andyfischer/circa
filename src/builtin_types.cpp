@@ -305,6 +305,10 @@ namespace any_t {
     {
         return true;
     }
+    void cast(Type* type, TaggedValue* source, TaggedValue* dest)
+    {
+        copy(source, dest);
+    }
 }
 
 namespace void_t {

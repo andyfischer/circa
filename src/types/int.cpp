@@ -8,7 +8,7 @@
 
 namespace circa {
 namespace int_t {
-    void reset(TaggedValue* v) { set_int(v, 0); }
+    void reset(TaggedValue* v) { make_int(v, 0); }
 
     bool equals(TaggedValue* a, TaggedValue* b)
     {

@@ -9,12 +9,12 @@ namespace circa {
 namespace float_t {
     void reset(TaggedValue* value)
     {
-        set_float(value, 0);
+        make_float(value, 0);
     }
 
     void cast(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        set_float(dest, to_float(source));
+        make_float(dest, to_float(source));
     }
 
     bool equals(TaggedValue* a, TaggedValue* b)

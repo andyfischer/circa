@@ -239,6 +239,7 @@ void print_bytecode(std::ostream& out, BytecodeData* data);
 void print_bytecode(std::ostream& out, Branch& branch);
 void print_operation(std::ostream& out, Operation* op);
 void print_bytecode_raw(std::ostream& out, BytecodeData* data);
+void print_bytecode_for_all_major_branches(std::ostream& out, Branch& branch);
 
 CallOperation* create_orphan_call_operation(Term* caller, Term* function, int numInputs);
 void free_orphan_call_operation(CallOperation* op);

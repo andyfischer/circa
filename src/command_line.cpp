@@ -98,7 +98,7 @@ int run_command_line(std::vector<std::string> args)
         parse_script(branch, args[1]);
         bytecode::update_bytecode(branch);
         print_branch_raw(std::cout, branch);
-        bytecode::print_bytecode(std::cout, branch);
+        bytecode::print_bytecode_for_all_major_branches(std::cout, branch);
         return 0;
     }
 
@@ -134,8 +134,7 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         parse_script(branch, args[1]);
         bytecode::update_bytecode(branch);
-        bytecode::print_bytecode(std::cout, branch);
-        std::cout << std::endl;
+        bytecode::print_bytecode_for_all_major_branches(std::cout, branch);
         return 0;
     }
 

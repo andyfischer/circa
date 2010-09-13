@@ -573,6 +573,22 @@ void print_bytecode_raw(std::ostream& out, BytecodeData* data)
     }
 }
 
+void print_bytecode_for_all_major_branches(std::ostream& out, Branch& branch)
+{
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (is_subroutine(term)) {
+            update_bytecode(term->nestedContents);
+            out << "[" << term->name << "]" << std::endl;
+            print_bytecode(out, term->nestedContents);
+        }
+    }
+
+    out << "[#main]" << std::endl;
+    update_bytecode(branch);
+    print_bytecode(out, branch);
+}
+
 CallOperation* create_orphan_call_operation(Term* caller, Term* function, int numInputs)
 {
     CallOperation* op = (CallOperation*) malloc(sizeof(CallOperation)

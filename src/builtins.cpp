@@ -113,6 +113,8 @@ Term* get_global(std::string name)
 
 CA_FUNCTION(empty_evaluate_function) {}
 
+void empty_bytecode_generation(bytecode::WriteContext* context, Term* term) {}
+
 namespace null_t {
     std::string toString(TaggedValue* value) { return "null";}
 }
@@ -183,6 +185,7 @@ void bootstrap_kernel()
     as_type(ANY_TYPE).name = "any";
     as_type(ANY_TYPE).toString = any_t::to_string;
     as_type(ANY_TYPE).isSubtype = any_t::matches_type;
+    as_type(ANY_TYPE).cast = any_t::cast;
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Branch type
@@ -228,6 +231,8 @@ void pre_initialize_types(Branch& kernel)
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
             "input_placeholder() -> any");
+
+    function_t::get_attrs(INPUT_PLACEHOLDER_FUNC).writeBytecode = empty_bytecode_generation;
 
     // FileSignature is used in some builtin functions
     parse_type(kernel, "type FileSignature { string filename, int time_modified }");

@@ -310,8 +310,8 @@ void test_state_in_function()
 
     test_assert(context);
 
-    dump_branch(branch);
-    std::cout << context.topLevelState.toString();
+    //dump_branch(branch);
+    //std::cout << context.topLevelState.toString();
     test_equals(as_int(call1), 3);
 }
 
