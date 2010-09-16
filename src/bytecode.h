@@ -1,43 +1,9 @@
-
-// Goals:
-//
-// Do as much pre-processing of code as possible. This includes:
-//   Resolving overloaded function calls (if possible)
-//   Figuring out the return value for function calls
-//   Insert code to preserve state vars
-//   Assign stack registers
-//
-// Outline:
-//   Each bytecode entry will have:
-//     Pointer to function's term
-//     Pointer to original term
-//     List of inputs. Each input has:
-//       Type of input location: either Stack or Static
-//       The location (for Stack, an index, for Static, a pointer)
-//     Stack index for output
-//
-// Algorithm:
-//
-// For a block:
-//   Iterate through each item, count the # of items that should go on the stack
-//     (In this loop, also assign indexes to the Term)
-//   Record the stack size in bytecode output
-//   For each term:
-//     Should we skip this term? (yes for comments/whitespace)
-//     Write an entry with function, caller, inputs
-//
-// Bytecode ops:
-//
-// stack_size - First op in a branch, 2nd arg declares the # of items on the stack
-// call - Variable sized, call a function with the given function,caller,inputs
-// return - Return, has one input: the stack index of the return value
-
-
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #pragma once
 
 #include "common_headers.h"
+#include "types/list.h"
 
 namespace circa {
 namespace bytecode {
@@ -193,12 +159,15 @@ struct WriteContext {
 
 struct BytecodeData {
     bool needsUpdate;
+    bool inuse;
+
+    List locals;
+
     size_t size;
     size_t capacity;
     char* opdata;
-    bool inuse;
 
-    BytecodeData(): needsUpdate(true), size(0), capacity(0), opdata(NULL), inuse(false) {}
+    BytecodeData(): needsUpdate(true), inuse(false), size(0), capacity(0), opdata(NULL) {}
 };
 
 // The size of the operation, in words.

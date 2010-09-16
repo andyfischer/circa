@@ -136,14 +136,6 @@ Branch* get_if_block_else_block(Term* ifCall)
     return &(callContents[callContents.length()-2]->nestedContents);
 }
 
-List* get_if_block_state(Term* ifCall)
-{
-    Term* term = ifCall->input(0);
-    if (term == NULL)
-        return NULL;
-    return List::checkCast(term);
-}
-
 bool if_block_contains_state(Term* ifCall)
 {
     Branch& contents = ifCall->nestedContents;
@@ -154,7 +146,6 @@ bool if_block_contains_state(Term* ifCall)
     }
     return false;
 }
-
 
 void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 {
@@ -169,6 +160,8 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     // Fetch a list container for the state in this block.
     int stateContainer = -1;
     if (hasState) {
+        const char* stateName = "#if_block";
+        
         Term* getState = ifBlock->owningBranch->get(ifBlock->index-1);
         ca_assert(getState != NULL);
         ca_assert(getState->function->name == "get_state_field");

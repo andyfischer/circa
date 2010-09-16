@@ -677,15 +677,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         set_source_hidden(branch.owningTerm, true);
     }
 
-    // Create a state term if necessary
-    if (if_block_contains_state(result)) {
-        // FIXME: make sure this name is unique
-        std::string hiddenStateName = "#if_block";
-        /*Term* stateTerm =*/ create_stateful_value(branch, LIST_TYPE, NULL, hiddenStateName);
-        //set_input(result, 0, stateTerm);
-    }
-
-    // Move the if_block term to be after the condition and state terms
+    // Move the if_block term to be after the condition term
+    // TODO: check if this is necessary
     branch.moveToEnd(result);
 
     update_if_block_joining_branch(result);
