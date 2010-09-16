@@ -108,13 +108,13 @@ Ref Term::refProp(std::string const& name)
 void Term::setIntProp(std::string const& name, int i)
 {
     Term* t = addProperty(name, INT_TYPE);
-    set_int(t, i);
+    make_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
     Term* t = addProperty(name, FLOAT_TYPE);
-    set_float(t, f);
+    make_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)

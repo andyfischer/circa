@@ -19,7 +19,7 @@ void test_lift_closure()
     test_assert(as_int(sub_a) == 1);
 
     lift_closure(sub);
-    set_int(a, 2);
+    make_int(a, 2);
     evaluate_branch(branch);
 
     test_assert(sub_a->input(0) == a);

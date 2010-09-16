@@ -78,7 +78,7 @@ TODO: needs to be fixed for new style of storing state
     //test_assert(is_subroutine_state_expanded(sourceCallState));
     //test_assert(!is_subroutine_state_expanded(destCallState));
 
-    set_int(sourceCallState->getIndex(0), 111);
+    make_int(sourceCallState->getIndex(0), 111);
 
     migrate_stateful_values(source, dest);
 
@@ -93,14 +93,14 @@ void test_load_and_save()
 TODO: needs to be updated for new style of storing state
     Branch branch;
     Term* statefulTerm = branch.eval("state int i");
-    set_int(statefulTerm, 1);
+    make_int(statefulTerm, 1);
 
     TaggedValue stateTv;
     List* state = List::checkCast(make_list(&stateTv));
 
     make_int(state->append(), 5);
     //Term* value_i = create_value(state, INT_TYPE, "i");
-    //set_int(value_i, 5);
+    //make_int(value_i, 5);
 
     test_assert(as_int(statefulTerm) == 1);
 
@@ -108,7 +108,7 @@ TODO: needs to be updated for new style of storing state
 
     test_assert(as_int(statefulTerm) == 5);
 
-    set_int(statefulTerm, 11);
+    make_int(statefulTerm, 11);
 
     persist_state_from_branch(branch, state);
 
@@ -172,17 +172,17 @@ TODO: update
 
     // change value before evaluate_branch, to make sure it's not stored
     // at compile time.
-    set_int(a, 5);
+    make_int(a, 5);
     evaluate_branch(branch);
     test_assert(s);
     test_assert(as_int(s) == 5);
 
     // now make sure a subsequent evaluation doesn't change 's'
-    set_int(a, 7);
+    make_int(a, 7);
     evaluate_branch(branch);
     test_assert(s);
     test_assert(as_int(s) == 5);
-    set_int(a, 9);
+    make_int(a, 9);
     evaluate_branch(branch);
     test_assert(s);
     test_assert(as_int(s) == 5);
@@ -193,7 +193,7 @@ int NEXT_UNIQUE_OUTPUT = 0;
 
 CA_FUNCTION(_unique_output)
 {
-    set_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
+    make_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
 }
 
 std::vector<int> SPY_RESULTS;
@@ -329,7 +329,7 @@ void test_reset_state()
 
     test_assert(i->asInt() == 5);
 
-    set_int(i, 11);
+    make_int(i, 11);
 
     test_assert(i->asInt() == 11);
 
@@ -354,7 +354,7 @@ void bug_where_stateful_function_wouldnt_update_inputs()
 
     test_assert(b_call->asInt() == 1);
 
-    set_int(x, 2);
+    make_int(x, 2);
     evaluate_branch(branch);
 
     test_assert(b_call->asInt() == 2);

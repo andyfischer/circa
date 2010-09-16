@@ -358,25 +358,25 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
 void make_int(TaggedValue* value, int i)
 {
     change_type(value, INT_T);
-    set_int(value, i);
+    value->value_data.asint = i;
 }
 
 void make_float(TaggedValue* value, float f)
 {
     change_type(value, FLOAT_T);
-    set_float(value, f);
+    value->value_data.asfloat = f;
 }
 
 void make_string(TaggedValue* value, const char* s)
 {
     change_type(value, STRING_T);
-    set_str(value, s);
+    *((std::string*) value->value_data.ptr) = s;
 }
 
 void make_bool(TaggedValue* value, bool b)
 {
     change_type(value, BOOL_T);
-    set_bool(value, b);
+    value->value_data.asbool = b;
 }
 
 void make_ref(TaggedValue* value, Term* t)
@@ -409,20 +409,6 @@ void make_type(TaggedValue* value, Type* type)
 void make_null(TaggedValue* value)
 {
     change_type(value, NULL_T);
-}
-
-void set_int(TaggedValue* value, int i)
-{
-    if (!is_int(value))
-        internal_error("Value is not an int");
-    value->value_data.asint = i;
-}
-
-void set_float(TaggedValue* value, float f)
-{
-    if (!is_float(value))
-        internal_error("Value is not a float");
-    value->value_data.asfloat = f;
 }
 
 void set_bool(TaggedValue* value, bool b)

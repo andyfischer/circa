@@ -36,7 +36,7 @@ CA_FUNCTION(paused)
 
 CA_FUNCTION(get_time)
 {
-    set_float(OUTPUT, app::singleton()._ticksElapsed / 1000.0);
+    make_float(OUTPUT, app::singleton()._ticksElapsed / 1000.0);
 }
 
 void setup(circa::Branch& branch)

@@ -219,14 +219,14 @@ Term* create_string(Branch& branch, std::string const& s, std::string const& nam
 Term* create_int(Branch& branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, INT_TYPE, name);
-    set_int(term, i);
+    make_int(term, i);
     return term;
 }
 
 Term* create_float(Branch& branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, FLOAT_TYPE, name);
-    set_float(term, f);
+    make_float(term, f);
     return term;
 }
 

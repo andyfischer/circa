@@ -190,8 +190,8 @@ bool reload_runtime()
         return false;
 
     // Write window width & height
-    set_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
-    set_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
+    make_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
+    make_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
 
     return true;
 }

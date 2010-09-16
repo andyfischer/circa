@@ -70,7 +70,7 @@ void test_set()
     s = branch.eval("s.add(val)");
 
     test_assert(s->getIndex(1)->asInt() == 5);
-    set_int(val, 6);
+    make_int(val, 6);
     test_assert(s->getIndex(1)->asInt() == 5);
 }
 

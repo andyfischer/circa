@@ -76,8 +76,6 @@ void make_branch(TaggedValue* value);
 void make_type(TaggedValue* value, Type* type);
 void make_null(TaggedValue* value);
 
-void set_int(TaggedValue* value, int i);
-void set_float(TaggedValue* value, float f);
 void set_bool(TaggedValue* value, bool b);
 void set_str(TaggedValue* value, const char* s);
 void set_str(TaggedValue* value, std::string const& s);

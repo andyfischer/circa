@@ -60,8 +60,8 @@ CA_FUNCTION(get_string_dimensions)
         
     float width = mainFont->stringWidth(STRING_INPUT(0));
     
-    set_float(OUTPUT->getIndex(0), width);
-    set_float(OUTPUT->getIndex(1), mainFont->getLineHeight());
+    make_float(OUTPUT->getIndex(0), width);
+    make_float(OUTPUT->getIndex(1), mainFont->getLineHeight());
 }
 
 void setup()

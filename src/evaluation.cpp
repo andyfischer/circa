@@ -164,7 +164,7 @@ void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* sta
             case bytecode::OP_INCREMENT: {
                 bytecode::IncrementOperation *incop = (bytecode::IncrementOperation*) op;
                 TaggedValue* value = stack->get(incop->stackIndex);
-                set_int(value, as_int(value) + 1);
+                make_int(value, as_int(value) + 1);
                 pos += sizeof(bytecode::IncrementOperation);
                 continue;
             }

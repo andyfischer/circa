@@ -156,7 +156,7 @@ void test_duplicate()
     test_assert(as_string(term2_duplicate) == "yarn");
 
     // make sure 'duplicate' uses different terms
-    set_int(term1, 8);
+    make_int(term1, 8);
     test_assert(as_int(term1_duplicate) == 5);
 
     test_assert(term1);

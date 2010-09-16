@@ -127,7 +127,7 @@ namespace string_t {
 
     CA_FUNCTION(length)
     {
-        set_int(OUTPUT, int(INPUT(0)->asString().length()));
+        make_int(OUTPUT, int(INPUT(0)->asString().length()));
     }
 
     CA_FUNCTION(substr)

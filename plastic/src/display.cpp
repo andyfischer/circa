@@ -72,8 +72,8 @@ bool resize_display(int width, int height)
     }
 
     // Write window width & height
-    set_int(app::runtime_branch()["window"]->getField("width"), width);
-    set_int(app::runtime_branch()["window"]->getField("height"), height);
+    make_int(app::runtime_branch()["window"]->getField("width"), width);
+    make_int(app::runtime_branch()["window"]->getField("height"), height);
 
     // Set window caption
     std::string windowTitle;

@@ -293,7 +293,7 @@ CA_FUNCTION(append)
 CA_FUNCTION(count)
 {
     List* list = List::checkCast(INPUT(0));
-    set_int(OUTPUT, list->length());
+    make_int(OUTPUT, list->length());
 }
 
 void postponed_setup_type(Term* type)

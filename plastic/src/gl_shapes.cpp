@@ -350,7 +350,7 @@ CA_FUNCTION(load_program)
 
     gl_check_error(CONTEXT_AND_CALLER);
 
-    set_int(OUTPUT, program);
+    make_int(OUTPUT, program);
 }
 
 CA_FUNCTION(use_program)
