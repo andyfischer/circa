@@ -397,7 +397,7 @@ void test_changing_stateful_value_externally()
     Branch branch;
     branch.compile("state v = 'value'");
 
-    set_str(branch["v"], "new");
+    make_string(branch["v"], "new");
     mark_stateful_value_assigned(branch["v"]);
 
     evaluate_branch(branch);

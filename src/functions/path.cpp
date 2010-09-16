@@ -31,7 +31,7 @@ namespace path_function {
 
     CA_DEFINE_FUNCTION(path, "def path(string) -> string")
     {
-        set_str(OUTPUT,
+        make_string(OUTPUT,
             get_path_relative_to_source(CALLER, as_string(INPUT(0))));
     }
 

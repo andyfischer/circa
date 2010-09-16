@@ -69,6 +69,7 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs);
 void make_int(TaggedValue* value, int i);
 void make_float(TaggedValue* value, float f);
 void make_string(TaggedValue* value, const char* s);
+void make_string(TaggedValue* value, std::string const& s);
 void make_bool(TaggedValue* value, bool b);
 void make_ref(TaggedValue* value, Term* t);
 TaggedValue* make_list(TaggedValue* value);
@@ -76,13 +77,10 @@ void make_branch(TaggedValue* value);
 void make_type(TaggedValue* value, Type* type);
 void make_null(TaggedValue* value);
 
-void set_str(TaggedValue* value, const char* s);
-void set_str(TaggedValue* value, std::string const& s);
-void set_ref(TaggedValue* value, Term* t);
 void set_pointer(TaggedValue* value, Type* type, void* p);
+void set_pointer(TaggedValue* value, void* ptr);
 
 void* get_pointer(TaggedValue* value);
-void set_pointer(TaggedValue* value, void* ptr);
 
 Type* get_type_value(TaggedValue* value);
 Branch* get_branch_value(TaggedValue* value);
@@ -93,8 +91,6 @@ bool as_bool(TaggedValue* value);
 void* get_pointer(TaggedValue* value, Type* expectedType);
 Ref& as_ref(TaggedValue* value);
 Type& as_type(TaggedValue* value);
-float to_float(TaggedValue* value);
-int to_int(TaggedValue* value);
 
 bool is_int(TaggedValue* value);
 bool is_float(TaggedValue* value);
@@ -105,5 +101,8 @@ bool is_value_branch(TaggedValue* value);
 bool is_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);
 bool is_null(TaggedValue* value);
+
+float to_float(TaggedValue* value);
+int to_int(TaggedValue* value);
 
 } // namespace circa

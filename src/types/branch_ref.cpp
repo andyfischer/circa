@@ -160,7 +160,7 @@ namespace branch_ref_t {
             return;
         }
 
-        set_str(OUTPUT, get_relative_name(target_branch, target));
+        make_string(OUTPUT, get_relative_name(target_branch, target));
     }
 
     CA_FUNCTION(get_length)
@@ -174,9 +174,9 @@ namespace branch_ref_t {
         Branch& target_branch = get_target_branch(INPUT(0));
         int index = INT_INPUT(1);
         if (index >= target_branch.length())
-            set_ref(OUTPUT, NULL);
+            make_ref(OUTPUT, NULL);
         else
-            set_ref(OUTPUT, target_branch[index]);
+            make_ref(OUTPUT, target_branch[index]);
     }
 
     CA_FUNCTION(append_code)
@@ -206,7 +206,7 @@ namespace branch_ref_t {
     {
         Branch& target_branch = get_target_branch(INPUT(0));
 
-        set_str(OUTPUT, get_branch_raw(target_branch));
+        make_string(OUTPUT, get_branch_raw(target_branch));
     }
 
     CA_FUNCTION(save)
@@ -218,7 +218,7 @@ namespace branch_ref_t {
     CA_FUNCTION(to_source)
     {
         Branch& target_branch = get_target_branch(INPUT(0));
-        set_str(OUTPUT, get_branch_source_text(target_branch));
+        make_string(OUTPUT, get_branch_source_text(target_branch));
     }
 
     void setup_type(Type* type)

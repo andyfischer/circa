@@ -7,7 +7,7 @@ namespace to_string_function {
 
     CA_FUNCTION(evaluate)
     {
-        set_str(OUTPUT, to_string(INPUT(0)));
+        make_string(OUTPUT, to_string(INPUT(0)));
     }
 
     void setup(Branch& kernel)

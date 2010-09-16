@@ -8,7 +8,7 @@ namespace term_to_source_function {
     CA_FUNCTION(evaluate)
     {
         Term* term = INPUT_TERM(0);
-        set_str(OUTPUT, get_term_source_text(term));
+        make_string(OUTPUT, get_term_source_text(term));
     }
 
     void setup(Branch& kernel)

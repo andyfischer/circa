@@ -15,7 +15,7 @@ void test_copy()
     test_assert(is_int(copy));
 
     change_type(a, STRING_TYPE);
-    set_str(a, "hi");
+    make_string(a, "hi");
     evaluate_branch(branch);
     test_assert(is_string(copy));
 }

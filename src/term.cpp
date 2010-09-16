@@ -126,13 +126,13 @@ void Term::setBoolProp(std::string const& name, bool b)
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
     Term* t = addProperty(name, STRING_TYPE);
-    set_str(t, s);
+    make_string(t, s);
 }
 
 void Term::setRefProp(std::string const& name, Term* r)
 {
     Term* t = addProperty(name, REF_TYPE);
-    set_ref(t, r);
+    make_ref(t, r);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)

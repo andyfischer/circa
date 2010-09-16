@@ -373,6 +373,11 @@ void make_string(TaggedValue* value, const char* s)
     *((std::string*) value->value_data.ptr) = s;
 }
 
+void make_string(TaggedValue* value, std::string const& s)
+{
+    make_string(value, s.c_str());
+}
+
 void make_bool(TaggedValue* value, bool b)
 {
     change_type(value, BOOL_T);
@@ -382,7 +387,7 @@ void make_bool(TaggedValue* value, bool b)
 void make_ref(TaggedValue* value, Term* t)
 {
     change_type(value, &as_type(REF_TYPE));
-    set_ref(value, t);
+    *((Ref*) value->value_data.ptr) = t;
 }
 
 TaggedValue* make_list(TaggedValue* value)
@@ -411,27 +416,15 @@ void make_null(TaggedValue* value)
     change_type(value, NULL_T);
 }
 
-void set_str(TaggedValue* value, const char* s)
-{
-    ca_assert(is_string(value));
-    *((std::string*) value->value_data.ptr) = s;
-}
-
-void set_str(TaggedValue* value, std::string const& s)
-{
-    set_str(value, s.c_str());
-}
-
-void set_ref(TaggedValue* value, Term* t)
-{
-    ca_assert(is_ref(value));
-    *((Ref*) value->value_data.ptr) = t;
-}
-
 void set_pointer(TaggedValue* value, Type* type, void* p)
 {
     value->value_type = type;
     value->value_data.ptr = p;
+}
+
+void set_pointer(TaggedValue* value, void* ptr)
+{
+    value->value_data.ptr = ptr;
 }
 
 int as_int(TaggedValue* value)
@@ -444,6 +437,12 @@ float as_float(TaggedValue* value)
 {
     ca_assert(is_float(value));
     return value->value_data.asfloat;
+}
+
+std::string const& as_string(TaggedValue* value)
+{
+    ca_assert(is_string(value));
+    return *((std::string*) value->value_data.ptr);
 }
 
 bool as_bool(TaggedValue* value)
@@ -464,20 +463,9 @@ Type& as_type(TaggedValue* value)
     return *((Type*) value->value_data.ptr);
 }
 
-std::string const& as_string(TaggedValue* value)
-{
-    ca_assert(is_string(value));
-    return *((std::string*) value->value_data.ptr);
-}
-
 void* get_pointer(TaggedValue* value)
 {
     return value->value_data.ptr;
-}
-
-void set_pointer(TaggedValue* value, void* ptr)
-{
-    value->value_data.ptr = ptr;
 }
 
 Type* get_type_value(TaggedValue* value)
@@ -509,26 +497,6 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
     }
 
     return value->value_data.ptr;
-}
-
-float to_float(TaggedValue* value)
-{
-    if (value->value_type == INT_TYPE->value_data.ptr)
-        return (float) as_int(value);
-    else if (value->value_type == FLOAT_TYPE->value_data.ptr)
-        return as_float(value);
-    else
-        throw std::runtime_error("In to_float, type is not an int or float");
-}
-
-int to_int(TaggedValue* value)
-{
-    if (value->value_type == INT_TYPE->value_data.ptr)
-        return as_int(value);
-    else if (value->value_type == FLOAT_TYPE->value_data.ptr)
-        return (int) as_float(value);
-    else
-        throw std::runtime_error("In to_float, type is not an int or float");
 }
 
 bool is_int(TaggedValue* value)
@@ -581,6 +549,26 @@ bool is_value_of_type(TaggedValue* value, Type* type)
 bool is_null(TaggedValue* value)
 {
     return value->value_type == NULL_T;
+}
+
+float to_float(TaggedValue* value)
+{
+    if (is_int(value))
+        return (float) as_int(value);
+    else if (is_float(value))
+        return as_float(value);
+    else
+        throw std::runtime_error("In to_float, type is not an int or float");
+}
+
+int to_int(TaggedValue* value)
+{
+    if (is_int(value))
+        return as_int(value);
+    else if (is_float(value))
+        return (int) as_float(value);
+    else
+        throw std::runtime_error("In to_float, type is not an int or float");
 }
 
 }

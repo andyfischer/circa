@@ -91,7 +91,7 @@ namespace string_t {
     }
     void reset(TaggedValue* v)
     {
-        set_str(v, "");
+        make_string(v, "");
     }
 
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
@@ -150,7 +150,7 @@ namespace string_t {
             return error_occurred(CONTEXT, CALLER, msg.str().c_str());
         }
 
-        set_str(OUTPUT, s.substr(start, end));
+        make_string(OUTPUT, s.substr(start, end));
     }
 
     CA_FUNCTION(slice)
@@ -163,8 +163,8 @@ namespace string_t {
         if (start < 0) start = s.length() + start;
         if (end < 0) end = s.length() + end;
 
-        if (start < 0) return set_str(OUTPUT, "");
-        if (end < 0) return set_str(OUTPUT, "");
+        if (start < 0) return make_string(OUTPUT, "");
+        if (end < 0) return make_string(OUTPUT, "");
 
         if ((unsigned) start > s.length()) {
             std::stringstream msg;
@@ -178,9 +178,9 @@ namespace string_t {
         }
 
         if (end < start)
-            return set_str(OUTPUT, "");
+            return make_string(OUTPUT, "");
 
-        set_str(OUTPUT, s.substr(start, end - start));
+        make_string(OUTPUT, s.substr(start, end - start));
     }
 
     void setup_type(Type* type)

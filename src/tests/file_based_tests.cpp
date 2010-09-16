@@ -109,7 +109,7 @@ void test_file_changed()
     test_assert(!as_bool(changed));
 
     // Change the filename
-    set_str(filename, "y");
+    make_string(filename, "y");
     evaluate_branch(&context, branch);
     test_assert(as_bool(changed));
     evaluate_branch(&context, branch);

@@ -19,7 +19,7 @@ namespace concat_function {
             else
                 out << to_string(v);
         }
-        set_str(OUTPUT, out.str());
+        make_string(OUTPUT, out.str());
     }
 
     void setup(Branch& kernel)

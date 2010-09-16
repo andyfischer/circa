@@ -87,7 +87,7 @@ namespace type_t {
 
     CA_FUNCTION(name_accessor)
     {
-        set_str(OUTPUT, as_type(INPUT(0)).name);
+        make_string(OUTPUT, as_type(INPUT(0)).name);
     }
 
     void setup_type(Term* type)

@@ -203,7 +203,7 @@ bool load_user_script_filename(std::string const& filename)
 
     if (filename != "") {
         circa::Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");
-        circa::set_str(user_script_filename, filename);
+        circa::make_string(user_script_filename, filename);
         circa::mark_stateful_value_assigned(user_script_filename);
 
         std::stringstream msg;

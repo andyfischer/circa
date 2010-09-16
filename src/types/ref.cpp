@@ -26,7 +26,7 @@ namespace ref_t {
     }
     void reset(TaggedValue* value)
     {
-        set_ref(value, NULL);
+        make_ref(value, NULL);
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
@@ -42,21 +42,21 @@ namespace ref_t {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL reference");
-        set_str(OUTPUT, t->name);
+        make_string(OUTPUT, t->name);
     }
     CA_FUNCTION(hosted_to_string)
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL reference");
-        set_str(OUTPUT, circa::to_string(t));
+        make_string(OUTPUT, circa::to_string(t));
     }
     CA_FUNCTION(hosted_to_source_string)
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL reference");
-        set_str(OUTPUT, circa::get_term_source_text(t));
+        make_string(OUTPUT, circa::get_term_source_text(t));
     }
     CA_FUNCTION(get_function)
     {
