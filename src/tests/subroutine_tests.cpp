@@ -90,6 +90,8 @@ void test_recursion_with_state()
 
     test_assert(branch);
 
+    dump_branch(branch);
+
     Term* recr_4 = branch.eval("recr(4)");
     test_assert(as_int(recr_4) == 4);
 }
