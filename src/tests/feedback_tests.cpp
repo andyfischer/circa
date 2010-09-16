@@ -81,7 +81,7 @@ void train_cond()
 
     // try changing cond
     make_int(a, 1);
-    set_bool(cond, false);
+    make_bool(cond, false);
 
     evaluate_branch(branch);
 

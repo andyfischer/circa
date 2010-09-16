@@ -8,7 +8,7 @@ namespace circa {
 namespace bool_t {
     void reset(TaggedValue* value)
     {
-        set_bool(value, false);
+        make_bool(value, false);
     }
     std::string to_string(TaggedValue* value)
     {
@@ -60,7 +60,7 @@ namespace set_t {
     {
         List* list = List::checkCast(INPUT(0));
         TaggedValue* value = INPUT(1);
-        set_bool(OUTPUT, contains(list, value));
+        make_bool(OUTPUT, contains(list, value));
     }
 
     CA_FUNCTION(remove)
@@ -157,7 +157,7 @@ namespace map_t {
     CA_FUNCTION(contains)
     {
         bool result = find_key_index(INPUT(0), INPUT(1)) != -1;
-        set_bool(OUTPUT, result);
+        make_bool(OUTPUT, result);
     }
 
     CA_FUNCTION(insert)

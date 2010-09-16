@@ -727,7 +727,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
 
-    set_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
+    make_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
 
     if (foundAtOperator)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);

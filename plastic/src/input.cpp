@@ -34,7 +34,7 @@ void handle_key_press(SDL_Event &event, int key);
 CA_FUNCTION(key_down)
 {
     int i = INT_INPUT(0);
-    set_bool(OUTPUT, KEY_DOWN[i]);
+    make_bool(OUTPUT, KEY_DOWN[i]);
 }
 
 CA_FUNCTION(key_pressed)
@@ -43,11 +43,11 @@ CA_FUNCTION(key_pressed)
         int key = as_int(INPUT(0));
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (KEYS_JUST_PRESSED[index].sym == key) {
-                set_bool(OUTPUT, true);
+                make_bool(OUTPUT, true);
                 return;
             }
         }
-        set_bool(OUTPUT, false);
+        make_bool(OUTPUT, false);
         return;
     }
 
@@ -58,12 +58,12 @@ CA_FUNCTION(key_pressed)
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
-                set_bool(OUTPUT, true);
+                make_bool(OUTPUT, true);
                 return;
             }
         }
             
-        set_bool(OUTPUT, false);
+        make_bool(OUTPUT, false);
         return;
     }
 }
@@ -223,36 +223,36 @@ bool mouse_in(TaggedValue* box)
 
 CA_FUNCTION(mouse_pressed)
 {
-    set_bool(OUTPUT, LEFT_MOUSE_DOWN);
+    make_bool(OUTPUT, LEFT_MOUSE_DOWN);
 }
 
 CA_FUNCTION(mouse_clicked)
 {
     if (NUM_INPUTS == 0)
-        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
+        make_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
     else
-        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
+        make_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_over)
 {
-    set_bool(OUTPUT, mouse_in(INPUT(0)));
+    make_bool(OUTPUT, mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_wheel_up)
 {
     if (NUM_INPUTS == 0)
-        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
+        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
     else
-        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
+        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_wheel_down)
 {
     if (NUM_INPUTS == 0)
-        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
+        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
     else
-        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
+        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
 }
 
 void setup(Branch& branch)

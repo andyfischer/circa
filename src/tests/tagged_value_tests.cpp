@@ -221,7 +221,7 @@ namespace manual_memory_management_test {
         test_assert(pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        set_null(&value);
+        make_null(&value);
 
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
@@ -239,7 +239,7 @@ namespace manual_memory_management_test {
             TaggedValue scoped_value;
             change_type(&scoped_value, myType);
             test_assert(pool_allocated[0]);
-            set_null(&scoped_value);
+            make_null(&scoped_value);
             test_assert(!pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -326,7 +326,7 @@ void list_memory_management()
     test_assert(toy_refcounted_pool::nothing_allocated());
 }
 
-void reset_null()
+void remake_null()
 {
     TaggedValue value;
     make_null(&value);
@@ -346,7 +346,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
     REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
-    REGISTER_TEST_CASE(tagged_value_tests::reset_null);
+    REGISTER_TEST_CASE(tagged_value_tests::remake_null);
 }
 
 }

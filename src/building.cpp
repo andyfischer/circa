@@ -233,7 +233,7 @@ Term* create_float(Branch& branch, float f, std::string const& name)
 Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
-    set_bool(term, b);
+    make_bool(term, b);
     return term;
 }
 

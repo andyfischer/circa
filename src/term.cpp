@@ -120,7 +120,7 @@ void Term::setFloatProp(std::string const& name, float f)
 void Term::setBoolProp(std::string const& name, bool b)
 {
     Term* t = addProperty(name, BOOL_TYPE);
-    set_bool(t, b);
+    make_bool(t, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)

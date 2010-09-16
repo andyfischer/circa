@@ -76,11 +76,9 @@ void make_branch(TaggedValue* value);
 void make_type(TaggedValue* value, Type* type);
 void make_null(TaggedValue* value);
 
-void set_bool(TaggedValue* value, bool b);
 void set_str(TaggedValue* value, const char* s);
 void set_str(TaggedValue* value, std::string const& s);
 void set_ref(TaggedValue* value, Term* t);
-void set_null(TaggedValue* value);
 void set_pointer(TaggedValue* value, Type* type, void* p);
 
 void* get_pointer(TaggedValue* value);

@@ -411,12 +411,6 @@ void make_null(TaggedValue* value)
     change_type(value, NULL_T);
 }
 
-void set_bool(TaggedValue* value, bool b)
-{
-    ca_assert(is_bool(value));
-    value->value_data.asbool = b;
-}
-
 void set_str(TaggedValue* value, const char* s)
 {
     ca_assert(is_string(value));
@@ -432,11 +426,6 @@ void set_ref(TaggedValue* value, Term* t)
 {
     ca_assert(is_ref(value));
     *((Ref*) value->value_data.ptr) = t;
-}
-
-void set_null(TaggedValue* value)
-{
-    change_type(value, NULL_T);
 }
 
 void set_pointer(TaggedValue* value, Type* type, void* p)

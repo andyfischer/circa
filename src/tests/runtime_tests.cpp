@@ -10,7 +10,7 @@ std::vector<std::string> gSpyResults;
 CA_FUNCTION(spy_function)
 {
     gSpyResults.push_back(as_string(INPUT(0)));
-    set_bool(OUTPUT, true);
+    make_bool(OUTPUT, true);
 }
 
 CA_FUNCTION(i_only_throw_errors)

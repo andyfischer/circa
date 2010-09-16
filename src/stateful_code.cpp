@@ -146,7 +146,7 @@ void mark_stateful_value_assigned(Term* term)
     if (assignTerm->input(0) != term) return;
 
     Term* doOnceHiddenState = followingTerm;
-    set_bool(doOnceHiddenState, true);
+    make_bool(doOnceHiddenState, true);
 }
 
 bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc)
