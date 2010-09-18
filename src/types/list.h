@@ -21,6 +21,7 @@ struct List : TaggedValue
     List();
 
     TaggedValue* append();
+    void append(TaggedValue* val);
     void clear();
     int length();
     bool empty();

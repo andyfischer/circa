@@ -12,7 +12,6 @@
 #include "term.h"
 #include "type.h"
 
-#define VERBOSE_PRINT_VM 0
 
 namespace circa {
 
@@ -34,7 +33,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
 {
     bytecode::update_bytecode(branch);
     List stack;
-    evaluate_bytecode(context, &branch._bytecode, &stack);
+    bytecode::evaluate_bytecode(context, &branch._bytecode, &stack);
     copy_stack_back_to_terms(branch, &stack);
     
     reset(&context->subroutineOutput);
@@ -76,173 +75,12 @@ void evaluate_without_side_effects(Term* term)
     evaluate_term(term);
 }
 
-
-void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack)
-{
-    //std::cout << "running bytecode:" << std::endl;
-    //print_bytecode(std::cout, data);
-
-    //cxt->clearError();
-    data->inuse = true;
-
-    char* pos = data->opdata;
-    char* end = data->opdata + data->size;
-
-    while (pos != end) {
-
-        bytecode::Operation* op = (bytecode::Operation*) pos;
-
-        #if VERBOSE_PRINT_VM
-            std::cout << std::endl << "stack: " << stack->toString() << std::endl;
-            std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
-            std::cout << "next op: ";
-            print_operation(std::cout, op);
-        #endif
-
-        switch (op->opid) {
-            case bytecode::OP_STACK_SIZE: {
-                bytecode::StackSizeOperation *ssop = (bytecode::StackSizeOperation*) op;
-                stack->resize(ssop->numElements);
-                pos += sizeof(bytecode::StackSizeOperation);
-                continue;
-            }
-            case bytecode::OP_PUSH_VALUE: {
-                bytecode::PushValueOperation *callop = (bytecode::PushValueOperation*) op;
-                TaggedValue* output = stack->get(callop->outputIndex);
-                ca_assert(output != NULL);
-                change_type(output, type_contents(callop->source->type));
-                copy(callop->source, output);
-                pos += sizeof(bytecode::PushValueOperation);
-                continue;
-            }
-            case bytecode::OP_CALL: {
-                bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
-
-                EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
-                func(cxt, stack, callop);
-
-                pos += sizeof(bytecode::CallOperation)
-                    + sizeof(bytecode::CallOperation::Input)*callop->numInputs;
-                continue;
-            }
-            case bytecode::OP_JUMP: {
-                bytecode::JumpOperation *jumpop = (bytecode::JumpOperation*) op;
-                pos = data->opdata + jumpop->offset;
-                continue;
-            }
-            case bytecode::OP_JUMP_IF: {
-                bytecode::JumpIfOperation *jumpop = (bytecode::JumpIfOperation*) op;
-                if (as_bool(stack->get(jumpop->conditionIndex)))
-                    pos = data->opdata + jumpop->offset;
-                else
-                    pos += sizeof(bytecode::JumpIfOperation);
-                continue;
-            }
-            case bytecode::OP_JUMP_IF_NOT: {
-                bytecode::JumpIfNotOperation *jumpop = (bytecode::JumpIfNotOperation*) op;
-                if (!as_bool(stack->get(jumpop->conditionIndex)))
-                    pos = data->opdata + jumpop->offset;
-                else
-                    pos += sizeof(bytecode::JumpIfNotOperation);
-                continue;
-            }
-
-            case bytecode::OP_RETURN: {
-                bytecode::ReturnOperation *retop = (bytecode::ReturnOperation*) op;
-                if (retop->stackIndex != -1) {
-                    TaggedValue* v = stack->get(retop->stackIndex);
-                    copy(v, &cxt->subroutineOutput);
-                }
-                goto loop_end;
-            }
-            case bytecode::OP_PUSH_INT: {
-                bytecode::PushIntOperation *pushop = (bytecode::PushIntOperation*) op;
-                make_int(stack->get(pushop->outputIndex), pushop->value);
-                pos += sizeof(bytecode::PushIntOperation);
-                continue;
-            }
-            case bytecode::OP_INCREMENT: {
-                bytecode::IncrementOperation *incop = (bytecode::IncrementOperation*) op;
-                TaggedValue* value = stack->get(incop->stackIndex);
-                make_int(value, as_int(value) + 1);
-                pos += sizeof(bytecode::IncrementOperation);
-                continue;
-            }
-            case bytecode::OP_GET_INDEX: {
-                bytecode::GetIndexOperation *getop = (bytecode::GetIndexOperation*) op;
-                TaggedValue *list = stack->get(getop->listIndex);
-                TaggedValue *listIndex = stack->get(getop->indexInList);
-                TaggedValue *item = list->getIndex(as_int(listIndex));
-                copy(item, stack->get(getop->outputIndex));
-                pos += sizeof(bytecode::GetIndexOperation);
-                continue;
-            }
-            case bytecode::OP_APPEND: {
-                bytecode::AppendOperation *appendop = (bytecode::AppendOperation*) op;
-                TaggedValue *item = stack->get(appendop->itemIndex);
-                copy(item, ((List*) stack->get(appendop->outputIndex))->append());
-                pos += sizeof(bytecode::AppendOperation);
-                continue;
-            }
-            case bytecode::OP_NUM_ELEMENTS: {
-                bytecode::NumElementsOperation *neop = (bytecode::NumElementsOperation*) op;
-                TaggedValue *list = stack->get(neop->listIndex);
-                make_int(stack->get(neop->outputIndex), list->numElements());
-                pos += sizeof(bytecode::NumElementsOperation);
-                continue;
-            }
-            case bytecode::OP_COPY: {
-                bytecode::CopyOperation *copyop = (bytecode::CopyOperation*) op;
-                copy(stack->get(copyop->fromIndex), stack->get(copyop->toIndex));
-                pos += sizeof(bytecode::CopyOperation);
-                continue;
-            }
-            case bytecode::OP_RAISE: {
-                //TODO
-                //bytecode::RaiseOperation *raiseop = (bytecode::RaiseOperation*) op;
-                cxt->errorOccurred = true;
-                pos += sizeof(bytecode::RaiseOperation);
-                continue;
-            }
-            case bytecode::OP_CHECK_ERROR: {
-                if (cxt->errorOccurred)
-                    goto loop_end;
-                pos += sizeof(bytecode::CheckErrorOperation);
-                continue;
-            }
-            case bytecode::OP_COMMENT: {
-                bytecode::CommentOperation *commentop = (bytecode::CommentOperation*) op;
-                pos += commentop->size;
-                continue;
-            }
-            case bytecode::OP_VAR_NAME: {
-                bytecode::VarNameOperation *nameop = (bytecode::VarNameOperation*) op;
-                pos += nameop->size;
-                continue;
-            }
-        }
-    }
-
-loop_end:
-    data->inuse = false;
-    #if VERBOSE_PRINT_VM
-        std::cout << std::endl << "stack: " << stack->toString() << std::endl;
-        std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
-    #endif
-}
-
-void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack)
-{
-    EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
-    func(cxt, stack, callop);
-}
-
 void evaluate_bytecode(Branch& branch)
 {
     EvalContext context;
     List stack;
     bytecode::update_bytecode(branch);
-    evaluate_bytecode(&context, &branch._bytecode, &stack);
+    bytecode::evaluate_bytecode(&context, &branch._bytecode, &stack);
 }
 
 void copy_stack_back_to_terms(Branch& branch, List* stack)
@@ -296,6 +134,12 @@ void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
     callop.function = function;
 
     std::cout << "evaluate_single_term" << std::endl;
+}
+
+void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack)
+{
+    EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
+    func(cxt, stack, callop);
 }
 
 } // namespace circa

@@ -36,8 +36,6 @@ void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const
 void evaluate_term(EvalContext* cxt, Term* term);
 void evaluate_term(Term* term);
 void evaluate_branch(EvalContext* context, Branch& branch);
-void evaluate_bytecode(EvalContext* cxt, bytecode::BytecodeData* data, List* stack);
-void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack);
 void evaluate_bytecode(Branch& branch);
 
 // Shorthand to call evaluate_branch with a new EvalContext:
@@ -62,5 +60,6 @@ TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index);
 TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp);
 void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
         List* inputs, TaggedValue* output);
+void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack);
 
 } // namespace circa

@@ -317,6 +317,11 @@ List::append()
 {
     return list_t::append((TaggedValue*) this);
 }
+void
+List::append(TaggedValue* val)
+{
+    copy(val, append());
+}
 
 void
 List::clear()

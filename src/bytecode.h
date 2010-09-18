@@ -12,6 +12,7 @@ enum OpId {
     OP_STACK_SIZE = 1,
     OP_CALL,
     OP_PUSH_VALUE,
+    OP_PUSH_LOCAL,
     OP_JUMP,
     OP_JUMP_IF,
     OP_JUMP_IF_NOT,
@@ -55,6 +56,11 @@ struct PushValueOperation {
     OpId opid;
     Term* source;
     int outputIndex;
+};
+struct PushLocalOperation {
+    OpId opid;
+    int localIndex;
+    int output;
 };
 
 struct ReturnOperation {
@@ -149,6 +155,7 @@ struct WriteContext {
     int getOffset();
     Operation* writePos();
     BytecodePosition getPosition();
+    int appendLocal(TaggedValue* val);
 };
 
 struct BytecodeData {
@@ -178,6 +185,7 @@ bool should_term_output_go_on_stack(Term* term);
 bool should_term_generate_call(Term* term);
 
 void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex);
+int write_push_local_op(WriteContext* context, TaggedValue* value);
 void write_call_op(WriteContext* context, Term* term);
 void write_jump(WriteContext* context, int offset);
 void write_jump_if(WriteContext* context, int conditionIndex, int offset);
@@ -202,6 +210,8 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
 
 void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch);
 void write_raise_if(WriteContext* context, Term* errorCondition);
+void write_get_state_field(WriteContext* context, Term* term, int name,
+        int defaultValue, int output);
 
 void resize_opdata(BytecodeData* bytecode, size_t newCapacity);
 void update_bytecode(Branch& branch, BytecodeData* bytecode);
@@ -209,12 +219,14 @@ void update_bytecode(Branch& branch);
 
 void print_bytecode(std::ostream& out, BytecodeData* data);
 void print_bytecode(std::ostream& out, Branch& branch);
-void print_operation(std::ostream& out, Operation* op);
+void print_operation(std::ostream& out, BytecodeData* bytecode, Operation* op);
 void print_bytecode_raw(std::ostream& out, BytecodeData* data);
 void print_bytecode_for_all_major_branches(std::ostream& out, Branch& branch);
 
 CallOperation* create_orphan_call_operation(Term* caller, Term* function, int numInputs);
 void free_orphan_call_operation(CallOperation* op);
+
+void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack);
 
 struct Iterator {
     Operation* pos;

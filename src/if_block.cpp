@@ -158,15 +158,27 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 
     // Fetch a list container for the state in this block.
     int stateContainer = -1;
+    int stateContainerName = -1;
     if (hasState) {
-        const char* stateName = "#if_block";
-        
-        Term* getState = ifBlock->owningBranch->get(ifBlock->index-1);
-        ca_assert(getState != NULL);
-        ca_assert(getState->function->name == "get_state_field");
+
+        // State field name. TODO: Make this unique across the branch
+        TaggedValue stateName;
+        make_string(&stateName, "#if_block");
+        stateContainerName = bytecode::write_push_local_op(context, &stateName);
+
+        // State default value
+        TaggedValue defaultValue;
+        make_list(&defaultValue);
+        int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
+
+        // get_state_field
+        stateContainer = context->nextStackIndex++;
+        bytecode::write_get_state_field(context, NULL, stateContainerName, stateDefaultValue,
+                stateContainer);
+
+        // push(numBranches)
         numBranchesStack = context->nextStackIndex++;
         bytecode::write_push_int(context, numBranches, numBranchesStack);
-        stateContainer = getState->stackIndex;
 
         // Resize state list
         {
@@ -269,6 +281,13 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 
     for (size_t i=0; i < jumpsToEnd.size(); i++)
         ((bytecode::JumpOperation*) jumpsToEnd[i].get())->offset = context->getOffset();
+
+    // Wrap up state container
+    if (hasState) {
+        int inputs[] = { context->inlineState, stateContainerName, stateContainer };
+        bytecode::write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
+                context->inlineState);
+    }
 }
 
 } // namespace circa
