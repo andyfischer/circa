@@ -155,7 +155,6 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 
     int numBranches = blockContents.length() - 1;
     int numBranchesStack = -1;
-    bool assignStackIndexes = context->writePos != NULL;
 
     // Fetch a list container for the state in this block.
     int stateContainer = -1;
@@ -177,28 +176,26 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         }
     }
 
-    if (assignStackIndexes) {
-        // For each name in #joining, we want corresponding variables (across the
-        // branches in this if-block) to have the same stack indexes.
-        for (int i=0; i < joining.length(); i++) {
-            ca_assert(joining[i] != NULL);
-            if (joining[i]->stackIndex == -1)
-                joining[i]->stackIndex = context->nextStackIndex++;
-            std::string const& name = joining[i]->name;
-            ca_assert(name != "");
+    // For each name in #joining, we want corresponding variables (across the
+    // branches in this if-block) to have the same stack indexes.
+    for (int i=0; i < joining.length(); i++) {
+        ca_assert(joining[i] != NULL);
+        if (joining[i]->stackIndex == -1)
+            joining[i]->stackIndex = context->nextStackIndex++;
+        std::string const& name = joining[i]->name;
+        ca_assert(name != "");
 
-            // Find the corresponding term in each branch, give it this stack index.
-            for (int b=0; b < numBranches; b++) {
-                Term* term = blockContents[b]->nestedContents[name];
-                if (term != NULL)
-                    term->stackIndex = joining[i]->stackIndex;
-            }
+        // Find the corresponding term in each branch, give it this stack index.
+        for (int b=0; b < numBranches; b++) {
+            Term* term = blockContents[b]->nestedContents[name];
+            if (term != NULL)
+                term->stackIndex = joining[i]->stackIndex;
         }
     }
     
     // Go through each branch
-    bytecode::JumpIfNotOperation *lastBranchJumpOp = NULL;
-    std::vector<bytecode::JumpOperation*> jumpsToEnd;
+    bytecode::BytecodePosition lastBranchJumpOp(NULL,0);
+    std::vector<bytecode::BytecodePosition> jumpsToEnd;
 
     // Stack position for condition-specific state.
     int conditionLocalState = -1;
@@ -212,14 +209,14 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         Term* term = blockContents[branch];
 
         // Check if we need to write the address for the previous branch's jump
-        if (lastBranchJumpOp) {
-            lastBranchJumpOp->offset = context->getOffset();
-            lastBranchJumpOp = NULL;
+        if (lastBranchJumpOp.data) {
+            ((bytecode::JumpIfNotOperation*) lastBranchJumpOp.get())->offset = context->getOffset();
+            lastBranchJumpOp = bytecode::BytecodePosition(NULL, 0);
         }
 
         // Jump check, for 'if' and 'elsif'. Don't know offset yet, will write it later.
         if (term->function == IF_FUNC) {
-            lastBranchJumpOp = (bytecode::JumpIfNotOperation*) context->writePos;
+            lastBranchJumpOp = context->getPosition();
             bytecode::write_jump_if_not(context, term->input(0)->stackIndex, 0);
         }
 
@@ -265,16 +262,13 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         
         // Jump past remaining branches. But, don't need to do this for last branch.
         if (branch+1 < numBranches) {
-            if (context->writePos)
-                jumpsToEnd.push_back((bytecode::JumpOperation*) context->writePos);
+            jumpsToEnd.push_back(context->getPosition());
             bytecode::write_jump(context, 0);
         }
     }
 
-    if (context->writePos) {
-        for (size_t i=0; i < jumpsToEnd.size(); i++)
-            jumpsToEnd[i]->offset = context->getOffset();
-    }
+    for (size_t i=0; i < jumpsToEnd.size(); i++)
+        ((bytecode::JumpOperation*) jumpsToEnd[i].get())->offset = context->getOffset();
 }
 
 } // namespace circa

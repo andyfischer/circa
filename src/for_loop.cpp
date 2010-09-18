@@ -153,26 +153,24 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     ca_assert(outputList != -1);
     bool writingOutputList = true;
 
-    bool assignStackIndexes = context->writePos != NULL;
-    if (assignStackIndexes) {
-        for (int i=0; i < innerRebinds.length(); i++) {
-            Term* term = innerRebinds[i];
-            if (term->stackIndex == -1)
-                term->stackIndex = context->nextStackIndex++;
-        }
+    // Assign stack indices
+    for (int i=0; i < innerRebinds.length(); i++) {
+        Term* term = innerRebinds[i];
+        if (term->stackIndex == -1)
+            term->stackIndex = context->nextStackIndex++;
+    }
 
-        // For names in #outer_rebinds, the join terms should have the same stack
-        // indices as the term's output.
-        for (int i=0; i < outerRebinds.length(); i++) {
-            Term* outerRebind = outerRebinds[i];
-            bytecode::assign_stack_index(context, outerRebind);
+    // For names in #outer_rebinds, the join terms should have the same stack
+    // indices as the term's output.
+    for (int i=0; i < outerRebinds.length(); i++) {
+        Term* outerRebind = outerRebinds[i];
+        bytecode::assign_stack_index(context, outerRebind);
 
-            // Don't treat the list name as a name to join, this is handled differently
-            if (outerRebind->name == listName)
-                continue;
+        // Don't treat the list name as a name to join, this is handled differently
+        if (outerRebind->name == listName)
+            continue;
 
-            forContents[outerRebinds[i]->name]->stackIndex = outerRebind->stackIndex;
-        }
+        forContents[outerRebinds[i]->name]->stackIndex = outerRebind->stackIndex;
     }
 
     int inputList = inputTerm->stackIndex;
@@ -214,13 +212,15 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     }
 
     // Copy values for any rebinds
-    bytecode::write_comment(context, "Copy local rebinds");
-    for (int i=0; i < innerRebinds.length(); i++) {
-        Term* term = innerRebinds[i];
-        if (term->stackIndex == -1)
-            term->stackIndex = context->nextStackIndex++;
-        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
-        bytecode::write_copy(context, outerVersion->stackIndex, term->stackIndex);
+    if (innerRebinds.length() > 0) {
+        bytecode::write_comment(context, "Copy local rebinds");
+        for (int i=0; i < innerRebinds.length(); i++) {
+            Term* term = innerRebinds[i];
+            if (term->stackIndex == -1)
+                term->stackIndex = context->nextStackIndex++;
+            Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
+            bytecode::write_copy(context, outerVersion->stackIndex, term->stackIndex);
+        }
     }
 
     // Do another copy for rebind output, in case the loop has 0 iterations. This could be 
@@ -247,7 +247,8 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     // jump_if_not(compareIndexOutput) offset:end
     bytecode::write_comment(context, "jump to end if iterator >= listLength");
-    bytecode::JumpIfNotOperation *jumpToEnd = (bytecode::JumpIfNotOperation*) context->writePos;
+    bytecode::BytecodePosition jumpToEnd = context->getPosition();
+    ca_assert(compareIndexOutput != -1);
     bytecode::write_jump_if_not(context, compareIndexOutput, 0);
 
     Term* iteratorTerm = get_for_loop_iterator(forTerm);
@@ -325,8 +326,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     bytecode::write_jump(context, loopStartPos);
 
     // complete the above jumpToEnd
-    if (jumpToEnd)
-        jumpToEnd->offset = context->getOffset();
+    ((bytecode::JumpIfNotOperation*) jumpToEnd.get())->offset = context->getOffset();
 }
 
 } // namespace circa

@@ -15,6 +15,44 @@
 namespace circa {
 namespace bytecode {
 
+WriteContext::WriteContext(BytecodeData* _bytecode)
+  : bytecode(_bytecode),
+    nextStackIndex(0),
+    topLevelState(-1),
+    inlineState(-1)
+{}
+
+void
+WriteContext::guaranteeSize(size_t moreBytes)
+{
+    size_t neededSize = bytecode->size + moreBytes;
+    if (neededSize > bytecode->capacity) {
+        resize_opdata(bytecode, std::max(neededSize, bytecode->capacity*2));
+    }
+}
+
+void
+WriteContext::advance(size_t bytes) {
+    ca_assert((bytecode->size + bytes) <= bytecode->capacity);
+    bytecode->size += bytes;
+}
+int
+WriteContext::getOffset()
+{
+    return int(bytecode->size);
+}
+Operation*
+WriteContext::writePos()
+{
+    ca_assert(bytecode->size < bytecode->capacity);
+    return (Operation*) (bytecode->opdata + bytecode->size);
+}
+BytecodePosition
+WriteContext::getPosition()
+{
+    return BytecodePosition(bytecode, bytecode->size);
+}
+
 size_t get_operation_size(Operation* op)
 {
     switch (op->opid) {
@@ -79,37 +117,39 @@ bool should_term_generate_call(Term* term)
 
 void write_stack_size_op(WriteContext* context, int stacksize)
 {
-    if (context->writePos) {
-        StackSizeOperation* op = (StackSizeOperation*) context->writePos;
-        op->opid = OP_STACK_SIZE;
-        op->numElements = stacksize;
-    }
-    context->advance(sizeof(StackSizeOperation));
+    size_t size = sizeof(StackSizeOperation);
+    context->guaranteeSize(size);
+    StackSizeOperation* op = (StackSizeOperation*) context->writePos();
+    op->opid = OP_STACK_SIZE;
+    op->numElements = stacksize;
+    context->advance(size);
 }
 
 void write_check_error(WriteContext* context)
 {
-    if (context->writePos) {
-        CheckErrorOperation* op = (CheckErrorOperation*) context->writePos;
-        op->opid = OP_CHECK_ERROR;
-    }
-    context->advance(sizeof(CheckErrorOperation));
+    size_t size = sizeof(CheckErrorOperation);
+    context->guaranteeSize(size);
+    CheckErrorOperation* op = (CheckErrorOperation*) context->writePos();
+    op->opid = OP_CHECK_ERROR;
+    context->advance(size);
 }
 
 void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex)
 {
-    if (context->writePos) {
-        CallOperation* op = (CallOperation*) context->writePos;
-        op->opid = OP_CALL;
-        op->caller = caller;
-        op->function = function;
-        op->numInputs = numInputs;
-        op->outputIndex = outputIndex;
+    size_t size = sizeof(CallOperation) + sizeof(CallOperation::Input)*numInputs;
+    context->guaranteeSize(size);
 
-        for (int i=0; i < numInputs; i++)
-            op->inputs[i].stackIndex = inputIndexes[i];
-    }
-    context->advance(sizeof(CallOperation) + sizeof(CallOperation::Input)*numInputs);
+    CallOperation* op = (CallOperation*) context->writePos();
+    op->opid = OP_CALL;
+    op->caller = caller;
+    op->function = function;
+    op->numInputs = numInputs;
+    op->outputIndex = outputIndex;
+
+    for (int i=0; i < numInputs; i++)
+        op->inputs[i].stackIndex = inputIndexes[i];
+
+    context->advance(size);
 
     // If this call can throw error, add a check_error op
     if (function_t::get_attrs(function).throws)
@@ -140,108 +180,110 @@ void write_call_op(WriteContext* context, Term* term)
 
 void write_push_value_op(WriteContext* context, Term* term)
 {
-    if (context && term->stackIndex == -1) {
+    size_t size = sizeof(PushValueOperation);
+    context->guaranteeSize(size);
+
+    if (term->stackIndex == -1) {
         ca_assert(term->function->name != "trace");
         term->stackIndex = context->nextStackIndex++;
     }
 
-    if (context->writePos) {
-        PushValueOperation* op = (PushValueOperation*) context->writePos;
-        op->opid = OP_PUSH_VALUE;
-        op->outputIndex = term->stackIndex;
-        op->source = term;
-    }
-    context->advance(sizeof(PushValueOperation));
+    PushValueOperation* op = (PushValueOperation*) context->writePos();
+    op->opid = OP_PUSH_VALUE;
+    op->outputIndex = term->stackIndex;
+    op->source = term;
+    
+    context->advance(size);
 }
 
 void write_jump(WriteContext* context, int offset)
 {
-    if (context->writePos) {
-        JumpOperation* op = (JumpOperation*) context->writePos;
-        op->opid = OP_JUMP;
-        op->offset = offset;
-    }
-    context->advance(sizeof(JumpOperation));
+    size_t size = sizeof(JumpOperation);
+    context->guaranteeSize(size);
+    JumpOperation* op = (JumpOperation*) context->writePos();
+    op->opid = OP_JUMP;
+    op->offset = offset;
+    context->advance(size);
 }
 
 void write_jump_if(WriteContext* context, int conditionIndex, int offset)
 {
-    if (context->writePos) {
-        JumpIfOperation* op = (JumpIfOperation*) context->writePos;
-        op->opid = OP_JUMP_IF;
-        op->conditionIndex = conditionIndex;
-        op->offset = offset;
-    }
-    context->advance(sizeof(JumpIfOperation));
+    size_t size = sizeof(JumpIfOperation);
+    context->guaranteeSize(size);
+    JumpIfOperation* op = (JumpIfOperation*) context->writePos();
+    op->opid = OP_JUMP_IF;
+    op->conditionIndex = conditionIndex;
+    op->offset = offset;
+    context->advance(size);
 }
 void write_jump_if_not(WriteContext* context, int conditionIndex, int offset)
 {
-    if (context->writePos) {
-        JumpIfNotOperation* op = (JumpIfNotOperation*) context->writePos;
-        op->opid = OP_JUMP_IF_NOT;
-        op->conditionIndex = conditionIndex;
-        op->offset = offset;
-    }
-    context->advance(sizeof(JumpIfNotOperation));
+    size_t size = sizeof(JumpIfNotOperation);
+    context->guaranteeSize(size);
+    JumpIfNotOperation* op = (JumpIfNotOperation*) context->writePos();
+    op->opid = OP_JUMP_IF_NOT;
+    op->conditionIndex = conditionIndex;
+    op->offset = offset;
+    context->advance(size);
 }
 void write_push_int(WriteContext* context, int value, int outputIndex)
 {
-    if (context->writePos) {
-        PushIntOperation* op = (PushIntOperation*) context->writePos;
-        op->opid = OP_PUSH_INT;
-        op->value = value;
-        op->outputIndex = outputIndex;
-    }
-    context->advance(sizeof(PushIntOperation));
+    size_t size = sizeof(PushIntOperation);
+    context->guaranteeSize(size);
+    PushIntOperation* op = (PushIntOperation*) context->writePos();
+    op->opid = OP_PUSH_INT;
+    op->value = value;
+    op->outputIndex = outputIndex;
+    context->advance(size);
 }
 void write_get_index(WriteContext* context, int listIndex, int indexInList, int outputIndex)
 {
-    if (context->writePos) {
-        GetIndexOperation* op = (GetIndexOperation*) context->writePos;
-        op->opid = OP_GET_INDEX;
-        op->listIndex = listIndex;
-        op->indexInList = indexInList;
-        op->outputIndex = outputIndex;
-    }
-    context->advance(sizeof(GetIndexOperation));
+    size_t size = sizeof(GetIndexOperation);
+    context->guaranteeSize(size);
+    GetIndexOperation* op = (GetIndexOperation*) context->writePos();
+    op->opid = OP_GET_INDEX;
+    op->listIndex = listIndex;
+    op->indexInList = indexInList;
+    op->outputIndex = outputIndex;
+    context->advance(size);
 }
 void write_increment(WriteContext* context, int intIndex)
 {
-    if (context->writePos) {
-        IncrementOperation* op = (IncrementOperation*) context->writePos;
-        op->opid = OP_INCREMENT;
-        op->stackIndex = intIndex;
-    }
-    context->advance(sizeof(IncrementOperation));
+    size_t size = sizeof(IncrementOperation);
+    context->guaranteeSize(size);
+    IncrementOperation* op = (IncrementOperation*) context->writePos();
+    op->opid = OP_INCREMENT;
+    op->stackIndex = intIndex;
+    context->advance(size);
 }
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex)
 {
-    if (context->writePos) {
-        NumElementsOperation* op = (NumElementsOperation*) context->writePos;
-        op->opid = OP_NUM_ELEMENTS;
-        op->listIndex = listIndex;
-        op->outputIndex = outputIndex;
-    }
-    context->advance(sizeof(NumElementsOperation));
+    size_t size = sizeof(NumElementsOperation);
+    context->guaranteeSize(size);
+    NumElementsOperation* op = (NumElementsOperation*) context->writePos();
+    op->opid = OP_NUM_ELEMENTS;
+    op->listIndex = listIndex;
+    op->outputIndex = outputIndex;
+    context->advance(size);
 }
 
 void write_copy(WriteContext* context, int fromIndex, int toIndex)
 {
-    if (context->writePos) {
-        CopyOperation* op = (CopyOperation*) context->writePos;
-        op->opid = OP_COPY;
-        op->fromIndex = fromIndex;
-        op->toIndex = toIndex;
-    }
-    context->advance(sizeof(CopyOperation));
+    size_t size = sizeof(CopyOperation);
+    context->guaranteeSize(size);
+    CopyOperation* op = (CopyOperation*) context->writePos();
+    op->opid = OP_COPY;
+    op->fromIndex = fromIndex;
+    op->toIndex = toIndex;
+    context->advance(size);
 }
 void write_raise(WriteContext* context)
 {
-    if (context->writePos) {
-        RaiseOperation* op = (RaiseOperation*) context->writePos;
-        op->opid = OP_RAISE;
-    }
-    context->advance(sizeof(RaiseOperation));
+    size_t size = sizeof(RaiseOperation);
+    context->guaranteeSize(size);
+    RaiseOperation* op = (RaiseOperation*) context->writePos();
+    op->opid = OP_RAISE;
+    context->advance(size);
 }
 
 void write_comment(WriteContext* context, const char* str)
@@ -251,12 +293,12 @@ void write_comment(WriteContext* context, const char* str)
     size_t size = sizeof(CommentOperation) + strlen(str) + 1;
     // Round up size to multiple of 4 bytes
     size = (size + 3) & ~0x3;
-    if (context->writePos) {
-        CommentOperation* op = (CommentOperation*) context->writePos;
-        op->opid = OP_COMMENT;
-        op->size = size;
-        strcpy(op->text, str);
-    }
+
+    context->guaranteeSize(size);
+    CommentOperation* op = (CommentOperation*) context->writePos();
+    op->opid = OP_COMMENT;
+    op->size = size;
+    strcpy(op->text, str);
     context->advance(size);
 }
 void write_var_name(WriteContext* context, int stackIndex, const char* name)
@@ -266,15 +308,15 @@ void write_var_name(WriteContext* context, int stackIndex, const char* name)
 
 void write_return_op(WriteContext* context, Term* term)
 {
-    if (context->writePos) {
-        ReturnOperation* op = (ReturnOperation*) context->writePos;
-        op->opid = OP_RETURN;
-        op->caller = term;
-        op->stackIndex = -1;
-        if (term->input(0) != NULL)
-            op->stackIndex = term->input(0)->stackIndex;
-    }
-    context->advance(sizeof(ReturnOperation));
+    size_t size = sizeof(ReturnOperation);
+    context->guaranteeSize(size);
+    ReturnOperation* op = (ReturnOperation*) context->writePos();
+    op->opid = OP_RETURN;
+    op->caller = term;
+    op->stackIndex = -1;
+    if (term->input(0) != NULL)
+        op->stackIndex = term->input(0)->stackIndex;
+    context->advance(size);
 }
 
 void write_op(WriteContext* context, Term* term)
@@ -371,20 +413,18 @@ void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch)
 }
 void write_raise_if(WriteContext* context, Term* errorCondition)
 {
-    JumpIfNotOperation *jump = (JumpIfNotOperation*) context->writePos;
+    BytecodePosition jumpIfNot = context->getPosition();
     write_jump_if_not(context, errorCondition->stackIndex, 0);
     write_raise(context);
-    if (jump)
-        jump->offset = context->getOffset();
+    ((JumpIfNotOperation*) jumpIfNot.get())->offset = context->getOffset();
 }
 
 void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
 {
-    if (context->writePos)
-        assign_stack_for_major_branch(context, branch);
+    assign_stack_for_major_branch(context, branch);
 
     // First add a STACK_SIZE op. Will fill in the actual size later.
-    StackSizeOperation *stackSizeOperation = (StackSizeOperation*) context->writePos;
+    BytecodePosition stackSize = context->getPosition();
     write_stack_size_op(context, 0);
 
     // If this branch has any state, then create a get_top_level_state call.
@@ -403,41 +443,30 @@ void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
         write_call_op(context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
     }
        
-    if (stackSizeOperation)
-        stackSizeOperation->numElements = context->nextStackIndex;
+    ((StackSizeOperation*) stackSize.get())->numElements = context->nextStackIndex;
+}
+
+void resize_opdata(BytecodeData* bytecode, size_t newCapacity)
+{
+    bytecode->capacity = newCapacity;
+    bytecode->opdata = (char*) realloc(bytecode->opdata, newCapacity);
 }
 
 void update_bytecode(Branch& branch, BytecodeData* bytecode)
 {
     ca_assert(!bytecode->inuse);
 
-    // First pass: Figure out the size of generated bytecode.
-    WriteContext context;
-    context.writePos = NULL;
-    context.sizeWritten = 0;
+    bytecode->size = 0;
 
-    write_bytecode_for_top_level_branch(&context, branch);
+    const size_t default_size = 256;
 
-    size_t size = context.sizeWritten;
+    if (bytecode->capacity < default_size)
+        resize_opdata(bytecode, default_size);
 
-    // Check to reallocate opdata
-    if (size > bytecode->capacity) {
-        free(bytecode->opdata);
-        bytecode->opdata = new char[size];
-        bytecode->capacity = size;
-    }
-
-    bytecode->size = size;
-    ca_assert(bytecode->size <= bytecode->capacity);
-
-    // Second pass: Write data for real
-    context.writePos = bytecode->opdata;
-    context.sizeWritten = 0;
+    WriteContext context(bytecode);
     context.nextStackIndex = 0;
 
     write_bytecode_for_top_level_branch(&context, branch);
-
-    bytecode->size = context.sizeWritten;
 }
 
 void update_bytecode(Branch& branch)

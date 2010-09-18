@@ -12,15 +12,14 @@ namespace do_once_function {
     void write_bytecode(bytecode::WriteContext* context, Term* term)
     {
         ca_assert(term->function->name == "do_once");
-        bytecode::JumpIfOperation* jumpToEnd = (bytecode::JumpIfOperation*) context->writePos;
+        bytecode::BytecodePosition jumpToEnd = context->getPosition();
         bytecode::write_jump_if(context, term->input(0)->stackIndex, 0);
 
         // fixme: support state inside do_once
 
         bytecode::write_bytecode_for_branch(context, term->nestedContents, -1);
 
-        if (jumpToEnd)
-            jumpToEnd->offset = context->getOffset();
+        ((bytecode::JumpIfOperation*) jumpToEnd.get())->offset = context->getOffset();
     }
 
     void formatSource(StyledSource* source, Term* term)

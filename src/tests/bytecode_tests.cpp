@@ -42,8 +42,6 @@ void if_block_name_joining()
     branch.clear();
     branch.compile("if false elif false elif false elif false end");
     update_bytecode(branch);
-    //print_bytecode(std::cout, branch);
-    //evaluate_bytecode(branch);
 }
 
 void test_evaluate()

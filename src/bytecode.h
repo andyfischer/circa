@@ -129,10 +129,12 @@ struct VarNameOperation {
     char name[0];
 };
 
+struct BytecodePosition;
+
 struct WriteContext {
+    BytecodeData* bytecode;
     int nextStackIndex;
     size_t sizeWritten;
-    char* writePos;
 
     // Stack index of top level state
     int topLevelState;
@@ -140,21 +142,13 @@ struct WriteContext {
     // Stack index of state object for the current branch
     int inlineState;
 
-    WriteContext()
-      : nextStackIndex(0),
-        sizeWritten(0),
-        writePos(NULL),
-        topLevelState(-1),
-        inlineState(-1)
-    {}
+    WriteContext(BytecodeData* _bytecode);
 
-    void advance(size_t bytes) {
-        if (writePos)
-            writePos += bytes;
-        sizeWritten += bytes;
-    }
-
-    int getOffset() { return int(sizeWritten); }
+    void guaranteeSize(size_t moreBytes);
+    void advance(size_t bytes);
+    int getOffset();
+    Operation* writePos();
+    BytecodePosition getPosition();
 };
 
 struct BytecodeData {
@@ -168,6 +162,14 @@ struct BytecodeData {
     char* opdata;
 
     BytecodeData(): needsUpdate(true), inuse(false), size(0), capacity(0), opdata(NULL) {}
+};
+
+struct BytecodePosition {
+    BytecodeData* data;
+    size_t offset;
+    BytecodePosition(BytecodeData* d, size_t o) : data(d), offset(o) {}
+
+    Operation* get() { return (Operation*) (data->opdata + offset); }
 };
 
 // The size of the operation, in words.
@@ -201,6 +203,7 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
 void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch);
 void write_raise_if(WriteContext* context, Term* errorCondition);
 
+void resize_opdata(BytecodeData* bytecode, size_t newCapacity);
 void update_bytecode(Branch& branch, BytecodeData* bytecode);
 void update_bytecode(Branch& branch);
 
