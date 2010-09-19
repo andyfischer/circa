@@ -22,6 +22,8 @@ namespace inline_state_function {
     CA_DEFINE_FUNCTION(get_state_field,
             "get_state_field(any +optional, string name, any default_value +optional) -> any")
     {
+        ca_assert(INPUT(1) != NULL);
+
         TaggedValue *container = INPUT(0);
         if (!is_dict(container)) make_dict(container);
 

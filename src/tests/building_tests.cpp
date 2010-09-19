@@ -38,7 +38,7 @@ void test_create_duplicate()
     test_assert(a->function == b->function);
     test_assert(a->type == b->type);
     test_assert(a->value_type == b->value_type);
-    test_assert(is_stateful(b));
+    test_assert(is_get_state(b));
 }
 
 void test_duplicate_value()

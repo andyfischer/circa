@@ -42,9 +42,6 @@ namespace include_function {
             //std::cout << "### New:" << std::endl;
             //dump_branch(contents);
 
-            if (previous_contents.length() > 0)
-                migrate_stateful_values(previous_contents, contents);
-
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);
         }

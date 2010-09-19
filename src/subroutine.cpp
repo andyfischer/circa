@@ -85,7 +85,7 @@ void subroutine_update_state_type_from_contents(Term* func)
     for (int i=0; i < contents.length(); i++) {
         if (contents[i] == NULL)
             continue;
-        if (is_stateful(contents[i])) {
+        if (is_get_state(contents[i])) {
             hasState = true;
             break;
         }

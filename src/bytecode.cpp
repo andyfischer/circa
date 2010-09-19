@@ -414,9 +414,9 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     }
 
     // Wrap up any state vars that were declared in this branch.
-    for (int i=0; i < branch.length(); i++) {
+    /*for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
-        if (is_stateful(term)) {
+        if (is_get_state(term)) {
             Term* modifiedResult = branch[term->name];
             ca_assert(term->name != "");
             ca_assert(modifiedResult != NULL);
@@ -426,7 +426,7 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
             write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
                     context->inlineState);
         }
-    }
+    }*/
 
     context->inlineState = prevInlineState;
     return lastStackIndex;
@@ -449,6 +449,7 @@ void write_get_state_field(WriteContext* context, Term* term, int name,
         int defaultValue, int output)
 {
     ca_assert(context->topLevelState != -1);
+    ca_assert(name != -1);
     int inputs[] = { context->inlineState, name, defaultValue };
     bytecode::write_call_op(context, term, get_global("get_state_field"), 3, inputs,
             output);

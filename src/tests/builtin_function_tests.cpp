@@ -260,7 +260,8 @@ void test_changed()
 
 void test_message_passing()
 {
-    // FIXME
+    #if 0
+    FIXME
     return;
     Branch branch;
     EvalContext context;
@@ -297,6 +298,7 @@ void test_message_passing()
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 0);
     test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    #endif
 }
 
 void register_tests()

@@ -290,6 +290,8 @@ void find_name_in_outer_branch()
 
 void test_migrate()
 {
+    #if 0
+    TODO: delete?
     Branch dest, source;
 
     Term* a = dest.eval("state a = 1");
@@ -307,10 +309,13 @@ void test_migrate()
 
     test_assert(source);
     test_assert(dest);
+    #endif
 }
 
 void test_migrate2()
 {
+    #if 0
+    TODO: delete?
     // In this test, we migrate with 1 term added and 1 term removed.
     Branch source, dest;
 
@@ -327,6 +332,7 @@ void test_migrate2()
 
     test_assert(source);
     test_assert(dest);
+    #endif
 }
 
 void test_cast()

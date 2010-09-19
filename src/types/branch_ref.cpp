@@ -44,7 +44,7 @@ namespace branch_ref_t {
         if (term == NULL) return false;
         if (term->name == "") return false;
         if (!is_value(term)) return false;
-        if (is_stateful(term)) return false;
+        if (is_get_state(term)) return false;
         if (is_hidden(term)) return false;
 
         // ignore branch-based types

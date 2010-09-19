@@ -15,6 +15,7 @@ namespace message_passing_function {
 
     CA_FUNCTION(evaluate_send)
     {
+        /* FIXME
         Term* inbox = INPUT_TERM(0);
         Term* input = INPUT_TERM(1);
 
@@ -22,6 +23,7 @@ namespace message_passing_function {
 
         List* inboxState = List::checkCast(get_hidden_state_for_call(inbox));
         copy(input, inboxState->append());
+        */
     }
 
     void setup(Branch& kernel)

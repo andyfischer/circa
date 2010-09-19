@@ -203,7 +203,7 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
 {
     Term* fieldName = create_string(branch, name);
     Term* result = apply(branch, get_global("get_state_field"),
-            RefList(NULL, fieldName, defaultValue), name);
+            RefList(NULL, fieldName, defaultValue));
     change_type(result, type);
     return result;
 
