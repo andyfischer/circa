@@ -54,7 +54,7 @@ namespace inline_state_function {
             term->stackIndex = context->nextStackIndex++;
         bytecode::write_get_state_field(context, term, name, defaultValue, term->stackIndex);
 
-        context->appendStateFieldStore(as_string(nameTerm), name);
+        context->appendStateFieldStore(as_string(nameTerm), name, -1);
     }
 
     CA_DEFINE_FUNCTION(set_state_field,

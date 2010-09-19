@@ -143,6 +143,7 @@ struct WriteContext {
     struct PendingStateFieldStore {
         std::string fieldName;
         int nameRegister;
+        int resultRegister;
     };
 
     BytecodeData* bytecode;
@@ -166,7 +167,10 @@ struct WriteContext {
     BytecodePosition getPosition();
     int appendLocal(TaggedValue* val);
 
-    void appendStateFieldStore(std::string const& fieldName, int nameRegister);
+    // Either fieldName or resultRegister is required; if fieldName is non-blank
+    // then resultRegister should be -1.
+    void appendStateFieldStore(std::string const& fieldName, int nameRegister,
+            int resultRegister);
 };
 
 struct BytecodeData {

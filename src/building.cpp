@@ -33,7 +33,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     function = overloaded_function::statically_specialize_function(function, inputs);
 
     // If 'function' has hidden state, create the necessary state.
-    if (is_function_stateful(function)
+    /*if (is_function_stateful(function)
             && (inputs.length() < function_t::num_inputs(function)))
     {
         Term* stateContainer = create_stateful_value(branch,
@@ -45,7 +45,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
             newInputs.append(inputs[i]);
 
         return apply(branch, function, newInputs, name);
-    }
+    }*/
 
     // Create the term
     Term* result = branch.appendNew();

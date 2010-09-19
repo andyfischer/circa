@@ -65,11 +65,13 @@ WriteContext::appendLocal(TaggedValue* val)
 }
 
 void
-WriteContext::appendStateFieldStore(std::string const& fieldName, int nameRegister)
+WriteContext::appendStateFieldStore(std::string const& fieldName, int nameRegister,
+    int resultRegister)
 {
     PendingStateFieldStore store;
     store.fieldName = fieldName;
     store.nameRegister = nameRegister;
+    store.resultRegister = resultRegister;
     pendingStateFieldStores.push_back(store);
 }
 
@@ -179,7 +181,21 @@ void write_call_op(WriteContext* context, Term* caller, Term* function, int numI
 
 void write_call_op(WriteContext* context, Term* term)
 {
-    int numInputs = term->numInputs();
+    // If this call has implicit state, then generate a get_state_field
+    int stateRegister = -1;
+    if (has_implicit_state(term)) {
+        TaggedValue fieldName;
+        
+        std::string fieldNameStr = get_implicit_state_name(term);
+        make_string(&fieldName, fieldNameStr);
+
+        int nameRegister = write_push_local_op(context, &fieldName);
+
+        stateRegister = context->nextStackIndex++;
+        write_get_state_field(context, term, nameRegister, -1, stateRegister);
+
+        context->appendStateFieldStore("", nameRegister, stateRegister);
+    }
 
     if (should_term_output_go_on_stack(term) && term->stackIndex == -1) {
         term->stackIndex = context->nextStackIndex++;
@@ -188,15 +204,21 @@ void write_call_op(WriteContext* context, Term* term)
     const int MAX_INPUTS_EVER = 1000;
     int inputIndexes[MAX_INPUTS_EVER];
 
-    for (int i=0; i < numInputs; i++) {
-        Term* input = term->input(i);
-        if (input == NULL)
-            inputIndexes[i] = -1;
-        else
-            inputIndexes[i] = input->stackIndex;
+    int inputCount = 0;
+
+    if (stateRegister != -1) {
+        inputIndexes[inputCount++] = stateRegister;
     }
 
-    write_call_op(context, term, term->function, numInputs, inputIndexes, term->stackIndex);
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+        if (input == NULL)
+            inputIndexes[inputCount++] = -1;
+        else
+            inputIndexes[inputCount++] = input->stackIndex;
+    }
+
+    write_call_op(context, term, term->function, inputCount, inputIndexes, term->stackIndex);
 }
 
 void write_push_value_op(WriteContext* context, Term* term)
@@ -426,9 +448,17 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     for (size_t i=0; i < context->pendingStateFieldStores.size(); i++) {
         WriteContext::PendingStateFieldStore &store = context->pendingStateFieldStores[i];
 
-        Term* result = branch[store.fieldName];
+        int resultRegister = store.resultRegister;
 
-        int inputs[] = { context->inlineState, store.nameRegister, result->stackIndex };
+        if (resultRegister == -1) {
+            Term* result = branch[store.fieldName];
+
+            if (result == NULL)
+                continue;
+            resultRegister = result->stackIndex;
+        }
+
+        int inputs[] = { context->inlineState, store.nameRegister, resultRegister };
         write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
                 context->inlineState);
     }

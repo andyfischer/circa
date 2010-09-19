@@ -23,6 +23,8 @@ namespace subroutine_t {
 
     CA_FUNCTION(evaluate)
     {
+        EvalContext context;
+
         Term* function = FUNCTION;
         Branch& functionBranch = function->nestedContents;
 
@@ -39,16 +41,18 @@ namespace subroutine_t {
             }
         }
 
-        reset(&CONTEXT->subroutineOutput);
-
         if (!functionBranch._bytecode.inuse)
             bytecode::update_bytecode(functionBranch);
-        evaluate_bytecode(CONTEXT, &functionBranch._bytecode, &stack);
+        evaluate_bytecode(&context, &functionBranch._bytecode, &stack);
 
         if (OUTPUT != NULL) {
-            swap(&CONTEXT->subroutineOutput, OUTPUT);
+            swap(&context.subroutineOutput, OUTPUT);
         }
-        reset(&CONTEXT->subroutineOutput);
+
+        // Copy state (if any)
+        if (is_function_stateful(function)) {
+            swap(&context.topLevelState, INPUT(0));
+        }
     }
 }
 
