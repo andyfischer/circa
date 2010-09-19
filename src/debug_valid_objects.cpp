@@ -12,40 +12,40 @@
 namespace circa {
 
 #if ENABLE_VALID_OBJECT_CHECKING
-std::map<void*, int> g_addressToType;
+std::map<void*, int> *g_addressToType = new std::map<void*,int>;
 
 void debug_register_valid_object(void* obj, int type)
 {
-    bool alreadyValid = g_addressToType.find(obj) != g_addressToType.end();
+    bool alreadyValid = g_addressToType->find(obj) != g_addressToType->end();
     if (alreadyValid) {
         std::stringstream err;
         err << "Double register at address: " << size_t(obj);
         internal_error(err.str().c_str());
     }
-    g_addressToType[obj] = type;
+    (*g_addressToType)[obj] = type;
 }
 
 void debug_unregister_valid_object(void* obj)
 {
-    bool valid = g_addressToType.find(obj) != g_addressToType.end();
+    bool valid = g_addressToType->find(obj) != g_addressToType->end();
     if (!valid) {
         std::stringstream err;
         err << "Freed unregistered address: " << size_t(obj);
         internal_error(err.str().c_str());
     }
-    g_addressToType.erase(obj);
+    g_addressToType->erase(obj);
 }
 
 void debug_assert_valid_object(void* obj, int type)
 {
     if (obj == NULL) return;
-    bool valid = g_addressToType.find(obj) != g_addressToType.end();
+    bool valid = g_addressToType->find(obj) != g_addressToType->end();
     if (!valid) {
         std::stringstream err;
         err << "assert_valid_object failed, nothing registered at addr " << size_t(obj);
         internal_error(err.str().c_str());
     }
-    int existingType = g_addressToType[obj];
+    int existingType = (*g_addressToType)[obj];
     if (type != existingType) {
         std::stringstream err;
         err << "assert_valid_object failed, type mismatch (expected " << type
@@ -60,9 +60,9 @@ bool debug_is_object_valid(void* obj, int type)
 {
     #if ENABLE_VALID_OBJECT_CHECKING
         if (obj == NULL) return false;
-        bool valid = g_addressToType.find(obj) != g_addressToType.end();
+        bool valid = g_addressToType->find(obj) != g_addressToType->end();
         if (!valid) return false;
-        int existingType = g_addressToType[obj];
+        int existingType = (*g_addressToType)[obj];
         if (type != existingType) return false;
         return true;
     #else

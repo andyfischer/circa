@@ -16,7 +16,6 @@ void test_is_get_state()
 
     Term* j = branch.compile("state i = 0");
     test_assert(is_get_state(j));
-    //test_assert(j->type == INT_TYPE);
 }
 
 void test_is_function_stateful()
@@ -113,6 +112,14 @@ void one_time_assignment_inside_for_loop()
     test_assert(SPY_RESULTS[2] == 2);
 }
 
+void state_and_bytecode()
+{
+    Branch branch;
+    branch.compile("state s");
+    branch.compile("s = 1");
+    dump_bytecode(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -121,6 +128,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
+    REGISTER_TEST_CASE(stateful_code_tests::state_and_bytecode);
 }
 
 } // namespace stateful_code_tests
