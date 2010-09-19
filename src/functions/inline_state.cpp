@@ -47,11 +47,14 @@ namespace inline_state_function {
 
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
     {
+        Term* nameTerm = term->input(1);
+        int name = nameTerm->stackIndex;
         int defaultValue = term->input(2) == NULL ? -1 : term->input(2)->stackIndex;
         if (term->stackIndex == -1)
             term->stackIndex = context->nextStackIndex++;
-        bytecode::write_get_state_field(context, term, term->input(1)->stackIndex,
-                defaultValue, term->stackIndex);
+        bytecode::write_get_state_field(context, term, name, defaultValue, term->stackIndex);
+
+        context->appendStateFieldStore(as_string(nameTerm), name);
     }
 
     CA_DEFINE_FUNCTION(set_state_field,
@@ -71,7 +74,6 @@ namespace inline_state_function {
         std::cout << "result = " << OUTPUT->toString() << std::endl;
         #endif
     }
-
 
     void formatSource(StyledSource* source, Term* term)
     {

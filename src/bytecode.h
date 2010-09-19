@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <vector>
+
 #include "common_headers.h"
 #include "types/list.h"
 
@@ -138,6 +140,11 @@ struct VarNameOperation {
 struct BytecodePosition;
 
 struct WriteContext {
+    struct PendingStateFieldStore {
+        std::string fieldName;
+        int nameRegister;
+    };
+
     BytecodeData* bytecode;
     int nextStackIndex;
     size_t sizeWritten;
@@ -148,6 +155,8 @@ struct WriteContext {
     // Stack index of state object for the current branch
     int inlineState;
 
+    std::vector<PendingStateFieldStore> pendingStateFieldStores;
+
     WriteContext(BytecodeData* _bytecode);
 
     void guaranteeSize(size_t moreBytes);
@@ -156,6 +165,8 @@ struct WriteContext {
     Operation* writePos();
     BytecodePosition getPosition();
     int appendLocal(TaggedValue* val);
+
+    void appendStateFieldStore(std::string const& fieldName, int nameRegister);
 };
 
 struct BytecodeData {

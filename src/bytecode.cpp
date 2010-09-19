@@ -64,6 +64,15 @@ WriteContext::appendLocal(TaggedValue* val)
     return index;
 }
 
+void
+WriteContext::appendStateFieldStore(std::string const& fieldName, int nameRegister)
+{
+    PendingStateFieldStore store;
+    store.fieldName = fieldName;
+    store.nameRegister = nameRegister;
+    pendingStateFieldStores.push_back(store);
+}
+
 size_t get_operation_size(Operation* op)
 {
     switch (op->opid) {
@@ -414,19 +423,16 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     }
 
     // Wrap up any state vars that were declared in this branch.
-    /*for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-        if (is_get_state(term)) {
-            Term* modifiedResult = branch[term->name];
-            ca_assert(term->name != "");
-            ca_assert(modifiedResult != NULL);
-            ca_assert(modifiedResult->stackIndex != -1);
-            int inputs[] = { context->inlineState, term->input(1)->stackIndex,
-                modifiedResult->stackIndex };
-            write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
-                    context->inlineState);
-        }
-    }*/
+    for (size_t i=0; i < context->pendingStateFieldStores.size(); i++) {
+        WriteContext::PendingStateFieldStore &store = context->pendingStateFieldStores[i];
+
+        Term* result = branch[store.fieldName];
+
+        int inputs[] = { context->inlineState, store.nameRegister, result->stackIndex };
+        write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
+                context->inlineState);
+    }
+    context->pendingStateFieldStores.clear();
 
     context->inlineState = prevInlineState;
     return lastStackIndex;
