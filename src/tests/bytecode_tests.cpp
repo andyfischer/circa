@@ -103,17 +103,14 @@ void if_block_state()
     branch.compile("if true state i; i = 4 else state j; j = 3; end");
     test_assert(has_any_inlined_state(branch));
 
-    dump_branch(branch);
-    dump_bytecode(branch);
-
     EvalContext context;
     evaluate_branch(&context, branch);
-    test_equals(context.topLevelState.toString(), "[#if_block: [[i: 4], null]]");
+    test_equals(context.topLevelState.toString(), "[if_block: [[i: 4], null]]");
 
     branch.clear();
     branch.compile("if false state i; i = 4 else state j; j = 3; end");
     evaluate_branch(&context, branch);
-    test_equals(context.topLevelState.toString(), "[#if_block: [null, [j: 3]]]");
+    test_equals(context.topLevelState.toString(), "[if_block: [null, [j: 3]]]");
 }
 
 void for_block_state()
@@ -127,7 +124,7 @@ void for_block_state()
     evaluate_branch(&context, branch);
 
     test_equals(context.topLevelState.toString(),
-            "[#hidden_state_for_for_loop: [[s: 1], [s: 1], [s: 1], [s: 1], [s: 1]]]");
+            "[for: [[s: 1], [s: 1], [s: 1], [s: 1], [s: 1]]]");
 }
 
 void test_do_once()

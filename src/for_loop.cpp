@@ -182,11 +182,23 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     // Fetch state container
     int stateContainer = -1;
+    int stateContainerName = -1;
+
     if (hasState) {
-        Term* getState = forTerm->owningBranch->get(forTerm->index-1);
-        ca_assert(getState != NULL);
-        ca_assert(getState->function->name == "get_state_field");
-        stateContainer = getState->stackIndex;
+        // State field name.
+        TaggedValue stateName;
+        make_string(&stateName, get_implicit_state_name(forTerm));
+        stateContainerName = bytecode::write_push_local_op(context, &stateName);
+
+        // State default value
+        TaggedValue defaultValue;
+        make_list(&defaultValue);
+        int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
+
+        // get_state_field
+        stateContainer = context->nextStackIndex++;
+        bytecode::write_get_state_field(context, NULL, stateContainerName, stateDefaultValue,
+                stateContainer);
 
         // Resize state list
         {
@@ -327,6 +339,13 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     // complete the above jumpToEnd
     ((bytecode::JumpIfNotOperation*) jumpToEnd.get())->offset = context->getOffset();
+
+    // Wrap up state container
+    if (hasState) {
+        int inputs[] = { context->inlineState, stateContainerName, stateContainer };
+        bytecode::write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
+                context->inlineState);
+    }
 }
 
 } // namespace circa

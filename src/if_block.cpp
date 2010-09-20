@@ -161,9 +161,9 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     int stateContainerName = -1;
     if (hasState) {
 
-        // State field name. TODO: Make this unique across the branch
+        // State field name.
         TaggedValue stateName;
-        make_string(&stateName, "#if_block");
+        make_string(&stateName, get_implicit_state_name(ifBlock));
         stateContainerName = bytecode::write_push_local_op(context, &stateName);
 
         // State default value
