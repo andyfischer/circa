@@ -13,7 +13,7 @@ void recursively_evaluate_inputs_inside_branch(Term* term, Branch* branch)
     if (term->owningBranch != branch)
         return;
 
-    evaluate_term(term);
+    //evaluate_term(term);
 
     for (int i=0; i < term->numInputs(); i++)
         recursively_evaluate_inputs_inside_branch(term->input(i), branch);

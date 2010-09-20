@@ -32,9 +32,6 @@ struct EvalContext
 
 };
 
-void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output);
-void evaluate_term(EvalContext* cxt, Term* term);
-void evaluate_term(Term* term);
 void evaluate_branch(EvalContext* context, Branch& branch);
 void evaluate_bytecode(Branch& branch);
 
@@ -48,11 +45,6 @@ Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs);
 Term* apply_and_eval(Branch& branch,
                     std::string const& functionName,
                     RefList const& inputs);
-
-// Evaluates the given term, but doesn't evaluate any functions that have side effects.
-// This function will also recursively evaluate inputs if needed, but it won't go outside
-// of the current branch.
-void evaluate_without_side_effects(Term* term);
 
 void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);

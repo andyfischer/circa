@@ -29,7 +29,9 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
         }
 
         EvalContext context;
-        evaluate_term(&context, result);
+
+        // FIXME: Should only reevaluate new terms
+        evaluate_branch(&context, branch);
 
         if (context.errorOccurred) {
             output << "error: ";

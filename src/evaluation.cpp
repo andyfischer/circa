@@ -15,20 +15,6 @@
 
 namespace circa {
 
-void evaluate_term(EvalContext* cxt, Term* caller, Term* function, RefList const& inputs, TaggedValue* output)
-{
-}
-
-inline void evaluate_term(EvalContext* cxt, Term* term)
-{
-}
-
-void evaluate_term(Term* term)
-{
-    EvalContext context;
-    evaluate_term(&context, term);
-}
-
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
     bytecode::update_bytecode(branch);
@@ -49,7 +35,7 @@ EvalContext evaluate_branch(Branch& branch)
 Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
 {
     Term* result = apply(branch, function, inputs);
-    evaluate_term(result);
+    // TODO: eval
     return result;
 }
 
@@ -61,18 +47,6 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
         throw std::runtime_error("function not found: "+functionName);
 
     return apply_and_eval(branch, function, inputs);
-}
-
-void evaluate_without_side_effects(Term* term)
-{
-    // TODO: Should actually check if the function has side effects.
-    for (int i=0; i < term->numInputs(); i++) {
-        Term* input = term->input(i);
-        if (input->owningBranch == term->owningBranch)
-            evaluate_without_side_effects(input);
-    }
-
-    evaluate_term(term);
 }
 
 void evaluate_bytecode(Branch& branch)

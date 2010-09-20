@@ -9,8 +9,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 {
     ca_assert(function != NULL);
 
-    evaluate_without_side_effects(function);
-
     // If 'function' is actually a type, create a value instead.
     if (is_type(function)) {
         if (inputs.length() == 0) {

@@ -69,33 +69,6 @@ void test_list()
     test_assert(l->getIndex(2)->asString() == "foo");
 }
 
-void test_range()
-{
-    Branch branch;
-    Term* t = branch.eval("range(0,5)");
-
-    test_assert(t->numElements() == 5);
-    for (int i=0; i < 5; i++)
-        test_assert(t->getIndex(i)->asInt() == i);
-
-    // there was once a bug where the result list would grow on every call
-    evaluate_term(t);
-    evaluate_term(t);
-    evaluate_term(t);
-    evaluate_term(t);
-    test_assert(t->numElements() == 5);
-}
-
-void test_map()
-{
-    Branch branch;
-    branch.eval("input_list = [1 2 3 4 5]");
-    Term* map_sqr = branch.eval("map(sqr, input_list)");
-
-    test_assert(map_sqr);
-
-}
-
 void test_vectorized_funcs()
 {
     Branch branch;
@@ -308,8 +281,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
-    REGISTER_TEST_CASE(builtin_function_tests::test_range);
-    //REGISTER_TEST_CASE(builtin_function_tests::test_map);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
