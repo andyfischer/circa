@@ -78,7 +78,6 @@ WriteContext::appendStateFieldStore(std::string const& fieldName, int nameRegist
 size_t get_operation_size(Operation* op)
 {
     switch (op->opid) {
-        case OP_STACK_SIZE: return sizeof(StackSizeOperation);
         case OP_CALL: {
             CallOperation *callOp = (CallOperation*) op;
             return sizeof(CallOperation) + sizeof(CallOperation::Input)*callOp->numInputs;
@@ -136,16 +135,6 @@ bool should_term_generate_call(Term* term)
         return false;
 
     return true;
-}
-
-void write_stack_size_op(WriteContext* context, int stacksize)
-{
-    size_t size = sizeof(StackSizeOperation);
-    context->guaranteeSize(size);
-    StackSizeOperation* op = (StackSizeOperation*) context->writePos();
-    op->opid = OP_STACK_SIZE;
-    op->numElements = stacksize;
-    context->advance(size);
 }
 
 void write_check_error(WriteContext* context)
@@ -495,10 +484,6 @@ void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
 {
     assign_registers_for_major_branch(context, branch);
 
-    // First add a STACK_SIZE op. Will fill in the actual size later.
-    BytecodePosition stackSize = context->getPosition();
-    write_stack_size_op(context, 0);
-
     // If this branch has any state, then create a get_top_level_state call.
     bool hasAnyInlinedState = false;
     if (has_any_inlined_state(branch)) {
@@ -515,7 +500,7 @@ void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
         write_call_op(context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
     }
        
-    ((StackSizeOperation*) stackSize.get())->numElements = context->nextStackIndex;
+    context->bytecode->registerCount = context->nextStackIndex;
 }
 
 void resize_opdata(BytecodeData* bytecode, size_t newCapacity)
@@ -565,9 +550,6 @@ void print_bytecode(std::ostream& out, Branch& branch)
 void print_operation(std::ostream& out, BytecodeData* bytecode, Operation* op)
 {
     switch (op->opid) {
-        case OP_STACK_SIZE:
-            out << "stack_size[" << ((StackSizeOperation*) op)->numElements << "]";
-            break;
         case OP_CALL: {
             CallOperation *callOp = (CallOperation*) op;
             out << "call " << callOp->function->name;
@@ -736,6 +718,8 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
     //cxt->clearError();
     data->inuse = true;
 
+    registers->resize(data->registerCount);
+
     char* pos = data->opdata;
     char* end = data->opdata + data->size;
 
@@ -751,12 +735,6 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
         #endif
 
         switch (op->opid) {
-            case bytecode::OP_STACK_SIZE: {
-                bytecode::StackSizeOperation *ssop = (bytecode::StackSizeOperation*) op;
-                registers->resize(ssop->numElements);
-                pos += sizeof(bytecode::StackSizeOperation);
-                continue;
-            }
             case bytecode::OP_PUSH_VALUE: {
                 bytecode::PushValueOperation *pushOp = (bytecode::PushValueOperation*) op;
                 TaggedValue* output = registers->get(pushOp->outputIndex);

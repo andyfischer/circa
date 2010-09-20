@@ -11,8 +11,7 @@ namespace circa {
 namespace bytecode {
 
 enum OpId {
-    OP_STACK_SIZE = 1,
-    OP_CALL,
+    OP_CALL = 1,
     OP_PUSH_VALUE,
     OP_PUSH_LOCAL,
     OP_JUMP,
@@ -34,11 +33,6 @@ enum OpId {
 struct Operation {
     OpId opid;
     int data[0];
-};
-
-struct StackSizeOperation {
-    OpId opid;
-    int numElements; 
 };
 
 struct CallOperation {
@@ -178,12 +172,19 @@ struct BytecodeData {
     bool inuse;
 
     List locals;
+    int registerCount;
 
     size_t size;
     size_t capacity;
     char* opdata;
 
-    BytecodeData(): needsUpdate(true), inuse(false), size(0), capacity(0), opdata(NULL) {}
+    BytecodeData()
+      : needsUpdate(true),
+        inuse(false),
+        registerCount(0),
+        size(0),
+        capacity(0),
+        opdata(NULL) {}
 };
 
 struct BytecodePosition {
