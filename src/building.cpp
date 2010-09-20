@@ -30,21 +30,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     // Try to specialize an overloaded function
     function = overloaded_function::statically_specialize_function(function, inputs);
 
-    // If 'function' has hidden state, create the necessary state.
-    /*if (is_function_stateful(function)
-            && (inputs.length() < function_t::num_inputs(function)))
-    {
-        Term* stateContainer = create_stateful_value(branch,
-                function_t::get_inline_state_type(function), NULL,
-                default_name_for_hidden_state(name));
-
-        RefList newInputs(stateContainer);
-        for (int i=0; i < inputs.length(); i++)
-            newInputs.append(inputs[i]);
-
-        return apply(branch, function, newInputs, name);
-    }*/
-
     // Create the term
     Term* result = branch.appendNew();
 
@@ -60,7 +45,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     Term* outputType = function_get_specialized_output_type(function, result);
 
     ca_assert(outputType != NULL);
-    ca_assert(size_t(outputType) > 10);
     ca_assert(is_type(outputType));
 
     change_type(result, outputType);

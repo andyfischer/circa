@@ -50,8 +50,8 @@ void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
 TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index);
 TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp);
-void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
-        List* inputs, TaggedValue* output);
-void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack);
+void evaluate_single_term(Term* caller);
+void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
+    List* registers);
 
 } // namespace circa

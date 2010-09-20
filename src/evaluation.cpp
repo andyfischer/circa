@@ -18,9 +18,9 @@ namespace circa {
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
     bytecode::update_bytecode(branch);
-    List stack;
-    bytecode::evaluate_bytecode(context, &branch._bytecode, &stack);
-    copy_stack_back_to_terms(branch, &stack);
+    List registers;
+    bytecode::evaluate_bytecode(context, &branch._bytecode, &registers);
+    copy_stack_back_to_terms(branch, &registers);
     
     reset(&context->subroutineOutput);
 }
@@ -100,20 +100,47 @@ TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp)
     return stack->get(callOp->outputIndex);
 }
 
-void evaluate_single_term(EvalContext* context, Term* caller, Term* function,
-        List* inputs, TaggedValue* output)
+void evaluate_single_term(Term* caller)
 {
-    bytecode::CallOperation callop;
-    callop.caller = caller;
-    callop.function = function;
+    int numInputs = caller->numInputs();
 
-    std::cout << "evaluate_single_term" << std::endl;
+    List registers;
+    registers.resize(numInputs + 1);
+
+    // Populate registers with inputs
+    for (int i=0; i < caller->numInputs(); i++)
+        copy(caller->input(i), registers.get(i));
+
+    bytecode::CallOperation *callop = (bytecode::CallOperation*)
+        malloc(sizeof(bytecode::CallOperation)
+                + numInputs*sizeof(bytecode::CallOperation::Input));
+
+    callop->caller = caller;
+    callop->function = caller->function;
+    callop->numInputs = numInputs;
+
+    for (int i=0; i < caller->numInputs(); i++)
+        callop->inputs[i].registerIndex = i;
+
+    callop->outputIndex = numInputs;
+
+    EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
+
+    EvalContext context;
+    func(&context, &registers, callop);
+
+    delete callop;
+
+    // Copy output
+    copy(registers.get(numInputs), caller);
 }
 
-void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop, List* stack)
+void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
+    List* registers)
 {
     EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
-    func(cxt, stack, callop);
+    func(cxt, registers, callop);
 }
+
 
 } // namespace circa
