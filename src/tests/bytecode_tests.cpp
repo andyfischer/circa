@@ -101,6 +101,10 @@ void if_block_state()
     Branch branch;
 
     branch.compile("if true state i; i = 4 else state j; j = 3; end");
+    test_assert(has_any_inlined_state(branch));
+
+    dump_branch(branch);
+    dump_bytecode(branch);
 
     EvalContext context;
     evaluate_branch(&context, branch);

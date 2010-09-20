@@ -18,9 +18,8 @@ bool has_implicit_state(Term* term)
 {
     if (is_function_stateful(term->function))
         return true;
-    for (int i=0; i < term->nestedContents.length(); i++)
-        if (has_implicit_state(term->nestedContents[i]))
-            return true;
+    if (has_any_inlined_state(term->nestedContents))
+        return true;
     return false;
 }
 
