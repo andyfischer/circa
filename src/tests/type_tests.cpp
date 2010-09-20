@@ -27,26 +27,30 @@ void compound_types()
     test_assert(as_type(MyType).findFieldIndex("the_bodies") == -1);
 
     // instanciation
-    Term* inst = branch.eval("inst = MyType()");
-    test_assert(inst != NULL);
+    Term* inst = branch.compile("inst = MyType()");
+
+    // field access on a brand new type
+    Term* astr = branch.compile("inst.astr");
+
+    // field assignment
+    Term *inst2 = branch.compile("inst.astr = 'hello'");
+
+    // field access of recently assigned value
+    Term* astr2 = branch.compile("inst.astr");
+
+    evaluate_branch(branch);
+
     test_assert(inst->type = MyType);
     test_assert(inst->value_data.ptr != NULL);
     test_assert(inst->getIndex(0)->asInt() == 0);
     test_assert(inst->getIndex(1)->asString() == "");
 
-    // field access on a brand new type
-    Term* astr = branch.eval("inst.astr");
     test_assert(is_string(astr));
     test_equals(as_string(astr), "");
 
-    // field assignment
-    Term *inst2 = branch.eval("inst.astr = 'hello'");
-    test_assert(inst2);
     test_assert(inst2->getIndex(1)->asString() == "hello");
     test_assert(inst2->type == MyType); // type specialization
 
-    // field access of recently assigned value
-    Term* astr2 = branch.eval("inst.astr");
     test_assert(is_string(astr2));
     test_equals(as_string(astr2), "hello");
 }

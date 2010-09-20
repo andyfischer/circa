@@ -16,7 +16,6 @@ Term::Term()
   : owningBranch(NULL),
     index(0),
     registerIndex(-1),
-    flags(0),
     refCount(0)
 {
     globalID = gNextGlobalID++;

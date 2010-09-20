@@ -480,29 +480,6 @@ void write_get_state_field(WriteContext* context, Term* term, int name,
             output);
 }
 
-void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
-{
-    assign_registers_for_major_branch(context, branch);
-
-    // If this branch has any state, then create a get_top_level_state call.
-    bool hasAnyInlinedState = false;
-    if (has_any_inlined_state(branch)) {
-        hasAnyInlinedState = true;
-        context->topLevelState = context->nextStackIndex++;
-        write_call_op(context, NULL, get_global("get_top_level_state"), 0, NULL,
-                context->topLevelState);
-    }
-
-    write_bytecode_for_branch(context, branch, context->topLevelState);
-
-    if (hasAnyInlinedState) {
-        int inputs[] = { context->topLevelState };
-        write_call_op(context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
-    }
-       
-    context->bytecode->registerCount = context->nextStackIndex;
-}
-
 void resize_opdata(BytecodeData* bytecode, size_t newCapacity)
 {
     bytecode->capacity = newCapacity;
@@ -524,7 +501,26 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
     WriteContext context(bytecode);
     context.nextStackIndex = 0;
 
-    write_bytecode_for_top_level_branch(&context, branch);
+    assign_registers_for_major_branch(&context, branch);
+
+    // If this branch has any state, then create a get_top_level_state call.
+    bool hasAnyInlinedState = false;
+    if (has_any_inlined_state(branch)) {
+        hasAnyInlinedState = true;
+        context.topLevelState = context.nextStackIndex++;
+        write_call_op(&context, NULL, get_global("get_top_level_state"), 0, NULL,
+                context.topLevelState);
+    }
+
+    write_bytecode_for_branch(&context, branch, context.topLevelState);
+
+    // Wrap up state with set_top_level_state
+    if (hasAnyInlinedState) {
+        int inputs[] = { context.topLevelState };
+        write_call_op(&context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
+    }
+       
+    context.bytecode->registerCount = context.nextStackIndex;
 }
 
 void update_bytecode(Branch& branch)

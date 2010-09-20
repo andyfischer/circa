@@ -15,7 +15,7 @@ namespace for_function {
         append_phrase(source, get_for_loop_iterator(term)->name.c_str(),
                 term, phrase_type::UNDEFINED);
         append_phrase(source, " in ", term, phrase_type::KEYWORD);
-        format_source_for_input(source, term, 1);
+        format_source_for_input(source, term, 0);
     }
 
     void formatSource(StyledSource* source, Term* term)

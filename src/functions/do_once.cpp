@@ -12,8 +12,18 @@ namespace do_once_function {
     void write_bytecode(bytecode::WriteContext* context, Term* term)
     {
         ca_assert(term->function->name == "do_once");
+
+        TaggedValue fieldName;
+        make_string(&fieldName, get_implicit_state_name(term));
+        int name = bytecode::write_push_local_op(context, &fieldName);
+
+        int alreadyRan = context->nextStackIndex++;
+        bytecode::write_get_state_field(context, NULL, name, -1, alreadyRan);
+
         bytecode::BytecodePosition jumpToEnd = context->getPosition();
-        bytecode::write_jump_if(context, term->input(0)->registerIndex, 0);
+        bytecode::write_jump_if(context, alreadyRan, 0);
+
+        // fixme: set state to true
 
         // fixme: support state inside do_once
 
