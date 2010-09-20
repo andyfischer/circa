@@ -110,7 +110,7 @@ size_t get_operation_size(Operation* op)
     return 0;
 }
 
-bool should_term_output_go_on_stack(Term* term)
+bool does_term_have_output(Term* term)
 {
     if (term->type == VOID_TYPE)
         return false;
@@ -170,7 +170,7 @@ void write_call_op(WriteContext* context, Term* caller, Term* function, int numI
     op->outputIndex = outputIndex;
 
     for (int i=0; i < numInputs; i++)
-        op->inputs[i].stackIndex = inputIndexes[i];
+        op->inputs[i].registerIndex = inputIndexes[i];
 
     context->advance(size);
 
@@ -197,8 +197,8 @@ void write_call_op(WriteContext* context, Term* term)
         context->appendStateFieldStore("", nameRegister, stateRegister);
     }
 
-    if (should_term_output_go_on_stack(term) && term->stackIndex == -1) {
-        term->stackIndex = context->nextStackIndex++;
+    if (does_term_have_output(term) && term->registerIndex == -1) {
+        term->registerIndex = context->nextStackIndex++;
     }
 
     const int MAX_INPUTS_EVER = 1000;
@@ -215,10 +215,10 @@ void write_call_op(WriteContext* context, Term* term)
         if (input == NULL)
             inputIndexes[inputCount++] = -1;
         else
-            inputIndexes[inputCount++] = input->stackIndex;
+            inputIndexes[inputCount++] = input->registerIndex;
     }
 
-    write_call_op(context, term, term->function, inputCount, inputIndexes, term->stackIndex);
+    write_call_op(context, term, term->function, inputCount, inputIndexes, term->registerIndex);
 }
 
 void write_push_value_op(WriteContext* context, Term* term)
@@ -226,14 +226,14 @@ void write_push_value_op(WriteContext* context, Term* term)
     size_t size = sizeof(PushValueOperation);
     context->guaranteeSize(size);
 
-    if (term->stackIndex == -1) {
+    if (term->registerIndex == -1) {
         ca_assert(term->function->name != "trace");
-        term->stackIndex = context->nextStackIndex++;
+        term->registerIndex = context->nextStackIndex++;
     }
 
     PushValueOperation* op = (PushValueOperation*) context->writePos();
     op->opid = OP_PUSH_VALUE;
-    op->outputIndex = term->stackIndex;
+    op->outputIndex = term->registerIndex;
     op->source = term;
     
     context->advance(size);
@@ -310,7 +310,7 @@ void write_increment(WriteContext* context, int intIndex)
     context->guaranteeSize(size);
     IncrementOperation* op = (IncrementOperation*) context->writePos();
     op->opid = OP_INCREMENT;
-    op->stackIndex = intIndex;
+    op->registerIndex = intIndex;
     context->advance(size);
 }
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex)
@@ -358,7 +358,7 @@ void write_comment(WriteContext* context, const char* str)
     strcpy(op->text, str);
     context->advance(size);
 }
-void write_var_name(WriteContext* context, int stackIndex, const char* name)
+void write_var_name(WriteContext* context, int registerIndex, const char* name)
 {
     // todo
 }
@@ -370,9 +370,9 @@ void write_return_op(WriteContext* context, Term* term)
     ReturnOperation* op = (ReturnOperation*) context->writePos();
     op->opid = OP_RETURN;
     op->caller = term;
-    op->stackIndex = -1;
+    op->registerIndex = -1;
     if (term->input(0) != NULL)
-        op->stackIndex = term->input(0)->stackIndex;
+        op->registerIndex = term->input(0)->registerIndex;
     context->advance(size);
 }
 
@@ -400,28 +400,28 @@ void write_op(WriteContext* context, Term* term)
     return write_call_op(context, term);
 }
 
-void assign_stack_index(WriteContext* context, Term* term)
+void assign_register_index(WriteContext* context, Term* term)
 {
-    if (term->stackIndex == -1)
-        term->stackIndex = context->nextStackIndex++;
+    if (term->registerIndex == -1)
+        term->registerIndex = context->nextStackIndex++;
 }
 
-void assign_stack_for_major_branch(WriteContext* context, Branch& branch)
+void assign_registers_for_major_branch(WriteContext* context, Branch& branch)
 {
-    // Clean up existing stack indices
+    // Clean up existing indices
     for (BranchIterator it(branch); !it.finished(); ++it) {
         // Don't touch major branches
         if (is_subroutine(*it)) {
             it.skipNextBranch();
         }
-        it->stackIndex = -1;
+        it->registerIndex = -1;
     }
 
-    // Scan for input() terms, these must get certain stack indexes.
+    // Scan for input() terms, these must get certain indices.
     ca_assert(context->nextStackIndex == 0);
     for (int i=0; i < branch.length(); i++) {
         if (branch[i]->function == INPUT_PLACEHOLDER_FUNC)
-            branch[i]->stackIndex = context->nextStackIndex++;
+            branch[i]->registerIndex = context->nextStackIndex++;
     }
 }
 
@@ -436,10 +436,10 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     for (int i=0; i < branch.length(); i++)
         write_op(context, branch[i]);
 
-    // Find stack index of last expression
+    // Find register index of last expression
     for (int i=branch.length()-1; i >= 0; i--) {
         if (should_term_generate_call(branch[i])) {
-            lastStackIndex = branch[i]->stackIndex;
+            lastStackIndex = branch[i]->registerIndex;
             break;
         }
     }
@@ -455,7 +455,7 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
 
             if (result == NULL)
                 continue;
-            resultRegister = result->stackIndex;
+            resultRegister = result->registerIndex;
         }
 
         int inputs[] = { context->inlineState, store.nameRegister, resultRegister };
@@ -476,7 +476,7 @@ void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch)
 void write_raise_if(WriteContext* context, Term* errorCondition)
 {
     BytecodePosition jumpIfNot = context->getPosition();
-    write_jump_if_not(context, errorCondition->stackIndex, 0);
+    write_jump_if_not(context, errorCondition->registerIndex, 0);
     write_raise(context);
     ((JumpIfNotOperation*) jumpIfNot.get())->offset = context->getOffset();
 }
@@ -493,7 +493,7 @@ void write_get_state_field(WriteContext* context, Term* term, int name,
 
 void write_bytecode_for_top_level_branch(WriteContext* context, Branch& branch)
 {
-    assign_stack_for_major_branch(context, branch);
+    assign_registers_for_major_branch(context, branch);
 
     // First add a STACK_SIZE op. Will fill in the actual size later.
     BytecodePosition stackSize = context->getPosition();
@@ -574,7 +574,7 @@ void print_operation(std::ostream& out, BytecodeData* bytecode, Operation* op)
             out << "(";
             for (int i=0; i < callOp->numInputs; i++) {
                 if (i != 0) out << " ";
-                out << callOp->inputs[i].stackIndex;
+                out << callOp->inputs[i].registerIndex;
             }
             out << ")";
             if (callOp->outputIndex != -1)
@@ -610,7 +610,7 @@ void print_operation(std::ostream& out, BytecodeData* bytecode, Operation* op)
         }
         case OP_RETURN: {
             ReturnOperation *retop = (ReturnOperation*) op;
-            out << "return(" << retop->stackIndex << ")";
+            out << "return(" << retop->registerIndex << ")";
             break;
         }
         case OP_PUSH_INT: {
@@ -620,7 +620,7 @@ void print_operation(std::ostream& out, BytecodeData* bytecode, Operation* op)
         }
         case OP_INCREMENT: {
             IncrementOperation *incOp = (IncrementOperation*) op;
-            out << "increment " << incOp->stackIndex;
+            out << "increment " << incOp->registerIndex;
             break;
         }
         case OP_GET_INDEX: {
@@ -660,7 +660,7 @@ void print_operation(std::ostream& out, BytecodeData* bytecode, Operation* op)
         }
         case OP_VAR_NAME: {
             VarNameOperation *nameop = (VarNameOperation*) op;
-            out << nameop->name << ": " << nameop->stackIndex;
+            out << nameop->name << ": " << nameop->registerIndex;
             break;
         }
         default: ca_assert(false);
@@ -728,7 +728,7 @@ void Iterator::advance()
     ca_assert(pos < end);
 }
 
-void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
+void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
 {
     //std::cout << "running bytecode:" << std::endl;
     //print_bytecode(std::cout, data);
@@ -744,7 +744,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
         bytecode::Operation* op = (Operation*) pos;
 
         #if VERBOSE_PRINT_VM
-            std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+            std::cout << std::endl << "registers: " << registers->toString() << std::endl;
             std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
             std::cout << "next op: ";
             print_operation(std::cout, data, op);
@@ -753,13 +753,13 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
         switch (op->opid) {
             case bytecode::OP_STACK_SIZE: {
                 bytecode::StackSizeOperation *ssop = (bytecode::StackSizeOperation*) op;
-                stack->resize(ssop->numElements);
+                registers->resize(ssop->numElements);
                 pos += sizeof(bytecode::StackSizeOperation);
                 continue;
             }
             case bytecode::OP_PUSH_VALUE: {
                 bytecode::PushValueOperation *pushOp = (bytecode::PushValueOperation*) op;
-                TaggedValue* output = stack->get(pushOp->outputIndex);
+                TaggedValue* output = registers->get(pushOp->outputIndex);
                 ca_assert(output != NULL);
                 change_type(output, type_contents(pushOp->source->type));
                 copy(pushOp->source, output);
@@ -769,7 +769,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
             case bytecode::OP_PUSH_LOCAL: {
                 bytecode::PushLocalOperation *pushOp = (bytecode::PushLocalOperation*) op;
                 TaggedValue* val = data->locals.get(pushOp->localIndex);
-                TaggedValue* output = stack->get(pushOp->output);
+                TaggedValue* output = registers->get(pushOp->output);
                 ca_assert(val != NULL);
                 copy(val,output);
                 pos += sizeof(bytecode::PushLocalOperation);
@@ -779,7 +779,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
                 bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
 
                 EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
-                func(cxt, stack, callop);
+                func(cxt, registers, callop);
 
                 pos += sizeof(bytecode::CallOperation)
                     + sizeof(bytecode::CallOperation::Input)*callop->numInputs;
@@ -792,7 +792,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
             }
             case bytecode::OP_JUMP_IF: {
                 bytecode::JumpIfOperation *jumpop = (bytecode::JumpIfOperation*) op;
-                if (as_bool(stack->get(jumpop->conditionIndex)))
+                if (as_bool(registers->get(jumpop->conditionIndex)))
                     pos = data->opdata + jumpop->offset;
                 else
                     pos += sizeof(bytecode::JumpIfOperation);
@@ -800,7 +800,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
             }
             case bytecode::OP_JUMP_IF_NOT: {
                 bytecode::JumpIfNotOperation *jumpop = (bytecode::JumpIfNotOperation*) op;
-                if (!as_bool(stack->get(jumpop->conditionIndex)))
+                if (!as_bool(registers->get(jumpop->conditionIndex)))
                     pos = data->opdata + jumpop->offset;
                 else
                     pos += sizeof(bytecode::JumpIfNotOperation);
@@ -809,51 +809,51 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
 
             case bytecode::OP_RETURN: {
                 bytecode::ReturnOperation *retop = (bytecode::ReturnOperation*) op;
-                if (retop->stackIndex != -1) {
-                    TaggedValue* v = stack->get(retop->stackIndex);
+                if (retop->registerIndex != -1) {
+                    TaggedValue* v = registers->get(retop->registerIndex);
                     copy(v, &cxt->subroutineOutput);
                 }
                 goto loop_end;
             }
             case bytecode::OP_PUSH_INT: {
                 bytecode::PushIntOperation *pushop = (bytecode::PushIntOperation*) op;
-                make_int(stack->get(pushop->outputIndex), pushop->value);
+                make_int(registers->get(pushop->outputIndex), pushop->value);
                 pos += sizeof(bytecode::PushIntOperation);
                 continue;
             }
             case bytecode::OP_INCREMENT: {
                 bytecode::IncrementOperation *incop = (bytecode::IncrementOperation*) op;
-                TaggedValue* value = stack->get(incop->stackIndex);
+                TaggedValue* value = registers->get(incop->registerIndex);
                 make_int(value, as_int(value) + 1);
                 pos += sizeof(bytecode::IncrementOperation);
                 continue;
             }
             case bytecode::OP_GET_INDEX: {
                 bytecode::GetIndexOperation *getop = (bytecode::GetIndexOperation*) op;
-                TaggedValue *list = stack->get(getop->listIndex);
-                TaggedValue *listIndex = stack->get(getop->indexInList);
+                TaggedValue *list = registers->get(getop->listIndex);
+                TaggedValue *listIndex = registers->get(getop->indexInList);
                 TaggedValue *item = list->getIndex(as_int(listIndex));
-                copy(item, stack->get(getop->outputIndex));
+                copy(item, registers->get(getop->outputIndex));
                 pos += sizeof(bytecode::GetIndexOperation);
                 continue;
             }
             case bytecode::OP_APPEND: {
                 bytecode::AppendOperation *appendop = (bytecode::AppendOperation*) op;
-                TaggedValue *item = stack->get(appendop->itemIndex);
-                copy(item, ((List*) stack->get(appendop->outputIndex))->append());
+                TaggedValue *item = registers->get(appendop->itemIndex);
+                copy(item, ((List*) registers->get(appendop->outputIndex))->append());
                 pos += sizeof(bytecode::AppendOperation);
                 continue;
             }
             case bytecode::OP_NUM_ELEMENTS: {
                 bytecode::NumElementsOperation *neop = (bytecode::NumElementsOperation*) op;
-                TaggedValue *list = stack->get(neop->listIndex);
-                make_int(stack->get(neop->outputIndex), list->numElements());
+                TaggedValue *list = registers->get(neop->listIndex);
+                make_int(registers->get(neop->outputIndex), list->numElements());
                 pos += sizeof(bytecode::NumElementsOperation);
                 continue;
             }
             case bytecode::OP_COPY: {
                 bytecode::CopyOperation *copyop = (bytecode::CopyOperation*) op;
-                copy(stack->get(copyop->fromIndex), stack->get(copyop->toIndex));
+                copy(registers->get(copyop->fromIndex), registers->get(copyop->toIndex));
                 pos += sizeof(bytecode::CopyOperation);
                 continue;
             }
@@ -886,7 +886,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* stack)
 loop_end:
     data->inuse = false;
     #if VERBOSE_PRINT_VM
-        std::cout << std::endl << "stack: " << stack->toString() << std::endl;
+        std::cout << std::endl << "registers: " << registers->toString() << std::endl;
         std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
     #endif
 }

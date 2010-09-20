@@ -87,14 +87,14 @@ void copy_stack_back_to_terms(Branch& branch, List* stack)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
         Term* term = *it;
-        if (term->stackIndex == -1)
+        if (term->registerIndex == -1)
             continue;
 
         // Don't modify value terms
         if (is_value(term))
             continue;
 
-        TaggedValue* value = stack->get(term->stackIndex);
+        TaggedValue* value = stack->get(term->registerIndex);
         if (value == NULL)
             continue;
 
@@ -107,16 +107,16 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
     touch(inputs);
     inputs->resize(callOp->numInputs);
     for (int i=0; i < callOp->numInputs; i++)
-        copy(stack->get(callOp->inputs[i].stackIndex), inputs->get(i));
+        copy(stack->get(callOp->inputs[i].registerIndex), inputs->get(i));
 }
 
 TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index)
 {
     ca_assert(index < callOp->numInputs);
-    int stackIndex = callOp->inputs[index].stackIndex;
-    if (stackIndex == -1)
+    int registerIndex = callOp->inputs[index].registerIndex;
+    if (registerIndex == -1)
         return NULL;
-    return stack->get(stackIndex);
+    return stack->get(registerIndex);
 }
 
 TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp)

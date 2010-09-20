@@ -192,8 +192,8 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     // branches in this if-block) to have the same stack indexes.
     for (int i=0; i < joining.length(); i++) {
         ca_assert(joining[i] != NULL);
-        if (joining[i]->stackIndex == -1)
-            joining[i]->stackIndex = context->nextStackIndex++;
+        if (joining[i]->registerIndex == -1)
+            joining[i]->registerIndex = context->nextStackIndex++;
         std::string const& name = joining[i]->name;
         ca_assert(name != "");
 
@@ -201,7 +201,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         for (int b=0; b < numBranches; b++) {
             Term* term = blockContents[b]->nestedContents[name];
             if (term != NULL)
-                term->stackIndex = joining[i]->stackIndex;
+                term->registerIndex = joining[i]->registerIndex;
         }
     }
     
@@ -229,7 +229,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         // Jump check, for 'if' and 'elsif'. Don't know offset yet, will write it later.
         if (term->function == IF_FUNC) {
             lastBranchJumpOp = context->getPosition();
-            bytecode::write_jump_if_not(context, term->input(0)->stackIndex, 0);
+            bytecode::write_jump_if_not(context, term->input(0)->registerIndex, 0);
         }
 
         // If there's state, then pull out the state for this branch.
@@ -250,8 +250,8 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
             if (branchContents[name] == NULL) {
                 Term* outerVersion = get_named_at(ifBlock, name);
                 ca_assert(outerVersion != NULL);
-                bytecode::write_copy(context, outerVersion->stackIndex,
-                        joining[i]->stackIndex);
+                bytecode::write_copy(context, outerVersion->registerIndex,
+                        joining[i]->registerIndex);
             }
         }
 

@@ -42,8 +42,8 @@ namespace vectorize_vv_function {
         apply(forTerm->nestedContents, func, RefList(left_i, right_i));
         setup_for_loop_post_code(forTerm);
 
-        bytecode::assign_stack_index(context, term);
-        forTerm->stackIndex = term->stackIndex;
+        bytecode::assign_register_index(context, term);
+        forTerm->registerIndex = term->registerIndex;
 
         write_bytecode_for_branch_inline(context, branch);
 

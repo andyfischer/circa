@@ -48,11 +48,11 @@ namespace inline_state_function {
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
     {
         Term* nameTerm = term->input(1);
-        int name = nameTerm->stackIndex;
-        int defaultValue = term->input(2) == NULL ? -1 : term->input(2)->stackIndex;
-        if (term->stackIndex == -1)
-            term->stackIndex = context->nextStackIndex++;
-        bytecode::write_get_state_field(context, term, name, defaultValue, term->stackIndex);
+        int name = nameTerm->registerIndex;
+        int defaultValue = term->input(2) == NULL ? -1 : term->input(2)->registerIndex;
+        if (term->registerIndex == -1)
+            term->registerIndex = context->nextStackIndex++;
+        bytecode::write_get_state_field(context, term, name, defaultValue, term->registerIndex);
 
         context->appendStateFieldStore(as_string(nameTerm), name, -1);
     }

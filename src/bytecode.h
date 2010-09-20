@@ -43,7 +43,7 @@ struct StackSizeOperation {
 
 struct CallOperation {
     struct Input {
-        int stackIndex;
+        int registerIndex;
     };
 
     OpId opid;
@@ -68,7 +68,7 @@ struct PushLocalOperation {
 struct ReturnOperation {
     OpId opid;
     Term* caller;
-    int stackIndex;
+    int registerIndex;
 };
 
 struct JumpOperation {
@@ -95,7 +95,7 @@ struct PushIntOperation {
 };
 struct IncrementOperation {
     OpId opid;
-    int stackIndex;
+    int registerIndex;
 };
 struct GetIndexOperation {
     OpId opid;
@@ -133,7 +133,7 @@ struct CommentOperation {
 struct VarNameOperation {
     OpId opid;
     int size;
-    int stackIndex;
+    int registerIndex;
     char name[0];
 };
 
@@ -150,10 +150,10 @@ struct WriteContext {
     int nextStackIndex;
     size_t sizeWritten;
 
-    // Stack index of top level state
+    // Register index of top level state
     int topLevelState;
 
-    // Stack index of state object for the current branch
+    // Register index of state object for the current branch
     int inlineState;
 
     std::vector<PendingStateFieldStore> pendingStateFieldStores;
@@ -196,7 +196,7 @@ struct BytecodePosition {
 
 // The size of the operation, in words.
 size_t get_operation_size(Operation* op);
-bool should_term_output_go_on_stack(Term* term);
+bool does_term_have_output(Term* term);
 bool should_term_generate_call(Term* term);
 
 void write_call_op(WriteContext* context, Term* caller, Term* function, int numInputs, int* inputIndexes, int outputIndex);
@@ -205,18 +205,18 @@ void write_call_op(WriteContext* context, Term* term);
 void write_jump(WriteContext* context, int offset);
 void write_jump_if(WriteContext* context, int conditionIndex, int offset);
 void write_jump_if_not(WriteContext* context, int conditionIndex, int offset);
-void write_push_int(WriteContext* context, int value, int stackIndex);
+void write_push_int(WriteContext* context, int value, int registerIndex);
 void write_get_index(WriteContext* context, int listIndex, int indexInList, int outputIndex);
 void write_increment(WriteContext* context, int intIndex);
 void write_num_elements(WriteContext* context, int listIndex, int outputIndex);
 void write_copy(WriteContext* context, int fromIndex, int toIndex);
 void write_raise(WriteContext* context);
 void write_comment(WriteContext* context, const char* str);
-void write_var_name(WriteContext* context, int stackIndex, const char* name);
+void write_var_name(WriteContext* context, int registerIndex, const char* name);
 void write_op(WriteContext* context, Term* term);
 
-// Give this term the next available stack index, if it doesn't already have one.
-void assign_stack_index(WriteContext* context, Term* term);
+// Give this term the next available register index, if it doesn't already have one.
+void assign_register_index(WriteContext* context, Term* term);
 
 // Writes operations inside the given branch. If there are any state vars, we'll pull
 // them out of the container with stack index 'inlineState'. Returns the stack index of

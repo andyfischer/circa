@@ -13,7 +13,7 @@ namespace do_once_function {
     {
         ca_assert(term->function->name == "do_once");
         bytecode::BytecodePosition jumpToEnd = context->getPosition();
-        bytecode::write_jump_if(context, term->input(0)->stackIndex, 0);
+        bytecode::write_jump_if(context, term->input(0)->registerIndex, 0);
 
         // fixme: support state inside do_once
 

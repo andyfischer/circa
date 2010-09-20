@@ -71,9 +71,9 @@ namespace assign_function {
     void writeBytecode(bytecode::WriteContext* context, Term* term)
     {
         Branch& contents = term->nestedContents;
-        if (term->stackIndex == -1)
-            term->stackIndex = context->nextStackIndex++;
-        contents[contents.length()-1]->stackIndex = term->stackIndex;
+        if (term->registerIndex == -1)
+            term->registerIndex = context->nextStackIndex++;
+        contents[contents.length()-1]->registerIndex = term->registerIndex;
         bytecode::write_bytecode_for_branch_inline(context, contents);
     }
 
