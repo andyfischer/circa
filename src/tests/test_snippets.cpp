@@ -540,7 +540,7 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
-    //REGISTER_TEST_CASE(test_snippets::test_styled_source);
+    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_styled_source);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_lists);

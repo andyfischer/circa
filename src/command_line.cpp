@@ -5,6 +5,7 @@
 #include "building.h"
 #include "builtins.h"
 #include "codegen.h"
+#include "dynamic_libs.h"
 #include "errors.h"
 #include "evaluation.h"
 #include "feedback.h"
@@ -35,6 +36,13 @@ void print_usage()
 
 int run_command_line(std::vector<std::string> args)
 {
+    // temp test
+    Branch branch;
+    load_dynamic_lib(branch, "testdll/td");
+    branch.compile("myfunc()");
+    evaluate_branch(branch);
+
+
     // No arguments, run tests
     if (args.size() == 0) {
         run_all_tests();

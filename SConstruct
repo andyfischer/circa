@@ -24,11 +24,13 @@ ALL = [DEBUG, RELEASE]
 # Common build flags
 if POSIX:
     def common_flags(env):
-        env.Append(CPPFLAGS=['-ggdb', '-Wall'])
+        env.Append(CPPFLAGS=['-ggdb', '-Wall','-fvisibility=hidden','-rdynamic'])
+        env.Append(LINKFLAGS=['-ldl'])
         env.SetOption('num_jobs', 2)
     map(common_flags, ALL)
     DEBUG.Append(CPPDEFINES = ["DEBUG"])
     RELEASE.Append(CPPFLAGS=['-O1'])
+    
 
 if WINDOWS:
     def common_flags(env):

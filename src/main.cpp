@@ -10,10 +10,7 @@ int main(int argc, const char * args[])
         argv.push_back(args[i]);
 
     circa::initialize();
-
     circa::storage::use_filesystem();
-
-    //circa::temp_test();
 
     int result = 0;
     result = circa::run_command_line(argv);
