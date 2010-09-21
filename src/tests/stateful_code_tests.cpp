@@ -143,9 +143,9 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
-    REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
+    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
-    REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
+    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state_and_bytecode);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state_and_bytecode);
 }

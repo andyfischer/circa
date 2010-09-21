@@ -40,10 +40,9 @@ def setup_builtin_functions():
 
     namespaces = map(lambda s: s+'_function', get_cpp_file_names(dir))
     function_decls = '\n'.join(
-            map(lambda n: 'namespace '+n+' { void setup(Branch& kernel); }',
-            namespaces))
+            sorted(map(lambda n: 'namespace '+n+' { void setup(Branch& kernel); }', namespaces)))
     function_calls = '\n    '.join(
-            map(lambda n: n+'::setup(kernel);', namespaces))
+            sorted(map(lambda n: n+'::setup(kernel);', namespaces)))
 
     return """
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
@@ -71,12 +70,11 @@ def register_all_tests():
     dir = 'src/tests'
     #print "cpp file names = " + str(get_cpp_file_names(dir))
 
-    namespaces = get_cpp_file_names(dir)#map(lambda s: s+'_function', get_cpp_file_names(dir))
+    namespaces = get_cpp_file_names(dir)
     function_decls = '\n'.join(
-            map(lambda n: 'namespace '+n+' { void register_tests(); }',
-            namespaces))
+            sorted(map(lambda n: 'namespace '+n+' { void register_tests(); }', namespaces)))
     function_calls = '\n    '.join(
-            map(lambda n: n+'::register_tests();', namespaces))
+            sorted(map(lambda n: n+'::register_tests();', namespaces)))
 
     return """\
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.

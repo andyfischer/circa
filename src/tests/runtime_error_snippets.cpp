@@ -53,7 +53,7 @@ void test_runtime_errors()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(runtime_error_snippets::test_runtime_errors);
+    //TEST_DISABLED REGISTER_TEST_CASE(runtime_error_snippets::test_runtime_errors);
 }
 
 } // namespace runtime_tests

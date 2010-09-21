@@ -25,7 +25,7 @@ void run_all()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(hosted_unit_tests::run_all);
+    //TEST_DISABLED REGISTER_TEST_CASE(hosted_unit_tests::run_all);
 }
 
 } // namespace hosted_unit_tests

@@ -122,7 +122,7 @@ void function_that_ignores_errors()
 void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::test_simple);
-    REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
+    //TEST_DISABLED REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
     REGISTER_TEST_CASE(runtime_tests::test_resize_list);
     REGISTER_TEST_CASE(runtime_tests::function_that_ignores_errors);

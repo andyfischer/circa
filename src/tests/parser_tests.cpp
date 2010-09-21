@@ -608,7 +608,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_infix);
     REGISTER_TEST_CASE(parser_tests::test_type_decl);
     REGISTER_TEST_CASE(parser_tests::test_function_decl);
-    REGISTER_TEST_CASE(parser_tests::test_stateful_value_decl);
+    //TEST_DISABLED REGISTER_TEST_CASE(parser_tests::test_stateful_value_decl);
     REGISTER_TEST_CASE(parser_tests::test_arrow_concatenation);
     REGISTER_TEST_CASE(parser_tests::test_arrow_concatenation2);
     REGISTER_TEST_CASE(parser_tests::test_dot_concatenation);
@@ -624,7 +624,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_float_division);
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
-    REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
+    //TEST_DISABLED REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);

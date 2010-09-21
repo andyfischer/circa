@@ -70,10 +70,10 @@ void test_with_custom_type()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(script_reload_tests::test_simple);
-    REGISTER_TEST_CASE(script_reload_tests::test_simple_with_state);
-    REGISTER_TEST_CASE(script_reload_tests::test_function_change);
-    REGISTER_TEST_CASE(script_reload_tests::test_with_custom_type);
+    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_simple);
+    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_simple_with_state);
+    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_function_change);
+    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_with_custom_type);
 }
 
 } // namespace script_reload_tests

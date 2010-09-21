@@ -58,8 +58,8 @@ void save_code_generated_with_reflection()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(metaprogramming_tests::test_lift_closure);
-    REGISTER_TEST_CASE(metaprogramming_tests::save_code_generated_with_reflection);
+    //TEST_DISABLED REGISTER_TEST_CASE(metaprogramming_tests::test_lift_closure);
+    //TEST_DISABLED REGISTER_TEST_CASE(metaprogramming_tests::save_code_generated_with_reflection);
 }
 
 } // namespace metaprogramming_tests

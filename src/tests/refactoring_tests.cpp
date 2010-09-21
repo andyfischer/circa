@@ -76,7 +76,7 @@ void register_tests()
 {
     REGISTER_TEST_CASE(refactoring_tests::repro_source_after_rename);
     REGISTER_TEST_CASE(refactoring_tests::test_change_function);
-    REGISTER_TEST_CASE(refactoring_tests::repro_source_after_append_code);
+    //TEST_DISABLED REGISTER_TEST_CASE(refactoring_tests::repro_source_after_append_code);
 }
 
 } // namespace refactoring_tests

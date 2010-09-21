@@ -63,7 +63,7 @@ void test_unknown_identifier()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(static_errors_tests::input_type_error);
+    //TEST_DISABLED REGISTER_TEST_CASE(static_errors_tests::input_type_error);
     REGISTER_TEST_CASE(static_errors_tests::no_error);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_func);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_type);

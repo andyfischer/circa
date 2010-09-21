@@ -198,7 +198,10 @@ bool run_tests(std::string const& searchStr)
         std::cout << "Running " << it->name << std::endl;
         bool result = run_test(*it, false);
         if (result) successCount++;
-        else failureCount++;
+        else {
+            failureCount++;
+            std::cout << "Test failed: " << it->name << std::endl;
+        }
     }
 
     std::cout << "Ran " << totalTestCount << " tests. ";
@@ -225,7 +228,10 @@ bool run_all_tests()
         totalTestCount++;
         bool result = run_test(*it, false);
         if (result) successCount++;
-        else failureCount++;
+        else {
+            failureCount++;
+            std::cout << "Test failed: " << it->name << std::endl;
+        }
     }
 
     std::cout << "Ran " << totalTestCount << " tests. ";

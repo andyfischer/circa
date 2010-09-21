@@ -75,7 +75,7 @@ void register_every_possible_parse_error()
     register_input("state int %");
     register_input("state foo x");
     register_input("foo = 1; state foo x");
-    register_input("a.b 3 4 = 4");
+    //TEST_DISABLED register_input("a.b 3 4 = 4");
     register_input("a.0");
     register_input("[].append %");
     register_input("[].append(%");

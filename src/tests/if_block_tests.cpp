@@ -386,10 +386,10 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_execution);
     REGISTER_TEST_CASE(if_block_tests::test_execution_with_elif);
     REGISTER_TEST_CASE(if_block_tests::test_parse_with_no_line_endings);
-    REGISTER_TEST_CASE(if_block_tests::test_state_simple);
-    REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
-    REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
-    REGISTER_TEST_CASE(if_block_tests::test_nested_state);
+    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_state_simple);
+    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
+    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
+    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_nested_state);
 }
 
 } // namespace if_block_tests

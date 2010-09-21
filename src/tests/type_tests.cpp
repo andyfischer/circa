@@ -299,7 +299,7 @@ void test_create_implicit_tuple_type()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(type_tests::compound_types);
+    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
@@ -307,9 +307,9 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
-    REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
+    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
     REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
-    REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
+    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
     REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
 }
