@@ -398,7 +398,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_string_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_color_literal);
-    //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
     //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_member_calls);

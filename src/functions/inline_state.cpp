@@ -20,7 +20,7 @@ namespace inline_state_function {
     }
 
     CA_DEFINE_FUNCTION(get_state_field,
-            "get_state_field(any +optional, string name, any default_value +optional) -> any")
+            "get_state_field(any container +optional, string name, any default_value +optional) -> any")
     {
         ca_assert(INPUT(1) != NULL);
 
@@ -47,14 +47,17 @@ namespace inline_state_function {
 
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
     {
-        Term* nameTerm = term->input(1);
-        int name = nameTerm->registerIndex;
+        TaggedValue nameVal;
+        make_string(&nameVal, term->name);
+
+        int name = bytecode::write_push_local_op(context, &nameVal);
+
         int defaultValue = term->input(2) == NULL ? -1 : term->input(2)->registerIndex;
         if (term->registerIndex == -1)
             term->registerIndex = context->nextRegisterIndex++;
         bytecode::write_get_state_field(context, term, name, defaultValue, term->registerIndex);
 
-        context->appendStateFieldStore(as_string(nameTerm), name, -1);
+        context->appendStateFieldStore(term->name, name, -1);
     }
 
     CA_DEFINE_FUNCTION(set_state_field,
@@ -66,13 +69,6 @@ namespace inline_state_function {
         if (!is_dict(container)) make_dict(container);
         Dict* dict = Dict::checkCast(container);
         dict->set(STRING_INPUT(1), INPUT(2));
-        #if 0
-        std::cout << "set_state_field("
-            << INPUT(0)->toString() << ","
-            << INPUT(1)->toString() << ","
-            << INPUT(2)->toString() << ")" << std::endl;
-        std::cout << "result = " << OUTPUT->toString() << std::endl;
-        #endif
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -87,14 +83,14 @@ namespace inline_state_function {
 
         append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);
 
-        if (term->hasProperty("initializedBy")) {
-            Term* initializedBy = term->refProp("initializedBy");
+        Term* defaultValue = term->input(2);
+        if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);
-            if (initializedBy->name != "")
-                append_phrase(source, get_relative_name(term, initializedBy),
+            if (defaultValue->name != "")
+                append_phrase(source, get_relative_name(term, defaultValue),
                         term, phrase_type::TERM_NAME);
             else
-                format_term_source(source, initializedBy);
+                format_term_source(source, defaultValue);
         }
     }
 
@@ -103,6 +99,8 @@ namespace inline_state_function {
         CA_SETUP_FUNCTIONS(kernel);
         function_t::get_attrs(kernel["get_state_field"]).writeBytecode =
             get_state_field_write_bytecode;
+        function_t::get_attrs(kernel["get_state_field"]).formatSource =
+            formatSource;
     }
 }
 }
