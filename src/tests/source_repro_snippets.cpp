@@ -399,7 +399,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_color_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
-    //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_member_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding);
@@ -415,7 +415,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_bracket_syntax);
-    //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_identifiers_inside_namespaces);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_namespaced_function);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
