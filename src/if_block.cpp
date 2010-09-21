@@ -172,12 +172,12 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
 
         // get_state_field
-        stateContainer = context->nextStackIndex++;
+        stateContainer = context->nextRegisterIndex++;
         bytecode::write_get_state_field(context, NULL, stateContainerName, stateDefaultValue,
                 stateContainer);
 
         // push(numBranches)
-        numBranchesStack = context->nextStackIndex++;
+        numBranchesStack = context->nextRegisterIndex++;
         bytecode::write_push_int(context, numBranches, numBranchesStack);
 
         // Resize state list
@@ -193,7 +193,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     for (int i=0; i < joining.length(); i++) {
         ca_assert(joining[i] != NULL);
         if (joining[i]->registerIndex == -1)
-            joining[i]->registerIndex = context->nextStackIndex++;
+            joining[i]->registerIndex = context->nextRegisterIndex++;
         std::string const& name = joining[i]->name;
         ca_assert(name != "");
 
@@ -213,8 +213,8 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     int conditionLocalState = -1;
     int branchIndexStack = -1;
     if (hasState) {
-        conditionLocalState = context->nextStackIndex++;
-        branchIndexStack = context->nextStackIndex++;
+        conditionLocalState = context->nextRegisterIndex++;
+        branchIndexStack = context->nextRegisterIndex++;
     }
 
     for (int branch=0; branch < numBranches; branch++) {

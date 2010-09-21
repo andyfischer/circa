@@ -17,7 +17,7 @@ namespace do_once_function {
         make_string(&fieldName, get_implicit_state_name(term));
         int name = bytecode::write_push_local_op(context, &fieldName);
 
-        int alreadyRan = context->nextStackIndex++;
+        int alreadyRan = context->nextRegisterIndex++;
         bytecode::write_get_state_field(context, NULL, name, -1, alreadyRan);
 
         bytecode::BytecodePosition jumpToEnd = context->getPosition();

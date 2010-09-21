@@ -72,7 +72,7 @@ namespace assign_function {
     {
         Branch& contents = term->nestedContents;
         if (term->registerIndex == -1)
-            term->registerIndex = context->nextStackIndex++;
+            term->registerIndex = context->nextRegisterIndex++;
         contents[contents.length()-1]->registerIndex = term->registerIndex;
         bytecode::write_bytecode_for_branch_inline(context, contents);
     }

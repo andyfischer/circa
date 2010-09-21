@@ -21,7 +21,7 @@ namespace bytecode {
 
 WriteContext::WriteContext(BytecodeData* _bytecode)
   : bytecode(_bytecode),
-    nextStackIndex(0),
+    nextRegisterIndex(0),
     topLevelState(-1),
     inlineState(-1)
 {}
@@ -180,14 +180,14 @@ void write_call_op(WriteContext* context, Term* term)
 
         int nameRegister = write_push_local_op(context, &fieldName);
 
-        stateRegister = context->nextStackIndex++;
+        stateRegister = context->nextRegisterIndex++;
         write_get_state_field(context, term, nameRegister, -1, stateRegister);
 
         context->appendStateFieldStore("", nameRegister, stateRegister);
     }
 
     if (does_term_have_output(term) && term->registerIndex == -1) {
-        term->registerIndex = context->nextStackIndex++;
+        term->registerIndex = context->nextRegisterIndex++;
     }
 
     const int MAX_INPUTS_EVER = 1000;
@@ -217,7 +217,7 @@ void write_push_value_op(WriteContext* context, Term* term)
 
     if (term->registerIndex == -1) {
         ca_assert(term->function->name != "trace");
-        term->registerIndex = context->nextStackIndex++;
+        term->registerIndex = context->nextRegisterIndex++;
     }
 
     PushValueOperation* op = (PushValueOperation*) context->writePos();
@@ -236,7 +236,7 @@ int write_push_local_op(WriteContext* context, TaggedValue* value)
     PushLocalOperation* op = (PushLocalOperation*) context->writePos();
     op->opid = OP_PUSH_LOCAL;
     op->localIndex = context->bytecode->locals.length();
-    op->output = context->nextStackIndex++;
+    op->output = context->nextRegisterIndex++;
     context->bytecode->locals.append(value);
     context->advance(size);
     return op->output;
@@ -392,7 +392,7 @@ void write_op(WriteContext* context, Term* term)
 void assign_register_index(WriteContext* context, Term* term)
 {
     if (term->registerIndex == -1)
-        term->registerIndex = context->nextStackIndex++;
+        term->registerIndex = context->nextRegisterIndex++;
 }
 
 void assign_registers_for_major_branch(WriteContext* context, Branch& branch)
@@ -407,10 +407,10 @@ void assign_registers_for_major_branch(WriteContext* context, Branch& branch)
     }
 
     // Scan for input() terms, these must get certain indices.
-    ca_assert(context->nextStackIndex == 0);
+    ca_assert(context->nextRegisterIndex == 0);
     for (int i=0; i < branch.length(); i++) {
         if (branch[i]->function == INPUT_PLACEHOLDER_FUNC)
-            branch[i]->registerIndex = context->nextStackIndex++;
+            branch[i]->registerIndex = context->nextRegisterIndex++;
     }
 }
 
@@ -499,7 +499,7 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
         resize_opdata(bytecode, default_size);
 
     WriteContext context(bytecode);
-    context.nextStackIndex = 0;
+    context.nextRegisterIndex = 0;
 
     assign_registers_for_major_branch(&context, branch);
 
@@ -507,7 +507,7 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
     bool hasAnyInlinedState = false;
     if (has_any_inlined_state(branch)) {
         hasAnyInlinedState = true;
-        context.topLevelState = context.nextStackIndex++;
+        context.topLevelState = context.nextRegisterIndex++;
         write_call_op(&context, NULL, get_global("get_top_level_state"), 0, NULL,
                 context.topLevelState);
     }
@@ -520,7 +520,7 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
         write_call_op(&context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
     }
        
-    context.bytecode->registerCount = context.nextStackIndex;
+    context.bytecode->registerCount = context.nextRegisterIndex;
 }
 
 void update_bytecode(Branch& branch)

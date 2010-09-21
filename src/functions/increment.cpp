@@ -13,7 +13,7 @@ namespace increment_function {
         make_int(OUTPUT, INT_INPUT(0) + 1);
     }
 
-    CA_DEFINE_FUNCTION(increment, "decrement(int i) -> int")
+    CA_DEFINE_FUNCTION(decrement, "decrement(int i) -> int")
     {
         make_int(OUTPUT, INT_INPUT(0) - 1);
     }

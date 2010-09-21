@@ -157,7 +157,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     for (int i=0; i < innerRebinds.length(); i++) {
         Term* term = innerRebinds[i];
         if (term->registerIndex == -1)
-            term->registerIndex = context->nextStackIndex++;
+            term->registerIndex = context->nextRegisterIndex++;
     }
 
     // For names in #outer_rebinds, the join terms should have the same stack
@@ -174,9 +174,9 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     }
 
     int inputList = inputTerm->registerIndex;
-    int iteratorIndex = context->nextStackIndex++;
+    int iteratorIndex = context->nextRegisterIndex++;
 
-    int listLength = context->nextStackIndex++;
+    int listLength = context->nextRegisterIndex++;
     bytecode::write_comment(context, "length(input_list) -> listLength");
     bytecode::write_num_elements(context, inputList, listLength);
 
@@ -196,7 +196,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
 
         // get_state_field
-        stateContainer = context->nextStackIndex++;
+        stateContainer = context->nextRegisterIndex++;
         bytecode::write_get_state_field(context, NULL, stateContainerName, stateDefaultValue,
                 stateContainer);
 
@@ -212,7 +212,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     bytecode::write_comment(context, "push 0 -> iteratorIndex");
     bytecode::write_push_int(context, 0, iteratorIndex);
 
-    int compareIndexOutput = context->nextStackIndex++;
+    int compareIndexOutput = context->nextRegisterIndex++;
 
     // If we're outputing a list, then initialize a blank list output here.
     if (writingOutputList) {
@@ -229,7 +229,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         for (int i=0; i < innerRebinds.length(); i++) {
             Term* term = innerRebinds[i];
             if (term->registerIndex == -1)
-                term->registerIndex = context->nextStackIndex++;
+                term->registerIndex = context->nextRegisterIndex++;
             Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
             bytecode::write_copy(context, outerVersion->registerIndex, term->registerIndex);
         }
@@ -265,7 +265,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 
     Term* iteratorTerm = get_for_loop_iterator(forTerm);
     if (iteratorTerm->registerIndex == -1)
-        iteratorTerm->registerIndex = context->nextStackIndex++;
+        iteratorTerm->registerIndex = context->nextRegisterIndex++;
 
     // get_index(inputList, iteratorIndex) -> iterator
     bytecode::write_comment(context, "inputList[iteratorIndex] -> iterator");
@@ -282,7 +282,7 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     // Fetch state for this iteration
     int iterationLocalState = -1;
     if (hasState) {
-        iterationLocalState = context->nextStackIndex++;
+        iterationLocalState = context->nextRegisterIndex++;
         bytecode::write_comment(context, "fetch iteration-local state");
         bytecode::write_get_index(context, stateContainer, iteratorIndex,
                 iterationLocalState);

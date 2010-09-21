@@ -51,7 +51,7 @@ namespace inline_state_function {
         int name = nameTerm->registerIndex;
         int defaultValue = term->input(2) == NULL ? -1 : term->input(2)->registerIndex;
         if (term->registerIndex == -1)
-            term->registerIndex = context->nextStackIndex++;
+            term->registerIndex = context->nextRegisterIndex++;
         bytecode::write_get_state_field(context, term, name, defaultValue, term->registerIndex);
 
         context->appendStateFieldStore(as_string(nameTerm), name, -1);

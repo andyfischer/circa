@@ -141,7 +141,7 @@ struct WriteContext {
     };
 
     BytecodeData* bytecode;
-    int nextStackIndex;
+    int nextRegisterIndex;
     size_t sizeWritten;
 
     // Register index of top level state

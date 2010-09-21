@@ -16,7 +16,7 @@ namespace branch_function {
         int stateContainer = -1;
         if (has_any_inlined_state(branch)) {
             // TODO: Fix
-            stateContainer = context->nextStackIndex++;
+            stateContainer = context->nextRegisterIndex++;
         }
         bytecode::write_bytecode_for_branch(context, branch, stateContainer);
     }
