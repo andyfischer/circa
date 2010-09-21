@@ -440,12 +440,6 @@ void test_range()
     test_snippet("", "25..24 == [25]");
 }
 
-void test_stateful_code()
-{
-    test_snippet("def hi() state int i end; c = hi()", "inspect:get_state(c) == [0]");
-    test_snippet("def hi() state int i; i = 4 end; c = hi()", "inspect:get_state(c) == [4]");
-}
-
 void test_significant_indentation()
 {
     test_snippet("namespace a:\n  b = 5", "a:b == 5");
@@ -524,7 +518,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_strings);
     REGISTER_TEST_CASE(test_snippets::test_equals_snippets);
     REGISTER_TEST_CASE(test_snippets::test_abs);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_filter);
+    REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_references);
     REGISTER_TEST_CASE(test_snippets::test_blocks);
@@ -543,11 +537,10 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);
     REGISTER_TEST_CASE(test_snippets::test_repeat);
     REGISTER_TEST_CASE(test_snippets::test_range);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_stateful_code);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_styled_source);
+    //REGISTER_TEST_CASE(test_snippets::test_styled_source);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_lists);

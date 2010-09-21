@@ -21,9 +21,8 @@ namespace filter_function {
         for (int i=0; i < numInputs; i++)
             if (bools->getIndex(i)->asBool())
                 count++;
-
         
-        List* output = List::checkCast(OUTPUT);
+        List* output = make_list(OUTPUT);
         output->resize(count);
         touch(output);
 

@@ -390,11 +390,11 @@ void make_ref(TaggedValue* value, Term* t)
     *((Ref*) value->value_data.ptr) = t;
 }
 
-TaggedValue* make_list(TaggedValue* value)
+List* make_list(TaggedValue* value)
 {
     change_type(value, NULL_T); // substitute for 'reset'
     change_type(value, LIST_T);
-    return value;
+    return List::checkCast(value);
 }
 
 void make_branch(TaggedValue* value)
