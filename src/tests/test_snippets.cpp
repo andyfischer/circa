@@ -522,7 +522,7 @@ void test_state_in_subroutine()
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_equals_snippets);
+    REGISTER_TEST_CASE(test_snippets::test_equals_snippets);
     REGISTER_TEST_CASE(test_snippets::test_abs);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);

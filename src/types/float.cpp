@@ -19,7 +19,7 @@ namespace float_t {
 
     bool equals(TaggedValue* a, TaggedValue* b)
     {
-        if (!is_float(b))
+        if (!is_float(b) && !is_int(b))
             return false;
         return to_float(a) == to_float(b);
     }
