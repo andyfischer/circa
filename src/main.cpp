@@ -4,18 +4,13 @@
 
 int main(int argc, const char * args[])
 {
-    std::vector<std::string> argv;
-
-    for (int i = 1; i < argc; i++)
-        argv.push_back(args[i]);
-
-    circa::initialize();
-    circa::storage::use_filesystem();
+    circa_initialize();
+    circa_storage_use_filesystem();
 
     int result = 0;
-    result = circa::run_command_line(argv);
+    result = circa_run_command_line(argc, args);
 
-    circa::shutdown();
+    circa_shutdown();
     
     return result;
 }

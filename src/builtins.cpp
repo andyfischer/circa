@@ -17,6 +17,8 @@ namespace circa {
 // setup_functions is defined in generated/setup_builtin_functions.cpp
 void setup_builtin_functions(Branch&);
 
+extern "C" {
+
 // BUILTIN_SCRIPT_TEXT is defined in generated/builtin_script_text.cpp
 extern const char* BUILTIN_SCRIPT_TEXT;
 
@@ -86,6 +88,8 @@ Term* FUNCTION_ATTRS_TYPE = NULL;
 Term* MAP_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
+
+} // extern "C"
 
 TypeRef TYPE_T;
 TypeRef BOOL_T;
@@ -282,7 +286,18 @@ void parse_builtin_script(Branch& kernel)
     parser::compile(&kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
 }
 
-void initialize()
+bool is_value(Term* term)
+{
+    assert_valid_term(term);
+
+    return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
+}
+
+} // namespace circa
+
+using namespace circa;
+
+export_func void circa_initialize()
 {
     create_types();
     bootstrap_kernel();
@@ -300,17 +315,8 @@ void initialize()
     parse_builtin_script(*KERNEL);
 }
 
-void shutdown()
+export_func void circa_shutdown()
 {
     delete KERNEL;
     KERNEL = NULL;
 }
-
-bool is_value(Term* term)
-{
-    assert_valid_term(term);
-
-    return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
-}
-
-} // namespace circa

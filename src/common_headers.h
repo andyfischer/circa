@@ -26,6 +26,8 @@
 #include <string>
 #include <sstream>
 
+#define export_func extern "C"
+
 namespace circa {
 
 struct Branch;

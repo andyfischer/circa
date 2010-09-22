@@ -40,8 +40,8 @@ void install_storage_interface(StorageInterface* interface);
 // Copy the current storage interface to the given argument
 void get_current_storage_interface(StorageInterface* interface);
 
-// Install a builtin interface that just uses the filesystem in a standard way
-void use_filesystem();
-
 } // namespace storage
 } // namespace circa
+
+// Install a builtin interface that just uses the filesystem in a standard way
+export_func void circa_storage_use_filesystem();

@@ -6,6 +6,8 @@
 
 namespace circa {
 
+extern "C" {
+
 extern Branch* KERNEL;
 
 extern Term* ALIAS_FUNC;
@@ -73,6 +75,8 @@ extern Term* NAMESPACE_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
 
+} // extern "C"
+
 extern TypeRef TYPE_T;
 extern TypeRef BOOL_T;
 extern TypeRef DICT_T;
@@ -90,8 +94,6 @@ Branch& kernel();
 Term* get_global(std::string name);
 
 void empty_evaluate_function(Term* caller);
-void initialize();
-void shutdown();
 
 bool is_value(Term* term);
 
@@ -133,3 +135,6 @@ namespace overloaded_function {
 }
 
 } // namespace circa
+
+export_func void circa_initialize();
+export_func void circa_shutdown();

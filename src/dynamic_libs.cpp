@@ -31,6 +31,13 @@ void load_dynamic_lib(Branch& branch, const char* filename)
 
     registerFunctions(&branch);
 
+    typedef int (*fptr)(int a, int b);
+    typedef fptr (*GetFunc)(int a, int b);
+
+    GetFunc getFunc = (GetFunc) dlsym(dl, "get_func");
+    fptr f = getFunc(4, 5);
+    std::cout << "f = " << f(6,7) << std::endl;
+
     dlclose(dl);
 }
 

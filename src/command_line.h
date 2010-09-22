@@ -2,10 +2,4 @@
 
 #pragma once
 
-#include <vector>
-
-namespace circa {
-
-int run_command_line(std::vector<std::string> args);
-
-} // namespace circa
+export_func int circa_run_command_line(int argc, const char* args[]);

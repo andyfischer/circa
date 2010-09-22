@@ -24,7 +24,7 @@ ALL = [DEBUG, RELEASE]
 # Common build flags
 if POSIX:
     def common_flags(env):
-        env.Append(CPPFLAGS=['-ggdb', '-Wall','-fvisibility=hidden','-rdynamic'])
+        env.Append(CPPFLAGS=['-ggdb', '-Wall'])
         env.Append(LINKFLAGS=['-ldl'])
         env.SetOption('num_jobs', 2)
     map(common_flags, ALL)
@@ -50,10 +50,10 @@ def list_source_files(dir):
         if not path.endswith('.cpp'): continue
         yield path
 
-circa_static_libs = {}
+circa_libs = {}
 
-# Define static library builds, save the results in circa_static_libs.
-def circa_static_library(env):
+# Define library builds, save the results in circa_libs.
+def circa_library(env):
     env = env.Clone()
     variant_name = env['variant_name']
 
@@ -64,10 +64,15 @@ def circa_static_library(env):
             ['generated/'+filename for filename in list_source_files('src/generated')])
     source_files = filter(lambda f: f != 'main.cpp', source_files)
 
-    circa_static_libs[variant_name] = env.StaticLibrary('build/'+variant_name+'/circa',
+    if config.get('circa', 'shared_library') == 'true':
+        builder = env.SharedLibrary
+    else:
+        builder = env.StaticLibrary
+
+    circa_libs[variant_name] = builder('build/'+variant_name+'/circa',
         ['build/'+variant_name+'/src/'+filename for filename in source_files])
 
-map(circa_static_library, ALL)
+map(circa_library, ALL)
 
 # Define command-line app builds, save the results in circa_cl_builds
 circa_cl_apps = {}
@@ -76,7 +81,7 @@ def circa_command_line_app(env):
     variant_name = env['variant_name']
     env.Append(CPPPATH = ['src'])
     result = env.Program('build/bin/circa',
-        'build/'+variant_name+'/src/main.cpp', LIBS=[circa_static_libs[variant_name]])
+        'build/'+variant_name+'/src/main.cpp', LIBS=[circa_libs[variant_name]])
     circa_cl_apps[variant_name] = result
     return result
     
@@ -120,7 +125,7 @@ def sdl_env(env):
     variant_name = env['variant_name']
 
     # Append appropriate circa lib
-    env.Append(LIBS = [circa_static_libs[variant_name]])
+    env.Append(LIBS = [circa_libs[variant_name]])
 
 def build_plastic(env):
     env = env.Clone()

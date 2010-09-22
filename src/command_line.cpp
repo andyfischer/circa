@@ -15,6 +15,8 @@
 #include "source_repro.h"
 #include "testing.h"
 
+extern "C" int EXPORTED_INT;
+
 namespace circa {
 
 void print_usage()
@@ -256,3 +258,12 @@ int run_command_line(std::vector<std::string> args)
 
 } // namespace circa
 
+export_func int circa_run_command_line(int argc, const char* args[])
+{
+    std::vector<std::string> argv;
+
+    for (int i = 1; i < argc; i++)
+        argv.push_back(args[i]);
+
+    return circa::run_command_line(argv);
+}

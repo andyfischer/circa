@@ -123,13 +123,6 @@ void get_current_storage_interface(StorageInterface* interface)
     *interface = g_storageInterface;
 }
 
-void use_filesystem()
-{
-    g_storageInterface.readTextFile = filesystem_storage::read_text_file;
-    g_storageInterface.writeTextFile = filesystem_storage::write_text_file;
-    g_storageInterface.getModifiedTime = filesystem_storage::get_modified_time;
-    g_storageInterface.fileExists = filesystem_storage::file_exists;
-}
 
 } // namespace storage
 
@@ -173,3 +166,14 @@ std::string get_absolute_path(std::string const& path)
     return cwd + "/" + path;
 }
 } // namespace circa
+
+using namespace circa;
+using namespace circa::storage;
+
+void circa_storage_use_filesystem()
+{
+    g_storageInterface.readTextFile = filesystem_storage::read_text_file;
+    g_storageInterface.writeTextFile = filesystem_storage::write_text_file;
+    g_storageInterface.getModifiedTime = filesystem_storage::get_modified_time;
+    g_storageInterface.fileExists = filesystem_storage::file_exists;
+}
