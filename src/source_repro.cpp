@@ -348,21 +348,11 @@ std::string get_input_source_text(Term* term, int index)
 
 bool should_print_term_source_line(Term* term)
 {
-    return is_statement(term) && !is_hidden(term);
-}
-
-bool is_hidden(Term* term)
-{
-    if (term->boolPropOptional("syntax:hidden", false))
-        return true;
-
-    if (term->name == "")
+    if (!is_statement(term))
         return false;
-
-    if (term->name[0] == '#')
-        return true;
-
-    return false;
+    if (is_hidden(term))
+        return false;
+    return true;
 }
 
 int get_first_visible_input_index(Term* term)

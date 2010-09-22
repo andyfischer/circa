@@ -286,13 +286,6 @@ void parse_builtin_script(Branch& kernel)
     parser::compile(&kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
 }
 
-bool is_value(Term* term)
-{
-    assert_valid_term(term);
-
-    return term->function == VALUE_FUNC || term->function == STATEFUL_VALUE_FUNC;
-}
-
 } // namespace circa
 
 using namespace circa;

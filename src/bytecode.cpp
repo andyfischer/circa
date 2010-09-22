@@ -420,7 +420,7 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
 
     context->inlineState = inlineState;
 
-    int lastStackIndex = -1;
+    int lastRegisterIndex = -1;
 
     for (int i=0; i < branch.length(); i++)
         write_op(context, branch[i]);
@@ -428,7 +428,7 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     // Find register index of last expression
     for (int i=branch.length()-1; i >= 0; i--) {
         if (should_term_generate_call(branch[i])) {
-            lastStackIndex = branch[i]->registerIndex;
+            lastRegisterIndex = branch[i]->registerIndex;
             break;
         }
     }
@@ -454,7 +454,7 @@ int write_bytecode_for_branch(WriteContext* context, Branch& branch, int inlineS
     context->pendingStateFieldStores.clear();
 
     context->inlineState = prevInlineState;
-    return lastStackIndex;
+    return lastRegisterIndex;
 }
 
 void write_bytecode_for_branch_inline(WriteContext* context, Branch& branch)
@@ -486,7 +486,7 @@ void resize_opdata(BytecodeData* bytecode, size_t newCapacity)
     bytecode->opdata = (char*) realloc(bytecode->opdata, newCapacity);
 }
 
-void update_bytecode(Branch& branch, BytecodeData* bytecode)
+void start_bytecode_update(BytecodeData* bytecode)
 {
     ca_assert(!bytecode->inuse);
 
@@ -497,16 +497,19 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
 
     if (bytecode->capacity < default_size)
         resize_opdata(bytecode, default_size);
+}
+
+void update_bytecode(Branch& branch, BytecodeData* bytecode)
+{
+    start_bytecode_update(bytecode);
 
     WriteContext context(bytecode);
-    context.nextRegisterIndex = 0;
 
     assign_registers_for_major_branch(&context, branch);
 
     // If this branch has any state, then create a get_top_level_state call.
-    bool hasAnyInlinedState = false;
+    context.topLevelState = -1;
     if (has_any_inlined_state(branch)) {
-        hasAnyInlinedState = true;
         context.topLevelState = context.nextRegisterIndex++;
         write_call_op(&context, NULL, get_global("get_top_level_state"), 0, NULL,
                 context.topLevelState);
@@ -515,7 +518,7 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
     write_bytecode_for_branch(&context, branch, context.topLevelState);
 
     // Wrap up state with set_top_level_state
-    if (hasAnyInlinedState) {
+    if (context.topLevelState != -1) {
         int inputs[] = { context.topLevelState };
         write_call_op(&context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
     }

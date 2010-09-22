@@ -106,7 +106,6 @@ void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
 {
     if (term == NULL)
         return;
-
     if (term->name != "")
         return;
 

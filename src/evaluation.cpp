@@ -8,6 +8,7 @@
 #include "errors.h"
 #include "evaluation.h"
 #include "function.h"
+#include "introspection.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -64,7 +65,7 @@ void copy_stack_back_to_terms(Branch& branch, List* stack)
         if (term->registerIndex == -1)
             continue;
 
-        // Don't modify value terms
+        // Don't modify value terms.
         if (is_value(term))
             continue;
 

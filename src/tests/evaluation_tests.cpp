@@ -17,6 +17,14 @@ void test_evaluate_single_term()
     evaluate_single_term(c);
 
     test_assert(as_int(c) == 3);
+
+    #if 0 // TEST_DISABLED
+    // Test a term which needs bytecode generation in order to work
+    Term* ifBlock = branch.compile("if true c = 5 end");
+    evaluate_single_term(ifBlock);
+
+    test_equals(branch["c"]->asInt(), 5);
+    #endif
 }
 
 void register_tests()

@@ -95,8 +95,6 @@ Term* get_global(std::string name);
 
 void empty_evaluate_function(Term* caller);
 
-bool is_value(Term* term);
-
 namespace assign_function {
     void update_assign_contents(Term* term);
 }

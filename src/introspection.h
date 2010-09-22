@@ -27,6 +27,10 @@ bool is_actually_using(Term* user, Term* usee);
 void set_is_statement(Term* term, bool value);
 bool is_statement(Term* term);
 
+bool is_comment(Term* term);
+bool is_value(Term* term);
+bool is_hidden(Term* term);
+
 // Format the term's global id as a string that looks like: $ab3
 std::string format_global_id(Term* term);
 

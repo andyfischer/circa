@@ -904,8 +904,7 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = infix_expression(branch, tokens);
 
-    for (int i=0; i < result->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
+    recursively_mark_terms_as_occuring_inside_an_expression(result);
 
     result = apply(branch, RETURN_FUNC, RefList(result));
     

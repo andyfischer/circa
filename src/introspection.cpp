@@ -20,6 +20,30 @@ bool is_statement(Term* term)
     return term->boolPropOptional("statement", true);
 }
 
+bool is_comment(Term* term)
+{
+    return term->function == COMMENT_FUNC;
+}
+
+bool is_value(Term* term)
+{
+    return term->function == VALUE_FUNC;
+}
+
+bool is_hidden(Term* term)
+{
+    if (term->boolPropOptional("syntax:hidden", false))
+        return true;
+
+    if (term->name == "")
+        return false;
+
+    if (term->name[0] == '#')
+        return true;
+
+    return false;
+}
+
 std::string format_global_id(Term* term)
 {
     if (term == NULL)
