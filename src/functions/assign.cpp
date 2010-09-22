@@ -6,23 +6,6 @@ namespace circa {
 
 namespace assign_function {
 
-/*
-    CA_FUNCTION(assign)
-    {
-        Term* root = INPUT_TERM(0);
-        PathExpression path = get_lexpr_path_expression(root);
-        root = path._head;
-        TaggedValue* value = INPUT(1);
-        
-        if (path.length() <= 0)
-            return error_occurred(CONTEXT, CALLER, "Empty path expression");
-
-        copy(root, OUTPUT);
-        touch(OUTPUT);
-        assign_using_path(OUTPUT, path, value);
-    }
-*/
-
     CA_FUNCTION(assign)
     {
     }
@@ -40,10 +23,35 @@ namespace assign_function {
             set = SET_INDEX_FUNC;
         } else if (term->function == GET_FIELD_FUNC) {
             set = SET_FIELD_FUNC;
+        } else {
+            return NULL;
         }
 
         return apply(branch, set, RefList(term->input(0), term->input(1), desiredValue));
     }
+
+    /*
+     * With a chained lexpr, this expression:
+     *
+     * a[i0][i1][i2] = y
+     *
+     * would look like this:
+     * 
+     * a = ...
+     * i0 = ...
+     * i1 = ...
+     * i2 = ...
+     * a_0 = get_index(a, i0)
+     * a_1 = get_index(a_0, i1)
+     * a_2 = get_index(a_1, i2)
+     * assign(a_2, y)
+     *
+     * We want to generate the following terms:
+     * a_2' = set_index(a_2, i2, y)
+     * a_1' = set_index(a_1, i1, a_2')
+     * a_0' = set_index(a_0, i0, a_1')
+     * a = a_0'
+     */
 
     void update_assign_contents(Term* term)
     {
@@ -58,22 +66,25 @@ namespace assign_function {
         while (true) {
             Term* result = write_setter_from_getter(contents, getter, desired);
 
+            if (result == NULL)
+                break;
+
             desired = result;
             getter = getter->input(0);
 
             if (getter->name != "")
-                break;
-            if (getter->function != GET_INDEX_FUNC && getter->function != GET_FIELD_FUNC)
                 break;
         }
     }
 
     void writeBytecode(bytecode::WriteContext* context, Term* term)
     {
+        update_assign_contents(term);
         Branch& contents = term->nestedContents;
         if (term->registerIndex == -1)
             term->registerIndex = context->nextRegisterIndex++;
-        contents[contents.length()-1]->registerIndex = term->registerIndex;
+        if (contents.length() > 0)
+            contents[contents.length()-1]->registerIndex = term->registerIndex;
         bytecode::write_bytecode_for_branch_inline(context, contents);
     }
 

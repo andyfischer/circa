@@ -36,6 +36,7 @@ docs/nanodoc/index.html
 # downloaded files
 /SDL_deps
 /SDL_deps.zip
+/deps
 
 # miscellaneous
 x.ca
