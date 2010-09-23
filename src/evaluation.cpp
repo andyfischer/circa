@@ -15,29 +15,34 @@
 
 namespace circa {
 
-void evaluate_branch(EvalContext* context, Branch& branch)
+void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output)
 {
-    List stack;
-    stack.resize(1);
+    int newStackLength = stack->length() + 1;
+    stack->resize(newStackLength);
 
-    List* topRegisters = make_list(stack.get(0));
+    List* topRegisters = make_list(stack->get(newStackLength-1));
     topRegisters->resize(branch.length());
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         EvaluateFunc func = function_t::get_evaluate(term->function);
         if (func != NULL) 
-            func(context, &stack, term);
+            func(context, stack, term);
     }
 
-    #if 0
-    bytecode::update_bytecode(branch);
-    List registers;
-    bytecode::evaluate_bytecode(context, &branch._bytecode, &registers);
-    copy_stack_back_to_terms(branch, &registers);
-    
-    reset(&context->subroutineOutput);
-    #endif
+    // Save output value
+    if (output != NULL) {
+        swap(topRegisters->get(topRegisters->length()-1), output);
+    }
+
+    stack->resize(newStackLength - 1);
+}
+
+void evaluate_branch(EvalContext* context, Branch& branch)
+{
+    List stack;
+    stack.resize(1);
+    evaluate_branch(context, &stack, branch, NULL);
 }
 
 EvalContext evaluate_branch(Branch& branch)

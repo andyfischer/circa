@@ -79,8 +79,6 @@ void print_term_raw_string(std::ostream& out, Term* term)
    
     out << format_global_id(term) << " ";
 
-    //out << "reg:" << term->registerIndex << " ";
-
     if (name != "")
         out << "'" << name << "' ";
 
@@ -268,7 +266,6 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
     }
 
     out << format_global_id(term);
-    out << " r:" << term->registerIndex;
 
     if (term->name != "")
         out << " '" << term->name << "'";

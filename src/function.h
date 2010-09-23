@@ -14,6 +14,7 @@ struct FunctionAttrs
 {
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
     typedef void (*WriteBytecode)(bytecode::WriteContext*, Term*);
+    typedef void (*PostInputChange)(Term*);
 
     std::string name;
     Ref outputType;
@@ -33,6 +34,7 @@ struct FunctionAttrs
     CheckInvariants checkInvariants;
     StaticTypeQueryFunc staticTypeQuery;
     WriteBytecode writeBytecode;
+    PostInputChange postInputChange;
 
     List parameters;
 

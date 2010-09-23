@@ -8,6 +8,10 @@ namespace assign_function {
 
     CA_FUNCTION(assign)
     {
+        Branch& contents = CALLER->nestedContents;
+        TaggedValue output;
+        evaluate_branch(CONTEXT, STACK, contents, &output);
+        swap(&output, OUTPUT);
     }
 
     Term* specializeType(Term* term)
@@ -77,9 +81,13 @@ namespace assign_function {
         }
     }
 
-    void writeBytecode(bytecode::WriteContext* context, Term* term)
+    void postInputChange(Term* term)
     {
         update_assign_contents(term);
+    }
+
+    void writeBytecode(bytecode::WriteContext* context, Term* term)
+    {
         Branch& contents = term->nestedContents;
         if (term->registerIndex == -1)
             term->registerIndex = context->nextRegisterIndex++;
@@ -93,6 +101,7 @@ namespace assign_function {
         ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
         function_t::get_attrs(ASSIGN_FUNC).specializeType = specializeType;
         function_t::get_attrs(ASSIGN_FUNC).writeBytecode = writeBytecode;
+        function_t::get_attrs(ASSIGN_FUNC).postInputChange = postInputChange;
     }
 }
 }

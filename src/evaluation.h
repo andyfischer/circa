@@ -32,6 +32,11 @@ struct EvalContext
 
 };
 
+// Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
+// null, if it's not null then we'll copy the output register of this branch to it.
+// When specifying 'output', don't use a value that is in the stack, because that
+// seems to break things. Instead use a temporary.
+void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output);
 void evaluate_branch(EvalContext* context, Branch& branch);
 void evaluate_bytecode(Branch& branch);
 

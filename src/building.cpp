@@ -50,6 +50,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     change_type(result, outputType);
 
+    post_input_change(result);
+
     return result;
 }
 
@@ -75,6 +77,8 @@ void set_input(Term* term, int index, Term* input)
     // Check if we should remove 'term' from the user list of previousInput
     if (previousInput != NULL && !is_actually_using(previousInput, term))
         previousInput->users.remove(term);
+
+    post_input_change(term);
 }
 
 void set_inputs(Term* term, RefList const& inputs)
@@ -102,6 +106,8 @@ void set_inputs(Term* term, RefList const& inputs)
         if (previousInput != NULL && !is_actually_using(previousInput, term))
             previousInput->users.remove(term);
     }
+
+    post_input_change(term);
 }
 
 void update_input_info(Term* term, int index, Term* input)
@@ -129,6 +135,14 @@ void update_input_info(Term* term, int index, Term* input)
     }
 
     info.relativeScope = relativeScope;
+}
+
+void post_input_change(Term* term)
+{
+    FunctionAttrs::PostInputChange func = function_t::get_attrs(term->function).postInputChange;
+    if (func) {
+        func(term);
+    }
 }
 
 bool is_actually_using(Term* user, Term* usee)

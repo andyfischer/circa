@@ -9,6 +9,7 @@ struct InputInfo
     int relativeScope;
 
     InputInfo() : relativeScope(0) {}
+
 };
 
 }

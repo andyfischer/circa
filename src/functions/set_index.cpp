@@ -9,7 +9,7 @@ namespace set_index_function {
     {
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
-        int index = INPUT(1)->asInt();
+        int index = INT_INPUT(1);
         copy(INPUT(2), OUTPUT->getIndex(index));
     }
 

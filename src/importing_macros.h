@@ -22,8 +22,6 @@
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
     CA_FUNCTION(evaluate_##fname)
 
-#define EVALUATION_ARGS _circa_cxt, _circa_caller, _circa_func, _circa_inputs, _circa_output
-
 #define INPUT(index) (get_input(_circa_stack, _circa_caller, (index)))
 #define FLOAT_INPUT(index) circa::to_float(INPUT(index))
 #define BOOL_INPUT(index) circa::as_bool(INPUT(index))
@@ -36,6 +34,7 @@
 #define OUTPUT (get_output(_circa_stack, _circa_caller))
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_caller->function)
+#define STACK (_circa_stack)
 
 #define CA_SETUP_FUNCTIONS(branch) {\
     for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \
