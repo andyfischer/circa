@@ -13,17 +13,31 @@
 #include "term.h"
 #include "type.h"
 
-
 namespace circa {
 
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
+    List stack;
+    stack.resize(1);
+
+    List* topRegisters = make_list(stack.get(0));
+    topRegisters->resize(branch.length());
+
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        EvaluateFunc func = function_t::get_evaluate(term->function);
+        if (func != NULL) 
+            func(context, &stack, term);
+    }
+
+    #if 0
     bytecode::update_bytecode(branch);
     List registers;
     bytecode::evaluate_bytecode(context, &branch._bytecode, &registers);
     copy_stack_back_to_terms(branch, &registers);
     
     reset(&context->subroutineOutput);
+    #endif
 }
 
 EvalContext evaluate_branch(Branch& branch)
@@ -85,24 +99,26 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
         copy(stack->get(callOp->inputs[i].registerIndex), inputs->get(i));
 }
 
-TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index)
+TaggedValue* get_input(List* stack, Term* term, int index)
 {
-    ca_assert(index < callOp->numInputs);
-    int registerIndex = callOp->inputs[index].registerIndex;
-    if (registerIndex == -1)
-        return NULL;
-    return stack->get(registerIndex);
+    InputInfo& input = term->inputInfo(index);
+    Term* inputTerm = term->input(index);
+
+    List* registers = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
+
+    return registers->get(inputTerm->index);
 }
 
-TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp)
+TaggedValue* get_output(List* stack, Term* term)
 {
-    if (callOp->outputIndex == -1)
-        return NULL;
-    return stack->get(callOp->outputIndex);
+    List* registers = List::checkCast(stack->get(stack->length()-1));
+
+    return registers->get(term->index);
 }
 
 void evaluate_single_term(Term* caller)
 {
+#ifdef BYTECODE
     int numInputs = caller->numInputs();
 
     List registers;
@@ -134,14 +150,16 @@ void evaluate_single_term(Term* caller)
 
     // Copy output
     copy(registers.get(numInputs), caller);
+#endif
 }
 
+#ifdef BYTECODE
 void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
     List* registers)
 {
     EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
     func(cxt, registers, callop);
 }
-
+#endif
 
 } // namespace circa

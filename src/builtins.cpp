@@ -226,6 +226,7 @@ void post_initialize_primitive_types(Branch& kernel)
     // Properly setup value() func
     initialize_function(VALUE_FUNC);
     function_t::get_attrs(VALUE_FUNC).outputType = ANY_TYPE;
+    function_t::get_evaluate(VALUE_FUNC) = value_function::evaluate;
 
     ca_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }

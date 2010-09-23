@@ -132,6 +132,10 @@ namespace overloaded_function {
     void append_overload(Term* overloadedFunction, Term* overload);
 }
 
+namespace value_function {
+    CA_FUNCTION(evaluate);
+}
+
 } // namespace circa
 
 export_func void circa_initialize();

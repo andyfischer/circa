@@ -24,6 +24,7 @@ std::string default_name_for_hidden_state(const std::string& termName);
 
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
+void update_input_info(Term* term, int index, Term* input);
 
 bool is_actually_using(Term* user, Term* usee);
 

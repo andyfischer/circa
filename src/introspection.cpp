@@ -79,7 +79,7 @@ void print_term_raw_string(std::ostream& out, Term* term)
    
     out << format_global_id(term) << " ";
 
-    out << "reg:" << term->registerIndex << " ";
+    //out << "reg:" << term->registerIndex << " ";
 
     if (name != "")
         out << "'" << name << "' ";

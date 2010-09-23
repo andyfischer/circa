@@ -2,6 +2,7 @@
 
 #include "circa.h"
 #include "debug_valid_objects.h"
+#include "names.h"
 
 namespace circa {
 
@@ -62,6 +63,11 @@ void set_input(Term* term, int index, Term* input)
 
     term->inputs.setAt(index, input);
 
+    if (index >= term->inputInfoList.length())
+        term->inputInfoList.resize(index+1);
+
+    update_input_info(term, index, input);
+
     // Add 'term' to the user list of input
     if (input != NULL && term != input)
         input->users.appendUnique(term);
@@ -79,6 +85,12 @@ void set_inputs(Term* term, RefList const& inputs)
 
     term->inputs = inputs;
 
+    term->inputInfoList.resize(inputs.length());
+
+    for (int i=0; i < inputs.length(); i++) {
+        update_input_info(term, i, inputs[i]);
+    }
+
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
         if (inputs[i] != NULL)
@@ -90,6 +102,33 @@ void set_inputs(Term* term, RefList const& inputs)
         if (previousInput != NULL && !is_actually_using(previousInput, term))
             previousInput->users.remove(term);
     }
+}
+
+void update_input_info(Term* term, int index, Term* input)
+{
+    InputInfo& info = term->inputInfo(index);
+
+    if (input == NULL) {
+        info.relativeScope = -1;
+        return;
+    }
+
+    // Find the difference in scope between the term and input
+    int relativeScope = 0;
+    Branch* scope = term->owningBranch;
+    while (input->owningBranch != scope) {
+
+        relativeScope++;
+        scope = get_parent_branch(*scope);
+
+        if (scope == NULL) {
+            // FIXME
+            info.relativeScope = -1;
+            return;
+        }
+    }
+
+    info.relativeScope = relativeScope;
 }
 
 bool is_actually_using(Term* user, Term* usee)

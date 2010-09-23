@@ -5,6 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "input_info_list.h"
 #include "references.h"
 #include "ref_list.h"
 #include "tagged_value.h"
@@ -23,6 +24,9 @@ struct Term : TaggedValue
 
     // Input terms
     RefList inputs;
+
+    // Metadata around inputs.
+    InputInfoList inputInfoList;
 
     // Our function: the thing that takes our inputs and produces a value.
     Ref function;
@@ -63,6 +67,7 @@ struct Term : TaggedValue
     ~Term();
 
     Term* input(int index) const;
+    InputInfo& inputInfo(int index) { return inputInfoList[index]; }
     int numInputs() const;
 
     std::string toString();

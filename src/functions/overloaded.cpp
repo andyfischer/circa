@@ -20,6 +20,8 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_overloaded)
     {
+        // FIXME
+        #if 0
         Term* func = FUNCTION;
         List& overloads = function_t::get_attrs(func).parameters;
 
@@ -41,6 +43,7 @@ namespace overloaded_function {
         evaluate_single_call_op(CONTEXT, op, _circa_stack);
 
         free_orphan_call_operation(op);
+        #endif
     }
 
     Term* statically_specialize_function(Term* func, RefList const& inputs)

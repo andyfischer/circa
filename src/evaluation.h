@@ -48,10 +48,13 @@ Term* apply_and_eval(Branch& branch,
 
 void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
-TaggedValue* get_input(List* stack, bytecode::CallOperation* callOp, int index);
-TaggedValue* get_output(List* stack, bytecode::CallOperation* callOp);
+TaggedValue* get_input(List* stack, Term* term, int index);
+TaggedValue* get_output(List* stack, Term* term);
 void evaluate_single_term(Term* caller);
+
+#ifdef BYTECODE
 void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
     List* registers);
+#endif
 
 } // namespace circa

@@ -61,10 +61,9 @@ typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 #define CA_FUNCTION(fname) \
     void fname(circa::EvalContext* _circa_cxt, \
             List* _circa_stack, \
-            bytecode::CallOperation* _circa_op)
+            Term* _circa_caller)
 
-typedef void (*EvaluateFunc)(EvalContext* cxt, List* stack,
-        bytecode::CallOperation* call);
+typedef void (*EvaluateFunc)(EvalContext* cxt, List* stack, Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
