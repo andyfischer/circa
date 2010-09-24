@@ -119,6 +119,29 @@ void test_get_named_at()
     test_assert(get_named_at(i, "h") == h);
 }
 
+void test_find_first_common_branch()
+{
+    Branch branch;
+    Term* a = create_int(branch, 0);
+    Term* b = create_int(branch, 0);
+
+    test_assert(find_first_common_branch(a,b) == &branch);
+    test_assert(find_first_common_branch(b,a) == &branch);
+
+    Branch& b1 = create_branch(branch);
+    Term* c = create_int(b1, 0);
+    Term* d = create_int(b1, 0);
+
+    test_assert(find_first_common_branch(c,d) == &b1);
+    test_assert(find_first_common_branch(d,c) == &b1);
+    test_assert(find_first_common_branch(a,c) == &branch);
+    test_assert(find_first_common_branch(d,b) == &branch);
+
+    Branch alternate;
+    Term* e = create_int(alternate, 0);
+    test_assert(find_first_common_branch(a,e) == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
@@ -127,6 +150,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_get_relative_name_from_hidden_branch);
     REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
     REGISTER_TEST_CASE(names_tests::test_get_named_at);
+    REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
 }
 
 } // namespace names_tests

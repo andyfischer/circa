@@ -17,6 +17,7 @@ Term* get_named_at(Term* location, std::string const& name);
 Branch* get_parent_branch(Branch& branch);
 Term* get_parent_term(Term* term);
 bool name_is_reachable_from(Term* term, Branch& branch);
+Branch* find_first_common_branch(Term* left, Term* right);
 
 // Get a name of 'term' which is valid in 'branch'. This might simply return term's name,
 // or if term is inside a namespace or object, this would return a colon-separated name.

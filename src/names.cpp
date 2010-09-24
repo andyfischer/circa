@@ -135,6 +135,29 @@ bool name_is_reachable_from(Term* term, Branch& branch)
     return name_is_reachable_from(term, *parent);
 }
 
+Branch* find_first_common_branch(Term* left, Term* right)
+{
+    Branch* leftParent = left->owningBranch;
+    Branch* rightParent = right->owningBranch;
+
+    // Walk upwards from left term.
+    while (leftParent != NULL && leftParent != KERNEL) {
+
+        // Walk upwards from right term.
+        while (rightParent != NULL && leftParent != KERNEL) {
+            if (leftParent == rightParent)
+                return leftParent;
+
+            rightParent = get_parent_branch(*rightParent);
+        }
+
+        leftParent = get_parent_branch(*leftParent);
+        rightParent = right->owningBranch;
+    }
+
+    return NULL;
+}
+
 // Returns whether or not we succeeded
 bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& output)
 {

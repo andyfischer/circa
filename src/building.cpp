@@ -113,6 +113,7 @@ void set_inputs(Term* term, RefList const& inputs)
 void update_input_info(Term* term, int index, Term* input)
 {
     InputInfo& info = term->inputInfo(index);
+    Term* inputTerm = term->input(index);
 
     if (input == NULL) {
         info.relativeScope = -1;
@@ -128,10 +129,17 @@ void update_input_info(Term* term, int index, Term* input)
         scope = get_parent_branch(*scope);
 
         if (scope == NULL) {
-            // FIXME
-            info.relativeScope = -1;
-            return;
+            relativeScope = -1;
+            break;
         }
+    }
+
+    // If we didn't find it in that pass, it must be an exposed name in a nested
+    // branch.
+    if (relativeScope == -1) {
+        // First find the first common branch.
+        Branch* common = find_first_common_branch(term, inputTerm);
+
     }
 
     info.relativeScope = relativeScope;
