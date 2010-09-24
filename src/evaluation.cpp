@@ -105,9 +105,24 @@ TaggedValue* get_input(List* stack, Term* term, int index)
     InputInfo& input = term->inputInfo(index);
     Term* inputTerm = term->input(index);
 
+    TaggedValue inputTv;
+    input.toTaggedValue(&inputTv);
+
+    std::cout << "stack = " << stack->toString() << std::endl;
+    std::cout << "looking for input = " << inputTv.toString() << std::endl;
+
     List* registers = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
 
-    return registers->get(inputTerm->index);
+    TaggedValue* result = registers;
+
+    for (int i=0; i < input.nestedStepCount; i++) {
+        result = result->getIndex(input.steps[i].index);
+        ca_assert(result != NULL);
+    }
+
+    result = result->getIndex(inputTerm->index);
+
+    return result;
 }
 
 TaggedValue* get_output(List* stack, Term* term)

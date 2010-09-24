@@ -15,18 +15,31 @@ struct InputInfo
     int nestedStepCount;
     NestedStep *steps;
 
-    InputInfo() : relativeScope(0), nestedStepCount(0), steps(NULL) {}
+    InputInfo()
+      : relativeScope(0), nestedStepCount(0), steps(NULL)
+    {}
+
+    InputInfo(InputInfo const& copy)
+    {
+        relativeScope = copy.relativeScope;
+        nestedStepCount = copy.nestedStepCount;
+        size_t steps_size = copy.nestedStepCount*sizeof(InputInfo);
+        steps = (NestedStep*) malloc(steps_size);
+        memcpy(steps, copy.steps, steps_size);
+    }
 
     ~InputInfo()
     {
         free(steps);
     }
 
+
     void setNestedStepCount(int count)
     {
         nestedStepCount = count;
         steps = (NestedStep*) realloc(steps, sizeof(NestedStep) * count);
     }
+    void toTaggedValue(TaggedValue* value);
 };
 
 } // namespace circa

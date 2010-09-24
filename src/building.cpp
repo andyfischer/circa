@@ -120,29 +120,45 @@ void update_input_info(Term* term, int index, Term* input)
         return;
     }
 
-    // Find the difference in scope between the term and input
-    int relativeScope = 0;
+    // First find the first common branch.
+    Branch* commonBranch = find_first_common_branch(term, inputTerm);
+
+    if (commonBranch == NULL)
+        internal_error("No common branch in update_input_info");
+
+    // Find the distance from the term to the common branch, this is
+    // the relativeScope distance.
+    info.relativeScope = 0;
     Branch* scope = term->owningBranch;
-    while (input->owningBranch != scope) {
-
-        relativeScope++;
+    while (scope != commonBranch) {
+        info.relativeScope++;
         scope = get_parent_branch(*scope);
-
-        if (scope == NULL) {
-            relativeScope = -1;
-            break;
-        }
     }
 
-    // If we didn't find it in that pass, it must be an exposed name in a nested
-    // branch.
-    if (relativeScope == -1) {
-        // First find the first common branch.
-        Branch* common = find_first_common_branch(term, inputTerm);
-
+    // Find the distance from the inputTerm to common branch, if it's non-zero
+    // then the input is nested (such as in a namespace or exposed from an if-block)
+    int nestedStepCount = 0;
+    scope = inputTerm->owningBranch;
+    while (scope != commonBranch) {
+        nestedStepCount++;
+        scope = get_parent_branch(*scope);
     }
 
-    info.relativeScope = relativeScope;
+    Term* walk = inputTerm;
+
+    // Special case for if-block: don't include the step where we find #joining
+    if (get_parent_term(term) != NULL && get_parent_term(term)->name == "#joining") {
+        nestedStepCount--;
+        walk = get_parent_term(term);
+    }
+
+    info.setNestedStepCount(nestedStepCount);
+
+    // Walk from inputTerm to common branch again, this time record the indexes used.
+    for (int i=nestedStepCount-1; i >= 0; i--) {
+        walk = get_parent_term(walk);
+        info.steps[i].index = walk->index;
+    }
 }
 
 void post_input_change(Term* term)

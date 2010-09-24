@@ -269,8 +269,8 @@ CA_FUNCTION(evaluate_if_block)
 {
     Branch& contents = CALLER->nestedContents;
 
-    // If-blocks create a useless extra stack frame, because of the way the contents
-    // are nested inside an outer branch.
+    // If-blocks create an extra stack frame, to match up with the way that the contents
+    // are inside two branch levels.
     push_stack_frame(STACK);
 
     for (int i=0; i < contents.length() - 1; i++) {
@@ -286,6 +286,16 @@ CA_FUNCTION(evaluate_if_block)
     }
 
     pop_stack_frame(STACK);
+
+    // Copy the results of our #join terms to the stack
+    List* output = make_list(OUTPUT);
+
+    Branch& joining = contents[contents.length()-1]->nestedContents;
+    output->resize(joining.length());
+    for (int i=0; i < joining.length(); i++)
+        swap(joining[i], output->get(i));
+
+    std::cout << STACK->toString() << std::endl;
 }
 
 } // namespace circa

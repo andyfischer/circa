@@ -140,6 +140,9 @@ Branch* find_first_common_branch(Term* left, Term* right)
     Branch* leftParent = left->owningBranch;
     Branch* rightParent = right->owningBranch;
 
+    if (leftParent == NULL) return NULL;
+    if (rightParent == NULL) return NULL;
+
     // Walk upwards from left term.
     while (leftParent != NULL && leftParent != KERNEL) {
 
