@@ -5,10 +5,6 @@
 namespace circa {
 namespace if_block_function {
 
-    CA_FUNCTION(evaluate)
-    {
-    }
-
     void formatSource(StyledSource* source, Term* term)
     {
         Branch& contents = term->nestedContents;
@@ -43,7 +39,7 @@ namespace if_block_function {
 
     void setup(Branch& kernel)
     {
-        IF_BLOCK_FUNC = import_function(kernel, evaluate, "if_block()");
+        IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block()");
         function_t::get_attrs(IF_BLOCK_FUNC).formatSource = formatSource;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
     }

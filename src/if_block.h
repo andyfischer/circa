@@ -11,6 +11,7 @@ Branch* get_if_condition_block(Term* ifCall, int index);
 Branch* get_if_block_else_block(Term* ifCall);
 bool if_block_contains_state(Term* ifCall);
 
+CA_FUNCTION(evaluate_if_block);
 
 void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock);
 

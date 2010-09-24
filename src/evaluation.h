@@ -57,6 +57,9 @@ TaggedValue* get_input(List* stack, Term* term, int index);
 TaggedValue* get_output(List* stack, Term* term);
 void evaluate_single_term(Term* caller);
 
+List* push_stack_frame(List* stack);
+void pop_stack_frame(List* stack);
+
 #ifdef BYTECODE
 void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
     List* registers);

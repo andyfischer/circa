@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
+#include "importing_macros.h"
 
 namespace circa {
 
@@ -17,32 +18,6 @@ namespace circa {
 //   [N-2] branch()  (this corresponds to the 'else' block)
 //   [N-1] #joining = branch() 
 //
-//
-// Bytecode:
-//
-// if <expr0>
-//   ..branch A..
-//   name = x
-// elif <expr1>
-//   ..branch B..
-//   name = y
-// else
-//   ..branch Z..
-// end
-// name = join()
-//
-// 0: expr0
-// 1: jump_if_not(0) to 2
-// .. branch A
-// .. jump to End
-// 2: expr1
-//    jump_if_not(2) to
-// .. branch B
-// ..
-// End
-//
-// Algorithm:
-//   Figure out stack positions for exported names
 
 void update_if_block_joining_branch(Term* ifCall)
 {
@@ -288,6 +263,29 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         bytecode::write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
                 context->inlineState);
     }
+}
+
+CA_FUNCTION(evaluate_if_block)
+{
+    Branch& contents = CALLER->nestedContents;
+
+    // If-blocks create a useless extra stack frame, because of the way the contents
+    // are nested inside an outer branch.
+    push_stack_frame(STACK);
+
+    for (int i=0; i < contents.length() - 1; i++) {
+        Term* branch = contents[i];
+        if (branch->numInputs() == 0 || as_bool(get_input(STACK, branch, 0))) {
+
+            TaggedValue output;
+            evaluate_branch(CONTEXT, STACK, branch->nestedContents, &output);
+            if (OUTPUT != NULL)
+                swap(&output, OUTPUT);
+            break;
+        }
+    }
+
+    pop_stack_frame(STACK);
 }
 
 } // namespace circa

@@ -17,11 +17,8 @@ namespace circa {
 
 void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output)
 {
-    int newStackLength = stack->length() + 1;
-    stack->resize(newStackLength);
-
-    List* topRegisters = make_list(stack->get(newStackLength-1));
-    topRegisters->resize(branch.length());
+    List* frame = push_stack_frame(stack);
+    frame->resize(branch.length());
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
@@ -31,11 +28,10 @@ void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedVa
     }
 
     // Save output value
-    if (output != NULL) {
-        swap(topRegisters->get(topRegisters->length()-1), output);
-    }
+    if (output != NULL)
+        swap(frame->get(frame->length()-1), output);
 
-    stack->resize(newStackLength - 1);
+    pop_stack_frame(stack);
 }
 
 void evaluate_branch(EvalContext* context, Branch& branch)
@@ -156,6 +152,20 @@ void evaluate_single_term(Term* caller)
     // Copy output
     copy(registers.get(numInputs), caller);
 #endif
+}
+
+List* push_stack_frame(List* stack)
+{
+    int newStackLength = stack->length() + 1;
+    stack->resize(newStackLength);
+
+    List* frame = make_list(stack->get(newStackLength-1));
+    return frame;
+}
+
+void pop_stack_frame(List* stack)
+{
+    stack->resize(stack->length() - 1);
 }
 
 #ifdef BYTECODE
