@@ -176,6 +176,12 @@ void test_relative_input_locations_in_if_block()
 
     g->inputInfo(0).toTaggedValue(&tv);
     test_equals(tv.toString(), "[0, [2, 0]]");
+
+    join_a->inputInfo(0).toTaggedValue(&tv);
+    test_equals(tv.toString(), "[-1, [1]]");
+
+    join_a->inputInfo(1).toTaggedValue(&tv);
+    test_equals(tv.toString(), "[0, [0]]");
 }
 
 void register_tests()

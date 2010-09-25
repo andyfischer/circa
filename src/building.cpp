@@ -101,11 +101,11 @@ void set_inputs(Term* term, RefList const& inputs)
     post_input_change(term);
 }
 
-bool include_step_in_relative_input_location(Term* step)
+bool include_step_in_relative_input_location(Term* term)
 {
-    if (step->name == "#joining")
+    if (get_parent_term(term) && get_parent_term(term)->function == IF_BLOCK_FUNC)
         return false;
-    if (get_parent_term(step) && get_parent_term(step)->function == IF_BLOCK_FUNC)
+    if (term->name == "#joining")
         return false;
     return true;
 }
@@ -140,18 +140,13 @@ void update_input_info(Term* term, int index)
     }
     info.relativeScope--;
 
-    //std::cout << "update_input_info " << get_term_to_string_extended(term) << ", " << index << std::endl;
-
-    // Find the distance from the inputTerm to common branch, if it's non-zero
-    // then the inputTerm is nested (such as in a namespace or exposed from an if-block)
+    // Find the distance from the inputTerm to common branch; this is usually 1, but
+    // it might be greater if the input is nested in a namespace or something.
     int nestedStepCount = 0;
     walk = inputTerm;
     while (commonBranch->owningTerm != walk) {
-        //std::cout << "walk looking at: " << get_term_to_string_extended(walk) << std::endl;
-        if (include_step_in_relative_input_location(walk)) {
-            //std::cout << "(include)" << std::endl;
+        if (include_step_in_relative_input_location(walk))
             nestedStepCount++;
-        }
         walk = get_parent_term(walk);
     }
 
@@ -164,6 +159,11 @@ void update_input_info(Term* term, int index)
         if (include_step_in_relative_input_location(walk))
             info.steps[i--].index = walk->index;
         walk = get_parent_term(walk);
+    }
+
+    // Join terms are not evaluated until their stack frame is gone.
+    if (term->function == JOIN_FUNC) {
+        info.relativeScope--;
     }
 }
 

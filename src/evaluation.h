@@ -32,6 +32,9 @@ struct EvalContext
 
 };
 
+void evaluate_branch_existing_frame(EvalContext* context, List *stack,
+        Branch& branch, TaggedValue* output);
+
 // Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
 // null, if it's not null then we'll copy the output register of this branch to it.
 // When specifying 'output', don't use a value that is in the stack, because that
@@ -57,7 +60,7 @@ TaggedValue* get_input(List* stack, Term* term, int index);
 TaggedValue* get_output(List* stack, Term* term);
 void evaluate_single_term(Term* caller);
 
-List* push_stack_frame(List* stack);
+List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);
 
 #ifdef BYTECODE

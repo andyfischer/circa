@@ -18,34 +18,6 @@ namespace overloaded_function {
         return NULL;
     }
 
-    CA_FUNCTION(evaluate_overloaded)
-    {
-        // FIXME
-        #if 0
-        Term* func = FUNCTION;
-        List& overloads = function_t::get_attrs(func).parameters;
-
-        // Dynamically find the right overload.
-
-        List inputs;
-        CAPTURE_INPUTS(&inputs);
-        Term* overload = dynamically_specialize_func(&overloads, &inputs);
-
-        if (overload == NULL)
-            return error_occurred(CONTEXT, CALLER, "No usable overload found");
-
-        bytecode::CallOperation* op = bytecode::create_orphan_call_operation(CALLER, overload,
-                NUM_INPUTS);
-        for (int i=0; i < NUM_INPUTS; i++)
-            op->inputs[i] = _circa_op->inputs[i];
-        op->outputIndex = _circa_op->outputIndex;
-
-        evaluate_single_call_op(CONTEXT, op, _circa_stack);
-
-        free_orphan_call_operation(op);
-        #endif
-    }
-
     Term* statically_specialize_function(Term* func, RefList const& inputs)
     {
         if (!is_function(func))
@@ -64,6 +36,11 @@ namespace overloaded_function {
 
         // no overload found
         return func;
+    }
+
+    CA_FUNCTION(evaluate_overloaded)
+    {
+        
     }
 
     bool is_overloaded_function(Term* func)

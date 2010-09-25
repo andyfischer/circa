@@ -15,10 +15,10 @@
 
 namespace circa {
 
-void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output)
+void evaluate_branch_existing_frame(EvalContext* context, List *stack,
+    Branch& branch, TaggedValue* output)
 {
-    List* frame = push_stack_frame(stack);
-    frame->resize(branch.length());
+    List* frame = List::checkCast(stack->get(stack->length()-1));
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
@@ -34,7 +34,12 @@ void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedVa
     // Save output value
     if (output != NULL)
         swap(frame->get(frame->length()-1), output);
+}
 
+void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output)
+{
+    push_stack_frame(stack, branch.length());
+    evaluate_branch_existing_frame(context, stack, branch, output);
     pop_stack_frame(stack);
 }
 
@@ -111,24 +116,24 @@ TaggedValue* get_input(List* stack, Term* term, int index)
     TaggedValue inputTv;
     input.toTaggedValue(&inputTv);
 
-    std::cout << "stack = " << stack->toString() << std::endl;
-    std::cout << "looking for input = " << inputTv.toString() << std::endl;
+    //std::cout << "stack = " << stack->toString() << std::endl;
+    //std::cout << "looking for input = " << inputTv.toString() << std::endl;
 
     List* frame = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
 
-    std::cout << "frame = " << frame->toString() << std::endl;
+    //std::cout << "frame = " << frame->toString() << std::endl;
 
     TaggedValue* result = frame;
 
     for (int i=0; i < input.nestedStepCount; i++) {
         int index = input.steps[i].index;
-        std::cout << "using index: " << index << std::endl;
+        //std::cout << "using index: " << index << std::endl;
         result = result->getIndex(index);
         ca_assert(result != NULL);
-        std::cout << "result is now: " << result->toString() << std::endl;
+        //std::cout << "result is now: " << result->toString() << std::endl;
     }
 
-    std::cout << "found = " << result->toString() << std::endl;
+    //std::cout << "found = " << result->toString() << std::endl;
 
     return result;
 }
@@ -177,12 +182,12 @@ void evaluate_single_term(Term* caller)
 #endif
 }
 
-List* push_stack_frame(List* stack)
+List* push_stack_frame(List* stack, int size)
 {
     int newStackLength = stack->length() + 1;
     stack->resize(newStackLength);
 
-    List* frame = make_list(stack->get(newStackLength-1));
+    List* frame = make_list(stack->get(newStackLength-1), size);
     return frame;
 }
 
