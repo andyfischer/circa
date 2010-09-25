@@ -14,15 +14,12 @@ namespace circa {
    [n-1] #outer_rebinds
 */
 
-Branch& get_for_loop_rebinds(Term* forTerm)
-{
-    Branch& contents = forTerm->nestedContents;
-    return contents[1]->nestedContents;
-}
+static const int inner_rebinds_location = 1;
+static const int iterator_location = 2;
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return forTerm->nestedContents[2];
+    return forTerm->nestedContents[inner_rebinds_location];
 }
 
 Term* get_for_loop_modify_list(Term* forTerm)
@@ -81,11 +78,13 @@ void setup_for_loop_post_code(Term* forTerm)
         if (name == iteratorName)
             continue;
 
-        Term* original = outerScope[name];
+        Term* original = get_named_at(forTerm, name);
+        Term* loopResult = forContents[name];
+        RefList inputs(original, loopResult);
 
-        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, RefList(), name);
+        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, inputs, name);
         change_type(innerRebind, original->type);
-        apply(outerRebinds, JOIN_FUNC, RefList(), name);
+        apply(outerRebinds, JOIN_FUNC, inputs, name);
 
         // Rewrite the loop code to use our local copies of these rebound variables.
         remap_pointers(forContents, original, innerRebind);
@@ -344,16 +343,41 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
 CA_FUNCTION(evaluate_for_loop)
 {
     Branch& forContents = CALLER->nestedContents;
+    Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
     bool modifyList = as_bool(get_for_loop_modify_list(CALLER));
-    Term* iterator = get_for_loop_iterator(CALLER);
+    //Term* iterator = get_for_loop_iterator(CALLER);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
-    for (int i=0; i < inputListLength; i++) {
-        copy(inputList->getIndex(i), iterator);
+    List locals;
 
-        evaluate_branch(CONTEXT, STACK, forContents, NULL);
+    for (int iteration=0; iteration < inputListLength; iteration++) {
+
+        List* frame = push_stack_frame(STACK, forContents.length());
+
+        // copy iterator
+        copy(inputList->getIndex(iteration), frame->get(iterator_location));
+
+        List innerRebindStack;
+        innerRebindStack.resize(innerRebinds.length());
+
+        // copy inner rebinds
+        for (int i=0; i < innerRebinds.length(); i++) {
+            Term* rebindTerm = innerRebinds[i];
+            copy(get_input(STACK, rebindTerm, 0), innerRebindStack.get(i));
+        }
+
+        swap(&innerRebindStack, frame->get(inner_rebinds_location));
+
+        //std::cout << "stack before contents: " << STACK->toString() << std::endl;
+        
+        for (int i=iterator_location+1; i < forContents.length(); i++)
+            evaluate_single_term(CONTEXT, STACK, forContents[i]);
+
+        // save locals
+        swap(STACK->get(STACK->length() - 1), &locals);
+        pop_stack_frame(STACK);
     }
 }
 

@@ -40,6 +40,7 @@ struct InputInfo
         steps = (NestedStep*) realloc(steps, sizeof(NestedStep) * count);
     }
     void toTaggedValue(TaggedValue* value);
+    std::string toShortString();
 };
 
 } // namespace circa

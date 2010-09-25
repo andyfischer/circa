@@ -19,4 +19,16 @@ InputInfo::toTaggedValue(TaggedValue* value)
         make_int(steps_list->get(i), steps[i].index);
 }
 
+std::string
+InputInfo::toShortString()
+{
+    std::stringstream out;
+    out << relativeScope << ":";
+    for (int i=0; i < nestedStepCount; i++) {
+        if (i != 0) out << ",";
+        out << steps[i].index;
+    }
+    return out.str();
+}
+
 } // namespace circa

@@ -298,7 +298,6 @@ CA_FUNCTION(evaluate_if_block)
             evaluate_branch_existing_frame(CONTEXT, STACK, contents, NULL);
 
             // save locals
-            //std::cout << "saving locals, stack = " << STACK->toString() << std::endl;
             swap(STACK->get(STACK->length() - 1), &locals);
             pop_stack_frame(STACK);
 
@@ -309,8 +308,9 @@ CA_FUNCTION(evaluate_if_block)
 
     // Copy the results of our #join terms to the stack
     Branch& joining = contents[contents.length()-1]->nestedContents;
-    List* output = make_list(OUTPUT);
-    output->resize(joining.length());
+
+    TaggedValue outputTv;
+    List* output = make_list(&outputTv, joining.length());
 
     //std::cout << "locals = " << locals.toString() << std::endl;
 
@@ -328,6 +328,8 @@ CA_FUNCTION(evaluate_if_block)
 
         copy(stackValue, output->get(i));
     }
+
+    swap(output, OUTPUT);
 
     //std::cout << "if block fin: " << STACK->toString() << std::endl;
 }
