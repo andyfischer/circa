@@ -334,6 +334,22 @@ void remake_null()
     debug_assert_valid_object(value.value_type, TYPE_OBJECT);
 }
 
+void resize_list_maintains_existing_data()
+{
+    TaggedValue outerTv;
+    List* outer = make_list(&outerTv, 3);
+
+    List* inner = make_list(outer->get(1), 4);
+    TaggedValue* a = inner->get(1);
+    make_int(a, 5);
+
+    test_assert(outer->get(1)->getIndex(1) == a);
+
+    outer->resize(5);
+
+    test_assert(outer->get(1)->getIndex(1) == a);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
@@ -347,6 +363,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
     REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
     REGISTER_TEST_CASE(tagged_value_tests::remake_null);
+    REGISTER_TEST_CASE(tagged_value_tests::resize_list_maintains_existing_data);
 }
 
 }

@@ -5,10 +5,6 @@
 namespace circa {
 namespace for_function {
 
-    CA_FUNCTION(empty_evaluate)
-    {
-    }
-
     void format_heading(StyledSource* source, Term* term)
     {
         append_phrase(source, "for ", term, phrase_type::KEYWORD);
@@ -39,7 +35,7 @@ namespace for_function {
 
     void setup(Branch& kernel)
     {
-        FOR_FUNC = import_function(kernel, empty_evaluate, "for(Indexable) -> List");
+        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         function_t::get_attrs(FOR_FUNC).formatSource = formatSource;
         function_t::set_exposed_name_path(FOR_FUNC, "#rebinds_for_outer");
 

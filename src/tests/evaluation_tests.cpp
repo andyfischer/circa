@@ -7,6 +7,7 @@ namespace evaluation_tests {
 
 void test_evaluate_single_term()
 {
+    #if 0 // TEST_DISABLED
     Branch branch;
     branch.compile("a = 1");
     branch.compile("b = 2");
@@ -18,7 +19,6 @@ void test_evaluate_single_term()
 
     test_assert(as_int(c) == 3);
 
-    #if 0 // TEST_DISABLED
     // Test a term which needs bytecode generation in order to work
     Term* ifBlock = branch.compile("if true c = 5 end");
     evaluate_single_term(ifBlock);

@@ -711,6 +711,7 @@ void Iterator::advance()
 
 void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
 {
+#ifdef BYTECODE
     //std::cout << "running bytecode:" << std::endl;
     //print_bytecode(std::cout, data);
 
@@ -753,7 +754,6 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
                 continue;
             }
             case bytecode::OP_CALL: {
-                #ifdef BYTECODE
                 bytecode::CallOperation *callop = (bytecode::CallOperation*) op;
 
                 EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
@@ -761,7 +761,6 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
 
                 pos += sizeof(bytecode::CallOperation)
                     + sizeof(bytecode::CallOperation::Input)*callop->numInputs;
-                #endif
                 continue;
             }
             case bytecode::OP_JUMP: {
@@ -868,6 +867,7 @@ loop_end:
         std::cout << std::endl << "registers: " << registers->toString() << std::endl;
         std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
     #endif
+#endif
 }
 
 } // namespace bytecode

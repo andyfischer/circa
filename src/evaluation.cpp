@@ -15,21 +15,20 @@
 
 namespace circa {
 
+void evaluate_single_term(EvalContext* context, List* stack, Term* term)
+{
+    EvaluateFunc func = function_t::get_evaluate(term->function);
+    if (func != NULL) 
+        func(context, stack, term);
+}
+
 void evaluate_branch_existing_frame(EvalContext* context, List *stack,
     Branch& branch, TaggedValue* output)
 {
     List* frame = List::checkCast(stack->get(stack->length()-1));
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-
-        //std::cout << "running: " << get_term_to_string_extended(term) << std::endl;
-        //std::cout << "with stack: " << stack->toString() << std::endl;
-
-        EvaluateFunc func = function_t::get_evaluate(term->function);
-        if (func != NULL) 
-            func(context, stack, term);
-    }
+    for (int i=0; i < branch.length(); i++)
+        evaluate_single_term(context, stack, branch[i]);
 
     // Save output value
     if (output != NULL)
@@ -143,43 +142,6 @@ TaggedValue* get_output(List* stack, Term* term)
     List* registers = List::checkCast(stack->get(stack->length()-1));
 
     return registers->get(term->index);
-}
-
-void evaluate_single_term(Term* caller)
-{
-#ifdef BYTECODE
-    int numInputs = caller->numInputs();
-
-    List registers;
-    registers.resize(numInputs + 1);
-
-    // Populate registers with inputs
-    for (int i=0; i < caller->numInputs(); i++)
-        copy(caller->input(i), registers.get(i));
-
-    bytecode::CallOperation *callop = (bytecode::CallOperation*)
-        malloc(sizeof(bytecode::CallOperation)
-                + numInputs*sizeof(bytecode::CallOperation::Input));
-
-    callop->caller = caller;
-    callop->function = caller->function;
-    callop->numInputs = numInputs;
-
-    for (int i=0; i < caller->numInputs(); i++)
-        callop->inputs[i].registerIndex = i;
-
-    callop->outputIndex = numInputs;
-
-    EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
-
-    EvalContext context;
-    func(&context, &registers, callop);
-
-    delete callop;
-
-    // Copy output
-    copy(registers.get(numInputs), caller);
-#endif
 }
 
 List* push_stack_frame(List* stack, int size)

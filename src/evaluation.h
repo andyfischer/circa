@@ -32,7 +32,9 @@ struct EvalContext
 
 };
 
-void evaluate_branch_existing_frame(EvalContext* context, List *stack,
+void evaluate_single_term(EvalContext* context, List* stack, Term* caller);
+
+void evaluate_branch_existing_frame(EvalContext* context, List* stack,
         Branch& branch, TaggedValue* output);
 
 // Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
@@ -58,7 +60,6 @@ void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
 TaggedValue* get_input(List* stack, Term* term, int index);
 TaggedValue* get_output(List* stack, Term* term);
-void evaluate_single_term(Term* caller);
 
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);

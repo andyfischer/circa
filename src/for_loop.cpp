@@ -8,8 +8,8 @@ namespace circa {
 /* Organization of for loop contents:
    [0] #attributes
      [0] #modify_list
-   [1] iterator
-   [2] #inner_rebinds
+   [1] #inner_rebinds
+   [2] iterator
    [...] contents
    [n-1] #outer_rebinds
 */
@@ -272,13 +272,6 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     bytecode::write_get_index(context, inputList, iteratorIndex,
             iteratorTerm->registerIndex);
 
-    // Copy local rebinds to their output slots
-    /*for (int i=0; i < outerRebinds.length(); i++) {
-        Term* outerVersion = get_named_at(outerScope, forTerm->index, outerRebinds[i]->name);
-        ca_assert(outerVersion != NULL);
-        bytecode::write_copy(context, outerVersion->registerIndex, outerRebinds[i]->registerIndex);
-    }*/
-
     // Fetch state for this iteration
     int iterationLocalState = -1;
     if (hasState) {
@@ -345,6 +338,22 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
         int inputs[] = { context->inlineState, stateContainerName, stateContainer };
         bytecode::write_call_op(context, NULL, get_global("set_state_field"), 3, inputs,
                 context->inlineState);
+    }
+}
+
+CA_FUNCTION(evaluate_for_loop)
+{
+    Branch& forContents = CALLER->nestedContents;
+    bool modifyList = as_bool(get_for_loop_modify_list(CALLER));
+    Term* iterator = get_for_loop_iterator(CALLER);
+
+    TaggedValue* inputList = INPUT(0);
+    int inputListLength = inputList->numElements();
+
+    for (int i=0; i < inputListLength; i++) {
+        copy(inputList->getIndex(i), iterator);
+
+        evaluate_branch(CONTEXT, STACK, forContents, NULL);
     }
 }
 

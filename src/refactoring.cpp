@@ -12,10 +12,6 @@ void change_function(Term* term, Term* function)
     if (!is_callable(function))
         throw std::runtime_error("Term "+function->name+" is not callable");
 
-    // Check to specialize function
-    Term* originalFunction = function;
-    function = overloaded_function::statically_specialize_function(function, term->inputs);
-
     term->function = function;
 
     // Check if we need to change the # of inputs
@@ -27,7 +23,7 @@ void change_function(Term* term, Term* function)
     if (newType != ANY_TYPE)
         change_type(term, newType);
 
-    term->setStringProp("syntax:functionName", get_relative_name(term, originalFunction));
+    term->setStringProp("syntax:functionName", get_relative_name(term, function));
 }
 
 void unsafe_change_type(Term *term, Term *type)

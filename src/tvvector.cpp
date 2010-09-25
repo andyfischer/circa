@@ -101,9 +101,17 @@ ListData* increase_capacity(ListData* original, int new_capacity)
     assert_valid_list(original);
     ListData* result = create_list(new_capacity);
 
+    bool createCopy = original->refCount > 1;
+
     result->count = original->count;
-    for (int i=0; i < result->count; i++)
-        copy(&original->items[i], &result->items[i]);
+    for (int i=0; i < result->count; i++) {
+        TaggedValue* left = &original->items[i];
+        TaggedValue* right = &result->items[i];
+        if (createCopy)
+            copy(left, right);
+        else
+            swap(left, right);
+    }
 
     decref(original);
     return result;

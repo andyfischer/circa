@@ -35,18 +35,36 @@ namespace overloaded_function {
         }
 
         // no overload found
-        return func;
+        return NULL;
     }
 
-    CA_FUNCTION(evaluate_overloaded)
+    CA_FUNCTION(evaluate_dynamic_overload)
     {
-        
+    }
+
+    CA_FUNCTION(evaluate_overload)
+    {
+        TaggedValue output;
+        Branch& contents = CALLER->nestedContents;
+        evaluate_branch(CONTEXT, STACK, contents, &output);
+        swap(&output, OUTPUT);
+    }
+
+    void overload_post_input_change(Term* term)
+    {
+        Branch& contents = term->nestedContents;
+        contents.clear();
+
+        Term* specializedFunc = statically_specialize_function(term->function, term->inputs);
+
+        if (specializedFunc != NULL)
+            apply(contents, specializedFunc, term->inputs);
     }
 
     bool is_overloaded_function(Term* func)
     {
         ca_assert(is_function(func));
-        return function_t::get_attrs(func).evaluate == evaluate_overloaded;
+        return function_t::get_attrs(func).evaluate == evaluate_overload;
     }
 
     int num_overloads(Term* func)
@@ -76,7 +94,8 @@ namespace overloaded_function {
         initialize_function(term);
 
         function_t::set_name(term, name);
-        function_t::get_attrs(term).evaluate = evaluate_overloaded;
+        function_t::get_attrs(term).evaluate = evaluate_overload;
+        function_t::get_attrs(term).postInputChange = overload_post_input_change;
 
         List& parameters = function_t::get_attrs(term).parameters;
         parameters.clear();

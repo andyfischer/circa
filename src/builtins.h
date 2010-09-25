@@ -128,8 +128,8 @@ namespace overloaded_function {
     Term* find_overload(Term* func, const char* name);
     Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads);
-    Term* statically_specialize_function(Term* func, RefList const& inputs);
     void append_overload(Term* overloadedFunction, Term* overload);
+    Term* statically_specialize_function(Term* func, RefList const& inputs);
 }
 
 namespace value_function {

@@ -33,14 +33,23 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 
 Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 {
+    int prevHead = branch.length();
 
     Term* result = compile(&branch, step, input);
 
     EvalContext context;
     List stack;
+
+    push_stack_frame(&stack, branch.length());
+
+    // Evaluate all the new terms
+    for (int i=prevHead; i < branch.length(); i++)
+        evaluate_single_term(&context, &stack, branch[i]);
+
     bytecode::update_bytecode(branch);
     evaluate_bytecode(&context, &branch._bytecode, &stack);
-    copy_stack_back_to_terms(branch, &stack);
+
+    pop_stack_frame(&stack);
 
     return result;
 }

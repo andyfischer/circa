@@ -161,10 +161,10 @@ void update_input_info(Term* term, int index)
         walk = get_parent_term(walk);
     }
 
-    // Join terms are not evaluated until their stack frame is gone.
-    if (term->function == JOIN_FUNC) {
+    // Join terms are not evaluated until their stack frame is gone, so account for that
+    // here.
+    if (term->function == JOIN_FUNC)
         info.relativeScope--;
-    }
 }
 
 void post_input_change(Term* term)
