@@ -28,9 +28,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     if (!is_callable(function))
         throw std::runtime_error("Term "+function->name+" is not callable");
 
-    // Try to specialize an overloaded function
-    function = overloaded_function::statically_specialize_function(function, inputs);
-
     // Create the term
     Term* result = branch.appendNew();
 
@@ -68,8 +65,6 @@ void set_input(Term* term, int index, Term* input)
     if (index >= term->inputInfoList.length())
         term->inputInfoList.resize(index+1);
 
-    update_input_info(term, index, input);
-
     // Add 'term' to the user list of input
     if (input != NULL && term != input)
         input->users.appendUnique(term);
@@ -91,10 +86,6 @@ void set_inputs(Term* term, RefList const& inputs)
 
     term->inputInfoList.resize(inputs.length());
 
-    for (int i=0; i < inputs.length(); i++) {
-        update_input_info(term, i, inputs[i]);
-    }
-
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
         if (inputs[i] != NULL)
@@ -110,12 +101,21 @@ void set_inputs(Term* term, RefList const& inputs)
     post_input_change(term);
 }
 
-void update_input_info(Term* term, int index, Term* input)
+bool include_step_in_relative_input_location(Term* step)
+{
+    if (step->name == "#joining")
+        return false;
+    if (get_parent_term(step) && get_parent_term(step)->function == IF_BLOCK_FUNC)
+        return false;
+    return true;
+}
+
+void update_input_info(Term* term, int index)
 {
     InputInfo& info = term->inputInfo(index);
     Term* inputTerm = term->input(index);
 
-    if (input == NULL) {
+    if (inputTerm == NULL) {
         info.relativeScope = -1;
         return;
     }
@@ -123,46 +123,55 @@ void update_input_info(Term* term, int index, Term* input)
     // First find the first common branch.
     Branch* commonBranch = find_first_common_branch(term, inputTerm);
 
+    //std::cout << "common branch: " << std::endl;
+    //dump_branch(*commonBranch);
+
     if (commonBranch == NULL)
         internal_error("No common branch in update_input_info");
 
     // Find the distance from the term to the common branch, this is
     // the relativeScope distance.
     info.relativeScope = 0;
-    Branch* scope = term->owningBranch;
-    while (scope != commonBranch) {
-        info.relativeScope++;
-        scope = get_parent_branch(*scope);
+    Term* walk = term;
+    while (commonBranch->owningTerm != walk) {
+        if (include_step_in_relative_input_location(walk))
+            info.relativeScope++;
+        walk = get_parent_term(walk);
     }
+    info.relativeScope--;
+
+    //std::cout << "update_input_info " << get_term_to_string_extended(term) << ", " << index << std::endl;
 
     // Find the distance from the inputTerm to common branch, if it's non-zero
-    // then the input is nested (such as in a namespace or exposed from an if-block)
+    // then the inputTerm is nested (such as in a namespace or exposed from an if-block)
     int nestedStepCount = 0;
-    scope = inputTerm->owningBranch;
-    while (scope != commonBranch) {
-        nestedStepCount++;
-        scope = get_parent_branch(*scope);
-    }
-
-    Term* walk = inputTerm;
-
-    // Special case for if-block: don't include the step where we find #joining
-    if (get_parent_term(term) != NULL && get_parent_term(term)->name == "#joining") {
-        nestedStepCount--;
-        walk = get_parent_term(term);
+    walk = inputTerm;
+    while (commonBranch->owningTerm != walk) {
+        //std::cout << "walk looking at: " << get_term_to_string_extended(walk) << std::endl;
+        if (include_step_in_relative_input_location(walk)) {
+            //std::cout << "(include)" << std::endl;
+            nestedStepCount++;
+        }
+        walk = get_parent_term(walk);
     }
 
     info.setNestedStepCount(nestedStepCount);
 
-    // Walk from inputTerm to common branch again, this time record the indexes used.
-    for (int i=nestedStepCount-1; i >= 0; i--) {
+    // Walk from inputTerm to common branch again, this time we record the indexes used.
+    walk = inputTerm;
+    int i = nestedStepCount-1;
+    while (commonBranch->owningTerm != walk) {
+        if (include_step_in_relative_input_location(walk))
+            info.steps[i--].index = walk->index;
         walk = get_parent_term(walk);
-        info.steps[i].index = walk->index;
     }
 }
 
 void post_input_change(Term* term)
 {
+    for (int i=0; i < term->numInputs(); i++)
+        update_input_info(term, i);
+
     FunctionAttrs::PostInputChange func = function_t::get_attrs(term->function).postInputChange;
     if (func) {
         func(term);

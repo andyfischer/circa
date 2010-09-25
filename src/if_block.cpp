@@ -33,14 +33,20 @@ void update_if_block_joining_branch(Term* ifCall)
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
 
-    {
-        for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            Term* term = contents[branch_index];
-            Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
+    for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
+        Term* term = contents[branch_index];
+        Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
 
-            TermNamespace::const_iterator it;
-            for (it = branch.names.begin(); it != branch.names.end(); ++it)
-                boundNames.insert(it->first);
+        TermNamespace::const_iterator it;
+        for (it = branch.names.begin(); it != branch.names.end(); ++it) {
+            std::string const& name = it->first;
+
+            // Ignore empty or hidden names
+            if (name == "" || name[0] == '#') {
+                continue;
+            }
+
+            boundNames.insert(it->first);
         }
     }
 
@@ -52,26 +58,16 @@ void update_if_block_joining_branch(Term* ifCall)
     {
         std::string const& name = *it;
 
-        // Ignore hidden names
-        if (name[0] == '#') {
-            boundNames.erase(it++);
-            continue;
-        }
-
         // We only rebind names that are either 1) already bound in the outer scope, or
         // 2) bound in every possible branch.
         
         bool boundInOuterScope = find_named(*outerScope, name) != NULL;
 
-        int numberOfBranchesWithThisName = 0;
         bool boundInEveryBranch = true;
 
         for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            Term* term = contents[branch_index];
-            Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
-            if (branch.contains(name))
-                numberOfBranchesWithThisName++;
-            else
+            Branch& branch = contents[branch_index]->nestedContents;
+            if (!branch.contains(name))
                 boundInEveryBranch = false;
         }
 
@@ -81,6 +77,8 @@ void update_if_block_joining_branch(Term* ifCall)
             ++it;
     }
 
+    int numBranches = contents.length() - 1;
+
     // For each name, create a term that selects the correct version of this name.
     for (std::set<std::string>::const_iterator it = boundNames.begin();
             it != boundNames.end();
@@ -88,7 +86,17 @@ void update_if_block_joining_branch(Term* ifCall)
     {
         std::string const& name = *it;
 
-        apply(joining, JOIN_FUNC, RefList(), name);
+        RefList inputs;
+        inputs.resize(numBranches);
+
+        Term* outerVersion = get_named_at(ifCall, name);
+
+        for (int i=0; i < numBranches; i++) {
+            Term* local = contents[i]->nestedContents[name];
+            inputs[i] = local == NULL ? outerVersion : local;
+        }
+
+        apply(joining, JOIN_FUNC, inputs, name);
     }
 
     // Expose all names in 'joining' branch.
@@ -269,33 +277,34 @@ CA_FUNCTION(evaluate_if_block)
 {
     Branch& contents = CALLER->nestedContents;
 
-    // If-blocks create an extra stack frame, to match up with the way that the contents
-    // are inside two branch levels.
-    push_stack_frame(STACK);
+    List* output = make_list(OUTPUT);
+
+    int acceptedBranchIndex = 0;
 
     for (int i=0; i < contents.length() - 1; i++) {
         Term* branch = contents[i];
+
+        //std::cout << "checking: " << get_term_to_string_extended(branch) << std::endl;
+        //std::cout << "with stack: " << STACK->toString() << std::endl;
+
         if (branch->numInputs() == 0 || as_bool(get_input(STACK, branch, 0))) {
 
-            TaggedValue output;
-            evaluate_branch(CONTEXT, STACK, branch->nestedContents, &output);
-            if (OUTPUT != NULL)
-                swap(&output, OUTPUT);
+            evaluate_branch(CONTEXT, STACK, branch->nestedContents, NULL);
+            acceptedBranchIndex = i;
             break;
         }
     }
 
-    pop_stack_frame(STACK);
-
     // Copy the results of our #join terms to the stack
-    List* output = make_list(OUTPUT);
-
     Branch& joining = contents[contents.length()-1]->nestedContents;
     output->resize(joining.length());
-    for (int i=0; i < joining.length(); i++)
-        swap(joining[i], output->get(i));
+    for (int i=0; i < joining.length(); i++) {
+        Term* joinTerm = joining[i];
+        TaggedValue* stackValue = get_input(STACK, joinTerm, acceptedBranchIndex);
+        copy(stackValue, output->get(i));
+    }
 
-    std::cout << STACK->toString() << std::endl;
+    //std::cout << "if block fin: " << STACK->toString() << std::endl;
 }
 
 } // namespace circa

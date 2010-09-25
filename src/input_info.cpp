@@ -10,11 +10,11 @@ namespace circa {
 void
 InputInfo::toTaggedValue(TaggedValue* value)
 {
-    List* list = make_list(value);
-    list->resize(2);
+    List* list = make_list(value, 2);
     make_int(list->get(0), relativeScope);
-    List* steps_list = make_list(list->get(1));
-    steps_list->resize(nestedStepCount);
+
+    List* steps_list = make_list(list->get(1), nestedStepCount);
+
     for (int i=0; i < nestedStepCount; i++)
         make_int(steps_list->get(i), steps[i].index);
 }

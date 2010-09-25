@@ -677,12 +677,12 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         set_source_hidden(branch.owningTerm, true);
     }
 
-    // Move the if_block term to be after the condition term
-    // TODO: check if this is necessary
+    // Move the if_block term to be after the condition terms.
     branch.moveToEnd(result);
 
     update_if_block_joining_branch(result);
     set_source_location(result, startPosition, tokens);
+
     return result;
 }
 

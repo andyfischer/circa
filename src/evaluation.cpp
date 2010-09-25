@@ -22,6 +22,10 @@ void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedVa
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
+
+        //std::cout << "running: " << get_term_to_string_extended(term) << std::endl;
+        //std::cout << "with stack: " << stack->toString() << std::endl;
+
         EvaluateFunc func = function_t::get_evaluate(term->function);
         if (func != NULL) 
             func(context, stack, term);
@@ -103,7 +107,6 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
 TaggedValue* get_input(List* stack, Term* term, int index)
 {
     InputInfo& input = term->inputInfo(index);
-    Term* inputTerm = term->input(index);
 
     TaggedValue inputTv;
     input.toTaggedValue(&inputTv);
@@ -111,16 +114,21 @@ TaggedValue* get_input(List* stack, Term* term, int index)
     std::cout << "stack = " << stack->toString() << std::endl;
     std::cout << "looking for input = " << inputTv.toString() << std::endl;
 
-    List* registers = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
+    List* frame = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
 
-    TaggedValue* result = registers;
+    std::cout << "frame = " << frame->toString() << std::endl;
+
+    TaggedValue* result = frame;
 
     for (int i=0; i < input.nestedStepCount; i++) {
-        result = result->getIndex(input.steps[i].index);
+        int index = input.steps[i].index;
+        std::cout << "using index: " << index << std::endl;
+        result = result->getIndex(index);
         ca_assert(result != NULL);
+        std::cout << "result is now: " << result->toString() << std::endl;
     }
 
-    result = result->getIndex(inputTerm->index);
+    std::cout << "found = " << result->toString() << std::endl;
 
     return result;
 }

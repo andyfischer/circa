@@ -1,5 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "circa.h"
 #include "cpp_codegen.h"
 
 namespace circa {

@@ -73,6 +73,7 @@ void make_string(TaggedValue* value, std::string const& s);
 void make_bool(TaggedValue* value, bool b);
 void make_ref(TaggedValue* value, Term* t);
 List* make_list(TaggedValue* value);
+List* make_list(TaggedValue* value, int size);
 void make_branch(TaggedValue* value);
 void make_type(TaggedValue* value, Type* type);
 void make_null(TaggedValue* value);

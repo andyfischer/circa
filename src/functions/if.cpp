@@ -11,7 +11,7 @@ namespace if_function {
     {
     }
 
-    CA_DEFINE_FUNCTION(join_function, "join() -> any")
+    CA_DEFINE_FUNCTION(join_function, "join(any...) -> any")
     {
         // Compilation placeholder
     }

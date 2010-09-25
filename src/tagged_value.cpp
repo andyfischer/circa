@@ -397,6 +397,13 @@ List* make_list(TaggedValue* value)
     return List::checkCast(value);
 }
 
+List* make_list(TaggedValue* value, int size)
+{
+    List* list = make_list(value);
+    list->resize(size);
+    return list;
+}
+
 void make_branch(TaggedValue* value)
 {
     change_type(value, NULL_T); // substitute for 'reset'
