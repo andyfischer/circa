@@ -101,15 +101,6 @@ void set_inputs(Term* term, RefList const& inputs)
     post_input_change(term);
 }
 
-bool include_step_in_relative_input_location(Term* term)
-{
-    if (get_parent_term(term) && get_parent_term(term)->function == IF_BLOCK_FUNC)
-        return false;
-    if (term->name == "#joining")
-        return false;
-    return true;
-}
-
 void update_input_info(Term* term, int index)
 {
     InputInfo& info = term->inputInfo(index);
@@ -120,8 +111,40 @@ void update_input_info(Term* term, int index)
         return;
     }
 
-    // First find the first common branch.
+    // Find the first common branch.
     Branch* commonBranch = find_first_common_branch(term, inputTerm);
+
+    // Find the distance from the term to the common branch, this is
+    // the relativeScope distance.
+    info.relativeScope = 0;
+    Term* walk = term;
+    while (commonBranch->owningTerm != walk) {
+
+        // In certain cases, we don't count a scope layer.
+        bool countLayer = true;
+        if (walk->function == IF_BLOCK_FUNC)
+            countLayer = false;
+        else if (walk->name == "#inner_rebinds")
+            countLayer = false;
+        else if (walk->name == "#outer_rebinds")
+            countLayer = false;
+
+        if (countLayer)
+            info.relativeScope++;
+
+        walk = get_parent_term(walk);
+    }
+    info.relativeScope--;
+
+    // Special case for joining terms
+    if (inputTerm->function == JOIN_FUNC) {
+        Term* enclosingBlock = get_parent_term(get_parent_term(inputTerm));
+        info.registerIndex = enclosingBlock->registerIndex + 1 + inputTerm->index;
+    } else {
+        info.registerIndex = inputTerm->registerIndex;
+    }
+
+    #if 0
 
     //std::cout << "common branch: " << std::endl;
     //dump_branch(*commonBranch);
@@ -129,16 +152,6 @@ void update_input_info(Term* term, int index)
     if (commonBranch == NULL)
         internal_error("No common branch in update_input_info");
 
-    // Find the distance from the term to the common branch, this is
-    // the relativeScope distance.
-    info.relativeScope = 0;
-    Term* walk = term;
-    while (commonBranch->owningTerm != walk) {
-        if (include_step_in_relative_input_location(walk))
-            info.relativeScope++;
-        walk = get_parent_term(walk);
-    }
-    info.relativeScope--;
 
     // Find the distance from the inputTerm to common branch; this is usually 1, but
     // it might be greater if the input is nested in a namespace or something.
@@ -165,6 +178,7 @@ void update_input_info(Term* term, int index)
     // here.
     if (term->function == JOIN_FUNC)
         info.relativeScope--;
+    #endif
 }
 
 void post_input_change(Term* term)
@@ -176,6 +190,29 @@ void post_input_change(Term* term)
     if (func) {
         func(term);
     }
+}
+
+void update_register_indices(Branch& branch)
+{
+    int next = 0;
+
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+
+        term->registerIndex = next;
+
+        int registerCount = 1;
+
+        FunctionAttrs::GetRegisterCount getRegisterCount
+            = function_t::get_attrs(term->function).getRegisterCount;
+
+        if (getRegisterCount != NULL)
+            registerCount = getRegisterCount(term);
+
+        next += registerCount;
+    }
+
+    branch.registerCount = next;
 }
 
 bool is_actually_using(Term* user, Term* usee)

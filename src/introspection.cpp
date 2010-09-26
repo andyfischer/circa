@@ -270,6 +270,9 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
     if (term->name != "")
         out << " '" << term->name << "'";
 
+    if (term->registerIndex != -1)
+        out << " r:" << term->registerIndex;
+
     if (term->function == NULL) {
         out << " <NULL function>";
     } else {

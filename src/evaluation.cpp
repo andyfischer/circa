@@ -37,7 +37,7 @@ void evaluate_branch_existing_frame(EvalContext* context, List *stack,
 
 void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output)
 {
-    push_stack_frame(stack, branch.length());
+    push_stack_frame(stack, branch.registerCount);
     evaluate_branch_existing_frame(context, stack, branch, output);
     pop_stack_frame(stack);
 }
@@ -112,36 +112,14 @@ TaggedValue* get_input(List* stack, Term* term, int index)
 {
     InputInfo& input = term->inputInfo(index);
 
-    TaggedValue inputTv;
-    input.toTaggedValue(&inputTv);
-
-    //std::cout << "stack = " << stack->toString() << std::endl;
-    //std::cout << "looking for input = " << inputTv.toString() << std::endl;
-
     List* frame = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
-
-    //std::cout << "frame = " << frame->toString() << std::endl;
-
-    TaggedValue* result = frame;
-
-    for (int i=0; i < input.nestedStepCount; i++) {
-        int index = input.steps[i].index;
-        //std::cout << "using index: " << index << std::endl;
-        result = result->getIndex(index);
-        ca_assert(result != NULL);
-        //std::cout << "result is now: " << result->toString() << std::endl;
-    }
-
-    //std::cout << "found = " << result->toString() << std::endl;
-
-    return result;
+    return frame->get(input.registerIndex);
 }
 
 TaggedValue* get_output(List* stack, Term* term)
 {
-    List* registers = List::checkCast(stack->get(stack->length()-1));
-
-    return registers->get(term->index);
+    List* frame = List::checkCast(stack->get(stack->length()-1));
+    return frame->get(term->registerIndex);
 }
 
 List* push_stack_frame(List* stack, int size)

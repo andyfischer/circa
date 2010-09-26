@@ -15,6 +15,7 @@ struct FunctionAttrs
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
     typedef void (*WriteBytecode)(bytecode::WriteContext*, Term*);
     typedef void (*PostInputChange)(Term*);
+    typedef int (*GetRegisterCount)(Term*);
 
     std::string name;
     Ref outputType;
@@ -35,6 +36,7 @@ struct FunctionAttrs
     StaticTypeQueryFunc staticTypeQuery;
     WriteBytecode writeBytecode;
     PostInputChange postInputChange;
+    GetRegisterCount getRegisterCount;
 
     List parameters;
 

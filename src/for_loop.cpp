@@ -79,15 +79,22 @@ void setup_for_loop_post_code(Term* forTerm)
             continue;
 
         Term* original = get_named_at(forTerm, name);
+
         Term* loopResult = forContents[name];
-        RefList inputs(original, loopResult);
+
+        // First input should be 'original', but we need to wait until after remap_pointers
+        // before setting this.
+        RefList inputs(NULL, loopResult);
 
         Term* innerRebind = apply(innerRebinds, JOIN_FUNC, inputs, name);
         change_type(innerRebind, original->type);
-        apply(outerRebinds, JOIN_FUNC, inputs, name);
+        Term* outerRebind = apply(outerRebinds, JOIN_FUNC, inputs, name);
 
         // Rewrite the loop code to use our local copies of these rebound variables.
         remap_pointers(forContents, original, innerRebind);
+
+        set_input(innerRebind, 0, original);
+        set_input(outerRebind, 0, original);
     }
 
     bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
@@ -344,17 +351,16 @@ CA_FUNCTION(evaluate_for_loop)
 {
     Branch& forContents = CALLER->nestedContents;
     Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
+    Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     bool modifyList = as_bool(get_for_loop_modify_list(CALLER));
     //Term* iterator = get_for_loop_iterator(CALLER);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
-    List locals;
-
     for (int iteration=0; iteration < inputListLength; iteration++) {
 
-        List* frame = push_stack_frame(STACK, forContents.length());
+        List* frame = push_stack_frame(STACK, forContents.registerCount);
 
         // copy iterator
         copy(inputList->getIndex(iteration), frame->get(iterator_location));
@@ -370,15 +376,34 @@ CA_FUNCTION(evaluate_for_loop)
 
         swap(&innerRebindStack, frame->get(inner_rebinds_location));
 
-        //std::cout << "stack before contents: " << STACK->toString() << std::endl;
-        
-        for (int i=iterator_location+1; i < forContents.length(); i++)
+        for (int i=iterator_location+1; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, STACK, forContents[i]);
 
-        // save locals
-        swap(STACK->get(STACK->length() - 1), &locals);
-        pop_stack_frame(STACK);
+        // todo: copy stuff back to inner rebinds
+
+        // If this is the last iteration, don't pop the stack yet, we'll do that
+        // later.
+        if (iteration+1 < inputListLength) {
+            pop_stack_frame(STACK);
+        }
     }
+
+    // Copy the outer rebinds to the output stack frame.
+    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
+
+    for (int i=0; i < outerRebinds.length(); i++) {
+
+        Term* rebindTerm = outerRebinds[i];
+
+        // use the outer version if there were 0 iterations
+        int inputIndex = inputListLength == 0 ? 0 : 1;
+
+        TaggedValue* result = get_input(STACK, rebindTerm, inputIndex);
+        int registerIndex = CALLER->registerIndex + 1 + i;
+        copy(result, outputFrame->get(registerIndex));
+    }
+
+    pop_stack_frame(STACK);
 }
 
 } // namespace circa

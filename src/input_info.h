@@ -6,40 +6,13 @@ namespace circa {
 
 struct InputInfo
 {
-    struct NestedStep {
-        int index;
-    };
-
     int relativeScope;
-
-    int nestedStepCount;
-    NestedStep *steps;
+    int registerIndex;
 
     InputInfo()
-      : relativeScope(0), nestedStepCount(0), steps(NULL)
+      : relativeScope(0), registerIndex(0)
     {}
 
-    InputInfo(InputInfo const& copy)
-    {
-        relativeScope = copy.relativeScope;
-        nestedStepCount = copy.nestedStepCount;
-        size_t steps_size = copy.nestedStepCount*sizeof(InputInfo);
-        steps = (NestedStep*) malloc(steps_size);
-        memcpy(steps, copy.steps, steps_size);
-    }
-
-    ~InputInfo()
-    {
-        free(steps);
-    }
-
-
-    void setNestedStepCount(int count)
-    {
-        nestedStepCount = count;
-        steps = (NestedStep*) realloc(steps, sizeof(NestedStep) * count);
-    }
-    void toTaggedValue(TaggedValue* value);
     std::string toShortString();
 };
 

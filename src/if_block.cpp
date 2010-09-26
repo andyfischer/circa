@@ -279,8 +279,6 @@ CA_FUNCTION(evaluate_if_block)
 
     int acceptedBranchIndex = 0;
 
-    List locals;
-
     for (int i=0; i < contents.length() - 1; i++) {
         Term* branch = contents[i];
 
@@ -291,15 +289,8 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
-            //std::cout << "running branch: " << std::endl;
-            //dump_branch(contents);
-
-            push_stack_frame(STACK, contents.length());
+            push_stack_frame(STACK, contents.registerCount);
             evaluate_branch_existing_frame(CONTEXT, STACK, contents, NULL);
-
-            // save locals
-            swap(STACK->get(STACK->length() - 1), &locals);
-            pop_stack_frame(STACK);
 
             acceptedBranchIndex = i;
             break;
@@ -308,30 +299,16 @@ CA_FUNCTION(evaluate_if_block)
 
     // Copy the results of our #join terms to the stack
     Branch& joining = contents[contents.length()-1]->nestedContents;
-
-    TaggedValue outputTv;
-    List* output = make_list(&outputTv, joining.length());
-
-    //std::cout << "locals = " << locals.toString() << std::endl;
+    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        InputInfo& inputLoc = joinTerm->inputInfo(acceptedBranchIndex);
-        TaggedValue* stackValue;
-        if (inputLoc.relativeScope == -1)
-            stackValue = locals.get(inputLoc.steps[0].index);
-        else
-            stackValue = get_input(STACK, joinTerm, acceptedBranchIndex);
-
-        //std::cout << "copying join, stack = " << STACK->toString() << std::endl;
-        //std::cout << "output = " << output->toString() << std::endl;
-
-        copy(stackValue, output->get(i));
+        TaggedValue* val = get_input(STACK, joinTerm, acceptedBranchIndex);
+        int registerIndex = CALLER->registerIndex + 1 + i;
+        copy(val, outputFrame->get(registerIndex));
     }
 
-    swap(output, OUTPUT);
-
-    //std::cout << "if block fin: " << STACK->toString() << std::endl;
+    pop_stack_frame(STACK);
 }
 
 } // namespace circa

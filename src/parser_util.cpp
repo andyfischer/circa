@@ -91,6 +91,8 @@ void post_parse_branch(Branch& branch)
     // Remove NULLs
     branch.removeNulls();
 
+    update_register_indices(branch);
+
     // Update input info on all terms
     for (BranchIterator it(branch); !it.finished(); ++it) {
         post_input_change(*it);
