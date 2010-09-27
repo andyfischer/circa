@@ -118,59 +118,25 @@ void test_set_input()
     test_assert(b->users[0] == a);
 }
 
-void test_relative_input_locations()
+void test_get_relative_input_scope()
 {
     Branch branch;
-    branch.compile("a = 1");
-
+    create_int(branch, 1, "a");
     Term* b = branch.compile("b = sqr(a)");
-    test_equals(b->inputInfo(0).toShortString(), "0:0");
+    test_equals(get_input_relative_scope(b, 0), 0);
 
-    Term* c = branch.compile("c = sqr(b)");
-    test_equals(c->inputInfo(0).toShortString(), "0:1");
-
-    // Upvals
     Branch& b1 = create_branch(branch);
+    Term* c = b1.compile("c = sqr(a)");
+    test_equals(get_input_relative_scope(c, 0), 1);
+
     Branch& b2 = create_branch(b1);
+    Term* d = b2.compile("d = sqr(a)");
+    test_equals(get_input_relative_scope(d, 0), 2);
 
-    Term* d = b2.compile("d = sqr(c)");
-    test_equals(d->inputInfo(0).toShortString(), "2:2");
-
-    // Nested values
-#if 0
-    // TODO: Need to change namespaces so that they don't need intermediate get_field terms
-    Branch& ns1 = create_namespace(branch, "ns1");
-    Branch& ns2 = create_namespace(ns1, "ns2");
-    create_int(ns2, 5, "e");
-    Term* f = branch.compile("sqr(ns1.ns2.e)");
-    f->inputInfo(0).toTaggedValue(&tv);
-    test_equals(tv.toString(), "[0, [4, 0, 0]]");
-#endif
-
-}
-
-void test_relative_input_locations_in_if_block()
-{
-    Branch branch;
-
-    branch.compile("a = 1");
-    Term* ifBlock = branch.compile("if true b = sqr(a); a = 2; end");
-    Term* firstCondition = ifBlock->nestedContents[0];
-    Term* inner_a = ifBlock->nestedContents[0]->nestedContents["a"];
-    Term* inner_b = ifBlock->nestedContents[0]->nestedContents["b"];
-    test_assert(inner_a->name == "a");
-    Term* join_a = ifBlock->nestedContents[2]->nestedContents[0];
-    test_assert(join_a->name == "a");
-    Term* g = branch.compile("sqr(a)");
-
-    test_equals(firstCondition->inputInfo(0).toShortString(), "0:1");
-
-    test_equals(inner_b->inputInfo(0).toShortString(), "1:0");
-
-    test_equals(g->inputInfo(0).toShortString(), "0:2");
-
-    test_equals(join_a->inputInfo(0).toShortString(), "0:1");
-    test_equals(join_a->inputInfo(1).toShortString(), "0:0");
+    branch.compile("e = 1");
+    branch.compile("if true e = 2 end");
+    Term* f = branch.compile("f = sqr(e)");
+    test_equals(get_input_relative_scope(f, 0), 0);
 }
 
 void register_tests()
@@ -182,8 +148,7 @@ void register_tests()
     REGISTER_TEST_CASE(building_tests::test_rewrite_as_value);
     REGISTER_TEST_CASE(building_tests::test_procure);
     REGISTER_TEST_CASE(building_tests::test_set_input);
-    REGISTER_TEST_CASE(building_tests::test_relative_input_locations);
-    REGISTER_TEST_CASE(building_tests::test_relative_input_locations_in_if_block);
+    REGISTER_TEST_CASE(building_tests::test_get_relative_input_scope);
 }
 
 } // namespace building_tests

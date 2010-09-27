@@ -101,46 +101,71 @@ void set_inputs(Term* term, RefList const& inputs)
     post_input_change(term);
 }
 
-void update_input_info(Term* term, int index)
+int get_input_relative_scope(Term* term, int index)
 {
-    InputInfo& info = term->inputInfo(index);
     Term* inputTerm = term->input(index);
 
-    if (inputTerm == NULL) {
-        info.relativeScope = -1;
-        return;
+    if (inputTerm == NULL)
+        return -1;
+
+    Branch* rootScope = inputTerm->owningBranch;
+
+    ca_assert(rootScope != NULL);
+
+    // Special case for if-blocks: if a join term is trying to reach a term inside
+    // an if-branch, then it's relative scope 0.
+    
+    Term* termParent = get_parent_term(term);
+    Term* inputParent = get_parent_term(inputTerm);
+    Term* input2ndParent = inputParent == NULL ? NULL : get_parent_term(inputParent);
+
+    if (termParent != NULL && termParent->name == "#joining"
+            && input2ndParent != NULL && input2ndParent->function == IF_BLOCK_FUNC) {
+        return 0;
     }
 
-    // Find the first common branch.
-    Branch* commonBranch = find_first_common_branch(term, inputTerm);
+    // Otherwise, if a term is inside an if_block #joining, use the if_block's parent
+    // as rootScope.
+    if (inputParent != NULL && inputParent->name == "#joining"
+            && input2ndParent != NULL && input2ndParent->function == IF_BLOCK_FUNC)
+        rootScope = input2ndParent->owningBranch;
 
-    // Find the distance from the term to the common branch, this is
-    // the relativeScope distance.
-    info.relativeScope = 0;
-    Term* walk = term;
-    while (commonBranch->owningTerm != walk) {
+    // Walk upwards from 'term' until we find the root branch.
+    int relativeScope = 0;
+    Branch* scope = term->owningBranch;
+    while (scope != rootScope) {
+
+        if (scope == NULL && rootScope != NULL) {
+            //internal_error("Couldn't reach root scope from term");
+            //FIXME
+            return -1;
+        }
 
         // In certain cases, we don't count a scope layer.
         bool countLayer = true;
-        if (walk->function == IF_BLOCK_FUNC)
+        Term* parentTerm = scope->owningTerm;
+
+        if (parentTerm == NULL)
+            countLayer = true;
+        else if (parentTerm->function == IF_BLOCK_FUNC)
             countLayer = false;
-        else if (walk->name == "#inner_rebinds")
+        else if (parentTerm->name == "#inner_rebinds")
             countLayer = false;
-        else if (walk->name == "#outer_rebinds")
+        else if (parentTerm->name == "#outer_rebinds")
             countLayer = false;
 
         if (countLayer)
-            info.relativeScope++;
+            relativeScope++;
 
-        walk = get_parent_term(walk);
+        scope = get_parent_branch(*scope);
     }
-    info.relativeScope--;
+    return relativeScope;
 }
 
 void post_input_change(Term* term)
 {
     for (int i=0; i < term->numInputs(); i++)
-        update_input_info(term, i);
+        term->inputInfo(i).relativeScope = get_input_relative_scope(term, i);
 
     FunctionAttrs::PostInputChange func = function_t::get_attrs(term->function).postInputChange;
     if (func) {
