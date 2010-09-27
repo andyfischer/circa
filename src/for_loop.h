@@ -17,5 +17,6 @@ Term* find_enclosing_for_loop(Term* term);
 void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm);
 
 CA_FUNCTION(evaluate_for_loop);
+void for_loop_assign_registers(Term* term);
 
 } // namespace circa

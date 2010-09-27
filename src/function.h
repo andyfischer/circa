@@ -16,6 +16,7 @@ struct FunctionAttrs
     typedef void (*WriteBytecode)(bytecode::WriteContext*, Term*);
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetRegisterCount)(Term*);
+    typedef void (*AssignRegisters)(Term*);
 
     std::string name;
     Ref outputType;
@@ -37,6 +38,7 @@ struct FunctionAttrs
     WriteBytecode writeBytecode;
     PostInputChange postInputChange;
     GetRegisterCount getRegisterCount;
+    AssignRegisters assignRegisters;
 
     List parameters;
 

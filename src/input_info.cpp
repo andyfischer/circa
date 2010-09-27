@@ -12,7 +12,7 @@ InputInfo::toShortString()
 {
     std::stringstream out;
     out << relativeScope << ":";
-    out << index;
+    out << registerIndex;
     return out.str();
 }
 

@@ -136,49 +136,7 @@ void update_input_info(Term* term, int index)
     }
     info.relativeScope--;
 
-    // Special case for joining terms
-    if (inputTerm->function == JOIN_FUNC) {
-        Term* enclosingBlock = get_parent_term(get_parent_term(inputTerm));
-        info.registerIndex = enclosingBlock->registerIndex + 1 + inputTerm->index;
-    } else {
-        info.registerIndex = inputTerm->registerIndex;
-    }
-
-    #if 0
-
-    //std::cout << "common branch: " << std::endl;
-    //dump_branch(*commonBranch);
-
-    if (commonBranch == NULL)
-        internal_error("No common branch in update_input_info");
-
-
-    // Find the distance from the inputTerm to common branch; this is usually 1, but
-    // it might be greater if the input is nested in a namespace or something.
-    int nestedStepCount = 0;
-    walk = inputTerm;
-    while (commonBranch->owningTerm != walk) {
-        if (include_step_in_relative_input_location(walk))
-            nestedStepCount++;
-        walk = get_parent_term(walk);
-    }
-
-    info.setNestedStepCount(nestedStepCount);
-
-    // Walk from inputTerm to common branch again, this time we record the indexes used.
-    walk = inputTerm;
-    int i = nestedStepCount-1;
-    while (commonBranch->owningTerm != walk) {
-        if (include_step_in_relative_input_location(walk))
-            info.steps[i--].index = walk->index;
-        walk = get_parent_term(walk);
-    }
-
-    // Join terms are not evaluated until their stack frame is gone, so account for that
-    // here.
-    if (term->function == JOIN_FUNC)
-        info.relativeScope--;
-    #endif
+    info.registerIndex = inputTerm->registerIndex;
 }
 
 void post_input_change(Term* term)
@@ -194,25 +152,51 @@ void post_input_change(Term* term)
 
 void update_register_indices(Branch& branch)
 {
+    // Check if the owning function overrides assignRegisters
+    if (branch.owningTerm != NULL) {
+        FunctionAttrs::AssignRegisters assignRegisters =
+            function_t::get_attrs(branch.owningTerm->function).assignRegisters;
+        if (assignRegisters != NULL) {
+            assignRegisters(branch.owningTerm);
+            return;
+        }
+    }
+
     int next = 0;
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
-
-        term->registerIndex = next;
-
-        int registerCount = 1;
-
-        FunctionAttrs::GetRegisterCount getRegisterCount
-            = function_t::get_attrs(term->function).getRegisterCount;
-
-        if (getRegisterCount != NULL)
-            registerCount = getRegisterCount(term);
-
-        next += registerCount;
+        next = assign_register(term, next);
     }
 
     branch.registerCount = next;
+}
+
+int assign_register(Term* term, int nextRegister)
+{
+    FunctionAttrs::GetRegisterCount getRegisterCount
+        = function_t::get_attrs(term->function).getRegisterCount;
+
+    int registerCount;
+    if (getRegisterCount == NULL) {
+        // Default behavior if getRegisterCount is not defined: 0 registers
+        // for a term with Void output, 1 register otherwise.
+        registerCount = term->type == VOID_TYPE ? 0 : 1;
+    } else {
+        registerCount = getRegisterCount(term);
+    }
+
+    if (registerCount == 0)
+        term->registerIndex = -1;
+    else
+        term->registerIndex = nextRegister;
+
+    // Some terms have inner registers that need to be changed along with the
+    // outer registerIndex.
+    if (term->function == IF_BLOCK_FUNC || term->function == FOR_FUNC)
+        update_register_indices(term->nestedContents);
+
+    return nextRegister + registerCount;
 }
 
 bool is_actually_using(Term* user, Term* usee)

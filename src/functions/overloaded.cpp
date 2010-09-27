@@ -59,6 +59,8 @@ namespace overloaded_function {
 
         if (specializedFunc != NULL)
             apply(contents, specializedFunc, term->inputs);
+
+        update_register_indices(contents);
     }
 
     bool is_overloaded_function(Term* func)

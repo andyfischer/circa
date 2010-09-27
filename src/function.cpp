@@ -16,7 +16,8 @@ FunctionAttrs::FunctionAttrs()
     staticTypeQuery(NULL),
     writeBytecode(NULL),
     postInputChange(NULL),
-    getRegisterCount(NULL)
+    getRegisterCount(NULL),
+    assignRegisters(NULL)
 {
     debug_register_valid_object(this, FUNCTION_ATTRS_OBJECT);
 }

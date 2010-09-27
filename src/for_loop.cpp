@@ -16,10 +16,11 @@ namespace circa {
 
 static const int inner_rebinds_location = 1;
 static const int iterator_location = 2;
+static const int loop_contents_location = 3;
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return forTerm->nestedContents[inner_rebinds_location];
+    return forTerm->nestedContents[iterator_location];
 }
 
 Term* get_for_loop_modify_list(Term* forTerm)
@@ -82,13 +83,11 @@ void setup_for_loop_post_code(Term* forTerm)
 
         Term* loopResult = forContents[name];
 
-        // First input should be 'original', but we need to wait until after remap_pointers
-        // before setting this.
-        RefList inputs(NULL, loopResult);
-
-        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, inputs, name);
+        // First input to both of these should be 'original', but we need to wait until
+        // after remap_pointers before setting this.
+        Term* innerRebind = apply(innerRebinds, JOIN_FUNC, RefList(NULL, loopResult), name);
         change_type(innerRebind, original->type);
-        Term* outerRebind = apply(outerRebinds, JOIN_FUNC, inputs, name);
+        Term* outerRebind = apply(outerRebinds, JOIN_FUNC, RefList(NULL, loopResult), name);
 
         // Rewrite the loop code to use our local copies of these rebound variables.
         remap_pointers(forContents, original, innerRebind);
@@ -103,6 +102,7 @@ void setup_for_loop_post_code(Term* forTerm)
         apply(outerRebinds, JOIN_FUNC, RefList(), listName);
 
     expose_all_names(outerRebinds, outerScope);
+    update_register_indices(forContents);
 }
 
 Term* find_enclosing_for_loop(Term* term)
@@ -353,37 +353,42 @@ CA_FUNCTION(evaluate_for_loop)
     Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     bool modifyList = as_bool(get_for_loop_modify_list(CALLER));
-    //Term* iterator = get_for_loop_iterator(CALLER);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
+    List previousFrame;
+
     for (int iteration=0; iteration < inputListLength; iteration++) {
+        bool firstIter = iteration == 0;
+        bool lastIter = iteration + 1 >= inputListLength;
 
         List* frame = push_stack_frame(STACK, forContents.registerCount);
 
         // copy iterator
-        copy(inputList->getIndex(iteration), frame->get(iterator_location));
-
-        List innerRebindStack;
-        innerRebindStack.resize(innerRebinds.length());
+        copy(inputList->getIndex(iteration), frame->get(0));
 
         // copy inner rebinds
         for (int i=0; i < innerRebinds.length(); i++) {
             Term* rebindTerm = innerRebinds[i];
-            copy(get_input(STACK, rebindTerm, 0), innerRebindStack.get(i));
+            TaggedValue* dest = frame->get(rebindTerm->registerIndex);
+
+            if (firstIter)
+                copy(get_input(STACK, rebindTerm, 0), dest);
+            else
+                copy(previousFrame.get(rebindTerm->input(1)->registerIndex), dest);
         }
 
-        swap(&innerRebindStack, frame->get(inner_rebinds_location));
-
-        for (int i=iterator_location+1; i < forContents.length() - 1; i++)
+        for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
             evaluate_single_term(CONTEXT, STACK, forContents[i]);
+        }
 
-        // todo: copy stuff back to inner rebinds
+        frame = List::checkCast(STACK->get(STACK->numElements() - 1));
 
-        // If this is the last iteration, don't pop the stack yet, we'll do that
-        // later.
-        if (iteration+1 < inputListLength) {
+        if (!lastIter) {
+            // Only pop the stack if this isn't the last iteration; if it's the last
+            // iter then we do it later.
+            swap(frame, &previousFrame);
             pop_stack_frame(STACK);
         }
     }
@@ -404,6 +409,34 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     pop_stack_frame(STACK);
+}
+
+void for_loop_assign_registers(Term* term)
+{
+    int next = 0;
+
+    // Iterator goes in register 0
+    Term* iterator = get_for_loop_iterator(term);
+    next = assign_register(iterator, next);
+
+    // Inner_rebinds go in 1..n
+    Branch& forContents = term->nestedContents;
+    Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
+
+    for (int i=0; i < innerRebinds.length(); i++)
+        next = assign_register(innerRebinds[i], next);
+
+    for (int i=loop_contents_location; i < forContents.length() - 1; i++)
+        next = assign_register(forContents[i], next);
+
+    if (forContents["#outer_rebinds"] != NULL) {
+        Branch& outerRebinds = forContents["#outer_rebinds"]->nestedContents;
+        for (int i=0; i < outerRebinds.length(); i++) {
+            outerRebinds[i]->registerIndex = term->registerIndex + 1 + i;
+        }
+    }
+
+    forContents.registerCount = next;
 }
 
 } // namespace circa
