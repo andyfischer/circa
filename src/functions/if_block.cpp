@@ -44,11 +44,21 @@ namespace if_block_function {
         return outerRebinds.length() + 1;
     }
 
+    void if_block_assign_registers(Term* term)
+    {
+        Branch& joining = term->nestedContents["#joining"]->nestedContents;
+
+        for (int i=0; i < joining.length(); i++) {
+            joining[i]->registerIndex = term->registerIndex + 1 + i;
+        }
+    }
+
     void setup(Branch& kernel)
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block()");
         function_t::get_attrs(IF_BLOCK_FUNC).formatSource = formatSource;
         function_t::get_attrs(IF_BLOCK_FUNC).getRegisterCount = get_register_count;
+        function_t::get_attrs(IF_BLOCK_FUNC).assignRegisters = if_block_assign_registers;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
     }
 }

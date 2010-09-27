@@ -135,8 +135,6 @@ void update_input_info(Term* term, int index)
         walk = get_parent_term(walk);
     }
     info.relativeScope--;
-
-    info.registerIndex = inputTerm->registerIndex;
 }
 
 void post_input_change(Term* term)

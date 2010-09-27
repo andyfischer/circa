@@ -113,7 +113,7 @@ TaggedValue* get_input(List* stack, Term* term, int index)
     InputInfo& input = term->inputInfo(index);
 
     List* frame = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
-    return frame->get(input.registerIndex);
+    return frame->get(term->input(index)->registerIndex);
 }
 
 TaggedValue* get_output(List* stack, Term* term)

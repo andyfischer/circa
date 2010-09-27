@@ -11,8 +11,7 @@ std::string
 InputInfo::toShortString()
 {
     std::stringstream out;
-    out << relativeScope << ":";
-    out << registerIndex;
+    out << "-" << relativeScope;
     return out.str();
 }
 

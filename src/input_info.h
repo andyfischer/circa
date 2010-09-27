@@ -7,10 +7,9 @@ namespace circa {
 struct InputInfo
 {
     int relativeScope;
-    int registerIndex;
 
     InputInfo()
-      : relativeScope(0), registerIndex(0)
+      : relativeScope(0)
     {}
 
     std::string toShortString();

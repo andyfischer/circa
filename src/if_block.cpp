@@ -304,8 +304,7 @@ CA_FUNCTION(evaluate_if_block)
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
         TaggedValue* val = get_input(STACK, joinTerm, acceptedBranchIndex);
-        int registerIndex = CALLER->registerIndex + 1 + i;
-        copy(val, outputFrame->get(registerIndex));
+        copy(val, outputFrame->get(joinTerm->registerIndex));
     }
 
     pop_stack_frame(STACK);
