@@ -131,30 +131,21 @@ void pop_stack_frame(List* stack)
     stack->resize(stack->length() - 1);
 }
 
-void evaluate_in_place(Term* term)
+void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
 {
-    EvalContext context;
-    List stack;
-    stack.resize(1);
-
     Branch& branch = *term->owningBranch;
 
-    List* frame = push_stack_frame(&stack, branch.registerCount);
+    // Check each input.
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+        if (input == NULL)
+            continue;
+        int relativeScope = term->inputInfo(i).relativeScope;
 
-    // upload values to stack
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-        if (term->registerIndex != -1)
-            copy(term, frame->get(term->registerIndex));
-    }
-
-    evaluate_single_term(&context, &stack, term);
-
-    // copy from stack back to terms
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-        if (term->registerIndex != -1)
-            copy(frame->get(term->registerIndex), term);
+        // Check to add more stack frames.
+        while (stack->length() < (relativeScope + 1)) {
+            stack->prepend();
+        }
     }
 }
 

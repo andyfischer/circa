@@ -13,7 +13,7 @@ void test_evaluate_in_place()
     Term* c = branch.compile("add_i(a,b)");
     test_assert(as_int(c) == 0);
 
-    evaluate_in_place(c);
+    //evaluate_in_place(c);
     test_assert(as_int(c) == 2);
 }
 

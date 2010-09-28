@@ -64,6 +64,9 @@ TaggedValue* get_output(List* stack, Term* term);
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);
 
-void evaluate_in_place(Term* term);
+// Before evaluating the term, we'll check each input to see if it's not-null on
+// the stack (or if the stack frame is missing). Any missing values will get
+// copied from their respective terms.
+void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term);
 
 } // namespace circa

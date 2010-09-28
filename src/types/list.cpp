@@ -7,302 +7,560 @@
 #include "builtin_types.h"
 #include "debug_valid_objects.h"
 #include "tagged_value.h"
-#include "tvvector.h"
 #include "testing.h"
 
 #include "type.h"
 
 #include "list.h"
 
-using namespace circa::tvvector;
-
 namespace circa {
 namespace list_t {
 
-bool is_list(TaggedValue* value);
-void tv_touch(TaggedValue* value);
+    struct ListData {
+        int refCount;
+        int count;
+        int capacity;
+        TaggedValue items[0];
+        // items has size [capacity].
+    };
 
-void resize(TaggedValue* list, int newSize)
-{
-    ca_assert(is_list(list));
-    set_pointer(list, resize((ListData*) get_pointer(list), newSize));
-}
+    ListData* touch(ListData* original);
 
-void clear(TaggedValue* list)
-{
-    ca_assert(is_list(list));
-    clear((ListData**) &list->value_data);
-}
-
-TaggedValue* append(TaggedValue* list)
-{
-    ca_assert(is_list(list));
-    return append((ListData**) &list->value_data);
-}
-
-void tv_initialize(Type* type, TaggedValue* value)
-{
-    ca_assert(value->value_data.ptr == NULL);
-
-    // If type has a prototype then initialize to that.
-    Branch& prototype = type_t::get_prototype(type);
-    if (prototype.length() > 0) {
-        List* list = List::checkCast(value);
-        list->resize(prototype.length());
-
-        for (int i=0; i < prototype.length(); i++)
-            change_type(list->get(i), type_contents(prototype[i]->type));
+    void assert_valid_list(ListData* list)
+    {
+        if (list == NULL) return;
+        debug_assert_valid_object(list, LIST_OBJECT);
+        if (list->refCount == 0) {
+            std::stringstream err;
+            err << "list has zero refs: " << list;
+            internal_error(err.str().c_str());
+        }
+        ca_assert(list->refCount > 0);
     }
-}
 
-void tv_release(TaggedValue* value)
-{
-    ca_assert(is_list(value));
-    ListData* data = (ListData*) get_pointer(value);
-    if (data == NULL) return;
-    decref(data);
-}
+    void incref(ListData* data)
+    {
+        assert_valid_list(data);
+        data->refCount++;
 
-void tv_copy(TaggedValue* source, TaggedValue* dest)
-{
-    ca_assert(is_list(source));
-    ca_assert(is_list(dest));
-    ListData* s = (ListData*) get_pointer(source);
-    ListData* d = (ListData*) get_pointer(dest);
+        //std::cout << "incref " << data << " to " << data->refCount << std::endl;
+    }
 
-#if DISABLE_LIST_VALUE_SHARING
-    if (d != NULL) decref(d);
-    set_pointer(dest, tvvector::duplicate(s));
-#else
-    if (s != NULL) incref(s);
-    if (d != NULL) decref(d);
-    set_pointer(dest, s);
-#endif
-}
+    void decref(ListData* data)
+    {
+        assert_valid_list(data);
+        ca_assert(data->refCount > 0);
+        data->refCount--;
 
-bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
-{
-    ca_assert(is_list(leftValue));
-    Type* rhsType = right->value_type;
-    if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
-        return false;
+        if (data->refCount == 0) {
+            // Release all elements
+            for (int i=0; i < data->count; i++)
+                make_null(&data->items[i]);
+            free(data);
+            debug_unregister_valid_object(data);
+        }
 
-    List* left = List::checkCast(leftValue);
+        //std::cout << "decref " << data << " to " << data->refCount << std::endl;
+    }
 
-    int leftCount = left->numElements();
+    ListData* create_list(int capacity)
+    {
+        ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
+        debug_register_valid_object(result, LIST_OBJECT);
 
-    if (leftCount != right->numElements())
-        return false;
+        result->refCount = 1;
+        result->count = 0;
+        result->capacity = capacity;
+        memset(result->items, 0, capacity * sizeof(TaggedValue));
+        for (int i=0; i < capacity; i++)
+            result->items[i].init();
 
-    for (int i=0; i < leftCount; i++) {
-        if (!circa::equals(left->get(i), right->getIndex(i)))
+        //std::cout << "created list " << result << std::endl;
+
+        return result;
+    }
+
+    ListData* duplicate(ListData* source)
+    {
+        if (source == NULL || source->count == 0)
+            return NULL;
+
+        assert_valid_list(source);
+
+        ListData* result = create_list(source->capacity);
+
+        result->count = source->count;
+
+        for (int i=0; i < source->count; i++)
+            copy(&source->items[i], &result->items[i]);
+
+        return result;
+    }
+
+    ListData* increase_capacity(ListData* original, int new_capacity)
+    {
+        if (original == NULL)
+            return create_list(new_capacity);
+
+        assert_valid_list(original);
+        ListData* result = create_list(new_capacity);
+
+        bool createCopy = original->refCount > 1;
+
+        result->count = original->count;
+        for (int i=0; i < result->count; i++) {
+            TaggedValue* left = &original->items[i];
+            TaggedValue* right = &result->items[i];
+            if (createCopy)
+                copy(left, right);
+            else
+                swap(left, right);
+        }
+
+        decref(original);
+        return result;
+    }
+
+    ListData* double_capacity(ListData* original)
+    {
+        if (original == NULL)
+            return create_list(1);
+
+        ListData* result = increase_capacity(original, original->capacity * 2);
+        return result;
+    }
+
+    ListData* resize(ListData* original, int numElements)
+    {
+        if (original == NULL) {
+            if (numElements == 0)
+                return NULL;
+            ListData* result = create_list(numElements);
+            result->count = numElements;
+            return result;
+        }
+
+        if (numElements == 0) {
+            decref(original);
+            return NULL;
+        }
+
+        // Check for not enough capacity
+        if (numElements > original->capacity) {
+            ListData* result = increase_capacity(original, numElements);
+            result->count = numElements;
+            return result;
+        }
+
+        if (original->count == numElements)
+            return original;
+
+        // Capacity is good, will need to modify 'count' on list and possibly
+        // set some items to null. This counts as a modification.
+        ListData* result = touch(original);
+
+        // Possibly set extra elements to null, if we are shrinking.
+        for (int i=numElements; i < result->count; i++)
+            make_null(&result->items[i]);
+        result->count = numElements;
+
+        return result;
+    }
+
+    void clear(ListData** data)
+    {
+        if (*data == NULL) return;
+        decref(*data);
+        *data = NULL;
+    }
+
+    ListData* touch(ListData* original)
+    {
+        if (original == NULL)
+            return NULL;
+        ca_assert(original->refCount > 0);
+        if (original->refCount == 1)
+            return original;
+
+        ListData* copy = duplicate(original);
+        decref(original);
+        return copy;
+    }
+
+    TaggedValue* append(ListData** data)
+    {
+        if (*data == NULL) {
+            *data = create_list(1);
+        } else {
+            *data = touch(*data);
+            
+            if ((*data)->count == (*data)->capacity)
+                *data = double_capacity(*data);
+        }
+
+        ListData* d = *data;
+        d->count++;
+        return &d->items[d->count - 1];
+    }
+
+    TaggedValue* get_index(ListData* list, int index)
+    {
+        if (list == NULL)
+            return NULL;
+        if (index >= list->count)
+            return NULL;
+        return &list->items[index];
+    }
+
+    void set_index(ListData** data, int index, TaggedValue* v)
+    {
+        *data = touch(*data);
+        copy(v, get_index(*data, index));
+    }
+
+    int num_elements(ListData* list)
+    {
+        if (list == NULL) return 0;
+        return list->count;
+    }
+
+    int refcount(ListData* value)
+    {
+        if (value == NULL) return 0;
+        return value->refCount;
+    }
+
+    void remove_and_replace_with_back(ListData** data, int index)
+    {
+        *data = touch(*data);
+        ca_assert(index < (*data)->count);
+
+        make_null(&(*data)->items[index]);
+
+        int lastElement = (*data)->count - 1;
+        if (index < lastElement)
+            swap(&(*data)->items[index], &(*data)->items[lastElement]);
+
+        (*data)->count--;
+    }
+
+    TaggedValue* prepend(ListData** data)
+    {
+        append(data);
+
+        ListData* d = *data;
+
+        for (int i=d->count - 1; i >= 1; i++)
+            swap(&d->items[i], &d->items[i - 1]);
+
+        return &d->items[0];
+    }
+
+    std::string to_string(ListData* value)
+    {
+        if (value == NULL)
+            return "[]";
+
+        std::stringstream out;
+        out << "[";
+        for (int i=0; i < value->count; i++) {
+            if (i > 0) out << ", ";
+            out << to_string(&value->items[i]);
+        }
+        out << "]";
+        return out.str();
+    }
+
+    // TaggedValue wrappers
+    bool is_list(TaggedValue* value);
+    void tv_touch(TaggedValue* value);
+
+    void resize(TaggedValue* list, int newSize)
+    {
+        ca_assert(is_list(list));
+        set_pointer(list, resize((ListData*) get_pointer(list), newSize));
+    }
+
+    void clear(TaggedValue* list)
+    {
+        ca_assert(is_list(list));
+        clear((ListData**) &list->value_data);
+    }
+
+    TaggedValue* append(TaggedValue* list)
+    {
+        ca_assert(is_list(list));
+        return append((ListData**) &list->value_data);
+    }
+    TaggedValue* prepend(TaggedValue* list)
+    {
+        ca_assert(is_list(list));
+        return prepend((ListData**) &list->value_data);
+    }
+
+    void tv_initialize(Type* type, TaggedValue* value)
+    {
+        ca_assert(value->value_data.ptr == NULL);
+
+        // If type has a prototype then initialize to that.
+        Branch& prototype = type_t::get_prototype(type);
+        if (prototype.length() > 0) {
+            List* list = List::checkCast(value);
+            list->resize(prototype.length());
+
+            for (int i=0; i < prototype.length(); i++)
+                change_type(list->get(i), type_contents(prototype[i]->type));
+        }
+    }
+
+    void tv_release(TaggedValue* value)
+    {
+        ca_assert(is_list(value));
+        ListData* data = (ListData*) get_pointer(value);
+        if (data == NULL) return;
+        decref(data);
+    }
+
+    void tv_copy(TaggedValue* source, TaggedValue* dest)
+    {
+        ca_assert(is_list(source));
+        ca_assert(is_list(dest));
+        ListData* s = (ListData*) get_pointer(source);
+        ListData* d = (ListData*) get_pointer(dest);
+
+    #if DISABLE_LIST_VALUE_SHARING
+        if (d != NULL) decref(d);
+        set_pointer(dest, duplicate(s));
+    #else
+        if (s != NULL) incref(s);
+        if (d != NULL) decref(d);
+        set_pointer(dest, s);
+    #endif
+    }
+
+    bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
+    {
+        ca_assert(is_list(leftValue));
+        Type* rhsType = right->value_type;
+        if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
             return false;
+
+        List* left = List::checkCast(leftValue);
+
+        int leftCount = left->numElements();
+
+        if (leftCount != right->numElements())
+            return false;
+
+        for (int i=0; i < leftCount; i++) {
+            if (!circa::equals(left->get(i), right->getIndex(i)))
+                return false;
+        }
+        return true;
     }
-    return true;
-}
 
-void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
-{
-    // FIXME: should these be asserts?
-    if (!is_list(source)) return;
-    if (!is_list(dest)) return;
+    void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
+    {
+        // FIXME: should these be asserts?
+        if (!is_list(source)) return;
+        if (!is_list(dest)) return;
 
-    bool keep_existing_shape = dest->value_type->prototype.length() != 0;
+        bool keep_existing_shape = dest->value_type->prototype.length() != 0;
 
-    if (keep_existing_shape) {
-        List* s = List::checkCast(source);
-        List* d = List::checkCast(dest);
+        if (keep_existing_shape) {
+            List* s = List::checkCast(source);
+            List* d = List::checkCast(dest);
 
-        int count = std::min(s->numElements(), d->numElements());
+            int count = std::min(s->numElements(), d->numElements());
 
-        for (int i=0; i < count; i++)
-            cast(s->get(i), d->get(i));
+            for (int i=0; i < count; i++)
+                cast(s->get(i), d->get(i));
 
-    } else {
-        tv_copy(source, dest);
+        } else {
+            tv_copy(source, dest);
+        }
     }
-}
 
-TaggedValue* tv_get_index(TaggedValue* value, int index)
-{
-    ca_assert(is_list(value));
-    ListData* s = (ListData*) get_pointer(value);
-    return get_index(s, index);
-}
+    TaggedValue* tv_get_index(TaggedValue* value, int index)
+    {
+        ca_assert(is_list(value));
+        ListData* s = (ListData*) get_pointer(value);
+        return get_index(s, index);
+    }
 
-void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
-{
-    ca_assert(is_list(value));
-    ListData* s = (ListData*) get_pointer(value);
-    set_index(&s, index, element);
-    set_pointer(value, s);
-}
+    void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
+    {
+        ca_assert(is_list(value));
+        ListData* s = (ListData*) get_pointer(value);
+        set_index(&s, index, element);
+        set_pointer(value, s);
+    }
 
-TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
-{
-    int index = value->value_type->findFieldIndex(fieldName);
-    if (index < 0)
-        return NULL;
-    return tv_get_index(value, index);
-}
+    TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
+    {
+        int index = value->value_type->findFieldIndex(fieldName);
+        if (index < 0)
+            return NULL;
+        return tv_get_index(value, index);
+    }
 
-int tv_num_elements(TaggedValue* value)
-{
-    ca_assert(is_list(value));
-    ListData* s = (ListData*) get_pointer(value);
-    return num_elements(s);
-}
+    int tv_num_elements(TaggedValue* value)
+    {
+        ca_assert(is_list(value));
+        ListData* s = (ListData*) get_pointer(value);
+        return num_elements(s);
+    }
 
-std::string tv_to_string(TaggedValue* value)
-{
-    ca_assert(is_list(value));
-    return to_string((ListData*) get_pointer(value));
-}
+    std::string tv_to_string(TaggedValue* value)
+    {
+        ca_assert(is_list(value));
+        return to_string((ListData*) get_pointer(value));
+    }
 
-void tv_touch(TaggedValue* value)
-{
-    ca_assert(is_list(value));
-    ListData* data = (ListData*) get_pointer(value);
-    set_pointer(value, touch(data));
-}
+    void tv_touch(TaggedValue* value)
+    {
+        ca_assert(is_list(value));
+        ListData* data = (ListData*) get_pointer(value);
+        set_pointer(value, touch(data));
+    }
 
-void tv_static_type_query(Type* type, StaticTypeQuery* result)
-{
-    Term* term = result->targetTerm;
-    Branch& prototype = type->prototype;
-    
-    // If prototype is empty then accept any list
-    if (prototype.length() == 0) {
-        if (is_list_based_type(type_contents(term->type)))
+    void tv_static_type_query(Type* type, StaticTypeQuery* result)
+    {
+        Term* term = result->targetTerm;
+        Branch& prototype = type->prototype;
+        
+        // If prototype is empty then accept any list
+        if (prototype.length() == 0) {
+            if (is_list_based_type(type_contents(term->type)))
+                return result->succeed();
+            else
+                return result->fail();
+        }
+
+        // Inspect a call to list(), look at inputs instead of looking at the result.
+        if (term->function == LIST_FUNC)
+        {
+            if (term->numInputs() != prototype.length())
+                return result->fail();
+
+            for (int i=0; i < prototype.length(); i++)
+                if (!circa::term_output_always_satisfies_type(
+                            term->input(i), type_contents(prototype[i]->type)))
+                    return result->fail();
+
+            return result->succeed();
+        }
+
+        if (is_subtype(type, type_contents(term->type)))
             return result->succeed();
         else
             return result->fail();
     }
 
-    // Inspect a call to list(), look at inputs instead of looking at the result.
-    if (term->function == LIST_FUNC)
+    bool tv_is_subtype(Type* type, Type* otherType)
     {
-        if (term->numInputs() != prototype.length())
-            return result->fail();
+        if (!is_list_based_type(otherType))
+            return false;
 
+        // Check if our type has a prototype. If there's no prototype
+        // then any list can be a subtype.
+        Branch& prototype = type->prototype;
+
+        if (prototype.length() == 0)
+            return true;
+
+        Branch& otherPrototype = otherType->prototype;
+        if (prototype.length() != otherType->prototype.length())
+            return false;
+
+        // Check each element
         for (int i=0; i < prototype.length(); i++)
-            if (!circa::term_output_always_satisfies_type(
-                        term->input(i), type_contents(prototype[i]->type)))
-                return result->fail();
+            if (!circa::is_subtype(type_contents(prototype[i]->type),
+                        type_contents(otherPrototype[i]->type)))
+                return false;
 
-        return result->succeed();
+        return true;
     }
 
-    if (is_subtype(type, type_contents(term->type)))
-        return result->succeed();
-    else
-        return result->fail();
-}
-
-bool tv_is_subtype(Type* type, Type* otherType)
-{
-    if (!is_list_based_type(otherType))
-        return false;
-
-    // Check if our type has a prototype. If there's no prototype
-    // then any list can be a subtype.
-    Branch& prototype = type->prototype;
-
-    if (prototype.length() == 0)
-        return true;
-
-    Branch& otherPrototype = otherType->prototype;
-    if (prototype.length() != otherType->prototype.length())
-        return false;
-
-    // Check each element
-    for (int i=0; i < prototype.length(); i++)
-        if (!circa::is_subtype(type_contents(prototype[i]->type),
-                    type_contents(otherPrototype[i]->type)))
+    bool tv_value_fits_type(Type* type, TaggedValue* value)
+    {
+        if (!is_list(value))
             return false;
 
-    return true;
-}
+        Branch& prototype = type->prototype;
+        if (prototype.length() == 0)
+            return true;
 
-bool tv_value_fits_type(Type* type, TaggedValue* value)
-{
-    if (!is_list(value))
-        return false;
-
-    Branch& prototype = type->prototype;
-    if (prototype.length() == 0)
-        return true;
-
-    int numElements = value->numElements();
-    if (prototype.length() != numElements)
-        return false;
-
-    for (int i=0; i < numElements; i++)
-        if (!circa::value_fits_type(value->getIndex(i),
-                    type_contents(prototype[i]->type)))
+        int numElements = value->numElements();
+        if (prototype.length() != numElements)
             return false;
-    return true;
-}
 
-void remove_and_replace_with_back(TaggedValue* value, int index)
-{
-    ca_assert(is_list(value));
-    ListData* data = (ListData*) get_pointer(value);
-    remove_and_replace_with_back(&data, index);
-    set_pointer(value, data);
-}
+        for (int i=0; i < numElements; i++)
+            if (!circa::value_fits_type(value->getIndex(i),
+                        type_contents(prototype[i]->type)))
+                return false;
+        return true;
+    }
 
-bool is_list(TaggedValue* value)
-{
-    return is_list_based_type(value->value_type);
-}
+    void remove_and_replace_with_back(TaggedValue* value, int index)
+    {
+        ca_assert(is_list(value));
+        ListData* data = (ListData*) get_pointer(value);
+        remove_and_replace_with_back(&data, index);
+        set_pointer(value, data);
+    }
 
-bool is_list_based_type(Type* type)
-{
-    return type->initialize == tv_initialize;
-}
+    bool is_list(TaggedValue* value)
+    {
+        return is_list_based_type(value->value_type);
+    }
 
-void setup_type(Type* type)
-{
-    reset_type(type);
-    type->initialize = tv_initialize;
-    type->release = tv_release;
-    type->copy = tv_copy;
-    type->toString = tv_to_string;
-    type->equals = tv_equals;
-    type->cast = tv_cast;
-    type->getIndex = tv_get_index;
-    type->setIndex = tv_set_index;
-    type->getField = tv_get_field;
-    type->numElements = tv_num_elements;
-    type->touch = tv_touch;
-    type->staticTypeQuery = tv_static_type_query;
-    type->isSubtype = tv_is_subtype;
-    type->valueFitsType = tv_value_fits_type;
-}
+    bool is_list_based_type(Type* type)
+    {
+        return type->initialize == tv_initialize;
+    }
 
-CA_FUNCTION(append)
-{
-    make_list(OUTPUT);
-    List* result = List::checkCast(OUTPUT);
-    copy(INPUT(0), OUTPUT);
-    TaggedValue* value = INPUT(1);
-    copy(value, result->append());
-}
+    void setup_type(Type* type)
+    {
+        reset_type(type);
+        type->initialize = tv_initialize;
+        type->release = tv_release;
+        type->copy = tv_copy;
+        type->toString = tv_to_string;
+        type->equals = tv_equals;
+        type->cast = tv_cast;
+        type->getIndex = tv_get_index;
+        type->setIndex = tv_set_index;
+        type->getField = tv_get_field;
+        type->numElements = tv_num_elements;
+        type->touch = tv_touch;
+        type->staticTypeQuery = tv_static_type_query;
+        type->isSubtype = tv_is_subtype;
+        type->valueFitsType = tv_value_fits_type;
+    }
 
-CA_FUNCTION(count)
-{
-    List* list = List::checkCast(INPUT(0));
-    make_int(OUTPUT, list->length());
-}
+    CA_FUNCTION(append)
+    {
+        make_list(OUTPUT);
+        List* result = List::checkCast(OUTPUT);
+        copy(INPUT(0), OUTPUT);
+        TaggedValue* value = INPUT(1);
+        copy(value, result->append());
+    }
 
-void postponed_setup_type(Term* type)
-{
-    Term* list_append =
-        import_member_function(type, append, "append(List, any) -> List");
-    function_set_use_input_as_output(list_append, 0, true);
-    import_member_function(type, count, "count(List) -> int");
-}
+    CA_FUNCTION(count)
+    {
+        List* list = List::checkCast(INPUT(0));
+        make_int(OUTPUT, list->length());
+    }
+
+    void postponed_setup_type(Term* type)
+    {
+        Term* list_append =
+            import_member_function(type, append, "append(List, any) -> List");
+        function_set_use_input_as_output(list_append, 0, true);
+        import_member_function(type, count, "count(List) -> int");
+    }
 
 } // namespace list_t
 
@@ -321,6 +579,12 @@ void
 List::append(TaggedValue* val)
 {
     copy(val, append());
+}
+
+TaggedValue*
+List::prepend()
+{
+    return list_t::prepend((TaggedValue*) this);
 }
 
 void
