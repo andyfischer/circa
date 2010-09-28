@@ -34,14 +34,14 @@ struct EvalContext
 
 void evaluate_single_term(EvalContext* context, List* stack, Term* caller);
 
-void evaluate_branch_existing_frame(EvalContext* context, List* stack,
-        Branch& branch, TaggedValue* output);
+void evaluate_branch_existing_frame(EvalContext* context, List* stack, Branch& branch);
 
 // Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
 // null, if it's not null then we'll copy the output register of this branch to it.
 // When specifying 'output', don't use a value that is in the stack, because that
 // seems to break things. Instead use a temporary.
 void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output);
+
 void evaluate_branch(EvalContext* context, Branch& branch);
 void evaluate_bytecode(Branch& branch);
 
@@ -64,9 +64,6 @@ TaggedValue* get_output(List* stack, Term* term);
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);
 
-#ifdef BYTECODE
-void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
-    List* registers);
-#endif
+void evaluate_in_place(Term* term);
 
 } // namespace circa

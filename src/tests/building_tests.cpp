@@ -137,6 +137,11 @@ void test_get_relative_input_scope()
     branch.compile("if true e = 2 end");
     Term* f = branch.compile("f = sqr(e)");
     test_equals(get_input_relative_scope(f, 0), 0);
+
+    branch.compile("g = 1");
+    branch.compile("for i in [1] g = 2 end");
+    Term* h = branch.compile("h = sqr(g)");
+    test_equals(get_input_relative_scope(h, 0), 0);
 }
 
 void register_tests()

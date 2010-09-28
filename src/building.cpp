@@ -130,6 +130,12 @@ int get_input_relative_scope(Term* term, int index)
             && input2ndParent != NULL && input2ndParent->function == IF_BLOCK_FUNC)
         rootScope = input2ndParent->owningBranch;
 
+    // Ditto for a for_loop #outer_rebind
+    if (inputParent != NULL && inputParent->name == "#outer_rebinds"
+            && input2ndParent != NULL && input2ndParent->function == FOR_FUNC)
+        rootScope = input2ndParent->owningBranch;
+            
+
     // Walk upwards from 'term' until we find the root branch.
     int relativeScope = 0;
     Branch* scope = term->owningBranch;

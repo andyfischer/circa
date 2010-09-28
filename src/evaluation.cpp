@@ -22,23 +22,18 @@ void evaluate_single_term(EvalContext* context, List* stack, Term* term)
         func(context, stack, term);
 }
 
-void evaluate_branch_existing_frame(EvalContext* context, List *stack,
-    Branch& branch, TaggedValue* output)
+void evaluate_branch_existing_frame(EvalContext* context, List* stack, Branch& branch)
 {
-    List* frame = List::checkCast(stack->get(stack->length()-1));
-
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, stack, branch[i]);
-
-    // Save output value
-    if (output != NULL)
-        swap(frame->get(frame->length()-1), output);
 }
 
-void evaluate_branch(EvalContext* context, List *stack, Branch& branch, TaggedValue* output)
+void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedValue* output)
 {
-    push_stack_frame(stack, branch.registerCount);
-    evaluate_branch_existing_frame(context, stack, branch, output);
+    List* frame = push_stack_frame(stack, branch.registerCount);
+    evaluate_branch_existing_frame(context, stack, branch);
+    if (output != NULL)
+        swap(frame->get(frame->length()-1), output);
     pop_stack_frame(stack);
 }
 
@@ -136,13 +131,31 @@ void pop_stack_frame(List* stack)
     stack->resize(stack->length() - 1);
 }
 
-#ifdef BYTECODE
-void evaluate_single_call_op(EvalContext *cxt, bytecode::CallOperation* callop,
-    List* registers)
+void evaluate_in_place(Term* term)
 {
-    EvaluateFunc func = function_t::get_attrs(callop->function).evaluate;
-    func(cxt, registers, callop);
+    EvalContext context;
+    List stack;
+    stack.resize(1);
+
+    Branch& branch = *term->owningBranch;
+
+    List* frame = push_stack_frame(&stack, branch.registerCount);
+
+    // upload values to stack
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term->registerIndex != -1)
+            copy(term, frame->get(term->registerIndex));
+    }
+
+    evaluate_single_term(&context, &stack, term);
+
+    // copy from stack back to terms
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term->registerIndex != -1)
+            copy(frame->get(term->registerIndex), term);
+    }
 }
-#endif
 
 } // namespace circa
