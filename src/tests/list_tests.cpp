@@ -5,7 +5,8 @@
 namespace circa {
 namespace list_tests {
 
-#if 0
+    #if 0
+
 namespace memory_management_for_each_operation
 {
     typedef void (*ListOperation)(List* value);
