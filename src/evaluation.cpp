@@ -133,20 +133,49 @@ void pop_stack_frame(List* stack)
 
 void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
 {
-    Branch& branch = *term->owningBranch;
-
     // Check each input.
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);
         if (input == NULL)
             continue;
+
         int relativeScope = term->inputInfo(i).relativeScope;
 
         // Check to add more stack frames.
-        while (stack->length() < (relativeScope + 1)) {
+        while (stack->length() < (relativeScope + 1))
             stack->prepend();
-        }
+
+        // Check to expand the stack frame that this input uses.
+        TaggedValue* frameTv = stack->get(stack->length() - 1 -relativeScope);
+
+        List* frame = List::checkCast(frameTv);
+        int owningBranchRegCount = input->owningBranch->registerCount;
+
+        if (frame == NULL)
+            frame = make_list(frameTv, owningBranchRegCount);
+        else if (frame->length() != owningBranchRegCount)
+            frame->resize(owningBranchRegCount);
+
+        // Check to populate this input's register
+        if (is_null(frame->get(input->registerIndex)))
+            copy(input, frame->get(input->registerIndex));
     }
+
+    // Evaluate
+    evaluate_single_term(context, stack, term);
+
+    // Copy output value back to term
+    if (term->registerIndex != -1) {
+        List* frame = List::checkCast(stack->get(stack->length() - 1));
+        copy(frame->get(term->registerIndex), term);
+    }
+}
+
+void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int start, int end)
+{
+    List stack;
+    for (int i=start; i <= end; i++)
+        evaluate_with_lazy_stack(context, &stack, branch[i]);
 }
 
 } // namespace circa

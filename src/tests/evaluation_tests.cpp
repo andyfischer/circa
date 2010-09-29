@@ -5,21 +5,29 @@
 namespace circa {
 namespace evaluation_tests {
 
-void test_evaluate_in_place()
+void test_evaluate_with_lazy_stack()
 {
     Branch branch;
     branch.compile("a = 1");
-    branch.compile("b = 1");
-    Term* c = branch.compile("add_i(a,b)");
-    test_assert(as_int(c) == 0);
+    branch.compile("b = 3");
+    Term* c = branch.compile("add_i(a,a)");
 
-    //evaluate_in_place(c);
-    test_assert(as_int(c) == 2);
+    EvalContext context;
+    List stack;
+    evaluate_with_lazy_stack(&context, &stack, c);
+
+    test_equals(stack.toString(), "[[1, null, 2]]");
+    test_equals(as_int(c), 2);
+
+    Term* d = branch.compile("add_i(a,b)");
+    evaluate_with_lazy_stack(&context, &stack, d);
+    test_equals(stack.toString(), "[[1, 3, 2, 4]]");
+    test_equals(as_int(d), 4);
 }
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(evaluation_tests::test_evaluate_in_place);
+    REGISTER_TEST_CASE(evaluation_tests::test_evaluate_with_lazy_stack);
 }
 
 } // evaluation_tests

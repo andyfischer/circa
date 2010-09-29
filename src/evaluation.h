@@ -69,4 +69,6 @@ void pop_stack_frame(List* stack);
 // copied from their respective terms.
 void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term);
 
+void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int start, int end);
+
 } // namespace circa
