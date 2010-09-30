@@ -62,7 +62,7 @@ void test_builtin_equals()
 void test_list()
 {
     Branch branch;
-    Term* l = branch.eval("l = list(1,2,\"foo\")");
+    Term* l = branch.eval("l = list(1,2,'foo')");
 
     test_assert(l->getIndex(0)->asInt() == 1);
     test_assert(l->getIndex(1)->asInt() == 2);
@@ -82,8 +82,6 @@ void test_vectorized_funcs()
 
     // Test mult_s (multiply a vector to a scalar)
     t = branch.eval("[10 20 30] * 1.1");
-
-    //dump_branch(branch);
 
     test_assert(t->numElements() == 3);
     test_equals(t->getIndex(0)->asFloat(), 11);

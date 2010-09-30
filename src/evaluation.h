@@ -63,6 +63,7 @@ TaggedValue* get_output(List* stack, Term* term);
 
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);
+List* get_stack_frame(List* stack, int relativeScope);
 
 // Before evaluating the term, we'll check each input to see if it's not-null on
 // the stack (or if the stack frame is missing). Any missing values will get

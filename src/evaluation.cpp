@@ -32,6 +32,7 @@ void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedVa
 {
     List* frame = push_stack_frame(stack, branch.registerCount);
     evaluate_branch_existing_frame(context, stack, branch);
+    frame = get_stack_frame(stack, 0);
     if (output != NULL)
         swap(frame->get(frame->length()-1), output);
     pop_stack_frame(stack);
@@ -129,6 +130,11 @@ List* push_stack_frame(List* stack, int size)
 void pop_stack_frame(List* stack)
 {
     stack->resize(stack->length() - 1);
+}
+
+List* get_stack_frame(List* stack, int relativeScope)
+{
+    return List::checkCast(stack->get(stack->length() - 1 - relativeScope));
 }
 
 void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)

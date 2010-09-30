@@ -56,6 +56,64 @@ namespace vectorize_vv_function {
 
     CA_FUNCTION(evaluate)
     {
+        // Push stack frame
+        Branch& contents = CALLER->nestedContents;
+        TaggedValue input0, input1;
+        copy(INPUT(0), &input0);
+        copy(INPUT(1), &input1);
+        int listLength = input0.numElements();
+
+        List* frame = push_stack_frame(STACK, 3);
+
+
+        // Prepare output
+        TaggedValue outputTv;
+        List* output = make_list(&outputTv, listLength);
+
+        // Evaluate vectorized call, once for each input
+        for (int i=0; i < listLength; i++) {
+            // Copy inputs into placeholder
+            swap(input0.getIndex(i), frame->get(0));
+            swap(input1.getIndex(i), frame->get(1));
+
+            evaluate_single_term(CONTEXT, STACK, contents[2]);
+            frame = get_stack_frame(STACK, 0);
+
+            // Save output
+            swap(frame->get(2), output->get(i));
+        }
+
+        pop_stack_frame(STACK);
+        swap(output, OUTPUT);
+    }
+
+    void post_input_change(Term* term)
+    {
+        // Update generated code
+        Branch& contents = term->nestedContents;
+        contents.clear();
+
+        TaggedValue* funcParam = function_t::get_parameters(term->function);
+        if (funcParam == NULL || !is_ref(funcParam))
+            return;
+
+        Term* func = as_ref(funcParam);
+
+        Term* left = term->input(0);
+        Term* right = term->input(1);
+
+        if (left == NULL || right == NULL)
+            return;
+
+        Term* leftPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList());
+        change_type(leftPlaceholder, find_type_of_get_index(left));
+
+        Term* rightPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList());
+        change_type(rightPlaceholder, find_type_of_get_index(right));
+
+        apply(contents, func, RefList(leftPlaceholder, rightPlaceholder));
+
+        update_register_indices(contents);
     }
 
     void setup(Branch& kernel)
@@ -64,6 +122,7 @@ namespace vectorize_vv_function {
                 "vectorize_vv(List,List) -> List");
         function_t::get_specialize_type(func) = specializeType;
         function_t::get_attrs(func).writeBytecode = writeBytecode;
+        function_t::get_attrs(func).postInputChange = post_input_change;
     }
 }
 } // namespace circa

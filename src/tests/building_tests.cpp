@@ -109,13 +109,19 @@ void test_procure()
 
 void test_set_input()
 {
-    Term* a = alloc_term();
-    Term* b = alloc_term();
+    Branch branch;
 
-    set_input(a, 0, b);
+    Term* a = branch.compile("a = 1");
+    Term* b = branch.compile("b = print()");
 
-    test_assert(a->input(0) == b);
-    test_assert(b->users[0] == a);
+    test_assert(b->numInputs() == 0);
+    test_assert(a->users.length() == 0);
+
+    set_input(b, 0, a);
+
+    test_assert(b->numInputs() == 1);
+    test_assert(b->input(0) == a);
+    test_assert(a->users[0] == b);
 }
 
 void test_get_relative_input_scope()
