@@ -25,9 +25,16 @@ void test_evaluate_with_lazy_stack()
     test_equals(as_int(d), 4);
 }
 
+void test_branch_eval()
+{
+    Branch branch;
+    branch.eval("a = 1");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_with_lazy_stack);
+    REGISTER_TEST_CASE(evaluation_tests::test_branch_eval);
 }
 
 } // evaluation_tests

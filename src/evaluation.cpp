@@ -153,12 +153,20 @@ void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
 
         if (frame == NULL)
             frame = make_list(frameTv, owningBranchRegCount);
-        else if (frame->length() != owningBranchRegCount)
+        else
             frame->resize(owningBranchRegCount);
 
         // Check to populate this input's register
         if (is_null(frame->get(input->registerIndex)))
             copy(input, frame->get(input->registerIndex));
+    }
+
+    // Check that the stack has room for the term's output.
+    if (stack->length() == 0)
+        make_list(stack->append(), term->owningBranch->registerCount);
+    else {
+        List* frame = List::checkCast(stack->get(stack->length() - 1));
+        frame->resize(term->owningBranch->registerCount);
     }
 
     // Evaluate
