@@ -65,7 +65,6 @@ namespace vectorize_vv_function {
 
         List* frame = push_stack_frame(STACK, 3);
 
-
         // Prepare output
         TaggedValue outputTv;
         List* output = make_list(&outputTv, listLength);
@@ -98,11 +97,10 @@ namespace vectorize_vv_function {
             return;
 
         Term* func = as_ref(funcParam);
-
         Term* left = term->input(0);
         Term* right = term->input(1);
 
-        if (left == NULL || right == NULL)
+        if (func == NULL || left == NULL || right == NULL)
             return;
 
         Term* leftPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList());
