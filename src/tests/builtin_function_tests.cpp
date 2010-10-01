@@ -104,26 +104,13 @@ void test_vectorized_funcs_with_points()
     
     Term* point_t = branch.compile("type Point {number x, number y}");
 
-    Term* a = branch.compile("a = [1 0] -> Point");
+    Term* a = branch.eval("a = [1 0] -> Point");
 
     test_assert(a->type == point_t);
 
-    Term* b = branch.compile("b = a + [0 2]");
+    Term* b = branch.eval("b = a + [0 2]");
 
-    // Make sure 'b' was resolved to the correct overload (previous bug)
-    test_assert(inputs_statically_fit_function(
-                overloaded_function::find_overload(ADD_FUNC, "add_v"), b->inputs));
-    test_equals(overloaded_function::statically_specialize_function(ADD_FUNC, b->inputs)->name,
-            "add_v");
-            
-    test_equals(b->function->name, "add_v");
-
-    // FIXME
-    return;
-
-    branch.compile("print('b = ' b)");
-
-    evaluate_branch(branch);
+    dump_branch(branch);
 
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);

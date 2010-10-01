@@ -32,7 +32,9 @@ struct EvalContext
 
 };
 
-void evaluate_single_term(EvalContext* context, List* stack, Term* caller);
+// Evaluate a single term against the given stack. After this function, the caller
+// must reestablish any internal pointers to the contents of 'stack'.
+void evaluate_single_term(EvalContext* context, List* stack, Term* term);
 
 void evaluate_branch_existing_frame(EvalContext* context, List* stack, Branch& branch);
 

@@ -71,6 +71,14 @@ Term* find_type_of_get_index(Term* listTerm)
     if (listTerm->function == COPY_FUNC)
         return find_type_of_get_index(listTerm->input(0));
 
+    if (list_t::is_list_based_type(type_contents(listTerm->type))) {
+        Branch& prototype = type_t::get_prototype(type_contents(listTerm->type));
+        RefList types;
+        for (int i=0; i < prototype.length(); i++)
+            types.append(prototype[i]->type);
+        return find_common_type(types);
+    }
+
     // Unrecognized
     return ANY_TYPE;
 }

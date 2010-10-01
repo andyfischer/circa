@@ -32,6 +32,10 @@ void test_find_type_of_get_index()
 
     Term* list4 = branch.compile("[0.1 4]");
     test_assert(find_type_of_get_index(list4) == FLOAT_TYPE);
+
+    branch.compile("type T { number x, number y }");
+    Term* list5 = branch.compile("[.1 .1] -> T");
+    test_assert(find_type_of_get_index(list5) == FLOAT_TYPE);
 }
 
 void compare_builtin_types()
