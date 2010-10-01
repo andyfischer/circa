@@ -23,6 +23,36 @@ namespace subroutine_t {
 
     CA_FUNCTION(evaluate)
     {
+        Term* function = FUNCTION;
+        Branch& contents = function->nestedContents;
+        List* frame = push_stack_frame(STACK, contents.registerCount);
+
+        // Copy inputs to stack frame
+        for (int i=0; i < NUM_INPUTS; i++) {
+            TaggedValue* input = INPUT(i);
+            if (input == NULL)
+                continue;
+            Term* inputTypeTerm = function_t::get_input_type(function, i);
+            Type* inputType = type_contents(inputTypeTerm);
+
+            cast(inputType, input, frame->get(i));
+        }
+
+        // Evaluate each term
+        evaluate_branch_existing_frame(CONTEXT, STACK, contents);
+        frame = get_stack_frame(STACK, 0);
+
+        TaggedValue output;
+        if (frame->length() > 0)
+            swap(frame->get(frame->length() - 1), &output);
+
+        pop_stack_frame(STACK);
+
+        if (OUTPUT != NULL) {
+            swap(&output, OUTPUT);
+        }
+
+        #if 0
         EvalContext context;
 
         Term* function = FUNCTION;
@@ -53,6 +83,7 @@ namespace subroutine_t {
         if (is_function_stateful(function)) {
             swap(&context.topLevelState, INPUT(0));
         }
+        #endif
     }
 }
 
