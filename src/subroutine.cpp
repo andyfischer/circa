@@ -25,25 +25,40 @@ namespace subroutine_t {
     {
         Term* function = FUNCTION;
         Branch& contents = function->nestedContents;
-        List* frame = push_stack_frame(STACK, contents.registerCount);
 
-        // Copy inputs to stack frame
-        for (int i=0; i < NUM_INPUTS; i++) {
-            TaggedValue* input = INPUT(i);
-            if (input == NULL)
-                continue;
-            Term* inputTypeTerm = function_t::get_input_type(function, i);
-            Type* inputType = type_contents(inputTypeTerm);
+        {
+            List frame;
+            frame.resize(contents.registerCount);
 
-            cast(inputType, input, frame->get(i));
+            // Copy inputs to stack frame
+            for (int i=0; i < NUM_INPUTS; i++) {
+                TaggedValue* input = INPUT(i);
+                if (input == NULL)
+                    continue;
+                Term* inputTypeTerm = function_t::get_input_type(function, i);
+                Type* inputType = type_contents(inputTypeTerm);
+
+                cast(inputType, input, frame.get(i));
+            }
+
+            swap(&frame, STACK->append());
         }
 
-        // Evaluate each term
-        evaluate_branch_existing_frame(CONTEXT, STACK, contents);
-        frame = get_stack_frame(STACK, 0);
+        make_null(&CONTEXT->subroutineOutput);
 
+        // Evaluate each term
+        for (int i=0; i < contents.length(); i++) {
+            evaluate_single_term(CONTEXT, STACK, contents[i]);
+            if (CONTEXT->interruptSubroutine)
+                break;
+        }
+        List* frame = get_stack_frame(STACK, 0);
+
+        // Fetch output
         TaggedValue output;
-        if (frame->length() > 0)
+        if (!is_null(&CONTEXT->subroutineOutput))
+            swap(&CONTEXT->subroutineOutput, &output);
+        else if (frame->length() > 0)
             swap(frame->get(frame->length() - 1), &output);
 
         pop_stack_frame(STACK);

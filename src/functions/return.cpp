@@ -10,14 +10,6 @@ namespace return_function {
 
     CA_DEFINE_FUNCTION(return_func, "return(any)")
     {
-        // Find the enclosing subroutine
-        Term* parent = get_parent_term(CALLER);
-        while (parent != NULL && !is_subroutine(parent))
-            parent = get_parent_term(parent);
-
-        if (parent == NULL)
-            internal_error("return() couldn't find enclosing subroutine");
-
         CONTEXT->interruptSubroutine = true;
         copy(INPUT(0), &CONTEXT->subroutineOutput);
     }

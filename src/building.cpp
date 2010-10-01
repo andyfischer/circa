@@ -210,7 +210,12 @@ int assign_register(Term* term, int nextRegister)
     if (getRegisterCount == NULL) {
         // Default behavior if getRegisterCount is not defined: 0 registers
         // for a term with Void output, 1 register otherwise.
-        registerCount = term->type == VOID_TYPE ? 0 : 1;
+        if (term->type == VOID_TYPE)
+            registerCount = 0;
+        else if (is_value(term) && is_hidden(term))
+            registerCount = 0;
+        else
+            registerCount = 1;
     } else {
         registerCount = getRegisterCount(term);
     }

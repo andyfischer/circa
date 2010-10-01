@@ -120,14 +120,20 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
 
 TaggedValue* get_input(List* stack, Term* term, int index)
 {
-    InputInfo& input = term->inputInfo(index);
+    Term* input = term->input(index);
+    InputInfo& inputInfo = term->inputInfo(index);
 
-    List* frame = List::checkCast(stack->get(stack->length() - 1 - input.relativeScope));
+    if (input->registerIndex == -1)
+        return NULL;
+
+    List* frame = List::checkCast(stack->get(stack->length() - 1 - inputInfo.relativeScope));
     return frame->get(term->input(index)->registerIndex);
 }
 
 TaggedValue* get_output(List* stack, Term* term)
 {
+    if (term->registerIndex == -1)
+        return NULL;
     List* frame = List::checkCast(stack->get(stack->length()-1));
     return frame->get(term->registerIndex);
 }

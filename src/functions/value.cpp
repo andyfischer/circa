@@ -5,7 +5,8 @@ namespace value_function {
 
     CA_FUNCTION(evaluate)
     {
-        copy(CALLER, OUTPUT);
+        if (OUTPUT != NULL)
+            copy(CALLER, OUTPUT);
     }
 
     void setup(Branch& kernel)
