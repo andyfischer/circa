@@ -33,14 +33,12 @@ void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedVa
     List* frame = push_stack_frame(stack, branch.registerCount);
     evaluate_branch_existing_frame(context, stack, branch);
     frame = get_stack_frame(stack, 0);
-    std::cout << "evaluate_branch has frame: " << frame->toString() << std::endl;
     if (output != NULL) {
         TaggedValue* lastValue = frame->get(frame->length()-1);
         if (lastValue != NULL)
             swap(lastValue, output);
         else
             make_null(output);
-        std::cout << "output: " << output->toString() << std::endl;
     }
     pop_stack_frame(stack);
 }
@@ -48,8 +46,17 @@ void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedVa
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
     List stack;
-    stack.resize(1);
-    evaluate_branch(context, &stack, branch, NULL);
+    push_stack_frame(&stack, branch.registerCount);
+    evaluate_branch_existing_frame(context, &stack, branch);
+
+    // Copy stack back to terms
+    List* frame = get_stack_frame(&stack, 0);
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (is_value(term)) continue;
+        if (term->registerIndex != -1)
+            swap(frame->get(term->registerIndex), branch[i]);
+    }
 }
 
 EvalContext evaluate_branch(Branch& branch)
@@ -155,12 +162,13 @@ void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
         int relativeScope = term->inputInfo(i).relativeScope;
 
         // Check to add more stack frames.
-        while (stack->length() < (relativeScope + 1))
+        while (stack->length() < (relativeScope + 1)) {
+            ca_assert(stack->length() < 1000); // <-- trying to catch a bug
             stack->prepend();
+        }
 
         // Check to expand the stack frame that this input uses.
         TaggedValue* frameTv = stack->get(stack->length() - 1 -relativeScope);
-
         List* frame = List::checkCast(frameTv);
         int owningBranchRegCount = input->owningBranch->registerCount;
 
@@ -172,6 +180,8 @@ void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
         // Check to populate this input's register
         if (is_null(frame->get(input->registerIndex)))
             copy(input, frame->get(input->registerIndex));
+
+            ca_assert(stack->length() < 1000); // <-- trying to catch a bug
     }
 
     // Check that the stack has room for the term's output.
@@ -190,6 +200,8 @@ void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
         List* frame = List::checkCast(stack->get(stack->length() - 1));
         copy(frame->get(term->registerIndex), term);
     }
+
+    ca_assert(stack->length() < 1000); // <-- trying to catch a bug
 }
 
 void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int start, int end)

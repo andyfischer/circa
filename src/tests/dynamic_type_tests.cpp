@@ -8,10 +8,8 @@ namespace dynamic_type_tests {
 void test_copy()
 {
     Branch branch;
-    Term* a = branch.compile("a = 5");
-    Term* copy = branch.compile("copy(a)");
-    evaluate_branch(branch);
-
+    Term* a = branch.eval("a = 5");
+    Term* copy = branch.eval("copy(a)");
     test_assert(is_int(copy));
 
     change_type(a, STRING_TYPE);
