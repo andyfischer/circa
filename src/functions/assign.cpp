@@ -79,6 +79,8 @@ namespace assign_function {
             if (getter->name != "")
                 break;
         }
+
+        update_register_indices(contents);
     }
 
     void postInputChange(Term* term)

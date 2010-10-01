@@ -110,8 +110,6 @@ void test_vectorized_funcs_with_points()
 
     Term* b = branch.eval("b = a + [0 2]");
 
-    dump_branch(branch);
-
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);
 }
@@ -130,10 +128,8 @@ void test_cond_with_int_and_float()
 void test_get_index()
 {
     Branch branch;
-    branch.compile("l = [1 2 3]");
-    Term* get = branch.compile("get_index(l, 0)");
-
-    evaluate_branch(branch);
+    branch.eval("l = [1 2 3]");
+    Term* get = branch.eval("get_index(l, 0)");
 
     test_assert(get);
     test_assert(get->value_type == type_contents(INT_TYPE));

@@ -33,12 +33,14 @@ void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedVa
     List* frame = push_stack_frame(stack, branch.registerCount);
     evaluate_branch_existing_frame(context, stack, branch);
     frame = get_stack_frame(stack, 0);
+    std::cout << "evaluate_branch has frame: " << frame->toString() << std::endl;
     if (output != NULL) {
         TaggedValue* lastValue = frame->get(frame->length()-1);
         if (lastValue != NULL)
             swap(lastValue, output);
         else
             make_null(output);
+        std::cout << "output: " << output->toString() << std::endl;
     }
     pop_stack_frame(stack);
 }
