@@ -22,6 +22,10 @@ struct EvalContext
     // Top-level inlined state
     TaggedValue topLevelState;
 
+    TaggedValue stack;
+
+    TaggedValue currentScopeState;
+
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 
     void clearError() {

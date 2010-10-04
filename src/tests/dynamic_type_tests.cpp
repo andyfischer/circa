@@ -21,22 +21,19 @@ void test_copy()
 void test_subroutine()
 {
     Branch branch;
-    branch.compile("def f(any v) -> any return(v) end");
+    branch.eval("def f(any v) -> any return(v) end");
     test_assert(branch);
 
-    Term* a = branch.compile("f('test')");
-    evaluate_branch(branch);
+    Term* a = branch.eval("f('test')");
 
     test_assert(is_string(a));
     test_assert(as_string(a) == "test");
 
     branch.clear();
-    branch.compile("def f(bool b, any v) -> any; if b return(v) else return(5) end end");
+    branch.eval("def f(bool b, any v) -> any; if b return(v) else return(5) end end");
 
-    Term* b = branch.compile("f(true, 'test')");
-    Term* c = branch.compile("f(false, 'test')");
-
-    evaluate_branch(branch);
+    Term* b = branch.eval("f(true, 'test')");
+    Term* c = branch.eval("f(false, 'test')");
 
     test_assert(is_string(b));
     test_assert(as_string(b) == "test");
@@ -49,10 +46,10 @@ void test_field_access()
     Branch branch;
     EvalContext context;
 
-    Term* T = branch.compile("type T { int a, string b }");
-    branch.compile("def f() -> any; return(T([4, 's'])); end");
+    Term* T = branch.eval("type T { int a, string b }");
+    branch.eval("def f() -> any; return(T([4, 's'])); end");
     Branch& f = branch["f"]->nestedContents;
-    Term* r = branch.compile("r = f()");
+    Term* r = branch.eval("r = f()");
 
     Term* four = f[1];
     test_assert(as_int(four) == 4);
@@ -60,10 +57,9 @@ void test_field_access()
     evaluate_branch(&context, branch);
     test_assert(context);
 
-    branch.compile("r.a");
-    Term* eq1 = branch.compile("r.a == 4");
-    Term* eq2 = branch.compile("r.b == 's'");
-    evaluate_branch(&context, branch);
+    branch.eval("r.a");
+    Term* eq1 = branch.eval("r.a == 4");
+    Term* eq2 = branch.eval("r.b == 's'");
     test_assert(context);
 
     test_assert(as_bool(eq1));
@@ -101,7 +97,7 @@ void test_dynamic_overload()
     Branch branch;
     Term* a = create_value(branch, ANY_TYPE, "a");
     Term* b = create_value(branch, ANY_TYPE, "b");
-    Term* result = branch.compile("add(a, b)");
+    Term* result = branch.eval("add(a, b)");
 
     make_int(a, 5);
     make_int(b, 3);
@@ -114,7 +110,9 @@ void test_dynamic_overload()
     RefList inputs(a,b);
     test_assert(inputs_fit_function_dynamic(add_i, inputs));
 
+    dump_branch(branch);
     evaluate_branch(&context, branch);
+    dump_branch(branch);
     test_assert(context);
     test_assert(result->asInt() == 8);
 
