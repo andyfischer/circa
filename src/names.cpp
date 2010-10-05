@@ -225,6 +225,7 @@ void initialize_unique_name(Term* term)
         term->uniqueName.name = term->name;
     } else {
         term->uniqueName.ordinal = existingName->uniqueName.ordinal + 1;
+
         // Construct a name by adding the ordinal to the end of the declared name,
         // keep looping until we end up with a unique name. (the user may have already
         // declared a name which matches our generated one.

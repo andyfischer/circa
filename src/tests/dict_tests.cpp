@@ -23,6 +23,19 @@ void test_simple()
     dict_t::free_dict(data);
 }
 
+void test_insert()
+{
+    Dict dict;
+    TaggedValue v;
+    make_int(&v, 5);
+
+    TaggedValue* a_inserted = dict.insert("a");
+    test_equals(dict.toString(), "[a: null]");
+
+    make_int(a_inserted, 7);
+    test_equals(dict.toString(), "[a: 7]");
+}
+
 void dont_insert_same_key_multiple_times()
 {
     dict_t::DictData* data = dict_t::create_dict();
@@ -39,6 +52,7 @@ void dont_insert_same_key_multiple_times()
     test_assert(dict_t::count(data) == 1);
     dict_t::free_dict(data);
 }
+
 
 void handle_missing_keys()
 {
@@ -183,6 +197,7 @@ void test_reset()
 void register_tests()
 {
     REGISTER_TEST_CASE(dict_tests::test_simple);
+    REGISTER_TEST_CASE(dict_tests::test_insert);
     REGISTER_TEST_CASE(dict_tests::dont_insert_same_key_multiple_times);
     REGISTER_TEST_CASE(dict_tests::handle_missing_keys);
     REGISTER_TEST_CASE(dict_tests::hash_collision);

@@ -35,15 +35,17 @@ namespace dict_t {
 // C++ wrapper
 struct Dict : TaggedValue
 {
-    static Dict* checkCast(TaggedValue* value);
+    Dict();
 
     std::string toString();
     TaggedValue* get(const char* key);
     TaggedValue* operator[](const char* key);
-    void insert(const char* key);
+    TaggedValue* insert(const char* key);
     void set(const char* key, TaggedValue* value);
     void clear();
     bool empty();
+
+    static Dict* checkCast(TaggedValue* value);
 };
 
 void make_dict(TaggedValue* value);

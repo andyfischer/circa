@@ -12,6 +12,7 @@
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
+#include "types/dict.h"
 
 namespace circa {
 
@@ -139,6 +140,12 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
     List* stack = &cxt->stack;
     List* frame = List::checkCast(stack->get(stack->length()-1));
     return frame->get(term->registerIndex);
+}
+
+TaggedValue* get_state_input(EvalContext* cxt, Term* term)
+{
+    Dict* state = Dict::checkCast(&cxt->currentScopeState);
+    return state->get(term->uniqueName.name.c_str());
 }
 
 List* push_stack_frame(List* stack, int size)

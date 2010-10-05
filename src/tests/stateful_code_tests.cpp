@@ -138,6 +138,22 @@ void implicit_state_and_bytecode()
     test_equals(context.topLevelState.toString(), "[f: [s: 1]]");
 }
 
+namespace test_interpreted_state_access
+{
+    CA_FUNCTION(evaluate)
+    {
+    }
+
+    void test()
+    {
+        Branch branch;
+        import_function(branch, evaluate, "func() -> void");
+
+        EvalContext context;
+
+    }
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);

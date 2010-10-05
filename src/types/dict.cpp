@@ -359,6 +359,12 @@ void setup_type(Type* type)
 
 } // namespace dict_t
 
+Dict::Dict()
+  : TaggedValue()
+{
+    change_type(this, DICT_T);
+}
+
 Dict* Dict::checkCast(TaggedValue* value)
 {
     if (value->value_type->initialize == dict_t::tagged_value_wrap::initialize)
@@ -380,11 +386,13 @@ TaggedValue* Dict::operator[](const char* key)
 {
     return get(key);
 }
-void Dict::insert(const char* key)
+TaggedValue* Dict::insert(const char* key)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
-    dict_t::insert(&data, key);
+    int newIndex = dict_t::insert(&data, key);
     this->value_data.ptr = data;
+    return &data->slots[newIndex].value;
+
 }
 void Dict::set(const char* key, TaggedValue* value)
 {
