@@ -285,12 +285,12 @@ CA_FUNCTION(evaluate_if_block)
         //std::cout << "checking: " << get_term_to_string_extended(branch) << std::endl;
         //std::cout << "with stack: " << STACK->toString() << std::endl;
 
-        if (branch->numInputs() == 0 || as_bool(get_input(STACK, branch, 0))) {
+        if (branch->numInputs() == 0 || as_bool(get_input(CONTEXT, branch, 0))) {
 
             Branch& contents = branch->nestedContents;
 
             push_stack_frame(STACK, contents.registerCount);
-            evaluate_branch_existing_frame(CONTEXT, STACK, contents);
+            evaluate_branch_existing_frame(CONTEXT, contents);
 
             acceptedBranchIndex = i;
             break;
@@ -303,7 +303,7 @@ CA_FUNCTION(evaluate_if_block)
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        TaggedValue* val = get_input(STACK, joinTerm, acceptedBranchIndex);
+        TaggedValue* val = get_input(CONTEXT, joinTerm, acceptedBranchIndex);
         copy(val, outputFrame->get(joinTerm->registerIndex));
     }
 

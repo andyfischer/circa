@@ -46,7 +46,7 @@ namespace overloaded_function {
     {
         TaggedValue output;
         Branch& contents = CALLER->nestedContents;
-        evaluate_branch(CONTEXT, STACK, contents, &output);
+        evaluate_branch(CONTEXT, contents, &output);
         swap(&output, OUTPUT);
     }
 

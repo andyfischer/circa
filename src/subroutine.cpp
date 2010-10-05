@@ -48,7 +48,7 @@ namespace subroutine_t {
 
         // Evaluate each term
         for (int i=0; i < contents.length(); i++) {
-            evaluate_single_term(CONTEXT, STACK, contents[i]);
+            evaluate_single_term(CONTEXT, contents[i]);
             if (CONTEXT->interruptSubroutine)
                 break;
         }

@@ -374,13 +374,13 @@ CA_FUNCTION(evaluate_for_loop)
             TaggedValue* dest = frame->get(rebindTerm->registerIndex);
 
             if (firstIter)
-                copy(get_input(STACK, rebindTerm, 0), dest);
+                copy(get_input(CONTEXT, rebindTerm, 0), dest);
             else
                 copy(previousFrame.get(rebindTerm->input(1)->registerIndex), dest);
         }
 
         for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
-            evaluate_single_term(CONTEXT, STACK, forContents[i]);
+            evaluate_single_term(CONTEXT, forContents[i]);
         }
 
         frame = List::checkCast(STACK->get(STACK->numElements() - 1));
@@ -403,7 +403,7 @@ CA_FUNCTION(evaluate_for_loop)
         // use the outer version if there were 0 iterations
         int inputIndex = inputListLength == 0 ? 0 : 1;
 
-        TaggedValue* result = get_input(STACK, rebindTerm, inputIndex);
+        TaggedValue* result = get_input(CONTEXT, rebindTerm, inputIndex);
         int registerIndex = CALLER->registerIndex + 1 + i;
         copy(result, outputFrame->get(registerIndex));
     }

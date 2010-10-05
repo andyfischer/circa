@@ -13,15 +13,14 @@ void test_evaluate_with_lazy_stack()
     Term* c = branch.compile("add_i(a,a)");
 
     EvalContext context;
-    List stack;
-    evaluate_with_lazy_stack(&context, &stack, c);
+    evaluate_with_lazy_stack(&context, c);
 
-    test_equals(stack.toString(), "[[1, null, 2]]");
+    test_equals(context.stack.toString(), "[[1, null, 2]]");
     test_equals(as_int(c), 2);
 
     Term* d = branch.compile("add_i(a,b)");
-    evaluate_with_lazy_stack(&context, &stack, d);
-    test_equals(stack.toString(), "[[1, 3, 2, 4]]");
+    evaluate_with_lazy_stack(&context, d);
+    test_equals(context.stack.toString(), "[[1, 3, 2, 4]]");
     test_equals(as_int(d), 4);
 }
 

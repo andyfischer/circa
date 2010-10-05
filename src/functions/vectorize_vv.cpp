@@ -75,7 +75,7 @@ namespace vectorize_vv_function {
             swap(input0.getIndex(i), frame->get(0));
             swap(input1.getIndex(i), frame->get(1));
 
-            evaluate_single_term(CONTEXT, STACK, contents[2]);
+            evaluate_single_term(CONTEXT, contents[2]);
             frame = get_stack_frame(STACK, 0);
 
             // Save output

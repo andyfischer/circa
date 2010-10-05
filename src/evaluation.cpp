@@ -15,24 +15,24 @@
 
 namespace circa {
 
-void evaluate_single_term(EvalContext* context, List* stack, Term* term)
+void evaluate_single_term(EvalContext* context, Term* term)
 {
     EvaluateFunc func = function_t::get_evaluate(term->function);
     if (func != NULL) 
-        func(context, stack, term);
+        func(context, term);
 }
 
-void evaluate_branch_existing_frame(EvalContext* context, List* stack, Branch& branch)
+void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
     for (int i=0; i < branch.length(); i++)
-        evaluate_single_term(context, stack, branch[i]);
+        evaluate_single_term(context, branch[i]);
 }
 
-void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedValue* output)
+void evaluate_branch(EvalContext* context, Branch& branch, TaggedValue* output)
 {
-    List* frame = push_stack_frame(stack, branch.registerCount);
-    evaluate_branch_existing_frame(context, stack, branch);
-    frame = get_stack_frame(stack, 0);
+    List* frame = push_stack_frame(&context->stack, branch.registerCount);
+    evaluate_branch_existing_frame(context, branch);
+    frame = get_stack_frame(&context->stack, 0);
     if (output != NULL) {
         TaggedValue* lastValue = frame->get(frame->length()-1);
         if (lastValue != NULL)
@@ -40,17 +40,16 @@ void evaluate_branch(EvalContext* context, List* stack, Branch& branch, TaggedVa
         else
             make_null(output);
     }
-    pop_stack_frame(stack);
+    pop_stack_frame(&context->stack);
 }
 
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
-    List stack;
-    push_stack_frame(&stack, branch.registerCount);
-    evaluate_branch_existing_frame(context, &stack, branch);
+    push_stack_frame(&context->stack, branch.registerCount);
+    evaluate_branch_existing_frame(context, branch);
 
     // Copy stack back to terms
-    List* frame = get_stack_frame(&stack, 0);
+    List* frame = get_stack_frame(&context->stack, 0);
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;
@@ -83,6 +82,7 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
     return apply_and_eval(branch, function, inputs);
 }
 
+#ifdef BYTECODE
 void evaluate_bytecode(Branch& branch)
 {
     EvalContext context;
@@ -90,8 +90,9 @@ void evaluate_bytecode(Branch& branch)
     bytecode::update_bytecode(branch);
     bytecode::evaluate_bytecode(&context, &branch._bytecode, &stack);
 }
+#endif
 
-void copy_stack_back_to_terms(Branch& branch, List* stack)
+void copy_stack_back_to_terms(Branch& branch, List* frame)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
         Term* term = *it;
@@ -102,7 +103,7 @@ void copy_stack_back_to_terms(Branch& branch, List* stack)
         if (is_value(term))
             continue;
 
-        TaggedValue* value = stack->get(term->registerIndex);
+        TaggedValue* value = frame->get(term->registerIndex);
         if (value == NULL)
             continue;
 
@@ -118,7 +119,7 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
         copy(stack->get(callOp->inputs[i].registerIndex), inputs->get(i));
 }
 
-TaggedValue* get_input(List* stack, Term* term, int index)
+TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
 {
     Term* input = term->input(index);
     InputInfo& inputInfo = term->inputInfo(index);
@@ -126,14 +127,16 @@ TaggedValue* get_input(List* stack, Term* term, int index)
     if (input->registerIndex == -1)
         return NULL;
 
+    List* stack = &cxt->stack;
     List* frame = List::checkCast(stack->get(stack->length() - 1 - inputInfo.relativeScope));
     return frame->get(term->input(index)->registerIndex);
 }
 
-TaggedValue* get_output(List* stack, Term* term)
+TaggedValue* get_output(EvalContext* cxt, Term* term)
 {
     if (term->registerIndex == -1)
         return NULL;
+    List* stack = &cxt->stack;
     List* frame = List::checkCast(stack->get(stack->length()-1));
     return frame->get(term->registerIndex);
 }
@@ -157,8 +160,10 @@ List* get_stack_frame(List* stack, int relativeScope)
     return List::checkCast(stack->get(stack->length() - 1 - relativeScope));
 }
 
-void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
+void evaluate_with_lazy_stack(EvalContext* context, Term* term)
 {
+    List* stack = &context->stack;
+
     // Check each input.
     for (int i=0; i < term->numInputs(); i++) {
         Term* input = term->input(i);
@@ -199,7 +204,7 @@ void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
     }
 
     // Evaluate
-    evaluate_single_term(context, stack, term);
+    evaluate_single_term(context, term);
 
     // Copy output value back to term
     if (term->registerIndex != -1) {
@@ -212,9 +217,9 @@ void evaluate_with_lazy_stack(EvalContext* context, List* stack, Term* term)
 
 void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int start, int end)
 {
-    List stack;
+    context->stack.clear();
     for (int i=start; i <= end; i++)
-        evaluate_with_lazy_stack(context, &stack, branch[i]);
+        evaluate_with_lazy_stack(context, branch[i]);
 }
 
 } // namespace circa

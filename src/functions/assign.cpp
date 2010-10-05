@@ -10,7 +10,7 @@ namespace assign_function {
     {
         Branch& contents = CALLER->nestedContents;
         TaggedValue output;
-        evaluate_branch(CONTEXT, STACK, contents, &output);
+        evaluate_branch(CONTEXT, contents, &output);
         swap(&output, OUTPUT);
     }
 

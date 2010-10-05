@@ -36,7 +36,7 @@ namespace vectorize_vs_function {
             // Copy left into placeholder
             swap(input0.getIndex(i), frame->get(0));
 
-            evaluate_single_term(CONTEXT, STACK, contents[2]);
+            evaluate_single_term(CONTEXT, contents[2]);
             frame = get_stack_frame(STACK, 0);
 
             // Save output
