@@ -49,6 +49,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     post_input_change(result);
 
+    initialize_unique_name(result);
+
     return result;
 }
 
@@ -305,6 +307,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     term->type = type;
     change_type(term, type);
     reset(term);
+    initialize_unique_name(term);
 
     return term;
 }

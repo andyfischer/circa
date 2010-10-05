@@ -24,6 +24,8 @@ Branch* find_first_common_branch(Term* left, Term* right);
 std::string get_relative_name(Branch& branch, Term* term);
 std::string get_relative_name(Term* location, Term* term);
 
+void initialize_unique_name(Term* term);
+
 // Take all named terms in 'source' and bind them to the same name in 'destination'.
 // This is used for joining branches in if/for blocks.
 void expose_all_names(Branch& source, Branch& destination);

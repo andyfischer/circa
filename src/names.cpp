@@ -216,6 +216,31 @@ std::string get_relative_name(Term* location, Term* term)
         return get_relative_name(*location->owningBranch, term);
 }
 
+void initialize_unique_name(Term* term)
+{
+    Term* existingName = get_named_at(term, term->name);
+
+    if (existingName == NULL) {
+        term->uniqueName.ordinal = 0;
+        term->uniqueName.name = term->name;
+    } else {
+        term->uniqueName.ordinal = existingName->uniqueName.ordinal + 1;
+        // Construct a name by adding the ordinal to the end of the declared name,
+        // keep looping until we end up with a unique name. (the user may have already
+        // declared a name which matches our generated one.
+        while (true) {
+            char ordinalBuf[30];
+            sprintf(ordinalBuf, "%d", term->uniqueName.ordinal);
+            term->uniqueName.name = term->name + "_" + ordinalBuf;
+
+            if (get_named_at(term, term->uniqueName.name) == NULL)
+                break;
+
+            term->uniqueName.ordinal++;
+        }
+    }
+}
+
 void expose_all_names(Branch& source, Branch& destination)
 {
     for (TermNamespace::iterator it = source.names.begin(); it != source.names.end(); ++it)

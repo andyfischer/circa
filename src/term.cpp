@@ -165,7 +165,7 @@ Term* alloc_term()
     return term;
 }
 
-void ca_assert_term_invariants(Term* t)
+void assert_term_invariants(Term* t)
 {
     // Make sure the value type matches the declared type.
     if (t->type == INT_TYPE)

@@ -13,6 +13,13 @@
 
 namespace circa {
 
+struct UniqueName
+{
+    std::string name;
+    int ordinal;
+    UniqueName() : ordinal(0) {}
+};
+
 struct Term : TaggedValue
 {
     // Inherited from TaggedValue:
@@ -33,6 +40,8 @@ struct Term : TaggedValue
 
     // Our name binding.
     std::string name;
+
+    UniqueName uniqueName;
 
     // The branch that owns this term. May be NULL
     Branch* owningBranch;
@@ -100,6 +109,6 @@ struct Term : TaggedValue
 // Allocate a new Term object.
 Term* alloc_term();
 
-void ca_assert_term_invariants(Term* t);
+void assert_term_invariants(Term* t);
 
 } // namespace circa

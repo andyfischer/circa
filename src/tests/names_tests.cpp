@@ -142,6 +142,26 @@ void test_find_first_common_branch()
     test_assert(find_first_common_branch(a,e) == NULL);
 }
 
+void test_unique_names()
+{
+    Branch branch;
+    Term* a0 = create_int(branch, 5, "a");
+    Term* a1 = create_int(branch, 5, "a");
+
+    test_equals(a0->uniqueName.name, "a");
+    test_assert(a0->uniqueName.ordinal == 0);
+    test_equals(a1->uniqueName.name, "a_1");
+    test_assert(a1->uniqueName.ordinal == 1);
+
+    // Declare a name which overlaps with the next unique name that we'll
+    // try to generate for 'a'.
+    create_int(branch, 5, "a_2");
+    Term* a3 = create_int(branch, 5, "a");
+
+    test_equals(a3->uniqueName.name, "a_3");
+    test_assert(a3->uniqueName.ordinal == 3);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
@@ -151,6 +171,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
     REGISTER_TEST_CASE(names_tests::test_get_named_at);
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
+    REGISTER_TEST_CASE(names_tests::test_unique_names);
 }
 
 } // namespace names_tests

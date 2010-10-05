@@ -42,10 +42,9 @@ bool has_any_inlined_state(Branch& branch)
     return false;
 }
 
-std::string const& get_implicit_state_name(Term* term)
+const char* get_implicit_state_name(Term* term)
 {
-    // TODO
-    return term->function->name;
+    return term->uniqueName.name.c_str();
 }
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)

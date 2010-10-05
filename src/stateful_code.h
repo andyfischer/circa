@@ -10,7 +10,7 @@ bool is_get_state(Term* term);
 bool has_implicit_state(Term* term);
 bool is_function_stateful(Term* func);
 bool has_any_inlined_state(Branch& branch);
-std::string const& get_implicit_state_name(Term* term);
+const char* get_implicit_state_name(Term* term);
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
 
