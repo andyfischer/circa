@@ -355,6 +355,12 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
+TaggedValue* make_int(TaggedValue* value)
+{
+    change_type(value, INT_T);
+    return value;
+}
+
 void make_int(TaggedValue* value, int i)
 {
     change_type(value, INT_T);

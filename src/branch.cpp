@@ -289,6 +289,7 @@ void Branch::bindName(Term* term, std::string name)
 
     names.bind(term, name);
     term->name = name;
+    update_unique_name(term);
 }
 
 void Branch::remapPointers(ReferenceMap const& map)

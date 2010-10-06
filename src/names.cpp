@@ -216,7 +216,7 @@ std::string get_relative_name(Term* location, Term* term)
         return get_relative_name(*location->owningBranch, term);
 }
 
-void initialize_unique_name(Term* term)
+void update_unique_name(Term* term)
 {
     Term* existingName = get_named_at(term, term->name);
 

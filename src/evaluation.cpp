@@ -144,8 +144,8 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
 
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 {
-    Dict* state = Dict::checkCast(&cxt->currentScopeState);
-    return state->get(term->uniqueName.name.c_str());
+    Dict* state = make_dict(&cxt->currentScopeState);
+    return state->insert(term->uniqueName.name.c_str());
 }
 
 List* push_stack_frame(List* stack, int size)

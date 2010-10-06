@@ -415,9 +415,10 @@ bool is_dict(TaggedValue* value)
 {
     return value->value_type == DICT_T;
 }
-void make_dict(TaggedValue* value)
+Dict* make_dict(TaggedValue* value)
 {
     change_type(value, DICT_T);
+    return (Dict*) value;
 }
 
 } // namespace circa

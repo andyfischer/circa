@@ -48,7 +48,7 @@ struct Dict : TaggedValue
     static Dict* checkCast(TaggedValue* value);
 };
 
-void make_dict(TaggedValue* value);
+Dict* make_dict(TaggedValue* value);
 bool is_dict(TaggedValue* value);
 
 } // namespace circa

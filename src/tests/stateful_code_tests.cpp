@@ -130,8 +130,6 @@ void implicit_state_and_bytecode()
     branch.compile("def f() state s; s = 1 end");
     branch.compile("f()");
 
-    //dump_bytecode(branch);
-
     EvalContext context;
     evaluate_branch(&context, branch);
     
@@ -142,15 +140,29 @@ namespace test_interpreted_state_access
 {
     CA_FUNCTION(evaluate)
     {
+        TaggedValue* state = make_int(get_state_input(CONTEXT, CALLER));
+        make_int(state, as_int(state) + 1);
     }
 
     void test()
     {
         Branch branch;
         import_function(branch, evaluate, "func() -> void");
+        Term* a = branch.compile("a = func()");
+
+        test_equals(a->uniqueName.name, "a");
 
         EvalContext context;
+        test_equals(context.currentScopeState.toString(), "null");
 
+        evaluate_branch(&context, branch);
+        test_equals(context.currentScopeState.toString(), "[a: 1]");
+
+        evaluate_branch(&context, branch);
+        test_equals(context.currentScopeState.toString(), "[a: 2]");
+
+        evaluate_branch(&context, branch);
+        test_equals(context.currentScopeState.toString(), "[a: 3]");
     }
 }
 
@@ -164,6 +176,7 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state_and_bytecode);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state_and_bytecode);
+    REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);
 }
 
 } // namespace stateful_code_tests

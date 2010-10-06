@@ -66,6 +66,8 @@ void set_index(TaggedValue* value, int index, TaggedValue* element);
 TaggedValue* get_field(TaggedValue* value, const char* field);
 void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 
+TaggedValue* make_int(TaggedValue* value);
+
 void make_int(TaggedValue* value, int i);
 void make_float(TaggedValue* value, float f);
 void make_string(TaggedValue* value, const char* s);
