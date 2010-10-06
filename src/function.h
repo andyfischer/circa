@@ -72,6 +72,7 @@ namespace function_t {
     void set_variable_args(Term* function, bool value);
     Term* get_input_placeholder(Term* function, int index);
     Term* get_input_type(Term* function, int index);
+    bool is_state_input(Term* function, int index);
     std::string const& get_input_name(Term* function, int index);
     bool get_input_modified(Term* function, int index);
     bool get_input_meta(Term* function, int index);

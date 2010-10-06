@@ -80,6 +80,7 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
     bool meta = function_t::get_input_meta(term->function, effectiveIndex);
     bool optional = function_t::get_input_optional(term->function, effectiveIndex);
     Term* type = function_t::get_input_type(term->function, effectiveIndex);
+    optional = optional || function_t::is_state_input(term->function, effectiveIndex);
      
     if (input == NULL) {
         if (meta || optional)

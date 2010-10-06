@@ -12,7 +12,7 @@ namespace changed_function {
         "'Stateful function, returns whether the given input has changed since the "
         "last call.' end")
     {
-        TaggedValue* state = INPUT(0);
+        TaggedValue* state = STATE_INPUT;
         TaggedValue* current = INPUT(1);
 
         bool result;

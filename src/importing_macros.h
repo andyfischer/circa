@@ -28,6 +28,7 @@
 #define STRING_INPUT(index) circa::as_string(INPUT(index)).c_str()
 #define INT_INPUT(index) circa::as_int(INPUT(index))
 #define NUM_INPUTS (_circa_caller->numInputs())
+#define STATE_INPUT (get_state_input(_circa_cxt, _circa_caller))
 #define CALLER (_circa_caller)
 #define INPUT_TERM(index) (CALLER->input(index))
 #define CAPTURE_INPUTS(list) (capture_inputs(_circa_cxt, _circa_op, (list)))

@@ -269,6 +269,10 @@ namespace function_t {
 
         return function_t::get_input_placeholder(func, index)->type;
     }
+    bool is_state_input(Term* function, int index)
+    {
+        return get_input_placeholder(function,index)->boolPropOptional("state", false);
+    }
     EvaluateFunc& get_evaluate(Term* func)
     {
         return get_attrs(func).evaluate;

@@ -37,8 +37,14 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
         branch.bindName(result, name);
 
     // Initialize inputs
+    int firstInput = 0;
+    
+    // If the function is native and stateful then inputs start at 1 instead of 0.
+    if (is_native_function(function) && is_function_stateful(function))
+        firstInput = 1;
+
     for (int i=0; i < inputs.length(); i++)
-        set_input(result, i, inputs[i]);
+        set_input(result, i+firstInput, inputs[i]);
 
     Term* outputType = function_get_specialized_output_type(function, result);
 
