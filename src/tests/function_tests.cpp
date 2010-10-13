@@ -66,14 +66,14 @@ void overloaded_function()
             ->name, "mult_f");
 
     Term* add_i = branch.eval("add(1 2)");
-    test_equals(add_i->function->name, "add_i");
+    test_equals(add_i->nestedContents[0]->function->name, "add_i");
     Term* add_f = branch.eval("add(1.0 2)");
-    test_equals(add_f->function->name, "add_f");
+    test_equals(add_f->nestedContents[0]->function->name, "add_f");
 
     Term* mult_f = branch.eval("mult(1.0 3)");
-    test_equals(mult_f->function->name, "mult_f");
+    test_equals(mult_f->nestedContents[0]->function->name, "mult_f");
     Term* mult_f_2 = branch.eval("mult(3 1.0)");
-    test_equals(mult_f_2->function->name, "mult_f");
+    test_equals(mult_f_2->nestedContents[0]->function->name, "mult_f");
 }
 
 void test_is_native_function()
