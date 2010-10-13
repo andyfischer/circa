@@ -40,14 +40,73 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_dynamic_overload)
     {
+        //std::cout << STACK->toString() << std::endl;
+        //std::cout << get_term_to_string_extended(CALLER) << std::endl;
+
+        Branch& contents = CALLER->nestedContents;
+        Term* func = CALLER->function;
+
+        List& overloads = function_t::get_attrs(func).parameters;
+
+        int numInputs = NUM_INPUTS;
+
+        // Dynamically specialize this function
+        Term* specializedFunc = NULL;
+        for (int i=0; i < overloads.length(); i++) {
+            Term* overload = as_ref(overloads[i]);
+            bool varArgs = function_t::get_variable_args(func);
+
+            // Fail if wrong # of inputs
+            if (!varArgs && (function_t::num_inputs(overload) != numInputs))
+                continue;
+
+            // Check each input
+            bool inputsMatch = true;
+            for (int i=0; i < numInputs; i++) {
+                Type* type = type_contents(function_t::get_input_type(overload, i));
+                TaggedValue* value = INPUT(i);
+                if (value == NULL)
+                    continue;
+                if (!value_fits_type(value, type)) {
+                    inputsMatch = false;
+                    break;
+                }
+            }
+
+            if (!inputsMatch)
+                break;
+
+            specializedFunc = overload;
+            break;
+        }
+
+        if (specializedFunc != NULL) {
+            bool alreadyGenerated = (contents.length() > 0)
+                && contents[0]->function == specializedFunc;
+            if (!alreadyGenerated) {
+                apply(contents, specializedFunc, CALLER->inputs);
+                update_register_indices(contents);
+                //change_type(CALLER, contents[0]->type);
+            }
+            TaggedValue output;
+            evaluate_branch(CONTEXT, contents, &output);
+            cast(type_contents(contents[0]->type), &output, OUTPUT);
+        } else {
+            make_string(OUTPUT, "(specialized func not found)");
+        }
     }
 
     CA_FUNCTION(evaluate_overload)
     {
-        TaggedValue output;
         Branch& contents = CALLER->nestedContents;
-        evaluate_branch(CONTEXT, contents, &output);
-        swap(&output, OUTPUT);
+        if (contents.length() == 0) {
+            evaluate_dynamic_overload(CONTEXT, CALLER);
+            contents.clear();
+        } else {
+            TaggedValue output;
+            evaluate_branch(CONTEXT, contents, &output);
+            swap(&output, OUTPUT);
+        }
     }
 
     void overload_post_input_change(Term* term)
@@ -57,10 +116,19 @@ namespace overloaded_function {
 
         Term* specializedFunc = statically_specialize_function(term->function, term->inputs);
 
-        if (specializedFunc != NULL)
+        if (specializedFunc != NULL) {
             apply(contents, specializedFunc, term->inputs);
+            update_register_indices(contents);
+            change_type(term, contents[0]->type);
+        } else {
+            change_type(term, term->function->type);
+        }
+    }
 
-        update_register_indices(contents);
+    Term* overload_specialize_type(Term* term)
+    {
+        Branch& contents = term->nestedContents;
+        return contents[0]->type;
     }
 
     bool is_overloaded_function(Term* func)
@@ -98,6 +166,7 @@ namespace overloaded_function {
         function_t::set_name(term, name);
         function_t::get_attrs(term).evaluate = evaluate_overload;
         function_t::get_attrs(term).postInputChange = overload_post_input_change;
+        //function_t::get_attrs(term).specializeType = overload_specialize_type;
 
         List& parameters = function_t::get_attrs(term).parameters;
         parameters.clear();

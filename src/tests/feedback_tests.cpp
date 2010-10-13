@@ -153,13 +153,13 @@ void feedback_operation()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(feedback_tests::train_addition1);
-    REGISTER_TEST_CASE(feedback_tests::train_addition2);
-    REGISTER_TEST_CASE(feedback_tests::train_mult);
-    REGISTER_TEST_CASE(feedback_tests::train_cond);
-    //FIXME REGISTER_TEST_CASE(feedback_tests::train_sin);
-    //FIXME REGISTER_TEST_CASE(feedback_tests::train_cos);
-    REGISTER_TEST_CASE(feedback_tests::feedback_operation);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_addition1);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_addition2);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_mult);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_cond);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_sin);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_cos);
+    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::feedback_operation);
 }
 
 } // namespace feedback_tests
