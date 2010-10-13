@@ -50,8 +50,9 @@ void type_inference_for_iterator()
 void test_rebind_external()
 {
     Branch branch;
-    branch.eval("a = 0");
-    branch.eval("for i in [1]; a = 1; end");
+    branch.compile("a = 0");
+    branch.compile("for i in [1]; a = 1; end; a = a");
+    evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 1);
 }
@@ -61,6 +62,7 @@ void test_rebind_internally()
     Branch branch;
     branch.compile("a = 0");
     branch.compile("for i in [0 0 0]; a += 1; end");
+    dump_branch(branch);
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 3);

@@ -354,6 +354,9 @@ CA_FUNCTION(evaluate_for_loop)
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     bool modifyList = as_bool(get_for_loop_modify_list(CALLER));
 
+    TaggedValue output;
+    make_list(&output, 0);
+
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
@@ -411,6 +414,8 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     pop_stack_frame(STACK);
+
+    swap(&output, OUTPUT);
 }
 
 void for_loop_assign_registers(Term* term)
