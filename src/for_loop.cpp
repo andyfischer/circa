@@ -384,9 +384,8 @@ CA_FUNCTION(evaluate_for_loop)
                 copy(previousFrame.get(rebindTerm->input(1)->registerIndex), dest);
         }
 
-        for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
+        for (int i=loop_contents_location; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, forContents[i]);
-        }
 
         frame = List::checkCast(STACK->get(STACK->numElements() - 1));
 

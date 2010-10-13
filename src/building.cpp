@@ -142,7 +142,11 @@ int get_input_relative_scope(Term* term, int index)
     if (inputParent != NULL && inputParent->name == "#outer_rebinds"
             && input2ndParent != NULL && input2ndParent->function == FOR_FUNC)
         rootScope = input2ndParent->owningBranch;
-            
+
+    // For a for_loop #inner_rebind, use the for-loop contents as the root scope.
+    if (inputParent != NULL && inputParent->name == "#inner_rebinds"
+            && input2ndParent != NULL && input2ndParent->function == FOR_FUNC)
+        rootScope = inputParent->owningBranch;
 
     // Walk upwards from 'term' until we find the root branch.
     int relativeScope = 0;

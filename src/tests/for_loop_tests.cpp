@@ -59,21 +59,22 @@ void test_rebind_external()
 
 void test_rebind_internally()
 {
+    // The reason we have a=a at the end is because, when evaluating a branch locally, it
+    // won't correctly copy the stack back to a value when the value is inside the for-loop.
     Branch branch;
     branch.compile("a = 0");
-    branch.compile("for i in [0 0 0]; a += 1; end");
-    dump_branch(branch);
+    branch.compile("for i in [0 0 0]; a += 1; end; a = a");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 3);
 
     branch.compile("found_3 = false");
-    branch.compile("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end");
+    branch.compile("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end; found_3=found_3");
     evaluate_branch(branch);
     test_assert(branch["found_3"]->asBool());
 
     branch.compile("found_3 = false");
-    branch.compile("for n in [2 4 6 8]; if n == 3; found_3 = true; end; end");
+    branch.compile("for n in [2 4 6 8]; if n == 3; found_3 = true; end; end; found_3=found_3");
     evaluate_branch(branch);
     test_assert(branch["found_3"]->asBool() == false);
 }
