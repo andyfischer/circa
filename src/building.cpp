@@ -220,7 +220,7 @@ int assign_register(Term* term, int nextRegister)
         // for a term with Void output, 1 register otherwise.
         if (term->type == VOID_TYPE)
             registerCount = 0;
-        else if (is_value(term) && is_hidden(term))
+        else if (term->name == "#attributes")
             registerCount = 0;
         else
             registerCount = 1;

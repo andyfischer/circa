@@ -363,6 +363,8 @@ CA_FUNCTION(evaluate_for_loop)
         bool firstIter = iteration == 0;
         bool lastIter = iteration + 1 >= inputListLength;
 
+        ca_assert(forContents.registerCount > 0);
+
         List* frame = push_stack_frame(STACK, forContents.registerCount);
 
         // copy iterator
