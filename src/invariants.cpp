@@ -15,12 +15,17 @@ bool check_invariants(Term* term, std::string& result)
         return false;
     }
 
-    if (term->type != NULL
-            && term->type != ANY_TYPE
-            && !value_fits_type(term, type_contents(term->type))) {
-        result = "Value has wrong type: term->type is " + term->type->name + ", tag is "
-            + term->value_type->name;
-        return false;
+    if (term->type != NULL) {
+
+        bool typeOk = (term->type == ANY_TYPE)
+            || (term->type == VOID_TYPE && is_null(term))
+            || value_fits_type(term, type_contents(term->type));
+
+        if (!typeOk) {
+            result = "Value has wrong type: term->type is " + term->type->name + ", tag is "
+                + term->value_type->name;
+            return false;
+        }
     }
 
     if (term->nestedContents.owningTerm != term) {

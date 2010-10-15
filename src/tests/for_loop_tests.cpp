@@ -51,7 +51,7 @@ void test_rebind_external()
 {
     Branch branch;
     branch.compile("a = 0");
-    branch.compile("for i in [1]; a = 1; end; a = a");
+    branch.compile("for i in [1]; a = 1; end; a=a");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 1);
@@ -59,8 +59,8 @@ void test_rebind_external()
 
 void test_rebind_internally()
 {
-    // The reason we have a=a at the end is because, when evaluating a branch locally, it
-    // won't correctly copy the stack back to a value when the value is inside the for-loop.
+    // The reason we have a=a at the end is because for-loop exports aren't copied back
+    // to their respective terms.
     Branch branch;
     branch.compile("a = 0");
     branch.compile("for i in [0 0 0]; a += 1; end; a = a");

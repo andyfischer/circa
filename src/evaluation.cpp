@@ -97,6 +97,9 @@ void copy_stack_back_to_terms(Branch& branch, List* frame)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
         Term* term = *it;
+        if (is_major_branch(term))
+            it.skipNextBranch();
+
         if (term->registerIndex == -1)
             continue;
 
@@ -199,11 +202,11 @@ void evaluate_with_lazy_stack(EvalContext* context, Term* term)
         else
             frame->resize(owningBranchRegCount);
 
+        ca_assert(input->registerIndex < owningBranchRegCount);
+
         // Check to populate this input's register
         if (is_null(frame->get(input->registerIndex)))
             copy(input, frame->get(input->registerIndex));
-
-            ca_assert(stack->length() < 1000); // <-- trying to catch a bug
     }
 
     // Check that the stack has room for the term's output.

@@ -7,7 +7,6 @@
 
 namespace circa {
 
-
 void set_is_statement(Term* term, bool value)
 {
     term->setBoolProp("statement", value);
@@ -42,6 +41,11 @@ bool is_hidden(Term* term)
         return true;
 
     return false;
+}
+
+bool is_major_branch(Term* term)
+{
+    return is_subroutine(term);
 }
 
 std::string format_global_id(Term* term)
