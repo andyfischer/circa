@@ -57,7 +57,7 @@ CA_FUNCTION(load_font)
     if (result == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
-        error_occurred(CONTEXT_AND_CALLER, err.str());
+        error_occurred(CONTEXT, CALLER, err.str());
         return;
     }
 
@@ -152,7 +152,7 @@ CA_FUNCTION(draw_rendered_text)
     // Clean up state
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 void pre_setup(Branch& branch)

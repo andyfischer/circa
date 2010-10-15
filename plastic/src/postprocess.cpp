@@ -135,7 +135,7 @@ namespace postprocess_functions
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
         glBindTexture(GL_TEXTURE_2D, 0);
 
-        gl_check_error(CONTEXT_AND_CALLER);
+        gl_check_error(CONTEXT, CALLER);
     }
 
     CA_FUNCTION(draw_surface_at)

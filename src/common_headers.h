@@ -60,7 +60,7 @@ typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
 #define CA_FUNCTION(fname) \
     void fname(circa::EvalContext* _circa_cxt, \
-            Term* _circa_caller)
+            circa::Term* _circa_caller)
 
 typedef void (*EvaluateFunc)(EvalContext* cxt, Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);

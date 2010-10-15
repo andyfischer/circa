@@ -28,7 +28,7 @@ CA_FUNCTION(hosted_load_texture)
     }
     make_int(OUTPUT, texid);
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(hosted_image)
@@ -41,7 +41,7 @@ CA_FUNCTION(hosted_image)
     float y2 = FLOAT_INPUT(5);
 
     if (texid == 0) {
-        texid = load_image_to_texture(CONTEXT_AND_CALLER, filename.c_str());
+        texid = load_image_to_texture(CONTEXT, CALLER, filename.c_str());
         if (CONTEXT->errorOccurred) return;
     }
 
@@ -63,7 +63,7 @@ CA_FUNCTION(hosted_image)
     // reset state
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 void setup(circa::Branch& branch)

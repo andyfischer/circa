@@ -19,7 +19,7 @@ CA_FUNCTION(quit)
 
 CA_FUNCTION(reset_state)
 {
-    reset_state(app::users_branch());
+    //reset_state(app::users_branch());
     if (app::paused() && app::pause_reason() == PauseStatus::RUNTIME_ERROR)
         app::unpause();
 }

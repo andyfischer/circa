@@ -106,7 +106,7 @@ CA_FUNCTION(load_image)
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
-        error_occurred(CONTEXT_AND_CALLER, "Error loading " + filename + ": " + SDL_GetError());
+        error_occurred(CONTEXT, CALLER, "Error loading " + filename + ": " + SDL_GetError());
         return;
     }
 
@@ -145,7 +145,7 @@ CA_FUNCTION(draw_image)
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(draw_image_clip)
@@ -195,7 +195,7 @@ CA_FUNCTION(draw_image_clip)
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 #endif
 }
 

@@ -14,7 +14,7 @@ int main( int argc, char* args[] )
     for (int i = 1; i < argc; i++)
         argv.push_back(args[i]);
 
-    circa::storage::use_filesystem();
+    circa_storage_use_filesystem();
 
     return plastic_main(argv);
 }

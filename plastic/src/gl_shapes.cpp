@@ -83,7 +83,7 @@ CA_FUNCTION(background)
 
     glClear(GL_COLOR_BUFFER_BIT);
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_triangles)
@@ -105,7 +105,7 @@ CA_FUNCTION(gl_triangles)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_line_strip)
@@ -126,7 +126,7 @@ CA_FUNCTION(gl_line_strip)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_line_loop)
@@ -147,7 +147,7 @@ CA_FUNCTION(gl_line_loop)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_lines)
@@ -168,7 +168,7 @@ CA_FUNCTION(gl_lines)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_points)
@@ -189,7 +189,7 @@ CA_FUNCTION(gl_points)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_circle)
@@ -231,7 +231,7 @@ CA_FUNCTION(gl_circle)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(gl_pie)
@@ -286,7 +286,7 @@ CA_FUNCTION(gl_pie)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(load_program)
@@ -295,11 +295,11 @@ CA_FUNCTION(load_program)
     std::string fragFilename = STRING_INPUT(1);
 
     if (!circa::storage::file_exists(vertFilename.c_str())) {
-        error_occurred(CONTEXT_AND_CALLER, "File not found: " + vertFilename);
+        error_occurred(CONTEXT, CALLER, "File not found: " + vertFilename);
         return;
     }
     if (!circa::storage::file_exists(fragFilename.c_str())) {
-        error_occurred(CONTEXT_AND_CALLER, "File not found: " + fragFilename);
+        error_occurred(CONTEXT, CALLER, "File not found: " + fragFilename);
         return;
     }
 
@@ -315,7 +315,7 @@ CA_FUNCTION(load_program)
     if (!success) {
         GLchar error[256];
         glGetShaderInfoLog(vertShader, sizeof(error), 0, error);
-        error_occurred(CONTEXT_AND_CALLER, error);
+        error_occurred(CONTEXT, CALLER, error);
         return;
     }
 
@@ -330,7 +330,7 @@ CA_FUNCTION(load_program)
     if (!success) {
         GLchar error[256];
         glGetShaderInfoLog(fragShader, sizeof(error), 0, error);
-        error_occurred(CONTEXT_AND_CALLER, error);
+        error_occurred(CONTEXT, CALLER, error);
         return;
     }
 
@@ -344,11 +344,11 @@ CA_FUNCTION(load_program)
     {
         GLchar error[256];
         glGetProgramInfoLog(program, sizeof(error), 0, error);
-        error_occurred(CONTEXT_AND_CALLER, error);
+        error_occurred(CONTEXT, CALLER, error);
         return;
     }
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 
     make_int(OUTPUT, program);
 }
@@ -357,7 +357,7 @@ CA_FUNCTION(use_program)
 {
     current_program = INT_INPUT(0);
     glUseProgram(current_program);
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(set_uniform)
@@ -367,7 +367,7 @@ CA_FUNCTION(set_uniform)
 
     GLint loc = glGetUniformLocation(current_program, name);
 
-    if (gl_check_error(CONTEXT_AND_CALLER))
+    if (gl_check_error(CONTEXT, CALLER))
         return;
 
     if (is_int(input)) {
@@ -393,7 +393,7 @@ CA_FUNCTION(set_uniform)
             int item_length = contents[0]->asBranch().length();
 
             if (item_length != 2) {
-                error_occurred(CONTEXT_AND_CALLER, "Unsupported item length");
+                error_occurred(CONTEXT, CALLER, "Unsupported item length");
                 return;
             }
 
@@ -412,11 +412,11 @@ CA_FUNCTION(set_uniform)
     }
 #endif
     else {
-        error_occurred(CONTEXT_AND_CALLER, "Unsupported type: " + input->value_type->name);
+        error_occurred(CONTEXT, CALLER, "Unsupported type: " + input->value_type->name);
         return;
     }
 
-    gl_check_error(CONTEXT_AND_CALLER);
+    gl_check_error(CONTEXT, CALLER);
 }
 
 void setup(Branch& branch)
