@@ -84,7 +84,7 @@ void test_rewrite_input_list()
     Branch branch;
     branch.compile("l = [1 2 3]");
     branch.compile("for i in @l; i += 1; end");
-    dump_branch(branch);
+    //dump_branch(branch);
     evaluate_branch(branch);
 
     List* l = List::checkCast(branch["l"]);

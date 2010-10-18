@@ -115,7 +115,7 @@ void test_dynamic_overload()
     test_assert(result->asInt() == 8);
 
     make_float(b, 3.0);
-    dump_branch(branch);
+    //dump_branch(branch);
     evaluate_branch(&context, branch);
     test_assert(context);
     test_assert(result->asFloat() == 8.0);

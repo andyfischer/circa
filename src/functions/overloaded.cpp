@@ -120,8 +120,6 @@ namespace overloaded_function {
             apply(contents, specializedFunc, term->inputs);
             update_register_indices(contents);
             change_type(term, contents[0]->type);
-        } else {
-            change_type(term, term->function->type);
         }
     }
 

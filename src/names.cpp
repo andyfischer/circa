@@ -58,10 +58,6 @@ Term* get_named(Branch const& branch, std::string const& name)
     if (prefix == NULL)
         return NULL;
 
-    // Give up if prefix does not refer to a branch
-    if (!is_branch(prefix))
-        return NULL;
-
     // Recursively search inside prefix. Future: should do this without allocating
     // a new string.
     std::string suffix = name.substr(nameEnd+1, name.length());
