@@ -586,7 +586,7 @@ void initialize_branch_based_type(Term* term)
 
 bool is_namespace(Term* term)
 {
-    return is_branch(term) && term->type == NAMESPACE_TYPE;
+    return term->function == NAMESPACE_FUNC;
 }
 
 bool is_namespace(Branch& branch)

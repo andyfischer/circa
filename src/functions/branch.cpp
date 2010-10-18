@@ -36,17 +36,6 @@ namespace branch_function {
             }
 
             append_phrase(source, "]", term, token::RBRACKET);
-        } else if (term->type == NAMESPACE_TYPE) {
-            append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
-            append_phrase(source, term->name, term, phrase_type::TERM_NAME);
-            append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
-                    term, token::WHITESPACE);
-            format_branch_source(source, term->nestedContents, NULL);
-            append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
-                    term, token::WHITESPACE);
-                    
-            append_phrase(source, "end", term, phrase_type::KEYWORD);
-            
         } else {
             format_name_binding(source, term);
             format_branch_source(source, term->nestedContents, term);

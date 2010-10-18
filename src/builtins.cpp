@@ -52,7 +52,7 @@ Term* JOIN_FUNC = NULL;
 Term* LIST_TYPE = NULL;
 Term* LIST_FUNC = NULL;
 Term* MULT_FUNC = NULL;
-Term* NAMESPACE_TYPE = NULL;
+Term* NAMESPACE_FUNC = NULL;
 Term* NEG_FUNC = NULL;
 Term* NOT_FUNC = NULL;
 Term* ONE_TIME_ASSIGN_FUNC = NULL;
@@ -243,6 +243,11 @@ void pre_initialize_types(Branch& kernel)
     parse_type(kernel, "type FileSignature { string filename, int time_modified }");
 }
 
+void pre_setup_builtin_functions(Branch& kernel)
+{
+    namespace_function::early_setup(kernel);
+}
+
 void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
@@ -300,6 +305,7 @@ export_func void circa_initialize()
     pre_initialize_types(*KERNEL);
     setup_types(*KERNEL);
     feedback_register_constants(*KERNEL);
+    pre_setup_builtin_functions(*KERNEL);
     setup_builtin_functions(*KERNEL);
     post_setup_functions(*KERNEL);
     parse_types(*KERNEL);

@@ -395,7 +395,7 @@ Branch& create_branch(Branch& owner, std::string const& name)
 
 Branch& create_namespace(Branch& branch, std::string const& name)
 {
-    return create_value(branch, NAMESPACE_TYPE, name)->nestedContents;
+    return apply(branch, NAMESPACE_FUNC, RefList(), name)->nestedContents;
 }
 
 Term* create_type(Branch& branch, std::string name)

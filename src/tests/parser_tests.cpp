@@ -126,7 +126,7 @@ void test_infix()
     test_assert(branch.length() == 3);
     test_assert(branch[0]->asFloat() == 1.0);
     test_assert(branch[1]->asFloat() == 2.0);
-    test_assert(branch[2]->function->name == "add_f");
+    test_assert(branch[2]->function->name == "add");
     test_assert(branch[2]->input(0) == branch[0]);
     test_assert(branch[2]->input(1) == branch[1]);
 
@@ -182,7 +182,7 @@ void test_function_decl()
     test_assert(funcbranch[4]->input(1) == funcbranch[2]);
     test_assert(funcbranch[4]->input(1) == funcbranch[2]);
     test_assert(funcbranch[5]->asInt() == 3);
-    test_equals(funcbranch[6]->function->name, "greater_than_i");
+    test_equals(funcbranch[6]->function->name, "greater_than");
     test_assert(funcbranch[6]->input(0) == funcbranch[3]);
     test_assert(funcbranch[6]->input(1) == funcbranch[5]);
     //test_assert(funcbranch.length() == 7);
@@ -291,7 +291,7 @@ void test_rebinding_infix_operator()
     Term* i = branch.eval("i += 1.0");
 
     test_assert(branch["i"] == i);
-    test_assert(i->function->name == "add_f");
+    test_assert(i->function->name == "add");
     test_assert(i->name == "i");
     test_assert(i->input(0)->name == "i");
 }
@@ -355,11 +355,12 @@ void test_semicolon_as_line_ending()
     branch.compile("a = 1+2 ; b = mult(3,4) ; b -> print");
     test_assert(!has_static_errors(branch));
     test_assert(branch.length() == 7);
-    test_assert(branch["a"]->function->name == "add_i");
-    test_assert(branch["b"]->function->name == "mult_i");
+    test_assert(branch["a"]->function->name == "add");
+    test_assert(branch["b"]->function->name == "mult");
 
     branch.clear();
     branch.compile("cond = true; if cond; a = 1; else; a = 2; end");
+    branch.compile("a=a");
 
     test_assert(!has_static_errors(branch));
     evaluate_branch(branch);
@@ -377,7 +378,7 @@ void test_unary_minus()
     Term* a = branch.eval("a = 1");
     Term* b = branch.eval("b = -a");
 
-    test_assert(b->function->name == "neg_i");
+    test_assert(b->function->name == "neg");
     test_assert(b->input(0) == a);
     test_equals(b->toFloat(), -1.0);
 
@@ -390,12 +391,12 @@ void test_unary_minus()
     // Sometimes, literals with a - sign are supposed to turn that into a minus operation
     // This is the case if there are no spaces around the -
     Term* d = branch.eval("2-1");
-    test_assert(d->function->name == "sub_i");
+    test_assert(d->function->name == "sub");
     test_assert(d->asInt() == 1);
 
     // Or if there are spaces on both sides of the -
     Term* e = branch.eval("2 - 1");
-    test_assert(e->function->name == "sub_i");
+    test_assert(e->function->name == "sub");
     test_assert(e->asInt() == 1);
 
     // But if there's a space before the - and not after it, that should be parsed as
@@ -426,7 +427,8 @@ void test_float_division()
     Term* a = branch.eval("5 / 3");
 
     test_assert(a->type == FLOAT_TYPE);
-    test_equals(a->function->name, "div_f");
+    test_equals(a->function->name, "div");
+    test_equals(a->nestedContents[0]->function->name, "div_f");
     test_equals(a->toFloat(), 5.0f/3.0f);
 }
 
@@ -436,7 +438,7 @@ void test_integer_division()
     Term* a = branch.eval("5 // 3");
 
     test_assert(a->type == INT_TYPE);
-    test_assert(a->function->name == "div_i");
+    test_equals(a->function->name, "div_i");
     test_assert(a->asInt() == 1);
 }
 
@@ -446,7 +448,7 @@ void test_namespace()
     Term* ns = branch.eval("namespace ns; a = 1; b = 2; end");
 
     test_assert(branch);
-    test_assert(ns->type == NAMESPACE_TYPE);
+    test_assert(ns->function == NAMESPACE_FUNC);
     test_assert(ns->nestedContents.contains("a"));
     test_assert(ns->nestedContents.contains("b"));
 

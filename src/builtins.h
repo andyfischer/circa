@@ -38,6 +38,7 @@ extern Term* JOIN_FUNC;
 extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;
+extern Term* NAMESPACE_FUNC;
 extern Term* NEG_FUNC;
 extern Term* NOT_FUNC;
 extern Term* ONE_TIME_ASSIGN_FUNC;
@@ -71,7 +72,6 @@ extern Term* FEEDBACK_TYPE;
 extern Term* FUNCTION_TYPE;
 extern Term* FUNCTION_ATTRS_TYPE;
 extern Term* LIST_TYPE;
-extern Term* NAMESPACE_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
 
@@ -99,6 +99,10 @@ namespace assign_function {
     void update_assign_contents(Term* term);
 }
 
+namespace branch_function {
+    CA_FUNCTION(branch_evaluate);
+}
+
 namespace copy_function {
     CA_FUNCTION(evaluate);
 }
@@ -118,6 +122,10 @@ namespace file_changed_function {
 
 namespace for_function {
     std::string get_heading_source(Term* term);
+}
+
+namespace namespace_function {
+    void early_setup(Branch& kernel);
 }
 
 namespace overloaded_function {

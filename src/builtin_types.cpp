@@ -380,7 +380,6 @@ void setup_types(Branch& kernel)
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(type_contents(map_type));
 
-    NAMESPACE_TYPE = create_branch_based_type(kernel, "Namespace");
     CODE_TYPE = create_branch_based_type(kernel, "Code");
 
     Term* branchRefType = parse_type(kernel, "type BranchRef { Ref target }");

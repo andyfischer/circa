@@ -1663,8 +1663,7 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
             "Expected identifier after 'namespace'");
 
     std::string name = tokens.consume(IDENTIFIER);
-    Term* result = apply(branch, BRANCH_FUNC, RefList(), name);
-    change_type(result, NAMESPACE_TYPE);
+    Term* result = apply(branch, NAMESPACE_FUNC, RefList(), name);
 
     result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
