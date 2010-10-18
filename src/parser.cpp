@@ -705,23 +705,27 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     // check for @ operator
-    bool foundAtOperator = false;
+    bool rebindListName = false;
     if (tokens.nextIs(AT_SIGN)) {
         tokens.consume(AT_SIGN);
-        foundAtOperator = true;
+        rebindListName = true;
         possible_whitespace(tokens);
     }
 
     Term* listExpr = infix_expression(branch, tokens);
     recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
-    Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr));
+    std::string name;
+    if (rebindListName)
+        name = listExpr->name;
+
+    Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr), name);
     Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
 
-    make_bool(get_for_loop_modify_list(forTerm), foundAtOperator);
+    make_bool(get_for_loop_modify_list(forTerm), rebindListName);
 
-    if (foundAtOperator)
+    if (rebindListName)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
 
     forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));

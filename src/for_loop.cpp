@@ -96,11 +96,6 @@ void setup_for_loop_post_code(Term* forTerm)
         set_input(outerRebind, 0, original);
     }
 
-    bool modifyList = as_bool(get_for_loop_modify_list(forTerm));
-
-    if (modifyList)
-        apply(outerRebinds, JOIN_FUNC, RefList(), listName);
-
     expose_all_names(outerRebinds, outerScope);
     update_register_indices(forContents);
 }
@@ -352,13 +347,12 @@ CA_FUNCTION(evaluate_for_loop)
     Branch& forContents = CALLER->nestedContents;
     Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
-    bool modifyList = as_bool(get_for_loop_modify_list(CALLER));
-
-    TaggedValue output;
-    make_list(&output, 0);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
+
+    TaggedValue outputTv;
+    List* output = make_list(&outputTv, inputListLength);
 
     List previousFrame;
 
@@ -389,6 +383,10 @@ CA_FUNCTION(evaluate_for_loop)
 
         frame = List::checkCast(STACK->get(STACK->numElements() - 1));
 
+        // Save output
+        if (forContents.outputRegister != -1)
+            copy(frame->get(forContents.outputRegister), output->get(iteration));
+
         if (!lastIter) {
             // Only pop the stack if this isn't the last iteration; if it's the last
             // iter then we do it later.
@@ -414,7 +412,7 @@ CA_FUNCTION(evaluate_for_loop)
 
     pop_stack_frame(STACK);
 
-    swap(&output, OUTPUT);
+    swap(output, OUTPUT);
 }
 
 void for_loop_assign_registers(Term* term)
@@ -443,6 +441,18 @@ void for_loop_assign_registers(Term* term)
     }
 
     forContents.registerCount = next;
+
+    // Figure out the output register. If this is a list-rewrite, then the output
+    // is the last term that has the iterator's name binding. Otherwise just use
+    // the last term.
+    if (as_bool(get_for_loop_modify_list(term))) {
+        Term* output = forContents[get_for_loop_iterator(term)->name];
+        ca_assert(output != NULL);
+        //ca_assert(output->registerIndex != -1);
+        forContents.outputRegister = output->registerIndex;
+    } else {
+        forContents.outputRegister = forContents.registerCount - 1;
+    }
 }
 
 } // namespace circa

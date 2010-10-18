@@ -23,6 +23,7 @@ struct Branch
     int _refCount;
 
     int registerCount;
+    int outputRegister;
 
     bytecode::BytecodeData _bytecode;
 

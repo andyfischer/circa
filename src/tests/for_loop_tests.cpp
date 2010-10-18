@@ -79,12 +79,26 @@ void test_rebind_internally()
     test_assert(branch["found_3"]->asBool() == false);
 }
 
+void test_rewrite_input_list()
+{
+    Branch branch;
+    branch.compile("l = [1 2 3]");
+    branch.compile("for i in @l; i += 1; end");
+    dump_branch(branch);
+    evaluate_branch(branch);
+
+    List* l = List::checkCast(branch["l"]);
+    test_assert(l != NULL);
+    test_equals(l->toString(), "[2, 3, 4]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
     REGISTER_TEST_CASE(for_loop_tests::type_inference_for_iterator);
     REGISTER_TEST_CASE(for_loop_tests::test_rebind_external);
     REGISTER_TEST_CASE(for_loop_tests::test_rebind_internally);
+    REGISTER_TEST_CASE(for_loop_tests::test_rewrite_input_list);
 }
 
 } // for_loop_tests
