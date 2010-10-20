@@ -30,7 +30,6 @@ if POSIX:
     map(common_flags, ALL)
     DEBUG.Append(CPPDEFINES = ["DEBUG"])
     RELEASE.Append(CPPFLAGS=['-O1'])
-    
 
 if WINDOWS:
     def common_flags(env):

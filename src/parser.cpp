@@ -1669,6 +1669,8 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 
     consume_branch(result->nestedContents, tokens);
 
+    post_input_change(result);
+
     return result;
 }
 

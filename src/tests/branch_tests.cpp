@@ -174,7 +174,8 @@ void test_duplicate_nested()
     branch.eval("a = 1.0");
     Branch& inner = branch.eval("inner = branch()")->nestedContents;
     inner.eval("i = 2.0");
-    inner.eval("j = add(a,i)");
+    inner.compile("j = add(a,i)");
+    dump_branch(branch);
 
     Branch dupe;
     duplicate_branch(branch, dupe);

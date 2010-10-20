@@ -6,6 +6,34 @@
 namespace circa {
 namespace namespace_function {
 
+    CA_FUNCTION(evaluate)
+    {
+        Branch& contents = CALLER->nestedContents;
+        evaluate_branch_existing_frame(CONTEXT, contents);
+    }
+
+    int get_register_count(Term* term)
+    {
+        Branch& contents = term->nestedContents;
+        int count = 0;
+        for (int i=0; i < contents.length(); i++)
+            count += circa::get_register_count(contents[i]);
+        return count;
+    }
+
+    void assign_registers(Term* term)
+    {
+        Branch& contents = term->nestedContents;
+        int next = term->registerIndex;
+        for (int i=0; i < contents.length(); i++) {
+            Term* item = contents[i];
+            int count = circa::get_register_count(item);
+            if (count != 0)
+                item->registerIndex = next;
+            next += count;
+        }
+    }
+
     void format_source(StyledSource* source, Term* term)
     {
         append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
@@ -21,8 +49,10 @@ namespace namespace_function {
 
     void early_setup(Branch& kernel)
     {
-        NAMESPACE_FUNC = import_function(kernel, branch_function::branch_evaluate, "namespace()");
+        NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
         function_t::get_attrs(NAMESPACE_FUNC).formatSource = format_source;
+        function_t::get_attrs(NAMESPACE_FUNC).getRegisterCount = get_register_count;
+        function_t::get_attrs(NAMESPACE_FUNC).assignRegisters = assign_registers;
     }
     void setup(Branch& kernel) {}
 }

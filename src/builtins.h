@@ -99,10 +99,6 @@ namespace assign_function {
     void update_assign_contents(Term* term);
 }
 
-namespace branch_function {
-    CA_FUNCTION(branch_evaluate);
-}
-
 namespace copy_function {
     CA_FUNCTION(evaluate);
 }

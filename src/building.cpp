@@ -53,6 +53,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     change_type(result, outputType);
 
+    result->registerIndex = guess_at_register_index_of_new_term(result);
+
     post_input_change(result);
 
     update_unique_name(result);
@@ -120,6 +122,15 @@ int get_input_relative_scope(Term* term, int index)
 
     ca_assert(rootScope != NULL);
 
+    // If the input term is inside a namespace, look at its parent scope.
+    while (rootScope->owningTerm && is_namespace(rootScope->owningTerm)) {
+        Branch* parent_branch = get_parent_branch(*rootScope);
+        // shouldn't have a parentless namespace
+        ca_assert(parent_branch != NULL);
+
+        rootScope = parent_branch;
+    }
+
     // Special case for if-blocks: if a join term is trying to reach a term inside
     // an if-branch, then it's relative scope 0.
     
@@ -154,8 +165,7 @@ int get_input_relative_scope(Term* term, int index)
     while (scope != rootScope) {
 
         if (scope == NULL && rootScope != NULL) {
-            //internal_error("Couldn't reach root scope from term");
-            //FIXME
+            //FIXME internal_error("Couldn't reach root scope from term");
             return -1;
         }
 
@@ -171,13 +181,36 @@ int get_input_relative_scope(Term* term, int index)
             countLayer = false;
         else if (parentTerm->name == "#outer_rebinds")
             countLayer = false;
+        else if (parentTerm->function == NAMESPACE_FUNC)
+            countLayer = false;
 
         if (countLayer)
             relativeScope++;
 
         scope = get_parent_branch(*scope);
     }
+
+    ca_assert(relativeScope >= 0);
+
     return relativeScope;
+}
+
+int guess_at_register_index_of_new_term(Term* term)
+{
+    if (get_register_count(term) == 0)
+        return -1;
+
+    if (term->owningBranch == NULL)
+        return 0;
+
+    Branch& branch = *term->owningBranch;
+
+    for (int i = term->index - 1; i >= 0; i--) {
+        Term* prev = branch[i];
+        if (prev && prev->registerIndex != -1)
+            return prev->registerIndex + get_register_count(prev);
+    }
+    return 0;
 }
 
 void post_input_change(Term* term)
@@ -213,24 +246,34 @@ void update_register_indices(Branch& branch)
     branch.registerCount = next;
 }
 
-int assign_register(Term* term, int nextRegister)
+void update_register_indices(Term* term)
+{
+    // Might be nice to get rid of update_register_indices(Branch&) in favor of this.
+    update_register_indices(term->nestedContents);
+}
+
+int get_register_count(Term* term)
 {
     FunctionAttrs::GetRegisterCount getRegisterCount
         = function_t::get_attrs(term->function).getRegisterCount;
 
-    int registerCount;
     if (getRegisterCount == NULL) {
         // Default behavior if getRegisterCount is not defined: 0 registers
         // for a term with Void output, 1 register otherwise.
         if (term->type == VOID_TYPE)
-            registerCount = 0;
+            return 0;
         else if (term->name == "#attributes")
-            registerCount = 0;
+            return 0;
         else
-            registerCount = 1;
+            return 1;
     } else {
-        registerCount = getRegisterCount(term);
+        return getRegisterCount(term);
     }
+}
+
+int assign_register(Term* term, int nextRegister)
+{
+    int registerCount = get_register_count(term);
 
     if (registerCount == 0)
         term->registerIndex = -1;
@@ -239,8 +282,10 @@ int assign_register(Term* term, int nextRegister)
 
     // Some terms have inner registers that need to be changed along with the
     // outer registerIndex.
-    if (term->function == IF_BLOCK_FUNC || term->function == FOR_FUNC)
-        update_register_indices(term->nestedContents);
+    if (term->function == IF_BLOCK_FUNC
+            || term->function == FOR_FUNC
+            || term->function == NAMESPACE_FUNC)
+        update_register_indices(term);
 
     return nextRegister + registerCount;
 }
@@ -318,6 +363,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     change_type(term, type);
     reset(term);
     update_unique_name(term);
+    term->registerIndex = guess_at_register_index_of_new_term(term);
 
     return term;
 }

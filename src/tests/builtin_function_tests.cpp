@@ -214,9 +214,6 @@ void test_changed()
 
 void test_message_passing()
 {
-    #if 0
-    FIXME
-    return;
     Branch branch;
     EvalContext context;
     Term* i = branch.compile("i = inbox()");
@@ -224,20 +221,20 @@ void test_message_passing()
 
     // Before running, i should be empty
     test_assert(i->numElements() == 0);
-    test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
 
     // First run, i is still empty, but the hidden state has 1
     std::cout << context.topLevelState.toString() << std::endl;
     evaluate_branch(&context, branch);
     std::cout << context.topLevelState.toString() << std::endl;
     test_assert(i->numElements() == 0);
-    test_assert(get_hidden_state_for_call(i)->numElements() == 1);
+    //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
 
     // Second run, i now returns 1
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    test_assert(get_hidden_state_for_call(i)->numElements() == 1);
+    //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
 
     // Delete the send() call
     branch.remove(send);
@@ -246,13 +243,28 @@ void test_message_passing()
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
 
     // Fourth run, i is empty again
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 0);
-    test_assert(get_hidden_state_for_call(i)->numElements() == 0);
-    #endif
+    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+}
+
+void test_namespace()
+{
+    Branch branch;
+
+    // make it harder for registerIndex to be correct by coincidence:
+    branch.compile("filler1 = 'filler1'");
+    branch.compile("filler2 = 'filler2'");
+
+    branch.compile("namespace ns a = 1 end");
+    Term* b = branch.compile("b = ns:a");
+    dump_branch(branch);
+    evaluate_branch(branch);
+
+    test_assert(as_int(b) == 1);
 }
 
 void register_tests()
@@ -269,7 +281,8 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
-    REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
+    REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
 }
 
 } // namespace builtin_function_tests

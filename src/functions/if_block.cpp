@@ -40,6 +40,11 @@ namespace if_block_function {
     int get_register_count(Term* term)
     {
         Branch& contents = term->nestedContents;
+
+        // check if term is still being initialized:
+        if (contents.length() == 0)
+            return 1;
+
         Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
         return outerRebinds.length() + 1;
     }
@@ -48,9 +53,8 @@ namespace if_block_function {
     {
         Branch& joining = term->nestedContents["#joining"]->nestedContents;
 
-        for (int i=0; i < joining.length(); i++) {
+        for (int i=0; i < joining.length(); i++)
             joining[i]->registerIndex = term->registerIndex + 1 + i;
-        }
     }
 
     void setup(Branch& kernel)
