@@ -68,49 +68,6 @@ std::string get_short_local_name(Term* term)
     return format_global_id(term);
 }
 
-void print_term_raw_string(std::ostream& out, Term* term)
-{
-    if (term == NULL) {
-        out << "<NULL>";
-        return;
-    }
-
-    std::string name = term->name;
-    std::string funcName = term->function == NULL ? "<NULL function>"
-        : get_short_local_name(term->function);
-    std::string typeName = term->type == NULL ? "<NULL type>"
-        : term->type->name;
-   
-    out << format_global_id(term) << " ";
-
-    if (name != "")
-        out << "'" << name << "' ";
-
-    out << funcName << "(";
-
-    bool first_input = true;
-    for (int input_index=0; input_index < term->inputs.length(); input_index++) {
-        Term* input = term->inputs[input_index];
-        if (!first_input) out << ", ";
-        if (input == NULL)
-            out << "NULL";
-        else
-            out << format_global_id(input);
-        first_input = false;
-    }
-
-    out << ")";
-    out << " -> " << typeName;
-    out << " == " << term->toString();
-}
-
-std::string term_to_raw_string(Term* term)
-{
-    std::stringstream out;
-    print_term_raw_string(out, term);
-    return out.str();
-}
-
 std::string branch_namespace_to_string(Branch& branch)
 {
     std::stringstream out;
