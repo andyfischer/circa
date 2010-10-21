@@ -186,6 +186,8 @@ void test_duplicate_nested()
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);
 
+    //dump_branch(dupe);
+
     test_assert(dupe["a"]->asFloat() == 1.0);
     test_assert(inner_i->asFloat() == 2.0);
     test_assert(inner_j->input(0) != branch["a"]);

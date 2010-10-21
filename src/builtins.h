@@ -88,6 +88,8 @@ extern TypeRef REF_T;
 extern TypeRef LIST_T;
 extern TypeRef VOID_T;
 
+extern bool FINISHED_BOOTSTRAP;
+
 Branch& kernel();
 
 // Get a named term from the global namespace.

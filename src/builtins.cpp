@@ -102,7 +102,7 @@ TypeRef REF_T;
 TypeRef LIST_T;
 TypeRef VOID_T;
 
-bool 
+bool FINISHED_BOOTSTRAP = false;
 
 Branch& kernel()
 {
@@ -300,6 +300,8 @@ using namespace circa;
 
 export_func void circa_initialize()
 {
+    FINISHED_BOOTSTRAP = false;
+
     create_types();
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
@@ -308,12 +310,17 @@ export_func void circa_initialize()
     setup_types(*KERNEL);
     feedback_register_constants(*KERNEL);
     pre_setup_builtin_functions(*KERNEL);
+
+    FINISHED_BOOTSTRAP = true;
+
     setup_builtin_functions(*KERNEL);
     post_setup_functions(*KERNEL);
     parse_types(*KERNEL);
     post_setup_types();
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
+
+
     parse_builtin_script(*KERNEL);
 }
 

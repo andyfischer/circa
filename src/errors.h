@@ -12,6 +12,7 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
 // Signal that an unexpected error has occurred. Depending on debug settings, this
 // will either throw an exception or trigger an assert().
 void internal_error(const char* message);
+void internal_error(std::string const& message);
 
 // Signal that a type mismatch has occurred in native code.
 void native_type_mismatch(std::string const& message);

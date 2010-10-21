@@ -638,6 +638,8 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
         duplicate_branch_nested(newTermMap,
                 source_term->nestedContents, dest_term->nestedContents);
     }
+
+    update_register_indices(dest);
 }
 
 void duplicate_branch(Branch& source, Branch& dest)

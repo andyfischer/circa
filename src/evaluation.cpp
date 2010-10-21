@@ -223,6 +223,11 @@ void evaluate_with_lazy_stack(EvalContext* context, Term* term)
     // Copy output value back to term
     if (term->registerIndex != -1) {
         List* frame = List::checkCast(stack->get(stack->length() - 1));
+
+        // Expand frame if necessary
+        if (term->registerIndex >= frame->length())
+            frame->resize(term->registerIndex+1);
+
         copy(frame->get(term->registerIndex), term);
     }
 

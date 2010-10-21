@@ -35,6 +35,11 @@ void internal_error(const char* message)
     }
 }
 
+void internal_error(std::string const& message)
+{
+    internal_error(message.c_str());
+}
+
 void ca_assert_function(bool expr, const char* exprStr, int line, const char* file)
 {
     if (!expr) {

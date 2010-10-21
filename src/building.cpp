@@ -1,5 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include "builtins.h"
 #include "circa.h"
 #include "debug_valid_objects.h"
 #include "names.h"
@@ -21,12 +22,12 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
             change_type(result, function);
             return result;
         } else {
-            throw std::runtime_error("Constructors with multiple arguments not yet supported.");
+            internal_error("Constructors with multiple arguments not yet supported.");
         }
     }
 
     if (!is_callable(function))
-        throw std::runtime_error("Term "+function->name+" is not callable");
+        internal_error("Term "+function->name+" is not callable");
 
     // Create the term
     Term* result = branch.appendNew();
@@ -54,6 +55,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     change_type(result, outputType);
 
     result->registerIndex = guess_at_register_index_of_new_term(result);
+    if (result->registerIndex != -1)
+        branch.registerCount++;
 
     post_input_change(result);
 
@@ -197,6 +200,9 @@ int get_input_relative_scope(Term* term, int index)
 
 int guess_at_register_index_of_new_term(Term* term)
 {
+    if (!FINISHED_BOOTSTRAP)
+        return -1;
+
     if (get_register_count(term) == 0)
         return -1;
 
@@ -340,7 +346,7 @@ Term* apply(Branch& branch, std::string const& functionName, RefList const& inpu
 {
     Term* function = find_named(branch, functionName);
     if (function == NULL)
-        throw std::runtime_error("function not found: "+functionName);
+        internal_error("function not found: "+functionName);
 
     Term* result = apply(branch, function, inputs, name);
     result->setStringProp("syntax:functionName", functionName);
@@ -375,7 +381,7 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     type = find_named(branch, typeName);
 
     if (type == NULL)
-        throw std::runtime_error("Couldn't find type: "+typeName);
+        internal_error("Couldn't find type: "+typeName);
 
     return create_value(branch, type, name);
 }
