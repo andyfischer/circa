@@ -51,7 +51,13 @@ namespace if_block_function {
 
     void if_block_assign_registers(Term* term)
     {
-        Branch& joining = term->nestedContents["#joining"]->nestedContents;
+        Branch& contents = term->nestedContents;
+
+        // check if we're still building
+        if (contents["joining"] == NULL)
+            return;
+
+        Branch& joining = contents["#joining"]->nestedContents;
 
         for (int i=0; i < joining.length(); i++)
             joining[i]->registerIndex = term->registerIndex + 1 + i;

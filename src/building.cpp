@@ -54,9 +54,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     change_type(result, outputType);
 
-    result->registerIndex = guess_at_register_index_of_new_term(result);
-    if (result->registerIndex != -1)
-        branch.registerCount++;
+    update_register_index_of_new_term(result);
 
     post_input_change(result);
 
@@ -198,25 +196,31 @@ int get_input_relative_scope(Term* term, int index)
     return relativeScope;
 }
 
-int guess_at_register_index_of_new_term(Term* term)
+void update_register_index_of_new_term(Term* term)
 {
     if (!FINISHED_BOOTSTRAP)
-        return -1;
+        return;
 
     if (get_register_count(term) == 0)
-        return -1;
+        return;
 
     if (term->owningBranch == NULL)
-        return 0;
+        return;
 
     Branch& branch = *term->owningBranch;
 
+    int reg = 0;
     for (int i = term->index - 1; i >= 0; i--) {
         Term* prev = branch[i];
-        if (prev && prev->registerIndex != -1)
-            return prev->registerIndex + get_register_count(prev);
+        if (prev && prev->registerIndex != -1) {
+            reg = prev->registerIndex + get_register_count(prev);
+            break;
+        }
     }
-    return 0;
+
+    term->registerIndex = reg;
+    term->owningBranch->registerCount = std::max(term->owningBranch->registerCount,
+            reg + get_register_count(term));
 }
 
 void post_input_change(Term* term)
@@ -246,6 +250,7 @@ void update_register_indices(Branch& branch)
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
+        if (term == NULL) continue;
         next = assign_register(term, next);
     }
 
@@ -260,6 +265,10 @@ void update_register_indices(Term* term)
 
 int get_register_count(Term* term)
 {
+    // TODO: get rid of these terms:
+    if (term->name == "#attr:comp-pending-rebind")
+        return 0;
+
     FunctionAttrs::GetRegisterCount getRegisterCount
         = function_t::get_attrs(term->function).getRegisterCount;
 
@@ -369,7 +378,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     change_type(term, type);
     reset(term);
     update_unique_name(term);
-    term->registerIndex = guess_at_register_index_of_new_term(term);
+    update_register_index_of_new_term(term);
 
     return term;
 }

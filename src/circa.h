@@ -5,6 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "branch_check_invariants.h"
 #include "branch_iterator.h"
 #include "building.h"
 #include "builtin_types.h"

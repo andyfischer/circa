@@ -9,10 +9,7 @@ void test_simple()
 {
     Branch branch;
 
-    Term* a = branch.compile("a = 1");
-    //TEMP
-    dump_branch(branch);
-    evaluate_branch(branch);
+    Term* a = branch.eval("a = 1");
     Term* b = branch.eval("b = 2");
 
     test_assert(a);

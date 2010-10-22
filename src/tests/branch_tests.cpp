@@ -175,7 +175,6 @@ void test_duplicate_nested()
     Branch& inner = branch.eval("inner = branch()")->nestedContents;
     inner.eval("i = 2.0");
     inner.compile("j = add(a,i)");
-    dump_branch(branch);
 
     Branch dupe;
     duplicate_branch(branch, dupe);
@@ -185,8 +184,6 @@ void test_duplicate_nested()
 
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);
-
-    //dump_branch(dupe);
 
     test_assert(dupe["a"]->asFloat() == 1.0);
     test_assert(inner_i->asFloat() == 2.0);
@@ -348,7 +345,6 @@ void test_cast()
     // Cast a value that will require coercion
     Term* dest = branch.eval("Mytype()");
     Term* source = branch.eval("[3 4]");
-    //dump_branch(branch);
     TaggedValue* dest0 = dest->getIndex(0);
     TaggedValue* dest1 = dest->getIndex(1);
 

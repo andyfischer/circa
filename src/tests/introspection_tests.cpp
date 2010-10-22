@@ -57,6 +57,7 @@ void test_visit_name_accessible_terms()
     Term* c = ns.eval("c = 1");
     Term* d = ns.eval("d = 1");
     /*Term* e =*/ ns.eval("e = 1");
+    update_register_indices(branch);
     branch.eval("f = 1");
 
     TaggedValue results;

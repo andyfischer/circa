@@ -11,3 +11,7 @@
 // Disable value sharing in tvvector data, each reference will have a separate
 // copy of data.
 #define DISABLE_LIST_VALUE_SHARING 1
+
+// Do frequent sanity checks of code data before executing it. Has a performance
+// penalty.
+#define AGGRESSIVELY_CHECK_BRANCH_INVARIANTS 1

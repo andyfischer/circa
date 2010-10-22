@@ -26,7 +26,13 @@ namespace for_function {
 
     int get_register_count(Term* term)
     {
-        Branch& outerRebinds = term->nestedContents["#outer_rebinds"]->nestedContents;
+        Branch& contents = term->nestedContents;
+        
+        // Check if we're still building
+        if (contents.length() == 0)
+            return 1;
+
+        Branch& outerRebinds = contents["#outer_rebinds"]->nestedContents;
         return 1 + outerRebinds.length();
     }
 

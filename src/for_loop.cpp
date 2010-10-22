@@ -430,8 +430,10 @@ void for_loop_assign_registers(Term* term)
     for (int i=0; i < innerRebinds.length(); i++)
         next = assign_register(innerRebinds[i], next);
 
-    for (int i=loop_contents_location; i < forContents.length() - 1; i++)
+    for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
+        if (forContents[i] == NULL) continue;
         next = assign_register(forContents[i], next);
+    }
 
     if (forContents["#outer_rebinds"] != NULL) {
         Branch& outerRebinds = forContents["#outer_rebinds"]->nestedContents;

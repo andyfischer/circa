@@ -1,8 +1,10 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "building.h"
+#include "build_options.h"
 #include "builtins.h"
 #include "branch.h"
+#include "branch_check_invariants.h"
 #include "branch_iterator.h"
 #include "bytecode.h"
 #include "errors.h"
@@ -236,6 +238,12 @@ void evaluate_with_lazy_stack(EvalContext* context, Term* term)
 
 void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int start, int end)
 {
+    update_register_indices(branch);
+
+    #if AGGRESSIVELY_CHECK_BRANCH_INVARIANTS
+        ca_assert(branch_check_invariants_print_result(branch, std::cout));
+    #endif
+
     context->stack.clear();
     for (int i=start; i <= end; i++)
         evaluate_with_lazy_stack(context, branch[i]);

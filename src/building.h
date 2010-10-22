@@ -25,7 +25,7 @@ std::string default_name_for_hidden_state(const std::string& termName);
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
 int get_input_relative_scope(Term* term, int index);
-int guess_at_register_index_of_new_term(Term* term);
+void update_register_index_of_new_term(Term* term);
 void post_input_change(Term* term);
 void update_register_indices(Branch& branch);
 void update_register_indices(Term* term);

@@ -177,7 +177,6 @@ void test_do_once()
 
     // the assign() inside do_once should modify x
     bytecode::print_bytecode(std::cout, branch);
-    dump_branch(branch);
     evaluate_branch(branch);
     test_assert(as_int(x) == 2);
 
@@ -261,7 +260,6 @@ void test_namespace()
 
     branch.compile("namespace ns a = 1 end");
     Term* b = branch.compile("b = ns:a");
-    dump_branch(branch);
     evaluate_branch(branch);
 
     test_assert(as_int(b) == 1);
