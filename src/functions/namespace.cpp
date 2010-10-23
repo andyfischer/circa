@@ -24,7 +24,18 @@ namespace namespace_function {
     void assign_registers(Term* term)
     {
         Branch& contents = term->nestedContents;
+        bool updatedParent = false;
+
+        // Check if we need to update the parent term's register
+        if (term->registerIndex == -1 && contents.length() > 0) {
+            if (term->owningBranch)
+                update_register_indices(*term->owningBranch);
+            else
+                term->registerIndex = 0;
+        }
+
         int next = term->registerIndex;
+
         for (int i=0; i < contents.length(); i++) {
             Term* item = contents[i];
             int count = circa::get_register_count(item);

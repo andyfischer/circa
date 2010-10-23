@@ -56,6 +56,10 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     update_register_index_of_new_term(result);
 
+    // special case, need to update parent registers when adding to a namespace
+    if (branch.owningTerm && is_namespace(branch.owningTerm))
+        update_register_indices(*get_parent_branch(branch));
+
     post_input_change(result);
 
     update_unique_name(result);
@@ -290,16 +294,17 @@ int assign_register(Term* term, int nextRegister)
 {
     int registerCount = get_register_count(term);
 
-    if (registerCount == 0)
-        term->registerIndex = -1;
-    else
-        term->registerIndex = nextRegister;
+    int newRegister = registerCount == 0 ? -1 : nextRegister;
+    bool registerChanged = false;
+
+    if (term->registerIndex != newRegister) {
+        term->registerIndex = newRegister;
+        registerChanged = true;
+    }
 
     // Some terms have inner registers that need to be changed along with the
     // outer registerIndex.
-    if (term->function == IF_BLOCK_FUNC
-            || term->function == FOR_FUNC
-            || term->function == NAMESPACE_FUNC)
+    if (registerChanged)
         update_register_indices(term);
 
     return nextRegister + registerCount;

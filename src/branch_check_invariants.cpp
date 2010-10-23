@@ -22,6 +22,14 @@ void append_internal_error(BranchInvariantCheck* result, int index, std::string 
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
 {
     int nextExpectedRegisterIndex = 0;
+    int registerCount = branch.registerCount;
+
+    bool isNamespace = branch.owningTerm && is_namespace(branch.owningTerm);
+
+    if (isNamespace) {
+        nextExpectedRegisterIndex = branch.owningTerm->registerIndex;
+        registerCount = branch.owningTerm->owningBranch->registerCount;
+    }
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
@@ -46,10 +54,10 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
             append_internal_error(result, i, msg.str());
         }
 
-        if (term->registerIndex >= branch.registerCount) {
+        if (term->registerIndex >= registerCount) {
             std::stringstream msg;
             msg << "registerIndex above limit, registerIndex = " << term->registerIndex
-                << ", branch.registerCount = " << branch.registerCount;
+                << ", branch.registerCount = " << registerCount;
             append_internal_error(result, i, msg.str());
         }
     }
