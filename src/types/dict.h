@@ -29,6 +29,11 @@ namespace dict_t {
     std::string to_string(DictData* data);
     void debug_print(DictData* data);
 
+    void iterator_start(DictData* data, TaggedValue* iterator);
+    void iterator_next(DictData* data, TaggedValue* iterator);
+    void iterator_get(DictData* data, TaggedValue* iterator,
+            const char** key, TaggedValue** value);
+
     void setup_type(Type*);
 } // namespace dict_t
 
@@ -40,10 +45,17 @@ struct Dict : TaggedValue
     std::string toString();
     TaggedValue* get(const char* key);
     TaggedValue* operator[](const char* key);
+    bool contains(const char* key);
     TaggedValue* insert(const char* key);
+    void remove(const char* key);
     void set(const char* key, TaggedValue* value);
     void clear();
     bool empty();
+
+    void iteratorStart(TaggedValue* iterator);
+    void iteratorNext(TaggedValue* iterator);
+    void iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value);
+    bool iteratorFinished(TaggedValue* iterator);
 
     static Dict* checkCast(TaggedValue* value);
 };

@@ -60,8 +60,6 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     // This was implemented once, and it caused spurious crash bugs
     // Term* newType = map.getRemapped(term->type);
     
-    //FIXME? if (is_branch(term)) as_branch(term).remapPointers(map);
-
     Type::RemapPointers remapPointers = type_t::get_remap_pointers_func(term->type);
 
     // Remap on value
@@ -72,9 +70,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
         remapPointers(term, map);
     }
 
-    // Remap inside properties
-    for (int i=0; i < term->properties.length(); i++)
-        remap_pointers(term->properties[i], map);
+    // This code once called remap on term->properties
 
     // Remap inside nestedContents
     term->nestedContents.remapPointers(map);

@@ -269,7 +269,7 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
     out << " " << to_string(term);
 
     if (prefs->showProperties)
-        out << " " << dict_t::to_string(term->properties);
+        out << " " << term->properties.toString();
 }
 
 void print_branch_raw(std::ostream& out, Branch& branch)

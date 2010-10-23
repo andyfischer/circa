@@ -179,19 +179,59 @@ void test_duplicate()
 
 void test_reset()
 {
-    TaggedValue value;
-    make_dict(&value);
-    Dict *dict = Dict::checkCast(&value);
+    Dict dict;
 
     TaggedValue a;
     make_int(&a, 4);
-    dict->set("a", &a);
+    dict.set("a", &a);
 
-    test_equals(value.toString(), "[a: 4]");
-    reset(&value);
-    test_equals(value.toString(), "[]");
-    dict->set("a", &a);
-    test_equals(value.toString(), "[a: 4]");
+    test_equals(dict.toString(), "[a: 4]");
+    reset(&dict);
+    test_equals(dict.toString(), "[]");
+    dict.set("a", &a);
+    test_equals(dict.toString(), "[a: 4]");
+}
+
+void test_iterate()
+{
+    Dict dict;
+    TaggedValue iterator;
+
+    TaggedValue one;
+    make_int(&one, 1);
+    TaggedValue two;
+    make_int(&two, 2);
+
+    dict.set("one", &one);
+    dict.set("two", &two);
+
+    const char* currentKey;
+    TaggedValue* currentValue;
+
+    bool foundOne = false;
+    bool foundTwo = false;
+    for (dict.iteratorStart(&iterator);
+            !dict.iteratorFinished(&iterator);
+            dict.iteratorNext(&iterator)) {
+
+        dict.iteratorGet(&iterator, &currentKey, &currentValue);
+
+        test_assert(currentValue != NULL);
+
+        if (std::string(currentKey) == "one") {
+            test_assert(!foundOne);
+            test_equals(currentValue->asInt(), 1);
+            foundOne = true;
+        } else if (std::string(currentKey) == "two") {
+            test_assert(!foundTwo);
+            test_equals(currentValue->asInt(), 2);
+            foundTwo = true;
+        } else {
+            test_assert(false);
+        }
+    }
+    test_assert(foundOne);
+    test_assert(foundTwo);
 }
 
 void register_tests()
@@ -204,6 +244,7 @@ void register_tests()
     REGISTER_TEST_CASE(dict_tests::many_items);
     REGISTER_TEST_CASE(dict_tests::test_duplicate);
     REGISTER_TEST_CASE(dict_tests::test_reset);
+    REGISTER_TEST_CASE(dict_tests::test_iterate);
 }
 
 }

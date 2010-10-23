@@ -49,88 +49,87 @@ Term::toString()
     return to_string(this);
 }
 
-Term* Term::property(std::string const& name) const
+TaggedValue* Term::property(std::string const& name)
 {
-    return properties[name];
+    return properties.get(name.c_str());
 }
 
-bool Term::hasProperty(std::string const& name) const
+bool Term::hasProperty(std::string const& name)
 {
-    return properties.contains(name);
+    return properties.contains(name.c_str());
 }
 
-Term* Term::addProperty(std::string const& name, Term* type)
+TaggedValue* Term::addProperty(std::string const& name, Term* type)
 {
-    Term* existing = property(name);
+    TaggedValue* prop = properties.insert(name.c_str());
+    Type* valueType = type_contents(type);
 
-    if (existing != NULL) {
-        if (existing->type != type)
-            throw std::runtime_error("Property "+name+" exists with different type");
+    if (!is_null(prop) && prop->value_type != valueType)
+        internal_error("Property "+name+" exists with different type");
 
-        return existing;
-    }
-
-    return create_value(properties, type, name);
+    change_type(prop, valueType);
+    return prop;
 }
 
 void Term::removeProperty(std::string const& name)
 {
-    properties.remove(name);
+    properties.remove(name.c_str());
 }
 
 bool Term::boolProp(std::string const& name)
 {
-    Term* t = addProperty(name, BOOL_TYPE);
+    TaggedValue* t = addProperty(name, BOOL_TYPE);
     return as_bool(t);
 }
 int Term::intProp(std::string const& name)
 {
-    Term* t = addProperty(name, INT_TYPE);
+    TaggedValue* t = addProperty(name, INT_TYPE);
     return as_int(t);
 }
 float Term::floatProp(std::string const& name)
 {
-    Term* t = addProperty(name, FLOAT_TYPE);
+    TaggedValue* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
 std::string const& Term::stringProp(std::string const& name)
 {
-    Term* t = addProperty(name, STRING_TYPE);
+    TaggedValue* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
 Ref Term::refProp(std::string const& name)
 {
-    Term* t = addProperty(name, REF_TYPE);
+    TaggedValue* t = addProperty(name, REF_TYPE);
     return as_ref(t);
 }
 
 void Term::setIntProp(std::string const& name, int i)
 {
-    Term* t = addProperty(name, INT_TYPE);
+    TaggedValue* t = addProperty(name, INT_TYPE);
     make_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
-    Term* t = addProperty(name, FLOAT_TYPE);
+    TaggedValue* t = addProperty(name, FLOAT_TYPE);
     make_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)
 {
-    Term* t = addProperty(name, BOOL_TYPE);
+    TaggedValue* t = addProperty(name, BOOL_TYPE);
     make_bool(t, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
-    Term* t = addProperty(name, STRING_TYPE);
+    TaggedValue* t = addProperty(name, STRING_TYPE);
     make_string(t, s);
 }
 
 void Term::setRefProp(std::string const& name, Term* r)
 {
-    Term* t = addProperty(name, REF_TYPE);
+    std::cout << "Term::setRefProp is deprecated" << std::endl;
+    TaggedValue* t = addProperty(name, REF_TYPE);
     make_ref(t, r);
 }
 

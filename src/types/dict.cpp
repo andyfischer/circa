@@ -322,7 +322,42 @@ void debug_print(DictData* data)
     }
 }
 
-namespace tagged_value_wrap {
+void iterator_start(DictData* data, TaggedValue* iterator)
+{
+    if (data == NULL || data->count == 0)
+        return make_null(iterator);
+
+    make_int(iterator, 0);
+
+    // Advance if this iterator location isn't valid
+    if (data->slots[0].key == NULL)
+        iterator_next(data, iterator);
+}
+
+void iterator_next(DictData* data, TaggedValue* iterator)
+{
+    int i = as_int(iterator);
+
+    // Advance to next valid location
+    int next = i + 1;
+    while ((next < data->capacity) && (data->slots[next].key == NULL))
+        next++;
+
+    if (next >= data->capacity)
+        make_null(iterator);
+    else
+        make_int(iterator, next);
+}
+
+void iterator_get(DictData* data, TaggedValue* iterator, const char** key, TaggedValue** value)
+{
+    int i = as_int(iterator);
+
+    *key = data->slots[i].key;
+    *value = &data->slots[i].value;
+}
+
+namespace tagged_value_wrappers {
 
     void initialize(Type* type, TaggedValue* value)
     {
@@ -345,15 +380,15 @@ namespace tagged_value_wrap {
         return dict_t::get_value((DictData*) value->value_data.ptr, field);
 
     }
-} // namespace tagged_value_wrap
+} // namespace tagged_value_wrappers
 
 void setup_type(Type* type)
 {
-    type->initialize = tagged_value_wrap::initialize;
-    type->release = tagged_value_wrap::release;
-    type->copy = tagged_value_wrap::copy;
-    type->toString = tagged_value_wrap::to_string;
-    type->getField = tagged_value_wrap::get_field;
+    type->initialize = tagged_value_wrappers::initialize;
+    type->release = tagged_value_wrappers::release;
+    type->copy = tagged_value_wrappers::copy;
+    type->toString = tagged_value_wrappers::to_string;
+    type->getField = tagged_value_wrappers::get_field;
     type->name = "Dict";
 }
 
@@ -367,7 +402,7 @@ Dict::Dict()
 
 Dict* Dict::checkCast(TaggedValue* value)
 {
-    if (value->value_type->initialize == dict_t::tagged_value_wrap::initialize)
+    if (value->value_type->initialize == dict_t::tagged_value_wrappers::initialize)
         return (Dict*) value;
     else
         return NULL;
@@ -386,13 +421,21 @@ TaggedValue* Dict::operator[](const char* key)
 {
     return get(key);
 }
+bool Dict::contains(const char* key)
+{
+    return get(key) != NULL;
+}
 TaggedValue* Dict::insert(const char* key)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     int newIndex = dict_t::insert(&data, key);
     this->value_data.ptr = data;
     return &data->slots[newIndex].value;
-
+}
+void Dict::remove(const char* key)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::remove(data, key);
 }
 void Dict::set(const char* key, TaggedValue* value)
 {
@@ -409,6 +452,26 @@ bool Dict::empty()
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     return dict_t::count(data) == 0;
+}
+
+void Dict::iteratorStart(TaggedValue* iterator)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::iterator_start(data, iterator);
+}
+void Dict::iteratorNext(TaggedValue* iterator)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::iterator_next(data, iterator);
+}
+void Dict::iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::iterator_get(data, iterator, key, value);
+}
+bool Dict::iteratorFinished(TaggedValue* iterator)
+{
+    return is_null(iterator);
 }
 
 bool is_dict(TaggedValue* value)

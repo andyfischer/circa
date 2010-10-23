@@ -10,6 +10,7 @@
 #include "ref_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
+#include "types/dict.h"
 
 namespace circa {
 
@@ -61,7 +62,7 @@ struct Term : TaggedValue
     unsigned int globalID;
 
     // Dynamic properties
-    Branch properties;
+    Dict properties;
 
     // Reference count.
     int refCount;
@@ -82,10 +83,10 @@ struct Term : TaggedValue
     std::string toString();
 
     // Returns the named property
-    Term* property(std::string const& name) const;
+    TaggedValue* property(std::string const& name);
 
-    bool hasProperty(std::string const& name) const;
-    Term* addProperty(std::string const& name, Term* type);
+    bool hasProperty(std::string const& name);
+    TaggedValue* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
 
     int intProp(std::string const& name);

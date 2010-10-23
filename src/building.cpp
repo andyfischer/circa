@@ -338,7 +338,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
         duplicate_branch(original->nestedContents, term->nestedContents);
 
     term->sourceLoc = original->sourceLoc;
-    duplicate_branch(original->properties, term->properties);
+    copy(&original->properties, &term->properties);
 
     return term;
 }
