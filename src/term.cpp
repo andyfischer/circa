@@ -96,11 +96,6 @@ std::string const& Term::stringProp(std::string const& name)
     TaggedValue* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
-Ref Term::refProp(std::string const& name)
-{
-    TaggedValue* t = addProperty(name, REF_TYPE);
-    return as_ref(t);
-}
 
 void Term::setIntProp(std::string const& name, int i)
 {
@@ -124,13 +119,6 @@ void Term::setStringProp(std::string const& name, std::string const& s)
 {
     TaggedValue* t = addProperty(name, STRING_TYPE);
     make_string(t, s);
-}
-
-void Term::setRefProp(std::string const& name, Term* r)
-{
-    std::cout << "Term::setRefProp is deprecated" << std::endl;
-    TaggedValue* t = addProperty(name, REF_TYPE);
-    make_ref(t, r);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)

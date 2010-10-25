@@ -93,13 +93,11 @@ struct Term : TaggedValue
     float floatProp(std::string const& name);
     bool boolProp(std::string const& name);
     std::string const& stringProp(std::string const& name);
-    Ref refProp(std::string const& name);
 
     void setIntProp(std::string const& name, int i);
     void setFloatProp(std::string const& name, float f);
     void setBoolProp(std::string const& name, bool b);
     void setStringProp(std::string const& name, std::string const& s);
-    void setRefProp(std::string const& name, Term* r);
 
     int intPropOptional(std::string const& name, int defaultValue);
     float floatPropOptional(std::string const& name, float defaultValue);
