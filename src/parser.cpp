@@ -1220,6 +1220,8 @@ Term* function_call(Branch& branch, Term* function, std::string const& nameUsed,
         result = member_function_call(branch, function, arguments, originalName);
     } else {
 
+        function = statically_resolve_namespace_access(function);
+
         if (!is_callable(function))
             function = UNKNOWN_FUNCTION;
 
@@ -1293,6 +1295,21 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens,
         finished = false;
         return head;
 
+    } else if (tokens.nextIs(COLON)) {
+        tokens.consume(COLON);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition,
+                    "Expected identifier after .");
+
+        std::string ident = tokens.consume(IDENTIFIER);
+        
+        Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head, create_string(branch, ident)));
+        set_source_location(result, startPosition, tokens);
+        set_input_syntax_hint(result, 0, "postWhitespace", "");
+        finished = false;
+        return result;
+
     } else if (tokens.nextIs(LPAREN)) {
 
         // Function call
@@ -1313,7 +1330,12 @@ Term* subscripted_atom(Branch& branch, TokenStream& tokens)
     Term* result = NULL;
 
     // Check for an identifier so that we can remember the actual string used.
-    if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(QUALIFIED_IDENTIFIER))
+    if (tokens.nextIs(IDENTIFIER)
+            #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
+            || tokens.nextIs(QUALIFIED_IDENTIFIER)
+            #endif
+            )
+
         result = identifier(branch, tokens, identifierStr);
     else
         result = atom(branch, tokens);
@@ -1374,7 +1396,11 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result = identifier_with_rebind(branch, tokens);
 
     // identifier?
-    else if (tokens.nextIs(IDENTIFIER) || tokens.nextIs(QUALIFIED_IDENTIFIER))
+    else if (tokens.nextIs(IDENTIFIER)
+            #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
+            || tokens.nextIs(QUALIFIED_IDENTIFIER)
+            #endif
+            )
         result = identifier(branch, tokens);
 
     // literal integer?
@@ -1699,8 +1725,10 @@ Term* identifier(Branch& branch, TokenStream& tokens, std::string& idStrOut)
 {
     if (tokens.nextIs(IDENTIFIER))
         idStrOut = tokens.consume(IDENTIFIER);
+    #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
     else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
         idStrOut = tokens.consume(QUALIFIED_IDENTIFIER);
+    #endif
     else 
         throw std::runtime_error("identifier() expected ident");
 
@@ -1732,6 +1760,19 @@ Term* identifier_with_rebind(Branch& branch, TokenStream& tokens)
         push_pending_rebind(branch, head->name);
 
     return head;
+}
+
+Term* statically_resolve_namespace_access(Term* target)
+{
+    if (target->function == GET_NAMESPACE_FIELD) {
+        Term* ns = target->input(0);
+        ca_assert(is_namespace(ns));
+        const char* name = target->input(1)->asString().c_str();
+        Term* original = ns->nestedContents[name];
+        return statically_resolve_namespace_access(original);
+    }
+
+    return target;
 }
 
 } // namespace parser

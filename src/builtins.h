@@ -28,6 +28,7 @@ extern Term* FREEZE_FUNC;
 extern Term* FOR_FUNC;
 extern Term* GET_INDEX_FUNC;
 extern Term* GET_INDEX_FROM_BRANCH_FUNC;
+extern Term* GET_NAMESPACE_FIELD;
 extern Term* GET_FIELD_FUNC;
 extern Term* IF_FUNC;
 extern Term* IF_BLOCK_FUNC;

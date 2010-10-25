@@ -56,10 +56,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     update_register_index_of_new_term(result);
 
-    // special case, need to update parent registers when adding to a namespace
-    if (branch.owningTerm && is_namespace(branch.owningTerm))
-        update_register_indices(*get_parent_branch(branch));
-
     post_input_change(result);
 
     update_unique_name(result);
@@ -126,15 +122,6 @@ int get_input_relative_scope(Term* term, int index)
     Branch* rootScope = inputTerm->owningBranch;
 
     ca_assert(rootScope != NULL);
-
-    // If the input term is inside a namespace, look at its parent scope.
-    while (rootScope->owningTerm && is_namespace(rootScope->owningTerm)) {
-        Branch* parent_branch = get_parent_branch(*rootScope);
-        // shouldn't have a parentless namespace
-        ca_assert(parent_branch != NULL);
-
-        rootScope = parent_branch;
-    }
 
     // Special case for if-blocks: if a join term is trying to reach a term inside
     // an if-branch, then it's relative scope 0.

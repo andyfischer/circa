@@ -9,40 +9,21 @@ namespace namespace_function {
     CA_FUNCTION(evaluate)
     {
         Branch& contents = CALLER->nestedContents;
+        push_stack_frame(STACK, contents.registerCount);
         evaluate_branch_existing_frame(CONTEXT, contents);
-    }
 
-    int get_register_count(Term* term)
-    {
-        Branch& contents = term->nestedContents;
-        int count = 0;
-        for (int i=0; i < contents.length(); i++)
-            count += circa::get_register_count(contents[i]);
-        return count;
-    }
-
-    void assign_registers(Term* term)
-    {
-        Branch& contents = term->nestedContents;
-        bool updatedParent = false;
-
-        // Check if we need to update the parent term's register
-        if (term->registerIndex == -1 && contents.length() > 0) {
-            if (term->owningBranch)
-                update_register_indices(*term->owningBranch);
-            else
-                term->registerIndex = 0;
-        }
-
-        int next = term->registerIndex;
+        List* stack = get_stack_frame(STACK, 0);
+        TaggedValue outputTv;
+        Dict* out = make_dict(&outputTv);
+        out->clear();
 
         for (int i=0; i < contents.length(); i++) {
-            Term* item = contents[i];
-            int count = circa::get_register_count(item);
-            if (count != 0)
-                item->registerIndex = next;
-            next += count;
+            Term* term = contents[i];
+            if (term->name != "" && term->registerIndex != -1)
+                swap(stack->get(term->registerIndex), out->insert(term->name.c_str()));
         }
+        pop_stack_frame(STACK);
+        swap(&outputTv, OUTPUT);
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -58,12 +39,32 @@ namespace namespace_function {
         append_phrase(source, "end", term, phrase_type::KEYWORD);
     }
 
+    CA_FUNCTION(get_namespace_field)
+    {
+        Dict* dict = Dict::checkCast(INPUT(0));
+        const char* name = STRING_INPUT(1);
+
+        copy(dict->get(name), OUTPUT);
+    }
+
+    void get_namespace_field_format_source(StyledSource* source, Term* term)
+    {
+        format_name_binding(source, term);
+        format_source_for_input(source, term, 0);
+        append_phrase(source, ":", term, token::COLON);
+        append_phrase(source, term->input(1)->asString(), term, phrase_type::TERM_NAME);
+    }
+
     void early_setup(Branch& kernel)
     {
-        NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
+        NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace() -> Dict");
         function_t::get_attrs(NAMESPACE_FUNC).formatSource = format_source;
-        function_t::get_attrs(NAMESPACE_FUNC).getRegisterCount = get_register_count;
-        function_t::get_attrs(NAMESPACE_FUNC).assignRegisters = assign_registers;
+
+        GET_NAMESPACE_FIELD = import_function(kernel, get_namespace_field,
+                "get_namespace_field(Dict, string) -> any");
+        function_t::get_attrs(GET_NAMESPACE_FIELD).formatSource =
+            get_namespace_field_format_source;
+
     }
     void setup(Branch& kernel) {}
 }

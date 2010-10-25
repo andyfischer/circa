@@ -24,13 +24,6 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
     int nextExpectedRegisterIndex = 0;
     int registerCount = branch.registerCount;
 
-    bool isNamespace = branch.owningTerm && is_namespace(branch.owningTerm);
-
-    if (isNamespace) {
-        nextExpectedRegisterIndex = branch.owningTerm->registerIndex;
-        registerCount = branch.owningTerm->owningBranch->registerCount;
-    }
-
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 

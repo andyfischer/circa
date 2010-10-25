@@ -67,5 +67,9 @@ bool lookahead_match_comment_statement(TokenStream& tokens);
 bool lookahead_match_leading_name_binding(TokenStream& tokens);
 Term* find_lexpr_root(Term* term);
 
+// Check if 'target' is a namespace access; if so, we'll return the original
+// term that it accesses. If not, we'll just return 'target'.
+Term* statically_resolve_namespace_access(Term* target);
+
 } // namespace parser
 } // namespace circa

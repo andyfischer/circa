@@ -31,6 +31,7 @@ void test_identifiers()
     test_assert(results[6].text == "hasnumbers183");
     test_assert(results[6].match == token::IDENTIFIER);
 
+    #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
     results.clear();
     token::tokenize("qual:ident another:qual:ident a:b: _a:_b:_c", results);
     test_assert(results.size() == 8);
@@ -44,6 +45,7 @@ void test_identifiers()
     test_assert(results[5].match == token::COLON);
     test_assert(results[7].text == "_a:_b:_c");
     test_assert(results[7].match == token::QUALIFIED_IDENTIFIER);
+    #endif
 }
 
 void test_integers()

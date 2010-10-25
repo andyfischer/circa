@@ -254,15 +254,10 @@ void test_namespace()
 {
     Branch branch;
 
-    // make it harder for registerIndex to be correct by coincidence:
-    branch.compile("filler1 = 'filler1'");
-    branch.compile("filler2 = 'filler2'");
+    branch.eval("namespace ns a = 1 end");
+    test_equals(branch["ns"]->toString(), "[a: 1]");
 
-    branch.compile("namespace ns a = 1 end");
-    Term* b = branch.compile("b = ns:a");
-    evaluate_branch(branch);
 
-    test_assert(as_int(b) == 1);
 }
 
 void register_tests()
