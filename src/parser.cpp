@@ -1192,7 +1192,7 @@ void function_call_inputs(Branch& branch, TokenStream& tokens,
     }
 }
 
-Term* function_call(Branch& branch, Term* function, std::string const& nameUsed, TokenStream& tokens)
+Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
@@ -1207,11 +1207,7 @@ Term* function_call(Branch& branch, Term* function, std::string const& nameUsed,
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
-    std::string originalName;
-    if (nameUsed != "")
-        originalName = nameUsed;
-    else
-        originalName = function->name;
+    std::string originalName = function->name;
 
     Term* result = NULL;
 
@@ -1220,13 +1216,18 @@ Term* function_call(Branch& branch, Term* function, std::string const& nameUsed,
         result = member_function_call(branch, function, arguments, originalName);
     } else {
 
-        function = statically_resolve_namespace_access(function);
+        Term* originalFunction = function;
+
+        function = statically_resolve_namespace_access(originalFunction);
+
+        if ((originalFunction != function) && (originalFunction->name == "")) {
+            originalName = get_relative_name(branch, function);
+            erase_term(originalFunction);
+        }
 
         if (!is_callable(function))
             function = UNKNOWN_FUNCTION;
 
-        //overloaded_function::is_overloaded_function(function);
-       
         result = apply(branch, function, arguments);
 
         if (result->function->name != originalName)
@@ -1256,8 +1257,7 @@ Term* function_call(Branch& branch, Term* function, std::string const& nameUsed,
 //   a[0]
 // Field access example:
 //   a.b 
-static Term* possible_subscript(Branch& branch, TokenStream& tokens,
-        std::string const& possibleIdentifierStr, Term* head, bool& finished)
+static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head, bool& finished)
 {
     int startPosition = tokens.getPosition();
 
@@ -1288,12 +1288,12 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens,
 
         std::string ident = tokens.consume(IDENTIFIER);
         
-        head = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
-        set_source_location(head, startPosition, tokens);
-        set_input_syntax_hint(head, 0, "postWhitespace", "");
+        Term* result = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
+        set_source_location(result, startPosition, tokens);
+        set_input_syntax_hint(result, 0, "postWhitespace", "");
         
         finished = false;
-        return head;
+        return result;
 
     } else if (tokens.nextIs(COLON)) {
         tokens.consume(COLON);
@@ -1304,7 +1304,10 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens,
 
         std::string ident = tokens.consume(IDENTIFIER);
         
-        Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head, create_string(branch, ident)));
+        Term* identTerm = create_string(branch, ident);
+        set_source_hidden(identTerm, true);
+
+        Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head, identTerm));
         set_source_location(result, startPosition, tokens);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         finished = false;
@@ -1313,7 +1316,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens,
     } else if (tokens.nextIs(LPAREN)) {
 
         // Function call
-        Term* result = function_call(branch, head, possibleIdentifierStr, tokens);
+        Term* result = function_call(branch, head, tokens);
         finished = false;
         return result;
 
@@ -1326,27 +1329,15 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens,
 
 Term* subscripted_atom(Branch& branch, TokenStream& tokens)
 {
-    std::string identifierStr;
-    Term* result = NULL;
-
-    // Check for an identifier so that we can remember the actual string used.
-    if (tokens.nextIs(IDENTIFIER)
-            #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
-            || tokens.nextIs(QUALIFIED_IDENTIFIER)
-            #endif
-            )
-
-        result = identifier(branch, tokens, identifierStr);
-    else
-        result = atom(branch, tokens);
+    Term* result = atom(branch, tokens);
 
     bool finished = false;
     while (!finished) {
-        result = possible_subscript(branch, tokens, identifierStr, result, finished);
+        result = possible_subscript(branch, tokens, result, finished);
 
         if (has_static_error(result))
             return result;
-    };
+    }
 
     return result;
 }
@@ -1766,7 +1757,8 @@ Term* statically_resolve_namespace_access(Term* target)
 {
     if (target->function == GET_NAMESPACE_FIELD) {
         Term* ns = target->input(0);
-        ca_assert(is_namespace(ns));
+        if (!is_namespace(ns))
+            return target;
         const char* name = target->input(1)->asString().c_str();
         Term* original = ns->nestedContents[name];
         return statically_resolve_namespace_access(original);

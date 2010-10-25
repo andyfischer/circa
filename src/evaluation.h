@@ -34,7 +34,6 @@ struct EvalContext
         errorTerm = NULL;
         errorMessage = "";
     }
-
 };
 
 // Evaluate a single term against the given stack. After this function, the caller

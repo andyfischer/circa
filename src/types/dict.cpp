@@ -402,7 +402,10 @@ Dict::Dict()
 
 Dict* Dict::checkCast(TaggedValue* value)
 {
-    if (value->value_type->initialize == dict_t::tagged_value_wrappers::initialize)
+    if (value == NULL)
+        return NULL;
+
+    if (is_dict(value))
         return (Dict*) value;
     else
         return NULL;

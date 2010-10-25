@@ -130,6 +130,9 @@ TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
     Term* input = term->input(index);
     InputInfo& inputInfo = term->inputInfo(index);
 
+    if (input == NULL)
+        return NULL;
+
     if (input->registerIndex == -1)
         return NULL;
 

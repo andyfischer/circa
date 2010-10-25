@@ -24,11 +24,18 @@ namespace inline_state_function {
     {
         ca_assert(INPUT(1) != NULL);
 
-        TaggedValue *container = INPUT(0);
-        if (!is_dict(container)) make_dict(container);
+        Dict* stateContainer = NULL;
 
-        Dict* dict = Dict::checkCast(container);
-        TaggedValue* value = dict->get(STRING_INPUT(1));
+        TaggedValue *containerFromInput = INPUT(0);
+        if (containerFromInput != NULL)
+            stateContainer = Dict::checkCast(containerFromInput);
+
+        if (stateContainer == NULL)
+            stateContainer = Dict::checkCast(&CONTEXT->currentScopeState);
+
+        ca_assert(stateContainer != NULL);
+
+        TaggedValue* value = stateContainer->get(STRING_INPUT(1));
         if (value) {
             // todo: check if we need to cast this value
             copy(value, OUTPUT);
