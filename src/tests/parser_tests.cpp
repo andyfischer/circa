@@ -596,6 +596,24 @@ void test_sig_indent_one_liner()
     test_equals(branch[1]->asInt(), 4);
 }
 
+void test_statically_resolve_namespace_access()
+{
+    Branch branch;
+    Branch& ns1 = create_namespace(branch, "ns1");
+    Term* a = create_int(ns1, 1, "a");
+    Branch& ns2 = create_namespace(branch, "ns2");
+    Term* b = create_int(ns2, 1, "b");
+    Branch& ns3 = create_namespace(branch, "ns3");
+    Term* c = create_int(ns3, 1, "c");
+
+    Term* ns1_a = branch.compile("ns1:a");
+    test_assert(is_namespace(ns1_a->input(0)));
+    test_assert(parser::statically_resolve_namespace_access(ns1_a) == a);
+
+    Term* ns2_b = branch.compile("ns2:b");
+    test_assert(parser::statically_resolve_namespace_access(ns2_b) == b);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -632,6 +650,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
+    REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
 }
 
 } // namespace parser_tests

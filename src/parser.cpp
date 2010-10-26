@@ -1214,16 +1214,30 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     // Check if 'function' is a get_field term. If so, parse this as a member function call.
     if (function->function == GET_FIELD_FUNC) {
         result = member_function_call(branch, function, arguments, originalName);
-    } else {
+
+    // Check if 'function' is a namespace access term
+    } else if (function->function == GET_NAMESPACE_FIELD) {
 
         Term* originalFunction = function;
-
         function = statically_resolve_namespace_access(originalFunction);
 
         if ((originalFunction != function) && (originalFunction->name == "")) {
             originalName = get_relative_name(branch, function);
             erase_term(originalFunction);
         }
+
+        if (!is_callable(function)) {
+            std::cout << "in function_call, term is not callable: "
+                << get_term_to_string_extended(function) << std::endl;
+            function = UNKNOWN_FUNCTION;
+        }
+
+        result = apply(branch, function, arguments);
+
+        if (result->function->name != originalName)
+            result->setStringProp("syntax:functionName", originalName);
+
+    } else {
 
         if (!is_callable(function))
             function = UNKNOWN_FUNCTION;
@@ -1756,12 +1770,21 @@ Term* identifier_with_rebind(Branch& branch, TokenStream& tokens)
 Term* statically_resolve_namespace_access(Term* target)
 {
     if (target->function == GET_NAMESPACE_FIELD) {
-        Term* ns = target->input(0);
-        if (!is_namespace(ns))
+
+        Term* root = target->input(0);
+
+        if (root == NULL)
             return target;
+
+        if (!is_namespace(root))
+            return target;
+
         const char* name = target->input(1)->asString().c_str();
-        Term* original = ns->nestedContents[name];
-        return statically_resolve_namespace_access(original);
+        Term* original = root->nestedContents[name];
+        if (original == NULL)
+            return target;
+
+        return original;
     }
 
     return target;
