@@ -47,6 +47,13 @@ namespace namespace_function {
         copy(dict->get(name), OUTPUT);
     }
 
+    Term* get_namespace_field_specialize_type(Term* caller)
+    {
+        Term* type = parser::statically_resolve_namespace_access(caller)->type;
+        if (type != NULL) return type;
+        return ANY_TYPE;
+    }
+
     void get_namespace_field_format_source(StyledSource* source, Term* term)
     {
         format_name_binding(source, term);
@@ -64,6 +71,8 @@ namespace namespace_function {
                 "get_namespace_field(Dict, string) -> any");
         function_t::get_attrs(GET_NAMESPACE_FIELD).formatSource =
             get_namespace_field_format_source;
+        function_t::get_attrs(GET_NAMESPACE_FIELD).specializeType =
+            get_namespace_field_specialize_type;
 
     }
     void setup(Branch& kernel) {}

@@ -256,8 +256,6 @@ void test_namespace()
 
     branch.eval("namespace ns a = 1 end");
     test_equals(branch["ns"]->toString(), "[a: 1]");
-
-
 }
 
 void register_tests()

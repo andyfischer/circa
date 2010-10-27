@@ -325,7 +325,7 @@ void reproduce_with_parse_errors() {
     round_trip_source("nonexistant_function()");
     round_trip_source("nonexistant_function(1 2 3)");
     round_trip_source("a:b");
-    round_trip_source("a:b()");
+    //TEST_DISABLED round_trip_source("a:b()");
     finish_source_repro_category();
 }
 

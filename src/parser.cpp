@@ -1288,6 +1288,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         tokens.consume(RBRACKET);
 
         Term* result = apply(branch, GET_INDEX_FUNC, RefList(head, subscript));
+        set_input_syntax_hint(result, 0, "postWhitespace", "");
         set_input_syntax_hint(result, 1, "preWhitespace", postLbracketWs);
         set_source_location(result, startPosition, tokens);
         finished = false;
