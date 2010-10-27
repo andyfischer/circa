@@ -601,17 +601,20 @@ void test_statically_resolve_namespace_access()
     Branch branch;
     Branch& ns1 = create_namespace(branch, "ns1");
     Term* a = create_int(ns1, 1, "a");
-    Branch& ns2 = create_namespace(branch, "ns2");
+    Branch& ns2 = create_namespace(ns1, "ns2");
     Term* b = create_int(ns2, 1, "b");
-    Branch& ns3 = create_namespace(branch, "ns3");
+    Branch& ns3 = create_namespace(ns2, "ns3");
     Term* c = create_int(ns3, 1, "c");
 
     Term* ns1_a = branch.compile("ns1:a");
     test_assert(is_namespace(ns1_a->input(0)));
     test_assert(parser::statically_resolve_namespace_access(ns1_a) == a);
 
-    Term* ns2_b = branch.compile("ns2:b");
-    test_assert(parser::statically_resolve_namespace_access(ns2_b) == b);
+    Term* ns1_ns2_b = branch.compile("ns1:ns2:b");
+    test_assert(parser::statically_resolve_namespace_access(ns1_ns2_b) == b);
+
+    Term* ns1_ns2_ns3_c = branch.compile("ns1:ns2:ns3:c");
+    test_assert(parser::statically_resolve_namespace_access(ns1_ns2_ns3_c) == c);
 }
 
 void register_tests()

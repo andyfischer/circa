@@ -1773,6 +1773,8 @@ Term* statically_resolve_namespace_access(Term* target)
 
         Term* root = target->input(0);
 
+        root = statically_resolve_namespace_access(root);
+
         if (root == NULL)
             return target;
 
