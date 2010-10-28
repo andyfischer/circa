@@ -29,6 +29,21 @@ void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, branch[i]);
+    finish_branch_evaluation(context, branch);
+}
+
+void finish_branch_evaluation(EvalContext* context, Branch& branch)
+{
+    // Preserve the results of state vars
+    for (int i=0; i < context->openStateVariables.length(); i++) {
+        const char* name = context->openStateVariables[i]->asString().c_str();
+        Term* term = branch[name];
+        ca_assert(term != NULL);
+        ca_assert(term->registerIndex != -1);
+        TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
+        copy(result, context->currentScopeState.insert(name));
+    }
+    context->openStateVariables.clear();
 }
 
 void evaluate_branch(EvalContext* context, Branch& branch, TaggedValue* output)
@@ -59,6 +74,8 @@ void evaluate_branch(EvalContext* context, Branch& branch)
         if (term->registerIndex != -1)
             swap(frame->get(term->registerIndex), branch[i]);
     }
+
+    // Copy currentScopeState to 
 }
 
 EvalContext evaluate_branch(Branch& branch)
@@ -153,8 +170,7 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 {
     if (term->input(0) == NULL) {
-        Dict* state = make_dict(&cxt->currentScopeState);
-        return state->insert(term->uniqueName.name.c_str());
+        return cxt->currentScopeState.insert(term->uniqueName.name.c_str());
     } else {
         return get_input(cxt, term, 0);
     }

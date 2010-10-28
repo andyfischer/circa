@@ -411,6 +411,13 @@ Dict* Dict::checkCast(TaggedValue* value)
         return NULL;
 }
 
+Dict* Dict::lazyCast(TaggedValue* value)
+{
+    if (is_dict(value))
+        return (Dict*) value;
+    return make_dict(value);
+}
+
 std::string Dict::toString()
 {
     return dict_t::to_string((dict_t::DictData*) this->value_data.ptr);

@@ -20,7 +20,7 @@ namespace inline_state_function {
     }
 
     CA_DEFINE_FUNCTION(get_state_field,
-            "get_state_field(any container +optional, string name, any default_value +optional) -> any")
+        "get_state_field(any container +optional, string name, any default_value +optional) -> any")
     {
         ca_assert(INPUT(1) != NULL);
 
@@ -31,11 +31,12 @@ namespace inline_state_function {
             stateContainer = Dict::checkCast(containerFromInput);
 
         if (stateContainer == NULL)
-            stateContainer = Dict::checkCast(&CONTEXT->currentScopeState);
+            stateContainer = Dict::lazyCast(&CONTEXT->currentScopeState);
 
         ca_assert(stateContainer != NULL);
 
-        TaggedValue* value = stateContainer->get(STRING_INPUT(1));
+        const char* name = STRING_INPUT(1);
+        TaggedValue* value = stateContainer->get(name);
         if (value) {
             // todo: check if we need to cast this value
             copy(value, OUTPUT);
@@ -50,6 +51,9 @@ namespace inline_state_function {
             change_type(OUTPUT, type_contents(CALLER->type));
             reset(OUTPUT);
         }
+
+        // append name to the list of open state vars
+        make_string(CONTEXT->openStateVariables.append(), name);
     }
 
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)

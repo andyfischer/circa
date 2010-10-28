@@ -112,7 +112,7 @@ void one_time_assignment_inside_for_loop()
     test_assert(SPY_RESULTS[2] == 2);
 }
 
-void explicit_state_and_bytecode()
+void explicit_state()
 {
     Branch branch;
     branch.compile("state s");
@@ -124,7 +124,7 @@ void explicit_state_and_bytecode()
     test_equals(context.topLevelState.toString(), "[s: 1]");
 }
 
-void implicit_state_and_bytecode()
+void implicit_state()
 {
     Branch branch;
     branch.compile("def f() state s; s = 1 end");
@@ -174,8 +174,8 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
     //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
-    REGISTER_TEST_CASE(stateful_code_tests::explicit_state_and_bytecode);
-    REGISTER_TEST_CASE(stateful_code_tests::implicit_state_and_bytecode);
+    REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
+    REGISTER_TEST_CASE(stateful_code_tests::implicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);
 }
 

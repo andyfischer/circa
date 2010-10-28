@@ -6,6 +6,7 @@
 #include "references.h"
 #include "tagged_value.h"
 #include "types/list.h"
+#include "types/dict.h"
 
 namespace circa {
 
@@ -23,9 +24,14 @@ struct EvalContext
     // Top-level inlined state
     TaggedValue topLevelState;
 
+    // Stack of temporary values
     List stack;
 
-    TaggedValue currentScopeState;
+    // Names of state variables which need to be preserved at the end of this branch
+    List openStateVariables;
+
+    // State dictionary for the current scope
+    Dict currentScopeState;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 
@@ -41,6 +47,8 @@ struct EvalContext
 void evaluate_single_term(EvalContext* context, Term* term);
 
 void evaluate_branch_existing_frame(EvalContext* context, Branch& branch);
+
+void finish_branch_evaluation(EvalContext* context, Branch& branch);
 
 // Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
 // null, if it's not null then we'll copy the output register of this branch to it.
