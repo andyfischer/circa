@@ -30,7 +30,6 @@ struct EvalContext
     // Names of state variables which need to be preserved at the end of this branch
     List openStateVariables;
 
-    // State dictionary for the current scope
     Dict* currentScopeState;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false), currentScopeState(NULL) {}
@@ -48,7 +47,7 @@ void evaluate_single_term(EvalContext* context, Term* term);
 
 void evaluate_branch_existing_frame(EvalContext* context, Branch& branch);
 
-void finish_branch_evaluation(EvalContext* context, Branch& branch);
+void wrap_up_open_state_vars(EvalContext* context, Branch& branch, Dict* state);
 
 // Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
 // null, if it's not null then we'll copy the output register of this branch to it.
@@ -56,6 +55,7 @@ void finish_branch_evaluation(EvalContext* context, Branch& branch);
 // seems to break things. Instead use a temporary.
 void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedValue* output);
 
+// Top-level call. Evalaute the branch and then preserve stack outputs back to terms.
 void evaluate_branch(EvalContext* context, Branch& branch);
 #ifdef BYTECODE
 void evaluate_branch(Branch& branch);
@@ -77,6 +77,8 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
+Dict* get_current_scope_state(EvalContext* cxt);
+Dict* fetch_state_container(EvalContext* cxt, Term* term);
 
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);

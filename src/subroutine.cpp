@@ -26,11 +26,11 @@ namespace subroutine_t {
         Term* function = FUNCTION;
         Branch& contents = function->nestedContents;
 
+        // Copy inputs to a new stack frame
         {
             List frame;
             frame.resize(contents.registerCount);
 
-            // Copy inputs to stack frame
             for (int i=0; i < NUM_INPUTS; i++) {
                 TaggedValue* input = INPUT(i);
                 if (input == NULL)
@@ -44,7 +44,15 @@ namespace subroutine_t {
             swap(&frame, STACK->append());
         }
 
+        // prepare output
         make_null(&CONTEXT->subroutineOutput);
+
+        // Fetch state container
+        Dict* prevScopeState = CONTEXT->currentScopeState;
+
+        CONTEXT->currentScopeState = NULL;
+        if (is_function_stateful(function))
+            CONTEXT->currentScopeState = fetch_state_container(CONTEXT, CALLER);
 
         // Evaluate each term
         for (int i=0; i < contents.length(); i++) {
@@ -61,44 +69,14 @@ namespace subroutine_t {
         else if (frame->length() > 0)
             swap(frame->get(frame->length() - 1), &output);
 
+        // Write to state
+        wrap_up_open_state_vars(CONTEXT, contents, NULL);
+
         pop_stack_frame(STACK);
+        CONTEXT->currentScopeState = prevScopeState;
 
-        if (OUTPUT != NULL) {
+        if (OUTPUT != NULL)
             swap(&output, OUTPUT);
-        }
-
-        #if 0
-        EvalContext context;
-
-        Term* function = FUNCTION;
-        Branch& functionBranch = function->nestedContents;
-
-        // Copy inputs to a new stack
-        List stack;
-        stack.resize(NUM_INPUTS);
-        for (int i=0; i < NUM_INPUTS; i++) {
-            TaggedValue* input = INPUT(i);
-            if (input != NULL) {
-                Term* inputTypeTerm = function_t::get_input_type(function, i);
-                Type* inputType = type_contents(inputTypeTerm);
-
-                cast(inputType, input, stack.get(i));
-            }
-        }
-
-        if (!functionBranch._bytecode.inuse)
-            bytecode::update_bytecode(functionBranch);
-        evaluate_bytecode(&context, &functionBranch._bytecode, &stack);
-
-        if (OUTPUT != NULL) {
-            swap(&context.subroutineOutput, OUTPUT);
-        }
-
-        // Copy state (if any)
-        if (is_function_stateful(function)) {
-            swap(&context.state, INPUT(0));
-        }
-        #endif
     }
 }
 

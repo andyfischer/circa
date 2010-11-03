@@ -29,19 +29,21 @@ void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, branch[i]);
-    finish_branch_evaluation(context, branch);
+    wrap_up_open_state_vars(context, branch, get_current_scope_state(context));
 }
 
-void finish_branch_evaluation(EvalContext* context, Branch& branch)
+void wrap_up_open_state_vars(EvalContext* context, Branch& branch, Dict* state)
 {
-    // Preserve the results of state vars
-    for (int i=0; i < context->openStateVariables.length(); i++) {
-        const char* name = context->openStateVariables[i]->asString().c_str();
-        Term* term = branch[name];
-        ca_assert(term != NULL);
-        ca_assert(term->registerIndex != -1);
-        TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
-        copy(result, context->currentScopeState->insert(name));
+    if (state != NULL) {
+        // Preserve the results of state vars
+        for (int i=0; i < context->openStateVariables.length(); i++) {
+            const char* name = context->openStateVariables[i]->asString().c_str();
+            Term* term = branch[name];
+            ca_assert(term != NULL);
+            ca_assert(term->registerIndex != -1);
+            TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
+            copy(result, state->insert(name));
+        }
     }
     context->openStateVariables.clear();
 }
@@ -64,7 +66,9 @@ void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedVa
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
     push_stack_frame(&context->stack, branch.registerCount);
+    context->currentScopeState = Dict::lazyCast(&context->state);
     evaluate_branch_existing_frame(context, branch);
+    context->currentScopeState = NULL;
 
     // Copy stack back to terms
     List* frame = get_stack_frame(&context->stack, 0);
@@ -168,10 +172,22 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 {
     if (term->input(0) == NULL) {
-        return cxt->currentScopeState->insert(term->uniqueName.name.c_str());
+        Dict* currentScopeState = get_current_scope_state(cxt);
+        ca_assert(currentScopeState != NULL);
+        return currentScopeState->insert(term->uniqueName.name.c_str());
     } else {
         return get_input(cxt, term, 0);
     }
+}
+Dict* get_current_scope_state(EvalContext* cxt)
+{
+    return cxt->currentScopeState;
+}
+Dict* fetch_state_container(EvalContext* cxt, Term* term)
+{
+    if (cxt->currentScopeState == NULL)
+        return NULL;
+    return Dict::lazyCast(cxt->currentScopeState->insert(term->uniqueName.name.c_str()));
 }
 
 List* push_stack_frame(List* stack, int size)
