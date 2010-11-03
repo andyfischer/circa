@@ -89,7 +89,7 @@ namespace overloaded_function {
                 //change_type(CALLER, contents[0]->type);
             }
             TaggedValue output;
-            evaluate_branch(CONTEXT, contents, &output);
+            evaluate_branch_in_new_frame(CONTEXT, contents, &output);
             cast(type_contents(contents[0]->type), &output, OUTPUT);
         } else {
             make_string(OUTPUT, "(specialized func not found)");
@@ -104,7 +104,7 @@ namespace overloaded_function {
             contents.clear();
         } else {
             TaggedValue output;
-            evaluate_branch(CONTEXT, contents, &output);
+            evaluate_branch_in_new_frame(CONTEXT, contents, &output);
             swap(&output, OUTPUT);
         }
     }

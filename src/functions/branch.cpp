@@ -9,7 +9,7 @@ namespace branch_function {
     CA_FUNCTION(branch_evaluate)
     {
         Branch& contents = CALLER->nestedContents;
-        evaluate_branch(CONTEXT, contents, NULL);
+        evaluate_branch_in_new_frame(CONTEXT, contents, NULL);
     }
 
     void writeBytecode(bytecode::WriteContext* context, Term* term)

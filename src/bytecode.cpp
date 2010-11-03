@@ -22,7 +22,7 @@ namespace bytecode {
 WriteContext::WriteContext(BytecodeData* _bytecode)
   : bytecode(_bytecode),
     nextRegisterIndex(0),
-    topLevelState(-1),
+    state(-1),
     inlineState(-1)
 {}
 
@@ -473,7 +473,7 @@ void write_raise_if(WriteContext* context, Term* errorCondition)
 void write_get_state_field(WriteContext* context, Term* term, int name,
         int defaultValue, int output)
 {
-    ca_assert(context->topLevelState != -1);
+    ca_assert(context->state != -1);
     ca_assert(name != -1);
     int inputs[] = { context->inlineState, name, defaultValue };
     bytecode::write_call_op(context, term, get_global("get_state_field"), 3, inputs,
@@ -508,18 +508,18 @@ void update_bytecode(Branch& branch, BytecodeData* bytecode)
     assign_registers_for_major_branch(&context, branch);
 
     // If this branch has any state, then create a get_top_level_state call.
-    context.topLevelState = -1;
+    context.state = -1;
     if (has_any_inlined_state(branch)) {
-        context.topLevelState = context.nextRegisterIndex++;
+        context.state = context.nextRegisterIndex++;
         write_call_op(&context, NULL, get_global("get_top_level_state"), 0, NULL,
-                context.topLevelState);
+                context.state);
     }
 
-    write_bytecode_for_branch(&context, branch, context.topLevelState);
+    write_bytecode_for_branch(&context, branch, context.state);
 
     // Wrap up state with set_top_level_state
-    if (context.topLevelState != -1) {
-        int inputs[] = { context.topLevelState };
+    if (context.state != -1) {
+        int inputs[] = { context.state };
         write_call_op(&context, NULL, get_global("set_top_level_state"), 1, inputs, -1);
     }
        
@@ -729,7 +729,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
 
         #if VERBOSE_PRINT_VM
             std::cout << std::endl << "registers: " << registers->toString() << std::endl;
-            std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+            std::cout << "state: " << cxt->state.toString() << std::endl;
             std::cout << "next op: ";
             print_operation(std::cout, data, op);
         #endif
@@ -865,7 +865,7 @@ loop_end:
     data->inuse = false;
     #if VERBOSE_PRINT_VM
         std::cout << std::endl << "registers: " << registers->toString() << std::endl;
-        std::cout << "state: " << cxt->topLevelState.toString() << std::endl;
+        std::cout << "state: " << cxt->state.toString() << std::endl;
     #endif
 #endif
 }

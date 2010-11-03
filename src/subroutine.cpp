@@ -96,7 +96,7 @@ namespace subroutine_t {
 
         // Copy state (if any)
         if (is_function_stateful(function)) {
-            swap(&context.topLevelState, INPUT(0));
+            swap(&context.state, INPUT(0));
         }
         #endif
     }

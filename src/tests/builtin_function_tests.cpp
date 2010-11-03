@@ -223,9 +223,9 @@ void test_message_passing()
     //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
 
     // First run, i is still empty, but the hidden state has 1
-    std::cout << context.topLevelState.toString() << std::endl;
+    std::cout << context.state.toString() << std::endl;
     evaluate_branch(&context, branch);
-    std::cout << context.topLevelState.toString() << std::endl;
+    std::cout << context.state.toString() << std::endl;
     test_assert(i->numElements() == 0);
     //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
 

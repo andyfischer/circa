@@ -83,11 +83,11 @@ void top_level_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    Dict* state = Dict::checkCast(&context.topLevelState);
+    Dict* state = Dict::checkCast(&context.state);
     test_equals(state->toString(), "[i: 1]");
 
     branch.clear();
-    reset(&context.topLevelState);
+    reset(&context.state);
     branch.compile("state int i; i += 1");
 
     for (int i = 0; i < 4; i++)
@@ -105,12 +105,12 @@ void if_block_state()
 
     EvalContext context;
     evaluate_branch(&context, branch);
-    test_equals(context.topLevelState.toString(), "[if_block: [[i: 4], null]]");
+    test_equals(context.state.toString(), "[if_block: [[i: 4], null]]");
 
     branch.clear();
     branch.compile("if false state i; i = 4 else state j; j = 3; end");
     evaluate_branch(&context, branch);
-    test_equals(context.topLevelState.toString(), "[if_block: [null, [j: 3]]]");
+    test_equals(context.state.toString(), "[if_block: [null, [j: 3]]]");
 }
 
 void for_block_state()
@@ -123,7 +123,7 @@ void for_block_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(context.topLevelState.toString(),
+    test_equals(context.state.toString(),
             "[for: [[s: 1], [s: 1], [s: 1], [s: 1], [s: 1]]]");
 }
 

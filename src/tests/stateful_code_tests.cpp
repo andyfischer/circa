@@ -121,7 +121,7 @@ void explicit_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(context.topLevelState.toString(), "[s: 1]");
+    test_equals(context.state.toString(), "[s: 1]");
 }
 
 void implicit_state()
@@ -133,7 +133,7 @@ void implicit_state()
     EvalContext context;
     evaluate_branch(&context, branch);
     
-    test_equals(context.topLevelState.toString(), "[f: [s: 1]]");
+    test_equals(context.state.toString(), "[f: [s: 1]]");
 }
 
 namespace test_interpreted_state_access
@@ -153,16 +153,16 @@ namespace test_interpreted_state_access
         test_equals(a->uniqueName.name, "a");
 
         EvalContext context;
-        test_equals(context.currentScopeState.toString(), "null");
+        test_equals(context.state.toString(), "null");
 
         evaluate_branch(&context, branch);
-        test_equals(context.currentScopeState.toString(), "[a: 1]");
+        test_equals(context.state.toString(), "[a: 1]");
 
         evaluate_branch(&context, branch);
-        test_equals(context.currentScopeState.toString(), "[a: 2]");
+        test_equals(context.state.toString(), "[a: 2]");
 
         evaluate_branch(&context, branch);
-        test_equals(context.currentScopeState.toString(), "[a: 3]");
+        test_equals(context.state.toString(), "[a: 3]");
     }
 }
 

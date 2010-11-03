@@ -41,12 +41,12 @@ void finish_branch_evaluation(EvalContext* context, Branch& branch)
         ca_assert(term != NULL);
         ca_assert(term->registerIndex != -1);
         TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
-        copy(result, context->currentScopeState.insert(name));
+        copy(result, context->currentScopeState->insert(name));
     }
     context->openStateVariables.clear();
 }
 
-void evaluate_branch(EvalContext* context, Branch& branch, TaggedValue* output)
+void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedValue* output)
 {
     List* frame = push_stack_frame(&context->stack, branch.registerCount);
     evaluate_branch_existing_frame(context, branch);
@@ -74,8 +74,6 @@ void evaluate_branch(EvalContext* context, Branch& branch)
         if (term->registerIndex != -1)
             swap(frame->get(term->registerIndex), branch[i]);
     }
-
-    // Copy currentScopeState to 
 }
 
 EvalContext evaluate_branch(Branch& branch)
@@ -170,7 +168,7 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 {
     if (term->input(0) == NULL) {
-        return cxt->currentScopeState.insert(term->uniqueName.name.c_str());
+        return cxt->currentScopeState->insert(term->uniqueName.name.c_str());
     } else {
         return get_input(cxt, term, 0);
     }

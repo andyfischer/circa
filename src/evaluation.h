@@ -21,8 +21,8 @@ struct EvalContext
     Ref errorTerm;
     std::string errorMessage;
 
-    // Top-level inlined state
-    TaggedValue topLevelState;
+    // Tree of persistent state
+    TaggedValue state;
 
     // Stack of temporary values
     List stack;
@@ -31,9 +31,9 @@ struct EvalContext
     List openStateVariables;
 
     // State dictionary for the current scope
-    Dict currentScopeState;
+    Dict* currentScopeState;
 
-    EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
+    EvalContext() : interruptSubroutine(false), errorOccurred(false), currentScopeState(NULL) {}
 
     void clearError() {
         errorOccurred = false;
@@ -54,11 +54,11 @@ void finish_branch_evaluation(EvalContext* context, Branch& branch);
 // null, if it's not null then we'll copy the output register of this branch to it.
 // When specifying 'output', don't use a value that is in the stack, because that
 // seems to break things. Instead use a temporary.
-void evaluate_branch(EvalContext* context, Branch& branch, TaggedValue* output);
+void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedValue* output);
 
 void evaluate_branch(EvalContext* context, Branch& branch);
 #ifdef BYTECODE
-void evaluate_bytecode(Branch& branch);
+void evaluate_branch(Branch& branch);
 #endif
 
 // Shorthand to call evaluate_branch with a new EvalContext:

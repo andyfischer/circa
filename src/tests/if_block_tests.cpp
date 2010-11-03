@@ -262,27 +262,27 @@ void test_state_simple()
     Term* block = branch.compile("if true; state i = 0; i += 1; end");
     evaluate_branch(&context, branch);
 
-    TaggedValue *i = context.topLevelState.getField("#if_block")->getIndex(0)->getField("i");
+    TaggedValue *i = context.state.getField("#if_block")->getIndex(0)->getField("i");
     test_assert(i != NULL);
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(0)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(0)->getField("i");
     test_assert(as_int(i) == 2);
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(0)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(0)->getField("i");
     test_assert(as_int(i) == 3);
 
     // Same test with elif
     branch.clear();
     block = branch.compile("if false; elif true; state i = 0; i += 1; end");
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 2);
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 3);
 
     // Same test with else
@@ -290,13 +290,13 @@ void test_state_simple()
     context = EvalContext();
     block = branch.compile("if false; else state i = 0; i += 1; end");
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 2);
     evaluate_branch(&context, branch);
-    i = context.topLevelState.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 3);
 }
 
@@ -320,7 +320,7 @@ void test_state_in_function()
 
     test_assert(context);
 
-    //std::cout << context.topLevelState.toString();
+    //std::cout << context.state.toString();
     test_equals(as_int(call1), 3);
 }
 

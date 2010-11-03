@@ -145,7 +145,7 @@ struct WriteContext {
     size_t sizeWritten;
 
     // Register index of top level state
-    int topLevelState;
+    int state;
 
     // Register index of state object for the current branch
     int inlineState;

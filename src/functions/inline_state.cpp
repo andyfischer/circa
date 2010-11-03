@@ -12,11 +12,11 @@ namespace inline_state_function {
 
     CA_DEFINE_FUNCTION(get_top_level_state, "get_top_level_state() -> any")
     {
-        copy(&CONTEXT->topLevelState, OUTPUT);
+        copy(&CONTEXT->state, OUTPUT);
     }
     CA_DEFINE_FUNCTION(set_top_level_state, "set_top_level_state(any)")
     {
-        copy(INPUT(0), &CONTEXT->topLevelState);
+        copy(INPUT(0), &CONTEXT->state);
     }
 
     CA_DEFINE_FUNCTION(get_state_field,
@@ -31,7 +31,7 @@ namespace inline_state_function {
             stateContainer = Dict::checkCast(containerFromInput);
 
         if (stateContainer == NULL)
-            stateContainer = Dict::lazyCast(&CONTEXT->currentScopeState);
+            stateContainer = Dict::lazyCast(&CONTEXT->state);
 
         ca_assert(stateContainer != NULL);
 

@@ -95,7 +95,7 @@ void test_file_changed()
     // Subsequent call should return false
     evaluate_branch(&context, branch);
     //dump_branch(branch);
-    //std::cout << context.topLevelState.toString();
+    //std::cout << context.state.toString();
     //bytecode::print_bytecode(std::cout, branch);
     test_assert(!as_bool(changed));
     evaluate_branch(&context, branch);

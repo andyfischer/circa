@@ -117,17 +117,17 @@ void subroutine_stateful_term()
 
     evaluate_branch(&context, branch);
 
-    test_equals(context.topLevelState.toString(), "[call: [a: 1.0]]");
+    test_equals(context.state.toString(), "[call: [a: 1.0]]");
 
     evaluate_branch(&context, branch);
 
-    test_equals(context.topLevelState.toString(), "[call: [a: 2.0]]");
+    test_equals(context.state.toString(), "[call: [a: 2.0]]");
 
     // Make sure that subsequent calls to this subroutine have their own state container.
     branch.compile("another_call = mysub()");
     evaluate_branch(&context, branch);
 
-    test_equals(context.topLevelState.toString(), "[call: [a: 2.0], another_call: [a: 1.0]]");
+    test_equals(context.state.toString(), "[call: [a: 2.0], another_call: [a: 1.0]]");
 }
 
 void initialize_state_type()
