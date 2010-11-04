@@ -24,7 +24,6 @@
 #include "feedback.h"
 #include "for_loop.h"
 #include "function.h"
-#include "hosted_types.h"
 #include "if_block.h"
 #include "importing.h"
 #include "introspection.h"
