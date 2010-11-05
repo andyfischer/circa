@@ -48,11 +48,11 @@ namespace subroutine_t {
         make_null(&CONTEXT->subroutineOutput);
 
         // Fetch state container
-        Dict* prevScopeState = CONTEXT->currentScopeState;
+        TaggedValue prevScopeState;
+        swap(&CONTEXT->currentScopeState, &prevScopeState);
 
-        CONTEXT->currentScopeState = NULL;
         if (is_function_stateful(function))
-            CONTEXT->currentScopeState = fetch_state_container(CONTEXT, CALLER);
+            fetch_state_container(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
 
         // Evaluate each term
         for (int i=0; i < contents.length(); i++) {
@@ -73,7 +73,11 @@ namespace subroutine_t {
         wrap_up_open_state_vars(CONTEXT, contents, NULL);
 
         pop_stack_frame(STACK);
-        CONTEXT->currentScopeState = prevScopeState;
+
+        // Restore currentScopeState
+        if (is_function_stateful(function))
+            preserve_state_result(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
+        swap(&CONTEXT->currentScopeState, &prevScopeState);
 
         if (OUTPUT != NULL)
             swap(&output, OUTPUT);

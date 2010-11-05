@@ -162,6 +162,23 @@ void test_unique_names()
     test_assert(a3->uniqueName.ordinal == 3);
 }
 
+void test_unique_names_for_anons()
+{
+    Branch branch;
+
+    Term* a = branch.compile("add(1,2)");
+    test_equals(a->uniqueName.name, "_add");
+
+    Term* b = branch.compile("add(3,4)");
+    test_equals(b->uniqueName.name, "_add_1");
+
+    Term* c = branch.compile("_add_2 = add(3,4)");
+    test_equals(c->uniqueName.name, "_add_2");
+
+    Term* d = branch.compile("add(3,4)");
+    test_equals(d->uniqueName.name, "_add_3");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
@@ -172,6 +189,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_get_named_at);
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
     REGISTER_TEST_CASE(names_tests::test_unique_names);
+    REGISTER_TEST_CASE(names_tests::test_unique_names_for_anons);
 }
 
 } // namespace names_tests

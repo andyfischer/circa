@@ -30,7 +30,8 @@ struct EvalContext
     // Names of state variables which need to be preserved at the end of this branch
     List openStateVariables;
 
-    Dict* currentScopeState;
+    // Persistent state that should be used for the current branch
+    TaggedValue currentScopeState;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false), currentScopeState(NULL) {}
 
@@ -78,7 +79,8 @@ TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 Dict* get_current_scope_state(EvalContext* cxt);
-Dict* fetch_state_container(EvalContext* cxt, Term* term);
+void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
+void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);
 
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);

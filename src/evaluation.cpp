@@ -66,9 +66,9 @@ void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedVa
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
     push_stack_frame(&context->stack, branch.registerCount);
-    context->currentScopeState = Dict::lazyCast(&context->state);
+    copy(&context->state, &context->currentScopeState);
     evaluate_branch_existing_frame(context, branch);
-    context->currentScopeState = NULL;
+    copy(&context->currentScopeState, &context->state);
 
     // Copy stack back to terms
     List* frame = get_stack_frame(&context->stack, 0);
@@ -181,13 +181,17 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 }
 Dict* get_current_scope_state(EvalContext* cxt)
 {
-    return cxt->currentScopeState;
+    return Dict::lazyCast(&cxt->currentScopeState);
 }
-Dict* fetch_state_container(EvalContext* cxt, Term* term)
+void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output)
 {
-    if (cxt->currentScopeState == NULL)
-        return NULL;
-    return Dict::lazyCast(cxt->currentScopeState->insert(term->uniqueName.name.c_str()));
+    Dict* containerDict = Dict::lazyCast(container);
+    copy(containerDict->insert(term->uniqueName.name.c_str()), output);
+}
+void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result)
+{
+    Dict* containerDict = Dict::lazyCast(container);
+    copy(result, containerDict->insert(term->uniqueName.name.c_str()));
 }
 
 List* push_stack_frame(List* stack, int size)
