@@ -75,8 +75,12 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;
+        // term->registerIndex might be -1
+        TaggedValue* val = NULL;
         if (term->registerIndex != -1)
-            swap(frame->get(term->registerIndex), branch[i]);
+            val = frame->get(term->registerIndex);
+        if (val != NULL)
+            swap(val, branch[i]);
     }
 }
 

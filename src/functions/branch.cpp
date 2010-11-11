@@ -12,15 +12,10 @@ namespace branch_function {
         evaluate_branch_in_new_frame(CONTEXT, contents, NULL);
     }
 
-    void writeBytecode(bytecode::WriteContext* context, Term* term)
+    CA_FUNCTION(branch_evaluate_preserve_stack)
     {
-        Branch& branch = term->nestedContents;
-        int stateContainer = -1;
-        if (has_any_inlined_state(branch)) {
-            // TODO: Fix
-            stateContainer = context->nextRegisterIndex++;
-        }
-        bytecode::write_bytecode_for_branch(context, branch, stateContainer);
+        Branch& contents = CALLER->nestedContents;
+        evaluate_branch(CONTEXT, contents);
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -46,7 +41,10 @@ namespace branch_function {
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         function_t::get_attrs(BRANCH_FUNC).formatSource = format_source;
-        function_t::get_attrs(BRANCH_FUNC).writeBytecode = writeBytecode;
+
+        Term* branch_preserve_stack = import_function(kernel, branch_evaluate_preserve_stack,
+                "branch_preserve_stack()");
+        function_t::get_attrs(branch_preserve_stack).formatSource = format_source;
     }
 }
 }

@@ -47,6 +47,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     Branch& assertions = create_branch(code, "assertions");
+    change_function(code["assertions"], get_global("branch_preserve_stack"));
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
     if (has_static_errors(assertions)) {
@@ -56,8 +57,6 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         dump_branch(code);
         return;
     }
-
-    //dump_branch(code);
 
     EvalContext result;
     evaluate_branch(&result, code);
@@ -496,6 +495,8 @@ void test_lists()
 void test_type_check_functions()
 {
     test_snippet("", "is_int(1)");
+    #if 0
+    TEST_DISABLED
     test_snippet("", "not(is_int(1.0))");
     test_snippet("", "is_float(1.0)");
     test_snippet("", "not(is_float(1))");
@@ -505,6 +506,7 @@ void test_type_check_functions()
     test_snippet("", "not(is_string(true))");
     test_snippet("", "is_list([1 2 3])");
     test_snippet("", "not(is_list(1.0))");
+    #endif
 }
 
 void test_state_in_subroutine()
