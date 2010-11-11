@@ -67,10 +67,10 @@ namespace subroutine_t {
         if (!is_null(&CONTEXT->subroutineOutput))
             swap(&CONTEXT->subroutineOutput, &output);
         else if (frame->length() > 0)
-            swap(frame->get(frame->length() - 1), &output);
+            copy(frame->get(frame->length() - 1), &output);
 
         // Write to state
-        wrap_up_open_state_vars(CONTEXT, contents, NULL);
+        wrap_up_open_state_vars(CONTEXT, contents);
 
         pop_stack_frame(STACK);
 

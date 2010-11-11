@@ -48,7 +48,7 @@ void evaluate_single_term(EvalContext* context, Term* term);
 
 void evaluate_branch_existing_frame(EvalContext* context, Branch& branch);
 
-void wrap_up_open_state_vars(EvalContext* context, Branch& branch, Dict* state);
+void wrap_up_open_state_vars(EvalContext* context, Branch& branch);
 
 // Evaluate a branch with an existing EvalContext, stack, and branch. 'output' can be
 // null, if it's not null then we'll copy the output register of this branch to it.

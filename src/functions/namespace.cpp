@@ -42,6 +42,9 @@ namespace namespace_function {
     CA_FUNCTION(get_namespace_field)
     {
         Dict* dict = Dict::checkCast(INPUT(0));
+        if (dict == NULL)
+            return error_occurred(CONTEXT, CALLER, "type mismatch");
+
         const char* name = STRING_INPUT(1);
 
         copy(dict->get(name), OUTPUT);

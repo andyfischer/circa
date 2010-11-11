@@ -29,21 +29,21 @@ void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, branch[i]);
-    wrap_up_open_state_vars(context, branch, get_current_scope_state(context));
+    wrap_up_open_state_vars(context, branch);
 }
 
-void wrap_up_open_state_vars(EvalContext* context, Branch& branch, Dict* state)
+void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
 {
-    if (state != NULL) {
-        // Preserve the results of state vars
-        for (int i=0; i < context->openStateVariables.length(); i++) {
-            const char* name = context->openStateVariables[i]->asString().c_str();
-            Term* term = branch[name];
-            ca_assert(term != NULL);
-            ca_assert(term->registerIndex != -1);
-            TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
-            copy(result, state->insert(name));
-        }
+    Dict* state = Dict::lazyCast(&context->currentScopeState);
+
+    // Preserve the results of state vars
+    for (int i=0; i < context->openStateVariables.length(); i++) {
+        const char* name = context->openStateVariables[i]->asString().c_str();
+        Term* term = branch[name];
+        ca_assert(term != NULL);
+        ca_assert(term->registerIndex != -1);
+        TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
+        copy(result, state->insert(name));
     }
     context->openStateVariables.clear();
 }

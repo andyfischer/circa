@@ -133,7 +133,7 @@ void implicit_state()
     EvalContext context;
     evaluate_branch(&context, branch);
     
-    test_equals(context.state.toString(), "[f: [s: 1]]");
+    test_equals(context.state.toString(), "[_f: [s: 1]]");
 }
 
 namespace test_interpreted_state_access

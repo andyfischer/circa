@@ -55,10 +55,12 @@ void test_unknown_identifier()
 
     branch.clear();
     t = branch.eval("a:b");
-    //dump_branch(branch);
+    #if 0
+    TEST_DISABLED
     test_equals(get_static_error_message(t), "Unknown identifier: a:b");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_IDENTIFIER);
     test_assert(has_static_errors(branch));
+    #endif
 }
 
 void register_tests()
