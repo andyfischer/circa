@@ -55,6 +55,7 @@ struct Branch
 
     // Find a term with the given name, returns -1 if not found.
     int findIndex(std::string const& name) const;
+    int findIndex(const char* name) const;
 
     void set(int index, Term* term);
     void setNull(int index);

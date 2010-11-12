@@ -7,9 +7,7 @@ Bugs/tasks:
      function( end
     It should throw an error on encountering the unexpected 'end'
 
- - Remaining things using branch-based types should use list_t
-
- - Add dictionary_t and map_t
+ - Add map_t
 
  - Can't use a namespace qualifier on a type name in function declaration
 

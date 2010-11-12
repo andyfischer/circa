@@ -48,7 +48,7 @@ void compound_types()
     test_assert(is_string(astr));
     test_equals(as_string(astr), "");
 
-    test_assert(inst2->getIndex(1)->asString() == "hello");
+    test_equals(inst2->getIndex(1)->asString(), "hello");
     test_assert(inst2->type == MyType); // type specialization
 
     test_assert(is_string(astr2));
@@ -299,7 +299,7 @@ void test_create_implicit_tuple_type()
 
 void register_tests()
 {
-    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::compound_types);
+    REGISTER_TEST_CASE(type_tests::compound_types);
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);

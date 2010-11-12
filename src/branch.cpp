@@ -86,6 +86,16 @@ int Branch::findIndex(std::string const& name) const
     }
     return -1;
 }
+int Branch::findIndex(const char* name) const
+{
+    for (int i=0; i < length(); i++) {
+        if (get(i) == NULL)
+            continue;
+        if (get(i)->name == name)
+            return i;
+    }
+    return -1;
+}
 
 void Branch::set(int index, Term* term)
 {

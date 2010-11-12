@@ -8,6 +8,12 @@ namespace set_field_function {
     CA_FUNCTION(evaluate)
     {
         copy(INPUT(0), OUTPUT);
+        touch(OUTPUT);
+        const char* name = INPUT(1)->asCString();
+        int index = OUTPUT->value_type->findFieldIndex(name);
+        copy(INPUT(2), OUTPUT->getIndex(index));
+
+#if 0
 
         Term* head = CALLER;
 
@@ -27,6 +33,7 @@ namespace set_field_function {
             copy(INPUT(1), head);
         else
             cast(head->value_type, INPUT(1), head);
+#endif
     }
 
     Term* specializeType(Term* caller)
@@ -49,7 +56,7 @@ namespace set_field_function {
     void setup(Branch& kernel)
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
-                "set_field(any, any, string...) -> any");
+                "set_field(any, string, any) -> any");
         function_t::get_attrs(SET_FIELD_FUNC).specializeType = specializeType;
         function_t::get_attrs(SET_FIELD_FUNC).formatSource = formatSource;
     }

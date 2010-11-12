@@ -38,6 +38,7 @@ struct TaggedValue
     int asInt();
     float asFloat();
     float toFloat();
+    const char* asCString();
     std::string const& asString();
     bool asBool();
     Ref& asRef();

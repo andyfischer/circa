@@ -104,6 +104,10 @@ float TaggedValue::toFloat()
 {
     return to_float(this);
 }
+const char* TaggedValue::asCString()
+{
+    return as_string(this).c_str();
+}
 
 std::string const& TaggedValue::asString()
 {
