@@ -193,6 +193,7 @@ void bootstrap_kernel()
     as_type(ANY_TYPE).toString = any_t::to_string;
     as_type(ANY_TYPE).isSubtype = any_t::matches_type;
     as_type(ANY_TYPE).cast = any_t::cast;
+    as_type(ANY_TYPE).cast2 = any_t::cast2;
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Branch type

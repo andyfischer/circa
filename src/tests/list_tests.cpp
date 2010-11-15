@@ -135,7 +135,7 @@ void test_cast()
     test_equals(x.toString(), "[1, 2]");
 
     Branch branch;
-    Term* t_term = branch.eval("type T { int i, float f }");
+    Term* t_term = branch.eval("type T { int i, number f }");
     Type* t = type_contents(t_term);
 
     test_assert(!cast_possible(&a, t));

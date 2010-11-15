@@ -174,12 +174,23 @@ void cast(TaggedValue* source, TaggedValue* dest)
 
 void cast2(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
 {
-    if (type->cast2 == NULL) {
+    if (type->cast2 != NULL) {
+        type->cast2(result, source, type, dest, checkOnly);
+        return;
+    }
+
+    // Default case when the type has no handler: only allow the cast if source has the exact
+    // same type
+
+    if (source->value_type != type) {
         result->success = false;
         return;
     }
 
-    type->cast2(result, source, type, dest, checkOnly);
+    if (checkOnly)
+        return;
+
+    copy(source, dest);
 }
 
 bool cast2(TaggedValue* source, Type* type, TaggedValue* dest)

@@ -38,7 +38,7 @@ namespace subroutine_t {
                 Term* inputTypeTerm = function_t::get_input_type(function, i);
                 Type* inputType = type_contents(inputTypeTerm);
 
-                cast(inputType, input, frame.get(i));
+                ca_assert(cast2(input, inputType, frame.get(i)));
             }
 
             swap(&frame, STACK->append());
@@ -68,15 +68,17 @@ namespace subroutine_t {
         TaggedValue output;
 
         if (outputTypeTerm != VOID_TYPE) {
-            if (!is_null(&CONTEXT->subroutineOutput)) {
-                cast(outputType, &CONTEXT->subroutineOutput, &output);
-                //std::cout << "casting to " << outputType->name << std::endl;
-                //std::cout << output.toString() << std::endl;
-                //std::cout << output.value_type->name << std::endl;
-                make_null(&CONTEXT->subroutineOutput);
-            } else if (frame->length() > 0) {
-                cast(outputType, frame->get(frame->length() - 1), &output);
-            }
+            TaggedValue* outputSource = NULL;
+
+            if (!is_null(&CONTEXT->subroutineOutput))
+                outputSource = &CONTEXT->subroutineOutput;
+            else
+                outputSource = frame->get(frame->length() - 1);
+
+            bool success = cast2(outputSource, outputType, &output);
+            ca_assert(success);
+
+            make_null(&CONTEXT->subroutineOutput);
         }
 
         // Write to state

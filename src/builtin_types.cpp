@@ -309,6 +309,15 @@ namespace any_t {
     {
         copy(source, dest);
     }
+    void cast2(CastResult* result, TaggedValue* source, Type* type,
+        TaggedValue* dest, bool checkOnly)
+    {
+        // casting to 'any' always succeeds.
+        if (checkOnly)
+            return;
+
+        copy(source, dest);
+    }
 }
 
 namespace void_t {

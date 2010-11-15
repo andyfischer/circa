@@ -64,7 +64,7 @@ void compound_type_cast()
     test_assert(a->value_type != type_contents(t));
 
     TaggedValue casted;
-    cast(type_contents(t), a, &casted);
+    test_assert(cast2(a, type_contents(t), &casted));
     test_assert(list_t::is_list(&casted));
     test_assert(casted.value_type == type_contents(t));
 }
