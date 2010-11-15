@@ -236,6 +236,11 @@ void test_modulo()
     test_snippet("", "mod(-2, 4) == 2");
 }
 
+void test_subroutine()
+{
+    test_snippet("def f() -> List return([1]) end", "f() == [1]");
+}
+
 void test_references()
 {
     test_snippet("a = 1; ra = ref(a)", "ra.name() == 'a'");
@@ -495,8 +500,6 @@ void test_lists()
 void test_type_check_functions()
 {
     test_snippet("", "is_int(1)");
-    #if 0
-    TEST_DISABLED
     test_snippet("", "not(is_int(1.0))");
     test_snippet("", "is_float(1.0)");
     test_snippet("", "not(is_float(1))");
@@ -506,7 +509,6 @@ void test_type_check_functions()
     test_snippet("", "not(is_string(true))");
     test_snippet("", "is_list([1 2 3])");
     test_snippet("", "not(is_list(1.0))");
-    #endif
 }
 
 void test_state_in_subroutine()
@@ -522,16 +524,17 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_abs);
     REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);
+    REGISTER_TEST_CASE(test_snippets::test_subroutine);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_references);
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
     REGISTER_TEST_CASE(test_snippets::test_cond);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_for_loops);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_subscripting);
+    REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_field_syntax);
+    REGISTER_TEST_CASE(test_snippets::test_field_syntax);
     REGISTER_TEST_CASE(test_snippets::test_lexprs);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
     REGISTER_TEST_CASE(test_snippets::test_color_arithmetic);

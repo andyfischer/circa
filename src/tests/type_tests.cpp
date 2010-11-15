@@ -55,6 +55,20 @@ void compound_types()
     test_equals(as_string(astr2), "hello");
 }
 
+void compound_type_cast()
+{
+    Branch branch;
+    Term* t = branch.eval("type T { string a }");
+    Term* a = branch.eval("['hi']");
+    test_assert(list_t::is_list(a));
+    test_assert(a->value_type != type_contents(t));
+
+    TaggedValue casted;
+    cast(type_contents(t), a, &casted);
+    test_assert(list_t::is_list(&casted));
+    test_assert(casted.value_type == type_contents(t));
+}
+
 void type_declaration()
 {
     Branch branch;
@@ -300,6 +314,7 @@ void test_create_implicit_tuple_type()
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::compound_types);
+    REGISTER_TEST_CASE(type_tests::compound_type_cast);
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);

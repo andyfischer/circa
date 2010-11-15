@@ -102,6 +102,51 @@ void test_tagged_value()
 }
 
 #endif
+
+void test_cast()
+{
+    TaggedValue a;
+    make_list(&a);
+
+    TaggedValue b;
+    make_list(&b, 2);
+    make_int(b.getIndex(0), 1);
+    make_int(b.getIndex(1), 2);
+    test_equals(b.toString(), "[1, 2]");
+
+    TaggedValue c;
+    make_list(&c, 2);
+    make_int(c.getIndex(0), 1);
+    make_string(c.getIndex(1), "hi");
+    test_equals(c.toString(), "[1, 'hi']");
+
+    TaggedValue d;
+    make_list(&d, 1);
+    make_float(d.getIndex(0), 1);
+    test_equals(d.toString(), "[1.0]");
+
+    TaggedValue x;
+
+    test_assert(!cast_possible(&a, INT_T));
+    test_assert(cast_possible(&a, LIST_T));
+
+    test_assert(cast_possible(&b, LIST_T));
+    test_assert(cast2(&b, LIST_T, &x));
+    test_equals(x.toString(), "[1, 2]");
+
+    Branch branch;
+    Term* t_term = branch.eval("type T { int i, float f }");
+    Type* t = type_contents(t_term);
+
+    test_assert(!cast_possible(&a, t));
+    test_assert(cast_possible(&b, t));
+    test_assert(!cast_possible(&c, t));
+    test_assert(!cast_possible(&d, t));
+
+    test_assert(cast2(&b, t, &x));
+    test_equals(x.toString(), "[1, 2.0]");
+}
+
 void register_tests()
 {
     // Unsupported:
@@ -109,6 +154,8 @@ void register_tests()
 
     //TEST_DISABLED REGISTER_TEST_CASE(list_tests::test_tagged_value);
     //TEST_DISABLED REGISTER_TEST_CASE(list_tests::memory_management_for_each_operation::run_all);
+
+    REGISTER_TEST_CASE(list_tests::test_cast);
 }
 
 }

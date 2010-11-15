@@ -63,11 +63,21 @@ namespace subroutine_t {
         List* frame = get_stack_frame(STACK, 0);
 
         // Fetch output
+        Term* outputTypeTerm = function_t::get_output_type(FUNCTION);
+        Type* outputType = type_contents(outputTypeTerm);
         TaggedValue output;
-        if (!is_null(&CONTEXT->subroutineOutput))
-            swap(&CONTEXT->subroutineOutput, &output);
-        else if (frame->length() > 0)
-            copy(frame->get(frame->length() - 1), &output);
+
+        if (outputTypeTerm != VOID_TYPE) {
+            if (!is_null(&CONTEXT->subroutineOutput)) {
+                cast(outputType, &CONTEXT->subroutineOutput, &output);
+                //std::cout << "casting to " << outputType->name << std::endl;
+                //std::cout << output.toString() << std::endl;
+                //std::cout << output.value_type->name << std::endl;
+                make_null(&CONTEXT->subroutineOutput);
+            } else if (frame->length() > 0) {
+                cast(outputType, frame->get(frame->length() - 1), &output);
+            }
+        }
 
         // Write to state
         wrap_up_open_state_vars(CONTEXT, contents);

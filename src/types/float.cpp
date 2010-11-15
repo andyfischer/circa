@@ -16,6 +16,19 @@ namespace float_t {
     {
         make_float(dest, to_float(source));
     }
+    void cast2(CastResult* result, TaggedValue* source, Type* type,
+        TaggedValue* dest, bool checkOnly)
+    {
+        if (!(is_int(source) || is_float(source))) {
+            result->success = false;
+            return;
+        }
+
+        if (checkOnly)
+            return;
+
+        make_float(dest, to_float(source));
+    }
 
     bool equals(TaggedValue* a, TaggedValue* b)
     {
@@ -56,9 +69,8 @@ namespace float_t {
             std::string const& originalFormat = term->stringProp("float:original-format");
             float actual = as_float(term);
             float original = (float) atof(originalFormat.c_str());
-            if (actual == original) {
+            if (actual == original)
                 return originalFormat;
-            }
         }
 
         // Otherwise, format the current value with naive formatting. This could be
@@ -92,6 +104,7 @@ namespace float_t {
         type->name = "number";
         type->reset = reset;
         type->cast = cast;
+        type->cast2 = cast2;
         type->equals = equals;
         type->isSubtype = is_subtype;
         type->toString = to_string;

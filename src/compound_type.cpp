@@ -26,4 +26,9 @@ Term* create_compound_type(Branch& branch, std::string const& name)
     return term;
 }
 
+Type* get_compound_list_element_type(Type* compoundType, int index)
+{
+    return type_contents(compoundType->prototype[index]->type);
+}
+
 }

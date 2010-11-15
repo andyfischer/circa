@@ -361,9 +361,10 @@ namespace list_t {
 
     void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
     {
-        // FIXME: should these be asserts?
-        if (!is_list(source)) return;
-        if (!is_list(dest)) return;
+        ca_assert(is_list(source));
+
+        if (!is_list(dest))
+            make_list(dest);
 
         bool keep_existing_shape = dest->value_type->prototype.length() != 0;
 
@@ -379,6 +380,61 @@ namespace list_t {
         } else {
             tv_copy(source, dest);
         }
+    }
+
+    void tv_cast2(CastResult* result, TaggedValue* source, Type* type,
+        TaggedValue* dest, bool checkOnly)
+    {
+        List* sourceList = List::checkCast(source);
+
+        if (sourceList == NULL) {
+            result->success = false;
+            return;
+        }
+
+        int sourceLength = sourceList->length();
+        int prototypeLength = type->prototype.length();
+
+        // if prototypeLength is 0 then this is a freeform list, so just do a
+        // copy and call it a day.
+        if (prototypeLength == 0) {
+            if (!checkOnly) {
+                copy(source, dest);
+                dest->value_type = type;
+            }
+            return;
+        }
+
+        // check for correct # of elements
+        if (sourceLength != prototypeLength) {
+            result->success = false;
+            return;
+        }
+
+        List* destList = NULL;
+
+        if (!checkOnly) {
+            destList = make_list(dest);
+            destList->resize(sourceLength);
+            dest->value_type = type;
+        }
+
+        for (int i=0; i < sourceLength; i++) {
+            TaggedValue* sourceElement = sourceList->get(i);
+            Type* elementType = get_compound_list_element_type(type, i);
+
+            TaggedValue* destElement = NULL;
+            if (!checkOnly)
+                destElement = destList->get(i);
+        
+            cast2(result, sourceElement, elementType, destElement, checkOnly);
+
+            if (!result->success)
+                return;
+        }
+
+        if (!checkOnly)
+            dest->value_type = type;
     }
 
     TaggedValue* tv_get_index(TaggedValue* value, int index)
@@ -529,6 +585,7 @@ namespace list_t {
         type->toString = tv_to_string;
         type->equals = tv_equals;
         type->cast = tv_cast;
+        type->cast2 = tv_cast2;
         type->getIndex = tv_get_index;
         type->setIndex = tv_set_index;
         type->getField = tv_get_field;

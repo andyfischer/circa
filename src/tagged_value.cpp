@@ -172,6 +172,30 @@ void cast(TaggedValue* source, TaggedValue* dest)
     return cast(dest->value_type, source, dest);
 }
 
+void cast2(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
+{
+    if (type->cast2 == NULL) {
+        result->success = false;
+        return;
+    }
+
+    type->cast2(result, source, type, dest, checkOnly);
+}
+
+bool cast2(TaggedValue* source, Type* type, TaggedValue* dest)
+{
+    CastResult result;
+    cast2(&result, source, type, dest, false);
+    return result.success;
+}
+
+bool cast_possible(TaggedValue* source, Type* type)
+{
+    CastResult result;
+    cast2(&result, source, type, NULL, true);
+    return result.success;
+}
+
 void copy(TaggedValue* source, TaggedValue* dest)
 {
     ca_assert(source);

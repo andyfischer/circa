@@ -11,4 +11,6 @@ void initialize_compound_type(Term* term);
 
 Term* create_compound_type(Branch& branch, std::string const& name);
 
+Type* get_compound_list_element_type(Type* compoundType, int index);
+
 }

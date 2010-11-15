@@ -12,28 +12,6 @@ namespace set_field_function {
         const char* name = INPUT(1)->asCString();
         int index = OUTPUT->value_type->findFieldIndex(name);
         copy(INPUT(2), OUTPUT->getIndex(index));
-
-#if 0
-
-        Term* head = CALLER;
-
-        for (int nameIndex=2; nameIndex < NUM_INPUTS; nameIndex++) {
-            std::string name = INPUT(nameIndex)->asString();
-            int index = head->value_type->findFieldIndex(name);
-
-            if (index == -1) {
-                error_occurred(CONTEXT, CALLER, "field not found: "+name);
-                return;
-            }
-
-            head = as_branch(head)[index];
-        }
-
-        if (head->type == ANY_TYPE)
-            copy(INPUT(1), head);
-        else
-            cast(head->value_type, INPUT(1), head);
-#endif
     }
 
     Term* specializeType(Term* caller)
