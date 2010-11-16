@@ -357,93 +357,41 @@ Branch::eval(std::string const& code)
 namespace branch_t {
     void initialize(Type* type, TaggedValue* value)
     {
-        set_pointer(value, new Branch());
-
-        Branch& prototype = type->prototype;
-        branch_t::branch_copy(prototype, as_branch(value));
     }
 
     void release(TaggedValue* value)
     {
-        delete (Branch*) get_pointer(value);
-        set_pointer(value, NULL);
     }
 
     void reset_to_prototype(TaggedValue* value)
     {
-        Branch& branch = as_branch(value);
-        branch.clear();
-        Branch& prototype = value->value_type->prototype;
-        branch_t::branch_copy(prototype, as_branch(value));
     }
 
     void copy(TaggedValue* sourceValue, TaggedValue* destValue)
     {
-        Branch& source = as_branch(sourceValue);
-        Branch& dest = as_branch(destValue);
-        assert_valid_branch(&source);
-        assert_valid_branch(&dest);
-
-        branch_copy(source, dest);
-    }
-
-    void cast(Type*, TaggedValue* sourceValue, TaggedValue* destValue)
-    {
-        Branch& dest = as_branch(destValue);
-        assert_valid_branch(&dest);
-
-        if (is_branch(sourceValue)) {
-            Branch& source = as_branch(sourceValue);
-            assert_valid_branch(&source);
-
-            // For Branch or List type, overwrite existing shape
-            if (is_branch(destValue) || (list_t::is_list(destValue)))
-                branch_copy(source, dest);
-            else
-                assign(source, dest);
-        } else {
-            dest.clear();
-            int numElements = sourceValue->numElements();
-            for (int i=0; i < numElements; i++) {
-                Term* v = create_value(dest, ANY_TYPE);
-                circa::copy(sourceValue->getIndex(i), v);
-            }
-        }
     }
 
     TaggedValue* get_index(TaggedValue* value, int index)
     {
-        Branch& b = as_branch(value);
-        if (index >= b.length())
-            return NULL;
-        return b[index];
+        return NULL;
     }
 
     void set_index(TaggedValue* value, int index, TaggedValue* element)
     {
-        ca_assert(value != element);
-        circa::copy(element, as_branch(value)[index]);
     }
 
     TaggedValue* get_field(TaggedValue* value, const char* name)
     {
-        Branch& b = as_branch(value);
-        return b[name];
+        return NULL;
     }
 
     void set_field(TaggedValue* value, const char* name, TaggedValue* element)
     {
-        TaggedValue* destination = as_branch(value)[name];
-        if (destination == NULL)
-            return;
-        ca_assert(destination != value);
-        circa::copy(element, as_branch(value)[name]);
     }
 
     int num_elements(TaggedValue* value)
     {
-        Branch& b = as_branch(value);
-        return b.length();
+        return 0;
     }
 
     void branch_copy(Branch& source, Branch& dest)
@@ -497,40 +445,13 @@ namespace branch_t {
 
     bool equals(TaggedValue* lhsValue, TaggedValue* rhs)
     {
-        if (rhs->value_type->numElements == NULL
-            || rhs->value_type->getIndex == NULL)
-            return false;
-
-        Branch& lhs = as_branch(lhsValue);
-    
-        if (lhs.length() != rhs->numElements())
-            return false;
-
-        for (int i=0; i < lhs.length(); i++) {
-            if (!circa::equals(lhs[i], rhs->getIndex(i)))
-                return false;
-        }
-
-        return true;
-    }
-    CA_FUNCTION(append)
-    {
-        circa::copy(INPUT(0), OUTPUT);
-        Branch& branch = as_branch(OUTPUT);
-        Term* t = INPUT_TERM(1);
-        create_duplicate(branch, t);
-    }
-    void setup_type(Term* type)
-    {
-        Term* branch_append = 
-            import_member_function(type, append, "append(Branch, any) -> Branch");
-        function_set_use_input_as_output(branch_append, 0, true);
+        return false;
     }
 }
 
 bool is_branch(TaggedValue* value)
 {
-    return is_branch_based_type(value->value_type);
+    return false;
 }
 
 Branch& as_branch(TaggedValue* value)
@@ -544,36 +465,6 @@ Branch& as_branch(Term* term)
 {
     ca_assert(term->nestedContents.length() == 0); // <- Temp while things are refactored
     return as_branch((TaggedValue*) term);
-}
-
-std::string compound_type_to_string(TaggedValue* value)
-{
-    std::stringstream out;
-    out << "[";
-
-    Branch& branch = as_branch(value);
-
-    for (int i=0; i < branch.length(); i++) {
-        if (i != 0)
-            out << ", ";
-        out << to_string(branch[i]);
-    }
-
-    out << "]";
-    return out.str();
-}
-
-bool is_branch_based_type(Term* type)
-{
-    ca_assert(type != NULL);
-    ca_assert(type_contents(type) != NULL);
-    return type_contents(type)->initialize == branch_t::initialize;
-}
-
-bool is_branch_based_type(Type* type)
-{
-    ca_assert(type != NULL);
-    return type->initialize == branch_t::initialize;
 }
 
 void initialize_branch_based_type(Term* term)
@@ -592,7 +483,6 @@ void initialize_branch_based_type(Term* term)
     type->getField = branch_t::get_field;
     type->setField = branch_t::set_field;
     type->numElements = branch_t::num_elements;
-    type->toString = compound_type_to_string;
 }
 
 bool is_namespace(Term* term)

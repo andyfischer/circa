@@ -36,18 +36,12 @@ Term* find_common_type(RefList const& list)
     if (all_are_ints_or_floats)
         return FLOAT_TYPE;
 
-    // Another special case, if all types are branch based then use BRANCH_TYPE
-    bool all_are_branch_based = true;
+    // Another special case, if all types are lists then use LIST_TYPE
     bool all_are_lists = true;
     for (int i=0; i < list.length(); i++) {
-        if (!is_branch_based_type(list[i]))
-            all_are_branch_based = false;
         if (!list_t::is_list_based_type(type_contents(list[i])))
             all_are_lists = false;
     }
-
-    if (all_are_branch_based)
-        return BRANCH_TYPE;
 
     if (all_are_lists)
         return LIST_TYPE;

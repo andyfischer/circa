@@ -105,6 +105,8 @@ void test_tagged_value()
 
 void test_cast()
 {
+    Branch branch;
+
     TaggedValue a;
     set_list(&a);
 
@@ -134,7 +136,6 @@ void test_cast()
     test_assert(cast(&b, LIST_T, &x));
     test_equals(x.toString(), "[1, 2]");
 
-    Branch branch;
     Term* t_term = branch.eval("type T { int i, number f }");
     Type* t = type_contents(t_term);
 

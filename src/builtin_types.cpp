@@ -373,7 +373,6 @@ void initialize_primitive_types(Branch& kernel)
 
 void setup_types(Branch& kernel)
 {
-    branch_t::setup_type(BRANCH_TYPE);
     type_t::setup_type(TYPE_TYPE);
 
     Term* set_type = create_compound_type(kernel, "Set");

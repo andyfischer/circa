@@ -10,9 +10,6 @@ void test_create_value()
     Branch branch;
     Term *term = create_value(branch, INT_TYPE);
     test_assert(term->type == INT_TYPE);
-
-    term = create_value(branch, BRANCH_TYPE);
-    test_assert(get_branch_value(term) != NULL);
 }
 
 void test_create_int()

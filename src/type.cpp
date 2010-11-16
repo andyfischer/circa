@@ -165,7 +165,8 @@ Type::~Type()
 
 bool is_native_type(Term* type)
 {
-    return !is_branch_based_type(type);
+    // this once did something useful
+    return true;
 }
 
 Type* declared_type(Term* term)

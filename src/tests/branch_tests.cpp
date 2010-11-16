@@ -232,8 +232,6 @@ void test_duplicate_subroutine()
     Term* dupedFunc = dupe["func"];
     test_assert(function_t::get_name(dupedFunc) == "func");
 
-    test_assert(is_branch(dupedFunc));
-
     test_assert(func->nestedContents.length() == dupedFunc->nestedContents.length());
     test_assert(func->nestedContents[1]->function == dupedFunc->nestedContents[1]->function);
     test_assert(func->nestedContents[1]->type == dupedFunc->nestedContents[1]->type);

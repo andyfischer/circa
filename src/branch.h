@@ -107,16 +107,12 @@ namespace branch_t {
 
     void branch_copy(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
-
-    void setup_type(Term* type);
 }
 
 bool is_branch(TaggedValue* term);
 Branch& as_branch(TaggedValue* term);
 Branch& as_branch(Term* term);
 
-bool is_branch_based_type(Term* type);
-bool is_branch_based_type(Type* type);
 void initialize_branch_based_type(Term* term);
 
 bool is_namespace(Term* term);
