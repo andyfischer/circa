@@ -14,12 +14,6 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
 void internal_error(const char* message);
 void internal_error(std::string const& message);
 
-// Signal that a type mismatch has occurred in native code.
-void native_type_mismatch(std::string const& message);
-
-// Check if term has the given type, calls native_type_mismatch if not.
-void ca_assert_type(Term* term, Term* type);
-
 bool has_static_error(Term* term);
 bool has_static_errors(Branch& branch);
 

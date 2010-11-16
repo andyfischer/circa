@@ -177,8 +177,6 @@ Type* declared_type(Term* term)
 Type& as_type(Term *term)
 {
     ca_assert(get_type_value(term) != NULL);
-
-    // don't use ca_assert_type here because ca_assert_type uses as_type
     ca_assert(term->type == TYPE_TYPE);
 
     return *get_type_value(term);
