@@ -354,57 +354,6 @@ Branch::eval(std::string const& code)
     return parser::evaluate(*this, parser::statement_list, code);
 }
 
-namespace branch_t {
-    void branch_copy(Branch& source, Branch& dest)
-    {
-        assert_valid_branch(&source);
-        assert_valid_branch(&dest);
-
-        // Assign terms as necessary
-        int lengthToAssign = std::min(source.length(), dest.length());
-
-        for (int i=0; i < lengthToAssign; i++) {
-            assert_valid_term(source[i]);
-            assert_valid_term(dest[i]);
-
-            // Change type if needed
-            if (source[i]->type != dest[i]->type)
-                change_type(source[i], dest[i]->type);
-            circa::copy(source[i], dest[i]);
-        }
-
-        // Add terms if necessary
-        for (int i=dest.length(); i < source.length(); i++) {
-            ca_assert(source[i] != NULL);
-            assert_valid_term(source[i]);
-
-            Term* t = create_duplicate(dest, source[i]);
-            if (source[i]->name != "")
-                dest.bindName(t, source[i]->name);
-        }
-
-        // Remove terms if necessary
-        for (int i=source.length(); i < dest.length(); i++) {
-            dest.set(i, NULL);
-        }
-
-        dest.removeNulls();
-    }
-
-    void assign(Branch& source, Branch& dest)
-    {
-        // Temporary special case, if the two branches have different sizes then
-        // do a copy instead. This should be removed.
-        if (source.length() != dest.length())
-            return branch_copy(source, dest);
-
-        #if 0
-        for (int i=0; i < source.length(); i++)
-            cast(source[i], dest[i]);
-        #endif
-    }
-}
-
 bool is_namespace(Term* term)
 {
     return term->function == NAMESPACE_FUNC;

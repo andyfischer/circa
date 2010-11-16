@@ -96,11 +96,6 @@ private:
     Branch& operator=(Branch const& b) { return *this; }
 };
 
-namespace branch_t {
-    void branch_copy(Branch& source, Branch& dest);
-    void assign(Branch& source, Branch& dest);
-}
-
 bool is_namespace(Term* term);
 bool is_namespace(Branch& branch);
 
