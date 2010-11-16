@@ -405,18 +405,6 @@ namespace branch_t {
     }
 }
 
-Branch& as_branch(TaggedValue* value)
-{
-    ca_assert(value != NULL);
-    return *((Branch*) value->value_data.ptr);
-}
-
-Branch& as_branch(Term* term)
-{
-    ca_assert(term->nestedContents.length() == 0); // <- Temp while things are refactored
-    return as_branch((TaggedValue*) term);
-}
-
 bool is_namespace(Term* term)
 {
     return term->function == NAMESPACE_FUNC;
