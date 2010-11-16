@@ -340,14 +340,14 @@ void test_state_is_reset_when_if_fails()
     evaluate_branch(branch);
     test_assert(as_int(i) == 3);
 
-    make_bool(c, false);
+    set_bool(c, false);
 
     evaluate_branch(branch);
     test_assert(as_int(i) == 0);
     evaluate_branch(branch);
     test_assert(as_int(i) == 0);
 
-    make_bool(c, true);
+    set_bool(c, true);
 
     evaluate_branch(branch);
     test_assert(as_int(i) == 1);
@@ -363,12 +363,12 @@ void test_state_is_reset_when_if_fails()
     test_assert(as_int(i) == 0);
     evaluate_branch(branch);
     test_assert(as_int(i) == 0);
-    make_bool(c, false);
+    set_bool(c, false);
     evaluate_branch(branch);
     test_assert(as_int(i) == 1);
     evaluate_branch(branch);
     test_assert(as_int(i) == 2);
-    make_bool(c, true);
+    set_bool(c, true);
     evaluate_branch(branch);
     test_assert(as_int(i) == 0);
     evaluate_branch(branch);

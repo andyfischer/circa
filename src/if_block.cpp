@@ -146,12 +146,12 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 
         // State field name.
         TaggedValue stateName;
-        make_string(&stateName, get_implicit_state_name(ifBlock));
+        set_string(&stateName, get_implicit_state_name(ifBlock));
         stateContainerName = bytecode::write_push_local_op(context, &stateName);
 
         // State default value
         TaggedValue defaultValue;
-        make_list(&defaultValue);
+        set_list(&defaultValue);
         int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
 
         // get_state_field

@@ -67,7 +67,7 @@ namespace vectorize_vv_function {
 
         // Prepare output
         TaggedValue outputTv;
-        List* output = make_list(&outputTv, listLength);
+        List* output = set_list(&outputTv, listLength);
 
         // Evaluate vectorized call, once for each input
         for (int i=0; i < listLength; i++) {

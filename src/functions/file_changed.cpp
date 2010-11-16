@@ -20,7 +20,7 @@ namespace file_changed_function {
 
         if (modifiedTime != as_int(sigModified)
                 || filename != as_string(sigFilename)) {
-            make_string(sigFilename, filename);
+            set_string(sigFilename, filename);
             set_int(sigModified, (int) modifiedTime);
             return true;
         } else {
@@ -30,7 +30,7 @@ namespace file_changed_function {
 
     CA_FUNCTION(evaluate)
     {
-        make_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), INPUT(1)->asString()));
+        set_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), INPUT(1)->asString()));
     }
 
     void setup(Branch& kernel)

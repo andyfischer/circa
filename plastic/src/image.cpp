@@ -19,7 +19,7 @@ namespace image_t {
     int get_width(TaggedValue* v) { return v->getIndex(2)->asInt(); }
     int get_height(TaggedValue* v) { return v->getIndex(3)->asInt(); }
 
-    void set_filename(TaggedValue* v, std::string const& s) { touch(v); make_string(v->getIndex(0), s); }
+    void set_filename(TaggedValue* v, std::string const& s) { touch(v); set_string(v->getIndex(0), s); }
     void set_texid(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
     void set_width(TaggedValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
     void set_height(TaggedValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }

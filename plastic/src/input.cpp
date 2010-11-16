@@ -34,7 +34,7 @@ void handle_key_press(SDL_Event &event, int key);
 CA_FUNCTION(key_down)
 {
     int i = INT_INPUT(0);
-    make_bool(OUTPUT, KEY_DOWN[i]);
+    set_bool(OUTPUT, KEY_DOWN[i]);
 }
 
 CA_FUNCTION(key_pressed)
@@ -43,11 +43,11 @@ CA_FUNCTION(key_pressed)
         int key = as_int(INPUT(0));
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (KEYS_JUST_PRESSED[index].sym == key) {
-                make_bool(OUTPUT, true);
+                set_bool(OUTPUT, true);
                 return;
             }
         }
-        make_bool(OUTPUT, false);
+        set_bool(OUTPUT, false);
         return;
     }
 
@@ -58,12 +58,12 @@ CA_FUNCTION(key_pressed)
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
-                make_bool(OUTPUT, true);
+                set_bool(OUTPUT, true);
                 return;
             }
         }
             
-        make_bool(OUTPUT, false);
+        set_bool(OUTPUT, false);
         return;
     }
 }
@@ -194,7 +194,7 @@ CA_FUNCTION(recent_key_presses)
     output->clear();
 
     for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++) {
-        List* item = (List*) make_list(output->append());
+        List* item = (List*) set_list(output->append());
         Uint16 key = KEYS_JUST_PRESSED[index].unicode;
         char keyStr[2];
         keyStr[1] = 0;
@@ -205,7 +205,7 @@ CA_FUNCTION(recent_key_presses)
         else
             keyStr[0] = char(key);
 
-        make_string(item->append(), keyStr);
+        set_string(item->append(), keyStr);
         set_int(item->append(), KEYS_JUST_PRESSED[index].sym);
         set_int(item->append(), KEYS_JUST_PRESSED[index].mod);
     }
@@ -223,36 +223,36 @@ bool mouse_in(TaggedValue* box)
 
 CA_FUNCTION(mouse_pressed)
 {
-    make_bool(OUTPUT, LEFT_MOUSE_DOWN);
+    set_bool(OUTPUT, LEFT_MOUSE_DOWN);
 }
 
 CA_FUNCTION(mouse_clicked)
 {
     if (NUM_INPUTS == 0)
-        make_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
+        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
     else
-        make_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
+        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_over)
 {
-    make_bool(OUTPUT, mouse_in(INPUT(0)));
+    set_bool(OUTPUT, mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_wheel_up)
 {
     if (NUM_INPUTS == 0)
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
     else
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_wheel_down)
 {
     if (NUM_INPUTS == 0)
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
     else
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
 }
 
 void setup(Branch& branch)

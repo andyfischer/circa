@@ -55,7 +55,7 @@ namespace list_t {
         if (data->refCount == 0) {
             // Release all elements
             for (int i=0; i < data->count; i++)
-                make_null(&data->items[i]);
+                set_null(&data->items[i]);
             free(data);
             debug_unregister_valid_object(data);
         }
@@ -161,7 +161,7 @@ namespace list_t {
 
         // Possibly set extra elements to null, if we are shrinking.
         for (int i=numElements; i < result->count; i++)
-            make_null(&result->items[i]);
+            set_null(&result->items[i]);
         result->count = numElements;
 
         return result;
@@ -235,7 +235,7 @@ namespace list_t {
         *data = touch(*data);
         ca_assert(index < (*data)->count);
 
-        make_null(&(*data)->items[index]);
+        set_null(&(*data)->items[index]);
 
         int lastElement = (*data)->count - 1;
         if (index < lastElement)
@@ -391,7 +391,7 @@ namespace list_t {
         List* destList = NULL;
 
         if (!checkOnly) {
-            destList = make_list(dest);
+            destList = set_list(dest);
             destList->resize(sourceLength);
             dest->value_type = type;
         }
@@ -574,7 +574,7 @@ namespace list_t {
 
     CA_FUNCTION(append)
     {
-        make_list(OUTPUT);
+        set_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
         copy(INPUT(0), OUTPUT);
         TaggedValue* value = INPUT(1);

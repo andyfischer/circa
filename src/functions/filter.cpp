@@ -22,7 +22,7 @@ namespace filter_function {
             if (bools->getIndex(i)->asBool())
                 count++;
         
-        List* output = make_list(OUTPUT);
+        List* output = set_list(OUTPUT);
         output->resize(count);
         touch(output);
 

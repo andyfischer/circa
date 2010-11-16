@@ -75,15 +75,15 @@ TaggedValue* set_int(TaggedValue* value);
 
 void set_int(TaggedValue* value, int i);
 void set_float(TaggedValue* value, float f);
-void make_string(TaggedValue* value, const char* s);
-void make_string(TaggedValue* value, std::string const& s);
-void make_bool(TaggedValue* value, bool b);
-void make_ref(TaggedValue* value, Term* t);
-List* make_list(TaggedValue* value);
-List* make_list(TaggedValue* value, int size);
+void set_string(TaggedValue* value, const char* s);
+void set_string(TaggedValue* value, std::string const& s);
+void set_bool(TaggedValue* value, bool b);
+void set_ref(TaggedValue* value, Term* t);
+List* set_list(TaggedValue* value);
+List* set_list(TaggedValue* value, int size);
 void make_branch(TaggedValue* value);
-void make_type(TaggedValue* value, Type* type);
-void make_null(TaggedValue* value);
+void set_type(TaggedValue* value, Type* type);
+void set_null(TaggedValue* value);
 
 void set_pointer(TaggedValue* value, Type* type, void* p);
 void set_pointer(TaggedValue* value, void* ptr);

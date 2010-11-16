@@ -403,7 +403,7 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
 Term* create_string(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, STRING_TYPE, name);
-    make_string(term, s);
+    set_string(term, s);
     return term;
 }
 
@@ -424,14 +424,14 @@ Term* create_float(Branch& branch, float f, std::string const& name)
 Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
-    make_bool(term, b);
+    set_bool(term, b);
     return term;
 }
 
 Term* create_ref(Branch& branch, Term* ref, std::string const& name)
 {
     Term* term = create_value(branch, REF_TYPE, name);
-    make_ref(term, ref);
+    set_ref(term, ref);
     return term;
 }
 Term* create_void(Branch& branch, std::string const& name)

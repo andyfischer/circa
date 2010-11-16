@@ -8,7 +8,7 @@ namespace circa {
 namespace bool_t {
     void reset(TaggedValue* value)
     {
-        make_bool(value, false);
+        set_bool(value, false);
     }
     std::string to_string(TaggedValue* value)
     {
@@ -60,7 +60,7 @@ namespace set_t {
     {
         List* list = List::checkCast(INPUT(0));
         TaggedValue* value = INPUT(1);
-        make_bool(OUTPUT, contains(list, value));
+        set_bool(OUTPUT, contains(list, value));
     }
 
     CA_FUNCTION(remove)
@@ -157,7 +157,7 @@ namespace map_t {
     CA_FUNCTION(contains)
     {
         bool result = find_key_index(INPUT(0), INPUT(1)) != -1;
-        make_bool(OUTPUT, result);
+        set_bool(OUTPUT, result);
     }
 
     CA_FUNCTION(insert)
@@ -345,28 +345,28 @@ namespace point_t {
 void initialize_primitive_types(Branch& kernel)
 {
     STRING_TYPE = create_type(kernel, "string");
-    make_type(STRING_TYPE, STRING_T);
+    set_type(STRING_TYPE, STRING_T);
 
     INT_TYPE = create_type(kernel, "int");
-    make_type(INT_TYPE, INT_T);
+    set_type(INT_TYPE, INT_T);
 
     FLOAT_TYPE = create_type(kernel, "number");
-    make_type(FLOAT_TYPE, FLOAT_T);
+    set_type(FLOAT_TYPE, FLOAT_T);
 
     DICT_TYPE = create_type(kernel, "Dict");
-    make_type(DICT_TYPE, DICT_T);
+    set_type(DICT_TYPE, DICT_T);
 
     BOOL_TYPE = create_type(kernel, "bool");
-    make_type(BOOL_TYPE, BOOL_T);
+    set_type(BOOL_TYPE, BOOL_T);
 
     REF_TYPE = create_type(kernel, "Ref");
-    make_type(REF_TYPE, REF_T);
+    set_type(REF_TYPE, REF_T);
 
     VOID_TYPE = create_type(kernel, "void");
-    make_type(VOID_TYPE, VOID_T);
+    set_type(VOID_TYPE, VOID_T);
 
     LIST_TYPE = create_type(kernel, "List");
-    make_type(LIST_TYPE, LIST_T);
+    set_type(LIST_TYPE, LIST_T);
 
     // ANY_TYPE was created in bootstrap_kernel
 }

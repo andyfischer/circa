@@ -58,7 +58,7 @@ void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedVa
         if (lastValue != NULL)
             swap(lastValue, output);
         else
-            make_null(output);
+            set_null(output);
     }
     pop_stack_frame(&context->stack);
 }
@@ -202,7 +202,7 @@ List* push_stack_frame(List* stack, int size)
     int newStackLength = stack->length() + 1;
     stack->resize(newStackLength);
 
-    List* frame = make_list(stack->get(newStackLength-1), size);
+    List* frame = set_list(stack->get(newStackLength-1), size);
     return frame;
 }
 
@@ -240,7 +240,7 @@ void evaluate_with_lazy_stack(EvalContext* context, Term* term)
         int owningBranchRegCount = input->owningBranch->registerCount;
 
         if (frame == NULL)
-            frame = make_list(frameTv, owningBranchRegCount);
+            frame = set_list(frameTv, owningBranchRegCount);
         else
             frame->resize(owningBranchRegCount);
 
@@ -253,7 +253,7 @@ void evaluate_with_lazy_stack(EvalContext* context, Term* term)
 
     // Check that the stack has room for the term's output.
     if (stack->length() == 0)
-        make_list(stack->append(), term->owningBranch->registerCount);
+        set_list(stack->append(), term->owningBranch->registerCount);
     else {
         List* frame = List::checkCast(stack->get(stack->length() - 1));
         frame->resize(term->owningBranch->registerCount);

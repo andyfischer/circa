@@ -44,7 +44,7 @@ void test_term_to_raw_string()
 
 bool name_visitor_that_appends_to_list(Term* term, const char* name, TaggedValue* list)
 {
-    make_ref(List::checkCast(list)->append(), term);
+    set_ref(List::checkCast(list)->append(), term);
     return false;
 }
 
@@ -61,7 +61,7 @@ void test_visit_name_accessible_terms()
     branch.eval("f = 1");
 
     TaggedValue results;
-    make_list(&results);
+    set_list(&results);
     visit_name_accessible_terms(d, name_visitor_that_appends_to_list, &results);
 
     List* list = List::checkCast(&results);

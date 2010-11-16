@@ -92,7 +92,7 @@ namespace overloaded_function {
             evaluate_branch_in_new_frame(CONTEXT, contents, &output);
             cast(&output, type_contents(contents[0]->type), OUTPUT);
         } else {
-            make_string(OUTPUT, "(specialized func not found)");
+            set_string(OUTPUT, "(specialized func not found)");
         }
     }
 
@@ -176,7 +176,7 @@ namespace overloaded_function {
         RefList outputTypes;
 
         for (int i=0; i < overloads.length(); i++) {
-            make_ref(parameters[i], overloads[i]);
+            set_ref(parameters[i], overloads[i]);
 
             if (argumentCount != function_t::num_inputs(overloads[i]))
                 variableArgs = true;
@@ -216,7 +216,7 @@ namespace overloaded_function {
         ca_assert(is_overloaded_function(overloadedFunction));
 
         List& parameters = function_t::get_attrs(overloadedFunction).parameters;
-        make_ref(parameters.append(), overload);
+        set_ref(parameters.append(), overload);
     }
 
     void setup(Branch& kernel)

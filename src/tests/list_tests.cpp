@@ -31,7 +31,7 @@ namespace memory_management_for_each_operation
     void run_test(ListOperation operation, const char* name)
     {
         TaggedValue value;
-        make_list(&value);
+        set_list(&value);
         set_int(List::checkCast(&value)->append(), 0);
 
         tvvector::ListData* origData = (tvvector::ListData*)
@@ -106,22 +106,22 @@ void test_tagged_value()
 void test_cast()
 {
     TaggedValue a;
-    make_list(&a);
+    set_list(&a);
 
     TaggedValue b;
-    make_list(&b, 2);
+    set_list(&b, 2);
     set_int(b.getIndex(0), 1);
     set_int(b.getIndex(1), 2);
     test_equals(b.toString(), "[1, 2]");
 
     TaggedValue c;
-    make_list(&c, 2);
+    set_list(&c, 2);
     set_int(c.getIndex(0), 1);
-    make_string(c.getIndex(1), "hi");
+    set_string(c.getIndex(1), "hi");
     test_equals(c.toString(), "[1, 'hi']");
 
     TaggedValue d;
-    make_list(&d, 1);
+    set_list(&d, 1);
     set_float(d.getIndex(0), 1);
     test_equals(d.toString(), "[1.0]");
 

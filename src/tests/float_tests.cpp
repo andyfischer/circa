@@ -10,7 +10,7 @@ void test_cast()
     TaggedValue f;
     set_float(&f, 5.0);
     TaggedValue s;
-    make_string(&s, "hello");
+    set_string(&s, "hello");
 
 
     test_assert(cast_possible(&f, FLOAT_T));

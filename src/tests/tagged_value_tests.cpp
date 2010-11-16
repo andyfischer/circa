@@ -88,7 +88,7 @@ void test_polymorphic()
     test_assert(is_float(&v));
     test_assert(!is_bool(&v));
 
-    make_bool(&v, false);
+    set_bool(&v, false);
     test_assert(!is_int(&v));
     test_assert(!is_float(&v));
     test_assert(is_bool(&v));
@@ -210,7 +210,7 @@ namespace manual_memory_management_test {
         test_assert(pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        make_null(&value);
+        set_null(&value);
 
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
@@ -228,7 +228,7 @@ namespace manual_memory_management_test {
             TaggedValue scoped_value;
             change_type(&scoped_value, myType);
             test_assert(pool_allocated[0]);
-            make_null(&scoped_value);
+            set_null(&scoped_value);
             test_assert(!pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -298,7 +298,7 @@ void list_memory_management()
     test_assert(toy_refcounted_pool::refcount[1] == 1);
     test_assert(toy_refcounted_pool::refcount[2] == 1);
 
-    make_null(list[1]);
+    set_null(list[1]);
 
     test_assert(toy_refcounted_pool::refcount[0] == 1);
     test_assert(toy_refcounted_pool::refcount[1] == 0);
@@ -315,10 +315,10 @@ void list_memory_management()
     test_assert(toy_refcounted_pool::nothing_allocated());
 }
 
-void remake_null()
+void reset_null()
 {
     TaggedValue value;
-    make_null(&value);
+    set_null(&value);
     reset(&value);
     debug_assert_valid_object(value.value_type, TYPE_OBJECT);
 }
@@ -326,9 +326,9 @@ void remake_null()
 void resize_list_maintains_existing_data()
 {
     TaggedValue outerTv;
-    List* outer = make_list(&outerTv, 3);
+    List* outer = set_list(&outerTv, 3);
 
-    List* inner = make_list(outer->get(1), 4);
+    List* inner = set_list(outer->get(1), 4);
     TaggedValue* a = inner->get(1);
     set_int(a, 5);
 
@@ -350,7 +350,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
     REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
-    REGISTER_TEST_CASE(tagged_value_tests::remake_null);
+    REGISTER_TEST_CASE(tagged_value_tests::reset_null);
     REGISTER_TEST_CASE(tagged_value_tests::resize_list_maintains_existing_data);
 }
 

@@ -313,10 +313,10 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type)
         }
     }
 
-    List* list = (List*) make_list(source->_phrases.append());
+    List* list = (List*) set_list(source->_phrases.append());
     list->resize(3);
-    make_string((*list)[0], str);
-    make_ref((*list)[1], term);
+    set_string((*list)[0], str);
+    set_ref((*list)[1], term);
     set_int((*list)[2], type);
 }
 

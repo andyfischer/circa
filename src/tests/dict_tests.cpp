@@ -43,7 +43,7 @@ void dont_insert_same_key_multiple_times()
     TaggedValue val;
     set_int(&val, 5);
     TaggedValue val2;
-    make_string(&val2, "a");
+    set_string(&val2, "a");
 
     dict_t::insert_value(&data, "key", &val);
     dict_t::insert_value(&data, "key", &val2);
@@ -87,8 +87,8 @@ void hash_collision()
     test_assert(index_b1 != index_a1);
 
     TaggedValue x, y;
-    make_string(&x, "x");
-    make_string(&y, "y");
+    set_string(&x, "x");
+    set_string(&y, "y");
 
     dict_t::insert_value(&data1, a, &x);
     dict_t::insert_value(&data1, b, &y);

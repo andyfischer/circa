@@ -36,7 +36,7 @@ namespace branch_ref_t {
     {
         List* list = List::checkCast(value);
         touch(list);
-        make_ref(list->getIndex(0), ref);
+        set_ref(list->getIndex(0), ref);
     }
     
     bool is_considered_config(Term* term)
@@ -86,7 +86,7 @@ namespace branch_ref_t {
                 continue;
 
             ca_assert(write < count);
-            make_ref(output->get(write++), t);
+            set_ref(output->get(write++), t);
         }
     }
     CA_FUNCTION(get_configs_nested)
@@ -117,9 +117,9 @@ namespace branch_ref_t {
                 continue;
 
             if (write >= output->length())
-                make_ref(output->append(), t);
+                set_ref(output->append(), t);
             else
-                make_ref(output->get(write), t);
+                set_ref(output->get(write), t);
 
             write++;
         }
@@ -160,7 +160,7 @@ namespace branch_ref_t {
             return;
         }
 
-        make_string(OUTPUT, get_relative_name(target_branch, target));
+        set_string(OUTPUT, get_relative_name(target_branch, target));
     }
 
     CA_FUNCTION(get_length)
@@ -174,9 +174,9 @@ namespace branch_ref_t {
         Branch& target_branch = get_target_branch(INPUT(0));
         int index = INT_INPUT(1);
         if (index >= target_branch.length())
-            make_ref(OUTPUT, NULL);
+            set_ref(OUTPUT, NULL);
         else
-            make_ref(OUTPUT, target_branch[index]);
+            set_ref(OUTPUT, target_branch[index]);
     }
 
     CA_FUNCTION(append_code)
@@ -206,7 +206,7 @@ namespace branch_ref_t {
     {
         Branch& target_branch = get_target_branch(INPUT(0));
 
-        make_string(OUTPUT, get_branch_raw(target_branch));
+        set_string(OUTPUT, get_branch_raw(target_branch));
     }
 
     CA_FUNCTION(save)
@@ -218,7 +218,7 @@ namespace branch_ref_t {
     CA_FUNCTION(to_source)
     {
         Branch& target_branch = get_target_branch(INPUT(0));
-        make_string(OUTPUT, get_branch_source_text(target_branch));
+        set_string(OUTPUT, get_branch_source_text(target_branch));
     }
 
     void setup_type(Type* type)

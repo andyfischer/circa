@@ -26,7 +26,7 @@ namespace vectorize_vs_function {
 
         // Prepare output
         TaggedValue outputTv;
-        List* output = make_list(&outputTv, listLength);
+        List* output = set_list(&outputTv, listLength);
 
         // Copy right input once
         swap(&input1, frame->get(1));

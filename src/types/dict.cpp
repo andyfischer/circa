@@ -60,7 +60,7 @@ void free_dict(DictData* data)
 {
     for (int i=0; i < data->capacity; i++) {
         free(data->slots[i].key);
-        make_null(&data->slots[i].value);
+        set_null(&data->slots[i].value);
     }
     free(data);
 }
@@ -209,7 +209,7 @@ void remove(DictData* data, const char* key)
     // Clear out this slot
     free(data->slots[index].key);
     data->slots[index].key = NULL;
-    make_null(&data->slots[index].value);
+    set_null(&data->slots[index].value);
     data->count--;
 
     // Check if any following keys would prefer to be moved up to this
@@ -247,7 +247,7 @@ void clear(DictData* data)
             continue;
         free(slot->key);
         slot->key = NULL;
-        make_null(&slot->value);
+        set_null(&slot->value);
     }
     data->count = 0;
 }
@@ -325,7 +325,7 @@ void debug_print(DictData* data)
 void iterator_start(DictData* data, TaggedValue* iterator)
 {
     if (data == NULL || data->count == 0)
-        return make_null(iterator);
+        return set_null(iterator);
 
     set_int(iterator, 0);
 
@@ -344,7 +344,7 @@ void iterator_next(DictData* data, TaggedValue* iterator)
         next++;
 
     if (next >= data->capacity)
-        make_null(iterator);
+        set_null(iterator);
     else
         set_int(iterator, next);
 }

@@ -188,12 +188,12 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     if (hasState) {
         // State field name.
         TaggedValue stateName;
-        make_string(&stateName, get_implicit_state_name(forTerm));
+        set_string(&stateName, get_implicit_state_name(forTerm));
         stateContainerName = bytecode::write_push_local_op(context, &stateName);
 
         // State default value
         TaggedValue defaultValue;
-        make_list(&defaultValue);
+        set_list(&defaultValue);
         int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
 
         // get_state_field
@@ -352,7 +352,7 @@ CA_FUNCTION(evaluate_for_loop)
     int inputListLength = inputList->numElements();
 
     TaggedValue outputTv;
-    List* output = make_list(&outputTv, inputListLength);
+    List* output = set_list(&outputTv, inputListLength);
 
     List previousFrame;
 

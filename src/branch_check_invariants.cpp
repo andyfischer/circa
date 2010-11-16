@@ -13,10 +13,10 @@ const int INTERNAL_ERROR_TYPE = 1;
 
 void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)
 {
-    List& error = *make_list(result->errors.append(), 3);
+    List& error = *set_list(result->errors.append(), 3);
     set_int(error[0], INTERNAL_ERROR_TYPE);
     set_int(error[1], index);
-    make_string(error[2], message);
+    set_string(error[2], message);
 }
 
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)

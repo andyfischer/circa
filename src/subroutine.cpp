@@ -45,7 +45,7 @@ namespace subroutine_t {
         }
 
         // prepare output
-        make_null(&CONTEXT->subroutineOutput);
+        set_null(&CONTEXT->subroutineOutput);
 
         // Fetch state container
         TaggedValue prevScopeState;
@@ -78,7 +78,7 @@ namespace subroutine_t {
             bool success = cast(outputSource, outputType, &output);
             ca_assert(success);
 
-            make_null(&CONTEXT->subroutineOutput);
+            set_null(&CONTEXT->subroutineOutput);
         }
 
         // Write to state
@@ -192,7 +192,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {
     touch(storageTv);
-    make_list(storageTv);
+    set_list(storageTv);
     List* storage = List::checkCast(storageTv);
     storage->resize(branch.length());
     for (int i=0; i < branch.length(); i++) {

@@ -7,7 +7,7 @@ namespace inspect_function {
 
     CA_FUNCTION(get_raw)
     {
-        make_string(OUTPUT, get_branch_raw(INPUT_TERM(0)->nestedContents));
+        set_string(OUTPUT, get_branch_raw(INPUT_TERM(0)->nestedContents));
     }
 
     void setup(Branch& kernel)

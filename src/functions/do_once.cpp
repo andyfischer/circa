@@ -14,7 +14,7 @@ namespace do_once_function {
         ca_assert(term->function->name == "do_once");
 
         TaggedValue fieldName;
-        make_string(&fieldName, get_implicit_state_name(term));
+        set_string(&fieldName, get_implicit_state_name(term));
         int name = bytecode::write_push_local_op(context, &fieldName);
 
         int alreadyRan = context->nextRegisterIndex++;

@@ -7,7 +7,7 @@ namespace lang_function {
 
     CA_FUNCTION(field)
     {
-        make_ref(OUTPUT, INPUT_TERM(0)->nestedContents[INPUT(1)->asInt()]);
+        set_ref(OUTPUT, INPUT_TERM(0)->nestedContents[INPUT(1)->asInt()]);
     }
 
     CA_FUNCTION(num_fields)

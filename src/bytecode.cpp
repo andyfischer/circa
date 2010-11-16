@@ -176,7 +176,7 @@ void write_call_op(WriteContext* context, Term* term)
         TaggedValue fieldName;
         
         std::string fieldNameStr = get_implicit_state_name(term);
-        make_string(&fieldName, fieldNameStr);
+        set_string(&fieldName, fieldNameStr);
 
         int nameRegister = write_push_local_op(context, &fieldName);
 

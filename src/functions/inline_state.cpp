@@ -53,13 +53,13 @@ namespace inline_state_function {
         }
 
         // append name to the list of open state vars
-        make_string(CONTEXT->openStateVariables.append(), name);
+        set_string(CONTEXT->openStateVariables.append(), name);
     }
 
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
     {
         TaggedValue nameVal;
-        make_string(&nameVal, term->name);
+        set_string(&nameVal, term->name);
 
         int name = bytecode::write_push_local_op(context, &nameVal);
 

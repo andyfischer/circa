@@ -60,15 +60,15 @@ void run()
     run_test_for_type(FLOAT_TYPE, floatExamples);
 
     List stringExamples;
-    make_string(stringExamples.append(), "hello");
-    make_string(stringExamples.append(), "goodbye");
+    set_string(stringExamples.append(), "hello");
+    set_string(stringExamples.append(), "goodbye");
     run_test_for_type(STRING_TYPE, stringExamples);
 
     List refExamples;
     Term* refTarget1 = alloc_term();
     Term* refTarget2 = alloc_term();
-    make_ref(refExamples.append(), refTarget1);
-    make_ref(refExamples.append(), refTarget2);
+    set_ref(refExamples.append(), refTarget1);
+    set_ref(refExamples.append(), refTarget2);
     test_assert(run_test_for_type(REF_TYPE, refExamples));
 }
 
