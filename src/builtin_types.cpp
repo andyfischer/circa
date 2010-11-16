@@ -305,11 +305,7 @@ namespace any_t {
     {
         return true;
     }
-    void cast(Type* type, TaggedValue* source, TaggedValue* dest)
-    {
-        copy(source, dest);
-    }
-    void cast2(CastResult* result, TaggedValue* source, Type* type,
+    void cast(CastResult* result, TaggedValue* source, Type* type,
         TaggedValue* dest, bool checkOnly)
     {
         // casting to 'any' always succeeds.

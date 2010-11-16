@@ -21,7 +21,10 @@ namespace cast_function {
         }
 
         change_type(OUTPUT, type);
-        cast(type, source, OUTPUT);
+        bool success = cast(source, type, OUTPUT);
+
+        if (!success)
+            return error_occurred(CONTEXT, CALLER, "cast failed");
     }
 
     void setup(Branch& kernel)

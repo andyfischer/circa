@@ -489,8 +489,10 @@ namespace branch_t {
         if (source.length() != dest.length())
             return branch_copy(source, dest);
 
+        #if 0
         for (int i=0; i < source.length(); i++)
             cast(source[i], dest[i]);
+        #endif
     }
 
     bool equals(TaggedValue* lhsValue, TaggedValue* rhs)
@@ -584,7 +586,6 @@ void initialize_branch_based_type(Term* term)
     type->release = branch_t::release;
     type->copy = branch_t::copy;
     type->reset = branch_t::reset_to_prototype;
-    type->cast = branch_t::cast;
     type->equals = branch_t::equals;
     type->getIndex = branch_t::get_index;
     type->setIndex = branch_t::set_index;

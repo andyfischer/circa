@@ -80,7 +80,7 @@ namespace ref_t {
             return;
         }
 
-        cast(source, target);
+        circa::copy(source, target);
     }
 
     int round(double a) {

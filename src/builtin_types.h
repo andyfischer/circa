@@ -43,8 +43,7 @@ namespace ref_t {
 namespace any_t {
     std::string to_string(TaggedValue*);
     bool matches_type(Type* type, Type* otherType);
-    void cast(Type* type, TaggedValue* source, TaggedValue* dest);
-    void cast2(CastResult* result, TaggedValue* source, Type* type,
+    void cast(CastResult* result, TaggedValue* source, Type* type,
         TaggedValue* dest, bool checkOnly);
 }
 

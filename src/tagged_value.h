@@ -50,12 +50,10 @@ struct TaggedValue
     static TaggedValue fromBool(bool b);
 };
 
-void cast(Type* type, TaggedValue* source, TaggedValue* dest);
-void cast(TaggedValue* source, TaggedValue* dest);
-void cast2(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly);
+void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly);
 
 // Attempts to cast, returns whether it was successful
-bool cast2(TaggedValue* source, Type* type, TaggedValue* dest);
+bool cast(TaggedValue* source, Type* type, TaggedValue* dest);
 
 bool cast_possible(TaggedValue* source, Type* type);
 void copy(TaggedValue* source, TaggedValue* dest);

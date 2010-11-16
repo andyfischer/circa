@@ -151,31 +151,10 @@ TaggedValue TaggedValue::fromBool(bool b)
     return tv;
 }
 
-void cast(Type* type, TaggedValue* source, TaggedValue* dest)
+void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
 {
-    if (type->cast == NULL) {
-        // If types are equal and there's no cast() function, just do a copy.
-        if (source->value_type == type) {
-            copy(source, dest);
-            return;
-        }
-
-        std::string msg = "No cast function on type " + type->name;
-        internal_error(msg.c_str());
-    }
-
-    type->cast(type, source, dest);
-}
-
-void cast(TaggedValue* source, TaggedValue* dest)
-{
-    return cast(dest->value_type, source, dest);
-}
-
-void cast2(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
-{
-    if (type->cast2 != NULL) {
-        type->cast2(result, source, type, dest, checkOnly);
+    if (type->cast != NULL) {
+        type->cast(result, source, type, dest, checkOnly);
         return;
     }
 
@@ -193,17 +172,17 @@ void cast2(CastResult* result, TaggedValue* source, Type* type, TaggedValue* des
     copy(source, dest);
 }
 
-bool cast2(TaggedValue* source, Type* type, TaggedValue* dest)
+bool cast(TaggedValue* source, Type* type, TaggedValue* dest)
 {
     CastResult result;
-    cast2(&result, source, type, dest, false);
+    cast(&result, source, type, dest, false);
     return result.success;
 }
 
 bool cast_possible(TaggedValue* source, Type* type)
 {
     CastResult result;
-    cast2(&result, source, type, NULL, true);
+    cast(&result, source, type, NULL, true);
     return result.success;
 }
 

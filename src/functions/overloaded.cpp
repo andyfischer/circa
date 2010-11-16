@@ -90,7 +90,7 @@ namespace overloaded_function {
             }
             TaggedValue output;
             evaluate_branch_in_new_frame(CONTEXT, contents, &output);
-            cast(type_contents(contents[0]->type), &output, OUTPUT);
+            cast(&output, type_contents(contents[0]->type), OUTPUT);
         } else {
             make_string(OUTPUT, "(specialized func not found)");
         }

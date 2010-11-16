@@ -38,7 +38,7 @@ namespace subroutine_t {
                 Term* inputTypeTerm = function_t::get_input_type(function, i);
                 Type* inputType = type_contents(inputTypeTerm);
 
-                ca_assert(cast2(input, inputType, frame.get(i)));
+                ca_assert(cast(input, inputType, frame.get(i)));
             }
 
             swap(&frame, STACK->append());
@@ -75,7 +75,7 @@ namespace subroutine_t {
             else
                 outputSource = frame->get(frame->length() - 1);
 
-            bool success = cast2(outputSource, outputType, &output);
+            bool success = cast(outputSource, outputType, &output);
             ca_assert(success);
 
             make_null(&CONTEXT->subroutineOutput);

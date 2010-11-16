@@ -131,7 +131,7 @@ void test_cast()
     test_assert(cast_possible(&a, LIST_T));
 
     test_assert(cast_possible(&b, LIST_T));
-    test_assert(cast2(&b, LIST_T, &x));
+    test_assert(cast(&b, LIST_T, &x));
     test_equals(x.toString(), "[1, 2]");
 
     Branch branch;
@@ -143,7 +143,7 @@ void test_cast()
     test_assert(!cast_possible(&c, t));
     test_assert(!cast_possible(&d, t));
 
-    test_assert(cast2(&b, t, &x));
+    test_assert(cast(&b, t, &x));
     test_equals(x.toString(), "[1, 2.0]");
 }
 

@@ -38,18 +38,6 @@ void test_void()
     test_equals(to_string(v), "<void>");
 }
 
-void cast_int_to_float()
-{
-    Branch branch;
-    Term* source = branch.eval("1");
-    Term* dest = branch.eval("2.0");
-
-    cast(source, dest);
-
-    test_assert(is_float(dest));
-    test_equals(as_float(dest), 1.0);
-}
-
 void float_to_string()
 {
     Branch branch;
@@ -105,7 +93,6 @@ void register_tests()
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
     REGISTER_TEST_CASE(primitive_type_tests::test_void);
-    REGISTER_TEST_CASE(primitive_type_tests::cast_int_to_float);
     REGISTER_TEST_CASE(primitive_type_tests::float_to_string);
     REGISTER_TEST_CASE(primitive_type_tests::test_ref_tweak);
 }

@@ -359,30 +359,7 @@ namespace list_t {
         return true;
     }
 
-    void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
-    {
-        ca_assert(is_list(source));
-
-        if (!is_list(dest))
-            make_list(dest);
-
-        bool keep_existing_shape = dest->value_type->prototype.length() != 0;
-
-        if (keep_existing_shape) {
-            List* s = List::checkCast(source);
-            List* d = List::checkCast(dest);
-
-            int count = std::min(s->numElements(), d->numElements());
-
-            for (int i=0; i < count; i++)
-                cast(s->get(i), d->get(i));
-
-        } else {
-            tv_copy(source, dest);
-        }
-    }
-
-    void tv_cast2(CastResult* result, TaggedValue* source, Type* type,
+    void tv_cast(CastResult* result, TaggedValue* source, Type* type,
         TaggedValue* dest, bool checkOnly)
     {
         List* sourceList = List::checkCast(source);
@@ -427,7 +404,7 @@ namespace list_t {
             if (!checkOnly)
                 destElement = destList->get(i);
         
-            cast2(result, sourceElement, elementType, destElement, checkOnly);
+            cast(result, sourceElement, elementType, destElement, checkOnly);
 
             if (!result->success)
                 return;
@@ -585,7 +562,6 @@ namespace list_t {
         type->toString = tv_to_string;
         type->equals = tv_equals;
         type->cast = tv_cast;
-        type->cast2 = tv_cast2;
         type->getIndex = tv_get_index;
         type->setIndex = tv_set_index;
         type->getField = tv_get_field;

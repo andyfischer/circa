@@ -71,17 +71,6 @@ void test_int_simple()
     test_assert(is_int(b));
 }
 
-void test_int_and_float_casting()
-{
-    TaggedValue i;
-    make_int(&i, 4);
-    TaggedValue f;
-    make_float(&f, 0.0);
-
-    cast(f.value_type, &i, &f);
-    test_assert(as_float(&f) == 4.0);
-}
-
 void test_polymorphic()
 {
     TaggedValue v;
@@ -353,7 +342,6 @@ void resize_list_maintains_existing_data()
 void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
-    REGISTER_TEST_CASE(tagged_value_tests::test_int_and_float_casting);
     REGISTER_TEST_CASE(tagged_value_tests::test_polymorphic);
     REGISTER_TEST_CASE(tagged_value_tests::test_term_value);
     REGISTER_TEST_CASE(tagged_value_tests::subroutine_call_test);

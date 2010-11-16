@@ -11,12 +11,7 @@ namespace float_t {
     {
         make_float(value, 0);
     }
-
-    void cast(Type* type, TaggedValue* source, TaggedValue* dest)
-    {
-        make_float(dest, to_float(source));
-    }
-    void cast2(CastResult* result, TaggedValue* source, Type* type,
+    void cast(CastResult* result, TaggedValue* source, Type* type,
         TaggedValue* dest, bool checkOnly)
     {
         if (!(is_int(source) || is_float(source))) {
@@ -104,7 +99,6 @@ namespace float_t {
         type->name = "number";
         type->reset = reset;
         type->cast = cast;
-        type->cast2 = cast2;
         type->equals = equals;
         type->isSubtype = is_subtype;
         type->toString = to_string;

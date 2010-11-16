@@ -139,7 +139,6 @@ Type::Type() :
     reset(NULL),
     equals(NULL),
     cast(NULL),
-    cast2(NULL),
     isSubtype(NULL),
     staticTypeQuery(NULL),
     valueFitsType(NULL),
