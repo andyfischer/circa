@@ -80,7 +80,7 @@ void train_cond()
     test_equals(a->asInt(), 5);
 
     // try changing cond
-    make_int(a, 1);
+    set_int(a, 1);
     make_bool(cond, false);
 
     evaluate_branch(branch);

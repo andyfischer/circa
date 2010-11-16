@@ -181,7 +181,7 @@ void test_do_once()
     test_assert(as_int(x) == 2);
 
     // but if we call it again, it shouldn't do that any more
-    make_int(x, 3);
+    set_int(x, 3);
     evaluate_branch(branch);
     test_assert(as_int(x) == 3);
 
@@ -204,7 +204,7 @@ void test_changed()
     evaluate_branch(&context, branch);
     test_assert(changed->asBool() == false);
 
-    make_int(x, 6);
+    set_int(x, 6);
     evaluate_branch(&context, branch);
     test_assert(changed->asBool() == true);
     evaluate_branch(&context, branch);

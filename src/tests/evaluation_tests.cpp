@@ -46,9 +46,9 @@ void test_copy_stack_back_to_terms()
 
     List frame;
     frame.resize(3);
-    make_int(frame[0], 10);
-    make_int(frame[1], 20);
-    make_int(frame[2], 30);
+    set_int(frame[0], 10);
+    set_int(frame[1], 20);
+    set_int(frame[2], 30);
 
     copy_stack_back_to_terms(branch, &frame);
 

@@ -22,10 +22,10 @@ namespace postprocess_functions
         int get_width(TaggedValue* v) { return as_int(v->getIndex(2)); }
         int get_height(TaggedValue* v) { return as_int(v->getIndex(3)); }
 
-        void set_tex_id(TaggedValue* v, int id) { touch(v); make_int(v->getIndex(0), id); }
-        void set_fbo_id(TaggedValue* v, int id) { touch(v); make_int(v->getIndex(1), id); }
-        void set_width(TaggedValue* v, int w) { touch(v); make_int(v->getIndex(2), w); }
-        void set_height(TaggedValue* v, int h) { touch(v); make_int(v->getIndex(3), h); }
+        void set_tex_id(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(0), id); }
+        void set_fbo_id(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
+        void set_width(TaggedValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
+        void set_height(TaggedValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
     }
     
     CA_FUNCTION(make_surface)

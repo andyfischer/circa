@@ -795,14 +795,14 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
             }
             case bytecode::OP_PUSH_INT: {
                 bytecode::PushIntOperation *pushop = (bytecode::PushIntOperation*) op;
-                make_int(registers->get(pushop->outputIndex), pushop->value);
+                set_int(registers->get(pushop->outputIndex), pushop->value);
                 pos += sizeof(bytecode::PushIntOperation);
                 continue;
             }
             case bytecode::OP_INCREMENT: {
                 bytecode::IncrementOperation *incop = (bytecode::IncrementOperation*) op;
                 TaggedValue* value = registers->get(incop->registerIndex);
-                make_int(value, as_int(value) + 1);
+                set_int(value, as_int(value) + 1);
                 pos += sizeof(bytecode::IncrementOperation);
                 continue;
             }
@@ -825,7 +825,7 @@ void evaluate_bytecode(EvalContext* cxt, BytecodeData* data, List* registers)
             case bytecode::OP_NUM_ELEMENTS: {
                 bytecode::NumElementsOperation *neop = (bytecode::NumElementsOperation*) op;
                 TaggedValue *list = registers->get(neop->listIndex);
-                make_int(registers->get(neop->outputIndex), list->numElements());
+                set_int(registers->get(neop->outputIndex), list->numElements());
                 pos += sizeof(bytecode::NumElementsOperation);
                 continue;
             }

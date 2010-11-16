@@ -93,9 +93,9 @@ CA_FUNCTION(render_text)
 
         // Clear results if text is empty
         if (inputText == "") {
-            make_int(state->texidContainer(), 0);
-            make_int(state->widthContainer(), 0);
-            make_int(state->heightContainer(), 0);
+            set_int(state->texidContainer(), 0);
+            set_int(state->widthContainer(), 0);
+            set_int(state->heightContainer(), 0);
             copy(INPUT(0), OUTPUT);
             return;
         }
@@ -108,9 +108,9 @@ CA_FUNCTION(render_text)
         SDL_Color sdlColor = unpack_sdl_color(INPUT(3));
         SDL_Surface *surface = TTF_RenderText_Blended(*font, inputText.c_str(), sdlColor);
 
-        make_int(state->texidContainer(), load_surface_to_texture(surface));
-        make_int(state->widthContainer(), surface->w);
-        make_int(state->heightContainer(), surface->h);
+        set_int(state->texidContainer(), load_surface_to_texture(surface));
+        set_int(state->widthContainer(), surface->w);
+        set_int(state->heightContainer(), surface->h);
         copy(inputColor, state->color());
 
         //SDL_SaveBMP(surface, "hello.bmp");

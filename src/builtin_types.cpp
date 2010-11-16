@@ -337,8 +337,8 @@ namespace point_t {
     void write(TaggedValue* value, float x, float y)
     {
         touch(value);
-        make_float(value->getIndex(0), x);
-        make_float(value->getIndex(1), y);
+        set_float(value->getIndex(0), x);
+        set_float(value->getIndex(1), y);
     }
 }
 

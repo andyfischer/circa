@@ -166,7 +166,7 @@ namespace branch_ref_t {
     CA_FUNCTION(get_length)
     {
         Branch& target_branch = get_target_branch(INPUT(0));
-        make_int(OUTPUT, target_branch.length());
+        set_int(OUTPUT, target_branch.length());
     }
 
     CA_FUNCTION(get_index)

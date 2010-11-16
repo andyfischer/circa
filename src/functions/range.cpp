@@ -18,7 +18,7 @@ namespace range_function {
         int val = start;
         int increment = start < max ? 1 : -1;
         for (int i=0; i < count; i++) {
-            make_int(list->get(i), val);
+            set_int(list->get(i), val);
             val += increment;
         }
     }

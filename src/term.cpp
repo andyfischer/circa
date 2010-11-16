@@ -100,13 +100,13 @@ std::string const& Term::stringProp(std::string const& name)
 void Term::setIntProp(std::string const& name, int i)
 {
     TaggedValue* t = addProperty(name, INT_TYPE);
-    make_int(t, i);
+    set_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
     TaggedValue* t = addProperty(name, FLOAT_TYPE);
-    make_float(t, f);
+    set_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)

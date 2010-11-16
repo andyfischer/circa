@@ -105,10 +105,10 @@ namespace ref_t {
 
             // do the math like this so that rounding errors are not accumulated
             float new_value = (round(as_float(t) / step) + steps) * step;
-            make_float(t, new_value);
+            set_float(t, new_value);
 
         } else if (is_int(t))
-            make_int(t, as_int(t) + steps);
+            set_int(t, as_int(t) + steps);
         else
             error_occurred(CONTEXT, CALLER, "Ref is not an int or number");
     }
@@ -124,7 +124,7 @@ namespace ref_t {
             error_occurred(CONTEXT, CALLER, "Not an int");
             return;
         }
-        make_int(OUTPUT, as_int(t));
+        set_int(OUTPUT, as_int(t));
     }
     CA_FUNCTION(asfloat)
     {
@@ -134,7 +134,7 @@ namespace ref_t {
             return;
         }
         
-        make_float(OUTPUT, to_float(t));
+        set_float(OUTPUT, to_float(t));
     }
     CA_FUNCTION(get_input)
     {
@@ -156,7 +156,7 @@ namespace ref_t {
             error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
-        make_int(OUTPUT, t->numInputs());
+        set_int(OUTPUT, t->numInputs());
     }
 
     CA_FUNCTION(get_source_location)
@@ -169,11 +169,11 @@ namespace ref_t {
         Branch& output = as_branch(OUTPUT);
 
         if (t->sourceLoc.defined()) {
-            make_int(output[0], t->sourceLoc.col);
-            make_int(output[1], t->sourceLoc.line);
+            set_int(output[0], t->sourceLoc.col);
+            set_int(output[1], t->sourceLoc.line);
         } else {
-            make_int(output[0], 0);
-            make_int(output[1], 0);
+            set_int(output[0], 0);
+            set_int(output[1], 0);
         }
     }
     void setup_type(Type* type)

@@ -53,14 +53,14 @@ void float_to_string()
 
     // Try changing a value, make sure that new value is printed
     Term* b = branch.eval(".1");
-    make_float(b, .123456f);
+    set_float(b, .123456f);
     test_assert(get_term_source_text(b) == "0.123456");
 
     // Make sure that if we assign a float to a value which might get printed without
     // a decimal point, that we still do print the decimal point. Otherwise if the
     // string gets re-parsed, that value will have a different type.
     Term* c = branch.eval("1.0");
-    make_float(c, 2.0);
+    set_float(c, 2.0);
     test_equals(get_term_source_text(c), "2.0");
 }
 

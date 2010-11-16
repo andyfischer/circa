@@ -26,7 +26,7 @@ CA_FUNCTION(hosted_load_texture)
         GLuint id = load_image_to_texture(CONTEXT, CALLER, filename.c_str());
         texid = id;
     }
-    make_int(OUTPUT, texid);
+    set_int(OUTPUT, texid);
 
     gl_check_error(CONTEXT, CALLER);
 }

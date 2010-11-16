@@ -169,7 +169,7 @@ void test_default_values()
 
     Term* t_value = create_value(branch, t);
 
-    make_int(t_value->value, 5);
+    set_int(t_value->value, 5);
     type_t::enable_default_value(t);
     assign_value(t_value, type_t::get_default_value(t));
 
@@ -226,7 +226,7 @@ void type_inference_for_get_field()
 
 CA_FUNCTION(_evaluate_type_error)
 {
-    make_float(OUTPUT, to_float(INPUT(0)));
+    set_float(OUTPUT, to_float(INPUT(0)));
 }
 
 void test_type_error_in_a_native_call()

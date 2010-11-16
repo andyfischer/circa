@@ -327,7 +327,7 @@ void iterator_start(DictData* data, TaggedValue* iterator)
     if (data == NULL || data->count == 0)
         return make_null(iterator);
 
-    make_int(iterator, 0);
+    set_int(iterator, 0);
 
     // Advance if this iterator location isn't valid
     if (data->slots[0].key == NULL)
@@ -346,7 +346,7 @@ void iterator_next(DictData* data, TaggedValue* iterator)
     if (next >= data->capacity)
         make_null(iterator);
     else
-        make_int(iterator, next);
+        set_int(iterator, next);
 }
 
 void iterator_get(DictData* data, TaggedValue* iterator, const char** key, TaggedValue** value)

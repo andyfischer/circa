@@ -317,7 +317,7 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type)
     list->resize(3);
     make_string((*list)[0], str);
     make_ref((*list)[1], term);
-    make_int((*list)[2], type);
+    set_int((*list)[2], type);
 }
 
 void append_phrase(StyledSource* source, std::string const& str, Term* term, int type)

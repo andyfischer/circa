@@ -138,7 +138,7 @@ CA_FUNCTION(hosted_load_mesh)
         glNewList(index, GL_COMPILE);
         draw_mesh_immediate(mesh);
         glEndList();
-        make_int(caller, index);
+        set_int(caller, index);
     }
 }
 #endif

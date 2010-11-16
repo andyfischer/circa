@@ -58,7 +58,7 @@ namespace toy_refcounted_pool {
 void test_int_simple()
 {
     TaggedValue v;
-    make_int(&v, 4);
+    set_int(&v, 4);
 
     test_assert(is_int(&v));
     test_assert(as_int(&v) == 4);
@@ -78,12 +78,12 @@ void test_polymorphic()
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
 
-    make_int(&v, 11);
+    set_int(&v, 11);
     test_assert(is_int(&v));
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
 
-    make_float(&v, 2.0);
+    set_float(&v, 2.0);
     test_assert(!is_int(&v));
     test_assert(is_float(&v));
     test_assert(!is_bool(&v));
@@ -330,7 +330,7 @@ void resize_list_maintains_existing_data()
 
     List* inner = make_list(outer->get(1), 4);
     TaggedValue* a = inner->get(1);
-    make_int(a, 5);
+    set_int(a, 5);
 
     test_assert(outer->get(1)->getIndex(1) == a);
 

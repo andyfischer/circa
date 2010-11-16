@@ -75,7 +75,7 @@ int NEXT_UNIQUE_OUTPUT = 0;
 
 CA_FUNCTION(_unique_output)
 {
-    make_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
+    set_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
 }
 
 std::vector<int> SPY_RESULTS;
@@ -140,8 +140,8 @@ namespace test_interpreted_state_access
 {
     CA_FUNCTION(evaluate)
     {
-        TaggedValue* state = make_int(get_state_input(CONTEXT, CALLER));
-        make_int(state, as_int(state) + 1);
+        TaggedValue* state = set_int(get_state_input(CONTEXT, CALLER));
+        set_int(state, as_int(state) + 1);
     }
 
     void test()

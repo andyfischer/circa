@@ -14,7 +14,7 @@ namespace memory_management_for_each_operation
     void set_index_op(List* value)
     {
         TaggedValue one;
-        make_int(&one, 1);
+        set_int(&one, 1);
         value->set(0, &one);
     }
 
@@ -32,7 +32,7 @@ namespace memory_management_for_each_operation
     {
         TaggedValue value;
         make_list(&value);
-        make_int(List::checkCast(&value)->append(), 0);
+        set_int(List::checkCast(&value)->append(), 0);
 
         tvvector::ListData* origData = (tvvector::ListData*)
             get_pointer(&value);
@@ -110,19 +110,19 @@ void test_cast()
 
     TaggedValue b;
     make_list(&b, 2);
-    make_int(b.getIndex(0), 1);
-    make_int(b.getIndex(1), 2);
+    set_int(b.getIndex(0), 1);
+    set_int(b.getIndex(1), 2);
     test_equals(b.toString(), "[1, 2]");
 
     TaggedValue c;
     make_list(&c, 2);
-    make_int(c.getIndex(0), 1);
+    set_int(c.getIndex(0), 1);
     make_string(c.getIndex(1), "hi");
     test_equals(c.toString(), "[1, 'hi']");
 
     TaggedValue d;
     make_list(&d, 1);
-    make_float(d.getIndex(0), 1);
+    set_float(d.getIndex(0), 1);
     test_equals(d.toString(), "[1.0]");
 
     TaggedValue x;

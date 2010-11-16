@@ -127,8 +127,8 @@ void capture_events()
         }
     } // finish event loop
 
-    make_float(MOUSE_POSITION_TERM->getIndex(0), float(MOUSE_X));
-    make_float(MOUSE_POSITION_TERM->getIndex(1), float(MOUSE_Y));
+    set_float(MOUSE_POSITION_TERM->getIndex(0), float(MOUSE_X));
+    set_float(MOUSE_POSITION_TERM->getIndex(1), float(MOUSE_Y));
 }
 
 void handle_key_press(SDL_Event &event, int key)
@@ -206,8 +206,8 @@ CA_FUNCTION(recent_key_presses)
             keyStr[0] = char(key);
 
         make_string(item->append(), keyStr);
-        make_int(item->append(), KEYS_JUST_PRESSED[index].sym);
-        make_int(item->append(), KEYS_JUST_PRESSED[index].mod);
+        set_int(item->append(), KEYS_JUST_PRESSED[index].sym);
+        set_int(item->append(), KEYS_JUST_PRESSED[index].mod);
     }
 }
 
@@ -280,14 +280,14 @@ void setup(Branch& branch)
     Branch& key = branch["key"]->nestedContents;
     ca_assert(is_namespace(key));
 
-    make_int(key["up"], SDLK_UP);
-    make_int(key["down"], SDLK_DOWN);
-    make_int(key["left"], SDLK_LEFT);
-    make_int(key["right"], SDLK_RIGHT);
-    make_int(key["space"], SDLK_SPACE);
-    make_int(key["delete"], SDLK_BACKSPACE);
-    make_int(key["enter"], SDLK_RETURN);
-    make_int(key["escape"], SDLK_ESCAPE);
+    set_int(key["up"], SDLK_UP);
+    set_int(key["down"], SDLK_DOWN);
+    set_int(key["left"], SDLK_LEFT);
+    set_int(key["right"], SDLK_RIGHT);
+    set_int(key["space"], SDLK_SPACE);
+    set_int(key["delete"], SDLK_BACKSPACE);
+    set_int(key["enter"], SDLK_RETURN);
+    set_int(key["escape"], SDLK_ESCAPE);
 }
 
 } // namespace input

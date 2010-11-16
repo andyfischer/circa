@@ -50,13 +50,13 @@ bool run_test_for_type(Term* type, List& exampleValues)
 void run()
 {
     List intExamples;
-    make_int(intExamples.append(), 5);
-    make_int(intExamples.append(), 3);
+    set_int(intExamples.append(), 5);
+    set_int(intExamples.append(), 3);
     run_test_for_type(INT_TYPE, intExamples);
 
     List floatExamples;
-    make_float(floatExamples.append(), 1.2);
-    make_float(floatExamples.append(), -0.001);
+    set_float(floatExamples.append(), 1.2);
+    set_float(floatExamples.append(), -0.001);
     run_test_for_type(FLOAT_TYPE, floatExamples);
 
     List stringExamples;

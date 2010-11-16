@@ -21,7 +21,7 @@ namespace file_changed_function {
         if (modifiedTime != as_int(sigModified)
                 || filename != as_string(sigFilename)) {
             make_string(sigFilename, filename);
-            make_int(sigModified, (int) modifiedTime);
+            set_int(sigModified, (int) modifiedTime);
             return true;
         } else {
             return false;

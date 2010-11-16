@@ -1107,11 +1107,11 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         // rather than introduce a neg() operation.
         if (is_value(expr) && expr->name == "") {
             if (is_int(expr)) {
-                make_int(expr, as_int(expr) * -1);
+                set_int(expr, as_int(expr) * -1);
                 return expr;
             }
             else if (is_float(expr)) {
-                make_float(expr, as_float(expr) * -1.0f);
+                set_float(expr, as_float(expr) * -1.0f);
                 expr->setStringProp("float:original-format",
                     "-" + expr->stringProp("float:original-format"));
                 return expr;
@@ -1646,10 +1646,10 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
             a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
-    make_float(result->getIndex(0), r);
-    make_float(result->getIndex(1), g);
-    make_float(result->getIndex(2), b);
-    make_float(result->getIndex(3), a);
+    set_float(result->getIndex(0), r);
+    set_float(result->getIndex(1), g);
+    set_float(result->getIndex(2), b);
+    set_float(result->getIndex(3), a);
 
     resultTerm->setIntProp("syntax:colorFormat", (int) text.length());
 

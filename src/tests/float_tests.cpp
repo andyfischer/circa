@@ -8,7 +8,7 @@ namespace float_tests {
 void test_cast()
 {
     TaggedValue f;
-    make_float(&f, 5.0);
+    set_float(&f, 5.0);
     TaggedValue s;
     make_string(&s, "hello");
 

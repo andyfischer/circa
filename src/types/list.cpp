@@ -584,7 +584,7 @@ namespace list_t {
     CA_FUNCTION(count)
     {
         List* list = List::checkCast(INPUT(0));
-        make_int(OUTPUT, list->length());
+        set_int(OUTPUT, list->length());
     }
 
     void postponed_setup_type(Term* type)
@@ -621,9 +621,9 @@ namespace list_t {
             test_assert(get_index(&value, 1) == NULL);
             test_assert(num_elements(&value) == 0);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
-            make_int(list_t::append(&value), 3);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 3);
 
             test_equals(to_string(&value), "[1, 2, 3]");
 
@@ -638,9 +638,9 @@ namespace list_t {
 
             TaggedValue value(list);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
-            make_int(list_t::append(&value), 3);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 3);
 
             test_equals(to_string(&value), "[1, 2, 3]");
 
@@ -650,7 +650,7 @@ namespace list_t {
 
             test_equals(to_string(&value2), "[1, 2, 3]");
 
-            make_int(list_t::append(&value2), 4);
+            set_int(list_t::append(&value2), 4);
 
             test_equals(to_string(&value), "[1, 2, 3]");
             test_equals(to_string(&value2), "[1, 2, 3, 4]");
@@ -663,8 +663,8 @@ namespace list_t {
 
             TaggedValue value(list);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
 
             TaggedValue value2(list);
             copy(&value, &value2);
@@ -683,13 +683,13 @@ namespace list_t {
 
             TaggedValue value(list);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
 
             test_assert(to_string(&value) == "[1, 2]");
             list_t::prepend(&value);
             test_assert(to_string(&value) == "[null, 1, 2]");
-            make_int(list_t::tv_get_index(&value, 0), 4);
+            set_int(list_t::tv_get_index(&value, 0), 4);
             test_assert(to_string(&value) == "[4, 1, 2]");
 
             reset(&value);
@@ -701,7 +701,7 @@ namespace list_t {
             reset(&value);
 
             list_t::prepend(&value);
-            make_int(list_t::tv_get_index(&value, 0), 1);
+            set_int(list_t::tv_get_index(&value, 0), 1);
             test_assert(to_string(&value) == "[1]");
             list_t::prepend(&value);
             test_assert(to_string(&value) == "[null, 1]");

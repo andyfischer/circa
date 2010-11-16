@@ -14,8 +14,8 @@ const int INTERNAL_ERROR_TYPE = 1;
 void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)
 {
     List& error = *make_list(result->errors.append(), 3);
-    make_int(error[0], INTERNAL_ERROR_TYPE);
-    make_int(error[1], index);
+    set_int(error[0], INTERNAL_ERROR_TYPE);
+    set_int(error[1], index);
     make_string(error[2], message);
 }
 

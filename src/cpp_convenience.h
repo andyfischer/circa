@@ -32,7 +32,7 @@ class Int {
 public:
     Int(TaggedValue* value) { _value = value; }
     
-    Int& operator=(int rhs) { make_int(_value, rhs); return *this; }
+    Int& operator=(int rhs) { set_int(_value, rhs); return *this; }
     operator int() { return as_int(_value); }
 };
 

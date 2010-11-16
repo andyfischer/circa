@@ -99,8 +99,8 @@ void test_dynamic_overload()
     Term* b = create_value(branch, ANY_TYPE, "b");
     Term* result = branch.compile("add(a, b)");
 
-    make_int(a, 5);
-    make_int(b, 3);
+    set_int(a, 5);
+    set_int(b, 3);
 
     Term* add_i = get_global("add_i");
     test_assert(add_i == overloaded_function::get_overload(ADD_FUNC, 0));
@@ -114,7 +114,7 @@ void test_dynamic_overload()
     test_assert(context);
     test_assert(result->asInt() == 8);
 
-    make_float(b, 3.0);
+    set_float(b, 3.0);
     //dump_branch(branch);
     evaluate_branch(&context, branch);
     test_assert(context);

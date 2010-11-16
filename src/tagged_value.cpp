@@ -127,14 +127,14 @@ Ref& TaggedValue::asRef()
 TaggedValue TaggedValue::fromInt(int i)
 {
     TaggedValue tv;
-    make_int(&tv, i);
+    set_int(&tv, i);
     return tv;
 }
 
 TaggedValue TaggedValue::fromFloat(float f)
 {
     TaggedValue tv;
-    make_float(&tv, f);
+    set_float(&tv, f);
     return tv;
 }
 TaggedValue TaggedValue::fromString(const char* s)
@@ -373,19 +373,19 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
-TaggedValue* make_int(TaggedValue* value)
+TaggedValue* set_int(TaggedValue* value)
 {
     change_type(value, INT_T);
     return value;
 }
 
-void make_int(TaggedValue* value, int i)
+void set_int(TaggedValue* value, int i)
 {
     change_type(value, INT_T);
     value->value_data.asint = i;
 }
 
-void make_float(TaggedValue* value, float f)
+void set_float(TaggedValue* value, float f)
 {
     change_type(value, FLOAT_T);
     value->value_data.asfloat = f;
