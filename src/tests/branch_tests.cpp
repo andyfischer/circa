@@ -11,11 +11,11 @@ void test_insert()
 {
     Branch branch;
 
-    test_assert(branch_check_invariants(branch, &std::cout)); // sanity check
+    test_assert(branch_check_invariants_print_result(branch, std::cout)); // sanity check
 
     Term* a = create_void(branch);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     Term* b = alloc_term();
     test_assert(b->value_type != NULL);
@@ -23,17 +23,17 @@ void test_insert()
     test_assert(branch.length() == 1);
     test_assert(branch[0] == a);
     
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     branch.insert(0, b);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     test_assert(branch.length() == 2);
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     Term* c = alloc_term();
     branch.insert(2, c);
@@ -42,7 +42,7 @@ void test_insert()
     test_assert(branch[1] == a);
     test_assert(branch[2] == c);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     Term* d = alloc_term();
     branch.insert(1, d);
@@ -52,22 +52,23 @@ void test_insert()
     test_assert(branch[2] == a);
     test_assert(branch[3] == c);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 }
 
 void test_check_invariants()
 {
     Branch branch;
+    std::stringstream output;
     Term* t = branch.appendNew();
-    test_assert(branch_check_invariants(branch));
+    test_assert(branch_check_invariants_print_result(branch, output));
     t->owningBranch = NULL;
-    test_assert(!branch_check_invariants(branch));
+    test_assert(!branch_check_invariants_print_result(branch, output));
 
     branch.clear();
     t = branch.appendNew();
-    test_assert(branch_check_invariants(branch));
+    test_assert(branch_check_invariants_print_result(branch, output));
     t->index = 5;
-    test_assert(!branch_check_invariants(branch));
+    test_assert(!branch_check_invariants_print_result(branch, output));
 }
 
 void test_setNull()
@@ -82,8 +83,6 @@ void test_setNull()
     branch.setNull(0);
     test_assert(!branch.contains("a"));
     test_assert(branch[0] == NULL);
-
-    test_assert(branch);
 }
 
 void test_remove()
@@ -133,7 +132,7 @@ void test_removeNulls()
     test_assert(branch[1] == b);
     test_assert(branch[2] == c);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 }
 
 void test_duplicate()

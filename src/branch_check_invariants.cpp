@@ -32,6 +32,18 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
             continue;
         }
 
+        // Check that the term's index is correct
+        if (term->index != i) {
+            std::stringstream msg;
+            msg << "Wrong index (found " << term->index << ", expected " << i << ")";
+            append_internal_error(result, i, msg.str());
+        }
+
+        // Check that owningBranch is correct
+        if (term->owningBranch != &branch) {
+            append_internal_error(result, i, "Wrong owningBranch");
+        }
+
         int regCount = get_register_count(term);
         int expectedRegister = -1;
 
@@ -74,7 +86,7 @@ bool branch_check_invariants_print_result(Branch& branch, std::ostream& out)
         out << std::endl;
     }
 
-    std::cout << "contents:" << std::endl;
+    out << "contents:" << std::endl;
     print_branch_raw(out, branch);
 
     return false;

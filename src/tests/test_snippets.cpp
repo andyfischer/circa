@@ -38,7 +38,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     std::stringstream checkInvariantsOutput;
-    if (!branch_check_invariants(code, &checkInvariantsOutput)) {
+    if (!branch_check_invariants_print_result(code, checkInvariantsOutput)) {
         std::cout << "Failed invariant in code: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
         print_branch_raw(std::cout, code);
@@ -75,7 +75,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     checkInvariantsOutput.clear();
-    if (!branch_check_invariants(assertions, &checkInvariantsOutput)) {
+    if (!branch_check_invariants_print_result(assertions, checkInvariantsOutput)) {
         std::cout << "Failed invariant in assertions: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
         print_branch_raw(std::cout, code);

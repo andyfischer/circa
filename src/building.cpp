@@ -261,6 +261,9 @@ int get_register_count(Term* term)
     if (term->name == "#attr:comp-pending-rebind")
         return 0;
 
+    if (term->function == NULL)
+        return 0;
+
     FunctionAttrs::GetRegisterCount getRegisterCount
         = function_t::get_attrs(term->function).getRegisterCount;
 

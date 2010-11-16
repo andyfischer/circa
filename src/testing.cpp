@@ -58,7 +58,7 @@ void test_assert_function(Term* term, int line, const char* file)
 
 void test_assert_function(Branch& branch, int line, const char* file)
 {
-    if (!branch_check_invariants(branch, &std::cout)) {
+    if (!branch_check_invariants_print_result(branch, std::cout)) {
         declare_current_test_failed();
         throw std::runtime_error("");
     }
@@ -288,7 +288,7 @@ void test_branch_as_assertions_list(Branch& branch, std::string const& contextSt
     }
 
     std::stringstream checkInvariantsOutput;
-    if (!branch_check_invariants(branch, &checkInvariantsOutput)) {
+    if (!branch_check_invariants_print_result(branch, checkInvariantsOutput)) {
         std::cout << "Failed invariant " << contextStr << std::endl;
         std::cout << checkInvariantsOutput.str() << std::endl;
         declare_current_test_failed();

@@ -112,6 +112,4 @@ Term* find_term_by_id(Branch& branch, unsigned int id);
 void persist_branch_to_file(Branch& branch);
 std::string get_source_file_location(Branch& branch);
 
-bool branch_check_invariants(Branch& branch, std::ostream* output=NULL);
-
 } // namespace circa
