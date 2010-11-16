@@ -428,12 +428,6 @@ List* set_list(TaggedValue* value, int size)
     return list;
 }
 
-void make_branch(TaggedValue* value)
-{
-    change_type(value, NULL_T); // substitute for 'reset'
-    change_type(value, type_contents(BRANCH_TYPE));
-}
-
 void set_type(TaggedValue* value, Type* type)
 {
     reset(value);

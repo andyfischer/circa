@@ -15,7 +15,7 @@ namespace meta_function {
     {
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
-        lift_closure(as_branch(OUTPUT));
+        //FIXME lift_closure(as_branch(OUTPUT));
     }
 
     void setup(Branch& kernel)

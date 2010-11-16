@@ -130,7 +130,7 @@ namespace branch_ref_t {
     CA_FUNCTION(get_visible)
     {
         Branch& target_branch = get_target_branch(INPUT(0));
-        Branch& output = as_branch(OUTPUT);
+        Branch output; //FIXME = as_branch(OUTPUT);
 
         int write = 0;
         for (int i=0; i < target_branch.length(); i++) {

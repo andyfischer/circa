@@ -35,7 +35,7 @@ void update_if_block_joining_branch(Term* ifCall)
 
     for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
         Term* term = contents[branch_index];
-        Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
+        Branch& branch = term->nestedContents;
 
         TermNamespace::const_iterator it;
         for (it = branch.names.begin(); it != branch.names.end(); ++it) {

@@ -81,7 +81,6 @@ void set_bool(TaggedValue* value, bool b);
 void set_ref(TaggedValue* value, Term* t);
 List* set_list(TaggedValue* value);
 List* set_list(TaggedValue* value, int size);
-void make_branch(TaggedValue* value);
 void set_type(TaggedValue* value, Type* type);
 void set_null(TaggedValue* value);
 

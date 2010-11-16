@@ -166,6 +166,8 @@ namespace ref_t {
             error_occurred(CONTEXT, CALLER, "NULL reference");
             return;
         }
+        #if 0
+        FIXME
         Branch& output = as_branch(OUTPUT);
 
         if (t->sourceLoc.defined()) {
@@ -175,6 +177,7 @@ namespace ref_t {
             set_int(output[0], 0);
             set_int(output[1], 0);
         }
+        #endif
     }
     void setup_type(Type* type)
     {

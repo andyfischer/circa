@@ -13,7 +13,7 @@ namespace feedback_function {
     CA_FUNCTION(evaluate_apply_feedback)
     {
         Branch& input = INPUT_TERM(0)->nestedContents;
-        refresh_training_branch(input, as_branch(OUTPUT));
+        //FIXME refresh_training_branch(input, as_branch(OUTPUT));
     }
 
     void setup(Branch& kernel)
