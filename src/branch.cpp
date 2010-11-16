@@ -405,15 +405,9 @@ namespace branch_t {
     }
 }
 
-bool is_branch(TaggedValue* value)
-{
-    return false;
-}
-
 Branch& as_branch(TaggedValue* value)
 {
     ca_assert(value != NULL);
-    ca_assert(is_branch(value));
     return *((Branch*) value->value_data.ptr);
 }
 

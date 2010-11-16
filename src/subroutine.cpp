@@ -203,10 +203,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
         if (term->type == FUNCTION_ATTRS_TYPE)
             continue;
 
-        if (is_branch(term))
-            store_locals(term->nestedContents, storage->get(i));
-        else
-            copy(term, storage->get(i));
+        copy(term, storage->get(i));
     }
 }
 
@@ -227,10 +224,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
         if (term->type == FUNCTION_ATTRS_TYPE)
             continue;
 
-        if (is_branch(term))
-            restore_locals(storage->get(i), term->nestedContents);
-        else
-            copy(storage->get(i), term);
+        copy(storage->get(i), term);
     }
 }
 

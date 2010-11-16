@@ -101,7 +101,6 @@ namespace branch_t {
     void assign(Branch& source, Branch& dest);
 }
 
-bool is_branch(TaggedValue* term);
 Branch& as_branch(TaggedValue* term);
 Branch& as_branch(Term* term);
 

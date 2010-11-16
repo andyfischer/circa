@@ -324,8 +324,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     change_type(term, original->type);
     change_type((TaggedValue*) term, original->value_type);
 
-    if (copyBranches || !is_branch(original))
-        copy(original, term);
+    copy(original, term);
 
     if (copyBranches)
         duplicate_branch(original->nestedContents, term->nestedContents);

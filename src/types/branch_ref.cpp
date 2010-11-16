@@ -48,7 +48,7 @@ namespace branch_ref_t {
         if (is_hidden(term)) return false;
 
         // ignore branch-based types
-        if (is_branch(term)) return false;
+        //if (is_branch(term)) return false;
         if (is_type(term)) return false;
 
         return true;
@@ -102,6 +102,7 @@ namespace branch_ref_t {
         for (BranchIterator it(target_branch); !it.finished(); it.advance()) {
             Term* t = *it;
 
+            #if 0
             if (is_branch(t)) {
                 // check if we should explore this branch
                 bool explore = (is_function(t))
@@ -112,6 +113,7 @@ namespace branch_ref_t {
                 
                 continue;
             }
+            #endif
 
             if (!is_considered_config(t))
                 continue;
