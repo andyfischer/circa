@@ -275,13 +275,13 @@ void test_duplicate_destination_has_different_type()
 void find_name_in_outer_branch()
 {
     Branch branch;
-    Term* outer_branch = branch.eval("Branch()");
+    Branch& nested = create_branch(branch);
 
-    Term* a = outer_branch->nestedContents.eval("a = 1");
+    Term* a = nested.eval("a = 1");
 
-    Term* inner_branch = outer_branch->nestedContents.eval("branch()");
+    Branch& nested2 = create_branch(nested);
 
-    test_assert(find_named(inner_branch->nestedContents, "a") == a);
+    test_assert(find_named(nested2, "a") == a);
 
     test_assert(branch);
 }

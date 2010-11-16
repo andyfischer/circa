@@ -46,8 +46,10 @@ namespace cond_function {
         function_t::get_specialize_type(COND_FUNC) = specializeType;
         function_t::set_input_meta(COND_FUNC, 1, true);
         function_t::set_input_meta(COND_FUNC, 2, true);
+        #if 0
         function_t::get_feedback_func(COND_FUNC) =
             import_function(kernel, feedback, "cond_feedback(any, any) -> Branch");
+        #endif
     }
 }
 }

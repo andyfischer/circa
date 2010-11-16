@@ -355,45 +355,6 @@ Branch::eval(std::string const& code)
 }
 
 namespace branch_t {
-    void initialize(Type* type, TaggedValue* value)
-    {
-    }
-
-    void release(TaggedValue* value)
-    {
-    }
-
-    void reset_to_prototype(TaggedValue* value)
-    {
-    }
-
-    void copy(TaggedValue* sourceValue, TaggedValue* destValue)
-    {
-    }
-
-    TaggedValue* get_index(TaggedValue* value, int index)
-    {
-        return NULL;
-    }
-
-    void set_index(TaggedValue* value, int index, TaggedValue* element)
-    {
-    }
-
-    TaggedValue* get_field(TaggedValue* value, const char* name)
-    {
-        return NULL;
-    }
-
-    void set_field(TaggedValue* value, const char* name, TaggedValue* element)
-    {
-    }
-
-    int num_elements(TaggedValue* value)
-    {
-        return 0;
-    }
-
     void branch_copy(Branch& source, Branch& dest)
     {
         assert_valid_branch(&source);
@@ -442,11 +403,6 @@ namespace branch_t {
             cast(source[i], dest[i]);
         #endif
     }
-
-    bool equals(TaggedValue* lhsValue, TaggedValue* rhs)
-    {
-        return false;
-    }
 }
 
 bool is_branch(TaggedValue* value)
@@ -465,24 +421,6 @@ Branch& as_branch(Term* term)
 {
     ca_assert(term->nestedContents.length() == 0); // <- Temp while things are refactored
     return as_branch((TaggedValue*) term);
-}
-
-void initialize_branch_based_type(Term* term)
-{
-    Type* type = &as_type(term);
-
-    reset_type(type);
-    type->name = "Branch";
-    type->initialize = branch_t::initialize;
-    type->release = branch_t::release;
-    type->copy = branch_t::copy;
-    type->reset = branch_t::reset_to_prototype;
-    type->equals = branch_t::equals;
-    type->getIndex = branch_t::get_index;
-    type->setIndex = branch_t::set_index;
-    type->getField = branch_t::get_field;
-    type->setField = branch_t::set_field;
-    type->numElements = branch_t::num_elements;
 }
 
 bool is_namespace(Term* term)

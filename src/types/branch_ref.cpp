@@ -104,7 +104,7 @@ namespace branch_ref_t {
 
             if (is_branch(t)) {
                 // check if we should explore this branch
-                bool explore = (t->type == CODE_TYPE || is_function(t))
+                bool explore = (is_function(t))
                         && !is_hidden(t) && t->name != "";
 
                 if (!explore)
@@ -235,8 +235,10 @@ namespace branch_ref_t {
             "length(BranchRef) -> int");
         import_member_function(type, branch_ref_t::get_index,
             "get_index(BranchRef, int) -> Ref");
+        #if 0
         import_member_function(type, branch_ref_t::append_code,
             "append_code(BranchRef, Branch)");
+        #endif
         import_member_function(type, branch_ref_t::print_raw,
             "print_raw(BranchRef) -> string");
         import_member_function(type, branch_ref_t::save,

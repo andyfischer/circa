@@ -97,14 +97,6 @@ private:
 };
 
 namespace branch_t {
-    void initialize(Type*, TaggedValue* value);
-    void release(TaggedValue* value);
-    void assign(TaggedValue*, TaggedValue*);
-    void cast(Type*, TaggedValue* source, TaggedValue* dest);
-    bool equals(TaggedValue*, TaggedValue*);
-    TaggedValue* get_index(TaggedValue* value, int index);
-    int num_elements(TaggedValue* value);
-
     void branch_copy(Branch& source, Branch& dest);
     void assign(Branch& source, Branch& dest);
 }
@@ -112,8 +104,6 @@ namespace branch_t {
 bool is_branch(TaggedValue* term);
 Branch& as_branch(TaggedValue* term);
 Branch& as_branch(Term* term);
-
-void initialize_branch_based_type(Term* term);
 
 bool is_namespace(Term* term);
 bool is_namespace(Branch& branch);

@@ -67,7 +67,6 @@ extern Term* INT_TYPE;
 extern Term* REF_TYPE;
 extern Term* STRING_TYPE;
 extern Term* BRANCH_TYPE;
-extern Term* CODE_TYPE;
 extern Term* COLOR_TYPE;
 extern Term* FEEDBACK_TYPE;
 extern Term* FUNCTION_TYPE;

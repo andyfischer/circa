@@ -186,7 +186,7 @@ Type& as_type(Term *term)
 
 Type* type_contents(Term* type)
 {
-    return &as_type(type);
+    return get_type_value(type);
 }
 
 bool value_fits_type(TaggedValue* value, Type* type)

@@ -473,13 +473,6 @@ Term* create_empty_type(Branch& branch, std::string name)
     return type;
 }
 
-Term* create_branch_based_type(Branch& branch, std::string const& name)
-{
-    Term* term = create_type(branch, name);
-    initialize_branch_based_type(term);
-    return term;
-}
-
 Term* duplicate_value(Branch& branch, Term* term)
 {
     Term* dup = create_value(branch, term->type);

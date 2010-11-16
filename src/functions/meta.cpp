@@ -20,10 +20,13 @@ namespace meta_function {
 
     void setup(Branch& kernel)
     {
+        #if 0
+        FIXME
         FREEZE_FUNC = import_function(kernel, copy_function::evaluate, "freeze(any) -> any");
         function_t::get_specialize_type(FREEZE_FUNC) = freeze_specializeType;
 
         import_function(kernel, lift_closure_evaluate, "lift_closure(Branch) -> Branch");
+        #endif
     }
 
 } // namespace meta_function

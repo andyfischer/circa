@@ -81,7 +81,6 @@ Term* INT_TYPE = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 Term* BRANCH_TYPE = NULL;
-Term* CODE_TYPE = NULL;
 Term* COLOR_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
@@ -196,7 +195,7 @@ void bootstrap_kernel()
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Branch type
-    BRANCH_TYPE = create_branch_based_type(*KERNEL, "Branch");
+    //BRANCH_TYPE = create_branch_based_type(*KERNEL, "Branch");
 
     // Create FunctionAttrs type
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
@@ -211,7 +210,7 @@ void bootstrap_kernel()
     ca_assert(is_type(FUNCTION_ATTRS_TYPE));
 
     // Create Function type
-    FUNCTION_TYPE = create_branch_based_type(*KERNEL, "Function");
+    FUNCTION_TYPE = create_empty_type(*KERNEL, "Function");
     Type* functionType = &as_type(FUNCTION_TYPE);
     functionType->formatSource = subroutine_t::format_source;
     functionType->checkInvariants = function_t::check_invariants;
@@ -219,7 +218,7 @@ void bootstrap_kernel()
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
-    change_type((TaggedValue*)VALUE_FUNC, (Type*)BRANCH_TYPE->value_data.ptr);
+    change_type((TaggedValue*)VALUE_FUNC, type_contents(FUNCTION_TYPE));
 
     // Initialize List type, it's needed soon
 }
