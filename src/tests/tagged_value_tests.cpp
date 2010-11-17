@@ -111,10 +111,6 @@ void test_term_value()
     
     Term* c = create_value(branch, INT_TYPE);
     test_assert(is_int(c));
-
-    Branch list;
-    resize_list(list, 4, INT_TYPE);
-    test_assert(is_int(list[0]));
 }
 
 namespace subroutine_call_test_helper {

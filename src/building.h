@@ -20,8 +20,6 @@ Term* apply(Branch& branch, std::string const& functionName,
 Term* create_duplicate(Branch& branch, Term* original, std::string const& name="",
         bool copyBranches=true);
 
-std::string default_name_for_hidden_state(const std::string& termName);
-
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
 int get_input_relative_scope(Term* term, int index);
@@ -66,9 +64,6 @@ Term* procure_value(Branch& branch, Term* type, std::string const& name);
 Term* procure_int(Branch& branch, std::string const& name);
 Term* procure_float(Branch& branch, std::string const& name);
 Term* procure_bool(Branch& branch, std::string const& name);
-
-// Resize this list term, making sure that each element is a type of 'type'.
-void resize_list(Branch& list, int numElements, Term* type);
 
 void set_step(Term* term, float step);
 float get_step(Term* term);

@@ -338,14 +338,6 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     return term;
 }
 
-std::string default_name_for_hidden_state(const std::string& termName)
-{
-    std::stringstream new_value_name;
-    new_value_name << "#hidden_state";
-    if (termName != "") new_value_name << "_for_" << termName;
-    return new_value_name.str();
-}
-
 Term* apply(Branch& branch, std::string const& functionName, RefList const& inputs, std::string const& name)
 {
     Term* function = find_named(branch, functionName);
@@ -505,25 +497,6 @@ Term* procure_float(Branch& branch, std::string const& name)
 Term* procure_bool(Branch& branch, std::string const& name)
 {
     return procure_value(branch, BOOL_TYPE, name);
-}
-
-void resize_list(Branch& list, int numElements, Term* type)
-{
-    ca_assert(numElements >= 0);
-
-    // Add terms if necessary
-    for (int i=list.length(); i < numElements; i++)
-        create_value(list, type);
-
-    // Remove terms if necessary
-    bool anyRemoved = false;
-    for (int i=numElements; i < list.length(); i++) {
-        list.set(i, NULL);
-        anyRemoved = true;
-    }
-
-    if (anyRemoved)
-        list.removeNulls();
 }
 
 void set_step(Term* term, float step)
