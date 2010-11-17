@@ -358,7 +358,6 @@ CA_FUNCTION(evaluate_for_loop)
 
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
-        bool lastIter = iteration + 1 >= inputListLength;
 
         ca_assert(forContents.registerCount > 0);
 
@@ -387,30 +386,32 @@ CA_FUNCTION(evaluate_for_loop)
         if (forContents.outputRegister != -1)
             copy(frame->get(forContents.outputRegister), output->get(iteration));
 
-        if (!lastIter) {
-            // Only pop the stack if this isn't the last iteration; if it's the last
-            // iter then we do it later.
-            swap(frame, &previousFrame);
-            pop_stack_frame(STACK);
-        }
+        swap(frame, &previousFrame);
+        pop_stack_frame(STACK);
     }
 
     // Copy the outer rebinds to the output stack frame.
-    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
+    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 1));
+
+    int outputIndexBase = CALLER->registerIndex + 1;
 
     for (int i=0; i < outerRebinds.length(); i++) {
 
         Term* rebindTerm = outerRebinds[i];
 
-        // use the outer version if there were 0 iterations
-        int inputIndex = inputListLength == 0 ? 0 : 1;
+        TaggedValue* result = NULL;
 
-        TaggedValue* result = get_input(CONTEXT, rebindTerm, inputIndex);
-        int registerIndex = CALLER->registerIndex + 1 + i;
+        if (inputListLength == 0) {
+            // No iterations, use the outer rebind
+            result = get_input_relative(CONTEXT, rebindTerm, 0, -1);
+        } else {
+            // At least one iteration, use our local rebind
+            result = previousFrame.get(rebindTerm->input(1)->registerIndex);
+        }
+
+        int registerIndex = outputIndexBase + i;
         copy(result, outputFrame->get(registerIndex));
     }
-
-    pop_stack_frame(STACK);
 
     swap(output, OUTPUT);
 }

@@ -220,7 +220,8 @@ void post_input_change(Term* term)
         term->inputInfo(i).relativeScope = get_input_relative_scope(term, i);
 
     if (term->function != NULL) {
-        FunctionAttrs::PostInputChange func = function_t::get_attrs(term->function).postInputChange;
+        FunctionAttrs::PostInputChange func =
+            function_t::get_attrs(term->function).postInputChange;
         if (func)
             func(term);
     }

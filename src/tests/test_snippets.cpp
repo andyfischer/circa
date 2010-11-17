@@ -58,6 +58,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
+    //dump_branch(code);
+
     EvalContext result;
     evaluate_branch(&result, code);
 
@@ -530,7 +532,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
     REGISTER_TEST_CASE(test_snippets::test_cond);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_for_loops);
+    REGISTER_TEST_CASE(test_snippets::test_for_loops);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map);

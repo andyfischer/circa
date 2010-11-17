@@ -739,6 +739,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+
+    update_register_indices(branch);
     
     return forTerm;
 }

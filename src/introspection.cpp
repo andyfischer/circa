@@ -82,6 +82,8 @@ std::string branch_namespace_to_string(Branch& branch)
 
 void print_branch_raw(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
 {
+    out << "[Branch " << &branch << ", regs = " << branch.registerCount
+        << ", output = " << branch.outputRegister << "]" << std::endl;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 

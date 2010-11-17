@@ -75,6 +75,7 @@ Term* apply_and_eval(Branch& branch,
 
 void copy_stack_back_to_terms(Branch& branch, List* stack);
 void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs);
+TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int relativeStack);
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);

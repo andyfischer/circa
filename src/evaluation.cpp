@@ -147,7 +147,7 @@ void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
         copy(stack->get(callOp->inputs[i].registerIndex), inputs->get(i));
 }
 
-TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
+TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int relativeStack)
 {
     Term* input = term->input(index);
     InputInfo& inputInfo = term->inputInfo(index);
@@ -158,9 +158,20 @@ TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
     if (input->registerIndex == -1)
         return NULL;
 
+    int stackDistance = inputInfo.relativeScope + relativeStack;
+
     List* stack = &cxt->stack;
-    List* frame = List::checkCast(stack->get(stack->length() - 1 - inputInfo.relativeScope));
+
+    ca_assert(stackDistance >= 0);
+    ca_assert(stackDistance < stack->length());
+
+    List* frame = List::checkCast(stack->get(stack->length() - 1 - stackDistance));
     return frame->get(term->input(index)->registerIndex);
+}
+
+TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
+{
+    return get_input_relative(cxt, term, index, 0);
 }
 
 TaggedValue* get_output(EvalContext* cxt, Term* term)
