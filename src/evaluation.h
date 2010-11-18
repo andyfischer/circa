@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
+#include "for_loop.h"
 #include "references.h"
 #include "tagged_value.h"
 #include "types/list.h"
@@ -32,6 +33,9 @@ struct EvalContext
 
     // Persistent state that should be used for the current branch
     TaggedValue currentScopeState;
+
+    // State used for the current for loop
+    ForLoopContext forLoopContext;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false), currentScopeState(NULL) {}
 

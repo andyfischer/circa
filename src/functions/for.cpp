@@ -38,6 +38,7 @@ namespace for_function {
 
     CA_FUNCTION(evaluate_discard)
     {
+        CONTEXT->forLoopContext.discard = true;
     }
 
     void discard_formatSource(StyledSource* source, Term* term)

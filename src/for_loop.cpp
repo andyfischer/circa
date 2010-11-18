@@ -352,7 +352,12 @@ CA_FUNCTION(evaluate_for_loop)
     int inputListLength = inputList->numElements();
 
     TaggedValue outputTv;
+    bool saveOutput = forContents.outputRegister != -1;
     List* output = set_list(&outputTv, inputListLength);
+    int nextOutputIndex = 0;
+
+    // Preserve old for-loop context
+    ForLoopContext prevLoopContext = CONTEXT->forLoopContext;
 
     List previousFrame;
 
@@ -377,18 +382,23 @@ CA_FUNCTION(evaluate_for_loop)
                 copy(previousFrame.get(rebindTerm->input(1)->registerIndex), dest);
         }
 
+        CONTEXT->forLoopContext.discard = false;
+
         for (int i=loop_contents_location; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, forContents[i]);
 
         frame = List::checkCast(STACK->get(STACK->numElements() - 1));
 
         // Save output
-        if (forContents.outputRegister != -1)
-            copy(frame->get(forContents.outputRegister), output->get(iteration));
+        if (saveOutput && !CONTEXT->forLoopContext.discard)
+            copy(frame->get(forContents.outputRegister), output->get(nextOutputIndex++));
 
         swap(frame, &previousFrame);
         pop_stack_frame(STACK);
     }
+
+    // Resize output, in case some elements were discarded
+    output->resize(nextOutputIndex);
 
     // Copy the outer rebinds to the output stack frame.
     List* outputFrame = List::checkCast(STACK->get(STACK->length() - 1));
@@ -412,6 +422,9 @@ CA_FUNCTION(evaluate_for_loop)
         int registerIndex = outputIndexBase + i;
         copy(result, outputFrame->get(registerIndex));
     }
+
+    // Restore loop context
+    CONTEXT->forLoopContext = prevLoopContext;
 
     swap(output, OUTPUT);
 }

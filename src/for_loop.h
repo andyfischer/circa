@@ -6,6 +6,13 @@
 
 namespace circa {
 
+struct ForLoopContext
+{
+    bool discard;
+
+    ForLoopContext() : discard(false) {}
+};
+
 Term* get_for_loop_iterator(Term* forTerm);
 Term* get_for_loop_modify_list(Term* forTerm);
 void setup_for_loop_pre_code(Term* forTerm);
