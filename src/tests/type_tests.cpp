@@ -224,71 +224,6 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
-CA_FUNCTION(_evaluate_type_error)
-{
-    set_float(OUTPUT, to_float(INPUT(0)));
-}
-
-void test_type_error_in_a_native_call()
-{
-    Branch branch;
-
-    import_function(branch, _evaluate_type_error, "f(string) -> float");
-
-    branch.eval("f('hello')");
-    EvalContext context;
-    evaluate_branch(&context, branch);
-    test_assert(context.errorOccurred);
-}
-
-class test_nativeType {};
-
-void test_imported_pointer_type()
-{
-    Branch branch;
-    Term* T = branch.eval("type T {}");
-
-    import_type<test_nativeType*>(branch["T"]);
-
-    Term* v = branch.eval("v = T()");
-
-    test_assert(is_value_of_type(v, &as_type(T)));
-}
-
-namespace simple_pointer_test {
-
-TypeRef gType;
-CA_FUNCTION(_evaluate)
-{
-    test_assert(is_value_of_type(INPUT(0), gType));
-    test_assert(is_value_of_type(OUTPUT, gType));
-
-    test_assert(get_pointer(INPUT(0), gType) == NULL);
-    test_assert(get_pointer(OUTPUT, gType) == NULL);
-
-    set_pointer(INPUT(0), gType, NULL);
-    set_pointer(OUTPUT, gType, NULL);
-}
-
-void test()
-{
-    gType = Type::create();
-    gType->name = "T";
-    initialize_simple_pointer_type(gType);
-
-    Branch branch;
-    import_type(branch, gType);
-    import_function(branch, _evaluate, "f(T) -> T");
-
-    branch.eval("a = T()");
-    branch.eval("b = f(a)");
-
-    import_function(branch, _evaluate, "g(state T) -> T");
-    branch.eval("c = g()");
-}
-
-}
-
 void test_list_based_types()
 {
     Branch branch;
@@ -322,9 +257,6 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
-    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
-    REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
-    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
     REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
 }
