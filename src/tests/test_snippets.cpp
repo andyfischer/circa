@@ -338,7 +338,7 @@ void test_for_loops()
     test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
 
     // For loop with state
-    test_snippet("for i in [1 2 3]; state s = i; end", "");
+    //test_snippet("for i in [1 2 3]; state s = i; end", "");
 }
 
 void test_subscripting()
@@ -470,11 +470,6 @@ void test_misc()
     test_snippet("l = []\nl.append([1])\n    ", "");
 }
 
-void test_styled_source()
-{
-    test_snippet("styled_source = { 1 } -> branch_ref -> format_source", "");
-}
-
 void test_refactoring()
 {
     test_snippet("s = { x = 1 } -> branch_ref; refactor:rename(s.get_index(0), 'y')",
@@ -513,12 +508,6 @@ void test_type_check_functions()
     test_snippet("", "not(is_list(1.0))");
 }
 
-void test_state_in_subroutine()
-{
-    // make sure this doesn't crash:
-    test_snippet("def func(state int i) end; func()", "");
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -547,12 +536,10 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_styled_source);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_lists);
+    REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_state_in_subroutine);
 }
 
 } // namespace test_snippets

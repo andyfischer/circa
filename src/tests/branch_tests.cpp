@@ -285,98 +285,6 @@ void find_name_in_outer_branch()
     test_assert(branch);
 }
 
-void test_migrate()
-{
-    #if 0
-    TODO: delete?
-    Branch dest, source;
-
-    Term* a = dest.eval("state a = 1");
-    source.eval("state a = 2");
-    post_parse_branch(source);
-    post_parse_branch(dest);
-
-    migrate_stateful_values(source, dest);
-
-    // Test that the 'dest' terms are the same terms
-    test_assert(dest["a"] == a);
-
-    // Test that the value was transferred
-    test_assert(dest["a"]->asInt() == 2);
-
-    test_assert(source);
-    test_assert(dest);
-    #endif
-}
-
-void test_migrate2()
-{
-    #if 0
-    TODO: delete?
-    // In this test, we migrate with 1 term added and 1 term removed.
-    Branch source, dest;
-
-    Term* a = dest.eval("state a = 1");
-    dest.eval("state b = 2");
-
-    source.eval("state a = 3");
-    source.eval("state c = 4");
-
-    migrate_stateful_values(source, dest);
-
-    test_assert(dest["a"] == a);
-    test_assert(dest["a"]->asInt() == 3);
-
-    test_assert(source);
-    test_assert(dest);
-    #endif
-}
-
-void test_cast()
-{
-#if 0
-    Branch branch;
-
-    branch.eval("type Mytype { int a, number b }");
-
-    // Cast a value that will require coercion
-    Term* dest = branch.eval("Mytype()");
-    Term* source = branch.eval("[3 4]");
-    TaggedValue* dest0 = dest->getIndex(0);
-    TaggedValue* dest1 = dest->getIndex(1);
-
-    cast(source, dest);
-    test_assert(is_int(dest0));
-    test_assert(as_int(dest0) == 3);
-    //test_assert(is_float(dest1));
-    test_equals(as_float(dest1), 4);
-
-    // Cast a value with more elements
-    dest = branch.eval("dest = [1]");
-    test_assert(as_int(dest->getIndex(0)) == 1);
-
-    source = branch.eval("source = [7 8 9]");
-
-    cast(source, dest);
-
-    test_assert(dest->numElements() == 3);
-    test_assert(as_int(dest->getIndex(0)) == 7);
-    test_assert(as_int(dest->getIndex(1)) == 8);
-    test_assert(as_int(dest->getIndex(2)) == 9);
-
-    // Cast one list to another list- make sure that it doesn't type check
-    // the fields.
-    Term* a = branch.eval("a = [1 2.0 'hi']");
-    Term* b = branch.eval("b = ['bye' 4 1.0]");
-
-    test_assert(term_output_always_satisfies_type(a, declared_type(b)));
-    test_assert(term_output_always_satisfies_type(b, declared_type(a)));
-    cast(a, b);
-
-    test_assert(branch);
-#endif
-}
-
 void test_get_source_file_location()
 {
     Branch branch;
@@ -478,9 +386,6 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_destination_has_different_type);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_move);
-    // FIXME
-    //REGISTER_TEST_CASE(branch_tests::test_migrate);
-    //REGISTER_TEST_CASE(branch_tests::test_migrate2);
 }
 
 }
