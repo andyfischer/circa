@@ -1,7 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "builtins.h"
-#include "external_api.h"
 #include "importing.h"
 #include "errors.h"
 #include "evaluation.h"

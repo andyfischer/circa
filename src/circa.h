@@ -18,7 +18,6 @@
 #include "dynamic_libs.h"
 #include "errors.h"
 #include "evaluation.h"
-#include "external_api.h"
 #include "feedback.h"
 #include "for_loop.h"
 #include "function.h"
