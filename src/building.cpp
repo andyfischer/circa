@@ -26,9 +26,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
         }
     }
 
-    if (!is_callable(function))
-        internal_error("Term "+function->name+" is not callable");
-
     // Create the term
     Term* result = branch.appendNew();
 
@@ -219,7 +216,7 @@ void post_input_change(Term* term)
     for (int i=0; i < term->numInputs(); i++)
         term->inputInfo(i).relativeScope = get_input_relative_scope(term, i);
 
-    if (term->function != NULL) {
+    if (is_function(term->function)) {
         FunctionAttrs::PostInputChange func =
             function_t::get_attrs(term->function).postInputChange;
         if (func)
@@ -262,7 +259,7 @@ int get_register_count(Term* term)
     if (term->name == "#attr:comp-pending-rebind")
         return 0;
 
-    if (term->function == NULL)
+    if (!is_function(term->function))
         return 0;
 
     FunctionAttrs::GetRegisterCount getRegisterCount

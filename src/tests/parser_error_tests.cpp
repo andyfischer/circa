@@ -17,9 +17,22 @@ void call_unknown_function()
     test_equals(result.count(), 1);
 }
 
+void call_unknown_namespaced_function()
+{
+    Branch branch;
+    branch.compile("blee:blah()");
+
+    StaticErrorCheck result;
+
+    check_for_static_errors(&result, branch);
+
+    test_equals(result.count(), 1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_error_tests::call_unknown_function);
+    REGISTER_TEST_CASE(parser_error_tests::call_unknown_namespaced_function);
 }
 
 } // namespace parser_error_tests

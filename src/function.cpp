@@ -154,13 +154,13 @@ namespace function_t {
         }
     }
 
-    std::string get_documentation(Term* term)
+    std::string get_documentation(Term* func)
     {
         // A function can optionally have a documentation string. If present,
         // it will be the first thing defined in the function, and it'll be
         // anonymous and be a statement.
-        int expected_index = function_t::num_inputs(term) + 1;
-        Branch& contents = term->nestedContents;
+        int expected_index = function_t::num_inputs(func) + 1;
+        Branch& contents = func->nestedContents;
 
         if (expected_index >= contents.length()) return "";
         Term* possibleDocString = contents[expected_index];
@@ -203,6 +203,7 @@ namespace function_t {
 
     Term* get_output_type(Term* function)
     {
+        if (!is_function(function)) return ANY_TYPE;
         return get_attrs(function).outputType;
     }
     void set_output_type(Term* function, Term* type)
@@ -217,6 +218,7 @@ namespace function_t {
 
     bool get_variable_args(Term* function)
     {
+        if (!is_function(function)) return true;
         return get_attrs(function).variableArgs;
     }
 
@@ -305,6 +307,8 @@ namespace function_t {
 
 bool is_function(Term* term)
 {
+    if (term == NULL)
+        return false;
     return term->type == FUNCTION_TYPE;
 }
 
@@ -445,6 +449,8 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
 
 Term* function_get_specialized_output_type(Term* function, Term* call)
 {
+    if (!is_function(function))
+        return ANY_TYPE;
     Term* outputType = function_t::get_output_type(function);
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(call);
@@ -459,6 +465,8 @@ void function_set_use_input_as_output(Term* function, int index, bool value)
 
 bool is_native_function(Term* func)
 {
+    if (!is_function(func))
+        return false;
     return function_t::get_evaluate(func) != subroutine_t::evaluate;
 }
 

@@ -1228,11 +1228,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
             erase_term(originalFunction);
         }
 
-        if (!is_callable(function)) {
-            function = UNKNOWN_FUNCTION;
-            erase_term(originalFunction);
-        }
-
         result = apply(branch, function, arguments);
 
         if (result->function->name != originalName)
