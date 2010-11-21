@@ -251,6 +251,7 @@ namespace function_t {
 
     bool get_input_meta(Term* func, int index)
     {
+        if (!is_function(func)) return false;
         return function_t::get_input_placeholder(func, index)->boolPropOptional("meta", false);
     }
 
@@ -261,11 +262,16 @@ namespace function_t {
 
     bool get_input_optional(Term* func, int index)
     {
+        if (!is_function(func))
+            return true;
         return function_t::get_input_placeholder(func, index)->boolPropOptional("optional", false);
     }
 
     Term* get_input_type(Term* func, int index)
     {
+        if (!is_function(func))
+            return ANY_TYPE;
+
         if (function_t::get_variable_args(func))
             index = 0;
 
@@ -273,6 +279,8 @@ namespace function_t {
     }
     bool is_state_input(Term* function, int index)
     {
+        if (!is_function(function))
+            return false;
         return get_input_placeholder(function,index)->boolPropOptional("state", false);
     }
     EvaluateFunc& get_evaluate(Term* func)

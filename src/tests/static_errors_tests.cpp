@@ -19,7 +19,7 @@ void input_type_error()
 void no_error()
 {
     Branch branch;
-    Term* t = branch.eval("1 + 2");
+    Term* t = branch.compile("1 + 2");
     test_assert(get_static_error(t) == SERROR_NO_ERROR);
     test_assert(!has_static_error(t));
 }
@@ -27,7 +27,7 @@ void no_error()
 void test_unknown_func()
 {
     Branch branch;
-    Term* t = branch.eval("embiggen(1)");
+    Term* t = branch.compile("embiggen(1)");
     test_equals(get_static_error_message(t), "Unknown function: embiggen");
     test_assert(get_static_error(t) == SERROR_UNKNOWN_FUNCTION);
 }
@@ -35,7 +35,7 @@ void test_unknown_func()
 void test_unknown_type()
 {
     Branch branch;
-    branch.eval("type T { X x }");
+    branch.compile("type T { X x }");
     Term* t = branch[0];
     test_assert(t->name == "X");
     test_assert(t->function == UNKNOWN_TYPE_FUNC);
