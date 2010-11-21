@@ -11,13 +11,10 @@ namespace circa {
 
 namespace token { struct Token; }
 
-Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::string name="");
-
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
 void set_source_location(Term* term, int start, TokenStream& tokens);
 Term* find_and_apply(Branch& branch, std::string const& functionName, RefList inputs);
-void recursively_mark_terms_as_occuring_inside_an_expression(Term* term);
 
 // Find a type with the given name, looking in this branch. If the name isn't found,
 // we'll return a call to unknown_type()

@@ -641,7 +641,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens);
             ca_assert(condition != NULL);
-            recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
             block->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
@@ -716,7 +715,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     }
 
     Term* listExpr = infix_expression(branch, tokens);
-    recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
     std::string name;
     if (rebindListName)
@@ -800,7 +798,6 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         hide_from_source(initialization);
 
         initialValue = infix_expression(initialization->nestedContents, tokens);
-        recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
         post_parse_branch(initialization->nestedContents);
     }
 
@@ -836,22 +833,19 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     bool expr_is_new = branch.length() != originalBranchLength;
 
-    for (int i=0; i < expr->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
-
     expr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
     expr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
     // If the expr is an identifier, then create an implicit copy()
     if (expr->name != "" && !expr_is_new)
-        expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
+        expr = apply(branch, COPY_FUNC, RefList(expr));
 
     // Check to bind a new name
     if (nameBinding != "") {
         // If the term already has a name (this is the case for member-function syntax
         // and for unknown_identifier), then make a copy.
         if (expr->name != "")
-            expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
+            expr = apply(branch, COPY_FUNC, RefList(expr));
 
         branch.bindName(expr, nameBinding);
     }
@@ -874,6 +868,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     set_source_location(expr, startPosition, tokens);
+    set_is_statement(expr, true);
 
     return expr;
 }
@@ -911,8 +906,6 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
-
-    recursively_mark_terms_as_occuring_inside_an_expression(result);
 
     result = apply(branch, RETURN_FUNC, RefList(result));
     
@@ -1222,9 +1215,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     } else if (function->function == GET_NAMESPACE_FIELD) {
 
         function = statically_resolve_namespace_access(originalFunction);
-
-        if (function->name == "")
-            hide_from_source(originalFunction);
 
         if ((originalFunction != function) && (originalFunction->name == "")) {
             originalName = get_relative_name(branch, function);

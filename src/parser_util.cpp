@@ -6,16 +6,6 @@ using namespace circa::token;
 
 namespace circa {
 
-Term* apply_with_syntax(Branch& branch, Term* function, RefList inputs, std::string name)
-{
-    Term* result = apply(branch, function, inputs, name);
-
-    for (int i=0; i < result->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(result->input(i));
-
-    return result;
-}
-
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL)
@@ -104,25 +94,6 @@ Term* find_and_apply(Branch& branch,
     Term* function = find_function(branch, functionName);
 
     return apply(branch, function, inputs);
-}
-
-void recursively_mark_terms_as_occuring_inside_an_expression(Term* term)
-{
-    if (term == NULL)
-        return;
-    if (term->name != "")
-        return;
-
-    set_is_statement(term, false);
-
-    for (int i=0; i < term->numInputs(); i++) {
-        Term* input = term->input(i);
-
-        if (input == NULL)
-            continue;
-
-        recursively_mark_terms_as_occuring_inside_an_expression(input);
-    }
 }
 
 Term* find_type(Branch& branch, std::string const& name)
