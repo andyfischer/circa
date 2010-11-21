@@ -393,6 +393,14 @@ void reproduce_type_cast() {
     finish_source_repro_category();
 }
 
+void reproduce_uncallable_functions() {
+    round_trip_source("blah()");
+    round_trip_source("blee:blah()");
+    //TEST_DISABLED round_trip_source("blue:blee:blah()");
+    //TEST_DISABLED round_trip_source("1()");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_string_literal);
@@ -421,6 +429,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_cast);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_uncallable_functions);
 }
 
 } // namespace source_repro_snippets

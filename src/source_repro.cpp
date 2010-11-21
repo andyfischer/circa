@@ -164,7 +164,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         return;
     }
 
-    // Don't prepend name binding for certain functions
+    // Name binding, but not for assign() terms.
     if (term->function != ASSIGN_FUNC)
         format_name_binding(source, term);
 
@@ -174,7 +174,11 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, "(", term, token::LPAREN);
 
     if (declarationStyle == "function-call") {
-        append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
+
+        if (functionName == "")
+            format_term_source(source, term->function);
+        else
+            append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
             append_phrase(source, "(", term, token::LPAREN);
