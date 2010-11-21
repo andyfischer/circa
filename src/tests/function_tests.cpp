@@ -47,8 +47,8 @@ void test_inputs_fit_function()
     Term* b = branch.eval("1.0");
     RefList inputs(a,b);
 
-    test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
-    test_assert(!inputs_fit_function(KERNEL->get("add_i"), inputs));
+    test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
+    test_assert(!inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
 }
 
 void overloaded_function()
@@ -118,7 +118,7 @@ void test_call_copied_function()
     //evaluate_without_side_effects(add_copy);
 
     test_assert(overloaded_function::is_overloaded_function(add_copy));
-    test_assert(inputs_fit_function(KERNEL->get("add_i"), inputs));
+    test_assert(inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
 
     test_assert(overloaded_function::statically_specialize_function(add_copy, inputs)
             != UNKNOWN_FUNCTION);
@@ -150,7 +150,7 @@ void test_calling_manual_overloaded_function()
     //evaluate_without_side_effects(my_add);
     test_assert(branch);
     test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);
-    test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
+    test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
 }
 
 void test_bug_where_a_mysterious_copy_term_was_added()

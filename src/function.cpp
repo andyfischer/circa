@@ -358,29 +358,6 @@ bool is_callable(Term* term)
             || term->type == TYPE_TYPE);
 }
 
-// Depcrecated in favor of inputs_statically_fit_function
-bool inputs_fit_function(Term* func, RefList const& inputs)
-{
-    return inputs_statically_fit_function(func, inputs);
-#if 0
-    bool varArgs = function_t::get_variable_args(func);
-
-    // Fail if wrong # of inputs
-    if (!varArgs && (function_t::num_inputs(func) != inputs.length()))
-        return false;
-
-    for (int i=0; i < inputs.length(); i++) {
-        Term* type = function_t::get_input_type(func, i);
-        if (inputs[i] == NULL)
-            continue;
-        if (!is_subtype(type_contents(type), inputs[i]))
-            return false;
-    }
-
-    return true;
-#endif
-}
-
 bool inputs_statically_fit_function(Term* func, RefList const& inputs)
 {
     bool varArgs = function_t::get_variable_args(func);
