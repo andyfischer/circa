@@ -163,7 +163,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         return;
     }
 
-    // Name binding, but not for assign() terms.
+    // Name binding (but not for assign() terms)
     if (term->function != ASSIGN_FUNC)
         format_name_binding(source, term);
 

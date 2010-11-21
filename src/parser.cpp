@@ -1953,10 +1953,8 @@ Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
         change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
     std::string line = consume_line(tokens, start, existing);
 
-    if (message == "")
-        existing->setStringProp("message", line);
-    else
-        existing->setStringProp("message", message);
+    existing->setStringProp("originalText", line);
+    existing->setStringProp("message", message);
 
     ca_assert(has_static_error(existing));
 

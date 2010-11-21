@@ -398,7 +398,7 @@ void reproduce_uncallable_functions() {
     round_trip_source("blee:blah()");
     round_trip_source("blue:blee:blah()");
     round_trip_source("1()");
-    //round_trip_source("()()()");
+    round_trip_source("()()()");
     finish_source_repro_category();
 }
 
