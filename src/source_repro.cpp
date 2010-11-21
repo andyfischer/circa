@@ -6,7 +6,6 @@
 #include "function.h"
 #include "introspection.h"
 #include "parser.h"
-#include "parser_util.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "tagged_value.h"
@@ -156,7 +155,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
 
     // Check for an infix operator with implicit rebinding (like +=).
     if (infix && 
-            is_infix_operator_rebinding(functionName)) {
+            parser::is_infix_operator_rebinding(functionName)) {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
         append_phrase(source, " ", term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::INFIX_OPERATOR);
@@ -389,6 +388,12 @@ void set_input_syntax_hint(Term* term, int index, std::string const& field,
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
     term->setStringProp(fieldName.str(), value);
+}
+
+void hide_from_source(Term* term)
+{
+    ca_assert(term != NULL);
+    term->setBoolProp("syntax:hidden", true);
 }
 
 } // namespace circa

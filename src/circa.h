@@ -30,7 +30,6 @@
 #include "metrics.h"
 #include "names.h"
 #include "parser.h"
-#include "parser_util.h"
 #include "path_expression.h"
 #include "refactoring.h"
 #include "references.h"

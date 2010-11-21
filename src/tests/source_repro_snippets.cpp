@@ -325,7 +325,7 @@ void reproduce_with_parse_errors() {
     round_trip_source("nonexistant_function()");
     round_trip_source("nonexistant_function(1 2 3)");
     round_trip_source("a:b");
-    //TEST_DISABLED round_trip_source("a:b()");
+    round_trip_source("a:b()");
     finish_source_repro_category();
 }
 
@@ -398,7 +398,7 @@ void reproduce_uncallable_functions() {
     round_trip_source("blee:blah()");
     round_trip_source("blue:blee:blah()");
     round_trip_source("1()");
-    //TEST_DISABLED round_trip_source("()()()");
+    //round_trip_source("()()()");
     finish_source_repro_category();
 }
 

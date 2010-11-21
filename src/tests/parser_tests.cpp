@@ -617,6 +617,17 @@ void test_statically_resolve_namespace_access()
     test_assert(parser::statically_resolve_namespace_access(ns1_ns2_ns3_c) == c);
 }
 
+void test_get_number_of_decimal_figures()
+{
+    test_assert(parser::get_number_of_decimal_figures("1") == 0);
+    test_assert(parser::get_number_of_decimal_figures("9438432") == 0);
+    test_assert(parser::get_number_of_decimal_figures("1.") == 1);
+    test_assert(parser::get_number_of_decimal_figures("1.1") == 1);
+    test_assert(parser::get_number_of_decimal_figures("1.10") == 2);
+    test_assert(parser::get_number_of_decimal_figures(".10") == 2);
+    test_assert(parser::get_number_of_decimal_figures("0.101010") == 6);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -654,6 +665,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
+    REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);
 }
 
 } // namespace parser_tests

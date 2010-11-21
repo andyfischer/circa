@@ -4,6 +4,7 @@
 #include "circa.h"
 #include "debug_valid_objects.h"
 #include "names.h"
+#include "parser.h"
 
 namespace circa {
 
