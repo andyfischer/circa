@@ -349,7 +349,7 @@ void initialize_function(Term* func)
     */
 
     Term* attributesTerm = create_value(func->nestedContents, FUNCTION_ATTRS_TYPE, "#attributes");
-    set_source_hidden(attributesTerm, true);
+    hide_from_source(attributesTerm);
 }
 
 bool is_callable(Term* term)

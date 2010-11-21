@@ -150,10 +150,10 @@ Term* find_function(Branch& branch, std::string const& name)
     return result;
 }
 
-void set_source_hidden(Term* term, bool hidden)
+void hide_from_source(Term* term)
 {
     ca_assert(term != NULL);
-    term->setBoolProp("syntax:hidden", hidden);
+    term->setBoolProp("syntax:hidden", true);
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)

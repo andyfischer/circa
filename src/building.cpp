@@ -384,7 +384,7 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
         std::string const& name)
 {
     Term* nameTerm = create_string(branch, name);
-    set_source_hidden(nameTerm, true);
+    hide_from_source(nameTerm);
 
     Term* result = apply(branch, get_global("get_state_field"),
             RefList(NULL, nameTerm, defaultValue), name);

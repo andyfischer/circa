@@ -52,7 +52,7 @@ Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 {
     Term* iteratorType = find_type_of_get_index(forTerm->input(0));
     Term* result = create_value(forTerm->nestedContents, iteratorType, name);
-    set_source_hidden(result, true);
+    hide_from_source(result);
     result->setBoolProp("no-bytecode", true);
     return result;
 }

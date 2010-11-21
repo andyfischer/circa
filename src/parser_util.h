@@ -35,7 +35,7 @@ std::string pop_pending_rebind(Branch& branch);
 void post_parse_branch(Branch& branch);
 
 // Mark the given term as hidden from source reproduction.
-void set_source_hidden(Term* term, bool hidden);
+void hide_from_source(Term* term);
 
 // Consume tokens starting at 'start' and ending at something which might
 // be the end of the statement. Return line as string. This should probably

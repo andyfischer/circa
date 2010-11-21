@@ -440,7 +440,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
         change_type(input, typeTerm);
-        set_source_hidden(input, true);
+        hide_from_source(input);
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
@@ -673,7 +673,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
         Branch& branch = create_branch(contents, "else");
-        set_source_hidden(branch.owningTerm, true);
+        hide_from_source(branch.owningTerm);
     }
 
     // Move the if_block term to be after the condition terms.
@@ -797,7 +797,7 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         possible_whitespace(tokens);
 
         Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
-        set_source_hidden(initialization, true);
+        hide_from_source(initialization);
 
         initialValue = infix_expression(initialization->nestedContents, tokens);
         recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
@@ -896,7 +896,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
     }
 
     Term* filenameTerm = create_string(branch, filename);
-    set_source_hidden(filenameTerm, true);
+    hide_from_source(filenameTerm);
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
@@ -1223,6 +1223,9 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
         function = statically_resolve_namespace_access(originalFunction);
 
+        if (function->name == "")
+            hide_from_source(originalFunction);
+
         if ((originalFunction != function) && (originalFunction->name == "")) {
             originalName = get_relative_name(branch, function);
             erase_term(originalFunction);
@@ -1318,7 +1321,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         std::string ident = tokens.consume(IDENTIFIER);
         
         Term* identTerm = create_string(branch, ident);
-        set_source_hidden(identTerm, true);
+        hide_from_source(identTerm);
 
         Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head, identTerm));
         set_source_location(result, startPosition, tokens);

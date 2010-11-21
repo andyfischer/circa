@@ -111,7 +111,8 @@ void format_term_source(StyledSource* source, Term* term)
             term, phrase_type::WHITESPACE);
 
     // If the function has a formatSource function, use that.
-    if (function_t::get_attrs(term->function).formatSource != NULL) {
+    if (is_function(term->function) &&
+            function_t::get_attrs(term->function).formatSource != NULL) {
         function_t::get_attrs(term->function).formatSource(source, term);
 
     // Or, check if this is a value term.

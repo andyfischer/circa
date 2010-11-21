@@ -240,8 +240,7 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
         out << " <NULL function>";
     } else {
         out << " " << term->function->name;
-        if (prefs->showAllIDs)
-           out << format_global_id(term->function);
+        out << format_global_id(term->function);
         out << "()";
     }
 
@@ -263,8 +262,6 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
         for (int i=0; i < term->numInputs(); i++) {
             if (i != 0) out << " ";
             out << format_global_id(term->input(i));
-            out << " ";
-            out << term->inputInfo(i).toShortString();
         }
         out << "]";
     }
