@@ -36,6 +36,7 @@
 #include "references.h"
 #include "repl.h"
 #include "stateful_code.h"
+#include "static_checking.h"
 #include "source_repro.h"
 #include "storage.h"
 #include "subroutine.h"

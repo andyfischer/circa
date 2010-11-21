@@ -1209,6 +1209,7 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
+    Term* originalFunction = function;
     std::string originalName = function->name;
 
     Term* result = NULL;
@@ -1220,7 +1221,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     // Check if 'function' is a namespace access term
     } else if (function->function == GET_NAMESPACE_FIELD) {
 
-        Term* originalFunction = function;
         function = statically_resolve_namespace_access(originalFunction);
 
         if ((originalFunction != function) && (originalFunction->name == "")) {
@@ -1229,9 +1229,8 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         }
 
         if (!is_callable(function)) {
-            std::cout << "in function_call, term is not callable: "
-                << get_term_to_string_extended(function) << std::endl;
             function = UNKNOWN_FUNCTION;
+            erase_term(originalFunction);
         }
 
         result = apply(branch, function, arguments);
@@ -1241,8 +1240,10 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
     } else {
 
-        if (!is_callable(function))
+        if (!is_callable(function)) {
             function = UNKNOWN_FUNCTION;
+            erase_term(originalFunction);
+        }
 
         result = apply(branch, function, arguments);
 
