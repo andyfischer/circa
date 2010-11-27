@@ -80,7 +80,6 @@ Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
-Term* BRANCH_TYPE = NULL;
 Term* COLOR_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
@@ -193,9 +192,6 @@ void bootstrap_kernel()
     as_type(ANY_TYPE).isSubtype = any_t::matches_type;
     as_type(ANY_TYPE).cast = any_t::cast;
     KERNEL->bindName(ANY_TYPE, "any");
-
-    // Create Branch type
-    //BRANCH_TYPE = create_branch_based_type(*KERNEL, "Branch");
 
     // Create FunctionAttrs type
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();

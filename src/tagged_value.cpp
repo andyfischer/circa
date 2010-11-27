@@ -554,12 +554,6 @@ bool is_ref(TaggedValue* value)
         && value->value_type == (Type*) REF_TYPE->value_data.ptr;
 }
 
-bool is_value_branch(TaggedValue* value)
-{
-    return BRANCH_TYPE != NULL
-        && value->value_type == (Type*) BRANCH_TYPE->value_data.ptr;
-}
-
 bool is_type(TaggedValue* value)
 {
     return TYPE_TYPE != NULL
