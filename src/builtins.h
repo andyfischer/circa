@@ -135,6 +135,7 @@ namespace overloaded_function {
         RefList const& overloads);
     void append_overload(Term* overloadedFunction, Term* overload);
     Term* statically_specialize_function(Term* func, RefList const& inputs);
+    void post_compile_setup_overloaded_function(Term* term);
 }
 
 namespace value_function {

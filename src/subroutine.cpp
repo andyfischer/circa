@@ -1,5 +1,21 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+/*
+   Some notes on handling state inside a subroutine:
+  
+   when each term evaluates, we will look for EvalContext.currentScopeState(), and
+   do a lookup using the term's name
+
+Start evaluating a subroutine:
+ - Grab state container from currentScopeState
+ - Preserve parent currentScopeState
+ - Assign this to EvalContext.currentScopeState
+ - Evaluate each term
+ - Assign modified state back into the parent currentScopeState
+ - Restore parent currentScopeState
+
+*/
+ 
 #include "evaluation.h"
 #include "circa.h"
 #include "importing_macros.h"

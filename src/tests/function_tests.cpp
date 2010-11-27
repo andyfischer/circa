@@ -76,6 +76,23 @@ void overloaded_function()
     test_equals(mult_f_2->nestedContents[0]->function->name, "mult_f");
 }
 
+void overloaded_function_in_script()
+{
+    Branch branch;
+    Term* f1 = branch.compile("def f1(int i) end");
+    Term* f2 = branch.compile("def f2(int i) end");
+    
+    branch.compile("g = overloaded_function(f1 f2)");
+    Term* g_call = branch.compile("g(1)");
+
+    test_assert(g_call->nestedContents[0]->function == f1);
+
+    branch.compile("h = overloaded_function(f2 f1)");
+    Term* h_call = branch.compile("h(1)");
+
+    test_assert(h_call->nestedContents[0]->function == f2);
+}
+
 void test_is_native_function()
 {
     test_assert(is_native_function(KERNEL->get("assert")));
@@ -171,6 +188,7 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::test_is_callable);
     REGISTER_TEST_CASE(function_tests::test_inputs_fit_function);
     REGISTER_TEST_CASE(function_tests::overloaded_function);
+    REGISTER_TEST_CASE(function_tests::overloaded_function_in_script);
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
     REGISTER_TEST_CASE(function_tests::test_bug_with_declaring_state_argument);

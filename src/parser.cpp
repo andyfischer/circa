@@ -317,6 +317,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
         throw std::runtime_error("parser::statement is stuck, next token is: "
                 + tokens.next().text);
 
+    // Some functions have a post-compile step.
+    post_compile_term(result);
+
     return result;
 }
 

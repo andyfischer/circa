@@ -105,7 +105,8 @@ namespace overloaded_function {
         } else {
             TaggedValue output;
             evaluate_branch_in_new_frame(CONTEXT, contents, &output);
-            swap(&output, OUTPUT);
+            if (OUTPUT != NULL)
+                swap(&output, OUTPUT);
         }
     }
 
@@ -195,20 +196,17 @@ namespace overloaded_function {
         function_t::set_variable_args(term, variableArgs);
     }
 
-    CA_FUNCTION(setup_overloaded)
-    {
-        if (NUM_INPUTS == 0)
-            return error_occurred(CONTEXT, CALLER, "Number of inputs must be >0");
-
-        setup_overloaded_function(CALLER, CALLER->name, CALLER->inputs);
-    }
-
     Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads)
     {
         Term* result = create_value(branch, FUNCTION_TYPE, name);
         setup_overloaded_function(result, name, overloads);
         return result;
+    }
+
+    void post_compile_setup_overloaded_function(Term* term)
+    {
+        setup_overloaded_function(term, term->name, term->inputs);
     }
 
     void append_overload(Term* overloadedFunction, Term* overload)
@@ -221,7 +219,7 @@ namespace overloaded_function {
 
     void setup(Branch& kernel)
     {
-        OVERLOADED_FUNCTION_FUNC = import_function(kernel, setup_overloaded,
+        OVERLOADED_FUNCTION_FUNC = import_function(kernel, NULL,
                 "overloaded_function(Function...) -> Function");
     }
 }
