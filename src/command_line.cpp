@@ -5,6 +5,7 @@
 #include "building.h"
 #include "builtins.h"
 #include "codegen.h"
+#include "debugger_repl.h"
 #include "dynamic_libs.h"
 #include "errors.h"
 #include "evaluation.h"
@@ -125,6 +126,14 @@ int run_command_line(std::vector<std::string> args)
     // Start repl
     if (args[0] == "-repl") {
         start_repl();
+        return 0;
+    }
+
+    // Start debugger repl
+    if (args[0] == "-d") {
+        std::string filename;
+        if (args.size() > 0) filename = args[1];
+        start_debugger_repl(filename);
         return 0;
     }
 
