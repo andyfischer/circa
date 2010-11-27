@@ -166,27 +166,25 @@ void test_set_index()
 
 void test_do_once()
 {
-#if 0
-    FIXME
     Branch branch;
+    EvalContext context;
+
     Term* x = branch.compile("x = 1");
     Term* t = branch.compile("do_once()");
     t->nestedContents.compile("unsafe_assign(x,2)");
 
+    test_assert(branch);
+
     test_assert(as_int(x) == 1);
 
     // the assign() inside do_once should modify x
-    bytecode::print_bytecode(std::cout, branch);
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
     test_assert(as_int(x) == 2);
 
     // but if we call it again, it shouldn't do that any more
     set_int(x, 3);
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
     test_assert(as_int(x) == 3);
-
-    branch.clear();
-#endif
 }
 
 void test_changed()
@@ -270,7 +268,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
-    REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     REGISTER_TEST_CASE(builtin_function_tests::test_namespace);

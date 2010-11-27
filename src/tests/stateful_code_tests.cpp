@@ -61,14 +61,11 @@ void initialize_from_expression()
     branch.compile("b = a * 2");
     Term *c = branch.compile("state c = b");
 
+    test_assert(branch);
+
     evaluate_branch(branch);
 
     test_equals(to_float(c), 6);
-}
-
-void one_time_assignment()
-{
-    // TODO
 }
 
 int NEXT_UNIQUE_OUTPUT = 0;
@@ -171,8 +168,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
-    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
-    REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
+    REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state);

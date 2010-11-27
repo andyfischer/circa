@@ -39,8 +39,10 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     int firstInput = 0;
     
     // If the function is native and stateful then inputs start at 1 instead of 0.
-    if (is_native_function(function) && is_function_stateful(function))
+    if (is_native_function(function) && is_function_stateful(function)) {
+        set_input(result, 0, NULL);
         firstInput = 1;
+    }
 
     for (int i=0; i < inputs.length(); i++)
         set_input(result, i+firstInput, inputs[i]);
