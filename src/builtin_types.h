@@ -62,7 +62,6 @@ namespace point_t {
     void write(TaggedValue* value, float x, float y);
 }
 
-void parse_types(Branch& kernel);
 void post_setup_types();
 
 }

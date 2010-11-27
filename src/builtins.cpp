@@ -9,6 +9,7 @@
 
 #include "circa.h"
 #include "debug_valid_objects.h"
+#include "types/color.h"
 #include "types/dict.h"
 #include "types/list.h"
 #include "types/map.h"
@@ -284,7 +285,6 @@ void initialize_compound_types(Branch& kernel)
     callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
 }
 
-
 void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
@@ -324,6 +324,23 @@ void post_setup_functions(Branch& kernel)
     function_t::get_feedback_func(VALUE_FUNC) = UNSAFE_ASSIGN_FUNC;
 }
 
+void parse_hosted_types(Branch& kernel)
+{
+    parse_type(kernel, "type Point { number x, number y }");
+    parse_type(kernel, "type Point_i { int x, int y }");
+    parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
+
+    COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
+
+    color_t::setup_type(type_contents(COLOR_TYPE));
+}
+
+void post_setup_types()
+{
+    string_t::postponed_setup_type(&as_type(STRING_TYPE));
+    ref_t::postponed_setup_type(&as_type(REF_TYPE));
+}
+
 void parse_builtin_script(Branch& kernel)
 {
     parser::compile(&kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
@@ -349,8 +366,9 @@ export_func void circa_initialize()
 
     setup_builtin_functions(*KERNEL);
     post_setup_functions(*KERNEL);
-    parse_types(*KERNEL);
+    parse_hosted_types(*KERNEL);
     post_setup_types();
+
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
 
