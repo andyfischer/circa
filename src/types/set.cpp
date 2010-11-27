@@ -1,35 +1,8 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
-#include "importing_macros.h"
 
 namespace circa {
-
-namespace bool_t {
-    void reset(TaggedValue* value)
-    {
-        set_bool(value, false);
-    }
-    std::string to_string(TaggedValue* value)
-    {
-        if (as_bool(value))
-            return "true";
-        else
-            return "false";
-    }
-    void format_source(StyledSource* source, Term* term)
-    {
-        append_phrase(source, bool_t::to_string(term), term, token::BOOL);
-    }
-    void setup_type(Type* type)
-    {
-        type->name = "bool";
-        type->reset = reset;
-        type->toString = to_string;
-        type->formatSource = format_source;
-    }
-}
-
 namespace set_t {
     bool contains(List* list, TaggedValue* value)
     {
@@ -103,74 +76,5 @@ namespace set_t {
     }
 
 } // namespace set_t
-
-namespace dict_t {
-    std::string to_string(Branch& branch)
-    {
-        std::stringstream out;
-        out << "{";
-        for (int i=0; i < branch.length(); i++) {
-            Term* term = branch[i];
-            std::string name = term->name;
-            if (name == "")
-                name = "<anon>";
-
-            if (i != 0)
-                out << ", ";
-
-            out << name << ": " << to_string(term);
-        }
-        out << "}";
-        return out.str();
-    }
-} // namespace dict_t
-
-
-namespace any_t {
-    std::string to_string(TaggedValue*)
-    {
-        return "<any>";
-    }
-    bool matches_type(Type*, Type*)
-    {
-        return true;
-    }
-    void cast(CastResult* result, TaggedValue* source, Type* type,
-        TaggedValue* dest, bool checkOnly)
-    {
-        // casting to 'any' always succeeds.
-        if (checkOnly)
-            return;
-
-        copy(source, dest);
-    }
-}
-
-namespace void_t {
-    std::string to_string(TaggedValue*)
-    {
-        return "<void>";
-    }
-    void setup_type(Type* type)
-    {
-        type->toString = to_string;
-    }
-}
-
-namespace point_t {
-
-    void read(TaggedValue* value, float* x, float* y)
-    {
-        *x = value->getIndex(0)->toFloat();
-        *y = value->getIndex(1)->toFloat();
-    }
-    void write(TaggedValue* value, float x, float y)
-    {
-        touch(value);
-        set_float(value->getIndex(0), x);
-        set_float(value->getIndex(1), y);
-    }
-}
-
-
 } // namespace circa
+

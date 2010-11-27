@@ -8,7 +8,6 @@
 #include "branch_check_invariants.h"
 #include "branch_iterator.h"
 #include "building.h"
-#include "builtin_types.h"
 #include "builtins.h"
 #include "codegen.h"
 #include "command_line.h"

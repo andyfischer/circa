@@ -202,5 +202,4 @@ namespace string_t {
     }
 }
 
-
 } // namespace circa

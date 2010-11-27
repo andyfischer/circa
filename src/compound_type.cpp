@@ -1,10 +1,9 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "builtin_types.h"
-#include "types/list.h"
 #include "building.h"
 #include "term.h"
 #include "type.h"
+#include "types/list.h"
 
 namespace circa {
 

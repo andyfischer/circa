@@ -2,7 +2,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "builtin_types.h"
 #include "function.h"
 #include "introspection.h"
 #include "parser.h"

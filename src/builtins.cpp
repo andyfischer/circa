@@ -9,11 +9,23 @@
 
 #include "circa.h"
 #include "debug_valid_objects.h"
+#include "types/any.h"
+#include "types/bool.h"
+#include "types/branch_ref.h"
+#include "types/callable.h"
 #include "types/color.h"
 #include "types/dict.h"
+#include "types/float.h"
+#include "types/indexable.h"
+#include "types/int.h"
 #include "types/list.h"
 #include "types/map.h"
 #include "types/null.h"
+#include "types/ref.h"
+#include "types/set.h"
+#include "types/string.h"
+#include "types/styled_source.h"
+#include "types/void.h"
 
 namespace circa {
 
