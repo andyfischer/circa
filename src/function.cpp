@@ -252,7 +252,10 @@ namespace function_t {
     bool get_input_meta(Term* func, int index)
     {
         if (!is_function(func)) return false;
-        return function_t::get_input_placeholder(func, index)->boolPropOptional("meta", false);
+        Term* placeholder = function_t::get_input_placeholder(func, index);
+        if (placeholder == NULL)
+            return false;
+        return placeholder->boolPropOptional("meta", false);
     }
 
     void set_input_meta(Term* func, int index, bool value)
@@ -264,7 +267,10 @@ namespace function_t {
     {
         if (!is_function(func))
             return true;
-        return function_t::get_input_placeholder(func, index)->boolPropOptional("optional", false);
+        Term* placeholder = function_t::get_input_placeholder(func, index);
+        if (placeholder == NULL)
+            return false;
+        return placeholder->boolPropOptional("optional", false);
     }
 
     Term* get_input_type(Term* func, int index)

@@ -10,7 +10,7 @@ namespace static_errors_tests {
 void input_type_error()
 {
     Branch branch;
-    Term* t = branch.eval("add_f('hi', 'bye')");
+    Term* t = branch.compile("add_f('hi', 'bye')");
 
     test_assert(get_static_error(t) == SERROR_INPUT_TYPE_ERROR);
     test_assert(has_static_error(t));
@@ -63,13 +63,23 @@ void test_unknown_identifier()
     #endif
 }
 
+void too_many_inputs()
+{
+    Branch branch;
+    branch.compile("def f() end");
+    Term* t = branch.compile("f(1)");
+    
+    test_assert(has_static_error(t));
+}
+
 void register_tests()
 {
-    //TEST_DISABLED REGISTER_TEST_CASE(static_errors_tests::input_type_error);
+    REGISTER_TEST_CASE(static_errors_tests::input_type_error);
     REGISTER_TEST_CASE(static_errors_tests::no_error);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_func);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_type);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_identifier);
+    REGISTER_TEST_CASE(static_errors_tests::too_many_inputs);
 }
 
 } // namespace static_errors_tests
