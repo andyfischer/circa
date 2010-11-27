@@ -194,9 +194,9 @@ CA_FUNCTION(gl_points)
 
 CA_FUNCTION(gl_circle)
 {
-    float x = 0;
-    float y = 0;
-    circa::point_t::read(INPUT(0), &x, &y);
+    Point* loc = Point::checkCast(INPUT(0));
+    float x = loc->getX();
+    float y = loc->getY();
     float radius = FLOAT_INPUT(1);
     TaggedValue* color = INPUT(2);
     set_gl_color(color);
@@ -236,9 +236,9 @@ CA_FUNCTION(gl_circle)
 
 CA_FUNCTION(gl_pie)
 {
-    float x = 0;
-    float y = 0;
-    circa::point_t::read(INPUT(0), &x, &y);
+    Point* loc = Point::checkCast(INPUT(0));
+    float x = loc->getX();
+    float y = loc->getY();
     float radius = FLOAT_INPUT(1);
     float angle_start = FLOAT_INPUT(2);
     float angle_fin = FLOAT_INPUT(3);

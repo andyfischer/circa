@@ -104,6 +104,7 @@ bool is_float(TaggedValue* value);
 bool is_bool(TaggedValue* value);
 bool is_string(TaggedValue* value);
 bool is_ref(TaggedValue* value);
+bool is_list(TaggedValue* value);
 bool is_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);
 bool is_null(TaggedValue* value);

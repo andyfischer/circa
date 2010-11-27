@@ -554,6 +554,11 @@ bool is_ref(TaggedValue* value)
         && value->value_type == (Type*) REF_TYPE->value_data.ptr;
 }
 
+bool is_list(TaggedValue* value)
+{
+    return list_t::is_list_based_type(value->value_type);
+}
+
 bool is_type(TaggedValue* value)
 {
     return TYPE_TYPE != NULL

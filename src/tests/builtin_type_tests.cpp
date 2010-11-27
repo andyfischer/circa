@@ -81,7 +81,7 @@ void test_list()
     Term* l = branch.compile("l = List()");
 
     evaluate_branch(branch);
-    test_assert(list_t::is_list(l));
+    test_assert(is_list(l));
     test_assert(l->numElements() == 0);
 
     l = branch.compile("l.append(2)");

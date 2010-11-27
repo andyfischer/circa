@@ -272,7 +272,6 @@ namespace list_t {
     }
 
     // TaggedValue wrappers
-    bool is_list(TaggedValue* value);
     void tv_touch(TaggedValue* value);
 
     void resize(TaggedValue* list, int newSize)
@@ -543,11 +542,6 @@ namespace list_t {
         set_pointer(value, data);
     }
 
-    bool is_list(TaggedValue* value)
-    {
-        return is_list_based_type(value->value_type);
-    }
-
     bool is_list_based_type(Type* type)
     {
         return type->initialize == tv_initialize;
@@ -781,7 +775,7 @@ List::resize(int newSize)
 List*
 List::checkCast(TaggedValue* v)
 {
-    if (list_t::is_list(v))
+    if (is_list(v))
         return (List*) v;
     else
         return NULL;

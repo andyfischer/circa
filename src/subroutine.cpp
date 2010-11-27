@@ -225,7 +225,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
 
 void restore_locals(TaggedValue* storageTv, Branch& branch)
 {
-    if (!list_t::is_list(storageTv))
+    if (!is_list(storageTv))
         internal_error("storageTv is not a list");
 
     List* storage = List::checkCast(storageTv);

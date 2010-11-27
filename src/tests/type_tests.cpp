@@ -60,12 +60,12 @@ void compound_type_cast()
     Branch branch;
     Term* t = branch.eval("type T { string a }");
     Term* a = branch.eval("['hi']");
-    test_assert(list_t::is_list(a));
+    test_assert(is_list(a));
     test_assert(a->value_type != type_contents(t));
 
     TaggedValue casted;
     test_assert(cast(a, type_contents(t), &casted));
-    test_assert(list_t::is_list(&casted));
+    test_assert(is_list(&casted));
     test_assert(casted.value_type == type_contents(t));
 }
 

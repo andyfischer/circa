@@ -72,6 +72,20 @@ void too_many_inputs()
     test_assert(has_static_error(t));
 }
 
+void crash_with_overloaded_varargs()
+{
+    Branch branch;
+
+    branch.compile("def f() end");
+    branch.compile("def f2(int i) end");
+    branch.compile("g = overloaded_function(f f2)");
+
+    Term* t = branch.compile("g(1)");
+
+    // once caused a crash:
+    has_static_error(t);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(static_errors_tests::input_type_error);
@@ -80,6 +94,7 @@ void register_tests()
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_type);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_identifier);
     REGISTER_TEST_CASE(static_errors_tests::too_many_inputs);
+    REGISTER_TEST_CASE(static_errors_tests::crash_with_overloaded_varargs);
 }
 
 } // namespace static_errors_tests

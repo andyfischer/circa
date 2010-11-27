@@ -186,10 +186,10 @@ namespace overloaded_function {
             outputTypes.append(function_t::get_output_type(overloads[i]));
         }
 
-
         Branch& result = term->nestedContents;
         result.shorten(1);
-        for (int i=0; i < argumentCount; i++)
+        int placeholderCount = variableArgs ? 1 : argumentCount;
+        for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* outputType = find_common_type(outputTypes);
         function_t::set_output_type(term, outputType);

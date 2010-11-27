@@ -126,9 +126,9 @@ CA_FUNCTION(draw_image)
     TaggedValue* image = INPUT(0);
     TaggedValue* point = INPUT(1);
 
-    float x = 0;
-    float y = 0;
-    circa::point_t::read(point, &x, &y);
+    Point* loc = Point::checkCast(INPUT(0));
+    float x = loc->getX();
+    float y = loc->getY();
     float width = float(image_t::get_width(image));
     float height = float(image_t::get_height(image));
 

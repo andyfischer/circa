@@ -10,7 +10,7 @@ namespace type_check_function {
 
     CA_DEFINE_FUNCTION(is_list, "is_list(any) -> bool")
     {
-        set_bool(OUTPUT, list_t::is_list(INPUT(0)));
+        set_bool(OUTPUT, circa::is_list(INPUT(0)));
     }
     CA_DEFINE_FUNCTION(is_int, "is_int(any) -> bool")
     {

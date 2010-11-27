@@ -50,3 +50,4 @@
 
 #include "types/dict.h"
 #include "types/list.h"
+#include "types/point.h"
