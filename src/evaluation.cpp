@@ -107,16 +107,6 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
     return apply_and_eval(branch, function, inputs);
 }
 
-#ifdef BYTECODE
-void evaluate_bytecode(Branch& branch)
-{
-    EvalContext context;
-    List stack;
-    bytecode::update_bytecode(branch);
-    bytecode::evaluate_bytecode(&context, &branch._bytecode, &stack);
-}
-#endif
-
 void copy_stack_back_to_terms(Branch& branch, List* frame)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
@@ -137,14 +127,6 @@ void copy_stack_back_to_terms(Branch& branch, List* frame)
 
         copy(value, term);
     }
-}
-
-void capture_inputs(List* stack, bytecode::CallOperation* callOp, List* inputs)
-{
-    touch(inputs);
-    inputs->resize(callOp->numInputs);
-    for (int i=0; i < callOp->numInputs; i++)
-        copy(stack->get(callOp->inputs[i].registerIndex), inputs->get(i));
 }
 
 TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int relativeStack)

@@ -464,7 +464,6 @@ void for_loop_assign_registers(Term* term)
     if (as_bool(get_for_loop_modify_list(term))) {
         Term* output = forContents[get_for_loop_iterator(term)->name];
         ca_assert(output != NULL);
-        //ca_assert(output->registerIndex != -1);
         forContents.outputRegister = output->registerIndex;
     } else {
         forContents.outputRegister = forContents.registerCount - 1;

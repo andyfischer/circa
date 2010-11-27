@@ -24,15 +24,15 @@ void print_usage()
     std::cout <<
         "Usage:\n"
         "  circa <filename>      : Evaluate the given Circa source file\n"
+        "  circa -repl           : Start an interactive read-eval-print-loop\n"
+        "  circa -e <expression> : Evaluate an expression on the command line\n"
         "  circa -test           : Run unit tests\n"
         "  circa -test <name>    : Run unit test of a certain name\n"
-        "  circa -e <expression> : Evaluate an expression on the command line\n"
         "  circa -list-tests     : List every unit test name\n"
         "  circa -p <filename>   : Show the raw display of a source file\n"
         "  circa -ep <filename>  : Evaluate a source file and then show raw display\n"
         "  circa -pp <filename>  : Like -p but also print term properties\n"
-        "  circa -s <filename>   : Compile the source file and reproduce its source code\n"
-        "  circa -repl           : Start an interactive read-eval-print-loop\n";
+        "  circa -s <filename>   : Compile the source file and reproduce its source code\n";
     std::cout << std::endl;
 }
 
@@ -95,16 +95,6 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
-    // Show compiled code and bytecode
-    if (args[0] == "-pb") {
-        Branch branch;
-        parse_script(branch, args[1]);
-        bytecode::update_bytecode(branch);
-        print_branch_raw(std::cout, branch);
-        bytecode::print_bytecode_for_all_major_branches(std::cout, branch);
-        return 0;
-    }
-
     // Evaluate and show compiled code
     if (args[0] == "-ep") {
         Branch branch;
@@ -129,26 +119,6 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         parse_script(branch, args[1]);
         std::cout << get_branch_source_text(branch) << std::endl;
-        return 0;
-    }
-
-    // Show bytecode
-    if (args[0] == "-b") {
-        Branch branch;
-        parse_script(branch, args[1]);
-        bytecode::update_bytecode(branch);
-        bytecode::print_bytecode_for_all_major_branches(std::cout, branch);
-        return 0;
-    }
-
-    // Evaluate bytecode
-    if (args[0] == "-eb") {
-        Branch branch;
-        parse_script(branch, args[1]);
-        bytecode::update_bytecode(branch);
-        EvalContext context;
-        List stack;
-        evaluate_bytecode(&context, &branch._bytecode, &stack);
         return 0;
     }
 
