@@ -195,7 +195,7 @@ namespace overloaded_function {
         function_t::set_variable_args(term, variableArgs);
     }
 
-    CA_FUNCTION(evaluate)
+    CA_FUNCTION(setup_overloaded)
     {
         if (NUM_INPUTS == 0)
             return error_occurred(CONTEXT, CALLER, "Number of inputs must be >0");
@@ -221,7 +221,7 @@ namespace overloaded_function {
 
     void setup(Branch& kernel)
     {
-        OVERLOADED_FUNCTION_FUNC = import_function(kernel, evaluate,
+        OVERLOADED_FUNCTION_FUNC = import_function(kernel, setup_overloaded,
                 "overloaded_function(Function...) -> Function");
     }
 }
