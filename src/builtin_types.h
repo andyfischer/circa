@@ -48,9 +48,7 @@ namespace any_t {
 }
 
 namespace branch_ref_t {
-    void set_from_ref(TaggedValue* value, Term* ref);
-    void setup_type(Type* type);
-    Branch& get_target_branch(TaggedValue* value);
+    void initialize(Branch& kernel);
 }
 
 namespace void_t { void setup_type(Type* type); }

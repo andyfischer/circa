@@ -320,7 +320,6 @@ export_func void circa_initialize()
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
 
-
     parse_builtin_script(*KERNEL);
 }
 

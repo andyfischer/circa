@@ -6,6 +6,7 @@
 #include "build_options.h"
 #include "builtin_types.h"
 #include "debug_valid_objects.h"
+#include "importing_macros.h"
 #include "tagged_value.h"
 #include "testing.h"
 

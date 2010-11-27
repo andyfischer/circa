@@ -384,8 +384,7 @@ void setup_types(Branch& kernel)
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(type_contents(map_type));
 
-    Term* branchRefType = parse_type(kernel, "type BranchRef { Ref target }");
-    branch_ref_t::setup_type(&as_type(branchRefType));
+    branch_ref_t::initialize(kernel);
 
     Term* styledSourceType = parse_type(kernel, "type StyledSource;");
     styled_source_t::setup_type(&as_type(styledSourceType));
@@ -412,6 +411,5 @@ void post_setup_types()
     string_t::postponed_setup_type(&as_type(STRING_TYPE));
     ref_t::postponed_setup_type(&as_type(REF_TYPE));
 }
-
 
 } // namespace circa
