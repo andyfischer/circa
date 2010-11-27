@@ -25,7 +25,6 @@ namespace set_t {
     void setup_type(Type* type);
 }
 
-
 namespace dict_t {
     std::string to_string(Branch& branch);
 }
@@ -63,9 +62,6 @@ namespace point_t {
     void write(TaggedValue* value, float x, float y);
 }
 
-void initialize_primitive_types(Branch& kernel);
-
-void setup_types(Branch& kernel);
 void parse_types(Branch& kernel);
 void post_setup_types();
 

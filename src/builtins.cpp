@@ -11,6 +11,8 @@
 #include "debug_valid_objects.h"
 #include "types/dict.h"
 #include "types/list.h"
+#include "types/map.h"
+#include "types/null.h"
 
 namespace circa {
 
@@ -116,19 +118,10 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-CA_FUNCTION(empty_evaluate_function) {}
-
-void empty_bytecode_generation(bytecode::WriteContext* context, Term* term) {}
-
-namespace null_t {
-    std::string toString(TaggedValue* value) { return "null";}
-}
-
-void create_types()
+void create_primitive_types()
 {
     NULL_T = Type::create();
-    NULL_T->name = "null";
-    NULL_T->toString = null_t::toString;
+    null_t::setup_type(NULL_T);
 
     DICT_T = Type::create();
     dict_t::setup_type(DICT_T);
@@ -215,8 +208,35 @@ void bootstrap_kernel()
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
     change_type((TaggedValue*)VALUE_FUNC, type_contents(FUNCTION_TYPE));
+}
 
-    // Initialize List type, it's needed soon
+void initialize_primitive_types(Branch& kernel)
+{
+    STRING_TYPE = create_type(kernel, "string");
+    set_type(STRING_TYPE, STRING_T);
+
+    INT_TYPE = create_type(kernel, "int");
+    set_type(INT_TYPE, INT_T);
+
+    FLOAT_TYPE = create_type(kernel, "number");
+    set_type(FLOAT_TYPE, FLOAT_T);
+
+    DICT_TYPE = create_type(kernel, "Dict");
+    set_type(DICT_TYPE, DICT_T);
+
+    BOOL_TYPE = create_type(kernel, "bool");
+    set_type(BOOL_TYPE, BOOL_T);
+
+    REF_TYPE = create_type(kernel, "Ref");
+    set_type(REF_TYPE, REF_T);
+
+    VOID_TYPE = create_type(kernel, "void");
+    set_type(VOID_TYPE, VOID_T);
+
+    LIST_TYPE = create_type(kernel, "List");
+    set_type(LIST_TYPE, LIST_T);
+
+    // ANY_TYPE was created in bootstrap_kernel
 }
 
 void post_initialize_primitive_types(Branch& kernel)
@@ -229,22 +249,41 @@ void post_initialize_primitive_types(Branch& kernel)
     ca_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }
 
-void pre_initialize_types(Branch& kernel)
+void pre_setup_types(Branch& kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
-    INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
-            "input_placeholder() -> any");
-
-    function_t::get_attrs(INPUT_PLACEHOLDER_FUNC).writeBytecode = empty_bytecode_generation;
+    INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
 
     // FileSignature is used in some builtin functions
     parse_type(kernel, "type FileSignature { string filename, int time_modified }");
-}
 
-void pre_setup_builtin_functions(Branch& kernel)
-{
     namespace_function::early_setup(kernel);
 }
+
+void initialize_compound_types(Branch& kernel)
+{
+    type_t::setup_type(TYPE_TYPE);
+
+    Term* set_type = create_compound_type(kernel, "Set");
+    set_t::setup_type(type_contents(set_type));
+
+    // LIST_TYPE was created in bootstrap_kernel
+    list_t::postponed_setup_type(LIST_TYPE);
+
+    Term* map_type = create_compound_type(kernel, "Map");
+    map_t::setup_type(type_contents(map_type));
+
+    branch_ref_t::initialize(kernel);
+
+    Term* styledSourceType = parse_type(kernel, "type StyledSource;");
+    styled_source_t::setup_type(&as_type(styledSourceType));
+
+    Term* indexableType = parse_type(kernel, "type Indexable;");
+    indexable_t::setup_type(&as_type(indexableType));
+
+    callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
+}
+
 
 void post_setup_functions(Branch& kernel)
 {
@@ -298,14 +337,13 @@ export_func void circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
 
-    create_types();
+    create_primitive_types();
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
     post_initialize_primitive_types(*KERNEL);
-    pre_initialize_types(*KERNEL);
-    setup_types(*KERNEL);
+    pre_setup_types(*KERNEL);
+    initialize_compound_types(*KERNEL);
     feedback_register_constants(*KERNEL);
-    pre_setup_builtin_functions(*KERNEL);
 
     FINISHED_BOOTSTRAP = true;
 
