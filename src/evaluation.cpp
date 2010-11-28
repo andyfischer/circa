@@ -21,8 +21,8 @@ namespace circa {
 void evaluate_single_term(EvalContext* context, Term* term)
 {
     EvaluateFunc func = function_t::get_evaluate(term->function);
-    if (func != NULL) 
-        func(context, term);
+    ca_assert(func != NULL);
+    func(context, term);
 }
 
 void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)

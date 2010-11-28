@@ -37,9 +37,9 @@ namespace subroutine_t {
             format_branch_source(source, term->nestedContents, term);
     }
 
-    CA_FUNCTION(evaluate)
+    void evaluate_subroutine(EvalContext* context, Term* caller)
     {
-        Term* function = FUNCTION;
+        Term* function = caller->function;
         Branch& contents = function->nestedContents;
 
         // Copy inputs to a new stack frame
@@ -47,8 +47,8 @@ namespace subroutine_t {
             List frame;
             frame.resize(contents.registerCount);
 
-            for (int i=0; i < NUM_INPUTS; i++) {
-                TaggedValue* input = INPUT(i);
+            for (int i=0; i < caller->numInputs(); i++) {
+                TaggedValue* input = get_input(context, caller, i);
                 if (input == NULL)
                     continue;
                 Term* inputTypeTerm = function_t::get_input_type(function, i);
@@ -57,37 +57,37 @@ namespace subroutine_t {
                 ca_assert(cast(input, inputType, frame.get(i)));
             }
 
-            swap(&frame, STACK->append());
+            swap(&frame, context->stack.append());
         }
 
         // prepare output
-        set_null(&CONTEXT->subroutineOutput);
+        set_null(&context->subroutineOutput);
 
         // Fetch state container
         TaggedValue prevScopeState;
-        swap(&CONTEXT->currentScopeState, &prevScopeState);
+        swap(&context->currentScopeState, &prevScopeState);
 
         if (is_function_stateful(function))
-            fetch_state_container(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
+            fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
 
         // Evaluate each term
         for (int i=0; i < contents.length(); i++) {
-            evaluate_single_term(CONTEXT, contents[i]);
-            if (CONTEXT->interruptSubroutine)
+            evaluate_single_term(context, contents[i]);
+            if (context->interruptSubroutine)
                 break;
         }
-        List* frame = get_stack_frame(STACK, 0);
+        List* frame = get_stack_frame(&context->stack, 0);
 
         // Fetch output
-        Term* outputTypeTerm = function_t::get_output_type(FUNCTION);
+        Term* outputTypeTerm = function_t::get_output_type(caller->function);
         Type* outputType = type_contents(outputTypeTerm);
         TaggedValue output;
 
         if (outputTypeTerm != VOID_TYPE) {
             TaggedValue* outputSource = NULL;
 
-            if (!is_null(&CONTEXT->subroutineOutput))
-                outputSource = &CONTEXT->subroutineOutput;
+            if (!is_null(&context->subroutineOutput))
+                outputSource = &context->subroutineOutput;
             else
                 outputSource = frame->get(frame->length() - 1);
 
@@ -97,24 +97,26 @@ namespace subroutine_t {
                 std::stringstream msg;
                 msg << "Couldn't cast output " << output.toString()
                     << " to type " << outputType->name;
-                error_occurred(CONTEXT, CALLER, msg.str());
+                error_occurred(context, caller, msg.str());
             }
 
-            set_null(&CONTEXT->subroutineOutput);
+            set_null(&context->subroutineOutput);
         }
 
         // Write to state
-        wrap_up_open_state_vars(CONTEXT, contents);
+        wrap_up_open_state_vars(context, contents);
 
-        pop_stack_frame(STACK);
+        pop_stack_frame(&context->stack);
 
         // Restore currentScopeState
         if (is_function_stateful(function))
-            preserve_state_result(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
-        swap(&CONTEXT->currentScopeState, &prevScopeState);
+            preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
 
-        if (OUTPUT != NULL)
-            swap(&output, OUTPUT);
+        swap(&context->currentScopeState, &prevScopeState);
+
+        TaggedValue* outputDest = get_output(context, caller);
+        if (outputDest != NULL)
+            swap(&output, outputDest);
     }
 }
 
@@ -126,13 +128,13 @@ bool is_subroutine(Term* term)
         return false;
     if (term->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
         return false;
-    return function_t::get_evaluate(term) == subroutine_t::evaluate;
+    return function_t::get_evaluate(term) == subroutine_t::evaluate_subroutine;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
     // Install evaluate function
-    function_t::get_evaluate(sub) = subroutine_t::evaluate;
+    function_t::get_evaluate(sub) = subroutine_t::evaluate_subroutine;
 
     subroutine_update_state_type_from_contents(sub);
 }

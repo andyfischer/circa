@@ -268,17 +268,13 @@ void test_delta()
 
     EvalContext context;
     evaluate_branch(&context, branch);
-
     std::cout << context.state.toString() << std::endl;
 
     test_assert(is_float(delta));
     test_equals(delta->toFloat(), 0);
     
-    std::cout << context.state.toString() << std::endl;
-
     set_int(i, 5);
     evaluate_branch(&context, branch);
-
     std::cout << context.state.toString() << std::endl;
 
     test_assert(is_float(delta));
