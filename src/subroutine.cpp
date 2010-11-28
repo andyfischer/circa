@@ -92,7 +92,13 @@ namespace subroutine_t {
                 outputSource = frame->get(frame->length() - 1);
 
             bool success = cast(outputSource, outputType, &output);
-            ca_assert(success);
+            
+            if (!success) {
+                std::stringstream msg;
+                msg << "Couldn't cast output " << output.toString()
+                    << " to type " << outputType->name;
+                error_occurred(CONTEXT, CALLER, msg.str());
+            }
 
             set_null(&CONTEXT->subroutineOutput);
         }
@@ -176,8 +182,10 @@ void subroutine_change_state_type(Term* func, Term* newType)
     // create a stateful input if needed
     if (newType != VOID_TYPE && !hasStateInput) {
         contents.insert(1, alloc_term());
-        rewrite(contents[1], INPUT_PLACEHOLDER_FUNC, RefList());
-        contents.bindName(contents[1], "#state");
+        Term* input = contents[1];
+        rewrite(input, INPUT_PLACEHOLDER_FUNC, RefList());
+        contents.bindName(input, "#state");
+        input->setBoolProp("optional", true);
     }
 
     // If state was added, find all the recursive calls to this function and
@@ -203,6 +211,8 @@ void subroutine_change_state_type(Term* func, Term* newType)
             }
         }
     }
+
+    update_register_indices(func);
 }
 
 void store_locals(Branch& branch, TaggedValue* storageTv)

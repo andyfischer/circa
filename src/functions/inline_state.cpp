@@ -24,6 +24,7 @@ namespace inline_state_function {
     {
         ca_assert(INPUT(1) != NULL);
 
+
         Dict* stateContainer = NULL;
 
         TaggedValue *containerFromInput = INPUT(0);
@@ -37,6 +38,9 @@ namespace inline_state_function {
 
         const char* name = STRING_INPUT(1);
         TaggedValue* value = stateContainer->get(name);
+
+        std::cout << "get_state_field: " << name << std::endl;
+
         if (value) {
             // todo: check if we need to cast this value
             copy(value, OUTPUT);

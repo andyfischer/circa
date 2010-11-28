@@ -56,4 +56,4 @@ void set_input_syntax_hint(Term* term, int index, std::string const& field,
 // Mark the given term as hidden from source reproduction.
 void hide_from_source(Term* term);
 
-}
+} // namespace circa

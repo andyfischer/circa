@@ -256,6 +256,46 @@ void test_namespace()
     test_equals(branch["ns"]->toString(), "[a: 1]");
 }
 
+void test_delta()
+{
+    Branch branch;
+
+    Term* i = branch.compile("i = 1");
+    Term* delta = branch.compile("delta(i)");
+
+    dump_branch(branch);
+    dump_branch(get_global("delta")->nestedContents);
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    std::cout << context.state.toString() << std::endl;
+
+    test_assert(is_float(delta));
+    test_equals(delta->toFloat(), 0);
+    
+    std::cout << context.state.toString() << std::endl;
+
+    set_int(i, 5);
+    evaluate_branch(&context, branch);
+
+    std::cout << context.state.toString() << std::endl;
+
+    test_assert(is_float(delta));
+    test_equals(delta->toFloat(), 5);
+
+    evaluate_branch(&context, branch);
+    test_equals(delta->toFloat(), 9);
+
+    set_int(i, 2);
+    evaluate_branch(&context, branch);
+    test_equals(delta->toFloat(), -3);
+
+    set_int(i, 0);
+    evaluate_branch(&context, branch);
+    test_equals(delta->toFloat(), -2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -272,6 +312,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
+    REGISTER_TEST_CASE(builtin_function_tests::test_delta);
 }
 
 } // namespace builtin_function_tests

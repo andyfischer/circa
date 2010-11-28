@@ -29,7 +29,6 @@ void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, branch[i]);
-    wrap_up_open_state_vars(context, branch);
 }
 
 void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
@@ -40,9 +39,17 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
     for (int i=0; i < context->openStateVariables.length(); i++) {
         const char* name = context->openStateVariables[i]->asString().c_str();
         Term* term = branch[name];
-        ca_assert(term != NULL);
+
+        if (term == NULL) {
+            dump_branch(branch);
+            std::stringstream msg;
+            msg << "couldn't find state var: " << name;
+            internal_error(msg.str());
+        }
+
         ca_assert(term->registerIndex != -1);
         TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
+        std::cout << "saving state: " << result->toString() << " to " << name << std::endl;
         copy(result, state->insert(name));
     }
     context->openStateVariables.clear();
@@ -68,6 +75,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     push_stack_frame(&context->stack, branch.registerCount);
     copy(&context->state, &context->currentScopeState);
     evaluate_branch_existing_frame(context, branch);
+    wrap_up_open_state_vars(context, branch);
     copy(&context->currentScopeState, &context->state);
 
     // Copy stack back to terms
