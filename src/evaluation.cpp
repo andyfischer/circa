@@ -49,7 +49,7 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
 
         ca_assert(term->registerIndex != -1);
         TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
-        std::cout << "saving state: " << result->toString() << " to " << name << std::endl;
+        //std::cout << "saving state: " << result->toString() << " to " << name << std::endl;
         copy(result, state->insert(name));
     }
     context->openStateVariables.clear();

@@ -41,6 +41,7 @@ namespace subroutine_t {
     {
         Term* function = caller->function;
         Branch& contents = function->nestedContents;
+        context->interruptSubroutine = false;
 
         // Copy inputs to a new stack frame
         {

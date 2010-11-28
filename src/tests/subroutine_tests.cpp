@@ -189,6 +189,25 @@ void to_source_string()
     test_equals(get_term_source_text(c), "f()");
 }
 
+void bug_with_return()
+{
+    Branch branch;
+    branch.compile("def f(bool b)->int if b return 1 else return 2 end");
+    Term* input = branch.compile("b = true");
+    Term* f = branch.compile("f(b)");
+
+    // there once was a bug where EvalContext.interruptSubroutine was not reset
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_assert(is_int(f));
+    test_assert(f->asInt() == 1);
+
+    set_bool(input, false);
+    evaluate_branch(&context, branch);
+    test_assert(is_int(f));
+    test_assert(f->asInt() == 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
@@ -200,6 +219,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::specialization_to_output_type);
     REGISTER_TEST_CASE(subroutine_tests::stateful_function_with_arguments);
     REGISTER_TEST_CASE(subroutine_tests::to_source_string);
+    REGISTER_TEST_CASE(subroutine_tests::bug_with_return);
 }
 
 } // namespace refactoring_tests

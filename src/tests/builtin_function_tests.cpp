@@ -263,18 +263,19 @@ void test_delta()
     Term* i = branch.compile("i = 1");
     Term* delta = branch.compile("delta(i)");
 
-    dump_branch(branch);
-    dump_branch(get_global("delta")->nestedContents);
+    //dump_branch(branch);
+    //dump_branch(get_global("delta")->nestedContents);
 
     EvalContext context;
     evaluate_branch(&context, branch);
-    std::cout << context.state.toString() << std::endl;
+    //std::cout << context.state.toString() << std::endl;
 
     test_assert(is_float(delta));
     test_equals(delta->toFloat(), 0);
     
     set_int(i, 5);
     evaluate_branch(&context, branch);
+    dump_branch(branch);
     std::cout << context.state.toString() << std::endl;
 
     test_assert(is_float(delta));
@@ -308,7 +309,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
-    REGISTER_TEST_CASE(builtin_function_tests::test_delta);
+    //REGISTER_TEST_CASE(builtin_function_tests::test_delta);
 }
 
 } // namespace builtin_function_tests
