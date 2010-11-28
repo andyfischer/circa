@@ -12,6 +12,8 @@ namespace return_function {
     {
         CONTEXT->interruptSubroutine = true;
         copy(INPUT(0), &CONTEXT->subroutineOutput);
+
+        //std::cout << "returing: " << INPUT(0)->toString() << std::endl;
     }
 
     void setup(Branch& kernel)

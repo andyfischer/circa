@@ -77,7 +77,12 @@ namespace subroutine_t {
             if (context->interruptSubroutine)
                 break;
         }
+
+        // Stack frame object may have moved, grab it again.
         List* frame = get_stack_frame(&context->stack, 0);
+
+        //std::cout << "finished subroutine, stack = " << context->stack.toString() <<std::endl;
+        //dump_branch(contents);
 
         // Fetch output
         Term* outputTypeTerm = function_t::get_output_type(caller->function);
@@ -87,10 +92,14 @@ namespace subroutine_t {
         if (outputTypeTerm != VOID_TYPE) {
             TaggedValue* outputSource = NULL;
 
-            if (!is_null(&context->subroutineOutput))
+            if (!is_null(&context->subroutineOutput)) {
                 outputSource = &context->subroutineOutput;
-            else
+            }
+            else {
                 outputSource = frame->get(frame->length() - 1);
+            }
+
+            //std::cout << "found output: " << outputSource->toString() << std::endl;
 
             bool success = cast(outputSource, outputType, &output);
             

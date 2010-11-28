@@ -24,7 +24,6 @@ namespace inline_state_function {
     {
         ca_assert(INPUT(1) != NULL);
 
-
         Dict* stateContainer = NULL;
 
         TaggedValue *containerFromInput = INPUT(0);
@@ -32,7 +31,7 @@ namespace inline_state_function {
             stateContainer = Dict::checkCast(containerFromInput);
 
         if (stateContainer == NULL)
-            stateContainer = Dict::lazyCast(&CONTEXT->state);
+            stateContainer = Dict::lazyCast(&CONTEXT->currentScopeState);
 
         ca_assert(stateContainer != NULL);
 
@@ -42,6 +41,7 @@ namespace inline_state_function {
         if (value) {
             // todo: check if we need to cast this value
             copy(value, OUTPUT);
+
 
         // If we didn't find the value, see if they provided a default
         } else if (INPUT(2) != NULL) {

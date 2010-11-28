@@ -113,7 +113,6 @@ void subroutine_stateful_term()
     test_assert(is_function_stateful(branch["mysub"]));
 
     dump_branch(branch);
-    dump_bytecode(branch);
 
     evaluate_branch(&context, branch);
 

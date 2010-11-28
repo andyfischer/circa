@@ -66,6 +66,17 @@ void initialize_from_expression()
     evaluate_branch(branch);
 
     test_equals(to_float(c), 6);
+
+    branch.clear();
+    Term* d = branch.compile("d = 5");
+    Term* e = branch.compile("state e = d");
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_equals(e->asInt(), 5);
+
+    set_int(d, 10);
+    evaluate_branch(&context, branch);
+    test_equals(e->asInt(), 5);
 }
 
 int NEXT_UNIQUE_OUTPUT = 0;
