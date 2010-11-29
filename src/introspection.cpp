@@ -265,6 +265,8 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
     }
     out << " " << to_string(term);
 
+    out << " local:" << get_local(term)->toString();
+
     if (prefs->showProperties)
         out << " " << term->properties.toString();
 }

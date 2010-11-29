@@ -304,7 +304,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
     REGISTER_TEST_CASE(builtin_function_tests::test_delta);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
-    REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
 }
 
 } // namespace builtin_function_tests

@@ -376,48 +376,37 @@ CA_FUNCTION(evaluate_for_loop)
         // copy iterator
         copy(inputList->getIndex(iteration), get_local(iterator));
 
-        #if 0
         // copy inner rebinds
         for (int i=0; i < innerRebinds.length(); i++) {
             Term* rebindTerm = innerRebinds[i];
-            TaggedValue* dest = frame->get(rebindTerm->registerIndex);
+            TaggedValue* dest = get_local(rebindTerm);
 
             if (firstIter)
                 copy(get_input(CONTEXT, rebindTerm, 0), dest);
             else
-                copy(previousFrame.get(rebindTerm->input(1)->registerIndex), dest);
+                copy(get_input(CONTEXT, rebindTerm, 1), dest);
         }
-        #endif
+
+        //dump_branch(forContents);
 
         CONTEXT->forLoopContext.discard = false;
 
         for (int i=loop_contents_location; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, forContents[i]);
 
-        copy(get_local(forContents[forContents.outputRegister]),
-                output->get(nextOutputIndex++));
-
-        #if 0
-        frame = List::checkCast(STACK->get(STACK->numElements() - 1));
-
         // Save output
-        if (saveOutput && !CONTEXT->forLoopContext.discard)
-            copy(frame->get(forContents.outputRegister), output->get(nextOutputIndex++));
-
-        swap(frame, &previousFrame);
-        pop_stack_frame(STACK);
-        #endif
+        if (saveOutput && !CONTEXT->forLoopContext.discard) {
+            copy(get_local(forContents[forContents.outputRegister]),
+                output->get(nextOutputIndex++));
+        }
     }
 
     // Resize output, in case some elements were discarded
     output->resize(nextOutputIndex);
 
-    #if 0
-    // Copy the outer rebinds to the output stack frame.
-    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 1));
+    swap(output, OUTPUT);
 
-    int outputIndexBase = CALLER->registerIndex + 1;
-
+    // Copy outer rebinds
     for (int i=0; i < outerRebinds.length(); i++) {
 
         Term* rebindTerm = outerRebinds[i];
@@ -426,21 +415,17 @@ CA_FUNCTION(evaluate_for_loop)
 
         if (inputListLength == 0) {
             // No iterations, use the outer rebind
-            result = get_input_relative(CONTEXT, rebindTerm, 0, -1);
+            result = get_input(CONTEXT, rebindTerm, 0);
         } else {
             // At least one iteration, use our local rebind
-            result = previousFrame.get(rebindTerm->input(1)->registerIndex);
+            result = get_input(CONTEXT, rebindTerm, 1);
         }
 
-        int registerIndex = outputIndexBase + i;
-        copy(result, outputFrame->get(registerIndex));
+        copy(result, get_local(rebindTerm));
     }
-    #endif
 
     // Restore loop context
     CONTEXT->forLoopContext = prevLoopContext;
-
-    swap(output, OUTPUT);
 }
 
 void for_loop_assign_registers(Term* term)

@@ -180,7 +180,10 @@ TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int rel
 
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
 {
-    return get_local(term->input(index));
+    Term* input = term->input(index);
+    if (input == NULL)
+        return NULL;
+    return get_local(input);
     #if 0
     return get_input_relative(cxt, term, index, 0);
     #endif
@@ -213,7 +216,15 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 TaggedValue* get_local(Term* term)
 {
     ca_assert(term->owningBranch != NULL);
-    return term->owningBranch->locals[term->index];
+
+    // TODO: make sure that this list is the right size when building
+    // the branch, instead of here.
+
+    term->owningBranch->locals.resize(term->owningBranch->length());
+
+    TaggedValue* local = term->owningBranch->locals[term->index];
+    ca_assert(local != NULL);
+    return local;
 }
 
 Dict* get_current_scope_state(EvalContext* cxt)
@@ -329,6 +340,17 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
     branch.locals.resize(branch.length());
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch[i]);
+
+    // copy locals back to terms
+    for (int i=start; i <= end; i++) {
+        Term* term = branch[i];
+        if (is_value(term))
+            continue;
+        TaggedValue* value = get_local(term);
+        if (value == NULL)
+            continue;
+        copy(value, term);
+    }
 }
 
 } // namespace circa
