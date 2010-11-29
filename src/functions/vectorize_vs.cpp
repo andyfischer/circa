@@ -15,6 +15,9 @@ namespace vectorize_vs_function {
 
     CA_FUNCTION(evaluate)
     {
+        #if 0
+        FIXME
+
         // Push stack frame
         Branch& contents = CALLER->nestedContents;
         TaggedValue input0, input1;
@@ -45,6 +48,7 @@ namespace vectorize_vs_function {
 
         pop_stack_frame(STACK);
         swap(output, OUTPUT);
+        #endif
     }
 
     void writeBytecode(bytecode::WriteContext* context, Term* term)

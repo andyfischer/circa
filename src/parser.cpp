@@ -39,7 +39,7 @@ Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 
     EvalContext context;
 
-    evaluate_range_with_lazy_stack(&context, branch, prevHead, branch.length() - 1);
+    evaluate_range(&context, branch, prevHead, branch.length() - 1);
 
     return result;
 }

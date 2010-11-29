@@ -25,9 +25,6 @@ struct EvalContext
     // Tree of persistent state
     TaggedValue state;
 
-    // Stack of temporary values
-    List stack;
-
     // Names of state variables which need to be preserved at the end of this branch
     List openStateVariables;
 
@@ -74,15 +71,16 @@ Term* apply_and_eval(Branch& branch,
                     std::string const& functionName,
                     RefList const& inputs);
 
-void copy_stack_back_to_terms(Branch& branch, List* stack);
 TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int relativeStack);
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
+TaggedValue* get_local(Term* term);
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);
 
+#if 0
 List* push_stack_frame(List* stack, int size);
 void pop_stack_frame(List* stack);
 List* get_stack_frame(List* stack, int relativeScope);
@@ -93,5 +91,8 @@ List* get_stack_frame(List* stack, int relativeScope);
 void evaluate_with_lazy_stack(EvalContext* context, Term* term);
 
 void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int start, int end);
+#endif
+
+void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 
 } // namespace circa

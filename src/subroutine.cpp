@@ -43,7 +43,7 @@ namespace subroutine_t {
         Branch& contents = function->nestedContents;
         context->interruptSubroutine = false;
 
-        // Copy inputs to a new stack frame
+        // Copy inputs to input placeholders
         {
             List frame;
             frame.resize(contents.registerCount);
@@ -52,13 +52,16 @@ namespace subroutine_t {
                 TaggedValue* input = get_input(context, caller, i);
                 if (input == NULL)
                     continue;
+                Term* placeholder = function_t::get_input_placeholder(function, i);
                 Term* inputTypeTerm = function_t::get_input_type(function, i);
                 Type* inputType = type_contents(inputTypeTerm);
 
-                ca_assert(cast(input, inputType, frame.get(i)));
+                ca_assert(cast(input, inputType, get_local(placeholder)));
             }
 
+            #if 0
             swap(&frame, context->stack.append());
+            #endif
         }
 
         // prepare output
@@ -78,8 +81,10 @@ namespace subroutine_t {
                 break;
         }
 
+        #if 0
         // Stack frame object may have moved, grab it again.
         List* frame = get_stack_frame(&context->stack, 0);
+        #endif
 
         //std::cout << "finished subroutine, stack = " << context->stack.toString() <<std::endl;
         //dump_branch(contents);
@@ -96,7 +101,10 @@ namespace subroutine_t {
                 outputSource = &context->subroutineOutput;
             }
             else {
+                outputSource = get_local(contents[contents.length()-1]);
+                #if 0
                 outputSource = frame->get(frame->length() - 1);
+                #endif
             }
 
             //std::cout << "found output: " << outputSource->toString() << std::endl;
@@ -116,7 +124,9 @@ namespace subroutine_t {
         // Write to state
         wrap_up_open_state_vars(context, contents);
 
+        #if 0
         pop_stack_frame(&context->stack);
+        #endif
 
         // Restore currentScopeState
         if (is_function_stateful(function))

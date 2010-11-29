@@ -27,6 +27,8 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
 void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
+    branch.locals.resize(branch.length());
+
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, branch[i]);
 }
@@ -48,7 +50,7 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
         }
 
         ca_assert(term->registerIndex != -1);
-        TaggedValue* result = get_stack_frame(&context->stack, 0)->get(term->registerIndex);
+        TaggedValue* result = get_local(term);
         //std::cout << "saving state: " << result->toString() << " to " << name << std::endl;
         copy(result, state->insert(name));
     }
@@ -57,8 +59,15 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
 
 void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedValue* output)
 {
+    #if 0
     List* frame = push_stack_frame(&context->stack, branch.registerCount);
+    #endif
     evaluate_branch_existing_frame(context, branch);
+
+    if (output != NULL)
+        swap(get_local(branch[branch.length()-1]), output);
+
+    #if 0
     frame = get_stack_frame(&context->stack, 0);
     if (output != NULL) {
         TaggedValue* lastValue = frame->get(frame->length()-1);
@@ -68,24 +77,27 @@ void evaluate_branch_in_new_frame(EvalContext* context, Branch& branch, TaggedVa
             set_null(output);
     }
     pop_stack_frame(&context->stack);
+    #endif
 }
 
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
+    #if 0
     push_stack_frame(&context->stack, branch.registerCount);
+    #endif
+
     copy(&context->state, &context->currentScopeState);
     evaluate_branch_existing_frame(context, branch);
     wrap_up_open_state_vars(context, branch);
     copy(&context->currentScopeState, &context->state);
 
     // Copy stack back to terms
-    List* frame = get_stack_frame(&context->stack, 0);
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;
         TaggedValue* val = NULL;
         if (term->registerIndex != -1)
-            val = frame->get(term->registerIndex);
+            val = get_local(term);
         if (val != NULL)
             swap(val, branch[i]);
     }
@@ -115,7 +127,8 @@ Term* apply_and_eval(Branch& branch, std::string const& functionName,
     return apply_and_eval(branch, function, inputs);
 }
 
-void copy_stack_back_to_terms(Branch& branch, List* frame)
+#if 0
+void copy_stack_back_to_terms(Branch& branch)
 {
     for (BranchIterator it(branch); !it.finished(); ++it) {
         Term* term = *it;
@@ -129,17 +142,22 @@ void copy_stack_back_to_terms(Branch& branch, List* frame)
         if (is_value(term))
             continue;
 
-        TaggedValue* value = frame->get(term->registerIndex);
+        TaggedValue* value = get_local(term);
         if (value == NULL)
             continue;
 
         copy(value, term);
     }
 }
+#endif
 
 TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int relativeStack)
 {
     Term* input = term->input(index);
+
+    return get_local(input);
+
+    #if 0
     InputInfo& inputInfo = term->inputInfo(index);
 
     if (input == NULL)
@@ -157,20 +175,28 @@ TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int rel
 
     List* frame = List::checkCast(stack->get(stack->length() - 1 - stackDistance));
     return frame->get(term->input(index)->registerIndex);
+    #endif
 }
 
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
 {
+    return get_local(term->input(index));
+    #if 0
     return get_input_relative(cxt, term, index, 0);
+    #endif
 }
 
 TaggedValue* get_output(EvalContext* cxt, Term* term)
 {
+    return get_local(term);
+
+    #if 0
     if (term->registerIndex == -1)
         return NULL;
     List* stack = &cxt->stack;
     List* frame = List::checkCast(stack->get(stack->length()-1));
     return frame->get(term->registerIndex);
+    #endif
 }
 
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
@@ -183,6 +209,13 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
         return get_input(cxt, term, 0);
     }
 }
+
+TaggedValue* get_local(Term* term)
+{
+    ca_assert(term->owningBranch != NULL);
+    return term->owningBranch->locals[term->index];
+}
+
 Dict* get_current_scope_state(EvalContext* cxt)
 {
     return Dict::lazyCast(&cxt->currentScopeState);
@@ -198,6 +231,7 @@ void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* resu
     copy(result, containerDict->insert(term->uniqueName.name.c_str()));
 }
 
+#if 0
 List* push_stack_frame(List* stack, int size)
 {
     int newStackLength = stack->length() + 1;
@@ -288,6 +322,13 @@ void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int st
     context->stack.clear();
     for (int i=start; i <= end; i++)
         evaluate_with_lazy_stack(context, branch[i]);
+}
+#endif
+void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
+{
+    branch.locals.resize(branch.length());
+    for (int i=start; i <= end; i++)
+        evaluate_single_term(context, branch[i]);
 }
 
 } // namespace circa

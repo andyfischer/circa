@@ -25,6 +25,8 @@ struct Branch
     int registerCount;
     int outputRegister;
 
+    List locals;
+
     bytecode::BytecodeData _bytecode;
 
     Branch();

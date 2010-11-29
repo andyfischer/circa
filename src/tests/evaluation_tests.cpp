@@ -7,6 +7,7 @@ namespace evaluation_tests {
 
 void test_evaluate_with_lazy_stack()
 {
+    #if 0
     Branch branch;
     branch.compile("a = 1");
     branch.compile("b = 3");
@@ -22,6 +23,7 @@ void test_evaluate_with_lazy_stack()
     evaluate_with_lazy_stack(&context, d);
     test_equals(context.stack.toString(), "[[1, 3, 2, 4]]");
     test_equals(as_int(d), 4);
+    #endif
 }
 
 void test_branch_eval()
@@ -30,6 +32,7 @@ void test_branch_eval()
     branch.eval("a = 1");
 }
 
+#if 0
 void test_copy_stack_back_to_terms()
 {
     Branch branch;
@@ -58,12 +61,13 @@ void test_copy_stack_back_to_terms()
     test_equals(b->asInt(), 20);
     test_equals(c->asInt(), 30);
 }
+#endif
 
 void register_tests()
 {
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_with_lazy_stack);
     REGISTER_TEST_CASE(evaluation_tests::test_branch_eval);
-    REGISTER_TEST_CASE(evaluation_tests::test_copy_stack_back_to_terms);
+    //REGISTER_TEST_CASE(evaluation_tests::test_copy_stack_back_to_terms);
 }
 
 } // evaluation_tests

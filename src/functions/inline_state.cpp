@@ -42,7 +42,6 @@ namespace inline_state_function {
             // todo: check if we need to cast this value
             copy(value, OUTPUT);
 
-
         // If we didn't find the value, see if they provided a default
         } else if (INPUT(2) != NULL) {
             copy(INPUT(2), OUTPUT);

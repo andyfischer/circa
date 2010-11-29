@@ -172,7 +172,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     }
 
     // For each name in #joining, we want corresponding variables (across the
-    // branches in this if-block) to have the same stack indexes.
+    // branches in this if-block) to have the same register indexes.
     for (int i=0; i < joining.length(); i++) {
         ca_assert(joining[i] != NULL);
         if (joining[i]->registerIndex == -1)
@@ -180,7 +180,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         std::string const& name = joining[i]->name;
         ca_assert(name != "");
 
-        // Find the corresponding term in each branch, give it this stack index.
+        // Find the corresponding term in each branch, give it this register index.
         for (int b=0; b < numBranches; b++) {
             Term* term = blockContents[b]->nestedContents[name];
             if (term != NULL)
@@ -226,7 +226,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         Branch& branchContents = term->nestedContents;
         bytecode::write_bytecode_for_branch(context, branchContents, conditionLocalState);
 
-        // For each local rebind, make sure that the branch writes to its stack position.
+        // For each local rebind, make sure that the branch writes to its register position.
         // If one branch doesn't mention a local rebind, then insert a copy term.
         for (int i=0; i < joining.length(); i++) {
             std::string const& name = joining[i]->name;
@@ -289,7 +289,9 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
+            #if 0
             push_stack_frame(STACK, contents.registerCount);
+            #endif
             evaluate_branch_existing_frame(CONTEXT, contents);
 
             acceptedBranchIndex = i;
@@ -298,6 +300,7 @@ CA_FUNCTION(evaluate_if_block)
     }
 
     // Copy the results of our #join terms to the stack
+    #if 0
     Branch& joining = contents[contents.length()-1]->nestedContents;
     List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
 
@@ -308,6 +311,7 @@ CA_FUNCTION(evaluate_if_block)
     }
 
     pop_stack_frame(STACK);
+    #endif
 }
 
 } // namespace circa

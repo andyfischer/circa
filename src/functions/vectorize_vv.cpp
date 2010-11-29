@@ -56,6 +56,8 @@ namespace vectorize_vv_function {
 
     CA_FUNCTION(evaluate)
     {
+        #if 0
+        FIXME
         // Push stack frame
         Branch& contents = CALLER->nestedContents;
         TaggedValue input0, input1;
@@ -84,6 +86,7 @@ namespace vectorize_vv_function {
 
         pop_stack_frame(STACK);
         swap(output, OUTPUT);
+        #endif
     }
 
     void post_input_change(Term* term)

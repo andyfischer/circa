@@ -33,7 +33,6 @@
 #define OUTPUT (get_output(_circa_cxt, _circa_caller))
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_caller->function)
-#define STACK (&_circa_cxt->stack)
 
 #define CA_SETUP_FUNCTIONS(branch) {\
     for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \

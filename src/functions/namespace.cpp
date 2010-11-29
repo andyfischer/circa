@@ -8,6 +8,7 @@ namespace namespace_function {
 
     CA_FUNCTION(evaluate)
     {
+        #if 0
         Branch& contents = CALLER->nestedContents;
         push_stack_frame(STACK, contents.registerCount);
         evaluate_branch_existing_frame(CONTEXT, contents);
@@ -24,6 +25,7 @@ namespace namespace_function {
         }
         pop_stack_frame(STACK);
         swap(&outputTv, OUTPUT);
+        #endif
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -41,6 +43,8 @@ namespace namespace_function {
 
     CA_FUNCTION(get_namespace_field)
     {
+        #if 0
+        FIXME
         Dict* dict = Dict::checkCast(INPUT(0));
         if (dict == NULL)
             return error_occurred(CONTEXT, CALLER, "type mismatch");
@@ -48,6 +52,7 @@ namespace namespace_function {
         const char* name = STRING_INPUT(1);
 
         copy(dict->get(name), OUTPUT);
+        #endif
     }
 
     Term* get_namespace_field_specialize_type(Term* caller)
