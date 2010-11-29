@@ -71,6 +71,7 @@ void test_rebind_internally()
     branch.compile("found_3 = false");
     branch.compile("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end; found_3=found_3");
     evaluate_branch(branch);
+    dump_branch(branch);
     test_assert(branch["found_3"]->asBool());
 
     branch.compile("found_3 = false");

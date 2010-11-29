@@ -320,6 +320,20 @@ void test_cond()
     test_snippet("", "cond(false, 5, true) == true");
 }
 
+void test_if_block()
+{
+    test_snippet("a = 1; if true a = 2 end", "a == 2");
+    test_snippet("a = 1; if false a = 2 end", "a == 1");
+    test_snippet("a = 1; if true a = 2 else end", "a == 2");
+    test_snippet("a = 1; if false a = 2 else end", "a == 1");
+    test_snippet("a = 1; if true a = 2 else a = 3 end", "a == 2");
+    test_snippet("a = 1; if false a = 2 else a = 3 end", "a == 3");
+    test_snippet("a = 1; if true else a = 3 end", "a == 1");
+    test_snippet("a = 1; if false else a = 3 end", "a == 3");
+    test_snippet("a = 1; if false a = 2 elif true a = 3 else a = 4 end", "a == 3");
+    test_snippet("a = 1; if false a = 2 elif false a = 3 else a = 4 end", "a == 4");
+}
+
 void test_for_loops()
 {
     test_snippet("l = []; for i in 0..3; int(@i), l.append(i); end", "l == [0 1 2]");
@@ -521,6 +535,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
     REGISTER_TEST_CASE(test_snippets::test_cond);
+    REGISTER_TEST_CASE(test_snippets::test_if_block);
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);

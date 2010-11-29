@@ -299,19 +299,13 @@ CA_FUNCTION(evaluate_if_block)
         }
     }
 
-    // Copy the results of our #join terms to the stack
-    #if 0
+    // Copy values to joining terms
     Branch& joining = contents[contents.length()-1]->nestedContents;
-    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        TaggedValue* val = get_input(CONTEXT, joinTerm, acceptedBranchIndex);
-        copy(val, outputFrame->get(joinTerm->registerIndex));
+        copy(get_input(CONTEXT, joinTerm, acceptedBranchIndex), get_local(joinTerm));
     }
-
-    pop_stack_frame(STACK);
-    #endif
 }
 
 } // namespace circa

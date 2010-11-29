@@ -215,7 +215,8 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 
 TaggedValue* get_local(Term* term)
 {
-    ca_assert(term->owningBranch != NULL);
+    if (term->owningBranch == NULL)
+        return NULL;
 
     // TODO: make sure that this list is the right size when building
     // the branch, instead of here.
@@ -223,7 +224,6 @@ TaggedValue* get_local(Term* term)
     term->owningBranch->locals.resize(term->owningBranch->length());
 
     TaggedValue* local = term->owningBranch->locals[term->index];
-    ca_assert(local != NULL);
     return local;
 }
 
