@@ -85,7 +85,7 @@ struct Branch
     // Compile the given statement, return the result term.
     Term* compile(std::string const& statement);
 
-    // Evaluate the given statement, return the result term.
+    // Evaluate the given statement, return the result value.
     Term* eval(std::string const& statement);
 
     std::string toString();

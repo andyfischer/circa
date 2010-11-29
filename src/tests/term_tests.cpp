@@ -52,7 +52,7 @@ void remove_user_reference_on_delete()
 void duplicate_nested_contents()
 {
     Branch branch;
-    Term* a = branch.eval("a = branch()");
+    Term* a = branch.compile("a = branch()");
 
     Term* x = create_int(a->nestedContents, 5);
 

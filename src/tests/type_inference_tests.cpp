@@ -41,11 +41,11 @@ void test_find_type_of_get_index()
 void compare_builtin_types()
 {
     Branch branch;
-    Term* aFloat = branch.eval("1.2");
+    Term* aFloat = branch.compile("1.2");
     test_assert(term_output_always_satisfies_type(aFloat, type_contents(FLOAT_TYPE)));
     test_assert(term_output_never_satisfies_type(aFloat, type_contents(INT_TYPE)));
 
-    Term* anInt = branch.eval("1");
+    Term* anInt = branch.compile("1");
     test_assert(term_output_always_satisfies_type(anInt, type_contents(FLOAT_TYPE)));
     test_assert(term_output_always_satisfies_type(anInt, type_contents(INT_TYPE)));
 }

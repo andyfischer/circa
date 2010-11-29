@@ -30,7 +30,7 @@ void test_if_joining_on_bool()
     // The following code once had a bug where cond wouldn't work
     // if one of its inputs was missing value.
     Branch branch;
-    Term* s = branch.eval("hey = true");
+    TaggedValue* s = branch.eval("hey = true");
 
     test_assert(s->value_data.ptr != NULL);
 

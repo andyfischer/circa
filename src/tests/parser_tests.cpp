@@ -188,7 +188,7 @@ void test_function_decl()
     //test_assert(funcbranch.length() == 7);
 
     // This string once caused an error
-    Term* a = branch.eval("def f()\n  end");
+    Term* a = branch.compile("def f()\n  end");
     test_assert(a);
 }
 
@@ -250,10 +250,10 @@ void test_dot_concatenation()
 {
     Branch branch;
 
-    branch.eval("s = Set()");
+    branch.compile("s = Set()");
 
     // This function should rebind 's'
-    Term *s = branch.eval("s.add(1)");
+    Term *s = branch.compile("s.add(1)");
 
     test_assert(branch.length() == 3);
     test_assert(is_value(branch[0]));
@@ -277,8 +277,8 @@ void test_syntax_hints()
 void test_implicit_copy_by_identifier()
 {
     Branch branch;
-    Term* a = branch.eval("a = 1");
-    Term* b = branch.eval("b = a");
+    Term* a = branch.compile("a = 1");
+    Term* b = branch.compile("b = a");
 
     test_assert(b->function == COPY_FUNC);
     test_assert(b->input(0) == a);
@@ -287,8 +287,8 @@ void test_implicit_copy_by_identifier()
 void test_rebinding_infix_operator()
 {
     Branch branch;
-    branch.eval("i = 1.0");
-    Term* i = branch.eval("i += 1.0");
+    branch.compile("i = 1.0");
+    Term* i = branch.compile("i += 1.0");
 
     test_assert(branch["i"] == i);
     test_assert(i->function->name == "add");
@@ -299,8 +299,8 @@ void test_rebinding_infix_operator()
 void test_infix_whitespace()
 {
     Branch branch;
-    branch.eval("a = 1");
-    branch.eval("b = 1");
+    branch.compile("a = 1");
+    branch.compile("b = 1");
 
     Term* term = parser::compile(&branch, parser::infix_expression, "  a + b");
     test_equals(term->stringProp("syntax:preWhitespace"), "  ");
@@ -317,12 +317,12 @@ void test_infix_whitespace()
 void test_list_arguments()
 {
     Branch branch;
-    Term *t = branch.eval("add(1 2 3)");
+    Term *t = branch.compile("add(1 2 3)");
     test_assert(as_int(t->input(0)) == 1);
     test_assert(as_int(t->input(1)) == 2);
     test_assert(as_int(t->input(2)) == 3);
 
-    t = branch.eval("add(5\n 6 , 7;8)");
+    t = branch.compile("add(5\n 6 , 7;8)");
     test_assert(as_int(t->input(0)) == 5);
     test_assert(as_int(t->input(1)) == 6);
     test_assert(as_int(t->input(2)) == 7);
@@ -332,7 +332,7 @@ void test_list_arguments()
 void test_function_decl_parse_error()
 {
     Branch branch;
-    Term* t = branch.eval("def !@#$");
+    Term* t = branch.compile("def !@#$");
 
     test_assert(t->function == UNRECOGNIZED_EXPRESSION_FUNC);
     test_assert(has_static_error(t));

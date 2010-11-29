@@ -9,8 +9,8 @@ void test_tagged_value()
 {
     Branch branch;
 
-    branch.eval("type MyType { string s, int i }");
-    Term* val = branch.eval("MyType()");
+    branch.compile("type MyType { string s, int i }");
+    TaggedValue* val = branch.eval("MyType()");
 
     test_assert(is_string(val->getIndex(0)));
     test_assert(is_int(val->getIndex(1)));
@@ -53,7 +53,7 @@ void test_cast()
     test_assert(cast(&b, LIST_T, &x));
     test_equals(x.toString(), "[1, 2]");
 
-    Term* t_term = branch.eval("type T { int i, number f }");
+    Term* t_term = branch.compile("type T { int i, number f }");
     Type* t = type_contents(t_term);
 
     test_assert(!cast_possible(&a, t));

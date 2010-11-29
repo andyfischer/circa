@@ -64,10 +64,10 @@ void test_int_simple()
     test_assert(as_int(&v) == 4);
 
     Branch branch;
-    Term* a = branch.eval("a = 1");
+    Term* a = branch.compile("a = 1");
     test_assert(is_int(a));
 
-    Term* b = branch.eval("b = a");
+    Term* b = branch.compile("b = a");
     test_assert(is_int(b));
 }
 
@@ -101,11 +101,11 @@ void test_term_value()
     test_assert(is_int(i));
     test_assert(is_int(i));
 
-    Term* a = branch.eval("a = [1 2 3]");
+    TaggedValue* a = branch.eval("a = [1 2 3]");
     test_assert(a->numElements() == 3);
     test_assert(a->getIndex(1)->asInt() == 2);
 
-    Term* b = branch.eval("b = a");
+    TaggedValue* b = branch.eval("b = a");
     test_assert(b->numElements() == 3);
     test_assert(b->getIndex(1)->asInt() == 2);
     
@@ -144,7 +144,7 @@ void test_constructor_syntax()
     TypeRef myType = Type::create();
     myType->name = "T";
     import_type(branch, myType);
-    Term* a = branch.eval("a = T()");
+    TaggedValue* a = branch.eval("a = T()");
     test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
     reset(a);

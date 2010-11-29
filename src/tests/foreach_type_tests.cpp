@@ -14,7 +14,7 @@ bool run_test_for_type(Term* type, List& exampleValues)
 
     test_assert(branch.eval("x == x"));
 
-    Term* cpy = branch.eval("cpy = copy(x)");
+    TaggedValue* cpy = branch.eval("cpy = copy(x)");
     test_assert(branch);
     test_assert(equals(x, cpy));
 
@@ -23,15 +23,15 @@ bool run_test_for_type(Term* type, List& exampleValues)
     test_assert(!equals(x,y));
     test_assert(branch.eval("x != y"));
 
-    Term* cnd1 = branch.eval("cond(true, x, y)");
-    Term* cnd2 = branch.eval("cond(false, x, y)");
+    TaggedValue* cnd1 = branch.eval("cond(true, x, y)");
+    TaggedValue* cnd2 = branch.eval("cond(false, x, y)");
     test_assert(branch);
     test_assert(equals(cnd1, x));
     test_assert(equals(cnd2, y));
 
     branch.eval("boxed = [x y]");
-    Term* unbox1 = branch.eval("boxed[0]");
-    Term* unbox2 = branch.eval("boxed[1]");
+    TaggedValue* unbox1 = branch.eval("boxed[0]");
+    TaggedValue* unbox2 = branch.eval("boxed[1]");
     test_assert(branch);
     test_assert(equals(unbox1, x));
     test_assert(equals(unbox2, y));

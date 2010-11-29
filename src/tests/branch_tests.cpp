@@ -170,9 +170,9 @@ void test_duplicate()
 void test_duplicate_nested()
 {
     Branch branch;
-    branch.eval("a = 1.0");
-    Branch& inner = branch.eval("inner = branch()")->nestedContents;
-    inner.eval("i = 2.0");
+    branch.compile("a = 1.0");
+    Branch& inner = branch.compile("inner = branch()")->nestedContents;
+    inner.compile("i = 2.0");
     inner.compile("j = add(a,i)");
 
     Branch dupe;
@@ -201,8 +201,8 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = orig.eval("inner = branch()")->nestedContents;
-    inner.eval("i = 2");
+    Branch& inner = orig.compile("inner = branch()")->nestedContents;
+    inner.compile("i = 2");
 
     Branch dupe;
     duplicate_branch(orig, dupe);
@@ -217,7 +217,7 @@ void test_duplicate_subroutine()
 {
     Branch branch;
 
-    Term* func = branch.eval("def func()\na = 1\nend");
+    Term* func = branch.compile("def func()\na = 1\nend");
 
     // sanity check:
     test_assert(function_t::get_name(func) == "func");
@@ -244,9 +244,9 @@ void test_duplicate_subroutine()
 void test_duplicate_get_field_by_name()
 {
     Branch branch;
-    branch.eval("type mytype { int f }");
-    branch.eval("v = mytype()");
-    Term* b = branch.eval("b = v.f");
+    branch.compile("type mytype { int f }");
+    branch.compile("v = mytype()");
+    Term* b = branch.compile("b = v.f");
 
     test_assert(b->function == GET_FIELD_FUNC);
 
@@ -264,8 +264,8 @@ void test_duplicate_get_field_by_name()
 void test_duplicate_destination_has_different_type()
 {
     Branch source, dest;
-    Term* a = source.eval("a = any()");
-    Term* p = source.eval("p = Point()");
+    TaggedValue* a = source.eval("a = any()");
+    TaggedValue* p = source.eval("p = Point()");
     copy(p,a);
     // This once tripped an assert:
     duplicate_branch(source, dest);
@@ -276,7 +276,7 @@ void find_name_in_outer_branch()
     Branch branch;
     Branch& nested = create_branch(branch);
 
-    Term* a = nested.eval("a = 1");
+    Term* a = nested.compile("a = 1");
 
     Branch& nested2 = create_branch(nested);
 

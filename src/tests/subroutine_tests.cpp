@@ -8,7 +8,7 @@ namespace subroutine_tests {
 void test_return_from_conditional()
 {
     Branch branch;
-    branch.eval("def my_max(number a, number b) -> number\n"
+    branch.compile("def my_max(number a, number b) -> number\n"
                 "  if (a < b)\n"
                 "    return(b)\n"
                 "  else\n"
@@ -18,11 +18,8 @@ void test_return_from_conditional()
 
     test_assert(branch);
 
-    branch.eval("my_max(3,8)");
     test_equals(branch.eval("my_max(3,8)")->toFloat(), 8);
     test_equals(branch.eval("my_max(3,3)")->toFloat(), 3);
-
-    branch.eval("my_max(11,0)");
 
     test_equals(branch.eval("my_max(11,0)")->toFloat(), 11);
 }
@@ -33,11 +30,11 @@ void test_recursion()
 
     // I think this is the simplest possible recursive function. Evaluate it
     // just to make sure that nothing crashes.
-    branch.eval("def recr(bool r) if r recr(false) end end");
+    branch.compile("def recr(bool r) if r recr(false) end end");
     branch.eval("recr(true)");
 
     // Factorial
-    branch.eval("def factorial(int n) -> int\n"
+    branch.compile("def factorial(int n) -> int\n"
                 "  if (n < 2)\n"
                 "    return(1)\n"
                 "  else\n"
@@ -46,23 +43,23 @@ void test_recursion()
                 "  end\n"
                 "end");
 
-    Term* fact_1 = branch.eval("factorial(1)");
-    test_assert(fact_1);
+    TaggedValue* fact_1 = branch.eval("factorial(1)");
+    test_assert(branch);
     test_assert(fact_1->asInt() == 1);
 
-    Term* fact_2 = branch.eval("factorial(2)");
-    test_assert(fact_2);
+    TaggedValue* fact_2 = branch.eval("factorial(2)");
+    test_assert(branch);
     test_assert(fact_2->asInt() == 2);
 
-    Term* fact_3 = branch.eval("factorial(3)");
-    test_assert(fact_3);
+    TaggedValue* fact_3 = branch.eval("factorial(3)");
+    test_assert(branch);
     test_assert(fact_3->asInt() == 6);
 
-    Term* fact_4 = branch.eval("factorial(4)");
-    test_assert(fact_4);
+    TaggedValue* fact_4 = branch.eval("factorial(4)");
+    test_assert(branch);
     test_assert(fact_4->asInt() == 24);
 
-    branch.eval("def recr(int n) -> int\n"
+    branch.compile("def recr(int n) -> int\n"
                 "  if (n == 1)\n"
                 "    return(1)\n"
                 "  else\n"
@@ -133,10 +130,10 @@ void initialize_state_type()
 {
     Branch branch;
 
-    Term* a = branch.eval("def a() -> number\nreturn(1 + 1)\nend");
+    Term* a = branch.compile("def a() -> number\nreturn(1 + 1)\nend");
     test_assert(function_t::get_inline_state_type(a) == VOID_TYPE);
 
-    Term* b = branch.eval("def b()\nstate i\nend");
+    Term* b = branch.compile("def b()\nstate i\nend");
     test_assert(function_t::get_inline_state_type(b) != VOID_TYPE);
 }
 
@@ -147,7 +144,7 @@ void shadow_input()
     // Try having a name that shadows an input. This had a bug at one point
     branch.eval("def f(int i) -> int\ni = 2\nreturn(i)\nend");
 
-    Term* a = branch.eval("f(1)");
+    TaggedValue* a = branch.eval("f(1)");
 
     test_assert(a->asInt() == 2);
 }
@@ -158,12 +155,12 @@ void specialization_to_output_type()
     // than the implicit output type, then make sure that it uses the
     // declared type. This code once had a bug.
     Branch branch;
-    Term* a = branch.eval("def a() -> Point\nreturn([1 2])\nend");
+    Term* a = branch.compile("def a() -> Point\nreturn([1 2])\nend");
 
     test_assert(function_t::get_output_type(a)->name == "Point");
 
     // Make sure that the return value is preserved. This had a bug too
-    Term* call = branch.eval("a()");
+    TaggedValue* call = branch.eval("a()");
     test_assert(call->numElements() == 2);
     test_equals(call->getIndex(0)->toFloat(), 1.0);
     test_equals(call->getIndex(1)->toFloat(), 2.0);
@@ -173,8 +170,8 @@ void stateful_function_with_arguments()
 {
     // This code once had a bug
     Branch branch;
-    branch.eval("def myfunc(int i) -> int\nstate s\nreturn(i)\nend");
-    Term* call = branch.eval("myfunc(5)");
+    branch.compile("def myfunc(int i) -> int\nstate s\nreturn(i)\nend");
+    TaggedValue* call = branch.eval("myfunc(5)");
     test_assert(call->asInt() == 5);
 }
 
@@ -182,8 +179,8 @@ void to_source_string()
 {
     // This code once had a bug
     Branch branch;
-    branch.eval("def f() end");
-    Term* c = branch.eval("f()");
+    branch.compile("def f() end");
+    Term* c = branch.compile("f()");
 
     test_equals(get_term_source_text(c), "f()");
 }

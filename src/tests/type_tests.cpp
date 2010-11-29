@@ -12,7 +12,7 @@ void compound_types()
 {
     Branch branch;
 
-    Term* MyType = branch.eval("type MyType { int myint, string astr }");
+    Term* MyType = branch.compile("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
     Branch& prototype = type_t::get_prototype(MyType);
@@ -58,8 +58,8 @@ void compound_types()
 void compound_type_cast()
 {
     Branch branch;
-    Term* t = branch.eval("type T { string a }");
-    Term* a = branch.eval("['hi']");
+    Term* t = branch.compile("type T { string a }");
+    TaggedValue* a = branch.eval("['hi']");
     test_assert(is_list(a));
     test_assert(a->value_type != type_contents(t));
 
@@ -72,7 +72,7 @@ void compound_type_cast()
 void type_declaration()
 {
     Branch branch;
-    Term* myType = branch.eval("type MyType { string a, int b } ");
+    Term* myType = branch.compile("type MyType { string a, int b } ");
 
     Branch& prototype = type_t::get_prototype(myType);
     test_assert(prototype.length() == 2);
@@ -85,7 +85,7 @@ void type_declaration()
     test_assert(type->initialize != NULL);
     test_assert(type->copy != NULL);
 
-    branch.eval("mt = MyType()");
+    branch.compile("mt = MyType()");
 
     test_assert(branch);
 }
@@ -100,36 +100,36 @@ void test_term_output_always_satisfies_type()
     test_assert(!term_output_always_satisfies_type(a, type_contents(STRING_TYPE)));
     test_assert(term_output_always_satisfies_type(a, type_contents(ANY_TYPE)));
 
-    Type* t1 = type_contents(branch.eval("type t1 { int a, number b }"));
-    Type* t2 = type_contents(branch.eval("type t2 { int a }"));
-    Type* t3 = type_contents(branch.eval("type t3 { int a, number b, string c }"));
-    Type* t4 = type_contents(branch.eval("type t4 { number a, int b }"));
+    Type* t1 = type_contents(branch.compile("type t1 { int a, number b }"));
+    Type* t2 = type_contents(branch.compile("type t2 { int a }"));
+    Type* t3 = type_contents(branch.compile("type t3 { int a, number b, string c }"));
+    Type* t4 = type_contents(branch.compile("type t4 { number a, int b }"));
 
-    Term* v1 = branch.eval("[1, 2.0]");
+    Term* v1 = branch.compile("[1, 2.0]");
     test_assert(term_output_always_satisfies_type(v1, t1));
     test_assert(!term_output_always_satisfies_type(v1, t2));
     test_assert(!term_output_always_satisfies_type(v1, t3));
     test_assert(!term_output_always_satisfies_type(v1, t4));
 
-    Term* v2 = branch.eval("['hello' 2.0]");
+    Term* v2 = branch.compile("['hello' 2.0]");
     test_assert(!term_output_always_satisfies_type(v2, t1));
     test_assert(!term_output_always_satisfies_type(v2, t2));
     test_assert(!term_output_always_satisfies_type(v2, t3));
     test_assert(!term_output_always_satisfies_type(v2, t4));
 
-    Term* v3 = branch.eval("[1]");
+    Term* v3 = branch.compile("[1]");
     test_assert(!term_output_always_satisfies_type(v3, t1));
     test_assert(term_output_always_satisfies_type(v3, t2));
     test_assert(!term_output_always_satisfies_type(v3, t3));
     test_assert(!term_output_always_satisfies_type(v3, t4));
     
-    Term* v4 = branch.eval("[]");
+    Term* v4 = branch.compile("[]");
     test_assert(!term_output_always_satisfies_type(v4, t1));
     test_assert(!term_output_always_satisfies_type(v4, t2));
     test_assert(!term_output_always_satisfies_type(v4, t3));
     test_assert(!term_output_always_satisfies_type(v4, t4));
 
-    Term* v5 = branch.eval("[1 2]");
+    Term* v5 = branch.compile("[1 2]");
     test_assert(term_output_always_satisfies_type(v5, t1));  // coercion into a compound value
     test_assert(!term_output_always_satisfies_type(v5, t2));
     test_assert(!term_output_always_satisfies_type(v5, t3));
@@ -185,7 +185,7 @@ void test_assign_compound_value_to_default()
 {
     Branch branch;
 
-    Term* t = branch.eval("[1 2 3]");
+    TaggedValue* t = branch.eval("[1 2 3]");
     reset(t);
 
     //FIXME
@@ -239,8 +239,8 @@ void test_create_implicit_tuple_type()
     RefList types(INT_TYPE, FLOAT_TYPE, STRING_TYPE);
     Term* result = create_implicit_tuple_type(types);
 
-    Term* a = branch.eval("[1, 3.0, 'hi']");
-    Term* b = branch.eval("['hi', 3.0, 1]");
+    TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
+    TaggedValue* b = branch.eval("['hi', 3.0, 1]");
 
     test_assert(value_fits_type(a, type_contents(result)));
     test_assert(!value_fits_type(b, type_contents(result)));

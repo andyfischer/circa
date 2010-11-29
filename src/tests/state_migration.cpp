@@ -100,8 +100,8 @@ void migrate_across_user_defined_types()
 {
     // Pre-test work, make sure that 'state T t = [1]' works
     Branch branch;
-    Term* typeT = branch.eval("type T { int x }");
-    Term* x = branch.eval("x = [1]");
+    Term* typeT = branch.compile("type T { int x }");
+    TaggedValue* x = branch.eval("x = [1]");
     test_assert(value_fits_type(x, type_contents(typeT)));
 
     // Type T is defined the same way

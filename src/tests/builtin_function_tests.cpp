@@ -62,7 +62,7 @@ void test_builtin_equals()
 void test_list()
 {
     Branch branch;
-    Term* l = branch.eval("l = list(1,2,'foo')");
+    TaggedValue* l = branch.eval("l = list(1,2,'foo')");
 
     test_assert(l->getIndex(0)->asInt() == 1);
     test_assert(l->getIndex(1)->asInt() == 2);
@@ -72,7 +72,7 @@ void test_list()
 void test_vectorized_funcs()
 {
     Branch branch;
-    Term* t = branch.eval("[1 2 3] + [4 5 6]");
+    TaggedValue* t = branch.eval("[1 2 3] + [4 5 6]");
     test_assert(t);
 
     test_assert(t->numElements() == 3);
@@ -104,11 +104,13 @@ void test_vectorized_funcs_with_points()
     
     Term* point_t = branch.compile("type Point {number x, number y}");
 
-    Term* a = branch.eval("a = [1 0] -> Point");
+    Term* a = branch.compile("a = [1 0] -> Point");
 
     test_assert(a->type == point_t);
 
-    Term* b = branch.eval("b = a + [0 2]");
+    Term* b = branch.compile("b = a + [0 2]");
+
+    evaluate_branch(branch);
 
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);
@@ -119,9 +121,9 @@ void test_cond_with_int_and_float()
     Branch branch;
 
     // This code once caused a bug
-    Term* a = branch.eval("cond(true, 1, 1.0)");
+    Term* a = branch.compile("cond(true, 1, 1.0)");
     test_assert(a->type != ANY_TYPE);
-    Term* b = branch.eval("cond(true, 1.0, 1)");
+    Term* b = branch.compile("cond(true, 1.0, 1)");
     test_assert(b->type != ANY_TYPE);
 }
 
@@ -129,7 +131,7 @@ void test_get_index()
 {
     Branch branch;
     branch.eval("l = [1 2 3]");
-    Term* get = branch.eval("get_index(l, 0)");
+    TaggedValue* get = branch.eval("get_index(l, 0)");
 
     test_assert(get);
     test_assert(get->value_type == type_contents(INT_TYPE));
@@ -150,15 +152,13 @@ void test_set_index()
     Branch branch;
 
     branch.eval("l = [1 2 3]");
-    Term* l2 = branch.eval("set_index(@l, 1, 5)");
+    TaggedValue* l2 = branch.eval("set_index(@l, 1, 5)");
 
-    test_assert(l2);
     test_assert(l2->getIndex(0)->asInt() == 1);
     test_assert(l2->getIndex(1)->asInt() == 5);
     test_assert(l2->getIndex(2)->asInt() == 3);
 
-    Term* l3 = branch.eval("l[2] = 9");
-    test_assert(l3);
+    TaggedValue* l3 = branch.eval("l[2] = 9");
     test_assert(l3->getIndex(0)->asInt() == 1);
     test_assert(l3->getIndex(1)->asInt() == 5);
     test_assert(l3->getIndex(2)->asInt() == 9);

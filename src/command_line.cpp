@@ -73,7 +73,7 @@ int run_command_line(std::vector<std::string> args)
         }
 
         Branch workspace;
-        Term* result = workspace.eval(command.str());
+        TaggedValue* result = workspace.eval(command.str());
         std::cout << result->toString() << std::endl;
         return 0;
     }

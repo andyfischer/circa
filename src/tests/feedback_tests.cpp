@@ -107,7 +107,7 @@ void train_sin()
 void train_cos()
 {
     Branch branch;
-    Term* a = branch.eval("a = 5.0");
+    Term* a = branch.compile("a = 5.0");
     branch.eval("cos(a) <- 1");
 
     set_trainable(a, true);

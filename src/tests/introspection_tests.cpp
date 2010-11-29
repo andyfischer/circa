@@ -14,18 +14,18 @@ void test_is_value()
     test_assert(is_value(create_value(branch, INT_TYPE)));
     test_assert(is_value(create_value(branch, STRING_TYPE)));
     test_assert(is_value(create_value(branch, BOOL_TYPE)));
-    test_assert(!is_value(branch.eval("1 + 2")));
+    test_assert(!is_value(branch.compile("1 + 2")));
 }
 
 void test_get_involved_terms()
 {
     Branch branch;
 
-    Term* a = branch.eval("a = 1.0");
-    branch.eval("b = 2.0");
-    Term* c = branch.eval("c = add(a,b)");
-    Term* d = branch.eval("d = add(c,5.0)");
-    branch.eval("e = add(c,5.0)");
+    Term* a = branch.compile("a = 1.0");
+    branch.compile("b = 2.0");
+    Term* c = branch.compile("c = add(a,b)");
+    Term* d = branch.compile("d = add(c,5.0)");
+    branch.compile("e = add(c,5.0)");
 
     RefList subtree = get_involved_terms(RefList(a), RefList(d));
 
@@ -51,14 +51,14 @@ bool name_visitor_that_appends_to_list(Term* term, const char* name, TaggedValue
 void test_visit_name_accessible_terms()
 {
     Branch branch;
-    Term* a = branch.eval("a = 1");
-    Term* b = branch.eval("b = 1");
+    Term* a = branch.compile("a = 1");
+    Term* b = branch.compile("b = 1");
     Branch& ns = create_namespace(branch, "ns");
-    Term* c = ns.eval("c = 1");
-    Term* d = ns.eval("d = 1");
-    /*Term* e =*/ ns.eval("e = 1");
+    Term* c = ns.compile("c = 1");
+    Term* d = ns.compile("d = 1");
+    /*Term* e =*/ ns.compile("e = 1");
     update_register_indices(branch);
-    branch.eval("f = 1");
+    branch.compile("f = 1");
 
     TaggedValue results;
     set_list(&results);
