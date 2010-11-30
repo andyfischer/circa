@@ -444,6 +444,8 @@ void test_integer_division()
 
 void test_namespace()
 {
+    #if 0
+    TEST_DISABLED
     Branch branch;
     Term* ns = branch.eval("namespace ns; a = 1; b = 2; end");
 
@@ -467,6 +469,7 @@ void test_namespace()
     Term* x = branch.eval("ns1:ns2:x");
     test_assert(branch);
     test_assert(x->asInt() == 12);
+    #endif
 }
 
 void test_member_function_calls()

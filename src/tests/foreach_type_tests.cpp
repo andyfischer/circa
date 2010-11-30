@@ -9,18 +9,30 @@ bool run_test_for_type(Term* type, List& exampleValues)
 {
     Branch branch;
 
-    Term* x = create_value(branch, type, "x");
-    copy(exampleValues[0], x);
+    TaggedValue x;
+    copy(exampleValues[0], &x);
 
+    TaggedValue cpy;
+    copy(&x, &cpy);
+    test_assert(equals(&x, &cpy));
+
+    TaggedValue y;
+    copy(exampleValues[1], &y);
+    test_assert(!equals(&x,&y));
+
+    reset(&x);
+    reset(&y);
+    test_assert(equals(&x,&y));
+
+    #if 0
+
+    Term* x = create_value(branch, type, "x");
     test_assert(branch.eval("x == x"));
 
     TaggedValue* cpy = branch.eval("cpy = copy(x)");
     test_assert(branch);
-    test_assert(equals(x, cpy));
 
     Term* y = create_value(branch, type, "y");
-    copy(exampleValues[1], x);
-    test_assert(!equals(x,y));
     test_assert(branch.eval("x != y"));
 
     TaggedValue* cnd1 = branch.eval("cond(true, x, y)");
@@ -44,26 +56,36 @@ bool run_test_for_type(Term* type, List& exampleValues)
     evaluate_branch(branch);
     branch.clear();
 
+    #endif
     return true;
 }
 
-void run()
+void check_int()
 {
     List intExamples;
     set_int(intExamples.append(), 5);
     set_int(intExamples.append(), 3);
     run_test_for_type(INT_TYPE, intExamples);
+}
 
+void check_float()
+{
     List floatExamples;
     set_float(floatExamples.append(), 1.2);
     set_float(floatExamples.append(), -0.001);
     run_test_for_type(FLOAT_TYPE, floatExamples);
+}
 
+void check_string()
+{
     List stringExamples;
     set_string(stringExamples.append(), "hello");
     set_string(stringExamples.append(), "goodbye");
     run_test_for_type(STRING_TYPE, stringExamples);
+}
 
+void check_ref()
+{
     List refExamples;
     Term* refTarget1 = alloc_term();
     Term* refTarget2 = alloc_term();
@@ -74,8 +96,11 @@ void run()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(foreach_type_tests::run);
+    REGISTER_TEST_CASE(foreach_type_tests::check_int);
+    REGISTER_TEST_CASE(foreach_type_tests::check_float);
+    REGISTER_TEST_CASE(foreach_type_tests::check_string);
+    REGISTER_TEST_CASE(foreach_type_tests::check_ref);
 }
 
 }
-}
+} // namespace circa

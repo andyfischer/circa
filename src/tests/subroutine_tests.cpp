@@ -207,7 +207,7 @@ void bug_with_return()
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
-    REGISTER_TEST_CASE(subroutine_tests::test_recursion);
+    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
     //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
