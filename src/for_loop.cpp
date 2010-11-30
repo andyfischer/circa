@@ -396,8 +396,8 @@ CA_FUNCTION(evaluate_for_loop)
 
         // Save output
         if (saveOutput && !CONTEXT->forLoopContext.discard) {
-            copy(get_local(forContents[forContents.outputRegister]),
-                output->get(nextOutputIndex++));
+            TaggedValue* localResult = get_local(forContents[forContents.outputRegister]);
+            copy(localResult, output->get(nextOutputIndex++));
         }
     }
 
@@ -463,9 +463,10 @@ void for_loop_assign_registers(Term* term)
     if (as_bool(get_for_loop_modify_list(term))) {
         Term* output = forContents[get_for_loop_iterator(term)->name];
         ca_assert(output != NULL);
-        forContents.outputRegister = output->registerIndex;
+        //forContents.outputRegister = output->registerIndex;
+        forContents.outputRegister = output->index;
     } else {
-        forContents.outputRegister = forContents.registerCount - 1;
+        forContents.outputRegister = forContents.length() - 1;
     }
 }
 
