@@ -25,7 +25,17 @@ struct Branch
     int registerCount;
     int outputRegister;
 
+    // Local values for each term. These are the results of the most recent
+    // interpreted execution of this branch.
+    // (This list makes it impossible for the same branch to be simultaneously
+    // executed by different threads, but that problem will eventually be
+    // revisited).
     List locals;
+
+    // While the interpreter is using a branch, it can be marked 'inuse' and
+    // it can have a list of old local lists. This is to support recursion.
+    bool inuse;
+    List localsStack;
 
     bytecode::BytecodeData _bytecode;
 

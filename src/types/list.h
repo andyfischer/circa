@@ -35,6 +35,12 @@ struct List : TaggedValue
     TaggedValue* operator[](int index) { return get(index); }
     void resize(int size);
 
+    // get the item at length - 1
+    TaggedValue* getLast();
+
+    // remove the item at length - 1
+    void pop();
+
     static List* checkCast(TaggedValue* v);
 };
 

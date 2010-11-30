@@ -63,14 +63,6 @@ void evaluate_branch(EvalContext* context, Branch& branch);
 // Shorthand to call evaluate_branch with a new EvalContext:
 EvalContext evaluate_branch(Branch& branch);
 
-// Perform 'apply' and then evaluate the result.
-Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs);
-
-// Find the named function in this branch, and then do the above 'apply_and_eval'.
-Term* apply_and_eval(Branch& branch,
-                    std::string const& functionName,
-                    RefList const& inputs);
-
 TaggedValue* get_input_relative(EvalContext* cxt, Term* term, int index, int relativeStack);
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
@@ -94,5 +86,8 @@ void evaluate_range_with_lazy_stack(EvalContext* context, Branch& branch, int st
 #endif
 
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
+
+void start_using(Branch& branch);
+void finish_using(Branch& branch);
 
 } // namespace circa

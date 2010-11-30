@@ -11,7 +11,12 @@ static void assert_valid_branch(Branch const* obj)
     debug_assert_valid_object((void*) obj, BRANCH_OBJECT);
 }
 
-Branch::Branch() : owningTerm(NULL), _refCount(0), registerCount(0), outputRegister(0)
+Branch::Branch()
+  : owningTerm(NULL),
+    _refCount(0),
+    registerCount(0),
+    outputRegister(0),
+    inuse(false)
 {
     debug_register_valid_object((void*) this, BRANCH_OBJECT);
 }

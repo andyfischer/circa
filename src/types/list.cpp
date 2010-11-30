@@ -772,6 +772,18 @@ List::resize(int newSize)
     list_t::resize(this, newSize); 
 }
 
+TaggedValue*
+List::getLast()
+{
+    return get(length() - 1);
+}
+
+void
+List::pop()
+{
+    resize(length() - 1);
+}
+
 List*
 List::checkCast(TaggedValue* v)
 {

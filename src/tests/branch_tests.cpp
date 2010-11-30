@@ -371,6 +371,33 @@ void test_move()
     test_assert(four->index == 2);
 }
 
+void test_locals_stack()
+{
+    Branch branch;
+    EvalContext context;
+
+    start_using(branch);
+
+    Term* a = branch.compile("a = 5");
+    Term* b = branch.compile("b = add(a,a)");
+
+    for (int i=0; i < branch.length(); i++)
+        evaluate_single_term(&context, branch[i]);
+
+    test_equals(get_local(b)->asInt(), 10);
+
+    start_using(branch);
+
+    set_int(a, 11);
+    for (int i=0; i < branch.length(); i++)
+        evaluate_single_term(&context, branch[i]);
+
+    test_equals(get_local(b)->asInt(), 22);
+    finish_using(branch);
+
+    test_equals(get_local(b)->asInt(), 10);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_insert);
@@ -386,6 +413,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_destination_has_different_type);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_move);
+    REGISTER_TEST_CASE(branch_tests::test_locals_stack);
 }
 
 }

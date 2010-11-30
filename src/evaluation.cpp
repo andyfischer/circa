@@ -27,10 +27,12 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
 void evaluate_branch_existing_frame(EvalContext* context, Branch& branch)
 {
-    branch.locals.resize(branch.length());
+    start_using(branch);
 
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(context, branch[i]);
+
+    finish_using(branch);
 }
 
 void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
@@ -91,7 +93,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     wrap_up_open_state_vars(context, branch);
     copy(&context->currentScopeState, &context->state);
 
-    // Copy stack back to terms
+    // Copy stack back to terms, for backwards compatibility
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;
@@ -108,23 +110,6 @@ EvalContext evaluate_branch(Branch& branch)
     EvalContext context;
     evaluate_branch(&context, branch);
     return context;
-}
-
-Term* apply_and_eval(Branch& branch, Term* function, RefList const& inputs)
-{
-    Term* result = apply(branch, function, inputs);
-    // TODO: eval
-    return result;
-}
-
-Term* apply_and_eval(Branch& branch, std::string const& functionName,
-        RefList const &inputs)
-{
-    Term* function = find_named(branch, functionName);
-    if (function == NULL)
-        throw std::runtime_error("function not found: "+functionName);
-
-    return apply_and_eval(branch, function, inputs);
 }
 
 #if 0
@@ -350,6 +335,28 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
         if (value == NULL)
             continue;
         copy(value, term);
+    }
+}
+
+void start_using(Branch& branch)
+{
+    if (branch.inuse) {
+        swap(&branch.locals, branch.localsStack.append());
+        set_list(&branch.locals, branch.length());
+    }
+
+    branch.inuse = true;
+}
+
+void finish_using(Branch& branch)
+{
+    ca_assert(branch.inuse);
+
+    if (branch.localsStack.length() == 0) {
+        branch.inuse = false;
+    } else {
+        swap(&branch.locals, branch.localsStack.getLast());
+        branch.localsStack.pop();
     }
 }
 
