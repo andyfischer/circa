@@ -43,10 +43,35 @@ namespace subroutine_t {
         Branch& contents = function->nestedContents;
         context->interruptSubroutine = false;
 
+        // Copy inputs to a temporary list
+        List inputs;
+        inputs.resize(caller->numInputs());
+
+        for (int i=0; i < caller->numInputs(); i++) {
+            TaggedValue* input = get_input(context, caller, i);
+            if (input == NULL)
+                continue;
+
+            Type* inputType = type_contents(function_t::get_input_type(function, i));
+
+            bool success = cast(input, inputType, inputs[i]);
+            ca_assert(success);
+        }
+
+        start_using(contents);
+
+        // Insert inputs into placeholdes
+        for (int i=0; i < caller->numInputs(); i++) {
+            Term* placeholder = function_t::get_input_placeholder(function, i);
+            swap(inputs[i], get_local(placeholder));
+        }
+
+        #if 0
+
         // Copy inputs to input placeholders
         {
-            List frame;
-            frame.resize(contents.registerCount);
+            //List frame;
+            //frame.resize(contents.registerCount);
 
             for (int i=0; i < caller->numInputs(); i++) {
                 TaggedValue* input = get_input(context, caller, i);
@@ -56,13 +81,13 @@ namespace subroutine_t {
                 Term* inputTypeTerm = function_t::get_input_type(function, i);
                 Type* inputType = type_contents(inputTypeTerm);
 
-                ca_assert(cast(input, inputType, get_local(placeholder)));
+                bool success = cast(input, inputType, get_local(placeholder));
+                ca_assert(success);
             }
 
-            #if 0
-            swap(&frame, context->stack.append());
-            #endif
+            //swap(&frame, context->stack.append());
         }
+        #endif
 
         // prepare output
         set_null(&context->subroutineOutput);
@@ -133,6 +158,8 @@ namespace subroutine_t {
             preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
 
         swap(&context->currentScopeState, &prevScopeState);
+
+        finish_using(contents);
 
         TaggedValue* outputDest = get_output(context, caller);
         if (outputDest != NULL)
