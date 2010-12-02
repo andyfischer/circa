@@ -330,6 +330,7 @@ def post_game_stuff()
     end
 
     -- Name selector
+    <<<
     if toggle(key_pressed('b'))
         br = branch_ref(users_branch)
         x = 10, y = 10
@@ -338,5 +339,6 @@ def post_game_stuff()
             y += 24
         end
     end
+    >>>
 end
 post_game_stuff()

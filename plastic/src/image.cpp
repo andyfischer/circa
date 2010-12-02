@@ -124,9 +124,8 @@ CA_FUNCTION(load_image)
 CA_FUNCTION(draw_image)
 {
     TaggedValue* image = INPUT(0);
-    TaggedValue* point = INPUT(1);
 
-    Point* loc = Point::checkCast(INPUT(0));
+    Point* loc = Point::checkCast(INPUT(1));
     float x = loc->getX();
     float y = loc->getY();
     float width = float(image_t::get_width(image));

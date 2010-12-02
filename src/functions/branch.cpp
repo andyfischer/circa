@@ -9,7 +9,7 @@ namespace branch_function {
     CA_FUNCTION(branch_evaluate)
     {
         Branch& contents = CALLER->nestedContents;
-        evaluate_branch_in_new_frame(CONTEXT, contents, NULL);
+        evaluate_branch_internal(CONTEXT, contents);
     }
 
     CA_FUNCTION(branch_evaluate_preserve_stack)

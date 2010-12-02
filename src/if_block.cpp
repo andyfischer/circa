@@ -289,10 +289,7 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
-            #if 0
-            push_stack_frame(STACK, contents.registerCount);
-            #endif
-            evaluate_branch_existing_frame(CONTEXT, contents);
+            evaluate_branch_internal(CONTEXT, contents);
 
             acceptedBranchIndex = i;
             break;
