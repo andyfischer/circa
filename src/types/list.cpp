@@ -244,6 +244,24 @@ namespace list_t {
         (*data)->count--;
     }
 
+    void remove_nulls(ListData** dataPtr)
+    {
+        if (*dataPtr == NULL)
+            return;
+
+        *dataPtr = touch(*dataPtr);
+        ListData* data = *dataPtr;
+
+        int numRemoved = 0;
+        for (int i=0; i < data->count; i++) {
+            if (is_null(&data->items[i]))
+                numRemoved++;
+            else
+                swap(&data->items[i - numRemoved], &data->items[i]);
+        }
+        *dataPtr = resize(*dataPtr, data->count - numRemoved);
+    }
+
     TaggedValue* prepend(ListData** data)
     {
         append(data);
@@ -295,6 +313,12 @@ namespace list_t {
     {
         ca_assert(is_list(list));
         return prepend((ListData**) &list->value_data);
+    }
+
+    void remove_nulls(TaggedValue* list)
+    {
+        ca_assert(is_list(list));
+        remove_nulls((ListData**) &list->value_data);
     }
 
     void tv_initialize(Type* type, TaggedValue* value)
@@ -782,6 +806,12 @@ void
 List::pop()
 {
     resize(length() - 1);
+}
+
+void
+List::removeNulls()
+{
+    list_t::remove_nulls(this);
 }
 
 List*

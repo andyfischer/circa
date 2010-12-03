@@ -57,21 +57,17 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
         const char* name = context->openStateVariables[i]->asString().c_str();
         Term* term = branch[name];
 
-        if (term == NULL) {
-            dump_branch(branch);
-            std::stringstream msg;
-            msg << "couldn't find state var: " << name;
-            internal_error(msg.str());
-        }
+        if (term == NULL)
+            continue;
 
         ca_assert(term->registerIndex != -1);
         TaggedValue* result = get_local(term);
-        //std::cout << "saving state: " << result->toString() << " to " << name << std::endl;
         copy(result, state->insert(name));
-    }
-    context->openStateVariables.clear();
-}
 
+        set_null(context->openStateVariables[i]);
+    }
+    context->openStateVariables.removeNulls();
+}
 
 void evaluate_branch(EvalContext* context, Branch& branch)
 {

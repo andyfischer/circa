@@ -41,6 +41,8 @@ struct List : TaggedValue
     // remove the item at length - 1
     void pop();
 
+    void removeNulls();
+
     static List* checkCast(TaggedValue* v);
 };
 

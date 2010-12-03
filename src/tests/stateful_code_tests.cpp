@@ -174,6 +174,16 @@ namespace test_interpreted_state_access
     }
 }
 
+void bug_with_top_level_state()
+{
+    // This code once caused an assertion failure
+    Branch branch;
+    branch.compile("state s = 1");
+    branch.compile("def f() state t end");
+    branch.compile("f()");
+    evaluate_branch(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -184,6 +194,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);
+    REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
 }
 
 } // namespace stateful_code_tests

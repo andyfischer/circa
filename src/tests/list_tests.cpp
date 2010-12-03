@@ -65,9 +65,47 @@ void test_cast()
     test_equals(x.toString(), "[1, 2.0]");
 }
 
+void test_remove_nulls()
+{
+    TaggedValue v;
+    List list;
+    test_equals(list.toString(), "[]");
+
+    for (int i=0; i < 6; i++) {
+        set_int(&v, i);
+        list.append(&v);
+    }
+
+    test_equals(list.toString(), "[0, 1, 2, 3, 4, 5]");
+
+    list.removeNulls();
+    test_equals(list.toString(), "[0, 1, 2, 3, 4, 5]");
+
+    set_null(list[3]);
+    test_equals(list.toString(), "[0, 1, 2, null, 4, 5]");
+
+    list.removeNulls();
+    test_equals(list.toString(), "[0, 1, 2, 4, 5]");
+
+    set_null(list[4]);
+    list.removeNulls();
+    test_equals(list.toString(), "[0, 1, 2, 4]");
+
+    set_null(list[0]);
+    set_null(list[1]);
+    set_null(list[3]);
+    list.removeNulls();
+    test_equals(list.toString(), "[2]");
+
+    set_null(list[0]);
+    list.removeNulls();
+    test_equals(list.toString(), "[]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(list_tests::test_cast);
+    REGISTER_TEST_CASE(list_tests::test_remove_nulls);
 }
 
 }
