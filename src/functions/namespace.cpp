@@ -8,6 +8,9 @@ namespace namespace_function {
 
     CA_FUNCTION(evaluate)
     {
+        Branch& contents = CALLER->nestedContents;
+        evaluate_branch_internal(CONTEXT, contents);
+
         #if 0
         Branch& contents = CALLER->nestedContents;
         push_stack_frame(STACK, contents.registerCount);
@@ -43,6 +46,16 @@ namespace namespace_function {
 
     CA_FUNCTION(get_namespace_field)
     {
+        Branch& namespaceContents = INPUT_TERM(0)->nestedContents;
+        const char* name = STRING_INPUT(1);
+
+        Term* term = namespaceContents[name];
+
+        if (term == NULL)
+            return error_occurred(CONTEXT, CALLER, "couldn't find name");
+
+        copy(get_local(term), OUTPUT);
+
         #if 0
         FIXME
         Dict* dict = Dict::checkCast(INPUT(0));

@@ -560,7 +560,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
-    //REGISTER_TEST_CASE(test_snippets::test_namespace);
+    REGISTER_TEST_CASE(test_snippets::test_namespace);
 }
 
 } // namespace test_snippets

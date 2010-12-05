@@ -123,7 +123,6 @@ void test_include_namespace()
 
     branch.compile("include('file')");
     Term* a = branch.compile("ns:a");
-    dump_branch(branch);
     evaluate_branch(branch);
 
     test_assert(branch);
@@ -151,7 +150,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_include_function);
     REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
     REGISTER_TEST_CASE(file_based_tests::test_file_changed);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
+    REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
     //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
 }
 
