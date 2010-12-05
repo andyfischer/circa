@@ -74,9 +74,9 @@ end
 -- Text rendering functions
 namespace text begin
     type RenderedText { int texid, int width, int height, Color color, string text }
-    def load_font(state TTF_Font, string filename, int size) -> TTF_Font:
+    def load_font(state Font, string filename, int size) -> Font:
         "Load the given font"
-    def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText
+    def render_text(state RenderedText, Font font, string text, Color color) -> RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
     end
     def draw_rendered_text(RenderedText, Point loc)
@@ -84,14 +84,14 @@ namespace text begin
     end
 end
 
-def draw_text(TTF_Font font, string str, Color color, Point location) -> Rect
+def draw_text(Font font, string str, Color color, Point location) -> Rect
     "Render and draw a string."
     sprite = text:render_text(font, str, color)
     text:draw_rendered_text(sprite, location)
     return(to_rect(location, [sprite.width sprite.height]))
 end
 
-def draw_text_centered(TTF_Font font, string str, Color color, Point location)
+def draw_text_centered(Font font, string str, Color color, Point location)
     sprite = text:render_text(font, str, color)
     text:draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
 end

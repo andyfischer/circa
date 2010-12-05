@@ -2,11 +2,16 @@
 
 #include <cassert>
 
-#include "circa.h"
+#include "branch_iterator.h"
+#include "build_options.h"
+#include "errors.h"
+#include "evaluation.h"
+#include "function.h"
+#include "introspection.h"
+#include "source_repro.h"
+#include "type.h"
 
 namespace circa {
-
-const bool ASSERT_INTERNAL_ERROR = true;
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
