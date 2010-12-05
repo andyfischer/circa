@@ -5,7 +5,7 @@
 namespace circa {
 namespace include_function {
 
-    void preload_script(EvalContext* cxt, Term* caller,
+    void load_script(EvalContext* cxt, Term* caller,
             TaggedValue* fileSignature, const std::string& filename)
     {
         Branch& contents = caller->nestedContents;
@@ -46,18 +46,29 @@ namespace include_function {
                 expose_all_names(contents, *caller->owningBranch);
         }
     }
-    void preload_script(EvalContext* cxt, Term* term)
+    void preload_script(Term* term)
     {
         TaggedValue* fileSignature = &term->nestedContents.fileSignature;
-        std::string filename = term->input(0)->asString();
-        return preload_script(cxt, term, fileSignature, filename);
+
+        Term* inputTerm = term->input(0);
+
+        EvalContext context;
+        evaluate_minimum(&context, inputTerm);
+
+        TaggedValue *input = get_input(&context, term, 0);
+
+        if (!is_string(input))
+            return;
+
+        return load_script(&context, term, fileSignature, as_string(input));
     }
 
     CA_FUNCTION(evaluate_include)
     {
         Branch& contents = CALLER->nestedContents;
 
-        preload_script(CONTEXT, CALLER);
+        load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
+            STRING_INPUT(0));
 
         if (CONTEXT->errorOccurred)
             return;
@@ -67,7 +78,8 @@ namespace include_function {
 
     CA_FUNCTION(load_script)
     {
-        preload_script(CONTEXT, CALLER);
+        load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
+            STRING_INPUT(0));
     }
 
     void setup(Branch& kernel)

@@ -188,4 +188,36 @@ void finish_using(Branch& branch)
     }
 }
 
+void evaluate_minimum(EvalContext* context, Term* term)
+{
+    // Get a list of every term that this term depends on. Also, limit this
+    // search to terms inside the current branch.
+    
+    Branch& branch = *term->owningBranch;
+
+    bool *marked = new bool[branch.length()];
+    memset(marked, false, sizeof(bool)*branch.length());
+
+    marked[term->index] = true;
+
+    for (int i=term->index; i >= 0; i--) {
+        if (marked[i]) {
+            for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+                Term* input = term->input(inputIndex);
+                if (input == NULL) continue;
+                if (input->owningBranch != &branch) continue;
+                marked[input->index] = true;
+            }
+        }
+    }
+
+    for (int i=0; i <= term->index; i++) {
+        if (marked[i]) {
+            evaluate_single_term(context, branch[i]);
+        }
+    }
+
+    delete[] marked;
+}
+
 } // namespace circa

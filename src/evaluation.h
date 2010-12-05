@@ -71,4 +71,6 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 void start_using(Branch& branch);
 void finish_using(Branch& branch);
 
+void evaluate_minimum(EvalContext* context, Term* term);
+
 } // namespace circa

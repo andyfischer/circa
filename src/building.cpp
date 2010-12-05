@@ -537,7 +537,7 @@ void post_compile_term(Term* term)
     }
 
     if (term->function == INCLUDE_FUNC) {
-        include_function::preload_script(NULL, term);
+        include_function::preload_script(term);
     }
 }
 

@@ -110,7 +110,7 @@ namespace do_once_function {
 }
 
 namespace include_function {
-    void preload_script(EvalContext* cxt, Term* term);
+    void preload_script(Term* term);
 }
 
 namespace file_changed_function {

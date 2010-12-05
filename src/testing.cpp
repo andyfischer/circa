@@ -154,6 +154,13 @@ void test_equals_function(std::string a, std::string b,
     }
 }
 
+void test_equals_function(TaggedValue* a, std::string b,
+        const char* aText, const char* bText,
+        int line, const char* file)
+{
+    return test_equals_function(a->toString(), b, aText, bText, line, file);
+}
+
 bool run_test(TestCase& testCase, bool catch_exceptions)
 {
     gCurrentTestCase = testCase;

@@ -144,6 +144,18 @@ void test_include_with_error()
     test_assert(has_static_errors(branch));
 }
 
+void test_include_from_expression()
+{
+    Branch branch;
+    FakeFileSystem files;
+    files["a"] = "x = 1";
+
+    branch.compile("name = cond(true,'a','b')");
+    branch.compile("include(name)");
+
+    evaluate_branch(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
@@ -152,6 +164,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_file_changed);
     REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
     //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
+    REGISTER_TEST_CASE(file_based_tests::test_include_from_expression);
 }
 
 } // namespace file_based_tests
