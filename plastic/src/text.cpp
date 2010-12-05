@@ -42,7 +42,7 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
 
 CA_FUNCTION(load_font)
 {
-    TTF_Font_ptr state = INPUT(0);
+    TTF_Font_ptr state = STATE_INPUT;
     TTF_Font_ptr output = OUTPUT;
 
     if (*state != NULL) {
