@@ -96,7 +96,6 @@ void test_file_changed()
     evaluate_branch(&context, branch);
     //dump_branch(branch);
     //std::cout << context.state.toString();
-    //bytecode::print_bytecode(std::cout, branch);
     test_assert(!as_bool(changed));
     evaluate_branch(&context, branch);
     test_assert(!as_bool(changed));
@@ -149,9 +148,9 @@ void test_include_with_error()
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_function);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_file_changed);
+    REGISTER_TEST_CASE(file_based_tests::test_include_function);
+    REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
+    REGISTER_TEST_CASE(file_based_tests::test_file_changed);
     //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
     //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
 }

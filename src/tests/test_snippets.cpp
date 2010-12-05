@@ -522,6 +522,11 @@ void test_type_check_functions()
     test_snippet("", "not(is_list(1.0))");
 }
 
+void test_namespace()
+{
+    test_snippet("namespace ns a = 1 end", "ns:a == 1");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -555,6 +560,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
+    //REGISTER_TEST_CASE(test_snippets::test_namespace);
 }
 
 } // namespace test_snippets

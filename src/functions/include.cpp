@@ -48,19 +48,20 @@ namespace include_function {
     }
     void preload_script(EvalContext* cxt, Term* term)
     {
-        TaggedValue* fileSignature = term->input(0);
-        std::string filename = term->input(1)->asString();
+        TaggedValue* fileSignature = &term->nestedContents.fileSignature;
+        std::string filename = term->input(0)->asString();
         return preload_script(cxt, term, fileSignature, filename);
     }
 
     CA_FUNCTION(evaluate_include)
     {
-        preload_script(CONTEXT, CALLER, INPUT(0), STRING_INPUT(1));
+        Branch& contents = CALLER->nestedContents;
+
+        preload_script(CONTEXT, CALLER);
 
         if (CONTEXT->errorOccurred)
             return;
 
-        Branch& contents = CALLER->nestedContents;
         evaluate_branch(CONTEXT, contents);
     }
 
@@ -72,12 +73,12 @@ namespace include_function {
     void setup(Branch& kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
-                "include(state FileSignature, string filename)");
+                "include(string filename)");
 
         function_t::set_exposed_name_path(INCLUDE_FUNC, ".");
 
         Term* load_script_f = import_function(kernel, load_script,
-            "load_script(state FileSignature, string filename)");
+            "load_script(string filename)");
 
         function_t::set_exposed_name_path(load_script_f, ".");
     }

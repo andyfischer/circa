@@ -37,6 +37,10 @@ struct Branch
     bool inuse;
     List localsStack;
 
+    // For a branch loaded from a file, this keeps track of the file signature
+    // of the last time this was loaded.
+    List fileSignature;
+
     bytecode::BytecodeData _bytecode;
 
     Branch();

@@ -108,6 +108,7 @@ Term* VOID_TYPE = NULL;
 TypeRef TYPE_T;
 TypeRef BOOL_T;
 TypeRef DICT_T;
+TypeRef FILE_SIGNATURE_T;
 TypeRef FLOAT_T;
 TypeRef INT_T;
 TypeRef NULL_T;
@@ -268,7 +269,8 @@ void pre_setup_types(Branch& kernel)
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
 
     // FileSignature is used in some builtin functions
-    parse_type(kernel, "type FileSignature { string filename, int time_modified }");
+    FILE_SIGNATURE_T = type_contents(parse_type(kernel,
+            "type FileSignature { string filename, int time_modified }"));
 
     namespace_function::early_setup(kernel);
 }

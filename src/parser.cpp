@@ -898,8 +898,6 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
 
-    include_function::preload_script(NULL, result);
-
     return result;
 }
 

@@ -535,6 +535,10 @@ void post_compile_term(Term* term)
     if (term->function == OVERLOADED_FUNCTION_FUNC) {
         overloaded_function::post_compile_setup_overloaded_function(term);
     }
+
+    if (term->function == INCLUDE_FUNC) {
+        include_function::preload_script(NULL, term);
+    }
 }
 
 } // namespace circa
