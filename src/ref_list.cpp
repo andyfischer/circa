@@ -2,7 +2,10 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
+#include "references.h"
+#include "term.h"
+
+#include "ref_list.h"
 
 namespace circa {
 

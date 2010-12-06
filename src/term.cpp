@@ -1,12 +1,16 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include <cstdio>
-#include <sstream>
-#include <iostream>
-#include <stdexcept>
+#include "common_headers.h"
 
-#include "circa.h"
+#include "branch.h"
+#include "building.h"
+#include "builtins.h"
 #include "debug_valid_objects.h"
+#include "errors.h"
+#include "term.h"
+#include "type.h"
+
+#include "term.h"
 
 namespace circa {
 

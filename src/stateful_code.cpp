@@ -1,11 +1,15 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
+#include "common_headers.h"
+
+#include "function.h"
+#include "branch.h"
+#include "building.h"
+#include "builtins.h"
+#include "stateful_code.h"
+#include "term.h"
 
 namespace circa {
-
-#define VERBOSE_LOG(f, ...) ; // disabled
-//#define VERBOSE_LOG printf
 
 bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc);
 

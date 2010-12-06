@@ -1,7 +1,19 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
+#include "branch.h"
+#include "building.h"
+#include "builtins.h"
+#include "evaluation.h"
 #include "importing_macros.h"
+#include "introspection.h"
+#include "source_repro.h"
+#include "references.h"
+#include "refactoring.h"
+#include "term.h"
+#include "type.h"
+#include "type_inference.h"
+
+#include "for_loop.h"
 
 namespace circa {
 

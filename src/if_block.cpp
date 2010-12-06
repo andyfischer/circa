@@ -1,9 +1,19 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <set>
+
 #include "common_headers.h"
 
-#include "circa.h"
+#include "branch.h"
+#include "builtins.h"
+#include "building.h"
+#include "evaluation.h"
 #include "importing_macros.h"
+#include "ref_list.h"
+#include "stateful_code.h"
+#include "term.h"
+
+#include "if_block.h"
 
 namespace circa {
 
