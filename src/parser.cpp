@@ -1302,7 +1302,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         finished = false;
         return result;
 
-    } else if (tokens.nextIs(COLON)) {
+    } else if (tokens.nextIs(COLON) && tokens.nextIs(IDENTIFIER, 1)) {
         tokens.consume(COLON);
 
         if (!tokens.nextIs(IDENTIFIER))

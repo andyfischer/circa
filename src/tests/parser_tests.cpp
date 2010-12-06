@@ -599,6 +599,15 @@ void test_sig_indent_one_liner()
     test_equals(branch[1]->asInt(), 4);
 }
 
+void test_sig_indent_for_loop()
+{
+    Branch branch;
+    Term* f = branch.compile("for i in [1]: 1");
+    test_assert(branch);
+
+    f;
+}
+
 void test_statically_resolve_namespace_access()
 {
     Branch branch;
@@ -667,6 +676,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_for_loop);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);
 }

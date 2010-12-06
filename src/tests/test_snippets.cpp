@@ -353,6 +353,10 @@ void test_for_loops()
 
     // For loop with state
     //test_snippet("for i in [1 2 3]; state s = i; end", "");
+
+    // Syntax with significant indentation
+    test_snippet("a = 0; for i in [1 2 3]: a += i", "a == 6");
+    test_snippet("a = []; for i in [1 2 3]: a.append(i)", "a == [1 2 3]");
 }
 
 void test_subscripting()
