@@ -38,8 +38,11 @@ namespace inline_state_function {
         const char* name = STRING_INPUT(1);
         TaggedValue* value = stateContainer->get(name);
 
+        //std::cout << "get_state_field looking at container: "
+        //    << stateContainer->toString() << " with name: " << name << std::endl;
+
         if (value) {
-            // todo: check if we need to cast this value
+            // TODO: check if we need to cast this value
             copy(value, OUTPUT);
 
         // If we didn't find the value, see if they provided a default

@@ -797,11 +797,16 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         tokens.consume();
         possible_whitespace(tokens);
 
+        // TODO: make this do_once() stuff work again
+        #if 0
         Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
         hide_from_source(initialization);
 
         initialValue = infix_expression(initialization->nestedContents, tokens);
         post_parse_branch(initialization->nestedContents);
+        #endif
+
+        initialValue = infix_expression(branch, tokens);
     }
 
     Term* result = create_stateful_value(branch, type, initialValue, name);

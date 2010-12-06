@@ -43,7 +43,7 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue*
         evaluate_single_term(context, branch[i]);
 
     if (output != NULL)
-        swap(get_local(branch[branch.length()-1]), output);
+        copy(get_local(branch[branch.length()-1]), output);
 
     finish_using(branch);
 }
@@ -84,7 +84,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
         if (term->registerIndex != -1)
             val = get_local(term);
         if (val != NULL)
-            swap(val, branch[i]);
+            copy(val, branch[i]);
     }
 }
 
