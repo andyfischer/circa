@@ -49,7 +49,7 @@ void test_get_relative_name()
     test_equals(get_relative_name(branch, b), "ns:B");
 
     // This code once had a bug:
-    Term* c = branch.eval("[1 1] -> Point");
+    Term* c = branch.compile("[1 1] -> Point");
     test_assert(c->function->name == "cast");
     test_assert(c->type->name == "Point");
     test_equals(get_relative_name(c, c->type), "Point");
@@ -67,13 +67,13 @@ void test_get_relative_name_from_hidden_branch()
 void test_lookup_qualified_name()
 {
     Branch branch;
-    Term* a = branch.eval("namespace a { b = 1 }");
+    Term* a = branch.compile("namespace a { b = 1 }");
     Term* b = a->nestedContents["b"];
 
     test_assert(b != NULL);
     test_assert(branch["a:b"] == b);
 
-    Term* x = branch.eval("namespace x { namespace y { namespace z { w = 1 }}}");
+    Term* x = branch.compile("namespace x { namespace y { namespace z { w = 1 }}}");
     Term* w = x->nestedContents["y"]->nestedContents["z"]->nestedContents["w"];
     test_assert(branch["x:y:z:w"] == w);
 }
@@ -162,6 +162,23 @@ void test_unique_names()
     test_assert(a3->uniqueName.ordinal == 3);
 }
 
+void test_unique_names_for_anons()
+{
+    Branch branch;
+
+    Term* a = branch.compile("add(1,2)");
+    test_equals(a->uniqueName.name, "_add");
+
+    Term* b = branch.compile("add(3,4)");
+    test_equals(b->uniqueName.name, "_add_1");
+
+    Term* c = branch.compile("_add_2 = add(3,4)");
+    test_equals(c->uniqueName.name, "_add_2");
+
+    Term* d = branch.compile("add(3,4)");
+    test_equals(d->uniqueName.name, "_add_3");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
@@ -172,6 +189,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_get_named_at);
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
     REGISTER_TEST_CASE(names_tests::test_unique_names);
+    REGISTER_TEST_CASE(names_tests::test_unique_names_for_anons);
 }
 
 } // namespace names_tests

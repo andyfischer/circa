@@ -69,8 +69,8 @@ void set_point(circa::TaggedValue* value, float x, float y)
 {
     change_type(value, type_contents(circa::get_global("Point")));
     touch(value);
-    make_float(value->getIndex(0), x);
-    make_float(value->getIndex(1), y);
+    set_float(value->getIndex(0), x);
+    set_float(value->getIndex(1), y);
 }
 
 void touch_event_to_tagged_value(ofTouchEventArgs& event, circa::TaggedValue* eventType,
@@ -80,16 +80,16 @@ void touch_event_to_tagged_value(ofTouchEventArgs& event, circa::TaggedValue* ev
     List* list = List::checkCast(value);
     
     touch(list);
-    make_int(list->get(0), event.id);
-    make_int(list->get(1), event.time);
+    set_int(list->get(0), event.id);
+    set_int(list->get(1), event.time);
     copy(eventType, list->get(2));
     set_point(list->get(3), event.x, event.y);
-    make_int(list->get(4), event.numTouches);
+    set_int(list->get(4), event.numTouches);
     set_point(list->get(5), event.x, event.y);
-    make_float(list->get(6), event.angle);
-    make_float(list->get(7), event.minoraxis);
-    make_float(list->get(8), event.majoraxis);
-    make_float(list->get(9), event.pressure);
+    set_float(list->get(6), event.angle);
+    set_float(list->get(7), event.minoraxis);
+    set_float(list->get(8), event.majoraxis);
+    set_float(list->get(9), event.pressure);
     set_point(list->get(10), event.xspeed, event.yspeed);
     set_point(list->get(11), event.xaccel, event.yaccel);
 }

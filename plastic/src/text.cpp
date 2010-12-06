@@ -4,6 +4,7 @@
 
 #include "circa.h"
 #include "importing_macros.h"
+#include "refcounted_type_wrapper.h"
 
 #include <SDL_ttf.h>
 
@@ -16,8 +17,41 @@ using namespace circa;
 
 namespace text {
 
-TypeRef TTF_Font_t;
+struct FontRef
+{
+    int _refCount;
+    TTF_Font* ttfFont;
 
+    FontRef() : ttfFont(NULL) {}
+
+    static TypeRef singleton;
+};
+
+TypeRef FontRef::singleton;
+
+struct Font : public circa::TaggedValue
+{
+    FontRef* contents()
+    {
+        return (FontRef*) get_pointer(this);
+    }
+
+    static Font* checkCast(TaggedValue* val)
+    {
+        if (val->value_type != FontRef::singleton)
+            return NULL;
+        return (Font*) val;
+    }
+
+    static Font* lazyCast(TaggedValue* val)
+    {
+        if (val->value_type != FontRef::singleton)
+            change_type(val, FontRef::singleton);
+        return (Font*) val;
+    }
+};
+
+#if 0
 class TTF_Font_ptr
 {
     TaggedValue* _value;
@@ -30,6 +64,7 @@ public:
     TTF_Font* operator*() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
     TTF_Font* operator->() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
 };
+#endif
 
 SDL_Color unpack_sdl_color(TaggedValue* color)
 {
@@ -42,11 +77,11 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
 
 CA_FUNCTION(load_font)
 {
-    TTF_Font_ptr state = INPUT(0);
-    TTF_Font_ptr output = OUTPUT;
+    TaggedValue* state = STATE_INPUT;
+    Font* output = Font::lazyCast(OUTPUT);
 
-    if (*state != NULL) {
-        output = state;
+    if (!is_null(state)) {
+        copy(state, output);
         return;
     }
 
@@ -57,15 +92,14 @@ CA_FUNCTION(load_font)
     if (result == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
-        error_occurred(CONTEXT, CALLER, err.str());
-        return;
+        return error_occurred(CONTEXT, CALLER, err.str());
     }
 
-    state = result;
-    output = result;
+    output->contents()->ttfFont = result;
+    copy(output, state);
 }
 
-struct RenderedText : TaggedValue
+struct RenderedText : public TaggedValue
 {
     int texid() { return getIndex(0)->asInt(); }
     int width() { return getIndex(1)->asInt(); }
@@ -93,9 +127,9 @@ CA_FUNCTION(render_text)
 
         // Clear results if text is empty
         if (inputText == "") {
-            make_int(state->texidContainer(), 0);
-            make_int(state->widthContainer(), 0);
-            make_int(state->heightContainer(), 0);
+            set_int(state->texidContainer(), 0);
+            set_int(state->widthContainer(), 0);
+            set_int(state->heightContainer(), 0);
             copy(INPUT(0), OUTPUT);
             return;
         }
@@ -103,14 +137,15 @@ CA_FUNCTION(render_text)
         // Render the text to a new surface, upload it as a texture, destroy the surface,
         // record the texture id.
 
-        TTF_Font_ptr font = INPUT(1);
+        Font* font = Font::checkCast(INPUT(1));
 
         SDL_Color sdlColor = unpack_sdl_color(INPUT(3));
-        SDL_Surface *surface = TTF_RenderText_Blended(*font, inputText.c_str(), sdlColor);
+        SDL_Surface *surface = TTF_RenderText_Blended(font->contents()->ttfFont,
+                inputText.c_str(), sdlColor);
 
-        make_int(state->texidContainer(), load_surface_to_texture(surface));
-        make_int(state->widthContainer(), surface->w);
-        make_int(state->heightContainer(), surface->h);
+        set_int(state->texidContainer(), load_surface_to_texture(surface));
+        set_int(state->widthContainer(), surface->w);
+        set_int(state->heightContainer(), surface->h);
         copy(inputColor, state->color());
 
         //SDL_SaveBMP(surface, "hello.bmp");
@@ -157,11 +192,8 @@ CA_FUNCTION(draw_rendered_text)
 
 void pre_setup(Branch& branch)
 {
-    TTF_Font_t = Type::create();
-    initialize_simple_pointer_type(TTF_Font_t);
-    TTF_Font_t->name = "TTF_Font";
-
-    import_type(branch, TTF_Font_t);
+    FontRef::singleton = type_contents(create_type(branch, "Font"));
+    intrusive_refcounted::setup_type<FontRef>(FontRef::singleton);
 }
 
 void setup(Branch& branch)
@@ -170,9 +202,6 @@ void setup(Branch& branch)
         std::cout << "TTF_Init failed with error: " << TTF_GetError();
         return;
     }
-
-    //TTF_Font_t = &as_type(branch["TTF_Font"]);
-    //initialize_simple_pointer_type(TTF_Font_t);
 
     Branch& text_ns = branch["text"]->nestedContents;
     install_function(text_ns["load_font"], load_font);

@@ -37,15 +37,12 @@ void change_type(Term *term, Term *typeTerm)
 {
     ca_assert(term != NULL);
     ca_assert(typeTerm != NULL);
-    ca_assert_type(typeTerm, TYPE_TYPE);
+    ca_assert(typeTerm->type == TYPE_TYPE);
 
     Term* oldType = term->type;
 
     term->type = typeTerm;
     change_type(term, &as_type(typeTerm));
-
-    if (is_branch(term))
-        as_branch(term).owningTerm = term;
 
     if (oldType == typeTerm)
         return;
@@ -58,7 +55,7 @@ void specialize_type(Term *term, Term *type)
     if (term->type == type)
         return;
 
-    ca_assert_type(term, ANY_TYPE);
+    ca_assert(term->type == ANY_TYPE);
 
     change_type(term, type);
 }

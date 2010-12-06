@@ -20,8 +20,6 @@ Term* apply(Branch& branch, std::string const& functionName,
 Term* create_duplicate(Branch& branch, Term* original, std::string const& name="",
         bool copyBranches=true);
 
-std::string default_name_for_hidden_state(const std::string& termName);
-
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
 int get_input_relative_scope(Term* term, int index);
@@ -57,7 +55,6 @@ Branch& create_branch(Branch& owner, std::string const& name="");
 Branch& create_namespace(Branch&, std::string const& name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_empty_type(Branch& branch, std::string name);
-Term* create_branch_based_type(Branch& branch, std::string const& name);
 Term* duplicate_value(Branch& branch, Term* term);
 
 // In this context, "procure" means "return the existing thing if it already exists, and
@@ -68,10 +65,9 @@ Term* procure_int(Branch& branch, std::string const& name);
 Term* procure_float(Branch& branch, std::string const& name);
 Term* procure_bool(Branch& branch, std::string const& name);
 
-// Resize this list term, making sure that each element is a type of 'type'.
-void resize_list(Branch& list, int numElements, Term* type);
-
 void set_step(Term* term, float step);
 float get_step(Term* term);
+
+void post_compile_term(Term* term);
 
 } // namespace circa

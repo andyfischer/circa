@@ -66,8 +66,6 @@ extern Term* FLOAT_TYPE;
 extern Term* INT_TYPE;
 extern Term* REF_TYPE;
 extern Term* STRING_TYPE;
-extern Term* BRANCH_TYPE;
-extern Term* CODE_TYPE;
 extern Term* COLOR_TYPE;
 extern Term* FEEDBACK_TYPE;
 extern Term* FUNCTION_TYPE;
@@ -78,15 +76,16 @@ extern Term* VOID_TYPE;
 
 } // extern "C"
 
-extern TypeRef TYPE_T;
 extern TypeRef BOOL_T;
 extern TypeRef DICT_T;
+extern TypeRef FILE_SIGNATURE_T;
 extern TypeRef FLOAT_T;
 extern TypeRef INT_T;
+extern TypeRef LIST_T;
 extern TypeRef NULL_T;
 extern TypeRef STRING_T;
 extern TypeRef REF_T;
-extern TypeRef LIST_T;
+extern TypeRef TYPE_T;
 extern TypeRef VOID_T;
 
 extern bool FINISHED_BOOTSTRAP;
@@ -111,7 +110,7 @@ namespace do_once_function {
 }
 
 namespace include_function {
-    void preload_script(EvalContext*, Term* term);
+    void preload_script(Term* term);
 }
 
 namespace file_changed_function {
@@ -137,6 +136,7 @@ namespace overloaded_function {
         RefList const& overloads);
     void append_overload(Term* overloadedFunction, Term* overload);
     Term* statically_specialize_function(Term* func, RefList const& inputs);
+    void post_compile_setup_overloaded_function(Term* term);
 }
 
 namespace value_function {

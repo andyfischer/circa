@@ -14,9 +14,7 @@ void set_is_statement(Term* term, bool value)
 
 bool is_statement(Term* term)
 {
-    // The default for whether or not something is a statement is true, because
-    // that's what manually-created terms should be.
-    return term->boolPropOptional("statement", true);
+    return term->boolPropOptional("statement", false);
 }
 
 bool is_comment(Term* term)
@@ -82,6 +80,8 @@ std::string branch_namespace_to_string(Branch& branch)
 
 void print_branch_raw(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
 {
+    out << "[Branch " << &branch << ", regs = " << branch.registerCount
+        << ", output = " << branch.outputRegister << "]" << std::endl;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
@@ -238,8 +238,7 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
         out << " <NULL function>";
     } else {
         out << " " << term->function->name;
-        if (prefs->showAllIDs)
-           out << format_global_id(term->function);
+        out << format_global_id(term->function);
         out << "()";
     }
 
@@ -261,12 +260,14 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
         for (int i=0; i < term->numInputs(); i++) {
             if (i != 0) out << " ";
             out << format_global_id(term->input(i));
-            out << " ";
-            out << term->inputInfo(i).toShortString();
         }
         out << "]";
     }
     out << " " << to_string(term);
+
+    TaggedValue* local = get_local(term);
+    if (local != NULL)
+        out << " local:" << local->toString();
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();

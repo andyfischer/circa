@@ -9,9 +9,9 @@ namespace dict_tests {
 void test_simple()
 {
     TaggedValue five;
-    make_int(&five, 5);
+    set_int(&five, 5);
     TaggedValue ten;
-    make_int(&ten, 10);
+    set_int(&ten, 10);
 
     dict_t::DictData* data = dict_t::create_dict();
     dict_t::insert_value(&data, "a", &five);
@@ -27,12 +27,12 @@ void test_insert()
 {
     Dict dict;
     TaggedValue v;
-    make_int(&v, 5);
+    set_int(&v, 5);
 
     TaggedValue* a_inserted = dict.insert("a");
     test_equals(dict.toString(), "[a: null]");
 
-    make_int(a_inserted, 7);
+    set_int(a_inserted, 7);
     test_equals(dict.toString(), "[a: 7]");
 }
 
@@ -41,9 +41,9 @@ void dont_insert_same_key_multiple_times()
     dict_t::DictData* data = dict_t::create_dict();
 
     TaggedValue val;
-    make_int(&val, 5);
+    set_int(&val, 5);
     TaggedValue val2;
-    make_string(&val2, "a");
+    set_string(&val2, "a");
 
     dict_t::insert_value(&data, "key", &val);
     dict_t::insert_value(&data, "key", &val2);
@@ -87,8 +87,8 @@ void hash_collision()
     test_assert(index_b1 != index_a1);
 
     TaggedValue x, y;
-    make_string(&x, "x");
-    make_string(&y, "y");
+    set_string(&x, "x");
+    set_string(&y, "y");
 
     dict_t::insert_value(&data1, a, &x);
     dict_t::insert_value(&data1, b, &y);
@@ -114,7 +114,7 @@ void many_items()
     // Insert lots of items
     for (int i=0; i < count; i++) {
         char key[10]; sprintf(key, "%d", i);
-        TaggedValue val; make_int(&val, i);
+        TaggedValue val; set_int(&val, i);
         dict_t::insert_value(&data, key, &val);
     }
 
@@ -182,7 +182,7 @@ void test_reset()
     Dict dict;
 
     TaggedValue a;
-    make_int(&a, 4);
+    set_int(&a, 4);
     dict.set("a", &a);
 
     test_equals(dict.toString(), "[a: 4]");
@@ -198,9 +198,9 @@ void test_iterate()
     TaggedValue iterator;
 
     TaggedValue one;
-    make_int(&one, 1);
+    set_int(&one, 1);
     TaggedValue two;
-    make_int(&two, 2);
+    set_int(&two, 2);
 
     dict.set("one", &one);
     dict.set("two", &two);

@@ -17,6 +17,7 @@ namespace circa {
 struct UniqueName
 {
     std::string name;
+    std::string base;
     int ordinal;
     UniqueName() : ordinal(0) {}
 };

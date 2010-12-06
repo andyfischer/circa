@@ -7,10 +7,12 @@ namespace styled_source_function {
 
     CA_FUNCTION(format_source)
     {
+        #if 0
         Branch& branch = branch_ref_t::get_target_branch(INPUT(0));
 
         OUTPUT->reset();
         format_branch_source((StyledSource*) OUTPUT, branch);
+        #endif
     }
 
     void setup(Branch& kernel)

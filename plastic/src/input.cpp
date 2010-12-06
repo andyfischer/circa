@@ -34,7 +34,7 @@ void handle_key_press(SDL_Event &event, int key);
 CA_FUNCTION(key_down)
 {
     int i = INT_INPUT(0);
-    make_bool(OUTPUT, KEY_DOWN[i]);
+    set_bool(OUTPUT, KEY_DOWN[i]);
 }
 
 CA_FUNCTION(key_pressed)
@@ -43,11 +43,11 @@ CA_FUNCTION(key_pressed)
         int key = as_int(INPUT(0));
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (KEYS_JUST_PRESSED[index].sym == key) {
-                make_bool(OUTPUT, true);
+                set_bool(OUTPUT, true);
                 return;
             }
         }
-        make_bool(OUTPUT, false);
+        set_bool(OUTPUT, false);
         return;
     }
 
@@ -58,12 +58,12 @@ CA_FUNCTION(key_pressed)
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {
-                make_bool(OUTPUT, true);
+                set_bool(OUTPUT, true);
                 return;
             }
         }
             
-        make_bool(OUTPUT, false);
+        set_bool(OUTPUT, false);
         return;
     }
 }
@@ -127,8 +127,8 @@ void capture_events()
         }
     } // finish event loop
 
-    make_float(MOUSE_POSITION_TERM->getIndex(0), float(MOUSE_X));
-    make_float(MOUSE_POSITION_TERM->getIndex(1), float(MOUSE_Y));
+    set_float(MOUSE_POSITION_TERM->getIndex(0), float(MOUSE_X));
+    set_float(MOUSE_POSITION_TERM->getIndex(1), float(MOUSE_Y));
 }
 
 void handle_key_press(SDL_Event &event, int key)
@@ -194,7 +194,7 @@ CA_FUNCTION(recent_key_presses)
     output->clear();
 
     for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++) {
-        List* item = (List*) make_list(output->append());
+        List* item = (List*) set_list(output->append());
         Uint16 key = KEYS_JUST_PRESSED[index].unicode;
         char keyStr[2];
         keyStr[1] = 0;
@@ -205,9 +205,9 @@ CA_FUNCTION(recent_key_presses)
         else
             keyStr[0] = char(key);
 
-        make_string(item->append(), keyStr);
-        make_int(item->append(), KEYS_JUST_PRESSED[index].sym);
-        make_int(item->append(), KEYS_JUST_PRESSED[index].mod);
+        set_string(item->append(), keyStr);
+        set_int(item->append(), KEYS_JUST_PRESSED[index].sym);
+        set_int(item->append(), KEYS_JUST_PRESSED[index].mod);
     }
 }
 
@@ -223,36 +223,36 @@ bool mouse_in(TaggedValue* box)
 
 CA_FUNCTION(mouse_pressed)
 {
-    make_bool(OUTPUT, LEFT_MOUSE_DOWN);
+    set_bool(OUTPUT, LEFT_MOUSE_DOWN);
 }
 
 CA_FUNCTION(mouse_clicked)
 {
     if (NUM_INPUTS == 0)
-        make_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
+        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN);
     else
-        make_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
+        set_bool(OUTPUT, RECENT_LEFT_MOUSE_DOWN && mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_over)
 {
-    make_bool(OUTPUT, mouse_in(INPUT(0)));
+    set_bool(OUTPUT, mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_wheel_up)
 {
     if (NUM_INPUTS == 0)
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP);
     else
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_UP && mouse_in(INPUT(0)));
 }
 
 CA_FUNCTION(mouse_wheel_down)
 {
     if (NUM_INPUTS == 0)
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN);
     else
-        make_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
+        set_bool(OUTPUT, RECENT_MOUSE_WHEEL_DOWN && mouse_in(INPUT(0)));
 }
 
 void setup(Branch& branch)
@@ -280,14 +280,14 @@ void setup(Branch& branch)
     Branch& key = branch["key"]->nestedContents;
     ca_assert(is_namespace(key));
 
-    make_int(key["up"], SDLK_UP);
-    make_int(key["down"], SDLK_DOWN);
-    make_int(key["left"], SDLK_LEFT);
-    make_int(key["right"], SDLK_RIGHT);
-    make_int(key["space"], SDLK_SPACE);
-    make_int(key["delete"], SDLK_BACKSPACE);
-    make_int(key["enter"], SDLK_RETURN);
-    make_int(key["escape"], SDLK_ESCAPE);
+    set_int(key["up"], SDLK_UP);
+    set_int(key["down"], SDLK_DOWN);
+    set_int(key["left"], SDLK_LEFT);
+    set_int(key["right"], SDLK_RIGHT);
+    set_int(key["space"], SDLK_SPACE);
+    set_int(key["delete"], SDLK_BACKSPACE);
+    set_int(key["enter"], SDLK_RETURN);
+    set_int(key["escape"], SDLK_ESCAPE);
 }
 
 } // namespace input

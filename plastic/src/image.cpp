@@ -19,10 +19,10 @@ namespace image_t {
     int get_width(TaggedValue* v) { return v->getIndex(2)->asInt(); }
     int get_height(TaggedValue* v) { return v->getIndex(3)->asInt(); }
 
-    void set_filename(TaggedValue* v, std::string const& s) { touch(v); make_string(v->getIndex(0), s); }
-    void set_texid(TaggedValue* v, int id) { touch(v); make_int(v->getIndex(1), id); }
-    void set_width(TaggedValue* v, int w) { touch(v); make_int(v->getIndex(2), w); }
-    void set_height(TaggedValue* v, int h) { touch(v); make_int(v->getIndex(3), h); }
+    void set_filename(TaggedValue* v, std::string const& s) { touch(v); set_string(v->getIndex(0), s); }
+    void set_texid(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
+    void set_width(TaggedValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
+    void set_height(TaggedValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
 }
 
 namespace rect_t {
@@ -124,11 +124,10 @@ CA_FUNCTION(load_image)
 CA_FUNCTION(draw_image)
 {
     TaggedValue* image = INPUT(0);
-    TaggedValue* point = INPUT(1);
 
-    float x = 0;
-    float y = 0;
-    circa::point_t::read(point, &x, &y);
+    Point* loc = Point::checkCast(INPUT(1));
+    float x = loc->getX();
+    float y = loc->getY();
     float width = float(image_t::get_width(image));
     float height = float(image_t::get_height(image));
 

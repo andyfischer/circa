@@ -13,16 +13,16 @@ const int INTERNAL_ERROR_TYPE = 1;
 
 void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)
 {
-    List& error = *make_list(result->errors.append(), 3);
-    make_int(error[0], INTERNAL_ERROR_TYPE);
-    make_int(error[1], index);
-    make_string(error[2], message);
+    List& error = *set_list(result->errors.append(), 3);
+    set_int(error[0], INTERNAL_ERROR_TYPE);
+    set_int(error[1], index);
+    set_string(error[2], message);
 }
 
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
 {
-    int nextExpectedRegisterIndex = 0;
-    int registerCount = branch.registerCount;
+    //int nextExpectedRegisterIndex = 0;
+    //int registerCount = branch.registerCount;
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
@@ -32,6 +32,19 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
             continue;
         }
 
+        // Check that the term's index is correct
+        if (term->index != i) {
+            std::stringstream msg;
+            msg << "Wrong index (found " << term->index << ", expected " << i << ")";
+            append_internal_error(result, i, msg.str());
+        }
+
+        // Check that owningBranch is correct
+        if (term->owningBranch != &branch) {
+            append_internal_error(result, i, "Wrong owningBranch");
+        }
+
+        #if 0
         int regCount = get_register_count(term);
         int expectedRegister = -1;
 
@@ -53,6 +66,7 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
                 << ", branch.registerCount = " << registerCount;
             append_internal_error(result, i, msg.str());
         }
+        #endif
     }
 } 
 
@@ -74,7 +88,7 @@ bool branch_check_invariants_print_result(Branch& branch, std::ostream& out)
         out << std::endl;
     }
 
-    std::cout << "contents:" << std::endl;
+    out << "contents:" << std::endl;
     print_branch_raw(out, branch);
 
     return false;

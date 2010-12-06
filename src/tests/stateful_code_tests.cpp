@@ -54,6 +54,22 @@ void test_get_type_from_branches_stateful_terms()
     test_assert(type[1]->type == BOOL_TYPE);
 }
 
+void initial_value()
+{
+    Branch branch;
+    EvalContext context;
+
+    Term* i = branch.compile("state i = 3");
+    Term* j = branch.compile("state int j = 4");
+    evaluate_branch(&context, branch);
+
+    test_assert(is_int(get_local(i)));
+    test_equals(get_local(i)->asInt(), 3);
+
+    test_assert(is_int(get_local(j)));
+    test_equals(get_local(j)->asInt(), 4);
+}
+
 void initialize_from_expression()
 {
     Branch branch;
@@ -61,21 +77,30 @@ void initialize_from_expression()
     branch.compile("b = a * 2");
     Term *c = branch.compile("state c = b");
 
+    test_assert(branch);
+
     evaluate_branch(branch);
 
     test_equals(to_float(c), 6);
+
+    branch.clear();
+    Term* d = branch.compile("d = 5");
+    Term* e = branch.compile("state e = d");
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_equals(e->asInt(), 5);
+
+    set_int(d, 10);
+    evaluate_branch(&context, branch);
+    test_equals(e->asInt(), 5);
 }
 
-void one_time_assignment()
-{
-    // TODO
-}
 
 int NEXT_UNIQUE_OUTPUT = 0;
 
 CA_FUNCTION(_unique_output)
 {
-    make_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
+    set_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
 }
 
 std::vector<int> SPY_RESULTS;
@@ -133,15 +158,15 @@ void implicit_state()
     EvalContext context;
     evaluate_branch(&context, branch);
     
-    test_equals(context.state.toString(), "[f: [s: 1]]");
+    test_equals(context.state.toString(), "[_f: [s: 1]]");
 }
 
 namespace test_interpreted_state_access
 {
     CA_FUNCTION(evaluate)
     {
-        TaggedValue* state = make_int(get_state_input(CONTEXT, CALLER));
-        make_int(state, as_int(state) + 1);
+        TaggedValue* state = set_int(get_state_input(CONTEXT, CALLER));
+        set_int(state, as_int(state) + 1);
     }
 
     void test()
@@ -166,17 +191,38 @@ namespace test_interpreted_state_access
     }
 }
 
+void bug_with_top_level_state()
+{
+    // This code once caused an assertion failure
+    Branch branch;
+    branch.compile("state s = 1");
+    branch.compile("def f() state t end");
+    branch.compile("f()");
+    evaluate_branch(branch);
+}
+
+void bug_with_state_and_plus_equals()
+{
+    Branch branch;
+    branch.compile("state int count = 0; count += 1");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
-    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
-    REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment);
+    REGISTER_TEST_CASE(stateful_code_tests::initial_value);
+    REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);
+    REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
+    REGISTER_TEST_CASE(stateful_code_tests::bug_with_state_and_plus_equals);
 }
 
 } // namespace stateful_code_tests

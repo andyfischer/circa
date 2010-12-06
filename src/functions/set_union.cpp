@@ -1,6 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
 #include "circa.h"
+#include "types/set.h"
 
 namespace circa {
 namespace set_union_function {

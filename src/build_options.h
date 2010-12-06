@@ -15,3 +15,7 @@
 // Do frequent sanity checks of code data before executing it. Has a performance
 // penalty.
 #define AGGRESSIVELY_CHECK_BRANCH_INVARIANTS 1
+
+// Trigger an assert when internal_error is called. If this is off, the alternative
+// is that an exception is thrown.
+#define ASSERT_INTERNAL_ERROR false

@@ -1,5 +1,21 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+/*
+   Some notes on handling state inside a subroutine:
+  
+   when each term evaluates, we will look for EvalContext.currentScopeState(), and
+   do a lookup using the term's name
+
+Start evaluating a subroutine:
+ - Grab state container from currentScopeState
+ - Preserve parent currentScopeState
+ - Assign this to EvalContext.currentScopeState
+ - Evaluate each term
+ - Assign modified state back into the parent currentScopeState
+ - Restore parent currentScopeState
+
+*/
+ 
 #include "evaluation.h"
 #include "circa.h"
 #include "importing_macros.h"
@@ -21,62 +37,133 @@ namespace subroutine_t {
             format_branch_source(source, term->nestedContents, term);
     }
 
-    CA_FUNCTION(evaluate)
+    void evaluate_subroutine(EvalContext* context, Term* caller)
     {
-        Term* function = FUNCTION;
+        Term* function = caller->function;
         Branch& contents = function->nestedContents;
+        context->interruptSubroutine = false;
 
-        // Copy inputs to a new stack frame
+        // Copy inputs to a temporary list
+        List inputs;
+        inputs.resize(caller->numInputs());
+
+        for (int i=0; i < caller->numInputs(); i++) {
+            TaggedValue* input = get_input(context, caller, i);
+            if (input == NULL)
+                continue;
+
+            Type* inputType = type_contents(function_t::get_input_type(function, i));
+
+            bool success = cast(input, inputType, inputs[i]);
+            ca_assert(success);
+        }
+
+        start_using(contents);
+
+        // Insert inputs into placeholdes
+        for (int i=0; i < caller->numInputs(); i++) {
+            Term* placeholder = function_t::get_input_placeholder(function, i);
+            swap(inputs[i], get_local(placeholder));
+        }
+
+        #if 0
+
+        // Copy inputs to input placeholders
         {
-            List frame;
-            frame.resize(contents.registerCount);
+            //List frame;
+            //frame.resize(contents.registerCount);
 
-            for (int i=0; i < NUM_INPUTS; i++) {
-                TaggedValue* input = INPUT(i);
+            for (int i=0; i < caller->numInputs(); i++) {
+                TaggedValue* input = get_input(context, caller, i);
                 if (input == NULL)
                     continue;
+                Term* placeholder = function_t::get_input_placeholder(function, i);
                 Term* inputTypeTerm = function_t::get_input_type(function, i);
                 Type* inputType = type_contents(inputTypeTerm);
 
-                cast(inputType, input, frame.get(i));
+                bool success = cast(input, inputType, get_local(placeholder));
+                ca_assert(success);
             }
 
-            swap(&frame, STACK->append());
+            //swap(&frame, context->stack.append());
         }
+        #endif
 
         // prepare output
-        make_null(&CONTEXT->subroutineOutput);
+        set_null(&context->subroutineOutput);
 
         // Fetch state container
-        Dict* prevScopeState = CONTEXT->currentScopeState;
+        TaggedValue prevScopeState;
+        swap(&context->currentScopeState, &prevScopeState);
 
-        CONTEXT->currentScopeState = NULL;
         if (is_function_stateful(function))
-            CONTEXT->currentScopeState = fetch_state_container(CONTEXT, CALLER);
+            fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
 
         // Evaluate each term
         for (int i=0; i < contents.length(); i++) {
-            evaluate_single_term(CONTEXT, contents[i]);
-            if (CONTEXT->interruptSubroutine)
+            evaluate_single_term(context, contents[i]);
+            if (context->interruptSubroutine)
                 break;
         }
-        List* frame = get_stack_frame(STACK, 0);
+
+        #if 0
+        // Stack frame object may have moved, grab it again.
+        List* frame = get_stack_frame(&context->stack, 0);
+        #endif
+
+        //std::cout << "finished subroutine, stack = " << context->stack.toString() <<std::endl;
+        //dump_branch(contents);
 
         // Fetch output
+        Term* outputTypeTerm = function_t::get_output_type(caller->function);
+        Type* outputType = type_contents(outputTypeTerm);
         TaggedValue output;
-        if (!is_null(&CONTEXT->subroutineOutput))
-            swap(&CONTEXT->subroutineOutput, &output);
-        else if (frame->length() > 0)
-            swap(frame->get(frame->length() - 1), &output);
+
+        if (outputTypeTerm != VOID_TYPE) {
+            TaggedValue* outputSource = NULL;
+
+            if (!is_null(&context->subroutineOutput)) {
+                outputSource = &context->subroutineOutput;
+            }
+            else {
+                outputSource = get_local(contents[contents.length()-1]);
+                #if 0
+                outputSource = frame->get(frame->length() - 1);
+                #endif
+            }
+
+            //std::cout << "found output: " << outputSource->toString() << std::endl;
+
+            bool success = cast(outputSource, outputType, &output);
+            
+            if (!success) {
+                std::stringstream msg;
+                msg << "Couldn't cast output " << output.toString()
+                    << " to type " << outputType->name;
+                error_occurred(context, caller, msg.str());
+            }
+
+            set_null(&context->subroutineOutput);
+        }
 
         // Write to state
-        wrap_up_open_state_vars(CONTEXT, contents, NULL);
+        wrap_up_open_state_vars(context, contents);
 
-        pop_stack_frame(STACK);
-        CONTEXT->currentScopeState = prevScopeState;
+        #if 0
+        pop_stack_frame(&context->stack);
+        #endif
 
-        if (OUTPUT != NULL)
-            swap(&output, OUTPUT);
+        // Restore currentScopeState
+        if (is_function_stateful(function))
+            preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
+
+        swap(&context->currentScopeState, &prevScopeState);
+
+        finish_using(contents);
+
+        TaggedValue* outputDest = get_output(context, caller);
+        if (outputDest != NULL)
+            swap(&output, outputDest);
     }
 }
 
@@ -88,13 +175,13 @@ bool is_subroutine(Term* term)
         return false;
     if (term->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
         return false;
-    return function_t::get_evaluate(term) == subroutine_t::evaluate;
+    return function_t::get_evaluate(term) == subroutine_t::evaluate_subroutine;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
     // Install evaluate function
-    function_t::get_evaluate(sub) = subroutine_t::evaluate;
+    function_t::get_evaluate(sub) = subroutine_t::evaluate_subroutine;
 
     subroutine_update_state_type_from_contents(sub);
 }
@@ -144,8 +231,10 @@ void subroutine_change_state_type(Term* func, Term* newType)
     // create a stateful input if needed
     if (newType != VOID_TYPE && !hasStateInput) {
         contents.insert(1, alloc_term());
-        rewrite(contents[1], INPUT_PLACEHOLDER_FUNC, RefList());
-        contents.bindName(contents[1], "#state");
+        Term* input = contents[1];
+        rewrite(input, INPUT_PLACEHOLDER_FUNC, RefList());
+        contents.bindName(input, "#state");
+        input->setBoolProp("optional", true);
     }
 
     // If state was added, find all the recursive calls to this function and
@@ -157,8 +246,8 @@ void subroutine_change_state_type(Term* func, Term* newType)
             if (term->function == func) {
                 Branch* branch = term->owningBranch;
                 Term* stateType = function_t::get_inline_state_type(func);
-                std::string name = default_name_for_hidden_state(term->name);
-                Term* stateContainer = create_stateful_value(*branch, stateType, NULL, name);
+                Term* stateContainer = create_stateful_value(*branch, stateType, NULL,
+                        term->uniqueName.name);
                 branch->move(stateContainer, term->index);
 
                 RefList inputs = term->inputs;
@@ -171,12 +260,14 @@ void subroutine_change_state_type(Term* func, Term* newType)
             }
         }
     }
+
+    update_register_indices(func);
 }
 
 void store_locals(Branch& branch, TaggedValue* storageTv)
 {
     touch(storageTv);
-    make_list(storageTv);
+    set_list(storageTv);
     List* storage = List::checkCast(storageTv);
     storage->resize(branch.length());
     for (int i=0; i < branch.length(); i++) {
@@ -187,16 +278,13 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
         if (term->type == FUNCTION_ATTRS_TYPE)
             continue;
 
-        if (is_branch(term))
-            store_locals(term->nestedContents, storage->get(i));
-        else
-            copy(term, storage->get(i));
+        copy(term, storage->get(i));
     }
 }
 
 void restore_locals(TaggedValue* storageTv, Branch& branch)
 {
-    if (!list_t::is_list(storageTv))
+    if (!is_list(storageTv))
         internal_error("storageTv is not a list");
 
     List* storage = List::checkCast(storageTv);
@@ -211,10 +299,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
         if (term->type == FUNCTION_ATTRS_TYPE)
             continue;
 
-        if (is_branch(term))
-            restore_locals(storage->get(i), term->nestedContents);
-        else
-            copy(storage->get(i), term);
+        copy(storage->get(i), term);
     }
 }
 

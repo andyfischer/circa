@@ -7,16 +7,17 @@ namespace lookup_branch_ref_function {
 
     CA_FUNCTION(evaluate)
     {
+        #if 0
         std::string name = as_string(INPUT(0));
         Term* term = get_global(name);
 
         if (term == NULL)
             return branch_ref_t::set_from_ref(OUTPUT, NULL);
 
-        if (!is_branch(term))
-            return branch_ref_t::set_from_ref(OUTPUT, NULL);
+        // FIXME: Don't give references to a non-branch
 
         return branch_ref_t::set_from_ref(OUTPUT, term);
+        #endif
     }
 
     void setup(Branch& kernel)

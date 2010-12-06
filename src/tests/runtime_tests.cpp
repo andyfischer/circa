@@ -10,7 +10,7 @@ std::vector<std::string> gSpyResults;
 CA_FUNCTION(spy_function)
 {
     gSpyResults.push_back(as_string(INPUT(0)));
-    make_bool(OUTPUT, true);
+    set_bool(OUTPUT, true);
 }
 
 CA_FUNCTION(i_only_throw_errors)
@@ -75,34 +75,6 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
-void test_resize_list()
-{
-    Branch list;
-
-    create_int(list, 1, "a");
-    create_int(list, 2, "b");
-
-    resize_list(list, 4, INT_TYPE);
-
-    test_assert(list.length() == 4);
-    test_assert(list[0]->asInt() == 1);
-    test_assert(list[0]->name == "a");
-    test_assert(list[1]->asInt() == 2);
-    test_assert(list[1]->name == "b");
-    test_assert(list[2]->asInt() == 0);
-    test_assert(list[3]->asInt() == 0);
-
-    resize_list(list, 1, INT_TYPE);
-    test_assert(list.length() == 1);
-    test_assert(list[0]->asInt() == 1);
-    test_assert(list[0]->name == "a");
-
-    resize_list(list, 3, STRING_TYPE);
-    test_assert(list.length() == 3);
-    test_assert(list[1]->type == STRING_TYPE);
-    test_assert(list[2]->type == STRING_TYPE);
-}
-
 void function_that_ignores_errors()
 {
 #if 0
@@ -124,7 +96,6 @@ void register_tests()
     REGISTER_TEST_CASE(runtime_tests::test_simple);
     //TEST_DISABLED REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
-    REGISTER_TEST_CASE(runtime_tests::test_resize_list);
     REGISTER_TEST_CASE(runtime_tests::function_that_ignores_errors);
 }
 

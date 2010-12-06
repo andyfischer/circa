@@ -7,19 +7,22 @@ namespace lang_function {
 
     CA_FUNCTION(field)
     {
-        make_ref(OUTPUT, INPUT_TERM(0)->nestedContents[INPUT(1)->asInt()]);
+        set_ref(OUTPUT, INPUT_TERM(0)->nestedContents[INPUT(1)->asInt()]);
     }
 
     CA_FUNCTION(num_fields)
     {
-        make_int(OUTPUT, INPUT_TERM(0)->nestedContents.length());
+        set_int(OUTPUT, INPUT_TERM(0)->nestedContents.length());
     }
 
     void setup(Branch& kernel)
     {
+        #if 0
+        FIXME
         Branch& lang_ns = create_namespace(kernel, "lang");
         import_function(lang_ns, field, "field(Branch,int) -> Ref");
         import_function(lang_ns, num_fields, "num_fields(Branch) -> int");
+        #endif
     }
 }
 }

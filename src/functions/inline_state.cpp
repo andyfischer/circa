@@ -31,14 +31,18 @@ namespace inline_state_function {
             stateContainer = Dict::checkCast(containerFromInput);
 
         if (stateContainer == NULL)
-            stateContainer = Dict::lazyCast(&CONTEXT->state);
+            stateContainer = Dict::lazyCast(&CONTEXT->currentScopeState);
 
         ca_assert(stateContainer != NULL);
 
         const char* name = STRING_INPUT(1);
         TaggedValue* value = stateContainer->get(name);
+
+        //std::cout << "get_state_field looking at container: "
+        //    << stateContainer->toString() << " with name: " << name << std::endl;
+
         if (value) {
-            // todo: check if we need to cast this value
+            // TODO: check if we need to cast this value
             copy(value, OUTPUT);
 
         // If we didn't find the value, see if they provided a default
@@ -53,13 +57,13 @@ namespace inline_state_function {
         }
 
         // append name to the list of open state vars
-        make_string(CONTEXT->openStateVariables.append(), name);
+        set_string(CONTEXT->openStateVariables.append(), name);
     }
 
     void get_state_field_write_bytecode(bytecode::WriteContext* context, Term* term)
     {
         TaggedValue nameVal;
-        make_string(&nameVal, term->name);
+        set_string(&nameVal, term->name);
 
         int name = bytecode::write_push_local_op(context, &nameVal);
 

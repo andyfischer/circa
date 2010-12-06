@@ -5,7 +5,7 @@
 namespace circa {
 namespace include_function {
 
-    void preload_script(EvalContext* cxt, Term* caller,
+    void load_script(EvalContext* cxt, Term* caller,
             TaggedValue* fileSignature, const std::string& filename)
     {
         Branch& contents = caller->nestedContents;
@@ -18,10 +18,8 @@ namespace include_function {
 
             contents.clear();
 
-            if (!storage::file_exists(filename.c_str())) {
-                error_occurred(cxt, caller, "File not found: "+filename);
-                return;
-            }
+            if (!storage::file_exists(filename.c_str()))
+                return error_occurred(cxt, caller, "File not found: "+filename);
 
             parse_script(contents, filename);
 
@@ -37,47 +35,55 @@ namespace include_function {
                 return;
             }
 
-            //std::cout << "### Previous:" << std::endl;
-            //dump_branch(previous_contents);
-            //std::cout << "### New:" << std::endl;
-            //dump_branch(contents);
-
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);
         }
     }
-    void preload_script(EvalContext* cxt, Term* term)
+    void preload_script(Term* term)
     {
-        TaggedValue* fileSignature = term->input(0);
-        std::string filename = term->input(1)->asString();
-        return preload_script(cxt, term, fileSignature, filename);
+        TaggedValue* fileSignature = &term->nestedContents.fileSignature;
+
+        Term* inputTerm = term->input(0);
+
+        EvalContext context;
+        evaluate_minimum(&context, inputTerm);
+
+        TaggedValue *input = get_input(&context, term, 0);
+
+        if (!is_string(input))
+            return;
+
+        return load_script(&context, term, fileSignature, as_string(input));
     }
 
     CA_FUNCTION(evaluate_include)
     {
-        preload_script(CONTEXT, CALLER, INPUT(0), STRING_INPUT(1));
+        Branch& contents = CALLER->nestedContents;
+
+        load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
+            STRING_INPUT(0));
 
         if (CONTEXT->errorOccurred)
             return;
 
-        Branch& contents = CALLER->nestedContents;
         evaluate_branch(CONTEXT, contents);
     }
 
     CA_FUNCTION(load_script)
     {
-        preload_script(CONTEXT, CALLER);
+        load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
+            STRING_INPUT(0));
     }
 
     void setup(Branch& kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
-                "include(state FileSignature, string filename)");
+                "include(string filename)");
 
         function_t::set_exposed_name_path(INCLUDE_FUNC, ".");
 
         Term* load_script_f = import_function(kernel, load_script,
-            "load_script(state FileSignature, string filename)");
+            "load_script(string filename)");
 
         function_t::set_exposed_name_path(load_script_f, ".");
     }

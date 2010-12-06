@@ -25,6 +25,22 @@ struct Branch
     int registerCount;
     int outputRegister;
 
+    // Local values for each term. These are the results of the most recent
+    // interpreted execution of this branch.
+    // (This list makes it impossible for the same branch to be simultaneously
+    // executed by different threads, but that problem will eventually be
+    // revisited).
+    List locals;
+
+    // While the interpreter is using a branch, it can be marked 'inuse' and
+    // it can have a list of old local lists. This is to support recursion.
+    bool inuse;
+    List localsStack;
+
+    // For a branch loaded from a file, this keeps track of the file signature
+    // of the last time this was loaded.
+    List fileSignature;
+
     bytecode::BytecodeData _bytecode;
 
     Branch();
@@ -55,6 +71,7 @@ struct Branch
 
     // Find a term with the given name, returns -1 if not found.
     int findIndex(std::string const& name) const;
+    int findIndex(const char* name) const;
 
     void set(int index, Term* term);
     void setNull(int index);
@@ -84,7 +101,7 @@ struct Branch
     // Compile the given statement, return the result term.
     Term* compile(std::string const& statement);
 
-    // Evaluate the given statement, return the result term.
+    // Evaluate the given statement, return the result value.
     Term* eval(std::string const& statement);
 
     std::string toString();
@@ -94,29 +111,6 @@ private:
     Branch(Branch const& copy) {}
     Branch& operator=(Branch const& b) { return *this; }
 };
-
-namespace branch_t {
-    void initialize(Type*, TaggedValue* value);
-    void release(TaggedValue* value);
-    void assign(TaggedValue*, TaggedValue*);
-    void cast(Type*, TaggedValue* source, TaggedValue* dest);
-    bool equals(TaggedValue*, TaggedValue*);
-    TaggedValue* get_index(TaggedValue* value, int index);
-    int num_elements(TaggedValue* value);
-
-    void branch_copy(Branch& source, Branch& dest);
-    void assign(Branch& source, Branch& dest);
-
-    void setup_type(Term* type);
-}
-
-bool is_branch(TaggedValue* term);
-Branch& as_branch(TaggedValue* term);
-Branch& as_branch(Term* term);
-
-bool is_branch_based_type(Term* type);
-bool is_branch_based_type(Type* type);
-void initialize_branch_based_type(Term* term);
 
 bool is_namespace(Term* term);
 bool is_namespace(Branch& branch);
@@ -133,7 +127,5 @@ Term* find_term_by_id(Branch& branch, unsigned int id);
 
 void persist_branch_to_file(Branch& branch);
 std::string get_source_file_location(Branch& branch);
-
-bool branch_check_invariants(Branch& branch, std::ostream* output=NULL);
 
 } // namespace circa

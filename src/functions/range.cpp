@@ -11,14 +11,14 @@ namespace range_function {
         int max = INT_INPUT(1);
 
         int count = abs(max-start);
-        make_list(OUTPUT);
+        set_list(OUTPUT);
         List* list = List::checkCast(OUTPUT);
         list->resize(count);
 
         int val = start;
         int increment = start < max ? 1 : -1;
         for (int i=0; i < count; i++) {
-            make_int(list->get(i), val);
+            set_int(list->get(i), val);
             val += increment;
         }
     }

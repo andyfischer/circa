@@ -35,7 +35,7 @@ void update_if_block_joining_branch(Term* ifCall)
 
     for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
         Term* term = contents[branch_index];
-        Branch& branch = is_branch(term) ? as_branch(term) : term->nestedContents;
+        Branch& branch = term->nestedContents;
 
         TermNamespace::const_iterator it;
         for (it = branch.names.begin(); it != branch.names.end(); ++it) {
@@ -146,12 +146,12 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
 
         // State field name.
         TaggedValue stateName;
-        make_string(&stateName, get_implicit_state_name(ifBlock));
+        set_string(&stateName, get_implicit_state_name(ifBlock));
         stateContainerName = bytecode::write_push_local_op(context, &stateName);
 
         // State default value
         TaggedValue defaultValue;
-        make_list(&defaultValue);
+        set_list(&defaultValue);
         int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
 
         // get_state_field
@@ -172,7 +172,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
     }
 
     // For each name in #joining, we want corresponding variables (across the
-    // branches in this if-block) to have the same stack indexes.
+    // branches in this if-block) to have the same register indexes.
     for (int i=0; i < joining.length(); i++) {
         ca_assert(joining[i] != NULL);
         if (joining[i]->registerIndex == -1)
@@ -180,7 +180,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         std::string const& name = joining[i]->name;
         ca_assert(name != "");
 
-        // Find the corresponding term in each branch, give it this stack index.
+        // Find the corresponding term in each branch, give it this register index.
         for (int b=0; b < numBranches; b++) {
             Term* term = blockContents[b]->nestedContents[name];
             if (term != NULL)
@@ -226,7 +226,7 @@ void write_if_block_bytecode(bytecode::WriteContext* context, Term* ifBlock)
         Branch& branchContents = term->nestedContents;
         bytecode::write_bytecode_for_branch(context, branchContents, conditionLocalState);
 
-        // For each local rebind, make sure that the branch writes to its stack position.
+        // For each local rebind, make sure that the branch writes to its register position.
         // If one branch doesn't mention a local rebind, then insert a copy term.
         for (int i=0; i < joining.length(); i++) {
             std::string const& name = joining[i]->name;
@@ -289,25 +289,20 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
-            push_stack_frame(STACK, contents.registerCount);
-            evaluate_branch_existing_frame(CONTEXT, contents);
+            evaluate_branch_internal(CONTEXT, contents);
 
             acceptedBranchIndex = i;
             break;
         }
     }
 
-    // Copy the results of our #join terms to the stack
+    // Copy values to joining terms
     Branch& joining = contents[contents.length()-1]->nestedContents;
-    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        TaggedValue* val = get_input(CONTEXT, joinTerm, acceptedBranchIndex);
-        copy(val, outputFrame->get(joinTerm->registerIndex));
+        copy(get_input(CONTEXT, joinTerm, acceptedBranchIndex), get_local(joinTerm));
     }
-
-    pop_stack_frame(STACK);
 }
 
 } // namespace circa

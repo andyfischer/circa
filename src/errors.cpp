@@ -2,11 +2,16 @@
 
 #include <cassert>
 
-#include "circa.h"
+#include "branch_iterator.h"
+#include "build_options.h"
+#include "errors.h"
+#include "evaluation.h"
+#include "function.h"
+#include "introspection.h"
+#include "source_repro.h"
+#include "type.h"
 
 namespace circa {
-
-const bool ASSERT_INTERNAL_ERROR = true;
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
@@ -47,22 +52,6 @@ void ca_assert_function(bool expr, const char* exprStr, int line, const char* fi
         msg << "ca_assert(" << exprStr << ") failed in " << file << " line " << line;
         internal_error(msg.str().c_str());
     }
-}
-
-void ca_assert_type(Term* term, Term* type)
-{
-    if (term->type != type) {
-        std::stringstream msg;
-        msg << "Expected " << as_type(type).name
-            << ", found " << as_type(term->type).name;
-        native_type_mismatch(msg.str());
-    }
-}
-
-void native_type_mismatch(std::string const& message)
-{
-    //assert(false);
-    throw std::runtime_error(message);
 }
 
 bool has_static_error(Term* term)
@@ -129,6 +118,8 @@ StaticError get_static_error(Term* term)
     // Unknown function
     if (term->function == UNKNOWN_FUNCTION)
         return SERROR_UNKNOWN_FUNCTION;
+    if (!is_function(term->function))
+        return SERROR_UNKNOWN_FUNCTION;
 
     // Unknown type
     if (term->function == UNKNOWN_TYPE_FUNC)
@@ -187,9 +178,13 @@ std::string get_static_error_message(Term* term)
         return out.str();
     } 
 
-    case SERROR_UNKNOWN_FUNCTION:
-        out << "Unknown function: " << term->stringProp("syntax:functionName");
+    case SERROR_UNKNOWN_FUNCTION: {
+        std::string functionName = term->stringProp("syntax:functionName");
+        if (functionName == "")
+            functionName = get_term_source_text(term->function);
+        out << "Unknown function: " << functionName;
         return out.str();
+    }
     case SERROR_UNKNOWN_TYPE:
         out << "Unknown type: " << term->name;
         return out.str();

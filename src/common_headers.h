@@ -31,6 +31,7 @@
 namespace circa {
 
 struct Branch;
+struct CastResult;
 struct Dict;
 struct EvalContext;
 struct FeedbackOperation;
@@ -42,6 +43,7 @@ struct Ref;
 struct RefList;
 struct ReferenceMap;
 struct StaticTypeQuery;
+struct StaticErrorCheck;
 struct StyledSource;
 struct TaggedValue;
 struct Term;

@@ -15,35 +15,34 @@ namespace vectorize_vs_function {
 
     CA_FUNCTION(evaluate)
     {
-        // Push stack frame
         Branch& contents = CALLER->nestedContents;
         TaggedValue input0, input1;
         copy(INPUT(0), &input0);
         copy(INPUT(1), &input1);
         int listLength = input0.numElements();
 
-        List* frame = push_stack_frame(STACK, 3);
+        Term* input0_placeholder = contents[0];
+        Term* input1_placeholder = contents[1]; 
+        Term* content_output = contents[2]; 
 
         // Prepare output
         TaggedValue outputTv;
-        List* output = make_list(&outputTv, listLength);
+        List* output = set_list(&outputTv, listLength);
 
         // Copy right input once
-        swap(&input1, frame->get(1));
+        swap(&input1, get_local(input1_placeholder));
 
         // Evaluate vectorized call, once for each input
         for (int i=0; i < listLength; i++) {
             // Copy left into placeholder
-            swap(input0.getIndex(i), frame->get(0));
+            swap(input0.getIndex(i), get_local(input0_placeholder));
 
-            evaluate_single_term(CONTEXT, contents[2]);
-            frame = get_stack_frame(STACK, 0);
+            evaluate_single_term(CONTEXT, content_output);
 
             // Save output
-            swap(frame->get(2), output->get(i));
+            swap(get_local(content_output), output->get(i));
         }
 
-        pop_stack_frame(STACK);
         swap(output, OUTPUT);
     }
 

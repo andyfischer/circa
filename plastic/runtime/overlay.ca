@@ -1,0 +1,30 @@
+-- Draw HUD
+draw_main_menu = false
+if draw_main_menu
+    include('mainmenu.ca' -> path)
+end
+
+-- Draw fpses
+draw_fps = false
+if draw_fps
+    text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
+    text:draw_rendered_text(text_sprite, [10 window.height - 40])
+end
+
+-- Draw pause indicator
+if ide:paused()
+    draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
+end
+
+-- Name selector
+<<<
+if toggle(key_pressed('b'))
+    br = branch_ref(users_branch)
+    x = 10, y = 10
+    for r in br.get_configs_nested()
+        tweak:button(r, [x y], br.get_relative_name(r))
+        y += 24
+    end
+end
+>>>
+

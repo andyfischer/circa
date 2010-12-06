@@ -12,7 +12,7 @@ void compound_types()
 {
     Branch branch;
 
-    Term* MyType = branch.eval("type MyType { int myint, string astr }");
+    Term* MyType = branch.compile("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
     Branch& prototype = type_t::get_prototype(MyType);
@@ -48,17 +48,31 @@ void compound_types()
     test_assert(is_string(astr));
     test_equals(as_string(astr), "");
 
-    test_assert(inst2->getIndex(1)->asString() == "hello");
+    test_equals(inst2->getIndex(1)->asString(), "hello");
     test_assert(inst2->type == MyType); // type specialization
 
     test_assert(is_string(astr2));
     test_equals(as_string(astr2), "hello");
 }
 
+void compound_type_cast()
+{
+    Branch branch;
+    Term* t = branch.compile("type T { string a }");
+    TaggedValue* a = branch.eval("['hi']");
+    test_assert(is_list(a));
+    test_assert(a->value_type != type_contents(t));
+
+    TaggedValue casted;
+    test_assert(cast(a, type_contents(t), &casted));
+    test_assert(is_list(&casted));
+    test_assert(casted.value_type == type_contents(t));
+}
+
 void type_declaration()
 {
     Branch branch;
-    Term* myType = branch.eval("type MyType { string a, int b } ");
+    Term* myType = branch.compile("type MyType { string a, int b } ");
 
     Branch& prototype = type_t::get_prototype(myType);
     test_assert(prototype.length() == 2);
@@ -71,7 +85,7 @@ void type_declaration()
     test_assert(type->initialize != NULL);
     test_assert(type->copy != NULL);
 
-    branch.eval("mt = MyType()");
+    branch.compile("mt = MyType()");
 
     test_assert(branch);
 }
@@ -86,36 +100,36 @@ void test_term_output_always_satisfies_type()
     test_assert(!term_output_always_satisfies_type(a, type_contents(STRING_TYPE)));
     test_assert(term_output_always_satisfies_type(a, type_contents(ANY_TYPE)));
 
-    Type* t1 = type_contents(branch.eval("type t1 { int a, number b }"));
-    Type* t2 = type_contents(branch.eval("type t2 { int a }"));
-    Type* t3 = type_contents(branch.eval("type t3 { int a, number b, string c }"));
-    Type* t4 = type_contents(branch.eval("type t4 { number a, int b }"));
+    Type* t1 = type_contents(branch.compile("type t1 { int a, number b }"));
+    Type* t2 = type_contents(branch.compile("type t2 { int a }"));
+    Type* t3 = type_contents(branch.compile("type t3 { int a, number b, string c }"));
+    Type* t4 = type_contents(branch.compile("type t4 { number a, int b }"));
 
-    Term* v1 = branch.eval("[1, 2.0]");
+    Term* v1 = branch.compile("[1, 2.0]");
     test_assert(term_output_always_satisfies_type(v1, t1));
     test_assert(!term_output_always_satisfies_type(v1, t2));
     test_assert(!term_output_always_satisfies_type(v1, t3));
     test_assert(!term_output_always_satisfies_type(v1, t4));
 
-    Term* v2 = branch.eval("['hello' 2.0]");
+    Term* v2 = branch.compile("['hello' 2.0]");
     test_assert(!term_output_always_satisfies_type(v2, t1));
     test_assert(!term_output_always_satisfies_type(v2, t2));
     test_assert(!term_output_always_satisfies_type(v2, t3));
     test_assert(!term_output_always_satisfies_type(v2, t4));
 
-    Term* v3 = branch.eval("[1]");
+    Term* v3 = branch.compile("[1]");
     test_assert(!term_output_always_satisfies_type(v3, t1));
     test_assert(term_output_always_satisfies_type(v3, t2));
     test_assert(!term_output_always_satisfies_type(v3, t3));
     test_assert(!term_output_always_satisfies_type(v3, t4));
     
-    Term* v4 = branch.eval("[]");
+    Term* v4 = branch.compile("[]");
     test_assert(!term_output_always_satisfies_type(v4, t1));
     test_assert(!term_output_always_satisfies_type(v4, t2));
     test_assert(!term_output_always_satisfies_type(v4, t3));
     test_assert(!term_output_always_satisfies_type(v4, t4));
 
-    Term* v5 = branch.eval("[1 2]");
+    Term* v5 = branch.compile("[1 2]");
     test_assert(term_output_always_satisfies_type(v5, t1));  // coercion into a compound value
     test_assert(!term_output_always_satisfies_type(v5, t2));
     test_assert(!term_output_always_satisfies_type(v5, t3));
@@ -155,7 +169,7 @@ void test_default_values()
 
     Term* t_value = create_value(branch, t);
 
-    make_int(t_value->value, 5);
+    set_int(t_value->value, 5);
     type_t::enable_default_value(t);
     assign_value(t_value, type_t::get_default_value(t));
 
@@ -171,7 +185,7 @@ void test_assign_compound_value_to_default()
 {
     Branch branch;
 
-    Term* t = branch.eval("[1 2 3]");
+    TaggedValue* t = branch.eval("[1 2 3]");
     reset(t);
 
     //FIXME
@@ -210,71 +224,6 @@ void type_inference_for_get_field()
     test_assert(b->type == FLOAT_TYPE);
 }
 
-CA_FUNCTION(_evaluate_type_error)
-{
-    make_float(OUTPUT, to_float(INPUT(0)));
-}
-
-void test_type_error_in_a_native_call()
-{
-    Branch branch;
-
-    import_function(branch, _evaluate_type_error, "f(string) -> float");
-
-    branch.eval("f('hello')");
-    EvalContext context;
-    evaluate_branch(&context, branch);
-    test_assert(context.errorOccurred);
-}
-
-class test_nativeType {};
-
-void test_imported_pointer_type()
-{
-    Branch branch;
-    Term* T = branch.eval("type T {}");
-
-    import_type<test_nativeType*>(branch["T"]);
-
-    Term* v = branch.eval("v = T()");
-
-    test_assert(is_value_of_type(v, &as_type(T)));
-}
-
-namespace simple_pointer_test {
-
-TypeRef gType;
-CA_FUNCTION(_evaluate)
-{
-    test_assert(is_value_of_type(INPUT(0), gType));
-    test_assert(is_value_of_type(OUTPUT, gType));
-
-    test_assert(get_pointer(INPUT(0), gType) == NULL);
-    test_assert(get_pointer(OUTPUT, gType) == NULL);
-
-    set_pointer(INPUT(0), gType, NULL);
-    set_pointer(OUTPUT, gType, NULL);
-}
-
-void test()
-{
-    gType = Type::create();
-    gType->name = "T";
-    initialize_simple_pointer_type(gType);
-
-    Branch branch;
-    import_type(branch, gType);
-    import_function(branch, _evaluate, "f(T) -> T");
-
-    branch.eval("a = T()");
-    branch.eval("b = f(a)");
-
-    import_function(branch, _evaluate, "g(state T) -> T");
-    branch.eval("c = g()");
-}
-
-}
-
 void test_list_based_types()
 {
     Branch branch;
@@ -290,8 +239,8 @@ void test_create_implicit_tuple_type()
     RefList types(INT_TYPE, FLOAT_TYPE, STRING_TYPE);
     Term* result = create_implicit_tuple_type(types);
 
-    Term* a = branch.eval("[1, 3.0, 'hi']");
-    Term* b = branch.eval("['hi', 3.0, 1]");
+    TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
+    TaggedValue* b = branch.eval("['hi', 3.0, 1]");
 
     test_assert(value_fits_type(a, type_contents(result)));
     test_assert(!value_fits_type(b, type_contents(result)));
@@ -299,7 +248,8 @@ void test_create_implicit_tuple_type()
 
 void register_tests()
 {
-    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::compound_types);
+    REGISTER_TEST_CASE(type_tests::compound_types);
+    REGISTER_TEST_CASE(type_tests::compound_type_cast);
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
@@ -307,9 +257,6 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
-    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::test_type_error_in_a_native_call);
-    REGISTER_TEST_CASE(type_tests::test_imported_pointer_type);
-    //TEST_DISABLED REGISTER_TEST_CASE(type_tests::simple_pointer_test::test);
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
     REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
 }

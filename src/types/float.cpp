@@ -9,12 +9,20 @@ namespace circa {
 namespace float_t {
     void reset(TaggedValue* value)
     {
-        make_float(value, 0);
+        set_float(value, 0);
     }
-
-    void cast(Type* type, TaggedValue* source, TaggedValue* dest)
+    void cast(CastResult* result, TaggedValue* source, Type* type,
+        TaggedValue* dest, bool checkOnly)
     {
-        make_float(dest, to_float(source));
+        if (!(is_int(source) || is_float(source))) {
+            result->success = false;
+            return;
+        }
+
+        if (checkOnly)
+            return;
+
+        set_float(dest, to_float(source));
     }
 
     bool equals(TaggedValue* a, TaggedValue* b)
@@ -56,9 +64,8 @@ namespace float_t {
             std::string const& originalFormat = term->stringProp("float:original-format");
             float actual = as_float(term);
             float original = (float) atof(originalFormat.c_str());
-            if (actual == original) {
+            if (actual == original)
                 return originalFormat;
-            }
         }
 
         // Otherwise, format the current value with naive formatting. This could be

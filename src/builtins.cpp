@@ -9,8 +9,23 @@
 
 #include "circa.h"
 #include "debug_valid_objects.h"
+#include "types/any.h"
+#include "types/bool.h"
+#include "types/branch_ref.h"
+#include "types/callable.h"
+#include "types/color.h"
 #include "types/dict.h"
+#include "types/float.h"
+#include "types/indexable.h"
+#include "types/int.h"
 #include "types/list.h"
+#include "types/map.h"
+#include "types/null.h"
+#include "types/ref.h"
+#include "types/set.h"
+#include "types/string.h"
+#include "types/styled_source.h"
+#include "types/void.h"
 
 namespace circa {
 
@@ -80,8 +95,6 @@ Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
-Term* BRANCH_TYPE = NULL;
-Term* CODE_TYPE = NULL;
 Term* COLOR_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
@@ -95,6 +108,7 @@ Term* VOID_TYPE = NULL;
 TypeRef TYPE_T;
 TypeRef BOOL_T;
 TypeRef DICT_T;
+TypeRef FILE_SIGNATURE_T;
 TypeRef FLOAT_T;
 TypeRef INT_T;
 TypeRef NULL_T;
@@ -118,19 +132,10 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-CA_FUNCTION(empty_evaluate_function) {}
-
-void empty_bytecode_generation(bytecode::WriteContext* context, Term* term) {}
-
-namespace null_t {
-    std::string toString(TaggedValue* value) { return "null";}
-}
-
-void create_types()
+void create_primitive_types()
 {
     NULL_T = Type::create();
-    NULL_T->name = "null";
-    NULL_T->toString = null_t::toString;
+    null_t::setup_type(NULL_T);
 
     DICT_T = Type::create();
     dict_t::setup_type(DICT_T);
@@ -195,9 +200,6 @@ void bootstrap_kernel()
     as_type(ANY_TYPE).cast = any_t::cast;
     KERNEL->bindName(ANY_TYPE, "any");
 
-    // Create Branch type
-    BRANCH_TYPE = create_branch_based_type(*KERNEL, "Branch");
-
     // Create FunctionAttrs type
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
     FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
@@ -211,7 +213,7 @@ void bootstrap_kernel()
     ca_assert(is_type(FUNCTION_ATTRS_TYPE));
 
     // Create Function type
-    FUNCTION_TYPE = create_branch_based_type(*KERNEL, "Function");
+    FUNCTION_TYPE = create_empty_type(*KERNEL, "Function");
     Type* functionType = &as_type(FUNCTION_TYPE);
     functionType->formatSource = subroutine_t::format_source;
     functionType->checkInvariants = function_t::check_invariants;
@@ -219,9 +221,36 @@ void bootstrap_kernel()
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
-    change_type((TaggedValue*)VALUE_FUNC, (Type*)BRANCH_TYPE->value_data.ptr);
+    change_type((TaggedValue*)VALUE_FUNC, type_contents(FUNCTION_TYPE));
+}
 
-    // Initialize List type, it's needed soon
+void initialize_primitive_types(Branch& kernel)
+{
+    STRING_TYPE = create_type(kernel, "string");
+    set_type(STRING_TYPE, STRING_T);
+
+    INT_TYPE = create_type(kernel, "int");
+    set_type(INT_TYPE, INT_T);
+
+    FLOAT_TYPE = create_type(kernel, "number");
+    set_type(FLOAT_TYPE, FLOAT_T);
+
+    DICT_TYPE = create_type(kernel, "Dict");
+    set_type(DICT_TYPE, DICT_T);
+
+    BOOL_TYPE = create_type(kernel, "bool");
+    set_type(BOOL_TYPE, BOOL_T);
+
+    REF_TYPE = create_type(kernel, "Ref");
+    set_type(REF_TYPE, REF_T);
+
+    VOID_TYPE = create_type(kernel, "void");
+    set_type(VOID_TYPE, VOID_T);
+
+    LIST_TYPE = create_type(kernel, "List");
+    set_type(LIST_TYPE, LIST_T);
+
+    // ANY_TYPE was created in bootstrap_kernel
 }
 
 void post_initialize_primitive_types(Branch& kernel)
@@ -234,48 +263,67 @@ void post_initialize_primitive_types(Branch& kernel)
     ca_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
 }
 
-void pre_initialize_types(Branch& kernel)
+void pre_setup_types(Branch& kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
-    INPUT_PLACEHOLDER_FUNC = import_function(kernel, empty_evaluate_function,
-            "input_placeholder() -> any");
-
-    function_t::get_attrs(INPUT_PLACEHOLDER_FUNC).writeBytecode = empty_bytecode_generation;
+    INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
 
     // FileSignature is used in some builtin functions
-    parse_type(kernel, "type FileSignature { string filename, int time_modified }");
+    FILE_SIGNATURE_T = type_contents(parse_type(kernel,
+            "type FileSignature { string filename, int time_modified }"));
+
+    namespace_function::early_setup(kernel);
 }
 
-void pre_setup_builtin_functions(Branch& kernel)
+void initialize_compound_types(Branch& kernel)
 {
-    namespace_function::early_setup(kernel);
+    type_t::setup_type(TYPE_TYPE);
+
+    Term* set_type = create_compound_type(kernel, "Set");
+    set_t::setup_type(type_contents(set_type));
+
+    // LIST_TYPE was created in bootstrap_kernel
+    list_t::postponed_setup_type(LIST_TYPE);
+
+    Term* map_type = create_compound_type(kernel, "Map");
+    map_t::setup_type(type_contents(map_type));
+
+    branch_ref_t::initialize(kernel);
+
+    Term* styledSourceType = parse_type(kernel, "type StyledSource;");
+    styled_source_t::setup_type(&as_type(styledSourceType));
+
+    Term* indexableType = parse_type(kernel, "type Indexable;");
+    indexable_t::setup_type(&as_type(indexableType));
+
+    callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
 }
 
 void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
-    make_ref(function_t::get_parameters(add_v), ADD_FUNC);
+    set_ref(function_t::get_parameters(add_v), ADD_FUNC);
     Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
-    make_ref(function_t::get_parameters(add_s), ADD_FUNC);
+    set_ref(function_t::get_parameters(add_s), ADD_FUNC);
 
     overloaded_function::append_overload(ADD_FUNC, add_v);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
     // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
-    make_ref(function_t::get_parameters(sub_v), SUB_FUNC);
+    set_ref(function_t::get_parameters(sub_v), SUB_FUNC);
     Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
-    make_ref(function_t::get_parameters(sub_s), SUB_FUNC);
+    set_ref(function_t::get_parameters(sub_s), SUB_FUNC);
 
     overloaded_function::append_overload(SUB_FUNC, sub_v);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
-    make_ref(function_t::get_parameters(mult_v), MULT_FUNC);
+    set_ref(function_t::get_parameters(mult_v), MULT_FUNC);
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
-    make_ref(function_t::get_parameters(mult_s), MULT_FUNC);
+    set_ref(function_t::get_parameters(mult_s), MULT_FUNC);
 
     overloaded_function::append_overload(MULT_FUNC, mult_v);
     overloaded_function::append_overload(MULT_FUNC, mult_s);
@@ -283,11 +331,28 @@ void post_setup_functions(Branch& kernel)
     // Create vectorized div() function
     Branch& div_overloads = DIV_FUNC->nestedContents;
     Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
-    make_ref(function_t::get_parameters(div_s), DIV_FUNC);
+    set_ref(function_t::get_parameters(div_s), DIV_FUNC);
 
     overloaded_function::append_overload(DIV_FUNC, div_s);
 
     function_t::get_feedback_func(VALUE_FUNC) = UNSAFE_ASSIGN_FUNC;
+}
+
+void parse_hosted_types(Branch& kernel)
+{
+    parse_type(kernel, "type Point { number x, number y }");
+    parse_type(kernel, "type Point_i { int x, int y }");
+    parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
+
+    COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
+
+    color_t::setup_type(type_contents(COLOR_TYPE));
+}
+
+void post_setup_types()
+{
+    string_t::postponed_setup_type(&as_type(STRING_TYPE));
+    ref_t::postponed_setup_type(&as_type(REF_TYPE));
 }
 
 void parse_builtin_script(Branch& kernel)
@@ -303,24 +368,23 @@ export_func void circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
 
-    create_types();
+    create_primitive_types();
     bootstrap_kernel();
     initialize_primitive_types(*KERNEL);
     post_initialize_primitive_types(*KERNEL);
-    pre_initialize_types(*KERNEL);
-    setup_types(*KERNEL);
+    pre_setup_types(*KERNEL);
+    initialize_compound_types(*KERNEL);
     feedback_register_constants(*KERNEL);
-    pre_setup_builtin_functions(*KERNEL);
 
     FINISHED_BOOTSTRAP = true;
 
     setup_builtin_functions(*KERNEL);
     post_setup_functions(*KERNEL);
-    parse_types(*KERNEL);
+    parse_hosted_types(*KERNEL);
     post_setup_types();
+
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
-
 
     parse_builtin_script(*KERNEL);
 }

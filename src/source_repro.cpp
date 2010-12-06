@@ -2,11 +2,9 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "builtin_types.h"
 #include "function.h"
 #include "introspection.h"
 #include "parser.h"
-#include "parser_util.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "tagged_value.h"
@@ -111,7 +109,8 @@ void format_term_source(StyledSource* source, Term* term)
             term, phrase_type::WHITESPACE);
 
     // If the function has a formatSource function, use that.
-    if (function_t::get_attrs(term->function).formatSource != NULL) {
+    if (is_function(term->function) &&
+            function_t::get_attrs(term->function).formatSource != NULL) {
         function_t::get_attrs(term->function).formatSource(source, term);
 
     // Or, check if this is a value term.
@@ -155,7 +154,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
 
     // Check for an infix operator with implicit rebinding (like +=).
     if (infix && 
-            is_infix_operator_rebinding(functionName)) {
+            parser::is_infix_operator_rebinding(functionName)) {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
         append_phrase(source, " ", term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::INFIX_OPERATOR);
@@ -163,7 +162,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         return;
     }
 
-    // Don't prepend name binding for certain functions
+    // Name binding (but not for assign() terms)
     if (term->function != ASSIGN_FUNC)
         format_name_binding(source, term);
 
@@ -173,7 +172,11 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, "(", term, token::LPAREN);
 
     if (declarationStyle == "function-call") {
-        append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
+
+        if (functionName == "")
+            format_term_source(source, term->function);
+        else
+            append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
             append_phrase(source, "(", term, token::LPAREN);
@@ -313,11 +316,11 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type)
         }
     }
 
-    List* list = (List*) make_list(source->_phrases.append());
+    List* list = (List*) set_list(source->_phrases.append());
     list->resize(3);
-    make_string((*list)[0], str);
-    make_ref((*list)[1], term);
-    make_int((*list)[2], type);
+    set_string((*list)[0], str);
+    set_ref((*list)[1], term);
+    set_int((*list)[2], type);
 }
 
 void append_phrase(StyledSource* source, std::string const& str, Term* term, int type)
@@ -359,6 +362,8 @@ int get_first_visible_input_index(Term* term)
 {
     if (get_input_syntax_hint(term, 0, "hidden") == "true")
         return 1;
+    if (is_function_stateful(term->function))
+        return 1;
     else
         return 0;
 }
@@ -384,6 +389,12 @@ void set_input_syntax_hint(Term* term, int index, std::string const& field,
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
     term->setStringProp(fieldName.str(), value);
+}
+
+void hide_from_source(Term* term)
+{
+    ca_assert(term != NULL);
+    term->setBoolProp("syntax:hidden", true);
 }
 
 } // namespace circa

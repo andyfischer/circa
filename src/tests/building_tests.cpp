@@ -10,9 +10,6 @@ void test_create_value()
     Branch branch;
     Term *term = create_value(branch, INT_TYPE);
     test_assert(term->type == INT_TYPE);
-
-    term = create_value(branch, BRANCH_TYPE);
-    test_assert(get_branch_value(term) != NULL);
 }
 
 void test_create_int()
@@ -44,18 +41,12 @@ void test_create_duplicate()
 void test_duplicate_value()
 {
     Branch branch;
-    Term* a = branch.eval("a = 5");
-    Term* b = branch.eval("add(4,5)");
+    Term* a = branch.compile("a = 5");
 
     Term* a_dup = duplicate_value(branch, a);
     test_assert(a_dup->asInt() == 5);
     test_assert(a_dup->name == "");
     test_assert(a_dup->function == VALUE_FUNC);
-
-    Term* b_dup = duplicate_value(branch, b);
-    test_assert(b_dup->asInt() == 9);
-    test_assert(b_dup->name == "");
-    test_assert(b_dup->function == VALUE_FUNC);
 }
 
 void test_rewrite_as_value()

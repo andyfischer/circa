@@ -8,10 +8,10 @@ namespace metaprogramming_tests {
 void test_lift_closure()
 {
     Branch branch;
-    Term* a = branch.eval("a = 1");
+    Term* a = branch.compile("a = 1");
     Branch& sub = create_branch(branch);
-    Term* sub_a = sub.eval("a");
-    Term* sub_freeze_a = sub.eval("freeze(a)");
+    Term* sub_a = sub.compile("a");
+    Term* sub_freeze_a = sub.compile("freeze(a)");
 
     test_assert(sub_a->input(0) == a);
     test_assert(as_int(sub_a) == 1);
@@ -19,7 +19,7 @@ void test_lift_closure()
     test_assert(as_int(sub_a) == 1);
 
     lift_closure(sub);
-    make_int(a, 2);
+    set_int(a, 2);
     evaluate_branch(branch);
 
     test_assert(sub_a->input(0) == a);
@@ -34,7 +34,7 @@ void save_code_generated_with_reflection()
     files["included.ca"] = "";
 
     Branch branch;
-    Term* b = branch.eval("b = include('included.ca')");
+    Term* b = branch.compile("b = include('included.ca')");
     test_equals(b->nestedContents["#attr:source-file"]->asString(), "included.ca");
 
     branch.eval("bm = branch_ref(b)");

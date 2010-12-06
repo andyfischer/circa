@@ -7,7 +7,6 @@
 namespace circa {
 
 namespace list_t {
-    bool is_list(TaggedValue*);
     bool is_list_based_type(Type*);
 
     void setup_type(Type*);
@@ -36,7 +35,16 @@ struct List : TaggedValue
     TaggedValue* operator[](int index) { return get(index); }
     void resize(int size);
 
+    // get the item at length - 1
+    TaggedValue* getLast();
+
+    // remove the item at length - 1
+    void pop();
+
+    void removeNulls();
+
     static List* checkCast(TaggedValue* v);
+    static List* lazyCast(TaggedValue* v);
 };
 
 }

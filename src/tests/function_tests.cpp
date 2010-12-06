@@ -47,8 +47,8 @@ void test_inputs_fit_function()
     Term* b = branch.eval("1.0");
     RefList inputs(a,b);
 
-    test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
-    test_assert(!inputs_fit_function(KERNEL->get("add_i"), inputs));
+    test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
+    test_assert(!inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
 }
 
 void overloaded_function()
@@ -74,6 +74,23 @@ void overloaded_function()
     test_equals(mult_f->nestedContents[0]->function->name, "mult_f");
     Term* mult_f_2 = branch.eval("mult(3 1.0)");
     test_equals(mult_f_2->nestedContents[0]->function->name, "mult_f");
+}
+
+void overloaded_function_in_script()
+{
+    Branch branch;
+    Term* f1 = branch.compile("def f1(int i) end");
+    Term* f2 = branch.compile("def f2(int i) end");
+    
+    branch.compile("g = overloaded_function(f1 f2)");
+    Term* g_call = branch.compile("g(1)");
+
+    test_assert(g_call->nestedContents[0]->function == f1);
+
+    branch.compile("h = overloaded_function(f2 f1)");
+    Term* h_call = branch.compile("h(1)");
+
+    test_assert(h_call->nestedContents[0]->function == f2);
 }
 
 void test_is_native_function()
@@ -118,7 +135,7 @@ void test_call_copied_function()
     //evaluate_without_side_effects(add_copy);
 
     test_assert(overloaded_function::is_overloaded_function(add_copy));
-    test_assert(inputs_fit_function(KERNEL->get("add_i"), inputs));
+    test_assert(inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
 
     test_assert(overloaded_function::statically_specialize_function(add_copy, inputs)
             != UNKNOWN_FUNCTION);
@@ -142,15 +159,19 @@ void test_calling_manual_overloaded_function()
 {
     Branch branch;
     Term* my_add = branch.compile("my_add = overloaded_function(add_f add_i)");
+    test_assert(is_callable(my_add));
 
     Term* two = branch.compile("2");
     RefList inputs(two, two);
 
-    test_assert(is_callable(my_add));
-    //evaluate_without_side_effects(my_add);
     test_assert(branch);
     test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);
-    test_assert(inputs_fit_function(KERNEL->get("add_f"), inputs));
+    test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
+
+    Term* sum = branch.compile("my_add(2 2)");
+    evaluate_branch(branch);
+    test_assert(branch);
+    test_assert(sum->asInt() == 4);
 }
 
 void test_bug_where_a_mysterious_copy_term_was_added()
@@ -167,12 +188,12 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::test_is_callable);
     REGISTER_TEST_CASE(function_tests::test_inputs_fit_function);
     REGISTER_TEST_CASE(function_tests::overloaded_function);
+    REGISTER_TEST_CASE(function_tests::overloaded_function_in_script);
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
     REGISTER_TEST_CASE(function_tests::test_bug_with_declaring_state_argument);
-    // Unsupported:
-    //REGISTER_TEST_CASE(function_tests::test_call_copied_function);
-    //REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
+    //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_call_copied_function);
+    //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
     REGISTER_TEST_CASE(function_tests::test_bug_where_a_mysterious_copy_term_was_added);
 }
 

@@ -4,8 +4,8 @@
 #include <sstream>
 
 #include "build_options.h"
-#include "builtin_types.h"
 #include "debug_valid_objects.h"
+#include "importing_macros.h"
 #include "tagged_value.h"
 #include "testing.h"
 
@@ -55,7 +55,7 @@ namespace list_t {
         if (data->refCount == 0) {
             // Release all elements
             for (int i=0; i < data->count; i++)
-                make_null(&data->items[i]);
+                set_null(&data->items[i]);
             free(data);
             debug_unregister_valid_object(data);
         }
@@ -161,7 +161,7 @@ namespace list_t {
 
         // Possibly set extra elements to null, if we are shrinking.
         for (int i=numElements; i < result->count; i++)
-            make_null(&result->items[i]);
+            set_null(&result->items[i]);
         result->count = numElements;
 
         return result;
@@ -235,13 +235,31 @@ namespace list_t {
         *data = touch(*data);
         ca_assert(index < (*data)->count);
 
-        make_null(&(*data)->items[index]);
+        set_null(&(*data)->items[index]);
 
         int lastElement = (*data)->count - 1;
         if (index < lastElement)
             swap(&(*data)->items[index], &(*data)->items[lastElement]);
 
         (*data)->count--;
+    }
+
+    void remove_nulls(ListData** dataPtr)
+    {
+        if (*dataPtr == NULL)
+            return;
+
+        *dataPtr = touch(*dataPtr);
+        ListData* data = *dataPtr;
+
+        int numRemoved = 0;
+        for (int i=0; i < data->count; i++) {
+            if (is_null(&data->items[i]))
+                numRemoved++;
+            else
+                swap(&data->items[i - numRemoved], &data->items[i]);
+        }
+        *dataPtr = resize(*dataPtr, data->count - numRemoved);
     }
 
     TaggedValue* prepend(ListData** data)
@@ -272,7 +290,6 @@ namespace list_t {
     }
 
     // TaggedValue wrappers
-    bool is_list(TaggedValue* value);
     void tv_touch(TaggedValue* value);
 
     void resize(TaggedValue* list, int newSize)
@@ -296,6 +313,12 @@ namespace list_t {
     {
         ca_assert(is_list(list));
         return prepend((ListData**) &list->value_data);
+    }
+
+    void remove_nulls(TaggedValue* list)
+    {
+        ca_assert(is_list(list));
+        remove_nulls((ListData**) &list->value_data);
     }
 
     void tv_initialize(Type* type, TaggedValue* value)
@@ -359,26 +382,59 @@ namespace list_t {
         return true;
     }
 
-    void tv_cast(Type*, TaggedValue* source, TaggedValue* dest)
+    void tv_cast(CastResult* result, TaggedValue* source, Type* type,
+        TaggedValue* dest, bool checkOnly)
     {
-        // FIXME: should these be asserts?
-        if (!is_list(source)) return;
-        if (!is_list(dest)) return;
+        List* sourceList = List::checkCast(source);
 
-        bool keep_existing_shape = dest->value_type->prototype.length() != 0;
-
-        if (keep_existing_shape) {
-            List* s = List::checkCast(source);
-            List* d = List::checkCast(dest);
-
-            int count = std::min(s->numElements(), d->numElements());
-
-            for (int i=0; i < count; i++)
-                cast(s->get(i), d->get(i));
-
-        } else {
-            tv_copy(source, dest);
+        if (sourceList == NULL) {
+            result->success = false;
+            return;
         }
+
+        int sourceLength = sourceList->length();
+        int prototypeLength = type->prototype.length();
+
+        // if prototypeLength is 0 then this is a freeform list, so just do a
+        // copy and call it a day.
+        if (prototypeLength == 0) {
+            if (!checkOnly) {
+                copy(source, dest);
+                dest->value_type = type;
+            }
+            return;
+        }
+
+        // check for correct # of elements
+        if (sourceLength != prototypeLength) {
+            result->success = false;
+            return;
+        }
+
+        List* destList = NULL;
+
+        if (!checkOnly) {
+            destList = set_list(dest);
+            destList->resize(sourceLength);
+            dest->value_type = type;
+        }
+
+        for (int i=0; i < sourceLength; i++) {
+            TaggedValue* sourceElement = sourceList->get(i);
+            Type* elementType = get_compound_list_element_type(type, i);
+
+            TaggedValue* destElement = NULL;
+            if (!checkOnly)
+                destElement = destList->get(i);
+        
+            cast(result, sourceElement, elementType, destElement, checkOnly);
+
+            if (!result->success)
+                return;
+        }
+
+        if (!checkOnly)
+            dest->value_type = type;
     }
 
     TaggedValue* tv_get_index(TaggedValue* value, int index)
@@ -510,11 +566,6 @@ namespace list_t {
         set_pointer(value, data);
     }
 
-    bool is_list(TaggedValue* value)
-    {
-        return is_list_based_type(value->value_type);
-    }
-
     bool is_list_based_type(Type* type)
     {
         return type->initialize == tv_initialize;
@@ -541,7 +592,7 @@ namespace list_t {
 
     CA_FUNCTION(append)
     {
-        make_list(OUTPUT);
+        set_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
         copy(INPUT(0), OUTPUT);
         TaggedValue* value = INPUT(1);
@@ -551,7 +602,7 @@ namespace list_t {
     CA_FUNCTION(count)
     {
         List* list = List::checkCast(INPUT(0));
-        make_int(OUTPUT, list->length());
+        set_int(OUTPUT, list->length());
     }
 
     void postponed_setup_type(Term* type)
@@ -588,9 +639,9 @@ namespace list_t {
             test_assert(get_index(&value, 1) == NULL);
             test_assert(num_elements(&value) == 0);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
-            make_int(list_t::append(&value), 3);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 3);
 
             test_equals(to_string(&value), "[1, 2, 3]");
 
@@ -605,9 +656,9 @@ namespace list_t {
 
             TaggedValue value(list);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
-            make_int(list_t::append(&value), 3);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 3);
 
             test_equals(to_string(&value), "[1, 2, 3]");
 
@@ -617,7 +668,7 @@ namespace list_t {
 
             test_equals(to_string(&value2), "[1, 2, 3]");
 
-            make_int(list_t::append(&value2), 4);
+            set_int(list_t::append(&value2), 4);
 
             test_equals(to_string(&value), "[1, 2, 3]");
             test_equals(to_string(&value2), "[1, 2, 3, 4]");
@@ -630,8 +681,8 @@ namespace list_t {
 
             TaggedValue value(list);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
 
             TaggedValue value2(list);
             copy(&value, &value2);
@@ -650,13 +701,13 @@ namespace list_t {
 
             TaggedValue value(list);
 
-            make_int(list_t::append(&value), 1);
-            make_int(list_t::append(&value), 2);
+            set_int(list_t::append(&value), 1);
+            set_int(list_t::append(&value), 2);
 
             test_assert(to_string(&value) == "[1, 2]");
             list_t::prepend(&value);
             test_assert(to_string(&value) == "[null, 1, 2]");
-            make_int(list_t::tv_get_index(&value, 0), 4);
+            set_int(list_t::tv_get_index(&value, 0), 4);
             test_assert(to_string(&value) == "[4, 1, 2]");
 
             reset(&value);
@@ -668,7 +719,7 @@ namespace list_t {
             reset(&value);
 
             list_t::prepend(&value);
-            make_int(list_t::tv_get_index(&value, 0), 1);
+            set_int(list_t::tv_get_index(&value, 0), 1);
             test_assert(to_string(&value) == "[1]");
             list_t::prepend(&value);
             test_assert(to_string(&value) == "[null, 1]");
@@ -745,13 +796,39 @@ List::resize(int newSize)
     list_t::resize(this, newSize); 
 }
 
+TaggedValue*
+List::getLast()
+{
+    return get(length() - 1);
+}
+
+void
+List::pop()
+{
+    resize(length() - 1);
+}
+
+void
+List::removeNulls()
+{
+    list_t::remove_nulls(this);
+}
+
 List*
 List::checkCast(TaggedValue* v)
 {
-    if (list_t::is_list(v))
+    if (is_list(v))
         return (List*) v;
     else
         return NULL;
+}
+
+List*
+List::lazyCast(TaggedValue* v)
+{
+    if (!is_list(v))
+        set_list(v, 0);
+    return (List*) v;
 }
 
 } // namespace circa

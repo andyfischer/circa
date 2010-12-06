@@ -87,7 +87,7 @@ namespace type_t {
 
     CA_FUNCTION(name_accessor)
     {
-        make_string(OUTPUT, as_type(INPUT(0)).name);
+        set_string(OUTPUT, as_type(INPUT(0)).name);
     }
 
     void setup_type(Term* type)
@@ -165,7 +165,8 @@ Type::~Type()
 
 bool is_native_type(Term* type)
 {
-    return !is_branch_based_type(type);
+    // this once did something useful
+    return true;
 }
 
 Type* declared_type(Term* term)
@@ -176,8 +177,6 @@ Type* declared_type(Term* term)
 Type& as_type(Term *term)
 {
     ca_assert(get_type_value(term) != NULL);
-
-    // don't use ca_assert_type here because ca_assert_type uses as_type
     ca_assert(term->type == TYPE_TYPE);
 
     return *get_type_value(term);
@@ -185,7 +184,7 @@ Type& as_type(Term *term)
 
 Type* type_contents(Term* type)
 {
-    return &as_type(type);
+    return get_type_value(type);
 }
 
 bool value_fits_type(TaggedValue* value, Type* type)

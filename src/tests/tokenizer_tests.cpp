@@ -317,7 +317,7 @@ void test_consume_line()
     tokens.consume();
 
     // now freak out
-    std::string errorline = consume_line(tokens, startPosition);
+    std::string errorline = parser::consume_line(tokens, startPosition);
 
     test_equals(errorline, "in $#!$#@ 151 poop ");
     test_assert(tokens.nextIs(token::IDENTIFIER));

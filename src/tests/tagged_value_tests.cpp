@@ -58,28 +58,17 @@ namespace toy_refcounted_pool {
 void test_int_simple()
 {
     TaggedValue v;
-    make_int(&v, 4);
+    set_int(&v, 4);
 
     test_assert(is_int(&v));
     test_assert(as_int(&v) == 4);
 
     Branch branch;
-    Term* a = branch.eval("a = 1");
+    Term* a = branch.compile("a = 1");
     test_assert(is_int(a));
 
-    Term* b = branch.eval("b = a");
+    Term* b = branch.compile("b = a");
     test_assert(is_int(b));
-}
-
-void test_int_and_float_casting()
-{
-    TaggedValue i;
-    make_int(&i, 4);
-    TaggedValue f;
-    make_float(&f, 0.0);
-
-    cast(f.value_type, &i, &f);
-    test_assert(as_float(&f) == 4.0);
 }
 
 void test_polymorphic()
@@ -89,17 +78,17 @@ void test_polymorphic()
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
 
-    make_int(&v, 11);
+    set_int(&v, 11);
     test_assert(is_int(&v));
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
 
-    make_float(&v, 2.0);
+    set_float(&v, 2.0);
     test_assert(!is_int(&v));
     test_assert(is_float(&v));
     test_assert(!is_bool(&v));
 
-    make_bool(&v, false);
+    set_bool(&v, false);
     test_assert(!is_int(&v));
     test_assert(!is_float(&v));
     test_assert(is_bool(&v));
@@ -112,20 +101,16 @@ void test_term_value()
     test_assert(is_int(i));
     test_assert(is_int(i));
 
-    Term* a = branch.eval("a = [1 2 3]");
+    TaggedValue* a = branch.eval("a = [1 2 3]");
     test_assert(a->numElements() == 3);
     test_assert(a->getIndex(1)->asInt() == 2);
 
-    Term* b = branch.eval("b = a");
+    TaggedValue* b = branch.eval("b = a");
     test_assert(b->numElements() == 3);
     test_assert(b->getIndex(1)->asInt() == 2);
     
     Term* c = create_value(branch, INT_TYPE);
     test_assert(is_int(c));
-
-    Branch list;
-    resize_list(list, 4, INT_TYPE);
-    test_assert(is_int(list[0]));
 }
 
 namespace subroutine_call_test_helper {
@@ -159,7 +144,7 @@ void test_constructor_syntax()
     TypeRef myType = Type::create();
     myType->name = "T";
     import_type(branch, myType);
-    Term* a = branch.eval("a = T()");
+    TaggedValue* a = branch.eval("a = T()");
     test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
     reset(a);
@@ -221,7 +206,7 @@ namespace manual_memory_management_test {
         test_assert(pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        make_null(&value);
+        set_null(&value);
 
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
@@ -239,7 +224,7 @@ namespace manual_memory_management_test {
             TaggedValue scoped_value;
             change_type(&scoped_value, myType);
             test_assert(pool_allocated[0]);
-            make_null(&scoped_value);
+            set_null(&scoped_value);
             test_assert(!pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -309,7 +294,7 @@ void list_memory_management()
     test_assert(toy_refcounted_pool::refcount[1] == 1);
     test_assert(toy_refcounted_pool::refcount[2] == 1);
 
-    make_null(list[1]);
+    set_null(list[1]);
 
     test_assert(toy_refcounted_pool::refcount[0] == 1);
     test_assert(toy_refcounted_pool::refcount[1] == 0);
@@ -326,10 +311,10 @@ void list_memory_management()
     test_assert(toy_refcounted_pool::nothing_allocated());
 }
 
-void remake_null()
+void reset_null()
 {
     TaggedValue value;
-    make_null(&value);
+    set_null(&value);
     reset(&value);
     debug_assert_valid_object(value.value_type, TYPE_OBJECT);
 }
@@ -337,11 +322,11 @@ void remake_null()
 void resize_list_maintains_existing_data()
 {
     TaggedValue outerTv;
-    List* outer = make_list(&outerTv, 3);
+    List* outer = set_list(&outerTv, 3);
 
-    List* inner = make_list(outer->get(1), 4);
+    List* inner = set_list(outer->get(1), 4);
     TaggedValue* a = inner->get(1);
-    make_int(a, 5);
+    set_int(a, 5);
 
     test_assert(outer->get(1)->getIndex(1) == a);
 
@@ -353,7 +338,6 @@ void resize_list_maintains_existing_data()
 void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
-    REGISTER_TEST_CASE(tagged_value_tests::test_int_and_float_casting);
     REGISTER_TEST_CASE(tagged_value_tests::test_polymorphic);
     REGISTER_TEST_CASE(tagged_value_tests::test_term_value);
     REGISTER_TEST_CASE(tagged_value_tests::subroutine_call_test);
@@ -362,7 +346,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::manual_memory_management_test::test);
     REGISTER_TEST_CASE(tagged_value_tests::refcount_test);
     REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
-    REGISTER_TEST_CASE(tagged_value_tests::remake_null);
+    REGISTER_TEST_CASE(tagged_value_tests::reset_null);
     REGISTER_TEST_CASE(tagged_value_tests::resize_list_maintains_existing_data);
 }
 

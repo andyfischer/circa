@@ -1,6 +1,5 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "builtin_types.h"
 #include "source_repro.h"
 #include "tagged_value.h"
 #include "token.h"
@@ -8,7 +7,7 @@
 
 namespace circa {
 namespace int_t {
-    void reset(TaggedValue* v) { make_int(v, 0); }
+    void reset(TaggedValue* v) { set_int(v, 0); }
 
     bool equals(TaggedValue* a, TaggedValue* b)
     {

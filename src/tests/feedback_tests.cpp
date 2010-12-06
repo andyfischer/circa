@@ -80,8 +80,8 @@ void train_cond()
     test_equals(a->asInt(), 5);
 
     // try changing cond
-    make_int(a, 1);
-    make_bool(cond, false);
+    set_int(a, 1);
+    set_bool(cond, false);
 
     evaluate_branch(branch);
 
@@ -107,7 +107,7 @@ void train_sin()
 void train_cos()
 {
     Branch branch;
-    Term* a = branch.eval("a = 5.0");
+    Term* a = branch.compile("a = 5.0");
     branch.eval("cos(a) <- 1");
 
     set_trainable(a, true);

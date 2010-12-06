@@ -214,26 +214,55 @@ std::string get_relative_name(Term* location, Term* term)
 
 void update_unique_name(Term* term)
 {
-    Term* existingName = get_named_at(term, term->name);
+    UniqueName& name = term->uniqueName;
 
-    if (existingName == NULL) {
-        term->uniqueName.ordinal = 0;
-        term->uniqueName.name = term->name;
-    } else {
-        term->uniqueName.ordinal = existingName->uniqueName.ordinal + 1;
+    if (term->owningBranch == NULL) {
+        name.name = term->name;
+        return;
+    }
 
-        // Construct a name by adding the ordinal to the end of the declared name,
-        // keep looping until we end up with a unique name. (the user may have already
-        // declared a name which matches our generated one.
-        while (true) {
-            char ordinalBuf[30];
-            sprintf(ordinalBuf, "%d", term->uniqueName.ordinal);
-            term->uniqueName.name = term->name + "_" + ordinalBuf;
+    name.base = term->name;
 
-            if (get_named_at(term, term->uniqueName.name) == NULL)
+    if (name.base == "")
+        name.base = "_" + term->function->name;
+
+    name.name = name.base;
+    name.ordinal = 0;
+
+    // Look for a name collision. We might need to keep looping, if our generated name
+    // collides with an existing name.
+
+    Branch& branch = *term->owningBranch;
+
+    bool updatedName = true;
+    while (updatedName) {
+        updatedName = false;
+
+        for (int i = term->index-1; i >= 0; i--) {
+            Term* other = branch[i];
+            if (other == NULL) continue;
+
+            // If another term shares the same base, then make sure our ordinal is
+            // higher. This turns some O(n) cases into O(1)
+            if ((other->uniqueName.base == name.base)
+                    && (other->uniqueName.ordinal >= name.ordinal)) {
+                name.ordinal = other->uniqueName.ordinal + 1;
+                updatedName = true;
+
+            // If this name is already used, then just try the next ordinal. This
+            // case results in more blind searching, but it's necessary to handle
+            // the situation where a generated name is already taken.
+            } else if (other->uniqueName.name == name.name) {
+                name.ordinal++;
+                updatedName = true;
+            }
+
+            if (updatedName) {
+                char ordinalBuf[30];
+                sprintf(ordinalBuf, "%d", name.ordinal);
+                name.name = name.base + "_" + ordinalBuf;
                 break;
-
-            term->uniqueName.ordinal++;
+            }
         }
     }
 }

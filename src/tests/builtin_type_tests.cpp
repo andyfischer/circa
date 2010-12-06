@@ -70,7 +70,7 @@ void test_set()
     s = branch.eval("s.add(val)");
 
     test_assert(s->getIndex(1)->asInt() == 5);
-    make_int(val, 6);
+    set_int(val, 6);
     test_assert(s->getIndex(1)->asInt() == 5);
 }
 
@@ -81,7 +81,7 @@ void test_list()
     Term* l = branch.compile("l = List()");
 
     evaluate_branch(branch);
-    test_assert(list_t::is_list(l));
+    test_assert(is_list(l));
     test_assert(l->numElements() == 0);
 
     l = branch.compile("l.append(2)");

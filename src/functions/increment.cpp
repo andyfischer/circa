@@ -10,12 +10,12 @@ namespace increment_function {
 
     CA_DEFINE_FUNCTION(increment, "increment(int i) -> int")
     {
-        make_int(OUTPUT, INT_INPUT(0) + 1);
+        set_int(OUTPUT, INT_INPUT(0) + 1);
     }
 
     CA_DEFINE_FUNCTION(decrement, "decrement(int i) -> int")
     {
-        make_int(OUTPUT, INT_INPUT(0) - 1);
+        set_int(OUTPUT, INT_INPUT(0) - 1);
     }
 
     void setup(Branch& kernel)

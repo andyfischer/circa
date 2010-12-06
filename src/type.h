@@ -35,6 +35,13 @@ struct TypeRef
     Type* operator->() { return t; }
 };
 
+struct CastResult
+{
+    bool success;
+
+    CastResult() : success(true) {}
+};
+
 struct Type
 {
     typedef void (*Initialize)(Type* type, TaggedValue* value);
@@ -42,7 +49,17 @@ struct Type
     typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
     typedef void (*Reset)(TaggedValue* value);
     typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
-    typedef void (*Cast)(Type* type, TaggedValue* source, TaggedValue* dest);
+
+    // Attempts to write a value to 'dest' which is of type 'type', and has a value
+    // that comes from 'source'. If the cast isn't possible, callee will record the
+    // failure in the CastResult.
+    //
+    // If checkOnly is true, then callee should only record whether the cast is possible,
+    // and not actually write to 'dest'. Caller is allowed to pass NULL for 'dest' when
+    // checkOnly is true.
+    typedef void (*Cast)(CastResult* result, TaggedValue* source, Type* type,
+            TaggedValue* dest, bool checkOnly);
+
     typedef bool (*IsSubtype)(Type* type, Type* otherType);
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
@@ -113,6 +130,11 @@ public:
     ~Type();
 
     int findFieldIndex(std::string const& name)
+    {
+        return prototype.findIndex(name);
+    }
+
+    int findFieldIndex(const char* name)
     {
         return prototype.findIndex(name);
     }

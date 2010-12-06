@@ -124,6 +124,7 @@ void normalize_feedback_branch(Branch& branch)
 
 void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 {
+    #if 0
     update_derived_trainable_properties(branch);
     trainingBranch.clear();
 
@@ -214,6 +215,7 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
             }
         }
     }
+    #endif
 }
 
 void refresh_training_branch(Branch& branch)

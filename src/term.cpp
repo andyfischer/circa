@@ -100,25 +100,25 @@ std::string const& Term::stringProp(std::string const& name)
 void Term::setIntProp(std::string const& name, int i)
 {
     TaggedValue* t = addProperty(name, INT_TYPE);
-    make_int(t, i);
+    set_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
     TaggedValue* t = addProperty(name, FLOAT_TYPE);
-    make_float(t, f);
+    set_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)
 {
     TaggedValue* t = addProperty(name, BOOL_TYPE);
-    make_bool(t, b);
+    set_bool(t, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
     TaggedValue* t = addProperty(name, STRING_TYPE);
-    make_string(t, s);
+    set_string(t, s);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)

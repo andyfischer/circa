@@ -62,7 +62,7 @@ void test_builtin_equals()
 void test_list()
 {
     Branch branch;
-    Term* l = branch.eval("l = list(1,2,'foo')");
+    TaggedValue* l = branch.eval("l = list(1,2,'foo')");
 
     test_assert(l->getIndex(0)->asInt() == 1);
     test_assert(l->getIndex(1)->asInt() == 2);
@@ -72,7 +72,7 @@ void test_list()
 void test_vectorized_funcs()
 {
     Branch branch;
-    Term* t = branch.eval("[1 2 3] + [4 5 6]");
+    TaggedValue* t = branch.eval("[1 2 3] + [4 5 6]");
     test_assert(t);
 
     test_assert(t->numElements() == 3);
@@ -104,11 +104,13 @@ void test_vectorized_funcs_with_points()
     
     Term* point_t = branch.compile("type Point {number x, number y}");
 
-    Term* a = branch.eval("a = [1 0] -> Point");
+    Term* a = branch.compile("a = [1 0] -> Point");
 
     test_assert(a->type == point_t);
 
-    Term* b = branch.eval("b = a + [0 2]");
+    Term* b = branch.compile("b = a + [0 2]");
+
+    evaluate_branch(branch);
 
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);
@@ -119,9 +121,9 @@ void test_cond_with_int_and_float()
     Branch branch;
 
     // This code once caused a bug
-    Term* a = branch.eval("cond(true, 1, 1.0)");
+    Term* a = branch.compile("cond(true, 1, 1.0)");
     test_assert(a->type != ANY_TYPE);
-    Term* b = branch.eval("cond(true, 1.0, 1)");
+    Term* b = branch.compile("cond(true, 1.0, 1)");
     test_assert(b->type != ANY_TYPE);
 }
 
@@ -129,7 +131,7 @@ void test_get_index()
 {
     Branch branch;
     branch.eval("l = [1 2 3]");
-    Term* get = branch.eval("get_index(l, 0)");
+    TaggedValue* get = branch.eval("get_index(l, 0)");
 
     test_assert(get);
     test_assert(get->value_type == type_contents(INT_TYPE));
@@ -150,15 +152,13 @@ void test_set_index()
     Branch branch;
 
     branch.eval("l = [1 2 3]");
-    Term* l2 = branch.eval("set_index(@l, 1, 5)");
+    TaggedValue* l2 = branch.eval("set_index(@l, 1, 5)");
 
-    test_assert(l2);
     test_assert(l2->getIndex(0)->asInt() == 1);
     test_assert(l2->getIndex(1)->asInt() == 5);
     test_assert(l2->getIndex(2)->asInt() == 3);
 
-    Term* l3 = branch.eval("l[2] = 9");
-    test_assert(l3);
+    TaggedValue* l3 = branch.eval("l[2] = 9");
     test_assert(l3->getIndex(0)->asInt() == 1);
     test_assert(l3->getIndex(1)->asInt() == 5);
     test_assert(l3->getIndex(2)->asInt() == 9);
@@ -166,27 +166,25 @@ void test_set_index()
 
 void test_do_once()
 {
-#if 0
-    FIXME
     Branch branch;
+    EvalContext context;
+
     Term* x = branch.compile("x = 1");
     Term* t = branch.compile("do_once()");
     t->nestedContents.compile("unsafe_assign(x,2)");
 
+    test_assert(branch);
+
     test_assert(as_int(x) == 1);
 
     // the assign() inside do_once should modify x
-    bytecode::print_bytecode(std::cout, branch);
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
     test_assert(as_int(x) == 2);
 
     // but if we call it again, it shouldn't do that any more
-    make_int(x, 3);
-    evaluate_branch(branch);
+    set_int(x, 3);
+    evaluate_branch(&context, branch);
     test_assert(as_int(x) == 3);
-
-    branch.clear();
-#endif
 }
 
 void test_changed()
@@ -204,11 +202,42 @@ void test_changed()
     evaluate_branch(&context, branch);
     test_assert(changed->asBool() == false);
 
-    make_int(x, 6);
+    set_int(x, 6);
     evaluate_branch(&context, branch);
     test_assert(changed->asBool() == true);
     evaluate_branch(&context, branch);
     test_assert(changed->asBool() == false);
+}
+
+void test_delta()
+{
+    Branch branch;
+
+    Term* i = branch.compile("i = 0");
+    Term* delta = branch.compile("delta(i)");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    test_assert(is_float(delta));
+    test_equals(delta->toFloat(), 0);
+    
+    set_int(i, 5);
+    evaluate_branch(&context, branch);
+    test_assert(is_float(delta));
+    test_equals(delta->toFloat(), 5);
+
+    // do another evaluation without changing i, delta is now 0
+    evaluate_branch(&context, branch);
+    test_equals(delta->toFloat(), 0);
+
+    set_int(i, 2);
+    evaluate_branch(&context, branch);
+    test_equals(delta->toFloat(), -3);
+
+    set_int(i, 0);
+    evaluate_branch(&context, branch);
+    test_equals(delta->toFloat(), -2);
 }
 
 void test_message_passing()
@@ -220,20 +249,18 @@ void test_message_passing()
 
     // Before running, i should be empty
     test_assert(i->numElements() == 0);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    test_equals(&context.state, "null");
 
     // First run, i is still empty, but the hidden state has 1
-    std::cout << context.state.toString() << std::endl;
     evaluate_branch(&context, branch);
-    std::cout << context.state.toString() << std::endl;
     test_assert(i->numElements() == 0);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
+    test_equals(&context.state, "[i: [1]]");
 
     // Second run, i now returns 1
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
+    test_equals(&context.state, "[i: [1]]");
 
     // Delete the send() call
     branch.remove(send);
@@ -242,12 +269,12 @@ void test_message_passing()
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    test_equals(&context.state, "[i: []]");
 
     // Fourth run, i is empty again
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 0);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    test_equals(&context.state, "[i: []]");
 }
 
 void test_namespace()
@@ -257,6 +284,7 @@ void test_namespace()
     branch.eval("namespace ns a = 1 end");
     test_equals(branch["ns"]->toString(), "[a: 1]");
 }
+
 
 void register_tests()
 {
@@ -270,10 +298,11 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
     REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
     REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
-    REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
-    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
-    REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
+    REGISTER_TEST_CASE(builtin_function_tests::test_delta);
+    REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
 }
 
 } // namespace builtin_function_tests

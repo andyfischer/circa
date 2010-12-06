@@ -21,7 +21,6 @@ def random_location() -> Point
     return([rand() * window.width, rand() * window.height])
 end
 
-
 -- ide - functions for controlling IDE behavior
 namespace ide
     def quit(): "Tell the IDE to shutdown"
@@ -75,9 +74,9 @@ end
 -- Text rendering functions
 namespace text begin
     type RenderedText { int texid, int width, int height, Color color, string text }
-    def load_font(state TTF_Font, string filename, int size) -> TTF_Font:
+    def load_font(state Font, string filename, int size) -> Font:
         "Load the given font"
-    def render_text(state RenderedText, TTF_Font font, string text, Color color) -> RenderedText
+    def render_text(state RenderedText, Font font, string text, Color color) -> RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
     end
     def draw_rendered_text(RenderedText, Point loc)
@@ -85,14 +84,14 @@ namespace text begin
     end
 end
 
-def draw_text(TTF_Font font, string str, Color color, Point location) -> Rect
+def draw_text(Font font, string str, Color color, Point location) -> Rect
     "Render and draw a string."
     sprite = text:render_text(font, str, color)
     text:draw_rendered_text(sprite, location)
     return(to_rect(location, [sprite.width sprite.height]))
 end
 
-def draw_text_centered(TTF_Font font, string str, Color color, Point location)
+def draw_text_centered(Font font, string str, Color color, Point location)
     sprite = text:render_text(font, str, color)
     text:draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
 end
@@ -207,7 +206,7 @@ def draggable_rect(Point initial_location, Point size) -> Point
 end
 
 ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->path, 16)
-coding_font = text:load_font("../assets/inconsolata.otf"->path, 16)
+coding_font = text:load_font("../assets/Inconsolata.otf"->path, 16)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -310,33 +309,4 @@ end
 
 users_branch = include(user_script_filename)
 
-def post_game_stuff()
-    -- Draw HUD
-    draw_main_menu = false
-    if draw_main_menu
-        include('mainmenu.ca' -> path)
-    end
-
-    -- Draw fpses
-    draw_fps = false
-    if draw_fps
-        text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
-        text:draw_rendered_text(text_sprite, [10 window.height - 40])
-    end
-
-    -- Draw pause indicator
-    if ide:paused()
-        draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
-    end
-
-    -- Name selector
-    if toggle(key_pressed('b'))
-        br = branch_ref(users_branch)
-        x = 10, y = 10
-        for r in br.get_configs_nested()
-            tweak:button(r, [x y], br.get_relative_name(r))
-            y += 24
-        end
-    end
-end
-post_game_stuff()
+--include('overlay.ca' -> path)

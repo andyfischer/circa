@@ -52,7 +52,7 @@ Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 {
     Term* iteratorType = find_type_of_get_index(forTerm->input(0));
     Term* result = create_value(forTerm->nestedContents, iteratorType, name);
-    set_source_hidden(result, true);
+    hide_from_source(result);
     result->setBoolProp("no-bytecode", true);
     return result;
 }
@@ -188,12 +188,12 @@ void write_for_loop_bytecode(bytecode::WriteContext* context, Term* forTerm)
     if (hasState) {
         // State field name.
         TaggedValue stateName;
-        make_string(&stateName, get_implicit_state_name(forTerm));
+        set_string(&stateName, get_implicit_state_name(forTerm));
         stateContainerName = bytecode::write_push_local_op(context, &stateName);
 
         // State default value
         TaggedValue defaultValue;
-        make_list(&defaultValue);
+        set_list(&defaultValue);
         int stateDefaultValue = bytecode::write_push_local_op(context, &defaultValue);
 
         // get_state_field
@@ -347,72 +347,85 @@ CA_FUNCTION(evaluate_for_loop)
     Branch& forContents = CALLER->nestedContents;
     Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
+    Term* iterator = get_for_loop_iterator(CALLER);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
     TaggedValue outputTv;
-    List* output = make_list(&outputTv, inputListLength);
+    bool saveOutput = forContents.outputRegister != -1;
+    List* output = set_list(&outputTv, inputListLength);
+    int nextOutputIndex = 0;
 
+    // Preserve old for-loop context
+    ForLoopContext prevLoopContext = CONTEXT->forLoopContext;
+
+    #if 0
     List previousFrame;
+    #endif
 
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
-        bool lastIter = iteration + 1 >= inputListLength;
 
         ca_assert(forContents.registerCount > 0);
 
+        #if 0
         List* frame = push_stack_frame(STACK, forContents.registerCount);
+        #endif
 
         // copy iterator
-        copy(inputList->getIndex(iteration), frame->get(0));
+        copy(inputList->getIndex(iteration), get_local(iterator));
 
         // copy inner rebinds
         for (int i=0; i < innerRebinds.length(); i++) {
             Term* rebindTerm = innerRebinds[i];
-            TaggedValue* dest = frame->get(rebindTerm->registerIndex);
+            TaggedValue* dest = get_local(rebindTerm);
 
             if (firstIter)
                 copy(get_input(CONTEXT, rebindTerm, 0), dest);
             else
-                copy(previousFrame.get(rebindTerm->input(1)->registerIndex), dest);
+                copy(get_input(CONTEXT, rebindTerm, 1), dest);
         }
+
+        //dump_branch(forContents);
+
+        CONTEXT->forLoopContext.discard = false;
 
         for (int i=loop_contents_location; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, forContents[i]);
 
-        frame = List::checkCast(STACK->get(STACK->numElements() - 1));
-
         // Save output
-        if (forContents.outputRegister != -1)
-            copy(frame->get(forContents.outputRegister), output->get(iteration));
-
-        if (!lastIter) {
-            // Only pop the stack if this isn't the last iteration; if it's the last
-            // iter then we do it later.
-            swap(frame, &previousFrame);
-            pop_stack_frame(STACK);
+        if (saveOutput && !CONTEXT->forLoopContext.discard) {
+            TaggedValue* localResult = get_local(forContents[forContents.outputRegister]);
+            copy(localResult, output->get(nextOutputIndex++));
         }
     }
 
-    // Copy the outer rebinds to the output stack frame.
-    List* outputFrame = List::checkCast(STACK->get(STACK->length() - 2));
+    // Resize output, in case some elements were discarded
+    output->resize(nextOutputIndex);
 
+    swap(output, OUTPUT);
+
+    // Copy outer rebinds
     for (int i=0; i < outerRebinds.length(); i++) {
 
         Term* rebindTerm = outerRebinds[i];
 
-        // use the outer version if there were 0 iterations
-        int inputIndex = inputListLength == 0 ? 0 : 1;
+        TaggedValue* result = NULL;
 
-        TaggedValue* result = get_input(CONTEXT, rebindTerm, inputIndex);
-        int registerIndex = CALLER->registerIndex + 1 + i;
-        copy(result, outputFrame->get(registerIndex));
+        if (inputListLength == 0) {
+            // No iterations, use the outer rebind
+            result = get_input(CONTEXT, rebindTerm, 0);
+        } else {
+            // At least one iteration, use our local rebind
+            result = get_input(CONTEXT, rebindTerm, 1);
+        }
+
+        copy(result, get_local(rebindTerm));
     }
 
-    pop_stack_frame(STACK);
-
-    swap(output, OUTPUT);
+    // Restore loop context
+    CONTEXT->forLoopContext = prevLoopContext;
 }
 
 void for_loop_assign_registers(Term* term)
@@ -450,10 +463,10 @@ void for_loop_assign_registers(Term* term)
     if (as_bool(get_for_loop_modify_list(term))) {
         Term* output = forContents[get_for_loop_iterator(term)->name];
         ca_assert(output != NULL);
-        //ca_assert(output->registerIndex != -1);
-        forContents.outputRegister = output->registerIndex;
+        //forContents.outputRegister = output->registerIndex;
+        forContents.outputRegister = output->index;
     } else {
-        forContents.outputRegister = forContents.registerCount - 1;
+        forContents.outputRegister = forContents.length() - 1;
     }
 }
 

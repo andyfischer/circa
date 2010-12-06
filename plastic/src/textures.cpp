@@ -19,33 +19,33 @@ namespace textures {
 
 CA_FUNCTION(hosted_load_texture)
 {
-    Int texid = INPUT(0);
+    TaggedValue* texid = INPUT(0);
 
-    if (texid == 0) {
+    if (as_int(texid) == 0) {
         std::string filename = INPUT(1)->asString();
         GLuint id = load_image_to_texture(CONTEXT, CALLER, filename.c_str());
-        texid = id;
+        set_int(texid, id);
     }
-    make_int(OUTPUT, texid);
+    set_int(OUTPUT, as_int(texid));
 
     gl_check_error(CONTEXT, CALLER);
 }
 
 CA_FUNCTION(hosted_image)
 {
-    Int texid = INPUT(0);
+    TaggedValue* texid = INPUT(0);
     std::string filename = INPUT(1)->asString();
     float x1 = FLOAT_INPUT(2);
     float y1 = FLOAT_INPUT(3);
     float x2 = FLOAT_INPUT(4);
     float y2 = FLOAT_INPUT(5);
 
-    if (texid == 0) {
-        texid = load_image_to_texture(CONTEXT, CALLER, filename.c_str());
+    if (as_int(texid) == 0) {
+        set_int(texid, load_image_to_texture(CONTEXT, CALLER, filename.c_str()));
         if (CONTEXT->errorOccurred) return;
     }
 
-    glBindTexture(GL_TEXTURE_2D, texid);
+    glBindTexture(GL_TEXTURE_2D, as_int(texid));
 
     glBegin(GL_QUADS);
 

@@ -38,6 +38,7 @@ struct TaggedValue
     int asInt();
     float asFloat();
     float toFloat();
+    const char* asCString();
     std::string const& asString();
     bool asBool();
     Ref& asRef();
@@ -49,8 +50,12 @@ struct TaggedValue
     static TaggedValue fromBool(bool b);
 };
 
-void cast(Type* type, TaggedValue* source, TaggedValue* dest);
-void cast(TaggedValue* source, TaggedValue* dest);
+void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly);
+
+// Attempts to cast, returns whether it was successful
+bool cast(TaggedValue* source, Type* type, TaggedValue* dest);
+
+bool cast_possible(TaggedValue* source, Type* type);
 void copy(TaggedValue* source, TaggedValue* dest);
 void swap(TaggedValue* left, TaggedValue* right);
 void reset(TaggedValue* value);
@@ -66,19 +71,18 @@ void set_index(TaggedValue* value, int index, TaggedValue* element);
 TaggedValue* get_field(TaggedValue* value, const char* field);
 void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 
-TaggedValue* make_int(TaggedValue* value);
+TaggedValue* set_int(TaggedValue* value);
 
-void make_int(TaggedValue* value, int i);
-void make_float(TaggedValue* value, float f);
-void make_string(TaggedValue* value, const char* s);
-void make_string(TaggedValue* value, std::string const& s);
-void make_bool(TaggedValue* value, bool b);
-void make_ref(TaggedValue* value, Term* t);
-List* make_list(TaggedValue* value);
-List* make_list(TaggedValue* value, int size);
-void make_branch(TaggedValue* value);
-void make_type(TaggedValue* value, Type* type);
-void make_null(TaggedValue* value);
+void set_int(TaggedValue* value, int i);
+void set_float(TaggedValue* value, float f);
+void set_string(TaggedValue* value, const char* s);
+void set_string(TaggedValue* value, std::string const& s);
+void set_bool(TaggedValue* value, bool b);
+void set_ref(TaggedValue* value, Term* t);
+List* set_list(TaggedValue* value);
+List* set_list(TaggedValue* value, int size);
+void set_type(TaggedValue* value, Type* type);
+void set_null(TaggedValue* value);
 
 void set_pointer(TaggedValue* value, Type* type, void* p);
 void set_pointer(TaggedValue* value, void* ptr);
@@ -100,7 +104,7 @@ bool is_float(TaggedValue* value);
 bool is_bool(TaggedValue* value);
 bool is_string(TaggedValue* value);
 bool is_ref(TaggedValue* value);
-bool is_value_branch(TaggedValue* value);
+bool is_list(TaggedValue* value);
 bool is_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);
 bool is_null(TaggedValue* value);

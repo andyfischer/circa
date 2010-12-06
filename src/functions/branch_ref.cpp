@@ -7,7 +7,9 @@ namespace branch_ref_function {
 
     CA_FUNCTION(branch_ref)
     {
+        #if 0
         branch_ref_t::set_from_ref(OUTPUT, INPUT_TERM(0));
+        #endif
     }
 
     void setup(Branch& kernel)

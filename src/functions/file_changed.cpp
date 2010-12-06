@@ -12,6 +12,9 @@ namespace file_changed_function {
             error_occurred(cxt, caller, "File not found: " + filename);
             return false;
         }
+
+        if (fileSignature->value_type != FILE_SIGNATURE_T)
+            change_type(fileSignature, FILE_SIGNATURE_T);
         
         TaggedValue* sigFilename = fileSignature->getIndex(0);
         TaggedValue* sigModified = fileSignature->getIndex(1);
@@ -20,8 +23,8 @@ namespace file_changed_function {
 
         if (modifiedTime != as_int(sigModified)
                 || filename != as_string(sigFilename)) {
-            make_string(sigFilename, filename);
-            make_int(sigModified, (int) modifiedTime);
+            set_string(sigFilename, filename);
+            set_int(sigModified, (int) modifiedTime);
             return true;
         } else {
             return false;
@@ -30,7 +33,8 @@ namespace file_changed_function {
 
     CA_FUNCTION(evaluate)
     {
-        make_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), INPUT(1)->asString()));
+        set_bool(OUTPUT, check(CONTEXT, CALLER, get_state_input(CONTEXT, CALLER),
+                    INPUT(1)->asString()));
     }
 
     void setup(Branch& kernel)

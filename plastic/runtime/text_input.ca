@@ -30,7 +30,7 @@ namespace text_input
         return(tis.text)
     end
 
-    def draw_input(TTF_Font font, Color color, Point loc) -> string
+    def draw_input(Font font, Color color, Point loc) -> string
         state TextInputState tis
         for key in recent_key_presses()
             input_character(@tis, key)

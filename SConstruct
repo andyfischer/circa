@@ -21,7 +21,7 @@ DEBUG['variant_name'] = 'debug'
 RELEASE['variant_name'] = 'release'
 ALL = [DEBUG, RELEASE]
 
-# Common build flags
+# Build flags
 if POSIX:
     def common_flags(env):
         env.Append(CPPFLAGS=['-ggdb', '-Wall'])

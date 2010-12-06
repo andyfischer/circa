@@ -4,6 +4,7 @@
 #include "circa.h"
 #include "debug_valid_objects.h"
 #include "names.h"
+#include "parser.h"
 
 namespace circa {
 
@@ -26,9 +27,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
         }
     }
 
-    if (!is_callable(function))
-        internal_error("Term "+function->name+" is not callable");
-
     // Create the term
     Term* result = branch.appendNew();
 
@@ -37,15 +35,17 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     if (name != "")
         branch.bindName(result, name);
 
-    // Initialize inputs
-    int firstInput = 0;
-    
-    // If the function is native and stateful then inputs start at 1 instead of 0.
-    if (is_native_function(function) && is_function_stateful(function))
-        firstInput = 1;
+    RefList _inputs = inputs;
 
-    for (int i=0; i < inputs.length(); i++)
-        set_input(result, i+firstInput, inputs[i]);
+    // If the function takes a state input, and there aren't enough inputs, then prepend
+    // a NULL input for state.
+    if (is_function_stateful(function)
+            && _inputs.length() == function_t::num_inputs(function) - 1) {
+        _inputs.prepend(NULL);
+    }
+
+    for (int i=0; i < _inputs.length(); i++)
+        set_input(result, i, _inputs[i]);
 
     Term* outputType = function_get_specialized_output_type(function, result);
 
@@ -219,9 +219,11 @@ void post_input_change(Term* term)
     for (int i=0; i < term->numInputs(); i++)
         term->inputInfo(i).relativeScope = get_input_relative_scope(term, i);
 
-    FunctionAttrs::PostInputChange func = function_t::get_attrs(term->function).postInputChange;
-    if (func) {
-        func(term);
+    if (is_function(term->function)) {
+        FunctionAttrs::PostInputChange func =
+            function_t::get_attrs(term->function).postInputChange;
+        if (func)
+            func(term);
     }
 }
 
@@ -258,6 +260,9 @@ int get_register_count(Term* term)
 {
     // TODO: get rid of these terms:
     if (term->name == "#attr:comp-pending-rebind")
+        return 0;
+
+    if (!is_function(term->function))
         return 0;
 
     FunctionAttrs::GetRegisterCount getRegisterCount
@@ -323,8 +328,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     change_type(term, original->type);
     change_type((TaggedValue*) term, original->value_type);
 
-    if (copyBranches || !is_branch(original))
-        copy(original, term);
+    copy(original, term);
 
     if (copyBranches)
         duplicate_branch(original->nestedContents, term->nestedContents);
@@ -333,14 +337,6 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     copy(&original->properties, &term->properties);
 
     return term;
-}
-
-std::string default_name_for_hidden_state(const std::string& termName)
-{
-    std::stringstream new_value_name;
-    new_value_name << "#hidden_state";
-    if (termName != "") new_value_name << "_for_" << termName;
-    return new_value_name.str();
 }
 
 Term* apply(Branch& branch, std::string const& functionName, RefList const& inputs, std::string const& name)
@@ -391,7 +387,7 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
         std::string const& name)
 {
     Term* nameTerm = create_string(branch, name);
-    set_source_hidden(nameTerm, true);
+    hide_from_source(nameTerm);
 
     Term* result = apply(branch, get_global("get_state_field"),
             RefList(NULL, nameTerm, defaultValue), name);
@@ -402,35 +398,35 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
 Term* create_string(Branch& branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, STRING_TYPE, name);
-    make_string(term, s);
+    set_string(term, s);
     return term;
 }
 
 Term* create_int(Branch& branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, INT_TYPE, name);
-    make_int(term, i);
+    set_int(term, i);
     return term;
 }
 
 Term* create_float(Branch& branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, FLOAT_TYPE, name);
-    make_float(term, f);
+    set_float(term, f);
     return term;
 }
 
 Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, BOOL_TYPE, name);
-    make_bool(term, b);
+    set_bool(term, b);
     return term;
 }
 
 Term* create_ref(Branch& branch, Term* ref, std::string const& name)
 {
     Term* term = create_value(branch, REF_TYPE, name);
-    make_ref(term, ref);
+    set_ref(term, ref);
     return term;
 }
 Term* create_void(Branch& branch, std::string const& name)
@@ -472,13 +468,6 @@ Term* create_empty_type(Branch& branch, std::string name)
     return type;
 }
 
-Term* create_branch_based_type(Branch& branch, std::string const& name)
-{
-    Term* term = create_type(branch, name);
-    initialize_branch_based_type(term);
-    return term;
-}
-
 Term* duplicate_value(Branch& branch, Term* term)
 {
     Term* dup = create_value(branch, term->type);
@@ -511,25 +500,6 @@ Term* procure_bool(Branch& branch, std::string const& name)
     return procure_value(branch, BOOL_TYPE, name);
 }
 
-void resize_list(Branch& list, int numElements, Term* type)
-{
-    ca_assert(numElements >= 0);
-
-    // Add terms if necessary
-    for (int i=list.length(); i < numElements; i++)
-        create_value(list, type);
-
-    // Remove terms if necessary
-    bool anyRemoved = false;
-    for (int i=numElements; i < list.length(); i++) {
-        list.set(i, NULL);
-        anyRemoved = true;
-    }
-
-    if (anyRemoved)
-        list.removeNulls();
-}
-
 void set_step(Term* term, float step)
 {
     term->setFloatProp("step", step);
@@ -556,6 +526,18 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
         Term* pos = outsidePositive ? outerVersion : innerVersion;
         Term* neg = outsidePositive ? innerVersion : outerVersion ;
         apply(rebinds, COND_FUNC, RefList(rebindCondition, pos, neg), name);
+    }
+}
+
+void post_compile_term(Term* term)
+{
+    // Check for overloaded_function
+    if (term->function == OVERLOADED_FUNCTION_FUNC) {
+        overloaded_function::post_compile_setup_overloaded_function(term);
+    }
+
+    if (term->function == INCLUDE_FUNC) {
+        include_function::preload_script(term);
     }
 }
 

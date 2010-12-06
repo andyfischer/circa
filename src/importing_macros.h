@@ -16,7 +16,6 @@
     };
 
 
-
 #define CA_DEFINE_FUNCTION(fname, header) \
     CA_FUNCTION(evaluate_##fname); \
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
@@ -31,11 +30,9 @@
 #define STATE_INPUT (get_state_input(_circa_cxt, _circa_caller))
 #define CALLER (_circa_caller)
 #define INPUT_TERM(index) (CALLER->input(index))
-#define CAPTURE_INPUTS(list) (capture_inputs(_circa_cxt, _circa_op, (list)))
 #define OUTPUT (get_output(_circa_cxt, _circa_caller))
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_caller->function)
-#define STACK (&_circa_cxt->stack)
 
 #define CA_SETUP_FUNCTIONS(branch) {\
     for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \

@@ -89,10 +89,10 @@ namespace overloaded_function {
                 //change_type(CALLER, contents[0]->type);
             }
             TaggedValue output;
-            evaluate_branch_in_new_frame(CONTEXT, contents, &output);
-            cast(type_contents(contents[0]->type), &output, OUTPUT);
+            evaluate_branch_internal(CONTEXT, contents, &output);
+            cast(&output, type_contents(contents[0]->type), OUTPUT);
         } else {
-            make_string(OUTPUT, "(specialized func not found)");
+            set_string(OUTPUT, "(specialized func not found)");
         }
     }
 
@@ -104,8 +104,9 @@ namespace overloaded_function {
             contents.clear();
         } else {
             TaggedValue output;
-            evaluate_branch_in_new_frame(CONTEXT, contents, &output);
-            swap(&output, OUTPUT);
+            evaluate_branch_internal(CONTEXT, contents, &output);
+            if (OUTPUT != NULL)
+                swap(&output, OUTPUT);
         }
     }
 
@@ -176,7 +177,7 @@ namespace overloaded_function {
         RefList outputTypes;
 
         for (int i=0; i < overloads.length(); i++) {
-            make_ref(parameters[i], overloads[i]);
+            set_ref(parameters[i], overloads[i]);
 
             if (argumentCount != function_t::num_inputs(overloads[i]))
                 variableArgs = true;
@@ -185,22 +186,14 @@ namespace overloaded_function {
             outputTypes.append(function_t::get_output_type(overloads[i]));
         }
 
-
         Branch& result = term->nestedContents;
         result.shorten(1);
-        for (int i=0; i < argumentCount; i++)
+        int placeholderCount = variableArgs ? 1 : argumentCount;
+        for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* outputType = find_common_type(outputTypes);
         function_t::set_output_type(term, outputType);
         function_t::set_variable_args(term, variableArgs);
-    }
-
-    CA_FUNCTION(evaluate)
-    {
-        if (NUM_INPUTS == 0)
-            return error_occurred(CONTEXT, CALLER, "Number of inputs must be >0");
-
-        setup_overloaded_function(CALLER, CALLER->name, CALLER->inputs);
     }
 
     Term* create_overloaded_function(Branch& branch, std::string const& name,
@@ -211,17 +204,22 @@ namespace overloaded_function {
         return result;
     }
 
+    void post_compile_setup_overloaded_function(Term* term)
+    {
+        setup_overloaded_function(term, term->name, term->inputs);
+    }
+
     void append_overload(Term* overloadedFunction, Term* overload)
     {
         ca_assert(is_overloaded_function(overloadedFunction));
 
         List& parameters = function_t::get_attrs(overloadedFunction).parameters;
-        make_ref(parameters.append(), overload);
+        set_ref(parameters.append(), overload);
     }
 
     void setup(Branch& kernel)
     {
-        OVERLOADED_FUNCTION_FUNC = import_function(kernel, evaluate,
+        OVERLOADED_FUNCTION_FUNC = import_function(kernel, NULL,
                 "overloaded_function(Function...) -> Function");
     }
 }

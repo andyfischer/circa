@@ -38,7 +38,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     std::stringstream checkInvariantsOutput;
-    if (!branch_check_invariants(code, &checkInvariantsOutput)) {
+    if (!branch_check_invariants_print_result(code, checkInvariantsOutput)) {
         std::cout << "Failed invariant in code: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
         print_branch_raw(std::cout, code);
@@ -47,6 +47,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     Branch& assertions = create_branch(code, "assertions");
+    change_function(code["assertions"], get_global("branch_preserve_stack"));
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
     if (has_static_errors(assertions)) {
@@ -76,7 +77,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     checkInvariantsOutput.clear();
-    if (!branch_check_invariants(assertions, &checkInvariantsOutput)) {
+    if (!branch_check_invariants_print_result(assertions, checkInvariantsOutput)) {
         std::cout << "Failed invariant in assertions: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
         print_branch_raw(std::cout, code);
@@ -237,6 +238,11 @@ void test_modulo()
     test_snippet("", "mod(-2, 4) == 2");
 }
 
+void test_subroutine()
+{
+    test_snippet("def f() -> List return([1]) end", "f() == [1]");
+}
+
 void test_references()
 {
     test_snippet("a = 1; ra = ref(a)", "ra.name() == 'a'");
@@ -314,6 +320,20 @@ void test_cond()
     test_snippet("", "cond(false, 5, true) == true");
 }
 
+void test_if_block()
+{
+    test_snippet("a = 1; if true a = 2 end", "a == 2");
+    test_snippet("a = 1; if false a = 2 end", "a == 1");
+    test_snippet("a = 1; if true a = 2 else end", "a == 2");
+    test_snippet("a = 1; if false a = 2 else end", "a == 1");
+    test_snippet("a = 1; if true a = 2 else a = 3 end", "a == 2");
+    test_snippet("a = 1; if false a = 2 else a = 3 end", "a == 3");
+    test_snippet("a = 1; if true else a = 3 end", "a == 1");
+    test_snippet("a = 1; if false else a = 3 end", "a == 3");
+    test_snippet("a = 1; if false a = 2 elif true a = 3 else a = 4 end", "a == 3");
+    test_snippet("a = 1; if false a = 2 elif false a = 3 else a = 4 end", "a == 4");
+}
+
 void test_for_loops()
 {
     test_snippet("l = []; for i in 0..3; int(@i), l.append(i); end", "l == [0 1 2]");
@@ -332,7 +352,11 @@ void test_for_loops()
     test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
 
     // For loop with state
-    test_snippet("for i in [1 2 3]; state s = i; end", "");
+    //test_snippet("for i in [1 2 3]; state s = i; end", "");
+
+    // Syntax with significant indentation
+    test_snippet("a = 0; for i in [1 2 3]: a += i", "a == 6");
+    test_snippet("a = []; for i in [1 2 3]: a.append(i)", "a == [1 2 3]");
 }
 
 void test_subscripting()
@@ -464,11 +488,6 @@ void test_misc()
     test_snippet("l = []\nl.append([1])\n    ", "");
 }
 
-void test_styled_source()
-{
-    test_snippet("styled_source = { 1 } -> branch_ref -> format_source", "");
-}
-
 void test_refactoring()
 {
     test_snippet("s = { x = 1 } -> branch_ref; refactor:rename(s.get_index(0), 'y')",
@@ -507,10 +526,9 @@ void test_type_check_functions()
     test_snippet("", "not(is_list(1.0))");
 }
 
-void test_state_in_subroutine()
+void test_namespace()
 {
-    // make sure this doesn't crash:
-    test_snippet("def func(state int i) end; func()", "");
+    test_snippet("namespace ns a = 1 end", "ns:a == 1");
 }
 
 void register_tests()
@@ -520,16 +538,18 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_abs);
     REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);
+    REGISTER_TEST_CASE(test_snippets::test_subroutine);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_references);
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);
     REGISTER_TEST_CASE(test_snippets::test_cond);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_for_loops);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_subscripting);
+    REGISTER_TEST_CASE(test_snippets::test_if_block);
+    REGISTER_TEST_CASE(test_snippets::test_for_loops);
+    REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_field_syntax);
+    REGISTER_TEST_CASE(test_snippets::test_field_syntax);
     REGISTER_TEST_CASE(test_snippets::test_lexprs);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
     REGISTER_TEST_CASE(test_snippets::test_color_arithmetic);
@@ -540,12 +560,11 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_styled_source);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_lists);
+    REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_state_in_subroutine);
+    REGISTER_TEST_CASE(test_snippets::test_namespace);
 }
 
 } // namespace test_snippets

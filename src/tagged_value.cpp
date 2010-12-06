@@ -104,6 +104,10 @@ float TaggedValue::toFloat()
 {
     return to_float(this);
 }
+const char* TaggedValue::asCString()
+{
+    return as_string(this).c_str();
+}
 
 std::string const& TaggedValue::asString()
 {
@@ -123,49 +127,63 @@ Ref& TaggedValue::asRef()
 TaggedValue TaggedValue::fromInt(int i)
 {
     TaggedValue tv;
-    make_int(&tv, i);
+    set_int(&tv, i);
     return tv;
 }
 
 TaggedValue TaggedValue::fromFloat(float f)
 {
     TaggedValue tv;
-    make_float(&tv, f);
+    set_float(&tv, f);
     return tv;
 }
 TaggedValue TaggedValue::fromString(const char* s)
 {
     TaggedValue tv;
-    make_string(&tv, s);
+    set_string(&tv, s);
     return tv;
 }
 
 TaggedValue TaggedValue::fromBool(bool b)
 {
     TaggedValue tv;
-    make_bool(&tv, b);
+    set_bool(&tv, b);
     return tv;
 }
 
-void cast(Type* type, TaggedValue* source, TaggedValue* dest)
+void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
 {
-    if (type->cast == NULL) {
-        // If types are equal and there's no cast() function, just do a copy.
-        if (source->value_type == type) {
-            copy(source, dest);
-            return;
-        }
-
-        std::string msg = "No cast function on type " + type->name;
-        internal_error(msg.c_str());
+    if (type->cast != NULL) {
+        type->cast(result, source, type, dest, checkOnly);
+        return;
     }
 
-    type->cast(type, source, dest);
+    // Default case when the type has no handler: only allow the cast if source has the exact
+    // same type
+
+    if (source->value_type != type) {
+        result->success = false;
+        return;
+    }
+
+    if (checkOnly)
+        return;
+
+    copy(source, dest);
 }
 
-void cast(TaggedValue* source, TaggedValue* dest)
+bool cast(TaggedValue* source, Type* type, TaggedValue* dest)
 {
-    return cast(dest->value_type, source, dest);
+    CastResult result;
+    cast(&result, source, type, dest, false);
+    return result.success;
+}
+
+bool cast_possible(TaggedValue* source, Type* type)
+{
+    CastResult result;
+    cast(&result, source, type, NULL, true);
+    return result.success;
 }
 
 void copy(TaggedValue* source, TaggedValue* dest)
@@ -208,7 +226,7 @@ void reset(TaggedValue* value)
     // Check for NULL. Most TaggedValue functions don't do this, but reset() is
     // a convenient special case.
     if (value->value_type == NULL)
-        return make_null(value);
+        return set_null(value);
 
     Type* type = value->value_type;
 
@@ -355,68 +373,62 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
-TaggedValue* make_int(TaggedValue* value)
+TaggedValue* set_int(TaggedValue* value)
 {
     change_type(value, INT_T);
     return value;
 }
 
-void make_int(TaggedValue* value, int i)
+void set_int(TaggedValue* value, int i)
 {
     change_type(value, INT_T);
     value->value_data.asint = i;
 }
 
-void make_float(TaggedValue* value, float f)
+void set_float(TaggedValue* value, float f)
 {
     change_type(value, FLOAT_T);
     value->value_data.asfloat = f;
 }
 
-void make_string(TaggedValue* value, const char* s)
+void set_string(TaggedValue* value, const char* s)
 {
     change_type(value, STRING_T);
     *((std::string*) value->value_data.ptr) = s;
 }
 
-void make_string(TaggedValue* value, std::string const& s)
+void set_string(TaggedValue* value, std::string const& s)
 {
-    make_string(value, s.c_str());
+    set_string(value, s.c_str());
 }
 
-void make_bool(TaggedValue* value, bool b)
+void set_bool(TaggedValue* value, bool b)
 {
     change_type(value, BOOL_T);
     value->value_data.asbool = b;
 }
 
-void make_ref(TaggedValue* value, Term* t)
+void set_ref(TaggedValue* value, Term* t)
 {
     change_type(value, &as_type(REF_TYPE));
     *((Ref*) value->value_data.ptr) = t;
 }
 
-List* make_list(TaggedValue* value)
+List* set_list(TaggedValue* value)
 {
     change_type(value, NULL_T); // substitute for 'reset'
     change_type(value, LIST_T);
     return List::checkCast(value);
 }
 
-List* make_list(TaggedValue* value, int size)
+List* set_list(TaggedValue* value, int size)
 {
-    List* list = make_list(value);
+    List* list = set_list(value);
     list->resize(size);
     return list;
 }
 
-void make_branch(TaggedValue* value)
-{
-    change_type(value, NULL_T); // substitute for 'reset'
-    change_type(value, type_contents(BRANCH_TYPE));
-}
-
-void make_type(TaggedValue* value, Type* type)
+void set_type(TaggedValue* value, Type* type)
 {
     reset(value);
     change_type(value, TYPE_T);
@@ -424,7 +436,7 @@ void make_type(TaggedValue* value, Type* type)
     value->value_data.ptr = type;
 }
 
-void make_null(TaggedValue* value)
+void set_null(TaggedValue* value)
 {
     change_type(value, NULL_T);
 }
@@ -542,10 +554,9 @@ bool is_ref(TaggedValue* value)
         && value->value_type == (Type*) REF_TYPE->value_data.ptr;
 }
 
-bool is_value_branch(TaggedValue* value)
+bool is_list(TaggedValue* value)
 {
-    return BRANCH_TYPE != NULL
-        && value->value_type == (Type*) BRANCH_TYPE->value_data.ptr;
+    return list_t::is_list_based_type(value->value_type);
 }
 
 bool is_type(TaggedValue* value)

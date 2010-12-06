@@ -96,7 +96,6 @@ void test_file_changed()
     evaluate_branch(&context, branch);
     //dump_branch(branch);
     //std::cout << context.state.toString();
-    //bytecode::print_bytecode(std::cout, branch);
     test_assert(!as_bool(changed));
     evaluate_branch(&context, branch);
     test_assert(!as_bool(changed));
@@ -109,7 +108,7 @@ void test_file_changed()
     test_assert(!as_bool(changed));
 
     // Change the filename
-    make_string(filename, "y");
+    set_string(filename, "y");
     evaluate_branch(&context, branch);
     test_assert(as_bool(changed));
     evaluate_branch(&context, branch);
@@ -124,7 +123,6 @@ void test_include_namespace()
 
     branch.compile("include('file')");
     Term* a = branch.compile("ns:a");
-    dump_branch(branch);
     evaluate_branch(branch);
 
     test_assert(branch);
@@ -146,14 +144,27 @@ void test_include_with_error()
     test_assert(has_static_errors(branch));
 }
 
+void test_include_from_expression()
+{
+    Branch branch;
+    FakeFileSystem files;
+    files["a"] = "x = 1";
+
+    branch.compile("name = cond(true,'a','b')");
+    branch.compile("include(name)");
+
+    evaluate_branch(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_function);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_file_changed);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
+    REGISTER_TEST_CASE(file_based_tests::test_include_function);
+    REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
+    REGISTER_TEST_CASE(file_based_tests::test_file_changed);
+    REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
     //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
+    REGISTER_TEST_CASE(file_based_tests::test_include_from_expression);
 }
 
 } // namespace file_based_tests

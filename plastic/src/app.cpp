@@ -137,7 +137,7 @@ bool load_runtime()
     }
     parse_script(app::runtime_branch(), runtime_ca_path);
 
-    ca_assert(branch_check_invariants(app::runtime_branch(), &std::cout));
+    ca_assert(branch_check_invariants_print_result(app::runtime_branch(), std::cout));
 
     setup_functions();
 
@@ -190,8 +190,8 @@ bool reload_runtime()
         return false;
 
     // Write window width & height
-    make_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
-    make_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
+    set_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
+    set_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
 
     return true;
 }
@@ -203,7 +203,7 @@ bool load_user_script_filename(std::string const& filename)
 
     if (filename != "") {
         circa::Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");
-        circa::make_string(user_script_filename, filename);
+        circa::set_string(user_script_filename, filename);
 
         std::stringstream msg;
         msg << "Loading script: " << filename;

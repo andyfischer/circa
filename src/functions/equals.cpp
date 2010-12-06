@@ -10,12 +10,12 @@ namespace equals_function {
 
     CA_DEFINE_FUNCTION(equals, "equals(any,any) -> bool")
     {
-        make_bool(OUTPUT, equals(INPUT(0), INPUT(1)));
+        set_bool(OUTPUT, equals(INPUT(0), INPUT(1)));
     }
 
     CA_DEFINE_FUNCTION(not_equals, "not_equals(any,any) -> bool")
     {
-        make_bool(OUTPUT, !equals(INPUT(0), INPUT(1)));
+        set_bool(OUTPUT, !equals(INPUT(0), INPUT(1)));
     }
 
     void setup(Branch& kernel)

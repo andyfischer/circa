@@ -39,7 +39,7 @@ Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 
     EvalContext context;
 
-    evaluate_range_with_lazy_stack(&context, branch, prevHead, branch.length() - 1);
+    evaluate_range(&context, branch, prevHead, branch.length() - 1);
 
     return result;
 }
@@ -317,6 +317,9 @@ Term* statement(Branch& branch, TokenStream& tokens)
         throw std::runtime_error("parser::statement is stuck, next token is: "
                 + tokens.next().text);
 
+    // Some functions have a post-compile step.
+    post_compile_term(result);
+
     return result;
 }
 
@@ -440,7 +443,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
         change_type(input, typeTerm);
-        set_source_hidden(input, true);
+        hide_from_source(input);
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
@@ -641,7 +644,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens);
             ca_assert(condition != NULL);
-            recursively_mark_terms_as_occuring_inside_an_expression(condition);
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
             block->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
@@ -673,7 +675,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
         Branch& branch = create_branch(contents, "else");
-        set_source_hidden(branch.owningTerm, true);
+        hide_from_source(branch.owningTerm);
     }
 
     // Move the if_block term to be after the condition terms.
@@ -716,7 +718,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     }
 
     Term* listExpr = infix_expression(branch, tokens);
-    recursively_mark_terms_as_occuring_inside_an_expression(listExpr);
 
     std::string name;
     if (rebindListName)
@@ -726,7 +727,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
 
-    make_bool(get_for_loop_modify_list(forTerm), rebindListName);
+    set_bool(get_for_loop_modify_list(forTerm), rebindListName);
 
     if (rebindListName)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
@@ -739,6 +740,8 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+
+    update_register_indices(branch);
     
     return forTerm;
 }
@@ -794,12 +797,16 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         tokens.consume();
         possible_whitespace(tokens);
 
+        // TODO: make this do_once() stuff work again
+        #if 0
         Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
-        set_source_hidden(initialization, true);
+        hide_from_source(initialization);
 
         initialValue = infix_expression(initialization->nestedContents, tokens);
-        recursively_mark_terms_as_occuring_inside_an_expression(initialValue);
         post_parse_branch(initialization->nestedContents);
+        #endif
+
+        initialValue = infix_expression(branch, tokens);
     }
 
     Term* result = create_stateful_value(branch, type, initialValue, name);
@@ -834,22 +841,19 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
 
     bool expr_is_new = branch.length() != originalBranchLength;
 
-    for (int i=0; i < expr->numInputs(); i++)
-        recursively_mark_terms_as_occuring_inside_an_expression(expr->input(i));
-
     expr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
     expr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
     // If the expr is an identifier, then create an implicit copy()
     if (expr->name != "" && !expr_is_new)
-        expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
+        expr = apply(branch, COPY_FUNC, RefList(expr));
 
     // Check to bind a new name
     if (nameBinding != "") {
         // If the term already has a name (this is the case for member-function syntax
         // and for unknown_identifier), then make a copy.
         if (expr->name != "")
-            expr = apply_with_syntax(branch, COPY_FUNC, RefList(expr));
+            expr = apply(branch, COPY_FUNC, RefList(expr));
 
         branch.bindName(expr, nameBinding);
     }
@@ -872,6 +876,7 @@ Term* expression_statement(Branch& branch, TokenStream& tokens)
     }
 
     set_source_location(expr, startPosition, tokens);
+    set_is_statement(expr, true);
 
     return expr;
 }
@@ -894,11 +899,9 @@ Term* include_statement(Branch& branch, TokenStream& tokens)
     }
 
     Term* filenameTerm = create_string(branch, filename);
-    set_source_hidden(filenameTerm, true);
+    hide_from_source(filenameTerm);
 
     Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
-
-    include_function::preload_script(NULL, result);
 
     return result;
 }
@@ -909,8 +912,6 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     possible_whitespace(tokens);
 
     Term* result = infix_expression(branch, tokens);
-
-    recursively_mark_terms_as_occuring_inside_an_expression(result);
 
     result = apply(branch, RETURN_FUNC, RefList(result));
     
@@ -1107,11 +1108,11 @@ Term* unary_expression(Branch& branch, TokenStream& tokens)
         // rather than introduce a neg() operation.
         if (is_value(expr) && expr->name == "") {
             if (is_int(expr)) {
-                make_int(expr, as_int(expr) * -1);
+                set_int(expr, as_int(expr) * -1);
                 return expr;
             }
             else if (is_float(expr)) {
-                make_float(expr, as_float(expr) * -1.0f);
+                set_float(expr, as_float(expr) * -1.0f);
                 expr->setStringProp("float:original-format",
                     "-" + expr->stringProp("float:original-format"));
                 return expr;
@@ -1207,6 +1208,7 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
+    Term* originalFunction = function;
     std::string originalName = function->name;
 
     Term* result = NULL;
@@ -1218,18 +1220,11 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     // Check if 'function' is a namespace access term
     } else if (function->function == GET_NAMESPACE_FIELD) {
 
-        Term* originalFunction = function;
         function = statically_resolve_namespace_access(originalFunction);
 
         if ((originalFunction != function) && (originalFunction->name == "")) {
             originalName = get_relative_name(branch, function);
             erase_term(originalFunction);
-        }
-
-        if (!is_callable(function)) {
-            std::cout << "in function_call, term is not callable: "
-                << get_term_to_string_extended(function) << std::endl;
-            function = UNKNOWN_FUNCTION;
         }
 
         result = apply(branch, function, arguments);
@@ -1238,9 +1233,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
             result->setStringProp("syntax:functionName", originalName);
 
     } else {
-
-        if (!is_callable(function))
-            function = UNKNOWN_FUNCTION;
 
         result = apply(branch, function, arguments);
 
@@ -1310,7 +1302,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         finished = false;
         return result;
 
-    } else if (tokens.nextIs(COLON)) {
+    } else if (tokens.nextIs(COLON) && tokens.nextIs(IDENTIFIER, 1)) {
         tokens.consume(COLON);
 
         if (!tokens.nextIs(IDENTIFIER))
@@ -1320,7 +1312,7 @@ static Term* possible_subscript(Branch& branch, TokenStream& tokens, Term* head,
         std::string ident = tokens.consume(IDENTIFIER);
         
         Term* identTerm = create_string(branch, ident);
-        set_source_hidden(identTerm, true);
+        hide_from_source(identTerm);
 
         Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head, identTerm));
         set_source_location(result, startPosition, tokens);
@@ -1646,10 +1638,10 @@ Term* literal_color(Branch& branch, TokenStream& tokens)
             a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
-    make_float(result->getIndex(0), r);
-    make_float(result->getIndex(1), g);
-    make_float(result->getIndex(2), b);
-    make_float(result->getIndex(3), a);
+    set_float(result->getIndex(0), r);
+    set_float(result->getIndex(1), g);
+    set_float(result->getIndex(2), b);
+    set_float(result->getIndex(3), a);
 
     resultTerm->setIntProp("syntax:colorFormat", (int) text.length());
 
@@ -1791,6 +1783,255 @@ Term* statically_resolve_namespace_access(Term* target)
     }
 
     return target;
+}
+
+// --- More Utility functions ---
+
+
+void prepend_whitespace(Term* term, std::string const& whitespace)
+{
+    if (whitespace != "" && term != NULL)
+        term->setStringProp("syntax:preWhitespace", 
+            whitespace + term->stringProp("syntax:preWhitespace"));
+}
+
+void append_whitespace(Term* term, std::string const& whitespace)
+{
+    if (whitespace != "" && term != NULL)
+        term->setStringProp("syntax:postWhitespace",
+            term->stringProp("syntax:postWhitespace") + whitespace);
+}
+
+void set_source_location(Term* term, int start, TokenStream& tokens)
+{
+    ca_assert(term != NULL);
+    ca_assert(tokens.length() != 0);
+
+    TermSourceLocation loc;
+
+    if (start >= tokens.length()) {
+        // 'start' is at the end of the stream
+        loc.col = tokens[start-1].colEnd+1;
+        loc.line = tokens[start-1].lineEnd;
+
+    } else {
+        loc.col = tokens[start].colStart;
+        loc.line = tokens[start].lineStart;
+    }
+
+    int end = tokens.getPosition();
+    if (end >= tokens.length()) end = tokens.length()-1;
+
+    loc.colEnd = tokens[end].colEnd;
+    loc.lineEnd = tokens[end].lineEnd;
+
+    term->sourceLoc.grow(loc);
+}
+
+Term* find_and_apply(Branch& branch,
+        std::string const& functionName,
+        RefList inputs)
+{
+    Term* function = find_function(branch, functionName);
+
+    return apply(branch, function, inputs);
+}
+
+
+Term* find_type(Branch& branch, std::string const& name)
+{
+    Term* result = find_named(branch, name);
+
+    if (result == NULL) {
+        result = apply(branch, UNKNOWN_TYPE_FUNC, RefList(), name);
+        ca_assert(result->type == TYPE_TYPE);
+    }   
+
+    return result;
+}
+
+Term* find_function(Branch& branch, std::string const& name)
+{
+    Term* result = find_named(branch, name);
+
+    if (result == NULL)
+        return UNKNOWN_FUNCTION;
+
+    if (!is_callable(result))
+        return UNKNOWN_FUNCTION;
+
+    return result;
+}
+
+void push_pending_rebind(Branch& branch, std::string const& name)
+{
+    std::string attrname = "#attr:comp-pending-rebind";
+
+    if (branch.contains(attrname)) {
+        dump_branch(branch);
+        throw std::runtime_error("pending rebind already exists (name: " + name + ")");
+    }
+
+    create_string(branch, name, attrname);
+}
+
+std::string pop_pending_rebind(Branch& branch)
+{
+    std::string attrname = "#attr:comp-pending-rebind";
+
+    Term* attrTerm = branch[attrname];
+
+    if (attrTerm != NULL) {
+        std::string result = as_string(attrTerm);
+        branch.remove("#attr:comp-pending-rebind");
+        return result;
+    } else {
+        return "";
+    }
+}
+
+void post_parse_branch(Branch& branch)
+{
+    // Remove temporary attributes
+    branch.remove("#attr:comp-pending-rebind");
+
+    // Remove NULLs
+    branch.removeNulls();
+
+    // Update input info on all terms
+    for (BranchIterator it(branch); !it.finished(); ++it) {
+        post_input_change(*it);
+    }
+}
+
+std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)
+{
+    ca_assert(start <= tokens.getPosition());
+
+    int originalPosition = tokens.getPosition();
+
+    tokens.resetPosition(start);
+
+    std::stringstream line;
+    while (!tokens.finished()) {
+
+        // If we've passed our originalPosition and reached a newline, then stop
+        if (tokens.getPosition() > originalPosition
+                && (tokens.nextIs(token::NEWLINE) || tokens.nextIs(token::SEMICOLON)))
+            break;
+
+        line << tokens.consume();
+    }
+
+    // throw out trailing newline
+    if (!tokens.finished())
+        tokens.consume();
+
+    // make sure we passed our original position
+    ca_assert(tokens.getPosition() >= originalPosition);
+
+    if (positionRecepient != NULL)
+        set_source_location(positionRecepient, start, tokens);
+
+    return line.str();
+}
+
+Term* insert_compile_error(Branch& branch, TokenStream& tokens,
+        std::string const& message)
+{
+    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    result->setStringProp("message", message);
+    set_source_location(result, tokens.getPosition(), tokens);
+    return result;
+}
+
+Term* compile_error_for_line(Branch& branch, TokenStream& tokens, int start,
+        std::string const& message)
+{
+    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    return compile_error_for_line(result, tokens, start, message);
+}
+
+Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
+        std::string const& message)
+{
+    if (existing->function != UNRECOGNIZED_EXPRESSION_FUNC)
+        change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
+    std::string line = consume_line(tokens, start, existing);
+
+    existing->setStringProp("originalText", line);
+    existing->setStringProp("message", message);
+
+    ca_assert(has_static_error(existing));
+
+    return existing;
+}
+
+bool is_infix_operator_rebinding(std::string const& infix)
+{
+    return (infix == "+=" || infix == "-=" || infix == "*=" || infix == "/=");
+}
+
+std::string possible_whitespace(TokenStream& tokens)
+{
+    if (tokens.nextIs(token::WHITESPACE))
+        return tokens.consume(token::WHITESPACE);
+    else
+        return "";
+}
+
+std::string possible_newline(TokenStream& tokens)
+{
+    if (tokens.nextIs(token::NEWLINE))
+        return tokens.consume(token::NEWLINE);
+    else
+        return "";
+}
+
+std::string possible_whitespace_or_newline(TokenStream& tokens)
+{
+    std::stringstream output;
+
+    while (tokens.nextIs(token::NEWLINE) || tokens.nextIs(token::WHITESPACE))
+        output << tokens.consume();
+
+    return output.str();
+}
+
+std::string possible_statement_ending(TokenStream& tokens)
+{
+    std::stringstream result;
+    if (tokens.nextIs(token::WHITESPACE))
+        result << tokens.consume();
+
+    if (tokens.nextIs(token::COMMA) || tokens.nextIs(token::SEMICOLON))
+        result << tokens.consume();
+
+    if (tokens.nextIs(token::NEWLINE))
+        result << tokens.consume(token::NEWLINE);
+
+    return result.str();
+}
+
+int get_number_of_decimal_figures(std::string const& str)
+{
+    bool dotFound = false;
+    int result = 0;
+
+    for (int i=0; str[i] != 0; i++) {
+        if (str[i] == '.') {
+            dotFound = true;
+            continue;
+        }
+
+        if (dotFound)
+            result++;
+    }
+
+    if (result == 0 && dotFound)
+        result = 1;
+
+    return result;
 }
 
 } // namespace parser

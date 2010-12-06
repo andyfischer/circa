@@ -11,11 +11,11 @@ void test_insert()
 {
     Branch branch;
 
-    test_assert(branch_check_invariants(branch, &std::cout)); // sanity check
+    test_assert(branch_check_invariants_print_result(branch, std::cout)); // sanity check
 
     Term* a = create_void(branch);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     Term* b = alloc_term();
     test_assert(b->value_type != NULL);
@@ -23,17 +23,17 @@ void test_insert()
     test_assert(branch.length() == 1);
     test_assert(branch[0] == a);
     
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     branch.insert(0, b);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     test_assert(branch.length() == 2);
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     Term* c = alloc_term();
     branch.insert(2, c);
@@ -42,7 +42,7 @@ void test_insert()
     test_assert(branch[1] == a);
     test_assert(branch[2] == c);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     Term* d = alloc_term();
     branch.insert(1, d);
@@ -52,22 +52,23 @@ void test_insert()
     test_assert(branch[2] == a);
     test_assert(branch[3] == c);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 }
 
 void test_check_invariants()
 {
     Branch branch;
+    std::stringstream output;
     Term* t = branch.appendNew();
-    test_assert(branch_check_invariants(branch));
+    test_assert(branch_check_invariants_print_result(branch, output));
     t->owningBranch = NULL;
-    test_assert(!branch_check_invariants(branch));
+    test_assert(!branch_check_invariants_print_result(branch, output));
 
     branch.clear();
     t = branch.appendNew();
-    test_assert(branch_check_invariants(branch));
+    test_assert(branch_check_invariants_print_result(branch, output));
     t->index = 5;
-    test_assert(!branch_check_invariants(branch));
+    test_assert(!branch_check_invariants_print_result(branch, output));
 }
 
 void test_setNull()
@@ -82,8 +83,6 @@ void test_setNull()
     branch.setNull(0);
     test_assert(!branch.contains("a"));
     test_assert(branch[0] == NULL);
-
-    test_assert(branch);
 }
 
 void test_remove()
@@ -133,7 +132,7 @@ void test_removeNulls()
     test_assert(branch[1] == b);
     test_assert(branch[2] == c);
 
-    test_assert(branch_check_invariants(branch, &std::cout));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
 }
 
 void test_duplicate()
@@ -156,7 +155,7 @@ void test_duplicate()
     test_assert(as_string(term2_duplicate) == "yarn");
 
     // make sure 'duplicate' uses different terms
-    make_int(term1, 8);
+    set_int(term1, 8);
     test_assert(as_int(term1_duplicate) == 5);
 
     test_assert(term1);
@@ -171,9 +170,9 @@ void test_duplicate()
 void test_duplicate_nested()
 {
     Branch branch;
-    branch.eval("a = 1.0");
-    Branch& inner = branch.eval("inner = branch()")->nestedContents;
-    inner.eval("i = 2.0");
+    branch.compile("a = 1.0");
+    Branch& inner = branch.compile("inner = branch()")->nestedContents;
+    inner.compile("i = 2.0");
     inner.compile("j = add(a,i)");
 
     Branch dupe;
@@ -202,8 +201,8 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = orig.eval("inner = branch()")->nestedContents;
-    inner.eval("i = 2");
+    Branch& inner = orig.compile("inner = branch()")->nestedContents;
+    inner.compile("i = 2");
 
     Branch dupe;
     duplicate_branch(orig, dupe);
@@ -218,7 +217,7 @@ void test_duplicate_subroutine()
 {
     Branch branch;
 
-    Term* func = branch.eval("def func()\na = 1\nend");
+    Term* func = branch.compile("def func()\na = 1\nend");
 
     // sanity check:
     test_assert(function_t::get_name(func) == "func");
@@ -231,8 +230,6 @@ void test_duplicate_subroutine()
 
     Term* dupedFunc = dupe["func"];
     test_assert(function_t::get_name(dupedFunc) == "func");
-
-    test_assert(is_branch(dupedFunc));
 
     test_assert(func->nestedContents.length() == dupedFunc->nestedContents.length());
     test_assert(func->nestedContents[1]->function == dupedFunc->nestedContents[1]->function);
@@ -247,9 +244,9 @@ void test_duplicate_subroutine()
 void test_duplicate_get_field_by_name()
 {
     Branch branch;
-    branch.eval("type mytype { int f }");
-    branch.eval("v = mytype()");
-    Term* b = branch.eval("b = v.f");
+    branch.compile("type mytype { int f }");
+    branch.compile("v = mytype()");
+    Term* b = branch.compile("b = v.f");
 
     test_assert(b->function == GET_FIELD_FUNC);
 
@@ -267,8 +264,8 @@ void test_duplicate_get_field_by_name()
 void test_duplicate_destination_has_different_type()
 {
     Branch source, dest;
-    Term* a = source.eval("a = any()");
-    Term* p = source.eval("p = Point()");
+    TaggedValue* a = source.eval("a = any()");
+    TaggedValue* p = source.eval("p = Point()");
     copy(p,a);
     // This once tripped an assert:
     duplicate_branch(source, dest);
@@ -277,107 +274,15 @@ void test_duplicate_destination_has_different_type()
 void find_name_in_outer_branch()
 {
     Branch branch;
-    Term* outer_branch = branch.eval("Branch()");
+    Branch& nested = create_branch(branch);
 
-    Term* a = outer_branch->nestedContents.eval("a = 1");
+    Term* a = nested.compile("a = 1");
 
-    Term* inner_branch = outer_branch->nestedContents.eval("branch()");
+    Branch& nested2 = create_branch(nested);
 
-    test_assert(find_named(inner_branch->nestedContents, "a") == a);
-
-    test_assert(branch);
-}
-
-void test_migrate()
-{
-    #if 0
-    TODO: delete?
-    Branch dest, source;
-
-    Term* a = dest.eval("state a = 1");
-    source.eval("state a = 2");
-    post_parse_branch(source);
-    post_parse_branch(dest);
-
-    migrate_stateful_values(source, dest);
-
-    // Test that the 'dest' terms are the same terms
-    test_assert(dest["a"] == a);
-
-    // Test that the value was transferred
-    test_assert(dest["a"]->asInt() == 2);
-
-    test_assert(source);
-    test_assert(dest);
-    #endif
-}
-
-void test_migrate2()
-{
-    #if 0
-    TODO: delete?
-    // In this test, we migrate with 1 term added and 1 term removed.
-    Branch source, dest;
-
-    Term* a = dest.eval("state a = 1");
-    dest.eval("state b = 2");
-
-    source.eval("state a = 3");
-    source.eval("state c = 4");
-
-    migrate_stateful_values(source, dest);
-
-    test_assert(dest["a"] == a);
-    test_assert(dest["a"]->asInt() == 3);
-
-    test_assert(source);
-    test_assert(dest);
-    #endif
-}
-
-void test_cast()
-{
-#if 0
-    Branch branch;
-
-    branch.eval("type Mytype { int a, number b }");
-
-    // Cast a value that will require coercion
-    Term* dest = branch.eval("Mytype()");
-    Term* source = branch.eval("[3 4]");
-    TaggedValue* dest0 = dest->getIndex(0);
-    TaggedValue* dest1 = dest->getIndex(1);
-
-    cast(source, dest);
-    test_assert(is_int(dest0));
-    test_assert(as_int(dest0) == 3);
-    //test_assert(is_float(dest1));
-    test_equals(as_float(dest1), 4);
-
-    // Cast a value with more elements
-    dest = branch.eval("dest = [1]");
-    test_assert(as_int(dest->getIndex(0)) == 1);
-
-    source = branch.eval("source = [7 8 9]");
-
-    cast(source, dest);
-
-    test_assert(dest->numElements() == 3);
-    test_assert(as_int(dest->getIndex(0)) == 7);
-    test_assert(as_int(dest->getIndex(1)) == 8);
-    test_assert(as_int(dest->getIndex(2)) == 9);
-
-    // Cast one list to another list- make sure that it doesn't type check
-    // the fields.
-    Term* a = branch.eval("a = [1 2.0 'hi']");
-    Term* b = branch.eval("b = ['bye' 4 1.0]");
-
-    test_assert(term_output_always_satisfies_type(a, declared_type(b)));
-    test_assert(term_output_always_satisfies_type(b, declared_type(a)));
-    cast(a, b);
+    test_assert(find_named(nested2, "a") == a);
 
     test_assert(branch);
-#endif
 }
 
 void test_get_source_file_location()
@@ -466,6 +371,33 @@ void test_move()
     test_assert(four->index == 2);
 }
 
+void test_locals_stack()
+{
+    Branch branch;
+    EvalContext context;
+
+    start_using(branch);
+
+    Term* a = branch.compile("a = 5");
+    Term* b = branch.compile("b = add(a,a)");
+
+    for (int i=0; i < branch.length(); i++)
+        evaluate_single_term(&context, branch[i]);
+
+    test_equals(get_local(b)->asInt(), 10);
+
+    start_using(branch);
+
+    set_int(a, 11);
+    for (int i=0; i < branch.length(); i++)
+        evaluate_single_term(&context, branch[i]);
+
+    test_equals(get_local(b)->asInt(), 22);
+    finish_using(branch);
+
+    test_equals(get_local(b)->asInt(), 10);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_insert);
@@ -481,9 +413,7 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_duplicate_destination_has_different_type);
     REGISTER_TEST_CASE(branch_tests::find_name_in_outer_branch);
     REGISTER_TEST_CASE(branch_tests::test_move);
-    // FIXME
-    //REGISTER_TEST_CASE(branch_tests::test_migrate);
-    //REGISTER_TEST_CASE(branch_tests::test_migrate2);
+    REGISTER_TEST_CASE(branch_tests::test_locals_stack);
 }
 
 }

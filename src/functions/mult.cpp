@@ -7,12 +7,12 @@ namespace mult_function {
 
     CA_FUNCTION(evaluate_f)
     {
-        make_float(OUTPUT, FLOAT_INPUT(0) * FLOAT_INPUT(1));
+        set_float(OUTPUT, FLOAT_INPUT(0) * FLOAT_INPUT(1));
     }
 
     CA_FUNCTION(evaluate_i)
     {
-        make_int(OUTPUT, INT_INPUT(0) * INT_INPUT(1));
+        set_int(OUTPUT, INT_INPUT(0) * INT_INPUT(1));
     }
 
     CA_FUNCTION(feedback_evaluate)
@@ -34,12 +34,12 @@ namespace mult_function {
 
             // If this product is too close to 0 then give up. We can't solve x = a * 0
             if (fabs(divisor) < 0.0001) {
-                make_float(output, to_float(outputTarget));
+                set_float(output, to_float(outputTarget));
                 continue;
             }
 
             // Otherwise, to solve for x = a * b, tell a that it should be closer to x / b
-            make_float(output, to_float(outputTarget) + balanced_delta / divisor);
+            set_float(output, to_float(outputTarget) + balanced_delta / divisor);
         }
     }
 
@@ -48,8 +48,11 @@ namespace mult_function {
         Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
         Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) -> number");
 
+        #if 0
+        FIXME
         function_t::get_feedback_func(mult_f) = 
             import_function(kernel, feedback_evaluate, "mult_feedback(any, number) -> Branch");
+        #endif
 
         MULT_FUNC = create_overloaded_function(kernel, "mult", RefList(mult_i, mult_f));
     }

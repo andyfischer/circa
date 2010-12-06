@@ -154,13 +154,13 @@ namespace function_t {
         }
     }
 
-    std::string get_documentation(Term* term)
+    std::string get_documentation(Term* func)
     {
         // A function can optionally have a documentation string. If present,
         // it will be the first thing defined in the function, and it'll be
         // anonymous and be a statement.
-        int expected_index = function_t::num_inputs(term) + 1;
-        Branch& contents = term->nestedContents;
+        int expected_index = function_t::num_inputs(func) + 1;
+        Branch& contents = func->nestedContents;
 
         if (expected_index >= contents.length()) return "";
         Term* possibleDocString = contents[expected_index];
@@ -203,6 +203,7 @@ namespace function_t {
 
     Term* get_output_type(Term* function)
     {
+        if (!is_function(function)) return ANY_TYPE;
         return get_attrs(function).outputType;
     }
     void set_output_type(Term* function, Term* type)
@@ -217,6 +218,7 @@ namespace function_t {
 
     bool get_variable_args(Term* function)
     {
+        if (!is_function(function)) return true;
         return get_attrs(function).variableArgs;
     }
 
@@ -249,7 +251,11 @@ namespace function_t {
 
     bool get_input_meta(Term* func, int index)
     {
-        return function_t::get_input_placeholder(func, index)->boolPropOptional("meta", false);
+        if (!is_function(func)) return false;
+        Term* placeholder = function_t::get_input_placeholder(func, index);
+        if (placeholder == NULL)
+            return false;
+        return placeholder->boolPropOptional("meta", false);
     }
 
     void set_input_meta(Term* func, int index, bool value)
@@ -259,11 +265,19 @@ namespace function_t {
 
     bool get_input_optional(Term* func, int index)
     {
-        return function_t::get_input_placeholder(func, index)->boolPropOptional("optional", false);
+        if (!is_function(func))
+            return true;
+        Term* placeholder = function_t::get_input_placeholder(func, index);
+        if (placeholder == NULL)
+            return false;
+        return placeholder->boolPropOptional("optional", false);
     }
 
     Term* get_input_type(Term* func, int index)
     {
+        if (!is_function(func))
+            return ANY_TYPE;
+
         if (function_t::get_variable_args(func))
             index = 0;
 
@@ -271,6 +285,8 @@ namespace function_t {
     }
     bool is_state_input(Term* function, int index)
     {
+        if (!is_function(function))
+            return false;
         return get_input_placeholder(function,index)->boolPropOptional("state", false);
     }
     EvaluateFunc& get_evaluate(Term* func)
@@ -305,6 +321,8 @@ namespace function_t {
 
 bool is_function(Term* term)
 {
+    if (term == NULL)
+        return false;
     return term->type == FUNCTION_TYPE;
 }
 
@@ -345,36 +363,13 @@ void initialize_function(Term* func)
     */
 
     Term* attributesTerm = create_value(func->nestedContents, FUNCTION_ATTRS_TYPE, "#attributes");
-    set_source_hidden(attributesTerm, true);
+    hide_from_source(attributesTerm);
 }
 
 bool is_callable(Term* term)
 {
     return (term->type == FUNCTION_TYPE
             || term->type == TYPE_TYPE);
-}
-
-// Depcrecated in favor of inputs_statically_fit_function
-bool inputs_fit_function(Term* func, RefList const& inputs)
-{
-    return inputs_statically_fit_function(func, inputs);
-#if 0
-    bool varArgs = function_t::get_variable_args(func);
-
-    // Fail if wrong # of inputs
-    if (!varArgs && (function_t::num_inputs(func) != inputs.length()))
-        return false;
-
-    for (int i=0; i < inputs.length(); i++) {
-        Term* type = function_t::get_input_type(func, i);
-        if (inputs[i] == NULL)
-            continue;
-        if (!is_subtype(type_contents(type), inputs[i]))
-            return false;
-    }
-
-    return true;
-#endif
 }
 
 bool inputs_statically_fit_function(Term* func, RefList const& inputs)
@@ -445,6 +440,8 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
 
 Term* function_get_specialized_output_type(Term* function, Term* call)
 {
+    if (!is_function(function))
+        return ANY_TYPE;
     Term* outputType = function_t::get_output_type(function);
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(call);
@@ -459,7 +456,9 @@ void function_set_use_input_as_output(Term* function, int index, bool value)
 
 bool is_native_function(Term* func)
 {
-    return function_t::get_evaluate(func) != subroutine_t::evaluate;
+    if (!is_function(func))
+        return false;
+    return function_t::get_evaluate(func) != subroutine_t::evaluate_subroutine;
 }
 
 } // namespace circa

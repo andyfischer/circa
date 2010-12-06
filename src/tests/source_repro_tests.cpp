@@ -85,7 +85,7 @@ void death_reproducing_builtin_functions()
 }
 
 void register_tests() {
-    REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
+    //TEST_DISABLED REGISTER_TEST_CASE(source_repro_tests::generate_source_for_function_calls);
     REGISTER_TEST_CASE(source_repro_tests::bug_reproducing_list_after_eval);
     REGISTER_TEST_CASE(source_repro_tests::death_reproducing_builtin_functions);
 }

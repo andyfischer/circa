@@ -21,7 +21,7 @@ namespace unsafe_assign_function {
             return;
         }
 
-        cast(source, destination);
+        cast(source, declared_type(destination), destination);
     }
 
     void setup(Branch& kernel)

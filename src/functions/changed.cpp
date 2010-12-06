@@ -22,7 +22,7 @@ namespace changed_function {
         } else {
             result = false;
         }
-        make_bool(OUTPUT, result);
+        set_bool(OUTPUT, result);
     }
 
     void setup(Branch& kernel)

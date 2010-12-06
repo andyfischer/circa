@@ -8,12 +8,14 @@ namespace dynamic_type_tests {
 void test_copy()
 {
     Branch branch;
-    Term* a = branch.eval("a = 5");
-    Term* copy = branch.eval("copy(a)");
+    Term* a = branch.compile("a = 5");
+    Term* copy = branch.compile("copy(a)");
+
+    evaluate_branch(branch);
     test_assert(is_int(copy));
 
     change_type(a, STRING_TYPE);
-    make_string(a, "hi");
+    set_string(a, "hi");
     evaluate_branch(branch);
     test_assert(is_string(copy));
 }
@@ -21,19 +23,19 @@ void test_copy()
 void test_subroutine()
 {
     Branch branch;
-    branch.eval("def f(any v) -> any return(v) end");
+    branch.compile("def f(any v) -> any return(v) end");
     test_assert(branch);
 
-    Term* a = branch.eval("f('test')");
+    TaggedValue* a = branch.eval("f('test')");
 
     test_assert(is_string(a));
     test_assert(as_string(a) == "test");
 
     branch.clear();
-    branch.eval("def f(bool b, any v) -> any; if b return(v) else return(5) end end");
+    branch.compile("def f(bool b, any v) -> any; if b return(v) else return(5) end end");
 
-    Term* b = branch.eval("f(true, 'test')");
-    Term* c = branch.eval("f(false, 'test')");
+    TaggedValue* b = branch.eval("f(true, 'test')");
+    TaggedValue* c = branch.eval("f(false, 'test')");
 
     test_assert(is_string(b));
     test_assert(as_string(b) == "test");
@@ -46,10 +48,12 @@ void test_field_access()
     Branch branch;
     EvalContext context;
 
-    Term* T = branch.eval("type T { int a, string b }");
-    branch.eval("def f() -> any; return(T([4, 's'])); end");
+    Term* T = branch.compile("type T { int a, string b }");
+    branch.compile("def f() -> any; return(T([4, 's'])); end");
     Branch& f = branch["f"]->nestedContents;
-    Term* r = branch.eval("r = f()");
+    Term* r = branch.compile("r = f()");
+
+    evaluate_branch(branch);
 
     Term* four = f[1];
     test_assert(as_int(four) == 4);
@@ -99,8 +103,8 @@ void test_dynamic_overload()
     Term* b = create_value(branch, ANY_TYPE, "b");
     Term* result = branch.compile("add(a, b)");
 
-    make_int(a, 5);
-    make_int(b, 3);
+    set_int(a, 5);
+    set_int(b, 3);
 
     Term* add_i = get_global("add_i");
     test_assert(add_i == overloaded_function::get_overload(ADD_FUNC, 0));
@@ -114,7 +118,7 @@ void test_dynamic_overload()
     test_assert(context);
     test_assert(result->asInt() == 8);
 
-    make_float(b, 3.0);
+    set_float(b, 3.0);
     //dump_branch(branch);
     evaluate_branch(&context, branch);
     test_assert(context);

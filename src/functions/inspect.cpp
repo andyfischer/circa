@@ -7,13 +7,16 @@ namespace inspect_function {
 
     CA_FUNCTION(get_raw)
     {
-        make_string(OUTPUT, get_branch_raw(INPUT_TERM(0)->nestedContents));
+        set_string(OUTPUT, get_branch_raw(INPUT_TERM(0)->nestedContents));
     }
 
     void setup(Branch& kernel)
     {
+        #if 0
+        FIXME
         Branch& inspect_ns = create_namespace(kernel, "inspect");
         import_function(inspect_ns, get_raw, "get_raw(Branch)->string");
+        #endif
     }
 }
 }

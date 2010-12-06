@@ -325,7 +325,7 @@ void reproduce_with_parse_errors() {
     round_trip_source("nonexistant_function()");
     round_trip_source("nonexistant_function(1 2 3)");
     round_trip_source("a:b");
-    //TEST_DISABLED round_trip_source("a:b()");
+    round_trip_source("a:b()");
     finish_source_repro_category();
 }
 
@@ -393,6 +393,15 @@ void reproduce_type_cast() {
     finish_source_repro_category();
 }
 
+void reproduce_uncallable_functions() {
+    round_trip_source("blah()");
+    round_trip_source("blee:blah()");
+    round_trip_source("blue:blee:blah()");
+    round_trip_source("1()");
+    round_trip_source("()()()");
+    finish_source_repro_category();
+}
+
 void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_string_literal);
@@ -421,6 +430,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_cast);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_uncallable_functions);
 }
 
 } // namespace source_repro_snippets
