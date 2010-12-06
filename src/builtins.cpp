@@ -124,14 +124,6 @@ Branch& kernel()
     return *KERNEL;
 }
 
-Term* get_global(std::string name)
-{
-    if (KERNEL->contains(name))
-        return KERNEL->get(name);
-
-    return NULL;
-}
-
 void create_primitive_types()
 {
     NULL_T = Type::create();

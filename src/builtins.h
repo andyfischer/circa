@@ -92,9 +92,6 @@ extern bool FINISHED_BOOTSTRAP;
 
 Branch& kernel();
 
-// Get a named term from the global namespace.
-Term* get_global(std::string name);
-
 void empty_evaluate_function(Term* caller);
 
 namespace assign_function {

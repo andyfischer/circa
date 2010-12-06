@@ -101,6 +101,14 @@ Term* get_named_at(Term* location, std::string const& name)
     return get_named_at(*location->owningBranch, location->index, name);
 }
 
+Term* get_global(std::string name)
+{
+    if (KERNEL->contains(name))
+        return KERNEL->get(name);
+
+    return NULL;
+}
+
 Branch* get_parent_branch(Branch& branch)
 {
     if (&branch == KERNEL)
