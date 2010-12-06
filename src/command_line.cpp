@@ -6,7 +6,6 @@
 #include "builtins.h"
 #include "codegen.h"
 #include "debugger_repl.h"
-#include "dynamic_libs.h"
 #include "errors.h"
 #include "evaluation.h"
 #include "feedback.h"
