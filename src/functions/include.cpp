@@ -18,10 +18,8 @@ namespace include_function {
 
             contents.clear();
 
-            if (!storage::file_exists(filename.c_str())) {
-                error_occurred(cxt, caller, "File not found: "+filename);
-                return;
-            }
+            if (!storage::file_exists(filename.c_str()))
+                return error_occurred(cxt, caller, "File not found: "+filename);
 
             parse_script(contents, filename);
 
@@ -36,11 +34,6 @@ namespace include_function {
                 }
                 return;
             }
-
-            //std::cout << "### Previous:" << std::endl;
-            //dump_branch(previous_contents);
-            //std::cout << "### New:" << std::endl;
-            //dump_branch(contents);
 
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);

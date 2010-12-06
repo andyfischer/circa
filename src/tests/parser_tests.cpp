@@ -444,8 +444,6 @@ void test_integer_division()
 
 void test_namespace()
 {
-    #if 0
-    TEST_DISABLED
     Branch branch;
     Term* ns = branch.eval("namespace ns; a = 1; b = 2; end");
 
@@ -463,13 +461,16 @@ void test_namespace()
     test_assert(branch);
     test_assert(c->asInt() == 5);
 
+#if 0
+
     branch.clear();
     branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
 
     Term* x = branch.eval("ns1:ns2:x");
     test_assert(branch);
-    test_assert(x->asInt() == 12);
-    #endif
+    dump_branch(branch);
+    test_assert(get_local(x)->asInt() == 12);
+#endif
 }
 
 void test_member_function_calls()
@@ -602,10 +603,8 @@ void test_sig_indent_one_liner()
 void test_sig_indent_for_loop()
 {
     Branch branch;
-    Term* f = branch.compile("for i in [1]: 1");
+    branch.compile("for i in [1]: 1");
     test_assert(branch);
-
-    f;
 }
 
 void test_statically_resolve_namespace_access()

@@ -21,8 +21,8 @@ void append_internal_error(BranchInvariantCheck* result, int index, std::string 
 
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
 {
-    int nextExpectedRegisterIndex = 0;
-    int registerCount = branch.registerCount;
+    //int nextExpectedRegisterIndex = 0;
+    //int registerCount = branch.registerCount;
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
@@ -44,6 +44,7 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
             append_internal_error(result, i, "Wrong owningBranch");
         }
 
+        #if 0
         int regCount = get_register_count(term);
         int expectedRegister = -1;
 
@@ -65,6 +66,7 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
                 << ", branch.registerCount = " << registerCount;
             append_internal_error(result, i, msg.str());
         }
+        #endif
     }
 } 
 
