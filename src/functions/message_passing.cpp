@@ -9,21 +9,20 @@ namespace message_passing_function {
 
     CA_FUNCTION(evaluate_inbox)
     {
-        copy(INPUT(0), OUTPUT);
-        (List::checkCast(INPUT(0)))->resize(0);
+        List* input = List::lazyCast(STATE_INPUT);
+        copy(input, OUTPUT);
+        input->resize(0);
     }
 
     CA_FUNCTION(evaluate_send)
     {
-        /* FIXME
         Term* inbox = INPUT_TERM(0);
         Term* input = INPUT_TERM(1);
 
         ca_assert(inbox->function == INBOX_FUNC);
 
-        List* inboxState = List::checkCast(get_hidden_state_for_call(inbox));
+        List* inboxState = List::lazyCast(get_state_input(CONTEXT, inbox));
         copy(input, inboxState->append());
-        */
     }
 
     void setup(Branch& kernel)

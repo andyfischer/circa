@@ -823,4 +823,12 @@ List::checkCast(TaggedValue* v)
         return NULL;
 }
 
+List*
+List::lazyCast(TaggedValue* v)
+{
+    if (!is_list(v))
+        set_list(v, 0);
+    return (List*) v;
+}
+
 } // namespace circa

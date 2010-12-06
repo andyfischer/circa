@@ -249,20 +249,18 @@ void test_message_passing()
 
     // Before running, i should be empty
     test_assert(i->numElements() == 0);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    test_equals(&context.state, "null");
 
     // First run, i is still empty, but the hidden state has 1
-    std::cout << context.state.toString() << std::endl;
     evaluate_branch(&context, branch);
-    std::cout << context.state.toString() << std::endl;
     test_assert(i->numElements() == 0);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
+    test_equals(&context.state, "[i: [1]]");
 
     // Second run, i now returns 1
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 1);
+    test_equals(&context.state, "[i: [1]]");
 
     // Delete the send() call
     branch.remove(send);
@@ -271,12 +269,12 @@ void test_message_passing()
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    test_equals(&context.state, "[i: []]");
 
     // Fourth run, i is empty again
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 0);
-    //test_assert(get_hidden_state_for_call(i)->numElements() == 0);
+    test_equals(&context.state, "[i: []]");
 }
 
 void test_namespace()
@@ -303,7 +301,7 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
     REGISTER_TEST_CASE(builtin_function_tests::test_delta);
-    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
+    REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
 }
 

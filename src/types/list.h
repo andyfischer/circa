@@ -44,6 +44,7 @@ struct List : TaggedValue
     void removeNulls();
 
     static List* checkCast(TaggedValue* v);
+    static List* lazyCast(TaggedValue* v);
 };
 
 }
