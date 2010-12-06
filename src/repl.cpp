@@ -19,6 +19,10 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
 
     bool anyErrors = false;
 
+    EvalContext context;
+
+    int resultIndex = -1;
+
     for (int i=previousHead; i < newHead; i++) {
         Term* result = branch[i];
 
@@ -28,10 +32,7 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
             break;
         }
 
-        EvalContext context;
-
-        // FIXME: Should only reevaluate new terms
-        evaluate_branch(&context, branch);
+        evaluate_single_term(&context, result);
 
         if (context.errorOccurred) {
             output << "error: ";
@@ -39,11 +40,17 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
             anyErrors = true;
             break;
         }
+
+        resultIndex = i;
     }
 
     // Print results of the last expression
-    output << to_string(branch[branch.length()-1]) << std::endl;
-
+    if (!anyErrors && resultIndex != -1) {
+        Term* result = branch[resultIndex];
+        if (result->type != VOID_TYPE) {
+            output << get_local(result)->toString() << std::endl;
+        }
+    }
 }
 
 void start_repl()
