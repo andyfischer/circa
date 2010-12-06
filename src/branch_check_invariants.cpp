@@ -43,30 +43,6 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
         if (term->owningBranch != &branch) {
             append_internal_error(result, i, "Wrong owningBranch");
         }
-
-        #if 0
-        int regCount = get_register_count(term);
-        int expectedRegister = -1;
-
-        if (regCount != 0) {
-            expectedRegister = nextExpectedRegisterIndex;
-            nextExpectedRegisterIndex += regCount;
-        }
-
-        if (term->registerIndex != expectedRegister) {
-            std::stringstream msg;
-            msg << "registerIndex unexpected value, registerIndex = " << term->registerIndex
-                << ", expected = " << expectedRegister;
-            append_internal_error(result, i, msg.str());
-        }
-
-        if (term->registerIndex >= registerCount) {
-            std::stringstream msg;
-            msg << "registerIndex above limit, registerIndex = " << term->registerIndex
-                << ", branch.registerCount = " << registerCount;
-            append_internal_error(result, i, msg.str());
-        }
-        #endif
     }
 } 
 

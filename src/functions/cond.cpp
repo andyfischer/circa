@@ -42,14 +42,12 @@ namespace cond_function {
 
     void setup(Branch& kernel)
     {
-        COND_FUNC = import_function(kernel, cond_evaluate, "cond(bool condition, any pos, any neg) -> any; \"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\" end");
+        COND_FUNC = import_function(kernel, cond_evaluate,
+                "cond(bool condition, any pos, any neg) -> any;"
+                "\"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\" end");
         function_t::get_specialize_type(COND_FUNC) = specializeType;
         function_t::set_input_meta(COND_FUNC, 1, true);
         function_t::set_input_meta(COND_FUNC, 2, true);
-        #if 0
-        function_t::get_feedback_func(COND_FUNC) =
-            import_function(kernel, feedback, "cond_feedback(any, any) -> Branch");
-        #endif
     }
 }
 }

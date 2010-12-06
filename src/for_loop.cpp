@@ -141,18 +141,10 @@ CA_FUNCTION(evaluate_for_loop)
     // Preserve old for-loop context
     ForLoopContext prevLoopContext = CONTEXT->forLoopContext;
 
-    #if 0
-    List previousFrame;
-    #endif
-
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
 
         ca_assert(forContents.registerCount > 0);
-
-        #if 0
-        List* frame = push_stack_frame(STACK, forContents.registerCount);
-        #endif
 
         // copy iterator
         copy(inputList->getIndex(iteration), get_local(iterator));

@@ -66,29 +66,6 @@ namespace subroutine_t {
             swap(inputs[i], get_local(placeholder));
         }
 
-        #if 0
-
-        // Copy inputs to input placeholders
-        {
-            //List frame;
-            //frame.resize(contents.registerCount);
-
-            for (int i=0; i < caller->numInputs(); i++) {
-                TaggedValue* input = get_input(context, caller, i);
-                if (input == NULL)
-                    continue;
-                Term* placeholder = function_t::get_input_placeholder(function, i);
-                Term* inputTypeTerm = function_t::get_input_type(function, i);
-                Type* inputType = type_contents(inputTypeTerm);
-
-                bool success = cast(input, inputType, get_local(placeholder));
-                ca_assert(success);
-            }
-
-            //swap(&frame, context->stack.append());
-        }
-        #endif
-
         // prepare output
         set_null(&context->subroutineOutput);
 
@@ -106,11 +83,6 @@ namespace subroutine_t {
                 break;
         }
 
-        #if 0
-        // Stack frame object may have moved, grab it again.
-        List* frame = get_stack_frame(&context->stack, 0);
-        #endif
-
         //std::cout << "finished subroutine, stack = " << context->stack.toString() <<std::endl;
         //dump_branch(contents);
 
@@ -127,9 +99,6 @@ namespace subroutine_t {
             }
             else {
                 outputSource = get_local(contents[contents.length()-1]);
-                #if 0
-                outputSource = frame->get(frame->length() - 1);
-                #endif
             }
 
             //std::cout << "found output: " << outputSource->toString() << std::endl;
@@ -148,10 +117,6 @@ namespace subroutine_t {
 
         // Write to state
         wrap_up_open_state_vars(context, contents);
-
-        #if 0
-        pop_stack_frame(&context->stack);
-        #endif
 
         // Restore currentScopeState
         if (is_function_stateful(function))
