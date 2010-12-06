@@ -89,7 +89,7 @@ void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
 
         for (int i=0; i < indent; i++) out << "  ";
 
-        print_term_to_string_extended(out, term, prefs);
+        print_term(out, term, prefs);
         out << std::endl;
     }
 }
@@ -219,7 +219,7 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
     }
 }
 
-void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs* prefs)
+void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 {
     if (term == NULL) {
         out << "<NULL>";
@@ -290,7 +290,7 @@ std::string get_term_to_string_extended(Term* term)
 {
     RawOutputPrefs prefs;
     std::stringstream out;
-    print_term_to_string_extended(out, term, &prefs);
+    print_term(out, term, &prefs);
     return out.str();
 }
 
@@ -299,7 +299,7 @@ std::string get_term_to_string_extended_with_props(Term* term)
     RawOutputPrefs prefs;
     prefs.showProperties = true;
     std::stringstream out;
-    print_term_to_string_extended(out, term, &prefs);
+    print_term(out, term, &prefs);
     return out.str();
 }
 
