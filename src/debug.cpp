@@ -14,11 +14,6 @@ void dump_branch(Branch& branch)
     print_branch_raw(std::cout, branch);
 }
 
-void dump_bytecode(Branch& branch)
-{
-    bytecode::print_bytecode_for_all_major_branches(std::cout, branch);
-}
-
 void dump_branch_with_props(Branch& branch)
 {
     print_branch_raw_with_properties(std::cout, branch);

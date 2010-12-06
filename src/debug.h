@@ -17,7 +17,6 @@ extern bool DEBUG_TRAP_ERROR_OCCURRED;
 
 // Spit out this branch's raw contents to std::cout
 void dump_branch(Branch& branch);
-void dump_bytecode(Branch& branch);
 void dump_branch_with_props(Branch& branch);
 
 } // namespace circa

@@ -91,8 +91,6 @@ void test_recursion_with_state()
 
     Term* recr_4 = branch.compile("recr(4)");
 
-    bytecode::print_bytecode_for_all_major_branches(std::cout, branch);
-
     evaluate_branch(branch);
     test_assert(as_int(recr_4) == 4);
 }

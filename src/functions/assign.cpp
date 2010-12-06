@@ -88,21 +88,10 @@ namespace assign_function {
         update_assign_contents(term);
     }
 
-    void writeBytecode(bytecode::WriteContext* context, Term* term)
-    {
-        Branch& contents = term->nestedContents;
-        if (term->registerIndex == -1)
-            term->registerIndex = context->nextRegisterIndex++;
-        if (contents.length() > 0)
-            contents[contents.length()-1]->registerIndex = term->registerIndex;
-        bytecode::write_bytecode_for_branch_inline(context, contents);
-    }
-
     void setup(Branch& kernel)
     {
         ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
         function_t::get_attrs(ASSIGN_FUNC).specializeType = specializeType;
-        function_t::get_attrs(ASSIGN_FUNC).writeBytecode = writeBytecode;
         function_t::get_attrs(ASSIGN_FUNC).postInputChange = postInputChange;
     }
 }

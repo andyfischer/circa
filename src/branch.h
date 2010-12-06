@@ -4,10 +4,10 @@
 
 #include "common_headers.h"
 
-#include "bytecode.h"
 #include "names.h"
 #include "ref_list.h"
 #include "term_namespace.h"
+#include "types/list.h"
 
 namespace circa {
 
@@ -40,8 +40,6 @@ struct Branch
     // For a branch loaded from a file, this keeps track of the file signature
     // of the last time this was loaded.
     List fileSignature;
-
-    bytecode::BytecodeData _bytecode;
 
     Branch();
     ~Branch();

@@ -14,7 +14,6 @@ FunctionAttrs::FunctionAttrs()
     formatSource(NULL),
     checkInvariants(NULL),
     staticTypeQuery(NULL),
-    writeBytecode(NULL),
     postInputChange(NULL),
     getRegisterCount(NULL),
     assignRegisters(NULL)

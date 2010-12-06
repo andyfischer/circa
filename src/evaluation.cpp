@@ -6,7 +6,6 @@
 #include "branch.h"
 #include "branch_check_invariants.h"
 #include "branch_iterator.h"
-#include "bytecode.h"
 #include "errors.h"
 #include "evaluation.h"
 #include "function.h"

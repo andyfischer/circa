@@ -13,7 +13,6 @@ namespace circa {
 struct FunctionAttrs
 {
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
-    typedef void (*WriteBytecode)(bytecode::WriteContext*, Term*);
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetRegisterCount)(Term*);
     typedef void (*AssignRegisters)(Term*);
@@ -35,7 +34,6 @@ struct FunctionAttrs
     FormatSource formatSource;
     CheckInvariants checkInvariants;
     StaticTypeQueryFunc staticTypeQuery;
-    WriteBytecode writeBytecode;
     PostInputChange postInputChange;
     GetRegisterCount getRegisterCount;
     AssignRegisters assignRegisters;

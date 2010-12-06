@@ -50,7 +50,6 @@ void start_repl()
 {
     Branch replState;
     bool displayRaw = false;
-    bool displayBytecode = false;
 
     while (true) {
         std::cout << "> ";
@@ -70,12 +69,6 @@ void start_repl()
             displayRaw = !displayRaw;
             if (displayRaw) std::cout << "Displaying raw output" << std::endl;
             else std::cout << "Not displaying raw output" << std::endl;
-            continue;
-        }
-        if (input == "/bytes") {
-            displayBytecode = !displayBytecode;
-            if (displayBytecode) std::cout << "Displaying bytecode" << std::endl;
-            else std::cout << "Not displaying bytecode" << std::endl;
             continue;
         }
         if (input == "/clear") {
@@ -98,11 +91,6 @@ void start_repl()
                 if (replState[i]->nestedContents.length() > 0)
                     print_branch_raw(std::cout, replState[i]->nestedContents);
             }
-        }
-        if (displayBytecode) {
-            // TODO: Only show code for new terms
-            bytecode::update_bytecode(replState);
-            bytecode::print_bytecode(std::cout, replState);
         }
     }
 }
