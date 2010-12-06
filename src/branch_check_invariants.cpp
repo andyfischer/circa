@@ -89,7 +89,7 @@ bool branch_check_invariants_print_result(Branch& branch, std::ostream& out)
     }
 
     out << "contents:" << std::endl;
-    print_branch_raw(out, branch);
+    print_branch(out, branch);
 
     return false;
 }

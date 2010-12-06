@@ -78,7 +78,7 @@ std::string branch_namespace_to_string(Branch& branch)
     return out.str();
 }
 
-void print_branch_raw(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
+void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
 {
     out << "[Branch " << &branch << ", regs = " << branch.registerCount
         << ", output = " << branch.outputRegister << "]" << std::endl;
@@ -98,7 +98,7 @@ std::string get_branch_raw(Branch& branch)
 {
     RawOutputPrefs prefs;
     std::stringstream out;
-    print_branch_raw(out, branch, &prefs);
+    print_branch(out, branch, &prefs);
     return out.str();
 }
 
@@ -273,17 +273,17 @@ void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs
         out << " " << term->properties.toString();
 }
 
-void print_branch_raw(std::ostream& out, Branch& branch)
+void print_branch(std::ostream& out, Branch& branch)
 {
     RawOutputPrefs prefs;
-    print_branch_raw(out, branch, &prefs);
+    print_branch(out, branch, &prefs);
 }
 
-void print_branch_raw_with_properties(std::ostream& out, Branch& branch)
+void print_branch_with_properties(std::ostream& out, Branch& branch)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
-    print_branch_raw(out, branch, &prefs);
+    print_branch(out, branch, &prefs);
 }
 
 std::string get_term_to_string_extended(Term* term)

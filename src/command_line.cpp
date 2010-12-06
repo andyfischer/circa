@@ -92,7 +92,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-p") {
         Branch branch;
         parse_script(branch, args[1]);
-        print_branch_raw(std::cout, branch);
+        print_branch(std::cout, branch);
         return 0;
     }
 
@@ -103,7 +103,7 @@ int run_command_line(std::vector<std::string> args)
 
         evaluate_branch(branch);
 
-        print_branch_raw(std::cout, branch);
+        print_branch(std::cout, branch);
         return 0;
     }
 
@@ -111,7 +111,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-pp") {
         Branch branch;
         parse_script(branch, args[1]);
-        print_branch_raw_with_properties(std::cout, branch);
+        print_branch_with_properties(std::cout, branch);
         return 0;
     }
 
@@ -149,13 +149,13 @@ int run_command_line(std::vector<std::string> args)
 
         std::cout << std::endl;
         std::cout << "-- Before evaluation:" << std::endl;
-        print_branch_raw(std::cout, branch);
+        print_branch(std::cout, branch);
 
         evaluate_branch(branch);
 
         std::cout << std::endl;
         std::cout << "-- After evaluation:" << std::endl;
-        print_branch_raw(std::cout, branch);
+        print_branch(std::cout, branch);
 
         std::cout << std::endl;
         std::cout << "-- Code result:" << std::endl;

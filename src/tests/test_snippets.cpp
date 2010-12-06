@@ -41,7 +41,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (!branch_check_invariants_print_result(code, checkInvariantsOutput)) {
         std::cout << "Failed invariant in code: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
-        print_branch_raw(std::cout, code);
+        print_branch(std::cout, code);
         declare_current_test_failed();
         return;
     }
@@ -71,7 +71,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         std::cout << "assertion: " << assertionsStr << std::endl;
         print_runtime_error_formatted(result, std::cout);
         std::cout << std::endl;
-        print_branch_raw(std::cout, code);
+        print_branch(std::cout, code);
         declare_current_test_failed();
         return;
     }
@@ -80,7 +80,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (!branch_check_invariants_print_result(assertions, checkInvariantsOutput)) {
         std::cout << "Failed invariant in assertions: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
-        print_branch_raw(std::cout, code);
+        print_branch(std::cout, code);
         declare_current_test_failed();
         return;
     }
@@ -100,7 +100,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
             std::cout << "assertion failed: "
                 << get_term_source_text(assertions[i]) << std::endl;
             std::cout << "Compiled code: " << std::endl;
-            print_branch_raw(std::cout, code);
+            print_branch(std::cout, code);
             declare_current_test_failed();
             return;
         }
@@ -109,7 +109,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (boolean_statements_found == 0 && assertionsStr != "") {
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "no boolean statements found in: " << assertionsStr << std::endl;
-        print_branch_raw(std::cout, code);
+        print_branch(std::cout, code);
         declare_current_test_failed();
         return;
     }
@@ -159,7 +159,7 @@ void test_snippet_runtime_error(std::string const& str)
     if (!result.errorOccurred) {
         std::cout << "No runtime error occured: " << get_current_test_name() << std::endl;
         std::cout << str << std::endl;
-        print_branch_raw(std::cout, code);
+        print_branch(std::cout, code);
         declare_current_test_failed();
         return;
     }

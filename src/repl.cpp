@@ -96,7 +96,7 @@ void start_repl()
             for (int i=previousHead; i < replState.length(); i++) {
                 std::cout << get_term_to_string_extended(replState[i]) << std::endl;
                 if (replState[i]->nestedContents.length() > 0)
-                    print_branch_raw(std::cout, replState[i]->nestedContents);
+                    print_branch(std::cout, replState[i]->nestedContents);
             }
         }
     }

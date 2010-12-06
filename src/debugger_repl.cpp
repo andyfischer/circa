@@ -39,7 +39,7 @@ void start_debugger_repl(std::string const& filename)
             continue;
 
         if (input == "p") {
-            print_branch_raw(std::cout, branch);
+            print_branch(std::cout, branch);
             continue;
         }
 

@@ -11,12 +11,12 @@ bool DEBUG_TRAP_ERROR_OCCURRED = false;
 
 void dump_branch(Branch& branch)
 {
-    print_branch_raw(std::cout, branch);
+    print_branch(std::cout, branch);
 }
 
 void dump_branch_with_props(Branch& branch)
 {
-    print_branch_raw_with_properties(std::cout, branch);
+    print_branch_with_properties(std::cout, branch);
 }
 
 } // namespace circa

@@ -43,12 +43,12 @@ std::string get_short_local_name(Term* term);
 std::string branch_namespace_to_string(Branch& branch);
 
 // Print compiled code in a raw format
-void print_branch_raw(std::ostream& out, Branch& branch, RawOutputPrefs* prefs);
+void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs);
 void print_term_to_string_extended(std::ostream& out, Term* term, RawOutputPrefs* prefs);
 
 // Convenient overloads for raw format printing
-void print_branch_raw(std::ostream& out, Branch& branch);
-void print_branch_raw_with_properties(std::ostream& out, Branch& branch);
+void print_branch(std::ostream& out, Branch& branch);
+void print_branch_with_properties(std::ostream& out, Branch& branch);
 std::string get_branch_raw(Branch& branch);
 std::string get_term_to_string_extended(Term*);
 std::string get_term_to_string_extended_with_props(Term*);
