@@ -5,6 +5,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <fstream>
 #include <sys/stat.h>
 
 #include "branch.h"

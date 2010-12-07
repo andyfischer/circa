@@ -13,12 +13,10 @@
 
 #endif // WINDOWS
 
-#include <algorithm>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
 #include <exception>
-#include <fstream>
 #include <iostream>
 #include <map>
 #include <memory>

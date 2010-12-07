@@ -73,7 +73,7 @@ int plastic_main(std::vector<std::string> args)
         EvalContext cxt;
         include_function::preload_script(app::users_branch().owningTerm);
 
-        print_branch_raw(std::cout, app::users_branch());
+        print_branch(std::cout, app::users_branch());
         return 0;
     }
 

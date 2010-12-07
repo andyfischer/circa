@@ -7,12 +7,7 @@ namespace write_text_file_function {
 
     CA_FUNCTION(evaluate)
     {
-        std::string filename = STRING_INPUT(0);
-        std::string contents = STRING_INPUT(1);
-        std::ofstream file;
-        file.open(filename.c_str(), std::ios::out);
-        file << contents;
-        file.close();
+        storage::write_text_file(STRING_INPUT(0), STRING_INPUT(1));
     }
 
     void setup(Branch& kernel)
