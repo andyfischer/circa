@@ -27,9 +27,6 @@ struct Token
 typedef std::vector<Token> TokenList;
 
 const int IDENTIFIER = 1;
-#ifndef DISABLE_QUALIFIED_IDENT_TOKEN
-const int QUALIFIED_IDENTIFIER = 2;
-#endif
 const int INTEGER = 3;
 const int HEX_INTEGER = 4;
 const int FLOAT_TOKEN = 5;

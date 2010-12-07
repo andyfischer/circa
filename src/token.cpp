@@ -19,9 +19,6 @@ const char* get_token_text(int match)
         case COMMA: return ",";
         case AT_SIGN: return "@";
         case IDENTIFIER: return "IDENTIFIER";
-#ifndef DISABLE_QUALIFIED_IDENT_TOKEN
-        case QUALIFIED_IDENTIFIER: return "QUALIFIED_IDENTIFIER";
-#endif
         case INTEGER: return "INTEGER";
         case HEX_INTEGER: return "HEX_INTEGER";
         case FLOAT_TOKEN: return "FLOAT";
@@ -542,21 +539,7 @@ void consume_identifier(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next()))
         text << context.consume();
 
-#ifdef DISABLE_QUALIFIED_IDENT_TOKEN
     context.push(IDENTIFIER, text.str());
-#else
-    // Possibly consume a qualified identifier, example: "names:ident"
-    bool qualified = false;
-
-    while (context.next() == ':' && is_acceptable_inside_identifier(context.next(1))) {
-        text << context.consume(); // colon
-        qualified = true;
-        while (is_acceptable_inside_identifier(context.next()))
-            text << context.consume();
-    }
-
-    context.push(qualified ? QUALIFIED_IDENTIFIER : IDENTIFIER, text.str());
-#endif
 }
 
 void consume_whitespace(TokenizeContext &context)

@@ -1386,11 +1386,7 @@ Term* atom(Branch& branch, TokenStream& tokens)
         result = identifier_with_rebind(branch, tokens);
 
     // identifier?
-    else if (tokens.nextIs(IDENTIFIER)
-            #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
-            || tokens.nextIs(QUALIFIED_IDENTIFIER)
-            #endif
-            )
+    else if (tokens.nextIs(IDENTIFIER))
         result = identifier(branch, tokens);
 
     // literal integer?
@@ -1714,10 +1710,6 @@ Term* identifier(Branch& branch, TokenStream& tokens, std::string& idStrOut)
 {
     if (tokens.nextIs(IDENTIFIER))
         idStrOut = tokens.consume(IDENTIFIER);
-    #ifndef DISABLE_QUALIFIED_IDENT_TOKEN
-    else if (tokens.nextIs(QUALIFIED_IDENTIFIER))
-        idStrOut = tokens.consume(QUALIFIED_IDENTIFIER);
-    #endif
     else 
         throw std::runtime_error("identifier() expected ident");
 

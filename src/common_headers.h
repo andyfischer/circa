@@ -67,6 +67,4 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 #define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
 void ca_assert_function(bool result, const char* expr, int line, const char* file);
 
-#define DISABLE_QUALIFIED_IDENT_TOKEN
-
 } // namespace circa
