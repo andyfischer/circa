@@ -54,8 +54,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     change_type(result, outputType);
 
-    update_register_index_of_new_term(result);
-
     post_input_change(result);
 
     update_unique_name(result);
@@ -187,33 +185,6 @@ int get_input_relative_scope(Term* term, int index)
     return relativeScope;
 }
 
-void update_register_index_of_new_term(Term* term)
-{
-    if (!FINISHED_BOOTSTRAP)
-        return;
-
-    if (get_register_count(term) == 0)
-        return;
-
-    if (term->owningBranch == NULL)
-        return;
-
-    Branch& branch = *term->owningBranch;
-
-    int reg = 0;
-    for (int i = term->index - 1; i >= 0; i--) {
-        Term* prev = branch[i];
-        if (prev && prev->registerIndex != -1) {
-            reg = prev->registerIndex + get_register_count(prev);
-            break;
-        }
-    }
-
-    term->registerIndex = reg;
-    term->owningBranch->registerCount = std::max(term->owningBranch->registerCount,
-            reg + get_register_count(term));
-}
-
 void post_input_change(Term* term)
 {
     for (int i=0; i < term->numInputs(); i++)
@@ -225,81 +196,6 @@ void post_input_change(Term* term)
         if (func)
             func(term);
     }
-}
-
-void update_register_indices(Branch& branch)
-{
-    // Check if the owning function overrides assignRegisters
-    if (branch.owningTerm != NULL) {
-        FunctionAttrs::AssignRegisters assignRegisters =
-            function_t::get_attrs(branch.owningTerm->function).assignRegisters;
-        if (assignRegisters != NULL) {
-            assignRegisters(branch.owningTerm);
-            return;
-        }
-    }
-
-    int next = 0;
-
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
-        if (term == NULL) continue;
-        next = assign_register(term, next);
-    }
-
-    branch.registerCount = next;
-}
-
-void update_register_indices(Term* term)
-{
-    // Might be nice to get rid of update_register_indices(Branch&) in favor of this.
-    update_register_indices(term->nestedContents);
-}
-
-int get_register_count(Term* term)
-{
-    // TODO: get rid of these terms:
-    if (term->name == "#attr:comp-pending-rebind")
-        return 0;
-
-    if (!is_function(term->function))
-        return 0;
-
-    FunctionAttrs::GetRegisterCount getRegisterCount
-        = function_t::get_attrs(term->function).getRegisterCount;
-
-    if (getRegisterCount == NULL) {
-        // Default behavior if getRegisterCount is not defined: 0 registers
-        // for a term with Void output, 1 register otherwise.
-        if (term->type == VOID_TYPE)
-            return 0;
-        else if (term->name == "#attributes")
-            return 0;
-        else
-            return 1;
-    } else {
-        return getRegisterCount(term);
-    }
-}
-
-int assign_register(Term* term, int nextRegister)
-{
-    int registerCount = get_register_count(term);
-
-    int newRegister = registerCount == 0 ? -1 : nextRegister;
-    bool registerChanged = false;
-
-    if (term->registerIndex != newRegister) {
-        term->registerIndex = newRegister;
-        registerChanged = true;
-    }
-
-    // Some terms have inner registers that need to be changed along with the
-    // outer registerIndex.
-    if (registerChanged)
-        update_register_indices(term);
-
-    return nextRegister + registerCount;
 }
 
 bool is_actually_using(Term* user, Term* usee)
@@ -366,7 +262,6 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     change_type(term, type);
     reset(term);
     update_unique_name(term);
-    update_register_index_of_new_term(term);
 
     return term;
 }

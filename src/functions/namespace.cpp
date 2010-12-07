@@ -10,25 +10,6 @@ namespace namespace_function {
     {
         Branch& contents = CALLER->nestedContents;
         evaluate_branch_internal(CONTEXT, contents);
-
-        #if 0
-        Branch& contents = CALLER->nestedContents;
-        push_stack_frame(STACK, contents.registerCount);
-        evaluate_branch_existing_frame(CONTEXT, contents);
-
-        List* stack = get_stack_frame(STACK, 0);
-        TaggedValue outputTv;
-        Dict* out = make_dict(&outputTv);
-        out->clear();
-
-        for (int i=0; i < contents.length(); i++) {
-            Term* term = contents[i];
-            if (term->name != "" && term->registerIndex != -1)
-                swap(stack->get(term->registerIndex), out->insert(term->name.c_str()));
-        }
-        pop_stack_frame(STACK);
-        swap(&outputTv, OUTPUT);
-        #endif
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -55,17 +36,6 @@ namespace namespace_function {
             return error_occurred(CONTEXT, CALLER, "couldn't find name");
 
         copy(get_local(term), OUTPUT);
-
-        #if 0
-        FIXME
-        Dict* dict = Dict::checkCast(INPUT(0));
-        if (dict == NULL)
-            return error_occurred(CONTEXT, CALLER, "type mismatch");
-
-        const char* name = STRING_INPUT(1);
-
-        copy(dict->get(name), OUTPUT);
-        #endif
     }
 
     Term* get_namespace_field_specialize_type(Term* caller)

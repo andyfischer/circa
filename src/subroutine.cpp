@@ -225,8 +225,6 @@ void subroutine_change_state_type(Term* func, Term* newType)
             }
         }
     }
-
-    update_register_indices(func);
 }
 
 void store_locals(Branch& branch, TaggedValue* storageTv)

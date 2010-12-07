@@ -80,8 +80,7 @@ std::string branch_namespace_to_string(Branch& branch)
 
 void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
 {
-    out << "[Branch " << &branch << ", regs = " << branch.registerCount
-        << ", output = " << branch.outputRegister << "]" << std::endl;
+    out << "[Branch " << &branch << ", output = " << branch.outputIndex << "]" << std::endl;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
@@ -230,9 +229,6 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 
     if (term->name != "")
         out << " '" << term->name << "'";
-
-    if (term->registerIndex != -1)
-        out << " r:" << term->registerIndex;
 
     if (term->function == NULL) {
         out << " <NULL function>";

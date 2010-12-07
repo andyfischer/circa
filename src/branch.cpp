@@ -14,8 +14,7 @@ static void assert_valid_branch(Branch const* obj)
 Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
-    registerCount(0),
-    outputRegister(0),
+    outputIndex(0),
     inuse(false)
 {
     debug_register_valid_object((void*) this, BRANCH_OBJECT);
@@ -413,8 +412,6 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
         duplicate_branch_nested(newTermMap,
                 source_term->nestedContents, dest_term->nestedContents);
     }
-
-    update_register_indices(dest);
 }
 
 void duplicate_branch(Branch& source, Branch& dest)

@@ -59,7 +59,6 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
         if (term == NULL)
             continue;
 
-        ca_assert(term->registerIndex != -1);
         TaggedValue* result = get_local(term);
         copy(result, state->insert(name));
 
@@ -79,9 +78,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;
-        TaggedValue* val = NULL;
-        if (term->registerIndex != -1)
-            val = get_local(term);
+        TaggedValue* val = get_local(term);
         if (val != NULL)
             copy(val, branch[i]);
     }

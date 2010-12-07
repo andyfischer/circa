@@ -22,8 +22,7 @@ struct Branch
 
     int _refCount;
 
-    int registerCount;
-    int outputRegister;
+    int outputIndex;
 
     // Local values for each term. These are the results of the most recent
     // interpreted execution of this branch.

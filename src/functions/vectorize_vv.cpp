@@ -68,8 +68,6 @@ namespace vectorize_vv_function {
         change_type(rightPlaceholder, find_type_of_get_index(right));
 
         apply(contents, func, RefList(leftPlaceholder, rightPlaceholder));
-
-        update_register_indices(contents);
     }
 
     void setup(Branch& kernel)

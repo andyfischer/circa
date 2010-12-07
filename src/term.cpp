@@ -19,7 +19,6 @@ static unsigned int gNextGlobalID = 1;
 Term::Term()
   : owningBranch(NULL),
     index(0),
-    registerIndex(-1),
     refCount(0)
 {
     globalID = gNextGlobalID++;

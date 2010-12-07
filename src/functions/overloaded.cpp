@@ -85,7 +85,6 @@ namespace overloaded_function {
                 && contents[0]->function == specializedFunc;
             if (!alreadyGenerated) {
                 apply(contents, specializedFunc, CALLER->inputs);
-                update_register_indices(contents);
                 //change_type(CALLER, contents[0]->type);
             }
             TaggedValue output;
@@ -119,7 +118,6 @@ namespace overloaded_function {
 
         if (specializedFunc != NULL) {
             apply(contents, specializedFunc, term->inputs);
-            update_register_indices(contents);
             change_type(term, contents[0]->type);
         }
     }

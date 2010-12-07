@@ -70,8 +70,6 @@ namespace vectorize_vs_function {
         change_type(rightPlaceholder, right->type);
 
         apply(contents, func, RefList(leftPlaceholder, rightPlaceholder));
-
-        update_register_indices(contents);
     }
 
     void setup(Branch& kernel)

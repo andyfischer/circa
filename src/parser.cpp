@@ -681,9 +681,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     // Move the if_block term to be after the condition terms.
     branch.moveToEnd(result);
 
-    // Update register indexes after rearranging terms
-    update_register_indices(branch);
-
     update_if_block_joining_branch(result);
     set_source_location(result, startPosition, tokens);
 
@@ -741,8 +738,6 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
 
-    update_register_indices(branch);
-    
     return forTerm;
 }
 
@@ -1154,9 +1149,6 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         result->setStringProp("syntax:functionName", fieldName);
         result->setStringProp("syntax:declarationStyle", "member-function-call");
-
-        // fix register indexes now that we've erased some terms
-        update_register_indices(branch);
 
         return result;
     } else {
@@ -1699,7 +1691,6 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 
     consume_branch(result->nestedContents, tokens);
 
-    update_register_indices(branch);
     post_input_change(result);
 
     return result;

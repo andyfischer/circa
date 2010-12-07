@@ -21,9 +21,6 @@ void append_internal_error(BranchInvariantCheck* result, int index, std::string 
 
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
 {
-    //int nextExpectedRegisterIndex = 0;
-    //int registerCount = branch.registerCount;
-
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
 

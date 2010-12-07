@@ -105,7 +105,7 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     expose_all_names(outerRebinds, outerScope);
-    update_register_indices(forContents);
+    for_loop_update_output_index(forTerm);
 }
 
 Term* find_enclosing_for_loop(Term* term)
@@ -123,6 +123,21 @@ Term* find_enclosing_for_loop(Term* term)
     return find_enclosing_for_loop(branch->owningTerm);
 }
 
+void for_loop_update_output_index(Term* forTerm)
+{
+    Branch& contents = forTerm->nestedContents;
+
+    // If this is a list-rewrite, then the output is the last term that has the iterator's
+    // name binding. Otherwise just use the last term.
+    if (as_bool(get_for_loop_modify_list(forTerm))) {
+        Term* output = contents[get_for_loop_iterator(forTerm)->name];
+        ca_assert(output != NULL);
+        contents.outputIndex = output->index;
+    } else {
+        contents.outputIndex = contents.length() - 1;
+    }
+}
+
 CA_FUNCTION(evaluate_for_loop)
 {
     Branch& forContents = CALLER->nestedContents;
@@ -134,7 +149,7 @@ CA_FUNCTION(evaluate_for_loop)
     int inputListLength = inputList->numElements();
 
     TaggedValue outputTv;
-    bool saveOutput = forContents.outputRegister != -1;
+    bool saveOutput = forContents.outputIndex != -1;
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
 
@@ -143,8 +158,6 @@ CA_FUNCTION(evaluate_for_loop)
 
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
-
-        ca_assert(forContents.registerCount > 0);
 
         // copy iterator
         copy(inputList->getIndex(iteration), get_local(iterator));
@@ -169,7 +182,7 @@ CA_FUNCTION(evaluate_for_loop)
 
         // Save output
         if (saveOutput && !CONTEXT->forLoopContext.discard) {
-            TaggedValue* localResult = get_local(forContents[forContents.outputRegister]);
+            TaggedValue* localResult = get_local(forContents[forContents.outputIndex]);
             copy(localResult, output->get(nextOutputIndex++));
         }
     }
@@ -199,48 +212,6 @@ CA_FUNCTION(evaluate_for_loop)
 
     // Restore loop context
     CONTEXT->forLoopContext = prevLoopContext;
-}
-
-void for_loop_assign_registers(Term* term)
-{
-    int next = 0;
-
-    // Iterator goes in register 0
-    Term* iterator = get_for_loop_iterator(term);
-    next = assign_register(iterator, next);
-
-    // Inner_rebinds go in 1..n
-    Branch& forContents = term->nestedContents;
-    Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
-
-    for (int i=0; i < innerRebinds.length(); i++)
-        next = assign_register(innerRebinds[i], next);
-
-    for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
-        if (forContents[i] == NULL) continue;
-        next = assign_register(forContents[i], next);
-    }
-
-    if (forContents["#outer_rebinds"] != NULL) {
-        Branch& outerRebinds = forContents["#outer_rebinds"]->nestedContents;
-        for (int i=0; i < outerRebinds.length(); i++) {
-            outerRebinds[i]->registerIndex = term->registerIndex + 1 + i;
-        }
-    }
-
-    forContents.registerCount = next;
-
-    // Figure out the output register. If this is a list-rewrite, then the output
-    // is the last term that has the iterator's name binding. Otherwise just use
-    // the last term.
-    if (as_bool(get_for_loop_modify_list(term))) {
-        Term* output = forContents[get_for_loop_iterator(term)->name];
-        ca_assert(output != NULL);
-        //forContents.outputRegister = output->registerIndex;
-        forContents.outputRegister = output->index;
-    } else {
-        forContents.outputRegister = forContents.length() - 1;
-    }
 }
 
 } // namespace circa
