@@ -60,21 +60,13 @@ namespace include_function {
     {
         Branch& contents = CALLER->nestedContents;
 
-        load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
+        load_script(CONTEXT, CALLER, &contents.fileSignature,
             STRING_INPUT(0));
 
         if (CONTEXT->errorOccurred)
             return;
 
-        TaggedValue prevScopeState;
-        swap(&CONTEXT->currentScopeState, &prevScopeState);
-        fetch_state_container(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
-
-        evaluate_branch_internal(CONTEXT, contents);
-        wrap_up_open_state_vars(CONTEXT, contents);
-
-        preserve_state_result(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
-        swap(&CONTEXT->currentScopeState, &prevScopeState);
+        evaluate_branch_internal_with_state(CONTEXT, CALLER);
     }
 
     CA_FUNCTION(load_script)

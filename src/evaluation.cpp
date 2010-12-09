@@ -67,6 +67,23 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
     context->openStateVariables.removeNulls();
 }
 
+void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
+{
+    Branch& contents = term->nestedContents;
+
+    // Store currentScopeState and fetch the container for this branch
+    TaggedValue prevScopeState;
+    swap(&context->currentScopeState, &prevScopeState);
+    fetch_state_container(term, &prevScopeState, &context->currentScopeState);
+
+    evaluate_branch_internal(context, contents);
+    wrap_up_open_state_vars(context, contents);
+
+    // Store container and replace currentScopeState
+    preserve_state_result(term, &prevScopeState, &context->currentScopeState);
+    swap(&context->currentScopeState, &prevScopeState);
+}
+
 void evaluate_branch(EvalContext* context, Branch& branch)
 {
     copy(&context->state, &context->currentScopeState);

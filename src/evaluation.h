@@ -52,6 +52,8 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue*
 
 void wrap_up_open_state_vars(EvalContext* context, Branch& branch);
 
+void evaluate_branch_internal_with_state(EvalContext* context, Term* term);
+
 // Top-level call. Evalaute the branch and then preserve stack outputs back to terms.
 void evaluate_branch(EvalContext* context, Branch& branch);
 
