@@ -148,9 +148,13 @@ CA_FUNCTION(evaluate_if_block)
     int numBranches = contents.length() - 1;
     int acceptedBranchIndex = 0;
 
+    TaggedValue listState;
+    TaggedValue prevScopeState;
     List* state = NULL;
     if (useState) {
-        state = List::lazyCast(STATE_INPUT);
+        swap(&prevScopeState, &CONTEXT->currentScopeState);
+        fetch_state_container(CALLER, &prevScopeState, &listState);
+        state = List::lazyCast(&listState);
         state->resize(numBranches);
     }
 
@@ -164,24 +168,14 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
-            TaggedValue localState;
-            TaggedValue prevScopeState;
-
-            if (useState) {
-                copy(state->get(i), &localState);
-                copy(&CONTEXT->currentScopeState, &prevScopeState);
-                copy(&localState, &CONTEXT->currentScopeState);
-            }
+            if (useState)
+                swap(state->get(i), &CONTEXT->currentScopeState);
 
             evaluate_branch_internal(CONTEXT, contents);
             wrap_up_open_state_vars(CONTEXT, contents);
 
-            if (useState) {
-                copy(&CONTEXT->currentScopeState, &localState);
-                copy(&prevScopeState, &CONTEXT->currentScopeState);
-                state = List::lazyCast(STATE_INPUT);
-                copy(&localState, state->get(i));
-            }
+            if (useState)
+                swap(state->get(i), &CONTEXT->currentScopeState);
 
             acceptedBranchIndex = i;
             break;
@@ -190,11 +184,12 @@ CA_FUNCTION(evaluate_if_block)
 
     // Reset state for non-accepted branches
     if (useState) {
-        state = List::lazyCast(STATE_INPUT);
         for (int i=0; i < numBranches; i++) {
             if (i != acceptedBranchIndex)
                 set_null(state->get(i));
         }
+        preserve_state_result(CALLER, &prevScopeState, &listState);
+        swap(&prevScopeState, &CONTEXT->currentScopeState);
     }
 
     // Copy values to joining terms

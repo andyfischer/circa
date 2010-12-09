@@ -1,4 +1,7 @@
 
+Optimization tasks:
+ - evaluate_if_block should not use if_block_contains_state, it's O(n) 
+ - various places where swap() can be used instead of copy()
 
 Bugs/tasks:
  - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.

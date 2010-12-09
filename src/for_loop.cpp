@@ -160,10 +160,11 @@ CA_FUNCTION(evaluate_for_loop)
     TaggedValue stateVal;
     TaggedValue prevScopeState;
     if (useState) {
-        fetch_state_container(CALLER, &CONTEXT->currentScopeState, &stateVal);
+        swap(&CONTEXT->currentScopeState, &prevScopeState);
+        fetch_state_container(CALLER, &prevScopeState, &stateVal);
+
         state = List::lazyCast(&stateVal);
         state->resize(inputListLength);
-        swap(&CONTEXT->currentScopeState, &prevScopeState);
     }
 
     // Preserve old for-loop context
@@ -172,9 +173,9 @@ CA_FUNCTION(evaluate_for_loop)
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
 
-        // load state
+        // load state for this iteration
         if (useState)
-            copy(state->get(iteration), &CONTEXT->currentScopeState);
+            swap(state->get(iteration), &CONTEXT->currentScopeState);
 
         // copy iterator
         copy(inputList->getIndex(iteration), get_local(iterator));
@@ -207,7 +208,7 @@ CA_FUNCTION(evaluate_for_loop)
 
         // Unload state
         if (useState)
-            copy(&CONTEXT->currentScopeState, state->get(iteration));
+            swap(&CONTEXT->currentScopeState, state->get(iteration));
     }
 
     // Resize output, in case some elements were discarded
@@ -237,8 +238,8 @@ CA_FUNCTION(evaluate_for_loop)
     CONTEXT->forLoopContext = prevLoopContext;
 
     if (useState) {
+        preserve_state_result(CALLER, &prevScopeState, &stateVal);
         swap(&prevScopeState, &CONTEXT->currentScopeState);
-        preserve_state_result(CALLER, &CONTEXT->currentScopeState, &stateVal);
     }
 }
 
