@@ -143,10 +143,18 @@ bool if_block_contains_state(Term* ifCall)
 CA_FUNCTION(evaluate_if_block)
 {
     Branch& contents = CALLER->nestedContents;
+    bool useState = if_block_contains_state(CALLER);
 
+    int numBranches = contents.length() - 1;
     int acceptedBranchIndex = 0;
 
-    for (int i=0; i < contents.length() - 1; i++) {
+    List* state = NULL;
+    if (useState) {
+        state = List::lazyCast(STATE_INPUT);
+        state->resize(numBranches);
+    }
+
+    for (int i=0; i < numBranches; i++) {
         Term* branch = contents[i];
 
         //std::cout << "checking: " << get_term_to_string_extended(branch) << std::endl;
@@ -156,10 +164,36 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
+            TaggedValue iterationState;
+            TaggedValue prevScopeState;
+
+            if (useState) {
+                copy(state->get(i), &iterationState);
+                copy(&CONTEXT->currentScopeState, &prevScopeState);
+                copy(&iterationState, &CONTEXT->currentScopeState);
+            }
+
             evaluate_branch_internal(CONTEXT, contents);
+            wrap_up_open_state_vars(CONTEXT, contents);
+
+            if (useState) {
+                copy(&CONTEXT->currentScopeState, &iterationState);
+                copy(&prevScopeState, &CONTEXT->currentScopeState);
+                state = List::lazyCast(STATE_INPUT);
+                copy(&iterationState, state->get(i));
+            }
 
             acceptedBranchIndex = i;
             break;
+        }
+    }
+
+    // Reset state for non-accepted branches
+    if (useState) {
+        state = List::lazyCast(STATE_INPUT);
+        for (int i=0; i < numBranches; i++) {
+            if (i != acceptedBranchIndex)
+                set_null(state->get(i));
         }
     }
 

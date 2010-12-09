@@ -9,6 +9,7 @@ namespace if_function {
 
     CA_DEFINE_FUNCTION(evaluate, "if(bool) -> any")
     {
+        // Compilation placeholder
     }
 
     CA_DEFINE_FUNCTION(join_function, "join(any...) -> any")

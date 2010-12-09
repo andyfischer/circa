@@ -34,7 +34,7 @@ struct EvalContext
     // State used for the current for loop
     ForLoopContext forLoopContext;
 
-    EvalContext() : interruptSubroutine(false), errorOccurred(false), currentScopeState(NULL) {}
+    EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 
     void clearError() {
         errorOccurred = false;

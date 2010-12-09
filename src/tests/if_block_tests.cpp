@@ -262,27 +262,27 @@ void test_state_simple()
     Term* block = branch.compile("if true; state i = 0; i += 1; end");
     evaluate_branch(&context, branch);
 
-    TaggedValue *i = context.state.getField("#if_block")->getIndex(0)->getField("i");
+    TaggedValue *i = context.state.getField("_if_block")->getIndex(0)->getField("i");
     test_assert(i != NULL);
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(0)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(0)->getField("i");
     test_assert(as_int(i) == 2);
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(0)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(0)->getField("i");
     test_assert(as_int(i) == 3);
 
     // Same test with elif
     branch.clear();
     block = branch.compile("if false; elif true; state i = 0; i += 1; end");
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 2);
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 3);
 
     // Same test with else
@@ -290,13 +290,13 @@ void test_state_simple()
     context = EvalContext();
     block = branch.compile("if false; else state i = 0; i += 1; end");
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 2);
     evaluate_branch(&context, branch);
-    i = context.state.getField("#if_block")->getIndex(1)->getField("i");
+    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 3);
 }
 
@@ -307,8 +307,10 @@ void test_state_in_function()
     Branch branch;
     EvalContext context;
 
-    branch.compile("def my_func() -> int;"
+    Term* my_func = branch.compile("def my_func() -> int;"
            " if true; state i = 0; i += 1; return(i); else return(0) end end");
+
+    test_assert(is_function_stateful(my_func));
 
     Term* call1 = branch.compile("my_func()");
 
@@ -320,70 +322,52 @@ void test_state_in_function()
 
     test_assert(context);
 
-    //std::cout << context.state.toString();
     test_equals(as_int(call1), 3);
 }
 
 void test_state_is_reset_when_if_fails()
 {
     Branch branch;
+    EvalContext context;
 
     Term* c = branch.compile("c = true");
-    Term* ifBlock = branch.compile("if c; state i = 0; i += 1; end");
-    Term* i = get_if_condition_block(ifBlock, 0)->findFirstBinding("i");
+    branch.compile("if c; state i = 0; i += 1; end");
 
-    test_assert(as_int(i) == 0);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 1);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 2);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 3);
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[i: 1], null]]");
+
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[i: 2], null]]");
+
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[i: 3], null]]");
 
     set_bool(c, false);
 
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 0);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 0);
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [null, []]]");
 
     set_bool(c, true);
 
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 1);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 2);
-
-    // Same thing with state in the else() block
-    branch.clear();
-    c = branch.compile("c = true");
-    ifBlock = branch.compile("if c; else state i = 0; i += 1; end");
-    i = get_if_condition_block(ifBlock, 1)->findFirstBinding("i");
-
-    test_assert(as_int(i) == 0);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 0);
-    set_bool(c, false);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 1);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 2);
-    set_bool(c, true);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 0);
-    evaluate_branch(branch);
-    test_assert(as_int(i) == 0);
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[i: 1], null]]");
 }
 
 void test_nested_state()
 {
     Branch branch;
-    Term* block = branch.compile("if true; t = toggle(true); end");
-    Term* t = get_if_condition_block(block, 0)->findFirstBinding("t");
+    EvalContext context;
 
-    evaluate_branch(branch);
+    branch.compile("t = false; if true; t = toggle(true); end");
+    TaggedValue* t = get_local(branch["t"]);
+
+    evaluate_branch(&context, branch);
     test_assert(as_bool(t) == true);
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
+    test_assert(as_bool(t) == false);
+    evaluate_branch(&context, branch);
+    test_assert(as_bool(t) == true);
+    evaluate_branch(&context, branch);
     test_assert(as_bool(t) == false);
 }
 
@@ -395,10 +379,10 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_execution);
     REGISTER_TEST_CASE(if_block_tests::test_execution_with_elif);
     REGISTER_TEST_CASE(if_block_tests::test_parse_with_no_line_endings);
-    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_state_simple);
-    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
-    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
-    //TEST_DISABLED REGISTER_TEST_CASE(if_block_tests::test_nested_state);
+    REGISTER_TEST_CASE(if_block_tests::test_state_simple);
+    REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
+    REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
+    REGISTER_TEST_CASE(if_block_tests::test_nested_state);
 }
 
 } // namespace if_block_tests

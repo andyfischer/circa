@@ -160,22 +160,29 @@ void subroutine_update_state_type_from_contents(Term* func)
         return;
     }
 
-    bool hasState = false;
+    bool hasState = has_implicit_state(func);
+    #if 0
     Branch& contents = func->nestedContents;
     for (int i=0; i < contents.length(); i++) {
-        if (contents[i] == NULL)
+        Term* term = contents[i];
+        if (term == NULL)
             continue;
-        if (is_get_state(contents[i])) {
+        if (is_get_state(term)) {
             hasState = true;
             break;
         }
-        if (is_subroutine(contents[i]->function)) {
-            if (is_function_stateful(contents[i]->function)) {
+        if (is_subroutine(term->function)) {
+            if (is_function_stateful(term->function)) {
                 hasState = true;
                 break;
             }
         }
+        if (term->function == IF_BLOCK_FUNC) {
+            if (if_block
+
+        }
     }
+    #endif
 
     if (hasState)
         subroutine_change_state_type(func, LIST_TYPE);
