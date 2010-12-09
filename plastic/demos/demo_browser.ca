@@ -1,6 +1,5 @@
 
 
-"""
 background(#333)
 picked = ui_widgets:draw_vmenu([30 30]
     [['Asteroids' 'asteroids.ca']
@@ -17,4 +16,3 @@ picked = ui_widgets:draw_vmenu([30 30]
 if picked != 0
     load_user_script(path(picked))
 end
-"""

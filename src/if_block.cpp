@@ -148,13 +148,13 @@ CA_FUNCTION(evaluate_if_block)
     int numBranches = contents.length() - 1;
     int acceptedBranchIndex = 0;
 
-    TaggedValue listState;
+    TaggedValue localState;
     TaggedValue prevScopeState;
     List* state = NULL;
     if (useState) {
         swap(&prevScopeState, &CONTEXT->currentScopeState);
-        fetch_state_container(CALLER, &prevScopeState, &listState);
-        state = List::lazyCast(&listState);
+        fetch_state_container(CALLER, &prevScopeState, &localState);
+        state = List::lazyCast(&localState);
         state->resize(numBranches);
     }
 
@@ -188,7 +188,7 @@ CA_FUNCTION(evaluate_if_block)
             if (i != acceptedBranchIndex)
                 set_null(state->get(i));
         }
-        preserve_state_result(CALLER, &prevScopeState, &listState);
+        preserve_state_result(CALLER, &prevScopeState, &localState);
         swap(&prevScopeState, &CONTEXT->currentScopeState);
     }
 

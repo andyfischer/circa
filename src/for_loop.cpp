@@ -156,14 +156,14 @@ CA_FUNCTION(evaluate_for_loop)
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
-    List* state = NULL;
-    TaggedValue stateVal;
+    TaggedValue localState;
     TaggedValue prevScopeState;
+    List* state = NULL;
     if (useState) {
         swap(&CONTEXT->currentScopeState, &prevScopeState);
-        fetch_state_container(CALLER, &prevScopeState, &stateVal);
+        fetch_state_container(CALLER, &prevScopeState, &localState);
 
-        state = List::lazyCast(&stateVal);
+        state = List::lazyCast(&localState);
         state->resize(inputListLength);
     }
 
@@ -238,7 +238,7 @@ CA_FUNCTION(evaluate_for_loop)
     CONTEXT->forLoopContext = prevLoopContext;
 
     if (useState) {
-        preserve_state_result(CALLER, &prevScopeState, &stateVal);
+        preserve_state_result(CALLER, &prevScopeState, &localState);
         swap(&prevScopeState, &CONTEXT->currentScopeState);
     }
 }

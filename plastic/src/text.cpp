@@ -77,9 +77,6 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
 
 CA_FUNCTION(load_font)
 {
-    std::cout << "load_font starting with state: " << CONTEXT->currentScopeState.toString()
-        << std::endl;
-
     TaggedValue* state = STATE_INPUT;
     Font* output = Font::lazyCast(OUTPUT);
 
@@ -101,9 +98,6 @@ CA_FUNCTION(load_font)
 
     output->contents()->ttfFont = result;
     copy(output, state);
-
-    std::cout << "load_font finished with state: " << CONTEXT->currentScopeState.toString()
-        << std::endl;
 }
 
 struct RenderedText : public TaggedValue
@@ -117,11 +111,18 @@ struct RenderedText : public TaggedValue
     TaggedValue* color() { return getIndex(3); }
     std::string const& text() { return getIndex(4)->asString(); }
     TaggedValue* textContainer() { return getIndex(4); }
+
+    static TypeRef singleton;
 };
+
+TypeRef RenderedText::singleton;
 
 CA_FUNCTION(render_text)
 {
-    RenderedText* state = (RenderedText*) INPUT(0);
+    RenderedText* state = (RenderedText*) STATE_INPUT;
+    if (!cast(state, RenderedText::singleton, state))
+        return error_occurred(CONTEXT, CALLER, "state couldn't be cast to RenderedText");
+
     touch(state);
 
     std::string const& inputText = as_string(INPUT(2));
@@ -214,6 +215,8 @@ void setup(Branch& branch)
     install_function(text_ns["load_font"], load_font);
     install_function(text_ns["render_text"], render_text);
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);
+
+    RenderedText::singleton = type_contents(text_ns["RenderedText"]);
 }
 
 } // namespace text
