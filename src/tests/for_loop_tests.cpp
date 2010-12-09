@@ -92,6 +92,42 @@ void test_rewrite_input_list()
     test_equals(l->toString(), "[2, 3, 4]");
 }
 
+void test_state_simple()
+{
+    Branch branch;
+    EvalContext context;
+
+    branch.compile("for i in [1 2 3]; state s = i; end");
+
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_for: [[s: 1], [s: 2], [s: 3]]]");
+
+    branch.clear();
+    context = EvalContext();
+
+    branch.compile("l = [1 2 3]; for i in @l; state s = 0; s += i; end");
+
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[l_1: [[s: 1], [s: 2], [s: 3]]]");
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[l_1: [[s: 2], [s: 4], [s: 6]]]");
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[l_1: [[s: 3], [s: 6], [s: 9]]]");
+}
+
+void test_state_nested()
+{
+    Branch branch;
+    EvalContext context;
+
+    branch.compile("for a in [1 2] for b in [3 4] for c in [5 6] state s = c end end end");
+    evaluate_branch(&context, branch);
+
+    test_equals(&context.state, "[_for: [[_for: [[_for: [[s: 5], [s: 6]]], "
+            "[_for: [[s: 5], [s: 6]]]]], [_for: [[_for: [[s: 5], [s: 6]]], "
+            "[_for: [[s: 5], [s: 6]]]]]]]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
@@ -99,6 +135,8 @@ void register_tests()
     REGISTER_TEST_CASE(for_loop_tests::test_rebind_external);
     REGISTER_TEST_CASE(for_loop_tests::test_rebind_internally);
     REGISTER_TEST_CASE(for_loop_tests::test_rewrite_input_list);
+    REGISTER_TEST_CASE(for_loop_tests::test_state_simple);
+    REGISTER_TEST_CASE(for_loop_tests::test_state_nested);
 }
 
 } // for_loop_tests

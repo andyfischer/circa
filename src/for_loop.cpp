@@ -7,6 +7,7 @@
 #include "importing_macros.h"
 #include "introspection.h"
 #include "source_repro.h"
+#include "stateful_code.h"
 #include "references.h"
 #include "refactoring.h"
 #include "term.h"
@@ -153,11 +154,27 @@ CA_FUNCTION(evaluate_for_loop)
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
 
+    // Prepare state container
+    bool useState = has_implicit_state(CALLER);
+    List* state = NULL;
+    TaggedValue stateVal;
+    TaggedValue prevScopeState;
+    if (useState) {
+        fetch_state_container(CALLER, &CONTEXT->currentScopeState, &stateVal);
+        state = List::lazyCast(&stateVal);
+        state->resize(inputListLength);
+        swap(&CONTEXT->currentScopeState, &prevScopeState);
+    }
+
     // Preserve old for-loop context
     ForLoopContext prevLoopContext = CONTEXT->forLoopContext;
 
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
+
+        // load state
+        if (useState)
+            copy(state->get(iteration), &CONTEXT->currentScopeState);
 
         // copy iterator
         copy(inputList->getIndex(iteration), get_local(iterator));
@@ -180,11 +197,17 @@ CA_FUNCTION(evaluate_for_loop)
         for (int i=loop_contents_location; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, forContents[i]);
 
+        wrap_up_open_state_vars(CONTEXT, forContents);
+
         // Save output
         if (saveOutput && !CONTEXT->forLoopContext.discard) {
             TaggedValue* localResult = get_local(forContents[forContents.outputIndex]);
             copy(localResult, output->get(nextOutputIndex++));
         }
+
+        // Unload state
+        if (useState)
+            copy(&CONTEXT->currentScopeState, state->get(iteration));
     }
 
     // Resize output, in case some elements were discarded
@@ -212,6 +235,11 @@ CA_FUNCTION(evaluate_for_loop)
 
     // Restore loop context
     CONTEXT->forLoopContext = prevLoopContext;
+
+    if (useState) {
+        swap(&prevScopeState, &CONTEXT->currentScopeState);
+        preserve_state_result(CALLER, &CONTEXT->currentScopeState, &stateVal);
+    }
 }
 
 } // namespace circa

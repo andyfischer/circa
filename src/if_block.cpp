@@ -164,23 +164,23 @@ CA_FUNCTION(evaluate_if_block)
 
             Branch& contents = branch->nestedContents;
 
-            TaggedValue iterationState;
+            TaggedValue localState;
             TaggedValue prevScopeState;
 
             if (useState) {
-                copy(state->get(i), &iterationState);
+                copy(state->get(i), &localState);
                 copy(&CONTEXT->currentScopeState, &prevScopeState);
-                copy(&iterationState, &CONTEXT->currentScopeState);
+                copy(&localState, &CONTEXT->currentScopeState);
             }
 
             evaluate_branch_internal(CONTEXT, contents);
             wrap_up_open_state_vars(CONTEXT, contents);
 
             if (useState) {
-                copy(&CONTEXT->currentScopeState, &iterationState);
+                copy(&CONTEXT->currentScopeState, &localState);
                 copy(&prevScopeState, &CONTEXT->currentScopeState);
                 state = List::lazyCast(STATE_INPUT);
-                copy(&iterationState, state->get(i));
+                copy(&localState, state->get(i));
             }
 
             acceptedBranchIndex = i;
