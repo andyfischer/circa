@@ -12,12 +12,6 @@ namespace branch_function {
         evaluate_branch_internal(CONTEXT, contents);
     }
 
-    CA_FUNCTION(branch_evaluate_preserve_stack)
-    {
-        Branch& contents = CALLER->nestedContents;
-        evaluate_branch(CONTEXT, contents);
-    }
-
     void format_source(StyledSource* source, Term* term)
     {
         if (term->boolPropOptional("syntax:literal-list", false)) {
@@ -41,10 +35,6 @@ namespace branch_function {
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         function_t::get_attrs(BRANCH_FUNC).formatSource = format_source;
-
-        Term* branch_preserve_stack = import_function(kernel, branch_evaluate_preserve_stack,
-                "branch_preserve_stack()");
-        function_t::get_attrs(branch_preserve_stack).formatSource = format_source;
     }
 }
 }

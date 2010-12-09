@@ -47,7 +47,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     Branch& assertions = create_branch(code, "assertions");
-    change_function(code["assertions"], get_global("branch_preserve_stack"));
+    //change_function(code["assertions"], get_global("branch_preserve_stack"));
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
     if (has_static_errors(assertions)) {
@@ -90,12 +90,14 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         if (!is_statement(assertions[i]))
             continue;
 
-        if (!is_bool(assertions[i]))
+        TaggedValue* result = get_local(assertions[i]);
+
+        if (!is_bool(result))
             continue;
 
         boolean_statements_found++;
 
-        if (!as_bool(assertions[i])) {
+        if (!as_bool(result)) {
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: "
                 << get_term_source_text(assertions[i]) << std::endl;
