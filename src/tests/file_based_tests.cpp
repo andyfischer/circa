@@ -156,6 +156,19 @@ void test_include_from_expression()
     evaluate_branch(branch);
 }
 
+void test_include_with_state()
+{
+    Branch branch;
+    branch.compile("state a = 1");
+    FakeFileSystem files;
+    files["file"] = "state b = 2; b = 3";
+    branch.compile("include('file')");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_include: [b: 3], a: 1]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
@@ -165,6 +178,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
     //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
     REGISTER_TEST_CASE(file_based_tests::test_include_from_expression);
+    REGISTER_TEST_CASE(file_based_tests::test_include_with_state);
 }
 
 } // namespace file_based_tests

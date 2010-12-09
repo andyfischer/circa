@@ -66,7 +66,15 @@ namespace include_function {
         if (CONTEXT->errorOccurred)
             return;
 
-        evaluate_branch(CONTEXT, contents);
+        TaggedValue prevScopeState;
+        swap(&CONTEXT->currentScopeState, &prevScopeState);
+        fetch_state_container(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
+
+        evaluate_branch_internal(CONTEXT, contents);
+        wrap_up_open_state_vars(CONTEXT, contents);
+
+        preserve_state_result(CALLER, &prevScopeState, &CONTEXT->currentScopeState);
+        swap(&CONTEXT->currentScopeState, &prevScopeState);
     }
 
     CA_FUNCTION(load_script)
