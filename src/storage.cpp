@@ -24,17 +24,43 @@ void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* con
     return g_storageInterface.readTextFile(filename, receiveFile, context);
 }
 
-std::string read_text_file_as_str(const char* filename)
+void read_text_file_to_value(const char* filename, TaggedValue* contents, TaggedValue* error)
 {
     struct ReceiveFile {
-        static void Func(void* context, const char* contents) {
-            *((std::string*) context) = contents;
+        TaggedValue* _contents;
+        TaggedValue* _error;
+        static void Func(void* context, const char* contents, const char* error) {
+            ReceiveFile* obj = (ReceiveFile*) context;
+
+            if (contents == NULL)
+                set_string(obj->_contents, "");
+            else
+                set_string(obj->_contents, contents);
+
+            if (obj->_error != NULL) {
+                if (error == NULL)
+                    set_null(obj->_error);
+                else
+                    set_string(obj->_error, error);
+            }
         }
     };
 
-    std::string out;
-    read_text_file(filename, ReceiveFile::Func, &out);
-    return out;
+    ReceiveFile obj;
+    obj._contents = contents;
+    obj._error = error;
+
+    read_text_file(filename, ReceiveFile::Func, &obj);
+}
+
+std::string read_text_file_as_str(const char* filename)
+{
+    TaggedValue contents;
+    read_text_file_to_value(filename, &contents, NULL);
+
+    if (is_string(&contents))
+        return as_string(&contents);
+    return "";
 }
 
 void write_text_file(const char* filename, const char* contents)
@@ -66,20 +92,27 @@ namespace filesystem_storage
 {
     void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
     {
-        std::ifstream file;
-        file.open(filename, std::ios::in);
-        std::stringstream contents;
-        std::string line;
-        bool firstLine = true;
-        while (std::getline(file, line)) {
-            if (!firstLine)
-                contents << "\n";
-            contents << line;
-            firstLine = false;
-        }
-        file.close();
+        FILE* fp = fopen(filename, "r");
+        if (fp == NULL)
+            return receiveFile(context, NULL, "fopen returned NULL");
 
-        receiveFile(context, contents.str().c_str());
+        // get file size
+        fseek(fp, 0, SEEK_END);
+        size_t size = ftell(fp);
+        rewind(fp);
+
+        char* buffer = (char*) malloc(size + 1);
+
+        size_t bytes_read = fread(buffer, 1, size, fp);
+        if (bytes_read != size)
+            return receiveFile(context, NULL, "failed to read entire file");
+
+        buffer[size] = 0;
+
+        receiveFile(context, buffer, NULL);
+
+        free(buffer);
+        fclose(fp);
     }
 
     void write_text_file(const char* filename, const char* contents)
@@ -102,7 +135,6 @@ namespace filesystem_storage
 
     bool file_exists(const char* filename)
     {
-        // This could also be replaced by boost::path
         FILE* fp = fopen(filename, "r");
         if (fp) {
             // file exists

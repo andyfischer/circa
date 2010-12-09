@@ -11,6 +11,8 @@ struct App {
     circa::Branch* _runtimeBranch;
     circa::Branch* _usersBranch;
 
+    circa::EvalContext _evalContext;
+
     // the filename of the running binary, passed in as args[0]
     std::string _binaryFilename;
 
@@ -60,7 +62,7 @@ void error(std::string const& msg);
 std::string find_runtime_file();
 std::string find_asset_file(std::string const& filename);
 bool load_user_script_filename(std::string const& _filename);
-bool setup_functions();
+bool setup_functions(circa::Branch& runtime);
 bool reload_runtime();
 
 bool initialize();

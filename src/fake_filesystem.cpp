@@ -9,10 +9,20 @@ FakeFileSystem* g_currentFakeFilesystem = NULL;
 
 namespace fakefilesystem_interface {
 
+    bool file_exists(const char* filename)
+    {
+        return g_currentFakeFilesystem->_files.find(std::string(filename))
+            != g_currentFakeFilesystem->_files.end();
+    }
+
     void read_text_file(const char* filename, storage::FileReceiveFunc receiveFile, void* context)
     {
-       receiveFile(context,
-               g_currentFakeFilesystem->_files[std::string(filename)].contents.c_str());
+        if (!file_exists(filename))
+            receiveFile(context, NULL, "File not found");
+        else
+            receiveFile(context,
+                    g_currentFakeFilesystem->_files[std::string(filename)].contents.c_str(),
+                    NULL);
     }
 
     void write_text_file(const char* filename, const char* contents)
@@ -23,12 +33,6 @@ namespace fakefilesystem_interface {
     time_t get_modified_time(const char* filename)
     {
         return g_currentFakeFilesystem->_files[std::string(filename)].last_modified;
-    }
-
-    bool file_exists(const char* filename)
-    {
-        return g_currentFakeFilesystem->_files.find(std::string(filename))
-            != g_currentFakeFilesystem->_files.end();
     }
 }
 

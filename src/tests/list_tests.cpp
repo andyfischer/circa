@@ -47,10 +47,10 @@ void test_cast()
     TaggedValue x;
 
     test_assert(!cast_possible(&a, INT_T));
-    test_assert(cast_possible(&a, LIST_T));
+    test_assert(cast_possible(&a, &LIST_T));
 
-    test_assert(cast_possible(&b, LIST_T));
-    test_assert(cast(&b, LIST_T, &x));
+    test_assert(cast_possible(&b, &LIST_T));
+    test_assert(cast(&b, &LIST_T, &x));
     test_equals(x.toString(), "[1, 2]");
 
     Term* t_term = branch.compile("type T { int i, number f }");

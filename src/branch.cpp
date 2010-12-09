@@ -437,9 +437,10 @@ void parse_script(Branch& branch, std::string const& filename)
     // Record the filename
     create_string(branch, filename, "#attr:source-file");
 
-    std::string fileContents = storage::read_text_file_as_str(filename.c_str());
+    TaggedValue contents;
+    storage::read_text_file_to_value(filename.c_str(), &contents, NULL);
 
-    parser::compile(&branch, parser::statement_list, fileContents);
+    parser::compile(&branch, parser::statement_list, as_string(&contents));
 }
 
 void evaluate_script(Branch& branch, std::string const& filename)

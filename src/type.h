@@ -123,10 +123,7 @@ struct Type
     int refCount;
     bool permanent;
 
-private:
     Type();
-
-public:
     ~Type();
 
     int findFieldIndex(std::string const& name)

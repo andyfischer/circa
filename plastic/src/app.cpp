@@ -119,11 +119,11 @@ std::string find_asset_file(std::string const& filename)
     return get_home_directory() + "/" + filename;
 }
 
-bool load_runtime()
+bool load_runtime(circa::Branch& runtime)
 {
     // Pre-setup
 #ifndef PLASTIC_IPAD
-    text::pre_setup(app::runtime_branch());
+    text::pre_setup(runtime);
 #endif
 
     // Load runtime.ca
@@ -135,11 +135,11 @@ bool load_runtime()
             << runtime_ca_path << ")" << std::endl;
         return false;
     }
-    parse_script(app::runtime_branch(), runtime_ca_path);
+    parse_script(runtime, runtime_ca_path);
 
-    ca_assert(branch_check_invariants_print_result(app::runtime_branch(), std::cout));
+    ca_assert(branch_check_invariants_print_result(runtime, std::cout));
 
-    setup_functions();
+    setup_functions(app::runtime_branch());
 
     return true;
 }
@@ -152,11 +152,13 @@ bool initialize()
     install_function(circa::get_global("print"), trace);
     install_function(circa::get_global("trace"), trace);
 
-    app::singleton()._runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
-    return load_runtime();
+    App& app = app::singleton();
+
+    app._runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
+    return load_runtime(*app._runtimeBranch);
 }
 
-bool setup_functions()
+bool setup_functions(circa::Branch& runtime)
 {
     circa::Branch& branch = app::runtime_branch();
 
@@ -184,9 +186,9 @@ bool setup_functions()
 bool reload_runtime()
 {
     app::runtime_branch().clear();
-    if (!load_runtime())
+    if (!load_runtime(app::runtime_branch()))
         return false;
-    if (!setup_functions())
+    if (!setup_functions(app::runtime_branch()))
         return false;
 
     // Write window width & height
@@ -215,13 +217,14 @@ bool load_user_script_filename(std::string const& filename)
 
 bool evaluate_main_script()
 {
-    circa::EvalContext context;
-    circa::evaluate_branch(&context, app::runtime_branch());
+    App* app = &app::singleton();
 
-    if (context.errorOccurred) {
+    circa::evaluate_branch(&app->_evalContext, app::runtime_branch());
+
+    if (app->_evalContext.errorOccurred) {
         std::stringstream msg;
         msg << "Runtime error:" << std::endl;
-        circa::print_runtime_error_formatted(context, msg);
+        circa::print_runtime_error_formatted(app->_evalContext, msg);
         info(msg.str().c_str());
 
         app::pause(PauseStatus::RUNTIME_ERROR);

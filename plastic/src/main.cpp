@@ -7,14 +7,14 @@
 
 int main( int argc, char* args[] )
 {
+    circa_storage_use_filesystem();
+
     app::singleton()._binaryFilename = args[0];
 
     std::vector<std::string> argv;
 
     for (int i = 1; i < argc; i++)
         argv.push_back(args[i]);
-
-    circa_storage_use_filesystem();
 
     return plastic_main(argv);
 }

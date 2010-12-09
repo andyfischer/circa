@@ -77,6 +77,7 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
 
 CA_FUNCTION(load_font)
 {
+    //std::cout << "state before load_font: " << CONTEXT->state.toString() << std::endl;
     TaggedValue* state = STATE_INPUT;
     Font* output = Font::lazyCast(OUTPUT);
 
@@ -88,6 +89,7 @@ CA_FUNCTION(load_font)
     std::string path = STRING_INPUT(1);
     int pointSize = INT_INPUT(2);
 
+    std::cout << "Calling TTF_OpenFont(" << path.c_str() << std::endl;
     TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
     if (result == NULL) {
         std::stringstream err;
@@ -97,6 +99,8 @@ CA_FUNCTION(load_font)
 
     output->contents()->ttfFont = result;
     copy(output, state);
+
+    //std::cout << "state after load_font: " << CONTEXT->state.toString() << std::endl;
 }
 
 struct RenderedText : public TaggedValue

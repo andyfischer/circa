@@ -111,11 +111,12 @@ TypeRef DICT_T;
 TypeRef FILE_SIGNATURE_T;
 TypeRef FLOAT_T;
 TypeRef INT_T;
-TypeRef NULL_T;
 TypeRef STRING_T;
 TypeRef REF_T;
-TypeRef LIST_T;
 TypeRef VOID_T;
+
+Type NULL_TYPE;
+Type LIST_T;
 
 bool FINISHED_BOOTSTRAP = false;
 
@@ -126,8 +127,7 @@ Branch& kernel()
 
 void create_primitive_types()
 {
-    NULL_T = Type::create();
-    null_t::setup_type(NULL_T);
+    null_t::setup_type(&NULL_TYPE);
 
     DICT_T = Type::create();
     dict_t::setup_type(DICT_T);
@@ -147,8 +147,7 @@ void create_primitive_types()
     REF_T = Type::create();
     ref_t::setup_type(REF_T);
 
-    LIST_T = Type::create();
-    list_t::setup_type(LIST_T);
+    list_t::setup_type(&LIST_T);
 
     VOID_T = Type::create();
     void_t::setup_type(VOID_T);
@@ -240,7 +239,7 @@ void initialize_primitive_types(Branch& kernel)
     set_type(VOID_TYPE, VOID_T);
 
     LIST_TYPE = create_type(kernel, "List");
-    set_type(LIST_TYPE, LIST_T);
+    set_type(LIST_TYPE, &LIST_T);
 
     // ANY_TYPE was created in bootstrap_kernel
 }

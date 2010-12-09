@@ -14,7 +14,11 @@ std::string get_absolute_path(std::string const& path);
 
 namespace storage {
 
-typedef void (*FileReceiveFunc)(void* context, const char* contents);
+// Callback used in read_text_file. If the file is read successfully, then 'contents' will
+// contain its full contents. If there is an error, 'contents' will be NULL and 'error' will
+// have a human-readable description of the error.
+typedef void (*FileReceiveFunc)(void* context, const char* contents, const char* error);
+
 typedef void (*ReadTextFile)(const char* filename, FileReceiveFunc receiveFile, void* context);
 typedef void (*WriteTextFile)(const char* filename, const char* contents);
 typedef time_t (*GetModifiedTime)(const char* filename);
@@ -25,6 +29,7 @@ void write_text_file(const char* filename, const char* contents);
 time_t get_modified_time(const char* filename);
 bool file_exists(const char* filename);
 
+void read_text_file_to_value(const char* filename, TaggedValue* contents, TaggedValue* error);
 std::string read_text_file_as_str(const char* filename);
 
 struct StorageInterface {

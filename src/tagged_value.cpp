@@ -17,14 +17,14 @@ TaggedValue::TaggedValue()
 void
 TaggedValue::init()
 {
-    value_type = NULL_T;
+    value_type = &NULL_TYPE;
     value_data.ptr = 0;
 }
 
 TaggedValue::~TaggedValue()
 {
     // Deallocate this value
-    change_type(this, NULL_T);
+    change_type(this, &NULL_TYPE);
 }
 
 TaggedValue::TaggedValue(TaggedValue const& original)
@@ -244,7 +244,7 @@ void reset(TaggedValue* value)
     }
 
     // No default value, just change type to null and back
-    change_type(value, NULL_T);
+    change_type(value, &NULL_TYPE);
     change_type(value, type);
 }
 
@@ -416,8 +416,8 @@ void set_ref(TaggedValue* value, Term* t)
 
 List* set_list(TaggedValue* value)
 {
-    change_type(value, NULL_T); // substitute for 'reset'
-    change_type(value, LIST_T);
+    change_type(value, &NULL_TYPE); // substitute for 'reset'
+    change_type(value, &LIST_T);
     return List::checkCast(value);
 }
 
@@ -438,7 +438,7 @@ void set_type(TaggedValue* value, Type* type)
 
 void set_null(TaggedValue* value)
 {
-    change_type(value, NULL_T);
+    change_type(value, &NULL_TYPE);
 }
 
 void set_pointer(TaggedValue* value, Type* type, void* p)
@@ -572,7 +572,7 @@ bool is_value_of_type(TaggedValue* value, Type* type)
 
 bool is_null(TaggedValue* value)
 {
-    return value->value_type == NULL_T;
+    return value->value_type == &NULL_TYPE;
 }
 
 float to_float(TaggedValue* value)

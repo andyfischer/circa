@@ -740,7 +740,7 @@ namespace list_t {
 List::List()
   : TaggedValue()
 {
-    change_type(this, LIST_T);
+    change_type(this, &LIST_T);
 }
 
 TaggedValue*

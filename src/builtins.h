@@ -81,12 +81,13 @@ extern TypeRef DICT_T;
 extern TypeRef FILE_SIGNATURE_T;
 extern TypeRef FLOAT_T;
 extern TypeRef INT_T;
-extern TypeRef LIST_T;
-extern TypeRef NULL_T;
 extern TypeRef STRING_T;
 extern TypeRef REF_T;
 extern TypeRef TYPE_T;
 extern TypeRef VOID_T;
+
+extern Type NULL_TYPE;
+extern Type LIST_T;
 
 extern bool FINISHED_BOOTSTRAP;
 
