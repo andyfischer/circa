@@ -11,7 +11,7 @@ namespace map_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "def map(any,Indexable) -> List");
+        //FIXME import_function(kernel, evaluate, "def map(any,Indexable) -> List");
     }
 }
 } // namespace circa

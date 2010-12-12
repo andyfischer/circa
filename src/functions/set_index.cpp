@@ -15,13 +15,15 @@ namespace set_index_function {
 
     Term* specializeType(Term* caller)
     {
-        return caller->input(0)->type;
+        //FIXME
+        return LIST_TYPE;
+        //return caller->input(0)->type;
     }
 
     void setup(Branch& kernel)
     {
         SET_INDEX_FUNC = import_function(kernel, evaluate,
-                "set_index(any, int, any) -> any");
+                "set_index(any, int, any) -> List");
         function_t::get_specialize_type(SET_INDEX_FUNC) = specializeType;
     }
 }

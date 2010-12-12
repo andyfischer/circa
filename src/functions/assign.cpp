@@ -16,7 +16,9 @@ namespace assign_function {
 
     Term* specializeType(Term* term)
     {
-        return parser::find_lexpr_root(term->input(0))->type;
+        //FIXME
+        return ANY_TYPE;
+        //return parser::find_lexpr_root(term->input(0))->type;
     }
 
     Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredValue)

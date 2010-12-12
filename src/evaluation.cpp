@@ -23,8 +23,8 @@ void evaluate_single_term(EvalContext* context, Term* term)
     ca_assert(func != NULL);
     func(context, term);
 
-    #if 0
-    //#if ENABLE_UNNECESSARY_TYPE_CHECKS
+    //#if 0
+    #if ENABLE_UNNECESSARY_TYPE_CHECKS
     {
         Type* outputType = type_contents(term->type);
         TaggedValue* output = get_local(term);

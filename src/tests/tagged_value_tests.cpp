@@ -117,8 +117,7 @@ namespace subroutine_call_test_helper {
     CA_FUNCTION(assert_ints)
     {
         test_assert(is_int(INPUT(0)));
-        
-        // Disabled: function output is no longer automatically initialized to the type.
+        set_int(OUTPUT, 0);
     }
 }
 

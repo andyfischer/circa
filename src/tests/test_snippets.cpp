@@ -376,14 +376,12 @@ void test_set()
     test_snippet("s = Set(); s.add(1); s.add(1)", "to_string(s) == '{1}'");
 }
 
-void test_map()
+void test_map_type()
 {
     test_snippet("m = Map(); m.add(1,2)", "m.contains(1); to_string(m) == '{1: 2}'");
     test_snippet("m = Map(); m.add(1,2); m.add(3,4)", "m.get(1) == 2; m.get(3) == 4");
     test_snippet("m = Map(); m.add('a','b')",
         "m.contains('a'); m.remove('a'); not(m.contains('a'))");
-
-    test_snippet("def f(int i) -> int for i in [] return(0) end end; map(f, [0])", "");
 }
 
 void test_field_syntax()
@@ -550,7 +548,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
-    REGISTER_TEST_CASE(test_snippets::test_map);
+    REGISTER_TEST_CASE(test_snippets::test_map_type);
     REGISTER_TEST_CASE(test_snippets::test_field_syntax);
     REGISTER_TEST_CASE(test_snippets::test_lexprs);
     //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);

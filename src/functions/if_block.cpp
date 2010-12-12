@@ -51,7 +51,7 @@ namespace if_block_function {
 
     void setup(Branch& kernel)
     {
-        IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block()");
+        IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         function_t::get_attrs(IF_BLOCK_FUNC).formatSource = formatSource;
         function_t::get_attrs(IF_BLOCK_FUNC).getRegisterCount = get_register_count;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
