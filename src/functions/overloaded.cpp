@@ -215,9 +215,16 @@ namespace overloaded_function {
         set_ref(parameters.append(), overload);
     }
 
+    CA_FUNCTION(evaluate_declaration)
+    {
+        // Make our output of type Function so that the type checker doesn't
+        // get mad. This value isn't used.
+        change_type(OUTPUT, type_contents(FUNCTION_TYPE));
+    }
+
     void setup(Branch& kernel)
     {
-        OVERLOADED_FUNCTION_FUNC = import_function(kernel, NULL,
+        OVERLOADED_FUNCTION_FUNC = import_function(kernel, evaluate_declaration,
                 "overloaded_function(Function...) -> Function");
     }
 }

@@ -158,7 +158,15 @@ void test_equals_function(TaggedValue* a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
-    return test_equals_function(a->toString(), b, aText, bText, line, file);
+    return test_equals_function(is_string(a) ? as_string(a) : to_string(a),
+            b, aText, bText, line, file);
+}
+
+void test_equals_function(TaggedValue* a, float b,
+        const char* aText, const char* bText,
+        int line, const char* file)
+{
+    return test_equals_function(a->toFloat(), b, aText, bText, line, file);
 }
 
 bool run_test(TestCase& testCase, bool catch_exceptions)
