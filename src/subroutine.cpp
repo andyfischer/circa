@@ -131,9 +131,22 @@ namespace subroutine_t {
 
         finish_using(contents);
 
+        // Write output
         TaggedValue* outputDest = get_output(context, caller);
         if (outputDest != NULL)
             swap(&output, outputDest);
+
+        // Sanity check output
+        if (outputDest == NULL)
+            ca_assert(outputTypeTerm == VOID_TYPE);
+
+        if (!value_fits_type(outputDest, outputType)) {
+            std::stringstream msg;
+            msg << "Subroutine " << caller->function->name << " produced output "
+                << outputDest->toString() << " which doesn't fit output type "
+                << outputType->name;
+            internal_error(msg.str());
+        }
     }
 }
 
