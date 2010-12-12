@@ -7,9 +7,11 @@ namespace vectorize_vs_function {
 
     Term* specializeType(Term* caller)
     {
+        #if 0
         Term* lhsType = caller->input(0)->type;
         if (list_t::is_list_based_type(type_contents(lhsType)))
             return lhsType;
+        #endif
         return LIST_TYPE;
     }
 

@@ -11,6 +11,7 @@ void change_function(Term* term, Term* newFunction);
 
 void unsafe_change_type(Term* term, Term* type);
 void change_type(Term* term, Term* type);
+void possibly_respecialize_type(Term* term);
 void specialize_type(Term* term, Term* type);
 
 // Rename term, modify the name binding of the owning branch if necessary

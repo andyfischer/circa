@@ -96,7 +96,9 @@ namespace subroutine_t {
         Type* outputType = type_contents(outputTypeTerm);
         TaggedValue output;
 
-        if (outputTypeTerm != VOID_TYPE) {
+        if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
+            set_null(&output);
+        } else {
             TaggedValue* outputSource = NULL;
 
             if (!is_null(&context->subroutineOutput)) {
@@ -136,17 +138,6 @@ namespace subroutine_t {
         if (outputDest != NULL)
             swap(&output, outputDest);
 
-        // Sanity check output
-        if (outputDest == NULL)
-            ca_assert(outputTypeTerm == VOID_TYPE);
-
-        if (!value_fits_type(outputDest, outputType)) {
-            std::stringstream msg;
-            msg << "Subroutine " << caller->function->name << " produced output "
-                << outputDest->toString() << " which doesn't fit output type "
-                << outputType->name;
-            internal_error(msg.str());
-        }
     }
 }
 

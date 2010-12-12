@@ -42,12 +42,21 @@ void change_type(Term *term, Term *typeTerm)
     Term* oldType = term->type;
 
     term->type = typeTerm;
-    change_type(term, &as_type(typeTerm));
+    change_type(term, type_contents(typeTerm));
 
     if (oldType == typeTerm)
         return;
 
-    reset(term);
+    // Cascade type inference
+    for (int user=0; user < term->users.length(); user++)
+        possibly_respecialize_type(term->users[user]);
+}
+
+void possibly_respecialize_type(Term* term)
+{
+    Term* outputType = function_get_specialized_output_type(term->function, term);
+    if (outputType != term->type)
+        change_type(term, outputType);
 }
 
 void specialize_type(Term *term, Term *type)

@@ -22,6 +22,22 @@ void evaluate_single_term(EvalContext* context, Term* term)
     EvaluateFunc func = function_t::get_evaluate(term->function);
     ca_assert(func != NULL);
     func(context, term);
+
+    #if 0
+    //#if ENABLE_UNNECESSARY_TYPE_CHECKS
+    {
+        Type* outputType = type_contents(term->type);
+        TaggedValue* output = get_local(term);
+
+        if (!context->errorOccurred && !value_fits_type(output, outputType)) {
+            std::stringstream msg;
+            msg << "Function " << term->function->name << " produced output "
+                << output->toString() << " which doesn't fit output type "
+                << outputType->name;
+            internal_error(msg.str());
+        }
+    }
+    #endif
 }
 
 void evaluate_branch_internal(EvalContext* context, Branch& branch)

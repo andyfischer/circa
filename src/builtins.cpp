@@ -312,9 +312,9 @@ void post_setup_functions(Branch& kernel)
 
     // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
-    set_ref(function_t::get_parameters(mult_v), MULT_FUNC);
+    set_ref(function_t::get_parameters(mult_v), kernel["mult_f"]);
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
-    set_ref(function_t::get_parameters(mult_s), MULT_FUNC);
+    set_ref(function_t::get_parameters(mult_s), kernel["mult_f"]);
 
     overloaded_function::append_overload(MULT_FUNC, mult_v);
     overloaded_function::append_overload(MULT_FUNC, mult_s);
