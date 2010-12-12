@@ -60,6 +60,7 @@ def draw_vmenu(Point topleft, List items) -> any
         index += 1
     end
 
+    print('returing = ' result)
     return(result)
 end
 

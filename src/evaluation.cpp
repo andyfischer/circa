@@ -28,8 +28,14 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch)
 {
     start_using(branch);
 
-    for (int i=0; i < branch.length(); i++)
+    for (int i=0; i < branch.length(); i++) {
         evaluate_single_term(context, branch[i]);
+
+//        if (context->errorOccurred || context->interruptSubroutine)
+//            break;
+          if (context->errorOccurred)
+              break;
+    }
 
     finish_using(branch);
 }

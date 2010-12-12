@@ -55,12 +55,17 @@ namespace subroutine_t {
             Type* inputType = type_contents(function_t::get_input_type(function, i));
 
             bool success = cast(input, inputType, inputs[i]);
-            ca_assert(success);
+            if (!success) {
+                std::stringstream msg;
+                msg << "Couldn't cast input " << i << " to " << inputType->name;
+                ca_assert(false);
+                return error_occurred(context, caller, msg.str());
+            }
         }
 
         start_using(contents);
 
-        // Insert inputs into placeholdes
+        // Insert inputs into placeholders
         for (int i=0; i < caller->numInputs(); i++) {
             Term* placeholder = function_t::get_input_placeholder(function, i);
             swap(inputs[i], get_local(placeholder));
@@ -79,7 +84,7 @@ namespace subroutine_t {
         // Evaluate each term
         for (int i=0; i < contents.length(); i++) {
             evaluate_single_term(context, contents[i]);
-            if (context->interruptSubroutine)
+            if (context->errorOccurred || context->interruptSubroutine)
                 break;
         }
 

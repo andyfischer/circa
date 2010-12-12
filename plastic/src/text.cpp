@@ -121,7 +121,7 @@ CA_FUNCTION(render_text)
 {
     RenderedText* state = (RenderedText*) STATE_INPUT;
     if (!cast(state, RenderedText::singleton, state))
-        return error_occurred(CONTEXT, CALLER, "state couldn't be cast to RenderedText");
+        change_type(state, RenderedText::singleton);
 
     touch(state);
 
