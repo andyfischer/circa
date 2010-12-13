@@ -5,19 +5,15 @@ menu_font = ui_font_medium
 
 def draw_vmenu(Point topleft, List items) -> any
 
-    print('check 1')
     labels = []
     for item in items
         labels.append(item[0])
     end
-    print('check 2')
 
     -- Render text sprites
     for label in @labels
         text:render_text(menu_font, @label, #fff)
     end
-
-    print('check 3')
 
     -- Get maximum text width
     text_width = 0
@@ -25,7 +21,6 @@ def draw_vmenu(Point topleft, List items) -> any
         max(@text_width, label.width)
     end
 
-    print('check 3.5')
     index = 0
     item_height = 21
     h_gutter = 5
@@ -35,14 +30,10 @@ def draw_vmenu(Point topleft, List items) -> any
     box_height = length(labels) * item_height + v_gutter*2
     result = 0
 
-    print('check 4')
-
     -- Draw rounded corners on top
     rounded_radius = 5.0
     bgrect_topleft = topleft - [0 v_gutter]
     fill_rounded_rect(to_rect(bgrect_topleft [box_width box_height]) rounded_radius bg_color)
-
-    print('check 5')
 
     -- Draw each label
     for label in labels
@@ -68,8 +59,6 @@ def draw_vmenu(Point topleft, List items) -> any
 
         index += 1
     end
-
-    print('check 6')
 
     print('returing = ' result)
     return(result)

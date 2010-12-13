@@ -40,9 +40,6 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_dynamic_overload)
     {
-        //std::cout << STACK->toString() << std::endl;
-        //std::cout << get_term_to_string_extended(CALLER) << std::endl;
-
         Branch& contents = CALLER->nestedContents;
         Term* func = CALLER->function;
 
@@ -74,7 +71,7 @@ namespace overloaded_function {
             }
 
             if (!inputsMatch)
-                break;
+                continue;
 
             specializedFunc = overload;
             break;
@@ -91,7 +88,7 @@ namespace overloaded_function {
             evaluate_branch_internal(CONTEXT, contents, &output);
             cast(&output, type_contents(contents[0]->type), OUTPUT);
         } else {
-            set_string(OUTPUT, "(specialized func not found)");
+            return error_occurred(CONTEXT, CALLER, "specialized func not found");
         }
     }
 
