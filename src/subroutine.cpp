@@ -89,9 +89,6 @@ namespace subroutine_t {
                 break;
         }
 
-        //std::cout << "finished subroutine, stack = " << context->stack.toString() <<std::endl;
-        //dump_branch(contents);
-
         // Fetch output
         Term* outputTypeTerm = function_t::get_output_type(caller->function);
         Type* outputType = type_contents(outputTypeTerm);
@@ -133,12 +130,12 @@ namespace subroutine_t {
         swap(&context->currentScopeState, &prevScopeState);
 
         finish_using(contents);
+        context->interruptSubroutine = false;
 
         // Write output
         TaggedValue* outputDest = get_output(context, caller);
         if (outputDest != NULL)
             swap(&output, outputDest);
-
     }
 }
 

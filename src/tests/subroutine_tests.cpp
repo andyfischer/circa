@@ -202,6 +202,15 @@ void bug_with_return()
     test_assert(f->asInt() == 2);
 }
 
+void bug_where_interrupt_subroutine_wasnt_being_cleared()
+{
+    Branch branch;
+    branch.compile("def f()->int return(1) end");
+    branch.compile("def g()->int a = f() return(2) end");
+    TaggedValue* x = branch.eval("x = g()");
+    test_equals(x, 2);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
@@ -214,6 +223,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::stateful_function_with_arguments);
     REGISTER_TEST_CASE(subroutine_tests::to_source_string);
     REGISTER_TEST_CASE(subroutine_tests::bug_with_return);
+    REGISTER_TEST_CASE(subroutine_tests::bug_where_interrupt_subroutine_wasnt_being_cleared);
 }
 
 } // namespace refactoring_tests
