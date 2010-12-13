@@ -60,19 +60,22 @@ namespace include_function {
     {
         Branch& contents = CALLER->nestedContents;
 
-        load_script(CONTEXT, CALLER, &contents.fileSignature,
-            STRING_INPUT(0));
+        load_script(CONTEXT, CALLER, &contents.fileSignature, STRING_INPUT(0));
 
         if (CONTEXT->errorOccurred)
             return;
 
         evaluate_branch_internal_with_state(CONTEXT, CALLER);
+
+        set_null(OUTPUT);
     }
 
     CA_FUNCTION(load_script)
     {
         load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
             STRING_INPUT(0));
+
+        set_null(OUTPUT);
     }
 
     void setup(Branch& kernel)

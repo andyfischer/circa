@@ -1,10 +1,22 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#include "circa.h"
+#include "common_headers.h"
+
+#include "branch.h"
+#include "building.h"
+#include "evaluation.h"
+#include "function.h"
+#include "importing_macros.h"
+#include "parser.h"
+#include "tagged_value.h"
+#include "type.h"
 
 namespace circa {
 
-CA_FUNCTION(empty_evaluate_function) {}
+CA_FUNCTION(empty_evaluate_function)
+{
+    set_null(OUTPUT);
+}
 
 Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& header)
 {
