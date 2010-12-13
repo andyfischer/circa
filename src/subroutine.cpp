@@ -42,12 +42,13 @@ namespace subroutine_t {
         Term* function = caller->function;
         Branch& contents = function->nestedContents;
         context->interruptSubroutine = false;
+        int numInputs = caller->numInputs();
 
         // Copy inputs to a temporary list
         List inputs;
-        inputs.resize(caller->numInputs());
+        inputs.resize(numInputs);
 
-        for (int i=0; i < caller->numInputs(); i++) {
+        for (int i=0; i < numInputs; i++) {
             TaggedValue* input = get_input(context, caller, i);
             if (input == NULL)
                 continue;
@@ -66,7 +67,7 @@ namespace subroutine_t {
         start_using(contents);
 
         // Insert inputs into placeholders
-        for (int i=0; i < caller->numInputs(); i++) {
+        for (int i=0; i < numInputs; i++) {
             Term* placeholder = function_t::get_input_placeholder(function, i);
             swap(inputs[i], get_local(placeholder));
         }
@@ -82,7 +83,7 @@ namespace subroutine_t {
             fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
 
         // Evaluate each term
-        for (int i=0; i < contents.length(); i++) {
+        for (int i=numInputs+1; i < contents.length(); i++) {
             evaluate_single_term(context, contents[i]);
             if (context->errorOccurred || context->interruptSubroutine)
                 break;
@@ -169,31 +170,7 @@ void subroutine_update_state_type_from_contents(Term* func)
         return;
     }
 
-    bool hasState = has_implicit_state(func);
-    #if 0
-    Branch& contents = func->nestedContents;
-    for (int i=0; i < contents.length(); i++) {
-        Term* term = contents[i];
-        if (term == NULL)
-            continue;
-        if (is_get_state(term)) {
-            hasState = true;
-            break;
-        }
-        if (is_subroutine(term->function)) {
-            if (is_function_stateful(term->function)) {
-                hasState = true;
-                break;
-            }
-        }
-        if (term->function == IF_BLOCK_FUNC) {
-            if (if_block
-
-        }
-    }
-    #endif
-
-    if (hasState)
+    if (has_implicit_state(func))
         subroutine_change_state_type(func, LIST_TYPE);
 }
 
