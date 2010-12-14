@@ -8,7 +8,7 @@ namespace one_time_assign_function {
     CA_FUNCTION(evaluate)
     {
         if (!BOOL_INPUT(0)) {
-            cast(INPUT(1), type_contents(CALLER->type), OUTPUT);
+            cast(INPUT(1), unbox_type(CALLER->type), OUTPUT);
             set_bool(INPUT(0), true);
         }
     }

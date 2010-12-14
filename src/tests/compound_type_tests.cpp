@@ -61,12 +61,12 @@ void test_cast()
     Term* t = branch.compile("type T { string a }");
     TaggedValue* a = branch.eval("['hi']");
     test_assert(is_list(a));
-    test_assert(a->value_type != type_contents(t));
+    test_assert(a->value_type != unbox_type(t));
 
     TaggedValue casted;
-    test_assert(cast(a, type_contents(t), &casted));
+    test_assert(cast(a, unbox_type(t), &casted));
     test_assert(is_list(&casted));
-    test_assert(casted.value_type == type_contents(t));
+    test_assert(casted.value_type == unbox_type(t));
 }
 
 void test_bug_with_cast()
@@ -77,7 +77,7 @@ void test_bug_with_cast()
     set_int(value.append(), 72);
     set_int(value.append(), 18);
     List* color = set_list(value.append(), 0);
-    change_type(color, type_contents(COLOR_TYPE));
+    change_type(color, unbox_type(COLOR_TYPE));
     set_float(color->get(0), 1.0);
     set_float(color->get(1), 1.0);
     set_float(color->get(2), 1.0);
@@ -91,7 +91,7 @@ void test_bug_with_cast()
         "int texid, int width, int height, Color color, string text }");
 
     TaggedValue castResult;
-    cast(&value, type_contents(renderedText), &castResult);
+    cast(&value, unbox_type(renderedText), &castResult);
 
     test_equals(&castResult, "[1, 72, 18, [1.0, 1.0, 1.0, 1.0], 'Asteroids']");
 }

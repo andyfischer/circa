@@ -102,7 +102,7 @@ void migrate_across_user_defined_types()
     Branch branch;
     Term* typeT = branch.compile("type T { int x }");
     TaggedValue* x = branch.eval("x = [1]");
-    test_assert(value_fits_type(x, type_contents(typeT)));
+    test_assert(value_fits_type(x, unbox_type(typeT)));
 
     // Type T is defined the same way
     test_migration("type T { int x } \n state T t = [1]",

@@ -9,7 +9,7 @@ namespace vectorize_vs_function {
     {
         #if 0
         Term* lhsType = caller->input(0)->type;
-        if (list_t::is_list_based_type(type_contents(lhsType)))
+        if (list_t::is_list_based_type(unbox_type(lhsType)))
             return lhsType;
         #endif
         return LIST_TYPE;

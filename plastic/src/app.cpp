@@ -87,7 +87,7 @@ CA_FUNCTION(trace)
 {
     std::stringstream out;
     for (int i = 0; i < NUM_INPUTS; i++) {
-        if (INPUT(i)->value_type == circa::type_contents(circa::STRING_TYPE))
+        if (INPUT(i)->value_type == circa::unbox_type(circa::STRING_TYPE))
             out << circa::as_string(INPUT(i));
         else
             out << INPUT(i)->toString();

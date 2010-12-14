@@ -60,7 +60,7 @@ namespace overloaded_function {
             // Check each input
             bool inputsMatch = true;
             for (int i=0; i < numInputs; i++) {
-                Type* type = type_contents(function_t::get_input_type(overload, i));
+                Type* type = unbox_type(function_t::get_input_type(overload, i));
                 TaggedValue* value = INPUT(i);
                 if (value == NULL)
                     continue;
@@ -86,7 +86,7 @@ namespace overloaded_function {
             }
             TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
-            cast(&output, type_contents(contents[0]->type), OUTPUT);
+            cast(&output, unbox_type(contents[0]->type), OUTPUT);
         } else {
             return error_occurred(CONTEXT, CALLER, "specialized func not found");
         }
@@ -216,7 +216,7 @@ namespace overloaded_function {
     {
         // Make our output of type Function so that the type checker doesn't
         // get mad. This value isn't used.
-        change_type(OUTPUT, type_contents(FUNCTION_TYPE));
+        change_type(OUTPUT, unbox_type(FUNCTION_TYPE));
     }
 
     void setup(Branch& kernel)

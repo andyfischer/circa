@@ -14,20 +14,20 @@ void initialize_compound_type(Type* type)
 
 void initialize_compound_type(Term* term)
 {
-    initialize_compound_type(type_contents(term));
+    initialize_compound_type(unbox_type(term));
 }
 
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);
     initialize_compound_type(term);
-    type_contents(term)->name = name;
+    unbox_type(term)->name = name;
     return term;
 }
 
 Type* get_compound_list_element_type(Type* compoundType, int index)
 {
-    return type_contents(compoundType->prototype[index]->type);
+    return unbox_type(compoundType->prototype[index]->type);
 }
 
 }

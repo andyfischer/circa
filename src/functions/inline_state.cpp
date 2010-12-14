@@ -52,7 +52,7 @@ namespace inline_state_function {
         // Otherwise, reset to default value of type
         } else {
             ca_assert(CALLER != NULL);
-            change_type(OUTPUT, type_contents(CALLER->type));
+            change_type(OUTPUT, unbox_type(CALLER->type));
             reset(OUTPUT);
         }
 

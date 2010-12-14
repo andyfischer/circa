@@ -84,7 +84,7 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
     }
 
     // Check type
-    if (term_output_never_satisfies_type(input, type_contents(type)))
+    if (term_output_never_satisfies_type(input, unbox_type(type)))
         return SERROR_INPUT_TYPE_ERROR;
 
     return SERROR_NO_ERROR;

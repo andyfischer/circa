@@ -50,8 +50,8 @@ namespace float_t {
     }
     bool is_subtype(Type* type, Type* otherType)
     {
-        return otherType == type_contents(FLOAT_TYPE)
-            || otherType == type_contents(INT_TYPE);
+        return otherType == unbox_type(FLOAT_TYPE)
+            || otherType == unbox_type(INT_TYPE);
     }
 
     std::string to_source_string(Term* term)

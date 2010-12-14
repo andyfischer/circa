@@ -42,12 +42,12 @@ void compare_builtin_types()
 {
     Branch branch;
     Term* aFloat = branch.compile("1.2");
-    test_assert(term_output_always_satisfies_type(aFloat, type_contents(FLOAT_TYPE)));
-    test_assert(term_output_never_satisfies_type(aFloat, type_contents(INT_TYPE)));
+    test_assert(term_output_always_satisfies_type(aFloat, unbox_type(FLOAT_TYPE)));
+    test_assert(term_output_never_satisfies_type(aFloat, unbox_type(INT_TYPE)));
 
     Term* anInt = branch.compile("1");
-    test_assert(term_output_always_satisfies_type(anInt, type_contents(FLOAT_TYPE)));
-    test_assert(term_output_always_satisfies_type(anInt, type_contents(INT_TYPE)));
+    test_assert(term_output_always_satisfies_type(anInt, unbox_type(FLOAT_TYPE)));
+    test_assert(term_output_always_satisfies_type(anInt, unbox_type(INT_TYPE)));
 }
 
 void register_tests()

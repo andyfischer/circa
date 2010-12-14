@@ -7,8 +7,8 @@ namespace callable_t {
 
     bool is_subtype(Type* type, Type* otherType)
     {
-        return otherType == type_contents(FUNCTION_TYPE)
-            || otherType == type_contents(TYPE_TYPE);
+        return otherType == unbox_type(FUNCTION_TYPE)
+            || otherType == unbox_type(TYPE_TYPE);
     }
     void setup_type(Type* type)
     {

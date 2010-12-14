@@ -203,7 +203,7 @@ CA_FUNCTION(draw_rendered_text)
 
 void pre_setup(Branch& branch)
 {
-    FontRef::singleton = type_contents(create_type(branch, "Font"));
+    FontRef::singleton = unbox_type(create_type(branch, "Font"));
     intrusive_refcounted::setup_type<FontRef>(FontRef::singleton);
 }
 
@@ -219,7 +219,7 @@ void setup(Branch& branch)
     install_function(text_ns["render_text"], render_text);
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);
 
-    RenderedText::singleton = type_contents(text_ns["RenderedText"]);
+    RenderedText::singleton = unbox_type(text_ns["RenderedText"]);
 }
 
 } // namespace text

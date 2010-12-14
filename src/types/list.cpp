@@ -332,7 +332,7 @@ namespace list_t {
             list->resize(prototype.length());
 
             for (int i=0; i < prototype.length(); i++)
-                change_type(list->get(i), type_contents(prototype[i]->type));
+                change_type(list->get(i), unbox_type(prototype[i]->type));
         }
     }
 
@@ -487,7 +487,7 @@ namespace list_t {
         
         // If prototype is empty then accept any list
         if (prototype.length() == 0) {
-            if (is_list_based_type(type_contents(term->type)))
+            if (is_list_based_type(unbox_type(term->type)))
                 return result->succeed();
             else
                 return result->fail();
@@ -501,13 +501,13 @@ namespace list_t {
 
             for (int i=0; i < prototype.length(); i++)
                 if (!circa::term_output_always_satisfies_type(
-                            term->input(i), type_contents(prototype[i]->type)))
+                            term->input(i), unbox_type(prototype[i]->type)))
                     return result->fail();
 
             return result->succeed();
         }
 
-        if (is_subtype(type, type_contents(term->type)))
+        if (is_subtype(type, unbox_type(term->type)))
             return result->succeed();
         else
             return result->fail();
@@ -531,8 +531,8 @@ namespace list_t {
 
         // Check each element
         for (int i=0; i < prototype.length(); i++)
-            if (!circa::is_subtype(type_contents(prototype[i]->type),
-                        type_contents(otherPrototype[i]->type)))
+            if (!circa::is_subtype(unbox_type(prototype[i]->type),
+                        unbox_type(otherPrototype[i]->type)))
                 return false;
 
         return true;
@@ -553,7 +553,7 @@ namespace list_t {
 
         for (int i=0; i < numElements; i++)
             if (!circa::value_fits_type(value->getIndex(i),
-                        type_contents(prototype[i]->type)))
+                        unbox_type(prototype[i]->type)))
                 return false;
         return true;
     }

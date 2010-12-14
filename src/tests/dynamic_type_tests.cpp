@@ -109,7 +109,7 @@ void test_dynamic_overload()
     Term* add_i = get_global("add_i");
     test_assert(add_i == overloaded_function::get_overload(ADD_FUNC, 0));
 
-    test_assert(value_fits_type(a, type_contents(INT_TYPE)));
+    test_assert(value_fits_type(a, unbox_type(INT_TYPE)));
 
     RefList inputs(a,b);
     test_assert(inputs_fit_function_dynamic(add_i, inputs));

@@ -212,7 +212,7 @@ void bootstrap_kernel()
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
-    change_type((TaggedValue*)VALUE_FUNC, type_contents(FUNCTION_TYPE));
+    change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 }
 
 void initialize_primitive_types(Branch& kernel)
@@ -260,7 +260,7 @@ void pre_setup_types(Branch& kernel)
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
 
     // FileSignature is used in some builtin functions
-    FILE_SIGNATURE_T = type_contents(parse_type(kernel,
+    FILE_SIGNATURE_T = unbox_type(parse_type(kernel,
             "type FileSignature { string filename, int time_modified }"));
 
     namespace_function::early_setup(kernel);
@@ -271,13 +271,13 @@ void initialize_compound_types(Branch& kernel)
     type_t::setup_type(TYPE_TYPE);
 
     Term* set_type = create_compound_type(kernel, "Set");
-    set_t::setup_type(type_contents(set_type));
+    set_t::setup_type(unbox_type(set_type));
 
     // LIST_TYPE was created in bootstrap_kernel
     list_t::postponed_setup_type(LIST_TYPE);
 
     Term* map_type = create_compound_type(kernel, "Map");
-    map_t::setup_type(type_contents(map_type));
+    map_t::setup_type(unbox_type(map_type));
 
     branch_ref_t::initialize(kernel);
 
@@ -337,7 +337,7 @@ void parse_hosted_types(Branch& kernel)
 
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
-    color_t::setup_type(type_contents(COLOR_TYPE));
+    color_t::setup_type(unbox_type(COLOR_TYPE));
 }
 
 void post_setup_types()

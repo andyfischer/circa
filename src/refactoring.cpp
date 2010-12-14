@@ -42,7 +42,7 @@ void change_type(Term *term, Term *typeTerm)
     Term* oldType = term->type;
 
     term->type = typeTerm;
-    change_type(term, type_contents(typeTerm));
+    change_type(term, unbox_type(typeTerm));
 
     if (oldType == typeTerm)
         return;

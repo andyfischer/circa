@@ -26,7 +26,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     //#if 0
     #if ENABLE_UNNECESSARY_TYPE_CHECKS
     {
-        Type* outputType = type_contents(term->type);
+        Type* outputType = unbox_type(term->type);
         TaggedValue* output = get_local(term);
 
         if (!context->errorOccurred && !value_fits_type(output, outputType)) {

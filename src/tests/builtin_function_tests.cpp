@@ -134,7 +134,7 @@ void test_get_index()
     TaggedValue* get = branch.eval("get_index(l, 0)");
 
     test_assert(get);
-    test_assert(get->value_type == type_contents(INT_TYPE));
+    test_assert(get->value_type == unbox_type(INT_TYPE));
     test_assert(get->asInt() == 1);
 
     // FIXME

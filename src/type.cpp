@@ -182,7 +182,7 @@ Type& as_type(Term *term)
     return *get_type_value(term);
 }
 
-Type* type_contents(Term* type)
+Type* unbox_type(Term* type)
 {
     return get_type_value(type);
 }
@@ -218,7 +218,7 @@ static void run_static_type_query(Type* type, Term* outputTerm, StaticTypeQuery*
     }
 
     // Finally, use is_subtype
-    if (is_subtype(type, type_contents(outputTerm->type)))
+    if (is_subtype(type, unbox_type(outputTerm->type)))
         return result->succeed();
     else
         return result->fail();
@@ -289,14 +289,14 @@ Term* create_implicit_tuple_type(RefList const& types)
     typeName << "Tuple<";
     for (int i=0; i < types.length(); i++) {
         if (i != 0) typeName << ",";
-        typeName << type_contents(types[i])->name;
+        typeName << unbox_type(types[i])->name;
     }
     typeName << ">";
 
     Term* result = create_type(IMPLICIT_TYPES->nestedContents, typeName.str());
-    list_t::setup_type(type_contents(result));
-    Branch& prototype = type_contents(result)->prototype;
-    type_contents(result)->parent = type_contents(LIST_TYPE);
+    list_t::setup_type(unbox_type(result));
+    Branch& prototype = unbox_type(result)->prototype;
+    unbox_type(result)->parent = unbox_type(LIST_TYPE);
 
     for (int i=0; i < types.length(); i++) {
         ca_assert(is_type(types[i]));

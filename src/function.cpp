@@ -380,7 +380,7 @@ bool inputs_statically_fit_function(Term* func, RefList const& inputs)
         return false;
 
     for (int i=0; i < inputs.length(); i++) {
-        Type* type = type_contents(function_t::get_input_type(func, i));
+        Type* type = unbox_type(function_t::get_input_type(func, i));
         Term* input = inputs[i];
         if (input == NULL)
             continue;
@@ -402,7 +402,7 @@ bool inputs_fit_function_dynamic(Term* func, RefList const& inputs)
         return false;
 
     for (int i=0; i < inputs.length(); i++) {
-        Type* type = type_contents(function_t::get_input_type(func, i));
+        Type* type = unbox_type(function_t::get_input_type(func, i));
         TaggedValue* value = inputs[i];
         if (value == NULL)
             continue;
@@ -421,7 +421,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
         return false;
 
     for (int i=0; i < list->length(); i++) {
-        Type* type = type_contents(function_t::get_input_type(func, i));
+        Type* type = unbox_type(function_t::get_input_type(func, i));
         TaggedValue* value = list->get(i);
         if (value == NULL)
             continue;

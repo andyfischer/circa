@@ -188,7 +188,7 @@ namespace type_t {
 }
 
 Type& as_type(Term* term);
-Type* type_contents(Term* type);
+Type* unbox_type(Term* type);
 bool is_native_type(Term* type);
 Type* declared_type(Term* term);
 

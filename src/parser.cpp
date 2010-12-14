@@ -1131,7 +1131,7 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
     std::string const& fieldName = fieldNameTerm->asString();
     std::string nameRebind;
 
-    Term* memberFunction = find_member_function(type_contents(head->type), fieldName);
+    Term* memberFunction = find_member_function(unbox_type(head->type), fieldName);
 
     if (memberFunction != NULL) {
         inputs.prepend(head);

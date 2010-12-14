@@ -67,7 +67,7 @@ void render()
 
 void set_point(circa::TaggedValue* value, float x, float y)
 {
-    change_type(value, type_contents(circa::get_global("Point")));
+    change_type(value, unbox_type(circa::get_global("Point")));
     touch(value);
     set_float(value->getIndex(0), x);
     set_float(value->getIndex(1), y);
@@ -76,7 +76,7 @@ void set_point(circa::TaggedValue* value, float x, float y)
 void touch_event_to_tagged_value(ofTouchEventArgs& event, circa::TaggedValue* eventType,
     circa::TaggedValue* value)
 {
-    change_type(value, type_contents(app::runtime_branch()["TouchEvent"]));
+    change_type(value, unbox_type(app::runtime_branch()["TouchEvent"]));
     List* list = List::checkCast(value);
     
     touch(list);

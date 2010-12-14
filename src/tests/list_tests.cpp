@@ -54,7 +54,7 @@ void test_cast()
     test_equals(x.toString(), "[1, 2]");
 
     Term* t_term = branch.compile("type T { int i, number f }");
-    Type* t = type_contents(t_term);
+    Type* t = unbox_type(t_term);
 
     test_assert(!cast_possible(&a, t));
     test_assert(cast_possible(&b, t));

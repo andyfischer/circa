@@ -65,7 +65,7 @@ bool Term::hasProperty(std::string const& name)
 TaggedValue* Term::addProperty(std::string const& name, Term* type)
 {
     TaggedValue* prop = properties.insert(name.c_str());
-    Type* valueType = type_contents(type);
+    Type* valueType = unbox_type(type);
 
     if (!is_null(prop) && prop->value_type != valueType)
         internal_error("Property "+name+" exists with different type");

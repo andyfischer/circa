@@ -53,7 +53,7 @@ namespace subroutine_t {
             if (input == NULL)
                 continue;
 
-            Type* inputType = type_contents(function_t::get_input_type(function, i));
+            Type* inputType = unbox_type(function_t::get_input_type(function, i));
 
             bool success = cast(input, inputType, inputs[i]);
             if (!success) {
@@ -91,7 +91,7 @@ namespace subroutine_t {
 
         // Fetch output
         Term* outputTypeTerm = function_t::get_output_type(caller->function);
-        Type* outputType = type_contents(outputTypeTerm);
+        Type* outputType = unbox_type(outputTypeTerm);
         TaggedValue output;
 
         if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {

@@ -34,15 +34,15 @@ void test_term_output_always_satisfies_type()
     Branch branch;
 
     Term* a = create_int(branch, 5);
-    test_assert(term_output_always_satisfies_type(a, type_contents(INT_TYPE)));
-    test_assert(term_output_always_satisfies_type(a, type_contents(FLOAT_TYPE)));
-    test_assert(!term_output_always_satisfies_type(a, type_contents(STRING_TYPE)));
-    test_assert(term_output_always_satisfies_type(a, type_contents(ANY_TYPE)));
+    test_assert(term_output_always_satisfies_type(a, unbox_type(INT_TYPE)));
+    test_assert(term_output_always_satisfies_type(a, unbox_type(FLOAT_TYPE)));
+    test_assert(!term_output_always_satisfies_type(a, unbox_type(STRING_TYPE)));
+    test_assert(term_output_always_satisfies_type(a, unbox_type(ANY_TYPE)));
 
-    Type* t1 = type_contents(branch.compile("type t1 { int a, number b }"));
-    Type* t2 = type_contents(branch.compile("type t2 { int a }"));
-    Type* t3 = type_contents(branch.compile("type t3 { int a, number b, string c }"));
-    Type* t4 = type_contents(branch.compile("type t4 { number a, int b }"));
+    Type* t1 = unbox_type(branch.compile("type t1 { int a, number b }"));
+    Type* t2 = unbox_type(branch.compile("type t2 { int a }"));
+    Type* t3 = unbox_type(branch.compile("type t3 { int a, number b, string c }"));
+    Type* t4 = unbox_type(branch.compile("type t4 { number a, int b }"));
 
     Term* v1 = branch.compile("[1, 2.0]");
     test_assert(term_output_always_satisfies_type(v1, t1));
@@ -157,8 +157,8 @@ void test_list_based_types()
     Branch branch;
     Term* l = branch.compile("[1 2]");
 
-    test_assert(term_output_always_satisfies_type(l, type_contents(LIST_TYPE)));
-    test_assert(term_output_always_satisfies_type(l, type_contents(get_global("Point"))));
+    test_assert(term_output_always_satisfies_type(l, unbox_type(LIST_TYPE)));
+    test_assert(term_output_always_satisfies_type(l, unbox_type(get_global("Point"))));
 }
 
 void test_create_implicit_tuple_type()
@@ -170,8 +170,8 @@ void test_create_implicit_tuple_type()
     TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
     TaggedValue* b = branch.eval("['hi', 3.0, 1]");
 
-    test_assert(value_fits_type(a, type_contents(result)));
-    test_assert(!value_fits_type(b, type_contents(result)));
+    test_assert(value_fits_type(a, unbox_type(result)));
+    test_assert(!value_fits_type(b, unbox_type(result)));
 }
 
 void register_tests()
