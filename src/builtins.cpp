@@ -205,7 +205,7 @@ void bootstrap_kernel()
 
     // Create Function type
     FUNCTION_TYPE = create_empty_type(*KERNEL, "Function");
-    Type* functionType = &as_type(FUNCTION_TYPE);
+    Type* functionType = unbox_type(FUNCTION_TYPE);
     functionType->formatSource = subroutine_t::format_source;
     functionType->checkInvariants = function_t::check_invariants;
 
@@ -282,12 +282,12 @@ void initialize_compound_types(Branch& kernel)
     branch_ref_t::initialize(kernel);
 
     Term* styledSourceType = parse_type(kernel, "type StyledSource;");
-    styled_source_t::setup_type(&as_type(styledSourceType));
+    styled_source_t::setup_type(unbox_type(styledSourceType));
 
     Term* indexableType = parse_type(kernel, "type Indexable;");
-    indexable_t::setup_type(&as_type(indexableType));
+    indexable_t::setup_type(unbox_type(indexableType));
 
-    callable_t::setup_type(&as_type(parse_type(kernel, "type Callable;")));
+    callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
 }
 
 void post_setup_functions(Branch& kernel)
@@ -342,8 +342,8 @@ void parse_hosted_types(Branch& kernel)
 
 void post_setup_types()
 {
-    string_t::postponed_setup_type(&as_type(STRING_TYPE));
-    ref_t::postponed_setup_type(&as_type(REF_TYPE));
+    string_t::postponed_setup_type(unbox_type(STRING_TYPE));
+    ref_t::postponed_setup_type(unbox_type(REF_TYPE));
 }
 
 void parse_builtin_script(Branch& kernel)

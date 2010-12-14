@@ -40,7 +40,7 @@ Term* import_member_function(Type* type, EvaluateFunc evaluate, std::string cons
 
 Term* import_member_function(Term* type, EvaluateFunc evaluate, std::string const& header)
 {
-    return import_member_function(&as_type(type), evaluate, header);
+    return import_member_function(unbox_type(type), evaluate, header);
 }
 
 void install_function(Term* function, EvaluateFunc evaluate)

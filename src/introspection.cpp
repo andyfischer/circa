@@ -246,7 +246,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         if (prefs->showAllIDs)
             out << format_global_id(term->type);
 
-        if (&as_type(term->type) != term->value_type)
+        if (unbox_type(term->type) != term->value_type)
             out << " vt:" << term->value_type->name;
     }
 

@@ -20,7 +20,7 @@ void type_declaration()
     test_assert(prototype[1]->name == "b");
     test_assert(prototype[1]->type == INT_TYPE);
 
-    Type* type = &as_type(myType);
+    Type* type = unbox_type(myType);
     test_assert(type->initialize != NULL);
     test_assert(type->copy != NULL);
 

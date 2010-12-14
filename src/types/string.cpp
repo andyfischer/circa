@@ -74,8 +74,7 @@ namespace string_t {
     void initialize(Type* type, TaggedValue* value)
     {
         // temp:
-        STRING_T = &as_type(STRING_TYPE);
-
+        STRING_T = unbox_type(STRING_TYPE);
         set_pointer(value, STRING_T, new std::string());
     }
     void release(TaggedValue* value)

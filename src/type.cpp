@@ -171,20 +171,19 @@ bool is_native_type(Term* type)
 
 Type* declared_type(Term* term)
 {
-    return &as_type(term->type);
+    return unbox_type(term->type);
 }
 
 Type& as_type(Term *term)
 {
-    ca_assert(get_type_value(term) != NULL);
-    ca_assert(term->type == TYPE_TYPE);
-
-    return *get_type_value(term);
+    ca_assert(unbox_type(term) != NULL);
+    return *unbox_type(term);
 }
 
-Type* unbox_type(Term* type)
+Type* unbox_type(Term* term)
 {
-    return get_type_value(type);
+    ca_assert(term->type == TYPE_TYPE);
+    return (Type*) term->value_data.ptr;
 }
 
 bool value_fits_type(TaggedValue* value, Type* type)

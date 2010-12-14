@@ -28,7 +28,7 @@ void test_float()
 {
     Branch branch;
 
-    Type* floatType = &as_type(FLOAT_TYPE);
+    Type* floatType = unbox_type(FLOAT_TYPE);
 
     test_assert(floatType->equals != NULL);
     test_assert(floatType->formatSource != NULL);

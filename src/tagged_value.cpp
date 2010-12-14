@@ -410,7 +410,7 @@ void set_bool(TaggedValue* value, bool b)
 
 void set_ref(TaggedValue* value, Term* t)
 {
-    change_type(value, &as_type(REF_TYPE));
+    change_type(value, unbox_type(REF_TYPE));
     *((Ref*) value->value_data.ptr) = t;
 }
 
@@ -493,15 +493,8 @@ void* get_pointer(TaggedValue* value)
     return value->value_data.ptr;
 }
 
-Type* get_type_value(TaggedValue* value)
-{
-    //assert(value.value_type == &as_type(TYPE_TYPE));
-    return (Type*) value->value_data.ptr;
-}
-
 Branch* get_branch_value(TaggedValue* value)
 {
-    //assert(value.value_type == &as_type(TYPE_TYPE));
     return (Branch*) value->value_data.ptr;
 }
 

@@ -17,7 +17,7 @@ namespace ref_t {
     void initialize(Type* type, TaggedValue* value)
     {
         // Temp:
-        REF_T = &as_type(REF_TYPE);
+        REF_T = unbox_type(REF_TYPE);
         set_pointer(value, type, new Ref());
     }
     void release(TaggedValue* value)

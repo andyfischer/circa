@@ -89,7 +89,6 @@ void set_pointer(TaggedValue* value, void* ptr);
 
 void* get_pointer(TaggedValue* value);
 
-Type* get_type_value(TaggedValue* value);
 Branch* get_branch_value(TaggedValue* value);
 int as_int(TaggedValue* value);
 float as_float(TaggedValue* value);
