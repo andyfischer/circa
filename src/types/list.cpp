@@ -414,7 +414,7 @@ namespace list_t {
         List* destList = NULL;
 
         if (!checkOnly) {
-            destList = set_list(dest);
+            destList = List::lazyCast(dest);
             destList->resize(sourceLength);
             dest->value_type = type;
         }

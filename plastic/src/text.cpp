@@ -120,10 +120,12 @@ TypeRef RenderedText::singleton;
 CA_FUNCTION(render_text)
 {
     RenderedText* state = (RenderedText*) STATE_INPUT;
-    std::cout << "raw input: " << state->toString() << std::endl;
+
+    if (!is_null(state))
+        std::cout << "raw input: " << to_string_annotated(state) << std::endl;
     if (!cast(state, RenderedText::singleton, state))
         change_type(state, RenderedText::singleton);
-    std::cout << "casted: " << state->toString() << std::endl;
+    std::cout << "casted: " << to_string_annotated(state) << std::endl;
 
     touch(state);
 

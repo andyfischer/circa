@@ -24,6 +24,15 @@ bool run_test_for_type(Term* type, List& exampleValues)
     reset(&y);
     test_assert(equals(&x,&y));
 
+    // use cast(), make sure the output is equal
+    TaggedValue castResult;
+    cast(&x, unbox_type(type), &castResult);
+    test_assert(equals(&x, &castResult));
+
+    // do cast again, using same value for source and output
+    cast(&castResult, unbox_type(type), &castResult);
+    test_assert(equals(&x, &castResult));
+
     #if 0
 
     Term* x = create_value(branch, type, "x");

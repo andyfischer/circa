@@ -76,24 +76,25 @@ void test_bug_with_cast()
     set_int(value.append(), 1);
     set_int(value.append(), 72);
     set_int(value.append(), 18);
-    List* color = set_list(value.append(), 0);
-    change_type(color, unbox_type(COLOR_TYPE));
-    set_float(color->get(0), 1.0);
-    set_float(color->get(1), 1.0);
-    set_float(color->get(2), 1.0);
-    set_float(color->get(3), 1.0);
-    set_string(value.append(), "Asteroids");
 
-    test_equals(&value, "[1, 72, 18, [1.0, 1.0, 1.0, 1.0], 'Asteroids']");
+    test_equals(&value, "[1, 72, 18]");
 
     Branch branch;
-    Term* renderedText = branch.compile("type RenderedText {"
-        "int texid, int width, int height, Color color, string text }");
+    Term* type = branch.compile("type T {int x, int y, int z}");
 
     TaggedValue castResult;
-    cast(&value, unbox_type(renderedText), &castResult);
+    cast(&value, unbox_type(type), &castResult);
 
-    test_equals(&castResult, "[1, 72, 18, [1.0, 1.0, 1.0, 1.0], 'Asteroids']");
+    test_equals(&castResult, "[1, 72, 18]");
+
+    cast(&castResult, unbox_type(type), &castResult);
+
+    test_equals(&castResult, "[1, 72, 18]");
+}
+
+void test_bug_with_change_type()
+{
+
 }
     
 void register_tests()
