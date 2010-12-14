@@ -60,6 +60,7 @@ void copy(TaggedValue* source, TaggedValue* dest);
 void swap(TaggedValue* left, TaggedValue* right);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
+std::string to_string_annotated(TaggedValue* value);
 bool matches_type(Type* type, Term* term);
 int num_elements(TaggedValue* value);
 void touch(TaggedValue* value);

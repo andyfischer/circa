@@ -334,6 +334,18 @@ void resize_list_maintains_existing_data()
     test_assert(outer->get(1)->getIndex(1) == a);
 }
 
+void test_to_string_annotated()
+{
+    TaggedValue v;
+    set_int(&v, 5);
+    test_equals(to_string_annotated(&v), "int#5");
+
+    List list;
+    set_int(list.append(), 3);
+    set_string(list.append(), "hi");
+    test_equals(to_string_annotated(&list), "List#[int#3, string#'hi']");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
@@ -347,6 +359,7 @@ void register_tests()
     REGISTER_TEST_CASE(tagged_value_tests::list_memory_management);
     REGISTER_TEST_CASE(tagged_value_tests::reset_null);
     REGISTER_TEST_CASE(tagged_value_tests::resize_list_maintains_existing_data);
+    REGISTER_TEST_CASE(tagged_value_tests::test_to_string_annotated);
 }
 
 }

@@ -254,13 +254,35 @@ std::string to_string(TaggedValue* value)
         return "<type is NULL>";
 
     Type::ToString toString = value->value_type->toString;
-    if (toString == NULL) {
-        std::stringstream out;
-        out << "<" << value->value_type->name << " " << value->value_data.ptr << ">";
-        return out.str();
+    if (toString != NULL)
+        return toString(value);
+
+    std::stringstream out;
+    out << "<" << value->value_type->name << " " << value->value_data.ptr << ">";
+    return out.str();
+}
+
+std::string to_string_annotated(TaggedValue* value)
+{
+    if (value->value_type == NULL)
+        return "<type is NULL>";
+
+    std::stringstream out;
+
+    out << value->value_type->name << "#";
+
+    if (is_list(value)) {
+        out << "[";
+        for (int i=0; i < value->numElements(); i++) {
+            if (i > 0) out << ", ";
+            out << to_string_annotated(value->getIndex(i));
+        }
+        out << "]";
+    } else {
+        out << to_string(value);
     }
 
-    return toString(value);
+    return out.str();
 }
 
 TaggedValue* get_index(TaggedValue* value, int index)

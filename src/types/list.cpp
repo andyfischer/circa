@@ -574,6 +574,7 @@ namespace list_t {
     void setup_type(Type* type)
     {
         reset_type(type);
+        type->name = "List";
         type->initialize = tv_initialize;
         type->release = tv_release;
         type->copy = tv_copy;
