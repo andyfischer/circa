@@ -27,8 +27,6 @@ bool RECENT_LEFT_MOUSE_DOWN = false;
 bool RECENT_MOUSE_WHEEL_UP = false;
 bool RECENT_MOUSE_WHEEL_DOWN = false;
 
-Ref MOUSE_POSITION_TERM;
-
 void handle_key_press(SDL_Event &event, int key);
 
 CA_FUNCTION(key_down)
@@ -126,9 +124,6 @@ void capture_events()
             break;
         }
     } // finish event loop
-
-    set_float(MOUSE_POSITION_TERM->getIndex(0), float(MOUSE_X));
-    set_float(MOUSE_POSITION_TERM->getIndex(1), float(MOUSE_Y));
 }
 
 void handle_key_press(SDL_Event &event, int key)
@@ -211,6 +206,14 @@ CA_FUNCTION(recent_key_presses)
     }
 }
 
+CA_FUNCTION(mouse_location)
+{
+    List* output = List::lazyCast(OUTPUT);
+    output->resize(2);
+    set_float(output->get(0), MOUSE_X);
+    set_float(output->get(1), MOUSE_Y);
+}
+
 bool mouse_in(TaggedValue* box)
 {
     float x1 = box->getIndex(0)->toFloat();
@@ -260,15 +263,13 @@ void setup(Branch& branch)
     for (int i=0; i < SDLK_LAST; i++)
         KEY_DOWN[i] = false;
 
-    MOUSE_POSITION_TERM = branch.findFirstBinding("mouse");
-
     install_function(branch["key_down"], key_down);
     install_function(branch["key_pressed_code"], key_pressed);
     install_function(branch["key_pressed_char"], key_pressed);
     install_function(branch["recent_key_presses"], recent_key_presses);
+    install_function(branch["mouse_location"], mouse_location);
     install_function(branch["mouse_pressed"], mouse_pressed);
     install_function(branch["mouse_over"], mouse_over);
-
     install_function(branch["mouse_clicked_anywhere"], mouse_clicked);
     install_function(branch["mouse_clicked_region"], mouse_clicked);
     install_function(branch["mouse_wheel_up_anywhere"], mouse_wheel_up);

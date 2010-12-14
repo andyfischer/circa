@@ -121,18 +121,14 @@ CA_FUNCTION(render_text)
 {
     RenderedText* state = (RenderedText*) STATE_INPUT;
 
-    if (!is_null(state))
-        std::cout << "raw input: " << to_string_annotated(state) << std::endl;
     if (!cast(state, RenderedText::singleton, state))
         change_type(state, RenderedText::singleton);
-    std::cout << "casted: " << to_string_annotated(state) << std::endl;
 
     touch(state);
 
     std::string const& inputText = as_string(INPUT(2));
     TaggedValue* inputColor = INPUT(3);
     bool changed_color = !state->color()->equals(inputColor);
-
 
     if (state->texid() == 0 || state->text() != inputText || changed_color) {
 

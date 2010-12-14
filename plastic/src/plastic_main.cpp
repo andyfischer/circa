@@ -67,8 +67,7 @@ int plastic_main(std::vector<std::string> args)
 
     // -p to print raw compiled code
     if (arg0 == "-p") {
-        if (!app::load_user_script_filename(args[1]))
-            return 1;
+        app::singleton().setScriptFilename(args[1]);
 
         EvalContext cxt;
         include_function::preload_script(app::users_branch().owningTerm);
@@ -79,8 +78,7 @@ int plastic_main(std::vector<std::string> args)
 
     // -tr to do a test run of a script, without creating a display.
     if (arg0 == "-tr") {
-        if (!app::load_user_script_filename(args[1]))
-            return 1;
+        app::singleton().setScriptFilename(args[1]);
 
         if (has_static_errors(app::users_branch())) {
             print_static_errors_formatted(app::users_branch(), std::cout);
@@ -97,8 +95,7 @@ int plastic_main(std::vector<std::string> args)
     // Normal operation, load the script file in argument 0.
     std::string filename = arg0;
 
-    if (!app::load_user_script_filename(filename))
-        return 1;
+    app::singleton().setScriptFilename(filename);
 
     if (has_static_errors(app::users_branch())) {
         print_static_errors_formatted(app::users_branch(), std::cout);

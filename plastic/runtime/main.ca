@@ -1,10 +1,3 @@
--- Wrap up mouse position into a point (values are passed in from input.cpp)
-state Point mouse
-
-def mouse_in(Rect b) -> bool
-  "Return whether the mouse is currently inside the given rect."
-  return((b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y))
-end
 
 -- Information about the current window (passed in from main.cpp)
 type Window {
@@ -23,6 +16,7 @@ end
 
 -- ide - functions for controlling IDE behavior
 namespace ide
+    def script_filename() -> string {}
     def quit(): "Tell the IDE to shutdown"
     def reset_state(): "Reset state for the current script"
     def reload_runtime(): "Reload the builtin runtime"
@@ -46,6 +40,7 @@ def key_down(int key) -> bool {}
 def key_pressed_code(int key) -> bool {}
 def key_pressed_char(string key) -> bool {}
 key_pressed = overloaded_function(key_pressed_code key_pressed_char)
+def mouse_location() -> Point {}
 def mouse_pressed() -> bool {}
 def mouse_over(Rect region) -> bool {}
 def recent_key_presses() -> List {}
@@ -58,6 +53,14 @@ mouse_wheel_up = overloaded_function(mouse_wheel_up_anywhere mouse_wheel_up_regi
 def mouse_wheel_down_anywhere () -> bool {}
 def mouse_wheel_down_region (Rect region) -> bool {}
 mouse_wheel_down = overloaded_function(mouse_wheel_down_anywhere mouse_wheel_down_region)
+
+-- Wrap up mouse position into a point (values are passed in from input.cpp)
+mouse = mouse_location() -> Point
+
+def mouse_in(Rect b) -> bool
+  "Return whether the mouse is currently inside the given rect."
+  return((b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y))
+end
 
 -- These values are assigned in input.cpp
 namespace key
@@ -295,7 +298,11 @@ include('text_input.ca' -> path)
 include('ui_widgets.ca' -> path)
 
 -- Load the user's script
-state string user_script_filename = path("../demos/demo_browser.ca")
+initial_filename = ide:script_filename()
+if initial_filename == ""
+    initial_filename = "../demos/demo_browser.ca"->path
+end
+state string user_script_filename = initial_filename
 
 -- Function to specify a different script
 load_user_script_request = inbox()

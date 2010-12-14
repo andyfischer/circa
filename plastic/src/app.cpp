@@ -21,6 +21,12 @@ App& singleton()
     return *obj;
 }
 
+void
+App::setScriptFilename(const std::string& filename)
+{
+    _initialScriptFilename = filename;
+}
+
 circa::Branch& runtime_branch()
 {
     return *singleton()._runtimeBranch;
@@ -141,6 +147,9 @@ bool load_runtime(circa::Branch& runtime)
 
     setup_functions(app::runtime_branch());
 
+    circa::Term* users_branch = runtime["users_branch"];
+    app::singleton()._usersBranch = &users_branch->nestedContents;
+
     return true;
 }
 
@@ -194,23 +203,6 @@ bool reload_runtime()
     // Write window width & height
     set_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
     set_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
-
-    return true;
-}
-
-bool load_user_script_filename(std::string const& filename)
-{
-    circa::Term* users_branch = app::runtime_branch()["users_branch"];
-    app::singleton()._usersBranch = &users_branch->nestedContents;
-
-    if (filename != "") {
-        circa::Term* user_script_filename = app::runtime_branch().findFirstBinding("user_script_filename");
-        circa::set_string(user_script_filename, filename);
-
-        std::stringstream msg;
-        msg << "Loading script: " << filename;
-        info(msg.str());
-    }
 
     return true;
 }

@@ -28,6 +28,10 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_string(INPUT(0)));
     }
+    CA_DEFINE_FUNCTION(is_null, "is_null(any) -> bool")
+    {
+        set_bool(OUTPUT, is_null(INPUT(0)));
+    }
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

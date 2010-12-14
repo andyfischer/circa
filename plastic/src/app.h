@@ -41,6 +41,8 @@ struct App {
         _windowHeight(0)
     {
     }
+
+    void setScriptFilename(const std::string& filename);
 };
 
 App& singleton();
@@ -61,7 +63,6 @@ void error(std::string const& msg);
 
 std::string find_runtime_file();
 std::string find_asset_file(std::string const& filename);
-bool load_user_script_filename(std::string const& _filename);
 bool setup_functions(circa::Branch& runtime);
 bool reload_runtime();
 
