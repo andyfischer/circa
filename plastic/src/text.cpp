@@ -120,14 +120,17 @@ TypeRef RenderedText::singleton;
 CA_FUNCTION(render_text)
 {
     RenderedText* state = (RenderedText*) STATE_INPUT;
+    std::cout << "raw input: " << state->toString() << std::endl;
     if (!cast(state, RenderedText::singleton, state))
         change_type(state, RenderedText::singleton);
+    std::cout << "casted: " << state->toString() << std::endl;
 
     touch(state);
 
     std::string const& inputText = as_string(INPUT(2));
     TaggedValue* inputColor = INPUT(3);
     bool changed_color = !state->color()->equals(inputColor);
+
 
     if (state->texid() == 0 || state->text() != inputText || changed_color) {
 

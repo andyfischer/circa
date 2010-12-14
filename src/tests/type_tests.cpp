@@ -8,67 +8,6 @@
 namespace circa {
 namespace type_tests {
 
-void compound_types()
-{
-    Branch branch;
-
-    Term* MyType = branch.compile("type MyType { int myint, string astr }");
-    test_assert(MyType != NULL);
-    test_assert(is_type(MyType));
-    Branch& prototype = type_t::get_prototype(MyType);
-    test_assert(prototype.length() == 2);
-    test_assert(prototype[0]->name == "myint");
-    test_assert(prototype[0]->type == INT_TYPE);
-    test_assert(as_type(MyType).findFieldIndex("myint") == 0);
-    test_assert(prototype[1]->name == "astr");
-    test_assert(prototype[1]->type == STRING_TYPE);
-    test_assert(as_type(MyType).findFieldIndex("astr") == 1);
-
-    test_assert(as_type(MyType).findFieldIndex("the_bodies") == -1);
-
-    // instanciation
-    Term* inst = branch.compile("inst = MyType()");
-
-    // field access on a brand new type
-    Term* astr = branch.compile("inst.astr");
-
-    // field assignment
-    Term *inst2 = branch.compile("inst.astr = 'hello'");
-
-    // field access of recently assigned value
-    Term* astr2 = branch.compile("inst.astr");
-
-    evaluate_branch(branch);
-
-    test_assert(inst->type = MyType);
-    test_assert(inst->value_data.ptr != NULL);
-    test_assert(inst->getIndex(0)->asInt() == 0);
-    test_assert(inst->getIndex(1)->asString() == "");
-
-    test_assert(is_string(astr));
-    test_equals(as_string(astr), "");
-
-    test_equals(inst2->getIndex(1)->asString(), "hello");
-    //TEST_DISABLED test_assert(inst2->type == MyType); // type specialization
-
-    test_assert(is_string(astr2));
-    test_equals(as_string(astr2), "hello");
-}
-
-void compound_type_cast()
-{
-    Branch branch;
-    Term* t = branch.compile("type T { string a }");
-    TaggedValue* a = branch.eval("['hi']");
-    test_assert(is_list(a));
-    test_assert(a->value_type != type_contents(t));
-
-    TaggedValue casted;
-    test_assert(cast(a, type_contents(t), &casted));
-    test_assert(is_list(&casted));
-    test_assert(casted.value_type == type_contents(t));
-}
-
 void type_declaration()
 {
     Branch branch;
@@ -181,17 +120,6 @@ void test_default_values()
 #endif
 }
 
-void test_assign_compound_value_to_default()
-{
-    Branch branch;
-
-    TaggedValue* t = branch.eval("[1 2 3]");
-    reset(t);
-
-    //FIXME
-    //test_assert(t->numElements() == 0);
-}
-
 void type_inference_for_get_index()
 {
     Branch branch;
@@ -248,13 +176,10 @@ void test_create_implicit_tuple_type()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(type_tests::compound_types);
-    REGISTER_TEST_CASE(type_tests::compound_type_cast);
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
     REGISTER_TEST_CASE(type_tests::test_is_native_type);
     REGISTER_TEST_CASE(type_tests::test_default_values);
-    REGISTER_TEST_CASE(type_tests::test_assign_compound_value_to_default);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
