@@ -29,12 +29,12 @@ namespace if_block_function {
             else
                 append_phrase(source, "else", branch_term, phrase_type::UNDEFINED);
 
-            format_branch_source(source, branch_term->nestedContents, NULL);
+            format_branch_source(source, branch_term->nestedContents, branch_term);
         }
 
-        append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
-                term, token::WHITESPACE);
-        append_phrase(source, "end", term, phrase_type::KEYWORD);
+        //append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
+        //        term, token::WHITESPACE);
+        //append_phrase(source, "end", term, phrase_type::KEYWORD);
     }
 
     int get_register_count(Term* term)

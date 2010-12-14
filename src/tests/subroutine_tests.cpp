@@ -12,9 +12,7 @@ void test_return_from_conditional()
                 "  if (a < b)\n"
                 "    return(b)\n"
                 "  else\n"
-                "    return(a)\n"
-                "  end\n"
-                "end\n");
+                "    return(a)\n");
 
     test_assert(branch);
 
@@ -39,9 +37,7 @@ void test_recursion()
                 "    return(1)\n"
                 "  else\n"
                 "    next_i = add_i(n, -1)\n"
-                "    return(mult_i(n, factorial(next_i)))\n"
-                "  end\n"
-                "end");
+                "    return(mult_i(n, factorial(next_i)))\n");
 
     TaggedValue* fact_1 = branch.eval("factorial(1)");
     test_assert(branch);
@@ -63,9 +59,7 @@ void test_recursion()
                 "  if (n == 1)\n"
                 "    return(1)\n"
                 "  else\n"
-                "    return(recr(n - 1) + 1)\n"
-                "  end\n"
-                "end\n");
+                "    return(recr(n - 1) + 1)\n");
     
     test_assert(branch.eval("recr(1)")->asInt() == 1);
     test_assert(branch.eval("recr(2)")->asInt() == 2);
@@ -81,13 +75,9 @@ void test_recursion_with_state()
                 "  if i == 1\n"
                 "    return(1)\n"
                 "  else\n"
-                "    return(recr(i - 1) + 1)\n"
-                "  end\n"
-                "end\n");
+                "    return(recr(i - 1) + 1)\n");
 
     test_assert(branch);
-
-    dump_branch(branch);
 
     Term* recr_4 = branch.compile("recr(4)");
 
@@ -99,15 +89,13 @@ void subroutine_stateful_term()
 {
     EvalContext context;
     Branch branch;
-    branch.compile("def mysub()\nstate a = 0.0\na += 1\nend");
+    branch.compile("def mysub() state a = 0.0 a += 1 end");
 
     // Make sure that stateful terms work correctly
     Term* call = branch.compile("call = mysub()");
     test_assert(call);
     test_assert(function_t::get_inline_state_type(branch["mysub"]) != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
-
-    dump_branch(branch);
 
     evaluate_branch(&context, branch);
 
@@ -128,10 +116,10 @@ void initialize_state_type()
 {
     Branch branch;
 
-    Term* a = branch.compile("def a() -> number\nreturn(1 + 1)\nend");
+    Term* a = branch.compile("def a() -> number return(1 + 1) end");
     test_assert(function_t::get_inline_state_type(a) == VOID_TYPE);
 
-    Term* b = branch.compile("def b()\nstate i\nend");
+    Term* b = branch.compile("def b() state i end");
     test_assert(function_t::get_inline_state_type(b) != VOID_TYPE);
 }
 
@@ -140,7 +128,7 @@ void shadow_input()
     Branch branch;
 
     // Try having a name that shadows an input. This had a bug at one point
-    branch.eval("def f(int i) -> int\ni = 2\nreturn(i)\nend");
+    branch.eval("def f(int i) -> int i = 2 return(i) end");
 
     TaggedValue* a = branch.eval("f(1)");
 
@@ -153,7 +141,7 @@ void specialization_to_output_type()
     // than the implicit output type, then make sure that it uses the
     // declared type. This code once had a bug.
     Branch branch;
-    Term* a = branch.compile("def a() -> Point\nreturn([1 2])\nend");
+    Term* a = branch.compile("def a() -> Point return([1 2]) end");
 
     test_assert(function_t::get_output_type(a)->name == "Point");
 
@@ -168,7 +156,7 @@ void stateful_function_with_arguments()
 {
     // This code once had a bug
     Branch branch;
-    branch.compile("def myfunc(int i) -> int\nstate s\nreturn(i)\nend");
+    branch.compile("def myfunc(int i) -> int state s; return(i) end");
     TaggedValue* call = branch.eval("myfunc(5)");
     test_assert(call->asInt() == 5);
 }

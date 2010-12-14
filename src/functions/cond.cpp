@@ -44,7 +44,7 @@ namespace cond_function {
     {
         COND_FUNC = import_function(kernel, cond_evaluate,
                 "cond(bool condition, any pos, any neg) -> any;"
-                "\"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\" end");
+                "\"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\"");
         function_t::get_specialize_type(COND_FUNC) = specializeType;
         function_t::set_input_meta(COND_FUNC, 1, true);
         function_t::set_input_meta(COND_FUNC, 2, true);

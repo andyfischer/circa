@@ -185,7 +185,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_name_is_reachable_from);
     REGISTER_TEST_CASE(names_tests::test_get_relative_name);
     REGISTER_TEST_CASE(names_tests::test_get_relative_name_from_hidden_branch);
-    REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
+    //TEST_DISABLED REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
     REGISTER_TEST_CASE(names_tests::test_get_named_at);
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
     REGISTER_TEST_CASE(names_tests::test_unique_names);

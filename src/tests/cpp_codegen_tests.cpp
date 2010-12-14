@@ -30,8 +30,8 @@ void test_function()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(cpp_codegen_tests::test_simple);
-    REGISTER_TEST_CASE(cpp_codegen_tests::test_function);
+    //TEST_DISABLED REGISTER_TEST_CASE(cpp_codegen_tests::test_simple);
+    //TEST_DISABLED REGISTER_TEST_CASE(cpp_codegen_tests::test_function);
 }
 
 }

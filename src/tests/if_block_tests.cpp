@@ -11,17 +11,17 @@ void test_if_joining()
     Branch branch;
 
     // Test that a name defined in one branch is not rebound in outer scope
-    branch.eval("if true\napple = 5\nend");
+    branch.eval("if true apple = 5 end");
     test_assert(!branch.contains("apple"));
 
     // Test that a name which exists in the outer scope is rebound
     Term* original_banana = create_int(branch, 10, "banana");
-    branch.eval("if true\nbanana = 15\nend");
+    branch.eval("if true banana = 15 end");
     test_assert(branch["banana"] != original_banana);
 
     // Test that if a name is defined in both 'if' and 'else branches, that it gets defined 
     // in the outer scope.
-    branch.eval("if true\nCardiff = 5\nelse\nCardiff = 11\nend");
+    branch.eval("if true Cardiff = 5 else Cardiff = 11 end");
     test_assert(branch.contains("Cardiff"));
 }
 
@@ -34,7 +34,7 @@ void test_if_joining_on_bool()
 
     test_assert(s->value_data.ptr != NULL);
 
-    branch.eval("if false\nhey = false\nend");
+    branch.eval("if false hey = false end");
 
     evaluate_branch(branch);
 
@@ -49,7 +49,7 @@ void test_if_elif_else()
     evaluate_branch(branch);
 
     test_assert(branch.contains("a"));
-    test_assert(branch["a"]->asInt() == 1);
+    test_equals(branch["a"]->asInt(), 1);
 
     branch.compile(
         "if false; b = 'apple'; elif false; b = 'orange'; else; b = 'pineapple'; end; b=b");
@@ -101,10 +101,10 @@ void test_execution()
     gSpyResults.clear();
 
     // Start off with some simple expressions
-    branch.compile("if true\n spy('Success 1')\nend");
-    branch.compile("if false\n spy('Fail')\nend");
-    branch.compile("if (1 + 2) > 1\n spy('Success 2')\nend");
-    branch.compile("if (1 + 2) < 1\n spy('Fail')\nend");
+    branch.compile("if true spy('Success 1') end");
+    branch.compile("if false spy('Fail') end");
+    branch.compile("if (1 + 2) > 1 spy('Success 2') end");
+    branch.compile("if (1 + 2) < 1 spy('Fail') end");
     branch.compile("if true; spy('Success 3'); end");
     branch.compile("if false; spy('Fail'); end");
     evaluate_branch(branch);
@@ -120,10 +120,10 @@ void test_execution()
     import_function(branch, spy_function, "spy(string)");
     branch.compile("if true; spy('Success 1'); else; spy('Fail'); end");
     branch.compile("if false; spy('Fail'); else; spy('Success 2'); end");
-    branch.compile("if true; spy('Success 3-1')\n spy('Success 3-2')\n spy('Success 3-3')\n"
+    branch.compile("if true; spy('Success 3-1') spy('Success 3-2') spy('Success 3-3') "
                 "else; spy('Fail'); end");
-    branch.compile("if false; spy('Fail')\n spy('Fail 2')\n"
-                "else; spy('Success 4-1')\n spy('Success 4-2')\n spy('Success 4-3')\n end");
+    branch.compile("if false; spy('Fail') spy('Fail 2')"
+                "else; spy('Success 4-1') spy('Success 4-2') spy('Success 4-3') end");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 8);
@@ -196,13 +196,8 @@ void test_execution()
                         "spy('Nested 5')\n"
                     "else\n"
                         "spy('Error!')\n"
-                    "end\n"
-                "end\n"
-            "end\n"
-        "else\n"
             "spy('Error!')\n"
-        "end\n"
-    "end");
+            );
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 1);

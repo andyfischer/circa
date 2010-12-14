@@ -30,9 +30,6 @@ namespace subroutine_t {
 
         function_t::format_header_source(source, term);
 
-        append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
-                term, token::WHITESPACE);
-
         if (!is_native_function(term))
             format_branch_source(source, term->nestedContents, term);
     }

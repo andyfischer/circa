@@ -180,22 +180,22 @@ void reproduce_rebinding() {
 }
 
 void reproduce_if() {
-    round_trip_source("if true\nx = 1\nend");
-    round_trip_source("if true\n       1\nend");
-    round_trip_source("if 5.0 > 3.0\n  print('hey')\nend");
-    round_trip_source("if true\nelse\nend");
-    round_trip_source("  if true\nelse\nend");
-    round_trip_source("if true  \nelse\nend");
-    round_trip_source("if true\n  else\nend");
-    round_trip_source("if true\nelse  \nend");
-    round_trip_source("if true\nelse\n  end");
-    round_trip_source("if true\nelse\nend  ");
-    round_trip_source("if true\nelif true\nend  ");
-    round_trip_source("if true\n  elif true\nend");
-    round_trip_source("if true\nelif true  \nend");
-    round_trip_source("if true\nelif true\nelse\nend");
-    round_trip_source("if true\nelif true\n  else\nend");
-    round_trip_source("if 1 > 2\nprint('hi')\nelif 2 > 3\n  elif 3 > 4\nprint('hello')\nend");
+    round_trip_source("if true x = 1 end");
+    round_trip_source("if true       1 end");
+    round_trip_source("if 5.0 > 3.0  print('hey') end");
+    round_trip_source("if true else end");
+    round_trip_source("  if true else end");
+    round_trip_source("if true   else end");
+    round_trip_source("if true   else end");
+    round_trip_source("if true else   end");
+    round_trip_source("if true else   end");
+    round_trip_source("if true else end  ");
+    round_trip_source("if true elif true end  ");
+    round_trip_source("if true   elif true end");
+    round_trip_source("if true elif true   end");
+    round_trip_source("if true elif true else end");
+    round_trip_source("if true elif true   else end");
+    round_trip_source("if 1 > 2 print('hi') elif 2 > 3   elif 3 > 4 print('hello') end");
     round_trip_source("if true 1 2 3 end");
     round_trip_source("if true;1 2 3 end");
     round_trip_source("if true; a = 1; else; a = 2; end; b = a"); // once had a bug
@@ -222,13 +222,13 @@ void reproduce_lists() {
 }
 
 void reproduce_for_loop() {
-    round_trip_source("for x in 0..1\nend");
-    round_trip_source("  for x in 0..1\nend");
-    round_trip_source("for x in [5]\nend");
-    round_trip_source("for x in [1  ,2 ;3 ]\nend");
-    round_trip_source("for x in [1]\n   print(x)\nend");
-    round_trip_source("l = [1]\nfor x in l\nend");
-    round_trip_source("l = [1]\nfor x in l\n  x += 3\nend");
+    round_trip_source("for x in 0..1 end");
+    round_trip_source("  for x in 0..1 end");
+    round_trip_source("for x in [5] end");
+    round_trip_source("for x in [1  ,2 ;3 ] end");
+    round_trip_source("for x in [1]\n  print(x)");
+    round_trip_source("l = [1]\nfor x in l");
+    round_trip_source("l = [1]\nfor x in l\n  x += 3");
     round_trip_source("for x in [1];end");
     round_trip_source("for x in [1],end");
     round_trip_source("for x in [1]    ;end");
@@ -236,21 +236,15 @@ void reproduce_for_loop() {
     round_trip_source("for x in [1]   end");
     round_trip_source("for x in [1] print(1)  end");
     round_trip_source("l = [1]; for x in @l x += 1 end");
-    round_trip_source("for x in 0..1 do end");
-    round_trip_source("for x in 0..1 do   end");
-    round_trip_source("for x in 0..1 do  print(x)  end");
-    round_trip_source("for x in 0..1 {}");
-    round_trip_source("for x in 0..1 {   }");
-    round_trip_source("for x in 0..1 {  print(x)  }");
     finish_source_repro_category();
 }
 
 void reproduce_subroutine() {
-    round_trip_source("def hi()\nend");
-    round_trip_source("def hi2() -> int\nend");
-    round_trip_source("def hi2()->int\nend");
-    round_trip_source("def hi3(int a)\nend");
-    round_trip_source("def hi4() -> int\nreturn(1)\nend");
+    round_trip_source("def hi() end");
+    round_trip_source("def hi2() -> int end");
+    round_trip_source("def hi2()->int end");
+    round_trip_source("def hi3(int a) end");
+    round_trip_source("def hi4() -> int\n  return(1)");
     round_trip_source("def hi()->int;return(1);end");
     round_trip_source("def hi()->int  ;return(1);end");
     round_trip_source("def hi()->int return(add(sub(1,1),1)) end");
@@ -292,8 +286,8 @@ void reproduce_type_decl() {
 }
 
 void reproduce_do_once() {
-    round_trip_source("do once\nend");
-    round_trip_source("do once\nprint(1)\nend");
+    round_trip_source("do once end");
+    round_trip_source("do once\n print(1)");
     round_trip_source("do once; print(1); end");
     round_trip_source("do once , print(1); end");
     round_trip_source("do once     end");
@@ -301,13 +295,16 @@ void reproduce_do_once() {
     finish_source_repro_category();
 }
 
-void reproduce_misc_blocks() {
-    round_trip_source("namespace ns\nend");
-    round_trip_source("namespace ns\nprint(1)\nend");
+void reproduce_namespace() {
+    round_trip_source("namespace ns end");
+    round_trip_source("namespace ns\n  print(1)");
     round_trip_source("namespace ns end");
     round_trip_source("namespace ns 1 end");
-    round_trip_source("namespace ns; print(1)\nend");
+    round_trip_source("namespace ns; print(1) end");
     round_trip_source("namespace ns; a = 1; end; b = ns:a");
+}
+void reproduce_misc_blocks() {
+    #if 0
     round_trip_source("begin\nend");
     round_trip_source("begin;end");
     round_trip_source("begin;  ;end");
@@ -318,6 +315,7 @@ void reproduce_misc_blocks() {
     round_trip_source("{1}");
     round_trip_source("blah = {1}");
     round_trip_source("blah = { print(1) print(2) }");
+    #endif
     finish_source_repro_category();
 }
 
@@ -419,7 +417,8 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_headers);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
-    REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_namespace);
+    //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_with_parse_errors);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_unary);
@@ -428,7 +427,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_namespaced_function);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebind_operator);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_discard_statement);
-    REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);
+    //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_branch_styles);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_cast);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_uncallable_functions);
 }

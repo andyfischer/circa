@@ -23,7 +23,7 @@ namespace feedback_function {
 
         #if 0
         import_function(kernel, evaluate_apply_feedback, "apply_feedback(Branch branch)->Branch "
-            "'Experimental, creates terms to apply feedback in the given branch' end");
+            "'Experimental, creates terms to apply feedback in the given branch'");
         #endif
     }
 }

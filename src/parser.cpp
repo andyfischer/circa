@@ -120,6 +120,11 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     if (branchStyle == BRANCH_SYNTAX_UNDEF) {
         //std::cout << "deprecated: undef" << std::endl;
         //assert(false);
+#ifdef SIGINDENT
+        consume_branch_with_significant_indentation(branch, tokens);
+        post_parse_branch(branch);
+        return;
+#endif
     }
     else if (branchStyle == BRANCH_SYNTAX_BEGIN) {
         //std::cout << "deprecated: begin" << std::endl;
@@ -168,35 +173,58 @@ void consume_branch(Branch& branch, TokenStream& tokens)
 
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens)
 {
-    // Parse the line following the :
-    // We will either find stuff on this line (making this a one-liner), or
-    // we'll find nothing but whitespace or a comment.
-    bool foundStatementAfterColon = false;
+    Term* owningTerm = branch.owningTerm;
+    ca_assert(owningTerm != NULL);
 
-    while (!tokens.finished()) {
-        Term* statement = parser::statement(branch, tokens);
+    // Consume the whitespace immediately after the heading (and possibly a newline).
+    std::string postHeadingWs = possible_statement_ending(tokens);
+    bool foundNewline = postHeadingWs.find_first_of("\n") != std::string::npos;
 
-        std::string const& lineEnding = statement->stringProp("syntax:lineEnding");
-        bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
+    owningTerm->setStringProp("syntax:postHeadingWs", postHeadingWs);
 
-        if (statement->function != COMMENT_FUNC)
-            foundStatementAfterColon = true;
+    // If we're still on the same line, keep consuming statements. We might only
+    // find a comment (in which case we should keep parsing subsequent lines),
+    // or we might find statements (making this a one-liner).
+    bool foundStatementOnSameLine = false;
 
-        // If we hit a newline then move on to the next step
-        if (hasNewline)
-            break;
+    if (!foundNewline) {
+        while (!tokens.finished()) {
+            // If we hit an 'end' then consume and finish
+            if (tokens.nextIs(END)) {
+                owningTerm->setBoolProp("syntax:explicitEnd", true);
+                tokens.consume();
+                return;
+            }
+
+            // If we hit an if-block sepator then finish, but don't consume it
+            if (tokens.nextIs(ELSE) || tokens.nextIs(ELIF)) {
+                return;
+            }
+
+            Term* statement = parser::statement(branch, tokens);
+
+            std::string const& lineEnding = statement->stringProp("syntax:lineEnding");
+            bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
+
+            if (statement->function != COMMENT_FUNC)
+                foundStatementOnSameLine = true;
+
+            // If we hit a newline then move on to the next step
+            if (hasNewline)
+                break;
+        }
     }
 
-    // If we found any expressions after the : then stop parsing here
+    // If we found any expressions on the same line then stop parsing here
     // Example:
-    //    def f(): return 1 + 2
-    if (foundStatementAfterColon)
+    //    def f() return 1 + 2
+    if (foundStatementOnSameLine)
         return;
 
     // Next, keep parsing until we hit a statement that is not comment/whitespace.
     // This term will tell us the indentation level. It might take
     // a few lines until we find it. Example:
-    //     def f():
+    //     def f()
     //
     //             -- a misplaced comment
     //         return 1 + 2
@@ -502,7 +530,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     function_t::set_output_type(result, outputType);
 
-    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
+    //if (!tokens.nextNonWhitespaceIs(NEWLINE))
+    //    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     // If we're out of tokens, then stop here. This behavior is used when defining builtins.
     if (tokens.finished())
@@ -654,22 +683,25 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             // Create an 'else' block
             encounteredElse = true;
             Branch& elseBranch = create_branch(contents, "else");
-            (elseBranch.owningTerm)->setStringProp("syntax:preWhitespace",
+            elseBranch.owningTerm->setStringProp("syntax:preWhitespace",
                     preKeywordWhitespace);
             consume_branch(elseBranch, tokens);
         }
 
-        // If we just did an 'else' then the next thing must be 'end'
-        if (leadingToken == ELSE && !tokens.nextNonWhitespaceIs(END))
-            return compile_error_for_line(result, tokens, startPosition);
-
+        #ifndef SIGINDENT
         if (tokens.nextNonWhitespaceIs(END)) {
             result->setStringProp("syntax:whitespaceBeforeEnd", possible_whitespace(tokens));
             tokens.consume(END);
             break;
         }
+        #endif
 
-        firstIteration = false;
+        if (tokens.nextNonWhitespaceIs(ELIF) || tokens.nextNonWhitespaceIs(ELSE)) {
+            firstIteration = false;
+            continue;
+        }
+
+        break;
     }
 
     // If we didn't encounter an 'else' block, then create an empty one.
@@ -729,7 +761,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     if (rebindListName)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
 
-    forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
+    //forTerm->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     /*Term* iterator = */ setup_for_loop_iterator(forTerm, iterator_name.c_str());
 
@@ -748,8 +780,6 @@ Term* do_once_block(Branch& branch, TokenStream& tokens)
     tokens.consume(DO_ONCE);
 
     Term* result = apply(branch, DO_ONCE_FUNC, RefList());
-
-    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
 
     consume_branch(result->nestedContents, tokens);
 
@@ -1683,8 +1713,6 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
     std::string name = tokens.consume(IDENTIFIER);
     Term* result = apply(branch, NAMESPACE_FUNC, RefList(), name);
 
-    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
-
     consume_branch(result->nestedContents, tokens);
 
     post_input_change(result);
@@ -1988,6 +2016,9 @@ std::string possible_statement_ending(TokenStream& tokens)
         result << tokens.consume();
 
     if (tokens.nextIs(token::COMMA) || tokens.nextIs(token::SEMICOLON))
+        result << tokens.consume();
+
+    if (tokens.nextIs(token::WHITESPACE))
         result << tokens.consume();
 
     if (tokens.nextIs(token::NEWLINE))

@@ -82,23 +82,23 @@ namespace trig_function {
     void setup(Branch& kernel)
     {
         Term* sin_func = import_function(kernel, evaluate_sin, "sin(number angle) -> number;"
-            "'Trigonometric sin() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+            "'Trigonometric sin() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)'");
         function_t::get_feedback_func(sin_func) = 
             import_function(kernel, feedback_evaluate_sin, "sin_feedback(any, number) -> number");
 
         Term* cos_func = import_function(kernel, evaluate_cos, "cos(number angle) -> number;"
-            "'Trigonometric cos() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+            "'Trigonometric cos() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)'");
         function_t::get_feedback_func(cos_func) = 
             import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, number) -> number");
 
         import_function(kernel, evaluate_tan, "tan(number angle) -> number;"
-            "'Trigonometric tan() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+            "'Trigonometric tan() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)'");
         import_function(kernel, evaluate_arcsin, "arcsin(number) -> number;"
-            "'Trigonometric arcsin() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+            "'Trigonometric arcsin() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)'");
         import_function(kernel, evaluate_arccos, "arccos(number) -> number;"
-            "'Trigonometric arccos() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+            "'Trigonometric arccos() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)'");
         import_function(kernel, evaluate_arctan, "arctan(number) -> number;"
-            "'Trigonometric arctan() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)' end");
+            "'Trigonometric arctan() function. Note that angles are specified in a range of 0..1 (instead of 0..2pi)'");
     }
 } // namespace trig_function
 } // namespace circa

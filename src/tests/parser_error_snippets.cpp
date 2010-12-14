@@ -51,10 +51,8 @@ void register_every_possible_parse_error()
     register_input("type mytype { int a %");
     register_input("type mytype { int a");
     register_input("if");
-    register_input("if true");
-    register_input("if true else");
     register_input("if else");
-    register_input("if true else else");
+    //TEST_DISABLED register_input("if true else else");
     register_input("if %");
     register_input("for");
     register_input("for %");

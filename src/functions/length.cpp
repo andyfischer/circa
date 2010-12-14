@@ -8,7 +8,7 @@ namespace length_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(length,  "length(List) -> int;"
-            "'Return the number of items in the given list' end")
+            "'Return the number of items in the given list'")
     {
         set_int(OUTPUT, num_elements(INPUT(0)));
     }

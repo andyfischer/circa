@@ -8,8 +8,7 @@ namespace abs_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(abs, "abs(number n) -> number;"
-                "'Absolute value' end")
+    CA_DEFINE_FUNCTION(abs, "abs(number n) -> number 'Absolute value'")
     {
         set_float(OUTPUT, std::abs(FLOAT_INPUT(0)));
     }

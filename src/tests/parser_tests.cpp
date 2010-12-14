@@ -156,8 +156,7 @@ void test_function_decl()
     Term* func = parser::compile(&branch, parser::statement,
             "def Myfunc(string what, string hey, int yo) -> bool\n"
             "  whathey = concat(what,hey)\n"
-            "  return(yo > 3)\n"
-            "end");
+            "  return(yo > 3)\n");
 
     test_equals(func->name, "Myfunc");
     test_equals(function_t::get_name(func), "Myfunc");
@@ -173,23 +172,23 @@ void test_function_decl()
     Branch& funcbranch = function_contents(func);
 
     // index 0 has the function definition
-    test_equals(funcbranch[1]->name, "what");
-    test_equals(funcbranch[2]->name, "hey");
-    test_equals(funcbranch[3]->name, "yo");
-    test_equals(funcbranch[4]->name, "whathey");
-    test_equals(funcbranch[4]->function->name, "concat");
-    test_assert(funcbranch[4]->input(0) == funcbranch[1]);
-    test_assert(funcbranch[4]->input(1) == funcbranch[2]);
-    test_assert(funcbranch[4]->input(1) == funcbranch[2]);
-    test_assert(funcbranch[5]->asInt() == 3);
-    test_equals(funcbranch[6]->function->name, "greater_than");
-    test_assert(funcbranch[6]->input(0) == funcbranch[3]);
-    test_assert(funcbranch[6]->input(1) == funcbranch[5]);
-    //test_assert(funcbranch.length() == 7);
-
-    // This string once caused an error
-    Term* a = branch.compile("def f()\n  end");
-    test_assert(a);
+    int i = 1;
+    test_equals(funcbranch[i++]->name, "what");
+    test_equals(funcbranch[i++]->name, "hey");
+    test_equals(funcbranch[i++]->name, "yo");
+    // The parser might insert a comment here for the newline
+    if (funcbranch[i]->function->name == "comment")
+        i++;
+    test_equals(funcbranch[i]->name, "whathey");
+    test_equals(funcbranch[i]->function->name, "concat");
+    test_assert(funcbranch[i]->input(0) == funcbranch[1]);
+    test_assert(funcbranch[i]->input(1) == funcbranch[2]);
+    test_assert(funcbranch[i++]->input(1) == funcbranch[2]);
+    int three = i;
+    test_assert(funcbranch[i++]->asInt() == 3);
+    test_equals(funcbranch[i]->function->name, "greater_than");
+    test_assert(funcbranch[i]->input(0) == funcbranch[3]);
+    test_assert(funcbranch[i]->input(1) == funcbranch[three]);
 }
 
 void test_stateful_value_decl()
@@ -468,7 +467,6 @@ void test_namespace()
 
     Term* x = branch.eval("ns1:ns2:x");
     test_assert(branch);
-    dump_branch(branch);
     test_assert(get_local(x)->asInt() == 12);
 #endif
 }
@@ -528,11 +526,10 @@ void test_significant_indentation()
 
     Branch& funcBranch = function_contents(branch["func"]);
 
-    test_assert(funcBranch[1]->function == COMMENT_FUNC);
-    test_assert(funcBranch[2]->asInt() == 1);
-    test_assert(funcBranch[3]->asInt() == 2);
-    test_assert(funcBranch[4]->name == "a");
-    test_assert(funcBranch[6]->name == "b");
+    test_assert(funcBranch[1]->asInt() == 1);
+    test_assert(funcBranch[2]->asInt() == 2);
+    test_assert(funcBranch[3]->name == "a");
+    test_assert(funcBranch[5]->name == "b");
 
     test_assert(branch[1]->asInt() == 3);
     test_assert(branch[2]->asInt() == 4);
@@ -576,10 +573,9 @@ void test_significant_indentation2()
     test_assert(branch);
 
     Branch& func = function_contents(branch["func"]);
-    test_assert(func[1]->function == COMMENT_FUNC);
-    test_equals(func[2]->name, "a");
-    test_assert(func[3]->function == COMMENT_FUNC);
-    test_equals(func[4]->name, "b");
+    test_equals(func[1]->name, "a");
+    test_assert(func[2]->function == COMMENT_FUNC);
+    test_equals(func[3]->name, "b");
 }
 
 void test_sig_indent_one_liner()
@@ -605,6 +601,25 @@ void test_sig_indent_for_loop()
     Branch branch;
     branch.compile("for i in [1]: 1");
     test_assert(branch);
+}
+
+void test_sig_indent_multiline_function()
+{
+    Branch branch;
+#if 0
+    TokenStream tokens("\n state number prev = val"
+            "\n result = val - prev\n prev = val\n return result");
+    std::cout << tokens.toString() << std::endl;
+
+    Branch branch;
+    parser::consume_branch(branch, tokens);
+#endif
+
+    branch.compile("def delta(number val) -> number\n state number prev = val"
+            "\n result = val - prev\n prev = val\n return result");
+
+    test_assert(branch.length() == 1);
+    test_assert(branch["delta"]->nestedContents.length() > 7);
 }
 
 void test_statically_resolve_namespace_access()
@@ -676,6 +691,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_for_loop);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_multiline_function);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);
 }

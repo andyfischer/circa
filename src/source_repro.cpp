@@ -23,6 +23,7 @@ StyledSource::toString()
 
 void format_branch_source(StyledSource* source, Branch& branch, Term* format)
 {
+    #ifndef SIGINDENT
     parser::BranchSyntax branchSyntax = parser::BRANCH_SYNTAX_UNDEF;
 
     if (format != NULL) {
@@ -47,6 +48,11 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
             break;
         }
     }
+    #endif
+
+    if (format != NULL)
+        append_phrase(source, format->stringPropOptional("syntax:postHeadingWs", ""),
+                format, phrase_type::WHITESPACE);
 
     bool newlineNeeded = false;
     for (int i=0; i < branch.length(); i++) {
@@ -72,6 +78,14 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
     if (format != NULL) {
         append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
                 format, phrase_type::WHITESPACE);
+        if (format->boolPropOptional("syntax:explicitEnd", false))
+            append_phrase(source, "end", format, phrase_type::UNDEFINED);
+    }
+
+    #ifndef SIGINDENT
+    if (format != NULL) {
+        append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
+                format, phrase_type::WHITESPACE);
 
         switch (branchSyntax) {
         case parser::BRANCH_SYNTAX_UNDEF:
@@ -87,6 +101,7 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
             break;
         }
     }
+    #endif
 }
 
 std::string unformat_rich_source(StyledSource* source)

@@ -10,7 +10,7 @@ namespace changed_function {
 
     CA_DEFINE_FUNCTION(changed, "changed(state any, any input) -> bool;"
         "'Stateful function, returns whether the given input has changed since the "
-        "last call.' end")
+        "last call.'")
     {
         TaggedValue* state = STATE_INPUT;
         TaggedValue* current = INPUT(1);

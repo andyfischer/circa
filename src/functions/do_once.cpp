@@ -12,13 +12,9 @@ namespace do_once_function {
     void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
-        append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
-                term, token::WHITESPACE);
-        format_branch_source(source, term->nestedContents, NULL);
+        format_branch_source(source, term->nestedContents, term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, token::WHITESPACE);
-                
-        append_phrase(source, "end", term, phrase_type::KEYWORD);
     }
 
     void setup(Branch& kernel)

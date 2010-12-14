@@ -40,7 +40,8 @@ docs/nanodoc/index.html
 
 # miscellaneous
 x.ca
-.ca
+y.ca
+z.ca
 *.swp
 *.pyc
 .DS_Store

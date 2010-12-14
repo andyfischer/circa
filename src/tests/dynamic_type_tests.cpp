@@ -53,6 +53,7 @@ void test_field_access()
     Branch& f = branch["f"]->nestedContents;
     Term* r = branch.compile("r = f()");
 
+    test_assert(branch);
     evaluate_branch(branch);
 
     Term* four = f[1];

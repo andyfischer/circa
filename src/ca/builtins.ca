@@ -5,9 +5,8 @@ def toggle(bool tog) -> bool
     with (true), the result flips. Starts out false.
     >>>
     state bool on = false
-    if tog; on = not(on); end
-    return(on)
-end
+    if tog; on = not(on)
+    return on
 
 def approach(number target, number maximum_change) -> number
     <<<
@@ -20,8 +19,7 @@ def approach(number target, number maximum_change) -> number
     elif target < current
         current -= min(maximum_change, current - target)
     end
-    return(current)
-end
+    return current
 
 def once() -> bool
     <<<
@@ -30,59 +28,48 @@ def once() -> bool
     state bool s = true
     result = s
     s = false
-    return(result)
-end
+    return result
 
 -- Math utility functions
 def to_rect(Point topLeft, Point size) -> Rect
-    return([topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y])
-end
+    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
 
 def polar(number angle) -> Point
-    return([cos(angle) sin(angle)])
-end
+    return [cos(angle) sin(angle)]
 
 def magnitude(Point point) -> number
     "Returns the magnitude, or the distance from [0,0] to this point."
-    return(sqrt(sqr(point.x) + sqr(point.y)))
-end
+    return sqrt(sqr(point.x) + sqr(point.y))
 
 def point_distance(Point a, Point b) -> number
     "Returns the distance between a and b."
-    return(sqrt(sqr(a.x - b.x) + sqr(a.y - b.y)))
-end
+    return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 
 def rotate_point(Point p, number rotation) -> Point
     "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
-    return([p.x*cos(rotation) - p.y*sin(rotation),
+    return ([p.x*cos(rotation) - p.y*sin(rotation),
         p.x*sin(rotation)+p.y*cos(rotation)])
-end
 
 def random_norm_vector() -> Point
     "Return a random normalized vector"
     angle = rand()
-    return([cos(angle) sin(angle)])
-end
+    return [cos(angle) sin(angle)]
 
 def norm(Point v) -> Point
     "Returns v normalized to be along the unit circle."
     m = magnitude(v)
-    return([v.x / m, v.y / m])
-end
+    return [v.x / m, v.y / m]
 
 def perpendicular(Point v) -> Point
     "Returns a vector that is perpendicular to v, rotated clockwise."
-    return([v.y -v.x])
-end
+    return [v.y -v.x]
 
 def expand_rect(Point center, number width, number height) -> Rect
     "Return a rectangle with the given center, width, and height."
-    return([center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2])
-end
+    return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 
 def rect(Point topleft, Point bottomright) -> Rect
     return([topleft.x topleft.y bottomright.x bottomright.y])
-end
 
 def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     "Return whether the two rectangles intersect."
@@ -95,11 +82,9 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
     return(intersects_on_x and intersects_on_y)
-end
 
 def random_color() -> Color
     return([rand() rand() rand() 1.0])
-end
 
 def blend_color(Color a, Color b, number ratio) -> Color
     def unit_tests()
@@ -108,7 +93,6 @@ def blend_color(Color a, Color b, number ratio) -> Color
         blend_color(#abc #123 2.0) == #123
         blend_color(#abc #123 -1.0) == #abc
         blend_color(#fff #fff 0.5) == #fff
-    end
 
     max(@ratio, 0.0)
     min(@ratio, 1.0)
@@ -123,15 +107,12 @@ def blend_color(Color a, Color b, number ratio) -> Color
         -- hack to preserve alpha:
         result[3] = 1.0
         return(result)
-    end
-end
 
 def delta(number val) -> number
     state number prev = val
     result = val - prev
     prev = val
-    return(result)
-end
+    return result
 
 namespace styled_source
     literal_string = 1
@@ -144,4 +125,3 @@ namespace styled_source
     function_name = 202
     infix_operator = 201
     whitespace = 206
-end

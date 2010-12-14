@@ -9,7 +9,7 @@ namespace concat_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(concat, "concat(any...) -> string;"
-            "'Concatenate each input (converting to a string if necessary).' end")
+            "'Concatenate each input (converting to a string if necessary).'")
     {
         std::stringstream out;
         for (int index=0; index < NUM_INPUTS; index++) {

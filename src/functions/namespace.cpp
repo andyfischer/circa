@@ -16,13 +16,9 @@ namespace namespace_function {
     {
         append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TERM_NAME);
-        append_phrase(source, term->stringPropOptional("syntax:postHeadingWs", "\n"),
-                term, token::WHITESPACE);
-        format_branch_source(source, term->nestedContents, NULL);
+        format_branch_source(source, term->nestedContents, term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, token::WHITESPACE);
-                
-        append_phrase(source, "end", term, phrase_type::KEYWORD);
     }
 
     CA_FUNCTION(get_namespace_field)

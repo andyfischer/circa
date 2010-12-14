@@ -9,7 +9,7 @@ namespace assert_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(assert, "assert(bool condition);"
-            "'Raises a runtime error if condition is false' end")
+            "'Raises a runtime error if condition is false'")
     {
         if (!BOOL_INPUT(0))
             error_occurred(CONTEXT, CALLER, "Assert failed");
