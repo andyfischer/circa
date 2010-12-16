@@ -6,12 +6,10 @@ def fill_rect(Rect rect, Color color)
     sw = [rect.x1 rect.y2]
     se = [rect.x2 rect.y2]
     gl:triangles([nw ne se se sw nw] color)
-end
 
 def line(Point x, Point y, Color color)
     "Draw a line."
     gl:line_strip([x y] color)
-end
 
 def draw_rect(Rect rect, Color color)
     gl:line_strip([[rect.x1 rect.y1]
@@ -19,13 +17,11 @@ def draw_rect(Rect rect, Color color)
         [rect.x2 rect.y2]
         [rect.x1 rect.y2]
         [rect.x1 rect.y1-1]] color)
-end
 
 def thick_line(Point a, Point b, number width, Color color)
     "Draw a thick line with the given thickness."
     perp = perpendicular(norm(a - b)) * width
     gl:triangles([a - perp, a + perp, b + perp, b+perp, b-perp, a-perp] color)
-end
 
 def draw_circle(Point p, number radius, Color color)
     -- Dumb guess on how many points to use
@@ -35,10 +31,8 @@ def draw_circle(Point p, number radius, Color color)
     points = []
     for step in 0..steps
         points.append([cos(step / steps), sin(step / steps)] * radius + p)
-    end
 
     gl:line_loop(points, color)
-end
 
 def fill_rounded_rect(Rect rect, number cornerRadius, Color color)
     "Draw a rectangle with rounded corners"
@@ -74,4 +68,3 @@ def fill_rounded_rect(Rect rect, number cornerRadius, Color color)
 
     -- bottom right
     gl:pie([rect.x2-r, rect.y2-r] r .25 .5 color)
-end

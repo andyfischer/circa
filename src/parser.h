@@ -73,6 +73,7 @@ Term* statically_resolve_namespace_access(Term* target);
 
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
+void set_starting_source_location(Term* term, int start, TokenStream& tokens);
 void set_source_location(Term* term, int start, TokenStream& tokens);
 Term* find_and_apply(Branch& branch, std::string const& functionName, RefList inputs);
 

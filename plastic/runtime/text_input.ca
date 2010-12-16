@@ -18,25 +18,18 @@ namespace text_input
             st.text = concat(text.slice(0, st.cursor), keypress.character,
                 text.slice(st.cursor, text.length()))
             st.cursor = st.cursor + 1
-        end
-        return(st)
-    end
+        return st
 
     def get_input() -> string
         state TextInputState tis
         for key in recent_key_presses()
             input_character(@tis, key)
-        end
-        return(tis.text)
-    end
+        return tis.text
 
     def draw_input(Font font, Color color, Point loc) -> string
         state TextInputState tis
         for key in recent_key_presses()
             input_character(@tis, key)
-        end
         draw_text(font, tis.text, color, loc)
         fill_rect(to_rect([loc.x + tis.cursor loc.y] [2 15]), color)
-        return(tis.text)
-    end
-end
+        return tis.text

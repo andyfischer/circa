@@ -22,7 +22,7 @@ void test_simple()
     import_function(branch, spy_function, "spy(int)");
     gSpyResults.clear();
 
-    branch.compile("for i in 0..5\nspy(i)\nend");
+    branch.compile("for i in 0..5 spy(i) end");
 
     evaluate_branch(branch);
 
@@ -37,12 +37,12 @@ void test_simple()
 void type_inference_for_iterator()
 {
     Branch branch;
-    Term* loop = branch.compile("for i in [1]\nend");
+    Term* loop = branch.compile("for i in [1] end");
     Term* iterator = get_for_loop_iterator(loop);
     //test_assert(iterator->type == INT_TYPE);
 
     // test a situation where we can't do inference
-    loop = branch.compile("for i in []\nend");
+    loop = branch.compile("for i in [] end");
     iterator = get_for_loop_iterator(loop);
     test_assert(iterator->type == ANY_TYPE);
 }

@@ -183,20 +183,20 @@ void test_execution()
     import_function(branch, spy_function, "spy(string)");
     branch.compile(
     "if (false)\n"
-        "spy('Error!')\n"
+    "  spy('Error!')\n"
     "else\n"
-        "if (true)\n"
-            "if (false)\n"
-                "spy('Error!')\n"
-            "else\n"
-                "if (false)\n"
-                    "spy('Error!')\n"
-                "else\n"
-                    "if (true)\n"
-                        "spy('Nested 5')\n"
-                    "else\n"
-                        "spy('Error!')\n"
-            "spy('Error!')\n"
+    "  if (true)\n"
+    "    if (false)\n"
+    "      spy('Error!')\n"
+    "    else\n"
+    "      if (false)\n"
+    "        spy('Error!')\n"
+    "      else\n"
+    "         if (true)\n"
+    "           spy('Nested 5')\n"
+    "         else\n"
+    "           spy('Error!')\n"
+    "           spy('Error!')\n"
             );
     evaluate_branch(branch);
     test_assert(branch);

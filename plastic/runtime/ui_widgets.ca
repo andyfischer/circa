@@ -8,18 +8,15 @@ def draw_vmenu(Point topleft, List items) -> any
     labels = []
     for item in items
         labels.append(item[0])
-    end
 
     -- Render text sprites
     for label in @labels
         text:render_text(menu_font, @label, #fff)
-    end
 
     -- Get maximum text width
     text_width = 0
     for label in labels
         max(@text_width, label.width)
-    end
 
     index = 0
     item_height = 21
@@ -50,18 +47,14 @@ def draw_vmenu(Point topleft, List items) -> any
 
         if index != 0
             line([x y] [x+box_width y] #888)
-        end
 
         if mouse_clicked_region(rect)
             result = items[index][1]
             print(result)
-        end
 
         index += 1
-    end
 
-    return(result)
-end
+    return result
 
 def draw_hmenu(Point topleft, List items) -> any
     labels = []
@@ -88,9 +81,7 @@ def draw_hmenu(Point topleft, List items) -> any
         color = bg_color + #222 * highlight
         fill_rect(rect color)
         text:draw_rendered_text(label [x+h_gutter, y+v_gutter])
-    end
 
-    return(0)
-end
+    return 0
 
 } -- namespace ui_widgets

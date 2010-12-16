@@ -2,19 +2,16 @@
 draw_main_menu = false
 if draw_main_menu
     include('mainmenu.ca' -> path)
-end
 
 -- Draw fpses
 draw_fps = false
 if draw_fps
     text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
     text:draw_rendered_text(text_sprite, [10 window.height - 40])
-end
 
 -- Draw pause indicator
 if ide:paused()
     draw_text(ui_font_medium, "Paused", #fff, window - [100 40])
-end
 
 -- Name selector
 <<<

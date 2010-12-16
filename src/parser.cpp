@@ -171,16 +171,38 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     post_parse_branch(branch);
 }
 
+int find_indentation_of_next_statement(TokenStream& tokens)
+{
+    // Lookahead and find the next non-whitespace statement.
+    int lookahead = 0;
+    while (!tokens.finished()) {
+        if (tokens.nextIs(WHITESPACE, lookahead))
+            lookahead++;
+        else if (tokens.nextIs(NEWLINE, lookahead))
+            lookahead++;
+        else
+            break;
+    }
+
+    if (lookahead >= tokens.remaining())
+        return -1;
+
+    return tokens.next(lookahead).colStart;
+}
+
 void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens)
 {
-    Term* owningTerm = branch.owningTerm;
-    ca_assert(owningTerm != NULL);
+    Term* parentTerm = branch.owningTerm;
+    ca_assert(parentTerm != NULL);
+
+    ca_assert(parentTerm->sourceLoc.defined());
+    int parentTermIndent = parentTerm->sourceLoc.col;
 
     // Consume the whitespace immediately after the heading (and possibly a newline).
     std::string postHeadingWs = possible_statement_ending(tokens);
     bool foundNewline = postHeadingWs.find_first_of("\n") != std::string::npos;
 
-    owningTerm->setStringProp("syntax:postHeadingWs", postHeadingWs);
+    parentTerm->setStringProp("syntax:postHeadingWs", postHeadingWs);
 
     // If we're still on the same line, keep consuming statements. We might only
     // find a comment (in which case we should keep parsing subsequent lines),
@@ -191,7 +213,7 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
         while (!tokens.finished()) {
             // If we hit an 'end' then consume and finish
             if (tokens.nextIs(END)) {
-                owningTerm->setBoolProp("syntax:explicitEnd", true);
+                parentTerm->setBoolProp("syntax:explicitEnd", true);
                 tokens.consume();
                 return;
             }
@@ -221,13 +243,31 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
     if (foundStatementOnSameLine)
         return;
 
-    // Next, keep parsing until we hit a statement that is not comment/whitespace.
-    // This term will tell us the indentation level. It might take
-    // a few lines until we find it. Example:
+    // Lookahead and find the next non-whitespace statement.
+    int lookahead = 0;
+    while (!tokens.finished()) {
+        if (tokens.nextIs(WHITESPACE, lookahead))
+            lookahead++;
+        else if (tokens.nextIs(NEWLINE, lookahead))
+            lookahead++;
+        else
+            break;
+    }
+
+    // Check if the next statement has an indentation level that is higher
+    // or equal to the parent indentation. If so then stop here.
+
+    if (find_indentation_of_next_statement(tokens) <= parentTermIndent)
+        return;
+
+    // Okay, at this point we're ready to parse some statements. The first statement
+    // will tell us the indentation level for the whole block. But, we'll ignore
+    // comments when figuring this out. Example:
     //     def f()
     //
     //             -- a misplaced comment
-    //         return 1 + 2
+    //         a = 1
+    //         return a + 2
 
     int indentationLevel = 0;
     while (!tokens.finished()) {
@@ -281,7 +321,8 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     Term* result = NULL;
 
-    // Comment (blank lines count as comments)
+    // Comment (blank lines count as comments). This should do the same thing
+    // as matches_comment_statement.
     if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)
         || (foundWhitespace && (tokens.nextIs(RBRACE) || tokens.nextIs(END) || tokens.finished()))) {
         result = comment(branch, tokens);
@@ -330,10 +371,13 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     prepend_whitespace(result, preWhitespace);
 
-    append_whitespace(result, possible_whitespace(tokens));
+    if (!result->hasProperty("syntax:postHeadingWs")) {
+        // Consume some trailing whitespace
+        append_whitespace(result, possible_whitespace(tokens));
 
-    // Consume a newline or ; or ,
-    result->setStringProp("syntax:lineEnding", possible_statement_ending(tokens));
+        // Consume a newline or ; or ,
+        result->setStringProp("syntax:lineEnding", possible_statement_ending(tokens));
+    }
 
     // Mark this term as a statement
     set_is_statement(result, true);
@@ -349,6 +393,21 @@ Term* statement(Branch& branch, TokenStream& tokens)
     post_compile_term(result);
 
     return result;
+}
+
+bool matches_comment_statement(Branch& branch, TokenStream& tokens)
+{
+    int lookahead = 0;
+    bool foundWhitespace = false;
+    if (tokens.nextIs(WHITESPACE, lookahead)) {
+        lookahead++;
+        foundWhitespace = true;
+    }
+
+    int next = tokens.next(lookahead).match;
+    return (next == COMMENT || next == NEWLINE || next == SEMICOLON ||
+        (foundWhitespace &&
+             (tokens.nextIs(RBRACE) || tokens.nextIs(END) || tokens.finished())));
 }
 
 Term* comment(Branch& branch, TokenStream& tokens)
@@ -407,6 +466,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function(result);
     function_t::get_inline_state_type(result) = VOID_TYPE;
+    set_starting_source_location(result, startPosition, tokens);
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
@@ -653,6 +713,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         if (tokens.finished())
             return compile_error_for_line(result, tokens, startPosition);
 
+        int leadingTokenPosition = tokens.getPosition();
+
         int leadingToken = tokens.next().match;
 
         // First iteration should always be 'if'
@@ -676,6 +738,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
             Term* block = apply(contents, IF_FUNC, RefList(condition));
             block->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
+            set_starting_source_location(block, leadingTokenPosition, tokens);
+            
             set_input_syntax_hint(block, 0, "postWhitespace", possible_statement_ending(tokens));
 
             consume_branch(block->nestedContents, tokens);
@@ -685,6 +749,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             Branch& elseBranch = create_branch(contents, "else");
             elseBranch.owningTerm->setStringProp("syntax:preWhitespace",
                     preKeywordWhitespace);
+            set_starting_source_location(elseBranch.owningTerm, leadingTokenPosition, tokens);
             consume_branch(elseBranch, tokens);
         }
 
@@ -755,6 +820,7 @@ Term* for_block(Branch& branch, TokenStream& tokens)
     Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr), name);
     Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
+    set_starting_source_location(forTerm, startPosition, tokens);
 
     set_bool(get_for_loop_modify_list(forTerm), rebindListName);
 
@@ -775,12 +841,12 @@ Term* for_block(Branch& branch, TokenStream& tokens)
 
 Term* do_once_block(Branch& branch, TokenStream& tokens)
 {
-    //int startPosition = tokens.getPosition();
+    int startPosition = tokens.getPosition();
 
     tokens.consume(DO_ONCE);
 
     Term* result = apply(branch, DO_ONCE_FUNC, RefList());
-
+    set_starting_source_location(result, startPosition, tokens);
     consume_branch(result->nestedContents, tokens);
 
     return result;
@@ -1712,6 +1778,7 @@ Term* namespace_block(Branch& branch, TokenStream& tokens)
 
     std::string name = tokens.consume(IDENTIFIER);
     Term* result = apply(branch, NAMESPACE_FUNC, RefList(), name);
+    set_starting_source_location(result, startPosition, tokens);
 
     consume_branch(result->nestedContents, tokens);
 
@@ -1811,6 +1878,12 @@ void append_whitespace(Term* term, std::string const& whitespace)
     if (whitespace != "" && term != NULL)
         term->setStringProp("syntax:postWhitespace",
             term->stringProp("syntax:postWhitespace") + whitespace);
+}
+
+void set_starting_source_location(Term* term, int start, TokenStream& tokens)
+{
+    term->sourceLoc.col = tokens[start].colStart;
+    term->sourceLoc.line = tokens[start].lineStart;
 }
 
 void set_source_location(Term* term, int start, TokenStream& tokens)

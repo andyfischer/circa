@@ -4,7 +4,6 @@ state Point mouse
 def mouse_in(Rect b) -> bool
   "Return whether the mouse is currently inside the given rect."
   return((b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y))
-end
 
 -- Information about the current window (passed in from main.cpp)
 type Window {
@@ -29,7 +28,6 @@ namespace ide
     def reload_runtime(): "Reload the builtin runtime"
     def paused() -> bool : "Returns whether the current script is paused"
     def get_time() -> number {}
-end
 
 time = ide:get_time()
 time_delta = delta(time)
@@ -92,27 +90,19 @@ namespace key
     delete = 0
     enter = 0
     escape = 0
-end
 
 -- GL functions
 def background(Color)
     "Fill the screen with the given color."
-end
 
-namespace gl begin
-    def triangles(List, Color):
-        "Render a list of points as triangles."
-    def line_strip(List, Color):
-        "Render a list of points as a line strip."
-    def line_loop(List, Color):
-        "Render a list of points as a line loop."
-    def lines(List, Color):
-        "Render a list of points as a line list."
-    def points(List, Color):
-        "Render a list of points."
-    def circle(Point loc, number radius, Color):
-        "Render a circle."
-    def pie(Point loc, number radius, number angle_start, number angle_fin, Color):
+namespace gl
+    def triangles(List, Color) "Render a list of points as triangles."
+    def line_strip(List, Color) "Render a list of points as a line strip."
+    def line_loop(List, Color) "Render a list of points as a line loop."
+    def lines(List, Color) "Render a list of points as a line list."
+    def points(List, Color) "Render a list of points."
+    def circle(Point loc, number radius, Color) "Render a circle."
+    def pie(Point loc, number radius, number angle_start, number angle_fin, Color)
         "Render a pie slice."
     def load_program(string vertFile, string fragFile) -> int {}
     def _use_program(int prog_id) {}
@@ -126,7 +116,6 @@ namespace gl begin
     end
     def clear_program() {}
     def set_uniform(string name, any value) {}
-end
 
 def load_font(string filename, int size) {}
 def draw_string(string str, Point loc, Color color) {}
@@ -140,7 +129,6 @@ def alternate_over_time(number period) -> bool
     "Stateful function, alternates between true and false according to the given period."
     state number time_started = time
     return(round((time - time_started) / period) % 2 == 0)
-end
 
 def linear_fadein(number total_time) -> number
     <<<
@@ -150,13 +138,11 @@ def linear_fadein(number total_time) -> number
     state number time_started = time
     elapsed = (time - time_started) / total_time
     return(min(elapsed, 1.0))
-end
 
 def elapsed() -> number
     "Stateful function, returns the number of seconds that has passed since this function was first called"
     state number time_started = time
     return(time - time_started)
-end
 
 def draggable_rect(Point initial_location, Point size) -> Point
     state Point location = initial_location
@@ -167,13 +153,10 @@ def draggable_rect(Point initial_location, Point size) -> Point
         location = mouse + mouse_offset
         if not(mouse_pressed())
             currently_dragging = false
-        end
     elif mouse_clicked(rect)
         currently_dragging = true
         mouse_offset = location - mouse
-    end
     return(location)
-end
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -190,8 +173,6 @@ namespace fps_counter
         lastRecoredFps = framesElapsed / timeElapsed
         framesElapsed = 0
         timeStarted = time
-    end
-end
 
 fps = fps_counter:lastRecoredFps
 

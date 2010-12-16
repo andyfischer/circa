@@ -11,7 +11,7 @@ void create()
 {
     Branch branch;
 
-    Term* func = branch.eval("def mysub(int) -> string\nend");
+    Term* func = branch.eval("def mysub(int) -> string end");
 
     test_assert(func);
     test_assert(is_subroutine(func));
@@ -33,7 +33,7 @@ void test_is_callable()
 
     // subroutine
     Branch branch;
-    Term* s = branch.eval("def mysub()\nend");
+    Term* s = branch.eval("def mysub() end");
     test_assert(is_callable(s));
 
     Term* a = branch.eval("1");

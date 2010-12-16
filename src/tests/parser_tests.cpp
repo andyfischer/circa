@@ -519,7 +519,7 @@ void test_whitespace_after_statement()
 void test_significant_indentation()
 {
     Branch branch;
-    branch.eval("def func():\n"
+    branch.eval("def func()\n"
                 "  a = 1 + 2\n"
                 "  b = a + 1\n"
                 "c = 3 + 4");
@@ -538,27 +538,32 @@ void test_significant_indentation()
     branch.clear();
 
     // Test with whitespace before the function body
-    branch.eval("def func() -> int:\n"
-                "\n"
-                "  \n"
-                "    a = 2\n"
-                "    return(a)\n"
-                "b = func()");
+    branch.compile("def func() -> int\n"
+                   "\n"
+                   "  \n"
+                   "    a = 2\n"
+                   "    return(a)\n");
     test_assert(branch);
-    test_assert(branch["b"]->asInt() == 2);
+    test_assert(branch.eval("func()")->asInt() == 2);
 
     branch.clear();
 
     // Test with blank lines inside the function
-    branch.eval("def func() -> int:\n"
+    branch.eval("def func() -> int\n"
                 "  a = 5\n"
                 "\n"          // <-- Blank line doesn't have same indent
-                "  return(a)\n"
+                "  return(6)\n"
                 "b = func()");
     test_assert(branch);
-    test_assert(branch["b"]->asInt() == 5);
+    test_assert(branch["b"]->asInt() == 6);
 
     branch.clear();
+
+    // Test with no indented lines
+    branch.compile("def func()\na = 5");
+    test_assert(branch);
+    test_assert(branch["a"] != NULL);
+    test_assert(branch["func"]->nestedContents["a"] == NULL);
 }
 
 void test_significant_indentation2()
@@ -578,6 +583,33 @@ void test_significant_indentation2()
     test_equals(func[3]->name, "b");
 }
 
+void test_significant_indentation_bug_with_empty_functions()
+{
+    Branch branch;
+    branch.compile("namespace ns\n"
+                   "  def a()\n"
+                   "  def b()\n");
+
+    // This once caused a bug where function b() was outside the namespace.
+    test_assert(branch["ns"] != NULL);
+    test_assert(branch["ns"]->nestedContents["a"] != NULL);
+    test_assert(branch["ns"]->nestedContents["b"] != NULL);
+    test_assert(branch["a"] == NULL);
+    test_assert(branch["b"] == NULL);
+
+    branch.clear();
+    branch.compile("namespace ns\n"
+                   "  def a() 'blah blah blah'\n"
+                   "  def b() 'blah blah blah'\n");
+
+    // This once caused a bug where function b() was outside the namespace.
+    test_assert(branch["ns"] != NULL);
+    test_assert(branch["ns"]->nestedContents["a"] != NULL);
+    test_assert(branch["ns"]->nestedContents["b"] != NULL);
+    test_assert(branch["a"] == NULL);
+    test_assert(branch["b"] == NULL);
+}
+
 void test_sig_indent_one_liner()
 {
     Branch branch;
@@ -594,6 +626,21 @@ void test_sig_indent_one_liner()
     test_equals(g_contents[2]->asInt(), 2);
     test_equals(g_contents[3]->asInt(), 3);
     test_equals(branch[1]->asInt(), 4);
+}
+
+void test_sig_indent_bug_with_function_in_namespace()
+{
+    Branch branch;
+    branch.compile("namespace ns\n"
+                   "  type MyType { int a }\n"
+                   "  def func() -> int\n"
+                   "    a = 5\n"
+                   "  def another_func()\n");
+
+    test_assert(branch["ns"] != NULL);
+    test_assert(branch["ns"]->nestedContents["func"] != NULL);
+    test_assert(branch["ns"]->nestedContents["func"]->nestedContents["a"] != NULL);
+    test_assert(branch["ns"]->nestedContents["a"] == NULL);
 }
 
 void test_sig_indent_for_loop()
@@ -689,7 +736,9 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
+    REGISTER_TEST_CASE(parser_tests::test_significant_indentation_bug_with_empty_functions);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_bug_with_function_in_namespace);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_for_loop);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_multiline_function);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);

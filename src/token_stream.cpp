@@ -21,14 +21,14 @@ TokenStream::next(int lookahead) const
 }
 
 int
-TokenStream::nextNonWhitespace(int lookahead) const
+TokenStream::findNextNonWhitespace(int lookahead) const
 {
     int index = this->_position;
 
     while (true) {
 
         if (index >= (int) tokens.size())
-            return token::EOF_TOKEN;
+            return -1;
 
         if (tokens[index].match == token::WHITESPACE) {
             index++;
@@ -36,11 +36,22 @@ TokenStream::nextNonWhitespace(int lookahead) const
         }
 
         if (lookahead == 0)
-            return tokens[index].match;
+            return index;
 
         lookahead--;
         index++;
     }
+}
+
+int
+TokenStream::nextNonWhitespace(int lookahead) const
+{
+    int index = findNextNonWhitespace(lookahead);
+
+    if (index == -1)
+        return token::EOF_TOKEN;
+
+    return tokens[index].match;
 }
 
 bool TokenStream::nextIs(int match, int lookahead) const

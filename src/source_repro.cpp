@@ -68,11 +68,14 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
 
         format_term_source(source, term);
 
-        if (term->hasProperty("syntax:lineEnding"))
+        if (term->hasProperty("syntax:lineEnding")) {
             append_phrase(source, term->stringProp("syntax:lineEnding"),
                 term, phrase_type::UNDEFINED);
-        else
+        } else if (term->hasProperty("syntax:postHeadingWs"))  {
+            // no newline needed
+        } else {
             newlineNeeded = true;
+        }
     }
 
     if (format != NULL) {

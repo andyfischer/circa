@@ -120,6 +120,7 @@ void Term::setBoolProp(std::string const& name, bool b)
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
+    ca_assert(!(name == "syntax:postWhitespace" && s == "       "));
     TaggedValue* t = addProperty(name, STRING_TYPE);
     set_string(t, s);
 }

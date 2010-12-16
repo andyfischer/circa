@@ -46,6 +46,11 @@ struct TokenStream
 
     token::Token const& next(int lookahead=0) const;
 
+    // Returns the position of the next non-whitespace token. Returns -1 if
+    // the end of the stream was reached before anything was found.
+    int findNextNonWhitespace(int lookahead=0) const;
+
+    // Returns the token type of the next non-whitespace token.
     int nextNonWhitespace(int lookahead=0) const;
 
     bool nextIs(int match, int lookahead=0) const;
