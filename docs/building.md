@@ -1,4 +1,6 @@
 
+# Warning! These instructions have not been updated in a while, they are probably misleading! #
+
 # Building the command-line app #
 
 The command-line app can execute Circa scripts and has a REPL. However, this app
@@ -19,14 +21,13 @@ which has more instructions below.
 1. Install Visual Studio
 2. Install Python 2.6 from www.python.org
 3.  Install SCons from here: www.scons.org
-4. Install Ruby from: http://www.ruby-lang.org/en/downloads/
 5. Open a command prompt, navigate to the Circa project folder, and run 'scons'
 
 Note, currently we have only tested building with VS 2005
 
 ## Linux ##
 
-1. Using your package manager, install GCC, Python, Ruby and SCons
+1. Using your package manager, install GCC, Python, SCons
 2. In a terminal, from the Circa project folder, run the command: 'scons'
 
 # Building Plastic #

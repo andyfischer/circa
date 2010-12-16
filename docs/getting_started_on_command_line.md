@@ -40,8 +40,8 @@ Examples:
 
     > 1 + 1
     2
-    > def hi()::number return 0.5 end
-    def hi()::number return 0.5 end
+    > def hi() -> number return 0.5 end
+    def hi() -> number return 0.5 end
     > sqrt(hi())
     0.707107
 

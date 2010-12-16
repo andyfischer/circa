@@ -42,7 +42,6 @@ A simple example is:
     state int button_presses
     if button_pressed()
         button_presses += 1
-    end
 
 Every time this script is run, if `button_pressed()` is true then the `button_presses` count will go up.
 
@@ -52,13 +51,11 @@ State can be nested in function definitions. An example:
 
     def my_func_with_state()
         state int i
-    end
 
     def function_that_has_three_integers()
         my_counting_func()
         my_counting_func()
         my_counting_func()
-    end
 
 If a piece of code calls a function with inlined state, that code also becomes stateful. Also,
 there is a separate piece of state for each call to a stateful function. In the above example,
@@ -90,7 +87,6 @@ So the following loop would have 100 different strings in its state:
 
     for i in 0..100
         state string a_string
-    end
 
 *unbounded loops (such as the `while` loop)*
 
@@ -113,7 +109,6 @@ starts out at 0 again.
     duration_button_held = 0.0
     if button_down()
         duration_button_held = elapsed()
-    end
 
 # Helpful stateful functions #
 
@@ -125,9 +120,7 @@ toggle() will switch its result every time it's called with 'true':
         state bool status
         if switch
             status = not(status)
-        end
         return status
-    end
 
 approach() will return a result that approaches a target over time:
 
@@ -137,9 +130,7 @@ approach() will return a result that approaches a target over time:
             current += min(step, target - current)
         elif target < current
             current -= min(step, current - target)
-        end
         return current
-    end
 
 elapsed() returns the total time since the function was first called, using the `time`
 global variable.
@@ -147,10 +138,8 @@ global variable.
     def elapsed() -> number
         state number time_started = time
         return time - time_started
-    end
 
 fade() will go from 0.0 to 1.0 over the course of `total_time` seconds.
 
     def fade(number total_time) -> number
         return min(elapsed() / total_time, 1.0)
-    end

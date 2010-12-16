@@ -7,7 +7,7 @@ This page is a reference for Circa's syntax.
 Comments
 --------
 
-Linewise comments are specified with two dashes: `--`. This will cause the rest of the line to be ignored.
+Line comments are specified with two dashes: `--`. This will cause the rest of the line to be ignored.
 
     -- this is a comment
 
@@ -40,7 +40,7 @@ Exponent syntax is currently not supported (example: `1e9`), but planned for the
 Strings
 -------
 
-Either single-quoted or double-quoted.
+Strings can either be single-quoted or double-quoted.
 
     'hello', "goodbye"
 
@@ -49,21 +49,15 @@ These create a value of type `string`.
 Booleans
 --------
 
-Possibilities:
+Values of type `bool` have two possible values:
 
     true, false
 
-These create a value of type `bool`
 
 Colors
 ------
 
-Has several different forms:
-
- * 3 hex digits (corresponding to red, green, blue)
- * 4 hex digits (as above, with 4th digit for alpha)
- * 6 hex digits (red, green, blue; two digits for each color)
- * 8 hex digits (as above, with last two digits for alpha).
+Since Circa scripts tend to draw stuff, the language supports color literals. The syntax is similar to CSS.
 
 Examples:
 
@@ -73,7 +67,27 @@ Examples:
  * `#ff4f00` (International orange)
  * `#00ff0088` (Green with 50% transparency)
 
-Creates a value of type `Color`, which is a list of four numbers.
+The different formats are:
+
+ * 3 hex digits (corresponding to red, green, blue)
+ * 4 hex digits (as above, with 4th digit for alpha)
+ * 6 hex digits (red, green, blue; two digits for each color)
+ * 8 hex digits (as above, with last two digits for alpha).
+
+Creates a value of type `Color`, which is stored internally list of four numbers.
+
+Name bindings
+-------------
+
+To use a result somewhere else, one must bind it to a name. A name binding statement is of the form:
+
+    <identifier> = <expression>
+
+Some examples:
+
+    one = 1
+    four = 2 + 2
+    output = concat('There are ' number_of_things ' things)
 
 Function calls
 --------------
@@ -91,12 +105,17 @@ Examples:
 Right-apply syntax
 ------------------
 
-The `->` operator calls the function on the right with the value on the left. Example:
+The `->` operator is shorthand, it calls the function on the right using the value on the left as input.
+
+This code sample:
+
     'hi' -> print
-is equivalent to:
+
+does exactly the same thing as:
+
     print('hi')
 
-(This syntax only works for functions which take a single input; in a future version I'd like to add syntax for right-apply on functions with multiple inputs.)
+(Currently this syntax only supports sending a single output value to a function which takes a single input. In the future we'll support the same syntax for multiple inputs.)
 
 Typecasting
 -----------
@@ -105,21 +124,20 @@ A type name can be called like a function, this will attempt to cast the input t
     a = number(1)
     print(a)     -- prints 1.0
 
-Like function calls, you can also typecast with the right-apply operator (`->`):
+Since this is just a function call, you can also use the right-apply operator to do the same thing (`->`):
 
     a = 1 -> number
 
 Unary expressions
 -----------------
 
-There are three unary prefix operators:
+Circa has the following unary operators:
 
 <table>
 <tr>
  <th>Operator</th><th>Function name</th><th>Descrption</th>
 </tr>
 <tr><td>-</td>      <td>neg</td><td>Unary negation</td></tr>
-<tr><td>&</td>      <td>to_ref</td><td>Reference</td></tr>
 <tr><td>@</td>      <td>(none)</td><td>Rebinding operator</td></tr>
 </table>
 
@@ -129,14 +147,12 @@ A note of warning when using unary negation: if you have a list of items separat
  * `[3 -2]` - creates a list of two elements, equal to `[3, -2]`
  * `[3-2]` - creates a list of one element, equal to `[1]`
 
-Also, a side note about the `&` operator: references are not commonly used (as they are in C). Their primary usage is for writing code that does reflection/introspection.
-
 The rebinding operator `@` is explained below.
 
 Infix expressions
 -----------------
 
-We have the following infix operators:
+Circa has the following infix operators:
 
 <table>
 <tr>
@@ -166,40 +182,29 @@ We have the following infix operators:
  <tr><td>/=</td>      <td>div</td><td>Rebinding div</td><td>2</td></tr>
 </table>
 
-The `/` operator always does floating-point division, it isn't overloaded as in C.
+The `/` operator always does floating-point division (unlike C where it can sometimes do integer division). To do integer division, use the `//` operator.
 
-The 'rebinding' operators will perform the advertised operation, and then bind the result to the name of the identifier on the left. Example:
+Each 'rebinding' operator will perform the advertised operation, and then rebind the left-hand-side name to the result. Example:
     
     a += 1
 
-is the same as:
+Does the same thing as:
    
     a = a + 1
 
-Name bindings
--------------
-
-A name binding statement is of the form:
-
-    <identifier> = <expression>
-
-Some examples:
-
-    one = 1
-    four = 2 + 2
-    output = concat('There are ' number_of_things ' things)
 
 Rebind operator
 ------------------
 
-The `@` operator can be put in front of an identifier. This causes the result of the overall expression to be bound to the specified name. Example:
+The `@` operator is used for shorthand, it means that the given name should be rebound to the result of the whole expression.
 
-    a = 1
-    add(@a, 2)
-
-has the same effect as:
+So instead of typing 'a' twice in this example:
 
     a = add(a, 2)
+
+You can write this, for the same effect:
+
+    add(@a, 2)
 
 Lists
 -----
@@ -225,14 +230,50 @@ Note that there must not be any whitespace between the expression on the left an
     print(example_list[0])   -- prints '1'
     print(example_list [0])  -- prints '[1 2 3][0]'
 
+Function declarations
+---------------------
+
+A new function can be declared with the `def` keyword. Example:
+
+    def <function-name>(<list of arguments>) -> <optional-return-type>
+        <statements>
+
+An example:
+
+    def print_sum(number a, number b)
+        sum = a + b
+        print(sum)
+
+The indentation is significant. Lines which are indented to the left of the 'def' statement are considered to be inside the subroutine.
+
+A function can also be a one-liner, if there are any expressions to the left of the declaraion. The 'end' keyword is used to mark the end of the function.
+
+    def one_liner(number a, number b) sum = a + b; print(sum) end
+
+A function can return a value, if it declares a return type. This is done with a -> token at the end of the declaration.
+
+    def pythag(number a, number b) -> number
+        return sqrt(a*a + b*b)
+
+Once a function is declared, it can then be called like a normal function.
+
+    pythag(3, 4)           -- returns 5
+    print_warning('hi')    -- prints 'warning: hi'
+
 If statement
 ------------
 
-An if-statement is specified by the `if` keyword, followed by a conditional expression, followed by a list of statements, followed by the `end` keyword. The list of statements are executed if the conditional expression is true. Examples:
+An if-statement is specified by the `if` keyword, followed by a conditional expression, followed by a list of statements. The format is: 
+
+    if <condition>
+        <statements>
+        
+The inner statements are executed if the conditional expression is true. An example:
 
     if mouse_pressed()
         print('The mouse is pressed')
-    end
+
+Like functions, indentation is used to tell which statements are inside the block. One-liners are also possible:
 
     if a > b; print('a is higher'); end
 
@@ -246,7 +287,6 @@ An if-statement can also have an `else` section, which is evaluated if the condi
         highest = a
     else
         highest = b
-    end
 
 There is also the `elif` keyword, which is followed by another conditional expression. There can be many of these.
 
@@ -256,28 +296,26 @@ There is also the `elif` keyword, which is followed by another conditional expre
         print('b is higher')
     else
         print('a equals b')
-    end
 
 For loop
 -------------
 
-A for-loop is specified by the `for` keyword. The first line has this syntax:
+A for-loop is specified by the `for` keyword. The loop has this syntax:
 
     for <iterator name> in <list expression>
+        <statements>
 
-which is followed by a list of expressions, and then the `end` keyword. Example:
+An example:
 
-    for i in [0, 1, 2, 3]
+    for i in [1, 2, 3, 4, 5]
         print('i is ' i)
-    end
 
-When executing a for-loop, it goes through each element in the list expression, binds that value to the iterator name, and executes the inner statements.
+In that example, the list will go through each number from 1 to 5, and print out something like 'i is 1' or 'i is 3'. The 'i' name is called the iterator. When executing the list, the iterator is bound to each value in the list, one at a time.
 
 This piece of code:
 
     for i in [0 1 2 3 4]
         print(i ' squared is ' i*i)
-    end
 
 has the following output:
 
@@ -292,61 +330,44 @@ When iterating across a range of numbers, it's convenient to use the range opera
     a = 0..4
     -- a is now equal to: [0 1 2 3]
 
-The above for-loop can be rewritten as:
+So, the above for-loop can be rewritten as:
 
     for i in 0..5
         print(i ' squared is ' i*i)
-    end
 
 For loop with rebinding
 ----------------------------
 
-A for-loop can also *rebind* the list expression using the `@` operator, which means that the inner code is allowed to modify each item, and the list name is rebound to the modified list. Example:
+A for-loop can also modify the list that it iterates through. To do this, use the @ operator in front of the list name, to indicate that it will be rebound to a new value. Then in the body of the loop, rebind the iterator to a new value. The loop will collect the results of each iteration, and use those results as the new value of the list.
+
+Here's an example. We start with the numbers 0 though 4:
 
     numbers = [0 1 2 3 4]
+
+In the for loop, we use the @ operator to say that we are going to rebind 'numbers'
+
     for i in @numbers
         i = i*i
-    end
-    print(numbers)
 
-will print the result: `[0, 1, 4, 9, 16]`.
+Inside the loop, we rebind 'i' to the square of the iterator.
 
-A rebinding for-statement can use the special keyword `discard`, which means that it will remove the current element from the output. The following for-loop will discard any odd numbers from the `numbers` list:
+    print(numbers)   -- outputs: [0, 1, 4, 9, 16]
+
+The end result is that each item in the list is squared.
+
+Another way that the list can be modified is with the `discard` statement. If the loop encounters a `discard`, then it will remove the current element fron the result list.
+
+Here's an example. This list iterates through each number between 0 and 9. Each time it finds that the number is odd, it triggers `discard`:
 
     numbers = 0..10
     -- numbers is now equal to [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     for i in @numbers 
         if i % 2 == 1
             discard
-        end
-    end
+
     -- numbers is now equal to [0, 2, 4, 6, 8]
 
-Function declarations
----------------------
-
-A function can be declared with the `def` keyword. Example:
-
-    def <function-name>(<list of arguments>) -> <optional-return-type>
-        (statements)
-    end
-
-An example:
-
-    def pythag(number a, number b) -> number
-        return sqrt(a*a + b*b)
-    end
-
-The `->` in the header indicates that the function has a return type. This is optional:
-
-    def print_warning(string message)
-        print('warning: ' message)
-    end
-
-Once a function is declared, it can then be called like a normal function.
-
-    pythag(3, 4)           -- returns 5
-    print_warning('hi')    -- prints 'warning: hi'
+The result is that only the even numbers remain.
 
 Compound types
 --------------
@@ -367,13 +388,12 @@ A compound value can then be created using constructor syntax, or by taking an e
     complex_value = Complex()
     complex_value = [1.0 0.0] -> Complex
 
-Side note, we don't currently support constructors with arguments (such as `Complex(1.0 0.0)`), but this is planned for a future version.
+Circa currently doesn't support constructors with arguments (such as `Complex(1.0 0.0)`), but this is planned for a future version.
 
 Fields of a compound value can be accessed or assigned with the dot operator. Example:
 
     real_part = complex_value.real
     complex_value.imag = 1.0
-    
 
 Namespaces
 ----------
@@ -381,17 +401,16 @@ Namespaces
 Code can be organized into a namespace. The syntax is:
 
     namespace <name>
-        (statements)
-    end
+        <statements
+
+Like other blocks, indentation is used to tell what belongs inside the block.
 
 Example:
 
     namespace web
         def get_page(string url) :: string
             ...
-        end
-    end
 
-To access something inside a namespace, use a colon-seperated identifier:
+To access something inside a namespace, use a colon-seperated identifier. Here's how we would call the 'get_page' function within the 'web' namespace:
 
     contents = web:get_page(url)
