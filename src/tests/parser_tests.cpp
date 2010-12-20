@@ -628,19 +628,19 @@ void test_sig_indent_one_liner()
     test_equals(branch[1]->asInt(), 4);
 }
 
-void test_sig_indent_bug_with_function_in_namespace()
+void test_sig_indent_bug_with_bad_func_header()
 {
     Branch branch;
-    branch.compile("namespace ns\n"
-                   "  type MyType { int a }\n"
-                   "  def func() -> int\n"
-                   "    a = 5\n"
-                   "  def another_func()\n");
+    branch.compile(
+        "namespace ns\n"
+        "  type T { int a, int b, int c }\n"
+        "  def func1(state Font, string filename, int size) -> Font\n"
+        "   'Something something something'\n"
+        "\n");
 
     test_assert(branch["ns"] != NULL);
-    test_assert(branch["ns"]->nestedContents["func"] != NULL);
-    test_assert(branch["ns"]->nestedContents["func"]->nestedContents["a"] != NULL);
-    test_assert(branch["ns"]->nestedContents["a"] == NULL);
+    test_assert(branch["ns"]->nestedContents["func1"] != NULL);
+    test_assert(is_function(branch["ns"]->nestedContents["func1"]));
 }
 
 void test_sig_indent_for_loop()
@@ -738,7 +738,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation2);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation_bug_with_empty_functions);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_one_liner);
-    REGISTER_TEST_CASE(parser_tests::test_sig_indent_bug_with_function_in_namespace);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_bug_with_bad_func_header);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_for_loop);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_multiline_function);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);

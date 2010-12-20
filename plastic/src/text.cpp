@@ -203,6 +203,7 @@ void pre_setup(Branch& branch)
 {
     FontRef::singleton = unbox_type(create_type(branch, "Font"));
     intrusive_refcounted::setup_type<FontRef>(FontRef::singleton);
+std::cout << "presetup, created Font type" << std::endl;
 }
 
 void setup(Branch& branch)

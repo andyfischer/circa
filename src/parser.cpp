@@ -515,8 +515,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         Term* typeTerm = type_identifier_or_anonymous_type(branch, tokens);
 
-        if (has_static_error(typeTerm))
-            return compile_error_for_line(result, tokens, startPosition);
+        //if (has_static_error(typeTerm))
+        //    return compile_error_for_line(result, tokens, startPosition);
 
         possible_whitespace(tokens);
         
@@ -530,7 +530,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
-        change_type(input, typeTerm);
+        if (is_type(typeTerm))
+            change_type(input, typeTerm);
         hide_from_source(input);
 
         if (isHiddenStateArgument) {
