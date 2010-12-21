@@ -571,7 +571,7 @@ void test_significant_indentation2()
     Branch branch;
 
     // Test with indented comment line (comments should be ignored)
-    branch.eval("def func():\n"
+    branch.eval("def func()\n"
                 "  a = 1\n"
                 "    --comment\n"
                 "  b = 2\n");
@@ -613,14 +613,14 @@ void test_significant_indentation_bug_with_empty_functions()
 void test_sig_indent_one_liner()
 {
     Branch branch;
-    branch.eval("def f(): 'avacado'\n  'burrito'\n'cheese'");
+    branch.eval("def f() 'avacado'\n  'burrito'\n'cheese'");
     Branch& f_contents = function_contents(branch["f"]);
     test_equals(f_contents[1]->asString(), "avacado");
     test_assert(branch[1]->asString() == "burrito");
     test_assert(branch[2]->asString() == "cheese");
 
     branch.clear();
-    branch.eval("def g(): 1 2 3\n  4");
+    branch.eval("def g() 1 2 3\n  4");
     Branch& g_contents = function_contents(branch["g"]);
     test_equals(g_contents[1]->asInt(), 1);
     test_equals(g_contents[2]->asInt(), 2);
@@ -646,7 +646,7 @@ void test_sig_indent_bug_with_bad_func_header()
 void test_sig_indent_for_loop()
 {
     Branch branch;
-    branch.compile("for i in [1]: 1");
+    branch.compile("for i in [1]; 1");
     test_assert(branch);
 }
 

@@ -93,28 +93,11 @@ void consume_branch(Branch& branch, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
 
-    // If the next token is : then consume with significant indentation.
-    if (tokens.nextIs(COLON)) {
-        tokens.consume(COLON);
-        if (branch.owningTerm != NULL)
-            branch.owningTerm->setIntProp("syntax:branchStyle", BRANCH_SYNTAX_COLON);
-
-        consume_branch_with_significant_indentation(branch, tokens);
-        post_parse_branch(branch);
-        return;
-    }
-
     int branchStyle = BRANCH_SYNTAX_UNDEF;
 
     if (tokens.nextIs(LBRACE)) {
         tokens.consume(LBRACE);
         branchStyle = BRANCH_SYNTAX_BRACE;
-    } else if (tokens.nextIs(BEGIN)) {
-        tokens.consume(BEGIN);
-        branchStyle = BRANCH_SYNTAX_BEGIN;
-    } else if (tokens.nextIs(DO)) {
-        tokens.consume(DO);
-        branchStyle = BRANCH_SYNTAX_DO;
     }
 
     if (branchStyle == BRANCH_SYNTAX_UNDEF) {
@@ -125,9 +108,6 @@ void consume_branch(Branch& branch, TokenStream& tokens)
         post_parse_branch(branch);
         return;
 #endif
-    }
-    else if (branchStyle == BRANCH_SYNTAX_BEGIN) {
-        //std::cout << "deprecated: begin" << std::endl;
     }
 
     while (!tokens.finished()) {
@@ -149,23 +129,6 @@ void consume_branch(Branch& branch, TokenStream& tokens)
             tokens.consume(RBRACE);
         else
             compile_error_for_line(branch, tokens, startPosition, "Expected: }");
-    } else if (branchStyle == BRANCH_SYNTAX_BEGIN || branchStyle == BRANCH_SYNTAX_DO) {
-        if (tokens.nextIs(END))
-            tokens.consume(END);
-        else
-            compile_error_for_line(branch, tokens, startPosition, "Expected: end");
-    } else {
-        // Awful special case. Don't try to consume END while parsing an if-statement
-        if (branch.owningTerm != NULL && branch.owningTerm->owningBranch != NULL
-            && branch.owningTerm->owningBranch->owningTerm != NULL
-            && branch.owningTerm->owningBranch->owningTerm->function == IF_BLOCK_FUNC)
-            ; // blah
-        else {
-            if (tokens.nextIs(END))
-                tokens.consume(END);
-            else
-                compile_error_for_line(branch, tokens, startPosition);
-        }
     }
 
     post_parse_branch(branch);

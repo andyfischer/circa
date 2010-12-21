@@ -64,8 +64,6 @@ void register_every_possible_parse_error()
     //register_input("for x in 1\n");
     register_input("namespace");
     register_input("namespace %");
-    register_input("begin");
-    register_input("begin %");
     register_input("state");
     register_input("state %");
     register_input("state x = ");
