@@ -206,7 +206,7 @@ bool evaluate_main_script()
 {
     App* app = &app::singleton();
 
-    circa::evaluate_branch(&app->_evalContext, app::runtime_branch());
+    circa::evaluate_branch_no_preserve_locals(&app->_evalContext, app::runtime_branch());
 
     if (app->_evalContext.errorOccurred) {
         std::stringstream msg;

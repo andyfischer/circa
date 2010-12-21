@@ -106,12 +106,17 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
     swap(&context->currentScopeState, &prevScopeState);
 }
 
-void evaluate_branch(EvalContext* context, Branch& branch)
+void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch)
 {
     copy(&context->state, &context->currentScopeState);
     evaluate_branch_internal(context, branch);
     wrap_up_open_state_vars(context, branch);
     copy(&context->currentScopeState, &context->state);
+}
+
+void evaluate_branch(EvalContext* context, Branch& branch)
+{
+    evaluate_branch_no_preserve_locals(context, branch);
 
     // Copy stack back to terms, for backwards compatibility
     for (int i=0; i < branch.length(); i++) {
