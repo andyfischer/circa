@@ -174,6 +174,20 @@ void test_create_implicit_tuple_type()
     test_assert(!value_fits_type(b, unbox_type(result)));
 }
 
+void create_empty_type_then_populate_it()
+{
+    Branch branch;
+    branch.compile("type T;");
+    branch.compile("a = T()");
+    branch.compile("to_string(a)");
+    test_assert(branch);
+    evaluate_branch(branch);
+
+    initialize_compound_type(branch["T"]);
+    evaluate_branch(branch);
+    test_assert(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::type_declaration);
@@ -184,6 +198,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
     REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
+    REGISTER_TEST_CASE(type_tests::create_empty_type_then_populate_it);
 }
 
 } // namespace type_tests

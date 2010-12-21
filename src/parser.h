@@ -114,6 +114,7 @@ std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
 std::string possible_statement_ending(TokenStream& tokens);
+bool is_multiline_block(Term* term);
 
 int get_number_of_decimal_figures(std::string const& str);
 

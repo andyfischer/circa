@@ -231,17 +231,24 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
             if (statement->function != COMMENT_FUNC)
                 foundStatementOnSameLine = true;
 
-            // If we hit a newline then move on to the next step
-            if (hasNewline)
-                break;
+            // If we hit a newline then stop parsing
+            if (hasNewline) {
+
+                // If we hit any statements on this line, then stop parsing here.
+                // Example:
+                //    def f() return 1 + 2
+                // Also, steal this term's lineEnding and use it as the parent term's line
+                // ending.
+                if (foundStatementOnSameLine) {
+
+                    parentTerm->setStringProp("syntax:lineEnding",
+                            statement->stringProp("syntax:lineEnding"));
+                    statement->removeProperty("syntax:lineEnding");
+                }
+                return;
+            }
         }
     }
-
-    // If we found any expressions on the same line then stop parsing here
-    // Example:
-    //    def f() return 1 + 2
-    if (foundStatementOnSameLine)
-        return;
 
     // Lookahead and find the next non-whitespace statement.
     int lookahead = 0;
@@ -257,8 +264,14 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
     // Check if the next statement has an indentation level that is higher
     // or equal to the parent indentation. If so then stop here.
 
-    if (find_indentation_of_next_statement(tokens) <= parentTermIndent)
+    if (find_indentation_of_next_statement(tokens) <= parentTermIndent) {
+        // Take the line ending that we parsed as postHeadingWs, and move it over
+        // to lineEnding instead (so that we don't parse another line ending).
+        parentTerm->setStringProp("syntax:lineEnding",
+                parentTerm->stringProp("syntax:postHeadingWs"));
+        parentTerm->removeProperty("syntax:postHeadingWs");
         return;
+    }
 
     // Okay, at this point we're ready to parse some statements. The first statement
     // will tell us the indentation level for the whole block. But, we'll ignore
@@ -299,6 +312,8 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
 
         parser::statement(branch, tokens);
     }
+
+    parentTerm->setBoolProp("syntax:multiline", true);
 }
 
 // ---------------------------- Parsing steps ---------------------------------
@@ -371,7 +386,8 @@ Term* statement(Branch& branch, TokenStream& tokens)
 
     prepend_whitespace(result, preWhitespace);
 
-    if (!result->hasProperty("syntax:postHeadingWs")) {
+    if (!is_multiline_block(result) && !result->hasProperty("syntax:lineEnding")) {
+
         // Consume some trailing whitespace
         append_whitespace(result, possible_whitespace(tokens));
 
@@ -643,18 +659,19 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens)
     int startPosition = tokens.getPosition();
 
     Term* result = create_value(branch, TYPE_TYPE);
-    initialize_compound_type(result);
 
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    // if there's a semicolon, then don't parse a prototype
+    // if there's a semicolon, then finish it as an empty type.
     if (tokens.nextIs(SEMICOLON))
         return result;
 
     if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
 
+    // Parse as compound type
+    initialize_compound_type(result);
     int closingToken = tokens.nextIs(LBRACE) ? RBRACE : RBRACKET;
 
     tokens.consume();
@@ -703,6 +720,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
     Term* result = apply(branch, IF_BLOCK_FUNC, RefList());
     Branch& contents = result->nestedContents;
 
+    Term* currentBlock = NULL;
     bool firstIteration = true;
     bool encounteredElse = false;
 
@@ -715,7 +733,6 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             return compile_error_for_line(result, tokens, startPosition);
 
         int leadingTokenPosition = tokens.getPosition();
-
         int leadingToken = tokens.next().match;
 
         // First iteration should always be 'if'
@@ -737,30 +754,19 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             Term* condition = infix_expression(branch, tokens);
             ca_assert(condition != NULL);
 
-            Term* block = apply(contents, IF_FUNC, RefList(condition));
-            block->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
-            set_starting_source_location(block, leadingTokenPosition, tokens);
+            currentBlock = apply(contents, IF_FUNC, RefList(condition));
+            currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
+            set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
             
-            set_input_syntax_hint(block, 0, "postWhitespace", possible_statement_ending(tokens));
-
-            consume_branch(block->nestedContents, tokens);
+            consume_branch(currentBlock->nestedContents, tokens);
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            Branch& elseBranch = create_branch(contents, "else");
-            elseBranch.owningTerm->setStringProp("syntax:preWhitespace",
-                    preKeywordWhitespace);
-            set_starting_source_location(elseBranch.owningTerm, leadingTokenPosition, tokens);
-            consume_branch(elseBranch, tokens);
+            currentBlock = apply(contents, BRANCH_FUNC, RefList(), "else");
+            currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
+            set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
+            consume_branch(currentBlock->nestedContents, tokens);
         }
-
-        #ifndef SIGINDENT
-        if (tokens.nextNonWhitespaceIs(END)) {
-            result->setStringProp("syntax:whitespaceBeforeEnd", possible_whitespace(tokens));
-            tokens.consume(END);
-            break;
-        }
-        #endif
 
         if (tokens.nextNonWhitespaceIs(ELIF) || tokens.nextNonWhitespaceIs(ELSE)) {
             firstIteration = false;
@@ -769,6 +775,11 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
         break;
     }
+
+    // If the last block was marked syntax:multiline, then add a lineEnding, so that
+    // we don't parse another one.
+    if (currentBlock->boolPropOptional("syntax:multiline", false))
+        result->setStringProp("syntax:lineEnding", "");
 
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
@@ -2099,6 +2110,11 @@ std::string possible_statement_ending(TokenStream& tokens)
         result << tokens.consume(token::NEWLINE);
 
     return result.str();
+}
+
+bool is_multiline_block(Term* term)
+{
+    return term->boolPropOptional("syntax:multiline", false);
 }
 
 int get_number_of_decimal_figures(std::string const& str)
