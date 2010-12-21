@@ -672,7 +672,7 @@ void test_sig_indent_multiline_function()
 void test_sig_indent_nested_blocks()
 {
     Branch branch;
-    branch.compile(""
+    branch.compile(
         "namespace ns\n"
         "  def func1()\n"
         "  def func2()\n"
@@ -684,6 +684,17 @@ void test_sig_indent_nested_blocks()
 
     test_assert(branch);
     test_assert(branch["ns"]->nestedContents["func3"] != NULL);
+}
+
+void test_namespace_with_curly_braces()
+{
+    Branch branch;
+    branch.compile("namespace ns {\n"
+                   "a = 1\n"
+                   "}");
+    test_assert(branch);
+    test_assert(branch["ns"] != NULL);
+    test_assert(branch["ns"]->nestedContents["a"] != NULL);
 }
 
 void test_statically_resolve_namespace_access()
@@ -759,6 +770,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_for_loop);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_multiline_function);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_nested_blocks);
+    REGISTER_TEST_CASE(parser_tests::test_namespace_with_curly_braces);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);
 }

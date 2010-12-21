@@ -91,45 +91,16 @@ struct ListSyntaxHints {
 
 void consume_branch(Branch& branch, TokenStream& tokens)
 {
-    int startPosition = tokens.getPosition();
+    Term* parentTerm = branch.owningTerm;
 
-    int branchStyle = BRANCH_SYNTAX_UNDEF;
-
-    if (tokens.nextIs(LBRACE)) {
-        tokens.consume(LBRACE);
-        branchStyle = BRANCH_SYNTAX_BRACE;
-    }
-
-    if (branchStyle == BRANCH_SYNTAX_UNDEF) {
-        //std::cout << "deprecated: undef" << std::endl;
-        //assert(false);
+    if (tokens.nextNonWhitespaceIs(LBRACE)) {
+        consume_branch_with_braces(branch, tokens, parentTerm);
+    } else {
         consume_branch_with_significant_indentation(branch, tokens);
-        post_parse_branch(branch);
-        return;
-    }
-
-    while (!tokens.finished()) {
-        if (tokens.nextIs(END)
-                || tokens.nextNonWhitespaceIs(ELSE)
-                || tokens.nextNonWhitespaceIs(ELIF)
-                || tokens.nextIs(RBRACE)) {
-            break;
-        } else {
-            parser::statement(branch, tokens);
-        }
-    }
-
-    if (branch.owningTerm != NULL)
-        branch.owningTerm->setIntProp("syntax:branchStyle", branchStyle);
-
-    if (branchStyle == BRANCH_SYNTAX_BRACE) {
-        if (tokens.nextIs(RBRACE))
-            tokens.consume(RBRACE);
-        else
-            compile_error_for_line(branch, tokens, startPosition, "Expected: }");
     }
 
     post_parse_branch(branch);
+    return;
 }
 
 int find_indentation_of_next_statement(TokenStream& tokens)
@@ -275,6 +246,23 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
     }
 
     parentTerm->setBoolProp("syntax:multiline", true);
+}
+
+void consume_branch_with_braces(Branch& branch, TokenStream& tokens, Term* parentTerm)
+{
+    if (tokens.nextIs(WHITESPACE))
+        parentTerm->setStringProp("syntax:postHeadingWs", possible_whitespace(tokens));
+
+    tokens.consume(LBRACE);
+
+    while (!tokens.finished()) {
+        if (tokens.nextIs(RBRACE)) {
+            tokens.consume();
+            return;
+        }
+
+        parser::statement(branch, tokens);
+    }
 }
 
 // ---------------------------- Parsing steps ---------------------------------
