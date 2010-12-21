@@ -162,8 +162,7 @@ def linear_fadein(number total_time) -> number
     >>>
     state number time_started = time
     elapsed = (time - time_started) / total_time
-    return(min(elapsed, 1.0))
-end
+    return min(elapsed, 1.0)
 
 def elapsed() -> number
     "Stateful function, returns the number of seconds that has passed since this function was first called"
@@ -179,13 +178,10 @@ def draggable_rect(Point initial_location, Point size) -> Point
         location = mouse + mouse_offset
         if not(mouse_pressed())
             currently_dragging = false
-        end
     elif mouse_clicked(rect)
         currently_dragging = true
         mouse_offset = location - mouse
-    end
     return location
-end
 
 ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->path, 16)
 coding_font = text:load_font("../assets/Inconsolata.otf"->path, 16)

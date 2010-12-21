@@ -127,11 +127,6 @@ std::string find_asset_file(std::string const& filename)
 
 bool load_runtime(circa::Branch& runtime)
 {
-    // Pre-setup
-#ifndef PLASTIC_IPAD
-    text::pre_setup(runtime);
-#endif
-
     // Load runtime.ca
     std::string runtime_ca_path = find_runtime_file();
     info(std::string("loading runtime: ") + runtime_ca_path);

@@ -199,14 +199,11 @@ CA_FUNCTION(draw_rendered_text)
     gl_check_error(CONTEXT, CALLER);
 }
 
-void pre_setup(Branch& branch)
+void setup(Branch& branch)
 {
     FontRef::singleton = unbox_type(branch["Font"]);
     intrusive_refcounted::setup_type<FontRef>(FontRef::singleton);
-}
 
-void setup(Branch& branch)
-{
     if (TTF_Init() == -1) {
         std::cout << "TTF_Init failed with error: " << TTF_GetError();
         return;
