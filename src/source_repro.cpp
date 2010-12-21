@@ -23,32 +23,6 @@ StyledSource::toString()
 
 void format_branch_source(StyledSource* source, Branch& branch, Term* format)
 {
-    #ifndef SIGINDENT
-    parser::BranchSyntax branchSyntax = parser::BRANCH_SYNTAX_UNDEF;
-
-    if (format != NULL) {
-        branchSyntax = (parser::BranchSyntax)
-            format->intPropOptional("syntax:branchStyle", parser::BRANCH_SYNTAX_UNDEF);
-
-        switch (branchSyntax) {
-        case parser::BRANCH_SYNTAX_COLON:
-            append_phrase(source, ":", format, phrase_type::UNDEFINED);
-            break;
-        case parser::BRANCH_SYNTAX_BRACE:
-            append_phrase(source, "{", format, token::LBRACE);
-            break;
-        case parser::BRANCH_SYNTAX_BEGIN:
-            append_phrase(source, "begin", format, token::BEGIN);
-            break;
-        case parser::BRANCH_SYNTAX_DO:
-            append_phrase(source, "do", format, token::DO);
-            break;
-        case parser::BRANCH_SYNTAX_UNDEF:
-        case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
-            break;
-        }
-    }
-    #endif
 
     if (format != NULL)
         append_phrase(source, format->stringPropOptional("syntax:postHeadingWs", ""),
@@ -85,26 +59,6 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
             append_phrase(source, "end", format, phrase_type::UNDEFINED);
     }
 
-    #ifndef SIGINDENT
-    if (format != NULL) {
-        append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
-                format, phrase_type::WHITESPACE);
-
-        switch (branchSyntax) {
-        case parser::BRANCH_SYNTAX_UNDEF:
-        case parser::BRANCH_SYNTAX_BEGIN:
-        case parser::BRANCH_SYNTAX_IMPLICIT_BEGIN:
-        case parser::BRANCH_SYNTAX_DO:
-            append_phrase(source, "end", format, phrase_type::UNDEFINED);
-            break;
-        case parser::BRANCH_SYNTAX_BRACE:
-            append_phrase(source, "}", format, phrase_type::UNDEFINED);
-            break;
-        case parser::BRANCH_SYNTAX_COLON:
-            break;
-        }
-    }
-    #endif
 }
 
 std::string unformat_rich_source(StyledSource* source)

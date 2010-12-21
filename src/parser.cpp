@@ -103,11 +103,9 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     if (branchStyle == BRANCH_SYNTAX_UNDEF) {
         //std::cout << "deprecated: undef" << std::endl;
         //assert(false);
-#ifdef SIGINDENT
         consume_branch_with_significant_indentation(branch, tokens);
         post_parse_branch(branch);
         return;
-#endif
     }
 
     while (!tokens.finished()) {
