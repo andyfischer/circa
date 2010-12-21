@@ -12,14 +12,12 @@
 // copy of data.
 #define DISABLE_LIST_VALUE_SHARING 1
 
-// Do frequent sanity checks of code data before executing it. Has a performance
-// penalty.
-#define AGGRESSIVELY_CHECK_BRANCH_INVARIANTS 1
-
 // Enable frequent type checks in situations where they should be unnecessary. Has
 // a performance penalty.
 #define ENABLE_UNNECESSARY_TYPE_CHECKS true
 
 // Trigger an assert when internal_error is called. If this is off, the alternative
 // is that an exception is thrown.
-#define ASSERT_INTERNAL_ERROR false
+#define ASSERT_INTERNAL_ERROR 0
+
+#define THROW_INTERNAL_ERROR !ASSERT_INTERNAL_ERROR

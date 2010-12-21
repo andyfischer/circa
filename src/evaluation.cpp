@@ -21,7 +21,16 @@ void evaluate_single_term(EvalContext* context, Term* term)
 {
     EvaluateFunc func = function_t::get_evaluate(term->function);
     ca_assert(func != NULL);
+
+#if THROW_INTERNAL_ERROR
+    try {
+#endif
+
     func(context, term);
+
+#if THROW_INTERNAL_ERROR
+    } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
+#endif
 
     //#if 0
     #if ENABLE_UNNECESSARY_TYPE_CHECKS
