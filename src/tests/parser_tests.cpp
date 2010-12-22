@@ -686,6 +686,19 @@ void test_sig_indent_nested_blocks()
     test_assert(branch["ns"]->nestedContents["func3"] != NULL);
 }
 
+void test_sig_indent_bug_with_nested_one_liner()
+{
+    Branch branch;
+    branch.compile(
+            "def func()\n"
+            "  if true; a = 1\n"
+            "  b = 2\n");
+
+    test_assert(branch);
+    test_assert(branch["b"] == NULL);
+    test_assert(branch["func"]->nestedContents["b"] != NULL);
+}
+
 void test_namespace_with_curly_braces()
 {
     Branch branch;
@@ -770,6 +783,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_for_loop);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_multiline_function);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_nested_blocks);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_bug_with_nested_one_liner);
     REGISTER_TEST_CASE(parser_tests::test_namespace_with_curly_braces);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);

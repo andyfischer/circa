@@ -12,7 +12,7 @@
 //
 // The 'code' section may be empty, you might do this if you can put the entire test
 // inside 'assertions'. The 'assertions' section may be empty, you might do this if
-// you're only interested whether 'code' causes an error.
+// you're only interested in whether 'code' causes an error.
 
 #include "common_headers.h"
 
@@ -25,9 +25,6 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 {
     Branch code;
     parser::compile(&code, parser::statement_list, codeStr);
-
-    // Reproduce source of 'code', checked later.
-    std::string codeSourceRepro = get_branch_source_text(code);
 
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << codeStr << std::endl;
@@ -47,7 +44,6 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     Branch& assertions = create_branch(code, "assertions");
-    //change_function(code["assertions"], get_global("branch_preserve_stack"));
     parser::compile(&assertions, parser::statement_list, assertionsStr);
 
     if (has_static_errors(assertions)) {
@@ -58,12 +54,8 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
-    //dump_branch(code);
-
     EvalContext result;
     evaluate_branch(&result, code);
-
-    //bytecode::print_bytecode(std::cout, code);
 
     if (result.errorOccurred) {
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
@@ -115,38 +107,12 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         declare_current_test_failed();
         return;
     }
-
-    // Check source reproduction
-#if 0
-    if (codeStr != codeSourceRepro) {
-        std::cout << "Source reproduction fail in: " << get_current_test_name() << std::endl;
-        std::cout << "Expected:\n  " << escape_newlines(codeStr) << "\n";
-        std::cout << "Observed:\n  " << escape_newlines(codeSourceRepro);
-        std::cout << std::endl;
-        declare_current_test_failed();
-        return;
-    }
-
-    std::string assertionsRepro = get_branch_source_text(assertions);
-    if (assertionsStr != assertionsRepro) {
-        std::cout << "Source reproduction fail in: " << get_current_test_name() << std::endl;
-        std::cout << "Expected: "
-            << escape_newlines(assertionsStr) << "\n";
-        std::cout << "Observed: " << escape_newlines(assertionsRepro);
-        std::cout << std::endl;
-        declare_current_test_failed();
-        return;
-    }
-#endif
 }
 
 void test_snippet_runtime_error(std::string const& str)
 {
     Branch code;
     parser::compile(&code, parser::statement_list, str);
-
-    // Reproduce source of 'code', checked later.
-    std::string codeSourceRepro = get_branch_source_text(code);
 
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << str << std::endl;

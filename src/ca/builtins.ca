@@ -68,7 +68,7 @@ def expand_rect(Point center, number width, number height) -> Rect
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 
 def rect(Point topleft, Point bottomright) -> Rect
-    return([topleft.x topleft.y bottomright.x bottomright.y])
+    return [topleft.x topleft.y bottomright.x bottomright.y]
 
 def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     "Return whether the two rectangles intersect."
@@ -82,7 +82,7 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     return(intersects_on_x and intersects_on_y)
 
 def random_color() -> Color
-    return([rand() rand() rand() 1.0])
+    return [rand() rand() rand() 1.0]
 
 def blend_color(Color a, Color b, number ratio) -> Color
     def unit_tests()

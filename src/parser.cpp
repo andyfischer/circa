@@ -727,7 +727,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
 
     // If the last block was marked syntax:multiline, then add a lineEnding, so that
     // we don't parse another one.
-    if (currentBlock->boolPropOptional("syntax:multiline", false))
+    if (currentBlock->boolPropOptional("syntax:multiline", false)
+            || currentBlock->hasProperty("syntax:lineEnding"))
         result->setStringProp("syntax:lineEnding", "");
 
     // If we didn't encounter an 'else' block, then create an empty one.
