@@ -1,0 +1,27 @@
+
+type Vector { number x, number y }
+
+type MyClass {
+  int a,
+  int b,
+  string name,
+  number distance
+}
+
+type Composite {
+  MyClass myClass,
+  MyClass myClass2,
+  string name,
+}
+
+c = Composite()
+assert(to_string(c) == "[[0, 0, '', 0.0], [0, 0, '', 0.0], '']")
+
+v = Vector()
+
+v.x = 5.0
+v.y = 6.0
+
+assert(to_string(v) == '[5.0, 6.0]')
+assert(v.x == 5.0)
+assert(v.y == 6.0)
