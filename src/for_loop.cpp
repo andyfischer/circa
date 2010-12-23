@@ -138,7 +138,8 @@ void for_loop_update_output_index(Term* forTerm)
         ca_assert(output != NULL);
         contents.outputIndex = output->index;
     } else {
-        contents.outputIndex = contents.length() - 1;
+        // use the term right before #outer_rebinds
+        contents.outputIndex = contents.length() - 2;
     }
 }
 

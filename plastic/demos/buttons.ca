@@ -13,11 +13,13 @@ def draggable_rect(Point initial_location, Point size) -> Point
     state Point mouse_offset = [0 0]
     if currently_dragging
         location = mouse + mouse_offset
+        @location -> Point
         if not(mouse_pressed())
             currently_dragging = false
     elif mouse_clicked(rect)
         currently_dragging = true
         mouse_offset = location - mouse
+
     return location
 
 def draggable_box(Point initial_location)

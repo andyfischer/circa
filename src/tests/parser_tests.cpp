@@ -742,6 +742,23 @@ void test_get_number_of_decimal_figures()
     test_assert(parser::get_number_of_decimal_figures("0.101010") == 6);
 }
 
+void test_bug_with_nested_ifs()
+{
+    Branch branch;
+    branch.compile("a = 'undef'\n"
+                   "if true\n"
+                   "  a = 'correct'\n"
+                   "  if false\n"
+                   "    a = 'very wrong'\n"
+                   "else\n"
+                   "  a = 'wrong'\n"
+                   "a = a");
+
+    test_assert(branch);
+    evaluate_branch(branch);
+    test_equals(get_local(branch["a"]), "correct");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -787,6 +804,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_namespace_with_curly_braces);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);
+    REGISTER_TEST_CASE(parser_tests::test_bug_with_nested_ifs);
 }
 
 } // namespace parser_tests

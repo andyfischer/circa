@@ -128,6 +128,18 @@ void test_state_nested()
             "[_for: [[s: 5], [s: 6]]]]]]]");
 }
 
+void test_produce_output()
+{
+    Branch branch;
+    branch.compile("x = for i in 0..5; i + 1");
+    evaluate_branch(branch);
+    List* x = List::checkCast(get_local(branch["x"]));
+    test_equals(x->length(), 5);
+    test_equals(x->get(0), "1");
+    test_equals(x->get(1), "2");
+    test_equals(x->get(4), "5");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
@@ -137,6 +149,7 @@ void register_tests()
     REGISTER_TEST_CASE(for_loop_tests::test_rewrite_input_list);
     REGISTER_TEST_CASE(for_loop_tests::test_state_simple);
     REGISTER_TEST_CASE(for_loop_tests::test_state_nested);
+    REGISTER_TEST_CASE(for_loop_tests::test_produce_output);
 }
 
 } // for_loop_tests

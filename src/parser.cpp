@@ -718,8 +718,16 @@ Term* if_block(Branch& branch, TokenStream& tokens)
         }
 
         if (tokens.nextNonWhitespaceIs(ELIF) || tokens.nextNonWhitespaceIs(ELSE)) {
-            firstIteration = false;
-            continue;
+
+            // If the previous block was multiline, then only parse the next block if
+            // it has equal indentation.
+            bool wrongIndent = currentBlock->boolPropOptional("syntax:multiline",false)
+                && (currentBlock->sourceLoc.col != find_indentation_of_next_statement(tokens));
+
+            if (!wrongIndent) {
+                firstIteration = false;
+                continue;
+            }
         }
 
         break;
