@@ -282,6 +282,11 @@ void update_unique_name(Term* term)
     }
 }
 
+const char* get_unique_name(Term* term)
+{
+    return term->uniqueName.name.c_str();
+}
+
 void expose_all_names(Branch& source, Branch& destination)
 {
     for (TermNamespace::iterator it = source.names.begin(); it != source.names.end(); ++it)

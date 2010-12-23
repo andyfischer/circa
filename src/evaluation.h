@@ -34,6 +34,9 @@ struct EvalContext
     // State used for the current for loop
     ForLoopContext forLoopContext;
 
+    // Intra-program messages
+    Dict messages;
+
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 
     void clearError() {

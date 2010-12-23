@@ -247,44 +247,64 @@ void test_message_passing()
     Term* i = branch.compile("i = inbox()");
     Term* send = branch.compile("send(i, 1)");
 
-    // Before running, i should be empty
+    // Before running, message queue should be empty
     test_assert(i->numElements() == 0);
-    test_equals(&context.state, "null");
+    test_equals(&context.messages, "[]");
 
-    // First run, i is still empty, but the hidden state has 1
+    // First run, i is still empty, but there is 1 message in transit
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 0);
-    test_equals(&context.state, "[i: [1]]");
+    test_equals(&context.messages, "[i: [1]]");
 
     // Second run, i now returns 1
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    test_equals(&context.state, "[i: [1]]");
+    test_equals(&context.messages, "[i: [1]]");
 
     // Delete the send() call
     branch.remove(send);
 
-    // Third run, i still returns 1 (from previous call), hidden state is empty
+    // Third run, i still returns 1 (from previous call), message queue is empty
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 1);
     test_assert(i->getIndex(0)->asInt() == 1);
-    test_equals(&context.state, "[i: []]");
+    test_equals(&context.messages, "[i: []]");
 
     // Fourth run, i is empty again
     evaluate_branch(&context, branch);
     test_assert(i->numElements() == 0);
-    test_equals(&context.state, "[i: []]");
+    test_equals(&context.messages, "[i: []]");
 }
 
-void test_namespace()
+void test_message_passing2()
 {
+    // Repro a bug from plastic's runtime
     Branch branch;
+    branch.compile(
+        "state last_output = 1\n"
+        "incoming = inbox()\n"
+        "def send_func(any s)\n"
+        "  send(incoming, s)\n"
+        "for s in incoming\n"
+        "  last_output = s\n"
+        "last_output = last_output\n"
+        "send_func(2)\n");
 
-    branch.eval("namespace ns a = 1 end");
-    test_equals(branch["ns"]->toString(), "[a: 1]");
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    test_equals(branch["last_output"], "1");
+
+    evaluate_branch(&context, branch);
+    test_equals(branch["last_output"], "2");
+
+    evaluate_branch(&context, branch);
+    test_equals(branch["last_output"], "2");
+
+    evaluate_branch(&context, branch);
+    test_equals(branch["last_output"], "2");
 }
-
 
 void register_tests()
 {
@@ -302,7 +322,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_changed);
     REGISTER_TEST_CASE(builtin_function_tests::test_delta);
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
-    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_namespace);
+    REGISTER_TEST_CASE(builtin_function_tests::test_message_passing2);
 }
 
 } // namespace builtin_function_tests
