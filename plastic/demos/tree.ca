@@ -2,8 +2,7 @@
 background(#eef)
 
 def interp(number progress, number e) -> number
-  return(min(progress / e, 1.0))
-end
+  return min(progress / e, 1.0)
 
 desired_window_size = [480 600]
 
@@ -34,8 +33,6 @@ def tree_segment(Point base, number direction, number width, number depth)
     state r_jitter = rand() * .2
     l_branch = tree_segment(next_center, direction - l_jitter - .3, width - .4, depth+1)
     r_branch = tree_segment(next_center, direction + r_jitter + .3, width - .4, depth+1)
-  end
-end
 
 starting_width = 3.0
 

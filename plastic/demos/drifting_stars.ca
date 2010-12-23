@@ -12,4 +12,3 @@ for i in 0..num_stars
     
     state Color color = [rand(.2 .6) .3 rand(.5 1) 1] 
     gl:points([draw_loc] color)
-end

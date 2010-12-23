@@ -13,9 +13,7 @@ def generate_particle_burst(List particles, Point loc, Point vel) -> List
     for i in 0..10
         a = rand()
         particles.append([0 loc vel + [cos(a) sin(a)] * 100*rand() ] -> Particle)
-    end
-    return(particles)
-end
+    return particles
 
 max_particle_age = 3.0
 
@@ -33,11 +31,8 @@ for particle in @particles
 
     if particle.age > max_particle_age
         discard
-    end
-end
 
 if mouse_clicked()
     generate_particle_burst(@particles, mouse, [0 0])
-end
 
 generate_particle_burst(@particles, [200 200], [10 0])

@@ -20,7 +20,6 @@ namespace console
 
     for incoming_item in incoming_items
         items.append(incoming_item)
-    end
 
     -- draw
     index = 0
@@ -33,7 +32,6 @@ namespace console
         fade = 1.0
         if lifespan > .8
             fade = (1.0 - lifespan) / .2
-        end
 
         y = 40 + index * 20
 
@@ -43,16 +41,12 @@ namespace console
 
         if lifetime > max_lifetime
             discard
-        end
         index += 1
-    end
-end
 
 for event in incoming_touch_events
     send(console:incoming_items, [time to_string(event)])
 
     last_touch_position = event.loc
-end
 
 type Star {
     Point loc
@@ -78,12 +72,9 @@ def draw_star(Star star)
     r_point = polar(r_angle)*(radius / 2) + star.loc
 
     gl:triangles([outer_point l_point star.loc, star.loc r_point outer_point] star_color)
-  end
 
   for t in 0..num_points
     draw_tip(t)
-  end
-end
 
 state stars = []
 
@@ -93,10 +84,9 @@ state stars = []
 --   (unnecessary cast to Point, probably means bug in type inferrence)
 mouse = last_touch_position -> Point
 
-begin
+namespace draw_arms
   def draw_quad(List points, Color color)
       gl:triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
-  end
 
   cross_color = #f396
   cross_thickness = 4.0
@@ -110,30 +100,24 @@ begin
       far_l = polar(rot - .25) * (cross_thickness/2) + far_center
       far_r = polar(rot + .25) * (cross_thickness/2) + far_center
       draw_quad([near_l far_l far_r near_r] cross_color)
-  end
 
   for rot in [.25 .5 .75 1]
       draw_arm(rot + -time)
-  end
-end
 
 -- Clicking will create a new spinning star
 if mouse_clicked()
   -- Check if we clicked on an existing star
   stars.append([mouse rand() 40])
-end
 
 -- Adjust the size of stars with the mouse wheel
 if mouse_wheel_up()
     global_scale *= 1.1
 elif mouse_wheel_down()
     global_scale *= 0.9
-end
 
 -- Draw each star
 for star in stars
   draw_star(star)
-end
 
 -- Draw code browser
 namespace editor
@@ -159,9 +143,6 @@ namespace editor
             return(#000000)
         else
             return(#003366)
-        end
-    end
-end
 
 def draw_code_editor(Point topleft, BranchRef branch)
     source = format_source(branch)
@@ -194,7 +175,6 @@ def draw_code_editor(Point topleft, BranchRef branch)
 
         if draw_highlight_rect
             fill_rect(rect, bg_color)
-        end
 
         draw_string(visable_s loc color)
 
@@ -202,22 +182,18 @@ def draw_code_editor(Point topleft, BranchRef branch)
             r.tweak(-1)
         elif mouse_wheel_down(rect)
             r.tweak(1)
-        end
 
         i += 1
         current_col += s.length()
         if (s == '\n')
             current_col = 0
             current_line += 1
-        end
-    end
-end
 
-sample_code = begin
+sample_code = {
     a = 1
     b = 2
     c = a + b
     d = c * 5
-end
+}
 
 draw_code_editor([10 10] draw_code_editor -> branch_ref)

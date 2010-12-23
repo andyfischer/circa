@@ -125,6 +125,9 @@ int find_ideal_slot_index(DictData* data, const char* str)
 // DictData* pointer after calling this.
 int insert(DictData** dataPtr, const char* key)
 {
+    if (*dataPtr == NULL)
+        *dataPtr = create_dict();
+
     // Check if this key is already here
     int existing = find_key(*dataPtr, key);
     if (existing != -1)
@@ -169,6 +172,9 @@ bool equal_strings(const char* left, const char* right)
 
 int find_key(DictData* data, const char* key)
 {
+    if (data == NULL)
+        return -1;
+
     int index = find_ideal_slot_index(data, key);
     int starting_index = index;
     while (!equal_strings(key, data->slots[index].key)) {

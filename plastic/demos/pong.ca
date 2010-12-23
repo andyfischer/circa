@@ -5,15 +5,13 @@ background(#042304)
 
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) -> bool
     -- lazy
-    return(rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius)))
-end
+    return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
 
 def random_initial_direction() -> Point
     if rand() > .5 serve = 1 else serve = -1 end
     angle = rand() * .4 - .2
     result = [cos(angle) * serve, sin(angle)]
-    return(result)
-end
+    return result
 
 state Point ball_loc = [window.width/2, window.height/2]
 state Point ball_direction = random_initial_direction()
@@ -46,14 +44,12 @@ elif (ball_loc.x - ball_radius) > window.width
     ball_loc = [window.width/2, window.height/2] -> Point
     ball_direction = random_initial_direction()
     round_start_time = time
-end
 
 -- bounce balls off of top and bottom
 if (ball_loc.y + ball_radius) > window.height
     ball_direction = ball_direction * [1 -1] -> Point
 elif (ball_loc.y - ball_radius) < 0
     ball_direction = ball_direction * [1 -1] -> Point
-end
 
 def get_collision_vector(Rect paddle, Point point) -> Point
     paddle_center_x = (paddle.x2 - paddle.x1) / 2 + paddle.x1
@@ -62,22 +58,18 @@ def get_collision_vector(Rect paddle, Point point) -> Point
     collision_loc_on_paddle = (point.y - paddle_center_y) / paddle_size
     angle = collision_loc_on_paddle * .3
     v = [cos(angle) sin(angle)] -> Point
-    return(v)
-end
+    return v
 
 -- bounce ball off of paddles
 if rect_intersects_circle(players_paddle, ball_loc, ball_radius)
     ball_direction = get_collision_vector(players_paddle, ball_loc)
-end
 if rect_intersects_circle(ai_paddle, ball_loc, ball_radius)
     ball_direction = get_collision_vector(ai_paddle, ball_loc)
     ball_direction = ([-1 1] * ball_direction) -> Point
-end
 
 -- move ball
 if not(ball_is_being_introduced)
     ball_loc = ball_loc + ball_direction * ball_speed * td
-end
 
 -- draw paddles
 fill_rect(players_paddle, #fff)
@@ -88,12 +80,10 @@ show_ball = not(ball_is_being_introduced) or alternate_over_time(0.2)
 
 if show_ball
     gl:circle(ball_loc, ball_radius, #fff)
-end
 
 def draw_text_centered_y(TTF_Font font, string str, Color color, Point location)
     render = text:render_text(font, str, color)
     text:draw_rendered_text(render, location - [render.width/2 0])
-end
 
 -- draw status
 draw_text_centered_y(ui_font_medium, concat('Score'), #fff, [window.width/2, 20])

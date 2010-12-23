@@ -14,7 +14,6 @@ if key_down(key:left)
     horiz_thrust = -1
 elif key_down(key:right)
     horiz_thrust = 1
-end
 
 move_speed = 150.0
 
@@ -29,7 +28,6 @@ ship_outline = [[-ship_width 0] [0 -ship_height] [ship_width 0]]
 
 for point in @ship_outline
     point = point + [player.x player_y]
-end
 
 gl:line_loop(ship_outline #fff)
 

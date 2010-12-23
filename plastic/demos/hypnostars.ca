@@ -7,8 +7,7 @@ type Star {
 background(#000)
 
 def random_star() -> Star
-    return([rand()*8 random_location()])
-end
+    return [rand()*8 random_location()]
 
 num_stars = 500
 for star in 0..num_stars
@@ -20,4 +19,3 @@ for star in 0..num_stars
 
     angle += time_delta
     angle = mod(angle,1)
-end

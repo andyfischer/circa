@@ -7,8 +7,7 @@ axis_center = [200 200] -> Point
 def map_point(number x) -> Point
   x = x - 200
   y = sin(x/100) * 100
-  return([x y] + axis_center)
-end
+  return [x y] + axis_center
 
 -- draw the axis
 gl:line_strip([axis_center-[0 200] axis_center+[0 200]] #888)

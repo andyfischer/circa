@@ -32,5 +32,4 @@ for i in 0..num_stars
 
     -- Draw twice for stars which wrap around vertically
     gl:line_strip([star.position - [0 window.height], star.position + [0 length] - [0 window.height]] color)
-end
 

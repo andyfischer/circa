@@ -17,21 +17,17 @@ def draggable_rect(Point initial_location, Point size) -> Point
         location = mouse + mouse_offset
         if not(mouse_pressed())
             currently_dragging = false
-        end
     elif mouse_clicked(rect)
         currently_dragging = true
         mouse_offset = location - mouse
-    end
-    return(location)
-end
+    return location
 
 box_size = [100 20] -> Point
 
 def initial_box_location(Ref ref) -> Point
     source_loc = ref.source_location()
     --print(ref ' location: ' source_loc)
-    return([source_loc.x*5, source_loc.y*10])
-end
+    return [source_loc.x*5, source_loc.y*10]
 
 -- Get locations for each box
 index = 0
@@ -45,11 +41,9 @@ for ref in contents
     term_to_location.add(ref, location)
 
     index += 1
-end
 
 def draw_arrow(Point a, Point b)
     thick_line(a,b, 3.0, #000)
-end
 
 -- Draw arrows for each box
 for ref in contents
@@ -63,8 +57,6 @@ for ref in contents
         input_loc = (term_to_location.get(input)->Point) + [box_size.x/2, box_size.y]
 
         draw_arrow(this_loc, input_loc)
-    end
-end
 
 def expand_rect_tl(Point tl, Point size) -> Rect:
     "Return a rectangle with the given center, width, and height."
@@ -77,4 +69,3 @@ for ref in contents
     location = term_to_location.get(ref) -> Point
     fill_rect(expand_rect_tl(location, box_size), #00a)
     draw_text(ui_font_medium, ref.name(), #fff, location + [5 2])
-end
