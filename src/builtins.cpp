@@ -105,18 +105,18 @@ Term* VOID_TYPE = NULL;
 
 } // extern "C"
 
-TypeRef TYPE_T;
-TypeRef BOOL_T;
-TypeRef DICT_T;
-TypeRef FILE_SIGNATURE_T;
-TypeRef FLOAT_T;
-TypeRef INT_T;
-TypeRef STRING_T;
-TypeRef REF_T;
-TypeRef VOID_T;
-
-Type NULL_TYPE;
+Type TYPE_T;
+Type BOOL_T;
+Type DICT_T;
+Type FLOAT_T;
+Type INT_T;
 Type LIST_T;
+Type NULL_TYPE;
+Type STRING_T;
+Type REF_T;
+Type VOID_T;
+
+TypeRef FILE_SIGNATURE_T;
 
 bool FINISHED_BOOTSTRAP = false;
 
@@ -128,29 +128,14 @@ Branch& kernel()
 void create_primitive_types()
 {
     null_t::setup_type(&NULL_TYPE);
-
-    DICT_T = Type::create();
-    dict_t::setup_type(DICT_T);
-
-    STRING_T = Type::create();
-    string_t::setup_type(STRING_T);
-
-    INT_T = Type::create();
-    int_t::setup_type(INT_T);
-
-    FLOAT_T = Type::create();
-    float_t::setup_type(FLOAT_T);
-
-    BOOL_T = Type::create();
-    bool_t::setup_type(BOOL_T);
-
-    REF_T = Type::create();
-    ref_t::setup_type(REF_T);
-
+    dict_t::setup_type(&DICT_T);
+    string_t::setup_type(&STRING_T);
+    int_t::setup_type(&INT_T);
+    float_t::setup_type(&FLOAT_T);
+    bool_t::setup_type(&BOOL_T);
+    ref_t::setup_type(&REF_T);
     list_t::setup_type(&LIST_T);
-
-    VOID_T = Type::create();
-    void_t::setup_type(VOID_T);
+    void_t::setup_type(&VOID_T);
 }
 
 void bootstrap_kernel()
@@ -169,22 +154,21 @@ void bootstrap_kernel()
     TYPE_TYPE = KERNEL->appendNew();
     TYPE_TYPE->function = VALUE_FUNC;
     TYPE_TYPE->type = TYPE_TYPE;
-    TYPE_T = Type::create();
-    TYPE_TYPE->value_type = TYPE_T;
-    TYPE_TYPE->value_data.ptr = TYPE_T;
-    TYPE_T->name = "Type";
-    TYPE_T->initialize = type_t::initialize;
-    TYPE_T->release = type_t::release;
-    TYPE_T->copy = type_t::copy;
-    TYPE_T->remapPointers = type_t::remap_pointers;
-    TYPE_T->formatSource = type_t::formatSource;
+    TYPE_TYPE->value_type = &TYPE_T;
+    TYPE_TYPE->value_data.ptr = &TYPE_T;
+    TYPE_T.name = "Type";
+    TYPE_T.initialize = type_t::initialize;
+    TYPE_T.release = type_t::release;
+    TYPE_T.copy = type_t::copy;
+    TYPE_T.remapPointers = type_t::remap_pointers;
+    TYPE_T.formatSource = type_t::formatSource;
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
     ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
-    change_type(ANY_TYPE, TYPE_T);
+    change_type(ANY_TYPE, &TYPE_T);
     as_type(ANY_TYPE).name = "any";
     as_type(ANY_TYPE).toString = any_t::to_string;
     as_type(ANY_TYPE).isSubtype = any_t::matches_type;
@@ -195,7 +179,7 @@ void bootstrap_kernel()
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
     FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
     FUNCTION_ATTRS_TYPE->type = TYPE_TYPE;
-    change_type(FUNCTION_ATTRS_TYPE, TYPE_T);
+    change_type(FUNCTION_ATTRS_TYPE, &TYPE_T);
     as_type(FUNCTION_ATTRS_TYPE).name = "FunctionAttrs";
     as_type(FUNCTION_ATTRS_TYPE).initialize = function_attrs_t::initialize;
     as_type(FUNCTION_ATTRS_TYPE).copy = function_attrs_t::copy;
@@ -218,25 +202,25 @@ void bootstrap_kernel()
 void initialize_primitive_types(Branch& kernel)
 {
     STRING_TYPE = create_type(kernel, "string");
-    set_type(STRING_TYPE, STRING_T);
+    set_type(STRING_TYPE, &STRING_T);
 
     INT_TYPE = create_type(kernel, "int");
-    set_type(INT_TYPE, INT_T);
+    set_type(INT_TYPE, &INT_T);
 
     FLOAT_TYPE = create_type(kernel, "number");
-    set_type(FLOAT_TYPE, FLOAT_T);
+    set_type(FLOAT_TYPE, &FLOAT_T);
 
     DICT_TYPE = create_type(kernel, "Dict");
-    set_type(DICT_TYPE, DICT_T);
+    set_type(DICT_TYPE, &DICT_T);
 
     BOOL_TYPE = create_type(kernel, "bool");
-    set_type(BOOL_TYPE, BOOL_T);
+    set_type(BOOL_TYPE, &BOOL_T);
 
     REF_TYPE = create_type(kernel, "Ref");
-    set_type(REF_TYPE, REF_T);
+    set_type(REF_TYPE, &REF_T);
 
     VOID_TYPE = create_type(kernel, "void");
-    set_type(VOID_TYPE, VOID_T);
+    set_type(VOID_TYPE, &VOID_T);
 
     LIST_TYPE = create_type(kernel, "List");
     set_type(LIST_TYPE, &LIST_T);

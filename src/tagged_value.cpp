@@ -397,25 +397,25 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
 
 TaggedValue* set_int(TaggedValue* value)
 {
-    change_type(value, INT_T);
+    change_type(value, &INT_T);
     return value;
 }
 
 void set_int(TaggedValue* value, int i)
 {
-    change_type(value, INT_T);
+    change_type(value, &INT_T);
     value->value_data.asint = i;
 }
 
 void set_float(TaggedValue* value, float f)
 {
-    change_type(value, FLOAT_T);
+    change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
 void set_string(TaggedValue* value, const char* s)
 {
-    change_type(value, STRING_T);
+    change_type(value, &STRING_T);
     *((std::string*) value->value_data.ptr) = s;
 }
 
@@ -426,7 +426,7 @@ void set_string(TaggedValue* value, std::string const& s)
 
 void set_bool(TaggedValue* value, bool b)
 {
-    change_type(value, BOOL_T);
+    change_type(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
@@ -453,7 +453,7 @@ List* set_list(TaggedValue* value, int size)
 void set_type(TaggedValue* value, Type* type)
 {
     reset(value);
-    change_type(value, TYPE_T);
+    change_type(value, &TYPE_T);
     type->refCount++;
     value->value_data.ptr = type;
 }

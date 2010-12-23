@@ -397,7 +397,7 @@ void setup_type(Type* type)
 Dict::Dict()
   : TaggedValue()
 {
-    change_type(this, DICT_T);
+    change_type(this, &DICT_T);
 }
 
 Dict* Dict::checkCast(TaggedValue* value)
@@ -486,11 +486,11 @@ bool Dict::iteratorFinished(TaggedValue* iterator)
 
 bool is_dict(TaggedValue* value)
 {
-    return value->value_type == DICT_T;
+    return value->value_type == &DICT_T;
 }
 Dict* make_dict(TaggedValue* value)
 {
-    change_type(value, DICT_T);
+    change_type(value, &DICT_T);
     return (Dict*) value;
 }
 

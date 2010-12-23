@@ -46,7 +46,7 @@ void test_cast()
 
     TaggedValue x;
 
-    test_assert(!cast_possible(&a, INT_T));
+    test_assert(!cast_possible(&a, &INT_T));
     test_assert(cast_possible(&a, &LIST_T));
 
     test_assert(cast_possible(&b, &LIST_T));

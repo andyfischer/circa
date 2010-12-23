@@ -73,9 +73,7 @@ namespace string_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
-        // temp:
-        STRING_T = unbox_type(STRING_TYPE);
-        set_pointer(value, STRING_T, new std::string());
+        set_pointer(value, &STRING_T, new std::string());
     }
     void release(TaggedValue* value)
     {
@@ -85,7 +83,7 @@ namespace string_t {
 
     void copy(TaggedValue* source, TaggedValue* dest)
     {
-        *((std::string*) get_pointer(dest, STRING_T)) = as_string(source);
+        *((std::string*) get_pointer(dest, &STRING_T)) = as_string(source);
     }
     void reset(TaggedValue* v)
     {
@@ -184,13 +182,13 @@ namespace string_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        STRING_T->name = "string";
-        STRING_T->initialize = initialize;
-        STRING_T->release = release;
-        STRING_T->copy = copy;
-        STRING_T->equals = equals;
-        STRING_T->toString = to_string;
-        STRING_T->formatSource = format_source;
+        type->name = "string";
+        type->initialize = initialize;
+        type->release = release;
+        type->copy = copy;
+        type->equals = equals;
+        type->toString = to_string;
+        type->formatSource = format_source;
     }
 
     void postponed_setup_type(Type* type)

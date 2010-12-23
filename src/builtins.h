@@ -76,18 +76,18 @@ extern Term* VOID_TYPE;
 
 } // extern "C"
 
-extern TypeRef BOOL_T;
-extern TypeRef DICT_T;
-extern TypeRef FILE_SIGNATURE_T;
-extern TypeRef FLOAT_T;
-extern TypeRef INT_T;
-extern TypeRef STRING_T;
-extern TypeRef REF_T;
-extern TypeRef TYPE_T;
-extern TypeRef VOID_T;
-
-extern Type NULL_TYPE;
+extern Type BOOL_T;
+extern Type DICT_T;
+extern Type FLOAT_T;
+extern Type INT_T;
 extern Type LIST_T;
+extern Type NULL_TYPE;
+extern Type STRING_T;
+extern Type REF_T;
+extern Type TYPE_T;
+extern Type VOID_T;
+
+extern TypeRef FILE_SIGNATURE_T;
 
 extern bool FINISHED_BOOTSTRAP;
 

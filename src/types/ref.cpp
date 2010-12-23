@@ -16,8 +16,6 @@ namespace ref_t {
     }
     void initialize(Type* type, TaggedValue* value)
     {
-        // Temp:
-        REF_T = unbox_type(REF_TYPE);
         set_pointer(value, type, new Ref());
     }
     void release(TaggedValue* value)
@@ -30,7 +28,7 @@ namespace ref_t {
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
-        *((Ref*) get_pointer(dest, REF_T)) = as_ref(source);
+        *((Ref*) get_pointer(dest, &REF_T)) = as_ref(source);
     }
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {

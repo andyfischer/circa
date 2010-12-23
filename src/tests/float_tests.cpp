@@ -13,11 +13,11 @@ void test_cast()
     set_string(&s, "hello");
 
 
-    test_assert(cast_possible(&f, FLOAT_T));
-    test_assert(!cast_possible(&s, FLOAT_T));
+    test_assert(cast_possible(&f, &FLOAT_T));
+    test_assert(!cast_possible(&s, &FLOAT_T));
 
     TaggedValue f2;
-    test_assert(cast(&f, FLOAT_T, &f2));
+    test_assert(cast(&f, &FLOAT_T, &f2));
 
     test_assert(equals(&f, &f2));
 }
