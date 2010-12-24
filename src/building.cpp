@@ -426,14 +426,14 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
 
 void post_compile_term(Term* term)
 {
-    // Check for overloaded_function
-    if (term->function == OVERLOADED_FUNCTION_FUNC) {
-        overloaded_function::post_compile_setup_overloaded_function(term);
-    }
+    FunctionAttrs* attrs = get_function_attrs(term->function);
+    if (attrs == NULL)
+        return;
 
-    if (term->function == INCLUDE_FUNC) {
-        include_function::preload_script(term);
-    }
+    FunctionAttrs::PostCompile func = attrs->postCompile;
+
+    if (func != NULL)
+        func(term);
 }
 
 } // namespace circa

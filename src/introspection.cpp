@@ -269,6 +269,12 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << " " << term->properties.toString();
 }
 
+void print_term(std::ostream& out, Term* term)
+{
+    RawOutputPrefs prefs;
+    print_term(out, term, &prefs);
+}
+
 void print_branch(std::ostream& out, Branch& branch)
 {
     RawOutputPrefs prefs;

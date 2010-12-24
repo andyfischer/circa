@@ -199,7 +199,7 @@ namespace overloaded_function {
         return result;
     }
 
-    void post_compile_setup_overloaded_function(Term* term)
+    void overloaded_func_post_compile(Term* term)
     {
         setup_overloaded_function(term, term->name, term->inputs);
     }
@@ -223,6 +223,7 @@ namespace overloaded_function {
     {
         OVERLOADED_FUNCTION_FUNC = import_function(kernel, evaluate_declaration,
                 "overloaded_function(Function...) -> Function");
+        get_function_attrs(OVERLOADED_FUNCTION_FUNC)->postCompile = overloaded_func_post_compile;
     }
 }
 }

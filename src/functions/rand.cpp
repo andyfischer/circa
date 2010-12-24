@@ -20,7 +20,7 @@ namespace rand_function {
     CA_FUNCTION(evaluate_f)
     {
         seed_if_needed();
-        set_float(CALLER, (float) rand() / RAND_MAX);
+        set_float(OUTPUT, (float) rand() / RAND_MAX);
     }
 
     CA_FUNCTION(evaluate_f_range)
@@ -35,7 +35,7 @@ namespace rand_function {
             return;
         }
 
-        set_float(CALLER, min + r * (max - min));
+        set_float(OUTPUT, min + r * (max - min));
     }
 
     CA_FUNCTION(evaluate_i)

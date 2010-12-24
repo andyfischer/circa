@@ -116,6 +116,7 @@ ship.loc = wrap_around(ship.loc)
 
 -- Move bullets
 for bullet in @bullets
+    @bullet -> Bullet
     loc = bullet.loc + bullet.direction * bullet_speed * time_delta
     wrap_around(@loc)
     bullet = [bullet.lifespan+time_delta, loc, bullet.direction] -> Bullet
@@ -173,7 +174,7 @@ def generate_child_asteroid(Asteroid parent) -> Asteroid
         (polar(angle) * (rand() * size + size/3)) -> Point
     rotation = rand() * .2 - .1
     speed = rand()*20 + 20.0
-    return [edges, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
+    return [edges, parent.location, random_norm_vector()*speed, 0, rotation size 0]
 
 def generate_particle_burst(List particles, Point loc, Point vel) -> List
     for i in 0..6
@@ -221,7 +222,7 @@ for asteroid in @asteroids
         if point_distance(asteroid.location, bullet.loc) < asteroid.size
             collides = true
 
-            bullet_vel = bullet.direction * bullet_speed
+            bullet_vel = Point(bullet.direction * bullet_speed)
             generate_particle_burst(@particles, asteroid.location, bullet_vel)
 
             discard

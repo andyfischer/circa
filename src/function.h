@@ -16,6 +16,7 @@ struct FunctionAttrs
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetRegisterCount)(Term*);
     typedef void (*AssignRegisters)(Term*);
+    typedef void (*PostCompile)(Term*);
 
     std::string name;
     Ref outputType;
@@ -37,6 +38,7 @@ struct FunctionAttrs
     PostInputChange postInputChange;
     GetRegisterCount getRegisterCount;
     AssignRegisters assignRegisters;
+    PostCompile postCompile;
 
     List parameters;
 
@@ -92,6 +94,7 @@ bool is_function(Term* term);
 bool is_function_attrs(Term* term);
 FunctionAttrs& as_function_attrs(Term* term);
 Branch& function_contents(Term* func);
+FunctionAttrs* get_function_attrs(Term* func);
 
 std::string get_placeholder_name_for_index(int index);
 

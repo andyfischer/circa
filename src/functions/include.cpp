@@ -69,6 +69,10 @@ namespace include_function {
 
         set_null(OUTPUT);
     }
+    void include_post_compile(Term* term)
+    {
+        preload_script(term);
+    }
 
     CA_FUNCTION(load_script)
     {
@@ -82,6 +86,7 @@ namespace include_function {
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
                 "include(string filename)");
+        get_function_attrs(INCLUDE_FUNC)->postCompile = include_post_compile;
 
         function_t::set_exposed_name_path(INCLUDE_FUNC, ".");
 

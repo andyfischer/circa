@@ -45,10 +45,10 @@ GLint current_program = 0;
 
 void set_gl_color(TaggedValue* color)
 {
-    glColor4f(color->getIndex(0)->asFloat(),
-              color->getIndex(1)->asFloat(),
-              color->getIndex(2)->asFloat(),
-              color->getIndex(3)->asFloat());
+    glColor4f(color->getIndex(0)->toFloat(),
+              color->getIndex(1)->toFloat(),
+              color->getIndex(2)->toFloat(),
+              color->getIndex(3)->toFloat());
 }
 
 void clear_gl_color()

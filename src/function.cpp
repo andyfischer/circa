@@ -16,7 +16,8 @@ FunctionAttrs::FunctionAttrs()
     staticTypeQuery(NULL),
     postInputChange(NULL),
     getRegisterCount(NULL),
-    assignRegisters(NULL)
+    assignRegisters(NULL),
+    postCompile(NULL)
 {
     debug_register_valid_object(this, FUNCTION_ATTRS_OBJECT);
 }
@@ -340,6 +341,15 @@ FunctionAttrs& as_function_attrs(Term* term)
 Branch& function_contents(Term* func)
 {
     return func->nestedContents;
+}
+
+FunctionAttrs* get_function_attrs(Term* func)
+{
+    if (func->nestedContents.length() == 0)
+        return NULL;
+    if (func->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
+        return NULL;
+    return &as_function_attrs(func->nestedContents[0]);
 }
 
 std::string get_placeholder_name_for_index(int index)
