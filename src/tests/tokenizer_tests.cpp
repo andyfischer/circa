@@ -349,6 +349,40 @@ void test_keyword_followed_by_lparen()
     test_assert(tokens.finished());
 }
 
+void test_preceding_indent()
+{
+    TokenStream tokens("1 2 3");
+    while (!tokens.finished()) {
+        test_assert(tokens.next().precedingIndent == 0);
+        tokens.consume();
+    }
+
+    tokens.reset("  1 2");
+    while (!tokens.finished()) {
+        test_assert(tokens.next().precedingIndent == 2);
+        tokens.consume();
+    }
+
+    tokens.reset("a a1 a2\n"
+                 "   b1 b2\n"
+                 " c1 c2\n"
+                 "      d1 + d2\n");
+
+    while (!tokens.finished()) {
+        std::string const& txt = tokens.next().text;
+        if (txt[0] == 'a') {
+            test_assert(tokens.next().precedingIndent == 0);
+        } else if (txt[0] == 'b') {
+            test_assert(tokens.next().precedingIndent == 3);
+        } else if (txt[0] == 'c') {
+            test_assert(tokens.next().precedingIndent == 1);
+        } else if (txt[0] == 'd') {
+            test_assert(tokens.next().precedingIndent == 6);
+        }
+        tokens.consume();
+    }
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -368,6 +402,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
+    REGISTER_TEST_CASE(tokenizer_tests::test_preceding_indent);
 }
 
 } // namespace tokenizer_tests

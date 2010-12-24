@@ -43,6 +43,7 @@ struct TokenStream
 
     int length() const { return (int) tokens.size(); }
     int remaining() const { return (int) tokens.size() - _position; }
+    int position() const { return _position; }
 
     token::Token const& next(int lookahead=0) const;
 

@@ -146,14 +146,17 @@ struct TokenizeContext
         if (results.size() == 0) {
             instance.lineStart = 1;
             instance.colStart = 0;
+            instance.precedingIndent = -1;
         } else {
             Token& prevToken = results[results.size()-1];
             if (prevToken.match == NEWLINE) {
                 instance.lineStart = prevToken.lineEnd + 1;
                 instance.colStart = 0;
+                instance.precedingIndent = -1;
             } else {
                 instance.lineStart = prevToken.lineEnd;
                 instance.colStart = prevToken.colEnd;
+                instance.precedingIndent = prevToken.precedingIndent;
             }
         }
 
@@ -164,6 +167,14 @@ struct TokenizeContext
         } else {
             instance.lineEnd = this->linePosition;
             instance.colEnd = this->charPosition;
+        }
+
+        // Update precedingIndent if this is the first whitespace on a line
+        if (instance.precedingIndent == -1) {
+            if (instance.match == WHITESPACE)
+                instance.precedingIndent = instance.text.length();
+            else
+                instance.precedingIndent = 0;
         }
 
         ca_assert(instance.lineStart >= 0);

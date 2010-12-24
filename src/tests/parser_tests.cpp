@@ -699,6 +699,17 @@ void test_sig_indent_bug_with_nested_one_liner()
     test_assert(branch["func"]->nestedContents["b"] != NULL);
 }
 
+void test_sig_indent_bug_with_for_loop_expression()
+{
+    Branch branch;
+    branch.compile(
+            "x = for i in 0..1\n"
+            "  i + 5\n");
+
+    evaluate_branch(branch);
+    test_equals(get_local(branch["x"]), "[5]");
+}
+
 void test_namespace_with_curly_braces()
 {
     Branch branch;
@@ -801,6 +812,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_multiline_function);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_nested_blocks);
     REGISTER_TEST_CASE(parser_tests::test_sig_indent_bug_with_nested_one_liner);
+    REGISTER_TEST_CASE(parser_tests::test_sig_indent_bug_with_for_loop_expression);
     REGISTER_TEST_CASE(parser_tests::test_namespace_with_curly_braces);
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);

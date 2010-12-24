@@ -115,12 +115,10 @@ ship.loc = wrap_around(ship.loc)
 
 
 -- Move bullets
-def move_bullet(Bullet bullet) -> Bullet
+for bullet in @bullets
     loc = bullet.loc + bullet.direction * bullet_speed * time_delta
-    loc = wrap_around(loc)
-    return [bullet.lifespan+time_delta, loc, bullet.direction]
-
-bullets = map(move_bullet, bullets)
+    wrap_around(@loc)
+    bullet = [bullet.lifespan+time_delta, loc, bullet.direction] -> Bullet
 
 -- Remove old bullets
 bullet_max_lifespan = 1.8
@@ -161,21 +159,21 @@ asteroid_starting_size = 30.0
 asteroid_num_edges = 10
 
 def generate_asteroid(number size) -> Asteroid
-    def get_edge(int index) -> Point
-        angle = index / asteroid_num_edges
-        return polar(angle) * (rand() * size + size/3)
+    edges = for index in 0..10
+             angle = index / asteroid_num_edges
+             (polar(angle) * (rand() * size + size/3)) -> Point
 
     rotation = rand() * .2 - .1
-    return [map(get_edge, 0..10), random_location(), random_norm_vector()*10, 0, rotation size 0]
+    return [edges, random_location(), random_norm_vector()*10, 0, rotation size 0]
 
 def generate_child_asteroid(Asteroid parent) -> Asteroid
     size = parent.size / 2
-    def get_edge(int index) -> Point
+    edges = for index in 0..10
         angle = index / asteroid_num_edges
-        return polar(angle) * rand() * size + size/3
+        (polar(angle) * (rand() * size + size/3)) -> Point
     rotation = rand() * .2 - .1
     speed = rand()*20 + 20.0
-    return [map(get_edge, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
+    return [edges, 0..10), parent.location, random_norm_vector()*speed, 0, rotation size 0]
 
 def generate_particle_burst(List particles, Point loc, Point vel) -> List
     for i in 0..6
@@ -203,11 +201,11 @@ for asteroid in @asteroids
 for asteroid in asteroids
     asteroid = asteroid -> Asteroid
 
-    def pos_edge(Point p) -> Point
+    edges = for p in asteroid.edges
+        @p -> Point
         p = rotate_point(p, asteroid.rotation)
         p = p + asteroid.location
-        return p
-    edges = map(pos_edge, asteroid.edges)
+        p -> Point
 
     gl:line_loop(edges, #fff)
 
@@ -285,11 +283,11 @@ def asteroid()
     asteroid.age = asteroid.age + time_delta
 
     -- draw asteroid
-    def pos_edge(Point p) -> Point
+    edges = for p in asteroid.edges
+        @p -> Point
         p = rotate_point(p, asteroid.rotation)
         p = p + asteroid.location
-        return p
+        p -> Point
 
-    edges = map(pos_edge, asteroid.edges)
     gl:line_loop(edges, #fff)
 

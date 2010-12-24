@@ -128,7 +128,7 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
     ca_assert(parentTerm != NULL);
 
     ca_assert(parentTerm->sourceLoc.defined());
-    int parentTermIndent = parentTerm->sourceLoc.col;
+    int parentTermIndent = tokens.next(-1).precedingIndent;
 
     // Consume the whitespace immediately after the heading (and possibly a newline).
     std::string postHeadingWs = possible_statement_ending(tokens);
@@ -1729,10 +1729,11 @@ Term* literal_list(Branch& branch, TokenStream& tokens)
 
 Term* plain_branch(Branch& branch, TokenStream& tokens)
 {
+    int startPosition = tokens.getPosition();
     Term* result = create_branch(branch).owningTerm;
-
-    consume_branch(result->nestedContents, tokens);
-
+    set_source_location(result, startPosition, tokens);
+    consume_branch_with_braces(result->nestedContents, tokens, result);
+    post_parse_branch(result->nestedContents);
     return result;
 }
 

@@ -17,9 +17,9 @@ struct Token
     int lineEnd;
     int colStart;
     int colEnd;
+    int precedingIndent;
 
-    Token() : match(0), lineStart(0), lineEnd(0),
-       colStart(0), colEnd(0) {}
+    Token() : match(0), lineStart(0), lineEnd(0), colStart(0), colEnd(0), precedingIndent(0) {}
 
     std::string toString() const;
 };
