@@ -151,6 +151,36 @@ namespace overloaded_function {
         return NULL;
     }
 
+    void update_function_signature(Term* term)
+    {
+        List& parameters = function_t::get_attrs(term).parameters;
+
+        ca_assert(parameters.length() > 0);
+        int argumentCount = function_t::num_inputs(as_ref(parameters[0]));
+        bool variableArgs = false;
+        RefList outputTypes;
+
+        for (int i=0; i < parameters.length(); i++) {
+
+            Term* overload = as_ref(parameters[i]);
+
+            if (argumentCount != function_t::num_inputs(overload))
+                variableArgs = true;
+            if (function_t::get_variable_args(overload))
+                variableArgs = true;
+            outputTypes.append(function_t::get_output_type(overload));
+        }
+
+        Branch& result = term->nestedContents;
+        result.shorten(1);
+        int placeholderCount = variableArgs ? 1 : argumentCount;
+        for (int i=0; i < placeholderCount; i++)
+            apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
+        Term* outputType = find_common_type(outputTypes);
+        function_t::set_output_type(term, outputType);
+        function_t::set_variable_args(term, variableArgs);
+    }
+
     void setup_overloaded_function(Term* term, std::string const& name,
             RefList const& overloads)
     {
@@ -166,29 +196,10 @@ namespace overloaded_function {
         parameters.clear();
         parameters.resize(overloads.length());
 
-        ca_assert(overloads.length() > 0);
-        int argumentCount = function_t::num_inputs(overloads[0]);
-        bool variableArgs = false;
-        RefList outputTypes;
-
-        for (int i=0; i < overloads.length(); i++) {
+        for (int i=0; i < overloads.length(); i++)
             set_ref(parameters[i], overloads[i]);
 
-            if (argumentCount != function_t::num_inputs(overloads[i]))
-                variableArgs = true;
-            if (function_t::get_variable_args(overloads[i]))
-                variableArgs = true;
-            outputTypes.append(function_t::get_output_type(overloads[i]));
-        }
-
-        Branch& result = term->nestedContents;
-        result.shorten(1);
-        int placeholderCount = variableArgs ? 1 : argumentCount;
-        for (int i=0; i < placeholderCount; i++)
-            apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
-        Term* outputType = find_common_type(outputTypes);
-        function_t::set_output_type(term, outputType);
-        function_t::set_variable_args(term, variableArgs);
+        update_function_signature(term);
     }
 
     Term* create_overloaded_function(Branch& branch, std::string const& name,
@@ -210,6 +221,7 @@ namespace overloaded_function {
 
         List& parameters = function_t::get_attrs(overloadedFunction).parameters;
         set_ref(parameters.append(), overload);
+        update_function_signature(overloadedFunction);
     }
 
     CA_FUNCTION(evaluate_declaration)
