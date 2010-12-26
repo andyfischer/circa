@@ -63,13 +63,11 @@ def circa_library(env):
             ['generated/'+filename for filename in list_source_files('src/generated')])
     source_files = filter(lambda f: f != 'main.cpp', source_files)
 
-    if config.get('circa', 'shared_library') == 'true':
-        builder = env.SharedLibrary
-    else:
-        builder = env.StaticLibrary
+    name = 'build/circa' + ('_d' if variant_name == 'debug' else '')
+    sources = ['build/'+variant_name+'/src/'+filename for filename in source_files]
 
-    circa_libs[variant_name] = builder('build/'+variant_name+'/circa',
-        ['build/'+variant_name+'/src/'+filename for filename in source_files])
+    circa_libs[variant_name] = env.StaticLibrary(name, sources)
+    env.SharedLibrary(name, sources)
 
 map(circa_library, ALL)
 
