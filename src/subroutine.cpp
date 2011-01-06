@@ -17,107 +17,131 @@ namespace subroutine_t {
         if (!is_native_function(term))
             format_branch_source(source, term->nestedContents, term);
     }
+}
 
-    void evaluate_subroutine(EvalContext* context, Term* caller)
-    {
-        Term* function = caller->function;
-        Branch& contents = function->nestedContents;
-        context->interruptSubroutine = false;
-        int numInputs = caller->numInputs();
+Term* get_subroutine_input_placeholder(Branch& contents, int index)
+{
+    return contents[index + 1];
+}
 
-        // Copy inputs to a temporary list
-        List inputs;
-        inputs.resize(numInputs);
+Term* get_subroutine_output_type(Branch& contents)
+{
+    return as_function_attrs(contents[0]).outputType;
+}
 
-        for (int i=0; i < numInputs; i++) {
-            TaggedValue* input = get_input(context, caller, i);
-            if (input == NULL)
-                continue;
+void evaluate_subroutine_internal(EvalContext* context, Term* caller,
+        Branch& contents, List* inputs, TaggedValue* output)
+{
+    context->interruptSubroutine = false;
+    start_using(contents);
 
-            Type* inputType = unbox_type(function_t::get_input_type(function, i));
+    int numInputs = inputs->length();
 
-            bool success = cast(input, inputType, inputs[i]);
-            if (!success) {
-                std::stringstream msg;
-                msg << "Couldn't cast input " << i << " to " << inputType->name;
-                ca_assert(false);
-                return error_occurred(context, caller, msg.str());
-            }
-        }
-
-        start_using(contents);
-
-        // Insert inputs into placeholders
-        for (int i=0; i < numInputs; i++) {
-            Term* placeholder = function_t::get_input_placeholder(function, i);
-            swap(inputs[i], get_local(placeholder));
-        }
-
-        // prepare output
-        set_null(&context->subroutineOutput);
-
-        // Fetch state container
-        TaggedValue prevScopeState;
-        swap(&context->currentScopeState, &prevScopeState);
-
-        if (is_function_stateful(function))
-            fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
-
-        // Evaluate each term
-        for (int i=numInputs+1; i < contents.length(); i++) {
-            evaluate_single_term(context, contents[i]);
-            if (context->errorOccurred || context->interruptSubroutine)
-                break;
-        }
-
-        // Fetch output
-        Term* outputTypeTerm = function_t::get_output_type(caller->function);
-        Type* outputType = unbox_type(outputTypeTerm);
-        TaggedValue output;
-
-        if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
-            set_null(&output);
-        } else {
-            TaggedValue* outputSource = NULL;
-
-            if (!is_null(&context->subroutineOutput)) {
-                outputSource = &context->subroutineOutput;
-            }
-            else {
-                outputSource = get_local(contents[contents.length()-1]);
-            }
-
-            //std::cout << "found output: " << outputSource->toString() << std::endl;
-
-            bool success = cast(outputSource, outputType, &output);
-            
-            if (!success) {
-                std::stringstream msg;
-                msg << "Couldn't cast output " << output.toString()
-                    << " to type " << outputType->name;
-                error_occurred(context, caller, msg.str());
-            }
-
-            set_null(&context->subroutineOutput);
-        }
-
-        // Write to state
-        wrap_up_open_state_vars(context, contents);
-
-        // Restore currentScopeState
-        if (is_function_stateful(function))
-            preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
-
-        swap(&context->currentScopeState, &prevScopeState);
-
-        finish_using(contents);
-        context->interruptSubroutine = false;
-
-        // Write output
-        TaggedValue* outputDest = get_output(context, caller);
-        if (outputDest != NULL)
-            swap(&output, outputDest);
+    // Insert inputs into placeholders
+    for (int i=0; i < numInputs; i++) {
+        Term* placeholder = get_subroutine_input_placeholder(contents, i);
+        swap(inputs->get(i), get_local(placeholder));
     }
+
+    // Prepare output
+    set_null(&context->subroutineOutput);
+
+    // Evaluate each term
+    for (int i=numInputs+1; i < contents.length(); i++) {
+        evaluate_single_term(context, contents[i]);
+        if (context->errorOccurred || context->interruptSubroutine)
+            break;
+    }
+
+    // Fetch output
+    Term* outputTypeTerm = get_subroutine_output_type(contents);
+    Type* outputType = unbox_type(outputTypeTerm);
+
+    if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
+        set_null(output);
+    } else {
+        TaggedValue* outputSource = NULL;
+
+        if (!is_null(&context->subroutineOutput)) {
+            outputSource = &context->subroutineOutput;
+        }
+        else {
+            outputSource = get_local(contents[contents.length()-1]);
+        }
+
+        //std::cout << "found output: " << outputSource->toString() << std::endl;
+
+        bool success = cast(outputSource, outputType, output);
+        
+        if (!success) {
+            std::stringstream msg;
+            msg << "Couldn't cast output " << output->toString()
+                << " to type " << outputType->name;
+            error_occurred(context, caller, msg.str());
+        }
+
+        set_null(&context->subroutineOutput);
+    }
+
+    // Rescue input values
+    for (int i=0; i < numInputs; i++) {
+        Term* placeholder = get_subroutine_input_placeholder(contents, i);
+        swap(inputs->get(i), get_local(placeholder));
+    }
+
+    // Clean up
+    wrap_up_open_state_vars(context, contents);
+    finish_using(contents);
+    context->interruptSubroutine = false;
+}
+
+void evaluate_subroutine(EvalContext* context, Term* caller)
+{
+    Term* function = caller->function;
+    Branch& contents = function->nestedContents;
+    int numInputs = caller->numInputs();
+
+    // Copy inputs to a temporary list
+    List inputs;
+    inputs.resize(numInputs);
+
+    for (int i=0; i < numInputs; i++) {
+        TaggedValue* input = get_input(context, caller, i);
+        if (input == NULL)
+            continue;
+
+        Type* inputType = unbox_type(function_t::get_input_type(function, i));
+
+        bool success = cast(input, inputType, inputs[i]);
+        if (!success) {
+            std::stringstream msg;
+            msg << "Couldn't cast input " << i << " to " << inputType->name;
+            ca_assert(false);
+            return error_occurred(context, caller, msg.str());
+        }
+    }
+
+    // Fetch state container
+    TaggedValue prevScopeState;
+    swap(&context->currentScopeState, &prevScopeState);
+
+    if (is_function_stateful(function))
+        fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
+
+    // Evaluate contents
+    TaggedValue output;
+    evaluate_subroutine_internal(context, caller, contents, &inputs, &output);
+
+    // Restore currentScopeState
+    if (is_function_stateful(function))
+        preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
+
+    swap(&context->currentScopeState, &prevScopeState);
+
+    // Write output
+    TaggedValue* outputDest = get_output(context, caller);
+    if (outputDest != NULL)
+        swap(&output, outputDest);
 }
 
 bool is_subroutine(Term* term)
@@ -128,13 +152,13 @@ bool is_subroutine(Term* term)
         return false;
     if (term->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
         return false;
-    return function_t::get_evaluate(term) == subroutine_t::evaluate_subroutine;
+    return function_t::get_evaluate(term) == evaluate_subroutine;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
     // Install evaluate function
-    function_t::get_evaluate(sub) = subroutine_t::evaluate_subroutine;
+    function_t::get_evaluate(sub) = evaluate_subroutine;
 
     subroutine_update_state_type_from_contents(sub);
 }
@@ -235,6 +259,24 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
 
         copy(storage->get(i), term);
     }
+}
+
+void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
+                     TaggedValue* error)
+{
+    List* inputsList = List::checkCast(inputs);
+    ca_assert(inputsList != NULL);
+
+    EvalContext context;
+    evaluate_subroutine_internal(&context, NULL, sub, inputsList, output);
+
+    if (context.errorOccurred)
+        set_string(error, context.errorMessage);
+}
+
+void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)
+{
+    return call_subroutine(sub->nestedContents, inputs, output, error);
 }
 
 } // namespace circa
