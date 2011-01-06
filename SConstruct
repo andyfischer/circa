@@ -63,11 +63,17 @@ def circa_library(env):
             ['generated/'+filename for filename in list_source_files('src/generated')])
     source_files = filter(lambda f: f != 'main.cpp', source_files)
 
-    name = 'build/circa' + ('_d' if variant_name == 'debug' else '')
+    baseName = 'circa' + ('_d' if variant_name == 'debug' else '')
+    fullPath = 'build/'+baseName
     sources = ['build/'+variant_name+'/src/'+filename for filename in source_files]
 
-    circa_libs[variant_name] = env.StaticLibrary(name, sources)
-    env.SharedLibrary(name, sources)
+    result = env.SharedLibrary(fullPath, sources)
+    circa_libs[variant_name] = result
+
+    if OSX:
+        actualFile = 'lib'+baseName+'.dylib'
+        env.AddPostAction(result, 'install_name_tool -id @executable_path/'+actualFile
+                + ' build/'+actualFile)
 
 map(circa_library, ALL)
 
@@ -77,9 +83,14 @@ circa_cl_apps = {}
 def circa_command_line_app(env):
     variant_name = env['variant_name']
     env.Append(CPPPATH = ['src'])
-    result = env.Program('build/bin/circa',
-        'build/'+variant_name+'/src/main.cpp', LIBS=[circa_libs[variant_name]])
+    path = 'build/circa'
+    result = env.Program(path, 'build/'+variant_name+'/src/main.cpp',
+            LIBS=[circa_libs[variant_name]])
     circa_cl_apps[variant_name] = result
+
+    if OSX:
+        env.AddPostAction(result, 'install_name_tool -change build/libcirca_d.dylib '
+                + '@executable_path/libcirca_d.dylib '+path)
     return result
     
 # Default build target is debug command-line binary.

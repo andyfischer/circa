@@ -50,14 +50,22 @@ void unload_dll(const char* filename)
     delete dll;
 }
 
-Dll* load_dll(const char* filename)
+Dll* load_dll(const char* filename, TaggedValue* errorOut)
 {
     Dll* dll = new Dll();
 
+    const int actual_filename_max_len = 250;
+    char actual_filename[actual_filename_max_len];
+
     // Platform specific
-    dll->module = dlopen(filename, RTLD_NOW);
+    sprintf(actual_filename, "%s.so", filename);
+    dll->module = dlopen(actual_filename, RTLD_NOW);
+
+    std::cout << "loading " << filename << std::endl;
 
     if (dll->module == NULL) {
+        set_string(errorOut, std::string("dlopen failed to open ")+actual_filename
+                +": \n"+dlerror());
         delete dll;
         return NULL;
     }
@@ -74,32 +82,45 @@ void* find_func_in_dll(Dll* dll, const char* funcName)
     return dlsym(dll->module, funcName);
 }
 
-void patch_with_dll(const char* dll_filename, Branch& branch)
+void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
+{
+    for (int i=0; i < branch.length(); i++)
+    {
+        Term* term = branch[i];
+
+        if (is_namespace(term)) {
+            patch_branch_recr(dll, term->nestedContents, namespacePrefix + term->name + "__");
+        }
+        else if (is_function(term)) {
+            FunctionAttrs* attrs = get_function_attrs(term);
+
+            std::string searchName = namespacePrefix + term->name.c_str();
+
+            void* newEvaluateFunc = find_func_in_dll(dll, searchName.c_str());
+
+            // Patch in this function and record the affected term
+            if (newEvaluateFunc != NULL) {
+                attrs->evaluate = (EvaluateFunc) newEvaluateFunc;
+                dll->affectedTerms.append(term);
+                dll->loadedFunctions.insert(newEvaluateFunc);
+            }
+        }
+    }
+}
+
+void patch_with_dll(const char* dll_filename, Branch& branch, TaggedValue* errorOut)
 {
     // Check to unload this file, if it's already loaded
     unload_dll(dll_filename);
 
-    Dll* dll = load_dll(dll_filename);
+    Dll* dll = load_dll(dll_filename, errorOut);
+
+    if (dll == NULL)
+        return;
 
     // Iterate through every function inside 'branch', and possibly replace
     // its evaluate function with one from the dll.
-    for (BranchIterator it(branch); it.unfinished(); it.advance())
-    {
-        Term* term = *it;
-        if (!is_function(term))
-            continue;
-
-        FunctionAttrs* attrs = get_function_attrs(term);
-
-        void* newEvaluateFunc = find_func_in_dll(dll, term->name.c_str());
-
-        // Patch in this function and record the affected term
-        if (newEvaluateFunc != NULL) {
-            attrs->evaluate = (EvaluateFunc) newEvaluateFunc;
-            dll->affectedTerms.append(term);
-            dll->loadedFunctions.insert(newEvaluateFunc);
-        }
-    }
+    patch_branch_recr(dll, branch, "");
 }
 
 } // namespace circa

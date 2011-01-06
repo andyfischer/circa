@@ -1,0 +1,14 @@
+
+def sample_a() -> string
+    return 'Not patched'
+
+namespace ns
+    def concat(string a, string b) -> string
+        return 'Not patched'
+        
+
+patch_with_dll('sampledll' -> path)
+
+sample_a() -> print
+ns:concat('it ' 'works') -> print
+
