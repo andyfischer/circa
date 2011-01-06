@@ -6,7 +6,7 @@
 #include "types/dict.h"
 
 namespace circa {
-namespace inline_state_function {
+namespace get_state_field_function {
 
     CA_START_FUNCTIONS;
 
@@ -44,17 +44,6 @@ namespace inline_state_function {
 
         // append name to the list of open state vars
         set_string(CONTEXT->openStateVariables.append(), name);
-    }
-
-    CA_DEFINE_FUNCTION(set_state_field,
-            "set_state_field(any container, string name, any field) -> any")
-    {
-        copy(INPUT(0), OUTPUT);
-        TaggedValue *container = OUTPUT;
-        touch(container);
-        if (!is_dict(container)) make_dict(container);
-        Dict* dict = Dict::checkCast(container);
-        dict->set(STRING_INPUT(1), INPUT(2));
     }
 
     void formatSource(StyledSource* source, Term* term)
