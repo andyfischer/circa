@@ -170,8 +170,7 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 
 TaggedValue* get_local(Term* term)
 {
-    if (term->owningBranch == NULL)
-        return NULL;
+    ca_assert(term->owningBranch != NULL);
 
     // TODO: make sure that this list is the right size when building
     // the branch, instead of here.
@@ -181,6 +180,14 @@ TaggedValue* get_local(Term* term)
     TaggedValue* local = term->owningBranch->locals[term->index];
     return local;
 }
+
+TaggedValue* get_local_safe(Term* term)
+{
+    if (term->owningBranch == NULL)
+        return NULL;
+    return get_local(term);
+}
+
 
 Dict* get_current_scope_state(EvalContext* cxt)
 {

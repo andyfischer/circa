@@ -69,6 +69,7 @@ TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 TaggedValue* get_local(Term* term);
+TaggedValue* get_local_safe(Term* term);
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);

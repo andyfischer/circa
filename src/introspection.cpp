@@ -261,7 +261,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     }
     out << " " << to_string(term);
 
-    TaggedValue* local = get_local(term);
+    TaggedValue* local = get_local_safe(term);
     if (local != NULL)
         out << " local:" << local->toString();
 
