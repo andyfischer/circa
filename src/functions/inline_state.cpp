@@ -10,20 +10,9 @@ namespace inline_state_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(get_top_level_state, "get_top_level_state() -> any")
-    {
-        copy(&CONTEXT->state, OUTPUT);
-    }
-    CA_DEFINE_FUNCTION(set_top_level_state, "set_top_level_state(any)")
-    {
-        copy(INPUT(0), &CONTEXT->state);
-    }
-
     CA_DEFINE_FUNCTION(get_state_field,
-        "get_state_field(any container +optional, string name, any default_value +optional) -> any")
+        "get_state_field(any container +optional, any default_value +optional) -> any")
     {
-        ca_assert(INPUT(1) != NULL);
-
         Dict* stateContainer = NULL;
 
         TaggedValue *containerFromInput = INPUT(0);
@@ -35,21 +24,16 @@ namespace inline_state_function {
 
         ca_assert(stateContainer != NULL);
 
-        const char* name = STRING_INPUT(1);
+        const char* name = CALLER->name.c_str();
         TaggedValue* value = stateContainer->get(name);
-
-        ca_assert(CALLER->name == name);
-
-        //std::cout << "get_state_field looking at container: "
-        //    << stateContainer->toString() << " with name: " << name << std::endl;
 
         if (value) {
             // TODO: check if we need to cast this value
             copy(value, OUTPUT);
 
         // If we didn't find the value, see if they provided a default
-        } else if (INPUT(2) != NULL) {
-            copy(INPUT(2), OUTPUT);
+        } else if (INPUT(1) != NULL) {
+            copy(INPUT(1), OUTPUT);
 
         // Otherwise, reset to default value of type
         } else {
@@ -85,7 +69,7 @@ namespace inline_state_function {
 
         append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);
 
-        Term* defaultValue = term->input(2);
+        Term* defaultValue = term->input(1);
         if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);
             if (defaultValue->name != "")

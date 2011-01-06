@@ -666,7 +666,7 @@ void test_sig_indent_multiline_function()
             "\n result = val - prev\n prev = val\n return result");
 
     test_assert(branch.length() == 1);
-    test_assert(branch["delta"]->nestedContents.length() > 7);
+    test_assert(branch["delta"]->nestedContents.length() > 6);
 }
 
 void test_sig_indent_nested_blocks()

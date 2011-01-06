@@ -105,7 +105,6 @@ void test_recursion_with_state()
                    "    return recr(i - 1) + 1\n");
 
     test_assert(branch);
-    dump_branch(branch);
 
     Term* recr_4 = branch.compile("recr(4)");
 
@@ -299,7 +298,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
-    //REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
+    REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);
     REGISTER_TEST_CASE(subroutine_tests::specialization_to_output_type);

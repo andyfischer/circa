@@ -281,11 +281,8 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
 Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
         std::string const& name)
 {
-    Term* nameTerm = create_string(branch, name);
-    hide_from_source(nameTerm);
-
     Term* result = apply(branch, get_global("get_state_field"),
-            RefList(NULL, nameTerm, defaultValue), name);
+            RefList(NULL, defaultValue), name);
     change_type(result, type);
     return result;
 }
