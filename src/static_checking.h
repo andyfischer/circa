@@ -16,6 +16,8 @@ struct StaticErrorCheck
     //  [1] string type
 
     int count() { return errors.length(); }
+    bool empty() { return count() == 0; }
+    std::string toString() { return errors.toString(); }
 };
 
 void check_for_static_errors(StaticErrorCheck* result, Branch& branch);

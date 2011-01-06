@@ -67,24 +67,6 @@ void test_recursion()
     test_assert(branch.eval("recr(4)")->asInt() == 4);
 }
 
-void test_recursion_with_state()
-{
-    Branch branch;
-    branch.compile("def recr(int i) -> int\n"
-                "  state s\n"
-                "  if i == 1\n"
-                "    return(1)\n"
-                "  else\n"
-                "    return(recr(i - 1) + 1)\n");
-
-    test_assert(branch);
-
-    Term* recr_4 = branch.compile("recr(4)");
-
-    evaluate_branch(branch);
-    test_assert(as_int(recr_4) == 4);
-}
-
 void subroutine_stateful_term()
 {
     EvalContext context;
@@ -109,7 +91,26 @@ void subroutine_stateful_term()
     branch.compile("another_call = mysub()");
     evaluate_branch(&context, branch);
 
-    test_equals(context.state.toString(), "[call: [a: 2.0], another_call: [a: 1.0]]");
+    test_equals(context.state.toString(), "[another_call: [a: 1.0], call: [a: 3.0]]");
+}
+
+void test_recursion_with_state()
+{
+    Branch branch;
+    branch.compile("def recr(int i) -> int\n"
+                   "  state s\n"
+                   "  if i == 1\n"
+                   "    return 1\n"
+                   "  else\n"
+                   "    return recr(i - 1) + 1\n");
+
+    test_assert(branch);
+    dump_branch(branch);
+
+    Term* recr_4 = branch.compile("recr(4)");
+
+    evaluate_branch(branch);
+    test_assert(as_int(recr_4) == 4);
 }
 
 void initialize_state_type()
@@ -221,12 +222,84 @@ void test_call_subroutine()
     test_equals(&inputs, "[5, 12]");
 }
 
+namespace copy_counting_tests
+{
+    Type T;
+
+    struct Slot
+    {
+        int copies;
+        Slot() : copies(0) {}
+    };
+
+    const int num_slots = 10;
+    int next_available_slot = 0;
+    Slot slots[num_slots];
+
+    void dump_slots(TaggedValue* value)
+    {
+        List* list = set_list(value, 0);
+        for (int s=0; s < next_available_slot; s++) {
+            set_int(list->append(), slots[s].copies);
+        }
+    }
+    void dump_slots_stdout()
+    {
+        TaggedValue v;
+        dump_slots(&v);
+        std::cout << v.toString() << std::endl;
+    }
+
+    void t_initialize(Type* type, TaggedValue* source)
+    {
+        source->value_data.asint = next_available_slot++;
+    }
+
+    void t_copy(TaggedValue* source, TaggedValue* dest)
+    {
+        dest->value_data = source->value_data;
+        Slot& slot = slots[dest->value_data.asint];
+        slot.copies++;
+    }
+
+    void setup(Branch& branch)
+    {
+        T.name = "T";
+        T.initialize = t_initialize;
+        T.copy = t_copy;
+        set_type(create_type(branch, "T"), &T);
+        for (int s = 0; s < num_slots; s++)
+            slots[s] = Slot();
+        next_available_slot = 0;
+    }
+
+    void test_single_call()
+    {
+        Branch branch;
+        setup(branch);
+
+        branch.compile("def f(T t) end");
+        Term* init = branch.compile("a = T()");
+        Term* call = branch.compile("f(a)");
+        test_assert(branch);
+        test_assert(init->function != NULL);
+        test_assert(call->function != NULL);
+
+        int slot = next_available_slot - 1;
+
+        test_equals(slots[slot].copies, 0);
+        evaluate_branch(branch);
+        // one copy for T(), another to evaluate f(a)
+        test_assert(slots[slot].copies <= 2);
+    }
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
-    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
-    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
+    REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
+    //REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
     REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);
     REGISTER_TEST_CASE(subroutine_tests::specialization_to_output_type);
@@ -235,6 +308,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::bug_with_return);
     REGISTER_TEST_CASE(subroutine_tests::bug_where_interrupt_subroutine_wasnt_being_cleared);
     REGISTER_TEST_CASE(subroutine_tests::test_call_subroutine);
+    REGISTER_TEST_CASE(subroutine_tests::copy_counting_tests::test_single_call);
 }
 
 } // namespace refactoring_tests

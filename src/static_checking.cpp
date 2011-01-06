@@ -10,7 +10,6 @@
 
 namespace circa {
 
-
 void append_static_error(StaticErrorCheck* result, Term* term, const char* type)
 {
     List* item = set_list(result->errors.append(), 2);

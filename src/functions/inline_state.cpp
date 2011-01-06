@@ -38,6 +38,8 @@ namespace inline_state_function {
         const char* name = STRING_INPUT(1);
         TaggedValue* value = stateContainer->get(name);
 
+        ca_assert(CALLER->name == name);
+
         //std::cout << "get_state_field looking at container: "
         //    << stateContainer->toString() << " with name: " << name << std::endl;
 

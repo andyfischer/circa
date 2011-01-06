@@ -69,8 +69,6 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
             outputSource = get_local(contents[contents.length()-1]);
         }
 
-        //std::cout << "found output: " << outputSource->toString() << std::endl;
-
         bool success = cast(outputSource, outputType, output);
         
         if (!success) {
