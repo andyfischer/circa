@@ -25,6 +25,7 @@ public:
     BranchIterator(Branch& branch, bool backwards=false);
     void reset(Branch& branch);
     bool finished();
+    bool unfinished() { return !finished(); }
     Term* current();
     void advance();
     void advanceSkippingBranch();

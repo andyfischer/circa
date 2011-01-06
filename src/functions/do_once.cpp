@@ -5,10 +5,6 @@
 namespace circa {
 namespace do_once_function {
 
-    CA_FUNCTION(empty_evaluate)
-    {
-    }
-
     void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
@@ -19,7 +15,7 @@ namespace do_once_function {
 
     void setup(Branch& kernel)
     {
-        DO_ONCE_FUNC = import_function(kernel, empty_evaluate, "do_once(state bool)");
+        DO_ONCE_FUNC = import_function(kernel, NULL, "do_once(state bool)");
         function_t::get_attrs(DO_ONCE_FUNC).formatSource = formatSource;
     }
 }
