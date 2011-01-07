@@ -6,6 +6,11 @@ using namespace circa;
 
 extern "C" {
 
+void on_load(Branch* branch)
+{
+    std::cout << "sampledll loaded" << std::endl;
+}
+
 CA_FUNCTION(sample_a)
 {
     set_string(OUTPUT, "it works");

@@ -51,21 +51,6 @@ struct Font : public circa::TaggedValue
     }
 };
 
-#if 0
-class TTF_Font_ptr
-{
-    TaggedValue* _value;
-
-public:
-    TTF_Font_ptr(TaggedValue* value) { _value = value; }
-
-    operator TTF_Font*() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
-    TTF_Font_ptr& operator=(TTF_Font* rhs) { set_pointer(_value, TTF_Font_t, rhs); return *this; }
-    TTF_Font* operator*() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
-    TTF_Font* operator->() { return (TTF_Font*) get_pointer(_value, TTF_Font_t); }
-};
-#endif
-
 SDL_Color unpack_sdl_color(TaggedValue* color)
 {
     SDL_Color c = {};

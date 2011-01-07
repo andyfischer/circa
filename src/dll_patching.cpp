@@ -19,6 +19,8 @@ struct Dll
     std::set<void*> loadedFunctions;
 };
 
+typedef void (*OnLoadFunc)(Branch* branch);
+
 typedef std::map<std::string, Dll*> LoadedDllMap;
 LoadedDllMap loaded_dlls;
 
@@ -32,7 +34,7 @@ void unload_dll(const char* filename)
     loaded_dlls.erase(it);
 
     // Track down anyone using this dll, and blank out those function pointers
-    for (int i=0; dll->affectedTerms.length(); i++) {
+    for (int i=0; i < dll->affectedTerms.length(); i++) {
         Term* ref = dll->affectedTerms[i];
 
         if (!is_function(ref))
@@ -50,6 +52,11 @@ void unload_dll(const char* filename)
     delete dll;
 }
 
+void* find_func_in_dll(Dll* dll, const char* funcName)
+{
+    return dlsym(dll->module, funcName);
+}
+
 Dll* load_dll(const char* filename, TaggedValue* errorOut)
 {
     Dll* dll = new Dll();
@@ -60,8 +67,6 @@ Dll* load_dll(const char* filename, TaggedValue* errorOut)
     // Platform specific
     sprintf(actual_filename, "%s.so", filename);
     dll->module = dlopen(actual_filename, RTLD_NOW);
-
-    std::cout << "loading " << filename << std::endl;
 
     if (dll->module == NULL) {
         set_string(errorOut, std::string("dlopen failed to open ")+actual_filename
@@ -77,10 +82,6 @@ Dll* load_dll(const char* filename, TaggedValue* errorOut)
     return dll;
 }
 
-void* find_func_in_dll(Dll* dll, const char* funcName)
-{
-    return dlsym(dll->module, funcName);
-}
 
 void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
 {
@@ -117,6 +118,11 @@ void patch_with_dll(const char* dll_filename, Branch& branch, TaggedValue* error
 
     if (dll == NULL)
         return;
+
+    // Call on_load (if it exists)
+    OnLoadFunc onLoad = (OnLoadFunc) find_func_in_dll(dll, "on_load");
+    if (onLoad != NULL)
+        onLoad(&branch);
 
     // Iterate through every function inside 'branch', and possibly replace
     // its evaluate function with one from the dll.

@@ -10,5 +10,5 @@ namespace ns
 patch_with_dll('sampledll' -> path)
 
 sample_a() -> print
-ns:concat('it ' 'works') -> print
+ns:concat('namespaced function ' 'works') -> print
 
