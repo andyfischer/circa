@@ -63,7 +63,7 @@ void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch);
 void evaluate_branch(EvalContext* context, Branch& branch);
 
 // Shorthand to call evaluate_branch with a new EvalContext:
-EvalContext evaluate_branch(Branch& branch);
+void evaluate_branch(Branch& branch);
 
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);

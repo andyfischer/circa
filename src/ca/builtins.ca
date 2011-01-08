@@ -46,8 +46,7 @@ def point_distance(Point a, Point b) -> number
 
 def rotate_point(Point p, number rotation) -> Point
     "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
-    return ([p.x*cos(rotation) - p.y*sin(rotation),
-        p.x*sin(rotation)+p.y*cos(rotation)])
+    return ([p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)])
 
 def random_norm_vector() -> Point
     "Return a random normalized vector"
@@ -79,7 +78,7 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
 
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
-    return(intersects_on_x and intersects_on_y)
+    return intersects_on_x and intersects_on_y
 
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
@@ -96,17 +95,18 @@ def blend_color(Color a, Color b, number ratio) -> Color
     min(@ratio, 1.0)
 
     if ratio == 0.0
-        return(a)
+        return a
     elif ratio == 1.0
-        return(b)
+        return b
     else
         result = a + (b - a) * ratio
 
         -- hack to preserve alpha:
         result[3] = 1.0
-        return(result)
+        return result
 
 def delta(number val) -> number
+    "Return the difference that 'val' has changed since the previous frame"
     state number prev = val
     result = val - prev
     prev = val

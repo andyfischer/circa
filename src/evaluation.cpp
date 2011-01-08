@@ -137,11 +137,10 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     }
 }
 
-EvalContext evaluate_branch(Branch& branch)
+void evaluate_branch(Branch& branch)
 {
     EvalContext context;
     evaluate_branch(&context, branch);
-    return context;
 }
 
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index)

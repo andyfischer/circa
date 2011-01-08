@@ -57,9 +57,10 @@ void blocked_by_error()
 
     test_assert(gSpyResults.size() == 0);
 
-    EvalContext result = evaluate_branch(branch);
-    test_assert(result.errorOccurred);
-    test_assert(result.errorTerm == error);
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_assert(context.errorOccurred);
+    test_assert(context.errorTerm == error);
     test_assert(gSpyResults.size() == 1);
     test_assert(gSpyResults[0] == "1");
 

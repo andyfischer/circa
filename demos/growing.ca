@@ -13,19 +13,20 @@ def tree_segment(Point base, number direction, number width, number depth)
   age += time_delta
   seg_length = 20.0 * log(age)
   min(@seg_length, max_length)
+
   --direction = direction + jitter
   bottom_width = width * interp(age, 8)
 
   has_branches = (seg_length > .4*max_length) and depth < 4.0
 
   top_width = width * interp(age, 11)
-  if_expr(has_branches, @top_width, 0.0)
+  cond(has_branches, @top_width, 0.0)
 
-  l = polar(direction - .5, bottom_width, base)
-  r = polar(direction + .5, bottom_width, base)
-  next_center = polar(direction, seg_length, base)
-  l2 = polar(direction - .5, top_width, next_center)
-  r2 = polar(direction + .5, top_width, next_center)
+  l = polar(direction - .5) * bottom_width + base
+  r = polar(direction + .5) * bottom_width + base
+  next_center = polar(direction) * seg_length + base
+  l2 = polar(direction - .5) * top_width + next_center
+  r2 = polar(direction + .5) * top_width + next_center
   gl:triangles([r l l2 l2 r2 r] #440101)
 
   if has_branches

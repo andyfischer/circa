@@ -66,14 +66,15 @@ void test_include_static_error_after_reload()
     files["file.ca"] = "add(1,1)";
     branch.compile("include('file.ca')");
 
-    EvalContext result = evaluate_branch(branch);
+    EvalContext result;
+    evaluate_branch(&result, branch);
 
     test_assert(!result.errorOccurred);
 
     files["file.ca"] = "add(what what)";
     files.last_modified("file.ca")++;
 
-    result = evaluate_branch(branch);
+    evaluate_branch(&result, branch);
     test_assert(result.errorOccurred);
 }
 
