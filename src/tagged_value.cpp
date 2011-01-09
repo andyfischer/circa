@@ -373,8 +373,7 @@ void change_type(TaggedValue* v, Type* type)
             initialize(type, v);
 
         // Any types that are actually used become permanent
-        if (!type->permanent)
-            type->permanent = true;
+        type->permanent = true;
     }
 }
 

@@ -375,6 +375,7 @@ namespace tagged_value_wrappers {
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
+        release(dest);
         dest->value_data.ptr = duplicate((DictData*) source->value_data.ptr);
     }
     std::string to_string(TaggedValue* value)
