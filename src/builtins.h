@@ -107,6 +107,11 @@ namespace include_function {
     void preload_script(Term* term);
 }
 
+namespace internal_debug_function {
+    void oracle_send(TaggedValue* value);
+    void oracle_send(int i);
+}
+
 namespace file_changed_function {
     bool check(EvalContext*, Term* caller, TaggedValue* fileSignature,
             std::string const& filename);

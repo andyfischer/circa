@@ -103,11 +103,11 @@ CA_FUNCTION(_unique_output)
     set_int(OUTPUT, NEXT_UNIQUE_OUTPUT++);
 }
 
-std::vector<int> SPY_RESULTS;
+List SPY_RESULTS;
 
 CA_FUNCTION(_spy)
 {
-    SPY_RESULTS.push_back(as_int(INPUT(0)));
+    copy(INPUT(0), SPY_RESULTS.append());
 }
 
 void one_time_assignment_inside_for_loop()
@@ -116,25 +116,21 @@ void one_time_assignment_inside_for_loop()
 
     import_function(branch, _unique_output, "unique_output() -> int");
     import_function(branch, _spy, "spy(int)");
-    branch.compile("for i in [1 1 1]\nstate s = unique_output()\nspy(s)\nend");
+    branch.compile("for i in [1 1 1]; state s = unique_output(); spy(s); end");
+    test_assert(branch);
 
     NEXT_UNIQUE_OUTPUT = 0;
     SPY_RESULTS.clear();
 
-    evaluate_branch(branch);
+    EvalContext context;
+    evaluate_branch(&context, branch);
 
-    test_assert(SPY_RESULTS.size() == 3);
-    test_assert(SPY_RESULTS[0] == 0);
-    test_assert(SPY_RESULTS[1] == 1);
-    test_assert(SPY_RESULTS[2] == 2);
+    test_equals(&SPY_RESULTS, "[0, 1, 2]");
 
     SPY_RESULTS.clear();
-    evaluate_branch(branch);
+    evaluate_branch(&context, branch);
 
-    test_assert(SPY_RESULTS.size() == 3);
-    test_assert(SPY_RESULTS[0] == 0);
-    test_assert(SPY_RESULTS[1] == 1);
-    test_assert(SPY_RESULTS[2] == 2);
+    test_equals(&SPY_RESULTS, "[0, 1, 2]");
 }
 
 void explicit_state()
@@ -217,7 +213,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::initial_value);
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
-    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
+    REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);

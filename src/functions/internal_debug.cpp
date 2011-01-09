@@ -25,12 +25,25 @@ namespace internal_debug_function {
 
     List oracleValues;
 
-    CA_DEFINE_FUNCTION(oracle, "oracle() -> any"
-        "'For internal debugging. This function will output values that are manually "
+    CA_DEFINE_FUNCTION(oracle, "test_oracle() -> any"
+        "'For internal testing. This function will output values that are manually "
         "inserted with the c++ function oracle_send'")
     {
+        ca_assert(oracleValues.length() > 0);
+        copy(oracleValues[0], OUTPUT);
+        oracleValues.remove(0);
+    }
 
+    void oracle_send(TaggedValue* value)
+    {
+        copy(value, oracleValues.append());
+    }
 
+    void oracle_send(int i)
+    {
+        TaggedValue v;
+        set_int(&v, i);
+        oracle_send(&v);
     }
 
     void setup(Branch& kernel)
