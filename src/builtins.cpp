@@ -242,6 +242,7 @@ void pre_setup_types(Branch& kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
+    JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
 
     // FileSignature is used in some builtin functions
     FILE_SIGNATURE_T = unbox_type(parse_type(kernel,
@@ -357,7 +358,6 @@ export_func void circa_initialize()
     post_setup_functions(*KERNEL);
     parse_hosted_types(*KERNEL);
     post_setup_types();
-
 
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);

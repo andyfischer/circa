@@ -38,14 +38,14 @@ struct Font : public circa::TaggedValue
 
     static Font* checkCast(TaggedValue* val)
     {
-        if (val->value_type != FontRef::singleton)
+        if (val->value_type->name != "Font")
             return NULL;
         return (Font*) val;
     }
 
     static Font* lazyCast(TaggedValue* val)
     {
-        if (val->value_type != FontRef::singleton)
+        if (val->value_type->name != "Font")
             change_type(val, FontRef::singleton);
         return (Font*) val;
     }

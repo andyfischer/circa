@@ -12,11 +12,6 @@ namespace if_function {
         // Compilation placeholder
     }
 
-    CA_DEFINE_FUNCTION(join_function, "join(any...) -> any")
-    {
-        // Compilation placeholder
-    }
-
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

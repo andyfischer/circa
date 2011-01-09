@@ -1,12 +1,12 @@
 
 background(#eef)
+desired_window_size = [480 600]
 
 def interp(number progress, number e) -> number
   return min(progress / e, 1.0)
 
-desired_window_size = [480 600]
-
-def tree_segment(Point base, number direction, number width, number depth)
+def tree_segment(Point base, number direction, number width, number depth,
+    List @leaves)
   jitter = (seed() - .5) *.05
   max_length = 20 + 30 * seed()
   age = 1.0 + elapsed()
@@ -29,9 +29,9 @@ def tree_segment(Point base, number direction, number width, number depth)
   r2 = polar(direction + .25) * top_width + next_center
   points = [r l l2 l2 r2 r]
   gl:triangles(points color)
-  gl:lines([l l2], #000)
-  gl:lines([r r2], #000)
+  gl:lines([l l2 r r2], #000)
 
+  -- branches
   if has_branches
     branch_age = elapsed()
     l_angle = direction - seed() * .2
@@ -41,6 +41,12 @@ def tree_segment(Point base, number direction, number width, number depth)
     l_branch = tree_segment(next_center->Point, l_angle, width * .8, depth+1)
     r_branch = tree_segment(next_center->Point, r_angle, width - .4, depth+1)
 
-starting_width = 3.0
+  -- leaves
+  if width < .6
+      leaf_pos = seed() * seg_length
+      leaves.append(base + polar(direction) * leaf_pos)
 
-root = tree_segment([200 300], 0, starting_width, 0)
+starting_width = 3.0
+leaves = []
+root = tree_segment([200 300], 0, starting_width, 0, @leaves)
+

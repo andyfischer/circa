@@ -84,6 +84,8 @@ CA_FUNCTION(background)
     glClear(GL_COLOR_BUFFER_BIT);
 
     gl_check_error(CONTEXT, CALLER);
+
+    set_null(OUTPUT);
 }
 
 CA_FUNCTION(gl_triangles)
