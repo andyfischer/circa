@@ -75,15 +75,6 @@ void test_term_output_always_satisfies_type()
     test_assert(term_output_always_satisfies_type(v5, t4));  // coercion again
 }
 
-void test_is_native_type()
-{
-    test_assert(is_native_type(INT_TYPE));
-    test_assert(is_native_type(STRING_TYPE));
-    test_assert(is_native_type(BOOL_TYPE));
-    test_assert(is_native_type(FLOAT_TYPE));
-    test_assert(is_native_type(TYPE_TYPE));
-}
-
 void test_default_values()
 {
     Branch branch;
@@ -192,7 +183,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::type_declaration);
     REGISTER_TEST_CASE(type_tests::test_term_output_always_satisfies_type);
-    REGISTER_TEST_CASE(type_tests::test_is_native_type);
     REGISTER_TEST_CASE(type_tests::test_default_values);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_index);
     REGISTER_TEST_CASE(type_tests::type_inference_for_get_field);

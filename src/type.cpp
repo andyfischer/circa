@@ -163,12 +163,6 @@ Type::~Type()
     debug_unregister_valid_object(this);
 }
 
-bool is_native_type(Term* type)
-{
-    // this once did something useful
-    return true;
-}
-
 Type* declared_type(Term* term)
 {
     return unbox_type(term->type);
