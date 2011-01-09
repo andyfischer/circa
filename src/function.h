@@ -109,6 +109,7 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads/*=RefList()*/);
 Term* function_get_specialized_output_type(Term* function, Term* call);
 void function_set_use_input_as_output(Term* function, int index, bool value);
+void set_specialize_type(Term* function, SpecializeTypeFunc st);
 
 bool is_native_function(Term* function);
 

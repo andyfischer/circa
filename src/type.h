@@ -189,6 +189,7 @@ namespace type_t {
 
 Type& as_type(Term* term);
 Type* unbox_type(Term* type);
+Type* unbox_type(TaggedValue* val);
 Type* declared_type(Term* term);
 
 bool value_fits_type(TaggedValue* value, Type* type);

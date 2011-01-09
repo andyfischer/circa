@@ -180,6 +180,11 @@ Type* unbox_type(Term* term)
     return (Type*) term->value_data.ptr;
 }
 
+Type* unbox_type(TaggedValue* val)
+{
+    return (Type*) val->value_data.ptr;
+}
+
 bool value_fits_type(TaggedValue* value, Type* type)
 {
     if (is_subtype(type, value->value_type))

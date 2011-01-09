@@ -358,10 +358,18 @@ export_func void circa_initialize()
     parse_hosted_types(*KERNEL);
     post_setup_types();
 
+
     type_initialize_kernel(*KERNEL);
     initialize_kernel_documentation(*KERNEL);
 
     parse_builtin_script(*KERNEL);
+
+    ca_assert(!has_static_errors(*KERNEL));
+
+    // evaluate kernel so that the local-value slots are filled
+    EvalContext context;
+    evaluate_branch(&context, *KERNEL);
+    ca_assert(!context.errorOccurred);
 }
 
 export_func void circa_shutdown()

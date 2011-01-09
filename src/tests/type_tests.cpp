@@ -179,6 +179,17 @@ void create_empty_type_then_populate_it()
     test_assert(branch);
 }
 
+void test_copy_builtin_type()
+{
+    TaggedValue v;
+    copy(INT_TYPE, &v);
+    test_assert(v.value_type == &TYPE_T);
+
+    Branch branch;
+    branch.eval("copy(int)");
+    test_assert(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::type_declaration);
@@ -189,6 +200,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_list_based_types);
     REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
     REGISTER_TEST_CASE(type_tests::create_empty_type_then_populate_it);
+    REGISTER_TEST_CASE(type_tests::test_copy_builtin_type);
 }
 
 } // namespace type_tests

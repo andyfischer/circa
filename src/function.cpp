@@ -463,6 +463,11 @@ void function_set_use_input_as_output(Term* function, int index, bool value)
     placeholder->setBoolProp("use-as-output", value);
 }
 
+void set_specialize_type(Term* function, SpecializeTypeFunc st)
+{
+    function_t::get_specialize_type(function) = st;
+}
+
 bool is_native_function(Term* func)
 {
     if (!is_function(func))
