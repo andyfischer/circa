@@ -341,7 +341,7 @@ int num_elements(TaggedValue* value)
 
 void touch(TaggedValue* value)
 {
-    Type::Mutate touch = value->value_type->touch;
+    Type::Touch touch = value->value_type->touch;
     if (touch != NULL)
         touch(value);
 

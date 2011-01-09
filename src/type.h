@@ -65,7 +65,7 @@ struct Type
     typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef std::string (*ToString)(TaggedValue* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
-    typedef void (*Mutate)(TaggedValue* value);
+    typedef void (*Touch)(TaggedValue* value);
     typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
     typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
     typedef TaggedValue* (*GetField)(TaggedValue* value, const char* field);
@@ -92,7 +92,7 @@ struct Type
     ValueFitsType valueFitsType;
     ToString toString;
     FormatSource formatSource;
-    Mutate touch;
+    Touch touch;
     GetIndex getIndex;
     SetIndex setIndex;
     GetField getField;
