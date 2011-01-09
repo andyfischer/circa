@@ -200,6 +200,8 @@ void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* outp
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result)
 {
     Dict* containerDict = Dict::lazyCast(container);
+    const char* name = term->uniqueName.name.c_str();
+    std::cout << "preserving " << result->toString() << " into name " << name << std::endl;
     copy(result, containerDict->insert(term->uniqueName.name.c_str()));
 }
 

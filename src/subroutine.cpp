@@ -35,6 +35,11 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     context->interruptSubroutine = false;
     start_using(contents);
 
+    // Store context.openStateVariables, in case the outer context is using it
+    List prevOpenStateVariables;
+    swap(&context->openStateVariables, &prevOpenStateVariables);
+std::cout << "prevOpenStateVariables = " << prevOpenStateVariables.toString() << std::endl;
+
     int numInputs = inputs->length();
 
     // Insert inputs into placeholders
@@ -52,6 +57,9 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
         if (context->errorOccurred || context->interruptSubroutine)
             break;
     }
+
+    std::cout << "finished evaluating contents, currentScopeState = "
+        << context->currentScopeState.toString() << std::endl;
 
     // Fetch output
     Term* outputTypeTerm = get_subroutine_output_type(contents);
@@ -91,6 +99,9 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     wrap_up_open_state_vars(context, contents);
     finish_using(contents);
     context->interruptSubroutine = false;
+    swap(&context->openStateVariables, &prevOpenStateVariables);
+std::cout << "wrapped up, openStateVariables = " << context->openStateVariables.toString() << std::endl;
+std::cout << "currentScopeState = " << context->currentScopeState.toString() << std::endl;
 }
 
 void evaluate_subroutine(EvalContext* context, Term* caller)
@@ -130,11 +141,18 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     TaggedValue output;
     evaluate_subroutine_internal(context, caller, contents, &inputs, &output);
 
-    // Restore currentScopeState
-    if (is_function_stateful(function))
+    // Preserve state
+    if (is_function_stateful(function)) {
+        std::cout << "storing " << context->currentScopeState.toString() << " into " <<
+            prevScopeState.toString() << std::endl;
         preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
+        std::cout << "prevScopeState = " << prevScopeState.toString() << std::endl;
+        std::cout << "currentScopeState = " << context->currentScopeState.toString() << std::endl;
+    }
 
     swap(&context->currentScopeState, &prevScopeState);
+
+std::cout << "finished sub, currentScopeState = " << context->currentScopeState.toString() << std::endl;
 
     // Write output
     TaggedValue* outputDest = get_output(context, caller);

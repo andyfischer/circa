@@ -97,19 +97,24 @@ void subroutine_stateful_term()
 void test_recursion_with_state()
 {
     Branch branch;
-    branch.compile("def recr(int i) -> int\n"
-                   "  state s\n"
-                   "  if i == 1\n"
-                   "    return 1\n"
-                   "  else\n"
-                   "    return recr(i - 1) + 1\n");
+    branch.compile("def recr(int i) -> int; state s = test_oracle();"
+            "print(s) "
+            "if i == 1 return 1 end; return recr(i - 1) end");
+    branch.compile("result = recr(4)");
 
     test_assert(branch);
 
-    Term* recr_4 = branch.compile("recr(4)");
+    EvalContext context;
 
-    evaluate_branch(branch);
-    test_assert(as_int(recr_4) == 4);
+    internal_debug_function::oracle_send(10);
+    internal_debug_function::oracle_send(21);
+    internal_debug_function::oracle_send(33);
+    internal_debug_function::oracle_send(45);
+
+    evaluate_branch(&context, branch);
+
+    test_equals(&context.state, "[1]");
+    test_equals(get_local(branch["result"]), 4);
 }
 
 void initialize_state_type()
