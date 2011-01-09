@@ -1,0 +1,1 @@
+$CIRCA_HOME/plastic/tools/pl-build && $CIRCA_HOME/build/plas $*

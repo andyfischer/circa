@@ -102,10 +102,30 @@ void test_remove_nulls()
     test_equals(list.toString(), "[]");
 }
 
+void test_remove_index()
+{
+    List list;
+    set_int(list.append(), 0);
+    set_int(list.append(), 1);
+    set_int(list.append(), 2);
+    set_int(list.append(), 3);
+
+    test_equals(&list, "[0, 1, 2, 3]");
+    list.remove(2);
+    test_equals(&list, "[0, 1, 3]");
+    list.remove(0);
+    test_equals(&list, "[1, 3]");
+    list.remove(1);
+    test_equals(&list, "[1]");
+    list.remove(0);
+    test_equals(&list, "[]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(list_tests::test_cast);
     REGISTER_TEST_CASE(list_tests::test_remove_nulls);
+    REGISTER_TEST_CASE(list_tests::test_remove_index);
 }
 
 }

@@ -166,6 +166,17 @@ namespace list_t {
 
         return result;
     }
+    ListData* remove_index(ListData* original, int index)
+    {
+        ca_assert(index < original->count);
+        ListData* result = touch(original);
+
+        for (int i=index; i < result->count - 1; i++)
+            swap(&result->items[i], &result->items[i+1]);
+        set_null(&result->items[result->count - 1]);
+        result->count--;
+        return result;
+    }
 
     void clear(ListData** data)
     {
@@ -296,6 +307,11 @@ namespace list_t {
     {
         ca_assert(is_list(list));
         set_pointer(list, resize((ListData*) get_pointer(list), newSize));
+    }
+    void remove_index(TaggedValue* list, int index)
+    {
+        ca_assert(is_list(list));
+        set_pointer(list, remove_index((ListData*) get_pointer(list), index));
     }
 
     void clear(TaggedValue* list)
@@ -807,6 +823,12 @@ void
 List::pop()
 {
     resize(length() - 1);
+}
+
+void
+List::remove(int index)
+{
+    list_t::remove_index(this, index);
 }
 
 void

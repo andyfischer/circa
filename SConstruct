@@ -144,7 +144,7 @@ def build_plastic(env):
 
     env.Append(CPPDEFINES=['PLASTIC_USE_SDL'])
 
-    result = env.Program('#build/bin/plas',
+    result = env.Program('#build/plas',
         source = ['build/plastic/src/'+f for f in source_files])
 
     # On Windows, embed manifest
