@@ -98,8 +98,7 @@ void test_recursion_with_state()
 {
     Branch branch;
     branch.compile("def recr(int i) -> int; state s = test_oracle();"
-            "print(s) "
-            "if i == 1 return 1 end; return recr(i - 1) end");
+            "if i == 1 return 1 end; return recr(i - 1) + 1 end");
     branch.compile("result = recr(4)");
 
     test_assert(branch);
@@ -113,7 +112,8 @@ void test_recursion_with_state()
 
     evaluate_branch(&context, branch);
 
-    test_equals(&context.state, "[1]");
+    test_equals(&context.state,
+        "[result: [_recr: [_recr: [_recr: [s: 45], s: 33], s: 21], s: 10]]");
     test_equals(get_local(branch["result"]), 4);
 }
 

@@ -91,6 +91,9 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
             continue;
 
         TaggedValue* result = get_local(term);
+
+        ca_assert(state->insert(name)->toString() != "[s: 45]");
+
         copy(result, state->insert(name));
 
         set_null(context->openStateVariables[i]);
@@ -187,7 +190,6 @@ TaggedValue* get_local_safe(Term* term)
     return get_local(term);
 }
 
-
 Dict* get_current_scope_state(EvalContext* cxt)
 {
     return Dict::lazyCast(&cxt->currentScopeState);
@@ -201,8 +203,7 @@ void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* resu
 {
     Dict* containerDict = Dict::lazyCast(container);
     const char* name = term->uniqueName.name.c_str();
-    std::cout << "preserving " << result->toString() << " into name " << name << std::endl;
-    copy(result, containerDict->insert(term->uniqueName.name.c_str()));
+    copy(result, containerDict->insert(name));
 }
 
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end)

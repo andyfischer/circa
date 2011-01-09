@@ -38,7 +38,6 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     // Store context.openStateVariables, in case the outer context is using it
     List prevOpenStateVariables;
     swap(&context->openStateVariables, &prevOpenStateVariables);
-std::cout << "prevOpenStateVariables = " << prevOpenStateVariables.toString() << std::endl;
 
     int numInputs = inputs->length();
 
@@ -57,9 +56,6 @@ std::cout << "prevOpenStateVariables = " << prevOpenStateVariables.toString() <<
         if (context->errorOccurred || context->interruptSubroutine)
             break;
     }
-
-    std::cout << "finished evaluating contents, currentScopeState = "
-        << context->currentScopeState.toString() << std::endl;
 
     // Fetch output
     Term* outputTypeTerm = get_subroutine_output_type(contents);
@@ -89,6 +85,9 @@ std::cout << "prevOpenStateVariables = " << prevOpenStateVariables.toString() <<
         set_null(&context->subroutineOutput);
     }
 
+    wrap_up_open_state_vars(context, contents);
+    swap(&context->openStateVariables, &prevOpenStateVariables);
+
     // Rescue input values
     for (int i=0; i < numInputs; i++) {
         Term* placeholder = get_subroutine_input_placeholder(contents, i);
@@ -96,12 +95,8 @@ std::cout << "prevOpenStateVariables = " << prevOpenStateVariables.toString() <<
     }
 
     // Clean up
-    wrap_up_open_state_vars(context, contents);
     finish_using(contents);
     context->interruptSubroutine = false;
-    swap(&context->openStateVariables, &prevOpenStateVariables);
-std::cout << "wrapped up, openStateVariables = " << context->openStateVariables.toString() << std::endl;
-std::cout << "currentScopeState = " << context->currentScopeState.toString() << std::endl;
 }
 
 void evaluate_subroutine(EvalContext* context, Term* caller)
@@ -143,16 +138,10 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
 
     // Preserve state
     if (is_function_stateful(function)) {
-        std::cout << "storing " << context->currentScopeState.toString() << " into " <<
-            prevScopeState.toString() << std::endl;
         preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
-        std::cout << "prevScopeState = " << prevScopeState.toString() << std::endl;
-        std::cout << "currentScopeState = " << context->currentScopeState.toString() << std::endl;
     }
 
     swap(&context->currentScopeState, &prevScopeState);
-
-std::cout << "finished sub, currentScopeState = " << context->currentScopeState.toString() << std::endl;
 
     // Write output
     TaggedValue* outputDest = get_output(context, caller);
@@ -220,6 +209,10 @@ void subroutine_change_state_type(Term* func, Term* newType)
             Term* term = *it;
 
             if (term->function == func) {
+                RefList inputs = term->inputs;
+                inputs.prepend(NULL);
+                set_inputs(term, inputs);
+                #if 0
                 Branch* branch = term->owningBranch;
                 Term* stateType = function_t::get_inline_state_type(func);
                 Term* stateContainer = create_stateful_value(*branch, stateType, NULL,
@@ -233,6 +226,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
                 // We just inserted a term, so the next iteration will hit the
                 // term we just checked. So, advance past this.
                 ++it;
+                #endif
             }
         }
     }

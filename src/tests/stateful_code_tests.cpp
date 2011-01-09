@@ -206,6 +206,16 @@ void bug_with_state_and_plus_equals()
     evaluate_branch(&context, branch);
 }
 
+void subroutine_unique_name_usage()
+{
+    Branch branch;
+    branch.compile("def f() state s = 0; s += 1; s += 2; s += 5 end; f()");
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    test_equals(&context.state, "[_f: [s: 8]]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -219,6 +229,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_state_and_plus_equals);
+    REGISTER_TEST_CASE(stateful_code_tests::subroutine_unique_name_usage);
 }
 
 } // namespace stateful_code_tests
