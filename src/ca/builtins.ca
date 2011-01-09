@@ -29,6 +29,11 @@ def once() -> bool
     s = false
     return result
 
+def seed() -> number
+    "Stateful function, returns a random number 0..1 which doesn't change after initialization"
+    state number s = rand()
+    return s
+
 -- Math utility functions
 def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]

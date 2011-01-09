@@ -30,7 +30,8 @@ void RefList::insert(int index, Term* term)
 
 void RefList::appendUnique(Term* term)
 {
-    for (int i=0; i < length(); i++)
+    int len = length();
+    for (int i=0; i < len; i++)
         if (get(i) == term)
             return;
 

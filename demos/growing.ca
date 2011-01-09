@@ -7,11 +7,12 @@ def interp(number progress, number e) -> number
 desired_window_size = [480 600]
 
 def tree_segment(Point base, number direction, number width, number depth)
-  state jitter = (rand() - .5) *.3
-  state max_length = 20 + 30 * rand()
+  jitter = (seed() - .5) *.05
+  max_length = 20 + 30 * seed()
   age = 1.0 + elapsed()
   seg_length = 20.0 * log(age)
   min(@seg_length, max_length)
+  color = #6a3
 
   --direction = direction + jitter
   bottom_width = width * interp(age, 8)
@@ -27,14 +28,18 @@ def tree_segment(Point base, number direction, number width, number depth)
   l2 = polar(direction - .25) * top_width + next_center
   r2 = polar(direction + .25) * top_width + next_center
   points = [r l l2 l2 r2 r]
-  gl:triangles(points #440101)
-  gl:lines(points, #000)
+  gl:triangles(points color)
+  gl:lines([l l2], #000)
+  gl:lines([r r2], #000)
 
   if has_branches
-    state l_jitter = rand() * .2
-    state r_jitter = rand() * .2
-    l_branch = tree_segment(next_center->Point, direction - l_jitter - .3, width * .8, depth+1)
-    --r_branch = tree_segment(next_center->Point, direction + r_jitter + .3, width - .4, depth+1)
+    branch_age = elapsed()
+    l_angle = direction - seed() * .2
+    r_angle = direction + seed() * .2
+    mult(@l_angle, interp(branch_age, 8))
+    mult(@r_angle, interp(branch_age, 8))
+    l_branch = tree_segment(next_center->Point, l_angle, width * .8, depth+1)
+    r_branch = tree_segment(next_center->Point, r_angle, width - .4, depth+1)
 
 starting_width = 3.0
 
