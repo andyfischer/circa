@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
+#include <algorithm>
+
 #include "common_headers.h"
 
 #include "references.h"

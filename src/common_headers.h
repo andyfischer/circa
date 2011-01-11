@@ -23,6 +23,7 @@
 #include <stdexcept>
 #include <string>
 #include <sstream>
+#include <stdlib.h>
 
 #define export_func extern "C"
 

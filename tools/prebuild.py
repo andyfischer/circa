@@ -108,7 +108,9 @@ def text_file_to_c_string(sourceFile, variableName):
     out.append("")
     out.append("namespace circa {")
     out.append("")
-    out.append('extern "C" const char* '+variableName+" = ")
+    out.append('extern "C" {')
+    out.append("")
+    out.append('const char* '+variableName+" = ")
 
     def escape_line(line):
         out = []
@@ -126,6 +128,8 @@ def text_file_to_c_string(sourceFile, variableName):
         out.append('    "' + line + '\\n"')
 
     out[-1] += ";"
+    out.append("")
+    out.append('} // extern "C"')
     out.append("")
     out.append("} // namespace circa")
     out.append("")
