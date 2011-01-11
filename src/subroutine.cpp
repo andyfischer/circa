@@ -57,6 +57,9 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
             break;
     }
 
+    std::cout << "finished sub " << caller->function->name << ", currentScopeState = "
+        << context->currentScopeState.toString() << std::endl;
+
     // Fetch output
     Term* outputTypeTerm = get_subroutine_output_type(contents);
     Type* outputType = unbox_type(outputTypeTerm);
@@ -85,7 +88,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
         set_null(&context->subroutineOutput);
     }
 
-    wrap_up_open_state_vars(context, contents);
+    //wrap_up_open_state_vars(context, contents);
     swap(&context->openStateVariables, &prevOpenStateVariables);
 
     // Rescue input values
@@ -194,8 +197,6 @@ void update_subroutine_return_contents(Term* sub, Term* returnCall)
             if (term->name == "")
                 continue;
             Term* outcome = get_named_at(returnCall, term->name);
-            if (outcome == term)
-                continue;
             apply(returnContents, PRESERVE_STATE_RESULT_FUNC, RefList(outcome));
         }
     }

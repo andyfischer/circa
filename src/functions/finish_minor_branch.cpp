@@ -4,24 +4,18 @@
 #include <importing_macros.h>
 
 namespace circa {
-namespace return_function {
+namespace finish_minor_branch_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(return_func, "return(any +optional)")
+    CA_DEFINE_FUNCTION(finish_minor_branch_func, "finish_minor_branch()")
     {
-        CONTEXT->interruptSubroutine = true;
-        if (INPUT(0) != NULL)
-            copy(INPUT(0), &CONTEXT->subroutineOutput);
-        else
-            set_null(&CONTEXT->subroutineOutput);
-
         Branch& contents = CALLER->nestedContents;
         for (int i=0; i < contents.length(); i++)
             evaluate_single_term(CONTEXT, contents[i]);
     }
 
-    void returnPostCompile(Term* term)
+    void postCompile(Term* term)
     {
         Term* sub = find_enclosing_subroutine(term);
         if (sub == NULL)
@@ -31,13 +25,9 @@ namespace return_function {
 
     void setup(Branch& kernel)
     {
-        // this function can be initialized early
-        if (kernel["return"] != NULL)
-            return;
-
         CA_SETUP_FUNCTIONS(kernel);
-        RETURN_FUNC = kernel["return"];
-        get_function_attrs(RETURN_FUNC)->postCompile = returnPostCompile;
+        FINISH_MINOR_BRANCH_FUNC = kernel["finish_minor_branch"];
+        get_function_attrs(FINISH_MINOR_BRANCH_FUNC)->postCompile = postCompile;
     }
 }
 }
