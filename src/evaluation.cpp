@@ -92,8 +92,6 @@ void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
 
         TaggedValue* result = get_local(term);
 
-        ca_assert(state->insert(name)->toString() != "[s: 45]");
-
         copy(result, state->insert(name));
 
         set_null(context->openStateVariables[i]);

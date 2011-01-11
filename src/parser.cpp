@@ -430,6 +430,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function(result);
+    initialize_subroutine(result);
     function_t::get_inline_state_type(result) = VOID_TYPE;
     set_starting_source_location(result, startPosition, tokens);
 

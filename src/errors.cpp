@@ -154,7 +154,8 @@ std::string get_static_error_message(Term* term)
 
     case SERROR_WRONG_NUMBER_OF_INPUTS: {
         int funcNumInputs = function_t::num_inputs(term->function);
-        out << "Wrong number of inputs (found " << term->inputs.length()
+        out << "Wrong number of inputs for function " << term->function->name
+            << " (found " << term->inputs.length()
             << ", expected " << funcNumInputs << ")";
         return out.str();
     }

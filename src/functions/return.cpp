@@ -12,14 +12,21 @@ namespace return_function {
     {
         CONTEXT->interruptSubroutine = true;
         copy(INPUT(0), &CONTEXT->subroutineOutput);
+    }
 
-        //std::cout << "returing: " << INPUT(0)->toString() << std::endl;
+    void returnPostCompile(Term* term)
+    {
+        Term* sub = find_enclosing_subroutine(term);
+        if (sub == NULL)
+            return;
+        update_subroutine_return_contents(sub, term);
     }
 
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel["return"];
+        get_function_attrs(RETURN_FUNC)->postCompile = returnPostCompile;
     }
 }
 }

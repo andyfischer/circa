@@ -63,6 +63,7 @@ Term* procure_bool(Branch& branch, std::string const& name);
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
+// Call the term's postCompile handler, if there is one.
 void post_compile_term(Term* term);
 
 } // namespace circa

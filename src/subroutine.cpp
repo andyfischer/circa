@@ -160,11 +160,55 @@ bool is_subroutine(Term* term)
     return function_t::get_evaluate(term) == evaluate_subroutine;
 }
 
-void finish_building_subroutine(Term* sub, Term* outputType)
+Term* find_enclosing_subroutine(Term* term)
+{
+    Term* parent = get_parent_term(term);
+    if (parent == NULL)
+        return NULL;
+    if (is_subroutine(parent))
+        return parent;
+    return find_enclosing_subroutine(parent);
+}
+
+void update_subroutine_return_contents(Term* sub, Term* returnCall)
+{
+    Branch& returnContents = returnCall->nestedContents;
+    returnContents.clear();
+
+    // Iterate through every state var in the subroutine that occurs before
+    // the 'return'.
+    for (BranchIterator it(sub->nestedContents); it.unfinished(); it.advance())
+    {
+        if (*it == NULL)
+            continue;
+        if (is_subroutine(*it)) {
+            it.skipNextBranch();
+            continue;
+        }
+
+        Term* term = *it;
+        if (term == returnCall)
+            break;
+
+        if (term->function == GET_STATE_FIELD_FUNC) {
+            if (term->name == "")
+                continue;
+            Term* outcome = get_named_at(returnCall, term->name);
+            if (outcome == term)
+                continue;
+            apply(returnContents, PRESERVE_STATE_RESULT_FUNC, RefList(outcome));
+        }
+    }
+}
+
+void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
     function_t::get_evaluate(sub) = evaluate_subroutine;
+}
 
+void finish_building_subroutine(Term* sub, Term* outputType)
+{
     subroutine_update_state_type_from_contents(sub);
 }
 

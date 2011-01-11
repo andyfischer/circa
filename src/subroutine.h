@@ -12,8 +12,11 @@ namespace subroutine_t {
 CA_FUNCTION(evaluate_subroutine);
 
 bool is_subroutine(Term* term);
+Term* find_enclosing_subroutine(Term* term);
 
 // Perform various steps to finish creating a subroutine
+void update_subroutine_return_contents(Term* sub, Term* returnCall);
+void initialize_subroutine(Term* sub);
 void finish_building_subroutine(Term* sub, Term* outputType);
 
 void subroutine_update_state_type_from_contents(Term* sub);
@@ -24,5 +27,6 @@ void restore_locals(TaggedValue* storageTv, Branch& branch);
 
 void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error);
 void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error);
+
 
 } // namespace circa

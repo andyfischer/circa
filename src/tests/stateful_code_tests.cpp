@@ -216,6 +216,15 @@ void subroutine_unique_name_usage()
     test_equals(&context.state, "[_f: [s: 8]]");
 }
 
+void subroutine_early_return()
+{
+    Branch branch;
+    branch.compile("def f()->int state s = 2; return 0; s = 4; end; f()");
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_f: [s: 2]]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -230,6 +239,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_state_and_plus_equals);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_unique_name_usage);
+    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::subroutine_early_return);
 }
 
 } // namespace stateful_code_tests

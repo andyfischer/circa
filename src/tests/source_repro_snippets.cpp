@@ -255,7 +255,7 @@ void reproduce_subroutine() {
     round_trip_source("def hi() 1  end");
     round_trip_source("def hi(int)  end");
     round_trip_source("def hi(number, string, bool)  end");
-    round_trip_source("type Point { number x, number y }\ndef hi() -> Point\nreturn([0 0])\nend");
+    round_trip_source("type Point { number x, number y }\ndef hi() -> Point return([0 0]) end");
     round_trip_source("def hi() if true return(1) else return(2) end end");
     round_trip_source("def hi() x = 1 if true return(x) else return(x) end end");
     round_trip_source("def my_func(int...) -> int end");

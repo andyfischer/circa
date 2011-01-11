@@ -72,7 +72,8 @@ namespace get_state_field_function {
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        function_t::get_attrs(kernel["get_state_field"]).formatSource =
+        GET_STATE_FIELD_FUNC = kernel["get_state_field"];
+        function_t::get_attrs(GET_STATE_FIELD_FUNC).formatSource =
             formatSource;
     }
 }

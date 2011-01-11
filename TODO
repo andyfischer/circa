@@ -1,16 +1,17 @@
 
+bugs:
+ - this doesn't work:
+     def f()
+       return
+     end
+
+
 Optimization tasks:
  - evaluate_if_block should not use if_block_contains_state, it's O(n) 
  - various places where swap() can be used instead of copy()
 
 Bugs/tasks:
  - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
-
- - This syntax error isn't handled well:
-     function( end
-    It should throw an error on encountering the unexpected 'end'
-
- - Add map_t
 
  - Can't use a namespace qualifier on a type name in function declaration
 

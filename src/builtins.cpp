@@ -55,10 +55,11 @@ Term* DO_ONCE_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
 Term* FOR_FUNC = NULL;
+Term* GET_FIELD_FUNC = NULL;
 Term* GET_INDEX_FUNC = NULL;
 Term* GET_INDEX_FROM_BRANCH_FUNC = NULL;
 Term* GET_NAMESPACE_FIELD = NULL;
-Term* GET_FIELD_FUNC = NULL;
+Term* GET_STATE_FIELD_FUNC = NULL;
 Term* IF_FUNC = NULL;
 Term* IF_BLOCK_FUNC = NULL;
 Term* COND_FUNC = NULL;
@@ -73,6 +74,7 @@ Term* NEG_FUNC = NULL;
 Term* NOT_FUNC = NULL;
 Term* ONE_TIME_ASSIGN_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
+Term* PRESERVE_STATE_RESULT_FUNC = NULL;
 Term* SET_FIELD_FUNC = NULL;
 Term* SET_INDEX_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
@@ -364,7 +366,11 @@ export_func void circa_initialize()
 
     parse_builtin_script(*KERNEL);
 
-    ca_assert(!has_static_errors(*KERNEL));
+    if (has_static_errors(*KERNEL)) {
+        std::cout << "Static errors found in kernel:" << std::endl;
+        print_static_errors_formatted(*KERNEL, std::cout);
+        return;
+    }
 
     // evaluate kernel so that the local-value slots are filled
     EvalContext context;
