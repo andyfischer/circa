@@ -277,6 +277,11 @@ void initialize_compound_types(Branch& kernel)
     callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
 }
 
+void pre_setup_builtin_functions(Branch& kernel)
+{
+    return_function::setup(kernel);
+}
+
 void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
@@ -356,6 +361,7 @@ export_func void circa_initialize()
 
     FINISHED_BOOTSTRAP = true;
 
+    pre_setup_builtin_functions(*KERNEL);
     setup_builtin_functions(*KERNEL);
     post_setup_functions(*KERNEL);
     parse_hosted_types(*KERNEL);

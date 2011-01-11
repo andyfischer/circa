@@ -8,10 +8,13 @@ namespace return_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(return_func, "return(any)")
+    CA_DEFINE_FUNCTION(return_func, "return(any +optional)")
     {
         CONTEXT->interruptSubroutine = true;
-        copy(INPUT(0), &CONTEXT->subroutineOutput);
+        if (INPUT(0) != NULL)
+            copy(INPUT(0), &CONTEXT->subroutineOutput);
+        else
+            set_null(&CONTEXT->subroutineOutput);
     }
 
     void returnPostCompile(Term* term)
@@ -24,6 +27,10 @@ namespace return_function {
 
     void setup(Branch& kernel)
     {
+        // this function can be initialized early
+        if (kernel["return"] != NULL)
+            return;
+
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel["return"];
         get_function_attrs(RETURN_FUNC)->postCompile = returnPostCompile;

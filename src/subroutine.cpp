@@ -210,6 +210,7 @@ void initialize_subroutine(Term* sub)
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
     subroutine_update_state_type_from_contents(sub);
+    subroutine_check_to_append_implicit_return(sub);
 }
 
 void subroutine_update_state_type_from_contents(Term* func)
@@ -256,24 +257,29 @@ void subroutine_change_state_type(Term* func, Term* newType)
                 RefList inputs = term->inputs;
                 inputs.prepend(NULL);
                 set_inputs(term, inputs);
-                #if 0
-                Branch* branch = term->owningBranch;
-                Term* stateType = function_t::get_inline_state_type(func);
-                Term* stateContainer = create_stateful_value(*branch, stateType, NULL,
-                        term->uniqueName.name);
-                branch->move(stateContainer, term->index);
-
-                RefList inputs = term->inputs;
-                inputs.prepend(stateContainer);
-                set_inputs(term, inputs);
-
-                // We just inserted a term, so the next iteration will hit the
-                // term we just checked. So, advance past this.
-                ++it;
-                #endif
             }
         }
     }
+}
+
+void subroutine_check_to_append_implicit_return(Term* sub)
+{
+    // Do nothing if this subroutine already ends with a return
+    Branch& contents = sub->nestedContents;
+    for (int i=contents.length()-1; i >= 0; i--) {
+        Term* term = contents[i];
+        if (term->function == RETURN_FUNC)
+            return;
+
+        // if we found a comment() then keep searching
+        if (term->function == COMMENT_FUNC)
+            continue;
+
+        // otherwise, break so that we'll insert a return()
+        break;
+    }
+
+    post_compile_term(apply(contents, RETURN_FUNC, RefList(NULL)));
 }
 
 void store_locals(Branch& branch, TaggedValue* storageTv)

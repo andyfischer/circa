@@ -140,6 +140,10 @@ namespace overloaded_function {
     void post_compile_setup_overloaded_function(Term* term);
 }
 
+namespace return_function {
+    void setup(Branch& kernel);
+}
+
 namespace value_function {
     CA_FUNCTION(evaluate);
 }

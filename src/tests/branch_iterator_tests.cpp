@@ -39,6 +39,8 @@ void test_simple()
     it.advance();
     test_assert(it.current()->name == "d");
     it.advance();
+    test_assert(it.current()->function->name == "return");
+    it.advance();
     test_assert(it.finished());
 }
 
