@@ -129,6 +129,11 @@ Branch* get_if_block_else_block(Term* ifCall)
     return &(callContents[callContents.length()-2]->nestedContents);
 }
 
+Branch* get_if_block_joining_branch(Term* ifCall)
+{
+    return &ifCall->nestedContents["#joining"]->nestedContents;
+}
+
 bool if_block_contains_state(Term* ifCall)
 {
     Branch& contents = ifCall->nestedContents;
@@ -172,7 +177,7 @@ CA_FUNCTION(evaluate_if_block)
                 swap(state->get(i), &CONTEXT->currentScopeState);
 
             evaluate_branch_internal(CONTEXT, contents);
-            wrap_up_open_state_vars(CONTEXT, contents);
+            //wrap_up_open_state_vars(CONTEXT, contents);
 
             if (useState)
                 swap(state->get(i), &CONTEXT->currentScopeState);

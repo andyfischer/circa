@@ -709,6 +709,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
             
             consume_branch(currentBlock->nestedContents, tokens);
+            finish_minor_branch(currentBlock->nestedContents);
         } else {
             // Create an 'else' block
             encounteredElse = true;
@@ -716,6 +717,7 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
             set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
             consume_branch(currentBlock->nestedContents, tokens);
+            finish_minor_branch(currentBlock->nestedContents);
         }
 
         if (tokens.nextNonWhitespaceIs(ELIF) || tokens.nextNonWhitespaceIs(ELSE)) {

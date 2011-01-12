@@ -340,7 +340,7 @@ void test_state_is_reset_when_if_fails()
     set_bool(c, false);
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [null, []]]");
+    test_equals(&context.state, "[_if_block: [null, null]]");
 
     set_bool(c, true);
 

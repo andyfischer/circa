@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "if_block.h"
 #include "source_repro.h"
 #include "term.h"
 
@@ -84,6 +85,14 @@ Term* get_named_at(Branch& branch, int index, std::string const& name)
                 && term->boolPropOptional("exposesNames", false))
         {
             Term* nested = term->nestedContents[name];
+            if (nested != NULL)
+                return nested;
+        }
+
+        // Special case for if-block
+        if (term->function == IF_BLOCK_FUNC) {
+            Branch& contents = *get_if_block_joining_branch(term);
+            Term* nested = contents[name];
             if (nested != NULL)
                 return nested;
         }

@@ -16,9 +16,6 @@ namespace preserve_state_result_function {
 
         copy(INPUT(0), state->insert(name));
         set_null(OUTPUT);
-
-        std::cout << "preserve_state_result: " << INPUT(0)->toString() << " with name "
-            << name << std::endl;
     }
 
     void setup(Branch& kernel)

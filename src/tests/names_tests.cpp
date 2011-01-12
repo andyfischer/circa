@@ -119,6 +119,17 @@ void test_get_named_at()
     test_assert(get_named_at(i, "h") == h);
 }
 
+void test_get_named_at_after_if_block()
+{
+    Branch branch;
+    Term* originalA = branch.compile("a = 1");
+    branch.compile("if true; a = 2; end");
+    Term* b = branch.compile("b = 1");
+    test_assert(branch["a"] != originalA); // sanity check
+    test_assert(get_named_at(b, "a") != originalA);
+    test_assert(get_named_at(b, "a") == branch["a"]);
+}
+
 void test_find_first_common_branch()
 {
     Branch branch;
@@ -187,6 +198,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_get_relative_name_from_hidden_branch);
     //TEST_DISABLED REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
     REGISTER_TEST_CASE(names_tests::test_get_named_at);
+    REGISTER_TEST_CASE(names_tests::test_get_named_at_after_if_block);
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
     REGISTER_TEST_CASE(names_tests::test_unique_names);
     REGISTER_TEST_CASE(names_tests::test_unique_names_for_anons);

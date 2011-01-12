@@ -433,4 +433,27 @@ void post_compile_term(Term* term)
         func(term);
 }
 
+void finish_minor_branch(Branch& branch)
+{
+    if (branch.length() > 0
+            && branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC)
+        return;
+
+    // Check if there are any state vars in this branch
+    bool anyStateVars = false;
+
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term->function == GET_STATE_FIELD_FUNC) {
+            anyStateVars = true;
+            break;
+        }
+    }
+
+    if (!anyStateVars)
+        return;
+
+    post_compile_term(apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList()));
+}
+
 } // namespace circa

@@ -57,9 +57,6 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
             break;
     }
 
-    std::cout << "finished sub " << caller->function->name << ", currentScopeState = "
-        << context->currentScopeState.toString() << std::endl;
-
     // Fetch output
     Term* outputTypeTerm = get_subroutine_output_type(contents);
     Type* outputType = unbox_type(outputTypeTerm);
@@ -132,8 +129,9 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     TaggedValue prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
 
-    if (is_function_stateful(function))
+    if (is_function_stateful(function)) {
         fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
+    }
 
     // Evaluate contents
     TaggedValue output;
@@ -178,18 +176,15 @@ void update_subroutine_return_contents(Term* sub, Term* returnCall)
     Branch& returnContents = returnCall->nestedContents;
     returnContents.clear();
 
+    Branch& subContents = sub->nestedContents;
+
     // Iterate through every state var in the subroutine that occurs before
     // the 'return'.
-    for (BranchIterator it(sub->nestedContents); it.unfinished(); it.advance())
-    {
-        if (*it == NULL)
+    for (int i=0; i < subContents.length(); i++) {
+        Term* term = subContents[i];
+        if (term == NULL)
             continue;
-        if (is_subroutine(*it)) {
-            it.skipNextBranch();
-            continue;
-        }
 
-        Term* term = *it;
         if (term == returnCall)
             break;
 
