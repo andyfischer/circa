@@ -74,6 +74,8 @@ void setup_for_loop_post_code(Term* forTerm)
     std::string listName = forTerm->input(0)->name;
     std::string iteratorName = get_for_loop_iterator(forTerm)->name;
 
+    finish_minor_branch(forContents);
+
     // Create a branch that has all the names which are rebound in this loop
     Branch& innerRebinds = forContents["#inner_rebinds"]->nestedContents;
     Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
@@ -195,14 +197,10 @@ CA_FUNCTION(evaluate_for_loop)
                 copy(get_input(CONTEXT, rebindTerm, 1), dest);
         }
 
-        //dump_branch(forContents);
-
         CONTEXT->forLoopContext.discard = false;
 
         for (int i=loop_contents_location; i < forContents.length() - 1; i++)
             evaluate_single_term(CONTEXT, forContents[i]);
-
-        wrap_up_open_state_vars(CONTEXT, forContents);
 
         // Save output
         if (saveOutput && !CONTEXT->forLoopContext.discard) {
