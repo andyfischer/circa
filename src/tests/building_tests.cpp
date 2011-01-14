@@ -141,6 +141,17 @@ void test_get_relative_input_scope()
     test_equals(get_input_relative_scope(h, 0), 0);
 }
 
+void test_finish_branch_is_at_end()
+{
+    Branch branch;
+    branch.compile("a = 1 + 2");
+    test_assert(branch[branch.length()-1]->function != FINISH_MINOR_BRANCH_FUNC);
+    apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList());
+    test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);
+    branch.compile("b = 3 / 4");
+    test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(building_tests::test_create_value);
@@ -151,6 +162,7 @@ void register_tests()
     REGISTER_TEST_CASE(building_tests::test_procure);
     REGISTER_TEST_CASE(building_tests::test_set_input);
     REGISTER_TEST_CASE(building_tests::test_get_relative_input_scope);
+    REGISTER_TEST_CASE(building_tests::test_finish_branch_is_at_end);
 }
 
 } // namespace building_tests

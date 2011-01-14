@@ -41,9 +41,6 @@ namespace get_state_field_function {
             change_type(OUTPUT, unbox_type(CALLER->type));
             reset(OUTPUT);
         }
-
-        // append name to the list of open state vars
-        set_string(CONTEXT->openStateVariables.append(), name);
     }
 
     void formatSource(StyledSource* source, Term* term)

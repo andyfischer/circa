@@ -456,4 +456,24 @@ void finish_minor_branch(Branch& branch)
     post_compile_term(apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList()));
 }
 
+void check_to_add_branch_finish_term(Branch& branch, int previousLastTerm)
+{
+    for (int i=previousLastTerm; i < branch.length(); i++) {
+
+        if (branch[i] == NULL)
+            continue;
+
+        if (branch[i]->function == GET_STATE_FIELD_FUNC) {
+            Term* term = apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList());
+            update_branch_finish_term(term);
+            break;
+        }
+    }
+}
+
+void update_branch_finish_term(Term* term)
+{
+    post_compile_term(term);
+}
+
 } // namespace circa

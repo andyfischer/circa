@@ -177,7 +177,6 @@ CA_FUNCTION(evaluate_if_block)
                 swap(state->get(i), &CONTEXT->currentScopeState);
 
             evaluate_branch_internal(CONTEXT, contents);
-            //wrap_up_open_state_vars(CONTEXT, contents);
 
             if (useState)
                 swap(state->get(i), &CONTEXT->currentScopeState);

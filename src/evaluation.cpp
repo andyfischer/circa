@@ -78,27 +78,6 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue*
     finish_using(branch);
 }
 
-void wrap_up_open_state_vars(EvalContext* context, Branch& branch)
-{
-    Dict* state = Dict::lazyCast(&context->currentScopeState);
-
-    // Preserve the results of state vars
-    for (int i=0; i < context->openStateVariables.length(); i++) {
-        const char* name = context->openStateVariables[i]->asString().c_str();
-        Term* term = branch[name];
-
-        if (term == NULL)
-            continue;
-
-        TaggedValue* result = get_local(term);
-
-        copy(result, state->insert(name));
-
-        set_null(context->openStateVariables[i]);
-    }
-    context->openStateVariables.removeNulls();
-}
-
 void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
 {
     Branch& contents = term->nestedContents;
@@ -109,7 +88,6 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
     fetch_state_container(term, &prevScopeState, &context->currentScopeState);
 
     evaluate_branch_internal(context, contents);
-    wrap_up_open_state_vars(context, contents);
 
     // Store container and replace currentScopeState
     preserve_state_result(term, &prevScopeState, &context->currentScopeState);
@@ -120,7 +98,6 @@ void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch)
 {
     copy(&context->state, &context->currentScopeState);
     evaluate_branch_internal(context, branch);
-    wrap_up_open_state_vars(context, branch);
     copy(&context->currentScopeState, &context->state);
 }
 

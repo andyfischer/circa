@@ -69,4 +69,7 @@ void post_compile_term(Term* term);
 // Add a finish_minor_branch() term to this branch, if needed.
 void finish_minor_branch(Branch& branch);
 
+void check_to_add_branch_finish_term(Branch& branch, int previousLastTerm);
+void update_branch_finish_term(Term* term);
+
 } // namespace circa

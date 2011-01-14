@@ -13,6 +13,7 @@ namespace finish_minor_branch_function {
         Branch& contents = CALLER->nestedContents;
         for (int i=0; i < contents.length(); i++)
             evaluate_single_term(CONTEXT, contents[i]);
+        set_null(OUTPUT);
     }
 
     void postCompile(Term* finishBranchTerm)

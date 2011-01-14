@@ -35,10 +35,6 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     context->interruptSubroutine = false;
     start_using(contents);
 
-    // Store context.openStateVariables, in case the outer context is using it
-    List prevOpenStateVariables;
-    swap(&context->openStateVariables, &prevOpenStateVariables);
-
     int numInputs = inputs->length();
 
     // Insert inputs into placeholders
@@ -84,9 +80,6 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
 
         set_null(&context->subroutineOutput);
     }
-
-    //wrap_up_open_state_vars(context, contents);
-    swap(&context->openStateVariables, &prevOpenStateVariables);
 
     // Rescue input values
     for (int i=0; i < numInputs; i++) {

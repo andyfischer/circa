@@ -25,9 +25,6 @@ struct EvalContext
     // Tree of persistent state
     TaggedValue state;
 
-    // Names of state variables which need to be preserved at the end of this branch
-    List openStateVariables;
-
     // Persistent state that should be used for the current branch
     TaggedValue currentScopeState;
 
@@ -52,8 +49,6 @@ void evaluate_single_term(EvalContext* context, Term* term);
 
 void evaluate_branch_internal(EvalContext* context, Branch& branch);
 void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output);
-
-void wrap_up_open_state_vars(EvalContext* context, Branch& branch);
 
 void evaluate_branch_internal_with_state(EvalContext* context, Term* term);
 
