@@ -1,4 +1,11 @@
 
+ - Multiple outputs from subroutine -
+
+When parsing a function decl, check argument for @
+
+Get a native function called multiple_outputs(@a, @b, @c) and make that work. Then make it work for subroutines.
+
+Add function subroutine_output()
 bugs:
  - this doesn't work:
      def f()

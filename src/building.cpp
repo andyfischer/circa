@@ -71,9 +71,6 @@ void set_input(Term* term, int index, Term* input)
 
     term->inputs.setAt(index, input);
 
-    if (index >= term->inputInfoList.length())
-        term->inputInfoList.resize(index+1);
-
     // Add 'term' to the user list of input
     if (input != NULL && term != input)
         input->users.appendUnique(term);
@@ -93,8 +90,6 @@ void set_inputs(Term* term, RefList const& inputs)
 
     term->inputs = inputs;
 
-    term->inputInfoList.resize(inputs.length());
-
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
         if (inputs[i] != NULL)
@@ -110,86 +105,8 @@ void set_inputs(Term* term, RefList const& inputs)
     post_input_change(term);
 }
 
-int get_input_relative_scope(Term* term, int index)
-{
-    Term* inputTerm = term->input(index);
-
-    if (inputTerm == NULL)
-        return -1;
-
-    Branch* rootScope = inputTerm->owningBranch;
-
-    ca_assert(rootScope != NULL);
-
-    // Special case for if-blocks: if a join term is trying to reach a term inside
-    // an if-branch, then it's relative scope 0.
-    
-    Term* termParent = get_parent_term(term);
-    Term* inputParent = get_parent_term(inputTerm);
-    Term* input2ndParent = inputParent == NULL ? NULL : get_parent_term(inputParent);
-
-    if (termParent != NULL && termParent->name == "#joining"
-            && input2ndParent != NULL && input2ndParent->function == IF_BLOCK_FUNC) {
-        return 0;
-    }
-
-    // Otherwise, if a term is inside an if_block #joining, use the if_block's parent
-    // as rootScope.
-    if (inputParent != NULL && inputParent->name == "#joining"
-            && input2ndParent != NULL && input2ndParent->function == IF_BLOCK_FUNC)
-        rootScope = input2ndParent->owningBranch;
-
-    // Ditto for a for_loop #outer_rebind
-    if (inputParent != NULL && inputParent->name == "#outer_rebinds"
-            && input2ndParent != NULL && input2ndParent->function == FOR_FUNC)
-        rootScope = input2ndParent->owningBranch;
-
-    // For a for_loop #inner_rebind, use the for-loop contents as the root scope.
-    if (inputParent != NULL && inputParent->name == "#inner_rebinds"
-            && input2ndParent != NULL && input2ndParent->function == FOR_FUNC)
-        rootScope = inputParent->owningBranch;
-
-    // Walk upwards from 'term' until we find the root branch.
-    int relativeScope = 0;
-    Branch* scope = term->owningBranch;
-    while (scope != rootScope) {
-
-        if (scope == NULL && rootScope != NULL) {
-            //FIXME internal_error("Couldn't reach root scope from term");
-            return -1;
-        }
-
-        // In certain cases, we don't count a scope layer.
-        bool countLayer = true;
-        Term* parentTerm = scope->owningTerm;
-
-        if (parentTerm == NULL)
-            countLayer = true;
-        else if (parentTerm->function == IF_BLOCK_FUNC)
-            countLayer = false;
-        else if (parentTerm->name == "#inner_rebinds")
-            countLayer = false;
-        else if (parentTerm->name == "#outer_rebinds")
-            countLayer = false;
-        else if (parentTerm->function == NAMESPACE_FUNC)
-            countLayer = false;
-
-        if (countLayer)
-            relativeScope++;
-
-        scope = get_parent_branch(*scope);
-    }
-
-    ca_assert(relativeScope >= 0);
-
-    return relativeScope;
-}
-
 void post_input_change(Term* term)
 {
-    for (int i=0; i < term->numInputs(); i++)
-        term->inputInfo(i).relativeScope = get_input_relative_scope(term, i);
-
     if (is_function(term->function)) {
         FunctionAttrs::PostInputChange func =
             function_t::get_attrs(term->function).postInputChange;

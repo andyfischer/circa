@@ -115,32 +115,6 @@ void test_set_input()
     test_assert(a->users[0] == b);
 }
 
-void test_get_relative_input_scope()
-{
-    Branch branch;
-    create_int(branch, 1, "a");
-    Term* b = branch.compile("b = sqr(a)");
-    test_equals(get_input_relative_scope(b, 0), 0);
-
-    Branch& b1 = create_branch(branch);
-    Term* c = b1.compile("c = sqr(a)");
-    test_equals(get_input_relative_scope(c, 0), 1);
-
-    Branch& b2 = create_branch(b1);
-    Term* d = b2.compile("d = sqr(a)");
-    test_equals(get_input_relative_scope(d, 0), 2);
-
-    branch.compile("e = 1");
-    branch.compile("if true e = 2 end");
-    Term* f = branch.compile("f = sqr(e)");
-    test_equals(get_input_relative_scope(f, 0), 0);
-
-    branch.compile("g = 1");
-    branch.compile("for i in [1] g = 2 end");
-    Term* h = branch.compile("h = sqr(g)");
-    test_equals(get_input_relative_scope(h, 0), 0);
-}
-
 void test_finish_branch_is_at_end()
 {
     Branch branch;
@@ -161,7 +135,6 @@ void register_tests()
     REGISTER_TEST_CASE(building_tests::test_rewrite_as_value);
     REGISTER_TEST_CASE(building_tests::test_procure);
     REGISTER_TEST_CASE(building_tests::test_set_input);
-    REGISTER_TEST_CASE(building_tests::test_get_relative_input_scope);
     REGISTER_TEST_CASE(building_tests::test_finish_branch_is_at_end);
 }
 

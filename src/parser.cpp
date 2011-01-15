@@ -27,6 +27,7 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     TokenStream tokens(input);
     Ref result = step(*branch, tokens);
 
+    // Update the finish_minor_branch() func at the end
     if (prevHead >= 0 && branch->get(prevHead)->function == FINISH_MINOR_BRANCH_FUNC) {
         branch->moveToEnd(branch->get(prevHead));
         update_branch_finish_term(branch->get(branch->length()-1));
@@ -533,6 +534,8 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
                 input->setBoolProp("ignore_error", true);
             } else if (qualifierName == "optional") {
                 input->setBoolProp("optional", true);
+            } else if (qualifierName == "output") {
+                input->setBoolProp("output", true);
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);
