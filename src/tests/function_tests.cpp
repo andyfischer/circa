@@ -182,6 +182,24 @@ void test_bug_where_a_mysterious_copy_term_was_added()
         test_assert(it->function->name != "copy");
 }
 
+namespace test_func_with_multiple_outputs {
+    CA_FUNCTION(f) {
+
+    }
+
+    void test()
+    {
+        Branch branch;
+        branch.compile("def f(int a +output, int b +output) -> int");
+        branch.compile("a = 1");
+        branch.compile("b = 2");
+        branch.compile("f(1,2)");
+        branch.compile("c = f(&a, &b)");
+
+        dump_branch(branch);
+    }
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(function_tests::create);
@@ -195,6 +213,7 @@ void register_tests()
     //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_call_copied_function);
     //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
     REGISTER_TEST_CASE(function_tests::test_bug_where_a_mysterious_copy_term_was_added);
+    REGISTER_TEST_CASE(function_tests::test_func_with_multiple_outputs::test);
 }
 
 } // namespace function_tests

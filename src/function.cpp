@@ -9,6 +9,7 @@ FunctionAttrs::FunctionAttrs()
   : variableArgs(false),
     throws(false),
     currentlyEvaluating(false),
+    outputCount(1),
     evaluate(NULL),
     specializeType(NULL),
     formatSource(NULL),

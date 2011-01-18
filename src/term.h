@@ -39,6 +39,7 @@ struct Term : TaggedValue
     // Our name binding.
     std::string name;
 
+    // A name which is unique across this branch.
     UniqueName uniqueName;
 
     // The branch that owns this term. May be NULL

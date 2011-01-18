@@ -39,9 +39,10 @@ extern const char* BUILTIN_SCRIPT_TEXT;
 
 Branch* KERNEL = NULL;
 
+Term* ADD_FUNC = NULL;
+Term* ADDITIONAL_OUTPUT_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
 Term* ASSIGN_FUNC = NULL;
-Term* ADD_FUNC = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
 Term* BRANCH_FUNC = NULL;
@@ -246,6 +247,7 @@ void pre_setup_types(Branch& kernel)
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
     JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
+    ADDITIONAL_OUTPUT_FUNC = import_function(kernel, NULL, "additional_output() -> any");
 
     // FileSignature is used in some builtin functions
     FILE_SIGNATURE_T = unbox_type(parse_type(kernel,

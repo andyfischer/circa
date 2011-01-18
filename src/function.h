@@ -28,6 +28,7 @@ struct FunctionAttrs
     TaggedValue parameter;
     bool throws;
     bool currentlyEvaluating; // deprecated
+    int outputCount;
 
     // Functions
     EvaluateFunc evaluate;

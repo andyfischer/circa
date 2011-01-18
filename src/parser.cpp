@@ -445,6 +445,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function(result);
     initialize_subroutine(result);
+    FunctionAttrs* attrs = get_function_attrs(result);
     function_t::get_inline_state_type(result) = VOID_TYPE;
     set_starting_source_location(result, startPosition, tokens);
 
@@ -536,6 +537,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
                 input->setBoolProp("optional", true);
             } else if (qualifierName == "output") {
                 input->setBoolProp("output", true);
+                attrs->outputCount += 1;
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);

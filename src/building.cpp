@@ -346,8 +346,21 @@ void post_compile_term(Term* term)
 
     FunctionAttrs::PostCompile func = attrs->postCompile;
 
-    if (func != NULL)
+    if (func != NULL) {
         func(term);
+        return;
+    }
+
+    // Default behavior for postCompile..
+    
+    // If the function has multiple outputs, then create additional_output terms
+    // in its nestedContents.
+    if (attrs->outputCount > 1) {
+        term->nestedContents.clear();
+        for (int i=0; i < attrs->outputCount - 1; i++) {
+            apply(term->nestedContents, ADDITIONAL_OUTPUT_FUNC, RefList());
+        }
+    }
 }
 
 void finish_minor_branch(Branch& branch)
