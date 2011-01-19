@@ -211,6 +211,7 @@ void test_subroutine()
     test_snippet("def f() -> List return([1]) end", "f() == [1]");
 }
 
+#if 0
 void test_references()
 {
     test_snippet("a = 1; ra = ref(a)", "ra.name() == 'a'");
@@ -236,6 +237,7 @@ void test_references()
 
     test_snippet("a = add(1 2 3); a_ref = ref(a)", "a_ref.num_inputs() == 3");
 }
+#endif
 
 void test_blocks()
 {
@@ -432,9 +434,9 @@ void test_range()
 
 void test_significant_indentation()
 {
-    test_snippet("namespace a:\n  b = 5", "a:b == 5");
-    test_snippet("l = 0..3, for i in @l:\n int(@i); i += 3", "l == [3 4 5]");
-    test_snippet("do once:\n a = 5", "");
+    test_snippet("namespace a\n  b = 5", "a:b == 5");
+    test_snippet("l = 0..3, for i in @l\n int(@i)\n i += 3", "l == [3 4 5]");
+    test_snippet("do once\n a = 5", "");
 }
 
 void test_concat()
@@ -452,14 +454,6 @@ void test_misc()
     test_snippet("add(1 1)    ", "");
     test_snippet("add(1 1)\n    ", "");
     test_snippet("l = []\nl.append([1])\n    ", "");
-}
-
-void test_refactoring()
-{
-    test_snippet("s = { x = 1 } -> branch_ref; refactor:rename(s.get_index(0), 'y')",
-            "s.to_source() == ' y = 1 '");
-    test_snippet("s = { add(1 1) } -> branch_ref; refactor:change_function(s.get_index(2), sub)",
-            "s.to_source() == ' sub(1 1) '");
 }
 
 void test_member_functions()
@@ -523,10 +517,9 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);
     REGISTER_TEST_CASE(test_snippets::test_repeat);
     REGISTER_TEST_CASE(test_snippets::test_range);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
+    REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_refactoring);
     REGISTER_TEST_CASE(test_snippets::test_member_functions);
     REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
