@@ -124,37 +124,6 @@ void test_bug_with_declaring_state_argument()
     test_assert(function_t::get_inline_state_type(f) == INT_TYPE);
 }
 
-void test_call_copied_function()
-{
-    Branch branch;
-    Term* add_copy = branch.compile("add_copy = add");
-    test_assert(is_callable(add_copy));
-    Term* two = branch.compile("2");
-    RefList inputs(two, two);
-
-    //evaluate_without_side_effects(add_copy);
-
-    test_assert(overloaded_function::is_overloaded_function(add_copy));
-    test_assert(inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
-
-    test_assert(overloaded_function::statically_specialize_function(add_copy, inputs)
-            != UNKNOWN_FUNCTION);
-
-    Term* a = branch.compile("a = add_copy(2 2)");
-    test_assert(branch);
-    evaluate_branch(branch);
-    test_assert(branch);
-    test_assert(a->asInt() == 4);
-
-    // Try the test once more, without all of the extra stuff
-    branch.compile("add_copy_2 = add");
-    Term* b = branch.compile("add_copy_2(3 3)");
-    test_assert(branch);
-    evaluate_branch(branch);
-    test_assert(branch);
-    test_assert(b->asInt() == 6);
-}
-
 void test_calling_manual_overloaded_function()
 {
     Branch branch;
@@ -171,7 +140,7 @@ void test_calling_manual_overloaded_function()
     Term* sum = branch.compile("my_add(2 2)");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(sum->asInt() == 4);
+    test_equals(sum, "4.0");
 }
 
 void test_bug_where_a_mysterious_copy_term_was_added()
@@ -189,7 +158,7 @@ namespace test_func_with_multiple_outputs {
         set_int(OUTPUT, INT_INPUT(0) + INT_INPUT(1));
     }
 
-    void test()
+    void simple()
     {
         Branch branch;
         Term* f = branch.compile("def f(int a +output, int b +output) -> int");
@@ -217,10 +186,9 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
     REGISTER_TEST_CASE(function_tests::test_bug_with_declaring_state_argument);
-    //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_call_copied_function);
-    //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
+    REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
     REGISTER_TEST_CASE(function_tests::test_bug_where_a_mysterious_copy_term_was_added);
-    REGISTER_TEST_CASE(function_tests::test_func_with_multiple_outputs::test);
+    REGISTER_TEST_CASE(function_tests::test_func_with_multiple_outputs::simple);
 }
 
 } // namespace function_tests
