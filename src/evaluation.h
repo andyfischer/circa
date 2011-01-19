@@ -62,6 +62,7 @@ void evaluate_branch(Branch& branch);
 
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
+TaggedValue* get_extra_output(Term* term, int index);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term);

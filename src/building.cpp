@@ -340,6 +340,9 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
 
 void post_compile_term(Term* term)
 {
+    if (term->function == NULL)
+        return;
+
     FunctionAttrs* attrs = get_function_attrs(term->function);
     if (attrs == NULL)
         return;
@@ -355,10 +358,16 @@ void post_compile_term(Term* term)
     
     // If the function has multiple outputs, then create additional_output terms
     // in its nestedContents.
-    if (attrs->outputCount > 1) {
-        term->nestedContents.clear();
-        for (int i=0; i < attrs->outputCount - 1; i++) {
-            apply(term->nestedContents, ADDITIONAL_OUTPUT_FUNC, RefList());
+    Branch& outerBranch = *term->owningBranch;
+    Branch& contents = term->nestedContents;
+    for (int i=0; i < term->numInputs(); i++) {
+        if (function_can_rebind_input(term->function, i)) {
+            Term* output = apply(contents, ADDITIONAL_OUTPUT_FUNC, RefList());
+            if (function_call_rebinds_input(term, i)
+                    && term->input(i) != NULL
+                    && term->input(i)->name != "") {
+                outerBranch.bindName(output, term->input(i)->name);
+            }
         }
     }
 }

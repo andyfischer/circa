@@ -97,11 +97,15 @@ FunctionAttrs& as_function_attrs(Term* term);
 Branch& function_contents(Term* func);
 FunctionAttrs* get_function_attrs(Term* func);
 
+// Return the'placeholder name for the given input index; this is the name that
+// is used if no name is given.
 std::string get_placeholder_name_for_index(int index);
 
 void initialize_function(Term* func);
 
+// Returns whether this term can be called as a function
 bool is_callable(Term* term);
+
 bool inputs_statically_fit_function(Term* func, RefList const& inputs);
 bool inputs_fit_function_dynamic(Term* func, RefList const& inputs);
 bool values_fit_function_dynamic(Term* func, List* list);
@@ -112,6 +116,13 @@ Term* function_get_specialized_output_type(Term* function, Term* call);
 void function_set_use_input_as_output(Term* function, int index, bool value);
 void set_specialize_type(Term* function, SpecializeTypeFunc st);
 
+// Returns whether the given function can rebind the input at 'index'
+bool function_can_rebind_input(Term* function, int index);
+
+// Returns whether this term rebinds the input at 'index'
+bool function_call_rebinds_input(Term* term, int index);
+
+// Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(Term* function);
 
 } // namespace circa

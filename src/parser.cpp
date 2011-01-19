@@ -448,6 +448,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     FunctionAttrs* attrs = get_function_attrs(result);
     function_t::get_inline_state_type(result) = VOID_TYPE;
     set_starting_source_location(result, startPosition, tokens);
+    function_t::set_name(result, functionName);
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
@@ -478,8 +479,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     Branch& contents = result->nestedContents;
 
-    function_t::set_name(result, functionName);
-
     // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
@@ -496,21 +495,20 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         Term* typeTerm = type_identifier_or_anonymous_type(branch, tokens);
 
-        //if (has_static_error(typeTerm))
-        //    return compile_error_for_line(result, tokens, startPosition);
-
         possible_whitespace(tokens);
-        
+
         std::string name;
         if (tokens.nextIs(IDENTIFIER)) {
             name = tokens.consume();
             possible_whitespace(tokens);
         } else {
+            // anonymous input; use a default name
             name = get_placeholder_name_for_index(function_t::num_inputs(result));
         }
 
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
+
         if (is_type(typeTerm))
             change_type(input, typeTerm);
         hide_from_source(input);
@@ -1253,14 +1251,13 @@ void function_call_inputs(Branch& branch, TokenStream& tokens,
     while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
         inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
-        //int origBranchLength = branch.length();
+
+        if (lookahead_match_rebind_argument(tokens)) {
+            tokens.consume(AMPERSAND);
+            inputHints.set(index, "rebindInput", "t");
+        }
+
         Term* term = infix_expression(branch, tokens);
-
-        // Check if we just parsed a qualified identifier. If so, record the actual
-        // identifier string that was used.
-        // TODO, not needed yet
-        //if (branch.length() == origBranchLength)
-
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
         arguments.append(term);
@@ -1320,18 +1317,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     }
 
     inputHints.apply(result);
-
-    // Special case for include() function: expand the contents immediately.
-    /*if (result->function == INCLUDE_FUNC) {
-        EvalContext cxt;
-        evaluate_without_side_effects(result->input(1));
-        include_function::preload_script(&cxt, result);
-
-    // Special case for overloaded_function, evaluate this immediately
-    } else if (result->function == OVERLOADED_FUNCTION_FUNC) {
-        EvalContext cxt;
-        evaluate_term(&cxt, result);
-    }*/
 
     return result;
 }
@@ -1451,6 +1436,18 @@ bool lookahead_match_leading_name_binding(TokenStream& tokens)
     if (tokens.nextIs(WHITESPACE, lookahead))
         lookahead++;
     if (!tokens.nextIs(EQUALS, lookahead++))
+        return false;
+    return true;
+}
+
+bool lookahead_match_rebind_argument(TokenStream& tokens)
+{
+    int lookahead = 0;
+    if (!tokens.nextIs(AMPERSAND, lookahead++))
+        return false;
+    if (tokens.nextIs(WHITESPACE, lookahead))
+        lookahead++;
+    if (!tokens.nextIs(IDENTIFIER, lookahead++))
         return false;
     return true;
 }

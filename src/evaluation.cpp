@@ -134,6 +134,11 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
     return get_local(term);
 }
 
+TaggedValue* get_extra_output(Term* term, int index)
+{
+    return get_local(term->nestedContents[index]);
+}
+
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 {
     if (term->input(0) == NULL) {

@@ -131,7 +131,10 @@ Branch* get_if_block_else_block(Term* ifCall)
 
 Branch* get_if_block_joining_branch(Term* ifCall)
 {
-    return &ifCall->nestedContents["#joining"]->nestedContents;
+    Term* joiningBranch = ifCall->nestedContents["#joining"];
+    if (joiningBranch == NULL)
+        return NULL;
+    return &joiningBranch->nestedContents;
 }
 
 bool if_block_contains_state(Term* ifCall)

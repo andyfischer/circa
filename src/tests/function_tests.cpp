@@ -183,20 +183,27 @@ void test_bug_where_a_mysterious_copy_term_was_added()
 }
 
 namespace test_func_with_multiple_outputs {
-    CA_FUNCTION(f) {
-
+    CA_FUNCTION(f_eval) {
+        set_int(EXTRA_OUTPUT(0), INT_INPUT(0) + 1);
+        set_int(EXTRA_OUTPUT(1), INT_INPUT(1) + 2);
+        set_int(OUTPUT, INT_INPUT(0) + INT_INPUT(1));
     }
 
     void test()
     {
         Branch branch;
-        branch.compile("def f(int a +output, int b +output) -> int");
-        branch.compile("a = 1");
+        Term* f = branch.compile("def f(int a +output, int b +output) -> int");
+        install_function(f, f_eval);
+        branch.compile("a = 2");
         branch.compile("b = 2");
-        branch.compile("f(1,2)");
+        branch.compile("f(2,2)");
         branch.compile("c = f(&a, &b)");
 
-        dump_branch(branch);
+        test_assert(branch);
+        evaluate_branch(branch);
+        test_equals(get_local(branch["a"]), "3");
+        test_equals(get_local(branch["b"]), "4");
+        test_equals(get_local(branch["c"]), "4");
     }
 }
 

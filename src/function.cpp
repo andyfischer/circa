@@ -469,6 +469,22 @@ void set_specialize_type(Term* function, SpecializeTypeFunc st)
     function_t::get_specialize_type(function) = st;
 }
 
+bool function_can_rebind_input(Term* function, int index)
+{
+    if (function_t::get_variable_args(function))
+        index = 0;
+
+    Term* input = function_t::get_input_placeholder(function, index);
+    if (input == NULL)
+        return false;
+    return input->boolPropOptional("output", false);
+}
+
+bool function_call_rebinds_input(Term* term, int index)
+{
+    return get_input_syntax_hint(term, index, "rebindInput") == "t";
+}
+
 bool is_native_function(Term* func)
 {
     if (!is_function(func))

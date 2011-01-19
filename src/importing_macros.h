@@ -31,6 +31,7 @@
 #define CALLER (_circa_caller)
 #define INPUT_TERM(index) (CALLER->input(index))
 #define OUTPUT (get_output(_circa_cxt, _circa_caller))
+#define EXTRA_OUTPUT(index) (get_extra_output(_circa_caller, index))
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_caller->function)
 

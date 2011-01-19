@@ -91,10 +91,12 @@ Term* get_named_at(Branch& branch, int index, std::string const& name)
 
         // Special case for if-block
         if (term->function == IF_BLOCK_FUNC) {
-            Branch& contents = *get_if_block_joining_branch(term);
-            Term* nested = contents[name];
-            if (nested != NULL)
-                return nested;
+            Branch* contents = get_if_block_joining_branch(term);
+            if (contents != NULL) {
+                Term* nested = contents->get(name);
+                if (nested != NULL)
+                    return nested;
+            }
         }
     }
 
