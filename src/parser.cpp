@@ -165,9 +165,8 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
             }
 
             // If we hit an if-block sepator then finish, but don't consume it
-            if (tokens.nextIs(ELSE) || tokens.nextIs(ELIF)) {
+            if (tokens.nextIs(ELSE) || tokens.nextIs(ELIF))
                 return;
-            }
 
             Term* statement = parser::statement(branch, tokens);
 
@@ -736,7 +735,8 @@ Term* if_block(Branch& branch, TokenStream& tokens)
             finish_minor_branch(currentBlock->nestedContents);
         }
 
-        if (tokens.nextNonWhitespaceIs(ELIF) || tokens.nextNonWhitespaceIs(ELSE)) {
+        if (tokens.nextNonWhitespaceIs(ELIF)
+                || (tokens.nextNonWhitespaceIs(ELSE) && !encounteredElse)) {
 
             // If the previous block was multiline, then only parse the next block if
             // it has equal indentation.
