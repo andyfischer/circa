@@ -459,27 +459,13 @@ void test_namespace()
     Term* c = branch.eval("c = ns:myfunc(4)");
     test_assert(branch);
     test_assert(c->asInt() == 5);
-
-#if 0
-
-    branch.clear();
-    branch.eval("namespace ns1; namespace ns2; x = 12; end; end");
-
-    Term* x = branch.eval("ns1:ns2:x");
-    test_assert(branch);
-    test_assert(get_local(x)->asInt() == 12);
-#endif
 }
 
 void test_member_function_calls()
 {
     Branch branch;
-    branch.eval("x = 1");
-    branch.eval("r = ref(x)");
-    test_assert(branch);
-    Term* s = branch.eval("r.name()");
-    test_assert(branch);
-    test_assert(s->asString() == "x");
+    branch.eval("x = [1 2 3]");
+    test_equals(branch.eval("x.count()"), "3");
 }
 
 void test_subscripted_atom()
@@ -784,7 +770,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_infix);
     REGISTER_TEST_CASE(parser_tests::test_type_decl);
     REGISTER_TEST_CASE(parser_tests::test_function_decl);
-    //TEST_DISABLED REGISTER_TEST_CASE(parser_tests::test_stateful_value_decl);
+    REGISTER_TEST_CASE(parser_tests::test_stateful_value_decl);
     REGISTER_TEST_CASE(parser_tests::test_arrow_concatenation);
     REGISTER_TEST_CASE(parser_tests::test_arrow_concatenation2);
     REGISTER_TEST_CASE(parser_tests::test_dot_concatenation);
@@ -800,7 +786,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_float_division);
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
-    //TEST_DISABLED REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
+    REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);

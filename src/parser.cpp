@@ -889,6 +889,11 @@ Term* stateful_value_decl(Branch& branch, TokenStream& tokens)
         initialValue = infix_expression(branch, tokens);
     }
 
+    // If an initial value was used and no specific type was mentioned, use
+    // the initial value's type.
+    if (typeName == "" && initialValue != NULL)
+        type = initialValue->type;
+
     Term* result = create_stateful_value(branch, type, initialValue, name);
 
     if (typeName != "")
