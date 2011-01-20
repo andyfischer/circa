@@ -491,6 +491,11 @@ void test_namespace()
     test_snippet("namespace ns a = 1 end", "ns:a == 1");
 }
 
+void test_swap()
+{
+    test_snippet("a = 1; b = 's'; swap(&a &b)", "a == 's'; b == 1");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -524,6 +529,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
     REGISTER_TEST_CASE(test_snippets::test_namespace);
+    REGISTER_TEST_CASE(test_snippets::test_swap);
 }
 
 } // namespace test_snippets
