@@ -168,6 +168,8 @@ namespace test_func_with_multiple_outputs {
         branch.compile("f(2,2)");
         branch.compile("c = f(&a, &b)");
 
+        test_assert(get_local(branch["a"]) == get_extra_output(branch["c"], 0));
+
         test_assert(branch);
         evaluate_branch(branch);
         test_equals(get_local(branch["a"]), "3");

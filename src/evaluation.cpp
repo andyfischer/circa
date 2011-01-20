@@ -136,7 +136,7 @@ TaggedValue* get_output(EvalContext* cxt, Term* term)
 
 TaggedValue* get_extra_output(Term* term, int index)
 {
-    return get_local(term->nestedContents[index]);
+    return get_local(term->owningBranch->get(term->index + 1 + index));
 }
 
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)

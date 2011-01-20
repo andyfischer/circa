@@ -50,6 +50,7 @@ struct Branch
 
     // Get a term from a name binding.
     inline Term* get(std::string const& name) const { return get_named(*this, name); }
+    inline Term* getNamed(const char* name) const { return get_named(*this, name); }
     inline Term* operator[](std::string const& name) const { return get_named(*this, name); }
 
     // Returns true if there is a term with the given name

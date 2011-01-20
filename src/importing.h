@@ -12,6 +12,7 @@
 namespace circa {
 
 CA_FUNCTION(empty_evaluate);
+CA_FUNCTION(empty_evaluate_no_touch_output);
 
 // Create a Circa function, using the given C evaluation function, and
 // a header in Circa-syntax.

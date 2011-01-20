@@ -17,7 +17,10 @@ void preserve_locals()
     // each code segment should be such that 'a' is equal to 1
     inputs.push_back("a = 1"); // <-- simplest possible
     inputs.push_back("a = level+1");
-    //TEST_DISABLED inputs.push_back("a = 'str'; b = level+1; swap(&a &b)");
+    inputs.push_back("a = 'str'; b = level+1; swap(&a &b)");
+    //TEST_DISABLED inputs.push_back("a = 'x'; if true a = level+1 end");
+    //TEST_DISABLED inputs.push_back("a = level+1; for i in [] a = 'x' end");
+    //TEST_DISABLED inputs.push_back("a = 'x'; for i in [1 2] a = level+1 end");
 
     for (size_t i=0; i < inputs.size(); i++) {
         std::string input = inputs[i];

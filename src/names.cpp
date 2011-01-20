@@ -73,6 +73,11 @@ Term* get_named(Branch const& branch, std::string const& name)
     return get_named(prefix->nestedContents, suffix);
 }
 
+Term* get_named(Branch const& branch, const char* name)
+{
+    return get_named(branch, std::string(name));
+}
+
 Term* get_named_at(Branch& branch, int index, std::string const& name)
 {
     for (int i=index - 1; i >= 0; i--) {

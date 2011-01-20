@@ -356,13 +356,15 @@ void post_compile_term(Term* term)
 
     // Default behavior for postCompile..
     
-    // If the function has multiple outputs, then create additional_output terms
-    // in its nestedContents.
+    // If the function has multiple outputs, then create additional_output terms.
     Branch& outerBranch = *term->owningBranch;
-    Branch& contents = term->nestedContents;
     for (int i=0; i < term->numInputs(); i++) {
         if (function_can_rebind_input(term->function, i)) {
-            Term* output = apply(contents, ADDITIONAL_OUTPUT_FUNC, RefList());
+            Term* output = apply(outerBranch, ADDITIONAL_OUTPUT_FUNC, RefList());
+
+            // make sure these terms occur immediately after
+            ca_assert(output->index = term->index + i + 1);
+
             if (function_call_rebinds_input(term, i)
                     && term->input(i) != NULL
                     && term->input(i)->name != "") {

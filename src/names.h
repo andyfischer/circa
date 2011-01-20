@@ -10,6 +10,9 @@ Term* find_named(Branch const& branch, std::string const& name);
 
 Term* get_named(Branch const& branch, std::string const& qualifiedName);
 
+// char* overload for use in GDB
+Term* get_named(Branch const& branch, const char* name);
+
 // Find the name binding that is active at the given branch index.
 Term* get_named_at(Branch& branch, int index, std::string const& name);
 Term* get_named_at(Term* location, std::string const& name);
