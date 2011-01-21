@@ -30,7 +30,7 @@ Term* get_subroutine_output_type(Branch& contents)
 }
 
 void evaluate_subroutine_internal(EvalContext* context, Term* caller,
-        Branch& contents, List* inputs, TaggedValue* output)
+        Branch& contents, List* inputs, List* outputs)
 {
     context->interruptSubroutine = false;
     start_using(contents);
@@ -58,27 +58,29 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     Type* outputType = unbox_type(outputTypeTerm);
 
     if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
-        set_null(output);
+        outputs->resize(1);
+        set_null(outputs->get(0));
     } else {
-        TaggedValue* outputSource = NULL;
-
         if (!is_null(&context->subroutineOutput)) {
-            outputSource = &context->subroutineOutput;
-        }
-        else {
-            outputSource = get_local(contents[contents.length()-1]);
+            ca_assert(is_list(&context->subroutineOutput));
+            swap(&context->subroutineOutput, outputs);
+            set_null(&context->subroutineOutput);
+        } else {
+            // TODO: factor this out
+            TaggedValue* output = get_local(contents[contents.length()-1]);
+            outputs->resize(1);
+            copy(output, outputs->get(0));
         }
 
-        bool success = cast(outputSource, outputType, output);
+        bool castSuccess = cast(outputs->get(0), outputType,
+                outputs->get(0));
         
-        if (!success) {
+        if (!castSuccess) {
             std::stringstream msg;
-            msg << "Couldn't cast output " << output->toString()
+            msg << "Couldn't cast output " << outputs->get(0)->toString()
                 << " to type " << outputType->name;
             error_occurred(context, caller, msg.str());
         }
-
-        set_null(&context->subroutineOutput);
     }
 
     // Rescue input values
@@ -122,25 +124,23 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     TaggedValue prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
 
-    if (is_function_stateful(function)) {
+    if (is_function_stateful(function))
         fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
-    }
 
     // Evaluate contents
-    TaggedValue output;
-    evaluate_subroutine_internal(context, caller, contents, &inputs, &output);
+    List outputs;
+    evaluate_subroutine_internal(context, caller, contents, &inputs, &outputs);
 
     // Preserve state
-    if (is_function_stateful(function)) {
+    if (is_function_stateful(function))
         preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
-    }
 
     swap(&context->currentScopeState, &prevScopeState);
 
     // Write output
     TaggedValue* outputDest = get_output(context, caller);
     if (outputDest != NULL)
-        swap(&output, outputDest);
+        swap(outputs[0], outputDest);
 }
 
 bool is_subroutine(Term* term)
@@ -188,6 +188,10 @@ void update_subroutine_return_contents(Term* sub, Term* returnCall)
             apply(returnContents, PRESERVE_STATE_RESULT_FUNC, RefList(outcome));
         }
     }
+
+    // Add a subroutine_output() function
+    if (SUBROUTINE_OUTPUT_FUNC != NULL)
+        apply(returnContents, SUBROUTINE_OUTPUT_FUNC, RefList(returnCall->input(0)));
 }
 
 void initialize_subroutine(Term* sub)
@@ -317,7 +321,11 @@ void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
     ca_assert(inputsList != NULL);
 
     EvalContext context;
-    evaluate_subroutine_internal(&context, NULL, sub, inputsList, output);
+    List outputs;
+    evaluate_subroutine_internal(&context, NULL, sub, inputsList, &outputs);
+
+    // TODO: caller should get this whole list
+    copy(outputs.get(0), output);
 
     if (context.errorOccurred)
         set_string(error, context.errorMessage);

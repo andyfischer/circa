@@ -524,7 +524,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         }
 
         // Optional list of qualifiers
-        if (tokens.nextIs(PLUS)) {
+        while (tokens.nextIs(PLUS)) {
             tokens.consume(PLUS);
             std::string qualifierName = tokens.consume(IDENTIFIER);
             // TODO: store syntax hint
@@ -535,10 +535,13 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
             } else if (qualifierName == "output") {
                 input->setBoolProp("output", true);
                 attrs->outputCount += 1;
+            } else if (qualifierName == "multiple") {
+                function_t::set_variable_args(result, true);
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);
             }
+            possible_whitespace(tokens);
         }
 
         if (!tokens.nextIs(RPAREN)) {

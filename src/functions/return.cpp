@@ -11,10 +11,12 @@ namespace return_function {
     CA_DEFINE_FUNCTION(return_func, "return(any +optional)")
     {
         CONTEXT->interruptSubroutine = true;
+        #if 0
         if (INPUT(0) != NULL)
             copy(INPUT(0), &CONTEXT->subroutineOutput);
         else
             set_null(&CONTEXT->subroutineOutput);
+        #endif
 
         Branch& contents = CALLER->nestedContents;
         for (int i=0; i < contents.length(); i++)

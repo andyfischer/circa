@@ -40,7 +40,7 @@ void test_simple()
     test_assert(it.current()->name == "d");
     it.advance();
     test_assert(it.current()->function->name == "return");
-    it.advance();
+    it.advanceSkippingBranch();
     test_assert(it.finished());
 }
 
