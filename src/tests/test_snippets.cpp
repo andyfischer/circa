@@ -496,6 +496,23 @@ void test_swap()
     test_snippet("a = 1; b = 's'; swap(&a &b)", "a == 's'; b == 1");
 }
 
+void test_subroutine_multiple_outputs()
+{
+    test_snippet("def f(int i +output) -> int; i += 7; return 2 end; a = 3; b = f(&a)",
+            "a == 10, b == 2");
+    test_snippet("def f(int i +output); i += 7; end; a = 3; f(&a)", "a == 10");
+    test_snippet("def f(int a +output, int b +output, int c +output)\n"
+                 "  a += 1\n  b += 2\n  c += 3\n"
+                 "a = 10; b = 10; c = 10;\n"
+                 "f(&a,&b,&c)",
+                 "a == 11, b == 12, c == 13");
+    test_snippet("def f(int a +output, int b +output, int c +output)\n"
+                 "  a += 1\n  b += 2\n  c += 3\n"
+                 "a = 10; b = 10; c = 10;\n"
+                 "f(a,&b,c)",
+                 "a == 10, b == 12, c == 10");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -530,6 +547,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
     REGISTER_TEST_CASE(test_snippets::test_namespace);
     REGISTER_TEST_CASE(test_snippets::test_swap);
+    REGISTER_TEST_CASE(test_snippets::test_subroutine_multiple_outputs);
 }
 
 } // namespace test_snippets

@@ -57,20 +57,20 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     Term* outputTypeTerm = get_subroutine_output_type(contents);
     Type* outputType = unbox_type(outputTypeTerm);
 
-    if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
+    if (!is_null(&context->subroutineOutput)) {
+        ca_assert(is_list(&context->subroutineOutput));
+        swap(&context->subroutineOutput, outputs);
+        set_null(&context->subroutineOutput);
+    } else {
+        // TODO: factor this out
+        TaggedValue* output = get_local(contents[contents.length()-1]);
         outputs->resize(1);
+        copy(output, outputs->get(0));
+    }
+
+    if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
         set_null(outputs->get(0));
     } else {
-        if (!is_null(&context->subroutineOutput)) {
-            ca_assert(is_list(&context->subroutineOutput));
-            swap(&context->subroutineOutput, outputs);
-            set_null(&context->subroutineOutput);
-        } else {
-            // TODO: factor this out
-            TaggedValue* output = get_local(contents[contents.length()-1]);
-            outputs->resize(1);
-            copy(output, outputs->get(0));
-        }
 
         bool castSuccess = cast(outputs->get(0), outputType,
                 outputs->get(0));
@@ -141,6 +141,15 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     TaggedValue* outputDest = get_output(context, caller);
     if (outputDest != NULL)
         swap(outputs[0], outputDest);
+
+    // Write extra outputs
+    Branch& outerBranch  = *caller->owningBranch;
+    for (int index=1; ; index++) {
+        Term* extraOutput = outerBranch[caller->index + index];
+        if (extraOutput == NULL || extraOutput->function != ADDITIONAL_OUTPUT_FUNC)
+            break;
+        copy(outputs[index], get_local(extraOutput));
+    }
 }
 
 bool is_subroutine(Term* term)
@@ -204,7 +213,7 @@ void update_subroutine_return_contents(Term* sub, Term* returnCall)
             }
         }
 
-        apply(returnContents, SUBROUTINE_OUTPUT_FUNC, RefList(returnCall->input(0)));
+        apply(returnContents, SUBROUTINE_OUTPUT_FUNC, inputs);
     }
 }
 
