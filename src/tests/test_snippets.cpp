@@ -511,6 +511,7 @@ void test_subroutine_multiple_outputs()
                  "a = 10; b = 10; c = 10;\n"
                  "f(a,&b,c)",
                  "a == 10, b == 12, c == 10");
+    test_snippet("def f(int a +output) a = 4; return; a = 6 end; a = 0; f(&a)", "a == 4");
 }
 
 void register_tests()

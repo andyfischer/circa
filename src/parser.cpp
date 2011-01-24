@@ -999,9 +999,12 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
     tokens.consume(RETURN);
     possible_whitespace(tokens);
 
-    Term* result = infix_expression(branch, tokens);
+    Term* output = NULL;
 
-    result = apply(branch, RETURN_FUNC, RefList(result));
+    if (!is_statement_ending(tokens.next().match))
+        output = infix_expression(branch, tokens);
+
+    Term* result = apply(branch, RETURN_FUNC, RefList(output));
     
     return result;
 }
@@ -2077,6 +2080,11 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
         output << tokens.consume();
 
     return output.str();
+}
+
+bool is_statement_ending(int t)
+{
+    return t == token::COMMA || t == token::SEMICOLON || t == token::NEWLINE;
 }
 
 std::string possible_statement_ending(TokenStream& tokens)

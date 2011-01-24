@@ -115,6 +115,7 @@ bool is_infix_operator_rebinding(std::string const& infix);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);
+bool is_statement_ending(int t);
 std::string possible_statement_ending(TokenStream& tokens);
 bool is_multiline_block(Term* term);
 
