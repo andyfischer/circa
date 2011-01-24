@@ -1,24 +1,13 @@
 
- - Multiple outputs from subroutine -
 
-When parsing a function decl, check argument for @
+BUGS
 
-Get a native function called multiple_outputs(@a, @b, @c) and make that work. Then make it work for subroutines.
-
-Add function subroutine_output()
-bugs:
  - this doesn't work:
      def f()
        return
      end
 
-
-Optimization tasks:
- - evaluate_if_block should not use if_block_contains_state, it's O(n) 
- - various places where swap() can be used instead of copy()
-
-Bugs/tasks:
- - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
+ - Plastic no longer reloads scripts when they encounter an error
 
  - Can't use a namespace qualifier on a type name in function declaration
 
@@ -33,10 +22,18 @@ Bugs/tasks:
 
  - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
 
+TASKS
+
+ - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
+
  - Lambdas
  - How to support introspection inside blocks (for, if, include). Should the user need to provide
    names or can we provide default names? Can the user provide a name if they want?
  - Store whether a function is pure
+
+Optimization tasks:
+ - evaluate_if_block should not use if_block_contains_state, it's O(n) 
+ - various places where swap() can be used instead of copy()
 
 Big tasks:
  - Parametrized/generic types
