@@ -32,12 +32,12 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
 
 void internal_error(const char* message)
 {
-    if (ASSERT_INTERNAL_ERROR) {
+    #if CIRCA_ASSERT_ON_ERROR
         std::cerr << "internal error: " << message << std::endl;
         assert(false);
-    } else {
+    #else
         throw std::runtime_error(message);
-    }
+    #endif
 }
 
 void internal_error(std::string const& message)

@@ -1,6 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
 
-#if ENABLE_VALID_OBJECT_CHECKING
+#if CIRCA_VALID_OBJECT_CHECKING
 #include <map>
 #endif
 
@@ -11,7 +11,7 @@
 
 namespace circa {
 
-#if ENABLE_VALID_OBJECT_CHECKING
+#if CIRCA_VALID_OBJECT_CHECKING
 std::map<void*, int> *g_addressToType = new std::map<void*,int>;
 
 void debug_register_valid_object(void* obj, int type)
@@ -58,7 +58,7 @@ void debug_assert_valid_object(void* obj, int type)
 
 bool debug_is_object_valid(void* obj, int type)
 {
-    #if ENABLE_VALID_OBJECT_CHECKING
+    #if CIRCA_VALID_OBJECT_CHECKING
         if (obj == NULL) return false;
         bool valid = g_addressToType->find(obj) != g_addressToType->end();
         if (!valid) return false;

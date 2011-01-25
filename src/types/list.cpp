@@ -367,7 +367,7 @@ namespace list_t {
         ListData* s = (ListData*) get_pointer(source);
         ListData* d = (ListData*) get_pointer(dest);
 
-    #if DISABLE_LIST_VALUE_SHARING
+    #if CIRCA_DISABLE_LIST_SHARING
         if (d != NULL) decref(d);
         set_pointer(dest, duplicate(s));
     #else
@@ -704,7 +704,7 @@ namespace list_t {
             TaggedValue value2(list);
             copy(&value, &value2);
 
-            #if !DISABLE_LIST_VALUE_SHARING
+            #if !CIRCA_DISABLE_LIST_SHARING
             test_assert(get_pointer(&value) == get_pointer(&value2));
             #endif
             touch(&value2);

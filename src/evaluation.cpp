@@ -22,18 +22,17 @@ void evaluate_single_term(EvalContext* context, Term* term)
     EvaluateFunc func = function_t::get_evaluate(term->function);
     ca_assert(func != NULL);
 
-#if THROW_INTERNAL_ERROR
+    #if CIRCA_THROW_ON_ERROR
     try {
-#endif
+    #endif
 
     func(context, term);
 
-#if THROW_INTERNAL_ERROR
+    #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
-#endif
+    #endif
 
-    //#if 0
-    #if ENABLE_UNNECESSARY_TYPE_CHECKS
+    #if CIRCA_ALWAYS_TYPE_CHECK_OUTPUTS
     {
         Type* outputType = unbox_type(term->type);
         TaggedValue* output = get_local(term);
