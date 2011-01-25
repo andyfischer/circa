@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 // Some code segments are based on example code from Philip Rideout for example code.
 // See: http://prideout.net/bloom/index.php

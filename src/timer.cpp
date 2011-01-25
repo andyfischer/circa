@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "timer.h"
 
