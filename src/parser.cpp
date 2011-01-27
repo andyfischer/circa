@@ -1248,8 +1248,9 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
 
         return result;
     } else {
-        Term* result = apply(branch, UNKNOWN_FUNCTION, inputs);
-        result->setStringProp("syntax:functionName", originalName);
+        Term* func = unknown_identifier(branch, fieldName);
+        Term* result = apply(branch, func, inputs);
+        result->setStringProp("syntax:functionName", fieldName);
         return result;
     }
 }

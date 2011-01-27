@@ -14,7 +14,7 @@ def tree_segment(Point base, number direction, number width, number depth, List 
   color = #6a3
 
   --direction = direction + jitter
-  bottom_width = width * interp(age, 8.0)
+  bottom_width = width * interp(age, 8)
 
   has_branches = (seg_length > .4*max_length) and depth < 4.0
 
