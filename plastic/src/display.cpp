@@ -15,6 +15,8 @@ using namespace circa;
 SDL_Surface* SCREEN = NULL;
 const int SCREEN_BPP = 32;
 
+namespace display {
+
 bool initialize_display()
 {
     // Initialize the window
@@ -49,6 +51,12 @@ bool initialize_display()
     SDL_EnableUNICODE(1);
 
     return true;
+}
+
+void teardown_display()
+{
+    // Quit SDL
+    SDL_Quit();
 }
 
 bool resize_display(int width, int height)
@@ -116,13 +124,15 @@ bool resize_display(int width, int height)
     return true;
 }
 
-void render_frame()
+void reset_for_new_frame()
 {
+    gl_clear_error();
     glClear(GL_DEPTH_BUFFER_BIT);
     glUseProgram(0);
+}
 
-    app::evaluate_main_script();
-
+void finish_frame()
+{
     // Check for uncaught GL error
     const char* err = gl_check_error();
     if (err != NULL) {
@@ -133,3 +143,4 @@ void render_frame()
     SDL_GL_SwapBuffers();
 }
 
+} // namespace display

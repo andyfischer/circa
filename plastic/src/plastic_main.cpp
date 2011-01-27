@@ -35,9 +35,9 @@ void main_loop()
         app::singleton()._ticksElapsed += ticksAdvanced;
     }
 
-    gl_clear_error();
-
-    render_frame();
+    display::reset_for_new_frame();
+    app::evaluate_main_script();
+    display::finish_frame();
 
     long new_ticks = SDL_GetTicks();
 
@@ -102,14 +102,13 @@ int plastic_main(std::vector<std::string> args)
         return 1;
     }
 
-    if (!initialize_display()) return 1;
+    if (!display::initialize_display()) return 1;
 
     // Main loop
     while (app::continue_main_loop())
         main_loop();
 
-    // Quit SDL
-    SDL_Quit();
+    display::teardown_display();
 
     return 0;
 }

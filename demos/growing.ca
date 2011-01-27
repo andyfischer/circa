@@ -5,8 +5,7 @@ desired_window_size = [480 600]
 def interp(number progress, number e) -> number
   return min(progress / e, 1.0)
 
-def tree_segment(Point base, number direction, number width, number depth,
-    List @leaves)
+def tree_segment(Point base, number direction, number width, number depth, List leaves +output)
   jitter = (seed() - .5) *.05
   max_length = 20 + 30 * seed()
   age = 1.0 + elapsed()
@@ -15,7 +14,7 @@ def tree_segment(Point base, number direction, number width, number depth,
   color = #6a3
 
   --direction = direction + jitter
-  bottom_width = width * interp(age, 8)
+  bottom_width = width * interp(age, 8.0)
 
   has_branches = (seg_length > .4*max_length) and depth < 4.0
 
@@ -38,8 +37,8 @@ def tree_segment(Point base, number direction, number width, number depth,
     r_angle = direction + seed() * .2
     mult(@l_angle, interp(branch_age, 8))
     mult(@r_angle, interp(branch_age, 8))
-    l_branch = tree_segment(next_center->Point, l_angle, width * .8, depth+1)
-    r_branch = tree_segment(next_center->Point, r_angle, width - .4, depth+1)
+    l_branch = tree_segment(next_center->Point, l_angle, width * .8, depth+1, &leaves)
+    r_branch = tree_segment(next_center->Point, r_angle, width - .4, depth+1, &leaves)
 
   -- leaves
   if width < .6
@@ -48,5 +47,5 @@ def tree_segment(Point base, number direction, number width, number depth,
 
 starting_width = 3.0
 leaves = []
-root = tree_segment([200 300], 0, starting_width, 0, @leaves)
+root = tree_segment([200 300], 0, starting_width, 0, &leaves)
 

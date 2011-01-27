@@ -83,7 +83,7 @@ void capture_events()
             break;
 
         case SDL_VIDEORESIZE:
-            resize_display(event.resize.w, event.resize.h);
+            display::resize_display(event.resize.w, event.resize.h);
             break;
 
         case SDL_KEYDOWN:

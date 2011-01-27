@@ -358,12 +358,14 @@ void post_compile_term(Term* term)
     
     // If the function has multiple outputs, then create additional_output terms.
     Branch& outerBranch = *term->owningBranch;
+    int additionalOutputTerms = 0;
     for (int i=0; i < term->numInputs(); i++) {
         if (function_can_rebind_input(term->function, i)) {
             Term* output = apply(outerBranch, ADDITIONAL_OUTPUT_FUNC, RefList());
+            additionalOutputTerms++;
 
             // make sure these terms occur immediately after
-            ca_assert(output->index = term->index + i + 1);
+            ca_assert(output->index == term->index + additionalOutputTerms);
 
             if (function_call_rebinds_input(term, i)
                     && term->input(i) != NULL

@@ -512,6 +512,9 @@ void test_subroutine_multiple_outputs()
                  "f(a,&b,c)",
                  "a == 10, b == 12, c == 10");
     test_snippet("def f(int a +output) a = 4; return; a = 6 end; a = 0; f(&a)", "a == 4");
+
+    // this once caused an assert fail:
+    test_snippet("def f(int a, int b, int c +output) end; f(1 2 3)", "");
 }
 
 void register_tests()

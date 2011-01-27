@@ -64,6 +64,7 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch)
     finish_using(branch);
 }
 
+
 void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output)
 {
     start_using(branch);
@@ -255,6 +256,13 @@ void evaluate_minimum(EvalContext* context, Term* term)
     }
 
     delete[] marked;
+}
+
+void clear_error(EvalContext* cxt)
+{
+    cxt->errorOccurred = false;
+    cxt->errorTerm = NULL;
+    cxt->errorMessage = "";
 }
 
 } // namespace circa

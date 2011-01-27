@@ -60,6 +60,10 @@ void evaluate_branch(EvalContext* context, Branch& branch);
 // Shorthand to call evaluate_branch with a new EvalContext:
 void evaluate_branch(Branch& branch);
 
+void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
+
+void evaluate_minimum(EvalContext* context, Term* term);
+
 TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
 TaggedValue* get_output(EvalContext* cxt, Term* term);
 TaggedValue* get_extra_output(Term* term, int index);
@@ -70,11 +74,9 @@ Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);
 
-void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
-
 void start_using(Branch& branch);
 void finish_using(Branch& branch);
 
-void evaluate_minimum(EvalContext* context, Term* term);
+void clear_error(EvalContext* cxt);
 
 } // namespace circa

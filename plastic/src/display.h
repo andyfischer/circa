@@ -2,6 +2,12 @@
 
 #pragma once
 
+namespace display {
+
 bool initialize_display();
+void teardown_display();
 bool resize_display(int width, int height);
-void render_frame();
+void reset_for_new_frame();
+void finish_frame();
+
+} // namespace display

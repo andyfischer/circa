@@ -152,7 +152,7 @@ bool initialize()
 {
     circa_initialize();
 
-    // Patch the trace() function to use our logging
+    // Patch the trace() function to use our own logging.
     install_function(circa::get_global("print"), trace);
     install_function(circa::get_global("trace"), trace);
 
@@ -205,6 +205,9 @@ bool reload_runtime()
 bool evaluate_main_script()
 {
     App* app = &app::singleton();
+    circa::EvalContext* context = &app->_evalContext;
+
+    circa::clear_error(context);
 
     circa::evaluate_branch_no_preserve_locals(&app->_evalContext, app::runtime_branch());
 
