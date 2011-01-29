@@ -168,8 +168,8 @@ Circa has the following infix operators:
  <tr><td>%</td>      <td>remainder</td><td>Modulo, truncated division</td><td>7</td></tr>
  <tr><td>+</td>      <td>add</td><td>Addition (overloaded)</td><td>6</td></tr>
  <tr><td>-</td>      <td>sub</td><td>Subtraction (overloaded)</td><td>6</td></tr>
- <tr><td><</td>      <td>less_than</td><td>Less-than comparison</td><td>4</td></tr>
- <tr><td><=</td>      <td>less_than_eq</td><td>Less-than-or-equals comparison</td><td>4</td></tr>
+ <tr><td>&lt;</td>      <td>less_than</td><td>Less-than comparison</td><td>4</td></tr>
+ <tr><td>&lt;=</td>      <td>less_than_eq</td><td>Less-than-or-equals comparison</td><td>4</td></tr>
  <tr><td>></td>      <td>greater_than</td><td>Greater-than comparison</td><td>4</td></tr>
  <tr><td>>=</td>      <td>greater_than_eq</td><td>Greater-than-or-equals comparison</td><td>4</td></tr>
  <tr><td>==</td>      <td>equals</td><td>Equality check</td><td>4</td></tr>
@@ -233,22 +233,22 @@ Note that there must not be any whitespace between the expression on the left an
 Function declarations
 ---------------------
 
-A new function can be declared with the `def` keyword. Example:
+A new function can be declared with the `def` keyword. The syntax is:
 
     def <function-name>(<list of arguments>) -> <optional-return-type>
         <statements>
+
+or:
+
+    def <function-name(<list of arguments>) -> <optional-return-type> <statements> end
+
+In the first example, indentation is used to indicate the end of the function. In the one-liner example, the 'end' keyword is used.
 
 An example:
 
     def print_sum(number a, number b)
         sum = a + b
         print(sum)
-
-The indentation is significant. Lines which are indented to the left of the 'def' statement are considered to be inside the subroutine.
-
-A function can also be a one-liner, if there are any expressions to the left of the declaraion. The 'end' keyword is used to mark the end of the function.
-
-    def one_liner(number a, number b) sum = a + b; print(sum) end
 
 A function can return a value, if it declares a return type. This is done with a -> token at the end of the declaration.
 
@@ -267,6 +267,10 @@ An if-statement is specified by the `if` keyword, followed by a conditional expr
 
     if <condition>
         <statements>
+
+or:
+
+    if <condition> <statements> end
         
 The inner statements are executed if the conditional expression is true. An example:
 
@@ -387,8 +391,6 @@ A compound value can then be created using constructor syntax, or by taking an e
 
     complex_value = Complex()
     complex_value = [1.0 0.0] -> Complex
-
-Circa currently doesn't support constructors with arguments (such as `Complex(1.0 0.0)`), but this is planned for a future version.
 
 Fields of a compound value can be accessed or assigned with the dot operator. Example:
 
