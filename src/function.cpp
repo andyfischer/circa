@@ -8,7 +8,6 @@ namespace circa {
 FunctionAttrs::FunctionAttrs()
   : variableArgs(false),
     throws(false),
-    currentlyEvaluating(false),
     outputCount(1),
     evaluate(NULL),
     specializeType(NULL),
@@ -313,10 +312,6 @@ namespace function_t {
     TaggedValue* get_parameters(Term* func)
     {
         return &get_attrs(func).parameter;
-    }
-    std::string const& get_description(Term* func)
-    {
-        return get_attrs(func).description;
     }
 } // namespace function_t
 

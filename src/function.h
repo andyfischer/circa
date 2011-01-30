@@ -24,10 +24,8 @@ struct FunctionAttrs
     bool variableArgs;
     std::string exposedNamePath;
     Ref feedbackFunc;
-    std::string description;
     TaggedValue parameter;
     bool throws;
-    bool currentlyEvaluating; // deprecated
     int outputCount;
 
     // Functions
@@ -59,7 +57,6 @@ namespace function_t {
     std::string to_string(Term* term);
     std::string get_header_source(Term* term);
     void format_header_source(StyledSource* source, Term* term);
-    std::string get_documentation(Term* term);
 
     bool check_invariants(Term* term, std::string* failureMessage);
 
@@ -83,7 +80,7 @@ namespace function_t {
     void set_exposed_name_path(Term* func, std::string const& value);
     Ref& get_feedback_func(Term* function);
     TaggedValue* get_parameters(Term* function);
-    std::string const& get_description(Term* function);
+    std::string get_documentation(Term* function);
 
     EvaluateFunc& get_evaluate(Term* function);
     SpecializeTypeFunc& get_specialize_type(Term* function);
