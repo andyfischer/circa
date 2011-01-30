@@ -140,7 +140,7 @@ void test_reset()
 void test_constructor_syntax()
 {
     Branch branch;
-    TypeRef myType = Type::create();
+    Type* myType = Type::create();
     myType->name = "T";
     import_type(branch, myType);
     TaggedValue* a = branch.eval("a = T()");
@@ -190,7 +190,7 @@ namespace manual_memory_management_test {
 
     void test()
     {
-        TypeRef myType = Type::create();
+        Type* myType = Type::create();
         myType->initialize = initialize;
         myType->release = release;
 
@@ -232,7 +232,7 @@ namespace manual_memory_management_test {
 
 void refcount_test()
 {
-    TypeRef t = Type::create();
+    Type* t = Type::create();
     toy_refcounted_pool::setup_type(t);
 
     {
@@ -262,7 +262,7 @@ void refcount_test()
 void list_memory_management()
 {
     List list;
-    TypeRef t = Type::create();
+    Type* t = Type::create();
     toy_refcounted_pool::setup_type(t);
 
     TaggedValue v(t);

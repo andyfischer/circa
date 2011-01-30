@@ -47,7 +47,6 @@ struct StyledSource;
 struct TaggedValue;
 struct Term;
 struct Type;
-struct TypeRef;
 
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 

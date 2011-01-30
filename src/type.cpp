@@ -152,6 +152,7 @@ Type::Type() :
     numElements(NULL),
     checkInvariants(NULL),
     remapPointers(NULL),
+    parent(NULL),
     refCount(0),
     permanent(false)
 {
@@ -318,23 +319,6 @@ Term* find_member_function(Type* type, std::string const& name)
 Term* parse_type(Branch& branch, std::string const& decl)
 {
     return parser::compile(&branch, parser::type_decl, decl);
-}
-
-void
-TypeRef::set(Type* target)
-{
-    if (t == target)
-        return;
-
-    Type* previousTarget = t;
-
-    t = target;
-
-    if (t != NULL)
-        t->refCount++;
-
-    if (previousTarget != NULL)
-        type_t::decref(previousTarget);
 }
 
 } // namespace circa

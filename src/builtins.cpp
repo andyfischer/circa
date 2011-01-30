@@ -121,7 +121,7 @@ Type STRING_T;
 Type REF_T;
 Type VOID_T;
 
-TypeRef FILE_SIGNATURE_T;
+Type* FILE_SIGNATURE_T;
 
 bool FINISHED_BOOTSTRAP = false;
 

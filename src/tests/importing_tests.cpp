@@ -33,7 +33,7 @@ void test_import_c()
 
 void test_import_type()
 {
-    TypeRef type = Type::create();
+    Type* type = Type::create();
     Branch branch;
 
     type->name = "A";

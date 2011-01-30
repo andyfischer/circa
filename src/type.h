@@ -17,24 +17,6 @@ namespace circa {
 
 extern Term* IMPLICIT_TYPES;
 
-struct TypeRef
-{
-    Type* t;
-
-    TypeRef() : t(NULL) {}
-    TypeRef(Type* initial) : t(NULL) { set(initial); }
-    TypeRef(TypeRef const& copy) : t(NULL) { set(copy.t); }
-    ~TypeRef() { set(NULL); }
-
-    void set(Type* target);
-
-    TypeRef& operator=(TypeRef const& rhs) { set(rhs.t); return *this; }
-    TypeRef& operator=(Type* target) { set(target); return *this; }
-    bool operator==(Type* _t) const { return _t == t; }
-    operator Type*() const { return t; }
-    Type* operator->() { return t; }
-};
-
 struct CastResult
 {
     bool success;
@@ -102,7 +84,7 @@ struct Type
     RemapPointers remapPointers;
 
     // Parent type, may be null.
-    TypeRef parent;
+    Type* parent;
     
     Branch prototype;
 

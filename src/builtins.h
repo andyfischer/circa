@@ -92,7 +92,7 @@ extern Type REF_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 
-extern TypeRef FILE_SIGNATURE_T;
+extern Type* FILE_SIGNATURE_T;
 
 extern bool FINISHED_BOOTSTRAP;
 

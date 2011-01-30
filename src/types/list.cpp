@@ -646,7 +646,7 @@ namespace list_t {
 
         void test_tagged_value()
         {
-            TypeRef list = Type::create();
+            Type* list = Type::create();
             list_t::setup_type(list);
 
             TaggedValue value;
@@ -668,7 +668,7 @@ namespace list_t {
 
         void test_tagged_value_copy()
         {
-            TypeRef list = Type::create();
+            Type* list = Type::create();
             list_t::setup_type(list);
 
             TaggedValue value(list);
@@ -693,7 +693,7 @@ namespace list_t {
 
         void test_touch()
         {
-            TypeRef list = Type::create();
+            Type* list = Type::create();
             list_t::setup_type(list);
 
             TaggedValue value(list);
@@ -713,7 +713,7 @@ namespace list_t {
 
         void test_prepend()
         {
-            TypeRef list = Type::create();
+            Type* list = Type::create();
             list_t::setup_type(list);
 
             TaggedValue value(list);
