@@ -78,8 +78,8 @@ namespace vectorize_vs_function {
     {
         Term* func = import_function(kernel, evaluate,
                 "vectorize_vs(List,any) -> List");
-        function_t::get_specialize_type(func) = specializeType;
-        function_t::get_attrs(func).postInputChange = post_input_change;
+        get_function_attrs(func)->specializeType = specializeType;
+        get_function_attrs(func)->postInputChange = post_input_change;
     }
 }
 } // namespace circa

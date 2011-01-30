@@ -58,8 +58,8 @@ namespace get_field_function {
     {
         GET_FIELD_FUNC = import_function(kernel, evaluate,
                 "get_field(any, string...) -> any");
-        function_t::get_attrs(GET_FIELD_FUNC).specializeType = specializeType;
-        function_t::get_attrs(GET_FIELD_FUNC).formatSource = formatSource;
+        get_function_attrs(GET_FIELD_FUNC)->specializeType = specializeType;
+        get_function_attrs(GET_FIELD_FUNC)->formatSource = formatSource;
     }
 }
 }

@@ -82,8 +82,8 @@ void format_term_source(StyledSource* source, Term* term)
 
     // If the function has a formatSource function, use that.
     if (is_function(term->function) &&
-            function_t::get_attrs(term->function).formatSource != NULL) {
-        function_t::get_attrs(term->function).formatSource(source, term);
+            get_function_attrs(term->function)->formatSource != NULL) {
+        get_function_attrs(term->function)->formatSource(source, term);
 
     // Or, check if this is a value term.
     } else if (is_value(term)) {

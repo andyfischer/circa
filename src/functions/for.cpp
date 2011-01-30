@@ -47,12 +47,12 @@ namespace for_function {
     void setup(Branch& kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
-        function_t::get_attrs(FOR_FUNC).formatSource = formatSource;
-        function_t::get_attrs(FOR_FUNC).getRegisterCount = get_register_count;
+        get_function_attrs(FOR_FUNC)->formatSource = formatSource;
+        get_function_attrs(FOR_FUNC)->getRegisterCount = get_register_count;
         function_t::set_exposed_name_path(FOR_FUNC, "#rebinds_for_outer");
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
-        function_t::get_attrs(DISCARD_FUNC).formatSource = discard_formatSource;
+        get_function_attrs(DISCARD_FUNC)->formatSource = discard_formatSource;
         hide_from_docs(DISCARD_FUNC);
     }
 }

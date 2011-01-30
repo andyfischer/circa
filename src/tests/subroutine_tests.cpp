@@ -76,7 +76,7 @@ void subroutine_stateful_term()
     // Make sure that stateful terms work correctly
     Term* call = branch.compile("call = mysub()");
     test_assert(call);
-    test_assert(function_t::get_inline_state_type(branch["mysub"]) != VOID_TYPE);
+    test_assert(get_function_attrs(branch["mysub"])->implicitStateType != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
 
     evaluate_branch(&context, branch);
@@ -122,10 +122,10 @@ void initialize_state_type()
     Branch branch;
 
     Term* a = branch.compile("def a() -> number return(1 + 1) end");
-    test_assert(function_t::get_inline_state_type(a) == VOID_TYPE);
+    test_assert(get_function_attrs(a)->implicitStateType == VOID_TYPE);
 
     Term* b = branch.compile("def b() state i end");
-    test_assert(function_t::get_inline_state_type(b) != VOID_TYPE);
+    test_assert(get_function_attrs(b)->implicitStateType != VOID_TYPE);
 }
 
 void shadow_input()

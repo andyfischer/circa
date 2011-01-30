@@ -52,7 +52,6 @@ namespace function_attrs_t {
 }
 
 namespace function_t {
-    FunctionAttrs& get_attrs(Term* function);
 
     std::string to_string(Term* term);
     std::string get_header_source(Term* term);
@@ -62,12 +61,8 @@ namespace function_t {
 
     // accessors
     std::string const& get_name(Term* function);
-    void set_name(Term* function, std::string const& name);
     Term* get_output_type(Term* function);
-    void set_output_type(Term* funciton, Term* type);
-    Ref& get_inline_state_type(Term* function);
     bool get_variable_args(Term* function);
-    void set_variable_args(Term* function, bool value);
     Term* get_input_placeholder(Term* function, int index);
     Term* get_input_type(Term* function, int index);
     bool is_state_input(Term* function, int index);

@@ -17,7 +17,7 @@ namespace unrecognized_expr_function {
     void setup(Branch& kernel)
     {
         UNRECOGNIZED_EXPRESSION_FUNC = import_function(kernel, evaluate, "unrecognized_expr()");
-        function_t::get_attrs(UNRECOGNIZED_EXPRESSION_FUNC).formatSource = formatSource;
+        get_function_attrs(UNRECOGNIZED_EXPRESSION_FUNC)->formatSource = formatSource;
     }
 }
 }

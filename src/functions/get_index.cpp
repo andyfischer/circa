@@ -67,8 +67,8 @@ namespace get_index_function {
         CA_SETUP_FUNCTIONS(kernel);
         GET_INDEX_FUNC = kernel["get_index"];
         GET_INDEX_FROM_BRANCH_FUNC = kernel["get_index_from_branch"];
-        function_t::get_attrs(GET_INDEX_FUNC).specializeType = specializeType;
-        function_t::get_attrs(GET_INDEX_FUNC).formatSource = formatSource;
+        get_function_attrs(GET_INDEX_FUNC)->specializeType = specializeType;
+        get_function_attrs(GET_INDEX_FUNC)->formatSource = formatSource;
     }
 }
 }

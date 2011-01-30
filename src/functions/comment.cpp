@@ -13,7 +13,7 @@ namespace comment_function {
     void setup(Branch& kernel)
     {
         COMMENT_FUNC = import_function(kernel, NULL, "comment()");
-        function_t::get_attrs(COMMENT_FUNC).formatSource = formatSource;
+        get_function_attrs(COMMENT_FUNC)->formatSource = formatSource;
     }
 }
 }

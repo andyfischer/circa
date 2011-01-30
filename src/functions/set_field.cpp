@@ -35,8 +35,8 @@ namespace set_field_function {
     {
         SET_FIELD_FUNC = import_function(kernel, evaluate,
                 "set_field(any, string, any) -> any");
-        function_t::get_attrs(SET_FIELD_FUNC).specializeType = specializeType;
-        function_t::get_attrs(SET_FIELD_FUNC).formatSource = formatSource;
+        get_function_attrs(SET_FIELD_FUNC)->specializeType = specializeType;
+        get_function_attrs(SET_FIELD_FUNC)->formatSource = formatSource;
     }
 }
 }

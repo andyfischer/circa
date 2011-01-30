@@ -121,7 +121,7 @@ void test_bug_with_declaring_state_argument()
     Branch branch;
     Term* f = branch.eval("def f(state int) end");
 
-    test_assert(function_t::get_inline_state_type(f) == INT_TYPE);
+    test_assert(get_function_attrs(f)->implicitStateType == INT_TYPE);
 }
 
 void test_calling_manual_overloaded_function()

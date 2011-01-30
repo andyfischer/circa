@@ -33,7 +33,7 @@ namespace branch_function {
     void setup(Branch& kernel)
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
-        function_t::get_attrs(BRANCH_FUNC).formatSource = format_source;
+        get_function_attrs(BRANCH_FUNC)->formatSource = format_source;
     }
 }
 }

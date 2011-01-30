@@ -25,8 +25,8 @@ namespace copy_function {
     void setup(Branch& kernel)
     {
         COPY_FUNC = import_function(kernel, evaluate, "copy(any) -> any");
-        function_t::get_attrs(COPY_FUNC).specializeType = specializeType;
-        function_t::get_attrs(COPY_FUNC).formatSource = formatSource;
+        get_function_attrs(COPY_FUNC)->specializeType = specializeType;
+        get_function_attrs(COPY_FUNC)->formatSource = formatSource;
     }
 }
 }

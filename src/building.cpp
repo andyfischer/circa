@@ -109,7 +109,7 @@ void post_input_change(Term* term)
 {
     if (is_function(term->function)) {
         FunctionAttrs::PostInputChange func =
-            function_t::get_attrs(term->function).postInputChange;
+            get_function_attrs(term->function)->postInputChange;
         if (func)
             func(term);
     }

@@ -91,8 +91,8 @@ namespace assign_function {
     void setup(Branch& kernel)
     {
         ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
-        function_t::get_attrs(ASSIGN_FUNC).specializeType = specializeType;
-        function_t::get_attrs(ASSIGN_FUNC).postInputChange = postInputChange;
+        get_function_attrs(ASSIGN_FUNC)->specializeType = specializeType;
+        get_function_attrs(ASSIGN_FUNC)->postInputChange = postInputChange;
     }
 }
 }

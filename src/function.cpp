@@ -183,48 +183,21 @@ namespace function_t {
         return true;
     }
 
-    FunctionAttrs& get_attrs(Term* function)
-    {
-        ca_assert(function->nestedContents.length() > 0);
-        ca_assert(function->nestedContents[0]->type == FUNCTION_ATTRS_TYPE);
-        FunctionAttrs* attrs= &as_function_attrs(function->nestedContents[0]);
-        debug_assert_valid_object(attrs, FUNCTION_ATTRS_OBJECT);
-        return *attrs;
-    }
-
     std::string const& get_name(Term* function)
     {
-        return get_attrs(function).name;
-    }
-    void set_name(Term* function, std::string const& name)
-    {
-        get_attrs(function).name = name;
+        return get_function_attrs(function)->name;
     }
 
     Term* get_output_type(Term* function)
     {
         if (!is_function(function)) return ANY_TYPE;
-        return get_attrs(function).outputType;
-    }
-    void set_output_type(Term* function, Term* type)
-    {
-        get_attrs(function).outputType = type;
-    }
-
-    Ref& get_inline_state_type(Term* function)
-    {
-        return get_attrs(function).implicitStateType;
+        return get_function_attrs(function)->outputType;
     }
 
     bool get_variable_args(Term* function)
     {
         if (!is_function(function)) return true;
-        return get_attrs(function).variableArgs;
-    }
-
-    void set_variable_args(Term* function, bool value)
-    {
-        get_attrs(function).variableArgs = value;
+        return get_function_attrs(function)->variableArgs;
     }
 
     int num_inputs(Term* function)
@@ -291,27 +264,27 @@ namespace function_t {
     }
     EvaluateFunc& get_evaluate(Term* func)
     {
-        return get_attrs(func).evaluate;
+        return get_function_attrs(func)->evaluate;
     }
     SpecializeTypeFunc& get_specialize_type(Term* func)
     {
-        return get_attrs(func).specializeType;
+        return get_function_attrs(func)->specializeType;
     }
     std::string const& get_exposed_name_path(Term* func)
     {
-        return get_attrs(func).exposedNamePath;
+        return get_function_attrs(func)->exposedNamePath;
     }
     void set_exposed_name_path(Term* func, std::string const& value)
     {
-        get_attrs(func).exposedNamePath = value;
+        get_function_attrs(func)->exposedNamePath = value;
     }
     Ref& get_feedback_func(Term* func)
     {
-        return get_attrs(func).feedbackFunc;
+        return get_function_attrs(func)->feedbackFunc;
     }
     TaggedValue* get_parameters(Term* func)
     {
-        return &get_attrs(func).parameter;
+        return &get_function_attrs(func)->parameter;
     }
 } // namespace function_t
 

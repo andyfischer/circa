@@ -25,7 +25,7 @@ namespace overloaded_function {
         if (!is_overloaded_function(func))
             return func;
 
-        List& overloads = function_t::get_attrs(func).parameters;
+        List& overloads = get_function_attrs(func)->parameters;
 
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
@@ -43,7 +43,7 @@ namespace overloaded_function {
         Branch& contents = CALLER->nestedContents;
         Term* func = CALLER->function;
 
-        List& overloads = function_t::get_attrs(func).parameters;
+        List& overloads = get_function_attrs(func)->parameters;
 
         int numInputs = NUM_INPUTS;
 
@@ -128,17 +128,17 @@ namespace overloaded_function {
     bool is_overloaded_function(Term* func)
     {
         ca_assert(is_function(func));
-        return function_t::get_attrs(func).evaluate == evaluate_overload;
+        return get_function_attrs(func)->evaluate == evaluate_overload;
     }
 
     int num_overloads(Term* func)
     {
-        return function_t::get_attrs(func).parameters.length();
+        return get_function_attrs(func)->parameters.length();
     }
 
     Term* get_overload(Term* func, int index)
     {
-        return function_t::get_attrs(func).parameters[index]->asRef();
+        return get_function_attrs(func)->parameters[index]->asRef();
     }
 
     Term* find_overload(Term* func, const char* name)
@@ -153,7 +153,7 @@ namespace overloaded_function {
 
     void update_function_signature(Term* term)
     {
-        List& parameters = function_t::get_attrs(term).parameters;
+        List& parameters = get_function_attrs(term)->parameters;
 
         ca_assert(parameters.length() > 0);
         int argumentCount = function_t::num_inputs(as_ref(parameters[0]));
@@ -177,8 +177,9 @@ namespace overloaded_function {
         for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* outputType = find_common_type(outputTypes);
-        function_t::set_output_type(term, outputType);
-        function_t::set_variable_args(term, variableArgs);
+        FunctionAttrs* attrs = get_function_attrs(term);
+        attrs->outputType = outputType;
+        attrs->variableArgs = variableArgs;
     }
 
     void setup_overloaded_function(Term* term, std::string const& name,
@@ -187,12 +188,13 @@ namespace overloaded_function {
         term->nestedContents.clear();
         initialize_function(term);
 
-        function_t::set_name(term, name);
-        function_t::get_attrs(term).evaluate = evaluate_overload;
-        function_t::get_attrs(term).postInputChange = overload_post_input_change;
-        //function_t::get_attrs(term).specializeType = overload_specialize_type;
+        FunctionAttrs* attrs = get_function_attrs(term);
+        attrs->name = name;
+        attrs->evaluate = evaluate_overload;
+        attrs->postInputChange = overload_post_input_change;
+        // attrs->specializeType = overload_specialize_type;
 
-        List& parameters = function_t::get_attrs(term).parameters;
+        List& parameters = get_function_attrs(term)->parameters;
         parameters.clear();
         parameters.resize(overloads.length());
 
@@ -219,7 +221,7 @@ namespace overloaded_function {
     {
         ca_assert(is_overloaded_function(overloadedFunction));
 
-        List& parameters = function_t::get_attrs(overloadedFunction).parameters;
+        List& parameters = get_function_attrs(overloadedFunction)->parameters;
         set_ref(parameters.append(), overload);
         update_function_signature(overloadedFunction);
     }

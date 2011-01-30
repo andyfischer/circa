@@ -445,9 +445,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
     initialize_function(result);
     initialize_subroutine(result);
     FunctionAttrs* attrs = get_function_attrs(result);
-    function_t::get_inline_state_type(result) = VOID_TYPE;
+    attrs->implicitStateType = VOID_TYPE;
     set_starting_source_location(result, startPosition, tokens);
-    function_t::set_name(result, functionName);
+    attrs->name = functionName;
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
@@ -460,7 +460,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         if (qualifierName == "native")
             isNative = true;
         else if (qualifierName == "throws")
-            function_t::get_attrs(result).throws = true;
+            attrs->throws = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);
@@ -514,13 +514,13 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
-            function_t::get_inline_state_type(result) = typeTerm;
+            attrs->implicitStateType = typeTerm;
         }
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
             tokens.consume(ELLIPSIS);
-            function_t::set_variable_args(result, true);
+            attrs->variableArgs = true;
         }
 
         // Optional list of qualifiers
@@ -536,7 +536,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
                 input->setBoolProp("output", true);
                 attrs->outputCount += 1;
             } else if (qualifierName == "multiple") {
-                function_t::set_variable_args(result, true);
+                attrs->variableArgs = true;
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+qualifierName);
@@ -573,7 +573,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    function_t::set_output_type(result, outputType);
+    attrs->outputType = outputType;
 
     //if (!tokens.nextNonWhitespaceIs(NEWLINE))
     //    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));

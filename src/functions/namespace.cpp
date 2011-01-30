@@ -53,13 +53,13 @@ namespace namespace_function {
     void early_setup(Branch& kernel)
     {
         NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
-        function_t::get_attrs(NAMESPACE_FUNC).formatSource = format_source;
+        get_function_attrs(NAMESPACE_FUNC)->formatSource = format_source;
 
         GET_NAMESPACE_FIELD = import_function(kernel, get_namespace_field,
                 "get_namespace_field(any +optional, string) -> any");
-        function_t::get_attrs(GET_NAMESPACE_FIELD).formatSource =
+        get_function_attrs(GET_NAMESPACE_FIELD)->formatSource =
             get_namespace_field_format_source;
-        function_t::get_attrs(GET_NAMESPACE_FIELD).specializeType =
+        get_function_attrs(GET_NAMESPACE_FIELD)->specializeType =
             get_namespace_field_specialize_type;
 
     }

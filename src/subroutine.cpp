@@ -244,12 +244,13 @@ void subroutine_update_state_type_from_contents(Term* func)
 
 void subroutine_change_state_type(Term* func, Term* newType)
 {
-    Term* previousType = function_t::get_inline_state_type(func);
+    FunctionAttrs* attrs = get_function_attrs(func);
+    Term* previousType = attrs->implicitStateType;
     if (previousType == newType)
         return;
 
     Branch& contents = func->nestedContents;
-    function_t::get_attrs(func).implicitStateType = newType;
+    attrs->implicitStateType = newType;
 
     bool hasStateInput = (function_t::num_inputs(func) > 0)
         && (function_t::get_input_name(func, 0) == "#state");
