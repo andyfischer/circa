@@ -122,6 +122,8 @@ bool function_can_rebind_input(Term* function, int index);
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);
 
+Term* function_get_input_type(Term* function, int index);
+
 // Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(Term* function);
 

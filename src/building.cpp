@@ -364,6 +364,8 @@ void post_compile_term(Term* term)
             Term* output = apply(outerBranch, ADDITIONAL_OUTPUT_FUNC, RefList());
             additionalOutputTerms++;
 
+            change_type(output, function_get_input_type(term->function, i));
+
             // make sure these terms occur immediately after
             ca_assert(output->index == term->index + additionalOutputTerms);
 

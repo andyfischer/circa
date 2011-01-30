@@ -485,6 +485,11 @@ bool function_call_rebinds_input(Term* term, int index)
     return get_input_syntax_hint(term, index, "rebindInput") == "t";
 }
 
+Term* function_get_input_type(Term* function, int index)
+{
+    return function_t::get_input_placeholder(function, index)->type;
+}
+
 bool is_native_function(Term* func)
 {
     if (!is_function(func))
