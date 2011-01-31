@@ -29,7 +29,7 @@ bool is_actually_using(Term* user, Term* usee);
 
 // This finds all the terms which have this term as a user, and removes it from
 // their user list. This is appropriate when you want to delete 'term'.
-void clear_all_users(Term* term);
+void remove_from_users(Term* term);
 
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");

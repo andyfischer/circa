@@ -263,7 +263,7 @@ void test_message_passing()
     test_equals(&context.messages, "[i: [1]]");
 
     // Delete the send() call
-    branch.remove(send);
+    erase_term(send);
 
     // Third run, i still returns 1 (from previous call), message queue is empty
     evaluate_branch(&context, branch);

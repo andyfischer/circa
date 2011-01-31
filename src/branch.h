@@ -116,6 +116,7 @@ bool is_namespace(Branch& branch);
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch const& branch);
 
+void safe_delete_branch_contents(Branch* branch);
 void duplicate_branch(Branch& source, Branch& dest);
 
 void parse_script(Branch& branch, std::string const& filename);

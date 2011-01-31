@@ -88,15 +88,17 @@ void RefList::setAt(unsigned int index, Term* term)
 
 void RefList::remove(Term* term)
 {
-    std::vector<Ref>::iterator it;
+    int numRemoved = 0;
+    for (size_t i=0; i < _items.size(); i++) {
 
-    for (it = _items.begin(); it != _items.end(); ) {
-
-        if (*it == term)
-            it = _items.erase(it);
-        else
-            ++it;
+        if (_items[i] == term) {
+            numRemoved++;
+        } else if (numRemoved > 0) {
+            _items[i - numRemoved] = _items[i];
+        }
     }
+
+    _items.resize(_items.size() - numRemoved);
 }
 
 void RefList::remove(int index)

@@ -455,6 +455,8 @@ bool function_call_rebinds_input(Term* term, int index)
 
 Term* function_get_input_type(Term* function, int index)
 {
+    if (function_t::get_variable_args(function))
+        index = 0;
     return function_t::get_input_placeholder(function, index)->type;
 }
 

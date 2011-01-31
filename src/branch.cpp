@@ -30,17 +30,7 @@ Branch::Branch()
 
 Branch::~Branch()
 {
-    names.clear();
-
-    // Turn all our terms into orphans
-    for (int i=0; i < _terms.length(); i++) {
-        Term* term = _terms[i];
-        if (term == NULL) continue;
-        clear_all_users(term);
-        term->owningBranch = NULL;
-    }
-
-    _terms.clear();
+    safe_delete_branch_contents(this);
     debug_unregister_valid_object(this);
 }
 
@@ -328,15 +318,7 @@ void Branch::remapPointers(ReferenceMap const& map)
 void
 Branch::clear()
 {
-    assert_valid_branch(this);
-
-    for (int i=0; i < _terms.length(); i++) {
-        _terms[i]->owningBranch = NULL;
-        _terms[i]->index = 0;
-    }
-
-    _terms.clear();
-    names.clear();
+    safe_delete_branch_contents(this);
 }
 
 std::string Branch::toString()
@@ -390,6 +372,43 @@ Branch* get_outer_scope(Branch const& branch)
     if (branch.owningTerm == NULL)
         return NULL;
     return branch.owningTerm->owningBranch;
+}
+
+void safe_delete_branch_contents(Branch* branch)
+{
+    assert_valid_branch(branch);
+    branch->names.clear();
+
+    for (BranchIterator it(*branch); it.unfinished(); ++it) {
+        if (*it == NULL)
+            continue;
+
+        remove_from_users(*it);
+    }
+
+    for (int i= branch->_terms.length() - 1; i >= 0; i--) {
+        Term* term = branch->get(i);
+        if (term == NULL)
+            continue;
+
+        safe_delete_branch_contents(&term->nestedContents);
+    }
+
+    for (int i= branch->_terms.length() - 1; i >= 0; i--) {
+        Term* term = branch->get(i);
+        if (term == NULL)
+            continue;
+
+        ca_assert(term->users.length() == 0);
+
+        // turn on this assert to catch orphaned terms:
+        //ca_assert(term->refCount == 1);
+        
+        term->owningBranch = NULL;
+        branch->_terms.setAt(term->index, NULL);
+    }
+
+    branch->_terms.clear();
 }
 
 Term* find_term_by_id(Branch& branch, unsigned int id)

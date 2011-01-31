@@ -19,6 +19,18 @@ LocalTermList::appendUnique(Term* term)
 }
 
 void
+LocalTermList::remove(int i)
+{
+    ca_assert(_terms.size() > i);
+
+    int replace = _terms.size() - 1;
+    if (replace > i) {
+        _terms[i] = _terms[replace];
+    }
+    _terms.resize(replace);
+}
+
+void
 LocalTermList::remove(Term* term)
 {
     int numRemoved = 0;

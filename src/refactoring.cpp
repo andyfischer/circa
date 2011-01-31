@@ -22,10 +22,11 @@ void change_function(Term* term, Term* function)
         throw std::runtime_error("Term "+function->name+" is not callable");
 
     term->function = function;
+    term->nestedContents.clear();
 
     // Check if we need to change the # of inputs
-    if (!function_t::get_variable_args(function))
-        term->inputs.resize(function_t::num_inputs(function));
+    //if (!function_t::get_variable_args(function))
+    //    term->inputs.resize(function_t::num_inputs(function));
 
     Term* newType = function_get_specialized_output_type(function, term);
 
@@ -138,8 +139,10 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
 
 void erase_term(Term* term)
 {
+    set_inputs(term, RefList());
     if (term->owningBranch != NULL)
         term->owningBranch->remove(term);
+    term->nestedContents.clear();
 }
 
 } // namespace circa

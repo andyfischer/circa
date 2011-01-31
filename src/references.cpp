@@ -40,7 +40,7 @@ void delete_term(Term* term)
     term->type = NULL;
     term->function = NULL;
 
-    delete term;
+    dealloc_term(term);
 }
 
 void remap_pointers(Term* term, ReferenceMap const& map)
