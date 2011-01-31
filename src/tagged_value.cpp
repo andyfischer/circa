@@ -31,15 +31,13 @@ TaggedValue::TaggedValue(TaggedValue const& original)
 {
     init();
 
-    Term* source = (Term*) &original;
-    copy(source, this);
+    copy(&const_cast<TaggedValue&>(original), this);
 }
 
 TaggedValue&
 TaggedValue::operator=(TaggedValue const& rhs)
 {
-    Term* source = (Term*) &rhs;
-    copy(source, this);
+    copy(&const_cast<TaggedValue&>(rhs), this);
     return *this;
 }
 
@@ -197,10 +195,7 @@ void copy(TaggedValue* source, TaggedValue* dest)
     change_type(dest, source->value_type);
     Type::Copy copyFunc = source->value_type->copy;
 
-    if (copyFunc == copy) {
-        std::string msg = "Circular usage of copy() in type " + source->value_type->name;
-        internal_error(msg.c_str());
-    }
+    ca_assert(copyFunc != copy);
 
     if (copyFunc != NULL) {
         copyFunc(source, dest);
@@ -312,8 +307,10 @@ TaggedValue* get_field(TaggedValue* value, const char* field)
 {
     Type::GetField getField = value->value_type->getField;
 
-    if (getField == NULL)
-        internal_error("No getField function available");
+    if (getField == NULL) {
+        std::string msg = "No getField function available on type " + value->value_type->name;
+        internal_error(msg.c_str());
+    }
 
     return getField(value, field);
 }
@@ -322,8 +319,10 @@ void set_field(TaggedValue* value, const char* field, TaggedValue* element)
 {
     Type::SetField setField = value->value_type->setField;
 
-    if (setField == NULL)
-        internal_error("No setField function available");
+    if (setField == NULL) {
+        std::string msg = "No setField function available on type " + value->value_type->name;
+        internal_error(msg.c_str());
+    }
 
     setField(value, field, element);
 }
@@ -394,16 +393,11 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
-TaggedValue* set_int(TaggedValue* value)
-{
-    change_type(value, &INT_T);
-    return value;
-}
-
-void set_int(TaggedValue* value, int i)
+TaggedValue* set_int(TaggedValue* value, int i)
 {
     change_type(value, &INT_T);
     value->value_data.asint = i;
+    return value;
 }
 
 void set_float(TaggedValue* value, float f)
@@ -514,11 +508,6 @@ void* get_pointer(TaggedValue* value)
     return value->value_data.ptr;
 }
 
-Branch* get_branch_value(TaggedValue* value)
-{
-    return (Branch*) value->value_data.ptr;
-}
-
 const char* get_name_for_type(Type* type)
 {
     if (type == NULL)
@@ -536,6 +525,11 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
     }
 
     return value->value_data.ptr;
+}
+
+Branch* get_branch_value(TaggedValue* value)
+{
+    return (Branch*) value->value_data.ptr;
 }
 
 bool is_int(TaggedValue* value)

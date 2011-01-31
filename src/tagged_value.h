@@ -72,9 +72,7 @@ void set_index(TaggedValue* value, int index, TaggedValue* element);
 TaggedValue* get_field(TaggedValue* value, const char* field);
 void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 
-TaggedValue* set_int(TaggedValue* value);
-
-void set_int(TaggedValue* value, int i);
+TaggedValue* set_int(TaggedValue* value, int i);
 void set_float(TaggedValue* value, float f);
 void set_string(TaggedValue* value, const char* s);
 void set_string(TaggedValue* value, std::string const& s);
@@ -89,13 +87,13 @@ void set_pointer(TaggedValue* value, Type* type, void* p);
 void set_pointer(TaggedValue* value, void* ptr);
 
 void* get_pointer(TaggedValue* value);
+void* get_pointer(TaggedValue* value, Type* expectedType);
 
 Branch* get_branch_value(TaggedValue* value);
 int as_int(TaggedValue* value);
 float as_float(TaggedValue* value);
 std::string const& as_string(TaggedValue* value);
 bool as_bool(TaggedValue* value);
-void* get_pointer(TaggedValue* value, Type* expectedType);
 Ref& as_ref(TaggedValue* value);
 Type& as_type(TaggedValue* value);
 
