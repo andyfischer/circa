@@ -40,7 +40,6 @@
 #include "term.h"
 #include "term_source_location.h"
 #include "testing.h"
-#include "timer.h"
 #include "token.h"
 #include "token_stream.h"
 #include "type.h"

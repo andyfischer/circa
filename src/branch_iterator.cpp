@@ -1,6 +1,9 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
+#include "branch.h"
+#include "term.h"
+
+#include "branch_iterator.h"
 
 namespace circa {
 

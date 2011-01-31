@@ -1,8 +1,16 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
+#include "branch_iterator.h"
+#include "building.h"
+#include "builtins.h"
 #include "debug_valid_objects.h"
+#include "evaluation.h"
 #include "importing_macros.h"
+#include "parser.h"
+#include "source_repro.h"
+#include "storage.h"
+#include "tagged_value.h"
+#include "term.h"
 
 namespace circa {
 
