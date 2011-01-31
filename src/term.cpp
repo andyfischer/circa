@@ -23,14 +23,12 @@ Term::Term()
 {
     globalID = gNextGlobalID++;
 
-    METRIC_TERMS_CREATED++;
     debug_register_valid_object(this, TERM_OBJECT);
     nestedContents.owningTerm = this;
 }
 
 Term::~Term()
 {
-    METRIC_TERMS_DESTROYED++;
     debug_unregister_valid_object(this);
 }
 

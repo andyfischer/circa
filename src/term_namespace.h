@@ -5,7 +5,6 @@
 #include "common_headers.h"
 
 #include "debug.h"
-#include "metrics.h"
 #include "ref_map.h"
 
 namespace circa {
@@ -25,8 +24,6 @@ struct TermNamespace
     }
     void bind(Term* term, std::string name)
     {
-        METRIC_NAMESPACE_BINDINGS++;
-
         _map[name] = term;
     }
 
@@ -39,8 +36,6 @@ struct TermNamespace
     {
         if (DEBUG_TRAP_NAME_LOOKUP)
             ca_assert(false);
-
-        METRIC_NAMESPACE_LOOKUPS++;
 
         StringToTermMap::const_iterator it = _map.find(name);
         if (it == _map.end())

@@ -163,30 +163,6 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
-    // Show metrics for evaluation
-    if (args[0] == "-m") {
-        Branch branch;
-        parse_script(branch, args[1]);
-
-        // Do a throw-away evaluation, because some initialization happens the
-        // first time through.
-        evaluate_branch(branch);
-
-        METRIC_TERMS_CREATED = 0;
-        METRIC_TERMS_DESTROYED = 0;
-        METRIC_NAMESPACE_LOOKUPS = 0;
-        METRIC_NAMESPACE_BINDINGS = 0;
-
-        evaluate_branch(branch);
-
-        std::cout << "terms_created: " << METRIC_TERMS_CREATED << std::endl;
-        std::cout << "terms_destroyed: " << METRIC_TERMS_CREATED << std::endl;
-        std::cout << "namespace_lookups: " << METRIC_NAMESPACE_LOOKUPS << std::endl;
-        std::cout << "namespace_bindings: " << METRIC_NAMESPACE_BINDINGS << std::endl;
-
-        return 0;
-    }
-
     // Generate cpp headers
     if (args[0] == "-gh") {
         Branch branch;

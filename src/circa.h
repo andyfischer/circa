@@ -24,7 +24,6 @@
 #include "introspection.h"
 #include "invariants.h"
 #include "metaprogramming.h"
-#include "metrics.h"
 #include "names.h"
 #include "parser.h"
 #include "path_expression.h"
