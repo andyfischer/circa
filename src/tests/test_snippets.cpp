@@ -209,6 +209,8 @@ void test_modulo()
 void test_subroutine()
 {
     test_snippet("def f() -> List return([1]) end", "f() == [1]");
+    test_snippet("def f()\n  return\nf()", "");
+    test_snippet("def f()\nf()", "");
 }
 
 #if 0

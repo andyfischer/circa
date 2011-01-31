@@ -2,11 +2,6 @@
 
 BUGS
 
- - this doesn't work:
-     def f()
-       return
-     end
-
  - Plastic no longer reloads scripts when they encounter an error
 
  - Can't use a namespace qualifier on a type name in function declaration
