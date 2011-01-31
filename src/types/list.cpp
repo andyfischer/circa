@@ -757,6 +757,7 @@ namespace list_t {
 List::List()
   : TaggedValue()
 {
+    debug_register_valid_object_ignore_dupe(&LIST_T, TYPE_OBJECT);
     change_type(this, &LIST_T);
 }
 

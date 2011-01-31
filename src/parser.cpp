@@ -1238,12 +1238,15 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
                     ->boolPropOptional("use-as-output", false))
             nameRebind = head->name;
 
+        // copy functionName because fieldName will become invalid after erase_term.
+        std::string functionName = fieldName;
+
         erase_term(fieldNameTerm);
         erase_term(originalFunctionTerm);
 
         Term* result = apply(branch, function, inputs, nameRebind);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
-        result->setStringProp("syntax:functionName", fieldName);
+        result->setStringProp("syntax:functionName", functionName);
         result->setStringProp("syntax:declarationStyle", "member-function-call");
 
         return result;

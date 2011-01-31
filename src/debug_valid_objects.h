@@ -13,9 +13,10 @@ const int BRANCH_OBJECT = 3;
 const int FUNCTION_ATTRS_OBJECT = 4;
 const int TYPE_OBJECT = 5;
 
-#if ENABLE_VALID_OBJECT_CHECKING
+#if CIRCA_VALID_OBJECT_CHECKING
 
 void debug_register_valid_object(void* obj, int type);
+void debug_register_valid_object_ignore_dupe(void* obj, int type);
 void debug_unregister_valid_object(void* obj);
 void debug_assert_valid_object(void* obj, int type);
 
@@ -23,6 +24,7 @@ void debug_assert_valid_object(void* obj, int type);
 
 // No-op these calls
 #define debug_register_valid_object(...)
+#define debug_register_valid_object_ignore_dupe(...)
 #define debug_unregister_valid_object(...)
 #define debug_assert_valid_object(...)
 

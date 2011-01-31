@@ -154,6 +154,11 @@ Term* alloc_term()
     return term;
 }
 
+void dealloc_term(Term* term)
+{
+    delete term;
+}
+
 void assert_term_invariants(Term* t)
 {
     // Make sure the value type matches the declared type.

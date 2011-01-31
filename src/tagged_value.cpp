@@ -17,6 +17,7 @@ TaggedValue::TaggedValue()
 void
 TaggedValue::init()
 {
+    debug_register_valid_object_ignore_dupe(&NULL_TYPE, TYPE_OBJECT);
     value_type = &NULL_TYPE;
     value_data.ptr = 0;
 }
@@ -445,9 +446,9 @@ List* set_list(TaggedValue* value, int size)
 
 void set_type(TaggedValue* value, Type* type)
 {
-    reset(value);
-    change_type(value, &TYPE_T);
+    set_null(value);
     type->refCount++;
+    value->value_type = &TYPE_T;
     value->value_data.ptr = type;
 }
 

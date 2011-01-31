@@ -5,6 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "local_term_list.h"
 #include "references.h"
 #include "ref_list.h"
 #include "tagged_value.h"
@@ -20,6 +21,7 @@ struct UniqueName
     int ordinal;
     UniqueName() : ordinal(0) {}
 };
+
 
 struct Term : TaggedValue
 {
@@ -61,7 +63,7 @@ struct Term : TaggedValue
     int refCount;
 
     // Terms which are using this term as an input.
-    RefList users;
+    LocalTermList users;
 
     // Location in textual source code.
     TermSourceLocation sourceLoc;
@@ -99,6 +101,7 @@ struct Term : TaggedValue
 
 // Allocate a new Term object.
 Term* alloc_term();
+void dealloc_term(Term*);
 
 void assert_term_invariants(Term* t);
 

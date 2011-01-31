@@ -177,7 +177,6 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     term->function = VALUE_FUNC;
     term->type = type;
     change_type(term, type);
-    reset(term);
     update_unique_name(term);
 
     return term;

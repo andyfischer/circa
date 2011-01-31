@@ -37,7 +37,7 @@ void remove_user_reference_on_delete()
 
         set_input(ref2, 0, term1);
         test_assert(term1->refCount == 2);
-        test_assert(ref2->refCount == 3);
+        test_assert(ref2->refCount == 2);
         test_assert(term1->users[0] == ref2);
     }
 

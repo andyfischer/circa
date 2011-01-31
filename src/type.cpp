@@ -156,7 +156,7 @@ Type::Type() :
     refCount(0),
     permanent(false)
 {
-    debug_register_valid_object(this, TYPE_OBJECT);
+    debug_register_valid_object_ignore_dupe(this, TYPE_OBJECT);
 }
 
 Type::~Type()

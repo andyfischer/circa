@@ -1,6 +1,15 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
+#include "branch.h"
+#include "building.h"
+#include "builtins.h"
+#include "debug_valid_objects.h"
+#include "function.h"
+#include "names.h"
+#include "term.h"
+#include "type.h"
+
+#include "refactoring.h"
 
 namespace circa {
 
@@ -48,8 +57,11 @@ void change_type(Term *term, Term *typeTerm)
         return;
 
     // Cascade type inference
-    for (int user=0; user < term->users.length(); user++)
-        possibly_respecialize_type(term->users[user]);
+    for (int user=0; user < term->users.length(); user++) {
+        Term* userTerm = term->users[user];
+        debug_assert_valid_object(userTerm, TERM_OBJECT);
+        possibly_respecialize_type(userTerm);
+    }
 }
 
 void possibly_respecialize_type(Term* term)
