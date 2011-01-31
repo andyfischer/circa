@@ -49,8 +49,6 @@ struct Term : TaggedValue
     int index;
 
     // Code which is nested inside this term. Usually this is empty.
-    // This is a new construct, code is still being refactored to use
-    // this.
     Branch nestedContents;
 
     // A globally unique ID

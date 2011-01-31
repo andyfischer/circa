@@ -49,7 +49,7 @@ bool is_major_branch(Term* term)
 std::string format_global_id(Term* term)
 {
     if (term == NULL)
-        return "<NULL>";
+        return "NULL";
 
     std::stringstream out;
     out << "$" << std::hex << term->globalID;
@@ -71,9 +71,8 @@ std::string branch_namespace_to_string(Branch& branch)
     std::stringstream out;
 
     TermNamespace::iterator it;
-    for (it = branch.names.begin(); it != branch.names.end(); ++it) {
+    for (it = branch.names.begin(); it != branch.names.end(); ++it)
         out << it->first << ": " << format_global_id(it->second) << "\n";
-    }
 
     return out.str();
 }
@@ -235,13 +234,20 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     } else {
         out << " " << term->function->name;
         out << format_global_id(term->function);
-        out << "()";
     }
+
+    // Arguments
+    out << "(";
+    for (int i=0; i < term->numInputs(); i++) {
+        if (i != 0) out << " ";
+        out << format_global_id(term->input(i));
+    }
+    out << ")";
 
     if (term->type == NULL)
         out << " <NULL type>";
     else {
-        out << " " << term->type->name;
+        out << " type:" << term->type->name;
 
         if (prefs->showAllIDs)
             out << format_global_id(term->type);
@@ -250,20 +256,16 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
             out << " vt:" << term->value_type->name;
     }
 
-    if (term->numInputs() > 0) {
-        out << " [";
-
-        for (int i=0; i < term->numInputs(); i++) {
-            if (i != 0) out << " ";
-            out << format_global_id(term->input(i));
-        }
-        out << "]";
-    }
-    out << " " << to_string(term);
+    if (is_value(term))
+        out << " " << to_string((TaggedValue*) term);
 
     TaggedValue* local = get_local_safe(term);
-    if (local != NULL)
-        out << " local:" << local->toString();
+    if (local != NULL) {
+        out << " ";
+        if (is_value(term))
+            out << "local:";
+        out << local->toString();
+    }
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();
