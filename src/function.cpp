@@ -15,7 +15,7 @@ FunctionAttrs::FunctionAttrs()
     checkInvariants(NULL),
     staticTypeQuery(NULL),
     postInputChange(NULL),
-    getRegisterCount(NULL),
+    getOutputCount(NULL),
     assignRegisters(NULL),
     postCompile(NULL)
 {

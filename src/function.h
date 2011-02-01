@@ -14,7 +14,7 @@ struct FunctionAttrs
 {
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
     typedef void (*PostInputChange)(Term*);
-    typedef int (*GetRegisterCount)(Term*);
+    typedef int (*GetOutputCount)(Term*);
     typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
 
@@ -35,7 +35,7 @@ struct FunctionAttrs
     CheckInvariants checkInvariants;
     StaticTypeQueryFunc staticTypeQuery;
     PostInputChange postInputChange;
-    GetRegisterCount getRegisterCount;
+    GetOutputCount getOutputCount;
     AssignRegisters assignRegisters;
     PostCompile postCompile;
 

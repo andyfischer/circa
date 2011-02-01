@@ -1,6 +1,7 @@
 
-Most programming languages try to improve *what* you can express, with Circa we instead
-try to improve the process by which code is created.
+Circa is a programming language designed for live coding. Most programming languages try
+to improve *what* you can express, with Circa we instead try to improve the process by
+which code is created.
 
 Some features of Circa are:
 

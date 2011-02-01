@@ -157,9 +157,9 @@ TaggedValue* get_local(Term* term)
     // TODO: make sure that this list is the right size when building
     // the branch, instead of here.
 
-    term->owningBranch->locals.resize(term->owningBranch->length());
+    term->owningBranch->locals.resize(term->owningBranch->localsCount);
 
-    TaggedValue* local = term->owningBranch->locals[term->index];
+    TaggedValue* local = term->owningBranch->locals[term->localsIndex];
     return local;
 }
 
@@ -188,7 +188,6 @@ void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* resu
 
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
 {
-    branch.locals.resize(branch.length());
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch[i]);
 

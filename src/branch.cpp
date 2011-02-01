@@ -23,6 +23,7 @@ Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
     outputIndex(0),
+    localsCount(0),
     inuse(false)
 {
     debug_register_valid_object((void*) this, BRANCH_OBJECT);

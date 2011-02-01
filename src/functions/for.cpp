@@ -22,7 +22,7 @@ namespace for_function {
             term, token::WHITESPACE);
     }
 
-    int get_register_count(Term* term)
+    int get_output_count(Term* term)
     {
         Branch& contents = term->nestedContents;
         
@@ -48,7 +48,7 @@ namespace for_function {
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         get_function_attrs(FOR_FUNC)->formatSource = formatSource;
-        get_function_attrs(FOR_FUNC)->getRegisterCount = get_register_count;
+        get_function_attrs(FOR_FUNC)->getOutputCount = get_output_count;
         function_t::set_exposed_name_path(FOR_FUNC, "#rebinds_for_outer");
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");

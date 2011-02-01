@@ -3,6 +3,7 @@
 #include "builtins.h"
 #include "circa.h"
 #include "debug_valid_objects.h"
+#include "locals.h"
 #include "names.h"
 #include "parser.h"
 
@@ -57,6 +58,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     post_input_change(result);
 
     update_unique_name(result);
+
+    update_locals_index_for_new_term(result);
 
     return result;
 }
@@ -178,6 +181,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     term->type = type;
     change_type(term, type);
     update_unique_name(term);
+    update_locals_index_for_new_term(term);
 
     return term;
 }

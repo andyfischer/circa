@@ -19,6 +19,7 @@ static unsigned int gNextGlobalID = 1;
 Term::Term()
   : owningBranch(NULL),
     index(0),
+    localsIndex(0),
     refCount(0)
 {
     globalID = gNextGlobalID++;
@@ -42,6 +43,26 @@ int
 Term::numInputs() const
 {
     return this->inputs.length();
+}
+
+const char*
+Term::getName(int index) const
+{
+    if (index == 0)
+        return name.c_str();
+
+    index -= 1;
+
+    if (index >= additionalOutputNames.count())
+        return "";
+
+    return additionalOutputNames[index];
+}
+
+int
+Term::nameCount() const
+{
+    return 1 + additionalOutputNames.count();
 }
 
 std::string

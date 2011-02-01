@@ -6,6 +6,7 @@
 
 #include "branch.h"
 #include "local_term_list.h"
+#include "name_list.h"
 #include "references.h"
 #include "ref_list.h"
 #include "tagged_value.h"
@@ -41,6 +42,9 @@ struct Term : TaggedValue
     // Our name binding.
     std::string name;
 
+    // Names for extra outputs
+    NameList additionalOutputNames;
+
     // A name which is unique across this branch.
     UniqueName uniqueName;
 
@@ -49,6 +53,10 @@ struct Term : TaggedValue
 
     // The index that this term currently holds inside owningBranch
     int index;
+
+    // The location of this term's output in the locals list. If the term has multiple
+    // outputs then this is the first index.
+    int localsIndex;
 
     // Code which is nested inside this term. Usually this is empty.
     Branch nestedContents;
@@ -73,6 +81,9 @@ struct Term : TaggedValue
 
     Term* input(int index) const;
     int numInputs() const;
+
+    const char* getName(int index) const;
+    int nameCount() const;
 
     std::string toString();
 
