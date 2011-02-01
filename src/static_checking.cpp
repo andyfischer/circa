@@ -26,7 +26,7 @@ void check_term_for_static_error(StaticErrorCheck* result, Term* term)
     int funcNumInputs = function_t::num_inputs(term->function);
 
     // Check # of inputs
-    if (!varArgs && (term->inputs.length() != funcNumInputs))
+    if (!varArgs && (term->numInputs() != funcNumInputs))
         return append_static_error(result, term, "wrong_input_count");
 
     // TODO: Errors related to inputs

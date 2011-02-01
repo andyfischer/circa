@@ -70,7 +70,7 @@ static StaticError get_static_error_for_input_index(Term* term, int index)
     if (varArgs)
         effectiveIndex = 0;
 
-    Term* input = term->inputs[index];
+    Term* input = term->input(index);
     bool meta = function_t::get_input_meta(term->function, effectiveIndex);
     bool optional = function_t::get_input_optional(term->function, effectiveIndex);
     Term* type = function_t::get_input_type(term->function, effectiveIndex);
@@ -99,7 +99,7 @@ StaticError get_static_error(Term* term)
     int funcNumInputs = function_t::num_inputs(term->function);
 
     // Check # of inputs
-    if (!varArgs && (term->inputs.length() != funcNumInputs))
+    if (!varArgs && (term->numInputs() != funcNumInputs))
         return SERROR_WRONG_NUMBER_OF_INPUTS;
 
     // Check each input. Make sure:
@@ -107,7 +107,7 @@ StaticError get_static_error(Term* term)
     //  - it has a non-null value
     //  - it has no errors
     //  - it has the correct type
-    for (int input=0; input < term->inputs.length(); input++) {
+    for (int input=0; input < term->numInputs(); input++) {
         StaticError error = get_static_error_for_input_index(term, input);
         if (error != SERROR_NO_ERROR)
             return error;
@@ -155,7 +155,7 @@ std::string get_static_error_message(Term* term)
     case SERROR_WRONG_NUMBER_OF_INPUTS: {
         int funcNumInputs = function_t::num_inputs(term->function);
         out << "Wrong number of inputs for function " << term->function->name
-            << " (found " << term->inputs.length()
+            << " (found " << term->numInputs()
             << ", expected " << funcNumInputs << ")";
         return out.str();
     }
@@ -165,7 +165,7 @@ std::string get_static_error_message(Term* term)
     case SERROR_INPUT_TYPE_ERROR:
     {
         int errorIndex = -1;
-        for (int input=0; input < term->inputs.length(); input++) {
+        for (int input=0; input < term->numInputs(); input++) {
             StaticError error = get_static_error_for_input_index(term, input);
             if (error != SERROR_NO_ERROR)
                 errorIndex = input;

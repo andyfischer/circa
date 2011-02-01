@@ -15,18 +15,27 @@
 
 namespace circa {
 
-struct UniqueName
-{
-    std::string name;
-    std::string base;
-    int ordinal;
-    UniqueName() : ordinal(0) {}
-};
-
-
 struct Term : TaggedValue
 {
-    // Inherited from TaggedValue:
+    struct UniqueName
+    {
+        std::string name;
+        std::string base;
+        int ordinal;
+        UniqueName() : ordinal(0) {}
+    };
+
+    struct Input {
+        Term* term;
+        int outputIndex;
+
+        Input() : outputIndex(0) {}
+        Input(Term* t) : term(t) {}
+    };
+
+    typedef std::vector<Input> InputList;
+
+    // Fields inherited from TaggedValue:
     //   TaggedValue::Data value_data
     //   Type* value_type
 
@@ -34,7 +43,7 @@ struct Term : TaggedValue
     Ref type;
 
     // Input terms
-    LocalTermList inputs;
+    InputList inputs;
 
     // Our function: the thing that takes our inputs and produces a value.
     Ref function;

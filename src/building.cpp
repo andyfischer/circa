@@ -74,9 +74,9 @@ void set_input(Term* term, int index, Term* input)
         previousInput = term->input(index);
 
     while (index >= term->numInputs())
-        term->inputs.append(NULL);
+        term->inputs.push_back(NULL);
 
-    term->inputs.setAt(index, input);
+    term->inputs[index] = Term::Input(input);
 
     // Add 'term' to the user list of 'input'
     if (input != NULL && term != input)
@@ -93,13 +93,11 @@ void set_inputs(Term* term, RefList const& inputs)
 {
     assert_valid_term(term);
 
-    LocalTermList previousInputs = term->inputs;
-
-    //term->inputs = inputs;
+    Term::InputList previousInputs = term->inputs;
 
     term->inputs.resize(inputs.length());
     for (int i=0; i < inputs.length(); i++)
-        term->inputs.setAt(i, inputs[i]);
+        term->inputs[0] = Term::Input(inputs[i]);
 
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
@@ -107,8 +105,8 @@ void set_inputs(Term* term, RefList const& inputs)
             inputs[i]->users.appendUnique(term);
 
     // Check to remove 'term' from user list of any previous inputs
-    for (int i=0; i < previousInputs.length(); i++) {
-        Term* previousInput = previousInputs[i];
+    for (size_t i=0; i < previousInputs.size(); i++) {
+        Term* previousInput = previousInputs[i].term;
         if (previousInput != NULL && !is_actually_using(previousInput, term))
             previousInput->users.remove(term);
     }
@@ -118,7 +116,7 @@ void set_inputs(Term* term, RefList const& inputs)
 
 void insert_input(Term* term, Term* input)
 {
-    term->inputs.insert(0, NULL);
+    term->inputs.insert(term->inputs.begin(), Term::Input(NULL));
     set_input(term, 0, input);
 }
 

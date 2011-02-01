@@ -245,7 +245,7 @@ std::string get_relative_name(Term* location, Term* term)
 
 void update_unique_name(Term* term)
 {
-    UniqueName& name = term->uniqueName;
+    Term::UniqueName& name = term->uniqueName;
 
     if (term->owningBranch == NULL) {
         name.name = term->name;

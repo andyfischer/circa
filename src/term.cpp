@@ -38,13 +38,13 @@ Term::input(int index) const
 {
     if (index >= numInputs())
         return NULL;
-    return this->inputs[index];
+    return this->inputs[index].term;
 }
 
 int
 Term::numInputs() const
 {
-    return this->inputs.length();
+    return this->inputs.size();
 }
 
 void
