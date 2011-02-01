@@ -270,11 +270,8 @@ void subroutine_change_state_type(Term* func, Term* newType)
         for (BranchIterator it(contents); !it.finished(); ++it) {
             Term* term = *it;
 
-            if (term->function == func) {
-                RefList inputs = term->inputs;
-                inputs.prepend(NULL);
-                set_inputs(term, inputs);
-            }
+            if (term->function == func)
+                insert_input(term, NULL);
         }
     }
 }

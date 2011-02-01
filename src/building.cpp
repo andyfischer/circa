@@ -67,14 +67,18 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 void set_input(Term* term, int index, Term* input)
 {
     assert_valid_term(term);
+    assert_valid_term(input);
 
     Ref previousInput = NULL;
     if (index < term->numInputs())
         previousInput = term->input(index);
 
+    while (index >= term->numInputs())
+        term->inputs.append(NULL);
+
     term->inputs.setAt(index, input);
 
-    // Add 'term' to the user list of input
+    // Add 'term' to the user list of 'input'
     if (input != NULL && term != input)
         input->users.appendUnique(term);
 
@@ -89,9 +93,13 @@ void set_inputs(Term* term, RefList const& inputs)
 {
     assert_valid_term(term);
 
-    RefList previousInputs = term->inputs;
+    LocalTermList previousInputs = term->inputs;
 
-    term->inputs = inputs;
+    //term->inputs = inputs;
+
+    term->inputs.resize(inputs.length());
+    for (int i=0; i < inputs.length(); i++)
+        term->inputs.setAt(i, inputs[i]);
 
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
@@ -106,6 +114,12 @@ void set_inputs(Term* term, RefList const& inputs)
     }
 
     post_input_change(term);
+}
+
+void insert_input(Term* term, Term* input)
+{
+    term->inputs.insert(0, NULL);
+    set_input(term, 0, input);
 }
 
 void post_input_change(Term* term)
@@ -140,7 +154,10 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
 {
     ca_assert(original != NULL);
 
-    Term* term = apply(branch, original->function, original->inputs, name);
+    RefList inputs;
+    original->inputsToList(&inputs);
+
+    Term* term = apply(branch, original->function, inputs, name);
     change_type(term, original->type);
     change_type((TaggedValue*) term, original->value_type);
 

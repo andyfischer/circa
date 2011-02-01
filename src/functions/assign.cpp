@@ -69,6 +69,9 @@ namespace assign_function {
         Term* getter = term->input(0);
         Term* desired = term->input(1);
 
+        if (getter == NULL || desired == NULL)
+            return;
+
         while (true) {
             Term* result = write_setter_from_getter(contents, getter, desired);
 

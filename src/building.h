@@ -22,7 +22,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name="
 
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, RefList const& inputs);
-int get_input_relative_scope(Term* term, int index);
+void insert_input(Term* term, Term* input);
 void post_input_change(Term* term);
 
 bool is_actually_using(Term* user, Term* usee);

@@ -34,7 +34,7 @@ struct Term : TaggedValue
     Ref type;
 
     // Input terms
-    RefList inputs;
+    LocalTermList inputs;
 
     // Our function: the thing that takes our inputs and produces a value.
     Ref function;
@@ -81,6 +81,7 @@ struct Term : TaggedValue
 
     Term* input(int index) const;
     int numInputs() const;
+    void inputsToList(RefList* out) const;
 
     const char* getName(int index) const;
     int nameCount() const;

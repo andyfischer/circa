@@ -36,6 +36,8 @@ Term::~Term()
 Term*
 Term::input(int index) const
 {
+    if (index >= numInputs())
+        return NULL;
     return this->inputs[index];
 }
 
@@ -43,6 +45,14 @@ int
 Term::numInputs() const
 {
     return this->inputs.length();
+}
+
+void
+Term::inputsToList(RefList* out) const
+{
+    out->resize(numInputs());
+    for (int i=0; i < numInputs(); i++)
+        out->setAt(i, input(i));
 }
 
 const char*

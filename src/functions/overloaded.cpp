@@ -81,7 +81,9 @@ namespace overloaded_function {
             bool alreadyGenerated = (contents.length() > 0)
                 && contents[0]->function == specializedFunc;
             if (!alreadyGenerated) {
-                apply(contents, specializedFunc, CALLER->inputs);
+                RefList inputs;
+                CALLER->inputsToList(&inputs);
+                apply(contents, specializedFunc, inputs);
                 //change_type(CALLER, contents[0]->type);
             }
             TaggedValue output;
@@ -111,10 +113,12 @@ namespace overloaded_function {
         Branch& contents = term->nestedContents;
         contents.clear();
 
-        Term* specializedFunc = statically_specialize_function(term->function, term->inputs);
+        RefList inputs;
+        term->inputsToList(&inputs);
+        Term* specializedFunc = statically_specialize_function(term->function, inputs);
 
         if (specializedFunc != NULL) {
-            apply(contents, specializedFunc, term->inputs);
+            apply(contents, specializedFunc, inputs);
             change_type(term, contents[0]->type);
         }
     }
@@ -214,7 +218,9 @@ namespace overloaded_function {
 
     void overloaded_func_post_compile(Term* term)
     {
-        setup_overloaded_function(term, term->name, term->inputs);
+        RefList inputs;
+        term->inputsToList(&inputs);
+        setup_overloaded_function(term, term->name, inputs);
     }
 
     void append_overload(Term* overloadedFunction, Term* overload)
