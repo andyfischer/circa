@@ -114,7 +114,8 @@ void test_every_parse_error()
             continue;
         }
 
-        if (count_static_errors(branch) == 0) {
+        if (!has_static_errors(branch)) {
+            dump_branch(branch);
             input.failedToCauseError = true;
             problemCount++;
         }
@@ -123,7 +124,7 @@ void test_every_parse_error()
     if (problemCount > 0) {
         std::cout << "Encountered " << problemCount << " problem";
         std::cout << (problemCount == 1 ? "" : "s");
-        std::cout << " in parser_error_tests:" << std::endl;
+        std::cout << " in parser_error_snippets:" << std::endl;
         for (it = TEST_INPUTS.begin(); it != TEST_INPUTS.end(); ++it) {
             if (it->exceptionThrown)
                 std::cout << "[EXCEPTION]";

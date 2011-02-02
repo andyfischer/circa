@@ -42,7 +42,8 @@ void test_assert_function(Term* term, int line, const char* file)
     if (has_static_error(term)) {
         std::stringstream msg;
         msg << "Compile error on term " << format_global_id(term) << std::endl;
-        msg << get_static_error_message(term) << std::endl;
+        print_static_error(term, msg);
+        msg << std::endl;
         msg << "Occurred in " << file << ", line " << line << std::endl;
         throw std::runtime_error(msg.str());
     }
@@ -80,14 +81,6 @@ void test_assert_function(Branch& branch, int line, const char* file)
             msg << message << std::endl;
             throw std::runtime_error(msg.str());
         }
-    }
-
-    // Old method of checking for static errors:
-    if (has_static_errors(branch)) {
-        std::stringstream msg;
-        msg << "Branch has errors at " << file << ", line " << line << std::endl;
-        msg << get_static_errors_formatted(branch);
-        throw std::runtime_error(msg.str());
     }
 
     StaticErrorCheck staticErrorCheck;

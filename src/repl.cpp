@@ -27,7 +27,9 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
         Term* result = branch[i];
 
         if (has_static_error(result)) {
-            output << "error: " << get_static_error_message(result) << std::endl;
+            output << "error: ";
+            print_static_error(result, output);
+            output << std::endl;
             anyErrors = true;
             break;
         }

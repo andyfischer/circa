@@ -13,6 +13,7 @@
 #include "parser.h"
 #include "repl.h"
 #include "source_repro.h"
+#include "static_checking.h"
 #include "testing.h"
 
 extern "C" int EXPORTED_INT;

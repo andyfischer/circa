@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "evaluation.h"
 #include "introspection.h"
+#include "static_checking.h"
 
 namespace circa {
 

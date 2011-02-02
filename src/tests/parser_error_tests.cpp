@@ -14,7 +14,7 @@ void call_unknown_function()
 
     check_for_static_errors(&result, branch);
 
-    test_equals(result.count(), 1);
+    test_assert(!result.empty());
 }
 
 void call_unknown_namespaced_function()
@@ -26,7 +26,7 @@ void call_unknown_namespaced_function()
 
     check_for_static_errors(&result, branch);
 
-    test_equals(result.count(), 1);
+    test_assert(!result.empty());
 }
 
 void register_tests()
