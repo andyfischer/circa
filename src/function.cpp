@@ -423,6 +423,8 @@ Term* function_get_specialized_output_type(Term* function, Term* call)
     Term* outputType = function_t::get_output_type(function);
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(call);
+    if (outputType == NULL)
+        outputType = ANY_TYPE;
     return outputType;
 }
 
@@ -430,11 +432,6 @@ void function_set_use_input_as_output(Term* function, int index, bool value)
 {
     Term* placeholder = function_t::get_input_placeholder(function, index);
     placeholder->setBoolProp("use-as-output", value);
-}
-
-void set_specialize_type(Term* function, SpecializeTypeFunc st)
-{
-    function_t::get_specialize_type(function) = st;
 }
 
 bool function_can_rebind_input(Term* function, int index)
@@ -458,6 +455,19 @@ Term* function_get_input_type(Term* function, int index)
     if (function_t::get_variable_args(function))
         index = 0;
     return function_t::get_input_placeholder(function, index)->type;
+}
+
+Term* function_get_output_type(Term* function, int index)
+{
+    if (index == 0)
+        return get_function_attrs(function)->outputType;
+
+    // Special handling for multiple outputs, this might get normalized.
+    int reboundInput = index - 1;
+    if (function_can_rebind_input(function, reboundInput))
+        return function_get_input_type(function, reboundInput);
+    else
+        return VOID_TYPE;
 }
 
 bool is_native_function(Term* func)

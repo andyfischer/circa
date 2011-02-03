@@ -174,6 +174,9 @@ Type* unbox_type(Term* type);
 Type* unbox_type(TaggedValue* val);
 Type* declared_type(Term* term);
 
+Term* get_output_type(Term* term, int outputIndex);
+Term* get_type_of_input(Term* term, int inputIndex);
+
 bool value_fits_type(TaggedValue* value, Type* type);
 bool term_output_always_satisfies_type(Term* term, Type* type);
 bool term_output_never_satisfies_type(Term* term, Type* type);

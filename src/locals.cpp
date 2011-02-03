@@ -9,31 +9,36 @@
 
 namespace circa {
 
-int get_number_of_outputs(Term* term)
+int get_output_count(Term* term)
 {
     if (!FINISHED_BOOTSTRAP)
         return 1;
 
     // check if the function has overridden getOutputCount
-    FunctionAttrs* attrs = get_function_attrs(term->function);
     FunctionAttrs::GetOutputCount getOutputCount = NULL;
+
+    if (term->function == NULL)
+        return 1;
+
+    FunctionAttrs* attrs = get_function_attrs(term->function);
+
+    if (attrs == NULL)
+        return 1;
     
-    if (attrs != NULL)
-        getOutputCount = attrs->getOutputCount;
+    getOutputCount = attrs->getOutputCount;
 
-    if (getOutputCount != NULL) {
+    if (getOutputCount != NULL)
         return getOutputCount(term);
-    }
 
-    // Default behavior
-    return 1;
+    // Default behavior, if FunctionAttrs was found.
+    return attrs->outputCount;
 }
     
 void update_locals_index_for_new_term(Term* term)
 {
     Branch* branch = term->owningBranch;
 
-    int numLocals = get_number_of_outputs(term);
+    int numLocals = get_output_count(term);
 
     if (numLocals > 0) {
         term->localsIndex = branch->localsCount;

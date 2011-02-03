@@ -3,6 +3,7 @@
 #include "evaluation.h"
 #include "circa.h"
 #include "importing_macros.h"
+#include "locals.h"
 
 namespace circa {
 
@@ -105,7 +106,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     inputs.resize(numInputs);
 
     for (int i=0; i < numInputs; i++) {
-        TaggedValue* input = get_input(context, caller, i);
+        TaggedValue* input = get_input(caller, i);
         if (input == NULL)
             continue;
 
@@ -138,18 +139,17 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     swap(&context->currentScopeState, &prevScopeState);
 
     // Write output
-    TaggedValue* outputDest = get_output(context, caller);
+    TaggedValue* outputDest = get_output(caller, 0);
     if (outputDest != NULL)
         swap(outputs[0], outputDest);
 
     // Write extra outputs
-    Branch& outerBranch  = *caller->owningBranch;
-    for (int index=1; ; index++) {
-        Term* extraOutput = outerBranch[caller->index + index];
-        if (extraOutput == NULL || extraOutput->function != ADDITIONAL_OUTPUT_FUNC)
-            break;
-        copy(outputs[index], get_local(extraOutput));
-    }
+    ca_assert(outputs.length() == get_output_count(caller));
+
+    //std::cout << "finished sub " << caller->function->name << ", outputs = " << outputs.toString() << std::endl;
+
+    for (int i=1; i < outputs.length(); i++)
+        copy(outputs[i], get_output(caller, i));
 }
 
 bool is_subroutine(Term* term)

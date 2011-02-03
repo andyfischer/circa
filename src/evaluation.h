@@ -64,12 +64,13 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 
 void evaluate_minimum(EvalContext* context, Term* term);
 
-TaggedValue* get_input(EvalContext* cxt, Term* term, int index);
-TaggedValue* get_output(EvalContext* cxt, Term* term);
+TaggedValue* get_input(Term* term, int index);
+TaggedValue* get_output(Term* term, int outputIndex);
 TaggedValue* get_extra_output(Term* term, int index);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
+TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);
-TaggedValue* get_local_safe(Term* term);
+TaggedValue* get_local_safe(Term* term, int outputIndex);
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);

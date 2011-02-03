@@ -527,12 +527,13 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         while (tokens.nextIs(PLUS)) {
             tokens.consume(PLUS);
             std::string qualifierName = tokens.consume(IDENTIFIER);
+
             // TODO: store syntax hint
             if (qualifierName == "ignore_error") {
                 input->setBoolProp("ignore_error", true);
             } else if (qualifierName == "optional") {
                 input->setBoolProp("optional", true);
-            } else if (qualifierName == "output") {
+            } else if (qualifierName == "output" || qualifierName == "out") {
                 input->setBoolProp("output", true);
                 attrs->outputCount += 1;
             } else if (qualifierName == "multiple") {
@@ -1304,7 +1305,7 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
     Term* result = NULL;
 
-    // Check if 'function' is a get_field term. If so, parse this as a member function call.
+    // Check if 'function' is a get_field term. If so, parse this as a member function c
     if (function->function == GET_FIELD_FUNC) {
         result = member_function_call(branch, function, arguments, originalName);
 
@@ -1322,7 +1323,6 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
 
         if (result->function->name != originalName)
             result->setStringProp("syntax:functionName", originalName);
-
     } else {
 
         result = apply(branch, function, arguments);
@@ -1332,6 +1332,55 @@ Term* function_call(Branch& branch, Term* function, TokenStream& tokens)
     }
 
     inputHints.apply(result);
+
+    return result;
+}
+
+Term* function_call2(Branch& branch, Term* function, TokenStream& tokens)
+{
+    int startPosition = tokens.getPosition();
+    
+    Term* originalFunction = function;
+    std::string originalName = function->name;
+
+    Term* result = NULL;
+
+    result = apply(branch, function, RefList());
+
+    tokens.consume(LPAREN);
+    int index = 0;
+    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
+
+        std::string preWhitespace = possible_whitespace_or_newline(tokens);
+        if (preWhitespace != "")
+            set_input_syntax_hint(result, index, "preWhitespace", preWhitespace);
+
+        if (lookahead_match_rebind_argument(tokens)) {
+            tokens.consume(AMPERSAND);
+            set_input_syntax_hint(result, index, "rebindInput", "t");
+        }
+
+        // TODO: Need to save the identifier used
+        Term* input = infix_expression(branch, tokens);
+
+        std::string postWhitespace = possible_whitespace_or_newline(tokens);
+        if (tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+            postWhitespace += tokens.consume();
+        if (postWhitespace != "")
+            set_input_syntax_hint(result, index, "postWhitespace", postWhitespace);
+
+        set_input2(result, index, input, 0);
+
+        index++;
+    }
+    if (!tokens.nextIs(RPAREN))
+        return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+    tokens.consume(RPAREN);
+
+    if (result->function->name != originalName)
+        result->setStringProp("syntax:functionName", originalName);
+
+    post_input_change(result);
 
     return result;
 }

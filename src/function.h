@@ -106,7 +106,6 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
         RefList const& overloads/*=RefList()*/);
 Term* function_get_specialized_output_type(Term* function, Term* call);
 void function_set_use_input_as_output(Term* function, int index, bool value);
-void set_specialize_type(Term* function, SpecializeTypeFunc st);
 
 // Returns whether the given function can rebind the input at 'index'
 bool function_can_rebind_input(Term* function, int index);
@@ -115,6 +114,7 @@ bool function_can_rebind_input(Term* function, int index);
 bool function_call_rebinds_input(Term* term, int index);
 
 Term* function_get_input_type(Term* function, int index);
+Term* function_get_output_type(Term* function, int index);
 
 // Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(Term* function);

@@ -4,6 +4,7 @@
 
 #include "circa.h"
 #include "debug_valid_objects.h"
+#include "locals.h"
 
 namespace circa {
 
@@ -241,9 +242,27 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     for (int i=0; i < term->numInputs(); i++) {
         if (i != 0) out << " ";
         out << format_global_id(term->input(i));
+        out << "#" << term->inputs[i].outputIndex;
     }
     out << ")";
 
+    int outputCount = get_output_count(term);
+
+    out << " -> (";
+
+    if (term->function != NULL) {
+        for (int i=0; i < outputCount; i++) {
+            if (i != 0) out << ", ";
+            Term* type = function_get_output_type(term->function, i);
+            if (type == NULL)
+                out << "<NULL type>";
+            else
+                out << type->name;
+        }
+    }
+    out << ")";
+
+    #if 0
     if (term->type == NULL)
         out << " <NULL type>";
     else {
@@ -255,10 +274,23 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         if (unbox_type(term->type) != term->value_type)
             out << " vt:" << term->value_type->name;
     }
+    #endif
 
     if (is_value(term))
-        out << " " << to_string((TaggedValue*) term);
+        out << " val:" << to_string((TaggedValue*) term);
 
+    out << " locals:[";
+    for (int i=0; i < outputCount; i++) {
+        if (i != 0) out << ", ";
+        TaggedValue* local = get_local_safe(term, i);
+        if (local == NULL)
+            out << "<NULL>";
+        else
+            out << local->toString();
+    }
+    out << "]";
+
+    #if 0
     TaggedValue* local = get_local_safe(term);
     if (local != NULL) {
         out << " ";
@@ -266,6 +298,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
             out << "local:";
         out << local->toString();
     }
+    #endif
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();

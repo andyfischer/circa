@@ -21,6 +21,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name="
         bool copyBranches=true);
 
 void set_input(Term* term, int index, Term* input);
+void set_input2(Term* term, int index, Term* input, int outputIndex);
 void set_inputs(Term* term, RefList const& inputs);
 void insert_input(Term* term, Term* input);
 void post_input_change(Term* term);

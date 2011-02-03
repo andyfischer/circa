@@ -37,7 +37,7 @@ namespace if_block_function {
         //append_phrase(source, "end", term, phrase_type::KEYWORD);
     }
 
-    int get_output_count(Term* term)
+    int getOutputCount(Term* term)
     {
         Branch& contents = term->nestedContents;
 
@@ -53,7 +53,7 @@ namespace if_block_function {
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         get_function_attrs(IF_BLOCK_FUNC)->formatSource = formatSource;
-        get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = get_output_count;
+        get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
     }
 }

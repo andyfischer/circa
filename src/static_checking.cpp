@@ -170,7 +170,7 @@ void print_static_error(StaticErrorCheck* result, int index, std::ostream& out)
 void print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out)
 {
     int count = result->count();
-    out << count << "static error";
+    out << count << " static error";
     if (count != 1) out << "s";
     out << ":\n";
 

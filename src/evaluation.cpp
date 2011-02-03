@@ -121,22 +121,22 @@ void evaluate_branch(Branch& branch)
     evaluate_branch(&context, branch);
 }
 
-TaggedValue* get_input(EvalContext* cxt, Term* term, int index)
+TaggedValue* get_input(Term* term, int index)
 {
     Term* input = term->input(index);
     if (input == NULL)
         return NULL;
-    return get_local(input);
+    return get_local(input, term->inputs[index].outputIndex);
 }
 
-TaggedValue* get_output(EvalContext* cxt, Term* term)
+TaggedValue* get_output(Term* term, int outputIndex)
 {
-    return get_local(term);
+    return get_local(term, outputIndex);
 }
 
 TaggedValue* get_extra_output(Term* term, int index)
 {
-    return get_local(term->owningBranch->get(term->index + 1 + index));
+    return get_output(term, index + 1);
 }
 
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
@@ -146,28 +146,34 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
         ca_assert(currentScopeState != NULL);
         return currentScopeState->insert(term->uniqueName.name.c_str());
     } else {
-        return get_input(cxt, term, 0);
+        return get_input(term, 0);
     }
+}
+
+TaggedValue* get_local(Term* term, int outputIndex)
+{
+    ca_assert(term->owningBranch != NULL);
+
+    // Make sure Branch.locals has the right size.
+    //
+    // TODO: Do this check earlier instead of here.
+
+    term->owningBranch->locals.resize(term->owningBranch->localsCount);
+
+    TaggedValue* local = term->owningBranch->locals[term->localsIndex + outputIndex];
+    return local;
 }
 
 TaggedValue* get_local(Term* term)
 {
-    ca_assert(term->owningBranch != NULL);
-
-    // TODO: make sure that this list is the right size when building
-    // the branch, instead of here.
-
-    term->owningBranch->locals.resize(term->owningBranch->localsCount);
-
-    TaggedValue* local = term->owningBranch->locals[term->localsIndex];
-    return local;
+    return get_local(term, 0);
 }
 
-TaggedValue* get_local_safe(Term* term)
+TaggedValue* get_local_safe(Term* term, int outputIndex)
 {
     if (term->owningBranch == NULL)
         return NULL;
-    return get_local(term);
+    return get_local(term, outputIndex);
 }
 
 Dict* get_current_scope_state(EvalContext* cxt)

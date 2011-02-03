@@ -30,7 +30,8 @@ struct Term : TaggedValue
         int outputIndex;
 
         Input() : outputIndex(0) {}
-        Input(Term* t) : term(t) {}
+        Input(Term* t) : term(t), outputIndex(0) {}
+        Input(Term* t, int i) : term(t), outputIndex(i) {}
     };
 
     typedef std::vector<Input> InputList;

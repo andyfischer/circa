@@ -12,7 +12,7 @@ namespace copy_function {
 
     Term* specializeType(Term* caller)
     {
-        return caller->input(0)->type;
+        return get_type_of_input(caller, 0);
     }
 
     void formatSource(StyledSource* source, Term* term)

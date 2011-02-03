@@ -48,7 +48,7 @@ namespace include_function {
         EvalContext context;
         evaluate_minimum(&context, inputTerm);
 
-        TaggedValue *input = get_input(&context, term, 0);
+        TaggedValue *input = get_input(term, 0);
 
         if (!is_string(input))
             return;

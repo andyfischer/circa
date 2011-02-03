@@ -21,7 +21,7 @@ namespace instance_function {
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        set_specialize_type(kernel["instance"], specializeType);
+        get_function_attrs(kernel["instance"])->specializeType = specializeType;
     }
 }
 }

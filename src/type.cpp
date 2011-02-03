@@ -169,6 +169,24 @@ Type* declared_type(Term* term)
     return unbox_type(term->type);
 }
 
+Term* get_output_type(Term* term, int outputIndex)
+{
+    if (outputIndex == 0)
+        return term->type;
+
+    return function_get_output_type(term->function, outputIndex);
+}
+
+Term* get_type_of_input(Term* term, int inputIndex)
+{
+    if (inputIndex >= term->numInputs())
+        return NULL;
+    if (term->input(inputIndex) == NULL)
+        return NULL;
+    int outputIndex = term->inputs[inputIndex].outputIndex;
+    return get_output_type(term->input(inputIndex), outputIndex);
+}
+
 Type& as_type(Term *term)
 {
     ca_assert(unbox_type(term) != NULL);

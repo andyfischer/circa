@@ -64,6 +64,31 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     return result;
 }
 
+void set_input2(Term* term, int index, Term* input, int outputIndex)
+{
+    assert_valid_term(term);
+    assert_valid_term(input);
+
+    Ref previousInput = NULL;
+    if (index < term->numInputs())
+        previousInput = term->input(index);
+
+    while (index >= term->numInputs())
+        term->inputs.push_back(NULL);
+
+    term->inputs[index] = Term::Input(input, outputIndex);
+
+    // Add 'term' to the user list of 'input'
+    if (input != NULL && term != input)
+        input->users.appendUnique(term);
+
+    // Check if we should remove 'term' from the user list of previousInput
+    if (previousInput != NULL && !is_actually_using(previousInput, term))
+        previousInput->users.remove(term);
+
+    // Don't do post_input_change here, caller must call it.
+}
+
 void set_input(Term* term, int index, Term* input)
 {
     assert_valid_term(term);
@@ -374,22 +399,24 @@ void post_compile_term(Term* term)
 
     // Default behavior for postCompile..
     
-    // If the function has multiple outputs, then create additional_output terms.
+    // If the function has multiple outputs, and any of these outputs have names,
+    // then copy them to named terms. This is a workaround until we can support
+    // terms with multiple output names.
     Branch& outerBranch = *term->owningBranch;
     int additionalOutputTerms = 0;
     for (int i=0; i < term->numInputs(); i++) {
         if (function_can_rebind_input(term->function, i)) {
-            Term* output = apply(outerBranch, ADDITIONAL_OUTPUT_FUNC, RefList());
-            additionalOutputTerms++;
-
-            change_type(output, function_get_input_type(term->function, i));
-
-            // make sure these terms occur immediately after
-            ca_assert(output->index == term->index + additionalOutputTerms);
-
             if (function_call_rebinds_input(term, i)
                     && term->input(i) != NULL
                     && term->input(i)->name != "") {
+
+                std::string name = term->input(i)->name;
+
+                Term* output = apply(outerBranch, COPY_FUNC, RefList(), name);
+                set_input2(output, 0, term, i + 1);
+                additionalOutputTerms++;
+
+                possibly_respecialize_type(output);
                 outerBranch.bindName(output, term->input(i)->name);
             }
         }

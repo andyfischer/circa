@@ -22,7 +22,7 @@ namespace alias_function {
     void setup(Branch& kernel)
     {
         ALIAS_FUNC = import_function(kernel, alias, "alias(any) -> any");
-        set_specialize_type(ALIAS_FUNC, specializeType);
+        get_function_attrs(ALIAS_FUNC)->specializeType = specializeType;
         hide_from_docs(ALIAS_FUNC);
     }
 }
