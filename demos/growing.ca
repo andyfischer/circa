@@ -5,7 +5,7 @@ desired_window_size = [480 600]
 def interp(number progress, number e) -> number
   return min(progress / e, 1.0)
 
-def tree_segment(Point base, number direction, number width, number depth, List leaves +output)
+def tree_segment(Point base, number direction, number width, number depth, List leaves +out)
   jitter = (seed() - .5) *.05
   max_length = 20 + 30 * seed()
   age = 1.0 + elapsed()
