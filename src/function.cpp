@@ -459,8 +459,13 @@ Term* function_get_input_type(Term* function, int index)
 
 Term* function_get_output_type(Term* function, int index)
 {
+    FunctionAttrs* attrs = get_function_attrs(function);
+
+    if (attrs == NULL)
+        return ANY_TYPE;
+
     if (index == 0)
-        return get_function_attrs(function)->outputType;
+        return attrs->outputType;
 
     // Special handling for multiple outputs, this might get normalized.
     int reboundInput = index - 1;

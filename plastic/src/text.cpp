@@ -24,10 +24,10 @@ struct FontRef
 
     FontRef() : ttfFont(NULL) {}
 
-    static TypeRef singleton;
+    static Type* singleton;
 };
 
-TypeRef FontRef::singleton;
+Type* FontRef::singleton;
 
 struct Font : public circa::TaggedValue
 {
@@ -97,10 +97,10 @@ struct RenderedText : public TaggedValue
     std::string const& text() { return getIndex(4)->asString(); }
     TaggedValue* textContainer() { return getIndex(4); }
 
-    static TypeRef singleton;
+    static Type* singleton;
 };
 
-TypeRef RenderedText::singleton;
+Type* RenderedText::singleton;
 
 CA_FUNCTION(render_text)
 {
