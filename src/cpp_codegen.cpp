@@ -27,7 +27,7 @@ void write_value(CppWriter& writer, Term* term)
 
 void write_function(CppWriter& writer, Term* term)
 {
-    write_type_name(writer, function_t::get_output_type(term));
+    write_type_name(writer, function_get_output_type(term, 0));
     writer.write(" ");
     writer.write(term->name);
     writer.write("(");

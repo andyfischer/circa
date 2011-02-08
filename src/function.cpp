@@ -90,11 +90,11 @@ namespace function_t {
 
         out << ")";
 
-        if (function_t::get_output_type(term) != VOID_TYPE) {
+        if (function_get_output_type(term, 0) != VOID_TYPE) {
             out << term->stringPropOptional("syntax:whitespacePreColon", "");
             out << "->";
             out << term->stringPropOptional("syntax:whitespacePostColon", " ");
-            out << function_t::get_output_type(term)->name;
+            out << function_get_output_type(term, 0)->name;
         }
 
         return out.str();
@@ -143,13 +143,13 @@ namespace function_t {
 
         append_phrase(source, ")", term, token::LPAREN);
 
-        if (function_t::get_output_type(term) != VOID_TYPE) {
+        if (function_get_output_type(term, 0) != VOID_TYPE) {
             append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
                     term, token::WHITESPACE);
             append_phrase(source, "->", term, phrase_type::UNDEFINED);
             append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
                     term, token::WHITESPACE);
-            append_phrase(source, function_t::get_output_type(term)->name,
+            append_phrase(source, function_get_output_type(term, 0)->name,
                     term, phrase_type::TYPE_NAME);
         }
     }
@@ -186,12 +186,6 @@ namespace function_t {
     std::string const& get_name(Term* function)
     {
         return get_function_attrs(function)->name;
-    }
-
-    Term* get_output_type(Term* function)
-    {
-        if (!is_function(function)) return ANY_TYPE;
-        return get_function_attrs(function)->outputType;
     }
 
     bool get_variable_args(Term* function)
@@ -420,7 +414,7 @@ Term* function_get_specialized_output_type(Term* function, Term* call)
 {
     if (!is_function(function))
         return ANY_TYPE;
-    Term* outputType = function_t::get_output_type(function);
+    Term* outputType = function_get_output_type(function, 0);
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(call);
     if (outputType == NULL)
@@ -465,12 +459,14 @@ Term* function_get_output_type(Term* function, int index)
         return ANY_TYPE;
 
     if (index == 0)
-        return attrs->outputType;
+        return attrs->outputTypes[0];
+
+    // TODO: use outputTypes
 
     // Special handling for multiple outputs, this might get normalized.
-    int reboundInput = index - 1;
-    if (function_can_rebind_input(function, reboundInput))
-        return function_get_input_type(function, reboundInput);
+    int extraOutputIndex = index - 1;
+    if (function_can_rebind_input(function, extraOutputIndex))
+        return function_get_input_type(function, extraOutputIndex);
     else
         return VOID_TYPE;
 }

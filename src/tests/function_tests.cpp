@@ -19,8 +19,8 @@ void create()
     test_assert(function_t::get_name(func) == "mysub");
 
     test_assert(function_t::num_inputs(func) == 1);
-    test_assert(function_t::get_input_type(func, 0) == INT_TYPE);
-    test_assert(function_t::get_output_type(func) == STRING_TYPE);
+    test_assert(function_get_input_type(func, 0) == INT_TYPE);
+    test_assert(function_get_output_type(func, 0) == STRING_TYPE);
 }
 
 void test_is_callable()

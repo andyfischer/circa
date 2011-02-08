@@ -10,6 +10,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "introspection.h"
+#include "locals.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -33,16 +34,28 @@ void evaluate_single_term(EvalContext* context, Term* term)
     #endif
 
     #if CIRCA_ALWAYS_TYPE_CHECK_OUTPUTS
-    {
-        Type* outputType = unbox_type(term->type);
-        TaggedValue* output = get_local(term);
+    if (!context->errorOccurred) {
+        for (int i=0; i < get_output_count(term); i++) {
 
-        if (!context->errorOccurred && !value_fits_type(output, outputType)) {
+            // even more temporary:
+            if (i > 0)
+                break;
+
+            // temp exception:
+            if (i > 0 && (term->function == FOR_FUNC || term->function == IF_BLOCK_FUNC))
+                continue;
+
+            Type* outputType = unbox_type(get_output_type(term, i));
+            TaggedValue* output = get_output(term, i);
+
             std::stringstream msg;
-            msg << "Function " << term->function->name << " produced output "
-                << output->toString() << " which doesn't fit output type "
-                << outputType->name;
-            internal_error(msg.str());
+            if (!value_fits_type(output, outputType)) {
+                msg << "Function " << term->function->name << " produced output "
+                    << output->toString() << " (in index " << i << ")"
+                    << " which doesn't fit output type "
+                    << outputType->name;
+                internal_error(msg.str());
+            }
         }
     }
     #endif

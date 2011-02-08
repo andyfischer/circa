@@ -28,10 +28,10 @@ void update_output_type()
     Branch branch;
     Term* f1 = branch.compile("def f1() -> int return 0");
     Term* f = overloaded_function::create_overloaded_function(branch, "f", RefList(f1));
-    test_assert(function_t::get_output_type(f) == INT_TYPE);
+    test_assert(function_get_output_type(f, 0) == INT_TYPE);
     Term* f2 = branch.compile("def f2() -> string return ''");
     overloaded_function::append_overload(f, f2);
-    test_assert(function_t::get_output_type(f) != INT_TYPE);
+    test_assert(function_get_output_type(f, 0) != INT_TYPE);
 }
 
 void test_specialize_type()

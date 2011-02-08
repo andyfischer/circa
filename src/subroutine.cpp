@@ -27,7 +27,7 @@ Term* get_subroutine_input_placeholder(Branch& contents, int index)
 
 Term* get_subroutine_output_type(Branch& contents)
 {
-    return as_function_attrs(contents[0]).outputType;
+    return as_function_attrs(contents[0]).outputTypes[0];
 }
 
 void evaluate_subroutine_internal(EvalContext* context, Term* caller,

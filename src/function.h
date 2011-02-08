@@ -19,7 +19,7 @@ struct FunctionAttrs
     typedef void (*PostCompile)(Term*);
 
     std::string name;
-    Ref outputType;
+    RefList outputTypes;
     Ref implicitStateType;
     bool variableArgs;
     std::string exposedNamePath;
@@ -61,7 +61,6 @@ namespace function_t {
 
     // accessors
     std::string const& get_name(Term* function);
-    Term* get_output_type(Term* function);
     bool get_variable_args(Term* function);
     Term* get_input_placeholder(Term* function, int index);
     Term* get_input_type(Term* function, int index);

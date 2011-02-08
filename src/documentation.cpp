@@ -56,7 +56,7 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
 
     out << "{\"name\":\"" << func->name << "\"";
     out << ", \"function\":true";
-    out << ", \"return_type\": \"" << function_t::get_output_type(func)->name << "\"";
+    out << ", \"return_type\": \"" << function_get_output_type(func, 0)->name << "\"";
     out << ", \"declaration\": \"" << header << "\"";
     //escape_string_for_json(get_term_source(func), out);
     out << ", \"comments\": \"";

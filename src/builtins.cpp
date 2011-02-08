@@ -236,10 +236,10 @@ void post_initialize_primitive_types(Branch& kernel)
     initialize_function(VALUE_FUNC);
 
     FunctionAttrs* attrs = get_function_attrs(VALUE_FUNC);
-    attrs->outputType = ANY_TYPE;
+    attrs->outputTypes.setAt(0, ANY_TYPE);
     attrs->evaluate = value_function::evaluate;
 
-    ca_assert(function_t::get_output_type(VALUE_FUNC) == ANY_TYPE);
+    ca_assert(function_get_output_type(VALUE_FUNC, 0) == ANY_TYPE);
 }
 
 void pre_setup_types(Branch& kernel)

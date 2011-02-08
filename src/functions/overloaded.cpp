@@ -172,7 +172,7 @@ namespace overloaded_function {
                 variableArgs = true;
             if (function_t::get_variable_args(overload))
                 variableArgs = true;
-            outputTypes.append(function_t::get_output_type(overload));
+            outputTypes.append(function_get_output_type(overload, 0));
         }
 
         Branch& result = term->nestedContents;
@@ -182,7 +182,7 @@ namespace overloaded_function {
             apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
         Term* outputType = find_common_type(outputTypes);
         FunctionAttrs* attrs = get_function_attrs(term);
-        attrs->outputType = outputType;
+        attrs->outputTypes.setAt(0, outputType);
         attrs->variableArgs = variableArgs;
     }
 

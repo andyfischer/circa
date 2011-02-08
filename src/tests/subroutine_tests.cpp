@@ -148,7 +148,7 @@ void specialization_to_output_type()
     Branch branch;
     Term* a = branch.compile("def a() -> Point return([1 2]) end");
 
-    test_assert(function_t::get_output_type(a)->name == "Point");
+    test_assert(function_get_output_type(a, 0)->name == "Point");
 
     // Make sure that the return value is preserved. This had a bug too
     TaggedValue* call = branch.eval("a()");

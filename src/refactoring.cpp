@@ -113,7 +113,7 @@ void rewrite(Term* term, Term* function, RefList const& inputs)
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
-    Term* outputType = function_t::get_output_type(function);
+    Term* outputType = function_get_output_type(function, 0);
 
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(term);

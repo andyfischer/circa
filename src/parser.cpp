@@ -574,7 +574,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    attrs->outputType = outputType;
+    attrs->outputTypes.setAt(0, outputType);
 
     //if (!tokens.nextNonWhitespaceIs(NEWLINE))
     //    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
