@@ -93,6 +93,7 @@ FunctionAttrs* get_function_attrs(Term* func);
 std::string get_placeholder_name_for_index(int index);
 
 void initialize_function(Term* func);
+void finish_parsing_function_header(Term* func);
 
 // Returns whether this term can be called as a function
 bool is_callable(Term* term);

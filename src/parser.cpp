@@ -535,7 +535,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
                 input->setBoolProp("optional", true);
             } else if (qualifierName == "output" || qualifierName == "out") {
                 input->setBoolProp("output", true);
-                attrs->outputCount += 1;
             } else if (qualifierName == "multiple") {
                 attrs->variableArgs = true;
             } else {
@@ -555,8 +554,9 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(result, tokens, startPosition);
-
     tokens.consume(RPAREN);
+
+    finish_parsing_function_header(result);
 
     // Output type
     Term* outputType = VOID_TYPE;

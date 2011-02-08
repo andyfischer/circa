@@ -177,6 +177,11 @@ Term* get_output_type(Term* term, int outputIndex)
     return function_get_output_type(term->function, outputIndex);
 }
 
+Term* get_output_type(Term* term)
+{
+    return get_output_type(term, 0);
+}
+
 Term* get_type_of_input(Term* term, int inputIndex)
 {
     if (inputIndex >= term->numInputs())

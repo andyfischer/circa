@@ -338,6 +338,26 @@ void initialize_function(Term* func)
     hide_from_source(attributesTerm);
 }
 
+void finish_parsing_function_header(Term* func)
+{
+    // Called by parser when we finish reading this function's list of inputs.
+    //
+    // Here we'll look at every input declared as +out, and we'll update the function's
+    // outputTypes and outputCount.
+
+    FunctionAttrs* attrs = get_function_attrs(func);
+    attrs->outputCount = 1;
+    attrs->outputTypes.resize(1);
+
+    for (int i=0; i < function_t::num_inputs(func); i++) {
+        Term* input = function_t::get_input_placeholder(func, i);
+        if (input->boolPropOptional("output", false)) {
+            attrs->outputCount++;
+            attrs->outputTypes.append(get_output_type(input));
+        }
+    }
+}
+
 bool is_callable(Term* term)
 {
     return (term->type == FUNCTION_TYPE
