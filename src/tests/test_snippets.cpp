@@ -519,6 +519,26 @@ void test_subroutine_multiple_outputs()
     test_snippet("def f(int a, int b, int c +out) end; f(1 2 3)", "");
 }
 
+void test_recursion_and_multiple_outputs()
+{
+    test_snippet(
+        "def tree(int depth, List leaves +out)"
+        "  leaves.append(depth)"
+        
+        "  if depth >= 3"
+        "    return;"
+        "  end"
+
+        "  tree(depth + 1, &leaves) "
+        "  tree(depth + 1, &leaves) "
+        "end "
+        "leaves = [] "
+        "tree(0, &leaves)",
+
+        "leaves == [0, 1, 2, 3, 3, 2, 3, 3, 1, 2, 3, 3, 2, 3, 3]"
+        );
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -554,6 +574,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_namespace);
     REGISTER_TEST_CASE(test_snippets::test_swap);
     REGISTER_TEST_CASE(test_snippets::test_subroutine_multiple_outputs);
+    REGISTER_TEST_CASE(test_snippets::test_recursion_and_multiple_outputs);
 }
 
 } // namespace test_snippets

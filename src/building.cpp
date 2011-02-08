@@ -403,7 +403,7 @@ void post_compile_term(Term* term)
     // then copy them to named terms. This is a workaround until we can support
     // terms with multiple output names.
     Branch& outerBranch = *term->owningBranch;
-    int additionalOutputTerms = 0;
+    int outputIndex = 0;
     for (int i=0; i < term->numInputs(); i++) {
         if (function_can_rebind_input(term->function, i)) {
             if (function_call_rebinds_input(term, i)
@@ -413,12 +413,12 @@ void post_compile_term(Term* term)
                 std::string name = term->input(i)->name;
 
                 Term* output = apply(outerBranch, COPY_FUNC, RefList(), name);
-                set_input2(output, 0, term, i + 1);
-                additionalOutputTerms++;
+                set_input2(output, 0, term, outputIndex + 1);
 
                 possibly_respecialize_type(output);
                 outerBranch.bindName(output, term->input(i)->name);
             }
+            outputIndex++;
         }
     }
 }

@@ -478,6 +478,8 @@ Term* function_get_output_type(Term* function, int index)
     if (attrs == NULL)
         return ANY_TYPE;
 
+    ca_assert(index < attrs->outputTypes.length());
+
     return attrs->outputTypes[index];
 }
 
