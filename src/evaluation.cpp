@@ -37,10 +37,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (!context->errorOccurred) {
         for (int i=0; i < get_output_count(term); i++) {
 
-            // even more temporary:
-            if (i > 0)
-                break;
-
             // temp exception:
             if (i > 0 && (term->function == FOR_FUNC || term->function == IF_BLOCK_FUNC))
                 continue;

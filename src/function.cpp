@@ -478,17 +478,7 @@ Term* function_get_output_type(Term* function, int index)
     if (attrs == NULL)
         return ANY_TYPE;
 
-    if (index == 0)
-        return attrs->outputTypes[0];
-
-    // TODO: use outputTypes
-
-    // Special handling for multiple outputs, this might get normalized.
-    int extraOutputIndex = index - 1;
-    if (function_can_rebind_input(function, extraOutputIndex))
-        return function_get_input_type(function, extraOutputIndex);
-    else
-        return VOID_TYPE;
+    return attrs->outputTypes[index];
 }
 
 bool is_native_function(Term* func)
