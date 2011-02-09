@@ -49,12 +49,23 @@ namespace if_block_function {
         return outerRebinds.length() + 1;
     }
 
+    Term* joinFunc_specializeType(Term* term)
+    {
+        if (term->input(0) == NULL || term->input(1) == NULL)
+            return ANY_TYPE;
+        RefList types(get_type_of_input(term, 0), get_type_of_input(term, 1));
+        return find_common_type(types);
+    }
+
     void setup(Branch& kernel)
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         get_function_attrs(IF_BLOCK_FUNC)->formatSource = formatSource;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
+
+        JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
+        get_function_attrs(JOIN_FUNC)->specializeType = joinFunc_specializeType;
     }
 }
 }

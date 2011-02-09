@@ -23,6 +23,10 @@ void test_if_joining()
     // in the outer scope.
     branch.eval("if true Cardiff = 5 else Cardiff = 11 end");
     test_assert(branch.contains("Cardiff"));
+
+    // Test that the type of the joined name is correct
+    branch.compile("if true a = 4 else a = 5 end; a = a");
+    test_assert(get_output_type(branch["a"]) == INT_TYPE);
 }
 
 void test_if_joining_on_bool()

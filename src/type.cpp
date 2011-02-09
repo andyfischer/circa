@@ -174,6 +174,9 @@ Term* get_output_type(Term* term, int outputIndex)
     if (outputIndex == 0)
         return term->type;
 
+    if (term->function == NULL)
+        return ANY_TYPE;
+
     return function_get_output_type(term->function, outputIndex);
 }
 

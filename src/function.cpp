@@ -478,6 +478,10 @@ Term* function_get_output_type(Term* function, int index)
     if (attrs == NULL)
         return ANY_TYPE;
 
+    // Temporary special case
+    if (index > 0 && (function == IF_BLOCK_FUNC || function == FOR_FUNC))
+        return ANY_TYPE;
+
     ca_assert(index < attrs->outputTypes.length());
 
     return attrs->outputTypes[index];

@@ -246,7 +246,6 @@ void pre_setup_types(Branch& kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
-    JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
     ADDITIONAL_OUTPUT_FUNC = import_function(kernel, empty_evaluate_no_touch_output,
             "additional_output() -> any");
 
