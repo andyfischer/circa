@@ -17,6 +17,7 @@ FunctionAttrs::FunctionAttrs()
     postInputChange(NULL),
     getOutputCount(NULL),
     getOutputName(NULL),
+    getOutputType(NULL),
     assignRegisters(NULL),
     postCompile(NULL)
 {

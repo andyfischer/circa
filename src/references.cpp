@@ -52,7 +52,7 @@ void remap_pointers(Term* term, ReferenceMap const& map)
     ca_assert(!map.contains(NULL));
 
     for (int i=0; i < term->numInputs(); i++)
-        set_input(term, i, map.getRemapped(term->input(i)));
+        set_input2(term, i, map.getRemapped(term->input(i)), term->inputs[i].outputIndex);
 
     term->function = map.getRemapped(term->function);
 

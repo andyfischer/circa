@@ -58,7 +58,22 @@ namespace if_block_function {
             return "";
 
         Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
-        return outerRebinds[outputIndex]->name.c_str();
+        return outerRebinds[outputIndex - 1]->name.c_str();
+    }
+
+    Term* getOutputType(Term* term, int outputIndex)
+    {
+        if (outputIndex == 0)
+            return VOID_TYPE;
+
+        Branch& contents = term->nestedContents;
+
+        // check if term is still being initialized:
+        if (contents.length() == 0)
+            return ANY_TYPE;
+
+        Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
+        return outerRebinds[outputIndex - 1]->type;
     }
 
     Term* joinFunc_specializeType(Term* term)
@@ -74,7 +89,8 @@ namespace if_block_function {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         get_function_attrs(IF_BLOCK_FUNC)->formatSource = formatSource;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
-        //get_function_attrs(IF_BLOCK_FUNC)->getOutputName = getOutputName;
+        get_function_attrs(IF_BLOCK_FUNC)->getOutputName = getOutputName;
+        get_function_attrs(IF_BLOCK_FUNC)->getOutputType = getOutputType;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
 
         JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");

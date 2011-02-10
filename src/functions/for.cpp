@@ -34,6 +34,30 @@ namespace for_function {
         return 1 + outerRebinds.length();
     }
 
+    const char* getOutputName(Term* term, int outputIndex)
+    {
+        Branch& contents = term->nestedContents;
+
+        // Check if we're still building
+        if (contents.length() == 0)
+            return "";
+
+        Branch& outerRebinds = contents["#outer_rebinds"]->nestedContents;
+        return outerRebinds[outputIndex - 1]->name.c_str();
+    }
+
+    Term* getOutputType(Term* term, int outputIndex)
+    {
+        Branch& contents = term->nestedContents;
+
+        // Check if we're still building
+        if (contents.length() == 0)
+            return ANY_TYPE;
+
+        Branch& outerRebinds = contents["#outer_rebinds"]->nestedContents;
+        return outerRebinds[outputIndex - 1]->type;
+    }
+
     CA_FUNCTION(evaluate_discard)
     {
         CONTEXT->forLoopContext.discard = true;
@@ -49,6 +73,8 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         get_function_attrs(FOR_FUNC)->formatSource = formatSource;
         get_function_attrs(FOR_FUNC)->getOutputCount = getOutputCount;
+        get_function_attrs(FOR_FUNC)->getOutputName = getOutputName;
+        get_function_attrs(FOR_FUNC)->getOutputType = getOutputType;
         function_t::set_exposed_name_path(FOR_FUNC, "#rebinds_for_outer");
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");

@@ -110,7 +110,9 @@ void setup_for_loop_post_code(Term* forTerm)
         set_input(outerRebind, 0, original);
     }
 
+    #if 0
     expose_all_names(outerRebinds, outerScope);
+    #endif
     for_loop_update_output_index(forTerm);
 }
 
@@ -233,7 +235,7 @@ CA_FUNCTION(evaluate_for_loop)
             result = get_input(rebindTerm, 1);
         }
 
-        copy(result, get_local(rebindTerm));
+        copy(result, EXTRA_OUTPUT(i));
     }
 
     // Restore loop context

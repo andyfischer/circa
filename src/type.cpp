@@ -177,6 +177,15 @@ Term* get_output_type(Term* term, int outputIndex)
     if (term->function == NULL)
         return ANY_TYPE;
 
+    FunctionAttrs* attrs = get_function_attrs(term->function);
+
+    FunctionAttrs::GetOutputType getOutputType = NULL;
+    if (attrs != NULL)
+        getOutputType = attrs->getOutputType;
+
+    if (getOutputType != NULL)
+        return getOutputType(term, outputIndex);
+
     return function_get_output_type(term->function, outputIndex);
 }
 

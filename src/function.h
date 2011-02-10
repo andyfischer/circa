@@ -16,6 +16,7 @@ struct FunctionAttrs
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetOutputCount)(Term*);
     typedef const char* (*GetOutputName)(Term*, int index);
+    typedef Term* (*GetOutputType)(Term*, int index);
     typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
 
@@ -38,6 +39,7 @@ struct FunctionAttrs
     PostInputChange postInputChange;
     GetOutputCount getOutputCount;
     GetOutputName getOutputName;
+    GetOutputType getOutputType;
     AssignRegisters assignRegisters;
     PostCompile postCompile;
 

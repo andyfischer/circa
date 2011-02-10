@@ -109,8 +109,10 @@ void update_if_block_joining_branch(Term* ifCall)
         apply(joining, JOIN_FUNC, inputs, name);
     }
 
+    #if 0
     // Expose all names in 'joining' branch.
     expose_all_names(joining, *outerScope);
+    #endif
 }
 
 Branch* get_if_condition_block(Term* ifCall, int index)
@@ -199,12 +201,12 @@ CA_FUNCTION(evaluate_if_block)
         swap(&prevScopeState, &CONTEXT->currentScopeState);
     }
 
-    // Copy values to joining terms
+    // Copy joined values to output slots
     Branch& joining = contents[contents.length()-1]->nestedContents;
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        copy(get_input(joinTerm, acceptedBranchIndex), get_local(joinTerm));
+        copy(get_input(joinTerm, acceptedBranchIndex), EXTRA_OUTPUT(i));
     }
 }
 
