@@ -15,6 +15,7 @@ struct FunctionAttrs
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetOutputCount)(Term*);
+    typedef const char* (*GetOutputName)(Term*, int index);
     typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
 
@@ -36,6 +37,7 @@ struct FunctionAttrs
     StaticTypeQueryFunc staticTypeQuery;
     PostInputChange postInputChange;
     GetOutputCount getOutputCount;
+    GetOutputName getOutputName;
     AssignRegisters assignRegisters;
     PostCompile postCompile;
 
@@ -115,6 +117,9 @@ bool function_call_rebinds_input(Term* term, int index);
 
 Term* function_get_input_type(Term* function, int index);
 Term* function_get_output_type(Term* function, int index);
+
+const char* get_output_name(Term* term, int outputIndex);
+const char* get_output_name_for_input(Term* term, int inputIndex);
 
 // Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(Term* function);

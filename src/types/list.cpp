@@ -609,9 +609,8 @@ namespace list_t {
 
     CA_FUNCTION(append)
     {
-        set_list(OUTPUT);
-        List* result = List::checkCast(OUTPUT);
         copy(INPUT(0), OUTPUT);
+        List* result = List::checkCast(OUTPUT);
         TaggedValue* value = INPUT(1);
         copy(value, result->append());
     }

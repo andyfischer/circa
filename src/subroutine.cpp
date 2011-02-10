@@ -7,7 +7,7 @@
 
 namespace circa {
 
-namespace subroutine_t {
+namespace subroutine_f {
 
     void format_source(StyledSource* source, Term* term)
     {
@@ -17,6 +17,10 @@ namespace subroutine_t {
 
         if (!is_native_function(term))
             format_branch_source(source, term->nestedContents, term);
+    }
+
+    void getOutputName(Term* term, int outputIndex)
+    {
     }
 }
 

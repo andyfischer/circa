@@ -192,7 +192,7 @@ void bootstrap_kernel()
     // Create Function type
     FUNCTION_TYPE = create_empty_type(*KERNEL, "Function");
     Type* functionType = unbox_type(FUNCTION_TYPE);
-    functionType->formatSource = subroutine_t::format_source;
+    functionType->formatSource = subroutine_f::format_source;
     functionType->checkInvariants = function_t::check_invariants;
 
     // Initialize Value func

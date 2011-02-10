@@ -400,10 +400,23 @@ void post_compile_term(Term* term)
     // Default behavior for postCompile..
     
     // If the function has multiple outputs, and any of these outputs have names,
-    // then copy them to named terms. This is a workaround until we can support
-    // terms with multiple output names.
-    Branch& outerBranch = *term->owningBranch;
-    int outputIndex = 0;
+    // then copy these outputs to named terms. This is a workaround until we can
+    // fully support terms with multiple output names.
+    Branch& owningBranch = *term->owningBranch;
+    int numOutputs = get_output_count(term);
+    for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
+        const char* name = get_output_name(term, outputIndex);
+        if (strcmp(name, "") != 0) {
+            Term* outputCopy = apply(owningBranch, COPY_FUNC, RefList(), name);
+            set_input2(outputCopy, 0, term, outputIndex);
+
+            possibly_respecialize_type(outputCopy);
+            owningBranch.bindName(outputCopy, name);
+        }
+    }
+
+    #if 0
+    int outputIndex = 1;
     for (int i=0; i < term->numInputs(); i++) {
         if (function_can_rebind_input(term->function, i)) {
             if (function_call_rebinds_input(term, i)
@@ -412,15 +425,19 @@ void post_compile_term(Term* term)
 
                 std::string name = term->input(i)->name;
 
-                Term* output = apply(outerBranch, COPY_FUNC, RefList(), name);
-                set_input2(output, 0, term, outputIndex + 1);
+                ca_assert(name == get_output_name(term, outputIndex));
+
+                Term* output = apply(owningBranch, COPY_FUNC, RefList(), name);
+                set_input2(output, 0, term, outputIndex);
 
                 possibly_respecialize_type(output);
-                outerBranch.bindName(output, term->input(i)->name);
+                owningBranch.bindName(output, term->input(i)->name);
+
             }
             outputIndex++;
         }
     }
+    #endif
 }
 
 void finish_minor_branch(Branch& branch)

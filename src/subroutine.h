@@ -4,8 +4,7 @@
 
 namespace circa {
 
-namespace subroutine_t {
-    std::string to_string(Term* term);
+namespace subroutine_f {
     void format_source(StyledSource* source, Term* term);
 }
 

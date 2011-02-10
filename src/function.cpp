@@ -16,6 +16,7 @@ FunctionAttrs::FunctionAttrs()
     staticTypeQuery(NULL),
     postInputChange(NULL),
     getOutputCount(NULL),
+    getOutputName(NULL),
     assignRegisters(NULL),
     postCompile(NULL)
 {
@@ -485,6 +486,54 @@ Term* function_get_output_type(Term* function, int index)
     ca_assert(index < attrs->outputTypes.length());
 
     return attrs->outputTypes[index];
+}
+
+const char* get_output_name(Term* term, int outputIndex)
+{
+    if (outputIndex == 0)
+        return term->name.c_str();
+
+    Term* function = term->function;
+    FunctionAttrs* attrs = NULL;
+
+    if (function != NULL)
+        attrs = get_function_attrs(function);
+
+    if (attrs == NULL)
+        return "";
+
+    FunctionAttrs::GetOutputName getOutputName = attrs->getOutputName;
+
+    if (getOutputName != NULL)
+        return getOutputName(term, outputIndex);
+
+    // Default behavior, if the call is rebinding an input name, then use that name.
+
+    // First we need to figure out what the corresponding input index is for this
+    // rebound output.
+    int checkOutputIndex = 1;
+    int reboundInputIndex = -1;
+    for (int inputIndex=0; inputIndex < function_t::num_inputs(function); inputIndex++) {
+        if (function_can_rebind_input(function, inputIndex)) {
+            if (function_call_rebinds_input(term, inputIndex)
+                    && (checkOutputIndex == outputIndex)) {
+                reboundInputIndex = inputIndex;
+                break;
+            }
+            checkOutputIndex++;
+        }
+    }
+
+    // If a rebound input was found, use that name.
+    if (reboundInputIndex != -1)
+        return get_output_name_for_input(term, reboundInputIndex);
+
+    return "";
+}
+
+const char* get_output_name_for_input(Term* term, int inputIndex)
+{
+    return get_output_name(term->input(inputIndex), term->inputs[inputIndex].outputIndex);
 }
 
 bool is_native_function(Term* func)

@@ -49,6 +49,18 @@ namespace if_block_function {
         return outerRebinds.length() + 1;
     }
 
+    const char* getOutputName(Term* term, int outputIndex)
+    {
+        Branch& contents = term->nestedContents;
+
+        // check if term is still being initialized:
+        if (contents.length() == 0)
+            return "";
+
+        Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
+        return outerRebinds[outputIndex]->name.c_str();
+    }
+
     Term* joinFunc_specializeType(Term* term)
     {
         if (term->input(0) == NULL || term->input(1) == NULL)
@@ -62,6 +74,7 @@ namespace if_block_function {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         get_function_attrs(IF_BLOCK_FUNC)->formatSource = formatSource;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
+        //get_function_attrs(IF_BLOCK_FUNC)->getOutputName = getOutputName;
         function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
 
         JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
