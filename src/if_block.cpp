@@ -108,11 +108,6 @@ void update_if_block_joining_branch(Term* ifCall)
 
         apply(joining, JOIN_FUNC, inputs, name);
     }
-
-    #if 0
-    // Expose all names in 'joining' branch.
-    expose_all_names(joining, *outerScope);
-    #endif
 }
 
 Branch* get_if_condition_block(Term* ifCall, int index)

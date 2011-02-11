@@ -70,7 +70,6 @@ Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 void setup_for_loop_post_code(Term* forTerm)
 {
     Branch& forContents = forTerm->nestedContents;
-    Branch& outerScope = *forTerm->owningBranch;
     std::string listName = forTerm->input(0)->name;
     std::string iteratorName = get_for_loop_iterator(forTerm)->name;
 
@@ -110,9 +109,6 @@ void setup_for_loop_post_code(Term* forTerm)
         set_input(outerRebind, 0, original);
     }
 
-    #if 0
-    expose_all_names(outerRebinds, outerScope);
-    #endif
     for_loop_update_output_index(forTerm);
 }
 

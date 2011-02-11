@@ -37,10 +37,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (!context->errorOccurred) {
         for (int i=0; i < get_output_count(term); i++) {
 
-            // temp exception:
-            if (i > 0 && (term->function == FOR_FUNC || term->function == IF_BLOCK_FUNC))
-                continue;
-
             Type* outputType = unbox_type(get_output_type(term, i));
             TaggedValue* output = get_output(term, i);
 
