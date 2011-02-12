@@ -12,6 +12,7 @@
 #include "ref_list.h"
 #include "stateful_code.h"
 #include "term.h"
+#include "type.h"
 
 #include "if_block.h"
 
@@ -201,7 +202,12 @@ CA_FUNCTION(evaluate_if_block)
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        copy(get_input(joinTerm, acceptedBranchIndex), EXTRA_OUTPUT(i));
+        TaggedValue* value = get_input(joinTerm, acceptedBranchIndex);
+
+        // Bug hunting:
+        ca_assert(value_fits_type(value, unbox_type(get_output_type(CALLER, i+1))));
+
+        swap(value, EXTRA_OUTPUT(i));
     }
 }
 

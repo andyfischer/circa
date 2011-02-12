@@ -18,9 +18,9 @@ void preserve_locals()
     inputs.push_back("a = 1"); // <-- simplest possible
     inputs.push_back("a = level+1");
     inputs.push_back("a = 'str'; b = level+1; swap(&a &b)");
-    //inputs.push_back("a = 'x'; if true a = level+1 end");
-    //TEST_DISABLED inputs.push_back("a = level+1; for i in [] a = 'x' end");
-    //TEST_DISABLED inputs.push_back("a = 'x'; for i in [1 2] a = level+1 end");
+    inputs.push_back("a = 'x'; if true a = level+1 end");
+    inputs.push_back("a = level+1; for i in [] a = 'x' end");
+    inputs.push_back("a = 'x'; for i in [1 2] a = level+1 end");
 
     for (size_t i=0; i < inputs.size(); i++) {
         std::string input = inputs[i];
