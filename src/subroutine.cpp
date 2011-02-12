@@ -18,10 +18,6 @@ namespace subroutine_f {
         if (!is_native_function(term))
             format_branch_source(source, term->nestedContents, term);
     }
-
-    void getOutputName(Term* term, int outputIndex)
-    {
-    }
 }
 
 Term* get_subroutine_input_placeholder(Branch& contents, int index)
@@ -62,23 +58,23 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     Term* outputTypeTerm = get_subroutine_output_type(contents);
     Type* outputType = unbox_type(outputTypeTerm);
 
-    if (!is_null(&context->subroutineOutput)) {
-        ca_assert(is_list(&context->subroutineOutput));
+    ca_assert(is_list(&context->subroutineOutput) || is_null(&context->subroutineOutput));
+
+    if (is_list(&context->subroutineOutput))
         swap(&context->subroutineOutput, outputs);
-        set_null(&context->subroutineOutput);
-    } else {
-        // TODO: factor this out
-        TaggedValue* output = get_local(contents[contents.length()-1]);
+    
+    set_null(&context->subroutineOutput);
+
+    if (context->errorOccurred) {
         outputs->resize(1);
-        copy(output, outputs->get(0));
-    }
-
-    if (context->errorOccurred || outputTypeTerm == VOID_TYPE) {
         set_null(outputs->get(0));
+    } else if (outputTypeTerm == VOID_TYPE) {
+
+        set_null(outputs->get(0));
+
     } else {
 
-        bool castSuccess = cast(outputs->get(0), outputType,
-                outputs->get(0));
+        bool castSuccess = cast(outputs->get(0), outputType, outputs->get(0));
         
         if (!castSuccess) {
             std::stringstream msg;

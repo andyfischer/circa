@@ -87,7 +87,7 @@ void test_subroutine_input_and_output()
     evaluate_branch(branch);
     test_assert(branch);
 
-    branch.compile("def f() -> any; return([1 1]) -> Point end");
+    branch.compile("def f() -> any; return([1 1] -> Point) end");
     branch.compile("a = f()");
     branch.compile("a.x");
     branch.compile("f().y");

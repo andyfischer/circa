@@ -3,9 +3,6 @@ Two bugs with recursion:
 
   1) Every block instruction can trigger a recursive call, so they must all use start_using
      and end_using.
-  2) Need to get rid of names bound to terms in other branches (specifically, join terms in
-     if and for blocks). These aren't currently saved/restored when there is a recursive
-     call.
 
 BUGS
 

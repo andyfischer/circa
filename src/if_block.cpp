@@ -204,8 +204,9 @@ CA_FUNCTION(evaluate_if_block)
         Term* joinTerm = joining[i];
         TaggedValue* value = get_input(joinTerm, acceptedBranchIndex);
 
-        // Bug hunting:
+        #if CIRCA_ALWAYS_TYPE_CHECK_OUTPUTS
         ca_assert(value_fits_type(value, unbox_type(get_output_type(CALLER, i+1))));
+        #endif
 
         swap(value, EXTRA_OUTPUT(i));
     }
