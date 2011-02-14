@@ -23,14 +23,15 @@ struct StaticErrorCheck
 
 void check_for_static_errors(StaticErrorCheck* result, Branch& branch);
 
-void print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out);
+// Print each static error to 'out'. Returns true if there were any static errors.
+bool print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out);
 
 // Convenience methods, where the caller doesn't need to create a StaticErrorCheck object:
 bool has_static_error(Term* term);
 bool has_static_errors(Branch& branch);
 int count_static_errors(Branch& branch);
 
-void print_static_errors_formatted(Branch& branch, std::ostream& out);
+bool print_static_errors_formatted(Branch& branch, std::ostream& out);
 void print_static_error(Term* term, std::ostream& out);
 
 std::string get_static_errors_formatted(Branch& branch);

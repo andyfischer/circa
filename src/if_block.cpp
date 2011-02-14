@@ -148,53 +148,62 @@ bool if_block_contains_state(Term* ifCall)
 
 CA_FUNCTION(evaluate_if_block)
 {
+    EvalContext* context = CONTEXT;
     Branch& contents = CALLER->nestedContents;
     bool useState = if_block_contains_state(CALLER);
 
     int numBranches = contents.length() - 1;
     int acceptedBranchIndex = 0;
+    Branch* acceptedBranch = NULL;
 
     TaggedValue localState;
     TaggedValue prevScopeState;
     List* state = NULL;
     if (useState) {
-        swap(&prevScopeState, &CONTEXT->currentScopeState);
+        swap(&prevScopeState, &context->currentScopeState);
         fetch_state_container(CALLER, &prevScopeState, &localState);
         state = List::lazyCast(&localState);
         state->resize(numBranches);
     }
 
-    for (int i=0; i < numBranches; i++) {
-        Term* branch = contents[i];
+    for (int branchIndex=0; branchIndex < numBranches; branchIndex++) {
+        Term* branch = contents[branchIndex];
 
         //std::cout << "checking: " << get_term_to_string_extended(branch) << std::endl;
         //std::cout << "with stack: " << STACK->toString() << std::endl;
 
         if (branch->numInputs() == 0 || as_bool(get_input(branch, 0))) {
 
-            Branch& contents = branch->nestedContents;
+            acceptedBranch = &branch->nestedContents;
+
+            start_using(*acceptedBranch);
 
             if (useState)
-                swap(state->get(i), &CONTEXT->currentScopeState);
+                swap(state->get(branchIndex), &context->currentScopeState);
 
-            evaluate_branch_internal(CONTEXT, contents);
+            // Evaluate each term
+            for (int j=0; j < acceptedBranch->length(); j++) {
+                evaluate_single_term(context, acceptedBranch->get(j));
+                if (context->errorOccurred)
+                    break;
+            }
 
             if (useState)
-                swap(state->get(i), &CONTEXT->currentScopeState);
+                swap(state->get(branchIndex), &context->currentScopeState);
 
-            acceptedBranchIndex = i;
+            acceptedBranchIndex = branchIndex;
             break;
         }
     }
 
-    // Reset state for non-accepted branches
+    // Reset state for all non-accepted branches
     if (useState) {
         for (int i=0; i < numBranches; i++) {
             if (i != acceptedBranchIndex)
                 set_null(state->get(i));
         }
         preserve_state_result(CALLER, &prevScopeState, &localState);
-        swap(&prevScopeState, &CONTEXT->currentScopeState);
+        swap(&prevScopeState, &context->currentScopeState);
     }
 
     // Copy joined values to output slots
@@ -208,8 +217,12 @@ CA_FUNCTION(evaluate_if_block)
         ca_assert(value_fits_type(value, unbox_type(get_output_type(CALLER, i+1))));
         #endif
 
-        swap(value, EXTRA_OUTPUT(i));
+        copy(value, EXTRA_OUTPUT(i));
     }
+
+    // Finish using the branch, this will pop its stack frame. Need to do this after
+    // copying joined values.
+    finish_using(*acceptedBranch);
 }
 
 } // namespace circa

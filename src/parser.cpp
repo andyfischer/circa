@@ -1340,7 +1340,6 @@ Term* function_call2(Branch& branch, Term* function, TokenStream& tokens)
 {
     int startPosition = tokens.getPosition();
     
-    Term* originalFunction = function;
     std::string originalName = function->name;
 
     Term* result = NULL;

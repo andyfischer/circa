@@ -167,9 +167,13 @@ void print_static_error(StaticErrorCheck* result, int index, std::ostream& out)
     // << type << std::endl;
 }
 
-void print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out)
+bool print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out)
 {
     int count = result->count();
+
+    if (count == 0)
+        return false;
+
     out << count << " static error";
     if (count != 1) out << "s";
     out << ":\n";
@@ -178,13 +182,14 @@ void print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out)
         print_static_error(result, i, out);
         out << std::endl;
     }
+    return true;
 }
 
-void print_static_errors_formatted(Branch& branch, std::ostream& out)
+bool print_static_errors_formatted(Branch& branch, std::ostream& out)
 {
     StaticErrorCheck result;
     check_for_static_errors(&result, branch);
-    print_static_errors_formatted(&result, out);
+    return print_static_errors_formatted(&result, out);
 }
 
 void print_static_error(Term* term, std::ostream& out)

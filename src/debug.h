@@ -19,4 +19,14 @@ extern bool DEBUG_TRAP_ERROR_OCCURRED;
 void dump_branch(Branch& branch);
 void dump_branch_with_props(Branch& branch);
 
+#if CIRCA_ENABLE_TRAP_ON_VALUE_WRITE
+
+void debug_trap_value_write(TaggedValue* val);
+
+#else
+
+#define debug_trap_value_write(x) ;
+
+#endif
+
 } // namespace circa

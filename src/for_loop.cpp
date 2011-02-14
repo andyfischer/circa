@@ -158,6 +158,8 @@ CA_FUNCTION(evaluate_for_loop)
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
 
+    start_using(forContents);
+
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
     TaggedValue localState;
@@ -241,6 +243,8 @@ CA_FUNCTION(evaluate_for_loop)
         preserve_state_result(CALLER, &prevScopeState, &localState);
         swap(&prevScopeState, &CONTEXT->currentScopeState);
     }
+
+    finish_using(forContents);
 }
 
 } // namespace circa

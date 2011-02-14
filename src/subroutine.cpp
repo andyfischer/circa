@@ -146,8 +146,6 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     // Write extra outputs
     ca_assert(outputs.length() == get_output_count(caller));
 
-    //std::cout << "finished sub " << caller->function->name << ", outputs = " << outputs.toString() << std::endl;
-
     for (int i=1; i < outputs.length(); i++)
         copy(outputs[i], get_output(caller, i));
 }

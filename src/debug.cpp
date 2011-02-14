@@ -1,8 +1,10 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
+#include "build_options.h"
+#include "branch.h"
+#include "introspection.h"
 
-#include "circa.h"
+#include "debug.h"
 
 namespace circa {
 
@@ -18,5 +20,14 @@ void dump_branch_with_props(Branch& branch)
 {
     print_branch_with_properties(std::cout, branch);
 }
+
+#if CIRCA_ENABLE_TRAP_ON_VALUE_WRITE
+
+void debug_trap_value_write(TaggedValue* val)
+{
+    ;
+}
+
+#endif
 
 } // namespace circa

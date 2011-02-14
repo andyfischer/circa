@@ -40,6 +40,10 @@ void evaluate_single_term(EvalContext* context, Term* term)
             Type* outputType = unbox_type(get_output_type(term, i));
             TaggedValue* output = get_output(term, i);
 
+            //std::cout << "output[" << i << "] for function " << term->function->name
+            //    << " produced output: " << output->toString()
+            //    << " (expected type: " << outputType->name << ")" << std::endl;
+
             std::stringstream msg;
             if (!value_fits_type(output, outputType)) {
                 msg << "Function " << term->function->name << " produced output "
@@ -214,7 +218,8 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
 
 void start_using(Branch& branch)
 {
-    if (branch.inuse) {
+    if (branch.inuse)
+    {
         swap(&branch.locals, branch.localsStack.append());
         set_list(&branch.locals, branch.length());
     }

@@ -193,6 +193,8 @@ void copy(TaggedValue* source, TaggedValue* dest)
     if (source == dest)
         return;
 
+    debug_trap_value_write(dest);
+
     change_type(dest, source->value_type);
     Type::Copy copyFunc = source->value_type->copy;
 
@@ -209,6 +211,9 @@ void copy(TaggedValue* source, TaggedValue* dest)
 
 void swap(TaggedValue* left, TaggedValue* right)
 {
+    debug_trap_value_write(left);
+    debug_trap_value_write(right);
+
     Type* temp_type = left->value_type;
     TaggedValue::Data temp_data = left->value_data;
     left->value_type = right->value_type;
@@ -396,6 +401,7 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
 
 TaggedValue* set_int(TaggedValue* value, int i)
 {
+    debug_trap_value_write(value);
     change_type(value, &INT_T);
     value->value_data.asint = i;
     return value;
@@ -403,35 +409,41 @@ TaggedValue* set_int(TaggedValue* value, int i)
 
 void set_float(TaggedValue* value, float f)
 {
+    debug_trap_value_write(value);
     change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
 void set_string(TaggedValue* value, const char* s)
 {
+    debug_trap_value_write(value);
     change_type(value, &STRING_T);
     *((std::string*) value->value_data.ptr) = s;
 }
 
 void set_string(TaggedValue* value, std::string const& s)
 {
+    debug_trap_value_write(value);
     set_string(value, s.c_str());
 }
 
 void set_bool(TaggedValue* value, bool b)
 {
+    debug_trap_value_write(value);
     change_type(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
 void set_ref(TaggedValue* value, Term* t)
 {
+    debug_trap_value_write(value);
     change_type(value, unbox_type(REF_TYPE));
     *((Ref*) value->value_data.ptr) = t;
 }
 
 List* set_list(TaggedValue* value)
 {
+    debug_trap_value_write(value);
     change_type(value, &NULL_TYPE); // substitute for 'reset'
     change_type(value, &LIST_T);
     return List::checkCast(value);
@@ -439,6 +451,7 @@ List* set_list(TaggedValue* value)
 
 List* set_list(TaggedValue* value, int size)
 {
+    debug_trap_value_write(value);
     List* list = set_list(value);
     list->resize(size);
     return list;
@@ -454,17 +467,20 @@ void set_type(TaggedValue* value, Type* type)
 
 void set_null(TaggedValue* value)
 {
+    debug_trap_value_write(value);
     change_type(value, &NULL_TYPE);
 }
 
 void set_pointer(TaggedValue* value, Type* type, void* p)
 {
+    debug_trap_value_write(value);
     value->value_type = type;
     value->value_data.ptr = p;
 }
 
 void set_pointer(TaggedValue* value, void* ptr)
 {
+    debug_trap_value_write(value);
     value->value_data.ptr = ptr;
 }
 
