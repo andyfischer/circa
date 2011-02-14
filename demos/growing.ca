@@ -5,7 +5,7 @@ desired_window_size = [480 600]
 def interp(number progress, number e) -> number
   return min(progress / e, 1.0)
 
-def tree_segment(Point base, number direction, number width, number depth, List leaves +out)
+def tree_segment(Point base, number direction, number width, int depth, List leaves +out)
   jitter = (seed() - .5) *.05
   max_length = 20 + 30 * seed()
   mult(@max_length, (1.0 - .1 * depth))
@@ -13,13 +13,28 @@ def tree_segment(Point base, number direction, number width, number depth, List 
   seg_length = max_length * interp(age, 10)
   color = #6a3
 
-  --direction = direction + jitter
+  -- bend our angle, if this isn't the root segment
+  if depth > 0
+      direction += interp(age, 10) * (seed()-.5) * .4
+
   bottom_width = width * interp(age, 8)
 
-  has_branches = (seg_length > .4*max_length) and depth < 4.0
+  branch_count = 0
+  
+  if age > 5
+      branch_count += 1
+  if age > 10
+      branch_count += 1
+  if age > 15
+      branch_count += 1
+
+  if depth >= 4.0
+    branch_count = 0
 
   top_width = width * interp(age, 11)
-  cond(has_branches, @top_width, 0.0)
+
+  -- taper the tip if there are no branches
+  cond(branch_count == 0, 0.0, @top_width)
 
   l = polar(direction - .25) * bottom_width + base
   r = polar(direction + .25) * bottom_width + base
@@ -30,22 +45,19 @@ def tree_segment(Point base, number direction, number width, number depth, List 
   gl:triangles(points color)
   gl:lines([l l2 r r2], #000)
 
-  branch_count = 3
-  if depth < 4.0
-    branch_count = 0
-
   for branchIndex in 0..branch_count
     branch_age = elapsed()
-    angle = direction + seed() * .2
-    mult(@angle, interp(branch_age, 8))
-    tree_segment(next_center->Point, angle, width * .8, depth+1, &leaves)
+    tree_segment(next_center->Point, direction, width * .6, depth+1, &leaves)
 
   -- leaves
-  if width < .6
-      leaf_pos = seed() * seg_length
-      leaves.append(base + polar(direction) * leaf_pos)
+  leaf_count = cond(width < .6, 0, 3)
+  myLeaves = []
+  for leafIndex in 0..leaf_count
+     leaf_pos = seed() * seg_length
+     myLeaves.append(leaf_pos)
+
+  leaves.append(myLeaves)
 
 starting_width = 3.0
 leaves = []
 root = tree_segment([200 300], 0, starting_width, 0, &leaves)
-
