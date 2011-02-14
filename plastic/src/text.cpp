@@ -73,7 +73,8 @@ CA_FUNCTION(load_font)
     std::string path = STRING_INPUT(1);
     int pointSize = INT_INPUT(2);
 
-    std::cout << "Calling TTF_OpenFont(" << path.c_str() << std::endl;
+    //std::cout << "Calling TTF_OpenFont(" << path.c_str() << std::endl;
+    
     TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
     if (result == NULL) {
         std::stringstream err;

@@ -21,11 +21,18 @@ DEBUG['variant_name'] = 'debug'
 RELEASE['variant_name'] = 'release'
 ALL = [DEBUG, RELEASE]
 
+SHARED_LIBRARY = config.get('circa', 'shared_library') == 'true'
+
 # Build flags
 if POSIX:
     def common_flags(env):
         env.Append(CPPFLAGS=['-ggdb', '-Wall'])
         env.Append(LINKFLAGS=['-ldl'])
+
+        if config.get('circa', 'gprof_support') == 'true':
+            env.Append(CPPFLAGS=['-pg'])
+            env.Append(LINKFLAGS=['-pg'])
+
         env.SetOption('num_jobs', 2)
     map(common_flags, ALL)
     DEBUG.Append(CPPDEFINES = ["DEBUG"])
@@ -67,10 +74,12 @@ def circa_library(env):
     fullPath = 'build/'+baseName
     sources = ['build/'+variant_name+'/src/'+filename for filename in source_files]
 
-    result = env.SharedLibrary(fullPath, sources)
+    buildStep = env.SharedLibrary if SHARED_LIBRARY else env.StaticLibrary
+
+    result = buildStep(fullPath, sources)
     circa_libs[variant_name] = result
 
-    if OSX:
+    if OSX and SHARED_LIBRARY:
         actualFile = 'lib'+baseName+'.dylib'
         env.AddPostAction(result, 'install_name_tool -id @executable_path/'+actualFile
                 + ' build/'+actualFile)
@@ -84,11 +93,14 @@ def circa_command_line_app(env):
     variant_name = env['variant_name']
     env.Append(CPPPATH = ['src'])
     path = 'build/circa'
+
+    libs = [circa_libs[variant_name]]
+    
     result = env.Program(path, 'build/'+variant_name+'/src/main.cpp',
-            LIBS=[circa_libs[variant_name]])
+            LIBS=libs)
     circa_cl_apps[variant_name] = result
 
-    if OSX:
+    if OSX and SHARED_LIBRARY:
         env.AddPostAction(result, 'install_name_tool -change build/libcirca_d.dylib '
                 + '@executable_path/libcirca_d.dylib '+path)
     return result

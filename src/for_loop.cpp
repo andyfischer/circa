@@ -107,6 +107,8 @@ void setup_for_loop_post_code(Term* forTerm)
 
         set_input(innerRebind, 0, original);
         set_input(outerRebind, 0, original);
+
+        possibly_respecialize_type(outerRebind);
     }
 
     for_loop_update_output_index(forTerm);

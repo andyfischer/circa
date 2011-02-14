@@ -193,7 +193,9 @@ namespace function_t {
     bool get_variable_args(Term* function)
     {
         if (!is_function(function)) return true;
-        return get_function_attrs(function)->variableArgs;
+        FunctionAttrs* attrs = get_function_attrs(function);
+        if (attrs == NULL) return true;
+        return attrs->variableArgs;
     }
 
     int num_inputs(Term* function)

@@ -14,7 +14,7 @@
 
 // If enabled, we'll type check the result of every term evaluation, to make sure that
 // the result conforms to the promised type.
-#define CIRCA_ALWAYS_TYPE_CHECK_OUTPUTS 1
+#define CIRCA_ALWAYS_TYPE_CHECK_OUTPUTS 0
 
 // Trigger an assert when internal_error is called. If this is off, the alternative is
 // that an exception is thrown.
@@ -22,4 +22,4 @@
 
 #define CIRCA_THROW_ON_ERROR !CIRCA_ASSERT_ON_ERROR
 
-#define CIRCA_ENABLE_TRAP_ON_VALUE_WRITE 1
+#define CIRCA_ENABLE_TRAP_ON_VALUE_WRITE 0

@@ -74,7 +74,7 @@ void
 LocalTermList::insert(int index, Term* term)
 {
     _terms.resize(_terms.size() + 1);
-    for (int i=index; i < _terms.size() - 1; i++)
+    for (size_t i=index; i < _terms.size() - 1; i++)
         _terms[i + 1] = _terms[i];
     _terms[index] = term;
 }

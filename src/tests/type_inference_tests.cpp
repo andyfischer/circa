@@ -50,11 +50,21 @@ void compare_builtin_types()
     test_assert(term_output_always_satisfies_type(anInt, unbox_type(INT_TYPE)));
 }
 
+void for_loop_output_type()
+{
+    Branch branch;
+    branch.compile("a = 1");
+    branch.compile("for i in [1] a = 2 end");
+
+    test_assert(branch["a"]->type == INT_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_inference_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_inference_tests::test_find_type_of_get_index);
     REGISTER_TEST_CASE(type_inference_tests::compare_builtin_types);
+    REGISTER_TEST_CASE(type_inference_tests::for_loop_output_type);
 }
 
 }

@@ -147,12 +147,14 @@ void insert_input(Term* term, Term* input)
 
 void post_input_change(Term* term)
 {
-    if (is_function(term->function)) {
-        FunctionAttrs::PostInputChange func =
-            get_function_attrs(term->function)->postInputChange;
-        if (func)
-            func(term);
-    }
+    FunctionAttrs* attrs = get_function_attrs(term->function);
+    if (attrs == NULL)
+        return;
+
+    FunctionAttrs::PostInputChange func = attrs->postInputChange;
+
+    if (func)
+        func(term);
 }
 
 bool is_actually_using(Term* user, Term* usee)
