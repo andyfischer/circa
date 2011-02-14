@@ -58,6 +58,9 @@ DictData* create_dict()
 
 void free_dict(DictData* data)
 {
+    if (data == NULL)
+        return;
+
     for (int i=0; i < data->capacity; i++) {
         free(data->slots[i].key);
         set_null(&data->slots[i].value);
@@ -69,8 +72,12 @@ DictData* grow(DictData* data, int new_capacity)
 {
     DictData* new_data = create_dict(new_capacity);
 
+    int existingCapacity = 0;
+    if (data != NULL)
+        existingCapacity = data->capacity;
+
     // Move all the keys & values over.
-    for (int i=0; i < data->capacity; i++) {
+    for (int i=0; i < existingCapacity; i++) {
         Slot* old_slot = &data->slots[i];
 
         if (old_slot->key == NULL)
@@ -94,6 +101,9 @@ void grow(DictData** dataPtr)
 
 DictData* duplicate(DictData* original)
 {
+    if (original == NULL)
+        return NULL;
+
     int new_capacity = int(original->count / INITIAL_LOAD_FACTOR);
     if (new_capacity < INITIAL_SIZE) new_capacity = INITIAL_SIZE;
     DictData* dupe = create_dict(new_capacity);
@@ -258,8 +268,6 @@ void clear(DictData* data)
     data->count = 0;
 }
 
-// Warning, C++ crap ahead:
-
 struct SortedVisitItem {
     char* key;
     TaggedValue* value;
@@ -274,7 +282,10 @@ struct SortedVisitItemCompare {
 
 void visit_sorted(DictData* data, DictVisitor visitor, void* context)
 {
-    // This function isn't efficient, currently it does a full sort on every
+    if (data == NULL)
+        return;
+
+    // This function is horribly inefficent, currently it does a full sort on every
     // key every time this is called. I'm not sure how frequently this function
     // will be used, if it's often then it will be revisited.
 
@@ -367,7 +378,7 @@ namespace tagged_value_wrappers {
 
     void initialize(Type* type, TaggedValue* value)
     {
-        value->value_data.ptr = create_dict();
+        value->value_data.ptr = NULL;
     }
     void release(TaggedValue* value)
     {
