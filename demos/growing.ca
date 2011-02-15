@@ -5,7 +5,7 @@ desired_window_size = [480 600]
 def interp(number progress, number e) -> number
   return min(progress / e, 1.0)
 
-def tree_segment(Point base, number direction, number width, int depth, List leaves +out)
+def tree_segment(Point base, number direction, number width, int depth, List leaves +out, List branch_polys +out, List branch_edges +out)
   jitter = (seed() - .5) *.05
   max_length = 20 + 30 * seed()
   mult(@max_length, (1.0 - .1 * depth))
@@ -47,7 +47,7 @@ def tree_segment(Point base, number direction, number width, int depth, List lea
 
   for branchIndex in 0..branch_count
     branch_age = elapsed()
-    tree_segment(next_center->Point, direction, width * .6, depth+1, &leaves)
+    tree_segment(next_center->Point, direction, width * .6, depth+1, &leaves, &branch_polys, &branch_edges)
 
   -- leaves
   leaf_count = cond(width < .6, 0, 3)
@@ -60,4 +60,7 @@ def tree_segment(Point base, number direction, number width, int depth, List lea
 
 starting_width = 3.0
 leaves = []
-root = tree_segment([200 300], 0, starting_width, 0, &leaves)
+
+branch_polys = []
+branch_edges = []
+root = tree_segment([200 300], 0, starting_width, 0, &leaves, &branch_polys, &branch_edges)
