@@ -115,7 +115,7 @@ void test_every_parse_error()
         }
 
         if (!has_static_errors(branch)) {
-            dump_branch(branch);
+            dump(branch);
             input.failedToCauseError = true;
             problemCount++;
         }

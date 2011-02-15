@@ -21,7 +21,7 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     int prevHead = branch->length() - 1;
 
     // std::cout << "compile, existing branch = " << std::endl;
-    // dump_branch(*branch);
+    // dump(*branch);
     // std::cout << "prevHead = " << prevHead << std::endl;
 
     TokenStream tokens(input);
@@ -2004,7 +2004,7 @@ void push_pending_rebind(Branch& branch, std::string const& name)
     std::string attrname = "#attr:comp-pending-rebind";
 
     if (branch.contains(attrname)) {
-        dump_branch(branch);
+        dump(branch);
         throw std::runtime_error("pending rebind already exists (name: " + name + ")");
     }
 

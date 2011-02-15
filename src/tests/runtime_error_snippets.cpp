@@ -13,7 +13,7 @@ void test_input(std::string const& in)
     if (has_static_errors(branch)) {
         std::cout << "In runtime error snippet: " << in << std::endl;
         print_static_errors_formatted(branch, std::cout);
-        dump_branch(branch);
+        dump(branch);
         declare_current_test_failed();
         return;
     }
@@ -23,7 +23,7 @@ void test_input(std::string const& in)
 
     if (!context.errorOccurred) {
         std::cout << "No runtime error: " << in << std::endl;
-        dump_branch(branch);
+        dump(branch);
         declare_current_test_failed();
         return;
     }

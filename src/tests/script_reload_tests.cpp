@@ -29,7 +29,7 @@ struct ReloadHelper
         if (context.errorOccurred) {
             std::cout << "Error in reload test: " << get_current_test_name() << std::endl;
             print_runtime_error_formatted(context, std::cout);
-            dump_branch(branch);
+            dump(branch);
             declare_current_test_failed();
         }
     }

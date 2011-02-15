@@ -16,8 +16,8 @@ extern bool DEBUG_TRAP_NAME_LOOKUP;
 extern bool DEBUG_TRAP_ERROR_OCCURRED;
 
 // Spit out this branch's raw contents to std::cout
-void dump_branch(Branch& branch);
-void dump_branch_with_props(Branch& branch);
+void dump(Branch& branch);
+void dump_with_props(Branch& branch);
 
 #if CIRCA_ENABLE_TRAP_ON_VALUE_WRITE
 

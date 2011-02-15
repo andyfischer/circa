@@ -11,12 +11,12 @@ namespace circa {
 bool DEBUG_TRAP_NAME_LOOKUP = false;
 bool DEBUG_TRAP_ERROR_OCCURRED = false;
 
-void dump_branch(Branch& branch)
+void dump(Branch& branch)
 {
     print_branch(std::cout, branch);
 }
 
-void dump_branch_with_props(Branch& branch)
+void dump_with_props(Branch& branch)
 {
     print_branch_with_properties(std::cout, branch);
 }
