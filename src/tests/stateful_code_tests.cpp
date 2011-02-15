@@ -175,7 +175,7 @@ namespace test_interpreted_state_access
         test_equals(a->uniqueName.name, "a");
 
         EvalContext context;
-        test_equals(context.state.toString(), "null");
+        test_equals(context.state.toString(), "[]");
 
         evaluate_branch(&context, branch);
         test_equals(context.state.toString(), "[a: 1]");
@@ -240,7 +240,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_state_and_plus_equals);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_unique_name_usage);
-    //TEST_DISABLED REGISTER_TEST_CASE(stateful_code_tests::subroutine_early_return);
+    REGISTER_TEST_CASE(stateful_code_tests::subroutine_early_return);
 }
 
 } // namespace stateful_code_tests

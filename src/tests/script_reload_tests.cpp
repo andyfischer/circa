@@ -25,7 +25,6 @@ struct ReloadHelper
 
     void rerun()
     {
-        EvalContext context;
         evaluate_branch(&context, branch);
         if (context.errorOccurred) {
             std::cout << "Error in reload test: " << get_current_test_name() << std::endl;
@@ -37,6 +36,7 @@ struct ReloadHelper
 
     Branch branch;
     FakeFileSystem files;
+    EvalContext context;
 };
 
 void test_simple()
@@ -50,9 +50,9 @@ void test_simple_with_state()
 {
     ReloadHelper helper;
     helper.load("state List l; l.append(1)");
+    test_equals(helper.context.state.toString(), "[_include: [l: [1]]]");
     helper.load("state List l; l.append(2)");
-    test_assert(helper.branch["l"]->getIndex(0)->asInt() == 1);
-    test_assert(helper.branch["l"]->getIndex(1)->asInt() == 2);
+    test_equals(helper.context.state.toString(), "[_include: [l: [1, 2]]]");
 }
 
 void test_function_change()
@@ -71,10 +71,10 @@ void test_with_custom_type()
 
 void register_tests()
 {
-    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_simple);
-    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_simple_with_state);
-    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_function_change);
-    //TEST_DISABLED REGISTER_TEST_CASE(script_reload_tests::test_with_custom_type);
+    REGISTER_TEST_CASE(script_reload_tests::test_simple);
+    REGISTER_TEST_CASE(script_reload_tests::test_simple_with_state);
+    REGISTER_TEST_CASE(script_reload_tests::test_function_change);
+    REGISTER_TEST_CASE(script_reload_tests::test_with_custom_type);
 }
 
 } // namespace script_reload_tests

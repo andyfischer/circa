@@ -120,7 +120,6 @@ void test_dynamic_overload()
     test_assert(result->asInt() == 8);
 
     set_float(b, 3.0);
-    //dump_branch(branch);
     evaluate_branch(&context, branch);
     test_assert(context);
     test_assert(result->asFloat() == 8.0);
@@ -132,7 +131,7 @@ void register_tests()
     REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine);
     REGISTER_TEST_CASE(dynamic_type_tests::test_field_access);
     REGISTER_TEST_CASE(dynamic_type_tests::test_subroutine_input_and_output);
-    //TEST_DISABLED REGISTER_TEST_CASE(dynamic_type_tests::test_dynamic_overload);
+    REGISTER_TEST_CASE(dynamic_type_tests::test_dynamic_overload);
 }
 
 } // namespace dynamic_type_tests
