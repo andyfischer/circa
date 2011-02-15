@@ -472,6 +472,7 @@ void test_lists()
 {
     test_snippet("to_rect([0 0] [5.0 10.0])", "");
     test_snippet("", "filter([1 2 3] [true false true]) == [1 3]");
+    test_snippet("", "[1 2 3].extend([4 5]) == [1 2 3 4 5]");
 }
 
 void test_type_check_functions()
@@ -559,7 +560,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_map_type);
     REGISTER_TEST_CASE(test_snippets::test_field_syntax);
     REGISTER_TEST_CASE(test_snippets::test_lexprs);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
+    REGISTER_TEST_CASE(test_snippets::test_vectorized_funcs);
     REGISTER_TEST_CASE(test_snippets::test_color_arithmetic);
     REGISTER_TEST_CASE(test_snippets::test_branch_value);
     REGISTER_TEST_CASE(test_snippets::test_rebinding_operators);

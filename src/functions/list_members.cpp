@@ -13,6 +13,21 @@ namespace list_members_function {
         copy(value, result->append());
     }
 
+    CA_DEFINE_FUNCTION(extend, "extend(List, List) -> List")
+    {
+        copy(INPUT(0), OUTPUT);
+        List* result = List::checkCast(OUTPUT);
+
+        List* additions = List::checkCast(INPUT(1));
+
+        int oldLength = result->length();
+        int additionsLength = additions->length();
+
+        result->resize(oldLength + additionsLength);
+        for (int i = 0; i < additionsLength; i++)
+            copy(additions->get(i), result->get(oldLength + i));
+    }
+
     CA_DEFINE_FUNCTION(count, "count(List) -> int")
     {
         List* list = List::checkCast(INPUT(0));
