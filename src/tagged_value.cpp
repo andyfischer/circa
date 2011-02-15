@@ -581,7 +581,7 @@ bool is_ref(TaggedValue* value)
 
 bool is_list(TaggedValue* value)
 {
-    return list_t::is_list_based_type(value->value_type);
+    return is_list_based_type(value->value_type);
 }
 
 bool is_type(TaggedValue* value)

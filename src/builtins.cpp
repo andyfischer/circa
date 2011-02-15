@@ -263,9 +263,6 @@ void initialize_compound_types(Branch& kernel)
     Term* set_type = create_compound_type(kernel, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-    // LIST_TYPE was created in bootstrap_kernel
-    list_t::postponed_setup_type(LIST_TYPE);
-
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(unbox_type(map_type));
 

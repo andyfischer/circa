@@ -39,7 +39,7 @@ Term* find_common_type(RefList const& list)
     // Another special case, if all types are lists then use LIST_TYPE
     bool all_are_lists = true;
     for (int i=0; i < list.length(); i++) {
-        if (!list_t::is_list_based_type(unbox_type(list[i])))
+        if (!is_list_based_type(unbox_type(list[i])))
             all_are_lists = false;
     }
 
@@ -65,7 +65,7 @@ Term* find_type_of_get_index(Term* listTerm)
     if (listTerm->function == COPY_FUNC)
         return find_type_of_get_index(listTerm->input(0));
 
-    if (list_t::is_list_based_type(unbox_type(listTerm->type))) {
+    if (is_list_based_type(unbox_type(listTerm->type))) {
         Branch& prototype = type_t::get_prototype(unbox_type(listTerm->type));
         RefList types;
         for (int i=0; i < prototype.length(); i++)

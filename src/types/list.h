@@ -7,10 +7,8 @@
 namespace circa {
 
 namespace list_t {
-    bool is_list_based_type(Type*);
 
     void setup_type(Type*);
-    void postponed_setup_type(Term*);
     void tv_initialize(Type*, TaggedValue*);
     TaggedValue* append(TaggedValue* list);
     TaggedValue* prepend(TaggedValue* list);
@@ -18,6 +16,8 @@ namespace list_t {
 
     namespace tests { void register_tests(); }
 }
+
+bool is_list_based_type(Type*);
 
 // Wrapper type to use a TaggedValue as a List.
 struct List : TaggedValue

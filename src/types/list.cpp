@@ -582,10 +582,6 @@ namespace list_t {
         set_pointer(value, data);
     }
 
-    bool is_list_based_type(Type* type)
-    {
-        return type->initialize == tv_initialize;
-    }
 
     void setup_type(Type* type)
     {
@@ -619,14 +615,6 @@ namespace list_t {
     {
         List* list = List::checkCast(INPUT(0));
         set_int(OUTPUT, list->length());
-    }
-
-    void postponed_setup_type(Term* type)
-    {
-        Term* list_append =
-            import_member_function(type, append, "append(List, any) -> List");
-        function_set_use_input_as_output(list_append, 0, true);
-        import_member_function(type, count, "count(List) -> int");
     }
 
     namespace tests {
@@ -752,6 +740,11 @@ namespace list_t {
 
     } // namespace tests
 } // namespace list_t
+
+bool is_list_based_type(Type* type)
+{
+    return type->initialize == list_t::tv_initialize;
+}
 
 List::List()
   : TaggedValue()
