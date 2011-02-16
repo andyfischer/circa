@@ -110,7 +110,7 @@ void consume_branch(Branch& branch, TokenStream& tokens)
     if (tokens.nextNonWhitespaceIs(LBRACE)) {
         consume_branch_with_braces(branch, tokens, parentTerm);
     } else {
-        consume_branch_with_significant_indentation(branch, tokens);
+        consume_branch_with_significant_indentation(branch, tokens, parentTerm);
     }
 
     post_parse_branch(branch);
@@ -136,12 +136,14 @@ int find_indentation_of_next_statement(TokenStream& tokens)
     return tokens.next(lookahead).colStart;
 }
 
-void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens)
+void consume_branch_with_significant_indentation(Branch& branch, TokenStream& tokens,
+        Term* parentTerm)
 {
-    Term* parentTerm = branch.owningTerm;
     ca_assert(parentTerm != NULL);
-
     ca_assert(parentTerm->sourceLoc.defined());
+
+    parentTerm->setStringProp("syntax:branchStyle", "sigIndent");
+
     int parentTermIndent = tokens.next(-1).precedingIndent;
 
     // Consume the whitespace immediately after the heading (and possibly a newline).
@@ -263,6 +265,8 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
 
 void consume_branch_with_braces(Branch& branch, TokenStream& tokens, Term* parentTerm)
 {
+    parentTerm->setStringProp("syntax:branchStyle", "braces");
+
     if (tokens.nextIs(WHITESPACE))
         parentTerm->setStringProp("syntax:postHeadingWs", possible_whitespace(tokens));
 

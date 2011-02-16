@@ -23,10 +23,14 @@ StyledSource::toString()
 
 void format_branch_source(StyledSource* source, Branch& branch, Term* format)
 {
-
     if (format != NULL)
         append_phrase(source, format->stringPropOptional("syntax:postHeadingWs", ""),
                 format, phrase_type::WHITESPACE);
+
+    bool styleBraces = format && format->stringPropOptional("syntax:branchStyle","") == "braces";
+
+    if (styleBraces)
+        append_phrase(source, "{", format, phrase_type::UNDEFINED);
 
     bool newlineNeeded = false;
     for (int i=0; i < branch.length(); i++) {
@@ -59,6 +63,8 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
             append_phrase(source, "end", format, phrase_type::UNDEFINED);
     }
 
+    if (styleBraces)
+        append_phrase(source, "}", format, phrase_type::UNDEFINED);
 }
 
 std::string unformat_rich_source(StyledSource* source)

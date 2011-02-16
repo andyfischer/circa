@@ -139,7 +139,7 @@ void reproduce_function_calls() {
     round_trip_source("d=add(1 2)");
     round_trip_source("d=   add(1 2)");
     round_trip_source("    text_sprite = render_text(ui_font_medium, text, #000)");
-    round_trip_source("def f(int a, int b, int c); state s; end;   f(1, 2 3)"); // once had a bug
+    round_trip_source("def f(int a, int b, int c) { state s; }   f(1, 2 3)"); // once had a bug
     finish_source_repro_category();
 }
 
@@ -180,9 +180,10 @@ void reproduce_rebinding() {
 }
 
 void reproduce_if() {
-    round_trip_source("if true x = 1 end");
-    round_trip_source("if true       1 end");
-    round_trip_source("if 5.0 > 3.0  print('hey') end");
+    round_trip_source("if { true x = 1 }");
+    round_trip_source("if true       { 1 }");
+    round_trip_source("if true {     1 }");
+    round_trip_source("if 5.0 > 3.0 { print('hey') }");
     round_trip_source("if true else end");
     round_trip_source("  if true else end");
     round_trip_source("if true   else end");
@@ -196,7 +197,7 @@ void reproduce_if() {
     round_trip_source("if true elif true else end");
     round_trip_source("if true elif true   else end");
     round_trip_source("if 1 > 2 print('hi') elif 2 > 3   elif 3 > 4 print('hello') end");
-    round_trip_source("if true 1 2 3 end");
+    round_trip_source("if true { 1 2 3 }");
     round_trip_source("if true;1 2 3 end");
     round_trip_source("if true; a = 1; else; a = 2; end; b = a"); // once had a bug
     finish_source_repro_category();

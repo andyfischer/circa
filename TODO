@@ -1,40 +1,8 @@
 
-Two bugs with recursion:
-
-  1) Every block instruction can trigger a recursive call, so they must all use start_using
-     and end_using.
-
-BUGS
+This is a list of short-term TODOs. There's a bigger list at docs/todo.md
 
  - Plastic no longer reloads scripts when they encounter an error
 
- - Can't use a namespace qualifier on a type name in function declaration
-
- - Can't comment out something inside of a literal list
-
- - Complex lvalues don't work.
-     Doesn't work: something.field += x
-     Doesn't work: something.field[i] = x
-
- - When reloading a branch, we need to search the whole world for references to the 
-   old branch, and update those references.
-
- - 'do once' needs to export name bindings. Maybe just make this syntactic sugar for if() ?
-
-TASKS
-
  - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
-
- - Lambdas
- - How to support introspection inside blocks (for, if, include). Should the user need to provide
-   names or can we provide default names? Can the user provide a name if they want?
- - Store whether a function is pure
-
-Optimization tasks:
  - evaluate_if_block should not use if_block_contains_state, it's O(n) 
  - various places where swap() can be used instead of copy()
-
-Big tasks:
- - Parametrized/generic types
- - JIT compilation
- - C reproduction

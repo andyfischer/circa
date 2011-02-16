@@ -8,11 +8,12 @@ namespace subroutine_tests {
 void test_return_from_conditional()
 {
     Branch branch;
-    branch.compile("def my_max(number a, number b) -> number\n"
-                "  if (a < b)\n"
-                "    return(b)\n"
-                "  else\n"
-                "    return(a)\n");
+    branch.compile("def my_max(number a, number b) -> number {"
+                "  if (a < b) {"
+                "    return(b)"
+                "  } else { "
+                "    return(a) }"
+                "}");
 
     test_assert(branch);
 
@@ -28,16 +29,16 @@ void test_recursion()
 
     // I think this is the simplest possible recursive function. Evaluate it
     // just to make sure that nothing crashes.
-    branch.compile("def recr(bool r) if r recr(false) end end");
+    branch.compile("def recr(bool r) { if r { recr(false) }}");
     branch.eval("recr(true)");
 
     // Factorial
-    branch.compile("def factorial(int n) -> int\n"
-                "  if (n < 2)\n"
-                "    return(1)\n"
-                "  else\n"
-                "    next_i = add_i(n, -1)\n"
-                "    return(mult_i(n, factorial(next_i)))\n");
+    branch.compile("def factorial(int n) -> int {"
+                "  if (n < 2) {"
+                "    return(1)"
+                "  } else {"
+                "    next_i = add_i(n, -1)"
+                "    return(mult_i(n, factorial(next_i))) }}");
 
     TaggedValue* fact_1 = branch.eval("factorial(1)");
     test_assert(branch);
@@ -71,7 +72,7 @@ void subroutine_stateful_term()
 {
     EvalContext context;
     Branch branch;
-    branch.compile("def mysub() state a = 0.0 a += 1 end");
+    branch.compile("def mysub() { state a = 0.0 a += 1 }");
 
     // Make sure that stateful terms work correctly
     Term* call = branch.compile("call = mysub()");
@@ -97,8 +98,10 @@ void subroutine_stateful_term()
 void test_recursion_with_state()
 {
     Branch branch;
-    branch.compile("def recr(int i) -> int; state s = test_oracle();"
-            "if i == 1 return 1 end; return recr(i - 1) + 1 end");
+    branch.compile("def recr(int i) -> int {"
+                    "state s = test_oracle();"
+                    "if i == 1 { return 1 }; return recr(i - 1) + 1"
+                   "}");
     branch.compile("result = recr(4)");
 
     test_assert(branch);
@@ -121,10 +124,10 @@ void initialize_state_type()
 {
     Branch branch;
 
-    Term* a = branch.compile("def a() -> number return(1 + 1) end");
+    Term* a = branch.compile("def a() -> number { return(1 + 1) }");
     test_assert(get_function_attrs(a)->implicitStateType == VOID_TYPE);
 
-    Term* b = branch.compile("def b() state i end");
+    Term* b = branch.compile("def b() { state i }");
     test_assert(get_function_attrs(b)->implicitStateType != VOID_TYPE);
 }
 
@@ -133,7 +136,7 @@ void shadow_input()
     Branch branch;
 
     // Try having a name that shadows an input. This had a bug at one point
-    branch.eval("def f(int i) -> int i = 2 return(i) end");
+    branch.eval("def f(int i) -> int { i = 2 return(i) }");
 
     TaggedValue* a = branch.eval("f(1)");
 
@@ -146,7 +149,7 @@ void specialization_to_output_type()
     // than the implicit output type, then make sure that it uses the
     // declared type. This code once had a bug.
     Branch branch;
-    Term* a = branch.compile("def a() -> Point return([1 2]) end");
+    Term* a = branch.compile("def a() -> Point { return([1 2]) }");
 
     test_assert(function_get_output_type(a, 0)->name == "Point");
 
@@ -161,7 +164,7 @@ void stateful_function_with_arguments()
 {
     // This code once had a bug
     Branch branch;
-    branch.compile("def myfunc(int i) -> int state s; return(i) end");
+    branch.compile("def myfunc(int i) -> int { state s; return(i) }");
     TaggedValue* call = branch.eval("myfunc(5)");
     test_assert(call->asInt() == 5);
 }
@@ -170,7 +173,7 @@ void to_source_string()
 {
     // This code once had a bug
     Branch branch;
-    branch.compile("def f() end");
+    branch.compile("def f();");
     Term* c = branch.compile("f()");
 
     test_equals(get_term_source_text(c), "f()");
@@ -179,7 +182,7 @@ void to_source_string()
 void bug_with_return()
 {
     Branch branch;
-    branch.compile("def f(bool b)->int if b return 1 else return 2 end");
+    branch.compile("def f(bool b)->int { if b return 1 else return 2 }");
     Term* input = branch.compile("b = true");
     Term* f = branch.compile("f(b)");
 
@@ -198,8 +201,8 @@ void bug_with_return()
 void bug_where_interrupt_subroutine_wasnt_being_cleared()
 {
     Branch branch;
-    branch.compile("def f()->int return(1) end");
-    branch.compile("def g()->int a = f() return(2) end");
+    branch.compile("def f()->int { return(1) }");
+    branch.compile("def g()->int { a = f() return(2) }");
     TaggedValue* x = branch.eval("x = g()");
     test_equals(x, 2);
 }
@@ -282,7 +285,7 @@ namespace copy_counting_tests
         Branch branch;
         setup(branch);
 
-        branch.compile("def f(T t) end");
+        branch.compile("def f(T t);");
         Term* init = branch.compile("a = T()");
         Term* call = branch.compile("f(a)");
         test_assert(branch);
