@@ -45,7 +45,7 @@ Examples:
     > sqrt(hi())
     0.707107
 
-Note, the REPL currently doesn't support multiline input, if you want to write a block of code (like a function, for-loop, or if-block) then currently you'll have to put it on one line.
+Note, the REPL currently doesn't support multiline input, if you want to write a block of code (like a function, for-loop, or if-block) then you'll have to put it on one line.
 
 The REPL has a few meta-commands that you can see by typing `/help`. One of these is the `/raw` command, which displays raw compiled output:
 

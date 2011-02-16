@@ -1,8 +1,8 @@
 
 Circa's object model uses a pluggable type system and tagged pointers. A type is defined
-by creating a Type object, and adding functions to its slots to control its behavior.
-The type system is meant to be pluggable and flat; inheritance and complex type hierarchies
-are discouraged. (There is some limited support for metaclasses)
+by creating a Type object, and adding functions to its slots to control its behavior. The
+type system is meant to be pluggable and flat; inheritance and complex type hierarchies
+are discouraged. (Though there is some support for metaclasses)
 
 Values are held by TaggedValue objects, which look like this:
 
@@ -14,12 +14,12 @@ Values are held by TaggedValue objects, which look like this:
 
 Each TaggedValue has a pointer to its original type, and a 32-bit slot to hold the actual
 data. The type can use `value_data` to hold the actual value, or it can store a pointer
-to an allocated object. Builtin types such as int, float, and bool will store their
-entire payload in `value_data`.
+to an allocated object. Builtin types such as int, float, and bool will store their entire
+payload in `value_data`.
 
 The object system has enough hooks to support a variety of memory-management strategies,
-including reference counting or memory pools. Each type can have its own strategy.
-Circa doesn't have a global garbage collector.
+including reference counting or memory pools. Each type can have its own strategy. Circa
+doesn't have a global garbage collector.
 
 # Type slots #
 
@@ -39,9 +39,9 @@ type.
 ## copy ##
 
 Called when a value of this type should be copied to another TaggedValue. This copy should
-behave like a separate value, not a reference to the same value. (if one value is later
-changed then that change shouldn't affect the copy). But, if the type is able to guarantee
-immutability then it can always reuse the same data on a copy.
+behave like a separate value, not a reference to the same value. If one value is later
+changed, the copy should not be changed. But, the type may reuse the same piece of data if
+it can guarantee that there are no visible side effects.
 
 If this function isn't implemented, the default behavior is to do a shallow copy of
 `value_data`
@@ -59,15 +59,14 @@ initialize().
 Returns whether the given values are equal. The right-hand-side value might be of a
 different type, so this function should check the types.
 
-If this function isn't implemented, the default behavior is: when the values have
-the same type, do a shallow comparison of `value_data`, and if they have different
-types, always return false.
+If this function isn't implemented, the default behavior is: when the values have the same
+type, do a shallow comparison of `value_data`. If they have different types, return false.
 
 ## cast ##
 
-Attempt to convert a value of this type to a value of a different type. The type can assume
-that this will only be called if valueFitsType or staticTypeQuery have indicated that
-this cast is possible.
+Attempt to convert a value of this type to a value of a different type. The type can
+assume that this will only be called if valueFitsType or staticTypeQuery have indicated
+that this cast is possible.
 
 If this function isn't implemented, the default behavior is to do a copy()
 
@@ -76,15 +75,13 @@ If this function isn't implemented, the default behavior is to do a copy()
 Returns whether every value of `otherType` can be cast to the current type. This is used
 for static and dynamic type checking.
 
-The subtype relationship isn't necessarily strict: two types can be subtypes of each other.
-
 ## staticTypeQuery ##
 
-This checks if the given term can be cast to a value of this type. This function
-may return a result of "always", "never", or "unable to statically determine".
-If the answer can't be statically determined, we'll call valueFitsType at runtime.
-This is only used for static checking, so this function has access to the Term object
-(isSubtype doesn't get access to that). This is optional.
+This checks if the given term can be cast to a value of this type. This function may
+return a result of "always", "never", or "unable to statically determine". If the answer
+can't be statically determined, we'll call valueFitsType at runtime.  This is only used
+for static checking, so this function has access to the Term object (isSubtype doesn't
+get access to that). This is optional.
 
 ## valueFitsType ##
 
@@ -99,13 +96,13 @@ output.
 
 ## formatSource ##
 
-Returns the value as a snippet of Circa source code. This is used for values which can
-be typed as literals in source code.
+Returns the value as a snippet of Circa source code. This is only relevant for values
+which can be written as a literal value.
 
 ## touch ##
 
-This is called when the contents of this value are about to be modified. Types which
-use copy-on-write data sharing should create a real copy of their data here.
+This is called when the contents of this value are about to be modified. Types which use
+copy-on-write data sharing should create a real copy of their data here.
 
 ## getIndex ##
 
@@ -130,8 +127,7 @@ Return the number of elements in a list-like object.
 ## remapPointers ##
 
 Deprecated.
-This function is called when a Branch is being
-duplicated, and each local Term reference needs to be remapped from the old branch to the
-new copy. If the type holds any Term reference, then they should remmap them (according
-to the provided map).
+This function is called when a Branch is being duplicated, and each local Term reference
+needs to be remapped from the old branch to the new copy. If the type holds any Term
+reference, then they should remmap them (according to the provided map).
 

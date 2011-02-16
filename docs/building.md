@@ -11,23 +11,19 @@ which has more instructions below.
 ## OSX ##
 
 1. Install Xcode from Apple's site
-2. Install MacPorts from www.macports.org
-3. In Terminal, use this command to install Scons:
-     sudo port install scons
+2. Install Scons.
 4. In Terminal, from the Circa project folder, enter the command: 'scons'
 
 ## Windows ##
 
-1. Install Visual Studio
+1. Install Visual Studio (currently we have only tested against VS 2005)
 2. Install Python 2.6 from www.python.org
-3.  Install SCons from here: www.scons.org
+3. Install SCons from here: www.scons.org
 5. Open a command prompt, navigate to the Circa project folder, and run 'scons'
-
-Note, currently we have only tested building with VS 2005
 
 ## Linux ##
 
-1. Using your package manager, install GCC, Python, SCons
+1. Install GCC, Python, SCons
 2. In a terminal, from the Circa project folder, run the command: 'scons'
 
 # Building Plastic #
@@ -38,7 +34,8 @@ and depends on the SDL library.
 ## OSX ##
 
 1. Follow the instructions above for building the command-line app
-2. In Terminal, use this command to install SDL:
+2. Install SDL with the gfx and image packages.
+2.1 One way you can do this is to install MacPorts, then run this command:
      sudo port install SDL-devel SDL_gfx SDL_image
 3. In Terminal, from the Circa project folder, enter the command: 'scons plastic'
 
@@ -53,10 +50,11 @@ folder, this will be fixed soon.
 
 ## Linux ##
 
+Warning, this build target is untested and unsupported, so it probably won't work
+without modification.
+
 1. Follow the instructions above for building the command-line app
 2. Install the following packages with your package manager:
      libsdl-dev, libsdl-image1.2-dev, libsdl-gfx1.2-dev, libsdl-ttf2.0-dev
 3. In a terminal, from the Circa project folder, run the command: 'scons plastic'
 
-Warning, the Linux build of Plastic has received very little testing and will probably
-not work.

@@ -11,7 +11,7 @@ fit for Circa:
 
 Questions..
 
-How does the user specify behavior? (probably with feedback)
+How does the user specify behavior?
 
 How is the structure stored?
 

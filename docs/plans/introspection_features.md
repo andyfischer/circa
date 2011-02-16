@@ -28,7 +28,6 @@ Example, if I had this code:
 
     def some_bool_func(bool a, bool b, bool c) -> bool
       return a and (b or c)
-    end
 
 Then let's say I called the function like this:
 
@@ -74,9 +73,8 @@ question Q2 on T2, etc.
 A query should be able to specify a complexity limit, because some questions can just spiral
 out of control. Perhaps infinitely. In the real world, I think that only simple answers are
 going to be useful. If an answer grows to be too complex, might as well throw it out and
-just tell the user "It's complicated". Or perhaps, offer a high-level answer and
-allow the user to dig in
-to the aspects that are useful to them.
+just tell the user "It's complicated". Or perhaps, offer a high-level answer and allow the user
+to dig in to the aspects that are useful to them.
 
 ### Nesting ###
 

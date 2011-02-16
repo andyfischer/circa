@@ -5,7 +5,6 @@ Example:
 
     def get_distance(Point a, Point b)
         ...
-    end
 
 can be called with:
 
