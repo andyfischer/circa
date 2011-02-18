@@ -50,7 +50,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     // Evaluate each term
     for (int i=numInputs+1; i < contents.length(); i++) {
         evaluate_single_term(context, contents[i]);
-        if (context->errorOccurred || context->interruptSubroutine)
+        if (evaluation_interrupted(context))
             break;
     }
 
@@ -116,7 +116,6 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
         if (!success) {
             std::stringstream msg;
             msg << "Couldn't cast input " << i << " to " << inputType->name;
-            ca_assert(false);
             return error_occurred(context, caller, msg.str());
         }
     }
@@ -173,28 +172,11 @@ Term* find_enclosing_subroutine(Term* term)
 
 void update_subroutine_return_contents(Term* sub, Term* returnCall)
 {
+    #if 0
     Branch& returnContents = returnCall->nestedContents;
     returnContents.clear();
 
     Branch& subContents = sub->nestedContents;
-
-    // Iterate through every state var in the subroutine that occurs before
-    // the 'return'.
-    for (int i=0; i < subContents.length(); i++) {
-        Term* term = subContents[i];
-        if (term == NULL)
-            continue;
-
-        if (term == returnCall)
-            break;
-
-        if (term->function == GET_STATE_FIELD_FUNC) {
-            if (term->name == "")
-                continue;
-            Term* outcome = get_named_at(returnCall, term->name);
-            apply(returnContents, PRESERVE_STATE_RESULT_FUNC, RefList(outcome));
-        }
-    }
 
     // Add a subroutine_output() function
     if (SUBROUTINE_OUTPUT_FUNC != NULL) {
@@ -213,6 +195,7 @@ void update_subroutine_return_contents(Term* sub, Term* returnCall)
 
         apply(returnContents, SUBROUTINE_OUTPUT_FUNC, inputs);
     }
+    #endif
 }
 
 void initialize_subroutine(Term* sub)

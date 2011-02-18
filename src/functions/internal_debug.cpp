@@ -46,6 +46,24 @@ namespace internal_debug_function {
         oracle_send(&v);
     }
 
+    List spyValues;
+
+    CA_DEFINE_FUNCTION(spy, "debug_spy(any)"
+            "'For internal testing. This function will save every inputs to a static list, "
+            "and the contents of this list can be checked from C++ code.")
+    {
+        copy(INPUT(0), spyValues.append());
+    }
+
+    void spy_clear()
+    {
+        spyValues.clear();
+    }
+    List* spy_results()
+    {
+        return &spyValues;
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

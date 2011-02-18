@@ -184,7 +184,7 @@ CA_FUNCTION(evaluate_if_block)
             // Evaluate each term
             for (int j=0; j < acceptedBranch->length(); j++) {
                 evaluate_single_term(context, acceptedBranch->get(j));
-                if (context->errorOccurred)
+                if (evaluation_interrupted(context))
                     break;
             }
 

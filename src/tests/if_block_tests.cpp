@@ -306,8 +306,8 @@ void test_state_in_function()
     Branch branch;
     EvalContext context;
 
-    Term* my_func = branch.compile("def my_func() -> int;"
-           " if true; state i = 0; i += 1; return(i); else return(0) end end");
+    Term* my_func = branch.compile("def my_func() -> int {"
+           " if true { state i = 0; i += 1; return(i) } else { return(0) } }");
 
     test_assert(is_function_stateful(my_func));
 

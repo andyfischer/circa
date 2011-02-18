@@ -198,6 +198,10 @@ void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* resu
     const char* name = term->uniqueName.name.c_str();
     copy(result, containerDict->insert(name));
 }
+bool evaluation_interrupted(EvalContext* context)
+{
+    return context->errorOccurred || context->interruptSubroutine;
+}
 
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
 {

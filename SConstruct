@@ -26,7 +26,7 @@ SHARED_LIBRARY = config.get('circa', 'shared_library') == 'true'
 # Build flags
 if POSIX:
     def common_flags(env):
-        env.Append(CPPFLAGS=['-ggdb', '-Wall'])
+        env.Append(CPPFLAGS=['-ggdb', '-Wall','-fasm-blocks'])
         env.Append(LINKFLAGS=['-ldl'])
 
         if config.get('circa', 'gprof_support') == 'true':

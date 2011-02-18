@@ -115,6 +115,8 @@ void test_recursion_with_state()
 
     evaluate_branch(&context, branch);
 
+    dump(branch);
+
     test_equals(&context.state,
         "[result: [_recr: [_recr: [_recr: [s: 45], s: 33], s: 21], s: 10]]");
     test_equals(get_local(branch["result"]), 4);
@@ -301,6 +303,36 @@ namespace copy_counting_tests
     }
 }
 
+void return_from_if_block()
+{
+    Branch branch;
+
+    internal_debug_function::spy_clear();
+    branch.compile("def f() { if true { debug_spy(1); return; debug_spy(2); }}");
+    branch.eval("f()");
+    test_equals(internal_debug_function::spy_results()->toString(), "[1]");
+
+    internal_debug_function::spy_clear();
+    branch.compile("def f() {if false {} else { debug_spy(3); return; debug_spy(4); }}");
+    branch.eval("f()");
+    test_equals(internal_debug_function::spy_results()->toString(), "[3]");
+}
+
+void return_from_for_loop()
+{
+    Branch branch;
+
+    internal_debug_function::spy_clear();
+    branch.compile("def f() { for i in [1 2 3] { debug_spy(5) return; debug_spy(6) }}");
+    branch.eval("f()");
+    test_equals(internal_debug_function::spy_results()->toString(), "[5]");
+
+    internal_debug_function::spy_clear();
+    branch.compile("def f() { for i in [1 2 3 4] { debug_spy(i) if i==3 { return }; debug_spy(0) }}");
+    branch.eval("f()");
+    test_equals(internal_debug_function::spy_results()->toString(), "[1 0 2 0 3]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
@@ -316,6 +348,8 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::bug_where_interrupt_subroutine_wasnt_being_cleared);
     REGISTER_TEST_CASE(subroutine_tests::test_call_subroutine);
     REGISTER_TEST_CASE(subroutine_tests::copy_counting_tests::test_single_call);
+    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::return_from_if_block);
+    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::return_from_for_loop);
 }
 
 } // namespace refactoring_tests

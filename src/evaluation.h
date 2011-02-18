@@ -75,6 +75,7 @@ TaggedValue* get_local_safe(Term* term, int outputIndex);
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);
+bool evaluation_interrupted(EvalContext* context);
 
 void start_using(Branch& branch);
 void finish_using(Branch& branch);
