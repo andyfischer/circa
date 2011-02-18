@@ -115,7 +115,7 @@ void test_recursion_with_state()
 
     evaluate_branch(&context, branch);
 
-    dump(branch);
+    //dump(branch);
 
     test_equals(&context.state,
         "[result: [_recr: [_recr: [_recr: [s: 45], s: 33], s: 21], s: 10]]");

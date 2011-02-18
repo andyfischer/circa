@@ -18,21 +18,21 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
         temporaryBranch = true;
     }
 
-    int prevHead = branch->length() - 1;
+    int prevLastIndex = branch->length() - 1;
 
-    // std::cout << "compile, existing branch = " << std::endl;
-    // dump(*branch);
-    // std::cout << "prevHead = " << prevHead << std::endl;
 
     TokenStream tokens(input);
     Ref result = step(*branch, tokens);
 
     // Update the finish_minor_branch() func at the end
-    if (prevHead >= 0 && branch->get(prevHead)->function == FINISH_MINOR_BRANCH_FUNC) {
-        branch->moveToEnd(branch->get(prevHead));
+    Term* prevLast = NULL;
+    if (prevLastIndex >= 0)
+        prevLast = branch->get(prevLastIndex);
+    if (prevLast && prevLast->function == FINISH_MINOR_BRANCH_FUNC) {
+        branch->moveToEnd(branch->get(prevLastIndex));
         update_branch_finish_term(branch->get(branch->length()-1));
     } else {
-        check_to_add_branch_finish_term(*branch, prevHead+1);
+        check_to_add_branch_finish_term(*branch, prevLastIndex+1);
     }
 
     post_parse_branch(*branch);

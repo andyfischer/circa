@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include <circa.h>
+#include "upward_iterator.h"
 
 namespace circa {
 namespace branch_iterator_tests {
@@ -44,9 +45,50 @@ void test_simple()
     test_assert(it.finished());
 }
 
+void iterate_names_to_list(UpwardIterator it, List& list)
+{
+    list.clear();
+    for ( ; it.unfinished(); it.advance())
+        set_string(list.append(), it->name);
+}
+
+void test_upwards_iterator()
+{
+    Branch branch;
+    branch.compile("a = 1; b = 2; c = { d = 3; e = 4} f = 5; g = { h = 6; i = 7; j = 8} k = 9");
+
+    List names;
+    iterate_names_to_list(UpwardIterator(branch["g"]->nestedContents["j"]), names);
+    test_equals(&names, "['i', 'h', 'g', 'f', 'c', 'b', 'a']");
+}
+
+void test_upwards_iterator_nulls()
+{
+    Branch branch;
+    branch.compile("a = 1; b = 2");
+    branch.append(NULL);
+    branch.compile("c = 1; d = 2");
+
+    List names;
+    iterate_names_to_list(UpwardIterator(branch["d"]), names);
+    test_equals(&names, "['c', 'b', 'a']");
+
+    branch.clear();
+    branch.compile("a = 2; b = {}");
+    branch["b"]->nestedContents.append(NULL);
+    branch["b"]->nestedContents.compile("c = 3");
+    branch["b"]->nestedContents.compile("d = {}");
+    branch["b"]->nestedContents["d"]->nestedContents.append(NULL);
+    Term* e = branch["b"]->nestedContents["d"]->nestedContents.compile("e = 1");
+    iterate_names_to_list(UpwardIterator(e), names);
+    test_equals(&names, "['d', 'c', 'b', 'a']");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_iterator_tests::test_simple);
+    REGISTER_TEST_CASE(branch_iterator_tests::test_upwards_iterator);
+    REGISTER_TEST_CASE(branch_iterator_tests::test_upwards_iterator_nulls);
 }
 
 } // namespace branch_iterator_tests

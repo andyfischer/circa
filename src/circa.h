@@ -43,6 +43,7 @@
 #include "token_stream.h"
 #include "type.h"
 #include "type_inference.h"
+#include "upward_iterator.h"
 
 #include "types/dict.h"
 #include "types/list.h"
