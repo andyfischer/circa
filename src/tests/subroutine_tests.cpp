@@ -115,8 +115,6 @@ void test_recursion_with_state()
 
     evaluate_branch(&context, branch);
 
-    //dump(branch);
-
     test_equals(&context.state,
         "[result: [_recr: [_recr: [_recr: [s: 45], s: 33], s: 21], s: 10]]");
     test_equals(get_local(branch["result"]), 4);
@@ -333,6 +331,20 @@ void return_from_for_loop()
     test_equals(internal_debug_function::spy_results()->toString(), "[1 0 2 0 3]");
 }
 
+void bug_with_misplaced_preserve_state_result()
+{
+    Branch branch;
+
+    branch.compile("def f() {"
+                    "if true { state s; s = 2 }"
+                    "if true { state t; t = 3 }"
+                   "}");
+
+    // there was a bug where this would create extra preserve_state_result() calls.
+    // These showed up as terms with null inputs.
+    test_assert(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(subroutine_tests::test_return_from_conditional);
@@ -350,6 +362,7 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::copy_counting_tests::test_single_call);
     //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::return_from_if_block);
     //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::return_from_for_loop);
+    REGISTER_TEST_CASE(subroutine_tests::bug_with_misplaced_preserve_state_result);
 }
 
 } // namespace refactoring_tests

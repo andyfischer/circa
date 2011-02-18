@@ -30,7 +30,10 @@ namespace return_function {
         if (sub == NULL)
             return;
 
-        for (BranchIterator it(sub->nestedContents); it.unfinished(); it.advance()) {
+        UpwardIterator it(returnCall);
+        it.stopAt(sub->owningBranch);
+
+        for ( ; it.unfinished(); it.advance()) {
             //if (format_global_id(*it) == "$1982") asm { int 3};
             Term* previousTerm = *it;
             if (previousTerm == NULL)
