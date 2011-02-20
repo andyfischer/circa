@@ -1,7 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include <circa.h>
-#include "upward_iterator.h"
 
 namespace circa {
 namespace branch_iterator_tests {

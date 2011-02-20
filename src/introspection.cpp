@@ -290,6 +290,8 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     }
     out << "]";
 
+    out << " " << term->localsIndex << "+" << get_output_count(term);
+
     #if 0
     TaggedValue* local = get_local_safe(term);
     if (local != NULL) {
