@@ -4,10 +4,10 @@
 
 #include "common_headers.h"
 
+namespace circa {
+
 struct Branch;
 struct Term;
-
-namespace circa {
 
 struct UpwardIterator
 {

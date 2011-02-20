@@ -140,8 +140,14 @@ void for_loop_update_output_index(Term* forTerm)
         ca_assert(output != NULL);
         contents.outputIndex = output->index;
     } else {
-        // use the term right before #outer_rebinds
-        contents.outputIndex = contents.length() - 2;
+        // Find the first non-comment expression before #outer_rebinds
+        contents.outputIndex = -1;
+        for (int i = contents.length() - 2; i >= 0; i--) {
+            if (contents[i] != NULL && contents[i]->function != COMMENT_FUNC) {
+                contents.outputIndex = i;
+                break;
+            }
+        }
     }
 }
 

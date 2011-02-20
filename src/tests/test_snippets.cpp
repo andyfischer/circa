@@ -327,11 +327,20 @@ void test_for_loops()
     test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
 
     // For loop with state
-    //test_snippet("for i in [1 2 3]; state s = i; end", "");
+    test_snippet("for i in [1 2 3]; state s = i; end", "");
 
     // Syntax with significant indentation
     test_snippet("a = 0; for i in [1 2 3] a += i", "a == 6");
     test_snippet("a = []; for i in [1 2 3] a.append(i)", "a == [1 2 3]");
+}
+
+void test_for_loop_output()
+{
+    test_snippet("for_loop = for i in 0..4 { i + 4 }", "[4 5 6 7] == for_loop");
+    test_snippet("for_loop = for i in 0..4 { add(i,2) sub(i,2) mult(i 2) }",
+            "[0 2 4 6] == for_loop");
+    test_snippet("for_loop = for i in 0..4 { mult(i 3) -- this is a comment }",
+            "[0 3 6 9] == for_loop");
 }
 
 void test_subscripting()
@@ -558,6 +567,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_cond);
     REGISTER_TEST_CASE(test_snippets::test_if_block);
     REGISTER_TEST_CASE(test_snippets::test_for_loops);
+    REGISTER_TEST_CASE(test_snippets::test_for_loop_output);
     REGISTER_TEST_CASE(test_snippets::test_subscripting);
     REGISTER_TEST_CASE(test_snippets::test_set);
     REGISTER_TEST_CASE(test_snippets::test_map_type);
