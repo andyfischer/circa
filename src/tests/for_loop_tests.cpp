@@ -51,7 +51,7 @@ void test_rebind_external()
 {
     Branch branch;
     branch.compile("a = 0");
-    branch.compile("for i in [1]; a = 1; end; a=a");
+    branch.compile("for i in [1] { a = 1 } a=a");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 1);

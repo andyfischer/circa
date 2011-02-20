@@ -48,4 +48,25 @@ void update_locals_index_for_new_term(Term* term)
     }
 }
 
+void refresh_locals_indices(Branch& branch, int startingAt)
+{
+    int nextLocal = 0;
+    if (startingAt > 0) {
+        Term* prev = branch[startingAt - 1];
+        nextLocal = prev->localsIndex + get_output_count(prev);
+    }
+
+    for (int i=startingAt; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term == NULL)
+            continue;
+        int outputCount = get_output_count(term);
+        if (outputCount == 0)
+            continue;
+        term->localsIndex = nextLocal;
+        nextLocal += outputCount;
+    }
+    branch.localsCount = nextLocal;
+}
+
 } // namespace circa

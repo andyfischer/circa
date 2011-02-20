@@ -199,6 +199,9 @@ void bootstrap_kernel()
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
     change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
+
+    // Update locals so that debugging checks don't complain.
+    refresh_locals_indices(*KERNEL);
 }
 
 void initialize_primitive_types(Branch& kernel)

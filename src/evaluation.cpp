@@ -40,6 +40,11 @@ void evaluate_single_term(EvalContext* context, Term* term)
             Type* outputType = unbox_type(get_output_type(term, i));
             TaggedValue* output = get_output(term, i);
 
+            // Temp special case, if the output type is void then we don't care
+            // if the output value is null or not.
+            if (i == 0 && outputType == &VOID_T)
+                continue;
+
             //std::cout << "output[" << i << "] for function " << term->function->name
             //    << " produced output: " << output->toString()
             //    << " (expected type: " << outputType->name << ")" << std::endl;

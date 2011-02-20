@@ -15,7 +15,6 @@ namespace circa {
 
 CA_FUNCTION(empty_evaluate)
 {
-    set_null(OUTPUT);
 }
 
 CA_FUNCTION(empty_evaluate_no_touch_output)

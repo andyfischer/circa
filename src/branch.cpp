@@ -320,6 +320,7 @@ void
 Branch::clear()
 {
     safe_delete_branch_contents(this);
+    localsCount = 0;
 }
 
 std::string Branch::toString()

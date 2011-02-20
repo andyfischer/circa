@@ -23,6 +23,7 @@
 #include "importing.h"
 #include "introspection.h"
 #include "invariants.h"
+#include "locals.h"
 #include "metaprogramming.h"
 #include "names.h"
 #include "parser.h"

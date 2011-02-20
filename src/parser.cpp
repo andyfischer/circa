@@ -20,7 +20,6 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
 
     int prevLastIndex = branch->length() - 1;
 
-
     TokenStream tokens(input);
     Ref result = step(*branch, tokens);
 
@@ -36,6 +35,8 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     }
 
     post_parse_branch(*branch);
+
+    ca_assert(branch_check_invariants_print_result(*branch, std::cout));
 
     if (temporaryBranch) {
         branch->clear();
@@ -560,8 +561,6 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
         return compile_error_for_line(result, tokens, startPosition);
     tokens.consume(RPAREN);
 
-    finish_parsing_function_header(result);
-
     // Output type
     Term* outputType = VOID_TYPE;
 
@@ -580,8 +579,7 @@ Term* function_decl(Branch& branch, TokenStream& tokens)
 
     attrs->outputTypes.setAt(0, outputType);
 
-    //if (!tokens.nextNonWhitespaceIs(NEWLINE))
-    //    result->setStringProp("syntax:postHeadingWs", possible_statement_ending(tokens));
+    finish_parsing_function_header(result);
 
     // If we're out of tokens, then stop here. This behavior is used when defining builtins.
     if (tokens.finished())
@@ -1251,6 +1249,8 @@ Term* member_function_call(Branch& branch, Term* function, RefList const& _input
 
         erase_term(fieldNameTerm);
         erase_term(originalFunctionTerm);
+
+        refresh_locals_indices(branch);
 
         Term* result = apply(branch, function, inputs, nameRebind);
         set_input_syntax_hint(result, 0, "postWhitespace", "");

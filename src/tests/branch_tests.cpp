@@ -27,6 +27,7 @@ void test_insert()
 
     branch.insert(0, b);
 
+    refresh_locals_indices(branch);
     test_assert(branch_check_invariants_print_result(branch, std::cout));
 
     test_assert(branch.length() == 2);
@@ -37,6 +38,7 @@ void test_insert()
 
     Term* c = alloc_term();
     branch.insert(2, c);
+    refresh_locals_indices(branch);
     test_assert(branch.length() == 3);
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
@@ -46,6 +48,7 @@ void test_insert()
 
     Term* d = alloc_term();
     branch.insert(1, d);
+    refresh_locals_indices(branch);
     test_assert(branch.length() == 4);
     test_assert(branch[0] == b);
     test_assert(branch[1] == d);
@@ -131,6 +134,8 @@ void test_removeNulls()
     test_assert(branch[0] == a);
     test_assert(branch[1] == b);
     test_assert(branch[2] == c);
+
+    refresh_locals_indices(branch);
 
     test_assert(branch_check_invariants_print_result(branch, std::cout));
 }

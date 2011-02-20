@@ -10,7 +10,6 @@ namespace namespace_function {
     {
         Branch& contents = CALLER->nestedContents;
         evaluate_branch_internal(CONTEXT, contents);
-        set_null(OUTPUT);
     }
 
     void format_source(StyledSource* source, Term* term)
