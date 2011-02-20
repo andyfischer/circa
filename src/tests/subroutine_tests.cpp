@@ -326,11 +326,12 @@ void return_from_for_loop()
     test_equals(internal_debug_function::spy_results()->toString(), "[5]");
 
     internal_debug_function::spy_clear();
-    branch.compile("def f() { for i in [1 2 3 4] { debug_spy(i) if i==3 { return }; print(i) debug_spy(0) }}");
-    dump(branch);
+    branch.compile("def f() { for i in [1 2 3 4] { "
+            "debug_spy(i) if i==3 { return }; debug_spy(0) }}");
+
     branch.eval("f()");
     test_assert(branch);
-    test_equals(internal_debug_function::spy_results()->toString(), "[1 0 2 0 3]");
+    test_equals(internal_debug_function::spy_results()->toString(), "[1, 0, 2, 0, 3]");
 }
 
 void bug_with_misplaced_preserve_state_result()
