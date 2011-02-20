@@ -65,7 +65,7 @@ void test_assert_function(Branch& branch, int line, const char* file)
     }
 
     // Sanity check on every term in this branch
-    for (BranchIterator it(branch); !it.finished(); ++it) {
+    for (BranchIterator it(&branch); !it.finished(); ++it) {
         Term* term = *it;
         if (term == NULL) continue;
 

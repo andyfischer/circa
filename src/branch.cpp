@@ -380,7 +380,7 @@ void safe_delete_branch_contents(Branch* branch)
     assert_valid_branch(branch);
     branch->names.clear();
 
-    for (BranchIterator it(*branch); it.unfinished(); ++it) {
+    for (BranchIterator it(branch); it.unfinished(); ++it) {
         if (*it == NULL)
             continue;
 
@@ -414,7 +414,7 @@ void safe_delete_branch_contents(Branch* branch)
 
 Term* find_term_by_id(Branch& branch, unsigned int id)
 {
-    for (BranchIterator it(branch); !it.finished(); it.advance()) {
+    for (BranchIterator it(&branch); !it.finished(); it.advance()) {
         if (*it == NULL)
             continue;
 

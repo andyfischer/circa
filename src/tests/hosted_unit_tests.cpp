@@ -10,7 +10,7 @@ namespace hosted_unit_tests {
 void run_all()
 {
     // Check every hosted function, see if it has 'unit_tests' inside it.
-    for (BranchIterator it(*KERNEL); !it.finished(); ++it) {
+    for (BranchIterator it(KERNEL); !it.finished(); ++it) {
         Term* term = *it;
         if (!is_function(term))
             continue;

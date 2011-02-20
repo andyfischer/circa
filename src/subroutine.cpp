@@ -248,7 +248,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
     // If state was added, find all the recursive calls to this function and
     // insert a state argument.
     if (previousType == VOID_TYPE && newType != VOID_TYPE) {
-        for (BranchIterator it(contents); !it.finished(); ++it) {
+        for (BranchIterator it(&contents); !it.finished(); ++it) {
             Term* term = *it;
 
             if (term->function == func)

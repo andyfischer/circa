@@ -134,20 +134,15 @@ void for_loop_update_output_index(Term* forTerm)
     Branch& contents = forTerm->nestedContents;
 
     // If this is a list-rewrite, then the output is the last term that has the iterator's
-    // name binding. Otherwise just use the last term.
+    // name binding. Otherwise the output is the last expression.
     if (as_bool(get_for_loop_modify_list(forTerm))) {
         Term* output = contents[get_for_loop_iterator(forTerm)->name];
         ca_assert(output != NULL);
         contents.outputIndex = output->index;
     } else {
         // Find the first non-comment expression before #outer_rebinds
-        contents.outputIndex = -1;
-        for (int i = contents.length() - 2; i >= 0; i--) {
-            if (contents[i] != NULL && contents[i]->function != COMMENT_FUNC) {
-                contents.outputIndex = i;
-                break;
-            }
-        }
+        Term* output = find_last_non_comment_expression(contents);
+        contents.outputIndex = output == NULL ? -1 : output->index;
     }
 }
 

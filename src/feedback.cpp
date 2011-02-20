@@ -66,7 +66,7 @@ void set_trainable(Term* term, bool value)
 
 void update_derived_trainable_properties(Branch& branch)
 {
-    for (BranchIterator it(branch); !it.finished(); it.advance()) {
+    for (BranchIterator it(&branch); !it.finished(); it.advance()) {
         // if any of our inputs are trainable then mark us as derived-trainable
         bool found = false;
         for (int i=0; i < it->numInputs(); i++) {
@@ -138,7 +138,7 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
     FeedbackOperation operation;
 
     // Iterate backwards through the code
-    for (BranchIterator it(branch, true); !it.finished(); ++it) {
+    for (BranchIterator it(&branch, true); !it.finished(); ++it) {
         Term* term = *it;
 
         // Check for feedback(), which does nothing but create a feedback signal

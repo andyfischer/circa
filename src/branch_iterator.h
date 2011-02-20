@@ -22,8 +22,8 @@ class BranchIterator
     bool _skipNextBranch;
 
 public:
-    BranchIterator(Branch& branch, bool backwards=false);
-    void reset(Branch& branch);
+    BranchIterator(Branch* branch, bool backwards=false);
+    void reset(Branch* branch);
     bool finished();
     bool unfinished() { return !finished(); }
     Term* current();

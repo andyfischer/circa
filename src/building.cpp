@@ -485,4 +485,12 @@ void update_branch_finish_term(Term* term)
     post_compile_term(term);
 }
 
+Term* find_last_non_comment_expression(Branch& branch)
+{
+    for (int i = branch.length() - 2; i >= 0; i--)
+        if (branch[i] != NULL && branch[i]->function != COMMENT_FUNC)
+            return branch[i];
+    return NULL;
+}
+
 } // namespace circa

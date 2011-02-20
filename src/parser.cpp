@@ -2042,7 +2042,7 @@ void post_parse_branch(Branch& branch)
     branch.removeNulls();
 
     // Update input info on all terms
-    for (BranchIterator it(branch); !it.finished(); ++it) {
+    for (BranchIterator it(&branch); !it.finished(); ++it) {
         post_input_change(*it);
     }
 }

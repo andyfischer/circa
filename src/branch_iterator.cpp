@@ -7,19 +7,19 @@
 
 namespace circa {
 
-BranchIterator::BranchIterator(Branch& branch, bool backwards)
+BranchIterator::BranchIterator(Branch* branch, bool backwards)
   : _backwards(backwards),
     _skipNextBranch(false)
 {
     reset(branch);
 }
 
-void BranchIterator::reset(Branch& branch)
+void BranchIterator::reset(Branch* branch)
 {
     _stack.clear();
-    if (branch.length() != 0) {
-        int firstIndex = _backwards ? branch.length() - 1 : 0;
-        _stack.push_back(Frame(&branch, firstIndex));
+    if (branch->length() != 0) {
+        int firstIndex = _backwards ? branch->length() - 1 : 0;
+        _stack.push_back(Frame(branch, firstIndex));
     }
 }
 

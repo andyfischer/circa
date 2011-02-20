@@ -16,7 +16,7 @@ void test_simple()
     test_assert(a);
     test_assert(b);
 
-    BranchIterator it(branch);
+    BranchIterator it(&branch);
 
     test_assert(it.current() == a);
     it.advance();
@@ -26,7 +26,7 @@ void test_simple()
 
     Term* sub = branch.compile("def func() c = 3 d = 4 end");
 
-    it.reset(branch);
+    it.reset(&branch);
 
     test_assert(it.current() == a);
     it.advance();

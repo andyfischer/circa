@@ -94,7 +94,7 @@ void check_term_for_static_error(StaticErrorCheck* result, Term* term)
 
 void check_for_static_errors(StaticErrorCheck* result, Branch& branch)
 {
-    for (BranchIterator it(branch); it.unfinished(); ++it)
+    for (BranchIterator it(&branch); it.unfinished(); ++it)
         check_term_for_static_error(result, *it);
 }
 
