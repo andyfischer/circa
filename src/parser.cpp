@@ -1006,7 +1006,10 @@ Term* return_statement(Branch& branch, TokenStream& tokens)
 
     Term* output = NULL;
 
-    if (!is_statement_ending(tokens.next().match))
+    bool returnsValue = !is_statement_ending(tokens.next().match) &&
+        tokens.next().match != RBRACE;
+
+    if (returnsValue)
         output = infix_expression(branch, tokens);
 
     Term* result = apply(branch, RETURN_FUNC, RefList(output));

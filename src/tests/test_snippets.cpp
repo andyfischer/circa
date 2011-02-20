@@ -211,6 +211,9 @@ void test_subroutine()
     test_snippet("def f() -> List return([1]) end", "f() == [1]");
     test_snippet("def f()\n  return\nf()", "");
     test_snippet("def f()\nf()", "");
+    test_snippet("def f() {}", "");
+    test_snippet("def f() { return }", "");
+    test_snippet("def f() { if 1==2 { return } }", "");
 }
 
 #if 0

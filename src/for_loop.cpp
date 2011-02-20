@@ -147,6 +147,7 @@ void for_loop_update_output_index(Term* forTerm)
 
 CA_FUNCTION(evaluate_for_loop)
 {
+    EvalContext* context = CONTEXT;
     Branch& forContents = CALLER->nestedContents;
     Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
@@ -168,7 +169,7 @@ CA_FUNCTION(evaluate_for_loop)
     TaggedValue prevScopeState;
     List* state = NULL;
     if (useState) {
-        swap(&CONTEXT->currentScopeState, &prevScopeState);
+        swap(&context->currentScopeState, &prevScopeState);
         fetch_state_container(CALLER, &prevScopeState, &localState);
 
         state = List::lazyCast(&localState);
@@ -176,14 +177,14 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     // Preserve old for-loop context
-    ForLoopContext prevLoopContext = CONTEXT->forLoopContext;
+    ForLoopContext prevLoopContext = context->forLoopContext;
 
     for (int iteration=0; iteration < inputListLength; iteration++) {
         bool firstIter = iteration == 0;
 
         // load state for this iteration
         if (useState)
-            swap(state->get(iteration), &CONTEXT->currentScopeState);
+            swap(state->get(iteration), &context->currentScopeState);
 
         // copy iterator
         copy(inputList->getIndex(iteration), get_local(iterator));
@@ -199,20 +200,23 @@ CA_FUNCTION(evaluate_for_loop)
                 copy(get_input(rebindTerm, 1), dest);
         }
 
-        CONTEXT->forLoopContext.discard = false;
+        context->forLoopContext.discard = false;
 
-        for (int i=loop_contents_location; i < forContents.length() - 1; i++)
-            evaluate_single_term(CONTEXT, forContents[i]);
+        for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
+            if (evaluation_interrupted(context))
+                break;
+            evaluate_single_term(context, forContents[i]);
+        }
 
         // Save output
-        if (saveOutput && !CONTEXT->forLoopContext.discard) {
+        if (saveOutput && !context->forLoopContext.discard) {
             TaggedValue* localResult = get_local(forContents[forContents.outputIndex]);
             copy(localResult, output->get(nextOutputIndex++));
         }
 
         // Unload state
         if (useState)
-            swap(&CONTEXT->currentScopeState, state->get(iteration));
+            swap(&context->currentScopeState, state->get(iteration));
     }
 
     // Resize output, in case some elements were discarded
@@ -239,11 +243,11 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     // Restore loop context
-    CONTEXT->forLoopContext = prevLoopContext;
+    context->forLoopContext = prevLoopContext;
 
     if (useState) {
         preserve_state_result(CALLER, &prevScopeState, &localState);
-        swap(&prevScopeState, &CONTEXT->currentScopeState);
+        swap(&prevScopeState, &context->currentScopeState);
     }
 
     finish_using(forContents);

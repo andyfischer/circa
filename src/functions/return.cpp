@@ -34,7 +34,6 @@ namespace return_function {
         it.stopAt(sub->owningBranch);
 
         for ( ; it.unfinished(); it.advance()) {
-            //if (format_global_id(*it) == "$1982") asm { int 3};
             Term* previousTerm = *it;
             if (previousTerm == NULL)
                 continue;

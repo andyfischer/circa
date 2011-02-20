@@ -326,8 +326,10 @@ void return_from_for_loop()
     test_equals(internal_debug_function::spy_results()->toString(), "[5]");
 
     internal_debug_function::spy_clear();
-    branch.compile("def f() { for i in [1 2 3 4] { debug_spy(i) if i==3 { return }; debug_spy(0) }}");
+    branch.compile("def f() { for i in [1 2 3 4] { debug_spy(i) if i==3 { return }; print(i) debug_spy(0) }}");
+    dump(branch);
     branch.eval("f()");
+    test_assert(branch);
     test_equals(internal_debug_function::spy_results()->toString(), "[1 0 2 0 3]");
 }
 
@@ -360,8 +362,8 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::bug_where_interrupt_subroutine_wasnt_being_cleared);
     REGISTER_TEST_CASE(subroutine_tests::test_call_subroutine);
     REGISTER_TEST_CASE(subroutine_tests::copy_counting_tests::test_single_call);
-    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::return_from_if_block);
-    //TEST_DISABLED REGISTER_TEST_CASE(subroutine_tests::return_from_for_loop);
+    REGISTER_TEST_CASE(subroutine_tests::return_from_if_block);
+    REGISTER_TEST_CASE(subroutine_tests::return_from_for_loop);
     REGISTER_TEST_CASE(subroutine_tests::bug_with_misplaced_preserve_state_result);
 }
 
