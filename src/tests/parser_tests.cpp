@@ -494,7 +494,8 @@ void test_whitespace_after_statement()
     // Make sure that parser::statement only consumes one \n
     branch.clear();
     TokenStream tokens("a = 1\n\n");
-    Term* term = parser::statement(branch, tokens);
+    parser::ParserCxt context;
+    Term* term = parser::statement(branch, tokens, &context);
     test_assert(term->function == VALUE_FUNC);
     test_assert(term->name == "a");
     test_assert(tokens.nextIs(token::NEWLINE));
