@@ -39,7 +39,7 @@ def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
 
 def polar(number angle) -> Point
-    return [-sin(angle) -cos(angle)]
+    return [sin(angle) -cos(angle)]
 
 def magnitude(Point point) -> number
     "Returns the magnitude, or the distance from [0,0] to this point."

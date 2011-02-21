@@ -2,7 +2,7 @@
 desired_window_size = [500 300]
 
 background(#000)
-include('drifting_stars.ca' -> path)
+include('modules/drifting_stars.ca' -> path)
 
 type Ship {
     Point loc,
@@ -95,11 +95,11 @@ if gstate == game_state:playing
     thrust = cond(key_down(key:up), 1, 0)
     cond(key_down(key:down), -1, @thrust)
 
-    ship.momentum = ship.momentum + [cos(ship.facing) sin(ship.facing)] * thrust * accelration_per_s * time_delta
+    ship.momentum = ship.momentum + polar(ship.facing) * thrust * accelration_per_s * time_delta
 
     -- Press space to shoot a bullet
     if key_pressed(key:space)
-        bullets.append([0, ship.loc [cos(ship.facing) sin(ship.facing)]] -> Bullet)
+        bullets.append([0, ship.loc polar(ship.facing)] -> Bullet)
 
 -- Add drag
 ship.momentum = ship.momentum * ship_drag
