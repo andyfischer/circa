@@ -61,17 +61,17 @@ void test_insert()
 void test_check_invariants()
 {
     Branch branch;
-    std::stringstream output;
     Term* t = branch.appendNew();
-    test_assert(branch_check_invariants_print_result(branch, output));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
     t->owningBranch = NULL;
-    test_assert(!branch_check_invariants_print_result(branch, output));
+    std::stringstream ignoredOutput;
+    test_assert(!branch_check_invariants_print_result(branch, ignoredOutput));
 
     branch.clear();
     t = branch.appendNew();
-    test_assert(branch_check_invariants_print_result(branch, output));
+    test_assert(branch_check_invariants_print_result(branch, std::cout));
     t->index = 5;
-    test_assert(!branch_check_invariants_print_result(branch, output));
+    test_assert(!branch_check_invariants_print_result(branch, ignoredOutput));
 }
 
 void test_setNull()

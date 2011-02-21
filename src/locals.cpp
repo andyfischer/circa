@@ -42,12 +42,11 @@ void update_locals_index_for_new_term(Term* term)
 
     int numLocals = get_output_count(term);
 
-    if (numLocals > 0) {
-        term->localsIndex = branch->localsCount;
-        branch->localsCount += numLocals;
-    } else {
-        term->localsIndex = -1;
-    }
+    // make sure localsIndex is -1 so that if get_locals_count looks at this
+    // term, it doesn't get confused.
+    term->localsIndex = -1;
+    if (numLocals > 0)
+        term->localsIndex = get_locals_count(*branch);
 }
 
 int get_locals_count(Branch& branch)
@@ -55,7 +54,16 @@ int get_locals_count(Branch& branch)
     if (branch.length() == 0)
         return 0;
 
-    Term* last = branch[branch.length()-1];
+    int lastLocal = branch.length() - 1;
+
+    while (branch[lastLocal] == NULL || branch[lastLocal]->localsIndex == -1) {
+        lastLocal--;
+        if (lastLocal < 0)
+            return 0;
+    }
+
+    Term* last = branch[lastLocal];
+
     return last->localsIndex + get_output_count(last);
 }
 
@@ -77,7 +85,6 @@ void refresh_locals_indices(Branch& branch, int startingAt)
         term->localsIndex = nextLocal;
         nextLocal += outputCount;
     }
-    branch.localsCount = nextLocal;
 }
 
 } // namespace circa

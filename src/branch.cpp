@@ -23,7 +23,6 @@ Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
     outputIndex(0),
-    localsCount(0),
     inuse(false)
 {
     debug_register_valid_object((void*) this, BRANCH_OBJECT);
@@ -320,7 +319,6 @@ void
 Branch::clear()
 {
     safe_delete_branch_contents(this);
-    localsCount = 0;
 }
 
 std::string Branch::toString()

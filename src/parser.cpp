@@ -839,9 +839,6 @@ Term* for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
 
-    // Hopefully TEMP, need to update Branch.localsCount of outer branch.
-    branch.localsCount = forTerm->localsIndex + get_output_count(forTerm);
-
     return forTerm;
 }
 

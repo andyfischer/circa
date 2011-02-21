@@ -24,8 +24,6 @@ struct Branch
 
     int outputIndex;
 
-    int localsCount;
-
     // Local values for each term. These are the results of the most recent
     // interpreted execution of this branch.
     // (This list makes it impossible for the same branch to be simultaneously

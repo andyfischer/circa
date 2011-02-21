@@ -170,7 +170,7 @@ TaggedValue* get_local(Term* term, int outputIndex)
     //
     // TODO: Do this check earlier instead of here.
 
-    term->owningBranch->locals.resize(term->owningBranch->localsCount);
+    term->owningBranch->locals.resize(get_locals_count(*term->owningBranch));
 
     TaggedValue* local = term->owningBranch->locals[term->localsIndex + outputIndex];
     return local;
