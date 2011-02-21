@@ -7,6 +7,8 @@
 #include "function.h"
 #include "term.h"
 
+#include "locals.h"
+
 namespace circa {
 
 int get_output_count(Term* term)
@@ -46,6 +48,15 @@ void update_locals_index_for_new_term(Term* term)
     } else {
         term->localsIndex = -1;
     }
+}
+
+int get_locals_count(Branch& branch)
+{
+    if (branch.length() == 0)
+        return 0;
+
+    Term* last = branch[branch.length()-1];
+    return last->localsIndex + get_output_count(last);
 }
 
 void refresh_locals_indices(Branch& branch, int startingAt)

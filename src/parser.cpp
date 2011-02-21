@@ -621,7 +621,7 @@ Term* type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context)
     if (has_static_error(result))
         return result;
 
-    branch.moveToEnd(result);
+    //branch.moveToEnd(result);
 
     branch.bindName(result, name);
     as_type(result).name = name;
@@ -684,6 +684,9 @@ Term* anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
     }
 
     tokens.consume(closingToken);
+
+    branch.moveToEnd(result);
+    refresh_locals_indices(branch);
 
     return result;
 }
@@ -778,6 +781,7 @@ Term* if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
     branch.moveToEnd(result);
 
     update_if_block_joining_branch(result);
+    refresh_locals_indices(branch);
     set_source_location(result, startPosition, tokens);
 
     return result;
@@ -834,6 +838,9 @@ Term* for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+
+    // Hopefully TEMP, need to update Branch.localsCount of outer branch.
+    branch.localsCount = forTerm->localsIndex + get_output_count(forTerm);
 
     return forTerm;
 }

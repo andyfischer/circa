@@ -44,7 +44,6 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
             append_internal_error(result, i, "Wrong owningBranch");
 
         // Check localIndex
-        #if 0
         int numOutputs = get_output_count(term);
         if (numOutputs != 0) {
             if (term->localsIndex != expectedLocalIndex) {
@@ -55,7 +54,6 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
             }
             expectedLocalIndex = term->localsIndex + numOutputs;
         }
-        #endif
     }
 } 
 

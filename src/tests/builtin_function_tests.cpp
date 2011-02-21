@@ -288,7 +288,6 @@ void test_message_passing2()
         "  send(incoming, s)\n"
         "for s in incoming\n"
         "  last_output = s\n"
-        "last_output = last_output\n"
         "send_func(2)\n");
 
     EvalContext context;
