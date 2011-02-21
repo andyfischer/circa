@@ -954,11 +954,11 @@ Term* expression_statement(Branch& branch, TokenStream& tokens, ParserCxt* conte
     }
 
     // Apply a pending rebind
-    std::string pendingRebind = pop_pending_rebind(branch);
-
-    if (pendingRebind != "") {
-        branch.bindName(expr, pendingRebind);
-        expr->setStringProp("syntax:rebindOperator", pendingRebind);
+    if (context->pendingRebind != "") {
+        std::string name = context->pendingRebind;
+        context->pendingRebind = "";
+        branch.bindName(expr, name);
+        expr->setStringProp("syntax:rebindOperator", name);
     }
 
     // If the term was an assign() term, then we may need to rebind the root name.
@@ -1898,7 +1898,7 @@ Term* identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCxt* con
         head = unknown_identifier(branch, id);
 
     if (rebindOperator)
-        push_pending_rebind(branch, head->name);
+        context->pendingRebind = head->name;
 
     return head;
 }
@@ -2012,38 +2012,8 @@ Term* find_function(Branch& branch, std::string const& name)
     return result;
 }
 
-void push_pending_rebind(Branch& branch, std::string const& name)
-{
-    std::string attrname = "#attr:comp-pending-rebind";
-
-    if (branch.contains(attrname)) {
-        dump(branch);
-        throw std::runtime_error("pending rebind already exists (name: " + name + ")");
-    }
-
-    create_string(branch, name, attrname);
-}
-
-std::string pop_pending_rebind(Branch& branch)
-{
-    std::string attrname = "#attr:comp-pending-rebind";
-
-    Term* attrTerm = branch[attrname];
-
-    if (attrTerm != NULL) {
-        std::string result = as_string(attrTerm);
-        branch.remove("#attr:comp-pending-rebind");
-        return result;
-    } else {
-        return "";
-    }
-}
-
 void post_parse_branch(Branch& branch)
 {
-    // Remove temporary attributes
-    branch.remove("#attr:comp-pending-rebind");
-
     // Remove NULLs
     branch.removeNulls();
 

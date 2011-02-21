@@ -96,9 +96,6 @@ Term* find_type(Branch& branch, std::string const& name);
 // we'll return unknown_function()
 Term* find_function(Branch& branch, std::string const& name);
 
-void push_pending_rebind(Branch& branch, std::string const& name);
-std::string pop_pending_rebind(Branch& branch);
-
 // Does various cleanup work on a branch that has just been used by a parsing step.
 // This should be done after parsing.
 void post_parse_branch(Branch& branch);
