@@ -2025,6 +2025,9 @@ void post_parse_branch(Branch& branch)
     for (BranchIterator it(&branch); !it.finished(); ++it) {
         post_input_change(*it);
     }
+
+    // Make sure the inputs array has the correct size
+    branch.locals.resize(get_locals_count(branch));
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)

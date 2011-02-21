@@ -11,8 +11,10 @@ namespace finish_minor_branch_function {
     CA_DEFINE_FUNCTION(finish_minor_branch_func, "finish_minor_branch()")
     {
         Branch& contents = CALLER->nestedContents;
+        start_using(contents);
         for (int i=0; i < contents.length(); i++)
             evaluate_single_term(CONTEXT, contents[i]);
+        finish_using(contents);
         set_null(OUTPUT);
     }
 

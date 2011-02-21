@@ -25,6 +25,8 @@ namespace vectorize_vv_function {
         Term* input1_placeholder = contents[1]; 
         Term* content_output = contents[2]; 
 
+        start_using(contents);
+
         // Prepare output
         TaggedValue outputTv;
         List* output = set_list(&outputTv, listLength);
@@ -40,6 +42,8 @@ namespace vectorize_vv_function {
             // Save output
             swap(get_local(content_output), output->get(i));
         }
+
+        finish_using(contents);
 
         swap(output, OUTPUT);
     }

@@ -163,6 +163,7 @@ CA_FUNCTION(evaluate_for_loop)
     int nextOutputIndex = 0;
 
     start_using(forContents);
+    start_using(innerRebinds);
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
@@ -252,6 +253,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     finish_using(forContents);
+    finish_using(innerRebinds);
 }
 
 } // namespace circa

@@ -61,14 +61,14 @@ void test_insert()
 void test_check_invariants()
 {
     Branch branch;
-    Term* t = branch.appendNew();
+    Term* t = branch.compile("a = 1");
     test_assert(branch_check_invariants_print_result(branch, std::cout));
     t->owningBranch = NULL;
     std::stringstream ignoredOutput;
     test_assert(!branch_check_invariants_print_result(branch, ignoredOutput));
 
     branch.clear();
-    t = branch.appendNew();
+    t = branch.compile("b = 2");
     test_assert(branch_check_invariants_print_result(branch, std::cout));
     t->index = 5;
     test_assert(!branch_check_invariants_print_result(branch, ignoredOutput));

@@ -69,7 +69,7 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch)
     for (int i=0; i < branch.length(); i++) {
         evaluate_single_term(context, branch[i]);
 
-          if (context->errorOccurred)
+          if (evaluation_interrupted(context))
               break;
     }
 
@@ -109,8 +109,11 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
 void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch)
 {
     copy(&context->state, &context->currentScopeState);
+
     evaluate_branch_internal(context, branch);
-    copy(&context->currentScopeState, &context->state);
+
+    swap(&context->currentScopeState, &context->state);
+    set_null(&context->currentScopeState);
 }
 
 void evaluate_branch(EvalContext* context, Branch& branch)
@@ -166,13 +169,14 @@ TaggedValue* get_local(Term* term, int outputIndex)
 {
     ca_assert(term->owningBranch != NULL);
 
+
     // Make sure Branch.locals has the right size.
     //
     // TODO: Do this check earlier instead of here.
 
-    term->owningBranch->locals.resize(get_locals_count(*term->owningBranch));
-
-    TaggedValue* local = term->owningBranch->locals[term->localsIndex + outputIndex];
+    int index = term->localsIndex + outputIndex;
+    ca_assert(index < term->owningBranch->locals.length());
+    TaggedValue* local = term->owningBranch->locals[index];
     return local;
 }
 
@@ -230,7 +234,9 @@ void start_using(Branch& branch)
     if (branch.inuse)
     {
         swap(&branch.locals, branch.localsStack.append());
-        set_list(&branch.locals, branch.length());
+        set_list(&branch.locals, get_locals_count(branch));
+    } else {
+        branch.locals.resize(get_locals_count(branch));
     }
 
     branch.inuse = true;
@@ -255,6 +261,8 @@ void evaluate_minimum(EvalContext* context, Term* term)
     
     Branch& branch = *term->owningBranch;
 
+    start_using(branch);
+
     bool *marked = new bool[branch.length()];
     memset(marked, false, sizeof(bool)*branch.length());
 
@@ -278,6 +286,8 @@ void evaluate_minimum(EvalContext* context, Term* term)
     }
 
     delete[] marked;
+
+    finish_using(branch);
 }
 
 void clear_error(EvalContext* cxt)
