@@ -6,14 +6,12 @@ which code is created.
 Some features of Circa are:
 
  - Live coding. Has a rich API for examining or modifying code at runtime.
- - Most compiled code is stored as a dataflow graph of pure functions, which allows for
-   many forms of static reasoning.
- - Has good support for preserving the program's running state. State can be preserved
-   across most kinds of code changes.
- - Has an unusual ability to support live code changes made externally (such as with a
-   separate text editor). Most live coding systems tend to only support changes made
-   within the system.
- - Visual programming is supported, but text remains the primary storage format.
+ - State is preserved across most code changes.
+ - Supports live code changes made by external tools (such as separate text editors), as
+   well as changes made within the system.
+ - Code is stored in a (relatively) simple format, allowing for easy introspection and
+   static reasoning.
+ - Visual programming is supported.
  - Compiled code can be unparsed back to text, with all comments and formatting preserved.
    This allows for a hybrid approach of textual and visual code editing.
 
@@ -27,7 +25,7 @@ Some implementation details:
  - Compiled code is stored as an ordered dataflow graph.
  - Pluggable type system, each type dictates its own form of garbage collection.
  - Implemented in C++
- - Interpreted execution. An LLVM backend is planned for the future.
+ - Interpreted execution. (an LLVM backend is planned for the future)
  - Currently supported on XP and OSX. A Linux port would probably not be hard.
 
 For more information, see the /docs folder.

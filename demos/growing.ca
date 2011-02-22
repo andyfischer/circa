@@ -10,7 +10,7 @@ def tree_segment(Point base, number direction, number width, int depth, List lea
   max_length = 20 + 30 * seed()
   mult(@max_length, (1.0 - .1 * depth))
   age = 1.0 + elapsed()
-  seg_length = max_length * interp(age, 10)
+  seg_length = max_length * interp(age, 5)
   color = #6a3
 
   -- bend our angle, if this isn't the root segment
