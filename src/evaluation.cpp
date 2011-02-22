@@ -33,7 +33,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
     #endif
 
-    #if CIRCA_ALWAYS_TYPE_CHECK_OUTPUTS
+    #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred) {
         for (int i=0; i < get_output_count(term); i++) {
 
@@ -44,10 +44,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
             // if the output value is null or not.
             if (i == 0 && outputType == &VOID_T)
                 continue;
-
-            //std::cout << "output[" << i << "] for function " << term->function->name
-            //    << " produced output: " << output->toString()
-            //    << " (expected type: " << outputType->name << ")" << std::endl;
 
             std::stringstream msg;
             if (!value_fits_type(output, outputType)) {

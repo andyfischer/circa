@@ -11,5 +11,4 @@ Important optimization tasks:
 
  - Value sharing, especially for Dict. Lots of performance loss in preserve_state_result.
  - Use swap instead of copy for inputs (when possible)
- - Don't check locals size in get_local
  - Some overloads that are currently resolved dynamically can be resolved statically

@@ -1,3 +1,0 @@
-cd $CIRCA_HOME/tests
-circa samples/$1
-circa samples/$1 > expected_output/$1.expected_output

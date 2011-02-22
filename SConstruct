@@ -1,3 +1,8 @@
+"""
+Primary build file for Circa.
+See docs/build_targets.md for more information on the available targets and variants.
+"""
+
 import os, sys, ConfigParser, SCons
 
 def fatal(msg):
@@ -11,21 +16,24 @@ config.read('build.config')
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
 
-# Check for a Mac-like environment. On Macs, 'POSIX' is true, but there is
-# a little bit of special behavior for using frameworks.
+# Check for a Mac-like environment. On Macs, 'POSIX' is true, so it's mostly the same as
+# a Unix build. But we look under /Library/Frameworks for some dependencies that are
+# provided by Xcode.
 OSX = os.path.exists('/Library/Frameworks')
 
-DEBUG = Environment(tools = ["default"], toolpath=".")
-RELEASE = Environment(tools = ["default"], toolpath=".")
-DEBUG['variant_name'] = 'debug'
-RELEASE['variant_name'] = 'release'
-ALL = [DEBUG, RELEASE]
+DEBUG = Environment(tools = ["default"], toolpath=".",
+        variant_name = 'debug', variant_suffix='_d')
+RELEASE = Environment(tools = ["default"], toolpath=".",
+        variant_name = 'release', variant_suffix='_r')
+TEST = Environment(tools = ["default"], toolpath=".",
+        variant_name = 'test', variant_suffix='_t')
+all_envs = [DEBUG, RELEASE, TEST]
 
 SHARED_LIBRARY = config.get('circa', 'shared_library') == 'true'
 
 # Build flags
 if POSIX:
-    def common_flags(env):
+    for env in all_envs:
         env.Append(CPPFLAGS=['-ggdb', '-Wall','-fasm-blocks'])
         env.Append(LINKFLAGS=['-ldl'])
 
@@ -34,20 +42,25 @@ if POSIX:
             env.Append(LINKFLAGS=['-pg'])
 
         env.SetOption('num_jobs', 2)
-    map(common_flags, ALL)
-    DEBUG.Append(CPPDEFINES = ["DEBUG"])
+
+    for env in [DEBUG,TEST]:
+        env.Append(CPPDEFINES = ["DEBUG"])
+
     RELEASE.Append(CPPFLAGS=['-O1'])
 
 if WINDOWS:
-    def common_flags(env):
+    for env in all_envs:
         env.Append(CPPDEFINES = ['WINDOWS'])
         env.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86 /DEBUG'.split())
-    map(common_flags, ALL)
-    DEBUG.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
-    DEBUG.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
-    DEBUG.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
+
+    for env in [DEBUG,TEST]:
+        env.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
+        env.Append(LINKFLAGS=['/NODEFAULTLIB:msvcrt.lib'])
+        env.Append(CPPDEFINES = ["DEBUG", "_DEBUG"])
     RELEASE.Append(CPPFLAGS='/EHsc /W3 /MD /Z7 /TP /O2'.split())
     RELEASE.Append(CPPDEFINES = ["NDEBUG"])
+
+TEST.Append(CPPDEFINES = ['CIRCA_TEST_BUILD'])
 
 def list_source_files(dir):
     for path in os.listdir(dir):
@@ -56,10 +69,10 @@ def list_source_files(dir):
         if not path.endswith('.cpp'): continue
         yield path
 
+# Define library builds, save the results in circa_libs.
 circa_libs = {}
 
-# Define library builds, save the results in circa_libs.
-def circa_library(env):
+for env in all_envs:
     env = env.Clone()
     variant_name = env['variant_name']
 
@@ -70,7 +83,7 @@ def circa_library(env):
             ['generated/'+filename for filename in list_source_files('src/generated')])
     source_files = filter(lambda f: f != 'main.cpp', source_files)
 
-    baseName = 'circa' + ('_d' if variant_name == 'debug' else '')
+    baseName = 'circa' + env['variant_suffix']
     fullPath = 'build/'+baseName
     sources = ['build/'+variant_name+'/src/'+filename for filename in source_files]
 
@@ -84,31 +97,27 @@ def circa_library(env):
         env.AddPostAction(result, 'install_name_tool -id @executable_path/'+actualFile
                 + ' build/'+actualFile)
 
-map(circa_library, ALL)
-
-# Define command-line app builds, save the results in circa_cl_builds
+# Define command-line app builds at build/circa_x
 circa_cl_apps = {}
 
-def circa_command_line_app(env):
+for env in all_envs:
     variant_name = env['variant_name']
     env.Append(CPPPATH = ['src'])
-    path = 'build/circa'
+    binaryFile = 'build/circa' + env['variant_suffix']
 
     libs = [circa_libs[variant_name]]
     
-    result = env.Program(path, 'build/'+variant_name+'/src/main.cpp',
+    result = env.Program(binaryFile, 'build/'+variant_name+'/src/main.cpp',
             LIBS=libs)
     circa_cl_apps[variant_name] = result
 
     if OSX and SHARED_LIBRARY:
         env.AddPostAction(result, 'install_name_tool -change build/libcirca_d.dylib '
-                + '@executable_path/libcirca_d.dylib '+path)
-    return result
+                + '@executable_path/libcirca_d.dylib '+binaryFile)
     
 # Default build target is debug command-line binary.
-circa_cl = circa_command_line_app(DEBUG)
+circa_cl = circa_cl_apps['debug']
 Default(circa_cl)
-Alias('circa', circa_cl)
 
 ########################### SDL-based targets ###############################
 
@@ -147,31 +156,23 @@ def sdl_env(env):
     # Append appropriate circa lib
     env.Append(LIBS = [circa_libs[variant_name]])
 
-def build_plastic(env):
+# Define plastic targets at build/plas_x
+for env in all_envs:
     env = env.Clone()
-    env.BuildDir('build/plastic/src', 'plastic/src')
+    variantName = env['variant_name']
+    env.BuildDir('build/'+variantName+'/plastic/src', 'plastic/src')
     sdl_env(env)
 
     source_files = list_source_files('plastic/src')
 
     env.Append(CPPDEFINES=['PLASTIC_USE_SDL'])
 
-    result = env.Program('#build/plas',
-        source = ['build/plastic/src/'+f for f in source_files])
+    binaryName = 'plas'+env['variant_suffix']
+
+    result = env.Program('#build/' + binaryName,
+        source = ['build/'+variantName+'/plastic/src/'+f for f in source_files])
 
     # On Windows, embed manifest
     if WINDOWS:
         env.AddPostAction(result,
         'mt.exe -nologo -manifest plastic/windows/plastic.manifest -outputresource:$TARGET;1')
-    return result
-    
-plastic_variant = config.get('plastic', 'variant')
-if plastic_variant == "release":
-    plastic_env = RELEASE
-elif plastic_variant == "debug":
-    plastic_env = DEBUG
-else:
-    fatal("Unrecognzied variant under [plastic]: " + plastic_variant)
-plastic = build_plastic(plastic_env)
-
-Alias('plastic', plastic)

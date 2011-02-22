@@ -60,10 +60,36 @@ typedef Term* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
-// ca_assert results in a call to internal_error. On failure, this function may throw
-// an exception or trigger a debugger breakpoint. But either way, execution will
-// be interrupted. ca_assert_function is defined in errors.cpp
+// Possibly enable ca_assert and/or ca_test_assert
+
+// when enabled, ca_assert will call internal_error if the condition is false.
+//
+// ca_test_assert does the same thing, but it is only enabled in "test" builds, so it's
+// intended to be used in situations that would kill performance.
+#ifdef DEBUG
+
+#ifdef CIRCA_TEST_BUILD
+
+// Test build
 #define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
+#define ca_test_assert(x) ca_assert(x)
+
+#else
+
+// Debug build
+#define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
+#define ca_test_assert(x)
+
+#endif
+
+#else
+
+// Release build
+#define ca_assert(x)
+#define ca_test_assert(x)
+
+#endif
+
 void ca_assert_function(bool result, const char* expr, int line, const char* file);
 
 } // namespace circa
