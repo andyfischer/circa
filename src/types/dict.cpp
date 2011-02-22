@@ -156,7 +156,10 @@ int insert(DictData** dataPtr, const char* key)
         index = (index + 1) % data->capacity;
 
         // Die if we made it all the way around
-        ca_assert(index != starting_index);
+        if (index == starting_index) {
+            ca_assert(false);
+            return 0;
+        }
     }
 
     Slot* slot = &data->slots[index];

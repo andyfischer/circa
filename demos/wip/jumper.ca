@@ -1,0 +1,8 @@
+
+type Tile {
+  int t
+}
+
+type World {
+  Field<Tile> tiles
+}
