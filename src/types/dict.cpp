@@ -89,8 +89,8 @@ DictData* grow(DictData* data, int new_capacity)
     return new_data;
 }
 
-// Grow this dictionary by the default growth rate. This will result in
-// a new DictData* object, don't use the old one after calling this.
+// Grow this dictionary by the default growth rate. This will result in a new DictData*
+// object, don't use the old one after calling this.
 void grow(DictData** dataPtr)
 {
     int new_capacity = int((*dataPtr)->count / INITIAL_LOAD_FACTOR);
@@ -105,7 +105,9 @@ DictData* duplicate(DictData* original)
         return NULL;
 
     int new_capacity = int(original->count / INITIAL_LOAD_FACTOR);
-    if (new_capacity < INITIAL_SIZE) new_capacity = INITIAL_SIZE;
+    if (new_capacity < INITIAL_SIZE)
+        new_capacity = INITIAL_SIZE;
+
     DictData* dupe = create_dict(new_capacity);
 
     // Copy all items
@@ -121,8 +123,8 @@ DictData* duplicate(DictData* original)
     return dupe;
 }
 
-// Get the 'ideal' slot index, the place we would put this string if
-// there is no collision.
+// Get the 'ideal' slot index, the place we would put this string if there is no
+// collision.
 int find_ideal_slot_index(DictData* data, const char* str)
 {
     ca_assert(data->capacity > 0);
@@ -131,8 +133,8 @@ int find_ideal_slot_index(DictData* data, const char* str)
 }
 
 // Insert the given key into the dictionary, returns the index.
-// This may create a new DictData* object, don't use the old
-// DictData* pointer after calling this.
+// This may create a new DictData* object, so don't use the old DictData* pointer after
+// calling this.
 int insert(DictData** dataPtr, const char* key)
 {
     if (*dataPtr == NULL)
@@ -175,11 +177,10 @@ void insert_value(DictData** dataPtr, const char* key, TaggedValue* value)
     copy(value, &(*dataPtr)->slots[index].value);
 }
 
-// This is like strcmp but it doesn't die on null pointers
+// Check if strings are equal, and don't die if either pointer is NULL.
 bool equal_strings(const char* left, const char* right)
 {
-    if (left == NULL) return false;
-    if (right == NULL) return false;
+    if (left == NULL || right == NULL) return false;
     return strcmp(left, right) == 0;
 }
 
@@ -193,11 +194,11 @@ int find_key(DictData* data, const char* key)
     while (!equal_strings(key, data->slots[index].key)) {
         index = (index + 1) % data->capacity;
 
-        // If we hit an empty slot then their key isn't there
+        // If we hit an empty slot, then give up.
         if (data->slots[index].key == NULL)
             return -1;
 
-        // Or if we did a loop then also give up
+        // Or, if we looped around to the starting index, give up.
         if (index == starting_index)
             return -1;
     }
@@ -231,16 +232,18 @@ void remove(DictData* data, const char* key)
     set_null(&data->slots[index].value);
     data->count--;
 
-    // Check if any following keys would prefer to be moved up to this
-    // empty slot.
+    // Check if any following keys would prefer to be moved up to this empty slot.
     while (true) {
         int prevIndex = index;
         index = (index+1) % data->capacity;
 
         Slot* slot = &data->slots[index];
+
         if (slot->key == NULL)
             break;
 
+        // If a slot isn't in its ideal index, then we assume that it would rather be in
+        // this slot.
         if (find_ideal_slot_index(data, slot->key) != index) {
             Slot* prevSlot = &data->slots[prevIndex];
             prevSlot->key = slot->key;

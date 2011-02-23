@@ -1,0 +1,4 @@
+cd $CIRCA_HOME
+scons build/circa_t
+build/circa_t $*
+

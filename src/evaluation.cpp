@@ -165,11 +165,6 @@ TaggedValue* get_local(Term* term, int outputIndex)
 {
     ca_assert(term->owningBranch != NULL);
 
-
-    // Make sure Branch.locals has the right size.
-    //
-    // TODO: Do this check earlier instead of here.
-
     int index = term->localsIndex + outputIndex;
     ca_assert(index < term->owningBranch->locals.length());
     TaggedValue* local = term->owningBranch->locals[index];
@@ -185,7 +180,11 @@ TaggedValue* get_local_safe(Term* term, int outputIndex)
 {
     if (term->owningBranch == NULL)
         return NULL;
-    return get_local(term, outputIndex);
+    int index = term->localsIndex + outputIndex;
+    if (index >= term->owningBranch->locals.length())
+        return NULL;
+    TaggedValue* local = term->owningBranch->locals[index];
+    return local;
 }
 
 Dict* get_current_scope_state(EvalContext* cxt)

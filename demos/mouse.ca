@@ -35,7 +35,7 @@ state stars = []
 background(#000)
 
 -- Draw an X where the mouse is
-begin
+namespace draw_x
   def draw_quad(List points, Color color)
       gl:triangles([points[0] points[1] points[2] points[2] points[3] points[0]] color)
 
@@ -43,7 +43,7 @@ begin
   cross_thickness = 4.0
   cross_length = 12.0
 
-  def draw_arm(number rot) -> List
+  def draw_arm(number rot)
       near_center = polar(rot) * cross_thickness + mouse
       near_l = polar(rot - .25) * (cross_thickness/2) + near_center
       near_r = polar(rot + .25) * (cross_thickness/2) + near_center
@@ -54,6 +54,7 @@ begin
 
   for rot in [.25 .5 .75 1]
       draw_arm(rot + -time)
+
 
 -- Clicking will create a new spinning star
 if mouse_clicked()
