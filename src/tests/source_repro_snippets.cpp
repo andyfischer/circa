@@ -143,6 +143,14 @@ void reproduce_function_calls() {
     finish_source_repro_category();
 }
 
+void reproduce_rebound_input() {
+    round_trip_source("a = 1; b = 2; swap(&a &b)");
+    round_trip_source("a = 1; b = 2; swap(&a b)");
+    round_trip_source("a = 1; b = 2; swap(  &a, b)");
+    round_trip_source("a = 1; b = 2; swap(&a  , b)");
+    finish_source_repro_category();
+}
+
 void reproduce_infix() {
     round_trip_source("1.0 + 2.0");
     round_trip_source("1.0 * 2.0");
@@ -431,6 +439,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_color_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebound_input);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_member_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding);

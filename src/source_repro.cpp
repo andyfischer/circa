@@ -231,6 +231,10 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
             && input->name == term->stringPropOptional("syntax:rebindOperator",""))
         append_phrase(source, "@", input, token::AT_SIGN);
 
+    // Also, possibly insert the & operator.
+    if (input->name != "" && function_call_rebinds_input(term, inputIndex)) 
+        append_phrase(source, "&", input, token::AMPERSAND);
+
     bool byValue = input->name == "";
 
     if (byValue) {
