@@ -1008,7 +1008,7 @@ Term* include_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
 Term* return_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     tokens.consume(RETURN);
-    possible_whitespace(tokens);
+    std::string postKeywordWs = possible_whitespace(tokens);
 
     Term* output = NULL;
 
@@ -1019,6 +1019,10 @@ Term* return_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
         output = infix_expression(branch, tokens, context);
 
     Term* result = apply(branch, RETURN_FUNC, RefList(output));
+
+    if (postKeywordWs != " ")
+        result->setStringProp("syntax:postKeywordWs", postKeywordWs);
+    result->setBoolProp("syntax:returnStatement", true);
     
     return result;
 }

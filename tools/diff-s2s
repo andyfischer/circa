@@ -1,1 +1,1 @@
-circa -s $1 | diff $1 -
+circa_t -s $1 | diff $1 -

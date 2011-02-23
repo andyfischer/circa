@@ -152,7 +152,7 @@ void consume_input(Term* term, int index, TaggedValue* dest)
     // if this function is called, then users shouldn't be 0.
     ca_assert(input->users.length() != 0);
 
-    if (input->users.length() == 1 && !is_value(input)) {
+    if (input->users.length() == 1) {
         swap(val,dest);
         set_null(val);
     } else {

@@ -32,6 +32,7 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format=NUL
 std::string unformat_rich_source(StyledSource* source);
 
 void format_term_source(StyledSource* source, Term* term);
+void format_term_source_default_formatting(StyledSource* source, Term* term);
 void format_source_for_input(StyledSource* source, Term* term, int inputIndex);
 void format_name_binding(StyledSource* source, Term* term);
 

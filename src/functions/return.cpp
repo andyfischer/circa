@@ -70,9 +70,21 @@ namespace return_function {
             if (SUBROUTINE_OUTPUT_FUNC != NULL)
                 apply(contents, SUBROUTINE_OUTPUT_FUNC, inputs);
         }
+    }
 
-        //std::cout << "finished returnPostCompile for " << format_global_id(returnCall) << std::endl;
-        //dump(returnCall->nestedContents);
+    void formatSource(StyledSource* source, Term* term)
+    {
+        if (term->boolPropOptional("syntax:returnStatement", false)) {
+            append_phrase(source, "return", term, phrase_type::KEYWORD);
+            append_phrase(source,
+                    term->stringPropOptional("syntax:postKeywordWs", " "),
+                    term, phrase_type::WHITESPACE);
+
+            if (term->input(0) != NULL)
+                format_source_for_input(source, term, 0);
+        } else {
+            format_term_source_default_formatting(source, term);
+        }
     }
 
     void setup(Branch& kernel)
@@ -84,6 +96,7 @@ namespace return_function {
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel["return"];
         get_function_attrs(RETURN_FUNC)->postCompile = returnPostCompile;
+        get_function_attrs(RETURN_FUNC)->formatSource = formatSource;
     }
 }
 }

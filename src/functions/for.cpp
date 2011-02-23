@@ -7,6 +7,7 @@ namespace for_function {
 
     void format_heading(StyledSource* source, Term* term)
     {
+        format_name_binding(source, term);
         append_phrase(source, "for ", term, phrase_type::KEYWORD);
         append_phrase(source, get_for_loop_iterator(term)->name.c_str(),
                 term, phrase_type::UNDEFINED);

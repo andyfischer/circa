@@ -236,7 +236,9 @@ void reproduce_for_loop() {
     round_trip_source("for x in [1];   end");
     round_trip_source("for x in [1]   end");
     round_trip_source("for x in [1] print(1)  end");
+    round_trip_source("for x in [1] { print(1) } end");
     round_trip_source("l = [1]; for x in @l x += 1 end");
+    round_trip_source("a = for x in [1] { x + 1 }");
     finish_source_repro_category();
 }
 
@@ -255,11 +257,24 @@ void reproduce_subroutine() {
     round_trip_source("def hi()   end");
     round_trip_source("def hi() 1  end");
     round_trip_source("def hi(int)  end");
+    round_trip_source("def hi(int) {}");
+    round_trip_source("def hi(int) {   }");
+    round_trip_source("def hi(int) { 1 }");
     round_trip_source("def hi(number, string, bool)  end");
     round_trip_source("type Point { number x, number y }\ndef hi() -> Point return([0 0]) end");
     round_trip_source("def hi() if true return(1) else return(2) end end");
     round_trip_source("def hi() x = 1 if true return(x) else return(x) end end");
     round_trip_source("def my_func(int...) -> int end");
+    finish_source_repro_category();
+}
+
+void reproduce_return_call() {
+    round_trip_source("def f() { return 1; }");
+    round_trip_source("def f() { return   1; }");
+    round_trip_source("def f() { return(1) }");
+    round_trip_source("def f() { return }");
+    round_trip_source("def f() { return   }");
+    finish_source_repro_category();
 }
 
 void reproduce_function_headers() {
@@ -415,6 +430,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_for_loop);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_subroutine);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_return_call);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_headers);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
