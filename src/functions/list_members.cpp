@@ -7,15 +7,14 @@ namespace list_members_function {
 
     CA_DEFINE_FUNCTION(append, "append(List, any) -> List")
     {
-        copy(INPUT(0), OUTPUT);
+        consume_input(CALLER, 0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
-        copy(value, result->append());
+        consume_input(CALLER, 1, result->append());
     }
 
     CA_DEFINE_FUNCTION(extend, "extend(List, List) -> List")
     {
-        copy(INPUT(0), OUTPUT);
+        consume_input(CALLER, 0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
 
         List* additions = List::checkCast(INPUT(1));

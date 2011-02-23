@@ -140,6 +140,26 @@ TaggedValue* get_input(Term* term, int index)
     return get_local(input, term->inputs[index].outputIndex);
 }
 
+void consume_input(Term* term, int index, TaggedValue* dest)
+{
+    Term* input = term->input(index);
+    if (input == NULL) {
+        set_null(dest);
+        return;
+    }
+    TaggedValue* val = get_local(input, term->inputs[index].outputIndex);
+
+    // if this function is called, then users shouldn't be 0.
+    ca_assert(input->users.length() != 0);
+
+    if (input->users.length() == 1 && !is_value(input)) {
+        swap(val,dest);
+        set_null(val);
+    } else {
+        copy(val,dest);
+    }
+}
+
 TaggedValue* get_output(Term* term, int outputIndex)
 {
     return get_local(term, outputIndex);

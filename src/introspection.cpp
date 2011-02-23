@@ -290,7 +290,14 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     }
     out << "]";
 
-    out << " " << term->localsIndex << "+" << get_output_count(term);
+    out << " users = ["; 
+    for (int i=0; i < term->users.length(); i++) {
+        if (i != 0) out << ", ";
+        out << format_global_id(term->users[i]);
+    }
+    out << "]";
+
+    // out << " " << term->localsIndex << "+" << get_output_count(term);
 
     #if 0
     TaggedValue* local = get_local_safe(term);

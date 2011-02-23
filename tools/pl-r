@@ -1,3 +1,2 @@
 cd $CIRCA_HOME
-scons build/plas_r
-build/plas_r $*
+scons build/plas_r && build/plas_r $*
