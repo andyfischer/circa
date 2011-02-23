@@ -138,6 +138,11 @@ namespace function_t {
                 append_phrase(source, " ", term, token::WHITESPACE);
                 append_phrase(source, name, term, phrase_type::UNDEFINED);
             }
+
+            if (function_can_rebind_input(term, i)) {
+                append_phrase(source, " ", term, token::WHITESPACE);
+                append_phrase(source, "+out", term, phrase_type::UNDEFINED);
+            }
         }
 
         if (function_t::get_variable_args(term))

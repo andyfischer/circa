@@ -268,6 +268,14 @@ void reproduce_subroutine() {
     finish_source_repro_category();
 }
 
+void reproduce_subroutine_headers()
+{
+    round_trip_source("def f(int i) -> int;");
+    round_trip_source("def f(NonexistantType i) -> int;");
+    round_trip_source("def f(int i +out) -> int;");
+    finish_source_repro_category();
+}
+
 void reproduce_return_call() {
     round_trip_source("def f() { return 1; }");
     round_trip_source("def f() { return   1; }");
@@ -430,6 +438,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_for_loop);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_subroutine);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_subroutine_headers);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_return_call);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_headers);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
