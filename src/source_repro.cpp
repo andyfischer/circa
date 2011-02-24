@@ -190,7 +190,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
     } else if (declarationStyle == "arrow-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);
-        append_phrase(source, get_input_syntax_hint(term, 1, "preWhitespace"),
+        append_phrase(source, term->stringPropOptional("syntax:postOperatorWs", ""),
                 term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
     }
@@ -350,27 +350,40 @@ int get_first_visible_input_index(Term* term)
         return 0;
 }
 
-std::string const& get_input_syntax_hint(Term* term, int index, std::string const& field)
+std::string get_input_syntax_hint(Term* term, int index, const char* field)
 {
+    if (term->inputInfo(index) == NULL)
+        return "";
+
+    //return term->inputInfo(index)->properties.getString(field, "");
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
     return term->stringProp(fieldName.str());
 }
 
-std::string get_input_syntax_hint_optional(Term* term, int index, std::string const& field,
+std::string get_input_syntax_hint_optional(Term* term, int index, const char* field,
         std::string const& defaultValue)
 {
+    if (term->inputInfo(index) == NULL)
+        return defaultValue;
+    //return term->inputInfo(index)->properties.getString(field, defaultValue.c_str());
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
     return term->stringPropOptional(fieldName.str(), defaultValue);
+
 }
 
-void set_input_syntax_hint(Term* term, int index, std::string const& field,
+void set_input_syntax_hint(Term* term, int index, const char* field,
         std::string const& value)
 {
+    //std::cout << "set_input_syntax_hint " << term << " " << index << " " << field << " " << value << std::endl;
+    ca_assert(term->inputInfo(index) != NULL);
+    //term->inputInfo(index)->properties.setString(field, value.c_str());
+
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;
     term->setStringProp(fieldName.str(), value);
+
 }
 
 void hide_from_source(Term* term)

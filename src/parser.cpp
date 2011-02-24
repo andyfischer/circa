@@ -100,7 +100,7 @@ struct ListSyntaxHints {
     {
         std::vector<Input>::const_iterator it;
         for (it = mPending.begin(); it != mPending.end(); ++it)
-            set_input_syntax_hint(term, it->index, it->field, it->value);
+            set_input_syntax_hint(term, it->index, it->field.c_str(), it->value);
     }
 
     std::vector<Input> mPending;
@@ -1173,7 +1173,8 @@ Term* infix_expression_nested(Branch& branch, TokenStream& tokens, ParserCxt* co
             result->setStringProp("syntax:declarationStyle", "arrow-concat");
 
             set_input_syntax_hint(result, 0, "postWhitespace", preOperatorWhitespace);
-            set_input_syntax_hint(result, 1, "preWhitespace", postOperatorWhitespace);
+            // Can't use preWhitespace of input 1 here, because there is no input 1
+            result->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
 
         } else {
             Term* rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
