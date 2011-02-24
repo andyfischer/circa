@@ -507,6 +507,34 @@ bool Dict::iteratorFinished(TaggedValue* iterator)
 {
     return is_null(iterator);
 }
+void Dict::setString(const char* key, const char* value)
+{
+    TaggedValue* dest = insert(key);
+    set_string(dest, value);
+}
+const char* Dict::getString(const char* key, const char* defaultValue)
+{
+    TaggedValue* val = get(key);
+    if (val == NULL)
+        return defaultValue;
+    if (is_string(val))
+        return as_cstring(val);
+    return defaultValue;
+}
+void Dict::setInt(const char* key, int value)
+{
+    TaggedValue* dest = insert(key);
+    set_int(dest, value);
+}
+int Dict::getInt(const char* key, int defaultValue)
+{
+    TaggedValue* val = get(key);
+    if (val == NULL)
+        return defaultValue;
+    if (is_int(val))
+        return as_int(val);
+    return defaultValue;
+}
 
 bool is_dict(TaggedValue* value)
 {

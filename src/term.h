@@ -28,6 +28,7 @@ struct Term : TaggedValue
     struct Input {
         Term* term;
         int outputIndex;
+        Dict properties;
 
         Input() : outputIndex(0) {}
         Input(Term* t) : term(t), outputIndex(0) {}

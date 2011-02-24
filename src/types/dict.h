@@ -57,6 +57,11 @@ struct Dict : TaggedValue
     void iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value);
     bool iteratorFinished(TaggedValue* iterator);
 
+    void setString(const char* key, const char* value);
+    const char* getString(const char* key, const char* defaultValue);
+    void setInt(const char* key, int value);
+    int getInt(const char* key, int defaultValue);
+
     static Dict* checkCast(TaggedValue* value);
 
     // lazyCast will cast value to Dict if it's the wrong type. If it's already a Dict,

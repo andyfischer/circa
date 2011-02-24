@@ -502,6 +502,12 @@ std::string const& as_string(TaggedValue* value)
     return *((std::string*) value->value_data.ptr);
 }
 
+const char* as_cstring(TaggedValue* value)
+{
+    ca_assert(is_string(value));
+    return ((std::string*) value->value_data.ptr)->c_str();
+}
+
 bool as_bool(TaggedValue* value)
 {
     ca_assert(is_bool(value));

@@ -100,6 +100,7 @@ Branch* get_branch_value(TaggedValue* value);
 int as_int(TaggedValue* value);
 float as_float(TaggedValue* value);
 std::string const& as_string(TaggedValue* value);
+const char* as_cstring(TaggedValue* value);
 bool as_bool(TaggedValue* value);
 Ref& as_ref(TaggedValue* value);
 Type& as_type(TaggedValue* value);

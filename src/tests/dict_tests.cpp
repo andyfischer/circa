@@ -234,6 +234,17 @@ void test_iterate()
     test_assert(foundTwo);
 }
 
+void test_cpp_wrapper()
+{
+    Dict dict;
+    set_int(dict.insert("a"), 1);
+    set_int(dict.insert("b"), 2);
+    test_equals(dict.get("a"), "1");
+    test_assert(dict.getInt("a", -1) == 1);
+    test_assert(dict.getInt("b", -1) == 2);
+    test_assert(dict.getInt("c", -1) == -1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(dict_tests::test_simple);
@@ -245,6 +256,7 @@ void register_tests()
     REGISTER_TEST_CASE(dict_tests::test_duplicate);
     REGISTER_TEST_CASE(dict_tests::test_reset);
     REGISTER_TEST_CASE(dict_tests::test_iterate);
+    REGISTER_TEST_CASE(dict_tests::test_cpp_wrapper);
 }
 
 }
