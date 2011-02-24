@@ -259,5 +259,5 @@ void register_tests()
     REGISTER_TEST_CASE(dict_tests::test_cpp_wrapper);
 }
 
-}
-}
+} // namespace dict_tests
+} // namespace circa

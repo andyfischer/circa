@@ -91,7 +91,9 @@ struct Term : TaggedValue
     ~Term();
 
     Term* input(int index) const;
+    Input* inputInfo(int index);
     int numInputs() const;
+
     void inputsToList(RefList* out) const;
 
     const char* getName(int index) const;

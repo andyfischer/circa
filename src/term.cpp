@@ -41,6 +41,14 @@ Term::input(int index) const
     return this->inputs[index].term;
 }
 
+Term::Input*
+Term::inputInfo(int index)
+{
+    if (index >= numInputs())
+        return NULL;
+    return &this->inputs[index];
+}
+
 int
 Term::numInputs() const
 {

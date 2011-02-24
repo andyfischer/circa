@@ -137,7 +137,7 @@ TaggedValue* get_input(Term* term, int index)
     Term* input = term->input(index);
     if (input == NULL)
         return NULL;
-    return get_local(input, term->inputs[index].outputIndex);
+    return get_local(input, term->inputInfo(index)->outputIndex);
 }
 
 void consume_input(Term* term, int index, TaggedValue* dest)
@@ -147,7 +147,7 @@ void consume_input(Term* term, int index, TaggedValue* dest)
         set_null(dest);
         return;
     }
-    TaggedValue* val = get_local(input, term->inputs[index].outputIndex);
+    TaggedValue* val = get_local(input, term->inputInfo(index)->outputIndex);
 
     // if this function is called, then users shouldn't be 0.
     ca_assert(input->users.length() != 0);

@@ -541,7 +541,8 @@ const char* get_output_name(Term* term, int outputIndex)
 
 const char* get_output_name_for_input(Term* term, int inputIndex)
 {
-    return get_output_name(term->input(inputIndex), term->inputs[inputIndex].outputIndex);
+    return get_output_name(term->input(inputIndex),
+            term->inputInfo(inputIndex)->outputIndex);
 }
 
 bool is_native_function(Term* func)
