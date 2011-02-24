@@ -25,6 +25,7 @@ namespace dict_t {
     TaggedValue* get_index(DictData* data, int index);
     void remove(DictData* data, const char* key);
     int count(DictData* data);
+    void clear(DictData* data);
     void visit_sorted(DictData* data, DictVisitor visitor, void* context);
     std::string to_string(DictData* data);
     void debug_print(DictData* data);
