@@ -118,11 +118,17 @@ void set_inputs(Term* term, RefList const& inputs)
 {
     assert_valid_term(term);
 
+    for (int i=0; i < term->numInputs(); i++) {
+        assert_valid_term(term->input(i));
+    }
+
     Term::InputList previousInputs = term->inputs;
 
     term->inputs.resize(inputs.length());
-    for (int i=0; i < inputs.length(); i++)
+    for (int i=0; i < inputs.length(); i++) {
+        assert_valid_term(inputs[i]);
         term->inputs[0] = Term::Input(inputs[i]);
+    }
 
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
@@ -172,6 +178,16 @@ void remove_from_users(Term* term)
         Term* user = term->input(i);
         if (user == NULL) continue;
         user->users.remove(term);
+    }
+}
+
+void clear_from_users_inputs(Term* term)
+{
+    for (int i=0; i < term->users.length(); i++) {
+        Term* user = term->users[i];
+        for (int input=0; input < user->numInputs(); input++)
+            if (user->input(input) == term)
+                set_input(user, input, NULL);
     }
 }
 

@@ -53,7 +53,8 @@ void debug_assert_valid_object(void* obj, int type)
     bool valid = address_to_type().find(obj) != address_to_type().end();
     if (!valid) {
         std::stringstream err;
-        err << "assert_valid_object failed, nothing registered at addr " << size_t(obj);
+        err << "assert_valid_object failed, nothing registered at addr 0x"
+            << std::hex << size_t(obj);
         internal_error(err.str().c_str());
     }
     int existingType = address_to_type()[obj];

@@ -378,7 +378,7 @@ void set_input_syntax_hint(Term* term, int index, const char* field,
 {
     //std::cout << "set_input_syntax_hint " << term << " " << index << " " << field << " " << value << std::endl;
     ca_assert(term->inputInfo(index) != NULL);
-    //term->inputInfo(index)->properties.setString(field, value.c_str());
+    term->inputInfo(index)->properties.setString(field, value.c_str());
 
     std::stringstream fieldName;
     fieldName << "syntax:input-" << index << ":" << field;

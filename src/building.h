@@ -32,6 +32,9 @@ bool is_actually_using(Term* user, Term* usee);
 // their user list. This is appropriate when you want to delete 'term'.
 void remove_from_users(Term* term);
 
+// This checks every user of this term, and removes it from their input lists.
+void clear_from_users_inputs(Term* term);
+
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");

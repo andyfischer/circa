@@ -110,6 +110,8 @@ private:
     Branch& operator=(Branch const& b) { return *this; }
 };
 
+void assert_valid_branch(Branch const* obj);
+
 bool is_namespace(Term* term);
 bool is_namespace(Branch& branch);
 

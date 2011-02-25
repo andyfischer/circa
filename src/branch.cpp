@@ -14,7 +14,7 @@
 
 namespace circa {
 
-static void assert_valid_branch(Branch const* obj)
+void assert_valid_branch(Branch const* obj)
 {
     debug_assert_valid_object((void*) obj, BRANCH_OBJECT);
 }
