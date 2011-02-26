@@ -846,5 +846,11 @@ List::lazyCast(TaggedValue* v)
         set_list(v, 0);
     return (List*) v;
 }
+List*
+List::cast(TaggedValue* v, int length)
+{
+    set_list(v, length);
+    return (List*) v;
+}
 
 } // namespace circa

@@ -48,6 +48,7 @@ struct List : TaggedValue
 
     static List* checkCast(TaggedValue* v);
     static List* lazyCast(TaggedValue* v);
+    static List* cast(TaggedValue* v, int length);
 };
 
 }

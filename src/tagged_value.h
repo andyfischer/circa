@@ -89,6 +89,7 @@ List* set_list(TaggedValue* value);
 List* set_list(TaggedValue* value, int size);
 void set_type(TaggedValue* value, Type* type);
 void set_null(TaggedValue* value);
+void set_opaque_pointer(TaggedValue* value, void* addr);
 
 void set_pointer(TaggedValue* value, Type* type, void* p);
 void set_pointer(TaggedValue* value, void* ptr);

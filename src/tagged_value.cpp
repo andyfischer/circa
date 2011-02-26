@@ -470,6 +470,11 @@ void set_null(TaggedValue* value)
     debug_trap_value_write(value);
     change_type(value, &NULL_TYPE);
 }
+void set_opaque_pointer(TaggedValue* value, void* addr)
+{
+    change_type(value, &OPAQUE_POINTER_T);
+    value->value_data.ptr = addr;
+}
 
 void set_pointer(TaggedValue* value, Type* type, void* p)
 {
