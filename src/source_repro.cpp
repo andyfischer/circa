@@ -13,8 +13,6 @@
 
 namespace circa {
 
-void format_term_source_default_formatting(StyledSource* source, Term* term);
-
 std::string
 StyledSource::toString()
 {

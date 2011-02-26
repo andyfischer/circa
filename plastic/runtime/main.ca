@@ -81,6 +81,7 @@ namespace text
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
     def draw_rendered_text(RenderedText, Point loc)
         "Draw a sprite created with render_text."
+    def get_metrics(Font font, string text) -> Point;
 
 def draw_text(Font font, string str, Color color, Point location) -> Rect
     "Render and draw a string."

@@ -185,6 +185,23 @@ CA_FUNCTION(draw_rendered_text)
     gl_check_error(CONTEXT, CALLER);
 }
 
+CA_FUNCTION(get_metrics)
+{
+    Font* font = Font::checkCast(INPUT(0));
+    const char* str = as_cstring(INPUT(1));
+
+    List* output = List::checkCast(OUTPUT);
+    output->resize(2);
+
+    int w;
+    int h;
+
+    TTF_SizeText(font->contents()->ttfFont, str, &w, &h);
+
+    set_int(output->get(0), w);
+    set_int(output->get(0), h);
+}
+
 void setup(Branch& branch)
 {
     FontRef::singleton = unbox_type(branch["Font"]);
