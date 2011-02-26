@@ -11,17 +11,16 @@
 #include "types/branch_ref.h"
 #include "types/callable.h"
 #include "types/color.h"
+#include "types/common.h"
 #include "types/dict.h"
 #include "types/float.h"
 #include "types/indexable.h"
 #include "types/int.h"
 #include "types/list.h"
 #include "types/map.h"
-#include "types/null.h"
 #include "types/ref.h"
 #include "types/set.h"
 #include "types/string.h"
-#include "types/styled_source.h"
 #include "types/void.h"
 
 namespace circa {
@@ -104,6 +103,7 @@ Term* FUNCTION_ATTRS_TYPE = NULL;
 Term* MAP_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
+Term* OPAQUE_POINTER_TYPE;
 
 } // extern "C"
 
@@ -117,6 +117,7 @@ Type NULL_TYPE;
 Type STRING_T;
 Type REF_T;
 Type VOID_T;
+Type OPAQUE_POINTER_T;
 
 Type* FILE_SIGNATURE_T;
 
@@ -138,6 +139,7 @@ void create_primitive_types()
     ref_t::setup_type(&REF_T);
     list_t::setup_type(&LIST_T);
     void_t::setup_type(&VOID_T);
+    opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
 }
 
 void bootstrap_kernel()
@@ -230,6 +232,9 @@ void initialize_primitive_types(Branch& kernel)
     LIST_TYPE = create_type(kernel, "List");
     set_type(LIST_TYPE, &LIST_T);
 
+    OPAQUE_POINTER_TYPE = create_type(kernel, "opaque_pointer");
+    set_type(OPAQUE_POINTER_TYPE, &OPAQUE_POINTER_T);
+
     // ANY_TYPE was created in bootstrap_kernel
 }
 
@@ -269,8 +274,6 @@ void initialize_compound_types(Branch& kernel)
     Term* map_type = create_compound_type(kernel, "Map");
     map_t::setup_type(unbox_type(map_type));
 
-    branch_ref_t::initialize(kernel);
-
     Term* styledSourceType = parse_type(kernel, "type StyledSource;");
     styled_source_t::setup_type(unbox_type(styledSourceType));
 
@@ -278,6 +281,8 @@ void initialize_compound_types(Branch& kernel)
     indexable_t::setup_type(unbox_type(indexableType));
 
     callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
+
+    parse_type(kernel, "type BranchRef { opaque_pointer branch }");
 }
 
 void pre_setup_builtin_functions(Branch& kernel)

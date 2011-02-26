@@ -96,13 +96,13 @@ void set_pointer(TaggedValue* value, void* ptr);
 void* get_pointer(TaggedValue* value);
 void* get_pointer(TaggedValue* value, Type* expectedType);
 
-Branch* get_branch_value(TaggedValue* value);
 int as_int(TaggedValue* value);
 float as_float(TaggedValue* value);
 std::string const& as_string(TaggedValue* value);
 const char* as_cstring(TaggedValue* value);
 bool as_bool(TaggedValue* value);
 Ref& as_ref(TaggedValue* value);
+void* as_opaque_pointer(TaggedValue* value);
 Type& as_type(TaggedValue* value);
 
 bool is_int(TaggedValue* value);
@@ -110,6 +110,7 @@ bool is_float(TaggedValue* value);
 bool is_bool(TaggedValue* value);
 bool is_string(TaggedValue* value);
 bool is_ref(TaggedValue* value);
+bool is_opaque_pointer(TaggedValue* value);
 bool is_list(TaggedValue* value);
 bool is_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);

@@ -25,13 +25,6 @@ namespace old_branch_ref_t {
         return true;
     }
 
-    void set_from_ref(TaggedValue* value, Term* ref)
-    {
-        List* list = List::checkCast(value);
-        touch(list);
-        set_ref(list->getIndex(0), ref);
-    }
-    
     bool is_considered_config(Term* term)
     {
         if (term == NULL) return false;

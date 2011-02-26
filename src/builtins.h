@@ -78,6 +78,7 @@ extern Term* FUNCTION_ATTRS_TYPE;
 extern Term* LIST_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
+extern Term* OPAQUE_POINTER_TYPE;
 
 } // extern "C"
 
@@ -91,6 +92,7 @@ extern Type STRING_T;
 extern Type REF_T;
 extern Type TYPE_T;
 extern Type VOID_T;
+extern Type OPAQUE_POINTER_T;
 
 extern Type* FILE_SIGNATURE_T;
 

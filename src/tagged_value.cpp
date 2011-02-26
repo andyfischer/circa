@@ -520,6 +520,12 @@ Ref& as_ref(TaggedValue* value)
     return *((Ref*) value->value_data.ptr);
 }
 
+void* as_opaque_pointer(TaggedValue* value)
+{
+    ca_assert(is_opaque_pointer(value));
+    return value->value_data.ptr;
+}
+
 Type& as_type(TaggedValue* value)
 {
     ca_assert(is_type(value));
@@ -550,11 +556,6 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-Branch* get_branch_value(TaggedValue* value)
-{
-    return (Branch*) value->value_data.ptr;
-}
-
 bool is_int(TaggedValue* value)
 {
     return INT_TYPE != NULL
@@ -583,6 +584,11 @@ bool is_ref(TaggedValue* value)
 {
     return REF_TYPE != NULL
         && value->value_type == (Type*) REF_TYPE->value_data.ptr;
+}
+
+bool is_opaque_pointer(TaggedValue* value)
+{
+    return value->value_type == &OPAQUE_POINTER_T;
 }
 
 bool is_list(TaggedValue* value)

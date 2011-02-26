@@ -5,8 +5,14 @@
 namespace circa {
 namespace branch_ref_t {
 
-    void initialize(Branch& kernel);
+    void setup_type(Type* type);
 
 } // namespace branch_ref_t
-} // namespace circa
 
+struct BranchRef : TaggedValue
+{
+    void set(Branch*);
+    Branch* get();
+};
+
+} // namespace circa
