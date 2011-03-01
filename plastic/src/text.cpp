@@ -125,7 +125,7 @@ CA_FUNCTION(render_text)
             set_int(state->texidContainer(), 0);
             set_int(state->widthContainer(), 0);
             set_int(state->heightContainer(), 0);
-            copy(INPUT(0), OUTPUT);
+            copy(state, OUTPUT);
             return;
         }
 
@@ -190,8 +190,7 @@ CA_FUNCTION(get_metrics)
     Font* font = Font::checkCast(INPUT(0));
     const char* str = as_cstring(INPUT(1));
 
-    List* output = List::checkCast(OUTPUT);
-    output->resize(2);
+    List* output = List::cast(OUTPUT, 2);
 
     int w;
     int h;
@@ -199,7 +198,7 @@ CA_FUNCTION(get_metrics)
     TTF_SizeText(font->contents()->ttfFont, str, &w, &h);
 
     set_int(output->get(0), w);
-    set_int(output->get(0), h);
+    set_int(output->get(1), h);
 }
 
 void setup(Branch& branch)
@@ -216,6 +215,7 @@ void setup(Branch& branch)
     install_function(text_ns["load_font"], load_font);
     install_function(text_ns["render_text"], render_text);
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);
+    install_function(text_ns["get_metrics"], get_metrics);
 
     RenderedText::singleton = unbox_type(text_ns["RenderedText"]);
 }

@@ -2,13 +2,13 @@ background(#eef)
 
 namespace editor
     def get_highlight_color(int token) -> Color
-        return 0x000
+        return #000
 
 def draw_code(string s, Point loc, Color color)
     draw_text(coding_font, s, color, loc)
 
 def draw_code_editor(Point topleft, BranchRef branch)
-    source = format_source(branch)
+    source = branch.format_source()
 
     letter_width = 8
     letter_height = 17
@@ -29,7 +29,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
         -- don't draw newline characters
         visable_s = cond(s == '\n', "", s)
         text_sprite_size = text:get_metrics(coding_font, visable_s)
-        rect = to_rect(loc, [text_sprite_size.x text_sprite_size.y])
+        rect = to_rect(loc, text_sprite_size)
 
         bg_color = #fff0
         cond(mouse_over(rect) #ffe @bg_color)
