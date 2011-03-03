@@ -2,6 +2,8 @@
 This is a list of short-term TODOs. There's a bigger list at docs/todo.md
 
  - Plastic no longer reloads scripts when they encounter an error
+ - Plastic shouldn't execute a script if it has static errors
+ - 'Unknown identifier' terms are being created without source location
 
  - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
  - evaluate_if_block should not use if_block_contains_state, it's O(n) 

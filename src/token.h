@@ -95,6 +95,7 @@ const int INCLUDE = 66;
 const int AND = 67;
 const int OR = 68;
 const int DISCARD = 69;
+const int NULL_TOKEN = 71;
 
 const int WHITESPACE = 80;
 const int NEWLINE = 81;

@@ -10,12 +10,22 @@ def draw_code(string s, Point loc, Color color)
 def draw_code_editor(Point topleft, BranchRef branch)
     source = branch.format_source()
 
+    type Fragment {
+      string str
+      Ref term
+      int token
+      Point loc
+    }
+
+    -- Iterate through the formatted source, and find the location for each fragment.
+
+    fragments = []
+
     letter_width = 8
     letter_height = 17
 
     current_line = 0
     current_col = 0
-    i = 0
     for phrase in source
         s = phrase[0] -> string
         r = phrase[1] -> Ref
@@ -24,33 +34,38 @@ def draw_code_editor(Point topleft, BranchRef branch)
         loc = [current_col*letter_width current_line*letter_height] -> Point
         loc += topleft
 
-        color = editor:get_highlight_color(t)
+        fragments.append(Fragment([s r t loc]))
 
-        -- don't draw newline characters
-        visable_s = cond(s == '\n', "", s)
-        text_sprite_size = text:get_metrics(coding_font, visable_s)
-        rect = to_rect(loc, text_sprite_size)
-
-        bg_color = #fff0
-        cond(mouse_over(rect) #ffe @bg_color)
-
-        draw_highlight_rect = t != styled_source:whitespace
-
-        if draw_highlight_rect
-            fill_rect(rect, bg_color)
-
-        draw_code(visable_s loc color)
-
-        if mouse_wheel_up(rect)
-            r.tweak(-1)
-        elif mouse_wheel_down(rect)
-            r.tweak(1)
-
-        i += 1
         current_col += s.length()
         if (s == '\n')
             current_col = 0
             current_line += 1
+
+    --highlighted_fragment = 
+
+    for phrase in fragments
+        @phrase -> Fragment
+        color = editor:get_highlight_color(phrase.token)
+
+        -- don't draw newline characters
+        visable_s = cond(phrase.str == '\n', "", phrase.str)
+        text_sprite_size = text:get_metrics(coding_font, visable_s)
+        rect = to_rect(phrase.loc, text_sprite_size)
+
+        bg_color = #fff0
+        cond(mouse_over(rect) #ffe @bg_color)
+
+        draw_highlight_rect = phrase.token != styled_source:whitespace
+
+        if draw_highlight_rect
+            fill_rect(rect, bg_color)
+
+        draw_code(visable_s phrase.loc color)
+
+        if mouse_wheel_up(rect)
+            phrase.term.tweak(-1)
+        elif mouse_wheel_down(rect)
+            phrase.term.tweak(1)
 
 def example()
   offset = [3 3]

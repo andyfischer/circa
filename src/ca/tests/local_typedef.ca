@@ -1,0 +1,16 @@
+
+def f() -> List
+  type A {
+    int x
+    int y
+  }
+
+  a = A()
+  a.x = 3
+  a.y = 4
+  assert(to_string(a) == '[3, 4]')
+
+  return a
+
+b = f()
+assert(to_string(b) == '[3, 4]')

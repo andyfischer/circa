@@ -94,6 +94,7 @@ Term* BOOL_TYPE = NULL;
 Term* DICT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
+Term* NULL_TYPE_TERM = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 Term* COLOR_TYPE = NULL;
@@ -216,6 +217,9 @@ void initialize_primitive_types(Branch& kernel)
 
     FLOAT_TYPE = create_type(kernel, "number");
     set_type(FLOAT_TYPE, &FLOAT_T);
+
+    NULL_TYPE_TERM = create_type(kernel, "Null");
+    set_type(NULL_TYPE_TERM, &NULL_TYPE);
 
     DICT_TYPE = create_type(kernel, "Dict");
     set_type(DICT_TYPE, &DICT_T);

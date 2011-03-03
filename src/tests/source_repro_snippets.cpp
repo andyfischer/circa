@@ -95,6 +95,12 @@ void reproduce_boolean() {
     round_trip_source("[false true false true]");
     finish_source_repro_category();
 }
+void reproduce_null_value() {
+    round_trip_source("null");
+    round_trip_source("a = null");
+    round_trip_source("[null null null]");
+    finish_source_repro_category();
+}
 
 void reproduce_color_literal() {
     round_trip_source("#123");
@@ -436,6 +442,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_simple_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_string_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_boolean);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_null_value);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_color_literal);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_stateful_values);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);

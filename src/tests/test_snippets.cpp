@@ -152,6 +152,12 @@ void test_strings()
     //test_snippet_runtime_error("'abc'.slice(0,-5)");
 }
 
+void test_null_literal()
+{
+    test_snippet("", "null == null");
+    test_snippet("", "to_string(null) == 'null'");
+}
+
 void test_equals_snippets()
 {
     test_snippet("", "4 == 4");
@@ -555,6 +561,7 @@ void test_recursion_and_multiple_outputs()
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
+    REGISTER_TEST_CASE(test_snippets::test_null_literal);
     REGISTER_TEST_CASE(test_snippets::test_equals_snippets);
     REGISTER_TEST_CASE(test_snippets::test_abs);
     REGISTER_TEST_CASE(test_snippets::test_filter);

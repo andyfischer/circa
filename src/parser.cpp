@@ -1569,6 +1569,10 @@ Term* atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(TRUE_TOKEN) || tokens.nextIs(FALSE_TOKEN))
         result = literal_bool(branch, tokens, context);
 
+    // literal null?
+    else if (tokens.nextIs(NULL_TOKEN))
+        result = literal_null(branch, tokens, context);
+
     // literal hex?
     else if (tokens.nextIs(HEX_INTEGER))
         result = literal_hex(branch, tokens, context);
@@ -1733,6 +1737,17 @@ Term* literal_bool(Branch& branch, TokenStream& tokens, ParserCxt* context)
     tokens.consume();
 
     Term* term = create_bool(branch, value);
+    set_source_location(term, startPosition, tokens);
+    return term;
+}
+
+Term* literal_null(Branch& branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(NULL_TOKEN);
+
+    Term* term = create_value(branch, NULL_TYPE_TERM);
     set_source_location(term, startPosition, tokens);
     return term;
 }

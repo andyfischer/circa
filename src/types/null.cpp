@@ -7,11 +7,16 @@ namespace null_t {
     {
         return "null";
     }
+    void formatSource(StyledSource* source, Term* term)
+    {
+        append_phrase(source, "null", term, token::NULL_TOKEN);
+    }
 
     void setup_type(Type* type)
     {
         type->name = "null";
         type->toString = toString;
+        type->formatSource = formatSource;
     }
 }
 }

@@ -56,6 +56,7 @@ Term* literal_hex(Branch& branch, TokenStream& tokens, ParserCxt* context);
 Term* literal_float(Branch& branch, TokenStream& tokens, ParserCxt* context);
 Term* literal_string(Branch& branch, TokenStream& tokens, ParserCxt* context);
 Term* literal_bool(Branch& branch, TokenStream& tokens, ParserCxt* context);
+Term* literal_null(Branch& branch, TokenStream& tokens, ParserCxt* context);
 Term* literal_color(Branch& branch, TokenStream& tokens, ParserCxt* context);
 Term* literal_list(Branch& branch, TokenStream& tokens, ParserCxt* context);
 Term* plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context);
