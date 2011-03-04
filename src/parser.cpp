@@ -1548,14 +1548,19 @@ Term* atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
     Term* result = NULL;
+    bool existingTerm = false;
 
     // identifier with rebind?
-    if (tokens.nextIs(AT_SIGN) && tokens.nextIs(IDENTIFIER, 1))
+    if (tokens.nextIs(AT_SIGN) && tokens.nextIs(IDENTIFIER, 1)) {
         result = identifier_with_rebind(branch, tokens, context);
+        existingTerm = true;
+    }
 
     // identifier?
-    else if (tokens.nextIs(IDENTIFIER))
+    else if (tokens.nextIs(IDENTIFIER)) {
         result = identifier(branch, tokens, context);
+        existingTerm = true;
+    }
 
     // literal integer?
     else if (tokens.nextIs(INTEGER))
@@ -1611,7 +1616,8 @@ Term* atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
             "Unrecognized expression, (next token = " + next + ")");
     }
 
-    set_source_location(result, startPosition, tokens);
+    if (!existingTerm)
+        set_source_location(result, startPosition, tokens);
 
     return result;
 }

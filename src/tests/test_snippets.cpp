@@ -222,12 +222,16 @@ void test_subroutine()
     test_snippet("def f() { if 1==2 { return } }", "");
 }
 
-#if 0
 void test_references()
 {
     test_snippet("a = 1; ra = ref(a)", "ra.name() == 'a'");
     test_snippet("a = 1; ra = ref(a); rb = ref(a)", "ra == rb");
 
+    // test source_location
+    test_snippet("a = 1; ra = ref(a)", "ra.source_location() == [0, 1, 18, 1]");
+
+
+#if 0
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"
                  "bm = branch_ref(br); cons = bm.get_configs();"
                  "cons_0 = cons[0] -> Ref",
@@ -247,8 +251,8 @@ void test_references()
             "mir_0.asint() == 1; mir_1.asint() == 2");
 
     test_snippet("a = add(1 2 3); a_ref = ref(a)", "a_ref.num_inputs() == 3");
-}
 #endif
+}
 
 void test_blocks()
 {
@@ -567,7 +571,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_filter);
     REGISTER_TEST_CASE(test_snippets::test_modulo);
     REGISTER_TEST_CASE(test_snippets::test_subroutine);
-    //TEST_DISABLED REGISTER_TEST_CASE(test_snippets::test_references);
+    REGISTER_TEST_CASE(test_snippets::test_references);
     REGISTER_TEST_CASE(test_snippets::test_blocks);
     REGISTER_TEST_CASE(test_snippets::test_rounding);
     REGISTER_TEST_CASE(test_snippets::test_boolean_ops);

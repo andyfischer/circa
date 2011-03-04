@@ -95,6 +95,7 @@ Term* DICT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
 Term* NULL_TYPE_TERM = NULL;
+Term* RECT_I_TYPE_TERM = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 Term* COLOR_TYPE = NULL;
@@ -338,6 +339,7 @@ void parse_hosted_types(Branch& kernel)
     parse_type(kernel, "type Point { number x, number y }");
     parse_type(kernel, "type Point_i { int x, int y }");
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
+    RECT_I_TYPE_TERM = parse_type(kernel, "type Rect_i { int x1, int y1, int x2, int y2 }");
 
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 

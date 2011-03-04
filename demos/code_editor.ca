@@ -15,6 +15,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
       Ref term
       int token
       Point loc
+      Point size
     }
 
     -- Iterate through the formatted source, and find the location for each fragment.
@@ -37,7 +38,9 @@ def draw_code_editor(Point topleft, BranchRef branch)
         -- Strip newlines
         displayed_s = cond(s == '\n', '', s)
 
-        fragments.append(Fragment([displayed_s r t loc]))
+        size = [displayed_s.length()*letter_width letter_height]
+
+        fragments.append(Fragment([displayed_s r t loc size]))
 
         current_col += s.length()
         if (s == '\n')
@@ -45,7 +48,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
             current_line += 1
 
     -- Find the fragment under the mouse
-    highlighted_phrase = null
+    mouseover_phrase = null
 
     for phrase in fragments
         @phrase -> Fragment
@@ -53,8 +56,12 @@ def draw_code_editor(Point topleft, BranchRef branch)
         text_sprite_size = text:get_metrics(coding_font, phrase.str)
         rect = to_rect(phrase.loc, text_sprite_size)
         if mouse_over(rect)
-            highlighted_phrase = phrase
+            mouseover_phrase = phrase
 
+    -- Draw a highlight for the mouseover phrase
+    if mouseover_phrase != null
+        @mouseover_phrase -> Fragment
+        fill_rect(to_rect(mouseover_phrase.loc mouseover_phrase.size) #ffe)
 
     for phrase in fragments
         @phrase -> Fragment
@@ -65,16 +72,8 @@ def draw_code_editor(Point topleft, BranchRef branch)
         rect = to_rect(phrase.loc, text_sprite_size)
 
         highlighted = false
-        if highlighted_phrase != null
-            highlighted = highlighted_phrase.term == phrase.term
-
-        bg_color = #fff0
-        cond(highlighted #ffe @bg_color)
-
-        draw_highlight_rect = phrase.token != styled_source:whitespace
-
-        if draw_highlight_rect
-            fill_rect(rect, bg_color)
+        if mouseover_phrase != null
+            highlighted = mouseover_phrase.term == phrase.term
 
         draw_code(phrase.str phrase.loc color)
 
@@ -83,14 +82,10 @@ def draw_code_editor(Point topleft, BranchRef branch)
         elif mouse_wheel_down(rect)
             phrase.term.tweak(1)
 
-    if highlighted_phrase != null
-        @highlighted_phrase -> Fragment
-        trace(highlighted_phrase.term.global_id())
-
 def example()
   offset = [3 3]
   angle = time % 1
   loc = [cos(angle) sin(angle)] * 5 + offset
   print(loc)
 
-draw_code_editor([0 0] (example->branch_ref))
+draw_code_editor([0 20] (example->branch_ref))

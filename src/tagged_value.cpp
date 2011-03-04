@@ -519,6 +519,7 @@ bool as_bool(TaggedValue* value)
     return value->value_data.asbool;
 }
 
+// TODO: this should just return Term*
 Ref& as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));

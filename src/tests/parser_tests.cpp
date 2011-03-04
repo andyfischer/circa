@@ -757,6 +757,19 @@ void test_bug_with_nested_ifs()
     test_equals(get_local(branch["a"]), "correct");
 }
 
+void test_source_location()
+{
+    return; //TEST_DISABLED
+    Branch branch;
+    branch.compile("a = 1");
+    branch.compile("ra = ref(a)");
+    Term* a = branch["a"];
+    test_equals(a->sourceLoc.col, 0);
+    test_equals(a->sourceLoc.line, 1);
+    test_equals(a->sourceLoc.colEnd, 6);
+    test_equals(a->sourceLoc.lineEnd, 1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(parser_tests::test_comment);
@@ -804,6 +817,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_statically_resolve_namespace_access);
     REGISTER_TEST_CASE(parser_tests::test_get_number_of_decimal_figures);
     REGISTER_TEST_CASE(parser_tests::test_bug_with_nested_ifs);
+    REGISTER_TEST_CASE(parser_tests::test_source_location);
 }
 
 } // namespace parser_tests

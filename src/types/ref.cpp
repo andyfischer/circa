@@ -3,6 +3,8 @@
 #include "circa.h"
 #include "importing_macros.h"
 
+#include "types/rect_i.h"
+
 namespace circa {
 namespace ref_t {
 
@@ -160,22 +162,12 @@ namespace ref_t {
     CA_FUNCTION(get_source_location)
     {
         Term* t = INPUT(0)->asRef();
-        if (t == NULL) {
-            error_occurred(CONTEXT, CALLER, "NULL reference");
-            return;
-        }
-        #if 0
-        FIXME
-        Branch& output = as_branch(OUTPUT);
+        if (t == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
 
-        if (t->sourceLoc.defined()) {
-            set_int(output[0], t->sourceLoc.col);
-            set_int(output[1], t->sourceLoc.line);
-        } else {
-            set_int(output[0], 0);
-            set_int(output[1], 0);
-        }
-        #endif
+        Rect_i* output = Rect_i::cast(OUTPUT);
+        output->set(t->sourceLoc.col, t->sourceLoc.line,
+                t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
     }
     CA_FUNCTION(global_id)
     {
@@ -211,7 +203,7 @@ namespace ref_t {
         import_member_function(type, ref_t::get_input, "input(Ref, int) -> Ref");
         import_member_function(type, ref_t::num_inputs, "num_inputs(Ref) -> int");
         import_member_function(type, ref_t::get_source_location,
-                "source_location(Ref) -> Point_i");
+                "source_location(Ref) -> Rect_i");
         import_member_function(type, ref_t::global_id, "global_id(Ref) -> string");
     }
     
