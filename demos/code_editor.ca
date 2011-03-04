@@ -34,38 +34,58 @@ def draw_code_editor(Point topleft, BranchRef branch)
         loc = [current_col*letter_width current_line*letter_height] -> Point
         loc += topleft
 
-        fragments.append(Fragment([s r t loc]))
+        -- Strip newlines
+        displayed_s = cond(s == '\n', '', s)
+
+        fragments.append(Fragment([displayed_s r t loc]))
 
         current_col += s.length()
         if (s == '\n')
             current_col = 0
             current_line += 1
 
-    --highlighted_fragment = 
+    -- Find the fragment under the mouse
+    highlighted_phrase = null
+
+    for phrase in fragments
+        @phrase -> Fragment
+
+        text_sprite_size = text:get_metrics(coding_font, phrase.str)
+        rect = to_rect(phrase.loc, text_sprite_size)
+        if mouse_over(rect)
+            highlighted_phrase = phrase
+
 
     for phrase in fragments
         @phrase -> Fragment
         color = editor:get_highlight_color(phrase.token)
 
         -- don't draw newline characters
-        visable_s = cond(phrase.str == '\n', "", phrase.str)
-        text_sprite_size = text:get_metrics(coding_font, visable_s)
+        text_sprite_size = text:get_metrics(coding_font, phrase.str)
         rect = to_rect(phrase.loc, text_sprite_size)
 
+        highlighted = false
+        if highlighted_phrase != null
+            highlighted = highlighted_phrase.term == phrase.term
+
         bg_color = #fff0
-        cond(mouse_over(rect) #ffe @bg_color)
+        cond(highlighted #ffe @bg_color)
 
         draw_highlight_rect = phrase.token != styled_source:whitespace
 
         if draw_highlight_rect
             fill_rect(rect, bg_color)
 
-        draw_code(visable_s phrase.loc color)
+        draw_code(phrase.str phrase.loc color)
 
         if mouse_wheel_up(rect)
             phrase.term.tweak(-1)
         elif mouse_wheel_down(rect)
             phrase.term.tweak(1)
+
+    if highlighted_phrase != null
+        @highlighted_phrase -> Fragment
+        trace(highlighted_phrase.term.global_id())
 
 def example()
   offset = [3 3]

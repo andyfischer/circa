@@ -177,6 +177,14 @@ namespace ref_t {
         }
         #endif
     }
+    CA_FUNCTION(global_id)
+    {
+        Term* t = INPUT(0)->asRef();
+        if (t == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+
+        set_string(OUTPUT, format_global_id(t));
+    }
     void setup_type(Type* type)
     {
         type->name = "ref";
@@ -204,6 +212,7 @@ namespace ref_t {
         import_member_function(type, ref_t::num_inputs, "num_inputs(Ref) -> int");
         import_member_function(type, ref_t::get_source_location,
                 "source_location(Ref) -> Point_i");
+        import_member_function(type, ref_t::global_id, "global_id(Ref) -> string");
     }
     
 }
