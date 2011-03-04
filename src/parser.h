@@ -22,6 +22,16 @@ struct ParserCxt {
     std::string pendingRebind;
 };
 
+struct ParseResult {
+    Term* term;
+    std::string identifierName;
+
+    ParseResult() : term(NULL) {}
+    ParseResult(Term* t) : term(t) {}
+    ParseResult(Term* t, std::string s) : term(t), identifierName(s) {}
+    bool isIdentifier() { return identifierName != ""; }
+};
+
 typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens, ParserCxt* context);
 
 Ref compile(Branch* branch, ParsingStep step, std::string const& input);
