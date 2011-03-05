@@ -228,7 +228,7 @@ void test_references()
     test_snippet("a = 1; ra = ref(a); rb = ref(a)", "ra == rb");
 
     // test source_location
-    test_snippet("a = 1; ra = ref(a)", "ra.source_location() == [0, 1, 18, 1]");
+    test_snippet("a = 1; ra = ref(a)", "ra.source_location() == [0, 1, 6, 1]");
 
 
 #if 0

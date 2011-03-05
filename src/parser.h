@@ -27,8 +27,8 @@ struct ParseResult {
     std::string identifierName;
 
     ParseResult() : term(NULL) {}
-    ParseResult(Term* t) : term(t) {}
-    ParseResult(Term* t, std::string s) : term(t), identifierName(s) {}
+    explicit ParseResult(Term* t) : term(t) {}
+    explicit ParseResult(Term* t, std::string s) : term(t), identifierName(s) {}
     bool isIdentifier() { return identifierName != ""; }
 };
 

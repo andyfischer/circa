@@ -404,7 +404,7 @@ ParseResult comment(Branch& branch, TokenStream& tokens, ParserCxt* context)
     Term* result = apply(branch, COMMENT_FUNC, RefList());
     result->setStringProp("comment", commentText);
 
-    return result;
+    return ParseResult(result);
 }
 
 ParseResult type_identifier_or_anonymous_type(Branch& branch, TokenStream& tokens,
@@ -929,52 +929,46 @@ ParseResult expression_statement(Branch& branch, TokenStream& tokens, ParserCxt*
     }
 
     // Parse an infix expression
-    int originalBranchLength = branch.length();
+    ParseResult result = bindable_expression(branch, tokens, context);
 
-    // TODO: Store this as a ParseResult, delete expr_is_new
-    Term* expr = bindable_expression(branch, tokens, context).term;
-    ca_assert(expr != NULL);
-
-    bool expr_is_new = branch.length() != originalBranchLength;
-
-    expr->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
-    expr->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
+    result.term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
+    result.term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
     // If the result is an identifier, then create an implicit copy()
-    if (expr->name != "" && !expr_is_new)
-        expr = apply(branch, COPY_FUNC, RefList(expr));
+    if (result.isIdentifier() && result.term->function != UNKNOWN_IDENTIFIER_FUNC)
+        result = ParseResult(apply(branch, COPY_FUNC, RefList(result.term)));
 
     // Check to bind a new name
     if (nameBinding != "") {
         // If the term already has a name (this is the case for member-function syntax
         // and for unknown_identifier), then make a copy.
-        if (expr->name != "")
-            expr = apply(branch, COPY_FUNC, RefList(expr));
+        if (result.term->name != "")
+            result = ParseResult(apply(branch, COPY_FUNC, RefList(result.term)));
 
-        branch.bindName(expr, nameBinding);
+        branch.bindName(result.term, nameBinding);
     }
 
     // Apply a pending rebind
     if (context->pendingRebind != "") {
         std::string name = context->pendingRebind;
         context->pendingRebind = "";
-        branch.bindName(expr, name);
-        expr->setStringProp("syntax:rebindOperator", name);
+        branch.bindName(result.term, name);
+        result.term->setStringProp("syntax:rebindOperator", name);
     }
 
     // If the term was an assign() term, then we may need to rebind the root name.
-    if (expr->function == ASSIGN_FUNC) {
-        Term* lexprRoot = find_lexpr_root(expr->input(0));
+    if (result.term->function == ASSIGN_FUNC) {
+        Term* lexprRoot = find_lexpr_root(result.term->input(0));
         if (lexprRoot != NULL && lexprRoot->name != "") {
-            branch.bindName(expr, lexprRoot->name);
+            branch.bindName(result.term, lexprRoot->name);
         }
-        assign_function::update_assign_contents(expr);
+        assign_function::update_assign_contents(result.term);
     }
 
-    set_source_location(expr, startPosition, tokens);
-    set_is_statement(expr, true);
+    set_source_location(result.term, startPosition, tokens);
+    set_is_statement(result.term, true);
 
-    return ParseResult(expr);
+    return result;
 }
 
 ParseResult include_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
@@ -1133,9 +1127,9 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
     std::string preWhitespace = possible_whitespace(tokens);
 
-    Term* leftExpr = infix_expression_nested(branch, tokens, context, precedence+1).term;
+    ParseResult leftExpr = infix_expression_nested(branch, tokens, context, precedence+1);
 
-    prepend_whitespace(leftExpr, preWhitespace);
+    prepend_whitespace(leftExpr.term, preWhitespace);
 
     while (!tokens.finished() && get_infix_precedence(tokens.nextNonWhitespace()) == precedence) {
 
@@ -1152,7 +1146,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
         std::string postOperatorWhitespace = possible_whitespace(tokens);
 
-        Term* result = NULL;
+        ParseResult result;
 
         if (operatorStr == "->") {
             if (!tokens.nextIs(IDENTIFIER))
@@ -1160,21 +1154,23 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
             std::string functionName = tokens.consume(IDENTIFIER);
 
-            RefList inputs(leftExpr);
+            RefList inputs(leftExpr.term);
 
-            result = find_and_apply(branch, functionName, inputs);
+            Term* term = find_and_apply(branch, functionName, inputs);
 
-            if (result->function->name != functionName)
-                result->setStringProp("syntax:functionName", functionName);
+            if (term->function->name != functionName)
+                term->setStringProp("syntax:functionName", functionName);
 
-            result->setStringProp("syntax:declarationStyle", "arrow-concat");
+            term->setStringProp("syntax:declarationStyle", "arrow-concat");
 
-            set_input_syntax_hint(result, 0, "postWhitespace", preOperatorWhitespace);
+            set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
             // Can't use preWhitespace of input 1 here, because there is no input 1
-            result->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
+            term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
+
+            result = ParseResult(term);
 
         } else {
-            Term* rightExpr = infix_expression_nested(branch, tokens, context, precedence+1).term;
+            ParseResult rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
 
             std::string functionName = get_function_for_infix(operatorStr);
 
@@ -1182,26 +1178,29 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
             bool isRebinding = is_infix_operator_rebinding(operatorStr);
 
-            if (isRebinding && leftExpr->name == "")
+            if (isRebinding && !leftExpr.isIdentifier())
                 throw std::runtime_error("Left side of " + functionName + " must be an identifier");
 
-            result = find_and_apply(branch, functionName, RefList(leftExpr, rightExpr));
-            result->setStringProp("syntax:declarationStyle", "infix");
-            result->setStringProp("syntax:functionName", operatorStr);
+            Term* term = find_and_apply(branch, functionName, RefList(leftExpr.term, rightExpr.term));
+            term->setStringProp("syntax:declarationStyle", "infix");
+            term->setStringProp("syntax:functionName", operatorStr);
 
-            set_input_syntax_hint(result, 0, "postWhitespace", preOperatorWhitespace);
-            set_input_syntax_hint(result, 1, "preWhitespace", postOperatorWhitespace);
+            set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
+            set_input_syntax_hint(term, 1, "preWhitespace", postOperatorWhitespace);
 
             if (isRebinding)
-                branch.bindName(result, leftExpr->name);
+                branch.bindName(term, leftExpr.term->name);
+
+            result = ParseResult(term);
         }
 
         leftExpr = result;
     }
 
-    set_source_location(leftExpr, startPosition, tokens);
+    if (!leftExpr.isIdentifier())
+        set_source_location(leftExpr.term, startPosition, tokens);
 
-    return ParseResult(leftExpr);
+    return leftExpr;
 }
 
 ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
@@ -1209,24 +1208,24 @@ ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
     // Unary minus
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
-        Term* expr = subscripted_atom(branch, tokens, context).term;
+        ParseResult expr = subscripted_atom(branch, tokens, context);
 
         // If the minus sign is on a literal number, then just negate it in place,
         // rather than introduce a neg() operation.
-        if (is_value(expr) && expr->name == "") {
-            if (is_int(expr)) {
-                set_int(expr, as_int(expr) * -1);
+        if (is_value(expr.term) && expr.term->name == "") {
+            if (is_int(expr.term)) {
+                set_int(expr.term, as_int(expr.term) * -1);
                 return expr;
             }
-            else if (is_float(expr)) {
-                set_float(expr, as_float(expr) * -1.0f);
-                expr->setStringProp("float:original-format",
-                    "-" + expr->stringProp("float:original-format"));
+            else if (is_float(expr.term)) {
+                set_float(expr.term, as_float(expr.term) * -1.0f);
+                expr.term->setStringProp("float:original-format",
+                    "-" + expr.term->stringProp("float:original-format"));
                 return expr;
             }
         }
 
-        return ParseResult(apply(branch, NEG_FUNC, RefList(expr)));
+        return ParseResult(apply(branch, NEG_FUNC, RefList(expr.term)));
     }
 
     return subscripted_atom(branch, tokens, context);
@@ -1408,7 +1407,8 @@ ParseResult function_call2(Branch& branch, Term* function, TokenStream& tokens, 
 //   a[0]
 // Field access example:
 //   a.b 
-static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, ParserCxt* context, Term* head, bool& finished)
+static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, ParserCxt* context,
+        ParseResult head, bool& finished)
 {
     int startPosition = tokens.getPosition();
 
@@ -1424,7 +1424,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
 
         tokens.consume(RBRACKET);
 
-        Term* result = apply(branch, GET_INDEX_FUNC, RefList(head, subscript));
+        Term* result = apply(branch, GET_INDEX_FUNC, RefList(head.term, subscript));
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         set_input_syntax_hint(result, 1, "preWhitespace", postLbracketWs);
         set_source_location(result, startPosition, tokens);
@@ -1440,7 +1440,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
 
         std::string ident = tokens.consume(IDENTIFIER);
         
-        Term* result = apply(branch, GET_FIELD_FUNC, RefList(head, create_string(branch, ident)));
+        Term* result = apply(branch, GET_FIELD_FUNC, RefList(head.term, create_string(branch, ident)));
         set_source_location(result, startPosition, tokens);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         
@@ -1459,7 +1459,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
         Term* identTerm = create_string(branch, ident);
         hide_from_source(identTerm);
 
-        Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head, identTerm));
+        Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head.term, identTerm));
         set_source_location(result, startPosition, tokens);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         finished = false;
@@ -1468,14 +1468,14 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
     } else if (tokens.nextIs(LPAREN)) {
 
         // Function call
-        Term* result = function_call(branch, head, tokens, context).term;
+        Term* result = function_call(branch, head.term, tokens, context).term;
         finished = false;
         return ParseResult(result);
 
     } else {
 
         finished = true;
-        return ParseResult(head);
+        return head;
     }
 }
 
@@ -1485,7 +1485,7 @@ ParseResult subscripted_atom(Branch& branch, TokenStream& tokens, ParserCxt* con
 
     bool finished = false;
     while (!finished) {
-        result = possible_subscript(branch, tokens, context, result.term, finished);
+        result = possible_subscript(branch, tokens, context, result, finished);
 
         if (has_static_error(result.term))
             return result;
@@ -1608,10 +1608,10 @@ ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
             "Unrecognized expression, (next token = " + next + ")");
     }
 
-    // TODO: only do this for non-identifires
-    set_source_location(result.term, startPosition, tokens);
+    if (!result.isIdentifier())
+        set_source_location(result.term, startPosition, tokens);
 
-    return ParseResult(result);
+    return result;
 }
 
 ParseResult literal_integer(Branch& branch, TokenStream& tokens, ParserCxt* context)
@@ -1878,7 +1878,7 @@ ParseResult unknown_identifier(Branch& branch, std::string const& name)
     Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, RefList(), name);
     set_is_statement(term, false);
     term->setStringProp("message", name);
-    return ParseResult(term);
+    return ParseResult(term, name);
 }
 
 ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context)

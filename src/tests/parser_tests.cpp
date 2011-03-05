@@ -759,14 +759,13 @@ void test_bug_with_nested_ifs()
 
 void test_source_location()
 {
-    return; //TEST_DISABLED
     Branch branch;
     branch.compile("a = 1");
     branch.compile("ra = ref(a)");
     Term* a = branch["a"];
     test_equals(a->sourceLoc.col, 0);
     test_equals(a->sourceLoc.line, 1);
-    test_equals(a->sourceLoc.colEnd, 6);
+    test_equals(a->sourceLoc.colEnd, 5);
     test_equals(a->sourceLoc.lineEnd, 1);
 }
 
