@@ -32,50 +32,50 @@ struct ParseResult {
     bool isIdentifier() { return identifierName != ""; }
 };
 
-typedef Term* (*ParsingStep)(Branch& branch, TokenStream& tokens, ParserCxt* context);
+typedef ParseResult (*ParsingStep)(Branch& branch, TokenStream& tokens, ParserCxt* context);
 
 Ref compile(Branch* branch, ParsingStep step, std::string const& input);
 Ref evaluate(Branch& branch, ParsingStep step, std::string const& input);
 
 // Parsing steps:
-Term* statement_list(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* comment(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* blank_line(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* function_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* if_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* for_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* do_once_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* expression_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* include_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* return_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* discard_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* bindable_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* infix_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* infix_expression_nested(Branch& branch, TokenStream& tokens, ParserCxt* context,
+ParseResult statement_list(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult comment(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult blank_line(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult do_once_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult expression_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult include_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult return_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult discard_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult bindable_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult infix_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserCxt* context,
         int precedence);
-Term* unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* function_call(Branch& branch, Term* function, TokenStream& tokens, ParserCxt* context);
-Term* subscripted_atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_integer(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_hex(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_float(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_string(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_bool(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_null(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_color(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* literal_list(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* unknown_identifier(Branch& branch, std::string const& name);
-Term* identifier(Branch& branch, TokenStream& tokens, ParserCxt* context);
-Term* identifier(Branch& branch, TokenStream& tokens, ParserCxt* context,
+ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, ParserCxt* context);
+ParseResult subscripted_atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_integer(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_hex(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_float(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_string(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_bool(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_null(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_color(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_list(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult unknown_identifier(Branch& branch, std::string const& name);
+ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context,
         std::string& idStrOut);
-Term* identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCxt* context);
 
 // Helper functions:
 void consume_branch(Branch& branch, TokenStream& tokens, ParserCxt* context);
@@ -119,12 +119,12 @@ void post_parse_branch(Branch& branch);
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient=NULL);
 
 // Consume the nearby line, return a newly created compile-error term.
-Term* compile_error_for_line(Branch& branch, TokenStream &tokens, int start,
+ParseResult compile_error_for_line(Branch& branch, TokenStream &tokens, int start,
         std::string const& message="");
 
 // Consume the nearby line, convert 'existing' into a compile-error term, and
 // return it.
-Term* compile_error_for_line(Term* existing, TokenStream &tokens, int start,
+ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int start,
         std::string const& message="");
 
 // Helper functions:
