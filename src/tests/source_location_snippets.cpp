@@ -75,11 +75,14 @@ struct SourceCodePainter
         std::string termSource = get_term_source_text(term)
             + term->stringPropOptional("syntax:lineEnding", "");
 
+        int preWhitespaceLength =
+            term->stringPropOptional("syntax:preWhitespace", "").length();
+
         bool encounteredError = false;
 
         for (unsigned i=0; i < termSource.length(); i++) {
             int row = term->sourceLoc.line;
-            int col = term->sourceLoc.col+i;
+            int col = term->sourceLoc.col+i - preWhitespaceLength;
             char c = termSource[i];
 
             initialize(col,row);

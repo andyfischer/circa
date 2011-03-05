@@ -25,6 +25,11 @@ def draw_code_editor(Point topleft, BranchRef branch)
     letter_width = 8
     letter_height = 17
 
+    def source_loc_to_rect(Rect_i source_loc) -> Rect
+        return [source_loc.x1*letter_width source_loc.y1*letter_height
+            source_loc.x2*letter_width source_loc.y2*letter_height]
+
+
     current_line = 0
     current_col = 0
     for phrase in source
@@ -47,21 +52,31 @@ def draw_code_editor(Point topleft, BranchRef branch)
             current_col = 0
             current_line += 1
 
+
+    topleft_source_pos = Fragment(fragments[0]).term.source_location()
+    topleft_source_pos -= [0 2 0 2]
+    topleft_source_loc = source_loc_to_rect(topleft_source_pos)
+    --topleft_source_loc += [topleft.x topleft.y topleft.x topleft.y]
+
     -- Find the fragment under the mouse
     mouseover_phrase = null
 
     for phrase in fragments
         @phrase -> Fragment
 
-        text_sprite_size = text:get_metrics(coding_font, phrase.str)
-        rect = to_rect(phrase.loc, text_sprite_size)
+        rect = to_rect(phrase.loc, phrase.size)
         if mouse_over(rect)
             mouseover_phrase = phrase
 
-    -- Draw a highlight for the mouseover phrase
+    -- Draw a highlight for the mouseover term
     if mouseover_phrase != null
         @mouseover_phrase -> Fragment
-        fill_rect(to_rect(mouseover_phrase.loc mouseover_phrase.size) #ffe)
+        source_loc = mouseover_phrase.term.source_location()
+        trace(source_loc)
+        rect = source_loc_to_rect(source_loc)
+        rect -= topleft_source_loc
+        trace(rect)
+        fill_rect(rect #ffe)
 
     for phrase in fragments
         @phrase -> Fragment

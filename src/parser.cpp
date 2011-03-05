@@ -300,8 +300,10 @@ ParseResult statement_list(Branch& branch, TokenStream& tokens, ParserCxt* conte
 
 ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
-    int startPosition = tokens.getPosition();
+    int initialPosition = tokens.getPosition();
     std::string preWhitespace = possible_whitespace(tokens);
+
+    int sourceStartPosition = tokens.getPosition();
     bool foundWhitespace = preWhitespace != "";
 
     ParseResult result;
@@ -354,6 +356,8 @@ ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
 
     prepend_whitespace(result.term, preWhitespace);
 
+    set_source_location(result.term, sourceStartPosition, tokens);
+
     if (!is_multiline_block(result.term) && !result.term->hasProperty("syntax:lineEnding")) {
 
         // Consume some trailing whitespace
@@ -366,10 +370,9 @@ ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
     // Mark this term as a statement
     set_is_statement(result.term, true);
 
-    set_source_location(result.term, startPosition, tokens);
 
     // Avoid an infinite loop
-    if (startPosition == tokens.getPosition())
+    if (initialPosition == tokens.getPosition())
         throw std::runtime_error("parser::statement is stuck, next token is: "
                 + tokens.next().text);
 

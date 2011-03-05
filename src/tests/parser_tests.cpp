@@ -767,6 +767,13 @@ void test_source_location()
     test_equals(a->sourceLoc.line, 1);
     test_equals(a->sourceLoc.colEnd, 5);
     test_equals(a->sourceLoc.lineEnd, 1);
+
+    branch.compile("def f()\n  b = add(1 2 3 4 5 6 7)\n  mult(3 4)\n");
+    Term* b = branch["f"]->nestedContents["b"];
+    test_equals(b->sourceLoc.col, 2);
+    test_equals(b->sourceLoc.line, 2);
+    test_equals(b->sourceLoc.colEnd, 25);
+    test_equals(b->sourceLoc.lineEnd, 2);
 }
 
 void register_tests()
