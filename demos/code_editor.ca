@@ -27,7 +27,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
 
     def source_loc_to_rect(Rect_i source_loc) -> Rect
         return [source_loc.x1*letter_width source_loc.y1*letter_height
-            source_loc.x2*letter_width source_loc.y2*letter_height]
+            source_loc.x2*letter_width (source_loc.y2+1)*letter_height]
 
 
     current_line = 0
@@ -54,9 +54,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
 
 
     topleft_source_pos = Fragment(fragments[0]).term.source_location()
-    topleft_source_pos -= [0 2 0 2]
-    topleft_source_loc = source_loc_to_rect(topleft_source_pos)
-    --topleft_source_loc += [topleft.x topleft.y topleft.x topleft.y]
+    topleft_source_pos = [topleft_source_pos.x1 topleft_source_pos.y1]->Point_i
 
     -- Find the fragment under the mouse
     mouseover_phrase = null
@@ -72,10 +70,10 @@ def draw_code_editor(Point topleft, BranchRef branch)
     if mouseover_phrase != null
         @mouseover_phrase -> Fragment
         source_loc = mouseover_phrase.term.source_location()
-        trace(source_loc)
-        rect = source_loc_to_rect(source_loc)
-        rect -= topleft_source_loc
-        trace(rect)
+        source_loc -= [topleft_source_pos.x topleft_source_pos.y topleft_source_pos.x topleft_source_pos.y]
+        source_loc += [2 0 1 0]
+        rect = source_loc_to_rect(source_loc->Rect_i)
+        rect += [topleft.x topleft.y topleft.x topleft.y]
         fill_rect(rect #ffe)
 
     for phrase in fragments
