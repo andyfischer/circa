@@ -59,7 +59,7 @@ namespace branch_ref_function {
         import_member_function(kernel["BranchRef"], get_terms,
                 "get_terms(BranchRef) -> List");
         import_member_function(kernel["BranchRef"], get_term,
-                "get_term(BranchRef) -> Ref");
+                "get_term(BranchRef, int index) -> Ref");
         import_member_function(kernel["BranchRef"], format_source,
                 "format_source(BranchRef) -> StyledSource");
     }

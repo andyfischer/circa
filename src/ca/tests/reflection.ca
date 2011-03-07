@@ -1,0 +1,26 @@
+
+my_sample_code = {
+  a = 1
+  b = add(a 2)
+}
+
+br = branch_ref(my_sample_code)
+terms = br.get_terms()
+
+for i in 0..4
+    assert(terms[i] == br.get_term(i))
+
+a = br.get_term(1)
+b = br.get_term(3)
+
+-- names
+assert(a.name() == 'a')
+assert(b.name() == 'b')
+
+-- source location
+assert(a.source_location() == [2, 3, 8, 3])
+
+-- inputs
+assert(a.num_inputs() == 0)
+assert(b.num_inputs() == 2)
+assert(b.input(0) == a)

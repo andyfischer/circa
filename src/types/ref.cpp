@@ -145,9 +145,9 @@ namespace ref_t {
         }
         int index = INPUT(1)->asInt();
         if (index >= t->numInputs())
-            as_ref(OUTPUT) = NULL;
+            set_ref(OUTPUT, NULL);
         else
-            as_ref(OUTPUT) = t->input(index);
+            set_ref(OUTPUT, t->input(index));
     }
     CA_FUNCTION(num_inputs)
     {
