@@ -48,7 +48,7 @@ struct TaggedValue
     const char* asCString();
     std::string const& asString();
     bool asBool();
-    Ref& asRef();
+    Term* asRef();
 
     // Convenient constructors
     static TaggedValue fromInt(int i);
@@ -102,7 +102,7 @@ float as_float(TaggedValue* value);
 std::string const& as_string(TaggedValue* value);
 const char* as_cstring(TaggedValue* value);
 bool as_bool(TaggedValue* value);
-Ref& as_ref(TaggedValue* value);
+Term* as_ref(TaggedValue* value);
 void* as_opaque_pointer(TaggedValue* value);
 Type& as_type(TaggedValue* value);
 

@@ -16,7 +16,7 @@ void test_reference()
     Term* a = create_value(branch, INT_TYPE);
     Term* r2 = create_value(branch, REF_TYPE);
 
-    as_ref(r1) = a;
+    set_ref(r1, a);
 
     test_assert(as_ref(r1) == a);
 
@@ -33,7 +33,7 @@ void reference_type_deletion_bug()
 
     Term* myref = create_value(*branch, REF_TYPE);
 
-    myref->asRef() = INT_TYPE;
+    set_ref(myref, INT_TYPE);
 
     delete branch;
 

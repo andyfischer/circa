@@ -27,7 +27,7 @@ void Ref::set(Term* target)
 
 void Ref::remap_pointers(Term* term, ReferenceMap const& map)
 {
-    as_ref(term) = map.getRemapped(as_ref(term));
+    set_ref(term, map.getRemapped(as_ref(term)));
 }
 
 void delete_term(Term* term)

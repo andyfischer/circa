@@ -118,7 +118,7 @@ bool TaggedValue::asBool()
     return as_bool(this);
 }
 
-Ref& TaggedValue::asRef()
+Term* TaggedValue::asRef()
 {
     return as_ref(this);
 }
@@ -519,8 +519,7 @@ bool as_bool(TaggedValue* value)
     return value->value_data.asbool;
 }
 
-// TODO: this should just return Term*
-Ref& as_ref(TaggedValue* value)
+Term* as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));
     return *((Ref*) value->value_data.ptr);

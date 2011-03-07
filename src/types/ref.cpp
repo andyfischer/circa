@@ -63,7 +63,7 @@ namespace ref_t {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL reference");
-        as_ref(OUTPUT) = t->function;
+        set_ref(OUTPUT, t->function);
     }
     CA_FUNCTION(assign)
     {
