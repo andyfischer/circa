@@ -5,6 +5,22 @@
 namespace circa {
 namespace branch_ref_function {
 
+    // homeless function, not used yet:
+    bool is_considered_config(Term* term)
+    {
+        if (term == NULL) return false;
+        if (term->name == "") return false;
+        if (!is_value(term)) return false;
+        if (is_get_state(term)) return false;
+        if (is_hidden(term)) return false;
+
+        // ignore branch-based types
+        //if (is_branch(term)) return false;
+        if (is_type(term)) return false;
+
+        return true;
+    }
+
     Branch* deref(TaggedValue* val)
     {
         if (!is_list(val))
