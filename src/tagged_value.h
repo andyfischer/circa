@@ -65,6 +65,7 @@ bool cast(TaggedValue* source, Type* type, TaggedValue* dest);
 bool cast_possible(TaggedValue* source, Type* type);
 void copy(TaggedValue* source, TaggedValue* dest);
 void swap(TaggedValue* left, TaggedValue* right);
+void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doCopy);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 std::string to_string_annotated(TaggedValue* value);

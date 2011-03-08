@@ -152,6 +152,7 @@ Type::Type() :
     numElements(NULL),
     checkInvariants(NULL),
     remapPointers(NULL),
+    hashFunc(NULL),
     parent(NULL),
     refCount(0),
     permanent(false)

@@ -222,6 +222,14 @@ void swap(TaggedValue* left, TaggedValue* right)
     right->value_data = temp_data;
 }
 
+void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)
+{
+    if (doSwap)
+        swap(left, right);
+    else
+        copy(left, right);
+}
+
 void reset(TaggedValue* value)
 {
     // Check for NULL. Most TaggedValue functions don't do this, but reset() is

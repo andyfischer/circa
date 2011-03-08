@@ -55,6 +55,7 @@ struct Type
     typedef int (*NumElements)(TaggedValue* value);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
+    typedef int (*HashFunc)(TaggedValue* value);
 
     std::string name;
 
@@ -82,6 +83,7 @@ struct Type
     NumElements numElements;
     CheckInvariants checkInvariants;
     RemapPointers remapPointers;
+    HashFunc hashFunc;
 
     // Parent type, may be null.
     Type* parent;
