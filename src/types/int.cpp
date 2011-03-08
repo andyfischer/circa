@@ -17,6 +17,10 @@ namespace int_t {
             return false;
         return as_int(a) == as_int(b);
     }
+    int hashFunc(TaggedValue* a)
+    {
+        return as_int(a);
+    }
     std::string to_string(TaggedValue* value)
     {
         std::stringstream strm;
@@ -38,6 +42,7 @@ namespace int_t {
         type->name = "int";
         type->reset = reset;
         type->equals = equals;
+        type->hashFunc = hashFunc;
         type->toString = to_string;
         type->formatSource = format_source;
     }

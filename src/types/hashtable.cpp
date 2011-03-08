@@ -1,16 +1,16 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "hash.h"
+#include "hashtable.h"
 
 namespace circa {
-namespace hash_t {
+namespace hashtable_t {
 
 struct Slot {
     TaggedValue key;
     TaggedValue value;
 };
 
-struct HashTable {
+struct Hashtable {
     int capacity;
     int count;
     Slot slots[0];
@@ -29,14 +29,18 @@ const float MAX_LOAD_FACTOR = 0.75;
 int get_hash_value(TaggedValue* value)
 {
     Type::HashFunc f = value->value_type->hashFunc;
-    ca_assert(f != NULL);
+    if (f == NULL) {
+        std::string msg;
+        msg += "No hash function for type " + value->value_type->name;
+        internal_error(msg);
+    }
     return f(value);
 }
 
-HashTable* create_table(int capacity)
+Hashtable* create_table(int capacity)
 {
     ca_assert(capacity > 0);
-    HashTable* result = (HashTable*) malloc(sizeof(HashTable) + capacity * sizeof(Slot));
+    Hashtable* result = (Hashtable*) malloc(sizeof(Hashtable) + capacity * sizeof(Slot));
     result->capacity = capacity;
     result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
@@ -47,12 +51,12 @@ HashTable* create_table(int capacity)
     return result;
 }
 
-HashTable* create_table()
+Hashtable* create_table()
 {
     return create_table(INITIAL_SIZE);
 }
 
-void free_table(HashTable* data)
+void free_table(Hashtable* data)
 {
     if (data == NULL)
         return;
@@ -64,9 +68,9 @@ void free_table(HashTable* data)
     free(data);
 }
 
-HashTable* grow(HashTable* data, int new_capacity)
+Hashtable* grow(Hashtable* data, int new_capacity)
 {
-    HashTable* new_data = create_table(new_capacity);
+    Hashtable* new_data = create_table(new_capacity);
 
     int existingCapacity = 0;
     if (data != NULL)
@@ -85,17 +89,17 @@ HashTable* grow(HashTable* data, int new_capacity)
     return new_data;
 }
 
-// Grow this dictionary by the default growth rate. This will result in a new HashTable*
+// Grow this dictionary by the default growth rate. This will result in a new Hashtable*
 // object, don't use the old one after calling this.
-void grow(HashTable** dataPtr)
+void grow(Hashtable** dataPtr)
 {
     int new_capacity = int((*dataPtr)->count / INITIAL_LOAD_FACTOR);
-    HashTable* oldData = *dataPtr;
+    Hashtable* oldData = *dataPtr;
     *dataPtr = grow(*dataPtr, new_capacity);
     free_table(oldData);
 }
 
-HashTable* duplicate(HashTable* original)
+Hashtable* duplicate(Hashtable* original)
 {
     if (original == NULL)
         return NULL;
@@ -104,7 +108,7 @@ HashTable* duplicate(HashTable* original)
     if (new_capacity < INITIAL_SIZE)
         new_capacity = INITIAL_SIZE;
 
-    HashTable* dupe = create_table(new_capacity);
+    Hashtable* dupe = create_table(new_capacity);
 
     // Copy all items
     for (int i=0; i < original->capacity; i++) {
@@ -121,7 +125,7 @@ HashTable* duplicate(HashTable* original)
 
 // Get the 'ideal' slot index, the place we would put this key if there is no
 // collision.
-int find_ideal_slot_index(HashTable* data, TaggedValue* key)
+int find_ideal_slot_index(Hashtable* data, TaggedValue* key)
 {
     ca_assert(data->capacity > 0);
     unsigned int hash = get_hash_value(key);
@@ -129,9 +133,9 @@ int find_ideal_slot_index(HashTable* data, TaggedValue* key)
 }
 
 // Insert the given key into the dictionary, returns the index.
-// This may create a new HashTable* object, so don't use the old HashTable* pointer after
+// This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int table_insert(HashTable** dataPtr, TaggedValue* key, bool swapKey)
+int table_insert(Hashtable** dataPtr, TaggedValue* key, bool swapKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
@@ -145,7 +149,7 @@ int table_insert(HashTable** dataPtr, TaggedValue* key, bool swapKey)
     if ((*dataPtr)->count >= MAX_LOAD_FACTOR * ((*dataPtr)->capacity))
         grow(dataPtr);
 
-    HashTable* data = *dataPtr;
+    Hashtable* data = *dataPtr;
     int index = find_ideal_slot_index(data, key);
 
     // Linearly advance if this slot is being used
@@ -167,13 +171,13 @@ int table_insert(HashTable** dataPtr, TaggedValue* key, bool swapKey)
     return index;
 }
 
-void insert_value(HashTable** dataPtr, TaggedValue* key, TaggedValue* value)
+void insert_value(Hashtable** dataPtr, TaggedValue* key, TaggedValue* value)
 {
     int index = table_insert(dataPtr, key, false);
     copy(value, &(*dataPtr)->slots[index].value);
 }
 
-int find_key(HashTable* data, TaggedValue* key)
+int find_key(Hashtable* data, TaggedValue* key)
 {
     if (data == NULL)
         return -1;
@@ -195,20 +199,20 @@ int find_key(HashTable* data, TaggedValue* key)
     return index;
 }
 
-TaggedValue* get_value(HashTable* data, TaggedValue* key)
+TaggedValue* get_value(Hashtable* data, TaggedValue* key)
 {
     int index = find_key(data, key);
     if (index == -1) return NULL;
     return &data->slots[index].value;
 }
 
-TaggedValue* get_index(HashTable* data, int index)
+TaggedValue* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);
     return &data->slots[index].value;
 }
 
-void remove(HashTable* data, TaggedValue* key)
+void remove(Hashtable* data, TaggedValue* key)
 {
     int index = find_key(data, key);
     if (index == -1)
@@ -243,12 +247,12 @@ void remove(HashTable* data, TaggedValue* key)
     }
 }
 
-int count(HashTable* data)
+int count(Hashtable* data)
 {
     return data->count;
 }
 
-void clear(HashTable* data)
+void clear(Hashtable* data)
 {
     for (int i=0; i < data->capacity; i++) {
         Slot* slot = &data->slots[i];
@@ -260,13 +264,19 @@ void clear(HashTable* data)
     data->count = 0;
 }
 
-std::string to_string(HashTable* data)
+std::string to_string(Hashtable* data)
 {
     std::stringstream strm;
     strm << "[";
-    for (int i=0; i < data->capacity; i++) {
+    int count = data == NULL ? 0 : data->capacity;
+    bool first = true;
+    for (int i=0; i < count; i++) {
         if (is_null(&data->slots[i].key))
             continue;
+
+        if (!first)
+            strm << ", ";
+        first = false;
 
         strm << to_string(&data->slots[i].key);
         strm << ": " << to_string(&data->slots[i].value);
@@ -275,7 +285,7 @@ std::string to_string(HashTable* data)
     return strm.str();
 }
 
-void debug_print(HashTable* data)
+void debug_print(Hashtable* data)
 {
     printf("dict: %p\n", data);
     printf("count: %d, capacity: %d\n", data->count, data->capacity);
@@ -285,7 +295,7 @@ void debug_print(HashTable* data)
     }
 }
 
-void iterator_start(HashTable* data, TaggedValue* iterator)
+void iterator_start(Hashtable* data, TaggedValue* iterator)
 {
     if (data == NULL || data->count == 0)
         return set_null(iterator);
@@ -297,7 +307,7 @@ void iterator_start(HashTable* data, TaggedValue* iterator)
         iterator_next(data, iterator);
 }
 
-void iterator_next(HashTable* data, TaggedValue* iterator)
+void iterator_next(Hashtable* data, TaggedValue* iterator)
 {
     int i = as_int(iterator);
 
@@ -312,7 +322,7 @@ void iterator_next(HashTable* data, TaggedValue* iterator)
         set_int(iterator, next);
 }
 
-void iterator_get(HashTable* data, TaggedValue* iterator, TaggedValue** key, TaggedValue** value)
+void iterator_get(Hashtable* data, TaggedValue* iterator, TaggedValue** key, TaggedValue** value)
 {
     int i = as_int(iterator);
 
@@ -328,24 +338,52 @@ namespace tagged_value_wrappers {
     }
     void release(TaggedValue* value)
     {
-        free_table((HashTable*) value->value_data.ptr);
+        free_table((Hashtable*) value->value_data.ptr);
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
         release(dest);
-        dest->value_data.ptr = duplicate((HashTable*) source->value_data.ptr);
+        dest->value_data.ptr = duplicate((Hashtable*) source->value_data.ptr);
     }
     std::string to_string(TaggedValue* value)
     {
-        return to_string((HashTable*) value->value_data.ptr);
+        return to_string((Hashtable*) value->value_data.ptr);
     }
     TaggedValue* get_field(TaggedValue* value, const char* field)
     {
         TaggedValue fieldStr;
         set_string(&fieldStr, field);
-        return hash_t::get_value((HashTable*) value->value_data.ptr, &fieldStr);
+        return hashtable_t::get_value((Hashtable*) value->value_data.ptr, &fieldStr);
     }
 } // namespace tagged_value_wrappers
+
+// Public API
+bool is_hashtable(TaggedValue* value)
+{
+    return value->value_type->initialize == tagged_value_wrappers::initialize;
+}
+
+TaggedValue* get_value(TaggedValue* table, TaggedValue* key)
+{
+    ca_assert(is_hashtable(table));
+    return get_value((Hashtable*) table->value_data.ptr, key);
+}
+
+void table_insert(TaggedValue* tableTv, TaggedValue* key, TaggedValue* value,
+        bool swapKey, bool swapValue)
+{
+    ca_assert(is_hashtable(tableTv));
+    Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
+    int index = table_insert(&table, key, swapKey);
+    swap_or_copy(value, &table->slots[index].value, swapValue);
+}
+
+void table_remove(TaggedValue* tableTv, TaggedValue* key)
+{
+    ca_assert(is_hashtable(tableTv));
+    Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
+    remove(table, key);
+}
 
 void setup_type(Type* type)
 {
@@ -357,5 +395,5 @@ void setup_type(Type* type)
     type->name = "Map";
 }
 
-} // namespace hash_t
+} // namespace hashtable_t
 } // namespace circa

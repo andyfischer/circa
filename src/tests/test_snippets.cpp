@@ -370,7 +370,7 @@ void test_set()
 
 void test_map_type()
 {
-    test_snippet("m = Map(); m.add(1,2)", "m.contains(1); to_string(m) == '{1: 2}'");
+    test_snippet("m = Map(); m.add(1,2)", "m.contains(1); to_string(m) == '[1: 2]'");
     test_snippet("m = Map(); m.add(1,2); m.add(3,4)", "m.get(1) == 2; m.get(3) == 4");
     test_snippet("m = Map(); m.add('a','b')",
         "m.contains('a'); m.remove('a'); not(m.contains('a'))");

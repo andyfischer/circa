@@ -52,35 +52,6 @@ namespace map_t {
         else
             return values->get(index);
     }
-    CA_FUNCTION(contains)
-    {
-        bool result = find_key_index(INPUT(0), INPUT(1)) != -1;
-        set_bool(OUTPUT, result);
-    }
-
-    CA_FUNCTION(insert)
-    {
-        copy(INPUT(0), OUTPUT);
-        touch(OUTPUT);
-        insert(OUTPUT, INPUT(1), INPUT(2));
-    }
-
-    CA_FUNCTION(remove)
-    {
-        copy(INPUT(0), OUTPUT);
-        touch(OUTPUT);
-        remove(OUTPUT, INPUT(1));
-    }
-
-    CA_FUNCTION(get)
-    {
-        TaggedValue* key = INPUT(1);
-        TaggedValue* value = get(INPUT(0), key);
-        if (value == NULL)
-            return error_occurred(CONTEXT, CALLER, "Key not found: " + to_string(key));
-
-        copy(value, OUTPUT);
-    }
 
     std::string to_string(TaggedValue* value)
     {
@@ -105,12 +76,6 @@ namespace map_t {
     void setup_type(Type* type)
     {
         type->toString = map_t::to_string;
-        Term* map_add = import_member_function(type, map_t::insert, "add(Map, any, any) -> Map");
-        function_set_use_input_as_output(map_add, 0, true);
-        import_member_function(type, map_t::contains, "contains(Map, any) -> bool");
-        Term* map_remove = import_member_function(type, map_t::remove, "remove(Map, any) -> Map");
-        function_set_use_input_as_output(map_remove, 0, true);
-        import_member_function(type, map_t::get, "get(Map, any) -> any");
 
         create_list(type->prototype);
         create_list(type->prototype);

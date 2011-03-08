@@ -17,7 +17,7 @@
 #include "types/indexable.h"
 #include "types/int.h"
 #include "types/list.h"
-#include "types/map.h"
+#include "types/hashtable.h"
 #include "types/ref.h"
 #include "types/set.h"
 #include "types/string.h"
@@ -277,7 +277,7 @@ void initialize_compound_types(Branch& kernel)
     set_t::setup_type(unbox_type(set_type));
 
     Term* map_type = create_compound_type(kernel, "Map");
-    map_t::setup_type(unbox_type(map_type));
+    hashtable_t::setup_type(unbox_type(map_type));
 
     Term* styledSourceType = parse_type(kernel, "type StyledSource;");
     styled_source_t::setup_type(unbox_type(styledSourceType));

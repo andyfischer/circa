@@ -89,6 +89,20 @@ namespace string_t {
     {
         set_string(v, "");
     }
+    int hashFunc(TaggedValue* v)
+    {
+        const char* str = as_cstring(v);
+
+        // Dumb and simple hash function
+        int result = 0;
+        int byte = 0;
+        while (*str != 0) {
+            result = result ^ (*str << (8 * byte));
+            byte = (byte + 1) % 4;
+            str++;
+        }
+        return result;
+    }
 
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
@@ -187,6 +201,7 @@ namespace string_t {
         type->release = release;
         type->copy = copy;
         type->equals = equals;
+        type->hashFunc = hashFunc;
         type->toString = to_string;
         type->formatSource = format_source;
     }
