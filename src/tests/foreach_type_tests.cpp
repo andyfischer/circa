@@ -9,17 +9,28 @@ bool run_test_for_type(Term* type, List& exampleValues)
 {
     Branch branch;
 
+    // Copy to x
     TaggedValue x;
     copy(exampleValues[0], &x);
 
+    // Copy again to cpy, check they are equal
     TaggedValue cpy;
     copy(&x, &cpy);
     test_assert(equals(&x, &cpy));
+    test_assert(equals(&cpy, &x));
 
+    // Check if example 0 != example 1
     TaggedValue y;
     copy(exampleValues[1], &y);
     test_assert(!equals(&x,&y));
+    test_assert(!equals(&y,&x));
 
+    // Use 'equals' on a different type, check if we die
+    TaggedValue nullValue;
+    test_assert(!equals(&nullValue, &x));
+    test_assert(!equals(&x, &nullValue));
+
+    // Reset, check equality.
     reset(&x);
     reset(&y);
     test_assert(equals(&x,&y));

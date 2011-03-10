@@ -18,18 +18,19 @@ def draw_code_editor(Point topleft, BranchRef branch)
       Point size
     }
 
-    -- Iterate through the formatted source, and find the location for each fragment.
-
     fragments = []
 
     letter_width = 8
     letter_height = 17
 
+    termToLocation = Map()
+
+
     def source_loc_to_rect(Rect_i source_loc) -> Rect
         return [source_loc.x1*letter_width source_loc.y1*letter_height
             source_loc.x2*letter_width (source_loc.y2+1)*letter_height]
 
-
+    -- Iterate through the formatted source, and find the location for each fragment.
     current_line = 0
     current_col = 0
     for phrase in source
@@ -52,6 +53,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
             current_col = 0
             current_line += 1
 
+        termToLocation.add(r, loc)
 
     topleft_source_pos = Fragment(fragments[0]).term.source_location()
     topleft_source_pos = [topleft_source_pos.x1 topleft_source_pos.y1]->Point_i
@@ -75,6 +77,14 @@ def draw_code_editor(Point topleft, BranchRef branch)
         rect = source_loc_to_rect(source_loc->Rect_i)
         rect += [topleft.x topleft.y topleft.x topleft.y]
         fill_rect(rect #ffe)
+
+        -- Highlight each input
+        term = mouseover_phrase.term->Ref
+        for input in term.inputs()
+            if input != null
+                @input ->Ref
+                trace(termToLocation.get(term) termToLocation.get(input) #fff)
+
 
     for phrase in fragments
         @phrase -> Fragment

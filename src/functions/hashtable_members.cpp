@@ -30,8 +30,9 @@ namespace hashtable_members_function {
 
     CA_FUNCTION(get)
     {
-        TaggedValue* key = INPUT(0);
-        TaggedValue* value = hashtable_t::get_value(key, INPUT(1));
+        TaggedValue* table = INPUT(0);
+        TaggedValue* key = INPUT(1);
+        TaggedValue* value = hashtable_t::get_value(table, key);
         if (value == NULL)
             return error_occurred(CONTEXT, CALLER, "Key not found: " + to_string(key));
         copy(value, OUTPUT);

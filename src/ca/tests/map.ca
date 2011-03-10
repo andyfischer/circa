@@ -1,0 +1,25 @@
+
+
+-- ints as keys
+{
+    m = Map()
+
+    m.add(3,3)
+    m.add(4,4)
+    assert(to_string(m) == '[3: 3, 4: 4]')
+}
+
+-- references as keys
+{
+    a = 1, b = 2
+    ra = ref(a)
+    rb = ref(b)
+
+    m = Map()
+    m.add(ra, 'a')
+    m.add(rb, 'b')
+    assert(m.get(ra) == 'a')
+    assert(m.get(rb) == 'b')
+    m.remove(ra)
+    assert(m.get(rb) == 'b')
+}

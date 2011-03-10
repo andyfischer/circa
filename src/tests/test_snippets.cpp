@@ -230,6 +230,9 @@ void test_references()
     // test source_location
     test_snippet("a = 1; ra = ref(a)", "ra.source_location() == [0, 1, 6, 1]");
 
+    test_snippet(" a = 1; b = 2; c = 3; d = add(a b c); rd = ref(d)",
+        "rd.inputs() == [ref(a) ref(b) ref(c)]");
+
 
 #if 0
     test_snippet("br = begin; a = 1; state b = 2; 3; end;"

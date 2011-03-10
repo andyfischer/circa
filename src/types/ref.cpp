@@ -3,12 +3,13 @@
 #include "circa.h"
 #include "importing_macros.h"
 
+#include "types/common.h"
 #include "types/rect_i.h"
 
 namespace circa {
 namespace ref_t {
 
-    std::string to_string(TaggedValue* term)
+    std::string toString(TaggedValue* term)
     {
         Term* t = as_ref(term);
         if (t == NULL)
@@ -34,7 +35,13 @@ namespace ref_t {
     }
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
+        if (!is_ref(lhs) || !is_ref(rhs))
+            return false;
         return as_ref(lhs) == as_ref(rhs);
+    }
+    int hashFunc(TaggedValue* value)
+    {
+        return (int) (long(as_ref(value)) >> 3);
     }
 
     CA_FUNCTION(get_name)
@@ -149,6 +156,17 @@ namespace ref_t {
         else
             set_ref(OUTPUT, t->input(index));
     }
+    CA_FUNCTION(get_inputs)
+    {
+        Term* t = INPUT(0)->asRef();
+        if (t == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+
+        List& output = *List::cast(OUTPUT, t->numInputs());
+
+        for (int i=0; i < t->numInputs(); i++)
+            set_ref(output[i], t->input(i));
+    }
     CA_FUNCTION(num_inputs)
     {
         Term* t = INPUT(0)->asRef();
@@ -181,12 +199,13 @@ namespace ref_t {
     {
         type->name = "ref";
         type->remapPointers = Ref::remap_pointers;
-        type->toString = to_string;
+        type->toString = toString;
         type->initialize = initialize;
         type->release = release;
         type->reset = reset;
         type->copy = copy;
         type->equals = equals;
+        type->hashFunc = hashFunc;
     }
 
     void postponed_setup_type(Type* type)
@@ -201,6 +220,7 @@ namespace ref_t {
         import_member_function(type, ref_t::asint, "asint(Ref) -> int");
         import_member_function(type, ref_t::asfloat, "asfloat(Ref) -> number");
         import_member_function(type, ref_t::get_input, "input(Ref, int) -> Ref");
+        import_member_function(type, ref_t::get_inputs, "inputs(Ref) -> List");
         import_member_function(type, ref_t::num_inputs, "num_inputs(Ref) -> int");
         import_member_function(type, ref_t::get_source_location,
                 "source_location(Ref) -> Rect_i");

@@ -238,7 +238,7 @@ void remove(Hashtable* data, TaggedValue* key)
         if (find_ideal_slot_index(data, &slot->key) != index) {
             Slot* prevSlot = &data->slots[prevIndex];
             prevSlot->key = slot->key;
-            slot->key = NULL;
+            set_null(&slot->key);
             swap(&slot->value, &prevSlot->value);
             continue;
         }
