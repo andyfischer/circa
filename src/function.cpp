@@ -470,7 +470,7 @@ bool function_can_rebind_input(Term* function, int index)
 
 bool function_call_rebinds_input(Term* term, int index)
 {
-    return get_input_syntax_hint(term, index, "rebindInput") == "t";
+    return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";
 }
 
 Term* function_get_input_type(Term* function, int index)

@@ -340,7 +340,7 @@ bool should_print_term_source_line(Term* term)
 
 int get_first_visible_input_index(Term* term)
 {
-    if (get_input_syntax_hint(term, 0, "hidden") == "true")
+    if (get_input_syntax_hint_optional(term, 0, "hidden", "") == "true")
         return 1;
     if (is_function_stateful(term->function))
         return 1;

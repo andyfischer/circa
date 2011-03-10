@@ -17,7 +17,6 @@ def wrap_string(string s, int limit) -> List
     return out
     
 def tooltip_text(List lines, Point loc)
-    trace(lines)
     actual_lines = []
     for line in lines
         for l in wrap_string(line, 50)
