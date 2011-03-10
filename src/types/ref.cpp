@@ -195,6 +195,13 @@ namespace ref_t {
 
         set_string(OUTPUT, format_global_id(t));
     }
+    CA_FUNCTION(get_properties)
+    {
+        Term* t = INPUT(0)->asRef();
+        if (t == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
+        circa::copy(&t->properties, OUTPUT);
+    }
     void setup_type(Type* type)
     {
         type->name = "ref";
@@ -225,6 +232,7 @@ namespace ref_t {
         import_member_function(type, ref_t::get_source_location,
                 "source_location(Ref) -> Rect_i");
         import_member_function(type, ref_t::global_id, "global_id(Ref) -> string");
+        import_member_function(type, ref_t::get_properties, "properties(Ref) -> Map");
     }
     
 }

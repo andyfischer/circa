@@ -176,16 +176,11 @@ namespace string_t {
         if (start < 0) return set_string(OUTPUT, "");
         if (end < 0) return set_string(OUTPUT, "");
 
-        if ((unsigned) start > s.length()) {
-            std::stringstream msg;
-            msg << "Start index is too high: " << start;
-            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
-        }
-        if ((unsigned) end > s.length()) {
-            std::stringstream msg;
-            msg << "End index is too high: " << start;
-            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
-        }
+        if ((unsigned) start > s.length())
+            start = s.length();
+
+        if ((unsigned) end > s.length())
+            end = s.length();
 
         if (end < start)
             return set_string(OUTPUT, "");

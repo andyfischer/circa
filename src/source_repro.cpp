@@ -222,28 +222,28 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
 
     append_phrase(source,
             get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre), 
-            input, phrase_type::WHITESPACE);
+            term, phrase_type::WHITESPACE);
 
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
             && input->name == term->stringPropOptional("syntax:rebindOperator",""))
-        append_phrase(source, "@", input, token::AT_SIGN);
+        append_phrase(source, "@", term, token::AT_SIGN);
 
     // Also, possibly insert the & operator.
     if (input->name != "" && function_call_rebinds_input(term, inputIndex)) 
-        append_phrase(source, "&", input, token::AMPERSAND);
+        append_phrase(source, "&", term, token::AMPERSAND);
 
     bool byValue = input->name == "";
 
     if (byValue) {
         format_term_source(source, input);
     } else {
-        append_phrase(source, get_relative_name(term, input), input, phrase_type::TERM_NAME);
+        append_phrase(source, get_relative_name(term, input), term, phrase_type::TERM_NAME);
     }
 
     append_phrase(source,
         get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
-        input, phrase_type::WHITESPACE);
+        term, phrase_type::WHITESPACE);
 }
 
 bool is_member_function_call(Term* term)
