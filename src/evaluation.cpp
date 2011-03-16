@@ -224,7 +224,8 @@ void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* resu
 }
 bool evaluation_interrupted(EvalContext* context)
 {
-    return context->errorOccurred || context->interruptSubroutine;
+    return context->errorOccurred || context->interruptSubroutine
+        || context->forLoopContext.breakCalled || context->forLoopContext.continueCalled;
 }
 
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end)

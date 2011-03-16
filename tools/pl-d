@@ -1,0 +1,2 @@
+cd $CIRCA_HOME
+scons build/plas_d && build/plas_d $*

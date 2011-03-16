@@ -306,12 +306,12 @@ void return_from_if_block()
     Branch branch;
 
     internal_debug_function::spy_clear();
-    branch.compile("def f() { if true { debug_spy(1); return; debug_spy(2); }}");
+    branch.compile("def f() { if true { test_spy(1); return; test_spy(2); }}");
     branch.eval("f()");
     test_equals(internal_debug_function::spy_results()->toString(), "[1]");
 
     internal_debug_function::spy_clear();
-    branch.compile("def f() {if false {} else { debug_spy(3); return; debug_spy(4); }}");
+    branch.compile("def f() {if false {} else { test_spy(3); return; test_spy(4); }}");
     branch.eval("f()");
     test_equals(internal_debug_function::spy_results()->toString(), "[3]");
 }
@@ -321,13 +321,13 @@ void return_from_for_loop()
     Branch branch;
 
     internal_debug_function::spy_clear();
-    branch.compile("def f() { for i in [1 2 3] { debug_spy(5) return; debug_spy(6) }}");
+    branch.compile("def f() { for i in [1 2 3] { test_spy(5) return; test_spy(6) }}");
     branch.eval("f()");
     test_equals(internal_debug_function::spy_results()->toString(), "[5]");
 
     internal_debug_function::spy_clear();
     branch.compile("def f() { for i in [1 2 3 4] { "
-            "debug_spy(i) if i==3 { return }; debug_spy(0) }}");
+            "test_spy(i) if i==3 { return }; test_spy(0) }}");
 
     branch.eval("f()");
     test_assert(branch);

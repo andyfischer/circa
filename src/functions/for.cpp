@@ -59,11 +59,28 @@ namespace for_function {
         return outerRebinds[outputIndex - 1]->type;
     }
 
+    CA_FUNCTION(evaluate_break)
+    {
+        CONTEXT->forLoopContext.breakCalled = true;
+    }
+    CA_FUNCTION(evaluate_continue)
+    {
+        CONTEXT->forLoopContext.continueCalled = true;
+    }
+
     CA_FUNCTION(evaluate_discard)
     {
         CONTEXT->forLoopContext.discard = true;
     }
 
+    void break_formatSource(StyledSource* source, Term* term)
+    {
+        append_phrase(source, "break", term, phrase_type::KEYWORD);
+    }
+    void continue_formatSource(StyledSource* source, Term* term)
+    {
+        append_phrase(source, "continue", term, phrase_type::KEYWORD);
+    }
     void discard_formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "discard", term, phrase_type::KEYWORD);
@@ -81,6 +98,14 @@ namespace for_function {
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         get_function_attrs(DISCARD_FUNC)->formatSource = discard_formatSource;
         hide_from_docs(DISCARD_FUNC);
+
+        BREAK_FUNC = import_function(kernel, evaluate_break, "break()");
+        get_function_attrs(BREAK_FUNC)->formatSource = break_formatSource;
+        hide_from_docs(BREAK_FUNC);
+
+        CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
+        get_function_attrs(CONTINUE_FUNC)->formatSource = continue_formatSource;
+        hide_from_docs(CONTINUE_FUNC);
     }
 }
 } // namespace circa

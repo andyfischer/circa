@@ -343,6 +343,14 @@ ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(DISCARD)) {
         result = discard_statement(branch, tokens, context);
     }
+    // Break statement
+    else if (tokens.nextIs(BREAK)) {
+        result = break_statement(branch, tokens, context);
+    }
+    // Continue statement
+    else if (tokens.nextIs(CONTINUE)) {
+        result = continue_statement(branch, tokens, context);
+    }
 
     // Namespace block
     else if (tokens.nextIs(NAMESPACE)) {
@@ -1034,6 +1042,40 @@ ParseResult discard_statement(Branch& branch, TokenStream& tokens, ParserCxt* co
                 "'discard' can only be used inside a for loop");
 
     Term* result = apply(branch, DISCARD_FUNC, RefList(enclosingForLoop));
+
+    set_source_location(result, startPosition, tokens);
+    return ParseResult(result);
+}
+ParseResult break_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(BREAK);
+    
+    Term* enclosingForLoop = find_enclosing_for_loop(branch.owningTerm);
+
+    if (enclosingForLoop == NULL)
+        return compile_error_for_line(branch, tokens, startPosition,
+                "'break' can only be used inside a for loop");
+
+    Term* result = apply(branch, BREAK_FUNC, RefList());
+
+    set_source_location(result, startPosition, tokens);
+    return ParseResult(result);
+}
+ParseResult continue_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(CONTINUE);
+    
+    Term* enclosingForLoop = find_enclosing_for_loop(branch.owningTerm);
+
+    if (enclosingForLoop == NULL)
+        return compile_error_for_line(branch, tokens, startPosition,
+                "'continue' can only be used inside a for loop");
+
+    Term* result = apply(branch, CONTINUE_FUNC, RefList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);

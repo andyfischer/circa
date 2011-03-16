@@ -17,8 +17,8 @@ def h1_label(string s, Point loc)
 
 def wrap_string(string s, int limit) -> List
     break_count = s.length() // limit + 1
-    out = for break in 0..break_count
-        s.slice(limit*break limit*(break+1))
+    out = for b in 0..break_count
+        s.slice(limit*b limit*(b+1))
     return out
 
 def rect_center(Rect r) -> Point

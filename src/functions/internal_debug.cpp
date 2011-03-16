@@ -48,7 +48,7 @@ namespace internal_debug_function {
 
     List spyValues;
 
-    CA_DEFINE_FUNCTION(spy, "debug_spy(any)"
+    CA_DEFINE_FUNCTION(spy, "test_spy(any)"
             "'For internal testing. This function will save every inputs to a static list, "
             "and the contents of this list can be checked from C++ code.")
     {

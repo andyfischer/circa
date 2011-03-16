@@ -140,6 +140,38 @@ void test_produce_output()
     test_equals(x->get(4), "5");
 }
 
+void test_break()
+{
+    Branch branch;
+    internal_debug_function::spy_clear();
+    branch.compile("for i in [1 2 3 4] { if i == 3 { break } test_spy(i) }");
+    evaluate_branch(branch);
+    test_equals(internal_debug_function::spy_results(), "[1, 2]");
+}
+
+void test_nested_break()
+{
+    Branch branch;
+
+    internal_debug_function::spy_clear();
+    branch.compile("for i in ['a' 'b'] "
+            "{ for j in [1 2 3] { if j == 2 { break } test_spy([i j]) }}");
+    evaluate_branch(branch);
+
+    test_equals(internal_debug_function::spy_results(), "[['a', 1], ['b', 1]]");
+}
+
+void test_continue()
+{
+    Branch branch;
+
+    internal_debug_function::spy_clear();
+    branch.compile("for i in [1 2 3 4] { if i == 3 { continue } test_spy(i) }");
+    evaluate_branch(branch);
+
+    test_equals(internal_debug_function::spy_results(), "[1, 2, 4]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(for_loop_tests::test_simple);
@@ -150,6 +182,9 @@ void register_tests()
     REGISTER_TEST_CASE(for_loop_tests::test_state_simple);
     REGISTER_TEST_CASE(for_loop_tests::test_state_nested);
     REGISTER_TEST_CASE(for_loop_tests::test_produce_output);
+    REGISTER_TEST_CASE(for_loop_tests::test_break);
+    REGISTER_TEST_CASE(for_loop_tests::test_nested_break);
+    REGISTER_TEST_CASE(for_loop_tests::test_continue);
 }
 
 } // for_loop_tests

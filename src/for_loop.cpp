@@ -182,6 +182,8 @@ CA_FUNCTION(evaluate_for_loop)
     ForLoopContext prevLoopContext = context->forLoopContext;
 
     for (int iteration=0; iteration < inputListLength; iteration++) {
+        context->forLoopContext.continueCalled = false;
+
         bool firstIter = iteration == 0;
 
         // load state for this iteration
@@ -207,6 +209,7 @@ CA_FUNCTION(evaluate_for_loop)
         for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
             if (evaluation_interrupted(context))
                 break;
+
             evaluate_single_term(context, forContents[i]);
         }
 

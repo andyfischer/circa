@@ -9,8 +9,10 @@ namespace circa {
 struct ForLoopContext
 {
     bool discard;
+    bool breakCalled;
+    bool continueCalled;
 
-    ForLoopContext() : discard(false) {}
+    ForLoopContext() : discard(false), breakCalled(false), continueCalled(false) {}
 };
 
 Term* get_for_loop_iterator(Term* forTerm);
