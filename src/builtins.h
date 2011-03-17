@@ -110,6 +110,10 @@ namespace assign_function {
     void update_assign_contents(Term* term);
 }
 
+namespace branch_ref_function {
+    Branch* deref(TaggedValue* val);
+}
+
 namespace copy_function {
     CA_FUNCTION(evaluate);
 }

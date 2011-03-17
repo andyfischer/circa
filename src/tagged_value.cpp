@@ -533,6 +533,11 @@ Term* as_ref(TaggedValue* value)
     return *((Ref*) value->value_data.ptr);
 }
 
+Branch* as_branch_ref(TaggedValue* value)
+{
+    return branch_ref_function::deref(value);
+}
+
 void* as_opaque_pointer(TaggedValue* value)
 {
     ca_assert(is_opaque_pointer(value));

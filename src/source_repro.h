@@ -23,6 +23,13 @@ namespace phrase_type {
 
 struct StyledSource
 {
+    // Each phrase has type:
+    // Phrase {
+    //   string text
+    //   Ref term
+    //   int phrase_type
+    // }
+    
     List _phrases;
 
     std::string toString();

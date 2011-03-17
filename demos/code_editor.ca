@@ -36,6 +36,9 @@ def tooltip_text(List lines, Point loc)
         draw_text(coding_font, line->string, #000, loc)
         loc += [0 20]
 
+def terms_have_same_source_line(Ref a, Ref b) -> bool
+    return a.source_location().y1 == b.source_location().y1
+
 def draw_code_editor(Point topleft, BranchRef branch)
 
     state mode = display_mode:text
@@ -49,15 +52,21 @@ def draw_code_editor(Point topleft, BranchRef branch)
 
     source = branch.format_source()
 
-    type Fragment {
-      string str
+    type Phrase {
+      string text
       Ref term
-      int token
-      Point loc
-      Point size
+      int phrase_type
+      List inputs
+      List users
     }
 
-    fragments = []
+    type Statement {
+      List phrases
+      Rect position
+      Ref term
+    }
+
+    statements = format_source_for_graph(branch)
 
     letter_width = 8
     line_height = 17
@@ -65,126 +74,23 @@ def draw_code_editor(Point topleft, BranchRef branch)
     if mode == display_mode:text_hybrid
         line_height = 32
 
-    approach(@line_height, time)
-
-    termToLocation = Map()
+    approach(@line_height, td*100)
 
     def source_loc_to_rect(Rect_i source_loc) -> Rect
         return [source_loc.x1*letter_width source_loc.y1*line_height
             source_loc.x2*letter_width (source_loc.y2+1)*line_height]
 
-    -- Iterate through the formatted source, and find the location for each fragment.
-    current_line = 0
-    current_col = 0
-    for phrase in source
-        s = phrase[0] -> string
-        r = phrase[1] -> Ref
-        t = phrase[2] -> int
+    for statement in statements
+        @statement -> Statement
+        for phrase in statement.phrases
+            @phrase -> Phrase
+            term = phrase.term -> Ref
 
-        loc = [current_col*letter_width current_line*line_height] -> Point
-        loc += topleft
-
-        -- Strip newlines
-        displayed_s = cond(s == '\n', '', s)
-
-        size = [displayed_s.length()*letter_width line_height]
-
-        fragments.append(Fragment([displayed_s r t loc size]))
-
-        current_col += s.length()
-        if (s == '\n')
-            current_col = 0
-            current_line += 1
-
-    -- store the location for every term
-    topleft_source_pos = Fragment(fragments[0]).term.source_location()
-    topleft_source_pos = [topleft_source_pos.x1 topleft_source_pos.y1]->Point_i
-   
-    for phrase in fragments
-        @phrase -> Fragment
-        term = phrase.term -> Ref
-
-        source_loc = term.source_location()
-        source_loc -= [topleft_source_pos.x topleft_source_pos.y topleft_source_pos.x topleft_source_pos.y]
-        source_loc += [2 0 1 0]
-        rect = source_loc_to_rect(source_loc->Rect_i)
-        rect += [topleft.x topleft.y topleft.x topleft.y]
-
-        termToLocation.add(term, rect)
-
-
-    -- Find the fragment under the mouse
-    mouseover_phrase = null
-
-    for phrase in fragments
-        @phrase -> Fragment
-
-        rect = to_rect(phrase.loc, phrase.size)
-        if mouse_over(rect)
-            mouseover_phrase = phrase
-
-    -- Draw a highlight for the mouseover term
-    if mouseover_phrase != null
-        @mouseover_phrase -> Fragment
-        term = mouseover_phrase.term->Ref
-        --source_loc = mouseover_phrase.term.source_location()
-        --source_loc -= [topleft_source_pos.x topleft_source_pos.y topleft_source_pos.x topleft_source_pos.y]
-        --source_loc += [2 0 1 0]
-        --rect = source_loc_to_rect(source_loc->Rect_i)
-        --rect += [topleft.x topleft.y topleft.x topleft.y]
-        --fill_rect(rect #ffe)
-
-        rect = termToLocation.get(term) -> Rect
-        fill_rect(rect #ffe)
-
-
-    for phrase in fragments
-        @phrase -> Fragment
-        term = phrase.term -> Ref
-
-        -- Highlight each input
-        num_inputs = term.num_inputs()
-        term_location = termToLocation.get(term) -> Rect
-        input_index = 0
-        for input in term.inputs()
-            if input != null and termToLocation.contains(term) and termToLocation.contains(input)
-                @input ->Ref
-                input_location = termToLocation.get(input) -> Rect
-
-                input_point = term_location.x1 + rect_width(term_location) * ((input_index+1) / (num_inputs+1))
-                output_point = [input_location.x1 + rect_width(input_location) / 2, input_location.y2]
-                line([input_point term_location.y1] output_point #fff)
-
-            input_index += 1
-
-        color = editor:get_highlight_color(phrase.token)
-
-        -- don't draw newline characters
-        text_sprite_size = text:get_metrics(coding_font, phrase.str)
-        rect = to_rect(phrase.loc, text_sprite_size)
-
-        highlighted = false
-        if mouseover_phrase != null
-            highlighted = mouseover_phrase.term == phrase.term
-
-        draw_code(phrase.str phrase.loc color)
-
-    -- Draw tooltip
-    if mouseover_phrase != null
-        term = mouseover_phrase.term -> Ref
-        loc = [100 100]
-        fill_rect(to_rect(loc [200 100]) #ddd)
-        h1_label(concat('Term ' term.global_id()) loc)
-        text_lines = [
-          term.function().name()
-          to_string(term.properties())
-        ]
-        tooltip_text(text_lines loc+[0 30])
+            draw_code(phrase.str phrase.loc editor:get_highlight_color(phrase.phrase_type))
 
 def example()
-  offset = [3 3]
-  angle = time % 1
-  loc = [cos(angle) sin(angle)] * 5 + offset
-  print(loc)
+  a = 1
+  b = add(a a)
+  mult(a,b)
 
 draw_code_editor([0 20] (example->branch_ref))

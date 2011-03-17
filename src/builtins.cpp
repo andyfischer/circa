@@ -8,7 +8,6 @@
 #include "debug_valid_objects.h"
 #include "types/any.h"
 #include "types/bool.h"
-#include "types/branch_ref.h"
 #include "types/callable.h"
 #include "types/color.h"
 #include "types/common.h"
