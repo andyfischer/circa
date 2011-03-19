@@ -52,23 +52,31 @@ def draw_code_editor(Point topleft, BranchRef branch)
 
     source = branch.format_source()
 
+    type PhraseLink {
+      Point startPos
+      Point endPos
+      Ref source
+      Ref user
+    }
     type Phrase {
       string text
       Ref term
       int phrase_type
-      List inputs
-      List users
+      Rect location
     }
 
     type Statement {
       List phrases
-      Rect position
+      Rect location
       Ref term
+      List inputs
+      List users
     }
 
     statements = format_source_for_graph(branch)
 
     letter_width = 8
+    letter_height = 17
     line_height = 17
 
     if mode == display_mode:text_hybrid
@@ -76,21 +84,46 @@ def draw_code_editor(Point topleft, BranchRef branch)
 
     approach(@line_height, td*100)
 
-    def source_loc_to_rect(Rect_i source_loc) -> Rect
+    def source_loc_to_rect(Rect source_loc) -> Rect
         return [source_loc.x1*letter_width source_loc.y1*line_height
-            source_loc.x2*letter_width (source_loc.y2+1)*line_height]
+            source_loc.x2*letter_width (source_loc.y2)*line_height+letter_height]
+    def source_loc_to_point(Point source_loc) -> Point
+        return [source_loc.x*letter_width source_loc.y*line_height]
+
+    -- Find the mouseover term
+    mouseover_term = null
+    for statement in statements
+        @statement -> Statement
+        loc = source_loc_to_rect(statement.location)
+        if mouse_over(loc)
+            mouseover_term = statement.term
 
     for statement in statements
         @statement -> Statement
+
+        loc = source_loc_to_rect(statement.location)
+        term = statement.term
+        if term == mouseover_term
+            fill_rect(loc, #f004)
+
+            trace(statement.inputs)
+
+            for link in statement.inputs
+                @link -> PhraseLink
+                line(source_loc_to_point(link.startPos) + [0 letter_height]
+                    source_loc_to_point(link.endPos) #000)
+
         for phrase in statement.phrases
             @phrase -> Phrase
             term = phrase.term -> Ref
 
-            draw_code(phrase.str phrase.loc editor:get_highlight_color(phrase.phrase_type))
+            loc = source_loc_to_rect(phrase.location)
+
+            draw_code(phrase.text [loc.x1 loc.y1] editor:get_highlight_color(phrase.phrase_type))
 
 def example()
-  a = 1
-  b = add(a a)
+  a = 2
+  b = add(a add(1 add(1 2)) a a a a)
   mult(a,b)
 
-draw_code_editor([0 20] (example->branch_ref))
+draw_code_editor([20 20] (example->branch_ref))

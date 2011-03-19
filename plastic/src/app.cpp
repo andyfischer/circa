@@ -162,6 +162,10 @@ bool initialize()
     return load_runtime(*app._runtimeBranch);
 }
 
+namespace fmod_support {
+    #include "../libs/fmod/fmod.cpp"
+}
+
 bool setup_functions(circa::Branch& runtime)
 {
     circa::Branch& branch = app::runtime_branch();
@@ -177,6 +181,8 @@ bool setup_functions(circa::Branch& runtime)
     textures::setup(branch);
     text::setup(branch);
 #endif
+
+    fmod_support::setup(runtime);
 
     if (circa::has_static_errors(branch)) {
         circa::print_static_errors_formatted(branch, std::cout);

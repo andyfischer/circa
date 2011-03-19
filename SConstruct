@@ -119,9 +119,9 @@ for env in all_envs:
 circa_cl = circa_cl_apps['debug']
 Default(circa_cl)
 
-########################### SDL-based targets ###############################
+########################### Plastic ###############################
 
-def sdl_env(env):
+def use_sdl(env):
     if POSIX:
         # import path so that we will find the correct sdl-config
         env['ENV']['PATH'] = os.environ['PATH']
@@ -156,12 +156,21 @@ def sdl_env(env):
     # Append appropriate circa lib
     env.Append(LIBS = [circa_libs[variant_name]])
 
+def use_fmod(env):
+    base = 'build/deps/fmod/api/'
+    env.Append(CPPPATH=[base + 'inc'])
+    #env.Append(LINKFLAGS=['-arch','i386','-arch','ppc','-arch','x86_64'])
+    #env.Append(LINKFLAGS=['-l'+ base + 'lib/libfmodex.dylib'])
+    env.Append(LIBPATH=[base + 'lib'])
+    env.Append(LIBS=['fmodex'])
+
 # Define plastic targets at build/plas_x
 for env in all_envs:
     env = env.Clone()
     variantName = env['variant_name']
     env.BuildDir('build/'+variantName+'/plastic/src', 'plastic/src')
-    sdl_env(env)
+    use_sdl(env)
+    use_fmod(env)
 
     source_files = list_source_files('plastic/src')
 
@@ -176,3 +185,7 @@ for env in all_envs:
     if WINDOWS:
         env.AddPostAction(result,
         'mt.exe -nologo -manifest plastic/windows/plastic.manifest -outputresource:$TARGET;1')
+
+    if OSX:
+        env.AddPostAction(result,
+            'install_name_tool -change ./libfmodex.dylib build/deps/fmod/api/lib/libfmodex.dylib $TARGET')

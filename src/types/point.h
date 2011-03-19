@@ -9,6 +9,7 @@ struct Point : TaggedValue
     void set(float x, float y);
     
     static Point* checkCast(TaggedValue* tv);
+    static Point* cast(TaggedValue* tv);
 };
 
 } // namespace circa
