@@ -156,6 +156,10 @@ CA_FUNCTION(evaluate_if_block)
     int acceptedBranchIndex = 0;
     Branch* acceptedBranch = NULL;
 
+    // Keep track of whether the accepted branch was empty; this is for deciding whether
+    // to reset state.
+    bool acceptedBranchWasEmpty = true;
+
     TaggedValue localState;
     TaggedValue prevScopeState;
     List* state = NULL;
@@ -186,6 +190,8 @@ CA_FUNCTION(evaluate_if_block)
                 evaluate_single_term(context, acceptedBranch->get(j));
                 if (evaluation_interrupted(context))
                     break;
+
+                acceptedBranchWasEmpty = false;
             }
 
             if (useState)
@@ -199,7 +205,7 @@ CA_FUNCTION(evaluate_if_block)
     // Reset state for all non-accepted branches
     if (useState) {
         for (int i=0; i < numBranches; i++) {
-            if (i != acceptedBranchIndex)
+            if ((i != acceptedBranchIndex) && !acceptedBranchWasEmpty)
                 set_null(state->get(i));
         }
         preserve_state_result(CALLER, &prevScopeState, &localState);

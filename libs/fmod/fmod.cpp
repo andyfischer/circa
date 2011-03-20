@@ -20,6 +20,9 @@ CA_FUNCTION(load_sound)
     initialize();
 
     FMOD_SOUND *sound;
+
+    std::cout << "load_sound(" << circa::as_cstring(INPUT(0)) << ")" << std::endl;
+
     FMOD_RESULT result = FMOD_System_CreateSound(g_system, circa::as_cstring(INPUT(0)),
             FMOD_SOFTWARE, 0, &sound);
 

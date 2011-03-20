@@ -330,7 +330,7 @@ void test_state_is_reset_when_if_fails()
     EvalContext context;
 
     Term* c = branch.compile("c = true");
-    branch.compile("if c; state i = 0; i += 1; end");
+    branch.compile("if c { state i = 0; i += 1 } else { 'hi' }");
 
     evaluate_branch(&context, branch);
     test_equals(&context.state, "[_if_block: [[i: 1], null]]");
