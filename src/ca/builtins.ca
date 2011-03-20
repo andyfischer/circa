@@ -4,9 +4,9 @@ def toggle(bool tog) -> bool
     Stateful function, returns a boolean status. Every frame the function is called
     with (true), the result flips. Starts out false.
     >>>
-    state bool on = false
-    if tog; on = not(on)
-    return on
+    state bool s = false
+    if tog; s = not(s)
+    return s
 
 def approach(number target, number maximum_change) -> number
     <<<

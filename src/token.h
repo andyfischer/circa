@@ -98,6 +98,7 @@ const int DISCARD = 69;
 const int NULL_TOKEN = 71;
 const int BREAK = 72;
 const int CONTINUE = 73;
+const int ON = 74;
 
 const int WHITESPACE = 80;
 const int NEWLINE = 81;
