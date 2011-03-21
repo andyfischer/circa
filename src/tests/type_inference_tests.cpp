@@ -59,13 +59,22 @@ void for_loop_output_type()
     test_assert(branch["a"]->type == INT_TYPE);
 }
 
+void assign_output_type()
+{
+    Branch branch;
+    branch.compile("a = [1]");
+    Term* assign = branch.compile("a[0] = 2");
+    test_assert(assign->type == LIST_TYPE);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_inference_tests::test_find_common_type);
     REGISTER_TEST_CASE(type_inference_tests::test_find_type_of_get_index);
     REGISTER_TEST_CASE(type_inference_tests::compare_builtin_types);
     REGISTER_TEST_CASE(type_inference_tests::for_loop_output_type);
+    REGISTER_TEST_CASE(type_inference_tests::assign_output_type);
 }
 
-}
-}
+} // namespace type_inference_tests
+} // namespace circa

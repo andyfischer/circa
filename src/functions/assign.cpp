@@ -8,7 +8,8 @@ namespace assign_function {
 
     CA_FUNCTION(assign)
     {
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
+
         TaggedValue output;
         evaluate_branch_internal(CONTEXT, contents, &output);
         swap(&output, OUTPUT);
@@ -16,9 +17,11 @@ namespace assign_function {
 
     Term* specializeType(Term* term)
     {
-        //FIXME
-        return ANY_TYPE;
-        //return parser::find_lexpr_root(term->input(0))->type;
+        Branch& contents = nested_contents(term);
+        if (contents.length() > 0)
+            return contents[contents.length()-1]->type;
+        else
+            return ANY_TYPE;
     }
 
     Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredValue)

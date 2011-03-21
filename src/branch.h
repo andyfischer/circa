@@ -115,6 +115,8 @@ void assert_valid_branch(Branch const* obj);
 bool is_namespace(Term* term);
 bool is_namespace(Branch& branch);
 
+Branch& nested_contents(Term* term);
+
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch const& branch);
 
