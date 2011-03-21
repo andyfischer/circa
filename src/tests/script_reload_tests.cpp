@@ -58,8 +58,8 @@ void test_simple_with_state()
 void test_function_change()
 {
     ReloadHelper helper;
-    helper.load("def f(int i); add(i,i) end; f(5)");
-    helper.load("def f(number i); mult(i,i+1) end; f(5)");
+    helper.load("def f(int i) { add(i,i) } f(5)");
+    helper.load("def f(number i) { mult(i,i+1) } f(5)");
 }
 
 void test_with_custom_type()

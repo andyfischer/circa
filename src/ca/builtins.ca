@@ -29,14 +29,18 @@ def once() -> bool
     s = false
     return result
 
-def cycle_elements(List list) -> any
-    "Stateful function, returns each item of 'list' one at a time"
+def cycle(int max) -> int
+    "Stateful function, cycles though the integers starting at 0 and ending before 'max'"
     state int counter = 0
-    if counter >= length(list)
+    if counter >= length
         counter = 0
-    result = list[counter]
+    result = counter
     counter += 1
     return result
+
+def cycle_elements(List list) -> any
+    "Stateful function, returns each item of 'list' one at a time"
+    return list[cycle(length(list))]
 
 def random_element(List list) -> any
     "Return a random element from the given list, with equal probability per element"

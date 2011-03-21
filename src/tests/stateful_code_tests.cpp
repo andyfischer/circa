@@ -21,11 +21,11 @@ void test_is_get_state()
 void test_is_function_stateful()
 {
     Branch branch;
-    Term* f = branch.compile("def f() state s end");
+    Term* f = branch.compile("def f() { state s }");
 
     test_assert(is_function_stateful(f));
 
-    Term* g = branch.compile("def g() 1 2 3 end");
+    Term* g = branch.compile("def g() { 1 2 3 }");
 
     test_assert(!is_function_stateful(g));
 
@@ -116,7 +116,7 @@ void one_time_assignment_inside_for_loop()
 
     import_function(branch, _unique_output, "unique_output() -> int");
     import_function(branch, _spy, "spy(int)");
-    branch.compile("for i in [1 1 1]; state s = unique_output(); spy(s); end");
+    branch.compile("for i in [1 1 1] { state s = unique_output(); spy(s) }");
     test_assert(branch);
 
     NEXT_UNIQUE_OUTPUT = 0;
@@ -148,7 +148,7 @@ void explicit_state()
 void implicit_state()
 {
     Branch branch;
-    branch.compile("def f() state s; s = 1 end");
+    branch.compile("def f() { state s; s = 1 }");
     branch.compile("f()");
 
     EvalContext context;
@@ -193,7 +193,7 @@ void bug_with_top_level_state()
     // This code once caused an assertion failure
     Branch branch;
     branch.compile("state s = 1");
-    branch.compile("def f() state t end");
+    branch.compile("def f() { state t }");
     branch.compile("f()");
     evaluate_branch(branch);
 }
@@ -210,7 +210,7 @@ void bug_with_state_and_plus_equals()
 void subroutine_unique_name_usage()
 {
     Branch branch;
-    branch.compile("def f() state s = 0; s += 1; s += 2; s += 5 end; f()");
+    branch.compile("def f() { state s = 0; s += 1; s += 2; s += 5 } f()");
     EvalContext context;
     evaluate_branch(&context, branch);
 
@@ -220,7 +220,7 @@ void subroutine_unique_name_usage()
 void subroutine_early_return()
 {
     Branch branch;
-    branch.compile("def f()->int state s = 2; return 0; s = 4; end; f()");
+    branch.compile("def f()->int { state s = 2; return 0; s = 4; } f()");
     EvalContext context;
     evaluate_branch(&context, branch);
     test_equals(&context.state, "[_f: [s: 2]]");

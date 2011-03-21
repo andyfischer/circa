@@ -215,7 +215,7 @@ void test_lists()
 
 void test_blocks()
 {
-    test_snippet("def f() 1 2 3 end");
+    test_snippet("def f() { 1 2 3 }");
 }
 
 void register_tests() {

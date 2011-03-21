@@ -54,7 +54,7 @@ void for_loop_output_type()
 {
     Branch branch;
     branch.compile("a = 1");
-    branch.compile("for i in [1] a = 2 end");
+    branch.compile("for i in [1] { a = 2 }");
 
     test_assert(branch["a"]->type == INT_TYPE);
 }
