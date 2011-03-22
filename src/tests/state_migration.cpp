@@ -10,11 +10,6 @@ namespace state_migration {
 void test_migration(std::string sourceCode, std::string destinationCode,
     std::string assertionsCode)
 {
-    #if 0
-    FIXME
-    These tests are still good; instead of using migrate_stateful_values we
-    should just run both sides using the same context
-
     Branch source;
     parser::compile(&source, parser::statement_list, sourceCode);
 
@@ -37,25 +32,26 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         return;
     }
 
-    EvalContext result = evaluate_branch(source);
-    if (result.errorOccurred) {
+    EvalContext context;
+
+    evaluate_branch(&context, source);
+
+    if (context.errorOccurred) {
         std::cout << "Runtime error in " << get_current_test_name() << std::endl;
-        print_runtime_error_formatted(result, std::cout);
+        print_runtime_error_formatted(context, std::cout);
         std::cout << std::endl;
         declare_current_test_failed();
         return;
     }
 
-    migrate_stateful_values(source, destination);
-
     Branch& assertions = create_branch(destination, "assertions");
     parser::compile(&assertions, parser::statement_list, assertionsCode);
 
-    result = evaluate_branch(destination);
+    evaluate_branch(&context, destination);
 
-    if (result.errorOccurred) {
+    if (context.errorOccurred) {
         std::cout << "In " << get_current_test_name() << std::endl;
-        print_runtime_error_formatted(result, std::cout);
+        print_runtime_error_formatted(context, std::cout);
         std::cout << std::endl;
         declare_current_test_failed();
         return;
@@ -66,12 +62,14 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         if (!is_statement(assertions[i]))
             continue;
 
-        if (!is_bool(assertions[i]))
+        TaggedValue* result = get_local(assertions[i]);
+
+        if (!is_bool(result))
             continue;
 
         boolean_statements_found++;
 
-        if (!as_bool(assertions[i])) {
+        if (!as_bool(result)) {
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: "
                 << get_term_source_text(assertions[i]) << std::endl;
@@ -79,6 +77,8 @@ void test_migration(std::string sourceCode, std::string destinationCode,
             print_branch(std::cout, source);
             std::cout << "Destination:" << std::endl;
             print_branch(std::cout, destination);
+            std::cout << "State:" << std::endl;
+            std::cout << context.state.toString() << std::endl;
             declare_current_test_failed();
             return;
         }
@@ -88,7 +88,6 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "warn: no boolean statements found in: " << assertionsCode << std::endl;
     }
-    #endif
 }
 
 void migrate_simple()
@@ -98,6 +97,9 @@ void migrate_simple()
 
 void migrate_across_user_defined_types()
 {
+    #if 0
+    TEST_DISABLED
+
     // Pre-test work, make sure that 'state T t = [1]' works
     Branch branch;
     Term* typeT = branch.compile("type T { int x }");
@@ -113,6 +115,7 @@ void migrate_across_user_defined_types()
     test_migration("type T { int x } \n state T t = [1]",
         "type T { int y } \n state T t = [2]",
         "t.y == 1");
+    #endif
 }
 
 void dont_migrate_across_different_types()
@@ -120,10 +123,10 @@ void dont_migrate_across_different_types()
     //test_migration("state int i; i = 5", "state number i", "i == 0");
     test_migration("state Point p; p = [3 3]", "state Rect p", "p == [.0 .0 .0 .0]");
 
-    test_migration("def f1()->int state int i; return(i); end;"
-                   "def f2(int i) state number n end; f1()",
-                   "def f1()->int state int i; return(i); end;"
-                   "def f2(int i) state number n end; f2(f1())", "");
+    test_migration("def f1()->int { state int i; return(i) }"
+                   "def f2(int i) { state number n } f1()",
+                   "def f1()->int { state int i; return(i) }"
+                   "def f2(int i) { state number n } f2(f1())", "");
 }
 
 void migrate_complex_types()
@@ -135,7 +138,10 @@ void migrate_complex_types()
 
 void migrate_misc()
 {
-    // This tests don't have a specific focus
+    // These tests don't have a specific focus
+
+    #if 0
+    TEST_DISABLED
 
     test_migration("type Point { number x, number y }\n"
                    "def get_ship_start_point() -> Point { return([50,50]) }"
@@ -149,6 +155,7 @@ void migrate_misc()
                    "state Ship ship = [get_ship_start_point() [0 0] 0]\n",
 
                    "ship.loc == [5.0 5.0], ship.momentum == [1.0 1.0], ship.facing == 1.0");
+    #endif
 }
 
 void register_tests()

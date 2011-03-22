@@ -90,25 +90,6 @@ void test_default_values()
     Term* s = create_string(branch, "hello");
     reset(s);
     test_assert(s->asString() == "");
-
-    //create_type(branch, "T");
-
-#if 0
-    // FIXME
-    test_assert(type_t::get_default_value(t) == NULL);
-
-    Term* t_value = create_value(branch, t);
-
-    set_int(t_value->value, 5);
-    type_t::enable_default_value(t);
-    assign_value(t_value, type_t::get_default_value(t));
-
-    Term* t_value_2 = create_value(branch, t);
-
-    reset(t_value_2);
-
-    test_assert(equals(t_value, t_value_2));
-#endif
 }
 
 void type_inference_for_get_index()

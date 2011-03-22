@@ -27,8 +27,11 @@ namespace get_state_field_function {
         const char* name = CALLER->name.c_str();
         TaggedValue* value = stateContainer->get(name);
 
+        // Check if 'value' fits our declared type. If not, then ignore it.
+        if (value && !cast_possible(value, declared_type(CALLER)))
+            value = NULL;
+
         if (value) {
-            // TODO: check if we need to cast this value
             copy(value, OUTPUT);
 
         // If we didn't find the value, see if they provided a default
