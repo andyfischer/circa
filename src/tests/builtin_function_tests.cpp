@@ -135,13 +135,10 @@ void test_get_index()
     test_assert(get->value_type == unbox_type(INT_TYPE));
     test_assert(get->asInt() == 1);
 
-    // FIXME
-    return;
     branch.eval("l = []");
-    get = branch.compile("get_index(l, 5)");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate(&context, branch, "l = []; get_index(l, 5)");
     test_assert(context.errorOccurred);
 }
 

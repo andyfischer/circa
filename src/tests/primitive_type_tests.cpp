@@ -64,37 +64,12 @@ void float_to_string()
     test_equals(get_term_source_text(c), "2.0");
 }
 
-void test_ref_tweak()
-{
-    #if 0
-    FIXME
-    Branch branch;
-    Term* v = branch.compile("v = 1.0");
-    evaluate_branch(branch);
-    test_assert(as_float(v) == 1.0); // sanity check
-    
-    // Check that no rounding errors are introduced
-    branch.compile("r = ref(v)");
-    branch.compile("r.tweak(1)");
-    branch.compile("r.tweak(-1)");
-    evaluate_branch(branch);
-    test_assert(as_float(v) == 1.0);
-
-    branch.compile("r.tweak(10)");
-    for (int i=0; i < 10; i++)
-        branch.compile("r.tweak(-1)");
-    evaluate_branch(branch);
-    test_assert(as_float(v) == 1.0);
-    #endif
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(primitive_type_tests::strings);
     REGISTER_TEST_CASE(primitive_type_tests::builtin_objects);
     REGISTER_TEST_CASE(primitive_type_tests::test_void);
     REGISTER_TEST_CASE(primitive_type_tests::float_to_string);
-    REGISTER_TEST_CASE(primitive_type_tests::test_ref_tweak);
 }
 
 } // namespace primitive_type_tests
