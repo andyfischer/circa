@@ -11,6 +11,7 @@
 #include "function.h"
 #include "introspection.h"
 #include "locals.h"
+#include "parser.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -304,6 +305,14 @@ void evaluate_minimum(EvalContext* context, Term* term)
     delete[] marked;
 
     finish_using(branch);
+}
+
+TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input)
+{
+    int prevHead = branch.length();
+    Term* result = parser::compile(&branch, parser::statement_list, input);
+    evaluate_range(context, branch, prevHead, branch.length() - 1);
+    return get_local(result);
 }
 
 void clear_error(EvalContext* cxt)

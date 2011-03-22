@@ -17,6 +17,10 @@ namespace vectorize_vv_function {
     {
         Branch& contents = CALLER->nestedContents;
         TaggedValue input0, input1;
+
+        if (num_elements(INPUT(0)) != num_elements(INPUT(1)))
+            return error_occurred(CONTEXT, CALLER, "Input lists have different lengths");
+
         copy(INPUT(0), &input0);
         copy(INPUT(1), &input1);
         int listLength = input0.numElements();

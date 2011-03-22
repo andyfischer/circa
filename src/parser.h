@@ -37,6 +37,8 @@ typedef ParseResult (*ParsingStep)(Branch& branch, TokenStream& tokens, ParserCx
 Ref compile(Branch* branch, ParsingStep step, std::string const& input);
 Ref evaluate(Branch& branch, ParsingStep step, std::string const& input);
 
+Term* evaluate(Branch& branch, std::string const& input);
+
 // Parsing steps:
 ParseResult statement_list(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context);

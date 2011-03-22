@@ -65,6 +65,8 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 
 void evaluate_minimum(EvalContext* context, Term* term);
 
+TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
+
 TaggedValue* get_input(Term* term, int index);
 
 // consume_input will assign 'dest' to the value of the given input. It may copy the

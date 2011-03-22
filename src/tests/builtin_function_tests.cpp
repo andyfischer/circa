@@ -89,11 +89,9 @@ void test_vectorized_funcs()
     test_equals(t->getIndex(2)->asFloat(), 33);
 
     // Test error handling
-    // FIXME
-    //t = branch.eval("[1 1 1] + [1 1]");
-    //EvalContext context;
-    //evaluate_term(&context, t);
-    //test_assert(context.errorOccurred);
+    EvalContext context;
+    evaluate(&context, branch, "[1 1 1] + [1 1]");
+    test_assert(context.errorOccurred);
 }
 
 void test_vectorized_funcs_with_points()
