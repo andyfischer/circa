@@ -49,6 +49,13 @@ struct Font : public circa::TaggedValue
             change_type(val, FontRef::singleton);
         return (Font*) val;
     }
+
+    static Font* cast(TaggedValue* val)
+    {
+        circa::reset(val);
+        change_type(val, FontRef::singleton);
+        return (Font*) val;
+    }
 };
 
 SDL_Color unpack_sdl_color(TaggedValue* color)
@@ -62,16 +69,10 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
 
 CA_FUNCTION(load_font)
 {
-    TaggedValue* state = STATE_INPUT;
-    Font* output = Font::lazyCast(OUTPUT);
+    Font* output = Font::cast(OUTPUT);
 
-    if (!is_null(state)) {
-        copy(state, output);
-        return;
-    }
-
-    std::string path = STRING_INPUT(1);
-    int pointSize = INT_INPUT(2);
+    std::string path = STRING_INPUT(0);
+    int pointSize = INT_INPUT(1);
 
     //std::cout << "Calling TTF_OpenFont(" << path.c_str() << std::endl;
     
@@ -83,7 +84,6 @@ CA_FUNCTION(load_font)
     }
 
     output->contents()->ttfFont = result;
-    copy(output, state);
 }
 
 struct RenderedText : public TaggedValue
@@ -98,6 +98,12 @@ struct RenderedText : public TaggedValue
     std::string const& text() { return getIndex(4)->asString(); }
     TaggedValue* textContainer() { return getIndex(4); }
 
+    static RenderedText* cast(TaggedValue* val)
+    {
+        change_type(val, singleton);
+        return (RenderedText*) val;
+    }
+
     static Type* singleton;
 };
 
@@ -105,49 +111,38 @@ Type* RenderedText::singleton;
 
 CA_FUNCTION(render_text)
 {
-    RenderedText* state = (RenderedText*) STATE_INPUT;
+    std::string const& inputText = as_string(INPUT(1));
+    TaggedValue* inputColor = INPUT(2);
 
-    if (!cast(state, RenderedText::singleton, state))
-        change_type(state, RenderedText::singleton);
+    RenderedText* output = RenderedText::cast(OUTPUT);
 
-    touch(state);
+    copy(INPUT(1), output->textContainer());
 
-    std::string const& inputText = as_string(INPUT(2));
-    TaggedValue* inputColor = INPUT(3);
-    bool changed_color = !state->color()->equals(inputColor);
-
-    if (state->texid() == 0 || state->text() != inputText || changed_color) {
-
-        copy(INPUT(2), state->textContainer());
-
-        // Clear results if text is empty
-        if (inputText == "") {
-            set_int(state->texidContainer(), 0);
-            set_int(state->widthContainer(), 0);
-            set_int(state->heightContainer(), 0);
-            copy(state, OUTPUT);
-            return;
-        }
-
-        // Render the text to a new surface, upload it as a texture, destroy the surface,
-        // record the texture id.
-
-        Font* font = Font::checkCast(INPUT(1));
-
-        SDL_Color sdlColor = unpack_sdl_color(INPUT(3));
-        SDL_Surface *surface = TTF_RenderText_Blended(font->contents()->ttfFont,
-                inputText.c_str(), sdlColor);
-
-        set_int(state->texidContainer(), load_surface_to_texture(surface));
-        set_int(state->widthContainer(), surface->w);
-        set_int(state->heightContainer(), surface->h);
-        copy(inputColor, state->color());
-
-        //SDL_SaveBMP(surface, "hello.bmp");
-
-        SDL_FreeSurface(surface);
+    // Clear results if text is empty
+    if (inputText == "") {
+        set_int(output->texidContainer(), 0);
+        set_int(output->widthContainer(), 0);
+        set_int(output->heightContainer(), 0);
+        return;
     }
-    copy(state, OUTPUT);
+
+    // Render the text to a new surface, upload it as a texture, destroy the surface,
+    // record the texture id.
+
+    Font* font = Font::checkCast(INPUT(0));
+
+    SDL_Color sdlColor = unpack_sdl_color(INPUT(2));
+    SDL_Surface *surface = TTF_RenderText_Blended(font->contents()->ttfFont,
+            inputText.c_str(), sdlColor);
+
+    set_int(output->texidContainer(), load_surface_to_texture(surface));
+    set_int(output->widthContainer(), surface->w);
+    set_int(output->heightContainer(), surface->h);
+    copy(inputColor, output->color());
+
+    //SDL_SaveBMP(surface, "hello.bmp");
+
+    SDL_FreeSurface(surface);
 }
 
 CA_FUNCTION(draw_rendered_text)
@@ -212,8 +207,8 @@ void setup(Branch& branch)
     }
 
     Branch& text_ns = branch["text"]->nestedContents;
-    install_function(text_ns["load_font"], load_font);
-    install_function(text_ns["render_text"], render_text);
+    install_function(text_ns["load_font_internal"], load_font);
+    install_function(text_ns["render_text_internal"], render_text);
     install_function(text_ns["draw_rendered_text"], draw_rendered_text);
     install_function(text_ns["get_metrics"], get_metrics);
 

@@ -4,11 +4,11 @@ desired_window_size = [500 400]
 background(#042304)
 
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) -> bool
-    -- lazy
+    -- lazy intersection check
     return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
 
 def random_initial_direction() -> Point
-    if rand() > .5 serve = 1 else serve = -1 end
+    if rand() > .5 { serve = 1 } else { serve = -1 }
     angle = rand() * .4 - .2
     result = [cos(angle) * serve, sin(angle)]
     return result

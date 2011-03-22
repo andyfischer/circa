@@ -12,6 +12,7 @@ def draw_x(Point loc)
     dist = square_size * 0.35
     thick_line(loc - [dist dist], loc + [dist dist], thickness, #fff)
     thick_line(loc + [-dist dist], loc + [dist -dist], thickness, #fff)
+
 def draw_o(Point loc)
     radius = square_size * .35
     gl:circle(loc, radius, #fff)
@@ -87,9 +88,9 @@ def get_winner(List board_spaces) -> WinnerInformation
             if this_player != this_space.owner
                 all_match = false
         if all_match
-            return(this_player)
+            return this_player
         else
-            return(player:none)
+            return player:none
 
     result = WinnerInformation()
 
@@ -114,7 +115,7 @@ def get_winner(List board_spaces) -> WinnerInformation
 
     return result
 
-chosen_space = []
+chosen_space = null
 
 state moves_made = 0
 state game_is_finished = false
@@ -141,17 +142,15 @@ for board_space in board_spaces
 
 state winner_information = WinnerInformation()
 
-if chosen_space != []
+if chosen_space != null
     moves_made += 1
 
-    chosen_space = chosen_space -> BoardSpace
+    @chosen_space -> BoardSpace
 
-    -- Modify board_spaces in a silly way b/c the proper way doesn't work yet
-    def update_board_spaces(BoardSpace space) -> BoardSpace
+    for space in @board_spaces
+        @space -> BoardSpace
         if space.x == chosen_space.x and space.y == chosen_space.y
             space.owner = current_player
-        return space
-    board_spaces = map(update_board_spaces, board_spaces)
     chosen_space = chosen_space -> BoardSpace
     current_player = other_player(current_player)
 

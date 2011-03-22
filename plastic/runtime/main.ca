@@ -75,10 +75,21 @@ type Font;
 
 namespace text
     type RenderedText { int texid, int width, int height, Color color, string text }
-    def load_font(state Font, string filename, int size) -> Font
+    def load_font_internal(string filename, int size) -> Font
+    def load_font(string filename, int size) -> Font
         "Load the given font"
-    def render_text(state RenderedText, Font font, string text, Color color) -> RenderedText
+        state Font s
+        if changed(filename) or changed(size)
+            s = load_font_internal(filename,size)
+        return s
+
+    def render_text_internal(Font font, string text, Color color) -> RenderedText
+    def render_text(Font font, string text, Color color) -> RenderedText
         "Render text and return a sprite that can be drawn with draw_rendered_text. This is useful if you want to know the width or height of the rendered text before drawing it."
+        state RenderedText s
+        if changed(font) or changed(text) or changed(color)
+            s = render_text_internal(font, text, color)
+        return s
     def draw_rendered_text(RenderedText, Point loc)
         "Draw a sprite created with render_text."
     def get_metrics(Font font, string text) -> Point;
