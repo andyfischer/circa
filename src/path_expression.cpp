@@ -64,37 +64,4 @@ TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
     return result;
 }
     
-// TODO: Get rid of this
-void assign_using_path(TaggedValue* head, PathExpression const& path, TaggedValue* newValue)
-{
-    ca_assert(path.length() > 0);
-    ca_assert(head != newValue);
-
-    int numElements = path._elements.size();
-    for (int i=0; i < numElements; i++) {
-        PathExpression::Element const& element = path._elements[i];
-
-        TaggedValue* next = step_path(head, element);
-        touch(next);
-        ca_assert(head != newValue);
-
-        if (i == (numElements-1)) {
-            if (element.isIndex()) {
-                set_index(head, element.index, newValue);
-            } else if (element.isField()) {
-                if (head->value_type->setField != NULL) {
-                    set_field(head, element.field.c_str(), newValue);
-                } else {
-                    int fieldIndex = head->value_type->findFieldIndex(element.field.c_str());
-                    if (fieldIndex == -1)
-                        internal_error("field not found");
-                    set_index(head, fieldIndex, newValue);
-                }
-            }
-        } else {
-            head = next;
-        }
-    }
-}
-
 } // namespace circa

@@ -46,6 +46,5 @@ struct PathExpression
 };
 
 PathExpression get_lexpr_path_expression(Term* term);
-void assign_using_path(TaggedValue* target, PathExpression const& path, TaggedValue* newValue);
 
 }

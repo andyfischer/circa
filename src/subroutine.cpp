@@ -1,9 +1,24 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
  
+#include "common_headers.h"
+
+#include "branch.h"
+#include "branch_iterator.h"
+#include "building.h"
+#include "builtins.h"
+#include "errors.h"
 #include "evaluation.h"
-#include "circa.h"
+#include "function.h"
 #include "importing_macros.h"
 #include "locals.h"
+#include "refactoring.h"
+#include "source_repro.h"
+#include "stateful_code.h"
+#include "token.h"
+#include "term.h"
+#include "type.h"
+
+#include "subroutine.h"
 
 namespace circa {
 

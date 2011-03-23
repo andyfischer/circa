@@ -91,8 +91,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
         Term* original = get_named_at(forTerm, name);
 
-        if (original == NULL)  // TODO: investigate why this happens
-            continue;
+        ca_assert(original != NULL);
 
         Term* loopResult = forContents[name];
 
