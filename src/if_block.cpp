@@ -135,22 +135,11 @@ Branch* get_if_block_joining_branch(Term* ifCall)
     return &joiningBranch->nestedContents;
 }
 
-bool if_block_contains_state(Term* ifCall)
-{
-    Branch& contents = ifCall->nestedContents;
-    for (int cond=0; cond < contents.length(); cond++) {
-        Branch& condContents = contents[cond]->nestedContents;
-        if (has_any_inlined_state(condContents))
-            return true;
-    }
-    return false;
-}
-
 CA_FUNCTION(evaluate_if_block)
 {
     EvalContext* context = CONTEXT;
     Branch& contents = CALLER->nestedContents;
-    bool useState = if_block_contains_state(CALLER);
+    bool useState = has_any_inlined_state(contents);
 
     int numBranches = contents.length() - 1;
     int acceptedBranchIndex = 0;

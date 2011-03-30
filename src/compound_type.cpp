@@ -12,15 +12,10 @@ void initialize_compound_type(Type* type)
     list_t::setup_type(type);
 }
 
-void initialize_compound_type(Term* term)
-{
-    initialize_compound_type(unbox_type(term));
-}
-
 Term* create_compound_type(Branch& branch, std::string const& name)
 {
     Term* term = create_type(branch, name);
-    initialize_compound_type(term);
+    initialize_compound_type(unbox_type(term));
     unbox_type(term)->name = name;
     return term;
 }

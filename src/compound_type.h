@@ -7,7 +7,6 @@
 namespace circa {
 
 void initialize_compound_type(Type* type);
-void initialize_compound_type(Term* term);
 
 Term* create_compound_type(Branch& branch, std::string const& name);
 

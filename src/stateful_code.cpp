@@ -37,13 +37,48 @@ bool is_function_stateful(Term* func)
 
 bool has_any_inlined_state(Branch& branch)
 {
+    // Check if branch.hasInlinedState has a valid value.
+    if (is_bool(&branch.hasInlinedState))
+        return as_bool(&branch.hasInlinedState);
+
+    // No valid value, recalculate.
+    bool result = false;
     for (int i=0; i < branch.length(); i++) {
-        if (is_get_state(branch[i]))
-            return true;
-        if (has_implicit_state(branch[i]))
-            return true;
+        if (is_get_state(branch[i])) {
+            result = true;
+            break;
+        }
+
+        if (has_implicit_state(branch[i])) {
+            result = true;
+            break;
+        }
     }
-    return false;
+
+    set_bool(&branch.hasInlinedState, result);
+    return result;
+}
+
+void mark_branch_as_having_inlined_state(Branch& branch)
+{
+    if (is_bool(&branch.hasInlinedState) && as_bool(&branch.hasInlinedState))
+        return;
+
+    set_bool(&branch.hasInlinedState, true);
+    Branch* parent = get_parent_branch(branch);
+    if (parent != NULL)
+        mark_branch_as_having_inlined_state(*parent);
+}
+
+void mark_branch_as_possibly_not_having_inlined_state(Branch& branch)
+{
+    if (is_null(&branch.hasInlinedState))
+        return;
+
+    set_null(&branch.hasInlinedState);
+    Branch* parent = get_parent_branch(branch);
+    if (parent != NULL)
+        mark_branch_as_possibly_not_having_inlined_state(*parent);
 }
 
 const char* get_implicit_state_name(Term* term)

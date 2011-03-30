@@ -6,11 +6,9 @@ This is a list of short-term TODOs. There's a bigger list at docs/todo.md
  - 'Unknown identifier' terms are being created without source location
 
  - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
- - evaluate_if_block should not use if_block_contains_state, it's O(n) 
  - various places where swap() can be used instead of copy()
 
 Important optimization tasks:
 
  - Value sharing, especially for Dict. Lots of performance loss in preserve_state_result.
- - Use swap instead of copy for inputs (when possible)
  - Some overloads that are currently resolved dynamically can be resolved statically

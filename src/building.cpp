@@ -61,6 +61,9 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
 
     update_locals_index_for_new_term(result);
 
+    if (is_get_state(result) || has_implicit_state(result))
+        mark_branch_as_having_inlined_state(branch);
+
     return result;
 }
 

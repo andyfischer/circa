@@ -7,6 +7,7 @@
 #include "evaluation.h"
 #include "importing_macros.h"
 #include "parser.h"
+#include "stateful_code.h"
 #include "source_repro.h"
 #include "storage.h"
 #include "tagged_value.h"
@@ -382,6 +383,8 @@ Branch* get_outer_scope(Branch const& branch)
 void safe_delete_branch_contents(Branch* branch)
 {
     assert_valid_branch(branch);
+    mark_branch_as_possibly_not_having_inlined_state(*branch);
+
     branch->names.clear();
 
     for (BranchIterator it(branch); it.unfinished(); ++it) {

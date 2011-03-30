@@ -155,7 +155,7 @@ void create_empty_type_then_populate_it()
     test_assert(branch);
     evaluate_branch(branch);
 
-    initialize_compound_type(branch["T"]);
+    initialize_compound_type(unbox_type(branch["T"]));
     evaluate_branch(branch);
     test_assert(branch);
 }

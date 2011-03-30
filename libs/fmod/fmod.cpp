@@ -7,11 +7,13 @@
 FMOD_SYSTEM *g_system = NULL;
 circa::Type *g_soundType = NULL;
 
+const int g_numChannels = 32;
+
 void initialize()
 {
     if (g_system == NULL) {
         FMOD_System_Create(&g_system);
-        FMOD_System_Init(g_system, 32, FMOD_INIT_NORMAL, NULL);
+        FMOD_System_Init(g_system, g_numChannels, FMOD_INIT_NORMAL, NULL);
     }
 }
 
@@ -41,9 +43,19 @@ CA_FUNCTION(play_sound)
     FMOD_RESULT result;
 
     FMOD_SOUND *sound = (FMOD_SOUND*) INPUT(0)->value_data.ptr;
-
     FMOD_CHANNEL *channel;
-    result = FMOD_System_PlaySound(g_system, FMOD_CHANNEL_FREE, sound, 0, &channel);
+
+    static int nextChannel = 0;
+    result = FMOD_System_PlaySound(g_system, (FMOD_CHANNELINDEX) nextChannel, sound, 0, &channel);
+    nextChannel++;
+    if (nextChannel >= g_numChannels)
+        nextChannel = 0;
+
+    // nextChannel is a big hack because I'm having trouble getting fmod to stop running out
+    // of channels.
+
+    if (result != FMOD_OK)
+        std::cout << "Error in FMOD_System_PlaySound: " << FMOD_ErrorString(result) << std::endl;
 }
 
 void setup(circa::Branch& kernel)

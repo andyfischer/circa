@@ -40,6 +40,11 @@ struct Branch
     // of the last time this was loaded.
     List fileSignature;
 
+    // Whether this branch has inlined state inside its contents or any nested contents.
+    // This value will either be a boolean, or a null (indicating that the value needs to
+    // be recalculated).
+    TaggedValue hasInlinedState;
+
     Branch();
     ~Branch();
 

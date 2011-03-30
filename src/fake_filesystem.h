@@ -8,7 +8,7 @@
 namespace circa {
 
 // Dummy class that implements StorageInterface. This class installs itself on construction
-// and deletes itself afterwards.
+// and deletes itself afterwards. This class is only meant for unit tests.
 struct FakeFileSystem
 {
     struct File {

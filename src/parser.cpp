@@ -655,7 +655,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         return compile_error_for_line(result, tokens, startPosition);
 
     // Parse as compound type
-    initialize_compound_type(result);
+    initialize_compound_type(unbox_type(result));
     int closingToken = tokens.nextIs(LBRACE) ? RBRACE : RBRACKET;
 
     tokens.consume();

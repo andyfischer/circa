@@ -34,6 +34,9 @@ void evaluate_single_term(EvalContext* context, Term* term)
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
     #endif
 
+    // For a test build, we check the type result of every single call. This is slow and
+    // it should be unnecessary if the function is written correctly. But it's a good
+    // test.
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred) {
         for (int i=0; i < get_output_count(term); i++) {
@@ -41,7 +44,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
             Type* outputType = unbox_type(get_output_type(term, i));
             TaggedValue* output = get_output(term, i);
 
-            // Temp special case, if the output type is void then we don't care
+            // Special case, if the function's output type is void then we don't care
             // if the output value is null or not.
             if (i == 0 && outputType == &VOID_T)
                 continue;
@@ -117,7 +120,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
 {
     evaluate_branch_no_preserve_locals(context, branch);
 
-    // Copy stack back to terms, for backwards compatibility
+    // Copy stack back to the original terms. Many tests depend on this functionality.
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;

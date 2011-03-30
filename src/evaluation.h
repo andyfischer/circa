@@ -36,16 +36,9 @@ struct EvalContext
     Dict messages;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
-
-    void clearError() {
-        errorOccurred = false;
-        errorTerm = NULL;
-        errorMessage = "";
-    }
 };
 
-// Evaluate a single term against the given stack. After this function, the caller
-// must reestablish any internal pointers to the contents of 'stack'.
+// Evaluate a single term.
 void evaluate_single_term(EvalContext* context, Term* term);
 
 void evaluate_branch_internal(EvalContext* context, Branch& branch);
@@ -61,12 +54,15 @@ void evaluate_branch(EvalContext* context, Branch& branch);
 // Shorthand to call evaluate_branch with a new EvalContext:
 void evaluate_branch(Branch& branch);
 
+// Evaluate only the terms between 'start' and 'end'.
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 
+// Evaluate 'term' and every term that it depends on.
 void evaluate_minimum(EvalContext* context, Term* term);
 
 TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
 
+// Get the input value for the given term and index.
 TaggedValue* get_input(Term* term, int index);
 
 // consume_input will assign 'dest' to the value of the given input. It may copy the
@@ -80,12 +76,20 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term, int outputIndex);
+
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);
+
+// Returns whether evaluation has been interrupted, such as with a 'return' or
+// 'break' statement, or a runtime error.
 bool evaluation_interrupted(EvalContext* context);
 
+// Start using the given branch- this will push a new frame onto the locals stack, if
+// the branch is already in use.
 void start_using(Branch& branch);
+
+// Finish using the given branch- this may pop a frame from the locals stack.
 void finish_using(Branch& branch);
 
 void clear_error(EvalContext* cxt);
