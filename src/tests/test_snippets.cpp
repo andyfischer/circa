@@ -565,6 +565,11 @@ void test_recursion_and_multiple_outputs()
         );
 }
 
+void test_left_arrow()
+{
+    test_snippet("a = (sqr <- 5)", "a == 25");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -603,6 +608,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_swap);
     REGISTER_TEST_CASE(test_snippets::test_subroutine_multiple_outputs);
     REGISTER_TEST_CASE(test_snippets::test_recursion_and_multiple_outputs);
+    REGISTER_TEST_CASE(test_snippets::test_left_arrow);
 }
 
 } // namespace test_snippets

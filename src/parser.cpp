@@ -1100,6 +1100,7 @@ int get_infix_precedence(int match)
     switch(match) {
         case token::TWO_DOTS:
         case token::RIGHT_ARROW:
+        case token::LEFT_ARROW:
             return 8;
         case token::STAR:
         case token::SLASH:
@@ -1125,7 +1126,6 @@ int get_infix_precedence(int match)
         case token::SLASH_EQUALS:
             return 2;
         case token::COLON_EQUALS:
-        case token::LEFT_ARROW:
         case token::EQUALS:
             return 0;
         default:
@@ -1195,6 +1195,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
         ParseResult result;
 
+        // Right-apply
         if (operatorStr == "->") {
             if (!tokens.nextIs(IDENTIFIER))
                 return compile_error_for_line(branch, tokens, startPosition);
@@ -1213,6 +1214,24 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
             set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
             // Can't use preWhitespace of input 1 here, because there is no input 1
             term->setStringProp("syntax:postOperatorWs", postOperatorWhitespace);
+
+            result = ParseResult(term);
+
+        // Left-arrow
+        } else if (operatorStr == "<-") {
+            ParseResult rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
+
+            if (!is_function(leftExpr.term))
+                throw std::runtime_error("Left side of <- must be a function");
+
+            EvalContext context;
+            evaluate_minimum(&context, leftExpr.term);
+
+            Term* function = leftExpr.term;
+
+            Term* term = apply(branch, function, RefList(rightExpr.term));
+
+            term->setStringProp("syntax:declarationStyle", "left-arrow");
 
             result = ParseResult(term);
 

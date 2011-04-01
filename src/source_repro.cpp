@@ -191,6 +191,12 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, term->stringPropOptional("syntax:postOperatorWs", ""),
                 term, phrase_type::WHITESPACE);
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
+    } else if (declarationStyle == "left-arrow") {
+        append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
+        append_phrase(source, "<-", term, phrase_type::UNDEFINED);
+        append_phrase(source, term->stringPropOptional("syntax:postOperatorWs", ""),
+                term, phrase_type::WHITESPACE);
+        format_source_for_input(source, term, 0);
     }
 
     for (int p=0; p < numParens; p++)
