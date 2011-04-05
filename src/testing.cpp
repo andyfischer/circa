@@ -83,12 +83,12 @@ void test_assert_function(Branch& branch, int line, const char* file)
         }
     }
 
-    StaticErrorCheck staticErrorCheck;
-    check_for_static_errors(&staticErrorCheck, branch);
-    if (!staticErrorCheck.empty()) {
+    List errors;
+    check_for_static_errors(&errors, branch);
+    if (!errors.empty()) {
         std::stringstream msg;
         msg << "Branch has static errors at " << file << ", line " << line << std::endl;
-        msg << staticErrorCheck.toString() << std::endl;
+        print_static_errors_formatted(&errors, msg);
         throw std::runtime_error(msg.str());
     }
 }

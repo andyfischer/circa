@@ -7,26 +7,11 @@
 
 namespace circa {
 
-struct StaticErrorCheck
-{
-    List errors;
-
-    // Structure of each item in errors:
-    //  [0] int index
-    //  [1] string type
-    //  [2] int inputIndex (only used for errors related to inputs)
-
-    int count() { return errors.length(); }
-    bool empty() { return count() == 0; }
-    std::string toString() { return errors.toString(); }
-};
-
-void check_for_static_errors(StaticErrorCheck* result, Branch& branch);
+void check_for_static_errors(List* result, Branch& branch);
 
 // Print each static error to 'out'. Returns true if there were any static errors.
-bool print_static_errors_formatted(StaticErrorCheck* result, std::ostream& out);
+bool print_static_errors_formatted(List* result, std::ostream& out);
 
-// Convenience methods, where the caller doesn't need to create a StaticErrorCheck object:
 bool has_static_error(Term* term);
 bool has_static_errors(Branch& branch);
 int count_static_errors(Branch& branch);

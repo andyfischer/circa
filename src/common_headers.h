@@ -42,7 +42,6 @@ struct Ref;
 struct RefList;
 struct ReferenceMap;
 struct StaticTypeQuery;
-struct StaticErrorCheck;
 struct StyledSource;
 struct TaggedValue;
 struct Term;

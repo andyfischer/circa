@@ -383,6 +383,7 @@ Branch* get_outer_scope(Branch const& branch)
 void safe_delete_branch_contents(Branch* branch)
 {
     assert_valid_branch(branch);
+    set_null(&branch->staticErrors);
     mark_branch_as_possibly_not_having_inlined_state(*branch);
 
     branch->names.clear();
