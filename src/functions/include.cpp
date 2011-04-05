@@ -23,6 +23,7 @@ namespace include_function {
 
             parse_script(contents, filename);
 
+            #if 0
             if (has_static_errors(contents)) {
                 error_occurred(cxt, caller, get_static_errors_formatted(contents));
 
@@ -34,6 +35,7 @@ namespace include_function {
                 }
                 return;
             }
+            #endif
 
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);
@@ -64,6 +66,10 @@ namespace include_function {
 
         if (CONTEXT->errorOccurred)
             return;
+
+        if (has_static_errors(contents))
+            return error_occurred(CONTEXT, CALLER,
+                    get_static_errors_formatted(contents));
 
         evaluate_branch_internal_with_state(CONTEXT, CALLER);
 

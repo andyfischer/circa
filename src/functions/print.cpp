@@ -8,7 +8,7 @@ namespace print_function {
     CA_FUNCTION(evaluate)
     {
         for (int i = 0; i < NUM_INPUTS; i++) {
-            if (INPUT(i)->value_type == unbox_type(STRING_TYPE))
+            if (is_string(INPUT(i)))
                 std::cout << as_string(INPUT(i));
             else
                 std::cout << INPUT(i)->toString();
