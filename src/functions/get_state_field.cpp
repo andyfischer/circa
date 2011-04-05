@@ -27,22 +27,24 @@ namespace get_state_field_function {
         const char* name = CALLER->name.c_str();
         TaggedValue* value = stateContainer->get(name);
 
-        // Check if 'value' fits our declared type. If not, then ignore it.
-        if (value && !cast_possible(value, declared_type(CALLER)))
-            value = NULL;
+        bool cast_success = false;
 
-        if (value) {
-            copy(value, OUTPUT);
+        // Try to cast 'value' to the declared type.
+        if (value != NULL)
+            cast_success = cast(value, declared_type(CALLER), OUTPUT);
 
-        // If we didn't find the value, see if they provided a default
-        } else if (INPUT(1) != NULL) {
-            copy(INPUT(1), OUTPUT);
+        if (!cast_success) {
 
-        // Otherwise, reset to default value of type
-        } else {
-            ca_assert(CALLER != NULL);
-            change_type(OUTPUT, unbox_type(CALLER->type));
-            reset(OUTPUT);
+            // If we didn't find the value, see if they provided a default
+            if (INPUT(1) != NULL) {
+                copy(INPUT(1), OUTPUT);
+
+            // Otherwise, reset to default value of type
+            } else {
+                ca_assert(CALLER != NULL);
+                change_type(OUTPUT, declared_type(CALLER));
+                reset(OUTPUT);
+            }
         }
     }
 

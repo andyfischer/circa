@@ -254,6 +254,27 @@ void test_branch_has_inlined_state()
     test_assert(!has_any_inlined_state(branch));
 }
 
+void test_state_var_needs_cast()
+{
+    Branch branch;
+
+    internal_debug_function::spy_clear();
+
+    branch.compile("state Point blah");
+    branch.compile("test_spy(blah.x)");
+    branch.compile("blah = [blah.x + 1, 0]");
+
+    EvalContext context;
+
+    evaluate_branch(&context, branch);
+    test_assert(!context.errorOccurred);
+
+    evaluate_branch(&context, branch);
+    test_assert(!context.errorOccurred);
+
+    test_equals(internal_debug_function::spy_results(), "[0.0, 1.0]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -270,6 +291,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_unique_name_usage);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_early_return);
     REGISTER_TEST_CASE(stateful_code_tests::test_branch_has_inlined_state);
+    REGISTER_TEST_CASE(stateful_code_tests::test_state_var_needs_cast);
 }
 
 } // namespace stateful_code_tests

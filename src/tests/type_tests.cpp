@@ -171,6 +171,20 @@ void test_copy_builtin_type()
     test_assert(branch);
 }
 
+void test_compound_type_cast()
+{
+    List a;
+    a.resize(2);
+    set_int(a[0], 0);
+    set_int(a[1], 1);
+
+    test_equals(&a, "[0, 1]");
+
+    TaggedValue b;
+    cast(&a, unbox_type(get_global("Point")), &b);
+    test_equals(&b, "[0.0, 1.0]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::type_declaration);
@@ -182,6 +196,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_create_implicit_tuple_type);
     REGISTER_TEST_CASE(type_tests::create_empty_type_then_populate_it);
     REGISTER_TEST_CASE(type_tests::test_copy_builtin_type);
+    REGISTER_TEST_CASE(type_tests::test_compound_type_cast);
 }
 
 } // namespace type_tests
