@@ -149,9 +149,7 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         case SDLK_e:
-            //reset_state(app::users_branch());
-            if (app::paused() && app::pause_reason() == PauseStatus::RUNTIME_ERROR)
-                app::unpause();
+            set_null(&app::singleton()._evalContext.state);
             break;
 
         case SDLK_r:

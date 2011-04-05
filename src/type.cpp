@@ -167,6 +167,8 @@ Type::~Type()
 
 Type* declared_type(Term* term)
 {
+    if (term->type == NULL)
+        return NULL;
     return unbox_type(term->type);
 }
 

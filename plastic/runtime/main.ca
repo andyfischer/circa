@@ -208,7 +208,7 @@ def draggable_rect(Point initial_location, Point size) -> Point
     state currently_dragging = false
     state Point mouse_offset = [0 0]
     if currently_dragging
-        location = mouse + mouse_offset
+        location = (mouse + mouse_offset) -> Point
         if not(mouse_pressed())
             currently_dragging = false
     elif mouse_clicked(rect)

@@ -1,0 +1,39 @@
+
+background(#fff)
+
+type BoxDefinition {
+  string name
+  Point loc
+  Point size
+  List connections
+}
+
+def draw_graph(List box_definitions)
+    state List box_positions
+
+    if once()
+        box_positions = []
+        for defi in box_definitions
+            @defi -> BoxDefinition
+            box_positions.append(defi.loc)
+
+    -- draw each box
+    index = 0
+    for defi in box_definitions
+        @defi -> BoxDefinition
+        pos = box_positions[index] -> Point
+
+        rect = to_rect(pos defi.size)
+
+        fill_rect(rect #38)
+        draw_rect(rect #333)
+
+        index += 1
+
+sample_input = [
+  ['Box1' [20 20] [80 30] ['Box2']]
+  ['Box2' [20 60] [80 30] []]
+  ]
+
+draw_graph(sample_input)
+

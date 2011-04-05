@@ -24,9 +24,8 @@ CA_FUNCTION(quit)
 
 CA_FUNCTION(reset_state)
 {
-    //reset_state(app::users_branch());
-    if (app::paused() && app::pause_reason() == PauseStatus::RUNTIME_ERROR)
-        app::unpause();
+    // no worky
+    //set_null(&app::singleton()._evalContext.state);
 }
 
 CA_FUNCTION(hosted_reload_runtime)

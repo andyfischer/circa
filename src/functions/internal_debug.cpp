@@ -64,6 +64,11 @@ namespace internal_debug_function {
         return &spyValues;
     }
 
+    CA_DEFINE_FUNCTION(dump_scope_state, "dump_scope_state() -> any")
+    {
+        copy(&CONTEXT->currentScopeState, OUTPUT);
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
