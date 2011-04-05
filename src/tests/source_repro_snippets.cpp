@@ -442,6 +442,8 @@ void reproduce_left_arrow() {
     round_trip_source("print <- 1");
     round_trip_source("print    <- 1");
     round_trip_source("print <-   1");
+    round_trip_source("print <- {\n 1 1 1 }");
+    finish_source_repro_category();
 }
 
 void register_tests() {

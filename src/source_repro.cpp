@@ -193,9 +193,9 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
     } else if (declarationStyle == "left-arrow") {
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
-        append_phrase(source, "<-", term, phrase_type::UNDEFINED);
-        append_phrase(source, term->stringPropOptional("syntax:postOperatorWs", ""),
+        append_phrase(source, term->stringPropOptional("syntax:preOperatorWs", ""),
                 term, phrase_type::WHITESPACE);
+        append_phrase(source, "<-", term, phrase_type::UNDEFINED);
         format_source_for_input(source, term, 0);
     }
 

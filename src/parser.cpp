@@ -1232,6 +1232,8 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
             Term* term = apply(branch, function, RefList(rightExpr.term));
 
             term->setStringProp("syntax:declarationStyle", "left-arrow");
+            term->setStringProp("syntax:preOperatorWs", preOperatorWhitespace);
+            set_input_syntax_hint(term, 0, "preWhitespace", postOperatorWhitespace);
 
             result = ParseResult(term);
 
