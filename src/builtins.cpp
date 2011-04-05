@@ -50,6 +50,7 @@ Term* DESIRED_VALUE_FEEDBACK = NULL;
 Term* DISCARD_FUNC = NULL;
 Term* DIV_FUNC = NULL;
 Term* DO_ONCE_FUNC = NULL;
+Term* ERRORED_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FINISH_MINOR_BRANCH_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
@@ -110,17 +111,18 @@ Term* OPAQUE_POINTER_TYPE;
 
 } // extern "C"
 
-Type TYPE_T;
 Type BOOL_T;
 Type DICT_T;
+Type ERROR_T;
 Type FLOAT_T;
 Type INT_T;
 Type LIST_T;
 Type NULL_TYPE;
-Type STRING_T;
-Type REF_T;
-Type VOID_T;
 Type OPAQUE_POINTER_T;
+Type REF_T;
+Type STRING_T;
+Type TYPE_T;
+Type VOID_T;
 
 Type* FILE_SIGNATURE_T;
 
@@ -143,6 +145,9 @@ void create_primitive_types()
     list_t::setup_type(&LIST_T);
     void_t::setup_type(&VOID_T);
     opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
+
+    // errors are just stored as strings for now
+    string_t::setup_type(&ERROR_T);
 }
 
 void bootstrap_kernel()

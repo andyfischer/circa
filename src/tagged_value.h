@@ -109,6 +109,7 @@ void* as_opaque_pointer(TaggedValue* value);
 Type& as_type(TaggedValue* value);
 
 bool is_int(TaggedValue* value);
+bool is_error(TaggedValue* value);
 bool is_float(TaggedValue* value);
 bool is_bool(TaggedValue* value);
 bool is_string(TaggedValue* value);

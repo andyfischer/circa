@@ -511,7 +511,7 @@ float as_float(TaggedValue* value)
 
 std::string const& as_string(TaggedValue* value)
 {
-    ca_assert(is_string(value));
+    ca_assert(is_string(value) || is_error(value));
     return *((std::string*) value->value_data.ptr);
 }
 
@@ -576,32 +576,32 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
 
 bool is_int(TaggedValue* value)
 {
-    return INT_TYPE != NULL
-        && value->value_type == (Type*) INT_TYPE->value_data.ptr;
+    return INT_TYPE != NULL && value->value_type == unbox_type(INT_TYPE);
+}
+
+bool is_error(TaggedValue* value)
+{
+    return value->value_type == &ERROR_T;
 }
 
 bool is_float(TaggedValue* value)
 {
-    return FLOAT_TYPE != NULL
-        && value->value_type == (Type*) FLOAT_TYPE->value_data.ptr;
+    return FLOAT_TYPE != NULL && value->value_type == unbox_type(FLOAT_TYPE);
 }
 
 bool is_bool(TaggedValue* value)
 {
-    return BOOL_TYPE != NULL
-        && value->value_type == (Type*) BOOL_TYPE->value_data.ptr;
+    return BOOL_TYPE != NULL && value->value_type == unbox_type(BOOL_TYPE);
 }
 
 bool is_string(TaggedValue* value)
 {
-    return STRING_TYPE != NULL
-        && value->value_type == (Type*) STRING_TYPE->value_data.ptr;
+    return STRING_TYPE != NULL && value->value_type == unbox_type(STRING_TYPE);
 }
 
 bool is_ref(TaggedValue* value)
 {
-    return REF_TYPE != NULL
-        && value->value_type == (Type*) REF_TYPE->value_data.ptr;
+    return REF_TYPE != NULL && value->value_type == unbox_type(REF_TYPE);
 }
 
 bool is_opaque_pointer(TaggedValue* value)
@@ -616,8 +616,7 @@ bool is_list(TaggedValue* value)
 
 bool is_type(TaggedValue* value)
 {
-    return TYPE_TYPE != NULL
-        && value->value_type == (Type*) TYPE_TYPE->value_data.ptr;
+    return TYPE_TYPE != NULL && value->value_type == unbox_type(TYPE_TYPE);
 }
 
 bool is_value_of_type(TaggedValue* value, Type* type)

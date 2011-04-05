@@ -26,6 +26,7 @@ extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DISCARD_FUNC;
 extern Term* DIV_FUNC;
 extern Term* DO_ONCE_FUNC;
+extern Term* ERRORED_FUNC;
 extern Term* FEEDBACK_FUNC;
 extern Term* FINISH_MINOR_BRANCH_FUNC;
 extern Term* FREEZE_FUNC;
@@ -88,15 +89,16 @@ extern Term* OPAQUE_POINTER_TYPE;
 
 extern Type BOOL_T;
 extern Type DICT_T;
+extern Type ERROR_T;
 extern Type FLOAT_T;
 extern Type INT_T;
 extern Type LIST_T;
 extern Type NULL_TYPE;
-extern Type STRING_T;
+extern Type OPAQUE_POINTER_T;
 extern Type REF_T;
+extern Type STRING_T;
 extern Type TYPE_T;
 extern Type VOID_T;
-extern Type OPAQUE_POINTER_T;
 
 extern Type* FILE_SIGNATURE_T;
 

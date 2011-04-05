@@ -11,6 +11,8 @@
 #include "type.h"
 
 namespace circa {
+
+#if 0
 namespace new_string_t {
 
 struct StringData {
@@ -68,6 +70,8 @@ StringData* touch(StringData* original)
 }
 
 } // namespace string_t
+
+#endif
 
 namespace string_t {
 

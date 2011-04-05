@@ -66,9 +66,7 @@ namespace format_source_for_graph_function {
             // item[3]: PhraseLink[] inputs
             // item[4]: PhraseLink[] users
             List& statementInputs = *List::cast(statement[3], 0);
-            List& statementUsers = *List::cast(statement[4], 0);
-
-            statementUsers; // temp, prevent warning
+            //List& statementUsers = *List::cast(statement[4], 0);
 
             // item[0]: Phrase[] phrases
             List& phrases = *List::cast(statement[0], 0);
