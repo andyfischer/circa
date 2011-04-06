@@ -123,6 +123,7 @@ void test_remove_index()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(list_tests::test_tagged_value);
     REGISTER_TEST_CASE(list_tests::test_cast);
     REGISTER_TEST_CASE(list_tests::test_remove_nulls);
     REGISTER_TEST_CASE(list_tests::test_remove_index);

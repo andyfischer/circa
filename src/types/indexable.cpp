@@ -5,15 +5,19 @@
 namespace circa {
 namespace indexable_t {
 
-    bool is_subtype(Type* type, Type* otherType)
+    void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {
-        return otherType->getIndex != NULL
-            && otherType->numElements != NULL;
+        Type* subjectType = declared_type(query->subject);
+        if (subjectType->getIndex != NULL
+                && subjectType->numElements != NULL)
+            query->succeed();
+        else
+            query->fail();
     }
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->isSubtype = is_subtype;
+        type->staticTypeQuery = staticTypeQuery;
     }
 }
 }

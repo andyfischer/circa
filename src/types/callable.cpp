@@ -5,15 +5,18 @@
 namespace circa {
 namespace callable_t {
 
-    bool is_subtype(Type* type, Type* otherType)
+    void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {
-        return otherType == unbox_type(FUNCTION_TYPE)
-            || otherType == unbox_type(TYPE_TYPE);
+        if (declared_type(query->subject) == unbox_type(FUNCTION_TYPE)
+                || declared_type(query->subject) == unbox_type(TYPE_TYPE))
+            query->succeed();
+        else
+            query->fail();
     }
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->isSubtype = is_subtype;
+        type->staticTypeQuery = staticTypeQuery;
     }
 }
 }

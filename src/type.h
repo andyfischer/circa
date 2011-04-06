@@ -42,7 +42,6 @@ struct Type
     typedef void (*Cast)(CastResult* result, TaggedValue* source, Type* type,
             TaggedValue* dest, bool checkOnly);
 
-    typedef bool (*IsSubtype)(Type* type, Type* otherType);
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef std::string (*ToString)(TaggedValue* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
@@ -69,7 +68,6 @@ struct Type
     Reset reset;
     Equals equals;
     Cast cast;
-    IsSubtype isSubtype;
     StaticTypeQueryFunc staticTypeQuery;
     ToString toString;
     FormatSource formatSource;
@@ -135,14 +133,23 @@ struct StaticTypeQuery
         FAIL,
         UNABLE_TO_DETERMINE
     };
-        
-    // Inputs
-    Term* targetTerm;
+
+    // The type that we are checking against.
+    Type* type;
+
+    // The term that is being checked. The query will check to see if all the
+    // outputs from this subject conform to the type. This is sometimes NULL
+    // (such as for compound type checks)
+    Term* subject;
+
+    // The type of the subject. This is always available even if 'subject' is NULL.
+    Type* subjectType;
     
     // Outputs
     Result result;
 
-    StaticTypeQuery() : targetTerm(NULL), result(NULL_RESULT) {}
+    StaticTypeQuery() : type(NULL), subject(NULL), subjectType(NULL),
+        result(NULL_RESULT) {}
 
     void fail() { result = FAIL; }
     void succeed() { result = SUCCEED; }
@@ -178,9 +185,9 @@ Term* get_output_type(Term* term, int outputIndex);
 Term* get_output_type(Term* term);
 Term* get_type_of_input(Term* term, int inputIndex);
 
+StaticTypeQuery::Result run_static_type_query(Type* type, Term* term);
 bool term_output_always_satisfies_type(Term* term, Type* type);
 bool term_output_never_satisfies_type(Term* term, Type* type);
-bool is_subtype(Type* type, Type* subType);
 
 void reset_type(Type* type);
 void initialize_simple_pointer_type(Type* type);

@@ -496,62 +496,55 @@ namespace list_t {
         set_pointer(value, touch(data));
     }
 
-    void tv_static_type_query(Type* type, StaticTypeQuery* result)
+    void tv_static_type_query(Type* type, StaticTypeQuery* query)
     {
-        Term* term = result->targetTerm;
+        Term* subject = query->subject;
         Branch& prototype = type->prototype;
         
         // If prototype is empty then accept any list
         if (prototype.length() == 0) {
-            if (is_list_based_type(unbox_type(term->type)))
-                return result->succeed();
+            if (is_list_based_type(unbox_type(subject->type)))
+                return query->succeed();
             else
-                return result->fail();
+                return query->fail();
         }
 
-        // Inspect a call to list(), look at inputs instead of looking at the result.
-        if (term->function == LIST_FUNC)
+        // Special case when looking at a call to list(); look at inputs instead of
+        // looking at the result.
+        if (subject->function == LIST_FUNC)
         {
-            if (term->numInputs() != prototype.length())
-                return result->fail();
+            if (subject->numInputs() != prototype.length())
+                return query->fail();
 
             for (int i=0; i < prototype.length(); i++)
                 if (!circa::term_output_always_satisfies_type(
-                            term->input(i), unbox_type(prototype[i]->type)))
-                    return result->fail();
+                            subject->input(i), unbox_type(prototype[i]->type)))
+                    return query->fail();
 
-            return result->succeed();
+            return query->succeed();
         }
 
-        if (is_subtype(type, unbox_type(term->type)))
-            return result->succeed();
+        // Look at the subject's prototype.
+        Branch& subjectPrototype = query->subjectType->prototype;
+
+        bool anyUnableToDetermine = false;
+
+        for (int i=0; i < prototype.length(); i++) {
+            StaticTypeQuery::Result result = run_static_type_query(
+                    declared_type(prototype[i]), subjectPrototype[i]);
+
+            // If any of these fail, then fail.
+            if (result == StaticTypeQuery::FAIL)
+                return query->fail();
+
+            if (result == StaticTypeQuery::UNABLE_TO_DETERMINE)
+                anyUnableToDetermine = true;
+        }
+
+        if (anyUnableToDetermine)
+            return query->unableToDetermine();
         else
-            return result->fail();
-    }
-
-    bool tv_is_subtype(Type* type, Type* otherType)
-    {
-        if (!is_list_based_type(otherType))
-            return false;
-
-        // Check if our type has a prototype. If there's no prototype
-        // then any list can be a subtype.
-        Branch& prototype = type->prototype;
-
-        if (prototype.length() == 0)
-            return true;
-
-        Branch& otherPrototype = otherType->prototype;
-        if (prototype.length() != otherType->prototype.length())
-            return false;
-
-        // Check each element
-        for (int i=0; i < prototype.length(); i++)
-            if (!circa::is_subtype(unbox_type(prototype[i]->type),
-                        unbox_type(otherPrototype[i]->type)))
-                return false;
-
-        return true;
+            return query->succeed();
     }
 
     bool tv_cast_possible(Type* type, TaggedValue* value)
@@ -599,7 +592,6 @@ namespace list_t {
         type->numElements = tv_num_elements;
         type->touch = tv_touch;
         type->staticTypeQuery = tv_static_type_query;
-        type->isSubtype = tv_is_subtype;
     }
 
     CA_FUNCTION(append)

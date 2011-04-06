@@ -181,10 +181,7 @@ void bootstrap_kernel()
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = TYPE_TYPE;
     change_type(ANY_TYPE, &TYPE_T);
-    as_type(ANY_TYPE).name = "any";
-    as_type(ANY_TYPE).toString = any_t::to_string;
-    as_type(ANY_TYPE).isSubtype = any_t::matches_type;
-    as_type(ANY_TYPE).cast = any_t::cast;
+    any_t::setup_type(unbox_type(ANY_TYPE));
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create FunctionAttrs type

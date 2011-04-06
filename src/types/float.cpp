@@ -48,10 +48,13 @@ namespace float_t {
         else
             return result;
     }
-    bool is_subtype(Type* type, Type* otherType)
+    void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {
-        return otherType == unbox_type(FLOAT_TYPE)
-            || otherType == unbox_type(INT_TYPE);
+        if (query->subjectType == unbox_type(FLOAT_TYPE)
+                || query->subjectType == unbox_type(INT_TYPE))
+            query->succeed();
+        else
+            query->fail();
     }
 
     std::string to_source_string(Term* term)
@@ -100,7 +103,7 @@ namespace float_t {
         type->reset = reset;
         type->cast = cast;
         type->equals = equals;
-        type->isSubtype = is_subtype;
+        type->staticTypeQuery = staticTypeQuery;
         type->toString = to_string;
         type->formatSource = format_source;
     }

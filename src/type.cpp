@@ -139,7 +139,6 @@ Type::Type() :
     reset(NULL),
     equals(NULL),
     cast(NULL),
-    isSubtype(NULL),
     staticTypeQuery(NULL),
     toString(NULL),
     formatSource(NULL),
@@ -223,55 +222,67 @@ Type* unbox_type(TaggedValue* val)
     return (Type*) val->value_data.ptr;
 }
 
-static void run_static_type_query(Type* type, Term* outputTerm, StaticTypeQuery* result)
+static void run_static_type_query(StaticTypeQuery* query)
 {
-    // Always succeed if types are the same
-    if (declared_type(outputTerm) == type)
-        return result->succeed();
+    // Check that the subject term and subjectType match.
+    if (query->subject && query->subjectType)
+        ca_assert(query->subjectType == declared_type(query->subject));
+
+    ca_assert(query->type);
+
+    // Check that either subject or subjectType are provided.
+    ca_assert(query->subjectType || query->subject);
+
+    // Populate subjectType from subject if missing.
+    if (query->subjectType == NULL)
+        query->subjectType = declared_type(query->subject);
+
+    // Always succeed if types are the same.
+    if (query->subjectType == query->type)
+        return query->succeed();
 
     // If output term is ANY type then we cannot statically determine.
-    if (outputTerm->type == ANY_TYPE)
-        return result->unableToDetermine();
+    if (query->subjectType == unbox_type(ANY_TYPE))
+        return query->unableToDetermine();
 
     // Try using the type's static query func
-    Type::StaticTypeQueryFunc staticTypeQueryFunc = type->staticTypeQuery;
+    Type::StaticTypeQueryFunc staticTypeQueryFunc = query->type->staticTypeQuery;
     if (staticTypeQueryFunc != NULL) {
-        result->targetTerm = outputTerm;
-        staticTypeQueryFunc(type, result);
+        staticTypeQueryFunc(query->type, query);
         return;
     }
 
-    // Finally, use is_subtype
-    if (is_subtype(type, unbox_type(outputTerm->type)))
-        return result->succeed();
-    else
-        return result->fail();
+    // No static query function, and we know that the types are not equal, so
+    // default behavior here is to fail.
+    return query->fail();
+}
+
+StaticTypeQuery::Result run_static_type_query(Type* type, Term* term)
+{
+    StaticTypeQuery query;
+    query.subject = term;
+    query.type = type;
+    run_static_type_query(&query);
+    return query.result;
 }
 
 bool term_output_always_satisfies_type(Term* term, Type* type)
 {
-    StaticTypeQuery obj;
-    run_static_type_query(type, term, &obj);
-    return obj.result == StaticTypeQuery::SUCCEED;
+    return run_static_type_query(type, term) == StaticTypeQuery::SUCCEED;
 }
 
 bool term_output_never_satisfies_type(Term* term, Type* type)
 {
-    StaticTypeQuery obj;
-    run_static_type_query(type, term, &obj);
-    return obj.result == StaticTypeQuery::FAIL;
+    return run_static_type_query(type, term) == StaticTypeQuery::FAIL;
 }
 
-bool is_subtype(Type* type, Type* subType)
+bool type_is_static_subset_of_type(Type* superType, Type* subType)
 {
-    if (type == subType)
-        return true;
-
-    Type::IsSubtype isSubtype = type->isSubtype;
-    if (isSubtype == NULL)
-        return false;
-
-    return isSubtype(type, subType);
+    StaticTypeQuery query;
+    query.type = superType;
+    query.subjectType = subType;
+    run_static_type_query(&query);
+    return query.result != StaticTypeQuery::FAIL;
 }
 
 void reset_type(Type* type)
@@ -286,7 +297,6 @@ void reset_type(Type* type)
     type->toString = NULL;
     type->formatSource = NULL;
     type->checkInvariants = NULL;
-    type->isSubtype = NULL;
     type->staticTypeQuery = NULL;
     type->touch = NULL;
     type->getIndex = NULL;

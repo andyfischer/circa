@@ -69,7 +69,6 @@ void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doCopy);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 std::string to_string_annotated(TaggedValue* value);
-bool matches_type(Type* type, Term* term);
 int num_elements(TaggedValue* value);
 void touch(TaggedValue* value);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);

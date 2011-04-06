@@ -82,7 +82,7 @@ namespace ref_t {
 
         TaggedValue* source = INPUT(1);
 
-        if (!is_subtype(source->value_type, declared_type(target))) {
+        if (!cast_possible(source, declared_type(target))) {
             error_occurred(CONTEXT, CALLER, "Can't assign, type mismatch");
             return;
         }

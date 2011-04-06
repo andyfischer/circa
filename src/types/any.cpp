@@ -9,9 +9,9 @@ namespace any_t {
     {
         return "<any>";
     }
-    bool matches_type(Type*, Type*)
+    void staticTypeQuery(Type*, StaticTypeQuery* query)
     {
-        return true;
+        return query->succeed();
     }
     void cast(CastResult* result, TaggedValue* source, Type* type,
         TaggedValue* dest, bool checkOnly)
@@ -21,6 +21,13 @@ namespace any_t {
             return;
 
         copy(source, dest);
+    }
+    void setup_type(Type* type)
+    {
+        type->name = "any";
+        type->toString = to_string;
+        type->staticTypeQuery = staticTypeQuery;
+        type->cast = cast;
     }
 
 } // namespace any_t
