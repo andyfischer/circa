@@ -64,7 +64,7 @@ namespace overloaded_function {
                 TaggedValue* value = INPUT(i);
                 if (value == NULL)
                     continue;
-                if (!value_fits_type(value, type)) {
+                if (!cast_possible(value, type)) {
                     inputsMatch = false;
                     break;
                 }

@@ -19,7 +19,7 @@ bool check_invariants(Term* term, std::string& result)
 
         bool typeOk = (term->type == ANY_TYPE)
             || (term->type == VOID_TYPE && is_null(term))
-            || value_fits_type(term, unbox_type(term->type));
+            || cast_possible(term, unbox_type(term->type));
 
         if (!typeOk) {
             result = "Value has wrong type: term->type is " + term->type->name + ", tag is "

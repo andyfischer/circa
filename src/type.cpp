@@ -141,7 +141,6 @@ Type::Type() :
     cast(NULL),
     isSubtype(NULL),
     staticTypeQuery(NULL),
-    valueFitsType(NULL),
     toString(NULL),
     formatSource(NULL),
     touch(NULL),
@@ -224,18 +223,6 @@ Type* unbox_type(TaggedValue* val)
     return (Type*) val->value_data.ptr;
 }
 
-bool value_fits_type(TaggedValue* value, Type* type)
-{
-    if (is_subtype(type, value->value_type))
-        return true;
-
-    Type::ValueFitsType func = type->valueFitsType;
-    if (func != NULL)
-        return func(type, value);
-
-    return false;
-}
-
 static void run_static_type_query(Type* type, Term* outputTerm, StaticTypeQuery* result)
 {
     // Always succeed if types are the same
@@ -299,7 +286,6 @@ void reset_type(Type* type)
     type->toString = NULL;
     type->formatSource = NULL;
     type->checkInvariants = NULL;
-    type->valueFitsType = NULL;
     type->isSubtype = NULL;
     type->staticTypeQuery = NULL;
     type->touch = NULL;

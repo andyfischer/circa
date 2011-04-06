@@ -554,7 +554,7 @@ namespace list_t {
         return true;
     }
 
-    bool tv_value_fits_type(Type* type, TaggedValue* value)
+    bool tv_cast_possible(Type* type, TaggedValue* value)
     {
         if (!is_list(value))
             return false;
@@ -568,7 +568,7 @@ namespace list_t {
             return false;
 
         for (int i=0; i < numElements; i++)
-            if (!circa::value_fits_type(value->getIndex(i),
+            if (!circa::cast_possible(value->getIndex(i),
                         unbox_type(prototype[i]->type)))
                 return false;
         return true;
@@ -600,7 +600,6 @@ namespace list_t {
         type->touch = tv_touch;
         type->staticTypeQuery = tv_static_type_query;
         type->isSubtype = tv_is_subtype;
-        type->valueFitsType = tv_value_fits_type;
     }
 
     CA_FUNCTION(append)

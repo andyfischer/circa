@@ -142,8 +142,8 @@ void test_create_implicit_tuple_type()
     TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
     TaggedValue* b = branch.eval("['hi', 3.0, 1]");
 
-    test_assert(value_fits_type(a, unbox_type(result)));
-    test_assert(!value_fits_type(b, unbox_type(result)));
+    test_assert(cast_possible(a, unbox_type(result)));
+    test_assert(!cast_possible(b, unbox_type(result)));
 }
 
 void create_empty_type_then_populate_it()

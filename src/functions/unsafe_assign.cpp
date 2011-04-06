@@ -14,7 +14,7 @@ namespace unsafe_assign_function {
         Term* destination = INPUT_TERM(0);
         Term* source = INPUT_TERM(1);
 
-        if (!value_fits_type(source, declared_type(destination))) {
+        if (!cast_possible(source, declared_type(destination))) {
             error_occurred(CONTEXT, CALLER,
                     "Tried to assign a " + source->type->name + " to a "
                     + destination->type->name);

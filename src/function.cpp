@@ -408,7 +408,7 @@ bool inputs_fit_function_dynamic(Term* func, RefList const& inputs)
         TaggedValue* value = inputs[i];
         if (value == NULL)
             continue;
-        if (!value_fits_type(value, type))
+        if (!cast_possible(value, type))
             return false;
     }
     return true;
@@ -427,7 +427,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
         TaggedValue* value = list->get(i);
         if (value == NULL)
             continue;
-        if (!value_fits_type(value, type))
+        if (!cast_possible(value, type))
             return false;
     }
     return true;

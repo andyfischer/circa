@@ -44,7 +44,6 @@ struct Type
 
     typedef bool (*IsSubtype)(Type* type, Type* otherType);
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
-    typedef bool (*ValueFitsType)(Type* type, TaggedValue* value);
     typedef std::string (*ToString)(TaggedValue* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
     typedef void (*Touch)(TaggedValue* value);
@@ -72,7 +71,6 @@ struct Type
     Cast cast;
     IsSubtype isSubtype;
     StaticTypeQueryFunc staticTypeQuery;
-    ValueFitsType valueFitsType;
     ToString toString;
     FormatSource formatSource;
     Touch touch;
@@ -180,7 +178,6 @@ Term* get_output_type(Term* term, int outputIndex);
 Term* get_output_type(Term* term);
 Term* get_type_of_input(Term* term, int inputIndex);
 
-bool value_fits_type(TaggedValue* value, Type* type);
 bool term_output_always_satisfies_type(Term* term, Type* type);
 bool term_output_never_satisfies_type(Term* term, Type* type);
 bool is_subtype(Type* type, Type* subType);

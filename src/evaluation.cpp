@@ -50,7 +50,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
                 continue;
 
             std::stringstream msg;
-            if (!value_fits_type(output, outputType)) {
+            if (!cast_possible(output, outputType)) {
                 msg << "Function " << term->function->name << " produced output "
                     << output->toString() << " (in index " << i << ")"
                     << " which doesn't fit output type "

@@ -282,7 +282,7 @@ void initialize_compound_types(Branch& kernel)
     Term* set_type = create_compound_type(kernel, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-    Term* map_type = create_compound_type(kernel, "Map");
+    Term* map_type = parse_type(kernel, "type Map;");
     hashtable_t::setup_type(unbox_type(map_type));
 
     Term* styledSourceType = parse_type(kernel, "type StyledSource;");
