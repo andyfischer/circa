@@ -57,8 +57,6 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
     if (format != NULL) {
         append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
                 format, phrase_type::WHITESPACE);
-        if (format->boolPropOptional("syntax:explicitEnd", false))
-            append_phrase(source, "end", format, phrase_type::UNDEFINED);
     }
 
     if (styleBraces)

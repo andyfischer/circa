@@ -43,11 +43,11 @@ void test_input(std::string const& in)
 void test_runtime_errors()
 {
     test_input("assert(false)");
-    test_input("if true assert(false) end");
-    test_input("for i in [1] assert(false) end");
-    test_input("def hey() assert(false) end; hey()");
-    test_input("def hey() -> bool assert(false) return true end; if hey() end");
-    test_input("def hey() -> List assert(false) return [] end; hey()");
+    test_input("if true { assert(false) }");
+    test_input("for i in [1] { assert(false) }");
+    test_input("def hey() { assert(false) } hey()");
+    test_input("def hey() -> bool { assert(false) return true } if hey() {}");
+    test_input("def hey() -> List { assert(false) return [] } hey()");
 
     test_input("'string' -> number");
 }

@@ -59,7 +59,7 @@ void test_get_relative_name_from_hidden_branch()
 {
     // This code once had a bug
     Branch branch;
-    branch.eval("if true; a = 1; else; a = 2; end");
+    branch.eval("if true { a = 1 } else { a = 2 }");
 
     test_equals(get_relative_name(branch, branch["a"]), "a");
 }
@@ -123,7 +123,7 @@ void test_get_named_at_after_if_block()
 {
     Branch branch;
     Term* originalA = branch.compile("a = 1");
-    branch.compile("if true; a = 2; end");
+    branch.compile("if true { a = 2 }");
     Term* b = branch.compile("b = 1");
     test_assert(branch["a"] != originalA); // sanity check
     test_assert(get_named_at(b, "a") != originalA);

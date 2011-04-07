@@ -87,9 +87,9 @@ void register_every_possible_parse_error()
     register_input("a = [1]; a[0");
     register_input("a()");
     register_input("a = 1; a()");
-    register_input("def func() -> NonexistantType end");
+    register_input("def func() -> NonexistantType {}");
     register_input("nonexistant = nonexistant + 1");
-    register_input("for i in 0..1 print([0 [0 ]) end");
+    register_input("for i in 0..1 { print([0 [0 ]) }");
     register_input("a = 1; a = x");
 }
 

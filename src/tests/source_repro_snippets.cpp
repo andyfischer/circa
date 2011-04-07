@@ -198,22 +198,22 @@ void reproduce_if() {
     round_trip_source("if true       { 1 }");
     round_trip_source("if true {     1 }");
     round_trip_source("if 5.0 > 3.0 { print('hey') }");
-    round_trip_source("if true else end");
-    round_trip_source("  if true else end");
-    round_trip_source("if true   else end");
-    round_trip_source("if true   else end");
-    round_trip_source("if true else   end");
-    round_trip_source("if true else   end");
-    round_trip_source("if true else end  ");
-    round_trip_source("if true elif true end  ");
-    round_trip_source("if true   elif true end");
-    round_trip_source("if true elif true   end");
-    round_trip_source("if true elif true else end");
-    round_trip_source("if true elif true   else end");
-    round_trip_source("if 1 > 2 print('hi') elif 2 > 3   elif 3 > 4 print('hello') end");
+    round_trip_source("if true {} else {}");
+    round_trip_source("  if true {} else {}");
+    round_trip_source("if true   else {}");
+    round_trip_source("if true   else {}");
+    round_trip_source("if true else   {}");
+    round_trip_source("if true else   {}");
+    round_trip_source("if true else {}  ");
+    round_trip_source("if true elif true {}  ");
+    round_trip_source("if true   elif true {}");
+    round_trip_source("if true elif true   {}");
+    round_trip_source("if true elif true else {}");
+    round_trip_source("if true elif true   else {}");
+    round_trip_source("if 1 > 2 { print('hi') } elif 2 > 3 {}  elif 3 > 4 { print('hello') }");
     round_trip_source("if true { 1 2 3 }");
-    round_trip_source("if true;1 2 3 end");
-    round_trip_source("if true; a = 1; else; a = 2; end; b = a"); // once had a bug
+    round_trip_source("if true{1 2 3 }");
+    round_trip_source("if true{ a = 1} else { a = 2 }; b = a"); // once had a bug
     finish_source_repro_category();
 }
 
@@ -237,48 +237,42 @@ void reproduce_lists() {
 }
 
 void reproduce_for_loop() {
-    round_trip_source("for x in 0..1 end");
-    round_trip_source("  for x in 0..1 end");
-    round_trip_source("for x in [5] end");
-    round_trip_source("for x in [1  ,2 ;3 ] end");
+    round_trip_source("for x in 0..1 {}");
+    round_trip_source("  for x in 0..1 {}");
+    round_trip_source("for x in [5] {}");
+    round_trip_source("for x in [1  ,2 ;3 ] {}");
     round_trip_source("for x in [1]\n  print(x)");
     round_trip_source("l = [1]\nfor x in l");
     round_trip_source("l = [1]\nfor x in l\n  x += 3");
-    round_trip_source("for x in [1];end");
-    round_trip_source("for x in [1],end");
-    round_trip_source("for x in [1]    ;end");
-    round_trip_source("for x in [1];   end");
-    round_trip_source("for x in [1]   end");
-    round_trip_source("for x in [1] print(1)  end");
-    round_trip_source("for x in [1] { print(1) } end");
-    round_trip_source("l = [1]; for x in @l x += 1 end");
+    round_trip_source("for x in [1]   {}");
+    round_trip_source("for x in [1] { print(1)  }");
+    round_trip_source("for x in [1] { print(1) } ");
+    round_trip_source("l = [1]; for x in @l { x += 1 }");
     round_trip_source("a = for x in [1] { x + 1 }");
     finish_source_repro_category();
 }
 
 void reproduce_subroutine() {
-    round_trip_source("def hi() end");
-    round_trip_source("def hi2() -> int end");
-    round_trip_source("def hi2()->int end");
-    round_trip_source("def hi3(int a) end");
+    round_trip_source("def hi() {}");
+    round_trip_source("def hi2() -> int {}");
+    round_trip_source("def hi2()->int {}");
+    round_trip_source("def hi3(int a) {}");
     round_trip_source("def hi4() -> int\n  return(1)");
-    round_trip_source("def hi()->int;return(1);end");
-    round_trip_source("def hi()->int  ;return(1);end");
-    round_trip_source("def hi()->int return(add(sub(1,1),1)) end");
-    round_trip_source("def hi();1;end");
-    round_trip_source("def hi() ;1;end");
-    round_trip_source("def hi(); 1;end");
-    round_trip_source("def hi()   end");
-    round_trip_source("def hi() 1  end");
-    round_trip_source("def hi(int)  end");
+    round_trip_source("def hi()->int{return(1)}");
+    round_trip_source("def hi()->int  {return(1)}");
+    round_trip_source("def hi()->int { return(add(sub(1,1),1)) }");
+    round_trip_source("def hi() {1}");
+    round_trip_source("def hi()   {}");
+    round_trip_source("def hi() { 1  }");
+    round_trip_source("def hi(int)  {}");
     round_trip_source("def hi(int) {}");
     round_trip_source("def hi(int) {   }");
     round_trip_source("def hi(int) { 1 }");
-    round_trip_source("def hi(number, string, bool)  end");
-    round_trip_source("type Point { number x, number y }\ndef hi() -> Point return([0 0]) end");
-    round_trip_source("def hi() if true return(1) else return(2) end end");
-    round_trip_source("def hi() x = 1 if true return(x) else return(x) end end");
-    round_trip_source("def my_func(int...) -> int end");
+    round_trip_source("def hi(number, string, bool)  {}");
+    round_trip_source("type Point { number x, number y }\ndef hi() -> Point { return([0 0]) }");
+    round_trip_source("def hi() { if true { return(1) } else { return(2) } }");
+    round_trip_source("def hi() { x = 1 if true { return(x) } else { return(x) }}");
+    round_trip_source("def my_func(int...) -> int {}");
     finish_source_repro_category();
 }
 
@@ -324,36 +318,28 @@ void reproduce_type_decl() {
 }
 
 void reproduce_do_once() {
-    round_trip_source("do once end");
+    round_trip_source("do once {}");
     round_trip_source("do once\n print(1)");
-    round_trip_source("do once; print(1); end");
-    round_trip_source("do once , print(1); end");
-    round_trip_source("do once     end");
-    round_trip_source("do once  1 2 3    end");
+    round_trip_source("do once { print(1) }");
+    round_trip_source("do once     {}");
+    round_trip_source("do once  { 1 2 3    }");
     finish_source_repro_category();
 }
 
 void reproduce_namespace() {
-    round_trip_source("namespace ns end");
+    round_trip_source("namespace ns {}");
     round_trip_source("namespace ns\n  print(1)");
-    round_trip_source("namespace ns end");
-    round_trip_source("namespace ns 1 end");
-    round_trip_source("namespace ns; print(1) end");
-    round_trip_source("namespace ns; a = 1; end; b = ns:a");
+    round_trip_source("namespace ns {}");
+    round_trip_source("namespace ns { 1 }");
+    round_trip_source("namespace ns { print(1) }");
+    round_trip_source("namespace ns { a = 1 }; b = ns:a");
 }
 void reproduce_misc_blocks() {
-    #if 0
-    round_trip_source("begin\nend");
-    round_trip_source("begin;end");
-    round_trip_source("begin;  ;end");
-    round_trip_source("begin;  end");
-    round_trip_source("blah = begin 1   end");
     round_trip_source("{}");
     round_trip_source("{  }");
     round_trip_source("{1}");
     round_trip_source("blah = {1}");
     round_trip_source("blah = { print(1) print(2) }");
-    #endif
     finish_source_repro_category();
 }
 
@@ -391,16 +377,16 @@ void reproduce_bracket_syntax() {
 }
 
 void reproduce_identifiers_inside_namespaces() {
-    round_trip_source("namespace a; namespace b; c = 1; end; end; add(4, a:b:c)");
-    round_trip_source("namespace a; namespace b; c = [1];end;end; print(a:b:c[0])");
-    round_trip_source("namespace a; namespace b; c = 1; end; end; [1 2 a:b:c]");
-    round_trip_source("namespace a; namespace b; c = 1; end; end; state i = a:b:c");
+    round_trip_source("namespace a { namespace b { c = 1 } } add(4, a:b:c)");
+    round_trip_source("namespace a { namespace b { c = [1] } }; print(a:b:c[0])");
+    round_trip_source("namespace a { namespace b { c = 1 } } [1 2 a:b:c]");
+    round_trip_source("namespace a { namespace b { c = 1 } } state i = a:b:c");
     finish_source_repro_category();
 }
 
 void reproduce_namespaced_function() {
-    round_trip_source("namespace ns def func() end end; ns:func()");
-    //round_trip_source("namespace ns def func(int i) end end; 1 -> ns:func");
+    round_trip_source("namespace ns { def func() {} } ns:func()");
+    //round_trip_source("namespace ns { def func(int i) {} } 1 -> ns:func");
     finish_source_repro_category();
 }
 
@@ -410,7 +396,7 @@ void reproduce_rebind_operator() {
 }
 
 void reproduce_discard_statement() {
-    round_trip_source("l = [1]; for i in l; discard; end");
+    round_trip_source("l = [1]; for i in l { discard }");
     finish_source_repro_category();
 }
 
@@ -418,7 +404,6 @@ void reproduce_branch_styles() {
     round_trip_source("def hi():\n return(1)\nhi()");
     round_trip_source("def hi()->int:\n return(1)\nhi()");
     round_trip_source("def hi() { 1 2 3 }");
-    round_trip_source("def hi() do 1 2 3 end");
     finish_source_repro_category();
 }
 

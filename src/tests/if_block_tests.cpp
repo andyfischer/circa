@@ -11,21 +11,21 @@ void test_if_joining()
     Branch branch;
 
     // Test that a name defined in one branch is not rebound in outer scope
-    branch.eval("if true apple = 5 end");
+    branch.eval("if true { apple = 5 }");
     test_assert(!branch.contains("apple"));
 
     // Test that a name which exists in the outer scope is rebound
     Term* original_banana = create_int(branch, 10, "banana");
-    branch.eval("if true banana = 15 end");
+    branch.eval("if true { banana = 15 }");
     test_assert(branch["banana"] != original_banana);
 
     // Test that if a name is defined in both 'if' and 'else' branches, that it gets
     // defined in the outer scope.
-    branch.eval("if true Cardiff = 5 else Cardiff = 11 end");
+    branch.eval("if true { Cardiff = 5 } else { Cardiff = 11 }");
     test_assert(branch.contains("Cardiff"));
 
     // Test that the type of the joined name is correct
-    branch.compile("if true a = 4 else a = 5 end; a = a");
+    branch.compile("if true { a = 4 } else { a = 5 }; a = a");
     test_assert(get_output_type(branch["a"]) == INT_TYPE);
 }
 
@@ -38,7 +38,7 @@ void test_if_joining_on_bool()
 
     test_assert(s->value_data.ptr != NULL);
 
-    branch.eval("if false hey = false end");
+    branch.eval("if false { hey = false }");
 
     evaluate_branch(branch);
 
@@ -49,14 +49,14 @@ void test_if_elif_else()
 {
     Branch branch;
 
-    branch.compile("if true; a = 1; elif true; a = 2; else; a = 3; end; a=a");
+    branch.compile("if true { a = 1 } elif true { a = 2 } else { a = 3 } a=a");
     evaluate_branch(branch);
 
     test_assert(branch.contains("a"));
     test_equals(branch["a"]->asInt(), 1);
 
     branch.compile(
-        "if false; b = 'apple'; elif false; b = 'orange'; else; b = 'pineapple'; end; b=b");
+        "if false { b = 'apple' } elif false { b = 'orange' } else { b = 'pineapple' } b=b");
     evaluate_branch(branch);
     test_assert(branch.contains("b"));
     test_assert(branch["b"]->asString() == "pineapple");
@@ -64,7 +64,7 @@ void test_if_elif_else()
     // try one without 'else'
     branch.clear();
     branch.compile("c = 0");
-    branch.compile("if false; c = 7; elif true; c = 8; end; c=c");
+    branch.compile("if false { c = 7 } elif true { c = 8 }; c=c");
     evaluate_branch(branch);
     test_assert(branch.contains("c"));
     test_assert(branch["c"]->asInt() == 8);
@@ -72,7 +72,7 @@ void test_if_elif_else()
     // try with some more complex conditions
     branch.clear();
     branch.compile("x = 5");
-    branch.compile("if x > 6; compare = 1; elif x < 6; compare = -1; else; compare = 0; end");
+    branch.compile("if x > 6 { compare = 1 } elif x < 6 { compare = -1 } else { compare = 0}");
     branch.compile("compare=compare");
     evaluate_branch(branch);
 
@@ -83,7 +83,7 @@ void test_if_elif_else()
 void test_dont_always_rebind_inner_names()
 {
     Branch branch;
-    branch.compile("if false; b = 1; elif false; c = 1; elif false; d = 1; else; e = 1; end");
+    branch.compile("if false { b = 1 } elif false { c = 1 } elif false { d = 1 } else { e = 1 }");
     evaluate_branch(branch);
     test_assert(!branch.contains("b"));
     test_assert(!branch.contains("c"));
@@ -105,12 +105,12 @@ void test_execution()
     gSpyResults.clear();
 
     // Start off with some simple expressions
-    branch.compile("if true spy('Success 1') end");
-    branch.compile("if false spy('Fail') end");
-    branch.compile("if (1 + 2) > 1 spy('Success 2') end");
-    branch.compile("if (1 + 2) < 1 spy('Fail') end");
-    branch.compile("if true; spy('Success 3'); end");
-    branch.compile("if false; spy('Fail'); end");
+    branch.compile("if true { spy('Success 1') }");
+    branch.compile("if false { spy('Fail') }");
+    branch.compile("if (1 + 2) > 1 { spy('Success 2') }");
+    branch.compile("if (1 + 2) < 1 { spy('Fail') }");
+    branch.compile("if true { spy('Success 3') }");
+    branch.compile("if false { spy('Fail') }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 3);
@@ -122,12 +122,12 @@ void test_execution()
     gSpyResults.clear();
     branch.clear();
     import_function(branch, spy_function, "spy(string)");
-    branch.compile("if true; spy('Success 1'); else; spy('Fail'); end");
-    branch.compile("if false; spy('Fail'); else; spy('Success 2'); end");
-    branch.compile("if true; spy('Success 3-1') spy('Success 3-2') spy('Success 3-3') "
-                "else; spy('Fail'); end");
-    branch.compile("if false; spy('Fail') spy('Fail 2')"
-                "else; spy('Success 4-1') spy('Success 4-2') spy('Success 4-3') end");
+    branch.compile("if true { spy('Success 1') } else { spy('Fail') }");
+    branch.compile("if false { spy('Fail') } else { spy('Success 2') }");
+    branch.compile("if true { spy('Success 3-1') spy('Success 3-2') spy('Success 3-3') } "
+                "else { spy('Fail') }");
+    branch.compile("if false { spy('Fail') spy('Fail 2') } "
+                "else { spy('Success 4-1') spy('Success 4-2') spy('Success 4-3') }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 8);
@@ -145,8 +145,8 @@ void test_execution()
 
     branch.clear();
     import_function(branch, spy_function, "spy(string)");
-    branch.compile("if true; if false; spy('Error!'); else; spy('Nested 1'); end;"
-                "else; spy('Error!'); end");
+    branch.compile("if true { if false { spy('Error!') } else { spy('Nested 1') } } "
+                "else { spy('Error!') }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 1);
@@ -155,8 +155,8 @@ void test_execution()
 
     branch.clear();
     import_function(branch, spy_function, "spy(string)");
-    branch.compile("if false; spy('Error!'); else; if false; spy('Error!');"
-                "else; spy('Nested 2'); end; end");
+    branch.compile("if false { spy('Error!') } else { if false { spy('Error!') } "
+                "else { spy('Nested 2') } }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 1);
@@ -165,8 +165,8 @@ void test_execution()
     
     branch.clear();
     import_function(branch, spy_function, "spy(string)");
-    branch.compile("if false; spy('Error!');"
-                "else; if true; spy('Nested 3'); else; spy('Error!'); end; end");
+    branch.compile("if false { spy('Error!') }"
+                "else { if true { spy('Nested 3') } else { spy('Error!') } }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 1);
@@ -175,8 +175,8 @@ void test_execution()
 
     branch.clear();
     import_function(branch, spy_function, "spy(string)");
-    branch.compile("if true; if false; spy('Error!'); else; spy('Nested 4'); end;"
-                "else; spy('Error!'); end");
+    branch.compile("if true { if false { spy('Error!') } else { spy('Nested 4') } } "
+                "else { spy('Error!') }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 1);
@@ -217,10 +217,10 @@ void test_execution_with_elif()
 
     branch.compile("x = 5");
 
-    branch.compile("if x > 5; spy('Fail');"
-                "elif x < 5; spy('Fail');"
-                "elif x == 5; spy('Success');"
-                "else; spy('Fail'); end");
+    branch.compile("if x > 5 { spy('Fail') } "
+                "elif x < 5 { spy('Fail')} "
+                "elif x == 5 { spy('Success')} "
+                "else { spy('Fail') }");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(gSpyResults.size() == 1);
@@ -233,19 +233,19 @@ void test_parse_with_no_line_endings()
     Branch branch;
 
     branch.compile("a = 4");
-    branch.compile("if a < 5 a = 5 end");
+    branch.compile("if a < 5 { a = 5 }");
     branch.compile("a=a");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 5);
 
-    branch.compile("if a > 7 a = 5 else a = 3 end");
+    branch.compile("if a > 7 { a = 5 } else { a = 3 }");
     branch.compile("a=a");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 3);
 
-    branch.compile("if a == 2 a = 1 elif a == 3 a = 9 else a = 2 end");
+    branch.compile("if a == 2 { a = 1 } elif a == 3 { a = 9 } else { a = 2 }");
     branch.compile("a=a");
     evaluate_branch(branch);
     test_assert(branch);
@@ -258,7 +258,7 @@ void test_state_simple()
     EvalContext context;
 
     // Simple test, condition never changes
-    Term* block = branch.compile("if true; state i = 0; i += 1; end");
+    Term* block = branch.compile("if true { state i = 0; i += 1 }");
     evaluate_branch(&context, branch);
 
     TaggedValue *i = context.state.getField("_if_block")->getIndex(0)->getField("i");
@@ -273,7 +273,7 @@ void test_state_simple()
 
     // Same test with elif
     branch.clear();
-    block = branch.compile("if false; elif true; state i = 0; i += 1; end");
+    block = branch.compile("if false {} elif true { state i = 0; i += 1 }");
     evaluate_branch(&context, branch);
     i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
@@ -287,7 +287,7 @@ void test_state_simple()
     // Same test with else
     branch.clear();
     context = EvalContext();
-    block = branch.compile("if false; else state i = 0; i += 1; end");
+    block = branch.compile("if false {} else { state i = 0; i += 1 }");
     evaluate_branch(&context, branch);
     i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
@@ -357,7 +357,7 @@ void test_nested_state()
     Branch branch;
     EvalContext context;
 
-    branch.compile("t = false; if true; t = toggle(true); end");
+    branch.compile("t = false if true { t = toggle(true) }");
     TaggedValue* t = get_local(branch["t"]);
 
     evaluate_branch(&context, branch);

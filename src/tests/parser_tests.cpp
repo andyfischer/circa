@@ -358,7 +358,7 @@ void test_semicolon_as_line_ending()
     test_assert(branch["b"]->function->name == "mult");
 
     branch.clear();
-    branch.compile("cond = true; if cond; a = 1; else; a = 2; end");
+    branch.compile("cond = true; if cond { a = 1 } else { a = 2 }");
     branch.compile("a=a");
 
     test_assert(!has_static_errors(branch));
@@ -444,7 +444,7 @@ void test_integer_division()
 void test_namespace()
 {
     Branch branch;
-    Term* ns = branch.eval("namespace ns; a = 1; b = 2; end");
+    Term* ns = branch.eval("namespace ns { a = 1; b = 2 }");
 
     test_assert(branch);
     test_assert(ns->function == NAMESPACE_FUNC);
@@ -455,7 +455,7 @@ void test_namespace()
     test_assert(a->asInt() == 1);
 
     branch.clear();
-    ns = branch.eval("namespace ns; def myfunc(int a) -> int; return(a+1); end; end");
+    ns = branch.eval("namespace ns { def myfunc(int a) -> int { return(a+1) } }");
     Term* c = branch.eval("c = ns:myfunc(4)");
     test_assert(branch);
     test_assert(c->asInt() == 5);

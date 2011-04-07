@@ -120,7 +120,7 @@ void test_include_namespace()
 {
     Branch branch;
     FakeFileSystem files;
-    files["file"] = "namespace ns a = 5 end";
+    files["file"] = "namespace ns { a = 5 }";
 
     branch.compile("include('file')");
     Term* a = branch.compile("ns:a");

@@ -214,7 +214,7 @@ void test_modulo()
 
 void test_subroutine()
 {
-    test_snippet("def f() -> List return([1]) end", "f() == [1]");
+    test_snippet("def f() -> List { return([1]) }", "f() == [1]");
     test_snippet("def f()\n  return\nf()", "");
     test_snippet("def f()\nf()", "");
     test_snippet("def f() {}", "");
@@ -259,10 +259,10 @@ void test_references()
 
 void test_blocks()
 {
-    //test_snippet("if true end", "");
-    //test_snippet("if true; else; end", "");
-    test_snippet("for i in [1] end", "");
-    test_snippet("def func() end", "");
+    test_snippet("if true {}", "");
+    test_snippet("if true {} else {}", "");
+    test_snippet("for i in [1] {}", "");
+    test_snippet("def func() {}", "");
 }
 
 void test_rounding()
@@ -310,37 +310,37 @@ void test_cond()
 
 void test_if_block()
 {
-    test_snippet("a = 1; if true a = 2 end", "a == 2");
-    test_snippet("a = 1; if false a = 2 end", "a == 1");
-    test_snippet("a = 1; if true a = 2 else end", "a == 2");
-    test_snippet("a = 1; if false a = 2 else end", "a == 1");
-    test_snippet("a = 1; if true a = 2 else a = 3 end", "a == 2");
-    test_snippet("a = 1; if false a = 2 else a = 3 end", "a == 3");
-    test_snippet("a = 1; if true else a = 3 end", "a == 1");
-    test_snippet("a = 1; if false else a = 3 end", "a == 3");
-    test_snippet("a = 1; if false a = 2 elif true a = 3 else a = 4 end", "a == 3");
-    test_snippet("a = 1; if false a = 2 elif false a = 3 else a = 4 end", "a == 4");
+    test_snippet("a = 1; if true { a = 2 }", "a == 2");
+    test_snippet("a = 1; if false { a = 2 }", "a == 1");
+    test_snippet("a = 1; if true { a = 2 } else {}", "a == 2");
+    test_snippet("a = 1; if false { a = 2 } else {}", "a == 1");
+    test_snippet("a = 1; if true { a = 2 } else { a = 3 }", "a == 2");
+    test_snippet("a = 1; if false { a = 2 } else { a = 3 }", "a == 3");
+    test_snippet("a = 1; if true {} else { a = 3 }", "a == 1");
+    test_snippet("a = 1; if false {} else { a = 3 }", "a == 3");
+    test_snippet("a = 1; if false { a = 2 } elif true { a = 3 } else { a = 4 }", "a == 3");
+    test_snippet("a = 1; if false { a = 2 } elif false { a = 3 } else { a = 4 }", "a == 4");
 }
 
 void test_for_loops()
 {
-    test_snippet("l = []; for i in 0..3; int(@i), l.append(i); end", "l == [0 1 2]");
-    test_snippet("a = [3 2 1]; b = [];for item in a; b.append(item); end", "b == [3 2 1]");
-    test_snippet("a = [2 4]; b = [1 3];for item in a; b.append(item); end", "b == [1 3 2 4]");
-    test_snippet("a = [1 2];for item in []; a.append(item); end", "a == [1 2]");
-    test_snippet("a = [1 2];for i in a; int(@i); i += 1; end", "a == [1 2]");
-    test_snippet("a = [1 2];for i in @a; int(@i); i += 1; end", "a == [2 3]");
-    test_snippet("a = [1 2 3];for i in @a; discard; end", "a == []");
+    test_snippet("l = []; for i in 0..3 { int(@i), l.append(i) }", "l == [0 1 2]");
+    test_snippet("a = [3 2 1]; b = [];for item in a { b.append(item) }", "b == [3 2 1]");
+    test_snippet("a = [2 4]; b = [1 3];for item in a { b.append(item) }", "b == [1 3 2 4]");
+    test_snippet("a = [1 2];for item in [] { a.append(item) }", "a == [1 2]");
+    test_snippet("a = [1 2];for i in a { int(@i); i += 1 }", "a == [1 2]");
+    test_snippet("a = [1 2];for i in @a { int(@i); i += 1 }", "a == [2 3]");
+    test_snippet("a = [1 2 3];for i in @a { discard }", "a == []");
 
-    test_snippet("a = []; if true a.append(1) a.append(2) end; for i in a; int(@i); add(i,i) end", "");
+    test_snippet("a = []; if true { a.append(1) a.append(2) } for i in a { int(@i); add(i,i) }", "");
 
-    test_snippet("a = [1 2 3];for i in @a; if i == 1 discard end end", "a == [2 3]");
-    test_snippet("a = [1 2 3];for i in @a; if i == 2 discard end end", "a == [1 3]");
-    test_snippet("a = [1 2 3];for i in @a; if i == 3 discard end end", "a == [1 2]");
-    test_snippet("a = [1 2 3];for i in @a; i += 1 if i == 3 discard end end", "a == [2 4]");
+    test_snippet("a = [1 2 3];for i in @a { if i == 1 { discard } }", "a == [2 3]");
+    test_snippet("a = [1 2 3];for i in @a { if i == 2 { discard } }", "a == [1 3]");
+    test_snippet("a = [1 2 3];for i in @a { if i == 3 { discard } }", "a == [1 2]");
+    test_snippet("a = [1 2 3];for i in @a { i += 1 if i == 3 { discard } }", "a == [2 4]");
 
     // For loop with state
-    test_snippet("for i in [1 2 3]; state s = i; end", "");
+    test_snippet("for i in [1 2 3] { state s = i }", "");
 
     // Syntax with significant indentation
     test_snippet("a = 0; for i in [1 2 3] a += i", "a == 6");
@@ -359,7 +359,7 @@ void test_for_loop_output()
 void test_subscripting()
 {
     test_snippet("l = [[[1]]]", "l[0][0][0] == 1");
-    test_snippet("def return_point() -> Point return([8 9]) end", "return_point().x == 8");
+    test_snippet("def return_point() -> Point { return([8 9]) }", "return_point().x == 8");
 }
 
 void test_set()
@@ -516,7 +516,7 @@ void test_type_check_functions()
 
 void test_namespace()
 {
-    test_snippet("namespace ns a = 1 end", "ns:a == 1");
+    test_snippet("namespace ns { a = 1 }", "ns:a == 1");
 }
 
 void test_swap()
@@ -526,9 +526,9 @@ void test_swap()
 
 void test_subroutine_multiple_outputs()
 {
-    test_snippet("def f(int i +out) -> int; i += 7; return 2 end; a = 3; b = f(&a)",
+    test_snippet("def f(int i +out) -> int { i += 7; return 2 }; a = 3; b = f(&a)",
             "a == 10, b == 2");
-    test_snippet("def f(int i +out); i += 7; end; a = 3; f(&a)", "a == 10");
+    test_snippet("def f(int i +out) { i += 7 }; a = 3; f(&a)", "a == 10");
     test_snippet("def f(int a +out, int b +out, int c +out)\n"
                  "  a += 1\n  b += 2\n  c += 3\n"
                  "a = 10; b = 10; c = 10;\n"
@@ -539,25 +539,25 @@ void test_subroutine_multiple_outputs()
                  "a = 10; b = 10; c = 10;\n"
                  "f(a,&b,c)",
                  "a == 10, b == 12, c == 10");
-    test_snippet("def f(int a +out) a = 4; return; a = 6 end; a = 0; f(&a)", "a == 4");
+    test_snippet("def f(int a +out) { a = 4; return; a = 6 }; a = 0; f(&a)", "a == 4");
 
     // this once caused an assert fail:
-    test_snippet("def f(int a, int b, int c +out) end; f(1 2 3)", "");
+    test_snippet("def f(int a, int b, int c +out) {}; f(1 2 3)", "");
 }
 
 void test_recursion_and_multiple_outputs()
 {
     test_snippet(
-        "def tree(int depth, List leaves +out)"
+        "def tree(int depth, List leaves +out) {"
         "  leaves.append(depth)"
         
-        "  if depth >= 3"
+        "  if depth >= 3 {"
         "    return;"
-        "  end"
+        "  }"
 
         "  tree(depth + 1, &leaves) "
         "  tree(depth + 1, &leaves) "
-        "end "
+        "} "
         "leaves = [] "
         "tree(0, &leaves)",
 

@@ -8,8 +8,8 @@ namespace overloaded_function_tests {
 void declared_in_script()
 {
     Branch branch;
-    branch.compile("def f_1(int i) -> int return i + 1 end");
-    branch.compile("def f_2(string s) -> string return concat(s 'x') end");
+    branch.compile("def f_1(int i) -> int { return i + 1 }");
+    branch.compile("def f_2(string s) -> string { return concat(s 'x') }");
     branch.compile("f = overloaded_function(f_1 f_2)");
     test_assert(branch);
 

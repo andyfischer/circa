@@ -71,7 +71,7 @@ void test_unknown_identifier()
 void wrong_input_count()
 {
     Branch branch;
-    branch.compile("def f(int x) end");
+    branch.compile("def f(int x) {}");
 
     Term* t = branch.compile("f(1 2)");
     std::string msg = get_static_error_message(t);
@@ -88,8 +88,8 @@ void crash_with_overloaded_varargs()
 {
     Branch branch;
 
-    branch.compile("def f() end");
-    branch.compile("def f2(int i) end");
+    branch.compile("def f() {}");
+    branch.compile("def f2(int i) {}");
     branch.compile("g = overloaded_function(f f2)");
 
     Term* t = branch.compile("g(1)");
@@ -101,7 +101,7 @@ void crash_with_overloaded_varargs()
 void input_type_mismatch()
 {
     Branch branch;
-    branch.compile("def f(string) end");
+    branch.compile("def f(string) {}");
     Term* t = branch.compile("f(1)");
 
     std::string msg = get_static_error_message(t);

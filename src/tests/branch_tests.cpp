@@ -222,7 +222,7 @@ void test_duplicate_subroutine()
 {
     Branch branch;
 
-    Term* func = branch.compile("def func() a = 1 end");
+    Term* func = branch.compile("def func() { a = 1 }");
 
     // sanity check:
     test_assert(function_t::get_name(func) == "func");

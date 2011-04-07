@@ -23,7 +23,7 @@ void test_simple()
     it.advance();
     test_assert(it.finished());
 
-    Term* sub = branch.compile("def func() c = 3 d = 4 end");
+    Term* sub = branch.compile("def func() { c = 3 d = 4 }");
 
     it.reset(&branch);
 

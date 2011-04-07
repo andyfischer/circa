@@ -11,7 +11,7 @@ void create()
 {
     Branch branch;
 
-    Term* func = branch.eval("def mysub(int) -> string end");
+    Term* func = branch.eval("def mysub(int) -> string;");
 
     test_assert(func);
     test_assert(is_subroutine(func));
@@ -33,7 +33,7 @@ void test_is_callable()
 
     // subroutine
     Branch branch;
-    Term* s = branch.eval("def mysub() end");
+    Term* s = branch.eval("def mysub();");
     test_assert(is_callable(s));
 
     Term* a = branch.eval("1");
@@ -79,8 +79,8 @@ void overloaded_function()
 void overloaded_function_in_script()
 {
     Branch branch;
-    Term* f1 = branch.compile("def f1(int i) end");
-    Term* f2 = branch.compile("def f2(int i) end");
+    Term* f1 = branch.compile("def f1(int i);");
+    Term* f2 = branch.compile("def f2(int i);");
     
     branch.compile("g = overloaded_function(f1 f2)");
     Term* g_call = branch.compile("g(1)");
@@ -98,7 +98,7 @@ void test_is_native_function()
     test_assert(is_native_function(KERNEL->get("assert")));
 
     Branch branch;
-    Term* f = branch.eval("def f() end");
+    Term* f = branch.eval("def f();");
 
     test_assert(!is_native_function(f));
 }
@@ -106,20 +106,20 @@ void test_is_native_function()
 void test_documentation_string()
 {
     Branch branch;
-    Term* f = branch.eval("def f() 'docs' 1 + 2 end");
+    Term* f = branch.eval("def f() { 'docs' 1 + 2 }");
     test_assert(function_t::get_documentation(f) == "docs");
 
-    Term* f2 = branch.eval("def f2() a = 'not docs' 1 + 2 end");
+    Term* f2 = branch.eval("def f2() { a = 'not docs' 1 + 2 }");
     test_assert(function_t::get_documentation(f2) == "");
 
-    Term* f3 = branch.eval("def f2() print('not docs') 1 + 2 end");
+    Term* f3 = branch.eval("def f2() { print('not docs') 1 + 2 }");
     test_assert(function_t::get_documentation(f3) == "");
 }
 
 void test_bug_with_declaring_state_argument()
 {
     Branch branch;
-    Term* f = branch.eval("def f(state int) end");
+    Term* f = branch.eval("def f(state int);");
 
     test_assert(get_function_attrs(f)->implicitStateType == INT_TYPE);
 }
@@ -146,7 +146,7 @@ void test_calling_manual_overloaded_function()
 void test_bug_where_a_mysterious_copy_term_was_added()
 {
     Branch branch;
-    branch.compile("def f()->int return(1) end");
+    branch.compile("def f()->int { return(1) }");
     for (BranchIterator it(&branch); !it.finished(); ++it)
         test_assert(it->function->name != "copy");
 }
@@ -179,7 +179,7 @@ namespace test_func_with_multiple_outputs {
 void multiple_output_static_typing()
 {
     Branch branch;
-    branch.compile("def f(int a +out, string b +out) end");
+    branch.compile("def f(int a +out, string b +out);");
     Term* call = branch.compile("f(1, 'hi')");
     test_assert(get_output_type(call, 1) == INT_TYPE);
     test_assert(get_output_type(call, 2) == STRING_TYPE);
@@ -187,7 +187,8 @@ void multiple_output_static_typing()
 
     branch.compile("c = 2, d = 'hi'");
     branch.compile("f(&c, &d)");
-    branch.compile("def needs_int(int) end; def needs_string(string) end;");
+    branch.compile("def needs_int(int);");
+    branch.compile("def needs_string(string);");
     branch.compile("needs_int(c)");
     branch.compile("needs_string(d)");
     test_assert(branch);

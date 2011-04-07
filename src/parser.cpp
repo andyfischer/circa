@@ -162,12 +162,6 @@ void consume_branch_with_significant_indentation(Branch& branch, TokenStream& to
 
     if (!foundNewline) {
         while (!tokens.finished()) {
-            // If we hit an 'end' then consume and finish
-            if (tokens.nextIs(END)) {
-                parentTerm->setBoolProp("syntax:explicitEnd", true);
-                tokens.consume();
-                return;
-            }
 
             // If we hit an if-block sepator then finish, but don't consume it
             if (tokens.nextIs(ELSE) || tokens.nextIs(ELIF))

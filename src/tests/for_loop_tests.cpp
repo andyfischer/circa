@@ -22,7 +22,7 @@ void test_simple()
     import_function(branch, spy_function, "spy(int)");
     gSpyResults.clear();
 
-    branch.compile("for i in 0..5 spy(i) end");
+    branch.compile("for i in 0..5 { spy(i) }");
 
     evaluate_branch(branch);
 
@@ -37,12 +37,12 @@ void test_simple()
 void type_inference_for_iterator()
 {
     Branch branch;
-    Term* loop = branch.compile("for i in [1] end");
+    Term* loop = branch.compile("for i in [1] {}");
     Term* iterator = get_for_loop_iterator(loop);
     //test_assert(iterator->type == INT_TYPE);
 
     // test a situation where we can't do inference
-    loop = branch.compile("for i in [] end");
+    loop = branch.compile("for i in [] {}");
     iterator = get_for_loop_iterator(loop);
     test_assert(iterator->type == ANY_TYPE);
 }
@@ -63,19 +63,19 @@ void test_rebind_internally()
     // to their respective terms.
     Branch branch;
     branch.compile("a = 0");
-    branch.compile("for i in [0 0 0]; a += 1; end; a = a");
+    branch.compile("for i in [0 0 0] { a += 1 } a = a");
     evaluate_branch(branch);
     test_assert(branch);
     test_assert(branch["a"]->asInt() == 3);
 
     branch.compile("found_3 = false");
-    branch.compile("for n in [5 3 1 9 0]; if n == 3; found_3 = true; end; end; found_3=found_3");
+    branch.compile("for n in [5 3 1 9 0] { if n == 3 { found_3 = true } }; found_3=found_3");
     evaluate_branch(branch);
 
     test_assert(branch["found_3"]->asBool());
 
     branch.compile("found_3 = false");
-    branch.compile("for n in [2 4 6 8]; if n == 3; found_3 = true; end; end; found_3=found_3");
+    branch.compile("for n in [2 4 6 8] { if n == 3 { found_3 = true } } found_3=found_3");
     evaluate_branch(branch);
     test_assert(branch["found_3"]->asBool() == false);
 }
@@ -84,7 +84,7 @@ void test_rewrite_input_list()
 {
     Branch branch;
     branch.compile("l = [1 2 3]");
-    branch.compile("for i in @l; i += 1; end");
+    branch.compile("for i in @l { i += 1 }");
     evaluate_branch(branch);
 
     List* l = List::checkCast(branch["l"]);
@@ -97,7 +97,7 @@ void test_state_simple()
     Branch branch;
     EvalContext context;
 
-    branch.compile("for i in [1 2 3]; state s = i; end");
+    branch.compile("for i in [1 2 3] { state s = i }");
 
     evaluate_branch(&context, branch);
     test_equals(&context.state, "[_for: [[s: 1], [s: 2], [s: 3]]]");
@@ -105,7 +105,7 @@ void test_state_simple()
     branch.clear();
     context = EvalContext();
 
-    branch.compile("l = [1 2 3]; for i in @l; state s = 0; s += i; end");
+    branch.compile("l = [1 2 3]; for i in @l { state s = 0; s += i }");
 
     evaluate_branch(&context, branch);
     test_equals(&context.state, "[l_1: [[s: 1], [s: 2], [s: 3]]]");
@@ -120,7 +120,7 @@ void test_state_nested()
     Branch branch;
     EvalContext context;
 
-    branch.compile("for a in [1 2] for b in [3 4] for c in [5 6] state s = c end end end");
+    branch.compile("for a in [1 2] { for b in [3 4] { for c in [5 6] { state s = c } } }");
     evaluate_branch(&context, branch);
 
     test_equals(&context.state, "[_for: [[_for: [[_for: [[s: 5], [s: 6]]], "
