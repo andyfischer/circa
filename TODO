@@ -1,11 +1,7 @@
 
 This is a list of short-term TODOs. There's a bigger list at docs/todo.md
 
- - Plastic no longer reloads scripts when they encounter an error
- - Plastic shouldn't execute a script if it has static errors
  - 'Unknown identifier' terms are being created without source location
-
- - BranchIterator could be better behaved when a term is inserted. Currently, inserting a term before the iterator will cause it->current() to return something else.
  - various places where swap() can be used instead of copy()
 
 Important optimization tasks:

@@ -6,6 +6,8 @@
 #include "debug_valid_objects.h"
 #include "evaluation.h"
 #include "importing_macros.h"
+#include "introspection.h"
+#include "locals.h"
 #include "parser.h"
 #include "stateful_code.h"
 #include "source_repro.h"
@@ -508,6 +510,77 @@ std::string get_source_file_location(Branch& branch)
         return "";
 
     return get_directory_for_filename(get_branch_source_filename(*branch_p));
+}
+
+void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)
+{
+    const int INTERNAL_ERROR_TYPE = 1;
+
+    List& error = *set_list(result->errors.append(), 3);
+    set_int(error[0], INTERNAL_ERROR_TYPE);
+    set_int(error[1], index);
+    set_string(error[2], message);
+}
+
+void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
+{
+    int expectedLocalIndex = 0;
+
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+
+        if (term == NULL) {
+            append_internal_error(result, i, "NULL pointer");
+            continue;
+        }
+
+        // Check that the term's index is correct
+        if (term->index != i) {
+            std::stringstream msg;
+            msg << "Wrong index (found " << term->index << ", expected " << i << ")";
+            append_internal_error(result, i, msg.str());
+        }
+
+        // Check that owningBranch is correct
+        if (term->owningBranch != &branch)
+            append_internal_error(result, i, "Wrong owningBranch");
+
+        // Check localIndex
+        int numOutputs = get_output_count(term);
+        if (numOutputs != 0) {
+            if (term->localsIndex != expectedLocalIndex) {
+                std::stringstream msg;
+                msg << "Wrong localsIndex (found " << term->localsIndex << ", expected "
+                    << expectedLocalIndex << ")";
+                append_internal_error(result, i, msg.str());
+            }
+            expectedLocalIndex = term->localsIndex + numOutputs;
+        }
+    }
+} 
+
+bool branch_check_invariants_print_result(Branch& branch, std::ostream& out)
+{
+    BranchInvariantCheck result;
+    branch_check_invariants(&result, branch);
+
+    if (result.errors.length() == 0)
+        return true;
+
+    out << result.errors.length() << " errors found in branch " << &branch
+        << std::endl;
+
+    for (int i=0; i < result.errors.length(); i++) {
+        List* error = List::checkCast(result.errors[i]);
+        out << "[" << error->get(1)->asInt() << "] ";
+        out << error->get(2)->asString();
+        out << std::endl;
+    }
+
+    out << "contents:" << std::endl;
+    print_branch(out, branch);
+
+    return false;
 }
 
 } // namespace circa

@@ -198,14 +198,44 @@ void dealloc_term(Term* term)
     delete term;
 }
 
-void assert_term_invariants(Term* t)
+static void append_term_invariant_error(List* errors, Term* term,
+        std::string const& msg)
 {
-    // Make sure the value type matches the declared type.
-    if (t->type == INT_TYPE)
-        ca_assert(is_int(t));
+    List& error = *List::cast(errors->append(), 1);
+    set_string(error[0], msg);
+}
 
-    if (t->type != INT_TYPE)
-        ca_assert(!is_int(t));
+void term_check_invariants(List* errors, Term* term)
+{
+    if (term->value_type == NULL)
+        append_term_invariant_error(errors, term, "TaggedValue has null type");
+
+    if (term->type != NULL) {
+
+        bool typeOk = (term->type == ANY_TYPE)
+            || (term->type == VOID_TYPE && is_null(term))
+            || cast_possible(term, unbox_type(term->type));
+
+        if (!typeOk) {
+            std::string msg;
+            msg += "Value has wrong type: term->type is " + term->type->name
+                + ", tag is " + term->value_type->name;
+            append_term_invariant_error(errors, term, msg);
+        }
+    }
+
+    if (term->nestedContents.owningTerm != term)
+        append_term_invariant_error(errors, term,
+                "Term.nestedContents has wrong owningTerm");
+
+    if (term->owningBranch != NULL) {
+        Branch& branch = *term->owningBranch;
+        if ((term->index >= branch.length())
+                || (branch[term->index] != term)) {
+            append_term_invariant_error(errors, term,
+                    "Term.index doesn't resolve to this term in owningBranch");
+        }
+    }
 }
 
 } // namespace circa

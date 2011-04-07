@@ -143,4 +143,17 @@ Term* find_term_by_id(Branch& branch, unsigned int id);
 void persist_branch_to_file(Branch& branch);
 std::string get_source_file_location(Branch& branch);
 
+struct BranchInvariantCheck
+{
+    List errors;
+
+    // Structure of each error:
+    // [0] int type
+    // [1] int index
+    // [2] string message
+};
+
+void branch_check_invariants(BranchInvariantCheck* result, Branch& branch);
+bool branch_check_invariants_print_result(Branch& branch, std::ostream& out);
+
 } // namespace circa

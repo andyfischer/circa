@@ -5,7 +5,6 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "branch_check_invariants.h"
 #include "branch_iterator.h"
 #include "building.h"
 #include "builtins.h"
@@ -22,7 +21,6 @@
 #include "if_block.h"
 #include "importing.h"
 #include "introspection.h"
-#include "invariants.h"
 #include "locals.h"
 #include "metaprogramming.h"
 #include "names.h"

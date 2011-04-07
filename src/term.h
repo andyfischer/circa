@@ -128,6 +128,4 @@ struct Term : TaggedValue
 Term* alloc_term();
 void dealloc_term(Term*);
 
-void assert_term_invariants(Term* t);
-
 } // namespace circa
