@@ -249,7 +249,7 @@ namespace tweak
             loc.x + text_sprite.width + padding,
             loc.y + text_sprite.height + padding]
         color = #ee3399
-        if mouse_in(rect) color = #ff44aa end
+        if mouse_in(rect) { color = #ff44aa }
         fill_rect(rect, color)
         text:draw_rendered_text(text_sprite, [loc.x loc.y])
 

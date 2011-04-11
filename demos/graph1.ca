@@ -8,6 +8,24 @@ type BoxDefinition {
   List connections
 }
 
+node_content_font = text:load_font("../plastic/assets/Inconsolata.otf"->path, 16)
+
+def rect_center(Rect rect) -> Point
+    return [(rect.x1 + rect.x2) / 2, (rect.y1 + rect.y2) / 2]
+
+def linear_interp(number start, number fin, number total_time) -> number
+    ratio = elapsed() / total_time
+    min(@ratio, 1.0)
+    trace(ratio)
+    return start + (fin - start) * ratio
+
+def text_centered_in_rect(Font font, string str, Color color, Rect rect)
+    sprite = text:render_text(font, str, color)
+    x = (rect.x1 + rect.x2) / 2 - sprite.width / 2
+    y = (rect.y1 + rect.y2) / 2 - sprite.height / 2
+
+    text:draw_rendered_text(sprite, [x y])
+
 def draw_graph(List box_definitions)
     state List box_positions
 
@@ -17,7 +35,24 @@ def draw_graph(List box_definitions)
             @defi -> BoxDefinition
             box_positions.append(defi.loc)
 
-    -- draw each box
+    name_to_box_rect = Map()
+
+    -- Update positions for each box
+    index = 0
+    for defi in box_definitions
+        @defi -> BoxDefinition
+        pos = box_positions[index] -> Point
+        rect = to_rect(pos defi.size)
+
+        draggable_rect(@pos defi.size)
+
+        box_positions[index] = pos
+
+        name_to_box_rect.add(defi.name rect)
+
+        index += 1
+
+    -- Draw each box
     index = 0
     for defi in box_definitions
         @defi -> BoxDefinition
@@ -25,8 +60,20 @@ def draw_graph(List box_definitions)
 
         rect = to_rect(pos defi.size)
 
-        fill_rect(rect #38)
+        fill_rect(rect #383)
         draw_rect(rect #333)
+
+        text_centered_in_rect(node_content_font defi.name #fff rect)
+
+        -- Draw each line
+        outgoing_point = [(rect.x1 + rect.x2) / 2 rect.y2]
+        for conn in defi.connections
+            their_rect = name_to_box_rect.get(conn)
+
+            incoming_point = [(their_rect.x1 + their_rect.x2) / 2 rect.y1]
+
+            line(outgoing_point incoming_point #fff)
+
 
         index += 1
 
