@@ -52,28 +52,34 @@ def draw_graph(List box_definitions)
 
         index += 1
 
+    -- Draw each line
+    index = 0
+    for defi in box_definitions
+        @defi -> BoxDefinition
+        pos = box_positions[index] -> Point
+        rect = to_rect(pos defi.size)
+        -- Draw each line
+        outgoing_point = [(rect.x1 + rect.x2) / 2 rect.y2] -> Point
+        for conn in defi.connections
+            their_rect = name_to_box_rect.get(conn) -> Rect
+
+            incoming_point = [(their_rect.x1 + their_rect.x2) / 2 their_rect.y1]
+
+            line(outgoing_point incoming_point #000)
+
+        index += 1
+
     -- Draw each box
     index = 0
     for defi in box_definitions
         @defi -> BoxDefinition
         pos = box_positions[index] -> Point
-
         rect = to_rect(pos defi.size)
 
         fill_rect(rect #383)
         draw_rect(rect #333)
 
         text_centered_in_rect(node_content_font defi.name #fff rect)
-
-        -- Draw each line
-        outgoing_point = [(rect.x1 + rect.x2) / 2 rect.y2]
-        for conn in defi.connections
-            their_rect = name_to_box_rect.get(conn)
-
-            incoming_point = [(their_rect.x1 + their_rect.x2) / 2 rect.y1]
-
-            line(outgoing_point incoming_point #fff)
-
 
         index += 1
 

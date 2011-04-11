@@ -300,6 +300,31 @@ void test_message_passing2()
     test_equals(branch["last_output"], "2");
 }
 
+void test_run_single_statement()
+{
+    Branch branch;
+    branch.compile("br = { test_spy(1) test_spy('two') test_spy(3) \n"
+        "-- this is a comment \n"
+        "\n"
+        "test_spy(4) }");
+
+    internal_debug_function::spy_clear();
+    branch.eval("run_single_statement(br, 0)");
+    test_equals(internal_debug_function::spy_results(), "[1]");
+
+    internal_debug_function::spy_clear();
+    branch.eval("run_single_statement(br, 1)");
+    test_equals(internal_debug_function::spy_results(), "['two']");
+
+    internal_debug_function::spy_clear();
+    branch.eval("run_single_statement(br, 2)");
+    test_equals(internal_debug_function::spy_results(), "[3]");
+
+    internal_debug_function::spy_clear();
+    branch.eval("run_single_statement(br, 3)");
+    test_equals(internal_debug_function::spy_results(), "[4]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -317,6 +342,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_delta);
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing2);
+    REGISTER_TEST_CASE(builtin_function_tests::test_run_single_statement);
 }
 
 } // namespace builtin_function_tests
