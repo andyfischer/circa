@@ -273,14 +273,6 @@ namespace function_t {
     {
         return get_function_attrs(func)->specializeType;
     }
-    std::string const& get_exposed_name_path(Term* func)
-    {
-        return get_function_attrs(func)->exposedNamePath;
-    }
-    void set_exposed_name_path(Term* func, std::string const& value)
-    {
-        get_function_attrs(func)->exposedNamePath = value;
-    }
     Ref& get_feedback_func(Term* func)
     {
         return get_function_attrs(func)->feedbackFunc;

@@ -91,7 +91,6 @@ namespace if_block_function {
         get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputName = getOutputName;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputType = getOutputType;
-        function_t::set_exposed_name_path(IF_BLOCK_FUNC, "#joining");
 
         JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
         get_function_attrs(JOIN_FUNC)->specializeType = joinFunc_specializeType;

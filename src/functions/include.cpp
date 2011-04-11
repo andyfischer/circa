@@ -94,12 +94,8 @@ namespace include_function {
                 "include(string filename)");
         get_function_attrs(INCLUDE_FUNC)->postCompile = include_post_compile;
 
-        function_t::set_exposed_name_path(INCLUDE_FUNC, ".");
-
-        Term* load_script_f = import_function(kernel, load_script,
+        /*Term* load_script_f =*/ import_function(kernel, load_script,
             "load_script(string filename)");
-
-        function_t::set_exposed_name_path(load_script_f, ".");
     }
 }
 } // namespace circa

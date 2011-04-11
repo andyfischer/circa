@@ -24,7 +24,6 @@ struct FunctionAttrs
     RefList outputTypes;
     Ref implicitStateType;
     bool variableArgs;
-    std::string exposedNamePath;
     Ref feedbackFunc;
     TaggedValue parameter;
     bool throws;
@@ -92,7 +91,7 @@ FunctionAttrs& as_function_attrs(Term* term);
 Branch& function_contents(Term* func);
 FunctionAttrs* get_function_attrs(Term* func);
 
-// Return the'placeholder name for the given input index; this is the name that
+// Return the placeholder name for the given input index; this is the name that
 // is used if no name is given.
 std::string get_placeholder_name_for_index(int index);
 
