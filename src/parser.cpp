@@ -1649,7 +1649,7 @@ ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
         result = literal_list(branch, tokens, context);
 
     // plain branch?
-    else if (tokens.nextIs(BEGIN) || tokens.nextIs(LBRACE))
+    else if (tokens.nextIs(LBRACE))
         result = plain_branch(branch, tokens, context);
 
     // parenthesized expression?
