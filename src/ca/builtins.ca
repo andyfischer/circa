@@ -127,6 +127,37 @@ def blend_color(Color a, Color b, number ratio) -> Color
         result[3] = 1.0
         return result
 
+def hsv_to_rgb(List hsv) -> Color
+    h = hsv[0] -> number
+    s = hsv[1] -> number
+    v = hsv[2] -> number
+
+    if s == 0
+        -- grey
+        return [v v v 1]
+
+    h *= 6
+    i = floor(h)
+    f = h - i
+    p = v * (1 - s)
+    q = v * (1 - s * f)
+    t = v * (1 - s * (1 - f))
+
+    if i == 0
+        return [v t p 1]
+    elif i == 1
+        return [q v p 1]
+    elif i == 2
+        return [p v t 1]
+    elif i == 3
+        return [p q v 1]
+    elif i == 4
+        return [t p v 1]
+    elif i == 5
+        return [v p q 1]
+
+    return [0 0 0 0]
+
 def delta(number val) -> number
     "Return the difference that 'val' has changed since the previous frame"
     state number prev = val
