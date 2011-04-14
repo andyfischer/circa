@@ -90,7 +90,9 @@ namespace overloaded_function {
             evaluate_branch_internal(CONTEXT, contents, &output);
             cast(&output, unbox_type(contents[0]->type), OUTPUT);
         } else {
-            return error_occurred(CONTEXT, CALLER, "specialized func not found");
+            std::stringstream msg;
+            msg << "specialized func not found for: " << CALLER->function->name;
+            return error_occurred(CONTEXT, CALLER, msg.str());
         }
     }
 

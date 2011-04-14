@@ -2,13 +2,14 @@
 background(#fff)
 
 type BoxDefinition {
+  string id
   string name
   Point loc
   Point size
   List connections
 }
 
-node_content_font = text:load_font("../plastic/assets/Inconsolata.otf"->path, 16)
+node_content_font = text:load_font("plastic/assets/Inconsolata.otf", 16)
 
 def rect_center(Rect rect) -> Point
     return [(rect.x1 + rect.x2) / 2, (rect.y1 + rect.y2) / 2]
@@ -35,7 +36,7 @@ def draw_graph(List box_definitions)
             @defi -> BoxDefinition
             box_positions.append(defi.loc)
 
-    name_to_box_rect = Map()
+    id_to_box_rect = Map()
 
     -- Update positions for each box
     index = 0
@@ -48,7 +49,7 @@ def draw_graph(List box_definitions)
 
         box_positions[index] = pos
 
-        name_to_box_rect.add(defi.name rect)
+        id_to_box_rect.add(defi.id rect)
 
         index += 1
 
@@ -61,7 +62,7 @@ def draw_graph(List box_definitions)
         -- Draw each line
         outgoing_point = [(rect.x1 + rect.x2) / 2 rect.y2] -> Point
         for conn in defi.connections
-            their_rect = name_to_box_rect.get(conn) -> Rect
+            their_rect = id_to_box_rect.get(conn) -> Rect
 
             incoming_point = [(their_rect.x1 + their_rect.x2) / 2 their_rect.y1]
 
@@ -84,8 +85,8 @@ def draw_graph(List box_definitions)
         index += 1
 
 sample_input = [
-  ['Box1' [20 20] [80 30] ['Box2']]
-  ['Box2' [20 60] [80 30] []]
+  ['Box1' 'Box1' [20 20] [80 30] ['Box2']]
+  ['Box2' 'Box2' [20 60] [80 30] []]
   ]
 
 draw_graph(sample_input)

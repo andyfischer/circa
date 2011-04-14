@@ -43,10 +43,14 @@ CA_FUNCTION(play_sound)
     FMOD_RESULT result;
 
     FMOD_SOUND *sound = (FMOD_SOUND*) INPUT(0)->value_data.ptr;
+    float freq = FLOAT_INPUT(1);
     FMOD_CHANNEL *channel;
 
     static int nextChannel = 0;
+
     result = FMOD_System_PlaySound(g_system, (FMOD_CHANNELINDEX) nextChannel, sound, 0, &channel);
+    FMOD_Channel_SetFrequency(channel, freq);
+
     nextChannel++;
     if (nextChannel >= g_numChannels)
         nextChannel = 0;

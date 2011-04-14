@@ -66,7 +66,7 @@ namespace format_source_for_graph_function {
             // item[3]: PhraseLink[] inputs
             // item[4]: PhraseLink[] users
             List& statementInputs = *List::cast(statement[3], 0);
-            //List& statementUsers = *List::cast(statement[4], 0);
+            List& statementUsers = *List::cast(statement[4], 0);
 
             // item[0]: Phrase[] phrases
             List& phrases = *List::cast(statement[0], 0);
@@ -88,25 +88,26 @@ namespace format_source_for_graph_function {
 
                 termToStatement[term] = statementIndex;
 
-                if (as_string(phrase[0]) == "\n") {
-                    currentX = 0;
-                    currentY++;
-                    continue;
-                }
+                phrase.resize(4);
 
                 int length = as_string(phrase[0]).size();
 
-                if (phrase_type == phrase_type::FUNCTION_NAME)
-                    termToFunctionCallLocation[term] = FragmentLocation(currentX, currentY, length);
-
-                phrase.resize(4);
                 List& location = *List::cast(phrase[3], 4);
                 set_int(location[0], currentX);
                 set_int(location[1], currentY);
                 set_int(location[2], currentX + length);
                 set_int(location[3], currentY);
 
-                currentX += length;
+
+                if (phrase_type == phrase_type::FUNCTION_NAME)
+                    termToFunctionCallLocation[term] = FragmentLocation(currentX, currentY, length);
+
+                if (as_string(phrase[0]) == "\n") {
+                    currentX = 0;
+                    currentY++;
+                } else {
+                    currentX += length;
+                }
             }
 
             // For each input, add a PhraseLink

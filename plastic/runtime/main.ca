@@ -151,7 +151,7 @@ namespace image
 -- Audio
 type Sound;
 def load_sound_int(string filename) -> Sound
-def play_sound(Sound sound);
+def play_sound(Sound sound, number freq);
 
 def load_sound(string filename) -> Sound
     state Sound s

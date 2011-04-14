@@ -1,4 +1,4 @@
-background(#eef)
+--background(#eef)
 
 namespace display_mode
     text = 1
@@ -7,13 +7,13 @@ namespace display_mode
 
 namespace editor
     def get_highlight_color(int token) -> Color
-        return #000
+        return #fff
 
 def draw_code(string s, Point loc, Color color)
     draw_text(coding_font, s, color, loc)
 
 def h1_label(string s, Point loc)
-    draw_text(coding_font, s, #000, loc)
+    draw_text(coding_font, s, #fff, loc)
 
 def wrap_string(string s, int limit) -> List
     break_count = s.length() // limit + 1
@@ -33,7 +33,7 @@ def tooltip_text(List lines, Point loc)
         for l in wrap_string(line, 50)
             actual_lines.append(l)
     for line in actual_lines
-        draw_text(coding_font, line->string, #000, loc)
+        draw_text(coding_font, line->string, #fff, loc)
         loc += [0 20]
 
 def terms_have_same_source_line(Ref a, Ref b) -> bool
@@ -85,10 +85,11 @@ def draw_code_editor(Point topleft, BranchRef branch)
     approach(@line_height, td*100)
 
     def source_loc_to_rect(Rect source_loc) -> Rect
-        return [source_loc.x1*letter_width source_loc.y1*line_height
+        rel = [source_loc.x1*letter_width source_loc.y1*line_height
             source_loc.x2*letter_width (source_loc.y2)*line_height+letter_height]
+        return rel + [topleft.x topleft.y topleft.x topleft.y]
     def source_loc_to_point(Point source_loc) -> Point
-        return [source_loc.x*letter_width source_loc.y*line_height]
+        return [source_loc.x*letter_width source_loc.y*line_height] + topleft
 
     -- Find the mouseover term
     mouseover_term = null
@@ -111,7 +112,7 @@ def draw_code_editor(Point topleft, BranchRef branch)
             for link in statement.inputs
                 @link -> PhraseLink
                 line(source_loc_to_point(link.startPos) + [0 letter_height]
-                    source_loc_to_point(link.endPos) #000)
+                    source_loc_to_point(link.endPos) #fff)
 
         for phrase in statement.phrases
             @phrase -> Phrase
@@ -126,4 +127,4 @@ def example()
   b = add(a add(1 add(1 2)) a a a a)
   mult(a,b)
 
-draw_code_editor([20 20] (example->branch_ref))
+--draw_code_editor([20 20] (example->branch_ref))

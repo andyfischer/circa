@@ -20,4 +20,34 @@ namespace cpp_type_wrapper {
     }
 
 } // namespace type_wrapper
+
+namespace heap_value_type_wrapper {
+
+    template <typename T>
+    void initialize(Type* type, TaggedValue* value)
+    {
+        value->value_data.ptr = new T();
+    }
+
+    template <typename T>
+    void release(TaggedValue* value)
+    {
+        delete (T*) value->value_data.ptr;
+    }
+
+    template <typename T>
+    void copy(TaggedValue* source, TaggedValue* dest)
+    {
+        *((T*) dest->value_data.ptr) = *((T*) source->value_data.ptr);
+    }
+
+    template <typename T>
+    void setup_type(Type* type)
+    {
+        type->initialize = initialize<T>;
+        type->release = release<T>;
+        type->copy = copy<T>;
+    }
+
+}
 } // namespace circa

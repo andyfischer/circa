@@ -32,7 +32,7 @@ def once() -> bool
 def cycle(int max) -> int
     "Stateful function, cycles though the integers starting at 0 and ending before 'max'"
     state int counter = 0
-    if counter >= length
+    if counter >= max
         counter = 0
     result = counter
     counter += 1
