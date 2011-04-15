@@ -16,8 +16,8 @@ namespace circa {
 
 EvaluateFunc derive_evaluate_func(Term* term)
 {
-    if (!FINISHED_BOOTSTRAP)
-        return empty_evaluate_function;
+    if (!FINISHED_BOOTSTRAP && term->function == VALUE_FUNC)
+        return value_function::evaluate;
 
     if (term->function == NULL)
         return empty_evaluate_function;

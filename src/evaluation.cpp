@@ -11,6 +11,7 @@
 #include "introspection.h"
 #include "locals.h"
 #include "parser.h"
+#include "refactoring.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -20,14 +21,13 @@ namespace circa {
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-    EvaluateFunc func = function_t::get_evaluate(term->function);
-    ca_assert(func != NULL);
+    ca_test_assert(term->evaluateFunc == derive_evaluate_func(term));
 
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    func(context, term);
+    term->evaluateFunc(context, term);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }

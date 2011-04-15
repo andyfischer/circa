@@ -155,6 +155,11 @@ void create_primitive_types()
     string_t::setup_type(&ERROR_T);
 }
 
+void update_bootstrapped_term(Term* term)
+{
+    term->evaluateFunc = derive_evaluate_func(term);
+}
+
 void bootstrap_kernel()
 {
     // Create the very first building blocks. Most of the building functions in Circa
@@ -214,6 +219,12 @@ void bootstrap_kernel()
 
     // Update locals so that debugging checks don't complain.
     refresh_locals_indices(*KERNEL);
+
+    update_bootstrapped_term(VALUE_FUNC);
+    update_bootstrapped_term(TYPE_TYPE);
+    update_bootstrapped_term(ANY_TYPE);
+    update_bootstrapped_term(FUNCTION_ATTRS_TYPE);
+    update_bootstrapped_term(FUNCTION_TYPE);
 }
 
 void initialize_primitive_types(Branch& kernel)
