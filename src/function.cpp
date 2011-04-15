@@ -433,8 +433,10 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
     return overloaded_function::create_overloaded_function(branch, name, overloads);
 }
 
-Term* function_get_specialized_output_type(Term* function, Term* call)
+Term* derive_specialized_output_type(Term* function, Term* call)
 {
+    if (!FINISHED_BOOTSTRAP)
+        return ANY_TYPE;
     if (!is_function(function))
         return ANY_TYPE;
     Term* outputType = function_get_output_type(function, 0);

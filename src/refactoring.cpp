@@ -14,6 +14,20 @@
 
 namespace circa {
 
+EvaluateFunc derive_evaluate_func(Term* term)
+{
+    if (!FINISHED_BOOTSTRAP)
+        return empty_evaluate_function;
+
+    if (term->function == NULL)
+        return empty_evaluate_function;
+
+    if (!is_function(term->function))
+        return empty_evaluate_function;
+
+    return function_t::get_evaluate(term->function);
+}
+
 void change_function(Term* term, Term* function)
 {
     if (term->function == function)
@@ -23,21 +37,14 @@ void change_function(Term* term, Term* function)
 
     term->nestedContents.clear();
 
-    // Check if we need to change the # of inputs
-    //if (!function_t::get_variable_args(function))
-    //    term->inputs.resize(function_t::num_inputs(function));
-
-    Term* newType = function_get_specialized_output_type(function, term);
+    Term* newType = derive_specialized_output_type(function, term);
 
     ca_assert(newType != NULL);
     ca_assert(is_type(newType));
 
     change_type(term, newType);
 
-    if (is_function(function))
-        term->evaluateFunc = function_t::get_evaluate(function);
-    else
-        term->evaluateFunc = empty_evaluate_function;
+    term->evaluateFunc = derive_evaluate_func(term);
 }
 
 void unsafe_change_type(Term *term, Term *type)
@@ -71,7 +78,7 @@ void change_type(Term *term, Term *typeTerm)
 
 void possibly_respecialize_type(Term* term)
 {
-    Term* outputType = function_get_specialized_output_type(term->function, term);
+    Term* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
         change_type(term, outputType);
 }

@@ -232,7 +232,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     if (name != "")
         branch.bindName(term, name);
 
-    term->function = VALUE_FUNC;
+    change_function(term, VALUE_FUNC);
     term->type = type;
     change_type(term, type);
     update_unique_name(term);
