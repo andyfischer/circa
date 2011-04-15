@@ -133,6 +133,11 @@ Branch& kernel()
     return *KERNEL;
 }
 
+CA_FUNCTION(empty_evaluate_function)
+{
+    set_null(OUTPUT);
+}
+
 void create_primitive_types()
 {
     null_t::setup_type(&NULL_TYPE);

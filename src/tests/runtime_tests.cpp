@@ -44,11 +44,19 @@ void test_misc()
     test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
 }
 
+void test_dont_crash_on_static_error()
+{
+    Branch branch;
+    branch.compile("nonexistant()");
+    evaluate_branch(branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(runtime_tests::blocked_by_error);
     REGISTER_TEST_CASE(runtime_tests::test_errored_function);
     REGISTER_TEST_CASE(runtime_tests::test_misc);
+    //REGISTER_TEST_CASE(runtime_tests::test_dont_crash_on_static_error);
 }
 
 } // namespace runtime_tests

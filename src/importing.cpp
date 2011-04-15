@@ -13,10 +13,6 @@
 
 namespace circa {
 
-CA_FUNCTION(empty_evaluate)
-{
-}
-
 CA_FUNCTION(empty_evaluate_no_touch_output)
 {
 }
@@ -26,7 +22,7 @@ Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& 
     Term* result = parser::compile(&branch, parser::function_decl, header);
 
     if (evaluate == NULL)
-        evaluate = empty_evaluate;
+        evaluate = empty_evaluate_function;
 
     function_t::get_evaluate(result) = evaluate;
     return result;

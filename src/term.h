@@ -50,6 +50,10 @@ struct Term : TaggedValue
     // Our function: the thing that takes our inputs and produces a value.
     Ref function;
 
+    // A function pointer to the C function which does the actual work. This is
+    // derived from 'function'. Used during interpreted evaluation.
+    EvaluateFunc evaluateFunc;
+
     // Our name binding.
     std::string name;
 

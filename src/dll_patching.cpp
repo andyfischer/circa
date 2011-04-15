@@ -43,7 +43,7 @@ void unload_dll(const char* filename)
         FunctionAttrs* attrs = get_function_attrs(ref);
 
         if (dll->loadedFunctions.find((void*) attrs->evaluate) != dll->loadedFunctions.end())
-            attrs->evaluate = empty_evaluate;
+            attrs->evaluate = empty_evaluate_function;
     }
 
     // Platform specific

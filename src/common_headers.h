@@ -91,4 +91,7 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
 void ca_assert_function(bool result, const char* expr, int line, const char* file);
 
+// An evaluation function which does nothing
+CA_FUNCTION(empty_evaluate_function);
+
 } // namespace circa

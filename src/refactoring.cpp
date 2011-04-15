@@ -34,6 +34,8 @@ void change_function(Term* term, Term* function)
         change_type(term, newType);
 
     term->setStringProp("syntax:functionName", get_relative_name(term, function));
+
+    term->evaluateFunc = function_t::get_evaluate(function);
 }
 
 void unsafe_change_type(Term *term, Term *type)
