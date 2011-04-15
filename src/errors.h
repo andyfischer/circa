@@ -16,4 +16,6 @@ void internal_error(std::string const& message);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 
+CA_FUNCTION(evaluate_func_for_static_error);
+
 } // namespace circa

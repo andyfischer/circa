@@ -78,4 +78,9 @@ void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
         << " " << context.errorMessage;
 }
 
+CA_FUNCTION(evaluate_func_for_static_error)
+{
+    // No-op for now
+}
+
 } // namespace circa

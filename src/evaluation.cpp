@@ -21,8 +21,6 @@ namespace circa {
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-    ca_test_assert(term->evaluateFunc == derive_evaluate_func(term));
-
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif

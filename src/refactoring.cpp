@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "function.h"
 #include "names.h"
+#include "static_checking.h"
 #include "term.h"
 #include "type.h"
 
