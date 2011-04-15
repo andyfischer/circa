@@ -4,6 +4,7 @@
 #include "building.h"
 #include "builtins.h"
 #include "debug_valid_objects.h"
+#include "errors.h"
 #include "function.h"
 #include "names.h"
 #include "term.h"
@@ -19,9 +20,10 @@ void change_function(Term* term, Term* function)
         return;
 
     if (!is_callable(function))
-        throw std::runtime_error("Term "+function->name+" is not callable");
+        internal_error("Term "+function->name+" is not callable");
 
     term->function = function;
+
     term->nestedContents.clear();
 
     // Check if we need to change the # of inputs
@@ -30,10 +32,7 @@ void change_function(Term* term, Term* function)
 
     Term* newType = function_get_specialized_output_type(function, term);
 
-    if (newType != ANY_TYPE)
-        change_type(term, newType);
-
-    term->setStringProp("syntax:functionName", get_relative_name(term, function));
+    change_type(term, newType);
 
     term->evaluateFunc = function_t::get_evaluate(function);
 }

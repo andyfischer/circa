@@ -48,15 +48,6 @@ void test_change_function()
     change_function(a, KERNEL->get("mult_i"));
     evaluate_branch(branch);
     test_assert(as_int(a) == 9);
-
-    // Make sure that if we change an expression to value(), that its current
-    // value is preserved.
-    test_assert(function_get_output_type(VALUE_FUNC, 0) == ANY_TYPE);
-    change_function(a, VALUE_FUNC);
-    test_assert(as_int(a) == 9);
-    // test_assert(a->numInputs() == 0); // Should truncate inputs
-    evaluate_branch(branch);
-    test_assert(as_int(a) == 9);
 }
 
 void repro_source_after_append_code()
