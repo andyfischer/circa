@@ -170,6 +170,27 @@ void test_include_with_state()
     test_equals(&context.state, "[_include: [b: 3], a: 1]");
 }
 
+void test_call_function_from_included_file()
+{
+    FakeFileSystem files;
+    files["file"] = "def hi() -> int { return 1 }";
+    Branch branch;
+    Term* includeCall = branch.compile("include('file')");
+    branch.compile("hi()");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    return; // TEST_DISABLED
+
+    files.last_modified("file")++;
+    evaluate_single_term(&context, includeCall);
+
+    dump(branch);
+
+    evaluate_branch(&context, branch);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
@@ -180,6 +201,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
     REGISTER_TEST_CASE(file_based_tests::test_include_from_expression);
     REGISTER_TEST_CASE(file_based_tests::test_include_with_state);
+    REGISTER_TEST_CASE(file_based_tests::test_call_function_from_included_file);
 }
 
 } // namespace file_based_tests

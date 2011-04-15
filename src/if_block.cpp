@@ -39,7 +39,7 @@ void update_if_block_joining_branch(Term* ifCall)
         create_branch(contents, "#joining");
 
     Branch& joining = contents["#joining"]->nestedContents;
-    joining.clear();
+    clear_branch(&joining);
 
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;

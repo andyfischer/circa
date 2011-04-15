@@ -12,7 +12,7 @@ namespace circa {
 static void load(Branch& branch, std::string const& filename)
 {
     if (filename == "") {
-        branch.clear();
+        clear_branch(&branch);
         return;
     }
 

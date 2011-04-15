@@ -41,7 +41,7 @@ Ref compile(Branch* branch, ParsingStep step, std::string const& input)
     ca_assert(branch_check_invariants_print_result(*branch, std::cout));
 
     if (temporaryBranch) {
-        branch->clear();
+        clear_branch(branch);
         delete branch;
     }
 

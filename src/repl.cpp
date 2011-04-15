@@ -81,7 +81,7 @@ void start_repl()
             continue;
         }
         if (input == "/clear") {
-            replState.clear();
+            clear_branch(&replState);
             std::cout << "Cleared working area" << std::endl;
             continue;
         }

@@ -33,7 +33,7 @@ Branch::Branch()
 
 Branch::~Branch()
 {
-    safe_delete_branch_contents(this);
+    clear_branch(this);
     debug_unregister_valid_object(this);
 }
 
@@ -262,7 +262,7 @@ void Branch::removeNulls()
 void Branch::shorten(int newLength)
 {
     if (newLength == 0) {
-        clear();
+        clear_branch(this);
         return;
     }
 
@@ -270,6 +270,12 @@ void Branch::shorten(int newLength)
         set(i, NULL);
 
     removeNulls();
+}
+
+void
+Branch::clear()
+{
+    clear_branch(this);
 }
 
 Term* Branch::findFirstBinding(std::string const& name) const
@@ -316,12 +322,6 @@ void Branch::remapPointers(ReferenceMap const& map)
         if (term != NULL)
             remap_pointers(term, map);
     }
-}
-
-void
-Branch::clear()
-{
-    safe_delete_branch_contents(this);
 }
 
 std::string Branch::toString()
@@ -382,7 +382,7 @@ Branch* get_outer_scope(Branch const& branch)
     return branch.owningTerm->owningBranch;
 }
 
-void safe_delete_branch_contents(Branch* branch)
+void clear_branch(Branch* branch)
 {
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
@@ -402,7 +402,7 @@ void safe_delete_branch_contents(Branch* branch)
         if (term == NULL)
             continue;
 
-        safe_delete_branch_contents(&term->nestedContents);
+        clear_branch(&term->nestedContents);
     }
 
     for (int i= branch->_terms.length() - 1; i >= 0; i--) {
@@ -446,7 +446,7 @@ void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& d
         newTermMap[source_term] = dest_term;
 
         // duplicate nested contents
-        dest_term->nestedContents.clear();
+        clear_branch(&dest_term->nestedContents);
         duplicate_branch_nested(newTermMap,
                 source_term->nestedContents, dest_term->nestedContents);
     }

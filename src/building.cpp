@@ -379,7 +379,7 @@ float get_step(Term* term)
 
 void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition, bool outsidePositive)
 {
-    rebinds.clear();
+    clear_branch(&rebinds);
 
     std::vector<std::string> reboundNames;
     list_names_that_this_branch_rebinds(source, reboundNames);

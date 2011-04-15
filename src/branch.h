@@ -99,14 +99,13 @@ struct Branch
     void remove(int index);
     void removeNulls();
     void shorten(int newLength);
+    void clear();
 
     // Bind a name to a term
     void bindName(Term* term, std::string name);
 
     // Remap pointers
     void remapPointers(ReferenceMap const& map);
-
-    void clear();
 
     // Compile the given statement, return the result term.
     Term* compile(std::string const& statement);
@@ -132,7 +131,7 @@ Branch& nested_contents(Term* term);
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch const& branch);
 
-void safe_delete_branch_contents(Branch* branch);
+void clear_branch(Branch* branch);
 void duplicate_branch(Branch& source, Branch& dest);
 
 void parse_script(Branch& branch, std::string const& filename);

@@ -36,7 +36,7 @@ void change_function(Term* term, Term* function)
 
     term->function = function;
 
-    term->nestedContents.clear();
+    clear_branch(&term->nestedContents);
 
     Term* newType = derive_specialized_output_type(function, term);
 
@@ -154,7 +154,7 @@ void erase_term(Term* term)
     assert_valid_term(term);
 
     set_inputs(term, RefList());
-    term->nestedContents.clear();
+    clear_branch(&term->nestedContents);
 
     // for each user, clear that user's input list of this term
     clear_from_users_inputs(term);
