@@ -181,6 +181,8 @@ void test_call_function_from_included_file()
     EvalContext context;
     evaluate_branch(&context, branch);
 
+    //dump(branch);
+
     return; // TEST_DISABLED
 
     files.last_modified("file")++;

@@ -157,8 +157,8 @@ void post_input_change(Term* term)
 
 bool is_actually_using(Term* user, Term* usee)
 {
-    for (int i=0; i < user->numInputs(); i++)
-        if (user->input(i) == usee)
+    for (int i=0; i < user->numDependencies(); i++)
+        if (user->dependency(i) == usee)
             return true;
 
     return false;
@@ -172,9 +172,10 @@ void possibly_prune_user_list(Term* user, Term* usee)
 
 void remove_from_users(Term* term)
 {
-    for (int i=0; i < term->numInputs(); i++) {
-        Term* user = term->input(i);
-        if (user == NULL) continue;
+    for (int i=0; i < term->numDependencies(); i++) {
+        Term* user = term->dependency(i);
+        if (user == NULL)
+            continue;
         user->users.remove(term);
     }
 }
@@ -186,6 +187,8 @@ void clear_from_users_inputs(Term* term)
         for (int input=0; input < user->numInputs(); input++)
             if (user->input(input) == term)
                 set_input(user, input, NULL);
+        if (user->function == term)
+            change_function(user, NULL);
     }
 }
 

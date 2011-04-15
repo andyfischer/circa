@@ -49,7 +49,10 @@ void change_function(Term* term, Term* function)
 
     term->evaluateFunc = derive_evaluate_func(term);
 
+    possibly_prune_user_list(term, previousFunction);
 
+    //if (function != NULL)
+    //    function->users.appendUnique(term);
 }
 
 void unsafe_change_type(Term *term, Term *type)
