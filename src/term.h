@@ -100,6 +100,12 @@ struct Term : TaggedValue
 
     void inputsToList(RefList* out) const;
 
+    // In this context, the 'dependencies' include the function term and all input
+    // terms. So, this is the same as the input list, with the function inserted
+    // at element 0. This is more convenient in some situations.
+    Term* dependency(int index) const;
+    int numDependencies() const;
+
     const char* getName(int index) const;
     int nameCount() const;
 

@@ -28,8 +28,12 @@ void post_input_change(Term* term);
 
 bool is_actually_using(Term* user, Term* usee);
 
+void possibly_prune_user_list(Term* user, Term* usee);
+
 // This finds all the terms which have this term as a user, and removes it from
-// their user list. This is appropriate when you want to delete 'term'.
+// their user list. This creates a temporary inconsistency (because the term is
+// still technically using those things) but it's appropriate when you want to delete
+// this term.
 void remove_from_users(Term* term);
 
 // This checks every user of this term, and removes it from their input lists.

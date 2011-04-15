@@ -34,6 +34,8 @@ void change_function(Term* term, Term* function)
     if (term->function == function)
         return;
 
+    Term* previousFunction = term->function;
+
     term->function = function;
 
     clear_branch(&term->nestedContents);
@@ -46,6 +48,8 @@ void change_function(Term* term, Term* function)
     change_type(term, newType);
 
     term->evaluateFunc = derive_evaluate_func(term);
+
+
 }
 
 void unsafe_change_type(Term *term, Term *type)

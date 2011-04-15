@@ -80,8 +80,7 @@ void set_input2(Term* term, int index, Term* input, int outputIndex)
         input->users.appendUnique(term);
 
     // Check if we should remove 'term' from the user list of previousInput
-    if (previousInput != NULL && !is_actually_using(previousInput, term))
-        previousInput->users.remove(term);
+    possibly_prune_user_list(term, previousInput);
 
     // Don't do post_input_change here, caller must call it.
 }
@@ -105,8 +104,7 @@ void set_input(Term* term, int index, Term* input)
         input->users.appendUnique(term);
 
     // Check if we should remove 'term' from the user list of previousInput
-    if (previousInput != NULL && !is_actually_using(previousInput, term))
-        previousInput->users.remove(term);
+    possibly_prune_user_list(term, previousInput);
 
     post_input_change(term);
 }
@@ -133,11 +131,8 @@ void set_inputs(Term* term, RefList const& inputs)
             inputs[i]->users.appendUnique(term);
 
     // Check to remove 'term' from user list of any previous inputs
-    for (size_t i=0; i < previousInputs.size(); i++) {
-        Term* previousInput = previousInputs[i].term;
-        if (previousInput != NULL && !is_actually_using(previousInput, term))
-            previousInput->users.remove(term);
-    }
+    for (size_t i=0; i < previousInputs.size(); i++)
+        possibly_prune_user_list(term, previousInputs[i].term);
 
     post_input_change(term);
 }
@@ -162,11 +157,17 @@ void post_input_change(Term* term)
 
 bool is_actually_using(Term* user, Term* usee)
 {
-    for (int i=0; i < usee->numInputs(); i++)
-        if (usee->input(i) == user)
+    for (int i=0; i < user->numInputs(); i++)
+        if (user->input(i) == usee)
             return true;
 
     return false;
+}
+
+void possibly_prune_user_list(Term* user, Term* usee)
+{
+    if (usee != NULL && !is_actually_using(user, usee))
+        usee->users.remove(user);
 }
 
 void remove_from_users(Term* term)

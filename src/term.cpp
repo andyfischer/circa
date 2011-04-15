@@ -64,6 +64,21 @@ Term::inputsToList(RefList* out) const
         out->setAt(i, input(i));
 }
 
+Term*
+Term::dependency(int index) const
+{
+    if (index == 0)
+        return this->function;
+    else
+        return input(index - 1);
+}
+
+int
+Term::numDependencies() const
+{
+    return numInputs() + 1;
+}
+
 const char*
 Term::getName(int index) const
 {
