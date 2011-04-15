@@ -19,9 +19,6 @@ void change_function(Term* term, Term* function)
     if (term->function == function)
         return;
 
-    if (!is_callable(function))
-        internal_error("Term "+function->name+" is not callable");
-
     term->function = function;
 
     term->nestedContents.clear();
@@ -32,9 +29,15 @@ void change_function(Term* term, Term* function)
 
     Term* newType = function_get_specialized_output_type(function, term);
 
+    ca_assert(newType != NULL);
+    ca_assert(is_type(newType));
+
     change_type(term, newType);
 
-    term->evaluateFunc = function_t::get_evaluate(function);
+    if (is_function(function))
+        term->evaluateFunc = function_t::get_evaluate(function);
+    else
+        term->evaluateFunc = empty_evaluate_function;
 }
 
 void unsafe_change_type(Term *term, Term *type)

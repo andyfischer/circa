@@ -31,8 +31,6 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     // Create the term
     Term* result = branch.appendNew();
 
-    result->function = function;
-
     if (name != "")
         branch.bindName(result, name);
 
@@ -48,12 +46,8 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     for (int i=0; i < _inputs.length(); i++)
         set_input(result, i, _inputs[i]);
 
-    Term* outputType = function_get_specialized_output_type(function, result);
-
-    ca_assert(outputType != NULL);
-    ca_assert(is_type(outputType));
-
-    change_type(result, outputType);
+    // change_function will also update the declared type.
+    change_function(result, function);
 
     post_input_change(result);
 

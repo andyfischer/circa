@@ -92,6 +92,7 @@ namespace assign_function {
     void postInputChange(Term* term)
     {
         update_assign_contents(term);
+        possibly_respecialize_type(term);
     }
 
     void setup(Branch& kernel)

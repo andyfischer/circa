@@ -309,6 +309,8 @@ Branch& function_contents(Term* func)
 
 FunctionAttrs* get_function_attrs(Term* func)
 {
+    if (func == NULL)
+        return NULL;
     if (func->nestedContents.length() == 0)
         return NULL;
     if (func->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
