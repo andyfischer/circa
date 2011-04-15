@@ -1,0 +1,24 @@
+
+assert(receive('a') == [])
+
+send('a' 1)
+
+assert(receive('a') == [1])
+assert(receive('a') == [])
+
+send('a' 1)
+send('a' 2)
+send('a' 3)
+
+assert(receive('a') == [1 2 3])
+
+send('a' [[[1]]])
+
+assert(receive('a') == [[[[1]]]])
+
+send('a' 1)
+send('a' 2)
+send('a' 3)
+
+assert(receive_last(null 'a') == 3)
+assert(receive_last(null 'a') == null)

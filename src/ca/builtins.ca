@@ -51,6 +51,14 @@ def seed() -> number
     state number s = rand()
     return s
 
+-- Message passing functions
+def receive_last(any default, string inbox_name) -> any
+    results = receive(inbox_name)
+    if results == []
+        return default
+    else
+        return results[length(results)-1]
+
 -- Math utility functions
 def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]

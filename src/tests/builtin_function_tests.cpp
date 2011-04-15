@@ -239,37 +239,37 @@ void test_message_passing()
 {
     Branch branch;
     EvalContext context;
-    Term* i = branch.compile("i = inbox()");
-    Term* send = branch.compile("send(i, 1)");
+    Term* inbox = branch.compile("inbox = receive('inbox_name')");
+    Term* send = branch.compile("send('inbox_name', 1)");
 
     // Before running, message queue should be empty
-    test_assert(i->numElements() == 0);
+    test_assert(inbox->numElements() == 0);
     test_equals(&context.messages, "[]");
 
-    // First run, i is still empty, but there is 1 message in transit
+    // First run, inbox is still empty, but there is 1 message in transit
     evaluate_branch(&context, branch);
-    test_assert(i->numElements() == 0);
-    test_equals(&context.messages, "[i: [1]]");
+    test_assert(inbox->numElements() == 0);
+    test_equals(&context.messages, "[inbox_name: [1]]");
 
-    // Second run, i now returns 1
+    // Second run, inbox now returns 1
     evaluate_branch(&context, branch);
-    test_assert(i->numElements() == 1);
-    test_assert(i->getIndex(0)->asInt() == 1);
-    test_equals(&context.messages, "[i: [1]]");
+    test_assert(inbox->numElements() == 1);
+    test_assert(inbox->getIndex(0)->asInt() == 1);
+    test_equals(&context.messages, "[inbox_name: [1]]");
 
     // Delete the send() call
     erase_term(send);
 
-    // Third run, i still returns 1 (from previous call), message queue is empty
+    // Third run, inbox still returns 1 (from previous call), message queue is empty
     evaluate_branch(&context, branch);
-    test_assert(i->numElements() == 1);
-    test_assert(i->getIndex(0)->asInt() == 1);
-    test_equals(&context.messages, "[i: []]");
+    test_assert(inbox->numElements() == 1);
+    test_assert(inbox->getIndex(0)->asInt() == 1);
+    test_equals(&context.messages, "[inbox_name: []]");
 
-    // Fourth run, i is empty again
+    // Fourth run, inbox is empty again
     evaluate_branch(&context, branch);
-    test_assert(i->numElements() == 0);
-    test_equals(&context.messages, "[i: []]");
+    test_assert(inbox->numElements() == 0);
+    test_equals(&context.messages, "[inbox_name: []]");
 }
 
 void test_message_passing2()
@@ -278,9 +278,9 @@ void test_message_passing2()
     Branch branch;
     branch.compile(
         "state last_output = 1\n"
-        "incoming = inbox()\n"
+        "incoming = receive('inbox_name')\n"
         "def send_func(any s)\n"
-        "  send(incoming, s)\n"
+        "  send('inbox_name', s)\n"
         "for s in incoming\n"
         "  last_output = s\n"
         "send_func(2)\n");
