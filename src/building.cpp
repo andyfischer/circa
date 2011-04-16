@@ -173,10 +173,10 @@ void possibly_prune_user_list(Term* user, Term* usee)
 void remove_from_users(Term* term)
 {
     for (int i=0; i < term->numDependencies(); i++) {
-        Term* user = term->dependency(i);
-        if (user == NULL)
+        Term* usee = term->dependency(i);
+        if (usee == NULL)
             continue;
-        user->users.remove(term);
+        usee->users.remove(term);
     }
 }
 

@@ -38,18 +38,10 @@ void change_function(Term* term, Term* function)
 
     term->function = function;
 
-    clear_branch(&term->nestedContents);
-
-    Term* newType = derive_specialized_output_type(function, term);
-
-    ca_assert(newType != NULL);
-    ca_assert(is_type(newType));
-
-    change_type(term, newType);
-
     term->evaluateFunc = derive_evaluate_func(term);
 
     possibly_prune_user_list(term, previousFunction);
+    possibly_respecialize_type(term);
 
     //if (function != NULL)
     //    function->users.appendUnique(term);
