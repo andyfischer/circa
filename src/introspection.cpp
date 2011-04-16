@@ -47,7 +47,7 @@ bool is_major_branch(Term* term)
     return is_subroutine(term);
 }
 
-std::string format_global_id(Term* term)
+std::string global_id(Term* term)
 {
     if (term == NULL)
         return "NULL";
@@ -64,7 +64,7 @@ std::string get_short_local_name(Term* term)
     if (term->name != "")
         return term->name;
 
-    return format_global_id(term);
+    return global_id(term);
 }
 
 std::string branch_namespace_to_string(Branch& branch)
@@ -73,7 +73,7 @@ std::string branch_namespace_to_string(Branch& branch)
 
     TermNamespace::iterator it;
     for (it = branch.names.begin(); it != branch.names.end(); ++it)
-        out << it->first << ": " << format_global_id(it->second) << "\n";
+        out << it->first << ": " << global_id(it->second) << "\n";
 
     return out.str();
 }
@@ -113,7 +113,7 @@ std::string get_short_location(Term* term)
     else
         out << "loc?";
     out << " ";
-    out << format_global_id(term);
+    out << global_id(term);
     out << "]";
     return out.str();
 }
@@ -225,7 +225,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         return;
     }
 
-    out << format_global_id(term);
+    out << global_id(term);
 
     if (term->name != "")
         out << " '" << term->name << "'";
@@ -234,14 +234,14 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << " <NULL function>";
     } else {
         out << " " << term->function->name;
-        out << format_global_id(term->function);
+        out << global_id(term->function);
     }
 
     // Arguments
     out << "(";
     for (int i=0; i < term->numInputs(); i++) {
         if (i != 0) out << " ";
-        out << format_global_id(term->input(i));
+        out << global_id(term->input(i));
         out << "#" << term->inputs[i].outputIndex;
     }
     out << ")";
@@ -269,7 +269,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << " type:" << term->type->name;
 
         if (prefs->showAllIDs)
-            out << format_global_id(term->type);
+            out << global_id(term->type);
 
         if (unbox_type(term->type) != term->value_type)
             out << " vt:" << term->value_type->name;
@@ -293,7 +293,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     out << " users = ["; 
     for (int i=0; i < term->users.length(); i++) {
         if (i != 0) out << ", ";
-        out << format_global_id(term->users[i]);
+        out << global_id(term->users[i]);
     }
     out << "]";
 

@@ -41,7 +41,7 @@ void test_assert_function(Term* term, int line, const char* file)
 
     if (has_static_error(term)) {
         std::stringstream msg;
-        msg << "Compile error on term " << format_global_id(term) << std::endl;
+        msg << "Compile error on term " << global_id(term) << std::endl;
         print_static_error(term, msg);
         msg << std::endl;
         msg << "Occurred in " << file << ", line " << line << std::endl;

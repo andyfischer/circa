@@ -15,7 +15,7 @@ namespace ref_t {
         if (t == NULL)
             return "NULL";
         else
-            return format_global_id(t);
+            return global_id(t);
     }
     void initialize(Type* type, TaggedValue* value)
     {
@@ -193,7 +193,7 @@ namespace ref_t {
         if (t == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL reference");
 
-        set_string(OUTPUT, format_global_id(t));
+        set_string(OUTPUT, global_id(t));
     }
     CA_FUNCTION(get_properties)
     {

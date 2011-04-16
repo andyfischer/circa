@@ -16,7 +16,7 @@ namespace internal_debug_function {
 
     void dump_parse_post_compile(Term* term)
     {
-        std::cout << "dump_parse " << format_global_id(term) << ": ";
+        std::cout << "dump_parse " << global_id(term) << ": ";
         for (int i=0; i < term->numInputs(); i++) {
             if (i != 0) std::cout << ", ";
             print_term(std::cout, term->input(0));

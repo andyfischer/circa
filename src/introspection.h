@@ -36,7 +36,7 @@ bool is_hidden(Term* term);
 bool is_major_branch(Term* term);
 
 // Format the term's global id as a string that looks like: $ab3
-std::string format_global_id(Term* term);
+std::string global_id(Term* term);
 
 std::string get_short_local_name(Term* term);
 

@@ -112,7 +112,7 @@ struct SourceCodePainter
             out << "Conflicts:    " << getLineOfXsForConflcits(1) << std::endl;
             out << "Term ";
             out.width(7);
-            out << format_global_id(term);
+            out << global_id(term);
             out.width(0);
             out << ": " << getLineFromConflict(1) << std::endl;
             failureMessage = out.str();
