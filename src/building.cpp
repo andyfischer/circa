@@ -429,7 +429,7 @@ void post_compile_term(Term* term)
             Term* outputCopy = apply(owningBranch, COPY_FUNC, RefList(), name);
             set_input2(outputCopy, 0, term, outputIndex);
 
-            possibly_respecialize_type(outputCopy);
+            respecialize_type(outputCopy);
             owningBranch.bindName(outputCopy, name);
         }
     }
@@ -449,7 +449,7 @@ void post_compile_term(Term* term)
                 Term* output = apply(owningBranch, COPY_FUNC, RefList(), name);
                 set_input2(output, 0, term, outputIndex);
 
-                possibly_respecialize_type(output);
+                respecialize_type(output);
                 owningBranch.bindName(output, term->input(i)->name);
 
             }

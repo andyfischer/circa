@@ -41,7 +41,7 @@ void change_function(Term* term, Term* function)
     term->evaluateFunc = derive_evaluate_func(term);
 
     possibly_prune_user_list(term, previousFunction);
-    possibly_respecialize_type(term);
+    respecialize_type(term);
 
     //if (function != NULL)
     //    function->users.appendUnique(term);
@@ -72,11 +72,11 @@ void change_type(Term *term, Term *typeTerm)
     for (int user=0; user < term->users.length(); user++) {
         Term* userTerm = term->users[user];
         debug_assert_valid_object(userTerm, TERM_OBJECT);
-        possibly_respecialize_type(userTerm);
+        respecialize_type(userTerm);
     }
 }
 
-void possibly_respecialize_type(Term* term)
+void respecialize_type(Term* term)
 {
     Term* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
