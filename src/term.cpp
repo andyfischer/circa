@@ -18,7 +18,8 @@ namespace circa {
 static unsigned int gNextGlobalID = 1;
 
 Term::Term()
-  : evaluateFunc(empty_evaluate_function),
+  : function(NULL),
+    evaluateFunc(empty_evaluate_function),
     owningBranch(NULL),
     index(0),
     localsIndex(0),

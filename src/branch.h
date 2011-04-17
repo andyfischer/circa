@@ -155,4 +155,15 @@ struct BranchInvariantCheck
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch);
 bool branch_check_invariants_print_result(Branch& branch, std::ostream& out);
 
+struct BranchBrokenLinkList
+{
+    struct Link {
+        std::string relativeName;
+        Term* user;
+        int depIndex;
+    };
+
+    std::vector<Link> brokenLinks;
+};
+
 } // namespace circa
