@@ -76,8 +76,7 @@ void set_input2(Term* term, int index, Term* input, int outputIndex)
     term->inputs[index] = Term::Input(input, outputIndex);
 
     // Add 'term' to the user list of 'input'
-    if (input != NULL && term != input)
-        input->users.appendUnique(term);
+    append_user(term, input);
 
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
@@ -100,8 +99,7 @@ void set_input(Term* term, int index, Term* input)
     term->inputs[index] = Term::Input(input);
 
     // Add 'term' to the user list of 'input'
-    if (input != NULL && term != input)
-        input->users.appendUnique(term);
+    append_user(term, input);
 
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
@@ -127,8 +125,7 @@ void set_inputs(Term* term, RefList const& inputs)
 
     // Add 'term' as a user to these new inputs
     for (int i=0; i < inputs.length(); i++)
-        if (inputs[i] != NULL)
-            inputs[i]->users.appendUnique(term);
+        append_user(term, inputs[i]);
 
     // Check to remove 'term' from user list of any previous inputs
     for (size_t i=0; i < previousInputs.size(); i++)
@@ -162,6 +159,18 @@ bool is_actually_using(Term* user, Term* usee)
             return true;
 
     return false;
+}
+
+void append_user(Term* user, Term* usee)
+{
+    if (usee != NULL && user != NULL) {
+        #if 0
+        std::cout << "adding " << global_id(user) << " as user of "
+            << global_id(usee)
+            << std::endl;
+        #endif
+        usee->users.appendUnique(user);
+    }
 }
 
 void possibly_prune_user_list(Term* user, Term* usee)

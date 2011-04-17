@@ -304,6 +304,10 @@ void reset_type(Type* type)
     type->getField = NULL;
     type->setField = NULL;
     type->numElements = NULL;
+
+    clear_branch(&type->prototype);
+    clear_branch(&type->attributes);
+    clear_branch(&type->memberFunctions);
 }
 
 void initialize_simple_pointer_type(Type* type)

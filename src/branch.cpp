@@ -4,6 +4,7 @@
 #include "building.h"
 #include "builtins.h"
 #include "debug_valid_objects.h"
+#include "errors.h"
 #include "evaluation.h"
 #include "importing_macros.h"
 #include "introspection.h"
@@ -410,7 +411,19 @@ void clear_branch(Branch* branch)
         if (term == NULL)
             continue;
 
-        ca_assert(term->users.length() == 0);
+        if (term->users.length() != 0) {
+            // Bad news, there are still users of this term, even though we want
+            // to delete them all.
+            for (int user = 0; user < term->users.length(); user++) {
+                std::cout << "In clear_branch, term "
+                    << global_id(term) << " (" << term->name << ") "
+                    << "is still being used by "
+                    << global_id(term->users[user]) << " (" << term->users[user]->name
+                    << ") " << std::endl;
+            }
+
+            internal_error("stale user pointers in clear_branch");
+        }
 
         // turn on this assert to catch orphaned terms:
         //ca_assert(term->refCount == 1);

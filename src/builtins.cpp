@@ -419,6 +419,19 @@ export_func void circa_initialize()
 
 export_func void circa_shutdown()
 {
+    reset_type(&BOOL_T);
+    reset_type(&DICT_T);
+    reset_type(&ERROR_T);
+    reset_type(&FLOAT_T);
+    reset_type(&INT_T);
+    reset_type(&LIST_T);
+    reset_type(&NULL_TYPE);
+    reset_type(&OPAQUE_POINTER_T);
+    reset_type(&REF_T);
+    reset_type(&STRING_T);
+    reset_type(&TYPE_T);
+    reset_type(&VOID_T);
+
     delete KERNEL;
     KERNEL = NULL;
 }

@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "debug_valid_objects.h"
 #include "errors.h"
+#include "introspection.h"
 #include "term.h"
 #include "type.h"
 

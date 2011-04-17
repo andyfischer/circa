@@ -6,6 +6,7 @@
 #include "debug_valid_objects.h"
 #include "errors.h"
 #include "function.h"
+#include "introspection.h"
 #include "names.h"
 #include "static_checking.h"
 #include "term.h"
@@ -43,8 +44,12 @@ void change_function(Term* term, Term* function)
     possibly_prune_user_list(term, previousFunction);
     respecialize_type(term);
 
-    //if (function != NULL)
-    //    function->users.appendUnique(term);
+    // Don't append user for certain functions. Need to make this more robust.
+    if (function != NULL
+            && function != VALUE_FUNC
+            && function != INPUT_PLACEHOLDER_FUNC) {
+        append_user(term, function);
+    }
 }
 
 void unsafe_change_type(Term *term, Term *type)
@@ -153,6 +158,7 @@ void erase_term(Term* term)
     assert_valid_term(term);
 
     set_inputs(term, RefList());
+    change_function(term, NULL);
     clear_branch(&term->nestedContents);
 
     // for each user, clear that user's input list of this term

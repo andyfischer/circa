@@ -28,6 +28,11 @@ namespace get_field_function {
         Term* head = caller->input(0);
 
         for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
+
+            // Abort if input type is not correct
+            if (!is_string(caller->input(1)))
+                return ANY_TYPE;
+
             std::string const& name = caller->input(1)->asString();
 
             Branch& type_prototype = type_t::get_prototype(head->type);

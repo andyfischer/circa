@@ -28,6 +28,8 @@ void post_input_change(Term* term);
 
 bool is_actually_using(Term* user, Term* usee);
 
+void append_user(Term* user, Term* usee);
+
 void possibly_prune_user_list(Term* user, Term* usee);
 
 // This finds all the terms which have this term as a user, and removes it from

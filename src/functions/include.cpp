@@ -13,29 +13,12 @@ namespace include_function {
         // Reload if the filename or modified-time has changed
         if (file_changed_function::check(cxt, caller, fileSignature, filename))
         {
-            Branch previous_contents;
-            duplicate_branch(contents, previous_contents);
-
             contents.clear();
 
             if (!storage::file_exists(filename.c_str()))
                 return error_occurred(cxt, caller, "File not found: "+filename);
 
             parse_script(contents, filename);
-
-            #if 0
-            if (has_static_errors(contents)) {
-                error_occurred(cxt, caller, get_static_errors_formatted(contents));
-
-                // New script has errors. If we have an existing script, then revert
-                // to that.
-                if (previous_contents.length() != 0) {
-                    contents.clear();
-                    duplicate_branch(previous_contents, contents);
-                }
-                return;
-            }
-            #endif
 
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);
