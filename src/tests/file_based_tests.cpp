@@ -176,21 +176,17 @@ void test_call_function_from_included_file()
     files["file"] = "def hi() -> int { return 1 }";
     Branch branch;
     Term* includeCall = branch.compile("include('file')");
-    branch.compile("hi()");
+    Term* hiCall = branch.compile("hi()");
 
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    //dump(branch);
-
-    return; // TEST_DISABLED
-
     files.last_modified("file")++;
     evaluate_single_term(&context, includeCall);
 
-    dump(branch);
-
     evaluate_branch(&context, branch);
+
+    test_assert(hiCall->function != NULL);
 }
 
 void register_tests()

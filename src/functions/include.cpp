@@ -13,7 +13,9 @@ namespace include_function {
         // Reload if the filename or modified-time has changed
         if (file_changed_function::check(cxt, caller, fileSignature, filename))
         {
-            contents.clear();
+            BrokenLinkList brokenLinks;
+
+            clear_branch(&contents, &brokenLinks);
 
             if (!storage::file_exists(filename.c_str()))
                 return error_occurred(cxt, caller, "File not found: "+filename);
@@ -22,6 +24,8 @@ namespace include_function {
 
             if (caller->owningBranch != NULL)
                 expose_all_names(contents, *caller->owningBranch);
+
+            repair_broken_links(&brokenLinks);
         }
     }
     void preload_script(Term* term)
