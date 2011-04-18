@@ -78,6 +78,17 @@ Term* get_named(Branch const& branch, const char* name)
     return get_named(branch, std::string(name));
 }
 
+bool exposes_nested_names(Term* term)
+{
+    if (term->nestedContents.length() == 0)
+        return false;
+    if (term->boolPropOptional("exposesNames", false))
+        return true;
+    if (term->function == INCLUDE_FUNC)
+        return true;
+    return false;
+}
+
 Term* get_named_at(Branch& branch, int index, std::string const& name)
 {
     for (int i=index - 1; i >= 0; i--) {
@@ -86,8 +97,7 @@ Term* get_named_at(Branch& branch, int index, std::string const& name)
         if (term->name == name)
             return term;
 
-        if (term->nestedContents.length() > 0
-                && term->boolPropOptional("exposesNames", false))
+        if (exposes_nested_names(term))
         {
             Term* nested = term->nestedContents[name];
             if (nested != NULL)

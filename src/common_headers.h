@@ -30,6 +30,7 @@
 namespace circa {
 
 struct Branch;
+struct BrokenLinkList;
 struct CastResult;
 struct Dict;
 struct EvalContext;

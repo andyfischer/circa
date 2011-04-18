@@ -105,6 +105,7 @@ struct Term : TaggedValue
     // at element 0. This is more convenient in some situations.
     Term* dependency(int index) const;
     int numDependencies() const;
+    void setDependency(int index, Term* term);
 
     const char* getName(int index) const;
     int nameCount() const;

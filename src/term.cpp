@@ -8,6 +8,7 @@
 #include "debug_valid_objects.h"
 #include "errors.h"
 #include "introspection.h"
+#include "refactoring.h"
 #include "term.h"
 #include "type.h"
 
@@ -79,6 +80,15 @@ int
 Term::numDependencies() const
 {
     return numInputs() + 1;
+}
+
+void
+Term::setDependency(int index, Term* term)
+{
+    if (index == 0)
+        change_function(this, term);
+    else
+        set_input(this, index - 1, term);
 }
 
 const char*

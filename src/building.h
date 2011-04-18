@@ -70,6 +70,10 @@ Term* procure_int(Branch& branch, std::string const& name);
 Term* procure_float(Branch& branch, std::string const& name);
 Term* procure_bool(Branch& branch, std::string const& name);
 
+// This function will go through the contents of the brokenLinkList, and it'll try
+// to repair each link (using a fresh name lookup), or it'll set the link to NULL.
+void repair_broken_links(BrokenLinkList* brokenLinks);
+
 void set_step(Term* term, float step);
 float get_step(Term* term);
 

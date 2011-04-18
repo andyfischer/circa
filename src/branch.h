@@ -11,6 +11,8 @@
 
 namespace circa {
 
+struct BrokenLinkList;
+
 struct Branch
 {
     RefList _terms;
@@ -131,7 +133,14 @@ Branch& nested_contents(Term* term);
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch const& branch);
 
+// Delete the contents of 'branch', any terms outside this branch which depend on
+// terms inside this branch will be appended to 'brokenLinks'.
+void clear_branch(Branch* branch, BrokenLinkList* brokenLinks);
+
+// Delete the contents of 'branch'. If there are any broken links, an internal error
+// will be thrown. (to catch broken links, use the 1st clear_branch call).
 void clear_branch(Branch* branch);
+
 void duplicate_branch(Branch& source, Branch& dest);
 
 void parse_script(Branch& branch, std::string const& filename);
@@ -155,15 +164,24 @@ struct BranchInvariantCheck
 void branch_check_invariants(BranchInvariantCheck* result, Branch& branch);
 bool branch_check_invariants_print_result(Branch& branch, std::ostream& out);
 
-struct BranchBrokenLinkList
+struct BrokenLinkList
 {
     struct Link {
         std::string relativeName;
         Term* user;
         int depIndex;
+        Link(std::string _relativeName, Term* _user, int _depIndex)
+            : relativeName(_relativeName), user(_user), depIndex(_depIndex)
+        {}
     };
 
-    std::vector<Link> brokenLinks;
+    std::vector<Link> links;
+
+    void append(std::string relativeName, Term* user, int depIndex)
+    {
+        links.push_back(Link(relativeName, user, depIndex));
+    }
+    bool empty() { return links.size() == 0; }
 };
 
 } // namespace circa

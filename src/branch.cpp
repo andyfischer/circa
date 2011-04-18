@@ -1,5 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "branch.h"
 #include "branch_iterator.h"
 #include "building.h"
 #include "builtins.h"
@@ -383,7 +384,7 @@ Branch* get_outer_scope(Branch const& branch)
     return branch.owningTerm->owningBranch;
 }
 
-void clear_branch(Branch* branch)
+void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
 {
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
@@ -406,23 +407,18 @@ void clear_branch(Branch* branch)
         clear_branch(&term->nestedContents);
     }
 
-    for (int i= branch->_terms.length() - 1; i >= 0; i--) {
+    for (int i = branch->_terms.length() - 1; i >= 0; i--) {
         Term* term = branch->get(i);
         if (term == NULL)
             continue;
 
-        if (term->users.length() != 0) {
-            // Bad news, there are still users of this term, even though we want
-            // to delete them all.
-            for (int user = 0; user < term->users.length(); user++) {
-                std::cout << "In clear_branch, term "
-                    << global_id(term) << " (" << term->name << ") "
-                    << "is still being used by "
-                    << global_id(term->users[user]) << " (" << term->users[user]->name
-                    << ") " << std::endl;
+        // Record any leftover 'user' links.
+        for (int userIndex = 0; userIndex < term->users.length(); userIndex++) {
+            Term* user = term->users[userIndex];
+            for (int depIndex = 0; depIndex < user->numDependencies(); depIndex++) {
+                if (user->dependency(depIndex) == term)
+                    brokenLinks->append(term->name, user, depIndex);
             }
-
-            internal_error("stale user pointers in clear_branch");
         }
 
         // turn on this assert to catch orphaned terms:
@@ -433,6 +429,28 @@ void clear_branch(Branch* branch)
     }
 
     branch->_terms.clear();
+}
+
+void clear_branch(Branch* branch)
+{
+    BrokenLinkList brokenLinks;
+    clear_branch(branch, &brokenLinks);
+
+    if (!brokenLinks.empty()) {
+        // Bad news, there are still users of this term, even though we want
+        // to delete them all.
+        for (size_t i = 0; i < brokenLinks.links.size(); i++) {
+
+            BrokenLinkList::Link const& link = brokenLinks.links[i];
+
+            std::cout << "In clear_branch, term "
+                << global_id(link.user) << " (" << link.user->name << ") "
+                << "has a reference to deleted term "
+                << link.relativeName << ")" << std::endl;
+        }
+
+        internal_error("stale references in clear_branch");
+    }
 }
 
 Term* find_term_by_id(Branch& branch, unsigned int id)

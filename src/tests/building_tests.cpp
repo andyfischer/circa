@@ -126,6 +126,67 @@ void test_finish_branch_is_at_end()
     test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);
 }
 
+void test_erase_term()
+{
+    Branch branch;
+
+    // Erase an input that's being used
+    Term* a = branch.compile("a = 1");
+    Term* b = branch.compile("b = add(a a)");
+    test_assert(b->input(0) == a);
+
+    erase_term(a);
+    refresh_locals_indices(branch);
+    test_assert(b->input(0) == NULL);
+
+    // Erase a function that's being used
+    Term* f = branch.compile("def f() {}");
+    Term* f_call = branch.compile("f()");
+    test_assert(f_call->function == f);
+
+    erase_term(f);
+    refresh_locals_indices(branch);
+    test_assert(f_call->function == NULL);
+}
+
+void test_repair_broken_links()
+{
+    Branch branch;
+    Term* br = branch.compile("br = { a = 1 }");
+    Term* a = br->nestedContents["a"];
+    Term* b = branch.compile("add()");
+    set_input(b, 0, a);
+
+    BrokenLinkList brokenLinks;
+    clear_branch(&br->nestedContents, &brokenLinks);
+
+    test_assert(!brokenLinks.empty());
+    test_assert(b->input(0) == a);
+
+    repair_broken_links(&brokenLinks);
+
+    test_assert(b->input(0) == NULL);
+
+    clear_branch(&branch);
+    br = branch.compile("br = { a = 1 }");
+    a = br->nestedContents["a"];
+    b = branch.compile("add()");
+    set_input(b, 0, a);
+
+    BrokenLinkList brokenLinks2;
+    clear_branch(&br->nestedContents, &brokenLinks2);
+    br->nestedContents.compile("something_else = 1, a = 2");
+
+    // bit of a hack:
+    br->setBoolProp("exposesNames", true);
+
+    Term* new_a = br->nestedContents["a"];
+    repair_broken_links(&brokenLinks2);
+
+    test_assert(a != new_a);
+    test_assert(b->input(0) == new_a);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(building_tests::test_create_value);
@@ -136,6 +197,8 @@ void register_tests()
     REGISTER_TEST_CASE(building_tests::test_procure);
     REGISTER_TEST_CASE(building_tests::test_set_input);
     REGISTER_TEST_CASE(building_tests::test_finish_branch_is_at_end);
+    REGISTER_TEST_CASE(building_tests::test_erase_term);
+    REGISTER_TEST_CASE(building_tests::test_repair_broken_links);
 }
 
 } // namespace building_tests

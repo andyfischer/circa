@@ -3,7 +3,7 @@ This is a list of short-term TODOs. There's a bigger list at docs/todo.md
 
  - 'Unknown identifier' terms are being created without source location
  - various places where swap() can be used instead of copy()
- - can we remove the a=a part in for_loop_tests::test_rebind_internally
+ - clear_branch and repair_broken_links don't correctly handle nested names
 
 Important optimization tasks:
 

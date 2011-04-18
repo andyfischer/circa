@@ -66,7 +66,7 @@ void set_input2(Term* term, int index, Term* input, int outputIndex)
     assert_valid_term(term);
     assert_valid_term(input);
 
-    Ref previousInput = NULL;
+    Term* previousInput = NULL;
     if (index < term->numInputs())
         previousInput = term->input(index);
 
@@ -89,7 +89,7 @@ void set_input(Term* term, int index, Term* input)
     assert_valid_term(term);
     assert_valid_term(input);
 
-    Ref previousInput = NULL;
+    Term* previousInput = NULL;
     if (index < term->numInputs())
         previousInput = term->input(index);
 
@@ -378,6 +378,16 @@ Term* procure_float(Branch& branch, std::string const& name)
 Term* procure_bool(Branch& branch, std::string const& name)
 {
     return procure_value(branch, BOOL_TYPE, name);
+}
+
+void repair_broken_links(BrokenLinkList* brokenLinks)
+{
+    for (size_t i=0; i < brokenLinks->links.size(); i++) {
+        BrokenLinkList::Link& link = brokenLinks->links[i];
+
+        Term* term = get_named_at(link.user, link.relativeName);
+        link.user->setDependency(link.depIndex, term);
+    }
 }
 
 void set_step(Term* term, float step)
