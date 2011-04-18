@@ -436,6 +436,9 @@ void clear_branch(Branch* branch)
     BrokenLinkList brokenLinks;
     clear_branch(branch, &brokenLinks);
 
+    repair_broken_links(&brokenLinks);
+
+    #if 0
     if (!brokenLinks.empty()) {
         // Bad news, there are still users of this term, even though we want
         // to delete them all.
@@ -451,6 +454,7 @@ void clear_branch(Branch* branch)
 
         internal_error("stale references in clear_branch");
     }
+    #endif
 }
 
 Term* find_term_by_id(Branch& branch, unsigned int id)

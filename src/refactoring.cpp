@@ -30,6 +30,11 @@ EvaluateFunc derive_evaluate_func(Term* term)
     return function_t::get_evaluate(term->function);
 }
 
+void update_cached_evaluate_func(Term* term)
+{
+    term->evaluateFunc = derive_evaluate_func(term);
+}
+
 void change_function(Term* term, Term* function)
 {
     if (term->function == function)
@@ -39,7 +44,7 @@ void change_function(Term* term, Term* function)
 
     term->function = function;
 
-    term->evaluateFunc = derive_evaluate_func(term);
+    update_cached_evaluate_func(term);
 
     possibly_prune_user_list(term, previousFunction);
     respecialize_type(term);

@@ -7,6 +7,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "importing_macros.h"
+#include "refactoring.h"
 #include "parser.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -46,6 +47,11 @@ void install_function(Term* function, EvaluateFunc evaluate)
 {
     ca_assert(is_function(function));
     function_t::get_evaluate(function) = evaluate;
+
+    for (int i=0; i < function->users.length(); i++) {
+        Term* user = function->users[i];
+        update_cached_evaluate_func(user);
+    }
 }
 
 Term* import_type(Branch& branch, Type* type)
