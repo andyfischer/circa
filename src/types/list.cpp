@@ -530,6 +530,9 @@ namespace list_t {
         bool anyUnableToDetermine = false;
 
         for (int i=0; i < prototype.length(); i++) {
+            if (i >= subjectPrototype.length())
+                return query->fail();
+
             StaticTypeQuery::Result result = run_static_type_query(
                     declared_type(prototype[i]), subjectPrototype[i]);
 

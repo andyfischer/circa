@@ -11,29 +11,23 @@ namespace branch_function {
         evaluate_branch_internal_with_state(CONTEXT, CALLER);
     }
 
+    CA_FUNCTION(lambda_evaluate)
+    {
+        branch_ref_function::set_branch_ref(OUTPUT, &CALLER->nestedContents);
+    }
+
     void format_source(StyledSource* source, Term* term)
     {
-        if (term->boolPropOptional("syntax:literal-list", false)) {
-            format_name_binding(source, term);
-            append_phrase(source, "[", term, token::LBRACKET);
-            Branch& contents = term->nestedContents;
-
-            for (int i=0; i < contents.length(); i++) {
-                Term* term = contents[i];
-                format_term_source(source, term);
-            }
-
-            append_phrase(source, "]", term, token::RBRACKET);
-        } else {
-            format_name_binding(source, term);
-            format_branch_source(source, term->nestedContents, term);
-        }
+        format_name_binding(source, term);
+        format_branch_source(source, term->nestedContents, term);
     }
 
     void setup(Branch& kernel)
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         get_function_attrs(BRANCH_FUNC)->formatSource = format_source;
+        LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda()");
+        get_function_attrs(LAMBDA_FUNC)->formatSource = format_source;
     }
 }
 }

@@ -303,7 +303,7 @@ void test_message_passing2()
 void test_run_single_statement()
 {
     Branch branch;
-    branch.compile("br = { test_spy(1) test_spy('two') test_spy(3) \n"
+    branch.eval("br = { test_spy(1) test_spy('two') test_spy(3) \n"
         "-- this is a comment \n"
         "\n"
         "test_spy(4) }");

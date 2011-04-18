@@ -28,11 +28,15 @@ namespace branch_ref_function {
         return (Branch*) as_opaque_pointer(val->getIndex(0));
     }
 
+    void set_branch_ref(TaggedValue* value, Branch* branchPtr)
+    {
+        List& output = *List::cast(value, 1);
+        set_opaque_pointer(output[0], branchPtr);
+    }
+
     CA_FUNCTION(branch_ref)
     {
-        List& output = *List::cast(OUTPUT, 1);
-        Branch* ptr = &(INPUT_TERM(0)->nestedContents);
-        set_opaque_pointer(output[0], ptr);
+        set_branch_ref(OUTPUT, &(INPUT_TERM(0)->nestedContents));
     }
 
     CA_FUNCTION(get_terms)

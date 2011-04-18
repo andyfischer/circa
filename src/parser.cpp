@@ -1907,7 +1907,7 @@ ParseResult literal_list(Branch& branch, TokenStream& tokens, ParserCxt* context
 ParseResult plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    Term* term = create_branch(branch).owningTerm;
+    Term* term = apply(branch, LAMBDA_FUNC, RefList());
     set_source_location(term, startPosition, tokens);
     consume_branch_with_braces(term->nestedContents, tokens, context, term);
     post_parse_branch(term->nestedContents);

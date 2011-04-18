@@ -42,6 +42,7 @@ extern Term* COND_FUNC;
 extern Term* INCLUDE_FUNC;
 extern Term* INPUT_PLACEHOLDER_FUNC;
 extern Term* JOIN_FUNC;
+extern Term* LAMBDA_FUNC;
 extern Term* LIST_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;
@@ -114,6 +115,7 @@ namespace assign_function {
 
 namespace branch_ref_function {
     Branch* deref(TaggedValue* val);
+    void set_branch_ref(TaggedValue* value, Branch* branchPtr);
 }
 
 namespace copy_function {
