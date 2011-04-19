@@ -178,7 +178,7 @@ fps = fps_counter:lastRecoredFps
 
 
 -- Load the user's script
-state string user_script_filename = path("../demos/demo_browser.ca")
+state string user_script_filename = rpath("../demos/demo_browser.ca")
 
 -- Function to specify a different script
 load_user_script_request = inbox()

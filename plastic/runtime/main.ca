@@ -170,7 +170,7 @@ def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rot
     "(experimental) Draw a 3d mesh to the screen."
 
 -- Drawing utils
-include(path('vector_drawing.ca'))
+include(rpath('vector_drawing.ca'))
 
 -- Time-based stateful functions
 def alternate_over_time(number period) -> bool
@@ -216,8 +216,8 @@ def draggable_rect(Point initial_location, Point size) -> Point
         mouse_offset = location - mouse
     return location
 
-ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->path, 16)
-coding_font = text:load_font("../assets/Inconsolata.otf"->path, 16)
+ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->rpath, 16)
+coding_font = text:load_font("../assets/Inconsolata.otf"->rpath, 16)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -294,13 +294,13 @@ namespace postprocess
     def bind_main_surface() bind_surface(main_surface)
 
 -- Include other runtime scripts
-include('text_input.ca' -> path)
-include('ui_widgets.ca' -> path)
+include('text_input.ca' -> rpath)
+include('ui_widgets.ca' -> rpath)
 
 -- Load the user's script
 initial_filename = ide:script_filename()
 if initial_filename == ""
-    initial_filename = "../demos/demo_browser.ca"->path
+    initial_filename = "../demos/demo_browser.ca"->rpath
 state string user_script_filename = initial_filename
 
 -- Function to specify a different script
@@ -314,4 +314,4 @@ users_branch = include(user_script_filename)
 if errored(users_branch)
     print(users_branch)
 
---include('overlay.ca' -> path)
+--include('overlay.ca' -> rpath)

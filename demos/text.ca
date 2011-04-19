@@ -2,7 +2,7 @@
 background(#000)
 
 def draw_text(Point loc, int size)
-    font = text:load_font("../plastic/assets/sv_basic_manual/SVBasicManual.ttf"->path, size)
+    font = text:load_font("../plastic/assets/sv_basic_manual/SVBasicManual.ttf"->rpath, size)
     str = concat("Time: " to_string(time))
     text_sprite = text:render_text(font, str, #fff)
     text:draw_rendered_text(text_sprite, loc)

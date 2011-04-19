@@ -2,7 +2,7 @@
 desired_window_size = [500 300]
 
 background(#000)
-include('modules/drifting_stars.ca' -> path)
+include('modules/drifting_stars.ca' -> rpath)
 
 type Ship {
     Point loc,

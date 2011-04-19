@@ -1,7 +1,7 @@
 
 include('code_editor.ca')
 
-filename = path('drawlists.ca')
+filename = rpath('drawlists.ca')
 
 background(#fff)
 

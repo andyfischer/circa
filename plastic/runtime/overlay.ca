@@ -1,7 +1,7 @@
 -- Draw HUD
 draw_main_menu = false
 if draw_main_menu
-    include('mainmenu.ca' -> path)
+    include('mainmenu.ca' -> rpath)
 
 -- Draw fpses
 draw_fps = false

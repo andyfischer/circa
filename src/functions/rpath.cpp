@@ -4,7 +4,7 @@
 #include "storage.h"
 
 namespace circa {
-namespace path_function {
+namespace rpath_function {
 
     CA_START_FUNCTIONS;
 
@@ -29,7 +29,7 @@ namespace path_function {
         return scriptLocation + "/" + path;
     }
 
-    CA_DEFINE_FUNCTION(path, "def path(string) -> string")
+    CA_DEFINE_FUNCTION(rpath, "def rpath(string) -> string")
     {
         set_string(OUTPUT,
             get_path_relative_to_source(CALLER, as_string(INPUT(0))));
