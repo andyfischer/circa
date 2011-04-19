@@ -111,22 +111,6 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 }
 
-Branch* get_if_condition_block(Term* ifCall, int index)
-{
-    ca_assert(ifCall->function == IF_BLOCK_FUNC);
-    Branch& callContents = ifCall->nestedContents;
-    ca_assert(index < callContents.length());
-    return &(callContents[index]->nestedContents);
-}
-
-Branch* get_if_block_else_block(Term* ifCall)
-{
-    ca_assert(ifCall->function == IF_BLOCK_FUNC);
-    Branch& callContents = ifCall->nestedContents;
-    ca_assert(callContents.length() >= 2);
-    return &(callContents[callContents.length()-2]->nestedContents);
-}
-
 Branch* get_if_block_joining_branch(Term* ifCall)
 {
     Term* joiningBranch = ifCall->nestedContents["#joining"];

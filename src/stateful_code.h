@@ -13,10 +13,6 @@ bool has_any_inlined_state(Branch& branch);
 void mark_branch_as_having_inlined_state(Branch& branch);
 void mark_branch_as_possibly_not_having_inlined_state(Branch& branch);
 
-const char* get_implicit_state_name(Term* term);
-
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
-
-extern bool MIGRATE_STATEFUL_VALUES_VERBOSE;
 
 } // namespace circa

@@ -11,8 +11,6 @@
 
 namespace circa {
 
-bool subroutines_match_for_migration(Term* leftFunc, Term* rightFunc);
-
 bool is_get_state(Term* term)
 {
     return term->function->name == "get_state_field";
@@ -40,7 +38,8 @@ bool is_function_stateful(Term* func)
 
 bool has_any_inlined_state(Branch& branch)
 {
-    // Check if branch.hasInlinedState has a valid value.
+    // This result is cached on the branch. Check if branch.hasInlinedState has
+    // a valid value.
     if (is_bool(&branch.hasInlinedState))
         return as_bool(&branch.hasInlinedState);
 
@@ -82,11 +81,6 @@ void mark_branch_as_possibly_not_having_inlined_state(Branch& branch)
     Branch* parent = get_parent_branch(branch);
     if (parent != NULL)
         mark_branch_as_possibly_not_having_inlined_state(*parent);
-}
-
-const char* get_implicit_state_name(Term* term)
-{
-    return term->uniqueName.name.c_str();
 }
 
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)

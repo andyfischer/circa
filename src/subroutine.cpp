@@ -185,34 +185,6 @@ Term* find_enclosing_subroutine(Term* term)
     return find_enclosing_subroutine(parent);
 }
 
-void update_subroutine_return_contents(Term* sub, Term* returnCall)
-{
-    #if 0
-    Branch& returnContents = returnCall->nestedContents;
-    returnContents.clear();
-
-    Branch& subContents = sub->nestedContents;
-
-    // Add a subroutine_output() function
-    if (SUBROUTINE_OUTPUT_FUNC != NULL) {
-        RefList inputs(returnCall->input(0));
-
-        // Check for extra outputs, if found then include their results in this output
-        int numInputs = function_t::num_inputs(sub);
-        for (int i=0; i < numInputs; i++) {
-            if (function_can_rebind_input(sub, i)) {
-                std::string const& name =
-                    function_t::get_input_placeholder(sub, i)->name;
-                Term* result = get_named_at(returnCall, name);
-                inputs.append(result);
-            }
-        }
-
-        apply(returnContents, SUBROUTINE_OUTPUT_FUNC, inputs);
-    }
-    #endif
-}
-
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function

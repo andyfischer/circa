@@ -14,7 +14,6 @@ bool is_subroutine(Term* term);
 Term* find_enclosing_subroutine(Term* term);
 
 // Perform various steps to finish creating a subroutine
-void update_subroutine_return_contents(Term* sub, Term* returnCall);
 void initialize_subroutine(Term* sub);
 void finish_building_subroutine(Term* sub, Term* outputType);
 
