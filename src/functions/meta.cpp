@@ -6,6 +6,22 @@
 namespace circa {
 namespace meta_function {
 
+    void lift_closure(Branch& branch)
+    {
+        for (int i=0; i < branch.length(); i++) {
+            Term* term = branch[i];
+            if (term == NULL) continue;
+            if (term->function == FREEZE_FUNC) {
+                Term* input = term->input(0);
+
+                EvalContext context;
+                evaluate_minimum(&context, input);
+
+                change_function(term, VALUE_FUNC);
+            }
+        }
+    }
+
     Term* freeze_specializeType(Term* term)
     {
         return term->input(0)->type;

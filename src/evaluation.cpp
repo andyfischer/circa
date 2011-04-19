@@ -73,7 +73,6 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch)
     finish_using(branch);
 }
 
-
 void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output)
 {
     start_using(branch);
@@ -212,17 +211,20 @@ Dict* get_current_scope_state(EvalContext* cxt)
 {
     return Dict::lazyCast(&cxt->currentScopeState);
 }
+
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output)
 {
     Dict* containerDict = Dict::lazyCast(container);
     copy(containerDict->insert(term->uniqueName.name.c_str()), output);
 }
+
 void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result)
 {
     Dict* containerDict = Dict::lazyCast(container);
     const char* name = term->uniqueName.name.c_str();
     copy(result, containerDict->insert(name));
 }
+
 bool evaluation_interrupted(EvalContext* context)
 {
     return context->errorOccurred || context->interruptSubroutine

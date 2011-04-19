@@ -22,7 +22,6 @@
 #include "importing.h"
 #include "introspection.h"
 #include "locals.h"
-#include "metaprogramming.h"
 #include "names.h"
 #include "parser.h"
 #include "path_expression.h"

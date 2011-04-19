@@ -10,6 +10,8 @@ namespace circa {
 // list. Currently, this is not very sophisticated.
 Term* find_common_type(RefList const& list);
 
+// Guesses at the declared type for a get_index call on this term. Currently
+// this is not very sophisticated, since we don't have generic types.
 Term* find_type_of_get_index(Term* listTerm);
 
 }

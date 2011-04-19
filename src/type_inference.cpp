@@ -13,6 +13,7 @@ Term* find_common_type(RefList const& list)
     if (list.length() == 0)
         return ANY_TYPE;
 
+    // Check if every type in this list is the same.
     bool all_equal = true;
     for (int i=1; i < list.length(); i++) {
         if (list[0] != list[i]) {

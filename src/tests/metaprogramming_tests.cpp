@@ -5,6 +5,7 @@
 namespace circa {
 namespace metaprogramming_tests {
 
+#if 0
 void test_lift_closure()
 {
     Branch branch;
@@ -55,6 +56,7 @@ void save_code_generated_with_reflection()
 
     test_equals(files["included.ca"], "my_function()\nmy_function()\nmy_function()\n");
 }
+#endif
 
 void register_tests()
 {

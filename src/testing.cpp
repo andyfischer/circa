@@ -266,6 +266,7 @@ bool run_all_tests()
 
 void post_test_sanity_check()
 {
+    // this once did something
 }
 
 std::vector<std::string> list_all_test_names()
