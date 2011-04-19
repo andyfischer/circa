@@ -9,7 +9,7 @@ NE = 1
 SE = 2
 SW = 3
 
-def rotations_opposite(int x, int y) -> bool do
+def rotations_opposite(int x, int y) -> bool
   if x == NW
     return(y == SE)
   elif x == NE

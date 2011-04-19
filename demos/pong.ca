@@ -19,9 +19,6 @@ state number round_start_time = time
 state int players_points = 0
 state int ai_points = 0
 
--- Extra type cast for a type inferrence fail
-Point(@ball_loc)
-
 paddle_width = 60.0
 paddle_depth = 10.0
 ball_speed = 400.

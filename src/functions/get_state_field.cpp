@@ -37,7 +37,14 @@ namespace get_state_field_function {
 
             // If we didn't find the value, see if they provided a default
             if (INPUT(1) != NULL) {
-                copy(INPUT(1), OUTPUT);
+                cast_success = cast(INPUT(1), declared_type(CALLER), OUTPUT);
+
+                if (!cast_success) {
+                    std::stringstream msg;
+                    msg << "Couldn't cast default value to type " <<
+                        declared_type(CALLER)->name;
+                    return error_occurred(CONTEXT, CALLER, msg.str());
+                }
 
             // Otherwise, reset to default value of type
             } else {

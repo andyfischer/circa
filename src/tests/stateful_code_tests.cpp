@@ -275,6 +275,26 @@ void test_state_var_needs_cast()
     test_equals(internal_debug_function::spy_results(), "[0.0, 1.0]");
 }
 
+void test_state_var_default_needs_cast()
+{
+    Branch branch;
+    branch.compile("state Point p = [3 4]");
+    branch.compile("test_spy(p.x)");
+
+    internal_debug_function::spy_clear();
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_assert(!context.errorOccurred);
+    test_equals(internal_debug_function::spy_results(), "[3.0]");
+
+    branch.clear();
+    reset(&context.state);
+    branch.compile("state Point p = [1 2 3]");
+    evaluate_branch(&context, branch);
+    test_assert(context.errorOccurred);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -292,6 +312,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_early_return);
     REGISTER_TEST_CASE(stateful_code_tests::test_branch_has_inlined_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_needs_cast);
+    REGISTER_TEST_CASE(stateful_code_tests::test_state_var_default_needs_cast);
 }
 
 } // namespace stateful_code_tests
