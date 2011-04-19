@@ -26,7 +26,7 @@ namespace branch_function {
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         get_function_attrs(BRANCH_FUNC)->formatSource = format_source;
-        LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda()");
+        LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda() -> BranchRef");
         get_function_attrs(LAMBDA_FUNC)->formatSource = format_source;
     }
 }

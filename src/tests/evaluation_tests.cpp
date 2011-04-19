@@ -33,10 +33,36 @@ void test_evaluate_minimum()
     test_equals(get_local(d), "-1");
 }
 
+void test_evaluate_minimum2()
+{
+    Branch branch;
+    Term* a = branch.compile("a = [1]");
+    Term* x = branch.compile("x = [2]");
+    Term* b = branch.compile("b = [1 a 3]");
+    Term* y = branch.compile("y = [a b]");
+    Term* c = branch.compile("c = [b a]");
+    Term* z = branch.compile("z = [a x b y]");
+    Term* abc = branch.compile("evaluate_this = [a b c]");
+    Term* xyz = branch.compile("dont_evaluate_this = [x y z]");
+
+    EvalContext context;
+    evaluate_minimum(&context, abc);
+
+    test_equals(get_local(a), "[1]");
+    test_equals(get_local(b), "[1, [1], 3]");
+    test_equals(get_local(c), "[[1, [1], 3], [1]]");
+    test_equals(get_local(abc), "[[1], [1, [1], 3], [[1, [1], 3], [1]]]");
+    test_equals(get_local(x), "null");
+    test_equals(get_local(y), "null");
+    test_equals(get_local(z), "null");
+    test_equals(get_local(xyz), "null");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(evaluation_tests::test_branch_eval);
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum);
+    REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum2);
 }
 
 } // evaluation_tests

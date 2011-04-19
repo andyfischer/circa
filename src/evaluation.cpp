@@ -286,9 +286,13 @@ void evaluate_minimum(EvalContext* context, Term* term)
     marked[term->index] = true;
 
     for (int i=term->index; i >= 0; i--) {
+        Term* checkTerm = branch[i];
+        if (checkTerm == NULL)
+            continue;
+
         if (marked[i]) {
-            for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
-                Term* input = term->input(inputIndex);
+            for (int inputIndex=0; inputIndex < checkTerm->numInputs(); inputIndex++) {
+                Term* input = checkTerm->input(inputIndex);
                 if (input == NULL) continue;
                 if (input->owningBranch != &branch) continue;
                 marked[input->index] = true;
