@@ -412,7 +412,7 @@ ParseResult comment(Branch& branch, TokenStream& tokens, ParserCxt* context)
     return ParseResult(result);
 }
 
-ParseResult type_identifier_or_anonymous_type(Branch& branch, TokenStream& tokens,
+ParseResult type_expr(Branch& branch, TokenStream& tokens,
         ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -504,7 +504,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
             isHiddenStateArgument = true;
         }
 
-        Term* typeTerm = type_identifier_or_anonymous_type(branch, tokens, context).term;
+        Term* typeTerm = type_expr(branch, tokens, context).term;
 
         possible_whitespace(tokens);
 
@@ -576,7 +576,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         tokens.consume(RIGHT_ARROW);
         result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
 
-        outputType = type_identifier_or_anonymous_type(branch, tokens, context).term;
+        outputType = type_expr(branch, tokens, context).term;
         ca_assert(outputType != NULL);
     }
 
@@ -1945,23 +1945,16 @@ ParseResult unknown_identifier(Branch& branch, std::string const& name)
 
 ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
-    std::string id;
-    return identifier(branch, tokens, context, id);
-}
-
-ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context,
-        std::string& idStrOut)
-{
-    if (tokens.nextIs(IDENTIFIER))
-        idStrOut = tokens.consume(IDENTIFIER);
-    else 
+    if (!tokens.nextIs(IDENTIFIER))
         throw std::runtime_error("identifier() expected ident");
+    
+    std::string id = tokens.consume(IDENTIFIER);
 
-    Term* result = find_named(branch, idStrOut);
+    Term* result = find_named(branch, id);
     if (result == NULL)
-        return unknown_identifier(branch, idStrOut);
+        return unknown_identifier(branch, id);
 
-    return ParseResult(result, idStrOut);
+    return ParseResult(result, id);
 }
 
 ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCxt* context)

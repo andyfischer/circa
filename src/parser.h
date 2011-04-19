@@ -77,8 +77,6 @@ ParseResult plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context
 ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult unknown_identifier(Branch& branch, std::string const& name);
 ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context);
-ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context,
-        std::string& idStrOut);
 ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCxt* context);
 
 // Helper functions:
