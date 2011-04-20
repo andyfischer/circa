@@ -29,7 +29,7 @@ void round_trip_source(std::string statement)
     result.expected = statement;
 
     Branch branch;
-    parser::compile(&branch, parser::statement_list, statement);
+    parser::compile(branch, parser::statement_list, statement);
 
     StyledSource richSource;
     format_branch_source(&richSource, branch);

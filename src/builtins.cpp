@@ -374,7 +374,7 @@ void post_setup_types()
 
 void parse_builtin_script(Branch& kernel)
 {
-    parser::compile(&kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
+    parser::compile(kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
 }
 
 } // namespace circa

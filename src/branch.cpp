@@ -344,7 +344,7 @@ std::string Branch::toString()
 Term*
 Branch::compile(std::string const& code)
 {
-    return parser::compile(this, parser::statement_list, code);
+    return parser::compile(*this, parser::statement_list, code);
 }
 
 Term*
@@ -513,7 +513,7 @@ void parse_script(Branch& branch, std::string const& filename)
     TaggedValue contents;
     storage::read_text_file_to_value(filename.c_str(), &contents, NULL);
 
-    parser::compile(&branch, parser::statement_list, as_string(&contents));
+    parser::compile(branch, parser::statement_list, as_string(&contents));
 }
 
 void evaluate_script(Branch& branch, std::string const& filename)

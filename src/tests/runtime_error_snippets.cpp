@@ -8,7 +8,7 @@ namespace runtime_error_snippets {
 void test_input(std::string const& in)
 {
     Branch branch;
-    parser::compile(&branch, parser::statement_list, in);
+    parser::compile(branch, parser::statement_list, in);
 
     if (has_static_errors(branch)) {
         std::cout << "In runtime error snippet: " << in << std::endl;

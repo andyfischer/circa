@@ -20,7 +20,7 @@ CA_FUNCTION(empty_evaluate_no_touch_output)
 
 Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& header)
 {
-    Term* result = parser::compile(&branch, parser::function_decl, header);
+    Term* result = parser::compile(branch, parser::function_decl, header);
 
     if (evaluate == NULL)
         evaluate = empty_evaluate_function;
@@ -31,7 +31,7 @@ Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& 
 
 Term* import_member_function(Type* type, EvaluateFunc evaluate, std::string const& header)
 {
-    Ref result = parser::compile(&type->memberFunctions,
+    Ref result = parser::compile(type->memberFunctions,
             parser::function_decl, header);
 
     function_t::get_evaluate(result) = evaluate;

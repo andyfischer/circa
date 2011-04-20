@@ -14,7 +14,7 @@ namespace circa {
 void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& output)
 {
     int previousHead = branch.length();
-    parser::compile(&branch, parser::statement_list, input);
+    parser::compile(branch, parser::statement_list, input);
     int newHead = branch.length();
 
     bool anyErrors = false;

@@ -9,41 +9,29 @@ namespace parser {
 
 using namespace circa::token;
 
-Ref compile(Branch* branch, ParsingStep step, std::string const& input)
+Ref compile(Branch& branch, ParsingStep step, std::string const& input)
 {
-    // if branch is NULL, use a temporary branch
-    bool temporaryBranch = false;
-    if (branch == NULL) {
-        branch = new Branch();
-        temporaryBranch = true;
-    }
-
-    int prevLastIndex = branch->length() - 1;
+    int prevLastIndex = branch.length() - 1;
 
     TokenStream tokens(input);
     ParserCxt context;
-    Ref result = step(*branch, tokens, &context).term;
+    Ref result = step(branch, tokens, &context).term;
 
     // Update the finish_minor_branch() func at the end
     Term* prevLast = NULL;
     if (prevLastIndex >= 0)
-        prevLast = branch->get(prevLastIndex);
+        prevLast = branch[prevLastIndex];
     if (prevLast && prevLast->function == FINISH_MINOR_BRANCH_FUNC) {
-        branch->moveToEnd(branch->get(prevLastIndex));
-        update_branch_finish_term(branch->get(branch->length()-1));
-        refresh_locals_indices(*branch, prevLastIndex);
+        branch.moveToEnd(branch[prevLastIndex]);
+        update_branch_finish_term(branch[branch.length()-1]);
+        refresh_locals_indices(branch, prevLastIndex);
     } else {
-        check_to_add_branch_finish_term(*branch, prevLastIndex+1);
+        check_to_add_branch_finish_term(branch, prevLastIndex+1);
     }
 
-    post_parse_branch(*branch);
+    post_parse_branch(branch);
 
-    ca_assert(branch_check_invariants_print_result(*branch, std::cout));
-
-    if (temporaryBranch) {
-        clear_branch(branch);
-        delete branch;
-    }
+    ca_assert(branch_check_invariants_print_result(branch, std::cout));
 
     return result;
 }
@@ -52,7 +40,7 @@ Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
 {
     int prevHead = branch.length();
 
-    Term* result = compile(&branch, step, input);
+    Term* result = compile(branch, step, input);
 
     EvalContext context;
 
@@ -734,22 +722,17 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
             ca_assert(condition != NULL);
-
             currentBlock = apply(contents, IF_FUNC, RefList(condition));
-            currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
-            set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
-            
-            consume_branch(currentBlock->nestedContents, tokens, context);
-            finish_minor_branch(currentBlock->nestedContents);
         } else {
             // Create an 'else' block
             encounteredElse = true;
             currentBlock = apply(contents, BRANCH_FUNC, RefList(), "else");
-            currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
-            set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
-            consume_branch(currentBlock->nestedContents, tokens, context);
-            finish_minor_branch(currentBlock->nestedContents);
         }
+
+        currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
+        set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
+        consume_branch(currentBlock->nestedContents, tokens, context);
+        finish_minor_branch(currentBlock->nestedContents);
 
         if (tokens.nextNonWhitespaceIs(ELIF)
                 || (tokens.nextNonWhitespaceIs(ELSE) && !encounteredElse)) {

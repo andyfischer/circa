@@ -11,7 +11,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     std::string assertionsCode)
 {
     Branch source;
-    parser::compile(&source, parser::statement_list, sourceCode);
+    parser::compile(source, parser::statement_list, sourceCode);
 
     if (has_static_errors(source)) {
         std::cout << "Static error in code: " << sourceCode << std::endl;
@@ -22,7 +22,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     }
 
     Branch destination;
-    parser::compile(&destination, parser::statement_list, destinationCode);
+    parser::compile(destination, parser::statement_list, destinationCode);
 
     if (has_static_errors(destination)) {
         std::cout << "Static error in code: " << destinationCode << std::endl;
@@ -45,7 +45,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     }
 
     Branch& assertions = create_branch(destination, "assertions");
-    parser::compile(&assertions, parser::statement_list, assertionsCode);
+    parser::compile(assertions, parser::statement_list, assertionsCode);
 
     evaluate_branch(&context, destination);
 

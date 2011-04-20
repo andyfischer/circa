@@ -356,7 +356,7 @@ Term* find_member_function(Type* type, std::string const& name)
 
 Term* parse_type(Branch& branch, std::string const& decl)
 {
-    return parser::compile(&branch, parser::type_decl, decl);
+    return parser::compile(branch, parser::type_decl, decl);
 }
 
 } // namespace circa

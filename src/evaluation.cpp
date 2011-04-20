@@ -316,7 +316,7 @@ void evaluate_minimum(EvalContext* context, Term* term)
 TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input)
 {
     int prevHead = branch.length();
-    Term* result = parser::compile(&branch, parser::statement_list, input);
+    Term* result = parser::compile(branch, parser::statement_list, input);
     evaluate_range(context, branch, prevHead, branch.length() - 1);
     return get_local(result);
 }

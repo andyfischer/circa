@@ -24,7 +24,7 @@ namespace test_snippets {
 void test_snippet(std::string codeStr, std::string assertionsStr)
 {
     Branch code;
-    parser::compile(&code, parser::statement_list, codeStr);
+    parser::compile(code, parser::statement_list, codeStr);
 
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << codeStr << std::endl;
@@ -44,7 +44,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     Branch& assertions = create_branch(code, "assertions");
-    parser::compile(&assertions, parser::statement_list, assertionsStr);
+    parser::compile(assertions, parser::statement_list, assertionsStr);
 
     if (has_static_errors(assertions)) {
         std::cout << "In code snippet: " << assertionsStr << std::endl;
@@ -112,7 +112,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 void test_snippet_runtime_error(std::string const& str)
 {
     Branch code;
-    parser::compile(&code, parser::statement_list, str);
+    parser::compile(code, parser::statement_list, str);
 
     if (has_static_errors(code)) {
         std::cout << "In code snippet: " << str << std::endl;

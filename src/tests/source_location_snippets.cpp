@@ -158,7 +158,7 @@ void test_snippet(std::string const& text)
 {
     Branch branch;
 
-    parser::compile(&branch, parser::statement_list, text);
+    parser::compile(branch, parser::statement_list, text);
 
     // Check if source location is defined at all.
     for (int i=0; i < branch.length(); i++) {

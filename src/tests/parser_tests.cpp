@@ -12,13 +12,13 @@ namespace parser_tests {
 void test_comment()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "-- this is a comment");
+    parser::compile(branch, parser::statement, "-- this is a comment");
 
     test_assert(branch[0]->function == COMMENT_FUNC);
     test_equals(branch[0]->stringProp("comment"), "-- this is a comment");
     test_assert(branch.length() == 1);
 
-    parser::compile(&branch, parser::statement, "--");
+    parser::compile(branch, parser::statement, "--");
     test_assert(branch.length() == 2);
     test_assert(branch[1]->function == COMMENT_FUNC);
     test_equals(branch[1]->stringProp("comment"), "--");
@@ -27,7 +27,7 @@ void test_comment()
 void test_blank_line()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "\n");
+    parser::compile(branch, parser::statement, "\n");
     test_assert(branch.length() == 1);
     test_assert(branch[0]->function == COMMENT_FUNC);
     test_equals(branch[0]->stringProp("comment"), "");
@@ -36,7 +36,7 @@ void test_blank_line()
 void test_literal_integer()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "1");
+    parser::compile(branch, parser::statement, "1");
     test_assert(branch.length() == 1);
     test_assert(is_value(branch[0]));
     test_assert(branch[0]->asInt() == 1);
@@ -45,14 +45,14 @@ void test_literal_integer()
 void test_literal_float()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement, "1.0");
+    Term* a = parser::compile(branch, parser::statement, "1.0");
     test_assert(branch.length() == 1);
     test_assert(branch[0] == a);
     test_assert(is_value(a));
     test_assert(a->asFloat() == 1.0);
     test_equals(get_step(a), .1f);
 
-    Term* b = parser::compile(&branch, parser::statement_list, "5.200");
+    Term* b = parser::compile(branch, parser::statement_list, "5.200");
     test_assert(b->type == FLOAT_TYPE);
     test_equals(get_term_source_text(b), "5.200");
     test_equals(get_step(b), .001f);
@@ -61,7 +61,7 @@ void test_literal_float()
 void test_literal_string()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "\"hello\"");
+    parser::compile(branch, parser::statement, "\"hello\"");
     test_assert(branch.length() == 1);
     test_assert(is_value(branch[0]));
     test_assert(branch[0]->asString() == "hello");
@@ -70,7 +70,7 @@ void test_literal_string()
 void test_name_binding()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "a = 1");
+    parser::compile(branch, parser::statement, "a = 1");
     test_assert(branch.length() == 1);
     test_assert(is_value(branch[0]));
     test_assert(branch[0]->asInt() == 1);
@@ -81,7 +81,7 @@ void test_name_binding()
 void test_function_call()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "add_f(1.0,2.0)");
+    parser::compile(branch, parser::statement, "add_f(1.0,2.0)");
     test_assert(branch.length() == 3);
     test_assert(is_value(branch[0]));
     test_assert(branch[0]->asFloat() == 1.0);
@@ -96,13 +96,13 @@ void test_function_call()
 void test_identifier()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement, "a = 1.0");
+    Term* a = parser::compile(branch, parser::statement, "a = 1.0");
     test_assert(branch.length() == 1);
 
     test_assert(branch.length() == 1);
     test_assert(a == branch[0]);
 
-    parser::compile(&branch, parser::statement, "add(a,a)");
+    parser::compile(branch, parser::statement, "add(a,a)");
     test_assert(branch.length() == 2);
     test_assert(branch[1]->input(0) == a);
     test_assert(branch[1]->input(1) == a);
@@ -111,8 +111,8 @@ void test_identifier()
 void test_rebind()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "a = 1.0");
-    parser::compile(&branch, parser::statement, "add(@a,a)");
+    parser::compile(branch, parser::statement, "a = 1.0");
+    parser::compile(branch, parser::statement, "add(@a,a)");
 
     test_assert(branch.length() == 2);
     test_assert(branch["a"] == branch[1]);
@@ -121,7 +121,7 @@ void test_rebind()
 void test_infix()
 {
     Branch branch;
-    parser::compile(&branch, parser::statement, "1.0 + 2.0");
+    parser::compile(branch, parser::statement, "1.0 + 2.0");
 
     test_assert(branch.length() == 3);
     test_assert(branch[0]->asFloat() == 1.0);
@@ -136,7 +136,7 @@ void test_infix()
 void test_type_decl()
 {
     Branch branch;
-    Term* typeTerm = parser::compile(&branch, parser::statement,
+    Term* typeTerm = parser::compile(branch, parser::statement,
             "type Mytype {\nint a\nnumber b\n}");
 
     test_equals(as_type(typeTerm).name, "Mytype");
@@ -153,7 +153,7 @@ void test_type_decl()
 void test_function_decl()
 {
     Branch branch;
-    Term* func = parser::compile(&branch, parser::statement,
+    Term* func = parser::compile(branch, parser::statement,
             "def Myfunc(string what, string hey, int yo) -> bool\n"
             "  whathey = concat(what,hey)\n"
             "  return(yo > 3)\n");
@@ -194,14 +194,14 @@ void test_function_decl()
 void test_stateful_value_decl()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement, "state int a");
+    Term* a = parser::compile(branch, parser::statement, "state int a");
 
     test_assert(is_get_state(a));
     test_assert(a->name == "a");
     test_assert(a->type == INT_TYPE);
     test_assert(branch["a"] == a);
 
-    Term* b = parser::compile(&branch, parser::statement, "state b = 5.0");
+    Term* b = parser::compile(branch, parser::statement, "state b = 5.0");
     test_assert(b->name == "b");
     test_assert(is_get_state(b));
 
@@ -209,7 +209,7 @@ void test_stateful_value_decl()
     test_assert(branch["b"] == b);
     test_assert(as_float(b) != 5.0); // shouldn't have this value yet
 
-    Term* c = parser::compile(&branch, parser::statement, "state number c = 7.5");
+    Term* c = parser::compile(branch, parser::statement, "state number c = 7.5");
     test_assert(c->name == "c");
     test_assert(is_get_state(c));
     test_assert(c->type == FLOAT_TYPE);
@@ -220,7 +220,7 @@ void test_stateful_value_decl()
 void test_arrow_concatenation()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement, "1 -> to_string");
+    Term* a = parser::compile(branch, parser::statement, "1 -> to_string");
 
     test_assert(branch[0]->asInt() == 1);
     test_assert(branch[1] == a);
@@ -233,7 +233,7 @@ void test_arrow_concatenation()
 void test_arrow_concatenation2()
 {
     Branch branch;
-    Term* a = parser::compile(&branch, parser::statement,
+    Term* a = parser::compile(branch, parser::statement,
         "0.0 -> cos -> to_string");
 
     test_assert(branch[0]->asFloat() == 0.0);
@@ -266,7 +266,7 @@ void test_syntax_hints()
 {
     Branch branch;
 
-    Term* t = parser::compile(&branch, parser::statement, "concat('a', 'b')");
+    Term* t = parser::compile(branch, parser::statement, "concat('a', 'b')");
     test_equals(get_input_syntax_hint(t, 0, "preWhitespace"), "");
     test_equals(get_input_syntax_hint(t, 0, "postWhitespace"), ",");
     test_equals(get_input_syntax_hint(t, 1, "preWhitespace"), " ");
@@ -301,12 +301,12 @@ void test_infix_whitespace()
     branch.compile("a = 1");
     branch.compile("b = 1");
 
-    Term* term = parser::compile(&branch, parser::infix_expression, "  a + b");
+    Term* term = parser::compile(branch, parser::infix_expression, "  a + b");
     test_equals(term->stringProp("syntax:preWhitespace"), "  ");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), " ");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), " ");
 
-    term = parser::compile(&branch, parser::infix_expression, "5+3");
+    term = parser::compile(branch, parser::infix_expression, "5+3");
     test_assert(term->stringProp("syntax:preWhitespace") == "");
     test_equals(get_input_syntax_hint(term, 0, "postWhitespace"), "");
     test_equals(get_input_syntax_hint(term, 1, "preWhitespace"), "");
@@ -401,7 +401,7 @@ void test_unary_minus()
     // But if there's a space before the - and not after it, that should be parsed as
     // two separate expressions.
     branch.clear();
-    parser::compile(&branch, parser::statement_list, "2 -1");
+    parser::compile(branch, parser::statement_list, "2 -1");
     test_assert(branch.length() == 2);
     test_assert(is_int(branch[0]));
     test_assert(as_int(branch[0]) == 2);
@@ -473,7 +473,7 @@ void test_subscripted_atom()
     Branch branch;
 
     branch.eval("a = 1");
-    parser::compile(&branch, parser::subscripted_atom, "a.b.c");
+    parser::compile(branch, parser::subscripted_atom, "a.b.c");
 }
 
 void test_whitespace_after_statement()
