@@ -103,16 +103,6 @@ Term* get_named_at(Branch& branch, int index, std::string const& name)
             if (nested != NULL)
                 return nested;
         }
-
-        // Special case for if-block
-        if (term->function == IF_BLOCK_FUNC) {
-            Branch* contents = get_if_block_joining_branch(term);
-            if (contents != NULL) {
-                Term* nested = contents->get(name);
-                if (nested != NULL)
-                    return nested;
-            }
-        }
     }
 
     // Look in outer scopes

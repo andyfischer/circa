@@ -111,14 +111,6 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 }
 
-Branch* get_if_block_joining_branch(Term* ifCall)
-{
-    Term* joiningBranch = ifCall->nestedContents["#joining"];
-    if (joiningBranch == NULL)
-        return NULL;
-    return &joiningBranch->nestedContents;
-}
-
 CA_FUNCTION(evaluate_if_block)
 {
     EvalContext* context = CONTEXT;
