@@ -95,7 +95,7 @@ if gstate == game_state:playing
     thrust = cond(key_down(key:up), 1, 0)
     cond(key_down(key:down), -1, @thrust)
 
-    ship.momentum = ship.momentum + polar(ship.facing) * thrust * accelration_per_s * time_delta
+    ship.momentum += polar(ship.facing) * thrust * accelration_per_s * time_delta
 
     -- Press space to shoot a bullet
     if key_pressed(key:space)
@@ -191,10 +191,10 @@ if once()
 -- move asteroids
 for asteroid in @asteroids
     Asteroid(@asteroid)
-    asteroid.location = asteroid.location + asteroid.vel * time_delta * asteroid_speed_modifier
-    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta * asteroid_speed_modifier
+    asteroid.location += asteroid.vel * time_delta * asteroid_speed_modifier
+    asteroid.rotation += asteroid.rotation_vel * time_delta * asteroid_speed_modifier
     asteroid.location = wrap_around(asteroid.location)
-    asteroid.age = asteroid.age + time_delta
+    asteroid.age += time_delta
 
 -- draw asteroids
 for asteroid in asteroids
@@ -275,17 +275,16 @@ def asteroid()
     state asteroid = generate_asteroid(asteroid_starting_size)
 
     -- move asteroid
-    asteroid.location = asteroid.location + asteroid.vel * time_delta * asteroid_speed_modifier
-    asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta * asteroid_speed_modifier
+    asteroid.location += asteroid.vel * time_delta * asteroid_speed_modifier
+    asteroid.rotation += asteroid.rotation_vel * time_delta * asteroid_speed_modifier
     asteroid.location = wrap_around(asteroid.location)
-    asteroid.age = asteroid.age + time_delta
+    asteroid.age += time_delta
 
     -- draw asteroid
     edges = for p in asteroid.edges
         @p -> Point
         p = rotate_point(p, asteroid.rotation)
-        p = p + asteroid.location
-        p -> Point
+        p += asteroid.location
 
     gl:line_loop(edges, #fff)
 
