@@ -161,8 +161,8 @@ asteroid_num_edges = 10
 
 def generate_asteroid(number size) -> Asteroid
     edges = for index in 0..10
-             angle = index / asteroid_num_edges
-             (polar(angle) * (rand() * size + size/3)) -> Point
+        angle = index / asteroid_num_edges
+        (polar(angle) * (rand() * size + size/3)) -> Point
 
     rotation = rand() * .2 - .1
     return [edges, random_location(), random_norm_vector()*10, 0, rotation size 0]
@@ -183,16 +183,14 @@ def generate_particle_burst(List particles, Point loc, Point vel) -> List
 
 state List asteroids = []
 
-state bool initialized = false
-if not(initialized)
+if once()
     for i in 0..3
         as = generate_asteroid(asteroid_starting_size)
         asteroids.append(as)
-    initialized = true
 
 -- move asteroids
 for asteroid in @asteroids
-    asteroid = asteroid -> Asteroid
+    Asteroid(@asteroid)
     asteroid.location = asteroid.location + asteroid.vel * time_delta * asteroid_speed_modifier
     asteroid.rotation = asteroid.rotation + asteroid.rotation_vel * time_delta * asteroid_speed_modifier
     asteroid.location = wrap_around(asteroid.location)
@@ -200,13 +198,12 @@ for asteroid in @asteroids
 
 -- draw asteroids
 for asteroid in asteroids
-    asteroid = asteroid -> Asteroid
+    Asteroid(@asteroid)
 
     edges = for p in asteroid.edges
         @p -> Point
-        p = rotate_point(p, asteroid.rotation)
-        p = p + asteroid.location
-        p -> Point
+        rotate_point(@p, asteroid.rotation)
+        add(@p, asteroid.location)
 
     gl:line_loop(edges, #fff)
 
@@ -214,7 +211,7 @@ for asteroid in asteroids
 spawned = []
 
 for asteroid in @asteroids
-    asteroid = asteroid -> Asteroid
+    Asteroid(@asteroid)
     collides = false
 
     for bullet in @bullets
@@ -237,7 +234,7 @@ for asteroid in @asteroids
             spawned.append(generate_child_asteroid(asteroid))
 
 for spawn in spawned
-    spawn = spawn -> Asteroid
+    Asteroid(@spawn)
     asteroids.append(spawn)
 
 -- Check for collisions of asteroids and ship
@@ -260,7 +257,7 @@ max_particle_age = 3.0
 
 -- Draw/update particles
 for particle in @particles
-    particle = particle -> Particle
+    Particle(@particle)
 
     lifespan = particle.age / max_particle_age
     max(@lifespan, 1.0)
@@ -269,7 +266,7 @@ for particle in @particles
     gl:points([particle.loc], color)
 
     particle.loc = particle.loc + particle.vel * td
-    particle.age = particle.age + td + 4
+    particle.age = particle.age + td
 
     if particle.age > max_particle_age
         discard

@@ -1223,9 +1223,6 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
             bool isRebinding = is_infix_operator_rebinding(operatorStr);
 
-            if (isRebinding && !leftExpr.isIdentifier())
-                throw std::runtime_error("Left side of " + functionName + " must be an identifier");
-
             Term* term = find_and_apply(branch, functionName, RefList(leftExpr.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);
@@ -1233,8 +1230,24 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
             set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
             set_input_syntax_hint(term, 1, "preWhitespace", postOperatorWhitespace);
 
-            if (isRebinding)
-                branch.bindName(term, leftExpr.term->name);
+            if (isRebinding) {
+                // Just bind the name if left side is an identifier.
+                // Example: a += 1
+                if (leftExpr.isIdentifier())
+                    branch.bindName(term, leftExpr.term->name);
+
+                // Set up an assign() term if left side is complex
+                // Example: a[0] += 1
+                else {
+                    Term* assignTerm = apply(branch, ASSIGN_FUNC, RefList(leftExpr.term, term));
+                    Term* lexprRoot = find_lexpr_root(leftExpr.term);
+                    if (lexprRoot != NULL && lexprRoot->name != "") {
+                        branch.bindName(assignTerm, lexprRoot->name);
+                    }
+                    assign_function::update_assign_contents(assignTerm);
+                    term = assignTerm;
+                }
+            }
 
             result = ParseResult(term);
         }

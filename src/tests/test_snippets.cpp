@@ -438,6 +438,12 @@ void test_rebinding_operators()
 {
     test_snippet("a = 1, a += 2", "a == 3");
     test_snippet("a = [1 1]->Point, a += [4 4]","a == [5.0 5.0]");
+
+    // complex lexprs
+    test_snippet("a = [1], a[0] += 2", "a == [3]");
+    test_snippet("a = [1], a[0] -= 2", "a == [-1]");
+    test_snippet("a = [1 1]->Point, a.x = 2", "a == [2.0 1.0]");
+    test_snippet("a = [1 1]->Point, a.x += 2", "a == [3.0 1.0]");
 }
 
 void test_repeat()
