@@ -57,6 +57,28 @@ TermList::TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5, Term* t6)
 }
 
 void
+TermList::set(Term* t1)
+{
+    resize(1);
+    setAt(0, t1);
+}
+void
+TermList::set(Term* t1, Term* t2)
+{
+    resize(2);
+    setAt(0, t1);
+    setAt(1, t2);
+}
+void
+TermList::set(Term* t1, Term* t2, Term* t3)
+{
+    resize(3);
+    setAt(0, t1);
+    setAt(1, t2);
+    setAt(2, t3);
+}
+
+void
 TermList::setAt(int index, Term* term)
 {
     _terms[index] = term;
@@ -85,6 +107,21 @@ TermList::appendAll(TermList const& list)
     ca_assert(&list != this);
     for (int i=0; i < list.length(); i++)
         append(list[i]);
+}
+
+void
+TermList::prepend(Term* term)
+{
+    insert(0, term);
+}
+
+void
+TermList::insert(int index, Term* term)
+{
+    _terms.resize(_terms.size() + 1);
+    for (size_t i=index; i < _terms.size() - 1; i++)
+        _terms[i + 1] = _terms[i];
+    _terms[index] = term;
 }
 
 void
@@ -125,15 +162,6 @@ void
 TermList::clear()
 {
     _terms.clear();
-}
-
-void
-TermList::insert(int index, Term* term)
-{
-    _terms.resize(_terms.size() + 1);
-    for (size_t i=index; i < _terms.size() - 1; i++)
-        _terms[i + 1] = _terms[i];
-    _terms[index] = term;
 }
 
 Term*

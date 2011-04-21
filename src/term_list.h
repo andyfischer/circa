@@ -18,6 +18,10 @@ struct TermList
     TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5);
     TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5, Term* t6);
 
+    void set(Term* t1);
+    void set(Term* t1, Term* t2);
+    void set(Term* t1, Term* t2, Term* t3);
+
     int length() const { return _terms.size(); }
     Term* operator[] (int index) const;
     bool empty() const { return length() == 0; }
@@ -27,11 +31,12 @@ struct TermList
     void append(Term* term);
     void appendUnique(Term* term);
     void appendAll(TermList const& list);
+    void prepend(Term* term);
+    void insert(int index, Term* term);
     void remove(int i);
     void remove(Term* term);
     void resize(int s);
     void clear();
-    void insert(int index, Term* term);
 };
 
 } // namespace circa
