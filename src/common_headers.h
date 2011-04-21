@@ -46,6 +46,7 @@ struct StaticTypeQuery;
 struct StyledSource;
 struct TaggedValue;
 struct Term;
+struct TermList;
 struct Type;
 
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);

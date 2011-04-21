@@ -64,7 +64,7 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
 
 // Get a list of the set of terms which descend from 'inputs', and which have 'outputs'
 // as descendants.
-RefList get_involved_terms(RefList inputs, RefList outputs);
+TermList get_involved_terms(TermList inputs, TermList outputs);
 
 typedef bool (*NamedTermVisitor) (Term* term, const char* name, TaggedValue* context);
 void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, TaggedValue* context);

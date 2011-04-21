@@ -130,6 +130,26 @@ void test_equals_function(RefList const& a, RefList const& b,
         }
     }
 }
+void test_equals_function(TermList const& a, TermList const& b,
+        const char* aText, const char* bText, int line, const char* file)
+{
+    std::stringstream msg;
+
+    if (a.length() != b.length()) {
+        msg << "List equality fail in " << file << ", line " << line << std::endl;
+        msg << "  " << aText << " has " << a.length() << " items, ";
+        msg << bText << " has " << b.length() << " items.";
+        throw std::runtime_error(msg.str());
+    }
+
+    for (int i=0; i < a.length(); i++) {
+        if (a[i] != b[i]) {
+            msg << "List equality fail in " << file << ", line " << line << std::endl;
+            msg << "  " << aText << " != " << bText << " (index " << i << " differs)";
+            throw std::runtime_error(msg.str());
+        }
+    }
+}
 
 void test_equals_function(float a, float b,
         const char* aText, const char* bText,

@@ -7,11 +7,11 @@ namespace type_inference_tests {
 
 void test_find_common_type()
 {
-    test_assert(find_common_type(RefList(INT_TYPE,INT_TYPE)) == INT_TYPE);
-    test_assert(find_common_type(RefList(FLOAT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
-    test_assert(find_common_type(RefList(INT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
-    test_assert(find_common_type(RefList(BOOL_TYPE,STRING_TYPE)) == ANY_TYPE);
-    test_assert(find_common_type(RefList(KERNEL->get("Point"),KERNEL->get("Rect"))) == LIST_TYPE);
+    test_assert(find_common_type(TermList(INT_TYPE,INT_TYPE)) == INT_TYPE);
+    test_assert(find_common_type(TermList(FLOAT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
+    test_assert(find_common_type(TermList(INT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
+    test_assert(find_common_type(TermList(BOOL_TYPE,STRING_TYPE)) == ANY_TYPE);
+    test_assert(find_common_type(TermList(KERNEL->get("Point"),KERNEL->get("Rect"))) == LIST_TYPE);
 }
 
 void test_find_type_of_get_index()

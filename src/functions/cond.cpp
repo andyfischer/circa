@@ -13,7 +13,7 @@ namespace cond_function {
 
     Term* specializeType(Term* caller)
     {
-        RefList choices(caller->input(1)->type, caller->input(2)->type);
+        TermList choices(caller->input(1)->type, caller->input(2)->type);
         return find_common_type(choices);
     }
 

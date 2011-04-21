@@ -9,7 +9,7 @@ namespace list_function {
 
     Term* specializeType(Term* term)
     {
-        RefList inputTypes;
+        TermList inputTypes;
         for (int i=0; i < term->numInputs(); i++)
             inputTypes.append(term->input(i)->type);
 

@@ -27,9 +27,9 @@ void test_get_involved_terms()
     Term* d = branch.compile("d = add(c,5.0)");
     branch.compile("e = add(c,5.0)");
 
-    RefList subtree = get_involved_terms(RefList(a), RefList(d));
+    TermList subtree = get_involved_terms(TermList(a), TermList(d));
 
-    test_equals(subtree, RefList(a,c,d));
+    test_equals(subtree, TermList(a,c,d));
 }
 
 void test_term_to_raw_string()

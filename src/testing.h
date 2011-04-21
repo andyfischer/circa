@@ -16,6 +16,8 @@ void test_assert_function(EvalContext& context, int line, const char* file);
 void test_fail_function(int line, const char* file);
 void test_equals_function(RefList const& a, RefList const& b,
         const char* aText, const char* bText, int line, const char* file);
+void test_equals_function(TermList const& a, TermList const& b,
+        const char* aText, const char* bText, int line, const char* file);
 void test_equals_function(float a, float b,
         const char* aText, const char* bText,
         int line, const char* file);

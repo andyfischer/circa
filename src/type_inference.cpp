@@ -8,7 +8,7 @@
 
 namespace circa {
 
-Term* find_common_type(RefList const& list)
+Term* find_common_type(TermList const& list)
 {
     if (list.length() == 0)
         return ANY_TYPE;
@@ -57,7 +57,7 @@ Term* find_type_of_get_index(Term* listTerm)
         return INT_TYPE;
 
     if (listTerm->function == LIST_FUNC) {
-        RefList inputTypes;
+        TermList inputTypes;
         for (int i=0; i < listTerm->numInputs(); i++)
             inputTypes.append(listTerm->input(i)->type);
         return find_common_type(inputTypes);
@@ -68,7 +68,7 @@ Term* find_type_of_get_index(Term* listTerm)
 
     if (is_list_based_type(unbox_type(listTerm->type))) {
         Branch& prototype = type_t::get_prototype(unbox_type(listTerm->type));
-        RefList types;
+        TermList types;
         for (int i=0; i < prototype.length(); i++)
             types.append(prototype[i]->type);
         return find_common_type(types);

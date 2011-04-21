@@ -5,6 +5,7 @@
 #include "circa.h"
 #include "debug_valid_objects.h"
 #include "locals.h"
+#include "term_list.h"
 
 namespace circa {
 
@@ -137,18 +138,18 @@ std::string get_source_filename(Term* term)
     return "";
 }
 
-RefList get_involved_terms(RefList inputs, RefList outputs)
+TermList get_involved_terms(TermList inputs, TermList outputs)
 {
-    std::vector<RefList> stack;
+    std::vector<TermList> stack;
 
     // Step 1, search upwards from outputs. Maintain a stack of searched terms
     stack.push_back(outputs);
-    RefList searched = outputs;
+    TermList searched = outputs;
 
     while (!stack.back().empty()) {
-        RefList &top = stack.back();
+        TermList &top = stack.back();
 
-        RefList new_layer;
+        TermList new_layer;
 
         for (int i=0; i < top.length(); i++) {
             for (int input_i=0; input_i < top[i]->numInputs(); input_i++) {
@@ -167,13 +168,13 @@ RefList get_involved_terms(RefList inputs, RefList outputs)
         stack.push_back(new_layer);
     }
 
-    RefList result;
+    TermList result;
     result.appendAll(inputs);
 
     // Step 2, descend down our stack, and append any descendents of things
     // inside 'results'
     while (!stack.empty()) {
-        RefList &layer = stack.back();
+        TermList &layer = stack.back();
 
         for (int i=0; i < layer.length(); i++) {
             Term* term = layer[i];

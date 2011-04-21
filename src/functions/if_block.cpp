@@ -80,7 +80,7 @@ namespace if_block_function {
     {
         if (term->input(0) == NULL || term->input(1) == NULL)
             return ANY_TYPE;
-        RefList types(get_type_of_input(term, 0), get_type_of_input(term, 1));
+        TermList types(get_type_of_input(term, 0), get_type_of_input(term, 1));
         return find_common_type(types);
     }
 

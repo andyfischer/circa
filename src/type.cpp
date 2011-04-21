@@ -320,7 +320,7 @@ void type_initialize_kernel(Branch& kernel)
     IMPLICIT_TYPES = create_branch(kernel, "#implicit_types").owningTerm;
 }
 
-Term* create_implicit_tuple_type(RefList const& types)
+Term* create_implicit_tuple_type(TermList const& types)
 {
     std::stringstream typeName;
     typeName << "Tuple<";

@@ -164,7 +164,7 @@ namespace overloaded_function {
         ca_assert(parameters.length() > 0);
         int argumentCount = function_t::num_inputs(as_ref(parameters[0]));
         bool variableArgs = false;
-        RefList outputTypes;
+        TermList outputTypes;
 
         for (int i=0; i < parameters.length(); i++) {
 
