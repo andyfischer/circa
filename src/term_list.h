@@ -6,7 +6,7 @@
 
 namespace circa {
 
-struct LocalTermList
+struct TermList
 {
     std::vector<Term*> _terms;
     int length() const { return _terms.size(); }

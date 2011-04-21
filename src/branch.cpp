@@ -435,26 +435,7 @@ void clear_branch(Branch* branch)
 {
     BrokenLinkList brokenLinks;
     clear_branch(branch, &brokenLinks);
-
     repair_broken_links(&brokenLinks);
-
-    #if 0
-    if (!brokenLinks.empty()) {
-        // Bad news, there are still users of this term, even though we want
-        // to delete them all.
-        for (size_t i = 0; i < brokenLinks.links.size(); i++) {
-
-            BrokenLinkList::Link const& link = brokenLinks.links[i];
-
-            std::cout << "In clear_branch, term "
-                << global_id(link.user) << " (" << link.user->name << ") "
-                << "has a reference to deleted term "
-                << link.relativeName << ")" << std::endl;
-        }
-
-        internal_error("stale references in clear_branch");
-    }
-    #endif
 }
 
 Term* find_term_by_id(Branch& branch, unsigned int id)

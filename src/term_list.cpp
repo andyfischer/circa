@@ -3,24 +3,24 @@
 #include "common_headers.h"
 #include "debug_valid_objects.h"
 
-#include "local_term_list.h"
+#include "term_list.h"
 
 namespace circa {
 
 void
-LocalTermList::setAt(int index, Term* term)
+TermList::setAt(int index, Term* term)
 {
     _terms[index] = term;
 }
 
 void
-LocalTermList::append(Term* term)
+TermList::append(Term* term)
 {
     _terms.push_back(term);
 }
 
 void
-LocalTermList::appendUnique(Term* term)
+TermList::appendUnique(Term* term)
 {
     for (int i=0; i < length(); i++) {
         if (_terms[i] == term)
@@ -31,7 +31,7 @@ LocalTermList::appendUnique(Term* term)
 }
 
 void
-LocalTermList::remove(int i)
+TermList::remove(int i)
 {
     ca_assert(int(_terms.size()) > i);
 
@@ -43,7 +43,7 @@ LocalTermList::remove(int i)
 }
 
 void
-LocalTermList::remove(Term* term)
+TermList::remove(Term* term)
 {
     int numRemoved = 0;
     for (size_t i=0; i < _terms.size(); i++) {
@@ -59,19 +59,19 @@ LocalTermList::remove(Term* term)
 }
 
 void
-LocalTermList::resize(int s)
+TermList::resize(int s)
 {
     _terms.resize(s);
 }
 
 void
-LocalTermList::clear()
+TermList::clear()
 {
     _terms.clear();
 }
 
 void
-LocalTermList::insert(int index, Term* term)
+TermList::insert(int index, Term* term)
 {
     _terms.resize(_terms.size() + 1);
     for (size_t i=index; i < _terms.size() - 1; i++)
@@ -80,7 +80,7 @@ LocalTermList::insert(int index, Term* term)
 }
 
 Term*
-LocalTermList::operator[] (int index) const
+TermList::operator[] (int index) const
 {
     ca_assert(index < int(_terms.size()));
     return _terms[index];

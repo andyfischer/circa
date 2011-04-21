@@ -5,7 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "local_term_list.h"
+#include "term_list.h"
 #include "name_list.h"
 #include "references.h"
 #include "ref_list.h"
@@ -86,7 +86,7 @@ struct Term : TaggedValue
     int refCount;
 
     // Terms which are using this term as an input.
-    LocalTermList users;
+    TermList users;
 
     // Location in textual source code.
     TermSourceLocation sourceLoc;
