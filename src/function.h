@@ -106,7 +106,7 @@ bool inputs_fit_function_dynamic(Term* func, RefList const& inputs);
 bool values_fit_function_dynamic(Term* func, List* list);
 
 Term* create_overloaded_function(Branch& branch, std::string const& name,
-        RefList const& overloads/*=RefList()*/);
+        TermList const& overloads);
 Term* derive_specialized_output_type(Term* function, Term* call);
 void function_set_use_input_as_output(Term* function, int index, bool value);
 

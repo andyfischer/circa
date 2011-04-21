@@ -428,7 +428,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
 }
 
 Term* create_overloaded_function(Branch& branch, std::string const& name,
-        RefList const& overloads)
+        TermList const& overloads)
 {
     return overloaded_function::create_overloaded_function(branch, name, overloads);
 }

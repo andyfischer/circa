@@ -45,7 +45,7 @@ namespace add_function {
         function_t::get_feedback_func(add_f) =
             import_function(kernel, add_feedback, "add_feedback(any, number)");
 
-        ADD_FUNC = create_overloaded_function(kernel, "add", RefList(add_i, add_f));
+        ADD_FUNC = create_overloaded_function(kernel, "add", TermList(add_i, add_f));
     }
 } // namespace add_function
 } // namespace circa

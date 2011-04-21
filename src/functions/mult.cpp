@@ -54,7 +54,7 @@ namespace mult_function {
             import_function(kernel, feedback_evaluate, "mult_feedback(any, number) -> Branch");
         #endif
 
-        MULT_FUNC = create_overloaded_function(kernel, "mult", RefList(mult_i, mult_f));
+        MULT_FUNC = create_overloaded_function(kernel, "mult", TermList(mult_i, mult_f));
     }
 }
 } // namespace circa

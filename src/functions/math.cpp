@@ -135,14 +135,14 @@ namespace math_function {
         CA_SETUP_FUNCTIONS(kernel);
 
         create_overloaded_function(kernel, "max",
-                RefList(kernel["max_i"], kernel["max_f"]));
+                TermList(kernel["max_i"], kernel["max_f"]));
         create_overloaded_function(kernel, "min",
-                RefList(kernel["min_i"], kernel["min_f"]));
+                TermList(kernel["min_i"], kernel["min_f"]));
         create_overloaded_function(kernel, "remainder",
-                RefList(kernel["remainder_i"], kernel["remainder_f"]));
+                TermList(kernel["remainder_i"], kernel["remainder_f"]));
 
         create_overloaded_function(kernel, "mod",
-                RefList(kernel["mod_i"], kernel["mod_f"]));
+                TermList(kernel["mod_i"], kernel["mod_f"]));
     }
 }
 } // namespace circa

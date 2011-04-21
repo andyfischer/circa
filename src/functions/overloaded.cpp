@@ -189,7 +189,7 @@ namespace overloaded_function {
     }
 
     void setup_overloaded_function(Term* term, std::string const& name,
-            RefList const& overloads)
+            TermList const& overloads)
     {
         term->nestedContents.clear();
         initialize_function(term);
@@ -211,7 +211,7 @@ namespace overloaded_function {
     }
 
     Term* create_overloaded_function(Branch& branch, std::string const& name,
-        RefList const& overloads)
+        TermList const& overloads)
     {
         Term* result = create_value(branch, FUNCTION_TYPE, name);
         setup_overloaded_function(result, name, overloads);
@@ -220,8 +220,8 @@ namespace overloaded_function {
 
     void overloaded_func_post_compile(Term* term)
     {
-        RefList inputs;
-        term->inputsToList(&inputs);
+        TermList inputs;
+        term->inputsToList(inputs);
         setup_overloaded_function(term, term->name, inputs);
     }
 

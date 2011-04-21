@@ -53,13 +53,13 @@ namespace comparison_function {
         CA_SETUP_FUNCTIONS(kernel);
 
         create_overloaded_function(kernel, "less_than",
-                RefList(kernel["less_than_i"], kernel["less_than_f"]));
+                TermList(kernel["less_than_i"], kernel["less_than_f"]));
         create_overloaded_function(kernel, "less_than_eq",
-                RefList(kernel["less_than_eq_i"], kernel["less_than_eq_f"]));
+                TermList(kernel["less_than_eq_i"], kernel["less_than_eq_f"]));
         create_overloaded_function(kernel, "greater_than",
-                RefList(kernel["greater_than_i"], kernel["greater_than_eq_f"]));
+                TermList(kernel["greater_than_i"], kernel["greater_than_eq_f"]));
         create_overloaded_function(kernel, "greater_than_eq",
-                RefList(kernel["greater_than_eq_i"], kernel["greater_than_eq_f"]));
+                TermList(kernel["greater_than_eq_i"], kernel["greater_than_eq_f"]));
     }
 }
 }

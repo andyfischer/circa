@@ -130,6 +130,4 @@ struct RefList
     void remapPointers(ReferenceMap const& map);
 };
 
-void sort_by_name(RefList& list);
-
 } // namespace circa

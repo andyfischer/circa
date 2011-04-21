@@ -29,7 +29,7 @@ namespace neg_function  {
         get_function_attrs(neg_i)->formatSource = formatSource;
         get_function_attrs(neg_f)->formatSource = formatSource;
 
-        NEG_FUNC = create_overloaded_function(kernel, "neg", RefList(neg_i, neg_f));
+        NEG_FUNC = create_overloaded_function(kernel, "neg", TermList(neg_i, neg_f));
         get_function_attrs(NEG_FUNC)->formatSource = formatSource;
     }
 }

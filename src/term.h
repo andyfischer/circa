@@ -99,6 +99,7 @@ struct Term : TaggedValue
     int numInputs() const;
 
     void inputsToList(RefList* out) const;
+    void inputsToList(TermList& out) const;
 
     // In this context, the 'dependencies' include the function term and all input
     // terms. So, this is the same as the input list, with the function inserted

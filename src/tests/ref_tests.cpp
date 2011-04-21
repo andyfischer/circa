@@ -61,49 +61,11 @@ void test_destroy()
     test_assert(t->refCount == 1);
 }
 
-void test_list()
-{
-    Ref t1 = alloc_term();
-    Ref t2 = alloc_term();
-
-    test_assert(t1->refCount == 1);
-
-    {
-        RefList list;
-        list.append(t1);
-        list.append(t2);
-
-        test_assert(t1->refCount == 2);
-        test_assert(t2->refCount == 2);
-
-        {
-            RefList another_list = list;
-            test_assert(t1->refCount == 3);
-            test_assert(t2->refCount == 3);
-
-            {
-                RefList a_third_list = list;
-                test_assert(t1->refCount == 4);
-                test_assert(t2->refCount == 4);
-            }
-
-            test_assert(t1->refCount == 3);
-            test_assert(t2->refCount == 3);
-        }
-
-        test_assert(t1->refCount == 2);
-        test_assert(t2->refCount == 2);
-    }
-
-    test_assert(t1->refCount == 1);
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(ref_tests::test_basic);
     REGISTER_TEST_CASE(ref_tests::test_copy);
     REGISTER_TEST_CASE(ref_tests::test_destroy);
-    REGISTER_TEST_CASE(ref_tests::test_list);
 }
 
 } // namespace ref_tests

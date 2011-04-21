@@ -21,7 +21,7 @@ namespace div_function {
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        DIV_FUNC = create_overloaded_function(kernel, "div", RefList(kernel["div_f"]));
+        DIV_FUNC = create_overloaded_function(kernel, "div", TermList(kernel["div_f"]));
     }
 }
 } // namespace circa
