@@ -37,7 +37,7 @@ namespace finish_minor_branch_function {
                 if (term->name == "")
                     continue;
                 Term* outcome = get_named_at(finishBranchTerm, term->name);
-                apply(contents, PRESERVE_STATE_RESULT_FUNC, RefList(outcome));
+                apply(contents, PRESERVE_STATE_RESULT_FUNC, TermList(outcome));
             }
         }
     }

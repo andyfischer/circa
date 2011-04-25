@@ -36,7 +36,7 @@ namespace assign_function {
             return NULL;
         }
 
-        return apply(branch, set, RefList(term->input(0), term->input(1), desiredValue));
+        return apply(branch, set, TermList(term->input(0), term->input(1), desiredValue));
     }
 
     /*

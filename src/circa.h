@@ -26,7 +26,6 @@
 #include "parser.h"
 #include "path_expression.h"
 #include "refactoring.h"
-#include "references.h"
 #include "repl.h"
 #include "stateful_code.h"
 #include "static_checking.h"

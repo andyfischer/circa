@@ -9,6 +9,8 @@ namespace term_tests {
 
 void simple_refcounting()
 {
+    #if 0
+    TEST_DISABLED
     Term* term = NULL;
     Ref ref;
 
@@ -21,6 +23,7 @@ void simple_refcounting()
     }
 
     test_assert(term->refCount == 1);
+    #endif
 }
 
 void duplicate_nested_contents()

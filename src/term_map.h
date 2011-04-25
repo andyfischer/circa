@@ -6,13 +6,13 @@
 
 namespace circa {
 
-struct ReferenceMap
+struct TermMap
 {
     std::map<Term*,Term*> _map;
 
     typedef std::map<Term*,Term*>::iterator iterator;
 
-    explicit ReferenceMap() { }
+    explicit TermMap() { }
     Term* operator[](Term* key) const {
         std::map<Term*,Term*>::const_iterator it = _map.find(key);
         if (it == _map.end())

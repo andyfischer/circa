@@ -446,7 +446,7 @@ void set_ref(TaggedValue* value, Term* t)
 {
     debug_trap_value_write(value);
     change_type(value, unbox_type(REF_TYPE));
-    *((Ref*) value->value_data.ptr) = t;
+    value->value_data.ptr = t;
 }
 
 List* set_list(TaggedValue* value)
@@ -530,7 +530,7 @@ bool as_bool(TaggedValue* value)
 Term* as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));
-    return *((Ref*) value->value_data.ptr);
+    return (Term*) value->value_data.ptr;
 }
 
 Branch* as_branch_ref(TaggedValue* value)

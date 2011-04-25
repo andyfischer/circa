@@ -5,13 +5,13 @@
 #include "common_headers.h"
 
 #include "debug.h"
-#include "ref_map.h"
+#include "term_map.h"
 
 namespace circa {
 
 struct TermNamespace
 {
-    typedef std::map<std::string, Ref> StringToTermMap;
+    typedef std::map<std::string, TermPtr> StringToTermMap;
     typedef StringToTermMap::iterator iterator;
     typedef StringToTermMap::const_iterator const_iterator;
 
@@ -44,7 +44,7 @@ struct TermNamespace
             return it->second;
     }
 
-    Ref& operator[](std::string const& name)
+    TermPtr& operator[](std::string const& name)
     {
         return _map[name];
     }
@@ -80,7 +80,7 @@ struct TermNamespace
     const_iterator end() const { return _map.end(); }
     const_iterator find(std::string const& name) const { return _map.find(name); }
 
-    void remapPointers(ReferenceMap const& remapping)
+    void remapPointers(TermMap const& remapping)
     {
         StringToTermMap::iterator it;
         for (it = _map.begin(); it != _map.end(); ) {

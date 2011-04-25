@@ -36,4 +36,8 @@ void rewrite_as_value(Branch& branch, int index, Term* type);
 // Remove this term from its owning branch.
 void erase_term(Term* term);
 
+void remap_pointers(Term* term, TermMap const& map);
+void remap_pointers(Term* term, Term* original, Term* replacement);
+void remap_pointers(Branch& branch, Term* original, Term* replacement);
+
 } // namespace circa

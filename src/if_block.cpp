@@ -9,7 +9,6 @@
 #include "building.h"
 #include "evaluation.h"
 #include "importing_macros.h"
-#include "ref_list.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -97,14 +96,14 @@ void update_if_block_joining_branch(Term* ifCall)
     {
         std::string const& name = *it;
 
-        RefList inputs;
+        TermList inputs;
         inputs.resize(numBranches);
 
         Term* outerVersion = get_named_at(ifCall, name);
 
         for (int i=0; i < numBranches; i++) {
             Term* local = contents[i]->nestedContents[name];
-            inputs[i] = local == NULL ? outerVersion : local;
+            inputs.setAt(i, local == NULL ? outerVersion : local);
         }
 
         apply(joining, JOIN_FUNC, inputs, name);

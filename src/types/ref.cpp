@@ -19,11 +19,10 @@ namespace ref_t {
     }
     void initialize(Type* type, TaggedValue* value)
     {
-        set_pointer(value, type, new Ref());
+        set_pointer(value, type, NULL);
     }
     void release(TaggedValue* value)
     {
-        delete (Ref*) get_pointer(value);
     }
     void reset(TaggedValue* value)
     {
@@ -31,7 +30,7 @@ namespace ref_t {
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
-        *((Ref*) get_pointer(dest, &REF_T)) = as_ref(source);
+        dest->value_data = source->value_data;
     }
     bool equals(TaggedValue* lhs, TaggedValue* rhs)
     {
@@ -42,6 +41,10 @@ namespace ref_t {
     int hashFunc(TaggedValue* value)
     {
         return (int) (long(as_ref(value)) >> 3);
+    }
+    void remapPointers(Term* term, TermMap const& map)
+    {
+        set_ref(term, map.getRemapped(as_ref(term)));
     }
 
     CA_FUNCTION(get_name)
@@ -205,7 +208,7 @@ namespace ref_t {
     void setup_type(Type* type)
     {
         type->name = "ref";
-        type->remapPointers = Ref::remap_pointers;
+        type->remapPointers = remapPointers;
         type->toString = toString;
         type->initialize = initialize;
         type->release = release;

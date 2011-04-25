@@ -9,13 +9,13 @@ namespace parser {
 
 using namespace circa::token;
 
-Ref compile(Branch& branch, ParsingStep step, std::string const& input)
+TermPtr compile(Branch& branch, ParsingStep step, std::string const& input)
 {
     int prevLastIndex = branch.length() - 1;
 
     TokenStream tokens(input);
     ParserCxt context;
-    Ref result = step(branch, tokens, &context).term;
+    Term* result = step(branch, tokens, &context).term;
 
     // Update the finish_minor_branch() func at the end
     Term* prevLast = NULL;
@@ -36,7 +36,7 @@ Ref compile(Branch& branch, ParsingStep step, std::string const& input)
     return result;
 }
 
-Ref evaluate(Branch& branch, ParsingStep step, std::string const& input)
+TermPtr evaluate(Branch& branch, ParsingStep step, std::string const& input)
 {
     int prevHead = branch.length();
 
@@ -572,7 +572,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    attrs->outputTypes.setAt(0, outputType);
+    attrs->outputTypes = TermList(outputType);
 
     finish_parsing_function_header(result);
 

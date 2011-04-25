@@ -120,7 +120,7 @@ void rename(Term* term, std::string const& name)
 
 void steal_term(Term* _term, Branch& newHome)
 {
-    Ref term = _term;
+    Term* term = _term;
 
     if (term->owningBranch != NULL) {
         term->owningBranch->remove(term);
@@ -171,6 +171,61 @@ void erase_term(Term* term)
 
     if (term->owningBranch != NULL)
         term->owningBranch->remove(term);
+}
+
+void remap_pointers(Term* term, TermMap const& map)
+{
+    assert_valid_term(term);
+
+    // make sure this map doesn't try to remap NULL, because such a thing
+    // would almost definitely lead to errors.
+    ca_assert(!map.contains(NULL));
+
+    for (int i=0; i < term->numInputs(); i++)
+        set_input2(term, i, map.getRemapped(term->input(i)), term->inputInfo(i)->outputIndex);
+
+    term->function = map.getRemapped(term->function);
+
+    // TODO, call changeType if our type is changed
+    // This was implemented once, and it caused spurious crash bugs
+    // Term* newType = map.getRemapped(term->type);
+    
+    Type::RemapPointers remapPointers = type_t::get_remap_pointers_func(term->type);
+
+    // Remap on value
+    if ((term->value_data.ptr != NULL)
+            && term->type != NULL
+            && (remapPointers)) {
+
+        remapPointers(term, map);
+    }
+
+    // This code once called remap on term->properties
+
+    // Remap inside nestedContents
+    term->nestedContents.remapPointers(map);
+}
+
+void remap_pointers(Term* term, Term* original, Term* replacement)
+{
+    assert_valid_term(term);
+    assert_valid_term(original);
+    ca_assert(original != NULL);
+
+    TermMap map;
+    map[original] = replacement;
+    remap_pointers(term, map);
+}
+
+void remap_pointers(Branch& branch, Term* original, Term* replacement)
+{
+    TermMap map;
+    map[original] = replacement;
+
+    for (int i=0; i < branch.length(); i++) {
+        if (branch[i] == NULL) continue;
+        remap_pointers(branch[i], map);
+    }
 }
 
 } // namespace circa

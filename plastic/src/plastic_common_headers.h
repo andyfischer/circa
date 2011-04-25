@@ -41,7 +41,7 @@ struct Term;
 struct Type;
 struct Ref;
 struct RefList;
-struct ReferenceMap;
+struct TermMap;
 
 } // namespace circa
 

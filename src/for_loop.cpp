@@ -8,7 +8,6 @@
 #include "introspection.h"
 #include "source_repro.h"
 #include "stateful_code.h"
-#include "references.h"
 #include "refactoring.h"
 #include "term.h"
 #include "type.h"

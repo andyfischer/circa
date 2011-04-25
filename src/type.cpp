@@ -72,7 +72,7 @@ namespace type_t {
         append_phrase(source, "}", term, token::RBRACKET);
     }
 
-    void remap_pointers(Term *type, ReferenceMap const& map)
+    void remap_pointers(Term *type, TermMap const& map)
     {
         Branch& prototype = type_t::get_prototype(type);
 

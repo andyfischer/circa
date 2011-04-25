@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "ref_list.h"
 #include "term.h"
 
 namespace circa {

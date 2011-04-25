@@ -8,8 +8,7 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "references.h"
-#include "ref_map.h"
+#include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
 
@@ -52,7 +51,7 @@ struct Type
     typedef void (*SetField)(TaggedValue* value, const char* field, TaggedValue* element);
     typedef int (*NumElements)(TaggedValue* value);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
-    typedef void (*RemapPointers)(Term* term, ReferenceMap const& map);
+    typedef void (*RemapPointers)(Term* term, TermMap const& map);
     typedef int (*HashFunc)(TaggedValue* value);
 
     std::string name;
@@ -87,7 +86,7 @@ struct Type
     Branch prototype;
 
     // Type parameters
-    RefList parameters;
+    TermList parameters;
 
     // Attributes for this type.
     Branch attributes;
@@ -163,7 +162,7 @@ namespace type_t {
     void copy(TaggedValue* source, TaggedValue* dest);
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
-    void remap_pointers(Term *term, ReferenceMap const& map);
+    void remap_pointers(Term *term, TermMap const& map);
     void setup_type(Term* type);
 
     void copy(Type* value, TaggedValue* dest);

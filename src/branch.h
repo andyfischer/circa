@@ -5,7 +5,7 @@
 #include "common_headers.h"
 
 #include "names.h"
-#include "ref_list.h"
+#include "term_list.h"
 #include "term_namespace.h"
 #include "types/list.h"
 
@@ -15,7 +15,8 @@ struct BrokenLinkList;
 
 struct Branch
 {
-    RefList _terms;
+    // The branch owns all the Term objects in this list.
+    TermList _terms;
 
     TermNamespace names;
 
@@ -85,13 +86,12 @@ struct Branch
     int findIndex(std::string const& name) const;
     int findIndex(const char* name) const;
 
-    void set(int index, Term* term);
-    void setNull(int index);
-
     void insert(int index, Term* term);
-
     void append(Term* term);
     Term* appendNew();
+
+    void set(int index, Term* term);
+    void setNull(int index);
 
     void move(Term* term, int index);
     void moveToEnd(Term* term);
@@ -107,7 +107,7 @@ struct Branch
     void bindName(Term* term, std::string name);
 
     // Remap pointers
-    void remapPointers(ReferenceMap const& map);
+    void remapPointers(TermMap const& map);
 
     // Compile the given statement, return the result term.
     Term* compile(std::string const& statement);

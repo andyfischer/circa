@@ -61,14 +61,6 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     return result;
 }
 
-Term* apply(Branch& branch, Term* function, RefList const& inputs,
-    std::string const& name)
-{
-    TermList _inputs;
-    inputs.toTermList(_inputs);
-    return apply(branch, function, _inputs, name);
-}
-
 void set_input2(Term* term, int index, Term* input, int outputIndex)
 {
     assert_valid_term(term);

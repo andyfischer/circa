@@ -6,7 +6,9 @@
 namespace circa {
 
 FunctionAttrs::FunctionAttrs()
-  : variableArgs(false),
+  : implicitStateType(NULL),
+    variableArgs(false),
+    feedbackFunc(NULL),
     throws(false),
     outputCount(1),
     evaluate(NULL),
@@ -217,7 +219,10 @@ namespace function_t {
 
     Term* get_input_placeholder(Term* func, int index)
     {
-        return func->nestedContents[index + 1];
+        index += 1;
+        if (index >= func->nestedContents.length())
+            return NULL;
+        return func->nestedContents[index];
     }
 
     std::string const& get_input_name(Term* func, int index)
@@ -273,7 +278,7 @@ namespace function_t {
     {
         return get_function_attrs(func)->specializeType;
     }
-    Ref& get_feedback_func(Term* func)
+    Term* get_feedback_func(Term* func)
     {
         return get_function_attrs(func)->feedbackFunc;
     }

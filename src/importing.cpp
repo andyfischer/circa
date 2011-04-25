@@ -31,7 +31,7 @@ Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& 
 
 Term* import_member_function(Type* type, EvaluateFunc evaluate, std::string const& header)
 {
-    Ref result = parser::compile(type->memberFunctions,
+    Term* result = parser::compile(type->memberFunctions,
             parser::function_decl, header);
 
     function_t::get_evaluate(result) = evaluate;

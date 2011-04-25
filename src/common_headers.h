@@ -39,9 +39,7 @@ struct FunctionAttrs;
 struct List;
 struct PathExpression;
 struct RawOutputPrefs;
-struct Ref;
-struct RefList;
-struct ReferenceMap;
+struct TermMap;
 struct StaticTypeQuery;
 struct StyledSource;
 struct TaggedValue;
@@ -49,6 +47,7 @@ struct Term;
 struct TermList;
 struct Type;
 
+typedef Term* TermPtr;
 typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
 // Function-related typedefs:

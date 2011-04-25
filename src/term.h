@@ -7,8 +7,6 @@
 #include "branch.h"
 #include "term_list.h"
 #include "name_list.h"
-#include "references.h"
-#include "ref_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
 #include "types/dict.h"
@@ -42,7 +40,7 @@ struct Term : TaggedValue
     //   Type* value_type
 
     // A Type term that describes our data type
-    Ref type;
+    Term* type;
 
     // Input terms
     InputList inputs;
@@ -98,7 +96,6 @@ struct Term : TaggedValue
     Input* inputInfo(int index);
     int numInputs() const;
 
-    void inputsToList(RefList* out) const;
     void inputsToList(TermList& out) const;
 
     // In this context, the 'dependencies' include the function term and all input

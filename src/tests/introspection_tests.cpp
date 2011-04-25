@@ -35,7 +35,7 @@ void test_get_involved_terms()
 void test_term_to_raw_string()
 {
     // Test that term_to_raw_string doesn't die if a term has a NULL function or type.
-    Term* term = new Term();
+    Term* term = alloc_term();
 
     get_term_to_string_extended(term);
 

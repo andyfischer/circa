@@ -21,10 +21,10 @@ struct FunctionAttrs
     typedef void (*PostCompile)(Term*);
 
     std::string name;
-    RefList outputTypes;
-    Ref implicitStateType;
+    TermList outputTypes;
+    Term* implicitStateType;
     bool variableArgs;
-    Ref feedbackFunc;
+    Term* feedbackFunc;
     TaggedValue parameter;
     bool throws;
     int outputCount;
@@ -75,7 +75,7 @@ namespace function_t {
     bool get_input_optional(Term* func, int index);
     std::string const& get_exposed_name_path(Term* function);
     void set_exposed_name_path(Term* func, std::string const& value);
-    Ref& get_feedback_func(Term* function);
+    Term* get_feedback_func(Term* function);
     TaggedValue* get_parameters(Term* function);
     std::string get_documentation(Term* function);
 

@@ -7,7 +7,6 @@
 #include "dll_patching.h"
 #include "function.h"
 #include "importing.h"
-#include "ref_list.h"
 
 namespace circa {
 

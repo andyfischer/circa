@@ -4,7 +4,6 @@
 
 #include "common_headers.h"
 #include "for_loop.h"
-#include "references.h"
 #include "tagged_value.h"
 #include "types/list.h"
 #include "types/dict.h"
@@ -19,7 +18,7 @@ struct EvalContext
 
     // Error information:
     bool errorOccurred;
-    Ref errorTerm;
+    Term* errorTerm;
     std::string errorMessage;
 
     // Tree of persistent state

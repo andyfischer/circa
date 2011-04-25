@@ -93,14 +93,14 @@ void test_list()
 void test_namespace()
 {
     TermNamespace nspace;
-    Term *term = new Term();
+    Term *term = alloc_term();
 
     nspace.bind(term, "a");
     test_assert(nspace.contains("a"));
     test_assert(nspace["a"] == term);
 
-    Term *term2 = new Term();
-    ReferenceMap remap;
+    Term *term2 = alloc_term();
+    TermMap remap;
     remap[term] = term2;
     nspace.remapPointers(remap);
     test_assert(nspace["a"] == term2);
@@ -115,8 +115,8 @@ void test_list2()
 {
 #if 0
     TermList list;
-    Term* term = new Term();
-    Term* term2 = new Term();
+    Term* term = alloc_term();
+    Term* term2 = alloc_term();
 
     test_assert(list.length() == 0);
 
@@ -126,8 +126,8 @@ void test_list2()
     test_assert(list[0] == term);
     test_assert(list[1] == term2);
 
-    Term* term3 = new Term();
-    ReferenceMap remap;
+    Term* term3 = alloc_term();
+    TermMap remap;
     remap[term] = term3;
     list.remapPointers(remap);
     test_assert(list.length() == 2);

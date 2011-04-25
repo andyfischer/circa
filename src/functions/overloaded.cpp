@@ -184,7 +184,7 @@ namespace overloaded_function {
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
         Term* outputType = find_common_type(outputTypes);
         FunctionAttrs* attrs = get_function_attrs(term);
-        attrs->outputTypes.setAt(0, outputType);
+        attrs->outputTypes = TermList(outputType);
         attrs->variableArgs = variableArgs;
     }
 

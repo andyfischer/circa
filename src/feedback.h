@@ -13,9 +13,9 @@ extern const std::string TRAINING_BRANCH_NAME;
 struct FeedbackOperation
 {
     struct FeedbackEntry {
-        Ref target;
-        Ref value;
-        Ref type;
+        Term* target;
+        Term* value;
+        Term* type;
         FeedbackEntry(Term* _target, Term* _value, Term* _type)
           : target(_target), value(_value), type(_type) {}
     };

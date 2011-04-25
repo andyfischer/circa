@@ -69,13 +69,13 @@ namespace vectorize_vs_function {
         if (func == NULL || left == NULL || right == NULL)
             return;
 
-        Term* leftPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList());
+        Term* leftPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
         change_type(leftPlaceholder, find_type_of_get_index(left));
 
-        Term* rightPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList());
+        Term* rightPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
         change_type(rightPlaceholder, right->type);
 
-        apply(contents, func, RefList(leftPlaceholder, rightPlaceholder));
+        apply(contents, func, TermList(leftPlaceholder, rightPlaceholder));
     }
 
     void setup(Branch& kernel)

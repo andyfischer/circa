@@ -269,7 +269,7 @@ void post_initialize_primitive_types(Branch& kernel)
     initialize_function(VALUE_FUNC);
 
     FunctionAttrs* attrs = get_function_attrs(VALUE_FUNC);
-    attrs->outputTypes.setAt(0, ANY_TYPE);
+    attrs->outputTypes = TermList(ANY_TYPE);
     attrs->evaluate = value_function::evaluate;
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == ANY_TYPE);
@@ -351,7 +351,7 @@ void post_setup_functions(Branch& kernel)
 
     overloaded_function::append_overload(DIV_FUNC, div_s);
 
-    function_t::get_feedback_func(VALUE_FUNC) = UNSAFE_ASSIGN_FUNC;
+    get_function_attrs(VALUE_FUNC)->feedbackFunc = UNSAFE_ASSIGN_FUNC;
 }
 
 void parse_hosted_types(Branch& kernel)

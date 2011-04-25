@@ -11,6 +11,7 @@
 #include "introspection.h"
 #include "locals.h"
 #include "parser.h"
+#include "refactoring.h"
 #include "stateful_code.h"
 #include "source_repro.h"
 #include "storage.h"
@@ -53,7 +54,7 @@ bool Branch::contains(std::string const& name) const
 Term* Branch::get(int index) const
 {
     assert_valid_branch(this);
-    if (index > length())
+    if (index >= length())
         throw std::runtime_error("index out of range");
     return _terms[index];
 }
@@ -104,44 +105,6 @@ int Branch::findIndex(const char* name) const
     return -1;
 }
 
-void Branch::set(int index, Term* term)
-{
-    assert_valid_branch(this);
-    ca_assert(index <= length());
-
-    // No-op if this is the same term. Need to check this because otherwise
-    // we decrement refcount on term.
-    if (_terms[index] == term)
-        return;
-
-    setNull(index);
-    _terms[index] = term;
-    if (term != NULL) {
-        assert_valid_term(term);
-        ca_assert(term->owningBranch == NULL || term->owningBranch == this);
-        term->owningBranch = this;
-        term->index = index;
-    }
-
-    // TODO: update name bindings
-}
-
-void Branch::setNull(int index)
-{
-    assert_valid_branch(this);
-    ca_assert(index <= length());
-    Term* term = _terms[index];
-    if (term != NULL) {
-        // remove name binding if necessary
-        if ((term->name != "") && (names[term->name] == term))
-            names.remove(term->name);
-
-        term->owningBranch = NULL;
-        term->index = 0;
-        _terms[index] = NULL;
-    }
-}
-
 void Branch::append(Term* term)
 {
     assert_valid_branch(this);
@@ -165,6 +128,42 @@ Term* Branch::appendNew()
     return term;
 }
 
+void Branch::set(int index, Term* term)
+{
+    assert_valid_branch(this);
+    ca_assert(index <= length());
+
+    // No-op if this is the same term.
+    if (_terms[index] == term)
+        return;
+
+    setNull(index);
+    _terms.setAt(index, term);
+    if (term != NULL) {
+        assert_valid_term(term);
+        ca_assert(term->owningBranch == NULL || term->owningBranch == this);
+        term->owningBranch = this;
+        term->index = index;
+    }
+}
+
+void Branch::setNull(int index)
+{
+    assert_valid_branch(this);
+    ca_assert(index <= length());
+    Term* term = _terms[index];
+    if (term != NULL) {
+        // remove name binding if necessary
+        if ((term->name != "") && (names[term->name] == term))
+            names.remove(term->name);
+
+        term->owningBranch = NULL;
+        term->index = 0;
+        _terms.setAt(index, NULL);
+        dealloc_term(term);
+    }
+}
+
 void Branch::insert(int index, Term* term)
 {
     assert_valid_term(term);
@@ -174,10 +173,10 @@ void Branch::insert(int index, Term* term)
 
     _terms.append(NULL);
     for (int i=_terms.length()-1; i > index; i--) {
-        _terms[i] = _terms[i-1];
+        _terms.setAt(i, _terms[i-1]);
         _terms[i]->index = i;
     }
-    _terms[index] = term;
+    _terms.setAt(index, term);
 
     if (term != NULL) {
         ca_assert(term->owningBranch == NULL);
@@ -195,13 +194,11 @@ void Branch::move(Term* term, int index)
 
     int dir = term->index < index ? 1 : -1;
 
-    Ref ref = term;
-
     for (int i=term->index; i != index; i += dir) {
-        _terms[i] = _terms[i+dir];
+        _terms.setAt(i, _terms[i+dir]);
         _terms[i]->index = i;
     }
-    _terms[index] = term;
+    _terms.setAt(index, term);
     term->index = index;
 }
 
@@ -213,7 +210,7 @@ void Branch::moveToEnd(Term* term)
     ca_assert(term->index >= 0);
     int index = getIndex(term);
     _terms.append(term); // do this first so that the term doesn't lose references
-    _terms[index] = NULL;
+    _terms.setAt(index, NULL);
     term->index = _terms.length()-1;
 }
 
@@ -238,7 +235,7 @@ void Branch::remove(int index)
     setNull(index);
 
     for (int i=index; i < _terms.length()-1; i++) {
-        _terms[i] = _terms[i+1];
+        _terms.setAt(i, _terms[i+1]);
         if (_terms[i] != NULL)
             _terms[i]->index = i;
     }
@@ -252,7 +249,7 @@ void Branch::removeNulls()
         if (_terms[i] == NULL) {
             numDeleted++;
         } else if (numDeleted > 0) {
-            _terms[i - numDeleted] = _terms[i];
+            _terms.setAt(i - numDeleted, _terms[i]);
             _terms[i - numDeleted]->index = i - numDeleted;
         }
     }
@@ -315,7 +312,7 @@ void Branch::bindName(Term* term, std::string name)
     update_unique_name(term);
 }
 
-void Branch::remapPointers(ReferenceMap const& map)
+void Branch::remapPointers(TermMap const& map)
 {
     names.remapPointers(map);
 
@@ -451,7 +448,7 @@ Term* find_term_by_id(Branch& branch, unsigned int id)
     return NULL;
 }
 
-void duplicate_branch_nested(ReferenceMap& newTermMap, Branch& source, Branch& dest)
+void duplicate_branch_nested(TermMap& newTermMap, Branch& source, Branch& dest)
 {
     // Duplicate every term
     for (int index=0; index < source.length(); index++) {
@@ -473,7 +470,7 @@ void duplicate_branch(Branch& source, Branch& dest)
     assert_valid_branch(&source);
     assert_valid_branch(&dest);
 
-    ReferenceMap newTermMap;
+    TermMap newTermMap;
 
     duplicate_branch_nested(newTermMap, source, dest);
 

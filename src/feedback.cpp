@@ -6,7 +6,6 @@
 #include "branch_iterator.h"
 #include "builtins.h"
 #include "building.h"
-#include "ref_list.h"
 #include "term.h"
 
 #include "feedback.h"

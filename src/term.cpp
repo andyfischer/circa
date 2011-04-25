@@ -60,13 +60,6 @@ Term::numInputs() const
 }
 
 void
-Term::inputsToList(RefList* out) const
-{
-    out->resize(numInputs());
-    for (int i=0; i < numInputs(); i++)
-        out->setAt(i, input(i));
-}
-void
 Term::inputsToList(TermList& out) const
 {
     out.resize(numInputs());
@@ -230,6 +223,10 @@ Term* alloc_term()
 
 void dealloc_term(Term* term)
 {
+    term->inputs.clear();
+    term->type = NULL;
+    term->function = NULL;
+
     delete term;
 }
 

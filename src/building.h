@@ -10,9 +10,6 @@ namespace circa {
 Term* apply(Branch& branch, Term* function, TermList const& inputs,
     std::string const& name="");
 
-Term* apply(Branch& branch, Term* function, RefList const& inputs,
-    std::string const& name="");
-
 // Find the named function in this branch, and then call the above apply.
 Term* apply(Branch& branch, std::string const& functionName, 
                  TermList const& inputs, std::string const& name="");
