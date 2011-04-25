@@ -10,6 +10,7 @@
 
 #include "common_headers.h"
 #include "references.h"
+#include "term_list.h"
 
 namespace circa {
 
@@ -72,6 +73,8 @@ struct RefList
         append(term7);
         append(term8);
     }
+
+    void fromTermList(TermList const tl);
 
     void append(Term* term);
     void prepend(Term* term);

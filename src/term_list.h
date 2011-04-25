@@ -10,13 +10,13 @@ struct TermList
 {
     std::vector<Term*> _terms;
 
-    TermList();
-    TermList(Term* t1);
-    TermList(Term* t1, Term* t2);
-    TermList(Term* t1, Term* t2, Term* t3);
-    TermList(Term* t1, Term* t2, Term* t3, Term* t4);
-    TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5);
-    TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5, Term* t6);
+    explicit TermList();
+    explicit TermList(Term* t1);
+    explicit TermList(Term* t1, Term* t2);
+    explicit TermList(Term* t1, Term* t2, Term* t3);
+    explicit TermList(Term* t1, Term* t2, Term* t3, Term* t4);
+    explicit TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5);
+    explicit TermList(Term* t1, Term* t2, Term* t3, Term* t4, Term* t5, Term* t6);
 
     void set(Term* t1);
     void set(Term* t1, Term* t2);
