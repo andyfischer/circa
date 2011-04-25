@@ -7,12 +7,15 @@
 namespace circa {
 
 // Examine 'function' and 'inputs' and returns a result term.
+Term* apply(Branch& branch, Term* function, TermList const& inputs,
+    std::string const& name="");
+
 Term* apply(Branch& branch, Term* function, RefList const& inputs,
     std::string const& name="");
 
 // Find the named function in this branch, and then call the above apply.
 Term* apply(Branch& branch, std::string const& functionName, 
-                 RefList const& inputs, std::string const& name="");
+                 TermList const& inputs, std::string const& name="");
 
 // Create a duplicate of the given term.
 // If 'copyBranches' is false, don't copy branch state. It's assumed that the
@@ -22,7 +25,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name="
 
 void set_input(Term* term, int index, Term* input);
 void set_input2(Term* term, int index, Term* input, int outputIndex);
-void set_inputs(Term* term, RefList const& inputs);
+void set_inputs(Term* term, TermList const& inputs);
 void insert_input(Term* term, Term* input);
 void post_input_change(Term* term);
 

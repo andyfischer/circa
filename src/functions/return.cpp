@@ -47,14 +47,14 @@ namespace return_function {
                 if (previousTerm->name == "")
                     continue;
                 Term* outcome = get_named_at(returnCall, previousTerm->name);
-                apply(contents, PRESERVE_STATE_RESULT_FUNC, RefList(outcome));
+                apply(contents, PRESERVE_STATE_RESULT_FUNC, TermList(outcome));
             }
         }
 
         // Look for the enclosing subroutine, if found then add a call to
         // subroutine_output()
         {
-            RefList inputs(returnCall->input(0));
+            TermList inputs(returnCall->input(0));
 
             // Check for extra outputs, if found then include their results in this output
             int numInputs = function_t::num_inputs(sub);

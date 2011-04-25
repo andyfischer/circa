@@ -26,7 +26,7 @@ struct FeedbackOperation
     PendingFeedbackMap _pending;
 
     // Get a list of feedback terms for this term
-    RefList getFeedback(Term* target, Term* type);
+    TermList getFeedback(Term* target, Term* type);
 
     // Send feedback to the given term
     void sendFeedback(Term* target, Term* value, Term* type);

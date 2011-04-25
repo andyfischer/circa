@@ -139,7 +139,7 @@ void feedback_operation()
     Term* b = branch.compile("2");
     evaluate_branch(branch);
 
-    RefList list = operation.getFeedback(a, DESIRED_VALUE_FEEDBACK);
+    TermList list = operation.getFeedback(a, DESIRED_VALUE_FEEDBACK);
 
     test_assert(list.length() == 0);
 

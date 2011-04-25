@@ -101,8 +101,8 @@ void finish_parsing_function_header(Term* func);
 // Returns whether this term can be called as a function
 bool is_callable(Term* term);
 
-bool inputs_statically_fit_function(Term* func, RefList const& inputs);
-bool inputs_fit_function_dynamic(Term* func, RefList const& inputs);
+bool inputs_statically_fit_function(Term* func, TermList const& inputs);
+bool inputs_fit_function_dynamic(Term* func, TermList const& inputs);
 bool values_fit_function_dynamic(Term* func, List* list);
 
 Term* create_overloaded_function(Branch& branch, std::string const& name,

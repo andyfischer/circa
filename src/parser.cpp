@@ -394,7 +394,7 @@ ParseResult comment(Branch& branch, TokenStream& tokens, ParserCxt* context)
     if (tokens.nextIs(COMMENT))
         commentText = tokens.consume();
 
-    Term* result = apply(branch, COMMENT_FUNC, RefList());
+    Term* result = apply(branch, COMMENT_FUNC, TermList());
     result->setStringProp("comment", commentText);
 
     return ParseResult(result);
@@ -506,7 +506,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         }
 
         // Create an input placeholder term
-        Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, RefList(), name);
+        Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
 
         if (is_type(typeTerm))
             change_type(input, typeTerm);
@@ -686,7 +686,7 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = apply(branch, IF_BLOCK_FUNC, RefList());
+    Term* result = apply(branch, IF_BLOCK_FUNC, TermList());
     Branch& contents = result->nestedContents;
 
     Term* currentBlock = NULL;
@@ -722,11 +722,11 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
             ca_assert(condition != NULL);
-            currentBlock = apply(contents, IF_FUNC, RefList(condition));
+            currentBlock = apply(contents, IF_FUNC, TermList(condition));
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            currentBlock = apply(contents, BRANCH_FUNC, RefList(), "else");
+            currentBlock = apply(contents, BRANCH_FUNC, TermList(), "else");
         }
 
         currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
@@ -806,7 +806,7 @@ ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
     if (rebindListName)
         name = listExpr->name;
 
-    Term* forTerm = apply(branch, FOR_FUNC, RefList(listExpr), name);
+    Term* forTerm = apply(branch, FOR_FUNC, TermList(listExpr), name);
     Branch& innerBranch = forTerm->nestedContents;
     setup_for_loop_pre_code(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
@@ -832,7 +832,7 @@ ParseResult do_once_block(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     tokens.consume(DO_ONCE);
 
-    Term* result = apply(branch, DO_ONCE_FUNC, RefList());
+    Term* result = apply(branch, DO_ONCE_FUNC, TermList());
     set_starting_source_location(result, startPosition, tokens);
     consume_branch(result->nestedContents, tokens, context);
 
@@ -877,7 +877,7 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
         // TODO: make this do_once() stuff work again
         #if 0
-        Term* initialization = apply(branch, DO_ONCE_FUNC, RefList());
+        Term* initialization = apply(branch, DO_ONCE_FUNC, TermList());
         hide_from_source(initialization);
 
         initialValue = infix_expression(initialization->nestedContents, tokens);
@@ -924,14 +924,14 @@ ParseResult expression_statement(Branch& branch, TokenStream& tokens, ParserCxt*
 
     // If the result is an identifier, then create an implicit copy()
     if (result.isIdentifier() && result.term->function != UNKNOWN_IDENTIFIER_FUNC)
-        result = ParseResult(apply(branch, COPY_FUNC, RefList(result.term)));
+        result = ParseResult(apply(branch, COPY_FUNC, TermList(result.term)));
 
     // Check to bind a new name
     if (nameBinding != "") {
         // If the term already has a name (this is the case for member-function syntax
         // and for unknown_identifier), then make a copy.
         if (result.term->name != "")
-            result = ParseResult(apply(branch, COPY_FUNC, RefList(result.term)));
+            result = ParseResult(apply(branch, COPY_FUNC, TermList(result.term)));
 
         branch.bindName(result.term, nameBinding);
     }
@@ -979,7 +979,7 @@ ParseResult include_statement(Branch& branch, TokenStream& tokens, ParserCxt* co
     Term* filenameTerm = create_string(branch, filename);
     hide_from_source(filenameTerm);
 
-    Term* result = apply(branch, INCLUDE_FUNC, RefList(filenameTerm));
+    Term* result = apply(branch, INCLUDE_FUNC, TermList(filenameTerm));
 
     return ParseResult(result);
 }
@@ -997,7 +997,7 @@ ParseResult return_statement(Branch& branch, TokenStream& tokens, ParserCxt* con
     if (returnsValue)
         output = infix_expression(branch, tokens, context).term;
 
-    Term* result = apply(branch, RETURN_FUNC, RefList(output));
+    Term* result = apply(branch, RETURN_FUNC, TermList(output));
 
     if (postKeywordWs != " ")
         result->setStringProp("syntax:postKeywordWs", postKeywordWs);
@@ -1018,7 +1018,7 @@ ParseResult discard_statement(Branch& branch, TokenStream& tokens, ParserCxt* co
         return compile_error_for_line(branch, tokens, startPosition,
                 "'discard' can only be used inside a for loop");
 
-    Term* result = apply(branch, DISCARD_FUNC, RefList(enclosingForLoop));
+    Term* result = apply(branch, DISCARD_FUNC, TermList(enclosingForLoop));
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);
@@ -1035,7 +1035,7 @@ ParseResult break_statement(Branch& branch, TokenStream& tokens, ParserCxt* cont
         return compile_error_for_line(branch, tokens, startPosition,
                 "'break' can only be used inside a for loop");
 
-    Term* result = apply(branch, BREAK_FUNC, RefList());
+    Term* result = apply(branch, BREAK_FUNC, TermList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);
@@ -1052,7 +1052,7 @@ ParseResult continue_statement(Branch& branch, TokenStream& tokens, ParserCxt* c
         return compile_error_for_line(branch, tokens, startPosition,
                 "'continue' can only be used inside a for loop");
 
-    Term* result = apply(branch, CONTINUE_FUNC, RefList());
+    Term* result = apply(branch, CONTINUE_FUNC, TermList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);
@@ -1179,9 +1179,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
             std::string functionName = tokens.consume(IDENTIFIER);
 
-            RefList inputs(leftExpr.term);
-
-            Term* term = find_and_apply(branch, functionName, inputs);
+            Term* term = find_and_apply(branch, functionName, TermList(leftExpr.term));
 
             if (term->function->name != functionName)
                 term->setStringProp("syntax:functionName", functionName);
@@ -1206,7 +1204,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
             Term* function = leftExpr.term;
 
-            Term* term = apply(branch, function, RefList(rightExpr.term));
+            Term* term = apply(branch, function, TermList(rightExpr.term));
 
             term->setStringProp("syntax:declarationStyle", "left-arrow");
             term->setStringProp("syntax:preOperatorWs", preOperatorWhitespace);
@@ -1223,7 +1221,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
 
             bool isRebinding = is_infix_operator_rebinding(operatorStr);
 
-            Term* term = find_and_apply(branch, functionName, RefList(leftExpr.term, rightExpr.term));
+            Term* term = find_and_apply(branch, functionName, TermList(leftExpr.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);
 
@@ -1239,7 +1237,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
                 // Set up an assign() term if left side is complex
                 // Example: a[0] += 1
                 else {
-                    Term* assignTerm = apply(branch, ASSIGN_FUNC, RefList(leftExpr.term, term));
+                    Term* assignTerm = apply(branch, ASSIGN_FUNC, TermList(leftExpr.term, term));
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
                     if (lexprRoot != NULL && lexprRoot->name != "") {
                         branch.bindName(assignTerm, lexprRoot->name);
@@ -1283,16 +1281,16 @@ ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
             }
         }
 
-        return ParseResult(apply(branch, NEG_FUNC, RefList(expr.term)));
+        return ParseResult(apply(branch, NEG_FUNC, TermList(expr.term)));
     }
 
     return subscripted_atom(branch, tokens, context);
 }
 
-ParseResult member_function_call(Branch& branch, Term* function, RefList const& _inputs,
+ParseResult member_function_call(Branch& branch, Term* function, TermList const& _inputs,
     std::string const& originalName, ParserCxt* context)
 {
-    RefList inputs = _inputs;
+    TermList inputs = _inputs;
 
     Term* originalFunctionTerm = function;
     Term* head = function->input(0);
@@ -1334,7 +1332,7 @@ ParseResult member_function_call(Branch& branch, Term* function, RefList const& 
 }
 
 void function_call_inputs(Branch& branch, TokenStream& tokens, ParserCxt* context,
-        RefList& arguments, ListSyntaxHints& inputHints)
+        TermList& arguments, ListSyntaxHints& inputHints)
 {
     // Parse function arguments
     int index = 0;
@@ -1365,7 +1363,7 @@ ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, P
 
     tokens.consume(LPAREN);
 
-    RefList arguments;
+    TermList arguments;
     ListSyntaxHints inputHints;
 
     function_call_inputs(branch, tokens, context, arguments, inputHints);
@@ -1419,7 +1417,7 @@ ParseResult function_call2(Branch& branch, Term* function, TokenStream& tokens, 
 
     Term* result = NULL;
 
-    result = apply(branch, function, RefList());
+    result = apply(branch, function, TermList());
 
     tokens.consume(LPAREN);
     int index = 0;
@@ -1482,7 +1480,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
 
         tokens.consume(RBRACKET);
 
-        Term* result = apply(branch, GET_INDEX_FUNC, RefList(head.term, subscript));
+        Term* result = apply(branch, GET_INDEX_FUNC, TermList(head.term, subscript));
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         set_input_syntax_hint(result, 1, "preWhitespace", postLbracketWs);
         set_source_location(result, startPosition, tokens);
@@ -1498,7 +1496,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
 
         std::string ident = tokens.consume(IDENTIFIER);
         
-        Term* result = apply(branch, GET_FIELD_FUNC, RefList(head.term, create_string(branch, ident)));
+        Term* result = apply(branch, GET_FIELD_FUNC, TermList(head.term, create_string(branch, ident)));
         set_source_location(result, startPosition, tokens);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         
@@ -1517,7 +1515,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
         Term* identTerm = create_string(branch, ident);
         hide_from_source(identTerm);
 
-        Term* result = apply(branch, GET_NAMESPACE_FIELD, RefList(head.term, identTerm));
+        Term* result = apply(branch, GET_NAMESPACE_FIELD, TermList(head.term, identTerm));
         set_source_location(result, startPosition, tokens);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         finished = false;
@@ -1882,7 +1880,7 @@ ParseResult literal_list(Branch& branch, TokenStream& tokens, ParserCxt* context
 
     tokens.consume(LBRACKET);
 
-    RefList inputs;
+    TermList inputs;
     ListSyntaxHints listHints;
 
     function_call_inputs(branch, tokens, context, inputs, listHints);
@@ -1903,7 +1901,7 @@ ParseResult literal_list(Branch& branch, TokenStream& tokens, ParserCxt* context
 ParseResult plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    Term* term = apply(branch, LAMBDA_FUNC, RefList());
+    Term* term = apply(branch, LAMBDA_FUNC, TermList());
     set_source_location(term, startPosition, tokens);
     consume_branch_with_braces(term->nestedContents, tokens, context, term);
     post_parse_branch(term->nestedContents);
@@ -1921,7 +1919,7 @@ ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* cont
             "Expected identifier after 'namespace'");
 
     std::string name = tokens.consume(IDENTIFIER);
-    Term* term = apply(branch, NAMESPACE_FUNC, RefList(), name);
+    Term* term = apply(branch, NAMESPACE_FUNC, TermList(), name);
     set_starting_source_location(term, startPosition, tokens);
 
     consume_branch(term->nestedContents, tokens, context);
@@ -1933,7 +1931,7 @@ ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* cont
 
 ParseResult unknown_identifier(Branch& branch, std::string const& name)
 {
-    Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, RefList(), name);
+    Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, TermList(), name);
     set_is_statement(term, false);
     term->setStringProp("message", name);
     return ParseResult(term, name);
@@ -2056,7 +2054,7 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
 
 Term* find_and_apply(Branch& branch,
         std::string const& functionName,
-        RefList inputs)
+        TermList const& inputs)
 {
     Term* function = find_function(branch, functionName);
 
@@ -2069,7 +2067,7 @@ Term* find_type(Branch& branch, std::string const& name)
     Term* result = find_named(branch, name);
 
     if (result == NULL) {
-        result = apply(branch, UNKNOWN_TYPE_FUNC, RefList(), name);
+        result = apply(branch, UNKNOWN_TYPE_FUNC, TermList(), name);
         ca_assert(result->type == TYPE_TYPE);
     }   
 
@@ -2138,7 +2136,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 Term* insert_compile_error(Branch& branch, TokenStream& tokens,
         std::string const& message)
 {
-    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, TermList());
     result->setStringProp("message", message);
     set_source_location(result, tokens.getPosition(), tokens);
     return result;
@@ -2147,7 +2145,7 @@ Term* insert_compile_error(Branch& branch, TokenStream& tokens,
 ParseResult compile_error_for_line(Branch& branch, TokenStream& tokens, int start,
         std::string const& message)
 {
-    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, RefList());
+    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, TermList());
     return compile_error_for_line(result, tokens, start, message);
 }
 

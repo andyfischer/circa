@@ -18,7 +18,7 @@ namespace overloaded_function {
         return NULL;
     }
 
-    Term* statically_specialize_function(Term* func, RefList const& inputs)
+    Term* statically_specialize_function(Term* func, TermList const& inputs)
     {
         if (!is_function(func))
             return func;
@@ -81,8 +81,8 @@ namespace overloaded_function {
             bool alreadyGenerated = (contents.length() > 0)
                 && contents[0]->function == specializedFunc;
             if (!alreadyGenerated) {
-                RefList inputs;
-                CALLER->inputsToList(&inputs);
+                TermList inputs;
+                CALLER->inputsToList(inputs);
                 apply(contents, specializedFunc, inputs);
                 //change_type(CALLER, contents[0]->type);
             }
@@ -115,8 +115,8 @@ namespace overloaded_function {
         Branch& contents = term->nestedContents;
         contents.clear();
 
-        RefList inputs;
-        term->inputsToList(&inputs);
+        TermList inputs;
+        term->inputsToList(inputs);
         Term* specializedFunc = statically_specialize_function(term->function, inputs);
 
         if (specializedFunc != NULL) {
@@ -181,7 +181,7 @@ namespace overloaded_function {
         result.shorten(1);
         int placeholderCount = variableArgs ? 1 : argumentCount;
         for (int i=0; i < placeholderCount; i++)
-            apply(result, INPUT_PLACEHOLDER_FUNC, RefList());
+            apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
         Term* outputType = find_common_type(outputTypes);
         FunctionAttrs* attrs = get_function_attrs(term);
         attrs->outputTypes.setAt(0, outputType);

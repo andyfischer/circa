@@ -155,7 +155,7 @@ namespace overloaded_function {
     Term* create_overloaded_function(Branch& branch, std::string const& name,
         TermList const& overloads);
     void append_overload(Term* overloadedFunction, Term* overload);
-    Term* statically_specialize_function(Term* func, RefList const& inputs);
+    Term* statically_specialize_function(Term* func, TermList const& inputs);
     void post_compile_setup_overloaded_function(Term* term);
 }
 

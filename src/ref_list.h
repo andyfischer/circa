@@ -74,7 +74,8 @@ struct RefList
         append(term8);
     }
 
-    void fromTermList(TermList const tl);
+    void fromTermList(TermList const& tl);
+    void toTermList(TermList& tl) const;
 
     void append(Term* term);
     void prepend(Term* term);

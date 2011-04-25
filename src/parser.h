@@ -99,7 +99,8 @@ void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
 void set_starting_source_location(Term* term, int start, TokenStream& tokens);
 void set_source_location(Term* term, int start, TokenStream& tokens);
-Term* find_and_apply(Branch& branch, std::string const& functionName, RefList inputs);
+Term* find_and_apply(Branch& branch, std::string const& functionName,
+        TermList const& inputs);
 
 // Find a type with the given name, looking in this branch. If the name isn't found,
 // we'll return a call to unknown_type()

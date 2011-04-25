@@ -9,7 +9,7 @@
 
 namespace circa {
 
-Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string const& name)
+Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string const& name)
 {
     ca_assert(function != NULL);
 
@@ -34,7 +34,7 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
     if (name != "")
         branch.bindName(result, name);
 
-    RefList _inputs = inputs;
+    TermList _inputs = inputs;
 
     // If the function takes a state input, and there aren't enough inputs, then prepend
     // a NULL input for state.
@@ -59,6 +59,14 @@ Term* apply(Branch& branch, Term* function, RefList const& inputs, std::string c
         mark_branch_as_having_inlined_state(branch);
 
     return result;
+}
+
+Term* apply(Branch& branch, Term* function, RefList const& inputs,
+    std::string const& name)
+{
+    TermList _inputs;
+    inputs.toTermList(_inputs);
+    return apply(branch, function, _inputs, name);
 }
 
 void set_input2(Term* term, int index, Term* input, int outputIndex)
@@ -107,7 +115,7 @@ void set_input(Term* term, int index, Term* input)
     post_input_change(term);
 }
 
-void set_inputs(Term* term, RefList const& inputs)
+void set_inputs(Term* term, TermList const& inputs)
 {
     assert_valid_term(term);
 
@@ -205,8 +213,8 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
 {
     ca_assert(original != NULL);
 
-    RefList inputs;
-    original->inputsToList(&inputs);
+    TermList inputs;
+    original->inputsToList(inputs);
 
     Term* term = apply(branch, original->function, inputs, name);
     change_type(term, original->type);
@@ -223,7 +231,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     return term;
 }
 
-Term* apply(Branch& branch, std::string const& functionName, RefList const& inputs, std::string const& name)
+Term* apply(Branch& branch, std::string const& functionName, TermList const& inputs, std::string const& name)
 {
     Term* function = find_named(branch, functionName);
     if (function == NULL)
@@ -270,7 +278,7 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
         std::string const& name)
 {
     Term* result = apply(branch, get_global("get_state_field"),
-            RefList(NULL, defaultValue), name);
+            TermList(NULL, defaultValue), name);
     change_type(result, type);
     return result;
 }
@@ -322,12 +330,12 @@ Term* create_list(Branch& branch, std::string const& name)
 
 Branch& create_branch(Branch& owner, std::string const& name)
 {
-    return apply(owner, BRANCH_FUNC, RefList(), name)->nestedContents;
+    return apply(owner, BRANCH_FUNC, TermList(), name)->nestedContents;
 }
 
 Branch& create_namespace(Branch& branch, std::string const& name)
 {
-    return apply(branch, NAMESPACE_FUNC, RefList(), name)->nestedContents;
+    return apply(branch, NAMESPACE_FUNC, TermList(), name)->nestedContents;
 }
 
 Term* create_type(Branch& branch, std::string name)
@@ -415,7 +423,7 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
 
         Term* pos = outsidePositive ? outerVersion : innerVersion;
         Term* neg = outsidePositive ? innerVersion : outerVersion ;
-        apply(rebinds, COND_FUNC, RefList(rebindCondition, pos, neg), name);
+        apply(rebinds, COND_FUNC, TermList(rebindCondition, pos, neg), name);
     }
 }
 
@@ -445,7 +453,7 @@ void post_compile_term(Term* term)
     for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
         const char* name = get_output_name(term, outputIndex);
         if (strcmp(name, "") != 0) {
-            Term* outputCopy = apply(owningBranch, COPY_FUNC, RefList(), name);
+            Term* outputCopy = apply(owningBranch, COPY_FUNC, TermList(), name);
             set_input2(outputCopy, 0, term, outputIndex);
 
             respecialize_type(outputCopy);
@@ -465,7 +473,7 @@ void post_compile_term(Term* term)
 
                 ca_assert(name == get_output_name(term, outputIndex));
 
-                Term* output = apply(owningBranch, COPY_FUNC, RefList(), name);
+                Term* output = apply(owningBranch, COPY_FUNC, TermList(), name);
                 set_input2(output, 0, term, outputIndex);
 
                 respecialize_type(output);
@@ -498,7 +506,7 @@ void finish_minor_branch(Branch& branch)
     if (!anyStateVars)
         return;
 
-    post_compile_term(apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList()));
+    post_compile_term(apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList()));
 }
 
 void check_to_add_branch_finish_term(Branch& branch, int previousLastTerm)
@@ -509,7 +517,7 @@ void check_to_add_branch_finish_term(Branch& branch, int previousLastTerm)
             continue;
 
         if (branch[i]->function == GET_STATE_FIELD_FUNC) {
-            Term* term = apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList());
+            Term* term = apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList());
             update_branch_finish_term(term);
             break;
         }

@@ -45,7 +45,7 @@ void test_inputs_fit_function()
     Branch branch;
     Term* a = branch.eval("1");
     Term* b = branch.eval("1.0");
-    RefList inputs(a,b);
+    TermList inputs(a,b);
 
     test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
     test_assert(!inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
@@ -62,7 +62,7 @@ void overloaded_function()
 
     // Test statically_specialize_function
     test_equals(overloaded_function::statically_specialize_function(
-                    MULT_FUNC, RefList(floatInput, intInput))
+                    MULT_FUNC, TermList(floatInput, intInput))
             ->name, "mult_f");
 
     Term* add_i = branch.eval("add(1 2)");
@@ -131,7 +131,7 @@ void test_calling_manual_overloaded_function()
     test_assert(is_callable(my_add));
 
     Term* two = branch.compile("2");
-    RefList inputs(two, two);
+    TermList inputs(two, two);
 
     test_assert(branch);
     test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);

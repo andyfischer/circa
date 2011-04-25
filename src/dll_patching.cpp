@@ -15,7 +15,7 @@ struct Dll
 {
     void* module;
 
-    RefList affectedTerms;
+    TermList affectedTerms;
     std::set<void*> loadedFunctions;
 };
 

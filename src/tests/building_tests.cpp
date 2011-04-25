@@ -54,7 +54,7 @@ void test_rewrite_as_value()
     Branch branch;
 
     Term* a = create_value(branch, INT_TYPE);
-    Term* b = apply(branch, ADD_FUNC, RefList(a,a));
+    Term* b = apply(branch, ADD_FUNC, TermList(a,a));
 
     test_assert(branch[1] == b);
 
@@ -120,7 +120,7 @@ void test_finish_branch_is_at_end()
     Branch branch;
     branch.compile("a = 1 + 2");
     test_assert(branch[branch.length()-1]->function != FINISH_MINOR_BRANCH_FUNC);
-    apply(branch, FINISH_MINOR_BRANCH_FUNC, RefList());
+    apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList());
     test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);
     branch.compile("b = 3 / 4");
     test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);

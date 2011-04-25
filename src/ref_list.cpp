@@ -13,11 +13,18 @@ namespace circa {
 
 const size_t MAX_REF_LIST_LENGTH = 10000000;
 
-void RefList::fromTermList(TermList const tl)
+void RefList::fromTermList(TermList const& tl)
 {
     resize(tl.length());
     for (int i=0; i < tl.length(); i++)
         setAt(i, tl[i]);
+}
+
+void RefList::toTermList(TermList& tl) const
+{
+    tl.resize(length());
+    for (int i=0; i < length(); i++)
+        tl.setAt(i, get(i));
 }
 
 void RefList::append(Term* term)

@@ -367,7 +367,7 @@ bool is_callable(Term* term)
             || term->type == TYPE_TYPE);
 }
 
-bool inputs_statically_fit_function(Term* func, RefList const& inputs)
+bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 {
     bool varArgs = function_t::get_variable_args(func);
 
@@ -389,7 +389,7 @@ bool inputs_statically_fit_function(Term* func, RefList const& inputs)
     return true;
 }
 
-bool inputs_fit_function_dynamic(Term* func, RefList const& inputs)
+bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 {
     bool varArgs = function_t::get_variable_args(func);
 

@@ -15,15 +15,15 @@ namespace circa {
 
 const std::string TRAINING_BRANCH_NAME = "#training";
 
-RefList FeedbackOperation::getFeedback(Term* target, Term* type)
+TermList FeedbackOperation::getFeedback(Term* target, Term* type)
 {
     if (!hasPendingFeedback(target))
-        return RefList();
+        return TermList();
 
     PendingFeedbackList &list = _pending[target];
 
     // Make a list of values which match this type
-    RefList values;
+    TermList values;
 
     PendingFeedbackList::const_iterator it;
     for (it = list.begin(); it != list.end(); ++it) {
@@ -108,7 +108,7 @@ void normalize_feedback_branch(Branch& branch)
             // Remove all of the assign() terms, and make a list of terms to send
             // to the feedback-accumulator
             std::vector<int>::const_iterator index_it;
-            RefList accumulatorInputs;
+            TermList accumulatorInputs;
 
             for (index_it = it->second.begin(); index_it != it->second.end(); ++index_it) {
                 int index = *index_it;
@@ -122,7 +122,7 @@ void normalize_feedback_branch(Branch& branch)
             Term* accumulator = apply(branch, AVERAGE_FUNC, accumulatorInputs);
 
             // assign() this
-            apply(branch, UNSAFE_ASSIGN_FUNC, RefList(accumulator, target));
+            apply(branch, UNSAFE_ASSIGN_FUNC, TermList(accumulator, target));
         }
     }
 
@@ -178,18 +178,18 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
             continue;
 
         // Apply feedback function
-        RefList feedbackValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
+        TermList feedbackValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
 
         // TODO: accumulate desired value
         Term* desiredValue = feedbackValues[0];
 
         if (term->numInputs() == 0) {
             // Just create a feedback term. This is probably an assign() for a value()
-            apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
 
         } else if (term->numInputs() == 1) {
             // Create a feedback term with only 1 output
-            Term* feedback = apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
             operation.sendFeedback(term->input(0), feedback, DESIRED_VALUE_FEEDBACK);
 
         } else if (term->numInputs() > 1) {
@@ -198,7 +198,7 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 
             // Inputs to feedback func are [originalTerm, desiredValue]
 
-            Term* feedback = apply(trainingBranch, feedbackFunc, RefList(term, desiredValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
             // Resize the output of 'feedback' so that there is one output term per input
             resize_list(feedback_output(feedback), term->numInputs(), ANY_TYPE);
 

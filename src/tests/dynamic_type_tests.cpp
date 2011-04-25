@@ -112,7 +112,7 @@ void test_dynamic_overload()
 
     test_assert(cast_possible(a, unbox_type(INT_TYPE)));
 
-    RefList inputs(a,b);
+    TermList inputs(a,b);
     test_assert(inputs_fit_function_dynamic(add_i, inputs));
 
     evaluate_branch(&context, branch);

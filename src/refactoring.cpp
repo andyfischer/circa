@@ -129,7 +129,7 @@ void steal_term(Term* _term, Branch& newHome)
     newHome.append(term);
 }
 
-void rewrite(Term* term, Term* function, RefList const& inputs)
+void rewrite(Term* term, Term* function, TermList const& inputs)
 {
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
@@ -154,7 +154,7 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
 
         change_function(term, VALUE_FUNC);
         change_type(term, type);
-        set_inputs(term, RefList());
+        set_inputs(term, TermList());
     }
 }
 
@@ -162,7 +162,7 @@ void erase_term(Term* term)
 {
     assert_valid_term(term);
 
-    set_inputs(term, RefList());
+    set_inputs(term, TermList());
     change_function(term, NULL);
     clear_branch(&term->nestedContents);
 

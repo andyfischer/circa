@@ -227,7 +227,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
     if (newType != VOID_TYPE && !hasStateInput) {
         contents.insert(1, alloc_term());
         Term* input = contents[1];
-        rewrite(input, INPUT_PLACEHOLDER_FUNC, RefList());
+        rewrite(input, INPUT_PLACEHOLDER_FUNC, TermList());
         contents.bindName(input, "#state");
         input->setBoolProp("optional", true);
     }
@@ -261,7 +261,7 @@ void subroutine_check_to_append_implicit_return(Term* sub)
         break;
     }
 
-    post_compile_term(apply(contents, RETURN_FUNC, RefList(NULL)));
+    post_compile_term(apply(contents, RETURN_FUNC, TermList(NULL)));
 }
 
 void store_locals(Branch& branch, TaggedValue* storageTv)

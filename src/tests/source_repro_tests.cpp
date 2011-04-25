@@ -13,7 +13,7 @@ void generate_source_for_function_calls() {
 
     Term* a = create_int(branch, 5, "a");
     Term* b = create_int(branch, 9, "b");
-    Term* c = apply(branch, "add", RefList(a,b));
+    Term* c = apply(branch, "add", TermList(a,b));
 
     test_assert(should_print_term_source_line(a));
     test_assert(should_print_term_source_line(b));
@@ -24,7 +24,7 @@ void generate_source_for_function_calls() {
     branch.clear();
     Term* d = create_int(branch, 3);
     Term* e = create_int(branch, 4);
-    /*Term* f =*/ apply(branch, "add", RefList(d,e));
+    /*Term* f =*/ apply(branch, "add", TermList(d,e));
 
     /*
     TODO, fix this
@@ -40,7 +40,7 @@ void generate_source_for_function_calls() {
     branch.compile("b = 2");
     a = create_int(branch, 3, "c");
     b = create_int(branch, 4, "d");
-    apply(branch, "add", RefList(a,b));
+    apply(branch, "add", TermList(a,b));
 
     test_equals(get_branch_source_text(branch), "a = 1\nb = 2\nc = 3\nd = 4\nadd(c, d)");
     */

@@ -119,8 +119,8 @@ void
 TermList::insert(int index, Term* term)
 {
     _terms.resize(_terms.size() + 1);
-    for (size_t i=index; i < _terms.size() - 1; i++)
-        _terms[i + 1] = _terms[i];
+    for (int i = (int) _terms.size() - 1; i > index; i--)
+        _terms[i] = _terms[i - 1];
     _terms[index] = term;
 }
 

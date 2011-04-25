@@ -42,7 +42,7 @@ void duplicate_nested_contents()
     branch2.clear();
 
     // Now try duplicating, check that internal references are updated
-    apply(a->nestedContents, "add", RefList(x, x));
+    apply(a->nestedContents, "add", TermList(x, x));
     duplicate_branch(branch, branch2);
 
     test_assert(branch2.length() == 1);
