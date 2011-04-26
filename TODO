@@ -1,6 +1,7 @@
 
 This is a list of short-term TODOs. There's a bigger list at docs/todo.md
 
+ - State not preserved inside 'namespace'
  - 'Unknown identifier' terms are being created without source location
  - various places where swap() can be used instead of copy()
  - clear_branch and repair_broken_links don't correctly handle nested names

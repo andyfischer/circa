@@ -1,0 +1,45 @@
+
+background(#a0a)
+
+namespace players_paddle
+    paddle_y = window.height - 70
+    paddle_x = mouse.x
+
+    paddle_loc = [paddle_x paddle_y]
+
+    paddle_width = 60
+    paddle_height = 14
+
+    paddle_rect = expand_rect(paddle_loc paddle_width paddle_height)
+
+    fill_rect(paddle_rect #fff)
+
+def reset_blocks() -> List
+    blocks = []
+    blocks_center = window.width/2
+
+    num_blocks_x = 10
+
+    for x in 0..num_blocks_x
+      for y in 0..4
+        loc = [(x-(num_blocks_x-1)/2) * 60 + window.width/2,
+            y * 30 + 30]
+        blocks.append([random_color() loc])
+    return blocks
+state List blocks = reset_blocks()
+
+namespace board
+    type Block {
+      Color color
+      Point loc
+    }
+
+    block_width = 40
+    block_height = 16
+
+    for block in blocks
+        Block(@block)
+
+        fill_rect(expand_rect(block.loc block_width block_height) block.color)
+
+
