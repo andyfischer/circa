@@ -104,6 +104,7 @@ extern Type VOID_T;
 extern Type* FILE_SIGNATURE_T;
 
 extern bool FINISHED_BOOTSTRAP;
+extern bool SHUTTING_DOWN;
 
 Branch& kernel();
 

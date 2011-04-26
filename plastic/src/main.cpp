@@ -16,5 +16,9 @@ int main( int argc, char* args[] )
     for (int i = 1; i < argc; i++)
         argv.push_back(args[i]);
 
-    return plastic_main(argv);
+    int result = plastic_main(argv);
+
+    circa_shutdown();
+
+    return result;
 }

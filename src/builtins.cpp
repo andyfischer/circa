@@ -128,6 +128,7 @@ Type VOID_T;
 Type* FILE_SIGNATURE_T;
 
 bool FINISHED_BOOTSTRAP = false;
+bool SHUTTING_DOWN = false;
 
 Branch& kernel()
 {
@@ -420,6 +421,8 @@ export_func void circa_initialize()
 
 export_func void circa_shutdown()
 {
+    SHUTTING_DOWN = true;
+
     reset_type(&BOOL_T);
     reset_type(&DICT_T);
     reset_type(&ERROR_T);

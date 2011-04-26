@@ -88,6 +88,9 @@ void change_type(Term *term, Term *typeTerm)
 
 void respecialize_type(Term* term)
 {
+    if (SHUTTING_DOWN)
+        return;
+
     Term* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
         change_type(term, outputType);
