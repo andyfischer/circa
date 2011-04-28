@@ -12,37 +12,23 @@ Term* IMPLICIT_TYPES = NULL;
 
 namespace type_t {
 
-    void decref(Type* type)
-    {
-        if (type->permanent)
-            return;
-        ca_assert(type->refCount > 0);
-        //std::cout << "decref: " << type->name << std::endl;
-        type->refCount--;
-        if (type->refCount == 0) {
-            //std::cout << "deleted: " << type->name << std::endl;
-            //ca_assert(type->name != "Dict");
-            delete type;
-        }
-    }
-
     void initialize(Type*, TaggedValue* value)
     {
         Type* type = Type::create();
-        type->refCount++;
         set_pointer(value, type);
     }
     void release(TaggedValue* value)
     {
         ca_assert(is_type(value));
         Type* type = (Type*) get_pointer(value);
-        if (type != NULL)
-            decref(type);
+        if (type != NULL && !type->permanent)
+            delete type;
     }
     void copy(TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_type(source));
         copy((Type*) get_pointer(source), dest);
+        register_type_pointer(dest, (Type*) get_pointer(source));
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -103,8 +89,6 @@ namespace type_t {
             return;
 
         set_pointer(dest, value);
-        value->refCount++;
-        decref(oldType);
     }
 
     Type::RemapPointers& get_remap_pointers_func(Term* type)
@@ -152,7 +136,6 @@ Type::Type() :
     remapPointers(NULL),
     hashFunc(NULL),
     parent(NULL),
-    refCount(0),
     permanent(false)
 {
     debug_register_valid_object_ignore_dupe(this, TYPE_OBJECT);

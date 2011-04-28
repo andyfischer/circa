@@ -99,7 +99,6 @@ struct Type
     // Default value
     TaggedValue defaultValue;
 
-    int refCount;
     bool permanent;
 
     Type();
@@ -118,7 +117,6 @@ struct Type
     static Type* create()
     {
         Type* t = new Type();
-        //t->refCount = 1;
         return t;
     }
 };

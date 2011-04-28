@@ -467,9 +467,9 @@ List* set_list(TaggedValue* value, int size)
 void set_type(TaggedValue* value, Type* type)
 {
     set_null(value);
-    type->refCount++;
     value->value_type = &TYPE_T;
     value->value_data.ptr = type;
+    register_type_pointer(value, type);
 }
 
 void set_null(TaggedValue* value)
