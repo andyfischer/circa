@@ -170,6 +170,15 @@ Type* declared_type(Term* term)
     return unbox_type(term->type);
 }
 
+void register_type_pointer(void* owner, Type* pointee)
+{
+    // This is placeholder until our memory management becomes more sophisticated.
+    // Currently, if a type is used by anyone then it becomes permanent and is
+    // never deallocated.
+
+    pointee->permanent = true;
+}
+
 Term* get_output_type(Term* term, int outputIndex)
 {
     if (outputIndex == 0)
@@ -333,7 +342,9 @@ Term* create_implicit_tuple_type(TermList const& types)
     Term* result = create_type(IMPLICIT_TYPES->nestedContents, typeName.str());
     list_t::setup_type(unbox_type(result));
     Branch& prototype = unbox_type(result)->prototype;
+
     unbox_type(result)->parent = unbox_type(LIST_TYPE);
+    register_type_pointer(unbox_type(result), unbox_type(LIST_TYPE));
 
     for (int i=0; i < types.length(); i++) {
         ca_assert(is_type(types[i]));

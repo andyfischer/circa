@@ -385,8 +385,7 @@ void change_type(TaggedValue* v, Type* type)
         if (initialize != NULL)
             initialize(type, v);
 
-        // Any types that are actually used become permanent
-        type->permanent = true;
+        register_type_pointer(v, type);
     }
 }
 

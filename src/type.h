@@ -180,6 +180,8 @@ Type* unbox_type(Term* type);
 Type* unbox_type(TaggedValue* val);
 Type* declared_type(Term* term);
 
+void register_type_pointer(void* referrer, Type* referee);
+
 Term* get_output_type(Term* term, int outputIndex);
 Term* get_output_type(Term* term);
 Term* get_type_of_input(Term* term, int inputIndex);
