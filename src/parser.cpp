@@ -1924,6 +1924,7 @@ ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* cont
 
     consume_branch(term->nestedContents, tokens, context);
 
+    finish_minor_branch(term->nestedContents);
     post_input_change(term);
 
     return ParseResult(term);

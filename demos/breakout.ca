@@ -14,6 +14,7 @@ namespace players_paddle
 
     fill_rect(paddle_rect #fff)
 
+
 def reset_blocks() -> List
     blocks = []
     blocks_center = window.width/2
@@ -25,14 +26,18 @@ def reset_blocks() -> List
         loc = [(x-(num_blocks_x-1)/2) * 60 + window.width/2,
             y * 30 + 30]
         blocks.append([random_color() loc])
-    return blocks
-state List blocks = reset_blocks()
 
+    return blocks
+
+
+print(dump_scope_state())
 namespace board
     type Block {
       Color color
       Point loc
     }
+
+    state List blocks = reset_blocks()
 
     block_width = 40
     block_height = 16
@@ -42,4 +47,4 @@ namespace board
 
         fill_rect(expand_rect(block.loc block_width block_height) block.color)
 
-
+print(dump_scope_state())

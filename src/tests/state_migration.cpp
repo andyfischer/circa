@@ -136,6 +136,13 @@ void migrate_complex_types()
             "asteroids == [[[3.0 2.9] [[true false] 1 0 2]]]");
 }
 
+void migrate_namespace()
+{
+    test_migration("namespace ns { state s = 1.0 }",
+            "namespace ns { state s }",
+            "ns:s == 1.0");
+}
+
 void migrate_misc()
 {
     // These tests don't have a specific focus
@@ -164,6 +171,7 @@ void register_tests()
     REGISTER_TEST_CASE(state_migration::migrate_across_user_defined_types);
     REGISTER_TEST_CASE(state_migration::dont_migrate_across_different_types);
     REGISTER_TEST_CASE(state_migration::migrate_complex_types);
+    REGISTER_TEST_CASE(state_migration::migrate_namespace);
     REGISTER_TEST_CASE(state_migration::migrate_misc);
 }
 

@@ -8,8 +8,7 @@ namespace namespace_function {
 
     CA_FUNCTION(evaluate)
     {
-        Branch& contents = CALLER->nestedContents;
-        evaluate_branch_internal(CONTEXT, contents);
+        evaluate_branch_internal_with_state(CONTEXT, CALLER);
     }
 
     void format_source(StyledSource* source, Term* term)
