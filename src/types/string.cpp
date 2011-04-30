@@ -79,13 +79,13 @@ namespace string_t {
     {
         set_pointer(value, &STRING_T, new std::string());
     }
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         delete ((std::string*) get_pointer(value));
         set_pointer(value, NULL);
     }
 
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         *((std::string*) get_pointer(dest, &STRING_T)) = as_string(source);
     }
@@ -108,7 +108,7 @@ namespace string_t {
         return result;
     }
 
-    bool equals(TaggedValue* lhs, TaggedValue* rhs)
+    bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
     {
         if (!is_string(rhs)) return false;
         return as_string(lhs) == as_string(rhs);

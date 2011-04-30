@@ -7,12 +7,15 @@
 
 namespace circa {
 namespace int_t {
-    void reset(TaggedValue* v) { set_int(v, 0); }
+    void reset(Type*, TaggedValue* v)
+    {
+        set_int(v, 0);
+    }
 
-    bool equals(TaggedValue* a, TaggedValue* b)
+    bool equals(Type* type, TaggedValue* a, TaggedValue* b)
     {
         if (is_float(b))
-            return float_t::equals(a,b);
+            return float_t::equals(type, a,b);
         if (!is_int(b))
             return false;
         return as_int(a) == as_int(b);

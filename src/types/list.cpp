@@ -352,7 +352,7 @@ namespace list_t {
         }
     }
 
-    void tv_release(TaggedValue* value)
+    void tv_release(Type*, TaggedValue* value)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -360,7 +360,7 @@ namespace list_t {
         decref(data);
     }
 
-    void tv_copy(TaggedValue* source, TaggedValue* dest)
+    void tv_copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_list(source));
         ca_assert(is_list(dest));
@@ -377,7 +377,7 @@ namespace list_t {
     #endif
     }
 
-    bool tv_equals(TaggedValue* leftValue, TaggedValue* right)
+    bool tv_equals(Type*, TaggedValue* leftValue, TaggedValue* right)
     {
         ca_assert(is_list(leftValue));
         Type* rhsType = right->value_type;

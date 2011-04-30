@@ -386,13 +386,13 @@ namespace tagged_value_wrappers {
     {
         value->value_data.ptr = NULL;
     }
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         free_dict((DictData*) value->value_data.ptr);
     }
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        release(dest);
+        release(type, dest);
         dest->value_data.ptr = duplicate((DictData*) source->value_data.ptr);
     }
     std::string to_string(TaggedValue* value)

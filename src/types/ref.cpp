@@ -21,18 +21,18 @@ namespace ref_t {
     {
         set_pointer(value, type, NULL);
     }
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
     }
-    void reset(TaggedValue* value)
+    void reset(Type*, TaggedValue* value)
     {
         set_ref(value, NULL);
     }
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         dest->value_data = source->value_data;
     }
-    bool equals(TaggedValue* lhs, TaggedValue* rhs)
+    bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
     {
         if (!is_ref(lhs) || !is_ref(rhs))
             return false;

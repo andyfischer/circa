@@ -32,14 +32,14 @@ namespace toy_refcounted_pool {
         ca_assert(false);
     }
 
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         int index = value->value_data.asint;
         ca_assert(refcount[index] > 0);
         refcount[index]--;
     }
 
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         int prev = dest->value_data.asint;
         dest->value_data.asint = source->value_data.asint;
@@ -183,7 +183,7 @@ namespace manual_memory_management_test {
         value->value_data.asint = pool_allocate();
     }
 
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         pool_deallocate(value->value_data.asint);
     }

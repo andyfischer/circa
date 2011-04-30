@@ -39,12 +39,12 @@ namespace function_attrs_t {
         set_pointer(value, type, attrs);
     }
 
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         delete (FunctionAttrs*) get_pointer(value);
     }
 
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         *((FunctionAttrs*) get_pointer(dest)) = *((FunctionAttrs*) get_pointer(source));
     }

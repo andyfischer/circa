@@ -7,7 +7,7 @@
 
 namespace circa {
 namespace float_t {
-    void reset(TaggedValue* value)
+    void reset(Type*, TaggedValue* value)
     {
         set_float(value, 0);
     }
@@ -25,7 +25,7 @@ namespace float_t {
         set_float(dest, to_float(source));
     }
 
-    bool equals(TaggedValue* a, TaggedValue* b)
+    bool equals(Type*, TaggedValue* a, TaggedValue* b)
     {
         if (!is_float(b) && !is_int(b))
             return false;

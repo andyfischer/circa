@@ -4,7 +4,7 @@
 
 namespace circa {
 namespace bool_t {
-    void reset(TaggedValue* value)
+    void reset(Type*, TaggedValue* value)
     {
         set_bool(value, false);
     }

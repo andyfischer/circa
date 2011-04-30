@@ -17,14 +17,14 @@ namespace type_t {
         Type* type = Type::create();
         set_pointer(value, type);
     }
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         ca_assert(is_type(value));
         Type* type = (Type*) get_pointer(value);
         if (type != NULL && !type->permanent)
             delete type;
     }
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_type(source));
         copy((Type*) get_pointer(source), dest);

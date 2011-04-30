@@ -16,12 +16,14 @@ namespace intrusive_refcounted {
     }
 
     template <typename T>
-    void release(TaggedValue* value)
+    void release(Type*, TaggedValue* value)
     {
         T* instance = (T*) value->value_data.ptr;
         instance->_refCount--;
-        if (instance->_refCount <= 0)
+        if (instance->_refCount <= 0) {
             delete instance;
+            value->value_data.ptr = NULL;
+        }
     }
 
     template <typename T>
@@ -34,7 +36,7 @@ namespace intrusive_refcounted {
     }
 
     template <typename T>
-    void copy(TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         set_null(dest);
         dest->value_data = source->value_data;

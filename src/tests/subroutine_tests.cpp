@@ -262,7 +262,7 @@ namespace copy_counting_tests
         source->value_data.asint = next_available_slot++;
     }
 
-    void t_copy(TaggedValue* source, TaggedValue* dest)
+    void t_copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         dest->value_data = source->value_data;
         Slot& slot = slots[dest->value_data.asint];

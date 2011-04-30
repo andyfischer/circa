@@ -27,10 +27,10 @@ struct CastResult
 struct Type
 {
     typedef void (*Initialize)(Type* type, TaggedValue* value);
-    typedef void (*Release)(TaggedValue* value);
-    typedef void (*Copy)(TaggedValue* source, TaggedValue* dest);
-    typedef void (*Reset)(TaggedValue* value);
-    typedef bool (*Equals)(TaggedValue* lhs, TaggedValue* rhs);
+    typedef void (*Release)(Type* type, TaggedValue* value);
+    typedef void (*Copy)(Type* type, TaggedValue* source, TaggedValue* dest);
+    typedef void (*Reset)(Type* type, TaggedValue* value);
+    typedef bool (*Equals)(Type* type, TaggedValue* lhs, TaggedValue* rhs);
 
     // Attempts to write a value to 'dest' which is of type 'type', and has a value
     // that comes from 'source'. If the cast isn't possible, callee will record the
@@ -89,7 +89,7 @@ struct Type
     Branch prototype;
 
     // Type parameters
-    TermList parameters;
+    TaggedValue parameter;
 
     // Attributes for this type.
     Branch attributes;
@@ -101,6 +101,7 @@ struct Type
 
     // Default value
     TaggedValue defaultValue;
+
 
     bool permanent;
 
@@ -159,8 +160,8 @@ struct StaticTypeQuery
 namespace type_t {
 
     void initialize(Type* type, TaggedValue* value);
-    void release(TaggedValue* value);
-    void copy(TaggedValue* source, TaggedValue* dest);
+    void release(Type*, TaggedValue* value);
+    void copy(Type*, TaggedValue* source, TaggedValue* dest);
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, TermMap const& map);

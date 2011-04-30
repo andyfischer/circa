@@ -50,8 +50,8 @@ struct FunctionAttrs
 
 namespace function_attrs_t {
     void initialize(Type* type, TaggedValue* value);
-    void release(TaggedValue* value);
-    void copy(TaggedValue* source, TaggedValue* dest);
+    void release(Type*, TaggedValue* value);
+    void copy(Type*, TaggedValue* source, TaggedValue* dest);
 }
 
 namespace function_t {

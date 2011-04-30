@@ -198,10 +198,8 @@ void copy(TaggedValue* source, TaggedValue* dest)
     change_type(dest, source->value_type);
     Type::Copy copyFunc = source->value_type->copy;
 
-    ca_assert(copyFunc != copy);
-
     if (copyFunc != NULL) {
-        copyFunc(source, dest);
+        copyFunc(source->value_type, source, dest);
         return;
     }
 
@@ -248,7 +246,7 @@ void reset(TaggedValue* value)
 
     // Check if the reset() function is defined
     if (type->reset != NULL) {
-        type->reset(value);
+        type->reset(type, value);
         return;
     }
 
@@ -374,7 +372,7 @@ void change_type(TaggedValue* v, Type* type)
     if (v->value_type != NULL) {
         Type::Release release = v->value_type->release;
         if (release != NULL)
-            release(v);
+            release(v->value_type, v);
     }
 
     v->value_type = type;
@@ -396,7 +394,7 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     Type::Equals equals = lhs->value_type->equals;
 
     if (equals != NULL)
-        return equals(lhs, rhs);
+        return equals(lhs->value_type, lhs, rhs);
 
     // Default behavior for different types: return false
     if (lhs->value_type != rhs->value_type)
