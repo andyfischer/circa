@@ -4,6 +4,8 @@
 #include "circa.h"
 #include "importing_macros.h"
 
+namespace fmod_support {
+
 FMOD_SYSTEM *g_system = NULL;
 circa::Type *g_soundType = NULL;
 
@@ -68,3 +70,5 @@ void setup(circa::Branch& kernel)
     circa::install_function(kernel["load_sound_int"], load_sound);
     circa::install_function(kernel["play_sound"], play_sound);
 }
+
+} // namespace fmod_support

@@ -14,6 +14,10 @@ namespace simple_handle_t {
         value->value_data.ptr = allocate_list(1);
         set_int(list_get_element(value, 0), handle);
     }
+    int get(TaggedValue* value)
+    {
+        return as_int(list_get_element(value, 0));
+    }
 
     void initialize(Type* type, TaggedValue* value)
     {

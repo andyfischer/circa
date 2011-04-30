@@ -159,6 +159,18 @@ def load_sound(string filename) -> Sound
         s = load_sound_int(filename)
     return s
 
+-- box2d bindings
+namespace box2d
+    def step()
+    def gravity(Point vec)
+    def body_int(any handle, Point initialPosition, bool dynamic, Point shape) -> List
+
+    def body(Point initialPosition, bool dynamic, Point shape) -> List
+        state handle
+        result = body_int(handle, initialPosition, dynamic, shape)
+        handle = result[0]
+        return result[1]
+
 def load_texture(state int, string) -> int
 
 def draw_image(state int texid, string filename, number x, number y, number width, number height)

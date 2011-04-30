@@ -164,6 +164,9 @@ def use_fmod(env):
     env.Append(LIBPATH=[base + 'lib'])
     env.Append(LIBS=['fmodex'])
 
+def use_box2d(env):
+    env.Append(LIBS=['box2d'])
+
 # Define plastic targets at build/plas_x
 for env in all_envs:
     env = env.Clone()
@@ -171,6 +174,7 @@ for env in all_envs:
     env.BuildDir('build/'+variantName+'/plastic/src', 'plastic/src')
     use_sdl(env)
     use_fmod(env)
+    use_box2d(env)
 
     source_files = list_source_files('plastic/src')
 
