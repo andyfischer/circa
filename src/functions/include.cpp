@@ -10,8 +10,11 @@ namespace include_function {
     {
         Branch& contents = caller->nestedContents;
 
+        bool fileChanged =
+            file_changed_function::check(cxt, caller, fileSignature, filename);
+
         // Reload if the filename or modified-time has changed
-        if (file_changed_function::check(cxt, caller, fileSignature, filename))
+        if (fileChanged)
         {
             BrokenLinkList brokenLinks;
 
