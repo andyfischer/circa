@@ -8,21 +8,14 @@ namespace circa {
 
 struct TaggedValue
 {
-    union Data {
-        int asint;
-        float asfloat;
-        bool asbool;
-        void* ptr;
-    };
-
-    Data value_data;
+    VariantValue value_data;
     Type* value_type;
 
     // In test builds, types that use shared data structures can store an unshared copy
     // of their value in 'value_data_unshared', to assert that the shared data is not
     // corrupted.
     #ifdef CIRCA_TEST_BUILD
-    Data value_data_unshared;
+    VariantValue value_data_unshared;
     #endif
 
     TaggedValue();

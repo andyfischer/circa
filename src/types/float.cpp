@@ -100,6 +100,7 @@ namespace float_t {
     {
         reset_type(type);
         type->name = "number";
+        type->storageType = STORAGE_TYPE_FLOAT;
         type->reset = reset;
         type->cast = cast;
         type->equals = equals;

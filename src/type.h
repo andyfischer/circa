@@ -8,6 +8,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "storage_type.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -55,6 +56,8 @@ struct Type
     typedef int (*HashFunc)(TaggedValue* value);
 
     std::string name;
+
+    StorageType storageType;
 
     // C++ type info. This is only used to do runtime type checks, when the data
     // is accessed as a C++ type. Otherwise, this is optional.

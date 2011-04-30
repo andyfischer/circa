@@ -215,7 +215,7 @@ void swap(TaggedValue* left, TaggedValue* right)
     debug_trap_value_write(right);
 
     Type* temp_type = left->value_type;
-    TaggedValue::Data temp_data = left->value_data;
+    VariantValue temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;
@@ -510,13 +510,13 @@ float as_float(TaggedValue* value)
 
 std::string const& as_string(TaggedValue* value)
 {
-    ca_assert(is_string(value) || is_error(value));
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return *((std::string*) value->value_data.ptr);
 }
 
 const char* as_cstring(TaggedValue* value)
 {
-    ca_assert(is_string(value));
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return ((std::string*) value->value_data.ptr)->c_str();
 }
 
@@ -575,7 +575,7 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
 
 bool is_int(TaggedValue* value)
 {
-    return INT_TYPE != NULL && value->value_type == unbox_type(INT_TYPE);
+    return value->value_type->storageType == STORAGE_TYPE_INT;
 }
 
 bool is_error(TaggedValue* value)
@@ -585,17 +585,17 @@ bool is_error(TaggedValue* value)
 
 bool is_float(TaggedValue* value)
 {
-    return FLOAT_TYPE != NULL && value->value_type == unbox_type(FLOAT_TYPE);
+    return value->value_type->storageType == STORAGE_TYPE_FLOAT;
 }
 
 bool is_bool(TaggedValue* value)
 {
-    return BOOL_TYPE != NULL && value->value_type == unbox_type(BOOL_TYPE);
+    return value->value_type->storageType == STORAGE_TYPE_BOOL;
 }
 
 bool is_string(TaggedValue* value)
 {
-    return STRING_TYPE != NULL && value->value_type == unbox_type(STRING_TYPE);
+    return value->value_type->storageType == STORAGE_TYPE_STRING;
 }
 
 bool is_ref(TaggedValue* value)
@@ -610,7 +610,7 @@ bool is_opaque_pointer(TaggedValue* value)
 
 bool is_list(TaggedValue* value)
 {
-    return is_list_based_type(value->value_type);
+    return value->value_type->storageType == STORAGE_TYPE_LIST;
 }
 
 bool is_type(TaggedValue* value)

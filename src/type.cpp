@@ -116,6 +116,7 @@ namespace type_t {
 
 Type::Type() :
     name(""),
+    storageType(STORAGE_TYPE_NULL),
     cppTypeInfo(NULL),
     initialize(NULL),
     release(NULL),
@@ -279,6 +280,7 @@ bool type_is_static_subset_of_type(Type* superType, Type* subType)
 
 void reset_type(Type* type)
 {
+    type->storageType = STORAGE_TYPE_NULL;
     type->initialize = NULL;
     type->release = NULL;
     type->copy = NULL;

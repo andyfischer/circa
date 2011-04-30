@@ -578,11 +578,11 @@ namespace list_t {
         set_pointer(value, data);
     }
 
-
     void setup_type(Type* type)
     {
         reset_type(type);
         type->name = "List";
+        type->storageType = STORAGE_TYPE_LIST;
         type->initialize = tv_initialize;
         type->release = tv_release;
         type->copy = tv_copy;

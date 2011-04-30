@@ -22,6 +22,7 @@ namespace bool_t {
     void setup_type(Type* type)
     {
         type->name = "bool";
+        type->storageType = STORAGE_TYPE_BOOL;
         type->reset = reset;
         type->toString = to_string;
         type->formatSource = format_source;

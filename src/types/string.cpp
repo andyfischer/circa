@@ -196,6 +196,7 @@ namespace string_t {
     {
         reset_type(type);
         type->name = "string";
+        type->storageType = STORAGE_TYPE_STRING;
         type->initialize = initialize;
         type->release = release;
         type->copy = copy;

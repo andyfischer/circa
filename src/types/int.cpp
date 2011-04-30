@@ -40,6 +40,7 @@ namespace int_t {
     {
         reset_type(type);
         type->name = "int";
+        type->storageType = STORAGE_TYPE_INT;
         type->reset = reset;
         type->equals = equals;
         type->hashFunc = hashFunc;
