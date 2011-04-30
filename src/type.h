@@ -8,12 +8,21 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "storage_type.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
 
 namespace circa {
+
+typedef int StorageType;
+
+const int STORAGE_TYPE_NULL = 0;
+const int STORAGE_TYPE_INT = 1;
+const int STORAGE_TYPE_FLOAT = 2;
+const int STORAGE_TYPE_BOOL = 3;
+const int STORAGE_TYPE_STRING = 4;
+const int STORAGE_TYPE_LIST = 5;
+const int STORAGE_TYPE_OPAQUE_POINTER = 6;
 
 extern Term* IMPLICIT_TYPES;
 

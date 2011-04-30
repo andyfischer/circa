@@ -65,7 +65,9 @@ std::string to_string_annotated(TaggedValue* value);
 int num_elements(TaggedValue* value);
 void touch(TaggedValue* value);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);
+
 void change_type(TaggedValue* v, Type* type);
+void change_type_no_initialize(TaggedValue* v, Type* t);
 
 TaggedValue* get_index(TaggedValue* value, int index);
 void set_index(TaggedValue* value, int index, TaggedValue* element);

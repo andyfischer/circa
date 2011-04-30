@@ -16,6 +16,7 @@ namespace opaque_pointer_t {
     {
         reset_type(type);
         type->name = "opaque_pointer";
+        type->storageType = STORAGE_TYPE_OPAQUE_POINTER;
         type->toString = toString;
     }
 

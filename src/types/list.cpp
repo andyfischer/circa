@@ -11,18 +11,11 @@
 
 #include "type.h"
 
+#include "list_shared.h"
 #include "list.h"
 
 namespace circa {
 namespace list_t {
-
-    struct ListData {
-        int refCount;
-        int count;
-        int capacity;
-        TaggedValue items[0];
-        // items has size [capacity].
-    };
 
     ListData* touch(ListData* original);
 
@@ -52,32 +45,10 @@ namespace list_t {
         ca_assert(data->refCount > 0);
         data->refCount--;
 
-        if (data->refCount == 0) {
-            // Release all elements
-            for (int i=0; i < data->count; i++)
-                set_null(&data->items[i]);
-            free(data);
-            debug_unregister_valid_object(data);
-        }
+        if (data->refCount == 0)
+            free_list(data);
 
         //std::cout << "decref " << data << " to " << data->refCount << std::endl;
-    }
-
-    ListData* create_list(int capacity)
-    {
-        ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
-        debug_register_valid_object(result, LIST_OBJECT);
-
-        result->refCount = 1;
-        result->count = 0;
-        result->capacity = capacity;
-        memset(result->items, 0, capacity * sizeof(TaggedValue));
-        for (int i=0; i < capacity; i++)
-            result->items[i].init();
-
-        //std::cout << "created list " << result << std::endl;
-
-        return result;
     }
 
     ListData* duplicate(ListData* source)
@@ -87,7 +58,7 @@ namespace list_t {
 
         assert_valid_list(source);
 
-        ListData* result = create_list(source->capacity);
+        ListData* result = allocate_list(source->capacity);
 
         result->count = source->count;
 
@@ -100,10 +71,10 @@ namespace list_t {
     ListData* increase_capacity(ListData* original, int new_capacity)
     {
         if (original == NULL)
-            return create_list(new_capacity);
+            return allocate_list(new_capacity);
 
         assert_valid_list(original);
-        ListData* result = create_list(new_capacity);
+        ListData* result = allocate_list(new_capacity);
 
         bool createCopy = original->refCount > 1;
 
@@ -124,7 +95,7 @@ namespace list_t {
     ListData* double_capacity(ListData* original)
     {
         if (original == NULL)
-            return create_list(1);
+            return allocate_list(1);
 
         ListData* result = increase_capacity(original, original->capacity * 2);
         return result;
@@ -135,7 +106,7 @@ namespace list_t {
         if (original == NULL) {
             if (numElements == 0)
                 return NULL;
-            ListData* result = create_list(numElements);
+            ListData* result = allocate_list(numElements);
             result->count = numElements;
             return result;
         }
@@ -201,7 +172,7 @@ namespace list_t {
     TaggedValue* append(ListData** data)
     {
         if (*data == NULL) {
-            *data = create_list(1);
+            *data = allocate_list(1);
         } else {
             *data = touch(*data);
             

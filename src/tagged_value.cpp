@@ -387,6 +387,12 @@ void change_type(TaggedValue* v, Type* type)
     }
 }
 
+void change_type_no_initialize(TaggedValue* v, Type* t)
+{
+    register_type_pointer(v, t);
+    v->value_type = t;
+}
+
 bool equals(TaggedValue* lhs, TaggedValue* rhs)
 {
     ca_assert(lhs->value_type != NULL);
@@ -537,7 +543,7 @@ Branch* as_branch_ref(TaggedValue* value)
 
 void* as_opaque_pointer(TaggedValue* value)
 {
-    ca_assert(is_opaque_pointer(value));
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER);
     return value->value_data.ptr;
 }
 
