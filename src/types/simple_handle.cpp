@@ -17,11 +17,15 @@ namespace simple_handle_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
-        internal_error("don't call simple_handle::initialize");
+        value->value_data.ptr = NULL;
+        //internal_error("don't call simple_handle::initialize");
     }
     void release(Type* type, TaggedValue* value)
     {
         ListData* data = (ListData*) value->value_data.ptr;
+
+        if (data == NULL)
+            return;
 
         ca_assert(data->refCount > 0);
 
@@ -57,6 +61,7 @@ namespace simple_handle_t {
         type->release = release;
         type->copy = copy;
         type->storageType = STORAGE_TYPE_LIST;
+        type->toString = list_t::tv_to_string;
     }
 }
 }

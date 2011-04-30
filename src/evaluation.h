@@ -93,4 +93,7 @@ void finish_using(Branch& branch);
 
 void clear_error(EvalContext* cxt);
 
+// Recursively clear local values for this branch and all nested branches.
+void reset_locals(Branch& branch);
+
 } // namespace circa

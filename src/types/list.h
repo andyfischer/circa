@@ -10,6 +10,7 @@ namespace list_t {
 
     void setup_type(Type*);
     void tv_initialize(Type*, TaggedValue*);
+    std::string tv_to_string(TaggedValue* value);
     TaggedValue* append(TaggedValue* list);
     TaggedValue* prepend(TaggedValue* list);
     void remove_and_replace_with_back(TaggedValue* list, int index);

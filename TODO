@@ -1,10 +1,12 @@
 
 This is a list of short-term TODOs. There's a bigger list at docs/todo.md
 
- - State not preserved inside 'namespace'
  - 'Unknown identifier' terms are being created without source location
- - various places where swap() can be used instead of copy()
  - clear_branch and repair_broken_links don't correctly handle nested names
+ - Declare a function with multiple outputs in Circa
+ - Deprecate the way change_type() calls initialize()
+ - copy() should not result in a call to initialize()
+    - when fixed, remove initialize() from simple_handle
 
 Important optimization tasks:
 

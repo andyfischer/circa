@@ -328,4 +328,14 @@ void clear_error(EvalContext* cxt)
     cxt->errorMessage = "";
 }
 
+void reset_locals(Branch& branch)
+{
+    ca_assert(!branch.inuse);
+    reset(&branch.locals);
+    reset(&branch.localsStack);
+
+    for (int i=0; i < branch.length(); i++)
+        reset_locals(branch[i]->nestedContents);
+}
+
 } // namespace circa

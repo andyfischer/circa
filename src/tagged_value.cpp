@@ -389,6 +389,7 @@ void change_type(TaggedValue* v, Type* type)
 
 void change_type_no_initialize(TaggedValue* v, Type* t)
 {
+    set_null(v);
     register_type_pointer(v, t);
     v->value_type = t;
 }
