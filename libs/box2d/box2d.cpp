@@ -9,7 +9,13 @@ using namespace circa;
 
 namespace box2d_support {
 
-b2World *g_world;
+b2World *g_world = NULL;
+
+void initialize_world()
+{
+    if (g_world == NULL)
+        g_world = new b2World(b2Vec2(), true);
+}
 
 float c_timeStep = 1/60.0;
 int c_velocityIterations = 6;
@@ -33,7 +39,11 @@ Type g_bodyHandleType;
 
 void release_body_handle(int handle)
 {
-    // TODO: call destructor
+    if (g_world == NULL)
+        return;
+    if (g_bodies[handle] == NULL)
+        return;
+    g_world->DestroyBody(g_bodies[handle]);
     g_bodies[handle] = NULL;
 }
 
@@ -74,8 +84,7 @@ void assign_body_handle(TaggedValue* value, b2Body* body)
 
 CA_FUNCTION(step)
 {
-    if (g_world == NULL)
-        g_world = new b2World(b2Vec2(), true);
+    initialize_world();
 
     g_world->Step(c_timeStep, c_velocityIterations, c_positionIterations);
     g_world->ClearForces();
@@ -83,13 +92,10 @@ CA_FUNCTION(step)
 
 CA_FUNCTION(gravity)
 {
-    if (g_world == NULL)
-        return;
+    initialize_world();
 
-    List& list = *List::checkCast(INPUT(0));
-    b2Vec2 gravity(as_float(list[0]), as_float(list[1]));
-
-    g_world->SetGravity(gravity);
+    Point& gravity = *Point::checkCast(INPUT(0));
+    g_world->SetGravity(b2Vec2(gravity.getX(), gravity.getY()));
 }
 
 CA_FUNCTION(body)
@@ -97,8 +103,7 @@ CA_FUNCTION(body)
     // Inputs:
     //   State id
     //   Point initialPosition
-    //   bool dynamic
-    //   Point shape
+    //   List properties
     // Outputs:
     //   current position & angle
     //   state info
@@ -110,32 +115,76 @@ CA_FUNCTION(body)
     //   Set the density & friction
     //   Create a fixture attaching the b2PolygonShape to the b2Body
 
+    initialize_world();
+
     TaggedValue* handle = INPUT(0);
     Point& initialPosition = *Point::checkCast(INPUT(1));
-    bool isDynamic = BOOL_INPUT(2);
-    TaggedValue* shape = INPUT(3);
+    List& properties = *List::checkCast(INPUT(2));
+    bool isDynamic = as_bool(properties[0]);
+    Point& size = *Point::checkCast(properties[1]);
+    float density = to_float(properties[2]);
+    float friction = to_float(properties[3]);
 
     if (!is_valid_body_handle(handle)) {
-        // Create a b2Body
 
+        if (size.getX() <= 0.0 || size.getY() <= 0.0)
+            return error_occurred(CONTEXT, CALLER, "Size must be non-zero");
+
+        // Create a b2Body
         b2BodyDef bodyDef;
 
         if (isDynamic)
             bodyDef.type = b2_dynamicBody;
 
-        bodyDef.position.Set(initialPosition.getX(),
+        bodyDef.position.Set(
+                initialPosition.getX(),
             initialPosition.getY());
 
         b2Body* body = g_world->CreateBody(&bodyDef);
 
         // Assign the shape
         b2PolygonShape polygonShape;
-        // TODO
+        polygonShape.SetAsBox(size.getX(), size.getY());
+
+        b2FixtureDef fixtureDef;
+        fixtureDef.shape = &polygonShape;
+        fixtureDef.density = density;
+        fixtureDef.friction = friction;
+
+        body->CreateFixture(&fixtureDef);
 
         assign_body_handle(handle, body);
+
+        ca_assert(is_valid_body_handle(handle));
     }
 
     b2Body* body = get_body_from_handle(handle);
+
+    //b2Vec2 position = body->GetPosition();
+    //float32 angle = body->GetAngle();
+
+    // Write output as a list, with [handle, boxPoints]
+    List& output = *List::cast(OUTPUT, 2);
+    List& points = *List::cast(output[1], 0);
+
+    // Copy vertex locations
+    for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
+        b2Shape* shape = fixture->GetShape();
+
+        if (shape->GetType() == b2Shape::e_polygon) {
+            b2PolygonShape *poly = (b2PolygonShape*) shape;
+
+            int count = poly->GetVertexCount();
+
+            for (int i = 0; i < count; i++) {
+                b2Vec2 vec = body->GetWorldPoint(poly->GetVertex(i));
+                Point* p = Point::cast(points.append());
+                p->set(vec.x, vec.y);
+            }
+        }
+    }
+
+    copy(handle, output[0]);
 }
 
 void setup(Branch& kernel)
@@ -148,6 +197,7 @@ void setup(Branch& kernel)
 
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);
+    install_function(ns["body_int"], body);
 }
 
 } // box2d_support

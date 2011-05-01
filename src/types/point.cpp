@@ -23,8 +23,8 @@ Point* Point::checkCast(TaggedValue* tv)
 {
     if (!is_list(tv)) return NULL;
     if (tv->numElements() != 2) return NULL;
-    if (!is_float(tv->getIndex(0))) return NULL;
-    if (!is_float(tv->getIndex(1))) return NULL;
+    if (!is_number(tv->getIndex(0))) return NULL;
+    if (!is_number(tv->getIndex(1))) return NULL;
     return (Point*) tv;
 }
 

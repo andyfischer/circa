@@ -593,6 +593,11 @@ bool is_float(TaggedValue* value)
     return value->value_type->storageType == STORAGE_TYPE_FLOAT;
 }
 
+bool is_number(TaggedValue* value)
+{
+    return is_int(value) || is_float(value);
+}
+
 bool is_bool(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_BOOL;
