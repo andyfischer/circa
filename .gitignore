@@ -1,30 +1,8 @@
 # submodules:
-circa-web
+gh-pages
 
 # build results:
 /build
-/deploy
-*.o
-*.so
-*.a
-*.dylib
-*.obj
-*.lib
-*.exe
-*.dll
-
-# visual studio artifacts:
-*.ilk
-*.idb
-*.exp
-*.exe.manifest
-*.pdb
-*.suo
-
-# xcode artifacts:
-*.mode1v3
-*.pbxuser
-*.perspectivev3
 
 # miscellaneous artifacts:
 .sconsign.dblite
@@ -32,11 +10,6 @@ tags
 
 # generated docs
 docs/nanodoc/index.html
-
-# downloaded files
-/SDL_deps
-/SDL_deps.zip
-/deps
 
 # miscellaneous
 x.ca
