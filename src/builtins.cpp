@@ -346,8 +346,7 @@ void post_setup_functions(Branch& kernel)
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
-    Branch& div_overloads = DIV_FUNC->nestedContents;
-    Term* div_s = create_duplicate(div_overloads, kernel["vectorize_vs"], "div_s");
+    Term* div_s = create_duplicate(kernel, kernel["vectorize_vs"], "div_s");
     set_ref(function_t::get_parameters(div_s), DIV_FUNC);
 
     overloaded_function::append_overload(DIV_FUNC, div_s);

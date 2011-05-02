@@ -71,7 +71,6 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
             out << '"' << overloadTerm->name << '"';
 
             ca_assert(overloadTerm->name != "");
-            
         }
         out << "]";
     }

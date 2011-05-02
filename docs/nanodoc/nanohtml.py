@@ -41,7 +41,7 @@ FunctionsToHide = set(["annotate_type", "add_feedback", "additional_output",
     "assign", "branch", "sin_feedback", "comment", "copy",
     "cos_feedback", "do_once", "feedback",
     "finish_minor_branch",
-    "for", "get_field_by_name",
+    "for", "get_field_by_name","join",
     "get_index", "if_feedback", "mult_feedback", "namespace", "eval_script",
     "get_namespace_field","instance","run_single_statement",
     "set_field", "set_index", "stateful_value", "if_block", "if",
@@ -91,7 +91,8 @@ reorganize_document_for_overloads(Doc)
 
 MathFunctions = ['abs','add','arccos','arcsin','arctan','average','ceil','cos',
         'decrement',
-        'div','floor','increment','length','log','magnitude','max','min','mod','mult',
+        'div','div_i', 'floor','increment',
+        'length','log','magnitude','max','min','mod','mult',
         'neg','norm','perpendicular','point_distance','polar','pow',
         'range','remainder','round','rotate_point','sin','sqr','sqrt','sub','tan']
 
@@ -101,42 +102,44 @@ LogicalFunctions = ['and','any_true','not','or']
 
 FileIOFunctions = ['file_changed','load_script','read_text_file','write_text_file']
 
+ComparisonFunctions = ['equals', 'greater_than', 'greater_than_eq',
+        'less_than', 'less_than_eq', 'not_equals']
+
+MetaprogrammingFunctions = ['branch_ref','format_source_for_graph','get_statement_count',
+        'lookup_branch_ref']
+
+ColorFunctions = ['blend_color', 'hsv_to_rgb','random_color']
+
 def move_some_builtins_to_new_modules(doc):
-    mathModule = {}
-    mathModule['name'] = "&nbsp;&nbsp;math"
-    mathModule['contents'] = []
-    doc['packages'].insert(1, mathModule)
+    newModules = []
 
-    logicalModule = {}
-    logicalModule['name'] = "&nbsp;&nbsp;logical"
-    logicalModule['contents'] = []
-    doc['packages'].insert(1, logicalModule)
+    def declareModule(name, includesNames):
+        module = {}
+        module['name'] = name
+        module['contents'] = []
+        module['includesNames'] = includesNames
+        newModules.append(module)
 
-    fileIOModule = {}
-    fileIOModule['name'] = "&nbsp;&nbsp;file i/o"
-    fileIOModule['contents'] = []
-    doc['packages'].insert(1, fileIOModule)
-
-    debuggingModule = {}
-    debuggingModule['name'] = "&nbsp;&nbsp;debugging"
-    debuggingModule['contents'] = []
-    doc['packages'].insert(1, debuggingModule)
+    declareModule("&nbsp;&nbsp;color", ColorFunctions)
+    declareModule("&nbsp;&nbsp;comparison", ComparisonFunctions)
+    declareModule("&nbsp;&nbsp;file i/o", FileIOFunctions)
+    declareModule("&nbsp;&nbsp;internal debugging", DebuggingFunctions)
+    declareModule("&nbsp;&nbsp;logical", LogicalFunctions)
+    declareModule("&nbsp;&nbsp;math", MathFunctions)
+    declareModule("&nbsp;&nbsp;metaprogramming", MetaprogrammingFunctions)
 
     builtinContents = doc['packages'][0]['contents']
 
     for item in list(builtinContents):
-        if item['name'] in MathFunctions:
-            builtinContents.remove(item)
-            mathModule['contents'].append(item)
-        if item['name'] in DebuggingFunctions:
-            builtinContents.remove(item)
-            debuggingModule['contents'].append(item)
-        if item['name'] in FileIOFunctions:
-            builtinContents.remove(item)
-            fileIOModule['contents'].append(item)
-        if item['name'] in LogicalFunctions:
-            builtinContents.remove(item)
-            logicalModule['contents'].append(item)
+        for newModule in newModules:
+            if item['name'] in newModule['includesNames']:
+                builtinContents.remove(item)
+                newModule['contents'].append(item)
+
+    index = 1
+    for module in newModules:
+        doc['packages'].insert(index, module)
+        index += 1
 
 move_some_builtins_to_new_modules(Doc)
 

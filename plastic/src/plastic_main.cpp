@@ -58,6 +58,10 @@ int plastic_main(std::vector<std::string> args)
 
     // -gd to generate docs
     if (arg0 == "-gd") {
+        if (args.size() < 1) {
+            std::cout << "specify a filename after -gd" << std::endl;
+            return -1;
+        }
         std::cout << "writing docs to " << args[1] << std::endl;
         std::stringstream out;
         generate_plastic_docs(out);

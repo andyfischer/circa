@@ -57,7 +57,7 @@ namespace comparison_function {
         create_overloaded_function(kernel, "less_than_eq",
                 TermList(kernel["less_than_eq_i"], kernel["less_than_eq_f"]));
         create_overloaded_function(kernel, "greater_than",
-                TermList(kernel["greater_than_i"], kernel["greater_than_eq_f"]));
+                TermList(kernel["greater_than_i"], kernel["greater_than_f"]));
         create_overloaded_function(kernel, "greater_than_eq",
                 TermList(kernel["greater_than_eq_i"], kernel["greater_than_eq_f"]));
     }
