@@ -202,6 +202,8 @@ bool term_output_always_satisfies_type(Term* term, Type* type);
 bool term_output_never_satisfies_type(Term* term, Type* type);
 
 void reset_type(Type* type);
+void clear_type_contents(Type* type);
+
 void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch& kernel);

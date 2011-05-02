@@ -299,6 +299,11 @@ void reset_type(Type* type)
     type->setField = NULL;
     type->numElements = NULL;
 
+    clear_type_contents(type);
+}
+
+void clear_type_contents(Type* type)
+{
     clear_branch(&type->prototype);
     clear_branch(&type->attributes);
     clear_branch(&type->memberFunctions);

@@ -422,18 +422,18 @@ export_func void circa_shutdown()
 {
     SHUTTING_DOWN = true;
 
-    reset_type(&BOOL_T);
-    reset_type(&DICT_T);
-    reset_type(&ERROR_T);
-    reset_type(&FLOAT_T);
-    reset_type(&INT_T);
-    reset_type(&LIST_T);
-    reset_type(&NULL_TYPE);
-    reset_type(&OPAQUE_POINTER_T);
-    reset_type(&REF_T);
-    reset_type(&STRING_T);
-    reset_type(&TYPE_T);
-    reset_type(&VOID_T);
+    clear_type_contents(&BOOL_T);
+    clear_type_contents(&DICT_T);
+    clear_type_contents(&ERROR_T);
+    clear_type_contents(&FLOAT_T);
+    clear_type_contents(&INT_T);
+    clear_type_contents(&LIST_T);
+    clear_type_contents(&NULL_TYPE);
+    clear_type_contents(&OPAQUE_POINTER_T);
+    clear_type_contents(&REF_T);
+    clear_type_contents(&STRING_T);
+    clear_type_contents(&TYPE_T);
+    clear_type_contents(&VOID_T);
 
     delete KERNEL;
     KERNEL = NULL;

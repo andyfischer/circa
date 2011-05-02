@@ -317,10 +317,8 @@ include('ui_widgets.ca' -> rpath)
 
 -- Load the user's script
 initial_filename = ide:script_filename()
+cond(initial_filename == "", "../../demos/demo_browser.ca"->rpath, @initial_filename)
 state string user_script_filename = ide:script_filename()
-
-if user_script_filename == ""
-    user_script_filename = "../../demos/demo_browser.ca"->rpath
 
 -- Function to specify a different script
 def load_user_script(string filename)
