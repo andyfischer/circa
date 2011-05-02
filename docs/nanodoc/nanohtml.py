@@ -4,12 +4,141 @@
 Json document is layed out like this:
 
 headers
-  title
-packages
-  name
-  contents
+  title (string)
+[packages]
+  name (string)
+  [contents]
+    name
+    function (true or false)
+    return_type
+    declaration
+    [containsOverloads]
+    some other stuff
 
 """
+
+# Parse command-line options
+from optparse import OptionParser
+options = OptionParser()
+options.add_option('--doc', dest = 'doc_filename')
+options.add_option('--output', dest = 'output_filename')
+(cl_options, cl_args) = options.parse_args()
+
+# Load the entire document
+def load_json_doc(filename):
+    f = open(filename, 'r')
+    file_contents = f.read()
+    f.close()
+
+    import json
+    doc = json.loads(file_contents)
+    return doc
+
+Doc = load_json_doc(cl_options.doc_filename)
+
+# Hide certain functions
+FunctionsToHide = set(["annotate_type", "add_feedback", "additional_output",
+    "assign", "branch", "sin_feedback", "comment", "copy",
+    "cos_feedback", "do_once", "feedback",
+    "finish_minor_branch",
+    "for", "get_field_by_name",
+    "get_index", "if_feedback", "mult_feedback", "namespace", "eval_script",
+    "get_namespace_field","instance","run_single_statement",
+    "set_field", "set_index", "stateful_value", "if_block", "if",
+    "input_placeholder", "cond_feedback", "swap", "term_to_source", "ref",
+    "return",
+    "subroutine_output","preserve_state_result","lambda",
+    "one_time_assign", "unique_id", "unknown_field", "unknown_function",
+    "unknown_identifier", "unsafe_assign", "unrecognized_expr", "unknown_type",
+    "vectorize_vs", "vectorize_vv", "value",
+    "patch_with_dll"])
+
+def hide_stuff(doc):
+    for package in doc['packages']:
+        for item in list(package['contents']):
+            if item['name'] in FunctionsToHide:
+                package['contents'].remove(item)
+
+hide_stuff(Doc)
+
+# Reorganize overloads
+
+def reorganize_document_for_overloads(doc):
+    for package in doc['packages']:
+
+        # Make a list of every name that shows up as an overload
+        all_overload_names = set()
+        for item in package['contents']:
+            if 'containsOverloads' in item:
+                for name in item['containsOverloads']:
+                    all_overload_names.add(name)
+
+        # Remove these items from the regular list
+        all_overloads = {} # keyed by name
+        for item in list(package['contents']):
+            if item['name'] in all_overload_names:
+                all_overloads[item['name']] = item
+                package['contents'].remove(item)
+
+        # Attach the overloads to the containing functions
+        for item in package['contents']:
+            if 'containsOverloads' in item:
+                item['overloads'] = [all_overloads[name] for name in item['containsOverloads']]
+
+reorganize_document_for_overloads(Doc)
+
+# There's too much stuff in 'builtins', split off some of it into some new modules
+
+MathFunctions = ['abs','add','arccos','arcsin','arctan','average','ceil','cos',
+        'decrement',
+        'div','floor','increment','length','log','magnitude','max','min','mod','mult',
+        'neg','norm','perpendicular','point_distance','polar','pow',
+        'range','remainder','round','rotate_point','sin','sqr','sqrt','sub','tan']
+
+DebuggingFunctions = ['dump_parse','dump_scope_state','test_oracle','test_spy']
+
+LogicalFunctions = ['and','any_true','not','or']
+
+FileIOFunctions = ['file_changed','load_script','read_text_file','write_text_file']
+
+def move_some_builtins_to_new_modules(doc):
+    mathModule = {}
+    mathModule['name'] = "&nbsp;&nbsp;math"
+    mathModule['contents'] = []
+    doc['packages'].insert(1, mathModule)
+
+    logicalModule = {}
+    logicalModule['name'] = "&nbsp;&nbsp;logical"
+    logicalModule['contents'] = []
+    doc['packages'].insert(1, logicalModule)
+
+    fileIOModule = {}
+    fileIOModule['name'] = "&nbsp;&nbsp;file i/o"
+    fileIOModule['contents'] = []
+    doc['packages'].insert(1, fileIOModule)
+
+    debuggingModule = {}
+    debuggingModule['name'] = "&nbsp;&nbsp;debugging"
+    debuggingModule['contents'] = []
+    doc['packages'].insert(1, debuggingModule)
+
+    builtinContents = doc['packages'][0]['contents']
+
+    for item in list(builtinContents):
+        if item['name'] in MathFunctions:
+            builtinContents.remove(item)
+            mathModule['contents'].append(item)
+        if item['name'] in DebuggingFunctions:
+            builtinContents.remove(item)
+            debuggingModule['contents'].append(item)
+        if item['name'] in FileIOFunctions:
+            builtinContents.remove(item)
+            fileIOModule['contents'].append(item)
+        if item['name'] in LogicalFunctions:
+            builtinContents.remove(item)
+            logicalModule['contents'].append(item)
+
+move_some_builtins_to_new_modules(Doc)
 
 def to_ident(name):
     return name.strip(' ()').lower()
@@ -61,9 +190,22 @@ def detailHTML(item):
     html += '<div id="moduledetailtitle">%s</div>' % name
 
     html += '<div id="detailcontent">\n'
-    html += '<span class="detail_declaration">%s</span>\n' % item['declaration']
-    html += '<p>'
-    html += '<span class="detail_comments">%s</span>\n' % item['comments']
+
+    def itemBody(item):
+        html = '<span class="detail_declaration">%s</span>\n' % item['declaration']
+        html += '<p>'
+        html += '<span class="detail_comments">%s</span>\n' % item['comments']
+        return html
+
+    html += itemBody(item)
+
+    if 'overloads' in item:
+        html += '<p>'
+        html += '<br>'
+        html += 'Contains the following overloads:'
+        for overload in item['overloads']:
+            html += '<p>'
+            html += itemBody(overload)
 
     html += "</div>"
     html += "</div>"
@@ -124,7 +266,7 @@ def makeHTML(doc):
         # split up contents into 2 lists
         contents = list(package['contents'])
 
-        contents.sort(lambda l,r: cmp(lhs['name'], rhs['name']))
+        contents.sort(lambda lhs,rhs: cmp(lhs['name'], rhs['name']))
 
         contents_midpoint = len(contents)/2 + 1
         left_list = contents[:contents_midpoint]
@@ -184,26 +326,12 @@ def makeHTML(doc):
     html += "\t</html>\n"
     return html
 
-from optparse import OptionParser
-options = OptionParser()
-options.add_option('--doc', dest = 'doc_filename')
-options.add_option('--output', dest = 'output_filename')
-(cl_options, cl_args) = options.parse_args()
 
-def load_json_doc(filename):
-    f = open(filename, 'r')
-    file_contents = f.read()
-    f.close()
-
-    import json
-    doc = json.loads(file_contents)
-    return doc
 
 def write_text_file(filename, contents):
     output_file = open(filename, 'w')
     output_file.write(contents)
     output_file.write("\n")
 
-doc = load_json_doc(cl_options.doc_filename)
-html = makeHTML(doc)
+html = makeHTML(Doc)
 write_text_file(cl_options.output_filename, html)

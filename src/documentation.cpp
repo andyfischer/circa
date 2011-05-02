@@ -67,7 +67,11 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
         for (int overload=0; overload < overloads.length(); overload++) {
             if (overload != 0)
                 out << ", ";
-            out << '"' << as_ref(overloads[overload])->name << '"';
+            Term* overloadTerm = as_ref(overloads[overload]);
+            out << '"' << overloadTerm->name << '"';
+
+            ca_assert(overloadTerm->name != "");
+            
         }
         out << "]";
     }
@@ -101,49 +105,6 @@ void hide_from_docs(Term* term)
 {
     if (term == NULL) return;
     term->setBoolProp("docs:hidden", true);
-}
-
-void initialize_kernel_documentation(Branch& KERNEL)
-{
-    hide_from_docs(KERNEL["annotate_type"]);
-    hide_from_docs(KERNEL["add_feedback"]);
-    hide_from_docs(KERNEL["additional_output"]);
-    hide_from_docs(KERNEL["assign"]);
-    hide_from_docs(KERNEL["branch"]);
-    hide_from_docs(KERNEL["sin_feedback"]);
-    hide_from_docs(KERNEL["comment"]);
-    hide_from_docs(KERNEL["copy"]);
-    hide_from_docs(KERNEL["cos_feedback"]);
-    hide_from_docs(KERNEL["do_once"]);
-    hide_from_docs(KERNEL["feedback"]);
-    hide_from_docs(KERNEL["for"]);
-    hide_from_docs(KERNEL["get_field_by_name"]);
-    hide_from_docs(KERNEL["get_index"]);
-    hide_from_docs(KERNEL["if_feedback"]);
-    hide_from_docs(KERNEL["mult_feedback"]);
-    hide_from_docs(KERNEL["namespace"]);
-    hide_from_docs(KERNEL["eval_script"]);
-    hide_from_docs(KERNEL["set_field"]);
-    hide_from_docs(KERNEL["set_index"]);
-    hide_from_docs(KERNEL["stateful_value"]);
-    hide_from_docs(KERNEL["if_block"]);
-    hide_from_docs(KERNEL["if"]);
-    hide_from_docs(KERNEL["input_placeholder"]);
-    hide_from_docs(KERNEL["cond_feedback"]);
-    hide_from_docs(KERNEL["swap"]);
-    hide_from_docs(KERNEL["term_to_source"]);
-    hide_from_docs(KERNEL["ref"]);
-    hide_from_docs(KERNEL["one_time_assign"]);
-    hide_from_docs(KERNEL["unique_id"]);
-    hide_from_docs(KERNEL["unknown_field"]);
-    hide_from_docs(KERNEL["unknown_function"]);
-    hide_from_docs(KERNEL["unknown_identifier"]);
-    hide_from_docs(KERNEL["unsafe_assign"]);
-    hide_from_docs(KERNEL["unrecognized_expr"]);
-    hide_from_docs(KERNEL["unknown_type"]);
-    hide_from_docs(KERNEL["vectorize_vs"]);
-    hide_from_docs(KERNEL["vectorize_vv"]);
-    hide_from_docs(VALUE_FUNC);
 }
 
 } // namespace circa

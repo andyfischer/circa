@@ -403,7 +403,6 @@ export_func void circa_initialize()
     post_setup_types();
 
     type_initialize_kernel(*KERNEL);
-    initialize_kernel_documentation(*KERNEL);
 
     parse_builtin_script(*KERNEL);
 
