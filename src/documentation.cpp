@@ -59,6 +59,19 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
     out << ", \"return_type\": \"" << function_get_output_type(func, 0)->name << "\"";
     out << ", \"declaration\": \"" << header << "\"";
     //escape_string_for_json(get_term_source(func), out);
+
+    if (overloaded_function::is_overloaded_function(func)) {
+        out << ", \"containsOverloads\": [";
+
+        List& overloads = get_function_attrs(func)->parameters;
+        for (int overload=0; overload < overloads.length(); overload++) {
+            if (overload != 0)
+                out << ", ";
+            out << '"' << as_ref(overloads[overload])->name << '"';
+        }
+        out << "]";
+    }
+
     out << ", \"comments\": \"";
     escape_string_for_json(description, out);
     out << "\"";
@@ -94,6 +107,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
 {
     hide_from_docs(KERNEL["annotate_type"]);
     hide_from_docs(KERNEL["add_feedback"]);
+    hide_from_docs(KERNEL["additional_output"]);
     hide_from_docs(KERNEL["assign"]);
     hide_from_docs(KERNEL["branch"]);
     hide_from_docs(KERNEL["sin_feedback"]);
@@ -107,6 +121,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["get_index"]);
     hide_from_docs(KERNEL["if_feedback"]);
     hide_from_docs(KERNEL["mult_feedback"]);
+    hide_from_docs(KERNEL["namespace"]);
     hide_from_docs(KERNEL["eval_script"]);
     hide_from_docs(KERNEL["set_field"]);
     hide_from_docs(KERNEL["set_index"]);
@@ -115,6 +130,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["if"]);
     hide_from_docs(KERNEL["input_placeholder"]);
     hide_from_docs(KERNEL["cond_feedback"]);
+    hide_from_docs(KERNEL["swap"]);
     hide_from_docs(KERNEL["term_to_source"]);
     hide_from_docs(KERNEL["ref"]);
     hide_from_docs(KERNEL["one_time_assign"]);
@@ -122,6 +138,7 @@ void initialize_kernel_documentation(Branch& KERNEL)
     hide_from_docs(KERNEL["unknown_field"]);
     hide_from_docs(KERNEL["unknown_function"]);
     hide_from_docs(KERNEL["unknown_identifier"]);
+    hide_from_docs(KERNEL["unsafe_assign"]);
     hide_from_docs(KERNEL["unrecognized_expr"]);
     hide_from_docs(KERNEL["unknown_type"]);
     hide_from_docs(KERNEL["vectorize_vs"]);

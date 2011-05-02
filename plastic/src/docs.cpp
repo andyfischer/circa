@@ -20,7 +20,11 @@ void generate_plastic_docs(std::stringstream &out)
     out << ",";
     append_package_docs(out, runtimeBranch, "Plastic top level");
     out << ",";
+    append_package_docs(out, runtimeBranch["box2d"]->nestedContents, "box2d bindings");
+    out << ",";
     append_package_docs(out, runtimeBranch["gl"]->nestedContents, "gl namespace");
+    out << ",";
+    append_package_docs(out, runtimeBranch["ide"]->nestedContents, "ide namespace");
     out << ",";
     append_package_docs(out, runtimeBranch["image"]->nestedContents, "image namespace");
     out << ",";

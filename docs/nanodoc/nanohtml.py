@@ -44,9 +44,6 @@ def itemListHTML(items):
     html += "</ul>"
     return html
 
-def compareItems(lhs, rhs):
-    return cmp(lhs['name'], rhs['name'])
-
 def divideListIntoTwo(l):
     left_list = []
     right_list = []
@@ -127,7 +124,7 @@ def makeHTML(doc):
         # split up contents into 2 lists
         contents = list(package['contents'])
 
-        contents.sort(compareItems)
+        contents.sort(lambda l,r: cmp(lhs['name'], rhs['name']))
 
         contents_midpoint = len(contents)/2 + 1
         left_list = contents[:contents_midpoint]
