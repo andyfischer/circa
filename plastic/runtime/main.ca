@@ -161,21 +161,24 @@ def load_sound(string filename) -> Sound
 
 -- box2d bindings
 namespace box2d
-    def step()
+    def step(number duration)
     def gravity(Point vec)
-    def body_int(any handle, Point initialPosition, List properties) -> List
+    def body_int(any handle, Point initialPosition, number initialRotation, List properties, bool propertiesChanged) -> any
 
     -- Properties is a list with:
     --  [0] = bool dynamic
     --  [1] = Point size
     --  [2] = number density
     --  [3] = number friction
+    --  [4] = number restitution
 
-    def body(Point initialPosition, List properties) -> List
+    def body(Point initialPosition, number initialRotation, List properties) -> any
         state handle
-        result = body_int(handle, initialPosition, properties)
-        handle = result[0]
-        return result[1]
+        handle = body_int(handle, initialPosition, initialRotation, properties, changed(properties))
+        return handle
+
+    def get_body_points(any handle) -> List
+
 
 def load_texture(state int, string) -> int
 

@@ -17,12 +17,11 @@ void initialize_world()
         g_world = new b2World(b2Vec2(), true);
 }
 
-float c_timeStep = 1/60.0;
 int c_velocityIterations = 6;
 int c_positionIterations = 2;
 
 // Store a list of pointers to active b2Body objects.
-const int c_maxBodies = 100;
+const int c_maxBodies = 10000;
 
 int g_nextFreeBody = 0;
 b2Body* g_bodies[c_maxBodies] = {NULL,};
@@ -60,6 +59,8 @@ bool is_valid_body_handle(TaggedValue* value)
 
 int find_free_body_index()
 {
+    int first = g_nextFreeBody;
+
     while(1) {
 
         if (g_nextFreeBody >= c_maxBodies)
@@ -69,6 +70,9 @@ int find_free_body_index()
             break;
 
         g_nextFreeBody++;
+
+        if (g_nextFreeBody == first)
+            internal_error("reached maximum body count");
     }
 
     return g_nextFreeBody++;
@@ -86,7 +90,9 @@ CA_FUNCTION(step)
 {
     initialize_world();
 
-    g_world->Step(c_timeStep, c_velocityIterations, c_positionIterations);
+    float duration = FLOAT_INPUT(0);
+
+    g_world->Step(duration, c_velocityIterations, c_positionIterations);
     g_world->ClearForces();
 }
 
@@ -103,6 +109,7 @@ CA_FUNCTION(body)
     // Inputs:
     //   State id
     //   Point initialPosition
+    //   number initialRotation
     //   List properties
     // Outputs:
     //   current position & angle
@@ -119,11 +126,14 @@ CA_FUNCTION(body)
 
     TaggedValue* handle = INPUT(0);
     Point& initialPosition = *Point::checkCast(INPUT(1));
-    List& properties = *List::checkCast(INPUT(2));
+    float initialRotation = as_float(INPUT(2));
+    List& properties = *List::checkCast(INPUT(3));
     bool isDynamic = as_bool(properties[0]);
     Point& size = *Point::checkCast(properties[1]);
     float density = to_float(properties[2]);
     float friction = to_float(properties[3]);
+    float restitution = to_float(properties[4]);
+    bool propertiesChanged = as_bool(INPUT(4));
 
     if (!is_valid_body_handle(handle)) {
 
@@ -137,10 +147,27 @@ CA_FUNCTION(body)
             bodyDef.type = b2_dynamicBody;
 
         bodyDef.position.Set(
-                initialPosition.getX(),
+            initialPosition.getX(),
             initialPosition.getY());
 
+        bodyDef.angle = initialRotation;
+
         b2Body* body = g_world->CreateBody(&bodyDef);
+
+        assign_body_handle(handle, body);
+
+        ca_assert(is_valid_body_handle(handle));
+
+        propertiesChanged = true;
+    }
+
+    b2Body* body = get_body_from_handle(handle);
+
+    if (propertiesChanged) {
+
+        // remove any old fixtures
+        while (body->GetFixtureList())
+            body->DestroyFixture(body->GetFixtureList());
 
         // Assign the shape
         b2PolygonShape polygonShape;
@@ -150,22 +177,23 @@ CA_FUNCTION(body)
         fixtureDef.shape = &polygonShape;
         fixtureDef.density = density;
         fixtureDef.friction = friction;
+        fixtureDef.restitution = restitution;
 
         body->CreateFixture(&fixtureDef);
-
-        assign_body_handle(handle, body);
-
-        ca_assert(is_valid_body_handle(handle));
     }
 
+    copy(handle, OUTPUT);
+}
+
+CA_FUNCTION(get_body_points)
+{
+    TaggedValue* handle = INPUT(0);
     b2Body* body = get_body_from_handle(handle);
-
-    //b2Vec2 position = body->GetPosition();
-    //float32 angle = body->GetAngle();
-
+    if (body == NULL)
+        return;
+    
     // Write output as a list, with [handle, boxPoints]
-    List& output = *List::cast(OUTPUT, 2);
-    List& points = *List::cast(output[1], 0);
+    List& points = *List::cast(OUTPUT, 0);
 
     // Copy vertex locations
     for (b2Fixture* fixture = body->GetFixtureList(); fixture; fixture = fixture->GetNext()) {
@@ -183,8 +211,6 @@ CA_FUNCTION(body)
             }
         }
     }
-
-    copy(handle, output[0]);
 }
 
 void setup(Branch& kernel)
@@ -198,6 +224,7 @@ void setup(Branch& kernel)
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);
     install_function(ns["body_int"], body);
+    install_function(ns["get_body_points"], get_body_points);
 }
 
 } // box2d_support
