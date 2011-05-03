@@ -28,12 +28,15 @@ b2Body* g_bodies[c_maxBodies] = {NULL,};
 
 // Scale between screen & world coordinates. Box2d says that it likes objects
 // to have a size between 0.1 and 10 units.
-float screen_to_world(float screen) { return screen / 100.0; }
-float world_to_screen(float world) { return world * 100.0; }
+float screen_to_world(float screen) { return screen / 10.0; }
+float world_to_screen(float world) { return world * 10.0; }
+
+// Circa angles are in the range of 0..1
+float radians_to_unit_angles(float radians) { return radians / M_PI; }
+float unit_angles_to_radians(float unit) { return unit * M_PI; }
 
 // The Circa type g_bodyHandleType is used to hold on to b2Body objects. When
 // the Circa object is destroyed then releaseBodyHandle will be called.
-
 Type g_bodyHandleType;
 
 void release_body_handle(int handle)
@@ -48,6 +51,8 @@ void release_body_handle(int handle)
 
 b2Body* get_body_from_handle(TaggedValue* value)
 {
+    if (value->value_type != &g_bodyHandleType)
+        return NULL;
     return g_bodies[simple_handle_t::get(value)];
 }
 
@@ -147,10 +152,10 @@ CA_FUNCTION(body)
             bodyDef.type = b2_dynamicBody;
 
         bodyDef.position.Set(
-            initialPosition.getX(),
-            initialPosition.getY());
+            screen_to_world(initialPosition.getX()),
+            screen_to_world(initialPosition.getY()));
 
-        bodyDef.angle = initialRotation;
+        bodyDef.angle = unit_angles_to_radians(initialRotation);
 
         b2Body* body = g_world->CreateBody(&bodyDef);
 
@@ -171,7 +176,9 @@ CA_FUNCTION(body)
 
         // Assign the shape
         b2PolygonShape polygonShape;
-        polygonShape.SetAsBox(size.getX(), size.getY());
+        polygonShape.SetAsBox(
+                screen_to_world(size.getX()),
+                screen_to_world(size.getY()));
 
         b2FixtureDef fixtureDef;
         fixtureDef.shape = &polygonShape;
@@ -187,12 +194,10 @@ CA_FUNCTION(body)
 
 CA_FUNCTION(get_body_points)
 {
-    TaggedValue* handle = INPUT(0);
-    b2Body* body = get_body_from_handle(handle);
+    b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
         return;
     
-    // Write output as a list, with [handle, boxPoints]
     List& points = *List::cast(OUTPUT, 0);
 
     // Copy vertex locations
@@ -207,10 +212,66 @@ CA_FUNCTION(get_body_points)
             for (int i = 0; i < count; i++) {
                 b2Vec2 vec = body->GetWorldPoint(poly->GetVertex(i));
                 Point* p = Point::cast(points.append());
-                p->set(vec.x, vec.y);
+                p->set(
+                    world_to_screen(vec.x),
+                    world_to_screen(vec.y));
             }
         }
     }
+}
+
+CA_FUNCTION(get_body_position)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    b2Vec2 vec = body->GetPosition();
+
+    Point& output = *Point::cast(OUTPUT);
+    output.set(
+        world_to_screen(vec.x),
+        world_to_screen(vec.y));
+}
+
+CA_FUNCTION(set_body_position)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    Point& loc = *Point::checkCast(INPUT(1));
+
+    b2Vec2 vec(
+        screen_to_world(loc.getX()),
+        screen_to_world(loc.getY()));
+
+    body->SetTransform(vec, body->GetAngle());
+}
+
+CA_FUNCTION(body_contains_point)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    Point& input = *Point::checkCast(INPUT(1));
+
+    b2Vec2 p(
+        screen_to_world(input.getX()),
+        screen_to_world(input.getY()));
+
+    b2Fixture* fixture = body->GetFixtureList();
+
+    while (fixture) {
+        if (fixture->TestPoint(p)) {
+            set_bool(OUTPUT, true);
+            return;
+        }
+        fixture = fixture->GetNext();
+    }
+
+    set_bool(OUTPUT, false);
 }
 
 void setup(Branch& kernel)
@@ -225,6 +286,9 @@ void setup(Branch& kernel)
     install_function(ns["gravity"], gravity);
     install_function(ns["body_int"], body);
     install_function(ns["get_body_points"], get_body_points);
+    install_function(ns["get_body_position"], get_body_position);
+    install_function(ns["set_body_position"], set_body_position);
+    install_function(ns["body_contains_point"], body_contains_point);
 }
 
 } // box2d_support

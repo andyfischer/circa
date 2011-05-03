@@ -167,7 +167,7 @@ def hsv_to_rgb(List hsv) -> Color
     return [0 0 0 0]
 
 def delta(number val) -> number
-    "Return the difference that 'val' has changed since the previous frame"
+    "Return the difference between this value and the previous call's value"
     state number prev = val
     result = val - prev
     prev = val

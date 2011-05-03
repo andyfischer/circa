@@ -159,6 +159,13 @@ def load_sound(string filename) -> Sound
         s = load_sound_int(filename)
     return s
 
+def delta_point(Point p) -> Point
+    state Point prev = p
+    result = p - prev
+    prev = p
+    return result
+
+
 -- box2d bindings
 namespace box2d
     def step(number duration)
@@ -178,7 +185,28 @@ namespace box2d
         return handle
 
     def get_body_points(any handle) -> List
+    def get_body_position(any handle) -> Point
+    def set_body_position(any handle, Point p)
+    def body_contains_point(any handle, Point p) -> bool
 
+    def draggable_body(any handle)
+        state currently_dragging = false
+
+        if not(currently_dragging) and mouse_clicked()
+            if body_contains_point(handle, mouse)
+                currently_dragging = true
+
+        if not(mouse_pressed())
+            currently_dragging = false
+            
+        if currently_dragging
+            delt = delta_point(mouse)
+
+            -- Temporary workaround:
+            if mouse_clicked()
+                delt = [0 0]
+
+            set_body_position(handle, Point(get_body_position(handle) + delt))
 
 def load_texture(state int, string) -> int
 
