@@ -45,7 +45,7 @@ FunctionsToHide = set(["annotate_type", "add_feedback", "additional_output",
     "get_index", "if_feedback", "mult_feedback", "namespace", "eval_script",
     "get_namespace_field","instance","run_single_statement",
     "set_field", "set_index", "stateful_value", "if_block", "if",
-    "input_placeholder", "cond_feedback", "swap", "term_to_source", "ref",
+    "input_placeholder", "cond_feedback", "swap", "term_to_source",
     "return",
     "subroutine_output","preserve_state_result","lambda",
     "one_time_assign", "unique_id", "unknown_field", "unknown_function",
@@ -106,7 +106,7 @@ ComparisonFunctions = ['equals', 'greater_than', 'greater_than_eq',
         'less_than', 'less_than_eq', 'not_equals']
 
 MetaprogrammingFunctions = ['branch_ref','format_source_for_graph','get_statement_count',
-        'lookup_branch_ref']
+        'lookup_branch_ref','ref']
 
 ColorFunctions = ['blend_color', 'hsv_to_rgb','random_color']
 
