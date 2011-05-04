@@ -37,4 +37,6 @@ const char* get_unique_name(Term* term);
 // This is used for joining branches in if/for blocks.
 void expose_all_names(Branch& source, Branch& destination);
 
+Term* find_from_unique_name(Branch& branch, const char* name);
+
 } // namespace circa

@@ -190,6 +190,19 @@ void test_unique_names_for_anons()
     test_equals(d->uniqueName.name, "_add_3");
 }
 
+void test_find_from_unique_name()
+{
+    Branch branch;
+    Term* a0 = branch.compile("a = 0");
+    Term* a1 = branch.compile("a = 1");
+    Term* a2 = branch.compile("a = 2");
+
+    test_assert(find_from_unique_name(branch, "a") == a0);
+    test_assert(find_from_unique_name(branch, "a_1") == a1);
+    test_assert(find_from_unique_name(branch, "a_2") == a2);
+    test_assert(find_from_unique_name(branch, "b") == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
@@ -202,6 +215,7 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
     REGISTER_TEST_CASE(names_tests::test_unique_names);
     REGISTER_TEST_CASE(names_tests::test_unique_names_for_anons);
+    REGISTER_TEST_CASE(names_tests::test_find_from_unique_name);
 }
 
 } // namespace names_tests

@@ -108,6 +108,11 @@ void strip_abandoned_state(Branch& branch, TaggedValue* stateValue)
         TaggedValue* value = NULL;
 
         state.iteratorGet(&it, &key, &value);
+    
+        Term* owner = find_from_unique_name(branch, key);
+
+        if (owner == NULL)
+            state.iteratorDelete(&it);
     }
 }
 

@@ -295,6 +295,33 @@ void test_state_var_default_needs_cast()
     test_assert(context.errorOccurred);
 }
 
+void test_strip_abandoned_state()
+{
+    Branch branch;
+
+    Term* s = branch.compile("state s = 1");
+    Term* t = branch.compile("state t = 2");
+    Term* x = branch.compile("state x = 'hi'");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    test_equals(&context.state, "[s: 1, t: 2, x: 'hi']");
+
+    erase_term(t);
+    strip_abandoned_state(branch, &context.state);
+    test_equals(&context.state, "[s: 1, x: 'hi']");
+
+    erase_term(x);
+    strip_abandoned_state(branch, &context.state);
+    test_equals(&context.state, "[s: 1]");
+
+    erase_term(s);
+    strip_abandoned_state(branch, &context.state);
+    test_equals(&context.state, "[]");
+
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -313,6 +340,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_branch_has_inlined_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_needs_cast);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_default_needs_cast);
+    REGISTER_TEST_CASE(stateful_code_tests::test_strip_abandoned_state);
 }
 
 } // namespace stateful_code_tests

@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "errors.h"
 #include "if_block.h"
 #include "source_repro.h"
 #include "term.h"
@@ -25,7 +26,7 @@ Term* find_named(Branch const& branch, std::string const& name)
     Branch* outerScope = get_outer_scope(branch);
 
     if (outerScope == &branch)
-        throw std::runtime_error("Branch's outer scope is a circular reference");
+        internal_error("Branch's outer scope is a circular reference");
 
     if (outerScope == NULL)
         return get_global(name);
@@ -314,6 +315,18 @@ void expose_all_names(Branch& source, Branch& destination)
 
         destination.bindName(term, name);
     }
+}
+
+Term* find_from_unique_name(Branch& branch, const char* name)
+{
+    // O(n) search, maybe this should be made more efficient.
+
+    for (int i=0; i < branch.length(); i++) {
+        if (strcmp(get_unique_name(branch[i]), name) == 0) {
+            return branch[i];
+        }
+    }
+    return NULL;
 }
 
 } // namespace circa
