@@ -56,6 +56,7 @@ struct Dict : TaggedValue
     void iteratorStart(TaggedValue* iterator);
     void iteratorNext(TaggedValue* iterator);
     void iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value);
+    void iteratorDelete(TaggedValue* iterator);
     bool iteratorFinished(TaggedValue* iterator);
 
     void setString(const char* key, const char* value);

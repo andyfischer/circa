@@ -168,6 +168,17 @@ CA_FUNCTION(body)
 
     b2Body* body = get_body_from_handle(handle);
 
+#if 0
+    // If it's not dynamic then update the position & rotation.
+    if (!isDynamic) {
+        b2Vec2 pos(
+            screen_to_world(initialPosition.getX()),
+            screen_to_world(initialPosition.getY()));
+
+        body->SetTransform(pos, unit_angles_to_radians(initialRotation));
+    }
+#endif
+
     if (propertiesChanged) {
 
         // remove any old fixtures

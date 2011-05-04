@@ -95,4 +95,20 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
     }
 }
 
+void strip_abandoned_state(Branch& branch, TaggedValue* stateValue)
+{
+    if (!is_dict(stateValue))
+        return;
+
+    Dict& state = *Dict::checkCast(stateValue);
+
+    TaggedValue it;
+    for (state.iteratorStart(&it); !state.iteratorFinished(&it); state.iteratorNext(&it)) {
+        const char* key = NULL;
+        TaggedValue* value = NULL;
+
+        state.iteratorGet(&it, &key, &value);
+    }
+}
+
 } // namespace circa

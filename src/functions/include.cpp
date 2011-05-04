@@ -5,7 +5,7 @@
 namespace circa {
 namespace include_function {
 
-    void load_script(EvalContext* cxt, Term* caller,
+    bool load_script(EvalContext* cxt, Term* caller,
             TaggedValue* fileSignature, const std::string& filename)
     {
         Branch& contents = caller->nestedContents;
@@ -20,8 +20,10 @@ namespace include_function {
 
             clear_branch(&contents, &brokenLinks);
 
-            if (!storage::file_exists(filename.c_str()))
-                return error_occurred(cxt, caller, "File not found: "+filename);
+            if (!storage::file_exists(filename.c_str())) {
+                error_occurred(cxt, caller, "File not found: "+filename);
+                return false;
+            }
 
             parse_script(contents, filename);
 
@@ -29,7 +31,10 @@ namespace include_function {
                 expose_all_names(contents, *caller->owningBranch);
 
             repair_broken_links(&brokenLinks);
+
+            return true;
         }
+        return false;
     }
     void preload_script(Term* term)
     {
@@ -45,23 +50,38 @@ namespace include_function {
         if (!is_string(input))
             return;
 
-        return load_script(&context, term, fileSignature, as_string(input));
+        load_script(&context, term, fileSignature, as_string(input));
     }
 
     CA_FUNCTION(evaluate_include)
     {
+        EvalContext* context = CONTEXT;
         Branch& contents = CALLER->nestedContents;
 
-        load_script(CONTEXT, CALLER, &contents.fileSignature, STRING_INPUT(0));
+        bool fileChanged =
+            load_script(CONTEXT, CALLER, &contents.fileSignature, STRING_INPUT(0));
 
         if (CONTEXT->errorOccurred)
             return;
 
-        if (has_static_errors(contents))
+        if (fileChanged && has_static_errors(contents))
             return error_occurred(CONTEXT, CALLER,
                     get_static_errors_formatted(contents));
 
-        evaluate_branch_internal_with_state(CONTEXT, CALLER);
+        // Store currentScopeState and fetch the container for this branch
+        TaggedValue prevScopeState;
+        swap(&context->currentScopeState, &prevScopeState);
+        fetch_state_container(CALLER, &prevScopeState, &context->currentScopeState);
+
+        // Possibly strip out state that isn't referenced any more.
+        if (fileChanged)
+            strip_abandoned_state(contents, &context->currentScopeState);
+
+        evaluate_branch_internal(context, contents);
+
+        // Store container and replace currentScopeState
+        preserve_state_result(CALLER, &prevScopeState, &context->currentScopeState);
+        swap(&context->currentScopeState, &prevScopeState);
 
         set_null(OUTPUT);
     }

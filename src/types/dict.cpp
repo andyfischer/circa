@@ -220,12 +220,8 @@ TaggedValue* get_index(DictData* data, int index)
     return &data->slots[index].value;
 }
 
-void remove(DictData* data, const char* key)
+void remove_at(DictData* data, int index)
 {
-    int index = find_key(data, key);
-    if (index == -1)
-        return;
-
     // Clear out this slot
     free(data->slots[index].key);
     data->slots[index].key = NULL;
@@ -254,6 +250,14 @@ void remove(DictData* data, const char* key)
 
         break;
     }
+}
+
+void remove(DictData* data, const char* key)
+{
+    int index = find_key(data, key);
+    if (index == -1)
+        return;
+    remove_at(data, index);
 }
 
 int count(DictData* data)
@@ -380,6 +384,12 @@ void iterator_get(DictData* data, TaggedValue* iterator, const char** key, Tagge
     *value = &data->slots[i].value;
 }
 
+void iterator_delete(DictData* data, TaggedValue* iterator)
+{
+    int i = as_int(iterator);
+    remove_at(data, i);
+}
+
 namespace tagged_value_wrappers {
 
     void initialize(Type* type, TaggedValue* value)
@@ -502,6 +512,11 @@ void Dict::iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** va
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::iterator_get(data, iterator, key, value);
+}
+void Dict::iteratorDelete(TaggedValue* iterator)
+{
+    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    dict_t::iterator_delete(data, iterator);
 }
 bool Dict::iteratorFinished(TaggedValue* iterator)
 {

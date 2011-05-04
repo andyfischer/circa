@@ -12,7 +12,7 @@ bool is_function_stateful(Term* func);
 bool has_any_inlined_state(Branch& branch);
 void mark_branch_as_having_inlined_state(Branch& branch);
 void mark_branch_as_possibly_not_having_inlined_state(Branch& branch);
-
 void get_type_from_branches_stateful_terms(Branch& branch, Branch& type);
+void strip_abandoned_state(Branch& branch, TaggedValue* stateValue);
 
 } // namespace circa

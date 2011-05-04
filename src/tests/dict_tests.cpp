@@ -310,6 +310,39 @@ void test_iterate()
     test_assert(foundTwo);
 }
 
+void test_delete_from_iterator()
+{
+    Dict dict;
+    TaggedValue iterator;
+
+    const char* names[] = {"a","b","c","d","e"};
+
+    for (int i=0; i < 5; i++) {
+        TaggedValue val;
+        set_int(&val, i);
+        dict.set(names[i], &val);
+    }
+
+    test_equals(&dict, "[a: 0, b: 1, c: 2, d: 3, e: 4]");
+
+    for (dict.iteratorStart(&iterator);
+            !dict.iteratorFinished(&iterator);
+            dict.iteratorNext(&iterator)) {
+
+        const char* currentKey;
+        TaggedValue* currentValue;
+
+        dict.iteratorGet(&iterator, &currentKey, &currentValue);
+
+        if ((as_int(currentValue) % 2) == 1) {
+            dict.iteratorDelete(&iterator);
+            test_assert(is_null(currentValue));
+        }
+    }
+
+    test_equals(&dict, "[a: 0, c: 2, e: 4]");
+}
+
 void test_cpp_wrapper()
 {
     Dict dict;
@@ -332,6 +365,7 @@ void register_tests()
     REGISTER_TEST_CASE(dict_tests::test_duplicate);
     REGISTER_TEST_CASE(dict_tests::test_reset);
     REGISTER_TEST_CASE(dict_tests::test_iterate);
+    REGISTER_TEST_CASE(dict_tests::test_delete_from_iterator);
     REGISTER_TEST_CASE(dict_tests::test_cpp_wrapper);
 }
 
