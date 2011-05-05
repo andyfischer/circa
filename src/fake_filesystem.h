@@ -28,6 +28,9 @@ struct FakeFileSystem
 
     std::string& operator [] (std::string const& filename);
     time_t& last_modified(std::string const& filename);
+
+    // Change the contents for a certain file, and increment its last-modified time.
+    void set(std::string const& filename, std::string const& contents);
 };
 
 } // namespace circa

@@ -66,4 +66,10 @@ time_t& FakeFileSystem::last_modified(std::string const& filename)
     return _files[filename].last_modified;
 }
 
+void FakeFileSystem::set(std::string const& filename, std::string const& contents)
+{
+    _files[filename].contents = contents;
+    _files[filename].last_modified++;
+}
+
 } // namespace circa

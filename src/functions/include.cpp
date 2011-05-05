@@ -74,8 +74,10 @@ namespace include_function {
         fetch_state_container(CALLER, &prevScopeState, &context->currentScopeState);
 
         // Possibly strip out state that isn't referenced any more.
-        if (fileChanged)
+        if (fileChanged) {
             strip_abandoned_state(contents, &context->currentScopeState);
+            reset_locals(contents);
+        }
 
         evaluate_branch_internal(context, contents);
 

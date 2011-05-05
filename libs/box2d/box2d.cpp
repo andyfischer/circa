@@ -41,6 +41,7 @@ Type g_bodyHandleType;
 
 void release_body_handle(int handle)
 {
+    std::cout << "releasing body: " << handle << std::endl;
     if (g_world == NULL)
         return;
     if (g_bodies[handle] == NULL)
@@ -83,12 +84,13 @@ int find_free_body_index()
     return g_nextFreeBody++;
 }
 
-void assign_body_handle(TaggedValue* value, b2Body* body)
+int assign_body_handle(TaggedValue* value, b2Body* body)
 {
     int index = find_free_body_index();
     g_bodies[index] = body;
     set_null(value);
     simple_handle_t::set(&g_bodyHandleType, value, index);
+    return index;
 }
 
 CA_FUNCTION(step)
@@ -142,6 +144,7 @@ CA_FUNCTION(body)
 
     if (!is_valid_body_handle(handle)) {
 
+
         if (size.getX() <= 0.0 || size.getY() <= 0.0)
             return error_occurred(CONTEXT, CALLER, "Size must be non-zero");
 
@@ -159,7 +162,9 @@ CA_FUNCTION(body)
 
         b2Body* body = g_world->CreateBody(&bodyDef);
 
-        assign_body_handle(handle, body);
+        int handle_index = assign_body_handle(handle, body);
+
+        std::cout << " allocating body: " << handle_index << std::endl;
 
         ca_assert(is_valid_body_handle(handle));
 

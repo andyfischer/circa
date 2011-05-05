@@ -319,7 +319,6 @@ void test_strip_abandoned_state()
     erase_term(s);
     strip_abandoned_state(branch, &context.state);
     test_equals(&context.state, "[]");
-
 }
 
 void register_tests()
