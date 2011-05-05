@@ -75,7 +75,10 @@ namespace include_function {
 
         // Possibly strip out state that isn't referenced any more.
         if (fileChanged) {
-            strip_abandoned_state(contents, &context->currentScopeState);
+            TaggedValue trash;
+            TaggedValue description;
+            describe_state_shape(contents, &description);
+            strip_orphaned_state(&description, &context->currentScopeState, &trash);
             reset_locals(contents);
         }
 

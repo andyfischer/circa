@@ -69,6 +69,8 @@ struct Dict : TaggedValue
     // lazyCast will cast value to Dict if it's the wrong type. If it's already a Dict,
     // its contents are unchanged.
     static Dict* lazyCast(TaggedValue* value);
+
+    static Dict* cast(TaggedValue* value);
 };
 
 Dict* make_dict(TaggedValue* value);

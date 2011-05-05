@@ -19,6 +19,9 @@ extern bool DEBUG_TRAP_ERROR_OCCURRED;
 void dump(Branch& branch);
 void dump_with_props(Branch& branch);
 
+void dump(TaggedValue& value);
+void dump(TaggedValue* value);
+
 #if CIRCA_ENABLE_TRAP_ON_VALUE_WRITE
 
 void debug_trap_value_write(TaggedValue* val);

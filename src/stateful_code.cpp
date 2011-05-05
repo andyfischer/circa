@@ -2,12 +2,14 @@
 
 #include "common_headers.h"
 
-#include "function.h"
 #include "branch.h"
 #include "building.h"
 #include "builtins.h"
+#include "errors.h"
+#include "function.h"
 #include "stateful_code.h"
 #include "term.h"
+#include "type.h"
 
 namespace circa {
 
@@ -95,25 +97,128 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
     }
 }
 
-void strip_abandoned_state(Branch& branch, TaggedValue* stateValue)
+void get_state_description(Term* term, TaggedValue* output)
 {
-    if (!is_dict(stateValue))
+    if (term->function == FOR_FUNC) {
+        List& list = *List::cast(output, 1);
+        describe_state_shape(term->nestedContents, list[0]);
+    } else if (term->function == IF_BLOCK_FUNC) {
+        // TODO
+    } else if (is_get_state(term)) {
+        set_string(output, declared_type(term)->name);
+    }
+}
+
+void describe_state_shape(Branch& branch, TaggedValue* output)
+{
+    // Start off with an empty result
+    set_null(output);
+
+    Dict* dict = NULL;
+
+    // Iterate through 'branch' and see if we find anything.
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+
+        if (has_implicit_state(term) || is_get_state(term)) {
+            if (dict == NULL)
+                dict = Dict::cast(output);
+
+            TaggedValue* stateDescription = dict->insert(get_unique_name(term));
+            get_state_description(term, stateDescription);
+        }
+    }
+}
+
+void strip_orphaned_state(TaggedValue* description, TaggedValue* state,
+    TaggedValue* trash)
+{
+    set_null(trash);
+
+    // if description is null then delete everything
+    if (is_null(description)) {
+        swap(state, trash);
+        set_null(state);
+        return;
+    }
+
+    // if state is null, then there's nothing to do.
+    if (is_null(state))
         return;
 
-    Dict& state = *Dict::checkCast(stateValue);
+    // Handle a dictionary value
+    if (is_dict(description)) {
+        if (!is_dict(state)) {
+            swap(state, trash);
+            set_null(state);
+            return;
+        }
 
-    TaggedValue it;
-    for (state.iteratorStart(&it); !state.iteratorFinished(&it); state.iteratorNext(&it)) {
-        const char* key = NULL;
-        TaggedValue* value = NULL;
+        Dict& descriptionDict = *Dict::checkCast(description);
+        Dict& stateDict = *Dict::checkCast(state);
+        Dict* trashDict = NULL;
 
-        state.iteratorGet(&it, &key, &value);
-    
-        Term* owner = find_from_unique_name(branch, key);
+        TaggedValue it;
+        for (stateDict.iteratorStart(&it); !stateDict.iteratorFinished(&it);
+                stateDict.iteratorNext(&it)) {
 
-        if (owner == NULL)
-            state.iteratorDelete(&it);
+            const char* dictKey;
+            TaggedValue* dictValue;
+
+            stateDict.iteratorGet(&it, &dictKey, &dictValue);
+
+            // Check if this key name doesn't exist in the description.
+            if (!descriptionDict.contains(dictKey)) {
+
+                if (trashDict == NULL)
+                    trashDict = make_dict(trash);
+
+                swap(dictValue, trashDict->insert(dictKey));
+
+                stateDict.iteratorDelete(&it);
+                continue;
+            }
+
+            // This key does exist in the description, recursively call to check
+            // the key's value.
+            
+            TaggedValue nestedTrash;
+            strip_orphaned_state(descriptionDict.get(dictKey), dictValue, &nestedTrash);
+
+            if (!is_null(&nestedTrash)) {
+                if (trashDict == NULL)
+                    trashDict = make_dict(trash);
+                swap(&nestedTrash, trashDict->insert(dictKey));
+            }
+        }
+        return;
     }
+
+    // Handle a type name
+    if (is_string(description)) {
+        if (state->value_type->name != as_string(description)) {
+            swap(state, trash);
+            set_null(state);
+        }
+        return;
+    }
+
+    internal_error("Unrecognized state description");
+}
+
+void strip_orphaned_state(Branch& branch, TaggedValue* state, TaggedValue* trash)
+{
+    TaggedValue description;
+    describe_state_shape(branch, &description);
+    strip_orphaned_state(&description, state, trash);
+}
+
+void strip_orphaned_state(Branch& branch, TaggedValue* state)
+{
+    TaggedValue description;
+    TaggedValue trash;
+    describe_state_shape(branch, &description);
+    strip_orphaned_state(&description, state, &trash);
 }
 
 } // namespace circa

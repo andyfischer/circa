@@ -452,6 +452,12 @@ Dict* Dict::lazyCast(TaggedValue* value)
     return make_dict(value);
 }
 
+Dict*
+Dict::cast(TaggedValue* v)
+{
+    return make_dict(v);
+}
+
 std::string Dict::toString()
 {
     return dict_t::to_string((dict_t::DictData*) this->value_data.ptr);

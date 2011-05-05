@@ -21,6 +21,15 @@ void dump_with_props(Branch& branch)
     print_branch_with_properties(std::cout, branch);
 }
 
+void dump(TaggedValue& value)
+{
+    std::cout << value.toString() << std::endl;
+}
+void dump(TaggedValue* value)
+{
+    std::cout << value->toString() << std::endl;
+}
+
 #if CIRCA_ENABLE_TRAP_ON_VALUE_WRITE
 
 void debug_trap_value_write(TaggedValue* val)

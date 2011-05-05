@@ -7,7 +7,7 @@
 
 namespace circa {
 
-ListData* allocate_list(int capacity)
+ListData* allocate_empty_list(int capacity)
 {
     ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
     debug_register_valid_object(result, LIST_OBJECT);
@@ -21,6 +21,13 @@ ListData* allocate_list(int capacity)
 
     //std::cout << "created list " << result << std::endl;
 
+    return result;
+}
+
+ListData* allocate_list(int size)
+{
+    ListData* result = allocate_empty_list(size);
+    result->count = size;
     return result;
 }
 

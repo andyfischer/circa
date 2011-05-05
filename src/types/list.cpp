@@ -58,7 +58,7 @@ namespace list_t {
 
         assert_valid_list(source);
 
-        ListData* result = allocate_list(source->capacity);
+        ListData* result = allocate_empty_list(source->capacity);
 
         result->count = source->count;
 
@@ -71,10 +71,10 @@ namespace list_t {
     ListData* increase_capacity(ListData* original, int new_capacity)
     {
         if (original == NULL)
-            return allocate_list(new_capacity);
+            return allocate_empty_list(new_capacity);
 
         assert_valid_list(original);
-        ListData* result = allocate_list(new_capacity);
+        ListData* result = allocate_empty_list(new_capacity);
 
         bool createCopy = original->refCount > 1;
 
@@ -95,7 +95,7 @@ namespace list_t {
     ListData* double_capacity(ListData* original)
     {
         if (original == NULL)
-            return allocate_list(1);
+            return allocate_empty_list(1);
 
         ListData* result = increase_capacity(original, original->capacity * 2);
         return result;
@@ -106,7 +106,7 @@ namespace list_t {
         if (original == NULL) {
             if (numElements == 0)
                 return NULL;
-            ListData* result = allocate_list(numElements);
+            ListData* result = allocate_empty_list(numElements);
             result->count = numElements;
             return result;
         }
@@ -172,7 +172,7 @@ namespace list_t {
     TaggedValue* append(ListData** data)
     {
         if (*data == NULL) {
-            *data = allocate_list(1);
+            *data = allocate_empty_list(1);
         } else {
             *data = touch(*data);
             

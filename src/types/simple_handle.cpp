@@ -13,6 +13,11 @@ namespace simple_handle_t {
         change_type_no_initialize(value, type);
         value->value_data.ptr = allocate_list(1);
         set_int(list_get_element(value, 0), handle);
+
+        #if 0
+        std::cout << "allocated " << value->value_data.ptr
+            << " at " << value << std::endl;
+        #endif
     }
     int get(TaggedValue* value)
     {
@@ -34,6 +39,12 @@ namespace simple_handle_t {
         ca_assert(data->refCount > 0);
 
         data->refCount--;
+
+        #if 0
+        std::cout << "released " << data
+            << " from " << value << ", refCount = "
+            << data->refCount << std::endl;
+        #endif
 
         if (data->refCount == 0) {
 

@@ -144,7 +144,6 @@ CA_FUNCTION(body)
 
     if (!is_valid_body_handle(handle)) {
 
-
         if (size.getX() <= 0.0 || size.getY() <= 0.0)
             return error_occurred(CONTEXT, CALLER, "Size must be non-zero");
 

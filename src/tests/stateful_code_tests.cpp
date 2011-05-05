@@ -295,6 +295,21 @@ void test_state_var_default_needs_cast()
     test_assert(context.errorOccurred);
 }
 
+void test_describe_state_shape()
+{
+    Branch branch;
+    branch.compile("a = 1; for i in [2 3] {}; if true {}");
+    
+    TaggedValue description;
+    describe_state_shape(branch, &description);
+    test_assert(is_null(&description));
+
+    branch.clear();
+    branch.compile("state a = 1");
+
+    describe_state_shape(branch, &description);
+}
+
 void test_strip_abandoned_state()
 {
     Branch branch;
@@ -306,19 +321,24 @@ void test_strip_abandoned_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
+    TaggedValue trash;
+
     test_equals(&context.state, "[s: 1, t: 2, x: 'hi']");
 
     erase_term(t);
-    strip_abandoned_state(branch, &context.state);
+    strip_orphaned_state(branch, &context.state, &trash);
     test_equals(&context.state, "[s: 1, x: 'hi']");
+    test_equals(&trash, "[t: 2]");
 
     erase_term(x);
-    strip_abandoned_state(branch, &context.state);
+    strip_orphaned_state(branch, &context.state, &trash);
     test_equals(&context.state, "[s: 1]");
+    test_equals(&trash, "[x: 'hi']");
 
     erase_term(s);
-    strip_abandoned_state(branch, &context.state);
-    test_equals(&context.state, "[]");
+    strip_orphaned_state(branch, &context.state, &trash);
+    test_equals(&context.state, "null");
+    test_equals(&trash, "[s: 1]");
 }
 
 void register_tests()
@@ -339,6 +359,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_branch_has_inlined_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_needs_cast);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_default_needs_cast);
+    REGISTER_TEST_CASE(stateful_code_tests::test_describe_state_shape);
     REGISTER_TEST_CASE(stateful_code_tests::test_strip_abandoned_state);
 }
 

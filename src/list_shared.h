@@ -13,6 +13,7 @@ struct ListData {
     // items has size [capacity].
 };
 
+ListData* allocate_empty_list(int capacity);
 ListData* allocate_list(int num_elements);
 void free_list(ListData* data);
 
