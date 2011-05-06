@@ -314,7 +314,10 @@ void test_describe_state_shape()
             "[_if_block: [[a: 'int'], [b: 'any']]]");
     test_equals(code_to_state_shape("for i in [1 2 3] { 1 }"), "null");
     test_equals(code_to_state_shape("for i in [1 2 3] { state s }"),
-            "[_for: [[s: 'any'], '...']]");
+            "[_for: [[s: 'any'], :repeat]]");
+    test_equals(code_to_state_shape(
+        "for i in [1 2 3] { for j in [1 2 3] { state s } }"),
+            "[_for: [[_for: [[s: 'any'], :repeat]], :repeat]]");
 }
 
 void test_strip_abandoned_state()

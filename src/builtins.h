@@ -102,6 +102,8 @@ extern Type SYMBOL_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 
+extern TaggedValue REPEAT_SYMBOL;
+
 extern Type* FILE_SIGNATURE_T;
 
 extern bool FINISHED_BOOTSTRAP;

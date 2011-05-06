@@ -23,7 +23,7 @@ namespace symbol_t {
         int index = g_nextFreeSymbol++;
         g_symbols[index].name = name;
         change_type(result, &SYMBOL_T);
-        set_int(result, index);
+        result->value_data.asint = index;
     }
 
     std::string to_string(TaggedValue* value)
