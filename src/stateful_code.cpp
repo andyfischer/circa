@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "errors.h"
 #include "function.h"
+#include "if_block.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -100,10 +101,18 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
 void get_state_description(Term* term, TaggedValue* output)
 {
     if (term->function == FOR_FUNC) {
-        List& list = *List::cast(output, 1);
+        List& list = *List::cast(output, 2);
         describe_state_shape(term->nestedContents, list[0]);
+        set_string(list[1], "...");
     } else if (term->function == IF_BLOCK_FUNC) {
-        // TODO
+        int numBranches = if_block_num_branches(term);
+
+        List& list = *List::cast(output, numBranches);
+
+        for (int bindex=0; bindex < numBranches; bindex++) {
+            Branch* branch = if_block_get_branch(term, bindex);
+            describe_state_shape(*branch, list[bindex]);
+        }
     } else if (is_get_state(term)) {
         set_string(output, declared_type(term)->name);
     }

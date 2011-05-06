@@ -20,6 +20,7 @@
 #include "types/ref.h"
 #include "types/set.h"
 #include "types/string.h"
+#include "types/symbol.h"
 #include "types/void.h"
 
 namespace circa {
@@ -112,6 +113,7 @@ Term* OPAQUE_POINTER_TYPE;
 
 } // extern "C"
 
+// Builtin type objects:
 Type BOOL_T;
 Type DICT_T;
 Type ERROR_T;
@@ -122,8 +124,12 @@ Type NULL_TYPE;
 Type OPAQUE_POINTER_T;
 Type REF_T;
 Type STRING_T;
+Type SYMBOL_T;
 Type TYPE_T;
 Type VOID_T;
+
+// Builtin symbols:
+TaggedValue ELLIPSIS_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
 
@@ -143,18 +149,21 @@ CA_FUNCTION(empty_evaluate_function)
 void create_primitive_types()
 {
     null_t::setup_type(&NULL_TYPE);
-    dict_t::setup_type(&DICT_T);
-    string_t::setup_type(&STRING_T);
-    int_t::setup_type(&INT_T);
-    float_t::setup_type(&FLOAT_T);
     bool_t::setup_type(&BOOL_T);
-    ref_t::setup_type(&REF_T);
+    dict_t::setup_type(&DICT_T);
+    float_t::setup_type(&FLOAT_T);
+    int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);
+    string_t::setup_type(&STRING_T);
+    symbol_t::setup_type(&SYMBOL_T);
+    ref_t::setup_type(&REF_T);
     void_t::setup_type(&VOID_T);
     opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
 
     // errors are just stored as strings for now
     string_t::setup_type(&ERROR_T);
+
+    symbol_t::assign_new_symbol("...", &ELLIPSIS_SYMBOL);
 }
 
 void update_bootstrapped_term(Term* term)

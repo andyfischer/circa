@@ -295,19 +295,26 @@ void test_state_var_default_needs_cast()
     test_assert(context.errorOccurred);
 }
 
-void test_describe_state_shape()
+std::string code_to_state_shape(const char* code)
 {
     Branch branch;
-    branch.compile("a = 1; for i in [2 3] {}; if true {}");
-    
+    branch.compile(code);
     TaggedValue description;
     describe_state_shape(branch, &description);
-    test_assert(is_null(&description));
+    return description.toString();
+}
 
-    branch.clear();
-    branch.compile("state a = 1");
-
-    describe_state_shape(branch, &description);
+void test_describe_state_shape()
+{
+    test_equals(code_to_state_shape("a = 1; for i in [2 3] {}; if true {}"), "null");
+    test_equals(code_to_state_shape("state a = 1"), "[a: 'int']");
+    test_equals(code_to_state_shape("if true { state a = 1 }"),
+            "[_if_block: [[a: 'int'], null]]");
+    test_equals(code_to_state_shape("if true { state a = 1 } else {state b}"),
+            "[_if_block: [[a: 'int'], [b: 'any']]]");
+    test_equals(code_to_state_shape("for i in [1 2 3] { 1 }"), "null");
+    test_equals(code_to_state_shape("for i in [1 2 3] { state s }"),
+            "[_for: [[s: 'any'], '...']]");
 }
 
 void test_strip_abandoned_state()

@@ -98,6 +98,7 @@ extern Type NULL_TYPE;
 extern Type OPAQUE_POINTER_T;
 extern Type REF_T;
 extern Type STRING_T;
+extern Type SYMBOL_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 

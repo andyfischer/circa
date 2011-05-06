@@ -110,6 +110,15 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 }
 
+int if_block_num_branches(Term* ifCall)
+{
+    return ifCall->nestedContents.length() - 1;
+}
+Branch* if_block_get_branch(Term* ifCall, int index)
+{
+    return &ifCall->nestedContents[index]->nestedContents;
+}
+
 CA_FUNCTION(evaluate_if_block)
 {
     EvalContext* context = CONTEXT;
