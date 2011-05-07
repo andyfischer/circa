@@ -22,7 +22,7 @@ struct EvalContext
     std::string errorMessage;
 
     // Tree of persistent state
-    Dict state;
+    TaggedValue state;
 
     // State that should be used for the current branch. This is a temporary value
     // only used during evaluation.

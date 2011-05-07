@@ -175,7 +175,7 @@ namespace test_interpreted_state_access
         test_equals(a->uniqueName.name, "a");
 
         EvalContext context;
-        test_equals(context.state.toString(), "[]");
+        test_equals(context.state.toString(), "null");
 
         evaluate_branch(&context, branch);
         test_equals(context.state.toString(), "[a: 1]");

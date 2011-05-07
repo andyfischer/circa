@@ -637,6 +637,10 @@ bool is_null(TaggedValue* value)
 {
     return value->value_type == &NULL_TYPE;
 }
+bool is_symbol(TaggedValue* value)
+{
+    return value->value_type == &SYMBOL_T;
+}
 
 float to_float(TaggedValue* value)
 {

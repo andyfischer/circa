@@ -114,6 +114,7 @@ bool is_list(TaggedValue* value);
 bool is_type(TaggedValue* value);
 bool is_value_of_type(TaggedValue* value, Type* type);
 bool is_null(TaggedValue* value);
+bool is_symbol(TaggedValue* value);
 
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);

@@ -32,6 +32,16 @@ void test_equals_function(TaggedValue* a, float b,
 #define test_fail() test_fail_function(__LINE__, __FILE__)
 #define test_equals(a,b) test_equals_function(a,b,#a,#b,__LINE__,__FILE__)
 
+// If 'branch' has a static error, then print something to stdout, and declare
+// the current test failed, and return true. If this returns false then there
+// was no error.
+bool test_fail_on_static_error(Branch& branch);
+
+// If context has recorded a runtime error, then print something to stdout, and
+// declare the current test failed, and return true. If this returns false then
+// there was no error.
+bool test_fail_on_runtime_error(EvalContext& context);
+
 struct TestCase {
     typedef void (*TestExecuteFunction)();
 

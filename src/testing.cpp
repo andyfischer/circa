@@ -172,6 +172,30 @@ void test_equals_function(TaggedValue* a, float b,
     return test_equals_function(a->toFloat(), b, aText, bText, line, file);
 }
 
+bool test_fail_on_static_error(Branch& branch)
+{
+    if (has_static_errors(branch)) {
+        std::cout << "Static error in " << get_current_test_name() << std::endl;
+        print_static_errors_formatted(branch, std::cout);
+        std::cout << std::endl;
+        declare_current_test_failed();
+        return true;
+    }
+    return false;
+}
+
+bool test_fail_on_runtime_error(EvalContext& context)
+{
+    if (context.errorOccurred) {
+        std::cout << "Runtime error in " << get_current_test_name() << std::endl;
+        print_runtime_error_formatted(context, std::cout);
+        std::cout << std::endl;
+        declare_current_test_failed();
+        return true;
+    }
+    return false;
+}
+
 bool run_test(TestCase& testCase, bool catch_exceptions)
 {
     gCurrentTestCase = testCase;

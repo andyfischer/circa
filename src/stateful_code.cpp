@@ -115,6 +115,8 @@ void get_state_description(Term* term, TaggedValue* output)
         }
     } else if (is_get_state(term)) {
         set_string(output, declared_type(term)->name);
+    } else if (is_function_stateful(term->function)) {
+        describe_state_shape(term->function->nestedContents, output);
     }
 }
 
@@ -144,16 +146,26 @@ void strip_orphaned_state(TaggedValue* description, TaggedValue* state,
 {
     set_null(trash);
 
-    // if description is null then delete everything
+    // If description is null then delete everything.
     if (is_null(description)) {
         swap(state, trash);
         set_null(state);
         return;
     }
 
-    // if state is null, then there's nothing to do.
+    // If state is null, then there's nothing to do.
     if (is_null(state))
         return;
+
+    // Handle a type name
+    if (is_string(description)) {
+        if ((state->value_type->name != as_string(description))
+                && (as_string(description) != "any")) {
+            swap(state, trash);
+            set_null(state);
+        }
+        return;
+    }
 
     // Handle a dictionary value
     if (is_dict(description)) {
@@ -203,16 +215,54 @@ void strip_orphaned_state(TaggedValue* description, TaggedValue* state,
         return;
     }
 
-    // Handle a type name
-    if (is_string(description)) {
-        if (state->value_type->name != as_string(description)) {
+    // Handle a list
+    if (is_list(description)) {
+
+        if (!is_list(state)) {
             swap(state, trash);
             set_null(state);
+            return;
+        }
+
+        List& descriptionList = *List::checkCast(description);
+        List& stateList = *List::checkCast(state);
+        List* trashList = NULL;
+
+        int descriptionIndex = 0;
+        for (int index=0; index < stateList.length(); index++) {
+
+            TaggedValue* stateValue = stateList[index];
+
+            // Check if this state list is too long
+            if (descriptionIndex >= descriptionList.length()) {
+                if (trashList == NULL)
+                    trashList = List::cast(trash, stateList.length());
+
+                swap(stateValue, trashList->get(index));
+                set_null(stateValue);
+                return;
+            }
+
+            // check for :repeat symbol
+            if (is_symbol(descriptionList[descriptionIndex]))
+                descriptionIndex--;
+
+            TaggedValue* descriptionValue = descriptionList[descriptionIndex];
+
+            TaggedValue nestedTrash;
+            strip_orphaned_state(descriptionValue, stateValue, &nestedTrash);
+
+            if (!is_null(&nestedTrash)) {
+                if (trashList == NULL)
+                    trashList = List::cast(trash, stateList.length());
+
+                swap(&nestedTrash, trashList->get(index));
+            }
         }
         return;
     }
 
-    internal_error("Unrecognized state description");
+    internal_error("Unrecognized state description: " + description->toString());
 }
 
 void strip_orphaned_state(Branch& branch, TaggedValue* state, TaggedValue* trash)
