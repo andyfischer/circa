@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "errors.h"
+
 #include "hashtable.h"
 
 namespace circa {

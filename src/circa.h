@@ -20,6 +20,7 @@
 #include "function.h"
 #include "if_block.h"
 #include "importing.h"
+#include "importing_macros.h"
 #include "introspection.h"
 #include "locals.h"
 #include "names.h"

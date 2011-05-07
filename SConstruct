@@ -34,7 +34,7 @@ SHARED_LIBRARY = config.get('circa', 'shared_library') == 'true'
 # Build flags
 if POSIX:
     for env in all_envs:
-        env.Append(CPPFLAGS=['-ggdb', '-Wall','-fasm-blocks'])
+        env.Append(CPPFLAGS=['-ggdb', '-Wall'])
         env.Append(LINKFLAGS=['-ldl'])
 
         if config.get('circa', 'gprof_support') == 'true':
@@ -76,7 +76,7 @@ for env in all_envs:
     env = env.Clone()
     variant_name = env['variant_name']
 
-    env.BuildDir('build/'+variant_name+'/src', 'src')
+    env.VariantDir('build/'+variant_name+'/src', 'src')
     env.Append(CPPPATH = ['src'])
 
     source_files = (list(list_source_files('src')) + 
@@ -171,7 +171,7 @@ def use_box2d(env):
 for env in all_envs:
     env = env.Clone()
     variantName = env['variant_name']
-    env.BuildDir('build/'+variantName+'/plastic/src', 'plastic/src')
+    env.VariantDir('build/'+variantName+'/plastic/src', 'plastic/src')
     use_sdl(env)
     use_fmod(env)
     use_box2d(env)
