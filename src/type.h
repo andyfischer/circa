@@ -113,8 +113,8 @@ struct Type
     // Default value
     TaggedValue defaultValue;
 
-
     bool permanent;
+    bool heapAllocated;
 
     Type();
     ~Type();
@@ -129,13 +129,8 @@ struct Type
         return prototype.findIndex(name);
     }
 
-    static Type* create()
-    {
-        Type* t = new Type();
-        return t;
-    }
+    static Type* create();
 };
-
 
 struct StaticTypeQuery
 {
@@ -178,8 +173,6 @@ namespace type_t {
     void remap_pointers(Term *term, TermMap const& map);
     void setup_type(Term* type);
 
-    void copy(Type* value, TaggedValue* dest);
-
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);
     Branch& get_prototype(Term* type);
@@ -194,6 +187,11 @@ Type* unbox_type(TaggedValue* val);
 Type* declared_type(Term* term);
 
 void register_type_pointer(void* referrer, Type* referee);
+void release_type(Type* type);
+
+// Called during shutdown to delete all the Type object in permanent state. This
+// makes memory-leak checking tools happy.
+void delete_every_permanent_type();
 
 Term* get_output_type(Term* term, int outputIndex);
 Term* get_output_type(Term* term);

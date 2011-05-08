@@ -41,6 +41,8 @@ void test_import_type()
     Term* term = import_type(branch, type);
     test_assert(term->type == TYPE_TYPE);
     test_assert(term->name == "A");
+
+    release_type(type);
 }
 
 void register_tests()

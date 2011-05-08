@@ -446,4 +446,6 @@ export_func void circa_shutdown()
 
     delete KERNEL;
     KERNEL = NULL;
+
+    delete_every_permanent_type();
 }

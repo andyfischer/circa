@@ -1,1 +1,3 @@
-valgrind --leak-check=full --num-callers=50 2>&1 build/circa_d $*
+cd $CIRCA_HOME
+scons build/circa_t
+valgrind --leak-check=full --num-callers=50 2>&1 build/circa_t $*

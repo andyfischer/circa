@@ -8,6 +8,10 @@
 
 namespace circa {
 
+const int c_maxPermanentTypes = 5000;
+Type* g_everyPermanentType[c_maxPermanentTypes];
+int g_numPermanentTypes = 0;
+
 Term* IMPLICIT_TYPES = NULL;
 
 namespace type_t {
@@ -21,13 +25,12 @@ namespace type_t {
     {
         ca_assert(is_type(value));
         Type* type = (Type*) get_pointer(value);
-        if (type != NULL && !type->permanent)
-            delete type;
+        release_type(type);
     }
     void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_type(source));
-        copy((Type*) get_pointer(source), dest);
+        dest->value_data = source->value_data;
         register_type_pointer(dest, (Type*) get_pointer(source));
     }
 
@@ -81,16 +84,6 @@ namespace type_t {
         import_member_function(type, name_accessor, "name(Type) -> string");
     }
 
-    void copy(Type* value, TaggedValue* dest)
-    {
-        Type* oldType = (Type*) get_pointer(dest);
-
-        if (value == oldType)
-            return;
-
-        set_pointer(dest, value);
-    }
-
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {
         return as_type(type).remapPointers;
@@ -137,7 +130,8 @@ Type::Type() :
     remapPointers(NULL),
     hashFunc(NULL),
     parent(NULL),
-    permanent(false)
+    permanent(false),
+    heapAllocated(false)
 {
     debug_register_valid_object_ignore_dupe(this, TYPE_OBJECT);
 }
@@ -145,6 +139,13 @@ Type::Type() :
 Type::~Type()
 {
     debug_unregister_valid_object(this);
+}
+
+Type* Type::create()
+{
+    Type* t = new Type();
+    t->heapAllocated = true;
+    return t;
 }
 
 Type* declared_type(Term* term)
@@ -160,7 +161,31 @@ void register_type_pointer(void* owner, Type* pointee)
     // Currently, if a type is used by anyone then it becomes permanent and is
     // never deallocated.
 
-    pointee->permanent = true;
+    ca_assert(pointee != NULL);
+
+    if (!pointee->permanent) {
+        pointee->permanent = true;
+
+        if (pointee->heapAllocated) {
+            ca_assert(g_numPermanentTypes < c_maxPermanentTypes);
+            g_everyPermanentType[g_numPermanentTypes++] = pointee;
+        }
+    }
+}
+
+void release_type(Type* type)
+{
+    if (type != NULL && !type->permanent)
+        delete type;
+}
+
+void delete_every_permanent_type()
+{
+    for (int i=0; i < g_numPermanentTypes; i++)
+        clear_type_contents(g_everyPermanentType[i]);
+    for (int i=0; i < g_numPermanentTypes; i++)
+        delete g_everyPermanentType[i];
+    g_numPermanentTypes = 0;
 }
 
 Term* get_output_type(Term* term, int outputIndex)

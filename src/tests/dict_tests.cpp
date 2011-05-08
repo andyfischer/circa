@@ -223,6 +223,8 @@ void many_items()
             test_assert(dict_t::get_value(data, key) == NULL);
         }
     }
+
+    dict_t::free_dict(data);
 }
 
 void test_duplicate()

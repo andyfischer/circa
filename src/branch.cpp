@@ -389,6 +389,7 @@ void erase_term(Term* term)
 {
     assert_valid_term(term);
 
+    set_null((TaggedValue*) term);
     set_inputs(term, TermList(), false);
     change_function(term, NULL);
     term->type = NULL;
