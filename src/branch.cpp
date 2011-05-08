@@ -160,7 +160,6 @@ void Branch::setNull(int index)
         term->owningBranch = NULL;
         term->index = 0;
         _terms.setAt(index, NULL);
-        dealloc_term(term);
     }
 }
 
@@ -209,7 +208,7 @@ void Branch::moveToEnd(Term* term)
     ca_assert(term->owningBranch == this);
     ca_assert(term->index >= 0);
     int index = getIndex(term);
-    _terms.append(term); // do this first so that the term doesn't lose references
+    _terms.append(term);
     _terms.setAt(index, NULL);
     term->index = _terms.length()-1;
 }
@@ -232,7 +231,7 @@ void Branch::remove(std::string const& name)
 
 void Branch::remove(int index)
 {
-    setNull(index);
+    erase_term(get(index));
 
     for (int i=index; i < _terms.length()-1; i++) {
         _terms.setAt(i, _terms[i+1]);
@@ -256,6 +255,11 @@ void Branch::removeNulls()
 
     if (numDeleted > 0)
         _terms.resize(_terms.length() - numDeleted);
+}
+void Branch::removeNameBinding(Term* term)
+{
+    if (term->name != "" && names[term->name] == term)
+        names.remove(term->name);
 }
 
 void Branch::shorten(int newLength)
@@ -381,6 +385,33 @@ Branch* get_outer_scope(Branch const& branch)
     return branch.owningTerm->owningBranch;
 }
 
+void erase_term(Term* term)
+{
+    assert_valid_term(term);
+
+    set_inputs(term, TermList(), false);
+    change_function(term, NULL);
+    term->type = NULL;
+    clear_branch(&term->nestedContents);
+
+    // for each user, clear that user's input list of this term
+    clear_from_users_inputs(term);
+
+    if (term->owningBranch != NULL) {
+        // remove name binding if necessary
+        term->owningBranch->removeNameBinding(term);
+
+        // index may be invalid if something bad has happened
+        ca_assert(term->index < term->owningBranch->length());
+        term->owningBranch->setNull(term->index);
+
+        term->owningBranch = NULL;
+        term->index = -1;
+    }
+
+    dealloc_term(term);
+}
+
 void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
 {
     assert_valid_branch(branch);
@@ -393,6 +424,7 @@ void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
         if (*it == NULL)
             continue;
 
+        set_inputs(*it, TermList(), false);
         remove_from_users(*it);
     }
 
@@ -418,11 +450,7 @@ void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
             }
         }
 
-        // turn on this assert to catch orphaned terms:
-        //ca_assert(term->refCount == 1);
-        
-        term->owningBranch = NULL;
-        branch->_terms.setAt(term->index, NULL);
+        erase_term(term);
     }
 
     branch->_terms.clear();

@@ -1309,11 +1309,11 @@ ParseResult member_function_call(Branch& branch, Term* function, TermList const&
                     ->boolPropOptional("use-as-output", false))
             nameRebind = head->name;
 
-        // copy functionName because fieldName will become invalid after erase_term.
+        // copy functionName because fieldName will become invalid after remove_term.
         std::string functionName = fieldName;
 
-        erase_term(fieldNameTerm);
-        erase_term(originalFunctionTerm);
+        remove_term(fieldNameTerm);
+        remove_term(originalFunctionTerm);
 
         refresh_locals_indices(branch);
 
@@ -1388,7 +1388,7 @@ ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, P
 
         if ((originalFunction != function) && (originalFunction->name == "")) {
             originalName = get_relative_name(branch, function);
-            erase_term(originalFunction);
+            remove_term(originalFunction);
             refresh_locals_indices(branch);
         }
 

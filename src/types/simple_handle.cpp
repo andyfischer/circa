@@ -4,6 +4,8 @@
 
 #include "simple_handle.h"
 
+#define SIMPLE_HANDLE_VERBOSE_LOG 1
+
 namespace circa {
 namespace simple_handle_t {
 
@@ -14,7 +16,7 @@ namespace simple_handle_t {
         value->value_data.ptr = allocate_list(1);
         set_int(list_get_element(value, 0), handle);
 
-        #if 0
+        #if SIMPLE_HANDLE_VERBOSE_LOG
         std::cout << "allocated " << value->value_data.ptr
             << " at " << value << std::endl;
         #endif
@@ -40,7 +42,7 @@ namespace simple_handle_t {
 
         data->refCount--;
 
-        #if 0
+        #if SIMPLE_HANDLE_VERBOSE_LOG
         std::cout << "released " << data
             << " from " << value << ", refCount = "
             << data->refCount << std::endl;
@@ -67,6 +69,12 @@ namespace simple_handle_t {
         ca_assert(data->refCount > 0);
 
         data->refCount++;
+
+        #if SIMPLE_HANDLE_VERBOSE_LOG
+        std::cout << "copied " << data
+            << " from " << source << " to " << dest << ", refCount = "
+            << data->refCount << std::endl;
+        #endif
     }
 
     void setup_type(Type* type)

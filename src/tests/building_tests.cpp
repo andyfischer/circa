@@ -161,7 +161,7 @@ void test_repair_broken_links()
     clear_branch(&br->nestedContents, &brokenLinks);
 
     test_assert(!brokenLinks.empty());
-    test_assert(b->input(0) == a);
+    test_assert(b->input(0) == NULL);
 
     repair_broken_links(&brokenLinks);
 

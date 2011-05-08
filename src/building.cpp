@@ -107,7 +107,7 @@ void set_input(Term* term, int index, Term* input)
     post_input_change(term);
 }
 
-void set_inputs(Term* term, TermList const& inputs)
+void set_inputs(Term* term, TermList const& inputs, bool cascadeUpdates)
 {
     assert_valid_term(term);
 
@@ -131,7 +131,8 @@ void set_inputs(Term* term, TermList const& inputs)
     for (size_t i=0; i < previousInputs.size(); i++)
         possibly_prune_user_list(term, previousInputs[i].term);
 
-    post_input_change(term);
+    if (cascadeUpdates)
+        post_input_change(term);
 }
 
 void insert_input(Term* term, Term* input)

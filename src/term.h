@@ -80,9 +80,6 @@ struct Term : TaggedValue
     // Dynamic properties
     Dict properties;
 
-    // Reference count.
-    int refCount;
-
     // Terms which are using this term as an input.
     TermList users;
 

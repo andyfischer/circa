@@ -610,7 +610,7 @@ bool is_string(TaggedValue* value)
 
 bool is_ref(TaggedValue* value)
 {
-    return REF_TYPE != NULL && value->value_type == unbox_type(REF_TYPE);
+    return value->value_type->storageType == STORAGE_TYPE_REF;
 }
 
 bool is_opaque_pointer(TaggedValue* value)
@@ -625,7 +625,7 @@ bool is_list(TaggedValue* value)
 
 bool is_type(TaggedValue* value)
 {
-    return TYPE_TYPE != NULL && value->value_type == unbox_type(TYPE_TYPE);
+    return value->value_type->storageType == STORAGE_TYPE_TYPE;
 }
 
 bool is_value_of_type(TaggedValue* value, Type* type)

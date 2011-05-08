@@ -33,8 +33,9 @@ void rewrite(Term* term, Term* function, TermList const& _inputs);
 // index, then add NULL terms until it does.
 void rewrite_as_value(Branch& branch, int index, Term* type);
 
-// Remove this term from its owning branch.
-void erase_term(Term* term);
+// Calls erase_term, and will also shuffle the terms inside the owning branch to
+// fill in the empty index.
+void remove_term(Term* term);
 
 void remap_pointers(Term* term, TermMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);

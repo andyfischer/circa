@@ -221,7 +221,13 @@ static void run_static_type_query(StaticTypeQuery* query)
     if (query->subject && query->subjectType)
         ca_assert(query->subjectType == declared_type(query->subject));
 
+    // If the subject has a NULL type then just fail early. This should only
+    // happen when deleting terms.
+    if (query->subject && declared_type(query->subject) == NULL)
+        return query->fail();
+
     ca_assert(query->type);
+    ca_assert(declared_type(query->subject));
 
     // Check that either subject or subjectType are provided.
     ca_assert(query->subjectType || query->subject);

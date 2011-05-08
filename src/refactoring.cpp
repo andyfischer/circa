@@ -161,19 +161,9 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
     }
 }
 
-void erase_term(Term* term)
+void remove_term(Term* term)
 {
-    assert_valid_term(term);
-
-    set_inputs(term, TermList());
-    change_function(term, NULL);
-    clear_branch(&term->nestedContents);
-
-    // for each user, clear that user's input list of this term
-    clear_from_users_inputs(term);
-
-    if (term->owningBranch != NULL)
-        term->owningBranch->remove(term);
+    term->owningBranch->remove(term);
 }
 
 void remap_pointers(Term* term, TermMap const& map)

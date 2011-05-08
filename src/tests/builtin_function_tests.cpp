@@ -258,7 +258,7 @@ void test_message_passing()
     test_equals(&context.messages, "[inbox_name: [1]]");
 
     // Delete the send() call
-    erase_term(send);
+    remove_term(send);
 
     // Third run, inbox still returns 1 (from previous call), message queue is empty
     evaluate_branch(&context, branch);

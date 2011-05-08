@@ -335,17 +335,17 @@ void test_strip_abandoned_state()
 
     test_equals(&context.state, "[s: 1, t: 2, x: 'hi']");
 
-    erase_term(t);
+    remove_term(t);
     strip_orphaned_state(branch, &context.state, &trash);
     test_equals(&context.state, "[s: 1, x: 'hi']");
     test_equals(&trash, "[t: 2]");
 
-    erase_term(x);
+    remove_term(x);
     strip_orphaned_state(branch, &context.state, &trash);
     test_equals(&context.state, "[s: 1]");
     test_equals(&trash, "[x: 'hi']");
 
-    erase_term(s);
+    remove_term(s);
     strip_orphaned_state(branch, &context.state, &trash);
     test_equals(&context.state, "null");
     test_equals(&trash, "[s: 1]");

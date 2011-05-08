@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "debug_valid_objects.h"
 #include "errors.h"
 #include "if_block.h"
 #include "source_repro.h"
@@ -114,6 +115,7 @@ Term* get_named_at(Branch& branch, int index, std::string const& name)
 }
 Term* get_named_at(Term* location, std::string const& name)
 {
+    assert_valid_term(location);
     if (location->owningBranch == NULL) return NULL;
     return get_named_at(*location->owningBranch, location->index, name);
 }
@@ -310,6 +312,8 @@ void expose_all_names(Branch& source, Branch& destination)
     {
         std::string const& name = it->first;
         Term* term = it->second;
+
+        ca_assert(term != NULL);
         if (name == "") continue;
         if (name[0] == '#' && name != "#out") continue;
 

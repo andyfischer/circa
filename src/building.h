@@ -22,7 +22,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name="
 
 void set_input(Term* term, int index, Term* input);
 void set_input2(Term* term, int index, Term* input, int outputIndex);
-void set_inputs(Term* term, TermList const& inputs);
+void set_inputs(Term* term, TermList const& inputs, bool cascadeUpdates=true);
 void insert_input(Term* term, Term* input);
 void post_input_change(Term* term);
 

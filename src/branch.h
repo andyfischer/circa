@@ -100,6 +100,7 @@ struct Branch
     void remove(std::string const& name);
     void remove(int index);
     void removeNulls();
+    void removeNameBinding(Term* term);
     void shorten(int newLength);
     void clear();
 
@@ -133,12 +134,15 @@ Branch& nested_contents(Term* term);
 std::string get_branch_source_filename(Branch& branch);
 Branch* get_outer_scope(Branch const& branch);
 
+// Delete this term and remove it from its owning branch.
+void erase_term(Term* term);
+
 // Delete the contents of 'branch', any terms outside this branch which depend on
 // terms inside this branch will be appended to 'brokenLinks'.
 void clear_branch(Branch* branch, BrokenLinkList* brokenLinks);
 
 // Delete the contents of 'branch'. If there are any broken links, an internal error
-// will be thrown. (to catch broken links, use the 1st clear_branch call).
+// will be thrown. (to catch broken links, use the first clear_branch call).
 void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch& source, Branch& dest);

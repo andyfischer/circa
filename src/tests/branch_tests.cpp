@@ -72,6 +72,7 @@ void test_check_invariants()
     test_assert(branch_check_invariants_print_result(branch, std::cout));
     t->index = 5;
     test_assert(!branch_check_invariants_print_result(branch, ignoredOutput));
+    t->index = 0;
 }
 
 void test_setNull()

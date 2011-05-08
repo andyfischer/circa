@@ -23,8 +23,7 @@ Term::Term()
     evaluateFunc(empty_evaluate_function),
     owningBranch(NULL),
     index(0),
-    localsIndex(0),
-    refCount(0)
+    localsIndex(0)
 {
     globalID = gNextGlobalID++;
 

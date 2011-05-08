@@ -76,9 +76,9 @@ namespace include_function {
         // Possibly strip out state that isn't referenced any more.
         if (fileChanged) {
             TaggedValue trash;
-            TaggedValue description;
-            describe_state_shape(contents, &description);
-            strip_orphaned_state(&description, &context->currentScopeState, &trash);
+            strip_orphaned_state(contents, &context->currentScopeState, &trash);
+            if (!is_null(&trash))
+                std::cout << "include() deleting orphaned state: " << trash.toString() << std::endl;
             reset_locals(contents);
         }
 

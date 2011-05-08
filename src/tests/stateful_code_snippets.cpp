@@ -108,6 +108,8 @@ void for_loops()
     test_snippet("for i in [1] {}");
     test_snippet("for i in [1] { state s }");
     test_snippet("for i in [1 2 3] { state s }");
+
+    test_trimmed_state("for i in [1 2 3] { state s }", "", "[_for: [[s: <any>], [s: <any>], [s: <any>]]]");
 }
 
 void register_tests()

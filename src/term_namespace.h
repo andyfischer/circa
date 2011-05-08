@@ -17,15 +17,12 @@ struct TermNamespace
 
     StringToTermMap _map;
 
-    bool contains(std::string s) const
+    bool contains(std::string const& s) const
     {
         return _map.find(s) != _map.end();
 
     }
-    void bind(Term* term, std::string name)
-    {
-        _map[name] = term;
-    }
+    void bind(Term* term, std::string name);
 
     void clear()
     {
@@ -42,11 +39,6 @@ struct TermNamespace
             return NULL;
         else
             return it->second;
-    }
-
-    TermPtr& operator[](std::string const& name)
-    {
-        return _map[name];
     }
 
     std::string findName(Term* term) const
@@ -70,6 +62,7 @@ struct TermNamespace
     {
         StringToTermMap::const_iterator it;
         for (it = rhs._map.begin(); it != rhs._map.end(); ++it) {
+            ca_assert(it->second);
             _map[it->first] = it->second;
         }
     }
@@ -80,23 +73,7 @@ struct TermNamespace
     const_iterator end() const { return _map.end(); }
     const_iterator find(std::string const& name) const { return _map.find(name); }
 
-    void remapPointers(TermMap const& remapping)
-    {
-        StringToTermMap::iterator it;
-        for (it = _map.begin(); it != _map.end(); ) {
-            Term* replacement = remapping.getRemapped(it->second);
-            if (replacement != it->second) {
-                if (replacement == NULL) {
-                    _map.erase(it++);
-                    continue;
-                }
-                else {
-                    _map[it->first] = replacement;
-                }
-            }
-            ++it;
-        }
-    }
+    void remapPointers(TermMap const& remapping);
 };
 
 } // namespace circa
