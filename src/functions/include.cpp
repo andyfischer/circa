@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include <circa.h>
+#include "update_cascades.h"
 
 namespace circa {
 namespace include_function {
@@ -16,9 +17,7 @@ namespace include_function {
         // Reload if the filename or modified-time has changed
         if (fileChanged)
         {
-            BrokenLinkList brokenLinks;
-
-            clear_branch(&contents, &brokenLinks);
+            clear_branch(&contents);
 
             if (!storage::file_exists(filename.c_str())) {
                 error_occurred(cxt, caller, "File not found: "+filename);
@@ -27,10 +26,10 @@ namespace include_function {
 
             parse_script(contents, filename);
 
-            if (caller->owningBranch != NULL)
+            if (caller->owningBranch != NULL) {
                 expose_all_names(contents, *caller->owningBranch);
-
-            repair_broken_links(&brokenLinks);
+                finish_update_cascade(*caller->owningBranch);
+            }
 
             return true;
         }

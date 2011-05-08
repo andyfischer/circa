@@ -364,7 +364,7 @@ void change_type(TaggedValue* v, Type* type)
     // type may be null
     ca_assert(v != NULL);
     debug_assert_valid_object(type, TYPE_OBJECT);
-    debug_assert_valid_object(v->value_type, TYPE_OBJECT);
+    //debug_assert_valid_object(v->value_type, TYPE_OBJECT);
 
     if (v->value_type == type)
         return;

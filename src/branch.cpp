@@ -9,6 +9,7 @@
 #include "evaluation.h"
 #include "importing_macros.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "locals.h"
 #include "parser.h"
 #include "refactoring.h"
@@ -17,6 +18,7 @@
 #include "storage.h"
 #include "tagged_value.h"
 #include "term.h"
+#include "update_cascades.h"
 
 namespace circa {
 
@@ -29,7 +31,8 @@ Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
     outputIndex(0),
-    inuse(false)
+    inuse(false),
+    currentlyCascadingUpdates(false)
 {
     debug_register_valid_object((void*) this, BRANCH_OBJECT);
 }
@@ -239,10 +242,19 @@ void Branch::remove(int index)
             _terms[i]->index = i;
     }
     _terms.resize(_terms.length()-1);
+
+    if (is_list(&pendingUpdates))
+        list_remove_element(&pendingUpdates, index);
 }
 
 void Branch::removeNulls()
 {
+    if (is_list(&pendingUpdates)) {
+        for (int i=0; i < _terms.length(); i++)
+            if (_terms[i] == NULL)
+                list_remove_element(&pendingUpdates, i);
+    }
+
     int numDeleted = 0;
     for (int i=0; i < _terms.length(); i++) {
         if (_terms[i] == NULL) {
@@ -255,6 +267,9 @@ void Branch::removeNulls()
 
     if (numDeleted > 0)
         _terms.resize(_terms.length() - numDeleted);
+
+    if (is_list(&pendingUpdates))
+        List::checkCast(&pendingUpdates)->resize(_terms.length());
 }
 void Branch::removeNameBinding(Term* term)
 {
@@ -390,7 +405,7 @@ void erase_term(Term* term)
     assert_valid_term(term);
 
     set_null((TaggedValue*) term);
-    set_inputs(term, TermList(), false);
+    set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;
     clear_branch(&term->nestedContents);
@@ -413,11 +428,12 @@ void erase_term(Term* term)
     dealloc_term(term);
 }
 
-void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
+void clear_branch(Branch* branch)
 {
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
     mark_branch_as_possibly_not_having_inlined_state(*branch);
+    set_null(&branch->pendingUpdates);
 
     branch->names.clear();
 
@@ -425,7 +441,7 @@ void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
         if (*it == NULL)
             continue;
 
-        set_inputs(*it, TermList(), false);
+        set_inputs(*it, TermList());
         remove_from_users(*it);
     }
 
@@ -442,12 +458,14 @@ void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
         if (term == NULL)
             continue;
 
-        // Record any leftover 'user' links.
+        // Delete any leftover users, mark them as repairable.
         for (int userIndex = 0; userIndex < term->users.length(); userIndex++) {
             Term* user = term->users[userIndex];
             for (int depIndex = 0; depIndex < user->numDependencies(); depIndex++) {
-                if (user->dependency(depIndex) == term)
-                    brokenLinks->append(term->name, user, depIndex);
+                if (user->dependency(depIndex) == term) {
+                    mark_repairable_link(user, term->name, depIndex);
+                    user->setDependency(depIndex, NULL);
+                }
             }
         }
 
@@ -455,13 +473,6 @@ void clear_branch(Branch* branch, BrokenLinkList* brokenLinks)
     }
 
     branch->_terms.clear();
-}
-
-void clear_branch(Branch* branch)
-{
-    BrokenLinkList brokenLinks;
-    clear_branch(branch, &brokenLinks);
-    repair_broken_links(&brokenLinks);
 }
 
 Term* find_term_by_id(Branch& branch, unsigned int id)

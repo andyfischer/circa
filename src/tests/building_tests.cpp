@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include <circa.h>
+#include "update_cascades.h"
 
 namespace circa {
 namespace building_tests {
@@ -154,16 +155,14 @@ void test_repair_broken_links()
     Branch branch;
     Term* br = branch.compile("br = { a = 1 }");
     Term* a = br->nestedContents["a"];
-    Term* b = branch.compile("add()");
+    Term* b = branch.compile("add_call = add()");
     set_input(b, 0, a);
 
-    BrokenLinkList brokenLinks;
-    clear_branch(&br->nestedContents, &brokenLinks);
+    clear_branch(&br->nestedContents);
 
-    test_assert(!brokenLinks.empty());
     test_assert(b->input(0) == NULL);
 
-    repair_broken_links(&brokenLinks);
+    finish_update_cascade(branch);
 
     test_assert(b->input(0) == NULL);
 
@@ -173,15 +172,14 @@ void test_repair_broken_links()
     b = branch.compile("add()");
     set_input(b, 0, a);
 
-    BrokenLinkList brokenLinks2;
-    clear_branch(&br->nestedContents, &brokenLinks2);
+    clear_branch(&br->nestedContents);
     br->nestedContents.compile("something_else = 1, a = 2");
 
     // bit of a hack:
     br->setBoolProp("exposesNames", true);
 
     Term* new_a = br->nestedContents["a"];
-    repair_broken_links(&brokenLinks2);
+    finish_update_cascade(branch);
 
     test_assert(a != new_a);
     test_assert(b->input(0) == new_a);

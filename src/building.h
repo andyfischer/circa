@@ -22,9 +22,8 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name="
 
 void set_input(Term* term, int index, Term* input);
 void set_input2(Term* term, int index, Term* input, int outputIndex);
-void set_inputs(Term* term, TermList const& inputs, bool cascadeUpdates=true);
+void set_inputs(Term* term, TermList const& inputs);
 void insert_input(Term* term, Term* input);
-void post_input_change(Term* term);
 
 bool is_actually_using(Term* user, Term* usee);
 
@@ -69,10 +68,6 @@ Term* procure_value(Branch& branch, Term* type, std::string const& name);
 Term* procure_int(Branch& branch, std::string const& name);
 Term* procure_float(Branch& branch, std::string const& name);
 Term* procure_bool(Branch& branch, std::string const& name);
-
-// This function will go through the contents of the brokenLinkList, and it'll try
-// to repair each link (using a fresh name lookup), or it'll set the link to NULL.
-void repair_broken_links(BrokenLinkList* brokenLinks);
 
 void set_step(Term* term, float step);
 float get_step(Term* term);

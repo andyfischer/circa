@@ -55,6 +55,12 @@ struct Branch
     //  [2] int inputIndex (only used for errors related to inputs)
     TaggedValue staticErrors;
 
+    // This value stores information about pending code changes. This is populated
+    // when someone makes a term change that will force other terms to be updated.
+    // See update_cascades.cpp
+    TaggedValue pendingUpdates;
+    bool currentlyCascadingUpdates;
+
     Branch();
     ~Branch();
 
@@ -137,12 +143,7 @@ Branch* get_outer_scope(Branch const& branch);
 // Delete this term and remove it from its owning branch.
 void erase_term(Term* term);
 
-// Delete the contents of 'branch', any terms outside this branch which depend on
-// terms inside this branch will be appended to 'brokenLinks'.
-void clear_branch(Branch* branch, BrokenLinkList* brokenLinks);
-
-// Delete the contents of 'branch'. If there are any broken links, an internal error
-// will be thrown. (to catch broken links, use the first clear_branch call).
+// Delete the contents of 'branch'.
 void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch& source, Branch& dest);

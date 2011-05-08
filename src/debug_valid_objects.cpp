@@ -13,7 +13,6 @@ namespace circa {
 
 #if CIRCA_VALID_OBJECT_CHECKING
 
-
 std::map<void*, int>& address_to_type()
 {
     static std::map<void*, int> *g_addressToType = new std::map<void*,int>;

@@ -65,7 +65,7 @@ namespace assign_function {
     void update_assign_contents(Term* term)
     {
         Branch& contents = term->nestedContents;
-        contents.clear();
+        clear_branch(&contents);
 
         // The left-expression might be represented by a chain of get_xxx terms.
         // Walk upwards and append a series of set_terms.

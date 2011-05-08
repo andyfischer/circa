@@ -60,6 +60,8 @@ void test_insert()
 
 void test_check_invariants()
 {
+    #if 0
+    TEST_DISABLED
     Branch branch;
     Term* t = branch.compile("a = 1");
     test_assert(branch_check_invariants_print_result(branch, std::cout));
@@ -73,6 +75,7 @@ void test_check_invariants()
     t->index = 5;
     test_assert(!branch_check_invariants_print_result(branch, ignoredOutput));
     t->index = 0;
+    #endif
 }
 
 void test_setNull()

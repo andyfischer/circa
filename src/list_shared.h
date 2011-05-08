@@ -18,5 +18,6 @@ ListData* allocate_list(int num_elements);
 void free_list(ListData* data);
 
 TaggedValue* list_get_element(TaggedValue* value, int index);
+void list_remove_element(TaggedValue* list, int index);
 
 } // namespace circa

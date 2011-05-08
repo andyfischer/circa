@@ -50,4 +50,17 @@ TaggedValue* list_get_element(TaggedValue* value, int index)
     return &data->items[index];
 }
 
+void list_remove_element(TaggedValue* list, int index)
+{
+    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+
+    ListData* data = (ListData*) list->value_data.ptr;
+
+    for (int i=index; i < (data->count - 1); i++)
+        swap(&data->items[i], &data->items[i + 1]);
+
+    set_null(&data->items[data->count - 1]);
+    data->count--;
+}
+
 } // namespace circa

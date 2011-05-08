@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
+#include "update_cascades.h"
 
 namespace circa {
 namespace parser {
@@ -1452,7 +1453,8 @@ ParseResult function_call2(Branch& branch, Term* function, TokenStream& tokens, 
     if (result->function->name != originalName)
         result->setStringProp("syntax:functionName", originalName);
 
-    post_input_change(result);
+    mark_inputs_changed(result);
+    finish_update_cascade(branch);
 
     return ParseResult(result);
 }
@@ -1925,7 +1927,8 @@ ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* cont
     consume_branch(term->nestedContents, tokens, context);
 
     finish_minor_branch(term->nestedContents);
-    post_input_change(term);
+    mark_inputs_changed(term);
+    finish_update_cascade(branch);
 
     return ParseResult(term);
 }
@@ -2093,13 +2096,10 @@ void post_parse_branch(Branch& branch)
     // Remove NULLs
     branch.removeNulls();
 
-    // Update input info on all terms
-    for (BranchIterator it(&branch); !it.finished(); ++it) {
-        post_input_change(*it);
-    }
-
     // Make sure the inputs array has the correct size
     branch.locals.resize(get_locals_count(branch));
+
+    finish_update_cascade(branch);
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)

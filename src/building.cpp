@@ -6,6 +6,7 @@
 #include "locals.h"
 #include "names.h"
 #include "parser.h"
+#include "update_cascades.h"
 
 namespace circa {
 
@@ -49,8 +50,6 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     // change_function will also update the declared type.
     change_function(result, function);
 
-    post_input_change(result);
-
     update_unique_name(result);
 
     update_locals_index_for_new_term(result);
@@ -81,7 +80,7 @@ void set_input2(Term* term, int index, Term* input, int outputIndex)
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
 
-    // Don't do post_input_change here, caller must call it.
+    mark_inputs_changed(term);
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -104,10 +103,10 @@ void set_input(Term* term, int index, Term* input)
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
 
-    post_input_change(term);
+    mark_inputs_changed(term);
 }
 
-void set_inputs(Term* term, TermList const& inputs, bool cascadeUpdates)
+void set_inputs(Term* term, TermList const& inputs)
 {
     assert_valid_term(term);
 
@@ -131,26 +130,13 @@ void set_inputs(Term* term, TermList const& inputs, bool cascadeUpdates)
     for (size_t i=0; i < previousInputs.size(); i++)
         possibly_prune_user_list(term, previousInputs[i].term);
 
-    if (cascadeUpdates)
-        post_input_change(term);
+    mark_inputs_changed(term);
 }
 
 void insert_input(Term* term, Term* input)
 {
     term->inputs.insert(term->inputs.begin(), Term::Input(NULL));
     set_input(term, 0, input);
-}
-
-void post_input_change(Term* term)
-{
-    FunctionAttrs* attrs = get_function_attrs(term->function);
-    if (attrs == NULL)
-        return;
-
-    FunctionAttrs::PostInputChange func = attrs->postInputChange;
-
-    if (func)
-        func(term);
 }
 
 bool is_actually_using(Term* user, Term* usee)
@@ -192,8 +178,14 @@ void remove_from_users(Term* term)
 
 void clear_from_users_inputs(Term* term)
 {
-    for (int i=0; i < term->users.length(); i++) {
-        Term* user = term->users[i];
+    // Make a local copy of 'users', because these calls will want to modify
+    // the list.
+    TermList users = term->users;
+
+    term->users.clear();
+
+    for (int i=0; i < users.length(); i++) {
+        Term* user = users[i];
         for (int input=0; input < user->numInputs(); input++)
             if (user->input(input) == term)
                 set_input(user, input, NULL);
@@ -379,16 +371,6 @@ Term* procure_float(Branch& branch, std::string const& name)
 Term* procure_bool(Branch& branch, std::string const& name)
 {
     return procure_value(branch, BOOL_TYPE, name);
-}
-
-void repair_broken_links(BrokenLinkList* brokenLinks)
-{
-    for (size_t i=0; i < brokenLinks->links.size(); i++) {
-        BrokenLinkList::Link& link = brokenLinks->links[i];
-
-        Term* term = get_named_at(link.user, link.relativeName);
-        link.user->setDependency(link.depIndex, term);
-    }
 }
 
 void set_step(Term* term, float step)
