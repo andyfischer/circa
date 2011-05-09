@@ -394,7 +394,8 @@ void erase_term(Term* term)
     clear_branch(&term->nestedContents);
 
     // for each user, clear that user's input list of this term
-    clear_from_users_inputs(term);
+    remove_from_any_user_lists(term);
+    clear_from_inputs_of_users(term);
 
     if (term->owningBranch != NULL) {
         // remove name binding if necessary
@@ -425,7 +426,7 @@ void clear_branch(Branch* branch)
             continue;
 
         set_inputs(*it, TermList());
-        remove_from_users(*it);
+        remove_from_any_user_lists(*it);
     }
 
     for (int i= branch->_terms.length() - 1; i >= 0; i--) {

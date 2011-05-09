@@ -440,6 +440,7 @@ export_func void circa_shutdown()
     clear_type_contents(&STRING_T);
     clear_type_contents(&TYPE_T);
     clear_type_contents(&VOID_T);
+    clear_contents_of_every_permanent_type();
 
     delete KERNEL;
     KERNEL = NULL;

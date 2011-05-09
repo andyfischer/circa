@@ -166,17 +166,18 @@ void possibly_prune_user_list(Term* user, Term* usee)
         usee->users.remove(user);
 }
 
-void remove_from_users(Term* term)
+void remove_from_any_user_lists(Term* term)
 {
     for (int i=0; i < term->numDependencies(); i++) {
         Term* usee = term->dependency(i);
+        assert_valid_term(usee);
         if (usee == NULL)
             continue;
         usee->users.remove(term);
     }
 }
 
-void clear_from_users_inputs(Term* term)
+void clear_from_inputs_of_users(Term* term)
 {
     // Make a local copy of 'users', because these calls will want to modify
     // the list.

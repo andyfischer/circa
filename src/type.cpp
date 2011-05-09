@@ -180,10 +180,14 @@ void release_type(Type* type)
         delete type;
 }
 
-void delete_every_permanent_type()
+void clear_contents_of_every_permanent_type()
 {
     for (int i=0; i < g_numPermanentTypes; i++)
         clear_type_contents(g_everyPermanentType[i]);
+}
+
+void delete_every_permanent_type()
+{
     for (int i=0; i < g_numPermanentTypes; i++)
         delete g_everyPermanentType[i];
     g_numPermanentTypes = 0;

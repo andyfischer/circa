@@ -35,10 +35,10 @@ void possibly_prune_user_list(Term* user, Term* usee);
 // their user list. This creates a temporary inconsistency (because the term is
 // still technically using those things) but it's appropriate when you want to delete
 // this term.
-void remove_from_users(Term* term);
+void remove_from_any_user_lists(Term* term);
 
 // This checks every user of this term, and removes it from their input lists.
-void clear_from_users_inputs(Term* term);
+void clear_from_inputs_of_users(Term* term);
 
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Term* type, std::string const& name="");

@@ -191,6 +191,7 @@ void release_type(Type* type);
 
 // Called during shutdown to delete all the Type object in permanent state. This
 // makes memory-leak checking tools happy.
+void clear_contents_of_every_permanent_type();
 void delete_every_permanent_type();
 
 Term* get_output_type(Term* term, int outputIndex);
