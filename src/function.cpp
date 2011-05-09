@@ -44,8 +44,9 @@ namespace function_attrs_t {
         delete (FunctionAttrs*) get_pointer(value);
     }
 
-    void copy(Type*, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
+        change_type(dest, type);
         *((FunctionAttrs*) get_pointer(dest)) = *((FunctionAttrs*) get_pointer(source));
     }
 

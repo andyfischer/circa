@@ -77,7 +77,7 @@ namespace string_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
-        set_pointer(value, &STRING_T, new std::string());
+        set_pointer(value, new std::string());
     }
     void release(Type*, TaggedValue* value)
     {
@@ -85,9 +85,10 @@ namespace string_t {
         set_pointer(value, NULL);
     }
 
-    void copy(Type*, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        *((std::string*) get_pointer(dest, &STRING_T)) = as_string(source);
+        change_type(dest, type);
+        *((std::string*) dest->value_data.ptr) = as_string(source);
     }
     void reset(TaggedValue* v)
     {

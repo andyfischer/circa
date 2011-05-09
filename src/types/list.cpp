@@ -206,21 +206,24 @@ namespace list_t {
         list_decref(data);
     }
 
-    void tv_copy(Type*, TaggedValue* source, TaggedValue* dest)
+    void tv_copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_list(source));
-        ca_assert(is_list(dest));
-        ListData* s = (ListData*) get_pointer(source);
-        ListData* d = (ListData*) get_pointer(dest);
+        set_null(dest);
 
+        ListData* s = (ListData*) get_pointer(source);
+        set_pointer(dest, list_duplicate(s));
+        change_type_no_initialize(dest, type);
+
+        #if 0
     #if CIRCA_DISABLE_LIST_SHARING
         if (d != NULL) list_decref(d);
-        set_pointer(dest, list_duplicate(s));
     #else
         if (s != NULL) incref(s);
         if (d != NULL) list_decref(d);
         set_pointer(dest, s);
     #endif
+        #endif
     }
 
     bool tv_equals(Type*, TaggedValue* leftValue, TaggedValue* right)

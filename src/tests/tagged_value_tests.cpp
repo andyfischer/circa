@@ -39,8 +39,9 @@ namespace toy_refcounted_pool {
         refcount[index]--;
     }
 
-    void copy(Type*, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
+        change_type(dest, type);
         int prev = dest->value_data.asint;
         dest->value_data.asint = source->value_data.asint;
         refcount[dest->value_data.asint]++;

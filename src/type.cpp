@@ -27,9 +27,10 @@ namespace type_t {
         Type* type = (Type*) get_pointer(value);
         release_type(type);
     }
-    void copy(Type*, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_type(source));
+        change_type_no_initialize(dest, type);
         dest->value_data = source->value_data;
         register_type_pointer(dest, (Type*) get_pointer(source));
     }

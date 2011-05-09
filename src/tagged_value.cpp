@@ -195,15 +195,16 @@ void copy(TaggedValue* source, TaggedValue* dest)
 
     debug_trap_value_write(dest);
 
-    change_type(dest, source->value_type);
     Type::Copy copyFunc = source->value_type->copy;
 
     if (copyFunc != NULL) {
         copyFunc(source->value_type, source, dest);
+        ca_assert(dest->value_type == source->value_type);
         return;
     }
 
     // Default behavior, shallow assign.
+    dest->value_type = source->value_type;
     dest->value_data = source->value_data;
 }
 

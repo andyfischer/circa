@@ -28,10 +28,6 @@ namespace ref_t {
     {
         set_ref(value, NULL);
     }
-    void copy(Type*, TaggedValue* source, TaggedValue* dest)
-    {
-        dest->value_data = source->value_data;
-    }
     bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
     {
         if (!is_ref(lhs) || !is_ref(rhs))
@@ -214,7 +210,6 @@ namespace ref_t {
         type->initialize = initialize;
         type->release = release;
         type->reset = reset;
-        type->copy = copy;
         type->equals = equals;
         type->hashFunc = hashFunc;
     }
