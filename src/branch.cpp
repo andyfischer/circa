@@ -155,15 +155,8 @@ void Branch::setNull(int index)
     assert_valid_branch(this);
     ca_assert(index <= length());
     Term* term = _terms[index];
-    if (term != NULL) {
-        // remove name binding if necessary
-        if ((term->name != "") && (names[term->name] == term))
-            names.remove(term->name);
-
-        term->owningBranch = NULL;
-        term->index = 0;
-        _terms.setAt(index, NULL);
-    }
+    if (term != NULL)
+        erase_term(term);
 }
 
 void Branch::insert(int index, Term* term)
@@ -403,7 +396,7 @@ void erase_term(Term* term)
 
         // index may be invalid if something bad has happened
         ca_assert(term->index < term->owningBranch->length());
-        term->owningBranch->setNull(term->index);
+        term->owningBranch->_terms.setAt(term->index, NULL);
 
         term->owningBranch = NULL;
         term->index = -1;
