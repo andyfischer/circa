@@ -331,37 +331,34 @@ void post_setup_functions(Branch& kernel)
     // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
     set_ref(function_t::get_parameters(add_v), ADD_FUNC);
+    overloaded_function::append_overload(ADD_FUNC, add_v);
+
     Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
     set_ref(function_t::get_parameters(add_s), ADD_FUNC);
-
-    overloaded_function::append_overload(ADD_FUNC, add_v);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
     // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
     set_ref(function_t::get_parameters(sub_v), SUB_FUNC);
+    overloaded_function::append_overload(SUB_FUNC, sub_v);
+
     Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
     set_ref(function_t::get_parameters(sub_s), SUB_FUNC);
-
-    overloaded_function::append_overload(SUB_FUNC, sub_v);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
     set_ref(function_t::get_parameters(mult_v), kernel["mult"]);
+    overloaded_function::append_overload(MULT_FUNC, mult_v);
+
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
     set_ref(function_t::get_parameters(mult_s), kernel["mult"]);
-
-    overloaded_function::append_overload(MULT_FUNC, mult_v);
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
     Term* div_s = create_duplicate(kernel, kernel["vectorize_vs"], "div_s");
     set_ref(function_t::get_parameters(div_s), DIV_FUNC);
-
     overloaded_function::append_overload(DIV_FUNC, div_s);
-
-    get_function_attrs(VALUE_FUNC)->feedbackFunc = UNSAFE_ASSIGN_FUNC;
 }
 
 void parse_hosted_types(Branch& kernel)
@@ -378,8 +375,8 @@ void parse_hosted_types(Branch& kernel)
 
 void post_setup_types()
 {
-    string_t::postponed_setup_type(unbox_type(STRING_TYPE));
-    ref_t::postponed_setup_type(unbox_type(REF_TYPE));
+    string_t::postponed_setup_type(&STRING_T);
+    ref_t::postponed_setup_type(&REF_T);
 }
 
 void parse_builtin_script(Branch& kernel)

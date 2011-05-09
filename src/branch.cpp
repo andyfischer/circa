@@ -216,11 +216,9 @@ void Branch::moveToEnd(Term* term)
     term->index = _terms.length()-1;
 }
 
-void Branch::remove(Term* term)
+void Branch::remove(int index)
 {
-    assert_valid_term(term);
-    ca_assert(term != NULL);
-    remove(getIndex(term));
+    remove_term(get(index));
 }
 
 void Branch::remove(std::string const& name)
@@ -229,22 +227,7 @@ void Branch::remove(std::string const& name)
         return;
 
     Term* term = names[name];
-    remove(getIndex(term));
-}
-
-void Branch::remove(int index)
-{
-    erase_term(get(index));
-
-    for (int i=index; i < _terms.length()-1; i++) {
-        _terms.setAt(i, _terms[i+1]);
-        if (_terms[i] != NULL)
-            _terms[i]->index = i;
-    }
-    _terms.resize(_terms.length()-1);
-
-    if (is_list(&pendingUpdates))
-        list_remove_element(&pendingUpdates, index);
+    remove_term(term);
 }
 
 void Branch::removeNulls()

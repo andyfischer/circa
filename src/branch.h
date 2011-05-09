@@ -102,9 +102,8 @@ struct Branch
     void move(Term* term, int index);
     void moveToEnd(Term* term);
 
-    void remove(Term* term);
-    void remove(std::string const& name);
     void remove(int index);
+    void remove(std::string const& name);
     void removeNulls();
     void removeNameBinding(Term* term);
     void shorten(int newLength);

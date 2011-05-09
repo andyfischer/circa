@@ -278,10 +278,6 @@ namespace function_t {
     {
         return get_function_attrs(func)->specializeType;
     }
-    Term* get_feedback_func(Term* func)
-    {
-        return get_function_attrs(func)->feedbackFunc;
-    }
     TaggedValue* get_parameters(Term* func)
     {
         return &get_function_attrs(func)->parameter;

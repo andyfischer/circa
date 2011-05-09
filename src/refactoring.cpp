@@ -7,6 +7,7 @@
 #include "errors.h"
 #include "function.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "names.h"
 #include "static_checking.h"
 #include "term.h"
@@ -121,17 +122,6 @@ void rename(Term* term, std::string const& name)
     term->name = name;
 }
 
-void steal_term(Term* _term, Branch& newHome)
-{
-    Term* term = _term;
-
-    if (term->owningBranch != NULL) {
-        term->owningBranch->remove(term);
-    }
-
-    newHome.append(term);
-}
-
 void rewrite(Term* term, Term* function, TermList const& inputs)
 {
     change_function(term, function);
@@ -163,7 +153,22 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
 
 void remove_term(Term* term)
 {
-    term->owningBranch->remove(term);
+    assert_valid_term(term);
+
+    int index = term->index;
+    Branch& branch = *term->owningBranch;
+
+    erase_term(term);
+
+    for (int i=index; i < branch._terms.length()-1; i++) {
+        branch._terms.setAt(i, branch._terms[i+1]);
+        if (branch._terms[i] != NULL)
+            branch._terms[i]->index = i;
+    }
+    branch._terms.resize(branch._terms.length()-1);
+
+    if (is_list(&branch.pendingUpdates))
+        list_remove_element(&branch.pendingUpdates, index);
 }
 
 void remap_pointers(Term* term, TermMap const& map)

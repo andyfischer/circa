@@ -448,7 +448,7 @@ void set_bool(TaggedValue* value, bool b)
 void set_ref(TaggedValue* value, Term* t)
 {
     debug_trap_value_write(value);
-    change_type(value, unbox_type(REF_TYPE));
+    change_type(value, &REF_T);
     value->value_data.ptr = t;
 }
 
