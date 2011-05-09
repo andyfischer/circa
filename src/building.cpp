@@ -51,7 +51,7 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     change_function(result, function);
 
     update_unique_name(result);
-
+    on_inputs_changed(result);
     update_locals_index_for_new_term(result);
 
     if (is_get_state(result) || has_implicit_state(result))

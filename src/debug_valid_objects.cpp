@@ -5,6 +5,7 @@
 #endif
 
 #include "build_options.h"
+#include "builtins.h"
 #include "errors.h"
 #include "debug_valid_objects.h"
 #include "term.h"
@@ -21,6 +22,9 @@ std::map<void*, int>& address_to_type()
 
 void debug_register_valid_object(void* obj, int type)
 {
+    if (SHUTTING_DOWN)
+        return;
+
     bool alreadyValid = address_to_type().find(obj) != address_to_type().end();
     if (alreadyValid) {
         std::stringstream err;
@@ -37,6 +41,9 @@ void debug_register_valid_object_ignore_dupe(void* obj, int type)
 
 void debug_unregister_valid_object(void* obj)
 {
+    if (SHUTTING_DOWN)
+        return;
+
     bool valid = address_to_type().find(obj) != address_to_type().end();
     if (!valid) {
         std::stringstream err;
@@ -48,6 +55,9 @@ void debug_unregister_valid_object(void* obj)
 
 void debug_assert_valid_object(void* obj, int type)
 {
+    if (SHUTTING_DOWN)
+        return;
+
     if (obj == NULL) return;
     bool valid = address_to_type().find(obj) != address_to_type().end();
     if (!valid) {

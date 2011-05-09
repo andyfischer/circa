@@ -335,6 +335,8 @@ void reset_type(Type* type)
 
 void clear_type_contents(Type* type)
 {
+    set_null(&type->parameter);
+    set_null(&type->defaultValue);
     clear_branch(&type->prototype);
     clear_branch(&type->attributes);
     clear_branch(&type->memberFunctions);

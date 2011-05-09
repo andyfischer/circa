@@ -20,4 +20,6 @@ void mark_repairable_link(Term* term, std::string const& name, int dependencyInd
 
 void finish_update_cascade(Branch& branch);
 
+void on_inputs_changed(Term* term);
+
 } // namespace circa

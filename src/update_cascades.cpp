@@ -12,7 +12,6 @@ namespace circa {
 
 const int INPUTS_CHANGED = 0x1;
 
-static void on_inputs_changed(Term* term);
 static void on_repairable_link(Term* term, List& brokenLinks);
 
 List& initialize_pending_update_item(Term* term)
