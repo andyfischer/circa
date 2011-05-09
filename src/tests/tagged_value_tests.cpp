@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include <circa.h>
-#include "debug_valid_objects.h"
+#include "circa.h"
+#include "heap_debugging.h"
 #include "importing_macros.h"
 
 namespace circa {

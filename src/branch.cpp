@@ -4,9 +4,9 @@
 #include "branch_iterator.h"
 #include "building.h"
 #include "builtins.h"
-#include "debug_valid_objects.h"
 #include "errors.h"
 #include "evaluation.h"
+#include "heap_debugging.h"
 #include "importing_macros.h"
 #include "introspection.h"
 #include "list_shared.h"
@@ -40,7 +40,7 @@ Branch::Branch()
 Branch::~Branch()
 {
     clear_branch(this);
-    debug_unregister_valid_object(this);
+    debug_unregister_valid_object(this, BRANCH_OBJECT);
 }
 
 int Branch::length() const
@@ -388,7 +388,7 @@ void erase_term(Term* term)
 
     // for each user, clear that user's input list of this term
     remove_from_any_user_lists(term);
-    clear_from_inputs_of_users(term);
+    clear_from_dependencies_of_users(term);
 
     if (term->owningBranch != NULL) {
         // remove name binding if necessary
@@ -414,12 +414,15 @@ void clear_branch(Branch* branch)
 
     branch->names.clear();
 
+    // Iterate through the branch and tear down any term references, so that we
+    // don't have to worry about stale pointers later.
     for (BranchIterator it(branch); it.unfinished(); ++it) {
         if (*it == NULL)
             continue;
 
         set_inputs(*it, TermList());
         remove_from_any_user_lists(*it);
+        change_function(*it, NULL);
     }
 
     for (int i= branch->_terms.length() - 1; i >= 0; i--) {

@@ -106,6 +106,7 @@ extern TaggedValue REPEAT_SYMBOL;
 
 extern Type* FILE_SIGNATURE_T;
 
+extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;
 extern bool SHUTTING_DOWN;
 

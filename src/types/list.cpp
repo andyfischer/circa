@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "build_options.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 #include "importing_macros.h"
 #include "tagged_value.h"
 #include "testing.h"
@@ -592,7 +592,6 @@ bool is_list_based_type(Type* type)
 List::List()
   : TaggedValue()
 {
-    debug_register_valid_object_ignore_dupe(&LIST_T, TYPE_OBJECT);
     change_type(this, &LIST_T);
 }
 

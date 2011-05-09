@@ -181,7 +181,7 @@ CA_FUNCTION(evaluate_if_block)
             if ((i != acceptedBranchIndex) && !acceptedBranchWasEmpty)
                 set_null(state->get(i));
         }
-        preserve_state_result(CALLER, &prevScopeState, &localState);
+        save_and_consume_state(CALLER, &prevScopeState, &localState);
         swap(&prevScopeState, &context->currentScopeState);
     }
 
@@ -194,7 +194,7 @@ CA_FUNCTION(evaluate_if_block)
 
         ca_test_assert(cast_possible(value, unbox_type(get_output_type(CALLER, i+1))));
 
-        copy(value, EXTRA_OUTPUT(i));
+        swap(value, EXTRA_OUTPUT(i));
     }
 
     // Finish using the branch, this will pop its stack frame. Need to do this after

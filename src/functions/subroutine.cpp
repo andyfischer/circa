@@ -18,7 +18,7 @@ namespace subroutine_function {
             if (INPUT(i) == NULL)
                 set_null(out->get(i));
             else
-                copy(INPUT(i), out->get(i));
+                consume_input(CALLER, i, out->get(i));
         }
     }
 

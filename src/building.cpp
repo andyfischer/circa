@@ -1,8 +1,9 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "builtins.h"
+#include "building.h"
 #include "circa.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 #include "locals.h"
 #include "names.h"
 #include "parser.h"
@@ -177,7 +178,7 @@ void remove_from_any_user_lists(Term* term)
     }
 }
 
-void clear_from_inputs_of_users(Term* term)
+void clear_from_dependencies_of_users(Term* term)
 {
     // Make a local copy of 'users', because these calls will want to modify
     // the list.
@@ -240,8 +241,8 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
         branch.bindName(term, name);
 
     change_function(term, VALUE_FUNC);
-    term->type = type;
     change_declared_type(term, type);
+    change_type((TaggedValue*) term, unbox_type(type));
     update_unique_name(term);
     update_locals_index_for_new_term(term);
 

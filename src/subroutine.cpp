@@ -148,8 +148,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
 
     // Preserve state
     if (is_function_stateful(function))
-        preserve_state_result(caller, &prevScopeState, &context->currentScopeState);
-
+        save_and_consume_state(caller, &prevScopeState, &context->currentScopeState);
     swap(&context->currentScopeState, &prevScopeState);
 
     // Write output

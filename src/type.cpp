@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 #include "importing_macros.h"
 
 namespace circa {
@@ -109,6 +109,7 @@ namespace type_t {
 } // namespace type_t
 
 Type::Type() :
+    _heapTracker(TYPE_OBJECT),
     name(""),
     storageType(STORAGE_TYPE_NULL),
     cppTypeInfo(NULL),
@@ -134,12 +135,10 @@ Type::Type() :
     permanent(false),
     heapAllocated(false)
 {
-    debug_register_valid_object_ignore_dupe(this, TYPE_OBJECT);
 }
 
 Type::~Type()
 {
-    debug_unregister_valid_object(this);
 }
 
 Type* Type::create()
@@ -396,6 +395,11 @@ Term* find_member_function(Type* type, std::string const& name)
 Term* parse_type(Branch& branch, std::string const& decl)
 {
     return parser::compile(branch, parser::type_decl, decl);
+}
+
+void install_type(Term* term, Type* type)
+{
+    set_type(term, type);
 }
 
 } // namespace circa

@@ -9,12 +9,15 @@ namespace preserve_state_result_function {
 
     CA_DEFINE_FUNCTION(preserve_state_result, "preserve_state_result(any)")
     {
-        Term* term = INPUT_TERM(0);
-        const char* name = term->name.c_str();
+        TaggedValue result;
+        copy(INPUT(0), &result);
+        // TODO: switch to use consume_input instead of copy
+        //consume_input(CALLER, 0, &result);
 
+        // Use 'name' here, not uniqueName.
+        const char* name = INPUT_TERM(0)->name.c_str();
         Dict* state = Dict::lazyCast(&CONTEXT->currentScopeState);
-
-        copy(INPUT(0), state->insert(name));
+        swap(&result, state->insert(name));
         set_null(OUTPUT);
     }
 

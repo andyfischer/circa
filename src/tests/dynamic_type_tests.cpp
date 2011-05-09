@@ -7,6 +7,8 @@ namespace dynamic_type_tests {
 
 void test_copy()
 {
+    #if 0
+    TEST_DISABLED
     Branch branch;
     Term* a = branch.compile("a = 5");
     Term* copy = branch.compile("copy(a)");
@@ -18,6 +20,7 @@ void test_copy()
     set_string(a, "hi");
     evaluate_branch(branch);
     test_assert(is_string(copy));
+    #endif
 }
 
 void test_subroutine()

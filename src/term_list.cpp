@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "common_headers.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 
 #include "term_list.h"
 

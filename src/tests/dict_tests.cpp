@@ -179,6 +179,8 @@ void hash_collision()
 
     // Insert the first string again, now it should go to [2]
     // TEST_DISABLED test_assert(dict_t::insert(&dict, bucketToStr[0][0].c_str()) == 2);
+
+    dict_t::free_dict(dict);
 }
 
 void many_items()

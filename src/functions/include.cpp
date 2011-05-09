@@ -84,7 +84,7 @@ namespace include_function {
         evaluate_branch_internal(context, contents);
 
         // Store container and replace currentScopeState
-        preserve_state_result(CALLER, &prevScopeState, &context->currentScopeState);
+        save_and_consume_state(CALLER, &prevScopeState, &context->currentScopeState);
         swap(&context->currentScopeState, &prevScopeState);
 
         set_null(OUTPUT);

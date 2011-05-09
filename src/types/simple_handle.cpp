@@ -4,7 +4,7 @@
 
 #include "simple_handle.h"
 
-#define SIMPLE_HANDLE_VERBOSE_LOG 1
+#define SIMPLE_HANDLE_VERBOSE_LOG 0
 
 namespace circa {
 namespace simple_handle_t {

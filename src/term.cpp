@@ -5,8 +5,8 @@
 #include "branch.h"
 #include "building.h"
 #include "builtins.h"
-#include "debug_valid_objects.h"
 #include "errors.h"
+#include "heap_debugging.h"
 #include "introspection.h"
 #include "refactoring.h"
 #include "term.h"
@@ -34,7 +34,7 @@ Term::Term()
 
 Term::~Term()
 {
-    debug_unregister_valid_object(this);
+    debug_unregister_valid_object(this, TERM_OBJECT);
 }
 
 Term*

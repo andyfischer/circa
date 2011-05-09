@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 #include "locals.h"
 #include "term_list.h"
 

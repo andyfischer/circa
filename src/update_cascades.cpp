@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "branch.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 #include "function.h"
 #include "tagged_value.h"
 #include "term.h"

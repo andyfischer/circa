@@ -288,16 +288,16 @@ void test_message_passing2()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(branch["last_output"], "1");
+    test_equals(&context.state, "[last_output: 1]");
 
     evaluate_branch(&context, branch);
-    test_equals(branch["last_output"], "2");
+    test_equals(&context.state, "[last_output: 2]");
 
     evaluate_branch(&context, branch);
-    test_equals(branch["last_output"], "2");
+    test_equals(&context.state, "[last_output: 2]");
 
     evaluate_branch(&context, branch);
-    test_equals(branch["last_output"], "2");
+    test_equals(&context.state, "[last_output: 2]");
 }
 
 void test_run_single_statement()

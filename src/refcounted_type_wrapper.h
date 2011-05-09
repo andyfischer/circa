@@ -19,6 +19,7 @@ namespace intrusive_refcounted {
     void release(Type*, TaggedValue* value)
     {
         T* instance = (T*) value->value_data.ptr;
+
         ca_assert(instance != NULL);
 
         instance->_refCount--;
@@ -33,8 +34,7 @@ namespace intrusive_refcounted {
         // Increase refcount first, in case the value already has this object.
         value->_refCount++;
 
-        set_null(tv);
-        tv->value_type = type;
+        change_type_no_initialize(tv, type);
         tv->value_data = value;
     }
 

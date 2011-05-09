@@ -509,8 +509,9 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
 
-        if (is_type(typeTerm))
+        if (is_type(typeTerm)) {
             change_declared_type(input, typeTerm);
+        }
         hide_from_source(input);
 
         if (isHiddenStateArgument) {

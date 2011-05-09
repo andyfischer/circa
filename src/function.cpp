@@ -1,7 +1,18 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
-#include "debug_valid_objects.h"
+#include "building.h"
+#include "builtins.h"
+#include "evaluation.h"
+#include "function.h"
+#include "heap_debugging.h"
+#include "introspection.h"
+#include "source_repro.h"
+#include "subroutine.h"
+#include "term.h"
+#include "term_list.h"
+#include "token.h"
+#include "type.h"
+#include "types/list.h"
 
 namespace circa {
 
@@ -28,7 +39,7 @@ FunctionAttrs::FunctionAttrs()
 
 FunctionAttrs::~FunctionAttrs()
 {
-    debug_unregister_valid_object(this);
+    debug_unregister_valid_object(this, FUNCTION_ATTRS_OBJECT);
 }
 
 namespace function_attrs_t {

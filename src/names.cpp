@@ -4,8 +4,8 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "debug_valid_objects.h"
 #include "errors.h"
+#include "heap_debugging.h"
 #include "if_block.h"
 #include "source_repro.h"
 #include "term.h"

@@ -249,7 +249,7 @@ CA_FUNCTION(evaluate_for_loop)
     context->forLoopContext = prevLoopContext;
 
     if (useState) {
-        preserve_state_result(CALLER, &prevScopeState, &localState);
+        save_and_consume_state(CALLER, &prevScopeState, &localState);
         swap(&prevScopeState, &context->currentScopeState);
     }
 

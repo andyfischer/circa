@@ -313,9 +313,10 @@ void test_state_in_function()
 
     Term* call1 = branch.compile("my_func()");
 
-    test_assert(as_int(call1) == 0);
-
     evaluate_branch(&context, branch);
+
+    test_assert(as_int(call1) == 1);
+
     evaluate_branch(&context, branch);
     evaluate_branch(&context, branch);
 

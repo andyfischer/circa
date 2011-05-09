@@ -207,14 +207,14 @@ void test_stateful_value_decl()
 
     test_assert(b->type == FLOAT_TYPE);
     test_assert(branch["b"] == b);
-    test_assert(as_float(b) != 5.0); // shouldn't have this value yet
+    test_assert(!is_float(b) || as_float(b) == 0); // shouldn't have this value yet
 
     Term* c = parser::compile(branch, parser::statement, "state number c = 7.5");
     test_assert(c->name == "c");
     test_assert(is_get_state(c));
     test_assert(c->type == FLOAT_TYPE);
     test_assert(branch["c"] == c);
-    test_assert(as_float(c) != 7.5); // shouldn't have this value yet
+    test_assert(!is_float(c) || as_float(b) == 0); // shouldn't have this value yet
 }
 
 void test_arrow_concatenation()
@@ -627,7 +627,8 @@ void test_sig_indent_bug_with_bad_func_header()
 
     test_assert(branch["ns"] != NULL);
     test_assert(branch["ns"]->nestedContents["func1"] != NULL);
-    test_assert(is_function(branch["ns"]->nestedContents["func1"]));
+    Term* func1 = branch["ns"]->nestedContents["func1"];
+    test_assert(is_function(func1));
 }
 
 void test_sig_indent_for_loop()

@@ -22,14 +22,4 @@ void dump_with_props(Branch& branch);
 void dump(TaggedValue& value);
 void dump(TaggedValue* value);
 
-#if CIRCA_ENABLE_TRAP_ON_VALUE_WRITE
-
-void debug_trap_value_write(TaggedValue* val);
-
-#else
-
-#define debug_trap_value_write(x) ;
-
-#endif
-
 } // namespace circa

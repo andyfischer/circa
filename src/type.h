@@ -8,6 +8,7 @@
 
 #include "branch.h"
 #include "builtins.h"
+#include "heap_debugging.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -65,6 +66,8 @@ struct Type
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
     typedef int (*HashFunc)(TaggedValue* value);
+
+    HeapTracker _heapTracker;
 
     std::string name;
 
@@ -212,5 +215,9 @@ Term* create_implicit_tuple_type(TermList const& types);
 Term* find_member_function(Type* type, std::string const& name);
 
 Term* parse_type(Branch& branch, std::string const& decl);
+
+// Change the type value for an existing type. 'term' should be a value of
+// type Type.
+void install_type(Term* term, Type* type);
 
 } // namespace circa

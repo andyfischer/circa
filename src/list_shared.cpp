@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "debug_valid_objects.h"
 #include "errors.h"
+#include "heap_debugging.h"
 #include "list_shared.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -62,7 +62,7 @@ void free_list(ListData* data)
     for (int i=0; i < data->count; i++)
         set_null(&data->items[i]);
     free(data);
-    debug_unregister_valid_object(data);
+    debug_unregister_valid_object(data, LIST_OBJECT);
 }
 
 ListData* list_touch(ListData* original)

@@ -98,7 +98,7 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
     evaluate_branch_internal(context, contents);
 
     // Store container and replace currentScopeState
-    preserve_state_result(term, &prevScopeState, &context->currentScopeState);
+    save_and_consume_state(term, &prevScopeState, &context->currentScopeState);
     swap(&context->currentScopeState, &prevScopeState);
 }
 
@@ -218,11 +218,12 @@ void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* outp
     copy(containerDict->insert(term->uniqueName.name.c_str()), output);
 }
 
-void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result)
+void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* result)
 {
     Dict* containerDict = Dict::lazyCast(container);
     const char* name = term->uniqueName.name.c_str();
-    copy(result, containerDict->insert(name));
+    swap(result, containerDict->insert(name));
+    set_null(result);
 }
 
 bool evaluation_interrupted(EvalContext* context)

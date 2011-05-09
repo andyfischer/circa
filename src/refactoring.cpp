@@ -3,9 +3,9 @@
 #include "branch.h"
 #include "building.h"
 #include "builtins.h"
-#include "debug_valid_objects.h"
 #include "errors.h"
 #include "function.h"
+#include "heap_debugging.h"
 #include "introspection.h"
 #include "list_shared.h"
 #include "names.h"
@@ -73,18 +73,17 @@ void change_declared_type(Term *term, Term *typeTerm)
 
     Term* oldType = term->type;
 
-    term->type = typeTerm;
-    change_type(term, unbox_type(typeTerm));
-
     if (oldType == typeTerm)
         return;
 
-    // Cascade type inference
-    for (int user=0; user < term->users.length(); user++) {
-        Term* userTerm = term->users[user];
-        debug_assert_valid_object(userTerm, TERM_OBJECT);
-        respecialize_type(userTerm);
-    }
+    term->type = typeTerm;
+
+    set_null((TaggedValue*) term);
+
+    // TODO: Don't call change_type here
+    change_type(term, unbox_type(typeTerm));
+
+    // TODO: Use update_cascades to update inferred type on all users.
 }
 
 void respecialize_type(Term* term)

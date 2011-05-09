@@ -78,7 +78,11 @@ TaggedValue* get_local_safe(Term* term, int outputIndex);
 
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
-void preserve_state_result(Term* term, TaggedValue* container, TaggedValue* result);
+
+// Saves the state result inside 'result' into the given container, according to
+// the unique name of 'term'. This call will consume the value inside 'result',
+// so 'result' will be null after this call.
+void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* result);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.

@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 
 namespace circa {
 
@@ -30,12 +30,6 @@ void test_assert_function(Term* term, int line, const char* file)
     if (term == NULL) {
         std::stringstream msg;
         msg << "NULL term in " << file << ", line " << line;
-        throw std::runtime_error(msg.str());
-    }
-
-    if (!debug_is_term_pointer_valid(term)) {
-        std::stringstream msg;
-        msg << "Bad term pointer at " << file << ", line " << line;
         throw std::runtime_error(msg.str());
     }
 

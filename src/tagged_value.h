@@ -11,11 +11,13 @@ struct TaggedValue
     VariantValue value_data;
     Type* value_type;
 
-    // In test builds, types that use shared data structures can store an unshared copy
-    // of their value in 'value_data_unshared', to assert that the shared data is not
-    // corrupted.
-    #ifdef CIRCA_TEST_BUILD
-    VariantValue value_data_unshared;
+    #if CIRCA_ENABLE_TAGGED_VALUE_METADATA
+    // This metadata is only enabled in debug/test builds.
+    //
+    // The 'note' is a string describing the purpose of this value. For a temporary
+    // value it should describe the location it shows up, for a non-temporary, it
+    // should describe the owner and the context.
+    std::string metadata_note;
     #endif
 
     TaggedValue();
@@ -118,5 +120,15 @@ bool is_symbol(TaggedValue* value);
 
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);
+
+#if CIRCA_ENABLE_TAGGED_VALUE_METADATA
+
+void debug_set_tagged_value_note(TaggedValue* value, std::string const& note);
+
+#else
+
+#define debug_set_tagged_value_note(...)
+
+#endif
 
 } // namespace circa

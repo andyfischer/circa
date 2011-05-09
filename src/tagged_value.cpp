@@ -2,8 +2,8 @@
 
 #include "common_headers.h"
 
-#include "debug_valid_objects.h"
 #include "errors.h"
+#include "heap_debugging.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -11,13 +11,13 @@ namespace circa {
 
 TaggedValue::TaggedValue()
 {
+    debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
     init();
 }
 
 void
 TaggedValue::init()
 {
-    debug_register_valid_object_ignore_dupe(&NULL_T, TYPE_OBJECT);
     value_type = &NULL_T;
     value_data.ptr = 0;
 }
@@ -26,10 +26,13 @@ TaggedValue::~TaggedValue()
 {
     // Deallocate this value
     change_type(this, &NULL_T);
+    debug_unregister_valid_object(this, TAGGED_VALUE_OBJECT);
 }
 
 TaggedValue::TaggedValue(TaggedValue const& original)
 {
+    debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
+
     init();
 
     copy(&const_cast<TaggedValue&>(original), this);
@@ -44,6 +47,7 @@ TaggedValue::operator=(TaggedValue const& rhs)
 
 TaggedValue::TaggedValue(Type* type)
 {
+    debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
     init();
     change_type(this, type);
 }
@@ -169,6 +173,7 @@ void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest
         return;
 
     copy(source, dest);
+    result->success = true;
 }
 
 bool cast(TaggedValue* source, Type* type, TaggedValue* dest)
@@ -193,8 +198,6 @@ void copy(TaggedValue* source, TaggedValue* dest)
     if (source == dest)
         return;
 
-    debug_trap_value_write(dest);
-
     Type::Copy copyFunc = source->value_type->copy;
 
     if (copyFunc != NULL) {
@@ -204,21 +207,25 @@ void copy(TaggedValue* source, TaggedValue* dest)
     }
 
     // Default behavior, shallow assign.
+    set_null(dest);
     dest->value_type = source->value_type;
     dest->value_data = source->value_data;
 }
 
 void swap(TaggedValue* left, TaggedValue* right)
 {
-    debug_trap_value_write(left);
-    debug_trap_value_write(right);
-
     Type* temp_type = left->value_type;
     VariantValue temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;
     right->value_data = temp_data;
+
+    #if CIRCA_ENABLE_TAGGED_VALUE_METADATA
+    std::string temp_note = left->metadata_note;
+    left->metadata_note = right->metadata_note;
+    right->metadata_note = temp_note;
+    #endif
 }
 
 void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)
@@ -251,7 +258,7 @@ void reset(TaggedValue* value)
         return;
     }
 
-    // No default value, just change type to null and back
+    // No default value, just change type to null and back.
     change_type(value, &NULL_T);
     change_type(value, type);
 }
@@ -415,7 +422,6 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
 
 TaggedValue* set_int(TaggedValue* value, int i)
 {
-    debug_trap_value_write(value);
     change_type(value, &INT_T);
     value->value_data.asint = i;
     return value;
@@ -423,41 +429,35 @@ TaggedValue* set_int(TaggedValue* value, int i)
 
 void set_float(TaggedValue* value, float f)
 {
-    debug_trap_value_write(value);
     change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
 void set_string(TaggedValue* value, const char* s)
 {
-    debug_trap_value_write(value);
     change_type(value, &STRING_T);
     *((std::string*) value->value_data.ptr) = s;
 }
 
 void set_string(TaggedValue* value, std::string const& s)
 {
-    debug_trap_value_write(value);
     set_string(value, s.c_str());
 }
 
 void set_bool(TaggedValue* value, bool b)
 {
-    debug_trap_value_write(value);
     change_type(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
 void set_ref(TaggedValue* value, Term* t)
 {
-    debug_trap_value_write(value);
     change_type(value, &REF_T);
     value->value_data.ptr = t;
 }
 
 List* set_list(TaggedValue* value)
 {
-    debug_trap_value_write(value);
     change_type(value, &NULL_T); // substitute for 'reset'
     change_type(value, &LIST_T);
     return List::checkCast(value);
@@ -465,7 +465,6 @@ List* set_list(TaggedValue* value)
 
 List* set_list(TaggedValue* value, int size)
 {
-    debug_trap_value_write(value);
     List* list = set_list(value);
     list->resize(size);
     return list;
@@ -481,7 +480,6 @@ void set_type(TaggedValue* value, Type* type)
 
 void set_null(TaggedValue* value)
 {
-    debug_trap_value_write(value);
     change_type(value, &NULL_T);
 }
 void set_opaque_pointer(TaggedValue* value, void* addr)
@@ -492,14 +490,12 @@ void set_opaque_pointer(TaggedValue* value, void* addr)
 
 void set_pointer(TaggedValue* value, Type* type, void* p)
 {
-    debug_trap_value_write(value);
     value->value_type = type;
     value->value_data.ptr = p;
 }
 
 void set_pointer(TaggedValue* value, void* ptr)
 {
-    debug_trap_value_write(value);
     value->value_data.ptr = ptr;
 }
 

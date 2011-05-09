@@ -17,17 +17,15 @@ using namespace circa;
 
 namespace text {
 
+Type g_fontRefType;
+
 struct FontRef
 {
     int _refCount;
     TTF_Font* ttfFont;
 
     FontRef() : ttfFont(NULL) {}
-
-    static Type* singleton;
 };
-
-Type* FontRef::singleton;
 
 struct Font : public circa::TaggedValue
 {
@@ -46,14 +44,14 @@ struct Font : public circa::TaggedValue
     static Font* lazyCast(TaggedValue* val)
     {
         if (val->value_type->name != "Font")
-            change_type(val, FontRef::singleton);
+            change_type(val, &g_fontRefType);
         return (Font*) val;
     }
 
     static Font* cast(TaggedValue* val)
     {
         circa::reset(val);
-        change_type(val, FontRef::singleton);
+        change_type(val, &g_fontRefType);
         return (Font*) val;
     }
 };
@@ -198,8 +196,8 @@ CA_FUNCTION(get_metrics)
 
 void setup(Branch& branch)
 {
-    FontRef::singleton = unbox_type(branch["Font"]);
-    intrusive_refcounted::setup_type<FontRef>(FontRef::singleton);
+    intrusive_refcounted::setup_type<FontRef>(&g_fontRefType);
+    install_type(branch["Font"], &g_fontRefType);
 
     if (TTF_Init() == -1) {
         std::cout << "TTF_Init failed with error: " << TTF_GetError();

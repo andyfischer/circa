@@ -5,7 +5,7 @@
 #include "importing_macros.h"
 
 #include "circa.h"
-#include "debug_valid_objects.h"
+#include "heap_debugging.h"
 #include "types/any.h"
 #include "types/bool.h"
 #include "types/callable.h"
@@ -133,6 +133,7 @@ TaggedValue REPEAT_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
 
+bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
@@ -302,8 +303,6 @@ void pre_setup_types(Branch& kernel)
 
 void initialize_compound_types(Branch& kernel)
 {
-    type_t::setup_type(TYPE_TYPE);
-
     Term* set_type = create_compound_type(kernel, "Set");
     set_t::setup_type(unbox_type(set_type));
 
@@ -391,6 +390,7 @@ using namespace circa;
 export_func void circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
+    STATIC_INITIALIZATION_FINISHED = true;
 
     create_primitive_types();
     bootstrap_kernel();
