@@ -70,10 +70,10 @@ namespace vectorize_vv_function {
             return;
 
         Term* leftPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
-        change_type(leftPlaceholder, find_type_of_get_index(left));
+        change_declared_type(leftPlaceholder, find_type_of_get_index(left));
 
         Term* rightPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
-        change_type(rightPlaceholder, find_type_of_get_index(right));
+        change_declared_type(rightPlaceholder, find_type_of_get_index(right));
 
         apply(contents, func, TermList(leftPlaceholder, rightPlaceholder));
     }

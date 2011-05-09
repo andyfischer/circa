@@ -510,7 +510,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
 
         if (is_type(typeTerm))
-            change_type(input, typeTerm);
+            change_declared_type(input, typeTerm);
         hide_from_source(input);
 
         if (isHiddenStateArgument) {

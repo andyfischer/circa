@@ -20,10 +20,9 @@ namespace intrusive_refcounted {
     {
         T* instance = (T*) value->value_data.ptr;
         instance->_refCount--;
-        if (instance->_refCount <= 0) {
+        if (instance->_refCount <= 0)
             delete instance;
-            value->value_data.ptr = NULL;
-        }
+        value->value_data.ptr = NULL;
     }
 
     template <typename T>

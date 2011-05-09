@@ -362,21 +362,23 @@ void touch(TaggedValue* value)
 
 void change_type(TaggedValue* v, Type* type)
 {
-    // type may be null
+    // 'type' may be null
     ca_assert(v != NULL);
     debug_assert_valid_object(type, TYPE_OBJECT);
 
     if (v->value_type == type)
         return;
 
+    // Release old value.
     if (v->value_type != NULL) {
         Type::Release release = v->value_type->release;
         if (release != NULL)
             release(v->value_type, v);
     }
-
-    v->value_type = type;
     v->value_data.ptr = 0;
+
+    // Initialize to the new type.
+    v->value_type = type;
 
     if (type != NULL) {
         Type::Initialize initialize = type->initialize;

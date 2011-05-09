@@ -97,7 +97,7 @@ void setup_for_loop_post_code(Term* forTerm)
         // First input to both of these should be 'original', but we need to wait until
         // after remap_pointers before setting this.
         Term* innerRebind = apply(innerRebinds, JOIN_FUNC, TermList(NULL, loopResult), name);
-        change_type(innerRebind, original->type);
+        change_declared_type(innerRebind, original->type);
         Term* outerRebind = apply(outerRebinds, JOIN_FUNC, TermList(NULL, loopResult), name);
 
         // Rewrite the loop code to use our local copies of these rebound variables.

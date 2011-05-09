@@ -22,7 +22,7 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
             return result;
         } else if (inputs.length() == 1) {
             Term* result = apply(branch, CAST_FUNC, inputs);
-            change_type(result, function);
+            change_declared_type(result, function);
             return result;
         } else {
             internal_error("Constructors with multiple arguments not yet supported.");
@@ -202,7 +202,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     original->inputsToList(inputs);
 
     Term* term = apply(branch, original->function, inputs, name);
-    change_type(term, original->type);
+    change_declared_type(term, original->type);
     change_type((TaggedValue*) term, original->value_type);
 
     copy(original, term);
@@ -240,7 +240,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
 
     change_function(term, VALUE_FUNC);
     term->type = type;
-    change_type(term, type);
+    change_declared_type(term, type);
     update_unique_name(term);
     update_locals_index_for_new_term(term);
 
@@ -264,7 +264,7 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
 {
     Term* result = apply(branch, get_global("get_state_field"),
             TermList(NULL, defaultValue), name);
-    change_type(result, type);
+    change_declared_type(result, type);
     return result;
 }
 
@@ -354,7 +354,7 @@ Term* procure_value(Branch& branch, Term* type, std::string const& name)
     if (existing == NULL)
         existing = create_value(branch, type, name);
     else
-        change_type(existing, type);
+        change_declared_type(existing, type);
     return existing;
 }
 

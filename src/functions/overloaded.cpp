@@ -84,7 +84,7 @@ namespace overloaded_function {
                 TermList inputs;
                 CALLER->inputsToList(inputs);
                 apply(contents, specializedFunc, inputs);
-                //change_type(CALLER, contents[0]->type);
+                //change_declared_type(CALLER, contents[0]->type);
             }
             TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
@@ -121,7 +121,7 @@ namespace overloaded_function {
 
         if (specializedFunc != NULL) {
             apply(contents, specializedFunc, inputs);
-            change_type(term, contents[0]->type);
+            change_declared_type(term, contents[0]->type);
         }
     }
 

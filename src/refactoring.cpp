@@ -65,7 +65,7 @@ void unsafe_change_type(Term *term, Term *type)
     term->type = type;
 }
 
-void change_type(Term *term, Term *typeTerm)
+void change_declared_type(Term *term, Term *typeTerm)
 {
     ca_assert(term != NULL);
     ca_assert(typeTerm != NULL);
@@ -94,7 +94,7 @@ void respecialize_type(Term* term)
 
     Term* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
-        change_type(term, outputType);
+        change_declared_type(term, outputType);
 }
 
 void specialize_type(Term *term, Term *type)
@@ -104,7 +104,7 @@ void specialize_type(Term *term, Term *type)
 
     ca_assert(term->type == ANY_TYPE);
 
-    change_type(term, type);
+    change_declared_type(term, type);
 }
 
 void rename(Term* term, std::string const& name)
@@ -132,7 +132,7 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(term);
 
-    change_type(term, outputType);
+    change_declared_type(term, outputType);
 }
 
 void rewrite_as_value(Branch& branch, int index, Term* type)
@@ -146,7 +146,7 @@ void rewrite_as_value(Branch& branch, int index, Term* type)
         Term* term = branch[index];
 
         change_function(term, VALUE_FUNC);
-        change_type(term, type);
+        change_declared_type(term, type);
         set_inputs(term, TermList());
     }
 }
