@@ -17,15 +17,15 @@ TaggedValue::TaggedValue()
 void
 TaggedValue::init()
 {
-    debug_register_valid_object_ignore_dupe(&NULL_TYPE, TYPE_OBJECT);
-    value_type = &NULL_TYPE;
+    debug_register_valid_object_ignore_dupe(&NULL_T, TYPE_OBJECT);
+    value_type = &NULL_T;
     value_data.ptr = 0;
 }
 
 TaggedValue::~TaggedValue()
 {
     // Deallocate this value
-    change_type(this, &NULL_TYPE);
+    change_type(this, &NULL_T);
 }
 
 TaggedValue::TaggedValue(TaggedValue const& original)
@@ -251,7 +251,7 @@ void reset(TaggedValue* value)
     }
 
     // No default value, just change type to null and back
-    change_type(value, &NULL_TYPE);
+    change_type(value, &NULL_T);
     change_type(value, type);
 }
 
@@ -455,7 +455,7 @@ void set_ref(TaggedValue* value, Term* t)
 List* set_list(TaggedValue* value)
 {
     debug_trap_value_write(value);
-    change_type(value, &NULL_TYPE); // substitute for 'reset'
+    change_type(value, &NULL_T); // substitute for 'reset'
     change_type(value, &LIST_T);
     return List::checkCast(value);
 }
@@ -479,7 +479,7 @@ void set_type(TaggedValue* value, Type* type)
 void set_null(TaggedValue* value)
 {
     debug_trap_value_write(value);
-    change_type(value, &NULL_TYPE);
+    change_type(value, &NULL_T);
 }
 void set_opaque_pointer(TaggedValue* value, void* addr)
 {
@@ -634,7 +634,7 @@ bool is_value_of_type(TaggedValue* value, Type* type)
 
 bool is_null(TaggedValue* value)
 {
-    return value->value_type == &NULL_TYPE;
+    return value->value_type == &NULL_T;
 }
 bool is_symbol(TaggedValue* value)
 {

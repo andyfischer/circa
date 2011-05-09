@@ -17,20 +17,6 @@
 namespace circa {
 namespace list_t {
 
-    ListData* touch(ListData* original);
-
-    void assert_valid_list(ListData* list)
-    {
-        if (list == NULL) return;
-        debug_assert_valid_object(list, LIST_OBJECT);
-        if (list->refCount == 0) {
-            std::stringstream err;
-            err << "list has zero refs: " << list;
-            internal_error(err.str().c_str());
-        }
-        ca_assert(list->refCount > 0);
-    }
-
     void incref(ListData* data)
     {
         assert_valid_list(data);
@@ -39,108 +25,10 @@ namespace list_t {
         //std::cout << "incref " << data << " to " << data->refCount << std::endl;
     }
 
-    void decref(ListData* data)
-    {
-        assert_valid_list(data);
-        ca_assert(data->refCount > 0);
-        data->refCount--;
-
-        if (data->refCount == 0)
-            free_list(data);
-
-        //std::cout << "decref " << data << " to " << data->refCount << std::endl;
-    }
-
-    ListData* duplicate(ListData* source)
-    {
-        if (source == NULL || source->count == 0)
-            return NULL;
-
-        assert_valid_list(source);
-
-        ListData* result = allocate_empty_list(source->capacity);
-
-        result->count = source->count;
-
-        for (int i=0; i < source->count; i++)
-            copy(&source->items[i], &result->items[i]);
-
-        return result;
-    }
-
-    ListData* increase_capacity(ListData* original, int new_capacity)
-    {
-        if (original == NULL)
-            return allocate_empty_list(new_capacity);
-
-        assert_valid_list(original);
-        ListData* result = allocate_empty_list(new_capacity);
-
-        bool createCopy = original->refCount > 1;
-
-        result->count = original->count;
-        for (int i=0; i < result->count; i++) {
-            TaggedValue* left = &original->items[i];
-            TaggedValue* right = &result->items[i];
-            if (createCopy)
-                copy(left, right);
-            else
-                swap(left, right);
-        }
-
-        decref(original);
-        return result;
-    }
-
-    ListData* double_capacity(ListData* original)
-    {
-        if (original == NULL)
-            return allocate_empty_list(1);
-
-        ListData* result = increase_capacity(original, original->capacity * 2);
-        return result;
-    }
-
-    ListData* resize(ListData* original, int numElements)
-    {
-        if (original == NULL) {
-            if (numElements == 0)
-                return NULL;
-            ListData* result = allocate_empty_list(numElements);
-            result->count = numElements;
-            return result;
-        }
-
-        if (numElements == 0) {
-            decref(original);
-            return NULL;
-        }
-
-        // Check for not enough capacity
-        if (numElements > original->capacity) {
-            ListData* result = increase_capacity(original, numElements);
-            result->count = numElements;
-            return result;
-        }
-
-        if (original->count == numElements)
-            return original;
-
-        // Capacity is good, will need to modify 'count' on list and possibly
-        // set some items to null. This counts as a modification.
-        ListData* result = touch(original);
-
-        // Possibly set extra elements to null, if we are shrinking.
-        for (int i=numElements; i < result->count; i++)
-            set_null(&result->items[i]);
-        result->count = numElements;
-
-        return result;
-    }
     ListData* remove_index(ListData* original, int index)
     {
         ca_assert(index < original->count);
-        ListData* result = touch(original);
+        ListData* result = list_touch(original);
 
         for (int i=index; i < result->count - 1; i++)
             swap(&result->items[i], &result->items[i+1]);
@@ -152,21 +40,8 @@ namespace list_t {
     void clear(ListData** data)
     {
         if (*data == NULL) return;
-        decref(*data);
+        list_decref(*data);
         *data = NULL;
-    }
-
-    ListData* touch(ListData* original)
-    {
-        if (original == NULL)
-            return NULL;
-        ca_assert(original->refCount > 0);
-        if (original->refCount == 1)
-            return original;
-
-        ListData* copy = duplicate(original);
-        decref(original);
-        return copy;
     }
 
     TaggedValue* append(ListData** data)
@@ -174,10 +49,10 @@ namespace list_t {
         if (*data == NULL) {
             *data = allocate_empty_list(1);
         } else {
-            *data = touch(*data);
+            *data = list_touch(*data);
             
             if ((*data)->count == (*data)->capacity)
-                *data = double_capacity(*data);
+                *data = list_double_capacity(*data);
         }
 
         ListData* d = *data;
@@ -196,7 +71,7 @@ namespace list_t {
 
     void set_index(ListData** data, int index, TaggedValue* v)
     {
-        *data = touch(*data);
+        *data = list_touch(*data);
         copy(v, get_index(*data, index));
     }
 
@@ -214,7 +89,7 @@ namespace list_t {
 
     void remove_and_replace_with_back(ListData** data, int index)
     {
-        *data = touch(*data);
+        *data = list_touch(*data);
         ca_assert(index < (*data)->count);
 
         set_null(&(*data)->items[index]);
@@ -231,7 +106,7 @@ namespace list_t {
         if (*dataPtr == NULL)
             return;
 
-        *dataPtr = touch(*dataPtr);
+        *dataPtr = list_touch(*dataPtr);
         ListData* data = *dataPtr;
 
         int numRemoved = 0;
@@ -241,7 +116,7 @@ namespace list_t {
             else
                 swap(&data->items[i - numRemoved], &data->items[i]);
         }
-        *dataPtr = resize(*dataPtr, data->count - numRemoved);
+        *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
     }
 
     TaggedValue* prepend(ListData** data)
@@ -277,7 +152,7 @@ namespace list_t {
     void resize(TaggedValue* list, int newSize)
     {
         ca_assert(is_list(list));
-        set_pointer(list, resize((ListData*) get_pointer(list), newSize));
+        set_pointer(list, list_resize((ListData*) get_pointer(list), newSize));
     }
     void remove_index(TaggedValue* list, int index)
     {
@@ -328,7 +203,7 @@ namespace list_t {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
         if (data == NULL) return;
-        decref(data);
+        list_decref(data);
     }
 
     void tv_copy(Type*, TaggedValue* source, TaggedValue* dest)
@@ -339,11 +214,11 @@ namespace list_t {
         ListData* d = (ListData*) get_pointer(dest);
 
     #if CIRCA_DISABLE_LIST_SHARING
-        if (d != NULL) decref(d);
-        set_pointer(dest, duplicate(s));
+        if (d != NULL) list_decref(d);
+        set_pointer(dest, list_duplicate(s));
     #else
         if (s != NULL) incref(s);
-        if (d != NULL) decref(d);
+        if (d != NULL) list_decref(d);
         set_pointer(dest, s);
     #endif
     }
@@ -464,7 +339,7 @@ namespace list_t {
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
-        set_pointer(value, touch(data));
+        set_pointer(value, list_touch(data));
     }
 
     void tv_static_type_query(Type* type, StaticTypeQuery* query)

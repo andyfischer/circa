@@ -1803,7 +1803,7 @@ ParseResult literal_null(Branch& branch, TokenStream& tokens, ParserCxt* context
 
     tokens.consume(NULL_TOKEN);
 
-    Term* term = create_value(branch, NULL_TYPE_TERM);
+    Term* term = create_value(branch, NULL_T_TERM);
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }

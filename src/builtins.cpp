@@ -98,7 +98,7 @@ Term* BOOL_TYPE = NULL;
 Term* DICT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
-Term* NULL_TYPE_TERM = NULL;
+Term* NULL_T_TERM = NULL;
 Term* RECT_I_TYPE_TERM = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
@@ -120,7 +120,7 @@ Type ERROR_T;
 Type FLOAT_T;
 Type INT_T;
 Type LIST_T;
-Type NULL_TYPE;
+Type NULL_T;
 Type OPAQUE_POINTER_T;
 Type REF_T;
 Type STRING_T;
@@ -148,7 +148,7 @@ CA_FUNCTION(empty_evaluate_function)
 
 void create_primitive_types()
 {
-    null_t::setup_type(&NULL_TYPE);
+    null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
     dict_t::setup_type(&DICT_T);
     float_t::setup_type(&FLOAT_T);
@@ -250,8 +250,8 @@ void initialize_primitive_types(Branch& kernel)
     FLOAT_TYPE = create_type(kernel, "number");
     set_type(FLOAT_TYPE, &FLOAT_T);
 
-    NULL_TYPE_TERM = create_type(kernel, "Null");
-    set_type(NULL_TYPE_TERM, &NULL_TYPE);
+    NULL_T_TERM = create_type(kernel, "Null");
+    set_type(NULL_T_TERM, &NULL_T);
 
     DICT_TYPE = create_type(kernel, "Dict");
     set_type(DICT_TYPE, &DICT_T);
@@ -437,7 +437,7 @@ export_func void circa_shutdown()
     clear_type_contents(&FLOAT_T);
     clear_type_contents(&INT_T);
     clear_type_contents(&LIST_T);
-    clear_type_contents(&NULL_TYPE);
+    clear_type_contents(&NULL_T);
     clear_type_contents(&OPAQUE_POINTER_T);
     clear_type_contents(&REF_T);
     clear_type_contents(&STRING_T);
