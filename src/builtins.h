@@ -132,6 +132,7 @@ namespace include_function {
 }
 
 namespace internal_debug_function {
+    void oracle_clear();
     void oracle_send(TaggedValue* value);
     void oracle_send(int i);
     void spy_clear();

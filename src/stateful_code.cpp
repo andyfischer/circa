@@ -117,6 +117,8 @@ void get_state_description(Term* term, TaggedValue* output)
         set_string(output, declared_type(term)->name);
     } else if (is_function_stateful(term->function)) {
         describe_state_shape(term->function->nestedContents, output);
+    } else if (has_any_inlined_state(term->nestedContents)) {
+        describe_state_shape(term->nestedContents, output);
     }
 }
 

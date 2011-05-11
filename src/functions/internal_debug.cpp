@@ -31,9 +31,17 @@ namespace internal_debug_function {
         "'For internal testing. This function will output values that are manually "
         "inserted with the c++ function oracle_send'")
     {
-        ca_assert(oracleValues.length() > 0);
-        copy(oracleValues[0], OUTPUT);
-        oracleValues.remove(0);
+        if (oracleValues.length() == 0)
+            set_null(OUTPUT);
+        else {
+            copy(oracleValues[0], OUTPUT);
+            oracleValues.remove(0);
+        }
+    }
+
+    void oracle_clear()
+    {
+        oracleValues.clear();
     }
 
     void oracle_send(TaggedValue* value)

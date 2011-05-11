@@ -351,6 +351,40 @@ void test_strip_abandoned_state()
     test_equals(&trash, "[s: 1]");
 }
 
+void test_preserve_state_in_nested_include_file()
+{
+    // File 'a' includes 'b', both have state. When changing 'a', make sure that
+    // the state in 'b' is preserved.
+    Branch branch;
+    FakeFileSystem files;
+
+    internal_debug_function::oracle_clear();
+    internal_debug_function::oracle_send(1);
+    internal_debug_function::oracle_send(2);
+    internal_debug_function::oracle_send(3);
+    internal_debug_function::oracle_send(3);
+    
+    // (send a double 3, this test doesn't care if the test_oracle call gets reevaluated after
+    // the script change).
+
+    files.set("a", "include('b'); state s = test_oracle()");
+    files.set("b", "state x = test_oracle()");
+    branch.compile("include('a')");
+
+    TaggedValue desc;
+    describe_state_shape(branch, &desc);
+    
+    EvalContext context;
+    evaluate_branch(&context, branch);
+
+    test_equals(&context.state, "[_include: [_include: [x: 1], s: 2]]");
+
+    files.set("a", "include('b'); state t = test_oracle()");
+    evaluate_branch(&context, branch);
+
+    test_equals(&context.state, "[_include: [_include: [x: 1], t: 3]]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -371,6 +405,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_default_needs_cast);
     REGISTER_TEST_CASE(stateful_code_tests::test_describe_state_shape);
     REGISTER_TEST_CASE(stateful_code_tests::test_strip_abandoned_state);
+    REGISTER_TEST_CASE(stateful_code_tests::test_preserve_state_in_nested_include_file);
 }
 
 } // namespace stateful_code_tests
