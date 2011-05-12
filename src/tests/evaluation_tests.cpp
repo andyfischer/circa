@@ -58,11 +58,28 @@ void test_evaluate_minimum2()
     test_equals(get_local(xyz), "null");
 }
 
+void test_term_stack()
+{
+    Branch branch;
+    branch.compile("def term_names(List n)->List { return for n in names { n.name() } }");
+    Term* f = branch.compile("def f() { debug_get_term_stack() -> term_names -> test_spy }");
+    Term* g = branch.compile("def g() { f() }");
+    Term* h = branch.compile("def h() { g() }");
+
+    internal_debug_function::spy_clear();
+    branch.eval("f()");
+
+    test_equals(internal_debug_function::spy_results(), "['f', '']");
+
+    //branch.compile("def h() { g() }");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(evaluation_tests::test_branch_eval);
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum);
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum2);
+    //REGISTER_TEST_CASE(evaluation_tests::test_term_stack);
 }
 
 } // evaluation_tests

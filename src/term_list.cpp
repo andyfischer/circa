@@ -152,6 +152,12 @@ TermList::remove(Term* term)
     _terms.resize(_terms.size() - numRemoved);
 }
 
+void TermList::pop()
+{
+    ca_assert(length() > 0);
+    resize(length() - 1);
+}
+
 void
 TermList::resize(int s)
 {

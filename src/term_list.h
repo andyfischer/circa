@@ -35,6 +35,7 @@ struct TermList
     void insert(int index, Term* term);
     void remove(int i);
     void remove(Term* term);
+    void pop();
     void resize(int s);
     void clear();
 };

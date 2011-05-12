@@ -81,7 +81,11 @@ namespace include_function {
             reset_locals(contents);
         }
 
+        context->stack.append(CALLER);
+
         evaluate_branch_internal(context, contents);
+
+        context->stack.pop();
 
         // Store container and replace currentScopeState
         save_and_consume_state(CALLER, &prevScopeState, &context->currentScopeState);

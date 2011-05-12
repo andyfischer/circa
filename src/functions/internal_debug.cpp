@@ -121,6 +121,14 @@ namespace internal_debug_function {
         //std::cout << "allocated " << slot << std::endl;
     }
 
+    CA_DEFINE_FUNCTION(get_term_stack, "debug_get_term_stack() -> List")
+    {
+        int len = CONTEXT->stack.length();
+        List& output = *List::cast(OUTPUT, len);
+        for (int i=0; i < len; i++)
+            set_ref(output[i], CONTEXT->stack[i]);
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

@@ -5,6 +5,7 @@
 #include "common_headers.h"
 #include "for_loop.h"
 #include "tagged_value.h"
+#include "term_list.h"
 #include "types/list.h"
 #include "types/dict.h"
 
@@ -33,6 +34,9 @@ struct EvalContext
 
     // Intra-program messages
     Dict messages;
+
+    // Current stack of in-progress terms. Used for introspection.
+    TermList stack;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 };

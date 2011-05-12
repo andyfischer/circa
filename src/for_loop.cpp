@@ -162,6 +162,7 @@ CA_FUNCTION(evaluate_for_loop)
 
     start_using(forContents);
     start_using(innerRebinds);
+    context->stack.append(CALLER);
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
@@ -253,6 +254,7 @@ CA_FUNCTION(evaluate_for_loop)
         swap(&prevScopeState, &context->currentScopeState);
     }
 
+    context->stack.pop();
     finish_using(forContents);
     finish_using(innerRebinds);
 }
