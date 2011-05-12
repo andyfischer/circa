@@ -1,0 +1,65 @@
+
+-- box2d bindings
+namespace box2d
+    def step(number seconds)
+        "Run the simulation for the given timestep. It's recommended to use timesteps of 1/60."
+    def gravity(Point vec)
+        "Set the gravity vector."
+    def body_int(any handle, Point initialPosition, number initialRotation, List properties, bool propertiesChanged) -> any
+        "Internal function, update the given body"
+
+    -- Properties is a list with:
+    --  [0] = bool dynamic
+    --  [1] = Point size
+    --  [2] = number density
+    --  [3] = number friction
+    --  [4] = number restitution
+
+    def body(Point initialPosition, number initialRotation, List properties) -> any
+        "Stateful function, declare a body"
+        state handle
+        body_int(@handle, initialPosition, initialRotation, properties, changed(properties))
+
+        return handle
+
+    def get_body_points(any handle) -> List
+        "Return the list of points of the given body, in screen space."
+    def get_body_position(any handle) -> Point
+        "Get the position of the body, in screen space."
+    def get_body_rotation(any handle) -> number
+        "Get the rotation of the body, as a unit angle."
+    def set_body_position(any handle, Point p)
+        "Move the body to the given position"
+    def set_body_rotation(any handle, number rotation)
+        "Rotate the body to the given rotation"
+    def body_contains_point(any handle, Point p) -> bool
+        "Intersection test, returns true if the given point is inside the body"
+
+    def fixed_body(Point position, number rotation, List properties) -> any
+        handle = body(position, rotation, [false].extend(properties))
+
+        if changed(position)
+            set_body_position(handle, position)
+        if changed(rotation)
+            set_body_rotation(handle, rotation)
+        return handle
+
+    def draggable_body(any handle)
+        state currently_dragging = false
+
+        if not(currently_dragging) and mouse_clicked()
+            if body_contains_point(handle, mouse)
+                currently_dragging = true
+
+        if not(mouse_pressed())
+            currently_dragging = false
+            
+        if currently_dragging
+            delt = delta_point(mouse)
+
+            -- Temporary workaround:
+            if mouse_clicked()
+                delt = [0 0]
+
+            set_body_position(handle, Point(get_body_position(handle) + delt))
+

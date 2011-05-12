@@ -41,7 +41,7 @@ Type g_bodyHandleType;
 
 void release_body_handle(int handle)
 {
-    std::cout << "releasing body: " << handle << std::endl;
+    //std::cout << "releasing body: " << handle << std::endl;
     if (g_world == NULL)
         return;
     if (g_bodies[handle] == NULL)
@@ -161,9 +161,9 @@ CA_FUNCTION(body)
 
         b2Body* body = g_world->CreateBody(&bodyDef);
 
-        int handle_index = assign_body_handle(handle, body);
+        assign_body_handle(handle, body);
 
-        std::cout << " allocating body: " << handle_index << std::endl;
+        //std::cout << " allocating body: " << handle_index << std::endl;
 
         ca_assert(is_valid_body_handle(handle));
 
@@ -249,6 +249,15 @@ CA_FUNCTION(get_body_position)
         world_to_screen(vec.y));
 }
 
+CA_FUNCTION(get_body_rotation)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    set_float(OUTPUT, radians_to_unit_angles(body->GetAngle()));
+}
+
 CA_FUNCTION(set_body_position)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
@@ -262,6 +271,17 @@ CA_FUNCTION(set_body_position)
         screen_to_world(loc.getY()));
 
     body->SetTransform(vec, body->GetAngle());
+}
+
+CA_FUNCTION(set_body_rotation)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    float rotation = unit_angles_to_radians(FLOAT_INPUT(1));
+
+    body->SetTransform(body->GetPosition(), rotation);
 }
 
 CA_FUNCTION(body_contains_point)
@@ -302,7 +322,9 @@ void setup(Branch& kernel)
     install_function(ns["body_int"], body);
     install_function(ns["get_body_points"], get_body_points);
     install_function(ns["get_body_position"], get_body_position);
+    install_function(ns["get_body_rotation"], get_body_rotation);
     install_function(ns["set_body_position"], set_body_position);
+    install_function(ns["set_body_rotation"], set_body_rotation);
     install_function(ns["body_contains_point"], body_contains_point);
 }
 
