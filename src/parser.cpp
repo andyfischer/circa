@@ -918,8 +918,8 @@ ParseResult expression_statement(Branch& branch, TokenStream& tokens, ParserCxt*
         postEqualsSpace = possible_whitespace(tokens);
     }
 
-    // Parse an infix expression
-    ParseResult result = bindable_expression(branch, tokens, context);
+    // Parse an expression
+    ParseResult result = expression(branch, tokens, context);
 
     result.term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
     result.term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
@@ -997,7 +997,7 @@ ParseResult return_statement(Branch& branch, TokenStream& tokens, ParserCxt* con
         tokens.next().match != RBRACE;
 
     if (returnsValue)
-        output = infix_expression(branch, tokens, context).term;
+        output = expression(branch, tokens, context).term;
 
     Term* result = apply(branch, RETURN_FUNC, TermList(output));
 
@@ -1060,7 +1060,7 @@ ParseResult continue_statement(Branch& branch, TokenStream& tokens, ParserCxt* c
     return ParseResult(result);
 }
 
-ParseResult bindable_expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
+ParseResult expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     if (tokens.nextIs(IF))
         return if_block(branch, tokens, context);
@@ -1347,7 +1347,7 @@ void function_call_inputs(Branch& branch, TokenStream& tokens, ParserCxt* contex
             inputHints.set(index, "rebindInput", "t");
         }
 
-        Term* term = infix_expression(branch, tokens, context).term;
+        Term* term = expression(branch, tokens, context).term;
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
         arguments.append(term);
@@ -1434,8 +1434,7 @@ ParseResult function_call2(Branch& branch, Term* function, TokenStream& tokens, 
             set_input_syntax_hint(result, index, "rebindInput", "t");
         }
 
-        // TODO: Need to save the identifier used
-        Term* input = infix_expression(branch, tokens, context).term;
+        Term* input = expression(branch, tokens, context).term;
 
         std::string postWhitespace = possible_whitespace_or_newline(tokens);
         if (tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
@@ -1652,7 +1651,7 @@ ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
     // parenthesized expression?
     else if (tokens.nextIs(LPAREN)) {
         tokens.consume(LPAREN);
-        result = infix_expression(branch, tokens, context);
+        result = expression(branch, tokens, context);
 
         if (!tokens.nextIs(RPAREN))
             return compile_error_for_line(result.term, tokens, startPosition);

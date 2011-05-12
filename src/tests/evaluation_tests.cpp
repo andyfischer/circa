@@ -62,9 +62,9 @@ void test_term_stack()
 {
     Branch branch;
     branch.compile("def term_names(List n)->List { return for n in names { n.name() } }");
-    Term* f = branch.compile("def f() { debug_get_term_stack() -> term_names -> test_spy }");
-    Term* g = branch.compile("def g() { f() }");
-    Term* h = branch.compile("def h() { g() }");
+    branch.compile("def f() { debug_get_term_stack() -> term_names -> test_spy }");
+    branch.compile("def g() { f() }");
+    branch.compile("def h() { g() }");
 
     internal_debug_function::spy_clear();
     branch.eval("f()");

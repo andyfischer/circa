@@ -220,6 +220,11 @@ void test_subroutine()
     test_snippet("def f() {}", "");
     test_snippet("def f() { return }", "");
     test_snippet("def f() { if 1==2 { return } }", "");
+
+    // return a for list result
+    test_snippet("def f()->List { return for i in 0..3 { i + 4 } }","f() == [4, 5, 6]");
+    test_snippet("def f()->List { return (for i in 0..3 { i + 4 }) }","f() == [4, 5, 6]");
+    test_snippet("def f()->List { return(for i in 0..3 { i + 4 }) }","f() == [4, 5, 6]");
 }
 
 void test_references()
