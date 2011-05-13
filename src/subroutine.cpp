@@ -186,6 +186,12 @@ Term* find_enclosing_subroutine(Term* term)
     return find_enclosing_subroutine(parent);
 }
 
+int get_input_index_of_placeholder(Term* inputPlaceholder)
+{
+    ca_assert(inputPlaceholder->function == INPUT_PLACEHOLDER_FUNC);
+    return inputPlaceholder->index - 1;
+}
+
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function

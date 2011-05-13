@@ -8,6 +8,11 @@
 
 namespace circa {
 
+void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desired);
+
+#if 0
+OLD_FEEDBACK_IMPL_DISABLED
+
 extern const std::string TRAINING_BRANCH_NAME;
 
 struct FeedbackOperation
@@ -47,5 +52,7 @@ float get_feedback_weight(Term* term);
 void set_feedback_weight(Term* term, float weight);
 
 Branch& feedback_output(Term* term);
+
+#endif
 
 } // namespace circa

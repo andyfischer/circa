@@ -19,6 +19,8 @@ namespace cond_function {
 
     CA_FUNCTION(feedback)
     {
+#if 0
+OLD_FEEDBACK_IMPL_DISABLED
         Term* target = INPUT_TERM(0);
         Term* desired = INPUT_TERM(1);
         Branch& output = feedback_output(CALLER);
@@ -38,6 +40,7 @@ namespace cond_function {
             Term* signal = (i == indexUsed) ? desired : target->input(i);
             copy(signal, output[i]);
         }
+        #endif
     }
 
     void setup(Branch& kernel)

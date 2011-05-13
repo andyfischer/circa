@@ -138,6 +138,7 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Do a feedback test
+    #if 0
     if (args[0] == "-f") {
         Branch branch;
         parse_script(branch, args[1]);
@@ -163,6 +164,7 @@ int run_command_line(std::vector<std::string> args)
 
         return 0;
     }
+    #endif
 
     // Generate cpp headers
     if (args[0] == "-gh") {

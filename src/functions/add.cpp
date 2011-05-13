@@ -23,6 +23,8 @@ namespace add_function {
 
     CA_FUNCTION(add_feedback)
     {
+        #if 0
+        OLD_FEEDBACK_IMPL_DISABLED
         Term* target = INPUT_TERM(0);
         float desired = FLOAT_INPUT(1);
 
@@ -35,6 +37,7 @@ namespace add_function {
             float balanced_delta = delta * get_feedback_weight(output);
             set_float(output, to_float(outputTarget) + balanced_delta);
         }
+        #endif
     }
 
     void setup(Branch& kernel)

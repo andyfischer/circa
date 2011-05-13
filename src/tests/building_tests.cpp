@@ -152,6 +152,9 @@ void test_erase_term()
 
 void test_repair_broken_links()
 {
+    #if 0
+    // TEST_DISABLED
+
     Branch branch;
     Term* br = branch.compile("br = { a = 1 }");
     Term* a = br->nestedContents["a"];
@@ -183,6 +186,7 @@ void test_repair_broken_links()
 
     test_assert(a != new_a);
     test_assert(b->input(0) == new_a);
+    #endif
 }
 
 void register_tests()

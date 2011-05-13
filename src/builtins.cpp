@@ -398,7 +398,6 @@ export_func void circa_initialize()
     post_initialize_primitive_types(*KERNEL);
     pre_setup_types(*KERNEL);
     initialize_compound_types(*KERNEL);
-    feedback_register_constants(*KERNEL);
 
     FINISHED_BOOTSTRAP = true;
 

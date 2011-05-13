@@ -6,11 +6,56 @@
 #include "branch_iterator.h"
 #include "builtins.h"
 #include "building.h"
+#include "evaluation.h"
+#include "subroutine.h"
 #include "term.h"
+#include "type.h"
 
 #include "feedback.h"
 
 namespace circa {
+
+void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desired)
+{
+    // For now, use a simple implementation which cannot handle combining multiple
+    // feedback events, or dispatching feedback to multiple sources. All we handle
+    // is dispatching across copy/input terms.
+
+    if (target->function == COPY_FUNC) {
+        return handle_feedback_event(context, target->input(0), desired);
+    } else if (target->function == VALUE_FUNC) {
+        ca_assert(cast_possible(desired, declared_type(target)));
+        copy(desired, target);
+    } else if (target->function == INPUT_PLACEHOLDER_FUNC) {
+
+        ca_assert(context != NULL);
+
+        // Find where we are in context->stack.
+
+        int stackPos;
+        for (stackPos = context->stack.length() - 1; stackPos >= 0; stackPos--) {
+            Term* stackTerm = context->stack[stackPos];
+            if (!is_subroutine(stackTerm->function))
+                continue;
+            if (target->owningBranch == &stackTerm->function->nestedContents)
+                break;
+        }
+
+        ca_assert(stackPos >= 0);
+
+        Term* caller = context->stack[stackPos];
+
+        ca_assert(&caller->function->nestedContents == target->owningBranch);
+
+        int input = get_input_index_of_placeholder(target);
+
+        handle_feedback_event(context, caller->input(input), desired);
+    }
+}
+
+#if 0
+
+OLD_FEEDBACK_IMPL_DISABLED
 
 const std::string TRAINING_BRANCH_NAME = "#training";
 
@@ -130,7 +175,7 @@ void normalize_feedback_branch(Branch& branch)
 
 void refresh_training_branch(Branch& branch, Branch& trainingBranch)
 {
-    #if 0
+    //#if 0
     update_derived_trainable_properties(branch);
     trainingBranch.clear();
 
@@ -221,7 +266,7 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
             }
         }
     }
-    #endif
+    //#endif
 }
 
 void refresh_training_branch(Branch& branch)
@@ -259,5 +304,6 @@ Branch& feedback_output(Term* term)
     // might refactor this:
     return term->nestedContents;
 }
+#endif
 
 } // namespace circa

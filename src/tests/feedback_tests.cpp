@@ -7,6 +7,8 @@
 namespace circa {
 namespace feedback_tests {
 
+#if 0
+OLD_FEEDBACK_IMPL_DISABLED
 void train_addition1()
 {
     Branch branch;
@@ -150,16 +152,36 @@ void feedback_operation()
     test_assert(list.length() == 1);
     test_assert(list[0] == b);
 }
+#endif
+
+void test_feedback_on_copy()
+{
+    Branch branch;
+    Term* a = branch.compile("a = 1");
+    Term* b = branch.compile("b = copy(a)");
+
+    TaggedValue two;
+    set_int(&two, 2);
+    handle_feedback_event(NULL, b, &two);
+
+    test_equals(a, "2");
+}
+
+void test_feedback_on_subroutine_input()
+{
+    Branch branch;
+    Term* a = branch.compile("a = 1");
+    branch.compile("def f(int i) { feedback(i, 2) }");
+    branch.compile("f(a)");
+
+    evaluate_branch(branch);
+    test_equals(a, "2");
+}
 
 void register_tests()
 {
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_addition1);
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_addition2);
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_mult);
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_cond);
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_sin);
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::train_cos);
-    //TEST_DISABLED REGISTER_TEST_CASE(feedback_tests::feedback_operation);
+    REGISTER_TEST_CASE(feedback_tests::test_feedback_on_copy);
+    REGISTER_TEST_CASE(feedback_tests::test_feedback_on_subroutine_input);
 }
 
 } // namespace feedback_tests

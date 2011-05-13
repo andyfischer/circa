@@ -17,6 +17,8 @@ namespace mult_function {
 
     CA_FUNCTION(feedback_evaluate)
     {
+#if 0
+OLD_FEEDBACK_IMPL_DISABLED
         Term* target = INPUT_TERM(0);
         float desired = FLOAT_INPUT(1);
 
@@ -41,6 +43,7 @@ namespace mult_function {
             // Otherwise, to solve for x = a * b, tell a that it should be closer to x / b
             set_float(output, to_float(outputTarget) + balanced_delta / divisor);
         }
+        #endif
     }
 
     void setup(Branch& kernel)

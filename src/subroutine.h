@@ -12,6 +12,7 @@ CA_FUNCTION(evaluate_subroutine);
 
 bool is_subroutine(Term* term);
 Term* find_enclosing_subroutine(Term* term);
+int get_input_index_of_placeholder(Term* inputPlaceholder);
 
 // Perform various steps to finish creating a subroutine
 void initialize_subroutine(Term* sub);
