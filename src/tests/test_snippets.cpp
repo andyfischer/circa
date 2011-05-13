@@ -350,6 +350,11 @@ void test_for_loops()
     // Syntax with significant indentation
     test_snippet("a = 0; for i in [1 2 3] a += i", "a == 6");
     test_snippet("a = []; for i in [1 2 3] a.append(i)", "a == [1 2 3]");
+
+    // Name a for loop, even though it returns nothing
+    test_snippet("my_for_loop = for i in [0] {}", "");
+    test_snippet("def f() {}; my_for_loop = for i in [0] { f() }", "");
+    test_snippet("a = 1; my_for_loop = for i in [0] { a = 2 }", "");
 }
 
 void test_for_loop_output()

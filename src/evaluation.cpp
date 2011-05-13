@@ -31,9 +31,9 @@ void evaluate_single_term(EvalContext* context, Term* term)
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
     #endif
 
-    // For a test build, we check the type result of every single call. This is slow and
-    // it should be unnecessary if the function is written correctly. But it's a good
-    // test.
+    // For a test build, we check the type of the output of every single call. This is
+    // slow, and it should be unnecessary if the function is written correctly. But it's
+    // a good test.
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred) {
         for (int i=0; i < get_output_count(term); i++) {

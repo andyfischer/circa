@@ -8,9 +8,23 @@ namespace void_t {
     {
         return "<void>";
     }
+    void cast(CastResult* result, TaggedValue* source, Type* type,
+        TaggedValue* dest, bool checkOnly)
+    {
+        if (!is_null(source)) {
+            result->success = false;
+            return;
+        }
+
+        if (checkOnly)
+            return;
+
+        set_null(dest);
+    }
     void setup_type(Type* type)
     {
         type->name = "void";
+        type->cast = cast;
         type->toString = to_string;
     }
 } // namespace void_t

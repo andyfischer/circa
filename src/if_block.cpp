@@ -129,6 +129,8 @@ CA_FUNCTION(evaluate_if_block)
     int acceptedBranchIndex = 0;
     Branch* acceptedBranch = NULL;
 
+    context->stack.append(CALLER);
+
     // Keep track of whether the accepted branch was empty; this is for deciding whether
     // to reset state.
     bool acceptedBranchWasEmpty = true;
@@ -153,6 +155,7 @@ CA_FUNCTION(evaluate_if_block)
 
             acceptedBranch = &branch->nestedContents;
 
+            context->stack.append(branch);
             start_using(*acceptedBranch);
 
             if (useState)
@@ -200,6 +203,10 @@ CA_FUNCTION(evaluate_if_block)
     // Finish using the branch, this will pop its stack frame. Need to do this after
     // copying joined values.
     finish_using(*acceptedBranch);
+
+    context->stack.pop();
+
+    context->stack.pop();
 }
 
 } // namespace circa
