@@ -24,8 +24,12 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
     if (target->function == COPY_FUNC) {
         return handle_feedback_event(context, target->input(0), desired);
     } else if (target->function == VALUE_FUNC) {
-        ca_assert(cast_possible(desired, declared_type(target)));
-        copy(desired, target);
+        bool success = cast(desired, declared_type(target), target);
+        if (!success) {
+            std::cout << "in handle_feedback, failed to cast "
+                << desired->value_type->name << " to "
+                << declared_type(target)->name << std::endl;
+        }
     } else if (target->function == INPUT_PLACEHOLDER_FUNC) {
 
         ca_assert(context != NULL);
@@ -50,6 +54,18 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
         int input = get_input_index_of_placeholder(target);
 
         handle_feedback_event(context, caller->input(input), desired);
+    } else if (target->function == LIST_FUNC) {
+
+        ca_assert(is_list(desired));
+
+        List* desiredList = List::checkCast(desired);
+        ca_assert(desiredList->length() == target->numInputs());
+
+        for (int i=0; i < target->numInputs(); i++)
+            handle_feedback_event(context, target->input(i), desiredList->get(i));
+    } else {
+        std::cout << "function doesn't support feedback: " << target->function->name
+            << std::endl;
     }
 }
 

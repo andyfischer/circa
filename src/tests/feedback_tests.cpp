@@ -176,6 +176,14 @@ void test_feedback_on_subroutine_input()
 
     evaluate_branch(branch);
     test_equals(a, "2");
+
+    branch.clear();
+    a = branch.compile("a = 1");
+    branch.compile("def f(int i) { feedback(i, 3) }");
+    branch.compile("def g(int i) { f(i) }");
+    branch.compile("g(a)");
+    evaluate_branch(branch);
+    test_equals(a, "3");
 }
 
 void register_tests()

@@ -52,15 +52,31 @@ struct TaggedValue
     static TaggedValue fromBool(bool b);
 };
 
+// Full version of cast(). Attempt to cast 'source' to 'type' and store the result
+// in 'dest'. If source has a different type, then we'll ask 'type' how to do this
+// conversion. 'result' stores whether the operation succedded. If 'checkOnly' is
+// true, then we won't actually write to 'dest', we'll just record whether the
+// operation would have succeeded.
 void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly);
 
-// Attempts to cast, returns whether it was successful
+// Attempts to cast the value to the given type, returns whether it was successful.
 bool cast(TaggedValue* source, Type* type, TaggedValue* dest);
 
-bool cast_possible(TaggedValue* source, Type* type);
+// Returns whether this value can be cast to the given type.
+bool cast_possible(TaggedValue* value, Type* type);
+
+// Copy 'source' to 'dest'.
 void copy(TaggedValue* source, TaggedValue* dest);
+
+// Swap values between 'left' and 'right'. This is much cheaper than copy(),
+// because nothing special needs to happen. (In comparison, copy() will cause
+// some types to allocate a new piece of memory).
 void swap(TaggedValue* left, TaggedValue* right);
+
+// Convenience function, perform a swap or copy between the two values, depending
+// on the 'doCopy' flag.
 void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doCopy);
+
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 std::string to_string_annotated(TaggedValue* value);
