@@ -34,7 +34,9 @@ type Keypress {
     int modifier
 }
 
-def key_down(int key) -> bool
+def key_down_code(int key) -> bool
+def key_down_char(string key) -> bool
+key_down = overloaded_function(key_down_code key_down_char)
 def key_pressed_code(int key) -> bool
 def key_pressed_char(string key) -> bool
 key_pressed = overloaded_function(key_pressed_code key_pressed_char)

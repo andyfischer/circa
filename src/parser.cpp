@@ -10,6 +10,8 @@ namespace parser {
 
 using namespace circa::token;
 
+std::string namespace_term_back_to_string(Term* target);
+
 TermPtr compile(Branch& branch, ParsingStep step, std::string const& input)
 {
     int prevLastIndex = branch.length() - 1;
@@ -1389,7 +1391,7 @@ ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, P
         function = statically_resolve_namespace_access(originalFunction);
 
         if ((originalFunction != function) && (originalFunction->name == "")) {
-            originalName = get_relative_name(branch, function);
+            originalName = namespace_term_back_to_string(originalFunction);
             remove_term(originalFunction);
             refresh_locals_indices(branch);
         }
@@ -2005,6 +2007,25 @@ Term* statically_resolve_namespace_access(Term* target)
     }
 
     return target;
+}
+
+std::string namespace_term_back_to_string(Term* target)
+{
+    // This function is a little silly. I'd like to refactor namespace
+    // access terms so that they aren't separated into get_namespace_field()
+    // calls. But for now, this function can turn a namespace access
+    // back into the original string.
+
+    std::string result;
+
+    if (target->input(0)->function == GET_NAMESPACE_FIELD)
+        result = namespace_term_back_to_string(target->input(0));
+    else if (is_namespace(target->input(0)))
+        result = target->input(0)->name;
+
+    result += ":" + as_string(target->input(1));
+
+    return result;
 }
 
 // --- More Utility functions ---

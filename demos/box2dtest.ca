@@ -1,15 +1,12 @@
 
 include('demos/modules/drifting_stars.ca')
 
-box2d:step(td)
-box2d:gravity([0 8])
-
 def draw_body_outline(any handle, Color color)
     points = box2d:get_body_points(handle)
     gl:line_loop(points color)
 
 def wall(Point p, number rot)
-    body = box2d:fixed_body(p rot [[120 15] 1 1 0])
+    body = box2d:fixed_body(p rot [[60 10] 1 1 0])
     draw_body_outline(body #fff)
 
     -- Draggable, using code feedback
@@ -22,6 +19,12 @@ def wall(Point p, number rot)
         state Point mouse_offset = p - mouse
         feedback(p, mouse + mouse_offset)
 
+        -- Rotate with z/x keys
+        if key_down('z')
+            feedback(rot rot - 0.01)
+        elif key_down('x')
+            feedback(rot rot + 0.01)
+
 def bouncy_box(Point start)
     box = box2d:body(start 0.0 [true [3 3] 1 .1 1])
     draw_body_outline(box #fff)
@@ -31,16 +34,19 @@ def large_box(Point start)
     draw_body_outline(body #fff)
 
 
-    
 
---wall([100 150] 0)
-wall([400 200] elapsed())
-bottom_wall = wall([100 321] 0.2)
 
-large_box([140 200])
+box2d:step(0.016)
+box2d:gravity([0 8])
 
-emitter = [220 0] -> Point
-bouncy_box(emitter)
 
-for i in 0..round(elapsed())
-    bouncy_box(emitter + [rand()*200, 0])
+large_box([400 100])
+
+for i in 0..100
+    bouncy_box([400 100])
+
+
+wall([520.0 319.0] -0.15)
+wall([377.0 234.0] 0.12)
+
+

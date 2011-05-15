@@ -333,6 +333,15 @@ void reproduce_namespace() {
     round_trip_source("namespace ns { 1 }");
     round_trip_source("namespace ns { print(1) }");
     round_trip_source("namespace ns { a = 1 }; b = ns:a");
+    round_trip_source("namespace ns { def what(){}} ns:what()");
+}
+
+void reproduce_namespace_and_include() {
+    FakeFileSystem files;
+    files["a"] = "namespace ns { a = 1; def f() }";
+
+    //TEST_DISABLED round_trip_source("include('a'); ns:a");
+    round_trip_source("include('a'); ns:f()");
 }
 void reproduce_misc_blocks() {
     round_trip_source("{}");
@@ -453,6 +462,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_type_decl);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_do_once);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_namespace);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_namespace_and_include);
     //TEST_DISABLED REGISTER_TEST_CASE(source_repro_snippets::reproduce_misc_blocks);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_with_parse_errors);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_dot_expressions);

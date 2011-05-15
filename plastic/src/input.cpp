@@ -31,8 +31,19 @@ void handle_key_press(SDL_Event &event, int key);
 
 CA_FUNCTION(key_down)
 {
-    int i = INT_INPUT(0);
-    set_bool(OUTPUT, KEY_DOWN[i]);
+    if (is_int(INPUT(0))) {
+        int i = INT_INPUT(0);
+        set_bool(OUTPUT, KEY_DOWN[i]);
+    } else {
+        if (is_string(INPUT(0))) {
+            std::string const& key = INPUT(0)->asString();
+            if (key.length() != 1)
+                return error_occurred(CONTEXT, CALLER, "Expected a string of length 1");
+            char c = key[0];
+
+            set_bool(OUTPUT, KEY_DOWN[c]);
+        }
+    }
 }
 
 CA_FUNCTION(key_pressed)
@@ -261,7 +272,8 @@ void setup(Branch& branch)
     for (int i=0; i < SDLK_LAST; i++)
         KEY_DOWN[i] = false;
 
-    install_function(branch["key_down"], key_down);
+    install_function(branch["key_down_code"], key_down);
+    install_function(branch["key_down_char"], key_down);
     install_function(branch["key_pressed_code"], key_pressed);
     install_function(branch["key_pressed_char"], key_pressed);
     install_function(branch["recent_key_presses"], recent_key_presses);

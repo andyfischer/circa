@@ -14,7 +14,7 @@ b2World *g_world = NULL;
 void initialize_world()
 {
     if (g_world == NULL)
-        g_world = new b2World(b2Vec2(), true);
+        g_world = new b2World(b2Vec2(), false);
 }
 
 int c_velocityIterations = 6;
