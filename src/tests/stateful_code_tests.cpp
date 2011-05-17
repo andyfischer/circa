@@ -2,7 +2,8 @@
 
 #include "common_headers.h"
 
-#include <circa.h>
+#include "circa.h"
+#include "fake_filesystem.h"
 
 namespace circa {
 namespace stateful_code_tests {

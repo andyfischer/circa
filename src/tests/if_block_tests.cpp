@@ -91,141 +91,109 @@ void test_dont_always_rebind_inner_names()
     test_assert(!branch.contains("e"));
 }
 
-std::vector<std::string> gSpyResults;
-
-CA_FUNCTION(spy_function)
-{
-    gSpyResults.push_back(as_string(INPUT(0)));
-}
-
 void test_execution()
 {
     Branch branch;
-    import_function(branch, spy_function, "spy(string)");
-    gSpyResults.clear();
+
+    internal_debug_function::spy_clear();
 
     // Start off with some simple expressions
-    branch.compile("if true { spy('Success 1') }");
-    branch.compile("if false { spy('Fail') }");
-    branch.compile("if (1 + 2) > 1 { spy('Success 2') }");
-    branch.compile("if (1 + 2) < 1 { spy('Fail') }");
-    branch.compile("if true { spy('Success 3') }");
-    branch.compile("if false { spy('Fail') }");
+    branch.compile("if true { test_spy('Success 1') }");
+    branch.compile("if false { test_spy('Fail') }");
+    branch.compile("if (1 + 2) > 1 { test_spy('Success 2') }");
+    branch.compile("if (1 + 2) < 1 { test_spy('Fail') }");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 3);
-    test_equals(gSpyResults[0], "Success 1");
-    test_equals(gSpyResults[1], "Success 2");
-    test_equals(gSpyResults[2], "Success 3");
+    test_equals(internal_debug_function::spy_results(), "['Success 1', 'Success 2']");
     
     // Use 'else'
-    gSpyResults.clear();
     branch.clear();
-    import_function(branch, spy_function, "spy(string)");
-    branch.compile("if true { spy('Success 1') } else { spy('Fail') }");
-    branch.compile("if false { spy('Fail') } else { spy('Success 2') }");
-    branch.compile("if true { spy('Success 3-1') spy('Success 3-2') spy('Success 3-3') } "
-                "else { spy('Fail') }");
-    branch.compile("if false { spy('Fail') spy('Fail 2') } "
-                "else { spy('Success 4-1') spy('Success 4-2') spy('Success 4-3') }");
+    internal_debug_function::spy_clear();
+    branch.compile("if true { test_spy('Success 1') } else { test_spy('Fail') }");
+    branch.compile("if false { test_spy('Fail') } else { test_spy('Success 2') }");
+    branch.compile("if true { test_spy('Success 3-1') test_spy('Success 3-2') test_spy('Success 3-3') } "
+                "else { test_spy('Fail') }");
+    branch.compile("if false { test_spy('Fail') test_spy('Fail 2') } "
+                "else { test_spy('Success 4-1') test_spy('Success 4-2') test_spy('Success 4-3') }");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 8);
-    test_equals(gSpyResults[0], "Success 1");
-    test_equals(gSpyResults[1], "Success 2");
-    test_equals(gSpyResults[2], "Success 3-1");
-    test_equals(gSpyResults[3], "Success 3-2");
-    test_equals(gSpyResults[4], "Success 3-3");
-    test_equals(gSpyResults[5], "Success 4-1");
-    test_equals(gSpyResults[6], "Success 4-2");
-    test_equals(gSpyResults[7], "Success 4-3");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(),
+            "['Success 1', 'Success 2', 'Success 3-1', 'Success 3-2', 'Success 3-3', "
+            "'Success 4-1', 'Success 4-2', 'Success 4-3']");
 
     // Do some nested blocks
 
     branch.clear();
-    import_function(branch, spy_function, "spy(string)");
-    branch.compile("if true { if false { spy('Error!') } else { spy('Nested 1') } } "
-                "else { spy('Error!') }");
+    internal_debug_function::spy_clear();
+    branch.compile("if true { if false { test_spy('Error!') } else { test_spy('Nested 1') } } "
+                "else { test_spy('Error!') }");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 1);
-    test_equals(gSpyResults[0], "Nested 1");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(), "['Nested 1']");
 
     branch.clear();
-    import_function(branch, spy_function, "spy(string)");
-    branch.compile("if false { spy('Error!') } else { if false { spy('Error!') } "
-                "else { spy('Nested 2') } }");
+    internal_debug_function::spy_clear();
+    branch.compile("if false { test_spy('Error!') } else { if false { test_spy('Error!') } "
+                "else { test_spy('Nested 2') } }");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 1);
-    test_equals(gSpyResults[0], "Nested 2");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(), "['Nested 2']");
     
     branch.clear();
-    import_function(branch, spy_function, "spy(string)");
-    branch.compile("if false { spy('Error!') }"
-                "else { if true { spy('Nested 3') } else { spy('Error!') } }");
+    internal_debug_function::spy_clear();
+    branch.compile("if false { test_spy('Error!') }"
+                "else { if true { test_spy('Nested 3') } else { test_spy('Error!') } }");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 1);
-    test_equals(gSpyResults[0], "Nested 3");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(), "['Nested 3']");
 
     branch.clear();
-    import_function(branch, spy_function, "spy(string)");
-    branch.compile("if true { if false { spy('Error!') } else { spy('Nested 4') } } "
-                "else { spy('Error!') }");
+    internal_debug_function::spy_clear();
+    branch.compile("if true { if false { test_spy('Error!') } else { test_spy('Nested 4') } } "
+                "else { test_spy('Error!') }");
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 1);
-    test_equals(gSpyResults[0], "Nested 4");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(), "['Nested 4']");
 
     branch.clear();
-    import_function(branch, spy_function, "spy(string)");
+    internal_debug_function::spy_clear();
     branch.compile(
     "if (false)\n"
-    "  spy('Error!')\n"
+    "  test_spy('Error!')\n"
     "else\n"
     "  if (true)\n"
     "    if (false)\n"
-    "      spy('Error!')\n"
+    "      test_spy('Error!')\n"
     "    else\n"
     "      if (false)\n"
-    "        spy('Error!')\n"
+    "        test_spy('Error!')\n"
     "      else\n"
     "         if (true)\n"
-    "           spy('Nested 5')\n"
+    "           test_spy('Nested 5')\n"
     "         else\n"
-    "           spy('Error!')\n"
-    "           spy('Error!')\n"
+    "           test_spy('Error!')\n"
+    "           test_spy('Error!')\n"
             );
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 1);
-    test_equals(gSpyResults[0], "Nested 5");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(), "['Nested 5']");
 }
 
 void test_execution_with_elif()
 {
     Branch branch;
-    import_function(branch, spy_function, "spy(string)");
-    gSpyResults.clear();
 
     branch.compile("x = 5");
 
-    branch.compile("if x > 5 { spy('Fail') } "
-                "elif x < 5 { spy('Fail')} "
-                "elif x == 5 { spy('Success')} "
-                "else { spy('Fail') }");
+    branch.compile("if x > 5 { test_spy('Fail') } "
+                "elif x < 5 { test_spy('Fail')} "
+                "elif x == 5 { test_spy('Success')} "
+                "else { test_spy('Fail') }");
+
+    internal_debug_function::spy_clear();
     evaluate_branch(branch);
     test_assert(branch);
-    test_assert(gSpyResults.size() == 1);
-    test_equals(gSpyResults[0], "Success");
-    gSpyResults.clear();
+    test_equals(internal_debug_function::spy_results(), "['Success']");
 }
 
 void test_parse_with_no_line_endings()

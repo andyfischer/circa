@@ -5,7 +5,7 @@
 namespace circa {
 namespace foreach_type_tests {
 
-bool run_test_for_type(Term* type, List& exampleValues)
+bool run_test_for_type(Type* type, List& exampleValues)
 {
     Branch branch;
 
@@ -37,46 +37,19 @@ bool run_test_for_type(Term* type, List& exampleValues)
 
     // use cast(), make sure the output is equal
     TaggedValue castResult;
-    cast(&x, unbox_type(type), &castResult);
+    cast(&x, type, &castResult);
     test_assert(equals(&x, &castResult));
 
     // do cast again, using same value for source and output
-    cast(&castResult, unbox_type(type), &castResult);
+    cast(&castResult, type, &castResult);
     test_assert(equals(&x, &castResult));
-
-    #if 0
-
-    Term* x = create_value(branch, type, "x");
-    test_assert(branch.eval("x == x"));
-
-    TaggedValue* cpy = branch.eval("cpy = copy(x)");
-    test_assert(branch);
-
-    Term* y = create_value(branch, type, "y");
-    test_assert(branch.eval("x != y"));
-
-    TaggedValue* cnd1 = branch.eval("cond(true, x, y)");
-    TaggedValue* cnd2 = branch.eval("cond(false, x, y)");
-    test_assert(branch);
-    test_assert(equals(cnd1, x));
-    test_assert(equals(cnd2, y));
-
-    branch.eval("boxed = [x y]");
-    TaggedValue* unbox1 = branch.eval("boxed[0]");
-    TaggedValue* unbox2 = branch.eval("boxed[1]");
-    test_assert(branch);
-    test_assert(equals(unbox1, x));
-    test_assert(equals(unbox2, y));
-    branch.clear();
 
     // Cast an integer to this type. This might cause an error but it shouldn't
     // crash.
-    Term* cast = branch.compile("cast(1)");
-    change_type(cast, type);
-    evaluate_branch(branch);
-    branch.clear();
+    TaggedValue one;
+    set_int(&one, 1);
+    cast(&one, type, &castResult);
 
-    #endif
     return true;
 }
 
@@ -85,7 +58,7 @@ void check_int()
     List intExamples;
     set_int(intExamples.append(), 5);
     set_int(intExamples.append(), 3);
-    run_test_for_type(INT_TYPE, intExamples);
+    run_test_for_type(&INT_T, intExamples);
 }
 
 void check_float()
@@ -93,7 +66,7 @@ void check_float()
     List floatExamples;
     set_float(floatExamples.append(), 1.2);
     set_float(floatExamples.append(), -0.001);
-    run_test_for_type(FLOAT_TYPE, floatExamples);
+    run_test_for_type(&FLOAT_T, floatExamples);
 }
 
 void check_string()
@@ -101,7 +74,7 @@ void check_string()
     List stringExamples;
     set_string(stringExamples.append(), "hello");
     set_string(stringExamples.append(), "goodbye");
-    run_test_for_type(STRING_TYPE, stringExamples);
+    run_test_for_type(&STRING_T, stringExamples);
 }
 
 void check_ref()
@@ -111,7 +84,7 @@ void check_ref()
     Term* refTarget2 = alloc_term();
     set_ref(refExamples.append(), refTarget1);
     set_ref(refExamples.append(), refTarget2);
-    test_assert(run_test_for_type(REF_TYPE, refExamples));
+    test_assert(run_test_for_type(&REF_T, refExamples));
 }
 
 void register_tests()

@@ -111,36 +111,6 @@ void test_namespace()
     test_assert(!nspace.contains("a"));
 }
 
-void test_list2()
-{
-#if 0
-    TermList list;
-    Term* term = alloc_term();
-    Term* term2 = alloc_term();
-
-    test_assert(list.length() == 0);
-
-    list.append(term);
-    list.append(term2);
-    test_assert(list.length() == 2);
-    test_assert(list[0] == term);
-    test_assert(list[1] == term2);
-
-    Term* term3 = alloc_term();
-    TermMap remap;
-    remap[term] = term3;
-    list.remapPointers(remap);
-    test_assert(list.length() == 2);
-    test_assert(list[0] == term3);
-    test_assert(list[1] == term2);
-
-    list.clear();
-
-    test_assert(list.length() == 0);
-#endif
-}
-
-
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_type_tests::test_reference);
@@ -148,7 +118,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_type_tests::test_set);
     REGISTER_TEST_CASE(builtin_type_tests::test_list);
     REGISTER_TEST_CASE(builtin_type_tests::test_namespace);
-    REGISTER_TEST_CASE(builtin_type_tests::test_list2);
 
     list_t::tests::register_tests();
 }

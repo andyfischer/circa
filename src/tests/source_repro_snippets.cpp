@@ -10,7 +10,8 @@
 // display everything in that category. In practice, it's very helpful to see the
 // successful cases along side the failing cases.
 
-#include <circa.h>
+#include "circa.h"
+#include "fake_filesystem.h"
 
 namespace circa {
 namespace source_repro_snippets {
