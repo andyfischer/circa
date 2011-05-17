@@ -1,0 +1,6 @@
+
+This directory contains Circa bindings for various 3rd-party libraries.
+
+Currently, the .cpp files are #included by source in plastic/src/app.cpp , which works fine
+for now but isn't a good long-term strategy. The long-term plan is that each library binding
+will be compiled as a shared object (a .DLL or .SO) and loaded at runtime.

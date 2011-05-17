@@ -111,10 +111,103 @@ CA_FUNCTION(gravity)
     g_world->SetGravity(b2Vec2(gravity.getX(), gravity.getY()));
 }
 
+CA_FUNCTION(create_body)
+{
+    // Inputs:
+    //   int bodyType
+    //   Point initialPosition
+    //   number initialRotation
+    //
+    // Outputs:
+    //   BodyPtr handle
+    
+    initialize_world();
+
+    int bodyType = INT_INPUT(0);
+
+    Point& initialPosition = *Point::checkCast(INPUT(1));
+    float initialRotation = as_float(INPUT(2));
+
+    // Create a b2Body
+    b2BodyDef bodyDef;
+
+    switch (bodyType) {
+    case 0: bodyDef.type = b2_staticBody; break;
+    case 1: bodyDef.type = b2_dynamicBody; break;
+    case 2: bodyDef.type = b2_kinematicBody; break;
+    }
+    
+    bodyDef.position.Set(
+        screen_to_world(initialPosition.getX()),
+        screen_to_world(initialPosition.getY()));
+
+    bodyDef.angle = unit_angles_to_radians(initialRotation);
+
+    b2Body* body = g_world->CreateBody(&bodyDef);
+
+    assign_body_handle(OUTPUT, body);
+
+    //std::cout << " allocating body: " << handle_index << std::endl;
+
+    ca_assert(is_valid_body_handle(OUTPUT));
+}
+
+CA_FUNCTION(set_body_fixtures)
+{
+    // Inputs:
+    //   BodyPtr handle
+    //   List fixtureDefs:
+    //     int type
+    //     either int or Point - type-specific data
+    //     float density
+    //     float friction
+    //     float restitution
+    b2Body* body = get_body_from_handle(INPUT(0));
+
+    if (body == NULL)
+        return error_occurred(CONTEXT, CALLER, "invalid body handle");
+
+    // Remove any old fixtures
+    while (body->GetFixtureList())
+        body->DestroyFixture(body->GetFixtureList());
+
+    // Append new fixtures according to the fixtureDefs list
+    List& fixtureDefs = *List::checkCast(INPUT(1));
+
+    for (int i=0; i < fixtureDefs.length(); i++) {
+
+        List& fixtureDefIn = *List::checkCast(fixtureDefs[i]);
+
+        int shapeType = as_int(fixtureDefIn[0]);
+
+        b2FixtureDef fixtureDef;
+        b2PolygonShape polygonShape;
+        b2CircleShape circleShape;
+
+        if (shapeType == 0) {
+            Point& size = *Point::checkCast(fixtureDefIn[1]);
+            polygonShape.SetAsBox(
+                screen_to_world(size.getX()),
+                screen_to_world(size.getY()));
+            fixtureDef.shape = &polygonShape;
+        } else if (shapeType == 1) {
+            float radius = to_float(fixtureDefIn[1]);
+            circleShape.m_radius = screen_to_world(radius);
+            fixtureDef.shape = &circleShape;
+        }
+
+        fixtureDef.density = to_float(fixtureDefIn[2]);
+        fixtureDef.friction = to_float(fixtureDefIn[3]);
+        fixtureDef.restitution = to_float(fixtureDefIn[4]);
+
+        body->CreateFixture(&fixtureDef);
+    }
+}
+
 CA_FUNCTION(body)
 {
     // Inputs:
-    //   State id
+    //   State handle
     //   Point initialPosition
     //   number initialRotation
     //   List properties
@@ -171,17 +264,6 @@ CA_FUNCTION(body)
     }
 
     b2Body* body = get_body_from_handle(handle);
-
-#if 0
-    // If it's not dynamic then update the position & rotation.
-    if (!isDynamic) {
-        b2Vec2 pos(
-            screen_to_world(initialPosition.getX()),
-            screen_to_world(initialPosition.getY()));
-
-        body->SetTransform(pos, unit_angles_to_radians(initialRotation));
-    }
-#endif
 
     if (propertiesChanged) {
 
@@ -319,7 +401,8 @@ void setup(Branch& kernel)
 
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);
-    install_function(ns["body_int"], body);
+    install_function(ns["create_body"], create_body);
+    install_function(ns["set_body_fixtures"], set_body_fixtures);
     install_function(ns["get_body_points"], get_body_points);
     install_function(ns["get_body_position"], get_body_position);
     install_function(ns["get_body_rotation"], get_body_rotation);

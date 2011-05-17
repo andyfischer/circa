@@ -5,23 +5,12 @@ namespace box2d
         "Run the simulation for the given timestep. It's recommended to use timesteps of 1/60."
     def gravity(Point vec)
         "Set the gravity vector."
-    def body_int(any handle, Point initialPosition, number initialRotation, List properties, bool propertiesChanged) -> any
-        "Internal function, update the given body"
-
-    -- Properties is a list with:
-    --  [0] = bool dynamic
-    --  [1] = Point size
-    --  [2] = number density
-    --  [3] = number friction
-    --  [4] = number restitution
-
-    def body(Point initialPosition, number initialRotation, List properties) -> any
-        "Stateful function, declare a body"
-        state handle
-        body_int(@handle, initialPosition, initialRotation, properties, changed(properties))
-
-        return handle
-
+    namespace body_type { static = 0, dynamic = 1, kinematic = 2 }
+    def create_body(int bodyType, Point initialPosition, number initialRotation) -> any
+        "Create a new body. Don't call this directly, use body() instead."
+    namespace shape_type { rect = 0, circle = 1 }
+    def set_body_fixtures(any handle, List fixtureDefs)
+        "Update the shape on the given body."
     def get_body_points(any handle) -> List
         "Return the list of points of the given body, in screen space."
     def get_body_position(any handle) -> Point
@@ -35,13 +24,34 @@ namespace box2d
     def body_contains_point(any handle, Point p) -> bool
         "Intersection test, returns true if the given point is inside the body"
 
-    def fixed_body(Point position, number rotation, List properties) -> any
-        handle = body(position, rotation, [false].extend(properties))
-
-        if changed(position)
-            set_body_position(handle, position)
+    def fixed_rect(Point location, number rotation, Point size) -> any
+        state handle = create_body(body_type:static, location, rotation)
+        if changed(size)
+            set_body_fixtures(handle, [[shape_type:rect size 0 0 0]])
+        if changed(location)
+            set_body_position(handle location)
         if changed(rotation)
-            set_body_rotation(handle, rotation)
+            set_body_rotation(handle rotation)
+        return handle
+
+    def dynamic_rect(Point location, number rotation, Point size, List properties) -> any
+        state handle = create_body(body_type:dynamic, location, rotation)
+        if changed(size) or changed(properties)
+            set_body_fixtures(handle, [[shape_type:rect size].extend(properties)])
+        return handle
+
+    def fixed_circle(Point location, number radius) -> any
+        state handle = create_body(body_type:static, location, 0.0)
+        if changed(radius)
+            set_body_fixtures(handle, [[shape_type:circle radius 0 0 0]])
+        if changed(location)
+            set_body_position(handle location)
+        return handle
+
+    def dynamic_circle(Point location, number radius, List properties) -> any
+        state handle = create_body(body_type:dynamic, location, 0.0)
+        if changed(radius) or changed(properties)
+            set_body_fixtures(handle, [[shape_type:circle radius].extend(properties)])
         return handle
 
     def draggable_body(any handle)
