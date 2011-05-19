@@ -160,7 +160,7 @@ void test_feedback_on_copy()
     Term* a = branch.compile("a = 1");
     Term* b = branch.compile("b = copy(a)");
 
-    TaggedValue two;
+    Value two;
     set_int(&two, 2);
     handle_feedback_event(NULL, b, &two);
 

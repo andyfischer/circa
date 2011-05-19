@@ -44,7 +44,7 @@ namespace list_t {
         *data = NULL;
     }
 
-    TaggedValue* append(ListData** data)
+    Value* append(ListData** data)
     {
         if (*data == NULL) {
             *data = allocate_empty_list(1);
@@ -60,7 +60,7 @@ namespace list_t {
         return &d->items[d->count - 1];
     }
 
-    TaggedValue* get_index(ListData* list, int index)
+    Value* get_index(ListData* list, int index)
     {
         if (list == NULL)
             return NULL;
@@ -69,7 +69,7 @@ namespace list_t {
         return &list->items[index];
     }
 
-    void set_index(ListData** data, int index, TaggedValue* v)
+    void set_index(ListData** data, int index, Value* v)
     {
         *data = list_touch(*data);
         copy(v, get_index(*data, index));
@@ -119,7 +119,7 @@ namespace list_t {
         *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
     }
 
-    TaggedValue* prepend(ListData** data)
+    Value* prepend(ListData** data)
     {
         append(data);
 
@@ -146,44 +146,44 @@ namespace list_t {
         return out.str();
     }
 
-    // TaggedValue wrappers
-    void tv_touch(TaggedValue* value);
+    // Value wrappers
+    void tv_touch(Value* value);
 
-    void resize(TaggedValue* list, int newSize)
+    void resize(Value* list, int newSize)
     {
         ca_assert(is_list(list));
         set_pointer(list, list_resize((ListData*) get_pointer(list), newSize));
     }
-    void remove_index(TaggedValue* list, int index)
+    void remove_index(Value* list, int index)
     {
         ca_assert(is_list(list));
         set_pointer(list, remove_index((ListData*) get_pointer(list), index));
     }
 
-    void clear(TaggedValue* list)
+    void clear(Value* list)
     {
         ca_assert(is_list(list));
         clear((ListData**) &list->value_data);
     }
 
-    TaggedValue* append(TaggedValue* list)
+    Value* append(Value* list)
     {
         ca_assert(is_list(list));
         return append((ListData**) &list->value_data);
     }
-    TaggedValue* prepend(TaggedValue* list)
+    Value* prepend(Value* list)
     {
         ca_assert(is_list(list));
         return prepend((ListData**) &list->value_data);
     }
 
-    void remove_nulls(TaggedValue* list)
+    void remove_nulls(Value* list)
     {
         ca_assert(is_list(list));
         remove_nulls((ListData**) &list->value_data);
     }
 
-    void tv_initialize(Type* type, TaggedValue* value)
+    void tv_initialize(Type* type, Value* value)
     {
         ca_assert(value->value_data.ptr == NULL);
 
@@ -198,7 +198,7 @@ namespace list_t {
         }
     }
 
-    void tv_release(Type*, TaggedValue* value)
+    void tv_release(Type*, Value* value)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -206,7 +206,7 @@ namespace list_t {
         list_decref(data);
     }
 
-    void tv_copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void tv_copy(Type* type, Value* source, Value* dest)
     {
         ca_assert(is_list(source));
         set_null(dest);
@@ -226,7 +226,7 @@ namespace list_t {
         #endif
     }
 
-    bool tv_equals(Type*, TaggedValue* leftValue, TaggedValue* right)
+    bool tv_equals(Type*, Value* leftValue, Value* right)
     {
         ca_assert(is_list(leftValue));
         Type* rhsType = right->value_type;
@@ -247,8 +247,8 @@ namespace list_t {
         return true;
     }
 
-    void tv_cast(CastResult* result, TaggedValue* source, Type* type,
-        TaggedValue* dest, bool checkOnly)
+    void tv_cast(CastResult* result, Value* source, Type* type,
+        Value* dest, bool checkOnly)
     {
         List* sourceList = List::checkCast(source);
 
@@ -285,10 +285,10 @@ namespace list_t {
         }
 
         for (int i=0; i < sourceLength; i++) {
-            TaggedValue* sourceElement = sourceList->get(i);
+            Value* sourceElement = sourceList->get(i);
             Type* elementType = get_compound_list_element_type(type, i);
 
-            TaggedValue* destElement = NULL;
+            Value* destElement = NULL;
             if (!checkOnly)
                 destElement = destList->get(i);
         
@@ -302,14 +302,14 @@ namespace list_t {
             dest->value_type = type;
     }
 
-    TaggedValue* tv_get_index(TaggedValue* value, int index)
+    Value* tv_get_index(Value* value, int index)
     {
         ca_assert(is_list(value));
         ListData* s = (ListData*) get_pointer(value);
         return get_index(s, index);
     }
 
-    void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
+    void tv_set_index(Value* value, int index, Value* element)
     {
         ca_assert(is_list(value));
         ListData* s = (ListData*) get_pointer(value);
@@ -317,7 +317,7 @@ namespace list_t {
         set_pointer(value, s);
     }
 
-    TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
+    Value* tv_get_field(Value* value, const char* fieldName)
     {
         int index = value->value_type->findFieldIndex(fieldName);
         if (index < 0)
@@ -325,20 +325,20 @@ namespace list_t {
         return tv_get_index(value, index);
     }
 
-    int tv_num_elements(TaggedValue* value)
+    int tv_num_elements(Value* value)
     {
         ca_assert(is_list(value));
         ListData* s = (ListData*) get_pointer(value);
         return num_elements(s);
     }
 
-    std::string tv_to_string(TaggedValue* value)
+    std::string tv_to_string(Value* value)
     {
         ca_assert(is_list(value));
         return to_string((ListData*) get_pointer(value));
     }
 
-    void tv_touch(TaggedValue* value)
+    void tv_touch(Value* value)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -399,7 +399,7 @@ namespace list_t {
             return query->succeed();
     }
 
-    bool tv_cast_possible(Type* type, TaggedValue* value)
+    bool tv_cast_possible(Type* type, Value* value)
     {
         if (!is_list(value))
             return false;
@@ -419,7 +419,7 @@ namespace list_t {
         return true;
     }
 
-    void remove_and_replace_with_back(TaggedValue* value, int index)
+    void remove_and_replace_with_back(Value* value, int index)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -450,7 +450,7 @@ namespace list_t {
     {
         copy(INPUT(0), OUTPUT);
         List* result = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
+        Value* value = INPUT(1);
         copy(value, result->append());
     }
 
@@ -479,7 +479,7 @@ namespace list_t {
             Type* list = Type::create();
             list_t::setup_type(list);
 
-            TaggedValue value;
+            Value value;
             change_type(&value, list);
 
             test_equals(to_string(&value), "[]");
@@ -501,7 +501,7 @@ namespace list_t {
             Type* list = Type::create();
             list_t::setup_type(list);
 
-            TaggedValue value(list);
+            Value value(list);
 
             set_int(list_t::append(&value), 1);
             set_int(list_t::append(&value), 2);
@@ -509,7 +509,7 @@ namespace list_t {
 
             test_equals(to_string(&value), "[1, 2, 3]");
 
-            TaggedValue value2;
+            Value value2;
             test_assert(value.value_type->copy != NULL);
             copy(&value, &value2);
 
@@ -526,12 +526,12 @@ namespace list_t {
             Type* list = Type::create();
             list_t::setup_type(list);
 
-            TaggedValue value(list);
+            Value value(list);
 
             set_int(list_t::append(&value), 1);
             set_int(list_t::append(&value), 2);
 
-            TaggedValue value2(list);
+            Value value2(list);
             copy(&value, &value2);
 
             #if !CIRCA_DISABLE_LIST_SHARING
@@ -546,7 +546,7 @@ namespace list_t {
             Type* list = Type::create();
             list_t::setup_type(list);
 
-            TaggedValue value(list);
+            Value value(list);
 
             set_int(list_t::append(&value), 1);
             set_int(list_t::append(&value), 2);
@@ -590,38 +590,38 @@ bool is_list_based_type(Type* type)
 }
 
 List::List()
-  : TaggedValue()
+  : Value()
 {
     change_type(this, &LIST_T);
 }
 
-TaggedValue*
+Value*
 List::append()
 {
-    return list_t::append((TaggedValue*) this);
+    return list_t::append((Value*) this);
 }
 void
-List::append(TaggedValue* val)
+List::append(Value* val)
 {
     copy(val, append());
 }
 
-TaggedValue*
+Value*
 List::prepend()
 {
-    return list_t::prepend((TaggedValue*) this);
+    return list_t::prepend((Value*) this);
 }
 
 void
 List::clear()
 {
-    list_t::clear((TaggedValue*) this);
+    list_t::clear((Value*) this);
 }
 
 int
 List::length()
 {
-    return list_t::tv_num_elements((TaggedValue*) this);
+    return list_t::tv_num_elements((Value*) this);
 }
 
 bool
@@ -630,16 +630,16 @@ List::empty()
     return length() == 0;
 }
 
-TaggedValue*
+Value*
 List::get(int index)
 {
-    return list_t::tv_get_index((TaggedValue*) this, index);
+    return list_t::tv_get_index((Value*) this, index);
 }
 
 void
-List::set(int index, TaggedValue* value)
+List::set(int index, Value* value)
 {
-    list_t::tv_set_index((TaggedValue*) this, index, value);
+    list_t::tv_set_index((Value*) this, index, value);
 }
 
 void
@@ -648,7 +648,7 @@ List::resize(int newSize)
     list_t::resize(this, newSize); 
 }
 
-TaggedValue*
+Value*
 List::getLast()
 {
     return get(length() - 1);
@@ -673,7 +673,7 @@ List::removeNulls()
 }
 
 List*
-List::checkCast(TaggedValue* v)
+List::checkCast(Value* v)
 {
     if (is_list(v))
         return (List*) v;
@@ -682,14 +682,14 @@ List::checkCast(TaggedValue* v)
 }
 
 List*
-List::lazyCast(TaggedValue* v)
+List::lazyCast(Value* v)
 {
     if (!is_list(v))
         set_list(v, 0);
     return (List*) v;
 }
 List*
-List::cast(TaggedValue* v, int length)
+List::cast(Value* v, int length)
 {
     set_list(v, length);
     return (List*) v;

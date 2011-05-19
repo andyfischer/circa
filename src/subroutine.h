@@ -22,11 +22,11 @@ void subroutine_update_state_type_from_contents(Term* sub);
 void subroutine_change_state_type(Term* func, Term* type);
 void subroutine_check_to_append_implicit_return(Term* sub);
 
-void store_locals(Branch& branch, TaggedValue* storage);
-void restore_locals(TaggedValue* storageTv, Branch& branch);
+void store_locals(Branch& branch, Value* storage);
+void restore_locals(Value* storageTv, Branch& branch);
 
-void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error);
-void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error);
+void call_subroutine(Branch& sub, Value* inputs, Value* output, Value* error);
+void call_subroutine(Term* sub, Value* inputs, Value* output, Value* error);
 
 
 } // namespace circa

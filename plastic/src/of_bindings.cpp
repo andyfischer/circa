@@ -17,7 +17,7 @@ namespace of_bindings {
 
 CA_FUNCTION(background)
 {
-    circa::TaggedValue* color = INPUT(0);
+    circa::Value* color = INPUT(0);
 	ofBackground(color->getIndex(0)->toFloat() * 255,
         color->getIndex(1)->toFloat() * 255,
         color->getIndex(2)->toFloat() * 255);
@@ -37,8 +37,8 @@ CA_FUNCTION(load_font)
 
 CA_FUNCTION(draw_string)
 {
-    circa::TaggedValue *loc = INPUT(1);
-    circa::TaggedValue *color = INPUT(2);
+    circa::Value *loc = INPUT(1);
+    circa::Value *color = INPUT(2);
 
     ofSetColor(color->getIndex(0)->toFloat() * 255,
         color->getIndex(1)->toFloat() * 255,

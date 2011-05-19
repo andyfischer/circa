@@ -205,7 +205,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, inputs, name);
     change_declared_type(term, original->type);
-    change_type((TaggedValue*) term, original->value_type);
+    change_type((Value*) term, original->value_type);
 
     copy(original, term);
 
@@ -242,7 +242,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
 
     change_function(term, VALUE_FUNC);
     change_declared_type(term, type);
-    change_type((TaggedValue*) term, unbox_type(type));
+    change_type((Value*) term, unbox_type(type));
     update_unique_name(term);
     update_locals_index_for_new_term(term);
 

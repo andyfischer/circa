@@ -39,7 +39,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
         for (int i=0; i < get_output_count(term); i++) {
 
             Type* outputType = unbox_type(get_output_type(term, i));
-            TaggedValue* output = get_output(term, i);
+            Value* output = get_output(term, i);
 
             // Special case, if the function's output type is void then we don't care
             // if the output value is null or not.
@@ -73,7 +73,7 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch)
     finish_using(branch);
 }
 
-void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output)
+void evaluate_branch_internal(EvalContext* context, Branch& branch, Value* output)
 {
     start_using(branch);
 
@@ -91,7 +91,7 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
     Branch& contents = term->nestedContents;
 
     // Store currentScopeState and fetch the container for this branch
-    TaggedValue prevScopeState;
+    Value prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
     fetch_state_container(term, &prevScopeState, &context->currentScopeState);
 
@@ -120,7 +120,7 @@ void evaluate_branch(EvalContext* context, Branch& branch)
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
         if (is_value(term)) continue;
-        TaggedValue* val = get_local(term);
+        Value* val = get_local(term);
         if (val != NULL)
             copy(val, branch[i]);
     }
@@ -132,7 +132,7 @@ void evaluate_branch(Branch& branch)
     evaluate_branch(&context, branch);
 }
 
-TaggedValue* get_input(Term* term, int index)
+Value* get_input(Term* term, int index)
 {
     Term* input = term->input(index);
     if (input == NULL)
@@ -140,14 +140,14 @@ TaggedValue* get_input(Term* term, int index)
     return get_local(input, term->inputInfo(index)->outputIndex);
 }
 
-void consume_input(Term* term, int index, TaggedValue* dest)
+void consume_input(Term* term, int index, Value* dest)
 {
     Term* input = term->input(index);
     if (input == NULL) {
         set_null(dest);
         return;
     }
-    TaggedValue* val = get_local(input, term->inputInfo(index)->outputIndex);
+    Value* val = get_local(input, term->inputInfo(index)->outputIndex);
 
     // if this function is called, then users shouldn't be 0.
     ca_assert(input->users.length() != 0);
@@ -160,17 +160,17 @@ void consume_input(Term* term, int index, TaggedValue* dest)
     }
 }
 
-TaggedValue* get_output(Term* term, int outputIndex)
+Value* get_output(Term* term, int outputIndex)
 {
     return get_local(term, outputIndex);
 }
 
-TaggedValue* get_extra_output(Term* term, int index)
+Value* get_extra_output(Term* term, int index)
 {
     return get_output(term, index + 1);
 }
 
-TaggedValue* get_state_input(EvalContext* cxt, Term* term)
+Value* get_state_input(EvalContext* cxt, Term* term)
 {
     if (term->input(0) == NULL) {
         Dict* currentScopeState = get_current_scope_state(cxt);
@@ -181,29 +181,29 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
     }
 }
 
-TaggedValue* get_local(Term* term, int outputIndex)
+Value* get_local(Term* term, int outputIndex)
 {
     ca_assert(term->owningBranch != NULL);
 
     int index = term->localsIndex + outputIndex;
     ca_assert(index < term->owningBranch->locals.length());
-    TaggedValue* local = term->owningBranch->locals[index];
+    Value* local = term->owningBranch->locals[index];
     return local;
 }
 
-TaggedValue* get_local(Term* term)
+Value* get_local(Term* term)
 {
     return get_local(term, 0);
 }
 
-TaggedValue* get_local_safe(Term* term, int outputIndex)
+Value* get_local_safe(Term* term, int outputIndex)
 {
     if (term->owningBranch == NULL)
         return NULL;
     int index = term->localsIndex + outputIndex;
     if (index >= term->owningBranch->locals.length())
         return NULL;
-    TaggedValue* local = term->owningBranch->locals[index];
+    Value* local = term->owningBranch->locals[index];
     return local;
 }
 
@@ -212,13 +212,13 @@ Dict* get_current_scope_state(EvalContext* cxt)
     return Dict::lazyCast(&cxt->currentScopeState);
 }
 
-void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output)
+void fetch_state_container(Term* term, Value* container, Value* output)
 {
     Dict* containerDict = Dict::lazyCast(container);
     copy(containerDict->insert(term->uniqueName.name.c_str()), output);
 }
 
-void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* result)
+void save_and_consume_state(Term* term, Value* container, Value* result)
 {
     Dict* containerDict = Dict::lazyCast(container);
     const char* name = term->uniqueName.name.c_str();
@@ -242,7 +242,7 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
         Term* term = branch[i];
         if (is_value(term))
             continue;
-        TaggedValue* value = get_local(term);
+        Value* value = get_local(term);
         if (value == NULL)
             continue;
         copy(value, term);
@@ -314,7 +314,7 @@ void evaluate_minimum(EvalContext* context, Term* term)
     finish_using(branch);
 }
 
-TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input)
+Value* evaluate(EvalContext* context, Branch& branch, std::string const& input)
 {
     int prevHead = branch.length();
     Term* result = parser::compile(branch, parser::statement_list, input);

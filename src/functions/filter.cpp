@@ -8,8 +8,8 @@ namespace filter_function {
 
     CA_FUNCTION(evaluate)
     {
-        TaggedValue* inputs = INPUT(0);
-        TaggedValue* bools = INPUT(1);
+        Value* inputs = INPUT(0);
+        Value* bools = INPUT(1);
 
         int numInputs = inputs->numElements();
         int numBools = bools->numElements();

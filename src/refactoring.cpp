@@ -78,7 +78,7 @@ void change_declared_type(Term *term, Term *typeTerm)
 
     term->type = typeTerm;
 
-    set_null((TaggedValue*) term);
+    set_null((Value*) term);
 
     // TODO: Don't call change_type here
     change_type(term, unbox_type(typeTerm));

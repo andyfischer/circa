@@ -6,7 +6,7 @@
 
 namespace circa {
 
-struct TaggedValue
+struct Value
 {
     VariantValue value_data;
     Type* value_type;
@@ -20,21 +20,21 @@ struct TaggedValue
     std::string metadata_note;
     #endif
 
-    TaggedValue();
-    ~TaggedValue();
-    TaggedValue(TaggedValue const&);
-    TaggedValue(Type* type);
-    TaggedValue& operator=(TaggedValue const& rhs);
+    Value();
+    ~Value();
+    Value(Value const&);
+    Value(Type* type);
+    Value& operator=(Value const& rhs);
 
     void init();
     void reset();
     std::string toString();
-    inline TaggedValue* operator[](int index) { return getIndex(index); }
-    TaggedValue* getIndex(int index);
-    TaggedValue* getField(const char* fieldName);
-    TaggedValue* getField(std::string const& fieldName);
+    inline Value* operator[](int index) { return getIndex(index); }
+    Value* getIndex(int index);
+    Value* getField(const char* fieldName);
+    Value* getField(std::string const& fieldName);
     int numElements();
-    bool equals(TaggedValue* rhs);
+    bool equals(Value* rhs);
 
     // Convenient accessors
     int asInt();
@@ -46,10 +46,10 @@ struct TaggedValue
     Term* asRef();
 
     // Convenient constructors
-    static TaggedValue fromInt(int i);
-    static TaggedValue fromFloat(float f);
-    static TaggedValue fromString(const char* s);
-    static TaggedValue fromBool(bool b);
+    static Value fromInt(int i);
+    static Value fromFloat(float f);
+    static Value fromString(const char* s);
+    static Value fromBool(bool b);
 };
 
 // Full version of cast(). Attempt to cast 'source' to 'type' and store the result
@@ -57,89 +57,89 @@ struct TaggedValue
 // conversion. 'result' stores whether the operation succedded. If 'checkOnly' is
 // true, then we won't actually write to 'dest', we'll just record whether the
 // operation would have succeeded.
-void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly);
+void cast(CastResult* result, Value* source, Type* type, Value* dest, bool checkOnly);
 
 // Attempts to cast the value to the given type, returns whether it was successful.
-bool cast(TaggedValue* source, Type* type, TaggedValue* dest);
+bool cast(Value* source, Type* type, Value* dest);
 
 // Returns whether this value can be cast to the given type.
-bool cast_possible(TaggedValue* value, Type* type);
+bool cast_possible(Value* value, Type* type);
 
 // Copy 'source' to 'dest'.
-void copy(TaggedValue* source, TaggedValue* dest);
+void copy(Value* source, Value* dest);
 
 // Swap values between 'left' and 'right'. This is much cheaper than copy(),
 // because nothing special needs to happen. (In comparison, copy() will cause
 // some types to allocate a new piece of memory).
-void swap(TaggedValue* left, TaggedValue* right);
+void swap(Value* left, Value* right);
 
 // Convenience function, perform a swap or copy between the two values, depending
 // on the 'doCopy' flag.
-void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doCopy);
+void swap_or_copy(Value* left, Value* right, bool doCopy);
 
-void reset(TaggedValue* value);
-std::string to_string(TaggedValue* value);
-std::string to_string_annotated(TaggedValue* value);
-int num_elements(TaggedValue* value);
-void touch(TaggedValue* value);
-bool equals(TaggedValue* lhs, TaggedValue* rhs);
+void reset(Value* value);
+std::string to_string(Value* value);
+std::string to_string_annotated(Value* value);
+int num_elements(Value* value);
+void touch(Value* value);
+bool equals(Value* lhs, Value* rhs);
 
-void change_type(TaggedValue* v, Type* type);
-void change_type_no_initialize(TaggedValue* v, Type* t);
+void change_type(Value* v, Type* type);
+void change_type_no_initialize(Value* v, Type* t);
 
-TaggedValue* get_index(TaggedValue* value, int index);
-void set_index(TaggedValue* value, int index, TaggedValue* element);
-TaggedValue* get_field(TaggedValue* value, const char* field);
-void set_field(TaggedValue* value, const char* field, TaggedValue* element);
+Value* get_index(Value* value, int index);
+void set_index(Value* value, int index, Value* element);
+Value* get_field(Value* value, const char* field);
+void set_field(Value* value, const char* field, Value* element);
 
-TaggedValue* set_int(TaggedValue* value, int i);
-void set_float(TaggedValue* value, float f);
-void set_string(TaggedValue* value, const char* s);
-void set_string(TaggedValue* value, std::string const& s);
-void set_bool(TaggedValue* value, bool b);
-void set_ref(TaggedValue* value, Term* t);
-List* set_list(TaggedValue* value);
-List* set_list(TaggedValue* value, int size);
-void set_type(TaggedValue* value, Type* type);
-void set_null(TaggedValue* value);
-void set_opaque_pointer(TaggedValue* value, void* addr);
+Value* set_int(Value* value, int i);
+void set_float(Value* value, float f);
+void set_string(Value* value, const char* s);
+void set_string(Value* value, std::string const& s);
+void set_bool(Value* value, bool b);
+void set_ref(Value* value, Term* t);
+List* set_list(Value* value);
+List* set_list(Value* value, int size);
+void set_type(Value* value, Type* type);
+void set_null(Value* value);
+void set_opaque_pointer(Value* value, void* addr);
 
-void set_pointer(TaggedValue* value, Type* type, void* p);
-void set_pointer(TaggedValue* value, void* ptr);
+void set_pointer(Value* value, Type* type, void* p);
+void set_pointer(Value* value, void* ptr);
 
-void* get_pointer(TaggedValue* value);
-void* get_pointer(TaggedValue* value, Type* expectedType);
+void* get_pointer(Value* value);
+void* get_pointer(Value* value, Type* expectedType);
 
-int as_int(TaggedValue* value);
-float as_float(TaggedValue* value);
-std::string const& as_string(TaggedValue* value);
-const char* as_cstring(TaggedValue* value);
-bool as_bool(TaggedValue* value);
-Term* as_ref(TaggedValue* value);
-Branch* as_branch_ref(TaggedValue* value);
-void* as_opaque_pointer(TaggedValue* value);
-Type& as_type(TaggedValue* value);
+int as_int(Value* value);
+float as_float(Value* value);
+std::string const& as_string(Value* value);
+const char* as_cstring(Value* value);
+bool as_bool(Value* value);
+Term* as_ref(Value* value);
+Branch* as_branch_ref(Value* value);
+void* as_opaque_pointer(Value* value);
+Type& as_type(Value* value);
 
-bool is_int(TaggedValue* value);
-bool is_error(TaggedValue* value);
-bool is_float(TaggedValue* value);
-bool is_number(TaggedValue* value);
-bool is_bool(TaggedValue* value);
-bool is_string(TaggedValue* value);
-bool is_ref(TaggedValue* value);
-bool is_opaque_pointer(TaggedValue* value);
-bool is_list(TaggedValue* value);
-bool is_type(TaggedValue* value);
-bool is_value_of_type(TaggedValue* value, Type* type);
-bool is_null(TaggedValue* value);
-bool is_symbol(TaggedValue* value);
+bool is_int(Value* value);
+bool is_error(Value* value);
+bool is_float(Value* value);
+bool is_number(Value* value);
+bool is_bool(Value* value);
+bool is_string(Value* value);
+bool is_ref(Value* value);
+bool is_opaque_pointer(Value* value);
+bool is_list(Value* value);
+bool is_type(Value* value);
+bool is_value_of_type(Value* value, Type* type);
+bool is_null(Value* value);
+bool is_symbol(Value* value);
 
-float to_float(TaggedValue* value);
-int to_int(TaggedValue* value);
+float to_float(Value* value);
+int to_int(Value* value);
 
 #if CIRCA_ENABLE_TAGGED_VALUE_METADATA
 
-void debug_set_tagged_value_note(TaggedValue* value, std::string const& note);
+void debug_set_tagged_value_note(Value* value, std::string const& note);
 
 #else
 

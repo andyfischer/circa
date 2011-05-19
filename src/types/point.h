@@ -2,14 +2,14 @@
 
 namespace circa {
 
-struct Point : TaggedValue
+struct Point : Value
 {
     float getX();
     float getY();
     void set(float x, float y);
     
-    static Point* checkCast(TaggedValue* tv);
-    static Point* cast(TaggedValue* tv);
+    static Point* checkCast(Value* tv);
+    static Point* cast(Value* tv);
 };
 
 } // namespace circa

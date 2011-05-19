@@ -14,22 +14,22 @@
 using namespace circa;
 
 namespace image_t {
-    std::string get_filename(TaggedValue* v) { return v->getIndex(0)->asString(); }
-    int get_texid(TaggedValue* v) { return v->getIndex(1)->asInt(); }
-    int get_width(TaggedValue* v) { return v->getIndex(2)->asInt(); }
-    int get_height(TaggedValue* v) { return v->getIndex(3)->asInt(); }
+    std::string get_filename(Value* v) { return v->getIndex(0)->asString(); }
+    int get_texid(Value* v) { return v->getIndex(1)->asInt(); }
+    int get_width(Value* v) { return v->getIndex(2)->asInt(); }
+    int get_height(Value* v) { return v->getIndex(3)->asInt(); }
 
-    void set_filename(TaggedValue* v, std::string const& s) { touch(v); set_string(v->getIndex(0), s); }
-    void set_texid(TaggedValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
-    void set_width(TaggedValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
-    void set_height(TaggedValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
+    void set_filename(Value* v, std::string const& s) { touch(v); set_string(v->getIndex(0), s); }
+    void set_texid(Value* v, int id) { touch(v); set_int(v->getIndex(1), id); }
+    void set_width(Value* v, int w) { touch(v); set_int(v->getIndex(2), w); }
+    void set_height(Value* v, int h) { touch(v); set_int(v->getIndex(3), h); }
 }
 
 namespace rect_t {
-    float get_x1(TaggedValue* v) { return v->getIndex(0)->toFloat(); }
-    float get_y1(TaggedValue* v) { return v->getIndex(1)->toFloat(); }
-    float get_x2(TaggedValue* v) { return v->getIndex(2)->toFloat(); }
-    float get_y2(TaggedValue* v) { return v->getIndex(3)->toFloat(); }
+    float get_x1(Value* v) { return v->getIndex(0)->toFloat(); }
+    float get_y1(Value* v) { return v->getIndex(1)->toFloat(); }
+    float get_x2(Value* v) { return v->getIndex(2)->toFloat(); }
+    float get_y2(Value* v) { return v->getIndex(3)->toFloat(); }
 }
 
 GLuint load_image_to_texture(EvalContext* cxt, Term* caller, const char* filename)
@@ -123,7 +123,7 @@ CA_FUNCTION(load_image)
 
 CA_FUNCTION(draw_image)
 {
-    TaggedValue* image = INPUT(0);
+    Value* image = INPUT(0);
 
     Point* loc = Point::checkCast(INPUT(1));
     float x = loc->getX();
@@ -150,8 +150,8 @@ CA_FUNCTION(draw_image)
 CA_FUNCTION(draw_image_clip)
 {
 #if 0
-    TaggedValue* image = INPUT(0);
-    TaggedValue* clip = INPUT(1);
+    Value* image = INPUT(0);
+    Value* clip = INPUT(1);
 
     Branch& destination = INPUT(2)->asBranch();
     float dest_x = destination[0]->asFloat();

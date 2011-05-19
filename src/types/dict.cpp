@@ -9,7 +9,7 @@ namespace dict_t {
 
 struct Slot {
     char* key;
-    TaggedValue value;
+    Value value;
 };
 
 struct DictData {
@@ -173,7 +173,7 @@ int insert(DictData** dataPtr, const char* key)
     return index;
 }
 
-void insert_value(DictData** dataPtr, const char* key, TaggedValue* value)
+void insert_value(DictData** dataPtr, const char* key, Value* value)
 {
     int index = insert(dataPtr, key);
     copy(value, &(*dataPtr)->slots[index].value);
@@ -208,14 +208,14 @@ int find_key(DictData* data, const char* key)
     return index;
 }
 
-TaggedValue* get_value(DictData* data, const char* key)
+Value* get_value(DictData* data, const char* key)
 {
     int index = find_key(data, key);
     if (index == -1) return NULL;
     return &data->slots[index].value;
 }
 
-TaggedValue* get_index(DictData* data, int index)
+Value* get_index(DictData* data, int index)
 {
     ca_assert(index < data->capacity);
     ca_assert(data->slots[index].key != NULL);
@@ -282,8 +282,8 @@ void clear(DictData* data)
 
 struct SortedVisitItem {
     char* key;
-    TaggedValue* value;
-    SortedVisitItem(char* k, TaggedValue* v) : key(k), value(v) {}
+    Value* value;
+    SortedVisitItem(char* k, Value* v) : key(k), value(v) {}
 };
 
 struct SortedVisitItemCompare {
@@ -322,7 +322,7 @@ std::string to_string(DictData* data)
         std::stringstream strm;
         bool first;
         Visitor() : first(true) {}
-        static void visit(void* context, const char* key, TaggedValue* value)
+        static void visit(void* context, const char* key, Value* value)
         {
             Visitor& obj = *((Visitor*) context);
             if (!obj.first)
@@ -351,7 +351,7 @@ void debug_print(DictData* data)
     }
 }
 
-void iterator_start(DictData* data, TaggedValue* iterator)
+void iterator_start(DictData* data, Value* iterator)
 {
     if (data == NULL || data->count == 0)
         return set_null(iterator);
@@ -363,7 +363,7 @@ void iterator_start(DictData* data, TaggedValue* iterator)
         iterator_next(data, iterator);
 }
 
-void iterator_next(DictData* data, TaggedValue* iterator)
+void iterator_next(DictData* data, Value* iterator)
 {
     int i = as_int(iterator);
 
@@ -378,7 +378,7 @@ void iterator_next(DictData* data, TaggedValue* iterator)
         set_int(iterator, next);
 }
 
-void iterator_get(DictData* data, TaggedValue* iterator, const char** key, TaggedValue** value)
+void iterator_get(DictData* data, Value* iterator, const char** key, Value** value)
 {
     int i = as_int(iterator);
 
@@ -386,7 +386,7 @@ void iterator_get(DictData* data, TaggedValue* iterator, const char** key, Tagge
     *value = &data->slots[i].value;
 }
 
-void iterator_delete(DictData* data, TaggedValue* iterator)
+void iterator_delete(DictData* data, Value* iterator)
 {
     int i = as_int(iterator);
     remove_at(data, i);
@@ -394,24 +394,24 @@ void iterator_delete(DictData* data, TaggedValue* iterator)
 
 namespace tagged_value_wrappers {
 
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, Value* value)
     {
         value->value_data.ptr = NULL;
     }
-    void release(Type*, TaggedValue* value)
+    void release(Type*, Value* value)
     {
         free_dict((DictData*) value->value_data.ptr);
     }
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, Value* source, Value* dest)
     {
         change_type_no_initialize(dest, type);
         dest->value_data.ptr = duplicate((DictData*) source->value_data.ptr);
     }
-    std::string to_string(TaggedValue* value)
+    std::string to_string(Value* value)
     {
         return to_string((DictData*) value->value_data.ptr);
     }
-    TaggedValue* get_field(TaggedValue* value, const char* field)
+    Value* get_field(Value* value, const char* field)
     {
         return dict_t::get_value((DictData*) value->value_data.ptr, field);
 
@@ -431,12 +431,12 @@ void setup_type(Type* type)
 } // namespace dict_t
 
 Dict::Dict()
-  : TaggedValue()
+  : Value()
 {
     change_type(this, &DICT_T);
 }
 
-Dict* Dict::checkCast(TaggedValue* value)
+Dict* Dict::checkCast(Value* value)
 {
     if (value == NULL)
         return NULL;
@@ -447,7 +447,7 @@ Dict* Dict::checkCast(TaggedValue* value)
         return NULL;
 }
 
-Dict* Dict::lazyCast(TaggedValue* value)
+Dict* Dict::lazyCast(Value* value)
 {
     if (is_dict(value))
         return (Dict*) value;
@@ -455,7 +455,7 @@ Dict* Dict::lazyCast(TaggedValue* value)
 }
 
 Dict*
-Dict::cast(TaggedValue* v)
+Dict::cast(Value* v)
 {
     return make_dict(v);
 }
@@ -465,11 +465,11 @@ std::string Dict::toString()
     return dict_t::to_string((dict_t::DictData*) this->value_data.ptr);
 }
 
-TaggedValue* Dict::get(const char* key)
+Value* Dict::get(const char* key)
 {
     return dict_t::get_value((dict_t::DictData*) this->value_data.ptr, key);
 }
-TaggedValue* Dict::operator[](const char* key)
+Value* Dict::operator[](const char* key)
 {
     return get(key);
 }
@@ -477,7 +477,7 @@ bool Dict::contains(const char* key)
 {
     return get(key) != NULL;
 }
-TaggedValue* Dict::insert(const char* key)
+Value* Dict::insert(const char* key)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     int newIndex = dict_t::insert(&data, key);
@@ -489,7 +489,7 @@ void Dict::remove(const char* key)
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::remove(data, key);
 }
-void Dict::set(const char* key, TaggedValue* value)
+void Dict::set(const char* key, Value* value)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::insert_value(&data, key, value);
@@ -506,38 +506,38 @@ bool Dict::empty()
     return dict_t::count(data) == 0;
 }
 
-void Dict::iteratorStart(TaggedValue* iterator)
+void Dict::iteratorStart(Value* iterator)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::iterator_start(data, iterator);
 }
-void Dict::iteratorNext(TaggedValue* iterator)
+void Dict::iteratorNext(Value* iterator)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::iterator_next(data, iterator);
 }
-void Dict::iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value)
+void Dict::iteratorGet(Value* iterator, const char** key, Value** value)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::iterator_get(data, iterator, key, value);
 }
-void Dict::iteratorDelete(TaggedValue* iterator)
+void Dict::iteratorDelete(Value* iterator)
 {
     dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
     dict_t::iterator_delete(data, iterator);
 }
-bool Dict::iteratorFinished(TaggedValue* iterator)
+bool Dict::iteratorFinished(Value* iterator)
 {
     return is_null(iterator);
 }
 void Dict::setString(const char* key, const char* value)
 {
-    TaggedValue* dest = insert(key);
+    Value* dest = insert(key);
     set_string(dest, value);
 }
 const char* Dict::getString(const char* key, const char* defaultValue)
 {
-    TaggedValue* val = get(key);
+    Value* val = get(key);
     if (val == NULL)
         return defaultValue;
     if (is_string(val))
@@ -546,12 +546,12 @@ const char* Dict::getString(const char* key, const char* defaultValue)
 }
 void Dict::setInt(const char* key, int value)
 {
-    TaggedValue* dest = insert(key);
+    Value* dest = insert(key);
     set_int(dest, value);
 }
 int Dict::getInt(const char* key, int defaultValue)
 {
-    TaggedValue* val = get(key);
+    Value* val = get(key);
     if (val == NULL)
         return defaultValue;
     if (is_int(val))
@@ -559,11 +559,11 @@ int Dict::getInt(const char* key, int defaultValue)
     return defaultValue;
 }
 
-bool is_dict(TaggedValue* value)
+bool is_dict(Value* value)
 {
     return value->value_type == &DICT_T;
 }
-Dict* make_dict(TaggedValue* value)
+Dict* make_dict(Value* value)
 {
     change_type(value, &DICT_T);
     return (Dict*) value;

@@ -26,7 +26,7 @@ void on_release_func(int handle)
     set_bool(g_slots[handle], false);
 }
 
-void assign(TaggedValue* value, int handle)
+void assign(Value* value, int handle)
 {
     test_assert(!as_bool(g_slots[handle]));
     set_bool(g_slots[handle], true);
@@ -62,7 +62,7 @@ void test_simple()
 
     test_equals(&g_slots, "[false, false, false]");
 
-    TaggedValue handle;
+    Value handle;
 
     assign(&handle, 0);
     test_equals(&g_slots, "[true, false, false]");
@@ -78,8 +78,8 @@ void test_simple()
     assign(&handle, 2);
     test_equals(&g_slots, "[false, false, true]");
 
-    TaggedValue handle2;
-    TaggedValue handle3;
+    Value handle2;
+    Value handle3;
     assign(&handle2, 0);
     test_equals(&g_slots, "[true, false, true]");
     assign(&handle3, 1);

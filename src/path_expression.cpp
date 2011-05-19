@@ -44,9 +44,9 @@ PathExpression get_lexpr_path_expression(Term* term)
     return result;
 }
 
-TaggedValue* step_path(TaggedValue* obj, PathExpression::Element const& element)
+Value* step_path(Value* obj, PathExpression::Element const& element)
 {
-    TaggedValue* result = NULL;
+    Value* result = NULL;
     if (element.isIndex()) {
         result = get_index(obj, element.index);
     } else if (element.isField()) {

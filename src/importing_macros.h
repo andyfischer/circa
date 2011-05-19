@@ -21,6 +21,12 @@
     static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
     CA_FUNCTION(evaluate_##fname)
 
+#define CA_SETUP_FUNCTIONS(branch) {\
+    for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \
+        import_function(branch, _circa_START_FUNCTIONS[i]->_func,\
+                _circa_START_FUNCTIONS[i]->_header);\
+    }
+
 #define INPUT(index) (get_input(_circa_caller, (index)))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))
@@ -31,12 +37,7 @@
 #define CALLER (_circa_caller)
 #define INPUT_TERM(index) (CALLER->input(index))
 #define OUTPUT (get_output(_circa_caller, 0))
-#define EXTRA_OUTPUT(index) (get_extra_output(_circa_caller, index))
+#define EXTRA_OUTPUT(index) (get_extra_output(_circa_caller, (index)))
 #define CONTEXT (_circa_cxt)
 #define FUNCTION (_circa_caller->function)
-
-#define CA_SETUP_FUNCTIONS(branch) {\
-    for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \
-        import_function(branch, _circa_START_FUNCTIONS[i]->_func,\
-                _circa_START_FUNCTIONS[i]->_header);\
-    }
+#define ERROR_OCCURRED(msg) (error_occurred(_circa_cxt, _circa_caller, (msg)))

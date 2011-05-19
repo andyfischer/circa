@@ -102,7 +102,7 @@ extern Type SYMBOL_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 
-extern TaggedValue REPEAT_SYMBOL;
+extern Value REPEAT_SYMBOL;
 
 extern Type* FILE_SIGNATURE_T;
 
@@ -119,8 +119,8 @@ namespace assign_function {
 }
 
 namespace branch_ref_function {
-    Branch* deref(TaggedValue* val);
-    void set_branch_ref(TaggedValue* value, Branch* branchPtr);
+    Branch* deref(Value* val);
+    void set_branch_ref(Value* value, Branch* branchPtr);
 }
 
 namespace copy_function {
@@ -133,14 +133,14 @@ namespace include_function {
 
 namespace internal_debug_function {
     void oracle_clear();
-    void oracle_send(TaggedValue* value);
+    void oracle_send(Value* value);
     void oracle_send(int i);
     void spy_clear();
     List* spy_results();
 }
 
 namespace file_changed_function {
-    bool check(EvalContext*, Term* caller, TaggedValue* fileSignature,
+    bool check(EvalContext*, Term* caller, Value* fileSignature,
             std::string const& filename);
 }
 

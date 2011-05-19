@@ -44,14 +44,14 @@ namespace internal_debug_function {
         oracleValues.clear();
     }
 
-    void oracle_send(TaggedValue* value)
+    void oracle_send(Value* value)
     {
         copy(value, oracleValues.append());
     }
 
     void oracle_send(int i)
     {
-        TaggedValue v;
+        Value v;
         set_int(&v, i);
         oracle_send(&v);
     }

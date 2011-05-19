@@ -10,23 +10,23 @@ bool run_test_for_type(Type* type, List& exampleValues)
     Branch branch;
 
     // Copy to x
-    TaggedValue x;
+    Value x;
     copy(exampleValues[0], &x);
 
     // Copy again to cpy, check they are equal
-    TaggedValue cpy;
+    Value cpy;
     copy(&x, &cpy);
     test_assert(equals(&x, &cpy));
     test_assert(equals(&cpy, &x));
 
     // Check if example 0 != example 1
-    TaggedValue y;
+    Value y;
     copy(exampleValues[1], &y);
     test_assert(!equals(&x,&y));
     test_assert(!equals(&y,&x));
 
     // Use 'equals' on a different type, check if we die
-    TaggedValue nullValue;
+    Value nullValue;
     test_assert(!equals(&nullValue, &x));
     test_assert(!equals(&x, &nullValue));
 
@@ -36,7 +36,7 @@ bool run_test_for_type(Type* type, List& exampleValues)
     test_assert(equals(&x,&y));
 
     // use cast(), make sure the output is equal
-    TaggedValue castResult;
+    Value castResult;
     cast(&x, type, &castResult);
     test_assert(equals(&x, &castResult));
 
@@ -46,7 +46,7 @@ bool run_test_for_type(Type* type, List& exampleValues)
 
     // Cast an integer to this type. This might cause an error but it shouldn't
     // crash.
-    TaggedValue one;
+    Value one;
     set_int(&one, 1);
     cast(&one, type, &castResult);
 

@@ -123,7 +123,7 @@ int count_static_errors(Branch& branch)
     return !List::checkCast(&branch.staticErrors)->length();
 }
 
-void print_static_error(TaggedValue* error, std::ostream& out)
+void print_static_error(Value* error, std::ostream& out)
 {
     List* item = List::checkCast(error);
     Term* term = as_ref(item->get(0));

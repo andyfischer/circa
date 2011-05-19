@@ -29,7 +29,7 @@ void test_subroutine()
     branch.compile("def f(any v) -> any { return(v) }");
     test_assert(branch);
 
-    TaggedValue* a = branch.eval("f('test')");
+    Value* a = branch.eval("f('test')");
 
     test_assert(is_string(a));
     test_assert(as_string(a) == "test");
@@ -37,8 +37,8 @@ void test_subroutine()
     branch.clear();
     branch.compile("def f(bool b, any v) -> any { if b { return(v) } else { return(5) } }");
 
-    TaggedValue* b = branch.eval("f(true, 'test')");
-    TaggedValue* c = branch.eval("f(false, 'test')");
+    Value* b = branch.eval("f(true, 'test')");
+    Value* c = branch.eval("f(false, 'test')");
 
     test_assert(is_string(b));
     test_assert(as_string(b) == "test");

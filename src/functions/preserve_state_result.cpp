@@ -9,7 +9,7 @@ namespace preserve_state_result_function {
 
     CA_DEFINE_FUNCTION(preserve_state_result, "preserve_state_result(any)")
     {
-        TaggedValue result;
+        Value result;
         copy(INPUT(0), &result);
         // TODO: switch to use consume_input instead of copy
         //consume_input(CALLER, 0, &result);

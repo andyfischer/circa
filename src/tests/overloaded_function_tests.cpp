@@ -17,9 +17,9 @@ void declared_in_script()
     evaluate_branch(&context, branch);
     test_assert(context);
 
-    TaggedValue* a = branch.eval("a = f(1)");
+    Value* a = branch.eval("a = f(1)");
     test_equals(a, 2);
-    TaggedValue* b = branch.eval("b = f('aaa')");
+    Value* b = branch.eval("b = f('aaa')");
     test_equals(b, "aaax");
 }
 

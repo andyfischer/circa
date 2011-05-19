@@ -19,7 +19,7 @@ extern bool DEBUG_TRAP_ERROR_OCCURRED;
 void dump(Branch& branch);
 void dump_with_props(Branch& branch);
 
-void dump(TaggedValue& value);
-void dump(TaggedValue* value);
+void dump(Value& value);
+void dump(Value* value);
 
 } // namespace circa

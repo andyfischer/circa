@@ -19,7 +19,7 @@ namespace textures {
 
 CA_FUNCTION(hosted_load_texture)
 {
-    TaggedValue* texid = INPUT(0);
+    Value* texid = INPUT(0);
 
     if (as_int(texid) == 0) {
         std::string filename = INPUT(1)->asString();
@@ -33,7 +33,7 @@ CA_FUNCTION(hosted_load_texture)
 
 CA_FUNCTION(hosted_image)
 {
-    TaggedValue* texid = INPUT(0);
+    Value* texid = INPUT(0);
     std::string filename = INPUT(1)->asString();
     float x1 = FLOAT_INPUT(2);
     float y1 = FLOAT_INPUT(3);

@@ -29,7 +29,7 @@ void write_text_file(const char* filename, const char* contents);
 time_t get_modified_time(const char* filename);
 bool file_exists(const char* filename);
 
-void read_text_file_to_value(const char* filename, TaggedValue* contents, TaggedValue* error);
+void read_text_file_to_value(const char* filename, Value* contents, Value* error);
 std::string read_text_file_as_str(const char* filename);
 
 struct StorageInterface {

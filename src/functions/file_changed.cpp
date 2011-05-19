@@ -5,7 +5,7 @@
 namespace circa {
 namespace file_changed_function {
 
-    bool check(EvalContext* cxt, Term* caller, TaggedValue* fileSignature,
+    bool check(EvalContext* cxt, Term* caller, Value* fileSignature,
             std::string const& filename)
     {
         if (!storage::file_exists(filename.c_str()) && filename != "") {
@@ -16,8 +16,8 @@ namespace file_changed_function {
         if (fileSignature->value_type != FILE_SIGNATURE_T)
             change_type(fileSignature, FILE_SIGNATURE_T);
         
-        TaggedValue* sigFilename = fileSignature->getIndex(0);
-        TaggedValue* sigModified = fileSignature->getIndex(1);
+        Value* sigFilename = fileSignature->getIndex(0);
+        Value* sigModified = fileSignature->getIndex(1);
 
         time_t modifiedTime = storage::get_modified_time(filename.c_str());
 

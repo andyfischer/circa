@@ -129,7 +129,7 @@ Type TYPE_T;
 Type VOID_T;
 
 // Builtin symbols:
-TaggedValue REPEAT_SYMBOL;
+Value REPEAT_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
 
@@ -228,7 +228,7 @@ void bootstrap_kernel()
     // Initialize Value func
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
-    change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
+    change_type((Value*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 
     // Update locals so that debugging checks don't complain.
     refresh_locals_indices(*KERNEL);

@@ -162,7 +162,7 @@ namespace test_interpreted_state_access
 {
     CA_FUNCTION(evaluate)
     {
-        TaggedValue* state = get_state_input(CONTEXT, CALLER);
+        Value* state = get_state_input(CONTEXT, CALLER);
         change_type(state, &INT_T);
         set_int(state, as_int(state) + 1);
     }
@@ -300,7 +300,7 @@ std::string code_to_state_shape(const char* code)
 {
     Branch branch;
     branch.compile(code);
-    TaggedValue description;
+    Value description;
     describe_state_shape(branch, &description);
     return description.toString();
 }
@@ -332,7 +332,7 @@ void test_strip_abandoned_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    TaggedValue trash;
+    Value trash;
 
     test_equals(&context.state, "[s: 1, t: 2, x: 'hi']");
 
@@ -372,7 +372,7 @@ void test_preserve_state_in_nested_include_file()
     files.set("b", "state x = test_oracle()");
     branch.compile("include('a')");
 
-    TaggedValue desc;
+    Value desc;
     describe_state_shape(branch, &desc);
     
     EvalContext context;

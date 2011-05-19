@@ -44,18 +44,18 @@ FunctionAttrs::~FunctionAttrs()
 
 namespace function_attrs_t {
 
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, Value* value)
     {
         FunctionAttrs* attrs = new FunctionAttrs();
         set_pointer(value, type, attrs);
     }
 
-    void release(Type*, TaggedValue* value)
+    void release(Type*, Value* value)
     {
         delete (FunctionAttrs*) get_pointer(value);
     }
 
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, Value* source, Value* dest)
     {
         change_type(dest, type);
         *((FunctionAttrs*) get_pointer(dest)) = *((FunctionAttrs*) get_pointer(source));
@@ -290,7 +290,7 @@ namespace function_t {
     {
         return get_function_attrs(func)->specializeType;
     }
-    TaggedValue* get_parameters(Term* func)
+    Value* get_parameters(Term* func)
     {
         return &get_function_attrs(func)->parameter;
     }
@@ -412,7 +412,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 
     for (int i=0; i < inputs.length(); i++) {
         Type* type = unbox_type(function_t::get_input_type(func, i));
-        TaggedValue* value = inputs[i];
+        Value* value = inputs[i];
         if (value == NULL)
             continue;
         if (!cast_possible(value, type))
@@ -431,7 +431,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
 
     for (int i=0; i < list->length(); i++) {
         Type* type = unbox_type(function_t::get_input_type(func, i));
-        TaggedValue* value = list->get(i);
+        Value* value = list->get(i);
         if (value == NULL)
             continue;
         if (!cast_possible(value, type))

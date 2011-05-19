@@ -16,18 +16,18 @@ Term* IMPLICIT_TYPES = NULL;
 
 namespace type_t {
 
-    void initialize(Type*, TaggedValue* value)
+    void initialize(Type*, Value* value)
     {
         Type* type = Type::create();
         set_pointer(value, type);
     }
-    void release(Type*, TaggedValue* value)
+    void release(Type*, Value* value)
     {
         ca_assert(is_type(value));
         Type* type = (Type*) get_pointer(value);
         release_type(type);
     }
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, Value* source, Value* dest)
     {
         ca_assert(is_type(source));
         change_type_no_initialize(dest, type);
@@ -101,7 +101,7 @@ namespace type_t {
     {
         return as_type(type).attributes;
     }
-    TaggedValue* get_default_value(Type* type)
+    Value* get_default_value(Type* type)
     {
         return &type->defaultValue;
     }
@@ -239,7 +239,7 @@ Type* unbox_type(Term* term)
     return (Type*) term->value_data.ptr;
 }
 
-Type* unbox_type(TaggedValue* val)
+Type* unbox_type(Value* val)
 {
     return (Type*) val->value_data.ptr;
 }

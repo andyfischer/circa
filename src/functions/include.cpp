@@ -7,7 +7,7 @@ namespace circa {
 namespace include_function {
 
     bool load_script(EvalContext* cxt, Term* caller,
-            TaggedValue* fileSignature, const std::string& filename)
+            Value* fileSignature, const std::string& filename)
     {
         Branch& contents = caller->nestedContents;
 
@@ -37,14 +37,14 @@ namespace include_function {
     }
     void preload_script(Term* term)
     {
-        TaggedValue* fileSignature = &term->nestedContents.fileSignature;
+        Value* fileSignature = &term->nestedContents.fileSignature;
 
         Term* inputTerm = term->input(0);
 
         EvalContext context;
         evaluate_minimum(&context, inputTerm);
 
-        TaggedValue *input = get_input(term, 0);
+        Value *input = get_input(term, 0);
 
         if (!is_string(input))
             return;
@@ -68,13 +68,13 @@ namespace include_function {
                     get_static_errors_formatted(contents));
 
         // Store currentScopeState and fetch the container for this branch
-        TaggedValue prevScopeState;
+        Value prevScopeState;
         swap(&context->currentScopeState, &prevScopeState);
         fetch_state_container(CALLER, &prevScopeState, &context->currentScopeState);
 
         // Possibly strip out state that isn't referenced any more.
         if (fileChanged) {
-            TaggedValue trash;
+            Value trash;
             strip_orphaned_state(contents, &context->currentScopeState, &trash);
             //if (!is_null(&trash))
             //    std::cout << "include() deleting orphaned state: " << trash.toString() << std::endl;

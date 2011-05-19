@@ -5,7 +5,7 @@
 namespace circa {
 namespace set_t {
 
-    void add(List* list, TaggedValue* value);
+    void add(List* list, Value* value);
     void setup_type(Type* type);
 
 } // namespace set_t

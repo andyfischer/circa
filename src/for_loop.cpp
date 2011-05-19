@@ -152,10 +152,10 @@ CA_FUNCTION(evaluate_for_loop)
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     Term* iterator = get_for_loop_iterator(CALLER);
 
-    TaggedValue* inputList = INPUT(0);
+    Value* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
-    TaggedValue outputTv;
+    Value outputTv;
     bool saveOutput = forContents.outputIndex != -1;
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
@@ -166,8 +166,8 @@ CA_FUNCTION(evaluate_for_loop)
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
-    TaggedValue localState;
-    TaggedValue prevScopeState;
+    Value localState;
+    Value prevScopeState;
     List* state = NULL;
     if (useState) {
         swap(&context->currentScopeState, &prevScopeState);
@@ -195,7 +195,7 @@ CA_FUNCTION(evaluate_for_loop)
         // copy inner rebinds
         for (int i=0; i < innerRebinds.length(); i++) {
             Term* rebindTerm = innerRebinds[i];
-            TaggedValue* dest = get_local(rebindTerm);
+            Value* dest = get_local(rebindTerm);
 
             if (firstIter)
                 copy(get_input(rebindTerm, 0), dest);
@@ -214,7 +214,7 @@ CA_FUNCTION(evaluate_for_loop)
 
         // Save output
         if (saveOutput && !context->forLoopContext.discard) {
-            TaggedValue* localResult = get_local(forContents[forContents.outputIndex]);
+            Value* localResult = get_local(forContents[forContents.outputIndex]);
             copy(localResult, output->get(nextOutputIndex++));
         }
 
@@ -233,7 +233,7 @@ CA_FUNCTION(evaluate_for_loop)
 
         Term* rebindTerm = outerRebinds[i];
 
-        TaggedValue* result = NULL;
+        Value* result = NULL;
 
         if (inputListLength == 0) {
             // No iterations, use the outer rebind

@@ -68,7 +68,7 @@ std::string unformat_rich_source(StyledSource* source)
     std::stringstream strm;
 
     for (int i=0; i < source->_phrases.numElements(); i++) {
-        TaggedValue* phrase = source->_phrases[i];
+        Value* phrase = source->_phrases[i];
         strm << as_string((*phrase)[0]);
     }
     return strm.str();

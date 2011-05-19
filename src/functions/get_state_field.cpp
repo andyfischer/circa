@@ -15,7 +15,7 @@ namespace get_state_field_function {
     {
         Dict* stateContainer = NULL;
 
-        TaggedValue *containerFromInput = INPUT(0);
+        Value *containerFromInput = INPUT(0);
         if (containerFromInput != NULL)
             stateContainer = Dict::checkCast(containerFromInput);
 
@@ -25,7 +25,7 @@ namespace get_state_field_function {
         ca_assert(stateContainer != NULL);
 
         const char* name = CALLER->name.c_str();
-        TaggedValue* value = stateContainer->get(name);
+        Value* value = stateContainer->get(name);
 
         bool cast_success = false;
 

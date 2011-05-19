@@ -40,19 +40,19 @@ void test_recursion()
                 "    next_i = add_i(n, -1)"
                 "    return(mult_i(n, factorial(next_i))) }}");
 
-    TaggedValue* fact_1 = branch.eval("factorial(1)");
+    Value* fact_1 = branch.eval("factorial(1)");
     test_assert(branch);
     test_assert(fact_1->asInt() == 1);
 
-    TaggedValue* fact_2 = branch.eval("factorial(2)");
+    Value* fact_2 = branch.eval("factorial(2)");
     test_assert(branch);
     test_assert(fact_2->asInt() == 2);
 
-    TaggedValue* fact_3 = branch.eval("factorial(3)");
+    Value* fact_3 = branch.eval("factorial(3)");
     test_assert(branch);
     test_assert(fact_3->asInt() == 6);
 
-    TaggedValue* fact_4 = branch.eval("factorial(4)");
+    Value* fact_4 = branch.eval("factorial(4)");
     test_assert(branch);
     test_assert(fact_4->asInt() == 24);
 
@@ -138,7 +138,7 @@ void shadow_input()
     // Try having a name that shadows an input. This had a bug at one point
     branch.eval("def f(int i) -> int { i = 2 return(i) }");
 
-    TaggedValue* a = branch.eval("f(1)");
+    Value* a = branch.eval("f(1)");
 
     test_assert(a->asInt() == 2);
 }
@@ -154,7 +154,7 @@ void specialization_to_output_type()
     test_assert(function_get_output_type(a, 0)->name == "Point");
 
     // Make sure that the return value is preserved. This had a bug too
-    TaggedValue* call = branch.eval("a()");
+    Value* call = branch.eval("a()");
     test_assert(call->numElements() == 2);
     test_equals(call->getIndex(0)->toFloat(), 1.0);
     test_equals(call->getIndex(1)->toFloat(), 2.0);
@@ -165,7 +165,7 @@ void stateful_function_with_arguments()
     // This code once had a bug
     Branch branch;
     branch.compile("def myfunc(int i) -> int { state s; return(i) }");
-    TaggedValue* call = branch.eval("myfunc(5)");
+    Value* call = branch.eval("myfunc(5)");
     test_assert(call->asInt() == 5);
 }
 
@@ -203,7 +203,7 @@ void bug_where_interrupt_subroutine_wasnt_being_cleared()
     Branch branch;
     branch.compile("def f()->int { return(1) }");
     branch.compile("def g()->int { a = f() return(2) }");
-    TaggedValue* x = branch.eval("x = g()");
+    Value* x = branch.eval("x = g()");
     test_equals(x, 2);
 }
 
@@ -216,7 +216,7 @@ void test_call_subroutine()
     set_int(inputs.append(), 5);
     set_int(inputs.append(), 3);
     test_equals(&inputs, "[5, 3]");
-    TaggedValue output;
+    Value output;
 
     call_subroutine(f, &inputs, &output, NULL);
     test_equals(&output, "13");
@@ -243,7 +243,7 @@ namespace copy_counting_tests
     int next_available_slot = 0;
     Slot slots[num_slots];
 
-    void dump_slots(TaggedValue* value)
+    void dump_slots(Value* value)
     {
         List* list = set_list(value, 0);
         for (int s=0; s < next_available_slot; s++) {
@@ -252,17 +252,17 @@ namespace copy_counting_tests
     }
     void dump_slots_stdout()
     {
-        TaggedValue v;
+        Value v;
         dump_slots(&v);
         std::cout << v.toString() << std::endl;
     }
 
-    void t_initialize(Type* type, TaggedValue* source)
+    void t_initialize(Type* type, Value* source)
     {
         source->value_data.asint = next_available_slot++;
     }
 
-    void t_copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void t_copy(Type* type, Value* source, Value* dest)
     {
         change_type_no_initialize(dest, type);
         dest->value_data = source->value_data;

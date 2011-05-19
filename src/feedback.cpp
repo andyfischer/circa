@@ -15,7 +15,7 @@
 
 namespace circa {
 
-void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desired)
+void handle_feedback_event(EvalContext* context, Term* target, Value* desired)
 {
     // For now, use a simple implementation which cannot handle combining multiple
     // feedback events, or dispatching feedback to multiple sources. All we handle

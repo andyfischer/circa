@@ -19,7 +19,7 @@ void Point::set(float x, float y)
     set_float(getIndex(1), y);
 }
 
-Point* Point::checkCast(TaggedValue* tv)
+Point* Point::checkCast(Value* tv)
 {
     if (!is_list(tv)) return NULL;
     if (tv->numElements() != 2) return NULL;
@@ -29,7 +29,7 @@ Point* Point::checkCast(TaggedValue* tv)
 }
 
 Point*
-Point::cast(TaggedValue* v)
+Point::cast(Value* v)
 {
     set_list(v, 2);
     set_float(v->getIndex(0), 0);

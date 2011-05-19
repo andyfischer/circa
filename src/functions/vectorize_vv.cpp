@@ -16,7 +16,7 @@ namespace vectorize_vv_function {
     CA_FUNCTION(evaluate)
     {
         Branch& contents = CALLER->nestedContents;
-        TaggedValue input0, input1;
+        Value input0, input1;
 
         if (num_elements(INPUT(0)) != num_elements(INPUT(1)))
             return error_occurred(CONTEXT, CALLER, "Input lists have different lengths");
@@ -32,7 +32,7 @@ namespace vectorize_vv_function {
         start_using(contents);
 
         // Prepare output
-        TaggedValue outputTv;
+        Value outputTv;
         List* output = set_list(&outputTv, listLength);
 
         // Evaluate vectorized call, once for each input
@@ -58,7 +58,7 @@ namespace vectorize_vv_function {
         Branch& contents = term->nestedContents;
         contents.clear();
 
-        TaggedValue* funcParam = function_t::get_parameters(term->function);
+        Value* funcParam = function_t::get_parameters(term->function);
         if (funcParam == NULL || !is_ref(funcParam))
             return;
 

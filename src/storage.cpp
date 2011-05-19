@@ -24,11 +24,11 @@ void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* con
     return g_storageInterface.readTextFile(filename, receiveFile, context);
 }
 
-void read_text_file_to_value(const char* filename, TaggedValue* contents, TaggedValue* error)
+void read_text_file_to_value(const char* filename, Value* contents, Value* error)
 {
     struct ReceiveFile {
-        TaggedValue* _contents;
-        TaggedValue* _error;
+        Value* _contents;
+        Value* _error;
         static void Func(void* context, const char* contents, const char* error) {
             ReceiveFile* obj = (ReceiveFile*) context;
 
@@ -55,7 +55,7 @@ void read_text_file_to_value(const char* filename, TaggedValue* contents, Tagged
 
 std::string read_text_file_as_str(const char* filename)
 {
-    TaggedValue contents;
+    Value contents;
     read_text_file_to_value(filename, &contents, NULL);
 
     if (is_string(&contents))

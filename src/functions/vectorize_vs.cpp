@@ -18,7 +18,7 @@ namespace vectorize_vs_function {
     CA_FUNCTION(evaluate)
     {
         Branch& contents = CALLER->nestedContents;
-        TaggedValue input0, input1;
+        Value input0, input1;
         copy(INPUT(0), &input0);
         copy(INPUT(1), &input1);
         int listLength = input0.numElements();
@@ -30,7 +30,7 @@ namespace vectorize_vs_function {
         start_using(contents);
 
         // Prepare output
-        TaggedValue outputTv;
+        Value outputTv;
         List* output = set_list(&outputTv, listLength);
 
         // Copy right input once
@@ -58,7 +58,7 @@ namespace vectorize_vs_function {
         Branch& contents = term->nestedContents;
         contents.clear();
 
-        TaggedValue* funcParam = function_t::get_parameters(term->function);
+        Value* funcParam = function_t::get_parameters(term->function);
         if (funcParam == NULL || !is_ref(funcParam))
             return;
 

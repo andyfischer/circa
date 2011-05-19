@@ -135,8 +135,8 @@ CA_FUNCTION(evaluate_if_block)
     // to reset state.
     bool acceptedBranchWasEmpty = true;
 
-    TaggedValue localState;
-    TaggedValue prevScopeState;
+    Value localState;
+    Value prevScopeState;
     List* state = NULL;
     if (useState) {
         swap(&prevScopeState, &context->currentScopeState);
@@ -193,7 +193,7 @@ CA_FUNCTION(evaluate_if_block)
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];
-        TaggedValue* value = get_input(joinTerm, acceptedBranchIndex);
+        Value* value = get_input(joinTerm, acceptedBranchIndex);
 
         ca_test_assert(cast_possible(value, unbox_type(get_output_type(CALLER, i+1))));
 

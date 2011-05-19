@@ -123,7 +123,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     inputs.resize(numInputs);
 
     for (int i=0; i < numInputs; i++) {
-        TaggedValue* input = get_input(caller, i);
+        Value* input = get_input(caller, i);
         if (input == NULL)
             continue;
 
@@ -138,7 +138,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     }
 
     // Fetch state container
-    TaggedValue prevScopeState;
+    Value prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
 
     if (is_function_stateful(function))
@@ -154,7 +154,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     swap(&context->currentScopeState, &prevScopeState);
 
     // Write output
-    TaggedValue* outputDest = get_output(caller, 0);
+    Value* outputDest = get_output(caller, 0);
     if (outputDest != NULL)
         swap(outputs[0], outputDest);
 
@@ -271,7 +271,7 @@ void subroutine_check_to_append_implicit_return(Term* sub)
     post_compile_term(apply(contents, RETURN_FUNC, TermList(NULL)));
 }
 
-void store_locals(Branch& branch, TaggedValue* storageTv)
+void store_locals(Branch& branch, Value* storageTv)
 {
     touch(storageTv);
     set_list(storageTv);
@@ -289,7 +289,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
     }
 }
 
-void restore_locals(TaggedValue* storageTv, Branch& branch)
+void restore_locals(Value* storageTv, Branch& branch)
 {
     if (!is_list(storageTv))
         internal_error("storageTv is not a list");
@@ -310,8 +310,8 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
     }
 }
 
-void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
-                     TaggedValue* error)
+void call_subroutine(Branch& sub, Value* inputs, Value* output,
+                     Value* error)
 {
     List* inputsList = List::checkCast(inputs);
     ca_assert(inputsList != NULL);
@@ -327,7 +327,7 @@ void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
         set_string(error, context.errorMessage);
 }
 
-void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)
+void call_subroutine(Term* sub, Value* inputs, Value* output, Value* error)
 {
     return call_subroutine(sub->nestedContents, inputs, output, error);
 }

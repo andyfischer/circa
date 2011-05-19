@@ -29,7 +29,7 @@ void test_intrusive_refcount()
     intrusive_refcounted::setup_type<MyStruct>(type);
     type->toString = cpp_type_wrapper::toString<MyStruct>;
 
-    TaggedValue v;
+    Value v;
     intrusive_refcounted::set<MyStruct>(&v, type, new MyStruct());
     change_type(&v, type);
 
@@ -42,7 +42,7 @@ void test_intrusive_refcount()
 
     test_equals(v_value->_refCount, 1);
 
-    TaggedValue v2;
+    Value v2;
     copy(&v, &v2);
 
     test_equals(to_string(&v2), "[1, 2]");
@@ -89,7 +89,7 @@ void intrusive_refcount_tracked_alloc()
     // Step 1: Allocate and deallocate
     test_assert(fake_memory::used[0] == false);
 
-    TaggedValue value;
+    Value value;
     intrusive_refcounted::set<fake_memory::Object>(&value, type, new fake_memory::Object());
 
     test_assert(fake_memory::used[0] == true);
@@ -104,7 +104,7 @@ void intrusive_refcount_tracked_alloc()
     test_assert(fake_memory::used[0] == true);
     test_assert(fake_memory::used[1] == false);
 
-    TaggedValue value2;
+    Value value2;
     copy(&value, &value2);
 
     test_assert(fake_memory::used[0] == true);

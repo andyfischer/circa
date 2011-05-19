@@ -27,7 +27,7 @@ struct Font
     Font() : _refCount(0), ttfFont(NULL) {}
 };
 
-SDL_Color unpack_sdl_color(TaggedValue* color)
+SDL_Color unpack_sdl_color(Value* color)
 {
     SDL_Color c = {};
     c.r = Uint8(color->getIndex(0)->asFloat() * 255.0);
@@ -56,19 +56,19 @@ CA_FUNCTION(load_font)
     intrusive_refcounted::set<Font>(OUTPUT, &g_font_t, output);
 }
 
-struct RenderedText : public TaggedValue
+struct RenderedText : public Value
 {
     int texid() { return getIndex(0)->asInt(); }
     int width() { return getIndex(1)->asInt(); }
     int height() { return getIndex(2)->asInt(); }
-    TaggedValue* texidContainer() { return getIndex(0); }
-    TaggedValue* widthContainer() { return getIndex(1); }
-    TaggedValue* heightContainer() { return getIndex(2); }
-    TaggedValue* color() { return getIndex(3); }
+    Value* texidContainer() { return getIndex(0); }
+    Value* widthContainer() { return getIndex(1); }
+    Value* heightContainer() { return getIndex(2); }
+    Value* color() { return getIndex(3); }
     std::string const& text() { return getIndex(4)->asString(); }
-    TaggedValue* textContainer() { return getIndex(4); }
+    Value* textContainer() { return getIndex(4); }
 
-    static RenderedText* cast(TaggedValue* val)
+    static RenderedText* cast(Value* val)
     {
         change_type(val, singleton);
         return (RenderedText*) val;
@@ -82,7 +82,7 @@ Type* RenderedText::singleton;
 CA_FUNCTION(render_text)
 {
     std::string const& inputText = as_string(INPUT(1));
-    TaggedValue* inputColor = INPUT(2);
+    Value* inputColor = INPUT(2);
 
     RenderedText* output = RenderedText::cast(OUTPUT);
 

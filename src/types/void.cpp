@@ -4,12 +4,12 @@
 
 namespace circa {
 namespace void_t {
-    std::string to_string(TaggedValue*)
+    std::string to_string(Value*)
     {
         return "<void>";
     }
-    void cast(CastResult* result, TaggedValue* source, Type* type,
-        TaggedValue* dest, bool checkOnly)
+    void cast(CastResult* result, Value* source, Type* type,
+        Value* dest, bool checkOnly)
     {
         if (!is_null(source)) {
             result->success = false;

@@ -9,13 +9,13 @@ namespace hashtable_members_function {
 
     CA_FUNCTION(contains)
     {
-        TaggedValue* value = hashtable_t::get_value(INPUT(0), INPUT(1));
+        Value* value = hashtable_t::get_value(INPUT(0), INPUT(1));
         set_bool(OUTPUT, value != NULL);
     }
 
     CA_FUNCTION(insert)
     {
-        TaggedValue key, value;
+        Value key, value;
         consume_input(CALLER, 0, OUTPUT);
         consume_input(CALLER, 1, &key);
         consume_input(CALLER, 2, &value);
@@ -30,9 +30,9 @@ namespace hashtable_members_function {
 
     CA_FUNCTION(get)
     {
-        TaggedValue* table = INPUT(0);
-        TaggedValue* key = INPUT(1);
-        TaggedValue* value = hashtable_t::get_value(table, key);
+        Value* table = INPUT(0);
+        Value* key = INPUT(1);
+        Value* value = hashtable_t::get_value(table, key);
         if (value == NULL)
             return error_occurred(CONTEXT, CALLER, "Key not found: " + to_string(key));
         copy(value, OUTPUT);

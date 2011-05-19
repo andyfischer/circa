@@ -278,12 +278,12 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     #endif
 
     if (is_value(term))
-        out << " val:" << to_string((TaggedValue*) term);
+        out << " val:" << to_string((Value*) term);
 
     out << " locals:[";
     for (int i=0; i < outputCount; i++) {
         if (i != 0) out << ", ";
-        TaggedValue* local = get_local_safe(term, i);
+        Value* local = get_local_safe(term, i);
         if (local == NULL)
             out << "<NULL>";
         else
@@ -301,7 +301,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     // out << " " << term->localsIndex << "+" << get_output_count(term);
 
     #if 0
-    TaggedValue* local = get_local_safe(term);
+    Value* local = get_local_safe(term);
     if (local != NULL) {
         out << " ";
         if (is_value(term))
@@ -350,7 +350,7 @@ std::string get_term_to_string_extended_with_props(Term* term)
     return out.str();
 }
 
-void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, TaggedValue* context)
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, Value* context)
 {
     if (location->owningBranch == NULL)
         return;

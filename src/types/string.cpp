@@ -75,26 +75,26 @@ StringData* touch(StringData* original)
 
 namespace string_t {
 
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, Value* value)
     {
         set_pointer(value, new std::string());
     }
-    void release(Type*, TaggedValue* value)
+    void release(Type*, Value* value)
     {
         delete ((std::string*) get_pointer(value));
         set_pointer(value, NULL);
     }
 
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, Value* source, Value* dest)
     {
         change_type(dest, type);
         *((std::string*) dest->value_data.ptr) = as_string(source);
     }
-    void reset(TaggedValue* v)
+    void reset(Value* v)
     {
         set_string(v, "");
     }
-    int hashFunc(TaggedValue* v)
+    int hashFunc(Value* v)
     {
         const char* str = as_cstring(v);
 
@@ -109,13 +109,13 @@ namespace string_t {
         return result;
     }
 
-    bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
+    bool equals(Type*, Value* lhs, Value* rhs)
     {
         if (!is_string(rhs)) return false;
         return as_string(lhs) == as_string(rhs);
     }
 
-    std::string to_string(TaggedValue* value)
+    std::string to_string(Value* value)
     {
         std::stringstream result;
         result << "'" << as_string(value) << "'";

@@ -13,6 +13,6 @@ namespace circa {
 // dll_filename should be a filename with no suffix (ie without '.so' or '.dll')
 //
 // If the DLL fails to load then a string message will be written to 'errorOut..
-void patch_with_dll(const char* dll_filename, Branch& branch, TaggedValue* errorOut);
+void patch_with_dll(const char* dll_filename, Branch& branch, Value* errorOut);
 
 }

@@ -46,19 +46,19 @@ struct Branch
     // Whether this branch has inlined state inside its contents or any nested contents.
     // This value will either be a boolean, or a null (indicating that the value needs to
     // be recalculated).
-    TaggedValue hasInlinedState;
+    Value hasInlinedState;
 
     // If this branch has any static errors, then they are listed here.
     // Structure of each item in this list:
     //  [0] int index
     //  [1] string type
     //  [2] int inputIndex (only used for errors related to inputs)
-    TaggedValue staticErrors;
+    Value staticErrors;
 
     // This value stores information about pending code changes. This is populated
     // when someone makes a term change that will force other terms to be updated.
     // See update_cascades.cpp
-    TaggedValue pendingUpdates;
+    Value pendingUpdates;
     bool currentlyCascadingUpdates;
 
     Branch();

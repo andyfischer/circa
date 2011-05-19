@@ -82,7 +82,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         if (!is_statement(assertions[i]))
             continue;
 
-        TaggedValue* result = get_local(assertions[i]);
+        Value* result = get_local(assertions[i]);
 
         if (!is_bool(result))
             continue;

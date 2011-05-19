@@ -13,7 +13,7 @@ namespace message_passing_function {
 
     CA_FUNCTION(evaluate_send)
     {
-        TaggedValue* input = INPUT(1);
+        Value* input = INPUT(1);
 
         List* inboxState = get_message_queue(CONTEXT, STRING_INPUT(0));
 

@@ -38,11 +38,11 @@ struct CastResult
 
 struct Type
 {
-    typedef void (*Initialize)(Type* type, TaggedValue* value);
-    typedef void (*Release)(Type* type, TaggedValue* value);
-    typedef void (*Copy)(Type* type, TaggedValue* source, TaggedValue* dest);
-    typedef void (*Reset)(Type* type, TaggedValue* value);
-    typedef bool (*Equals)(Type* type, TaggedValue* lhs, TaggedValue* rhs);
+    typedef void (*Initialize)(Type* type, Value* value);
+    typedef void (*Release)(Type* type, Value* value);
+    typedef void (*Copy)(Type* type, Value* source, Value* dest);
+    typedef void (*Reset)(Type* type, Value* value);
+    typedef bool (*Equals)(Type* type, Value* lhs, Value* rhs);
 
     // Attempts to write a value to 'dest' which is of type 'type', and has a value
     // that comes from 'source'. If the cast isn't possible, callee will record the
@@ -51,21 +51,21 @@ struct Type
     // If checkOnly is true, then callee should only record whether the cast is possible,
     // and not actually write to 'dest'. Caller is allowed to pass NULL for 'dest' when
     // checkOnly is true.
-    typedef void (*Cast)(CastResult* result, TaggedValue* source, Type* type,
-            TaggedValue* dest, bool checkOnly);
+    typedef void (*Cast)(CastResult* result, Value* source, Type* type,
+            Value* dest, bool checkOnly);
 
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
-    typedef std::string (*ToString)(TaggedValue* value);
+    typedef std::string (*ToString)(Value* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
-    typedef void (*Touch)(TaggedValue* value);
-    typedef TaggedValue* (*GetIndex)(TaggedValue* value, int index);
-    typedef void (*SetIndex)(TaggedValue* value, int index, TaggedValue* element);
-    typedef TaggedValue* (*GetField)(TaggedValue* value, const char* field);
-    typedef void (*SetField)(TaggedValue* value, const char* field, TaggedValue* element);
-    typedef int (*NumElements)(TaggedValue* value);
+    typedef void (*Touch)(Value* value);
+    typedef Value* (*GetIndex)(Value* value, int index);
+    typedef void (*SetIndex)(Value* value, int index, Value* element);
+    typedef Value* (*GetField)(Value* value, const char* field);
+    typedef void (*SetField)(Value* value, const char* field, Value* element);
+    typedef int (*NumElements)(Value* value);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
-    typedef int (*HashFunc)(TaggedValue* value);
+    typedef int (*HashFunc)(Value* value);
 
     HeapTracker _heapTracker;
 
@@ -103,7 +103,7 @@ struct Type
     Branch prototype;
 
     // Type parameters
-    TaggedValue parameter;
+    Value parameter;
 
     // Attributes for this type.
     Branch attributes;
@@ -114,7 +114,7 @@ struct Type
     Branch memberFunctions;
 
     // Default value
-    TaggedValue defaultValue;
+    Value defaultValue;
 
     bool permanent;
     bool heapAllocated;
@@ -168,9 +168,9 @@ struct StaticTypeQuery
 
 namespace type_t {
 
-    void initialize(Type* type, TaggedValue* value);
-    void release(Type*, TaggedValue* value);
-    void copy(Type*, TaggedValue* source, TaggedValue* dest);
+    void initialize(Type* type, Value* value);
+    void release(Type*, Value* value);
+    void copy(Type*, Value* source, Value* dest);
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, TermMap const& map);
@@ -181,12 +181,12 @@ namespace type_t {
     Branch& get_prototype(Term* type);
     Branch& get_prototype(Type* type);
     Branch& get_attributes(Term* type);
-    TaggedValue* get_default_value(Type* type);
+    Value* get_default_value(Type* type);
 }
 
 Type& as_type(Term* term);
 Type* unbox_type(Term* type);
-Type* unbox_type(TaggedValue* val);
+Type* unbox_type(Value* val);
 Type* declared_type(Term* term);
 
 void register_type_pointer(void* referrer, Type* referee);
