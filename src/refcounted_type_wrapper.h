@@ -21,7 +21,7 @@ namespace intrusive_refcounted {
         if (instance == NULL)
             return;
 
-        std::cout << "release, refcount at " << instance << " is " << instance->_refCount << std::endl;
+        //std::cout << "release, refcount at " << instance << " is " << instance->_refCount << std::endl;
 
         instance->_refCount--;
         if (instance->_refCount <= 0)
@@ -42,14 +42,16 @@ namespace intrusive_refcounted {
     template <typename T>
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        // Increase refcount first, in case 'dest' already has this object.
+        change_type_no_initialize(dest, type);
+        dest->value_data = source->value_data;
+
         T* instance = (T*) source->value_data.ptr;
+
         ca_assert(instance->_refCount > 0);
-        std::cout << "copy, refcount at " << instance << " is " << instance->_refCount << std::endl;
+
         instance->_refCount++;
 
-        change_type_no_initialize(dest, type);
-        dest->value_data.ptr = instance;
+        //std::cout << "copy, refcount at " << instance << " is " << instance->_refCount << std::endl;
     }
 
     template <typename T>

@@ -14,7 +14,7 @@ namespace osc_support {
 struct ServerContext
 {
     lo_server_thread server_thread;
-    circa::List incomingValues;
+    circa::List incomingMessages;
     pthread_mutex_t mutex;
     int _refCount;
 
@@ -46,12 +46,27 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
 {
     ServerContext* context = (ServerContext*) user_data;
 
-    pthread_mutex_lock(&context->mutex);
-    
-    printf("path: %s\n", path);
+    List message;
+    message.resize(argc + 1);
+    set_string(message[0], path);
+
     for (int i=0; i < argc; i++) {
-        printf("arg %d '%c' \n", i, types[i]);
+        char type = types[i];
+        TaggedValue* val = message[i + 1];
+        if (type == 'i')
+            set_int(val, argv[i]->i);
+        else if (type == 'f')
+            set_float(val, argv[i]->f);
+        else if (type == 's')
+            set_string(val, &argv[i]->s);
+        else {
+            printf("osc incoming: couldn't handle type code: %c\n", type);
+            return 1;
+        }
     }
+
+    pthread_mutex_lock(&context->mutex);
+    swap(&message, context->incomingMessages.append());
     pthread_mutex_unlock(&context->mutex);
 
     return 1;
@@ -82,11 +97,28 @@ CA_FUNCTION(create_server_thread)
     intrusive_refcounted::set<ServerContext>(OUTPUT, &g_serverContext_t, context);
 }
 
+CA_FUNCTION(read_from_server)
+{
+    ServerContext* context = (ServerContext*) INPUT(0)->value_data.ptr;
+
+    List incoming;
+
+    pthread_mutex_lock(&context->mutex);
+    swap(&incoming, &context->incomingMessages);
+    pthread_mutex_unlock(&context->mutex);
+
+    swap(&incoming, OUTPUT);
+}
+
 CA_FUNCTION(open_address)
 {
     Address* address = new Address();
 
-    address->address = lo_address_new(STRING_INPUT(0), STRING_INPUT(1));
+    int port = INT_INPUT(1);
+    char portStr[20];
+    sprintf(portStr, "%d", port);
+
+    address->address = lo_address_new(STRING_INPUT(0), portStr);
 
     intrusive_refcounted::set<Address>(OUTPUT, &g_address_t, address);
 }
@@ -143,7 +175,8 @@ void setup(Branch& kernel)
     Branch& ns = kernel["osc"]->nestedContents;
 
     install_function(ns["create_server_thread"], create_server_thread);
-    install_function(ns["open_address"], open_address);
+    install_function(ns["read_from_server"], read_from_server);
+    install_function(ns["address"], open_address);
     install_function(ns["send"], send);
 }
 
