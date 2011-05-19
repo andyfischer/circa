@@ -893,7 +893,7 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
     // If an initial value was used and no specific type was mentioned, use
     // the initial value's type.
-    if (typeName == "" && initialValue != NULL)
+    if (typeName == "" && initialValue != NULL && initialValue->type != NULL_T_TERM)
         type = initialValue->type;
 
     Term* result = create_stateful_value(branch, type, initialValue, name);

@@ -35,7 +35,7 @@ namespace intrusive_refcounted {
         value->_refCount++;
 
         change_type_no_initialize(tv, type);
-        tv->value_data = value;
+        tv->value_data.ptr = value;
     }
 
     template <typename T>

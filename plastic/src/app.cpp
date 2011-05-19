@@ -13,9 +13,10 @@
 #include "text.h"
 #include "textures.h"
 
-// For now, include the 3rd party libs by source. Should be refactored.
-#include "../libs/fmod/fmod.cpp"
+// For now, include the 3rd party bindings by source. Should be refactored.
 #include "../libs/box2d/box2d.cpp"
+#include "../libs/fmod/fmod.cpp"
+#include "../libs/osc/osc.cpp"
 
 namespace app {
 
@@ -185,6 +186,7 @@ bool setup_functions(circa::Branch& runtime)
 
     fmod_support::setup(runtime);
     box2d_support::setup(runtime);
+    osc_support::setup(runtime);
 
     if (circa::has_static_errors(branch)) {
         circa::print_static_errors_formatted(branch, std::cout);

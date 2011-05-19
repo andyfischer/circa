@@ -129,6 +129,11 @@ namespace internal_debug_function {
             set_ref(output[i], CONTEXT->stack[i]);
     }
 
+    CA_DEFINE_FUNCTION(dump_current_branch, "dump_current_branch()")
+    {
+        dump(*CALLER->owningBranch);
+    }
+
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
