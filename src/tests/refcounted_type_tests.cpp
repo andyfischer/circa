@@ -13,7 +13,7 @@ struct MyStruct
     int b;
     int _refCount;
 
-    MyStruct() : a(0), b(0) {}
+    MyStruct() : a(0), b(0), _refCount(0) {}
 
     std::string toString()
     {
@@ -30,6 +30,7 @@ void test_intrusive_refcount()
     type->toString = cpp_type_wrapper::toString<MyStruct>;
 
     TaggedValue v;
+    intrusive_refcounted::set<MyStruct>(&v, type, new MyStruct());
     change_type(&v, type);
 
     test_equals(to_string(&v), "[0, 0]");
@@ -39,16 +40,16 @@ void test_intrusive_refcount()
     v_value->b = 2;
     test_equals(to_string(&v), "[1, 2]");
 
-    test_assert(v_value->_refCount == 1);
+    test_equals(v_value->_refCount, 1);
 
     TaggedValue v2;
     copy(&v, &v2);
 
     test_equals(to_string(&v2), "[1, 2]");
-    test_assert(v_value->_refCount == 2);
+    test_equals(v_value->_refCount, 2);
 
     reset(&v2);
-    test_assert(v_value->_refCount == 1);
+    test_equals(v_value->_refCount, 1);
 }
 
 namespace fake_memory {
@@ -68,7 +69,7 @@ namespace fake_memory {
         int address;
         int _refCount;
 
-        Object()
+        Object() : _refCount(0)
         {
             address = next_free();
             used[address] = true;
@@ -89,7 +90,7 @@ void intrusive_refcount_tracked_alloc()
     test_assert(fake_memory::used[0] == false);
 
     TaggedValue value;
-    change_type(&value, type);
+    intrusive_refcounted::set<fake_memory::Object>(&value, type, new fake_memory::Object());
 
     test_assert(fake_memory::used[0] == true);
 
@@ -98,7 +99,7 @@ void intrusive_refcount_tracked_alloc()
     test_assert(fake_memory::used[0] == false);
 
     // Step 2: Make a copy
-    change_type(&value, type);
+    intrusive_refcounted::set<fake_memory::Object>(&value, type, new fake_memory::Object());
 
     test_assert(fake_memory::used[0] == true);
     test_assert(fake_memory::used[1] == false);
