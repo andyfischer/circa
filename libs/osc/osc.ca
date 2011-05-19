@@ -6,9 +6,6 @@ namespace osc
     def send(any address, string path, any values...)
 
     def listen(int port)
-        trace('calling listen: ' port)
         state server_thread = null
-        trace('server_thread = ' server_thread)
         if server_thread == null
             server_thread = create_server_thread(port)
-        trace('server_thread = ' server_thread)

@@ -11,7 +11,6 @@ namespace simple_handle_t {
 
     void set(Type* type, TaggedValue* value, int handle)
     {
-        set_null(value);
         change_type_no_initialize(value, type);
         value->value_data.ptr = allocate_list(1);
         set_int(list_get_element(value, 0), handle);

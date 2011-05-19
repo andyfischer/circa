@@ -17,43 +17,14 @@ using namespace circa;
 
 namespace text {
 
-Type g_fontRefType;
+Type g_font_t;
 
-struct FontRef
+struct Font
 {
     int _refCount;
     TTF_Font* ttfFont;
 
-    FontRef() : ttfFont(NULL) {}
-};
-
-struct Font : public circa::TaggedValue
-{
-    FontRef* contents()
-    {
-        return (FontRef*) get_pointer(this);
-    }
-
-    static Font* checkCast(TaggedValue* val)
-    {
-        if (val->value_type->name != "Font")
-            return NULL;
-        return (Font*) val;
-    }
-
-    static Font* lazyCast(TaggedValue* val)
-    {
-        if (val->value_type->name != "Font")
-            change_type(val, &g_fontRefType);
-        return (Font*) val;
-    }
-
-    static Font* cast(TaggedValue* val)
-    {
-        circa::reset(val);
-        change_type(val, &g_fontRefType);
-        return (Font*) val;
-    }
+    Font() : _refCount(0), ttfFont(NULL) {}
 };
 
 SDL_Color unpack_sdl_color(TaggedValue* color)
@@ -67,21 +38,22 @@ SDL_Color unpack_sdl_color(TaggedValue* color)
 
 CA_FUNCTION(load_font)
 {
-    Font* output = Font::cast(OUTPUT);
+    Font* output = new Font();
 
     std::string path = STRING_INPUT(0);
     int pointSize = INT_INPUT(1);
 
     //std::cout << "Calling TTF_OpenFont(" << path.c_str() << std::endl;
     
-    TTF_Font* result = TTF_OpenFont(path.c_str(), pointSize);
-    if (result == NULL) {
+    output->ttfFont = TTF_OpenFont(path.c_str(), pointSize);
+    if (output->ttfFont == NULL) {
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
+        delete output;
         return error_occurred(CONTEXT, CALLER, err.str());
     }
 
-    output->contents()->ttfFont = result;
+    intrusive_refcounted::set<Font>(OUTPUT, &g_font_t, output);
 }
 
 struct RenderedText : public TaggedValue
@@ -127,10 +99,10 @@ CA_FUNCTION(render_text)
     // Render the text to a new surface, upload it as a texture, destroy the surface,
     // record the texture id.
 
-    Font* font = Font::checkCast(INPUT(0));
+    Font* font = (Font*) INPUT(0)->value_data.ptr;
 
     SDL_Color sdlColor = unpack_sdl_color(INPUT(2));
-    SDL_Surface *surface = TTF_RenderText_Blended(font->contents()->ttfFont,
+    SDL_Surface *surface = TTF_RenderText_Blended(font->ttfFont,
             inputText.c_str(), sdlColor);
 
     set_int(output->texidContainer(), load_surface_to_texture(surface));
@@ -180,7 +152,7 @@ CA_FUNCTION(draw_rendered_text)
 
 CA_FUNCTION(get_metrics)
 {
-    Font* font = Font::checkCast(INPUT(0));
+    Font* font = (Font*) INPUT(0)->value_data.ptr;
     const char* str = as_cstring(INPUT(1));
 
     List* output = List::cast(OUTPUT, 2);
@@ -188,7 +160,7 @@ CA_FUNCTION(get_metrics)
     int w;
     int h;
 
-    TTF_SizeText(font->contents()->ttfFont, str, &w, &h);
+    TTF_SizeText(font->ttfFont, str, &w, &h);
 
     set_int(output->get(0), w);
     set_int(output->get(1), h);
@@ -196,8 +168,8 @@ CA_FUNCTION(get_metrics)
 
 void setup(Branch& branch)
 {
-    intrusive_refcounted::setup_type<FontRef>(&g_fontRefType);
-    install_type(branch["Font"], &g_fontRefType);
+    intrusive_refcounted::setup_type<Font>(&g_font_t);
+    install_type(branch["Font"], &g_font_t);
 
     if (TTF_Init() == -1) {
         std::cout << "TTF_Init failed with error: " << TTF_GetError();

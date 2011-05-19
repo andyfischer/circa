@@ -10,9 +10,7 @@ namespace intrusive_refcounted {
     template <typename T>
     void initialize(Type* type, TaggedValue* value)
     {
-        T* instance = new T();
-        instance->_refCount = 1;
-        value->value_data.ptr = instance;
+        value->value_data.ptr = NULL;
     }
 
     template <typename T>
@@ -20,7 +18,10 @@ namespace intrusive_refcounted {
     {
         T* instance = (T*) value->value_data.ptr;
 
-        ca_assert(instance != NULL);
+        if (instance == NULL)
+            return;
+
+        std::cout << "release, refcount at " << instance << " is " << instance->_refCount << std::endl;
 
         instance->_refCount--;
         if (instance->_refCount <= 0)
@@ -44,6 +45,7 @@ namespace intrusive_refcounted {
         // Increase refcount first, in case 'dest' already has this object.
         T* instance = (T*) source->value_data.ptr;
         ca_assert(instance->_refCount > 0);
+        std::cout << "copy, refcount at " << instance << " is " << instance->_refCount << std::endl;
         instance->_refCount++;
 
         change_type_no_initialize(dest, type);
