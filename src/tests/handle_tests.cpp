@@ -2,10 +2,10 @@
 
 #include <circa.h>
 
-#include "types/simple_handle.h"
+#include "types/handle.h"
 
 namespace circa {
-namespace simple_handle_tests {
+namespace handle_tests {
 
 const int numSlots = 3;
 List g_slots;
@@ -20,17 +20,20 @@ int get_free_slot()
     return -1;
 }
 
-void on_release_func(int handle)
+void on_release_func(Value* data)
 {
-    test_assert(as_bool(g_slots[handle]));
-    set_bool(g_slots[handle], false);
+    int slot = as_int(data);
+    test_assert(as_bool(g_slots[slot]));
+    set_bool(g_slots[slot], false);
 }
 
 void assign(Value* value, int handle)
 {
     test_assert(!as_bool(g_slots[handle]));
     set_bool(g_slots[handle], true);
-    simple_handle_t::set(&handle_type, value, handle);
+    Value userdata;
+    set_int(&userdata, handle);
+    handle_t::set(&handle_type, value, &userdata);
 }
 
 CA_FUNCTION(alloc_handle)
@@ -47,7 +50,7 @@ void setup(Branch& branch)
     for (int i=0; i < numSlots; i++)
         set_bool(g_slots[i], false);
 
-    simple_handle_t::setup_type(&handle_type);
+    handle_t::setup_type(&handle_type);
     set_opaque_pointer(&handle_type.parameter, (void*) on_release_func);
 
     branch.compile("def alloc_handle(any s) -> any;");
@@ -171,6 +174,7 @@ void test_state_inside_if_block()
 
     test_equals(&g_slots, "[true, false, false]");
     clear_branch(&branch);
+    reset_locals(branch);
     strip_orphaned_state(branch, &context.state);
 
     test_equals(&g_slots, "[false, false, false]");
@@ -217,15 +221,12 @@ void test_included_file_changed()
 
 void register_tests()
 {
-    // TEST_DISABLED
-    #if 0
-    REGISTER_TEST_CASE(simple_handle_tests::test_simple);
-    REGISTER_TEST_CASE(simple_handle_tests::test_with_state);
-    REGISTER_TEST_CASE(simple_handle_tests::test_deleted_state);
-    REGISTER_TEST_CASE(simple_handle_tests::test_in_subroutine_state);
-    #endif
-    //TEST_DISABLED REGISTER_TEST_CASE(simple_handle_tests::test_state_inside_if_block);
-    //TEST_DISABLED REGISTER_TEST_CASE(simple_handle_tests::test_that_stripping_state_is_recursive);
+    REGISTER_TEST_CASE(handle_tests::test_simple);
+    REGISTER_TEST_CASE(handle_tests::test_with_state);
+    REGISTER_TEST_CASE(handle_tests::test_deleted_state);
+    REGISTER_TEST_CASE(handle_tests::test_in_subroutine_state);
+    REGISTER_TEST_CASE(handle_tests::test_state_inside_if_block);
+    REGISTER_TEST_CASE(handle_tests::test_that_stripping_state_is_recursive);
     //TEST_DISABLED REGISTER_TEST_CASE(simple_handle_tests::test_included_file_changed);
 }
 

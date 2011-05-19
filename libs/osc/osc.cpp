@@ -52,7 +52,7 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
 
     for (int i=0; i < argc; i++) {
         char type = types[i];
-        TaggedValue* val = message[i + 1];
+        Value* val = message[i + 1];
         if (type == 'i')
             set_int(val, argv[i]->i);
         else if (type == 'f')
@@ -139,7 +139,7 @@ CA_FUNCTION(send)
     bool failed = false;
 
     for (int i=2; i < NUM_INPUTS; i++) {
-        TaggedValue* val = INPUT(i);
+        Value* val = INPUT(i);
 
         if (is_int(val))
             lo_message_add(message, "i", as_int(val));

@@ -31,7 +31,6 @@ void test_intrusive_refcount()
 
     Value v;
     intrusive_refcounted::set<MyStruct>(&v, type, new MyStruct());
-    change_type(&v, type);
 
     test_equals(to_string(&v), "[0, 0]");
 

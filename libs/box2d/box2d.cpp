@@ -50,14 +50,14 @@ void release_body_handle(int handle)
     g_bodies[handle] = NULL;
 }
 
-b2Body* get_body_from_handle(TaggedValue* value)
+b2Body* get_body_from_handle(Value* value)
 {
     if (value->value_type != &g_bodyHandleType)
         return NULL;
     return g_bodies[simple_handle_t::get(value)];
 }
 
-bool is_valid_body_handle(TaggedValue* value)
+bool is_valid_body_handle(Value* value)
 {
     return value->value_type == &g_bodyHandleType
         && get_body_from_handle(value) != NULL;
@@ -84,7 +84,7 @@ int find_free_body_index()
     return g_nextFreeBody++;
 }
 
-int assign_body_handle(TaggedValue* value, b2Body* body)
+int assign_body_handle(Value* value, b2Body* body)
 {
     int index = find_free_body_index();
     g_bodies[index] = body;
@@ -224,7 +224,7 @@ CA_FUNCTION(body)
 
     initialize_world();
 
-    TaggedValue* handle = INPUT(0);
+    Value* handle = INPUT(0);
     Point& initialPosition = *Point::checkCast(INPUT(1));
     float initialRotation = as_float(INPUT(2));
     List& properties = *List::checkCast(INPUT(3));
