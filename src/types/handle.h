@@ -23,8 +23,8 @@ namespace handle_t {
     void setup_type(Type* type)
     {
         setup_type(type);
-        OnRelease callback = templated_release_func<T>;
-        set_opaque_pointer(&type->parameter, (void*) callback);
+        //OnRelease callback = templated_release_func<T>;
+        //set_opaque_pointer(&type->parameter, (void*) callback);
     }
 
 } // namespace handle_t

@@ -63,11 +63,13 @@ if WINDOWS:
 TEST.Append(CPPDEFINES = ['CIRCA_TEST_BUILD'])
 
 def list_source_files(dir):
+    result = []
     for path in os.listdir(dir):
         full_path = os.path.join(dir,path)
         if not os.path.isfile(full_path): continue
         if not path.endswith('.cpp'): continue
-        yield path
+        result.append(path)
+    return result
 
 # Define library builds, save the results in circa_libs.
 circa_libs = {}
@@ -79,9 +81,16 @@ for env in all_envs:
     env.VariantDir('build/'+variant_name+'/src', 'src')
     env.Append(CPPPATH = ['src'])
 
-    source_files = (list(list_source_files('src')) + 
-            ['generated/'+filename for filename in list_source_files('src/generated')])
-    source_files = filter(lambda f: f != 'main.cpp', source_files)
+    generatedFiles = ['generated/'+filename for filename in list_source_files('src/generated')]
+
+
+    source_files = (list_source_files('src')
+        + ['generated/'+filename for filename in list_source_files('src/generated')])
+
+    source_files.remove('main.cpp')
+
+    if variant_name != 'test':
+        source_files.remove('generated/all_tests.cpp')
 
     baseName = 'circa' + env['variant_suffix']
     fullPath = 'build/'+baseName

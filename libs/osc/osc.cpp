@@ -5,7 +5,7 @@
 #include "lo/lo.h"
 
 #include "circa.h"
-#include "refcounted_type_wrapper.h"
+#include "types/handle.h"
 
 using namespace circa;
 

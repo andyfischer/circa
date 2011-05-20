@@ -90,11 +90,13 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
 
     } else {
 
-        bool castSuccess = cast(outputs->get(0), outputType, outputs->get(0));
+        Value* output0 = outputs->get(0);
+
+        bool castSuccess = cast(output0, outputType, outputs->get(0));
         
         if (!castSuccess) {
             std::stringstream msg;
-            msg << "Couldn't cast output " << outputs->get(0)->toString()
+            msg << "Couldn't cast output " << output0->toString()
                 << " to type " << outputType->name;
             error_occurred(context, caller, msg.str());
         }

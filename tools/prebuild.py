@@ -45,7 +45,7 @@ def setup_builtin_functions():
             sorted(map(lambda n: n+'::setup(kernel);', namespaces)))
 
     return """
-// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 // This file is generated during the build process by prebuild.py .
 // You should probably not edit this file manually.
@@ -77,7 +77,7 @@ def register_all_tests():
             sorted(map(lambda n: n+'::register_tests();', namespaces)))
 
     return """\
-// Copyright (c) 2007-2010 Paul Hodge. All rights reserved.
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 // This file is generated during the build process by prebuild.py .
 // You should probably not edit this file manually.
@@ -94,7 +94,11 @@ void register_all_tests()
 {
     gTestCases.clear();
 
+#ifdef CIRCA_TEST_BUILD
+
     %s
+
+#endif
 }
 
 } // namespace circa""" % (function_decls, function_calls)

@@ -41,7 +41,7 @@ CA_FUNCTION(key_down)
                 return error_occurred(CONTEXT, CALLER, "Expected a string of length 1");
             char c = key[0];
 
-            set_bool(OUTPUT, KEY_DOWN[c]);
+            set_bool(OUTPUT, KEY_DOWN[(int) c]);
         }
     }
 }
