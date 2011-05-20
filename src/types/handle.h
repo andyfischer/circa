@@ -7,9 +7,25 @@ namespace handle_t {
 
     typedef void (*OnRelease)(Value* data);
 
-    void set(Type* type, Value* container, Value* data);
+    void set(Value* container, Type* type, Value* data);
+    void set(Value* container, Type* type, void* opaquePointer);
     Value* get(Value* value);
     void setup_type(Type* type);
+
+    template <typename T>
+    void templated_release_func(Value* value)
+    {
+        T* object = (T*) as_opaque_pointer(value);
+        delete object;
+    }
+
+    template <typename T>
+    void setup_type(Type* type)
+    {
+        setup_type(type);
+        OnRelease callback = templated_release_func<T>;
+        set_opaque_pointer(&type->parameter, (void*) callback);
+    }
 
 } // namespace handle_t
 } // namespace circa

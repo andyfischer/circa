@@ -11,7 +11,7 @@
 namespace circa {
 namespace handle_t {
 
-    void set(Type* type, Value* container, Value* userdata)
+    void set(Value* container, Type* type, Value* userdata)
     {
         change_type_no_initialize(container, type);
         container->value_data.ptr = allocate_list(1);
@@ -26,6 +26,12 @@ namespace handle_t {
             << ", refcount = " << data->refCount
             << std::endl;
         #endif
+    }
+    void set(Value* container, Type* type, void* opaquePointer)
+    {
+        Value value;
+        set_opaque_pointer(&value, opaquePointer);
+        set(container, type, &value);
     }
     Value* get(Value* container)
     {

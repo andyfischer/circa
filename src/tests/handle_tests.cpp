@@ -33,7 +33,7 @@ void assign(Value* value, int handle)
     set_bool(g_slots[handle], true);
     Value userdata;
     set_int(&userdata, handle);
-    handle_t::set(&handle_type, value, &userdata);
+    handle_t::set(value, &handle_type, &userdata);
 }
 
 CA_FUNCTION(alloc_handle)
@@ -219,6 +219,37 @@ void test_included_file_changed()
     test_equals(&g_slots, "[false, false, false]");
 }
 
+bool MyType_allocated = false;
+
+struct MyType
+{
+    MyType() {
+        test_assert(!MyType_allocated);
+        MyType_allocated = true;
+    }
+    ~MyType() {
+        test_assert(MyType_allocated);
+        MyType_allocated = false;
+    }
+};
+
+void test_user_defined_type()
+{
+    Type* type = Type::create();
+    handle_t::setup_type<MyType>(type);
+
+    test_assert(!MyType_allocated);
+
+    Value value;
+    handle_t::set(&value, type, new MyType());
+
+    test_assert(MyType_allocated);
+
+    set_null(&value);
+
+    test_assert(!MyType_allocated);
+};
+
 void register_tests()
 {
     REGISTER_TEST_CASE(handle_tests::test_simple);
@@ -228,6 +259,7 @@ void register_tests()
     REGISTER_TEST_CASE(handle_tests::test_state_inside_if_block);
     REGISTER_TEST_CASE(handle_tests::test_that_stripping_state_is_recursive);
     //TEST_DISABLED REGISTER_TEST_CASE(simple_handle_tests::test_included_file_changed);
+    REGISTER_TEST_CASE(handle_tests::test_user_defined_type);
 }
 
 }

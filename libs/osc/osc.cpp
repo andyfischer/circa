@@ -94,7 +94,7 @@ CA_FUNCTION(create_server_thread)
             (void*) context);
     lo_server_thread_start(context->server_thread);
 
-    intrusive_refcounted::set<ServerContext>(OUTPUT, &g_serverContext_t, context);
+    handle_t::set(OUTPUT, &g_serverContext_t, context);
 }
 
 CA_FUNCTION(read_from_server)
@@ -120,7 +120,7 @@ CA_FUNCTION(open_address)
 
     address->address = lo_address_new(STRING_INPUT(0), portStr);
 
-    intrusive_refcounted::set<Address>(OUTPUT, &g_address_t, address);
+    handle_t::set(OUTPUT, &g_address_t, address);
 }
 
 CA_FUNCTION(send)
@@ -169,8 +169,8 @@ CA_FUNCTION(send)
 
 void setup(Branch& kernel)
 {
-    intrusive_refcounted::setup_type<ServerContext>(&g_serverContext_t);
-    intrusive_refcounted::setup_type<Address>(&g_address_t);
+    handle_t::setup_type<ServerContext>(&g_serverContext_t);
+    handle_t::setup_type<Address>(&g_address_t);
 
     Branch& ns = kernel["osc"]->nestedContents;
 
