@@ -3,7 +3,7 @@
 #include "Box2D/Box2D.h"
 
 #include "circa.h"
-#include "types/simple_handle.h"
+#include "types/handle.h"
 
 using namespace circa;
 
@@ -20,12 +20,6 @@ void initialize_world()
 int c_velocityIterations = 6;
 int c_positionIterations = 2;
 
-// Store a list of pointers to active b2Body objects.
-const int c_maxBodies = 10000;
-
-int g_nextFreeBody = 0;
-b2Body* g_bodies[c_maxBodies] = {NULL,};
-
 // Scale between screen & world coordinates. Box2d says that it likes objects
 // to have a size between 0.1 and 10 units.
 float screen_to_world(float screen) { return screen / 10.0; }
@@ -35,62 +29,32 @@ float world_to_screen(float world) { return world * 10.0; }
 float radians_to_unit_angles(float radians) { return radians / M_PI; }
 float unit_angles_to_radians(float unit) { return unit * M_PI; }
 
-// The Circa type g_bodyHandleType is used to hold on to b2Body objects. When
-// the Circa object is destroyed then releaseBodyHandle will be called.
-Type g_bodyHandleType;
+// The BodyHandle type is used to hold on to b2Body objects.
+Type g_bodyHandle_t;
 
-void release_body_handle(int handle)
+struct BodyHandle
 {
-    //std::cout << "releasing body: " << handle << std::endl;
-    if (g_world == NULL)
-        return;
-    if (g_bodies[handle] == NULL)
-        return;
-    g_world->DestroyBody(g_bodies[handle]);
-    g_bodies[handle] = NULL;
-}
+    b2Body* body;
+    BodyHandle() : body(NULL) {}
+    ~BodyHandle() {
+        if (g_world == NULL)
+            return;
+        g_world->DestroyBody(body);
+    }
+};
 
 b2Body* get_body_from_handle(Value* value)
 {
-    if (value->value_type != &g_bodyHandleType)
+    BodyHandle* bodyHandle = (BodyHandle*) handle_t::get_ptr(value);
+    if (bodyHandle == NULL)
         return NULL;
-    return g_bodies[simple_handle_t::get(value)];
+    return bodyHandle->body;
 }
 
 bool is_valid_body_handle(Value* value)
 {
-    return value->value_type == &g_bodyHandleType
+    return value->value_type == &g_bodyHandle_t
         && get_body_from_handle(value) != NULL;
-}
-
-int find_free_body_index()
-{
-    int first = g_nextFreeBody;
-
-    while(1) {
-
-        if (g_nextFreeBody >= c_maxBodies)
-            g_nextFreeBody = 0;
-
-        if (g_bodies[g_nextFreeBody] == NULL)
-            break;
-
-        g_nextFreeBody++;
-
-        if (g_nextFreeBody == first)
-            internal_error("reached maximum body count");
-    }
-
-    return g_nextFreeBody++;
-}
-
-int assign_body_handle(Value* value, b2Body* body)
-{
-    int index = find_free_body_index();
-    g_bodies[index] = body;
-    set_null(value);
-    simple_handle_t::set(&g_bodyHandleType, value, index);
-    return index;
 }
 
 CA_FUNCTION(step)
@@ -143,13 +107,9 @@ CA_FUNCTION(create_body)
 
     bodyDef.angle = unit_angles_to_radians(initialRotation);
 
-    b2Body* body = g_world->CreateBody(&bodyDef);
+    BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_bodyHandle_t);
 
-    assign_body_handle(OUTPUT, body);
-
-    //std::cout << " allocating body: " << handle_index << std::endl;
-
-    ca_assert(is_valid_body_handle(OUTPUT));
+    bodyHandle->body = g_world->CreateBody(&bodyDef);
 }
 
 CA_FUNCTION(set_body_fixtures)
@@ -202,91 +162,6 @@ CA_FUNCTION(set_body_fixtures)
 
         body->CreateFixture(&fixtureDef);
     }
-}
-
-CA_FUNCTION(body)
-{
-    // Inputs:
-    //   State handle
-    //   Point initialPosition
-    //   number initialRotation
-    //   List properties
-    // Outputs:
-    //   current position & angle
-    //   state info
-    
-    // If we need to initialize:
-    //   Create the b2bodyDef (with position)
-    //   Create the b2Body using the bodyDef
-    //   Create the b2PolygonShape using input
-    //   Set the density & friction
-    //   Create a fixture attaching the b2PolygonShape to the b2Body
-
-    initialize_world();
-
-    Value* handle = INPUT(0);
-    Point& initialPosition = *Point::checkCast(INPUT(1));
-    float initialRotation = as_float(INPUT(2));
-    List& properties = *List::checkCast(INPUT(3));
-    bool isDynamic = as_bool(properties[0]);
-    Point& size = *Point::checkCast(properties[1]);
-    float density = to_float(properties[2]);
-    float friction = to_float(properties[3]);
-    float restitution = to_float(properties[4]);
-    bool propertiesChanged = as_bool(INPUT(4));
-
-    if (!is_valid_body_handle(handle)) {
-
-        if (size.getX() <= 0.0 || size.getY() <= 0.0)
-            return error_occurred(CONTEXT, CALLER, "Size must be non-zero");
-
-        // Create a b2Body
-        b2BodyDef bodyDef;
-
-        if (isDynamic)
-            bodyDef.type = b2_dynamicBody;
-
-        bodyDef.position.Set(
-            screen_to_world(initialPosition.getX()),
-            screen_to_world(initialPosition.getY()));
-
-        bodyDef.angle = unit_angles_to_radians(initialRotation);
-
-        b2Body* body = g_world->CreateBody(&bodyDef);
-
-        assign_body_handle(handle, body);
-
-        //std::cout << " allocating body: " << handle_index << std::endl;
-
-        ca_assert(is_valid_body_handle(handle));
-
-        propertiesChanged = true;
-    }
-
-    b2Body* body = get_body_from_handle(handle);
-
-    if (propertiesChanged) {
-
-        // remove any old fixtures
-        while (body->GetFixtureList())
-            body->DestroyFixture(body->GetFixtureList());
-
-        // Assign the shape
-        b2PolygonShape polygonShape;
-        polygonShape.SetAsBox(
-                screen_to_world(size.getX()),
-                screen_to_world(size.getY()));
-
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = &polygonShape;
-        fixtureDef.density = density;
-        fixtureDef.friction = friction;
-        fixtureDef.restitution = restitution;
-
-        body->CreateFixture(&fixtureDef);
-    }
-
-    copy(handle, OUTPUT);
 }
 
 CA_FUNCTION(get_body_points)
@@ -393,9 +268,8 @@ CA_FUNCTION(body_contains_point)
 
 void setup(Branch& kernel)
 {
-    simple_handle_t::setup_type(&g_bodyHandleType);
-    g_bodyHandleType.name = "Box2d::BodyHandle";
-    set_opaque_pointer(&g_bodyHandleType.parameter, (void*) release_body_handle);
+    handle_t::setup_type<BodyHandle>(&g_bodyHandle_t);
+    g_bodyHandle_t.name = "Box2d::BodyHandle";
 
     Branch& ns = kernel["box2d"]->nestedContents;
 
