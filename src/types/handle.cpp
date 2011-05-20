@@ -6,7 +6,7 @@
 
 #include "handle.h"
 
-#define HANDLE_VERBOSE_LOG 1
+#define HANDLE_VERBOSE_LOG 0
 
 namespace circa {
 namespace handle_t {
@@ -37,6 +37,10 @@ namespace handle_t {
     {
         return list_get_element(container, 0);
     }
+    void* get_ptr(Value* value)
+    {
+        return as_opaque_pointer(get(value));
+    }
 
     void initialize(Type* type, Value* value)
     {
@@ -64,10 +68,13 @@ namespace handle_t {
         if (data->refCount == 0) {
 
             Value* userdata = list_get_element(value, 0);
-            OnRelease onReleaseFunc = (OnRelease) as_opaque_pointer(&type->parameter);
 
-            if (onReleaseFunc != NULL)
-                onReleaseFunc(userdata);
+            if (!is_null(&type->parameter)) {
+                OnRelease onReleaseFunc = (OnRelease) as_opaque_pointer(&type->parameter);
+
+                if (onReleaseFunc != NULL)
+                    onReleaseFunc(userdata);
+            }
 
             #if HANDLE_VERBOSE_LOG
             std::cout << "released " << data

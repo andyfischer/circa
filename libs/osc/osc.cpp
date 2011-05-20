@@ -16,9 +16,8 @@ struct ServerContext
     lo_server_thread server_thread;
     circa::List incomingMessages;
     pthread_mutex_t mutex;
-    int _refCount;
 
-    ServerContext() : server_thread(NULL), _refCount(0) {}
+    ServerContext() : server_thread(NULL) {}
     ~ServerContext() {
         if (server_thread != NULL)
             lo_server_thread_stop(server_thread);
@@ -29,8 +28,6 @@ struct ServerContext
 struct Address
 {
     lo_address address;
-    int _refCount;
-    Address() : _refCount(NULL) {}
 };
 
 Type g_serverContext_t;
@@ -78,13 +75,12 @@ CA_FUNCTION(create_server_thread)
     char portStr[15];
     sprintf(portStr, "%d", port);
 
-    ServerContext* context = new ServerContext();
+    ServerContext* context = handle_t::create<ServerContext>(OUTPUT, &g_serverContext_t);
     printf("opened server at %s, context = %p\n", portStr, context);
 
     context->server_thread = lo_server_thread_new(portStr, error_callback);
 
     if (context->server_thread == NULL) {
-        delete context;
         error_occurred(CONTEXT, CALLER, "lo_server_thread_new failed");
         set_null(OUTPUT);
         return;
@@ -93,13 +89,11 @@ CA_FUNCTION(create_server_thread)
     lo_server_thread_add_method(context->server_thread, NULL, NULL, incoming_message_callback,
             (void*) context);
     lo_server_thread_start(context->server_thread);
-
-    handle_t::set(OUTPUT, &g_serverContext_t, context);
 }
 
 CA_FUNCTION(read_from_server)
 {
-    ServerContext* context = (ServerContext*) INPUT(0)->value_data.ptr;
+    ServerContext* context = (ServerContext*) handle_t::get_ptr(INPUT(0));
 
     List incoming;
 
@@ -112,20 +106,18 @@ CA_FUNCTION(read_from_server)
 
 CA_FUNCTION(open_address)
 {
-    Address* address = new Address();
+    Address* address = handle_t::create<Address>(OUTPUT, &g_address_t);
 
     int port = INT_INPUT(1);
     char portStr[20];
     sprintf(portStr, "%d", port);
 
     address->address = lo_address_new(STRING_INPUT(0), portStr);
-
-    handle_t::set(OUTPUT, &g_address_t, address);
 }
 
 CA_FUNCTION(send)
 {
-    Address* address = (Address*) INPUT(0)->value_data.ptr;
+    Address* address = (Address*) handle_t::get_ptr(INPUT(0));
 
     const char* destination = STRING_INPUT(1);
 

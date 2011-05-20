@@ -219,17 +219,16 @@ void test_included_file_changed()
     test_equals(&g_slots, "[false, false, false]");
 }
 
-bool MyType_allocated = false;
+int MyType_allocated = 0;
 
 struct MyType
 {
     MyType() {
-        test_assert(!MyType_allocated);
-        MyType_allocated = true;
+        MyType_allocated++;
     }
     ~MyType() {
-        test_assert(MyType_allocated);
-        MyType_allocated = false;
+        test_assert(MyType_allocated > 0);
+        MyType_allocated--;
     }
 };
 
@@ -238,16 +237,25 @@ void test_user_defined_type()
     Type* type = Type::create();
     handle_t::setup_type<MyType>(type);
 
-    test_assert(!MyType_allocated);
+    // Create a value and then free it.
+    test_assert(MyType_allocated == 0);
 
     Value value;
     handle_t::set(&value, type, new MyType());
-
-    test_assert(MyType_allocated);
+    test_assert(MyType_allocated == 1);
 
     set_null(&value);
+    test_assert(MyType_allocated == 0);
 
-    test_assert(!MyType_allocated);
+    // Overwrite a value with a new value
+    handle_t::set(&value, type, new MyType());
+    test_assert(MyType_allocated == 1);
+    handle_t::set(&value, type, new MyType());
+    test_assert(MyType_allocated == 1);
+    handle_t::set(&value, type, new MyType());
+    test_assert(MyType_allocated == 1);
+    set_null(&value);
+    test_assert(MyType_allocated == 0);
 };
 
 void register_tests()
@@ -258,7 +266,7 @@ void register_tests()
     REGISTER_TEST_CASE(handle_tests::test_in_subroutine_state);
     REGISTER_TEST_CASE(handle_tests::test_state_inside_if_block);
     REGISTER_TEST_CASE(handle_tests::test_that_stripping_state_is_recursive);
-    //TEST_DISABLED REGISTER_TEST_CASE(simple_handle_tests::test_included_file_changed);
+    REGISTER_TEST_CASE(handle_tests::test_included_file_changed);
     REGISTER_TEST_CASE(handle_tests::test_user_defined_type);
 }
 
