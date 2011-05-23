@@ -8,9 +8,9 @@ namespace dict_tests {
 
 void test_simple()
 {
-    Value five;
+    TaggedValue five;
     set_int(&five, 5);
-    Value ten;
+    TaggedValue ten;
     set_int(&ten, 10);
 
     dict_t::DictData* data = dict_t::create_dict();
@@ -26,10 +26,10 @@ void test_simple()
 void test_insert()
 {
     Dict dict;
-    Value v;
+    TaggedValue v;
     set_int(&v, 5);
 
-    Value* a_inserted = dict.insert("a");
+    TaggedValue* a_inserted = dict.insert("a");
     test_equals(dict.toString(), "[a: null]");
 
     set_int(a_inserted, 7);
@@ -40,9 +40,9 @@ void dont_insert_same_key_multiple_times()
 {
     dict_t::DictData* data = dict_t::create_dict();
 
-    Value val;
+    TaggedValue val;
     set_int(&val, 5);
-    Value val2;
+    TaggedValue val2;
     set_string(&val2, "a");
 
     dict_t::insert_value(&data, "key", &val);
@@ -192,7 +192,7 @@ void many_items()
     // Insert lots of items
     for (int i=0; i < count; i++) {
         char key[10]; sprintf(key, "%d", i);
-        Value val; set_int(&val, i);
+        TaggedValue val; set_int(&val, i);
         dict_t::insert_value(&data, key, &val);
     }
 
@@ -231,10 +231,10 @@ void many_items()
 
 void test_duplicate()
 {
-    Value eleven = Value::fromInt(11);
-    Value one_and_change = Value::fromFloat(1.2);
-    Value t = Value::fromBool(true);
-    Value hello = Value::fromString("hello");
+    TaggedValue eleven = TaggedValue::fromInt(11);
+    TaggedValue one_and_change = TaggedValue::fromFloat(1.2);
+    TaggedValue t = TaggedValue::fromBool(true);
+    TaggedValue hello = TaggedValue::fromString("hello");
 
     dict_t::DictData* data = dict_t::create_dict();
     dict_t::insert_value(&data, "a", &eleven);
@@ -261,7 +261,7 @@ void test_reset()
 {
     Dict dict;
 
-    Value a;
+    TaggedValue a;
     set_int(&a, 4);
     dict.set("a", &a);
 
@@ -275,18 +275,18 @@ void test_reset()
 void test_iterate()
 {
     Dict dict;
-    Value iterator;
+    TaggedValue iterator;
 
-    Value one;
+    TaggedValue one;
     set_int(&one, 1);
-    Value two;
+    TaggedValue two;
     set_int(&two, 2);
 
     dict.set("one", &one);
     dict.set("two", &two);
 
     const char* currentKey;
-    Value* currentValue;
+    TaggedValue* currentTaggedValue;
 
     bool foundOne = false;
     bool foundTwo = false;
@@ -294,17 +294,17 @@ void test_iterate()
             !dict.iteratorFinished(&iterator);
             dict.iteratorNext(&iterator)) {
 
-        dict.iteratorGet(&iterator, &currentKey, &currentValue);
+        dict.iteratorGet(&iterator, &currentKey, &currentTaggedValue);
 
-        test_assert(currentValue != NULL);
+        test_assert(currentTaggedValue != NULL);
 
         if (std::string(currentKey) == "one") {
             test_assert(!foundOne);
-            test_equals(currentValue->asInt(), 1);
+            test_equals(currentTaggedValue->asInt(), 1);
             foundOne = true;
         } else if (std::string(currentKey) == "two") {
             test_assert(!foundTwo);
-            test_equals(currentValue->asInt(), 2);
+            test_equals(currentTaggedValue->asInt(), 2);
             foundTwo = true;
         } else {
             test_assert(false);
@@ -317,12 +317,12 @@ void test_iterate()
 void test_delete_from_iterator()
 {
     Dict dict;
-    Value iterator;
+    TaggedValue iterator;
 
     const char* names[] = {"a","b","c","d","e"};
 
     for (int i=0; i < 5; i++) {
-        Value val;
+        TaggedValue val;
         set_int(&val, i);
         dict.set(names[i], &val);
     }
@@ -334,13 +334,13 @@ void test_delete_from_iterator()
             dict.iteratorNext(&iterator)) {
 
         const char* currentKey;
-        Value* currentValue;
+        TaggedValue* currentTaggedValue;
 
-        dict.iteratorGet(&iterator, &currentKey, &currentValue);
+        dict.iteratorGet(&iterator, &currentKey, &currentTaggedValue);
 
-        if ((as_int(currentValue) % 2) == 1) {
+        if ((as_int(currentTaggedValue) % 2) == 1) {
             dict.iteratorDelete(&iterator);
-            test_assert(is_null(currentValue));
+            test_assert(is_null(currentTaggedValue));
         }
     }
 

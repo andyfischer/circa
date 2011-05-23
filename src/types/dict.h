@@ -10,7 +10,7 @@ namespace dict_t {
 
     struct DictData;
 
-    typedef void (*DictVisitor)(void* context, const char* key, Value* value);
+    typedef void (*DictVisitor)(void* context, const char* key, TaggedValue* value);
 
     DictData* create_dict(int capacity);
     DictData* create_dict();
@@ -19,10 +19,10 @@ namespace dict_t {
     void grow(DictData** dataPtr);
     DictData* duplicate(DictData* original);
     int insert(DictData** dataPtr, const char* key);
-    void insert_value(DictData** dataPtr, const char* key, Value* value);
+    void insert_value(DictData** dataPtr, const char* key, TaggedValue* value);
     int find_key(DictData* data, const char* key);
-    Value* get_value(DictData* data, const char* key);
-    Value* get_index(DictData* data, int index);
+    TaggedValue* get_value(DictData* data, const char* key);
+    TaggedValue* get_index(DictData* data, int index);
     void remove(DictData* data, const char* key);
     int count(DictData* data);
     void clear(DictData* data);
@@ -30,50 +30,50 @@ namespace dict_t {
     std::string to_string(DictData* data);
     void debug_print(DictData* data);
 
-    void iterator_start(DictData* data, Value* iterator);
-    void iterator_next(DictData* data, Value* iterator);
-    void iterator_get(DictData* data, Value* iterator,
-            const char** key, Value** value);
+    void iterator_start(DictData* data, TaggedValue* iterator);
+    void iterator_next(DictData* data, TaggedValue* iterator);
+    void iterator_get(DictData* data, TaggedValue* iterator,
+            const char** key, TaggedValue** value);
 
     void setup_type(Type*);
 } // namespace dict_t
 
 // C++ wrapper
-struct Dict : Value
+struct Dict : TaggedValue
 {
     Dict();
 
     std::string toString();
-    Value* get(const char* key);
-    Value* operator[](const char* key);
+    TaggedValue* get(const char* key);
+    TaggedValue* operator[](const char* key);
     bool contains(const char* key);
-    Value* insert(const char* key);
+    TaggedValue* insert(const char* key);
     void remove(const char* key);
-    void set(const char* key, Value* value);
+    void set(const char* key, TaggedValue* value);
     void clear();
     bool empty();
 
-    void iteratorStart(Value* iterator);
-    void iteratorNext(Value* iterator);
-    void iteratorGet(Value* iterator, const char** key, Value** value);
-    void iteratorDelete(Value* iterator);
-    bool iteratorFinished(Value* iterator);
+    void iteratorStart(TaggedValue* iterator);
+    void iteratorNext(TaggedValue* iterator);
+    void iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value);
+    void iteratorDelete(TaggedValue* iterator);
+    bool iteratorFinished(TaggedValue* iterator);
 
     void setString(const char* key, const char* value);
-    const char* getString(const char* key, const char* defaultValue);
+    const char* getString(const char* key, const char* defaultTaggedValue);
     void setInt(const char* key, int value);
-    int getInt(const char* key, int defaultValue);
+    int getInt(const char* key, int defaultTaggedValue);
 
-    static Dict* checkCast(Value* value);
+    static Dict* checkCast(TaggedValue* value);
 
     // lazyCast will cast value to Dict if it's the wrong type. If it's already a Dict,
     // its contents are unchanged.
-    static Dict* lazyCast(Value* value);
+    static Dict* lazyCast(TaggedValue* value);
 
-    static Dict* cast(Value* value);
+    static Dict* cast(TaggedValue* value);
 };
 
-Dict* make_dict(Value* value);
-bool is_dict(Value* value);
+Dict* make_dict(TaggedValue* value);
+bool is_dict(TaggedValue* value);
 
 } // namespace circa

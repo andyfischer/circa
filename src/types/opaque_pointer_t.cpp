@@ -5,7 +5,7 @@
 namespace circa {
 namespace opaque_pointer_t {
 
-    std::string toString(Value* val)
+    std::string toString(TaggedValue* val)
     {
         char buf[17];
         sprintf(buf, "%p", as_opaque_pointer(val));

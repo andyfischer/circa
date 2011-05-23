@@ -43,7 +43,7 @@ struct BodyHandle
     }
 };
 
-b2Body* get_body_from_handle(Value* value)
+b2Body* get_body_from_handle(TaggedValue* value)
 {
     BodyHandle* bodyHandle = (BodyHandle*) handle_t::get_ptr(value);
     if (bodyHandle == NULL)
@@ -51,7 +51,7 @@ b2Body* get_body_from_handle(Value* value)
     return bodyHandle->body;
 }
 
-bool is_valid_body_handle(Value* value)
+bool is_valid_body_handle(TaggedValue* value)
 {
     return value->value_type == &g_bodyHandle_t
         && get_body_from_handle(value) != NULL;

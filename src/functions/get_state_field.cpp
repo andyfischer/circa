@@ -15,7 +15,7 @@ namespace get_state_field_function {
     {
         Dict* stateContainer = NULL;
 
-        Value *containerFromInput = INPUT(0);
+        TaggedValue *containerFromInput = INPUT(0);
         if (containerFromInput != NULL)
             stateContainer = Dict::checkCast(containerFromInput);
 
@@ -25,7 +25,7 @@ namespace get_state_field_function {
         ca_assert(stateContainer != NULL);
 
         const char* name = CALLER->name.c_str();
-        Value* value = stateContainer->get(name);
+        TaggedValue* value = stateContainer->get(name);
 
         bool cast_success = false;
 
@@ -67,14 +67,14 @@ namespace get_state_field_function {
 
         append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);
 
-        Term* defaultValue = term->input(1);
-        if (defaultValue != NULL) {
+        Term* defaultTaggedValue = term->input(1);
+        if (defaultTaggedValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);
-            if (defaultValue->name != "")
-                append_phrase(source, get_relative_name(term, defaultValue),
+            if (defaultTaggedValue->name != "")
+                append_phrase(source, get_relative_name(term, defaultTaggedValue),
                         term, phrase_type::TERM_NAME);
             else
-                format_term_source(source, defaultValue);
+                format_term_source(source, defaultTaggedValue);
         }
     }
 

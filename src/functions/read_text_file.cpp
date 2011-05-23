@@ -8,7 +8,7 @@ namespace read_text_file_function {
     CA_FUNCTION(evaluate)
     {
         std::string filename = as_string(INPUT(0));
-        Value error;
+        TaggedValue error;
         storage::read_text_file_to_value(filename.c_str(), OUTPUT, &error);
 
         if (!is_null(&error))

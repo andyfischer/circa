@@ -61,7 +61,7 @@ namespace overloaded_function {
             bool inputsMatch = true;
             for (int i=0; i < numInputs; i++) {
                 Type* type = unbox_type(function_t::get_input_type(overload, i));
-                Value* value = INPUT(i);
+                TaggedValue* value = INPUT(i);
                 if (value == NULL)
                     continue;
                 if (!cast_possible(value, type)) {
@@ -86,7 +86,7 @@ namespace overloaded_function {
                 apply(contents, specializedFunc, inputs);
                 //change_declared_type(CALLER, contents[0]->type);
             }
-            Value output;
+            TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
             cast(&output, unbox_type(contents[0]->type), OUTPUT);
         } else {
@@ -103,7 +103,7 @@ namespace overloaded_function {
             evaluate_dynamic_overload(CONTEXT, CALLER);
             contents.clear();
         } else {
-            Value output;
+            TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
             if (OUTPUT != NULL)
                 swap(&output, OUTPUT);

@@ -10,7 +10,7 @@ void test_tagged_value()
     Branch branch;
 
     branch.compile("type MyType { string s, int i }");
-    Value* val = branch.eval("MyType()");
+    TaggedValue* val = branch.eval("MyType()");
 
     test_assert(is_string(val->getIndex(0)));
     test_assert(is_int(val->getIndex(1)));
@@ -24,27 +24,27 @@ void test_cast()
 {
     Branch branch;
 
-    Value a;
+    TaggedValue a;
     set_list(&a);
 
-    Value b;
+    TaggedValue b;
     set_list(&b, 2);
     set_int(b.getIndex(0), 1);
     set_int(b.getIndex(1), 2);
     test_equals(b.toString(), "[1, 2]");
 
-    Value c;
+    TaggedValue c;
     set_list(&c, 2);
     set_int(c.getIndex(0), 1);
     set_string(c.getIndex(1), "hi");
     test_equals(c.toString(), "[1, 'hi']");
 
-    Value d;
+    TaggedValue d;
     set_list(&d, 1);
     set_float(d.getIndex(0), 1);
     test_equals(d.toString(), "[1.0]");
 
-    Value x;
+    TaggedValue x;
 
     test_assert(!cast_possible(&a, &INT_T));
     test_assert(cast_possible(&a, &LIST_T));
@@ -67,7 +67,7 @@ void test_cast()
 
 void test_remove_nulls()
 {
-    Value v;
+    TaggedValue v;
     List list;
     test_equals(list.toString(), "[]");
 

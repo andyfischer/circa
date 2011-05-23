@@ -98,7 +98,7 @@ void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
     }
 }
 
-void get_state_description(Term* term, Value* output)
+void get_state_description(Term* term, TaggedValue* output)
 {
     if (term->function == FOR_FUNC) {
         List& list = *List::cast(output, 2);
@@ -122,7 +122,7 @@ void get_state_description(Term* term, Value* output)
     }
 }
 
-void describe_state_shape(Branch& branch, Value* output)
+void describe_state_shape(Branch& branch, TaggedValue* output)
 {
     // Start off with an empty result
     set_null(output);
@@ -137,14 +137,14 @@ void describe_state_shape(Branch& branch, Value* output)
             if (dict == NULL)
                 dict = Dict::cast(output);
 
-            Value* stateDescription = dict->insert(get_unique_name(term));
+            TaggedValue* stateDescription = dict->insert(get_unique_name(term));
             get_state_description(term, stateDescription);
         }
     }
 }
 
-void strip_orphaned_state(Value* description, Value* state,
-    Value* trash)
+void strip_orphaned_state(TaggedValue* description, TaggedValue* state,
+    TaggedValue* trash)
 {
     set_null(trash);
 
@@ -181,14 +181,14 @@ void strip_orphaned_state(Value* description, Value* state,
         Dict& stateDict = *Dict::checkCast(state);
         Dict* trashDict = NULL;
 
-        Value it;
+        TaggedValue it;
         for (stateDict.iteratorStart(&it); !stateDict.iteratorFinished(&it);
                 stateDict.iteratorNext(&it)) {
 
             const char* dictKey;
-            Value* dictValue;
+            TaggedValue* dictTaggedValue;
 
-            stateDict.iteratorGet(&it, &dictKey, &dictValue);
+            stateDict.iteratorGet(&it, &dictKey, &dictTaggedValue);
 
             // Check if this key name doesn't exist in the description.
             if (!descriptionDict.contains(dictKey)) {
@@ -196,7 +196,7 @@ void strip_orphaned_state(Value* description, Value* state,
                 if (trashDict == NULL)
                     trashDict = make_dict(trash);
 
-                swap(dictValue, trashDict->insert(dictKey));
+                swap(dictTaggedValue, trashDict->insert(dictKey));
 
                 stateDict.iteratorDelete(&it);
                 continue;
@@ -205,8 +205,8 @@ void strip_orphaned_state(Value* description, Value* state,
             // This key does exist in the description, recursively call to check
             // the key's value.
             
-            Value nestedTrash;
-            strip_orphaned_state(descriptionDict.get(dictKey), dictValue, &nestedTrash);
+            TaggedValue nestedTrash;
+            strip_orphaned_state(descriptionDict.get(dictKey), dictTaggedValue, &nestedTrash);
 
             if (!is_null(&nestedTrash)) {
                 if (trashDict == NULL)
@@ -233,15 +233,15 @@ void strip_orphaned_state(Value* description, Value* state,
         int descriptionIndex = 0;
         for (int index=0; index < stateList.length(); index++) {
 
-            Value* stateValue = stateList[index];
+            TaggedValue* stateTaggedValue = stateList[index];
 
             // Check if this state list is too long
             if (descriptionIndex >= descriptionList.length()) {
                 if (trashList == NULL)
                     trashList = List::cast(trash, stateList.length());
 
-                swap(stateValue, trashList->get(index));
-                set_null(stateValue);
+                swap(stateTaggedValue, trashList->get(index));
+                set_null(stateTaggedValue);
                 return;
             }
 
@@ -249,10 +249,10 @@ void strip_orphaned_state(Value* description, Value* state,
             if (is_symbol(descriptionList[descriptionIndex]))
                 descriptionIndex--;
 
-            Value* descriptionValue = descriptionList[descriptionIndex];
+            TaggedValue* descriptionTaggedValue = descriptionList[descriptionIndex];
 
-            Value nestedTrash;
-            strip_orphaned_state(descriptionValue, stateValue, &nestedTrash);
+            TaggedValue nestedTrash;
+            strip_orphaned_state(descriptionTaggedValue, stateTaggedValue, &nestedTrash);
 
             if (!is_null(&nestedTrash)) {
                 if (trashList == NULL)
@@ -267,17 +267,17 @@ void strip_orphaned_state(Value* description, Value* state,
     internal_error("Unrecognized state description: " + description->toString());
 }
 
-void strip_orphaned_state(Branch& branch, Value* state, Value* trash)
+void strip_orphaned_state(Branch& branch, TaggedValue* state, TaggedValue* trash)
 {
-    Value description;
+    TaggedValue description;
     describe_state_shape(branch, &description);
     strip_orphaned_state(&description, state, trash);
 }
 
-void strip_orphaned_state(Branch& branch, Value* state)
+void strip_orphaned_state(Branch& branch, TaggedValue* state)
 {
-    Value description;
-    Value trash;
+    TaggedValue description;
+    TaggedValue trash;
     describe_state_shape(branch, &description);
     strip_orphaned_state(&description, state, &trash);
 }

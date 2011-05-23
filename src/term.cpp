@@ -117,7 +117,7 @@ Term::toString()
     return to_string(this);
 }
 
-Value* Term::property(std::string const& name)
+TaggedValue* Term::property(std::string const& name)
 {
     return properties.get(name.c_str());
 }
@@ -127,9 +127,9 @@ bool Term::hasProperty(std::string const& name)
     return properties.contains(name.c_str());
 }
 
-Value* Term::addProperty(std::string const& name, Term* type)
+TaggedValue* Term::addProperty(std::string const& name, Term* type)
 {
-    Value* prop = properties.insert(name.c_str());
+    TaggedValue* prop = properties.insert(name.c_str());
     Type* valueType = unbox_type(type);
 
     if (!is_null(prop) && prop->value_type != valueType)
@@ -146,47 +146,47 @@ void Term::removeProperty(std::string const& name)
 
 bool Term::boolProp(std::string const& name)
 {
-    Value* t = addProperty(name, BOOL_TYPE);
+    TaggedValue* t = addProperty(name, BOOL_TYPE);
     return as_bool(t);
 }
 int Term::intProp(std::string const& name)
 {
-    Value* t = addProperty(name, INT_TYPE);
+    TaggedValue* t = addProperty(name, INT_TYPE);
     return as_int(t);
 }
 float Term::floatProp(std::string const& name)
 {
-    Value* t = addProperty(name, FLOAT_TYPE);
+    TaggedValue* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
 std::string const& Term::stringProp(std::string const& name)
 {
-    Value* t = addProperty(name, STRING_TYPE);
+    TaggedValue* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
 
 void Term::setIntProp(std::string const& name, int i)
 {
-    Value* t = addProperty(name, INT_TYPE);
+    TaggedValue* t = addProperty(name, INT_TYPE);
     set_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
-    Value* t = addProperty(name, FLOAT_TYPE);
+    TaggedValue* t = addProperty(name, FLOAT_TYPE);
     set_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)
 {
-    Value* t = addProperty(name, BOOL_TYPE);
+    TaggedValue* t = addProperty(name, BOOL_TYPE);
     set_bool(t, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
     ca_assert(!(name == "syntax:postWhitespace" && s == "       "));
-    Value* t = addProperty(name, STRING_TYPE);
+    TaggedValue* t = addProperty(name, STRING_TYPE);
     set_string(t, s);
 }
 
@@ -240,7 +240,7 @@ static void append_term_invariant_error(List* errors, Term* term,
 void term_check_invariants(List* errors, Term* term)
 {
     if (term->value_type == NULL)
-        append_term_invariant_error(errors, term, "Value has null type");
+        append_term_invariant_error(errors, term, "TaggedValue has null type");
 
     if (term->type != NULL) {
 
@@ -250,7 +250,7 @@ void term_check_invariants(List* errors, Term* term)
 
         if (!typeOk) {
             std::string msg;
-            msg += "Value has wrong type: term->type is " + term->type->name
+            msg += "TaggedValue has wrong type: term->type is " + term->type->name
                 + ", tag is " + term->value_type->name;
             append_term_invariant_error(errors, term, msg);
         }

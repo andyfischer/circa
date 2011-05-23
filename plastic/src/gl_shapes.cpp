@@ -43,7 +43,7 @@ GLfloat MultipurposeBuffer::staticArray[MultipurposeBuffer::staticMemorySize];
 
 GLint current_program = 0;
 
-void set_gl_color(Value* color)
+void set_gl_color(TaggedValue* color)
 {
     glColor4f(color->getIndex(0)->toFloat(),
               color->getIndex(1)->toFloat(),
@@ -56,7 +56,7 @@ void clear_gl_color()
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
-void load_2d_vector_list_to_buffer(Value* list, GLfloat* buffer)
+void load_2d_vector_list_to_buffer(TaggedValue* list, GLfloat* buffer)
 {
     int numElements = list->numElements();
     int write = 0;
@@ -74,7 +74,7 @@ CA_FUNCTION(background)
 {
     gl_clear_error();
 
-    Value* color = INPUT(0);
+    TaggedValue* color = INPUT(0);
 
     glClearColor(color->getIndex(0)->asFloat(),
             color->getIndex(1)->asFloat(),
@@ -90,8 +90,8 @@ CA_FUNCTION(background)
 
 CA_FUNCTION(gl_triangles)
 {
-    Value* list = INPUT(0);
-    Value* color = INPUT(1);
+    TaggedValue* list = INPUT(0);
+    TaggedValue* color = INPUT(1);
 
     set_gl_color(color);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -112,8 +112,8 @@ CA_FUNCTION(gl_triangles)
 
 CA_FUNCTION(gl_line_strip)
 {
-    Value* list = INPUT(0);
-    Value* color = INPUT(1);
+    TaggedValue* list = INPUT(0);
+    TaggedValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -133,8 +133,8 @@ CA_FUNCTION(gl_line_strip)
 
 CA_FUNCTION(gl_line_loop)
 {
-    Value* list = INPUT(0);
-    Value* color = INPUT(1);
+    TaggedValue* list = INPUT(0);
+    TaggedValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -154,8 +154,8 @@ CA_FUNCTION(gl_line_loop)
 
 CA_FUNCTION(gl_lines)
 {
-    Value* list = INPUT(0);
-    Value* color = INPUT(1);
+    TaggedValue* list = INPUT(0);
+    TaggedValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -175,8 +175,8 @@ CA_FUNCTION(gl_lines)
 
 CA_FUNCTION(gl_points)
 {
-    Value* list = INPUT(0);
-    Value* color = INPUT(1);
+    TaggedValue* list = INPUT(0);
+    TaggedValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -200,7 +200,7 @@ CA_FUNCTION(gl_circle)
     float x = loc->getX();
     float y = loc->getY();
     float radius = FLOAT_INPUT(1);
-    Value* color = INPUT(2);
+    TaggedValue* color = INPUT(2);
     set_gl_color(color);
 
     // Dumb guess on how many polygons to use
@@ -244,7 +244,7 @@ CA_FUNCTION(gl_pie)
     float radius = FLOAT_INPUT(1);
     float angle_start = FLOAT_INPUT(2);
     float angle_fin = FLOAT_INPUT(3);
-    Value* color = INPUT(4);
+    TaggedValue* color = INPUT(4);
     set_gl_color(color);
 
     if (angle_start > angle_fin) {
@@ -365,7 +365,7 @@ CA_FUNCTION(use_program)
 CA_FUNCTION(set_uniform)
 {
     const char* name = STRING_INPUT(0);
-    Value* input = INPUT(1);
+    TaggedValue* input = INPUT(1);
 
     GLint loc = glGetUniformLocation(current_program, name);
 

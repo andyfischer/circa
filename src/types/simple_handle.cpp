@@ -9,7 +9,7 @@
 namespace circa {
 namespace simple_handle_t {
 
-    void set(Type* type, Value* value, int handle)
+    void set(Type* type, TaggedValue* value, int handle)
     {
         change_type_no_initialize(value, type);
         value->value_data.ptr = allocate_list(1);
@@ -20,17 +20,17 @@ namespace simple_handle_t {
             << " at " << value << std::endl;
         #endif
     }
-    int get(Value* value)
+    int get(TaggedValue* value)
     {
         return as_int(list_get_element(value, 0));
     }
 
-    void initialize(Type* type, Value* value)
+    void initialize(Type* type, TaggedValue* value)
     {
         value->value_data.ptr = NULL;
         //internal_error("don't call simple_handle::initialize");
     }
-    void release(Type* type, Value* value)
+    void release(Type* type, TaggedValue* value)
     {
         ListData* data = (ListData*) value->value_data.ptr;
 
@@ -58,7 +58,7 @@ namespace simple_handle_t {
             value->value_data.ptr = NULL;
         }
     }
-    void copy(Type* type, Value* source, Value* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         change_type_no_initialize(dest, type);
         dest->value_data = source->value_data;

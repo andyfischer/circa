@@ -40,7 +40,7 @@ namespace list_function {
     {
         set_list(OUTPUT);
         List* result = List::checkCast(OUTPUT);
-        Value* source = INPUT(0);
+        TaggedValue* source = INPUT(0);
         int repeatCount = INT_INPUT(1);
 
         result->resize(repeatCount);

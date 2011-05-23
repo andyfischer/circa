@@ -11,7 +11,7 @@ struct ListData {
     int refCount;
     int count;
     int capacity;
-    Value items[0];
+    TaggedValue items[0];
     // items has size [capacity].
 };
 
@@ -26,7 +26,7 @@ ListData* list_increase_capacity(ListData* original, int new_capacity);
 ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
 
-Value* list_get_element(Value* value, int index);
-void list_remove_element(Value* list, int index);
+TaggedValue* list_get_element(TaggedValue* value, int index);
+void list_remove_element(TaggedValue* list, int index);
 
 } // namespace circa

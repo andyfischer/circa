@@ -22,13 +22,13 @@ void assert_valid_list(ListData* list)
 
 ListData* allocate_empty_list(int capacity)
 {
-    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(Value));
+    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
     debug_register_valid_object(result, LIST_OBJECT);
 
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
-    memset(result->items, 0, capacity * sizeof(Value));
+    memset(result->items, 0, capacity * sizeof(TaggedValue));
     for (int i=0; i < capacity; i++)
         result->items[i].init();
 
@@ -107,8 +107,8 @@ ListData* list_increase_capacity(ListData* original, int new_capacity)
 
     result->count = original->count;
     for (int i=0; i < result->count; i++) {
-        Value* left = &original->items[i];
-        Value* right = &result->items[i];
+        TaggedValue* left = &original->items[i];
+        TaggedValue* right = &result->items[i];
         if (createCopy)
             copy(left, right);
         else
@@ -165,7 +165,7 @@ ListData* list_resize(ListData* original, int numElements)
     return result;
 }
 
-Value* list_get_element(Value* value, int index)
+TaggedValue* list_get_element(TaggedValue* value, int index)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
 
@@ -175,7 +175,7 @@ Value* list_get_element(Value* value, int index)
     return &data->items[index];
 }
 
-void list_remove_element(Value* list, int index)
+void list_remove_element(TaggedValue* list, int index)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
 

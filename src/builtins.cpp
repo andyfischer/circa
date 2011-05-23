@@ -131,7 +131,7 @@ Type TYPE_T;
 Type VOID_T;
 
 // Builtin symbols:
-Value REPEAT_SYMBOL;
+TaggedValue REPEAT_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
 
@@ -227,10 +227,10 @@ void bootstrap_kernel()
     functionType->formatSource = subroutine_f::format_source;
     functionType->checkInvariants = function_t::check_invariants;
 
-    // Initialize Value func
+    // Initialize TaggedValue func
     VALUE_FUNC->type = FUNCTION_TYPE;
     VALUE_FUNC->function = VALUE_FUNC;
-    change_type((Value*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
+    change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 
     // Update locals so that debugging checks don't complain.
     refresh_locals_indices(*KERNEL);

@@ -7,16 +7,16 @@
 namespace circa {
 namespace handle_t {
 
-    typedef void (*OnRelease)(Value* data);
+    typedef void (*OnRelease)(TaggedValue* data);
 
-    void set(Value* container, Type* type, Value* data);
-    void set(Value* container, Type* type, void* opaquePointer);
-    Value* get(Value* value);
-    void* get_ptr(Value* value);
+    void set(TaggedValue* container, Type* type, TaggedValue* data);
+    void set(TaggedValue* container, Type* type, void* opaquePointer);
+    TaggedValue* get(TaggedValue* value);
+    void* get_ptr(TaggedValue* value);
     void setup_type(Type* type);
 
     template <typename T>
-    T* create(Value* value, Type* type)
+    T* create(TaggedValue* value, Type* type)
     {
         T* obj = new T();
         set(value, type, obj);
@@ -24,7 +24,7 @@ namespace handle_t {
     }
 
     template <typename T>
-    void templated_release_func(Value* value)
+    void templated_release_func(TaggedValue* value)
     {
         T* object = (T*) as_opaque_pointer(value);
         delete object;

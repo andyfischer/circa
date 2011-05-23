@@ -9,7 +9,7 @@
 namespace circa {
 namespace ref_t {
 
-    std::string toString(Value* term)
+    std::string toString(TaggedValue* term)
     {
         Term* t = as_ref(term);
         if (t == NULL)
@@ -17,24 +17,24 @@ namespace ref_t {
         else
             return global_id(t);
     }
-    void initialize(Type* type, Value* value)
+    void initialize(Type* type, TaggedValue* value)
     {
         set_pointer(value, type, NULL);
     }
-    void release(Type*, Value* value)
+    void release(Type*, TaggedValue* value)
     {
     }
-    void reset(Type*, Value* value)
+    void reset(Type*, TaggedValue* value)
     {
         set_ref(value, NULL);
     }
-    bool equals(Type*, Value* lhs, Value* rhs)
+    bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
     {
         if (!is_ref(lhs) || !is_ref(rhs))
             return false;
         return as_ref(lhs) == as_ref(rhs);
     }
-    int hashFunc(Value* value)
+    int hashFunc(TaggedValue* value)
     {
         return (int) (long(as_ref(value)) >> 3);
     }
@@ -79,7 +79,7 @@ namespace ref_t {
             return;
         }
 
-        Value* source = INPUT(1);
+        TaggedValue* source = INPUT(1);
 
         if (!cast_possible(source, declared_type(target))) {
             error_occurred(CONTEXT, CALLER, "Can't assign, type mismatch");

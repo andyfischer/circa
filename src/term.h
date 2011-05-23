@@ -13,7 +13,7 @@
 
 namespace circa {
 
-struct Term : Value
+struct Term : TaggedValue
 {
     struct UniqueName
     {
@@ -35,8 +35,8 @@ struct Term : Value
 
     typedef std::vector<Input> InputList;
 
-    // Fields inherited from Value:
-    //   Value::Data value_data
+    // Fields inherited from TaggedValue:
+    //   TaggedValue::Data value_data
     //   Type* value_type
 
     // A Type term that describes our data type
@@ -108,10 +108,10 @@ struct Term : Value
     std::string toString();
 
     // Returns the named property
-    Value* property(std::string const& name);
+    TaggedValue* property(std::string const& name);
 
     bool hasProperty(std::string const& name);
-    Value* addProperty(std::string const& name, Term* type);
+    TaggedValue* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
 
     int intProp(std::string const& name);

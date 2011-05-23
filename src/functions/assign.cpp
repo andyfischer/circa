@@ -10,7 +10,7 @@ namespace assign_function {
     {
         Branch& contents = nested_contents(CALLER);
 
-        Value output;
+        TaggedValue output;
         evaluate_branch_internal(CONTEXT, contents, &output);
         swap(&output, OUTPUT);
     }
@@ -24,7 +24,7 @@ namespace assign_function {
             return ANY_TYPE;
     }
 
-    Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredValue)
+    Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredTaggedValue)
     {
         Term* set = NULL;
 
@@ -36,7 +36,7 @@ namespace assign_function {
             return NULL;
         }
 
-        return apply(branch, set, TermList(term->input(0), term->input(1), desiredValue));
+        return apply(branch, set, TermList(term->input(0), term->input(1), desiredTaggedValue));
     }
 
     /*

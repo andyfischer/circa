@@ -873,7 +873,7 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     if (!is_type(type))
         return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
-    Term* initialValue = NULL;
+    Term* initialTaggedValue = NULL;
 
     if (tokens.nextIs(EQUALS)) {
         tokens.consume();
@@ -884,19 +884,19 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         Term* initialization = apply(branch, DO_ONCE_FUNC, TermList());
         hide_from_source(initialization);
 
-        initialValue = infix_expression(initialization->nestedContents, tokens);
+        initialTaggedValue = infix_expression(initialization->nestedContents, tokens);
         post_parse_branch(initialization->nestedContents);
         #endif
 
-        initialValue = infix_expression(branch, tokens, context).term;
+        initialTaggedValue = infix_expression(branch, tokens, context).term;
     }
 
     // If an initial value was used and no specific type was mentioned, use
     // the initial value's type.
-    if (typeName == "" && initialValue != NULL && initialValue->type != NULL_T_TERM)
-        type = initialValue->type;
+    if (typeName == "" && initialTaggedValue != NULL && initialTaggedValue->type != NULL_T_TERM)
+        type = initialTaggedValue->type;
 
-    Term* result = create_stateful_value(branch, type, initialValue, name);
+    Term* result = create_stateful_value(branch, type, initialTaggedValue, name);
 
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);
@@ -995,10 +995,10 @@ ParseResult return_statement(Branch& branch, TokenStream& tokens, ParserCxt* con
 
     Term* output = NULL;
 
-    bool returnsValue = !is_statement_ending(tokens.next().match) &&
+    bool returnsTaggedValue = !is_statement_ending(tokens.next().match) &&
         tokens.next().match != RBRACE;
 
-    if (returnsValue)
+    if (returnsTaggedValue)
         output = expression(branch, tokens, context).term;
 
     Term* result = apply(branch, RETURN_FUNC, TermList(output));

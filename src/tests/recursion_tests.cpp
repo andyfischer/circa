@@ -16,7 +16,7 @@ void test_that_f_returns_1(std::string testName, std::string input)
         return;
     }
 
-    Value* result = branch.eval("f(0)");
+    TaggedValue* result = branch.eval("f(0)");
 
     if (result->toString() != "1") {
         std::cout << "recursion_tests::" << testName << " failed on input: "

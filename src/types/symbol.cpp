@@ -18,7 +18,7 @@ namespace symbol_t {
     Symbol g_symbols[c_maxSymbolCount];
     int g_nextFreeSymbol = 0;
 
-    void assign_new_symbol(const char* name, Value* result)
+    void assign_new_symbol(const char* name, TaggedValue* result)
     {
         int index = g_nextFreeSymbol++;
         g_symbols[index].name = name;
@@ -26,7 +26,7 @@ namespace symbol_t {
         result->value_data.asint = index;
     }
 
-    std::string to_string(Value* value)
+    std::string to_string(TaggedValue* value)
     {
         return ":" + g_symbols[as_int(value)].name;
     }

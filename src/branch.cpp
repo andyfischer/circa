@@ -380,7 +380,7 @@ void erase_term(Term* term)
 {
     assert_valid_term(term);
 
-    set_null((Value*) term);
+    set_null((TaggedValue*) term);
     set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;
@@ -508,7 +508,7 @@ void parse_script(Branch& branch, std::string const& filename)
     // Record the filename
     create_string(branch, filename, "#attr:source-file");
 
-    Value contents;
+    TaggedValue contents;
     storage::read_text_file_to_value(filename.c_str(), &contents, NULL);
 
     parser::compile(branch, parser::statement_list, as_string(&contents));

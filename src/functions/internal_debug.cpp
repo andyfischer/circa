@@ -25,53 +25,53 @@ namespace internal_debug_function {
         }
     }
 
-    List oracleValues;
+    List oracleTaggedValues;
 
     CA_DEFINE_FUNCTION(oracle, "test_oracle() -> any"
         "'For internal testing. This function will output values that are manually "
         "inserted with the c++ function oracle_send'")
     {
-        if (oracleValues.length() == 0)
+        if (oracleTaggedValues.length() == 0)
             set_null(OUTPUT);
         else {
-            copy(oracleValues[0], OUTPUT);
-            oracleValues.remove(0);
+            copy(oracleTaggedValues[0], OUTPUT);
+            oracleTaggedValues.remove(0);
         }
     }
 
     void oracle_clear()
     {
-        oracleValues.clear();
+        oracleTaggedValues.clear();
     }
 
-    void oracle_send(Value* value)
+    void oracle_send(TaggedValue* value)
     {
-        copy(value, oracleValues.append());
+        copy(value, oracleTaggedValues.append());
     }
 
     void oracle_send(int i)
     {
-        Value v;
+        TaggedValue v;
         set_int(&v, i);
         oracle_send(&v);
     }
 
-    List spyValues;
+    List spyTaggedValues;
 
     CA_DEFINE_FUNCTION(spy, "test_spy(any)"
             "'For internal testing. This function will save every inputs to a static list, "
             "and the contents of this list can be checked from C++ code.")
     {
-        copy(INPUT(0), spyValues.append());
+        copy(INPUT(0), spyTaggedValues.append());
     }
 
     void spy_clear()
     {
-        spyValues.clear();
+        spyTaggedValues.clear();
     }
     List* spy_results()
     {
-        return &spyValues;
+        return &spyTaggedValues;
     }
 
     CA_DEFINE_FUNCTION(dump_scope_state, "dump_scope_state() -> any")

@@ -5,7 +5,7 @@
 
 namespace circa {
 namespace set_t {
-    bool contains(List* list, Value* value)
+    bool contains(List* list, TaggedValue* value)
     {
         int numElements = list->numElements();
         for (int i=0; i < numElements; i++) {
@@ -14,7 +14,7 @@ namespace set_t {
         }
         return false;
     }
-    void add(List* list, Value* value)
+    void add(List* list, TaggedValue* value)
     {
         if (contains(list, value))
             return;
@@ -25,7 +25,7 @@ namespace set_t {
     {
         copy(INPUT(0), OUTPUT);
         List* output = List::checkCast(OUTPUT);
-        Value* value = INPUT(1);
+        TaggedValue* value = INPUT(1);
         if (!contains(output, value))
             copy(value, output->append());
     }
@@ -33,7 +33,7 @@ namespace set_t {
     CA_FUNCTION(contains)
     {
         List* list = List::checkCast(INPUT(0));
-        Value* value = INPUT(1);
+        TaggedValue* value = INPUT(1);
         set_bool(OUTPUT, contains(list, value));
     }
 
@@ -41,7 +41,7 @@ namespace set_t {
     {
         copy(INPUT(0), OUTPUT);
         List* list = List::checkCast(OUTPUT);
-        Value* value = INPUT(1);
+        TaggedValue* value = INPUT(1);
 
         int numElements = list->numElements();
         for (int index=0; index < numElements; index++) {
@@ -51,7 +51,7 @@ namespace set_t {
             }
         }
     }
-    std::string to_string(Value* value)
+    std::string to_string(TaggedValue* value)
     {
         List* list = List::checkCast(value);
         std::stringstream output;

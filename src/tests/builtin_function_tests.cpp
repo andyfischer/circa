@@ -62,7 +62,7 @@ void test_builtin_equals()
 void test_list()
 {
     Branch branch;
-    Value* l = branch.eval("l = list(1,2,'foo')");
+    TaggedValue* l = branch.eval("l = list(1,2,'foo')");
 
     test_assert(l->getIndex(0)->asInt() == 1);
     test_assert(l->getIndex(1)->asInt() == 2);
@@ -72,7 +72,7 @@ void test_list()
 void test_vectorized_funcs()
 {
     Branch branch;
-    Value* t = branch.eval("[1 2 3] + [4 5 6]");
+    TaggedValue* t = branch.eval("[1 2 3] + [4 5 6]");
     test_assert(t);
 
     test_assert(t->numElements() == 3);
@@ -129,7 +129,7 @@ void test_get_index()
 {
     Branch branch;
     branch.eval("l = [1 2 3]");
-    Value* get = branch.eval("get_index(l, 0)");
+    TaggedValue* get = branch.eval("get_index(l, 0)");
 
     test_assert(get);
     test_assert(get->value_type == unbox_type(INT_TYPE));
@@ -147,13 +147,13 @@ void test_set_index()
     Branch branch;
 
     branch.eval("l = [1 2 3]");
-    Value* l2 = branch.eval("set_index(@l, 1, 5)");
+    TaggedValue* l2 = branch.eval("set_index(@l, 1, 5)");
 
     test_assert(l2->getIndex(0)->asInt() == 1);
     test_assert(l2->getIndex(1)->asInt() == 5);
     test_assert(l2->getIndex(2)->asInt() == 3);
 
-    Value* l3 = branch.eval("l[2] = 9");
+    TaggedValue* l3 = branch.eval("l[2] = 9");
     test_assert(l3->getIndex(0)->asInt() == 1);
     test_assert(l3->getIndex(1)->asInt() == 5);
     test_assert(l3->getIndex(2)->asInt() == 9);

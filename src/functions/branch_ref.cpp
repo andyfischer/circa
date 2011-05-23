@@ -21,14 +21,14 @@ namespace branch_ref_function {
         return true;
     }
 
-    Branch* deref(Value* val)
+    Branch* deref(TaggedValue* val)
     {
         if (!is_list(val))
             return NULL;
         return (Branch*) as_opaque_pointer(val->getIndex(0));
     }
 
-    void set_branch_ref(Value* value, Branch* branchPtr)
+    void set_branch_ref(TaggedValue* value, Branch* branchPtr)
     {
         List& output = *List::cast(value, 1);
         set_opaque_pointer(output[0], branchPtr);

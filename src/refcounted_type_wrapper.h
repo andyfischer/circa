@@ -8,13 +8,13 @@ namespace circa {
 namespace intrusive_refcounted {
 
     template <typename T>
-    void initialize(Type* type, Value* value)
+    void initialize(Type* type, TaggedValue* value)
     {
         value->value_data.ptr = NULL;
     }
 
     template <typename T>
-    void release(Type*, Value* value)
+    void release(Type*, TaggedValue* value)
     {
         T* instance = (T*) value->value_data.ptr;
 
@@ -30,7 +30,7 @@ namespace intrusive_refcounted {
     }
 
     template <typename T>
-    void set(Value* tv, Type* type, T* value)
+    void set(TaggedValue* tv, Type* type, T* value)
     {
         // Increase refcount first, in case the value already has this object.
         value->_refCount++;
@@ -40,7 +40,7 @@ namespace intrusive_refcounted {
     }
 
     template <typename T>
-    void copy(Type* type, Value* source, Value* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         change_type_no_initialize(dest, type);
         dest->value_data = source->value_data;

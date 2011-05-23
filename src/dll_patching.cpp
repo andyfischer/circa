@@ -56,7 +56,7 @@ void* find_func_in_dll(Dll* dll, const char* funcName)
     return dlsym(dll->module, funcName);
 }
 
-Dll* load_dll(const char* filename, Value* errorOut)
+Dll* load_dll(const char* filename, TaggedValue* errorOut)
 {
     Dll* dll = new Dll();
 
@@ -108,7 +108,7 @@ void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
     }
 }
 
-void patch_with_dll(const char* dll_filename, Branch& branch, Value* errorOut)
+void patch_with_dll(const char* dll_filename, Branch& branch, TaggedValue* errorOut)
 {
     // Check to unload this file, if it's already loaded
     unload_dll(dll_filename);

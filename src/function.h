@@ -25,7 +25,7 @@ struct FunctionAttrs
     Term* implicitStateType;
     bool variableArgs;
     Term* feedbackFunc;
-    Value parameter;
+    TaggedValue parameter;
     bool throws;
     int outputCount;
 
@@ -49,9 +49,9 @@ struct FunctionAttrs
 };
 
 namespace function_attrs_t {
-    void initialize(Type* type, Value* value);
-    void release(Type*, Value* value);
-    void copy(Type*, Value* source, Value* dest);
+    void initialize(Type* type, TaggedValue* value);
+    void release(Type*, TaggedValue* value);
+    void copy(Type*, TaggedValue* source, TaggedValue* dest);
 }
 
 namespace function_t {
@@ -76,7 +76,7 @@ namespace function_t {
     std::string const& get_exposed_name_path(Term* function);
     void set_exposed_name_path(Term* func, std::string const& value);
     Term* get_feedback_func(Term* function);
-    Value* get_parameters(Term* function);
+    TaggedValue* get_parameters(Term* function);
     std::string get_documentation(Term* function);
 
     EvaluateFunc& get_evaluate(Term* function);

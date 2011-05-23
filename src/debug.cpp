@@ -21,11 +21,11 @@ void dump_with_props(Branch& branch)
     print_branch_with_properties(std::cout, branch);
 }
 
-void dump(Value& value)
+void dump(TaggedValue& value)
 {
     std::cout << value.toString() << std::endl;
 }
-void dump(Value* value)
+void dump(TaggedValue* value)
 {
     std::cout << value->toString() << std::endl;
 }

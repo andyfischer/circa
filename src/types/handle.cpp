@@ -11,7 +11,7 @@
 namespace circa {
 namespace handle_t {
 
-    void set(Value* container, Type* type, Value* userdata)
+    void set(TaggedValue* container, Type* type, TaggedValue* userdata)
     {
         change_type_no_initialize(container, type);
         container->value_data.ptr = allocate_list(1);
@@ -27,27 +27,27 @@ namespace handle_t {
             << std::endl;
         #endif
     }
-    void set(Value* container, Type* type, void* opaquePointer)
+    void set(TaggedValue* container, Type* type, void* opaquePointer)
     {
-        Value value;
+        TaggedValue value;
         set_opaque_pointer(&value, opaquePointer);
         set(container, type, &value);
     }
-    Value* get(Value* container)
+    TaggedValue* get(TaggedValue* container)
     {
         return list_get_element(container, 0);
     }
-    void* get_ptr(Value* value)
+    void* get_ptr(TaggedValue* value)
     {
         return as_opaque_pointer(get(value));
     }
 
-    void initialize(Type* type, Value* value)
+    void initialize(Type* type, TaggedValue* value)
     {
         value->value_data.ptr = NULL;
         //internal_error("don't call simple_handle::initialize");
     }
-    void release(Type* type, Value* value)
+    void release(Type* type, TaggedValue* value)
     {
         ListData* data = (ListData*) value->value_data.ptr;
 
@@ -67,7 +67,7 @@ namespace handle_t {
 
         if (data->refCount == 0) {
 
-            Value* userdata = list_get_element(value, 0);
+            TaggedValue* userdata = list_get_element(value, 0);
 
             if (!is_null(&type->parameter)) {
                 OnRelease onReleaseFunc = (OnRelease) as_opaque_pointer(&type->parameter);
@@ -87,7 +87,7 @@ namespace handle_t {
             value->value_data.ptr = NULL;
         }
     }
-    void copy(Type* type, Value* source, Value* dest)
+    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         change_type_no_initialize(dest, type);
         dest->value_data = source->value_data;

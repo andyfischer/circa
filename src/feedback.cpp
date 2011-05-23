@@ -15,7 +15,7 @@
 
 namespace circa {
 
-void handle_feedback_event(EvalContext* context, Term* target, Value* desired)
+void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desired)
 {
     // For now, use a simple implementation which cannot handle combining multiple
     // feedback events, or dispatching feedback to multiple sources. All we handle
@@ -238,27 +238,27 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
             continue;
 
         // Apply feedback function
-        TermList feedbackValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
+        TermList feedbackTaggedValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
 
         // TODO: accumulate desired value
-        Term* desiredValue = feedbackValues[0];
+        Term* desiredTaggedValue = feedbackTaggedValues[0];
 
         if (term->numInputs() == 0) {
             // Just create a feedback term. This is probably an assign() for a value()
-            apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
+            apply(trainingBranch, feedbackFunc, TermList(term, desiredTaggedValue));
 
         } else if (term->numInputs() == 1) {
             // Create a feedback term with only 1 output
-            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredTaggedValue));
             operation.sendFeedback(term->input(0), feedback, DESIRED_VALUE_FEEDBACK);
 
         } else if (term->numInputs() > 1) {
 
             // If the term has multiple inputs, then the feedback term will have multiple outputs
 
-            // Inputs to feedback func are [originalTerm, desiredValue]
+            // Inputs to feedback func are [originalTerm, desiredTaggedValue]
 
-            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredTaggedValue));
             // Resize the output of 'feedback' so that there is one output term per input
             resize_list(feedback_output(feedback), term->numInputs(), ANY_TYPE);
 

@@ -3,7 +3,7 @@
 namespace circa {
 namespace branch_t {
 
-    void visitHeap(Type*, Value* value, Type::VisitHeapCallback callback, void* userdata)
+    void visitHeap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, void* userdata)
     {
         // TODO
     }

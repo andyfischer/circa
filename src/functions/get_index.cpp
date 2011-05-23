@@ -10,7 +10,7 @@ namespace get_index_function {
     CA_DEFINE_FUNCTION(get_index, "get_index(Indexable, int) -> any")
     {
         int index = as_int(INPUT(1));
-        Value* result = get_index(INPUT(0), index);
+        TaggedValue* result = get_index(INPUT(0), index);
 
         if (result == NULL) {
             std::stringstream err;

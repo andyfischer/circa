@@ -20,18 +20,18 @@ int get_free_slot()
     return -1;
 }
 
-void on_release_func(Value* data)
+void on_release_func(TaggedValue* data)
 {
     int slot = as_int(data);
     test_assert(as_bool(g_slots[slot]));
     set_bool(g_slots[slot], false);
 }
 
-void assign(Value* value, int handle)
+void assign(TaggedValue* value, int handle)
 {
     test_assert(!as_bool(g_slots[handle]));
     set_bool(g_slots[handle], true);
-    Value userdata;
+    TaggedValue userdata;
     set_int(&userdata, handle);
     handle_t::set(value, &handle_type, &userdata);
 }
@@ -65,7 +65,7 @@ void test_simple()
 
     test_equals(&g_slots, "[false, false, false]");
 
-    Value handle;
+    TaggedValue handle;
 
     assign(&handle, 0);
     test_equals(&g_slots, "[true, false, false]");
@@ -81,8 +81,8 @@ void test_simple()
     assign(&handle, 2);
     test_equals(&g_slots, "[false, false, true]");
 
-    Value handle2;
-    Value handle3;
+    TaggedValue handle2;
+    TaggedValue handle3;
     assign(&handle2, 0);
     test_equals(&g_slots, "[true, false, true]");
     assign(&handle3, 1);
@@ -240,7 +240,7 @@ void test_user_defined_type()
     // Create a value and then free it.
     test_assert(MyType_allocated == 0);
 
-    Value value;
+    TaggedValue value;
     handle_t::set(&value, type, new MyType());
     test_assert(MyType_allocated == 1);
 

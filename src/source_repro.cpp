@@ -68,7 +68,7 @@ std::string unformat_rich_source(StyledSource* source)
     std::stringstream strm;
 
     for (int i=0; i < source->_phrases.numElements(); i++) {
-        Value* phrase = source->_phrases[i];
+        TaggedValue* phrase = source->_phrases[i];
         strm << as_string((*phrase)[0]);
     }
     return strm.str();
@@ -237,9 +237,9 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
     if (input->name != "" && function_call_rebinds_input(term, inputIndex)) 
         append_phrase(source, "&", term, token::AMPERSAND);
 
-    bool byValue = input->name == "";
+    bool byTaggedValue = input->name == "";
 
-    if (byValue) {
+    if (byTaggedValue) {
         format_term_source(source, input);
     } else {
         append_phrase(source, get_relative_name(term, input), term, phrase_type::TERM_NAME);

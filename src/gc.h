@@ -6,6 +6,6 @@
 
 namespace circa {
 
-void recursive_dump_heap(Value* value, const char* prefix);
+void recursive_dump_heap(TaggedValue* value, const char* prefix);
 
 } // namespace circa

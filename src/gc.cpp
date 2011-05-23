@@ -6,7 +6,7 @@
 
 namespace circa {
 
-void visit_heap(Value* value, Type::VisitHeapCallback callback, void* userdata)
+void visit_heap(TaggedValue* value, Type::VisitHeapCallback callback, void* userdata)
 {
     Type::VisitHeap func = value->value_type->visitHeap;
     if (func != NULL)
@@ -18,7 +18,7 @@ struct DumpHeapContext
     std::string prefix;
 };
 
-void dump_heap_callback(void* userdata, Value* value, Value* relativeIdentifier)
+void dump_heap_callback(void* userdata, TaggedValue* value, TaggedValue* relativeIdentifier)
 {
     DumpHeapContext* context = (DumpHeapContext*) userdata;
 
@@ -34,7 +34,7 @@ void dump_heap_callback(void* userdata, Value* value, Value* relativeIdentifier)
     context->prefix = oldprefix;
 }
 
-void recursive_dump_heap(Value* value, const char* prefix)
+void recursive_dump_heap(TaggedValue* value, const char* prefix)
 {
     DumpHeapContext context;
     context.prefix = prefix;

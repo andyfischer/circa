@@ -13,7 +13,7 @@ namespace concat_function {
     {
         std::stringstream out;
         for (int index=0; index < NUM_INPUTS; index++) {
-            Value* v = INPUT(index);
+            TaggedValue* v = INPUT(index);
             if (is_string(v))
                 out << as_string(v);
             else

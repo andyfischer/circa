@@ -42,15 +42,15 @@ struct RawOutputPrefs;
 struct TermMap;
 struct StaticTypeQuery;
 struct StyledSource;
-struct Value;
+struct TaggedValue;
 struct Term;
 struct TermList;
 struct Type;
 
 typedef Term* TermPtr;
-typedef bool (*TermVisitor)(Term* term, Value* context);
+typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
 
-// Variant value used in many places, including in Value:
+// Variant value used in many places, including in TaggedValue:
 union VariantValue {
     int asint;
     float asfloat;

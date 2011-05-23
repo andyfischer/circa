@@ -12,7 +12,7 @@ void Rect_i::set(int x1, int y1, int x2, int y2)
     set_int(get_index(this, 3), y2);
 }
 
-Rect_i* Rect_i::cast(Value* tv)
+Rect_i* Rect_i::cast(TaggedValue* tv)
 {
     change_type(tv, unbox_type(RECT_I_TYPE_TERM));
     return (Rect_i*) tv;

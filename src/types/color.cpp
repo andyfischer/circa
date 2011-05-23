@@ -16,7 +16,7 @@ namespace color_t {
 
     std::string to_string(Term* term)
     {
-        Value* value = term;
+        TaggedValue* value = term;
 
         bool valueHasAlpha = value->getIndex(3)->asFloat() < 1.0;
 

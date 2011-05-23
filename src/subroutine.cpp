@@ -90,7 +90,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
 
     } else {
 
-        Value* output0 = outputs->get(0);
+        TaggedValue* output0 = outputs->get(0);
 
         bool castSuccess = cast(output0, outputType, outputs->get(0));
         
@@ -125,7 +125,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     inputs.resize(numInputs);
 
     for (int i=0; i < numInputs; i++) {
-        Value* input = get_input(caller, i);
+        TaggedValue* input = get_input(caller, i);
         if (input == NULL)
             continue;
 
@@ -140,7 +140,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     }
 
     // Fetch state container
-    Value prevScopeState;
+    TaggedValue prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
 
     if (is_function_stateful(function))
@@ -156,7 +156,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     swap(&context->currentScopeState, &prevScopeState);
 
     // Write output
-    Value* outputDest = get_output(caller, 0);
+    TaggedValue* outputDest = get_output(caller, 0);
     if (outputDest != NULL)
         swap(outputs[0], outputDest);
 
@@ -273,7 +273,7 @@ void subroutine_check_to_append_implicit_return(Term* sub)
     post_compile_term(apply(contents, RETURN_FUNC, TermList(NULL)));
 }
 
-void store_locals(Branch& branch, Value* storageTv)
+void store_locals(Branch& branch, TaggedValue* storageTv)
 {
     touch(storageTv);
     set_list(storageTv);
@@ -291,7 +291,7 @@ void store_locals(Branch& branch, Value* storageTv)
     }
 }
 
-void restore_locals(Value* storageTv, Branch& branch)
+void restore_locals(TaggedValue* storageTv, Branch& branch)
 {
     if (!is_list(storageTv))
         internal_error("storageTv is not a list");
@@ -312,8 +312,8 @@ void restore_locals(Value* storageTv, Branch& branch)
     }
 }
 
-void call_subroutine(Branch& sub, Value* inputs, Value* output,
-                     Value* error)
+void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
+                     TaggedValue* error)
 {
     List* inputsList = List::checkCast(inputs);
     ca_assert(inputsList != NULL);
@@ -329,7 +329,7 @@ void call_subroutine(Branch& sub, Value* inputs, Value* output,
         set_string(error, context.errorMessage);
 }
 
-void call_subroutine(Term* sub, Value* inputs, Value* output, Value* error)
+void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)
 {
     return call_subroutine(sub->nestedContents, inputs, output, error);
 }

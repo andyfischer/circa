@@ -27,7 +27,7 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
     // Check if there is an errored() call listening to this term. If so, then save
     // the error as a value, but continue execution.
     if (has_an_error_listener(errorTerm)) {
-        Value* out = get_output(errorTerm, 0);
+        TaggedValue* out = get_output(errorTerm, 0);
         set_string(out, message);
         out->value_type = &ERROR_T;
         return;

@@ -3,7 +3,7 @@
 namespace circa {
 namespace common_type_callbacks {
 
-    int shallow_hash_func(Value* value)
+    int shallow_hash_func(TaggedValue* value)
     {
         return value->value_data.asint;
     }

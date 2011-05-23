@@ -15,7 +15,7 @@ namespace patch_with_dll_function {
         // TODO: check file signature
 
         const char* filename = STRING_INPUT(1);
-        Value error;
+        TaggedValue error;
         patch_with_dll(filename, *CALLER->owningBranch, &error);
 
         if (!is_null(&error))

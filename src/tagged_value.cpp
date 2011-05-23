@@ -9,152 +9,152 @@
 
 namespace circa {
 
-Value::Value()
+TaggedValue::TaggedValue()
 {
     debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
     init();
 }
 
 void
-Value::init()
+TaggedValue::init()
 {
     value_type = &NULL_T;
     value_data.ptr = 0;
 }
 
-Value::~Value()
+TaggedValue::~TaggedValue()
 {
     // Deallocate this value
     change_type(this, &NULL_T);
     debug_unregister_valid_object(this, TAGGED_VALUE_OBJECT);
 }
 
-Value::Value(Value const& original)
+TaggedValue::TaggedValue(TaggedValue const& original)
 {
     debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
 
     init();
 
-    copy(&const_cast<Value&>(original), this);
+    copy(&const_cast<TaggedValue&>(original), this);
 }
 
-Value&
-Value::operator=(Value const& rhs)
+TaggedValue&
+TaggedValue::operator=(TaggedValue const& rhs)
 {
-    copy(&const_cast<Value&>(rhs), this);
+    copy(&const_cast<TaggedValue&>(rhs), this);
     return *this;
 }
 
-Value::Value(Type* type)
+TaggedValue::TaggedValue(Type* type)
 {
     debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
     init();
     change_type(this, type);
 }
 
-void Value::reset()
+void TaggedValue::reset()
 {
     circa::reset(this);
 }
 
 std::string
-Value::toString()
+TaggedValue::toString()
 {
     return to_string(this);
 }
 
-Value*
-Value::getIndex(int index)
+TaggedValue*
+TaggedValue::getIndex(int index)
 {
     return get_index(this, index);
 }
 
-Value*
-Value::getField(const char* fieldName)
+TaggedValue*
+TaggedValue::getField(const char* fieldName)
 {
     return get_field(this, fieldName);
 }
 
-Value*
-Value::getField(std::string const& fieldName)
+TaggedValue*
+TaggedValue::getField(std::string const& fieldName)
 {
     return get_field(this, fieldName.c_str());
 }
 
 int
-Value::numElements()
+TaggedValue::numElements()
 {
     return num_elements(this);
 }
 
 bool
-Value::equals(Value* rhs)
+TaggedValue::equals(TaggedValue* rhs)
 {
     return circa::equals(this, rhs);
 }
 
-int Value::asInt()
+int TaggedValue::asInt()
 {
     return as_int(this);
 }
 
-float Value::asFloat()
+float TaggedValue::asFloat()
 {
     return as_float(this);
 }
 
-float Value::toFloat()
+float TaggedValue::toFloat()
 {
     return to_float(this);
 }
-const char* Value::asCString()
+const char* TaggedValue::asCString()
 {
     return as_string(this).c_str();
 }
 
-std::string const& Value::asString()
+std::string const& TaggedValue::asString()
 {
     return as_string(this);
 }
 
-bool Value::asBool()
+bool TaggedValue::asBool()
 {
     return as_bool(this);
 }
 
-Term* Value::asRef()
+Term* TaggedValue::asRef()
 {
     return as_ref(this);
 }
 
-Value Value::fromInt(int i)
+TaggedValue TaggedValue::fromInt(int i)
 {
-    Value tv;
+    TaggedValue tv;
     set_int(&tv, i);
     return tv;
 }
 
-Value Value::fromFloat(float f)
+TaggedValue TaggedValue::fromFloat(float f)
 {
-    Value tv;
+    TaggedValue tv;
     set_float(&tv, f);
     return tv;
 }
-Value Value::fromString(const char* s)
+TaggedValue TaggedValue::fromString(const char* s)
 {
-    Value tv;
+    TaggedValue tv;
     set_string(&tv, s);
     return tv;
 }
 
-Value Value::fromBool(bool b)
+TaggedValue TaggedValue::fromBool(bool b)
 {
-    Value tv;
+    TaggedValue tv;
     set_bool(&tv, b);
     return tv;
 }
 
-void cast(CastResult* result, Value* source, Type* type, Value* dest, bool checkOnly)
+void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
 {
     if (type->cast != NULL) {
         type->cast(result, source, type, dest, checkOnly);
@@ -176,21 +176,21 @@ void cast(CastResult* result, Value* source, Type* type, Value* dest, bool check
     result->success = true;
 }
 
-bool cast(Value* source, Type* type, Value* dest)
+bool cast(TaggedValue* source, Type* type, TaggedValue* dest)
 {
     CastResult result;
     cast(&result, source, type, dest, false);
     return result.success;
 }
 
-bool cast_possible(Value* source, Type* type)
+bool cast_possible(TaggedValue* source, Type* type)
 {
     CastResult result;
     cast(&result, source, type, NULL, true);
     return result.success;
 }
 
-void copy(Value* source, Value* dest)
+void copy(TaggedValue* source, TaggedValue* dest)
 {
     ca_assert(source);
     ca_assert(dest);
@@ -212,7 +212,7 @@ void copy(Value* source, Value* dest)
     dest->value_data = source->value_data;
 }
 
-void swap(Value* left, Value* right)
+void swap(TaggedValue* left, TaggedValue* right)
 {
     Type* temp_type = left->value_type;
     VariantValue temp_data = left->value_data;
@@ -228,7 +228,7 @@ void swap(Value* left, Value* right)
     #endif
 }
 
-void swap_or_copy(Value* left, Value* right, bool doSwap)
+void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)
 {
     if (doSwap)
         swap(left, right);
@@ -236,9 +236,9 @@ void swap_or_copy(Value* left, Value* right, bool doSwap)
         copy(left, right);
 }
 
-void reset(Value* value)
+void reset(TaggedValue* value)
 {
-    // Check for NULL. Most Value functions don't do this, but reset() is
+    // Check for NULL. Most TaggedValue functions don't do this, but reset() is
     // a convenient special case.
     if (value->value_type == NULL)
         return set_null(value);
@@ -246,9 +246,9 @@ void reset(Value* value)
     Type* type = value->value_type;
 
     // Check if there is a default value defined
-    Value* defaultValue = type_t::get_default_value(type);
-    if (defaultValue != NULL && !is_null(defaultValue) && defaultValue->value_type) {
-        copy(defaultValue, value);
+    TaggedValue* defaultTaggedValue = type_t::get_default_value(type);
+    if (defaultTaggedValue != NULL && !is_null(defaultTaggedValue) && defaultTaggedValue->value_type) {
+        copy(defaultTaggedValue, value);
         return;
     }
 
@@ -263,7 +263,7 @@ void reset(Value* value)
     change_type(value, type);
 }
 
-std::string to_string(Value* value)
+std::string to_string(TaggedValue* value)
 {
     if (value->value_type == NULL)
         return "<type is NULL>";
@@ -277,7 +277,7 @@ std::string to_string(Value* value)
     return out.str();
 }
 
-std::string to_string_annotated(Value* value)
+std::string to_string_annotated(TaggedValue* value)
 {
     if (value->value_type == NULL)
         return "<type is NULL>";
@@ -300,7 +300,7 @@ std::string to_string_annotated(Value* value)
     return out.str();
 }
 
-Value* get_index(Value* value, int index)
+TaggedValue* get_index(TaggedValue* value, int index)
 {
     Type::GetIndex getIndex = value->value_type->getIndex;
 
@@ -311,7 +311,7 @@ Value* get_index(Value* value, int index)
     return getIndex(value, index);
 }
 
-void set_index(Value* value, int index, Value* element)
+void set_index(TaggedValue* value, int index, TaggedValue* element)
 {
     Type::SetIndex setIndex = value->value_type->setIndex;
 
@@ -323,7 +323,7 @@ void set_index(Value* value, int index, Value* element)
     setIndex(value, index, element);
 }
 
-Value* get_field(Value* value, const char* field)
+TaggedValue* get_field(TaggedValue* value, const char* field)
 {
     Type::GetField getField = value->value_type->getField;
 
@@ -335,7 +335,7 @@ Value* get_field(Value* value, const char* field)
     return getField(value, field);
 }
 
-void set_field(Value* value, const char* field, Value* element)
+void set_field(TaggedValue* value, const char* field, TaggedValue* element)
 {
     Type::SetField setField = value->value_type->setField;
 
@@ -347,7 +347,7 @@ void set_field(Value* value, const char* field, Value* element)
     setField(value, field, element);
 }
 
-int num_elements(Value* value)
+int num_elements(TaggedValue* value)
 {
     Type::NumElements numElements = value->value_type->numElements;
 
@@ -358,7 +358,7 @@ int num_elements(Value* value)
     return numElements(value);
 }
 
-void touch(Value* value)
+void touch(TaggedValue* value)
 {
     Type::Touch touch = value->value_type->touch;
     if (touch != NULL)
@@ -367,7 +367,7 @@ void touch(Value* value)
     // Default behavior: no-op.
 }
 
-void change_type(Value* v, Type* type)
+void change_type(TaggedValue* v, Type* type)
 {
     // 'type' may be null
     ca_assert(v != NULL);
@@ -396,14 +396,14 @@ void change_type(Value* v, Type* type)
     }
 }
 
-void change_type_no_initialize(Value* v, Type* t)
+void change_type_no_initialize(TaggedValue* v, Type* t)
 {
     set_null(v);
     register_type_pointer(v, t);
     v->value_type = t;
 }
 
-bool equals(Value* lhs, Value* rhs)
+bool equals(TaggedValue* lhs, TaggedValue* rhs)
 {
     ca_assert(lhs->value_type != NULL);
 
@@ -420,57 +420,57 @@ bool equals(Value* lhs, Value* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
-Value* set_int(Value* value, int i)
+TaggedValue* set_int(TaggedValue* value, int i)
 {
     change_type(value, &INT_T);
     value->value_data.asint = i;
     return value;
 }
 
-void set_float(Value* value, float f)
+void set_float(TaggedValue* value, float f)
 {
     change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
-void set_string(Value* value, const char* s)
+void set_string(TaggedValue* value, const char* s)
 {
     change_type(value, &STRING_T);
     *((std::string*) value->value_data.ptr) = s;
 }
 
-void set_string(Value* value, std::string const& s)
+void set_string(TaggedValue* value, std::string const& s)
 {
     set_string(value, s.c_str());
 }
 
-void set_bool(Value* value, bool b)
+void set_bool(TaggedValue* value, bool b)
 {
     change_type(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
-void set_ref(Value* value, Term* t)
+void set_ref(TaggedValue* value, Term* t)
 {
     change_type(value, &REF_T);
     value->value_data.ptr = t;
 }
 
-List* set_list(Value* value)
+List* set_list(TaggedValue* value)
 {
     change_type(value, &NULL_T); // substitute for 'reset'
     change_type(value, &LIST_T);
     return List::checkCast(value);
 }
 
-List* set_list(Value* value, int size)
+List* set_list(TaggedValue* value, int size)
 {
     List* list = set_list(value);
     list->resize(size);
     return list;
 }
 
-void set_type(Value* value, Type* type)
+void set_type(TaggedValue* value, Type* type)
 {
     set_null(value);
     value->value_type = &TYPE_T;
@@ -478,81 +478,81 @@ void set_type(Value* value, Type* type)
     register_type_pointer(value, type);
 }
 
-void set_null(Value* value)
+void set_null(TaggedValue* value)
 {
     change_type(value, &NULL_T);
 }
-void set_opaque_pointer(Value* value, void* addr)
+void set_opaque_pointer(TaggedValue* value, void* addr)
 {
     change_type(value, &OPAQUE_POINTER_T);
     value->value_data.ptr = addr;
 }
 
-void set_pointer(Value* value, Type* type, void* p)
+void set_pointer(TaggedValue* value, Type* type, void* p)
 {
     value->value_type = type;
     value->value_data.ptr = p;
 }
 
-void set_pointer(Value* value, void* ptr)
+void set_pointer(TaggedValue* value, void* ptr)
 {
     value->value_data.ptr = ptr;
 }
 
-int as_int(Value* value)
+int as_int(TaggedValue* value)
 {
     ca_assert(is_int(value));
     return value->value_data.asint;
 }
 
-float as_float(Value* value)
+float as_float(TaggedValue* value)
 {
     ca_assert(is_float(value));
     return value->value_data.asfloat;
 }
 
-std::string const& as_string(Value* value)
+std::string const& as_string(TaggedValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return *((std::string*) value->value_data.ptr);
 }
 
-const char* as_cstring(Value* value)
+const char* as_cstring(TaggedValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return ((std::string*) value->value_data.ptr)->c_str();
 }
 
-bool as_bool(Value* value)
+bool as_bool(TaggedValue* value)
 {
     ca_assert(is_bool(value));
     return value->value_data.asbool;
 }
 
-Term* as_ref(Value* value)
+Term* as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));
     return (Term*) value->value_data.ptr;
 }
 
-Branch* as_branch_ref(Value* value)
+Branch* as_branch_ref(TaggedValue* value)
 {
     return branch_ref_function::deref(value);
 }
 
-void* as_opaque_pointer(Value* value)
+void* as_opaque_pointer(TaggedValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER);
     return value->value_data.ptr;
 }
 
-Type& as_type(Value* value)
+Type& as_type(TaggedValue* value)
 {
     ca_assert(is_type(value));
     return *((Type*) value->value_data.ptr);
 }
 
-void* get_pointer(Value* value)
+void* get_pointer(TaggedValue* value)
 {
     return value->value_data.ptr;
 }
@@ -564,7 +564,7 @@ const char* get_name_for_type(Type* type)
     else return type->name.c_str();
 }
 
-void* get_pointer(Value* value, Type* expectedType)
+void* get_pointer(TaggedValue* value, Type* expectedType)
 {
     if (value->value_type != expectedType) {
         std::stringstream strm;
@@ -576,71 +576,71 @@ void* get_pointer(Value* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-bool is_int(Value* value)
+bool is_int(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_INT;
 }
 
-bool is_error(Value* value)
+bool is_error(TaggedValue* value)
 {
     return value->value_type == &ERROR_T;
 }
 
-bool is_float(Value* value)
+bool is_float(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_FLOAT;
 }
 
-bool is_number(Value* value)
+bool is_number(TaggedValue* value)
 {
     return is_int(value) || is_float(value);
 }
 
-bool is_bool(Value* value)
+bool is_bool(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_BOOL;
 }
 
-bool is_string(Value* value)
+bool is_string(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_STRING;
 }
 
-bool is_ref(Value* value)
+bool is_ref(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_REF;
 }
 
-bool is_opaque_pointer(Value* value)
+bool is_opaque_pointer(TaggedValue* value)
 {
     return value->value_type == &OPAQUE_POINTER_T;
 }
 
-bool is_list(Value* value)
+bool is_list(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_LIST;
 }
 
-bool is_type(Value* value)
+bool is_type(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_TYPE;
 }
 
-bool is_value_of_type(Value* value, Type* type)
+bool is_value_of_type(TaggedValue* value, Type* type)
 {
     return value->value_type == type;
 }
 
-bool is_null(Value* value)
+bool is_null(TaggedValue* value)
 {
     return value->value_type == &NULL_T;
 }
-bool is_symbol(Value* value)
+bool is_symbol(TaggedValue* value)
 {
     return value->value_type == &SYMBOL_T;
 }
 
-float to_float(Value* value)
+float to_float(TaggedValue* value)
 {
     if (is_int(value))
         return (float) as_int(value);
@@ -650,7 +650,7 @@ float to_float(Value* value)
         throw std::runtime_error("In to_float, type is not an int or float");
 }
 
-int to_int(Value* value)
+int to_int(TaggedValue* value)
 {
     if (is_int(value))
         return as_int(value);

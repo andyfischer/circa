@@ -8,13 +8,13 @@ namespace circa {
 namespace cpp_type_wrapper {
 
     template <typename T>
-    T* get(Value* tv)
+    T* get(TaggedValue* tv)
     {
         return (T*) tv->value_data.ptr;
     }
 
     template <typename T>
-    std::string toString(Value* tv)
+    std::string toString(TaggedValue* tv)
     {
         return get<T>(tv)->toString();
     }
@@ -24,19 +24,19 @@ namespace cpp_type_wrapper {
 namespace heap_value_type_wrapper {
 
     template <typename T>
-    void initialize(Type* type, Value* value)
+    void initialize(Type* type, TaggedValue* value)
     {
         value->value_data.ptr = new T();
     }
 
     template <typename T>
-    void release(Value* value)
+    void release(TaggedValue* value)
     {
         delete (T*) value->value_data.ptr;
     }
 
     template <typename T>
-    void copy(Value* source, Value* dest)
+    void copy(TaggedValue* source, TaggedValue* dest)
     {
         *((T*) dest->value_data.ptr) = *((T*) source->value_data.ptr);
     }

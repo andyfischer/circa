@@ -6,8 +6,8 @@ namespace circa {
 namespace simple_handle_t {
     typedef void (*OnRelease)(int handle);
 
-    void set(Type* type, Value* value, int handle);
-    int get(Value* value);
+    void set(Type* type, TaggedValue* value, int handle);
+    int get(TaggedValue* value);
     void setup_type(Type* type);
 
 } // namespace simple_handle_t
