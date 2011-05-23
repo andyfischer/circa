@@ -399,24 +399,16 @@ namespace list_t {
             return query->succeed();
     }
 
-    bool tv_cast_possible(Type* type, Value* value)
+    void tv_visit_heap(Type*, Value* value, Type::VisitHeapCallback callback, void* userdata)
     {
-        if (!is_list(value))
-            return false;
-
-        Branch& prototype = type->prototype;
-        if (prototype.length() == 0)
-            return true;
-
-        int numElements = value->numElements();
-        if (prototype.length() != numElements)
-            return false;
-
-        for (int i=0; i < numElements; i++)
-            if (!circa::cast_possible(value->getIndex(i),
-                        unbox_type(prototype[i]->type)))
-                return false;
-        return true;
+        ListData* data = (ListData*) value->value_data.ptr;
+        if (data == NULL)
+            return;
+        Value relativeIdentifier;
+        for (int i=0; i < data->count; i++) {
+            set_int(&relativeIdentifier, i);
+            callback(userdata, &data->items[i], &relativeIdentifier);
+        }
     }
 
     void remove_and_replace_with_back(Value* value, int index)
@@ -444,6 +436,7 @@ namespace list_t {
         type->numElements = tv_num_elements;
         type->touch = tv_touch;
         type->staticTypeQuery = tv_static_type_query;
+        type->visitHeap = tv_visit_heap;
     }
 
     CA_FUNCTION(append)

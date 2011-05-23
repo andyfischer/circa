@@ -131,6 +131,7 @@ Type::Type() :
     checkInvariants(NULL),
     remapPointers(NULL),
     hashFunc(NULL),
+    visitHeap(NULL),
     parent(NULL),
     permanent(false),
     heapAllocated(false)
@@ -322,17 +323,19 @@ void reset_type(Type* type)
     type->reset = NULL;
     type->equals = NULL;
     type->cast = NULL;
-    type->remapPointers = NULL;
+    type->staticTypeQuery = NULL;
     type->toString = NULL;
     type->formatSource = NULL;
-    type->checkInvariants = NULL;
-    type->staticTypeQuery = NULL;
     type->touch = NULL;
     type->getIndex = NULL;
     type->setIndex = NULL;
     type->getField = NULL;
     type->setField = NULL;
     type->numElements = NULL;
+    type->checkInvariants = NULL;
+    type->remapPointers = NULL;
+    type->hashFunc = NULL;
+    type->visitHeap = NULL;
 
     clear_type_contents(type);
 }

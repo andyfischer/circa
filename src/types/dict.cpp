@@ -414,17 +414,32 @@ namespace tagged_value_wrappers {
     Value* get_field(Value* value, const char* field)
     {
         return dict_t::get_value((DictData*) value->value_data.ptr, field);
-
     }
+    void visit_heap(Type*, Value* value, Type::VisitHeapCallback callback, void* userdata)
+    {
+        DictData* data = (DictData*) value->value_data.ptr;
+        if (data == NULL)
+            return;
+        Value relativeIdentifier;
+        for (int i=0; i < data->capacity; i++) {
+            if (data->slots[i].key == NULL)
+                continue;
+            set_string(&relativeIdentifier, data->slots[i].key);
+            callback(userdata, &data->slots[i].value, &relativeIdentifier);
+        }
+    }
+
 } // namespace tagged_value_wrappers
 
 void setup_type(Type* type)
 {
+    reset_type(type);
     type->initialize = tagged_value_wrappers::initialize;
     type->release = tagged_value_wrappers::release;
     type->copy = tagged_value_wrappers::copy;
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
+    type->visitHeap = tagged_value_wrappers::visit_heap;
     type->name = "Dict";
 }
 

@@ -66,6 +66,10 @@ struct Type
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
     typedef int (*HashFunc)(Value* value);
+    typedef void (*VisitHeapCallback)(void* userdata, Value* value,
+            Value* relativeIdentifier);
+    typedef void (*VisitHeap)(Type* type, Value* value,
+            VisitHeapCallback callback, void* userdata);
 
     HeapTracker _heapTracker;
 
@@ -96,6 +100,7 @@ struct Type
     CheckInvariants checkInvariants;
     RemapPointers remapPointers;
     HashFunc hashFunc;
+    VisitHeap visitHeap;
 
     // Parent type, may be null.
     Type* parent;

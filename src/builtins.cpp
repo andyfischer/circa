@@ -115,8 +115,10 @@ Term* OPAQUE_POINTER_TYPE;
 
 // Builtin type objects:
 Type BOOL_T;
+Type BRANCH_T;
 Type DICT_T;
 Type ERROR_T;
+Type EVAL_CONTEXT_T;
 Type FLOAT_T;
 Type INT_T;
 Type LIST_T;

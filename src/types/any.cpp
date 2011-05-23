@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
+#include "type.h"
 
 namespace circa {
 namespace any_t {
