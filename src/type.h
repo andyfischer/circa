@@ -66,10 +66,10 @@ struct Type
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
     typedef int (*HashFunc)(TaggedValue* value);
-    typedef void (*VisitHeapCallback)(void* userdata, TaggedValue* value,
-            TaggedValue* relativeIdentifier);
+    typedef void (*VisitHeapCallback)(TaggedValue* value, TaggedValue* relativeIdentifier,
+            TaggedValue* context);
     typedef void (*VisitHeap)(Type* type, TaggedValue* value,
-            VisitHeapCallback callback, void* userdata);
+            VisitHeapCallback callback, TaggedValue* context);
 
     HeapTracker _heapTracker;
 

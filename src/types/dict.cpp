@@ -415,7 +415,7 @@ namespace tagged_value_wrappers {
     {
         return dict_t::get_value((DictData*) value->value_data.ptr, field);
     }
-    void visit_heap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, void* userdata)
+    void visit_heap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* context)
     {
         DictData* data = (DictData*) value->value_data.ptr;
         if (data == NULL)
@@ -425,7 +425,7 @@ namespace tagged_value_wrappers {
             if (data->slots[i].key == NULL)
                 continue;
             set_string(&relativeIdentifier, data->slots[i].key);
-            callback(userdata, &data->slots[i].value, &relativeIdentifier);
+            callback(&data->slots[i].value, &relativeIdentifier, context);
         }
     }
 

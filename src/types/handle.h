@@ -9,8 +9,12 @@ namespace handle_t {
 
     typedef void (*OnRelease)(TaggedValue* data);
 
-    void set(TaggedValue* container, Type* type, TaggedValue* data);
-    void set(TaggedValue* container, Type* type, void* opaquePointer);
+    // Initialize the given handle with a value. The value is consumed by this call.
+    void set(TaggedValue* handle, Type* type, TaggedValue* value /* consumed */);
+
+    // Convenience function to initalize a handle with an opaque pointer value.
+    void set(TaggedValue* handle, Type* type, void* opaquePointer);
+
     TaggedValue* get(TaggedValue* value);
     void* get_ptr(TaggedValue* value);
     void setup_type(Type* type);

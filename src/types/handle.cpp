@@ -1,5 +1,16 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+// The Handle type allows you to have a shared object which is deallocated
+// once all references to it are deleted.
+//
+// Using the 'set' function, you can create a handle value. The handle has
+// type Handle, and it points to a refcounted list of length 1. When handles
+// are copied, the list's refcount is updated.
+//
+// In the list is the 'userdata' value. This value is only initialized once,
+// when created, and released only when all of the handles are released.
+//
+
 #include "circa.h"
 
 #include "list_shared.h"
@@ -11,31 +22,31 @@
 namespace circa {
 namespace handle_t {
 
-    void set(TaggedValue* container, Type* type, TaggedValue* userdata)
+    void set(TaggedValue* handle, Type* type, TaggedValue* userdata)
     {
-        change_type_no_initialize(container, type);
-        container->value_data.ptr = allocate_list(1);
-        copy(userdata, list_get_element(container, 0));
+        change_type_no_initialize(handle, type);
+        handle->value_data.ptr = allocate_list(1);
+        swap(userdata, list_get_element(handle, 0));
 
         #if HANDLE_VERBOSE_LOG
-        ListData* data = (ListData*) container->value_data.ptr;
+        ListData* data = (ListData*) handle->value_data.ptr;
         std::cout << "initialized "
             << data
-            << " " << container->toString()
-            << " at " << container
+            << " " << handle->toString()
+            << " at " << handle
             << ", refcount = " << data->refCount
             << std::endl;
         #endif
     }
-    void set(TaggedValue* container, Type* type, void* opaquePointer)
+    void set(TaggedValue* handle, Type* type, void* opaquePointer)
     {
         TaggedValue value;
         set_opaque_pointer(&value, opaquePointer);
-        set(container, type, &value);
+        set(handle, type, &value);
     }
-    TaggedValue* get(TaggedValue* container)
+    TaggedValue* get(TaggedValue* handle)
     {
-        return list_get_element(container, 0);
+        return list_get_element(handle, 0);
     }
     void* get_ptr(TaggedValue* value)
     {
@@ -82,7 +93,6 @@ namespace handle_t {
                 << std::endl;
             #endif
 
-            
             free_list(data);
             value->value_data.ptr = NULL;
         }
@@ -105,14 +115,21 @@ namespace handle_t {
             << data->refCount << std::endl;
         #endif
     }
-
+    void visitHeap(Type* type, TaggedValue* handle, Type::VisitHeapCallback callback,
+            TaggedValue* context)
+    {
+        TaggedValue relativeIdentifier;
+        set_int(&relativeIdentifier, 0);
+        callback(list_get_element(handle, 0), &relativeIdentifier, context);
+    }
     void setup_type(Type* type)
     {
         type->name = "handle";
+        type->storageType = STORAGE_TYPE_LIST;
         type->initialize = initialize;
         type->release = release;
         type->copy = copy;
-        type->storageType = STORAGE_TYPE_LIST;
+        type->visitHeap = visitHeap;
         type->toString = list_t::tv_to_string;
     }
 

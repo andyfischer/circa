@@ -399,7 +399,7 @@ namespace list_t {
             return query->succeed();
     }
 
-    void tv_visit_heap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, void* userdata)
+    void tv_visit_heap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* context)
     {
         ListData* data = (ListData*) value->value_data.ptr;
         if (data == NULL)
@@ -407,7 +407,7 @@ namespace list_t {
         TaggedValue relativeIdentifier;
         for (int i=0; i < data->count; i++) {
             set_int(&relativeIdentifier, i);
-            callback(userdata, &data->items[i], &relativeIdentifier);
+            callback(&data->items[i], &relativeIdentifier, context);
         }
     }
 
