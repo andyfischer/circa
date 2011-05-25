@@ -26,7 +26,8 @@ struct TaggedValue
     TaggedValue(Type* type);
     TaggedValue& operator=(TaggedValue const& rhs);
 
-    void init();
+    void initializeNull();
+
     void reset();
     std::string toString();
     inline TaggedValue* operator[](int index) { return getIndex(index); }
@@ -130,12 +131,18 @@ bool is_ref(TaggedValue* value);
 bool is_opaque_pointer(TaggedValue* value);
 bool is_list(TaggedValue* value);
 bool is_type(TaggedValue* value);
-bool is_value_of_type(TaggedValue* value, Type* type);
 bool is_null(TaggedValue* value);
 bool is_symbol(TaggedValue* value);
 
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);
+
+// A 'transient' value is a tagged value that is not initialized/released by the
+// type. When the caller is finished with it, it must be set to null using
+// cleanup_transient_value(). The caller must guarantee that the value will stay
+// valid in between these two calls.
+void set_transient_value(TaggedValue* value, void* v, Type* t);
+void cleanup_transient_value(TaggedValue* value);
 
 #if CIRCA_ENABLE_TAGGED_VALUE_METADATA
 

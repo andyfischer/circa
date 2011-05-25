@@ -47,8 +47,8 @@ Hashtable* create_table(int capacity)
     result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
     for (int s=0; s < capacity; s++) {
-        result->slots[s].key.init();
-        result->slots[s].value.init();
+        result->slots[s].key.initializeNull();
+        result->slots[s].value.initializeNull();
     }
     return result;
 }

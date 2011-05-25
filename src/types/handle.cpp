@@ -52,6 +52,11 @@ namespace handle_t {
     {
         return as_opaque_pointer(get(value));
     }
+    int refcount(TaggedValue* value)
+    {
+        ListData* data = (ListData*) value->value_data.ptr;
+        return data->refCount;
+    }
 
     void initialize(Type* type, TaggedValue* value)
     {

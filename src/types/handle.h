@@ -17,6 +17,7 @@ namespace handle_t {
 
     TaggedValue* get(TaggedValue* value);
     void* get_ptr(TaggedValue* value);
+    int refcount(TaggedValue* value);
     void setup_type(Type* type);
 
     template <typename T>

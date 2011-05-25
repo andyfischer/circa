@@ -49,7 +49,7 @@ DictData* create_dict(int capacity)
     result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
     for (int s=0; s < capacity; s++)
-        result->slots[s].value.init();
+        result->slots[s].value.initializeNull();
     return result;
 }
 

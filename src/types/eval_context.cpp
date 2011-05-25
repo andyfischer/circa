@@ -3,9 +3,27 @@
 namespace circa {
 namespace eval_context_t {
 
-    void visitHeap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* context)
+    EvalContext* get(TaggedValue* value)
     {
-        // TODO
+        return ((EvalContext*) value->value_data.ptr);
+    }
+
+    void visitHeap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* visitContext)
+    {
+        EvalContext* context = get(value);
+        TaggedValue relIdent;
+
+        set_string(&relIdent, "subroutineOutput");
+        callback(&context->subroutineOutput, &relIdent, visitContext);
+
+        set_string(&relIdent, "state");
+        callback(&context->state, &relIdent, visitContext);
+
+        set_string(&relIdent, "currentScopeState");
+        callback(&context->currentScopeState, &relIdent, visitContext);
+
+        set_string(&relIdent, "messages");
+        callback(&context->messages, &relIdent, visitContext);
     }
 
     void setup_type(Type* type)

@@ -61,10 +61,57 @@ void test_count_references()
     test_equals(count_references_to_pointer(&tree, &myobject), 13);
 }
 
+void test_count_references_across_eval_context()
+{
+    int myobject;
+    TaggedValue handle;
+    handle_t::set(&handle, &HANDLE_T, &myobject);
+
+    // Copy this handle to various places on Branch
+    {
+        Branch branch;
+        branch.locals.resize(1);
+        copy(&handle, branch.locals[0]);
+
+        branch.localsStack.resize(1);
+        copy(&handle, branch.localsStack[0]);
+
+        copy(&handle, &branch.staticErrors);
+        copy(&handle, &branch.pendingUpdates);
+
+        TaggedValue root;
+        set_transient_value(&root, &branch, &BRANCH_T);
+        test_equals(count_references_to_pointer(&root, &myobject), 4);
+        test_equals(handle_t::refcount(&handle), 5);
+        cleanup_transient_value(&root);
+    }
+    test_equals(handle_t::refcount(&handle), 1);
+
+    // Copy this handle to various places on EvalContext
+    {
+        EvalContext context;
+
+        copy(&handle, &context.subroutineOutput);
+        Dict& state = *Dict::cast(&context.state);
+        copy(&handle, state.insert("apple"));
+        Dict& currentScopeState = *Dict::cast(&context.currentScopeState);
+        copy(&handle, currentScopeState.insert("banana"));
+        copy(&handle, context.messages.insert("cat"));
+
+        TaggedValue root;
+        set_transient_value(&root, &context, &EVAL_CONTEXT_T);
+        test_equals(count_references_to_pointer(&root, &myobject), 4);
+        test_equals(handle_t::refcount(&handle), 5);
+        cleanup_transient_value(&root);
+    }
+    test_equals(handle_t::refcount(&handle), 1);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(gc_tests::test_visit_heap);
     REGISTER_TEST_CASE(gc_tests::test_count_references);
+    REGISTER_TEST_CASE(gc_tests::test_count_references_across_eval_context);
 }
 
 } // namesapce gc_tests

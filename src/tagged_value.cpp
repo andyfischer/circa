@@ -12,11 +12,11 @@ namespace circa {
 TaggedValue::TaggedValue()
 {
     debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
-    init();
+    initializeNull();
 }
 
 void
-TaggedValue::init()
+TaggedValue::initializeNull()
 {
     value_type = &NULL_T;
     value_data.ptr = 0;
@@ -33,7 +33,7 @@ TaggedValue::TaggedValue(TaggedValue const& original)
 {
     debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
 
-    init();
+    initializeNull();
 
     copy(&const_cast<TaggedValue&>(original), this);
 }
@@ -48,7 +48,7 @@ TaggedValue::operator=(TaggedValue const& rhs)
 TaggedValue::TaggedValue(Type* type)
 {
     debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
-    init();
+    initializeNull();
     change_type(this, type);
 }
 
@@ -613,7 +613,7 @@ bool is_ref(TaggedValue* value)
 
 bool is_opaque_pointer(TaggedValue* value)
 {
-    return value->value_type == &OPAQUE_POINTER_T;
+    return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER;
 }
 
 bool is_list(TaggedValue* value)
@@ -624,11 +624,6 @@ bool is_list(TaggedValue* value)
 bool is_type(TaggedValue* value)
 {
     return value->value_type->storageType == STORAGE_TYPE_TYPE;
-}
-
-bool is_value_of_type(TaggedValue* value, Type* type)
-{
-    return value->value_type == type;
 }
 
 bool is_null(TaggedValue* value)
@@ -660,4 +655,15 @@ int to_int(TaggedValue* value)
         throw std::runtime_error("In to_float, type is not an int or float");
 }
 
+void set_transient_value(TaggedValue* value, void* data, Type* type)
+{
+    set_null(value);
+    value->value_data.ptr = data;
+    value->value_type = type;
 }
+void cleanup_transient_value(TaggedValue* value)
+{
+    value->initializeNull();
+}
+
+} // namespace circa

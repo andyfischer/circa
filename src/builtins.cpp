@@ -8,10 +8,12 @@
 #include "heap_debugging.h"
 #include "types/any.h"
 #include "types/bool.h"
+#include "types/branch.h"
 #include "types/callable.h"
 #include "types/color.h"
 #include "types/common.h"
 #include "types/dict.h"
+#include "types/eval_context.h"
 #include "types/float.h"
 #include "types/handle.h"
 #include "types/indexable.h"
@@ -155,7 +157,9 @@ void create_primitive_types()
 {
     null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
+    branch_t::setup_type(&BRANCH_T);
     dict_t::setup_type(&DICT_T);
+    eval_context_t::setup_type(&EVAL_CONTEXT_T);
     float_t::setup_type(&FLOAT_T);
     handle_t::setup_type(&HANDLE_T);
     int_t::setup_type(&INT_T);
