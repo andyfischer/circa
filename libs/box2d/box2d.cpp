@@ -39,6 +39,7 @@ struct BodyHandle
     ~BodyHandle() {
         if (g_world == NULL)
             return;
+        std::cout << "Destroyed " << body << std::endl;
         g_world->DestroyBody(body);
     }
 };
@@ -110,6 +111,7 @@ CA_FUNCTION(create_body)
     BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_bodyHandle_t);
 
     bodyHandle->body = g_world->CreateBody(&bodyDef);
+    std::cout << "Created " << bodyHandle->body << std::endl;
 }
 
 CA_FUNCTION(set_body_fixtures)

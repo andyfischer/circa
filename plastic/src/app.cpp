@@ -169,7 +169,6 @@ bool initialize()
     return load_runtime(*g_app->_runtimeBranch);
 }
 
-
 bool setup_functions(circa::Branch& runtime)
 {
     circa::Branch& branch = app::runtime_branch();
@@ -218,11 +217,21 @@ bool evaluate_main_script()
 {
     App* app = g_app;
 
+    for (size_t i=0; i < app->preFrameCallbacks.size(); i++) {
+        App::OnFrameCallback& callback = app->preFrameCallbacks[i];
+        callback.func(callback.userdata, app, 0);
+    }
+
     circa::EvalContext* context = &app->_evalContext;
 
     circa::clear_error(context);
 
     circa::evaluate_branch_no_preserve_locals(&app->_evalContext, app::runtime_branch());
+
+    for (size_t i=0; i < app->preFrameCallbacks.size(); i++) {
+        App::OnFrameCallback& callback = app->postFrameCallbacks[i];
+        callback.func(callback.userdata, app, 1);
+    }
 
     if (app->_evalContext.errorOccurred) {
         std::stringstream msg;

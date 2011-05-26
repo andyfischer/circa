@@ -8,6 +8,13 @@ namespace app {
 
 struct App {
 
+    typedef void (*OnFrameCallbackFunc)(void* userdata, App* app, int event);
+
+    struct OnFrameCallback {
+        OnFrameCallbackFunc func;
+        void* userdata;
+    };
+
     circa::Branch* _runtimeBranch;
     circa::Branch* _usersBranch;
 
@@ -30,6 +37,9 @@ struct App {
 
     int _windowWidth;
     int _windowHeight;
+
+    std::vector<OnFrameCallback> preFrameCallbacks;
+    std::vector<OnFrameCallback> postFrameCallbacks;
 
     App()
       : _runtimeBranch(NULL),

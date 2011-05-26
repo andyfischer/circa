@@ -25,7 +25,9 @@ namespace box2d
         "Intersection test, returns true if the given point is inside the body"
 
     def fixed_rect(Point location, number rotation, Point size) -> any
-        state handle = create_body(body_type:static, location, rotation)
+        state handle = null
+        if handle == null
+            handle = create_body(body_type:static, location, rotation)
         if changed(size)
             set_body_fixtures(handle, [[shape_type:rect size 0 0 0]])
         if changed(location)
