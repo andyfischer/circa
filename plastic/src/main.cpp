@@ -9,7 +9,7 @@ int main( int argc, char* args[] )
 {
     circa_storage_use_filesystem();
 
-    app::singleton()._binaryFilename = args[0];
+    app::get_global_app()._binaryFilename = args[0];
 
     std::vector<std::string> argv;
 

@@ -13,66 +13,68 @@
 #include "text.h"
 #include "textures.h"
 
-// For now, include the 3rd party bindings by source. Should be refactored.
+// For now, include the 3rd party bindings by source. Long term plan is for these
+// to each be compiled as a separate module.
 #include "../libs/box2d/box2d.cpp"
 #include "../libs/fmod/fmod.cpp"
 #include "../libs/osc/osc.cpp"
 
 namespace app {
 
-App& singleton()
-{
-    static App* obj = new App();
-    return *obj;
-}
+App* g_app = NULL;
 
 void
 App::setScriptFilename(const std::string& filename)
 {
     _initialScriptFilename = filename;
 }
+App& get_global_app()
+{
+    if (g_app == NULL) g_app = new App();
+    return *g_app;
+}
 
 circa::Branch& runtime_branch()
 {
-    return *singleton()._runtimeBranch;
+    return *g_app->_runtimeBranch;
 }
 
 circa::Branch& users_branch()
 {
-    return *singleton()._usersBranch;
+    return *g_app->_usersBranch;
 }
 
 bool paused()
 {
-    return singleton()._pauseStatus.paused;
+    return g_app->_pauseStatus.paused;
 }
 
 PauseStatus::Reason pause_reason()
 {
-    return singleton()._pauseStatus.reason;
+    return g_app->_pauseStatus.reason;
 }
 
 bool continue_main_loop()
 {
-    return singleton()._continueMainLoop;
+    return g_app->_continueMainLoop;
 }
 
 void pause(PauseStatus::Reason reason)
 {
-    singleton()._pauseStatus.paused = true;
-    singleton()._pauseStatus.reason = reason;
+    g_app->_pauseStatus.paused = true;
+    g_app->_pauseStatus.reason = reason;
 }
 
 void unpause()
 {
-    singleton()._pauseStatus.paused = false;
-    singleton()._pauseStatus.reason = PauseStatus::NONE;
+    g_app->_pauseStatus.paused = false;
+    g_app->_pauseStatus.reason = PauseStatus::NONE;
 }
 
 void update_window_dimensions(int width, int height)
 {
-    singleton()._windowWidth = width;
-    singleton()._windowHeight = height;
+    g_app->_windowWidth = width;
+    g_app->_windowHeight = height;
 }
 
 void info(std::string const& msg)
@@ -110,7 +112,7 @@ std::string get_home_directory()
 {
     char* circa_home = getenv("CIRCA_HOME");
     if (circa_home == NULL) {
-        return circa::get_directory_for_filename(app::singleton()._binaryFilename);
+        return circa::get_directory_for_filename(g_app->_binaryFilename);
     } else {
         return std::string(circa_home) + "/plastic";
     }
@@ -148,7 +150,7 @@ bool load_runtime(circa::Branch& runtime)
     setup_functions(app::runtime_branch());
 
     circa::Term* users_branch = runtime["users_branch"];
-    app::singleton()._usersBranch = &users_branch->nestedContents;
+    g_app->_usersBranch = &users_branch->nestedContents;
 
     return true;
 }
@@ -157,14 +159,14 @@ bool initialize()
 {
     circa_initialize();
 
+    get_global_app();
+
     // Patch the trace() function to use our own logging.
     install_function(circa::get_global("print"), trace);
     install_function(circa::get_global("trace"), trace);
 
-    App& app = app::singleton();
-
-    app._runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
-    return load_runtime(*app._runtimeBranch);
+    g_app->_runtimeBranch = &create_branch(*circa::KERNEL, "plastic_main");
+    return load_runtime(*g_app->_runtimeBranch);
 }
 
 
@@ -206,15 +208,16 @@ bool reload_runtime()
         return false;
 
     // Write window width & height
-    set_int(app::runtime_branch()["window"]->getField("width"), app::singleton()._windowWidth);
-    set_int(app::runtime_branch()["window"]->getField("height"), app::singleton()._windowHeight);
+    set_int(app::runtime_branch()["window"]->getField("width"), g_app->_windowWidth);
+    set_int(app::runtime_branch()["window"]->getField("height"), g_app->_windowHeight);
 
     return true;
 }
 
 bool evaluate_main_script()
 {
-    App* app = &app::singleton();
+    App* app = g_app;
+
     circa::EvalContext* context = &app->_evalContext;
 
     circa::clear_error(context);
@@ -241,7 +244,7 @@ void update_time_from_elapsed_millis(int elapsed_millis)
     previousMillis = elapsed_millis;
 
     if (!app::paused()) {
-        app::singleton()._ticksElapsed += ticksAdvanced;
+        g_app->_ticksElapsed += ticksAdvanced;
     }
 }
 

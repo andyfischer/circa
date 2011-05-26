@@ -32,7 +32,7 @@ void main_loop()
 
     // Evaluate script
     if (!app::paused()) {
-        app::singleton()._ticksElapsed += ticksAdvanced;
+        app::get_global_app()._ticksElapsed += ticksAdvanced;
     }
 
     display::reset_for_new_frame();
@@ -42,7 +42,7 @@ void main_loop()
     long new_ticks = SDL_GetTicks();
 
     // Delay to limit framerate
-    const long ticks_per_second = long(1.0 / app::singleton()._targetFps * 1000);
+    const long ticks_per_second = long(1.0 / app::get_global_app()._targetFps * 1000);
     if ((new_ticks - ticks) < ticks_per_second) {
         long delay = ticks_per_second - (new_ticks - ticks);
         SDL_Delay(delay);
@@ -71,7 +71,7 @@ int plastic_main(std::vector<std::string> args)
 
     // -p to print raw compiled code
     if (arg0 == "-p") {
-        app::singleton().setScriptFilename(args[1]);
+        app::get_global_app().setScriptFilename(args[1]);
 
         EvalContext cxt;
         include_function::preload_script(app::users_branch().owningTerm);
@@ -82,7 +82,7 @@ int plastic_main(std::vector<std::string> args)
 
     // -tr to do a test run of a script, without creating a display.
     if (arg0 == "-tr") {
-        app::singleton().setScriptFilename(args[1]);
+        app::get_global_app().setScriptFilename(args[1]);
 
         if (has_static_errors(app::users_branch())) {
             print_static_errors_formatted(app::users_branch(), std::cout);
@@ -99,7 +99,7 @@ int plastic_main(std::vector<std::string> args)
     // Normal operation, load the script file in argument 0.
     std::string filename = arg0;
 
-    app::singleton().setScriptFilename(filename);
+    app::get_global_app().setScriptFilename(filename);
 
     if (has_static_errors(app::users_branch())) {
         print_static_errors_formatted(app::users_branch(), std::cout);

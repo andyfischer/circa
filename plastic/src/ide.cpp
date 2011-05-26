@@ -14,18 +14,18 @@ namespace ide {
 
 CA_FUNCTION(script_filename)
 {
-    set_string(OUTPUT, app::singleton()._initialScriptFilename);
+    set_string(OUTPUT, app::get_global_app()._initialScriptFilename);
 }
 
 CA_FUNCTION(quit)
 {
-    app::singleton()._continueMainLoop = false;
+    app::get_global_app()._continueMainLoop = false;
 }
 
 CA_FUNCTION(reset_state)
 {
     // no worky
-    //set_null(&app::singleton()._evalContext.state);
+    //set_null(&app::get_global_app()._evalContext.state);
 }
 
 CA_FUNCTION(hosted_reload_runtime)
@@ -40,7 +40,7 @@ CA_FUNCTION(paused)
 
 CA_FUNCTION(get_time)
 {
-    set_float(OUTPUT, app::singleton()._ticksElapsed / 1000.0);
+    set_float(OUTPUT, app::get_global_app()._ticksElapsed / 1000.0);
 }
 
 void setup(circa::Branch& branch)

@@ -45,8 +45,7 @@ struct App {
     void setScriptFilename(const std::string& filename);
 };
 
-App& singleton();
-
+App& get_global_app();
 circa::Branch& runtime_branch();
 circa::Branch& users_branch();
 bool paused();

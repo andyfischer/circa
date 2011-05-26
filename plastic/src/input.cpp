@@ -90,7 +90,7 @@ void capture_events()
 
         switch (event.type) {
         case SDL_QUIT:
-            app::singleton()._continueMainLoop = false;
+            app::get_global_app()._continueMainLoop = false;
             break;
 
         case SDL_VIDEORESIZE:
@@ -145,7 +145,7 @@ void handle_key_press(SDL_Event &event, int key)
     if (!controlPressed) {
         switch (key) {
         case SDLK_ESCAPE:
-            app::singleton()._continueMainLoop = false;
+            app::get_global_app()._continueMainLoop = false;
             break;
         default: break;
         }
@@ -160,7 +160,7 @@ void handle_key_press(SDL_Event &event, int key)
             break;
 
         case SDLK_e:
-            set_null(&app::singleton()._evalContext.state);
+            set_null(&app::get_global_app()._evalContext.state);
             break;
 
         case SDLK_r:
@@ -179,11 +179,11 @@ void handle_key_press(SDL_Event &event, int key)
 
         // toggle low-power mode
         case SDLK_l: {
-            if (app::singleton()._targetFps == 6)
-                app::singleton()._targetFps = 60;
+            if (app::get_global_app()._targetFps == 6)
+                app::get_global_app()._targetFps = 60;
             else
-                app::singleton()._targetFps = 6;
-            std::cout << "target FPS = " << app::singleton()._targetFps << std::endl;
+                app::get_global_app()._targetFps = 6;
+            std::cout << "target FPS = " << app::get_global_app()._targetFps << std::endl;
             break;
         }
 
