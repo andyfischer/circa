@@ -116,7 +116,8 @@ namespace handle_t {
         #if HANDLE_VERBOSE_LOG
         std::cout << "copied " << data
             << " " << source->toString()
-            << " from " << source << " to " << dest << ", refCount = "
+            << " from $" << source << " to $" << dest
+            << ", refCount = "
             << data->refCount << std::endl;
         #endif
     }

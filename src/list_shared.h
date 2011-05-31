@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
+#include "gc.h"
 #include "tagged_value.h"
 
 namespace circa {

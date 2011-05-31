@@ -3,6 +3,8 @@
 #include "Box2D/Box2D.h"
 
 #include "circa.h"
+#include "gc.h"
+#include "list_shared.h"
 #include "types/handle.h"
 
 using namespace circa;
@@ -32,15 +34,26 @@ float unit_angles_to_radians(float unit) { return unit * M_PI; }
 // The BodyHandle type is used to hold on to b2Body objects.
 Type g_bodyHandle_t;
 
+GcHeap g_gcHeap;
+
 struct BodyHandle
 {
+    GcHeader gcHeader;
     b2Body* body;
-    BodyHandle() : body(NULL) {}
+    ListData* containingList;
+    int globalIndex;
+
+    BodyHandle() : body(NULL), containingList(NULL)
+    {
+        initialize_new_gc_object(&g_gcHeap, &gcHeader);
+    }
+
     ~BodyHandle() {
         if (g_world == NULL)
             return;
         std::cout << "Destroyed " << body << std::endl;
         g_world->DestroyBody(body);
+        remove_gc_object(&g_gcHeap, &gcHeader);
     }
 };
 
@@ -109,8 +122,10 @@ CA_FUNCTION(create_body)
     bodyDef.angle = unit_angles_to_radians(initialRotation);
 
     BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_bodyHandle_t);
+    bodyHandle->containingList = (ListData*) OUTPUT->value_data.ptr;
 
     bodyHandle->body = g_world->CreateBody(&bodyDef);
+
     std::cout << "Created " << bodyHandle->body << std::endl;
 }
 
@@ -268,6 +283,52 @@ CA_FUNCTION(body_contains_point)
     set_bool(OUTPUT, false);
 }
 
+void run_global_refcount_check()
+{
+    std::cout << "run_global_refcount_check" << std::endl;
+
+    TaggedValue evalContext;
+    TaggedValue usersBranch;
+    TaggedValue runtimeBranch;
+        
+    app::App* app = &app::get_global_app();
+    set_transient_value(&evalContext, &app->_evalContext, &EVAL_CONTEXT_T);
+    set_transient_value(&usersBranch, app->_usersBranch, &BRANCH_T);
+    set_transient_value(&runtimeBranch, app->_runtimeBranch, &BRANCH_T);
+
+    //recursive_dump_heap(&evalContext, "evalContext");
+    //recursive_dump_heap(&usersBranch, "usersBranch");
+    //recursive_dump_heap(&runtimeBranch, "runtimeBranch");
+
+    BodyHandle* handle = (BodyHandle*) g_gcHeap.firstObject;
+    while (handle != NULL) {
+
+        std::cout << "looking at " << handle->containingList
+            << " with refcount " << handle->containingList->refCount
+            << std::endl;
+
+        List references;
+        list_references_to_pointer(&evalContext, handle, &references);
+        list_references_to_pointer(&usersBranch, handle, &references);
+        list_references_to_pointer(&runtimeBranch, handle, &references);
+
+        for (int i=0; i < references.length(); i++)
+            std::cout << references[i]->asString() << std::endl;
+
+        handle = (BodyHandle*) handle->gcHeader.next;
+    }
+
+    cleanup_transient_value(&evalContext);
+    cleanup_transient_value(&usersBranch);
+    cleanup_transient_value(&runtimeBranch);
+}
+
+void on_frame_callback(void* userdata, app::App* app, int step)
+{
+    run_global_refcount_check();
+    //std::cout << "post_frame: " << app->_evalContext.state.toString() << std::endl;
+}
+
 void setup(Branch& kernel)
 {
     handle_t::setup_type<BodyHandle>(&g_bodyHandle_t);
@@ -285,6 +346,9 @@ void setup(Branch& kernel)
     install_function(ns["set_body_position"], set_body_position);
     install_function(ns["set_body_rotation"], set_body_rotation);
     install_function(ns["body_contains_point"], body_contains_point);
+
+    //app::get_global_app().addPreFrameCallback(on_frame_callback, NULL);
+    app::get_global_app().addPostFrameCallback(on_frame_callback, NULL);
 }
 
 } // box2d_support

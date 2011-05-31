@@ -23,16 +23,34 @@ namespace app {
 
 App* g_app = NULL;
 
-void
-App::setScriptFilename(const std::string& filename)
-{
-    _initialScriptFilename = filename;
-}
 App& get_global_app()
 {
     if (g_app == NULL) g_app = new App();
     return *g_app;
 }
+
+void shutdown()
+{
+    delete g_app;
+    g_app = NULL;
+}
+
+void
+App::setScriptFilename(const std::string& filename)
+{
+    _initialScriptFilename = filename;
+}
+void
+App::addPreFrameCallback(OnFrameCallbackFunc func, void* userdata)
+{
+    preFrameCallbacks.push_back(OnFrameCallback(func, userdata));
+}
+void
+App::addPostFrameCallback(OnFrameCallbackFunc func, void* userdata)
+{
+    postFrameCallbacks.push_back(OnFrameCallback(func, userdata));
+}
+
 
 circa::Branch& runtime_branch()
 {
@@ -228,7 +246,7 @@ bool evaluate_main_script()
 
     circa::evaluate_branch_no_preserve_locals(&app->_evalContext, app::runtime_branch());
 
-    for (size_t i=0; i < app->preFrameCallbacks.size(); i++) {
+    for (size_t i=0; i < app->postFrameCallbacks.size(); i++) {
         App::OnFrameCallback& callback = app->postFrameCallbacks[i];
         callback.func(callback.userdata, app, 1);
     }

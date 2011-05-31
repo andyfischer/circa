@@ -50,6 +50,11 @@ DictData* create_dict(int capacity)
     memset(result->slots, 0, capacity * sizeof(Slot));
     for (int s=0; s < capacity; s++)
         result->slots[s].value.initializeNull();
+
+    #if VERBOSE_LOG
+    std::cout << "create_dict: " << result << std::endl;
+    #endif
+
     return result;
 }
 
@@ -68,6 +73,10 @@ void free_dict(DictData* data)
         set_null(&data->slots[i].value);
     }
     free(data);
+
+    #if VERBOSE_LOG
+    std::cout << "free_dict: " << data << std::endl;
+    #endif
 }
 
 DictData* grow(DictData* data, int new_capacity)
@@ -87,6 +96,8 @@ DictData* grow(DictData* data, int new_capacity)
 
         int index = insert(&new_data, old_slot->key);
         swap(&old_slot->value, &new_data->slots[index].value);
+
+        ca_assert(is_null(&old_slot->value));
     }
     return new_data;
 }
@@ -278,6 +289,10 @@ void clear(DictData* data)
         set_null(&slot->value);
     }
     data->count = 0;
+
+    #if VERBOSE_LOG
+    std::cout << "clear_dict: " << data << std::endl;
+    #endif
 }
 
 struct SortedVisitItem {

@@ -113,6 +113,7 @@ int plastic_main(std::vector<std::string> args)
         main_loop();
 
     display::teardown_display();
+    app::shutdown();
 
     return 0;
 }

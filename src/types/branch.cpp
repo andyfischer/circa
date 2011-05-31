@@ -30,6 +30,22 @@ namespace branch_t {
 
         set_string(&relIdent, "pendingUpdates");
         callback(&branch.pendingUpdates, &relIdent, context);
+
+        for (int i=0; i < branch.length(); i++) {
+            Term* term = branch[i];
+            std::stringstream ident;
+            ident << "term[" << i << "]";
+            set_string(&relIdent, ident.str());
+            callback(term, &relIdent, context);
+
+            ident << ".nestedContents";
+            set_string(&relIdent, ident.str());
+    
+            TaggedValue nestedContents;
+            set_transient_value(&nestedContents, &term->nestedContents, &BRANCH_T);
+            callback(&nestedContents, &relIdent, context);
+            cleanup_transient_value(&nestedContents);
+        }
     }
 
     void setup_type(Type* type)

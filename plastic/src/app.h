@@ -13,6 +13,8 @@ struct App {
     struct OnFrameCallback {
         OnFrameCallbackFunc func;
         void* userdata;
+
+        OnFrameCallback(OnFrameCallbackFunc f, void* u) : func(f), userdata(u) {}
     };
 
     circa::Branch* _runtimeBranch;
@@ -53,6 +55,9 @@ struct App {
     }
 
     void setScriptFilename(const std::string& filename);
+
+    void addPreFrameCallback(OnFrameCallbackFunc func, void* userdata);
+    void addPostFrameCallback(OnFrameCallbackFunc func, void* userdata);
 };
 
 App& get_global_app();
@@ -76,8 +81,8 @@ bool setup_functions(circa::Branch& runtime);
 bool reload_runtime();
 
 bool initialize();
+void shutdown();
 bool evaluate_main_script();
 void update_time_from_elapsed_millis(int elapsed_millis);
-//bool reload_runtime();
 
 } // namespace app

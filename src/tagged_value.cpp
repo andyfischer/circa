@@ -221,11 +221,6 @@ void swap(TaggedValue* left, TaggedValue* right)
     right->value_type = temp_type;
     right->value_data = temp_data;
 
-    #if CIRCA_ENABLE_TAGGED_VALUE_METADATA
-    std::string temp_note = left->metadata_note;
-    left->metadata_note = right->metadata_note;
-    right->metadata_note = temp_note;
-    #endif
 }
 
 void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)

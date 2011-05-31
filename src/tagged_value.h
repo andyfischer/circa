@@ -6,19 +6,11 @@
 
 namespace circa {
 
+
 struct TaggedValue
 {
     VariantValue value_data;
     Type* value_type;
-
-    #if CIRCA_ENABLE_TAGGED_VALUE_METADATA
-    // This metadata is only enabled in debug/test builds.
-    //
-    // The 'note' is a string describing the purpose of this value. For a temporary
-    // value it should describe the location it shows up, for a non-temporary, it
-    // should describe the owner and the context.
-    std::string metadata_note;
-    #endif
 
     TaggedValue();
     ~TaggedValue();
@@ -143,15 +135,5 @@ int to_int(TaggedValue* value);
 // valid in between these two calls.
 void set_transient_value(TaggedValue* value, void* v, Type* t);
 void cleanup_transient_value(TaggedValue* value);
-
-#if CIRCA_ENABLE_TAGGED_VALUE_METADATA
-
-void debug_set_tagged_value_note(TaggedValue* value, std::string const& note);
-
-#else
-
-#define debug_set_tagged_value_note(...)
-
-#endif
 
 } // namespace circa
