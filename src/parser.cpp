@@ -773,6 +773,7 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
     update_if_block_joining_branch(result);
     refresh_locals_indices(branch);
     set_source_location(result, startPosition, tokens);
+    update_output_count(result);
 
     return ParseResult(result);
 }
@@ -826,6 +827,7 @@ ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+    update_output_count(forTerm);
 
     return ParseResult(forTerm);
 }
@@ -839,6 +841,8 @@ ParseResult do_once_block(Branch& branch, TokenStream& tokens, ParserCxt* contex
     Term* result = apply(branch, DO_ONCE_FUNC, TermList());
     set_starting_source_location(result, startPosition, tokens);
     consume_branch(result->nestedContents, tokens, context);
+
+    update_output_count(result);
 
     return ParseResult(result);
 }

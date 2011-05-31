@@ -245,6 +245,7 @@ bool evaluate_main_script()
     circa::clear_error(context);
 
     circa::evaluate_branch_no_preserve_locals(&app->_evalContext, app::runtime_branch());
+    reset_locals(app::runtime_branch());
 
     for (size_t i=0; i < app->postFrameCallbacks.size(); i++) {
         App::OnFrameCallback& callback = app->postFrameCallbacks[i];

@@ -146,8 +146,9 @@ void for_loop_update_output_index(Term* forTerm)
 
 CA_FUNCTION(evaluate_for_loop)
 {
+    Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch& forContents = CALLER->nestedContents;
+    Branch& forContents = caller->nestedContents;
     Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
     Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
     Term* iterator = get_for_loop_iterator(CALLER);
@@ -229,6 +230,8 @@ CA_FUNCTION(evaluate_for_loop)
     swap(output, OUTPUT);
 
     // Copy outer rebinds
+    ca_assert(caller->numOutputs() == outerRebinds.length() + 1);
+    
     for (int i=0; i < outerRebinds.length(); i++) {
 
         Term* rebindTerm = outerRebinds[i];

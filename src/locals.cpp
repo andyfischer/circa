@@ -40,12 +40,12 @@ void update_locals_index_for_new_term(Term* term)
 {
     Branch* branch = term->owningBranch;
 
-    int numLocals = get_output_count(term);
+    term->outputCount = get_output_count(term);
 
     // make sure localsIndex is -1 so that if get_locals_count looks at this
     // term, it doesn't get confused.
     term->localsIndex = -1;
-    if (numLocals > 0)
+    if (term->outputCount > 0)
         term->localsIndex = get_locals_count(*branch);
 }
 
@@ -79,12 +79,15 @@ void refresh_locals_indices(Branch& branch, int startingAt)
         Term* term = branch[i];
         if (term == NULL)
             continue;
-        int outputCount = get_output_count(term);
-        if (outputCount == 0)
-            continue;
         term->localsIndex = nextLocal;
-        nextLocal += outputCount;
+        term->outputCount = get_output_count(term);
+        nextLocal += term->outputCount;
     }
+}
+
+void update_output_count(Term* term)
+{
+    term->outputCount = get_output_count(term);
 }
 
 } // namespace circa

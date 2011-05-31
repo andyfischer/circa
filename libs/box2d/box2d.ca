@@ -37,13 +37,17 @@ namespace box2d
         return handle
 
     def dynamic_rect(Point location, number rotation, Point size, List properties) -> any
-        state handle = create_body(body_type:dynamic, location, rotation)
+        state handle = null
+        if handle == null
+            handle = create_body(body_type:dynamic, location, rotation)
         if changed(size) or changed(properties)
             set_body_fixtures(handle, [[shape_type:rect size].extend(properties)])
         return handle
 
     def fixed_circle(Point location, number radius) -> any
-        state handle = create_body(body_type:static, location, 0.0)
+        state handle = null
+        if handle == null
+            handle = create_body(body_type:static, location, 0.0)
         if changed(radius)
             set_body_fixtures(handle, [[shape_type:circle radius 0 0 0]])
         if changed(location)
@@ -51,7 +55,9 @@ namespace box2d
         return handle
 
     def dynamic_circle(Point location, number radius, List properties) -> any
-        state handle = create_body(body_type:dynamic, location, 0.0)
+        state handle = null
+        if handle == null
+            handle = create_body(body_type:dynamic, location, 0.0)
         if changed(radius) or changed(properties)
             set_body_fixtures(handle, [[shape_type:circle radius].extend(properties)])
         return handle

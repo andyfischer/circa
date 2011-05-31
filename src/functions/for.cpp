@@ -67,12 +67,10 @@ namespace for_function {
     {
         CONTEXT->forLoopContext.continueCalled = true;
     }
-
     CA_FUNCTION(evaluate_discard)
     {
         CONTEXT->forLoopContext.discard = true;
     }
-
     void break_formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "break", term, phrase_type::KEYWORD);

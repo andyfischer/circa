@@ -24,7 +24,8 @@ Term::Term()
     evaluateFunc(empty_evaluate_function),
     owningBranch(NULL),
     index(0),
-    localsIndex(0)
+    localsIndex(0),
+    outputCount(0)
 {
     globalID = gNextGlobalID++;
 
@@ -90,6 +91,7 @@ Term::setDependency(int index, Term* term)
     else
         set_input(this, index - 1, term);
 }
+int Term::numOutputs() const { return outputCount; }
 
 const char*
 Term::getName(int index) const

@@ -132,6 +132,13 @@ void evaluate_branch(Branch& branch)
     evaluate_branch(&context, branch);
 }
 
+TaggedValue* safe_get_input(TaggedValue** inputs, int index, int max)
+{
+    if (index >= max)
+        return NULL;
+    return inputs[index];
+}
+
 TaggedValue* get_input(Term* term, int index)
 {
     Term* input = term->input(index);

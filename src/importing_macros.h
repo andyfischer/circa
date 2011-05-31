@@ -27,17 +27,18 @@
                 _circa_START_FUNCTIONS[i]->_header);\
     }
 
-#define INPUT(index) (get_input(_circa_caller, (index)))
+
+#define INPUT(index) (get_input(_caller, (index)))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))
 #define STRING_INPUT(index) (circa::as_string(INPUT(index)).c_str())
 #define INT_INPUT(index) (circa::as_int(INPUT(index)))
-#define NUM_INPUTS (_circa_caller->numInputs())
-#define STATE_INPUT (get_state_input(_circa_cxt, _circa_caller))
-#define CALLER (_circa_caller)
+#define NUM_INPUTS (_caller->numInputs())
+#define STATE_INPUT (get_state_input(_context, _caller))
+#define CALLER (_caller)
 #define INPUT_TERM(index) (CALLER->input(index))
-#define OUTPUT (get_output(_circa_caller, 0))
-#define EXTRA_OUTPUT(index) (get_extra_output(_circa_caller, (index)))
-#define CONTEXT (_circa_cxt)
-#define FUNCTION (_circa_caller->function)
-#define ERROR_OCCURRED(msg) (error_occurred(_circa_cxt, _circa_caller, (msg)))
+#define OUTPUT (get_output(_caller, 0))
+#define EXTRA_OUTPUT(index) (get_extra_output(_caller, (index)))
+#define CONTEXT (_context)
+#define FUNCTION (_caller->function)
+#define ERROR_OCCURRED(msg) (error_occurred(_context, _caller, (msg)))

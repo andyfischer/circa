@@ -71,6 +71,9 @@ struct Term : TaggedValue
     // outputs then this is the first index.
     int localsIndex;
 
+    // Number of outputs.
+    int outputCount;
+
     // Code which is nested inside this term. Usually this is empty.
     Branch nestedContents;
 
@@ -101,6 +104,8 @@ struct Term : TaggedValue
     Term* dependency(int index) const;
     int numDependencies() const;
     void setDependency(int index, Term* term);
+
+    int numOutputs() const;
 
     const char* getName(int index) const;
     int nameCount() const;

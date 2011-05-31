@@ -61,7 +61,7 @@ union VariantValue {
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \
-    void fname(circa::EvalContext* _circa_cxt, circa::Term* _circa_caller)
+    void fname(circa::EvalContext* _context, circa::Term* _caller)
 
 typedef void (*EvaluateFunc)(EvalContext* cxt, Term* caller);
 typedef Term* (*SpecializeTypeFunc)(Term* caller);

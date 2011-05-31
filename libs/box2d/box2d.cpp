@@ -11,6 +11,8 @@ using namespace circa;
 
 namespace box2d_support {
 
+#define LOG_HANDLE_CREATION 0
+
 b2World *g_world = NULL;
 
 void initialize_world()
@@ -51,7 +53,9 @@ struct BodyHandle
     ~BodyHandle() {
         if (g_world == NULL)
             return;
+        #if LOG_HANDLE_CREATION
         std::cout << "Destroyed " << body << std::endl;
+        #endif
         g_world->DestroyBody(body);
         remove_gc_object(&g_gcHeap, &gcHeader);
     }
@@ -126,7 +130,9 @@ CA_FUNCTION(create_body)
 
     bodyHandle->body = g_world->CreateBody(&bodyDef);
 
+    #if LOG_HANDLE_CREATION
     std::cout << "Created " << bodyHandle->body << std::endl;
+    #endif
 }
 
 CA_FUNCTION(set_body_fixtures)
@@ -325,7 +331,7 @@ void run_global_refcount_check()
 
 void on_frame_callback(void* userdata, app::App* app, int step)
 {
-    run_global_refcount_check();
+    //run_global_refcount_check();
     //std::cout << "post_frame: " << app->_evalContext.state.toString() << std::endl;
 }
 

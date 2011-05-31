@@ -65,6 +65,8 @@ void evaluate_minimum(EvalContext* context, Term* term);
 
 TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
 
+TaggedValue* safe_get_input(TaggedValue** inputs, int index, int max);
+
 // Get the input value for the given term and index.
 TaggedValue* get_input(Term* term, int index);
 
