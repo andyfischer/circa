@@ -37,7 +37,6 @@ struct EvalContext;
 struct FeedbackOperation;
 struct FunctionAttrs;
 struct List;
-struct PathExpression;
 struct RawOutputPrefs;
 struct TermMap;
 struct StaticTypeQuery;

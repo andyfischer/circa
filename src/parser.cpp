@@ -1599,10 +1599,15 @@ bool lookahead_match_rebind_argument(TokenStream& tokens)
 
 Term* find_lexpr_root(Term* term)
 {
-    Term* result = get_lexpr_path_expression(term)._head;
-    if (result == NULL)
+    if (term->name != "")
         return term;
-    return result;
+
+    if (term->function == GET_INDEX_FUNC)
+        return find_lexpr_root(term->input(0));
+    else if (term->function == GET_FIELD_FUNC)
+        return find_lexpr_root(term->input(0));
+    else
+        return term;
 }
 
 ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context)

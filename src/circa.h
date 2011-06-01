@@ -25,7 +25,6 @@
 #include "locals.h"
 #include "names.h"
 #include "parser.h"
-#include "path_expression.h"
 #include "refactoring.h"
 #include "repl.h"
 #include "stateful_code.h"

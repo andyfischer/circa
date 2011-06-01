@@ -3,8 +3,6 @@
 #include <circa.h>
 #include <importing_macros.h>
 
-#include "types/simple_handle.h"
-
 namespace circa {
 namespace internal_debug_function {
 
@@ -98,27 +96,6 @@ namespace internal_debug_function {
         ca_assert(g_testHandleAllocated[handle]);
         g_testHandleAllocated[handle] = false;
         //std::cout << "released " << handle << std::endl;
-    }
-
-    CA_DEFINE_FUNCTION(alloc_handle, "debug_alloc_handle(any handle) -> any")
-    {
-        if (!g_initializedHandleType) {
-            simple_handle_t::setup_type(&g_testHandleType);
-            set_opaque_pointer(&g_testHandleType.parameter,
-                    (void*) test_handle_on_release);
-            g_testHandleType.name = "TestHandle";
-            memset(g_testHandleAllocated, sizeof(g_testHandleAllocated), 0);
-            g_initializedHandleType = true;
-        }
-
-        if (INPUT(0)->value_type == &g_testHandleType) {
-            copy(INPUT(0), OUTPUT);
-            return;
-        }
-
-        int slot = test_handle_find_free_slot();
-        simple_handle_t::set(&g_testHandleType, OUTPUT, slot);
-        //std::cout << "allocated " << slot << std::endl;
     }
 
     CA_DEFINE_FUNCTION(get_term_stack, "debug_get_term_stack() -> List")
