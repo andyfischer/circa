@@ -132,18 +132,10 @@ void evaluate_branch(Branch& branch)
     evaluate_branch(&context, branch);
 }
 
-TaggedValue* safe_get_input(TaggedValue** inputs, int index, int max)
-{
-    if (index >= max)
-        return NULL;
-    return inputs[index];
-}
-
 TaggedValue* get_input(Term* term, int index)
 {
     Term* input = term->input(index);
-    if (input == NULL)
-        return NULL;
+    ca_assert(input != NULL);
     return get_local(input, term->inputInfo(index)->outputIndex);
 }
 
@@ -193,9 +185,10 @@ TaggedValue* get_local(Term* term, int outputIndex)
     ca_assert(term->owningBranch != NULL);
 
     int index = term->localsIndex + outputIndex;
+
     ca_assert(index < term->owningBranch->locals.length());
-    TaggedValue* local = term->owningBranch->locals[index];
-    return local;
+
+    return term->owningBranch->locals[index];
 }
 
 TaggedValue* get_local(Term* term)

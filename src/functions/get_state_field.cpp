@@ -15,9 +15,9 @@ namespace get_state_field_function {
     {
         Dict* stateContainer = NULL;
 
-        TaggedValue *containerFromInput = INPUT(0);
-        if (containerFromInput != NULL)
-            stateContainer = Dict::checkCast(containerFromInput);
+        // Check if a container was passed as input0
+        if (INPUT_TERM(0) != NULL)
+            stateContainer = Dict::checkCast(INPUT(0));
 
         if (stateContainer == NULL)
             stateContainer = Dict::lazyCast(&CONTEXT->currentScopeState);

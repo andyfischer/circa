@@ -15,7 +15,7 @@ namespace subroutine_function {
         List* out = List::lazyCast(&CONTEXT->subroutineOutput);
         out->resize(NUM_INPUTS);
         for (int i=0; i < NUM_INPUTS; i++) {
-            if (INPUT(i) == NULL)
+            if (INPUT_TERM(i) == NULL)
                 set_null(out->get(i));
             else
                 consume_input(CALLER, i, out->get(i));

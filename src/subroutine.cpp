@@ -125,9 +125,10 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     inputs.resize(numInputs);
 
     for (int i=0; i < numInputs; i++) {
-        TaggedValue* input = get_input(caller, i);
-        if (input == NULL)
+        if (caller->input(i) == NULL)
             continue;
+
+        TaggedValue* input = get_input(caller, i);
 
         Type* inputType = unbox_type(function_t::get_input_type(function, i));
 
