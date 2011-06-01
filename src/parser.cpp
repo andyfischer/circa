@@ -877,30 +877,33 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     if (!is_type(type))
         return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
-    Term* initialTaggedValue = NULL;
+    // Create the get_state_field() term.
+    Term* result = create_stateful_value(branch, type, NULL, name);
 
+    // Possibly consume an expression for the initial value.
     if (tokens.nextIs(EQUALS)) {
         tokens.consume();
         possible_whitespace(tokens);
 
-        // TODO: make this do_once() stuff work again
-        #if 0
-        Term* initialization = apply(branch, DO_ONCE_FUNC, TermList());
-        hide_from_source(initialization);
+        // If the initial value contains any new expressions, then those live inside
+        // nestedContents. But, if it only contains an alias, then connect the alias
+        // as an input.
 
-        initialTaggedValue = infix_expression(initialization->nestedContents, tokens);
-        post_parse_branch(initialization->nestedContents);
-        #endif
+        Term* initialValue = infix_expression(result->nestedContents, tokens, context).term;
+        post_parse_branch(result->nestedContents);
 
-        initialTaggedValue = infix_expression(branch, tokens, context).term;
+        if (initialValue->owningBranch != &result->nestedContents)
+            set_input(result, 1, initialValue);
+
+        // If an initial value was used and no specific type was mentioned, use
+        // the initial value's type.
+        if (typeName == "" && initialValue->type != NULL_T_TERM)
+            change_declared_type(result, initialValue->type);
+
+        // Assert that either the initialValue input is non-null, or we have stuff
+        // inside nestedContents
+        ca_assert((result->input(1) != NULL) || (result->nestedContents.length() > 0));
     }
-
-    // If an initial value was used and no specific type was mentioned, use
-    // the initial value's type.
-    if (typeName == "" && initialTaggedValue != NULL && initialTaggedValue->type != NULL_T_TERM)
-        type = initialTaggedValue->type;
-
-    Term* result = create_stateful_value(branch, type, initialTaggedValue, name);
 
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);

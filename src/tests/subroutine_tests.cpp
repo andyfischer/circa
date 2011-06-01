@@ -108,6 +108,7 @@ void test_recursion_with_state()
 
     EvalContext context;
 
+    internal_debug_function::oracle_clear();
     internal_debug_function::oracle_send(10);
     internal_debug_function::oracle_send(21);
     internal_debug_function::oracle_send(33);

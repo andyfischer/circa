@@ -261,11 +261,11 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     return create_value(branch, type, name);
 }
 
-Term* create_stateful_value(Branch& branch, Term* type, Term* defaultTaggedValue,
+Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
         std::string const& name)
 {
-    Term* result = apply(branch, get_global("get_state_field"),
-            TermList(NULL, defaultTaggedValue), name);
+    Term* result = apply(branch, GET_STATE_FIELD_FUNC,
+            TermList(NULL, defaultValue), name);
     change_declared_type(result, type);
     return result;
 }

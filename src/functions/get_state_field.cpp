@@ -27,32 +27,48 @@ namespace get_state_field_function {
         const char* name = CALLER->name.c_str();
         TaggedValue* value = stateContainer->get(name);
 
-        bool cast_success = false;
-
         // Try to cast 'value' to the declared type.
-        if (value != NULL)
-            cast_success = cast(value, declared_type(CALLER), OUTPUT);
-
-        if (!cast_success) {
-
-            // If we didn't find the value, see if they provided a default
-            if (INPUT(1) != NULL) {
-                cast_success = cast(INPUT(1), declared_type(CALLER), OUTPUT);
-
-                if (!cast_success) {
-                    std::stringstream msg;
-                    msg << "Couldn't cast default value to type " <<
-                        declared_type(CALLER)->name;
-                    return error_occurred(CONTEXT, CALLER, msg.str());
-                }
-
-            // Otherwise, reset to default value of type
-            } else {
-                ca_assert(CALLER != NULL);
-                change_type(OUTPUT, declared_type(CALLER));
-                reset(OUTPUT);
-            }
+        if (value != NULL) {
+            bool cast_success = cast(value, declared_type(CALLER), OUTPUT);
+            if (cast_success)
+                return;
         }
+
+        // Try to use initialValue from an input.
+        if (INPUT_TERM(1) != NULL) {
+            bool cast_success = cast(INPUT(1), declared_type(CALLER), OUTPUT);
+
+            if (!cast_success) {
+                std::stringstream msg;
+                msg << "Couldn't cast default value to type " <<
+                    declared_type(CALLER)->name;
+                return error_occurred(CONTEXT, CALLER, msg.str());
+            }
+
+            return;
+        }
+
+        // Try to use initialValue from nestedContents
+        if (CALLER->nestedContents.length() > 0) {
+
+            TaggedValue result;
+            evaluate_branch_internal(CONTEXT, CALLER->nestedContents, &result);
+
+            bool cast_success = cast(&result, declared_type(CALLER), OUTPUT);
+
+            if (!cast_success) {
+                std::stringstream msg;
+                msg << "Couldn't cast default value to type " <<
+                    declared_type(CALLER)->name;
+                return error_occurred(CONTEXT, CALLER, msg.str());
+            }
+
+            return;
+        }
+
+        // Otherwise, reset to default value of type
+        change_type(OUTPUT, declared_type(CALLER));
+        reset(OUTPUT);
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -67,14 +83,18 @@ namespace get_state_field_function {
 
         append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);
 
-        Term* defaultTaggedValue = term->input(1);
-        if (defaultTaggedValue != NULL) {
+        Term* defaultValue = term->input(1);
+
+        if (defaultValue == NULL && term->nestedContents.length() > 0)
+            defaultValue = term->nestedContents[term->nestedContents.length()-1];
+
+        if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);
-            if (defaultTaggedValue->name != "")
-                append_phrase(source, get_relative_name(term, defaultTaggedValue),
+            if (defaultValue->name != "")
+                append_phrase(source, get_relative_name(term, defaultValue),
                         term, phrase_type::TERM_NAME);
             else
-                format_term_source(source, defaultTaggedValue);
+                format_term_source(source, defaultValue);
         }
     }
 

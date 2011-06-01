@@ -386,6 +386,35 @@ void test_preserve_state_in_nested_include_file()
     test_equals(&context.state, "[_include: [_include: [x: 1], t: 3]]");
 }
 
+void test_that_initial_value_doesnt_get_reevaluated()
+{
+    Branch branch;
+
+    internal_debug_function::spy_clear();
+
+    branch.compile("def f()->int { test_spy('call'); return 1 }");
+    branch.compile("state s = f()");
+
+    test_equals(internal_debug_function::spy_results(), "[]");
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    evaluate_branch(&context, branch);
+    evaluate_branch(&context, branch);
+
+    test_equals(internal_debug_function::spy_results(), "['call']");
+
+    internal_debug_function::spy_clear();
+    reset(&context.state);
+    evaluate_branch(&context, branch);
+    reset(&context.state);
+    evaluate_branch(&context, branch);
+    reset(&context.state);
+    evaluate_branch(&context, branch);
+
+    test_equals(internal_debug_function::spy_results(), "['call', 'call', 'call']");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
@@ -407,6 +436,7 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::test_describe_state_shape);
     REGISTER_TEST_CASE(stateful_code_tests::test_strip_abandoned_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_preserve_state_in_nested_include_file);
+    REGISTER_TEST_CASE(stateful_code_tests::test_that_initial_value_doesnt_get_reevaluated);
 }
 
 } // namespace stateful_code_tests
