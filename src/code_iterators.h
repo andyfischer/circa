@@ -8,7 +8,7 @@
 
 namespace circa {
 
-class BranchIterator
+struct BranchIterator
 {
     struct Frame {
         Branch* branch;
@@ -21,7 +21,6 @@ class BranchIterator
     bool _backwards;
     bool _skipNextBranch;
 
-public:
     BranchIterator(Branch* branch, bool backwards=false);
     void reset(Branch* branch);
     bool finished();
@@ -38,5 +37,28 @@ public:
     Term* operator->() { return current(); }
     void operator++() { advance(); }
 };
+
+struct UpwardIterator
+{
+    Branch* _branch;
+    int _index;
+
+    Branch* _stopAt;
+
+    UpwardIterator(Term* startingTerm);
+
+    // stopAt is optional, if set then we will not continue past the given branch.
+    void stopAt(Branch* branch);
+
+    bool finished();
+    Term* current();
+    void advance();
+
+    bool unfinished() { return !finished(); }
+    Term* operator*() { return current(); }
+    Term* operator->() { return current(); }
+    void operator++() { advance(); }
+};
+
     
 } // namespace circa

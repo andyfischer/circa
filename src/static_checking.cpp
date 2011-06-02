@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "branch.h"
-#include "branch_iterator.h"
+#include "code_iterators.h"
 #include "builtins.h"
 #include "function.h"
 #include "introspection.h"

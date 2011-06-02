@@ -3,7 +3,7 @@
 #include <set>
 #include <dlfcn.h>
 
-#include "branch_iterator.h"
+#include "code_iterators.h"
 #include "dll_patching.h"
 #include "function.h"
 #include "importing.h"

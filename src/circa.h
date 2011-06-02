@@ -5,9 +5,9 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "branch_iterator.h"
 #include "building.h"
 #include "builtins.h"
+#include "code_iterators.h"
 #include "codegen.h"
 #include "command_line.h"
 #include "compound_type.h"
@@ -40,7 +40,6 @@
 #include "token_stream.h"
 #include "type.h"
 #include "type_inference.h"
-#include "upward_iterator.h"
 
 #include "types/dict.h"
 #include "types/list.h"
