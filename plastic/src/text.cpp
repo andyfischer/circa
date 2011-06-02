@@ -4,7 +4,7 @@
 
 #include "circa.h"
 #include "importing_macros.h"
-#include "refcounted_type_wrapper.h"
+#include "types/handle.h"
 
 #include <SDL_ttf.h>
 
@@ -21,10 +21,9 @@ Type g_font_t;
 
 struct Font
 {
-    int _refCount;
     TTF_Font* ttfFont;
 
-    Font() : _refCount(0), ttfFont(NULL) {}
+    Font() : ttfFont(NULL) {}
 };
 
 SDL_Color unpack_sdl_color(TaggedValue* color)
@@ -53,7 +52,7 @@ CA_FUNCTION(load_font)
         return error_occurred(CONTEXT, CALLER, err.str());
     }
 
-    intrusive_refcounted::set<Font>(OUTPUT, &g_font_t, output);
+    handle_t::set(OUTPUT, &g_font_t, output);
 }
 
 struct RenderedText : public TaggedValue
@@ -99,7 +98,7 @@ CA_FUNCTION(render_text)
     // Render the text to a new surface, upload it as a texture, destroy the surface,
     // record the texture id.
 
-    Font* font = (Font*) INPUT(0)->value_data.ptr;
+    Font* font = (Font*) handle_t::get_ptr(INPUT(0));
 
     SDL_Color sdlColor = unpack_sdl_color(INPUT(2));
     SDL_Surface *surface = TTF_RenderText_Blended(font->ttfFont,
@@ -152,7 +151,7 @@ CA_FUNCTION(draw_rendered_text)
 
 CA_FUNCTION(get_metrics)
 {
-    Font* font = (Font*) INPUT(0)->value_data.ptr;
+    Font* font = (Font*) handle_t::get_ptr(INPUT(0));
     const char* str = as_cstring(INPUT(1));
 
     List* output = List::cast(OUTPUT, 2);
@@ -168,7 +167,7 @@ CA_FUNCTION(get_metrics)
 
 void setup(Branch& branch)
 {
-    intrusive_refcounted::setup_type<Font>(&g_font_t);
+    handle_t::setup_type<Font>(&g_font_t);
     install_type(branch["Font"], &g_font_t);
 
     if (TTF_Init() == -1) {
