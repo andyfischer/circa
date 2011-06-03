@@ -1,5 +1,8 @@
 
-background(#a0a)
+background(#000)
+
+box2d:gravity([0 0])
+box2d:step()
 
 namespace players_paddle
     paddle_y = window.height - 70
@@ -15,7 +18,7 @@ namespace players_paddle
     fill_rect(paddle_rect #fff)
 
 
-def reset_blocks() -> List
+namespace board
     blocks = []
     blocks_center = window.width/2
 
@@ -23,28 +26,15 @@ def reset_blocks() -> List
 
     for x in 0..num_blocks_x
       for y in 0..4
-        loc = [(x-(num_blocks_x-1)/2) * 60 + window.width/2,
+        initial_loc = [(x-(num_blocks_x-1)/2) * 60 + window.width/2,
             y * 30 + 30]
-        blocks.append([random_color() loc])
 
-    return blocks
+        size = [50 15]
+        obj = box2d:dynamic_rect(initial_loc, 0, Point(size/2.0) [0 0 0])
+
+        state color = random_color()
+        gl:line_loop(box2d:get_body_points(obj) color)
+
+namespace ball
 
 
-print(dump_scope_state())
-namespace board
-    type Block {
-      Color color
-      Point loc
-    }
-
-    state List blocks = reset_blocks()
-
-    block_width = 40
-    block_height = 16
-
-    for block in blocks
-        Block(@block)
-
-        fill_rect(expand_rect(block.loc block_width block_height) block.color)
-
-print(dump_scope_state())

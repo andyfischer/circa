@@ -1,8 +1,8 @@
 
 -- box2d bindings
 namespace box2d
-    def step(number seconds)
-        "Run the simulation for the given timestep. It's recommended to use timesteps of 1/60."
+    def step()
+        "Run the simulation for one timestep"
     def gravity(Point vec)
         "Set the gravity vector."
     namespace body_type { static = 0, dynamic = 1, kinematic = 2 }
@@ -15,17 +15,34 @@ namespace box2d
         "Return the list of points of the given body, in screen space."
     def get_body_position(any handle) -> Point
         "Get the position of the body, in screen space."
-    def get_body_rotation(any handle) -> number
-        "Get the rotation of the body, as a unit angle."
     def set_body_position(any handle, Point p)
         "Move the body to the given position"
+    def get_body_rotation(any handle) -> number
+        "Get the rotation of the body, as a unit angle."
     def set_body_rotation(any handle, number rotation)
         "Rotate the body to the given rotation"
+    def get_linear_velocity(any handle) -> Point
+    def set_linear_velocity(any handle, Point p)
+    def apply_force(any handle, Point force, Point point)
+    def apply_torque(any handle, number torque)
+    def apply_linear_impulse(any handle, any center, any point)
+    def apply_angular_impulse(any handle, number impulse)
+
     def body_contains_point(any handle, Point p) -> bool
         "Intersection test, returns true if the given point is inside the body"
 
-    def fixed_rect(Point location, number rotation, Point size) -> any
+    def static_rect(Point location, number rotation, Point size) -> any
         state handle = create_body(body_type:static, location, rotation)
+        if changed(size)
+            set_body_fixtures(handle, [[shape_type:rect size 0 0 0]])
+        if changed(location)
+            set_body_position(handle location)
+        if changed(rotation)
+            set_body_rotation(handle rotation)
+        return handle
+
+    def kinematic_rect(Point location, number rotation, Point size) -> any
+        state handle = create_body(body_type:kinematic, location, rotation)
         if changed(size)
             set_body_fixtures(handle, [[shape_type:rect size 0 0 0]])
         if changed(location)
@@ -40,7 +57,7 @@ namespace box2d
             set_body_fixtures(handle, [[shape_type:rect size].extend(properties)])
         return handle
 
-    def fixed_circle(Point location, number radius) -> any
+    def static_circle(Point location, number radius) -> any
         state handle = create_body(body_type:static, location, 0.0)
         if changed(radius)
             set_body_fixtures(handle, [[shape_type:circle radius 0 0 0]])

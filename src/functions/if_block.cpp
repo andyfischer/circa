@@ -31,10 +31,6 @@ namespace if_block_function {
 
             format_branch_source(source, branch_term->nestedContents, branch_term);
         }
-
-        //append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
-        //        term, token::WHITESPACE);
-        //append_phrase(source, "end", term, phrase_type::KEYWORD);
     }
 
     int getOutputCount(Term* term)

@@ -12,4 +12,7 @@ struct Point : TaggedValue
     static Point* cast(TaggedValue* tv);
 };
 
+void set_point(TaggedValue* val, float x, float y);
+void get_point(TaggedValue* val, float* x, float* y);
+
 } // namespace circa

@@ -29,12 +29,24 @@ Point* Point::checkCast(TaggedValue* tv)
 }
 
 Point*
-Point::cast(TaggedValue* v)
+Point::cast(TaggedValue* val)
 {
-    set_list(v, 2);
-    set_float(v->getIndex(0), 0);
-    set_float(v->getIndex(1), 0);
-    return (Point*) v;
+    set_list(val, 2);
+    set_float(val->getIndex(0), 0);
+    set_float(val->getIndex(1), 0);
+    return (Point*) val;
+}
+
+void set_point(TaggedValue* val, float x, float y)
+{
+    set_list(val, 2);
+    set_float(val->getIndex(0), x);
+    set_float(val->getIndex(1), y);
+}
+void get_point(TaggedValue* val, float* x, float* y)
+{
+    *x = to_float(get_index(val, 0));
+    *y = to_float(get_index(val, 1));
 }
 
 } // namespace circa

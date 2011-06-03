@@ -21,6 +21,7 @@ void initialize_world()
         g_world = new b2World(b2Vec2(), false);
 }
 
+float c_timestep = 1.0/60.0;
 int c_velocityIterations = 6;
 int c_positionIterations = 2;
 
@@ -32,6 +33,18 @@ float world_to_screen(float world) { return world * 10.0; }
 // Circa angles are in the range of 0..1
 float radians_to_unit_angles(float radians) { return radians / M_PI; }
 float unit_angles_to_radians(float unit) { return unit * M_PI; }
+
+void b2Vec2_to_point(b2Vec2 const& vec, TaggedValue* point)
+{
+    set_point(point, world_to_screen(vec.y), world_to_screen(vec.y));
+}
+
+b2Vec2 point_to_b2Vec2(TaggedValue* point)
+{
+    float x,y;
+    get_point(point, &x, &y);
+    return b2Vec2(screen_to_world(x), screen_to_world(y));
+}
 
 // The BodyHandle type is used to hold on to b2Body objects.
 Type g_bodyHandle_t;
@@ -79,9 +92,7 @@ CA_FUNCTION(step)
 {
     initialize_world();
 
-    float duration = FLOAT_INPUT(0);
-
-    g_world->Step(duration, c_velocityIterations, c_positionIterations);
+    g_world->Step(c_timestep, c_velocityIterations, c_positionIterations);
     g_world->ClearForces();
 }
 
@@ -221,12 +232,16 @@ CA_FUNCTION(get_body_position)
     if (body == NULL)
         return;
 
-    b2Vec2 vec = body->GetPosition();
+    b2Vec2_to_point(body->GetPosition(), OUTPUT);
+}
 
-    Point& output = *Point::cast(OUTPUT);
-    output.set(
-        world_to_screen(vec.x),
-        world_to_screen(vec.y));
+CA_FUNCTION(set_body_position)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    body->SetTransform(point_to_b2Vec2(INPUT(1)), body->GetAngle());
 }
 
 CA_FUNCTION(get_body_rotation)
@@ -238,20 +253,6 @@ CA_FUNCTION(get_body_rotation)
     set_float(OUTPUT, radians_to_unit_angles(body->GetAngle()));
 }
 
-CA_FUNCTION(set_body_position)
-{
-    b2Body* body = get_body_from_handle(INPUT(0));
-    if (body == NULL)
-        return;
-
-    Point& loc = *Point::checkCast(INPUT(1));
-
-    b2Vec2 vec(
-        screen_to_world(loc.getX()),
-        screen_to_world(loc.getY()));
-
-    body->SetTransform(vec, body->GetAngle());
-}
 
 CA_FUNCTION(set_body_rotation)
 {
@@ -262,6 +263,59 @@ CA_FUNCTION(set_body_rotation)
     float rotation = unit_angles_to_radians(FLOAT_INPUT(1));
 
     body->SetTransform(body->GetPosition(), rotation);
+}
+
+CA_FUNCTION(get_linear_velocity)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    b2Vec2_to_point(body->GetLinearVelocity(), OUTPUT);
+}
+
+CA_FUNCTION(set_linear_velocity)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    std::cout << "set_linear_velocity" << INPUT(1)->toString() << std::endl;
+
+    body->SetLinearVelocity(point_to_b2Vec2(INPUT(1)));
+}
+
+CA_FUNCTION(apply_force)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    body->ApplyForce(point_to_b2Vec2(INPUT(1)), point_to_b2Vec2(INPUT(2)));
+}
+CA_FUNCTION(apply_torque)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    body->ApplyTorque(FLOAT_INPUT(1));
+}
+CA_FUNCTION(apply_linear_impulse)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    body->ApplyLinearImpulse(point_to_b2Vec2(INPUT(1)), point_to_b2Vec2(INPUT(2)));
+}
+CA_FUNCTION(apply_angular_impulse)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    if (body == NULL)
+        return;
+
+    body->ApplyAngularImpulse(FLOAT_INPUT(1));
 }
 
 CA_FUNCTION(body_contains_point)
@@ -351,6 +405,11 @@ void setup(Branch& kernel)
     install_function(ns["get_body_rotation"], get_body_rotation);
     install_function(ns["set_body_position"], set_body_position);
     install_function(ns["set_body_rotation"], set_body_rotation);
+    install_function(ns["get_linear_velocity"], get_linear_velocity);
+    install_function(ns["set_linear_velocity"], set_linear_velocity);
+    install_function(ns["apply_torque"], apply_torque);
+    install_function(ns["apply_linear_impulse"], apply_linear_impulse);
+    install_function(ns["apply_angular_impulse"], apply_angular_impulse);
     install_function(ns["body_contains_point"], body_contains_point);
 
     //app::get_global_app().addPreFrameCallback(on_frame_callback, NULL);

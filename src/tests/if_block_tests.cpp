@@ -321,6 +321,38 @@ void test_state_is_reset_when_if_fails()
     test_equals(&context.state, "[_if_block: [[i: 1], null]]");
 }
 
+void test_state_is_reset_when_if_fails2()
+{
+    // Similar to test_state_is_reset_when_if_fails, but this one doesn't
+    // have an 'else' block and it uses test_oracle.
+    
+    internal_debug_function::oracle_clear();
+
+    Branch branch;
+    Term* a = branch.compile("a = true");
+    
+    branch.compile("if a { state s = test_oracle() }");
+
+    internal_debug_function::oracle_send(1);
+    internal_debug_function::oracle_send(2);
+    internal_debug_function::oracle_send(3);
+
+    EvalContext context;
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[s: 1], null]]");
+
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[s: 1], null]]");
+
+    set_bool(a, false);
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [null, null]]");
+
+    set_bool(a, true);
+    evaluate_branch(&context, branch);
+    test_equals(&context.state, "[_if_block: [[s: 2], null]]");
+}
+
 void test_nested_state()
 {
     Branch branch;
@@ -350,6 +382,7 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_state_simple);
     REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
     REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
+    REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails2);
     REGISTER_TEST_CASE(if_block_tests::test_nested_state);
 }
 
