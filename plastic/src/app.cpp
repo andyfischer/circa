@@ -25,7 +25,8 @@ App* g_app = NULL;
 
 App& get_global_app()
 {
-    if (g_app == NULL) g_app = new App();
+    if (g_app == NULL)
+        g_app = new App();
     return *g_app;
 }
 

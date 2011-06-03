@@ -13,7 +13,7 @@ namespace branch_function {
 
     CA_FUNCTION(lambda_evaluate)
     {
-        branch_ref_function::set_branch_ref(OUTPUT, &CALLER->nestedContents);
+        set_branch(OUTPUT, &CALLER->nestedContents);
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -26,7 +26,7 @@ namespace branch_function {
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         get_function_attrs(BRANCH_FUNC)->formatSource = format_source;
-        LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda() -> BranchRef");
+        LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda() -> Branch");
         get_function_attrs(LAMBDA_FUNC)->formatSource = format_source;
     }
 }

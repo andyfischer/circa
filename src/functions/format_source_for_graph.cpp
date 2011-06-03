@@ -13,7 +13,7 @@ namespace format_source_for_graph_function {
     };
 
     CA_DEFINE_FUNCTION(format_source_for_graph,
-        "format_source_for_graph(BranchRef br) -> List")
+        "format_source_for_graph(Branch br) -> List")
     {
         /*
         PhraseLink {
@@ -39,7 +39,7 @@ namespace format_source_for_graph_function {
         }
         */
 
-        Branch& branch = *as_branch_ref(INPUT(0));
+        Branch& branch = *as_branch(INPUT(0));
         List& statementList = *List::cast(OUTPUT, 0);
 
         if (branch.length() < 2)

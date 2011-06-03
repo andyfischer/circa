@@ -281,6 +281,9 @@ void initialize_primitive_types(Branch& kernel)
     OPAQUE_POINTER_TYPE = create_type(kernel, "opaque_pointer");
     set_type(OPAQUE_POINTER_TYPE, &OPAQUE_POINTER_T);
 
+    Term* branchType = create_type(kernel, "Branch");
+    set_type(branchType, &BRANCH_T);
+
     // ANY_TYPE was created in bootstrap_kernel
 }
 
@@ -325,8 +328,6 @@ void initialize_compound_types(Branch& kernel)
     indexable_t::setup_type(unbox_type(indexableType));
 
     callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
-
-    parse_type(kernel, "type BranchRef { opaque_pointer branch }");
 }
 
 void pre_setup_builtin_functions(Branch& kernel)

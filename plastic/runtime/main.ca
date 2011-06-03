@@ -314,9 +314,7 @@ state string user_script_filename = ide:script_filename()
 
 -- Function to specify a different script
 def load_user_script(string filename)
-    --trace('load_user_script:', filename)
     send('load_user_script_request', filename)
-
 receive_last(@user_script_filename 'load_user_script_request')
 
 users_branch = include(user_script_filename)

@@ -5,9 +5,9 @@ namespace run_single_statement_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(run_single_statement, "run_single_statement(BranchRef, int)")
+    CA_DEFINE_FUNCTION(run_single_statement, "run_single_statement(Branch, int)")
     {
-        Branch* branchPtr = branch_ref_function::deref(INPUT(0));
+        Branch* branchPtr = as_branch(INPUT(0));
         int index = INT_INPUT(1);
 
         if (branchPtr == NULL)
@@ -32,9 +32,9 @@ namespace run_single_statement_function {
     }
 
     
-    CA_DEFINE_FUNCTION(get_statement_count, "get_statement_count(BranchRef br) -> int")
+    CA_DEFINE_FUNCTION(get_statement_count, "get_statement_count(Branch br) -> int")
     {
-        Branch* branchPtr = branch_ref_function::deref(INPUT(0));
+        Branch* branchPtr = as_branch(INPUT(0));
 
         if (branchPtr == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");

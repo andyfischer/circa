@@ -96,6 +96,7 @@ List* set_list(TaggedValue* value, int size);
 void set_type(TaggedValue* value, Type* type);
 void set_null(TaggedValue* value);
 void set_opaque_pointer(TaggedValue* value, void* addr);
+void set_branch(TaggedValue* value, Branch* branch);
 
 void set_pointer(TaggedValue* value, Type* type, void* p);
 void set_pointer(TaggedValue* value, void* ptr);
@@ -109,7 +110,7 @@ std::string const& as_string(TaggedValue* value);
 const char* as_cstring(TaggedValue* value);
 bool as_bool(TaggedValue* value);
 Term* as_ref(TaggedValue* value);
-Branch* as_branch_ref(TaggedValue* value);
+Branch* as_branch(TaggedValue* value);
 void* as_opaque_pointer(TaggedValue* value);
 Type& as_type(TaggedValue* value);
 
@@ -125,6 +126,7 @@ bool is_list(TaggedValue* value);
 bool is_type(TaggedValue* value);
 bool is_null(TaggedValue* value);
 bool is_symbol(TaggedValue* value);
+bool is_branch(TaggedValue* value);
 
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);

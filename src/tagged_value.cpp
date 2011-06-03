@@ -479,8 +479,13 @@ void set_null(TaggedValue* value)
 }
 void set_opaque_pointer(TaggedValue* value, void* addr)
 {
-    change_type(value, &OPAQUE_POINTER_T);
+    change_type_no_initialize(value, &OPAQUE_POINTER_T);
     value->value_data.ptr = addr;
+}
+void set_branch(TaggedValue* value, Branch* branch)
+{
+    change_type_no_initialize(value, &BRANCH_T);
+    value->value_data.ptr = branch;
 }
 
 void set_pointer(TaggedValue* value, Type* type, void* p)
@@ -530,9 +535,10 @@ Term* as_ref(TaggedValue* value)
     return (Term*) value->value_data.ptr;
 }
 
-Branch* as_branch_ref(TaggedValue* value)
+Branch* as_branch(TaggedValue* value)
 {
-    return branch_ref_function::deref(value);
+    ca_assert(is_branch(value));
+    return (Branch*) value->value_data.ptr;
 }
 
 void* as_opaque_pointer(TaggedValue* value)
@@ -628,6 +634,10 @@ bool is_null(TaggedValue* value)
 bool is_symbol(TaggedValue* value)
 {
     return value->value_type == &SYMBOL_T;
+}
+bool is_branch(TaggedValue* value)
+{
+    return value->value_type == &BRANCH_T;
 }
 
 float to_float(TaggedValue* value)

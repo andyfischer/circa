@@ -21,27 +21,14 @@ namespace branch_ref_function {
         return true;
     }
 
-    Branch* deref(TaggedValue* val)
-    {
-        if (!is_list(val))
-            return NULL;
-        return (Branch*) as_opaque_pointer(val->getIndex(0));
-    }
-
-    void set_branch_ref(TaggedValue* value, Branch* branchPtr)
-    {
-        List& output = *List::cast(value, 1);
-        set_opaque_pointer(output[0], branchPtr);
-    }
-
     CA_FUNCTION(branch_ref)
     {
-        set_branch_ref(OUTPUT, &(INPUT_TERM(0)->nestedContents));
+        set_branch(OUTPUT, &(INPUT_TERM(0)->nestedContents));
     }
 
     CA_FUNCTION(get_terms)
     {
-        Branch* branch = deref(INPUT(0));
+        Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");
 
@@ -53,7 +40,7 @@ namespace branch_ref_function {
 
     CA_FUNCTION(get_term)
     {
-        Branch* branch = deref(INPUT(0));
+        Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");
 
@@ -63,7 +50,7 @@ namespace branch_ref_function {
 
     CA_FUNCTION(format_source)
     {
-        Branch* branch = deref(INPUT(0));
+        Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");
 
@@ -74,14 +61,14 @@ namespace branch_ref_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, branch_ref,
-            "def branch_ref(any branch +ignore_error) -> BranchRef");
+            "def branch_ref(any branch +ignore_error) -> Branch");
 
-        import_member_function(kernel["BranchRef"], get_terms,
-                "get_terms(BranchRef) -> List");
-        import_member_function(kernel["BranchRef"], get_term,
-                "get_term(BranchRef, int index) -> Ref");
-        import_member_function(kernel["BranchRef"], format_source,
-                "format_source(BranchRef) -> StyledSource");
+        import_member_function(kernel["Branch"], get_terms,
+                "get_terms(Branch) -> List");
+        import_member_function(kernel["Branch"], get_term,
+                "get_term(Branch, int index) -> Ref");
+        import_member_function(kernel["Branch"], format_source,
+                "format_source(Branch) -> StyledSource");
     }
 }
 }

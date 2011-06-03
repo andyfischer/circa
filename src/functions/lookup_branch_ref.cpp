@@ -22,7 +22,7 @@ namespace lookup_branch_ref_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, evaluate, "lookup_branch_ref(string) -> BranchRef");
+        import_function(kernel, evaluate, "lookup_branch_ref(string) -> Branch");
     }
 }
 }
