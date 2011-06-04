@@ -31,9 +31,9 @@ bool initialize_display()
     int desiredWidth = 800;
     int desiredHeight = 600;
 
-    if (app::users_branch().contains("desired_window_size")) {
-        desiredWidth = app::users_branch()["desired_window_size"]->nestedContents[0]->asInt();
-        desiredHeight = app::users_branch()["desired_window_size"]->nestedContents[1]->asInt();
+    if (app::users_script().contains("desired_window_size")) {
+        desiredWidth = app::users_script()["desired_window_size"]->nestedContents[0]->asInt();
+        desiredHeight = app::users_script()["desired_window_size"]->nestedContents[1]->asInt();
     }
 
     if (!resize_display(desiredWidth, desiredHeight))
@@ -85,10 +85,10 @@ bool resize_display(int width, int height)
 
     // Set window caption
     std::string windowTitle;
-    if (app::users_branch().contains("desired_window_title"))
-        windowTitle = app::users_branch()["desired_window_title"]->asString();
+    if (app::users_script().contains("desired_window_title"))
+        windowTitle = app::users_script()["desired_window_title"]->asString();
     else
-        windowTitle = get_branch_source_filename(app::users_branch());
+        windowTitle = get_branch_source_filename(app::users_script());
 
     SDL_WM_SetCaption(windowTitle.c_str(), NULL);
 

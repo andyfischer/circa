@@ -58,7 +58,7 @@ circa::Branch& runtime_branch()
     return *g_app->_runtimeBranch;
 }
 
-circa::Branch& users_branch()
+circa::Branch& users_script()
 {
     return *g_app->_usersBranch;
 }
@@ -168,8 +168,8 @@ bool load_runtime(circa::Branch& runtime)
 
     setup_functions(app::runtime_branch());
 
-    circa::Term* users_branch = runtime["users_branch"];
-    g_app->_usersBranch = &users_branch->nestedContents;
+    circa::Term* users_script = runtime["users_script"];
+    g_app->_usersBranch = &users_script->nestedContents;
 
     return true;
 }
@@ -207,12 +207,6 @@ bool setup_functions(circa::Branch& runtime)
     fmod_support::setup(runtime);
     box2d_support::setup(runtime);
     osc_support::setup(runtime);
-
-    if (circa::has_static_errors(branch)) {
-        circa::print_static_errors_formatted(branch, std::cout);
-        std::cout << std::endl;
-        return false;
-    }
 
     return true;
 }

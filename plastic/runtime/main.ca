@@ -317,8 +317,14 @@ def load_user_script(string filename)
     send('load_user_script_request', filename)
 receive_last(@user_script_filename 'load_user_script_request')
 
-users_branch = include(user_script_filename)
-if errored(users_branch)
-    print(users_branch)
+users_script = load_script(user_script_filename)
+
+if users_script.has_static_error()
+    trace('static error!')
+else
+    ev = users_script.evaluate()
+
+    if errored(ev)
+        print(ev)
 
 --include('overlay.ca' -> rpath)

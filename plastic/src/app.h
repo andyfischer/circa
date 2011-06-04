@@ -62,7 +62,7 @@ struct App {
 
 App& get_global_app();
 circa::Branch& runtime_branch();
-circa::Branch& users_branch();
+circa::Branch& users_script();
 bool paused();
 PauseStatus::Reason pause_reason();
 bool continue_main_loop();

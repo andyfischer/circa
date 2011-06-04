@@ -155,8 +155,8 @@ void handle_key_press(SDL_Event &event, int key)
     if (controlPressed) {
         switch (event.key.keysym.sym) {
         case SDLK_s:
-            persist_branch_to_file(app::users_branch());
-            std::cout << "saved to " << get_branch_source_filename(app::users_branch()) << std::endl;
+            persist_branch_to_file(app::users_script());
+            std::cout << "saved to " << get_branch_source_filename(app::users_script()) << std::endl;
             break;
 
         case SDLK_e:

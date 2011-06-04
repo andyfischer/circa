@@ -74,20 +74,15 @@ int plastic_main(std::vector<std::string> args)
         app::get_global_app().setScriptFilename(args[1]);
 
         EvalContext cxt;
-        include_function::preload_script(app::users_branch().owningTerm);
+        include_function::preload_script(app::users_script().owningTerm);
 
-        print_branch(std::cout, app::users_branch());
+        print_branch(std::cout, app::users_script());
         return 0;
     }
 
     // -tr to do a test run of a script, without creating a display.
     if (arg0 == "-tr") {
         app::get_global_app().setScriptFilename(args[1]);
-
-        if (has_static_errors(app::users_branch())) {
-            print_static_errors_formatted(app::users_branch(), std::cout);
-            return 1;
-        }
 
         for (int i=0; i < 5; i++)
             if (!app::evaluate_main_script())
@@ -100,11 +95,6 @@ int plastic_main(std::vector<std::string> args)
     std::string filename = arg0;
 
     app::get_global_app().setScriptFilename(filename);
-
-    if (has_static_errors(app::users_branch())) {
-        print_static_errors_formatted(app::users_branch(), std::cout);
-        return 1;
-    }
 
     if (!display::initialize_display()) return 1;
 
