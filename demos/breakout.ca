@@ -8,14 +8,19 @@ namespace players_paddle
     paddle_y = window.height - 70
     paddle_x = mouse.x
 
-    paddle_loc = [paddle_x paddle_y]
+    --paddle_loc = [paddle_x paddle_y]
+    paddle_loc = mouse
 
     paddle_width = 60
     paddle_height = 14
 
     paddle_rect = expand_rect(paddle_loc paddle_width paddle_height)
 
-    fill_rect(paddle_rect #fff)
+    --fill_rect(paddle_rect #fff)
+
+    body = box2d:dynamic_rect(paddle_loc 0 [paddle_width paddle_height] [1 0 1])
+    gl:line_loop(box2d:get_body_points(body) #f00)
+    box2d:set_body_position(body paddle_loc)
 
 
 namespace board
@@ -30,11 +35,18 @@ namespace board
             y * 30 + 30]
 
         size = [50 15]
-        obj = box2d:dynamic_rect(initial_loc, 0, Point(size/2.0) [0 0 0])
+        obj = box2d:dynamic_rect(initial_loc, 0, Point(size/2.0) [1 .3 .8])
 
         state color = random_color()
         gl:line_loop(box2d:get_body_points(obj) color)
 
 namespace ball
+    radius = 10.0
+    obj = box2d:dynamic_circle([100 100] radius [1 0 .8])
 
+    pos = box2d:get_body_position(obj)
 
+    if once()
+        box2d:apply_linear_impulse(obj pos [0 0])
+
+    gl:circle(box2d:get_body_position(obj) radius, #fff)

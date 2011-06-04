@@ -118,7 +118,7 @@ CA_FUNCTION(create_body)
 
     int bodyType = INT_INPUT(0);
 
-    Point& initialPosition = *Point::checkCast(INPUT(1));
+    TaggedValue* initialPosition = INPUT(1);
     float initialRotation = as_float(INPUT(2));
 
     // Create a b2Body
@@ -130,10 +130,7 @@ CA_FUNCTION(create_body)
     case 2: bodyDef.type = b2_kinematicBody; break;
     }
     
-    bodyDef.position.Set(
-        screen_to_world(initialPosition.getX()),
-        screen_to_world(initialPosition.getY()));
-
+    bodyDef.position = point_to_b2Vec2(initialPosition);
     bodyDef.angle = unit_angles_to_radians(initialRotation);
 
     BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_bodyHandle_t);
@@ -185,8 +182,7 @@ CA_FUNCTION(set_body_fixtures)
                 screen_to_world(size.getY()));
             fixtureDef.shape = &polygonShape;
         } else if (shapeType == 1) {
-            float radius = to_float(fixtureDefIn[1]);
-            circleShape.m_radius = screen_to_world(radius);
+            circleShape.m_radius = screen_to_world(to_float(fixtureDefIn[1]));
             fixtureDef.shape = &circleShape;
         }
 
@@ -217,10 +213,7 @@ CA_FUNCTION(get_body_points)
 
             for (int i = 0; i < count; i++) {
                 b2Vec2 vec = body->GetWorldPoint(poly->GetVertex(i));
-                Point* p = Point::cast(points.append());
-                p->set(
-                    world_to_screen(vec.x),
-                    world_to_screen(vec.y));
+                b2Vec2_to_point(vec, points.append());
             }
         }
     }
@@ -280,8 +273,6 @@ CA_FUNCTION(set_linear_velocity)
     if (body == NULL)
         return;
 
-    std::cout << "set_linear_velocity" << INPUT(1)->toString() << std::endl;
-
     body->SetLinearVelocity(point_to_b2Vec2(INPUT(1)));
 }
 
@@ -324,11 +315,7 @@ CA_FUNCTION(body_contains_point)
     if (body == NULL)
         return;
 
-    Point& input = *Point::checkCast(INPUT(1));
-
-    b2Vec2 p(
-        screen_to_world(input.getX()),
-        screen_to_world(input.getY()));
+    b2Vec2 p = point_to_b2Vec2(INPUT(1));
 
     b2Fixture* fixture = body->GetFixtureList();
 
