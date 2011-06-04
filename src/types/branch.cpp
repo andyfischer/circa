@@ -3,14 +3,9 @@
 namespace circa {
 namespace branch_t {
 
-    Branch& get(TaggedValue* value)
-    {
-        return *((Branch*) value->value_data.ptr);
-    }
-
     void visitHeap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* context)
     {
-        Branch& branch = get(value);
+        Branch& branch = *as_branch(value);
         TaggedValue relIdent;
 
         set_string(&relIdent, "locals");

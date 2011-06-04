@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include <circa.h>
+#include "static_checking.h"
 #include "update_cascades.h"
 
 namespace circa {
@@ -30,6 +31,9 @@ namespace include_function {
                 expose_all_names(contents, *caller->owningBranch);
                 finish_update_cascade(*caller->owningBranch);
             }
+
+            mark_static_errors_invalid(contents);
+            update_static_error_list(contents);
 
             return true;
         }
@@ -103,7 +107,7 @@ namespace include_function {
         load_script(CONTEXT, CALLER, &CALLER->nestedContents.fileSignature,
             STRING_INPUT(0));
 
-        set_null(OUTPUT);
+        set_branch(OUTPUT, &CALLER->nestedContents);
     }
 
     void setup(Branch& kernel)
@@ -112,8 +116,8 @@ namespace include_function {
                 "include(string filename)");
         get_function_attrs(INCLUDE_FUNC)->postCompile = include_post_compile;
 
-        /*Term* load_script_f =*/ import_function(kernel, load_script,
-            "load_script(string filename)");
+        import_function(kernel, load_script,
+                "load_script(string filename) -> Branch");
     }
 }
 } // namespace circa

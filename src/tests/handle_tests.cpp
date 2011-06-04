@@ -216,6 +216,8 @@ void test_included_file_changed()
     files.set("f", "");
     evaluate_branch_no_preserve_locals(&context, branch);
 
+    test_assert(branch);
+
     test_equals(&g_slots, "[false, false, false]");
 }
 

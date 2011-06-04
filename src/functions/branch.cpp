@@ -8,7 +8,7 @@ namespace branch_function {
 
     CA_FUNCTION(branch_evaluate)
     {
-        evaluate_branch_internal_with_state(CONTEXT, CALLER);
+        evaluate_branch_internal_with_state(CONTEXT, CALLER, CALLER->nestedContents);
     }
 
     CA_FUNCTION(lambda_evaluate)

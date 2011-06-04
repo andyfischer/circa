@@ -48,8 +48,9 @@ struct Branch
     // be recalculated).
     TaggedValue hasInlinedState;
 
-    // If this branch has any static errors, then they are listed here.
-    // Structure of each item in this list:
+    // If this branch has any static errors, then they are listed here. If there
+    // are no errors then this value is null.
+    // If this has a list, each element has structure:
     //  [0] int index
     //  [1] string type
     //  [2] int inputIndex (only used for errors related to inputs)

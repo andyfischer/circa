@@ -100,8 +100,12 @@ void check_for_static_errors(List* errors, Branch& branch)
 
 void update_static_error_list(Branch& branch)
 {
-    if (is_null(&branch.staticErrors))
-        check_for_static_errors(List::cast(&branch.staticErrors, 0), branch);
+    List errors;
+    check_for_static_errors(&errors, branch);
+    if (errors.empty())
+        set_null(&branch.staticErrors);
+    else
+        swap(&errors, &branch.staticErrors);
 }
 
 bool has_static_error(Term* term)
@@ -114,13 +118,20 @@ bool has_static_error(Term* term)
 bool has_static_errors(Branch& branch)
 {
     update_static_error_list(branch);
-    return !List::checkCast(&branch.staticErrors)->empty();
+    return has_static_errors_cached(branch);
+}
+
+bool has_static_errors_cached(Branch& branch)
+{
+    return !is_null(&branch.staticErrors);
 }
 
 int count_static_errors(Branch& branch)
 {
     update_static_error_list(branch);
-    return !List::checkCast(&branch.staticErrors)->length();
+    if (is_null(&branch.staticErrors))
+        return 0;
+    return List::checkCast(&branch.staticErrors)->length();
 }
 
 void print_static_error(TaggedValue* error, std::ostream& out)
@@ -192,6 +203,8 @@ bool print_static_errors_formatted(List* result, std::ostream& out)
 bool print_static_errors_formatted(Branch& branch, std::ostream& out)
 {
     update_static_error_list(branch);
+    if (!is_list(&branch.staticErrors))
+        return false;
     return print_static_errors_formatted(List::checkCast(&branch.staticErrors), out);
 }
 

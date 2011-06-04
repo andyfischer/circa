@@ -47,7 +47,8 @@ void evaluate_single_term(EvalContext* context, Term* term);
 void evaluate_branch_internal(EvalContext* context, Branch& branch);
 void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output);
 
-void evaluate_branch_internal_with_state(EvalContext* context, Term* term);
+void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
+        Branch& branch);
 
 void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch);
 

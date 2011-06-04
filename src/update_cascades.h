@@ -18,6 +18,9 @@ void mark_inputs_changed(Term* term);
 // This is used when include() loads a new block of code.
 void mark_repairable_link(Term* term, std::string const& name, int dependencyIndex);
 
+// Called when the staticErrors list on the Branch should be recalculated.
+void mark_static_errors_invalid(Branch& branch);
+
 void finish_update_cascade(Branch& branch);
 
 void on_inputs_changed(Term* term);

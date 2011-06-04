@@ -86,16 +86,15 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue*
     finish_using(branch);
 }
 
-void evaluate_branch_internal_with_state(EvalContext* context, Term* term)
+void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
+        Branch& branch)
 {
-    Branch& contents = term->nestedContents;
-
     // Store currentScopeState and fetch the container for this branch
     TaggedValue prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
     fetch_state_container(term, &prevScopeState, &context->currentScopeState);
 
-    evaluate_branch_internal(context, contents);
+    evaluate_branch_internal(context, branch);
 
     // Store container and replace currentScopeState
     save_and_consume_state(term, &prevScopeState, &context->currentScopeState);

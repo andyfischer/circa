@@ -54,6 +54,11 @@ void mark_repairable_link(Term* term, std::string const& name, int dependencyInd
     set_int(link[1], dependencyIndex);
 }
 
+void mark_static_errors_invalid(Branch& branch)
+{
+    set_null(&branch.staticErrors);
+}
+
 void finish_update_cascade(Branch& branch)
 {
     if (is_null(&branch.pendingUpdates))
