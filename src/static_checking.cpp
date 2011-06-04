@@ -134,13 +134,14 @@ int count_static_errors(Branch& branch)
     return List::checkCast(&branch.staticErrors)->length();
 }
 
-void print_static_error(TaggedValue* error, std::ostream& out)
+void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
 {
     List* item = List::checkCast(error);
     Term* term = as_ref(item->get(0));
     const char* type = as_string(item->get(1)).c_str();
     int inputIndex = item->get(2)->asInt();
 
+    std::stringstream out;
     out << get_short_location(term) << " ";
     
     // Convert 'type' to a readable string
@@ -179,7 +180,14 @@ void print_static_error(TaggedValue* error, std::ostream& out)
     else
         out << "(unrecognized error type: " << type << ")";
 
-    // << type << std::endl;
+    set_string(stringOutput, out.str());
+}
+
+void print_static_error(TaggedValue* value, std::ostream& out)
+{
+    TaggedValue str;
+    format_static_error(value, &str);
+    out << as_string(&str);
 }
 
 bool print_static_errors_formatted(List* result, std::ostream& out)
@@ -210,6 +218,7 @@ bool print_static_errors_formatted(Branch& branch, std::ostream& out)
 
 void print_static_error(Term* term, std::ostream& out)
 {
+    // delete this
     List result;
     check_term_for_static_error(&result, term);
     if (!result.empty())

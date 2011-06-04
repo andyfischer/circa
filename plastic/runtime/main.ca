@@ -320,7 +320,8 @@ receive_last(@user_script_filename 'load_user_script_request')
 users_script = load_script(user_script_filename)
 
 if users_script.has_static_error()
-    trace('static error!')
+    for err in users_script.get_static_errors_formatted()
+        print('Static error: ' err)
 else
     ev = users_script.evaluate()
 
