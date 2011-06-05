@@ -6,7 +6,7 @@ def draw_body_outline(any handle, Color color)
     gl:line_loop(points color)
 
 def wall(Point p, number rot)
-    body = box2d:fixed_rect(p rot [60 10])
+    body = box2d:static_rect(p rot [60 10])
     draw_body_outline(body #fff)
 
     -- Draggable, using code feedback
@@ -34,7 +34,7 @@ def large_box(Point start)
     draw_body_outline(body #fff)
 
 
-box2d:step(0.016)
+box2d:step()
 box2d:gravity([0 8])
 
 large_box([400 100])
@@ -45,6 +45,4 @@ for i in 0..100
 
 wall([520.0 319.0] -0.15)
 wall([377.0 234.0] 0.12)
-
-
 

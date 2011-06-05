@@ -27,6 +27,8 @@ namespace box2d
     def apply_torque(any handle, number torque)
     def apply_linear_impulse(any handle, any center, any point)
     def apply_angular_impulse(any handle, number impulse)
+    def create_mouse_joint(any body, Point target) -> any
+    def mouse_joint_set_target(any joint, Point target)
 
     def body_contains_point(any handle, Point p) -> bool
         "Intersection test, returns true if the given point is inside the body"
@@ -89,4 +91,8 @@ namespace box2d
                 delt = [0 0]
 
             set_body_position(handle, Point(get_body_position(handle) + delt))
+
+    def mouse_joint(any body, Point target)
+        state joint = create_mouse_joint(body, target)
+        mouse_joint_set_target(joint, target)
 

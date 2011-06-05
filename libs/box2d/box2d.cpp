@@ -14,6 +14,7 @@ namespace box2d_support {
 #define LOG_HANDLE_CREATION 0
 
 b2World *g_world = NULL;
+b2Body *g_groundBody = NULL; // used for mouse joints
 
 void initialize_world()
 {
@@ -36,7 +37,7 @@ float unit_angles_to_radians(float unit) { return unit * M_PI; }
 
 void b2Vec2_to_point(b2Vec2 const& vec, TaggedValue* point)
 {
-    set_point(point, world_to_screen(vec.y), world_to_screen(vec.y));
+    set_point(point, world_to_screen(vec.x), world_to_screen(vec.y));
 }
 
 b2Vec2 point_to_b2Vec2(TaggedValue* point)
@@ -47,7 +48,8 @@ b2Vec2 point_to_b2Vec2(TaggedValue* point)
 }
 
 // The BodyHandle type is used to hold on to b2Body objects.
-Type g_bodyHandle_t;
+Type g_body_t;
+Type g_mouseJoint_t;
 
 GcHeap g_gcHeap;
 
@@ -74,6 +76,17 @@ struct BodyHandle
     }
 };
 
+struct MouseJoint
+{
+    b2MouseJoint* joint;
+    
+    MouseJoint(b2MouseJoint* _joint) : joint(_joint) {}
+    ~MouseJoint() {
+        if (joint)
+            g_world->DestroyJoint(joint);
+    }
+};
+
 b2Body* get_body_from_handle(TaggedValue* value)
 {
     BodyHandle* bodyHandle = (BodyHandle*) handle_t::get_ptr(value);
@@ -84,7 +97,7 @@ b2Body* get_body_from_handle(TaggedValue* value)
 
 bool is_valid_body_handle(TaggedValue* value)
 {
-    return value->value_type == &g_bodyHandle_t
+    return value->value_type == &g_body_t
         && get_body_from_handle(value) != NULL;
 }
 
@@ -133,7 +146,7 @@ CA_FUNCTION(create_body)
     bodyDef.position = point_to_b2Vec2(initialPosition);
     bodyDef.angle = unit_angles_to_radians(initialRotation);
 
-    BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_bodyHandle_t);
+    BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_body_t);
     bodyHandle->containingList = (ListData*) OUTPUT->value_data.ptr;
 
     bodyHandle->body = g_world->CreateBody(&bodyDef);
@@ -330,6 +343,31 @@ CA_FUNCTION(body_contains_point)
     set_bool(OUTPUT, false);
 }
 
+CA_FUNCTION(create_mouse_joint)
+{
+    b2Body* body = get_body_from_handle(INPUT(0));
+    b2MouseJointDef def;
+
+    if (g_groundBody == NULL) {
+        b2BodyDef bodyDef;
+        g_groundBody = g_world->CreateBody(&bodyDef);
+    }
+
+    def.bodyA = g_groundBody;
+    def.bodyB = body;
+    def.target = point_to_b2Vec2(INPUT(1));
+    b2MouseJoint* joint = (b2MouseJoint*) g_world->CreateJoint(&def);
+    handle_t::set(OUTPUT, &g_mouseJoint_t, (void*) new MouseJoint(joint));
+    body->SetAwake(true);
+}
+
+CA_FUNCTION(mouse_joint_set_target)
+{
+    MouseJoint* jointHandle = (MouseJoint*) handle_t::get_ptr(INPUT(0));
+    jointHandle->joint->SetTarget(point_to_b2Vec2(INPUT(1)));
+    set_null(OUTPUT);
+}
+
 void run_global_refcount_check()
 {
     std::cout << "run_global_refcount_check" << std::endl;
@@ -378,8 +416,11 @@ void on_frame_callback(void* userdata, app::App* app, int step)
 
 void setup(Branch& kernel)
 {
-    handle_t::setup_type<BodyHandle>(&g_bodyHandle_t);
-    g_bodyHandle_t.name = "Box2d::BodyHandle";
+    handle_t::setup_type<BodyHandle>(&g_body_t);
+    g_body_t.name = "Box2d:BodyHandle";
+
+    handle_t::setup_type<MouseJoint>(&g_mouseJoint_t);
+    g_mouseJoint_t.name = "Box2d:MouseJoint";
 
     Branch& ns = kernel["box2d"]->nestedContents;
 
@@ -398,6 +439,8 @@ void setup(Branch& kernel)
     install_function(ns["apply_linear_impulse"], apply_linear_impulse);
     install_function(ns["apply_angular_impulse"], apply_angular_impulse);
     install_function(ns["body_contains_point"], body_contains_point);
+    install_function(ns["create_mouse_joint"], create_mouse_joint);
+    install_function(ns["mouse_joint_set_target"], mouse_joint_set_target);
 
     //app::get_global_app().addPreFrameCallback(on_frame_callback, NULL);
     app::get_global_app().addPostFrameCallback(on_frame_callback, NULL);
