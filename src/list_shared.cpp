@@ -56,6 +56,14 @@ void list_decref(ListData* data)
     //std::cout << "decref " << data << " to " << data->refCount << std::endl;
 }
 
+void list_incref(ListData* data)
+{
+    assert_valid_list(data);
+    data->refCount++;
+
+    //std::cout << "incref " << data << " to " << data->refCount << std::endl;
+}
+
 void free_list(ListData* data)
 {
     // Release all elements
@@ -165,7 +173,15 @@ ListData* list_resize(ListData* original, int numElements)
     return result;
 }
 
-TaggedValue* list_get_element(TaggedValue* value, int index)
+int list_get_length(TaggedValue* value)
+{
+    ListData* s = (ListData*) get_pointer(value);
+    if (s == NULL)
+        return 0;
+    return s->count;
+}
+
+TaggedValue* list_get_index(TaggedValue* value, int index)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
 
@@ -175,17 +191,25 @@ TaggedValue* list_get_element(TaggedValue* value, int index)
     return &data->items[index];
 }
 
-void list_remove_element(TaggedValue* list, int index)
+ListData* list_remove_index(ListData* original, int index)
+{
+    ca_assert(index < original->count);
+    ListData* result = list_touch(original);
+
+    for (int i=index; i < result->count - 1; i++)
+        swap(&result->items[i], &result->items[i+1]);
+    set_null(&result->items[result->count - 1]);
+    result->count--;
+    return result;
+}
+
+void list_remove_index(TaggedValue* list, int index)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
 
     ListData* data = (ListData*) list->value_data.ptr;
-
-    for (int i=index; i < (data->count - 1); i++)
-        swap(&data->items[i], &data->items[i + 1]);
-
-    set_null(&data->items[data->count - 1]);
-    data->count--;
+    list_remove_index(data, index);
+    list->value_data.ptr = data;
 }
 
 } // namespace circa

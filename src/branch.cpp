@@ -227,8 +227,8 @@ void Branch::removeNulls()
 {
     if (is_list(&pendingUpdates)) {
         for (int i=0; i < _terms.length(); i++)
-            if (_terms[i] == NULL)
-                list_remove_element(&pendingUpdates, i);
+            if ((_terms[i] == NULL) && i < list_get_length(&pendingUpdates))
+                list_remove_index(&pendingUpdates, i);
     }
 
     int numDeleted = 0;

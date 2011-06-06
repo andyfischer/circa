@@ -27,7 +27,8 @@ ListData* list_increase_capacity(ListData* original, int new_capacity);
 ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
 
-TaggedValue* list_get_element(TaggedValue* value, int index);
-void list_remove_element(TaggedValue* list, int index);
+int list_get_length(TaggedValue* value);
+TaggedValue* list_get_index(TaggedValue* value, int index);
+void list_remove_index(TaggedValue* list, int index);
 
 } // namespace circa

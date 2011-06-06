@@ -26,7 +26,7 @@ namespace handle_t {
     {
         change_type_no_initialize(handle, type);
         handle->value_data.ptr = allocate_list(1);
-        swap(userdata, list_get_element(handle, 0));
+        swap(userdata, list_get_index(handle, 0));
 
         #if HANDLE_VERBOSE_LOG
         ListData* data = (ListData*) handle->value_data.ptr;
@@ -46,7 +46,7 @@ namespace handle_t {
     }
     TaggedValue* get(TaggedValue* handle)
     {
-        return list_get_element(handle, 0);
+        return list_get_index(handle, 0);
     }
     void* get_ptr(TaggedValue* value)
     {
@@ -83,7 +83,7 @@ namespace handle_t {
 
         if (data->refCount == 0) {
 
-            TaggedValue* userdata = list_get_element(value, 0);
+            TaggedValue* userdata = list_get_index(value, 0);
 
             if (!is_null(&type->parameter)) {
                 OnRelease onReleaseFunc = (OnRelease) as_opaque_pointer(&type->parameter);
@@ -126,7 +126,7 @@ namespace handle_t {
     {
         TaggedValue relativeIdentifier;
         set_int(&relativeIdentifier, 0);
-        callback(list_get_element(handle, 0), &relativeIdentifier, context);
+        callback(list_get_index(handle, 0), &relativeIdentifier, context);
     }
     void setup_type(Type* type)
     {

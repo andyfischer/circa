@@ -17,26 +17,6 @@
 namespace circa {
 namespace list_t {
 
-    void incref(ListData* data)
-    {
-        assert_valid_list(data);
-        data->refCount++;
-
-        //std::cout << "incref " << data << " to " << data->refCount << std::endl;
-    }
-
-    ListData* remove_index(ListData* original, int index)
-    {
-        ca_assert(index < original->count);
-        ListData* result = list_touch(original);
-
-        for (int i=index; i < result->count - 1; i++)
-            swap(&result->items[i], &result->items[i+1]);
-        set_null(&result->items[result->count - 1]);
-        result->count--;
-        return result;
-    }
-
     void clear(ListData** data)
     {
         if (*data == NULL) return;
@@ -153,11 +133,6 @@ namespace list_t {
     {
         ca_assert(is_list(list));
         set_pointer(list, list_resize((ListData*) get_pointer(list), newSize));
-    }
-    void remove_index(TaggedValue* list, int index)
-    {
-        ca_assert(is_list(list));
-        set_pointer(list, remove_index((ListData*) get_pointer(list), index));
     }
 
     void clear(TaggedValue* list)
@@ -325,13 +300,6 @@ namespace list_t {
         return tv_get_index(value, index);
     }
 
-    int tv_num_elements(TaggedValue* value)
-    {
-        ca_assert(is_list(value));
-        ListData* s = (ListData*) get_pointer(value);
-        return num_elements(s);
-    }
-
     std::string tv_to_string(TaggedValue* value)
     {
         ca_assert(is_list(value));
@@ -433,7 +401,7 @@ namespace list_t {
         type->getIndex = tv_get_index;
         type->setIndex = tv_set_index;
         type->getField = tv_get_field;
-        type->numElements = tv_num_elements;
+        type->numElements = list_get_length;
         type->touch = tv_touch;
         type->staticTypeQuery = tv_static_type_query;
         type->visitHeap = tv_visit_heap;
@@ -614,7 +582,7 @@ List::clear()
 int
 List::length()
 {
-    return list_t::tv_num_elements((TaggedValue*) this);
+    return list_get_length(this);
 }
 
 bool
@@ -656,7 +624,7 @@ List::pop()
 void
 List::remove(int index)
 {
-    list_t::remove_index(this, index);
+    list_remove_index(this, index);
 }
 
 void

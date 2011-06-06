@@ -167,7 +167,7 @@ void remove_term(Term* term)
     branch._terms.resize(branch._terms.length()-1);
 
     if (is_list(&branch.pendingUpdates))
-        list_remove_element(&branch.pendingUpdates, index);
+        list_remove_index(&branch.pendingUpdates, index);
 }
 
 void remap_pointers(Term* term, TermMap const& map)
