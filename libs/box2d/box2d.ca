@@ -96,3 +96,13 @@ namespace box2d
         state joint = create_mouse_joint(body, target)
         mouse_joint_set_target(joint, target)
 
+    def draw_edges(any body, Color color)
+        gl:line_loop(box2d:get_body_points(body) color)
+
+    def walls_around_screen()
+        depth = 100.0
+        static_rect([window.width/2, -depth/2], 0, [window.width/2, depth/2])
+        static_rect([window.width/2, window.height+depth/2], 0, [window.width/2, depth/2])
+        static_rect([-depth/2, window.height/2], 0, [depth/2, window.height/2])
+        static_rect([window.width+depth/2, window.height/2], 0, [depth/2, window.width/2])
+

@@ -396,7 +396,6 @@ CA_FUNCTION(mouse_joint_set_target)
     if (jointHandle->joint == NULL)
         return;
     jointHandle->joint->SetTarget(point_to_b2Vec2(INPUT(1)));
-    std::cout << INPUT(1)->toString() << std::endl;
     set_null(OUTPUT);
 }
 

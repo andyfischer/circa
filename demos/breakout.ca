@@ -4,6 +4,8 @@ background(#000)
 box2d:gravity([0 0])
 box2d:step()
 
+box2d:walls_around_screen()
+
 namespace players_paddle
     paddle_y = window.height - 70
     paddle_x = mouse.x
@@ -20,7 +22,9 @@ namespace players_paddle
 
     body = box2d:dynamic_rect(paddle_loc 0 [paddle_width paddle_height] [1 0 1])
     gl:line_loop(box2d:get_body_points(body) #f00)
-    box2d:set_body_position(body paddle_loc)
+
+    box2d:mouse_joint(body paddle_loc)
+    box2d:set_body_rotation(body 0)
 
 
 namespace board
@@ -42,11 +46,22 @@ namespace board
 
 namespace ball
     radius = 10.0
-    obj = box2d:dynamic_circle([100 100] radius [1 0 .8])
+    obj = box2d:dynamic_circle([200 200] radius [1 0 .8])
 
     pos = box2d:get_body_position(obj)
-
+    min_ball_speed = 100.0
+    starting_ball_speed = 300.0
+    
     if once()
-        box2d:apply_linear_impulse(obj pos [0 0])
+        box2d:set_linear_velocity(obj Point(norm(Point([1 1])) * starting_ball_speed))
+
+    -- Do some hijinx to make sure the ball doesn't stop
+    vel = box2d:get_linear_velocity(obj)
+
+    if magnitude(vel) < 0.001
+        vel = Point([1 1])
+    if magnitude(vel) < min_ball_speed
+        vel = Point(norm(vel) * min_ball_speed)
+        box2d:set_linear_velocity(obj vel)
 
     gl:circle(box2d:get_body_position(obj) radius, #fff)
