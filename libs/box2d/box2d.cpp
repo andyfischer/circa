@@ -16,11 +16,6 @@ namespace box2d_support {
 b2World *g_world = NULL;
 b2Body *g_groundBody = NULL; // used for mouse joints
 
-void initialize_world()
-{
-    if (g_world == NULL)
-        g_world = new b2World(b2Vec2(), false);
-}
 
 float c_timestep = 1.0/60.0;
 int c_velocityIterations = 6;
@@ -91,6 +86,33 @@ struct MouseJoint
         remove_from_object_list(&g_mouseJoints, &jointList);
     }
 };
+
+class DestructionListener : public b2DestructionListener
+{
+    virtual void SayGoodbye(b2Joint* joint)
+    {
+        std::cout << "SayGoodbye: " << joint << std::endl;
+        ObjectListElement* element = g_mouseJoints.first;
+        while (element != NULL) {
+            MouseJoint* jointWrapper = (MouseJoint*) element->obj;
+            if (jointWrapper->joint == joint)
+                jointWrapper->joint = NULL;
+
+            element = element->next;
+        }
+    }
+    virtual void SayGoodbye(b2Fixture* fixture)
+    {
+    }
+} g_destructionListener;
+
+void initialize_world()
+{
+    if (g_world == NULL) {
+        g_world = new b2World(b2Vec2(), false);
+        g_world->SetDestructionListener(&g_destructionListener);
+    }
+}
 
 b2Body* get_body_from_handle(TaggedValue* value)
 {
@@ -360,15 +382,21 @@ CA_FUNCTION(create_mouse_joint)
     def.bodyA = g_groundBody;
     def.bodyB = body;
     def.target = point_to_b2Vec2(INPUT(1));
+    def.maxForce = 1000.0f * body->GetMass();
+
     b2MouseJoint* joint = (b2MouseJoint*) g_world->CreateJoint(&def);
     handle_t::set(OUTPUT, &g_mouseJoint_t, (void*) new MouseJoint(joint));
+
     body->SetAwake(true);
 }
 
 CA_FUNCTION(mouse_joint_set_target)
 {
     MouseJoint* jointHandle = (MouseJoint*) handle_t::get_ptr(INPUT(0));
+    if (jointHandle->joint == NULL)
+        return;
     jointHandle->joint->SetTarget(point_to_b2Vec2(INPUT(1)));
+    std::cout << INPUT(1)->toString() << std::endl;
     set_null(OUTPUT);
 }
 
