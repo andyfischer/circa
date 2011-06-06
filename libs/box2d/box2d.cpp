@@ -47,49 +47,54 @@ b2Vec2 point_to_b2Vec2(TaggedValue* point)
     return b2Vec2(screen_to_world(x), screen_to_world(y));
 }
 
-// The BodyHandle type is used to hold on to b2Body objects.
+// The Body type is used to hold on to b2Body objects.
 Type g_body_t;
 Type g_mouseJoint_t;
 
-GcHeap g_gcHeap;
+ObjectList g_bodyHandles;
+ObjectList g_mouseJoints;
 
-struct BodyHandle
+struct Body
 {
-    GcHeader gcHeader;
+    ObjectHeader header;
+    ObjectListElement bodyHandleList;
     b2Body* body;
-    ListData* containingList;
-    int globalIndex;
 
-    BodyHandle() : body(NULL), containingList(NULL)
+    Body() : header("Body"), body(NULL)
     {
-        initialize_new_gc_object(&g_gcHeap, &gcHeader);
+        append_to_object_list(&g_bodyHandles, &bodyHandleList, &header);
     }
 
-    ~BodyHandle() {
-        if (g_world == NULL)
-            return;
+    ~Body() {
         #if LOG_HANDLE_CREATION
         std::cout << "Destroyed " << body << std::endl;
         #endif
         g_world->DestroyBody(body);
-        remove_gc_object(&g_gcHeap, &gcHeader);
+
+        remove_from_object_list(&g_bodyHandles, &bodyHandleList);
     }
 };
 
 struct MouseJoint
 {
+    ObjectHeader header;
     b2MouseJoint* joint;
-    
-    MouseJoint(b2MouseJoint* _joint) : joint(_joint) {}
+    ObjectListElement jointList;
+
+    MouseJoint(b2MouseJoint* _joint) : header("MouseJoint"), joint(_joint) {
+        append_to_object_list(&g_mouseJoints, &jointList, &header);
+    }
+
     ~MouseJoint() {
         if (joint)
             g_world->DestroyJoint(joint);
+        remove_from_object_list(&g_mouseJoints, &jointList);
     }
 };
 
 b2Body* get_body_from_handle(TaggedValue* value)
 {
-    BodyHandle* bodyHandle = (BodyHandle*) handle_t::get_ptr(value);
+    Body* bodyHandle = (Body*) handle_t::get_ptr(value);
     if (bodyHandle == NULL)
         return NULL;
     return bodyHandle->body;
@@ -146,8 +151,7 @@ CA_FUNCTION(create_body)
     bodyDef.position = point_to_b2Vec2(initialPosition);
     bodyDef.angle = unit_angles_to_radians(initialRotation);
 
-    BodyHandle* bodyHandle = handle_t::create<BodyHandle>(OUTPUT, &g_body_t);
-    bodyHandle->containingList = (ListData*) OUTPUT->value_data.ptr;
+    Body* bodyHandle = handle_t::create<Body>(OUTPUT, &g_body_t);
 
     bodyHandle->body = g_world->CreateBody(&bodyDef);
 
@@ -385,22 +389,20 @@ void run_global_refcount_check()
     //recursive_dump_heap(&usersBranch, "usersBranch");
     //recursive_dump_heap(&runtimeBranch, "runtimeBranch");
 
-    BodyHandle* handle = (BodyHandle*) g_gcHeap.firstObject;
-    while (handle != NULL) {
+    ObjectListElement* element = g_bodyHandles.first;
 
-        std::cout << "looking at " << handle->containingList
-            << " with refcount " << handle->containingList->refCount
-            << std::endl;
+    while (element != NULL) {
+        Body* body = (Body*) element->obj;
 
         List references;
-        list_references_to_pointer(&evalContext, handle, &references);
-        list_references_to_pointer(&usersBranch, handle, &references);
-        list_references_to_pointer(&runtimeBranch, handle, &references);
+        list_references_to_pointer(&evalContext, body, &references);
+        list_references_to_pointer(&usersBranch, body, &references);
+        list_references_to_pointer(&runtimeBranch, body, &references);
 
         for (int i=0; i < references.length(); i++)
             std::cout << references[i]->asString() << std::endl;
 
-        handle = (BodyHandle*) handle->gcHeader.next;
+        element = element->next;
     }
 
     cleanup_transient_value(&evalContext);
@@ -416,8 +418,8 @@ void on_frame_callback(void* userdata, app::App* app, int step)
 
 void setup(Branch& kernel)
 {
-    handle_t::setup_type<BodyHandle>(&g_body_t);
-    g_body_t.name = "Box2d:BodyHandle";
+    handle_t::setup_type<Body>(&g_body_t);
+    g_body_t.name = "Box2d:Body";
 
     handle_t::setup_type<MouseJoint>(&g_mouseJoint_t);
     g_mouseJoint_t.name = "Box2d:MouseJoint";

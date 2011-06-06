@@ -95,35 +95,38 @@ void list_references_to_pointer(TaggedValue* container, void* ptr,
     swap(context[2], outputList);
 }
 
-void initialize_new_gc_object(GcHeap* heap, GcHeader* header)
+void append_to_object_list(ObjectList* list, ObjectListElement* element,
+        ObjectHeader* header)
 {
-    if (heap->firstObject == NULL) {
-        heap->firstObject = header;
-        heap->lastObject = header;
-        header->prev = NULL;
-        header->next = NULL;
+    element->obj = header;
+
+    if (list->first == NULL) {
+        list->first = element;
+        list->last = element;
+        element->prev = NULL;
+        element->next = NULL;
         return;
     } else {
-        heap->lastObject->next = header;
-        header->prev = heap->lastObject;
-        header->next = NULL;
-        heap->lastObject = header;
+        list->last->next = element;
+        element->prev = list->last;
+        element->next = NULL;
+        list->last = element;
     }
 }
 
-void remove_gc_object(GcHeap* heap, GcHeader* header)
+void remove_from_object_list(ObjectList* list, ObjectListElement* element)
 {
-    if (heap->firstObject == header)
-        heap->firstObject = header->next;
-    if (heap->lastObject == header)
-        heap->lastObject = header->prev;
-    if (header->prev != NULL)
-        header->prev->next = header->next;
-    if (header->next != NULL)
-        header->next->prev = header->prev;
+    if (list->first == element)
+        list->first = element->next;
+    if (list->last == element)
+        list->last = element->prev;
+    if (element->prev != NULL)
+        element->prev->next = element->next;
+    if (element->next != NULL)
+        element->next->prev = element->prev;
 
-    header->next = NULL;
-    header->prev = NULL;
+    element->next = NULL;
+    element->prev = NULL;
 }
 
 } // namespace circa

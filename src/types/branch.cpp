@@ -5,6 +5,9 @@ namespace branch_t {
 
     void visitHeap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* context)
     {
+        if (as_branch(value) == NULL)
+            return;
+
         Branch& branch = *as_branch(value);
         TaggedValue relIdent;
 
