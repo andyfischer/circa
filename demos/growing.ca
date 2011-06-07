@@ -1,66 +1,82 @@
 
-background(#eef)
-desired_window_size = [480 600]
+background(#000)
 
-def interp(number progress, number e) -> number
-  return min(progress / e, 1.0)
+type SegmentInput {
+  int generation
+  number distance_from_base
+  number distance_till_branch
+  number end_radius
+  Point loc
+  number angle
+  number bend_value
+}
 
-def tree_segment(Point base, number direction, number width, int depth, List leaves +out, List branch_polys +out, List branch_edges +out)
-  jitter = (seed() - .5) *.05
-  max_length = 20 + 30 * seed()
-  mult(@max_length, (1.0 - .1 * depth))
-  age = 1.0 + elapsed()
-  seg_length = max_length * interp(age, 5)
-  color = #6a3
+base_grow_rate = 200.0
+max_segment_length = 10.0 -- 10 to 30
+max_segment_radius = 1.0
+max_segment_angle = 1.0 -- .5 - 1
+max_segment_length = 10.0 -- 10 - 30
+wiggle_factor = 0.07 -- 0 - 1
+generation_limit = 21
+distance_between_branches_min = 30.0 -- 20 - 100
+distance_between_branches_var = 20.0 -- 20 - 100
+branch_split_angle = .1
 
-  -- bend our angle, if this isn't the root segment
-  if depth > 0
-      direction += interp(age, 10) * (seed()-.5) * .4
+def segment(SegmentInput input)
+    state number age = 0.0
+    state wiggle_value = rand() - .5
+    state thickness_ratio = 1.0
 
-  bottom_width = width * interp(age, 8)
+    generation = input.generation + 1
 
-  branch_count = 0
-  
-  if age > 5
-      branch_count += 1
-  if age > 10
-      branch_count += 1
-  if age > 15
-      branch_count += 1
+    age += td
 
-  if depth >= 4.0
-    branch_count = 0
+    -- length
+    target_length = base_grow_rate * age
+    min(@target_length, max_segment_length)
+    length = target_length * (1 - (1 / (age + 1)))
 
-  top_width = width * interp(age, 11)
+    -- thickness
+    -- todo
 
-  -- taper the tip if there are no branches
-  cond(branch_count == 0, 0.0, @top_width)
+    -- angle delta
+    angle_delt = wiggle_value * wiggle_factor + input.bend_value
+    mult(@angle_delt, (1 - 1 / (age + 1)))
+    angle = input.angle + angle_delt
 
-  l = polar(direction - .25) * bottom_width + base
-  r = polar(direction + .25) * bottom_width + base
-  next_center = polar(direction) * seg_length + base
-  l2 = polar(direction - .25) * top_width + next_center
-  r2 = polar(direction + .25) * top_width + next_center
-  points = [r l l2 l2 r2 r]
-  gl:triangles(points color)
-  gl:lines([l l2 r r2], #000)
+    min(@angle_delt, max_segment_angle)
+    max(@angle_delt, -max_segment_angle)
 
-  for branchIndex in 0..branch_count
-    branch_age = elapsed()
-    tree_segment(next_center->Point, direction, width * .6, depth+1, &leaves, &branch_polys, &branch_edges)
+    distance_from_base = input.distance_from_base + length
+    distance_till_branch = input.distance_till_branch - target_length
+    
+    start_pos = input.loc
+    end_pos = start_pos + polar(angle) * length
+    line(start_pos end_pos #fff)
 
-  -- leaves
-  leaf_count = cond(width < .6, 0, 3)
-  myLeaves = []
-  for leafIndex in 0..leaf_count
-     leaf_pos = seed() * seg_length
-     myLeaves.append(leaf_pos)
+    -- check to branch
+    if distance_till_branch < 0
+        for i in 0..2
+            distance_till_next_branch = distance_between_branches_min + seed() * distance_between_branches_var
+            bend_angle = ((i * 2) - 1) * branch_split_angle
+            segment([generation, distance_from_base, distance_till_next_branch, 0, end_pos, angle, bend_angle])
 
-  leaves.append(myLeaves)
+    -- or sprout a child
+    elif (target_length >= max_segment_length and generation < generation_limit)
+        segment([generation distance_from_base distance_till_branch 0 end_pos angle, 0])
 
-starting_width = 3.0
-leaves = []
 
-branch_polys = []
-branch_edges = []
-root = tree_segment([200 300], 0, starting_width, 0, &leaves, &branch_polys, &branch_edges)
+root_pos = [300 300]
+segment([0 0 50.0 0 root_pos 0 0])
+
+def make_plants_with_mouse()
+    state roots = []
+
+    if mouse_clicked()
+        roots.append(mouse)
+
+    for root in roots
+        Point(@root)
+        segment([0 0 50.0 0 root 0 0])
+
+make_plants_with_mouse()
