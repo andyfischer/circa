@@ -11,7 +11,7 @@ def draw_vmenu(Point topleft, List items) -> any
 
     -- Render text sprites
     for label in @labels
-        text:render_text(menu_font, @label, #fff)
+        sdl_ttf:render_text(menu_font, @label, #fff)
 
     -- Get maximum text width
     text_width = 0
@@ -45,7 +45,7 @@ def draw_vmenu(Point topleft, List items) -> any
 
         color = bg_color + #222 * highlight
         fill_rect(rect color)
-        text:draw_rendered_text(label [x+h_gutter y+2])
+        sdl_ttf:draw_rendered_text(label [x+h_gutter y+2])
 
         if index != 0
             line([x y] [x+box_width y] #888)
@@ -61,7 +61,7 @@ def draw_vmenu(Point topleft, List items) -> any
 def draw_hmenu(Point topleft, List items) -> any
     labels = []
     for item in items; labels.append(item[0])
-    for label in @labels; text:render_text(menu_font, @label, #fff)
+    for label in @labels; sdl_ttf:render_text(menu_font, @label, #fff)
 
     index = 0
     text_height = 18
@@ -82,7 +82,7 @@ def draw_hmenu(Point topleft, List items) -> any
         approach(@highlight, 5 * td)
         color = bg_color + #222 * highlight
         fill_rect(rect color)
-        text:draw_rendered_text(label [x+h_gutter, y+v_gutter])
+        sdl_ttf:draw_rendered_text(label [x+h_gutter, y+v_gutter])
 
     return 0
 

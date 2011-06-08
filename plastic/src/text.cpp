@@ -175,13 +175,13 @@ void setup(Branch& branch)
         return;
     }
 
-    Branch& text_ns = branch["text"]->nestedContents;
-    install_function(text_ns["load_font_internal"], load_font);
-    install_function(text_ns["render_text_internal"], render_text);
-    install_function(text_ns["draw_rendered_text"], draw_rendered_text);
-    install_function(text_ns["get_metrics"], get_metrics);
+    Branch& sdl_ttf_ns = branch["sdl_ttf"]->nestedContents;
+    install_function(sdl_ttf_ns["load_font_internal"], load_font);
+    install_function(sdl_ttf_ns["render_text_internal"], render_text);
+    install_function(sdl_ttf_ns["draw_rendered_text"], draw_rendered_text);
+    install_function(sdl_ttf_ns["get_metrics"], get_metrics);
 
-    RenderedText::singleton = unbox_type(text_ns["RenderedText"]);
+    RenderedText::singleton = unbox_type(sdl_ttf_ns["RenderedText"]);
 }
 
 } // namespace text

@@ -32,8 +32,8 @@ def draggable_box(Point initial_location)
 
     fill_rect(rect color)
     
-    text_sprite = text:render_text(ui_font_medium, "Draggable", text_color)
-    text:draw_rendered_text(text_sprite, [location.x + (size.x - text_sprite.width)/2,
+    text_sprite = sdl_ttf:render_text(ui_font_medium, "Draggable", text_color)
+    sdl_ttf:draw_rendered_text(text_sprite, [location.x + (size.x - text_sprite.width)/2,
         location.y + (size.y - text_sprite.height) / 2])
 
 draggable_box([100 50])

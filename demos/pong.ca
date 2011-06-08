@@ -82,8 +82,8 @@ if show_ball
     gl:circle(ball_loc, ball_radius, #fff)
 
 def draw_text_centered_y(Font font, string str, Color color, Point location)
-    render = text:render_text(font, str, color)
-    text:draw_rendered_text(render, location - [render.width/2 0])
+    render = sdl_ttf:render_text(font, str, color)
+    sdl_ttf:draw_rendered_text(render, location - [render.width/2 0])
 
 -- draw status
 draw_text_centered_y(ui_font_medium, concat('Score'), #fff, [window.width/2, 20])

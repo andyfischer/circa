@@ -6,8 +6,8 @@ if draw_main_menu
 -- Draw fpses
 draw_fps = false
 if draw_fps
-    text_sprite = text:render_text(ui_font_medium, concat('fps: ' fps), #fff)
-    text:draw_rendered_text(text_sprite, [10 window.height - 40])
+    text_sprite = sdl_ttf:render_text(ui_font_medium, concat('fps: ' fps), #fff)
+    sdl_ttf:draw_rendered_text(text_sprite, [10 window.height - 40])
 
 -- Draw pause indicator
 if ide:paused()

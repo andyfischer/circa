@@ -75,7 +75,7 @@ namespace key
 -- Text rendering functions
 type Font;
 
-namespace text
+namespace sdl_ttf
     type RenderedText { int texid, int width, int height, Color color, string text }
     def load_font_internal(string filename, int size) -> Font
     def load_font(string filename, int size) -> Font
@@ -98,13 +98,13 @@ namespace text
 
 def draw_text(Font font, string str, Color color, Point location) -> Rect
     "Render and draw a string."
-    sprite = text:render_text(font, str, color)
-    text:draw_rendered_text(sprite, location)
+    sprite = sdl_ttf:render_text(font, str, color)
+    sdl_ttf:draw_rendered_text(sprite, location)
     return to_rect(location, [sprite.width sprite.height])
 
 def draw_text_centered(Font font, string str, Color color, Point location)
-    sprite = text:render_text(font, str, color)
-    text:draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
+    sprite = sdl_ttf:render_text(font, str, color)
+    sdl_ttf:draw_rendered_text(sprite, [location.x - sprite.width/2 location.y])
 
 -- GL functions
 def background(Color) "Fill the screen with the given color."
@@ -224,8 +224,8 @@ def draggable_rect(Point initial_location, Point size) -> Point
         mouse_offset = location - mouse
     return location
 
-ui_font_medium = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->rpath, 16)
-coding_font = text:load_font("../assets/Inconsolata.otf"->rpath, 16)
+ui_font_medium = sdl_ttf:load_font("../assets/sv_basic_manual/SVBasicManual.ttf"->rpath, 16)
+coding_font = sdl_ttf:load_font("../assets/Inconsolata.otf"->rpath, 16)
 
 namespace fps_counter
     state int framesElapsed = 0
@@ -251,7 +251,7 @@ namespace tweak
         "Draw a button which displays the value of 'r', allowing the user to tweak that value using mouse input."
         str = concat(name ' = ' r.to_string())
 
-        text_sprite = text:render_text(ui_font_medium, str, #000)
+        text_sprite = sdl_ttf:render_text(ui_font_medium, str, #000)
         padding = 3.0
         rect = [loc.x - padding, loc.y - padding,
             loc.x + text_sprite.width + padding,
@@ -259,7 +259,7 @@ namespace tweak
         color = #ee3399
         if mouse_in(rect) { color = #ff44aa }
         fill_rect(rect, color)
-        text:draw_rendered_text(text_sprite, [loc.x loc.y])
+        sdl_ttf:draw_rendered_text(text_sprite, [loc.x loc.y])
 
         -- mouse wheel
         if mouse_wheel_up(rect)

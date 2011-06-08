@@ -36,7 +36,7 @@ for x in 0..num_tiles_x
     gl:triangles([box_tl box_tr box_bl box_tr box_br box_bl] color)
 
 -- Draw the goal label
-small_font = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 18)
+small_font = sdl_ttf:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 18)
 def draw_goal_label(Point loc)
     draw_text_centered(small_font, "GOAL", #000, loc)
     loc += [-15 20]
@@ -47,7 +47,7 @@ def draw_goal_label(Point loc)
 draw_goal_label([window.width - 50 window.height / 2])
 
 -- Draw # of points
-big_font = text:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 40)
+big_font = sdl_ttf:load_font("../assets/sv_basic_manual/SVBasicManual.ttf", 40)
 draw_text_centered(big_font, concat('Rescued: ' rescued_creatures) #000
     [window.width/2 20])
 
