@@ -302,23 +302,23 @@ void test_state_is_reset_when_if_fails()
     branch.compile("if c { state i = 0; i += 1 } else { 'hi' }");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[i: 1], null]]");
+    test_equals(&context.state, "{_if_block: [{i: 1}, null]}");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[i: 2], null]]");
+    test_equals(&context.state, "{_if_block: [{i: 2}, null]}");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[i: 3], null]]");
+    test_equals(&context.state, "{_if_block: [{i: 3}, null]}");
 
     set_bool(c, false);
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [null, null]]");
+    test_equals(&context.state, "{_if_block: [null, null]}");
 
     set_bool(c, true);
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[i: 1], null]]");
+    test_equals(&context.state, "{_if_block: [{i: 1}, null]}");
 }
 
 void test_state_is_reset_when_if_fails2()
@@ -339,18 +339,18 @@ void test_state_is_reset_when_if_fails2()
 
     EvalContext context;
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[s: 1], null]]");
+    test_equals(&context.state, "{_if_block: [{s: 1}, null]}");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[s: 1], null]]");
+    test_equals(&context.state, "{_if_block: [{s: 1}, null]}");
 
     set_bool(a, false);
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [null, null]]");
+    test_equals(&context.state, "{_if_block: [null, null]}");
 
     set_bool(a, true);
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_if_block: [[s: 2], null]]");
+    test_equals(&context.state, "{_if_block: [{s: 2}, null]}");
 }
 
 void test_nested_state()

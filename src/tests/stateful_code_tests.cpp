@@ -143,7 +143,7 @@ void explicit_state()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(context.state.toString(), "[s: 1]");
+    test_equals(context.state.toString(), "{s: 1}");
 }
 
 void implicit_state()
@@ -155,7 +155,7 @@ void implicit_state()
     EvalContext context;
     evaluate_branch(&context, branch);
     
-    test_equals(context.state.toString(), "[_f: [s: 1]]");
+    test_equals(context.state.toString(), "{_f: {s: 1}}");
 }
 
 namespace test_interpreted_state_access
@@ -179,13 +179,13 @@ namespace test_interpreted_state_access
         test_equals(context.state.toString(), "null");
 
         evaluate_branch(&context, branch);
-        test_equals(context.state.toString(), "[a: 1]");
+        test_equals(context.state.toString(), "{a: 1}");
 
         evaluate_branch(&context, branch);
-        test_equals(context.state.toString(), "[a: 2]");
+        test_equals(context.state.toString(), "{a: 2}");
 
         evaluate_branch(&context, branch);
-        test_equals(context.state.toString(), "[a: 3]");
+        test_equals(context.state.toString(), "{a: 3}");
     }
 }
 
@@ -215,7 +215,7 @@ void subroutine_unique_name_usage()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(&context.state, "[_f: [s: 8]]");
+    test_equals(&context.state, "{_f: {s: 8}}");
 }
 
 void subroutine_early_return()
@@ -224,7 +224,7 @@ void subroutine_early_return()
     branch.compile("def f()->int { state s = 2; return 0; s = 4; } f()");
     EvalContext context;
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_f: [s: 2]]");
+    test_equals(&context.state, "{_f: {s: 2}}");
 }
 
 void test_branch_has_inlined_state()
@@ -308,17 +308,17 @@ std::string code_to_state_shape(const char* code)
 void test_describe_state_shape()
 {
     test_equals(code_to_state_shape("a = 1; for i in [2 3] {}; if true {}"), "null");
-    test_equals(code_to_state_shape("state a = 1"), "[a: 'int']");
+    test_equals(code_to_state_shape("state a = 1"), "{a: 'int'}");
     test_equals(code_to_state_shape("if true { state a = 1 }"),
-            "[_if_block: [[a: 'int'], null]]");
+            "{_if_block: [{a: 'int'}, null]}");
     test_equals(code_to_state_shape("if true { state a = 1 } else {state b}"),
-            "[_if_block: [[a: 'int'], [b: 'any']]]");
+            "{_if_block: [{a: 'int'}, {b: 'any'}]}");
     test_equals(code_to_state_shape("for i in [1 2 3] { 1 }"), "null");
     test_equals(code_to_state_shape("for i in [1 2 3] { state s }"),
-            "[_for: [[s: 'any'], :repeat]]");
+            "{_for: [{s: 'any'}, :repeat]}");
     test_equals(code_to_state_shape(
         "for i in [1 2 3] { for j in [1 2 3] { state s } }"),
-            "[_for: [[_for: [[s: 'any'], :repeat]], :repeat]]");
+            "{_for: [{_for: [{s: 'any'}, :repeat]}, :repeat]}");
 }
 
 void test_strip_abandoned_state()
@@ -334,22 +334,22 @@ void test_strip_abandoned_state()
 
     TaggedValue trash;
 
-    test_equals(&context.state, "[s: 1, t: 2, x: 'hi']");
+    test_equals(&context.state, "{s: 1, t: 2, x: 'hi'}");
 
     remove_term(t);
     strip_orphaned_state(branch, &context.state, &trash);
-    test_equals(&context.state, "[s: 1, x: 'hi']");
-    test_equals(&trash, "[t: 2]");
+    test_equals(&context.state, "{s: 1, x: 'hi'}");
+    test_equals(&trash, "{t: 2}");
 
     remove_term(x);
     strip_orphaned_state(branch, &context.state, &trash);
-    test_equals(&context.state, "[s: 1]");
-    test_equals(&trash, "[x: 'hi']");
+    test_equals(&context.state, "{s: 1}");
+    test_equals(&trash, "{x: 'hi'}");
 
     remove_term(s);
     strip_orphaned_state(branch, &context.state, &trash);
     test_equals(&context.state, "null");
-    test_equals(&trash, "[s: 1]");
+    test_equals(&trash, "{s: 1}");
 }
 
 void test_preserve_state_in_nested_include_file()
@@ -378,12 +378,12 @@ void test_preserve_state_in_nested_include_file()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(&context.state, "[_include: [_include: [x: 1], s: 2]]");
+    test_equals(&context.state, "{_include: {_include: {x: 1}, s: 2}}");
 
     files.set("a", "include('b'); state t = test_oracle()");
     evaluate_branch(&context, branch);
 
-    test_equals(&context.state, "[_include: [_include: [x: 1], t: 3]]");
+    test_equals(&context.state, "{_include: {_include: {x: 1}, t: 3}}");
 }
 
 void test_that_initial_value_doesnt_get_reevaluated()

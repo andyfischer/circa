@@ -50,9 +50,9 @@ void test_simple_with_state()
 {
     ReloadHelper helper;
     helper.load("state List l; l.append(1)");
-    test_equals(helper.context.state.toString(), "[_include: [l: [1]]]");
+    test_equals(helper.context.state.toString(), "{_include: {l: [1]}}");
     helper.load("state List l; l.append(2)");
-    test_equals(helper.context.state.toString(), "[_include: [l: [1, 2]]]");
+    test_equals(helper.context.state.toString(), "{_include: {l: [1, 2]}}");
 }
 
 void test_function_change()

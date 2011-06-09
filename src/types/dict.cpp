@@ -348,9 +348,9 @@ std::string to_string(DictData* data)
     };
 
     Visitor visitor;
-    visitor.strm << "[";
+    visitor.strm << "{";
     visit_sorted(data, Visitor::visit, &visitor);
-    visitor.strm << "]";
+    visitor.strm << "}";
     return visitor.strm.str();
 }
 

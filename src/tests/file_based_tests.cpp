@@ -167,7 +167,7 @@ void test_include_with_state()
 
     EvalContext context;
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_include: [b: 3], a: 1]");
+    test_equals(&context.state, "{_include: {b: 3}, a: 1}");
 }
 
 void test_call_function_from_included_file()

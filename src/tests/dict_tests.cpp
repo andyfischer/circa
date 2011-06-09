@@ -19,7 +19,7 @@ void test_simple()
 
     test_assert(dict_t::get_value(data, "a")->asInt() == 5);
     test_assert(dict_t::get_value(data, "b")->asInt() == 10);
-    test_equals(dict_t::to_string(data), "[a: 5, b: 10]");
+    test_equals(dict_t::to_string(data), "{a: 5, b: 10}");
     dict_t::free_dict(data);
 }
 
@@ -30,10 +30,10 @@ void test_insert()
     set_int(&v, 5);
 
     TaggedValue* a_inserted = dict.insert("a");
-    test_equals(dict.toString(), "[a: null]");
+    test_equals(dict.toString(), "{a: null}");
 
     set_int(a_inserted, 7);
-    test_equals(dict.toString(), "[a: 7]");
+    test_equals(dict.toString(), "{a: 7}");
 }
 
 void dont_insert_same_key_multiple_times()
@@ -241,17 +241,17 @@ void test_duplicate()
     dict_t::insert_value(&data, "b", &one_and_change);
     dict_t::insert_value(&data, "c", &t);
 
-    test_equals(dict_t::to_string(data), "[a: 11, b: 1.2, c: true]");
+    test_equals(dict_t::to_string(data), "{a: 11, b: 1.2, c: true}");
 
     dict_t::DictData* dupe = dict_t::duplicate(data);
 
-    test_equals(dict_t::to_string(dupe), "[a: 11, b: 1.2, c: true]");
+    test_equals(dict_t::to_string(dupe), "{a: 11, b: 1.2, c: true}");
 
     // Modify original, make sure that dupe is unaffected
     dict_t::remove(data, "b");
     dict_t::insert_value(&data, "d", &hello);
-    test_equals(dict_t::to_string(data), "[a: 11, c: true, d: 'hello']");
-    test_equals(dict_t::to_string(dupe), "[a: 11, b: 1.2, c: true]");
+    test_equals(dict_t::to_string(data), "{a: 11, c: true, d: 'hello'}");
+    test_equals(dict_t::to_string(dupe), "{a: 11, b: 1.2, c: true}");
 
     dict_t::free_dict(data);
     dict_t::free_dict(dupe);
@@ -265,11 +265,11 @@ void test_reset()
     set_int(&a, 4);
     dict.set("a", &a);
 
-    test_equals(dict.toString(), "[a: 4]");
+    test_equals(dict.toString(), "{a: 4}");
     reset(&dict);
-    test_equals(dict.toString(), "[]");
+    test_equals(dict.toString(), "{}");
     dict.set("a", &a);
-    test_equals(dict.toString(), "[a: 4]");
+    test_equals(dict.toString(), "{a: 4}");
 }
 
 void test_iterate()
@@ -327,7 +327,7 @@ void test_delete_from_iterator()
         dict.set(names[i], &val);
     }
 
-    test_equals(&dict, "[a: 0, b: 1, c: 2, d: 3, e: 4]");
+    test_equals(&dict, "{a: 0, b: 1, c: 2, d: 3, e: 4}");
 
     for (dict.iteratorStart(&iterator);
             !dict.iteratorFinished(&iterator);
@@ -344,7 +344,7 @@ void test_delete_from_iterator()
         }
     }
 
-    test_equals(&dict, "[a: 0, c: 2, e: 4]");
+    test_equals(&dict, "{a: 0, c: 2, e: 4}");
 }
 
 void test_cpp_wrapper()

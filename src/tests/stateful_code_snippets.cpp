@@ -72,9 +72,9 @@ void simple_tests()
     test_snippet("state s = 0");
     test_snippet("state int s = 0");
 
-    test_trimmed_state("state s = 0", "", "[s: 0]");
-    test_trimmed_state("state int s; state string t", "", "[s: 0, t: '']");
-    test_trimmed_state("state int s; state string t", "state s", "[t: '']");
+    test_trimmed_state("state s = 0", "", "{s: 0}");
+    test_trimmed_state("state int s; state string t", "", "{s: 0, t: ''}");
+    test_trimmed_state("state int s; state string t", "state s", "{t: ''}");
 }
 
 void name_overlapping()
@@ -83,7 +83,7 @@ void name_overlapping()
     test_snippet("state string apple = 'hi'");
     test_snippet("state bool apple = false");
 
-    test_trimmed_state("state s = 0", "", "[s: 0]");
+    test_trimmed_state("state s = 0", "", "{s: 0}");
 }
 
 void if_blocks()
@@ -91,7 +91,7 @@ void if_blocks()
     test_snippet("if true { state a }");
     test_snippet("if true { state a } else { state b }");
 
-    test_trimmed_state("if true { state a }", "", "[_if_block: [[a: <any>], null]]");
+    test_trimmed_state("if true { state a }", "", "{_if_block: [{a: <any>}, null]}");
 }
 
 void function_calls()
@@ -100,7 +100,7 @@ void function_calls()
     test_snippet("def f() { state a }; def g() { f() } g() g()");
 
     test_trimmed_state("for i in [1 2 3] { state x = i }", "",
-            "[_for: [[x: 1], [x: 2], [x: 3]]]");
+            "{_for: [{x: 1}, {x: 2}, {x: 3}]}");
 }
 
 void for_loops()
@@ -109,7 +109,7 @@ void for_loops()
     test_snippet("for i in [1] { state s }");
     test_snippet("for i in [1 2 3] { state s }");
 
-    test_trimmed_state("for i in [1 2 3] { state s }", "", "[_for: [[s: <any>], [s: <any>], [s: <any>]]]");
+    test_trimmed_state("for i in [1 2 3] { state s }", "", "{_for: [{s: <any>}, {s: <any>}, {s: <any>}]}");
 }
 
 void register_tests()

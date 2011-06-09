@@ -591,7 +591,7 @@ void test_stateful_value_decl()
     // There once was a bug where a state var that gets initialized to 'null' would have
     // a type of null, and so it wouldn't be able to change value.
     test_snippet("def f() { state a = null; a = 1 } f(); st = dump_scope_state()",
-            "to_string(st) == '[_f: [a: 1]]'");
+            "to_string(st) == '{_f: {a: 1}}'");
 }
 
 void register_tests()

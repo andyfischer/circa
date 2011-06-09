@@ -82,17 +82,17 @@ void subroutine_stateful_term()
 
     evaluate_branch(&context, branch);
 
-    test_equals(context.state.toString(), "[call: [a: 1.0]]");
+    test_equals(context.state.toString(), "{call: {a: 1.0}}");
 
     evaluate_branch(&context, branch);
 
-    test_equals(context.state.toString(), "[call: [a: 2.0]]");
+    test_equals(context.state.toString(), "{call: {a: 2.0}}");
 
     // Make sure that subsequent calls to this subroutine have their own state container.
     branch.compile("another_call = mysub()");
     evaluate_branch(&context, branch);
 
-    test_equals(context.state.toString(), "[another_call: [a: 1.0], call: [a: 3.0]]");
+    test_equals(context.state.toString(), "{another_call: {a: 1.0}, call: {a: 3.0}}");
 }
 
 void test_recursion_with_state()
@@ -117,7 +117,7 @@ void test_recursion_with_state()
     evaluate_branch(&context, branch);
 
     test_equals(&context.state,
-        "[result: [_recr: [_recr: [_recr: [s: 45], s: 33], s: 21], s: 10]]");
+        "{result: {_recr: {_recr: {_recr: {s: 45}, s: 33}, s: 21}, s: 10}}");
     test_equals(get_local(branch["result"]), 4);
 }
 

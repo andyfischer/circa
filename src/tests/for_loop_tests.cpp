@@ -100,7 +100,7 @@ void test_state_simple()
     branch.compile("for i in [1 2 3] { state s = i }");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[_for: [[s: 1], [s: 2], [s: 3]]]");
+    test_equals(&context.state, "{_for: [{s: 1}, {s: 2}, {s: 3}]}");
 
     branch.clear();
     context = EvalContext();
@@ -108,11 +108,11 @@ void test_state_simple()
     branch.compile("l = [1 2 3]; for i in @l { state s = 0; s += i }");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[l_1: [[s: 1], [s: 2], [s: 3]]]");
+    test_equals(&context.state, "{l_1: [{s: 1}, {s: 2}, {s: 3}]}");
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[l_1: [[s: 2], [s: 4], [s: 6]]]");
+    test_equals(&context.state, "{l_1: [{s: 2}, {s: 4}, {s: 6}]}");
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[l_1: [[s: 3], [s: 6], [s: 9]]]");
+    test_equals(&context.state, "{l_1: [{s: 3}, {s: 6}, {s: 9}]}");
 }
 
 void test_state_nested()
@@ -123,9 +123,9 @@ void test_state_nested()
     branch.compile("for a in [1 2] { for b in [3 4] { for c in [5 6] { state s = c } } }");
     evaluate_branch(&context, branch);
 
-    test_equals(&context.state, "[_for: [[_for: [[_for: [[s: 5], [s: 6]]], "
-            "[_for: [[s: 5], [s: 6]]]]], [_for: [[_for: [[s: 5], [s: 6]]], "
-            "[_for: [[s: 5], [s: 6]]]]]]]");
+    test_equals(&context.state, "{_for: [{_for: [{_for: [{s: 5}, {s: 6}]}, "
+            "{_for: [{s: 5}, {s: 6}]}]}, {_for: [{_for: [{s: 5}, {s: 6}]}, "
+            "{_for: [{s: 5}, {s: 6}]}]}]}");
 }
 
 void test_produce_output()

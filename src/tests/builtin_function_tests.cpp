@@ -244,18 +244,18 @@ void test_message_passing()
 
     // Before running, message queue should be empty
     test_assert(inbox->numElements() == 0);
-    test_equals(&context.messages, "[]");
+    test_equals(&context.messages, "{}");
 
     // First run, inbox is still empty, but there is 1 message in transit
     evaluate_branch(&context, branch);
     test_assert(inbox->numElements() == 0);
-    test_equals(&context.messages, "[inbox_name: [1]]");
+    test_equals(&context.messages, "{inbox_name: [1]}");
 
     // Second run, inbox now returns 1
     evaluate_branch(&context, branch);
     test_assert(inbox->numElements() == 1);
     test_assert(inbox->getIndex(0)->asInt() == 1);
-    test_equals(&context.messages, "[inbox_name: [1]]");
+    test_equals(&context.messages, "{inbox_name: [1]}");
 
     // Delete the send() call
     remove_term(send);
@@ -264,12 +264,12 @@ void test_message_passing()
     evaluate_branch(&context, branch);
     test_assert(inbox->numElements() == 1);
     test_assert(inbox->getIndex(0)->asInt() == 1);
-    test_equals(&context.messages, "[inbox_name: []]");
+    test_equals(&context.messages, "{inbox_name: []}");
 
     // Fourth run, inbox is empty again
     evaluate_branch(&context, branch);
     test_assert(inbox->numElements() == 0);
-    test_equals(&context.messages, "[inbox_name: []]");
+    test_equals(&context.messages, "{inbox_name: []}");
 }
 
 void test_message_passing2()
@@ -288,16 +288,16 @@ void test_message_passing2()
     EvalContext context;
     evaluate_branch(&context, branch);
 
-    test_equals(&context.state, "[last_output: 1]");
+    test_equals(&context.state, "{last_output: 1}");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[last_output: 2]");
+    test_equals(&context.state, "{last_output: 2}");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[last_output: 2]");
+    test_equals(&context.state, "{last_output: 2}");
 
     evaluate_branch(&context, branch);
-    test_equals(&context.state, "[last_output: 2]");
+    test_equals(&context.state, "{last_output: 2}");
 }
 
 void test_run_single_statement()
