@@ -169,13 +169,14 @@ def delta_point(Point p) -> Point
 
 def load_texture(state int, string) -> int
 
-def draw_image(state int texid, string filename, number x, number y, number width, number height)
-    "Draw an image."
-
 def load_mesh(string filename) -> int
     "(experimental) Load a 3d mesh from an .obj file."
 def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
     "(experimental) Draw a 3d mesh to the screen."
+
+def draw_image(string filename, Point location)
+    im = image:load(filename)
+    image:draw(im location)
 
 -- Drawing utils
 include(rpath('vector_drawing.ca'))
@@ -320,8 +321,18 @@ receive_last(@user_script_filename 'load_user_script_request')
 users_script = load_script(user_script_filename)
 
 if users_script.has_static_error()
-    for err in users_script.get_static_errors_formatted()
-        print('Static error: ' err)
+    draw_image("../assets/Ferry_Boat_Sinking.jpg"->rpath, [0 0])
+    errs = users_script.get_static_errors_formatted()
+    image_height = 365
+    image_width = 550
+    text_area_height = 17 * (errs.count() + 1) + 15
+    fill_rect([0 image_height window.width image_height+text_area_height] #733)
+    y = image_height + 10
+    draw_text(ui_font_medium, "Static errors:", #fff, [5 y])
+    y += 17
+    for err in errs
+        draw_text(ui_font_medium err #fff [15 y])
+        y += 17
 else
     ev = users_script.evaluate()
 

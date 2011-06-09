@@ -69,7 +69,8 @@ CA_FUNCTION(hosted_image)
 void setup(circa::Branch& branch)
 {
     install_function(branch["load_texture"], hosted_load_texture);
-    install_function(branch["draw_image"], hosted_image);
+    
+    //install_function(branch["draw_image"], hosted_image);
 }
 
 } // namespace textures

@@ -39,6 +39,7 @@ GLuint load_image_to_texture(EvalContext* cxt, Term* caller, const char* filenam
         std::stringstream msg;
         msg << "Error loading " << filename << ": " << SDL_GetError();
         error_occurred(cxt, caller, msg.str());
+        std::cout << msg.str();
         return 0;
     }
 
@@ -106,15 +107,17 @@ CA_FUNCTION(load_image)
 
     SDL_Surface* surface = IMG_Load(filename.c_str());
     if (surface == NULL) {
-        error_occurred(CONTEXT, CALLER, "Error loading " + filename + ": " + SDL_GetError());
-        return;
+        std::string msg = "Error loading " + filename + ": " + SDL_GetError();
+        std::cout << msg << std::endl;
+        return error_occurred(CONTEXT, CALLER, msg.c_str());
     }
 
     if (has_indexed_color(surface))
         surface = convert_indexed_color_to_true_color(surface);
 
-    image_t::set_texid(OUTPUT, load_surface_to_texture(surface));
+    set_list(OUTPUT, 4);
     image_t::set_filename(OUTPUT, filename);
+    image_t::set_texid(OUTPUT, load_surface_to_texture(surface));
     image_t::set_width(OUTPUT, surface->w);
     image_t::set_height(OUTPUT, surface->h);
 
