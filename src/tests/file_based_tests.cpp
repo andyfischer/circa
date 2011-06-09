@@ -32,7 +32,7 @@ void test_include_function()
     Branch branch;
     Term* incl = branch.compile("include('file.ca')");
 
-    Branch& included = incl->nestedContents;
+    Branch& included = nested_contents(incl);
 
     // Make sure that the included file is loaded, even though the term wasn't evaluated.
     test_assert(included.length() > 0);

@@ -89,7 +89,7 @@ void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
         Term* term = branch[i];
 
         if (is_namespace(term)) {
-            patch_branch_recr(dll, term->nestedContents, namespacePrefix + term->name + "__");
+            patch_branch_recr(dll, nested_contents(term), namespacePrefix + term->name + "__");
         }
         else if (is_function(term)) {
             FunctionAttrs* attrs = get_function_attrs(term);

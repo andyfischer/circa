@@ -31,11 +31,6 @@ bool initialize_display()
     int desiredWidth = 800;
     int desiredHeight = 600;
 
-    if (app::users_script().contains("desired_window_size")) {
-        desiredWidth = app::users_script()["desired_window_size"]->nestedContents[0]->asInt();
-        desiredHeight = app::users_script()["desired_window_size"]->nestedContents[1]->asInt();
-    }
-
     if (!resize_display(desiredWidth, desiredHeight))
         return false;
 

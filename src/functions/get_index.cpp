@@ -25,15 +25,15 @@ namespace get_index_function {
     {
         // Not sure if this function will be permanent
         int index = as_int(INPUT(1));
-        Branch& branch = INPUT_TERM(0)->nestedContents;
+        Branch* branch = INPUT_TERM(0)->nestedContents;
 
-        if (index >= branch.length()) {
+        if (index >= branch->length()) {
             std::stringstream err;
             err << "Index out of range: " << index;
             return error_occurred(CONTEXT, CALLER, err.str());
         }
 
-        copy(branch[index], OUTPUT);
+        copy(branch->get(index), OUTPUT);
     }
 
     void formatSource(StyledSource* source, Term* term)

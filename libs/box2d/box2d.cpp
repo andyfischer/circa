@@ -451,7 +451,7 @@ void setup(Branch& kernel)
     handle_t::setup_type<MouseJoint>(&g_mouseJoint_t);
     g_mouseJoint_t.name = "Box2d:MouseJoint";
 
-    Branch& ns = kernel["box2d"]->nestedContents;
+    Branch& ns = nested_contents(kernel["box2d"]);
 
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);

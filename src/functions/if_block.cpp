@@ -7,7 +7,7 @@ namespace if_block_function {
 
     void formatSource(StyledSource* source, Term* term)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
 
         for (int branch_index=0; branch_index < contents.length(); branch_index++) {
             Term* branch_term = contents[branch_index];
@@ -29,31 +29,31 @@ namespace if_block_function {
             else
                 append_phrase(source, "else", branch_term, phrase_type::UNDEFINED);
 
-            format_branch_source(source, branch_term->nestedContents, branch_term);
+            format_branch_source(source, nested_contents(branch_term), branch_term);
         }
     }
 
     int getOutputCount(Term* term)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
 
         // check if term is still being initialized:
         if (contents.length() == 0)
             return 1;
 
-        Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
+        Branch& outerRebinds = contents.getFromEnd(0)->contents();
         return outerRebinds.length() + 1;
     }
 
     const char* getOutputName(Term* term, int outputIndex)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
 
         // check if term is still being initialized:
         if (contents.length() == 0)
             return "";
 
-        Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
+        Branch& outerRebinds = contents.getFromEnd(0)->contents();
         return outerRebinds[outputIndex - 1]->name.c_str();
     }
 
@@ -62,13 +62,13 @@ namespace if_block_function {
         if (outputIndex == 0)
             return VOID_TYPE;
 
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
 
         // check if term is still being initialized:
         if (contents.length() == 0)
             return ANY_TYPE;
 
-        Branch& outerRebinds = contents[contents.length()-1]->nestedContents;
+        Branch& outerRebinds = contents.getFromEnd(0)->contents();
         return outerRebinds[outputIndex - 1]->type;
     }
 

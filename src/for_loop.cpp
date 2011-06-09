@@ -32,25 +32,25 @@ static const int loop_contents_location = 3;
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return forTerm->nestedContents[iterator_location];
+    return forTerm->contents(iterator_location);
 }
 
 Term* get_for_loop_modify_list(Term* forTerm)
 {
-    Term* term = forTerm->nestedContents[0]->nestedContents[0];
+    Term* term = forTerm->contents(0)->contents(0);
     ca_assert(term != NULL);
     return term;
 }
 
 Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
 {
-    Branch& contents = forTerm->nestedContents;
-    return contents[contents.length()-1]->nestedContents;
+    Branch& contents = nested_contents(forTerm);
+    return contents.getFromEnd(0)->contents();
 }
 
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    Branch& forContents = forTerm->nestedContents;
+    Branch& forContents = nested_contents(forTerm);
     Branch& attributes = create_branch(forContents, "#attributes");
     create_bool(attributes, false, "#modify_list");
 
@@ -61,21 +61,21 @@ void setup_for_loop_pre_code(Term* forTerm)
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 {
     Term* iteratorType = find_type_of_get_index(forTerm->input(0));
-    Term* result = create_value(forTerm->nestedContents, iteratorType, name);
+    Term* result = create_value(nested_contents(forTerm), iteratorType, name);
     hide_from_source(result);
     return result;
 }
 
 void setup_for_loop_post_code(Term* forTerm)
 {
-    Branch& forContents = forTerm->nestedContents;
+    Branch& forContents = nested_contents(forTerm);
     std::string listName = forTerm->input(0)->name;
     std::string iteratorName = get_for_loop_iterator(forTerm)->name;
 
     finish_minor_branch(forContents);
 
     // Create a branch that has all the names which are rebound in this loop
-    Branch& innerRebinds = forContents["#inner_rebinds"]->nestedContents;
+    Branch& innerRebinds = nested_contents(forContents["#inner_rebinds"]);
     Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
 
     std::vector<std::string> reboundNames;
@@ -129,7 +129,7 @@ Term* find_enclosing_for_loop(Term* term)
 
 void for_loop_update_output_index(Term* forTerm)
 {
-    Branch& contents = forTerm->nestedContents;
+    Branch& contents = nested_contents(forTerm);
 
     // If this is a list-rewrite, then the output is the last term that has the iterator's
     // name binding. Otherwise the output is the last expression.
@@ -148,9 +148,9 @@ CA_FUNCTION(evaluate_for_loop)
 {
     Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch& forContents = caller->nestedContents;
-    Branch& innerRebinds = forContents[inner_rebinds_location]->nestedContents;
-    Branch& outerRebinds = forContents[forContents.length()-1]->nestedContents;
+    Branch& forContents = nested_contents(caller);
+    Branch& innerRebinds = forContents[inner_rebinds_location]->contents();
+    Branch& outerRebinds = forContents[forContents.length()-1]->contents();
     Term* iterator = get_for_loop_iterator(CALLER);
 
     TaggedValue* inputList = INPUT(0);

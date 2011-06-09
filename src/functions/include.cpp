@@ -9,7 +9,7 @@ namespace include_function {
 
     bool load_script(EvalContext* cxt, Term* caller, const std::string& filename, bool exposeNames)
     {
-        Branch& contents = caller->nestedContents;
+        Branch& contents = nested_contents(caller);
 
         TaggedValue* fileSignature = &contents.fileSignature;
 
@@ -58,7 +58,7 @@ namespace include_function {
     CA_FUNCTION(evaluate_include)
     {
         EvalContext* context = CONTEXT;
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
 
         bool fileChanged =
             load_script(CONTEXT, CALLER, STRING_INPUT(0), true);
@@ -105,7 +105,7 @@ namespace include_function {
     {
         load_script(CONTEXT, CALLER, STRING_INPUT(0), false);
 
-        set_branch(OUTPUT, &CALLER->nestedContents);
+        set_branch(OUTPUT, CALLER->nestedContents);
     }
 
     void setup(Branch& kernel)

@@ -31,13 +31,13 @@ namespace circa {
 
 void update_if_block_joining_branch(Term* ifCall)
 {
-    Branch& contents = ifCall->nestedContents;
+    Branch& contents = nested_contents(ifCall);
 
     // Create the joining contents if necessary
     if (!contents.contains("#joining"))
         create_branch(contents, "#joining");
 
-    Branch& joining = contents["#joining"]->nestedContents;
+    Branch& joining = nested_contents(contents["#joining"]);
     clear_branch(&joining);
 
     // Find the set of all names bound in every branch.
@@ -45,7 +45,7 @@ void update_if_block_joining_branch(Term* ifCall)
 
     for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
         Term* term = contents[branch_index];
-        Branch& branch = term->nestedContents;
+        Branch& branch = nested_contents(term);
 
         TermNamespace::const_iterator it;
         for (it = branch.names.begin(); it != branch.names.end(); ++it) {
@@ -76,7 +76,7 @@ void update_if_block_joining_branch(Term* ifCall)
         bool boundInEveryBranch = true;
 
         for (int branch_index=0; branch_index < contents.length()-1; branch_index++) {
-            Branch& branch = contents[branch_index]->nestedContents;
+            Branch& branch = nested_contents(contents[branch_index]);
             if (!branch.contains(name))
                 boundInEveryBranch = false;
         }
@@ -102,7 +102,7 @@ void update_if_block_joining_branch(Term* ifCall)
         Term* outerVersion = get_named_at(ifCall, name);
 
         for (int i=0; i < numBranches; i++) {
-            Term* local = contents[i]->nestedContents[name];
+            Term* local = contents[i]->contents(name.c_str());
             inputs.setAt(i, local == NULL ? outerVersion : local);
         }
 
@@ -112,17 +112,17 @@ void update_if_block_joining_branch(Term* ifCall)
 
 int if_block_num_branches(Term* ifCall)
 {
-    return ifCall->nestedContents.length() - 1;
+    return nested_contents(ifCall).length() - 1;
 }
 Branch* if_block_get_branch(Term* ifCall, int index)
 {
-    return &ifCall->nestedContents[index]->nestedContents;
+    return &ifCall->contents(index)->contents();
 }
 
 CA_FUNCTION(evaluate_if_block)
 {
     EvalContext* context = CONTEXT;
-    Branch& contents = CALLER->nestedContents;
+    Branch& contents = nested_contents(CALLER);
     bool useState = has_any_inlined_state(contents);
 
     int numBranches = contents.length() - 1;
@@ -149,7 +149,9 @@ CA_FUNCTION(evaluate_if_block)
 
         if (branch->numInputs() == 0 || as_bool(get_input(branch, 0))) {
 
-            acceptedBranch = &branch->nestedContents;
+            acceptedBranch = branch->nestedContents;
+
+            ca_assert(acceptedBranch != NULL);
 
             context->stack.append(branch);
             start_using(*acceptedBranch);
@@ -183,7 +185,7 @@ CA_FUNCTION(evaluate_if_block)
     }
 
     // Copy joined values to output slots
-    Branch& joining = contents[contents.length()-1]->nestedContents;
+    Branch& joining = nested_contents(contents[contents.length()-1]);
 
     for (int i=0; i < joining.length(); i++) {
         Term* joinTerm = joining[i];

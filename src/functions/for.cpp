@@ -18,44 +18,44 @@ namespace for_function {
     void formatSource(StyledSource* source, Term* term)
     {
         format_heading(source, term);
-        format_branch_source(source, term->nestedContents, term);
+        format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
             term, token::WHITESPACE);
     }
 
     int getOutputCount(Term* term)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
         
         // Check if we're still building
         if (contents.length() == 0)
             return 1;
 
-        Branch& outerRebinds = contents["#outer_rebinds"]->nestedContents;
+        Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
         return 1 + outerRebinds.length();
     }
 
     const char* getOutputName(Term* term, int outputIndex)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
 
         // Check if we're still building
         if (contents.length() == 0)
             return "";
 
-        Branch& outerRebinds = contents["#outer_rebinds"]->nestedContents;
+        Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
         return outerRebinds[outputIndex - 1]->name.c_str();
     }
 
     Term* getOutputType(Term* term, int outputIndex)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
 
         // Check if we're still building
         if (contents.length() == 0)
             return ANY_TYPE;
 
-        Branch& outerRebinds = contents["#outer_rebinds"]->nestedContents;
+        Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
         return outerRebinds[outputIndex - 1]->type;
     }
 

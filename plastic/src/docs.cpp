@@ -20,17 +20,17 @@ void generate_plastic_docs(std::stringstream &out)
     out << ",";
     append_package_docs(out, runtimeBranch, "Plastic top level");
     out << ",";
-    append_package_docs(out, runtimeBranch["box2d"]->nestedContents, "box2d bindings");
+    append_package_docs(out, nested_contents(runtimeBranch["box2d"]), "box2d bindings");
     out << ",";
-    append_package_docs(out, runtimeBranch["gl"]->nestedContents, "gl namespace");
+    append_package_docs(out, nested_contents(runtimeBranch["gl"]), "gl namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["ide"]->nestedContents, "ide namespace");
+    append_package_docs(out, nested_contents(runtimeBranch["ide"]), "ide namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["image"]->nestedContents, "image namespace");
+    append_package_docs(out, nested_contents(runtimeBranch["image"]), "image namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["text"]->nestedContents, "text namespace");
+    append_package_docs(out, nested_contents(runtimeBranch["text"]), "text namespace");
     out << ",";
-    append_package_docs(out, runtimeBranch["tweak"]->nestedContents, "tweak namespace");
+    append_package_docs(out, nested_contents(runtimeBranch["tweak"]), "tweak namespace");
 
     out << "]\n";
     out << "}\n";

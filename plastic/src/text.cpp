@@ -175,7 +175,7 @@ void setup(Branch& branch)
         return;
     }
 
-    Branch& sdl_ttf_ns = branch["sdl_ttf"]->nestedContents;
+    Branch& sdl_ttf_ns = nested_contents(branch["sdl_ttf"]);
     install_function(sdl_ttf_ns["load_font_internal"], load_font);
     install_function(sdl_ttf_ns["render_text_internal"], render_text);
     install_function(sdl_ttf_ns["draw_rendered_text"], draw_rendered_text);

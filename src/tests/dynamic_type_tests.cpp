@@ -53,7 +53,7 @@ void test_field_access()
 
     Term* T = branch.compile("type T { int a, string b }");
     branch.compile("def f() -> any { return(T([4, 's'])) }");
-    Branch& f = branch["f"]->nestedContents;
+    Branch& f = nested_contents(branch["f"]);
     Term* r = branch.compile("r = f()");
 
     test_assert(branch);

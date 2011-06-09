@@ -10,7 +10,7 @@ namespace finish_minor_branch_function {
 
     CA_DEFINE_FUNCTION(finish_minor_branch_func, "finish_minor_branch()")
     {
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
         start_using(contents);
         for (int i=0; i < contents.length(); i++)
             evaluate_single_term(CONTEXT, contents[i]);
@@ -20,7 +20,7 @@ namespace finish_minor_branch_function {
 
     void postCompile(Term* finishBranchTerm)
     {
-        Branch& contents = finishBranchTerm->nestedContents;
+        Branch& contents = nested_contents(finishBranchTerm);
         contents.clear();
 
         Branch& outerContents = *finishBranchTerm->owningBranch;

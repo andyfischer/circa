@@ -164,7 +164,7 @@ void setup(Branch& kernel)
     handle_t::setup_type<ServerContext>(&g_serverContext_t);
     handle_t::setup_type<Address>(&g_address_t);
 
-    Branch& ns = kernel["osc"]->nestedContents;
+    Branch& ns = nested_contents(kernel["osc"]);
 
     install_function(ns["create_server_thread"], create_server_thread);
     install_function(ns["read_from_server"], read_from_server);

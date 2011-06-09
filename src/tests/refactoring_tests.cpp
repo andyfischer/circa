@@ -60,7 +60,7 @@ void repro_source_after_append_code()
 
     branch.eval("bm.append_code({ 1  +  1 })");
 
-    test_equals(get_branch_source_text(target->nestedContents), " 1  +  1 ");
+    test_equals(get_branch_source_text(nested_contents(target)), " 1  +  1 ");
 }
 
 void register_tests()

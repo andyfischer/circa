@@ -166,7 +166,7 @@ void test_do_once()
 
     Term* x = branch.compile("x = 1");
     Term* t = branch.compile("do_once()");
-    t->nestedContents.compile("unsafe_assign(x,2)");
+    nested_contents(t).compile("unsafe_assign(x,2)");
 
     test_assert(branch);
 

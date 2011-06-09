@@ -24,7 +24,7 @@ namespace branch_members_function {
 
     CA_FUNCTION(branch_ref)
     {
-        set_branch(OUTPUT, &(INPUT_TERM(0)->nestedContents));
+        set_branch(OUTPUT, (INPUT_TERM(0)->nestedContents));
     }
 
     CA_FUNCTION(get_terms)

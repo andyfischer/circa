@@ -15,7 +15,7 @@ namespace vectorize_vv_function {
 
     CA_FUNCTION(evaluate)
     {
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
         TaggedValue input0, input1;
 
         if (num_elements(INPUT(0)) != num_elements(INPUT(1)))
@@ -55,7 +55,7 @@ namespace vectorize_vv_function {
     void post_input_change(Term* term)
     {
         // Update generated code
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
         contents.clear();
 
         TaggedValue* funcParam = function_t::get_parameters(term->function);

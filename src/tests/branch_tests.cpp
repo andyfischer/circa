@@ -180,15 +180,15 @@ void test_duplicate_nested()
 {
     Branch branch;
     branch.compile("a = 1.0");
-    Branch& inner = branch.compile("inner = branch()")->nestedContents;
+    Branch& inner = branch.compile("inner = branch()")->contents();
     inner.compile("i = 2.0");
     inner.compile("j = add(a,i)");
 
     Branch dupe;
     duplicate_branch(branch, dupe);
 
-    Term* inner_i = dupe["inner"]->nestedContents["i"];
-    Term* inner_j = dupe["inner"]->nestedContents["j"];
+    Term* inner_i = dupe["inner"]->contents("i");
+    Term* inner_j = dupe["inner"]->contents("j");
 
     test_assert(inner_i != NULL);
     test_assert(inner_j != NULL);
@@ -210,13 +210,13 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = orig.compile("inner = branch()")->nestedContents;
+    Branch& inner = nested_contents(orig.compile("inner = branch()"));
     inner.compile("i = 2");
 
     Branch dupe;
     duplicate_branch(orig, dupe);
 
-    test_assert(dupe["inner"]->nestedContents.length() == 1);
+    test_assert(nested_contents(dupe["inner"]).length() == 1);
 
     test_assert(orig);
     test_assert(dupe);
@@ -240,11 +240,11 @@ void test_duplicate_subroutine()
     Term* dupedFunc = dupe["func"];
     test_assert(function_t::get_name(dupedFunc) == "func");
 
-    test_assert(func->nestedContents.length() == dupedFunc->nestedContents.length());
-    test_assert(func->nestedContents[1]->function == dupedFunc->nestedContents[1]->function);
-    test_assert(func->nestedContents[1]->type == dupedFunc->nestedContents[1]->type);
-    test_assert(func->nestedContents[1]->asInt() == dupedFunc->nestedContents[1]->asInt());
-    test_assert(dupedFunc->nestedContents[1] == dupedFunc->nestedContents["a"]);
+    test_assert(func->nestedContents->length() == dupedFunc->nestedContents->length());
+    test_assert(func->contents(1)->function == dupedFunc->contents(1)->function);
+    test_assert(func->contents(1)->type == dupedFunc->contents(1)->type);
+    test_assert(func->contents(1)->asInt() == dupedFunc->contents(1)->asInt());
+    test_assert(dupedFunc->contents(1) == dupedFunc->contents("a"));
 
     test_assert(branch);
     test_assert(dupe);

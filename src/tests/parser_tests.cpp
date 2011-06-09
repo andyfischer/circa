@@ -427,7 +427,7 @@ void test_float_division()
 
     test_assert(a->type == FLOAT_TYPE);
     test_equals(a->function->name, "div");
-    test_equals(a->nestedContents[0]->function->name, "div_f");
+    test_equals(nested_contents(a)[0]->function->name, "div_f");
     test_equals(a->toFloat(), 5.0f/3.0f);
 }
 
@@ -448,8 +448,8 @@ void test_namespace()
 
     test_assert(branch);
     test_assert(ns->function == NAMESPACE_FUNC);
-    test_assert(ns->nestedContents.contains("a"));
-    test_assert(ns->nestedContents.contains("b"));
+    test_assert(nested_contents(ns).contains("a"));
+    test_assert(nested_contents(ns).contains("b"));
 
     Term* a = branch.eval("ns:a");
     test_assert(a->asInt() == 1);
@@ -550,7 +550,7 @@ void test_significant_indentation()
     branch.compile("def func()\na = 5");
     test_assert(branch);
     test_assert(branch["a"] != NULL);
-    test_assert(branch["func"]->nestedContents["a"] == NULL);
+    test_assert(branch["func"]->contents()["a"] == NULL);
 }
 
 void test_significant_indentation2()
@@ -579,8 +579,8 @@ void test_significant_indentation_bug_with_empty_functions()
 
     // This once caused a bug where function b() was outside the namespace.
     test_assert(branch["ns"] != NULL);
-    test_assert(branch["ns"]->nestedContents["a"] != NULL);
-    test_assert(branch["ns"]->nestedContents["b"] != NULL);
+    test_assert(branch["ns"]->contents()["a"] != NULL);
+    test_assert(branch["ns"]->contents()["b"] != NULL);
     test_assert(branch["a"] == NULL);
     test_assert(branch["b"] == NULL);
 
@@ -591,8 +591,8 @@ void test_significant_indentation_bug_with_empty_functions()
 
     // This once caused a bug where function b() was outside the namespace.
     test_assert(branch["ns"] != NULL);
-    test_assert(branch["ns"]->nestedContents["a"] != NULL);
-    test_assert(branch["ns"]->nestedContents["b"] != NULL);
+    test_assert(branch["ns"]->contents()["a"] != NULL);
+    test_assert(branch["ns"]->contents()["b"] != NULL);
     test_assert(branch["a"] == NULL);
     test_assert(branch["b"] == NULL);
 }
@@ -626,8 +626,8 @@ void test_sig_indent_bug_with_bad_func_header()
         "\n");
 
     test_assert(branch["ns"] != NULL);
-    test_assert(branch["ns"]->nestedContents["func1"] != NULL);
-    Term* func1 = branch["ns"]->nestedContents["func1"];
+    test_assert(branch["ns"]->contents()["func1"] != NULL);
+    Term* func1 = branch["ns"]->contents()["func1"];
     test_assert(is_function(func1));
 }
 
@@ -654,7 +654,7 @@ void test_sig_indent_multiline_function()
             "\n result = val - prev\n prev = val\n return result");
 
     test_assert(branch.length() == 1);
-    test_assert(branch["delta"]->nestedContents.length() > 6);
+    test_assert(branch["delta"]->contents().length() > 6);
 }
 
 void test_sig_indent_nested_blocks()
@@ -671,7 +671,7 @@ void test_sig_indent_nested_blocks()
         "  def func3()\n");
 
     test_assert(branch);
-    test_assert(branch["ns"]->nestedContents["func3"] != NULL);
+    test_assert(branch["ns"]->contents()["func3"] != NULL);
 }
 
 void test_sig_indent_bug_with_nested_one_liner()
@@ -684,7 +684,7 @@ void test_sig_indent_bug_with_nested_one_liner()
 
     test_assert(branch);
     test_assert(branch["b"] == NULL);
-    test_assert(branch["func"]->nestedContents["b"] != NULL);
+    test_assert(branch["func"]->contents()["b"] != NULL);
 }
 
 void test_sig_indent_bug_with_for_loop_expression()
@@ -706,7 +706,7 @@ void test_namespace_with_curly_braces()
                    "}");
     test_assert(branch);
     test_assert(branch["ns"] != NULL);
-    test_assert(branch["ns"]->nestedContents["a"] != NULL);
+    test_assert(branch["ns"]->contents()["a"] != NULL);
 }
 
 void test_statically_resolve_namespace_access()
@@ -770,7 +770,7 @@ void test_source_location()
     test_equals(a->sourceLoc.lineEnd, 1);
 
     branch.compile("def f()\n  b = add(1 2 3 4 5 6 7)\n  mult(3 4)\n");
-    Term* b = branch["f"]->nestedContents["b"];
+    Term* b = branch["f"]->contents()["b"];
     test_equals(b->sourceLoc.col, 2);
     test_equals(b->sourceLoc.line, 2);
     test_equals(b->sourceLoc.colEnd, 25);

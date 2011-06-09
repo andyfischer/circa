@@ -157,11 +157,11 @@ void test_repair_broken_links()
 
     Branch branch;
     Term* br = branch.compile("br = { a = 1 }");
-    Term* a = br->nestedContents["a"];
+    Term* a = br->contents()["a"];
     Term* b = branch.compile("add_call = add()");
     set_input(b, 0, a);
 
-    clear_branch(&br->nestedContents);
+    clear_branch(nested_contents(br));
 
     test_assert(b->input(0) == NULL);
 

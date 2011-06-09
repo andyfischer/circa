@@ -8,21 +8,21 @@ namespace namespace_function {
 
     CA_FUNCTION(evaluate)
     {
-        evaluate_branch_internal_with_state(CONTEXT, CALLER, CALLER->nestedContents);
+        evaluate_branch_internal_with_state(CONTEXT, CALLER, nested_contents(CALLER));
     }
 
     void format_source(StyledSource* source, Term* term)
     {
         append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TERM_NAME);
-        format_branch_source(source, term->nestedContents, term);
+        format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, token::WHITESPACE);
     }
 
     CA_FUNCTION(get_namespace_field)
     {
-        Branch& namespaceContents = INPUT_TERM(0)->nestedContents;
+        Branch& namespaceContents = nested_contents(INPUT_TERM(0));
         const char* name = STRING_INPUT(1);
 
         Term* term = namespaceContents[name];

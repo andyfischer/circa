@@ -68,13 +68,13 @@ void test_lookup_qualified_name()
 {
     Branch branch;
     Term* a = branch.compile("namespace a { b = 1 }");
-    Term* b = a->nestedContents["b"];
+    Term* b = nested_contents(a)["b"];
 
     test_assert(b != NULL);
     test_assert(branch["a:b"] == b);
 
     Term* x = branch.compile("namespace x { namespace y { namespace z { w = 1 }}}");
-    Term* w = x->nestedContents["y"]->nestedContents["z"]->nestedContents["w"];
+    Term* w = x->contents("y")->contents("z")->contents("w");
     test_assert(branch["x:y:z:w"] == w);
 }
 

@@ -23,7 +23,7 @@ bool has_implicit_state(Term* term)
 {
     if (is_function_stateful(term->function))
         return true;
-    if (has_any_inlined_state(term->nestedContents))
+    if (has_nested_contents(term) && has_any_inlined_state(nested_contents(term)))
         return true;
     return false;
 }
@@ -102,7 +102,7 @@ void get_state_description(Term* term, TaggedValue* output)
 {
     if (term->function == FOR_FUNC) {
         List& list = *List::cast(output, 2);
-        describe_state_shape(term->nestedContents, list[0]);
+        describe_state_shape(nested_contents(term), list[0]);
         copy(&REPEAT_SYMBOL, list[1]);
     } else if (term->function == IF_BLOCK_FUNC) {
         int numBranches = if_block_num_branches(term);
@@ -116,9 +116,9 @@ void get_state_description(Term* term, TaggedValue* output)
     } else if (is_get_state(term)) {
         set_string(output, declared_type(term)->name);
     } else if (is_function_stateful(term->function)) {
-        describe_state_shape(term->function->nestedContents, output);
-    } else if (has_any_inlined_state(term->nestedContents)) {
-        describe_state_shape(term->nestedContents, output);
+        describe_state_shape(nested_contents(term->function), output);
+    } else if (has_any_inlined_state(nested_contents(term))) {
+        describe_state_shape(nested_contents(term), output);
     }
 }
 

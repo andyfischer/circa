@@ -43,7 +43,7 @@ void write_function(CppWriter& writer, Term* term)
     writer.write("{");
     writer.indent();
     writer.newline();
-    write_branch_contents(writer, term->nestedContents);
+    write_branch_contents(writer, nested_contents(term));
     writer.unindent();
     writer.write("}");
 }

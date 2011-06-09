@@ -40,7 +40,7 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_dynamic_overload)
     {
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
         Term* func = CALLER->function;
 
         List& overloads = get_function_attrs(func)->parameters;
@@ -98,7 +98,7 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_overload)
     {
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
         if (contents.length() == 0) {
             evaluate_dynamic_overload(CONTEXT, CALLER);
             contents.clear();
@@ -112,7 +112,7 @@ namespace overloaded_function {
 
     void overload_post_input_change(Term* term)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
         contents.clear();
 
         TermList inputs;
@@ -127,7 +127,7 @@ namespace overloaded_function {
 
     Term* overload_specialize_type(Term* term)
     {
-        Branch& contents = term->nestedContents;
+        Branch& contents = nested_contents(term);
         return contents[0]->type;
     }
 
@@ -177,7 +177,7 @@ namespace overloaded_function {
             outputTypes.append(function_get_output_type(overload, 0));
         }
 
-        Branch& result = term->nestedContents;
+        Branch& result = nested_contents(term);
         result.shorten(1);
         int placeholderCount = variableArgs ? 1 : argumentCount;
         for (int i=0; i < placeholderCount; i++)
@@ -191,7 +191,7 @@ namespace overloaded_function {
     void setup_overloaded_function(Term* term, std::string const& name,
             TermList const& overloads)
     {
-        term->nestedContents.clear();
+        nested_contents(term);
         initialize_function(term);
 
         FunctionAttrs* attrs = get_function_attrs(term);

@@ -49,10 +49,10 @@ namespace get_state_field_function {
         }
 
         // Try to use initialValue from nestedContents
-        if (CALLER->nestedContents.length() > 0) {
+        if (nested_contents(CALLER).length() > 0) {
 
             TaggedValue result;
-            evaluate_branch_internal(CONTEXT, CALLER->nestedContents, &result);
+            evaluate_branch_internal(CONTEXT, nested_contents(CALLER), &result);
 
             bool cast_success = cast(&result, declared_type(CALLER), OUTPUT);
 
@@ -85,8 +85,8 @@ namespace get_state_field_function {
 
         Term* defaultValue = term->input(1);
 
-        if (defaultValue == NULL && term->nestedContents.length() > 0)
-            defaultValue = term->nestedContents[term->nestedContents.length()-1];
+        if (defaultValue == NULL && nested_contents(term).length() > 0)
+            defaultValue = nested_contents(term).getFromEnd(0);
 
         if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);

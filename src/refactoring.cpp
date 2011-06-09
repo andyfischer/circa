@@ -200,7 +200,8 @@ void remap_pointers(Term* term, TermMap const& map)
     // This code once called remap on term->properties
 
     // Remap inside nestedContents
-    term->nestedContents.remapPointers(map);
+    if (has_nested_contents(term))
+        nested_contents(term).remapPointers(map);
 }
 
 void remap_pointers(Term* term, Term* original, Term* replacement)

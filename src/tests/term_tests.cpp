@@ -31,7 +31,7 @@ void duplicate_nested_contents()
     Branch branch;
     Term* a = branch.compile("a = branch()");
 
-    Term* x = create_int(a->nestedContents, 5);
+    Term* x = create_int(nested_contents(a), 5);
 
     // Try duplicating branch
     Branch branch2;
@@ -39,21 +39,21 @@ void duplicate_nested_contents()
 
     test_assert(branch2.length() == 1);
     test_assert(branch2[0]->name == "a");
-    test_assert(branch2[0]->nestedContents.length() == 1);
-    test_assert(branch2[0]->nestedContents[0]->asInt() == 5);
+    test_assert(branch2[0]->contents().length() == 1);
+    test_assert(branch2[0]->contents()[0]->asInt() == 5);
 
     branch2.clear();
 
     // Now try duplicating, check that internal references are updated
-    apply(a->nestedContents, "add", TermList(x, x));
+    apply(nested_contents(a), "add", TermList(x, x));
     duplicate_branch(branch, branch2);
 
     test_assert(branch2.length() == 1);
     test_assert(branch2[0]->name == "a");
-    test_assert(branch2[0]->nestedContents.length() == 2);
-    test_assert(branch2[0]->nestedContents[0]->asInt() == 5);
-    test_assert(branch2[0]->nestedContents[1]->input(0) == branch2[0]->nestedContents[0]);
-    test_assert(branch2[0]->nestedContents[1]->input(1) == branch2[0]->nestedContents[0]);
+    test_assert(branch2[0]->contents().length() == 2);
+    test_assert(branch2[0]->contents()[0]->asInt() == 5);
+    test_assert(branch2[0]->contents()[1]->input(0) == branch2[0]->contents()[0]);
+    test_assert(branch2[0]->contents()[1]->input(1) == branch2[0]->contents()[0]);
 }
 
 void register_tests()

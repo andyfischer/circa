@@ -205,7 +205,7 @@ namespace image {
 
 void setup(circa::Branch& branch)
 {
-    Branch& image_ns = branch["image"]->nestedContents;
+    Branch& image_ns = nested_contents(branch["image"]);
     install_function(image_ns["_load"], load_image);
     install_function(image_ns["draw"], draw_image);
     install_function(image_ns["draw_clip_p"], draw_image_clip);

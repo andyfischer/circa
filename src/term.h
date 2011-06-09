@@ -74,8 +74,8 @@ struct Term : TaggedValue
     // Number of outputs.
     int outputCount;
 
-    // Code which is nested inside this term. Usually this is empty.
-    Branch nestedContents;
+    // Code which is nested inside this term. This object is created on-demand.
+    Branch* nestedContents;
 
     // A globally unique ID
     unsigned int globalID;
@@ -109,6 +109,15 @@ struct Term : TaggedValue
 
     const char* getName(int index) const;
     int nameCount() const;
+
+    // Shorthand for nested_contents()
+    Branch& contents();
+
+    // Shorthand for nested_contents()[index]
+    Term* contents(int index);
+
+    // Shorthand for nested_contents()[name]
+    Term* contents(const char* name);
 
     std::string toString();
 

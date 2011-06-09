@@ -334,8 +334,11 @@ void reset_locals(Branch& branch)
     reset(&branch.locals);
     reset(&branch.localsStack);
 
-    for (int i=0; i < branch.length(); i++)
-        reset_locals(branch[i]->nestedContents);
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term->nestedContents)
+            reset_locals(nested_contents(term));
+    }
 }
 
 } // namespace circa

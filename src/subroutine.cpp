@@ -31,7 +31,7 @@ namespace subroutine_f {
         function_t::format_header_source(source, term);
 
         if (!is_native_function(term))
-            format_branch_source(source, term->nestedContents, term);
+            format_branch_source(source, nested_contents(term), term);
     }
 }
 
@@ -117,7 +117,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
 void evaluate_subroutine(EvalContext* context, Term* caller)
 {
     Term* function = caller->function;
-    Branch& contents = function->nestedContents;
+    Branch& contents = nested_contents(function);
     int numInputs = caller->numInputs();
 
     // Copy inputs to a temporary list
@@ -172,9 +172,11 @@ bool is_subroutine(Term* term)
 {
     if (term->type != FUNCTION_TYPE)
         return false;
-    if (term->nestedContents.length() < 1)
+    if (!has_nested_contents(term))
         return false;
-    if (term->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
+    if (nested_contents(term).length() < 1)
+        return false;
+    if (term->contents(0)->type != FUNCTION_ATTRS_TYPE)
         return false;
     return function_t::get_evaluate(term) == evaluate_subroutine;
 }
@@ -227,7 +229,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
     if (previousType == newType)
         return;
 
-    Branch& contents = func->nestedContents;
+    Branch& contents = nested_contents(func);
     attrs->implicitStateType = newType;
 
     bool hasStateInput = (function_t::num_inputs(func) > 0)
@@ -257,7 +259,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
 void subroutine_check_to_append_implicit_return(Term* sub)
 {
     // Do nothing if this subroutine already ends with a return
-    Branch& contents = sub->nestedContents;
+    Branch& contents = nested_contents(sub);
     for (int i=contents.length()-1; i >= 0; i--) {
         Term* term = contents[i];
         if (term->function == RETURN_FUNC)
@@ -332,7 +334,7 @@ void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
 
 void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)
 {
-    return call_subroutine(sub->nestedContents, inputs, output, error);
+    return call_subroutine(nested_contents(sub), inputs, output, error);
 }
 
 } // namespace circa

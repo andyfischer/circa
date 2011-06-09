@@ -8,18 +8,18 @@ namespace branch_function {
 
     CA_FUNCTION(branch_evaluate)
     {
-        evaluate_branch_internal_with_state(CONTEXT, CALLER, CALLER->nestedContents);
+        evaluate_branch_internal_with_state(CONTEXT, CALLER, nested_contents(CALLER));
     }
 
     CA_FUNCTION(lambda_evaluate)
     {
-        set_branch(OUTPUT, &CALLER->nestedContents);
+        set_branch(OUTPUT, CALLER->nestedContents);
     }
 
     void format_source(StyledSource* source, Term* term)
     {
         format_name_binding(source, term);
-        format_branch_source(source, term->nestedContents, term);
+        format_branch_source(source, nested_contents(term), term);
     }
 
     void setup(Branch& kernel)

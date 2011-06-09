@@ -479,7 +479,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     tokens.consume(LPAREN);
 
-    Branch& contents = result->nestedContents;
+    Branch& contents = nested_contents(result);
 
     // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
@@ -691,7 +691,7 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
     int startPosition = tokens.getPosition();
 
     Term* result = apply(branch, IF_BLOCK_FUNC, TermList());
-    Branch& contents = result->nestedContents;
+    Branch& contents = nested_contents(result);
 
     Term* currentBlock = NULL;
     bool firstIteration = true;
@@ -735,8 +735,8 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
 
         currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
         set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
-        consume_branch(currentBlock->nestedContents, tokens, context);
-        finish_minor_branch(currentBlock->nestedContents);
+        consume_branch(nested_contents(currentBlock), tokens, context);
+        finish_minor_branch(nested_contents(currentBlock));
 
         if (tokens.nextNonWhitespaceIs(ELIF)
                 || (tokens.nextNonWhitespaceIs(ELSE) && !encounteredElse)) {
@@ -812,7 +812,7 @@ ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
         name = listExpr->name;
 
     Term* forTerm = apply(branch, FOR_FUNC, TermList(listExpr), name);
-    Branch& innerBranch = forTerm->nestedContents;
+    Branch& innerBranch = nested_contents(forTerm);
     setup_for_loop_pre_code(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
 
@@ -840,7 +840,7 @@ ParseResult do_once_block(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     Term* result = apply(branch, DO_ONCE_FUNC, TermList());
     set_starting_source_location(result, startPosition, tokens);
-    consume_branch(result->nestedContents, tokens, context);
+    consume_branch(nested_contents(result), tokens, context);
 
     update_output_count(result);
 
@@ -889,10 +889,10 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         // nestedContents. But, if it only contains an alias, then connect the alias
         // as an input.
 
-        Term* initialValue = infix_expression(result->nestedContents, tokens, context).term;
-        post_parse_branch(result->nestedContents);
+        Term* initialValue = infix_expression(nested_contents(result), tokens, context).term;
+        post_parse_branch(nested_contents(result));
 
-        if (initialValue->owningBranch != &result->nestedContents)
+        if (initialValue->owningBranch != result->nestedContents)
             set_input(result, 1, initialValue);
 
         // If an initial value was used and no specific type was mentioned, use
@@ -902,7 +902,7 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
         // Assert that either the initialValue input is non-null, or we have stuff
         // inside nestedContents
-        ca_assert((result->input(1) != NULL) || (result->nestedContents.length() > 0));
+        ca_assert((result->input(1) != NULL) || (result->nestedContents->length() > 0));
     }
 
     if (typeName != "")
@@ -1919,8 +1919,8 @@ ParseResult plain_branch(Branch& branch, TokenStream& tokens, ParserCxt* context
     int startPosition = tokens.getPosition();
     Term* term = apply(branch, LAMBDA_FUNC, TermList());
     set_source_location(term, startPosition, tokens);
-    consume_branch_with_braces(term->nestedContents, tokens, context, term);
-    post_parse_branch(term->nestedContents);
+    consume_branch_with_braces(nested_contents(term), tokens, context, term);
+    post_parse_branch(nested_contents(term));
     return ParseResult(term);
 }
 
@@ -1938,9 +1938,9 @@ ParseResult namespace_block(Branch& branch, TokenStream& tokens, ParserCxt* cont
     Term* term = apply(branch, NAMESPACE_FUNC, TermList(), name);
     set_starting_source_location(term, startPosition, tokens);
 
-    consume_branch(term->nestedContents, tokens, context);
+    consume_branch(nested_contents(term), tokens, context);
 
-    finish_minor_branch(term->nestedContents);
+    finish_minor_branch(nested_contents(term));
     mark_inputs_changed(term);
     finish_update_cascade(branch);
 
@@ -2011,7 +2011,7 @@ Term* statically_resolve_namespace_access(Term* target)
             return target;
 
         const char* name = target->input(1)->asString().c_str();
-        Term* original = root->nestedContents[name];
+        Term* original = root->contents(name);
         if (original == NULL)
             return target;
 

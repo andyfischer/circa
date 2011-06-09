@@ -41,7 +41,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
             Term* stackTerm = context->stack[stackPos];
             if (!is_subroutine(stackTerm->function))
                 continue;
-            if (target->owningBranch == &stackTerm->function->nestedContents)
+            if (target->owningBranch == stackTerm->function->nestedContents)
                 break;
         }
 
@@ -49,7 +49,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
 
         Term* caller = context->stack[stackPos];
 
-        ca_assert(&caller->function->nestedContents == target->owningBranch);
+        ca_assert(caller->function->nestedContents == target->owningBranch);
 
         int input = get_input_index_of_placeholder(target);
 
@@ -296,7 +296,7 @@ Branch& default_training_branch(Branch& branch)
     if (!branch.contains(TRAINING_BRANCH_NAME))
         create_branch(branch, TRAINING_BRANCH_NAME);
 
-    return branch[TRAINING_BRANCH_NAME]->nestedContents;
+    return nested_contents(branch[TRAINING_BRANCH_NAME]);
 }
 
 float get_feedback_weight(Term* term)
@@ -318,7 +318,7 @@ void feedback_register_constants(Branch& kernel)
 Branch& feedback_output(Term* term)
 {
     // might refactor this:
-    return term->nestedContents;
+    return nested_contents(term);
 }
 #endif
 

@@ -12,7 +12,7 @@ namespace return_function {
     {
         CONTEXT->interruptSubroutine = true;
 
-        Branch& contents = CALLER->nestedContents;
+        Branch& contents = nested_contents(CALLER);
         start_using(contents);
         for (int i=0; i < contents.length(); i++)
             evaluate_single_term(CONTEXT, contents[i]);
@@ -21,7 +21,7 @@ namespace return_function {
 
     void returnPostCompile(Term* returnCall)
     {
-        Branch& contents = returnCall->nestedContents;
+        Branch& contents = nested_contents(returnCall);
         contents.clear();
 
         // Iterate through every open state var in the subroutine that occurs before

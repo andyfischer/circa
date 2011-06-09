@@ -210,7 +210,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     copy(original, term);
 
     if (copyBranches)
-        duplicate_branch(original->nestedContents, term->nestedContents);
+        duplicate_branch(nested_contents(original), nested_contents(term));
 
     term->sourceLoc = original->sourceLoc;
     copy(&original->properties, &term->properties);
@@ -317,12 +317,12 @@ Term* create_list(Branch& branch, std::string const& name)
 
 Branch& create_branch(Branch& owner, std::string const& name)
 {
-    return apply(owner, BRANCH_FUNC, TermList(), name)->nestedContents;
+    return apply(owner, BRANCH_FUNC, TermList(), name)->contents();
 }
 
 Branch& create_namespace(Branch& branch, std::string const& name)
 {
-    return apply(branch, NAMESPACE_FUNC, TermList(), name)->nestedContents;
+    return apply(branch, NAMESPACE_FUNC, TermList(), name)->contents();
 }
 
 Term* create_type(Branch& branch, std::string name)

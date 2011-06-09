@@ -424,7 +424,7 @@ CA_FUNCTION(set_uniform)
 void setup(Branch& branch)
 {
     install_function(branch["background"], background);
-    Branch& gl_ns = branch["gl"]->nestedContents;
+    Branch& gl_ns = nested_contents(branch["gl"]);
     install_function(gl_ns["triangles"], gl_triangles);
     install_function(gl_ns["line_strip"], gl_line_strip);
     install_function(gl_ns["line_loop"], gl_line_loop);

@@ -67,14 +67,14 @@ void overloaded_function()
             ->name, "mult_f");
 
     Term* add_i = branch.eval("add(1 2)");
-    test_equals(add_i->nestedContents[0]->function->name, "add_i");
+    test_equals(add_i->contents(0)->function->name, "add_i");
     Term* add_f = branch.eval("add(1.0 2)");
-    test_equals(add_f->nestedContents[0]->function->name, "add_f");
+    test_equals(add_f->contents(0)->function->name, "add_f");
 
     Term* mult_f = branch.eval("mult(1.0 3)");
-    test_equals(mult_f->nestedContents[0]->function->name, "mult_f");
+    test_equals(mult_f->contents(0)->function->name, "mult_f");
     Term* mult_f_2 = branch.eval("mult(3 1.0)");
-    test_equals(mult_f_2->nestedContents[0]->function->name, "mult_f");
+    test_equals(mult_f_2->contents(0)->function->name, "mult_f");
 }
 
 void overloaded_function_in_script()
@@ -86,12 +86,12 @@ void overloaded_function_in_script()
     branch.compile("g = overloaded_function(f1 f2)");
     Term* g_call = branch.compile("g(1)");
 
-    test_assert(g_call->nestedContents[0]->function == f1);
+    test_assert(g_call->contents(0)->function == f1);
 
     branch.compile("h = overloaded_function(f2 f1)");
     Term* h_call = branch.compile("h(1)");
 
-    test_assert(h_call->nestedContents[0]->function == f2);
+    test_assert(h_call->contents(0)->function == f2);
 }
 
 void test_is_native_function()

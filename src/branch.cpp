@@ -62,6 +62,11 @@ Term* Branch::get(int index) const
     return _terms[index];
 }
 
+Term* Branch::getFromEnd(int index) const
+{
+    return get(length() - index - 1);
+}
+
 Term* Branch::last() const
 {
     if (length() == 0) return NULL;
@@ -355,9 +360,18 @@ bool is_namespace(Branch& branch)
     return branch.owningTerm != NULL && is_namespace(branch.owningTerm);
 }
 
+bool has_nested_contents(Term* term)
+{
+    return term->nestedContents != NULL;
+}
+
 Branch& nested_contents(Term* term)
 {
-    return term->nestedContents;
+    if (term->nestedContents == NULL) {
+        term->nestedContents = new Branch();
+        term->nestedContents->owningTerm = term;
+    }
+    return *term->nestedContents;
 }
 
 std::string get_branch_source_filename(Branch& branch)
@@ -384,7 +398,11 @@ void erase_term(Term* term)
     set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;
-    clear_branch(&term->nestedContents);
+    if (term->nestedContents) {
+        clear_branch(term->nestedContents);
+        delete term->nestedContents;
+        term->nestedContents = NULL;
+    }
 
     // for each user, clear that user's input list of this term
     remove_from_any_user_lists(term);
@@ -430,7 +448,8 @@ void clear_branch(Branch* branch)
         if (term == NULL)
             continue;
 
-        clear_branch(&term->nestedContents);
+        if (term->nestedContents)
+            clear_branch(term->nestedContents);
     }
 
     for (int i = branch->_terms.length() - 1; i >= 0; i--) {
@@ -479,9 +498,9 @@ void duplicate_branch_nested(TermMap& newTermMap, Branch& source, Branch& dest)
         newTermMap[source_term] = dest_term;
 
         // duplicate nested contents
-        clear_branch(&dest_term->nestedContents);
+        clear_branch(&nested_contents(dest_term));
         duplicate_branch_nested(newTermMap,
-                source_term->nestedContents, dest_term->nestedContents);
+                nested_contents(source_term), nested_contents(dest_term));
     }
 }
 

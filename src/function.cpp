@@ -181,7 +181,7 @@ namespace function_t {
         // it will be the first thing defined in the function, and it'll be
         // anonymous and be a statement.
         int expected_index = function_t::num_inputs(func) + 1;
-        Branch& contents = func->nestedContents;
+        Branch& contents = nested_contents(func);
 
         if (expected_index >= contents.length()) return "";
         Term* possibleDocString = contents[expected_index];
@@ -197,7 +197,7 @@ namespace function_t {
         if (!is_subroutine(func))
             return true;
 
-        //Branch& contents = func->nestedContents;
+        //Branch& contents = nested_contents(func);
 
         // There was once stuff here
 
@@ -219,7 +219,7 @@ namespace function_t {
 
     int num_inputs(Term* function)
     {
-        Branch& contents = function->nestedContents;
+        Branch& contents = nested_contents(function);
         int i = 1;
 
         while (i < contents.length()
@@ -232,9 +232,9 @@ namespace function_t {
     Term* get_input_placeholder(Term* func, int index)
     {
         index += 1;
-        if (index >= func->nestedContents.length())
+        if (index >= nested_contents(func).length())
             return NULL;
-        return func->nestedContents[index];
+        return nested_contents(func)[index];
     }
 
     std::string const& get_input_name(Term* func, int index)
@@ -317,18 +317,18 @@ FunctionAttrs& as_function_attrs(Term* term)
 
 Branch& function_contents(Term* func)
 {
-    return func->nestedContents;
+    return nested_contents(func);
 }
 
 FunctionAttrs* get_function_attrs(Term* func)
 {
     if (func == NULL)
         return NULL;
-    if (func->nestedContents.length() == 0)
+    if (nested_contents(func).length() == 0)
         return NULL;
-    if (func->nestedContents[0]->type != FUNCTION_ATTRS_TYPE)
+    if (nested_contents(func)[0]->type != FUNCTION_ATTRS_TYPE)
         return NULL;
-    return &as_function_attrs(func->nestedContents[0]);
+    return &as_function_attrs(nested_contents(func)[0]);
 }
 
 std::string get_placeholder_name_for_index(int index)
@@ -350,7 +350,7 @@ void initialize_function(Term* func)
       }
     */
 
-    Term* attributesTerm = create_value(func->nestedContents, FUNCTION_ATTRS_TYPE, "#attributes");
+    Term* attributesTerm = create_value(nested_contents(func), FUNCTION_ATTRS_TYPE, "#attributes");
     hide_from_source(attributesTerm);
 }
 

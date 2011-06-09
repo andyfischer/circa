@@ -169,7 +169,7 @@ bool load_runtime(circa::Branch& runtime)
     setup_functions(app::runtime_branch());
 
     circa::Term* users_script = runtime["users_script"];
-    g_app->_usersBranch = &users_script->nestedContents;
+    g_app->_usersBranch = &nested_contents(users_script);
 
     return true;
 }

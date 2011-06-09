@@ -25,12 +25,12 @@ Term::Term()
     owningBranch(NULL),
     index(0),
     localsIndex(0),
-    outputCount(0)
+    outputCount(0),
+    nestedContents(NULL)
 {
     globalID = gNextGlobalID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
-    nestedContents.owningTerm = this;
 }
 
 Term::~Term()
@@ -111,6 +111,22 @@ int
 Term::nameCount() const
 {
     return 1 + additionalOutputNames.count();
+}
+
+Branch&
+Term::contents()
+{
+    return nested_contents(this);
+}
+Term*
+Term::contents(int index)
+{
+    return nested_contents(this)[index];
+}
+Term*
+Term::contents(const char* name)
+{
+    return nested_contents(this)[name];
 }
 
 std::string
@@ -258,7 +274,7 @@ void term_check_invariants(List* errors, Term* term)
         }
     }
 
-    if (term->nestedContents.owningTerm != term)
+    if (term->nestedContents && term->nestedContents->owningTerm != term)
         append_term_invariant_error(errors, term,
                 "Term.nestedContents has wrong owningTerm");
 

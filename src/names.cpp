@@ -72,7 +72,7 @@ Term* get_named(Branch const& branch, std::string const& name)
     // a new string.
     std::string suffix = name.substr(nameEnd+1, name.length());
     
-    return get_named(prefix->nestedContents, suffix);
+    return get_named(nested_contents(prefix), suffix);
 }
 
 Term* get_named(Branch const& branch, const char* name)
@@ -82,7 +82,9 @@ Term* get_named(Branch const& branch, const char* name)
 
 bool exposes_nested_names(Term* term)
 {
-    if (term->nestedContents.length() == 0)
+    if (term->nestedContents == NULL)
+        return false;
+    if (nested_contents(term).length() == 0)
         return false;
     if (term->boolPropOptional("exposesNames", false))
         return true;
@@ -99,9 +101,9 @@ Term* get_named_at(Branch& branch, int index, std::string const& name)
         if (term->name == name)
             return term;
 
-        if (exposes_nested_names(term))
+        if (term->nestedContents && exposes_nested_names(term))
         {
-            Term* nested = term->nestedContents[name];
+            Term* nested = nested_contents(term)[name];
             if (nested != NULL)
                 return nested;
         }

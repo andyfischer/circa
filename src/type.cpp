@@ -369,7 +369,7 @@ Term* create_implicit_tuple_type(TermList const& types)
     }
     typeName << ">";
 
-    Term* result = create_type(IMPLICIT_TYPES->nestedContents, typeName.str());
+    Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str());
     list_t::setup_type(unbox_type(result));
     Branch& prototype = unbox_type(result)->prototype;
 

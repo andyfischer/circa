@@ -33,7 +33,7 @@ void test_simple()
     it.advance();
     test_assert(it.current() == sub);
     it.advance();
-    test_assert(it.current() == sub->nestedContents[0]);
+    test_assert(it.current() == sub->contents(0));
     it.advanceSkippingBranch(); // skip over 'attributes'
     test_assert(it.current()->name == "c");
     it.advance();
@@ -57,7 +57,7 @@ void test_upwards_iterator()
     branch.compile("a = 1; b = 2; c = { d = 3; e = 4} f = 5; g = { h = 6; i = 7; j = 8} k = 9");
 
     List names;
-    iterate_names_to_list(UpwardIterator(branch["g"]->nestedContents["j"]), names);
+    iterate_names_to_list(UpwardIterator(branch["g"]->contents("j")), names);
     test_equals(&names, "['i', 'h', 'g', 'f', 'c', 'b', 'a']");
 }
 
@@ -74,11 +74,12 @@ void test_upwards_iterator_nulls()
 
     branch.clear();
     branch.compile("a = 2; b = {}");
-    branch["b"]->nestedContents.append(NULL);
-    branch["b"]->nestedContents.compile("c = 3");
-    branch["b"]->nestedContents.compile("d = {}");
-    branch["b"]->nestedContents["d"]->nestedContents.append(NULL);
-    Term* e = branch["b"]->nestedContents["d"]->nestedContents.compile("e = 1");
+    branch["b"]->nestedContents->append(NULL);
+    branch["b"]->nestedContents->compile("c = 3");
+    branch["b"]->nestedContents->compile("d = {}");
+    branch["b"]->contents("d")->nestedContents->append(NULL);
+
+    Term* e = branch["b"]->contents("d")->nestedContents->compile("e = 1");
     iterate_names_to_list(UpwardIterator(e), names);
     test_equals(&names, "['d', 'c', 'b', 'a']");
 }

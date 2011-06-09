@@ -68,6 +68,10 @@ struct Branch
     int length() const;
 
     Term* get(int index) const;
+
+    // Get an index counting from the end; equivalent to get(length() - index - 1)
+    Term* getFromEnd(int index) const;
+
     Term* operator[](int index) const { return get(index); }
 
     // Get a term from a name binding.
@@ -135,6 +139,7 @@ void assert_valid_branch(Branch const* obj);
 bool is_namespace(Term* term);
 bool is_namespace(Branch& branch);
 
+bool has_nested_contents(Term* term);
 Branch& nested_contents(Term* term);
 
 std::string get_branch_source_filename(Branch& branch);
