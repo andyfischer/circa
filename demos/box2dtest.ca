@@ -1,5 +1,5 @@
 
-include('demos/modules/drifting_stars.ca')
+include('shared/drifting_stars.ca'->rpath)
 
 def draw_body_outline(any handle, Color color)
     points = box2d:get_body_points(handle)

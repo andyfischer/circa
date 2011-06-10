@@ -185,7 +185,7 @@ for env in all_envs:
     variantName = env['variant_name']
     env.VariantDir('build/'+variantName+'/plastic/src', 'plastic/src')
     use_sdl(env)
-    use_fmod(env)
+    #use_fmod(env)
     use_box2d(env)
     use_liblo(env)
 

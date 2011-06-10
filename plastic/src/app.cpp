@@ -16,8 +16,12 @@
 // For now, include the 3rd party bindings by source. Long term plan is for these
 // to each be compiled as a separate module.
 #include "../libs/box2d/box2d.cpp"
-#include "../libs/fmod/fmod.cpp"
 #include "../libs/osc/osc.cpp"
+
+#if PLASTIC_USE_FMOD
+#include "../libs/fmod/fmod.cpp"
+#endif
+
 
 namespace app {
 
@@ -204,7 +208,10 @@ bool setup_functions(circa::Branch& runtime)
     text::setup(branch);
 #endif
 
+#if PLASTIC_USE_FMOD
     fmod_support::setup(runtime);
+#endif
+
     box2d_support::setup(runtime);
     osc_support::setup(runtime);
 
