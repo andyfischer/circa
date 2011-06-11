@@ -304,7 +304,12 @@ namespace postprocess
 
 -- Include other runtime scripts
 include('../../libs/box2d/box2d.ca' -> rpath)
+include('../../libs/opengl/opengl.ca' -> rpath)
 include('../../libs/osc/osc.ca' -> rpath)
+
+-- cairo.ca depends on opengl
+include('../../libs/cairo/cairo.ca' -> rpath)
+
 include('text_input.ca' -> rpath)
 include('ui_widgets.ca' -> rpath)
 

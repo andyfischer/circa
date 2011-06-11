@@ -490,6 +490,7 @@ void set_branch(TaggedValue* value, Branch* branch)
 
 void set_pointer(TaggedValue* value, Type* type, void* p)
 {
+    set_null(value);
     value->value_type = type;
     value->value_data.ptr = p;
 }

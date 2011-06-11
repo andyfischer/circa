@@ -58,4 +58,13 @@ namespace color_t {
     }
 
 } // namespace color_t
+
+void get_color(TaggedValue* value, float* r, float* g, float* b, float* a)
+{
+    *r = to_float(get_index(value, 0));
+    *g = to_float(get_index(value, 1));
+    *b = to_float(get_index(value, 2));
+    *a = to_float(get_index(value, 3));
+}
+
 } // namespace circa

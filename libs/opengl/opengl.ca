@@ -1,0 +1,5 @@
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+
+namespace opengl
+    def new_texture_handle() -> int
+    def draw_texture_as_quad(int texid, Rect rect)

@@ -179,6 +179,11 @@ def use_box2d(env):
 def use_liblo(env):
     env.Append(LIBS=['lo'])
 
+def use_cairo(env):
+    env.Append(CPPPATH="/usr/local/Cellar/cairo/1.10.2/include")
+    env.Append(LIBPATH="/usr/local/Cellar/cairo/1.10.2/lib")
+    env.Append(LIBS=['cairo'])
+
 # Define plastic targets at build/plas_x
 for env in all_envs:
     env = env.Clone()
@@ -188,6 +193,7 @@ for env in all_envs:
     #use_fmod(env)
     use_box2d(env)
     use_liblo(env)
+    use_cairo(env)
 
     source_files = list_source_files('plastic/src')
 

@@ -8,4 +8,7 @@ namespace color_t {
     void setup_type(Type* type);
 
 } // namespace color_t
+
+void get_color(TaggedValue* value, float* r, float* g, float* b, float* a);
+
 } // namespace circa

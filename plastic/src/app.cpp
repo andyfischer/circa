@@ -16,12 +16,13 @@
 // For now, include the 3rd party bindings by source. Long term plan is for these
 // to each be compiled as a separate module.
 #include "../libs/box2d/box2d.cpp"
+#include "../libs/opengl/opengl.cpp"
 #include "../libs/osc/osc.cpp"
+#include "../libs/cairo/cairo.cpp"
 
 #if PLASTIC_USE_FMOD
 #include "../libs/fmod/fmod.cpp"
 #endif
-
 
 namespace app {
 
@@ -213,7 +214,9 @@ bool setup_functions(circa::Branch& runtime)
 #endif
 
     box2d_support::setup(runtime);
+    opengl_support::setup(runtime);
     osc_support::setup(runtime);
+    cairo_support::setup(runtime);
 
     return true;
 }

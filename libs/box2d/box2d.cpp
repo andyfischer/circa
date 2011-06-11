@@ -16,7 +16,6 @@ namespace box2d_support {
 b2World *g_world = NULL;
 b2Body *g_groundBody = NULL; // used for mouse joints
 
-
 float c_timestep = 1.0/60.0;
 int c_velocityIterations = 6;
 int c_positionIterations = 2;
@@ -471,7 +470,6 @@ void setup(Branch& kernel)
     install_function(ns["create_mouse_joint"], create_mouse_joint);
     install_function(ns["mouse_joint_set_target"], mouse_joint_set_target);
 
-    //app::get_global_app().addPreFrameCallback(on_frame_callback, NULL);
     app::get_global_app().addPostFrameCallback(on_frame_callback, NULL);
 }
 

@@ -1,0 +1,27 @@
+
+-- cairo bindings
+namespace cairo
+    type Context;
+    type Surface;
+
+    -- Contexts
+    def create_context_for_surface(Surface s) -> Context
+    def stroke(Context cr)
+    def paint(Context cr)
+    def set_source_color(Context cr, Color color)
+
+    -- Surfaces
+    def create_image_surface(int width, int height) -> Surface
+
+    -- Paths
+    def move_to(Context cr, Point p)
+    def curve_to(Context cr, Point control1, Point control2, Point p3)
+    def line_to(Context cr, Point p)
+
+    def set_line_width(Context cr, number width)
+
+    -- Rendering
+
+    -- This function will modify the pixels in 'surface' (so that the colors
+    -- are formatted in a way that OpenGL likes).
+    def upload_surface_to_opengl(Surface surface, int texture_id)
