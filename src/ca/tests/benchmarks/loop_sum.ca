@@ -1,0 +1,8 @@
+
+result = 0
+loop_count = 1000000
+
+for i in 0..loop_count
+  result += add(1 1 1 1 1 1 1 1 1 1)
+
+assert(result == loop_count*10)
