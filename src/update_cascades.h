@@ -22,6 +22,7 @@ void mark_repairable_link(Term* term, std::string const& name, int dependencyInd
 void mark_static_errors_invalid(Branch& branch);
 
 void finish_update_cascade(Branch& branch);
+void recursively_finish_update_cascade(Branch& branch);
 
 void on_inputs_changed(Term* term);
 

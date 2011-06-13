@@ -3,6 +3,7 @@
 #include "branch.h"
 #include "heap_debugging.h"
 #include "function.h"
+#include "locals.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "update_cascades.h"
@@ -100,8 +101,20 @@ void finish_update_cascade(Branch& branch)
     branch.currentlyCascadingUpdates = false;
 }
 
+void recursively_finish_update_cascade(Branch& branch)
+{
+    finish_update_cascade(branch);
+
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (term->nestedContents)
+            recursively_finish_update_cascade(nested_contents(term));
+    }
+}
+
 void on_inputs_changed(Term* term)
 {
+    // Update function pointer
     FunctionAttrs* attrs = get_function_attrs(term->function);
     if (attrs == NULL)
         return;
@@ -110,6 +123,8 @@ void on_inputs_changed(Term* term)
 
     if (func)
         func(term);
+
+    update_input_instructions(term);
 }
 
 void on_repairable_link(Term* term, List& brokenLinks)

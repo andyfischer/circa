@@ -12,6 +12,7 @@
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
+#include "update_cascades.h"
 
 #include "if_block.h"
 
@@ -108,6 +109,8 @@ void update_if_block_joining_branch(Term* ifCall)
 
         apply(joining, JOIN_FUNC, inputs, name);
     }
+
+    finish_update_cascade(joining);
 }
 
 int if_block_num_branches(Term* ifCall)
@@ -129,7 +132,7 @@ CA_FUNCTION(evaluate_if_block)
     int acceptedBranchIndex = 0;
     Branch* acceptedBranch = NULL;
 
-    context->stack.append(CALLER);
+    context->callStack.append(CALLER);
 
     TaggedValue localState;
     TaggedValue prevScopeState;
@@ -153,7 +156,7 @@ CA_FUNCTION(evaluate_if_block)
 
             ca_assert(acceptedBranch != NULL);
 
-            context->stack.append(branch);
+            context->callStack.append(branch);
             start_using(*acceptedBranch);
 
             if (useState)
@@ -193,16 +196,16 @@ CA_FUNCTION(evaluate_if_block)
 
         ca_test_assert(cast_possible(value, unbox_type(get_output_type(CALLER, i+1))));
 
-        swap(value, EXTRA_OUTPUT(i));
+        copy(value, EXTRA_OUTPUT(i));
     }
 
     // Finish using the branch, this will pop its stack frame. Need to do this after
     // copying joined values.
     finish_using(*acceptedBranch);
 
-    context->stack.pop();
+    context->callStack.pop();
 
-    context->stack.pop();
+    context->callStack.pop();
 }
 
 } // namespace circa

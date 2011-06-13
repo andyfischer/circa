@@ -12,6 +12,7 @@
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
+#include "update_cascades.h"
 
 #include "for_loop.h"
 
@@ -61,7 +62,8 @@ void setup_for_loop_pre_code(Term* forTerm)
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 {
     Term* iteratorType = find_type_of_get_index(forTerm->input(0));
-    Term* result = create_value(nested_contents(forTerm), iteratorType, name);
+    Term* result = apply(nested_contents(forTerm), INPUT_PLACEHOLDER_FUNC, TermList(), name);
+    change_declared_type(result, iteratorType);
     hide_from_source(result);
     return result;
 }
@@ -110,6 +112,7 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     for_loop_update_output_index(forTerm);
+    recursively_finish_update_cascade(forContents);
 }
 
 Term* find_enclosing_for_loop(Term* term)
@@ -163,7 +166,7 @@ CA_FUNCTION(evaluate_for_loop)
 
     start_using(forContents);
     start_using(innerRebinds);
-    context->stack.append(CALLER);
+    context->callStack.append(CALLER);
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
@@ -257,7 +260,7 @@ CA_FUNCTION(evaluate_for_loop)
         swap(&prevScopeState, &context->currentScopeState);
     }
 
-    context->stack.pop();
+    context->callStack.pop();
     finish_using(forContents);
     finish_using(innerRebinds);
 }

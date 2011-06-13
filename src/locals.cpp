@@ -5,6 +5,7 @@
 #include "branch.h"
 #include "builtins.h"
 #include "function.h"
+#include "introspection.h"
 #include "term.h"
 
 #include "locals.h"
@@ -88,6 +89,61 @@ void refresh_locals_indices(Branch& branch, int startingAt)
 void update_output_count(Term* term)
 {
     term->outputCount = get_output_count(term);
+}
+
+int get_frame_distance(Term* term, Term* input)
+{
+    if (input == NULL)
+        return -1;
+
+    // TODO: Walk 'input' upwards as long as it's in a function that shares registers.
+
+    // Walk upward from 'term' until we find the common branch.
+    int distance = 0;
+    while (term->owningBranch != input->owningBranch) {
+        term = get_parent_term(term);
+
+        if (term == NULL)
+            return -1;
+    }
+    return distance;
+}
+
+void update_input_instructions(Term* term)
+{
+    InputInstructionList& list = term->inputInstructionList;
+
+    list.inputs.resize(term->numInputs());
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+        if (input == NULL) {
+            list.inputs[i].type = InputInstruction::EMPTY;
+            continue;
+        }
+
+        if (is_value(input)) {
+            list.inputs[i].type = InputInstruction::GLOBAL;
+            continue;
+        }
+
+        // TEMP
+        list.inputs[i].type = InputInstruction::OLD_STYLE_LOCAL;
+        #if 0
+        list.inputs[i].relativeFrame =  get_frame_distance(term, input);
+        list.inputs[i].index = input->localsIndex + term->inputInfo(i)->outputIndex;
+        #endif
+    }
+
+    list.outputs.resize(term->numOutputs());
+    for (int i=0; i < term->numOutputs(); i++) {
+        #if 0
+        list.outputs[i].relativeFrame = 0;
+        list.outputs[i].index = term->localsIndex + i;
+        #endif
+
+        // TEMP
+        list.outputs[i].type = InputInstruction::OLD_STYLE_LOCAL;
+    }
 }
 
 } // namespace circa

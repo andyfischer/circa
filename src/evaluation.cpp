@@ -133,9 +133,25 @@ void evaluate_branch(Branch& branch)
 
 TaggedValue* get_input(Term* term, int index)
 {
-    Term* input = term->input(index);
-    ca_assert(input != NULL);
-    return get_local(input, term->inputInfo(index)->outputIndex);
+    InputInstruction *instruction = &term->inputInstructionList.inputs[index];
+
+    switch (instruction->type) {
+    case InputInstruction::GLOBAL: {
+        TaggedValue* v = (TaggedValue*) term->input(index);
+        //std::cout << "grabbing global: " << v->toString() << std::endl;
+        return v;
+    }
+    case InputInstruction::OLD_STYLE_LOCAL:
+        return get_local(term->input(index), term->inputInfo(index)->outputIndex);
+    case InputInstruction::EMPTY:
+        internal_error("Attempt to access NULL input");
+        return NULL;
+    case InputInstruction::LOCAL:
+    case InputInstruction::LOCAL_CONSUME:
+    default:
+        internal_error("Invalid input instruction");
+        return NULL;
+    }
 }
 
 void consume_input(Term* term, int index, TaggedValue* dest)

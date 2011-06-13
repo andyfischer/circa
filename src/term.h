@@ -5,8 +5,9 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "term_list.h"
 #include "name_list.h"
+#include "input_instructions.h"
+#include "term_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
 #include "types/dict.h"
@@ -45,6 +46,9 @@ struct Term : TaggedValue
     // Input terms
     InputList inputs;
 
+    // Instructions on where to find inputs during evaluation. Derived from inputs.
+    InputInstructionList inputInstructionList;
+
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
@@ -69,6 +73,7 @@ struct Term : TaggedValue
 
     // The location of this term's output in the locals list. If the term has multiple
     // outputs then this is the first index.
+    // Deprecated with registerList
     int localsIndex;
 
     // Number of outputs.

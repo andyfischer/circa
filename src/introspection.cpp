@@ -244,6 +244,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         if (i != 0) out << " ";
         out << global_id(term->input(i));
         out << "#" << term->inputs[i].outputIndex;
+        out << ":" << term->inputInstructionList.inputs[i].type;
     }
     out << ")";
 

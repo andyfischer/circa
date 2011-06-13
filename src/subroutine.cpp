@@ -14,6 +14,7 @@
 #include "refactoring.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "update_cascades.h"
 #include "token.h"
 #include "term.h"
 #include "type.h"
@@ -49,7 +50,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
         Branch& contents, List* inputs, List* outputs)
 {
     context->interruptSubroutine = false;
-    context->stack.append(caller);
+    context->callStack.append(caller);
     start_using(contents);
 
     int numInputs = inputs->length();
@@ -110,7 +111,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
 
     // Clean up
     finish_using(contents);
-    context->stack.pop();
+    context->callStack.pop();
     context->interruptSubroutine = false;
 }
 
@@ -207,6 +208,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
 {
     subroutine_update_state_type_from_contents(sub);
     subroutine_check_to_append_implicit_return(sub);
+    finish_update_cascade(nested_contents(sub));
 }
 
 void subroutine_update_state_type_from_contents(Term* func)

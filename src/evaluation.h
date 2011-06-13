@@ -36,10 +36,11 @@ struct EvalContext
     Dict messages;
 
     // Current stack of in-progress terms. Used for introspection.
-    TermList stack;
+    TermList callStack;
 
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 };
+
 
 // Evaluate a single term.
 void evaluate_single_term(EvalContext* context, Term* term);

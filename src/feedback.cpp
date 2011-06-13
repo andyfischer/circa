@@ -37,8 +37,8 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
         // Find where we are in context->stack.
 
         int stackPos;
-        for (stackPos = context->stack.length() - 1; stackPos >= 0; stackPos--) {
-            Term* stackTerm = context->stack[stackPos];
+        for (stackPos = context->callStack.length() - 1; stackPos >= 0; stackPos--) {
+            Term* stackTerm = context->callStack[stackPos];
             if (!is_subroutine(stackTerm->function))
                 continue;
             if (target->owningBranch == stackTerm->function->nestedContents)
@@ -47,7 +47,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
 
         ca_assert(stackPos >= 0);
 
-        Term* caller = context->stack[stackPos];
+        Term* caller = context->callStack[stackPos];
 
         ca_assert(caller->function->nestedContents == target->owningBranch);
 
