@@ -131,7 +131,7 @@ void evaluate_branch(Branch& branch)
     evaluate_branch(&context, branch);
 }
 
-TaggedValue* get_input(Term* term, int index)
+TaggedValue* get_input(EvalContext* context, Term* term, int index)
 {
     InputInstruction *instruction = &term->inputInstructionList.inputs[index];
 
@@ -146,29 +146,15 @@ TaggedValue* get_input(Term* term, int index)
     case InputInstruction::LOCAL:
     case InputInstruction::LOCAL_CONSUME:
     default:
-        internal_error("Invalid input instruction");
+        internal_error("Not yet implemented");
         return NULL;
     }
 }
 
-void consume_input(Term* term, int index, TaggedValue* dest)
+void consume_input(EvalContext* context, Term* term, int index, TaggedValue* dest)
 {
-    Term* input = term->input(index);
-    if (input == NULL) {
-        set_null(dest);
-        return;
-    }
-    TaggedValue* val = get_local(input, term->inputInfo(index)->outputIndex);
-
-    // if this function is called, then users shouldn't be 0.
-    ca_assert(input->users.length() != 0);
-
-    if (input->users.length() == 1) {
-        swap(val,dest);
-        set_null(val);
-    } else {
-        copy(val,dest);
-    }
+    // Temp, don't actually consume
+    copy(get_input(context, term, index), dest);
 }
 
 TaggedValue* get_output(Term* term, int outputIndex)
@@ -188,7 +174,7 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
         ca_assert(currentScopeState != NULL);
         return currentScopeState->insert(term->uniqueName.name.c_str());
     } else {
-        return get_input(term, 0);
+        return get_input(cxt, term, 0);
     }
 }
 

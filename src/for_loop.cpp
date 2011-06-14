@@ -202,9 +202,9 @@ CA_FUNCTION(evaluate_for_loop)
             TaggedValue* dest = get_local(rebindTerm);
 
             if (firstIter)
-                copy(get_input(rebindTerm, 0), dest);
+                copy(get_input(context, rebindTerm, 0), dest);
             else
-                copy(get_input(rebindTerm, 1), dest);
+                copy(get_input(context, rebindTerm, 1), dest);
         }
 
         context->forLoopContext.discard = false;
@@ -243,10 +243,10 @@ CA_FUNCTION(evaluate_for_loop)
 
         if (inputListLength == 0) {
             // No iterations, use the outer rebind
-            result = get_input(rebindTerm, 0);
+            result = get_input(context, rebindTerm, 0);
         } else {
             // At least one iteration, use our local rebind
-            result = get_input(rebindTerm, 1);
+            result = get_input(context, rebindTerm, 1);
         }
 
         copy(result, EXTRA_OUTPUT(i));

@@ -129,7 +129,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
         if (caller->input(i) == NULL)
             continue;
 
-        TaggedValue* input = get_input(caller, i);
+        TaggedValue* input = get_input(context, caller, i);
 
         Type* inputType = unbox_type(function_t::get_input_type(function, i));
 

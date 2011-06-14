@@ -123,6 +123,7 @@ Type DICT_T;
 Type ERROR_T;
 Type EVAL_CONTEXT_T;
 Type FLOAT_T;
+Type FUNCTION_T;
 Type HANDLE_T;
 Type INT_T;
 Type LIST_T;
@@ -229,10 +230,9 @@ void bootstrap_kernel()
     ca_assert(is_type(FUNCTION_ATTRS_TYPE));
 
     // Create Function type
-    FUNCTION_TYPE = create_empty_type(*KERNEL, "Function");
-    Type* functionType = unbox_type(FUNCTION_TYPE);
-    functionType->formatSource = subroutine_f::format_source;
-    functionType->checkInvariants = function_t::check_invariants;
+    function_t::setup_type(&FUNCTION_T);
+    FUNCTION_TYPE = create_type(*KERNEL, "Function");
+    set_type(FUNCTION_TYPE, &FUNCTION_T);
 
     // Initialize TaggedValue func
     VALUE_FUNC->type = FUNCTION_TYPE;
@@ -339,34 +339,34 @@ void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
-    set_ref(function_t::get_parameters(add_v), ADD_FUNC);
+    set_ref(function_get_parameters(add_v), ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_v);
 
     Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
-    set_ref(function_t::get_parameters(add_s), ADD_FUNC);
+    set_ref(function_get_parameters(add_s), ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
     // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
-    set_ref(function_t::get_parameters(sub_v), SUB_FUNC);
+    set_ref(function_get_parameters(sub_v), SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_v);
 
     Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
-    set_ref(function_t::get_parameters(sub_s), SUB_FUNC);
+    set_ref(function_get_parameters(sub_s), SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
-    set_ref(function_t::get_parameters(mult_v), kernel["mult"]);
+    set_ref(function_get_parameters(mult_v), kernel["mult"]);
     overloaded_function::append_overload(MULT_FUNC, mult_v);
 
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
-    set_ref(function_t::get_parameters(mult_s), kernel["mult"]);
+    set_ref(function_get_parameters(mult_s), kernel["mult"]);
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
     Term* div_s = create_duplicate(kernel, kernel["vectorize_vs"], "div_s");
-    set_ref(function_t::get_parameters(div_s), DIV_FUNC);
+    set_ref(function_get_parameters(div_s), DIV_FUNC);
     overloaded_function::append_overload(DIV_FUNC, div_s);
 }
 

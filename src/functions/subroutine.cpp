@@ -18,7 +18,7 @@ namespace subroutine_function {
             if (INPUT_TERM(i) == NULL)
                 set_null(out->get(i));
             else
-                consume_input(CALLER, i, out->get(i));
+                consume_input(CONTEXT, CALLER, i, out->get(i));
         }
     }
 

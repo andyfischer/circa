@@ -28,7 +28,7 @@
     }
 
 
-#define INPUT(index) (get_input(_caller, (index)))
+#define INPUT(index) (get_input(_context, _caller, (index)))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))
 #define STRING_INPUT(index) (circa::as_string(INPUT(index)).c_str())

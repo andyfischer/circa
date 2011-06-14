@@ -47,7 +47,7 @@ namespace include_function {
         EvalContext context;
         evaluate_minimum(&context, inputTerm);
 
-        TaggedValue *input = get_input(term, 0);
+        TaggedValue *input = get_input(NULL, term, 0);
 
         if (!is_string(input))
             return;
@@ -79,8 +79,6 @@ namespace include_function {
         if (fileChanged) {
             TaggedValue trash;
             strip_orphaned_state(contents, &context->currentScopeState, &trash);
-            //if (!is_null(&trash))
-            //    std::cout << "include() deleting orphaned state: " << trash.toString() << std::endl;
             reset_locals(contents);
         }
 

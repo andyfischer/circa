@@ -16,15 +16,15 @@ namespace hashtable_members_function {
     CA_FUNCTION(insert)
     {
         TaggedValue key, value;
-        consume_input(CALLER, 0, OUTPUT);
-        consume_input(CALLER, 1, &key);
-        consume_input(CALLER, 2, &value);
+        consume_input(CONTEXT, CALLER, 0, OUTPUT);
+        consume_input(CONTEXT, CALLER, 1, &key);
+        consume_input(CONTEXT, CALLER, 2, &value);
         hashtable_t::table_insert(OUTPUT, &key, &value, true, true);
     }
 
     CA_FUNCTION(remove)
     {
-        consume_input(CALLER, 0, OUTPUT);
+        consume_input(CONTEXT, CALLER, 0, OUTPUT);
         hashtable_t::table_remove(OUTPUT, INPUT(1));
     }
 

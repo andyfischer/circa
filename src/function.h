@@ -62,6 +62,8 @@ namespace function_t {
 
     bool check_invariants(Term* term, std::string* failureMessage);
 
+    void setup_type(Type* type);
+
     // accessors
     std::string const& get_name(Term* function);
     bool get_variable_args(Term* function);
@@ -76,7 +78,6 @@ namespace function_t {
     std::string const& get_exposed_name_path(Term* function);
     void set_exposed_name_path(Term* func, std::string const& value);
     Term* get_feedback_func(Term* function);
-    TaggedValue* get_parameters(Term* function);
     std::string get_documentation(Term* function);
 
     EvaluateFunc& get_evaluate(Term* function);
@@ -118,6 +119,7 @@ bool function_call_rebinds_input(Term* term, int index);
 
 Term* function_get_input_type(Term* function, int index);
 Term* function_get_output_type(Term* function, int index);
+TaggedValue* function_get_parameters(Term* function);
 
 const char* get_output_name(Term* term, int outputIndex);
 const char* get_output_name_for_input(Term* term, int inputIndex);

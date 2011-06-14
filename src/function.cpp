@@ -204,6 +204,14 @@ namespace function_t {
         return true;
     }
 
+    void setup_type(Type* type)
+    {
+        type->name = "Function";
+        type->formatSource = subroutine_f::format_source;
+        type->checkInvariants = function_t::check_invariants;
+        type->storageType = STORAGE_TYPE_REF;
+    }
+
     std::string const& get_name(Term* function)
     {
         return get_function_attrs(function)->name;
@@ -290,10 +298,6 @@ namespace function_t {
     {
         return get_function_attrs(func)->specializeType;
     }
-    TaggedValue* get_parameters(Term* func)
-    {
-        return &get_function_attrs(func)->parameter;
-    }
 } // namespace function_t
 
 bool is_function(Term* term)
@@ -352,6 +356,10 @@ void initialize_function(Term* func)
 
     Term* attributesTerm = create_value(nested_contents(func), FUNCTION_ATTRS_TYPE, "#attributes");
     hide_from_source(attributesTerm);
+
+    // Setup the term's global value to point back to the term, so that the function
+    // can be passed as a value.
+    set_function(func, func);
 }
 
 void finish_parsing_function_header(Term* func)
@@ -503,6 +511,13 @@ Term* function_get_output_type(Term* function, int index)
     ca_assert(index < attrs->outputTypes.length());
 
     return attrs->outputTypes[index];
+}
+TaggedValue* function_get_parameters(Term* function)
+{
+    FunctionAttrs* attrs = get_function_attrs(function);
+    if (attrs == NULL)
+        return NULL;
+    return &attrs->parameter;
 }
 
 const char* get_output_name(Term* term, int outputIndex)

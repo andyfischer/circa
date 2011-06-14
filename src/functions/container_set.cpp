@@ -4,7 +4,7 @@
 #include "types/set.h"
 
 namespace circa {
-namespace set_function {
+namespace container_set_function {
 
     CA_FUNCTION(evaluate)
     {

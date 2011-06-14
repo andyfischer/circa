@@ -94,6 +94,7 @@ void set_ref(TaggedValue* value, Term* t);
 List* set_list(TaggedValue* value);
 List* set_list(TaggedValue* value, int size);
 void set_type(TaggedValue* value, Type* type);
+void set_function(TaggedValue* value, Term* function);
 void set_null(TaggedValue* value);
 void set_opaque_pointer(TaggedValue* value, void* addr);
 void set_branch(TaggedValue* value, Branch* branch);

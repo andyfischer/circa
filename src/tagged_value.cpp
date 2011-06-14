@@ -473,6 +473,12 @@ void set_type(TaggedValue* value, Type* type)
     register_type_pointer(value, type);
 }
 
+void set_function(TaggedValue* value, Term* function)
+{
+    change_type_no_initialize(value, &FUNCTION_T);
+    value->value_data.ptr = function;
+}
+
 void set_null(TaggedValue* value)
 {
     change_type(value, &NULL_T);
