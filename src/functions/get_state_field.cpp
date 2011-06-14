@@ -36,25 +36,11 @@ namespace get_state_field_function {
 
         // Try to use initialValue from an input.
         if (INPUT_TERM(1) != NULL) {
+            // Evaluate nested contents first, since the initial value might come from there.
+            if (CALLER->nestedContents) 
+                evaluate_branch_internal(CONTEXT, nested_contents(CALLER));
+            
             bool cast_success = cast(INPUT(1), declared_type(CALLER), OUTPUT);
-
-            if (!cast_success) {
-                std::stringstream msg;
-                msg << "Couldn't cast default value to type " <<
-                    declared_type(CALLER)->name;
-                return error_occurred(CONTEXT, CALLER, msg.str());
-            }
-
-            return;
-        }
-
-        // Try to use initialValue from nestedContents
-        if (nested_contents(CALLER).length() > 0) {
-
-            TaggedValue result;
-            evaluate_branch_internal(CONTEXT, nested_contents(CALLER), &result);
-
-            bool cast_success = cast(&result, declared_type(CALLER), OUTPUT);
 
             if (!cast_success) {
                 std::stringstream msg;

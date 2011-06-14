@@ -886,23 +886,17 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         possible_whitespace(tokens);
 
         // If the initial value contains any new expressions, then those live inside
-        // nestedContents. But, if it only contains an alias, then connect the alias
-        // as an input.
+        // nestedContents.
 
         Term* initialValue = infix_expression(nested_contents(result), tokens, context).term;
         post_parse_branch(nested_contents(result));
 
-        if (initialValue->owningBranch != result->nestedContents)
-            set_input(result, 1, initialValue);
+        set_input(result, 1, initialValue);
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
         if (typeName == "" && initialValue->type != NULL_T_TERM)
             change_declared_type(result, initialValue->type);
-
-        // Assert that either the initialValue input is non-null, or we have stuff
-        // inside nestedContents
-        ca_assert((result->input(1) != NULL) || (result->nestedContents->length() > 0));
     }
 
     if (typeName != "")

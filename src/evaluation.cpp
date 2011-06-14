@@ -35,7 +35,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     // slow, and it should be unnecessary if the function is written correctly. But it's
     // a good test.
     #ifdef CIRCA_TEST_BUILD
-    if (!context->errorOccurred) {
+    if (!context->errorOccurred && !is_value(term)) {
         for (int i=0; i < get_output_count(term); i++) {
 
             Type* outputType = unbox_type(get_output_type(term, i));
@@ -136,11 +136,8 @@ TaggedValue* get_input(Term* term, int index)
     InputInstruction *instruction = &term->inputInstructionList.inputs[index];
 
     switch (instruction->type) {
-    case InputInstruction::GLOBAL: {
-        TaggedValue* v = (TaggedValue*) term->input(index);
-        //std::cout << "grabbing global: " << v->toString() << std::endl;
-        return v;
-    }
+    case InputInstruction::GLOBAL:
+        return (TaggedValue*) term->input(index);
     case InputInstruction::OLD_STYLE_LOCAL:
         return get_local(term->input(index), term->inputInfo(index)->outputIndex);
     case InputInstruction::EMPTY:
@@ -197,6 +194,8 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 
 TaggedValue* get_local(Term* term, int outputIndex)
 {
+    //ca_assert(!is_value(term));
+
     ca_assert(term->owningBranch != NULL);
 
     int index = term->localsIndex + outputIndex;
