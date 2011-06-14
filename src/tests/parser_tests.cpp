@@ -139,10 +139,10 @@ void test_type_decl()
     Term* typeTerm = parser::compile(branch, parser::statement,
             "type Mytype {\nint a\nnumber b\n}");
 
-    test_equals(as_type(typeTerm).name, "Mytype");
+    test_equals(as_type(typeTerm)->name, "Mytype");
     test_equals(typeTerm->name, "Mytype");
 
-    Branch& prototype = type_t::get_prototype(typeTerm);
+    Branch& prototype = type_t::get_prototype(unbox_type(typeTerm));
 
     test_assert(prototype[0]->type == INT_TYPE);
     test_equals(prototype[0]->name, "a");

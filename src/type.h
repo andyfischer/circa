@@ -183,13 +183,11 @@ namespace type_t {
 
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);
-    Branch& get_prototype(Term* type);
     Branch& get_prototype(Type* type);
     Branch& get_attributes(Term* type);
     TaggedValue* get_default_value(Type* type);
 }
 
-Type& as_type(Term* term);
 Type* unbox_type(Term* type);
 Type* unbox_type(TaggedValue* val);
 Type* declared_type(Term* term);

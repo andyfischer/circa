@@ -359,7 +359,7 @@ void initialize_function(Term* func)
 
     // Setup the term's global value to point back to the term, so that the function
     // can be passed as a value.
-    set_function(func, func);
+    set_function_pointer(func, func);
 }
 
 void finish_parsing_function_header(Term* func)

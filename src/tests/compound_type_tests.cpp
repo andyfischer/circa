@@ -15,16 +15,16 @@ void compound_type_usage()
     Term* MyType = branch.compile("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
-    Branch& prototype = type_t::get_prototype(MyType);
+    Branch& prototype = type_t::get_prototype(unbox_type(MyType));
     test_assert(prototype.length() == 2);
     test_assert(prototype[0]->name == "myint");
     test_assert(prototype[0]->type == INT_TYPE);
-    test_assert(as_type(MyType).findFieldIndex("myint") == 0);
+    test_assert(as_type(MyType)->findFieldIndex("myint") == 0);
     test_assert(prototype[1]->name == "astr");
     test_assert(prototype[1]->type == STRING_TYPE);
-    test_assert(as_type(MyType).findFieldIndex("astr") == 1);
+    test_assert(as_type(MyType)->findFieldIndex("astr") == 1);
 
-    test_assert(as_type(MyType).findFieldIndex("the_bodies") == -1);
+    test_assert(as_type(MyType)->findFieldIndex("the_bodies") == -1);
 
     // instanciation
     Term* inst = branch.compile("inst = MyType()");

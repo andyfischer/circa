@@ -13,7 +13,7 @@ void type_declaration()
     Branch branch;
     Term* myType = branch.compile("type MyType { string a, int b } ");
 
-    Branch& prototype = type_t::get_prototype(myType);
+    Branch& prototype = type_t::get_prototype(unbox_type(myType));
     test_assert(prototype.length() == 2);
     test_assert(prototype[0]->name == "a");
     test_assert(prototype[0]->type == STRING_TYPE);

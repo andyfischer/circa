@@ -12,7 +12,7 @@ void test_int()
 {
     Branch branch;
 
-    test_assert(as_type(INT_TYPE).formatSource != NULL);
+    test_assert(as_type(INT_TYPE)->formatSource != NULL);
 
     Term* four = create_int(branch, 4);
     Term* another_four = create_int(branch, 4);

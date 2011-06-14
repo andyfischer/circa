@@ -94,7 +94,7 @@ void set_ref(TaggedValue* value, Term* t);
 List* set_list(TaggedValue* value);
 List* set_list(TaggedValue* value, int size);
 void set_type(TaggedValue* value, Type* type);
-void set_function(TaggedValue* value, Term* function);
+void set_function_pointer(TaggedValue* value, Term* function);
 void set_null(TaggedValue* value);
 void set_opaque_pointer(TaggedValue* value, void* addr);
 void set_branch(TaggedValue* value, Branch* branch);
@@ -113,7 +113,8 @@ bool as_bool(TaggedValue* value);
 Term* as_ref(TaggedValue* value);
 Branch* as_branch(TaggedValue* value);
 void* as_opaque_pointer(TaggedValue* value);
-Type& as_type(TaggedValue* value);
+Type* as_type(TaggedValue* value);
+Term* as_function_pointer(TaggedValue* value);
 
 bool is_int(TaggedValue* value);
 bool is_error(TaggedValue* value);
@@ -128,6 +129,7 @@ bool is_type(TaggedValue* value);
 bool is_null(TaggedValue* value);
 bool is_symbol(TaggedValue* value);
 bool is_branch(TaggedValue* value);
+bool is_function_pointer(TaggedValue* value);
 
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);

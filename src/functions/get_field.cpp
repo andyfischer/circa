@@ -35,7 +35,7 @@ namespace get_field_function {
 
             std::string const& name = caller->input(1)->asString();
 
-            Branch& type_prototype = type_t::get_prototype(head->type);
+            Branch& type_prototype = type_t::get_prototype(declared_type(head));
 
             if (!type_prototype.contains(name))
                 return ANY_TYPE;

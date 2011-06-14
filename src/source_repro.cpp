@@ -99,14 +99,15 @@ void format_term_source(StyledSource* source, Term* term)
 
         // Otherwise use formatSource on type
         } else {
-            if (as_type(term->type).formatSource == NULL) {
+            Type* type = declared_type(term);
+            if (type->formatSource == NULL) {
                 std::stringstream out;
-                out << "Type " << term->type->name <<
+                out << "Type " << type->name <<
                     " doesn't have a formatSource function";
                 throw std::runtime_error(out.str());
             }
 
-            as_type(term->type).formatSource(source, term);
+            type->formatSource(source, term);
         }
     // Last option; a function call with default formatting.
     } else {

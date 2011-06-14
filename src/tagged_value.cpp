@@ -473,7 +473,7 @@ void set_type(TaggedValue* value, Type* type)
     register_type_pointer(value, type);
 }
 
-void set_function(TaggedValue* value, Term* function)
+void set_function_pointer(TaggedValue* value, Term* function)
 {
     change_type_no_initialize(value, &FUNCTION_T);
     value->value_data.ptr = function;
@@ -554,10 +554,15 @@ void* as_opaque_pointer(TaggedValue* value)
     return value->value_data.ptr;
 }
 
-Type& as_type(TaggedValue* value)
+Type* as_type(TaggedValue* value)
 {
     ca_assert(is_type(value));
-    return *((Type*) value->value_data.ptr);
+    return (Type*) value->value_data.ptr;
+}
+Term* as_function_pointer(TaggedValue* value)
+{
+    ca_assert(is_function_pointer(value));
+    return (Term*) value->value_data.ptr;
 }
 
 void* get_pointer(TaggedValue* value)
@@ -645,6 +650,10 @@ bool is_symbol(TaggedValue* value)
 bool is_branch(TaggedValue* value)
 {
     return value->value_type == &BRANCH_T;
+}
+bool is_function_pointer(TaggedValue* value)
+{
+    return value->value_type == &FUNCTION_T;
 }
 
 float to_float(TaggedValue* value)

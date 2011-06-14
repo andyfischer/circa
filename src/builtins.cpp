@@ -222,10 +222,10 @@ void bootstrap_kernel()
     FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
     FUNCTION_ATTRS_TYPE->type = TYPE_TYPE;
     change_type(FUNCTION_ATTRS_TYPE, &TYPE_T);
-    as_type(FUNCTION_ATTRS_TYPE).name = "FunctionAttrs";
-    as_type(FUNCTION_ATTRS_TYPE).initialize = function_attrs_t::initialize;
-    as_type(FUNCTION_ATTRS_TYPE).copy = function_attrs_t::copy;
-    as_type(FUNCTION_ATTRS_TYPE).release = function_attrs_t::release;
+    as_type(FUNCTION_ATTRS_TYPE)->name = "FunctionAttrs";
+    as_type(FUNCTION_ATTRS_TYPE)->initialize = function_attrs_t::initialize;
+    as_type(FUNCTION_ATTRS_TYPE)->copy = function_attrs_t::copy;
+    as_type(FUNCTION_ATTRS_TYPE)->release = function_attrs_t::release;
     KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
     ca_assert(is_type(FUNCTION_ATTRS_TYPE));
 

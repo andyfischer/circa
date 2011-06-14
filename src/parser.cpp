@@ -620,7 +620,7 @@ ParseResult type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context)
     //branch.moveToEnd(result);
 
     branch.bindName(result, name);
-    as_type(result).name = name;
+    as_type(result)->name = name;
 
     return ParseResult(result);
 }
@@ -650,7 +650,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     result->setStringProp("syntax:postLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    Branch& prototype = type_t::get_prototype(result);
+    Branch& prototype = type_t::get_prototype(unbox_type(result));
 
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);

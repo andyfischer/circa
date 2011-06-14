@@ -45,7 +45,7 @@ namespace type_t {
         append_phrase(source, term->stringPropOptional("syntax:postLBracketWhitespace", " "),
                 term, token::WHITESPACE);
 
-        Branch& prototype = type_t::get_prototype(term);
+        Branch& prototype = type_t::get_prototype(unbox_type(term));
 
         for (int i=0; i < prototype.length(); i++) {
             Term* field = prototype[i];
@@ -64,7 +64,7 @@ namespace type_t {
 
     void remap_pointers(Term *type, TermMap const& map)
     {
-        Branch& prototype = type_t::get_prototype(type);
+        Branch& prototype = type_t::get_prototype(unbox_type(type));
 
         for (int field_i=0; field_i < prototype.length(); field_i++) {
             Term* orig = prototype[field_i];
@@ -77,7 +77,7 @@ namespace type_t {
 
     CA_FUNCTION(name_accessor)
     {
-        set_string(OUTPUT, as_type(INPUT(0)).name);
+        set_string(OUTPUT, as_type(INPUT(0))->name);
     }
 
     void setup_type(Term* type)
@@ -87,11 +87,7 @@ namespace type_t {
 
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {
-        return as_type(type).remapPointers;
-    }
-    Branch& get_prototype(Term* type)
-    {
-        return as_type(type).prototype;
+        return as_type(type)->remapPointers;
     }
     Branch& get_prototype(Type* type)
     {
@@ -99,7 +95,7 @@ namespace type_t {
     }
     Branch& get_attributes(Term* type)
     {
-        return as_type(type).attributes;
+        return as_type(type)->attributes;
     }
     TaggedValue* get_default_value(Type* type)
     {
@@ -226,12 +222,6 @@ Term* get_type_of_input(Term* term, int inputIndex)
         return NULL;
     int outputIndex = term->inputInfo(inputIndex)->outputIndex;
     return get_output_type(term->input(inputIndex), outputIndex);
-}
-
-Type& as_type(Term *term)
-{
-    ca_assert(unbox_type(term) != NULL);
-    return *unbox_type(term);
 }
 
 Type* unbox_type(Term* term)

@@ -33,7 +33,7 @@ std::string cpp_accessor_for_type(Term* term)
     out << indent << get_cpp_type_name(term) << "(Term* term) : _term(term) {}\n";
     out << "\n";
 
-    Branch& prototype = type_t::get_prototype(term);
+    Branch& prototype = type_t::get_prototype(unbox_type(term));
     for (int i=0; i < prototype.length(); i++) {
         Term* field = prototype[i];
         out << indent << get_cpp_type_name(field->type) << "& " << field->name << "() ";
