@@ -6,6 +6,7 @@
 #include "evaluation.h"
 #include "importing_macros.h"
 #include "introspection.h"
+#include "locals.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "refactoring.h"
@@ -112,6 +113,7 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     for_loop_update_output_index(forTerm);
+    update_input_instructions(forTerm);
     recursively_finish_update_cascade(forContents);
 }
 

@@ -180,6 +180,7 @@ void create_primitive_types()
 void update_bootstrapped_term(Term* term)
 {
     term->evaluateFunc = derive_evaluate_func(term);
+    update_input_instructions(term);
 }
 
 void bootstrap_kernel()

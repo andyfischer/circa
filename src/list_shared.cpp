@@ -186,7 +186,19 @@ TaggedValue* list_get_index(TaggedValue* value, int index)
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
 
     ListData* data = (ListData*) value->value_data.ptr;
-    ca_assert(data->count >= index);
+    ca_assert(index < data->count);
+
+    return &data->items[index];
+}
+TaggedValue* list_get_index_from_end(TaggedValue* value, int reverseIndex)
+{
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
+
+    ListData* data = (ListData*) value->value_data.ptr;
+
+    int index = data->count - reverseIndex - 1;
+    ca_assert(index >= 0);
+    ca_assert(index < data->count);
 
     return &data->items[index];
 }

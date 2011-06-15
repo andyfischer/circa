@@ -594,6 +594,28 @@ void test_stateful_value_decl()
             "to_string(st) == '{_f: {a: 1}}'");
 }
 
+void test_dynamic_call()
+{
+    // No inputs/outputs
+    test_snippet("def f() { }; f_ptr = f; dynamic_call(f_ptr, [])", "");
+
+    // One input
+    test_snippet("def f(int i) { }; f_ptr = f; dynamic_call(f_ptr, [1])", "");
+
+    // One output
+    test_snippet("def f()->int { return 5 }; f_ptr = f; ", "dynamic_call(f_ptr, []) == 5");
+
+    // Input & output
+    test_snippet("def f(int i)->int { return i+3 }; f_ptr = f; ",
+            "dynamic_call(f_ptr, [10]) == 13");
+
+    test_snippet("def f(int i)->int { return i + 1 } "
+        "def g(int i)->int { return i // 2 } "
+        "dispatch_result = for i in [4 5 6 7 8 9 10] { "
+        "  if (i % 2 == 1) { x = f } else { x = g } "
+        "  i = dynamic_call(x, [i]) }", "dispatch_result == [2, 6, 3, 8, 4, 10, 5]");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -634,6 +656,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_recursion_and_multiple_outputs);
     REGISTER_TEST_CASE(test_snippets::test_left_arrow);
     REGISTER_TEST_CASE(test_snippets::test_stateful_value_decl);
+    REGISTER_TEST_CASE(test_snippets::test_dynamic_call);
 }
 
 } // namespace test_snippets

@@ -1,0 +1,27 @@
+
+def letter(List output, int i) -> List
+    if i % 3 == 0
+       output.append('a')
+    elif i % 3 == 1
+       output.append('b')
+    else
+       output.append('c')
+    return output
+
+def number(List output, int i) -> List
+    output.append(i)
+    return output
+
+def underscore(List output, int i) -> List
+    output.append('_')
+    return output
+
+function_list = [letter number underscore letter letter letter underscore number number]
+dispatch_result = []
+step = 0
+
+for f in function_list
+    dispatch_result = dynamic_call(f, [dispatch_result step])
+    step += 1
+
+assert(dispatch_result == ['a', 1, '_', 'a', 'b', 'c', '_', 7, 8])

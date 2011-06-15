@@ -9,6 +9,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "locals.h"
 #include "parser.h"
 #include "refactoring.h"
@@ -39,7 +40,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
         for (int i=0; i < get_output_count(term); i++) {
 
             Type* outputType = unbox_type(get_output_type(term, i));
-            TaggedValue* output = get_output(term, i);
+            TaggedValue* output = get_output(context, term, i);
 
             // Special case, if the function's output type is void then we don't care
             // if the output value is null or not.
@@ -133,7 +134,7 @@ void evaluate_branch(Branch& branch)
 
 TaggedValue* get_input(EvalContext* context, Term* term, int index)
 {
-    InputInstruction *instruction = &term->inputInstructionList.inputs[index];
+    InputInstruction *instruction = &term->inputIsns.inputs[index];
 
     switch (instruction->type) {
     case InputInstruction::GLOBAL:
@@ -141,9 +142,12 @@ TaggedValue* get_input(EvalContext* context, Term* term, int index)
     case InputInstruction::OLD_STYLE_LOCAL:
         return get_local(term->input(index), term->inputInfo(index)->outputIndex);
     case InputInstruction::EMPTY:
-        internal_error("Attempt to access NULL input");
         return NULL;
-    case InputInstruction::LOCAL:
+    case InputInstruction::LOCAL: {
+        TaggedValue* frame = list_get_index_from_end(&context->stack,
+            instruction->data.relativeFrame);
+        return list_get_index(frame, instruction->data.index);
+    }
     case InputInstruction::LOCAL_CONSUME:
     default:
         internal_error("Not yet implemented");
@@ -157,14 +161,33 @@ void consume_input(EvalContext* context, Term* term, int index, TaggedValue* des
     copy(get_input(context, term, index), dest);
 }
 
-TaggedValue* get_output(Term* term, int outputIndex)
+TaggedValue* get_output(EvalContext* context, Term* term, int index)
 {
-    return get_local(term, outputIndex);
+    InputInstruction *instruction = &term->inputIsns.outputs[index];
+
+    switch (instruction->type) {
+    case InputInstruction::GLOBAL:
+        return (TaggedValue*) term;
+    case InputInstruction::OLD_STYLE_LOCAL:
+        return get_local(term, index);
+    case InputInstruction::EMPTY:
+        internal_error("Attempt to access NULL output");
+        return NULL;
+    case InputInstruction::LOCAL: {
+        TaggedValue* frame = list_get_index_from_end(&context->stack,
+            instruction->data.relativeFrame);
+        return list_get_index(frame, instruction->data.index);
+    }
+    case InputInstruction::LOCAL_CONSUME:
+    default:
+        internal_error("Invalid instruction in get_output: LOCAL_CONSUME");
+        return NULL;
+    }
 }
 
-TaggedValue* get_extra_output(Term* term, int index)
+TaggedValue* get_extra_output(EvalContext* context, Term* term, int index)
 {
-    return get_output(term, index + 1);
+    return get_output(context, term, index + 1);
 }
 
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)

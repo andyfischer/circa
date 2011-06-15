@@ -47,7 +47,7 @@ struct Term : TaggedValue
     InputList inputs;
 
     // Instructions on where to find inputs during evaluation. Derived from inputs.
-    InputInstructionList inputInstructionList;
+    InputInstructionList inputIsns;
 
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
@@ -100,6 +100,8 @@ struct Term : TaggedValue
     Term* input(int index) const;
     Input* inputInfo(int index);
     int numInputs() const;
+
+    int numInputInstructions() const;
 
     void inputsToList(TermList& out) const;
 

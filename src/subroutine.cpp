@@ -119,17 +119,18 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
 {
     Term* function = caller->function;
     Branch& contents = nested_contents(function);
-    int numInputs = caller->numInputs();
+    int numInputs = caller->numInputInstructions();
 
     // Copy inputs to a temporary list
     List inputs;
     inputs.resize(numInputs);
 
     for (int i=0; i < numInputs; i++) {
-        if (caller->input(i) == NULL)
-            continue;
 
         TaggedValue* input = get_input(context, caller, i);
+
+        if (input == NULL)
+            continue;
 
         Type* inputType = unbox_type(function_t::get_input_type(function, i));
 
@@ -158,7 +159,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     swap(&context->currentScopeState, &prevScopeState);
 
     // Write output
-    TaggedValue* outputDest = get_output(caller, 0);
+    TaggedValue* outputDest = get_output(context, caller, 0);
     if (outputDest != NULL)
         swap(outputs[0], outputDest);
 
@@ -166,7 +167,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
     ca_assert(outputs.length() == get_output_count(caller));
 
     for (int i=1; i < outputs.length(); i++)
-        copy(outputs[i], get_output(caller, i));
+        copy(outputs[i], get_output(context, caller, i));
 }
 
 bool is_subroutine(Term* term)

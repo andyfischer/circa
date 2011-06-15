@@ -9,6 +9,7 @@
 #include "building.h"
 #include "evaluation.h"
 #include "importing_macros.h"
+#include "locals.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -111,6 +112,7 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 
     finish_update_cascade(joining);
+    update_input_instructions(ifCall);
 }
 
 int if_block_num_branches(Term* ifCall)

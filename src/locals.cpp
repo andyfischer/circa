@@ -81,6 +81,13 @@ void refresh_locals_indices(Branch& branch, int startingAt)
         if (term == NULL)
             continue;
         term->localsIndex = nextLocal;
+
+        int newOutputCount = get_output_count(term);
+        if (term->outputCount != newOutputCount) {
+            term->outputCount = newOutputCount;
+            update_input_instructions(term);
+        }
+
         term->outputCount = get_output_count(term);
         nextLocal += term->outputCount;
     }
@@ -111,7 +118,7 @@ int get_frame_distance(Term* term, Term* input)
 
 void update_input_instructions(Term* term)
 {
-    InputInstructionList& list = term->inputInstructionList;
+    InputInstructionList& list = term->inputIsns;
 
     list.inputs.resize(term->numInputs());
     for (int i=0; i < term->numInputs(); i++) {

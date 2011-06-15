@@ -29,6 +29,7 @@ ListData* list_resize(ListData* original, int numElements);
 
 int list_get_length(TaggedValue* value);
 TaggedValue* list_get_index(TaggedValue* value, int index);
+TaggedValue* list_get_index_from_end(TaggedValue* value, int index);
 void list_remove_index(TaggedValue* list, int index);
 
 } // namespace circa

@@ -35,6 +35,9 @@ struct EvalContext
     // Intra-program messages
     Dict messages;
 
+    // Local variables.
+    List stack;
+
     // Current stack of in-progress terms. Used for introspection.
     TermList callStack;
 
@@ -75,8 +78,8 @@ TaggedValue* get_input(EvalContext* context, Term* term, int index);
 // leaving a null behind and preventing the need for a copy.
 void consume_input(EvalContext* context, Term* term, int index, TaggedValue* dest);
 
-TaggedValue* get_output(Term* term, int outputIndex);
-TaggedValue* get_extra_output(Term* term, int index);
+TaggedValue* get_output(EvalContext* context, Term* term, int outputIndex);
+TaggedValue* get_extra_output(EvalContext* context, Term* term, int index);
 TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);

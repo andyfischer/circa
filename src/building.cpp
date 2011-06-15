@@ -54,6 +54,7 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     update_unique_name(result);
     on_inputs_changed(result);
     update_locals_index_for_new_term(result);
+    update_input_instructions(result);
 
     if (is_get_state(result) || has_implicit_state(result))
         mark_branch_as_having_inlined_state(branch);
@@ -245,6 +246,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
     change_type((TaggedValue*) term, unbox_type(type));
     update_unique_name(term);
     update_locals_index_for_new_term(term);
+    update_input_instructions(term);
 
     return term;
 }
