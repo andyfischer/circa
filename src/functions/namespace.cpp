@@ -20,52 +20,10 @@ namespace namespace_function {
                 term, token::WHITESPACE);
     }
 
-    CA_FUNCTION(get_namespace_field)
-    {
-        Branch& namespaceContents = nested_contents(INPUT_TERM(0));
-        const char* name = STRING_INPUT(1);
-
-        Term* term = namespaceContents[name];
-
-        if (term == NULL)
-            return error_occurred(CONTEXT, CALLER, "couldn't find name");
-
-        copy(get_local(term), OUTPUT);
-    }
-
-    #if 0
-    DELETE
-    Term* get_namespace_field_specialize_type(Term* caller)
-    {
-        Term* type = parser::statically_resolve_namespace_access(caller)->type;
-        if (type != NULL) return type;
-        return ANY_TYPE;
-    }
-
-    void get_namespace_field_format_source(StyledSource* source, Term* term)
-    {
-        format_name_binding(source, term);
-        format_source_for_input(source, term, 0);
-        append_phrase(source, ":", term, token::COLON);
-        append_phrase(source, term->input(1)->asString(), term, phrase_type::TERM_NAME);
-    }
-    #endif
-
     void early_setup(Branch& kernel)
     {
         NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
         get_function_attrs(NAMESPACE_FUNC)->formatSource = format_source;
-
-        
-        GET_NAMESPACE_FIELD = import_function(kernel, get_namespace_field,
-                "get_namespace_field(any +optional, string) -> any");
-        #if 0
-        DELETE
-        get_function_attrs(GET_NAMESPACE_FIELD)->formatSource =
-            get_namespace_field_format_source;
-        get_function_attrs(GET_NAMESPACE_FIELD)->specializeType =
-            get_namespace_field_specialize_type;
-        #endif
     }
     void setup(Branch& kernel) {}
 }

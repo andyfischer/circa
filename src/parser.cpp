@@ -10,8 +10,6 @@ namespace parser {
 
 using namespace circa::token;
 
-std::string namespace_term_back_to_string(Term* target);
-
 TermPtr compile(Branch& branch, ParsingStep step, std::string const& input)
 {
     int prevLastIndex = branch.length() - 1;
@@ -1385,29 +1383,12 @@ ParseResult function_call(Branch& branch, ParseResult head, TokenStream& tokens,
     if (function->function == GET_FIELD_FUNC) {
         result = member_function_call(branch, function, arguments, context).term;
 
-        #if 0
-        DELETE
-    // Check if 'function' is a namespace access term
-    } else if (function->function == GET_NAMESPACE_FIELD) {
-
-        function = statically_resolve_namespace_access(originalFunction);
-
-        if ((originalFunction != function) && (originalFunction->name == "")) {
-            originalName = namespace_term_back_to_string(originalFunction);
-            remove_term(originalFunction);
-            refresh_locals_indices(branch);
-        }
-
-        result = apply(branch, function, arguments);
-
-        if (result->function->name != originalName)
-            result->setStringProp("syntax:functionName", originalName);
-        #endif
     } else {
 
         result = apply(branch, function, arguments);
 
-        // Store the function name that they used, if it wasn't the actual name.
+        // Store the function name that they used, if it wasn't the function's
+        // actual name (for example, the function might be inside a namespace).
         if ((head.identifierName != "")
                 && (result->function->name != head.identifierName))
             result->setStringProp("syntax:functionName", head.identifierName);
@@ -1509,24 +1490,6 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
         set_source_location(result, startPosition, tokens);
         set_input_syntax_hint(result, 0, "postWhitespace", "");
         
-        finished = false;
-        return ParseResult(result);
-
-    } else if (tokens.nextIs(COLON) && tokens.nextIs(IDENTIFIER, 1)) {
-        tokens.consume(COLON);
-
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition,
-                    "Expected identifier after .");
-
-        std::string ident = tokens.consume(IDENTIFIER);
-        
-        Term* identTerm = create_string(branch, ident);
-        hide_from_source(identTerm);
-
-        Term* result = apply(branch, GET_NAMESPACE_FIELD, TermList(head.term, identTerm));
-        set_source_location(result, startPosition, tokens);
-        set_input_syntax_hint(result, 0, "postWhitespace", "");
         finished = false;
         return ParseResult(result);
 
@@ -1990,53 +1953,6 @@ ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCx
 
     if (rebindOperator)
         context->pendingRebind = result.term->name;
-
-    return result;
-}
-
-#if 0
-DELETE
-Term* statically_resolve_namespace_access(Term* target)
-{
-    if (target->function == GET_NAMESPACE_FIELD) {
-
-        Term* root = target->input(0);
-
-        root = statically_resolve_namespace_access(root);
-
-        if (root == NULL)
-            return target;
-
-        if (!is_namespace(root))
-            return target;
-
-        const char* name = target->input(1)->asString().c_str();
-        Term* original = root->contents(name);
-        if (original == NULL)
-            return target;
-
-        return original;
-    }
-
-    return target;
-}
-#endif
-
-std::string namespace_term_back_to_string(Term* target)
-{
-    // This function is a little silly. I'd like to refactor namespace
-    // access terms so that they aren't separated into get_namespace_field()
-    // calls. But for now, this function can turn a namespace access
-    // back into the original string.
-
-    std::string result;
-
-    if (target->input(0)->function == GET_NAMESPACE_FIELD)
-        result = namespace_term_back_to_string(target->input(0));
-    else if (is_namespace(target->input(0)))
-        result = target->input(0)->name;
-
-    result += ":" + as_string(target->input(1));
 
     return result;
 }
