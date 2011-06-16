@@ -11,7 +11,7 @@ namespace cairo
     def set_source_color(Context cr, Color color)
 
     -- Surfaces
-    def create_image_surface(int width, int height) -> Surface
+    def create_image_surface(Point_i size) -> Surface
 
     -- Paths
     def move_to(Context cr, Point p)
@@ -27,30 +27,23 @@ namespace cairo
     def upload_surface_to_opengl(Surface surface, int texture_id)
 
     -- Helper functions
-    def draw_command_list(List commandList, Point bufferSize, Point location)
-        s = cairo:create_image_surface(bufferSize)
-        cr = cairo:create_context_for_surface(s)
+    def draw_command_list(List commandList, Point_i bufferSize, Point location)
+        state texture = opengl:new_texture_handle()
 
-        -- run the command list
-        for command in commandList
-            List(@command)
-            func = command[0]
-            args = command[1]
+        if changed(commandList) or changed(bufferSize)
+            s = cairo:create_image_surface(bufferSize)
+            cr = cairo:create_context_for_surface(s)
 
-            args.insert
-        cairo:set_line_width(cr 5.0)
+            -- run the command list
+            for command in commandList
+                List(@command)
+                func = command[0]
+                args = command.slice(1, command.length())
 
-        def line(Point a, Point b, Color color)
-            cairo:set_source_color(cr color)
-            cairo:move_to(cr a)
-            cairo:line_to(cr b)
-            cairo:stroke(cr)
+                args.insert(0, cr)
 
-        line([0 0] [100 0] #f00)
-        line([0 50] [100 50] #0f0)
-        line([0 100] [100 100] #00f)
+                dynamic_call(func args)
 
-        tex = opengl:new_texture_handle()
-        cairo:upload_surface_to_opengl(s tex)
-        opengl:draw_texture_as_quad(tex [0 0 500 500])
+            cairo:upload_surface_to_opengl(s texture)
 
+        opengl:draw_texture_as_quad(texture to_rect(location bufferSize))

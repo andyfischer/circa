@@ -519,6 +519,14 @@ void test_lists()
     test_snippet("", "[].insert(0, 5) == [5]");
     test_snippet("", "[1].insert(0, 5) == [5, 1]");
     test_snippet("", "[1 2 3].insert(1, 'hi') == [1 'hi' 2 3]");
+
+    // .slice
+    test_snippet("", "[].slice(0, 0) == []");
+    test_snippet("", "[1].slice(0, 0) == []");
+    test_snippet("", "[1].slice(0, 1) == [1]");
+    test_snippet("", "[1 2 3].slice(1, 3) == [2 3]");
+    test_snippet("", "[1 2 3].slice(0, 2) == [1 2]");
+    test_snippet("", "[1 2 3].slice(0, 3) == [1 2 3]");
 }
 
 void test_type_check_functions()

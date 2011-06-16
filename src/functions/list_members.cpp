@@ -32,6 +32,11 @@ namespace list_members_function {
         List* list = List::checkCast(INPUT(0));
         set_int(OUTPUT, list->length());
     }
+    CA_DEFINE_FUNCTION(length, "length(List) -> int")
+    {
+        List* list = List::checkCast(INPUT(0));
+        set_int(OUTPUT, list->length());
+    }
 
     CA_DEFINE_FUNCTION(insert, "insert(List, int, any) -> List")
     {
@@ -40,6 +45,18 @@ namespace list_members_function {
         TaggedValue* newItem = list_insert(&result, INT_INPUT(1));
         consume_input(CONTEXT, CALLER, 2, newItem);
         swap(&result, OUTPUT);
+    }
+
+    CA_DEFINE_FUNCTION(slice, "slice(List, int start, int fin) -> List")
+    {
+        List* input = List::checkCast(INPUT(0));
+        int start = INT_INPUT(1);
+        int end = INT_INPUT(2);
+        int length = end - start;
+        List* result = List::cast(OUTPUT, length);
+
+        for (int i=0; i < length; i++)
+            copy(input->get(start + i), result->get(i));
     }
 
     void setup(Branch& kernel)

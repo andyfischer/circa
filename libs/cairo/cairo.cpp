@@ -53,8 +53,9 @@ CA_FUNCTION(create_context_for_surface)
 CA_FUNCTION(create_image_surface)
 {
     // user can't currently specify the format
-    int width = as_int(INPUT(0));
-    int height = as_int(INPUT(1));
+    TaggedValue* size = INPUT(0);
+    int width = as_int(list_get_index(size, 0));
+    int height = as_int(list_get_index(size, 1));
 
     cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
     set_pointer(OUTPUT, &g_cairoSurface_t, surface);
