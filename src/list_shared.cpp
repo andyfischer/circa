@@ -172,6 +172,34 @@ ListData* list_resize(ListData* original, int numElements)
 
     return result;
 }
+TaggedValue* list_append(ListData** dataPtr)
+{
+    if (*dataPtr == NULL) {
+        *dataPtr = allocate_empty_list(1);
+    } else {
+        *dataPtr = list_touch(*dataPtr);
+        
+        if ((*dataPtr)->count == (*dataPtr)->capacity)
+            *dataPtr = list_double_capacity(*dataPtr);
+    }
+
+    ListData* data = *dataPtr;
+    data->count++;
+    return &data->items[data->count - 1];
+}
+
+TaggedValue* list_insert(ListData** dataPtr, int index)
+{
+    list_append(dataPtr);
+
+    ListData* data = *dataPtr;
+
+    // Move everything over, up till 'index'.
+    for (int i = data->count - 1; i >= (index + 1); i--)
+        swap(&data->items[i], &data->items[i - 1]);
+
+    return &data->items[index];
+}
 
 int list_get_length(TaggedValue* value)
 {
@@ -218,10 +246,26 @@ ListData* list_remove_index(ListData* original, int index)
 void list_remove_index(TaggedValue* list, int index)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
-
     ListData* data = (ListData*) list->value_data.ptr;
     list_remove_index(data, index);
     list->value_data.ptr = data;
+}
+
+TaggedValue* list_append(TaggedValue* list)
+{
+    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ListData* data = (ListData*) list->value_data.ptr;
+    TaggedValue* result = list_append(&data);
+    list->value_data.ptr = data;
+    return result;
+}
+TaggedValue* list_insert(TaggedValue* list, int index)
+{
+    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ListData* data = (ListData*) list->value_data.ptr;
+    TaggedValue* result = list_insert(&data, index);
+    list->value_data.ptr = data;
+    return result;
 }
 
 } // namespace circa

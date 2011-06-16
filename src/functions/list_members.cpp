@@ -33,12 +33,22 @@ namespace list_members_function {
         set_int(OUTPUT, list->length());
     }
 
+    CA_DEFINE_FUNCTION(insert, "insert(List, int, any) -> List")
+    {
+        TaggedValue result;
+        consume_input(CONTEXT, CALLER, 0, &result);
+        TaggedValue* newItem = list_insert(&result, INT_INPUT(1));
+        consume_input(CONTEXT, CALLER, 2, newItem);
+        swap(&result, OUTPUT);
+    }
+
     void setup(Branch& kernel)
     {
         Type* listType = unbox_type(kernel["List"]);
         CA_SETUP_FUNCTIONS(listType->memberFunctions);
 
         function_set_use_input_as_output(listType->memberFunctions["append"], 0, true);
+        function_set_use_input_as_output(listType->memberFunctions["insert"], 0, true);
     }
 
 } // namespace list_members_function

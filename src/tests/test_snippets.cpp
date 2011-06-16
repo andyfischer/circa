@@ -514,6 +514,11 @@ void test_lists()
     test_snippet("to_rect([0 0] [5.0 10.0])", "");
     test_snippet("", "filter([1 2 3] [true false true]) == [1 3]");
     test_snippet("", "[1 2 3].extend([4 5]) == [1 2 3 4 5]");
+
+    // .insert
+    test_snippet("", "[].insert(0, 5) == [5]");
+    test_snippet("", "[1].insert(0, 5) == [5, 1]");
+    test_snippet("", "[1 2 3].insert(1, 'hi') == [1 'hi' 2 3]");
 }
 
 void test_type_check_functions()

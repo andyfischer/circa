@@ -25,3 +25,32 @@ namespace cairo
     -- This function will modify the pixels in 'surface' (so that the colors
     -- are formatted in a way that OpenGL likes).
     def upload_surface_to_opengl(Surface surface, int texture_id)
+
+    -- Helper functions
+    def draw_command_list(List commandList, Point bufferSize, Point location)
+        s = cairo:create_image_surface(bufferSize)
+        cr = cairo:create_context_for_surface(s)
+
+        -- run the command list
+        for command in commandList
+            List(@command)
+            func = command[0]
+            args = command[1]
+
+            args.insert
+        cairo:set_line_width(cr 5.0)
+
+        def line(Point a, Point b, Color color)
+            cairo:set_source_color(cr color)
+            cairo:move_to(cr a)
+            cairo:line_to(cr b)
+            cairo:stroke(cr)
+
+        line([0 0] [100 0] #f00)
+        line([0 50] [100 50] #0f0)
+        line([0 100] [100 100] #00f)
+
+        tex = opengl:new_texture_handle()
+        cairo:upload_surface_to_opengl(s tex)
+        opengl:draw_texture_as_quad(tex [0 0 500 500])
+
