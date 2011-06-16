@@ -228,9 +228,14 @@ bool is_hexadecimal_digit(char c)
     return is_number(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
 }
 
+bool is_identifier_first_letter(char c)
+{
+    return is_letter(c) || c == '_';
+}
+
 bool is_acceptable_inside_identifier(char c)
 {
-    return is_letter(c) || is_number(c) || c == '_';
+    return is_letter(c) || is_number(c) || c == '_' || c == ':';
 }
 
 bool is_whitespace(char c)
@@ -274,7 +279,7 @@ bool try_to_consume_keyword(TokenizeContext& context, int keyword)
 
 void top_level_consume_token(TokenizeContext &context)
 {
-    if (is_letter(context.next()) || context.next() == '_') {
+    if (is_identifier_first_letter(context.next())) {
 
         if (try_to_consume_keyword(context, DEF)) return;
         if (try_to_consume_keyword(context, TYPE)) return;

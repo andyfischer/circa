@@ -12,9 +12,9 @@ namespace tokenizer_tests {
 void test_identifiers()
 {
     token::TokenList results;
-    token::tokenize("word has_underscore has_hyphen,hasnumbers183", results);
+    token::tokenize("word has_underscore has_hyphen,hasnumbers183,has:colon", results);
 
-    test_assert(results.size() == 7);
+    test_assert(results.size() == 9);
 
     test_assert(results[0].text == "word");
     test_assert(results[0].match == token::IDENTIFIER);
@@ -30,7 +30,9 @@ void test_identifiers()
     test_assert(results[5].match == token::COMMA);
     test_assert(results[6].text == "hasnumbers183");
     test_assert(results[6].match == token::IDENTIFIER);
-
+    test_assert(results[7].match == token::COMMA);
+    test_assert(results[8].text == "has:colon");
+    test_assert(results[8].match == token::IDENTIFIER);
 }
 
 void test_integers()

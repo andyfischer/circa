@@ -62,7 +62,7 @@ ParseResult infix_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
 ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserCxt* context,
         int precedence);
 ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
-ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, ParserCxt* context);
+ParseResult function_call(Branch& branch, ParseResult head, TokenStream& tokens, ParserCxt* context);
 ParseResult subscripted_atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_integer(Branch& branch, TokenStream& tokens, ParserCxt* context);
@@ -93,7 +93,7 @@ Term* find_lexpr_root(Term* term);
 
 // Check if 'target' is a namespace access; if so, we'll return the original
 // term that it accesses. If not, we'll just return 'target'.
-Term* statically_resolve_namespace_access(Term* target);
+//Term* statically_resolve_namespace_access(Term* target);
 
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);

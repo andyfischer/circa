@@ -711,6 +711,8 @@ void test_namespace_with_curly_braces()
 
 void test_statically_resolve_namespace_access()
 {
+    #if 0
+    TEST_DISABLED
     Branch branch;
     Branch& ns1 = create_namespace(branch, "ns1");
     Term* a = create_int(ns1, 1, "a");
@@ -728,6 +730,7 @@ void test_statically_resolve_namespace_access()
 
     Term* ns1_ns2_ns3_c = branch.compile("ns1:ns2:ns3:c");
     test_assert(parser::statically_resolve_namespace_access(ns1_ns2_ns3_c) == c);
+    #endif
 }
 
 void test_get_number_of_decimal_figures()

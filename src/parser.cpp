@@ -1294,7 +1294,7 @@ ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
 }
 
 ParseResult member_function_call(Branch& branch, Term* function, TermList const& _inputs,
-    std::string const& originalName, ParserCxt* context)
+    ParserCxt* context)
 {
     TermList inputs = _inputs;
 
@@ -1363,7 +1363,7 @@ void function_call_inputs(Branch& branch, TokenStream& tokens, ParserCxt* contex
     }
 }
 
-ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, ParserCxt* context)
+ParseResult function_call(Branch& branch, ParseResult head, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
@@ -1378,15 +1378,15 @@ ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, P
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
-    Term* originalFunction = function;
-    std::string originalName = function->name;
-
+    Term* function = head.term;
     Term* result = NULL;
 
     // Check if 'function' is a get_field term. If so, parse this as a member function call
     if (function->function == GET_FIELD_FUNC) {
-        result = member_function_call(branch, function, arguments, originalName, context).term;
+        result = member_function_call(branch, function, arguments, context).term;
 
+        #if 0
+        DELETE
     // Check if 'function' is a namespace access term
     } else if (function->function == GET_NAMESPACE_FIELD) {
 
@@ -1402,12 +1402,15 @@ ParseResult function_call(Branch& branch, Term* function, TokenStream& tokens, P
 
         if (result->function->name != originalName)
             result->setStringProp("syntax:functionName", originalName);
+        #endif
     } else {
 
         result = apply(branch, function, arguments);
 
-        if (result->function->name != originalName)
-            result->setStringProp("syntax:functionName", originalName);
+        // Store the function name that they used, if it wasn't the actual name.
+        if ((head.identifierName != "")
+                && (result->function->name != head.identifierName))
+            result->setStringProp("syntax:functionName", head.identifierName);
     }
 
     inputHints.apply(result);
@@ -1530,7 +1533,7 @@ static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, Parse
     } else if (tokens.nextIs(LPAREN)) {
 
         // Function call
-        Term* result = function_call(branch, head.term, tokens, context).term;
+        Term* result = function_call(branch, head, tokens, context).term;
         finished = false;
         return ParseResult(result);
 
@@ -1991,6 +1994,8 @@ ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCx
     return result;
 }
 
+#if 0
+DELETE
 Term* statically_resolve_namespace_access(Term* target)
 {
     if (target->function == GET_NAMESPACE_FIELD) {
@@ -2015,6 +2020,7 @@ Term* statically_resolve_namespace_access(Term* target)
 
     return target;
 }
+#endif
 
 std::string namespace_term_back_to_string(Term* target)
 {
