@@ -546,6 +546,11 @@ void test_type_check_functions()
 void test_namespace()
 {
     test_snippet("namespace ns { a = 1 }", "ns:a == 1");
+
+    // Namespaced type name in function definition.
+    test_snippet("namespace ns { type t{} }; def f(ns:t t)", "");
+    test_snippet("namespace ns { type t{int i} }; def f(ns:t val)->int { return val.i }",
+            "f([1]) == 1");
 }
 
 void test_swap()
