@@ -44,6 +44,9 @@ void cairoSurface_release(Type*, TaggedValue* value)
     cairo_surface_destroy(surface);
 }
 
+float radians_to_unit_angles(float radians) { return radians / (M_PI * 2); }
+float unit_angles_to_radians(float unit) { return unit * M_PI * 2; }
+
 CA_FUNCTION(create_context_for_surface)
 {
     cairo_surface_t* surface = as_cairo_surface(INPUT(0));
@@ -81,6 +84,11 @@ CA_FUNCTION(set_source_color)
     cairo_set_source_rgba(context, r, g, b, a);
     set_null(OUTPUT);
 }
+CA_FUNCTION(fill_preserve)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_fill_preserve(context);
+}
 CA_FUNCTION(move_to)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
@@ -106,6 +114,26 @@ CA_FUNCTION(line_to)
     cairo_line_to(context, x, y);
     set_null(OUTPUT);
 }
+CA_FUNCTION(arc)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    float center_x(0), center_y(0);
+    get_point(INPUT(1), &center_x, &center_y);
+    cairo_arc(context, center_x, center_y,
+        FLOAT_INPUT(2),
+        unit_angles_to_radians(FLOAT_INPUT(3)),
+        unit_angles_to_radians(FLOAT_INPUT(4)));
+}
+CA_FUNCTION(new_sub_path)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_new_sub_path(context);
+}
+CA_FUNCTION(close_path)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_close_path(context);
+}
 CA_FUNCTION(set_line_width)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
@@ -123,16 +151,19 @@ CA_FUNCTION(upload_surface_to_opengl)
     int stride = cairo_image_surface_get_stride(surface);
     const int channels = 4;
 
-    // Modify 'surface' so that colors are in RGBA order instead of ARGB
+    // Modify 'surface' so that colors are in RGBA order instead of BGRA
     for (int y=0; y < height; y++) for (int x=0; x < width; x++) {
         size_t offset = y * stride + x * channels;
         //unsigned char alpha = pixels[offset + 3];
-        unsigned char temp = pixels[offset + 2];
-        pixels[offset + 2] = pixels[offset + 1];
-        pixels[offset + 1] = pixels[offset + 0];
-        pixels[offset + 0] = temp;
-        //pixels[offset + 1] = pixels[offset + 0];
-        //pixels[offset + 0] = alpha;
+        unsigned char b = pixels[offset + 0];
+        unsigned char g = pixels[offset + 1];
+        unsigned char r = pixels[offset + 2];
+        unsigned char a = pixels[offset + 3];
+
+        pixels[offset+0] = r;
+        pixels[offset+1] = g;
+        pixels[offset+2] = b;
+        pixels[offset+3] = a;
     }
 
     glBindTexture(GL_TEXTURE_2D, texture_id);
@@ -156,14 +187,22 @@ void setup(Branch& kernel)
     g_cairoSurface_t.release = cairoSurface_release;
 
     Branch& ns = nested_contents(kernel["cairo"]);
+
+    install_type(ns["Surface"], &g_cairoSurface_t);
+    install_type(ns["Context"], &g_cairoContext_t);
+
     install_function(ns["create_context_for_surface"], create_context_for_surface);
-    install_function(ns["create_image_surface"], create_image_surface);
     install_function(ns["stroke"], stroke);
     install_function(ns["paint"], paint);
     install_function(ns["set_source_color"], set_source_color);
+    install_function(ns["fill_preserve"], fill_preserve);
+    install_function(ns["create_image_surface"], create_image_surface);
     install_function(ns["move_to"], move_to);
     install_function(ns["curve_to"], curve_to);
     install_function(ns["line_to"], line_to);
+    install_function(ns["arc"], arc);
+    install_function(ns["new_sub_path"], new_sub_path);
+    install_function(ns["close_path"], close_path);
     install_function(ns["set_line_width"], set_line_width);
     install_function(ns["upload_surface_to_opengl"], upload_surface_to_opengl);
 }

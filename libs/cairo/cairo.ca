@@ -9,6 +9,7 @@ namespace cairo
     def stroke(Context cr)
     def paint(Context cr)
     def set_source_color(Context cr, Color color)
+    def fill_preserve(Context cr)
 
     -- Surfaces
     def create_image_surface(Point_i size) -> Surface
@@ -17,6 +18,9 @@ namespace cairo
     def move_to(Context cr, Point p)
     def curve_to(Context cr, Point control1, Point control2, Point p3)
     def line_to(Context cr, Point p)
+    def arc(Context cr, Point center, number radius, number angle1, number angle2)
+    def new_sub_path(Context cr)
+    def close_path(Context cr)
 
     def set_line_width(Context cr, number width)
 

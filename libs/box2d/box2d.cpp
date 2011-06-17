@@ -26,8 +26,8 @@ float screen_to_world(float screen) { return screen / 10.0; }
 float world_to_screen(float world) { return world * 10.0; }
 
 // Circa angles are in the range of 0..1
-float radians_to_unit_angles(float radians) { return radians / M_PI; }
-float unit_angles_to_radians(float unit) { return unit * M_PI; }
+float radians_to_unit_angles(float radians) { return radians / (M_PI * 2); }
+float unit_angles_to_radians(float unit) { return unit * M_PI * 2; }
 
 void b2Vec2_to_point(b2Vec2 const& vec, TaggedValue* point)
 {

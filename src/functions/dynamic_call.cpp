@@ -36,7 +36,6 @@ namespace dynamic_call_function {
             isn->type = InputInstruction::LOCAL;
             isn->data.index = frameIndex;
             isn->data.relativeFrame = 0;
-
             frameIndex++;
         }
 

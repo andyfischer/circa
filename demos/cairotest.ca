@@ -1,0 +1,44 @@
+background(#fff)
+
+e = elapsed()
+
+def redraw(cairo:Context cr)
+  cairo:set_line_width(cr 5.0)
+  cairo:set_source_color(cr #f00)
+  cairo:move_to(cr [0 0])
+  cairo:line_to(cr [300 e*20])
+  cairo:stroke(cr)
+
+x = 25.6
+y = 25.6 + 50
+width = 204.8
+height = 204.8
+aspect = 1.0
+radius = height / 10
+radius = 5
+
+command_list = [
+  [cairo:new_sub_path]
+  [cairo:arc [x + width - radius, y + radius] radius, -.5, 0]
+  [cairo:arc [x + width - radius, y + height - radius], radius, 0, .5]
+  [cairo:arc [x + radius, y + height - radius], radius, .5, 1]
+  [cairo:arc [x + radius, y + radius], radius, 1, -.5]
+  [cairo:close_path]
+
+  [cairo:set_source_color #88f]
+  [cairo:fill_preserve]
+  [cairo:set_source_color #8008]
+  [cairo:set_line_width 10.0]
+  [cairo:stroke]
+]
+
+cairo:draw_command_list(command_list, [500 500], [100 100])
+
+list = [
+  [cairo:new_sub_path]
+  [cairo:arc [100 100] 50 0 1]
+  [cairo:close_path]
+  [cairo:set_source_color #0f0]
+  [cairo:stroke]
+]
+cairo:draw_command_list(list, [500 500], [100 100])
