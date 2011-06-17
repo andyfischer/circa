@@ -15,14 +15,13 @@ width = 204.8
 height = 204.8
 aspect = 1.0
 radius = height / 10
-radius = 5
 
 command_list = [
   [cairo:new_sub_path]
-  [cairo:arc [x + width - radius, y + radius] radius, -.5, 0]
-  [cairo:arc [x + width - radius, y + height - radius], radius, 0, .5]
-  [cairo:arc [x + radius, y + height - radius], radius, .5, 1]
-  [cairo:arc [x + radius, y + radius], radius, 1, -.5]
+  [cairo:arc [x + width - radius, y + radius] radius, -90, 0]
+  [cairo:arc [x + width - radius, y + height - radius], radius, 0, 90]
+  [cairo:arc [x + radius, y + height - radius], radius, 90, 180]
+  [cairo:arc [x + radius, y + radius], radius, 180, 270]
   [cairo:close_path]
 
   [cairo:set_source_color #88f]

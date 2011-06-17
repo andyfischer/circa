@@ -25,9 +25,8 @@ int c_positionIterations = 2;
 float screen_to_world(float screen) { return screen / 10.0; }
 float world_to_screen(float world) { return world * 10.0; }
 
-// Circa angles are in the range of 0..1
-float radians_to_unit_angles(float radians) { return radians / (M_PI * 2); }
-float unit_angles_to_radians(float unit) { return unit * M_PI * 2; }
+float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
+float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
 
 void b2Vec2_to_point(b2Vec2 const& vec, TaggedValue* point)
 {
@@ -170,7 +169,7 @@ CA_FUNCTION(create_body)
     }
     
     bodyDef.position = point_to_b2Vec2(initialPosition);
-    bodyDef.angle = unit_angles_to_radians(initialRotation);
+    bodyDef.angle = degrees_to_radians(initialRotation);
 
     Body* bodyHandle = handle_t::create<Body>(OUTPUT, &g_body_t);
 
@@ -281,7 +280,7 @@ CA_FUNCTION(get_body_rotation)
     if (body == NULL)
         return;
 
-    set_float(OUTPUT, radians_to_unit_angles(body->GetAngle()));
+    set_float(OUTPUT, radians_to_degrees(body->GetAngle()));
 }
 
 
@@ -291,7 +290,7 @@ CA_FUNCTION(set_body_rotation)
     if (body == NULL)
         return;
 
-    float rotation = unit_angles_to_radians(FLOAT_INPUT(1));
+    float rotation = degrees_to_radians(FLOAT_INPUT(1));
 
     body->SetTransform(body->GetPosition(), rotation);
 }

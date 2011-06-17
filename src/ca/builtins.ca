@@ -75,12 +75,12 @@ def point_distance(Point a, Point b) -> number
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 
 def rotate_point(Point p, number rotation) -> Point
-    "Rotate p around [0,0] by the given angle. Angles are specified in the range 0..1."
+    "Rotate p around [0,0] by the given angle."
     return ([p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)])
 
 def random_norm_vector() -> Point
     "Return a random normalized vector"
-    angle = rand()
+    angle = rand() * 360
     return [cos(angle) sin(angle)]
 
 def norm(Point v) -> Point

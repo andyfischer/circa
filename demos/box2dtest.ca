@@ -21,9 +21,9 @@ def wall(Point p, number rot)
 
         -- Rotate with z/x keys
         if key_down('z')
-            feedback(rot rot - 0.01)
+            feedback(rot rot - 1)
         elif key_down('x')
-            feedback(rot rot + 0.01)
+            feedback(rot rot + 1)
 
 def bouncy_box(Point start)
     box = box2d:dynamic_rect(start 0.0 [3 3] [1 .1 1])
@@ -43,5 +43,5 @@ for i in 0..100
     bouncy_box([420 100])
 
 
-wall([520.0 319.0] -0.15)
-wall([377.0 234.0] 0.12)
+wall([520.0 319.0] -30.0)
+wall([377.0 234.0] 20.0)

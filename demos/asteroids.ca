@@ -27,7 +27,7 @@ state Ship ship = new_ship()
 state List bullets = []
 
 accelration_per_s = 5.0
-rotation_speed = 0.9
+rotation_speed = 270.0
 ship_drag = 0.991
 speed_limit = 1.8
 bullet_speed = 200.0
@@ -37,7 +37,7 @@ ship_size = 1.2
 ship_front = 10.0
 ship_back = 6.4
 ship_wing_size = 11.4
-ship_wing_rot = .40
+ship_wing_rot = 140
 ship_radius = ship_size * ship_front
 
 asteroid_speed_modifier = 1.0
@@ -60,7 +60,7 @@ def draw_ship(Point loc, number facing)
 
     points = [ship_point(0 ship_front)
                   ship_point(ship_wing_rot ship_wing_size)
-                  ship_point(.5 ship_back)
+                  ship_point(180 ship_back)
                   ship_point(-ship_wing_rot ship_wing_size)]
 
     sides = []
@@ -161,18 +161,18 @@ asteroid_num_edges = 10
 
 def generate_asteroid(number size) -> Asteroid
     edges = for index in 0..10
-        angle = index / asteroid_num_edges
+        angle = index / asteroid_num_edges * 360
         (polar(angle) * (rand() * size + size/3)) -> Point
 
-    rotation = rand() * .2 - .1
+    rotation = (rand() * .2 - .1) * 360
     return [edges, random_location(), random_norm_vector()*10, 0, rotation size 0]
 
 def generate_child_asteroid(Asteroid parent) -> Asteroid
     size = parent.size / 2
     edges = for index in 0..10
-        angle = index / asteroid_num_edges
+        angle = index / asteroid_num_edges * 360
         (polar(angle) * (rand() * size + size/3)) -> Point
-    rotation = rand() * .2 - .1
+    rotation = (rand() * .2 - .1) * 360
     speed = rand()*20 + 20.0
     return [edges, parent.location, random_norm_vector()*speed, 0, rotation size 0]
 

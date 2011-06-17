@@ -44,8 +44,8 @@ void cairoSurface_release(Type*, TaggedValue* value)
     cairo_surface_destroy(surface);
 }
 
-float radians_to_unit_angles(float radians) { return radians / (M_PI * 2); }
-float unit_angles_to_radians(float unit) { return unit * M_PI * 2; }
+float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
+float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
 
 CA_FUNCTION(create_context_for_surface)
 {
@@ -121,8 +121,8 @@ CA_FUNCTION(arc)
     get_point(INPUT(1), &center_x, &center_y);
     cairo_arc(context, center_x, center_y,
         FLOAT_INPUT(2),
-        unit_angles_to_radians(FLOAT_INPUT(3)),
-        unit_angles_to_radians(FLOAT_INPUT(4)));
+        degrees_to_radians(FLOAT_INPUT(3)),
+        degrees_to_radians(FLOAT_INPUT(4)));
 }
 CA_FUNCTION(new_sub_path)
 {

@@ -83,6 +83,7 @@ void set_input2(Term* term, int index, Term* input, int outputIndex)
     possibly_prune_user_list(term, previousInput);
 
     mark_inputs_changed(term);
+    update_input_instructions(term);
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -106,6 +107,7 @@ void set_input(Term* term, int index, Term* input)
     possibly_prune_user_list(term, previousInput);
 
     mark_inputs_changed(term);
+    update_input_instructions(term);
 }
 
 void set_inputs(Term* term, TermList const& inputs)
@@ -133,6 +135,7 @@ void set_inputs(Term* term, TermList const& inputs)
         possibly_prune_user_list(term, previousInputs[i].term);
 
     mark_inputs_changed(term);
+    update_input_instructions(term);
 }
 
 void insert_input(Term* term, Term* input)
