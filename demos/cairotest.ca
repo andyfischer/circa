@@ -29,6 +29,12 @@ command_list = [
   [cairo:set_source_color #8008]
   [cairo:set_line_width 10.0]
   [cairo:stroke]
+
+  [cairo:select_font_face "Sans"]
+  [cairo:set_font_size 100.0]
+  [cairo:move_to [100 100]]
+  [cairo:set_source_color #000]
+  [cairo:show_text concat(elapsed())]
 ]
 
 cairo:draw_command_list(command_list, [500 500], [100 100])

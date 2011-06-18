@@ -3,6 +3,10 @@
 namespace cairo
     type Context;
     type Surface;
+    type FontFace;
+    
+    type TextExtents { Point bearing; Point size; Point advance }
+
 
     -- Contexts
     def create_context_for_surface(Surface s) -> Context
@@ -13,6 +17,13 @@ namespace cairo
 
     -- Surfaces
     def create_image_surface(Point_i size) -> Surface
+
+    -- Text
+    def select_font_face(Context cr, string family)
+    def set_font_size(Context cr, number size)
+    def set_font_face(Context cr, FontFace font)
+    def show_text(Context cr, string s)
+    def text_extents(Context cr, string s) -> TextExtents
 
     -- Paths
     def move_to(Context cr, Point p)
