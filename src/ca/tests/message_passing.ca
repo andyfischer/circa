@@ -20,5 +20,5 @@ send('a' 1)
 send('a' 2)
 send('a' 3)
 
-assert(receive_last(null 'a') == 3)
-assert(receive_last(null 'a') == null)
+assert(receive_last('a' null) == 3)
+assert(receive_last('a' null) == null)

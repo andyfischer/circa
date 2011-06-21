@@ -7,13 +7,17 @@ namespace cairo
     
     type TextExtents { Point bearing; Point size; Point advance }
 
+    namespace Operator { clear = 0, source = 1, over = 2 }
 
     -- Contexts
+    def save(Context cr)
+    def restore(Context cr)
     def create_context_for_surface(Surface s) -> Context
     def stroke(Context cr)
     def paint(Context cr)
     def set_source_color(Context cr, Color color)
     def fill_preserve(Context cr)
+    def set_operator(Context cr, int operator)
 
     -- Surfaces
     def create_image_surface(Point_i size) -> Surface

@@ -1,0 +1,92 @@
+
+def receive_stateful(string inbox_name, any initialValue) -> any
+    state value = initialValue
+    return receive_last(inbox_name, value)
+
+def approach_rect(Rect target, number change) -> Rect
+    return Rect([approach(target.x1,change), approach(target.y1,change),
+        approach(target.x2,change),approach(target.y2,change)])
+
+def defer_draw(any command)
+    send('lincoln.draw', command)
+
+-- Draw the pink rounded rect. This is used for multiple purposes, and it smoothly
+-- blends when it changes shape.
+namespace activerect
+    target_shape = receive_last('lincoln.active.size') -> Rect
+    target_opacity = receive_last('lincoln.active.opacity') -> number
+
+def single_variable_tweak(cairo:Context cr, Point loc, string name, string value)
+    aspect = 1.0
+    radius = 12.0
+    gutter = 20
+    space_between_name_and_value = 30
+    inner_loc = loc + [gutter gutter]
+
+    cairo:select_font_face(cr "Sans")
+    cairo:set_font_size(cr 20.0)
+    name_extents = cairo:text_extents(cr name)
+    value_extents = cairo:text_extents(cr value)
+
+    name_width = name_extents.size[0]
+    width = name_width + value_extents.size[0] + gutter*2 + space_between_name_and_value
+    text_height = min(name_extents.size[1], value_extents.size[1])
+    height = text_height + gutter*2
+
+    -- draw a rounded rect
+    cairo:new_sub_path(cr)
+    cairo:arc(cr, loc + [width - radius, radius] radius, -90, 0)
+    cairo:arc(cr, loc + [width - radius, height - radius], radius, 0, 90)
+    cairo:arc(cr, loc + [radius, height - radius], radius, 90, 180)
+    cairo:arc(cr, loc + [radius, radius], radius, 180, 270)
+    cairo:close_path(cr)
+    cairo:set_source_color(cr #d08)
+    cairo:fill_preserve(cr)
+    cairo:set_source_color(cr #00f8)
+    cairo:set_line_width(cr 10.0)
+    cairo:stroke(cr)
+
+    -- draw text
+    cairo:set_source_color(cr #fff)
+    cairo:move_to(cr inner_loc+[0 text_height])
+    cairo:show_text(cr name)
+    cairo:move_to(cr inner_loc+[name_width+space_between_name_and_value text_height])
+    cairo:show_text(cr value)
+
+    
+defer_draw([single_variable_tweak [20 window.height-100] 'name' 'value'])
+
+namespace post_frame
+    state surface = null
+    window_size = [window.width window.height]
+    if surface == null or changed(window_size)
+        surface = cairo:create_image_surface(window_size)
+
+    state texture = opengl:new_texture_handle()
+
+    commandList = receive('lincoln.draw')
+
+    redraw = once() or changed(commandList)
+
+    if redraw
+        cr = cairo:create_context_for_surface(surface)
+
+        -- Clear the buffer
+        {cairo:save(cr)
+        cairo:set_operator(cr, cairo:Operator:clear)
+        cairo:paint(cr)
+        cairo:restore(cr)}
+
+        -- run the command list
+        for command in commandList
+            List(@command)
+            func = command[0]
+            args = command.slice(1, command.length())
+
+            args.insert(0, cr)
+
+            dynamic_call(func args)
+
+        cairo:upload_surface_to_opengl(surface texture)
+
+    opengl:draw_texture_as_quad(texture to_rect([0 0] window_size))

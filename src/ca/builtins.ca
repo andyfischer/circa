@@ -52,7 +52,7 @@ def seed() -> number
     return s
 
 -- Message passing functions
-def receive_last(any default, string inbox_name) -> any
+def receive_last(string inbox_name, any default) -> any
     results = receive(inbox_name)
     if results == []
         return default

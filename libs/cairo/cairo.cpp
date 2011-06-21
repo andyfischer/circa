@@ -64,6 +64,16 @@ void cairoFontFace_release(Type*, TaggedValue* value)
 float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
 float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
 
+CA_FUNCTION(save)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_save(context);
+}
+CA_FUNCTION(restore)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_restore(context);
+}
 CA_FUNCTION(create_context_for_surface)
 {
     cairo_surface_t* surface = as_cairo_surface(INPUT(0));
@@ -115,6 +125,8 @@ CA_FUNCTION(text_extents)
     set_point(out->get(0), extents.x_bearing, extents.y_bearing);
     set_point(out->get(1), extents.width, extents.height);
     set_point(out->get(2), extents.x_advance, extents.y_advance);
+
+    out->value_type = declared_type(CALLER);
 }
 
 CA_FUNCTION(stroke)
@@ -141,6 +153,11 @@ CA_FUNCTION(fill_preserve)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_fill_preserve(context);
+}
+CA_FUNCTION(set_operator)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_set_operator(context, (cairo_operator_t) INT_INPUT(1));
 }
 CA_FUNCTION(move_to)
 {
@@ -247,11 +264,14 @@ void setup(Branch& kernel)
     install_type(ns["Context"], &g_cairoContext_t);
     install_type(ns["FontFace"], &g_cairoFontFace_t);
 
+    install_function(ns["save"], save);
+    install_function(ns["restore"], restore);
     install_function(ns["create_context_for_surface"], create_context_for_surface);
     install_function(ns["stroke"], stroke);
     install_function(ns["paint"], paint);
     install_function(ns["set_source_color"], set_source_color);
     install_function(ns["fill_preserve"], fill_preserve);
+    install_function(ns["set_operator"], set_operator);
     install_function(ns["create_image_surface"], create_image_surface);
     install_function(ns["select_font_face"], select_font_face);
     install_function(ns["set_font_size"], set_font_size);

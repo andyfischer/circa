@@ -34,7 +34,7 @@ command_list = [
   [cairo:set_font_size 100.0]
   [cairo:move_to [100 100]]
   [cairo:set_source_color #000]
-  [cairo:show_text concat(elapsed())]
+  [cairo:show_text "Hello"]
 ]
 
 cairo:draw_command_list(command_list, [500 500], [100 100])
