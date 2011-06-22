@@ -138,7 +138,7 @@ CA_FUNCTION(stroke)
 CA_FUNCTION(paint)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_stroke(context);
+    cairo_paint(context);
     set_null(OUTPUT);
 }
 CA_FUNCTION(set_source_color)

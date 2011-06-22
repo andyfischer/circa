@@ -321,7 +321,7 @@ state string user_script_filename = ide:script_filename()
 -- Function to specify a different script
 def load_user_script(string filename)
     send('load_user_script_request', filename)
-receive_last(@user_script_filename 'load_user_script_request')
+receive_last('load_user_script_request' @user_script_filename)
 
 users_script = load_script(user_script_filename)
 

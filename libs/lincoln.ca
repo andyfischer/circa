@@ -1,24 +1,77 @@
 
-def receive_stateful(string inbox_name, any initialValue) -> any
-    state value = initialValue
-    return receive_last(inbox_name, value)
-
-def approach_rect(Rect target, number change) -> Rect
-    return Rect([approach(target.x1,change), approach(target.y1,change),
-        approach(target.x2,change),approach(target.y2,change)])
-
 def defer_draw(any command)
     send('lincoln.draw', command)
+
+def interp_rect(Rect a, Rect b, number ratio) -> Rect
+    min(@ratio, 1.0)
+    result = for i in 0..4 { a[i] + (b[i] - a[i]) * ratio }
+    return Rect(result)
+
 
 -- Draw the pink rounded rect. This is used for multiple purposes, and it smoothly
 -- blends when it changes shape.
 namespace activerect
-    target_shape = receive_last('lincoln.active.size') -> Rect
-    target_opacity = receive_last('lincoln.active.opacity') -> number
+    state rect
+
+    target_rect = receive_last('lincoln.active.size' null)
+
+    state transition_from = null
+    state transition_to
+
+    state time_since_target_change = 0.0
+    time_since_target_change += td
+    time_for_full_transition = 0.5
+    if target_rect != null
+        transition_from = rect
+        transition_to = target_rect
+        time_since_target_change = 0.0
+
+    if transition_from != null
+        r = time_since_target_change / time_for_full_transition
+        rect = interp_rect(transition_from transition_to r)
+        send('lincoln.should_redraw' true)
+        if r > 1
+            transition_from = null
+            rect = transition_to
+
+    Rect(@rect)
+
+    -- Receive changes to rect or opacity
+    target_opacity = receive_stateful('lincoln.active.opacity', 0.0) -> number
+
+    opacity = approach(target_opacity .1)
+
+    if opacity != target_opacity
+        send('lincoln.should_redraw' true)
+    else
+        -- After we reach the target, redraw once more.
+        if once()
+            send('lincoln.should_redraw' true)
+
+    def blend_color(Color c) -> Color
+        c[3] = c[3] * opacity
+        return c
+
+    def draw(cairo:Context cr)
+        p1 = [rect.x1 rect.y1]
+        width = rect.x2 - rect.x1
+        height = rect.y2 - rect.y1
+        cairo:new_sub_path(cr)
+        radius = 12.0
+        cairo:arc(cr, p1 + [width - radius, radius] radius, -90, 0)
+        cairo:arc(cr, p1 + [width - radius, height - radius], radius, 0, 90)
+        cairo:arc(cr, p1 + [radius, height - radius], radius, 90, 180)
+        cairo:arc(cr, p1 + [radius, radius], radius, 180, 270)
+        cairo:close_path(cr)
+        cairo:set_source_color(cr blend_color(#d08))
+        cairo:fill_preserve(cr)
+        cairo:set_source_color(cr blend_color(#00f8))
+        cairo:set_line_width(cr 10.0)
+        cairo:stroke(cr)
+
+    defer_draw([draw])
 
 def single_variable_tweak(cairo:Context cr, Point loc, string name, string value)
-    aspect = 1.0
-    radius = 12.0
     gutter = 20
     space_between_name_and_value = 30
     inner_loc = loc + [gutter gutter]
@@ -33,28 +86,28 @@ def single_variable_tweak(cairo:Context cr, Point loc, string name, string value
     text_height = min(name_extents.size[1], value_extents.size[1])
     height = text_height + gutter*2
 
-    -- draw a rounded rect
-    cairo:new_sub_path(cr)
-    cairo:arc(cr, loc + [width - radius, radius] radius, -90, 0)
-    cairo:arc(cr, loc + [width - radius, height - radius], radius, 0, 90)
-    cairo:arc(cr, loc + [radius, height - radius], radius, 90, 180)
-    cairo:arc(cr, loc + [radius, radius], radius, 180, 270)
-    cairo:close_path(cr)
-    cairo:set_source_color(cr #d08)
-    cairo:fill_preserve(cr)
-    cairo:set_source_color(cr #00f8)
-    cairo:set_line_width(cr 10.0)
-    cairo:stroke(cr)
+    send('lincoln.active.size' [loc.x loc.y loc.x+width loc.y+height])
 
     -- draw text
-    cairo:set_source_color(cr #fff)
+    cairo:set_source_color(cr activerect:blend_color(#fff))
     cairo:move_to(cr inner_loc+[0 text_height])
     cairo:show_text(cr name)
     cairo:move_to(cr inner_loc+[name_width+space_between_name_and_value text_height])
     cairo:show_text(cr value)
 
     
-defer_draw([single_variable_tweak [20 window.height-100] 'name' 'value'])
+
+--defer_draw([single_variable_tweak [20 window.height-100] 'name' 'value'])
+if key_down('1')
+    send('lincoln.active.opacity' 1.0)
+else
+    send('lincoln.active.opacity' 0.0)
+
+if key_pressed('2')
+    send('lincoln.active.size' [50 50 300 500])
+if key_pressed('3')
+    send('lincoln.active.size' [100 350 300 400])
+
 
 namespace post_frame
     state surface = null
@@ -67,15 +120,16 @@ namespace post_frame
     commandList = receive('lincoln.draw')
 
     redraw = once() or changed(commandList)
+    or(@redraw receive_last('lincoln.should_redraw' false))
 
     if redraw
         cr = cairo:create_context_for_surface(surface)
 
         -- Clear the buffer
-        {cairo:save(cr)
-        cairo:set_operator(cr, cairo:Operator:clear)
+        cairo:save(cr)
+        cairo:set_operator(cr cairo:Operator:clear)
         cairo:paint(cr)
-        cairo:restore(cr)}
+        cairo:restore(cr)
 
         -- run the command list
         for command in commandList

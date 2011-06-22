@@ -59,6 +59,11 @@ def receive_last(string inbox_name, any default) -> any
     else
         return results[length(results)-1]
 
+def receive_stateful(string inbox_name, any initialValue) -> any
+    state value = initialValue
+    receive_last(inbox_name, @value)
+    return value
+
 -- Math utility functions
 def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
@@ -92,9 +97,15 @@ def perpendicular(Point v) -> Point
     "Returns a vector that is perpendicular to v, rotated clockwise."
     return [v.y -v.x]
 
-def expand_rect(Point center, number width, number height) -> Rect
-    "Return a rectangle with the given center, width, and height."
+def expand_rect(Point center, Point size) -> Rect
+    "Return a rectangle with the given center and size"
+    width = abs(size.x)
+    height = abs(size.y)
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
+
+def approach_rect(Rect target, number change) -> Rect
+    return Rect([approach(target.x1,change), approach(target.y1,change),
+        approach(target.x2,change),approach(target.y2,change)])
 
 def grow_rect(Rect r, number amount) -> Rect
     return Rect([r.x1 - amount, r.y1 - amount, r.x2 + amount, r.y2 + amount])
