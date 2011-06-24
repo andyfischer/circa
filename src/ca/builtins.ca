@@ -124,6 +124,11 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
     return intersects_on_x and intersects_on_y
 
+def interp_rect(Rect a, Rect b, number ratio) -> Rect
+    min(@ratio, 1.0)
+    result = for i in 0..4 { a[i] + (b[i] - a[i]) * ratio }
+    return Rect(result)
+
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
 

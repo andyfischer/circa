@@ -12,3 +12,15 @@ Important optimization tasks:
 
  - Value sharing, especially for Dict. Lots of performance loss in preserve_state_result.
  - Some overloads that are currently resolved dynamically can be resolved statically
+
+Things that would have made lincoln.ca easier:
+ - dynamic_call supporting state
+   - Refactor state inputs as a separate input instruction
+   - Allow for lazy state fields?
+ - Comments start with #
+ - Complex lexprs
+ - Rebind syntax on lexprs
+ - More sane message passing
+ - More object methods
+ - Object methods don't need ()
+ - Declare a block that doesn't have an end marker (ends at file)

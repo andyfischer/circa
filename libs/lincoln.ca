@@ -2,26 +2,33 @@
 def defer_draw(any command)
     send('lincoln.draw', command)
 
-def interp_rect(Rect a, Rect b, number ratio) -> Rect
-    min(@ratio, 1.0)
-    result = for i in 0..4 { a[i] + (b[i] - a[i]) * ratio }
-    return Rect(result)
+namespace mode
+    hidden = 0
+    list_available_configs = 1
+    highlight_config = 2
 
+current_mode = receive_last('lincoln.current_mode', 0)
+listed_configs = receive_last('lincoln.config_list', [])
+highlighted_config = receive_last('lincoln.highlight_config' null)
+
+-- Public functions
 
 -- Draw the pink rounded rect. This is used for multiple purposes, and it smoothly
 -- blends when it changes shape.
 namespace activerect
-    state rect
-
-    target_rect = receive_last('lincoln.active.size' null)
+    state rect = Rect()
 
     state transition_from = null
     state transition_to
-
     state time_since_target_change = 0.0
+
     time_since_target_change += td
     time_for_full_transition = 0.5
-    if target_rect != null
+
+    reached_target = true
+
+    target_rect = receive_last('lincoln.active.size' null)
+    if target_rect != null and target_rect != transition_to
         transition_from = rect
         transition_to = target_rect
         time_since_target_change = 0.0
@@ -30,19 +37,21 @@ namespace activerect
         r = time_since_target_change / time_for_full_transition
         rect = interp_rect(transition_from transition_to r)
         send('lincoln.should_redraw' true)
+        and(@reached_target false)
         if r > 1
             transition_from = null
             rect = transition_to
 
     Rect(@rect)
 
-    -- Receive changes to rect or opacity
+    -- Receive changes to opacity
     target_opacity = receive_stateful('lincoln.active.opacity', 0.0) -> number
 
     opacity = approach(target_opacity .1)
 
     if opacity != target_opacity
         send('lincoln.should_redraw' true)
+        and(@reached_target false)
     else
         -- After we reach the target, redraw once more.
         if once()
@@ -51,6 +60,9 @@ namespace activerect
     def blend_color(Color c) -> Color
         c[3] = c[3] * opacity
         return c
+
+    if changed(reached_target)
+        send('lincoln.should_redraw' true)
 
     def draw(cairo:Context cr)
         p1 = [rect.x1 rect.y1]
@@ -71,42 +83,47 @@ namespace activerect
 
     defer_draw([draw])
 
-def single_variable_tweak(cairo:Context cr, Point loc, string name, string value)
+def draw_highlighted_config(cairo:Context cr)
+
+    topleft = [100 window.height - 100]
+
     gutter = 20
-    space_between_name_and_value = 30
-    inner_loc = loc + [gutter gutter]
+    inner_loc = topleft + [gutter gutter]
+
+    name = "<name>"
+    value = "<value>"
+    if highlighted_config != null
+        Ref(@highlighted_config)
+        name = highlighted_config.name()
+        value = highlighted_config.to_string()
+    str = concat(name ' = ' value)
+
+    if changed(str) trace('hi') --send('lincoln.should_redraw' true)
 
     cairo:select_font_face(cr "Sans")
     cairo:set_font_size(cr 20.0)
-    name_extents = cairo:text_extents(cr name)
-    value_extents = cairo:text_extents(cr value)
+    str_extents = cairo:text_extents(cr str)
 
-    name_width = name_extents.size[0]
-    width = name_width + value_extents.size[0] + gutter*2 + space_between_name_and_value
-    text_height = min(name_extents.size[1], value_extents.size[1])
+    str_width = str_extents.size[0]
+    width = str_width + gutter*2
+    text_height = str_extents.size[1]
     height = text_height + gutter*2
-
-    send('lincoln.active.size' [loc.x loc.y loc.x+width loc.y+height])
 
     -- draw text
     cairo:set_source_color(cr activerect:blend_color(#fff))
     cairo:move_to(cr inner_loc+[0 text_height])
-    cairo:show_text(cr name)
-    cairo:move_to(cr inner_loc+[name_width+space_between_name_and_value text_height])
-    cairo:show_text(cr value)
+    cairo:show_text(cr str)
 
-    
+    send('lincoln.active.size' to_rect(topleft [width height]))
 
---defer_draw([single_variable_tweak [20 window.height-100] 'name' 'value'])
-if key_down('1')
+def draw_config_list(cairo:Context cr)
+    send('lincoln.active.size' [100 350 300 400])
+
+if current_mode == mode:highlight_config
+    defer_draw([draw_highlighted_config])
     send('lincoln.active.opacity' 1.0)
 else
     send('lincoln.active.opacity' 0.0)
-
-if key_pressed('2')
-    send('lincoln.active.size' [50 50 300 500])
-if key_pressed('3')
-    send('lincoln.active.size' [100 350 300 400])
 
 
 namespace post_frame
