@@ -26,7 +26,7 @@ struct TestInput
 
 std::vector<TestInput> TEST_INPUTS;
 
-void register_input(std::string const& in)
+void test_case(std::string const& in)
 {
     TEST_INPUTS.push_back(TestInput(in));
 }
@@ -35,62 +35,62 @@ void register_every_possible_parse_error()
 {
     TEST_INPUTS.clear();
 
-    register_input("def");
-    register_input("def myfunc");
-    register_input("def myfunc%");
-    register_input("def myfunc(%");
-    register_input("def myfunc(int %");
-    register_input("def myfunc(int) %");
-    register_input("def myfunc(int) -> %");
-    register_input("def myfunc(foo, bar) : baz");
-    register_input("type");
-    register_input("type mytype");
-    register_input("type mytype %");
-    register_input("type mytype { %");
-    register_input("type mytype { int %");
-    register_input("type mytype { int a %");
-    register_input("type mytype { int a");
-    register_input("if");
-    register_input("if else");
-    register_input("if true else else");
-    register_input("if %");
-    register_input("for");
-    register_input("for %");
-    register_input("for x");
-    register_input("for x %");
-    register_input("for x in");
-    register_input("for x in %");
-    register_input("for x in 1\n");
-    register_input("namespace");
-    register_input("namespace %");
-    register_input("state");
-    register_input("state %");
-    register_input("state x = ");
-    register_input("state int x = ");
-    register_input("state int %");
-    register_input("state foo x");
-    register_input("foo = 1; state foo x");
-    register_input("a.b 3 4 = 4");
-    register_input("a.0");
-    register_input("[].append %");
-    register_input("[].append(%");
-    register_input("[].append(");
-    register_input("1 -> %");
-    register_input("1 -> 2");
-    register_input("(1 + 2");
-    register_input("add %");
-    register_input("add(");
-    register_input("add( %");
-    register_input("add(1");
-    register_input("[");
-    register_input("a = []; a[");
-    register_input("a = [1]; a[0");
-    register_input("a()");
-    register_input("a = 1; a()");
-    register_input("def func() -> NonexistantType {}");
-    register_input("nonexistant = nonexistant + 1");
-    register_input("for i in 0..1 { print([0 [0 ]) }");
-    register_input("a = 1; a = x");
+    test_case("def");
+    test_case("def myfunc");
+    test_case("def myfunc%");
+    test_case("def myfunc(%");
+    test_case("def myfunc(int %");
+    test_case("def myfunc(int) %");
+    test_case("def myfunc(int) -> %");
+    test_case("def myfunc(foo, bar) : baz");
+    test_case("type");
+    test_case("type mytype");
+    test_case("type mytype %");
+    test_case("type mytype { %");
+    test_case("type mytype { int %");
+    test_case("type mytype { int a %");
+    test_case("type mytype { int a");
+    test_case("if");
+    test_case("if else");
+    test_case("if true else else");
+    test_case("if %");
+    test_case("for");
+    test_case("for %");
+    test_case("for x");
+    test_case("for x %");
+    test_case("for x in");
+    test_case("for x in %");
+    test_case("for x in 1\n");
+    test_case("namespace");
+    test_case("namespace %");
+    test_case("state");
+    test_case("state %");
+    test_case("state x = ");
+    test_case("state int x = ");
+    test_case("state int %");
+    test_case("state foo x");
+    test_case("foo = 1; state foo x");
+    test_case("a.b 3 4 = 4");
+    test_case("a.0");
+    test_case("[].append %");
+    test_case("[].append(%");
+    test_case("[].append(");
+    test_case("1 -> %");
+    test_case("1 -> 2");
+    test_case("(1 + 2");
+    test_case("add %");
+    test_case("add(");
+    test_case("add( %");
+    test_case("add(1");
+    test_case("[");
+    test_case("a = []; a[");
+    test_case("a = [1]; a[0");
+    test_case("a()");
+    test_case("a = 1; a()");
+    test_case("def func() -> NonexistantType {}");
+    test_case("nonexistant = nonexistant + 1");
+    test_case("for i in 0..1 { print([0 [0 ]) }");
+    test_case("a = 1; a = x");
 }
 
 void test_every_parse_error()

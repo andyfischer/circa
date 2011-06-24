@@ -57,6 +57,7 @@ ParseResult return_statement(Branch& branch, TokenStream& tokens, ParserCxt* con
 ParseResult discard_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult break_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult continue_statement(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult infix_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserCxt* context,

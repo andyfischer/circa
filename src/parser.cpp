@@ -909,36 +909,8 @@ ParseResult expression_statement(Branch& branch, TokenStream& tokens, ParserCxt*
 {
     int startPosition = tokens.getPosition();
 
-    // Lookahead for a name binding.
-    std::string nameBinding;
-    std::string preEqualsSpace;
-    std::string postEqualsSpace;
-    if (lookahead_match_leading_name_binding(tokens)) {
-        nameBinding = tokens.consume(IDENTIFIER);
-        preEqualsSpace = possible_whitespace(tokens);
-        tokens.consume(EQUALS);
-        postEqualsSpace = possible_whitespace(tokens);
-    }
-
     // Parse an expression
-    ParseResult result = expression(branch, tokens, context);
-
-    result.term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
-    result.term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
-
-    // If the result is an identifier, then create an implicit copy()
-    if (result.isIdentifier() && result.term->function != UNKNOWN_IDENTIFIER_FUNC)
-        result = ParseResult(apply(branch, COPY_FUNC, TermList(result.term)));
-
-    // Check to bind a new name
-    if (nameBinding != "") {
-        // If the term already has a name (this is the case for member-function syntax
-        // and for unknown_identifier), then make a copy.
-        if (result.term->name != "")
-            result = ParseResult(apply(branch, COPY_FUNC, TermList(result.term)));
-
-        branch.bindName(result.term, nameBinding);
-    }
+    ParseResult result = name_binding_expression(branch, tokens, context);
 
     // Apply a pending rebind
     if (context->pendingRebind != "") {
@@ -1062,16 +1034,50 @@ ParseResult continue_statement(Branch& branch, TokenStream& tokens, ParserCxt* c
     return ParseResult(result);
 }
 
+ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
+{
+    // Lookahead for a name binding.
+    std::string nameBinding;
+    std::string preEqualsSpace;
+    std::string postEqualsSpace;
+    if (lookahead_match_leading_name_binding(tokens)) {
+        nameBinding = tokens.consume(IDENTIFIER);
+        preEqualsSpace = possible_whitespace(tokens);
+        tokens.consume(EQUALS);
+        postEqualsSpace = possible_whitespace(tokens);
+
+        ParseResult result = name_binding_expression(branch, tokens, context);
+        
+        // If the term already has a name (this is the case for member-function syntax
+        // and for unknown_identifier), then make a copy.
+        if (result.term->name != "")
+            result.term = apply(branch, COPY_FUNC, TermList(result.term));
+
+        result.term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
+        result.term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
+
+        branch.bindName(result.term, nameBinding);
+        return result;
+    }
+
+    // Otherwise, no name binding.
+    return expression(branch, tokens, context);
+}
+
 ParseResult expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
+    ParseResult result;
+
     if (tokens.nextIs(IF))
-        return if_block(branch, tokens, context);
+        result = if_block(branch, tokens, context);
     else if (tokens.nextIs(ON))
-        return if_block(branch, tokens, context);
+        result = if_block(branch, tokens, context);
     else if (tokens.nextIs(FOR))
-        return for_block(branch, tokens, context);
+        result = for_block(branch, tokens, context);
     else
-        return infix_expression(branch, tokens, context);
+        result = infix_expression(branch, tokens, context);
+
+    return result;
 }
 
 const int HIGHEST_INFIX_PRECEDENCE = 8;

@@ -634,6 +634,11 @@ void test_dynamic_call()
         "  i = dynamic_call(x, [i]) }", "dispatch_result == [2, 6, 3, 8, 4, 10, 5]");
 }
 
+void test_multiple_name_assignment()
+{
+    test_snippet("a = b = c = 1", "a == 1; b == 1; c == 1");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -675,6 +680,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_left_arrow);
     REGISTER_TEST_CASE(test_snippets::test_stateful_value_decl);
     REGISTER_TEST_CASE(test_snippets::test_dynamic_call);
+    REGISTER_TEST_CASE(test_snippets::test_multiple_name_assignment);
 }
 
 } // namespace test_snippets
