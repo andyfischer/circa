@@ -42,6 +42,7 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     // a NULL input for state.
     if (is_function_stateful(function)
             && _inputs.length() == function_t::num_inputs(function) - 1) {
+        //std::cout << "prepending null input: " << function->name << std::endl;
         _inputs.prepend(NULL);
     }
 

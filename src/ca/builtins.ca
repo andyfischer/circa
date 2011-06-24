@@ -1,4 +1,10 @@
 
+def changed(any current) -> bool
+    state any prev = null
+    result = prev != current
+    prev = current
+    return result
+
 def toggle(bool tog) -> bool
     <<<
     Stateful function, returns a boolean status. Every frame the function is called
