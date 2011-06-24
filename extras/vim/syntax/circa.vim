@@ -27,6 +27,7 @@ syn match circaKeyword "\<do\ once\>"
 
 " Comments
 syn region circaLineComment start="--" skip="\\$" end="$"
+syn region circaLineComment start="# " skip="\\$" end="$"
 
 hi def link circaColor          Number
 hi def link circaInteger        Number

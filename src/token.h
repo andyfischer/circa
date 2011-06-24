@@ -74,6 +74,7 @@ const int TWO_DOTS = 46;
 const int ELLIPSIS = 42;
 const int TRIPLE_LTHAN = 48;
 const int TRIPLE_GTHAN = 49;
+const int POUND = 50;
 
 const int DEF = 51;
 const int TYPE = 52;

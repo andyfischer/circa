@@ -24,3 +24,4 @@ Things that would have made lincoln.ca easier:
  - More object methods
  - Object methods don't need ()
  - Declare a block that doesn't have an end marker (ends at file)
+ - Subroutines don't need to explicity declare output type

@@ -387,6 +387,23 @@ void test_preceding_indent()
     }
 }
 
+void test_comment()
+{
+    TokenStream tokens("1 2 -- this is a comment");
+    test_equals(tokens.consume(token::INTEGER), "1");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::INTEGER), "2");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::COMMENT), "-- this is a comment");
+
+    tokens.reset("1 2 # this is a comment");
+    test_equals(tokens.consume(token::INTEGER), "1");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::INTEGER), "2");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::COMMENT), "# this is a comment");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -407,6 +424,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
     REGISTER_TEST_CASE(tokenizer_tests::test_preceding_indent);
+    REGISTER_TEST_CASE(tokenizer_tests::test_comment);
 }
 
 } // namespace tokenizer_tests

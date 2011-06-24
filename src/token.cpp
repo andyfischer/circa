@@ -57,6 +57,7 @@ const char* get_token_text(int match)
         case ELLIPSIS: return "...";
         case TRIPLE_LTHAN: return "<<<";
         case TRIPLE_GTHAN: return ">>>";
+        case POUND: return "#";
         case WHITESPACE: return "WHITESPACE";
         case NEWLINE: return "NEWLINE";
         case BEGIN: return "begin";
@@ -465,10 +466,8 @@ void top_level_consume_token(TokenizeContext &context)
                 return;
             }
 
-            if (context.next(1) == '-') {
-                consume_comment(context);
-                return;
-            }
+            if (context.next(1) == '-')
+                return consume_comment(context);
 
             if (context.next(1) == '=') {
                 context.consume();
@@ -546,6 +545,9 @@ void top_level_consume_token(TokenizeContext &context)
             break;
 
         case '#':
+            if (context.next(1) == ' ')
+                return consume_comment(context);
+
             consume_color_literal(context);
             return;
     }
@@ -580,10 +582,6 @@ void consume_whitespace(TokenizeContext &context)
 void consume_comment(TokenizeContext& context)
 {
     std::stringstream text;
-
-    // consume the -- part
-    text << context.consume();
-    text << context.consume();
 
     while (!context.finished() && !is_newline(context.next()))
         text << context.consume();
