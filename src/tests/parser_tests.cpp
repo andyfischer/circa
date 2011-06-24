@@ -654,7 +654,7 @@ void test_sig_indent_multiline_function()
             "\n result = val - prev\n prev = val\n return result");
 
     test_assert(branch.length() == 1);
-    test_assert(branch["delta"]->contents().length() > 6);
+    test_assert(branch["delta"]->contents().length() > 5);
 }
 
 void test_sig_indent_nested_blocks()

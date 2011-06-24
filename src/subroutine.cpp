@@ -232,31 +232,7 @@ void subroutine_change_state_type(Term* func, Term* newType)
     if (previousType == newType)
         return;
 
-    Branch& contents = nested_contents(func);
     attrs->implicitStateType = newType;
-
-    bool hasStateInput = (function_t::num_inputs(func) > 0)
-        && (function_t::get_input_name(func, 0) == "#state");
-
-    // create a stateful input if needed
-    if (newType != VOID_TYPE && !hasStateInput) {
-        contents.insert(1, alloc_term());
-        Term* input = contents[1];
-        rewrite(input, INPUT_PLACEHOLDER_FUNC, TermList());
-        contents.bindName(input, "#state");
-        input->setBoolProp("optional", true);
-    }
-
-    // If state was added, find all the recursive calls to this function and
-    // insert a state argument.
-    if (previousType == VOID_TYPE && newType != VOID_TYPE) {
-        for (BranchIterator it(&contents); !it.finished(); ++it) {
-            Term* term = *it;
-
-            if (term->function == func)
-                insert_input(term, NULL);
-        }
-    }
 }
 
 void subroutine_check_to_append_implicit_return(Term* sub)

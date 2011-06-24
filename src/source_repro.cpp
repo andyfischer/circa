@@ -7,6 +7,7 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "subroutine.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "type.h"
@@ -347,7 +348,7 @@ int get_first_visible_input_index(Term* term)
 {
     if (get_input_syntax_hint_optional(term, 0, "hidden", "") == "true")
         return 1;
-    if (is_function_stateful(term->function))
+    if (is_function_stateful(term->function) && !is_subroutine(term->function))
         return 1;
     else
         return 0;
