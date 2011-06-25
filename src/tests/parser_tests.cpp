@@ -473,7 +473,7 @@ void test_subscripted_atom()
     Branch branch;
 
     branch.eval("a = 1");
-    parser::compile(branch, parser::subscripted_atom, "a.b.c");
+    parser::compile(branch, parser::atom_with_subscripts, "a.b.c");
 }
 
 void test_whitespace_after_statement()

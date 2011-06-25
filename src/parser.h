@@ -64,7 +64,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
         int precedence);
 ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult function_call(Branch& branch, ParseResult head, TokenStream& tokens, ParserCxt* context);
-ParseResult subscripted_atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
+ParseResult atom_with_subscripts(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult atom(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_integer(Branch& branch, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_hex(Branch& branch, TokenStream& tokens, ParserCxt* context);

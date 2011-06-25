@@ -613,8 +613,6 @@ ParseResult type_decl(Branch& branch, TokenStream& tokens, ParserCxt* context)
     if (has_static_error(result))
         return ParseResult(result);
 
-    //branch.moveToEnd(result);
-
     branch.bindName(result, name);
     as_type(result)->name = name;
 
@@ -1035,14 +1033,11 @@ ParseResult continue_statement(Branch& branch, TokenStream& tokens, ParserCxt* c
 ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     // Lookahead for a name binding.
-    std::string nameBinding;
-    std::string preEqualsSpace;
-    std::string postEqualsSpace;
     if (lookahead_match_leading_name_binding(tokens)) {
-        nameBinding = tokens.consume(IDENTIFIER);
-        preEqualsSpace = possible_whitespace(tokens);
+        std::string nameBinding = tokens.consume(IDENTIFIER);
+        std::string preEqualsSpace = possible_whitespace(tokens);
         tokens.consume(EQUALS);
-        postEqualsSpace = possible_whitespace(tokens);
+        std::string postEqualsSpace = possible_whitespace(tokens);
 
         ParseResult result = name_binding_expression(branch, tokens, context);
         
@@ -1247,9 +1242,9 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
                 else {
                     Term* assignTerm = apply(branch, ASSIGN_FUNC, TermList(leftExpr.term, term));
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
-                    if (lexprRoot != NULL && lexprRoot->name != "") {
+                    if (lexprRoot != NULL && lexprRoot->name != "")
                         branch.bindName(assignTerm, lexprRoot->name);
-                    }
+                    
                     assign_function::update_assign_contents(assignTerm);
                     term = assignTerm;
                 }
@@ -1272,7 +1267,7 @@ ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
     // Unary minus
     if (tokens.nextIs(MINUS)) {
         tokens.consume(MINUS);
-        ParseResult expr = subscripted_atom(branch, tokens, context);
+        ParseResult expr = atom_with_subscripts(branch, tokens, context);
 
         // If the minus sign is on a literal number, then just negate it in place,
         // rather than introduce a neg() operation.
@@ -1292,7 +1287,7 @@ ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
         return ParseResult(apply(branch, NEG_FUNC, TermList(expr.term)));
     }
 
-    return subscripted_atom(branch, tokens, context);
+    return atom_with_subscripts(branch, tokens, context);
 }
 
 ParseResult member_function_call(Branch& branch, Term* function, TermList const& _inputs,
@@ -1451,76 +1446,67 @@ ParseResult function_call2(Branch& branch, Term* function, TokenStream& tokens, 
     return ParseResult(result);
 }
 
-// Tries to parse an index access or a field access, and returns a new term.
-// May return the same term, and may return a term with a static error.
-// Index access example:
-//   a[0]
-// Field access example:
-//   a.b 
-static ParseResult possible_subscript(Branch& branch, TokenStream& tokens, ParserCxt* context,
-        ParseResult head, bool& finished)
-{
-    int startPosition = tokens.getPosition();
-
-    if (tokens.nextIs(LBRACKET)) {
-        tokens.consume(LBRACKET);
-
-        std::string postLbracketWs = possible_whitespace(tokens);
-
-        Term* subscript = infix_expression(branch, tokens, context).term;
-
-        if (!tokens.nextIs(RBRACKET))
-            return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
-
-        tokens.consume(RBRACKET);
-
-        Term* result = apply(branch, GET_INDEX_FUNC, TermList(head.term, subscript));
-        set_input_syntax_hint(result, 0, "postWhitespace", "");
-        set_input_syntax_hint(result, 1, "preWhitespace", postLbracketWs);
-        set_source_location(result, startPosition, tokens);
-        finished = false;
-        return ParseResult(result);
-
-    } else if (tokens.nextIs(DOT)) {
-        tokens.consume(DOT);
-
-        if (!tokens.nextIs(IDENTIFIER))
-            return compile_error_for_line(branch, tokens, startPosition,
-                    "Expected identifier after .");
-
-        std::string ident = tokens.consume(IDENTIFIER);
-        
-        Term* result = apply(branch, GET_FIELD_FUNC, TermList(head.term, create_string(branch, ident)));
-        set_source_location(result, startPosition, tokens);
-        set_input_syntax_hint(result, 0, "postWhitespace", "");
-        
-        finished = false;
-        return ParseResult(result);
-
-    } else if (tokens.nextIs(LPAREN)) {
-
-        // Function call
-        Term* result = function_call(branch, head, tokens, context).term;
-        finished = false;
-        return ParseResult(result);
-
-    } else {
-
-        finished = true;
-        return head;
-    }
-}
-
-ParseResult subscripted_atom(Branch& branch, TokenStream& tokens, ParserCxt* context)
+ParseResult atom_with_subscripts(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     ParseResult result = atom(branch, tokens, context);
 
+    // Now try to parse a subscript to the atom, this could be:
+    //   a[0] 
+    //   a.b
+    //   a.b()
+
     bool finished = false;
     while (!finished) {
-        result = possible_subscript(branch, tokens, context, result, finished);
 
-        if (has_static_error(result.term))
-            return result;
+        //if (has_static_error(result.term))
+        //    return result;
+
+        int startPosition = tokens.getPosition();
+
+        // Check for a[0], array indexing.
+        if (tokens.nextIs(LBRACKET)) {
+            tokens.consume(LBRACKET);
+
+            std::string postLbracketWs = possible_whitespace(tokens);
+
+            Term* subscript = infix_expression(branch, tokens, context).term;
+
+            if (!tokens.nextIs(RBRACKET))
+                return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
+
+            tokens.consume(RBRACKET);
+
+            Term* term = apply(branch, GET_INDEX_FUNC, TermList(result.term, subscript));
+            set_input_syntax_hint(term, 0, "postWhitespace", "");
+            set_input_syntax_hint(term, 1, "preWhitespace", postLbracketWs);
+            set_source_location(term, startPosition, tokens);
+            result = ParseResult(term);
+
+        // Check for a.b, field access.
+        } else if (tokens.nextIs(DOT)) {
+            tokens.consume(DOT);
+
+            if (!tokens.nextIs(IDENTIFIER))
+                return compile_error_for_line(branch, tokens, startPosition,
+                        "Expected identifier after .");
+
+            std::string ident = tokens.consume(IDENTIFIER);
+            
+            Term* term = apply(branch, GET_FIELD_FUNC, TermList(result.term, create_string(branch, ident)));
+            set_source_location(term, startPosition, tokens);
+            set_input_syntax_hint(term, 0, "postWhitespace", "");
+            result = ParseResult(term);
+
+        // Check for a(..), function call.
+        } else if (tokens.nextIs(LPAREN)) {
+
+            // Function call
+            result = function_call(branch, result, tokens, context);
+
+        } else {
+
+            finished = true;
+        }
     }
 
     return result;
