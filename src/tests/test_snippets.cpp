@@ -92,6 +92,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
+    #if 0
     List sourceLocationFailures;
     if (!check_that_terms_have_locations(code, &sourceLocationFailures)) {
         std::cout << "Test snippet has terms missing locations in: "
@@ -101,6 +102,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         declare_current_test_failed();
         return;
     }
+    #endif
 
     int boolean_statements_found = 0;
     for (int i=0; i < assertions.length(); i++) {

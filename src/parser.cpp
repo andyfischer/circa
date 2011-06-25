@@ -538,6 +538,8 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
                 input->setBoolProp("output", true);
             } else if (symbolText == ":multiple") {
                 attrs->variableArgs = true;
+            } else if (symbolText == ":implied_rebind") {
+                input->setBoolProp("use-as-output", true);
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+symbolText);

@@ -42,13 +42,11 @@ namespace hashtable_members_function {
     {
         Type* hashType = unbox_type(kernel["Map"]);
 
-        Term* map_add = import_member_function(hashType, insert,
-                "add(Map, any, any) -> Map");
-        function_set_use_input_as_output(map_add, 0, true);
+        import_member_function(hashType, insert,
+                "add(Map :implied_rebind, any, any) -> Map");
         import_member_function(hashType, contains, "contains(Map, any) -> bool");
-        Term* map_remove = import_member_function(hashType, remove,
-                "remove(Map, any) -> Map");
-        function_set_use_input_as_output(map_remove, 0, true);
+        import_member_function(hashType, remove,
+                "remove(Map :implied_rebind, any) -> Map");
         import_member_function(hashType, get, "get(Map, any) -> any");
     }
 }

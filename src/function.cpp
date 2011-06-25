@@ -468,12 +468,6 @@ Term* derive_specialized_output_type(Term* function, Term* call)
     return outputType;
 }
 
-void function_set_use_input_as_output(Term* function, int index, bool value)
-{
-    Term* placeholder = function_t::get_input_placeholder(function, index);
-    placeholder->setBoolProp("use-as-output", value);
-}
-
 bool function_can_rebind_input(Term* function, int index)
 {
     if (function_t::get_variable_args(function))

@@ -68,10 +68,8 @@ namespace set_t {
     void setup_type(Type* type) {
         type->toString = set_t::to_string;
 
-        Term* set_add = import_member_function(type, set_t::hosted_add, "add(Set, any) -> Set");
-        function_set_use_input_as_output(set_add, 0, true);
-        Term* set_remove = import_member_function(type, set_t::remove, "remove(Set, any) -> Set");
-        function_set_use_input_as_output(set_remove, 0, true);
+        import_member_function(type, set_t::hosted_add, "add(Set :implied_rebind, any) -> Set");
+        import_member_function(type, set_t::remove, "remove(Set :implied_rebind, any) -> Set");
         import_member_function(type, set_t::contains, "contains(Set, any) -> bool");
 
     }

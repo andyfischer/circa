@@ -5,7 +5,7 @@ namespace list_members_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(append, "append(List, any) -> List")
+    CA_DEFINE_FUNCTION(append, "append(List :implied_rebind, any) -> List")
     {
         consume_input(CONTEXT, CALLER, 0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
@@ -38,7 +38,7 @@ namespace list_members_function {
         set_int(OUTPUT, list->length());
     }
 
-    CA_DEFINE_FUNCTION(insert, "insert(List, int, any) -> List")
+    CA_DEFINE_FUNCTION(insert, "insert(List :implied_rebind, int, any) -> List")
     {
         TaggedValue result;
         consume_input(CONTEXT, CALLER, 0, &result);
@@ -63,9 +63,6 @@ namespace list_members_function {
     {
         Type* listType = unbox_type(kernel["List"]);
         CA_SETUP_FUNCTIONS(listType->memberFunctions);
-
-        function_set_use_input_as_output(listType->memberFunctions["append"], 0, true);
-        function_set_use_input_as_output(listType->memberFunctions["insert"], 0, true);
     }
 
 } // namespace list_members_function

@@ -109,7 +109,6 @@ bool values_fit_function_dynamic(Term* func, List* list);
 Term* create_overloaded_function(Branch& branch, std::string const& name,
         TermList const& overloads);
 Term* derive_specialized_output_type(Term* function, Term* call);
-void function_set_use_input_as_output(Term* function, int index, bool value);
 
 // Returns whether the given function can rebind the input at 'index'. (The
 // calling code must still opt-in to this rebind.
