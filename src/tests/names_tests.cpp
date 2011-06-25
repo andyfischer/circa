@@ -205,8 +205,6 @@ void test_find_from_unique_name()
 
 void test_with_include()
 {
-    #if 0
-    TEST_DISABLED
     FakeFileSystem files;
     files["a"] = "namespace ns { a = 1 }";
 
@@ -216,7 +214,23 @@ void test_with_include()
     test_assert(a != NULL);
 
     test_assert(name_is_reachable_from(a, branch));
-    #endif
+}
+
+void name_with_colons()
+{
+    Branch branch;
+    Term* one = branch.compile("1");
+    branch.bindName(one, "qualified:name");
+
+    test_assert(branch["qualified:name"] == one);
+    test_assert(find_named(branch, "qualified:name") == one);
+
+    Branch& ns = create_namespace(branch, "ns");
+    Term* two = ns.compile("2");
+    ns.bindName(two, "another:name");
+
+    test_assert(branch["ns:another:name"] == two);
+    test_assert(find_named(branch, "ns:another:name") == two);
 }
 
 void register_tests()
@@ -232,7 +246,8 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_unique_names);
     REGISTER_TEST_CASE(names_tests::test_unique_names_for_anons);
     REGISTER_TEST_CASE(names_tests::test_find_from_unique_name);
-    REGISTER_TEST_CASE(names_tests::test_with_include);
+    //TEST_DISABLED REGISTER_TEST_CASE(names_tests::test_with_include);
+    REGISTER_TEST_CASE(names_tests::name_with_colons);
 }
 
 } // namespace names_tests
