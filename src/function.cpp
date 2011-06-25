@@ -485,6 +485,14 @@ bool function_can_rebind_input(Term* function, int index)
     return input->boolPropOptional("output", false);
 }
 
+bool function_implicitly_rebinds_input(Term* function, int index)
+{
+    Term* input = function_t::get_input_placeholder(function, index);
+    if (input == NULL)
+        return false;
+    return input->boolPropOptional("use-as-output", false);
+}
+
 bool function_call_rebinds_input(Term* term, int index)
 {
     return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";

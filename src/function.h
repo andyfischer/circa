@@ -111,8 +111,13 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
 Term* derive_specialized_output_type(Term* function, Term* call);
 void function_set_use_input_as_output(Term* function, int index, bool value);
 
-// Returns whether the given function can rebind the input at 'index'
+// Returns whether the given function can rebind the input at 'index'. (The
+// calling code must still opt-in to this rebind.
 bool function_can_rebind_input(Term* function, int index);
+
+// Returns whether the function will implicitly rebind the input at the given
+// index. (in practice, this only happens for some member-function calls).
+bool function_implicitly_rebinds_input(Term* function, int index);
 
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);

@@ -1290,50 +1290,6 @@ ParseResult unary_expression(Branch& branch, TokenStream& tokens, ParserCxt* con
     return atom_with_subscripts(branch, tokens, context);
 }
 
-ParseResult member_function_call(Branch& branch, Term* function, TermList const& _inputs,
-    ParserCxt* context)
-{
-    TermList inputs = _inputs;
-
-    Term* originalFunctionTerm = function;
-    Term* head = function->input(0);
-    Term* fieldNameTerm = function->input(1);
-    std::string const& fieldName = fieldNameTerm->asString();
-    std::string nameRebind;
-
-    Term* memberFunction = find_member_function(unbox_type(head->type), fieldName);
-
-    if (memberFunction != NULL) {
-        inputs.prepend(head);
-        function = memberFunction;
-
-        if (head->name != ""
-                && function_t::get_input_placeholder(function, 0)
-                    ->boolPropOptional("use-as-output", false))
-            nameRebind = head->name;
-
-        // copy functionName because fieldName will become invalid after remove_term.
-        std::string functionName = fieldName;
-
-        remove_term(fieldNameTerm);
-        remove_term(originalFunctionTerm);
-
-        refresh_locals_indices(branch);
-
-        Term* result = apply(branch, function, inputs, nameRebind);
-        set_input_syntax_hint(result, 0, "postWhitespace", "");
-        result->setStringProp("syntax:functionName", functionName);
-        result->setStringProp("syntax:declarationStyle", "member-function-call");
-
-        return ParseResult(result);
-    } else {
-        Term* func = unknown_identifier(branch, fieldName).term;
-        Term* result = apply(branch, func, inputs);
-        result->setStringProp("syntax:functionName", fieldName);
-        return ParseResult(result);
-    }
-}
-
 void function_call_inputs(Branch& branch, TokenStream& tokens, ParserCxt* context,
         TermList& arguments, ListSyntaxHints& inputHints)
 {
@@ -1360,38 +1316,74 @@ void function_call_inputs(Branch& branch, TokenStream& tokens, ParserCxt* contex
     }
 }
 
+ParseResult member_function_call(Branch& branch, TokenStream& tokens, ParserCxt* context, ParseResult root)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(DOT);
+    std::string functionName = tokens.consume(IDENTIFIER);
+
+    tokens.consume(LPAREN);
+
+    TermList inputs;
+    ListSyntaxHints inputHints;
+
+    // Parse inputs
+    function_call_inputs(branch, tokens, context, inputs, inputHints);
+    if (!tokens.nextIs(RPAREN))
+        return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+    tokens.consume(RPAREN);
+
+    inputs.prepend(root.term);
+
+    // Find the function
+    Term* function = find_member_function(unbox_type(root.term->type), functionName);
+
+    if (function == NULL) {
+        Term* func = unknown_identifier(branch, functionName).term;
+        Term* result = apply(branch, func, inputs);
+        result->setStringProp("syntax:functionName", functionName);
+        return ParseResult(result);
+    }
+
+    // Create the term
+    Term* term = apply(branch, function, inputs);
+
+    if (root.term->name != "" && function_implicitly_rebinds_input(function, 0))
+        branch.bindName(term, root.term->name);
+
+    inputHints.apply(term);
+    //set_input_syntax_hint(term, 0, "postWhitespace", "");
+    term->setStringProp("syntax:functionName", functionName);
+    term->setStringProp("syntax:declarationStyle", "member-function-call");
+    return ParseResult(term);
+}
+
+
 ParseResult function_call(Branch& branch, ParseResult head, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
     tokens.consume(LPAREN);
 
-    TermList arguments;
+    TermList inputs;
     ListSyntaxHints inputHints;
 
-    function_call_inputs(branch, tokens, context, arguments, inputHints);
+    function_call_inputs(branch, tokens, context, inputs, inputHints);
 
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(RPAREN);
     
     Term* function = head.term;
-    Term* result = NULL;
 
-    // Check if 'function' is a get_field term. If so, parse this as a member function call
-    if (function->function == GET_FIELD_FUNC) {
-        result = member_function_call(branch, function, arguments, context).term;
+    Term* result = apply(branch, function, inputs);
 
-    } else {
-
-        result = apply(branch, function, arguments);
-
-        // Store the function name that they used, if it wasn't the function's
-        // actual name (for example, the function might be inside a namespace).
-        if ((head.identifierName != "")
-                && (result->function->name != head.identifierName))
-            result->setStringProp("syntax:functionName", head.identifierName);
-    }
+    // Store the function name that they used, if it wasn't the function's
+    // actual name (for example, the function might be inside a namespace).
+    if ((head.identifierName != "")
+            && (result->function->name != head.identifierName))
+        result->setStringProp("syntax:functionName", head.identifierName);
 
     inputHints.apply(result);
 
@@ -1484,12 +1476,17 @@ ParseResult atom_with_subscripts(Branch& branch, TokenStream& tokens, ParserCxt*
 
         // Check for a.b, field access.
         } else if (tokens.nextIs(DOT)) {
-            tokens.consume(DOT);
 
-            if (!tokens.nextIs(IDENTIFIER))
+            if (!tokens.nextIs(IDENTIFIER, 1))
                 return compile_error_for_line(branch, tokens, startPosition,
                         "Expected identifier after .");
 
+            if (tokens.nextIs(LPAREN, 2)) {
+                result = member_function_call(branch, tokens, context, result);
+                continue;
+            }
+
+            tokens.consume(DOT);
             std::string ident = tokens.consume(IDENTIFIER);
             
             Term* term = apply(branch, GET_FIELD_FUNC, TermList(result.term, create_string(branch, ident)));

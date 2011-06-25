@@ -16,6 +16,7 @@ Important optimization tasks:
 Things that would have made lincoln.ca easier:
  - More sane message passing
  - More object methods
+ - Not all terms have location
  - Subroutines don't need to explicity declare output type
  - Declare a block that doesn't have an end marker (ends at file)
  - Rebind syntax on lexprs
