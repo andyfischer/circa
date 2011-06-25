@@ -456,21 +456,20 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
     bool isNative = false;
 
     // Optional list of qualifiers
-    while (tokens.nextIs(PLUS)) {
-        tokens.consume(PLUS);
-        std::string qualifierName = tokens.consume(IDENTIFIER);
-        if (qualifierName == "native")
+    while (tokens.nextIs(SYMBOL)) {
+        std::string symbolText = tokens.consume(SYMBOL);
+        if (symbolText == ":native")
             isNative = true;
-        else if (qualifierName == "throws")
+        else if (symbolText == ":throws")
             attrs->throws = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
-                    "Unrecognized qualifier: "+qualifierName);
+                    "Unrecognized symbol: "+symbolText);
 
-        qualifierName += possible_whitespace(tokens);
+        symbolText += possible_whitespace(tokens);
 
         result->setStringProp("syntax:properties", result->stringProp("syntax:properties")
-                + "+" + qualifierName);
+                + symbolText);
     }
 
     if (!tokens.nextIs(LPAREN))
@@ -527,22 +526,21 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         }
 
         // Optional list of qualifiers
-        while (tokens.nextIs(PLUS)) {
-            tokens.consume(PLUS);
-            std::string qualifierName = tokens.consume(IDENTIFIER);
+        while (tokens.nextIs(SYMBOL)) {
+            std::string symbolText = tokens.consume(SYMBOL);
 
             // TODO: store syntax hint
-            if (qualifierName == "ignore_error") {
+            if (symbolText == ":ignore_error") {
                 input->setBoolProp("ignore_error", true);
-            } else if (qualifierName == "optional") {
+            } else if (symbolText == ":optional") {
                 input->setBoolProp("optional", true);
-            } else if (qualifierName == "output" || qualifierName == "out") {
+            } else if (symbolText == ":output" || symbolText == ":out") {
                 input->setBoolProp("output", true);
-            } else if (qualifierName == "multiple") {
+            } else if (symbolText == ":multiple") {
                 attrs->variableArgs = true;
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
-                    "Unrecognized qualifier: "+qualifierName);
+                    "Unrecognized qualifier: "+symbolText);
             }
             possible_whitespace(tokens);
         }

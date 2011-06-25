@@ -135,6 +135,7 @@ Type TYPE_T;
 Type VOID_T;
 
 // Builtin symbols:
+TaggedValue OUT_SYMBOL;
 TaggedValue REPEAT_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
@@ -174,6 +175,7 @@ void create_primitive_types()
     string_t::setup_type(&ERROR_T);
 
     symbol_t::assign_new_symbol("repeat", &REPEAT_SYMBOL);
+    symbol_t::assign_new_symbol("out", &OUT_SYMBOL);
 }
 
 void update_bootstrapped_term(Term* term)

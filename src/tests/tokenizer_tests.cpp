@@ -91,7 +91,7 @@ void test_floats()
     test_assert(dotted_results[2].match == token::INTEGER);
 }
 
-void test_symbols1()
+void test_misc1()
 {
     token::TokenList results;
     token::tokenize(",()=?][<=>=", results);
@@ -117,32 +117,22 @@ void test_symbols1()
     test_assert(results[8].match == token::GTHANEQ);
 }
 
-void test_symbols2()
+void test_misc2()
 {
-    token::TokenList results;
-    token::tokenize("<>:;%...<-//&", results);
-    test_assert(results.size() == 9);
-    test_assert(results[0].text == "<");
-    test_assert(results[0].match == token::LTHAN);
-    test_assert(results[1].text == ">");
-    test_assert(results[1].match == token::GTHAN);
-    test_assert(results[2].text == ":");
-    test_assert(results[2].match == token::COLON);
-    test_assert(results[3].text == ";");
-    test_assert(results[3].match == token::SEMICOLON);
-    test_assert(results[4].text == "%");
-    test_assert(results[4].match == token::PERCENT);
-    test_assert(results[5].text == "...");
-    test_assert(results[5].match == token::ELLIPSIS);
-    test_assert(results[6].text == "<-");
-    test_assert(results[6].match == token::LEFT_ARROW);
-    test_assert(results[7].text == "//");
-    test_assert(results[7].match == token::DOUBLE_SLASH);
-    test_assert(results[8].text == "&");
-    test_assert(results[8].match == token::AMPERSAND);
+    TokenStream tokens("<>:;%...<-//&");
+    test_assert(tokens.consume(token::LTHAN) == "<");
+    test_assert(tokens.consume(token::GTHAN) == ">");
+    test_assert(tokens.consume(token::COLON) == ":");
+    test_assert(tokens.consume(token::SEMICOLON) == ";");
+    test_assert(tokens.consume(token::PERCENT) == "%");
+    test_assert(tokens.consume(token::ELLIPSIS) == "...");
+    test_assert(tokens.consume(token::LEFT_ARROW) == "<-");
+    test_assert(tokens.consume(token::DOUBLE_SLASH) == "//");
+    test_assert(tokens.consume(token::AMPERSAND) == "&");
+    test_assert(tokens.finished());
 }
 
-void test_symbols3()
+void test_misc3()
 {
     token::TokenList results;
     token::tokenize("&&!=..::", results);
@@ -395,6 +385,7 @@ void test_comment()
     test_equals(tokens.consume(token::INTEGER), "2");
     test_equals(tokens.consume(token::WHITESPACE), " ");
     test_equals(tokens.consume(token::COMMENT), "-- this is a comment");
+    test_assert(tokens.finished());
 
     tokens.reset("1 2 # this is a comment");
     test_equals(tokens.consume(token::INTEGER), "1");
@@ -402,6 +393,19 @@ void test_comment()
     test_equals(tokens.consume(token::INTEGER), "2");
     test_equals(tokens.consume(token::WHITESPACE), " ");
     test_equals(tokens.consume(token::COMMENT), "# this is a comment");
+    test_assert(tokens.finished());
+}
+
+void test_symbols()
+{
+    TokenStream tokens(":abc :a :1");
+    test_equals(tokens.consume(token::SYMBOL), ":abc");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::SYMBOL), ":a");
+    test_equals(tokens.consume(token::WHITESPACE), " ");
+    test_equals(tokens.consume(token::COLON), ":");
+    test_equals(tokens.consume(token::INTEGER), "1");
+    test_assert(tokens.finished());
 }
 
 void register_tests()
@@ -409,9 +413,9 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
     REGISTER_TEST_CASE(tokenizer_tests::test_floats);
-    REGISTER_TEST_CASE(tokenizer_tests::test_symbols1);
-    REGISTER_TEST_CASE(tokenizer_tests::test_symbols2);
-    REGISTER_TEST_CASE(tokenizer_tests::test_symbols3);
+    REGISTER_TEST_CASE(tokenizer_tests::test_misc1);
+    REGISTER_TEST_CASE(tokenizer_tests::test_misc2);
+    REGISTER_TEST_CASE(tokenizer_tests::test_misc3);
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_keywords2);
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
@@ -425,6 +429,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
     REGISTER_TEST_CASE(tokenizer_tests::test_preceding_indent);
     REGISTER_TEST_CASE(tokenizer_tests::test_comment);
+    REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
 }
 
 } // namespace tokenizer_tests

@@ -8,7 +8,7 @@ namespace return_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(return_func, "return(any +optional)")
+    CA_DEFINE_FUNCTION(return_func, "return(any :optional)")
     {
         CONTEXT->interruptSubroutine = true;
 

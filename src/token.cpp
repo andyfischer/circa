@@ -19,6 +19,7 @@ const char* get_token_text(int match)
         case COMMA: return ",";
         case AT_SIGN: return "@";
         case IDENTIFIER: return "IDENTIFIER";
+        case SYMBOL: return "SYMBOL";
         case INTEGER: return "INTEGER";
         case HEX_INTEGER: return "HEX_INTEGER";
         case FLOAT_TOKEN: return "FLOAT";
@@ -196,6 +197,7 @@ struct TokenizeContext
 
 void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
+void consume_symbol(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_comment(TokenizeContext& context);
 bool match_number(TokenizeContext &context);
@@ -435,18 +437,22 @@ void top_level_consume_token(TokenizeContext &context)
             break;
 
         case ':':
-            context.consume();
-            if (context.next() == '=') {
+            if (context.next(1) == '=') {
+                context.consume();
                 context.consume();
                 context.push(COLON_EQUALS);
                 return;
             }
-            else if (context.next() == ':') {
+            else if (context.next(1) == ':') {
+                context.consume();
                 context.consume();
                 context.push(DOUBLE_COLON);
                 return;
+            } else if (is_identifier_first_letter(context.next(1))) {
+                return consume_symbol(context);
             }
 
+            context.consume();
             context.push(COLON);
             return;
         case '+':
@@ -724,6 +730,19 @@ void consume_color_literal(TokenizeContext &context)
         context.push(COLOR, result);
     else
         context.push(UNRECOGNIZED, result);
+}
+
+void consume_symbol(TokenizeContext &context)
+{
+    std::stringstream text;
+
+    // consume the leading :
+    text << context.consume();
+
+    while (is_acceptable_inside_identifier(context.next()))
+        text << context.consume();
+
+    context.push(SYMBOL, text.str());
 }
 
 } // namespace token

@@ -11,7 +11,7 @@ namespace get_state_field_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(get_state_field,
-        "get_state_field(any container +optional, any default_value +optional) -> any")
+        "get_state_field(any container :optional, any default_value :optional) -> any")
     {
         Dict* stateContainer = NULL;
 

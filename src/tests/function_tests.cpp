@@ -162,7 +162,7 @@ namespace test_func_with_multiple_outputs {
     void simple()
     {
         Branch branch;
-        Term* f = branch.compile("def f(int a +out, int b +out) -> int");
+        Term* f = branch.compile("def f(int a :out, int b :out) -> int");
         install_function(f, f_eval);
         branch.compile("a = 2");
         branch.compile("b = 2");
@@ -180,7 +180,7 @@ namespace test_func_with_multiple_outputs {
 void multiple_output_static_typing()
 {
     Branch branch;
-    branch.compile("def f(int a +out, string b +out);");
+    branch.compile("def f(int a :out, string b :out);");
     Term* call = branch.compile("f(1, 'hi')");
     test_assert(get_output_type(call, 1) == INT_TYPE);
     test_assert(get_output_type(call, 2) == STRING_TYPE);

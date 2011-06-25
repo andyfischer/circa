@@ -10,7 +10,7 @@ namespace subroutine_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(subroutine_output,
-        "subroutine_output(any +optional +multiple)")
+        "subroutine_output(any :optional :multiple)")
     {
         List* out = List::lazyCast(&CONTEXT->subroutineOutput);
         out->resize(NUM_INPUTS);

@@ -97,7 +97,7 @@ namespace branch_members_function {
     void setup(Branch& kernel)
     {
         import_function(kernel, branch_ref,
-            "def branch_ref(any branch +ignore_error) -> Branch");
+            "def branch_ref(any branch :ignore_error) -> Branch");
 
         import_member_function(kernel["Branch"], get_terms,
                 "get_terms(Branch) -> List");

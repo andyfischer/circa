@@ -281,7 +281,7 @@ void reproduce_subroutine_headers()
 {
     round_trip_source("def f(int i) -> int;");
     round_trip_source("def f(NonexistantType i) -> int;");
-    round_trip_source("def f(int i +out) -> int;");
+    round_trip_source("def f(int i :out) -> int;");
     finish_source_repro_category();
 }
 

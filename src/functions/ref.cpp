@@ -13,7 +13,7 @@ namespace ref_function {
 
     void setup(Branch& kernel)
     {
-        REF_FUNC = import_function(kernel, ref, "ref(any +ignore_error) -> Ref");
+        REF_FUNC = import_function(kernel, ref, "ref(any :ignore_error) -> Ref");
     }
 }
 } // namespace circa

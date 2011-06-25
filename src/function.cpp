@@ -155,7 +155,7 @@ namespace function_t {
 
             if (function_can_rebind_input(term, i)) {
                 append_phrase(source, " ", term, token::WHITESPACE);
-                append_phrase(source, "+out", term, phrase_type::UNDEFINED);
+                append_phrase(source, ":out", term, phrase_type::UNDEFINED);
             }
         }
 

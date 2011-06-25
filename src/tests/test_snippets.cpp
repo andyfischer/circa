@@ -560,29 +560,29 @@ void test_swap()
 
 void test_subroutine_multiple_outputs()
 {
-    test_snippet("def f(int i +out) -> int { i += 7; return 2 }; a = 3; b = f(&a)",
+    test_snippet("def f(int i :out) -> int { i += 7; return 2 }; a = 3; b = f(&a)",
             "a == 10, b == 2");
-    test_snippet("def f(int i +out) { i += 7 }; a = 3; f(&a)", "a == 10");
-    test_snippet("def f(int a +out, int b +out, int c +out)\n"
+    test_snippet("def f(int i :out) { i += 7 }; a = 3; f(&a)", "a == 10");
+    test_snippet("def f(int a :out, int b :out, int c :out)\n"
                  "  a += 1\n  b += 2\n  c += 3\n"
                  "a = 10; b = 10; c = 10;\n"
                  "f(&a,&b,&c)",
                  "a == 11, b == 12, c == 13");
-    test_snippet("def f(int a +out, int b +out, int c +out)\n"
+    test_snippet("def f(int a :out, int b :out, int c :out)\n"
                  "  a += 1\n  b += 2\n  c += 3\n"
                  "a = 10; b = 10; c = 10;\n"
                  "f(a,&b,c)",
                  "a == 10, b == 12, c == 10");
-    test_snippet("def f(int a +out) { a = 4; return; a = 6 }; a = 0; f(&a)", "a == 4");
+    test_snippet("def f(int a :out) { a = 4; return; a = 6 }; a = 0; f(&a)", "a == 4");
 
     // this once caused an assert fail:
-    test_snippet("def f(int a, int b, int c +out) {}; f(1 2 3)", "");
+    test_snippet("def f(int a, int b, int c :out) {}; f(1 2 3)", "");
 }
 
 void test_recursion_and_multiple_outputs()
 {
     test_snippet(
-        "def tree(int depth, List leaves +out) {"
+        "def tree(int depth, List leaves :out) {"
         "  leaves.append(depth)"
         
         "  if depth >= 3 {"
