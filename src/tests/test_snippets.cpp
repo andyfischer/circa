@@ -21,6 +21,21 @@
 namespace circa {
 namespace test_snippets {
 
+bool check_that_terms_have_locations(Branch& branch, List* failures)
+{
+    bool allCorrect = true;
+    for (int i=0; i < branch.length(); i++) {
+        Term* term = branch[i];
+        if (!term->sourceLoc.defined()) {
+            List* failure = List::cast(failures->append(), 0);
+            set_ref(failure->append(), term);
+            set_string(failure->append(), get_term_source_text(term));
+            allCorrect = false;
+        }
+    }
+    return allCorrect;
+}
+
 void test_snippet(std::string codeStr, std::string assertionsStr)
 {
     Branch code;
@@ -72,6 +87,16 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     if (!branch_check_invariants_print_result(assertions, checkInvariantsOutput)) {
         std::cout << "Failed invariant in assertions: " << get_current_test_name() << std::endl;
         std::cout << checkInvariantsOutput.str();
+        print_branch(std::cout, code);
+        declare_current_test_failed();
+        return;
+    }
+
+    List sourceLocationFailures;
+    if (!check_that_terms_have_locations(code, &sourceLocationFailures)) {
+        std::cout << "Test snippet has terms missing locations in: "
+            << get_current_test_name() << std::endl;
+        std::cout << sourceLocationFailures.toString() << std::endl;
         print_branch(std::cout, code);
         declare_current_test_failed();
         return;

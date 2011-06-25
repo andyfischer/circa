@@ -53,4 +53,4 @@ struct TermSourceLocation
     }
 };
 
-}
+} // namespace circa
