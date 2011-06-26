@@ -19,12 +19,6 @@ CA_FUNCTION(empty_evaluate_no_touch_output);
 // Example function header: "function do-something(int, string) -> int"
 Term* import_function(Branch& branch, EvaluateFunc func, std::string const& header);
 
-Term* import_member_function(Type* type, EvaluateFunc evaluate,
-        std::string const& headerText);
-
-Term* import_member_function(Term* type, EvaluateFunc evaluate,
-        std::string const& headerText);
-
 // Install an evaluate function into an existing function object.
 void install_function(Term* function, EvaluateFunc evaluate);
 

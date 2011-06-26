@@ -29,20 +29,6 @@ Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& 
     return result;
 }
 
-Term* import_member_function(Type* type, EvaluateFunc evaluate, std::string const& header)
-{
-    Term* result = parser::compile(type->memberFunctions,
-            parser::function_decl, header);
-
-    function_t::get_evaluate(result) = evaluate;
-    return result;
-}
-
-Term* import_member_function(Term* type, EvaluateFunc evaluate, std::string const& header)
-{
-    return import_member_function(unbox_type(type), evaluate, header);
-}
-
 void install_function(Term* function, EvaluateFunc evaluate)
 {
     ca_assert(is_function(function));

@@ -113,11 +113,6 @@ struct Type
     // Attributes for this type.
     Branch attributes;
 
-    // memberFunctions is a list of Functions which 'belong' to this type.
-    // They are guaranteed to take an instance of this type as their first
-    // argument.
-    Branch memberFunctions;
-
     // Default value
     TaggedValue defaultTaggedValue;
 

@@ -5,6 +5,7 @@
 
 namespace circa {
 namespace set_t {
+
     bool contains(List* list, TaggedValue* value)
     {
         int numElements = list->numElements();
@@ -19,37 +20,6 @@ namespace set_t {
         if (contains(list, value))
             return;
         copy(value, list->append());
-    }
-
-    CA_FUNCTION(hosted_add)
-    {
-        copy(INPUT(0), OUTPUT);
-        List* output = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
-        if (!contains(output, value))
-            copy(value, output->append());
-    }
-
-    CA_FUNCTION(contains)
-    {
-        List* list = List::checkCast(INPUT(0));
-        TaggedValue* value = INPUT(1);
-        set_bool(OUTPUT, contains(list, value));
-    }
-
-    CA_FUNCTION(remove)
-    {
-        copy(INPUT(0), OUTPUT);
-        List* list = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
-
-        int numElements = list->numElements();
-        for (int index=0; index < numElements; index++) {
-            if (equals(value, list->get(index))) {
-                list_t::remove_and_replace_with_back(list, index);
-                return;
-            }
-        }
     }
     std::string to_string(TaggedValue* value)
     {
@@ -67,11 +37,6 @@ namespace set_t {
 
     void setup_type(Type* type) {
         type->toString = set_t::to_string;
-
-        import_member_function(type, set_t::hosted_add, "add(Set :implied_rebind, any) -> Set");
-        import_member_function(type, set_t::remove, "remove(Set :implied_rebind, any) -> Set");
-        import_member_function(type, set_t::contains, "contains(Set, any) -> bool");
-
     }
 
 } // namespace set_t

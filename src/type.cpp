@@ -75,16 +75,6 @@ namespace type_t {
         }
     }
 
-    CA_FUNCTION(name_accessor)
-    {
-        set_string(OUTPUT, as_type(INPUT(0))->name);
-    }
-
-    void setup_type(Term* type)
-    {
-        import_member_function(type, name_accessor, "name(Type) -> string");
-    }
-
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {
         return as_type(type)->remapPointers;
@@ -336,7 +326,6 @@ void clear_type_contents(Type* type)
     set_null(&type->defaultTaggedValue);
     clear_branch(&type->prototype);
     clear_branch(&type->attributes);
-    clear_branch(&type->memberFunctions);
 }
 
 void initialize_simple_pointer_type(Type* type)
@@ -384,9 +373,6 @@ Term* find_method(Branch& branch, Type* type, std::string const& name)
     Term* term = find_named(branch, qualifiedName);
     if (term != NULL && is_function(term))
         return term;
-
-    if (type->memberFunctions.contains(name))
-        return type->memberFunctions[name];
 
     if (type->parent != NULL)
         return find_method(branch, type->parent, name);

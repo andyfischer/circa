@@ -4,7 +4,6 @@
 #include "static_checking.h"
 
 namespace circa {
-
 namespace branch_methods_function {
 
     // homeless function, not used yet:

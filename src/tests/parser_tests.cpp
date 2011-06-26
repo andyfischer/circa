@@ -258,7 +258,7 @@ void test_dot_concatenation()
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
     test_assert(branch[1]->asInt() == 1);
-    test_equals(function_t::get_name(branch[2]->function), "add");
+    test_equals(function_t::get_name(branch[2]->function), "Set:add");
     test_assert(branch["s"] == s);
 }
 
