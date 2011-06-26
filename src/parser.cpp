@@ -1062,6 +1062,8 @@ ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserC
 {
     // Lookahead for a name binding.
     if (lookahead_match_leading_name_binding(tokens)) {
+        int startPosition = tokens.getPosition();
+
         std::string nameBinding = tokens.consume(IDENTIFIER);
         std::string preEqualsSpace = possible_whitespace(tokens);
         tokens.consume(EQUALS);
@@ -1078,6 +1080,7 @@ ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserC
         result.term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
         branch.bindName(result.term, nameBinding);
+        set_source_location(result.term, startPosition, tokens);
         return result;
     }
 
@@ -1384,6 +1387,7 @@ ParseResult method_call(Branch& branch, TokenStream& tokens, ParserCxt* context,
     //set_input_syntax_hint(term, 0, "postWhitespace", "");
     term->setStringProp("syntax:functionName", functionName);
     term->setStringProp("syntax:declarationStyle", "method-call");
+    set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
 
@@ -1932,16 +1936,18 @@ ParseResult unknown_identifier(Branch& branch, std::string const& name)
 
 ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
-    if (!tokens.nextIs(IDENTIFIER))
-        throw std::runtime_error("identifier() expected ident");
+    int startPosition = tokens.getPosition();
     
     std::string id = tokens.consume(IDENTIFIER);
 
-    Term* result = find_named(branch, id);
-    if (result == NULL)
-        return unknown_identifier(branch, id);
+    Term* term = find_named(branch, id);
+    if (term == NULL) {
+        ParseResult result = unknown_identifier(branch, id);
+        set_source_location(result.term, startPosition, tokens);
+        return result;
+    }
 
-    return ParseResult(result, id);
+    return ParseResult(term, id);
 }
 
 ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCxt* context)
