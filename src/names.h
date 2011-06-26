@@ -13,6 +13,16 @@ Term* get_named(Branch const& branch, std::string const& qualifiedName);
 // char* overload for use in GDB
 Term* get_named(Branch const& branch, const char* name);
 
+// If the string is a qualified name (such as "a:b:c"), returns the index
+// of the first colon. If the string isn't a qualified name then returns
+// strlen(name).
+unsigned find_qualified_name_separator(const char* name);
+
+// If the string is a qualified name (such as "a:b:c"), returns the string
+// of everything after the first colon (such as "b:c"). If it isn't a
+// qualified name, returns NULL.
+const char* split_qualified_name(const char* name);
+
 // Find the name binding that is active at the given branch index.
 Term* get_named_at(Branch& branch, int index, std::string const& name);
 Term* get_named_at(Term* location, std::string const& name);

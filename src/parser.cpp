@@ -453,14 +453,10 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
-    bool isNative = false;
-
     // Optional list of qualifiers
     while (tokens.nextIs(SYMBOL)) {
         std::string symbolText = tokens.consume(SYMBOL);
-        if (symbolText == ":native")
-            isNative = true;
-        else if (symbolText == ":throws")
+        if (symbolText == ":throws")
             attrs->throws = true;
         else
             return compile_error_for_line(branch, tokens, startPosition,
