@@ -526,7 +526,7 @@ void test_misc()
     test_snippet("l = []\nl.append([1])\n    ", "");
 }
 
-void test_member_functions()
+void test_methods1()
 {
     test_snippet("s = '123'; s.length()", "");
     test_snippet("type T { string s }; v = T(); v.s.length()", "");
@@ -534,6 +534,14 @@ void test_member_functions()
 
     // This once caused a failed assert in parser.cpp
     test_snippet("s = Set(); x = s.add(1)", "");
+}
+
+void test_methods2()
+{
+    test_snippet("def int:increment(i)->int { return i + 1 }",
+            "1.increment() == 2");
+    test_snippet("def int:increment(i)->int { return i + 1 }",
+            "int:increment(2) == 3");
 }
 
 void test_lists()
@@ -666,13 +674,6 @@ void test_multiple_name_assignment()
     test_snippet("a = b = c = 1", "a == 1; b == 1; c == 1");
 }
 
-void test_object_functions()
-{
-    test_snippet("def int:increment(i)->int { return i + 1 }",
-            "1.increment() == 2");
-    test_snippet("def int:increment(i)->int { return i + 1 }",
-            "int:increment(2) == 3");
-}
 
 void register_tests()
 {
@@ -705,7 +706,8 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
     REGISTER_TEST_CASE(test_snippets::test_misc);
-    REGISTER_TEST_CASE(test_snippets::test_member_functions);
+    REGISTER_TEST_CASE(test_snippets::test_methods1);
+    REGISTER_TEST_CASE(test_snippets::test_methods2);
     REGISTER_TEST_CASE(test_snippets::test_lists);
     REGISTER_TEST_CASE(test_snippets::test_type_check_functions);
     REGISTER_TEST_CASE(test_snippets::test_namespace);
@@ -716,7 +718,6 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_stateful_value_decl);
     REGISTER_TEST_CASE(test_snippets::test_dynamic_call);
     REGISTER_TEST_CASE(test_snippets::test_multiple_name_assignment);
-    REGISTER_TEST_CASE(test_snippets::test_object_functions);
 }
 
 } // namespace test_snippets

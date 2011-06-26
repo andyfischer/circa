@@ -1383,7 +1383,7 @@ ParseResult method_call(Branch& branch, TokenStream& tokens, ParserCxt* context,
     inputHints.apply(term);
     //set_input_syntax_hint(term, 0, "postWhitespace", "");
     term->setStringProp("syntax:functionName", functionName);
-    term->setStringProp("syntax:declarationStyle", "member-function-call");
+    term->setStringProp("syntax:declarationStyle", "method-call");
     return ParseResult(term);
 }
 

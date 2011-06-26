@@ -115,7 +115,7 @@ Term* derive_specialized_output_type(Term* function, Term* call);
 bool function_can_rebind_input(Term* function, int index);
 
 // Returns whether the function will implicitly rebind the input at the given
-// index. (in practice, this only happens for some member-function calls).
+// index. (in practice, this only happens for some method calls).
 bool function_implicitly_rebinds_input(Term* function, int index);
 
 // Returns whether this term rebinds the input at 'index'

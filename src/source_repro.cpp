@@ -162,7 +162,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
 
         if (!term->boolPropOptional("syntax:no-parens", false))
             append_phrase(source, ")", term, token::RPAREN);
-    } else if (declarationStyle == "member-function-call") {
+    } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
         append_phrase(source, ".", term, phrase_type::UNDEFINED);
@@ -209,8 +209,8 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
 
     if (input == NULL) return;
 
-    bool memberCall =
-        term->stringPropOptional("syntax:declarationStyle", "") == "member-function-call";
+    bool methodCall =
+        term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
 
     int firstVisible = get_first_visible_input_index(term);
 
@@ -218,12 +218,12 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
         return;
 
     int visibleIndex = inputIndex - firstVisible;
-    if (memberCall) visibleIndex--;
+    if (methodCall) visibleIndex--;
 
     std::string defaultPre = visibleIndex > 0 ? " " : "";
     std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
 
-    if (memberCall && inputIndex == 0)
+    if (methodCall && inputIndex == 0)
         defaultPost = "";
 
     append_phrase(source,
@@ -252,16 +252,16 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
         term, phrase_type::WHITESPACE);
 }
 
-bool is_member_function_call(Term* term)
+bool is_method_call(Term* term)
 {
-    return term->stringPropOptional("syntax:declarationStyle", "") == "member-function-call";
+    return term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
 }
 
 bool has_implicit_name_binding(Term* term)
 {
     if (term->name == "")
         return false;
-    if (!is_member_function_call(term))
+    if (!is_method_call(term))
         return false;
     return function_t::get_input_placeholder(term->function, 0)
         ->boolPropOptional("use-as-output", false);

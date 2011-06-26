@@ -461,7 +461,7 @@ void test_namespace()
     test_assert(c->asInt() == 5);
 }
 
-void test_member_function_calls()
+void test_method_calls()
 {
     Branch branch;
     branch.eval("x = [1 2 3]");
@@ -810,7 +810,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_float_division);
     REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
-    REGISTER_TEST_CASE(parser_tests::test_member_function_calls);
+    REGISTER_TEST_CASE(parser_tests::test_method_calls);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);

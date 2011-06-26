@@ -178,7 +178,7 @@ void reproduce_infix() {
     finish_source_repro_category();
 }
 
-void reproduce_member_calls() {
+void reproduce_methods() {
     round_trip_source("'string'.length()");
     round_trip_source("Map().add(1,2)");
     round_trip_source("Map().add(1, 2)");
@@ -451,7 +451,7 @@ void register_tests() {
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_function_calls);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebound_input);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_infix);
-    REGISTER_TEST_CASE(source_repro_snippets::reproduce_member_calls);
+    REGISTER_TEST_CASE(source_repro_snippets::reproduce_methods);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_rebinding);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_if);
     REGISTER_TEST_CASE(source_repro_snippets::reproduce_lists);
