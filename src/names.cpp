@@ -85,12 +85,11 @@ Term* get_named(Branch const& branch, const char* name)
 
 int find_qualified_name_separator(const char* name)
 {
-    int i = 0;
-    for (i=0; name[i] != 0; i++) {
+    for (int i=0; name[i] != 0; i++) {
         if (name[i] == ':' && name[i+1] != 0)
             return i;
     }
-    return i;
+    return -1;
 }
 
 bool exposes_nested_names(Term* term)

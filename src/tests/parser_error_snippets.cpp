@@ -91,6 +91,7 @@ void register_every_possible_parse_error()
     test_case("nonexistant = nonexistant + 1");
     test_case("for i in 0..1 { print([0 [0 ]) }");
     test_case("a = 1; a = x");
+    test_case("def NonexistantType:func()");
 }
 
 void test_every_parse_error()

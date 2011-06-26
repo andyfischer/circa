@@ -476,10 +476,23 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
     Branch& contents = nested_contents(result);
 
     // Check if this is a member function declaration
-    // check if it's a qualified name
-    // syntax error if it's 3 separated names
-    // syntax error if the type is not recognized
-    // insert a 'self' argument that has the same type as the one mentioned in the name
+    bool memberFunction = false;
+    int qualifierLoc = find_qualified_name_separator(functionName.c_str());
+
+    if (qualifierLoc >= 0) {
+        memberFunction = true;
+        std::string typeName = functionName.substr(0, qualifierLoc);
+        std::string actualFuncName = functionName.substr(qualifierLoc+1, functionName.length());
+
+        Term* type = find_named(branch, typeName);
+        if (type == NULL || !is_type(type))
+            return compile_error_for_line(branch, tokens, startPosition,
+                "Not a type: " + typeName);
+
+        // Insert a 'self' argument
+        Term* self = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), "self");
+        change_declared_type(self, type);
+    }
 
     // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
@@ -511,9 +524,8 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         // Create an input placeholder term
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
 
-        if (is_type(typeTerm)) {
+        if (is_type(typeTerm))
             change_declared_type(input, typeTerm);
-        }
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
@@ -1343,7 +1355,7 @@ ParseResult member_function_call(Branch& branch, TokenStream& tokens, ParserCxt*
     inputs.prepend(root.term);
 
     // Find the function
-    Term* function = find_member_function(unbox_type(root.term->type), functionName);
+    Term* function = find_member_function(branch, unbox_type(root.term->type), functionName);
 
     if (function == NULL) {
         Term* func = unknown_identifier(branch, functionName).term;
