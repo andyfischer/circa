@@ -668,9 +668,9 @@ void test_multiple_name_assignment()
 
 void test_object_functions()
 {
-    test_snippet("def int:increment()->int { return self + 1 }",
+    test_snippet("def int:increment(i)->int { return i + 1 }",
             "1.increment() == 2");
-    test_snippet("def int:increment()->int { return self + 1 }",
+    test_snippet("def int:increment(i)->int { return i + 1 }",
             "int:increment(2) == 3");
 }
 

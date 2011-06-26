@@ -374,7 +374,7 @@ Term* create_implicit_tuple_type(TermList const& types)
     return result;
 }
 
-Term* find_member_function(Branch& branch, Type* type, std::string const& name)
+Term* find_method(Branch& branch, Type* type, std::string const& name)
 {
     ca_assert(type->name != "");
     std::string qualifiedName = type->name + ":" + name;
@@ -387,7 +387,7 @@ Term* find_member_function(Branch& branch, Type* type, std::string const& name)
         return type->memberFunctions[name];
 
     if (type->parent != NULL)
-        return find_member_function(branch, type->parent, name);
+        return find_method(branch, type->parent, name);
 
     return NULL;
 }

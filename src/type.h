@@ -215,7 +215,7 @@ void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch& kernel);
 Term* create_implicit_tuple_type(TermList const& types);
-Term* find_member_function(Branch& branch, Type* type, std::string const& name);
+Term* find_method(Branch& branch, Type* type, std::string const& name);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 

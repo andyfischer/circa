@@ -475,26 +475,28 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     Branch& contents = nested_contents(result);
 
-    // Check if this is a member function declaration
-    bool memberFunction = false;
+    // Check if this is a method declaration
+    bool isMethod = false;
     int qualifierLoc = find_qualified_name_separator(functionName.c_str());
+    Term* methodType = NULL;
 
     if (qualifierLoc >= 0) {
-        memberFunction = true;
+        isMethod = true;
         std::string typeName = functionName.substr(0, qualifierLoc);
         std::string actualFuncName = functionName.substr(qualifierLoc+1, functionName.length());
 
-        Term* type = find_named(branch, typeName);
-        if (type == NULL || !is_type(type))
+        methodType = find_named(branch, typeName);
+        if (methodType == NULL || !is_type(methodType))
             return compile_error_for_line(branch, tokens, startPosition,
-                "Not a type: " + typeName);
+                "Not a methodType: " + typeName);
 
         // Insert a 'self' argument
-        Term* self = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), "self");
-        change_declared_type(self, type);
+        //Term* self = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), "self");
+        //change_declared_type(self, methodType);
     }
 
     // Consume input arguments
+    int inputIndex = 0;
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
         bool isHiddenStateArgument = false;
@@ -508,7 +510,12 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
             isHiddenStateArgument = true;
         }
 
-        Term* typeTerm = type_expr(branch, tokens, context).term;
+        // For input0 of a method, don't parse an explicit type name.
+        Term* typeTerm = NULL;
+        if (inputIndex == 0 && isMethod)
+            typeTerm = methodType;
+        else
+            typeTerm = type_expr(branch, tokens, context).term;
 
         possible_whitespace(tokens);
 
@@ -566,6 +573,9 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
             tokens.consume(COMMA);
         }
+
+        inputIndex++;
+
     } // Done consuming input arguments
 
     for (int i=0; i < contents.length(); i++)
@@ -1059,7 +1069,7 @@ ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserC
 
         ParseResult result = name_binding_expression(branch, tokens, context);
         
-        // If the term already has a name (this is the case for member-function syntax
+        // If the term already has a name (this is the case for method syntax
         // and for unknown_identifier), then make a copy.
         if (result.term->name != "")
             result.term = apply(branch, COPY_FUNC, TermList(result.term));
@@ -1334,7 +1344,7 @@ void function_call_inputs(Branch& branch, TokenStream& tokens, ParserCxt* contex
     }
 }
 
-ParseResult member_function_call(Branch& branch, TokenStream& tokens, ParserCxt* context, ParseResult root)
+ParseResult method_call(Branch& branch, TokenStream& tokens, ParserCxt* context, ParseResult root)
 {
     int startPosition = tokens.getPosition();
 
@@ -1355,7 +1365,7 @@ ParseResult member_function_call(Branch& branch, TokenStream& tokens, ParserCxt*
     inputs.prepend(root.term);
 
     // Find the function
-    Term* function = find_member_function(branch, unbox_type(root.term->type), functionName);
+    Term* function = find_method(branch, unbox_type(root.term->type), functionName);
 
     if (function == NULL) {
         Term* func = unknown_identifier(branch, functionName).term;
@@ -1500,7 +1510,7 @@ ParseResult atom_with_subscripts(Branch& branch, TokenStream& tokens, ParserCxt*
                         "Expected identifier after .");
 
             if (tokens.nextIs(LPAREN, 2)) {
-                result = member_function_call(branch, tokens, context, result);
+                result = method_call(branch, tokens, context, result);
                 continue;
             }
 
