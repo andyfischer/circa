@@ -475,6 +475,12 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     Branch& contents = nested_contents(result);
 
+    // Check if this is a member function declaration
+    // check if it's a qualified name
+    // syntax error if it's 3 separated names
+    // syntax error if the type is not recognized
+    // insert a 'self' argument that has the same type as the one mentioned in the name
+
     // Consume input arguments
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
@@ -508,7 +514,6 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         if (is_type(typeTerm)) {
             change_declared_type(input, typeTerm);
         }
-        hide_from_source(input);
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
@@ -550,6 +555,9 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
             tokens.consume(COMMA);
         }
     } // Done consuming input arguments
+
+    for (int i=0; i < contents.length(); i++)
+        hide_from_source(contents[i]);
 
     if (!tokens.nextIs(RPAREN))
         return compile_error_for_line(result, tokens, startPosition);

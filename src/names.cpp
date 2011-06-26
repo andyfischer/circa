@@ -43,9 +43,14 @@ Term* get_named(Branch const& branch, std::string const& name)
     if (it != branch.names.end())
         return it->second;
     
-    // 'name' can be a qualified name. Find the end of the first identifier, stopping
-    // at the : character or the end of string.
-    unsigned nameEnd = find_qualified_name_separator(name.c_str());
+    // 'name' can be a qualified name. Find the end of the first identifier.
+    int separatorLoc = find_qualified_name_separator(name.c_str());
+    bool qualifiedName = separatorLoc != -1;
+    size_t nameEnd;
+    if (separatorLoc < 0)
+        nameEnd = strlen(name.c_str());
+    else
+        nameEnd = unsigned(separatorLoc);
 
     // Find this name in branch's namespace
     Term* prefix = NULL;
@@ -66,12 +71,11 @@ Term* get_named(Branch const& branch, std::string const& name)
 
     // Recursively search inside prefix. TODO: should do this without allocating
     // a new string.
-    unsigned name_length = name.length();
-    if (nameEnd == name_length)
-        return NULL;
+    if (qualifiedName)
+        return get_named(nested_contents(prefix),
+            name.substr(nameEnd+1, name.length()));
 
-    return get_named(nested_contents(prefix),
-            name.substr(nameEnd+1, name_length));
+    return NULL;
 }
 
 Term* get_named(Branch const& branch, const char* name)
@@ -79,7 +83,7 @@ Term* get_named(Branch const& branch, const char* name)
     return get_named(branch, std::string(name));
 }
 
-unsigned find_qualified_name_separator(const char* name)
+int find_qualified_name_separator(const char* name)
 {
     int i = 0;
     for (i=0; name[i] != 0; i++) {
@@ -87,14 +91,6 @@ unsigned find_qualified_name_separator(const char* name)
             return i;
     }
     return i;
-}
-const char* split_qualified_name(const char* name)
-{
-    for (int i=0; name[i] != 0; i++) {
-        if (name[i] == ':' && name[i+1] != 0)
-            return &name[i+1];
-    }
-    return NULL;
 }
 
 bool exposes_nested_names(Term* term)
