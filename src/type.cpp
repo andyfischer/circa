@@ -352,7 +352,7 @@ Term* create_implicit_tuple_type(TermList const& types)
     list_t::setup_type(unbox_type(result));
     Branch& prototype = unbox_type(result)->prototype;
 
-    unbox_type(result)->parent = unbox_type(LIST_TYPE);
+    unbox_type(result)->parent = LIST_TYPE;
     register_type_pointer(unbox_type(result), unbox_type(LIST_TYPE));
 
     for (int i=0; i < types.length(); i++) {
@@ -363,10 +363,8 @@ Term* create_implicit_tuple_type(TermList const& types)
     return result;
 }
 
-Term* find_method(Branch& branch, Type* type, std::string const& name)
+Term* find_method(Branch& branch, Term* type, std::string const& name)
 {
-    // TODO: May want to use the type's Term* instead of Type* for name lookup.
-
     ca_assert(type->name != "");
     std::string qualifiedName = type->name + ":" + name;
 
@@ -374,8 +372,15 @@ Term* find_method(Branch& branch, Type* type, std::string const& name)
     if (term != NULL && is_function(term))
         return term;
 
-    if (type->parent != NULL)
-        return find_method(branch, type->parent, name);
+    // If not found, look in the branch where the type was declared.
+    if (&branch != type->owningBranch) {
+        term = find_named(*type->owningBranch, qualifiedName);
+        if (term != NULL && is_function(term))
+            return term;
+    }
+
+    if (unbox_type(type)->parent != NULL)
+        return find_method(branch, unbox_type(type)->parent, name);
 
     return NULL;
 }

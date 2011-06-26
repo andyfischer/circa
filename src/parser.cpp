@@ -364,8 +364,7 @@ ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
 
     // Avoid an infinite loop
     if (initialPosition == tokens.getPosition())
-        throw std::runtime_error("parser::statement is stuck, next token is: "
-                + tokens.next().text);
+        internal_error("parser::statement is stuck, next token is: " + tokens.next().text);
 
     // Some functions have a post-compile step.
     post_compile_term(result.term);
@@ -1368,7 +1367,7 @@ ParseResult method_call(Branch& branch, TokenStream& tokens, ParserCxt* context,
     inputs.prepend(root.term);
 
     // Find the function
-    Term* function = find_method(branch, unbox_type(root.term->type), functionName);
+    Term* function = find_method(branch, root.term->type, functionName);
 
     if (function == NULL) {
         Term* func = unknown_identifier(branch, functionName).term;
