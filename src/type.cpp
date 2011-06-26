@@ -376,6 +376,8 @@ Term* create_implicit_tuple_type(TermList const& types)
 
 Term* find_method(Branch& branch, Type* type, std::string const& name)
 {
+    // TODO: May want to use the type's Term* instead of Type* for name lookup.
+
     ca_assert(type->name != "");
     std::string qualifiedName = type->name + ":" + name;
 

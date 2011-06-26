@@ -64,5 +64,5 @@ namespace list_methods_function {
         CA_SETUP_FUNCTIONS(kernel);
     }
 
-} // namespace list_members_function
+} // namespace list_methods_function
 } // namespace circa

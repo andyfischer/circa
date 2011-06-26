@@ -1387,7 +1387,6 @@ ParseResult method_call(Branch& branch, TokenStream& tokens, ParserCxt* context,
     return ParseResult(term);
 }
 
-
 ParseResult function_call(Branch& branch, ParseResult head, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();

@@ -330,6 +330,8 @@ void initialize_compound_types(Branch& kernel)
     indexable_t::setup_type(unbox_type(indexableType));
 
     callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
+
+    RECT_I_TYPE_TERM = parse_type(kernel, "type Rect_i { int x1, int y1, int x2, int y2 }");
 }
 
 void pre_setup_builtin_functions(Branch& kernel)
@@ -377,17 +379,10 @@ void parse_hosted_types(Branch& kernel)
     parse_type(kernel, "type Point { number x, number y }");
     parse_type(kernel, "type Point_i { int x, int y }");
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
-    RECT_I_TYPE_TERM = parse_type(kernel, "type Rect_i { int x1, int y1, int x2, int y2 }");
 
     COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
 
     color_t::setup_type(unbox_type(COLOR_TYPE));
-}
-
-void post_setup_types()
-{
-    string_t::postponed_setup_type(&STRING_T);
-    ref_t::postponed_setup_type(&REF_T);
 }
 
 void parse_builtin_script(Branch& kernel)
@@ -417,7 +412,6 @@ export_func void circa_initialize()
     setup_builtin_functions(*KERNEL);
     post_setup_functions(*KERNEL);
     parse_hosted_types(*KERNEL);
-    post_setup_types();
 
     type_initialize_kernel(*KERNEL);
 
