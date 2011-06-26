@@ -666,6 +666,14 @@ void test_multiple_name_assignment()
     test_snippet("a = b = c = 1", "a == 1; b == 1; c == 1");
 }
 
+void test_object_functions()
+{
+    test_snippet("def int:increment()->int { return self + 1 }",
+            "1.increment() == 2");
+    test_snippet("def int:increment()->int { return self + 1 }",
+            "int:increment(2) == 3");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(test_snippets::test_strings);
@@ -708,6 +716,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_stateful_value_decl);
     REGISTER_TEST_CASE(test_snippets::test_dynamic_call);
     REGISTER_TEST_CASE(test_snippets::test_multiple_name_assignment);
+    REGISTER_TEST_CASE(test_snippets::test_object_functions);
 }
 
 } // namespace test_snippets

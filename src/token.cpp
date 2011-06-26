@@ -635,6 +635,11 @@ void consume_number(TokenizeContext &context)
             if (context.next(1) == '.')
                 break;
 
+            // Another special case, if the dot is followed by an identifier, then
+            // don't consume it here. It might be an object call.
+            if (is_identifier_first_letter(context.next(1)))
+                break;
+
             text << context.consume();
             dot_encountered = true;
         }

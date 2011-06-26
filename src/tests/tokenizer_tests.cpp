@@ -408,6 +408,15 @@ void test_symbols()
     test_assert(tokens.finished());
 }
 
+void test_number_followed_by_dot_call()
+{
+    TokenStream tokens("1.something");
+    test_equals(tokens.consume(token::INTEGER), "1");
+    test_equals(tokens.consume(token::DOT), ".");
+    test_equals(tokens.consume(token::IDENTIFIER), "something");
+    test_assert(tokens.finished());
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
@@ -430,6 +439,7 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_preceding_indent);
     REGISTER_TEST_CASE(tokenizer_tests::test_comment);
     REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
+    REGISTER_TEST_CASE(tokenizer_tests::test_number_followed_by_dot_call);
 }
 
 } // namespace tokenizer_tests
