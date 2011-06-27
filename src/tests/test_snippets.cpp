@@ -538,15 +538,13 @@ void test_methods1()
 
 void test_methods2()
 {
-    test_snippet("def int:increment(i)->int { return i + 1 }",
-            "1.increment() == 2");
-    test_snippet("def int:increment(i)->int { return i + 1 }",
-            "int:increment(2) == 3");
-    test_snippet("def Ref:name_w_suffix(s, string suffix)->string { return concat(s.name(),suffix) }",
+    test_snippet("def int.increment(i)->int { return i + 1 }", "1.increment() == 2");
+    //test_snippet("def int.increment(i)->int { return i + 1 }", "int.increment(2) == 3");
+    test_snippet("def Ref.name_w_suffix(s, string suffix)->string { return concat(s.name(),suffix) }",
             "a = 1; ref(a).name_w_suffix('_suff') == 'a_suff'");
 
     // Lookup a method inside a namespace.
-    test_snippet("namespace ns { type T { int i } def T:str(s)->string { return concat(s.i) } }",
+    test_snippet("namespace ns { type T { int i } def T.str(s)->string { return concat(s.i) } }",
             "t = ns:T([1]); t.str() == '1'");
 }
 

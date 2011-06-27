@@ -10,7 +10,7 @@ namespace type_methods_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, name_accessor, "Type:name(self) -> string");
+        import_function(kernel, name_accessor, "Type.name(self) -> string");
     }
 }
 }

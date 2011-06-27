@@ -5,14 +5,14 @@ namespace list_methods_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(append, "List:append(self :implied_rebind, any) -> List")
+    CA_DEFINE_FUNCTION(append, "List.append(self :implied_rebind, any) -> List")
     {
         consume_input(CONTEXT, CALLER, 0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
         consume_input(CONTEXT, CALLER, 1, result->append());
     }
 
-    CA_DEFINE_FUNCTION(extend, "List:extend(self, List) -> List")
+    CA_DEFINE_FUNCTION(extend, "List.extend(self, List) -> List")
     {
         consume_input(CONTEXT, CALLER, 0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
@@ -27,18 +27,18 @@ namespace list_methods_function {
             copy(additions->get(i), result->get(oldLength + i));
     }
 
-    CA_DEFINE_FUNCTION(count, "List:count(self) -> int")
+    CA_DEFINE_FUNCTION(count, "List.count(self) -> int")
     {
         List* list = List::checkCast(INPUT(0));
         set_int(OUTPUT, list->length());
     }
-    CA_DEFINE_FUNCTION(length, "List:length(self) -> int")
+    CA_DEFINE_FUNCTION(length, "List.length(self) -> int")
     {
         List* list = List::checkCast(INPUT(0));
         set_int(OUTPUT, list->length());
     }
 
-    CA_DEFINE_FUNCTION(insert, "List:insert(self :implied_rebind, int, any) -> List")
+    CA_DEFINE_FUNCTION(insert, "List.insert(self :implied_rebind, int, any) -> List")
     {
         TaggedValue result;
         consume_input(CONTEXT, CALLER, 0, &result);
@@ -47,7 +47,7 @@ namespace list_methods_function {
         swap(&result, OUTPUT);
     }
 
-    CA_DEFINE_FUNCTION(slice, "List:slice(self, int start, int fin) -> List")
+    CA_DEFINE_FUNCTION(slice, "List.slice(self, int start, int fin) -> List")
     {
         List* input = List::checkCast(INPUT(0));
         int start = INT_INPUT(1);

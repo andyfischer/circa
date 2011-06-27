@@ -58,9 +58,9 @@ namespace string_methods_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, length, "string:length(_) -> int");
-        import_function(kernel, substr, "string:substr(_,int,int) -> string");
-        import_function(kernel, slice,  "string:slice(_,int,int) -> string");
+        import_function(kernel, length, "string.length(_) -> int");
+        import_function(kernel, substr, "string.substr(_,int,int) -> string");
+        import_function(kernel, slice,  "string.slice(_,int,int) -> string");
     }
 
 }

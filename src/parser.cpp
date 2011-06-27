@@ -434,12 +434,32 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(IDENTIFIER)
-            // A few builtin functions have names which are keywords:
+            // These keywords are allowed as function names (used by builtins)
             && !tokens.nextIs(FOR) && !tokens.nextIs(IF) && !tokens.nextIs(INCLUDE))
         return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
 
     // Function name
-    std::string functionName = tokens.consume();
+    std::string functionName = tokens.consume(IDENTIFIER);
+
+    bool isMethod = false;
+    Term* methodType = NULL;
+
+    // Check if this is a method declaration (declared as Typename.funcname)
+    if (tokens.nextIs(DOT)) {
+        isMethod = true;
+
+        tokens.consume(DOT);
+
+        if (!tokens.nextIs(IDENTIFIER))
+            return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after .");
+
+        std::string typeName = functionName;
+        methodType = find_named(branch, typeName);
+        functionName += "." + tokens.consume(IDENTIFIER);
+
+        if (methodType == NULL || !is_type(methodType))
+            return compile_error_for_line(branch, tokens, startPosition, "Not a type: " + typeName);
+    }
 
     Term* result = create_value(branch, FUNCTION_TYPE, functionName);
     initialize_function(result);
@@ -474,9 +494,10 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     Branch& contents = nested_contents(result);
 
-    // Check if this is a method declaration
-    bool isMethod = false;
     int qualifierLoc = find_qualified_name_separator(functionName.c_str());
+
+    ca_assert(qualifierLoc == -1);
+    #if 0
     Term* methodType = NULL;
 
     if (qualifierLoc >= 0) {
@@ -488,11 +509,8 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         if (methodType == NULL || !is_type(methodType))
             return compile_error_for_line(branch, tokens, startPosition,
                 "Not a methodType: " + typeName);
-
-        // Insert a 'self' argument
-        //Term* self = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), "self");
-        //change_declared_type(self, methodType);
     }
+    #endif
 
     // Consume input arguments
     int inputIndex = 0;

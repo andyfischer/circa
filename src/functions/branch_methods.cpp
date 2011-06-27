@@ -29,7 +29,7 @@ namespace branch_methods_function {
         set_branch(OUTPUT, (INPUT_TERM(0)->nestedContents));
     }
 
-    CA_DEFINE_FUNCTION(get_terms, "Branch:get_terms(self) -> List")
+    CA_DEFINE_FUNCTION(get_terms, "Branch.get_terms(self) -> List")
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
@@ -41,7 +41,7 @@ namespace branch_methods_function {
             set_ref(output[i], branch->get(i));
     }
 
-    CA_DEFINE_FUNCTION(get_term, "Branch:get_term(self, int index) -> Ref")
+    CA_DEFINE_FUNCTION(get_term, "Branch.get_term(self, int index) -> Ref")
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
@@ -51,7 +51,7 @@ namespace branch_methods_function {
         set_ref(OUTPUT, branch->get(index));
     }
 
-    CA_DEFINE_FUNCTION(format_source, "Branch:format_source(self) -> StyledSource")
+    CA_DEFINE_FUNCTION(format_source, "Branch.format_source(self) -> StyledSource")
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
@@ -61,13 +61,13 @@ namespace branch_methods_function {
         format_branch_source((StyledSource*) output, *branch);
     }
 
-    CA_DEFINE_FUNCTION(has_static_error, "Branch:has_static_error(self) -> bool")
+    CA_DEFINE_FUNCTION(has_static_error, "Branch.has_static_error(self) -> bool")
     {
         Branch* branch = as_branch(INPUT(0));
         set_bool(OUTPUT, has_static_errors_cached(*branch));
     }
 
-    CA_DEFINE_FUNCTION(get_static_errors, "Branch:get_static_errors(self) -> List")
+    CA_DEFINE_FUNCTION(get_static_errors, "Branch.get_static_errors(self) -> List")
     {
         Branch* branch = as_branch(INPUT(0));
 
@@ -77,7 +77,7 @@ namespace branch_methods_function {
             copy(&branch->staticErrors, OUTPUT);
     }
 
-    CA_DEFINE_FUNCTION(get_static_errors_formatted, "Branch:get_static_errors_formatted(self) -> List")
+    CA_DEFINE_FUNCTION(get_static_errors_formatted, "Branch.get_static_errors_formatted(self) -> List")
     {
         Branch* branch = as_branch(INPUT(0));
 
@@ -90,7 +90,7 @@ namespace branch_methods_function {
             format_static_error(list[i], out[i]);
     }
 
-    CA_DEFINE_FUNCTION(evaluate, "Branch:evaluate()")
+    CA_DEFINE_FUNCTION(evaluate, "Branch.evaluate()")
     {
         Branch* branch = as_branch(INPUT(0));
         evaluate_branch_internal_with_state(CONTEXT, CALLER, *branch);

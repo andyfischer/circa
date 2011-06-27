@@ -166,22 +166,22 @@ namespace ref_methods_function {
 
     void setup(Branch& kernel)
     {
-        import_function(kernel, get_name, "Ref:name(self) -> string");
-        import_function(kernel, hosted_to_string, "Ref:to_string(_) -> string");
+        import_function(kernel, get_name, "Ref.name(self) -> string");
+        import_function(kernel, hosted_to_string, "Ref.to_string(_) -> string");
         import_function(kernel, hosted_to_source_string,
-                "Ref:to_source_string(_) -> string");
-        import_function(kernel, get_function, "Ref:function(_) -> Ref");
-        import_function(kernel, assign, "Ref:assign(_, any)");
-        import_function(kernel, tweak, "Ref:tweak(_, int steps)");
-        import_function(kernel, asint, "Ref:asint(_) -> int");
-        import_function(kernel, asfloat, "Ref:asfloat(_) -> number");
-        import_function(kernel, get_input, "Ref:input(_, int) -> Ref");
-        import_function(kernel, get_inputs, "Ref:inputs(_) -> List");
-        import_function(kernel, num_inputs, "Ref:num_inputs(_) -> int");
+                "Ref.to_source_string(_) -> string");
+        import_function(kernel, get_function, "Ref.function(_) -> Ref");
+        import_function(kernel, assign, "Ref.assign(_, any)");
+        import_function(kernel, tweak, "Ref.tweak(_, int steps)");
+        import_function(kernel, asint, "Ref.asint(_) -> int");
+        import_function(kernel, asfloat, "Ref.asfloat(_) -> number");
+        import_function(kernel, get_input, "Ref.input(_, int) -> Ref");
+        import_function(kernel, get_inputs, "Ref.inputs(_) -> List");
+        import_function(kernel, num_inputs, "Ref.num_inputs(_) -> int");
         import_function(kernel, get_source_location,
-                "Ref:source_location(_) -> Rect_i");
-        import_function(kernel, global_id, "Ref:global_id(_) -> string");
-        import_function(kernel, get_properties, "Ref:properties(_) -> Map");
+                "Ref.source_location(_) -> Rect_i");
+        import_function(kernel, global_id, "Ref.global_id(_) -> string");
+        import_function(kernel, get_properties, "Ref.properties(_) -> Map");
     }
 }
 }

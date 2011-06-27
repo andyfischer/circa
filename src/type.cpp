@@ -366,15 +366,15 @@ Term* create_implicit_tuple_type(TermList const& types)
 Term* find_method(Branch& branch, Term* type, std::string const& name)
 {
     ca_assert(type->name != "");
-    std::string qualifiedName = type->name + ":" + name;
+    std::string searchName = type->name + "." + name;
 
-    Term* term = find_named(branch, qualifiedName);
+    Term* term = find_named(branch, searchName);
     if (term != NULL && is_function(term))
         return term;
 
     // If not found, look in the branch where the type was declared.
     if (&branch != type->owningBranch) {
-        term = find_named(*type->owningBranch, qualifiedName);
+        term = find_named(*type->owningBranch, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
