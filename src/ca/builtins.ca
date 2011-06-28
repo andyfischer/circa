@@ -135,6 +135,21 @@ def interp_rect(Rect a, Rect b, number ratio) -> Rect
     result = for i in 0..4 { a[i] + (b[i] - a[i]) * ratio }
     return Rect(result)
 
+def bezier3(number t, List points) -> Point
+    "Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1]"
+    p0 = points[0] -> Point
+    p1 = points[1] -> Point
+    p2 = points[2] -> Point
+    return p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t)
+
+def bezier4(number t, List points) -> Point
+    "Cubic bezier curve, with 4 control points. t must be in the range of [0, 1]"
+    p0 = points[0] -> Point
+    p1 = points[1] -> Point
+    p2 = points[2] -> Point
+    p3 = points[3] -> Point
+    return p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t)
+
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
 

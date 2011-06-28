@@ -25,11 +25,10 @@ def thick_line(Point a, Point b, number width, Color color)
 
 def draw_circle(Point p, number radius, Color color)
     -- Dumb guess on how many points to use
-    steps = (round(radius / 3) + 10)
-    min(@steps, 15)
+    steps = 20
 
     points = for step in 0..steps
-        [cos(step / steps), sin(step / steps)] * radius + p
+        [cos(360* step / steps), sin(360 * step / steps)] * radius + p
 
     gl:line_loop(points, color)
 

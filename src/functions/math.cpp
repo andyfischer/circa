@@ -119,6 +119,11 @@ namespace math_function {
         float in = FLOAT_INPUT(0);
         set_float(OUTPUT, in * in);
     }
+    CA_DEFINE_FUNCTION(cube, "cube(number) -> number; 'Cube function'")
+    {
+        float in = FLOAT_INPUT(0);
+        set_float(OUTPUT, in * in * in);
+    }
 
     CA_DEFINE_FUNCTION(sqrt, "sqrt(number) -> number; 'Square root'")
     {

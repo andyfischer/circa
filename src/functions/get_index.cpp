@@ -10,6 +10,13 @@ namespace get_index_function {
     CA_DEFINE_FUNCTION(get_index, "get_index(Indexable, int) -> any")
     {
         int index = as_int(INPUT(1));
+
+        if (index < 0) {
+            char indexStr[40];
+            sprintf(indexStr, "Negative index: %d", index);
+            return error_occurred(CONTEXT, CALLER, indexStr);
+        }
+
         TaggedValue* result = get_index(INPUT(0), index);
 
         if (result == NULL) {
