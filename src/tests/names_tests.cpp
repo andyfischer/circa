@@ -1,6 +1,8 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include <circa.h>
+#include "circa.h"
+
+#include "fake_filesystem.h"
 
 namespace circa {
 namespace names_tests {

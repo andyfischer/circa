@@ -4,7 +4,7 @@
 
 namespace circa {
 
-typedef int WeakPtr;
+typedef size_t WeakPtr;
 
 WeakPtr weak_ptr_create(void* address);
 void* get_weak_ptr(WeakPtr ptr);

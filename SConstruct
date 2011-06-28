@@ -124,9 +124,8 @@ for env in all_envs:
         env.AddPostAction(result, 'install_name_tool -change build/libcirca_d.dylib '
                 + '@executable_path/libcirca_d.dylib '+binaryFile)
     
-# Default build target is debug command-line binary.
-circa_cl = circa_cl_apps['debug']
-Default(circa_cl)
+# Default build target is command-line binary that supports unit tests.
+Default(circa_cl_apps['test'])
 
 ########################### Plastic ###############################
 

@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "evaluation.h"
+
 namespace circa {
 namespace eval_context_t {
 

@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "point.h"
+
 namespace circa {
 
 float Point::getX()

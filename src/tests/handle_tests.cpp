@@ -2,6 +2,10 @@
 
 #include <circa.h>
 
+#include "fake_filesystem.h"
+#include "storage.h"
+#include "tagged_value.h"
+#include "type.h"
 #include "types/handle.h"
 
 namespace circa {

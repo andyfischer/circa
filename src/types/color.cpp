@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#pragma once
+#include "source_repro.h"
+#include "token.h"
 
 namespace circa {
 namespace color_t {
