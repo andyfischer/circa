@@ -17,8 +17,11 @@
 // to each be compiled as a separate module.
 #include "../libs/box2d/box2d.cpp"
 #include "../libs/opengl/opengl.cpp"
-#include "../libs/osc/osc.cpp"
 #include "../libs/cairo/cairo.cpp"
+
+#if PLASTIC_USE_OSC
+#include "../libs/osc/osc.cpp"
+#endif
 
 #if PLASTIC_USE_FMOD
 #include "../libs/fmod/fmod.cpp"
@@ -215,7 +218,11 @@ bool setup_functions(circa::Branch& runtime)
 
     box2d_support::setup(runtime);
     opengl_support::setup(runtime);
+
+#if PLASTIC_USE_OSC
     osc_support::setup(runtime);
+#endif
+
     cairo_support::setup(runtime);
 
     return true;

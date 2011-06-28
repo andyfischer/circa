@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 """
-
 This script goes out on the internets, downloads the various dependencies needed
 for Plastic, and reorganizes them into a build-friendly arrangement.
-
 """
 
 import os, shutil
+
+TempDir = 'build/temp'
 
 def mkdir(path):
     parent_dir = os.path.dirname(path)
@@ -16,21 +16,21 @@ def mkdir(path):
     if not os.path.exists(path):
         os.mkdir(path)
 
-def download_file_from_the_internets(url, filename):
-    print "Downloading "+url+" to "+filename
+def download_file_from_the_internets(url, localFilename=None):
+    if localFilename is None:
+        localFilename = os.path.join(TempDir, os.path.basename(url))
     import urllib
     webFile = urllib.urlopen(url)
-    localFile = open(filename, 'wb')
+    localFile = open(localFilename, 'wb')
     localFile.write(webFile.read())
     webFile.close()
     localFile.close()
-    return filename
+    return localFilename
 
 def unzip_file(filename, dir):
-    print "Unzipping "+filename+" to "+dir
     import zipfile
 
-    if not os.path.exists(dir): os.mkdir(dir)
+    mkdir(dir)
 
     zf = zipfile.ZipFile(filename)
     for name in zf.namelist():
@@ -41,6 +41,10 @@ def unzip_file(filename, dir):
             f = open(path, 'wb')
             f.write(zf.read(name))
             f.close()
+
+def download_and_unzip(url):
+    file = download_file_from_the_internets(url)
+    unzip_file(file, TempDir)
 
 def rmtree(path):
     if os.path.exists(path):
@@ -60,42 +64,38 @@ def copytree(src, dst):
 
 
 def main():
-    print 'Cleaning build/temp and build/deps'
-    rmtree('build/deps')
-    rmtree('build/temp')
+    #print 'Cleaning build/temp'
+    #rmtree('build/temp')
 
+    mkdir('deps')
     mkdir('build/temp')
-    mkdir('build/deps/include')
-    mkdir('build/deps/lib')
 
     # glew
-    glew_zip = download_file_from_the_internets(
-            "http://downloads.sourceforge.net/project/glew/glew/1.5.1/glew-1.5.1-win32.zip?use_mirror=softlayer",
-            "build/temp/glew-1.5.1.zip")
-    unzip_file(glew_zip, 'build/temp')
-    copytree('build/temp/glew/include', 'build/deps/include')
-    copytree('build/temp/glew/lib', 'build/deps/lib')
-    copytree('build/temp/glew/bin', 'build/bin')
+    download_and_unzip(
+            "http://downloads.sourceforge.net/project/glew/glew/1.5.1/glew-1.5.1-win32.zip")
+    copytree('build/temp/glew/include', 'deps/include')
+    copytree('build/temp/glew/lib', 'deps/lib')
+    copytree('build/temp/glew/bin', 'deps/bin')
 
     # SDL
-    SDL_zip = download_file_from_the_internets(
-            "http://cloud.github.com/downloads/andyfischer/circa/SDL_deps.zip",
-            "build/temp/SDL_deps.zip")
-    unzip_file(SDL_zip, 'build/temp')
+    download_and_unzip("http://www.libsdl.org/release/SDL-devel-1.2.14-VC8.zip")
+    copytree('build/temp/SDL-1.2.14/include', 'deps/include')
+    copytree('build/temp/SDL-1.2.14/lib', 'deps/lib')
 
-    copytree('build/temp/SDL_deps/SDL-1.2.13/include',      'build/deps/include')
-    copytree('build/temp/SDL_deps/SDL-1.2.13/lib',          'build/deps/lib')
-    copytree('build/temp/SDL_deps/SDL_image-1.2.7/include', 'build/deps/include')
-    copytree('build/temp/SDL_deps/SDL_image-1.2.7/lib',     'build/deps/lib')
-    copytree('build/temp/SDL_deps/SDL_mixer-1.2.8/include', 'build/deps/include')
-    copytree('build/temp/SDL_deps/SDL_mixer-1.2.8/lib',     'build/deps/lib')
-    copytree('build/temp/SDL_deps/SDL_ttf-2.0.9/include',   'build/deps/include')
-    copytree('build/temp/SDL_deps/SDL_ttf-2.0.9/lib',       'build/deps/lib')
-    copytree('build/temp/SDL_deps/bin',                     'build/bin')
+    # SDL_ttf
+    download_and_unzip("http://www.libsdl.org/projects/SDL_ttf/release/SDL_ttf-devel-2.0.10-VC.zip")
+    copytree('build/temp/SDL_image-1.2.10/include', 'deps/include')
+    copytree('build/temp/SDL_image-1.2.10/lib', 'deps/lib')
 
-    print 'Cleaning build/temp'
-    rmtree('build/temp')
+    # SDL_image
+    download_and_unzip("http://www.libsdl.org/projects/SDL_image/release/SDL_image-devel-1.2.10-VC.zip")
+    copytree('build/temp/SDL_ttf-2.0.10/include', 'deps/include')
+    copytree('build/temp/SDL_ttf-2.0.10/lib', 'deps/lib')
 
-    print 'Include files are in build/deps/include'
-    print 'Library files are in build/deps/lib'
-    print 'Binary files are in build/bin'
+    # Box2d
+    download_and_unzip("http://box2d.googlecode.com/files/Box2D_v2.1.2.zip")
+    copytree('build/temp/Box2D_v2.1.2/Box2D/Box2D', 'deps/include/Box2D')
+
+
+if __name__ == '__main__':
+    main()

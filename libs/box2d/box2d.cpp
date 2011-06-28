@@ -16,17 +16,17 @@ namespace box2d_support {
 b2World *g_world = NULL;
 b2Body *g_groundBody = NULL; // used for mouse joints
 
-float c_timestep = 1.0/60.0;
+double c_timestep = 1.0/60.0;
 int c_velocityIterations = 6;
 int c_positionIterations = 2;
 
 // Scale between screen & world coordinates. Box2d says that it likes objects
 // to have a size between 0.1 and 10 units.
-float screen_to_world(float screen) { return screen / 10.0; }
-float world_to_screen(float world) { return world * 10.0; }
+double screen_to_world(double screen) { return screen / 10.0; }
+double world_to_screen(double world) { return world * 10.0; }
 
-float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
-float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
+double radians_to_degrees(double radians) { return radians * 180.0 / M_PI; }
+double degrees_to_radians(double unit) { return unit * M_PI / 180.0; }
 
 void b2Vec2_to_point(b2Vec2 const& vec, TaggedValue* point)
 {

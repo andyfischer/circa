@@ -149,13 +149,12 @@ def use_sdl(env):
     if WINDOWS:
         env.Append(LIBS=['opengl32.lib'])
 
-        env.Append(CPPPATH=['build/deps/include'])
-        env.Append(LIBS=['build/deps/lib/SDL.lib'])
-        env.Append(LIBS=['build/deps/lib/SDLmain.lib'])
-        env.Append(LIBS=['build/deps/lib/SDL_image.lib'])
-        env.Append(LIBS=['build/deps/lib/SDL_mixer.lib'])
-        env.Append(LIBS=['build/deps/lib/SDL_ttf.lib'])
-        env.Append(LIBS=['build/deps/lib/glew32.lib'])
+        env.Append(CPPPATH=['deps/include'])
+        env.Append(LIBS=['deps/lib/SDL.lib'])
+        env.Append(LIBS=['deps/lib/SDLmain.lib'])
+        env.Append(LIBS=['deps/lib/SDL_image.lib'])
+        env.Append(LIBS=['deps/lib/SDL_ttf.lib'])
+        env.Append(LIBS=['deps/lib/glew32.lib'])
 
     env.Append(CPPPATH=['#src'])
 
