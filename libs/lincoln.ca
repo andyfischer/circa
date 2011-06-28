@@ -7,9 +7,9 @@ namespace mode
     list_available_configs = 1
     highlight_config = 2
 
-current_mode = receive_last('lincoln.current_mode', 0)
-listed_configs = receive_last('lincoln.config_list', [])
-highlighted_config = receive_last('lincoln.highlight_config' null)
+current_mode = receive_stateful('lincoln.current_mode', 0)
+listed_configs = receive_stateful('lincoln.config_list', [])
+highlighted_config = receive_stateful('lincoln.highlighted_config' null)
 
 -- Public functions
 
@@ -35,10 +35,14 @@ namespace activerect
 
     if transition_from != null
         r = time_since_target_change / time_for_full_transition
+        if rect == Rect()
+            r = 1.0
+
         rect = interp_rect(transition_from transition_to r)
         send('lincoln.should_redraw' true)
         and(@reached_target false)
-        if r > 1
+
+        if r >= 1
             transition_from = null
             rect = transition_to
 
@@ -57,7 +61,7 @@ namespace activerect
         if once()
             send('lincoln.should_redraw' true)
 
-    def blend_color(Color c) -> Color
+    def correct_color(Color c) -> Color
         c[3] = c[3] * opacity
         return c
 
@@ -68,18 +72,18 @@ namespace activerect
         p1 = [rect.x1 rect.y1]
         width = rect.x2 - rect.x1
         height = rect.y2 - rect.y1
-        cairo:new_sub_path(cr)
+        cr.new_sub_path()
         radius = 12.0
-        cairo:arc(cr, p1 + [width - radius, radius] radius, -90, 0)
-        cairo:arc(cr, p1 + [width - radius, height - radius], radius, 0, 90)
-        cairo:arc(cr, p1 + [radius, height - radius], radius, 90, 180)
-        cairo:arc(cr, p1 + [radius, radius], radius, 180, 270)
-        cairo:close_path(cr)
-        cairo:set_source_color(cr blend_color(#d08))
-        cairo:fill_preserve(cr)
-        cairo:set_source_color(cr blend_color(#00f8))
-        cairo:set_line_width(cr 10.0)
-        cairo:stroke(cr)
+        cr.arc(p1 + [width - radius, radius] radius, -90, 0)
+        cr.arc(p1 + [width - radius, height - radius], radius, 0, 90)
+        cr.arc(p1 + [radius, height - radius], radius, 90, 180)
+        cr.arc(p1 + [radius, radius], radius, 180, 270)
+        cr.close_path()
+        cr.set_source_color(#d08 -> correct_color)
+        cr.fill_preserve()
+        cr.set_source_color(#00f8 -> correct_color)
+        cr.set_line_width(10.0)
+        cr.stroke()
 
     defer_draw([draw])
 
@@ -96,13 +100,11 @@ def draw_highlighted_config(cairo:Context cr)
         Ref(@highlighted_config)
         name = highlighted_config.name()
         value = highlighted_config.to_string()
-    str = concat(name ' = ' value)
+    str = concat(name ': ' value)
 
-    if changed(str) trace('hi') --send('lincoln.should_redraw' true)
-
-    cairo:select_font_face(cr "Sans")
-    cairo:set_font_size(cr 20.0)
-    str_extents = cairo:text_extents(cr str)
+    cr.select_font_face("Sans")
+    cr.set_font_size(20.0)
+    str_extents = cr.text_extents(str)
 
     str_width = str_extents.size[0]
     width = str_width + gutter*2
@@ -110,20 +112,84 @@ def draw_highlighted_config(cairo:Context cr)
     height = text_height + gutter*2
 
     -- draw text
-    cairo:set_source_color(cr activerect:blend_color(#fff))
-    cairo:move_to(cr inner_loc+[0 text_height])
-    cairo:show_text(cr str)
+    cr.set_source_color(activerect:correct_color(#fff))
+    cr.move_to(inner_loc+[0 text_height])
+    cr.show_text(str)
 
     send('lincoln.active.size' to_rect(topleft [width height]))
 
 def draw_config_list(cairo:Context cr)
     send('lincoln.active.size' [100 350 300 400])
 
+    configs = listed_configs
+
+    type Layout {
+        string str
+        Point size
+        Ref term
+    }
+
+    cr.set_font_size(12.0)
+
+    -- Loop through each config and get layout
+    content_height = 0.0
+    content_width = 0.0
+    text_spacing = 6.0
+
+    layouts = for c in configs
+        Ref(@c)
+        str = concat(c.name() ': ' c.to_string())
+        size = cr.text_extents(str).size -> Point
+        content_height += size.y + text_spacing
+        max(@content_width size.x)
+        Layout([str size c])
+
+    rect_size = [content_width content_height] -> Point
+
+    topleft = [30 30] -> Point
+    gutter = 15
+    active_rect = to_rect(topleft - [gutter gutter] rect_size + [gutter gutter]*2)
+    send('lincoln.active.size' active_rect)
+
+    i = 0
+    y = topleft.y
+    for layout in layouts
+        Layout(@layout)
+        loc = [topleft.x y]
+        height = Point(layout.size).y
+
+        -- Highlight rect
+        rect = to_rect(loc layout.size)
+        if mouse_over(rect)
+            cr.set_source_color(#000)
+
+        if mouse_clicked(rect)
+            send('lincoln.selected_config' layout.term)
+
+        cr.set_source_color(activerect:correct_color(#fff))
+        cr.move_to(loc + [0 height])
+        cr.show_text(layout.str)
+        y += height + text_spacing
+
+
 if current_mode == mode:highlight_config
     defer_draw([draw_highlighted_config])
     send('lincoln.active.opacity' 1.0)
+    send('lincoln.should_redraw' true)
+elif current_mode == mode:list_available_configs
+    defer_draw([draw_config_list])
+    send('lincoln.active.opacity' 1.0)
+    send('lincoln.should_redraw' true)
 else
     send('lincoln.active.opacity' 0.0)
+
+namespace handle_input
+    selected_config = receive_last('lincoln.selected_config' null)
+
+    if selected_config != null
+        send('lincoln.current_mode' mode:highlight_config)
+        send('lincoln.highlighted_config' selected_config)
+
 
 
 namespace post_frame
@@ -143,10 +209,10 @@ namespace post_frame
         cr = cairo:create_context_for_surface(surface)
 
         -- Clear the buffer
-        cairo:save(cr)
-        cairo:set_operator(cr cairo:Operator:clear)
-        cairo:paint(cr)
-        cairo:restore(cr)
+        cr.save()
+        cr.set_operator(cairo:Operator:clear)
+        cr.paint()
+        cr.restore()
 
         -- run the command list
         for command in commandList
@@ -161,3 +227,4 @@ namespace post_frame
         cairo:upload_surface_to_opengl(surface texture)
 
     opengl:draw_texture_as_quad(texture to_rect([0 0] window_size))
+

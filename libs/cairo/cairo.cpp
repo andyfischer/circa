@@ -264,27 +264,27 @@ void setup(Branch& kernel)
     install_type(ns["Context"], &g_cairoContext_t);
     install_type(ns["FontFace"], &g_cairoFontFace_t);
 
-    install_function(ns["save"], save);
-    install_function(ns["restore"], restore);
     install_function(ns["create_context_for_surface"], create_context_for_surface);
-    install_function(ns["stroke"], stroke);
-    install_function(ns["paint"], paint);
-    install_function(ns["set_source_color"], set_source_color);
-    install_function(ns["fill_preserve"], fill_preserve);
-    install_function(ns["set_operator"], set_operator);
+    install_function(ns["Context.save"], save);
+    install_function(ns["Context.restore"], restore);
+    install_function(ns["Context.stroke"], stroke);
+    install_function(ns["Context.paint"], paint);
+    install_function(ns["Context.set_source_color"], set_source_color);
+    install_function(ns["Context.fill_preserve"], fill_preserve);
+    install_function(ns["Context.set_operator"], set_operator);
     install_function(ns["create_image_surface"], create_image_surface);
-    install_function(ns["select_font_face"], select_font_face);
-    install_function(ns["set_font_size"], set_font_size);
-    install_function(ns["set_font_face"], set_font_face);
-    install_function(ns["show_text"], show_text);
-    install_function(ns["text_extents"], text_extents);
-    install_function(ns["move_to"], move_to);
-    install_function(ns["curve_to"], curve_to);
-    install_function(ns["line_to"], line_to);
-    install_function(ns["arc"], arc);
-    install_function(ns["new_sub_path"], new_sub_path);
-    install_function(ns["close_path"], close_path);
-    install_function(ns["set_line_width"], set_line_width);
+    install_function(ns["Context.select_font_face"], select_font_face);
+    install_function(ns["Context.set_font_size"], set_font_size);
+    install_function(ns["Context.set_font_face"], set_font_face);
+    install_function(ns["Context.show_text"], show_text);
+    install_function(ns["Context.text_extents"], text_extents);
+    install_function(ns["Context.move_to"], move_to);
+    install_function(ns["Context.curve_to"], curve_to);
+    install_function(ns["Context.line_to"], line_to);
+    install_function(ns["Context.arc"], arc);
+    install_function(ns["Context.new_sub_path"], new_sub_path);
+    install_function(ns["Context.close_path"], close_path);
+    install_function(ns["Context.set_line_width"], set_line_width);
     install_function(ns["upload_surface_to_opengl"], upload_surface_to_opengl);
 }
 

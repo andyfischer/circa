@@ -6,49 +6,11 @@
 namespace circa {
 namespace branch_methods_function {
 
-    // homeless function, not used yet:
-    bool is_considered_config(Term* term)
-    {
-        if (term == NULL) return false;
-        if (term->name == "") return false;
-        if (!is_value(term)) return false;
-        if (is_get_state(term)) return false;
-        if (is_hidden(term)) return false;
-
-        // ignore branch-based types
-        //if (is_branch(term)) return false;
-        if (is_type(term)) return false;
-
-        return true;
-    }
-
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(branch_ref, "def branch_ref(any branch :ignore_error) -> Branch")
     {
         set_branch(OUTPUT, (INPUT_TERM(0)->nestedContents));
-    }
-
-    CA_DEFINE_FUNCTION(get_terms, "Branch.get_terms(self) -> List")
-    {
-        Branch* branch = as_branch(INPUT(0));
-        if (branch == NULL)
-            return error_occurred(CONTEXT, CALLER, "NULL branch");
-
-        List& output = *List::cast(OUTPUT, branch->length());
-
-        for (int i=0; i < branch->length(); i++)
-            set_ref(output[i], branch->get(i));
-    }
-
-    CA_DEFINE_FUNCTION(get_term, "Branch.get_term(self, int index) -> Ref")
-    {
-        Branch* branch = as_branch(INPUT(0));
-        if (branch == NULL)
-            return error_occurred(CONTEXT, CALLER, "NULL branch");
-
-        int index = INT_INPUT(1);
-        set_ref(OUTPUT, branch->get(index));
     }
 
     CA_DEFINE_FUNCTION(format_source, "Branch.format_source(self) -> StyledSource")
@@ -96,6 +58,61 @@ namespace branch_methods_function {
         evaluate_branch_internal_with_state(CONTEXT, CALLER, *branch);
     }
 
+    // Reflection
+
+    CA_DEFINE_FUNCTION(get_terms, "Branch.get_terms(self) -> List")
+    {
+        Branch* branch = as_branch(INPUT(0));
+        if (branch == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL branch");
+
+        List& output = *List::cast(OUTPUT, branch->length());
+
+        for (int i=0; i < branch->length(); i++)
+            set_ref(output[i], branch->get(i));
+    }
+
+    CA_DEFINE_FUNCTION(get_term, "Branch.get_term(self, int index) -> Ref")
+    {
+        Branch* branch = as_branch(INPUT(0));
+        if (branch == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL branch");
+
+        int index = INT_INPUT(1);
+        set_ref(OUTPUT, branch->get(index));
+    }
+
+    bool is_considered_config(Term* term)
+    {
+        if (term == NULL) return false;
+        if (term->name == "") return false;
+        if (!is_value(term)) return false;
+        if (is_get_state(term)) return false;
+        if (is_hidden(term)) return false;
+        if (is_function(term)) return false;
+
+        // ignore branch-based types
+        //if (is_branch(term)) return false;
+        if (is_type(term)) return false;
+
+        return true;
+    }
+
+    CA_DEFINE_FUNCTION(get_configs, "Branch.list_configs(self) -> List")
+    {
+        Branch* branch = as_branch(INPUT(0));
+        if (branch == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL branch");
+
+        List& output = *List::cast(OUTPUT, 0);
+
+        for (int i=0; i < branch->length(); i++) {
+            Term* term = branch->get(i);
+            if (is_considered_config(term))
+                set_ref(output.append(), term);
+        }
+    }
+    
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);

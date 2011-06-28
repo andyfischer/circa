@@ -92,7 +92,7 @@ namespace include_function {
         save_and_consume_state(CALLER, &prevScopeState, &context->currentScopeState);
         swap(&context->currentScopeState, &prevScopeState);
 
-        set_null(OUTPUT);
+        set_branch(OUTPUT, &contents);
     }
     void include_post_compile(Term* term)
     {
@@ -109,7 +109,7 @@ namespace include_function {
     void setup(Branch& kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
-                "include(string filename)");
+                "include(string filename) -> Branch");
         get_function_attrs(INCLUDE_FUNC)->postCompile = include_post_compile;
 
         import_function(kernel, load_script,

@@ -95,6 +95,7 @@ void register_every_possible_parse_error()
     test_case("def List%");
     test_case("def List.%");
     test_case("def List.func%");
+    test_case("def qualified:name()");
 }
 
 void test_every_parse_error()

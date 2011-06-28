@@ -10,34 +10,34 @@ namespace cairo
     namespace Operator { clear = 0, source = 1, over = 2 }
 
     -- Contexts
-    def save(Context cr)
-    def restore(Context cr)
     def create_context_for_surface(Surface s) -> Context
-    def stroke(Context cr)
-    def paint(Context cr)
-    def set_source_color(Context cr, Color color)
-    def fill_preserve(Context cr)
-    def set_operator(Context cr, int operator)
+    def Context.save(self)
+    def Context.restore(self)
+    def Context.stroke(self)
+    def Context.paint(self)
+    def Context.set_source_color(self, Color color)
+    def Context.fill_preserve(self)
+    def Context.set_operator(self, int operator)
 
     -- Surfaces
     def create_image_surface(Point_i size) -> Surface
 
     -- Text
-    def select_font_face(Context cr, string family)
-    def set_font_size(Context cr, number size)
-    def set_font_face(Context cr, FontFace font)
-    def show_text(Context cr, string s)
-    def text_extents(Context cr, string s) -> TextExtents
+    def Context.select_font_face(self, string family)
+    def Context.set_font_size(self, number size)
+    def Context.set_font_face(self, FontFace font)
+    def Context.show_text(self, string s)
+    def Context.text_extents(self, string s) -> TextExtents
 
     -- Paths
-    def move_to(Context cr, Point p)
-    def curve_to(Context cr, Point control1, Point control2, Point p3)
-    def line_to(Context cr, Point p)
-    def arc(Context cr, Point center, number radius, number angle1, number angle2)
-    def new_sub_path(Context cr)
-    def close_path(Context cr)
+    def Context.move_to(self, Point p)
+    def Context.curve_to(self, Point control1, Point control2, Point p3)
+    def Context.line_to(self, Point p)
+    def Context.arc(self, Point center, number radius, number angle1, number angle2)
+    def Context.new_sub_path(self)
+    def Context.close_path(self)
 
-    def set_line_width(Context cr, number width)
+    def Context.set_line_width(self, number width)
 
     -- Rendering
 

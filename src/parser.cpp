@@ -495,22 +495,9 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
     Branch& contents = nested_contents(result);
 
     int qualifierLoc = find_qualified_name_separator(functionName.c_str());
-
-    ca_assert(qualifierLoc == -1);
-    #if 0
-    Term* methodType = NULL;
-
-    if (qualifierLoc >= 0) {
-        isMethod = true;
-        std::string typeName = functionName.substr(0, qualifierLoc);
-        std::string actualFuncName = functionName.substr(qualifierLoc+1, functionName.length());
-
-        methodType = find_named(branch, typeName);
-        if (methodType == NULL || !is_type(methodType))
-            return compile_error_for_line(branch, tokens, startPosition,
-                "Not a methodType: " + typeName);
-    }
-    #endif
+    if (qualifierLoc != -1)
+        return compile_error_for_line(branch, tokens, startPosition,
+                "Can't declare function with qualified name: " + functionName);
 
     // Consume input arguments
     int inputIndex = 0;

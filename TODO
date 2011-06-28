@@ -1,7 +1,6 @@
 
 This is a list of short-term TODOs. There's a bigger list at docs/todo.md
-
- - 'Unknown identifier' terms are being created without source location
+ - Need a variant of include() that doesn't expose names 
  - clear_branch and repair_broken_links don't correctly handle nested names
  - Declare a function with multiple outputs in Circa
  - Deprecate the way change_type() calls initialize()
@@ -15,8 +14,6 @@ Important optimization tasks:
 
 Things that would have made lincoln.ca easier:
  - More sane message passing
- - More object methods
- - Not all terms have location
  - Subroutines don't need to explicity declare output type
  - Declare a block that doesn't have an end marker (ends at file)
  - Rebind syntax on lexprs
