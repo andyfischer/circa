@@ -98,7 +98,6 @@ void capture_events()
             break;
 
         case SDL_KEYDOWN:
-
             if (!KEY_DOWN[event.key.keysym.sym]) {
                 KEYS_JUST_PRESSED.push_back(event.key.keysym);
                 handle_key_press(event, event.key.keysym.sym);

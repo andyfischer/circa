@@ -57,7 +57,6 @@ App::addPostFrameCallback(OnFrameCallbackFunc func, void* userdata)
     postFrameCallbacks.push_back(OnFrameCallback(func, userdata));
 }
 
-
 circa::Branch& runtime_branch()
 {
     return *g_app->_runtimeBranch;

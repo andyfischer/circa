@@ -1,5 +1,4 @@
 
-background(#fff)
 
 
 def draggable_point(Point initial_location, number radius) -> Point

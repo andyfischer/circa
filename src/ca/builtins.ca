@@ -150,6 +150,9 @@ def bezier4(number t, List points) -> Point
     p3 = points[3] -> Point
     return p0 * cube(1 - t) + p1 * (3 * t * sqr(1 - t)) + p2 * sqr(t) * (3 * (1 - t)) + p3 * cube(t)
 
+def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
+    return bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
+
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
 

@@ -35,6 +35,8 @@ namespace activerect
 
     if transition_from != null
         r = time_since_target_change / time_for_full_transition
+        min(@r, 1.0)
+        smooth_in_out(@r, .5, .5)
         if rect == Rect()
             r = 1.0
 

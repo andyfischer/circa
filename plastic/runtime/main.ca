@@ -338,6 +338,9 @@ if users_script.has_static_error()
     for err in errs
         draw_text(ui_font_medium err #fff [15 y])
         y += 17
+
+    if once()
+        print(errs)
 else
     ev = users_script.evaluate()
 

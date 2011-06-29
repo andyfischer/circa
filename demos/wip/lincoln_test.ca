@@ -1,0 +1,29 @@
+
+namespace lincoln
+    def highlight_config(Ref t)
+        send('lincoln.current_mode', 2)
+        send('lincoln.highlight_config', t)
+    def list_configs(List l)
+        send('lincoln.current_mode', 1)
+        send('lincoln.config_list', l)
+        
+
+asteroids_file = include('demos/asteroids.ca')
+include('libs/lincoln.ca')
+
+--lincoln:highlight_config(ref(a))
+
+if key_pressed('5')
+    trace('redrawing')
+    send('lincoln.should_redraw', true)
+
+if key_pressed('1')
+    trace('listing configs..')
+    lincoln:list_configs(asteroids_file.list_configs())
+
+if key_pressed('3')
+    send('lincoln.current_mode', 0)
+
+
+
+
