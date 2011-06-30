@@ -10,8 +10,12 @@ std::vector<void*> g_everyWeakPtr;
 
 WeakPtr weak_ptr_create(void* address)
 {
+    // Make sure we don't give out a value of 0, because this means null.
+    if (g_everyWeakPtr.size() == 0)
+        g_everyWeakPtr.push_back(NULL);
+
     g_everyWeakPtr.push_back(address);
-    return (int) g_everyWeakPtr.size();
+    return (int) g_everyWeakPtr.size() - 1;
 }
 
 void* get_weak_ptr(WeakPtr ptr)
@@ -24,6 +28,10 @@ void* get_weak_ptr(WeakPtr ptr)
 void weak_ptr_set_null(WeakPtr ptr)
 {
     g_everyWeakPtr[ptr] = NULL;
+}
+bool is_weak_ptr_null(WeakPtr ptr)
+{
+    return ptr == 0;
 }
 
 }

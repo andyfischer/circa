@@ -10,19 +10,22 @@
 #include "term_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
+#include "weak_ptrs.h"
 #include "types/dict.h"
 
 namespace circa {
 
 struct Term : TaggedValue
 {
-    struct UniqueName
-    {
-        std::string name;
-        std::string base;
-        int ordinal;
-        UniqueName() : ordinal(0) {}
-    };
+    // Fields inherited from TaggedValue:
+    //   TaggedValue::Data value_data
+    //   Type* value_type
+
+    // A WeakPtr to this object, this is lazily initialized.
+    WeakPtr weakPtr;
+
+    // A Type term that describes our data type
+    Term* type;
 
     struct Input {
         Term* term;
@@ -35,13 +38,6 @@ struct Term : TaggedValue
     };
 
     typedef std::vector<Input> InputList;
-
-    // Fields inherited from TaggedValue:
-    //   TaggedValue::Data value_data
-    //   Type* value_type
-
-    // A Type term that describes our data type
-    Term* type;
 
     // Input terms
     InputList inputs;
@@ -63,6 +59,14 @@ struct Term : TaggedValue
     NameList additionalOutputNames;
 
     // A name which is unique across this branch.
+    struct UniqueName
+    {
+        std::string name;
+        std::string base;
+        int ordinal;
+        UniqueName() : ordinal(0) {}
+    };
+
     UniqueName uniqueName;
 
     // The branch that owns this term. May be NULL

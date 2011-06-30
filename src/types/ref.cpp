@@ -2,6 +2,7 @@
 
 #include "circa.h"
 #include "importing_macros.h"
+#include "weak_ptrs.h"
 
 #include "types/common.h"
 #include "types/rect_i.h"
@@ -62,7 +63,8 @@ namespace ref_t {
 Term* as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));
-    return (Term*) value->value_data.ptr;
+    WeakPtr ptr = value->value_data.asint;
+    return (Term*) get_weak_ptr(ptr);
 }
 
 void set_ref(TaggedValue* value, Term* t)
@@ -71,8 +73,19 @@ void set_ref(TaggedValue* value, Term* t)
     if (DEBUG_TRACE_ALL_REF_WRITES)
         std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
     #endif
+
     change_type(value, &REF_T);
-    value->value_data.ptr = t;
+
+    if (t == NULL) {
+        value->value_data.asint = 0;
+        return;
+    }
+
+    // Initialize the term's weakPtr
+    if (t->weakPtr == 0)
+        t->weakPtr = weak_ptr_create(t);
+
+    value->value_data.asint = t->weakPtr;
 }
 
 } // namespace circa

@@ -20,7 +20,8 @@ namespace circa {
 static unsigned int gNextGlobalID = 1;
 
 Term::Term()
-  : type(NULL),
+  : weakPtr(0),
+    type(NULL),
     function(NULL),
     evaluateFunc(empty_evaluate_function),
     owningBranch(NULL),
@@ -37,6 +38,8 @@ Term::Term()
 Term::~Term()
 {
     debug_unregister_valid_object(this, TERM_OBJECT);
+    weak_ptr_set_null(weakPtr);
+
     #if DEBUG
     if (DEBUG_TRACE_ALL_TERM_DESTRUCTORS)
         std::cout << "Destroyed term " << this << std::endl;
