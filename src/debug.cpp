@@ -10,6 +10,8 @@ namespace circa {
 
 bool DEBUG_TRAP_NAME_LOOKUP = false;
 bool DEBUG_TRAP_ERROR_OCCURRED = false;
+bool DEBUG_TRACE_ALL_REF_WRITES = false;
+bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS = false;
 
 void dump(Branch& branch)
 {

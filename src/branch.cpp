@@ -542,7 +542,7 @@ void evaluate_script(Branch& branch, std::string const& filename)
 void persist_branch_to_file(Branch& branch)
 {
     std::string filename = get_branch_source_filename(branch);
-    std::string contents = get_branch_source_text(branch) + "\n";
+    std::string contents = get_branch_source_text(branch);
     storage::write_text_file(filename.c_str(), contents.c_str());
 }
 

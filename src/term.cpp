@@ -5,6 +5,7 @@
 #include "branch.h"
 #include "building.h"
 #include "builtins.h"
+#include "debug.h"
 #include "errors.h"
 #include "heap_debugging.h"
 #include "introspection.h"
@@ -36,6 +37,10 @@ Term::Term()
 Term::~Term()
 {
     debug_unregister_valid_object(this, TERM_OBJECT);
+    #if DEBUG
+    if (DEBUG_TRACE_ALL_TERM_DESTRUCTORS)
+        std::cout << "Destroyed term " << this << std::endl;
+    #endif
 }
 
 Term*

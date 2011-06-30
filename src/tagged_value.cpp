@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "debug.h"
 #include "errors.h"
 #include "heap_debugging.h"
 #include "tagged_value.h"
@@ -447,6 +448,10 @@ void set_bool(TaggedValue* value, bool b)
 
 void set_ref(TaggedValue* value, Term* t)
 {
+    #if DEBUG
+    if (DEBUG_TRACE_ALL_REF_WRITES)
+        std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
+    #endif
     change_type(value, &REF_T);
     value->value_data.ptr = t;
 }

@@ -46,6 +46,7 @@ App::setScriptFilename(const std::string& filename)
 {
     _initialScriptFilename = filename;
 }
+
 void
 App::addPreFrameCallback(OnFrameCallbackFunc func, void* userdata)
 {
