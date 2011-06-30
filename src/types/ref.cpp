@@ -12,6 +12,12 @@
 namespace circa {
 namespace ref_t {
 
+    struct RobustRef
+    {
+        WeakPtr weakPtr;
+        std::string globalName;
+    };
+
     std::string toString(TaggedValue* term)
     {
         Term* t = as_ref(term);
@@ -22,14 +28,26 @@ namespace ref_t {
     }
     void initialize(Type* type, TaggedValue* value)
     {
-        set_pointer(value, type, NULL);
+        RobustRef* dupe = new RobustRef();
+        dupe->weakPtr = 0;
+        value->value_data.ptr = dupe;
     }
     void release(Type*, TaggedValue* value)
     {
+        delete (RobustRef*) value->value_data.ptr;
+    }
+    void copy(Type*, TaggedValue* source, TaggedValue* dest)
+    {
+        change_type_no_initialize(dest, &REF_T);
+        RobustRef* dupe = new RobustRef();
+        *dupe = *(RobustRef*) source->value_data.ptr;
+        dest->value_data.ptr = dupe;
     }
     void reset(Type*, TaggedValue* value)
     {
-        set_ref(value, NULL);
+        RobustRef* robustRef = (RobustRef*) value->value_data.ptr;
+        robustRef->weakPtr = 0;
+        robustRef->globalName = "";
     }
     bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
     {
@@ -54,6 +72,7 @@ namespace ref_t {
         type->toString = toString;
         type->initialize = initialize;
         type->release = release;
+        type->copy = copy;
         type->reset = reset;
         type->equals = equals;
         type->hashFunc = hashFunc;
@@ -63,8 +82,8 @@ namespace ref_t {
 Term* as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));
-    WeakPtr ptr = value->value_data.asint;
-    return (Term*) get_weak_ptr(ptr);
+    ref_t::RobustRef* robustRef = (ref_t::RobustRef*) value->value_data.ptr;
+    return (Term*) get_weak_ptr(robustRef->weakPtr);
 }
 
 void set_ref(TaggedValue* value, Term* t)
@@ -74,10 +93,13 @@ void set_ref(TaggedValue* value, Term* t)
         std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
     #endif
 
-    change_type(value, &REF_T);
+    change_type_no_initialize(value, &REF_T);
+
+    ref_t::RobustRef* robustRef = new ref_t::RobustRef();
+    value->value_data.ptr = robustRef;
 
     if (t == NULL) {
-        value->value_data.asint = 0;
+        robustRef->weakPtr = 0;
         return;
     }
 
@@ -85,7 +107,7 @@ void set_ref(TaggedValue* value, Term* t)
     if (t->weakPtr == 0)
         t->weakPtr = weak_ptr_create(t);
 
-    value->value_data.asint = t->weakPtr;
+    robustRef->weakPtr = t->weakPtr;
 }
 
 } // namespace circa
