@@ -417,16 +417,12 @@ export_func void circa_initialize()
 
     parse_builtin_script(*KERNEL);
 
+    // Finally, make sure there are no static errors.
     if (has_static_errors(*KERNEL)) {
         std::cout << "Static errors found in kernel:" << std::endl;
         print_static_errors_formatted(*KERNEL, std::cout);
         return;
     }
-
-    // evaluate kernel so that the local-value slots are filled
-    EvalContext context;
-    evaluate_branch(&context, *KERNEL);
-    ca_assert(!context.errorOccurred);
 }
 
 export_func void circa_shutdown()
