@@ -347,4 +347,40 @@ Term* find_from_unique_name(Branch& branch, const char* name)
     return NULL;
 }
 
+bool find_global_name(Term* term, std::string& name)
+{
+    // Search upwards, check if this term even has a global name.
+    Term* searchTerm = term;
+
+    std::vector<Term*> stack;
+
+    while (true) {
+        stack.push_back(searchTerm);
+
+        if (searchTerm->owningBranch == &kernel())
+            break;
+
+        searchTerm = get_parent_term(searchTerm);
+
+        if (searchTerm == NULL)
+            return false;
+    }
+
+    // Construct a qualified name.
+    std::stringstream out;
+
+    for (size_t i = stack.size()-1; i >= 0; i--) {
+        out << searchTerm->uniqueName.name;
+        if (i > 0)
+            out << ":";
+    }
+    name = out.str();
+    return true;
+}
+
+Term* get_term_from_global_name(const char* name)
+{
+    return NULL;
+}
+
 } // namespace circa

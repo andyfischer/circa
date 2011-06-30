@@ -44,4 +44,11 @@ void expose_all_names(Branch& source, Branch& destination);
 
 Term* find_from_unique_name(Branch& branch, const char* name);
 
+// Attempts to find a global name for the term. If successful, returns true
+// and writes the result to 'name'. If unsuccessful (for example, if the
+// Branch is locally-allocated), returns false.
+bool find_global_name(Term* term, std::string& name);
+
+Term* get_term_from_global_name(const char* name);
+
 } // namespace circa
