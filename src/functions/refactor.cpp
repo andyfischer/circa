@@ -3,6 +3,8 @@
 #include "circa.h"
 #include "importing_macros.h"
 
+#include "types/ref.h"
+
 namespace circa {
 namespace refactor_function {
 

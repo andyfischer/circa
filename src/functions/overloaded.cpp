@@ -2,6 +2,8 @@
 
 #include "circa.h"
 
+#include "types/ref.h"
+
 namespace circa {
 namespace overloaded_function {
 

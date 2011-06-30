@@ -306,12 +306,6 @@ Term* create_bool(Branch& branch, bool b, std::string const& name)
     return term;
 }
 
-Term* create_ref(Branch& branch, Term* ref, std::string const& name)
-{
-    Term* term = create_value(branch, REF_TYPE, name);
-    set_ref(term, ref);
-    return term;
-}
 Term* create_void(Branch& branch, std::string const& name)
 {
     return create_value(branch, VOID_TYPE, name);

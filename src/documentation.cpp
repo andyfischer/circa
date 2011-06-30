@@ -7,6 +7,8 @@
 #include "source_repro.h"
 #include "term.h"
 
+#include "types/ref.h"
+
 namespace circa {
 
 void escape_string_for_json(std::string s, std::stringstream& out)

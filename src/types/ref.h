@@ -8,5 +8,9 @@ namespace ref_t {
     void setup_type(Type* type);
 
 } // namespace ref_t
+
+Term* as_ref(TaggedValue* value);
+void set_ref(TaggedValue* value, Term* t);
+
 } // namespace circa
 

@@ -52,7 +52,6 @@ Term* create_string(Branch& branch, std::string const& s, std::string const& nam
 Term* create_int(Branch& branch, int i, std::string const& name="");
 Term* create_float(Branch& branch, float f, std::string const& name="");
 Term* create_bool(Branch& branch, bool b, std::string const& name="");
-Term* create_ref(Branch& branch, Term* ref, std::string const& name="");
 Term* create_void(Branch& branch, std::string const& name="");
 Term* create_list(Branch& branch, std::string const& name="");
 Branch& create_branch(Branch& owner, std::string const& name="");

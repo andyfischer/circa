@@ -3,6 +3,8 @@
 #include "circa.h"
 #include "static_checking.h"
 
+#include "types/ref.h"
+
 namespace circa {
 namespace branch_methods_function {
 

@@ -1,5 +1,7 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
+#include "types/ref.h"
+
 namespace circa {
 namespace format_source_for_graph_function {
     CA_START_FUNCTIONS;

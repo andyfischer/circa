@@ -10,6 +10,7 @@
 #include "type.h"
 
 #include "types/list.h"
+#include "types/ref.h"
 
 namespace circa {
 

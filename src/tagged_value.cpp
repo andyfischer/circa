@@ -8,6 +8,8 @@
 #include "tagged_value.h"
 #include "type.h"
 
+#include "types/ref.h"
+
 namespace circa {
 
 TaggedValue::TaggedValue()
@@ -446,16 +448,6 @@ void set_bool(TaggedValue* value, bool b)
     value->value_data.asbool = b;
 }
 
-void set_ref(TaggedValue* value, Term* t)
-{
-    #if DEBUG
-    if (DEBUG_TRACE_ALL_REF_WRITES)
-        std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
-    #endif
-    change_type(value, &REF_T);
-    value->value_data.ptr = t;
-}
-
 List* set_list(TaggedValue* value)
 {
     change_type(value, &NULL_T); // substitute for 'reset'
@@ -539,12 +531,6 @@ bool as_bool(TaggedValue* value)
 {
     ca_assert(is_bool(value));
     return value->value_data.asbool;
-}
-
-Term* as_ref(TaggedValue* value)
-{
-    ca_assert(is_ref(value));
-    return (Term*) value->value_data.ptr;
 }
 
 Branch* as_branch(TaggedValue* value)

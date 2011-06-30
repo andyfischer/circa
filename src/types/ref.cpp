@@ -6,6 +6,8 @@
 #include "types/common.h"
 #include "types/rect_i.h"
 
+#include "ref.h"
+
 namespace circa {
 namespace ref_t {
 
@@ -56,4 +58,21 @@ namespace ref_t {
         type->hashFunc = hashFunc;
     }
 }
+
+Term* as_ref(TaggedValue* value)
+{
+    ca_assert(is_ref(value));
+    return (Term*) value->value_data.ptr;
+}
+
+void set_ref(TaggedValue* value, Term* t)
+{
+    #if DEBUG
+    if (DEBUG_TRACE_ALL_REF_WRITES)
+        std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
+    #endif
+    change_type(value, &REF_T);
+    value->value_data.ptr = t;
+}
+
 } // namespace circa
