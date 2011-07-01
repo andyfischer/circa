@@ -233,6 +233,36 @@ void name_with_colons()
     test_assert(find_named(branch, "ns:another:name") == two);
 }
 
+void test_global_name()
+{
+    Branch& root = nested_contents(kernel()["_test_root"]);
+
+    Branch& branch = create_branch(root, "test_global_name");
+    Term* a = branch.compile("a = 1");
+    Term* b = branch.compile("if true { b = 3 }")->contents(0)->contents("b");
+
+    std::string a_name;
+    test_assert(find_global_name(a, a_name));
+    test_equals(a_name, "_test_root:test_global_name:a");
+
+    std::string b_name;
+    test_assert(find_global_name(b, b_name));
+    test_equals(b_name, "_test_root:test_global_name:_if_block:_if:b");
+
+    test_assert(get_term_from_global_name(a_name.c_str()) == a);
+    test_assert(get_term_from_global_name(b_name.c_str()) == b);
+}
+
+void test_global_name2()
+{
+    Branch branch;
+    Term* a = branch.compile("a = 1");
+    std::string str;
+    test_assert(find_global_name(a, str) == false);
+
+    test_assert(get_term_from_global_name("not:a:real:name") == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(names_tests::test_find_named);
@@ -248,6 +278,8 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_find_from_unique_name);
     //TEST_DISABLED REGISTER_TEST_CASE(names_tests::test_with_include);
     REGISTER_TEST_CASE(names_tests::name_with_colons);
+    REGISTER_TEST_CASE(names_tests::test_global_name);
+    REGISTER_TEST_CASE(names_tests::test_global_name2);
 }
 
 } // namespace names_tests

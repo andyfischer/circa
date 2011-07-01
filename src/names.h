@@ -49,6 +49,10 @@ Term* find_from_unique_name(Branch& branch, const char* name);
 // Branch is locally-allocated), returns false.
 bool find_global_name(Term* term, std::string& name);
 
+// Convenience function, calls find_global_name and returns a blank string if
+// it wasn't found.
+std::string find_global_name(Term* term);
+
 Term* get_term_from_global_name(const char* name);
 
 } // namespace circa

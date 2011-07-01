@@ -417,6 +417,11 @@ export_func void circa_initialize()
 
     parse_builtin_script(*KERNEL);
 
+#if CIRCA_TEST_BUILD
+    // Create a space for unit tests.
+    create_branch(*KERNEL, "_test_root");
+#endif
+
     // Finally, make sure there are no static errors.
     if (has_static_errors(*KERNEL)) {
         std::cout << "Static errors found in kernel:" << std::endl;

@@ -369,18 +369,44 @@ bool find_global_name(Term* term, std::string& name)
     // Construct a qualified name.
     std::stringstream out;
 
-    for (size_t i = stack.size()-1; i >= 0; i--) {
-        out << searchTerm->uniqueName.name;
+    for (int i = stack.size()-1; i >= 0; i--) {
+        out << stack[i]->uniqueName.name;
         if (i > 0)
             out << ":";
     }
     name = out.str();
     return true;
 }
+std::string find_global_name(Term* term)
+{
+    std::string out;
+    find_global_name(term, out);
+    return out;
+}
+
+Term* get_term_from_global_name_recr(Branch* searchBranch, const char* name)
+{
+    int separator = find_qualified_name_separator(name);
+    
+    if (separator == -1)
+        return find_from_unique_name(*searchBranch, name);
+
+    std::string namePortion = std::string(name, separator);
+    
+    Term* searchTerm = find_from_unique_name(*searchBranch, namePortion.c_str());
+    if (searchTerm == NULL)
+        return NULL;
+    if (searchTerm->nestedContents == NULL)
+        return NULL;
+
+    return get_term_from_global_name_recr(searchTerm->nestedContents,
+            &name[separator+1]);
+}
 
 Term* get_term_from_global_name(const char* name)
 {
-    return NULL;
+    Branch* searchBranch = &kernel();
+    return get_term_from_global_name_recr(searchBranch, name);
 }
 
 } // namespace circa
