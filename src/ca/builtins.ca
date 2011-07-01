@@ -153,6 +153,19 @@ def bezier4(number t, List points) -> Point
 def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
     return bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
 
+def clamp(number x, number minVal, number maxVal) -> number
+    return min(max(x, minVal), maxVal)
+
+def smoothstep(number x, number edge0, number edge1) -> number
+    "Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep"
+    x = clamp((x - edge0)/(edge1-edge0), 0, 1)
+    return x*x*(3 - 2*x)
+
+def smootherstep(number x, number edge0, number edge1) -> number
+    "Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep"
+    x = clamp((x - edge0)/(edge1-edge0), 0, 1)
+    return x*x*x*(x*(x*6 - 15) + 10)
+
 def random_color() -> Color
     return [rand() rand() rand() 1.0]
 

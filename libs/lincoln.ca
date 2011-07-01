@@ -36,7 +36,7 @@ namespace activerect
     if transition_from != null
         r = time_since_target_change / time_for_full_transition
         min(@r, 1.0)
-        smooth_in_out(@r, .5, .5)
+        smoothstep(@r, 0, 1)
         if rect == Rect()
             r = 1.0
 
@@ -91,7 +91,7 @@ namespace activerect
 
 def draw_highlighted_config(cairo:Context cr)
 
-    topleft = [100 window.height - 100]
+    topleft = [100 window.height - 250]
 
     gutter = 20
     inner_loc = topleft + [gutter gutter]
@@ -113,10 +113,24 @@ def draw_highlighted_config(cairo:Context cr)
     text_height = str_extents.size[1]
     height = text_height + gutter*2
 
+    click_rect = to_rect(inner_loc [str_width text_height])
+
     -- draw text
     cr.set_source_color(activerect:correct_color(#fff))
     cr.move_to(inner_loc+[0 text_height])
     cr.show_text(str)
+
+    -- handle mouse dragging
+    if highlighted_config != null
+        Ref(@highlighted_config)
+
+        state dragging = false
+        if mouse_clicked(click_rect)
+            dragging = true
+        elif not(mouse_pressed())
+            dragging = false
+        if dragging
+            highlighted_config.tweak(delta_point(mouse).y)
 
     send('lincoln.active.size' to_rect(topleft [width height]))
 

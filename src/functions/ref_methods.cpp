@@ -59,12 +59,10 @@ namespace ref_methods_function {
     CA_FUNCTION(tweak)
     {
         Term* t = INPUT(0)->asRef();
-        if (t == NULL) {
-            error_occurred(CONTEXT, CALLER, "NULL reference");
-            return;
-        }
+        if (t == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL reference");
 
-        int steps = INPUT(1)->asInt();
+        int steps = round(INPUT(1)->toFloat());
 
         if (steps == 0)
             return;
@@ -72,7 +70,7 @@ namespace ref_methods_function {
         if (is_float(t)) {
             float step = get_step(t);
 
-            // do the math like this so that rounding errors are not accumulated
+            // Do the math like this so that rounding errors are not accumulated
             float new_value = (round(as_float(t) / step) + steps) * step;
             set_float(t, new_value);
 
@@ -173,7 +171,7 @@ namespace ref_methods_function {
                 "Ref.to_source_string(_) -> string");
         import_function(kernel, get_function, "Ref.function(_) -> Ref");
         import_function(kernel, assign, "Ref.assign(_, any)");
-        import_function(kernel, tweak, "Ref.tweak(_, int steps)");
+        import_function(kernel, tweak, "Ref.tweak(_, number steps)");
         import_function(kernel, asint, "Ref.asint(_) -> int");
         import_function(kernel, asfloat, "Ref.asfloat(_) -> number");
         import_function(kernel, get_input, "Ref.input(_, int) -> Ref");
