@@ -53,6 +53,6 @@ bool find_global_name(Term* term, std::string& name);
 // it wasn't found.
 std::string find_global_name(Term* term);
 
-Term* get_term_from_global_name(const char* name);
+Term* find_term_from_global_name(const char* name);
 
 } // namespace circa

@@ -384,7 +384,7 @@ std::string find_global_name(Term* term)
     return out;
 }
 
-Term* get_term_from_global_name_recr(Branch* searchBranch, const char* name)
+Term* find_term_from_global_name_recr(Branch* searchBranch, const char* name)
 {
     int separator = find_qualified_name_separator(name);
     
@@ -399,14 +399,14 @@ Term* get_term_from_global_name_recr(Branch* searchBranch, const char* name)
     if (searchTerm->nestedContents == NULL)
         return NULL;
 
-    return get_term_from_global_name_recr(searchTerm->nestedContents,
+    return find_term_from_global_name_recr(searchTerm->nestedContents,
             &name[separator+1]);
 }
 
-Term* get_term_from_global_name(const char* name)
+Term* find_term_from_global_name(const char* name)
 {
     Branch* searchBranch = &kernel();
-    return get_term_from_global_name_recr(searchBranch, name);
+    return find_term_from_global_name_recr(searchBranch, name);
 }
 
 } // namespace circa

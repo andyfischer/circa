@@ -83,7 +83,20 @@ Term* as_ref(TaggedValue* value)
 {
     ca_assert(is_ref(value));
     ref_t::RobustRef* robustRef = (ref_t::RobustRef*) value->value_data.ptr;
-    return (Term*) get_weak_ptr(robustRef->weakPtr);
+    Term* result = (Term*) get_weak_ptr(robustRef->weakPtr);
+
+    if (result != NULL)
+        return result;
+
+    // Term is NULL, attempt to repair this reference using the global name.
+    result = find_term_from_global_name(robustRef->globalName.c_str());
+
+    if (result == NULL)
+        return NULL; // Still no luck
+        
+    // Found it, now remember the new weakPtr.
+    robustRef->weakPtr = result->weakPtr;
+    return result;
 }
 
 void set_ref(TaggedValue* value, Term* t)
@@ -108,6 +121,7 @@ void set_ref(TaggedValue* value, Term* t)
         t->weakPtr = weak_ptr_create(t);
 
     robustRef->weakPtr = t->weakPtr;
+    robustRef->globalName = find_global_name(t);
 }
 
 } // namespace circa
