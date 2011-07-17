@@ -4,6 +4,7 @@
 #include "heap_debugging.h"
 #include "function.h"
 #include "locals.h"
+#include "refactoring.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "update_cascades.h"
@@ -138,6 +139,16 @@ void on_repairable_link(Term* term, List& brokenLinks)
 
         Term* fixedLink = get_named_at(term, as_string(linkInfo[0]));
         term->setDependency(dependencyIndex, fixedLink);
+    }
+}
+
+void on_evaluate_function_changed(Term* function)
+{
+    // Don't use deferred updaets; just iterate through each user and update
+    // them.
+    for (int i=0; i < function->users.length(); i++) {
+        Term* user = function->users[i];
+        update_cached_evaluate_func(user);
     }
 }
 

@@ -13,6 +13,7 @@
 #include "token.h"
 #include "type.h"
 #include "types/list.h"
+#include "update_cascades.h"
 
 namespace circa {
 
@@ -576,6 +577,12 @@ bool is_native_function(Term* func)
     if (!is_function(func))
         return false;
     return function_t::get_evaluate(func) != evaluate_subroutine;
+}
+
+void function_set_evaluate_func(Term* function, EvaluateFunc evaluateFunc)
+{
+    get_function_attrs(function)->evaluate = evaluateFunc;
+    on_evaluate_function_changed(function);
 }
 
 } // namespace circa

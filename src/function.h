@@ -131,4 +131,7 @@ const char* get_output_name_for_input(Term* term, int inputIndex);
 // Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(Term* function);
 
+// Change the function's EvaluateFunc, and update any terms that are using it.
+void function_set_evaluate_func(Term* function, EvaluateFunc func);
+
 } // namespace circa

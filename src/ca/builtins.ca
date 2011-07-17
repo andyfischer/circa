@@ -229,6 +229,8 @@ def delta(number val) -> number
     prev = val
     return result
 
+def patch_with_dll(string filena
+
 namespace styled_source
     literal_string = 1
     literal_number = 4

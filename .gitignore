@@ -19,3 +19,4 @@ z.ca
 *.pyc
 .DS_Store
 *.os
+*.so

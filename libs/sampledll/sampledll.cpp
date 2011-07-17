@@ -8,7 +8,7 @@ extern "C" {
 
 void on_load(Branch* branch)
 {
-    std::cout << "sampledll loaded" << std::endl;
+    std::cout << "Called on_load in sampledll" << std::endl;
 }
 
 CA_FUNCTION(sample_a)

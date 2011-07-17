@@ -7,8 +7,7 @@ namespace ns
         return 'Not patched'
         
 
-patch_with_dll('sampledll' -> path)
+patch_with_dll('sampledll' -> rpath)
 
 sample_a() -> print
 ns:concat('namespaced function ' 'works') -> print
-

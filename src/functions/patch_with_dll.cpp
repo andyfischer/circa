@@ -9,12 +9,9 @@ namespace patch_with_dll_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(hosted_patch_with_dll,
-            "patch_with_dll(state FileSignature, string filename)")
+    CA_DEFINE_FUNCTION(hosted_patch_with_dll, "_patch_with_dll(string filename)")
     {
-        // TODO: check file signature
-
-        const char* filename = STRING_INPUT(1);
+        const char* filename = STRING_INPUT(0);
         TaggedValue error;
         patch_with_dll(filename, *CALLER->owningBranch, &error);
 
@@ -27,4 +24,4 @@ namespace patch_with_dll_function {
         CA_SETUP_FUNCTIONS(kernel);
     }
 }
-}
+} // namespace circa

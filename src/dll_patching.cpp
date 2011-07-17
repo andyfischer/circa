@@ -92,15 +92,13 @@ void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
             patch_branch_recr(dll, nested_contents(term), namespacePrefix + term->name + "__");
         }
         else if (is_function(term)) {
-            FunctionAttrs* attrs = get_function_attrs(term);
-
             std::string searchName = namespacePrefix + term->name.c_str();
 
             void* newEvaluateFunc = find_func_in_dll(dll, searchName.c_str());
 
             // Patch in this function and record the affected term
             if (newEvaluateFunc != NULL) {
-                attrs->evaluate = (EvaluateFunc) newEvaluateFunc;
+                function_set_evaluate_func(term, (EvaluateFunc) newEvaluateFunc);
                 dll->affectedTerms.append(term);
                 dll->loadedFunctions.insert(newEvaluateFunc);
             }
