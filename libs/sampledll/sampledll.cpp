@@ -21,4 +21,9 @@ CA_FUNCTION(ns__concat)
     set_string(OUTPUT, std::string(STRING_INPUT(0)) + STRING_INPUT(1));
 }
 
+CA_FUNCTION(get_number)
+{
+    set_int(OUTPUT, 0);
+}
+
 }

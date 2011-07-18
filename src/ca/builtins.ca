@@ -229,7 +229,15 @@ def delta(number val) -> number
     prev = val
     return result
 
-def patch_with_dll(string filena
+def patch_with_dll(Branch b, string baseFile)
+    <<<
+    Load the .DLL or .SO at the given baseFile, and patch the functions in
+    'branch' using appropriately-named functions from the DLL/SO.
+    >>>
+    if file_changed(dll_loading:source_filename(baseFile))
+        dll_loading:rebuild(baseFile)
+    if file_changed(dll_loading:dll_filename(baseFile))
+        dll_loading:load_and_patch(b, baseFile)
 
 namespace styled_source
     literal_string = 1

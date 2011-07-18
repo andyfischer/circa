@@ -161,7 +161,8 @@ void get_current_storage_interface(StorageInterface* interface)
 
 std::string get_directory_for_filename(std::string const& filename)
 {
-    // Should probably use boost::path or some other library here.
+    // TODO: This function is terrible, need to use an existing library for dealing
+    // with paths.
     size_t last_slash = filename.find_last_of("/");
 
     if (last_slash == filename.npos)
@@ -177,6 +178,9 @@ std::string get_directory_for_filename(std::string const& filename)
 
 bool is_absolute_path(std::string const& path)
 {
+    // TODO: This function is terrible, need to use an existing library for dealing
+    // with paths.
+    
     if (path.length() >= 1 && path[0] == '/')
         return true;
     if (path.length() >= 2 && path[1] == ':')
