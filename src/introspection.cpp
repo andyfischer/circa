@@ -2,10 +2,17 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
+#include "branch.h"
+#include "code_iterators.h"
+#include "builtins.h"
+#include "evaluation.h"
 #include "heap_debugging.h"
+#include "introspection.h"
 #include "locals.h"
+#include "subroutine.h"
+#include "term.h"
 #include "term_list.h"
+#include "type.h"
 
 namespace circa {
 

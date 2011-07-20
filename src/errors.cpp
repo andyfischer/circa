@@ -1,8 +1,11 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #include <cassert>
 
 #include "build_options.h"
+#include "builtins.h"
 #include "code_iterators.h"
 #include "errors.h"
 #include "evaluation.h"

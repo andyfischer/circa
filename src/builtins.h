@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 namespace circa {
 
 extern "C" {
@@ -105,6 +103,7 @@ extern Type SYMBOL_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 
+extern TaggedValue OUT_SYMBOL;
 extern TaggedValue REPEAT_SYMBOL;
 
 extern Type* FILE_SIGNATURE_T;
@@ -171,7 +170,6 @@ namespace value_function {
     CA_FUNCTION(evaluate);
 }
 
-} // namespace circa
+void install_standard_library(Branch& kernel);
 
-export_func void circa_initialize();
-export_func void circa_shutdown();
+} // namespace circa

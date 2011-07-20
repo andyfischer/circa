@@ -4,6 +4,7 @@
 
 #include "common_headers.h"
 
+#include "bootstrap.h"
 #include "branch.h"
 #include "building.h"
 #include "builtins.h"

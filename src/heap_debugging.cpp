@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #if CIRCA_ENABLE_HEAP_DEBUGGING
 #include <map>
 #endif

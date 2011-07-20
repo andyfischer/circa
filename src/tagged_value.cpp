@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "builtins.h"
 #include "debug.h"
 #include "errors.h"
 #include "heap_debugging.h"
