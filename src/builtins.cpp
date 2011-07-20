@@ -6,6 +6,7 @@
 
 #include "circa.h"
 #include "heap_debugging.h"
+#include "circa_stdlib.h"
 #include "types/any.h"
 #include "types/bool.h"
 #include "types/branch.h"
@@ -33,8 +34,8 @@ void setup_builtin_functions(Branch&);
 
 extern "C" {
 
-// BUILTIN_SCRIPT_TEXT is defined in generated/builtin_script_text.cpp
-extern const char* BUILTIN_SCRIPT_TEXT;
+// STDLIB_CA_TEXT is defined in generated/stdlib_script_text.cpp
+extern const char* STDLIB_CA_TEXT;
 
 Branch* KERNEL = NULL;
 
@@ -385,11 +386,6 @@ void parse_hosted_types(Branch& kernel)
     color_t::setup_type(unbox_type(COLOR_TYPE));
 }
 
-void parse_builtin_script(Branch& kernel)
-{
-    parser::compile(kernel, parser::statement_list, BUILTIN_SCRIPT_TEXT);
-}
-
 } // namespace circa
 
 using namespace circa;
@@ -401,31 +397,38 @@ export_func void circa_initialize()
 
     create_primitive_types();
     bootstrap_kernel();
-    initialize_primitive_types(*KERNEL);
-    post_initialize_primitive_types(*KERNEL);
-    pre_setup_types(*KERNEL);
-    initialize_compound_types(*KERNEL);
+
+    Branch& kernel = *KERNEL;
+
+    initialize_primitive_types(kernel);
+    post_initialize_primitive_types(kernel);
+    pre_setup_types(kernel);
+    initialize_compound_types(kernel);
 
     FINISHED_BOOTSTRAP = true;
 
-    pre_setup_builtin_functions(*KERNEL);
-    setup_builtin_functions(*KERNEL);
-    post_setup_functions(*KERNEL);
-    parse_hosted_types(*KERNEL);
+    pre_setup_builtin_functions(kernel);
+    setup_builtin_functions(kernel);
+    post_setup_functions(kernel);
+    parse_hosted_types(kernel);
 
-    type_initialize_kernel(*KERNEL);
+    type_initialize_kernel(kernel);
 
-    parse_builtin_script(*KERNEL);
+    // Parse the stdlib script
+    parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
+
+    // Install C functions into stdlib
+    install_stdlib_functions(kernel);
 
 #if CIRCA_TEST_BUILD
     // Create a space for unit tests.
-    create_branch(*KERNEL, "_test_root");
+    create_branch(kernel, "_test_root");
 #endif
 
     // Finally, make sure there are no static errors.
-    if (has_static_errors(*KERNEL)) {
+    if (has_static_errors(kernel)) {
         std::cout << "Static errors found in kernel:" << std::endl;
-        print_static_errors_formatted(*KERNEL, std::cout);
+        print_static_errors_formatted(kernel, std::cout);
         return;
     }
 }

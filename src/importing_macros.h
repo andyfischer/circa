@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
+#include "evaluation.h"
 
 #define CA_START_FUNCTIONS \
     struct _circa_StaticFuncDeclaration; \

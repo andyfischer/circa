@@ -1,4 +1,13 @@
 
+-- Builtin functions
+namespace file
+    def modified_time(string filename) -> int
+
+    def is_newer(string left, string right) -> bool
+        return modified_time(left) > modified_time(right)
+
+-- Stateful functions
+
 def changed(any current) -> bool
     state any prev = null
     result = prev != current

@@ -146,9 +146,9 @@ mkdir('src/generated')
 write_text_file('src/generated/setup_builtin_functions.cpp', setup_builtin_functions())
 write_text_file('src/generated/register_all_tests.cpp', register_all_tests())
 
-# generate builtin_script_text.cpp
-write_text_file('src/generated/builtin_script_text.cpp',
-        text_file_to_c_string("src/ca/builtins.ca", "BUILTIN_SCRIPT_TEXT"))
+# generate stdlib_script_text.cpp
+write_text_file('src/generated/stdlib_script_text.cpp',
+        text_file_to_c_string("src/ca/stdlib.ca", "STDLIB_CA_TEXT"))
 
 # generate all_tests.cpp, all_builtin_functions.cpp, and all_builtin_types.cpp
 def source_files(dir):
