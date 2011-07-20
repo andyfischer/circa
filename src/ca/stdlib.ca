@@ -6,6 +6,13 @@ namespace file
     def is_newer(string left, string right) -> bool
         return modified_time(left) > modified_time(right)
 
+namespace refactor
+    def rename(Ref r, string s)
+    def change_function(Ref r, Callable func)
+
+namespace reflect
+    def this_branch() -> Branch
+
 -- Stateful functions
 
 def changed(any current) -> bool

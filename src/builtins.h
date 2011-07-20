@@ -10,7 +10,6 @@ extern Branch* KERNEL;
 
 extern Term* ADD_FUNC;
 extern Term* ADDITIONAL_OUTPUT_FUNC;
-extern Term* ALIAS_FUNC;
 extern Term* ASSIGN_FUNC;
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;

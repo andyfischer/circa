@@ -7,9 +7,12 @@
 #include "parser.h"
 #include "importing.h"
 #include "importing_macros.h"
+#include "refactoring.h"
 #include "storage.h"
 #include "term.h"
 #include "type.h"
+
+#include "types/ref.h"
 
 namespace circa {
 
@@ -129,6 +132,21 @@ CA_FUNCTION(file__modified_time)
     set_int(OUTPUT, storage::get_modified_time(STRING_INPUT(0)));
 }
 
+CA_FUNCTION(refactor__rename)
+{
+    rename(as_ref(INPUT(0)), as_string(INPUT(1)));
+}
+
+CA_FUNCTION(refactor__change_function)
+{
+    change_function(as_ref(INPUT_TERM(0)), INPUT_TERM(1));
+}
+
+CA_FUNCTION(reflect__this_branch)
+{
+    set_branch(OUTPUT, CALLER->owningBranch);
+}
+
 void install_standard_library(Branch& kernel)
 {
     // Parse the stdlib script
@@ -136,6 +154,9 @@ void install_standard_library(Branch& kernel)
 
     // Install each function
     install_function(kernel["file:modified_time"], file__modified_time);
+    install_function(kernel["refactor:rename"], refactor__rename);
+    install_function(kernel["refactor:change_function"], refactor__change_function);
+    install_function(kernel["reflect:this_branch"], reflect__this_branch);
 }
 
 } // namespace circa
