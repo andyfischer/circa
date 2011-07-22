@@ -66,14 +66,15 @@ Term* NOT_FUNC = NULL;
 Term* ONE_TIME_ASSIGN_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
 Term* PRESERVE_STATE_RESULT_FUNC = NULL;
+Term* RANGE_FUNC = NULL;
+Term* REF_FUNC = NULL;
+Term* RETURN_FUNC = NULL;
 Term* SET_FIELD_FUNC = NULL;
 Term* SET_INDEX_FUNC = NULL;
 Term* SUBROUTINE_OUTPUT_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
 Term* SUB_FUNC = NULL;
-Term* RANGE_FUNC = NULL;
-Term* REF_FUNC = NULL;
-Term* RETURN_FUNC = NULL;
+Term* TYPE_FUNC = NULL;
 Term* UNKNOWN_FUNCTION = NULL;
 Term* UNKNOWN_FIELD_FUNC = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
@@ -169,6 +170,7 @@ void install_standard_library(Branch& kernel)
     install_function(kernel["reflect:this_branch"], reflect__this_branch);
 
     LENGTH_FUNC = kernel["length"];
+    TYPE_FUNC = kernel["type"];
 }
 
 } // namespace circa

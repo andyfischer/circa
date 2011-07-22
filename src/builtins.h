@@ -55,6 +55,7 @@ extern Term* SET_INDEX_FUNC;
 extern Term* SUBROUTINE_OUTPUT_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* SUB_FUNC;
+extern Term* TYPE_FUNC;
 extern Term* SYMBOL_TYPE;
 extern Term* RANGE_FUNC;
 extern Term* REF_FUNC;

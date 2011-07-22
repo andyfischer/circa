@@ -84,13 +84,6 @@ Term* find_type_of_get_index(Term* listTerm)
     return ANY_TYPE;
 }
 
-// This function will look at 'term' and attempt to statically determine
-// the result of length(). We'll write the result as an expression to
-// the branch (and return a pointer to the result term). If the length can
-// be statically determined then we'll write a simple integer value. If the
-// length is based on some unknowns, we might write out an expression. Finally,
-// if we have no idea, the result might be :unknown.
-
 Term* statically_infer_length(Branch& branch, Term* term)
 {
     Term* input = term->input(0);

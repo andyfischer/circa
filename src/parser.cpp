@@ -424,6 +424,16 @@ ParseResult type_expr(Branch& branch, TokenStream& tokens,
     return result;
 }
 
+bool token_is_allowed_as_function_name(int token)
+{
+    switch (token) {
+        case FOR: case IF: case INCLUDE: case TYPE:
+            return true;
+        default:
+            return false;
+    }
+}
+
 ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -433,9 +443,9 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
 
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IDENTIFIER)
-            // These keywords are allowed as function names (used by builtins)
-            && !tokens.nextIs(FOR) && !tokens.nextIs(IF) && !tokens.nextIs(INCLUDE))
+    if (tokens.finished()
+            || (!tokens.nextIs(IDENTIFIER)
+            && !token_is_allowed_as_function_name(tokens.next().match)))
         return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
 
     // Function name
@@ -564,6 +574,8 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
                 attrs->variableArgs = true;
             } else if (symbolText == ":implied_rebind") {
                 input->setBoolProp("use-as-output", true);
+            } else if (symbolText == ":meta") {
+                input->setBoolProp("meta", true);
             } else {
                 return compile_error_for_line(branch, tokens, startPosition,
                     "Unrecognized qualifier: "+symbolText);
