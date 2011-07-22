@@ -260,11 +260,6 @@ namespace function_t {
         return placeholder->boolPropOptional("meta", false);
     }
 
-    void set_input_meta(Term* func, int index, bool value)
-    {
-        function_t::get_input_placeholder(func, index)->setBoolProp("meta", value);
-    }
-
     bool get_input_optional(Term* func, int index)
     {
         if (!is_function(func))

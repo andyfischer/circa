@@ -73,7 +73,6 @@ namespace function_t {
     std::string const& get_input_name(Term* function, int index);
     bool get_input_modified(Term* function, int index);
     bool get_input_meta(Term* function, int index);
-    void set_input_meta(Term* function, int index, bool value);
     bool get_input_optional(Term* func, int index);
     std::string const& get_exposed_name_path(Term* function);
     void set_exposed_name_path(Term* func, std::string const& value);
