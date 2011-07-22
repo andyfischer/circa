@@ -15,7 +15,7 @@ namespace meta_function {
                 Term* input = term->input(0);
 
                 EvalContext context;
-                evaluate_minimum(&context, input);
+                evaluate_minimum(&context, input, NULL);
 
                 change_function(term, VALUE_FUNC);
             }

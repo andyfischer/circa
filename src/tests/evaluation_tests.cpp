@@ -13,8 +13,6 @@ void test_branch_eval()
 
 void test_evaluate_minimum()
 {
-#if 0
-TEST_DISABLED
     Branch branch;
     Term* a = branch.compile("a = 1");
     Term* b = branch.compile("b = 2");
@@ -27,13 +25,15 @@ TEST_DISABLED
     test_equals(get_local(d), "null");
 
     EvalContext context;
-    evaluate_minimum(&context, d);
+    TaggedValue result;
+    evaluate_minimum(&context, d, &result);
 
     test_equals(get_local(a), "1");
     test_equals(get_local(b), "2");
     test_equals(get_local(c), "null");
     test_equals(get_local(d), "-1");
-#endif
+
+    test_equals(&result, "-1");
 }
 
 void test_evaluate_minimum2()
@@ -49,7 +49,7 @@ void test_evaluate_minimum2()
     Term* xyz = branch.compile("dont_evaluate_this = [x y z]");
 
     EvalContext context;
-    evaluate_minimum(&context, abc);
+    evaluate_minimum(&context, abc, NULL);
 
     test_equals(get_local(a), "[1]");
     test_equals(get_local(b), "[1, [1], 3]");

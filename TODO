@@ -18,3 +18,11 @@ Things that would have made lincoln.ca easier:
  - Declare a block that doesn't have an end marker (ends at file)
  - Rebind syntax on lexprs
  - Object methods don't need ()
+
+Things learned from ropetest.ca:
+ - Cleaner syntax for a function that rebinds input
+ - For-loop type inferrence
+ - For-loop index() function
+ - delta() on lists
+ - Object initializer
+ - Situation where a list needed to be wrapped in Point()

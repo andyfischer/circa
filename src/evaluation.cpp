@@ -297,7 +297,7 @@ void finish_using(Branch& branch)
     }
 }
 
-void evaluate_minimum(EvalContext* context, Term* term)
+void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
 {
     // Get a list of every term that this term depends on. Also, limit this
     // search to terms inside the current branch.
@@ -331,6 +331,10 @@ void evaluate_minimum(EvalContext* context, Term* term)
             evaluate_single_term(context, branch[i]);
         }
     }
+
+    // Possibly save output
+    if (result != NULL)
+        copy(get_local(term), result);
 
     delete[] marked;
 

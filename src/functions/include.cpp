@@ -45,7 +45,7 @@ namespace include_function {
         Term* inputTerm = term->input(0);
 
         EvalContext context;
-        evaluate_minimum(&context, inputTerm);
+        evaluate_minimum(&context, inputTerm, NULL);
 
         TaggedValue *input = get_input(NULL, term, 0);
 

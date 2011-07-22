@@ -80,6 +80,7 @@ void create_primitive_types()
 
     symbol_t::assign_new_symbol("repeat", &REPEAT_SYMBOL);
     symbol_t::assign_new_symbol("out", &OUT_SYMBOL);
+    symbol_t::assign_new_symbol("unknown", &UNKNOWN_SYMBOL);
 }
 
 void update_bootstrapped_term(Term* term)
@@ -157,23 +158,26 @@ void bootstrap_kernel()
 
 void initialize_primitive_types(Branch& kernel)
 {
-    STRING_TYPE = create_type(kernel, "string");
-    set_type(STRING_TYPE, &STRING_T);
-
-    INT_TYPE = create_type(kernel, "int");
-    set_type(INT_TYPE, &INT_T);
+    BOOL_TYPE = create_type(kernel, "bool");
+    set_type(BOOL_TYPE, &BOOL_T);
 
     FLOAT_TYPE = create_type(kernel, "number");
     set_type(FLOAT_TYPE, &FLOAT_T);
 
+    INT_TYPE = create_type(kernel, "int");
+    set_type(INT_TYPE, &INT_T);
+
     NULL_T_TERM = create_type(kernel, "Null");
     set_type(NULL_T_TERM, &NULL_T);
 
+    STRING_TYPE = create_type(kernel, "string");
+    set_type(STRING_TYPE, &STRING_T);
+
+    SYMBOL_TYPE = create_type(kernel, "Symbol");
+    set_type(SYMBOL_TYPE, &SYMBOL_T);
+
     DICT_TYPE = create_type(kernel, "Dict");
     set_type(DICT_TYPE, &DICT_T);
-
-    BOOL_TYPE = create_type(kernel, "bool");
-    set_type(BOOL_TYPE, &BOOL_T);
 
     REF_TYPE = create_type(kernel, "Ref");
     set_type(REF_TYPE, &REF_T);

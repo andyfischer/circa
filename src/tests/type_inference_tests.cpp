@@ -2,6 +2,8 @@
 
 #include <circa.h>
 
+#include "type_inference.h"
+
 namespace circa {
 namespace type_inference_tests {
 
@@ -67,6 +69,22 @@ void assign_output_type()
     test_assert(assign->type == LIST_TYPE);
 }
 
+void infer_length()
+{
+    Branch branch;
+
+    TaggedValue result;
+
+    statically_infer_result(branch.compile("length([])"), &result);
+    test_equals(&result, "0");
+    statically_infer_result(branch.compile("length([1])"), &result);
+    test_equals(&result, "1");
+    statically_infer_result(branch.compile("length([1 2 3])"), &result);
+    test_equals(&result, "3");
+    statically_infer_result(branch.compile("length([1 2 3].append(3))"), &result);
+    test_equals(&result, "4");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_inference_tests::test_find_common_type);
@@ -74,6 +92,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_inference_tests::compare_builtin_types);
     REGISTER_TEST_CASE(type_inference_tests::for_loop_output_type);
     REGISTER_TEST_CASE(type_inference_tests::assign_output_type);
+    REGISTER_TEST_CASE(type_inference_tests::infer_length);
 }
 
 } // namespace type_inference_tests

@@ -347,6 +347,13 @@ Term* create_empty_type(Branch& branch, std::string name)
     return type;
 }
 
+Term* create_symbol_value(Branch& branch, TaggedValue* value, std::string const& name)
+{
+    Term* term = create_value(branch, SYMBOL_TYPE, name);
+    copy(value, term);
+    return term;
+}
+
 Term* duplicate_value(Branch& branch, Term* term)
 {
     Term* dup = create_value(branch, term->type);

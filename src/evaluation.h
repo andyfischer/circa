@@ -66,7 +66,7 @@ void evaluate_branch(Branch& branch);
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 
 // Evaluate 'term' and every term that it depends on.
-void evaluate_minimum(EvalContext* context, Term* term);
+void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result);
 
 TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
 

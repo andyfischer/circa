@@ -62,6 +62,8 @@ namespace list_methods_function {
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
+
+        LIST_APPEND_FUNC = kernel["List.append"];
     }
 
 } // namespace list_methods_function

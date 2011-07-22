@@ -14,4 +14,15 @@ Term* find_common_type(TermList const& list);
 // this is not very sophisticated, since we don't have generic types.
 Term* find_type_of_get_index(Term* listTerm);
 
-}
+// Looks at the term's function, and generates an expression which is our
+// best static guess as to the result. This might be a plain value (if the
+// result is completely knowable), or it might be an expression with some
+// unknowns.
+Term* statically_infer_result(Branch& branch, Term* term);
+
+// This is similar to statically_infer_result(Branch,Term), but it's used
+// if you don't care about partially known values. This will either return
+// a value result or :unknown.
+void statically_infer_result(Term* term, TaggedValue* result);
+
+} // namespace circa

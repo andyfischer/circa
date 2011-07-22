@@ -1,5 +1,9 @@
 
 -- Builtin functions
+
+def length(List) -> int
+    "Return the number of items in the given list"
+
 namespace file
     def modified_time(string filename) -> int
 

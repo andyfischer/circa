@@ -39,7 +39,9 @@ extern Term* INCLUDE_FUNC;
 extern Term* INPUT_PLACEHOLDER_FUNC;
 extern Term* JOIN_FUNC;
 extern Term* LAMBDA_FUNC;
+extern Term* LENGTH_FUNC;
 extern Term* LIST_FUNC;
+extern Term* LIST_APPEND_FUNC;
 extern Term* MAP_TYPE;
 extern Term* MULT_FUNC;
 extern Term* NAMESPACE_FUNC;
@@ -53,6 +55,7 @@ extern Term* SET_INDEX_FUNC;
 extern Term* SUBROUTINE_OUTPUT_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* SUB_FUNC;
+extern Term* SYMBOL_TYPE;
 extern Term* RANGE_FUNC;
 extern Term* REF_FUNC;
 extern Term* RETURN_FUNC;
@@ -104,6 +107,7 @@ extern Type VOID_T;
 
 extern TaggedValue OUT_SYMBOL;
 extern TaggedValue REPEAT_SYMBOL;
+extern TaggedValue UNKNOWN_SYMBOL;
 
 extern Type* FILE_SIGNATURE_T;
 

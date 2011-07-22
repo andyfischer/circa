@@ -21,7 +21,7 @@ namespace run_single_statement_function {
                 continue;
 
             if (index == 0) {
-                evaluate_minimum(CONTEXT, branch[i]);
+                evaluate_minimum(CONTEXT, branch[i], NULL);
                 break;
             }
 

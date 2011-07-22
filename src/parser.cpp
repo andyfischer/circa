@@ -1238,7 +1238,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
                 throw std::runtime_error("Left side of <- must be a function");
 
             EvalContext context;
-            evaluate_minimum(&context, leftExpr.term);
+            evaluate_minimum(&context, leftExpr.term, NULL);
 
             Term* function = leftExpr.term;
 
