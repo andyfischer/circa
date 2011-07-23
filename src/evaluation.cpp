@@ -319,17 +319,21 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
         if (marked[i]) {
             for (int inputIndex=0; inputIndex < checkTerm->numInputs(); inputIndex++) {
                 Term* input = checkTerm->input(inputIndex);
-                if (input == NULL) continue;
-                if (input->owningBranch != &branch) continue;
+                if (input == NULL)
+                    continue;
+                if (input->owningBranch != &branch)
+                    continue;
+                // don't follow :meta inputs
+                if (function_t::get_input_meta(checkTerm->function, inputIndex))
+                    continue;
                 marked[input->index] = true;
             }
         }
     }
 
     for (int i=0; i <= term->index; i++) {
-        if (marked[i]) {
+        if (marked[i])
             evaluate_single_term(context, branch[i]);
-        }
     }
 
     // Possibly save output

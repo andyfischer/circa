@@ -325,6 +325,13 @@ void test_run_single_statement()
     test_equals(internal_debug_function::spy_results(), "[4]");
 }
 
+void test_type_func()
+{
+    Branch branch;
+    TaggedValue* result = branch.eval("type(1)");
+    test_assert(as_type(result) == &INT_T);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
@@ -343,6 +350,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing2);
     REGISTER_TEST_CASE(builtin_function_tests::test_run_single_statement);
+    REGISTER_TEST_CASE(builtin_function_tests::test_type_func);
 }
 
 } // namespace builtin_function_tests

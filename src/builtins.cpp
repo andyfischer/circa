@@ -157,6 +157,11 @@ CA_FUNCTION(length)
     set_int(OUTPUT, num_elements(INPUT(0)));
 }
 
+CA_FUNCTION(type_func)
+{
+    set_type(OUTPUT, declared_type(INPUT_TERM(0)));
+}
+
 void install_standard_library(Branch& kernel)
 {
     // Parse the stdlib script
@@ -165,6 +170,7 @@ void install_standard_library(Branch& kernel)
     // Install each function
     install_function(kernel["length"], length);
     install_function(kernel["file:modified_time"], file__modified_time);
+    install_function(kernel["type"], type_func);
     install_function(kernel["refactor:rename"], refactor__rename);
     install_function(kernel["refactor:change_function"], refactor__change_function);
     install_function(kernel["reflect:this_branch"], reflect__this_branch);

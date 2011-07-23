@@ -61,6 +61,18 @@ void test_evaluate_minimum2()
     test_equals(get_local(xyz), "null");
 }
 
+void test_evaluate_minimum_ignores_meta_inputs()
+{
+    Branch branch;
+    Term* a = branch.compile("a = add(1 2)");
+    Term* b = branch.compile("type(a)");
+    EvalContext context;
+    TaggedValue result;
+    evaluate_minimum(&context, b, &result);
+    test_equals(get_local(a), "null");
+    test_equals(as_type(&result)->name, "int");
+}
+
 void test_term_stack()
 {
     Branch branch;
@@ -91,6 +103,7 @@ void register_tests()
     REGISTER_TEST_CASE(evaluation_tests::test_branch_eval);
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum);
     REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum2);
+    REGISTER_TEST_CASE(evaluation_tests::test_evaluate_minimum_ignores_meta_inputs);
     REGISTER_TEST_CASE(evaluation_tests::test_term_stack);
 }
 
