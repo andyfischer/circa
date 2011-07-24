@@ -341,6 +341,13 @@ Term* create_type(Branch& branch, std::string name)
     return term;
 }
 
+Term* create_type_value(Branch& branch, Type* value, std::string const& name)
+{
+    Term* term = create_value(branch, TYPE_TYPE, name);
+    set_type(term, value);
+    return term;
+}
+
 Term* create_empty_type(Branch& branch, std::string name)
 {
     Term* type = create_type(branch, name);

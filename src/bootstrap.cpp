@@ -138,8 +138,7 @@ void bootstrap_kernel()
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
-    FUNCTION_TYPE = create_type(*KERNEL, "Function");
-    set_type(FUNCTION_TYPE, &FUNCTION_T);
+    FUNCTION_TYPE = create_type_value(*KERNEL, &FUNCTION_T, "Function");
 
     // Initialize TaggedValue func
     VALUE_FUNC->type = FUNCTION_TYPE;
@@ -158,41 +157,18 @@ void bootstrap_kernel()
 
 void initialize_primitive_types(Branch& kernel)
 {
-    BOOL_TYPE = create_type(kernel, "bool");
-    set_type(BOOL_TYPE, &BOOL_T);
-
-    FLOAT_TYPE = create_type(kernel, "number");
-    set_type(FLOAT_TYPE, &FLOAT_T);
-
-    INT_TYPE = create_type(kernel, "int");
-    set_type(INT_TYPE, &INT_T);
-
-    NULL_T_TERM = create_type(kernel, "Null");
-    set_type(NULL_T_TERM, &NULL_T);
-
-    STRING_TYPE = create_type(kernel, "string");
-    set_type(STRING_TYPE, &STRING_T);
-
-    SYMBOL_TYPE = create_type(kernel, "Symbol");
-    set_type(SYMBOL_TYPE, &SYMBOL_T);
-
-    DICT_TYPE = create_type(kernel, "Dict");
-    set_type(DICT_TYPE, &DICT_T);
-
-    REF_TYPE = create_type(kernel, "Ref");
-    set_type(REF_TYPE, &REF_T);
-
-    VOID_TYPE = create_type(kernel, "void");
-    set_type(VOID_TYPE, &VOID_T);
-
-    LIST_TYPE = create_type(kernel, "List");
-    set_type(LIST_TYPE, &LIST_T);
-
-    OPAQUE_POINTER_TYPE = create_type(kernel, "opaque_pointer");
-    set_type(OPAQUE_POINTER_TYPE, &OPAQUE_POINTER_T);
-
-    Term* branchType = create_type(kernel, "Branch");
-    set_type(branchType, &BRANCH_T);
+    BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
+    FLOAT_TYPE = create_type_value(kernel, &FLOAT_T, "number");
+    INT_TYPE = create_type_value(kernel, &INT_T, "int");
+    NULL_T_TERM = create_type_value(kernel, &NULL_T, "Null");
+    STRING_TYPE = create_type_value(kernel, &STRING_T, "string");
+    SYMBOL_TYPE = create_type_value(kernel, &SYMBOL_T, "Symbol");
+    DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
+    REF_TYPE = create_type_value(kernel, &REF_T, "Ref");
+    VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
+    LIST_TYPE = create_type_value(kernel, &LIST_T, "List");
+    OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
+    create_type_value(kernel, &BRANCH_T, "Branch");
 
     // ANY_TYPE was created in bootstrap_kernel
 }

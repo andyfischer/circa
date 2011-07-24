@@ -84,11 +84,53 @@ Term* find_type_of_get_index(Term* listTerm)
     return ANY_TYPE;
 }
 
-Term* statically_infer_length(Branch& branch, Term* term)
+Term* statically_infer_type_of_get_index(Branch& branch, Term* term)
+{
+    if (term->function == RANGE_FUNC)
+        create_type_value(branch, &INT_T);
+
+    return NULL;
+
+#if 0
+    if (listTerm->function == LIST_FUNC) {
+        TermList inputTypes;
+        for (int i=0; i < listTerm->numInputs(); i++)
+            inputTypes.append(listTerm->input(i)->type);
+        return find_common_type(inputTypes);
+    }
+
+    if (listTerm->function == COPY_FUNC)
+        return find_type_of_get_index(listTerm->input(0));
+
+    if (is_list_based_type(unbox_type(listTerm->type))) {
+        Branch& prototype = type_t::get_prototype(unbox_type(listTerm->type));
+        TermList types;
+        for (int i=0; i < prototype.length(); i++)
+            types.append(prototype[i]->type);
+        return find_common_type(types);
+    }
+
+    // Unrecognized
+    return ANY_TYPE;
+#endif
+}
+
+Term* statically_infer_type(Branch& branch, Term* term)
+{
+    if (term->function == GET_INDEX_FUNC)
+        return statically_infer_type_of_get_index(branch, term);
+    
+    // Give up
+    std::cout << "statically_infer_type didn't understand: "
+        << term->function->name << std::endl;
+    return create_symbol_value(branch, &UNKNOWN_SYMBOL);
+}
+
+Term* statically_infer_length_func(Branch& branch, Term* term)
 {
     Term* input = term->input(0);
     if (input->function == COPY_FUNC)
-        return statically_infer_length(branch, input->input(0));
+        return statically_infer_length_func(branch, input->input(0));
 
     if (input->function == LIST_FUNC)
         return create_int(branch, input->numInputs());
@@ -96,22 +138,27 @@ Term* statically_infer_length(Branch& branch, Term* term)
     if (input->function == LIST_APPEND_FUNC) {
         Term* leftLength = apply(branch, LENGTH_FUNC, TermList(input->input(0)));
         return apply(branch, ADD_FUNC, TermList(
-                    statically_infer_length(branch, leftLength),
+                    statically_infer_length_func(branch, leftLength),
                     create_int(branch, 1)));
     }
 
     // Give up
-    std::cout << "length didn't understand: " << input->function << std::endl;
+    std::cout << "statically_infer_length_func didn't understand: "
+        << input->function->name << std::endl;
     return create_symbol_value(branch, &UNKNOWN_SYMBOL);
 }
 
 Term* statically_infer_result(Branch& branch, Term* term)
 {
     if (term->function == LENGTH_FUNC)
-        return statically_infer_length(branch, term);
+        return statically_infer_length_func(branch, term);
+
+    if (term->function == TYPE_FUNC)
+        return statically_infer_type(branch, term->input(0));
 
     // Function not recognized
-    std::cout << "unrecognized function: " << term->function << std::endl;
+    std::cout << "statically_infer_result didn't recognize: "
+        << term->function->name << std::endl;
     return create_symbol_value(branch, &UNKNOWN_SYMBOL);
 }
 
@@ -120,8 +167,6 @@ void statically_infer_result(Term* term, TaggedValue* result)
     Branch scratch;
 
     Term* resultTerm = statically_infer_result(scratch, term);
-
-    //dump(scratch);
 
     if (is_value(resultTerm))
         copy(resultTerm, result);
