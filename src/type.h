@@ -110,12 +110,6 @@ struct Type
     // Type parameters
     TaggedValue parameter;
 
-    // Attributes for this type.
-    Branch attributes;
-
-    // Default value
-    TaggedValue defaultTaggedValue;
-
     bool permanent;
     bool heapAllocated;
 
@@ -179,9 +173,7 @@ namespace type_t {
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);
     Branch& get_prototype(Type* type);
-    Branch& get_attributes(Term* type);
-    TaggedValue* get_default_value(Type* type);
-}
+} // namespace type_t
 
 Type* unbox_type(Term* type);
 Type* unbox_type(TaggedValue* val);

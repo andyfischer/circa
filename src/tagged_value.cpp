@@ -244,20 +244,13 @@ void reset(TaggedValue* value)
 
     Type* type = value->value_type;
 
-    // Check if there is a default value defined
-    TaggedValue* defaultTaggedValue = type_t::get_default_value(type);
-    if (defaultTaggedValue != NULL && !is_null(defaultTaggedValue) && defaultTaggedValue->value_type) {
-        copy(defaultTaggedValue, value);
-        return;
-    }
-
     // Check if the reset() function is defined
     if (type->reset != NULL) {
         type->reset(type, value);
         return;
     }
 
-    // No default value, just change type to null and back.
+    // No reset() function, just change type to null and back.
     change_type(value, &NULL_T);
     change_type(value, type);
 }

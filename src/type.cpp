@@ -83,14 +83,6 @@ namespace type_t {
     {
         return type->prototype;
     }
-    Branch& get_attributes(Term* type)
-    {
-        return as_type(type)->attributes;
-    }
-    TaggedValue* get_default_value(Type* type)
-    {
-        return &type->defaultTaggedValue;
-    }
 
 } // namespace type_t
 
@@ -323,9 +315,7 @@ void reset_type(Type* type)
 void clear_type_contents(Type* type)
 {
     set_null(&type->parameter);
-    set_null(&type->defaultTaggedValue);
     clear_branch(&type->prototype);
-    clear_branch(&type->attributes);
 }
 
 void initialize_simple_pointer_type(Type* type)
