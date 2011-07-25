@@ -311,8 +311,10 @@ void set_feedback_weight(Term* term, float weight)
 
 void feedback_register_constants(Branch& kernel)
 {
+#if 0
     FEEDBACK_TYPE = create_empty_type(kernel, "FeedbackType");
     DESIRED_VALUE_FEEDBACK = create_value(kernel, FEEDBACK_TYPE, "desired_value");
+#endif
 }
 
 Branch& feedback_output(Term* term)

@@ -11,7 +11,7 @@ struct InputInstruction
     // For each term, each input has InputInstruction data which records where the
     // input data can be found. This is precomputed in update_input_instructions.
     
-    enum Type {
+    enum InstructionType {
         // EMPTY means that there is no input value.
         EMPTY=0,
 
@@ -34,7 +34,7 @@ struct InputInstruction
         int index;
     };
 
-    Type type;
+    InstructionType type;
     LocalData data;
 };
 

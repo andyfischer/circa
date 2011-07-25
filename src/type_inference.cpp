@@ -89,8 +89,6 @@ Term* statically_infer_type_of_get_index(Branch& branch, Term* term)
     if (term->function == RANGE_FUNC)
         create_type_value(branch, &INT_T);
 
-    return NULL;
-
 #if 0
     if (listTerm->function == LIST_FUNC) {
         TermList inputTypes;
@@ -109,10 +107,10 @@ Term* statically_infer_type_of_get_index(Branch& branch, Term* term)
             types.append(prototype[i]->type);
         return find_common_type(types);
     }
+#endif
 
     // Unrecognized
     return ANY_TYPE;
-#endif
 }
 
 Term* statically_infer_type(Branch& branch, Term* term)

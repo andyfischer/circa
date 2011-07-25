@@ -58,7 +58,6 @@ Branch& create_branch(Branch& owner, std::string const& name="");
 Branch& create_namespace(Branch&, std::string const& name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_type_value(Branch& branch, Type* value, std::string const& name="");
-Term* create_empty_type(Branch& branch, std::string name);
 Term* create_symbol_value(Branch& branch, TaggedValue* value, std::string const& name="");
 Term* duplicate_value(Branch& branch, Term* term);
 

@@ -348,12 +348,6 @@ Term* create_type_value(Branch& branch, Type* value, std::string const& name)
     return term;
 }
 
-Term* create_empty_type(Branch& branch, std::string name)
-{
-    Term* type = create_type(branch, name);
-    return type;
-}
-
 Term* create_symbol_value(Branch& branch, TaggedValue* value, std::string const& name)
 {
     Term* term = create_value(branch, SYMBOL_TYPE, name);
