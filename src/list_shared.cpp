@@ -324,4 +324,49 @@ void list_remove_nulls(TaggedValue* value)
     list_remove_nulls((ListData**) &value->value_data);
 }
 
+// Functions for working with List's parameter. A list can have a different
+// "kind" depending on its parameter, including typed lists of N length, or
+// fixed-sized lists.
+enum ListKind
+{
+    LIST_INVALID_KIND=0,
+    LIST_UNTYPED,
+    LIST_TYPED_UNSIZED,
+    LIST_TYPED_SIZED,
+    LIST_TYPED_SIZED_NAMED
+};
+
+ListKind list_get_kind_from_parameter(TaggedValue* parameter)
+{
+    if (is_null(parameter))
+        return LIST_UNTYPED;
+    if (is_type(parameter))
+        return LIST_TYPED_UNSIZED;
+
+    if (is_list(parameter)) {
+        if ((list_get_length(parameter) == 2) && is_list(list_get_index(parameter, 0)))
+            return LIST_TYPED_SIZED_NAMED;
+        else
+            return LIST_TYPED_SIZED;
+    }
+    return LIST_INVALID_KIND;
+}
+
+bool list_kind_has_specific_size(TaggedValue* parameter)
+{
+    return is_list(parameter);
+}
+
+void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter)
+{
+    List& param = *set_list(parameter, 2);
+    List& types = *set_list(param[0], typeDecl.length());
+    List& names = *set_list(param[1], typeDecl.length());
+
+    for (int i=0; i < typeDecl.length(); i++) {
+        set_type(types[i], declared_type(typeDecl[i]));
+        set_string(names[i], typeDecl[i]->name);
+    }
+}
+
 } // namespace circa

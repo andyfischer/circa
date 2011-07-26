@@ -17,6 +17,7 @@
 namespace circa {
 namespace list_t {
 
+
     void clear(ListData** data)
     {
         if (*data == NULL) return;

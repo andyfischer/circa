@@ -3,6 +3,12 @@
 #include "common_headers.h"
 
 #include "circa.h"
+
+#include "branch.h"
+#include "list_shared.h"
+#include "parser.h"
+#include "term.h"
+#include "token.h"
 #include "update_cascades.h"
 
 namespace circa {
@@ -688,7 +694,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     result->setStringProp("syntax:postLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    Branch& prototype = type_t::get_prototype(unbox_type(result));
+    Branch& contents = type_t::get_prototype(unbox_type(result));
 
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);
@@ -710,7 +716,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
         Term* fieldType = find_type(branch, fieldTypeName);
 
-        Term* field = create_value(prototype, fieldType, fieldName);
+        Term* field = create_value(contents, fieldType, fieldName);
 
         field->setStringProp("syntax:preWhitespace", preWs);
         field->setStringProp("syntax:postNameWs", postNameWs);
@@ -718,6 +724,8 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     }
 
     tokens.consume(closingToken);
+
+    list_initialize_parameter_from_type_decl(contents, &as_type(result)->parameter);
 
     branch.moveToEnd(result);
     refresh_locals_indices(branch);

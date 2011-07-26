@@ -40,4 +40,7 @@ TaggedValue* list_insert(TaggedValue* list, int index);
 void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
 void list_remove_nulls(TaggedValue* list);
 
+// Functions for dealing with List parameters and kinds:
+void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter);
+
 } // namespace circa
