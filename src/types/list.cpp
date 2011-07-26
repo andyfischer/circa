@@ -67,38 +67,6 @@ namespace list_t {
         return value->refCount;
     }
 
-    void remove_and_replace_with_back(ListData** data, int index)
-    {
-        *data = list_touch(*data);
-        ca_assert(index < (*data)->count);
-
-        set_null(&(*data)->items[index]);
-
-        int lastElement = (*data)->count - 1;
-        if (index < lastElement)
-            swap(&(*data)->items[index], &(*data)->items[lastElement]);
-
-        (*data)->count--;
-    }
-
-    void remove_nulls(ListData** dataPtr)
-    {
-        if (*dataPtr == NULL)
-            return;
-
-        *dataPtr = list_touch(*dataPtr);
-        ListData* data = *dataPtr;
-
-        int numRemoved = 0;
-        for (int i=0; i < data->count; i++) {
-            if (is_null(&data->items[i]))
-                numRemoved++;
-            else
-                swap(&data->items[i - numRemoved], &data->items[i]);
-        }
-        *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
-    }
-
     TaggedValue* prepend(ListData** data)
     {
         append(data);
@@ -150,12 +118,6 @@ namespace list_t {
     {
         ca_assert(is_list(list));
         return prepend((ListData**) &list->value_data);
-    }
-
-    void remove_nulls(TaggedValue* list)
-    {
-        ca_assert(is_list(list));
-        remove_nulls((ListData**) &list->value_data);
     }
 
     void tv_initialize(Type* type, TaggedValue* value)
@@ -377,14 +339,6 @@ namespace list_t {
             set_int(&relativeIdentifier, i);
             callback(&data->items[i], &relativeIdentifier, context);
         }
-    }
-
-    void remove_and_replace_with_back(TaggedValue* value, int index)
-    {
-        ca_assert(is_list(value));
-        ListData* data = (ListData*) get_pointer(value);
-        remove_and_replace_with_back(&data, index);
-        set_pointer(value, data);
     }
 
     void setup_type(Type* type)
@@ -630,7 +584,7 @@ List::remove(int index)
 void
 List::removeNulls()
 {
-    list_t::remove_nulls(this);
+    list_remove_nulls(this);
 }
 
 List*

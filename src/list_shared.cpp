@@ -201,6 +201,38 @@ TaggedValue* list_insert(ListData** dataPtr, int index)
     return &data->items[index];
 }
 
+void list_remove_and_replace_with_last_element(ListData** data, int index)
+{
+    *data = list_touch(*data);
+    ca_assert(index < (*data)->count);
+
+    set_null(&(*data)->items[index]);
+
+    int lastElement = (*data)->count - 1;
+    if (index < lastElement)
+        swap(&(*data)->items[index], &(*data)->items[lastElement]);
+
+    (*data)->count--;
+}
+
+void list_remove_nulls(ListData** dataPtr)
+{
+    if (*dataPtr == NULL)
+        return;
+
+    *dataPtr = list_touch(*dataPtr);
+    ListData* data = *dataPtr;
+
+    int numRemoved = 0;
+    for (int i=0; i < data->count; i++) {
+        if (is_null(&data->items[i]))
+            numRemoved++;
+        else
+            swap(&data->items[i - numRemoved], &data->items[i]);
+    }
+    *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
+}
+
 int list_get_length(TaggedValue* value)
 {
     ListData* s = (ListData*) get_pointer(value);
@@ -266,6 +298,18 @@ TaggedValue* list_insert(TaggedValue* list, int index)
     TaggedValue* result = list_insert(&data, index);
     list->value_data.ptr = data;
     return result;
+}
+
+void list_remove_and_replace_with_last_element(TaggedValue* value, int index)
+{
+    ca_assert(is_list(value));
+    list_remove_and_replace_with_last_element((ListData**) &value->value_data, index);
+}
+
+void list_remove_nulls(TaggedValue* value)
+{
+    ca_assert(is_list(value));
+    list_remove_nulls((ListData**) &value->value_data);
 }
 
 } // namespace circa

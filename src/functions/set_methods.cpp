@@ -30,7 +30,7 @@ namespace set_methods_function {
         int numElements = list->numElements();
         for (int index=0; index < numElements; index++) {
             if (equals(value, list->get(index))) {
-                list_t::remove_and_replace_with_back(list, index);
+                list_remove_and_replace_with_last_element(list, index);
                 return;
             }
         }

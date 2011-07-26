@@ -35,5 +35,7 @@ TaggedValue* list_get_index_from_end(TaggedValue* value, int index);
 void list_remove_index(TaggedValue* list, int index);
 TaggedValue* list_append(TaggedValue* list);
 TaggedValue* list_insert(TaggedValue* list, int index);
+void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
+void list_remove_nulls(TaggedValue* list);
 
 } // namespace circa
