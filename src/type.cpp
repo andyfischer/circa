@@ -74,6 +74,10 @@ namespace type_t {
             prototype.set(field_i, remapped);
         }
     }
+    std::string toString(TaggedValue* value)
+    {
+        return "<Type "+as_type(value)->name+">";
+    }
     void setup_type(Type* type)
     {
         type->name = "Type";
@@ -83,6 +87,7 @@ namespace type_t {
         type->copy = copy;
         type->remapPointers = remap_pointers;
         type->formatSource = formatSource;
+        type->toString = toString;
     }
 
     Type::RemapPointers& get_remap_pointers_func(Term* type)

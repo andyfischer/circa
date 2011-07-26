@@ -14,7 +14,7 @@ void test_parse_type()
     Term* myType = branch.compile("type MyType { string s, int i }");
 
     // Check MyType's parameter
-    //test_equals(&as_type(myType)->parameter, "[[string, int], ['s', 'i']]");
+    test_equals(&as_type(myType)->parameter, "[[<Type string>, <Type int>], ['s', 'i']]");
 
     // Check an instanciated value
     TaggedValue* val = branch.eval("MyType()");
