@@ -168,7 +168,7 @@ namespace type_t {
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, TermMap const& map);
-    void setup_type(Term* type);
+    void setup_type(Type* type);
 
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);

@@ -11,9 +11,13 @@ void test_parse_type()
 {
     Branch branch;
 
-    branch.compile("type MyType { string s, int i }");
-    TaggedValue* val = branch.eval("MyType()");
+    Term* myType = branch.compile("type MyType { string s, int i }");
 
+    // Check MyType's parameter
+    //test_equals(&as_type(myType)->parameter, "[[string, int], ['s', 'i']]");
+
+    // Check an instanciated value
+    TaggedValue* val = branch.eval("MyType()");
     test_assert(is_string(val->getIndex(0)));
     test_assert(is_int(val->getIndex(1)));
 

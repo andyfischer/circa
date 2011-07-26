@@ -74,6 +74,16 @@ namespace type_t {
             prototype.set(field_i, remapped);
         }
     }
+    void setup_type(Type* type)
+    {
+        type->name = "Type";
+        type->storageType = STORAGE_TYPE_TYPE;
+        type->initialize = type_t::initialize;
+        type->release = release;
+        type->copy = copy;
+        type->remapPointers = remap_pointers;
+        type->formatSource = formatSource;
+    }
 
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {

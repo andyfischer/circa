@@ -107,13 +107,7 @@ void bootstrap_kernel()
     TYPE_TYPE->type = TYPE_TYPE;
     TYPE_TYPE->value_type = &TYPE_T;
     TYPE_TYPE->value_data.ptr = &TYPE_T;
-    TYPE_T.name = "Type";
-    TYPE_T.storageType = STORAGE_TYPE_TYPE;
-    TYPE_T.initialize = type_t::initialize;
-    TYPE_T.release = type_t::release;
-    TYPE_T.copy = type_t::copy;
-    TYPE_T.remapPointers = type_t::remap_pointers;
-    TYPE_T.formatSource = type_t::formatSource;
+    type_t::setup_type(&TYPE_T);
     KERNEL->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
