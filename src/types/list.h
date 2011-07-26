@@ -13,8 +13,6 @@ namespace list_t {
     std::string tv_to_string(TaggedValue* value);
     TaggedValue* append(TaggedValue* list);
     TaggedValue* prepend(TaggedValue* list);
-
-    namespace tests { void register_tests(); }
 }
 
 bool is_list_based_type(Type*);

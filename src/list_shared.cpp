@@ -201,6 +201,21 @@ TaggedValue* list_insert(ListData** dataPtr, int index)
     return &data->items[index];
 }
 
+TaggedValue* list_get_index(ListData* data, int index)
+{
+    if (data == NULL)
+        return NULL;
+    if (index >= data->count)
+        return NULL;
+    return &data->items[index];
+}
+void list_set_index(ListData* data, int index, TaggedValue* value)
+{
+    TaggedValue* dest = list_get_index(data, index);
+    ca_assert(dest != NULL);
+    copy(value, dest);
+}
+
 void list_remove_and_replace_with_last_element(ListData** data, int index)
 {
     *data = list_touch(*data);
@@ -244,12 +259,9 @@ int list_get_length(TaggedValue* value)
 TaggedValue* list_get_index(TaggedValue* value, int index)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
-
-    ListData* data = (ListData*) value->value_data.ptr;
-    ca_assert(index < data->count);
-
-    return &data->items[index];
+    return list_get_index((ListData*) value->value_data.ptr, index);
 }
+
 TaggedValue* list_get_index_from_end(TaggedValue* value, int reverseIndex)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);

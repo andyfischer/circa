@@ -2,10 +2,12 @@
 
 #include <circa.h>
 
+#include "list_shared.h"
+
 namespace circa {
 namespace list_tests {
 
-void test_tagged_value()
+void test_parse_type()
 {
     Branch branch;
 
@@ -18,6 +20,18 @@ void test_tagged_value()
     test_assert(is_string(val->getField("s")));
     test_assert(is_int(val->getField("i")));
     test_assert(val->getField("x") == NULL);
+}
+
+void test_cpp_wrapper_simple()
+{
+    List list;
+    test_assert(list.length() == 0);
+    list.append();
+    test_assert(list.length() == 1);
+    list.append();
+    test_assert(list.length() == 2);
+    list.clear();
+    test_assert(list.length() == 0);
 }
 
 void test_cast()
@@ -121,13 +135,117 @@ void test_remove_index()
     test_equals(&list, "[]");
 }
 
+
+void test_tagged_value()
+{
+    Type* list = Type::create();
+    list_t::setup_type(list);
+
+    TaggedValue value;
+    change_type(&value, list);
+
+    test_equals(to_string(&value), "[]");
+    test_assert(get_index(&value, 1) == NULL);
+    test_assert(num_elements(&value) == 0);
+
+    set_int(list_t::append(&value), 1);
+    set_int(list_t::append(&value), 2);
+    set_int(list_t::append(&value), 3);
+
+    test_equals(to_string(&value), "[1, 2, 3]");
+
+    test_assert(as_int(get_index(&value, 1)) == 2);
+    test_assert(num_elements(&value) == 3);
+}
+
+void test_tagged_value_copy()
+{
+    Type* list = Type::create();
+    list_t::setup_type(list);
+
+    TaggedValue value(list);
+
+    set_int(list_t::append(&value), 1);
+    set_int(list_t::append(&value), 2);
+    set_int(list_t::append(&value), 3);
+
+    test_equals(to_string(&value), "[1, 2, 3]");
+
+    TaggedValue value2;
+    test_assert(value.value_type->copy != NULL);
+    copy(&value, &value2);
+
+    test_equals(to_string(&value2), "[1, 2, 3]");
+
+    set_int(list_t::append(&value2), 4);
+
+    test_equals(to_string(&value), "[1, 2, 3]");
+    test_equals(to_string(&value2), "[1, 2, 3, 4]");
+}
+
+void test_touch()
+{
+    Type* list = Type::create();
+    list_t::setup_type(list);
+
+    TaggedValue value(list);
+
+    set_int(list_t::append(&value), 1);
+    set_int(list_t::append(&value), 2);
+
+    TaggedValue value2(list);
+    copy(&value, &value2);
+
+    #if !CIRCA_DISABLE_LIST_SHARING
+    test_assert(get_pointer(&value) == get_pointer(&value2));
+    #endif
+    touch(&value2);
+    test_assert(get_pointer(&value) != get_pointer(&value2));
+}
+
+void test_prepend()
+{
+    Type* list = Type::create();
+    list_t::setup_type(list);
+
+    TaggedValue value(list);
+
+    set_int(list_t::append(&value), 1);
+    set_int(list_t::append(&value), 2);
+
+    test_assert(to_string(&value) == "[1, 2]");
+    list_t::prepend(&value);
+    test_assert(to_string(&value) == "[null, 1, 2]");
+    set_int(list_get_index(&value, 0), 4);
+    test_assert(to_string(&value) == "[4, 1, 2]");
+
+    reset(&value);
+
+    test_assert(to_string(&value) == "[]");
+    list_t::prepend(&value);
+    test_assert(to_string(&value) == "[null]");
+
+    reset(&value);
+
+    list_t::prepend(&value);
+    set_int(list_get_index(&value, 0), 1);
+    test_assert(to_string(&value) == "[1]");
+    list_t::prepend(&value);
+    test_assert(to_string(&value) == "[null, 1]");
+}
+
 void register_tests()
 {
-    REGISTER_TEST_CASE(list_tests::test_tagged_value);
+    REGISTER_TEST_CASE(list_tests::test_parse_type);
+    REGISTER_TEST_CASE(list_tests::test_cpp_wrapper_simple);
     REGISTER_TEST_CASE(list_tests::test_cast);
     REGISTER_TEST_CASE(list_tests::test_remove_nulls);
     REGISTER_TEST_CASE(list_tests::test_remove_index);
+    REGISTER_TEST_CASE(list_tests::test_tagged_value);
+    REGISTER_TEST_CASE(list_tests::test_tagged_value_copy);
+    REGISTER_TEST_CASE(list_tests::test_touch);
+    REGISTER_TEST_CASE(list_tests::test_prepend);
 }
 
 }
-}
+} // namespace circa

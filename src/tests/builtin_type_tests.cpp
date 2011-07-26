@@ -118,8 +118,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_type_tests::test_set);
     REGISTER_TEST_CASE(builtin_type_tests::test_list);
     REGISTER_TEST_CASE(builtin_type_tests::test_namespace);
-
-    list_t::tests::register_tests();
 }
 
 } // namespace builtin_type_tests

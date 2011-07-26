@@ -40,21 +40,6 @@ namespace list_t {
         return &d->items[d->count - 1];
     }
 
-    TaggedValue* get_index(ListData* list, int index)
-    {
-        if (list == NULL)
-            return NULL;
-        if (index >= list->count)
-            return NULL;
-        return &list->items[index];
-    }
-
-    void set_index(ListData** data, int index, TaggedValue* v)
-    {
-        *data = list_touch(*data);
-        copy(v, get_index(*data, index));
-    }
-
     int num_elements(ListData* list)
     {
         if (list == NULL) return 0;
@@ -239,19 +224,11 @@ namespace list_t {
             dest->value_type = type;
     }
 
-    TaggedValue* tv_get_index(TaggedValue* value, int index)
-    {
-        ca_assert(is_list(value));
-        ListData* s = (ListData*) get_pointer(value);
-        return get_index(s, index);
-    }
-
     void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
     {
         ca_assert(is_list(value));
         ListData* s = (ListData*) get_pointer(value);
-        set_index(&s, index, element);
-        set_pointer(value, s);
+        list_set_index(s, index, element);
     }
 
     TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
@@ -259,7 +236,7 @@ namespace list_t {
         int index = value->value_type->findFieldIndex(fieldName);
         if (index < 0)
             return NULL;
-        return tv_get_index(value, index);
+        return list_get_index(value, index);
     }
 
     std::string tv_to_string(TaggedValue* value)
@@ -352,7 +329,7 @@ namespace list_t {
         type->toString = tv_to_string;
         type->equals = tv_equals;
         type->cast = tv_cast;
-        type->getIndex = tv_get_index;
+        type->getIndex = list_get_index;
         type->setIndex = tv_set_index;
         type->getField = tv_get_field;
         type->numElements = list_get_length;
@@ -375,128 +352,6 @@ namespace list_t {
         set_int(OUTPUT, list->length());
     }
 
-    namespace tests {
-
-        void test_simple()
-        {
-            List list;
-            test_assert(list.length() == 0);
-            list.append();
-            test_assert(list.length() == 1);
-            list.append();
-            test_assert(list.length() == 2);
-            list.clear();
-            test_assert(list.length() == 0);
-        }
-
-        void test_tagged_value()
-        {
-            Type* list = Type::create();
-            list_t::setup_type(list);
-
-            TaggedValue value;
-            change_type(&value, list);
-
-            test_equals(to_string(&value), "[]");
-            test_assert(get_index(&value, 1) == NULL);
-            test_assert(num_elements(&value) == 0);
-
-            set_int(list_t::append(&value), 1);
-            set_int(list_t::append(&value), 2);
-            set_int(list_t::append(&value), 3);
-
-            test_equals(to_string(&value), "[1, 2, 3]");
-
-            test_assert(as_int(get_index(&value, 1)) == 2);
-            test_assert(num_elements(&value) == 3);
-        }
-
-        void test_tagged_value_copy()
-        {
-            Type* list = Type::create();
-            list_t::setup_type(list);
-
-            TaggedValue value(list);
-
-            set_int(list_t::append(&value), 1);
-            set_int(list_t::append(&value), 2);
-            set_int(list_t::append(&value), 3);
-
-            test_equals(to_string(&value), "[1, 2, 3]");
-
-            TaggedValue value2;
-            test_assert(value.value_type->copy != NULL);
-            copy(&value, &value2);
-
-            test_equals(to_string(&value2), "[1, 2, 3]");
-
-            set_int(list_t::append(&value2), 4);
-
-            test_equals(to_string(&value), "[1, 2, 3]");
-            test_equals(to_string(&value2), "[1, 2, 3, 4]");
-        }
-
-        void test_touch()
-        {
-            Type* list = Type::create();
-            list_t::setup_type(list);
-
-            TaggedValue value(list);
-
-            set_int(list_t::append(&value), 1);
-            set_int(list_t::append(&value), 2);
-
-            TaggedValue value2(list);
-            copy(&value, &value2);
-
-            #if !CIRCA_DISABLE_LIST_SHARING
-            test_assert(get_pointer(&value) == get_pointer(&value2));
-            #endif
-            touch(&value2);
-            test_assert(get_pointer(&value) != get_pointer(&value2));
-        }
-
-        void test_prepend()
-        {
-            Type* list = Type::create();
-            list_t::setup_type(list);
-
-            TaggedValue value(list);
-
-            set_int(list_t::append(&value), 1);
-            set_int(list_t::append(&value), 2);
-
-            test_assert(to_string(&value) == "[1, 2]");
-            list_t::prepend(&value);
-            test_assert(to_string(&value) == "[null, 1, 2]");
-            set_int(list_t::tv_get_index(&value, 0), 4);
-            test_assert(to_string(&value) == "[4, 1, 2]");
-
-            reset(&value);
-
-            test_assert(to_string(&value) == "[]");
-            list_t::prepend(&value);
-            test_assert(to_string(&value) == "[null]");
-
-            reset(&value);
-
-            list_t::prepend(&value);
-            set_int(list_t::tv_get_index(&value, 0), 1);
-            test_assert(to_string(&value) == "[1]");
-            list_t::prepend(&value);
-            test_assert(to_string(&value) == "[null, 1]");
-        }
-
-        void register_tests()
-        {
-            REGISTER_TEST_CASE(list_t::tests::test_simple);
-            REGISTER_TEST_CASE(list_t::tests::test_tagged_value);
-            REGISTER_TEST_CASE(list_t::tests::test_tagged_value_copy);
-            REGISTER_TEST_CASE(list_t::tests::test_touch);
-            REGISTER_TEST_CASE(list_t::tests::test_prepend);
-        }
-
-    } // namespace tests
 } // namespace list_t
 
 bool is_list_based_type(Type* type)
@@ -548,7 +403,7 @@ List::empty()
 TaggedValue*
 List::get(int index)
 {
-    return list_t::tv_get_index((TaggedValue*) this, index);
+    return list_get_index((TaggedValue*) this, index);
 }
 
 void
