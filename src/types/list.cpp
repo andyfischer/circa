@@ -17,7 +17,6 @@
 namespace circa {
 namespace list_t {
 
-
     void clear(ListData** data)
     {
         if (*data == NULL) return;
@@ -110,14 +109,14 @@ namespace list_t {
     {
         ca_assert(value->value_data.ptr == NULL);
 
-        // If type has a prototype then initialize to that.
-        Branch& prototype = type_t::get_prototype(type);
-        if (prototype.length() > 0) {
-            List* list = List::checkCast(value);
-            list->resize(prototype.length());
-
-            for (int i=0; i < prototype.length(); i++)
-                change_type(list->get(i), unbox_type(prototype[i]->type));
+        // If the parameter has a fixed size list, then initialize to that.
+        if (list_type_has_specific_size(&type->parameter)) {
+            TaggedValue* typeList = list_get_type_list_from_parameter(&type->parameter);
+            List& types = *List::checkCast(typeList);
+            List& result = *List::checkCast(value);
+            result.resize(types.length());
+            for (int i=0; i < types.length(); i++)
+                change_type(result[i], as_type(types[i]));
         }
     }
 
@@ -181,11 +180,10 @@ namespace list_t {
         }
 
         int sourceLength = sourceList->length();
-        int prototypeLength = type->prototype.length();
 
-        // if prototypeLength is 0 then this is a freeform list, so just do a
-        // copy and call it a day.
-        if (prototypeLength == 0) {
+        // If the destination list type doesn't have a specific size restriction,
+        // then just copy the source list and call it a day.
+        if (!list_type_has_specific_size(&type->parameter)) {
             if (!checkOnly) {
                 copy(source, dest);
                 dest->value_type = type;
@@ -193,8 +191,11 @@ namespace list_t {
             return;
         }
 
-        // check for correct # of elements
-        if (sourceLength != prototypeLength) {
+        List& destTypes = *List::checkCast(
+            list_get_type_list_from_parameter(&type->parameter));
+
+        // Check for correct number of elements.
+        if (sourceLength != destTypes.length()) {
             result->success = false;
             return;
         }
@@ -209,13 +210,13 @@ namespace list_t {
 
         for (int i=0; i < sourceLength; i++) {
             TaggedValue* sourceElement = sourceList->get(i);
-            Type* elementType = get_compound_list_element_type(type, i);
+            Type* expectedType = as_type(destTypes[i]);
 
             TaggedValue* destElement = NULL;
             if (!checkOnly)
                 destElement = destList->get(i);
         
-            cast(result, sourceElement, elementType, destElement, checkOnly);
+            cast(result, sourceElement, expectedType, destElement, checkOnly);
 
             if (!result->success)
                 return;

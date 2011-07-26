@@ -40,7 +40,13 @@ TaggedValue* list_insert(TaggedValue* list, int index);
 void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
 void list_remove_nulls(TaggedValue* list);
 
-// Functions for dealing with List parameters and kinds:
+// Functions for dealing with List parameters and List types:
+bool list_type_has_specific_size(TaggedValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter);
+
+// From the parameter of a List type value, this returns a list of types for
+// the fields of the list. Only valid if this parameter describes a fixed-size
+// list (otherwise it returns NULL).
+TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter);
 
 } // namespace circa
