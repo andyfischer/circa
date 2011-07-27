@@ -21,7 +21,8 @@ namespace instance_function {
     void setup(Branch& kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        get_function_attrs(kernel["instance"])->specializeType = specializeType;
+        INSTANCE_FUNC = kernel["instance"];
+        get_function_attrs(INSTANCE_FUNC)->specializeType = specializeType;
     }
 }
-}
+} // namespace circa

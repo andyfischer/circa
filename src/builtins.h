@@ -37,6 +37,7 @@ extern Term* IF_BLOCK_FUNC;
 extern Term* COND_FUNC;
 extern Term* INCLUDE_FUNC;
 extern Term* INPUT_PLACEHOLDER_FUNC;
+extern Term* INSTANCE_FUNC;
 extern Term* JOIN_FUNC;
 extern Term* LAMBDA_FUNC;
 extern Term* LENGTH_FUNC;
