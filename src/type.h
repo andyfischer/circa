@@ -191,6 +191,7 @@ Term* get_output_type(Term* term, int outputIndex);
 Term* get_output_type(Term* term);
 Term* get_type_of_input(Term* term, int inputIndex);
 
+StaticTypeQuery::Result run_static_type_query(Type* type, Type* subjectType);
 StaticTypeQuery::Result run_static_type_query(Type* type, Term* term);
 bool term_output_always_satisfies_type(Term* term, Type* type);
 bool term_output_never_satisfies_type(Term* term, Type* type);
@@ -201,7 +202,7 @@ void clear_type_contents(Type* type);
 void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch& kernel);
-Term* create_implicit_tuple_type(TermList const& types);
+Term* create_tuple_type(TermList const& types);
 Term* find_method(Branch& branch, Term* type, std::string const& name);
 
 Term* parse_type(Branch& branch, std::string const& decl);

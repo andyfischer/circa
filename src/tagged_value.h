@@ -113,6 +113,7 @@ Branch* as_branch(TaggedValue* value);
 void* as_opaque_pointer(TaggedValue* value);
 Type* as_type(TaggedValue* value);
 Term* as_function_pointer(TaggedValue* value);
+List* as_list(TaggedValue* value);
 
 bool is_int(TaggedValue* value);
 bool is_error(TaggedValue* value);

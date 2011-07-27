@@ -137,7 +137,7 @@ void test_create_implicit_tuple_type()
 {
     Branch branch;
     TermList types(INT_TYPE, FLOAT_TYPE, STRING_TYPE);
-    Term* result = create_implicit_tuple_type(types);
+    Term* result = create_tuple_type(types);
 
     TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
     TaggedValue* b = branch.eval("['hi', 3.0, 1]");

@@ -549,6 +549,10 @@ Term* as_function_pointer(TaggedValue* value)
     ca_assert(is_function_pointer(value));
     return (Term*) value->value_data.ptr;
 }
+List* as_list(TaggedValue* value)
+{
+    return List::checkCast(value);
+}
 
 void* get_pointer(TaggedValue* value)
 {

@@ -244,7 +244,7 @@ static void run_static_type_query(StaticTypeQuery* query)
         return query->fail();
 
     ca_assert(query->type);
-    ca_assert(declared_type(query->subject));
+    ca_assert(query->subject == NULL || declared_type(query->subject));
 
     // Check that either subject or subjectType are provided.
     ca_assert(query->subjectType || query->subject);
@@ -273,11 +273,19 @@ static void run_static_type_query(StaticTypeQuery* query)
     return query->fail();
 }
 
+StaticTypeQuery::Result run_static_type_query(Type* type, Type* subjectType)
+{
+    StaticTypeQuery query;
+    query.type = type;
+    query.subjectType = subjectType;
+    run_static_type_query(&query);
+    return query.result;
+}
 StaticTypeQuery::Result run_static_type_query(Type* type, Term* term)
 {
     StaticTypeQuery query;
-    query.subject = term;
     query.type = type;
+    query.subject = term;
     run_static_type_query(&query);
     return query.result;
 }
@@ -343,7 +351,7 @@ void type_initialize_kernel(Branch& kernel)
     IMPLICIT_TYPES = create_branch(kernel, "#implicit_types").owningTerm;
 }
 
-Term* create_implicit_tuple_type(TermList const& types)
+Term* create_tuple_type(TermList const& types)
 {
     std::stringstream typeName;
     typeName << "Tuple<";
@@ -355,14 +363,15 @@ Term* create_implicit_tuple_type(TermList const& types)
 
     Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str());
     list_t::setup_type(unbox_type(result));
-    Branch& prototype = unbox_type(result)->prototype;
 
     unbox_type(result)->parent = LIST_TYPE;
     register_type_pointer(unbox_type(result), unbox_type(LIST_TYPE));
 
+    List& parameter = *set_list(&unbox_type(result)->parameter, types.length());
+
     for (int i=0; i < types.length(); i++) {
         ca_assert(is_type(types[i]));
-        create_value(prototype, types[i]);
+        set_type(parameter[i], unbox_type(types[i]));
     }
     
     return result;

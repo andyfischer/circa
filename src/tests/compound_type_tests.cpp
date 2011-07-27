@@ -103,17 +103,17 @@ void test_static_type_checking()
     Term* b = branch.compile("B()");
     Term* c = branch.compile("C()");
 
-    test_assert(run_static_type_query(unbox_type(A), a) == StaticTypeQuery::SUCCEED);
-    test_assert(run_static_type_query(unbox_type(A), b) == StaticTypeQuery::UNABLE_TO_DETERMINE);
-    test_assert(run_static_type_query(unbox_type(A), c) == StaticTypeQuery::FAIL);
+    test_equals(run_static_type_query(unbox_type(A), a), StaticTypeQuery::SUCCEED);
+    test_equals(run_static_type_query(unbox_type(A), b), StaticTypeQuery::UNABLE_TO_DETERMINE);
+    test_equals(run_static_type_query(unbox_type(A), c), StaticTypeQuery::FAIL);
 
-    test_assert(run_static_type_query(unbox_type(B), a) == StaticTypeQuery::SUCCEED);
-    test_assert(run_static_type_query(unbox_type(B), b) == StaticTypeQuery::SUCCEED);
-    test_assert(run_static_type_query(unbox_type(B), c) == StaticTypeQuery::SUCCEED);
+    test_equals(run_static_type_query(unbox_type(B), a), StaticTypeQuery::SUCCEED);
+    test_equals(run_static_type_query(unbox_type(B), b), StaticTypeQuery::SUCCEED);
+    test_equals(run_static_type_query(unbox_type(B), c), StaticTypeQuery::SUCCEED);
 
-    test_assert(run_static_type_query(unbox_type(C), a) == StaticTypeQuery::FAIL);
-    test_assert(run_static_type_query(unbox_type(C), b) == StaticTypeQuery::UNABLE_TO_DETERMINE);
-    test_assert(run_static_type_query(unbox_type(C), c) == StaticTypeQuery::SUCCEED);
+    test_equals(run_static_type_query(unbox_type(C), a), StaticTypeQuery::FAIL);
+    test_equals(run_static_type_query(unbox_type(C), b), StaticTypeQuery::UNABLE_TO_DETERMINE);
+    test_equals(run_static_type_query(unbox_type(C), c), StaticTypeQuery::SUCCEED);
 }
 
 void register_tests()

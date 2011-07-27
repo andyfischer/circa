@@ -257,42 +257,49 @@ namespace list_t {
     void tv_static_type_query(Type* type, StaticTypeQuery* query)
     {
         Term* subject = query->subject;
-        Branch& prototype = type->prototype;
-        
-        // If prototype is empty then accept any list
-        if (prototype.length() == 0) {
-            if (is_list_based_type(unbox_type(subject->type)))
+        Type* subjectType = query->subjectType;
+
+        // If the type doesn't have a specific size, then accept any list.
+        if (!list_type_has_specific_size(&type->parameter)) {
+            if (is_list_based_type(subjectType))
                 return query->succeed();
             else
                 return query->fail();
         }
 
+        List& expectedElementTypes =
+            *as_list(list_get_type_list_from_parameter(&type->parameter));
+
         // Special case when looking at a call to list(); look at inputs instead of
         // looking at the result.
-        if (subject->function == LIST_FUNC)
+        if (subject && subject->function == LIST_FUNC)
         {
-            if (subject->numInputs() != prototype.length())
+            if (subject->numInputs() != expectedElementTypes.length())
                 return query->fail();
 
-            for (int i=0; i < prototype.length(); i++)
+            for (int i=0; i < expectedElementTypes.length(); i++)
                 if (!circa::term_output_always_satisfies_type(
-                            subject->input(i), unbox_type(prototype[i]->type)))
+                            subject->input(i), as_type(expectedElementTypes[i])))
                     return query->fail();
 
             return query->succeed();
         }
 
-        // Look at the subject's prototype.
-        Branch& subjectPrototype = query->subjectType->prototype;
+        // Look at the subject's type.
+        if (!list_type_has_specific_size(&subjectType->parameter))
+            return query->fail();
+
+        List& subjectElementTypes =
+            *as_list(list_get_type_list_from_parameter(&subjectType->parameter));
 
         bool anyUnableToDetermine = false;
 
-        for (int i=0; i < prototype.length(); i++) {
-            if (i >= subjectPrototype.length())
+        for (int i=0; i < expectedElementTypes.length(); i++) {
+            if (i >= subjectElementTypes.length())
                 return query->fail();
 
             StaticTypeQuery::Result result = run_static_type_query(
-                    declared_type(prototype[i]), subjectPrototype[i]);
+                    as_type(expectedElementTypes[i]), as_type(subjectElementTypes[i]));
 
             // If any of these fail, then fail.
             if (result == StaticTypeQuery::FAIL)
