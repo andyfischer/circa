@@ -388,10 +388,13 @@ Term* find_method(Branch& branch, Type* type, std::string const& name)
         return term;
 
     // If not found, look in the branch where the type was declared.
-    Term* typeTerm = branch[type->name];
+    Branch* typeDeclarationBranch = NULL;
 
-    if (typeTerm != NULL && &branch != typeTerm->owningBranch) {
-        term = find_named(*typeTerm->owningBranch, searchName);
+    if (type->declaringTerm != NULL)
+        typeDeclarationBranch = type->declaringTerm->owningBranch;
+
+    if (typeDeclarationBranch != NULL && typeDeclarationBranch != &branch) {
+        term = find_named(*typeDeclarationBranch, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
