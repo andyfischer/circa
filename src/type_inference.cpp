@@ -14,7 +14,7 @@
 
 namespace circa {
 
-Term* find_common_type(TermList const& list)
+Type* find_common_type(List* typeList)
 {
     if (list.length() == 0)
         return ANY_TYPE;
@@ -22,45 +22,45 @@ Term* find_common_type(TermList const& list)
     // Check if every type in this list is the same.
     bool all_equal = true;
     for (int i=1; i < list.length(); i++) {
-        if (list[0] != list[i]) {
+        if (as_list(list[0]) != as_list(list[i])) {
             all_equal = false;
             break;
         }
     }
 
     if (all_equal)
-        return list[0];
+        return as_list(list[0]);
 
     // Special case, allow ints to go into floats
     bool all_are_ints_or_floats = true;
     for (int i=0; i < list.length(); i++) {
-        if ((list[i] != INT_TYPE) && (list[i] != FLOAT_TYPE)) {
+        if ((as_list(list[i]) != &INT_T) && (as_list(list[i]) != &FLOAT_T)) {
             all_are_ints_or_floats = false;
             break;
         }
     }
 
     if (all_are_ints_or_floats)
-        return FLOAT_TYPE;
+        return &FLOAT_T;
 
-    // Another special case, if all types are lists then use LIST_TYPE
+    // Another special case, if all types are lists then use LIST_T
     bool all_are_lists = true;
     for (int i=0; i < list.length(); i++) {
-        if (!is_list_based_type(unbox_type(list[i])))
+        if (!is_list_based_type(as_list(list[i])))
             all_are_lists = false;
     }
 
     if (all_are_lists)
-        return LIST_TYPE;
+        return &LIST_T;
 
     // Otherwise give up
-    return ANY_TYPE;
+    return &ANY_T;
 }
 
-Term* find_type_of_get_index(Term* listTerm)
+Type* find_type_of_get_index(Term* listTerm)
 {
     if (listTerm->function == RANGE_FUNC)
-        return INT_TYPE;
+        return &INT_T;
 
     if (listTerm->function == LIST_FUNC) {
         TermList inputTypes;
@@ -81,10 +81,10 @@ Term* find_type_of_get_index(Term* listTerm)
     }
 
     // Unrecognized
-    return ANY_TYPE;
+    return &ANY_T;
 }
 
-Term* statically_infer_type_of_get_index(Branch& branch, Term* term)
+Type* statically_infer_type_of_get_index(Branch& branch, Term* term)
 {
     if (term->function == RANGE_FUNC)
         create_type_value(branch, &INT_T);

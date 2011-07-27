@@ -72,10 +72,10 @@ namespace if_block_function {
         return outerRebinds[outputIndex - 1]->type;
     }
 
-    Term* joinFunc_specializeType(Term* term)
+    Type* joinFunc_specializeType(Term* term)
     {
         if (term->input(0) == NULL || term->input(1) == NULL)
-            return ANY_TYPE;
+            return &ANY_T;
         TermList types(get_type_of_input(term, 0), get_type_of_input(term, 1));
         return find_common_type(types);
     }

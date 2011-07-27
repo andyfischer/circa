@@ -63,7 +63,7 @@ union VariantValue {
     void fname(circa::EvalContext* _context, circa::Term* _caller)
 
 typedef void (*EvaluateFunc)(EvalContext* cxt, Term* caller);
-typedef Term* (*SpecializeTypeFunc)(Term* caller);
+typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 

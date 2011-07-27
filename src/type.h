@@ -187,9 +187,9 @@ void release_type(Type* type);
 void clear_contents_of_every_permanent_type();
 void delete_every_permanent_type();
 
-Term* get_output_type(Term* term, int outputIndex);
-Term* get_output_type(Term* term);
-Term* get_type_of_input(Term* term, int inputIndex);
+Type* get_output_type(Term* term, int outputIndex);
+Type* get_output_type(Term* term);
+Type* get_type_of_input(Term* term, int inputIndex);
 
 StaticTypeQuery::Result run_static_type_query(Type* type, Type* subjectType);
 StaticTypeQuery::Result run_static_type_query(Type* type, Term* term);

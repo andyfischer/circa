@@ -49,4 +49,6 @@ void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* par
 // list (otherwise it returns NULL).
 TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter);
 
+TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter);
+
 } // namespace circa

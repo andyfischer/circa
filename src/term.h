@@ -24,8 +24,8 @@ struct Term : TaggedValue
     // A WeakPtr to this object, this is lazily initialized.
     WeakPtr weakPtr;
 
-    // A Type term that describes our data type
-    Term* type;
+    // A Type that statically describes our type.
+    Type* type;
 
     struct Input {
         Term* term;

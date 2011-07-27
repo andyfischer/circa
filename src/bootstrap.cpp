@@ -104,7 +104,7 @@ void bootstrap_kernel()
     // Create Type type
     TYPE_TYPE = KERNEL->appendNew();
     TYPE_TYPE->function = VALUE_FUNC;
-    TYPE_TYPE->type = TYPE_TYPE;
+    TYPE_TYPE->type = &TYPE_T;
     TYPE_TYPE->value_type = &TYPE_T;
     TYPE_TYPE->value_data.ptr = &TYPE_T;
     type_t::setup_type(&TYPE_T);
@@ -113,7 +113,7 @@ void bootstrap_kernel()
     // Create Any type
     ANY_TYPE = KERNEL->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
-    ANY_TYPE->type = TYPE_TYPE;
+    ANY_TYPE->type = &TYPE_T;
     ANY_TYPE->value_type = &TYPE_T;
     ANY_TYPE->value_data.ptr = &ANY_T;
     any_t::setup_type(&ANY_T);
@@ -122,7 +122,7 @@ void bootstrap_kernel()
     // Create FunctionAttrs type
     FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
     FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
-    FUNCTION_ATTRS_TYPE->type = TYPE_TYPE;
+    FUNCTION_ATTRS_TYPE->type = &TYPE_T;
     change_type(FUNCTION_ATTRS_TYPE, &TYPE_T);
     as_type(FUNCTION_ATTRS_TYPE)->name = "FunctionAttrs";
     as_type(FUNCTION_ATTRS_TYPE)->initialize = function_attrs_t::initialize;
@@ -136,7 +136,7 @@ void bootstrap_kernel()
     FUNCTION_TYPE = create_type_value(*KERNEL, &FUNCTION_T, "Function");
 
     // Initialize TaggedValue func
-    VALUE_FUNC->type = FUNCTION_TYPE;
+    VALUE_FUNC->type = &FUNCTION_T;
     VALUE_FUNC->function = VALUE_FUNC;
     change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 
@@ -177,7 +177,7 @@ void post_initialize_primitive_types(Branch& kernel)
     attrs->outputTypes = TermList(ANY_TYPE);
     attrs->evaluate = value_function::evaluate;
 
-    ca_assert(function_get_output_type(VALUE_FUNC, 0) == ANY_TYPE);
+    ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);
 }
 
 void pre_setup_types(Branch& kernel)

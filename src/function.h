@@ -16,12 +16,12 @@ struct FunctionAttrs
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetOutputCount)(Term*);
     typedef const char* (*GetOutputName)(Term*, int index);
-    typedef Term* (*GetOutputType)(Term*, int index);
+    typedef Type* (*GetOutputType)(Term*, int index);
     typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
 
     std::string name;
-    TermList outputTypes;
+    List outputTypes;
     Term* implicitStateType;
     bool variableArgs;
     Term* feedbackFunc;
@@ -107,7 +107,7 @@ bool values_fit_function_dynamic(Term* func, List* list);
 
 Term* create_overloaded_function(Branch& branch, std::string const& name,
         TermList const& overloads);
-Term* derive_specialized_output_type(Term* function, Term* call);
+Type* derive_specialized_output_type(Term* function, Term* call);
 
 // Returns whether the given function can rebind the input at 'index'. (The
 // calling code must still opt-in to this rebind.
@@ -120,8 +120,8 @@ bool function_implicitly_rebinds_input(Term* function, int index);
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);
 
-Term* function_get_input_type(Term* function, int index);
-Term* function_get_output_type(Term* function, int index);
+Type* function_get_input_type(Term* function, int index);
+Type* function_get_output_type(Term* function, int index);
 TaggedValue* function_get_parameters(Term* function);
 
 const char* get_output_name(Term* term, int outputIndex);

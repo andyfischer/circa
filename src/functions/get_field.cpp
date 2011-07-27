@@ -44,6 +44,48 @@ namespace get_field_function {
         }
 
         return head->type;
+
+#if 0
+
+WIP code
+
+        Type* headType = declared_type(caller->input(0));
+
+        for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
+
+            // Abort if input type is not correct
+            if (!is_string(caller->input(1)))
+                return ANY_TYPE;
+
+            std::string const& name = caller->input(1)->asString();
+
+            if (!is_list_based_type(declared_type(head)))
+                return ANY_TYPE;
+
+            TaggedValue* nameList = list_get_name_list_from_parameter(declared_type(head));
+
+            if (nameList == NULL)
+                return ANY_TYPE;
+
+            List& names = *as_list(nameList);
+
+            for (int i=0; i < names.length(); i++) {
+                if (names[i] == name) {
+                }
+            }
+
+            
+
+            Branch& type_prototype = type_t::get_prototype(declared_type(head));
+
+            if (!type_prototype.contains(name))
+                return ANY_TYPE;
+
+            head = type_prototype[name];
+        }
+
+        return head->type;
+#endif
     }
 
     void formatSource(StyledSource* source, Term* term)

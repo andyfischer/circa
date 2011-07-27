@@ -13,10 +13,10 @@ namespace set_index_function {
         copy(INPUT(2), OUTPUT->getIndex(index));
     }
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
         //FIXME
-        return LIST_TYPE;
+        return &LIST_T;
         //return caller->input(0)->type;
     }
 

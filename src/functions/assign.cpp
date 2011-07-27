@@ -15,13 +15,13 @@ namespace assign_function {
         swap(&output, OUTPUT);
     }
 
-    Term* specializeType(Term* term)
+    Type* specializeType(Term* term)
     {
         Branch& contents = nested_contents(term);
         if (contents.length() > 0)
             return contents[contents.length()-1]->type;
         else
-            return ANY_TYPE;
+            return &ANY_T;
     }
 
     Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredTaggedValue)

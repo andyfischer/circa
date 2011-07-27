@@ -186,13 +186,13 @@ void delete_every_permanent_type()
     g_numPermanentTypes = 0;
 }
 
-Term* get_output_type(Term* term, int outputIndex)
+Type* get_output_type(Term* term, int outputIndex)
 {
     if (outputIndex == 0)
         return term->type;
 
     if (term->function == NULL)
-        return ANY_TYPE;
+        return &ANY_T;
 
     FunctionAttrs* attrs = get_function_attrs(term->function);
 
@@ -206,12 +206,12 @@ Term* get_output_type(Term* term, int outputIndex)
     return function_get_output_type(term->function, outputIndex);
 }
 
-Term* get_output_type(Term* term)
+Type* get_output_type(Term* term)
 {
     return get_output_type(term, 0);
 }
 
-Term* get_type_of_input(Term* term, int inputIndex)
+Type* get_type_of_input(Term* term, int inputIndex)
 {
     if (inputIndex >= term->numInputs())
         return NULL;

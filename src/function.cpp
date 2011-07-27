@@ -373,7 +373,7 @@ void finish_parsing_function_header(Term* func)
         Term* input = function_t::get_input_placeholder(func, i);
         if (input->boolPropOptional("output", false)) {
             attrs->outputCount++;
-            attrs->outputTypes.append(get_output_type(input));
+            set_type(attrs->outputTypes.append(), get_output_type(input));
         }
     }
 }
@@ -450,17 +450,17 @@ Term* create_overloaded_function(Branch& branch, std::string const& name,
     return overloaded_function::create_overloaded_function(branch, name, overloads);
 }
 
-Term* derive_specialized_output_type(Term* function, Term* call)
+Type* derive_specialized_output_type(Term* function, Term* call)
 {
     if (!FINISHED_BOOTSTRAP)
-        return ANY_TYPE;
+        return &ANY_T;
     if (!is_function(function))
-        return ANY_TYPE;
-    Term* outputType = function_get_output_type(function, 0);
+        return &ANY_T;
+    Type* outputType = function_get_output_type(function, 0);
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(call);
     if (outputType == NULL)
-        outputType = ANY_TYPE;
+        outputType = &ANY_T;
     return outputType;
 }
 
@@ -488,14 +488,14 @@ bool function_call_rebinds_input(Term* term, int index)
     return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";
 }
 
-Term* function_get_input_type(Term* function, int index)
+Type* function_get_input_type(Term* function, int index)
 {
     if (function_t::get_variable_args(function))
         index = 0;
     return function_t::get_input_placeholder(function, index)->type;
 }
 
-Term* function_get_output_type(Term* function, int index)
+Type* function_get_output_type(Term* function, int index)
 {
     FunctionAttrs* attrs = get_function_attrs(function);
 
@@ -508,7 +508,7 @@ Term* function_get_output_type(Term* function, int index)
 
     ca_assert(index < attrs->outputTypes.length());
 
-    return attrs->outputTypes[index];
+    return as_type(attrs->outputTypes[index]);
 }
 TaggedValue* function_get_parameters(Term* function)
 {

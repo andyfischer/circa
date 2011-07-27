@@ -13,9 +13,9 @@ namespace instance_function {
         change_type(OUTPUT, unbox_type(INPUT(0)));
     }
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
-        return caller->input(0);
+        return as_type(caller->input(0));
     }
 
     void setup(Branch& kernel)

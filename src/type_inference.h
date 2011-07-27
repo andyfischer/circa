@@ -8,11 +8,11 @@ namespace circa {
 
 // Returns a common type, which is guaranteed to hold all the types in this
 // list. Currently, this is not very sophisticated.
-Term* find_common_type(TermList const& list);
+Type* find_common_type(List* list);
 
 // Guesses at the declared type for a get_index call on this term. Currently
 // this is not very sophisticated, since we don't have generic types.
-Term* find_type_of_get_index(Term* listTerm);
+Type* find_type_of_get_index(Term* listTerm);
 
 // Looks at the term's function, and generates an expression which is our
 // best static guess as to the result. This might be a plain value (if the

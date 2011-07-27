@@ -14,7 +14,7 @@ namespace set_field_function {
         copy(INPUT(2), OUTPUT->getIndex(index));
     }
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
         return caller->input(0)->type;
     }

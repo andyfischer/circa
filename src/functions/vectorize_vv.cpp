@@ -7,12 +7,12 @@
 namespace circa {
 namespace vectorize_vv_function {
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
         Term* lhsType = caller->input(0)->type;
         if (is_list_based_type(unbox_type(lhsType)))
             return lhsType;
-        return LIST_TYPE;
+        return &LIST_T;
     }
 
     CA_FUNCTION(evaluate)

@@ -385,5 +385,19 @@ TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter)
     ca_assert(false);
     return NULL;
 }
+TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
+{
+    switch (list_get_parameter_type(parameter)) {
+    case LIST_TYPED_SIZED_NAMED:
+        return list_get_index(parameter, 1);
+    case LIST_TYPED_SIZED:
+    case LIST_UNTYPED:
+    case LIST_TYPED_UNSIZED:
+    case LIST_INVALID_PARAMETER:
+        return NULL;
+    }
+    ca_assert(false);
+    return NULL;
+}
 
 } // namespace circa

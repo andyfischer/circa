@@ -58,30 +58,30 @@ void change_function(Term* term, Term* function)
     }
 }
 
-void unsafe_change_type(Term *term, Term *type)
+void unsafe_change_type(Term *term, Type *type)
 {
     ca_assert(type != NULL);
 
     term->type = type;
 }
 
-void change_declared_type(Term *term, Term *typeTerm)
+void change_declared_type(Term *term, Type *newType)
 {
     ca_assert(term != NULL);
-    ca_assert(typeTerm != NULL);
-    ca_assert(typeTerm->type == TYPE_TYPE);
+    ca_assert(newType != NULL);
+    ca_assert(newType->type == TYPE_TYPE);
 
     Term* oldType = term->type;
 
-    if (oldType == typeTerm)
+    if (term->type == newType)
         return;
 
-    term->type = typeTerm;
+    term->type = newType;
 
     set_null((TaggedValue*) term);
 
     // TODO: Don't call change_type here
-    change_type(term, unbox_type(typeTerm));
+    change_type(term, unbox_type(newType));
 
     // TODO: Use update_cascades to update inferred type on all users.
 }
@@ -96,12 +96,12 @@ void respecialize_type(Term* term)
         change_declared_type(term, outputType);
 }
 
-void specialize_type(Term *term, Term *type)
+void specialize_type(Term *term, Type *type)
 {
     if (term->type == type)
         return;
 
-    ca_assert(term->type == ANY_TYPE);
+    ca_assert(term->type == &ANY_T);
 
     change_declared_type(term, type);
 }

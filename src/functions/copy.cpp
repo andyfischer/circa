@@ -10,7 +10,7 @@ namespace copy_function {
         copy(INPUT(0), OUTPUT);
     }
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
         return get_type_of_input(caller, 0);
     }
