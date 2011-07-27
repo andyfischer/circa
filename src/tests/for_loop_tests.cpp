@@ -44,7 +44,7 @@ void type_inference_for_iterator()
     // test a situation where we can't do inference
     loop = branch.compile("for i in [] {}");
     iterator = get_for_loop_iterator(loop);
-    test_assert(iterator->type == ANY_TYPE);
+    test_equals(iterator->type->name, "any");
 }
 
 void test_rebind_external()

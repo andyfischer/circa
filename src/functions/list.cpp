@@ -13,7 +13,7 @@ namespace list_function {
         for (int i=0; i < term->numInputs(); i++)
             set_type(inputTypes.append(), term->input(i)->type);
 
-        return as_type(create_tuple_type(inputTypes));
+        return as_type(create_tuple_type(&inputTypes));
     }
 
     CA_DEFINE_FUNCTION(evaluate, "list(any...) -> List")

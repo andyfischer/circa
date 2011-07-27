@@ -110,7 +110,7 @@ void test_term_value()
     test_assert(b->numElements() == 3);
     test_assert(b->getIndex(1)->asInt() == 2);
     
-    Term* c = create_value(branch, INT_TYPE);
+    Term* c = create_value(branch, &INT_T);
     test_assert(is_int(c));
 }
 

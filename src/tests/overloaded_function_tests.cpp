@@ -38,9 +38,9 @@ void test_specialize_type()
 {
     Branch branch;
     Term* t = branch.compile("add(1,2)");
-    test_assert(t->type == INT_TYPE);
+    test_equals(t->type->name, "int");
     Term* t2 = branch.compile("add(1.0,2.0)");
-    test_assert(t2->type == FLOAT_TYPE);
+    test_equals(t2->type->name, "number");
 }
 
 void register_tests()

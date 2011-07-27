@@ -16,9 +16,9 @@ void type_declaration()
     Branch& prototype = type_t::get_prototype(unbox_type(myType));
     test_assert(prototype.length() == 2);
     test_assert(prototype[0]->name == "a");
-    test_assert(prototype[0]->type == STRING_TYPE);
+    test_equals(prototype[0]->type->name, "string");
     test_assert(prototype[1]->name == "b");
-    test_assert(prototype[1]->type == INT_TYPE);
+    test_equals(prototype[1]->type->name, "int");
 
     Type* type = unbox_type(myType);
     test_assert(type->initialize != NULL);
@@ -98,18 +98,18 @@ void type_inference_for_get_index()
     branch.eval("l = [1 2 3]");
     Term* x = branch.compile("x = l[0]");
     test_assert(branch);
-    test_assert(x->type == INT_TYPE);
+    test_equals(x->type->name, "int");
 
     branch.clear();
     branch.eval("l = [1 2.0 3]");
     x = branch.compile("x = l[0]");
     test_assert(branch);
-    test_assert(x->type == FLOAT_TYPE);
+    test_equals(x->type->name, "number");
 
     branch.clear();
     branch.eval("l = [1 2.0 'three']");
     x = branch.compile("x = l[0]");
-    test_assert(x->type == ANY_TYPE);
+    test_equals(x->type->name, "any");
 }
 
 void type_inference_for_get_field()
@@ -119,9 +119,9 @@ void type_inference_for_get_field()
 
     branch.eval("t = T()");
     Term* a = branch.compile("a = t.a");
-    test_assert(a->type == INT_TYPE);
+    test_equals(a->type->name, "int");
     Term* b = branch.compile("b = t.b");
-    test_assert(b->type == FLOAT_TYPE);
+    test_equals(b->type->name, "number");
 }
 
 void test_list_based_types()
@@ -136,8 +136,9 @@ void test_list_based_types()
 void test_create_implicit_tuple_type()
 {
     Branch branch;
-    TermList types(INT_TYPE, FLOAT_TYPE, STRING_TYPE);
-    Term* result = create_tuple_type(types);
+    List typeList;
+    set_type_list(&typeList, &INT_T, &FLOAT_T, &STRING_T);
+    Term* result = create_tuple_type(&typeList);
 
     TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
     TaggedValue* b = branch.eval("['hi', 3.0, 1]");

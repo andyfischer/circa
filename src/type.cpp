@@ -351,13 +351,13 @@ void type_initialize_kernel(Branch& kernel)
     IMPLICIT_TYPES = create_branch(kernel, "#implicit_types").owningTerm;
 }
 
-Term* create_tuple_type(TermList const& types)
+Term* create_tuple_type(List* types)
 {
     std::stringstream typeName;
     typeName << "Tuple<";
-    for (int i=0; i < types.length(); i++) {
+    for (int i=0; i < types->length(); i++) {
         if (i != 0) typeName << ",";
-        typeName << unbox_type(types[i])->name;
+        typeName << as_type(types->get(i))->name;
     }
     typeName << ">";
 
@@ -367,11 +367,11 @@ Term* create_tuple_type(TermList const& types)
     unbox_type(result)->parent = &LIST_T;
     register_type_pointer(unbox_type(result), unbox_type(LIST_TYPE));
 
-    List& parameter = *set_list(&unbox_type(result)->parameter, types.length());
+    List& parameter = *set_list(&unbox_type(result)->parameter, types->length());
 
-    for (int i=0; i < types.length(); i++) {
-        ca_assert(is_type(types[i]));
-        set_type(parameter[i], unbox_type(types[i]));
+    for (int i=0; i < types->length(); i++) {
+        ca_assert(is_type(types->get(i)));
+        set_type(parameter[i], as_type(types->get(i)));
     }
     
     return result;

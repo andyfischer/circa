@@ -117,12 +117,15 @@ void test_dynamic_overload()
 
     TermList inputs(a,b);
     test_assert(inputs_fit_function_dynamic(add_i, inputs));
+    test_assert(!inputs_statically_fit_function(add_i, inputs));
 
     evaluate_branch(&context, branch);
     test_assert(context);
     test_assert(result->asInt() == 8);
 
     set_float(b, 3.0);
+    test_assert(!inputs_fit_function_dynamic(add_i, inputs));
+
     evaluate_branch(&context, branch);
     test_assert(context);
     test_assert(result->asFloat() == 8.0);

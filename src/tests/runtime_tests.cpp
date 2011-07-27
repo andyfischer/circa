@@ -38,10 +38,10 @@ void test_errored_function()
 void test_misc()
 {
     test_assert(is_type(TYPE_TYPE));
-    test_assert(TYPE_TYPE->type == TYPE_TYPE);
+    test_equals(TYPE_TYPE->type->name, "Type");
 
     test_assert(is_type(FUNCTION_TYPE));
-    test_assert(FUNCTION_TYPE->type == TYPE_TYPE);
+    test_equals(FUNCTION_TYPE->type->name, "Type");
 }
 
 void test_dont_crash_on_static_error()

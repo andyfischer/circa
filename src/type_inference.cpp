@@ -24,7 +24,7 @@ Type* find_common_type(List* typeList)
     // Check if every type in this list is the same.
     bool all_equal = true;
     for (int i=1; i < list.length(); i++) {
-        if (as_list(list[0]) != as_list(list[i])) {
+        if (as_type(list[0]) != as_type(list[i])) {
             all_equal = false;
             break;
         }

@@ -62,7 +62,7 @@ namespace overloaded_function {
             // Check each input
             bool inputsMatch = true;
             for (int i=0; i < numInputs; i++) {
-                Type* type = unbox_type(function_t::get_input_type(overload, i));
+                Type* type = function_t::get_input_type(overload, i);
                 TaggedValue* value = INPUT(i);
                 if (value == NULL)
                     continue;
@@ -90,7 +90,7 @@ namespace overloaded_function {
             }
             TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
-            cast(&output, unbox_type(contents[0]->type), OUTPUT);
+            cast(&output, contents[0]->type, OUTPUT);
         } else {
             std::stringstream msg;
             msg << "specialized func not found for: " << CALLER->function->name;
@@ -127,7 +127,7 @@ namespace overloaded_function {
         }
     }
 
-    Term* overload_specialize_type(Term* term)
+    Type* overload_specialize_type(Term* term)
     {
         Branch& contents = nested_contents(term);
         return contents[0]->type;
@@ -166,7 +166,7 @@ namespace overloaded_function {
         ca_assert(parameters.length() > 0);
         int argumentCount = function_t::num_inputs(as_ref(parameters[0]));
         bool variableArgs = false;
-        TermList outputTypes;
+        List outputTypes;
 
         for (int i=0; i < parameters.length(); i++) {
 
@@ -176,7 +176,7 @@ namespace overloaded_function {
                 variableArgs = true;
             if (function_t::get_variable_args(overload))
                 variableArgs = true;
-            outputTypes.append(function_get_output_type(overload, 0));
+            set_type(outputTypes.append(), function_get_output_type(overload, 0));
         }
 
         Branch& result = nested_contents(term);
@@ -184,9 +184,9 @@ namespace overloaded_function {
         int placeholderCount = variableArgs ? 1 : argumentCount;
         for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
-        Term* outputType = find_common_type(outputTypes);
+        Type* outputType = find_common_type(&outputTypes);
         FunctionAttrs* attrs = get_function_attrs(term);
-        attrs->outputTypes = TermList(outputType);
+        set_type_list(&attrs->outputTypes, outputType);
         attrs->variableArgs = variableArgs;
     }
 
@@ -215,7 +215,7 @@ namespace overloaded_function {
     Term* create_overloaded_function(Branch& branch, std::string const& name,
         TermList const& overloads)
     {
-        Term* result = create_value(branch, FUNCTION_TYPE, name);
+        Term* result = create_value(branch, &FUNCTION_T, name);
         setup_overloaded_function(result, name, overloads);
         return result;
     }

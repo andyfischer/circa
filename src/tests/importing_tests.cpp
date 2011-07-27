@@ -39,7 +39,7 @@ void test_import_type()
     type->name = "A";
 
     Term* term = import_type(branch, type);
-    test_assert(term->type == TYPE_TYPE);
+    test_assert(term->type->name == "Type");
     test_assert(term->name == "A");
 
     release_type(type);

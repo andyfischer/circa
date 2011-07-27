@@ -104,7 +104,7 @@ void test_vectorized_funcs_with_points()
 
     Term* a = branch.compile("a = [1 0] -> Point");
 
-    test_assert(a->type == point_t);
+    test_assert(a->type == as_type(point_t));
 
     Term* b = branch.compile("b = a + [0 2]");
 
@@ -120,9 +120,9 @@ void test_cond_with_int_and_float()
 
     // This code once caused a bug
     Term* a = branch.compile("cond(true, 1, 1.0)");
-    test_assert(a->type != ANY_TYPE);
+    test_assert(a->type != &ANY_T);
     Term* b = branch.compile("cond(true, 1.0, 1)");
-    test_assert(b->type != ANY_TYPE);
+    test_assert(b->type != &ANY_T);
 }
 
 void test_get_index()

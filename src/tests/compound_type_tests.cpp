@@ -21,7 +21,7 @@ void compound_type_usage()
     test_equals(prototype[0]->type->name, "int");
     test_assert(as_type(MyType)->findFieldIndex("myint") == 0);
     test_equals(prototype[1]->name, "astr");
-    test_equals(prototype[1]->type, "string");
+    test_equals(prototype[1]->type->name, "string");
     test_assert(as_type(MyType)->findFieldIndex("astr") == 1);
 
     test_assert(as_type(MyType)->findFieldIndex("the_bodies") == -1);

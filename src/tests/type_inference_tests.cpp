@@ -14,7 +14,7 @@ void test_find_common_type()
     test_assert(find_common_type(&INT_T,&FLOAT_T) == &FLOAT_T);
     test_assert(find_common_type(&BOOL_T,&STRING_T) == &ANY_T);
     test_assert(find_common_type(as_type(KERNEL->get("Point")),
-                as_type(KERNEL->get("Rect"))) == LIST_TYPE);
+                as_type(KERNEL->get("Rect"))) == &LIST_T);
 }
 
 void test_find_type_of_get_index()
@@ -59,7 +59,7 @@ void for_loop_output_type()
     branch.compile("a = 1");
     branch.compile("for i in [1] { a = 2 }");
 
-    test_assert(branch["a"]->type == INT_TYPE);
+    test_equals(branch["a"]->type->name, "int");
 }
 
 void assign_output_type()
@@ -67,7 +67,7 @@ void assign_output_type()
     Branch branch;
     branch.compile("a = [1]");
     Term* assign = branch.compile("a[0] = 2");
-    test_assert(assign->type == LIST_TYPE);
+    test_equals(assign->type->name, "List");
 }
 
 void infer_length()

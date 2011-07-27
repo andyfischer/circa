@@ -202,7 +202,7 @@ void clear_type_contents(Type* type);
 void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch& kernel);
-Term* create_tuple_type(TermList const& types);
+Term* create_tuple_type(List* types);
 Term* find_method(Branch& branch, Type* type, std::string const& name);
 
 Term* parse_type(Branch& branch, std::string const& decl);

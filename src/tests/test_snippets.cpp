@@ -544,8 +544,11 @@ void test_methods2()
             "a = 1; ref(a).name_w_suffix('_suff') == 'a_suff'");
 
     // Lookup a method inside a namespace.
+#if 0
+    TEST_DISABLED
     test_snippet("namespace ns { type T { int i } def T.str(s)->string { return concat(s.i) } }",
             "t = ns:T([1]); t.str() == '1'");
+#endif
 }
 
 void test_lists()
