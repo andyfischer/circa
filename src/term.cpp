@@ -275,9 +275,9 @@ void term_check_invariants(List* errors, Term* term)
 
     if (term->type != NULL) {
 
-        bool typeOk = (term->type == ANY_TYPE)
-            || (term->type == VOID_TYPE && is_null(term))
-            || cast_possible(term, unbox_type(term->type));
+        bool typeOk = (term->type == &ANY_T)
+            || (term->type == &VOID_T && is_null(term))
+            || cast_possible(term, term->type);
 
         if (!typeOk) {
             std::string msg;

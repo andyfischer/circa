@@ -477,7 +477,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
             return compile_error_for_line(branch, tokens, startPosition, "Not a type: " + typeName);
     }
 
-    Term* result = create_value(branch, FUNCTION_TYPE, functionName);
+    Term* result = create_value(branch, &FUNCTION_T, functionName);
     initialize_function(result);
     initialize_subroutine(result);
 
@@ -552,7 +552,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
 
         if (is_type(typeTerm))
-            change_declared_type(input, typeTerm);
+            change_declared_type(input, as_type(typeTerm));
 
         if (isHiddenStateArgument) {
             input->setBoolProp("state", true);
@@ -623,7 +623,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    attrs->outputTypes = TermList(outputType);
+    set_type_list(&attrs->outputTypes, as_type(outputType));
 
     finish_parsing_function_header(result);
 
@@ -673,7 +673,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = create_value(branch, TYPE_TYPE);
+    Term* result = create_value(branch, &TYPE_T);
 
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
@@ -716,7 +716,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
         Term* fieldType = find_type(branch, fieldTypeName);
 
-        Term* field = create_value(contents, fieldType, fieldName);
+        Term* field = create_value(contents, as_type(fieldType), fieldName);
 
         field->setStringProp("syntax:preWhitespace", preWs);
         field->setStringProp("syntax:postNameWs", postNameWs);
@@ -925,7 +925,7 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
 
     // Create the get_state_field() term.
-    Term* result = create_stateful_value(branch, type, NULL, name);
+    Term* result = create_stateful_value(branch, as_type(type), NULL, name);
 
     // Possibly consume an expression for the initial value.
     if (tokens.nextIs(EQUALS)) {
@@ -942,7 +942,7 @@ ParseResult stateful_value_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
-        if (typeName == "" && initialValue->type != NULL_T_TERM)
+        if (typeName == "" && initialValue->type != &NULL_T)
             change_declared_type(result, initialValue->type);
     }
 
@@ -1820,7 +1820,7 @@ ParseResult literal_null(Branch& branch, TokenStream& tokens, ParserCxt* context
 
     tokens.consume(NULL_TOKEN);
 
-    Term* term = create_value(branch, NULL_T_TERM);
+    Term* term = create_value(branch, &NULL_T);
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
@@ -1852,7 +1852,7 @@ ParseResult literal_color(Branch& branch, TokenStream& tokens, ParserCxt* contex
     // strip leading # sign
     text = text.substr(1, text.length()-1);
 
-    Term* resultTerm = create_value(branch, COLOR_TYPE);
+    Term* resultTerm = create_value(branch, as_type(COLOR_TYPE));
     List* result = List::checkCast(resultTerm);
 
     float r = 0;
@@ -2066,7 +2066,7 @@ Term* find_type(Branch& branch, std::string const& name)
 
     if (result == NULL) {
         result = apply(branch, UNKNOWN_TYPE_FUNC, TermList(), name);
-        ca_assert(result->type == TYPE_TYPE);
+        ca_assert(result->type == &TYPE_T);
     }   
 
     return result;

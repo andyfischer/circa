@@ -23,7 +23,7 @@ namespace get_field_function {
         copy(head, OUTPUT);
     }
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
         Term* head = caller->input(0);
 
@@ -31,14 +31,14 @@ namespace get_field_function {
 
             // Abort if input type is not correct
             if (!is_string(caller->input(1)))
-                return ANY_TYPE;
+                return &ANY_T;
 
             std::string const& name = caller->input(1)->asString();
 
             Branch& type_prototype = type_t::get_prototype(declared_type(head));
 
             if (!type_prototype.contains(name))
-                return ANY_TYPE;
+                return &ANY_T;
 
             head = type_prototype[name];
         }

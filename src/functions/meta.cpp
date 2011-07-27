@@ -22,7 +22,7 @@ namespace meta_function {
         }
     }
 
-    Term* freeze_specializeType(Term* term)
+    Type* freeze_specializeType(Term* term)
     {
         return term->input(0)->type;
     }

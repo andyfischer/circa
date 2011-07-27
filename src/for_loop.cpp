@@ -62,7 +62,7 @@ void setup_for_loop_pre_code(Term* forTerm)
 
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 {
-    Term* iteratorType = find_type_of_get_index(forTerm->input(0));
+    Type* iteratorType = find_type_of_get_index(forTerm->input(0));
     Term* result = apply(nested_contents(forTerm), INPUT_PLACEHOLDER_FUNC, TermList(), name);
     change_declared_type(result, iteratorType);
     hide_from_source(result);

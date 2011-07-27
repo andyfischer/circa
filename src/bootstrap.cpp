@@ -120,16 +120,11 @@ void bootstrap_kernel()
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create FunctionAttrs type
-    FUNCTION_ATTRS_TYPE = KERNEL->appendNew();
-    FUNCTION_ATTRS_TYPE->function = VALUE_FUNC;
-    FUNCTION_ATTRS_TYPE->type = &TYPE_T;
-    change_type(FUNCTION_ATTRS_TYPE, &TYPE_T);
-    as_type(FUNCTION_ATTRS_TYPE)->name = "FunctionAttrs";
-    as_type(FUNCTION_ATTRS_TYPE)->initialize = function_attrs_t::initialize;
-    as_type(FUNCTION_ATTRS_TYPE)->copy = function_attrs_t::copy;
-    as_type(FUNCTION_ATTRS_TYPE)->release = function_attrs_t::release;
-    KERNEL->bindName(FUNCTION_ATTRS_TYPE, "FunctionAttrs");
-    ca_assert(is_type(FUNCTION_ATTRS_TYPE));
+    FUNCTION_ATTRS_T.name = "FunctionAttrs";
+    FUNCTION_ATTRS_T.initialize = function_attrs_t::initialize;
+    FUNCTION_ATTRS_T.copy = function_attrs_t::copy;
+    FUNCTION_ATTRS_T.release = function_attrs_t::release;
+    FUNCTION_ATTRS_TYPE = create_type_value(*KERNEL, &FUNCTION_ATTRS_T, "FunctionAttrs");
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
@@ -174,7 +169,7 @@ void post_initialize_primitive_types(Branch& kernel)
     initialize_function(VALUE_FUNC);
 
     FunctionAttrs* attrs = get_function_attrs(VALUE_FUNC);
-    attrs->outputTypes = TermList(ANY_TYPE);
+    set_type_list(&attrs->outputTypes, &ANY_T);
     attrs->evaluate = value_function::evaluate;
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);

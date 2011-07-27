@@ -49,7 +49,7 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
     // Print results of the last expression
     if (!anyErrors && resultIndex != -1) {
         Term* result = branch[resultIndex];
-        if (result->type != VOID_TYPE) {
+        if (result->type != as_type(VOID_TYPE)) {
             output << get_local(result)->toString() << std::endl;
         }
     }

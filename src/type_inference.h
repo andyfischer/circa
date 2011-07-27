@@ -10,6 +10,10 @@ namespace circa {
 // list. Currently, this is not very sophisticated.
 Type* find_common_type(List* list);
 
+// Shorthands for finding the common type of a fixed list.
+Type* find_common_type(Type* type1, Type* type2);
+Type* find_common_type(Type* type1, Type* type2, Type* type3);
+
 // Guesses at the declared type for a get_index call on this term. Currently
 // this is not very sophisticated, since we don't have generic types.
 Type* find_type_of_get_index(Term* listTerm);

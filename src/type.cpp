@@ -146,7 +146,7 @@ Type* declared_type(Term* term)
 {
     if (term->type == NULL)
         return NULL;
-    return unbox_type(term->type);
+    return term->type;
 }
 
 void register_type_pointer(void* owner, Type* pointee)
@@ -223,7 +223,7 @@ Type* get_type_of_input(Term* term, int inputIndex)
 
 Type* unbox_type(Term* term)
 {
-    ca_assert(term->type == TYPE_TYPE);
+    ca_assert(term->type == &TYPE_T);
     return (Type*) term->value_data.ptr;
 }
 
@@ -364,7 +364,7 @@ Term* create_tuple_type(TermList const& types)
     Term* result = create_type(nested_contents(IMPLICIT_TYPES), typeName.str());
     list_t::setup_type(unbox_type(result));
 
-    unbox_type(result)->parent = LIST_TYPE;
+    unbox_type(result)->parent = &LIST_T;
     register_type_pointer(unbox_type(result), unbox_type(LIST_TYPE));
 
     List& parameter = *set_list(&unbox_type(result)->parameter, types.length());
@@ -377,7 +377,7 @@ Term* create_tuple_type(TermList const& types)
     return result;
 }
 
-Term* find_method(Branch& branch, Term* type, std::string const& name)
+Term* find_method(Branch& branch, Type* type, std::string const& name)
 {
     ca_assert(type->name != "");
     std::string searchName = type->name + "." + name;
@@ -387,14 +387,16 @@ Term* find_method(Branch& branch, Term* type, std::string const& name)
         return term;
 
     // If not found, look in the branch where the type was declared.
-    if (&branch != type->owningBranch) {
-        term = find_named(*type->owningBranch, searchName);
+    Term* typeTerm = branch[type->name];
+
+    if (typeTerm != NULL && &branch != typeTerm->owningBranch) {
+        term = find_named(*typeTerm->owningBranch, searchName);
         if (term != NULL && is_function(term))
             return term;
     }
 
-    if (unbox_type(type)->parent != NULL)
-        return find_method(branch, unbox_type(type)->parent, name);
+    if (type->parent != NULL)
+        return find_method(branch, type->parent, name);
 
     return NULL;
 }
@@ -407,6 +409,26 @@ Term* parse_type(Branch& branch, std::string const& decl)
 void install_type(Term* term, Type* type)
 {
     set_type(term, type);
+}
+
+void set_type_list(TaggedValue* value, Type* type1)
+{
+    List* list = set_list(value, 1);
+    set_type(list->get(0), type1);
+}
+
+void set_type_list(TaggedValue* value, Type* type1, Type* type2)
+{
+    List* list = set_list(value, 2);
+    set_type(list->get(0), type1);
+    set_type(list->get(1), type2);
+}
+void set_type_list(TaggedValue* value, Type* type1, Type* type2, Type* type3)
+{
+    List* list = set_list(value, 3);
+    set_type(list->get(0), type1);
+    set_type(list->get(1), type2);
+    set_type(list->get(2), type3);
 }
 
 } // namespace circa

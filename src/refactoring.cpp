@@ -69,9 +69,6 @@ void change_declared_type(Term *term, Type *newType)
 {
     ca_assert(term != NULL);
     ca_assert(newType != NULL);
-    ca_assert(newType->type == TYPE_TYPE);
-
-    Term* oldType = term->type;
 
     if (term->type == newType)
         return;
@@ -81,7 +78,7 @@ void change_declared_type(Term *term, Type *newType)
     set_null((TaggedValue*) term);
 
     // TODO: Don't call change_type here
-    change_type(term, unbox_type(newType));
+    change_type(term, newType);
 
     // TODO: Use update_cascades to update inferred type on all users.
 }
@@ -91,7 +88,7 @@ void respecialize_type(Term* term)
     if (SHUTTING_DOWN)
         return;
 
-    Term* outputType = derive_specialized_output_type(term->function, term);
+    Type* outputType = derive_specialized_output_type(term->function, term);
     if (outputType != term->type)
         change_declared_type(term, outputType);
 }
@@ -126,7 +123,7 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     change_function(term, function);
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
-    Term* outputType = function_get_output_type(function, 0);
+    Type* outputType = function_get_output_type(function, 0);
 
     if (function_t::get_specialize_type(function) != NULL)
         outputType = function_t::get_specialize_type(function)(term);
@@ -134,7 +131,7 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     change_declared_type(term, outputType);
 }
 
-void rewrite_as_value(Branch& branch, int index, Term* type)
+void rewrite_as_value(Branch& branch, int index, Type* type)
 {
     while (index > branch.length())
         branch.append(NULL);
@@ -187,7 +184,7 @@ void remap_pointers(Term* term, TermMap const& map)
     // This was implemented once, and it caused spurious crash bugs
     // Term* newType = map.getRemapped(term->type);
     
-    Type::RemapPointers remapPointers = type_t::get_remap_pointers_func(term->type);
+    Type::RemapPointers remapPointers = term->type->remapPointers;
 
     // Remap on value
     if ((term->value_data.ptr != NULL)

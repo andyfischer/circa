@@ -47,13 +47,13 @@ namespace for_function {
         return outerRebinds[outputIndex - 1]->name.c_str();
     }
 
-    Term* getOutputType(Term* term, int outputIndex)
+    Type* getOutputType(Term* term, int outputIndex)
     {
         Branch& contents = nested_contents(term);
 
         // Check if we're still building
         if (contents.length() == 0)
-            return ANY_TYPE;
+            return &ANY_T;
 
         Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
         return outerRebinds[outputIndex - 1]->type;

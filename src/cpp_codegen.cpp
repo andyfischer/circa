@@ -6,11 +6,12 @@
 #include "introspection.h"
 #include "source_repro.h"
 #include "term.h"
+#include "type.h"
 
 namespace circa {
 namespace cpp_codegen {
 
-void write_type_name(CppWriter& writer, Term* type)
+void write_type_name(CppWriter& writer, Type* type)
 {
     if (type->name == "number")
         writer.write("float");

@@ -39,7 +39,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (!context->errorOccurred && !is_value(term)) {
         for (int i=0; i < get_output_count(term); i++) {
 
-            Type* outputType = unbox_type(get_output_type(term, i));
+            Type* outputType = get_output_type(term, i);
             TaggedValue* output = get_output(context, term, i);
 
             // Special case, if the function's output type is void then we don't care

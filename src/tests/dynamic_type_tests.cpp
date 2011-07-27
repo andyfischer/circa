@@ -73,7 +73,7 @@ void test_field_access()
     test_assert(as_bool(eq1));
     test_assert(as_bool(eq2));
 
-    test_assert(r->type == ANY_TYPE);
+    test_equals(r->type->name, "any");
     test_assert(r->value_type == get_pointer(T));
 
     branch.compile("r.b = 's2'");
@@ -103,8 +103,8 @@ void test_dynamic_overload()
 {
     EvalContext context;
     Branch branch;
-    Term* a = create_value(branch, ANY_TYPE, "a");
-    Term* b = create_value(branch, ANY_TYPE, "b");
+    Term* a = create_value(branch, &ANY_T, "a");
+    Term* b = create_value(branch, &ANY_T, "b");
     Term* result = branch.compile("add(a, b)");
 
     set_int(a, 5);

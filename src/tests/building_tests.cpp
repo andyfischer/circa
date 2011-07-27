@@ -9,8 +9,8 @@ namespace building_tests {
 void test_create_value()
 {
     Branch branch;
-    Term *term = create_value(branch, INT_TYPE);
-    test_assert(term->type == INT_TYPE);
+    Term *term = create_value(branch, &INT_T);
+    test_assert(term->type == &INT_T);
 }
 
 void test_create_int()
@@ -54,48 +54,48 @@ void test_rewrite_as_value()
 {
     Branch branch;
 
-    Term* a = create_value(branch, INT_TYPE);
+    Term* a = create_value(branch, &INT_T);
     Term* b = apply(branch, ADD_FUNC, TermList(a,a));
 
     test_assert(branch[1] == b);
 
     // rewrite b
-    rewrite_as_value(branch, 1, FLOAT_TYPE);
+    rewrite_as_value(branch, 1, &FLOAT_T);
 
-    test_assert(b->type == FLOAT_TYPE);
+    test_assert(b->type == &FLOAT_T);
     test_assert(b->function == VALUE_FUNC);
     test_assert(is_value(b));
 
     // add new term
-    rewrite_as_value(branch, 2, INT_TYPE);
+    rewrite_as_value(branch, 2, &INT_T);
     test_assert(branch.length() == 3);
     Term* c = branch[2];
     test_assert(is_value(c));
-    test_assert(c->type == INT_TYPE);
+    test_assert(c->type == &INT_T);
 
     // add a new term such that we need to create NULLs
-    rewrite_as_value(branch, 5, STRING_TYPE);
+    rewrite_as_value(branch, 5, &STRING_T);
     test_assert(branch.length() == 6);
     test_assert(branch[3] == NULL);
     test_assert(branch[4] == NULL);
     test_assert(is_value(branch[5]));
-    test_assert(branch[5]->type == STRING_TYPE);
+    test_assert(branch[5]->type == &STRING_T);
 }
 
 void test_procure()
 {
     Branch branch;
-    Term* a = procure_value(branch, INT_TYPE, "a");
-    procure_value(branch, INT_TYPE, "b");
-    test_assert(a->type == INT_TYPE);
+    Term* a = procure_value(branch, &INT_T, "a");
+    procure_value(branch, &INT_T, "b");
+    test_assert(a->type == &INT_T);
     test_assert(is_value(a));
 
-    Term* a_again = procure_value(branch, INT_TYPE, "a");
+    Term* a_again = procure_value(branch, &INT_T, "a");
     test_assert(a == a_again);
 
-    a_again = procure_value(branch, FLOAT_TYPE, "a");
+    a_again = procure_value(branch, &FLOAT_T, "a");
     test_assert(a == a_again);
-    test_assert(a->type == FLOAT_TYPE);
+    test_assert(a->type == &FLOAT_T);
     test_assert(is_value(a));
 }
 

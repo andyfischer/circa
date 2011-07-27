@@ -103,7 +103,7 @@ struct Type
     VisitHeap visitHeap;
 
     // Parent type, may be null.
-    Term* parent;
+    Type* parent;
     
     Branch prototype;
 
@@ -203,12 +203,16 @@ void initialize_simple_pointer_type(Type* type);
 
 void type_initialize_kernel(Branch& kernel);
 Term* create_tuple_type(TermList const& types);
-Term* find_method(Branch& branch, Term* type, std::string const& name);
+Term* find_method(Branch& branch, Type* type, std::string const& name);
 
 Term* parse_type(Branch& branch, std::string const& decl);
 
 // Change the type value for an existing type. 'term' should be a value of
 // type Type.
 void install_type(Term* term, Type* type);
+
+void set_type_list(TaggedValue* value, Type* type1);
+void set_type_list(TaggedValue* value, Type* type1, Type* type2);
+void set_type_list(TaggedValue* value, Type* type1, Type* type2, Type* type3);
 
 } // namespace circa

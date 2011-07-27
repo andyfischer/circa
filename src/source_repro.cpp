@@ -93,7 +93,7 @@ void format_term_source(StyledSource* source, Term* term)
     // Or, check if this is a value term.
     } else if (is_value(term)) {
         // for certain types, don't write "name =" in front
-        if (term->type != FUNCTION_TYPE && term->type != TYPE_TYPE)
+        if (term->type != &FUNCTION_T && term->type != &TYPE_T)
             format_name_binding(source, term);
 
         // Special constructor syntax

@@ -17,11 +17,11 @@ void compound_type_usage()
     test_assert(is_type(MyType));
     Branch& prototype = type_t::get_prototype(unbox_type(MyType));
     test_assert(prototype.length() == 2);
-    test_assert(prototype[0]->name == "myint");
-    test_assert(prototype[0]->type == INT_TYPE);
+    test_equals(prototype[0]->name, "myint");
+    test_equals(prototype[0]->type->name, "int");
     test_assert(as_type(MyType)->findFieldIndex("myint") == 0);
-    test_assert(prototype[1]->name == "astr");
-    test_assert(prototype[1]->type == STRING_TYPE);
+    test_equals(prototype[1]->name, "astr");
+    test_equals(prototype[1]->type, "string");
     test_assert(as_type(MyType)->findFieldIndex("astr") == 1);
 
     test_assert(as_type(MyType)->findFieldIndex("the_bodies") == -1);
@@ -40,7 +40,7 @@ void compound_type_usage()
 
     evaluate_branch(branch);
 
-    test_assert(inst->type = MyType);
+    test_equals(inst->type->name, "MyType");
     test_assert(inst->value_data.ptr != NULL);
     test_assert(inst->getIndex(0)->asInt() == 0);
     test_assert(inst->getIndex(1)->asString() == "");

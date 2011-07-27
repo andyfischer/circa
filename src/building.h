@@ -41,10 +41,10 @@ void remove_from_any_user_lists(Term* term);
 void clear_from_dependencies_of_users(Term* term);
 
 // Create a new value term with the given type.
-Term* create_value(Branch& branch, Term* type, std::string const& name="");
+Term* create_value(Branch& branch, Type* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");
 
-Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
+Term* create_stateful_value(Branch& branch, Type* type, Term* defaultValue,
         std::string const& name);
 
 // Create values with a specified value.
@@ -63,7 +63,7 @@ Term* duplicate_value(Branch& branch, Term* term);
 
 // In this context, "procure" means "return the existing thing if it already exists, and
 // create it if it doesn't exist." Procure functions are idempotent.
-Term* procure_value(Branch& branch, Term* type, std::string const& name);
+Term* procure_value(Branch& branch, Type* type, std::string const& name);
 
 Term* procure_int(Branch& branch, std::string const& name);
 Term* procure_float(Branch& branch, std::string const& name);

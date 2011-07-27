@@ -22,7 +22,7 @@ Term* create_compound_type(Branch& branch, std::string const& name)
 
 Type* get_compound_list_element_type(Type* compoundType, int index)
 {
-    return unbox_type(compoundType->prototype[index]->type);
+    return compoundType->prototype[index]->type;
 }
 
 }

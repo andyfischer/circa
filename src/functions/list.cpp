@@ -7,13 +7,13 @@ namespace list_function {
 
     CA_START_FUNCTIONS;
 
-    Term* specializeType(Term* term)
+    Type* specializeType(Term* term)
     {
-        TermList inputTypes;
+        List inputTypes;
         for (int i=0; i < term->numInputs(); i++)
-            inputTypes.append(term->input(i)->type);
+            set_type(inputTypes.append(), term->input(i)->type);
 
-        return create_tuple_type(inputTypes);
+        return as_type(create_tuple_type(inputTypes));
     }
 
     CA_DEFINE_FUNCTION(evaluate, "list(any...) -> List")

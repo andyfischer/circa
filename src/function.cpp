@@ -107,7 +107,7 @@ namespace function_t {
 
         out << ")";
 
-        if (function_get_output_type(term, 0) != VOID_TYPE) {
+        if (function_get_output_type(term, 0) != &VOID_T) {
             out << term->stringPropOptional("syntax:whitespacePreColon", "");
             out << "->";
             out << term->stringPropOptional("syntax:whitespacePostColon", " ");
@@ -165,7 +165,7 @@ namespace function_t {
 
         append_phrase(source, ")", term, token::LPAREN);
 
-        if (function_get_output_type(term, 0) != VOID_TYPE) {
+        if (function_get_output_type(term, 0) != &VOID_T) {
             append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
                     term, token::WHITESPACE);
             append_phrase(source, "->", term, phrase_type::UNDEFINED);
@@ -270,10 +270,11 @@ namespace function_t {
         return placeholder->boolPropOptional("optional", false);
     }
 
-    Term* get_input_type(Term* func, int index)
+    // TODO: delete this
+    Type* get_input_type(Term* func, int index)
     {
         if (!is_function(func))
-            return ANY_TYPE;
+            return &ANY_T;
 
         if (function_t::get_variable_args(func))
             index = 0;
@@ -300,12 +301,12 @@ bool is_function(Term* term)
 {
     if (term == NULL)
         return false;
-    return term->type == FUNCTION_TYPE;
+    return term->type == &FUNCTION_T;
 }
 
 bool is_function_attrs(Term* term)
 {
-    return term->type == FUNCTION_ATTRS_TYPE;
+    return term->type == &FUNCTION_ATTRS_T;
 }
 
 FunctionAttrs& as_function_attrs(Term* term)
@@ -326,7 +327,7 @@ FunctionAttrs* get_function_attrs(Term* func)
         return NULL;
     if (nested_contents(func).length() == 0)
         return NULL;
-    if (nested_contents(func)[0]->type != FUNCTION_ATTRS_TYPE)
+    if (nested_contents(func)[0]->type != &FUNCTION_ATTRS_T)
         return NULL;
     return &as_function_attrs(nested_contents(func)[0]);
 }
@@ -350,7 +351,7 @@ void initialize_function(Term* func)
       }
     */
 
-    Term* attributesTerm = create_value(nested_contents(func), FUNCTION_ATTRS_TYPE, "#attributes");
+    Term* attributesTerm = create_value(nested_contents(func), &FUNCTION_ATTRS_T, "#attributes");
     hide_from_source(attributesTerm);
 
     // Setup the term's global value to point back to the term, so that the function
@@ -380,8 +381,7 @@ void finish_parsing_function_header(Term* func)
 
 bool is_callable(Term* term)
 {
-    return (term->type == FUNCTION_TYPE
-            || term->type == TYPE_TYPE);
+    return (term->type == &FUNCTION_T || term->type == &TYPE_T);
 }
 
 bool inputs_statically_fit_function(Term* func, TermList const& inputs)
@@ -393,7 +393,7 @@ bool inputs_statically_fit_function(Term* func, TermList const& inputs)
         return false;
 
     for (int i=0; i < inputs.length(); i++) {
-        Type* type = unbox_type(function_t::get_input_type(func, i));
+        Type* type = function_t::get_input_type(func, i);
         Term* input = inputs[i];
         if (input == NULL)
             continue;
@@ -415,7 +415,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
         return false;
 
     for (int i=0; i < inputs.length(); i++) {
-        Type* type = unbox_type(function_t::get_input_type(func, i));
+        Type* type = function_t::get_input_type(func, i);
         TaggedValue* value = inputs[i];
         if (value == NULL)
             continue;
@@ -434,7 +434,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
         return false;
 
     for (int i=0; i < list->length(); i++) {
-        Type* type = unbox_type(function_t::get_input_type(func, i));
+        Type* type = function_t::get_input_type(func, i);
         TaggedValue* value = list->get(i);
         if (value == NULL)
             continue;
@@ -500,16 +500,17 @@ Type* function_get_output_type(Term* function, int index)
     FunctionAttrs* attrs = get_function_attrs(function);
 
     if (attrs == NULL)
-        return ANY_TYPE;
+        return &ANY_T;
 
     // Temporary special case
     if (index > 0 && (function == IF_BLOCK_FUNC || function == FOR_FUNC))
-        return ANY_TYPE;
+        return &ANY_T;
 
     ca_assert(index < attrs->outputTypes.length());
 
     return as_type(attrs->outputTypes[index]);
 }
+
 TaggedValue* function_get_parameters(Term* function)
 {
     FunctionAttrs* attrs = get_function_attrs(function);

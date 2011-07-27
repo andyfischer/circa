@@ -6,6 +6,7 @@
 #include "function.h"
 #include "source_repro.h"
 #include "term.h"
+#include "type.h"
 
 #include "types/ref.h"
 

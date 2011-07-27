@@ -20,12 +20,12 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     // If 'function' is actually a type, create a value instead.
     if (is_type(function)) {
         if (inputs.length() == 0) {
-            Term* result = create_value(branch, function);
+            Term* result = create_value(branch, as_type(function));
             result->setBoolProp("constructor", true);
             return result;
         } else if (inputs.length() == 1) {
             Term* result = apply(branch, CAST_FUNC, inputs);
-            change_declared_type(result, function);
+            change_declared_type(result, as_type(function));
             return result;
         } else {
             internal_error("Constructors with multiple arguments not yet supported.");
@@ -238,11 +238,10 @@ Term* apply(Branch& branch, std::string const& functionName, TermList const& inp
     return result;
 }
 
-Term* create_value(Branch& branch, Term* type, std::string const& name)
+Term* create_value(Branch& branch, Type* type, std::string const& name)
 {
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
-    ca_assert(is_type(type));
 
     Term *term = branch.appendNew();
 
@@ -251,7 +250,7 @@ Term* create_value(Branch& branch, Term* type, std::string const& name)
 
     change_function(term, VALUE_FUNC);
     change_declared_type(term, type);
-    change_type((TaggedValue*) term, unbox_type(type));
+    change_type((TaggedValue*) term, type);
     update_unique_name(term);
     update_locals_index_for_new_term(term);
     update_input_instructions(term);
@@ -268,10 +267,10 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     if (type == NULL)
         internal_error("Couldn't find type: "+typeName);
 
-    return create_value(branch, type, name);
+    return create_value(branch, as_type(type), name);
 }
 
-Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
+Term* create_stateful_value(Branch& branch, Type* type, Term* defaultValue,
         std::string const& name)
 {
     Term* result = apply(branch, GET_STATE_FIELD_FUNC,
@@ -282,40 +281,40 @@ Term* create_stateful_value(Branch& branch, Term* type, Term* defaultValue,
 
 Term* create_string(Branch& branch, std::string const& s, std::string const& name)
 {
-    Term* term = create_value(branch, STRING_TYPE, name);
+    Term* term = create_value(branch, &STRING_T, name);
     set_string(term, s);
     return term;
 }
 
 Term* create_int(Branch& branch, int i, std::string const& name)
 {
-    Term* term = create_value(branch, INT_TYPE, name);
+    Term* term = create_value(branch, &INT_T, name);
     set_int(term, i);
     return term;
 }
 
 Term* create_float(Branch& branch, float f, std::string const& name)
 {
-    Term* term = create_value(branch, FLOAT_TYPE, name);
+    Term* term = create_value(branch, &FLOAT_T, name);
     set_float(term, f);
     return term;
 }
 
 Term* create_bool(Branch& branch, bool b, std::string const& name)
 {
-    Term* term = create_value(branch, BOOL_TYPE, name);
+    Term* term = create_value(branch, &BOOL_T, name);
     set_bool(term, b);
     return term;
 }
 
 Term* create_void(Branch& branch, std::string const& name)
 {
-    return create_value(branch, VOID_TYPE, name);
+    return create_value(branch, &VOID_T, name);
 }
 
 Term* create_list(Branch& branch, std::string const& name)
 {
-    Term* term = create_value(branch, LIST_TYPE, name);
+    Term* term = create_value(branch, &LIST_T, name);
     return term;
 }
 
@@ -331,7 +330,7 @@ Branch& create_namespace(Branch& branch, std::string const& name)
 
 Term* create_type(Branch& branch, std::string name)
 {
-    Term* term = create_value(branch, TYPE_TYPE);
+    Term* term = create_value(branch, &TYPE_T);
 
     if (name != "") {
         as_type(term)->name = name;
@@ -343,14 +342,14 @@ Term* create_type(Branch& branch, std::string name)
 
 Term* create_type_value(Branch& branch, Type* value, std::string const& name)
 {
-    Term* term = create_value(branch, TYPE_TYPE, name);
+    Term* term = create_value(branch, &TYPE_T, name);
     set_type(term, value);
     return term;
 }
 
 Term* create_symbol_value(Branch& branch, TaggedValue* value, std::string const& name)
 {
-    Term* term = create_value(branch, SYMBOL_TYPE, name);
+    Term* term = create_value(branch, &SYMBOL_T, name);
     copy(value, term);
     return term;
 }
@@ -362,7 +361,7 @@ Term* duplicate_value(Branch& branch, Term* term)
     return dup;
 }
 
-Term* procure_value(Branch& branch, Term* type, std::string const& name)
+Term* procure_value(Branch& branch, Type* type, std::string const& name)
 {
     Term* existing = branch[name];
     if (existing == NULL)
@@ -374,17 +373,17 @@ Term* procure_value(Branch& branch, Term* type, std::string const& name)
 
 Term* procure_int(Branch& branch, std::string const& name)
 {
-    return procure_value(branch, INT_TYPE, name);
+    return procure_value(branch, &INT_T, name);
 }
 
 Term* procure_float(Branch& branch, std::string const& name)
 {
-    return procure_value(branch, FLOAT_TYPE, name);
+    return procure_value(branch, &FLOAT_T, name);
 }
 
 Term* procure_bool(Branch& branch, std::string const& name)
 {
-    return procure_value(branch, BOOL_TYPE, name);
+    return procure_value(branch, &BOOL_T, name);
 }
 
 void set_step(Term* term, float step)

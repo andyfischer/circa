@@ -12,9 +12,9 @@ void test_reference()
 {
     Branch branch;
 
-    Term* r1 = create_value(branch, REF_TYPE);
-    Term* a = create_value(branch, INT_TYPE);
-    Term* r2 = create_value(branch, REF_TYPE);
+    Term* r1 = create_value(branch, &REF_T);
+    Term* a = create_value(branch, &INT_T);
+    Term* r2 = create_value(branch, &REF_T);
 
     set_ref(r1, a);
 
@@ -31,7 +31,7 @@ void reference_type_deletion_bug()
     // the thing it was pointed to.
     Branch *branch = new Branch();
 
-    Term* myref = create_value(*branch, REF_TYPE);
+    Term* myref = create_value(*branch, &REF_T);
 
     set_ref(myref, INT_TYPE);
 

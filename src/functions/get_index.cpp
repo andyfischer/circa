@@ -52,7 +52,7 @@ namespace get_index_function {
         append_phrase(source, "]", term, token::LBRACKET);
     }
 
-    Term* specializeType(Term* caller)
+    Type* specializeType(Term* caller)
     {
         return find_type_of_get_index(caller->input(0));
     }

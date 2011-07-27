@@ -43,7 +43,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
     bool meta = function_t::get_input_meta(term->function, effectiveIndex);
     bool optional = function_t::get_input_optional(term->function, effectiveIndex);
     optional = optional || function_t::is_state_input(term->function, effectiveIndex);
-    Term* type = function_t::get_input_type(term->function, effectiveIndex);
+    Type* type = function_t::get_input_type(term->function, effectiveIndex);
 
     if (input == NULL) {
         if (!meta && !optional)
@@ -52,7 +52,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
     }
 
     // Check type
-    if (term_output_never_satisfies_type(input, unbox_type(type)))
+    if (term_output_never_satisfies_type(input, type))
         append_static_error_for_input(errors, term, "type_mismatch", index);
 }
 

@@ -9,10 +9,10 @@ namespace cast_function {
     {
         TaggedValue* source = INPUT(0);
 
-        if (CALLER->type == ANY_TYPE)
+        if (CALLER->type == &ANY_T)
             return copy(source, OUTPUT);
 
-        Type* type = unbox_type(CALLER->type);
+        Type* type = CALLER->type;
         if (!cast_possible(source, type)) {
             std::stringstream message;
             message << "Can't cast value " << source->toString()

@@ -262,7 +262,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (term->function != NULL) {
         for (int i=0; i < outputCount; i++) {
             if (i != 0) out << ", ";
-            Term* type = get_output_type(term, i);
+            Type* type = get_output_type(term, i);
             if (type == NULL)
                 out << "<NULL type>";
             else

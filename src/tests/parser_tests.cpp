@@ -53,7 +53,7 @@ void test_literal_float()
     test_equals(get_step(a), .1f);
 
     Term* b = parser::compile(branch, parser::statement_list, "5.200");
-    test_assert(b->type == FLOAT_TYPE);
+    test_equals(b->type->name, "float");
     test_equals(get_term_source_text(b), "5.200");
     test_equals(get_step(b), .001f);
 }
@@ -144,9 +144,9 @@ void test_type_decl()
 
     Branch& prototype = type_t::get_prototype(unbox_type(typeTerm));
 
-    test_assert(prototype[0]->type == INT_TYPE);
+    test_equals(prototype[0]->type->name, "int");
     test_equals(prototype[0]->name, "a");
-    test_assert(prototype[1]->type == FLOAT_TYPE);
+    test_equals(prototype[1]->type->name, "float");
     test_equals(prototype[1]->name, "b");
 }
 
@@ -161,13 +161,13 @@ void test_function_decl()
     test_equals(func->name, "Myfunc");
     test_equals(function_t::get_name(func), "Myfunc");
 
-    test_assert(function_get_input_type(func, 0) == STRING_TYPE);
+    test_equals(function_get_input_type(func, 0)->name, "string");
     test_assert(function_t::get_input_name(func, 0) == "what");
-    test_assert(function_get_input_type(func, 1) == STRING_TYPE);
+    test_equals(function_get_input_type(func, 1)->name, "string");
     test_assert(function_t::get_input_name(func, 1) == "hey");
-    test_assert(function_get_input_type(func, 2) == INT_TYPE);
+    test_equals(function_get_input_type(func, 2)->name, "int");
     test_assert(function_t::get_input_name(func, 2) == "yo");
-    test_assert(function_get_output_type(func, 0) == BOOL_TYPE);
+    test_equals(function_get_output_type(func, 0)->name, "bool");
 
     Branch& funcbranch = function_contents(func);
 
@@ -198,21 +198,21 @@ void test_stateful_value_decl()
 
     test_assert(is_get_state(a));
     test_assert(a->name == "a");
-    test_assert(a->type == INT_TYPE);
+    test_assert(a->type, "int");
     test_assert(branch["a"] == a);
 
     Term* b = parser::compile(branch, parser::statement, "state b = 5.0");
     test_assert(b->name == "b");
     test_assert(is_get_state(b));
 
-    test_assert(b->type == FLOAT_TYPE);
+    test_assert(b->type, "number");
     test_assert(branch["b"] == b);
     test_assert(!is_float(b) || as_float(b) == 0); // shouldn't have this value yet
 
     Term* c = parser::compile(branch, parser::statement, "state number c = 7.5");
     test_assert(c->name == "c");
     test_assert(is_get_state(c));
-    test_assert(c->type == FLOAT_TYPE);
+    test_assert(c->type, "number");
     test_assert(branch["c"] == c);
     test_assert(!is_float(c) || as_float(b) == 0); // shouldn't have this value yet
 }
@@ -226,7 +226,7 @@ void test_arrow_concatenation()
     test_assert(branch[1] == a);
     test_equals(branch[1]->function->name, "to_string");
     test_assert(branch[1]->input(0) == branch[0]);
-    test_assert(branch[1]->type == STRING_TYPE);
+    test_equals(branch[1]->type->name, "string");
     test_assert(branch.length() == 2);
 }
 
@@ -425,7 +425,7 @@ void test_float_division()
     Branch branch;
     Term* a = branch.eval("5 / 3");
 
-    test_assert(a->type == FLOAT_TYPE);
+    test_assert(a->type->name, "float");
     test_equals(a->function->name, "div");
     test_equals(nested_contents(a)[0]->function->name, "div_f");
     test_equals(a->toFloat(), 5.0f/3.0f);
@@ -436,7 +436,7 @@ void test_integer_division()
     Branch branch;
     Term* a = branch.eval("5 // 3");
 
-    test_assert(a->type == INT_TYPE);
+    test_assert(a->type->name, "int");
     test_equals(a->function->name, "div_i");
     test_assert(a->asInt() == 1);
 }

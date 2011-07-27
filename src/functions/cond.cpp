@@ -13,8 +13,9 @@ namespace cond_function {
 
     Type* specializeType(Term* caller)
     {
-        TermList choices(caller->input(1)->type, caller->input(2)->type);
-        return find_common_type(choices);
+        List choices;
+        set_type_list(&choices, caller->input(1)->type, caller->input(2)->type);
+        return find_common_type(&choices);
     }
 
     CA_FUNCTION(feedback)

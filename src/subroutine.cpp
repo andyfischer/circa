@@ -41,9 +41,9 @@ Term* get_subroutine_input_placeholder(Branch& contents, int index)
     return contents[index + 1];
 }
 
-Term* get_subroutine_output_type(Branch& contents)
+Type* get_subroutine_output_type(Branch& contents)
 {
-    return as_function_attrs(contents[0]).outputTypes[0];
+    return as_type(as_function_attrs(contents[0]).outputTypes[0]);
 }
 
 void evaluate_subroutine_internal(EvalContext* context, Term* caller,
@@ -72,8 +72,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     }
 
     // Fetch output
-    Term* outputTypeTerm = get_subroutine_output_type(contents);
-    Type* outputType = unbox_type(outputTypeTerm);
+    Type* outputType = get_subroutine_output_type(contents);
 
     ca_assert(is_list(&context->subroutineOutput) || is_null(&context->subroutineOutput));
 
@@ -85,7 +84,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     if (context->errorOccurred) {
         outputs->resize(1);
         set_null(outputs->get(0));
-    } else if (outputTypeTerm == VOID_TYPE) {
+    } else if (outputType == &VOID_T) {
 
         set_null(outputs->get(0));
 
@@ -132,7 +131,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
         if (input == NULL)
             continue;
 
-        Type* inputType = unbox_type(function_t::get_input_type(function, i));
+        Type* inputType = function_t::get_input_type(function, i);
 
         bool success = cast(input, inputType, inputs[i]);
         if (!success) {
@@ -172,13 +171,13 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
 
 bool is_subroutine(Term* term)
 {
-    if (term->type != FUNCTION_TYPE)
+    if (term->type != &FUNCTION_T)
         return false;
     if (!has_nested_contents(term))
         return false;
     if (nested_contents(term).length() < 1)
         return false;
-    if (term->contents(0)->type != FUNCTION_ATTRS_TYPE)
+    if (term->contents(0)->type != &FUNCTION_ATTRS_T)
         return false;
     return function_t::get_evaluate(term) == evaluate_subroutine;
 }
@@ -266,7 +265,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
 
         if (term == NULL) continue;
 
-        if (term->type == FUNCTION_ATTRS_TYPE)
+        if (term->type == &FUNCTION_ATTRS_T)
             continue;
 
         copy(term, storage->get(i));
@@ -287,7 +286,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
 
         if (term == NULL) continue;
 
-        if (term->type == FUNCTION_ATTRS_TYPE)
+        if (term->type == &FUNCTION_ATTRS_T)
             continue;
 
         copy(storage->get(i), term);

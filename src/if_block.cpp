@@ -196,7 +196,7 @@ CA_FUNCTION(evaluate_if_block)
         Term* joinTerm = joining[i];
         TaggedValue* value = get_input(context, joinTerm, acceptedBranchIndex);
 
-        ca_test_assert(cast_possible(value, unbox_type(get_output_type(CALLER, i+1))));
+        ca_test_assert(cast_possible(value, get_output_type(CALLER, i+1)));
 
         copy(value, EXTRA_OUTPUT(i));
     }

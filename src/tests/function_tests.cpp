@@ -20,8 +20,8 @@ void create()
     test_assert(function_t::get_name(func) == "mysub");
 
     test_assert(function_t::num_inputs(func) == 1);
-    test_assert(function_get_input_type(func, 0) == INT_TYPE);
-    test_assert(function_get_output_type(func, 0) == STRING_TYPE);
+    test_equals(function_get_input_type(func, 0)->name, "int");
+    test_equals(function_get_output_type(func, 0)->name, "string");
 }
 
 void test_is_callable()
@@ -182,8 +182,8 @@ void multiple_output_static_typing()
     Branch branch;
     branch.compile("def f(int a :out, string b :out);");
     Term* call = branch.compile("f(1, 'hi')");
-    test_assert(get_output_type(call, 1) == INT_TYPE);
-    test_assert(get_output_type(call, 2) == STRING_TYPE);
+    test_equals(get_output_type(call, 1)->name, "int");
+    test_equals(get_output_type(call, 2)->name, "string");
     test_assert(branch);
 
     branch.compile("c = 2, d = 'hi'");

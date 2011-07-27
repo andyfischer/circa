@@ -13,7 +13,7 @@ void test_is_get_state()
     Branch branch;
     Term* i = branch.compile("state int i");
     test_assert(is_get_state(i));
-    test_assert(i->type == INT_TYPE);
+    test_equals(i->type->name, "int");
 
     Term* j = branch.compile("state i = 0");
     test_assert(is_get_state(j));
@@ -50,9 +50,9 @@ void test_get_type_from_branches_stateful_terms()
 
     test_assert(type.length() == 2);
     test_assert(is_value(type[0]));
-    test_assert(type[0]->type == FLOAT_TYPE);
+    test_equals(type[0]->type->name, "number");
     test_assert(is_value(type[0]));
-    test_assert(type[1]->type == BOOL_TYPE);
+    test_equals(type[1]->type->name, "bool");
 }
 
 void initial_value()

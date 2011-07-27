@@ -9,11 +9,12 @@ namespace type_inference_tests {
 
 void test_find_common_type()
 {
-    test_assert(find_common_type(TermList(INT_TYPE,INT_TYPE)) == INT_TYPE);
-    test_assert(find_common_type(TermList(FLOAT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
-    test_assert(find_common_type(TermList(INT_TYPE,FLOAT_TYPE)) == FLOAT_TYPE);
-    test_assert(find_common_type(TermList(BOOL_TYPE,STRING_TYPE)) == ANY_TYPE);
-    test_assert(find_common_type(TermList(KERNEL->get("Point"),KERNEL->get("Rect"))) == LIST_TYPE);
+    test_assert(find_common_type(&INT_T,&INT_T) == &INT_T);
+    test_assert(find_common_type(&FLOAT_T,&FLOAT_T) == &FLOAT_T);
+    test_assert(find_common_type(&INT_T,&FLOAT_T) == &FLOAT_T);
+    test_assert(find_common_type(&BOOL_T,&STRING_T) == &ANY_T);
+    test_assert(find_common_type(as_type(KERNEL->get("Point")),
+                as_type(KERNEL->get("Rect"))) == LIST_TYPE);
 }
 
 void test_find_type_of_get_index()
@@ -21,23 +22,23 @@ void test_find_type_of_get_index()
     Branch branch;
     Term* range = branch.compile("range(4,5)");
 
-    test_assert(find_type_of_get_index(range) == INT_TYPE);
+    test_equals(find_type_of_get_index(range)->name, "int");
 
     Term* list1 = branch.compile("['hello' 'hi' 'bye']");
-    test_assert(find_type_of_get_index(list1) == STRING_TYPE);
+    test_equals(find_type_of_get_index(list1)->name, "string");
 
     Term* list2 = branch.compile("[0 -1 11]");
-    test_assert(find_type_of_get_index(list2) == INT_TYPE);
+    test_equals(find_type_of_get_index(list2)->name, "int");
 
     Term* list3 = branch.compile("[]");
-    test_assert(find_type_of_get_index(list3) == ANY_TYPE);
+    test_equals(find_type_of_get_index(list3)->name, "any");
 
     Term* list4 = branch.compile("[0.1 4]");
-    test_assert(find_type_of_get_index(list4) == FLOAT_TYPE);
+    test_equals(find_type_of_get_index(list4)->name, "number");
 
     branch.compile("type T { number x, number y }");
     Term* list5 = branch.compile("[.1 .1] -> T");
-    test_assert(find_type_of_get_index(list5) == FLOAT_TYPE);
+    test_equals(find_type_of_get_index(list5)->name, "number");
 }
 
 void compare_builtin_types()

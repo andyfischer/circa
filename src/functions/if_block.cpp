@@ -57,16 +57,16 @@ namespace if_block_function {
         return outerRebinds[outputIndex - 1]->name.c_str();
     }
 
-    Term* getOutputType(Term* term, int outputIndex)
+    Type* getOutputType(Term* term, int outputIndex)
     {
         if (outputIndex == 0)
-            return VOID_TYPE;
+            return &VOID_T;
 
         Branch& contents = nested_contents(term);
 
         // check if term is still being initialized:
         if (contents.length() == 0)
-            return ANY_TYPE;
+            return &ANY_T;
 
         Branch& outerRebinds = contents.getFromEnd(0)->contents();
         return outerRebinds[outputIndex - 1]->type;
@@ -76,8 +76,9 @@ namespace if_block_function {
     {
         if (term->input(0) == NULL || term->input(1) == NULL)
             return &ANY_T;
-        TermList types(get_type_of_input(term, 0), get_type_of_input(term, 1));
-        return find_common_type(types);
+        List types;
+        set_type_list(&types, get_type_of_input(term, 0), get_type_of_input(term, 1));
+        return find_common_type(&types);
     }
 
     void setup(Branch& kernel)

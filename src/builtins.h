@@ -96,6 +96,7 @@ extern Type ERROR_T;
 extern Type EVAL_CONTEXT_T;
 extern Type FLOAT_T;
 extern Type FUNCTION_T;
+extern Type FUNCTION_ATTRS_T;
 extern Type HANDLE_T;
 extern Type INT_T;
 extern Type LIST_T;

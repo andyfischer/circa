@@ -23,7 +23,7 @@ void test_import_c()
     Term* func = import_function(branch, my_imported_function,
             "my_imported_func(int,int) -> int");
 
-    test_assert(function_get_output_type(func, 0) == INT_TYPE);
+    test_equals(function_get_output_type(func, 0)->name, "int");
 
     Term* result = branch.compile("my_imported_func(4,5)");
     evaluate_branch(branch);

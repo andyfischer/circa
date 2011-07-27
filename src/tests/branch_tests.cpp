@@ -96,7 +96,7 @@ void test_remove()
 {
     Branch branch;
 
-    create_value(branch, INT_TYPE, "a");
+    create_value(branch, &INT_T, "a");
 
     test_assert(branch.length() == 1);
     test_assert(branch.contains("a"));
