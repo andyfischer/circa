@@ -71,6 +71,7 @@ struct Type
     typedef void (*VisitHeap)(Type* type, TaggedValue* value,
             VisitHeapCallback callback, TaggedValue* context);
 
+    // Debugging metadata, this must be the first field.
     HeapTracker _heapTracker;
 
     std::string name;
@@ -80,6 +81,8 @@ struct Type
     // C++ type info. This is only used to do runtime type checks, when the data
     // is accessed as a C++ type. Otherwise, this is optional.
     const std::type_info *cppTypeInfo;
+
+    Term* declaringTerm;
 
     // Functions
     Initialize initialize;

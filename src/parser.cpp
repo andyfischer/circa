@@ -729,6 +729,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
     branch.moveToEnd(result);
     refresh_locals_indices(branch);
+    as_type(result)->declaringTerm = result;
 
     return ParseResult(result);
 }

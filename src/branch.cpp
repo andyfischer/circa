@@ -18,6 +18,7 @@
 #include "storage.h"
 #include "tagged_value.h"
 #include "term.h"
+#include "type.h"
 #include "update_cascades.h"
 
 namespace circa {
@@ -390,9 +391,19 @@ Branch* get_outer_scope(Branch const& branch)
     return branch.owningTerm->owningBranch;
 }
 
+void pre_erase_term(Term* term)
+{
+    // If this term declares a Type, then clear the Type.declaringTerm pointer
+    // before it becomes invalid.
+    if (is_value(term) && is_type(term) && as_type(term)->declaringTerm == term)
+        as_type(term)->declaringTerm = NULL;
+}
+
 void erase_term(Term* term)
 {
     assert_valid_term(term);
+
+    pre_erase_term(term);
 
     set_null((TaggedValue*) term);
     set_inputs(term, TermList());
@@ -438,6 +449,7 @@ void clear_branch(Branch* branch)
         if (*it == NULL)
             continue;
 
+        pre_erase_term(*it);
         set_inputs(*it, TermList());
         remove_from_any_user_lists(*it);
         change_function(*it, NULL);

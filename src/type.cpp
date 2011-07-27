@@ -106,6 +106,7 @@ Type::Type() :
     name(""),
     storageType(STORAGE_TYPE_NULL),
     cppTypeInfo(NULL),
+    declaringTerm(NULL),
     initialize(NULL),
     release(NULL),
     copy(NULL),

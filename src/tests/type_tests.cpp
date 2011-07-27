@@ -186,6 +186,20 @@ void test_compound_type_cast()
     test_equals(&b, "[0.0, 1.0]");
 }
 
+void test_declaring_term()
+{
+    Branch branch;
+    Term* myType = branch.compile("type MyType {}");
+    TaggedValue myValue;
+    change_type(&myValue, as_type(myType));
+    test_equals(myValue.value_type->name, "MyType");
+    test_assert(myValue.value_type->declaringTerm == myType);
+
+    clear_branch(&branch);
+    test_equals(myValue.value_type->name, "MyType");
+    test_assert(myValue.value_type->declaringTerm == NULL);
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::type_declaration);
@@ -198,6 +212,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::create_empty_type_then_populate_it);
     REGISTER_TEST_CASE(type_tests::test_copy_builtin_type);
     REGISTER_TEST_CASE(type_tests::test_compound_type_cast);
+    REGISTER_TEST_CASE(type_tests::test_declaring_term);
 }
 
 } // namespace type_tests
