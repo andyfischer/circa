@@ -88,6 +88,7 @@ extern Term* OPAQUE_POINTER_TYPE;
 
 } // extern "C"
 
+extern Type ANY_T;
 extern Type BOOL_T;
 extern Type BRANCH_T;
 extern Type DICT_T;

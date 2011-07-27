@@ -105,6 +105,7 @@ Term* OPAQUE_POINTER_TYPE;
 } // extern "C"
 
 // Builtin type objects:
+Type ANY_T;
 Type BOOL_T;
 Type BRANCH_T;
 Type DICT_T;
