@@ -6,6 +6,8 @@ def length(List) -> int
 
 def type(any :meta) -> Type
     "Returns the type of the given term"
+def typename(any :meta) -> string
+    "Returns the type name of the given term"
 
 namespace file
     def modified_time(string filename) -> int

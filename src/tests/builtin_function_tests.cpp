@@ -328,8 +328,17 @@ void test_run_single_statement()
 void test_type_func()
 {
     Branch branch;
-    TaggedValue* result = branch.eval("type(1)");
-    test_assert(as_type(result) == &INT_T);
+    test_assert(as_type(branch.eval("type(1)")) == &INT_T);
+    test_assert(as_type(branch.eval("type(1.0)")) == &FLOAT_T);
+    test_assert(as_type(branch.eval("type('hi')")) == &STRING_T);
+}
+
+void test_typename_func()
+{
+    Branch branch;
+    test_equals(branch.eval("typename(1)"), "int");
+    test_equals(branch.eval("typename(int)"), "Type");
+    test_equals(branch.eval("typename('hi')"), "string");
 }
 
 void register_tests()
@@ -351,6 +360,7 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing2);
     REGISTER_TEST_CASE(builtin_function_tests::test_run_single_statement);
     REGISTER_TEST_CASE(builtin_function_tests::test_type_func);
+    REGISTER_TEST_CASE(builtin_function_tests::test_typename_func);
 }
 
 } // namespace builtin_function_tests
