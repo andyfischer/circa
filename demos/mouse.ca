@@ -29,7 +29,7 @@ def draw_star(Star star)
   for t in 0..num_points
     draw_tip(t)
 
-state stars = []
+state List stars = []
 
 -- Draw a black background
 background(#000)

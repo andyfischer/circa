@@ -5,7 +5,7 @@ background(#042304)
 
 def rect_intersects_circle(Rect rect, Point circle_loc, number circle_radius) -> bool
     -- lazy intersection check
-    return rect_intersects_rect(rect, expand_rect(circle_loc, circle_radius, circle_radius))
+    return rect_intersects_rect(rect, expand_rect(circle_loc, [circle_radius circle_radius]))
 
 def random_initial_direction() -> Point
     if rand() > .5 { serve = 1 } else { serve = -1 }
@@ -26,11 +26,11 @@ ball_radius = 8.5
 
 -- player's paddle on left
 players_paddle_loc = [50 mouse.y] -> Point
-players_paddle = expand_rect(players_paddle_loc, paddle_depth, paddle_width)
+players_paddle = expand_rect(players_paddle_loc, [paddle_depth paddle_width])
 
 ai_speed = 180
 ai_paddle_loc = [window.width - 50, approach(ball_loc.y, ai_speed*td)] -> Point
-ai_paddle = expand_rect(ai_paddle_loc, paddle_depth, paddle_width)
+ai_paddle = expand_rect(ai_paddle_loc, [paddle_depth paddle_width])
 
 ball_is_being_introduced = (time - round_start_time) < 2.0
 
