@@ -378,11 +378,16 @@ Term* create_tuple_type(List* types)
     return result;
 }
 
-Term* find_method(Branch& branch, Type* type, std::string const& name)
+std::string get_base_type_name(std::string const& typeName)
 {
-    ca_assert(type->name != "");
-    std::string searchName = type->name + "." + name;
+    size_t pos = typeName.find_first_of("<");
+    if (pos != std::string::npos)
+        return typeName.substr(0, pos);
+    return "";
+}
 
+Term* find_method_with_search_name(Branch& branch, Type* type, std::string const& searchName)
+{
     Term* term = find_named(branch, searchName);
     if (term != NULL && is_function(term))
         return term;
@@ -399,8 +404,28 @@ Term* find_method(Branch& branch, Type* type, std::string const& name)
             return term;
     }
 
-    if (type->parent != NULL)
-        return find_method(branch, type->parent, name);
+    return NULL;
+}
+
+Term* find_method(Branch& branch, Type* type, std::string const& name)
+{
+    ca_assert(type->name != "");
+    std::string searchName = type->name + "." + name;
+
+    Term* result = find_method_with_search_name(branch, type, searchName);
+
+    if (result != NULL)
+        return result;
+
+    // If the type name is complex (such as List<int>), then try searching
+    // for the base type name (such as List).
+    std::string baseTypeName = get_base_type_name(type->name);
+    if (baseTypeName != "") {
+        result = find_method_with_search_name(branch, type, baseTypeName + "." + name);
+
+        if (result != NULL)
+            return result;
+    }
 
     return NULL;
 }

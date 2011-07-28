@@ -86,6 +86,16 @@ void infer_length()
     test_equals(&result, "4");
 }
 
+void infer_type_of_append()
+{
+    Branch branch;
+    branch.compile("a = []");
+    branch.compile("a.append(1)");
+    Term* b = branch.compile("a[0]");
+    //dump(branch);
+    //test_equals(b->type->name, "int");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_inference_tests::test_find_common_type);
@@ -94,6 +104,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_inference_tests::for_loop_output_type);
     REGISTER_TEST_CASE(type_inference_tests::assign_output_type);
     REGISTER_TEST_CASE(type_inference_tests::infer_length);
+    REGISTER_TEST_CASE(type_inference_tests::infer_type_of_append);
 }
 
 } // namespace type_inference_tests

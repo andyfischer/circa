@@ -40,7 +40,20 @@ TaggedValue* list_insert(TaggedValue* list, int index);
 void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
 void list_remove_nulls(TaggedValue* list);
 
-// Functions for dealing with List parameters and List types:
+// Functions for working with List's parameter. Depending on the parameter,
+// the list can be untyped, typed with an arbitrary size, or typed with
+// a specific size.
+
+enum ListType
+{
+    LIST_INVALID_PARAMETER=0,
+    LIST_UNTYPED,
+    LIST_TYPED_UNSIZED,
+    LIST_TYPED_SIZED,
+    LIST_TYPED_SIZED_NAMED
+};
+
+ListType list_get_parameter_type(TaggedValue* parameter);
 bool list_type_has_specific_size(TaggedValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter);
 
@@ -50,5 +63,11 @@ void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* par
 TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter);
 
 TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter);
+
+Type* list_get_single_type_from_parameter(TaggedValue* parameter);
+
+Type* create_typed_unsized_list(Type* elementType);
+
+Type* get_common_typed_unsized_list(Type* elementType1, Type* elementType2);
 
 } // namespace circa

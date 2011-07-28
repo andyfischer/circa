@@ -11,6 +11,35 @@ namespace list_methods_function {
         List* result = List::checkCast(OUTPUT);
         consume_input(CONTEXT, CALLER, 1, result->append());
     }
+    Type* append_specializeType(Term* term)
+    {
+        Term* listInput = term->input(0);
+        switch (list_get_parameter_type(&listInput->type->parameter)) {
+        case LIST_UNTYPED:
+            return listInput->type;
+        case LIST_TYPED_UNSIZED:
+        {
+            Type* listElementType = list_get_single_type_from_parameter(
+                    &listInput->type->parameter);
+            Type* commonType = find_common_type(listElementType, term->input(1)->type);
+            if (commonType == listElementType)
+                return listInput->type;
+            else
+                return create_typed_unsized_list(commonType);
+        }
+        case LIST_TYPED_SIZED:
+        case LIST_TYPED_SIZED_NAMED:
+        {    
+            List elementTypes;
+            copy(list_get_type_list_from_parameter(&listInput->type->parameter),
+                    &elementTypes);
+            set_type(elementTypes.append(), term->input(1)->type);
+            return create_typed_unsized_list(find_common_type(&elementTypes));
+        }
+        default:
+            return &ANY_T;
+        }
+    }
 
     CA_DEFINE_FUNCTION(extend, "List.extend(self, List) -> List")
     {
@@ -64,6 +93,7 @@ namespace list_methods_function {
         CA_SETUP_FUNCTIONS(kernel);
 
         LIST_APPEND_FUNC = kernel["List.append"];
+        get_function_attrs(LIST_APPEND_FUNC)->specializeType = append_specializeType;
     }
 
 } // namespace list_methods_function

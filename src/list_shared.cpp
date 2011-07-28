@@ -324,19 +324,6 @@ void list_remove_nulls(TaggedValue* value)
     list_remove_nulls((ListData**) &value->value_data);
 }
 
-// Functions for working with List's parameter. Depending on the parameter,
-// the list can be untyped, typed with an arbitrary size, or typed with
-// a specific size.
-
-enum ListType
-{
-    LIST_INVALID_PARAMETER=0,
-    LIST_UNTYPED,
-    LIST_TYPED_UNSIZED,
-    LIST_TYPED_SIZED,
-    LIST_TYPED_SIZED_NAMED
-};
-
 ListType list_get_parameter_type(TaggedValue* parameter)
 {
     if (is_null(parameter))
@@ -398,6 +385,19 @@ TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
     }
     ca_assert(false);
     return NULL;
+}
+
+Type* list_get_single_type_from_parameter(TaggedValue* parameter)
+{
+    return as_type(parameter);
+}
+Type* create_typed_unsized_list(Type* elementType)
+{
+    Type* type = Type::create();
+    list_t::setup_type(type);
+    set_type(&type->parameter, elementType);
+    type->name = std::string("List<") + elementType->name + ">";
+    return type;
 }
 
 } // namespace circa
