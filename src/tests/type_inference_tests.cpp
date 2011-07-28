@@ -92,8 +92,7 @@ void infer_type_of_append()
     branch.compile("a = []");
     branch.compile("a.append(1)");
     Term* b = branch.compile("a[0]");
-    //dump(branch);
-    //test_equals(b->type->name, "int");
+    test_equals(b->type->name, "int");
 }
 
 void register_tests()
