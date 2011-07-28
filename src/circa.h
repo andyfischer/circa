@@ -11,7 +11,6 @@
 #include "code_iterators.h"
 #include "codegen.h"
 #include "command_line.h"
-#include "compound_type.h"
 #include "debug.h"
 #include "documentation.h"
 #include "errors.h"

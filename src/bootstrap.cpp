@@ -8,7 +8,6 @@
 #include "building.h"
 #include "builtins.h"
 #include "bootstrap.h"
-#include "compound_type.h"
 #include "function.h"
 #include "heap_debugging.h"
 #include "importing.h"
@@ -191,7 +190,7 @@ void pre_setup_types(Branch& kernel)
 
 void initialize_compound_types(Branch& kernel)
 {
-    Term* set_type = create_compound_type(kernel, "Set");
+    Term* set_type = parse_type(kernel, "type Set;");
     set_t::setup_type(unbox_type(set_type));
 
     Term* map_type = parse_type(kernel, "type Map;");
