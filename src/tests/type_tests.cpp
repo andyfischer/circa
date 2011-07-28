@@ -4,6 +4,7 @@
 
 #include "circa.h"
 #include "importing_macros.h"
+#include "types/handle.h"
 
 namespace circa {
 namespace type_tests {
@@ -200,6 +201,30 @@ void test_declaring_term()
     test_assert(myValue.value_type->declaringTerm == NULL);
 }
 
+Type *g_testHandleType;
+
+CA_FUNCTION(test_handle_function)
+{
+    handle_t::set(OUTPUT, g_testHandleType, (void*) NULL);
+}
+
+void use_installed_handle_type()
+{
+    Branch branch;
+
+    Term* myType = branch.compile("type MyType {}");
+    g_testHandleType = as_type(myType);
+    Term* f = branch.compile("def f() -> MyType { return [] }");
+
+    handle_t::setup_type(g_testHandleType);
+    install_function(f, test_handle_function);
+
+    Term* fCall = branch.compile("f()");
+
+    evaluate_branch(branch);
+    test_assert(cast_possible(fCall, as_type(myType)));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(type_tests::type_declaration);
@@ -213,6 +238,7 @@ void register_tests()
     REGISTER_TEST_CASE(type_tests::test_copy_builtin_type);
     REGISTER_TEST_CASE(type_tests::test_compound_type_cast);
     REGISTER_TEST_CASE(type_tests::test_declaring_term);
+    REGISTER_TEST_CASE(type_tests::use_installed_handle_type);
 }
 
 } // namespace type_tests

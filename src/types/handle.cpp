@@ -109,6 +109,9 @@ namespace handle_t {
 
         ListData* data = (ListData*) source->value_data.ptr;
 
+        if (data == NULL)
+            return;
+
         ca_assert(data->refCount > 0);
 
         data->refCount++;
@@ -137,6 +140,7 @@ namespace handle_t {
         type->copy = copy;
         type->visitHeap = visitHeap;
         type->toString = list_t::tv_to_string;
+        set_null(&type->parameter);
     }
 
 } // namespace handle_t
