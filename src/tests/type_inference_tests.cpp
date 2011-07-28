@@ -19,31 +19,25 @@ void test_find_common_type()
 
 void test_find_type_of_get_index()
 {
-#if 0
-    TEST_DISABLED
-    Need to update find_type_of_get_index
-
     Branch branch;
     Term* range = branch.compile("range(4,5)");
-
-    test_equals(find_type_of_get_index(range)->name, "int");
+    test_equals(infer_type_of_get_index(range)->name, "int");
 
     Term* list1 = branch.compile("['hello' 'hi' 'bye']");
-    test_equals(find_type_of_get_index(list1)->name, "string");
+    test_equals(infer_type_of_get_index(list1)->name, "string");
 
     Term* list2 = branch.compile("[0 -1 11]");
-    test_equals(find_type_of_get_index(list2)->name, "int");
+    test_equals(infer_type_of_get_index(list2)->name, "int");
 
     Term* list3 = branch.compile("[]");
-    test_equals(find_type_of_get_index(list3)->name, "any");
+    test_equals(infer_type_of_get_index(list3)->name, "any");
 
     Term* list4 = branch.compile("[0.1 4]");
-    test_equals(find_type_of_get_index(list4)->name, "number");
+    test_equals(infer_type_of_get_index(list4)->name, "number");
 
     branch.compile("type T { number x, number y }");
     Term* list5 = branch.compile("[.1 .1] -> T");
-    test_equals(find_type_of_get_index(list5)->name, "number");
-#endif
+    test_equals(infer_type_of_get_index(list5)->name, "number");
 }
 
 void compare_builtin_types()

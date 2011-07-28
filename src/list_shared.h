@@ -70,9 +70,7 @@ Type* list_get_single_type_from_parameter(TaggedValue* parameter);
 
 int list_find_field_index_by_name(Type* listType, std::string const& name);
 
-Type* create_typed_unsized_list(Type* elementType);
 
 Type* get_common_typed_unsized_list(Type* elementType1, Type* elementType2);
-
 
 } // namespace circa

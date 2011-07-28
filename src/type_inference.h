@@ -14,9 +14,7 @@ Type* find_common_type(List* list);
 Type* find_common_type(Type* type1, Type* type2);
 Type* find_common_type(Type* type1, Type* type2, Type* type3);
 
-// Guesses at the declared type for a get_index call on this term. Currently
-// this is not very sophisticated, since we don't have generic types.
-Type* find_type_of_get_index(Term* listTerm);
+Type* infer_type_of_get_index(Term* input);
 
 // Looks at the term's function, and generates an expression which is our
 // best static guess as to the result. This might be a plain value (if the
@@ -28,5 +26,8 @@ Term* statically_infer_result(Branch& branch, Term* term);
 // if you don't care about partially known values. This will either return
 // a value result or :unknown.
 void statically_infer_result(Term* term, TaggedValue* result);
+
+// Create a List-based type that will have N elements, all of the same type.
+Type* create_typed_unsized_list_type(Type* elementType);
 
 } // namespace circa

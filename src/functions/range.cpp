@@ -23,11 +23,18 @@ namespace range_function {
         }
     }
 
+    Type* specializeType(Term* term)
+    {
+        // TODO: Should reuse existing type object
+        return create_typed_unsized_list_type(&INT_T);
+    }
+
     void setup(Branch& kernel)
     {
         RANGE_FUNC = import_function(kernel, evaluate,
                 "range(int start, int max) -> List;"
                 "'Return a list of integers from start to max-1'");
+        get_function_attrs(RANGE_FUNC)->specializeType = specializeType;
     }
 }
 } // namespace circa

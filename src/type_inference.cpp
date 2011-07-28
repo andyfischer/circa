@@ -6,6 +6,7 @@
 #include "building.h"
 #include "evaluation.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -73,33 +74,23 @@ Type* find_common_type(Type* type1, Type* type2, Type* type3)
     return find_common_type(&list);
 }
 
-Type* find_type_of_get_index(Term* listTerm)
+Type* infer_type_of_get_index(Term* input)
 {
-    if (listTerm->function == RANGE_FUNC)
-        return &INT_T;
+    if (input == NULL)
+        return &ANY_T;
 
-    if (listTerm->function == LIST_FUNC) {
-        List inputTypes;
-        for (int i=0; i < listTerm->numInputs(); i++)
-            set_type(inputTypes.append(), listTerm->input(i)->type);
-        return find_common_type(&inputTypes);
+    switch (list_get_parameter_type(&input->type->parameter)) {
+    case LIST_UNTYPED:
+        return &ANY_T;
+    case LIST_TYPED_UNSIZED:
+        return list_get_single_type_from_parameter(&input->type->parameter);
+    case LIST_TYPED_SIZED:
+    case LIST_TYPED_SIZED_NAMED:
+        return find_common_type(as_list(list_get_type_list_from_parameter(
+                    &input->type->parameter)));
+    default:
+        return &ANY_T;
     }
-
-    if (listTerm->function == COPY_FUNC)
-        return find_type_of_get_index(listTerm->input(0));
-
-#if 0
-    if (is_list_based_type(listTerm->type)) {
-        Branch& prototype = type_t::get_prototype(listTerm->type);
-        List types;
-        for (int i=0; i < prototype.length(); i++)
-            set_type(types.append(), prototype[i]->type);
-        return find_common_type(&types);
-    }
-#endif
-
-    // Unrecognized
-    return &ANY_T;
 }
 
 Type* statically_infer_type_of_get_index(Branch& branch, Term* term)
@@ -190,6 +181,15 @@ void statically_infer_result(Term* term, TaggedValue* result)
         EvalContext context;
         evaluate_minimum(&context, resultTerm, result);
     }
+}
+
+Type* create_typed_unsized_list_type(Type* elementType)
+{
+    Type* type = Type::create();
+    list_t::setup_type(type);
+    set_type(&type->parameter, elementType);
+    type->name = std::string("List<") + elementType->name + ">";
+    return type;
 }
 
 } // namespace circa

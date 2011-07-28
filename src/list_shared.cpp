@@ -410,13 +410,5 @@ int list_find_field_index_by_name(Type* listType, std::string const& name)
             return i;
     return -1;
 }
-Type* create_typed_unsized_list(Type* elementType)
-{
-    Type* type = Type::create();
-    list_t::setup_type(type);
-    set_type(&type->parameter, elementType);
-    type->name = std::string("List<") + elementType->name + ">";
-    return type;
-}
 
 } // namespace circa

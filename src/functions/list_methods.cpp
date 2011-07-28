@@ -25,7 +25,7 @@ namespace list_methods_function {
             if (commonType == listElementType)
                 return listInput->type;
             else
-                return create_typed_unsized_list(commonType);
+                return create_typed_unsized_list_type(commonType);
         }
         case LIST_TYPED_SIZED:
         case LIST_TYPED_SIZED_NAMED:
@@ -34,7 +34,7 @@ namespace list_methods_function {
             copy(list_get_type_list_from_parameter(&listInput->type->parameter),
                     &elementTypes);
             set_type(elementTypes.append(), term->input(1)->type);
-            return create_typed_unsized_list(find_common_type(&elementTypes));
+            return create_typed_unsized_list_type(find_common_type(&elementTypes));
         }
         default:
             return &ANY_T;

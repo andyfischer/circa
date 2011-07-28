@@ -29,19 +29,7 @@ namespace get_index_function {
     }
     Type* specializeType(Term* term)
     {
-        Term* listInput = term->input(0);
-        switch (list_get_parameter_type(&listInput->type->parameter)) {
-        case LIST_UNTYPED:
-            return &ANY_T;
-        case LIST_TYPED_UNSIZED:
-            return list_get_single_type_from_parameter(&listInput->type->parameter);
-        case LIST_TYPED_SIZED:
-        case LIST_TYPED_SIZED_NAMED:
-            return find_common_type(as_list(list_get_type_list_from_parameter(
-                        &listInput->type->parameter)));
-        default:
-            return &ANY_T;
-        }
+        return infer_type_of_get_index(term->input(0));
     }
 
     CA_DEFINE_FUNCTION(get_index_from_branch, "get_index_from_branch(any, int) -> any")

@@ -72,7 +72,7 @@ namespace vectorize_vs_function {
             return;
 
         Term* leftPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
-        change_declared_type(leftPlaceholder, find_type_of_get_index(left));
+        change_declared_type(leftPlaceholder, infer_type_of_get_index(left));
 
         Term* rightPlaceholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
         change_declared_type(rightPlaceholder, right->type);
