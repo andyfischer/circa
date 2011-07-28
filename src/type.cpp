@@ -45,10 +45,10 @@ namespace type_t {
         append_phrase(source, term->stringPropOptional("syntax:postLBracketWhitespace", " "),
                 term, token::WHITESPACE);
 
-        Branch& prototype = type_t::get_prototype(unbox_type(term));
+        Branch& contents = nested_contents(term);
 
-        for (int i=0; i < prototype.length(); i++) {
-            Term* field = prototype[i];
+        for (int i=0; i < contents.length(); i++) {
+            Term* field = contents[i];
             ca_assert(field != NULL);
             append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
                     term, token::WHITESPACE);
@@ -62,17 +62,20 @@ namespace type_t {
         append_phrase(source, "}", term, token::RBRACKET);
     }
 
+    // TODO: Delete
     void remap_pointers(Term *type, TermMap const& map)
     {
-        Branch& prototype = type_t::get_prototype(unbox_type(type));
+#if 0
+        Branch& contents = type_t::get_prototype(unbox_type(type));
 
-        for (int field_i=0; field_i < prototype.length(); field_i++) {
-            Term* orig = prototype[field_i];
+        for (int field_i=0; field_i < contents.length(); field_i++) {
+            Term* orig = contents[field_i];
             Term* remapped = map.getRemapped(orig);
             assert_valid_term(orig);
             assert_valid_term(remapped);
-            prototype.set(field_i, remapped);
+            contents.set(field_i, remapped);
         }
+#endif
     }
     std::string toString(TaggedValue* value)
     {
@@ -93,10 +96,6 @@ namespace type_t {
     Type::RemapPointers& get_remap_pointers_func(Term* type)
     {
         return as_type(type)->remapPointers;
-    }
-    Branch& get_prototype(Type* type)
-    {
-        return type->prototype;
     }
 
 } // namespace type_t
@@ -339,7 +338,6 @@ void reset_type(Type* type)
 void clear_type_contents(Type* type)
 {
     set_null(&type->parameter);
-    clear_branch(&type->prototype);
 }
 
 void initialize_simple_pointer_type(Type* type)

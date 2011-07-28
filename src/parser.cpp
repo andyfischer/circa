@@ -694,7 +694,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     result->setStringProp("syntax:postLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    Branch& contents = type_t::get_prototype(unbox_type(result));
+    Branch& contents = nested_contents(result);
 
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);

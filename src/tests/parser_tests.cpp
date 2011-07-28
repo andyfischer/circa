@@ -142,12 +142,12 @@ void test_type_decl()
     test_equals(as_type(typeTerm)->name, "Mytype");
     test_equals(typeTerm->name, "Mytype");
 
-    Branch& prototype = type_t::get_prototype(unbox_type(typeTerm));
+    Branch& contents = nested_contents(typeTerm);
 
-    test_equals(prototype[0]->type->name, "int");
-    test_equals(prototype[0]->name, "a");
-    test_equals(prototype[1]->type->name, "number");
-    test_equals(prototype[1]->name, "b");
+    test_equals(contents[0]->type->name, "int");
+    test_equals(contents[0]->name, "a");
+    test_equals(contents[1]->type->name, "number");
+    test_equals(contents[1]->name, "b");
 }
 
 void test_function_decl()

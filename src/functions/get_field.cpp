@@ -25,7 +25,7 @@ namespace get_field_function {
 
     Type* specializeType(Term* caller)
     {
-        Term* head = caller->input(0);
+        Type* head = caller->input(0)->type;
 
         for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
 
@@ -35,15 +35,15 @@ namespace get_field_function {
 
             std::string const& name = caller->input(1)->asString();
 
-            Branch& type_prototype = type_t::get_prototype(declared_type(head));
+            int fieldIndex = list_find_field_index_by_name(head, name);
 
-            if (!type_prototype.contains(name))
+            if (fieldIndex == -1)
                 return &ANY_T;
 
-            head = type_prototype[name];
+            head = as_type(list_get_type_list_from_type(head)->getIndex(fieldIndex));
         }
 
-        return head->type;
+        return head;
 
 #if 0
 

@@ -23,6 +23,7 @@ std::string get_cpp_type_accessor(Type* type)
 
 std::string cpp_accessor_for_type(Type* type)
 {
+#if 0
     std::stringstream out;
     std::string indent = "    ";
 
@@ -43,6 +44,8 @@ std::string cpp_accessor_for_type(Type* type)
 
     out << "};\n";
     return out.str();
+#endif
+    return "";
 }
 
 std::string generate_cpp_headers(Branch& branch)

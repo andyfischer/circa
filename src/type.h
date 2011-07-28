@@ -108,8 +108,6 @@ struct Type
     // Parent type, may be null.
     Type* parent;
     
-    Branch prototype;
-
     // Type parameters
     TaggedValue parameter;
 
@@ -165,7 +163,6 @@ namespace type_t {
 
     // Accessors
     Type::RemapPointers& get_remap_pointers_func(Term* type);
-    Branch& get_prototype(Type* type);
 } // namespace type_t
 
 Type* unbox_type(Term* type);

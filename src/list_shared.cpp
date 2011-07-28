@@ -374,7 +374,7 @@ TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter)
 }
 TaggedValue* list_get_type_list_from_type(Type* type)
 {
-    return list_get_name_list_from_parameter(&type->parameter);
+    return list_get_type_list_from_parameter(&type->parameter);
 }
 TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
 {

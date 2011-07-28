@@ -14,12 +14,12 @@ void type_declaration()
     Branch branch;
     Term* myType = branch.compile("type MyType { string a, int b } ");
 
-    Branch& prototype = type_t::get_prototype(unbox_type(myType));
-    test_assert(prototype.length() == 2);
-    test_assert(prototype[0]->name == "a");
-    test_equals(prototype[0]->type->name, "string");
-    test_assert(prototype[1]->name == "b");
-    test_equals(prototype[1]->type->name, "int");
+    Branch& contents = nested_contents(myType);
+    test_assert(contents.length() == 2);
+    test_assert(contents[0]->name == "a");
+    test_equals(contents[0]->type->name, "string");
+    test_assert(contents[1]->name == "b");
+    test_equals(contents[1]->type->name, "int");
 
     Type* type = unbox_type(myType);
     test_assert(type->initialize != NULL);
