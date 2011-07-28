@@ -10,7 +10,9 @@ namespace set_field_function {
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
         const char* name = INPUT(1)->asCString();
-        int index = OUTPUT->value_type->findFieldIndex(name);
+        int index = list_find_field_index_by_name(OUTPUT->value_type, name);
+        if (index == -1)
+            return error_occurred(CONTEXT, CALLER, std::string("field not found: ") + name);
         copy(INPUT(2), OUTPUT->getIndex(index));
     }
 

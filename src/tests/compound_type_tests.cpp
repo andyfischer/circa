@@ -4,6 +4,7 @@
 
 #include "circa.h"
 #include "importing_macros.h"
+#include "list_shared.h"
 
 namespace circa {
 namespace compound_type_tests {
@@ -19,12 +20,12 @@ void compound_type_usage()
     test_assert(prototype.length() == 2);
     test_equals(prototype[0]->name, "myint");
     test_equals(prototype[0]->type->name, "int");
-    test_assert(as_type(MyType)->findFieldIndex("myint") == 0);
+    test_assert(list_find_field_index_by_name(as_type(MyType),"myint") == 0);
     test_equals(prototype[1]->name, "astr");
     test_equals(prototype[1]->type->name, "string");
-    test_assert(as_type(MyType)->findFieldIndex("astr") == 1);
+    test_assert(list_find_field_index_by_name(as_type(MyType),"astr") == 1);
 
-    test_assert(as_type(MyType)->findFieldIndex("the_bodies") == -1);
+    test_assert(list_find_field_index_by_name(as_type(MyType),"the_bodies") == -1);
 
     // instanciation
     Term* inst = branch.compile("inst = MyType()");

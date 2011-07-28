@@ -372,6 +372,10 @@ TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter)
     ca_assert(false);
     return NULL;
 }
+TaggedValue* list_get_type_list_from_type(Type* type)
+{
+    return list_get_name_list_from_parameter(&type->parameter);
+}
 TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
 {
     switch (list_get_parameter_type(parameter)) {
@@ -386,10 +390,25 @@ TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
     ca_assert(false);
     return NULL;
 }
-
+TaggedValue* list_get_name_list_from_type(Type* type)
+{
+    return list_get_name_list_from_parameter(&type->parameter);
+}
 Type* list_get_single_type_from_parameter(TaggedValue* parameter)
 {
     return as_type(parameter);
+}
+int list_find_field_index_by_name(Type* listType, std::string const& name)
+{
+    TaggedValue* nameList = list_get_name_list_from_type(listType);
+    if (nameList == NULL)
+        return -1;
+
+    List& names = *as_list(nameList);
+    for (int i=0; i < names.length(); i++)
+        if (as_string(names[i]) == name)
+            return i;
+    return -1;
 }
 Type* create_typed_unsized_list(Type* elementType)
 {

@@ -61,13 +61,18 @@ void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* par
 // the fields of the list. Only valid if this parameter describes a fixed-size
 // list (otherwise it returns NULL).
 TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter);
+TaggedValue* list_get_type_list_from_type(Type* type);
 
 TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter);
+TaggedValue* list_get_name_list_from_type(Type* type);
 
 Type* list_get_single_type_from_parameter(TaggedValue* parameter);
+
+int list_find_field_index_by_name(Type* listType, std::string const& name);
 
 Type* create_typed_unsized_list(Type* elementType);
 
 Type* get_common_typed_unsized_list(Type* elementType1, Type* elementType2);
+
 
 } // namespace circa

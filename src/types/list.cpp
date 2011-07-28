@@ -235,7 +235,7 @@ namespace list_t {
 
     TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
     {
-        int index = value->value_type->findFieldIndex(fieldName);
+        int index = list_find_field_index_by_name(value->value_type, fieldName);
         if (index < 0)
             return NULL;
         return list_get_index(value, index);

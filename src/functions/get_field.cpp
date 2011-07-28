@@ -12,7 +12,7 @@ namespace get_field_function {
         for (int nameIndex=1; nameIndex < NUM_INPUTS; nameIndex++) {
             std::string const& name = INPUT(nameIndex)->asString();
 
-            int fieldIndex = head->value_type->findFieldIndex(name);
+            int fieldIndex = list_find_field_index_by_name(head->value_type, name);
 
             if (fieldIndex == -1)
                 return error_occurred(CONTEXT, CALLER, "field not found: " + name);

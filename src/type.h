@@ -119,16 +119,6 @@ struct Type
     Type();
     ~Type();
 
-    int findFieldIndex(std::string const& name)
-    {
-        return prototype.findIndex(name);
-    }
-
-    int findFieldIndex(const char* name)
-    {
-        return prototype.findIndex(name);
-    }
-
     static Type* create();
 };
 
