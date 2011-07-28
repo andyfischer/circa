@@ -17,7 +17,7 @@ using namespace circa;
 
 namespace text {
 
-Type g_font_t;
+Type *g_font_t;
 
 struct Font
 {
@@ -52,7 +52,7 @@ CA_FUNCTION(load_font)
         return error_occurred(CONTEXT, CALLER, err.str());
     }
 
-    handle_t::set(OUTPUT, &g_font_t, output);
+    handle_t::set(OUTPUT, g_font_t, output);
 }
 
 struct RenderedText : public TaggedValue
@@ -167,8 +167,8 @@ CA_FUNCTION(get_metrics)
 
 void setup(Branch& branch)
 {
-    handle_t::setup_type<Font>(&g_font_t);
-    install_type(branch["Font"], &g_font_t);
+    g_font_t = as_type(branch["Font"]);
+    handle_t::setup_type<Font>(g_font_t);
 
     if (TTF_Init() == -1) {
         std::cout << "TTF_Init failed with error: " << TTF_GetError();

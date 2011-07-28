@@ -8,30 +8,30 @@ using namespace circa;
 
 namespace cairo_support {
 
-Type g_cairoContext_t;
-Type g_cairoSurface_t;
-Type g_cairoFontFace_t;
+Type *g_cairoContext_t;
+Type *g_cairoSurface_t;
+Type *g_cairoFontFace_t;
 
 cairo_t* as_cairo_context(TaggedValue* value)
 {
-    return (cairo_t*) get_pointer(value, &g_cairoContext_t);
+    return (cairo_t*) get_pointer(value, g_cairoContext_t);
 }
 
 cairo_surface_t* as_cairo_surface(TaggedValue* value)
 {
-    return (cairo_surface_t*) get_pointer(value, &g_cairoSurface_t);
+    return (cairo_surface_t*) get_pointer(value, g_cairoSurface_t);
 }
 
 cairo_font_face_t* as_cairo_font_face(TaggedValue* value)
 {
-    return (cairo_font_face_t*) get_pointer(value, &g_cairoFontFace_t);
+    return (cairo_font_face_t*) get_pointer(value, g_cairoFontFace_t);
 }
 
 void cairoContext_copy(Type*, TaggedValue* source, TaggedValue* dest)
 {
     cairo_t* context = as_cairo_context(source);
     cairo_reference(context);
-    set_pointer(dest, &g_cairoContext_t, context);
+    set_pointer(dest, g_cairoContext_t, context);
 }
 void cairoContext_release(Type*, TaggedValue* value)
 {
@@ -42,7 +42,7 @@ void cairoSurface_copy(Type*, TaggedValue* source, TaggedValue* dest)
 {
     cairo_surface_t* surface = as_cairo_surface(source);
     cairo_surface_reference(surface);
-    set_pointer(dest, &g_cairoSurface_t, surface);
+    set_pointer(dest, g_cairoSurface_t, surface);
 }
 void cairoSurface_release(Type*, TaggedValue* value)
 {
@@ -53,7 +53,7 @@ void cairoFontFace_copy(Type*, TaggedValue* source, TaggedValue* dest)
 {
     cairo_font_face_t* font = as_cairo_font_face(source);
     cairo_font_face_reference(font);
-    set_pointer(dest, &g_cairoFontFace_t, font);
+    set_pointer(dest, g_cairoFontFace_t, font);
 }
 void cairoFontFace_release(Type*, TaggedValue* value)
 {
@@ -77,7 +77,7 @@ CA_FUNCTION(restore)
 CA_FUNCTION(create_context_for_surface)
 {
     cairo_surface_t* surface = as_cairo_surface(INPUT(0));
-    set_pointer(OUTPUT, &g_cairoContext_t, cairo_create(surface));
+    set_pointer(OUTPUT, g_cairoContext_t, cairo_create(surface));
 }
 
 CA_FUNCTION(create_image_surface)
@@ -88,7 +88,7 @@ CA_FUNCTION(create_image_surface)
     int height = as_int(list_get_index(size, 1));
 
     cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
-    set_pointer(OUTPUT, &g_cairoSurface_t, surface);
+    set_pointer(OUTPUT, g_cairoSurface_t, surface);
 }
 
 CA_FUNCTION(select_font_face)
@@ -251,18 +251,18 @@ CA_FUNCTION(upload_surface_to_opengl)
 
 void setup(Branch& kernel)
 {
-    g_cairoContext_t.copy = cairoContext_copy;
-    g_cairoContext_t.release = cairoContext_release;
-    g_cairoSurface_t.copy = cairoSurface_copy;
-    g_cairoSurface_t.release = cairoSurface_release;
-    g_cairoFontFace_t.copy = cairoFontFace_copy;
-    g_cairoFontFace_t.release = cairoFontFace_release;
-
     Branch& ns = nested_contents(kernel["cairo"]);
 
-    install_type(ns["Surface"], &g_cairoSurface_t);
-    install_type(ns["Context"], &g_cairoContext_t);
-    install_type(ns["FontFace"], &g_cairoFontFace_t);
+    g_cairoContext_t = as_type(ns["Context"]);
+    g_cairoSurface_t = as_type(ns["Surface"]);
+    g_cairoFontFace_t = as_type(ns["FontFace"]);
+
+    g_cairoContext_t->copy = cairoContext_copy;
+    g_cairoContext_t->release = cairoContext_release;
+    g_cairoSurface_t->copy = cairoSurface_copy;
+    g_cairoSurface_t->release = cairoSurface_release;
+    g_cairoFontFace_t->copy = cairoFontFace_copy;
+    g_cairoFontFace_t->release = cairoFontFace_release;
 
     install_function(ns["create_context_for_surface"], create_context_for_surface);
     install_function(ns["Context.save"], save);

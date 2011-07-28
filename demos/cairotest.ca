@@ -3,11 +3,11 @@ background(#fff)
 e = elapsed()
 
 def redraw(cairo:Context cr)
-  cairo:set_line_width(cr 5.0)
-  cairo:set_source_color(cr #f00)
-  cairo:move_to(cr [0 0])
-  cairo:line_to(cr [300 e*20])
-  cairo:stroke(cr)
+  cr.set_line_width(cr 5.0)
+  cr.set_source_color(cr #f00)
+  cr.move_to(cr [0 0])
+  cr.line_to(cr [300 e*20])
+  cr.stroke(cr)
 
 x = 25.6
 y = 25.6 + 50

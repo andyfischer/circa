@@ -412,7 +412,7 @@ Term* parse_type(Branch& branch, std::string const& decl)
 
 void install_type(Term* term, Type* type)
 {
-    Type* oldType = as_type(term);
+    // Type* oldType = as_type(term);
     set_type(term, type);
 }
 
