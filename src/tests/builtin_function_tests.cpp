@@ -12,7 +12,7 @@ void test_int()
 {
     Branch branch;
 
-    test_assert(as_type(INT_TYPE)->formatSource != NULL);
+    test_assert(INT_T.formatSource != NULL);
 
     Term* four = create_int(branch, 4);
     Term* another_four = create_int(branch, 4);
@@ -28,7 +28,7 @@ void test_float()
 {
     Branch branch;
 
-    Type* floatType = unbox_type(FLOAT_TYPE);
+    Type* floatType = &FLOAT_T;
 
     test_assert(floatType->equals != NULL);
     test_assert(floatType->formatSource != NULL);

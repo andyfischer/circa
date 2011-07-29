@@ -35,10 +35,10 @@ void test_term_output_always_satisfies_type()
     Branch branch;
 
     Term* a = create_int(branch, 5);
-    test_assert(term_output_always_satisfies_type(a, unbox_type(INT_TYPE)));
-    test_assert(term_output_always_satisfies_type(a, unbox_type(FLOAT_TYPE)));
-    test_assert(!term_output_always_satisfies_type(a, unbox_type(STRING_TYPE)));
-    test_assert(term_output_always_satisfies_type(a, unbox_type(ANY_TYPE)));
+    test_assert(term_output_always_satisfies_type(a, &INT_T));
+    test_assert(term_output_always_satisfies_type(a, &FLOAT_T));
+    test_assert(!term_output_always_satisfies_type(a, &STRING_T));
+    test_assert(term_output_always_satisfies_type(a, &ANY_T));
 
     Type* t1 = unbox_type(branch.compile("type t1 { int a, number b }"));
     Type* t2 = unbox_type(branch.compile("type t2 { int a }"));
@@ -130,7 +130,7 @@ void test_list_based_types()
     Branch branch;
     Term* l = branch.compile("[1 2]");
 
-    test_assert(term_output_always_satisfies_type(l, unbox_type(LIST_TYPE)));
+    test_assert(term_output_always_satisfies_type(l, &LIST_T));
     test_assert(term_output_always_satisfies_type(l, unbox_type(get_global("Point"))));
 }
 

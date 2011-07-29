@@ -62,21 +62,6 @@ namespace type_t {
         append_phrase(source, "}", term, token::RBRACKET);
     }
 
-    // TODO: Delete
-    void remap_pointers(Term *type, TermMap const& map)
-    {
-#if 0
-        Branch& contents = type_t::get_prototype(unbox_type(type));
-
-        for (int field_i=0; field_i < contents.length(); field_i++) {
-            Term* orig = contents[field_i];
-            Term* remapped = map.getRemapped(orig);
-            assert_valid_term(orig);
-            assert_valid_term(remapped);
-            contents.set(field_i, remapped);
-        }
-#endif
-    }
     std::string toString(TaggedValue* value)
     {
         return "<Type "+as_type(value)->name+">";
@@ -88,7 +73,6 @@ namespace type_t {
         type->initialize = type_t::initialize;
         type->release = release;
         type->copy = copy;
-        type->remapPointers = remap_pointers;
         type->formatSource = formatSource;
         type->toString = toString;
     }
@@ -258,7 +242,7 @@ static void run_static_type_query(StaticTypeQuery* query)
         return query->succeed();
 
     // If output term is ANY type then we cannot statically determine.
-    if (query->subjectType == unbox_type(ANY_TYPE))
+    if (query->subjectType == &ANY_T)
         return query->unableToDetermine();
 
     // Try using the type's static query func
@@ -364,7 +348,7 @@ Term* create_tuple_type(List* types)
     list_t::setup_type(unbox_type(result));
 
     unbox_type(result)->parent = &LIST_T;
-    register_type_pointer(unbox_type(result), unbox_type(LIST_TYPE));
+    register_type_pointer(unbox_type(result), &LIST_T);
 
     List& parameter = *set_list(&unbox_type(result)->parameter, types->length());
 

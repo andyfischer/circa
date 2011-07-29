@@ -50,8 +50,7 @@ namespace float_t {
     }
     void staticTypeQuery(Type* type, StaticTypeQuery* query)
     {
-        if (query->subjectType == unbox_type(FLOAT_TYPE)
-                || query->subjectType == unbox_type(INT_TYPE))
+        if (query->subjectType == &FLOAT_T || query->subjectType == &INT_T)
             query->succeed();
         else
             query->fail();
