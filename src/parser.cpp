@@ -674,6 +674,7 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
     int startPosition = tokens.getPosition();
 
     Term* result = create_value(branch, &TYPE_T);
+    as_type(result)->declaringTerm = result;
 
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
@@ -729,7 +730,6 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
 
     branch.moveToEnd(result);
     refresh_locals_indices(branch);
-    as_type(result)->declaringTerm = result;
 
     return ParseResult(result);
 }

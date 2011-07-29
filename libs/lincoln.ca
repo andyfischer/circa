@@ -207,7 +207,6 @@ namespace handle_input
         send('lincoln.highlighted_config' selected_config)
 
 
-
 namespace post_frame
     state surface = null
     window_size = [window.width window.height]

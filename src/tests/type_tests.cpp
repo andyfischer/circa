@@ -199,6 +199,9 @@ void test_declaring_term()
     clear_branch(&branch);
     test_equals(myValue.value_type->name, "MyType");
     test_assert(myValue.value_type->declaringTerm == NULL);
+
+    Term* myType2 = branch.compile("type MyType;");
+    test_assert(as_type(myType2)->declaringTerm == myType2);
 }
 
 Type *g_testHandleType;

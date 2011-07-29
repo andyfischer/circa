@@ -466,6 +466,16 @@ void test_method_calls()
     Branch branch;
     branch.eval("x = [1 2 3]");
     test_equals(branch.eval("x.count()"), "3");
+
+    // call a method inside a namespace
+    branch.clear();
+    branch.compile("namespace ns { type T; def T.method(t) -> string { return 'hello'}}");
+    branch.compile("v = ns:T()");
+    Term* v = branch.compile("v.method()");
+
+    test_assert(!has_static_errors(branch));
+    evaluate_branch(branch);
+    test_equals(v, "hello");
 }
 
 void test_subscripted_atom()
