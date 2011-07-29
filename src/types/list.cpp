@@ -111,7 +111,7 @@ namespace list_t {
 
         // If the parameter has a fixed size list, then initialize to that.
         if (list_type_has_specific_size(&type->parameter)) {
-            TaggedValue* typeList = list_get_type_list_from_parameter(&type->parameter);
+            TaggedValue* typeList = list_get_type_list_from_type(type);
             List& types = *List::checkCast(typeList);
             List& result = *List::checkCast(value);
             result.resize(types.length());
@@ -191,8 +191,7 @@ namespace list_t {
             return;
         }
 
-        List& destTypes = *List::checkCast(
-            list_get_type_list_from_parameter(&type->parameter));
+        List& destTypes = *List::checkCast(list_get_type_list_from_type(type));
 
         // Check for correct number of elements.
         if (sourceLength != destTypes.length()) {
@@ -267,8 +266,7 @@ namespace list_t {
                 return query->fail();
         }
 
-        List& expectedElementTypes =
-            *as_list(list_get_type_list_from_parameter(&type->parameter));
+        List& expectedElementTypes = *as_list(list_get_type_list_from_type(type));
 
         // Special case when looking at a call to list(); look at inputs instead of
         // looking at the result.
@@ -289,8 +287,7 @@ namespace list_t {
         if (!list_type_has_specific_size(&subjectType->parameter))
             return query->fail();
 
-        List& subjectElementTypes =
-            *as_list(list_get_type_list_from_parameter(&subjectType->parameter));
+        List& subjectElementTypes = *as_list(list_get_type_list_from_type(subjectType));
 
         bool anyUnableToDetermine = false;
 

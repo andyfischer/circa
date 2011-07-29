@@ -357,8 +357,11 @@ void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* par
     }
 }
 
-TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter)
+TaggedValue* list_get_type_list_from_type(Type* type)
 {
+    ca_assert(is_list_based_type(type));
+    TaggedValue* parameter = &type->parameter;
+
     switch (list_get_parameter_type(parameter)) {
     case LIST_TYPED_SIZED:
         return parameter;
@@ -372,12 +375,12 @@ TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter)
     ca_assert(false);
     return NULL;
 }
-TaggedValue* list_get_type_list_from_type(Type* type)
+
+TaggedValue* list_get_name_list_from_type(Type* type)
 {
-    return list_get_type_list_from_parameter(&type->parameter);
-}
-TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
-{
+    ca_assert(is_list_based_type(type));
+    TaggedValue* parameter = &type->parameter;
+
     switch (list_get_parameter_type(parameter)) {
     case LIST_TYPED_SIZED_NAMED:
         return list_get_index(parameter, 1);
@@ -390,13 +393,10 @@ TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter)
     ca_assert(false);
     return NULL;
 }
-TaggedValue* list_get_name_list_from_type(Type* type)
+Type* list_get_repeated_type_from_type(Type* type)
 {
-    return list_get_name_list_from_parameter(&type->parameter);
-}
-Type* list_get_single_type_from_parameter(TaggedValue* parameter)
-{
-    return as_type(parameter);
+    ca_assert(is_list_based_type(type));
+    return as_type(&type->parameter);
 }
 int list_find_field_index_by_name(Type* listType, std::string const& name)
 {

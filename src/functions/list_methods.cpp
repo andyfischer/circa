@@ -19,8 +19,7 @@ namespace list_methods_function {
             return listInput->type;
         case LIST_TYPED_UNSIZED:
         {
-            Type* listElementType = list_get_single_type_from_parameter(
-                    &listInput->type->parameter);
+            Type* listElementType = list_get_repeated_type_from_type(listInput->type);
             Type* commonType = find_common_type(listElementType, term->input(1)->type);
             if (commonType == listElementType)
                 return listInput->type;
@@ -31,8 +30,7 @@ namespace list_methods_function {
         case LIST_TYPED_SIZED_NAMED:
         {    
             List elementTypes;
-            copy(list_get_type_list_from_parameter(&listInput->type->parameter),
-                    &elementTypes);
+            copy(list_get_type_list_from_type(listInput->type), &elementTypes);
             set_type(elementTypes.append(), term->input(1)->type);
             return create_typed_unsized_list_type(find_common_type(&elementTypes));
         }

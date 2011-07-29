@@ -57,20 +57,19 @@ ListType list_get_parameter_type(TaggedValue* parameter);
 bool list_type_has_specific_size(TaggedValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter);
 
-// From the parameter of a List type value, this returns a list of types for
-// the fields of the list. Only valid if this parameter describes a fixed-size
-// list (otherwise it returns NULL).
-TaggedValue* list_get_type_list_from_parameter(TaggedValue* parameter);
+// For a List-based type, this returns the list of types that the elements will
+// have. This result is only valid for fixed-size List types, otherwise it will
+// return NULL.
 TaggedValue* list_get_type_list_from_type(Type* type);
 
-TaggedValue* list_get_name_list_from_parameter(TaggedValue* parameter);
+// For a List-based type, this returns the list of element names. This is only
+// valid for a typed_sized_named list, otherwise it will return NULL.
 TaggedValue* list_get_name_list_from_type(Type* type);
 
-Type* list_get_single_type_from_parameter(TaggedValue* parameter);
+// For a List-based type, this returns the type of each element. This is only
+// valid for a typed_unsized list.
+Type* list_get_repeated_type_from_type(Type* type);
 
 int list_find_field_index_by_name(Type* listType, std::string const& name);
-
-
-Type* get_common_typed_unsized_list(Type* elementType1, Type* elementType2);
 
 } // namespace circa

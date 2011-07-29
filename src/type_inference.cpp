@@ -83,54 +83,13 @@ Type* infer_type_of_get_index(Term* input)
     case LIST_UNTYPED:
         return &ANY_T;
     case LIST_TYPED_UNSIZED:
-        return list_get_single_type_from_parameter(&input->type->parameter);
+        return list_get_repeated_type_from_type(input->type);
     case LIST_TYPED_SIZED:
     case LIST_TYPED_SIZED_NAMED:
-        return find_common_type(as_list(list_get_type_list_from_parameter(
-                    &input->type->parameter)));
+        return find_common_type(as_list(list_get_type_list_from_type(input->type)));
     default:
         return &ANY_T;
     }
-}
-
-Type* statically_infer_type_of_get_index(Branch& branch, Term* term)
-{
-    if (term->function == RANGE_FUNC)
-        create_type_value(branch, &INT_T);
-
-#if 0
-    if (listTerm->function == LIST_FUNC) {
-        TermList inputTypes;
-        for (int i=0; i < listTerm->numInputs(); i++)
-            inputTypes.append(listTerm->input(i)->type);
-        return find_common_type(inputTypes);
-    }
-
-    if (listTerm->function == COPY_FUNC)
-        return find_type_of_get_index(listTerm->input(0));
-
-    if (is_list_based_type(unbox_type(listTerm->type))) {
-        Branch& prototype = type_t::get_prototype(unbox_type(listTerm->type));
-        TermList types;
-        for (int i=0; i < prototype.length(); i++)
-            types.append(prototype[i]->type);
-        return find_common_type(types);
-    }
-#endif
-
-    // Unrecognized
-    return &ANY_T;
-}
-
-Term* statically_infer_type(Branch& branch, Term* term)
-{
-    if (term->function == GET_INDEX_FUNC)
-        return create_type_value(branch, statically_infer_type_of_get_index(branch, term));
-    
-    // Give up
-    std::cout << "statically_infer_type didn't understand: "
-        << term->function->name << std::endl;
-    return create_symbol_value(branch, &UNKNOWN_SYMBOL);
 }
 
 Term* statically_infer_length_func(Branch& branch, Term* term)
@@ -160,8 +119,11 @@ Term* statically_infer_result(Branch& branch, Term* term)
     if (term->function == LENGTH_FUNC)
         return statically_infer_length_func(branch, term);
 
+#if 0
+    Disabled, this approach might be flawed
     if (term->function == TYPE_FUNC)
         return statically_infer_type(branch, term->input(0));
+#endif
 
     // Function not recognized
     std::cout << "statically_infer_result didn't recognize: "
