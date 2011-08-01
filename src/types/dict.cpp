@@ -326,7 +326,7 @@ void visit_sorted(DictData* data, DictVisitor visitor, void* context)
         set.insert(SortedVisitItem(slot->key, &slot->value));
     }
 
-    std::set<SortedVisitItem>::const_iterator it;
+    std::set<SortedVisitItem, SortedVisitItemCompare>::const_iterator it;
     for (it = set.begin(); it != set.end(); it++)
         visitor(context, it->key, it->value);
 }

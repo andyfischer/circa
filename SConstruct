@@ -51,7 +51,7 @@ if POSIX:
 if WINDOWS:
     for env in all_envs:
         env.Append(CPPDEFINES = ['WINDOWS'])
-        env.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /MACHINE:X86 /DEBUG'.split())
+        env.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /DEBUG'.split())
 
     for env in [DEBUG,TEST]:
         env.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())

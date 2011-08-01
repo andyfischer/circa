@@ -220,7 +220,8 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
         return;
 
     int visibleIndex = inputIndex - firstVisible;
-    if (methodCall) visibleIndex--;
+    if (methodCall)
+        visibleIndex--;
 
     std::string defaultPre = visibleIndex > 0 ? " " : "";
     std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
@@ -228,7 +229,8 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
     if (methodCall && inputIndex == 0)
         defaultPost = "";
 
-    append_phrase(source,
+    if (visibleIndex >= 0)
+        append_phrase(source,
             get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre), 
             term, phrase_type::WHITESPACE);
 
@@ -249,9 +251,10 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
         append_phrase(source, get_relative_name(term, input), term, phrase_type::TERM_NAME);
     }
 
-    append_phrase(source,
-        get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
-        term, phrase_type::WHITESPACE);
+    if (visibleIndex >= 0)
+        append_phrase(source,
+            get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
+            term, phrase_type::WHITESPACE);
 }
 
 bool is_method_call(Term* term)

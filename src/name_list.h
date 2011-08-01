@@ -8,7 +8,7 @@ struct NameList
 {
     std::vector<std::string> names;
 
-    int count() const { return names.size(); }
+    int count() const { return (int) names.size(); }
     const char* operator[](int index) const { return names[index].c_str(); }
 };
 

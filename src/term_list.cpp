@@ -129,7 +129,7 @@ TermList::remove(int i)
 {
     ca_assert(int(_terms.size()) > i);
 
-    int replace = _terms.size() - 1;
+    int replace = int(_terms.size() - 1);
     if (replace > i) {
         _terms[i] = _terms[replace];
     }

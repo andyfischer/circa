@@ -62,7 +62,7 @@ struct TermNamespace
     {
         StringToTermMap::const_iterator it;
         for (it = rhs._map.begin(); it != rhs._map.end(); ++it) {
-            ca_assert(it->second);
+            ca_assert(it->second != NULL);
             _map[it->first] = it->second;
         }
     }

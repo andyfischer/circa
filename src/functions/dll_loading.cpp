@@ -3,7 +3,12 @@
 #include "common_headers.h"
 
 #include <set>
+
+#ifdef WINDOWS
+// TODO
+#else
 #include <dlfcn.h>
+#endif
 
 #include "code_iterators.h"
 #include "function.h"
@@ -48,14 +53,23 @@ namespace dll_loading_function {
         }
 
         // Platform specific
-        dlclose(dll->module);
+        #ifdef WINDOWS
+            // TODO
+        #else
+            dlclose(dll->module);
+        #endif
 
         delete dll;
     }
 
     void* find_func_in_dll(Dll* dll, const char* funcName)
     {
-        return dlsym(dll->module, funcName);
+        #ifdef WINDOWS
+            //TODO
+            return NULL;
+        #else
+            return dlsym(dll->module, funcName);
+        #endif
     }
 
     Dll* load_dll(const char* filename, TaggedValue* errorOut)
@@ -66,12 +80,24 @@ namespace dll_loading_function {
         char actual_filename[actual_filename_max_len];
 
         // Platform specific
-        sprintf(actual_filename, "%s.so", filename);
-        dll->module = dlopen(actual_filename, RTLD_NOW);
+        #ifdef WINDOWS
+            // TODO
+            dll->module = NULL;
+        #else
+            sprintf(actual_filename, "%s.so", filename);
+            dll->module = dlopen(actual_filename, RTLD_NOW);
+        #endif
 
         if (dll->module == NULL) {
-            set_string(errorOut, std::string("dlopen failed to open ")+actual_filename
-                    +": \n"+dlerror());
+            std::string error("dlopen failed to open ");
+            error += actual_filename;
+            #ifdef WINDOWS
+                // TODO
+            #else
+                error += ": \n" + dlerror();
+            #endif
+
+            set_string(errorOut, error);
             delete dll;
             return NULL;
         }

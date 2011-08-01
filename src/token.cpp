@@ -178,7 +178,7 @@ struct TokenizeContext
         // Update precedingIndent if this is the first whitespace on a line
         if (instance.precedingIndent == -1) {
             if (instance.match == WHITESPACE)
-                instance.precedingIndent = instance.text.length();
+                instance.precedingIndent = (int) instance.text.length();
             else
                 instance.precedingIndent = 0;
         }
