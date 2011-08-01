@@ -115,6 +115,10 @@ def draw_highlighted_config(cairo:Context cr)
 
     click_rect = to_rect(inner_loc [str_width text_height])
 
+    -- clip text to the current activerect
+    cr.rectangle(activerect:rect)
+    cr.clip()
+
     -- draw text
     cr.set_source_color(activerect:correct_color(#fff))
     cr.move_to(inner_loc+[0 text_height])
@@ -133,6 +137,9 @@ def draw_highlighted_config(cairo:Context cr)
             highlighted_config.tweak(delta_point(mouse).y)
 
     send('lincoln.active.size' to_rect(topleft [width height]))
+
+    -- clear clip
+    cr.reset_clip()
 
 def draw_config_list(cairo:Context cr)
     send('lincoln.active.size' [100 350 300 400])

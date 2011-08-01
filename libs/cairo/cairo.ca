@@ -11,10 +11,14 @@ namespace cairo
 
     -- Contexts
     def create_context_for_surface(Surface s) -> Context
+
     def Context.save(self)
     def Context.restore(self)
     def Context.stroke(self)
     def Context.paint(self)
+    def Context.clip(self)
+    def Context.clip_preserve(self)
+    def Context.reset_clip(self)
     def Context.set_source_color(self, Color color)
     def Context.fill_preserve(self)
     def Context.set_operator(self, int operator)
@@ -30,8 +34,9 @@ namespace cairo
     def Context.text_extents(self, string s) -> TextExtents
 
     -- Paths
-    def Context.move_to(self, Point p)
     def Context.curve_to(self, Point control1, Point control2, Point p3)
+    def Context.move_to(self, Point p)
+    def Context.rectangle(self, Rect r)
     def Context.line_to(self, Point p)
     def Context.arc(self, Point center, number radius, number angle1, number angle2)
     def Context.new_sub_path(self)

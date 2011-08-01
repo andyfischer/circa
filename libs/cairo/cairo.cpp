@@ -3,6 +3,7 @@
 #include <cairo/cairo.h>
 
 #include "types/color.h"
+#include "types/rect.h"
 
 using namespace circa;
 
@@ -141,6 +142,24 @@ CA_FUNCTION(paint)
     cairo_paint(context);
     set_null(OUTPUT);
 }
+CA_FUNCTION(clip)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_clip(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(clip_preserve)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_clip_preserve(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(reset_clip)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_reset_clip(context);
+    set_null(OUTPUT);
+}
 CA_FUNCTION(set_source_color)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
@@ -165,6 +184,14 @@ CA_FUNCTION(move_to)
     float x(0), y(0);
     get_point(INPUT(1), &x, &y);
     cairo_move_to(context, x, y);
+}
+CA_FUNCTION(rectangle)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    float x1(0), y1(0), x2(0), y2(0);
+    get_rect(INPUT(1), &x1, &y1, &x2, &y2);
+    std::cout << "rect: " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;
+    cairo_rectangle(context, x1, y1, x2, y2);
 }
 CA_FUNCTION(curve_to)
 {
@@ -269,6 +296,9 @@ void setup(Branch& kernel)
     install_function(ns["Context.restore"], restore);
     install_function(ns["Context.stroke"], stroke);
     install_function(ns["Context.paint"], paint);
+    install_function(ns["Context.clip"], clip);
+    install_function(ns["Context.clip_preserve"], clip_preserve);
+    install_function(ns["Context.reset_clip"], reset_clip);
     install_function(ns["Context.set_source_color"], set_source_color);
     install_function(ns["Context.fill_preserve"], fill_preserve);
     install_function(ns["Context.set_operator"], set_operator);
@@ -279,6 +309,7 @@ void setup(Branch& kernel)
     install_function(ns["Context.show_text"], show_text);
     install_function(ns["Context.text_extents"], text_extents);
     install_function(ns["Context.move_to"], move_to);
+    install_function(ns["Context.rectangle"], rectangle);
     install_function(ns["Context.curve_to"], curve_to);
     install_function(ns["Context.line_to"], line_to);
     install_function(ns["Context.arc"], arc);

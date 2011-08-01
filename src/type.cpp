@@ -391,7 +391,9 @@ Term* find_method_with_search_name(Branch& branch, Type* type, std::string const
 
 Term* find_method(Branch& branch, Type* type, std::string const& name)
 {
-    ca_assert(type->name != "");
+    if (type->name == "")
+        return NULL;
+
     std::string searchName = type->name + "." + name;
 
     Term* result = find_method_with_search_name(branch, type, searchName);
