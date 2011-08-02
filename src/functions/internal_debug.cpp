@@ -23,6 +23,7 @@ namespace internal_debug_function {
             if (i != 0) std::cout << ", ";
             print_term(std::cout, term->input(0));
         }
+        std::cout << std::endl;
     }
 
     List oracleTaggedValues;

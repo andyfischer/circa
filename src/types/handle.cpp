@@ -133,7 +133,8 @@ namespace handle_t {
     }
     void setup_type(Type* type)
     {
-        type->name = "handle";
+        if (type->name == "")
+            type->name = "handle";
         type->storageType = STORAGE_TYPE_LIST;
         type->initialize = initialize;
         type->release = release;

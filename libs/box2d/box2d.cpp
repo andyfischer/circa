@@ -454,20 +454,20 @@ void setup(Branch& kernel)
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);
     install_function(ns["create_body"], create_body);
-    install_function(ns["set_body_fixtures"], set_body_fixtures);
-    install_function(ns["get_body_points"], get_body_points);
-    install_function(ns["get_body_position"], get_body_position);
-    install_function(ns["get_body_rotation"], get_body_rotation);
-    install_function(ns["set_body_position"], set_body_position);
-    install_function(ns["set_body_rotation"], set_body_rotation);
-    install_function(ns["get_linear_velocity"], get_linear_velocity);
-    install_function(ns["set_linear_velocity"], set_linear_velocity);
-    install_function(ns["apply_torque"], apply_torque);
-    install_function(ns["apply_linear_impulse"], apply_linear_impulse);
-    install_function(ns["apply_angular_impulse"], apply_angular_impulse);
+    install_function(ns["Body.set_fixtures"], set_body_fixtures);
+    install_function(ns["Body.get_points"], get_body_points);
+    install_function(ns["Body.get_position"], get_body_position);
+    install_function(ns["Body.get_rotation"], get_body_rotation);
+    install_function(ns["Body.get_position"], set_body_position);
+    install_function(ns["Body.set_rotation"], set_body_rotation);
+    install_function(ns["Body.get_linear_velocity"], get_linear_velocity);
+    install_function(ns["Body.set_linear_velocity"], set_linear_velocity);
+    install_function(ns["Body.apply_torque"], apply_torque);
+    install_function(ns["Body.apply_linear_impulse"], apply_linear_impulse);
+    install_function(ns["Body.apply_angular_impulse"], apply_angular_impulse);
+    install_function(ns["Body.create_mouse_joint"], create_mouse_joint);
+    install_function(ns["MouseJoint.set_target"], mouse_joint_set_target);
     install_function(ns["body_contains_point"], body_contains_point);
-    install_function(ns["create_mouse_joint"], create_mouse_joint);
-    install_function(ns["mouse_joint_set_target"], mouse_joint_set_target);
 
     app::get_global_app().addPostFrameCallback(on_frame_callback, NULL);
 }
