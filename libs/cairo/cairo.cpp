@@ -190,8 +190,7 @@ CA_FUNCTION(rectangle)
     cairo_t* context = as_cairo_context(INPUT(0));
     float x1(0), y1(0), x2(0), y2(0);
     get_rect(INPUT(1), &x1, &y1, &x2, &y2);
-    std::cout << "rect: " << x1 << " " << y1 << " " << x2 << " " << y2 << std::endl;
-    cairo_rectangle(context, x1, y1, x2, y2);
+    cairo_rectangle(context, x1, y1, x2-x1, y2-y1);
 }
 CA_FUNCTION(curve_to)
 {

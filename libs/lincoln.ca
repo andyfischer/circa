@@ -174,6 +174,10 @@ def draw_config_list(cairo:Context cr)
     active_rect = to_rect(topleft - [gutter gutter] rect_size + [gutter gutter]*2)
     send('lincoln.active.size' active_rect)
 
+    -- clip text to the current activerect
+    cr.rectangle(activerect:rect)
+    cr.clip()
+
     i = 0
     y = topleft.y
     for layout in layouts
@@ -193,6 +197,8 @@ def draw_config_list(cairo:Context cr)
         cr.move_to(loc + [0 height])
         cr.show_text(layout.str)
         y += height + text_spacing
+
+    cr.reset_clip()
 
 
 if current_mode == mode:highlight_config
