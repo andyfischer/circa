@@ -41,8 +41,8 @@ b2Vec2 point_to_b2Vec2(TaggedValue* point)
 }
 
 // The Body type is used to hold on to b2Body objects.
-Type g_body_t;
-Type g_mouseJoint_t;
+Type* g_body_t;
+Type* g_mouseJoint_t;
 
 ObjectList g_bodyHandles;
 ObjectList g_mouseJoints;
@@ -122,7 +122,7 @@ b2Body* get_body_from_handle(TaggedValue* value)
 
 bool is_valid_body_handle(TaggedValue* value)
 {
-    return value->value_type == &g_body_t
+    return value->value_type == g_body_t
         && get_body_from_handle(value) != NULL;
 }
 
@@ -171,7 +171,7 @@ CA_FUNCTION(create_body)
     bodyDef.position = point_to_b2Vec2(initialPosition);
     bodyDef.angle = degrees_to_radians(initialRotation);
 
-    Body* bodyHandle = handle_t::create<Body>(OUTPUT, &g_body_t);
+    Body* bodyHandle = handle_t::create<Body>(OUTPUT, g_body_t);
 
     bodyHandle->body = g_world->CreateBody(&bodyDef);
 
@@ -383,7 +383,7 @@ CA_FUNCTION(create_mouse_joint)
     def.maxForce = 1000.0f * body->GetMass();
 
     b2MouseJoint* joint = (b2MouseJoint*) g_world->CreateJoint(&def);
-    handle_t::set(OUTPUT, &g_mouseJoint_t, (void*) new MouseJoint(joint));
+    handle_t::set(OUTPUT, g_mouseJoint_t, (void*) new MouseJoint(joint));
 
     body->SetAwake(true);
 }
@@ -443,13 +443,13 @@ void on_frame_callback(void* userdata, app::App* app, int step)
 
 void setup(Branch& kernel)
 {
-    handle_t::setup_type<Body>(&g_body_t);
-    g_body_t.name = "Box2d:Body";
-
-    handle_t::setup_type<MouseJoint>(&g_mouseJoint_t);
-    g_mouseJoint_t.name = "Box2d:MouseJoint";
-
     Branch& ns = nested_contents(kernel["box2d"]);
+
+    g_body_t = as_type(ns["Body"]);
+    g_mouseJoint_t = as_type(ns["MouseJoint"]);
+
+    handle_t::setup_type<Body>(g_body_t);
+    handle_t::setup_type<MouseJoint>(g_mouseJoint_t);
 
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);

@@ -21,7 +21,6 @@ struct ServerContext
     ~ServerContext() {
         if (server_thread != NULL)
             lo_server_thread_stop(server_thread);
-        printf("deleted context %p\n", this);
     }
 };
 
@@ -30,8 +29,8 @@ struct Address
     lo_address address;
 };
 
-Type g_serverContext_t;
-Type g_address_t;
+Type* g_serverContext_t;
+Type* g_address_t;
 
 void error_callback(int num, const char *m, const char *path)
 {
@@ -75,8 +74,8 @@ CA_FUNCTION(create_server_thread)
     char portStr[15];
     sprintf(portStr, "%d", port);
 
-    ServerContext* context = handle_t::create<ServerContext>(OUTPUT, &g_serverContext_t);
-    printf("opened server at %s, context = %p\n", portStr, context);
+    ServerContext* context = handle_t::create<ServerContext>(OUTPUT, g_serverContext_t);
+    // printf("opened server at %s, context = %p\n", portStr, context);
 
     context->server_thread = lo_server_thread_new(portStr, error_callback);
 
@@ -106,7 +105,7 @@ CA_FUNCTION(read_from_server)
 
 CA_FUNCTION(open_address)
 {
-    Address* address = handle_t::create<Address>(OUTPUT, &g_address_t);
+    Address* address = handle_t::create<Address>(OUTPUT, g_address_t);
 
     int port = INT_INPUT(1);
     char portStr[20];
@@ -161,10 +160,13 @@ CA_FUNCTION(send)
 
 void setup(Branch& kernel)
 {
-    handle_t::setup_type<ServerContext>(&g_serverContext_t);
-    handle_t::setup_type<Address>(&g_address_t);
-
     Branch& ns = nested_contents(kernel["osc"]);
+
+    g_serverContext_t = as_type(ns["ServerContext"]);
+    g_address_t = as_type(ns["Address"]);
+
+    handle_t::setup_type<ServerContext>(g_serverContext_t);
+    handle_t::setup_type<Address>(g_address_t);
 
     install_function(ns["create_server_thread"], create_server_thread);
     install_function(ns["read_from_server"], read_from_server);

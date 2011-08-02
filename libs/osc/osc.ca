@@ -1,10 +1,13 @@
 
 -- liblo bindings
 namespace osc
-    def create_server_thread(int port) -> any
-    def read_from_server(any server_thread) -> List
-    def address(string hostname, int port) -> any
-    def send(any address, string path, any values...)
+    type ServerContext;
+    type Address;
+
+    def create_server_thread(int port) -> ServerContext
+    def read_from_server(ServerContext context) -> List
+    def address(string hostname, int port) -> Address
+    def send(Address address, string path, any values...)
     
     def listen(int port) -> List
         state server_thread = null

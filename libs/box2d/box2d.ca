@@ -1,39 +1,42 @@
 
 -- box2d bindings
 namespace box2d
+    type Body;
+    type MouseJoint;
+
     def step()
         "Run the simulation for one timestep"
     def gravity(Point vec)
         "Set the gravity vector."
     namespace body_type { static = 0, dynamic = 1, kinematic = 2 }
-    def create_body(int bodyType, Point initialPosition, number initialRotation) -> any
+    def create_body(int bodyType, Point initialPosition, number initialRotation) -> Body
         "Create a new body. Don't call this directly, use body() instead."
     namespace shape_type { rect = 0, circle = 1 }
-    def set_body_fixtures(any handle, List fixtureDefs)
+    def set_body_fixtures(Body handle, List fixtureDefs)
         "Update the shape on the given body."
-    def get_body_points(any handle) -> List
+    def get_body_points(Body handle) -> List
         "Return the list of points of the given body, in screen space."
-    def get_body_position(any handle) -> Point
+    def get_body_position(Body handle) -> Point
         "Get the position of the body, in screen space."
-    def set_body_position(any handle, Point p)
+    def set_body_position(Body handle, Point p)
         "Move the body to the given position"
-    def get_body_rotation(any handle) -> number
+    def get_body_rotation(Body handle) -> number
         "Get the rotation of the body, as a unit angle."
-    def set_body_rotation(any handle, number rotation)
+    def set_body_rotation(Body handle, number rotation)
         "Rotate the body to the given rotation"
-    def get_linear_velocity(any handle) -> Point
-    def set_linear_velocity(any handle, Point p)
-    def apply_force(any handle, Point force, Point point)
-    def apply_torque(any handle, number torque)
-    def apply_linear_impulse(any handle, any center, any point)
-    def apply_angular_impulse(any handle, number impulse)
-    def create_mouse_joint(any body, Point target) -> any
-    def mouse_joint_set_target(any joint, Point target)
+    def get_linear_velocity(Body handle) -> Point
+    def set_linear_velocity(Body handle, Point p)
+    def apply_force(Body handle, Point force, Point point)
+    def apply_torque(Body handle, number torque)
+    def apply_linear_impulse(Body handle, any center, any point)
+    def apply_angular_impulse(Body handle, number impulse)
+    def create_mouse_joint(Body body, Point target) -> MouseJoint
+    def mouse_joint_set_target(MouseJoint joint, Point target)
 
-    def body_contains_point(any handle, Point p) -> bool
+    def body_contains_point(Body handle, Point p) -> bool
         "Intersection test, returns true if the given point is inside the body"
 
-    def static_rect(Point location, number rotation, Point size) -> any
+    def static_rect(Point location, number rotation, Point size) -> Body
         state handle = create_body(body_type:static, location, rotation)
         if changed(size)
             set_body_fixtures(handle, [[shape_type:rect size 0 0 0]])
@@ -43,7 +46,7 @@ namespace box2d
             set_body_rotation(handle rotation)
         return handle
 
-    def kinematic_rect(Point location, number rotation, Point size) -> any
+    def kinematic_rect(Point location, number rotation, Point size) -> Body
         state handle = create_body(body_type:kinematic, location, rotation)
         if changed(size)
             set_body_fixtures(handle, [[shape_type:rect size 0 0 0]])
@@ -53,13 +56,13 @@ namespace box2d
             set_body_rotation(handle rotation)
         return handle
 
-    def dynamic_rect(Point location, number rotation, Point size, List properties) -> any
+    def dynamic_rect(Point location, number rotation, Point size, List properties) -> Body
         state handle = create_body(body_type:dynamic, location, rotation)
         if changed(size) or changed(properties)
             set_body_fixtures(handle, [[shape_type:rect size].extend(properties)])
         return handle
 
-    def static_circle(Point location, number radius) -> any
+    def static_circle(Point location, number radius) -> Body
         state handle = create_body(body_type:static, location, 0.0)
         if changed(radius)
             set_body_fixtures(handle, [[shape_type:circle radius 0 0 0]])
@@ -67,13 +70,13 @@ namespace box2d
             set_body_position(handle location)
         return handle
 
-    def dynamic_circle(Point location, number radius, List properties) -> any
+    def dynamic_circle(Point location, number radius, List properties) -> Body
         state handle = create_body(body_type:dynamic, location, 0.0)
         if changed(radius) or changed(properties)
             set_body_fixtures(handle, [[shape_type:circle radius].extend(properties)])
         return handle
 
-    def draggable_body(any handle)
+    def draggable_body(Body handle)
         state currently_dragging = false
 
         if not(currently_dragging) and mouse_clicked()
@@ -92,11 +95,11 @@ namespace box2d
 
             set_body_position(handle, Point(get_body_position(handle) + delt))
 
-    def mouse_joint(any body, Point target)
+    def mouse_joint(Body body, Point target)
         state joint = create_mouse_joint(body, target)
         mouse_joint_set_target(joint, target)
 
-    def draw_edges(any body, Color color)
+    def draw_edges(Body body, Color color)
         gl:line_loop(box2d:get_body_points(body) color)
 
     def walls_around_screen()
