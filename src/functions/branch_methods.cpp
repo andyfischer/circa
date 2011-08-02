@@ -114,6 +114,14 @@ namespace branch_methods_function {
                 set_ref(output.append(), term);
         }
     }
+
+    CA_DEFINE_FUNCTION(get_file_signature, "Branch.file_signature(self) -> any")
+    {
+        Branch* branch = as_branch(INPUT(0));
+        if (branch == NULL)
+            return error_occurred(CONTEXT, CALLER, "NULL branch");
+        copy(&branch->fileSignature, OUTPUT);
+    }
     
     void setup(Branch& kernel)
     {

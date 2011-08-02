@@ -259,9 +259,13 @@ def patch_with_dll(Branch b, string baseFile)
     Load the .DLL or .SO at the given baseFile, and patch the functions in
     'branch' using appropriately-named functions from the DLL/SO.
     >>>
-    if file_changed(dll_loading:source_filename(baseFile))
+
+    rebuilt = false
+    if file:modified_time(dll_loading:source_filename(baseFile)) > file:modified_time(dll_loading:dll_filename(baseFile))
         dll_loading:rebuild(baseFile)
-    if file_changed(dll_loading:dll_filename(baseFile))
+        rebuilt = true
+
+    if once() or rebuilt or changed(b.file_signature())
         dll_loading:load_and_patch(b, baseFile)
 
 namespace styled_source

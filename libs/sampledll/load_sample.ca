@@ -9,5 +9,4 @@ namespace ns
 
 patch_with_dll(reflect:this_branch(), 'sampledll' -> rpath)
 
-sample_a() -> print
-ns:concat('namespaced function ' 'works') -> print
+trace(sample_a())

@@ -13,7 +13,7 @@ void on_load(Branch* branch)
 
 CA_FUNCTION(sample_a)
 {
-    set_string(OUTPUT, "it works");
+    set_string(OUTPUT, "hi");
 }
 
 CA_FUNCTION(ns__concat)
