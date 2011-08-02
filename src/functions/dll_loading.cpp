@@ -94,7 +94,7 @@ namespace dll_loading_function {
             #ifdef WINDOWS
                 // TODO
             #else
-                error += ": \n" + dlerror();
+                error += std::string(": \n") + dlerror();
             #endif
 
             set_string(errorOut, error);
