@@ -425,6 +425,16 @@ void install_type(Term* term, Type* type)
     set_type(term, type);
 }
 
+Type* get_declared_type(Branch& branch, const char* name)
+{
+    Term* term = branch[name];
+    if (term == NULL)
+        return NULL;
+    if (!is_type(term))
+        return NULL;
+    return as_type(term);
+}
+
 void set_type_list(TaggedValue* value, Type* type1)
 {
     List* list = set_list(value, 1);

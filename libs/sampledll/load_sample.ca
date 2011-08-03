@@ -1,4 +1,6 @@
 
+patch_with_dll(reflect:this_branch(), 'sampledll' -> rpath)
+
 def sample_a() -> string
     return 'Not patched'
 
@@ -6,7 +8,4 @@ namespace ns
     def concat(string a, string b) -> string
         return 'Not patched'
         
-
-patch_with_dll(reflect:this_branch(), 'sampledll' -> rpath)
-
 trace(sample_a())

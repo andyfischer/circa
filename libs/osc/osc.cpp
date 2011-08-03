@@ -162,8 +162,8 @@ void setup(Branch& kernel)
 {
     Branch& ns = nested_contents(kernel["osc"]);
 
-    g_serverContext_t = as_type(ns["ServerContext"]);
-    g_address_t = as_type(ns["Address"]);
+    g_serverContext_t = get_declared_type(ns, "ServerContext");
+    g_address_t = get_declared_type(ns, "Address");
 
     handle_t::setup_type<ServerContext>(g_serverContext_t);
     handle_t::setup_type<Address>(g_address_t);

@@ -1,3 +1,4 @@
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include <circa.h>
 #include <importing_macros.h>
@@ -26,4 +27,4 @@ CA_FUNCTION(get_number)
     set_int(OUTPUT, 0);
 }
 
-}
+} // extern "C"
