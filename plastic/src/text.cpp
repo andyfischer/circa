@@ -9,7 +9,6 @@
 #include <SDL_ttf.h>
 
 #include "gl_util.h"
-#include "image.h"
 #include "sdl_util.h"
 #include "text.h"
 

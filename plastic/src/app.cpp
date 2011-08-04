@@ -6,12 +6,10 @@
 #include "app.h"
 #include "gl_shapes.h"
 #include "ide.h"
-#include "image.h"
 #include "input.h"
 #include "mesh.h"
 #include "postprocess.h"
 #include "text.h"
-#include "textures.h"
 
 // For now, include the 3rd party bindings by source. Long term plan is for these
 // to each be compiled as a separate module.
@@ -205,10 +203,8 @@ bool setup_functions(circa::Branch& runtime)
 
 #ifdef PLASTIC_USE_SDL
     postprocess_functions::setup(branch);
-    image::setup(branch);
     input::setup(branch);
     mesh::setup(branch);
-    textures::setup(branch);
     text::setup(branch);
 #endif
 

@@ -10,12 +10,10 @@
 #include "gl_shapes.h"
 #include "gl_util.h"
 #include "ide.h"
-#include "image.h"
 #include "input.h"
 #include "mesh.h"
 #include "postprocess.h"
 #include "text.h"
-#include "textures.h"
 
 #include "plastic_main.h"
 

@@ -129,27 +129,6 @@ namespace gl
     def clear_program()
     def set_uniform(string name, any value)
 
-namespace image
-    type Image {
-        string filename
-        int texid
-        int width
-        int height
-    }
-
-    def _load(string filename) -> Image
-
-    def load(string filename) -> Image
-        state Image existing
-        if file_changed(filename)
-            existing = _load(filename)
-        return existing
-    def draw(Image image, Point destination)
-    def draw_clip_p(Image image, Rect clip, Point destination)
-    def draw_clip_resized(Image image, Rect clip, Rect destination)
-
-    draw_clip = overloaded_function(draw_clip_p draw_clip_resized)
-
 -- Audio
 type Sound;
 def load_sound_int(string filename) -> Sound
@@ -167,16 +146,11 @@ def delta_point(Point p) -> Point
     prev = p
     return result
 
-def load_texture(state int, string) -> int
-
 def load_mesh(string filename) -> int
     "(experimental) Load a 3d mesh from an .obj file."
 def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
     "(experimental) Draw a 3d mesh to the screen."
 
-def draw_image(string filename, Point location)
-    im = image:load(filename)
-    image:draw(im location)
 
 -- Drawing utils
 include(rpath('vector_drawing.ca'))
@@ -306,12 +280,16 @@ namespace postprocess
 include('../../libs/box2d/box2d.ca' -> rpath)
 include('../../libs/opengl/opengl.ca' -> rpath)
 include('../../libs/osc/osc.ca' -> rpath)
+include('../../libs/sdl_img/sdl_img.ca' -> rpath)
 
 -- cairo.ca depends on opengl
 include('../../libs/cairo/cairo.ca' -> rpath)
 
 include('text_input.ca' -> rpath)
 include('ui_widgets.ca' -> rpath)
+
+def draw_image(string filename, Point location)
+    sdl_img:draw_image(filename, location)
 
 -- Load the user's script
 initial_filename = ide:script_filename()
