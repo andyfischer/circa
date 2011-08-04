@@ -260,9 +260,16 @@ def patch_with_dll(Branch b, string baseFile)
     'branch' using appropriately-named functions from the DLL/SO.
     >>>
 
+    state int last_rebuild_at = 0
+    source_modified_time = file:modified_time(dll_loading:source_filename(baseFile))
+    dll_modified_time = file:modified_time(dll_loading:dll_filename(baseFile))
+    build_has_not_been_attempted = last_rebuild_at != source_modified_time
+    source_newer_than_dll = source_modified_time > dll_modified_time
+
     rebuilt = false
-    if file:modified_time(dll_loading:source_filename(baseFile)) > file:modified_time(dll_loading:dll_filename(baseFile))
-        dll_loading:rebuild(baseFile)
+    if build_has_not_been_attempted and source_newer_than_dll
+        last_rebuild_at = source_modified_time
+        dll_loading:rebuild(baseFile) -> errored # ignore errors here
         rebuilt = true
 
     if once() or rebuilt or changed(b.file_signature())

@@ -42,6 +42,7 @@
 #include "type_inference.h"
 
 #include "types/dict.h"
+#include "types/handle.h"
 #include "types/list.h"
 #include "types/point.h"
 #include "types/ref.h"

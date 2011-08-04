@@ -109,7 +109,6 @@ namespace dll_loading_function {
         return dll;
     }
 
-
     void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
     {
         for (int i=0; i < branch.length(); i++)
@@ -120,7 +119,14 @@ namespace dll_loading_function {
                 patch_branch_recr(dll, nested_contents(term), namespacePrefix + term->name + "__");
             }
             else if (is_function(term)) {
-                std::string searchName = namespacePrefix + term->name.c_str();
+                std::string name = term->name;
+
+                // Replace '.' with '_'
+                for (size_t i=0; i < name.length(); i++)
+                    if (name[i] == '.')
+                        name[i] = '_';
+
+                std::string searchName = namespacePrefix + name;
 
                 void* newEvaluateFunc = find_func_in_dll(dll, searchName.c_str());
 
@@ -141,8 +147,11 @@ namespace dll_loading_function {
 
         Dll* dll = load_dll(dll_filename, errorOut);
 
-        if (dll == NULL)
+        if (dll == NULL) {
+            if (errorOut != NULL)
+                set_string(errorOut, "failed to load DLL");
             return;
+        }
 
         // Call on_load (if it exists)
         OnLoadFunc onLoad = (OnLoadFunc) find_func_in_dll(dll, "on_load");
@@ -185,7 +194,9 @@ namespace dll_loading_function {
 
         // TODO: This is probably terrible:
         std::string cmd ="cd " + dir + "; make"; 
-        system(cmd.c_str());
+        int ret = system(cmd.c_str());
+        if (ret != 0)
+            return error_occurred(CONTEXT, CALLER, "'make' returned error");
     }
 
     void setup(Branch& kernel)

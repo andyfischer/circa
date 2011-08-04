@@ -1,0 +1,19 @@
+
+namespace sdl_img
+    patch_with_dll(reflect:this_branch(), 'sdl_img' -> rpath)
+
+    type Image;
+    type ImageTexture;
+
+    def load_image(string filename) -> Image
+    def load_image_to_texture(Image image) -> ImageTexture
+    def ImageTexture.draw(tex, Point p)
+
+    def draw_image(string filename, Point p)
+        state texture = null
+        if file_changed(filename)
+            image = load_image(filename)
+            texture = load_image_to_texture(image)
+
+        ImageTexture(@texture)
+        texture.draw(p)
