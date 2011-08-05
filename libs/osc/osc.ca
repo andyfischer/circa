@@ -1,5 +1,6 @@
 
 -- liblo bindings
+
 namespace osc
     type ServerContext;
     type Address;
@@ -7,7 +8,7 @@ namespace osc
     def create_server_thread(int port) -> ServerContext
     def read_from_server(ServerContext context) -> List
     def address(string hostname, int port) -> Address
-    def send(Address address, string path, any values...)
+    def send(Address address, string path, any values)
     
     def listen(int port) -> List
         state server_thread = null
@@ -15,3 +16,5 @@ namespace osc
             server_thread = create_server_thread(port)
 
         return read_from_server(server_thread)
+
+patch_with_dll(reflect:this_branch(), 'osc' -> rpath)

@@ -9,16 +9,20 @@
 
 using namespace circa;
 
-namespace osc_support {
-
 struct ServerContext
 {
     lo_server_thread server_thread;
+
+    // incomingMessages is guarded by 'mutex'
     circa::List incomingMessages;
     pthread_mutex_t mutex;
 
-    ServerContext() : server_thread(NULL) {}
+    ServerContext() : server_thread(NULL)
+    {
+        pthread_mutex_init(&mutex, NULL);
+    }
     ~ServerContext() {
+        pthread_mutex_destroy(&mutex);
         if (server_thread != NULL)
             lo_server_thread_stop(server_thread);
     }
@@ -31,6 +35,8 @@ struct Address
 
 Type* g_serverContext_t;
 Type* g_address_t;
+
+extern "C" {
 
 void error_callback(int num, const char *m, const char *path)
 {
@@ -61,14 +67,16 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
         }
     }
 
-    pthread_mutex_lock(&context->mutex);
+    int ret = 0;
+
+    ret = pthread_mutex_lock(&context->mutex);
     swap(&message, context->incomingMessages.append());
-    pthread_mutex_unlock(&context->mutex);
+    ret = pthread_mutex_unlock(&context->mutex);
 
     return 1;
 }
 
-CA_FUNCTION(create_server_thread)
+CA_FUNCTION(osc__create_server_thread)
 {
     int port = INT_INPUT(0);
     char portStr[15];
@@ -90,7 +98,7 @@ CA_FUNCTION(create_server_thread)
     lo_server_thread_start(context->server_thread);
 }
 
-CA_FUNCTION(read_from_server)
+CA_FUNCTION(osc__read_from_server)
 {
     ServerContext* context = (ServerContext*) handle_t::get_ptr(INPUT(0));
 
@@ -103,7 +111,7 @@ CA_FUNCTION(read_from_server)
     swap(&incoming, OUTPUT);
 }
 
-CA_FUNCTION(open_address)
+CA_FUNCTION(osc__address)
 {
     Address* address = handle_t::create<Address>(OUTPUT, g_address_t);
 
@@ -114,7 +122,7 @@ CA_FUNCTION(open_address)
     address->address = lo_address_new(STRING_INPUT(0), portStr);
 }
 
-CA_FUNCTION(send)
+CA_FUNCTION(osc__send)
 {
     Address* address = (Address*) handle_t::get_ptr(INPUT(0));
 
@@ -158,20 +166,15 @@ CA_FUNCTION(send)
     lo_message_free(message);
 }
 
-void setup(Branch& kernel)
+void on_load(Branch* branch)
 {
-    Branch& ns = nested_contents(kernel["osc"]);
-
+    Branch& ns = nested_contents(branch->get("osc"));
     g_serverContext_t = get_declared_type(ns, "ServerContext");
     g_address_t = get_declared_type(ns, "Address");
 
     handle_t::setup_type<ServerContext>(g_serverContext_t);
     handle_t::setup_type<Address>(g_address_t);
-
-    install_function(ns["create_server_thread"], create_server_thread);
-    install_function(ns["read_from_server"], read_from_server);
-    install_function(ns["address"], open_address);
-    install_function(ns["send"], send);
 }
 
-} // namespace osc
+} // extern "C"
+

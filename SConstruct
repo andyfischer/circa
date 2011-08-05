@@ -195,7 +195,7 @@ for env in all_envs:
 
     source_files = list_source_files('plastic/src')
 
-    env.Append(CPPDEFINES=['PLASTIC_USE_SDL','PLASTIC_USE_OSC'])
+    env.Append(CPPDEFINES=['PLASTIC_USE_SDL'])
 
     binaryName = 'plas'+env['variant_suffix']
 
