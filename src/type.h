@@ -201,7 +201,7 @@ Term* parse_type(Branch& branch, std::string const& decl);
 // type Type.
 void install_type(Term* term, Type* type);
 
-Type* get_declared_type(Branch& branch, const char* name);
+Type* get_declared_type(Branch* branch, const char* name);
 
 void set_type_list(TaggedValue* value, Type* type1);
 void set_type_list(TaggedValue* value, Type* type1, Type* type2);

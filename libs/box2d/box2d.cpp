@@ -445,8 +445,8 @@ void setup(Branch& kernel)
 {
     Branch& ns = nested_contents(kernel["box2d"]);
 
-    g_body_t = get_declared_type(ns, "Body");
-    g_mouseJoint_t = get_declared_type(ns, "MouseJoint");
+    g_body_t = get_declared_type(&ns, "Body");
+    g_mouseJoint_t = get_declared_type(&ns, "MouseJoint");
 
     handle_t::setup_type<Body>(g_body_t);
     handle_t::setup_type<MouseJoint>(g_mouseJoint_t);

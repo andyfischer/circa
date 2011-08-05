@@ -425,9 +425,9 @@ void install_type(Term* term, Type* type)
     set_type(term, type);
 }
 
-Type* get_declared_type(Branch& branch, const char* name)
+Type* get_declared_type(Branch* branch, const char* name)
 {
-    Term* term = branch[name];
+    Term* term = branch->get(name);
     if (term == NULL)
         return NULL;
     if (!is_type(term))

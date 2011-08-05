@@ -279,9 +279,9 @@ void setup(Branch& kernel)
 {
     Branch& ns = nested_contents(kernel["cairo"]);
 
-    g_cairoContext_t = get_declared_type(ns, "Context");
-    g_cairoSurface_t = get_declared_type(ns, "Surface");
-    g_cairoFontFace_t = get_declared_type(ns, "FontFace");
+    g_cairoContext_t = get_declared_type(&ns, "Context");
+    g_cairoSurface_t = get_declared_type(&ns, "Surface");
+    g_cairoFontFace_t = get_declared_type(&ns, "FontFace");
 
     g_cairoContext_t->copy = cairoContext_copy;
     g_cairoContext_t->release = cairoContext_release;

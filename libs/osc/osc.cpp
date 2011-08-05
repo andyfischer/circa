@@ -13,9 +13,9 @@ struct ServerContext
 {
     lo_server_thread server_thread;
 
-    // incomingMessages is guarded by 'mutex'
-    circa::List incomingMessages;
+    // incomingMessages is guarded by a mutex.
     pthread_mutex_t mutex;
+    circa::List incomingMessages;
 
     ServerContext() : server_thread(NULL)
     {
@@ -168,9 +168,8 @@ CA_FUNCTION(osc__send)
 
 void on_load(Branch* branch)
 {
-    Branch& ns = nested_contents(branch->get("osc"));
-    g_serverContext_t = get_declared_type(ns, "ServerContext");
-    g_address_t = get_declared_type(ns, "Address");
+    g_serverContext_t = get_declared_type(branch, "osc:ServerContext");
+    g_address_t = get_declared_type(branch, "osc:Address");
 
     handle_t::setup_type<ServerContext>(g_serverContext_t);
     handle_t::setup_type<Address>(g_address_t);
