@@ -2,6 +2,7 @@
 
 #include <cairo/cairo.h>
 
+#include "list_shared.h"
 #include "types/color.h"
 #include "types/rect.h"
 

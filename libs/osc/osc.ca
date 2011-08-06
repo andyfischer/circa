@@ -1,6 +1,8 @@
 
 -- liblo bindings
 
+patch_with_dll(reflect:this_branch(), 'osc' -> rpath)
+
 namespace osc
     type ServerContext;
     type Address;
@@ -17,4 +19,3 @@ namespace osc
 
         return read_from_server(server_thread)
 
-patch_with_dll(reflect:this_branch(), 'osc' -> rpath)

@@ -1,7 +1,8 @@
 
 CFLAGS = -I${CIRCA_HOME}/src -rdynamic
-LINKFLAGS = -llo
-MODULE_NAME = osc
+LINKFLAGS = -lbox2d
+
+MODULE_NAME = box2d
 
 SOURCES = ${MODULE_NAME}.cpp
 

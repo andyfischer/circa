@@ -13,7 +13,6 @@
 
 // For now, include the 3rd party bindings by source. Long term plan is for these
 // to each be compiled as a separate module.
-#include "../libs/box2d/box2d.cpp"
 #include "../libs/opengl/opengl.cpp"
 #include "../libs/cairo/cairo.cpp"
 
@@ -208,7 +207,6 @@ bool setup_functions(circa::Branch& runtime)
     fmod_support::setup(runtime);
 #endif
 
-    box2d_support::setup(runtime);
     opengl_support::setup(runtime);
 
     cairo_support::setup(runtime);

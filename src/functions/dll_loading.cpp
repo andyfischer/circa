@@ -148,8 +148,11 @@ namespace dll_loading_function {
         Dll* dll = load_dll(dll_filename, errorOut);
 
         if (dll == NULL) {
-            if (errorOut != NULL)
-                set_string(errorOut, "failed to load DLL");
+            if (errorOut != NULL) {
+                std::stringstream msg;
+                msg << "load_dll failed, " << as_string(errorOut);
+                set_string(errorOut, msg.str().c_str());
+            }
             return;
         }
 

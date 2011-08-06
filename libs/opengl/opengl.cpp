@@ -1,6 +1,9 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "branch.h"
 #include "types/rect.h"
+
+using namespace circa;
 
 namespace opengl_support {
 

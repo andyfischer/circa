@@ -99,7 +99,7 @@ for env in all_envs:
     buildStep = env.SharedLibrary if SHARED_LIBRARY else env.StaticLibrary
 
     result = buildStep(fullPath, sources)
-    circa_libs[variant_name] = result
+    circa_libs[variant_name] = result[0]
 
     if OSX and SHARED_LIBRARY:
         actualFile = 'lib'+baseName+'.dylib'
@@ -160,8 +160,9 @@ def use_sdl(env):
 
     variant_name = env['variant_name']
 
-    # Append appropriate circa lib
+    # Append appropriate circa lib, use -force_load
     env.Append(LIBS = [circa_libs[variant_name]])
+    env.Append(LINKFLAGS = ["-all_load"])
 
 def use_fmod(env):
     base = 'build/deps/fmod/api/'
@@ -170,12 +171,6 @@ def use_fmod(env):
     #env.Append(LINKFLAGS=['-l'+ base + 'lib/libfmodex.dylib'])
     env.Append(LIBPATH=[base + 'lib'])
     env.Append(LIBS=['fmodex'])
-
-def use_box2d(env):
-    env.Append(LIBS=['box2d'])
-
-def use_liblo(env):
-    env.Append(LIBS=['lo'])
 
 def use_cairo(env):
     env.Append(CPPPATH="/usr/local/Cellar/cairo/1.10.2/include")
@@ -189,8 +184,6 @@ for env in all_envs:
     env.VariantDir('build/'+variantName+'/plastic/src', 'plastic/src')
     use_sdl(env)
     #use_fmod(env)
-    use_box2d(env)
-    use_liblo(env)
     use_cairo(env)
 
     source_files = list_source_files('plastic/src')

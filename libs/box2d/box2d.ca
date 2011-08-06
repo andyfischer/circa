@@ -1,5 +1,8 @@
 
 -- box2d bindings
+
+patch_with_dll(reflect:this_branch(), 'box2d' -> rpath)
+
 namespace box2d
     type Body;
     type MouseJoint;
@@ -31,11 +34,12 @@ namespace box2d
     def Body.apply_torque(body, number torque)
     def Body.apply_linear_impulse(body, any center, any point)
     def Body.apply_angular_impulse(body, number impulse)
+    def body_contains_point(Body body, Point p) -> bool
+        "Intersection test, returns true if the given point is inside the body"
+
     def Body.create_mouse_joint(body, Point target) -> MouseJoint
     def MouseJoint.set_target(joint, Point target)
 
-    def body_contains_point(Body body, Point p) -> bool
-        "Intersection test, returns true if the given point is inside the body"
 
     def static_rect(Point location, number rotation, Point size) -> Body
         state body = create_body(body_type:static, location, rotation)

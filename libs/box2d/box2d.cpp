@@ -9,8 +9,6 @@
 
 using namespace circa;
 
-namespace box2d_support {
-
 #define LOG_HANDLE_CREATION 0
 
 b2World *g_world = NULL;
@@ -104,6 +102,8 @@ class DestructionListener : public b2DestructionListener
     }
 } g_destructionListener;
 
+extern "C" {
+
 void initialize_world()
 {
     if (g_world == NULL) {
@@ -126,7 +126,7 @@ bool is_valid_body_handle(TaggedValue* value)
         && get_body_from_handle(value) != NULL;
 }
 
-CA_FUNCTION(step)
+CA_FUNCTION(box2d__step)
 {
     initialize_world();
 
@@ -134,7 +134,7 @@ CA_FUNCTION(step)
     g_world->ClearForces();
 }
 
-CA_FUNCTION(gravity)
+CA_FUNCTION(box2d__gravity)
 {
     initialize_world();
 
@@ -142,7 +142,7 @@ CA_FUNCTION(gravity)
     g_world->SetGravity(b2Vec2(gravity.getX(), gravity.getY()));
 }
 
-CA_FUNCTION(create_body)
+CA_FUNCTION(box2d__create_body)
 {
     // Inputs:
     //   int bodyType
@@ -180,7 +180,7 @@ CA_FUNCTION(create_body)
     #endif
 }
 
-CA_FUNCTION(set_body_fixtures)
+CA_FUNCTION(box2d__Body_set_fixtures)
 {
     // Inputs:
     //   BodyPtr handle
@@ -231,7 +231,7 @@ CA_FUNCTION(set_body_fixtures)
     }
 }
 
-CA_FUNCTION(get_body_points)
+CA_FUNCTION(box2d__Body_get_points)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -256,7 +256,7 @@ CA_FUNCTION(get_body_points)
     }
 }
 
-CA_FUNCTION(get_body_position)
+CA_FUNCTION(box2d__Body_get_position)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -265,7 +265,7 @@ CA_FUNCTION(get_body_position)
     b2Vec2_to_point(body->GetPosition(), OUTPUT);
 }
 
-CA_FUNCTION(set_body_position)
+CA_FUNCTION(box2d__Body_set_position)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -274,7 +274,7 @@ CA_FUNCTION(set_body_position)
     body->SetTransform(point_to_b2Vec2(INPUT(1)), body->GetAngle());
 }
 
-CA_FUNCTION(get_body_rotation)
+CA_FUNCTION(box2d__Body_get_rotation)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -283,8 +283,7 @@ CA_FUNCTION(get_body_rotation)
     set_float(OUTPUT, radians_to_degrees(body->GetAngle()));
 }
 
-
-CA_FUNCTION(set_body_rotation)
+CA_FUNCTION(box2d__Body_set_rotation)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -295,7 +294,7 @@ CA_FUNCTION(set_body_rotation)
     body->SetTransform(body->GetPosition(), rotation);
 }
 
-CA_FUNCTION(get_linear_velocity)
+CA_FUNCTION(box2d__Body_get_linear_velocity)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -304,7 +303,7 @@ CA_FUNCTION(get_linear_velocity)
     b2Vec2_to_point(body->GetLinearVelocity(), OUTPUT);
 }
 
-CA_FUNCTION(set_linear_velocity)
+CA_FUNCTION(box2d__Body_set_linear_velocity)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -313,7 +312,7 @@ CA_FUNCTION(set_linear_velocity)
     body->SetLinearVelocity(point_to_b2Vec2(INPUT(1)));
 }
 
-CA_FUNCTION(apply_force)
+CA_FUNCTION(box2d__Body_apply_force)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -321,7 +320,7 @@ CA_FUNCTION(apply_force)
 
     body->ApplyForce(point_to_b2Vec2(INPUT(1)), point_to_b2Vec2(INPUT(2)));
 }
-CA_FUNCTION(apply_torque)
+CA_FUNCTION(box2d__Body_apply_torque)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -329,7 +328,7 @@ CA_FUNCTION(apply_torque)
 
     body->ApplyTorque(FLOAT_INPUT(1));
 }
-CA_FUNCTION(apply_linear_impulse)
+CA_FUNCTION(box2d__Body_apply_linear_impulse)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -337,7 +336,7 @@ CA_FUNCTION(apply_linear_impulse)
 
     body->ApplyLinearImpulse(point_to_b2Vec2(INPUT(1)), point_to_b2Vec2(INPUT(2)));
 }
-CA_FUNCTION(apply_angular_impulse)
+CA_FUNCTION(box2d__Body_apply_angular_impulse)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -346,7 +345,7 @@ CA_FUNCTION(apply_angular_impulse)
     body->ApplyAngularImpulse(FLOAT_INPUT(1));
 }
 
-CA_FUNCTION(body_contains_point)
+CA_FUNCTION(box2d__body_contains_point)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     if (body == NULL)
@@ -367,7 +366,7 @@ CA_FUNCTION(body_contains_point)
     set_bool(OUTPUT, false);
 }
 
-CA_FUNCTION(create_mouse_joint)
+CA_FUNCTION(box2d__Body_create_mouse_joint)
 {
     b2Body* body = get_body_from_handle(INPUT(0));
     b2MouseJointDef def;
@@ -388,7 +387,7 @@ CA_FUNCTION(create_mouse_joint)
     body->SetAwake(true);
 }
 
-CA_FUNCTION(mouse_joint_set_target)
+CA_FUNCTION(box2d__MouseJoint_set_target)
 {
     MouseJoint* jointHandle = (MouseJoint*) handle_t::get_ptr(INPUT(0));
     if (jointHandle->joint == NULL)
@@ -397,6 +396,7 @@ CA_FUNCTION(mouse_joint_set_target)
     set_null(OUTPUT);
 }
 
+#if 0
 void run_global_refcount_check()
 {
     std::cout << "run_global_refcount_check" << std::endl;
@@ -434,23 +434,17 @@ void run_global_refcount_check()
     cleanup_transient_value(&usersBranch);
     cleanup_transient_value(&runtimeBranch);
 }
+#endif
 
-void on_frame_callback(void* userdata, app::App* app, int step)
+void on_load(Branch* branch)
 {
-    //run_global_refcount_check();
-    //std::cout << "post_frame: " << app->_evalContext.state.toString() << std::endl;
-}
-
-void setup(Branch& kernel)
-{
-    Branch& ns = nested_contents(kernel["box2d"]);
-
-    g_body_t = get_declared_type(&ns, "Body");
-    g_mouseJoint_t = get_declared_type(&ns, "MouseJoint");
+    g_body_t = get_declared_type(branch, "box2d:Body");
+    g_mouseJoint_t = get_declared_type(branch, "box2d:MouseJoint");
 
     handle_t::setup_type<Body>(g_body_t);
     handle_t::setup_type<MouseJoint>(g_mouseJoint_t);
 
+#if 0
     install_function(ns["step"], step);
     install_function(ns["gravity"], gravity);
     install_function(ns["create_body"], create_body);
@@ -468,8 +462,7 @@ void setup(Branch& kernel)
     install_function(ns["Body.create_mouse_joint"], create_mouse_joint);
     install_function(ns["MouseJoint.set_target"], mouse_joint_set_target);
     install_function(ns["body_contains_point"], body_contains_point);
-
-    app::get_global_app().addPostFrameCallback(on_frame_callback, NULL);
+#endif
 }
 
-} // box2d_support
+} // extern "C"
