@@ -14,7 +14,6 @@
 // For now, include the 3rd party bindings by source. Long term plan is for these
 // to each be compiled as a separate module.
 #include "../libs/opengl/opengl.cpp"
-#include "../libs/cairo/cairo.cpp"
 
 #if PLASTIC_USE_FMOD
 #include "../libs/fmod/fmod.cpp"
@@ -208,8 +207,6 @@ bool setup_functions(circa::Branch& runtime)
 #endif
 
     opengl_support::setup(runtime);
-
-    cairo_support::setup(runtime);
 
     return true;
 }

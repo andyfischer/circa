@@ -2,13 +2,18 @@
 
 #include <cairo/cairo.h>
 
+#include <OpenGL/glu.h>
+#include <OpenGL/glext.h>
+
+#include "circa.h"
+
 #include "list_shared.h"
 #include "types/color.h"
 #include "types/rect.h"
 
 using namespace circa;
 
-namespace cairo_support {
+extern "C" {
 
 Type *g_cairoContext_t;
 Type *g_cairoSurface_t;
@@ -66,23 +71,71 @@ void cairoFontFace_release(Type*, TaggedValue* value)
 float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
 float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
 
-CA_FUNCTION(save)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_save(context);
-}
-CA_FUNCTION(restore)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_restore(context);
-}
-CA_FUNCTION(create_context_for_surface)
+CA_FUNCTION(cairo__create_context_for_surface)
 {
     cairo_surface_t* surface = as_cairo_surface(INPUT(0));
     set_pointer(OUTPUT, g_cairoContext_t, cairo_create(surface));
 }
+CA_FUNCTION(cairo__Context_save)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_save(context);
+}
+CA_FUNCTION(cairo__Context_restore)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_restore(context);
+}
 
-CA_FUNCTION(create_image_surface)
+CA_FUNCTION(cairo__Context_stroke)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_stroke(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(cairo__Context_paint)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_paint(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(cairo__Context_clip)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_clip(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(cairo__Context_clip_preserve)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_clip_preserve(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(cairo__Context_reset_clip)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_reset_clip(context);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(cairo__Context_set_source_color)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    float r(0), g(0), b(0), a(0);
+    get_color(INPUT(1), &r, &g, &b, &a);
+    cairo_set_source_rgba(context, r, g, b, a);
+    set_null(OUTPUT);
+}
+CA_FUNCTION(cairo__Context_fill_preserve)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_fill_preserve(context);
+}
+CA_FUNCTION(cairo__Context_set_operator)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    cairo_set_operator(context, (cairo_operator_t) INT_INPUT(1));
+}
+CA_FUNCTION(cairo__create_image_surface)
 {
     // user can't currently specify the format
     TaggedValue* size = INPUT(0);
@@ -92,32 +145,31 @@ CA_FUNCTION(create_image_surface)
     cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
     set_pointer(OUTPUT, g_cairoSurface_t, surface);
 }
-
-CA_FUNCTION(select_font_face)
+CA_FUNCTION(cairo__Context_select_font_face)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     const char* family = STRING_INPUT(1);
     // currently, user can't specify font slant or weight.
     cairo_select_font_face(context, family, CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 }
-CA_FUNCTION(set_font_size)
+CA_FUNCTION(cairo__Context_set_font_size)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_set_font_size(context, FLOAT_INPUT(1));
 }
-CA_FUNCTION(set_font_face)
+CA_FUNCTION(cairo__Context_set_font_face)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_font_face_t* font = as_cairo_font_face(INPUT(1));
     cairo_set_font_face(context, font);
 }
-CA_FUNCTION(show_text)
+CA_FUNCTION(cairo__Context_show_text)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     const char* str = STRING_INPUT(1);
     cairo_show_text(context, str);
 }
-CA_FUNCTION(text_extents)
+CA_FUNCTION(cairo__Context_text_extents)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_text_extents_t extents;
@@ -130,70 +182,7 @@ CA_FUNCTION(text_extents)
 
     out->value_type = declared_type(CALLER);
 }
-
-CA_FUNCTION(stroke)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_stroke(context);
-    set_null(OUTPUT);
-}
-CA_FUNCTION(paint)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_paint(context);
-    set_null(OUTPUT);
-}
-CA_FUNCTION(clip)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_clip(context);
-    set_null(OUTPUT);
-}
-CA_FUNCTION(clip_preserve)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_clip_preserve(context);
-    set_null(OUTPUT);
-}
-CA_FUNCTION(reset_clip)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_reset_clip(context);
-    set_null(OUTPUT);
-}
-CA_FUNCTION(set_source_color)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    float r(0), g(0), b(0), a(0);
-    get_color(INPUT(1), &r, &g, &b, &a);
-    cairo_set_source_rgba(context, r, g, b, a);
-    set_null(OUTPUT);
-}
-CA_FUNCTION(fill_preserve)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_fill_preserve(context);
-}
-CA_FUNCTION(set_operator)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    cairo_set_operator(context, (cairo_operator_t) INT_INPUT(1));
-}
-CA_FUNCTION(move_to)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    float x(0), y(0);
-    get_point(INPUT(1), &x, &y);
-    cairo_move_to(context, x, y);
-}
-CA_FUNCTION(rectangle)
-{
-    cairo_t* context = as_cairo_context(INPUT(0));
-    float x1(0), y1(0), x2(0), y2(0);
-    get_rect(INPUT(1), &x1, &y1, &x2, &y2);
-    cairo_rectangle(context, x1, y1, x2-x1, y2-y1);
-}
-CA_FUNCTION(curve_to)
+CA_FUNCTION(cairo__Context_curve_to)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     float x1(0), y1(0), x2(0), y2(0), x3(0), y3(0);
@@ -203,7 +192,21 @@ CA_FUNCTION(curve_to)
     cairo_curve_to(context, x1, y1, x2, y2, x3, y3);
     set_null(OUTPUT);
 }
-CA_FUNCTION(line_to)
+CA_FUNCTION(cairo__Context_move_to)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    float x(0), y(0);
+    get_point(INPUT(1), &x, &y);
+    cairo_move_to(context, x, y);
+}
+CA_FUNCTION(cairo__Context_rectangle)
+{
+    cairo_t* context = as_cairo_context(INPUT(0));
+    float x1(0), y1(0), x2(0), y2(0);
+    get_rect(INPUT(1), &x1, &y1, &x2, &y2);
+    cairo_rectangle(context, x1, y1, x2-x1, y2-y1);
+}
+CA_FUNCTION(cairo__Context_line_to)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     float x(0), y(0);
@@ -211,7 +214,7 @@ CA_FUNCTION(line_to)
     cairo_line_to(context, x, y);
     set_null(OUTPUT);
 }
-CA_FUNCTION(arc)
+CA_FUNCTION(cairo__Context_arc)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     float center_x(0), center_y(0);
@@ -221,23 +224,23 @@ CA_FUNCTION(arc)
         degrees_to_radians(FLOAT_INPUT(3)),
         degrees_to_radians(FLOAT_INPUT(4)));
 }
-CA_FUNCTION(new_sub_path)
+CA_FUNCTION(cairo__Context_new_sub_path)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_new_sub_path(context);
 }
-CA_FUNCTION(close_path)
+CA_FUNCTION(cairo__Context_close_path)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_close_path(context);
 }
-CA_FUNCTION(set_line_width)
+CA_FUNCTION(cairo__Context_set_line_width)
 {
     cairo_t* context = as_cairo_context(INPUT(0));
     cairo_set_line_width(context, to_float(INPUT(1)));
     set_null(OUTPUT);
 }
-CA_FUNCTION(upload_surface_to_opengl)
+CA_FUNCTION(cairo__upload_surface_to_opengl)
 {
     cairo_surface_t* surface = as_cairo_surface(INPUT(0));
     int texture_id = as_int(INPUT(1));
@@ -276,13 +279,11 @@ CA_FUNCTION(upload_surface_to_opengl)
     set_null(OUTPUT);
 }
 
-void setup(Branch& kernel)
+void on_load(Branch* branch)
 {
-    Branch& ns = nested_contents(kernel["cairo"]);
-
-    g_cairoContext_t = get_declared_type(&ns, "Context");
-    g_cairoSurface_t = get_declared_type(&ns, "Surface");
-    g_cairoFontFace_t = get_declared_type(&ns, "FontFace");
+    g_cairoContext_t = get_declared_type(branch, "cairo:Context");
+    g_cairoSurface_t = get_declared_type(branch, "cairo:Surface");
+    g_cairoFontFace_t = get_declared_type(branch, "cairo:FontFace");
 
     g_cairoContext_t->copy = cairoContext_copy;
     g_cairoContext_t->release = cairoContext_release;
@@ -291,6 +292,7 @@ void setup(Branch& kernel)
     g_cairoFontFace_t->copy = cairoFontFace_copy;
     g_cairoFontFace_t->release = cairoFontFace_release;
 
+#if 0
     install_function(ns["create_context_for_surface"], create_context_for_surface);
     install_function(ns["Context.save"], save);
     install_function(ns["Context.restore"], restore);
@@ -317,6 +319,7 @@ void setup(Branch& kernel)
     install_function(ns["Context.close_path"], close_path);
     install_function(ns["Context.set_line_width"], set_line_width);
     install_function(ns["upload_surface_to_opengl"], upload_surface_to_opengl);
+#endif
 }
 
-} // namespace cairo_support
+} // extern "C"

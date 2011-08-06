@@ -1,5 +1,7 @@
 
 -- cairo bindings
+patch_with_dll(reflect:this_branch(), 'cairo' -> rpath)
+
 namespace cairo
     type Context;
     type Surface;
@@ -41,7 +43,6 @@ namespace cairo
     def Context.arc(self, Point center, number radius, number angle1, number angle2)
     def Context.new_sub_path(self)
     def Context.close_path(self)
-
     def Context.set_line_width(self, number width)
 
     -- Rendering
@@ -51,22 +52,15 @@ namespace cairo
     def upload_surface_to_opengl(Surface surface, int texture_id)
 
     -- Helper functions
-    def draw_command_list(List commandList, Point_i bufferSize, Point location)
+    def use_render_function(any func, Point_i bufferSize, Point location, bool redraw)
         state texture = opengl:new_texture_handle()
 
-        if changed(commandList) or changed(bufferSize)
+        if redraw or changed(bufferSize)
             s = cairo:create_image_surface(bufferSize)
             cr = cairo:create_context_for_surface(s)
 
-            -- run the command list
-            for command in commandList
-                List(@command)
-                func = command[0]
-                args = command.slice(1, command.length())
-
-                args.insert(0, cr)
-
-                dynamic_call(func args)
+            -- run the draw function
+            dynamic_call(func [cr])
 
             cairo:upload_surface_to_opengl(s texture)
 

@@ -164,27 +164,12 @@ def use_sdl(env):
     env.Append(LIBS = [circa_libs[variant_name]])
     env.Append(LINKFLAGS = ["-all_load"])
 
-def use_fmod(env):
-    base = 'build/deps/fmod/api/'
-    env.Append(CPPPATH=[base + 'inc'])
-    #env.Append(LINKFLAGS=['-arch','i386','-arch','ppc','-arch','x86_64'])
-    #env.Append(LINKFLAGS=['-l'+ base + 'lib/libfmodex.dylib'])
-    env.Append(LIBPATH=[base + 'lib'])
-    env.Append(LIBS=['fmodex'])
-
-def use_cairo(env):
-    env.Append(CPPPATH="/usr/local/Cellar/cairo/1.10.2/include")
-    env.Append(LIBPATH="/usr/local/Cellar/cairo/1.10.2/lib")
-    env.Append(LIBS=['cairo'])
-
 # Define plastic targets at build/plas_x
 for env in all_envs:
     env = env.Clone()
     variantName = env['variant_name']
     env.VariantDir('build/'+variantName+'/plastic/src', 'plastic/src')
     use_sdl(env)
-    #use_fmod(env)
-    use_cairo(env)
 
     source_files = list_source_files('plastic/src')
 
