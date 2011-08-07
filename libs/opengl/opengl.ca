@@ -1,5 +1,18 @@
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+-- Copyright (c) Paul Hodge. See LICENSE file for license terms.
+
+patch_with_dll(reflect:this_branch(), 'opengl' -> rpath)
 
 namespace opengl
     def new_texture_handle() -> int
     def draw_texture_as_quad(int texid, Rect rect)
+    def load_shader(string vertShaderFile, string fragShaderFile) -> int
+    def reload_shader(string vertShaderFile, string fragShaderFile) -> int
+        state shader = null
+        if file_changed(vertShaderFile) or file_changed(fragShaderFile)
+            shader = load_shader(vertShaderFile, fragShaderFile)
+        return shader
+    def get_uniform_location(int shader, string name) -> int
+    def uniform(int shader, number value)
+    def shader_quad(int shader, Rect quad, List uniforms)
+        trace('unpatched')
+

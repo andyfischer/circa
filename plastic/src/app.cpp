@@ -11,10 +11,6 @@
 #include "postprocess.h"
 #include "text.h"
 
-// For now, include the 3rd party bindings by source. Long term plan is for these
-// to each be compiled as a separate module.
-#include "../libs/opengl/opengl.cpp"
-
 #if PLASTIC_USE_FMOD
 #include "../libs/fmod/fmod.cpp"
 #endif
@@ -205,8 +201,6 @@ bool setup_functions(circa::Branch& runtime)
 #if PLASTIC_USE_FMOD
     fmod_support::setup(runtime);
 #endif
-
-    opengl_support::setup(runtime);
 
     return true;
 }

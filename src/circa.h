@@ -22,6 +22,7 @@
 #include "importing.h"
 #include "importing_macros.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "locals.h"
 #include "names.h"
 #include "parser.h"
@@ -45,4 +46,5 @@
 #include "types/handle.h"
 #include "types/list.h"
 #include "types/point.h"
+#include "types/rect.h"
 #include "types/ref.h"

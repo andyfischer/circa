@@ -1,8 +1,7 @@
 
 CFLAGS = -I${CIRCA_HOME}/src -rdynamic -DOSX
-LINKFLAGS = -lbox2d
 
-MODULE_NAME = box2d
+MODULE_NAME = opengl
 
 SOURCES = ${MODULE_NAME}.cpp
 
