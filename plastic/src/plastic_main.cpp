@@ -11,7 +11,6 @@
 #include "gl_util.h"
 #include "ide.h"
 #include "input.h"
-#include "mesh.h"
 #include "postprocess.h"
 #include "text.h"
 

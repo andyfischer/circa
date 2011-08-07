@@ -7,7 +7,6 @@
 #include "gl_shapes.h"
 #include "ide.h"
 #include "input.h"
-#include "mesh.h"
 #include "postprocess.h"
 #include "text.h"
 
@@ -194,7 +193,6 @@ bool setup_functions(circa::Branch& runtime)
 #ifdef PLASTIC_USE_SDL
     postprocess_functions::setup(branch);
     input::setup(branch);
-    mesh::setup(branch);
     text::setup(branch);
 #endif
 
