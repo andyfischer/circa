@@ -1,0 +1,80 @@
+
+background(#fff)
+
+type RopeSegment {
+  Point start
+  Point direction
+
+  Point mouseForces
+  Point momentum
+}
+
+state List rope
+
+gravity = [0 0]
+
+if rope == []
+    y = 30.0
+    for i in 0..20
+        x = i * 20
+        len = 20.0
+        new_segment = [[x y] [len, 0] [0 0] [0 0]] -> RopeSegment
+        rope.append(new_segment)
+
+def draw_rope(List rope)
+    width = 10.0
+    for s in rope
+        RopeSegment(@s)
+        start = s.start
+        fin = start + s.direction
+        perp = norm(perpendicular(s.direction))
+        p1 = start + perp * width / 2
+        p2 = fin + perp * width / 2
+        p3 = fin - perp * width / 2
+        p4 = start - perp * width / 2
+        gl:line_loop([p1 p2 p3 p4] #000)
+        line(start fin #f00)
+
+def drag_rope(List rope) -> List
+    index = 0
+    closestDistance = 99999.0
+    closestIndex = 0
+    for s in rope
+        RopeSegment(@s)
+        center = s.start + (s.direction * 0.5)
+
+        dist = magnitude(Point(mouse - center))
+        
+        if dist < closestDistance
+            closestIndex = index
+            closestDistance = dist
+
+        index += 1
+
+    trace(closestDistance)
+
+    index = 0
+    for s in @rope
+        RopeSegment(@s)
+        if closestDistance < 10.0 and index == closestIndex
+            mouse_delta = [delta(mouse.x) delta(mouse.y)] -> Point
+            s.mouseForces = mouse_delta
+        else
+            s.mouseForces = [0 0]
+        index += 1
+
+    return rope
+
+def rope_physics(List rope) -> List
+    for s in @rope
+        RopeSegment(@s)
+
+        s.momentum += gravity * td
+        s.start += s.momentum + s.mouseForces
+
+    return rope
+
+        
+draw_rope(rope)
+drag_rope(@rope)
+rope_physics(@rope)

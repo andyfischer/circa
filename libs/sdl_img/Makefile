@@ -1,5 +1,5 @@
 
-CFLAGS = -I${CIRCA_HOME}/src -rdynamic `sdl-config --cflags` `sdl-config --libs`
+CFLAGS = -I${CIRCA_HOME}/src -rdynamic -DOSX `sdl-config --cflags` `sdl-config --libs`
 
 # the "-undefined dynamic_lookup" flag is a Darwin thing
 

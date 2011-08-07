@@ -1,27 +1,14 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "../shared/opengl.h"
+
 #include <SDL_image.h>
-#include <OpenGL/glu.h>
-#include <OpenGL/glext.h>
+
+#include "Image.h"
 
 #include "circa.h"
 
 using namespace circa;
-
-struct Image
-{
-    int width;
-    int height;
-    char* pixels;
-    GLenum pixelFormat;
-    GLenum internalFormat;
-
-    Image() : pixels(NULL) {
-    }
-    ~Image() {
-        free(pixels);
-    }
-};
 
 struct ImageTexture
 {

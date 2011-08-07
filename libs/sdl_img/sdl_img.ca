@@ -9,6 +9,10 @@ namespace sdl_img
     def load_image_to_texture(Image image) -> ImageTexture
     def ImageTexture.draw(tex, Point p)
 
+    def Image.draw(image, Point p)
+        state texture = load_image_to_texture(image)
+        texture.draw(p)
+
     def draw_image(string filename, Point p)
         state texture = null
         if file_changed(filename)

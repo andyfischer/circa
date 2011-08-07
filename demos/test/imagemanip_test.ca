@@ -1,0 +1,10 @@
+
+include('libs/imagemanip/imagemanip.ca')
+
+background(#fff)
+
+ship = sdl_img:load_image('airship_phastings.jpeg')
+
+imagemanip:warp(ship)
+
+sdl_img:load_image_to_texture(ship).draw([0 0])

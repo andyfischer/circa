@@ -1,0 +1,17 @@
+
+Type philosophy:
+
+ - Type names are optional
+ - Compiler will find inferred types whenever possible
+ - The user should use explicit type names when:
+   - The compiler isn't able to do inferrence, and needs some help
+   - To act as an assertion
+
+Types are needed:
+ - To resolve overloaded functions
+ - To raise static errors around bad function usage
+ - Hints for code optimization
+ - Hints for editor
+ - Displayed during introspection
+ - Garbage collection, deallocation
+
