@@ -145,4 +145,6 @@ namespace handle_t {
     }
 
 } // namespace handle_t
+
+
 } // namespace circa

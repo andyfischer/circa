@@ -3,16 +3,37 @@
 patch_with_dll(reflect:this_branch(), 'opengl' -> rpath)
 
 namespace opengl
+    def draw_quad(Rect rect)
+
+    -- Textures
     def new_texture_handle() -> int
     def draw_texture_as_quad(int texid, Rect rect)
+    def activeTexture(int index)
+    def bind_texture(int tex_id)
+
+    -- Shaders
     def load_shader(string vertShaderFile, string fragShaderFile) -> int
+    def load_shader_text(string vertShader, string fragShader) -> int
     def reload_shader(string vertShaderFile, string fragShaderFile) -> int
-        state shader = null
+        state program = null
         if file_changed(vertShaderFile) or file_changed(fragShaderFile)
-            shader = load_shader(vertShaderFile, fragShaderFile)
-        return shader
-    def get_uniform_location(int shader, string name) -> int
-    def uniform(int shader, number value)
-    def shader_quad(int shader, Rect quad, List uniforms)
-        trace('unpatched')
+            program = load_shader(vertShaderFile, fragShaderFile)
+        return program
+    def reload_shader_text(string vertShader, string fragShader) -> int
+        state program = null
+        if changed(vertShader) or changed(fragShader)
+            program = load_shader_text(vertShader, fragShader)
+        return program
+    def get_uniform_location(int program, string name) -> int
+    def uniform(int program, number value)
+    def use_program(int program)
+    def shader_quad(int program, Rect quad, List uniforms)
+
+    -- FBOs
+    type FrameBuffer;
+    def generate_frame_buffer(Point p) -> FrameBuffer
+    def FrameBuffer.bind(buffer)
+    def FrameBuffer.draw_quad(buffer, Rect quad, int uniform)
+    def FrameBuffer.get_tex_id(buffer) -> int
+    def bind_main_frame_buffer()
 

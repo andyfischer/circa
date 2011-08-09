@@ -118,16 +118,6 @@ namespace gl
     def circle(Point loc, number radius, Color) "Render a circle."
     def pie(Point loc, number radius, number angle_start, number angle_fin, Color)
         "Render a pie slice."
-    def load_program(string vertFile, string fragFile) -> int
-    def _use_program(int prog_id)
-    def use_program(string vertexFilename, string fragFilename)
-        "Load and enable a GLSL shader."
-        state int prog_id = 0
-        if file_changed(vertexFilename) or file_changed(fragFilename)
-            prog_id = load_program(vertexFilename, fragFilename)
-        _use_program(prog_id)
-    def clear_program()
-    def set_uniform(string name, any value)
 
 -- Audio
 type Sound;
@@ -145,12 +135,6 @@ def delta_point(Point p) -> Point
     result = p - prev
     prev = p
     return result
-
-def load_mesh(string filename) -> int
-    "(experimental) Load a 3d mesh from an .obj file."
-def draw_mesh(int mesh_id, int tex_id, Point translation, Point scale, Point rotation)
-    "(experimental) Draw a 3d mesh to the screen."
-
 
 -- Drawing utils
 include(rpath('vector_drawing.ca'))

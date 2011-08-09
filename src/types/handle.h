@@ -44,4 +44,13 @@ namespace handle_t {
     }
 
 } // namespace handle_t
+
+template <typename T>
+Type* setup_type_as_handle(Branch* branch, const char* name)
+{
+    Type* type = get_declared_type(branch, name);
+    handle_t::setup_type<T>(type);
+    return type;
+}
+
 } // namespace circa

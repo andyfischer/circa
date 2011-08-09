@@ -15,6 +15,11 @@ struct ImageTexture
     int width;
     int height;
     GLuint textureId;
+
+    ~ImageTexture() {
+        if (textureId != 0)
+            glDeleteTextures(1, &textureId);
+    }
 };
 
 Type* g_image_t;
