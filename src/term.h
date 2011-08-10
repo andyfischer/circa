@@ -132,9 +132,6 @@ struct Term : TaggedValue
 
     std::string toString();
 
-    // Returns the named property
-    TaggedValue* property(std::string const& name);
-
     bool hasProperty(std::string const& name);
     TaggedValue* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
@@ -159,12 +156,14 @@ struct Term : TaggedValue
 Term* alloc_term();
 void dealloc_term(Term*);
 
+// Fetches a term property.
+TaggedValue* term_get_property(Term* term, const char* name);
+
 // Assigns a property with the given name and value. The argument 'value' is
 // consumed.
 void term_set_property(Term* term, const char* name, TaggedValue* value);
 
-TaggedValue* term_get_property(Term* term, const char* name);
-
+// Removes a term property.
 void term_remove_property(Term* term, const char* name);
 
 // Removes the property with the given name from 'source', and assigns that

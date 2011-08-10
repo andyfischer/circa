@@ -148,11 +148,6 @@ Term::toString()
     return to_string(this);
 }
 
-TaggedValue* Term::property(std::string const& name)
-{
-    return properties.get(name.c_str());
-}
-
 bool Term::hasProperty(std::string const& name)
 {
     return properties.contains(name.c_str());
@@ -223,25 +218,37 @@ void Term::setStringProp(std::string const& name, std::string const& s)
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)
 {
-    if (hasProperty(name)) return boolProp(name);
-    else return defaultValue;
+    TaggedValue* value = term_get_property(this, name.c_str());
+    if (value == NULL)
+        return defaultValue;
+    else
+        return as_bool(value);
 }
 
 float Term::floatPropOptional(std::string const& name, float defaultValue)
 {
-    if (hasProperty(name)) return floatProp(name);
-    else return defaultValue;
+    TaggedValue* value = term_get_property(this, name.c_str());
+    if (value == NULL)
+        return defaultValue;
+    else
+        return as_float(value);
 }
 
 int Term::intPropOptional(std::string const& name, int defaultValue)
 {
-    if (hasProperty(name)) return intProp(name);
-    else return defaultValue;
+    TaggedValue* value = term_get_property(this, name.c_str());
+    if (value == NULL)
+        return defaultValue;
+    else
+        return as_int(value);
 }
 std::string Term::stringPropOptional(std::string const& name, std::string const& defaultValue)
 {
-    if (hasProperty(name)) return stringProp(name);
-    else return defaultValue;
+    TaggedValue* value = term_get_property(this, name.c_str());
+    if (value == NULL)
+        return defaultValue;
+    else
+        return as_string(value);
 }
 
 Term* alloc_term()
