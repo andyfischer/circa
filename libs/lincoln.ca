@@ -155,7 +155,7 @@ def draw_config_list(cairo:Context cr)
         Ref term
     }
 
-    cr.set_font_size(12.0)
+    cr.set_font_size(16.0)
 
     -- Loop through each config and get layout
     content_height = 0.0
@@ -258,10 +258,24 @@ namespace post_frame
 
     opengl:draw_texture_as_quad(texture to_rect([0 0] window_size))
 
-namespace osc_support
-    for msg in osc:listen(8000)
-        name = msg[0] -> string
-        value = msg[1] -> number
+namespace lincoln
+    def default_control(Branch branch)
+        if key_pressed('5')
+            trace('redrawing')
+            send('lincoln.should_redraw', true)
 
-        send('tweak_events', delta(value) * 100)
+        if key_pressed('1')
+            trace('listing configs..')
+            send('lincoln.current_mode', 1)
+            send('lincoln.config_list', branch.list_configs())
+
+        if key_pressed('3')
+            send('lincoln.current_mode', 0)
+
+    def osc_listen()
+        for msg in osc:listen(8000)
+            name = msg[0] -> string
+            value = msg[1] -> number
+
+            send('tweak_events', delta(value) * 100)
 

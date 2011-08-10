@@ -270,3 +270,7 @@ for particle in @particles
 
     if particle.age > max_particle_age
         discard
+
+-- lincoln UI
+include('libs/lincoln.ca')
+lincoln:default_control(reflect:this_branch())
