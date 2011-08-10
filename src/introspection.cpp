@@ -250,8 +250,11 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     for (int i=0; i < term->numInputs(); i++) {
         if (i != 0) out << " ";
         out << global_id(term->input(i));
-        out << "#" << term->inputs[i].outputIndex;
-        out << ":" << term->inputIsns.inputs[i].type;
+        
+        int outputIndex = term->inputs[i].outputIndex;
+        if (outputIndex != 0)
+            out << "#" << outputIndex;
+        //out << ":" << term->inputIsns.inputs[i].type;
     }
     out << ")";
 

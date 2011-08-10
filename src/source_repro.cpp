@@ -205,11 +205,20 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, ")", term, token::RPAREN);
 }
 
+
 void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
+{
+    const char* defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
+    const char* defaultPre = inputIndex > 0 ? " " : "";
+    format_source_for_input(source, term, inputIndex, defaultPre, defaultPost);
+}
+void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
+        const char* defaultPre, const char* defaultPost)
 {
     Term* input = term->input(inputIndex);
 
-    if (input == NULL) return;
+    if (input == NULL)
+        return;
 
     bool methodCall =
         term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
@@ -222,9 +231,6 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
     int visibleIndex = inputIndex - firstVisible;
     if (methodCall)
         visibleIndex--;
-
-    std::string defaultPre = visibleIndex > 0 ? " " : "";
-    std::string defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
 
     if (methodCall && inputIndex == 0)
         defaultPost = "";
@@ -243,9 +249,9 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
     if (input->name != "" && function_call_rebinds_input(term, inputIndex)) 
         append_phrase(source, "&", term, token::AMPERSAND);
 
-    bool byTaggedValue = input->name == "";
+    bool byValue = input->name == "";
 
-    if (byTaggedValue) {
+    if (byValue) {
         format_term_source(source, input);
     } else {
         append_phrase(source, get_relative_name(term, input), term, phrase_type::TERM_NAME);

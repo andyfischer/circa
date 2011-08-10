@@ -1297,6 +1297,8 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
                 // Example: a[0] += 1
                 else {
                     Term* assignTerm = apply(branch, ASSIGN_FUNC, TermList(leftExpr.term, term));
+                    assignTerm->setBoolProp("syntax:rebindOperator", true);
+                    term_move_property(assignTerm->input(1), assignTerm, "syntax:input-0:postWhitespace");
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
                     if (lexprRoot != NULL && lexprRoot->name != "")
                         branch.bindName(assignTerm, lexprRoot->name);

@@ -301,4 +301,25 @@ void term_check_invariants(List* errors, Term* term)
     }
 }
 
+void term_set_property(Term* term, const char* name, TaggedValue* value)
+{
+    swap(value, term->properties.insert(name));
+}
+TaggedValue* term_get_property(Term* term, const char* name)
+{
+    return term->properties[name];
+}
+void term_remove_property(Term* term, const char* name)
+{
+    term->properties.remove(name);
+}
+void term_move_property(Term* from, Term* to, const char* propName)
+{
+    if (!from->hasProperty(propName))
+        return;
+
+    term_set_property(to, propName, term_get_property(from, propName));
+    term_remove_property(from, propName);
+}
+
 } // namespace circa

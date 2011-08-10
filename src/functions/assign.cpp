@@ -24,6 +24,24 @@ namespace assign_function {
             return &ANY_T;
     }
 
+    void formatSource(StyledSource* source, Term* term)
+    {
+        format_source_for_input(source, term, 0, "", "");
+
+        //append_phrase(source, "$", term, phrase_type::UNDEFINED);
+
+        Term* rhs = term->input(1);
+
+        if (term->boolPropOptional("syntax:rebindOperator", false)) {
+            append_phrase(source, rhs->stringPropOptional("syntax:functionName", ""),
+                rhs, phrase_type::UNDEFINED);
+            format_source_for_input(source, rhs, 1, "", "");
+        } else {
+            append_phrase(source, "=", term, phrase_type::UNDEFINED);
+            format_source_for_input(source, term, 1, "", "");
+        }
+    }
+
     Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredTaggedValue)
     {
         Term* set = NULL;
@@ -99,6 +117,7 @@ namespace assign_function {
     {
         ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
         get_function_attrs(ASSIGN_FUNC)->specializeType = specializeType;
+        get_function_attrs(ASSIGN_FUNC)->formatSource = formatSource;
         get_function_attrs(ASSIGN_FUNC)->postInputChange = postInputChange;
     }
 }

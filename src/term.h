@@ -159,4 +159,16 @@ struct Term : TaggedValue
 Term* alloc_term();
 void dealloc_term(Term*);
 
+// Assigns a property with the given name and value. The argument 'value' is
+// consumed.
+void term_set_property(Term* term, const char* name, TaggedValue* value);
+
+TaggedValue* term_get_property(Term* term, const char* name);
+
+void term_remove_property(Term* term, const char* name);
+
+// Removes the property with the given name from 'source', and assigns that
+// property to 'dest'. Has no effect if 'source' does not have the property.
+void term_move_property(Term* source, Term* dest, const char* propName);
+
 } // namespace circa

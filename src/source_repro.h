@@ -40,7 +40,12 @@ std::string unformat_rich_source(StyledSource* source);
 
 void format_term_source(StyledSource* source, Term* term);
 void format_term_source_default_formatting(StyledSource* source, Term* term);
+
+// Formats source for the given input, as used by the term.
 void format_source_for_input(StyledSource* source, Term* term, int inputIndex);
+void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
+        const char* defaultPre, const char* defaultPost);
+
 void format_name_binding(StyledSource* source, Term* term);
 
 void append_phrase(StyledSource* source, const char* str, Term* term, int type);

@@ -191,6 +191,15 @@ void reproduce_rebinding() {
     round_trip_source("a *= 5*3+1");
     round_trip_source("  a -= 5*3+1");
     round_trip_source("a /= 5*3+1  ");
+    round_trip_source("a.b += 1");
+    round_trip_source("a.b   += 1");
+    round_trip_source("a.b +=   1");
+    round_trip_source("p = Point(); p.x += 1.0");
+    round_trip_source("p = Point(); p.x   += 1.0");
+    round_trip_source("p = Point(); p.x +=   1.0");
+    round_trip_source("p = Point(); p.x = 1.0");
+    round_trip_source("p = Point(); p.x   = 1.0");
+    round_trip_source("p = Point(); p.x =   1.0");
     finish_source_repro_category();
 }
 
