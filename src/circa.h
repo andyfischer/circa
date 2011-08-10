@@ -27,7 +27,6 @@
 #include "names.h"
 #include "parser.h"
 #include "refactoring.h"
-#include "repl.h"
 #include "stateful_code.h"
 #include "static_checking.h"
 #include "source_repro.h"

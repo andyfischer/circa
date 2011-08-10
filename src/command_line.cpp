@@ -5,18 +5,17 @@
 #include "building.h"
 #include "builtins.h"
 #include "codegen.h"
-#include "debugger_repl.h"
 #include "errors.h"
 #include "evaluation.h"
 #include "feedback.h"
 #include "introspection.h"
 #include "parser.h"
-#include "repl.h"
 #include "source_repro.h"
 #include "static_checking.h"
 #include "testing.h"
 
-extern "C" int EXPORTED_INT;
+#include "tools/debugger_repl.h"
+#include "tools/repl.h"
 
 namespace circa {
 

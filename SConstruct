@@ -83,8 +83,8 @@ for env in all_envs:
 
     generatedFiles = ['generated/'+filename for filename in list_source_files('src/generated')]
 
-
     source_files = (list_source_files('src')
+        + ['tools/'+filename for filename in list_source_files('src/tools')]
         + ['generated/'+filename for filename in list_source_files('src/generated')])
 
     source_files.remove('main.cpp')
