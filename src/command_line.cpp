@@ -15,6 +15,7 @@
 #include "testing.h"
 
 #include "tools/debugger_repl.h"
+#include "tools/file_checker.h"
 #include "tools/repl.h"
 
 namespace circa {
@@ -23,17 +24,18 @@ void print_usage()
 {
     std::cout <<
         "Usage:\n"
-        "  circa <filename>      : Evaluate the given Circa source file\n"
-        "  circa -repl           : Start an interactive read-eval-print-loop\n"
-        "  circa -e <expression> : Evaluate an expression on the command line\n"
-        "  circa -test           : Run unit tests\n"
-        "  circa -test <name>    : Run unit test of a certain name\n"
-        "  circa -list-tests     : List every unit test name\n"
-        "  circa -p <filename>   : Show the raw display of a source file\n"
-        "  circa -ep <filename>  : Evaluate a source file and then show raw display\n"
-        "  circa -pp <filename>  : Like -p but also print term properties\n"
-        "  circa -s <filename>   : Compile the source file and reproduce its source code\n";
-    std::cout << std::endl;
+        "  circa <filename>        : Evaluate the given Circa source file\n"
+        "  circa -repl             : Start an interactive read-eval-print-loop\n"
+        "  circa -e <expression>   : Evaluate an expression on the command line\n"
+        "  circa -test             : Run unit tests\n"
+        "  circa -test <name>      : Run unit test of a certain name\n"
+        "  circa -list-tests       : List every unit test name\n"
+        "  circa -p <filename>     : Show the raw display of a source file\n"
+        "  circa -ep <filename>    : Evaluate a source file and then show raw display\n"
+        "  circa -pp <filename>    : Like -p but also print term properties\n"
+        "  circa -s <filename>     : Compile the source file and reproduce its source code\n"
+        "  circa -check <filename> : Statically check the script for any errors\n"
+        << std::endl;
 }
 
 int run_command_line(std::vector<std::string> args)
@@ -123,18 +125,12 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Start repl
-    if (args[0] == "-repl") {
-        start_repl();
-        return 0;
-    }
+    if (args[0] == "-repl")
+        return run_repl();
 
     // Start debugger repl
-    if (args[0] == "-d") {
-        std::string filename;
-        if (args.size() > 0) filename = args[1];
-        start_debugger_repl(filename);
-        return 0;
-    }
+    if (args[0] == "-d")
+        return run_debugger_repl(args[1]);
 
     // Do a feedback test
     #if 0
@@ -179,6 +175,10 @@ int run_command_line(std::vector<std::string> args)
 
         return 0;
     }
+
+    // Run file checker
+    if (args[0] == "-check")
+        return run_file_checker(args[1].c_str());
 
     // Otherwise, run script
     Branch& main_branch = create_branch(kernel());

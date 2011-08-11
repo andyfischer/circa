@@ -55,7 +55,7 @@ void repl_evaluate_line(Branch& branch, std::string const& input, std::ostream& 
     }
 }
 
-void start_repl()
+int run_repl()
 {
     Branch replState;
     bool displayRaw = false;
@@ -102,6 +102,8 @@ void start_repl()
             }
         }
     }
+
+    return 0;
 }
 
 } // namespace circa

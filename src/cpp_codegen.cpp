@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #include "branch.h"
 #include "cpp_codegen.h"
 #include "function.h"

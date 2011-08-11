@@ -44,6 +44,10 @@ struct List : TaggedValue
 
     void removeNulls();
 
+    // Convenience methods
+    void appendString(const char* str);
+    void appendString(const std::string& str);
+
     static List* checkCast(TaggedValue* v);
     static List* lazyCast(TaggedValue* v);
     static List* cast(TaggedValue* v, int length);

@@ -94,7 +94,7 @@ namespace filesystem_storage
     {
         FILE* fp = fopen(filename, "r");
         if (fp == NULL)
-            return receiveFile(context, NULL, "fopen returned NULL");
+            return receiveFile(context, NULL, "couldn't read file");
 
         // get file size
         fseek(fp, 0, SEEK_END);

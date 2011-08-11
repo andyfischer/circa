@@ -29,6 +29,9 @@ void write_text_file(const char* filename, const char* contents);
 time_t get_modified_time(const char* filename);
 bool file_exists(const char* filename);
 
+// Read the filename as a text file, and write the entire contents to 'contents' as a
+// string. If there are any problems, and 'error' is non-NULL, then an error message is
+// written to 'error'. (The caller can ignore errors by passing NULL for 'error').
 void read_text_file_to_value(const char* filename, TaggedValue* contents, TaggedValue* error);
 std::string read_text_file_as_str(const char* filename);
 

@@ -447,6 +447,20 @@ List::removeNulls()
 {
     list_remove_nulls(this);
 }
+void
+List::appendString(const char* str)
+{
+    TaggedValue val;
+    set_string(&val, str);
+    swap(&val, append());
+}
+void
+List::appendString(const std::string& str)
+{
+    TaggedValue val;
+    set_string(&val, str);
+    swap(&val, append());
+}
 
 List*
 List::checkCast(TaggedValue* v)

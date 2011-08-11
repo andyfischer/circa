@@ -2,6 +2,6 @@
 
 namespace circa {
 
-void start_debugger_repl(std::string const& filename);
+int run_debugger_repl(std::string const& filename);
 
 } // namespace circa

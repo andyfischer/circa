@@ -21,7 +21,7 @@ static void load(Branch& branch, std::string const& filename)
         print_static_errors_formatted(branch, std::cout);
 }
 
-void start_debugger_repl(std::string const& filename)
+int run_debugger_repl(std::string const& filename)
 {
     Branch branch;
 
@@ -56,6 +56,8 @@ void start_debugger_repl(std::string const& filename)
 
         std::cout << "unrecognized command: " << input << std::endl;
     }
+
+    return 0;
 }
 
 } // namespace circa
