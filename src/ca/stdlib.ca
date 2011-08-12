@@ -36,7 +36,7 @@ def toggle(bool tog) -> bool
     with (true), the result flips. Starts out false.
     >>>
     state bool s = false
-    if tog; s = not(s)
+    if tog { s = not(s) }
     return s
 
 def approach(number target, number maximum_change) -> number
@@ -112,7 +112,7 @@ def point_distance(Point a, Point b) -> number
 
 def rotate_point(Point p, number rotation) -> Point
     "Rotate p around [0,0] by the given angle."
-    return ([p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)])
+    return [p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)]
 
 def random_norm_vector() -> Point
     "Return a random normalized vector"

@@ -2,7 +2,7 @@
 -- In this test, we have a recursive function 'tree' which writes a tree
 -- data structure to 'out'.
 
-def tree(int depth, List leaves +out)
+def tree(int depth, List leaves :out)
     leaves.append(depth)
     
     if depth >= 3
@@ -13,4 +13,4 @@ def tree(int depth, List leaves +out)
 leaves = []
 tree(0, &leaves)
 
-print(leaves)
+assert(leaves == [0 1 2 3])
