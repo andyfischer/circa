@@ -57,7 +57,6 @@ namespace function_attrs_t {
 namespace function_t {
 
     std::string to_string(Term* term);
-    std::string get_header_source(Term* term);
     void format_header_source(StyledSource* source, Term* term);
 
     bool check_invariants(Term* term, std::string* failureMessage);

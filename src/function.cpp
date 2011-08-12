@@ -70,53 +70,6 @@ namespace function_t {
         return "<Function " + function_t::get_name(term) + ">";
     }
 
-    std::string get_header_source(Term* term)
-    {
-        std::stringstream out;
-
-        out << term->name;
-
-        out << term->stringPropOptional("syntax:postNameWs", "");
-        out << term->stringPropOptional("syntax:properties", "");
-
-        out << "(";
-
-        bool first = true;
-        int numInputs = function_t::num_inputs(term);
-        for (int i=0; i < numInputs; i++) {
-            std::string name = function_t::get_input_name(term, i);
-
-            if (name == "#state")
-                continue;
-
-            Term* input = function_t::get_input_placeholder(term, i);
-
-            if (input->boolPropOptional("state", false))
-                out << "state ";
-
-            if (!first) out << ", ";
-            first = false;
-            out << function_t::get_input_type(term, i)->name;
-
-            if (name != "" && name[0] != '#')
-                out << " " << name;
-        }
-
-        if (function_t::get_variable_args(term))
-            out << "...";
-
-        out << ")";
-
-        if (function_get_output_type(term, 0) != &VOID_T) {
-            out << term->stringPropOptional("syntax:whitespacePreColon", "");
-            out << "->";
-            out << term->stringPropOptional("syntax:whitespacePostColon", " ");
-            out << function_get_output_type(term, 0)->name;
-        }
-
-        return out.str();
-    }
-
     void format_header_source(StyledSource* source, Term* term)
     {
         append_phrase(source, term->name, term, phrase_type::TERM_NAME);
@@ -157,6 +110,11 @@ namespace function_t {
             if (function_can_rebind_input(term, i)) {
                 append_phrase(source, " ", term, token::WHITESPACE);
                 append_phrase(source, ":out", term, phrase_type::UNDEFINED);
+            }
+
+            if (input->boolPropOptional("meta", false)) {
+                append_phrase(source, " ", term, token::WHITESPACE);
+                append_phrase(source, ":meta", term, phrase_type::UNDEFINED);
             }
         }
 

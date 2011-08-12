@@ -183,6 +183,7 @@ void reproduce_methods() {
     round_trip_source("Map().add(1,2)");
     round_trip_source("Map().add(1, 2)");
     round_trip_source("Point().x = 1.0");
+    //round_trip_source("unknown.what()");
     finish_source_repro_category();
 }
 
@@ -291,6 +292,8 @@ void reproduce_subroutine_headers()
     round_trip_source("def f(int i) -> int;");
     //TEST_DISABLED round_trip_source("def f(NonexistantType i) -> int;");
     round_trip_source("def f(int i :out) -> int;");
+    round_trip_source("def f(int i :meta) -> int;");
+    // TODO: Test properties in any order
     finish_source_repro_category();
 }
 

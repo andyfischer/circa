@@ -51,9 +51,16 @@ bool hidden_from_documentation(Term* term)
     return false;
 }
 
+std::string get_header_source(Term* function)
+{
+    StyledSource styled;
+    function_t::format_header_source(&styled, function);
+    return unformat_rich_source(&styled);
+}
+
 void generate_docs_for_function(Term* func, std::stringstream &out)
 {
-    std::string header = function_t::get_header_source(func);
+    std::string header = get_header_source(func);
     std::string description = function_t::get_documentation(func);
     if (description == "") description = "No description provided";
 
