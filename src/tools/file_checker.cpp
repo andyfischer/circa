@@ -10,6 +10,7 @@
 #include "branch.h"
 #include "file_checker.h"
 #include "source_repro.h"
+#include "static_checking.h"
 #include "storage.h"
 #include "tagged_value.h"
 #include "types/list.h"
@@ -22,6 +23,14 @@ void run_file_checker(const char* filename, List* errors)
 {
     Branch branch;
     parse_script(branch, filename);
+
+    // Catch static errors
+    {
+        List staticErrors;
+        check_for_static_errors(&staticErrors, branch);
+        for (int i=0; i < staticErrors.length(); i++)
+            format_static_error(staticErrors[i], errors->append());
+    }
 
     // Fetch the file as a string
     std::string actualSource;
