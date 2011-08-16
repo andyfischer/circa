@@ -76,8 +76,6 @@ void check_term_for_static_error(List* errors, Term* term)
     if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
         return append_static_error(errors, term, "not_a_function");
 
-    // This next section includes expected parser errors
-
     // Unknown type
     if (term->function == UNKNOWN_TYPE_FUNC)
         return append_static_error(errors, term, "unknown_type");
