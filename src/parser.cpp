@@ -706,7 +706,8 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         if (!tokens.nextIs(IDENTIFIER))
             return compile_error_for_line(result, tokens, startPosition);
 
-        std::string fieldTypeName = tokens.consume(IDENTIFIER);
+        //std::string fieldTypeName = tokens.consume(IDENTIFIER);
+        Term* fieldType = type_expr(branch, tokens, context).term;
 
         std::string postNameWs = possible_whitespace(tokens);
 
@@ -715,7 +716,6 @@ ParseResult anonymous_type_decl(Branch& branch, TokenStream& tokens, ParserCxt* 
         if (tokens.nextIs(IDENTIFIER))
             fieldName = tokens.consume(IDENTIFIER);
 
-        Term* fieldType = find_type(branch, fieldTypeName);
 
         Term* field = create_value(contents, as_type(fieldType), fieldName);
 
@@ -2062,13 +2062,13 @@ Term* find_and_apply(Branch& branch,
     return apply(branch, function, inputs);
 }
 
-
 Term* find_type(Branch& branch, std::string const& name)
 {
     Term* result = find_named(branch, name);
 
     if (result == NULL) {
         result = apply(branch, UNKNOWN_TYPE_FUNC, TermList(), name);
+        //set_source_location(result, startPosition, tokens);
         ca_assert(result->type == &TYPE_T);
     }   
 
