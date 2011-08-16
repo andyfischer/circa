@@ -31,6 +31,8 @@ bool is_comment(Term* term);
 bool is_value(Term* term);
 bool is_hidden(Term* term);
 
+bool is_an_unknown_identifier(Term* term);
+
 // Checks if term->nestedContents is a major branch. A 'major' branch has its own stack
 // frame when executed.
 bool is_major_branch(Term* term);

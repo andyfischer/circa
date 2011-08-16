@@ -73,14 +73,10 @@ void check_term_for_static_error(List* errors, Term* term)
     for (int input=0; input < term->numInputs(); input++)
         check_input_for_static_error(errors, term, input);
 
-    if (!is_function(term->function))
+    if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
         return append_static_error(errors, term, "not_a_function");
 
     // This next section includes expected parser errors
-
-    // Unknown function
-    if (term->function == UNKNOWN_FUNCTION)
-        return append_static_error(errors, term, "unknown_function");
 
     // Unknown type
     if (term->function == UNKNOWN_TYPE_FUNC)
@@ -149,7 +145,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     
     // Convert 'type' to a readable string
     if (strcmp(type, "not_a_function") == 0)
-        out << "Unknown function: " << term->function->name;
+        out << "Not a function: " << term->function->name;
     else if (strcmp(type, "unknown_type") == 0)
         out << "Unknown type: " << term->name;
     else if (strcmp(type, "unknown_identifier") == 0)

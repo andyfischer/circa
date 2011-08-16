@@ -50,6 +50,11 @@ bool is_hidden(Term* term)
     return false;
 }
 
+bool is_an_unknown_identifier(Term* term)
+{
+    return term->function == UNKNOWN_IDENTIFIER_FUNC;
+}
+
 bool is_major_branch(Term* term)
 {
     return is_subroutine(term);

@@ -2055,7 +2055,10 @@ Term* find_and_apply(Branch& branch,
         std::string const& functionName,
         TermList const& inputs)
 {
-    Term* function = find_function(branch, functionName);
+    Term* function = find_named(branch, functionName);
+
+    if (function == NULL)
+        return unknown_identifier(branch, functionName).term;
 
     return apply(branch, function, inputs);
 }
@@ -2069,19 +2072,6 @@ Term* find_type(Branch& branch, std::string const& name)
         //set_source_location(result, startPosition, tokens);
         ca_assert(result->type == &TYPE_T);
     }   
-
-    return result;
-}
-
-Term* find_function(Branch& branch, std::string const& name)
-{
-    Term* result = find_named(branch, name);
-
-    if (result == NULL)
-        return UNKNOWN_FUNCTION;
-
-    if (!is_callable(result))
-        return UNKNOWN_FUNCTION;
 
     return result;
 }

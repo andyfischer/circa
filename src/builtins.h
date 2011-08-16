@@ -61,7 +61,6 @@ extern Term* SYMBOL_TYPE;
 extern Term* RANGE_FUNC;
 extern Term* REF_FUNC;
 extern Term* RETURN_FUNC;
-extern Term* UNKNOWN_FUNCTION;
 extern Term* UNKNOWN_FIELD_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;

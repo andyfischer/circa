@@ -27,15 +27,6 @@ void strip_error_location(std::string& s)
     s = s.substr(s.find_first_of("]") + 2, s.length());
 }
 
-void test_unknown_func()
-{
-    Branch branch;
-    Term* t = branch.compile("embiggen(1)");
-    std::string msg = get_static_error_message(t);
-    strip_error_location(msg);
-    test_equals(msg, "Unknown function: embiggen");
-}
-
 void test_unknown_type()
 {
     Branch branch;
@@ -114,7 +105,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(static_errors_tests::input_type_error);
     REGISTER_TEST_CASE(static_errors_tests::no_error);
-    REGISTER_TEST_CASE(static_errors_tests::test_unknown_func);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_type);
     REGISTER_TEST_CASE(static_errors_tests::test_unknown_identifier);
     REGISTER_TEST_CASE(static_errors_tests::wrong_input_count);
