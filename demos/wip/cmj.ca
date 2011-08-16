@@ -21,7 +21,7 @@ def cycle(int length) -> int
     counter += 1
     return result
 
-on every(1)
+if every(1)
     play_on_scale(0 major [0 2 4])
 
 switch_on_line (1)

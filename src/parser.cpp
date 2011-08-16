@@ -763,12 +763,12 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
             ca_assert(leadingToken != IF);
 
         // Otherwise expect 'elif' or 'else'
-        if (leadingToken != IF && leadingToken != ELIF && leadingToken != ELSE && leadingToken != ON)
+        if (leadingToken != IF && leadingToken != ELIF && leadingToken != ELSE)
             return compile_error_for_line(result, tokens, startPosition,
                     "Expected 'if' or 'elif' or 'else'");
         tokens.consume();
 
-        bool expectCondition = (leadingToken == IF || leadingToken == ELIF || leadingToken == ON);
+        bool expectCondition = (leadingToken == IF || leadingToken == ELIF);
 
         if (expectCondition) {
             possible_whitespace(tokens);
@@ -1118,8 +1118,6 @@ ParseResult expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
     ParseResult result;
 
     if (tokens.nextIs(IF))
-        result = if_block(branch, tokens, context);
-    else if (tokens.nextIs(ON))
         result = if_block(branch, tokens, context);
     else if (tokens.nextIs(FOR))
         result = for_block(branch, tokens, context);
