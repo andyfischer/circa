@@ -2,7 +2,7 @@
 
 #include "circa.h"
 
-#include "fake_filesystem.h"
+#include "filesystem_dummy.h"
 
 namespace circa {
 namespace names_tests {

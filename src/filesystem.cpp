@@ -9,7 +9,7 @@
 #include <sys/stat.h>
 
 #include "branch.h"
-#include "storage.h"
+#include "filesystem.h"
 #include "term.h"
 
 namespace circa {

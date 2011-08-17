@@ -2,8 +2,8 @@
 
 #include <circa.h>
 
-#include "fake_filesystem.h"
-#include "storage.h"
+#include "filesystem.h"
+#include "filesystem_dummy.h"
 #include "tagged_value.h"
 #include "type.h"
 #include "types/handle.h"

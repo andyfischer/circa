@@ -11,7 +11,7 @@
 // successful cases along side the failing cases.
 
 #include "circa.h"
-#include "fake_filesystem.h"
+#include "filesystem_dummy.h"
 
 namespace circa {
 namespace source_repro_snippets {
