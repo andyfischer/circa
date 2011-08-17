@@ -109,6 +109,9 @@ void test_namespace()
     remap[term2] = NULL;
     nspace.remapPointers(remap);
     test_assert(!nspace.contains("a"));
+
+    dealloc_term(term);
+    dealloc_term(term2);
 }
 
 void register_tests()

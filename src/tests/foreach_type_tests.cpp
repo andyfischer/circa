@@ -85,6 +85,9 @@ void check_ref()
     set_ref(refExamples.append(), refTarget1);
     set_ref(refExamples.append(), refTarget2);
     test_assert(run_test_for_type(&REF_T, refExamples));
+
+    dealloc_term(refTarget1);
+    dealloc_term(refTarget2);
 }
 
 void register_tests()
