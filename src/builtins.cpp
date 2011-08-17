@@ -135,7 +135,7 @@ Type* FILE_SIGNATURE_T;
 
 CA_FUNCTION(file__modified_time)
 {
-    set_int(OUTPUT, storage::get_modified_time(STRING_INPUT(0)));
+    set_int(OUTPUT, get_modified_time(STRING_INPUT(0)));
 }
 
 CA_FUNCTION(refactor__rename)

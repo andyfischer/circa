@@ -13,16 +13,8 @@
 #include "term.h"
 
 namespace circa {
-namespace storage {
 
 StorageInterface g_storageInterface;
-
-void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
-{
-    if (g_storageInterface.readTextFile == NULL)
-        return;
-    return g_storageInterface.readTextFile(filename, receiveFile, context);
-}
 
 void read_text_file_to_value(const char* filename, TaggedValue* contents, TaggedValue* error)
 {
@@ -63,30 +55,6 @@ std::string read_text_file_as_str(const char* filename)
     return "";
 }
 
-void write_text_file(const char* filename, const char* contents)
-{
-    if (g_storageInterface.writeTextFile == NULL)
-        return;
-    return g_storageInterface.writeTextFile(filename, contents);
-}
-
-time_t get_modified_time(const char* filename)
-{
-    if (filename[0] == 0)
-        return 0;
-
-    if (g_storageInterface.getModifiedTime == NULL)
-        return 0;
-
-    return g_storageInterface.getModifiedTime(filename);
-}
-
-bool file_exists(const char* filename)
-{
-    if (g_storageInterface.fileExists == NULL)
-        return false;
-    return g_storageInterface.fileExists(filename);
-}
 
 namespace filesystem_storage
 {
@@ -156,9 +124,6 @@ void get_current_storage_interface(StorageInterface* interface)
     *interface = g_storageInterface;
 }
 
-
-} // namespace storage
-
 std::string get_directory_for_filename(std::string const& filename)
 {
     // TODO: This function is terrible, need to use an existing library for dealing
@@ -202,10 +167,42 @@ std::string get_absolute_path(std::string const& path)
 
     return cwd + "/" + path;
 }
+
+void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
+{
+    if (g_storageInterface.readTextFile == NULL)
+        return;
+    return g_storageInterface.readTextFile(filename, receiveFile, context);
+}
+
+void write_text_file(const char* filename, const char* contents)
+{
+    if (g_storageInterface.writeTextFile == NULL)
+        return;
+    return g_storageInterface.writeTextFile(filename, contents);
+}
+
+time_t get_modified_time(const char* filename)
+{
+    if (filename[0] == 0)
+        return 0;
+
+    if (g_storageInterface.getModifiedTime == NULL)
+        return 0;
+
+    return g_storageInterface.getModifiedTime(filename);
+}
+
+bool file_exists(const char* filename)
+{
+    if (g_storageInterface.fileExists == NULL)
+        return false;
+    return g_storageInterface.fileExists(filename);
+}
+
 } // namespace circa
 
 using namespace circa;
-using namespace circa::storage;
 
 void circa_storage_use_filesystem()
 {

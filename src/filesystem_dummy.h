@@ -18,7 +18,7 @@ struct FakeFileSystem
         File() : last_modified(0) {}
     };
 
-    storage::StorageInterface _previousInterface;
+    StorageInterface _previousInterface;
     FakeFileSystem* _previousFakeFilesystem;
 
     std::map<std::string, File> _files;

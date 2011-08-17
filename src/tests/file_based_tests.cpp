@@ -3,8 +3,6 @@
 #include <circa.h>
 #include "filesystem_dummy.h"
 
-using namespace circa::storage;
-
 namespace circa {
 namespace file_based_tests {
 

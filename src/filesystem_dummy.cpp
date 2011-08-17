@@ -15,7 +15,7 @@ namespace fakefilesystem_interface {
             != g_currentFakeFilesystem->_files.end();
     }
 
-    void read_text_file(const char* filename, storage::FileReceiveFunc receiveFile, void* context)
+    void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
     {
         if (!file_exists(filename))
             receiveFile(context, NULL, "File not found");
@@ -38,23 +38,23 @@ namespace fakefilesystem_interface {
 
 FakeFileSystem::FakeFileSystem()
 {
-    storage::get_current_storage_interface(&_previousInterface);
+    get_current_storage_interface(&_previousInterface);
     _previousFakeFilesystem = g_currentFakeFilesystem;
 
-    storage::StorageInterface interface;
+    StorageInterface interface;
     interface.readTextFile = fakefilesystem_interface::read_text_file;
     interface.writeTextFile = fakefilesystem_interface::write_text_file;
     interface.getModifiedTime = fakefilesystem_interface::get_modified_time;
     interface.fileExists = fakefilesystem_interface::file_exists;
 
-    storage::install_storage_interface(&interface);
+    install_storage_interface(&interface);
     g_currentFakeFilesystem = this;
 }
 
 FakeFileSystem::~FakeFileSystem()
 {
     g_currentFakeFilesystem = _previousFakeFilesystem;
-    storage::install_storage_interface(&_previousInterface);
+    install_storage_interface(&_previousInterface);
 }
 
 std::string& FakeFileSystem::operator [] (std::string const& filename)

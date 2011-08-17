@@ -12,22 +12,20 @@ std::string get_directory_for_filename(std::string const& filename);
 bool is_absolute_path(std::string const& path);
 std::string get_absolute_path(std::string const& path);
 
-namespace storage {
-
 // Callback used in read_text_file. If the file is read successfully, then 'contents' will
 // contain its full contents. If there is an error, 'contents' will be NULL and 'error' will
 // have a human-readable description of the error.
 typedef void (*FileReceiveFunc)(void* context, const char* contents, const char* error);
 
-typedef void (*ReadTextFile)(const char* filename, FileReceiveFunc receiveFile, void* context);
-typedef void (*WriteTextFile)(const char* filename, const char* contents);
-typedef time_t (*GetModifiedTime)(const char* filename);
-typedef bool (*FileExists)(const char* filename);
-
 void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context);
 void write_text_file(const char* filename, const char* contents);
 time_t get_modified_time(const char* filename);
 bool file_exists(const char* filename);
+
+typedef void (*ReadTextFile)(const char* filename, FileReceiveFunc receiveFile, void* context);
+typedef void (*WriteTextFile)(const char* filename, const char* contents);
+typedef time_t (*GetModifiedTime)(const char* filename);
+typedef bool (*FileExists)(const char* filename);
 
 // Read the filename as a text file, and write the entire contents to 'contents' as a
 // string. If there are any problems, and 'error' is non-NULL, then an error message is
@@ -48,7 +46,6 @@ void install_storage_interface(StorageInterface* interface);
 // Copy the current storage interface to the given argument
 void get_current_storage_interface(StorageInterface* interface);
 
-} // namespace storage
 } // namespace circa
 
 // Install a builtin interface that just uses the filesystem in a standard way

@@ -37,7 +37,7 @@ void run_file_checker(const char* filename, List* errors)
     {
         TaggedValue fileContents;
         TaggedValue fileReadError;
-        storage::read_text_file_to_value(filename, &fileContents, &fileReadError);
+        read_text_file_to_value(filename, &fileContents, &fileReadError);
         if (!is_null(&fileReadError)) {
             std::stringstream msg;
             msg << "File read error: " << fileReadError.toString();

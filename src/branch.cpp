@@ -542,7 +542,7 @@ void parse_script(Branch& branch, std::string const& filename)
     create_string(branch, filename, "#attr:source-file");
 
     TaggedValue contents;
-    storage::read_text_file_to_value(filename.c_str(), &contents, NULL);
+    read_text_file_to_value(filename.c_str(), &contents, NULL);
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
 }
@@ -557,7 +557,7 @@ void persist_branch_to_file(Branch& branch)
 {
     std::string filename = get_branch_source_filename(branch);
     std::string contents = get_branch_source_text(branch);
-    storage::write_text_file(filename.c_str(), contents.c_str());
+    write_text_file(filename.c_str(), contents.c_str());
 }
 
 std::string get_source_file_location(Branch& branch)
