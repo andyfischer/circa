@@ -48,5 +48,4 @@ void get_current_storage_interface(StorageInterface* interface);
 
 } // namespace circa
 
-// Install a builtin interface that just uses the filesystem in a standard way
-export_func void circa_storage_use_filesystem();
+void circa_use_default_filesystem_interface();

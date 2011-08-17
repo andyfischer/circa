@@ -1,13 +1,5 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#ifdef WINDOWS
-// for fopen()
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
-#include <fstream>
-#include <sys/stat.h>
-
 #include "branch.h"
 #include "filesystem.h"
 #include "term.h"
@@ -54,65 +46,6 @@ std::string read_text_file_as_str(const char* filename)
         return as_string(&contents);
     return "";
 }
-
-
-namespace filesystem_storage
-{
-    void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
-    {
-        FILE* fp = fopen(filename, "r");
-        if (fp == NULL)
-            return receiveFile(context, NULL, "couldn't read file");
-
-        // get file size
-        fseek(fp, 0, SEEK_END);
-        size_t size = ftell(fp);
-        rewind(fp);
-
-        char* buffer = (char*) malloc(size + 1);
-
-        size_t bytes_read = fread(buffer, 1, size, fp);
-        if (bytes_read != size)
-            return receiveFile(context, NULL, "failed to read entire file");
-
-        buffer[size] = 0;
-
-        receiveFile(context, buffer, NULL);
-
-        free(buffer);
-        fclose(fp);
-    }
-
-    void write_text_file(const char* filename, const char* contents)
-    {
-        std::ofstream file;
-        file.open(filename, std::ios::out | std::ios::binary);
-        file << contents;
-        file.close();
-    }
-
-    time_t get_modified_time(const char* filename)
-    {
-        struct stat s;
-        s.st_mtime = 0;
-
-        stat(filename, &s);
-
-        return s.st_mtime;
-    }
-
-    bool file_exists(const char* filename)
-    {
-        FILE* fp = fopen(filename, "r");
-        if (fp) {
-            // file exists
-            fclose(fp);
-            return true;
-        } else {
-            return false;
-        }
-    }
-};
 
 void install_storage_interface(StorageInterface* interface)
 {
@@ -202,12 +135,10 @@ bool file_exists(const char* filename)
 
 } // namespace circa
 
-using namespace circa;
+// defined in filesystem_posix.cpp:
+void install_posix_filesystem_interface();
 
-void circa_storage_use_filesystem()
+void circa_use_default_filesystem_interface()
 {
-    g_storageInterface.readTextFile = filesystem_storage::read_text_file;
-    g_storageInterface.writeTextFile = filesystem_storage::write_text_file;
-    g_storageInterface.getModifiedTime = filesystem_storage::get_modified_time;
-    g_storageInterface.fileExists = filesystem_storage::file_exists;
+    install_posix_filesystem_interface();
 }
