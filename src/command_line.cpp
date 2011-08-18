@@ -180,7 +180,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-check")
         return run_file_checker(args[1].c_str());
 
-    // Otherwise, run script
+    // Otherwise, load args[0] as a script and run it
     Branch& main_branch = create_branch(kernel());
     parse_script(main_branch, args[0]);
 
@@ -191,12 +191,19 @@ int run_command_line(std::vector<std::string> args)
 
         Term error_listener;
 
-        EvalContext result;
-        evaluate_branch(&result, main_branch);
+        EvalContext context;
 
-        if (result.errorOccurred) {
+        // Push any extra command-line arguments to context.inputStack
+        List* inputs = set_list(context.inputStack.append());
+
+        for (size_t i=1; i < args.size(); i++)
+            set_string(inputs->append(), args[i]);
+
+        evaluate_branch(&context, main_branch);
+
+        if (context.errorOccurred) {
             std::cout << "Error occurred:\n";
-            print_runtime_error_formatted(result, std::cout);
+            print_runtime_error_formatted(context, std::cout);
             std::cout << std::endl;
             return 1;
         }

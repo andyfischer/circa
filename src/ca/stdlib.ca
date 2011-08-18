@@ -22,6 +22,9 @@ namespace refactor
 namespace reflect
     def this_branch() -> Branch
 
+namespace sys
+    def arg(int index) -> string
+
 -- Stateful functions
 
 def changed(any current) -> bool

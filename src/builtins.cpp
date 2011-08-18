@@ -131,6 +131,8 @@ TaggedValue UNKNOWN_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
 
+List g_commandLineArguments;
+
 // Standard library functions
 
 CA_FUNCTION(file__modified_time)
@@ -166,6 +168,11 @@ CA_FUNCTION(type_func)
 CA_FUNCTION(typename_func)
 {
     set_string(OUTPUT, declared_type(INPUT_TERM(0))->name);
+}
+
+CA_FUNCTION(input__func)
+{
+    int index = INT_INPUT(0);
 }
 
 void install_standard_library(Branch& kernel)

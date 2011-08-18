@@ -1,0 +1,3 @@
+
+INCLUDES = "`sdl-config --cflags`"
+LIB_FLAGS = "`sdl-config --libs`"
