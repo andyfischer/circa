@@ -14,7 +14,9 @@
 #include "static_checking.h"
 #include "testing.h"
 
+#include "tools/build_tool.h"
 #include "tools/debugger_repl.h"
+#include "tools/exporting_parser.h"
 #include "tools/file_checker.h"
 #include "tools/repl.h"
 
@@ -179,6 +181,25 @@ int run_command_line(std::vector<std::string> args)
     // Run file checker
     if (args[0] == "-check")
         return run_file_checker(args[1].c_str());
+
+    // Export parsed information
+    if (args[0] == "-export") {
+        const char* filename = "";
+        const char* format = "";
+        if (args.size() >= 2)
+            format = args[1].c_str();
+        if (args.size() >= 3)
+            filename = args[2].c_str();
+        return run_exporting_parser(format, filename);
+    }
+
+    // Build tool
+    if (args[0] == "-build") {
+        const char* filename = "";
+        if (args.size() >= 2)
+            filename = args[1].c_str();
+        return run_build_tool(filename);
+    }
 
     // Otherwise, load args[0] as a script and run it
     Branch& main_branch = create_branch(kernel());

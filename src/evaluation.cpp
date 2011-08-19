@@ -283,6 +283,8 @@ bool evaluation_interrupted(EvalContext* context)
 
 void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
 {
+    start_using(branch);
+
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch[i]);
 
@@ -296,6 +298,8 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
             continue;
         copy(value, term);
     }
+
+    finish_using(branch);
 }
 
 void start_using(Branch& branch)
@@ -377,6 +381,28 @@ TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& i
     Term* result = parser::compile(branch, parser::statement_list, input);
     evaluate_range(context, branch, prevHead, branch.length() - 1);
     return get_local(result);
+}
+
+TaggedValue* evaluate(Branch& branch, Term* function, List* inputs)
+{
+    EvalContext context;
+
+    TermList inputTerms;
+    inputTerms.resize(inputs->length());
+
+    for (int i=0; i < inputs->length(); i++)
+        inputTerms.setAt(i, create_value(branch, inputs->get(i)));
+
+    int prevHead = branch.length();
+    Term* result = apply(branch, function, inputTerms);
+    evaluate_range(&context, branch, prevHead, branch.length() - 1);
+    return get_local(result);
+}
+
+TaggedValue* evaluate(Term* function, List* inputs)
+{
+    Branch scratch;
+    return evaluate(scratch, function, inputs);
 }
 
 void clear_error(EvalContext* cxt)

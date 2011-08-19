@@ -41,8 +41,6 @@ struct EvalContext
     // Local variables.
     List stack;
 
-    List inputStack;
-
     // Current stack of in-progress terms. Used for introspection.
     TermList callStack;
 
@@ -50,7 +48,8 @@ struct EvalContext
 };
 
 
-// Evaluate a single term.
+// Evaluate a single term. This is not usually called directly, it's called
+// by the interpreter.
 void evaluate_single_term(EvalContext* context, Term* term);
 
 void evaluate_branch_internal(EvalContext* context, Branch& branch);
@@ -74,6 +73,10 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result);
 
 TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
+
+TaggedValue* evaluate(Branch& branch, Term* function, List* inputs);
+
+TaggedValue* evaluate(Term* function, List* inputs);
 
 // Get the input value for the given term and index.
 TaggedValue* get_input(EvalContext* context, Term* term, int index);

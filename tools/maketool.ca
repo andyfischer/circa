@@ -1,2 +1,0 @@
-
-make_ca = sys:args(0)

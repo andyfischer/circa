@@ -1,0 +1,3 @@
+
+CPPFLAGS = "`sdl-config --cflags`"
+LINKFLAGS = "`sdl-config --libs`"

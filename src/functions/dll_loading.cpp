@@ -189,19 +189,6 @@ namespace dll_loading_function {
         set_string(OUTPUT, base_filename + ".cpp");
     }
 
-    CA_FUNCTION(rebuild_dll)
-    {
-        std::string base_filename = STRING_INPUT(0);
-        std::cout << "rebuilding " << base_filename << std::endl;
-        std::string dir = get_directory_for_filename(base_filename);
-
-        // TODO: This is probably terrible:
-        std::string cmd ="cd " + dir + "; make"; 
-        int ret = system(cmd.c_str());
-        if (ret != 0)
-            return error_occurred(CONTEXT, CALLER, "'make' returned error");
-    }
-
     void setup(Branch& kernel)
     {
         Branch& ns = create_namespace(kernel, "dll_loading");
@@ -211,8 +198,6 @@ namespace dll_loading_function {
                 "dll_filename(string baseFilename) -> string");
         import_function(ns, source_filename,
                 "source_filename(string baseFilename) -> string");
-        import_function(ns, rebuild_dll,
-                "rebuild(string baseFilename)");
     }
 }
 } // namespace circa

@@ -11,6 +11,9 @@ def type(any :meta) -> Type
 def typename(any :meta) -> string
     "Returns the type name of the given term"
 
+namespace cppbuild
+    def build_module(string baseFilename)
+
 namespace file
     def modified_time(string filename) -> int
 
@@ -274,7 +277,7 @@ def patch_with_dll(Branch b, string baseFile)
     rebuilt = false
     if build_has_not_been_attempted and source_newer_than_dll
         last_rebuild_at = source_modified_time
-        dll_loading:rebuild(baseFile) -> errored # ignore errors here
+        cppbuild:build_module(baseFile) -> errored # ignore errors here
         rebuilt = true
 
     if once() or rebuilt or changed(b.file_signature())

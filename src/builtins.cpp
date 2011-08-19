@@ -131,7 +131,7 @@ TaggedValue UNKNOWN_SYMBOL;
 
 Type* FILE_SIGNATURE_T;
 
-List g_commandLineArguments;
+namespace cppbuild_function { CA_FUNCTION(build_module); }
 
 // Standard library functions
 
@@ -179,11 +179,6 @@ CA_FUNCTION(typename_func)
     set_string(OUTPUT, declared_type(INPUT_TERM(0))->name);
 }
 
-CA_FUNCTION(input__func)
-{
-    int index = INT_INPUT(0);
-}
-
 void install_standard_library(Branch& kernel)
 {
     // Parse the stdlib script
@@ -198,6 +193,8 @@ void install_standard_library(Branch& kernel)
     install_function(kernel["refactor:rename"], refactor__rename);
     install_function(kernel["refactor:change_function"], refactor__change_function);
     install_function(kernel["reflect:this_branch"], reflect__this_branch);
+
+    install_function(kernel["cppbuild:build_module"], cppbuild_function::build_module);
 
     LENGTH_FUNC = kernel["length"];
     TYPE_FUNC = kernel["type"];

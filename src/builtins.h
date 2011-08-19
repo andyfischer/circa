@@ -113,8 +113,6 @@ extern TaggedValue UNKNOWN_SYMBOL;
 
 extern Type* FILE_SIGNATURE_T;
 
-extern List g_commandLineArguments;
-
 extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;
 extern bool SHUTTING_DOWN;

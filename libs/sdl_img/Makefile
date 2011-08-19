@@ -1,9 +1,5 @@
 
-CFLAGS = -I${CIRCA_HOME}/src -rdynamic -DOSX `sdl-config --cflags` `sdl-config --libs`
-
-# the "-undefined dynamic_lookup" flag is a Darwin thing
-
-SOURCES = sdl_img.cpp
+CFLAGS = ${DEFAULT_CFLAGS} `sdl-config --cflags` `sdl-config --libs`
 
 all:
-	g++ ${CFLAGS} -shared -undefined dynamic_lookup ${SOURCES} -o sdl_img.so
+	g++ ${CFLAGS} ${SOURCES} -o ${LINKER_OUTPUT}

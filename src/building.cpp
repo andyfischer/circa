@@ -270,6 +270,13 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     return create_value(branch, as_type(type), name);
 }
 
+Term* create_value(Branch& branch, TaggedValue* initialValue)
+{
+    Term* term = create_value(branch, initialValue->value_type);
+    copy(initialValue, term);
+    return term;
+}
+
 Term* create_stateful_value(Branch& branch, Type* type, Term* defaultValue,
         std::string const& name)
 {
