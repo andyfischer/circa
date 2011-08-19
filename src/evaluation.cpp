@@ -230,6 +230,32 @@ TaggedValue* get_local_safe(Term* term, int outputIndex)
     return local;
 }
 
+void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
+{
+    // Check if there is an errored() call listening to this term. If so, then save
+    // the error as a value, but continue execution.
+    if (has_an_error_listener(errorTerm)) {
+        TaggedValue* out = get_output(context, errorTerm, 0);
+        set_string(out, message);
+        out->value_type = &ERROR_T;
+        return;
+    }
+
+    if (DEBUG_TRAP_ERROR_OCCURRED)
+        ca_assert(false);
+
+    ca_assert(errorTerm != NULL);
+
+    if (context == NULL)
+        throw std::runtime_error(message);
+
+    if (!context->errorOccurred) {
+        context->errorOccurred = true;
+        context->errorTerm = errorTerm;
+        context->errorMessage = message;
+    }
+}
+
 Dict* get_current_scope_state(EvalContext* cxt)
 {
     return Dict::lazyCast(&cxt->currentScopeState);

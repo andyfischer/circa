@@ -1,6 +1,8 @@
 
 -- Builtin functions
 
+def input(int index) -> any
+
 def length(List) -> int
     "Return the number of items in the given list"
 

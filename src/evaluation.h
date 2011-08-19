@@ -41,6 +41,8 @@ struct EvalContext
     // Local variables.
     List stack;
 
+    List inputStack;
+
     // Current stack of in-progress terms. Used for introspection.
     TermList callStack;
 
@@ -87,6 +89,8 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term, int outputIndex);
+
+void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);

@@ -37,6 +37,8 @@ bool is_an_unknown_identifier(Term* term);
 // frame when executed.
 bool is_major_branch(Term* term);
 
+bool has_an_error_listener(Term* term);
+
 // Format the term's global id as a string that looks like: $ab3
 std::string global_id(Term* term);
 

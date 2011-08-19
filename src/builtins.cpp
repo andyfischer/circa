@@ -140,6 +140,15 @@ CA_FUNCTION(file__modified_time)
     set_int(OUTPUT, get_modified_time(STRING_INPUT(0)));
 }
 
+CA_FUNCTION(input_func)
+{
+    int index = INT_INPUT(0);
+    TaggedValue* input = CONTEXT->inputStack.getLast()->getIndex(index);
+    if (input == NULL)
+        return ERROR_OCCURRED("invalid input index");
+    copy(input, OUTPUT);
+}
+
 CA_FUNCTION(refactor__rename)
 {
     rename(as_ref(INPUT(0)), as_string(INPUT(1)));
@@ -181,8 +190,9 @@ void install_standard_library(Branch& kernel)
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 
     // Install each function
-    install_function(kernel["length"], length);
     install_function(kernel["file:modified_time"], file__modified_time);
+    install_function(kernel["input"], input_func);
+    install_function(kernel["length"], length);
     install_function(kernel["type"], type_func);
     install_function(kernel["typename"], typename_func);
     install_function(kernel["refactor:rename"], refactor__rename);

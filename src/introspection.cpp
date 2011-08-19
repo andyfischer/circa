@@ -60,6 +60,15 @@ bool is_major_branch(Term* term)
     return is_subroutine(term);
 }
 
+bool has_an_error_listener(Term* term)
+{
+    for (int i=0; i < term->users.length(); i++) {
+        if (term->users[i] && term->users[i]->function == ERRORED_FUNC)
+            return true;
+    }
+    return false;
+}
+
 std::string global_id(Term* term)
 {
     if (term == NULL)
