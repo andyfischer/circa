@@ -110,8 +110,8 @@ CA_FUNCTION(opengl__bind_texture)
 
 CA_FUNCTION(opengl__load_shader)
 {
-    std::string vertText = circa::storage::read_text_file_as_str(STRING_INPUT(0));
-    std::string fragText = circa::storage::read_text_file_as_str(STRING_INPUT(1));
+    std::string vertText = circa::read_text_file_as_str(STRING_INPUT(0));
+    std::string fragText = circa::read_text_file_as_str(STRING_INPUT(1));
 
     const char* vert = vertText.c_str();
     const char* frag = fragText.c_str();

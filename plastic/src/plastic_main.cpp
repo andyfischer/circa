@@ -62,7 +62,7 @@ int plastic_main(std::vector<std::string> args)
         std::cout << "writing docs to " << args[1] << std::endl;
         std::stringstream out;
         generate_plastic_docs(out);
-        circa::storage::write_text_file(args[1].c_str(), out.str().c_str());
+        circa::write_text_file(args[1].c_str(), out.str().c_str());
         return 0;
     }
 

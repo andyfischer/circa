@@ -7,7 +7,7 @@
 
 int main( int argc, char* args[] )
 {
-    circa_storage_use_filesystem();
+    circa_use_default_filesystem_interface();
 
     app::get_global_app()._binaryFilename = args[0];
 
