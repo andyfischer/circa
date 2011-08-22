@@ -1,3 +1,4 @@
 
-CPPFLAGS = "`sdl-config --cflags`"
-LINKFLAGS = "`sdl-config --libs`"
+name = 'sdl_img'
+cflags = "`sdl-config --cflags`"
+linkflags = "`sdl-config --libs`"
