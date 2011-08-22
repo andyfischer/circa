@@ -20,6 +20,8 @@ struct FunctionAttrs
     typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
 
+    Term* declaringTerm;
+
     std::string name;
     List outputTypes;
     Term* implicitStateType;

@@ -8,6 +8,7 @@
 #include "code_iterators.h"
 #include "evaluation.h"
 #include "filesystem.h"
+#include "function.h"
 #include "heap_debugging.h"
 #include "importing_macros.h"
 #include "introspection.h"
@@ -398,6 +399,10 @@ void pre_erase_term(Term* term)
     // before it becomes invalid.
     if (is_value(term) && is_type(term) && as_type(term)->declaringTerm == term)
         as_type(term)->declaringTerm = NULL;
+
+    // Ditto for Function
+    if (is_value(term) && is_function(term) && get_function_attrs(term)->declaringTerm == term)
+        get_function_attrs(term)->declaringTerm = NULL;
 }
 
 void erase_term(Term* term)
