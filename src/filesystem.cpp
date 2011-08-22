@@ -47,6 +47,29 @@ std::string read_text_file_as_str(const char* filename)
     return "";
 }
 
+void read_directory(const char* dirname, ReadDirectoryCallback callback,
+    void* context)
+{
+    if (g_storageInterface.readDirectory == NULL) {
+        callback(context, NULL, "No storage interface is active");
+        return;
+    }
+    g_storageInterface.readDirectory(dirname, callback, context);
+}
+
+bool read_directory_as_list_callback(void* context, const char* filename, const char* error)
+{
+    List* list = (List*) context;
+    if (filename != NULL)
+        set_string(list->append(), filename);
+    return true;
+}
+
+void read_directory_as_list(const char* dirname, List* result)
+{
+    read_directory(dirname, read_directory_as_list_callback, (void*) result);
+}
+
 void install_storage_interface(StorageInterface* interface)
 {
     g_storageInterface = *interface;
@@ -101,11 +124,11 @@ std::string get_absolute_path(std::string const& path)
     return cwd + "/" + path;
 }
 
-void read_text_file(const char* filename, FileReceiveFunc receiveFile, void* context)
+void read_text_file(const char* filename, ReadFileCallback callback, void* context)
 {
     if (g_storageInterface.readTextFile == NULL)
-        return;
-    return g_storageInterface.readTextFile(filename, receiveFile, context);
+        return callback(context, NULL, "No storage interface is active");
+    g_storageInterface.readTextFile(filename, callback, context);
 }
 
 void write_text_file(const char* filename, const char* contents)

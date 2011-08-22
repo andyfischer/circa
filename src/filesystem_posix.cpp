@@ -1,16 +1,19 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #ifdef WINDOWS
 // for fopen()
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
+#include <dirent.h>
 #include <fstream>
 #include <sys/stat.h>
 
 #include "filesystem.h"
 
-static void read_text_file(const char* filename, circa::FileReceiveFunc receiveFile, void* context)
+static void read_text_file(const char* filename, circa::ReadFileCallback receiveFile, void* context)
 {
     FILE* fp = fopen(filename, "r");
     if (fp == NULL)
@@ -65,6 +68,34 @@ static bool file_exists(const char* filename)
     }
 }
 
+static void read_directory(const char* dirname, circa::ReadDirectoryCallback callback,
+       void* context)
+{
+    DIR* dir = opendir(dirname);
+
+    if (dir == NULL) {
+        callback(context, NULL, "failed to open file as a directory");
+        return;
+    }
+
+    while (true) {
+        struct dirent *ent = readdir(dir);
+
+        if (ent == NULL)
+            break;
+
+        // Don't expose the '.' or '..' entries
+        if ((strcmp(ent->d_name, ".") == 0) || (strcmp(ent->d_name, "..") == 0))
+            continue;
+
+        bool callbackContinue = callback(context, ent->d_name, NULL);
+        
+        if (!callbackContinue)
+            break;
+    }
+    closedir(dir);
+}
+
 void install_posix_filesystem_interface()
 {
     circa::StorageInterface interface;
@@ -72,5 +103,6 @@ void install_posix_filesystem_interface()
     interface.writeTextFile = write_text_file;
     interface.getModifiedTime = get_modified_time;
     interface.fileExists = file_exists;
+    interface.readDirectory = read_directory;
     circa::install_storage_interface(&interface);
 }

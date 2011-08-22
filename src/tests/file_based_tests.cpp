@@ -17,6 +17,16 @@ void test_the_test()
     write_text_file("a.txt", "goodbye");
     test_assert(read_text_file_as_str("a.txt") == "goodbye");
     test_assert(files["a.txt"] == "goodbye");
+
+    // Read directory
+    List fileList;
+    read_directory_as_list(".", &fileList);
+    test_equals(&fileList, "['a.txt']");
+
+    files["b.txt"] = "hi";
+    fileList.clear();
+    read_directory_as_list(".", &fileList);
+    test_equals(&fileList, "['a.txt', 'b.txt']");
 }
 
 void test_include_function()
