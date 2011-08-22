@@ -223,7 +223,6 @@ void swap(TaggedValue* left, TaggedValue* right)
     left->value_data = right->value_data;
     right->value_type = temp_type;
     right->value_data = temp_data;
-
 }
 
 void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)
@@ -411,11 +410,10 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
-TaggedValue* set_int(TaggedValue* value, int i)
+void set_int(TaggedValue* value, int i)
 {
     change_type(value, &INT_T);
     value->value_data.asint = i;
-    return value;
 }
 
 void set_float(TaggedValue* value, float f)
@@ -577,71 +575,23 @@ void* get_pointer(TaggedValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-bool is_int(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_INT;
-}
-
-bool is_error(TaggedValue* value)
-{
-    return value->value_type == &ERROR_T;
-}
-
-bool is_float(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_FLOAT;
-}
+bool is_bool(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
+bool is_branch(TaggedValue* value) { return value->value_type == &BRANCH_T; }
+bool is_error(TaggedValue* value) { return value->value_type == &ERROR_T; }
+bool is_float(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool is_function_pointer(TaggedValue* value) { return value->value_type == &FUNCTION_T; }
+bool is_int(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
+bool is_list(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
+bool is_null(TaggedValue* value) { return value->value_type == &NULL_T; }
+bool is_opaque_pointer(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER; }
+bool is_ref(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_REF; }
+bool is_string(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
+bool is_symbol(TaggedValue* value) { return value->value_type == &SYMBOL_T; }
+bool is_type(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
 
 bool is_number(TaggedValue* value)
 {
     return is_int(value) || is_float(value);
-}
-
-bool is_bool(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_BOOL;
-}
-
-bool is_string(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_STRING;
-}
-
-bool is_ref(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_REF;
-}
-
-bool is_opaque_pointer(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER;
-}
-
-bool is_list(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_LIST;
-}
-
-bool is_type(TaggedValue* value)
-{
-    return value->value_type->storageType == STORAGE_TYPE_TYPE;
-}
-
-bool is_null(TaggedValue* value)
-{
-    return value->value_type == &NULL_T;
-}
-bool is_symbol(TaggedValue* value)
-{
-    return value->value_type == &SYMBOL_T;
-}
-bool is_branch(TaggedValue* value)
-{
-    return value->value_type == &BRANCH_T;
-}
-bool is_function_pointer(TaggedValue* value)
-{
-    return value->value_type == &FUNCTION_T;
 }
 
 float to_float(TaggedValue* value)

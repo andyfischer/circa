@@ -85,51 +85,52 @@ void set_index(TaggedValue* value, int index, TaggedValue* element);
 TaggedValue* get_field(TaggedValue* value, const char* field);
 void set_field(TaggedValue* value, const char* field, TaggedValue* element);
 
-TaggedValue* set_int(TaggedValue* value, int i);
-void set_float(TaggedValue* value, float f);
-void set_string(TaggedValue* value, const char* s);
-void set_string(TaggedValue* value, std::string const& s);
-void set_bool(TaggedValue* value, bool b);
-List* set_list(TaggedValue* value);
-List* set_list(TaggedValue* value, int size);
-void set_type(TaggedValue* value, Type* type);
-void set_function_pointer(TaggedValue* value, Term* function);
-void set_null(TaggedValue* value);
-void set_opaque_pointer(TaggedValue* value, void* addr);
-void set_branch(TaggedValue* value, Branch* branch);
-
 void set_pointer(TaggedValue* value, Type* type, void* p);
 void set_pointer(TaggedValue* value, void* ptr);
 
 void* get_pointer(TaggedValue* value);
 void* get_pointer(TaggedValue* value, Type* expectedType);
 
-int as_int(TaggedValue* value);
-float as_float(TaggedValue* value);
-std::string const& as_string(TaggedValue* value);
-const char* as_cstring(TaggedValue* value);
-bool as_bool(TaggedValue* value);
-Branch* as_branch(TaggedValue* value);
-void* as_opaque_pointer(TaggedValue* value);
-Type* as_type(TaggedValue* value);
-Term* as_function_pointer(TaggedValue* value);
-List* as_list(TaggedValue* value);
+void set_bool(TaggedValue* value, bool b);
+void set_branch(TaggedValue* value, Branch* branch);
+void set_float(TaggedValue* value, float f);
+void set_function_pointer(TaggedValue* value, Term* function);
+void set_int(TaggedValue* value, int i);
+List* set_list(TaggedValue* value);
+List* set_list(TaggedValue* value, int size);
+void set_null(TaggedValue* value);
+void set_opaque_pointer(TaggedValue* value, void* addr);
+void set_string(TaggedValue* value, const char* s);
+void set_string(TaggedValue* value, std::string const& s);
+void set_type(TaggedValue* value, Type* type);
 
-bool is_int(TaggedValue* value);
+bool        as_bool(TaggedValue* value);
+Branch*     as_branch(TaggedValue* value);
+const char* as_cstring(TaggedValue* value);
+float       as_float(TaggedValue* value);
+Term*       as_function_pointer(TaggedValue* value);
+int         as_int(TaggedValue* value);
+List*       as_list(TaggedValue* value);
+void*       as_opaque_pointer(TaggedValue* value);
+std::string const& as_string(TaggedValue* value);
+Type*       as_type(TaggedValue* value);
+
+bool is_bool(TaggedValue* value);
+bool is_branch(TaggedValue* value);
 bool is_error(TaggedValue* value);
 bool is_float(TaggedValue* value);
-bool is_number(TaggedValue* value);
-bool is_bool(TaggedValue* value);
-bool is_string(TaggedValue* value);
-bool is_ref(TaggedValue* value);
-bool is_opaque_pointer(TaggedValue* value);
-bool is_list(TaggedValue* value);
-bool is_type(TaggedValue* value);
-bool is_null(TaggedValue* value);
-bool is_symbol(TaggedValue* value);
-bool is_branch(TaggedValue* value);
 bool is_function_pointer(TaggedValue* value);
+bool is_int(TaggedValue* value);
+bool is_list(TaggedValue* value);
+bool is_null(TaggedValue* value);
+bool is_number(TaggedValue* value);
+bool is_opaque_pointer(TaggedValue* value);
+bool is_ref(TaggedValue* value);
+bool is_string(TaggedValue* value);
+bool is_symbol(TaggedValue* value);
+bool is_type(TaggedValue* value);
 
+// Casting accessors:
 float to_float(TaggedValue* value);
 int to_int(TaggedValue* value);
 
