@@ -13,7 +13,6 @@
 #include "command_line.h"
 #include "debug.h"
 #include "documentation.h"
-#include "errors.h"
 #include "evaluation.h"
 #include "feedback.h"
 #include "filesystem.h"

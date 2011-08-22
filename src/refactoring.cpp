@@ -3,7 +3,6 @@
 #include "branch.h"
 #include "building.h"
 #include "builtins.h"
-#include "errors.h"
 #include "function.h"
 #include "heap_debugging.h"
 #include "introspection.h"

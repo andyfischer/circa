@@ -5,7 +5,6 @@
 #include "building.h"
 #include "builtins.h"
 #include "codegen.h"
-#include "errors.h"
 #include "evaluation.h"
 #include "feedback.h"
 #include "introspection.h"

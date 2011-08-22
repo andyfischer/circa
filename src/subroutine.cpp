@@ -6,7 +6,6 @@
 #include "code_iterators.h"
 #include "building.h"
 #include "builtins.h"
-#include "errors.h"
 #include "evaluation.h"
 #include "function.h"
 #include "importing_macros.h"

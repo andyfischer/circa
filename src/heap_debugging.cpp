@@ -8,7 +8,6 @@
 
 #include "build_options.h"
 #include "builtins.h"
-#include "errors.h"
 #include "heap_debugging.h"
 #include "term.h"
 

@@ -1,6 +1,5 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "errors.h"
 #include "heap_debugging.h"
 #include "list_shared.h"
 #include "tagged_value.h"

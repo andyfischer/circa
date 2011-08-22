@@ -1,11 +1,12 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #include "building.h"
 #include "build_options.h"
 #include "builtins.h"
 #include "branch.h"
 #include "code_iterators.h"
-#include "errors.h"
 #include "evaluation.h"
 #include "function.h"
 #include "introspection.h"
@@ -254,6 +255,11 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
         context->errorOccurred = true;
         context->errorTerm = errorTerm;
     }
+}
+void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
+{
+    output << get_short_location(context.errorTerm)
+        << " " << context_get_error_message(&context);
 }
 
 Dict* get_current_scope_state(EvalContext* cxt)

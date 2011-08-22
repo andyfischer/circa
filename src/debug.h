@@ -27,4 +27,9 @@ void dump_with_props(Branch& branch);
 void dump(TaggedValue& value);
 void dump(TaggedValue* value);
 
+// Signal that an unexpected error has occurred. Depending on debug settings, this
+// will either throw an exception or trigger an assert().
+void internal_error(const char* message);
+void internal_error(std::string const& message);
+
 } // namespace circa

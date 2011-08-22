@@ -4,7 +4,6 @@
 
 #include "branch.h"
 #include "builtins.h"
-#include "errors.h"
 #include "heap_debugging.h"
 #include "if_block.h"
 #include "source_repro.h"

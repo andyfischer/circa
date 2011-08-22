@@ -93,6 +93,8 @@ TaggedValue* get_local_safe(Term* term, int outputIndex);
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 
+void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
+
 Dict* get_current_scope_state(EvalContext* cxt);
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
 

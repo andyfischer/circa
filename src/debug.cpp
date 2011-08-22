@@ -1,5 +1,9 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
+#include <cassert>
+
 #include "build_options.h"
 #include "branch.h"
 #include "introspection.h"
@@ -30,6 +34,30 @@ void dump(TaggedValue& value)
 void dump(TaggedValue* value)
 {
     std::cout << value->toString() << std::endl;
+}
+
+void internal_error(const char* message)
+{
+    #if CIRCA_ASSERT_ON_ERROR
+        std::cerr << "internal error: " << message << std::endl;
+        assert(false);
+    #else
+        throw std::runtime_error(message);
+    #endif
+}
+
+void internal_error(std::string const& message)
+{
+    internal_error(message.c_str());
+}
+
+void ca_assert_function(bool expr, const char* exprStr, int line, const char* file)
+{
+    if (!expr) {
+        std::stringstream msg;
+        msg << "ca_assert(" << exprStr << ") failed in " << file << " line " << line;
+        internal_error(msg.str().c_str());
+    }
 }
 
 } // namespace circa

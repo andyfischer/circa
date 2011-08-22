@@ -6,7 +6,6 @@
 #include "building.h"
 #include "builtins.h"
 #include "code_iterators.h"
-#include "errors.h"
 #include "evaluation.h"
 #include "filesystem.h"
 #include "heap_debugging.h"
