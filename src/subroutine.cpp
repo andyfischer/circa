@@ -307,7 +307,7 @@ void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
     copy(outputs.get(0), output);
 
     if (context.errorOccurred)
-        set_string(error, context.errorMessage);
+        set_string(error, context_get_error_message(&context));
 }
 
 void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)

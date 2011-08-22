@@ -43,7 +43,7 @@ void ca_assert_function(bool expr, const char* exprStr, int line, const char* fi
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
 {
     output << get_short_location(context.errorTerm)
-        << " " << context.errorMessage;
+        << " " << context_get_error_message(&context);
 }
 
 CA_FUNCTION(evaluate_func_for_static_error)

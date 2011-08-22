@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include <circa.h>
+#include "circa.h"
 
 namespace circa {
 namespace runtime_error_snippets {
@@ -58,5 +58,4 @@ void register_tests()
 }
 
 } // namespace runtime_tests
-
 } // namespace circa

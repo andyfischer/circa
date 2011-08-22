@@ -232,14 +232,15 @@ TaggedValue* get_local_safe(Term* term, int outputIndex)
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
-    // Check if there is an errored() call listening to this term. If so, then save
-    // the error as a value, but continue execution.
-    if (has_an_error_listener(errorTerm)) {
-        TaggedValue* out = get_output(context, errorTerm, 0);
-        set_string(out, message);
-        out->value_type = &ERROR_T;
+    // Save the error as this term's output value.
+    TaggedValue* out = get_output(context, errorTerm, 0);
+    set_string(out, message);
+    out->value_type = &ERROR_T;
+
+    // Check if there is an errored() call listening to this term. If so, then
+    // continue execution.
+    if (has_an_error_listener(errorTerm))
         return;
-    }
 
     if (DEBUG_TRAP_ERROR_OCCURRED)
         ca_assert(false);
@@ -252,7 +253,6 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
     if (!context->errorOccurred) {
         context->errorOccurred = true;
         context->errorTerm = errorTerm;
-        context->errorMessage = message;
     }
 }
 
@@ -409,7 +409,6 @@ void clear_error(EvalContext* cxt)
 {
     cxt->errorOccurred = false;
     cxt->errorTerm = NULL;
-    cxt->errorMessage = "";
 }
 
 void reset_locals(Branch& branch)
@@ -423,6 +422,13 @@ void reset_locals(Branch& branch)
         if (term->nestedContents)
             reset_locals(nested_contents(term));
     }
+}
+
+std::string context_get_error_message(EvalContext* cxt)
+{
+    ca_assert(cxt != NULL);
+    ca_assert(cxt->errorTerm != NULL);
+    return as_string(get_output(cxt, cxt->errorTerm, 0));
 }
 
 } // namespace circa

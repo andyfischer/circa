@@ -20,7 +20,6 @@ struct EvalContext
     // Error information:
     bool errorOccurred;
     Term* errorTerm;
-    std::string errorMessage;
 
     // Tree of persistent state
     TaggedValue state;
@@ -72,10 +71,9 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
 // Evaluate 'term' and every term that it depends on.
 void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result);
 
+// Parse input and immediately evaluate it, returning the result value.
 TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
-
 TaggedValue* evaluate(Branch& branch, Term* function, List* inputs);
-
 TaggedValue* evaluate(Term* function, List* inputs);
 
 // Get the input value for the given term and index.
@@ -118,5 +116,7 @@ void clear_error(EvalContext* cxt);
 
 // Recursively clear local values for this branch and all nested branches.
 void reset_locals(Branch& branch);
+
+std::string context_get_error_message(EvalContext* cxt);
 
 } // namespace circa
