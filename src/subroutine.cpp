@@ -28,9 +28,11 @@ namespace subroutine_f {
     {
         append_phrase(source, "def ", term, token::DEF);
 
-        function_t::format_header_source(source, term);
+        FunctionAttrs* func = get_function_attrs(term);
 
-        if (!is_native_function(term))
+        function_format_header_source(source, func);
+
+        if (!is_native_function(func))
             format_branch_source(source, nested_contents(term), term);
     }
 }
@@ -130,7 +132,7 @@ void evaluate_subroutine(EvalContext* context, Term* caller)
         if (input == NULL)
             continue;
 
-        Type* inputType = function_t::get_input_type(function, i);
+        Type* inputType = function_get_input_type(function, i);
 
         bool success = cast(input, inputType, inputs[i]);
         if (!success) {
@@ -178,7 +180,7 @@ bool is_subroutine(Term* term)
         return false;
     if (term->contents(0)->type != &FUNCTION_ATTRS_T)
         return false;
-    return function_t::get_evaluate(term) == evaluate_subroutine;
+    return get_function_attrs(term)->evaluate == evaluate_subroutine;
 }
 
 Term* find_enclosing_subroutine(Term* term)
@@ -200,7 +202,7 @@ int get_input_index_of_placeholder(Term* inputPlaceholder)
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
-    function_t::get_evaluate(sub) = evaluate_subroutine;
+    get_function_attrs(sub)->evaluate = evaluate_subroutine;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)
@@ -213,7 +215,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
 void subroutine_update_state_type_from_contents(Term* func)
 {
     // Check if a stateful argument was declared
-    Term* firstInput = function_t::get_input_placeholder(func, 0);
+    Term* firstInput = function_get_input_placeholder(get_function_attrs(func), 0);
     if (firstInput != NULL && firstInput->boolPropOptional("state", false)) {
         // already updated state
         return;

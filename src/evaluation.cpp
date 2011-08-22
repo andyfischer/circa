@@ -360,7 +360,8 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
                 if (input->owningBranch != &branch)
                     continue;
                 // don't follow :meta inputs
-                if (function_t::get_input_meta(checkTerm->function, inputIndex))
+                if (function_get_input_meta(get_function_attrs(checkTerm->function),
+                            inputIndex))
                     continue;
                 marked[input->index] = true;
             }

@@ -158,15 +158,17 @@ void test_function_decl()
             "  whathey = concat(what,hey)\n"
             "  return(yo > 3)\n");
 
+    FunctionAttrs* funcAttrs = get_function_attrs(func);
+
     test_equals(func->name, "Myfunc");
-    test_equals(function_t::get_name(func), "Myfunc");
+    test_equals(funcAttrs->name, "Myfunc");
 
     test_equals(function_get_input_type(func, 0)->name, "string");
-    test_assert(function_t::get_input_name(func, 0) == "what");
+    test_assert(function_get_input_name(funcAttrs, 0) == "what");
     test_equals(function_get_input_type(func, 1)->name, "string");
-    test_assert(function_t::get_input_name(func, 1) == "hey");
+    test_assert(function_get_input_name(funcAttrs, 1) == "hey");
     test_equals(function_get_input_type(func, 2)->name, "int");
-    test_assert(function_t::get_input_name(func, 2) == "yo");
+    test_assert(function_get_input_name(funcAttrs, 2) == "yo");
     test_equals(function_get_output_type(func, 0)->name, "bool");
 
     Branch& funcbranch = function_contents(func);
@@ -258,7 +260,7 @@ void test_dot_concatenation()
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
     test_assert(branch[1]->asInt() == 1);
-    test_equals(function_t::get_name(branch[2]->function), "Set.add");
+    test_equals(get_function_attrs(branch[2]->function)->name, "Set.add");
     test_assert(branch["s"] == s);
 }
 

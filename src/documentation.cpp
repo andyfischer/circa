@@ -54,7 +54,7 @@ bool hidden_from_documentation(Term* term)
 std::string get_header_source(Term* function)
 {
     StyledSource styled;
-    function_t::format_header_source(&styled, function);
+    function_format_header_source(&styled, get_function_attrs(function));
     return unformat_rich_source(&styled);
 }
 

@@ -216,34 +216,34 @@ void post_setup_functions(Branch& kernel)
 {
     // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
-    set_ref(function_get_parameters(add_v), ADD_FUNC);
+    set_ref(&get_function_attrs(add_v)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_v);
 
     Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
-    set_ref(function_get_parameters(add_s), ADD_FUNC);
+    set_ref(&get_function_attrs(add_s)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
     // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
-    set_ref(function_get_parameters(sub_v), SUB_FUNC);
+    set_ref(&get_function_attrs(sub_v)->parameter, SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_v);
 
     Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
-    set_ref(function_get_parameters(sub_s), SUB_FUNC);
+    set_ref(&get_function_attrs(sub_s)->parameter, SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
-    set_ref(function_get_parameters(mult_v), kernel["mult"]);
+    set_ref(&get_function_attrs(mult_v)->parameter, kernel["mult"]);
     overloaded_function::append_overload(MULT_FUNC, mult_v);
 
     Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
-    set_ref(function_get_parameters(mult_s), kernel["mult"]);
+    set_ref(&get_function_attrs(mult_s)->parameter, kernel["mult"]);
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
     Term* div_s = create_duplicate(kernel, kernel["vectorize_vs"], "div_s");
-    set_ref(function_get_parameters(div_s), DIV_FUNC);
+    set_ref(&get_function_attrs(div_s)->parameter, DIV_FUNC);
     overloaded_function::append_overload(DIV_FUNC, div_s);
 }
 

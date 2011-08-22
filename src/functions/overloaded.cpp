@@ -44,6 +44,7 @@ namespace overloaded_function {
     {
         Branch& contents = nested_contents(CALLER);
         Term* func = CALLER->function;
+        FunctionAttrs* funcAttrs = get_function_attrs(func);
 
         List& overloads = get_function_attrs(func)->parameters;
 
@@ -53,16 +54,15 @@ namespace overloaded_function {
         Term* specializedFunc = NULL;
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
-            bool varArgs = function_t::get_variable_args(func);
 
             // Fail if wrong # of inputs
-            if (!varArgs && (function_t::num_inputs(overload) != numInputs))
+            if (!funcAttrs->variableArgs && (function_num_inputs(funcAttrs) != numInputs))
                 continue;
 
             // Check each input
             bool inputsMatch = true;
             for (int i=0; i < numInputs; i++) {
-                Type* type = function_t::get_input_type(overload, i);
+                Type* type = function_get_input_type(overload, i);
                 TaggedValue* value = INPUT(i);
                 if (value == NULL)
                     continue;
@@ -164,17 +164,18 @@ namespace overloaded_function {
         List& parameters = get_function_attrs(term)->parameters;
 
         ca_assert(parameters.length() > 0);
-        int argumentCount = function_t::num_inputs(as_ref(parameters[0]));
+        int argumentCount = function_num_inputs(get_function_attrs(as_ref(parameters[0])));
         bool variableArgs = false;
         List outputTypes;
 
         for (int i=0; i < parameters.length(); i++) {
 
             Term* overload = as_ref(parameters[i]);
+            FunctionAttrs* overloadAttrs = get_function_attrs(overload);
 
-            if (argumentCount != function_t::num_inputs(overload))
+            if (argumentCount != function_num_inputs(overloadAttrs))
                 variableArgs = true;
-            if (function_t::get_variable_args(overload))
+            if (overloadAttrs->variableArgs)
                 variableArgs = true;
             set_type(outputTypes.append(), function_get_output_type(overload, 0));
         }

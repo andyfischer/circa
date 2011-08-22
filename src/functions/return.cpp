@@ -57,11 +57,14 @@ namespace return_function {
             TermList inputs(returnCall->input(0));
 
             // Check for extra outputs, if found then include their results in this output
-            int numInputs = function_t::num_inputs(sub);
+
+            FunctionAttrs* subAttrs = get_function_attrs(sub);
+
+            int numInputs = function_num_inputs(subAttrs);
             for (int i=0; i < numInputs; i++) {
                 if (function_can_rebind_input(sub, i)) {
                     std::string const& name =
-                        function_t::get_input_placeholder(sub, i)->name;
+                        function_get_input_placeholder(subAttrs, i)->name;
                     Term* result = get_named_at(returnCall, name);
                     inputs.append(result);
                 }

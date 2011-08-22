@@ -26,14 +26,14 @@ Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& 
     if (evaluate == NULL)
         evaluate = empty_evaluate_function;
 
-    function_t::get_evaluate(result) = evaluate;
+    get_function_attrs(result)->evaluate = evaluate;
     return result;
 }
 
 void install_function(Term* function, EvaluateFunc evaluate)
 {
     ca_assert(is_function(function));
-    function_t::get_evaluate(function) = evaluate;
+    get_function_attrs(function)->evaluate = evaluate;
 
     for (int i=0; i < function->users.length(); i++) {
         Term* user = function->users[i];

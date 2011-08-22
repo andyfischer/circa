@@ -27,7 +27,7 @@ EvaluateFunc derive_evaluate_func(Term* term)
     if (!is_function(term->function))
         return empty_evaluate_function;
 
-    return function_t::get_evaluate(term->function);
+    return get_function_attrs(term->function)->evaluate;
 }
 
 void update_cached_evaluate_func(Term* term)
@@ -124,8 +124,10 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
         set_input(term, i, inputs[i]);
     Type* outputType = function_get_output_type(function, 0);
 
-    if (function_t::get_specialize_type(function) != NULL)
-        outputType = function_t::get_specialize_type(function)(term);
+    FunctionAttrs* attrs = get_function_attrs(function);
+
+    if (attrs->specializeType != NULL)
+        outputType = attrs->specializeType(term);
 
     change_declared_type(term, outputType);
 }

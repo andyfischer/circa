@@ -58,38 +58,20 @@ namespace function_attrs_t {
 
 namespace function_t {
 
-    std::string to_string(Term* term);
-    void format_header_source(StyledSource* source, Term* term);
-
     bool check_invariants(Term* term, std::string* failureMessage);
 
     void setup_type(Type* type);
 
     // accessors
-    std::string const& get_name(Term* function);
-    bool get_variable_args(Term* function);
-    Term* get_input_placeholder(Term* function, int index);
-    Type* get_input_type(Term* function, int index);
-    bool is_state_input(Term* function, int index);
-    std::string const& get_input_name(Term* function, int index);
-    bool get_input_modified(Term* function, int index);
-    bool get_input_meta(Term* function, int index);
-    bool get_input_optional(Term* func, int index);
-    std::string const& get_exposed_name_path(Term* function);
-    void set_exposed_name_path(Term* func, std::string const& value);
     Term* get_feedback_func(Term* function);
     std::string get_documentation(Term* function);
-
-    EvaluateFunc& get_evaluate(Term* function);
-    SpecializeTypeFunc& get_specialize_type(Term* function);
-
-    int num_inputs(Term* function);
 }
 
 bool is_function(Term* term);
 bool is_function_attrs(Term* term);
 FunctionAttrs& as_function_attrs(Term* term);
 Branch& function_contents(Term* func);
+Branch& function_contents(FunctionAttrs* func);
 FunctionAttrs* get_function_attrs(Term* func);
 
 // Return the placeholder name for the given input index; this is the name that
@@ -123,15 +105,27 @@ bool function_call_rebinds_input(Term* term, int index);
 
 Type* function_get_input_type(Term* function, int index);
 Type* function_get_output_type(Term* function, int index);
-TaggedValue* function_get_parameters(Term* function);
+Type* function_get_input_type(FunctionAttrs* func, int index);
+Type* function_get_output_type(FunctionAttrs* func, int index);
+int function_num_inputs(FunctionAttrs* func);
+
+bool function_is_state_input(FunctionAttrs* func, int index);
+bool function_get_input_meta(FunctionAttrs* func, int index);
+bool function_get_input_optional(FunctionAttrs* func, int index);
+
+Term* function_get_input_placeholder(FunctionAttrs* func, int index);
+std::string function_get_input_name(FunctionAttrs* func, int index);
 
 const char* get_output_name(Term* term, int outputIndex);
 const char* get_output_name_for_input(Term* term, int inputIndex);
 
 // Returns whether this function is 'native', meaning that it's not a subroutine.
-bool is_native_function(Term* function);
+bool is_native_function(FunctionAttrs* function);
 
 // Change the function's EvaluateFunc, and update any terms that are using it.
 void function_set_evaluate_func(Term* function, EvaluateFunc func);
+void function_set_specialize_type_func(Term* func, SpecializeTypeFunc func);
+
+void function_format_header_source(StyledSource* source, FunctionAttrs* func);
 
 } // namespace circa

@@ -30,16 +30,18 @@ void write_value(CppWriter& writer, Term* term)
 
 void write_function(CppWriter& writer, Term* term)
 {
-    write_type_name(writer, function_get_output_type(term, 0));
+    FunctionAttrs* func = get_function_attrs(term);
+
+    write_type_name(writer, function_get_output_type(func, 0));
     writer.write(" ");
     writer.write(term->name);
     writer.write("(");
 
-    for (int i=0; i < function_t::num_inputs(term); i++) {
+    for (int i=0; i < function_num_inputs(func); i++) {
         if (i != 0) writer.write(", ");
-        write_type_name(writer, function_t::get_input_type(term, i));
+        write_type_name(writer, function_get_input_type(func, i));
         writer.write(" ");
-        writer.write(function_t::get_input_name(term, i));
+        writer.write(function_get_input_name(func, i));
     }
     writer.write(")");
     writer.newline();

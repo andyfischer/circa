@@ -274,7 +274,7 @@ bool has_implicit_name_binding(Term* term)
         return false;
     if (!is_method_call(term))
         return false;
-    return function_t::get_input_placeholder(term->function, 0)
+    return function_get_input_placeholder(get_function_attrs(term->function), 0)
         ->boolPropOptional("use-as-output", false);
 }
 

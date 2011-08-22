@@ -37,15 +37,16 @@ void check_input_for_static_error(List* errors, Term* term, int index)
 {
     int effectiveIndex = index;
 
-    bool varArgs = function_t::get_variable_args(term->function);
-    if (varArgs)
+    FunctionAttrs* func = get_function_attrs(term->function);
+
+    if (func->variableArgs)
         effectiveIndex = 0;
 
     Term* input = term->input(index);
-    bool meta = function_t::get_input_meta(term->function, effectiveIndex);
-    bool optional = function_t::get_input_optional(term->function, effectiveIndex);
-    optional = optional || function_t::is_state_input(term->function, effectiveIndex);
-    Type* type = function_t::get_input_type(term->function, effectiveIndex);
+    bool meta = function_get_input_meta(func, effectiveIndex);
+    bool optional = function_get_input_optional(func, effectiveIndex);
+    optional = optional || function_is_state_input(func, effectiveIndex);
+    Type* type = function_get_input_type(term->function, effectiveIndex);
 
     if (input == NULL) {
         if (!meta && !optional)
@@ -63,8 +64,13 @@ void check_term_for_static_error(List* errors, Term* term)
     if (term->function == NULL)
         return append_static_error(errors, term, "null_function");
 
-    bool varArgs = function_t::get_variable_args(term->function);
-    int funcNumInputs = function_t::num_inputs(term->function);
+    FunctionAttrs* func = get_function_attrs(term->function);
+
+    if (func == NULL)
+        return append_static_error(errors, term, "not_a_function");
+
+    bool varArgs = func->variableArgs;
+    int funcNumInputs = function_num_inputs(func);
 
     // Check # of inputs
     if (!varArgs && (term->numInputs() != funcNumInputs))
@@ -151,7 +157,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     else if (strcmp(type, "unrecognized_expression") == 0)
         out << "Unrecognized expression: " << term->stringProp("message");
     else if (strcmp(type, "wrong_input_count") == 0) {
-        int funcNumInputs = function_t::num_inputs(term->function);
+        int funcNumInputs = function_num_inputs(get_function_attrs(term->function));
         int actualCount = term->numInputs();
         if (actualCount > funcNumInputs)
             out << "Too many inputs (" << actualCount << "), function "
@@ -172,7 +178,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
             out << "The input expression";
         out << " has type " << input->type->name << ", but function "
             << term->function->name << " expects type "
-            << function_t::get_input_type(term->function, inputIndex)->name;
+            << function_get_input_type(term->function, inputIndex)->name;
     }
     else
         out << "(unrecognized error type: " << type << ")";

@@ -24,7 +24,7 @@ namespace set_index_function {
     {
         SET_INDEX_FUNC = import_function(kernel, evaluate,
                 "set_index(any, int, any) -> List");
-        function_t::get_specialize_type(SET_INDEX_FUNC) = specializeType;
+        function_set_specialize_type_func(SET_INDEX_FUNC, specializeType);
     }
 }
 }

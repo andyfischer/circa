@@ -60,7 +60,7 @@ namespace vectorize_vv_function {
         Branch& contents = nested_contents(term);
         contents.clear();
 
-        TaggedValue* funcParam = function_get_parameters(term->function);
+        TaggedValue* funcParam = &get_function_attrs(term->function)->parameter;
         if (funcParam == NULL || !is_ref(funcParam))
             return;
 

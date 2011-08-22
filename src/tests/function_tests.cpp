@@ -13,15 +13,16 @@ void create()
     Branch branch;
 
     Term* func = branch.eval("def mysub(int) -> string;");
+    FunctionAttrs* attrs = get_function_attrs(func);
 
     test_assert(func);
     test_assert(is_subroutine(func));
 
-    test_assert(function_t::get_name(func) == "mysub");
+    test_assert(attrs->name == "mysub");
 
-    test_assert(function_t::num_inputs(func) == 1);
-    test_equals(function_get_input_type(func, 0)->name, "int");
-    test_equals(function_get_output_type(func, 0)->name, "string");
+    test_assert(function_num_inputs(attrs) == 1);
+    test_equals(function_get_input_type(attrs, 0)->name, "int");
+    test_equals(function_get_output_type(attrs, 0)->name, "string");
 }
 
 void test_is_callable()
@@ -96,12 +97,12 @@ void overloaded_function_in_script()
 
 void test_is_native_function()
 {
-    test_assert(is_native_function(KERNEL->get("assert")));
+    test_assert(is_native_function(get_function_attrs(KERNEL->get("assert"))));
 
     Branch branch;
     Term* f = branch.eval("def f();");
 
-    test_assert(!is_native_function(f));
+    test_assert(!is_native_function(get_function_attrs(f)));
 }
 
 void test_documentation_string()

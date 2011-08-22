@@ -482,7 +482,6 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
     initialize_subroutine(result);
 
     FunctionAttrs* attrs = get_function_attrs(result);
-    attrs->declaringTerm = result;
     attrs->implicitStateType = VOID_TYPE;
     set_starting_source_location(result, startPosition, tokens);
     attrs->name = functionName;
@@ -546,7 +545,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
             possible_whitespace(tokens);
         } else {
             // anonymous input; use a default name
-            name = get_placeholder_name_for_index(function_t::num_inputs(result));
+            name = get_placeholder_name_for_index(function_num_inputs(attrs));
         }
 
         // Create an input placeholder term
