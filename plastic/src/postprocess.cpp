@@ -91,7 +91,7 @@ namespace postprocess_functions
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface_t::get_fbo_id(surface));
 
         if (gl_check_error(cxt, caller)) {
-            cxt->errorMessage = "glBindFramebufferEXT failed";
+            error_occurred(cxt, caller, "glBindFramebufferEXT failed");
             return;
         }
 

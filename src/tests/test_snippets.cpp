@@ -524,6 +524,7 @@ void test_misc()
     test_snippet("add(1 1)    ", "");
     test_snippet("add(1 1)\n    ", "");
     test_snippet("l = []\nl.append([1])\n    ", "");
+    test_snippet("def f() -> List { return [1.0] }; m = f(); m[0]->number","");
 }
 
 void test_methods1()

@@ -129,7 +129,7 @@ void bootstrap_kernel()
     function_t::setup_type(&FUNCTION_T);
     FUNCTION_TYPE = create_type_value(*KERNEL, &FUNCTION_T, "Function");
 
-    // Initialize TaggedValue func
+    // Initialize Value func
     VALUE_FUNC->type = &FUNCTION_T;
     VALUE_FUNC->function = VALUE_FUNC;
     change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
@@ -159,6 +159,7 @@ void initialize_primitive_types(Branch& kernel)
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
     create_type_value(kernel, &BRANCH_T, "Branch");
 
+    initialize_function(VALUE_FUNC);
     // ANY_TYPE was created in bootstrap_kernel
 }
 
