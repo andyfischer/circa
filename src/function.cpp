@@ -67,42 +67,10 @@ namespace function_attrs_t {
 
 namespace function_t {
 
-    std::string get_documentation(Term* func)
-    {
-        FunctionAttrs* attrs = get_function_attrs(func);
-
-        // A function can optionally have a documentation string. If present,
-        // it will be the first thing defined in the function, and it'll be
-        // anonymous and be a statement.
-        int expected_index = function_num_inputs(attrs) + 1;
-        Branch& contents = nested_contents(func);
-
-        if (expected_index >= contents.length()) return "";
-        Term* possibleDocString = contents[expected_index];
-        if (possibleDocString->name != "") return "";
-        if (!is_string(possibleDocString)) return "";
-        if (!is_statement(possibleDocString)) return "";
-        if (!is_value(possibleDocString)) return "";
-        return as_string(possibleDocString);
-    }
-
-    bool check_invariants(Term* func, std::string* failureMessage)
-    {
-        if (!is_subroutine(func))
-            return true;
-
-        //Branch& contents = nested_contents(func);
-
-        // There was once stuff here
-
-        return true;
-    }
-
     void setup_type(Type* type)
     {
         type->name = "Function";
         type->formatSource = subroutine_f::format_source;
-        type->checkInvariants = function_t::check_invariants;
         type->storageType = STORAGE_TYPE_REF;
     }
 
@@ -376,11 +344,15 @@ bool function_get_input_optional(FunctionAttrs* func, int index)
 
 Term* function_get_input_placeholder(FunctionAttrs* func, int index)
 {
-    Branch& contents = nested_contents(func->declaringTerm);
+    Branch& contents = function_get_contents(func);
     index += 1;
     if (index >= contents.length())
         return NULL;
     return contents[index];
+}
+Branch& function_get_contents(FunctionAttrs* func)
+{
+    return nested_contents(func->declaringTerm);
 }
 
 std::string function_get_input_name(FunctionAttrs* func, int index)
@@ -390,6 +362,23 @@ std::string function_get_input_name(FunctionAttrs* func, int index)
         return "";
     return placeholder->name;
 }
+
+std::string function_get_documentation_string(FunctionAttrs* func)
+{
+    // A function can optionally have a documentation string. If present,
+    // it will be the first thing defined in the function, and it'll be
+    // anonymous and be a statement.
+    int expected_index = function_num_inputs(func) + 1;
+    Branch& contents = function_get_contents(func);
+
+    if (expected_index >= contents.length()) return "";
+    Term* possibleDocString = contents[expected_index];
+    if (possibleDocString->name != "") return "";
+    if (!is_string(possibleDocString)) return "";
+    if (!is_statement(possibleDocString)) return "";
+    if (!is_value(possibleDocString)) return "";
+    return as_string(possibleDocString);
+}    
 
 const char* get_output_name(Term* term, int outputIndex)
 {

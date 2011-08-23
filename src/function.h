@@ -58,13 +58,10 @@ namespace function_attrs_t {
 
 namespace function_t {
 
-    bool check_invariants(Term* term, std::string* failureMessage);
-
     void setup_type(Type* type);
 
     // accessors
     Term* get_feedback_func(Term* function);
-    std::string get_documentation(Term* function);
 }
 
 bool is_function(Term* term);
@@ -114,7 +111,10 @@ bool function_get_input_meta(FunctionAttrs* func, int index);
 bool function_get_input_optional(FunctionAttrs* func, int index);
 
 Term* function_get_input_placeholder(FunctionAttrs* func, int index);
+Branch& function_get_contents(FunctionAttrs* func);
 std::string function_get_input_name(FunctionAttrs* func, int index);
+
+std::string function_get_documentation_string(FunctionAttrs* func);
 
 const char* get_output_name(Term* term, int outputIndex);
 const char* get_output_name_for_input(Term* term, int inputIndex);

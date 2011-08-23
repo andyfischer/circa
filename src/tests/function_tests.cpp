@@ -109,13 +109,13 @@ void test_documentation_string()
 {
     Branch branch;
     Term* f = branch.eval("def f() { 'docs' 1 + 2 }");
-    test_assert(function_t::get_documentation(f) == "docs");
+    test_assert(function_get_documentation_string(get_function_attrs(f)) == "docs");
 
     Term* f2 = branch.eval("def f2() { a = 'not docs' 1 + 2 }");
-    test_assert(function_t::get_documentation(f2) == "");
+    test_assert(function_get_documentation_string(get_function_attrs(f2)) == "");
 
     Term* f3 = branch.eval("def f2() { print('not docs') 1 + 2 }");
-    test_assert(function_t::get_documentation(f3) == "");
+    test_assert(function_get_documentation_string(get_function_attrs(f3)) == "");
 }
 
 void test_bug_with_declaring_state_argument()

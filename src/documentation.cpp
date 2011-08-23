@@ -61,7 +61,7 @@ std::string get_header_source(Term* function)
 void generate_docs_for_function(Term* func, std::stringstream &out)
 {
     std::string header = get_header_source(func);
-    std::string description = function_t::get_documentation(func);
+    std::string description = function_get_documentation_string(get_function_attrs(func));
     if (description == "") description = "No description provided";
 
     out << "{\"name\":\"" << func->name << "\"";

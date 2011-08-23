@@ -58,25 +58,6 @@ void test_assert_function(Branch& branch, int line, const char* file)
         throw std::runtime_error("");
     }
 
-    // Sanity check on every term in this branch
-    for (BranchIterator it(&branch); !it.finished(); ++it) {
-        Term* term = *it;
-        if (term == NULL) continue;
-
-        bool result = true;
-        std::string message;
-
-        if (is_subroutine(term))
-            result = function_t::check_invariants(term, &message);
-
-        if (!result) {
-            std::stringstream msg;
-            msg << "Sanity check fail at " << file << ", line " << line << std::endl;
-            msg << message << std::endl;
-            throw std::runtime_error(msg.str());
-        }
-    }
-
     List errors;
     check_for_static_errors(&errors, branch);
     if (!errors.empty()) {
