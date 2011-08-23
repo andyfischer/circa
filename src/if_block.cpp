@@ -73,7 +73,7 @@ void update_if_block_joining_branch(Term* ifCall)
         // We only rebind names that are either 1) already bound in the outer scope, or
         // 2) bound in every possible branch.
         
-        bool boundInOuterScope = find_named(*outerScope, name) != NULL;
+        bool boundInOuterScope = find_name(*outerScope, name.c_str()) != NULL;
 
         bool boundInEveryBranch = true;
 

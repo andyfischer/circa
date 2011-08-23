@@ -6,12 +6,9 @@
 
 namespace circa {
 
-Term* find_named(Branch const& branch, std::string const& name);
+Term* find_name(Branch const& branch, const char* name);
 
-Term* get_named(Branch const& branch, std::string const& qualifiedName);
-
-// char* overload for use in GDB
-Term* get_named(Branch const& branch, const char* name);
+Term* find_local_name(Branch const& branch, const char* name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
 // of the first colon. If the string isn't a qualified name then returns

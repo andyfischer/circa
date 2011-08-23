@@ -13,73 +13,53 @@
 
 namespace circa {
 
-Term* find_named(Branch const& branch, std::string const& name)
+Term* find_name(Branch const& branch, const char* name)
 {
-    ca_assert(name != "");
-    ca_assert(name == "#out" || name[0] != '#'); // We shouldn't ever lookup hidden names
-
-    Term* result = get_named(branch, name);
+    Term* result = find_local_name(branch, name);
     if (result != NULL)
         return result;
 
     // Name not found in this branch, check the outer scope.
     Branch* outerScope = get_outer_scope(branch);
 
+    // Avoid infinite loop
     if (outerScope == &branch)
         internal_error("Branch's outer scope is a circular reference");
 
     if (outerScope == NULL)
         return get_global(name);
     else
-        return find_named(*outerScope, name);
+        return find_name(*outerScope, name);
 }
 
-Term* get_named(Branch const& branch, std::string const& name)
+Term* find_local_name(Branch const& branch, const char* name)
 {
     // First, check for an exact match
     TermNamespace::const_iterator it;
     it = branch.names.find(name);
     if (it != branch.names.end())
         return it->second;
-    
+
     // 'name' can be a qualified name. Find the end of the first identifier.
-    int separatorLoc = find_qualified_name_separator(name.c_str());
-    bool qualifiedName = separatorLoc != -1;
-    size_t nameEnd;
-    if (separatorLoc < 0)
-        nameEnd = strlen(name.c_str());
-    else
-        nameEnd = unsigned(separatorLoc);
+    int separatorLoc = find_qualified_name_separator(name);
 
-    // Find this name in branch's namespace
-    Term* prefix = NULL;
-    for (it = branch.names.begin(); it != branch.names.end(); ++it) {
-        std::string const& namespaceName = it->first;
-        if (strncmp(name.c_str(), namespaceName.c_str(), nameEnd) == 0
-            && namespaceName.length() == nameEnd) {
+    // Give up if no separator found
+    if (separatorLoc == -1)
+        return NULL;
 
-            // We found the part before the first :
-            prefix = it->second;
-            break;
-        }
-    }
+    // Find the namespace term
+    std::string namespaceName(name, separatorLoc);
+    Term* prefix = find_local_name(branch, namespaceName.c_str());
 
     // Give up if prefix not found
     if (prefix == NULL)
         return NULL;
 
-    // Recursively search inside prefix. TODO: should do this without allocating
-    // a new string.
-    if (qualifiedName)
-        return get_named(nested_contents(prefix),
-            name.substr(nameEnd+1, name.length()));
+    // Recursively search inside the prefix for the qualified suffix.
+    std::string suffix = name + separatorLoc + 1;
+    return find_local_name(nested_contents(prefix), suffix.c_str());
 
     return NULL;
-}
-
-Term* get_named(Branch const& branch, const char* name)
-{
-    return get_named(branch, std::string(name));
 }
 
 int find_qualified_name_separator(const char* name)

@@ -293,7 +293,7 @@ void find_name_in_outer_branch()
 
     Branch& nested2 = create_branch(nested);
 
-    test_assert(find_named(nested2, "a") == a);
+    test_assert(find_name(nested2, "a") == a);
 
     test_assert(branch);
 }
