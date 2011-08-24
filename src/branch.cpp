@@ -46,18 +46,18 @@ Branch::~Branch()
     debug_unregister_valid_object(this, BRANCH_OBJECT);
 }
 
-int Branch::length() const
+int Branch::length()
 {
     assert_valid_branch(this);
     return _terms.length();
 }
 
-bool Branch::contains(std::string const& name) const
+bool Branch::contains(std::string const& name)
 {
     return get(name) != NULL;
 }
 
-Term* Branch::get(int index) const
+Term* Branch::get(int index)
 {
     assert_valid_branch(this);
     if (index >= length())
@@ -65,18 +65,18 @@ Term* Branch::get(int index) const
     return _terms[index];
 }
 
-Term* Branch::getFromEnd(int index) const
+Term* Branch::getFromEnd(int index)
 {
     return get(length() - index - 1);
 }
 
-Term* Branch::last() const
+Term* Branch::last()
 {
     if (length() == 0) return NULL;
     else return _terms[length()-1];
 }
 
-int Branch::getIndex(Term* term) const
+int Branch::getIndex(Term* term)
 {
     ca_assert(term != NULL);
     ca_assert(term->owningBranch == this);
@@ -87,7 +87,7 @@ int Branch::getIndex(Term* term) const
     return term->index;
 }
 
-int Branch::debugFindIndex(Term* term) const
+int Branch::debugFindIndex(Term* term)
 {
     for (int i=0; i < length(); i++) 
         if (get(i) == term)
@@ -95,7 +95,7 @@ int Branch::debugFindIndex(Term* term) const
     return -1;
 }
 
-int Branch::findIndex(std::string const& name) const
+int Branch::findIndex(std::string const& name)
 {
     for (int i=0; i < length(); i++) {
         if (get(i) == NULL)
@@ -105,7 +105,7 @@ int Branch::findIndex(std::string const& name) const
     }
     return -1;
 }
-int Branch::findIndex(const char* name) const
+int Branch::findIndex(const char* name)
 {
     for (int i=0; i < length(); i++) {
         if (get(i) == NULL)
@@ -280,7 +280,7 @@ Branch::clear()
     clear_branch(this);
 }
 
-Term* Branch::findFirstBinding(std::string const& name) const
+Term* Branch::findFirstBinding(std::string const& name)
 {
     for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
@@ -292,7 +292,7 @@ Term* Branch::findFirstBinding(std::string const& name) const
     return NULL;
 }
 
-Term* Branch::findLastBinding(std::string const& name) const
+Term* Branch::findLastBinding(std::string const& name)
 {
     for (int i = _terms.length()-1; i >= 0; i--) {
         if (_terms[i] == NULL)
