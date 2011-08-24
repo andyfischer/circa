@@ -370,7 +370,7 @@ std::string get_base_type_name(std::string const& typeName)
 
 Term* find_method_with_search_name(Branch& branch, Type* type, std::string const& searchName)
 {
-    Term* term = find_name(branch, searchName.c_str());
+    Term* term = find_name(&branch, searchName.c_str());
     if (term != NULL && is_function(term))
         return term;
 
@@ -381,7 +381,7 @@ Term* find_method_with_search_name(Branch& branch, Type* type, std::string const
         typeDeclarationBranch = type->declaringTerm->owningBranch;
 
     if (typeDeclarationBranch != NULL && typeDeclarationBranch != &branch) {
-        term = find_name(*typeDeclarationBranch, searchName.c_str());
+        term = find_name(typeDeclarationBranch, searchName.c_str());
         if (term != NULL && is_function(term))
             return term;
     }

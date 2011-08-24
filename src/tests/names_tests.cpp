@@ -12,11 +12,11 @@ void test_find_name()
     Branch branch;
     Term* a = create_int(branch, 1, "a");
 
-    test_assert(find_name(branch, "a") == a);
-    test_assert(find_name(branch, "b") == NULL);
+    test_assert(find_name(&branch, "a") == a);
+    test_assert(find_name(&branch, "b") == NULL);
 
     Branch& sub = create_branch(branch, "sub");
-    test_assert(find_name(sub, "a") == a);
+    test_assert(find_name(&sub, "a") == a);
 }
 
 void test_name_is_reachable_from()
@@ -212,7 +212,7 @@ void test_with_include()
 
     Branch branch;
     branch.compile("include('a')");
-    Term* a = find_name(branch, "ns:a");
+    Term* a = find_name(&branch, "ns:a");
     test_assert(a != NULL);
 
     test_assert(name_is_reachable_from(a, branch));
@@ -225,14 +225,14 @@ void name_with_colons()
     branch.bindName(one, "qualified:name");
 
     test_assert(branch["qualified:name"] == one);
-    test_assert(find_name(branch, "qualified:name") == one);
+    test_assert(find_name(&branch, "qualified:name") == one);
 
     Branch& ns = create_namespace(branch, "ns");
     Term* two = ns.compile("2");
     ns.bindName(two, "another:name");
 
     test_assert(branch["ns:another:name"] == two);
-    test_assert(find_name(branch, "ns:another:name") == two);
+    test_assert(find_name(&branch, "ns:another:name") == two);
 }
 
 void test_global_name()

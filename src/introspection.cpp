@@ -224,11 +224,13 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
             continue;
 
         // Ignore names that aren't bound in the outer branch
-        Term* outer = NULL;
-        if (get_outer_scope(branch) != NULL)
-            outer = find_name(*get_outer_scope(branch), name.c_str());
+        Term* outer = find_name(get_outer_scope(branch), name.c_str());
 
         if (outer == NULL)
+            continue;
+
+        // Ignore global terms
+        if (outer->owningBranch == KERNEL)
             continue;
 
         // Ignore terms that are just a simple copy

@@ -13,31 +13,34 @@
 
 namespace circa {
 
-Term* find_name(Branch const& branch, const char* name)
+Term* find_name(Branch* branch, const char* name)
 {
+    if (branch == NULL)
+        return get_global(name);
+
     Term* result = find_local_name(branch, name);
     if (result != NULL)
         return result;
 
     // Name not found in this branch, check the outer scope.
-    Branch* outerScope = get_outer_scope(branch);
+    Branch* outerScope = get_outer_scope(*branch);
 
     // Avoid infinite loop
-    if (outerScope == &branch)
+    if (outerScope == branch)
         internal_error("Branch's outer scope is a circular reference");
 
-    if (outerScope == NULL)
-        return get_global(name);
-    else
-        return find_name(*outerScope, name);
+    return find_name(outerScope, name);
 }
 
-Term* find_local_name(Branch const& branch, const char* name)
+Term* find_local_name(Branch* branch, const char* name)
 {
+    if (branch == NULL)
+        return NULL;
+
     // First, check for an exact match
     TermNamespace::const_iterator it;
-    it = branch.names.find(name);
-    if (it != branch.names.end())
+    it = branch->names.find(name);
+    if (it != branch->names.end())
         return it->second;
 
     // 'name' can be a qualified name. Find the end of the first identifier.
@@ -57,7 +60,7 @@ Term* find_local_name(Branch const& branch, const char* name)
 
     // Recursively search inside the prefix for the qualified suffix.
     std::string suffix = name + separatorLoc + 1;
-    return find_local_name(nested_contents(prefix), suffix.c_str());
+    return find_local_name(&nested_contents(prefix), suffix.c_str());
 
     return NULL;
 }

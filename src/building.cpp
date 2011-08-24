@@ -235,7 +235,7 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
 
 Term* apply(Branch& branch, std::string const& functionName, TermList const& inputs, std::string const& name)
 {
-    Term* function = find_name(branch, functionName.c_str());
+    Term* function = find_name(&branch, functionName.c_str());
     if (function == NULL)
         internal_error("function not found: "+functionName);
 
@@ -268,7 +268,7 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
 {
     Term* type = NULL;
 
-    type = find_name(branch, typeName.c_str());
+    type = find_name(&branch, typeName.c_str());
 
     if (type == NULL)
         internal_error("Couldn't find type: "+typeName);
@@ -416,7 +416,7 @@ void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition
     std::vector<std::string> reboundNames;
     list_names_that_this_branch_rebinds(source, reboundNames);
 
-    Branch& outerScope = *source.owningTerm->owningBranch;
+    Branch* outerScope = source.owningTerm->owningBranch;
     for (unsigned i=0; i < reboundNames.size(); i++) {
         std::string name = reboundNames[i];
         Term* outerVersion = find_name(outerScope, name.c_str());

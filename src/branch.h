@@ -72,9 +72,9 @@ struct Branch
     Term* operator[](int index) { return get(index); }
 
     // Get a term from a name binding.
-    inline Term* get(std::string const& name) { return find_local_name(*this, name.c_str()); }
-    inline Term* getNamed(const char* name) { return find_local_name(*this, name); }
-    inline Term* operator[](std::string const& name) { return find_local_name(*this, name.c_str()); }
+    inline Term* get(std::string const& name) { return find_local_name(this, name.c_str()); }
+    inline Term* getNamed(const char* name) { return find_local_name(this, name); }
+    inline Term* operator[](std::string const& name) { return find_local_name(this, name.c_str()); }
 
     // Returns true if there is a term with the given name
     bool contains(std::string const& name);

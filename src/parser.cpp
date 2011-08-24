@@ -470,7 +470,7 @@ ParseResult function_decl(Branch& branch, TokenStream& tokens, ParserCxt* contex
             return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after .");
 
         std::string typeName = functionName;
-        methodType = find_name(branch, typeName.c_str());
+        methodType = find_name(&branch, typeName.c_str());
         functionName += "." + tokens.consume(IDENTIFIER);
 
         if (methodType == NULL || !is_type(methodType))
@@ -1965,7 +1965,7 @@ ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context)
     
     std::string id = tokens.consume(IDENTIFIER);
 
-    Term* term = find_name(branch, id.c_str());
+    Term* term = find_name(&branch, id.c_str());
     if (term == NULL) {
         ParseResult result = unknown_identifier(branch, id);
         set_source_location(result.term, startPosition, tokens);
@@ -1988,7 +1988,7 @@ ParseResult identifier_with_rebind(Branch& branch, TokenStream& tokens, ParserCx
 
     std::string id = tokens.consume(IDENTIFIER);
 
-    Term* head = find_name(branch, id.c_str());
+    Term* head = find_name(&branch, id.c_str());
     ParseResult result;
 
     if (head == NULL)
@@ -2055,7 +2055,7 @@ Term* find_and_apply(Branch& branch,
         std::string const& functionName,
         TermList const& inputs)
 {
-    Term* function = find_name(branch, functionName.c_str());
+    Term* function = find_name(&branch, functionName.c_str());
 
     if (function == NULL)
         return unknown_identifier(branch, functionName).term;
@@ -2065,7 +2065,7 @@ Term* find_and_apply(Branch& branch,
 
 Term* find_type(Branch& branch, std::string const& name)
 {
-    Term* result = find_name(branch, name.c_str());
+    Term* result = find_name(&branch, name.c_str());
 
     if (result == NULL) {
         result = apply(branch, UNKNOWN_TYPE_FUNC, TermList(), name);

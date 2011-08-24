@@ -38,7 +38,7 @@ bool check_that_terms_have_locations(Branch& branch, List* failures)
 
 void test_snippet(std::string codeStr, std::string assertionsStr)
 {
-    Branch code;
+    Branch& code = create_branch(*KERNEL);
     parser::compile(code, parser::statement_list, codeStr);
 
     if (has_static_errors(code)) {
