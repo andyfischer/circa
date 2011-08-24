@@ -44,7 +44,12 @@ Term* get_for_loop_modify_list(Term* forTerm)
     return term;
 }
 
-Branch& get_for_loop_rebinds_for_outer(Term* forTerm)
+Branch& get_for_loop_inner_rebinds(Term* forTerm)
+{
+    return nested_contents(forTerm->contents(1));
+}
+
+Branch& get_for_loop_outer_rebinds(Term* forTerm)
 {
     Branch& contents = nested_contents(forTerm);
     return contents.getFromEnd(0)->contents();
@@ -78,7 +83,7 @@ void setup_for_loop_post_code(Term* forTerm)
     finish_minor_branch(forContents);
 
     // Create a branch that has all the names which are rebound in this loop
-    Branch& innerRebinds = nested_contents(forContents["#inner_rebinds"]);
+    Branch& innerRebinds = get_for_loop_inner_rebinds(forTerm);
     Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
 
     std::vector<std::string> reboundNames;
@@ -156,9 +161,9 @@ CA_FUNCTION(evaluate_for_loop)
     Term* caller = CALLER;
     EvalContext* context = CONTEXT;
     Branch& forContents = nested_contents(caller);
-    Branch& innerRebinds = forContents[inner_rebinds_location]->contents();
-    Branch& outerRebinds = forContents[forContents.length()-1]->contents();
-    Term* iterator = get_for_loop_iterator(CALLER);
+    Branch& innerRebinds = get_for_loop_inner_rebinds(caller);
+    Branch& outerRebinds = get_for_loop_outer_rebinds(caller);
+    Term* iterator = get_for_loop_iterator(caller);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();

@@ -517,14 +517,18 @@ void test_concat()
     test_snippet("", "concat() == ''");
 }
 
-void test_misc()
+void test_things_that_once_caused_errors()
 {
     test_snippet("    ", "");
+
     // These snippets once caused parser errors:
     test_snippet("add(1 1)    ", "");
     test_snippet("add(1 1)\n    ", "");
     test_snippet("l = []\nl.append([1])\n    ", "");
     test_snippet("def f() -> List { return [1.0] }; m = f(); m[0]->number","");
+
+    // This once caused an error "Not a function: value"
+    test_snippet("for msg in [] { value = 1 -> number }", "");
 }
 
 void test_methods1()
@@ -710,7 +714,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_range);
     REGISTER_TEST_CASE(test_snippets::test_significant_indentation);
     REGISTER_TEST_CASE(test_snippets::test_concat);
-    REGISTER_TEST_CASE(test_snippets::test_misc);
+    REGISTER_TEST_CASE(test_snippets::test_things_that_once_caused_errors);
     REGISTER_TEST_CASE(test_snippets::test_methods1);
     REGISTER_TEST_CASE(test_snippets::test_methods2);
     REGISTER_TEST_CASE(test_snippets::test_lists);
