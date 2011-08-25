@@ -84,6 +84,7 @@ const char* get_token_text(int match)
         case NULL_TOKEN: return "null";
         case BREAK: return "break";
         case CONTINUE: return "continue";
+        case SWITCH: return "switch";
         case UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -307,6 +308,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, RETURN)) return;
         if (try_to_consume_keyword(context, BREAK)) return;
         if (try_to_consume_keyword(context, CONTINUE)) return;
+        if (try_to_consume_keyword(context, SWITCH)) return;
 
         consume_identifier(context);
         return;
