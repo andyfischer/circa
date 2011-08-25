@@ -826,6 +826,23 @@ ParseResult if_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
     return ParseResult(result);
 }
 
+ParseResult switch_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(SWITCH);
+    possible_whitespace(tokens);
+
+    Term* input = infix_expression(branch, tokens, context).term;
+
+    Term* result = apply(branch, SWITCH_FUNC, TermList(input));
+
+    // TODO
+
+    set_source_location(result, startPosition, tokens);
+    return ParseResult(result);
+}
+
 ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();

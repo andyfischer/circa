@@ -54,6 +54,7 @@ extern Term* PRESERVE_STATE_RESULT_FUNC;
 extern Term* SET_FIELD_FUNC;
 extern Term* SET_INDEX_FUNC;
 extern Term* SUBROUTINE_OUTPUT_FUNC;
+extern Term* SWITCH_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* SUB_FUNC;
 extern Term* TYPE_FUNC;
