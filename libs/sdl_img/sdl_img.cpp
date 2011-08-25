@@ -178,6 +178,40 @@ CA_FUNCTION(ImageTexture_draw)
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+CA_FUNCTION(ImageTexture_draw_clip)
+{
+    ImageTexture* imageTexture = (ImageTexture*) handle_t::get_ptr(INPUT(0));
+
+    float clip_x1, clip_y1, clip_x2, clip_y2;
+    get_rect(INPUT(1), &clip_x1, &clip_y1, &clip_x2, &clip_y2);
+    float x,y;
+    get_point(INPUT(2), &x, &y);
+
+    float textureWidth = imageTexture->width;
+    float textureHeight = imageTexture->height;
+
+    if (clip_x1 < 0) clip_x1 = 0;
+    if (clip_y1 < 0) clip_y1 = 0;
+    if (clip_x2 > textureWidth) clip_x2 = textureWidth;
+    if (clip_y2 > textureHeight) clip_y2 = textureHeight;
+
+    float width = clip_x2 - clip_x1;
+    float height = clip_y2 - clip_y1;
+
+    glBindTexture(GL_TEXTURE_2D, imageTexture->textureId);
+    glBegin(GL_QUADS);
+    glTexCoord2d(clip_x1 / textureWidth, clip_y1 / textureHeight);
+    glVertex3f(x, y, 0);
+    glTexCoord2d(clip_x2 / textureWidth, clip_y1 / textureHeight);
+    glVertex3f(x + width, y, 0);
+    glTexCoord2d(clip_x2 / textureWidth, clip_y2 / textureHeight);
+    glVertex3f(x + width, y + height, 0);
+    glTexCoord2d(clip_x1 / textureWidth, clip_y2 / textureHeight);
+    glVertex3f(x, y + height, 0);
+    glEnd();
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void on_load(Branch* branch)
 {
     g_image_t = get_declared_type(branch, "Image");

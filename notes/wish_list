@@ -1,11 +1,34 @@
 
-This page contains notes from the front lines; ideas from actual usage
+# WISH LIST #
 
-Enum type would be great
-Ability to do dynamic typing is really helpful
-Often you want to have a reference to an item in a list. Possible to do this in a typesafe way? Can this be used as an lexpr?
-Switch expressions used constantly, maybe have 1 or more special syntaxes
-(done) Fix how functions can be vectorized, currently it usually doesn't work
-(done) Would be great to tweak constants inside of functions
+# Defects #
+ - clear_branch and repair_broken_links don't correctly handle nested names
 
-Want some way to attach a block of code to a function call.
+# Miscellaneous #
+ - Need a variant of include() that doesn't expose names 
+ - More sanity when message passing.
+     See lincoln.ca for how crazy it is
+ - delta() should work on lists
+ - For-loop index() function
+
+# Types #
+ - Collapse 'null' and 'void' into the same type
+ - Remove initialize() from simple_handle
+ - Deprecate the way change_type() calls initialize()
+
+# Parser work #
+ - Switch statement
+ - Enums
+ - [low] omit ()s on method calls
+ - allow for @ syntax on complex lexprs
+ - Initialize an object with named fields
+
+# Function declaration #
+ - Implicit return type for subroutines
+ - Declare a block that doesn't have an end marker (ends at EOF)
+ - Cleaner syntax for a function that rebinds input
+ - Declare a function with multiple outputs with Circa code
+
+# Optimization tasks #
+ - Value sharing, especially for Dict. Lots of performance loss in preserve_state_result.
+ - Some overloads that are currently resolved dynamically can be resolved statically

@@ -7,10 +7,19 @@ namespace sdl_img
 
     def load_image(string filename) -> Image
     def load_image_to_texture(Image image) -> ImageTexture
+    def load_file_to_texture(string filename) -> ImageTexture
+        state image
+        state texture
+        if file_changed(filename)
+            image = load_image(filename)
+            texture = load_image_to_texture(image)
+        return texture->ImageTexture
+
     def ImageTexture.draw(tex, Point p)
+    def ImageTexture.draw_clip(tex, Rect source, Point dest)
 
     def Image.draw(image, Point p)
-        state texture = load_image_to_texture(image)
+        state ImageTexture texture = load_image_to_texture(image)
         texture.draw(p)
 
     def draw_image(string filename, Point p)

@@ -435,7 +435,10 @@ std::string context_get_error_message(EvalContext* cxt)
 {
     ca_assert(cxt != NULL);
     ca_assert(cxt->errorTerm != NULL);
-    return as_string(get_output(cxt, cxt->errorTerm, 0));
+    TaggedValue* output = get_output(cxt, cxt->errorTerm, 0);
+    if (output == NULL)
+        return "error message unavailable";
+    return as_string(output);
 }
 
 } // namespace circa
