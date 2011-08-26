@@ -171,7 +171,7 @@ void test_keywords()
 
 void test_keywords2()
 {
-    TokenStream tokens("and or discard return null switch");
+    TokenStream tokens("and or discard return null switch case");
 
     test_assert(tokens.consume(token::AND) == "and");
     test_assert(tokens.consume(token::WHITESPACE) == " ");
@@ -184,6 +184,8 @@ void test_keywords2()
     test_assert(tokens.consume(token::NULL_TOKEN) == "null");
     test_assert(tokens.consume(token::WHITESPACE) == " ");
     test_assert(tokens.consume(token::SWITCH) == "switch");
+    test_assert(tokens.consume(token::WHITESPACE) == " ");
+    test_assert(tokens.consume(token::CASE) == "case");
     test_assert(tokens.finished());
 }
 

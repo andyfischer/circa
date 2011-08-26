@@ -346,6 +346,11 @@ ParseResult statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
         result = namespace_block(branch, tokens, context);
     }
 
+    // Case statement
+    else if (tokens.nextIs(CASE)) {
+        result = case_statement(branch, tokens, context);
+    }
+
     // Otherwise, expression statement
     else {
         result = expression_statement(branch, tokens, context);
@@ -837,9 +842,45 @@ ParseResult switch_block(Branch& branch, TokenStream& tokens, ParserCxt* context
 
     Term* result = apply(branch, SWITCH_FUNC, TermList(input));
 
-    // TODO
+    set_starting_source_location(result, startPosition, tokens);
+    consume_branch(nested_contents(result), tokens, context);
+
+    // case_statement may have appended some terms to our branch, so move this
+    // term to compensate.
+    branch.moveToEnd(result);
+    refresh_locals_indices(branch);
 
     set_source_location(result, startPosition, tokens);
+    set_is_statement(result, true);
+    return ParseResult(result);
+}
+
+ParseResult case_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(CASE);
+    possible_whitespace(tokens);
+
+    // Find the parent 'switch' block.
+    Term* parent = branch.owningTerm;
+    if (parent == NULL || parent->function != SWITCH_FUNC) {
+        return compile_error_for_line(branch, tokens, startPosition,
+            "'case' keyword must occur inside 'switch' block");
+    }
+
+    Branch& parentBranch = *parent->owningBranch;
+
+    // Parse the 'case' input, using the branch that the 'switch' is in.
+    Term* input = infix_expression(parentBranch, tokens, context).term;
+
+    Term* result = apply(branch, CASE_FUNC, TermList(input));
+
+    set_starting_source_location(result, startPosition, tokens);
+    consume_branch(nested_contents(result), tokens, context);
+
+    set_source_location(result, startPosition, tokens);
+    set_is_statement(result, true);
     return ParseResult(result);
 }
 
@@ -877,7 +918,7 @@ ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
         name = listExpr->name;
 
     Term* forTerm = apply(branch, FOR_FUNC, TermList(listExpr), name);
-    Branch& innerBranch = nested_contents(forTerm);
+    Branch& contents = nested_contents(forTerm);
     setup_for_loop_pre_code(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
 
@@ -888,7 +929,7 @@ ParseResult for_block(Branch& branch, TokenStream& tokens, ParserCxt* context)
 
     setup_for_loop_iterator(forTerm, iterator_name.c_str());
 
-    consume_branch(innerBranch, tokens, context);
+    consume_branch(contents, tokens, context);
 
     setup_for_loop_post_code(forTerm);
     set_source_location(forTerm, startPosition, tokens);
@@ -1138,6 +1179,8 @@ ParseResult expression(Branch& branch, TokenStream& tokens, ParserCxt* context)
         result = if_block(branch, tokens, context);
     else if (tokens.nextIs(FOR))
         result = for_block(branch, tokens, context);
+    else if (tokens.nextIs(SWITCH))
+        result = switch_block(branch, tokens, context);
     else
         result = infix_expression(branch, tokens, context);
 

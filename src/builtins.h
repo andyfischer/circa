@@ -15,6 +15,7 @@ extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
 extern Term* BRANCH_FUNC;
 extern Term* BREAK_FUNC;
+extern Term* CASE_FUNC;
 extern Term* COMMENT_FUNC;
 extern Term* CONTINUE_FUNC;
 extern Term* COPY_FUNC;

@@ -201,12 +201,6 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Otherwise, load args[0] as a script and run it
-    
-    // temp
-    dump(kernel());
-    std::cout << "number: " << kernel()["number"]->globalID << std::endl;
-    std::cout << "value: " << kernel()["value"]->globalID << std::endl;
-
     Branch& main_branch = create_branch(kernel());
     parse_script(main_branch, args[0]);
 

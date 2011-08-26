@@ -683,6 +683,10 @@ void test_multiple_name_assignment()
     test_snippet("a = b = c = 1", "a == 1; b == 1; c == 1");
 }
 
+void test_switch_statement()
+{
+    test_snippet("switch 0\n case 1\n  assert(false)", "");
+}
 
 void register_tests()
 {
@@ -727,6 +731,7 @@ void register_tests()
     REGISTER_TEST_CASE(test_snippets::test_stateful_value_decl);
     REGISTER_TEST_CASE(test_snippets::test_dynamic_call);
     REGISTER_TEST_CASE(test_snippets::test_multiple_name_assignment);
+    REGISTER_TEST_CASE(test_snippets::test_switch_statement);
 }
 
 } // namespace test_snippets

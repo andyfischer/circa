@@ -5,15 +5,34 @@
 namespace circa {
 namespace switch_function {
 
-    void formatSource(StyledSource* source, Term* term)
+    CA_FUNCTION(evaluate_case)
     {
         // TODO
     }
 
+    void switch_formatSource(StyledSource* source, Term* term)
+    {
+        format_name_binding(source, term);
+        append_phrase(source, "switch ", term, phrase_type::KEYWORD);
+        format_source_for_input(source, term, 0);
+        format_branch_source(source, nested_contents(term), term);
+    }
+
+    void case_formatSource(StyledSource* source, Term* term)
+    {
+        append_phrase(source, "case ", term, phrase_type::KEYWORD);
+        format_source_for_input(source, term, 0);
+        format_branch_source(source, nested_contents(term), term);
+    }
+
     void setup(Branch& kernel)
     {
-        SWITCH_FUNC = import_function(kernel, evaluate_switch, "switch() -> any");
-        get_function_attrs(SWITCH_FUNC)->formatSource = formatSource;
+
+        SWITCH_FUNC = import_function(kernel, evaluate_switch, "switch(any input) -> any");
+        get_function_attrs(SWITCH_FUNC)->formatSource = switch_formatSource;
+
+        CASE_FUNC = import_function(kernel, evaluate_case, "case(any input)");
+        get_function_attrs(CASE_FUNC)->formatSource = case_formatSource;
     }
 
 } // namespace switch_function
