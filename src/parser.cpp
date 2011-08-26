@@ -7,6 +7,7 @@
 #include "branch.h"
 #include "list_shared.h"
 #include "parser.h"
+#include "switch_block.h"
 #include "term.h"
 #include "token.h"
 #include "update_cascades.h"
@@ -850,6 +851,7 @@ ParseResult switch_block(Branch& branch, TokenStream& tokens, ParserCxt* context
     branch.moveToEnd(result);
     refresh_locals_indices(branch);
 
+    switch_block_post_compile(result);
     set_source_location(result, startPosition, tokens);
     set_is_statement(result, true);
     return ParseResult(result);
