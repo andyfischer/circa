@@ -20,6 +20,7 @@ extern Term* COMMENT_FUNC;
 extern Term* CONTINUE_FUNC;
 extern Term* COPY_FUNC;
 extern Term* CAST_FUNC;
+extern Term* DEFAULT_CASE_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DISCARD_FUNC;
 extern Term* DIV_FUNC;

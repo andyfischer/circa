@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "building.h"
 #include "builtins.h"
 #include "if_block.h"
 #include "importing_macros.h"
@@ -13,6 +14,8 @@ namespace circa {
 
 void switch_block_post_compile(Term* term)
 {
+    // Add a default case
+    apply(nested_contents(term), DEFAULT_CASE_FUNC, TermList());
     update_if_block_joining_branch(term);
 }
 
@@ -22,12 +25,21 @@ CA_FUNCTION(evaluate_switch)
     Branch& contents = nested_contents(CALLER);
     TaggedValue* input = INPUT(0);
 
-    // Iterate through each 'case' and find one that equals the input
+    // Iterate through each 'case' and find one that succeeds.
     for (int caseIndex=0; caseIndex < contents.length()-1; caseIndex++) {
         Term* caseTerm = contents[caseIndex];
-        ca_assert(caseTerm->function == CASE_FUNC);
-        TaggedValue* caseValue = get_input(context, caseTerm, 0);
-        if (equals(input, caseValue)) {
+
+        bool succeeds = false;
+        if (caseTerm->function == DEFAULT_CASE_FUNC) {
+            succeeds = true;
+        } else if (caseTerm->function == CASE_FUNC) {
+            TaggedValue* caseValue = get_input(context, caseTerm, 0);
+            succeeds = equals(input, caseValue);
+        } else {
+            internal_error("unrecognized function inside switch()");
+        }
+
+        if (succeeds) {
             Branch& caseContents = nested_contents(caseTerm);
             start_using(caseContents);
 

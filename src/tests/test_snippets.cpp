@@ -686,6 +686,14 @@ void test_multiple_name_assignment()
 void test_switch_statement()
 {
     test_snippet("switch 0\n case 1\n  assert(false)", "");
+
+    test_snippet("a = 'outer'; switch 0 { case 0 { a = 'inner' }} ", "a == 'inner'");
+    test_snippet("a = 'outer'; switch 0 { case 1 { a = 'inner' }} ", "a == 'outer'");
+    test_snippet("a = 1; switch 0 { case 0 { a = 2 }} ", "a == 2");
+    test_snippet("a = 1; switch 0 { case 3 { a = 3 } case 4 { a = 4 } case 0 { a = 0 }} ",
+            "a == 0");
+    test_snippet("a = 1; switch 'banana' { case 'apple' { a = 2 } case 'banana' { a = 3 }}",
+            "a == 3");
 }
 
 void register_tests()

@@ -5,9 +5,8 @@
 namespace circa {
 namespace switch_function {
 
-    CA_FUNCTION(evaluate_case)
-    {
-    }
+    CA_FUNCTION(evaluate_case) { }
+    CA_FUNCTION(evaluate_default_case) { }
 
     void switch_formatSource(StyledSource* source, Term* term)
     {
@@ -72,6 +71,8 @@ namespace switch_function {
 
         CASE_FUNC = import_function(kernel, evaluate_case, "case(any input)");
         get_function_attrs(CASE_FUNC)->formatSource = case_formatSource;
+
+        DEFAULT_CASE_FUNC = import_function(kernel, evaluate_default_case, "default_case()");
     }
 
 } // namespace switch_function

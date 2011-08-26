@@ -307,23 +307,24 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (is_value(term))
         out << " val:" << to_string((TaggedValue*) term);
 
-    out << " locals:[";
+    out << " local:";
     for (int i=0; i < outputCount; i++) {
-        if (i != 0) out << ", ";
+        if (i != 0) out << ",";
         TaggedValue* local = get_local_safe(term, i);
         if (local == NULL)
             out << "<NULL>";
         else
             out << local->toString();
     }
-    out << "]";
 
+#if 0
     out << " users = ["; 
     for (int i=0; i < term->users.length(); i++) {
         if (i != 0) out << ", ";
         out << global_id(term->users[i]);
     }
     out << "]";
+#endif
 
     // out << " " << term->localsIndex << "+" << get_output_count(term);
 
