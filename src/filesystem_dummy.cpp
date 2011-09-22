@@ -32,7 +32,10 @@ void dummy_write_text_file(const char* filename, const char* contents)
 
 time_t dummy_get_modified_time(const char* filename)
 {
-    return g_currentFakeFilesystem->_files[std::string(filename)].last_modified;
+    if (!dummy_file_exists(filename))
+        return 0;
+    else
+        return g_currentFakeFilesystem->_files[std::string(filename)].last_modified;
 }
 
 static void dummy_read_directory(const char* dirname, circa::ReadDirectoryCallback callback,

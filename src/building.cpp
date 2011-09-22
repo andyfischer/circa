@@ -276,9 +276,9 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     return create_value(branch, as_type(type), name);
 }
 
-Term* create_value(Branch& branch, TaggedValue* initialValue)
+Term* create_value(Branch& branch, TaggedValue* initialValue, std::string const& name)
 {
-    Term* term = create_value(branch, initialValue->value_type);
+    Term* term = create_value(branch, initialValue->value_type, name);
     copy(initialValue, term);
     return term;
 }

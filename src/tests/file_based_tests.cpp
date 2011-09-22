@@ -197,6 +197,19 @@ void test_call_function_from_included_file()
     test_assert(hiCall->function != NULL);
 }
 
+void load_nonexistant_file()
+{
+    Branch branch;
+    FakeFileSystem files;
+    load_script(&branch, "a");
+    test_assert(has_static_errors(branch));
+
+    files.set("a", "x = 1");
+    clear_branch(&branch);
+    load_script(&branch, "a");
+    test_assert(!has_static_errors(branch));
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
@@ -208,6 +221,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_include_from_expression);
     REGISTER_TEST_CASE(file_based_tests::test_include_with_state);
     REGISTER_TEST_CASE(file_based_tests::test_call_function_from_included_file);
+    REGISTER_TEST_CASE(file_based_tests::load_nonexistant_file);
 }
 
 } // namespace file_based_tests

@@ -556,7 +556,14 @@ void load_script(Branch* branch, const char* filename)
 
     // Read the text file
     TaggedValue contents;
-    read_text_file_to_value(filename, &contents, NULL);
+    TaggedValue fileReadError;
+    read_text_file_to_value(filename, &contents, &fileReadError);
+
+    if (!is_null(&fileReadError)) {
+        Term* msg = create_value(*branch, &fileReadError, "fileReadError");
+        apply(*branch, STATIC_ERROR_FUNC, TermList(msg));
+        return;
+    }
 
     parser::compile(*branch, parser::statement_list, as_string(&contents));
 }

@@ -43,7 +43,7 @@ void clear_from_dependencies_of_users(Term* term);
 // Create a new value term with the given type.
 Term* create_value(Branch& branch, Type* type, std::string const& name="");
 Term* create_value(Branch& branch, std::string const& typeName, std::string const& name="");
-Term* create_value(Branch& branch, TaggedValue* initialValue);
+Term* create_value(Branch& branch, TaggedValue* initialValue, std::string const& name="");
 
 Term* create_stateful_value(Branch& branch, Type* type, Term* defaultValue,
         std::string const& name);
