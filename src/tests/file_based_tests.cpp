@@ -46,7 +46,7 @@ void test_include_function()
     test_assert(included.length() > 0);
 
     test_assert(included["a"]->asInt() == 1);
-    test_equals(included["#attr:source-file"]->asString(), "file.ca");
+    test_equals(get_branch_source_filename(included), "file.ca");
 
     // Next, modify the file and reload.
     files["file.ca"] = "b = 2";

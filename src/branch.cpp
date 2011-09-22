@@ -379,11 +379,12 @@ Branch& nested_contents(Term* term)
 
 std::string get_branch_source_filename(Branch& branch)
 {
-    Term* attr = branch["#attr:source-file"];
-    if (attr == NULL)
+    List* fileOrigin = branch_get_file_origin(&branch);
+
+    if (fileOrigin == NULL)
         return "";
-    else
-        return as_string(attr);
+
+    return as_string(fileOrigin->get(1));
 }
 
 Branch* get_outer_scope(Branch const& branch)
@@ -547,9 +548,13 @@ void parse_script(Branch& branch, const char* filename)
 
 void load_script(Branch* branch, const char* filename)
 {
-    // Record the filename
-    create_string(*branch, filename, "#attr:source-file");
+    // Store the file origin
+    List* fileOrigin = set_list(&branch->origin, 3);
+    copy(&FILE_SYMBOL, fileOrigin->get(0));
+    set_string(fileOrigin->get(1), filename);
+    set_int(fileOrigin->get(2), get_modified_time(filename));
 
+    // Read the text file
     TaggedValue contents;
     read_text_file_to_value(filename, &contents, NULL);
 
