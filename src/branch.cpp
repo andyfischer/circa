@@ -18,6 +18,7 @@
 #include "refactoring.h"
 #include "stateful_code.h"
 #include "source_repro.h"
+#include "static_checking.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "type.h"
@@ -626,6 +627,64 @@ List* branch_get_file_origin(Branch* branch)
         return NULL;
 
     return list;
+}
+
+bool check_and_update_file_origin(Branch* branch, const char* filename)
+{
+    time_t modifiedTime = get_modified_time(filename);
+
+    List* fileOrigin = branch_get_file_origin(branch);
+
+    if (fileOrigin == NULL) {
+        fileOrigin = set_list(&branch->origin, 3);
+        copy(&FILE_SYMBOL, fileOrigin->get(0));
+        set_string(fileOrigin->get(1), filename);
+        set_int(fileOrigin->get(2), modifiedTime);
+        return true;
+    }
+
+    if (!equals_string(fileOrigin->get(1), filename)) {
+        set_string(fileOrigin->get(1), filename);
+        set_int(fileOrigin->get(2), modifiedTime);
+        return true;
+    }
+
+    if (!equals_int(fileOrigin->get(2), modifiedTime)) {
+        set_int(fileOrigin->get(2), modifiedTime);
+        return true;
+    }
+
+    return false;
+}
+
+bool refresh_script(Branch* branch)
+{
+    List* fileOrigin = branch_get_file_origin(branch);
+    if (fileOrigin == NULL)
+        return false;
+
+    std::string filename = as_string(fileOrigin->get(1));
+
+    bool fileChanged = check_and_update_file_origin(branch, filename.c_str());
+
+    if (!fileChanged)
+        return false;
+
+    clear_branch(branch);
+    load_script(branch, filename.c_str());
+
+#if 0 // TODO: Logic for exposing names
+    Branch* parent = get_parent_branch(branch);
+
+    if (caller->owningBranch != NULL && exposeNames) {
+        expose_all_names(contents, *caller->owningBranch);
+        finish_update_cascade(*caller->owningBranch);
+    }
+#endif
+
+    mark_static_errors_invalid(*branch);
+    update_static_error_list(*branch);
+    return true;
 }
 
 void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)

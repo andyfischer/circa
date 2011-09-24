@@ -7,37 +7,6 @@
 namespace circa {
 namespace include_function {
 
-    // Checks Branch.origin, and checks the modified time of 'filename'. If the origin
-    // does not match the file's modified time, then we return true and update the
-    // branch's origin. So, if this function true then the branch should be reloaded.
-    bool check_and_update_file_origin(Branch* branch, const char* filename)
-    {
-        time_t modifiedTime = get_modified_time(filename);
-
-        List* fileOrigin = branch_get_file_origin(branch);
-
-        if (fileOrigin == NULL) {
-            fileOrigin = set_list(&branch->origin, 3);
-            copy(&FILE_SYMBOL, fileOrigin->get(0));
-            set_string(fileOrigin->get(1), filename);
-            set_int(fileOrigin->get(2), modifiedTime);
-            return true;
-        }
-
-        if (!equals_string(fileOrigin->get(1), filename)) {
-            set_string(fileOrigin->get(1), filename);
-            set_int(fileOrigin->get(2), modifiedTime);
-            return true;
-        }
-
-        if (!equals_int(fileOrigin->get(2), modifiedTime)) {
-            set_int(fileOrigin->get(2), modifiedTime);
-            return true;
-        }
-
-        return false;
-    }
-
     bool load_script(EvalContext* cxt, Term* caller, const std::string& filename, bool exposeNames)
     {
         Branch& contents = nested_contents(caller);

@@ -171,6 +171,16 @@ std::string get_source_file_location(Branch& branch);
 // Returns a List pointer if the branch has a file origin, NULL if not.
 List* branch_get_file_origin(Branch* branch);
 
+// Checks Branch.origin, and checks the modified time of 'filename'. If the origin
+// does not match the file's modified time, then we return true and update the
+// branch's origin. So, if this function true then the branch should be reloaded.
+bool check_and_update_file_origin(Branch* branch, const char* filename);
+
+// If this branch has a file origin, then check the backing file, and if it's
+// newer, update the branch with the latest contents. Returns true if the
+// branch contents were updated.
+bool refresh_script(Branch* branch);
+
 struct BranchInvariantCheck
 {
     List errors;

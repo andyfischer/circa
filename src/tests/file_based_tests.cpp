@@ -237,6 +237,20 @@ void test_load_script_call()
     test_assert(loadedBranch->get("x") != NULL);
 }
 
+void test_refresh_script()
+{
+    Branch branch;
+    FakeFileSystem files;
+    files.set("a", "x = 1");
+
+    load_script(&branch, "a");
+    test_equals(branch["x"], "1");
+    files.set("a", "x = 2");
+    test_equals(branch["x"], "1");
+    refresh_script(&branch);
+    test_equals(branch["x"], "2");
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
@@ -251,6 +265,7 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::load_nonexistant_file);
     REGISTER_TEST_CASE(file_based_tests::test_include_script);
     REGISTER_TEST_CASE(file_based_tests::test_load_script_call);
+    REGISTER_TEST_CASE(file_based_tests::test_refresh_script);
 }
 
 } // namespace file_based_tests
