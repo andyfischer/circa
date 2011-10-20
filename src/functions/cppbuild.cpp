@@ -48,7 +48,8 @@ namespace cppbuild_function {
         std::string moduleDir = STRING_INPUT(0);
 
         Branch buildFile;
-        parse_script(buildFile, moduleDir + "/build.ca");
+        std::string filename = moduleDir + "/build.ca";
+        parse_script(buildFile, filename.c_str());
 
         TaggedValue* moduleName = buildFile["name"];
         if (moduleName == NULL)

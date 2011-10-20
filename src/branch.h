@@ -150,8 +150,8 @@ void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch& source, Branch& dest);
 
-void parse_script(Branch& branch, std::string const& filename);
-void evaluate_script(Branch& branch, std::string const& filename);
+void parse_script(Branch& branch, const char* filename);
+void evaluate_script(Branch& branch, const char* filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 

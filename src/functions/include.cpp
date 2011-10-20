@@ -26,7 +26,7 @@ namespace include_function {
                 return false;
             }
 
-            parse_script(contents, filename);
+            parse_script(contents, filename.c_str());
 
             if (caller->owningBranch != NULL && exposeNames) {
                 expose_all_names(contents, *caller->owningBranch);

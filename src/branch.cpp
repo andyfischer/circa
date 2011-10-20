@@ -540,18 +540,18 @@ void duplicate_branch(Branch& source, Branch& dest)
     dest.names.remapPointers(newTermMap);
 }
 
-void parse_script(Branch& branch, std::string const& filename)
+void parse_script(Branch& branch, const char* filename)
 {
     // Record the filename
     create_string(branch, filename, "#attr:source-file");
 
     TaggedValue contents;
-    read_text_file_to_value(filename.c_str(), &contents, NULL);
+    read_text_file_to_value(filename, &contents, NULL);
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
 }
 
-void evaluate_script(Branch& branch, std::string const& filename)
+void evaluate_script(Branch& branch, const char* filename)
 {
     parse_script(branch, filename);
     evaluate_branch(branch);
