@@ -569,11 +569,22 @@ void evaluate_script(Branch& branch, const char* filename)
     evaluate_branch(branch);
 }
 
-void include_script(Branch* branch, const char* filename)
+Branch* include_script(Branch* branch, const char* filename)
 {
+    ca_assert(branch != NULL);
     Term* filenameTerm = create_string(*branch, filename);
     Term* includeFunc = apply(*branch, INCLUDE_FUNC, TermList(filenameTerm));
     post_compile_term(includeFunc);
+    return &nested_contents(includeFunc);
+}
+
+Branch* load_script_term(Branch* branch, const char* filename)
+{
+    ca_assert(branch != NULL);
+    Term* filenameTerm = create_string(*branch, filename);
+    Term* includeFunc = apply(*branch, LOAD_SCRIPT_FUNC, TermList(filenameTerm));
+    post_compile_term(includeFunc);
+    return &nested_contents(includeFunc);
 }
 
 void persist_branch_to_file(Branch& branch)

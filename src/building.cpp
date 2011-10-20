@@ -340,6 +340,10 @@ Branch& create_namespace(Branch& branch, std::string const& name)
 {
     return apply(branch, NAMESPACE_FUNC, TermList(), name)->contents();
 }
+Branch* create_branch_unevaluated(Branch* owner, const char* name)
+{
+    return &nested_contents(apply(*owner, BRANCH_UNEVALUATED_FUNC, TermList(), name));
+}
 
 Term* create_type(Branch& branch, std::string name)
 {

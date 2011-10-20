@@ -154,8 +154,14 @@ void duplicate_branch(Branch& source, Branch& dest);
 void load_script(Branch* branch, const char* filename);
 void evaluate_script(Branch& branch, const char* filename);
 
-// Create an include() call in the given branch, which loads the script file.
-void include_script(Branch* branch, const char* filename);
+// Create an include() call that loads the given file. Returns the included
+// branch.
+Branch* include_script(Branch* branch, const char* filename);
+
+// Create a load_script() call that loads the given file. The load_script
+// function doesn't evaluate the contents when called. Returns the included
+// branch.
+Branch* load_script_term(Branch* branch, const char* filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 

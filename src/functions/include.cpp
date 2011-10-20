@@ -136,8 +136,9 @@ namespace include_function {
                 "include(string filename) -> Branch");
         get_function_attrs(INCLUDE_FUNC)->postCompile = include_post_compile;
 
-        import_function(kernel, load_script,
+        LOAD_SCRIPT_FUNC = import_function(kernel, load_script,
                 "load_script(string filename) -> Branch");
+        get_function_attrs(LOAD_SCRIPT_FUNC)->postCompile = include_post_compile;
     }
 }
 } // namespace circa

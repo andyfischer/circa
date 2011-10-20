@@ -57,6 +57,7 @@ Term* create_void(Branch& branch, std::string const& name="");
 Term* create_list(Branch& branch, std::string const& name="");
 Branch& create_branch(Branch& owner, std::string const& name="");
 Branch& create_namespace(Branch&, std::string const& name);
+Branch* create_branch_unevaluated(Branch* owner, const char* name);
 Term* create_type(Branch& branch, std::string name="");
 Term* create_type_value(Branch& branch, Type* value, std::string const& name="");
 Term* create_symbol_value(Branch& branch, TaggedValue* value, std::string const& name="");
