@@ -16,7 +16,7 @@ static void load(Branch& branch, std::string const& filename)
         return;
     }
 
-    parse_script(branch, filename.c_str());
+    load_script(&branch, filename.c_str());
     if (has_static_errors(branch))
         print_static_errors_formatted(branch, std::cout);
 }

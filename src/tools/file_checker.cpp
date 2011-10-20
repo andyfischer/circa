@@ -22,7 +22,7 @@ int run_file_checker_for_directory(const char* dir);
 void run_file_checker(const char* filename, List* errors)
 {
     Branch branch;
-    parse_script(branch, filename);
+    load_script(&branch, filename);
 
     // Catch static errors
     {

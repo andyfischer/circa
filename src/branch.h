@@ -151,10 +151,11 @@ void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch& source, Branch& dest);
 
-// deprecated
-void parse_script(Branch& branch, const char* filename);
 void load_script(Branch* branch, const char* filename);
 void evaluate_script(Branch& branch, const char* filename);
+
+// Create an include() call in the given branch, which loads the script file.
+void include_script(Branch* branch, const char* filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 

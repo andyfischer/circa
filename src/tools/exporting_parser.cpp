@@ -17,7 +17,7 @@ int run_exporting_parser(const char* format, const char* filename)
     }
 
     Branch branch;
-    parse_script(branch, filename);
+    load_script(&branch, filename);
 
     if (print_static_errors_formatted(branch, std::cout))
         return -1;
