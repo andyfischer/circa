@@ -1,0 +1,104 @@
+
+namespace ide
+    def script_filename() -> string
+    def quit() "Tell the IDE to shutdown"
+    def reset_state() "Reset state for the current script"
+    def reload_runtime() "Reload the builtin runtime"
+    def paused() -> bool "Returns whether the current script is paused"
+    def get_time() -> number
+
+time = ide:get_time()
+time_delta = delta(time)
+td = time_delta -- shorthand
+
+-- Input
+type Keypress {
+    string character
+    int code
+    int modifier
+}
+
+def key_down_code(int key) -> bool
+def key_down_char(string key) -> bool
+key_down = overloaded_function(key_down_code key_down_char)
+def key_pressed_code(int key) -> bool
+def key_pressed_char(string key) -> bool
+key_pressed = overloaded_function(key_pressed_code key_pressed_char)
+def mouse_location() -> Point
+def mouse_pressed() -> bool
+def mouse_over(Rect region) -> bool
+def recent_key_presses() -> List
+def mouse_clicked_anywhere () -> bool
+def mouse_clicked_region (Rect region) -> bool
+mouse_clicked = overloaded_function(mouse_clicked_anywhere mouse_clicked_region)
+def mouse_wheel_up_anywhere () -> bool
+def mouse_wheel_up_region (Rect region) -> bool
+mouse_wheel_up = overloaded_function(mouse_wheel_up_anywhere mouse_wheel_up_region)
+def mouse_wheel_down_anywhere () -> bool
+def mouse_wheel_down_region (Rect region) -> bool
+mouse_wheel_down = overloaded_function(mouse_wheel_down_anywhere mouse_wheel_down_region)
+
+def mouse_in(Rect b) -> bool
+  "Return whether the mouse is currently inside the given rect."
+  return (b.x1 < mouse.x) and (b.x2 > mouse.x) and (b.y1 < mouse.y) and (b.y2 > mouse.y)
+
+def background(Color) "Fill the screen with the given color."
+
+def delta_point(Point p) -> Point
+    state Point prev = p
+    result = p - prev
+    prev = p
+    return result
+
+-- Time-based stateful functions
+def alternate_over_time(number period) -> bool
+    "Stateful function, alternates between true and false according to the given period."
+    state number time_started = time
+    return round((time - time_started) / period) % 2 == 0
+
+def linear_fadein(number total_time) -> number
+    <<<
+    Stateful function, starts out at 0 and increases linearly. After 'total_time'
+    has passed, it will return 1.0 and stay there.
+    >>>
+    state number time_started = time
+    elapsed = (time - time_started) / total_time
+    return min(elapsed, 1.0)
+
+def elapsed() -> number
+    "Stateful function, returns the number of seconds that has passed since this function was first called"
+    state number time_started = time
+    return time - time_started
+
+def every(number seconds) -> bool
+    "Stateful function, returns true once every 'seconds'"
+    state time_remaining = seconds
+    time_remaining -= time_delta
+    if time_remaining < 0
+        time_remaining += seconds
+        return true
+    else
+        return false
+
+-- Include other runtime scripts
+include('../../libs/box2d/box2d.ca' -> rpath)
+include('../../libs/opengl/opengl.ca' -> rpath)
+include('../../libs/osc/osc.ca' -> rpath)
+include('../../libs/sdl_img/sdl_img.ca' -> rpath)
+include('../../libs/imagemanip/imagemanip.ca' -> rpath)
+
+-- cairo.ca depends on opengl
+include('../../libs/cairo/cairo.ca' -> rpath)
+
+-- Load the user's script
+initial_filename = ide:script_filename()
+cond(initial_filename == "", "../../demos/demo_browser.ca"->rpath, @initial_filename)
+state string user_script_filename = ide:script_filename()
+
+-- Function to specify a different script
+def load_user_script(string filename)
+    send('load_user_script_request', filename)
+receive_last('load_user_script_request' @user_script_filename)
+
+users_script = load_script(user_script_filename)
+

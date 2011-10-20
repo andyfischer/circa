@@ -1,0 +1,26 @@
+
+mouse = viewport:mouse()
+
+def draw_turtle(Point loc, number facing)
+    points = [loc + polar(facing) * 10.0,
+      loc + polar(facing+140) * 10.0,
+      loc + polar(facing-140) * 10.0]
+    gl:triangles(points #fff)
+
+state Point turtle_loc = [200 200]
+
+turtle_loc += [1.0 0]
+
+def wrap_around_screen(Point p) -> Point
+    size = viewport:size() -> Point
+    if p.x < 0 { p.x += size.x }
+    if p.y < 0 { p.y += size.y }
+    if p.x >= size.x { p.x -= size.x }
+    if p.y >= size.y { p.y -= size.y }
+    return p
+
+trace('a: ' turtle_loc)
+wrap_around_screen(@turtle_loc)
+trace('b: ' turtle_loc)
+
+draw_turtle(turtle_loc 1.0)

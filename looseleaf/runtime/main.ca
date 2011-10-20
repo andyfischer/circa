@@ -1,0 +1,4 @@
+
+state window = create_window('turtle.ca'->rpath)
+if once()
+    window.resize([400 400])
