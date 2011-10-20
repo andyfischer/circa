@@ -77,6 +77,9 @@ int num_elements(TaggedValue* value);
 void touch(TaggedValue* value);
 bool equals(TaggedValue* lhs, TaggedValue* rhs);
 
+bool equals_string(TaggedValue* value, const char* s);
+bool equals_int(TaggedValue* value, int i);
+
 void change_type(TaggedValue* v, Type* type);
 void change_type_no_initialize(TaggedValue* v, Type* t);
 

@@ -410,6 +410,34 @@ bool equals(TaggedValue* lhs, TaggedValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
+bool equals_string(TaggedValue* value, const char* s)
+{
+    if (is_string(value))
+        return strcmp(as_cstring(value), s) == 0;
+    else
+        return false;
+}
+
+bool equals_int(TaggedValue* value, int i)
+{
+    if (is_int(value))
+        return as_int(value) == i;
+    else
+        return false;
+}
+
+void set_bool(TaggedValue* value, bool b)
+{
+    change_type(value, &BOOL_T);
+    value->value_data.asbool = b;
+}
+
+Dict* set_dict(TaggedValue* value)
+{
+    change_type(value, &DICT_T);
+    return (Dict*) value;
+}
+
 void set_int(TaggedValue* value, int i)
 {
     change_type(value, &INT_T);
@@ -431,12 +459,6 @@ void set_string(TaggedValue* value, const char* s)
 void set_string(TaggedValue* value, std::string const& s)
 {
     set_string(value, s.c_str());
-}
-
-void set_bool(TaggedValue* value, bool b)
-{
-    change_type(value, &BOOL_T);
-    value->value_data.asbool = b;
 }
 
 List* set_list(TaggedValue* value)

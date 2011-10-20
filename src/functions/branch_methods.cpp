@@ -120,7 +120,15 @@ namespace branch_methods_function {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");
-        copy(&branch->fileSignature, OUTPUT);
+        List* fileOrigin = branch_get_file_origin(branch);
+        if (fileOrigin == NULL)
+            set_null(OUTPUT);
+        else
+        {
+            List* output = set_list(OUTPUT, 2);
+            copy(fileOrigin->get(1), output->get(0));
+            copy(fileOrigin->get(2), output->get(1));
+        }
     }
     
     void setup(Branch& kernel)

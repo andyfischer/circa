@@ -542,13 +542,18 @@ void duplicate_branch(Branch& source, Branch& dest)
 
 void parse_script(Branch& branch, const char* filename)
 {
+    return load_script(&branch, filename);
+}
+
+void load_script(Branch* branch, const char* filename)
+{
     // Record the filename
-    create_string(branch, filename, "#attr:source-file");
+    create_string(*branch, filename, "#attr:source-file");
 
     TaggedValue contents;
     read_text_file_to_value(filename, &contents, NULL);
 
-    parser::compile(branch, parser::statement_list, as_string(&contents));
+    parser::compile(*branch, parser::statement_list, as_string(&contents));
 }
 
 void evaluate_script(Branch& branch, const char* filename)
@@ -580,6 +585,22 @@ std::string get_source_file_location(Branch& branch)
         return "";
 
     return get_directory_for_filename(get_branch_source_filename(*branch_p));
+}
+
+List* branch_get_file_origin(Branch* branch)
+{
+    if (!is_list(&branch->origin))
+        return NULL;
+
+    List* list = (List*) &branch->origin;
+
+    if (list->length() != 3)
+        return NULL;
+
+    if (!equals(list->get(0), &FILE_SYMBOL))
+        return NULL;
+
+    return list;
 }
 
 void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)

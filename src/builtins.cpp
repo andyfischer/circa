@@ -128,6 +128,7 @@ Type TYPE_T;
 Type VOID_T;
 
 // Builtin symbols:
+TaggedValue FILE_SYMBOL;
 TaggedValue OUT_SYMBOL;
 TaggedValue REPEAT_SYMBOL;
 TaggedValue UNKNOWN_SYMBOL;

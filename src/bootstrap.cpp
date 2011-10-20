@@ -77,6 +77,7 @@ void create_primitive_types()
     // errors are just stored as strings for now
     string_t::setup_type(&ERROR_T);
 
+    symbol_t::assign_new_symbol("file", &FILE_SYMBOL);
     symbol_t::assign_new_symbol("repeat", &REPEAT_SYMBOL);
     symbol_t::assign_new_symbol("out", &OUT_SYMBOL);
     symbol_t::assign_new_symbol("unknown", &UNKNOWN_SYMBOL);

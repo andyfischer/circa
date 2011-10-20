@@ -15,7 +15,7 @@ struct BrokenLinkList;
 
 struct Branch
 {
-    // The branch owns all the Term objects in this list.
+    // List of content terms. This branch owns all the Term objects in this list.
     TermList _terms;
 
     TermNamespace names;
@@ -36,9 +36,10 @@ struct Branch
     bool inuse;
     List localsStack;
 
-    // For a branch loaded from a file, this keeps track of the file signature
-    // of the last time this was loaded.
-    List fileSignature;
+    // Variant value describing where this branch came from. 
+    //   If the branch came from a file, then the value will be of format:
+    //     [:file, String filename, int nullable_timestamp]
+    TaggedValue origin;
 
     // Whether this branch has inlined state inside its contents or any nested contents.
     // This value will either be a boolean, or a null (indicating that the value needs to
@@ -150,13 +151,18 @@ void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch& source, Branch& dest);
 
+// deprecated
 void parse_script(Branch& branch, const char* filename);
+void load_script(Branch* branch, const char* filename);
 void evaluate_script(Branch& branch, const char* filename);
 
 Term* find_term_by_id(Branch& branch, unsigned int id);
 
 void persist_branch_to_file(Branch& branch);
 std::string get_source_file_location(Branch& branch);
+
+// Returns a List pointer if the branch has a file origin, NULL if not.
+List* branch_get_file_origin(Branch* branch);
 
 struct BranchInvariantCheck
 {

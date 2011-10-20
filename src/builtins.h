@@ -110,6 +110,7 @@ extern Type SYMBOL_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 
+extern TaggedValue FILE_SYMBOL;
 extern TaggedValue OUT_SYMBOL;
 extern TaggedValue REPEAT_SYMBOL;
 extern TaggedValue UNKNOWN_SYMBOL;
