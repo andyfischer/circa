@@ -7,6 +7,8 @@ namespace if_block_function {
 
     void formatSource(StyledSource* source, Term* term)
     {
+        format_name_binding(source, term);
+
         Branch& contents = nested_contents(term);
 
         for (int branch_index=0; branch_index < contents.length(); branch_index++) {

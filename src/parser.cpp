@@ -1020,28 +1020,35 @@ ParseResult expression_statement(Branch& branch, TokenStream& tokens, ParserCxt*
 
     // Parse an expression
     ParseResult result = name_binding_expression(branch, tokens, context);
+    Term* term = result.term;
+
+    // If the result was just the reuse of an existing identifier, create a Copy
+    // term so that source is preserved.
+    if (result.isIdentifier()) {
+        term = apply(branch, COPY_FUNC, TermList(term));
+    }
 
     // Apply a pending rebind
     if (context->pendingRebind != "") {
         std::string name = context->pendingRebind;
         context->pendingRebind = "";
-        branch.bindName(result.term, name);
-        result.term->setStringProp("syntax:rebindOperator", name);
+        branch.bindName(term, name);
+        term->setStringProp("syntax:rebindOperator", name);
     }
 
     // If the term was an assign() term, then we may need to rebind the root name.
-    if (result.term->function == ASSIGN_FUNC) {
-        Term* lexprRoot = find_lexpr_root(result.term->input(0));
+    if (term->function == ASSIGN_FUNC) {
+        Term* lexprRoot = find_lexpr_root(term->input(0));
         if (lexprRoot != NULL && lexprRoot->name != "") {
-            branch.bindName(result.term, lexprRoot->name);
+            branch.bindName(term, lexprRoot->name);
         }
-        assign_function::update_assign_contents(result.term);
+        assign_function::update_assign_contents(term);
     }
 
-    set_source_location(result.term, startPosition, tokens);
-    set_is_statement(result.term, true);
+    set_source_location(term, startPosition, tokens);
+    set_is_statement(term, true);
 
-    return result;
+    return ParseResult(term);
 }
 
 ParseResult include_statement(Branch& branch, TokenStream& tokens, ParserCxt* context)
@@ -1155,18 +1162,19 @@ ParseResult name_binding_expression(Branch& branch, TokenStream& tokens, ParserC
         std::string postEqualsSpace = possible_whitespace(tokens);
 
         ParseResult result = name_binding_expression(branch, tokens, context);
+        Term* term = result.term;
         
         // If the term already has a name (this is the case for method syntax
         // and for unknown_identifier), then make a copy.
-        if (result.term->name != "")
-            result.term = apply(branch, COPY_FUNC, TermList(result.term));
+        if (term->name != "")
+            term = apply(branch, COPY_FUNC, TermList(term));
 
-        result.term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
-        result.term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
+        term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
+        term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-        branch.bindName(result.term, nameBinding);
-        set_source_location(result.term, startPosition, tokens);
-        return result;
+        branch.bindName(term, nameBinding);
+        set_source_location(term, startPosition, tokens);
+        return ParseResult(term);
     }
 
     // Otherwise, no name binding.
@@ -1357,7 +1365,7 @@ ParseResult infix_expression_nested(Branch& branch, TokenStream& tokens, ParserC
                 // Example: a[0] += 1
                 else {
                     Term* assignTerm = apply(branch, ASSIGN_FUNC, TermList(leftExpr.term, term));
-                    assignTerm->setBoolProp("syntax:rebindOperator", true);
+                    assignTerm->setStringProp("syntax:rebindOperator", operatorStr);
                     term_move_property(assignTerm->input(1), assignTerm, "syntax:input-0:postWhitespace");
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
                     if (lexprRoot != NULL && lexprRoot->name != "")
@@ -2018,7 +2026,7 @@ ParseResult unknown_identifier(Branch& branch, std::string const& name)
     Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, TermList(), name);
     set_is_statement(term, false);
     term->setStringProp("message", name);
-    return ParseResult(term, name);
+    return ParseResult(term);
 }
 
 ParseResult identifier(Branch& branch, TokenStream& tokens, ParserCxt* context)

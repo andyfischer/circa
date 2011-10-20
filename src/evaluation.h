@@ -11,6 +11,11 @@
 
 namespace circa {
 
+struct Frame
+{
+    List stack;
+};
+
 struct EvalContext
 {
     bool interruptSubroutine;

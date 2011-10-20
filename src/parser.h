@@ -24,6 +24,11 @@ struct ParserCxt {
 
 struct ParseResult {
     Term* term;
+
+    // When the parser finds an identifier to an existing term, the ParseResult has
+    // a non-empty identifierName, so that the calling function can tell what happened.
+    // The identifierName should only be filled in if the parse step did *not* create
+    // a new term.
     std::string identifierName;
 
     ParseResult() : term(NULL) {}

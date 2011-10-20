@@ -24,6 +24,8 @@ void no_error()
 
 void strip_error_location(std::string& s)
 {
+    if (s == "")
+        return;
     s = s.substr(s.find_first_of("]") + 2, s.length());
 }
 
