@@ -127,8 +127,8 @@ struct Branch
 
 private:
     // Disabled calls
-    Branch(Branch const& copy) {}
-    Branch& operator=(Branch const& b) { return *this; }
+    Branch(Branch const&) {}
+    Branch& operator=(Branch const&) { return *this; }
 };
 
 void assert_valid_branch(Branch const* obj);

@@ -43,7 +43,7 @@ struct HeapTracker
 
 struct HeapTracker
 {
-    HeapTracker(int type) {}
+    HeapTracker(int) {}
 };
 
 // No-op these calls

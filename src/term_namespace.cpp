@@ -11,6 +11,19 @@ void TermNamespace::bind(Term* term, std::string name)
     _map[name] = term;
 }
 
+Term* TermNamespace::operator[](std::string const& name) const
+{
+    if (DEBUG_TRAP_NAME_LOOKUP)
+        ca_assert(false);
+
+    StringToTermMap::const_iterator it = _map.find(name);
+    if (it == _map.end())
+        return NULL;
+    else
+        return it->second;
+}
+
+
 void TermNamespace::remapPointers(TermMap const& remapping)
 {
     StringToTermMap::iterator it;
