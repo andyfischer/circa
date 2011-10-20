@@ -1,0 +1,24 @@
+
+def sub1()
+   print('called sub1')
+
+sub1()
+
+def return_value() -> int
+    return 3
+
+print('should be 3: ' return_value())
+
+def return_expr() -> int
+    return 1 + 2 + 3
+print('should be 6: ' return_expr())
+
+def with_args(string a, string b)
+    print(a b)
+
+with_args('with ', 'args')
+
+def with_args2(string a, string b) -> string
+    return concat(b, a)
+
+print(with_args2('args2', 'with '))

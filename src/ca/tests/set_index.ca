@@ -1,0 +1,11 @@
+
+l = [1 2 3]
+
+# explicit call
+set_index(@l, 1, 5)
+
+print('should be [1 5 3]: ' l)
+
+# [] syntax
+l[2] = 9
+print('should be [1 5 9]: ' l)

@@ -1,0 +1,4 @@
+
+print("Should be 0 through 3:")
+for i in [0 0 0 9]
+    print(index())

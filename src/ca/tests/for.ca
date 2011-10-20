@@ -1,0 +1,63 @@
+
+print('Simple execution:')
+
+print('just 1:')
+for i in [1]
+    print(i)
+
+print('just hi:')
+for i in [1]
+    print('hi')
+
+print('one through four:')
+for j in [1 2 3 4]
+    print(j)
+
+for x in []
+    print("don't print this")
+
+print('Outer rebind:')
+
+a = 'outer'
+for i in [1]
+    a = 'inner'
+print('should be inner: ' a)
+
+a = 'outer'
+for i in []
+    a = 'inner'
+print('should be outer: ' a)
+
+x = 'outer1'
+y = 'outer2'
+z = 'outer3'
+for i in [1 2 3]
+    x = 'inner1'
+    y = 'inner2'
+    z = 'inner3'
+
+print('should be inner x 3: ' x ' ' y ' ' z)
+
+print('Inner rebind:')
+
+a = 0
+for i in [0 0 0]
+    a += 1
+print('should be 3: ' a)
+
+a = 0
+for i in []
+    a += 1
+print('should be 0: ' a)
+
+print('For loop output value:')
+
+output = for i in [1 2 3] { i+3 }
+print('should be 4,5,6: ' output)
+
+print('For loop list rebinding:')
+
+list = [1 2 3]
+for i in @list
+    i *= 2
+print('should be 2,4,6: ' list)

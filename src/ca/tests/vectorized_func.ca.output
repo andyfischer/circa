@@ -1,0 +1,8 @@
+should be []: []
+should be [1]: [1]
+should be [3 4 5]: [3, 4, 5]
+should be []: []
+should be [3]: [3]
+should be [2 4 6]: [2, 4, 6]
+should be [4 8 16 0]: [4, 8, 16, 0]
+should be [1.0, 0.0]: [1.0, 2.0]

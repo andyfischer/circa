@@ -1,0 +1,7 @@
+
+s = {}
+
+call_with_state(&s) {
+    if true
+        state a = 1
+}

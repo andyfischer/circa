@@ -1,0 +1,21 @@
+Simple execution:
+just 1:
+1
+just hi:
+hi
+one through four:
+1
+2
+3
+4
+Outer rebind:
+should be inner: inner
+should be outer: outer
+should be inner x 3: inner1 inner2 inner3
+Inner rebind:
+should be 3: 3
+should be 0: 0
+For loop output value:
+should be 4,5,6: [4, 5, 6]
+For loop list rebinding:
+should be 2,4,6: [2, 4, 6]

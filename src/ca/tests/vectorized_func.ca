@@ -1,0 +1,17 @@
+
+# vector to scalar
+print('should be []: ' [] + 1)
+print('should be [1]: ' [0] + 1)
+print('should be [3 4 5]: ' [1 2 3] + 2)
+
+# vector to vector
+print('should be []: ' [] + [])
+print('should be [3]: ' [1] + [2])
+print('should be [2 4 6]: ' [1 2 3] + [1 2 3])
+print('should be [4 8 16 0]: ' [2 4 8 0] * [2 2 2 2])
+
+# Test using a Point
+type Point { number x, number y }
+a = [1 0] -> Point
+b = a + [0 2]
+print('should be [1.0, 0.0]: ' b)

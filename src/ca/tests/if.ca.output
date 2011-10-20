@@ -1,0 +1,17 @@
+Simple execution:
+check1
+check2
+check3
+check4
+check5
+check6
+check7
+check8
+Rebinding locals:
+should be inner: inner
+should be outer: outer
+should be 7: 7
+should be 3: 3
+Output values:
+Should be 1: 1
+Should be 2: 2

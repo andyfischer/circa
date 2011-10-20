@@ -1,0 +1,16 @@
+window_size = [200 200]->Point
+
+def wrap_around_screen(Point p) -> Point
+    size = window_size
+    if p.x < 0 { p.x += size.x }
+    if p.y < 0 { p.y += size.y }
+    if p.x >= size.x { p.x -= size.x }
+    if p.y >= size.y { p.y -= size.y }
+    return p
+
+assert(wrap_around_screen([0 0]) == [0 0])
+assert(wrap_around_screen([199 0]) == [199 0])
+assert(wrap_around_screen([201 0]) == [1 0])
+assert(wrap_around_screen([-50 0]) == [150 0])
+assert(wrap_around_screen([0 250]) == [0 50])
+assert(wrap_around_screen([300 300]) == [100 100])
