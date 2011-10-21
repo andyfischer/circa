@@ -20,7 +20,6 @@ Viewport::Viewport(QWidget* parent)
     QObject::connect(&updateTimer, SIGNAL(timeout()), this, SLOT(tick()));
     updateTimer.start(updateInterval);
 
-
     // Place a pointer to this Viewport in the EvalContext, so that the script can
     // access us.
     // TODO: This should use a handle, it doesn't b/c this object is owned

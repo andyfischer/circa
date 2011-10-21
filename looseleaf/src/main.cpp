@@ -39,8 +39,6 @@ int main(int argc, char *argv[])
     circa_initialize();
     circa_use_default_filesystem_interface();
 
-    DEBUG_ALWAYS_CHECK_OUTPUT_TYPE = true;
-
     Branch kernel;
     BackgroundScript kernelRunner(&kernel);
 
