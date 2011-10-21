@@ -20,7 +20,7 @@ namespace lookup_branch_ref_function {
         #endif
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "lookup_branch_ref(string) -> Branch");
     }

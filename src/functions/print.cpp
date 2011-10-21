@@ -16,7 +16,7 @@ namespace print_function {
         std::cout << std::endl;
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "print(any...) "
                 "'Prints a line of text output to the console'");

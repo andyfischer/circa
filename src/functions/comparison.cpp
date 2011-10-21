@@ -48,18 +48,18 @@ namespace comparison_function {
         set_bool(OUTPUT, FLOAT_INPUT(0) >= FLOAT_INPUT(1));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
 
         create_overloaded_function(kernel, "less_than",
-                TermList(kernel["less_than_i"], kernel["less_than_f"]));
+                TermList(kernel->get("less_than_i"), kernel->get("less_than_f")));
         create_overloaded_function(kernel, "less_than_eq",
-                TermList(kernel["less_than_eq_i"], kernel["less_than_eq_f"]));
+                TermList(kernel->get("less_than_eq_i"), kernel->get("less_than_eq_f")));
         create_overloaded_function(kernel, "greater_than",
-                TermList(kernel["greater_than_i"], kernel["greater_than_f"]));
+                TermList(kernel->get("greater_than_i"), kernel->get("greater_than_f")));
         create_overloaded_function(kernel, "greater_than_eq",
-                TermList(kernel["greater_than_eq_i"], kernel["greater_than_eq_f"]));
+                TermList(kernel->get("greater_than_eq_i"), kernel->get("greater_than_eq_f")));
     }
 }
 }

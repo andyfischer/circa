@@ -118,7 +118,7 @@ struct Term : TaggedValue
     int nameCount() const;
 
     // Shorthand for nested_contents()
-    Branch& contents();
+    Branch* contents();
 
     // Shorthand for nested_contents()[index]
     Term* contents(int index);

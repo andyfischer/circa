@@ -39,7 +39,7 @@ void test_unknown_type()
     std::string msg = get_static_error_message(t);
     strip_error_location(msg);
     test_equals(msg, "Unknown type: X");
-    test_assert(has_static_errors(branch));
+    test_assert(has_static_errors(&branch));
 }
 
 void test_unknown_identifier()
@@ -50,7 +50,7 @@ void test_unknown_identifier()
     strip_error_location(msg);
     test_equals(msg, "Unknown identifier: charlie");
     test_assert(has_static_error(t));
-    test_assert(has_static_errors(branch));
+    test_assert(has_static_errors(&branch));
 
     branch.clear();
     t = branch.eval("a:b");

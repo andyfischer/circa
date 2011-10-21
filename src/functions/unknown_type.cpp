@@ -9,7 +9,7 @@ namespace unknown_type_function {
     {
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         UNKNOWN_TYPE_FUNC = import_function(kernel, evaluate, "unknown_type() -> Type");
     }

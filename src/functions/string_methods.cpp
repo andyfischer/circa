@@ -56,7 +56,7 @@ namespace string_methods_function {
         set_string(OUTPUT, s.substr(start, end - start));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, length, "string.length(_) -> int");
         import_function(kernel, substr, "string.substr(_,int,int) -> string");

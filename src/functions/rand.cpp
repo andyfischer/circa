@@ -53,7 +53,7 @@ namespace rand_function {
         set_int(OUTPUT, rand() % period);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         Term* rand_f = import_function(kernel, evaluate_f, "rand_f() -> number");
         Term* rand_range = import_function(kernel, evaluate_f_range,

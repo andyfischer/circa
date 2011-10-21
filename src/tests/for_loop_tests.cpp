@@ -19,12 +19,12 @@ CA_FUNCTION(spy_function)
 void test_simple()
 {
     Branch branch;
-    import_function(branch, spy_function, "spy(int)");
+    import_function(&branch, spy_function, "spy(int)");
     gSpyResults.clear();
 
     branch.compile("for i in 0..5 { spy(i) }");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_assert(gSpyResults.size() == 5);
     test_assert(gSpyResults[0] == 0);
@@ -52,8 +52,8 @@ void test_rebind_external()
     Branch branch;
     branch.compile("a = 0");
     branch.compile("for i in [1] { a = 1 } a=a");
-    evaluate_branch(branch);
-    test_assert(branch);
+    evaluate_branch(&branch);
+    test_assert(&branch);
     test_assert(branch["a"]->asInt() == 1);
 }
 
@@ -65,19 +65,19 @@ void test_rebind_internally()
     branch.compile("a = 0");
     branch.compile("for i in [0 0 0] { a += 1 } a = a");
 
-    evaluate_branch(branch);
-    test_assert(branch);
+    evaluate_branch(&branch);
+    test_assert(&branch);
     test_equals(branch["a"], "3");
 
     branch.compile("found_3 = false");
     branch.compile("for n in [5 3 1 9 0] { if n == 3 { found_3 = true } }; found_3=found_3");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_assert(branch["found_3"]->asBool());
 
     branch.compile("found_3 = false");
     branch.compile("for n in [2 4 6 8] { if n == 3 { found_3 = true } } found_3=found_3");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_assert(branch["found_3"]->asBool() == false);
 }
 
@@ -86,7 +86,7 @@ void test_rewrite_input_list()
     Branch branch;
     branch.compile("l = [1 2 3]");
     branch.compile("for i in @l { i += 1 }");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     List* l = List::checkCast(branch["l"]);
     test_assert(l != NULL);
@@ -100,7 +100,7 @@ void test_state_simple()
 
     branch.compile("for i in [1 2 3] { state s = i }");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_for: [{s: 1}, {s: 2}, {s: 3}]}");
 
     branch.clear();
@@ -108,11 +108,11 @@ void test_state_simple()
 
     branch.compile("l = [1 2 3]; for i in @l { state s = 0; s += i }");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{l_1: [{s: 1}, {s: 2}, {s: 3}]}");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{l_1: [{s: 2}, {s: 4}, {s: 6}]}");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{l_1: [{s: 3}, {s: 6}, {s: 9}]}");
 }
 
@@ -122,7 +122,7 @@ void test_state_nested()
     EvalContext context;
 
     branch.compile("for a in [1 2] { for b in [3 4] { for c in [5 6] { state s = c } } }");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{_for: [{_for: [{_for: [{s: 5}, {s: 6}]}, "
             "{_for: [{s: 5}, {s: 6}]}]}, {_for: [{_for: [{s: 5}, {s: 6}]}, "
@@ -133,7 +133,7 @@ void test_produce_output()
 {
     Branch branch;
     branch.compile("x = for i in 0..5; i + 1");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     List* x = List::checkCast(get_local(branch["x"]));
     test_equals(x->length(), 5);
     test_equals(x->get(0), "1");
@@ -146,7 +146,7 @@ void test_break()
     Branch branch;
     internal_debug_function::spy_clear();
     branch.compile("for i in [1 2 3 4] { if i == 3 { break } test_spy(i) }");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_equals(internal_debug_function::spy_results(), "[1, 2]");
 }
 
@@ -157,7 +157,7 @@ void test_nested_break()
     internal_debug_function::spy_clear();
     branch.compile("for i in ['a' 'b'] "
             "{ for j in [1 2 3] { if j == 2 { break } test_spy([i j]) }}");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_equals(internal_debug_function::spy_results(), "[['a', 1], ['b', 1]]");
 }
@@ -168,7 +168,7 @@ void test_continue()
 
     internal_debug_function::spy_clear();
     branch.compile("for i in [1 2 3 4] { if i == 3 { continue } test_spy(i) }");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_equals(internal_debug_function::spy_results(), "[1, 2, 4]");
 }

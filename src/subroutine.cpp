@@ -37,18 +37,18 @@ namespace subroutine_f {
     }
 }
 
-Term* get_subroutine_input_placeholder(Branch& contents, int index)
+Term* get_subroutine_input_placeholder(Branch* contents, int index)
 {
-    return contents[index + 1];
+    return contents->get(index + 1);
 }
 
-Type* get_subroutine_output_type(Branch& contents)
+Type* get_subroutine_output_type(Branch* contents)
 {
-    return as_type(as_function_attrs(contents[0]).outputTypes[0]);
+    return as_type(as_function_attrs(contents->get(0)).outputTypes[0]);
 }
 
 void evaluate_subroutine_internal(EvalContext* context, Term* caller,
-        Branch& contents, List* inputs, List* outputs)
+        Branch* contents, List* inputs, List* outputs)
 {
     context->interruptSubroutine = false;
     context->callStack.append(caller);
@@ -66,8 +66,8 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     set_null(&context->subroutineOutput);
 
     // Evaluate each term
-    for (int i=numInputs+1; i < contents.length(); i++) {
-        evaluate_single_term(context, contents[i]);
+    for (int i=numInputs+1; i < contents->length(); i++) {
+        evaluate_single_term(context, contents->get(i));
         if (evaluation_interrupted(context))
             break;
     }
@@ -118,7 +118,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
 void evaluate_subroutine(EvalContext* context, Term* caller)
 {
     Term* function = caller->function;
-    Branch& contents = nested_contents(function);
+    Branch* contents = nested_contents(function);
     int numInputs = caller->numInputInstructions();
 
     // Copy inputs to a temporary list
@@ -176,7 +176,7 @@ bool is_subroutine(Term* term)
         return false;
     if (!has_nested_contents(term))
         return false;
-    if (nested_contents(term).length() < 1)
+    if (nested_contents(term)->length() < 1)
         return false;
     if (term->contents(0)->type != &FUNCTION_ATTRS_T)
         return false;
@@ -238,9 +238,9 @@ void subroutine_change_state_type(Term* func, Term* newType)
 void subroutine_check_to_append_implicit_return(Term* sub)
 {
     // Do nothing if this subroutine already ends with a return
-    Branch& contents = nested_contents(sub);
-    for (int i=contents.length()-1; i >= 0; i--) {
-        Term* term = contents[i];
+    Branch* contents = nested_contents(sub);
+    for (int i=contents->length()-1; i >= 0; i--) {
+        Term* term = contents->get(i);
         if (term->function == RETURN_FUNC)
             return;
 
@@ -255,14 +255,14 @@ void subroutine_check_to_append_implicit_return(Term* sub)
     post_compile_term(apply(contents, RETURN_FUNC, TermList(NULL)));
 }
 
-void store_locals(Branch& branch, TaggedValue* storageTv)
+void store_locals(Branch* branch, TaggedValue* storageTv)
 {
     touch(storageTv);
     set_list(storageTv);
     List* storage = List::checkCast(storageTv);
-    storage->resize(branch.length());
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    storage->resize(branch->length());
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
 
         if (term == NULL) continue;
 
@@ -273,7 +273,7 @@ void store_locals(Branch& branch, TaggedValue* storageTv)
     }
 }
 
-void restore_locals(TaggedValue* storageTv, Branch& branch)
+void restore_locals(TaggedValue* storageTv, Branch* branch)
 {
     if (!is_list(storageTv))
         internal_error("storageTv is not a list");
@@ -283,7 +283,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
     // The function branch may be longer than our list of locals. 
     int numItems = storage->length();
     for (int i=0; i < numItems; i++) {
-        Term* term = branch[i];
+        Term* term = branch->get(i);
 
         if (term == NULL) continue;
 
@@ -294,7 +294,7 @@ void restore_locals(TaggedValue* storageTv, Branch& branch)
     }
 }
 
-void call_subroutine(Branch& sub, TaggedValue* inputs, TaggedValue* output,
+void call_subroutine(Branch* sub, TaggedValue* inputs, TaggedValue* output,
                      TaggedValue* error)
 {
     List* inputsList = List::checkCast(inputs);

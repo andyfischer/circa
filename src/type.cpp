@@ -45,10 +45,10 @@ namespace type_t {
         append_phrase(source, term->stringPropOptional("syntax:postLBracketWhitespace", " "),
                 term, token::WHITESPACE);
 
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
-        for (int i=0; i < contents.length(); i++) {
-            Term* field = contents[i];
+        for (int i=0; i < contents->length(); i++) {
+            Term* field = contents->get(i);
             ca_assert(field != NULL);
             append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
                     term, token::WHITESPACE);
@@ -329,9 +329,9 @@ void initialize_simple_pointer_type(Type* type)
     reset_type(type);
 }
 
-void type_initialize_kernel(Branch& kernel)
+void type_initialize_kernel(Branch* kernel)
 {
-    IMPLICIT_TYPES = create_branch(kernel, "#implicit_types").owningTerm;
+    IMPLICIT_TYPES = create_branch(kernel, "#implicit_types")->owningTerm;
 }
 
 Term* create_tuple_type(List* types)
@@ -368,9 +368,9 @@ std::string get_base_type_name(std::string const& typeName)
     return "";
 }
 
-Term* find_method_with_search_name(Branch& branch, Type* type, std::string const& searchName)
+Term* find_method_with_search_name(Branch* branch, Type* type, std::string const& searchName)
 {
-    Term* term = find_name(&branch, searchName.c_str());
+    Term* term = find_name(branch, searchName.c_str());
     if (term != NULL && is_function(term))
         return term;
 
@@ -380,7 +380,7 @@ Term* find_method_with_search_name(Branch& branch, Type* type, std::string const
     if (type->declaringTerm != NULL)
         typeDeclarationBranch = type->declaringTerm->owningBranch;
 
-    if (typeDeclarationBranch != NULL && typeDeclarationBranch != &branch) {
+    if (typeDeclarationBranch != NULL && typeDeclarationBranch != branch) {
         term = find_name(typeDeclarationBranch, searchName.c_str());
         if (term != NULL && is_function(term))
             return term;
@@ -389,7 +389,7 @@ Term* find_method_with_search_name(Branch& branch, Type* type, std::string const
     return NULL;
 }
 
-Term* find_method(Branch& branch, Type* type, std::string const& name)
+Term* find_method(Branch* branch, Type* type, std::string const& name)
 {
     if (type->name == "")
         return NULL;
@@ -414,7 +414,7 @@ Term* find_method(Branch& branch, Type* type, std::string const& name)
     return NULL;
 }
 
-Term* parse_type(Branch& branch, std::string const& decl)
+Term* parse_type(Branch* branch, std::string const& decl)
 {
     return parser::compile(branch, parser::type_decl, decl);
 }

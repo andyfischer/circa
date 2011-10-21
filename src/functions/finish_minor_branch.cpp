@@ -10,25 +10,25 @@ namespace finish_minor_branch_function {
 
     CA_DEFINE_FUNCTION(finish_minor_branch_func, "finish_minor_branch()")
     {
-        Branch& contents = nested_contents(CALLER);
+        Branch* contents = nested_contents(CALLER);
         start_using(contents);
-        for (int i=0; i < contents.length(); i++)
-            evaluate_single_term(CONTEXT, contents[i]);
+        for (int i=0; i < contents->length(); i++)
+            evaluate_single_term(CONTEXT, contents->get(i));
         finish_using(contents);
         set_null(OUTPUT);
     }
 
     void postCompile(Term* finishBranchTerm)
     {
-        Branch& contents = nested_contents(finishBranchTerm);
-        contents.clear();
+        Branch* contents = nested_contents(finishBranchTerm);
+        contents->clear();
 
-        Branch& outerContents = *finishBranchTerm->owningBranch;
+        Branch* outerContents = finishBranchTerm->owningBranch;
 
         // Find every state var that was opened in this branch, and add a
         // preserve_state_result() call for each.
-        for (int i=0; i < outerContents.length(); i++) {
-            Term* term = outerContents[i];
+        for (int i=0; i < outerContents->length(); i++) {
+            Term* term = outerContents->get(i);
 
             if (term == NULL)
                 continue;
@@ -42,10 +42,10 @@ namespace finish_minor_branch_function {
         }
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        FINISH_MINOR_BRANCH_FUNC = kernel["finish_minor_branch"];
+        FINISH_MINOR_BRANCH_FUNC = kernel->get("finish_minor_branch");
         get_function_attrs(FINISH_MINOR_BRANCH_FUNC)->postCompile = postCompile;
     }
 }

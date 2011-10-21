@@ -34,7 +34,7 @@ std::string cpp_accessor_for_type(Type* type)
     out << indent << get_cpp_type_name(type) << "(Term* term) : _term(term) {}\n";
     out << "\n";
 
-    Branch& prototype = type->prototype;
+    Branch* prototype = type->prototype;
     for (int i=0; i < prototype.length(); i++) {
         Term* field = prototype[i];
         out << indent << get_cpp_type_name(field->type) << "& " << field->name << "() ";
@@ -48,14 +48,14 @@ std::string cpp_accessor_for_type(Type* type)
     return "";
 }
 
-std::string generate_cpp_headers(Branch& branch)
+std::string generate_cpp_headers(Branch* branch)
 {
     std::stringstream out;
 
-    for (int i=0; i < branch.length(); i++) {
-        if (branch[i] == NULL) continue;
+    for (int i=0; i < branch->length(); i++) {
+        if (branch->get(i) == NULL) continue;
 
-        Term* term = branch[i];
+        Term* term = branch->get(i);
 
         if (is_type(term))
             out << cpp_accessor_for_type(as_type(term));

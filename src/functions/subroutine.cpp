@@ -22,10 +22,10 @@ namespace subroutine_function {
         }
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        SUBROUTINE_OUTPUT_FUNC = kernel["subroutine_output"];
+        SUBROUTINE_OUTPUT_FUNC = kernel->get("subroutine_output");
     }
 } // namespace subroutine_function
 } // namespace circa

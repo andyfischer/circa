@@ -38,7 +38,7 @@ bool check_that_terms_have_locations(Branch& branch, List* failures)
 
 void test_snippet(std::string codeStr, std::string assertionsStr)
 {
-    Branch& code = create_branch(*KERNEL);
+    Branch* code = create_branch(KERNEL);
     parser::compile(code, parser::statement_list, codeStr);
 
     if (has_static_errors(code)) {
@@ -58,7 +58,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
-    Branch& assertions = create_branch(code, "assertions");
+    Branch* assertions = create_branch(code, "assertions");
     parser::compile(assertions, parser::statement_list, assertionsStr);
 
     if (has_static_errors(assertions)) {
@@ -105,11 +105,11 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     #endif
 
     int boolean_statements_found = 0;
-    for (int i=0; i < assertions.length(); i++) {
-        if (!is_statement(assertions[i]))
+    for (int i=0; i < assertions->length(); i++) {
+        if (!is_statement(assertions->get(i)))
             continue;
 
-        TaggedValue* result = get_local(assertions[i]);
+        TaggedValue* result = get_local(assertions->get(i));
 
         if (!is_bool(result))
             continue;
@@ -119,7 +119,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         if (!as_bool(result)) {
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: "
-                << get_term_source_text(assertions[i]) << std::endl;
+                << get_term_source_text(assertions->get(i)) << std::endl;
             std::cout << "Compiled code: " << std::endl;
             print_branch(std::cout, code);
             declare_current_test_failed();
@@ -139,22 +139,22 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
 void test_snippet_runtime_error(std::string const& str)
 {
     Branch code;
-    parser::compile(code, parser::statement_list, str);
+    parser::compile(&code, parser::statement_list, str);
 
-    if (has_static_errors(code)) {
+    if (has_static_errors(&code)) {
         std::cout << "In code snippet: " << str << std::endl;
-        print_static_errors_formatted(code, std::cout);
+        print_static_errors_formatted(&code, std::cout);
         declare_current_test_failed();
         return;
     }
 
     EvalContext result;
-    evaluate_branch(&result, code);
+    evaluate_branch(&result, &code);
 
     if (!result.errorOccurred) {
         std::cout << "No runtime error occured: " << get_current_test_name() << std::endl;
         std::cout << str << std::endl;
-        print_branch(std::cout, code);
+        print_branch(std::cout, &code);
         declare_current_test_failed();
         return;
     }

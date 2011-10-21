@@ -22,7 +22,7 @@ namespace branch_function {
         format_branch_source(source, nested_contents(term), term);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         get_function_attrs(BRANCH_FUNC)->formatSource = format_source;

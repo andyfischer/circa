@@ -109,11 +109,11 @@ namespace dll_loading_function {
         return dll;
     }
 
-    void patch_branch_recr(Dll* dll, Branch& branch, std::string namespacePrefix)
+    void patch_branch_recr(Dll* dll, Branch* branch, std::string namespacePrefix)
     {
-        for (int i=0; i < branch.length(); i++)
+        for (int i=0; i < branch->length(); i++)
         {
-            Term* term = branch[i];
+            Term* term = branch->get(i);
 
             if (is_namespace(term)) {
                 patch_branch_recr(dll, nested_contents(term), namespacePrefix + term->name + "__");
@@ -140,7 +140,7 @@ namespace dll_loading_function {
         }
     }
 
-    void patch_with_dll(const char* dll_filename, Branch& branch, TaggedValue* errorOut)
+    void patch_with_dll(const char* dll_filename, Branch* branch, TaggedValue* errorOut)
     {
         // Check to unload this file, if it's already loaded
         unload_dll(dll_filename);
@@ -159,7 +159,7 @@ namespace dll_loading_function {
         // Call on_load (if it exists)
         OnLoadFunc onLoad = (OnLoadFunc) find_func_in_dll(dll, "on_load");
         if (onLoad != NULL)
-            onLoad(&branch);
+            onLoad(branch);
 
         // Iterate through every function inside 'branch', and possibly replace
         // its evaluate function with one from the dll.
@@ -172,7 +172,7 @@ namespace dll_loading_function {
         const char* filename = STRING_INPUT(1);
 
         TaggedValue error;
-        patch_with_dll(filename, *branch, &error);
+        patch_with_dll(filename, branch, &error);
 
         if (!is_null(&error))
             error_occurred(CONTEXT, CALLER, as_string(&error));
@@ -189,9 +189,9 @@ namespace dll_loading_function {
         set_string(OUTPUT, base_filename + ".cpp");
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
-        Branch& ns = create_namespace(kernel, "dll_loading");
+        Branch* ns = create_namespace(kernel, "dll_loading");
         import_function(ns, load_and_patch,
                 "load_and_patch(Branch branch, string filename)");
         import_function(ns, dll_filename,

@@ -28,7 +28,7 @@ void repro_source_after_rename()
     test_equals(get_term_source_text(add), "add( banana , 10)");
 
     // Rename a function
-    Term* myfunc = import_function(branch, _empty_evaluate, "def myfunc(int)");
+    Term* myfunc = import_function(&branch, _empty_evaluate, "def myfunc(int)");
     Term* myfunc_call = branch.compile("myfunc(555)");
 
     rename(myfunc, "my_renamed_func");
@@ -42,11 +42,11 @@ void test_change_function()
 
     // simple test
     Term* a = branch.compile("add(3,3)");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_assert(as_int(a) == 6);
 
     change_function(a, KERNEL->get("mult_i"));
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_assert(as_int(a) == 9);
 }
 

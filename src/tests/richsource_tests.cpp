@@ -10,7 +10,7 @@ void starter_test()
     Branch branch;
     branch.compile("a = 1");
     StyledSource source;
-    format_branch_source(&source, branch);
+    format_branch_source(&source, &branch);
     //std::cout << source.toString() << std::endl;
 }
 

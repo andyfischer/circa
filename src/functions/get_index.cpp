@@ -56,11 +56,11 @@ namespace get_index_function {
         append_phrase(source, "]", term, token::LBRACKET);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        GET_INDEX_FUNC = kernel["get_index"];
-        GET_INDEX_FROM_BRANCH_FUNC = kernel["get_index_from_branch"];
+        GET_INDEX_FUNC = kernel->get("get_index");
+        GET_INDEX_FROM_BRANCH_FUNC = kernel->get("get_index_from_branch");
         get_function_attrs(GET_INDEX_FUNC)->specializeType = specializeType;
         get_function_attrs(GET_INDEX_FUNC)->formatSource = formatSource;
     }

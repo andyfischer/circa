@@ -32,7 +32,7 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_null(INPUT(0)));
     }
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

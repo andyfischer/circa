@@ -20,7 +20,7 @@ Type* infer_type_of_get_index(Term* input);
 // best static guess as to the result. This might be a plain value (if the
 // result is completely knowable), or it might be an expression with some
 // unknowns.
-Term* statically_infer_result(Branch& branch, Term* term);
+Term* statically_infer_result(Branch* branch, Term* term);
 
 // This is similar to statically_infer_result(Branch,Term), but it's used
 // if you don't care about partially known values. This will either return

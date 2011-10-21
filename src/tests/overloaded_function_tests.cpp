@@ -11,10 +11,10 @@ void declared_in_script()
     branch.compile("def f_1(int i) -> int { return i + 1 }");
     branch.compile("def f_2(string s) -> string { return concat(s 'x') }");
     branch.compile("f = overloaded_function(f_1 f_2)");
-    test_assert(branch);
+    test_assert(&branch);
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(context);
 
     TaggedValue* a = branch.eval("a = f(1)");
@@ -27,7 +27,7 @@ void update_output_type()
 {
     Branch branch;
     Term* f1 = branch.compile("def f1() -> int return 0");
-    Term* f = overloaded_function::create_overloaded_function(branch, "f", TermList(f1));
+    Term* f = overloaded_function::create_overloaded_function(&branch, "f", TermList(f1));
     test_equals(function_get_output_type(f, 0)->name, "int");
     Term* f2 = branch.compile("def f2() -> string return ''");
     overloaded_function::append_overload(f, f2);

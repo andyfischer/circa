@@ -8,22 +8,22 @@ namespace runtime_error_snippets {
 void test_input(std::string const& in)
 {
     Branch branch;
-    parser::compile(branch, parser::statement_list, in);
+    parser::compile(&branch, parser::statement_list, in);
 
-    if (has_static_errors(branch)) {
+    if (has_static_errors(&branch)) {
         std::cout << "In runtime error snippet: " << in << std::endl;
-        print_static_errors_formatted(branch, std::cout);
-        dump(branch);
+        print_static_errors_formatted(&branch, std::cout);
+        dump(&branch);
         declare_current_test_failed();
         return;
     }
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     if (!context.errorOccurred) {
         std::cout << "No runtime error: " << in << std::endl;
-        dump(branch);
+        dump(&branch);
         declare_current_test_failed();
         return;
     }

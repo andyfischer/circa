@@ -114,10 +114,10 @@ namespace internal_debug_function {
         dump(*CALLER->owningBranch);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        get_function_attrs(kernel["dump_parse"])->postCompile = dump_parse_post_compile;
+        get_function_attrs(kernel->get("dump_parse"))->postCompile = dump_parse_post_compile;
     }
 }
 }

@@ -38,57 +38,57 @@ bool is_function_stateful(Term* func)
     return (stateType != NULL && stateType != VOID_TYPE);
 }
 
-bool has_any_inlined_state(Branch& branch)
+bool has_any_inlined_state(Branch* branch)
 {
     // This result is cached on the branch. Check if branch.hasInlinedState has
     // a valid value.
-    if (is_bool(&branch.hasInlinedState))
-        return as_bool(&branch.hasInlinedState);
+    if (is_bool(&branch->hasInlinedState))
+        return as_bool(&branch->hasInlinedState);
 
     // No valid value, recalculate.
     bool result = false;
-    for (int i=0; i < branch.length(); i++) {
-        if (is_get_state(branch[i])) {
+    for (int i=0; i < branch->length(); i++) {
+        if (is_get_state(branch->get(i))) {
             result = true;
             break;
         }
 
-        if (has_implicit_state(branch[i])) {
+        if (has_implicit_state(branch->get(i))) {
             result = true;
             break;
         }
     }
 
-    set_bool(&branch.hasInlinedState, result);
+    set_bool(&branch->hasInlinedState, result);
     return result;
 }
 
-void mark_branch_as_having_inlined_state(Branch& branch)
+void mark_branch_as_having_inlined_state(Branch* branch)
 {
-    if (is_bool(&branch.hasInlinedState) && as_bool(&branch.hasInlinedState))
+    if (is_bool(&branch->hasInlinedState) && as_bool(&branch->hasInlinedState))
         return;
 
-    set_bool(&branch.hasInlinedState, true);
+    set_bool(&branch->hasInlinedState, true);
     Branch* parent = get_parent_branch(branch);
     if (parent != NULL)
-        mark_branch_as_having_inlined_state(*parent);
+        mark_branch_as_having_inlined_state(parent);
 }
 
-void mark_branch_as_possibly_not_having_inlined_state(Branch& branch)
+void mark_branch_as_possibly_not_having_inlined_state(Branch* branch)
 {
-    if (is_null(&branch.hasInlinedState))
+    if (is_null(&branch->hasInlinedState))
         return;
 
-    set_null(&branch.hasInlinedState);
+    set_null(&branch->hasInlinedState);
     Branch* parent = get_parent_branch(branch);
     if (parent != NULL)
-        mark_branch_as_possibly_not_having_inlined_state(*parent);
+        mark_branch_as_possibly_not_having_inlined_state(parent);
 }
 
-void get_type_from_branches_stateful_terms(Branch& branch, Branch& type)
+void get_type_from_branches_stateful_terms(Branch* branch, Branch* type)
 {
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
 
         if (!is_get_state(term))
             continue;
@@ -110,7 +110,7 @@ void get_state_description(Term* term, TaggedValue* output)
 
         for (int bindex=0; bindex < numBranches; bindex++) {
             Branch* branch = if_block_get_branch(term, bindex);
-            describe_state_shape(*branch, list[bindex]);
+            describe_state_shape(branch, list[bindex]);
         }
     } else if (is_get_state(term)) {
         set_string(output, declared_type(term)->name);
@@ -121,7 +121,7 @@ void get_state_description(Term* term, TaggedValue* output)
     }
 }
 
-void describe_state_shape(Branch& branch, TaggedValue* output)
+void describe_state_shape(Branch* branch, TaggedValue* output)
 {
     // Start off with an empty result
     set_null(output);
@@ -129,8 +129,8 @@ void describe_state_shape(Branch& branch, TaggedValue* output)
     Dict* dict = NULL;
 
     // Iterate through 'branch' and see if we find anything.
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
 
         if (has_implicit_state(term) || is_get_state(term)) {
             if (dict == NULL)
@@ -266,14 +266,14 @@ void strip_orphaned_state(TaggedValue* description, TaggedValue* state,
     internal_error("Unrecognized state description: " + description->toString());
 }
 
-void strip_orphaned_state(Branch& branch, TaggedValue* state, TaggedValue* trash)
+void strip_orphaned_state(Branch* branch, TaggedValue* state, TaggedValue* trash)
 {
     TaggedValue description;
     describe_state_shape(branch, &description);
     strip_orphaned_state(&description, state, trash);
 }
 
-void strip_orphaned_state(Branch& branch, TaggedValue* state)
+void strip_orphaned_state(Branch* branch, TaggedValue* state)
 {
     TaggedValue description;
     TaggedValue trash;

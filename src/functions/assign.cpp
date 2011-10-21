@@ -8,7 +8,7 @@ namespace assign_function {
 
     CA_FUNCTION(assign)
     {
-        Branch& contents = nested_contents(CALLER);
+        Branch* contents = nested_contents(CALLER);
 
         TaggedValue output;
         evaluate_branch_internal(CONTEXT, contents, &output);
@@ -17,9 +17,9 @@ namespace assign_function {
 
     Type* specializeType(Term* term)
     {
-        Branch& contents = nested_contents(term);
-        if (contents.length() > 0)
-            return contents[contents.length()-1]->type;
+        Branch* contents = nested_contents(term);
+        if (contents->length() > 0)
+            return contents->get(contents->length()-1)->type;
         else
             return &ANY_T;
     }
@@ -42,7 +42,7 @@ namespace assign_function {
         }
     }
 
-    Term* write_setter_from_getter(Branch& branch, Term* term, Term* desiredTaggedValue)
+    Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredTaggedValue)
     {
         Term* set = NULL;
 
@@ -82,8 +82,8 @@ namespace assign_function {
 
     void update_assign_contents(Term* term)
     {
-        Branch& contents = nested_contents(term);
-        clear_branch(&contents);
+        Branch* contents = nested_contents(term);
+        clear_branch(contents);
 
         // The left-expression might be represented by a chain of get_xxx terms.
         // Walk upwards and append a series of set_terms.
@@ -113,7 +113,7 @@ namespace assign_function {
         respecialize_type(term);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
         get_function_attrs(ASSIGN_FUNC)->specializeType = specializeType;

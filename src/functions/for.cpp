@@ -25,38 +25,38 @@ namespace for_function {
 
     int getOutputCount(Term* term)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
         
         // Check if we're still building
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return 1;
 
-        Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
-        return 1 + outerRebinds.length();
+        Branch* outerRebinds = nested_contents(contents->get("#outer_rebinds"));
+        return 1 + outerRebinds->length();
     }
 
     const char* getOutputName(Term* term, int outputIndex)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // Check if we're still building
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return "";
 
-        Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
-        return outerRebinds[outputIndex - 1]->name.c_str();
+        Branch* outerRebinds = nested_contents(contents->get("#outer_rebinds"));
+        return outerRebinds->get(outputIndex - 1)->name.c_str();
     }
 
     Type* getOutputType(Term* term, int outputIndex)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // Check if we're still building
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return &ANY_T;
 
-        Branch& outerRebinds = nested_contents(contents["#outer_rebinds"]);
-        return outerRebinds[outputIndex - 1]->type;
+        Branch* outerRebinds = nested_contents(contents->get("#outer_rebinds"));
+        return outerRebinds->get(outputIndex - 1)->type;
     }
 
     CA_FUNCTION(evaluate_break)
@@ -84,7 +84,7 @@ namespace for_function {
         append_phrase(source, "discard", term, phrase_type::KEYWORD);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         get_function_attrs(FOR_FUNC)->formatSource = formatSource;

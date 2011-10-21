@@ -22,7 +22,7 @@ StyledSource::toString()
     return _phrases.toString();
 }
 
-void format_branch_source(StyledSource* source, Branch& branch, Term* format)
+void format_branch_source(StyledSource* source, Branch* branch, Term* format)
 {
     if (format != NULL)
         append_phrase(source, format->stringPropOptional("syntax:postHeadingWs", ""),
@@ -34,8 +34,8 @@ void format_branch_source(StyledSource* source, Branch& branch, Term* format)
         append_phrase(source, "{", format, phrase_type::UNDEFINED);
 
     bool newlineNeeded = false;
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
 
         if (!should_print_term_source_line(term))
             continue;
@@ -254,7 +254,7 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
     if (byValue) {
         format_term_source(source, input);
     } else {
-        append_phrase(source, get_relative_name(term, input), term, phrase_type::TERM_NAME);
+        append_phrase(source, get_relative_name_at(term, input), term, phrase_type::TERM_NAME);
     }
 
     if (visibleIndex >= 0)
@@ -325,7 +325,7 @@ void append_phrase(StyledSource* source, std::string const& str, Term* term, int
     return append_phrase(source, str.c_str(), term, type);
 }
 
-std::string get_branch_source_text(Branch& branch)
+std::string get_branch_source_text(Branch* branch)
 {
     StyledSource source;
     format_branch_source(&source, branch);

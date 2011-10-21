@@ -47,10 +47,10 @@ void BranchIterator::advance()
     Term* term = current();
 
     // Check to start an inner branch.
-    if (term && term->nestedContents && term->contents().length() > 0) {
-        Branch& contents = nested_contents(term);
-        int firstIndex = _backwards ? contents.length() - 1 : 0;
-        _stack.push_back(Frame(&contents, firstIndex));
+    if (term && term->nestedContents && term->contents()->length() > 0) {
+        Branch* contents = nested_contents(term);
+        int firstIndex = _backwards ? contents->length() - 1 : 0;
+        _stack.push_back(Frame(contents, firstIndex));
         return;
     }
 
@@ -62,12 +62,12 @@ void BranchIterator::advance()
 void BranchIterator::advanceSkippingBranch()
 {
     while (true) {
-        Branch& branch = *_stack.back().branch;
+        Branch* branch = _stack.back().branch;
         int& index = _stack.back().index;
 
         index += _backwards ? -1 : 1;
 
-        if (index < 0 || index >= branch.length())
+        if (index < 0 || index >= branch->length())
             _stack.pop_back();
         else
             break;

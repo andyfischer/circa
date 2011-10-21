@@ -71,23 +71,23 @@ namespace get_state_field_function {
 
         Term* defaultValue = term->input(1);
 
-        if (defaultValue == NULL && nested_contents(term).length() > 0)
-            defaultValue = nested_contents(term).getFromEnd(0);
+        if (defaultValue == NULL && nested_contents(term)->length() > 0)
+            defaultValue = nested_contents(term)->getFromEnd(0);
 
         if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);
             if (defaultValue->name != "")
-                append_phrase(source, get_relative_name(term, defaultValue),
+                append_phrase(source, get_relative_name_at(term, defaultValue),
                         term, phrase_type::TERM_NAME);
             else
                 format_term_source(source, defaultValue);
         }
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        GET_STATE_FIELD_FUNC = kernel["get_state_field"];
+        GET_STATE_FIELD_FUNC = kernel->get("get_state_field");
         get_function_attrs(GET_STATE_FIELD_FUNC)->formatSource = formatSource;
     }
 }

@@ -20,11 +20,11 @@ namespace namespace_function {
                 term, token::WHITESPACE);
     }
 
-    void early_setup(Branch& kernel)
+    void early_setup(Branch* kernel)
     {
         NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
         get_function_attrs(NAMESPACE_FUNC)->formatSource = format_source;
     }
-    void setup(Branch& kernel) {}
+    void setup(Branch* kernel) {}
 }
 }

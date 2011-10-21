@@ -19,10 +19,10 @@ void mark_inputs_changed(Term* term);
 void mark_repairable_link(Term* term, std::string const& name, int dependencyIndex);
 
 // Called when the staticErrors list on the Branch should be recalculated.
-void mark_static_errors_invalid(Branch& branch);
+void mark_static_errors_invalid(Branch* branch);
 
-void finish_update_cascade(Branch& branch);
-void recursively_finish_update_cascade(Branch& branch);
+void finish_update_cascade(Branch* branch);
+void recursively_finish_update_cascade(Branch* branch);
 
 void on_inputs_changed(Term* term);
 

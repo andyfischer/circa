@@ -40,30 +40,30 @@ void test_include_function()
     Branch branch;
     Term* incl = branch.compile("include('file.ca')");
 
-    Branch& included = nested_contents(incl);
+    Branch* included = nested_contents(incl);
 
     // Make sure that the included file is loaded, even though the term wasn't evaluated.
-    test_assert(included.length() > 0);
+    test_assert(included->length() > 0);
 
-    test_assert(included["a"]->asInt() == 1);
+    test_assert(included->get("a")->asInt() == 1);
     test_equals(get_branch_source_filename(included), "file.ca");
 
     // Next, modify the file and reload.
     files["file.ca"] = "b = 2";
     files.last_modified("file.ca")++;
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
-    test_assert(!included.contains("a"));
-    test_assert(included["b"]->asInt() == 2);
+    test_assert(!included->contains("a"));
+    test_assert(included->get("b")->asInt() == 2);
 
     // Modify the file but don't modify the last_modified time, make sure that
     // it doesn't reload this time.
     files["file.ca"] = "c = 3";
-    evaluate_branch(&context, branch);
-    test_assert(!included.contains("a"));
-    test_assert(!included.contains("c"));
-    test_assert(included["b"]->asInt() == 2);
+    evaluate_branch(&context, &branch);
+    test_assert(!included->contains("a"));
+    test_assert(!included->contains("c"));
+    test_assert(included->get("b")->asInt() == 2);
 }
 
 void test_include_static_error_after_reload()
@@ -75,14 +75,14 @@ void test_include_static_error_after_reload()
     branch.compile("include('file.ca')");
 
     EvalContext result;
-    evaluate_branch(&result, branch);
+    evaluate_branch(&result, &branch);
 
     test_assert(!result.errorOccurred);
 
     files["file.ca"] = "add(what what)";
     files.last_modified("file.ca")++;
 
-    evaluate_branch(&result, branch);
+    evaluate_branch(&result, &branch);
     test_assert(result.errorOccurred);
 }
 
@@ -98,29 +98,29 @@ void test_file_changed()
 
     // First time through should always return true
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(as_bool(changed));
 
     // Subsequent call should return false
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     //dump(branch);
     //std::cout << context.state.toString();
     test_assert(!as_bool(changed));
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(!as_bool(changed));
 
     // Change the modified time
     files.last_modified("x")++;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(as_bool(changed));
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(!as_bool(changed));
 
     // Change the filename
     set_string(filename, "y");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(as_bool(changed));
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(!as_bool(changed));
 }
 
@@ -132,9 +132,9 @@ void test_include_namespace()
 
     branch.compile("include('file')");
     Term* a = branch.compile("ns:a");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
-    test_assert(branch);
+    test_assert(&branch);
     test_assert(as_int(a) == 5);
 }
 
@@ -149,8 +149,8 @@ void test_include_with_error()
     files["file"] = "eyjafjallajokull";
 
     branch.compile("include('file')");
-    evaluate_branch(branch);
-    test_assert(has_static_errors(branch));
+    evaluate_branch(&branch);
+    test_assert(has_static_errors(&branch));
 }
 
 void test_include_from_expression()
@@ -162,7 +162,7 @@ void test_include_from_expression()
     branch.compile("name = cond(true,'a','b')");
     branch.compile("include(name)");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 }
 
 void test_include_with_state()
@@ -174,7 +174,7 @@ void test_include_with_state()
     branch.compile("include('file')");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_include: {b: 3}, a: 1}");
 }
 
@@ -187,12 +187,12 @@ void test_call_function_from_included_file()
     Term* hiCall = branch.compile("hi()");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     files.last_modified("file")++;
     evaluate_single_term(&context, includeCall);
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_assert(hiCall->function != NULL);
 }
@@ -202,12 +202,12 @@ void load_nonexistant_file()
     Branch branch;
     FakeFileSystem files;
     load_script(&branch, "a");
-    test_assert(has_static_errors(branch));
+    test_assert(has_static_errors(&branch));
 
     files.set("a", "x = 1");
     clear_branch(&branch);
     load_script(&branch, "a");
-    test_assert(!has_static_errors(branch));
+    test_assert(!has_static_errors(&branch));
 }
 
 void test_include_script()
@@ -219,11 +219,11 @@ void test_include_script()
 
     include_script(&branch, "a");
     branch.compile("y = x");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_equals(branch["y"], "1");
 
     files.set("a", "x = 2");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_equals(branch["y"], "2");
 }
 

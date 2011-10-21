@@ -14,9 +14,9 @@ void test_int()
 
     test_assert(INT_T.formatSource != NULL);
 
-    Term* four = create_int(branch, 4);
-    Term* another_four = create_int(branch, 4);
-    Term* five = create_int(branch, 5);
+    Term* four = create_int(&branch, 4);
+    Term* another_four = create_int(&branch, 4);
+    Term* five = create_int(&branch, 5);
 
     test_assert(equals(four, another_four));
     test_assert(!equals(four, five));
@@ -33,9 +33,9 @@ void test_float()
     test_assert(floatType->equals != NULL);
     test_assert(floatType->formatSource != NULL);
 
-    Term* point_one = create_float(branch, .1f);
-    Term* point_one_again = create_float(branch, .1f);
-    Term* point_two = create_float(branch, 0.2f);
+    Term* point_one = create_float(&branch, .1f);
+    Term* point_one_again = create_float(&branch, .1f);
+    Term* point_two = create_float(&branch, 0.2f);
 
     test_assert(equals(point_one, point_one_again));
     test_assert(equals(point_two, point_two));
@@ -56,7 +56,7 @@ void test_builtin_equals()
     Branch branch;
     EvalContext context;
     branch.compile("equals(5.0, 'hello')");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 }
 
 void test_list()
@@ -90,7 +90,7 @@ void test_vectorized_funcs()
 
     // Test error handling
     EvalContext context;
-    evaluate(&context, branch, "[1 1 1] + [1 1]");
+    evaluate(&context, &branch, "[1 1 1] + [1 1]");
     test_assert(context.errorOccurred);
 }
 
@@ -108,7 +108,7 @@ void test_vectorized_funcs_with_points()
 
     Term* b = branch.compile("b = a + [0 2]");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_equals(b->getIndex(0)->toFloat(), 1);
     test_equals(b->getIndex(1)->toFloat(), 2);
@@ -138,7 +138,7 @@ void test_get_index()
     branch.eval("l = []");
 
     EvalContext context;
-    evaluate(&context, branch, "l = []; get_index(l, 5)");
+    evaluate(&context, &branch, "l = []; get_index(l, 5)");
     test_assert(context.errorOccurred);
 }
 
@@ -166,19 +166,19 @@ void test_do_once()
 
     Term* x = branch.compile("x = 1");
     Term* t = branch.compile("do_once()");
-    nested_contents(t).compile("unsafe_assign(x,2)");
+    nested_contents(t)->compile("unsafe_assign(x,2)");
 
-    test_assert(branch);
+    test_assert(&branch);
 
     test_assert(as_int(x) == 1);
 
     // the assign() inside do_once should modify x
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(as_int(x) == 2);
 
     // but if we call it again, it shouldn't do that any more
     set_int(x, 3);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(as_int(x) == 3);
 }
 
@@ -189,18 +189,18 @@ void test_changed()
     Term* x = branch.compile("x = 5");
     Term* changed = branch.compile("changed(x)");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(changed->asBool() == true);
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(changed->asBool() == false);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(changed->asBool() == false);
 
     set_int(x, 6);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(changed->asBool() == true);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(changed->asBool() == false);
 }
 
@@ -212,26 +212,26 @@ void test_delta()
     Term* delta = branch.compile("delta(i)");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_assert(is_float(delta));
     test_equals(delta->toFloat(), 0);
     
     set_int(i, 5);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(is_float(delta));
     test_equals(delta->toFloat(), 5);
 
     // do another evaluation without changing i, delta is now 0
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(delta->toFloat(), 0);
 
     set_int(i, 2);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(delta->toFloat(), -3);
 
     set_int(i, 0);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(delta->toFloat(), -2);
 }
 
@@ -247,12 +247,12 @@ void test_message_passing()
     test_equals(&context.messages, "{}");
 
     // First run, inbox is still empty, but there is 1 message in transit
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(inbox->numElements() == 0);
     test_equals(&context.messages, "{inbox_name: [1]}");
 
     // Second run, inbox now returns 1
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(inbox->numElements() == 1);
     test_assert(inbox->getIndex(0)->asInt() == 1);
     test_equals(&context.messages, "{inbox_name: [1]}");
@@ -261,13 +261,13 @@ void test_message_passing()
     remove_term(send);
 
     // Third run, inbox still returns 1 (from previous call), message queue is empty
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(inbox->numElements() == 1);
     test_assert(inbox->getIndex(0)->asInt() == 1);
     test_equals(&context.messages, "{inbox_name: []}");
 
     // Fourth run, inbox is empty again
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(inbox->numElements() == 0);
     test_equals(&context.messages, "{inbox_name: []}");
 }
@@ -286,17 +286,17 @@ void test_message_passing2()
         "send_func(2)\n");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{last_output: 1}");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{last_output: 2}");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{last_output: 2}");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{last_output: 2}");
 }
 

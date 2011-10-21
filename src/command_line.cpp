@@ -94,7 +94,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-p") {
         Branch branch;
         load_script(&branch, args[1].c_str());
-        print_branch(std::cout, branch);
+        print_branch(std::cout, &branch);
         return 0;
     }
 
@@ -103,9 +103,9 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         load_script(&branch, args[1].c_str());
 
-        print_branch(std::cout, branch);
+        print_branch(std::cout, &branch);
 
-        evaluate_branch(branch);
+        evaluate_branch(&branch);
         return 0;
     }
 
@@ -114,9 +114,9 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         load_script(&branch, args[1].c_str());
 
-        evaluate_branch(branch);
+        evaluate_branch(&branch);
 
-        print_branch(std::cout, branch);
+        print_branch(std::cout, &branch);
         return 0;
     }
 
@@ -124,7 +124,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-pp") {
         Branch branch;
         load_script(&branch, args[1].c_str());
-        print_branch_with_properties(std::cout, branch);
+        print_branch_with_properties(std::cout, &branch);
         return 0;
     }
 
@@ -132,7 +132,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-s") {
         Branch branch;
         load_script(&branch, args[1].c_str());
-        std::cout << get_branch_source_text(branch) << std::endl;
+        std::cout << get_branch_source_text(&branch) << std::endl;
         return 0;
     }
 
@@ -178,12 +178,12 @@ int run_command_line(std::vector<std::string> args)
         Branch branch;
         load_script(&branch, args[1].c_str());
 
-        if (has_static_errors(branch)) {
-            print_static_errors_formatted(branch, std::cout);
+        if (has_static_errors(&branch)) {
+            print_static_errors_formatted(&branch, std::cout);
             return 1;
         }
 
-        std::cout << generate_cpp_headers(branch);
+        std::cout << generate_cpp_headers(&branch);
 
         return 0;
     }
@@ -212,8 +212,8 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Otherwise, load args[0] as a script and run it
-    Branch& main_branch = create_branch(kernel());
-    load_script(&main_branch, args[0].c_str());
+    Branch* main_branch = create_branch(kernel());
+    load_script(main_branch, args[0].c_str());
 
     if (has_static_errors(main_branch)) {
         print_static_errors_formatted(main_branch, std::cout);

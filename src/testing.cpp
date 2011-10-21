@@ -51,7 +51,7 @@ void test_assert_function(Term* term, int line, const char* file)
     }
 }
 
-void test_assert_function(Branch& branch, int line, const char* file)
+void test_assert_function(Branch* branch, int line, const char* file)
 {
     if (!branch_check_invariants_print_result(branch, std::cout)) {
         declare_current_test_failed();
@@ -147,7 +147,7 @@ void test_equals_function(TaggedValue* a, float b,
     return test_equals_function(a->toFloat(), b, aText, bText, line, file);
 }
 
-bool test_fail_on_static_error(Branch& branch)
+bool test_fail_on_static_error(Branch* branch)
 {
     if (has_static_errors(branch)) {
         std::cout << "Static error in " << get_current_test_name() << std::endl;
@@ -296,7 +296,7 @@ bool current_test_has_failed()
     return gCurrentTestCase.failed;
 }
 
-void test_branch_as_assertions_list(Branch& branch, std::string const& contextStr)
+void test_branch_as_assertions_list(Branch* branch, std::string const& contextStr)
 {
     if (has_static_errors(branch)) {
         std::cout << "Static error " << contextStr << ":" << std::endl;
@@ -324,8 +324,8 @@ void test_branch_as_assertions_list(Branch& branch, std::string const& contextSt
     }
 
     int boolean_statements_found = 0;
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
         if (!is_statement(term))
             continue;
 

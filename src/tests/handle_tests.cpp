@@ -109,15 +109,15 @@ void test_with_state()
     branch.compile("alloc_handle(@s)");
 
     EvalContext context;
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
 
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
     test_equals(&g_slots, "[true, false, false]");
 
     reset(&context.state);
-    reset_locals(branch);
+    reset_locals(&branch);
     test_equals(&g_slots, "[false, false, false]");
 }
 
@@ -133,13 +133,13 @@ void test_deleted_state()
     branch.compile("alloc_handle(@t)");
 
     EvalContext context;
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
 
     test_equals(&g_slots, "[true, true, false]");
 
     clear_branch(&branch);
     branch.compile("state t");
-    strip_orphaned_state(branch, &context.state);
+    strip_orphaned_state(&branch, &context.state);
     
     test_equals(&g_slots, "[false, true, false]");
 }
@@ -155,12 +155,12 @@ void test_in_subroutine_state()
     branch.compile("hi(s)");
 
     EvalContext context;
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
 
     set_null(&context.state);
-    reset_locals(branch);
+    reset_locals(&branch);
 
     test_equals(&g_slots, "[false, false, false]");
 }
@@ -174,12 +174,12 @@ void test_state_inside_if_block()
     branch.compile("if is_null(s) { s = alloc_handle(s) }");
 
     EvalContext context;
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
     clear_branch(&branch);
-    reset_locals(branch);
-    strip_orphaned_state(branch, &context.state);
+    reset_locals(&branch);
+    strip_orphaned_state(&branch, &context.state);
 
     test_equals(&g_slots, "[false, false, false]");
 }
@@ -192,12 +192,12 @@ void test_that_stripping_state_is_recursive()
     branch.compile("if true { state a = 1; state s; s = alloc_handle(s) }");
 
     EvalContext context;
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
     test_equals(&g_slots, "[true, false, false]");
 
     clear_branch(&branch);
     branch.compile("if true { state a = 1 }");
-    strip_orphaned_state(branch, &context.state);
+    strip_orphaned_state(&branch, &context.state);
 
     test_equals(&g_slots, "[false, false, false]");
 }
@@ -213,14 +213,14 @@ void test_included_file_changed()
     branch.compile("include('f')");
 
     EvalContext context;
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
 
     files.set("f", "");
-    evaluate_branch_no_preserve_locals(&context, branch);
+    evaluate_branch_no_preserve_locals(&context, &branch);
 
-    test_assert(branch);
+    test_assert(&branch);
 
     test_equals(&g_slots, "[false, false, false]");
 }

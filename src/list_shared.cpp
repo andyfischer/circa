@@ -344,15 +344,15 @@ bool list_type_has_specific_size(TaggedValue* parameter)
     return is_list(parameter);
 }
 
-void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter)
+void list_initialize_parameter_from_type_decl(Branch* typeDecl, TaggedValue* parameter)
 {
     List& param = *set_list(parameter, 2);
-    List& types = *set_list(param[0], typeDecl.length());
-    List& names = *set_list(param[1], typeDecl.length());
+    List& types = *set_list(param[0], typeDecl->length());
+    List& names = *set_list(param[1], typeDecl->length());
 
-    for (int i=0; i < typeDecl.length(); i++) {
-        set_type(types[i], declared_type(typeDecl[i]));
-        set_string(names[i], typeDecl[i]->name);
+    for (int i=0; i < typeDecl->length(); i++) {
+        set_type(types[i], declared_type(typeDecl->get(i)));
+        set_string(names[i], typeDecl->get(i)->name);
     }
 }
 

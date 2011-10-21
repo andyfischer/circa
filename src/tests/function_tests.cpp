@@ -135,13 +135,13 @@ void test_calling_manual_overloaded_function()
     Term* two = branch.compile("2");
     TermList inputs(two, two);
 
-    test_assert(branch);
+    test_assert(&branch);
     test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);
     test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
 
     Term* sum = branch.compile("my_add(2 2)");
-    evaluate_branch(branch);
-    test_assert(branch);
+    evaluate_branch(&branch);
+    test_assert(&branch);
     test_equals(sum, "4.0");
 }
 
@@ -170,8 +170,8 @@ namespace test_func_with_multiple_outputs {
         branch.compile("f(2,2)");
         branch.compile("c = f(&a, &b)");
 
-        test_assert(branch);
-        evaluate_branch(branch);
+        test_assert(&branch);
+        evaluate_branch(&branch);
         test_equals(get_local(branch["a"]), "3");
         test_equals(get_local(branch["b"]), "4");
         test_equals(get_local(branch["c"]), "4");
@@ -185,7 +185,7 @@ void multiple_output_static_typing()
     Term* call = branch.compile("f(1, 'hi')");
     test_equals(get_output_type(call, 1)->name, "int");
     test_equals(get_output_type(call, 2)->name, "string");
-    test_assert(branch);
+    test_assert(&branch);
 
     branch.compile("c = 2, d = 'hi'");
     branch.compile("f(&c, &d)");
@@ -193,7 +193,7 @@ void multiple_output_static_typing()
     branch.compile("def needs_string(string);");
     branch.compile("needs_int(c)");
     branch.compile("needs_string(d)");
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void register_tests()

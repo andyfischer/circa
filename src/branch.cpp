@@ -345,13 +345,13 @@ std::string Branch::toString()
 Term*
 Branch::compile(std::string const& code)
 {
-    return parser::compile(*this, parser::statement_list, code);
+    return parser::compile(this, parser::statement_list, code);
 }
 
 Term*
 Branch::eval(std::string const& code)
 {
-    return parser::evaluate(*this, parser::statement_list, code);
+    return parser::evaluate(this, parser::statement_list, code);
 }
 
 bool is_namespace(Term* term)
@@ -359,9 +359,9 @@ bool is_namespace(Term* term)
     return term->function == NAMESPACE_FUNC;
 }
 
-bool is_namespace(Branch& branch)
+bool is_namespace(Branch* branch)
 {
-    return branch.owningTerm != NULL && is_namespace(branch.owningTerm);
+    return branch->owningTerm != NULL && is_namespace(branch->owningTerm);
 }
 
 bool has_nested_contents(Term* term)
@@ -369,18 +369,18 @@ bool has_nested_contents(Term* term)
     return term->nestedContents != NULL;
 }
 
-Branch& nested_contents(Term* term)
+Branch* nested_contents(Term* term)
 {
     if (term->nestedContents == NULL) {
         term->nestedContents = new Branch();
         term->nestedContents->owningTerm = term;
     }
-    return *term->nestedContents;
+    return term->nestedContents;
 }
 
-std::string get_branch_source_filename(Branch& branch)
+std::string get_branch_source_filename(Branch* branch)
 {
-    List* fileOrigin = branch_get_file_origin(&branch);
+    List* fileOrigin = branch_get_file_origin(branch);
 
     if (fileOrigin == NULL)
         return "";
@@ -388,11 +388,11 @@ std::string get_branch_source_filename(Branch& branch)
     return as_string(fileOrigin->get(1));
 }
 
-Branch* get_outer_scope(Branch const& branch)
+Branch* get_outer_scope(Branch* branch)
 {
-    if (branch.owningTerm == NULL)
+    if (branch->owningTerm == NULL)
         return NULL;
-    return branch.owningTerm->owningBranch;
+    return branch->owningTerm->owningBranch;
 }
 
 void pre_erase_term(Term* term)
@@ -446,7 +446,7 @@ void clear_branch(Branch* branch)
 {
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
-    mark_branch_as_possibly_not_having_inlined_state(*branch);
+    mark_branch_as_possibly_not_having_inlined_state(branch);
     set_null(&branch->pendingUpdates);
 
     branch->names.clear();
@@ -494,9 +494,9 @@ void clear_branch(Branch* branch)
     branch->_terms.clear();
 }
 
-Term* find_term_by_id(Branch& branch, unsigned int id)
+Term* find_term_by_id(Branch* branch, unsigned int id)
 {
-    for (BranchIterator it(&branch); !it.finished(); it.advance()) {
+    for (BranchIterator it(branch); !it.finished(); it.advance()) {
         if (*it == NULL)
             continue;
 
@@ -507,39 +507,39 @@ Term* find_term_by_id(Branch& branch, unsigned int id)
     return NULL;
 }
 
-void duplicate_branch_nested(TermMap& newTermMap, Branch& source, Branch& dest)
+void duplicate_branch_nested(TermMap& newTermMap, Branch* source, Branch* dest)
 {
     // Duplicate every term
-    for (int index=0; index < source.length(); index++) {
-        Term* source_term = source.get(index);
+    for (int index=0; index < source->length(); index++) {
+        Term* source_term = source->get(index);
 
         Term* dest_term = create_duplicate(dest, source_term, source_term->name, false);
 
         newTermMap[source_term] = dest_term;
 
         // duplicate nested contents
-        clear_branch(&nested_contents(dest_term));
+        clear_branch(nested_contents(dest_term));
         duplicate_branch_nested(newTermMap,
                 nested_contents(source_term), nested_contents(dest_term));
     }
 }
 
-void duplicate_branch(Branch& source, Branch& dest)
+void duplicate_branch(Branch* source, Branch* dest)
 {
-    assert_valid_branch(&source);
-    assert_valid_branch(&dest);
+    assert_valid_branch(source);
+    assert_valid_branch(dest);
 
     TermMap newTermMap;
 
     duplicate_branch_nested(newTermMap, source, dest);
 
     // Remap pointers
-    for (int i=0; i < dest.length(); i++)
-        remap_pointers(dest[i], newTermMap);
+    for (int i=0; i < dest->length(); i++)
+        remap_pointers(dest->get(i), newTermMap);
 
     // Include/overwrite names
-    dest.names.append(source.names);
-    dest.names.remapPointers(newTermMap);
+    dest->names.append(source->names);
+    dest->names.remapPointers(newTermMap);
 }
 
 void load_script(Branch* branch, const char* filename)
@@ -556,51 +556,51 @@ void load_script(Branch* branch, const char* filename)
     read_text_file_to_value(filename, &contents, &fileReadError);
 
     if (!is_null(&fileReadError)) {
-        Term* msg = create_value(*branch, &fileReadError, "fileReadError");
-        apply(*branch, STATIC_ERROR_FUNC, TermList(msg));
+        Term* msg = create_value(branch, &fileReadError, "fileReadError");
+        apply(branch, STATIC_ERROR_FUNC, TermList(msg));
         return;
     }
 
-    parser::compile(*branch, parser::statement_list, as_string(&contents));
+    parser::compile(branch, parser::statement_list, as_string(&contents));
 }
 
-void evaluate_script(Branch& branch, const char* filename)
+void evaluate_script(Branch* branch, const char* filename)
 {
-    load_script(&branch, filename);
+    load_script(branch, filename);
     evaluate_branch(branch);
 }
 
 Branch* include_script(Branch* branch, const char* filename)
 {
     ca_assert(branch != NULL);
-    Term* filenameTerm = create_string(*branch, filename);
-    Term* includeFunc = apply(*branch, INCLUDE_FUNC, TermList(filenameTerm));
+    Term* filenameTerm = create_string(branch, filename);
+    Term* includeFunc = apply(branch, INCLUDE_FUNC, TermList(filenameTerm));
     post_compile_term(includeFunc);
-    return &nested_contents(includeFunc);
+    return nested_contents(includeFunc);
 }
 
 Branch* load_script_term(Branch* branch, const char* filename)
 {
     ca_assert(branch != NULL);
-    Term* filenameTerm = create_string(*branch, filename);
-    Term* includeFunc = apply(*branch, LOAD_SCRIPT_FUNC, TermList(filenameTerm));
+    Term* filenameTerm = create_string(branch, filename);
+    Term* includeFunc = apply(branch, LOAD_SCRIPT_FUNC, TermList(filenameTerm));
     post_compile_term(includeFunc);
-    return &nested_contents(includeFunc);
+    return nested_contents(includeFunc);
 }
 
-void persist_branch_to_file(Branch& branch)
+void persist_branch_to_file(Branch* branch)
 {
     std::string filename = get_branch_source_filename(branch);
     std::string contents = get_branch_source_text(branch);
     write_text_file(filename.c_str(), contents.c_str());
 }
 
-std::string get_source_file_location(Branch& branch)
+std::string get_source_file_location(Branch* branch)
 {
     // Search upwards until we find a branch that has source-file defined.
-    Branch* branch_p = &branch;
+    Branch* branch_p = branch;
 
-    while (branch_p != NULL && get_branch_source_filename(*branch_p) == "") {
+    while (branch_p != NULL && get_branch_source_filename(branch_p) == "") {
         if (branch_p->owningTerm == NULL)
             branch_p = NULL;
         else
@@ -610,7 +610,7 @@ std::string get_source_file_location(Branch& branch)
     if (branch_p == NULL)
         return "";
 
-    return get_directory_for_filename(get_branch_source_filename(*branch_p));
+    return get_directory_for_filename(get_branch_source_filename(branch_p));
 }
 
 List* branch_get_file_origin(Branch* branch)
@@ -682,8 +682,8 @@ bool refresh_script(Branch* branch)
     }
 #endif
 
-    mark_static_errors_invalid(*branch);
-    update_static_error_list(*branch);
+    mark_static_errors_invalid(branch);
+    update_static_error_list(branch);
     return true;
 }
 
@@ -697,12 +697,12 @@ void append_internal_error(BranchInvariantCheck* result, int index, std::string 
     set_string(error[2], message);
 }
 
-void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
+void branch_check_invariants(BranchInvariantCheck* result, Branch* branch)
 {
     int expectedLocalIndex = 0;
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
 
         if (term == NULL) {
             append_internal_error(result, i, "NULL pointer");
@@ -717,7 +717,7 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
         }
 
         // Check that owningBranch is correct
-        if (term->owningBranch != &branch)
+        if (term->owningBranch != branch)
             append_internal_error(result, i, "Wrong owningBranch");
 
         // Check localIndex
@@ -734,7 +734,7 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch& branch)
     }
 } 
 
-bool branch_check_invariants_print_result(Branch& branch, std::ostream& out)
+bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
 {
     BranchInvariantCheck result;
     branch_check_invariants(&result, branch);

@@ -37,7 +37,7 @@ namespace file_changed_function {
                     INPUT(1)->asString()));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate,
             "file_changed(state FileSignature, string filename) -> bool");

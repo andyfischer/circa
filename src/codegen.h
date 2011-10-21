@@ -12,6 +12,6 @@
 
 namespace circa {
 
-std::string generate_cpp_headers(Branch& branch);
+std::string generate_cpp_headers(Branch* branch);
 
 } // namespace circa

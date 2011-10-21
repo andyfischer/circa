@@ -23,7 +23,7 @@ Term* find_name(Branch* branch, const char* name)
         return result;
 
     // Name not found in this branch, check the outer scope.
-    Branch* outerScope = get_outer_scope(*branch);
+    Branch* outerScope = get_outer_scope(branch);
 
     // Avoid infinite loop
     if (outerScope == branch)
@@ -60,7 +60,7 @@ Term* find_local_name(Branch* branch, const char* name)
 
     // Recursively search inside the prefix for the qualified suffix.
     std::string suffix = name + separatorLoc + 1;
-    return find_local_name(&nested_contents(prefix), suffix.c_str());
+    return find_local_name(nested_contents(prefix), suffix.c_str());
 
     return NULL;
 }
@@ -78,7 +78,7 @@ bool exposes_nested_names(Term* term)
 {
     if (term->nestedContents == NULL)
         return false;
-    if (nested_contents(term).length() == 0)
+    if (nested_contents(term)->length() == 0)
         return false;
     if (term->boolPropOptional("exposesNames", false))
         return true;
@@ -87,33 +87,33 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
-Term* get_named_at(Branch& branch, int index, std::string const& name)
+Term* get_named_at(Branch* branch, int index, std::string const& name)
 {
     for (int i=index - 1; i >= 0; i--) {
-        Term* term = branch[i];
+        Term* term = branch->get(i);
         if (term == NULL) continue;
         if (term->name == name)
             return term;
 
         if (term->nestedContents && exposes_nested_names(term))
         {
-            Term* nested = nested_contents(term)[name];
+            Term* nested = nested_contents(term)->get(name);
             if (nested != NULL)
                 return nested;
         }
     }
 
     // Look in outer scopes
-    if (branch.owningTerm == NULL)
+    if (branch->owningTerm == NULL)
         return NULL;
 
-    return get_named_at(branch.owningTerm, name);
+    return get_named_at(branch->owningTerm, name);
 }
 Term* get_named_at(Term* location, std::string const& name)
 {
     assert_valid_term(location);
     if (location->owningBranch == NULL) return NULL;
-    return get_named_at(*location->owningBranch, location->index, name);
+    return get_named_at(location->owningBranch, location->index, name);
 }
 
 Term* get_global(std::string name)
@@ -124,18 +124,18 @@ Term* get_global(std::string name)
     return NULL;
 }
 
-Branch* get_parent_branch(Branch& branch)
+Branch* get_parent_branch(Branch* branch)
 {
-    if (&branch == KERNEL)
+    if (branch == KERNEL)
         return NULL;
 
-    if (branch.owningTerm == NULL)
+    if (branch->owningTerm == NULL)
         return KERNEL;
 
-    if (branch.owningTerm->owningBranch == NULL)
+    if (branch->owningTerm->owningBranch == NULL)
         return KERNEL;
 
-    return branch.owningTerm->owningBranch;
+    return branch->owningTerm->owningBranch;
 }
 
 Term* get_parent_term(Term* term)
@@ -148,9 +148,9 @@ Term* get_parent_term(Term* term)
     return term->owningBranch->owningTerm;
 }
 
-bool name_is_reachable_from(Term* term, Branch& branch)
+bool name_is_reachable_from(Term* term, Branch* branch)
 {
-    if (term->owningBranch == &branch)
+    if (term->owningBranch == branch)
         return true;
 
     Branch* parent = get_parent_branch(branch);
@@ -158,7 +158,7 @@ bool name_is_reachable_from(Term* term, Branch& branch)
     if (parent == NULL)
         return false;
 
-    return name_is_reachable_from(term, *parent);
+    return name_is_reachable_from(term, parent);
 }
 
 Branch* find_first_common_branch(Term* left, Term* right)
@@ -177,10 +177,10 @@ Branch* find_first_common_branch(Term* left, Term* right)
             if (leftParent == rightParent)
                 return leftParent;
 
-            rightParent = get_parent_branch(*rightParent);
+            rightParent = get_parent_branch(rightParent);
         }
 
-        leftParent = get_parent_branch(*leftParent);
+        leftParent = get_parent_branch(leftParent);
         rightParent = right->owningBranch;
     }
 
@@ -188,7 +188,7 @@ Branch* find_first_common_branch(Term* left, Term* right)
 }
 
 // Returns whether or not we succeeded
-bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& output)
+bool get_relative_name_recursive(Branch* branch, Term* term, std::stringstream& output)
 {
     if (name_is_reachable_from(term, branch)) {
         output << term->name;
@@ -216,7 +216,7 @@ bool get_relative_name_recursive(Branch& branch, Term* term, std::stringstream& 
     }
 }
 
-std::string get_relative_name(Branch& branch, Term* term)
+std::string get_relative_name(Branch* branch, Term* term)
 {
     ca_assert(term != NULL);
 
@@ -231,15 +231,15 @@ std::string get_relative_name(Branch& branch, Term* term)
     return result.str();
 }
 
-std::string get_relative_name(Term* location, Term* term)
+std::string get_relative_name_at(Term* location, Term* term)
 {
     if (location == NULL)
-        return get_relative_name(*KERNEL, term);
+        return get_relative_name(KERNEL, term);
 
     if (location->owningBranch == NULL)
         return term->name;
     else
-        return get_relative_name(*location->owningBranch, term);
+        return get_relative_name(location->owningBranch, term);
 }
 
 void update_unique_name(Term* term)
@@ -262,14 +262,14 @@ void update_unique_name(Term* term)
     // Look for a name collision. We might need to keep looping, if our generated name
     // collides with an existing name.
 
-    Branch& branch = *term->owningBranch;
+    Branch* branch = term->owningBranch;
 
     bool updatedName = true;
     while (updatedName) {
         updatedName = false;
 
         for (int i = term->index-1; i >= 0; i--) {
-            Term* other = branch[i];
+            Term* other = branch->get(i);
             if (other == NULL) continue;
 
             // If another term shares the same base, then make sure our ordinal is
@@ -302,9 +302,9 @@ const char* get_unique_name(Term* term)
     return term->uniqueName.name.c_str();
 }
 
-void expose_all_names(Branch& source, Branch& destination)
+void expose_all_names(Branch* source, Branch* destination)
 {
-    for (TermNamespace::iterator it = source.names.begin(); it != source.names.end(); ++it)
+    for (TermNamespace::iterator it = source->names.begin(); it != source->names.end(); ++it)
     {
         std::string const& name = it->first;
         Term* term = it->second;
@@ -313,17 +313,17 @@ void expose_all_names(Branch& source, Branch& destination)
         if (name == "") continue;
         if (name[0] == '#' && name != "#out") continue;
 
-        destination.bindName(term, name);
+        destination->bindName(term, name);
     }
 }
 
-Term* find_from_unique_name(Branch& branch, const char* name)
+Term* find_from_unique_name(Branch* branch, const char* name)
 {
     // O(n) search, maybe this should be made more efficient.
 
-    for (int i=0; i < branch.length(); i++) {
-        if (strcmp(get_unique_name(branch[i]), name) == 0) {
-            return branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        if (strcmp(get_unique_name(branch->get(i)), name) == 0) {
+            return branch->get(i);
         }
     }
     return NULL;
@@ -339,7 +339,7 @@ bool find_global_name(Term* term, std::string& name)
     while (true) {
         stack.push_back(searchTerm);
 
-        if (searchTerm->owningBranch == &kernel())
+        if (searchTerm->owningBranch == kernel())
             break;
 
         searchTerm = get_parent_term(searchTerm);
@@ -371,11 +371,11 @@ Term* find_term_from_global_name_recr(Branch* searchBranch, const char* name)
     int separator = find_qualified_name_separator(name);
     
     if (separator == -1)
-        return find_from_unique_name(*searchBranch, name);
+        return find_from_unique_name(searchBranch, name);
 
     std::string namePortion = std::string(name, separator);
     
-    Term* searchTerm = find_from_unique_name(*searchBranch, namePortion.c_str());
+    Term* searchTerm = find_from_unique_name(searchBranch, namePortion.c_str());
     if (searchTerm == NULL)
         return NULL;
     if (searchTerm->nestedContents == NULL)
@@ -387,7 +387,7 @@ Term* find_term_from_global_name_recr(Branch* searchBranch, const char* name)
 
 Term* find_term_from_global_name(const char* name)
 {
-    Branch* searchBranch = &kernel();
+    Branch* searchBranch = kernel();
     return find_term_from_global_name_recr(searchBranch, name);
 }
 

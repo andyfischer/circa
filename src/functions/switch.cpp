@@ -18,40 +18,40 @@ namespace switch_function {
 
     int switch_getOutputCount(Term* term)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // check if term is still being initialized:
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return 1;
 
-        Branch& outerRebinds = contents.getFromEnd(0)->contents();
-        return outerRebinds.length() + 1;
+        Branch* outerRebinds = contents->getFromEnd(0)->contents();
+        return outerRebinds->length() + 1;
     }
 
     const char* switch_getOutputName(Term* term, int outputIndex)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // check if term is still being initialized:
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return "";
 
-        Branch& outerRebinds = contents.getFromEnd(0)->contents();
-        return outerRebinds[outputIndex - 1]->name.c_str();
+        Branch* outerRebinds = contents->getFromEnd(0)->contents();
+        return outerRebinds->get(outputIndex - 1)->name.c_str();
     }
     Type* switch_getOutputType(Term* term, int outputIndex)
     {
         if (outputIndex == 0)
             return &VOID_T;
 
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // check if term is still being initialized:
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return &ANY_T;
 
-        Branch& outerRebinds = contents.getFromEnd(0)->contents();
-        return outerRebinds[outputIndex - 1]->type;
+        Branch* outerRebinds = contents->getFromEnd(0)->contents();
+        return outerRebinds->get(outputIndex - 1)->type;
     }
 
     void case_formatSource(StyledSource* source, Term* term)
@@ -61,7 +61,7 @@ namespace switch_function {
         format_branch_source(source, nested_contents(term), term);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         SWITCH_FUNC = import_function(kernel, evaluate_switch, "switch(any input) -> any");
         get_function_attrs(SWITCH_FUNC)->formatSource = switch_formatSource;

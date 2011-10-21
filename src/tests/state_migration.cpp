@@ -11,22 +11,22 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     std::string assertionsCode)
 {
     Branch source;
-    parser::compile(source, parser::statement_list, sourceCode);
+    parser::compile(&source, parser::statement_list, sourceCode);
 
-    if (has_static_errors(source)) {
+    if (has_static_errors(&source)) {
         std::cout << "Static error in code: " << sourceCode << std::endl;
-        print_static_errors_formatted(source, std::cout);
+        print_static_errors_formatted(&source, std::cout);
         std::cout << std::endl;
         declare_current_test_failed();
         return;
     }
 
     Branch destination;
-    parser::compile(destination, parser::statement_list, destinationCode);
+    parser::compile(&destination, parser::statement_list, destinationCode);
 
-    if (has_static_errors(destination)) {
+    if (has_static_errors(&destination)) {
         std::cout << "Static error in code: " << destinationCode << std::endl;
-        print_static_errors_formatted(destination, std::cout);
+        print_static_errors_formatted(&destination, std::cout);
         std::cout << std::endl;
         declare_current_test_failed();
         return;
@@ -34,7 +34,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
 
     EvalContext context;
 
-    evaluate_branch(&context, source);
+    evaluate_branch(&context, &source);
 
     if (context.errorOccurred) {
         std::cout << "Runtime error in " << get_current_test_name() << std::endl;
@@ -44,10 +44,10 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         return;
     }
 
-    Branch& assertions = create_branch(destination, "assertions");
+    Branch* assertions = create_branch(&destination, "assertions");
     parser::compile(assertions, parser::statement_list, assertionsCode);
 
-    evaluate_branch(&context, destination);
+    evaluate_branch(&context, &destination);
 
     if (context.errorOccurred) {
         std::cout << "In " << get_current_test_name() << std::endl;
@@ -58,11 +58,11 @@ void test_migration(std::string sourceCode, std::string destinationCode,
     }
 
     int boolean_statements_found = 0;
-    for (int i=0; i < assertions.length(); i++) {
-        if (!is_statement(assertions[i]))
+    for (int i=0; i < assertions->length(); i++) {
+        if (!is_statement(assertions->get(i)))
             continue;
 
-        TaggedValue* result = get_local(assertions[i]);
+        TaggedValue* result = get_local(assertions->get(i));
 
         if (!is_bool(result))
             continue;
@@ -72,11 +72,11 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         if (!as_bool(result)) {
             std::cout << "In " << get_current_test_name() << std::endl;
             std::cout << "assertion failed: "
-                << get_term_source_text(assertions[i]) << std::endl;
+                << get_term_source_text(assertions->get(i)) << std::endl;
             std::cout << "Source:" << std::endl;
-            print_branch(std::cout, source);
+            print_branch(std::cout, &source);
             std::cout << "Destination:" << std::endl;
-            print_branch(std::cout, destination);
+            print_branch(std::cout, &destination);
             std::cout << "State:" << std::endl;
             std::cout << context.state.toString() << std::endl;
             declare_current_test_failed();
@@ -84,7 +84,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         }
     }
 
-    if (boolean_statements_found == 0 && assertions.length() > 0) {
+    if (boolean_statements_found == 0 && assertions->length() > 0) {
         std::cout << "In " << get_current_test_name() << std::endl;
         std::cout << "warn: no boolean statements found in: " << assertionsCode << std::endl;
     }

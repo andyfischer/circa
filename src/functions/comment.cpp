@@ -10,7 +10,7 @@ namespace comment_function {
         append_phrase(source, term->stringProp("comment"), term, token::COMMENT);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         COMMENT_FUNC = import_function(kernel, NULL, "comment()");
         get_function_attrs(COMMENT_FUNC)->formatSource = formatSource;

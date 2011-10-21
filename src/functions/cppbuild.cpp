@@ -89,7 +89,7 @@ namespace cppbuild_function {
             return error_occurred(CONTEXT, CALLER, "g++ returned error");
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         // installed in builtins.cpp
     }

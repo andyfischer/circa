@@ -19,7 +19,7 @@ namespace set_union_function {
         }
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "set_union(Set...) -> Set");
     }

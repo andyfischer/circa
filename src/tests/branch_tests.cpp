@@ -11,11 +11,11 @@ void test_insert()
 {
     Branch branch;
 
-    test_assert(branch_check_invariants_print_result(branch, std::cout)); // sanity check
+    test_assert(branch_check_invariants_print_result(&branch, std::cout)); // sanity check
 
-    Term* a = create_void(branch);
+    Term* a = create_void(&branch);
 
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 
     Term* b = alloc_term();
     test_assert(b->value_type != NULL);
@@ -23,39 +23,39 @@ void test_insert()
     test_assert(branch.length() == 1);
     test_assert(branch[0] == a);
     
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 
     branch.insert(0, b);
 
-    refresh_locals_indices(branch);
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    refresh_locals_indices(&branch);
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 
     test_assert(branch.length() == 2);
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
 
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 
     Term* c = alloc_term();
     branch.insert(2, c);
-    refresh_locals_indices(branch);
+    refresh_locals_indices(&branch);
     test_assert(branch.length() == 3);
     test_assert(branch[0] == b);
     test_assert(branch[1] == a);
     test_assert(branch[2] == c);
 
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 
     Term* d = alloc_term();
     branch.insert(1, d);
-    refresh_locals_indices(branch);
+    refresh_locals_indices(&branch);
     test_assert(branch.length() == 4);
     test_assert(branch[0] == b);
     test_assert(branch[1] == d);
     test_assert(branch[2] == a);
     test_assert(branch[3] == c);
 
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 }
 
 void test_check_invariants()
@@ -96,7 +96,7 @@ void test_remove()
 {
     Branch branch;
 
-    create_value(branch, &INT_T, "a");
+    create_value(&branch, &INT_T, "a");
 
     test_assert(branch.length() == 1);
     test_assert(branch.contains("a"));
@@ -105,7 +105,7 @@ void test_remove()
 
     test_assert(branch.length() == 0);
     test_assert(!branch.contains("a"));
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void test_removeNulls()
@@ -139,21 +139,21 @@ void test_removeNulls()
     test_assert(branch[1] == b);
     test_assert(branch[2] == c);
 
-    refresh_locals_indices(branch);
+    refresh_locals_indices(&branch);
 
-    test_assert(branch_check_invariants_print_result(branch, std::cout));
+    test_assert(branch_check_invariants_print_result(&branch, std::cout));
 }
 
 void test_duplicate()
 {
     Branch original;
-    Term* term1 = create_int(original, 5);
-    Term* term2 = create_string(original, "yarn");
+    Term* term1 = create_int(&original, 5);
+    Term* term2 = create_string(&original, "yarn");
     original.bindName(term1, "term1");
     original.bindName(term2, "term two");
 
     Branch duplicate;
-    duplicate_branch(original, duplicate);
+    duplicate_branch(&original, &duplicate);
 
     Term* term1_duplicate = duplicate["term1"];
     test_assert(term1_duplicate != NULL);
@@ -172,20 +172,20 @@ void test_duplicate()
     test_assert(term1_duplicate);
     test_assert(term2_duplicate);
 
-    test_assert(original);
-    test_assert(duplicate);
+    test_assert(&original);
+    test_assert(&duplicate);
 }
 
 void test_duplicate_nested()
 {
     Branch branch;
     branch.compile("a = 1.0");
-    Branch& inner = branch.compile("inner = branch()")->contents();
-    inner.compile("i = 2.0");
-    inner.compile("j = add(a,i)");
+    Branch* inner = branch.compile("inner = branch()")->contents();
+    inner->compile("i = 2.0");
+    inner->compile("j = add(a,i)");
 
     Branch dupe;
-    duplicate_branch(branch, dupe);
+    duplicate_branch(&branch, &dupe);
 
     Term* inner_i = dupe["inner"]->contents("i");
     Term* inner_j = dupe["inner"]->contents("j");
@@ -201,8 +201,8 @@ void test_duplicate_nested()
     //test_assert(inner_j->input(0)->input(0) == dupe["a"]);
     test_assert(inner_j->input(1) == inner_i);
 
-    test_assert(branch);
-    test_assert(dupe);
+    test_assert(&branch);
+    test_assert(&dupe);
 }
 
 void test_duplicate_nested_dont_make_extra_terms()
@@ -210,16 +210,16 @@ void test_duplicate_nested_dont_make_extra_terms()
     // this test case looks for a bug where nested branches have
     // too many terms after duplication
     Branch orig;
-    Branch& inner = nested_contents(orig.compile("inner = branch()"));
-    inner.compile("i = 2");
+    Branch* inner = nested_contents(orig.compile("inner = branch()"));
+    inner->compile("i = 2");
 
     Branch dupe;
-    duplicate_branch(orig, dupe);
+    duplicate_branch(&orig, &dupe);
 
-    test_assert(nested_contents(dupe["inner"]).length() == 1);
+    test_assert(nested_contents(dupe["inner"])->length() == 1);
 
-    test_assert(orig);
-    test_assert(dupe);
+    test_assert(&orig);
+    test_assert(&dupe);
 }
 
 void test_duplicate_subroutine()
@@ -235,7 +235,7 @@ void test_duplicate_subroutine()
     test_assert(funcAttrs->declaringTerm == func);
 
     Branch dupe;
-    duplicate_branch(branch, dupe);
+    duplicate_branch(&branch, &dupe);
 
     test_assert(dupe.contains("func"));
 
@@ -250,8 +250,8 @@ void test_duplicate_subroutine()
     test_assert(func->contents(1)->asInt() == dupedFunc->contents(1)->asInt());
     test_assert(dupedFunc->contents(1) == dupedFunc->contents("a"));
 
-    test_assert(branch);
-    test_assert(dupe);
+    test_assert(&branch);
+    test_assert(&dupe);
 }
 
 void test_duplicate_get_field_by_name()
@@ -264,14 +264,14 @@ void test_duplicate_get_field_by_name()
     test_assert(b->function == GET_FIELD_FUNC);
 
     Branch dupe;
-    duplicate_branch(branch, dupe);
+    duplicate_branch(&branch, &dupe);
 
     b = dupe["b"];
 
     test_assert(b->function == GET_FIELD_FUNC);
 
-    test_assert(branch);
-    test_assert(dupe);
+    test_assert(&branch);
+    test_assert(&dupe);
 }
 
 void test_duplicate_destination_has_different_type()
@@ -281,37 +281,37 @@ void test_duplicate_destination_has_different_type()
     TaggedValue* p = source.eval("p = Point()");
     copy(p,a);
     // This once tripped an assert:
-    duplicate_branch(source, dest);
+    duplicate_branch(&source, &dest);
 }
 
 void find_name_in_outer_branch()
 {
     Branch branch;
-    Branch& nested = create_branch(branch);
+    Branch* nested = create_branch(&branch);
 
-    Term* a = nested.compile("a = 1");
+    Term* a = nested->compile("a = 1");
 
-    Branch& nested2 = create_branch(nested);
+    Branch* nested2 = create_branch(nested);
 
-    test_assert(find_name(&nested2, "a") == a);
+    test_assert(find_name(nested2, "a") == a);
 
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void test_get_source_file_location()
 {
     Branch branch;
-    create_string(branch, "c:/a/b/something.ca", "attr:source-file");
-    test_equals(get_source_file_location(branch), "c:/a/b");
-    test_assert(branch);
+    create_string(&branch, "c:/a/b/something.ca", "attr:source-file");
+    test_equals(get_source_file_location(&branch), "c:/a/b");
+    test_assert(&branch);
 }
 
 void test_shorten()
 {
     Branch branch;
-    create_int(branch, 5);
-    create_int(branch, 5);
-    create_int(branch, 5);
+    create_int(&branch, 5);
+    create_int(&branch, 5);
+    create_int(&branch, 5);
 
     test_assert(branch.length() == 3);
 
@@ -331,16 +331,16 @@ void test_shorten()
 
     test_assert(branch.length() == 0);
 
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void test_move()
 {
     Branch branch;
-    Term* one = create_int(branch, 1, "1");
-    Term* two = create_int(branch, 2, "2");
-    Term* three = create_int(branch, 3, "3");
-    Term* four = create_int(branch, 4, "4");
+    Term* one = create_int(&branch, 1, "1");
+    Term* two = create_int(&branch, 2, "2");
+    Term* three = create_int(&branch, 3, "3");
+    Term* four = create_int(&branch, 4, "4");
 
     test_assert(branch.length() == 4);
     test_assert(one->index == 0);
@@ -389,7 +389,7 @@ void test_locals_stack()
     Branch branch;
     EvalContext context;
 
-    start_using(branch);
+    start_using(&branch);
 
     Term* a = branch.compile("a = 5");
     Term* b = branch.compile("b = add(a,a)");
@@ -399,14 +399,14 @@ void test_locals_stack()
 
     test_equals(get_local(b)->asInt(), 10);
 
-    start_using(branch);
+    start_using(&branch);
 
     set_int(a, 11);
     for (int i=0; i < branch.length(); i++)
         evaluate_single_term(&context, branch[i]);
 
     test_equals(get_local(b)->asInt(), 22);
-    finish_using(branch);
+    finish_using(&branch);
 
     test_equals(get_local(b)->asInt(), 10);
 }

@@ -46,7 +46,7 @@ void test_get_type_from_branches_stateful_terms()
 
     Branch type;
     
-    get_type_from_branches_stateful_terms(branch, type);
+    get_type_from_branches_stateful_terms(&branch, &type);
 
     test_assert(type.length() == 2);
     test_assert(is_value(type[0]));
@@ -62,7 +62,7 @@ void initial_value()
 
     Term* i = branch.compile("state i = 3");
     Term* j = branch.compile("state int j = 4");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_assert(is_int(get_local(i)));
     test_equals(get_local(i)->asInt(), 3);
@@ -78,9 +78,9 @@ void initialize_from_expression()
     branch.compile("b = a * 2");
     Term *c = branch.compile("state c = b");
 
-    test_assert(branch);
+    test_assert(&branch);
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_equals(to_float(c), 6);
 
@@ -88,11 +88,11 @@ void initialize_from_expression()
     Term* d = branch.compile("d = 5");
     Term* e = branch.compile("state e = d");
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(e->asInt(), 5);
 
     set_int(d, 10);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(e->asInt(), 5);
 }
 
@@ -115,21 +115,21 @@ void one_time_assignment_inside_for_loop()
 {
     Branch branch;
 
-    import_function(branch, _unique_output, "unique_output() -> int");
-    import_function(branch, _spy, "spy(int)");
+    import_function(&branch, _unique_output, "unique_output() -> int");
+    import_function(&branch, _spy, "spy(int)");
     branch.compile("for i in [1 1 1] { state s = unique_output(); spy(s) }");
-    test_assert(branch);
+    test_assert(&branch);
 
     NEXT_UNIQUE_OUTPUT = 0;
     SPY_RESULTS.clear();
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&SPY_RESULTS, "[0, 1, 2]");
 
     SPY_RESULTS.clear();
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&SPY_RESULTS, "[0, 1, 2]");
 }
@@ -141,7 +141,7 @@ void explicit_state()
     branch.compile("s = 1");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(context.state.toString(), "{s: 1}");
 }
@@ -153,7 +153,7 @@ void implicit_state()
     branch.compile("f()");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     
     test_equals(context.state.toString(), "{_f: {s: 1}}");
 }
@@ -170,7 +170,7 @@ namespace test_interpreted_state_access
     void test()
     {
         Branch branch;
-        import_function(branch, evaluate, "func() -> void");
+        import_function(&branch, evaluate, "func() -> void");
         Term* a = branch.compile("a = func()");
 
         test_equals(a->uniqueName.name, "a");
@@ -178,13 +178,13 @@ namespace test_interpreted_state_access
         EvalContext context;
         test_equals(context.state.toString(), "null");
 
-        evaluate_branch(&context, branch);
+        evaluate_branch(&context, &branch);
         test_equals(context.state.toString(), "{a: 1}");
 
-        evaluate_branch(&context, branch);
+        evaluate_branch(&context, &branch);
         test_equals(context.state.toString(), "{a: 2}");
 
-        evaluate_branch(&context, branch);
+        evaluate_branch(&context, &branch);
         test_equals(context.state.toString(), "{a: 3}");
     }
 }
@@ -196,7 +196,7 @@ void bug_with_top_level_state()
     branch.compile("state s = 1");
     branch.compile("def f() { state t }");
     branch.compile("f()");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 }
 
 void bug_with_state_and_plus_equals()
@@ -205,7 +205,7 @@ void bug_with_state_and_plus_equals()
     branch.compile("state int count = 0; count += 1");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 }
 
 void subroutine_unique_name_usage()
@@ -213,7 +213,7 @@ void subroutine_unique_name_usage()
     Branch branch;
     branch.compile("def f() { state s = 0; s += 1; s += 2; s += 5 } f()");
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{_f: {s: 8}}");
 }
@@ -223,7 +223,7 @@ void subroutine_early_return()
     Branch branch;
     branch.compile("def f()->int { state s = 2; return 0; s = 4; } f()");
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_f: {s: 2}}");
 }
 
@@ -232,27 +232,27 @@ void test_branch_has_inlined_state()
     Branch branch;
 
     test_assert(is_null(&branch.hasInlinedState));
-    test_assert(!has_any_inlined_state(branch));
+    test_assert(!has_any_inlined_state(&branch));
     test_assert(as_bool(&branch.hasInlinedState) == false);
     set_null(&branch.hasInlinedState);
 
     branch.compile("state int i");
-    test_assert(has_any_inlined_state(branch));
+    test_assert(has_any_inlined_state(&branch));
 
     branch.clear();
-    test_assert(!has_any_inlined_state(branch));
+    test_assert(!has_any_inlined_state(&branch));
 
-    Branch& nested = create_branch(branch);
-    test_assert(!has_any_inlined_state(branch));
+    Branch* nested = create_branch(&branch);
+    test_assert(!has_any_inlined_state(&branch));
     test_assert(!has_any_inlined_state(nested));
 
-    nested.compile("state i");
-    test_assert(has_any_inlined_state(branch));
+    nested->compile("state i");
+    test_assert(has_any_inlined_state(&branch));
     test_assert(has_any_inlined_state(nested));
 
-    nested.clear();
+    nested->clear();
     test_assert(!has_any_inlined_state(nested));
-    test_assert(!has_any_inlined_state(branch));
+    test_assert(!has_any_inlined_state(&branch));
 }
 
 void test_state_var_needs_cast()
@@ -267,10 +267,10 @@ void test_state_var_needs_cast()
 
     EvalContext context;
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(!context.errorOccurred);
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(!context.errorOccurred);
 
     test_equals(internal_debug_function::spy_results(), "[0.0, 1.0]");
@@ -285,14 +285,14 @@ void test_state_var_default_needs_cast()
     internal_debug_function::spy_clear();
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(!context.errorOccurred);
     test_equals(internal_debug_function::spy_results(), "[3.0]");
 
     branch.clear();
     reset(&context.state);
     branch.compile("state Point p = [1 2 3]");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(context.errorOccurred);
 }
 
@@ -301,7 +301,7 @@ std::string code_to_state_shape(const char* code)
     Branch branch;
     branch.compile(code);
     TaggedValue description;
-    describe_state_shape(branch, &description);
+    describe_state_shape(&branch, &description);
     return description.toString();
 }
 
@@ -330,24 +330,24 @@ void test_strip_abandoned_state()
     Term* x = branch.compile("state x = 'hi'");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     TaggedValue trash;
 
     test_equals(&context.state, "{s: 1, t: 2, x: 'hi'}");
 
     remove_term(t);
-    strip_orphaned_state(branch, &context.state, &trash);
+    strip_orphaned_state(&branch, &context.state, &trash);
     test_equals(&context.state, "{s: 1, x: 'hi'}");
     test_equals(&trash, "{t: 2}");
 
     remove_term(x);
-    strip_orphaned_state(branch, &context.state, &trash);
+    strip_orphaned_state(&branch, &context.state, &trash);
     test_equals(&context.state, "{s: 1}");
     test_equals(&trash, "{x: 'hi'}");
 
     remove_term(s);
-    strip_orphaned_state(branch, &context.state, &trash);
+    strip_orphaned_state(&branch, &context.state, &trash);
     test_equals(&context.state, "null");
     test_equals(&trash, "{s: 1}");
 }
@@ -373,15 +373,15 @@ void test_preserve_state_in_nested_include_file()
     branch.compile("include('a')");
 
     TaggedValue desc;
-    describe_state_shape(branch, &desc);
+    describe_state_shape(&branch, &desc);
     
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{_include: {_include: {x: 1}, s: 2}}");
 
     files.set("a", "include('b'); state t = test_oracle()");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{_include: {_include: {x: 1}, t: 3}}");
 }
@@ -398,19 +398,19 @@ void test_that_initial_value_doesnt_get_reevaluated()
     test_equals(internal_debug_function::spy_results(), "[]");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
-    evaluate_branch(&context, branch);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
+    evaluate_branch(&context, &branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(internal_debug_function::spy_results(), "['call']");
 
     internal_debug_function::spy_clear();
     reset(&context.state);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     reset(&context.state);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     reset(&context.state);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(internal_debug_function::spy_results(), "['call', 'call', 'call']");
 }

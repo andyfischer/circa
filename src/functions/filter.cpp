@@ -35,7 +35,7 @@ namespace filter_function {
         }
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "filter(Indexable,Indexable) -> List");
     }

@@ -24,7 +24,7 @@ namespace unsafe_assign_function {
         cast(source, declared_type(destination), destination);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         UNSAFE_ASSIGN_FUNC = import_function(kernel, evaluate, "unsafe_assign(any, any)");
     }

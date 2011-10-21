@@ -10,7 +10,7 @@ namespace to_string_function {
         set_string(OUTPUT, to_string(INPUT(0)));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "to_string(any) -> string");
     }

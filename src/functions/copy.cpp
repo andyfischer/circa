@@ -18,11 +18,11 @@ namespace copy_function {
     void formatSource(StyledSource* source, Term* term)
     {
         format_name_binding(source, term);
-        append_phrase(source, get_relative_name(term, term->input(0)),
+        append_phrase(source, get_relative_name_at(term, term->input(0)),
                 term, token::IDENTIFIER);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         COPY_FUNC = import_function(kernel, evaluate, "copy(any) -> any");
         get_function_attrs(COPY_FUNC)->specializeType = specializeType;

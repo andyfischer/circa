@@ -13,7 +13,7 @@ namespace do_once_function {
                 term, token::WHITESPACE);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         DO_ONCE_FUNC = import_function(kernel, NULL, "do_once(state bool)");
         get_function_attrs(DO_ONCE_FUNC)->formatSource = formatSource;

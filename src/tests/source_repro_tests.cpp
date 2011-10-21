@@ -11,20 +11,20 @@ namespace source_repro_tests {
 void generate_source_for_function_calls() {
     Branch branch;
 
-    Term* a = create_int(branch, 5, "a");
-    Term* b = create_int(branch, 9, "b");
-    Term* c = apply(branch, "add", TermList(a,b));
+    Term* a = create_int(&branch, 5, "a");
+    Term* b = create_int(&branch, 9, "b");
+    Term* c = apply(&branch, "add", TermList(a,b));
 
     test_assert(should_print_term_source_line(a));
     test_assert(should_print_term_source_line(b));
     test_assert(should_print_term_source_line(c));
-    test_equals(get_branch_source_text(branch), "a = 5\nb = 9\nadd(a, b)");
+    test_equals(get_branch_source_text(&branch), "a = 5\nb = 9\nadd(a, b)");
 
     // Same test with anonymous values
     branch.clear();
-    Term* d = create_int(branch, 3);
-    Term* e = create_int(branch, 4);
-    /*Term* f =*/ apply(branch, "add", TermList(d,e));
+    Term* d = create_int(&branch, 3);
+    Term* e = create_int(&branch, 4);
+    /*Term* f =*/ apply(&branch, "add", TermList(d,e));
 
     /*
     TODO, fix this
@@ -62,16 +62,16 @@ void bug_reproducing_list_after_eval()
     test_equals(get_term_source_text(in1), "[1 1]");
     test_equals(get_input_source_text(sum, 0), "[1 1] ");
     test_equals(get_input_source_text(sum, 1), " [1 1]");
-    test_equals(get_branch_source_text(branch), "[1 1] + [1 1]");
+    test_equals(get_branch_source_text(&branch), "[1 1] + [1 1]");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_equals(get_term_source_text(in0), "[1 1]");
     test_equals(get_term_source_text(in1), "[1 1]");
     test_equals(get_input_source_text(sum, 0), "[1 1] ");
     test_equals(get_input_source_text(sum, 1), " [1 1]");
 
-    test_equals(get_branch_source_text(branch), "[1 1] + [1 1]");
+    test_equals(get_branch_source_text(&branch), "[1 1] + [1 1]");
 }
 
 void death_reproducing_builtin_functions()

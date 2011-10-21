@@ -98,7 +98,7 @@ void test_polymorphic()
 void test_term_value()
 {
     Branch branch;
-    Term* i = create_int(branch, 5);
+    Term* i = create_int(&branch, 5);
     test_assert(is_int(i));
     test_assert(is_int(i));
 
@@ -110,7 +110,7 @@ void test_term_value()
     test_assert(b->numElements() == 3);
     test_assert(b->getIndex(1)->asInt() == 2);
     
-    Term* c = create_value(branch, &INT_T);
+    Term* c = create_value(&branch, &INT_T);
     test_assert(is_int(c));
 }
 
@@ -125,14 +125,14 @@ namespace subroutine_call_test_helper {
 void subroutine_call_test()
 {
     Branch branch;
-    import_function(branch, subroutine_call_test_helper::assert_ints, "f(int) -> int");
+    import_function(&branch, subroutine_call_test_helper::assert_ints, "f(int) -> int");
     branch.eval("f(1)");
 }
 
 void test_reset()
 {
     Branch branch;
-    Term* a = create_int(branch, 5);
+    Term* a = create_int(&branch, 5);
     test_assert(as_int(a) == 5);
     reset(a);
     test_assert(as_int(a) == 0);
@@ -143,7 +143,7 @@ void test_constructor_syntax()
     Branch branch;
     Type* myType = Type::create();
     myType->name = "T";
-    import_type(branch, myType);
+    import_type(&branch, myType);
     TaggedValue* a = branch.eval("a = T()");
     test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);

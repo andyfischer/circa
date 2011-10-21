@@ -88,11 +88,11 @@ namespace list_methods_function {
             copy(input->get(start + i), result->get(i));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
 
-        LIST_APPEND_FUNC = kernel["List.append"];
+        LIST_APPEND_FUNC = kernel->get("List.append");
         get_function_attrs(LIST_APPEND_FUNC)->specializeType = append_specializeType;
     }
 

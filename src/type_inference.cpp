@@ -92,7 +92,7 @@ Type* infer_type_of_get_index(Term* input)
     }
 }
 
-Term* statically_infer_length_func(Branch& branch, Term* term)
+Term* statically_infer_length_func(Branch* branch, Term* term)
 {
     Term* input = term->input(0);
     if (input->function == COPY_FUNC)
@@ -114,7 +114,7 @@ Term* statically_infer_length_func(Branch& branch, Term* term)
     return create_symbol_value(branch, &UNKNOWN_SYMBOL);
 }
 
-Term* statically_infer_result(Branch& branch, Term* term)
+Term* statically_infer_result(Branch* branch, Term* term)
 {
     if (term->function == LENGTH_FUNC)
         return statically_infer_length_func(branch, term);
@@ -135,7 +135,7 @@ void statically_infer_result(Term* term, TaggedValue* result)
 {
     Branch scratch;
 
-    Term* resultTerm = statically_infer_result(scratch, term);
+    Term* resultTerm = statically_infer_result(&scratch, term);
 
     if (is_value(resultTerm))
         copy(resultTerm, result);

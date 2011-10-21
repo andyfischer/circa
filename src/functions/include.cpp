@@ -9,20 +9,20 @@ namespace include_function {
 
     bool load_script(EvalContext* cxt, Term* caller, const std::string& filename, bool exposeNames)
     {
-        Branch& contents = nested_contents(caller);
+        Branch* contents = nested_contents(caller);
 
-        bool fileChanged = check_and_update_file_origin(&contents, filename.c_str());
+        bool fileChanged = check_and_update_file_origin(contents, filename.c_str());
 
         // Reload if the filename or modified-time has changed
         if (fileChanged)
         {
-            clear_branch(&contents);
+            clear_branch(contents);
 
-            load_script(&contents, filename.c_str());
+            load_script(contents, filename.c_str());
 
             if (caller->owningBranch != NULL && exposeNames) {
-                expose_all_names(contents, *caller->owningBranch);
-                finish_update_cascade(*caller->owningBranch);
+                expose_all_names(contents, caller->owningBranch);
+                finish_update_cascade(caller->owningBranch);
             }
 
             mark_static_errors_invalid(contents);
@@ -51,7 +51,7 @@ namespace include_function {
     CA_FUNCTION(evaluate_include)
     {
         EvalContext* context = CONTEXT;
-        Branch& contents = nested_contents(CALLER);
+        Branch* contents = nested_contents(CALLER);
 
         bool fileChanged =
             load_script(CONTEXT, CALLER, STRING_INPUT(0), true);
@@ -85,7 +85,7 @@ namespace include_function {
         save_and_consume_state(CALLER, &prevScopeState, &context->currentScopeState);
         swap(&context->currentScopeState, &prevScopeState);
 
-        set_branch(OUTPUT, &contents);
+        set_branch(OUTPUT, contents);
     }
     void include_post_compile(Term* term)
     {
@@ -99,7 +99,7 @@ namespace include_function {
         set_branch(OUTPUT, CALLER->nestedContents);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
                 "include(string filename) -> Branch");

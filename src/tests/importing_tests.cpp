@@ -20,13 +20,13 @@ void test_import_c()
 {
     Branch branch;
 
-    Term* func = import_function(branch, my_imported_function,
+    Term* func = import_function(&branch, my_imported_function,
             "my_imported_func(int,int) -> int");
 
     test_equals(function_get_output_type(func, 0)->name, "int");
 
     Term* result = branch.compile("my_imported_func(4,5)");
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_assert(as_int(result) == 9);
 }
@@ -38,7 +38,7 @@ void test_import_type()
 
     type->name = "A";
 
-    Term* term = import_type(branch, type);
+    Term* term = import_type(&branch, type);
     test_assert(term->type->name == "Type");
     test_assert(term->name == "A");
 

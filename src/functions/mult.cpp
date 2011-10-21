@@ -25,7 +25,7 @@ OLD_FEEDBACK_IMPL_DISABLED
         float delta = desired - to_float(target);
 
         // for each input, send a delta divided by the product of all other inputs
-        Branch& outputList = feedback_output(CALLER);
+        Branch* outputList = feedback_output(CALLER);
         for (int i=0; i < outputList.length(); i++) {
             Term* output = outputList[i];
             Term* outputTarget = target->input(i);
@@ -46,7 +46,7 @@ OLD_FEEDBACK_IMPL_DISABLED
         #endif
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
         Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) -> number");

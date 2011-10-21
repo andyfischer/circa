@@ -97,17 +97,17 @@ void write_statement(CppWriter& writer, Term* term)
     }
 }
 
-void write_branch_contents(CppWriter& writer, Branch& branch)
+void write_branch_contents(CppWriter& writer, Branch* branch)
 {
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
         if (!should_print_term_source_line(term))
             continue;
         if (is_comment(term) && term->stringProp("comment") == "")
             continue;
         write_statement(writer, term);
 
-        if (i+1 < branch.length())
+        if (i+1 < branch->length())
             writer.newline();
     }
 }

@@ -14,7 +14,7 @@ namespace swap_function {
         copy(INPUT(1), EXTRA_OUTPUT(0));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

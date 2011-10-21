@@ -15,7 +15,7 @@ namespace container_set_function {
             set_t::add(result, INPUT(index));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "set(any...) -> Set");
     }

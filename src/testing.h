@@ -10,7 +10,7 @@ namespace circa {
 
 void test_assert_function(bool condition, int line, const char* file);
 void test_assert_function(Term* term, int line, const char* file);
-void test_assert_function(Branch& branch, int line, const char* file);
+void test_assert_function(Branch* branch, int line, const char* file);
 void test_assert_function(EvalContext& context, int line, const char* file);
 void test_fail_function(int line, const char* file);
 void test_equals_function(TermList const& a, TermList const& b,
@@ -35,7 +35,7 @@ void test_equals_function(TaggedValue* a, float b,
 // If 'branch' has a static error, then print something to stdout, and declare
 // the current test failed, and return true. If this returns false then there
 // was no error.
-bool test_fail_on_static_error(Branch& branch);
+bool test_fail_on_static_error(Branch* branch);
 
 // If context has recorded a runtime error, then print something to stdout, and
 // declare the current test failed, and return true. If this returns false then
@@ -69,6 +69,6 @@ std::string get_current_test_name();
 void declare_current_test_failed();
 bool current_test_has_failed();
 
-void test_branch_as_assertions_list(Branch& branch, std::string const& contextStr);
+void test_branch_as_assertions_list(Branch* branch, std::string const& contextStr);
 
 } // namespace circa

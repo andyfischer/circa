@@ -10,7 +10,7 @@ void test_that_f_returns_1(std::string testName, std::string input)
     Branch branch;
     branch.compile(input);
 
-    if (print_static_errors_formatted(branch, std::cout)) {
+    if (print_static_errors_formatted(&branch, std::cout)) {
         dump(branch);
         declare_current_test_failed();
         return;
@@ -99,7 +99,7 @@ void recursion_and_multiple_outputs()
                    "l = [] "
                    "f(0, &l)");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 }
 
 void register_tests()

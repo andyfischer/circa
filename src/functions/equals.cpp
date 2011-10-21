@@ -18,7 +18,7 @@ namespace equals_function {
         set_bool(OUTPUT, !equals(INPUT(0), INPUT(1)));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

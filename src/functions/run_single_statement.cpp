@@ -13,15 +13,15 @@ namespace run_single_statement_function {
         if (branchPtr == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");
 
-        Branch& branch = *branchPtr;
+        Branch* branch = branchPtr;
 
         // Find the nth statement in this branch
-        for (int i=0; i < branch.length(); i++) {
-            if (!is_statement(branch[i]) || is_comment(branch[i]))
+        for (int i=0; i < branch->length(); i++) {
+            if (!is_statement(branch->get(i)) || is_comment(branch->get(i)))
                 continue;
 
             if (index == 0) {
-                evaluate_minimum(CONTEXT, branch[i], NULL);
+                evaluate_minimum(CONTEXT, branch->get(i), NULL);
                 break;
             }
 
@@ -39,18 +39,18 @@ namespace run_single_statement_function {
         if (branchPtr == NULL)
             return error_occurred(CONTEXT, CALLER, "NULL branch");
 
-        Branch& branch = *branchPtr;
+        Branch* branch = branchPtr;
 
         int count = 0;
-        for (int i=0; i < branch.length(); i++) {
-            if (!is_statement(branch[i]) || is_comment(branch[i]))
+        for (int i=0; i < branch->length(); i++) {
+            if (!is_statement(branch->get(i)) || is_comment(branch->get(i)))
                 continue;
             count++;
         }
         set_int(OUTPUT, count);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

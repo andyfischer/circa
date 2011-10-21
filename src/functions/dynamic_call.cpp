@@ -60,7 +60,7 @@ namespace dynamic_call_function {
         swap(list_get_index(&finishedFrame, outputIndex), OUTPUT);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

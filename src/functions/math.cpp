@@ -135,19 +135,19 @@ namespace math_function {
         set_float(OUTPUT, std::log(FLOAT_INPUT(0)));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
 
         create_overloaded_function(kernel, "max",
-                TermList(kernel["max_i"], kernel["max_f"]));
+                TermList(kernel->get("max_i"), kernel->get("max_f")));
         create_overloaded_function(kernel, "min",
-                TermList(kernel["min_i"], kernel["min_f"]));
+                TermList(kernel->get("min_i"), kernel->get("min_f")));
         create_overloaded_function(kernel, "remainder",
-                TermList(kernel["remainder_i"], kernel["remainder_f"]));
+                TermList(kernel->get("remainder_i"), kernel->get("remainder_f")));
 
         create_overloaded_function(kernel, "mod",
-                TermList(kernel["mod_i"], kernel["mod_f"]));
+                TermList(kernel->get("mod_i"), kernel->get("mod_f")));
     }
 }
 } // namespace circa

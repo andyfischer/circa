@@ -10,7 +10,7 @@ void call_unknown_function()
     Branch branch;
     branch.compile("blah()");
 
-    test_assert(has_static_errors(branch));
+    test_assert(has_static_errors(&branch));
 }
 
 void call_unknown_namespaced_function()
@@ -18,7 +18,7 @@ void call_unknown_namespaced_function()
     Branch branch;
     branch.compile("blee:blah()");
 
-    test_assert(has_static_errors(branch));
+    test_assert(has_static_errors(&branch));
 }
 
 void register_tests()

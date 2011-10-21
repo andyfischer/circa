@@ -20,15 +20,15 @@ List& initialize_pending_update_item(Term* term)
 {
     assert_valid_branch(term->owningBranch);
 
-    Branch& branch = *term->owningBranch;
+    Branch* branch = term->owningBranch;
     List* pendingUpdates = NULL;
 
     // Cast or resize branch.pendingUpdates
-    if (is_null(&branch.pendingUpdates))
-        pendingUpdates = List::cast(&branch.pendingUpdates, branch.length());
+    if (is_null(&branch->pendingUpdates))
+        pendingUpdates = List::cast(&branch->pendingUpdates, branch->length());
     else {
-        pendingUpdates = List::checkCast(&branch.pendingUpdates);
-        pendingUpdates->resize(branch.length());
+        pendingUpdates = List::checkCast(&branch->pendingUpdates);
+        pendingUpdates->resize(branch->length());
     }
 
     // Initialize the element at 'term'
@@ -56,27 +56,27 @@ void mark_repairable_link(Term* term, std::string const& name, int dependencyInd
     set_int(link[1], dependencyIndex);
 }
 
-void mark_static_errors_invalid(Branch& branch)
+void mark_static_errors_invalid(Branch* branch)
 {
-    set_null(&branch.staticErrors);
+    set_null(&branch->staticErrors);
 }
 
-void finish_update_cascade(Branch& branch)
+void finish_update_cascade(Branch* branch)
 {
-    if (is_null(&branch.pendingUpdates))
+    if (is_null(&branch->pendingUpdates))
         return;
 
-    ca_assert(!branch.currentlyCascadingUpdates);
+    ca_assert(!branch->currentlyCascadingUpdates);
 
-    branch.currentlyCascadingUpdates = true;
+    branch->currentlyCascadingUpdates = true;
 
-    List& pendingUpdates = *List::checkCast(&branch.pendingUpdates);
+    List& pendingUpdates = *List::checkCast(&branch->pendingUpdates);
     for (int index=0; index < pendingUpdates.length(); index++) {
 
-        if (index >= branch.length())
+        if (index >= branch->length())
             continue;
 
-        Term* term = branch[index];
+        Term* term = branch->get(index);
         TaggedValue* item = pendingUpdates[index];
         if (is_null(item))
             continue;
@@ -98,16 +98,16 @@ void finish_update_cascade(Branch& branch)
         ca_assert(is_null(pendingUpdates[index]));
     }
 
-    set_null(&branch.pendingUpdates);
-    branch.currentlyCascadingUpdates = false;
+    set_null(&branch->pendingUpdates);
+    branch->currentlyCascadingUpdates = false;
 }
 
-void recursively_finish_update_cascade(Branch& branch)
+void recursively_finish_update_cascade(Branch* branch)
 {
     finish_update_cascade(branch);
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
         if (term->nestedContents)
             recursively_finish_update_cascade(nested_contents(term));
     }

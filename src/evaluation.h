@@ -56,29 +56,29 @@ struct EvalContext
 // by the interpreter.
 void evaluate_single_term(EvalContext* context, Term* term);
 
-void evaluate_branch_internal(EvalContext* context, Branch& branch);
-void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output);
+void evaluate_branch_internal(EvalContext* context, Branch* branch);
+void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output);
 
 void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
-        Branch& branch);
+        Branch* branch);
 
-void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch);
+void evaluate_branch_no_preserve_locals(EvalContext* context, Branch* branch);
 
 // Top-level call. Evalaute the branch and then preserve stack outputs back to terms.
-void evaluate_branch(EvalContext* context, Branch& branch);
+void evaluate_branch(EvalContext* context, Branch* branch);
 
 // Shorthand to call evaluate_branch with a new EvalContext:
-void evaluate_branch(Branch& branch);
+void evaluate_branch(Branch* branch);
 
 // Evaluate only the terms between 'start' and 'end'.
-void evaluate_range(EvalContext* context, Branch& branch, int start, int end);
+void evaluate_range(EvalContext* context, Branch* branch, int start, int end);
 
 // Evaluate 'term' and every term that it depends on.
 void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result);
 
 // Parse input and immediately evaluate it, returning the result value.
-TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input);
-TaggedValue* evaluate(Branch& branch, Term* function, List* inputs);
+TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
+TaggedValue* evaluate(Branch* branch, Term* function, List* inputs);
 TaggedValue* evaluate(Term* function, List* inputs);
 
 // Get the input value for the given term and index.
@@ -114,15 +114,15 @@ bool evaluation_interrupted(EvalContext* context);
 
 // Start using the given branch- this will push a new frame onto the locals stack, if
 // the branch is already in use.
-void start_using(Branch& branch);
+void start_using(Branch* branch);
 
 // Finish using the given branch- this may pop a frame from the locals stack.
-void finish_using(Branch& branch);
+void finish_using(Branch* branch);
 
 void clear_error(EvalContext* cxt);
 
 // Recursively clear local values for this branch and all nested branches.
-void reset_locals(Branch& branch);
+void reset_locals(Branch* branch);
 
 std::string context_get_error_message(EvalContext* cxt);
 

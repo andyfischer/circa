@@ -16,7 +16,7 @@ void blocked_by_error()
     branch.compile("test_spy(2)");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(context.errorOccurred);
     test_assert(context.errorTerm == error);
     test_equals(internal_debug_function::spy_results(), "[1]");
@@ -29,7 +29,7 @@ void test_errored_function()
     Term* t = branch.compile("t = errored(e)");
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_assert(!context.errorOccurred);
     test_assert(as_bool(get_local(t)));
@@ -48,8 +48,8 @@ void test_dont_crash_on_static_error()
 {
     Branch branch;
     branch.compile("nonexistant()");
-    evaluate_branch(branch);
-    test_assert(has_static_errors(branch));
+    evaluate_branch(&branch);
+    test_assert(has_static_errors(&branch));
 }
 
 void register_tests()

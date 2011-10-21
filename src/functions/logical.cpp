@@ -24,7 +24,7 @@ namespace logical_function {
         set_bool(OUTPUT, !BOOL_INPUT(0));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

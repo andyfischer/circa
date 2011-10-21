@@ -42,7 +42,7 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_dynamic_overload)
     {
-        Branch& contents = nested_contents(CALLER);
+        Branch* contents = nested_contents(CALLER);
         Term* func = CALLER->function;
         FunctionAttrs* funcAttrs = get_function_attrs(func);
 
@@ -80,8 +80,8 @@ namespace overloaded_function {
         }
 
         if (specializedFunc != NULL) {
-            bool alreadyGenerated = (contents.length() > 0)
-                && contents[0]->function == specializedFunc;
+            bool alreadyGenerated = (contents->length() > 0)
+                && contents->get(0)->function == specializedFunc;
             if (!alreadyGenerated) {
                 TermList inputs;
                 CALLER->inputsToList(inputs);
@@ -90,7 +90,7 @@ namespace overloaded_function {
             }
             TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
-            cast(&output, contents[0]->type, OUTPUT);
+            cast(&output, contents->get(0)->type, OUTPUT);
         } else {
             std::stringstream msg;
             msg << "specialized func not found for: " << CALLER->function->name;
@@ -100,10 +100,10 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_overload)
     {
-        Branch& contents = nested_contents(CALLER);
-        if (contents.length() == 0) {
+        Branch* contents = nested_contents(CALLER);
+        if (contents->length() == 0) {
             evaluate_dynamic_overload(CONTEXT, CALLER);
-            contents.clear();
+            contents->clear();
         } else {
             TaggedValue output;
             evaluate_branch_internal(CONTEXT, contents, &output);
@@ -114,8 +114,8 @@ namespace overloaded_function {
 
     void overload_post_input_change(Term* term)
     {
-        Branch& contents = nested_contents(term);
-        contents.clear();
+        Branch* contents = nested_contents(term);
+        contents->clear();
 
         TermList inputs;
         term->inputsToList(inputs);
@@ -123,14 +123,14 @@ namespace overloaded_function {
 
         if (specializedFunc != NULL) {
             apply(contents, specializedFunc, inputs);
-            change_declared_type(term, contents[0]->type);
+            change_declared_type(term, contents->get(0)->type);
         }
     }
 
     Type* overload_specialize_type(Term* term)
     {
-        Branch& contents = nested_contents(term);
-        return contents[0]->type;
+        Branch* contents = nested_contents(term);
+        return contents->get(0)->type;
     }
 
     bool is_overloaded_function(Term* func)
@@ -180,8 +180,8 @@ namespace overloaded_function {
             set_type(outputTypes.append(), function_get_output_type(overload, 0));
         }
 
-        Branch& result = nested_contents(term);
-        result.shorten(1);
+        Branch* result = nested_contents(term);
+        result->shorten(1);
         int placeholderCount = variableArgs ? 1 : argumentCount;
         for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
@@ -213,7 +213,7 @@ namespace overloaded_function {
         update_function_signature(term);
     }
 
-    Term* create_overloaded_function(Branch& branch, std::string const& name,
+    Term* create_overloaded_function(Branch* branch, std::string const& name,
         TermList const& overloads)
     {
         Term* result = create_value(branch, &FUNCTION_T, name);
@@ -244,7 +244,7 @@ namespace overloaded_function {
         change_type(OUTPUT, unbox_type(FUNCTION_TYPE));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         OVERLOADED_FUNCTION_FUNC = import_function(kernel, evaluate_declaration,
                 "overloaded_function(Function...) -> Function");

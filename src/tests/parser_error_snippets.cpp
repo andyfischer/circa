@@ -112,14 +112,14 @@ void test_every_parse_error()
         Branch branch;
 
         try {
-            parser::compile(branch, parser::statement_list, input.text);
+            parser::compile(&branch, parser::statement_list, input.text);
         } catch (std::exception const&) {
             input.exceptionThrown = true;
             problemCount++;
             continue;
         }
 
-        if (!has_static_errors(branch)) {
+        if (!has_static_errors(&branch)) {
             dump(branch);
             input.failedToCauseError = true;
             problemCount++;

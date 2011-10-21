@@ -12,10 +12,10 @@ namespace errored_function {
     {
         set_bool(OUTPUT, is_error(INPUT(0)));
     }
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        ERRORED_FUNC = kernel["errored"];
+        ERRORED_FUNC = kernel->get("errored");
     }
 }
 }

@@ -11,8 +11,8 @@ namespace primitive_type_tests {
 void strings()
 {
     Branch branch;
-    Term* str1 = create_string(branch, "one");
-    Term* str2 = create_string(branch, "two");
+    Term* str1 = create_string(&branch, "one");
+    Term* str2 = create_string(&branch, "two");
 
     test_assert(as_string(str1) == "one");
     test_assert(as_string(str2) == "two");
@@ -34,7 +34,7 @@ void builtin_objects()
 void test_void()
 {
     Branch branch;
-    Term* v = create_void(branch);
+    Term* v = create_void(&branch);
     test_equals(to_string(v), "<void>");
 }
 

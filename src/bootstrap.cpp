@@ -41,15 +41,15 @@
 namespace circa {
 
 // setup_functions is defined in generated/setup_builtin_functions.cpp
-void setup_builtin_functions(Branch&);
+void setup_builtin_functions(Branch*);
 
 bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
-Branch& kernel()
+Branch* kernel()
 {
-    return *KERNEL;
+    return KERNEL;
 }
 
 CA_FUNCTION(empty_evaluate_function)
@@ -123,11 +123,11 @@ void bootstrap_kernel()
     FUNCTION_ATTRS_T.initialize = function_attrs_t::initialize;
     FUNCTION_ATTRS_T.copy = function_attrs_t::copy;
     FUNCTION_ATTRS_T.release = function_attrs_t::release;
-    FUNCTION_ATTRS_TYPE = create_type_value(*KERNEL, &FUNCTION_ATTRS_T, "FunctionAttrs");
+    FUNCTION_ATTRS_TYPE = create_type_value(KERNEL, &FUNCTION_ATTRS_T, "FunctionAttrs");
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
-    FUNCTION_TYPE = create_type_value(*KERNEL, &FUNCTION_T, "Function");
+    FUNCTION_TYPE = create_type_value(KERNEL, &FUNCTION_T, "Function");
 
     // Initialize Value func
     VALUE_FUNC->type = &FUNCTION_T;
@@ -135,7 +135,7 @@ void bootstrap_kernel()
     change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 
     // Update locals so that debugging checks don't complain.
-    refresh_locals_indices(*KERNEL);
+    refresh_locals_indices(KERNEL);
 
     update_bootstrapped_term(VALUE_FUNC);
     update_bootstrapped_term(TYPE_TYPE);
@@ -144,7 +144,7 @@ void bootstrap_kernel()
     update_bootstrapped_term(FUNCTION_TYPE);
 }
 
-void initialize_primitive_types(Branch& kernel)
+void initialize_primitive_types(Branch* kernel)
 {
     BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
     FLOAT_TYPE = create_type_value(kernel, &FLOAT_T, "number");
@@ -163,7 +163,7 @@ void initialize_primitive_types(Branch& kernel)
     // ANY_TYPE was created in bootstrap_kernel
 }
 
-void post_initialize_primitive_types(Branch& kernel)
+void post_initialize_primitive_types(Branch* kernel)
 {
     // Properly setup value() func
     initialize_function(VALUE_FUNC);
@@ -174,7 +174,7 @@ void post_initialize_primitive_types(Branch& kernel)
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);
 }
 
-void pre_setup_types(Branch& kernel)
+void pre_setup_types(Branch* kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
@@ -188,7 +188,7 @@ void pre_setup_types(Branch& kernel)
     namespace_function::early_setup(kernel);
 }
 
-void initialize_compound_types(Branch& kernel)
+void initialize_compound_types(Branch* kernel)
 {
     Term* set_type = parse_type(kernel, "type Set;");
     set_t::setup_type(unbox_type(set_type));
@@ -207,47 +207,47 @@ void initialize_compound_types(Branch& kernel)
     RECT_I_TYPE_TERM = parse_type(kernel, "type Rect_i { int x1, int y1, int x2, int y2 }");
 }
 
-void pre_setup_builtin_functions(Branch& kernel)
+void pre_setup_builtin_functions(Branch* kernel)
 {
     return_function::setup(kernel);
 }
 
-void post_setup_functions(Branch& kernel)
+void post_setup_functions(Branch* kernel)
 {
     // Create vectorized add() functions
-    Term* add_v = create_duplicate(kernel, kernel["vectorize_vv"], "add_v");
+    Term* add_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "add_v");
     set_ref(&get_function_attrs(add_v)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_v);
 
-    Term* add_s = create_duplicate(kernel, kernel["vectorize_vs"], "add_s");
+    Term* add_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "add_s");
     set_ref(&get_function_attrs(add_s)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
     // Create vectorized sub() functions
-    Term* sub_v = create_duplicate(kernel, kernel["vectorize_vv"], "sub_v");
+    Term* sub_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "sub_v");
     set_ref(&get_function_attrs(sub_v)->parameter, SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_v);
 
-    Term* sub_s = create_duplicate(kernel, kernel["vectorize_vs"], "sub_s");
+    Term* sub_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "sub_s");
     set_ref(&get_function_attrs(sub_s)->parameter, SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
-    Term* mult_v = create_duplicate(kernel, kernel["vectorize_vv"], "mult_v");
-    set_ref(&get_function_attrs(mult_v)->parameter, kernel["mult"]);
+    Term* mult_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "mult_v");
+    set_ref(&get_function_attrs(mult_v)->parameter, kernel->get("mult"));
     overloaded_function::append_overload(MULT_FUNC, mult_v);
 
-    Term* mult_s = create_duplicate(kernel, kernel["vectorize_vs"], "mult_s");
-    set_ref(&get_function_attrs(mult_s)->parameter, kernel["mult"]);
+    Term* mult_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "mult_s");
+    set_ref(&get_function_attrs(mult_s)->parameter, kernel->get("mult"));
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
-    Term* div_s = create_duplicate(kernel, kernel["vectorize_vs"], "div_s");
+    Term* div_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "div_s");
     set_ref(&get_function_attrs(div_s)->parameter, DIV_FUNC);
     overloaded_function::append_overload(DIV_FUNC, div_s);
 }
 
-void parse_hosted_types(Branch& kernel)
+void parse_hosted_types(Branch* kernel)
 {
     parse_type(kernel, "type Point { number x, number y }");
     parse_type(kernel, "type Point_i { int x, int y }");
@@ -270,7 +270,7 @@ export_func void circa_initialize()
     create_primitive_types();
     bootstrap_kernel();
 
-    Branch& kernel = *KERNEL;
+    Branch* kernel = KERNEL;
 
     initialize_primitive_types(kernel);
     post_initialize_primitive_types(kernel);

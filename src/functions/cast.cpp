@@ -27,7 +27,7 @@ namespace cast_function {
             return error_occurred(CONTEXT, CALLER, "cast failed");
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CAST_FUNC = import_function(kernel, cast_evaluate, "cast :throws (any) -> any");
     }

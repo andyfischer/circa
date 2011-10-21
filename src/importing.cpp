@@ -19,7 +19,7 @@ CA_FUNCTION(empty_evaluate_no_touch_output)
 {
 }
 
-Term* import_function(Branch& branch, EvaluateFunc evaluate, std::string const& header)
+Term* import_function(Branch* branch, EvaluateFunc evaluate, std::string const& header)
 {
     Term* result = parser::compile(branch, parser::function_decl, header);
 
@@ -36,7 +36,7 @@ void install_function(Term* function, EvaluateFunc evaluate)
     get_function_attrs(function)->evaluate = evaluate;
 }
 
-Term* import_type(Branch& branch, Type* type)
+Term* import_type(Branch* branch, Type* type)
 {
     if (type->name == "")
         throw std::runtime_error("In import_type, type must have a name");

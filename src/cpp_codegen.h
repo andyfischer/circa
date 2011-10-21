@@ -38,7 +38,7 @@ struct CppWriter
 };
 
 void write_term(CppWriter& writer, Term* term);
-void write_branch_contents(CppWriter& writer, Branch& branch);
+void write_branch_contents(CppWriter& writer, Branch* branch);
 
 } // namespace cpp_codegen
 } // namespace circa

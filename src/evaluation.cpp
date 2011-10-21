@@ -70,12 +70,12 @@ void evaluate_single_term(EvalContext* context, Term* term)
     #endif
 }
 
-void evaluate_branch_internal(EvalContext* context, Branch& branch)
+void evaluate_branch_internal(EvalContext* context, Branch* branch)
 {
     start_using(branch);
 
-    for (int i=0; i < branch.length(); i++) {
-        evaluate_single_term(context, branch[i]);
+    for (int i=0; i < branch->length(); i++) {
+        evaluate_single_term(context, branch->get(i));
 
           if (evaluation_interrupted(context))
               break;
@@ -84,21 +84,21 @@ void evaluate_branch_internal(EvalContext* context, Branch& branch)
     finish_using(branch);
 }
 
-void evaluate_branch_internal(EvalContext* context, Branch& branch, TaggedValue* output)
+void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output)
 {
     start_using(branch);
 
-    for (int i=0; i < branch.length(); i++)
-        evaluate_single_term(context, branch[i]);
+    for (int i=0; i < branch->length(); i++)
+        evaluate_single_term(context, branch->get(i));
 
     if (output != NULL)
-        copy(get_local(branch[branch.length()-1]), output);
+        copy(get_local(branch->get(branch->length()-1)), output);
 
     finish_using(branch);
 }
 
 void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
-        Branch& branch)
+        Branch* branch)
 {
     // Store currentScopeState and fetch the container for this branch
     TaggedValue prevScopeState;
@@ -112,7 +112,7 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
     swap(&context->currentScopeState, &prevScopeState);
 }
 
-void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch)
+void evaluate_branch_no_preserve_locals(EvalContext* context, Branch* branch)
 {
     copy(&context->state, &context->currentScopeState);
 
@@ -122,21 +122,21 @@ void evaluate_branch_no_preserve_locals(EvalContext* context, Branch& branch)
     set_null(&context->currentScopeState);
 }
 
-void evaluate_branch(EvalContext* context, Branch& branch)
+void evaluate_branch(EvalContext* context, Branch* branch)
 {
     evaluate_branch_no_preserve_locals(context, branch);
 
     // Copy stack back to the original terms. Many tests depend on this functionality.
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
         if (is_value(term)) continue;
         TaggedValue* val = get_local(term);
         if (val != NULL)
-            copy(val, branch[i]);
+            copy(val, branch->get(i));
     }
 }
 
-void evaluate_branch(Branch& branch)
+void evaluate_branch(Branch* branch)
 {
     EvalContext context;
     evaluate_branch(&context, branch);
@@ -296,16 +296,16 @@ bool evaluation_interrupted(EvalContext* context)
         || context->forLoopContext.breakCalled || context->forLoopContext.continueCalled;
 }
 
-void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
+void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
 {
     start_using(branch);
 
     for (int i=start; i <= end; i++)
-        evaluate_single_term(context, branch[i]);
+        evaluate_single_term(context, branch->get(i));
 
     // copy locals back to terms
     for (int i=start; i <= end; i++) {
-        Term* term = branch[i];
+        Term* term = branch->get(i);
         if (is_value(term))
             continue;
         TaggedValue* value = get_local(term);
@@ -317,28 +317,28 @@ void evaluate_range(EvalContext* context, Branch& branch, int start, int end)
     finish_using(branch);
 }
 
-void start_using(Branch& branch)
+void start_using(Branch* branch)
 {
-    if (branch.inuse)
+    if (branch->inuse)
     {
-        swap(&branch.locals, branch.localsStack.append());
-        set_list(&branch.locals, get_locals_count(branch));
+        swap(&branch->locals, branch->localsStack.append());
+        set_list(&branch->locals, get_locals_count(branch));
     } else {
-        branch.locals.resize(get_locals_count(branch));
+        branch->locals.resize(get_locals_count(branch));
     }
 
-    branch.inuse = true;
+    branch->inuse = true;
 }
 
-void finish_using(Branch& branch)
+void finish_using(Branch* branch)
 {
-    ca_assert(branch.inuse);
+    ca_assert(branch->inuse);
 
-    if (branch.localsStack.length() == 0) {
-        branch.inuse = false;
+    if (branch->localsStack.length() == 0) {
+        branch->inuse = false;
     } else {
-        swap(&branch.locals, branch.localsStack.getLast());
-        branch.localsStack.pop();
+        swap(&branch->locals, branch->localsStack.getLast());
+        branch->localsStack.pop();
     }
 }
 
@@ -347,17 +347,17 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
     // Get a list of every term that this term depends on. Also, limit this
     // search to terms inside the current branch.
     
-    Branch& branch = *term->owningBranch;
+    Branch* branch = term->owningBranch;
 
     start_using(branch);
 
-    bool *marked = new bool[branch.length()];
-    memset(marked, false, sizeof(bool)*branch.length());
+    bool *marked = new bool[branch->length()];
+    memset(marked, false, sizeof(bool)*branch->length());
 
     marked[term->index] = true;
 
     for (int i=term->index; i >= 0; i--) {
-        Term* checkTerm = branch[i];
+        Term* checkTerm = branch->get(i);
         if (checkTerm == NULL)
             continue;
 
@@ -366,7 +366,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
                 Term* input = checkTerm->input(inputIndex);
                 if (input == NULL)
                     continue;
-                if (input->owningBranch != &branch)
+                if (input->owningBranch != branch)
                     continue;
                 // don't follow :meta inputs
                 if (function_get_input_meta(get_function_attrs(checkTerm->function),
@@ -379,7 +379,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
 
     for (int i=0; i <= term->index; i++) {
         if (marked[i])
-            evaluate_single_term(context, branch[i]);
+            evaluate_single_term(context, branch->get(i));
     }
 
     // Possibly save output
@@ -391,15 +391,15 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
     finish_using(branch);
 }
 
-TaggedValue* evaluate(EvalContext* context, Branch& branch, std::string const& input)
+TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
 {
-    int prevHead = branch.length();
+    int prevHead = branch->length();
     Term* result = parser::compile(branch, parser::statement_list, input);
-    evaluate_range(context, branch, prevHead, branch.length() - 1);
+    evaluate_range(context, branch, prevHead, branch->length() - 1);
     return get_local(result);
 }
 
-TaggedValue* evaluate(Branch& branch, Term* function, List* inputs)
+TaggedValue* evaluate(Branch* branch, Term* function, List* inputs)
 {
     EvalContext context;
 
@@ -409,16 +409,16 @@ TaggedValue* evaluate(Branch& branch, Term* function, List* inputs)
     for (int i=0; i < inputs->length(); i++)
         inputTerms.setAt(i, create_value(branch, inputs->get(i)));
 
-    int prevHead = branch.length();
+    int prevHead = branch->length();
     Term* result = apply(branch, function, inputTerms);
-    evaluate_range(&context, branch, prevHead, branch.length() - 1);
+    evaluate_range(&context, branch, prevHead, branch->length() - 1);
     return get_local(result);
 }
 
 TaggedValue* evaluate(Term* function, List* inputs)
 {
     Branch scratch;
-    return evaluate(scratch, function, inputs);
+    return evaluate(&scratch, function, inputs);
 }
 
 void clear_error(EvalContext* cxt)
@@ -427,14 +427,14 @@ void clear_error(EvalContext* cxt)
     cxt->errorTerm = NULL;
 }
 
-void reset_locals(Branch& branch)
+void reset_locals(Branch* branch)
 {
-    ca_assert(!branch.inuse);
-    reset(&branch.locals);
-    reset(&branch.localsStack);
+    ca_assert(!branch->inuse);
+    reset(&branch->locals);
+    reset(&branch->localsStack);
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
         if (term->nestedContents)
             reset_locals(nested_contents(term));
     }

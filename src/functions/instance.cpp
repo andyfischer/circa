@@ -18,10 +18,10 @@ namespace instance_function {
         return as_type(caller->input(0));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        INSTANCE_FUNC = kernel["instance"];
+        INSTANCE_FUNC = kernel->get("instance");
         get_function_attrs(INSTANCE_FUNC)->specializeType = specializeType;
     }
 }

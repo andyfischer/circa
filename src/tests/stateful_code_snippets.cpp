@@ -12,18 +12,18 @@ void test_snippet(std::string const& source)
     Branch branch;
     branch.compile(source);
 
-    if (test_fail_on_static_error(branch))
+    if (test_fail_on_static_error(&branch))
         return;
 
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     if (test_fail_on_runtime_error(context))
         return;
 
     // Try stripping orphaned state, this should not have an effect.
     TaggedValue trash;
-    strip_orphaned_state(branch, &context.state, &trash);
+    strip_orphaned_state(&branch, &context.state, &trash);
 
     if (!is_null(&trash)) {
         std::cout << "Falsely orphaned state in " << get_current_test_name() << std::endl;
@@ -40,11 +40,11 @@ void test_trimmed_state(std::string const& source, std::string const& dest,
     Branch sourceBranch;
     sourceBranch.compile(source);
 
-    if (test_fail_on_static_error(sourceBranch))
+    if (test_fail_on_static_error(&sourceBranch))
         return;
 
     EvalContext context;
-    evaluate_branch(&context, sourceBranch);
+    evaluate_branch(&context, &sourceBranch);
 
     if (test_fail_on_runtime_error(context))
         return;
@@ -52,11 +52,11 @@ void test_trimmed_state(std::string const& source, std::string const& dest,
     Branch destBranch;
     destBranch.compile(dest);
 
-    if (test_fail_on_static_error(destBranch))
+    if (test_fail_on_static_error(&destBranch))
         return;
 
     TaggedValue trash;
-    strip_orphaned_state(destBranch, &context.state, &trash);
+    strip_orphaned_state(&destBranch, &context.state, &trash);
 
     if (expectedTrash != trash.toString()) {
         declare_current_test_failed();

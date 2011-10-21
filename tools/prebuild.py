@@ -40,7 +40,7 @@ def setup_builtin_functions():
 
     namespaces = map(lambda s: s+'_function', get_cpp_file_names(dir))
     function_decls = '\n'.join(
-            sorted(map(lambda n: 'namespace '+n+' { void setup(Branch& kernel); }', namespaces)))
+            sorted(map(lambda n: 'namespace '+n+' { void setup(Branch* kernel); }', namespaces)))
     function_calls = '\n    '.join(
             sorted(map(lambda n: n+'::setup(kernel);', namespaces)))
 
@@ -58,7 +58,7 @@ namespace circa {
 
 %s
 
-void setup_builtin_functions(Branch& kernel)
+void setup_builtin_functions(Branch* kernel)
 {
     %s
 }

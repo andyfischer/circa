@@ -9,14 +9,14 @@
 
 namespace circa {
 
-static void load(Branch& branch, std::string const& filename)
+static void load(Branch* branch, std::string const& filename)
 {
     if (filename == "") {
-        clear_branch(&branch);
+        clear_branch(branch);
         return;
     }
 
-    load_script(&branch, filename.c_str());
+    load_script(branch, filename.c_str());
     if (has_static_errors(branch))
         print_static_errors_formatted(branch, std::cout);
 }
@@ -25,7 +25,7 @@ int run_debugger_repl(std::string const& filename)
 {
     Branch branch;
 
-    load(branch, filename);
+    load(&branch, filename);
 
     while (true) {
         std::cout << "> ";
@@ -40,17 +40,17 @@ int run_debugger_repl(std::string const& filename)
             continue;
 
         if (input == "p") {
-            print_branch(std::cout, branch);
+            print_branch(std::cout, &branch);
             continue;
         }
 
         if (input == "e") {
-            evaluate_branch(branch);
+            evaluate_branch(&branch);
             continue;
         }
 
         if (input == "c") {
-            print_static_errors_formatted(branch, std::cout);
+            print_static_errors_formatted(&branch, std::cout);
             continue;
         }
 

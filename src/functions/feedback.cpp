@@ -10,7 +10,7 @@ namespace feedback_function {
         handle_feedback_event(CONTEXT, INPUT_TERM(0), INPUT(1));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         FEEDBACK_FUNC = import_function(kernel, evaluate, "feedback(any :meta,any)");
     }

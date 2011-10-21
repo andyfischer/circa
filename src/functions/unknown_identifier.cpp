@@ -15,7 +15,7 @@ namespace unknown_identifier_function {
         append_phrase(source, term->name, term, phrase_type::UNKNOWN_IDENTIFIER);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         UNKNOWN_IDENTIFIER_FUNC = import_function(kernel, evaluate, "unknown_identifier() -> any");
         get_function_attrs(UNKNOWN_IDENTIFIER_FUNC)->formatSource = formatSource;

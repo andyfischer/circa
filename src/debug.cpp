@@ -19,12 +19,16 @@ bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS = false;
 
 void dump(Branch& branch)
 {
+    print_branch(std::cout, &branch);
+}
+void dump(Branch* branch)
+{
     print_branch(std::cout, branch);
 }
 
 void dump_with_props(Branch& branch)
 {
-    print_branch_with_properties(std::cout, branch);
+    print_branch_with_properties(std::cout, &branch);
 }
 
 void dump(TaggedValue& value)

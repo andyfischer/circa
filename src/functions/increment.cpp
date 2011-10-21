@@ -18,7 +18,7 @@ namespace increment_function {
         set_int(OUTPUT, INT_INPUT(0) - 1);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

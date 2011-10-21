@@ -96,12 +96,12 @@ FunctionAttrs& as_function_attrs(Term* term)
     return *((FunctionAttrs*) get_pointer(term));
 }
 
-Branch& function_contents(Term* func)
+Branch* function_contents(Term* func)
 {
     return nested_contents(func);
 }
 
-Branch& function_contents(FunctionAttrs* func)
+Branch* function_contents(FunctionAttrs* func)
 {
     return nested_contents(func->declaringTerm);
 }
@@ -110,11 +110,11 @@ FunctionAttrs* get_function_attrs(Term* func)
 {
     if (func == NULL)
         return NULL;
-    if (nested_contents(func).length() == 0)
+    if (nested_contents(func)->length() == 0)
         return NULL;
-    if (nested_contents(func)[0]->type != &FUNCTION_ATTRS_T)
+    if (nested_contents(func)->get(0)->type != &FUNCTION_ATTRS_T)
         return NULL;
-    return &as_function_attrs(nested_contents(func)[0]);
+    return &as_function_attrs(nested_contents(func)->get(0));
 }
 
 std::string get_placeholder_name_for_index(int index)
@@ -234,7 +234,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
     return true;
 }
 
-Term* create_overloaded_function(Branch& branch, std::string const& name,
+Term* create_overloaded_function(Branch* branch, std::string const& name,
         TermList const& overloads)
 {
     return overloaded_function::create_overloaded_function(branch, name, overloads);
@@ -311,12 +311,12 @@ Type* function_get_output_type(FunctionAttrs* func, int index)
 
 int function_num_inputs(FunctionAttrs* func)
 {
-    Branch& contents = nested_contents(func->declaringTerm);
+    Branch* contents = nested_contents(func->declaringTerm);
     int i = 1;
 
-    while (i < contents.length()
-            && contents[i] != NULL
-            && contents[i]->function == INPUT_PLACEHOLDER_FUNC)
+    while (i < contents->length()
+            && contents->get(i) != NULL
+            && contents->get(i)->function == INPUT_PLACEHOLDER_FUNC)
         i++;
     return i - 1;
 }
@@ -345,13 +345,13 @@ bool function_get_input_optional(FunctionAttrs* func, int index)
 
 Term* function_get_input_placeholder(FunctionAttrs* func, int index)
 {
-    Branch& contents = function_get_contents(func);
+    Branch* contents = function_get_contents(func);
     index += 1;
-    if (index >= contents.length())
+    if (index >= contents->length())
         return NULL;
-    return contents[index];
+    return contents->get(index);
 }
-Branch& function_get_contents(FunctionAttrs* func)
+Branch* function_get_contents(FunctionAttrs* func)
 {
     return nested_contents(func->declaringTerm);
 }
@@ -370,10 +370,10 @@ std::string function_get_documentation_string(FunctionAttrs* func)
     // it will be the first thing defined in the function, and it'll be
     // anonymous and be a statement.
     int expected_index = function_num_inputs(func) + 1;
-    Branch& contents = function_get_contents(func);
+    Branch* contents = function_get_contents(func);
 
-    if (expected_index >= contents.length()) return "";
-    Term* possibleDocString = contents[expected_index];
+    if (expected_index >= contents->length()) return "";
+    Term* possibleDocString = contents->get(expected_index);
     if (possibleDocString->name != "") return "";
     if (!is_string(possibleDocString)) return "";
     if (!is_statement(possibleDocString)) return "";

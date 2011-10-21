@@ -44,25 +44,25 @@ Term* get_for_loop_modify_list(Term* forTerm)
     return term;
 }
 
-Branch& get_for_loop_inner_rebinds(Term* forTerm)
+Branch* get_for_loop_inner_rebinds(Term* forTerm)
 {
     return nested_contents(forTerm->contents(1));
 }
 
-Branch& get_for_loop_outer_rebinds(Term* forTerm)
+Branch* get_for_loop_outer_rebinds(Term* forTerm)
 {
-    Branch& contents = nested_contents(forTerm);
-    return contents.getFromEnd(0)->contents();
+    Branch* contents = nested_contents(forTerm);
+    return contents->getFromEnd(0)->contents();
 }
 
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    Branch& forContents = nested_contents(forTerm);
-    Branch& attributes = create_branch(forContents, "#attributes");
+    Branch* forContents = nested_contents(forTerm);
+    Branch* attributes = create_branch(forContents, "#attributes");
     create_bool(attributes, false, "#modify_list");
 
-    Branch& innerRebinds = create_branch(forContents, "#inner_rebinds");
-    innerRebinds.owningTerm->setBoolProp("exposesNames", true);
+    Branch* innerRebinds = create_branch(forContents, "#inner_rebinds");
+    innerRebinds->owningTerm->setBoolProp("exposesNames", true);
 }
 
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
@@ -76,15 +76,15 @@ Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 
 void setup_for_loop_post_code(Term* forTerm)
 {
-    Branch& forContents = nested_contents(forTerm);
+    Branch* forContents = nested_contents(forTerm);
     std::string listName = forTerm->input(0)->name;
     std::string iteratorName = get_for_loop_iterator(forTerm)->name;
 
     finish_minor_branch(forContents);
 
     // Create a branch that has all the names which are rebound in this loop
-    Branch& innerRebinds = get_for_loop_inner_rebinds(forTerm);
-    Branch& outerRebinds = create_branch(forContents, "#outer_rebinds");
+    Branch* innerRebinds = get_for_loop_inner_rebinds(forTerm);
+    Branch* outerRebinds = create_branch(forContents, "#outer_rebinds");
 
     std::vector<std::string> reboundNames;
     list_names_that_this_branch_rebinds(forContents, reboundNames);
@@ -102,7 +102,7 @@ void setup_for_loop_post_code(Term* forTerm)
         if (original == NULL)
             continue;
 
-        Term* loopResult = forContents[name];
+        Term* loopResult = forContents->get(name);
 
         // First input to both of these should be 'original', but we need to wait until
         // after remap_pointers before setting this.
@@ -141,18 +141,18 @@ Term* find_enclosing_for_loop(Term* term)
 
 void for_loop_update_output_index(Term* forTerm)
 {
-    Branch& contents = nested_contents(forTerm);
+    Branch* contents = nested_contents(forTerm);
 
     // If this is a list-rewrite, then the output is the last term that has the iterator's
     // name binding. Otherwise the output is the last expression.
     if (as_bool(get_for_loop_modify_list(forTerm))) {
-        Term* output = contents[get_for_loop_iterator(forTerm)->name];
+        Term* output = contents->get(get_for_loop_iterator(forTerm)->name);
         ca_assert(output != NULL);
-        contents.outputIndex = output->index;
+        contents->outputIndex = output->index;
     } else {
         // Find the first non-comment expression before #outer_rebinds
         Term* output = find_last_non_comment_expression(contents);
-        contents.outputIndex = output == NULL ? -1 : output->index;
+        contents->outputIndex = output == NULL ? -1 : output->index;
     }
 }
 
@@ -160,16 +160,16 @@ CA_FUNCTION(evaluate_for_loop)
 {
     Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch& forContents = nested_contents(caller);
-    Branch& innerRebinds = get_for_loop_inner_rebinds(caller);
-    Branch& outerRebinds = get_for_loop_outer_rebinds(caller);
+    Branch* forContents = nested_contents(caller);
+    Branch* innerRebinds = get_for_loop_inner_rebinds(caller);
+    Branch* outerRebinds = get_for_loop_outer_rebinds(caller);
     Term* iterator = get_for_loop_iterator(caller);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
     TaggedValue outputTv;
-    bool saveOutput = forContents.outputIndex != -1;
+    bool saveOutput = forContents->outputIndex != -1;
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
 
@@ -206,8 +206,8 @@ CA_FUNCTION(evaluate_for_loop)
         copy(inputList->getIndex(iteration), get_local(iterator));
 
         // copy inner rebinds
-        for (int i=0; i < innerRebinds.length(); i++) {
-            Term* rebindTerm = innerRebinds[i];
+        for (int i=0; i < innerRebinds->length(); i++) {
+            Term* rebindTerm = innerRebinds->get(i);
             TaggedValue* dest = get_local(rebindTerm);
 
             if (firstIter)
@@ -218,16 +218,16 @@ CA_FUNCTION(evaluate_for_loop)
 
         context->forLoopContext.discard = false;
 
-        for (int i=loop_contents_location; i < forContents.length() - 1; i++) {
+        for (int i=loop_contents_location; i < forContents->length() - 1; i++) {
             if (evaluation_interrupted(context))
                 break;
 
-            evaluate_single_term(context, forContents[i]);
+            evaluate_single_term(context, forContents->get(i));
         }
 
         // Save output
         if (saveOutput && !context->forLoopContext.discard) {
-            TaggedValue* localResult = get_local(forContents[forContents.outputIndex]);
+            TaggedValue* localResult = get_local(forContents->get(forContents->outputIndex));
             copy(localResult, output->get(nextOutputIndex++));
         }
 
@@ -242,11 +242,11 @@ CA_FUNCTION(evaluate_for_loop)
     swap(output, OUTPUT);
 
     // Copy outer rebinds
-    ca_assert(caller->numOutputs() == outerRebinds.length() + 1);
+    ca_assert(caller->numOutputs() == outerRebinds->length() + 1);
     
-    for (int i=0; i < outerRebinds.length(); i++) {
+    for (int i=0; i < outerRebinds->length(); i++) {
 
-        Term* rebindTerm = outerRebinds[i];
+        Term* rebindTerm = outerRebinds->get(i);
 
         TaggedValue* result = NULL;
 

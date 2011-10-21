@@ -9,10 +9,10 @@ namespace if_block_function {
     {
         format_name_binding(source, term);
 
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
-        for (int branch_index=0; branch_index < contents.length(); branch_index++) {
-            Term* branch_term = contents[branch_index];
+        for (int branch_index=0; branch_index < contents->length(); branch_index++) {
+            Term* branch_term = contents->get(branch_index);
 
             if (is_hidden(branch_term))
                 continue;
@@ -24,7 +24,7 @@ namespace if_block_function {
             if (branch_index == 0) {
                 append_phrase(source, "if ", branch_term, phrase_type::KEYWORD);
                 format_source_for_input(source, branch_term, 0);
-            } else if (branch_index < (contents.length()-2)) {
+            } else if (branch_index < (contents->length()-2)) {
                 append_phrase(source, "elif ", branch_term, phrase_type::KEYWORD);
                 format_source_for_input(source, branch_term, 0);
             }
@@ -37,26 +37,26 @@ namespace if_block_function {
 
     int getOutputCount(Term* term)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // check if term is still being initialized:
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return 1;
 
-        Branch& outerRebinds = contents.getFromEnd(0)->contents();
-        return outerRebinds.length() + 1;
+        Branch* outerRebinds = contents->getFromEnd(0)->contents();
+        return outerRebinds->length() + 1;
     }
 
     const char* getOutputName(Term* term, int outputIndex)
     {
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // check if term is still being initialized:
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return "";
 
-        Branch& outerRebinds = contents.getFromEnd(0)->contents();
-        return outerRebinds[outputIndex - 1]->name.c_str();
+        Branch* outerRebinds = contents->getFromEnd(0)->contents();
+        return outerRebinds->get(outputIndex - 1)->name.c_str();
     }
 
     Type* getOutputType(Term* term, int outputIndex)
@@ -64,14 +64,14 @@ namespace if_block_function {
         if (outputIndex == 0)
             return &VOID_T;
 
-        Branch& contents = nested_contents(term);
+        Branch* contents = nested_contents(term);
 
         // check if term is still being initialized:
-        if (contents.length() == 0)
+        if (contents->length() == 0)
             return &ANY_T;
 
-        Branch& outerRebinds = contents.getFromEnd(0)->contents();
-        return outerRebinds[outputIndex - 1]->type;
+        Branch* outerRebinds = contents->getFromEnd(0)->contents();
+        return outerRebinds->get(outputIndex - 1)->type;
     }
 
     Type* joinFunc_specializeType(Term* term)
@@ -83,7 +83,7 @@ namespace if_block_function {
         return find_common_type(&types);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         get_function_attrs(IF_BLOCK_FUNC)->formatSource = formatSource;

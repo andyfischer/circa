@@ -35,7 +35,7 @@ struct StyledSource
     std::string toString();
 };
 
-void format_branch_source(StyledSource* source, Branch& branch, Term* format=NULL);
+void format_branch_source(StyledSource* source, Branch* branch, Term* format=NULL);
 std::string unformat_rich_source(StyledSource* source);
 
 void format_term_source(StyledSource* source, Term* term);
@@ -52,7 +52,7 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type);
 // Convenient overload:
 void append_phrase(StyledSource* source, std::string const& str, Term* term, int type);
 
-std::string get_branch_source_text(Branch& branch);
+std::string get_branch_source_text(Branch* branch);
 std::string get_term_source_text(Term* term);
 std::string get_input_source_text(Term* term, int index);
 

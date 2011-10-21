@@ -13,7 +13,7 @@ namespace abs_function {
         set_float(OUTPUT, std::abs(FLOAT_INPUT(0)));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

@@ -22,7 +22,7 @@ namespace concat_function {
         set_string(OUTPUT, out.str());
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

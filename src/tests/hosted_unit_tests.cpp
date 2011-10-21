@@ -15,9 +15,9 @@ void run_all()
         if (!is_function(term))
             continue;
 
-        Term* unit_tests = function_contents(term)["unit_tests"];
+        Term* unit_tests = function_contents(term)->get("unit_tests");
         if (unit_tests && is_function(unit_tests)) {
-            std::string context = "while running " + get_relative_name(NULL, unit_tests);
+            std::string context = "while running " + get_relative_name_at(NULL, unit_tests);
             test_branch_as_assertions_list(function_contents(unit_tests), context);
         }
     }

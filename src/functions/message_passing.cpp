@@ -27,7 +27,7 @@ namespace message_passing_function {
         input->resize(0);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate_send, "def send(string inbox_name, any)");
         import_function(kernel, evaluate_receive, "def receive(string inbox_name) -> List");

@@ -16,13 +16,13 @@ void compound_type_usage()
     Term* MyType = branch.compile("type MyType { int myint, string astr }");
     test_assert(MyType != NULL);
     test_assert(is_type(MyType));
-    Branch& contents = nested_contents(MyType);
-    test_assert(contents.length() == 2);
-    test_equals(contents[0]->name, "myint");
-    test_equals(contents[0]->type->name, "int");
+    Branch* contents = nested_contents(MyType);
+    test_assert(contents->length() == 2);
+    test_equals(contents->get(0)->name, "myint");
+    test_equals(contents->get(0)->type->name, "int");
     test_assert(list_find_field_index_by_name(as_type(MyType),"myint") == 0);
-    test_equals(contents[1]->name, "astr");
-    test_equals(contents[1]->type->name, "string");
+    test_equals(contents->get(1)->name, "astr");
+    test_equals(contents->get(1)->type->name, "string");
     test_assert(list_find_field_index_by_name(as_type(MyType),"astr") == 1);
 
     test_assert(list_find_field_index_by_name(as_type(MyType),"the_bodies") == -1);
@@ -39,7 +39,7 @@ void compound_type_usage()
     // field access of recently assigned value
     Term* astr2 = branch.compile("inst.astr");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
 
     test_equals(inst->type->name, "MyType");
     test_assert(inst->value_data.ptr != NULL);

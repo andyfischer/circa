@@ -14,7 +14,7 @@ namespace unrecognized_expr_function {
         append_phrase(source, term->stringProp("originalText"), term, phrase_type::UNDEFINED);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         UNRECOGNIZED_EXPRESSION_FUNC = import_function(kernel, evaluate, "unrecognized_expr(any...)");
         get_function_attrs(UNRECOGNIZED_EXPRESSION_FUNC)->formatSource = formatSource;

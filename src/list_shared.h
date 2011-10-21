@@ -55,7 +55,7 @@ enum ListType
 
 ListType list_get_parameter_type(TaggedValue* parameter);
 bool list_type_has_specific_size(TaggedValue* parameter);
-void list_initialize_parameter_from_type_decl(Branch& typeDecl, TaggedValue* parameter);
+void list_initialize_parameter_from_type_decl(Branch* typeDecl, TaggedValue* parameter);
 
 // For a List-based type, this returns the list of types that the elements will
 // have. This result is only valid for fixed-size List types, otherwise it will

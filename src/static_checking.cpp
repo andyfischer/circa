@@ -98,20 +98,20 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, to_string(term->input(0)).c_str());
 }
 
-void check_for_static_errors(List* errors, Branch& branch)
+void check_for_static_errors(List* errors, Branch* branch)
 {
-    for (BranchIterator it(&branch); it.unfinished(); ++it)
+    for (BranchIterator it(branch); it.unfinished(); ++it)
         check_term_for_static_error(errors, *it);
 }
 
-void update_static_error_list(Branch& branch)
+void update_static_error_list(Branch* branch)
 {
     List errors;
     check_for_static_errors(&errors, branch);
     if (errors.empty())
-        set_null(&branch.staticErrors);
+        set_null(&branch->staticErrors);
     else
-        swap(&errors, &branch.staticErrors);
+        swap(&errors, &branch->staticErrors);
 }
 
 bool has_static_error(Term* term)
@@ -121,23 +121,23 @@ bool has_static_error(Term* term)
     return !errors.empty();
 }
 
-bool has_static_errors(Branch& branch)
+bool has_static_errors(Branch* branch)
 {
     update_static_error_list(branch);
     return has_static_errors_cached(branch);
 }
 
-bool has_static_errors_cached(Branch& branch)
+bool has_static_errors_cached(Branch* branch)
 {
-    return !is_null(&branch.staticErrors);
+    return !is_null(&branch->staticErrors);
 }
 
-int count_static_errors(Branch& branch)
+int count_static_errors(Branch* branch)
 {
     update_static_error_list(branch);
-    if (is_null(&branch.staticErrors))
+    if (is_null(&branch->staticErrors))
         return 0;
-    return List::checkCast(&branch.staticErrors)->length();
+    return List::checkCast(&branch->staticErrors)->length();
 }
 
 void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
@@ -216,12 +216,12 @@ bool print_static_errors_formatted(List* result, std::ostream& out)
     return true;
 }
 
-bool print_static_errors_formatted(Branch& branch, std::ostream& out)
+bool print_static_errors_formatted(Branch* branch, std::ostream& out)
 {
     update_static_error_list(branch);
-    if (!is_list(&branch.staticErrors))
+    if (!is_list(&branch->staticErrors))
         return false;
-    return print_static_errors_formatted(List::checkCast(&branch.staticErrors), out);
+    return print_static_errors_formatted(List::checkCast(&branch->staticErrors), out);
 }
 
 void print_static_error(Term* term, std::ostream& out)
@@ -233,7 +233,7 @@ void print_static_error(Term* term, std::ostream& out)
         print_static_error(result[0], out);
 }
 
-std::string get_static_errors_formatted(Branch& branch)
+std::string get_static_errors_formatted(Branch* branch)
 {
     std::stringstream out;
     print_static_errors_formatted(branch, out);

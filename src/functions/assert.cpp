@@ -15,7 +15,7 @@ namespace assert_function {
             error_occurred(CONTEXT, CALLER, "Assert failed");
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
     }

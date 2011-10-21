@@ -24,7 +24,7 @@ namespace cond_function {
 OLD_FEEDBACK_IMPL_DISABLED
         Term* target = INPUT_TERM(0);
         Term* desired = INPUT_TERM(1);
-        Branch& output = feedback_output(CALLER);
+        Branch* output = feedback_output(CALLER);
 
         // cond(condition, pos, neg)
         //
@@ -44,7 +44,7 @@ OLD_FEEDBACK_IMPL_DISABLED
         #endif
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         COND_FUNC = import_function(kernel, cond_evaluate,
                 "cond(bool condition, any pos :meta, any neg :meta) -> any;"

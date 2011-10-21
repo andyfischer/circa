@@ -12,11 +12,11 @@ namespace if_function {
         // Compilation placeholder
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        IF_FUNC = kernel["if"];
-        JOIN_FUNC = kernel["join"];
+        IF_FUNC = kernel->get("if");
+        JOIN_FUNC = kernel->get("join");
     }
 }
 }

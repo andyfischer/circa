@@ -13,7 +13,7 @@
 
 namespace circa {
 
-Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string const& name)
+Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string const& name)
 {
     ca_assert(function != NULL);
 
@@ -33,10 +33,10 @@ Term* apply(Branch& branch, Term* function, TermList const& inputs, std::string 
     }
 
     // Create the term
-    Term* result = branch.appendNew();
+    Term* result = branch->appendNew();
 
     if (name != "")
-        branch.bindName(result, name);
+        branch->bindName(result, name);
 
     TermList _inputs = inputs;
 
@@ -205,7 +205,7 @@ void clear_from_dependencies_of_users(Term* term)
     }
 }
 
-Term* create_duplicate(Branch& branch, Term* original, std::string const& name, bool copyBranches)
+Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
 {
     ca_assert(original != NULL);
 
@@ -233,9 +233,9 @@ Term* create_duplicate(Branch& branch, Term* original, std::string const& name, 
     return term;
 }
 
-Term* apply(Branch& branch, std::string const& functionName, TermList const& inputs, std::string const& name)
+Term* apply(Branch* branch, std::string const& functionName, TermList const& inputs, std::string const& name)
 {
-    Term* function = find_name(&branch, functionName.c_str());
+    Term* function = find_name(branch, functionName.c_str());
     if (function == NULL)
         internal_error("function not found: "+functionName);
 
@@ -244,15 +244,15 @@ Term* apply(Branch& branch, std::string const& functionName, TermList const& inp
     return result;
 }
 
-Term* create_value(Branch& branch, Type* type, std::string const& name)
+Term* create_value(Branch* branch, Type* type, std::string const& name)
 {
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
 
-    Term *term = branch.appendNew();
+    Term *term = branch->appendNew();
 
     if (name != "")
-        branch.bindName(term, name);
+        branch->bindName(term, name);
 
     change_function(term, VALUE_FUNC);
     change_declared_type(term, type);
@@ -264,11 +264,11 @@ Term* create_value(Branch& branch, Type* type, std::string const& name)
     return term;
 }
 
-Term* create_value(Branch& branch, std::string const& typeName, std::string const& name)
+Term* create_value(Branch* branch, std::string const& typeName, std::string const& name)
 {
     Term* type = NULL;
 
-    type = find_name(&branch, typeName.c_str());
+    type = find_name(branch, typeName.c_str());
 
     if (type == NULL)
         internal_error("Couldn't find type: "+typeName);
@@ -276,14 +276,14 @@ Term* create_value(Branch& branch, std::string const& typeName, std::string cons
     return create_value(branch, as_type(type), name);
 }
 
-Term* create_value(Branch& branch, TaggedValue* initialValue, std::string const& name)
+Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const& name)
 {
     Term* term = create_value(branch, initialValue->value_type, name);
     copy(initialValue, term);
     return term;
 }
 
-Term* create_stateful_value(Branch& branch, Type* type, Term* defaultValue,
+Term* create_stateful_value(Branch* branch, Type* type, Term* defaultValue,
         std::string const& name)
 {
     Term* result = apply(branch, GET_STATE_FIELD_FUNC,
@@ -292,95 +292,95 @@ Term* create_stateful_value(Branch& branch, Type* type, Term* defaultValue,
     return result;
 }
 
-Term* create_string(Branch& branch, std::string const& s, std::string const& name)
+Term* create_string(Branch* branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, &STRING_T, name);
     set_string(term, s);
     return term;
 }
 
-Term* create_int(Branch& branch, int i, std::string const& name)
+Term* create_int(Branch* branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, &INT_T, name);
     set_int(term, i);
     return term;
 }
 
-Term* create_float(Branch& branch, float f, std::string const& name)
+Term* create_float(Branch* branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, &FLOAT_T, name);
     set_float(term, f);
     return term;
 }
 
-Term* create_bool(Branch& branch, bool b, std::string const& name)
+Term* create_bool(Branch* branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, &BOOL_T, name);
     set_bool(term, b);
     return term;
 }
 
-Term* create_void(Branch& branch, std::string const& name)
+Term* create_void(Branch* branch, std::string const& name)
 {
     return create_value(branch, &VOID_T, name);
 }
 
-Term* create_list(Branch& branch, std::string const& name)
+Term* create_list(Branch* branch, std::string const& name)
 {
     Term* term = create_value(branch, &LIST_T, name);
     return term;
 }
 
-Branch& create_branch(Branch& owner, std::string const& name)
+Branch* create_branch(Branch* owner, std::string const& name)
 {
     return apply(owner, BRANCH_FUNC, TermList(), name)->contents();
 }
 
-Branch& create_namespace(Branch& branch, std::string const& name)
+Branch* create_namespace(Branch* branch, std::string const& name)
 {
     return apply(branch, NAMESPACE_FUNC, TermList(), name)->contents();
 }
 Branch* create_branch_unevaluated(Branch* owner, const char* name)
 {
-    return &nested_contents(apply(*owner, BRANCH_UNEVALUATED_FUNC, TermList(), name));
+    return nested_contents(apply(owner, BRANCH_UNEVALUATED_FUNC, TermList(), name));
 }
 
-Term* create_type(Branch& branch, std::string name)
+Term* create_type(Branch* branch, std::string name)
 {
     Term* term = create_value(branch, &TYPE_T);
 
     if (name != "") {
         as_type(term)->name = name;
-        branch.bindName(term, name);
+        branch->bindName(term, name);
     }
 
     return term;
 }
 
-Term* create_type_value(Branch& branch, Type* value, std::string const& name)
+Term* create_type_value(Branch* branch, Type* value, std::string const& name)
 {
     Term* term = create_value(branch, &TYPE_T, name);
     set_type(term, value);
     return term;
 }
 
-Term* create_symbol_value(Branch& branch, TaggedValue* value, std::string const& name)
+Term* create_symbol_value(Branch* branch, TaggedValue* value, std::string const& name)
 {
     Term* term = create_value(branch, &SYMBOL_T, name);
     copy(value, term);
     return term;
 }
 
-Term* duplicate_value(Branch& branch, Term* term)
+Term* duplicate_value(Branch* branch, Term* term)
 {
     Term* dup = create_value(branch, term->type);
     copy(term, dup);
     return dup;
 }
 
-Term* procure_value(Branch& branch, Type* type, std::string const& name)
+Term* procure_value(Branch* branch, Type* type, std::string const& name)
 {
-    Term* existing = branch[name];
+    Term* existing = branch->get(name);
     if (existing == NULL)
         existing = create_value(branch, type, name);
     else
@@ -388,17 +388,17 @@ Term* procure_value(Branch& branch, Type* type, std::string const& name)
     return existing;
 }
 
-Term* procure_int(Branch& branch, std::string const& name)
+Term* procure_int(Branch* branch, std::string const& name)
 {
     return procure_value(branch, &INT_T, name);
 }
 
-Term* procure_float(Branch& branch, std::string const& name)
+Term* procure_float(Branch* branch, std::string const& name)
 {
     return procure_value(branch, &FLOAT_T, name);
 }
 
-Term* procure_bool(Branch& branch, std::string const& name)
+Term* procure_bool(Branch* branch, std::string const& name)
 {
     return procure_value(branch, &BOOL_T, name);
 }
@@ -413,18 +413,18 @@ float get_step(Term* term)
     return term->floatPropOptional("step", 1.0);
 }
 
-void create_rebind_branch(Branch& rebinds, Branch& source, Term* rebindCondition, bool outsidePositive)
+void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition, bool outsidePositive)
 {
-    clear_branch(&rebinds);
+    clear_branch(rebinds);
 
     std::vector<std::string> reboundNames;
     list_names_that_this_branch_rebinds(source, reboundNames);
 
-    Branch* outerScope = source.owningTerm->owningBranch;
+    Branch* outerScope = source->owningTerm->owningBranch;
     for (unsigned i=0; i < reboundNames.size(); i++) {
         std::string name = reboundNames[i];
         Term* outerVersion = find_name(outerScope, name.c_str());
-        Term* innerVersion = source[name];
+        Term* innerVersion = source->get(name);
 
         Term* pos = outsidePositive ? outerVersion : innerVersion;
         Term* neg = outsidePositive ? innerVersion : outerVersion ;
@@ -453,7 +453,7 @@ void post_compile_term(Term* term)
     // If the function has multiple outputs, and any of these outputs have names,
     // then copy these outputs to named terms. This is a workaround until we can
     // fully support terms with multiple output names.
-    Branch& owningBranch = *term->owningBranch;
+    Branch* owningBranch = term->owningBranch;
     int numOutputs = get_output_count(term);
     for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
         const char* name = get_output_name(term, outputIndex);
@@ -462,7 +462,7 @@ void post_compile_term(Term* term)
             set_input2(outputCopy, 0, term, outputIndex);
 
             respecialize_type(outputCopy);
-            owningBranch.bindName(outputCopy, name);
+            owningBranch->bindName(outputCopy, name);
         }
     }
 
@@ -491,17 +491,17 @@ void post_compile_term(Term* term)
     #endif
 }
 
-void finish_minor_branch(Branch& branch)
+void finish_minor_branch(Branch* branch)
 {
-    if (branch.length() > 0
-            && branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC)
+    if (branch->length() > 0
+            && branch->get(branch->length()-1)->function == FINISH_MINOR_BRANCH_FUNC)
         return;
 
     // Check if there are any state vars in this branch
     bool anyStateVars = false;
 
-    for (int i=0; i < branch.length(); i++) {
-        Term* term = branch[i];
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
         if (term->function == GET_STATE_FIELD_FUNC) {
             anyStateVars = true;
             break;
@@ -514,14 +514,14 @@ void finish_minor_branch(Branch& branch)
     post_compile_term(apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList()));
 }
 
-void check_to_add_branch_finish_term(Branch& branch, int previousLastTerm)
+void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm)
 {
-    for (int i=previousLastTerm; i < branch.length(); i++) {
+    for (int i=previousLastTerm; i < branch->length(); i++) {
 
-        if (branch[i] == NULL)
+        if (branch->get(i) == NULL)
             continue;
 
-        if (branch[i]->function == GET_STATE_FIELD_FUNC) {
+        if (branch->get(i)->function == GET_STATE_FIELD_FUNC) {
             Term* term = apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList());
             update_branch_finish_term(term);
             break;
@@ -534,11 +534,11 @@ void update_branch_finish_term(Term* term)
     post_compile_term(term);
 }
 
-Term* find_last_non_comment_expression(Branch& branch)
+Term* find_last_non_comment_expression(Branch* branch)
 {
-    for (int i = branch.length() - 2; i >= 0; i--)
-        if (branch[i] != NULL && branch[i]->function != COMMENT_FUNC)
-            return branch[i];
+    for (int i = branch->length() - 2; i >= 0; i--)
+        if (branch->get(i) != NULL && branch->get(i)->function != COMMENT_FUNC)
+            return branch->get(i);
     return NULL;
 }
 

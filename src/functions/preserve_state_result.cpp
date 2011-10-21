@@ -21,10 +21,10 @@ namespace preserve_state_result_function {
         set_null(OUTPUT);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        PRESERVE_STATE_RESULT_FUNC = kernel["preserve_state_result"];
+        PRESERVE_STATE_RESULT_FUNC = kernel->get("preserve_state_result");
     }
 }
 }

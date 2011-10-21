@@ -124,7 +124,7 @@ Term::nameCount() const
     return 1 + additionalOutputNames.count();
 }
 
-Branch&
+Branch*
 Term::contents()
 {
     return nested_contents(this);
@@ -132,12 +132,12 @@ Term::contents()
 Term*
 Term::contents(int index)
 {
-    return nested_contents(this)[index];
+    return nested_contents(this)->get(index);
 }
 Term*
 Term::contents(const char* name)
 {
-    return nested_contents(this)[name];
+    return nested_contents(this)->get(name);
 }
 
 std::string
@@ -297,9 +297,9 @@ void term_check_invariants(List* errors, Term* term)
                 "Term.nestedContents has wrong owningTerm");
 
     if (term->owningBranch != NULL) {
-        Branch& branch = *term->owningBranch;
-        if ((term->index >= branch.length())
-                || (branch[term->index] != term)) {
+        Branch* branch = term->owningBranch;
+        if ((term->index >= branch->length())
+                || (branch->get(term->index) != term)) {
             append_term_invariant_error(errors, term,
                     "Term.index doesn't resolve to this term in owningBranch");
         }

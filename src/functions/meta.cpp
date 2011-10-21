@@ -6,10 +6,10 @@
 namespace circa {
 namespace meta_function {
 
-    void lift_closure(Branch& branch)
+    void lift_closure(Branch* branch)
     {
-        for (int i=0; i < branch.length(); i++) {
-            Term* term = branch[i];
+        for (int i=0; i < branch->length(); i++) {
+            Term* term = branch->get(i);
             if (term == NULL) continue;
             if (term->function == FREEZE_FUNC) {
                 Term* input = term->input(0);
@@ -34,7 +34,7 @@ namespace meta_function {
         //FIXME lift_closure(as_branch(OUTPUT));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         #if 0
         FIXME

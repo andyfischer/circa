@@ -14,12 +14,12 @@ void type_declaration()
     Branch branch;
     Term* myType = branch.compile("type MyType { string a, int b } ");
 
-    Branch& contents = nested_contents(myType);
-    test_assert(contents.length() == 2);
-    test_assert(contents[0]->name == "a");
-    test_equals(contents[0]->type->name, "string");
-    test_assert(contents[1]->name == "b");
-    test_equals(contents[1]->type->name, "int");
+    Branch* contents = nested_contents(myType);
+    test_assert(contents->length() == 2);
+    test_assert(contents->get(0)->name == "a");
+    test_equals(contents->get(0)->type->name, "string");
+    test_assert(contents->get(1)->name == "b");
+    test_equals(contents->get(1)->type->name, "int");
 
     Type* type = unbox_type(myType);
     test_assert(type->initialize != NULL);
@@ -27,14 +27,14 @@ void type_declaration()
 
     branch.compile("mt = MyType()");
 
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void test_term_output_always_satisfies_type()
 {
     Branch branch;
 
-    Term* a = create_int(branch, 5);
+    Term* a = create_int(&branch, 5);
     test_assert(term_output_always_satisfies_type(a, &INT_T));
     test_assert(term_output_always_satisfies_type(a, &FLOAT_T));
     test_assert(!term_output_always_satisfies_type(a, &STRING_T));
@@ -80,15 +80,15 @@ void test_default_values()
 {
     Branch branch;
 
-    Term* i = create_int(branch, 5, "i");
+    Term* i = create_int(&branch, 5, "i");
     reset(i);
     test_assert(i->asInt() == 0);
 
-    Term* f = create_float(branch, 5);
+    Term* f = create_float(&branch, 5);
     reset(f);
     test_assert(f->asFloat() == 0);
 
-    Term* s = create_string(branch, "hello");
+    Term* s = create_string(&branch, "hello");
     reset(s);
     test_assert(s->asString() == "");
 }
@@ -98,13 +98,13 @@ void type_inference_for_get_index()
     Branch branch;
     branch.eval("l = [1 2 3]");
     Term* x = branch.compile("x = l[0]");
-    test_assert(branch);
+    test_assert(&branch);
     test_equals(x->type->name, "int");
 
     branch.clear();
     branch.eval("l = [1 2.0 3]");
     x = branch.compile("x = l[0]");
-    test_assert(branch);
+    test_assert(&branch);
     test_equals(x->type->name, "number");
 
     branch.clear();
@@ -154,12 +154,12 @@ void create_empty_type_then_populate_it()
     branch.compile("type T;");
     branch.compile("a = T()");
     branch.compile("to_string(a)");
-    test_assert(branch);
-    evaluate_branch(branch);
+    test_assert(&branch);
+    evaluate_branch(&branch);
 
     list_t::setup_type(unbox_type(branch["T"]));
-    evaluate_branch(branch);
-    test_assert(branch);
+    evaluate_branch(&branch);
+    test_assert(&branch);
 }
 
 void test_copy_builtin_type()
@@ -170,7 +170,7 @@ void test_copy_builtin_type()
 
     Branch branch;
     branch.eval("copy(int)");
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void test_compound_type_cast()
@@ -224,7 +224,7 @@ void use_installed_handle_type()
 
     Term* fCall = branch.compile("f()");
 
-    evaluate_branch(branch);
+    evaluate_branch(&branch);
     test_assert(cast_possible(fCall, as_type(myType)));
 }
 

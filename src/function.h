@@ -69,8 +69,8 @@ namespace function_t {
 bool is_function(Term* term);
 bool is_function_attrs(Term* term);
 FunctionAttrs& as_function_attrs(Term* term);
-Branch& function_contents(Term* func);
-Branch& function_contents(FunctionAttrs* func);
+Branch* function_contents(Term* func);
+Branch* function_contents(FunctionAttrs* func);
 FunctionAttrs* get_function_attrs(Term* func);
 
 // Return the placeholder name for the given input index; this is the name that
@@ -87,7 +87,7 @@ bool inputs_statically_fit_function(Term* func, TermList const& inputs);
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs);
 bool values_fit_function_dynamic(Term* func, List* list);
 
-Term* create_overloaded_function(Branch& branch, std::string const& name,
+Term* create_overloaded_function(Branch* branch, std::string const& name,
         TermList const& overloads);
 Type* derive_specialized_output_type(Term* function, Term* call);
 
@@ -113,7 +113,7 @@ bool function_get_input_meta(FunctionAttrs* func, int index);
 bool function_get_input_optional(FunctionAttrs* func, int index);
 
 Term* function_get_input_placeholder(FunctionAttrs* func, int index);
-Branch& function_get_contents(FunctionAttrs* func);
+Branch* function_get_contents(FunctionAttrs* func);
 std::string function_get_input_name(FunctionAttrs* func, int index);
 
 std::string function_get_documentation_string(FunctionAttrs* func);

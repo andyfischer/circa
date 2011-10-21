@@ -21,7 +21,7 @@ namespace any_true_function {
         set_bool(OUTPUT, result);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, any_true, "any_true(List l) -> bool;"
                 "'Return whether any of the items in l are true'");

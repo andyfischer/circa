@@ -22,6 +22,7 @@ extern bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS;
 
 // Spit out this branch's raw contents to std::cout
 void dump(Branch& branch);
+void dump(Branch* branch);
 void dump_with_props(Branch& branch);
 
 void dump(TaggedValue& value);

@@ -135,13 +135,13 @@ private:
 void assert_valid_branch(Branch const* obj);
 
 bool is_namespace(Term* term);
-bool is_namespace(Branch& branch);
+bool is_namespace(Branch* branch);
 
 bool has_nested_contents(Term* term);
-Branch& nested_contents(Term* term);
+Branch* nested_contents(Term* term);
 
-std::string get_branch_source_filename(Branch& branch);
-Branch* get_outer_scope(Branch const& branch);
+std::string get_branch_source_filename(Branch* branch);
+Branch* get_outer_scope(Branch* branch);
 
 // Delete this term and remove it from its owning branch.
 void erase_term(Term* term);
@@ -149,10 +149,10 @@ void erase_term(Term* term);
 // Delete the contents of 'branch'.
 void clear_branch(Branch* branch);
 
-void duplicate_branch(Branch& source, Branch& dest);
+void duplicate_branch(Branch* source, Branch* dest);
 
 void load_script(Branch* branch, const char* filename);
-void evaluate_script(Branch& branch, const char* filename);
+void evaluate_script(Branch* branch, const char* filename);
 
 // Create an include() call that loads the given file. Returns the included
 // branch.
@@ -163,10 +163,10 @@ Branch* include_script(Branch* branch, const char* filename);
 // branch.
 Branch* load_script_term(Branch* branch, const char* filename);
 
-Term* find_term_by_id(Branch& branch, unsigned int id);
+Term* find_term_by_id(Branch* branch, unsigned int id);
 
-void persist_branch_to_file(Branch& branch);
-std::string get_source_file_location(Branch& branch);
+void persist_branch_to_file(Branch* branch);
+std::string get_source_file_location(Branch* branch);
 
 // Returns a List pointer if the branch has a file origin, NULL if not.
 List* branch_get_file_origin(Branch* branch);
@@ -191,8 +191,8 @@ struct BranchInvariantCheck
     // [2] string message
 };
 
-void branch_check_invariants(BranchInvariantCheck* result, Branch& branch);
-bool branch_check_invariants_print_result(Branch& branch, std::ostream& out);
+void branch_check_invariants(BranchInvariantCheck* result, Branch* branch);
+bool branch_check_invariants_print_result(Branch* branch, std::ostream& out);
 
 struct BrokenLinkList
 {

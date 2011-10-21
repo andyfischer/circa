@@ -15,7 +15,7 @@ void test_return_from_conditional()
                 "    return(a) }"
                 "}");
 
-    test_assert(branch);
+    test_assert(&branch);
 
     test_equals(branch.eval("my_max(3,8)")->toFloat(), 8);
     test_equals(branch.eval("my_max(3,3)")->toFloat(), 3);
@@ -41,19 +41,19 @@ void test_recursion()
                 "    return(mult_i(n, factorial(next_i))) }}");
 
     TaggedValue* fact_1 = branch.eval("factorial(1)");
-    test_assert(branch);
+    test_assert(&branch);
     test_assert(fact_1->asInt() == 1);
 
     TaggedValue* fact_2 = branch.eval("factorial(2)");
-    test_assert(branch);
+    test_assert(&branch);
     test_assert(fact_2->asInt() == 2);
 
     TaggedValue* fact_3 = branch.eval("factorial(3)");
-    test_assert(branch);
+    test_assert(&branch);
     test_assert(fact_3->asInt() == 6);
 
     TaggedValue* fact_4 = branch.eval("factorial(4)");
-    test_assert(branch);
+    test_assert(&branch);
     test_assert(fact_4->asInt() == 24);
 
     branch.compile("def recr(int n) -> int\n"
@@ -80,17 +80,17 @@ void subroutine_stateful_term()
     test_assert(get_function_attrs(branch["mysub"])->implicitStateType != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(context.state.toString(), "{call: {a: 1.0}}");
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(context.state.toString(), "{call: {a: 2.0}}");
 
     // Make sure that subsequent calls to this subroutine have their own state container.
     branch.compile("another_call = mysub()");
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(context.state.toString(), "{another_call: {a: 1.0}, call: {a: 3.0}}");
 }
@@ -104,7 +104,7 @@ void test_recursion_with_state()
                    "}");
     branch.compile("result = recr(4)");
 
-    test_assert(branch);
+    test_assert(&branch);
 
     EvalContext context;
 
@@ -114,7 +114,7 @@ void test_recursion_with_state()
     internal_debug_function::oracle_send(33);
     internal_debug_function::oracle_send(45);
 
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
 
     test_equals(&context.state,
         "{result: {_recr: {_recr: {_recr: {s: 45}, s: 33}, s: 21}, s: 10}}");
@@ -189,12 +189,12 @@ void bug_with_return()
 
     // there once was a bug where EvalContext.interruptSubroutine was not reset
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(is_int(f));
     test_assert(f->asInt() == 1);
 
     set_bool(input, false);
-    evaluate_branch(&context, branch);
+    evaluate_branch(&context, &branch);
     test_assert(is_int(f));
     test_assert(f->asInt() == 2);
 }
@@ -276,7 +276,7 @@ namespace copy_counting_tests
         T.name = "T";
         T.initialize = t_initialize;
         T.copy = t_copy;
-        set_type(create_type(branch, "T"), &T);
+        set_type(create_type(&branch, "T"), &T);
         for (int s = 0; s < num_slots; s++)
             slots[s] = Slot();
         next_available_slot = 0;
@@ -290,14 +290,14 @@ namespace copy_counting_tests
         branch.compile("def f(T t);");
         Term* init = branch.compile("a = T()");
         Term* call = branch.compile("f(a)");
-        test_assert(branch);
+        test_assert(&branch);
         test_assert(init->function != NULL);
         test_assert(call->function != NULL);
 
         int slot = next_available_slot - 1;
 
         test_equals(slots[slot].copies, 0);
-        evaluate_branch(branch);
+        evaluate_branch(&branch);
         // one copy for T(), another to evaluate f(a)
         test_assert(slots[slot].copies <= 2);
     }
@@ -332,7 +332,7 @@ void return_from_for_loop()
             "test_spy(i) if i==3 { return }; test_spy(0) }}");
 
     branch.eval("f()");
-    test_assert(branch);
+    test_assert(&branch);
     test_equals(internal_debug_function::spy_results()->toString(), "[1, 0, 2, 0, 3]");
 }
 
@@ -347,7 +347,7 @@ void bug_with_misplaced_preserve_state_result()
 
     // there was a bug where this would create extra preserve_state_result() calls.
     // These showed up as terms with null inputs.
-    test_assert(branch);
+    test_assert(&branch);
 }
 
 void register_tests()

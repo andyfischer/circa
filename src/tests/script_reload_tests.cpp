@@ -25,7 +25,7 @@ struct ReloadHelper
 
     void rerun()
     {
-        evaluate_branch(&context, branch);
+        evaluate_branch(&context, &branch);
         if (context.errorOccurred) {
             std::cout << "Error in reload test: " << get_current_test_name() << std::endl;
             print_runtime_error_formatted(context, std::cout);

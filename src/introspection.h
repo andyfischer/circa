@@ -44,17 +44,17 @@ std::string global_id(Term* term);
 
 std::string get_short_local_name(Term* term);
 
-std::string branch_namespace_to_string(Branch& branch);
+std::string branch_namespace_to_string(Branch* branch);
 
 // Print compiled code in a raw format
-void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs);
+void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs);
 void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs);
 void print_term(std::ostream& out, Term* term);
 
 // Convenient overloads for raw format printing
-void print_branch(std::ostream& out, Branch& branch);
-void print_branch_with_properties(std::ostream& out, Branch& branch);
-std::string get_branch_raw(Branch& branch);
+void print_branch(std::ostream& out, Branch* branch);
+void print_branch_with_properties(std::ostream& out, Branch* branch);
+std::string get_branch_raw(Branch* branch);
 std::string get_term_to_string_extended(Term*);
 std::string get_term_to_string_extended_with_props(Term*);
 
@@ -64,7 +64,7 @@ std::string get_short_location(Term* term);
 // Print the source file that this term came from, if any.
 std::string get_source_filename(Term* term);
 
-void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string> &names);
+void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string> &names);
 
 // Get a list of the set of terms which descend from 'inputs', and which have 'outputs'
 // as descendants.

@@ -163,7 +163,7 @@ namespace ref_methods_function {
         circa::copy(&t->properties, OUTPUT);
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, get_name, "Ref.name(self) -> string");
         import_function(kernel, hosted_to_string, "Ref.to_string(_) -> string");

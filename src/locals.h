@@ -5,9 +5,9 @@
 namespace circa {
     
 int get_output_count(Term* term);
-int get_locals_count(Branch& branch);
+int get_locals_count(Branch* branch);
 void update_locals_index_for_new_term(Term*);
-void refresh_locals_indices(Branch&, int startingAt = 0);
+void refresh_locals_indices(Branch*, int startingAt = 0);
 void update_output_count(Term* term);
 
 void update_input_instructions(Term* term);

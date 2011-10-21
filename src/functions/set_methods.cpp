@@ -36,7 +36,7 @@ namespace set_methods_function {
         }
     }
     
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, hosted_add, "Set.add(self :implied_rebind, any) -> Set");
         import_function(kernel, remove, "Set.remove(self :implied_rebind, any) -> Set");

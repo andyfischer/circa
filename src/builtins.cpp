@@ -186,25 +186,25 @@ CA_FUNCTION(typename_func)
     set_string(OUTPUT, declared_type(INPUT_TERM(0))->name);
 }
 
-void install_standard_library(Branch& kernel)
+void install_standard_library(Branch* kernel)
 {
     // Parse the stdlib script
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 
     // Install each function
-    install_function(kernel["file:modified_time"], file__modified_time);
-    install_function(kernel["input"], input_func);
-    install_function(kernel["length"], length);
-    install_function(kernel["type"], type_func);
-    install_function(kernel["typename"], typename_func);
-    install_function(kernel["refactor:rename"], refactor__rename);
-    install_function(kernel["refactor:change_function"], refactor__change_function);
-    install_function(kernel["reflect:this_branch"], reflect__this_branch);
+    install_function(kernel->get("file:modified_time"), file__modified_time);
+    install_function(kernel->get("input"), input_func);
+    install_function(kernel->get("length"), length);
+    install_function(kernel->get("type"), type_func);
+    install_function(kernel->get("typename"), typename_func);
+    install_function(kernel->get("refactor:rename"), refactor__rename);
+    install_function(kernel->get("refactor:change_function"), refactor__change_function);
+    install_function(kernel->get("reflect:this_branch"), reflect__this_branch);
 
-    install_function(kernel["cppbuild:build_module"], cppbuild_function::build_module);
+    install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
 
-    LENGTH_FUNC = kernel["length"];
-    TYPE_FUNC = kernel["type"];
+    LENGTH_FUNC = kernel->get("length");
+    TYPE_FUNC = kernel->get("type");
 }
 
 } // namespace circa

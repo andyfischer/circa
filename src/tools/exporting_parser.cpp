@@ -19,7 +19,7 @@ int run_exporting_parser(const char* format, const char* filename)
     Branch branch;
     load_script(&branch, filename);
 
-    if (print_static_errors_formatted(branch, std::cout))
+    if (print_static_errors_formatted(&branch, std::cout))
         return -1;
 
     if (strcmp(format, "json") == 0) {

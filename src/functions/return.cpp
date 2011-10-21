@@ -12,17 +12,17 @@ namespace return_function {
     {
         CONTEXT->interruptSubroutine = true;
 
-        Branch& contents = nested_contents(CALLER);
+        Branch* contents = nested_contents(CALLER);
         start_using(contents);
-        for (int i=0; i < contents.length(); i++)
-            evaluate_single_term(CONTEXT, contents[i]);
+        for (int i=0; i < contents->length(); i++)
+            evaluate_single_term(CONTEXT, contents->get(i));
         finish_using(contents);
     }
 
     void returnPostCompile(Term* returnCall)
     {
-        Branch& contents = nested_contents(returnCall);
-        contents.clear();
+        Branch* contents = nested_contents(returnCall);
+        contents->clear();
 
         // Iterate through every open state var in the subroutine that occurs before
         // the return(). If any were found, append a call to preserve_state_result().
@@ -90,14 +90,14 @@ namespace return_function {
         }
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         // this function can be initialized early
-        if (kernel["return"] != NULL)
+        if (kernel->get("return") != NULL)
             return;
 
         CA_SETUP_FUNCTIONS(kernel);
-        RETURN_FUNC = kernel["return"];
+        RETURN_FUNC = kernel->get("return");
         get_function_attrs(RETURN_FUNC)->postCompile = returnPostCompile;
         get_function_attrs(RETURN_FUNC)->formatSource = formatSource;
     }

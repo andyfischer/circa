@@ -111,15 +111,15 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
     change_declared_type(term, outputType);
 }
 
-void rewrite_as_value(Branch& branch, int index, Type* type)
+void rewrite_as_value(Branch* branch, int index, Type* type)
 {
-    while (index > branch.length())
-        branch.append(NULL);
+    while (index > branch->length())
+        branch->append(NULL);
 
-    if (index >= branch.length()) {
+    if (index >= branch->length()) {
         create_value(branch, type);
     } else {
-        Term* term = branch[index];
+        Term* term = branch->get(index);
 
         change_function(term, VALUE_FUNC);
         change_declared_type(term, type);
@@ -132,19 +132,19 @@ void remove_term(Term* term)
     assert_valid_term(term);
 
     int index = term->index;
-    Branch& branch = *term->owningBranch;
+    Branch* branch = term->owningBranch;
 
     erase_term(term);
 
-    for (int i=index; i < branch._terms.length()-1; i++) {
-        branch._terms.setAt(i, branch._terms[i+1]);
-        if (branch._terms[i] != NULL)
-            branch._terms[i]->index = i;
+    for (int i=index; i < branch->_terms.length()-1; i++) {
+        branch->_terms.setAt(i, branch->_terms[i+1]);
+        if (branch->_terms[i] != NULL)
+            branch->_terms[i]->index = i;
     }
-    branch._terms.resize(branch._terms.length()-1);
+    branch->_terms.resize(branch->_terms.length()-1);
 
-    if (is_list(&branch.pendingUpdates))
-        list_remove_index(&branch.pendingUpdates, index);
+    if (is_list(&branch->pendingUpdates))
+        list_remove_index(&branch->pendingUpdates, index);
 }
 
 void remap_pointers(Term* term, TermMap const& map)
@@ -178,7 +178,7 @@ void remap_pointers(Term* term, TermMap const& map)
 
     // Remap inside nestedContents
     if (has_nested_contents(term))
-        nested_contents(term).remapPointers(map);
+        nested_contents(term)->remapPointers(map);
 }
 
 void remap_pointers(Term* term, Term* original, Term* replacement)
@@ -192,14 +192,14 @@ void remap_pointers(Term* term, Term* original, Term* replacement)
     remap_pointers(term, map);
 }
 
-void remap_pointers(Branch& branch, Term* original, Term* replacement)
+void remap_pointers(Branch* branch, Term* original, Term* replacement)
 {
     TermMap map;
     map[original] = replacement;
 
-    for (int i=0; i < branch.length(); i++) {
-        if (branch[i] == NULL) continue;
-        remap_pointers(branch[i], map);
+    for (int i=0; i < branch->length(); i++) {
+        if (branch->get(i) == NULL) continue;
+        remap_pointers(branch->get(i), map);
     }
 }
 

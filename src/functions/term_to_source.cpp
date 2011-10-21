@@ -11,7 +11,7 @@ namespace term_to_source_function {
         set_string(OUTPUT, get_term_source_text(term));
     }
 
-    void setup(Branch& kernel)
+    void setup(Branch* kernel)
     {
         import_function(kernel, evaluate, "term_to_source(any :meta) -> string");
     }

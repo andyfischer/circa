@@ -10,45 +10,45 @@ namespace names_tests {
 void test_find_name()
 {
     Branch branch;
-    Term* a = create_int(branch, 1, "a");
+    Term* a = create_int(&branch, 1, "a");
 
     test_assert(find_name(&branch, "a") == a);
     test_assert(find_name(&branch, "b") == NULL);
 
-    Branch& sub = create_branch(branch, "sub");
-    test_assert(find_name(&sub, "a") == a);
+    Branch* sub = create_branch(&branch, "sub");
+    test_assert(find_name(sub, "a") == a);
 }
 
 void test_name_is_reachable_from()
 {
     Branch branch;
 
-    Term* a = create_int(branch, 5, "a");
+    Term* a = create_int(&branch, 5, "a");
 
-    test_assert(name_is_reachable_from(a, branch));
+    test_assert(name_is_reachable_from(a, &branch));
 
-    Branch& sub_1 = create_branch(branch, "sub_1");
+    Branch* sub_1 = create_branch(&branch, "sub_1");
     test_assert(name_is_reachable_from(a, sub_1));
 
-    Branch& sub_2 = create_branch(sub_1, "sub_2");
+    Branch* sub_2 = create_branch(sub_1, "sub_2");
     test_assert(name_is_reachable_from(a, sub_2));
 }
 
 void test_get_relative_name()
 {
     Branch branch;
-    Term* a = create_int(branch, 5, "A");
-    test_assert(get_relative_name(branch, a) == "A");
+    Term* a = create_int(&branch, 5, "A");
+    test_assert(get_relative_name(&branch, a) == "A");
 
-    Branch& ns = create_namespace(branch, "ns");
-    test_assert(ns.owningTerm != NULL);
+    Branch* ns = create_namespace(&branch, "ns");
+    test_assert(ns->owningTerm != NULL);
     Term* b = create_int(ns, 5, "B");
 
     test_assert(is_namespace(branch["ns"]));
-    test_assert(ns.owningTerm != NULL);
-    test_assert(ns.owningTerm == branch["ns"]);
+    test_assert(ns->owningTerm != NULL);
+    test_assert(ns->owningTerm == branch["ns"]);
     test_assert(get_relative_name(ns, b) == "B");
-    test_equals(get_relative_name(branch, b), "ns:B");
+    test_equals(get_relative_name(&branch, b), "ns:B");
 
     // This code once had a bug:
     Term* c = branch.compile("[1 1] -> Point");
@@ -63,14 +63,14 @@ void test_get_relative_name_from_hidden_branch()
     Branch branch;
     branch.eval("if true { a = 1 } else { a = 2 }");
 
-    test_equals(get_relative_name(branch, branch["a"]), "a");
+    test_equals(get_relative_name(&branch, branch.get("a")), "a");
 }
 
 void test_lookup_qualified_name()
 {
     Branch branch;
     Term* a = branch.compile("namespace a { b = 1 }");
-    Term* b = nested_contents(a)["b"];
+    Term* b = nested_contents(a)->get("b");
 
     test_assert(b != NULL);
     test_assert(branch["a:b"] == b);
@@ -85,39 +85,39 @@ void test_get_named_at()
     Branch branch;
 
     // Simple case
-    Term* a = create_int(branch, 1, "a");
-    Term* b = create_int(branch, 1, "b");
-    create_int(branch, 1, "a");
+    Term* a = create_int(&branch, 1, "a");
+    Term* b = create_int(&branch, 1, "b");
+    create_int(&branch, 1, "a");
 
     test_assert(get_named_at(b, "a") == a);
 
     // Make sure that the location term is not checked, should only check
     // things before that.
-    Term* c1 = create_int(branch, 1, "c");
-    Term* c2 = create_int(branch, 1, "c");
-    create_int(branch, 1, "c");
+    Term* c1 = create_int(&branch, 1, "c");
+    Term* c2 = create_int(&branch, 1, "c");
+    create_int(&branch, 1, "c");
     test_assert(get_named_at(c2, "c") != c2);
     test_assert(get_named_at(c2, "c") == c1);
 
     // Find names in outer scopes
-    Term* d = create_int(branch, 1, "d");
-    Branch& subBranch = create_branch(branch);
+    Term* d = create_int(&branch, 1, "d");
+    Branch* subBranch = create_branch(&branch);
     Term* e = create_int(subBranch, 1, "e");
     test_assert(get_named_at(e, "d") == d);
 
     // Make sure that when we look into outer scopes, we don't check the name of
     // our enclosing branch, or any names after that.
-    Term* f1 = create_int(branch, 1, "f");
-    Branch& subBranch2 = create_branch(branch, "f");
+    Term* f1 = create_int(&branch, 1, "f");
+    Branch* subBranch2 = create_branch(&branch, "f");
     Term* fsub = create_int(subBranch2, 1, "f");
-    create_int(branch, 1, "f");
+    create_int(&branch, 1, "f");
     test_assert(get_named_at(fsub, "f") == f1);
 
     // Find names in exposed-name branches
-    Branch& subBranch3 = create_branch(branch);
+    Branch* subBranch3 = create_branch(&branch);
     Term* h = create_int(subBranch3, 1, "h");
-    subBranch3.owningTerm->setBoolProp("exposesNames", true);
-    Term* i = create_int(branch, 1, "i");
+    subBranch3->owningTerm->setBoolProp("exposesNames", true);
+    Term* i = create_int(&branch, 1, "i");
     test_assert(get_named_at(i, "h") == h);
 }
 
@@ -135,31 +135,31 @@ void test_get_named_at_after_if_block()
 void test_find_first_common_branch()
 {
     Branch branch;
-    Term* a = create_int(branch, 0);
-    Term* b = create_int(branch, 0);
+    Term* a = create_int(&branch, 0);
+    Term* b = create_int(&branch, 0);
 
     test_assert(find_first_common_branch(a,b) == &branch);
     test_assert(find_first_common_branch(b,a) == &branch);
 
-    Branch& b1 = create_branch(branch);
+    Branch* b1 = create_branch(&branch);
     Term* c = create_int(b1, 0);
     Term* d = create_int(b1, 0);
 
-    test_assert(find_first_common_branch(c,d) == &b1);
-    test_assert(find_first_common_branch(d,c) == &b1);
+    test_assert(find_first_common_branch(c,d) == b1);
+    test_assert(find_first_common_branch(d,c) == b1);
     test_assert(find_first_common_branch(a,c) == &branch);
     test_assert(find_first_common_branch(d,b) == &branch);
 
     Branch alternate;
-    Term* e = create_int(alternate, 0);
+    Term* e = create_int(&alternate, 0);
     test_assert(find_first_common_branch(a,e) == NULL);
 }
 
 void test_unique_names()
 {
     Branch branch;
-    Term* a0 = create_int(branch, 5, "a");
-    Term* a1 = create_int(branch, 5, "a");
+    Term* a0 = create_int(&branch, 5, "a");
+    Term* a1 = create_int(&branch, 5, "a");
 
     test_equals(a0->uniqueName.name, "a");
     test_assert(a0->uniqueName.ordinal == 0);
@@ -168,8 +168,8 @@ void test_unique_names()
 
     // Declare a name which overlaps with the next unique name that we'll
     // try to generate for 'a'.
-    create_int(branch, 5, "a_2");
-    Term* a3 = create_int(branch, 5, "a");
+    create_int(&branch, 5, "a_2");
+    Term* a3 = create_int(&branch, 5, "a");
 
     test_equals(a3->uniqueName.name, "a_3");
     test_assert(a3->uniqueName.ordinal == 3);
@@ -199,10 +199,10 @@ void test_find_from_unique_name()
     Term* a1 = branch.compile("a = 1");
     Term* a2 = branch.compile("a = 2");
 
-    test_assert(find_from_unique_name(branch, "a") == a0);
-    test_assert(find_from_unique_name(branch, "a_1") == a1);
-    test_assert(find_from_unique_name(branch, "a_2") == a2);
-    test_assert(find_from_unique_name(branch, "b") == NULL);
+    test_assert(find_from_unique_name(&branch, "a") == a0);
+    test_assert(find_from_unique_name(&branch, "a_1") == a1);
+    test_assert(find_from_unique_name(&branch, "a_2") == a2);
+    test_assert(find_from_unique_name(&branch, "b") == NULL);
 }
 
 void test_with_include()
@@ -215,7 +215,7 @@ void test_with_include()
     Term* a = find_name(&branch, "ns:a");
     test_assert(a != NULL);
 
-    test_assert(name_is_reachable_from(a, branch));
+    test_assert(name_is_reachable_from(a, &branch));
 }
 
 void name_with_colons()
@@ -227,9 +227,9 @@ void name_with_colons()
     test_assert(branch["qualified:name"] == one);
     test_assert(find_name(&branch, "qualified:name") == one);
 
-    Branch& ns = create_namespace(branch, "ns");
-    Term* two = ns.compile("2");
-    ns.bindName(two, "another:name");
+    Branch* ns = create_namespace(&branch, "ns");
+    Term* two = ns->compile("2");
+    ns->bindName(two, "another:name");
 
     test_assert(branch["ns:another:name"] == two);
     test_assert(find_name(&branch, "ns:another:name") == two);
@@ -237,11 +237,11 @@ void name_with_colons()
 
 void test_global_name()
 {
-    Branch& root = nested_contents(kernel()["_test_root"]);
+    Branch* root = nested_contents(kernel()->get("_test_root"));
 
-    Branch& branch = create_branch(root, "test_global_name");
-    Term* a = branch.compile("a = 1");
-    Term* b = branch.compile("if true { b = 3 }")->contents(0)->contents("b");
+    Branch* branch = create_branch(root, "test_global_name");
+    Term* a = branch->compile("a = 1");
+    Term* b = branch->compile("if true { b = 3 }")->contents(0)->contents("b");
 
     std::string a_name;
     test_assert(find_global_name(a, a_name));

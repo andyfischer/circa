@@ -89,21 +89,21 @@ std::string get_short_local_name(Term* term)
     return global_id(term);
 }
 
-std::string branch_namespace_to_string(Branch& branch)
+std::string branch_namespace_to_string(Branch* branch)
 {
     std::stringstream out;
 
     TermNamespace::iterator it;
-    for (it = branch.names.begin(); it != branch.names.end(); ++it)
+    for (it = branch->names.begin(); it != branch->names.end(); ++it)
         out << it->first << ": " << global_id(it->second) << "\n";
 
     return out.str();
 }
 
-void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
+void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
 {
-    out << "[Branch " << &branch << ", output = " << branch.outputIndex << "]" << std::endl;
-    for (BranchIterator it(&branch); !it.finished(); it.advance()) {
+    out << "[Branch " << &branch << ", output = " << branch->outputIndex << "]" << std::endl;
+    for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
         int indent = it.depth();
@@ -115,7 +115,7 @@ void print_branch(std::ostream& out, Branch& branch, RawOutputPrefs* prefs)
     }
 }
 
-std::string get_branch_raw(Branch& branch)
+std::string get_branch_raw(Branch* branch)
 {
     RawOutputPrefs prefs;
     std::stringstream out;
@@ -148,12 +148,12 @@ std::string get_source_filename(Term* term)
     Branch* branch = term->owningBranch;
 
     while (branch != NULL) {
-        std::string filename = get_branch_source_filename(*branch);
+        std::string filename = get_branch_source_filename(branch);
 
         if (filename != "")
             return filename;
 
-        branch = get_outer_scope(*branch);
+        branch = get_outer_scope(branch);
     }
 
     return "";
@@ -213,10 +213,10 @@ TermList get_involved_terms(TermList inputs, TermList outputs)
     return result;
 }
 
-void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string> &names)
+void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string> &names)
 {
     TermNamespace::iterator it;
-    for (it = branch.names.begin(); it != branch.names.end(); ++it) {
+    for (it = branch->names.begin(); it != branch->names.end(); ++it) {
         std::string name = it->first;
 
         // Ignore compiler-generated terms
@@ -234,7 +234,7 @@ void list_names_that_this_branch_rebinds(Branch& branch, std::vector<std::string
             continue;
 
         // Ignore terms that are just a simple copy
-        Term* result = branch[name];
+        Term* result = branch->get(name);
         if (result->function == COPY_FUNC && result->input(0) == outer)
             continue;
 
@@ -348,13 +348,13 @@ void print_term(std::ostream& out, Term* term)
     print_term(out, term, &prefs);
 }
 
-void print_branch(std::ostream& out, Branch& branch)
+void print_branch(std::ostream& out, Branch* branch)
 {
     RawOutputPrefs prefs;
     print_branch(out, branch, &prefs);
 }
 
-void print_branch_with_properties(std::ostream& out, Branch& branch)
+void print_branch_with_properties(std::ostream& out, Branch* branch)
 {
     RawOutputPrefs prefs;
     prefs.showProperties = true;
@@ -383,11 +383,11 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, Tagge
     if (location->owningBranch == NULL)
         return;
 
-    Branch& branch = *location->owningBranch;
+    Branch* branch = location->owningBranch;
 
     // Iterate upwards through all the terms that are above 'location' in this branch
     for (int index=location->index - 1; index >= 0; index--) {
-        Term* t = branch[index];
+        Term* t = branch->get(index);
         if (t == NULL) continue;
         if (t->name == "") continue;
         bool stop = visitor(t, t->name.c_str(), context);
@@ -396,8 +396,9 @@ void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, Tagge
         // TODO: Iterate inside namespaces, providing the correct name
     }
 
-    if (branch.owningTerm != NULL)
-        visit_name_accessible_terms(branch.owningTerm, visitor, context);
+    if (branch->owningTerm != NULL)
+        visit_name_accessible_terms(branch->owningTerm, visitor, context);
 }
 
-} // namespace circa
+}
+

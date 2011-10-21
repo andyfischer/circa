@@ -11,9 +11,9 @@ void test_is_value()
 {
     Branch branch;
 
-    test_assert(is_value(create_value(branch, &INT_T)));
-    test_assert(is_value(create_value(branch, &STRING_T)));
-    test_assert(is_value(create_value(branch, &BOOL_T)));
+    test_assert(is_value(create_value(&branch, &INT_T)));
+    test_assert(is_value(create_value(&branch, &STRING_T)));
+    test_assert(is_value(create_value(&branch, &BOOL_T)));
     test_assert(!is_value(branch.compile("1 + 2")));
 }
 
@@ -53,10 +53,10 @@ void test_visit_name_accessible_terms()
     Branch branch;
     Term* a = branch.compile("a = 1");
     Term* b = branch.compile("b = 1");
-    Branch& ns = create_namespace(branch, "ns");
-    Term* c = ns.compile("c = 1");
-    Term* d = ns.compile("d = 1");
-    /*Term* e =*/ ns.compile("e = 1");
+    Branch* ns = create_namespace(&branch, "ns");
+    Term* c = ns->compile("c = 1");
+    Term* d = ns->compile("d = 1");
+    /*Term* e =*/ ns->compile("e = 1");
     branch.compile("f = 1");
 
     TaggedValue results;
