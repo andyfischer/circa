@@ -536,9 +536,14 @@ void update_branch_finish_term(Term* term)
 
 Term* find_last_non_comment_expression(Branch* branch)
 {
-    for (int i = branch->length() - 2; i >= 0; i--)
-        if (branch->get(i) != NULL && branch->get(i)->function != COMMENT_FUNC)
+    for (int i = branch->length() - 1; i >= 0; i--) {
+        if (branch->get(i) == NULL)
+            continue;
+        if (branch->get(i)->name == "#outer_rebinds")
+            continue;
+        if (branch->get(i)->function != COMMENT_FUNC)
             return branch->get(i);
+    }
     return NULL;
 }
 

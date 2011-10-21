@@ -136,6 +136,8 @@ CA_FUNCTION(evaluate_if_block)
 
     context->callStack.append(CALLER);
 
+    TaggedValue output;
+
     TaggedValue localState;
     TaggedValue prevScopeState;
     List* state = NULL;
@@ -170,6 +172,11 @@ CA_FUNCTION(evaluate_if_block)
                 if (evaluation_interrupted(context))
                     break;
             }
+
+            // Save result
+            Term* outputTerm = find_last_non_comment_expression(acceptedBranch);
+            if (outputTerm != NULL)
+                copy(outputTerm, &output);
 
             if (useState)
                 swap(state->get(branchIndex), &context->currentScopeState);
@@ -208,6 +215,8 @@ CA_FUNCTION(evaluate_if_block)
     context->callStack.pop();
 
     context->callStack.pop();
+
+    swap(&output, OUTPUT);
 }
 
 } // namespace circa
