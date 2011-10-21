@@ -6,112 +6,167 @@
 namespace circa {
 namespace gc_tests {
 
-void test_visit_heap()
-{
-    List list1;
-    set_string(list1.append(), "element0");
-    set_string(list1.append(), "element1");
-    List& list2 = *List::cast(list1.append(), 0);
-    set_string(list2.append(), "element3");
-    Dict& dict1 = *Dict::cast(list1.append());
-    set_string(dict1.insert("a"), "element4");
-    set_string(dict1.insert("b"), "element5");
+List g_recentlyDeleted;
 
-    //recursive_dump_heap(&list1, "list1");
+struct Thing
+{
+    GCHeader gcHeader;
+
+    std::string name;
+    Thing* ref;
+
+    Thing() : ref(NULL) {}
+};
+
+void thingListReferences(void* obj, GCReferenceList* refs)
+{
+    Thing* thing = (Thing*) obj;
+    if (thing->ref != NULL)
+        gc_ref_append(refs, &thing->ref->gcHeader);
 }
 
-void test_count_references()
+void releaseThing(void* obj)
 {
-    int myobject;
-    TaggedValue handle;
-    handle_t::set(&handle, &HANDLE_T, &myobject);
-
-    test_assert(count_references_to_pointer(&handle, &myobject) == 1);
-
-    List list;
-    list.resize(3);
-    copy(&handle, list[0]);
-    copy(&handle, list[1]);
-    copy(&handle, list[2]);
-
-    test_assert(count_references_to_pointer(&list, &myobject) == 3);
-    set_null(&list);
-    test_assert(count_references_to_pointer(&list, &myobject) == 0);
-
-    Dict dict;
-    copy(&handle, dict.insert("a"));
-    copy(&handle, dict.insert("b"));
-
-    test_assert(count_references_to_pointer(&dict, &myobject) == 2);
-
-    // Build a tree of depth 3, at each depth there are 4 branches where one is a
-    // nested list and the other 3 are handles, except for the last depth which
-    // is just 4 handles.
-    List tree;
-    TaggedValue* head = &tree;
-    for (int depth=0; depth < 4; depth++) {
-        List& list = *List::cast(head, 4);
-        copy(&handle, list[0]);
-        copy(&handle, list[1]);
-        copy(&handle, list[2]);
-        copy(&handle, list[3]);
-        head = list[3];
-    }
-
-    test_equals(count_references_to_pointer(&tree, &myobject), 13);
+    Thing* thing = (Thing*) obj;
+    set_string(g_recentlyDeleted.append(), thing->name.c_str());
+    delete (Thing*) obj;
 }
 
-void test_count_references_across_eval_context()
+void start_test(Type* type)
 {
-    int myobject;
-    TaggedValue handle;
-    handle_t::set(&handle, &HANDLE_T, &myobject);
+    type->gcListReferences = thingListReferences;
+    type->gcRelease = releaseThing;
 
-    // Copy this handle to various places on Branch
-    {
-        Branch branch;
-        branch.locals.resize(1);
-        copy(&handle, branch.locals[0]);
+    set_list(&g_recentlyDeleted, 0);
+}
 
-        branch.localsStack.resize(1);
-        copy(&handle, branch.localsStack[0]);
+void test_simple()
+{
+    Type type;
+    start_test(&type);
 
-        copy(&handle, &branch.staticErrors);
-        copy(&handle, &branch.pendingUpdates);
+    Thing* a = new Thing();
+    a->name = "test_simple";
+    a->gcHeader.type = &type;
 
-        TaggedValue root;
-        set_transient_value(&root, &branch, &BRANCH_T);
-        test_equals(count_references_to_pointer(&root, &myobject), 4);
-        test_equals(handle_t::refcount(&handle), 5);
-        cleanup_transient_value(&root);
-    }
-    test_equals(handle_t::refcount(&handle), 1);
+    // Register and collect, 'a' will get released.
+    gc_register_new_object(&a->gcHeader);
+    gc_collect();
 
-    // Copy this handle to various places on EvalContext
-    {
-        EvalContext context;
+    test_equals(&g_recentlyDeleted, "['test_simple']");
+}
 
-        copy(&handle, &context.subroutineOutput);
-        Dict& state = *Dict::cast(&context.state);
-        copy(&handle, state.insert("apple"));
-        Dict& currentScopeState = *Dict::cast(&context.currentScopeState);
-        copy(&handle, currentScopeState.insert("banana"));
-        copy(&handle, context.messages.insert("cat"));
+void test_simple_root()
+{
+    Type type;
+    start_test(&type);
 
-        TaggedValue root;
-        set_transient_value(&root, &context, &EVAL_CONTEXT_T);
-        test_equals(count_references_to_pointer(&root, &myobject), 4);
-        test_equals(handle_t::refcount(&handle), 5);
-        cleanup_transient_value(&root);
-    }
-    test_equals(handle_t::refcount(&handle), 1);
+    Thing* a = new Thing();
+    a->name = "test_simple_root";
+    a->gcHeader.type = &type;
+    a->gcHeader.root = true;
+
+    // Register and collect, 'a' will remain because it's a root.
+    gc_register_new_object(&a->gcHeader);
+    gc_collect();
+
+    test_equals(&g_recentlyDeleted, "[]");
+
+    // Clean up the mess..
+    a->gcHeader.root = false;
+    gc_collect();
+    test_equals(&g_recentlyDeleted, "['test_simple_root']");
+}
+
+void test_with_refs()
+{
+    Type type;
+    start_test(&type);
+
+    Thing* thing1 = new Thing();
+    thing1->name = "thing_1";
+    thing1->gcHeader.type = &type;
+    thing1->gcHeader.root = true;
+    gc_register_new_object(&thing1->gcHeader);
+
+    Thing* thing2 = new Thing();
+    thing2->name = "thing_2";
+    thing2->gcHeader.type = &type;
+    gc_register_new_object(&thing2->gcHeader);
+
+    Thing* thing3 = new Thing();
+    thing3->name = "thing_3";
+    thing3->gcHeader.type = &type;
+    gc_register_new_object(&thing3->gcHeader);
+
+    Thing* thing4 = new Thing();
+    thing4->name = "thing_4";
+    thing4->gcHeader.type = &type;
+    gc_register_new_object(&thing4->gcHeader);
+    
+    thing1->ref = thing2;
+    thing2->ref = thing3;
+
+    set_list(&g_recentlyDeleted, 0);
+    gc_collect();
+    test_equals(&g_recentlyDeleted, "['thing_4']");
+
+    thing2->ref = NULL;
+    set_list(&g_recentlyDeleted, 0);
+    gc_collect();
+    test_equals(&g_recentlyDeleted, "['thing_3']");
+
+    thing1->gcHeader.root = false;
+    set_list(&g_recentlyDeleted, 0);
+    gc_collect();
+    test_equals(&g_recentlyDeleted, "['thing_1', 'thing_2']");
+}
+
+void test_with_refs2()
+{
+    Type type;
+    start_test(&type);
+
+    Thing* thing1 = new Thing();
+    thing1->name = "thing_1";
+    thing1->gcHeader.type = &type;
+    thing1->gcHeader.root = true;
+    gc_register_new_object(&thing1->gcHeader);
+
+    Thing* thing2 = new Thing();
+    thing2->name = "thing_2";
+    thing2->gcHeader.type = &type;
+    gc_register_new_object(&thing2->gcHeader);
+
+    Thing* thing3 = new Thing();
+    thing3->name = "thing_3";
+    thing3->gcHeader.type = &type;
+    gc_register_new_object(&thing3->gcHeader);
+
+    Thing* thing4 = new Thing();
+    thing4->name = "thing_4";
+    thing4->gcHeader.type = &type;
+    gc_register_new_object(&thing4->gcHeader);
+    
+    thing1->ref = thing2;
+    thing2->ref = thing3;
+    thing3->ref = thing4;
+
+    gc_collect();
+    test_equals(&g_recentlyDeleted, "[]");
+
+    thing1->gcHeader.root = false;
+    set_list(&g_recentlyDeleted, 0);
+    gc_collect();
+    test_equals(&g_recentlyDeleted, "['thing_1', 'thing_2', 'thing_3', 'thing_4']");
 }
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(gc_tests::test_visit_heap);
-    REGISTER_TEST_CASE(gc_tests::test_count_references);
-    REGISTER_TEST_CASE(gc_tests::test_count_references_across_eval_context);
+    REGISTER_TEST_CASE(gc_tests::test_simple);
+    REGISTER_TEST_CASE(gc_tests::test_simple_root);
+    REGISTER_TEST_CASE(gc_tests::test_with_refs);
+    REGISTER_TEST_CASE(gc_tests::test_with_refs2);
 }
 
 } // namesapce gc_tests

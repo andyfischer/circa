@@ -6,127 +6,119 @@
 
 namespace circa {
 
-void visit_heap(TaggedValue* value, Type::VisitHeapCallback callback,
-        TaggedValue* context)
+// Global GC zone
+GCHeader* g_firstObject = NULL;
+GCHeader* g_lastObject = NULL;
+char g_lastColorUsed = 0;
+
+void gc_register_new_object(GCHeader* obj)
 {
-    Type::VisitHeap func = value->value_type->visitHeap;
-    if (func != NULL)
-        func(value->value_type, value, callback, context);
-}
+    obj->next = NULL;
+    obj->color = 0;
 
-void dump_heap_callback(TaggedValue* value, TaggedValue* relativeIdentifier, TaggedValue* context)
-{
-    std::string prefix = as_string(context);
-
-    std::cout << prefix << relativeIdentifier->toString()
-       << " = " << value->toString() << std::endl;
-
-    set_string(context, prefix + relativeIdentifier->toString() + ".");
-
-    visit_heap(value, dump_heap_callback, context);
-
-    set_string(context, prefix);
-}
-
-void recursive_dump_heap(TaggedValue* value, const char* prefix)
-{
-    TaggedValue context;
-    set_string(&context, std::string(prefix) + ".");
-    visit_heap(value, dump_heap_callback, &context);
-}
-
-void count_references_to_pointer_callback(TaggedValue* value,
-        TaggedValue* relativeIdentifier, TaggedValue* context)
-{
-    if (is_opaque_pointer(value)) {
-        List& contextList = *List::checkCast(context);
-        if (as_opaque_pointer(value) == as_opaque_pointer(contextList[0]))
-            set_int(contextList[1], as_int(contextList[1]) + 1);
+    if (g_firstObject == NULL) {
+        g_firstObject = obj;
+        g_lastObject = obj;
+    } else {
+        ca_assert(g_lastObject->next == NULL);
+        g_lastObject->next = obj;
+        g_lastObject = obj;
     }
-
-    visit_heap(value, count_references_to_pointer_callback, context);
 }
 
-int count_references_to_pointer(TaggedValue* container, void* ptr)
+void gc_collect()
 {
-    List context;
-    context.resize(2);
-    set_opaque_pointer(context[0], ptr);
-    set_int(context[1], 0);
+    char color = 1;
+    if (color == g_lastColorUsed)
+        color = 2;
+    g_lastColorUsed = color;
 
-    visit_heap(container, count_references_to_pointer_callback, &context);
+    GCReferenceList toMark;
 
-    return as_int(context[1]);
-}
-
-void list_references_to_pointer_callback(TaggedValue* value,
-        TaggedValue* relativeIdentifier, TaggedValue* context)
-{
-    List& contextList = *List::checkCast(context);
-
-    List& globalIdentifier = *List::checkCast(contextList[1]);
-    List& resultList = *List::checkCast(contextList[2]);
-
-    copy(relativeIdentifier, globalIdentifier.append());
-    
-    if (is_opaque_pointer(value)) {
-        if (as_opaque_pointer(value) == as_opaque_pointer(contextList[0])) {
-            std::string wholeIdentifierString = globalIdentifier.toString();
-            set_string(resultList.append(), wholeIdentifierString);
+    // First pass: mark roots
+    for (GCHeader* current = g_firstObject; current != NULL; current = current->next) {
+        if (current->root) {
+            current->color = color;
+            current->type->gcListReferences(current, &toMark);
         }
     }
 
-    visit_heap(value, list_references_to_pointer_callback, context);
+    GCReferenceList currentlyMarking;
 
-    globalIdentifier.pop();
-}
+    // Breadth first search to mark remaining things
+    while (toMark.count > 0) {
 
-void list_references_to_pointer(TaggedValue* container, void* ptr,
-        TaggedValue* outputList)
-{
-    List context;
-    context.resize(3);
-    set_opaque_pointer(context[0], ptr);
-    set_list(context[1], 0);
-    swap(outputList, context[2]);
+        gc_ref_list_swap(&toMark, &currentlyMarking);
+        gc_ref_list_reset(&toMark);
 
-    visit_heap(container, list_references_to_pointer_callback, &context);
+        for (int i=0; i < currentlyMarking.count; i++) {
+            GCHeader* object = currentlyMarking.refs[i];
 
-    swap(context[2], outputList);
-}
+            // Skip objs that are already marked
+            if (object->color == color)
+                continue;
 
-void append_to_object_list(ObjectList* list, ObjectListElement* element,
-        ObjectHeader* header)
-{
-    element->obj = header;
+            object->color = color;
+            object->type->gcListReferences(object, &toMark);
+        }
+    }
 
-    if (list->first == NULL) {
-        list->first = element;
-        list->last = element;
-        element->prev = NULL;
-        element->next = NULL;
-        return;
-    } else {
-        list->last->next = element;
-        element->prev = list->last;
-        element->next = NULL;
-        list->last = element;
+    // Last pass: delete unmarked objects
+    GCHeader* previous = NULL;
+    for (GCHeader* current = g_firstObject; current != NULL; ) {
+
+        // Save ->next pointer, in case object is destroyed
+        GCHeader* next = current->next;
+
+        if (current->color != color) {
+
+            // Remove from linked list
+            if (current == g_firstObject) {
+                g_firstObject = current->next;
+            } else {
+                previous->next = current->next;
+            }
+
+            if (current == g_lastObject) {
+                g_lastObject = previous;
+                if (g_lastObject != NULL)
+                    g_lastObject->next = NULL;
+            }
+
+            // Release object
+            if (current->type->gcRelease != NULL)
+                current->type->gcRelease(current);
+        } else {
+            previous = current;
+        }
+
+        current = next;
     }
 }
 
-void remove_from_object_list(ObjectList* list, ObjectListElement* element)
+void gc_ref_append(GCReferenceList* list, GCHeader* item)
 {
-    if (list->first == element)
-        list->first = element->next;
-    if (list->last == element)
-        list->last = element->prev;
-    if (element->prev != NULL)
-        element->prev->next = element->next;
-    if (element->next != NULL)
-        element->next->prev = element->prev;
+    if (item == NULL)
+        return;
 
-    element->next = NULL;
-    element->prev = NULL;
+    list->count += 1;
+    list->refs = (GCHeader**) realloc(list->refs, sizeof(GCHeader*) * list->count);
+    list->refs[list->count - 1] = item;
+}
+
+void gc_ref_list_reset(GCReferenceList* list)
+{
+    list->count = 0;
+}
+
+void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b)
+{
+    int tempCount = a->count;
+    GCHeader** tempRefs = a->refs;
+    a->count = b->count;
+    a->refs = b->refs;
+    b->count = tempCount;
+    b->refs = tempRefs;
 }
 
 } // namespace circa

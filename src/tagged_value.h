@@ -45,6 +45,9 @@ struct TaggedValue
     static TaggedValue fromBool(bool b);
 };
 
+// Call the type's destructor and set this value to null
+void release(TaggedValue* value);
+
 // Full version of cast(). Attempt to cast 'source' to 'type' and store the result
 // in 'dest'. If source has a different type, then we'll ask 'type' how to do this
 // conversion. 'result' stores whether the operation succedded. If 'checkOnly' is

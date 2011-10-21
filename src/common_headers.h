@@ -36,6 +36,7 @@ struct Dict;
 struct EvalContext;
 struct FeedbackOperation;
 struct FunctionAttrs;
+struct GCReferenceList;
 struct List;
 struct RawOutputPrefs;
 struct TermMap;

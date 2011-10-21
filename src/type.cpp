@@ -109,6 +109,8 @@ Type::Type() :
     remapPointers(NULL),
     hashFunc(NULL),
     visitHeap(NULL),
+    gcListReferences(NULL),
+    gcRelease(NULL),
     parent(NULL),
     permanent(false),
     heapAllocated(false)

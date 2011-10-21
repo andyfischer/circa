@@ -71,6 +71,9 @@ struct Type
     typedef void (*VisitHeap)(Type* type, TaggedValue* value,
             VisitHeapCallback callback, TaggedValue* context);
 
+    typedef void (*GCListReferences)(void* object, GCReferenceList* list);
+    typedef void (*GCRelease)(void* object);
+
     // Debugging metadata, this must be the first field.
     HeapTracker _heapTracker;
 
@@ -104,6 +107,9 @@ struct Type
     RemapPointers remapPointers;
     HashFunc hashFunc;
     VisitHeap visitHeap;
+
+    GCListReferences gcListReferences;
+    GCRelease gcRelease;
 
     // Parent type, may be null.
     Type* parent;

@@ -6,35 +6,36 @@
 
 namespace circa {
 
-struct ObjectHeader
+struct GCHeader
 {
-    char debugLabel[4];
-    ObjectHeader(const char* label)
-    {
-        memcpy(&debugLabel, label, 4);
-    };
+    Type *type;
+
+    // Linked list of all GC objects in this zone
+    GCHeader* next;
+
+    // Whether this object is a 'root', meaning that it cannot be collected.
+    bool root;
+
+    // Used during collection
+    char color;
+
+    GCHeader() : type(NULL), root(false) {}
 };
 
-struct ObjectListElement
+struct GCReferenceList
 {
-    ObjectListElement* next;
-    ObjectListElement* prev;
-    ObjectHeader* obj;
+    int count;
+    GCHeader** refs;
+
+    GCReferenceList() : count(0), refs(NULL) {}
+    ~GCReferenceList() { free(refs); }
 };
 
-struct ObjectList
-{
-    ObjectListElement* first;
-    ObjectListElement* last;
-};
+void gc_register_new_object(GCHeader* obj);
+void gc_collect();
 
-void recursive_dump_heap(TaggedValue* value, const char* prefix);
-int count_references_to_pointer(TaggedValue* container, void* ptr);
-void list_references_to_pointer(TaggedValue* container, void* ptr,
-        TaggedValue* outputList);
-
-void append_to_object_list(ObjectList* list, ObjectListElement* element,
-        ObjectHeader* header);
-void remove_from_object_list(ObjectList* list, ObjectListElement* element);
+void gc_ref_append(GCReferenceList* list, GCHeader* item);
+void gc_ref_list_reset(GCReferenceList* list);
+void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b);
 
 } // namespace circa

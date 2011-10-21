@@ -157,6 +157,17 @@ TaggedValue TaggedValue::fromBool(bool b)
     return tv;
 }
 
+void release(TaggedValue* value)
+{
+    if (value->value_type != NULL) {
+        Type::Release release = value->value_type->release;
+        if (release != NULL)
+            release(value->value_type, value);
+    }
+    value->value_type = &NULL_T;
+    value->value_data.ptr = 0;
+}
+
 void cast(CastResult* result, TaggedValue* source, Type* type, TaggedValue* dest, bool checkOnly)
 {
     if (type->cast != NULL) {
@@ -252,6 +263,7 @@ void reset(TaggedValue* value)
     change_type(value, &NULL_T);
     change_type(value, type);
 }
+
 
 std::string to_string(TaggedValue* value)
 {
@@ -367,12 +379,7 @@ void change_type(TaggedValue* v, Type* type)
         return;
 
     // Release old value.
-    if (v->value_type != NULL) {
-        Type::Release release = v->value_type->release;
-        if (release != NULL)
-            release(v->value_type, v);
-    }
-    v->value_data.ptr = 0;
+    release(v);
 
     // Initialize to the new type.
     v->value_type = type;

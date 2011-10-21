@@ -124,10 +124,10 @@ const char* get_output_name_for_input(Term* term, int inputIndex);
 // Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(FunctionAttrs* function);
 
-void function_set_evaluate_func(Term* func, EvaluateFunc func);
+void function_set_evaluate_func(Term* func, EvaluateFunc eval);
 
 // Change the function's EvaluateFunc, and update any terms that are using it.
-void function_set_specialize_type_func(Term* func, SpecializeTypeFunc func);
+void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeType);
 
 void function_format_header_source(StyledSource* source, FunctionAttrs* func);
 
