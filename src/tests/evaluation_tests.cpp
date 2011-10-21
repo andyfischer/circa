@@ -28,8 +28,6 @@ void test_evaluate_minimum()
     TaggedValue result;
     evaluate_minimum(&context, d, &result);
 
-    test_equals(get_local(a), "1");
-    test_equals(get_local(b), "2");
     test_equals(get_local(c), "null");
     test_equals(get_local(d), "-1");
 

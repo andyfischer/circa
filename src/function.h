@@ -32,7 +32,9 @@ struct FunctionAttrs
     int outputCount;
 
     // Functions
+    SimpleEvaluateFunc simpleEvaluate;
     EvaluateFunc evaluate;
+    
     SpecializeTypeFunc specializeType;
     FormatSource formatSource;
     CheckInvariants checkInvariants;

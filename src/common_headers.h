@@ -62,6 +62,7 @@ union VariantValue {
 #define CA_FUNCTION(fname) \
     void fname(circa::EvalContext* _context, circa::Term* _caller)
 
+typedef void (*SimpleEvaluateFunc)(List* args);
 typedef void (*EvaluateFunc)(EvalContext* cxt, Term* caller);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);

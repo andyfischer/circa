@@ -24,6 +24,7 @@ FunctionAttrs::FunctionAttrs()
     feedbackFunc(NULL),
     throws(false),
     outputCount(1),
+    simpleEvaluate(NULL),
     evaluate(NULL),
     specializeType(NULL),
     formatSource(NULL),

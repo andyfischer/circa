@@ -170,7 +170,6 @@ void post_initialize_primitive_types(Branch& kernel)
 
     FunctionAttrs* attrs = get_function_attrs(VALUE_FUNC);
     set_type_list(&attrs->outputTypes, &ANY_T);
-    attrs->evaluate = value_function::evaluate;
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);
 }
