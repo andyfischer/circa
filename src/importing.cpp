@@ -36,6 +36,12 @@ void install_function(Term* function, EvaluateFunc evaluate)
     get_function_attrs(function)->evaluate = evaluate;
 }
 
+void install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
+{
+    Term* term = find_name(branch, name);
+    get_function_attrs(term)->evaluate = evaluate;
+}
+
 Term* import_type(Branch* branch, Type* type)
 {
     if (type->name == "")

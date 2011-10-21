@@ -163,6 +163,8 @@ Branch* include_script(Branch* branch, const char* filename);
 // branch.
 Branch* load_script_term(Branch* branch, const char* filename);
 
+void save_script(Branch* branch);
+
 Term* find_term_by_id(Branch* branch, unsigned int id);
 
 void persist_branch_to_file(Branch* branch);

@@ -21,6 +21,7 @@ Term* import_function(Branch* branch, EvaluateFunc func, std::string const& head
 
 // Install an evaluate function into an existing function object.
 void install_function(Term* function, EvaluateFunc evaluate);
+void install_function(Branch* branch, const char* name, EvaluateFunc evaluate);
 
 Term* import_type(Branch* branch, Type* type);
 

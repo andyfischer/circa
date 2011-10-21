@@ -587,6 +587,15 @@ Branch* load_script_term(Branch* branch, const char* filename)
     post_compile_term(includeFunc);
     return nested_contents(includeFunc);
 }
+void save_script(Branch* branch)
+{
+    std::string text = get_branch_source_text(branch);
+    List* fileOrigin = branch_get_file_origin(branch);
+    if (fileOrigin == NULL)
+        return;
+
+    write_text_file(as_cstring(fileOrigin->get(1)), text.c_str());
+}
 
 void persist_branch_to_file(Branch* branch)
 {

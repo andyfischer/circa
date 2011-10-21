@@ -131,8 +131,8 @@ CA_FUNCTION(viewport__mouse)
 void viewport_static_setup(Branch* branch)
 {
     viewport_t.initialize(branch, "Viewport");
-    install_function(branch, create_window, "create_window");
-    install_function(branch, Viewport__resize, "Viewport.resize");
-    install_function(branch, viewport__mouse, "viewport:mouse");
-    install_function(branch, viewport__size, "viewport:size");
+    install_function(branch, "create_window", create_window);
+    install_function(branch, "Viewport.resize", Viewport__resize);
+    install_function(branch, "viewport:mouse", viewport__mouse);
+    install_function(branch, "viewport:size", viewport__size);
 }

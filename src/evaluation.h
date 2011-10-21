@@ -48,6 +48,9 @@ struct EvalContext
     // Current stack of in-progress terms. Used for introspection.
     TermList callStack;
 
+    // List of values that are being passed from the EvalContext owner to the script.
+    List argumentList;
+
     EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
 };
 
