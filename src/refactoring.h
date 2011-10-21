@@ -6,10 +6,6 @@
 
 namespace circa {
 
-// Used in change_function, find the correct EvaluateFunc for this term.
-EvaluateFunc derive_evaluate_func(Term* term);
-void update_cached_evaluate_func(Term* term);
-
 // Change this term to have the given function
 void change_function(Term* term, Term* newFunction);
 

@@ -22,7 +22,6 @@ Term::Term()
   : weakPtr(0),
     type(NULL),
     function(NULL),
-    evaluateFunc(empty_evaluate_function),
     owningBranch(NULL),
     index(0),
     localsIndex(0),

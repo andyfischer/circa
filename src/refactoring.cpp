@@ -16,25 +16,6 @@
 
 namespace circa {
 
-EvaluateFunc derive_evaluate_func(Term* term)
-{
-    if (!FINISHED_BOOTSTRAP && term->function == VALUE_FUNC)
-        return value_function::evaluate;
-
-    if (term->function == NULL)
-        return empty_evaluate_function;
-
-    if (!is_function(term->function))
-        return empty_evaluate_function;
-
-    return get_function_attrs(term->function)->evaluate;
-}
-
-void update_cached_evaluate_func(Term* term)
-{
-    term->evaluateFunc = derive_evaluate_func(term);
-}
-
 void change_function(Term* term, Term* function)
 {
     if (term->function == function)
@@ -43,8 +24,6 @@ void change_function(Term* term, Term* function)
     Term* previousFunction = term->function;
 
     term->function = function;
-
-    update_cached_evaluate_func(term);
 
     possibly_prune_user_list(term, previousFunction);
     respecialize_type(term);

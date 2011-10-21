@@ -15,7 +15,6 @@ namespace dynamic_call_function {
         Term temporaryTerm;
         temporaryTerm.function = function;
         temporaryTerm.type = CALLER->type;
-        update_cached_evaluate_func(&temporaryTerm);
 
         List* stack = &CONTEXT->stack;
         List* frame = List::cast(stack->append(), 0);

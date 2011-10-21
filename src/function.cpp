@@ -434,11 +434,11 @@ bool is_native_function(FunctionAttrs* func)
     return func->evaluate != evaluate_subroutine;
 }
 
-void function_set_evaluate_func(Term* func, EvaluateFunc evaluateFunc)
+void function_set_evaluate_func(Term* function, EvaluateFunc evaluate)
 {
-    get_function_attrs(func)->evaluate = evaluateFunc;
-    on_evaluate_function_changed(func);
+    get_function_attrs(function)->evaluate = evaluate;
 }
+
 void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specializeFunc)
 {
     get_function_attrs(func)->specializeType = specializeFunc;

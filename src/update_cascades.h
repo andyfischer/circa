@@ -26,7 +26,4 @@ void recursively_finish_update_cascade(Branch& branch);
 
 void on_inputs_changed(Term* term);
 
-// Called when a function's EvaluateFunc changes.
-void on_evaluate_function_changed(Term* function);
-
 } // namespace circa

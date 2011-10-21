@@ -27,7 +27,16 @@ void evaluate_single_term(EvalContext* context, Term* term)
     try {
     #endif
 
-    term->evaluateFunc(context, term);
+    if (term->function == NULL)
+        return;
+
+    FunctionAttrs* function = get_function_attrs(term->function);
+
+    if (function == NULL)
+        return;
+
+    if (function->evaluate != NULL)
+        function->evaluate(context, term);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
