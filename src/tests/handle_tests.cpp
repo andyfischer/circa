@@ -240,7 +240,7 @@ struct MyType
 
 void test_user_defined_type()
 {
-    Type* type = Type::create();
+    Type* type = create_type();
     handle_t::setup_type<MyType>(type);
 
     // Create a value and then free it.

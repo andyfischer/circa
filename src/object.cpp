@@ -11,6 +11,8 @@ void register_new_object(CircaObject* obj, Type* type, bool permanent)
 {
     CircaObject* header = (CircaObject*) obj;
 
+    ca_assert(type != NULL);
+
     obj->type = type;
     obj->next = NULL;
     obj->prev = NULL;

@@ -147,7 +147,7 @@ void statically_infer_result(Term* term, TaggedValue* result)
 
 Type* create_typed_unsized_list_type(Type* elementType)
 {
-    Type* type = Type::create();
+    Type* type = create_type();
     list_t::setup_type(type);
     set_type(&type->parameter, elementType);
     type->name = std::string("List<") + elementType->name + ">";

@@ -7,31 +7,26 @@
 
 namespace circa {
 
-const int c_maxPermanentTypes = 5000;
-Type* g_everyPermanentType[c_maxPermanentTypes];
-int g_numPermanentTypes = 0;
-
 Term* IMPLICIT_TYPES = NULL;
 
 namespace type_t {
 
     void initialize(Type*, TaggedValue* value)
     {
-        Type* type = Type::create();
+        Type* type = create_type();
         set_pointer(value, type);
     }
     void release(Type*, TaggedValue* value)
     {
         ca_assert(is_type(value));
         Type* type = (Type*) get_pointer(value);
-        release_type(type);
+        set_object_permanent((CircaObject*) type, false);
     }
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_type(source));
         change_type_no_initialize(dest, type);
         dest->value_data = source->value_data;
-        register_type_pointer(dest, (Type*) get_pointer(source));
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -109,9 +104,7 @@ Type::Type() :
     visitHeap(NULL),
     gcListReferences(NULL),
     gcRelease(NULL),
-    parent(NULL),
-    permanent(false),
-    heapAllocated(false)
+    parent(NULL)
 {
     // Register ourselves. Start out as 'permanent'.
     register_new_object((CircaObject*) this, &TYPE_T, true);
@@ -122,55 +115,11 @@ Type::~Type()
     on_object_deleted((CircaObject*) this);
 }
 
-Type* Type::create()
-{
-    Type* t = new Type();
-    t->heapAllocated = true;
-    return t;
-}
-
 Type* declared_type(Term* term)
 {
     if (term->type == NULL)
         return NULL;
     return term->type;
-}
-
-void register_type_pointer(void* owner, Type* pointee)
-{
-    // This is placeholder until our memory management becomes more sophisticated.
-    // Currently, if a type is used by anyone then it becomes permanent and is
-    // never deallocated.
-
-    ca_assert(pointee != NULL);
-
-    if (!pointee->permanent) {
-        pointee->permanent = true;
-
-        if (pointee->heapAllocated) {
-            ca_assert(g_numPermanentTypes < c_maxPermanentTypes);
-            g_everyPermanentType[g_numPermanentTypes++] = pointee;
-        }
-    }
-}
-
-void release_type(Type* type)
-{
-    if (type != NULL && !type->permanent)
-        delete type;
-}
-
-void clear_contents_of_every_permanent_type()
-{
-    for (int i=0; i < g_numPermanentTypes; i++)
-        clear_type_contents(g_everyPermanentType[i]);
-}
-
-void delete_every_permanent_type()
-{
-    for (int i=0; i < g_numPermanentTypes; i++)
-        delete g_everyPermanentType[i];
-    g_numPermanentTypes = 0;
 }
 
 Type* get_output_type(Term* term, int outputIndex)
@@ -206,6 +155,13 @@ Type* get_type_of_input(Term* term, int inputIndex)
         return NULL;
     int outputIndex = term->inputInfo(inputIndex)->outputIndex;
     return get_output_type(term->input(inputIndex), outputIndex);
+}
+
+Type* create_type()
+{
+    Type* t = new Type();
+    set_object_permanent((CircaObject*) t, false);
+    return t;
 }
 
 Type* unbox_type(Term* term)
@@ -351,7 +307,6 @@ Term* create_tuple_type(List* types)
     list_t::setup_type(unbox_type(result));
 
     unbox_type(result)->parent = &LIST_T;
-    register_type_pointer(unbox_type(result), &LIST_T);
 
     List& parameter = *set_list(&unbox_type(result)->parameter, types->length());
 

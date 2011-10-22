@@ -388,15 +388,12 @@ void change_type(TaggedValue* v, Type* type)
         Type::Initialize initialize = type->initialize;
         if (initialize != NULL)
             initialize(type, v);
-
-        register_type_pointer(v, type);
     }
 }
 
 void change_type_no_initialize(TaggedValue* v, Type* t)
 {
     set_null(v);
-    register_type_pointer(v, t);
     v->value_type = t;
 }
 
@@ -487,7 +484,6 @@ void set_type(TaggedValue* value, Type* type)
     set_null(value);
     value->value_type = &TYPE_T;
     value->value_data.ptr = type;
-    register_type_pointer(value, type);
 }
 
 void set_function_pointer(TaggedValue* value, Term* function)

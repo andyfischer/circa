@@ -33,7 +33,7 @@ void test_import_c()
 
 void test_import_type()
 {
-    Type* type = Type::create();
+    Type* type = create_type();
     Branch branch;
 
     type->name = "A";
@@ -41,8 +41,6 @@ void test_import_type()
     Term* term = import_type(&branch, type);
     test_assert(term->type->name == "Type");
     test_assert(term->name == "A");
-
-    release_type(type);
 }
 
 void register_tests()

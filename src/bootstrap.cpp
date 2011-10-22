@@ -11,6 +11,7 @@
 #include "function.h"
 #include "heap_debugging.h"
 #include "importing.h"
+#include "gc.h"
 #include "locals.h"
 #include "parser.h"
 #include "refactoring.h"
@@ -318,10 +319,9 @@ export_func void circa_shutdown()
     clear_type_contents(&STRING_T);
     clear_type_contents(&TYPE_T);
     clear_type_contents(&VOID_T);
-    clear_contents_of_every_permanent_type();
+
+    gc_collect();
 
     delete KERNEL;
     KERNEL = NULL;
-
-    delete_every_permanent_type();
 }

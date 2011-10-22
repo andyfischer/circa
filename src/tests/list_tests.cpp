@@ -142,7 +142,7 @@ void test_remove_index()
 
 void test_tagged_value()
 {
-    Type* list = Type::create();
+    Type* list = create_type();
     list_t::setup_type(list);
 
     TaggedValue value;
@@ -164,7 +164,7 @@ void test_tagged_value()
 
 void test_tagged_value_copy()
 {
-    Type* list = Type::create();
+    Type* list = create_type();
     list_t::setup_type(list);
 
     TaggedValue value(list);
@@ -189,7 +189,7 @@ void test_tagged_value_copy()
 
 void test_touch()
 {
-    Type* list = Type::create();
+    Type* list = create_type();
     list_t::setup_type(list);
 
     TaggedValue value(list);
@@ -209,7 +209,7 @@ void test_touch()
 
 void test_prepend()
 {
-    Type* list = Type::create();
+    Type* list = create_type();
     list_t::setup_type(list);
 
     TaggedValue value(list);

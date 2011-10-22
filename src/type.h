@@ -118,13 +118,8 @@ struct Type
     // Type parameters
     TaggedValue parameter;
 
-    bool permanent;
-    bool heapAllocated;
-
     Type();
     ~Type();
-
-    static Type* create();
 };
 
 struct StaticTypeQuery
@@ -172,17 +167,12 @@ namespace type_t {
     Type::RemapPointers& get_remap_pointers_func(Term* type);
 } // namespace type_t
 
+// Create a collectable type instance.
+Type* create_type();
+
 Type* unbox_type(Term* type);
 Type* unbox_type(TaggedValue* val);
 Type* declared_type(Term* term);
-
-void register_type_pointer(void* referrer, Type* referee);
-void release_type(Type* type);
-
-// Called during shutdown to delete all the Type object in permanent state. This
-// makes memory-leak checking tools happy.
-void clear_contents_of_every_permanent_type();
-void delete_every_permanent_type();
 
 Type* get_output_type(Term* term, int outputIndex);
 Type* get_output_type(Term* term);
