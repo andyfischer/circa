@@ -16,6 +16,10 @@ struct GCReferenceList
     ~GCReferenceList() { free(refs); }
 };
 
+// Remove object from the global object list. If the object owner wants to delete
+// this object outside of garbage collection, they should call this.
+void gc_on_object_deleted(CircaObject* obj);
+
 void gc_collect();
 
 // Add object to the global list. Should call this on object creation.

@@ -14,16 +14,38 @@ CircaObject* g_lastObject = NULL;
 void gc_register_object(CircaObject* obj)
 {
     ca_assert(obj->next == NULL);
+    ca_assert(obj->prev == NULL);
 
     if (g_firstObject == NULL) {
         g_firstObject = obj;
         g_lastObject = obj;
     } else {
         ca_assert(g_lastObject->next == NULL);
+        obj->prev = g_lastObject;
         g_lastObject->next = obj;
         g_lastObject = obj;
     }
 }
+
+void gc_on_object_deleted(CircaObject* obj)
+{
+    if (obj->next != NULL)
+        obj->next->prev = obj->prev;
+    if (obj->prev != NULL)
+        obj->prev->next = obj->next;
+
+    // Check if 'obj' was first object
+    if (obj == g_firstObject)
+        g_firstObject = obj->next;
+
+    // Check if 'obj' was last object
+    if (obj == g_lastObject)
+        g_lastObject = obj->prev;
+
+    obj->next = NULL;
+    obj->prev = NULL;
+}
+
 
 void gc_collect()
 {
@@ -64,32 +86,19 @@ void gc_collect()
     }
 
     // Last pass: delete unmarked objects.
-    CircaObject* previous = NULL;
     for (CircaObject* current = g_firstObject; current != NULL; ) {
 
-        // Save ->next pointer, in case object is destroyed
+        // Save 'next' pointer, in case the object is destroyed
         CircaObject* next = current->next;
 
         if (current->gcColor != color) {
 
-            // Remove from linked list
-            if (current == g_firstObject) {
-                g_firstObject = current->next;
-            } else {
-                previous->next = current->next;
-            }
-
-            if (current == g_lastObject) {
-                g_lastObject = previous;
-                if (g_lastObject != NULL)
-                    g_lastObject->next = NULL;
-            }
+            // Remove from linked list. This will nullify 'next' and 'prev'.
+            gc_on_object_deleted(current);
 
             // Release object
             if (current->type->gcRelease != NULL)
                 current->type->gcRelease(current);
-        } else {
-            previous = current;
         }
 
         current = next;

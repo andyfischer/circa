@@ -9,6 +9,7 @@
 #include "branch.h"
 #include "bootstrap.h"
 #include "heap_debugging.h"
+#include "object.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
@@ -74,8 +75,8 @@ struct Type
     typedef void (*GCListReferences)(void* object, GCReferenceList* list);
     typedef void (*GCRelease)(void* object);
 
-    // Debugging metadata, this must be the first field.
-    HeapTracker _heapTracker;
+    // CircaObject header, must be the first field.
+    CircaObject header;
 
     std::string name;
 

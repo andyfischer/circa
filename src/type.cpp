@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "heap_debugging.h"
 #include "importing_macros.h"
 
 namespace circa {
@@ -85,7 +84,6 @@ namespace type_t {
 } // namespace type_t
 
 Type::Type() :
-    _heapTracker(TYPE_OBJECT),
     name(""),
     storageType(STORAGE_TYPE_NULL),
     cppTypeInfo(NULL),

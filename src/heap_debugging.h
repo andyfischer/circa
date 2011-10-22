@@ -12,7 +12,6 @@ const int TERM_OBJECT =           0x1;
 const int LIST_OBJECT =           0x2;
 const int BRANCH_OBJECT =         0x4;
 const int FUNCTION_ATTRS_OBJECT = 0x8;
-const int TYPE_OBJECT =           0x10;
 const int TAGGED_VALUE_OBJECT =   0x20;
 
 struct HeapEntry

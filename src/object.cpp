@@ -7,13 +7,14 @@
 
 namespace circa {
 
-void register_new_object(CircaObject* obj, Type* type)
+void register_new_object(CircaObject* obj, Type* type, bool permanent)
 {
     CircaObject* header = (CircaObject*) obj;
 
     obj->type = type;
     obj->next = NULL;
-    obj->permanent = false;
+    obj->prev = NULL;
+    obj->permanent = permanent;
     obj->gcColor = 0;
     gc_register_object(header);
 }

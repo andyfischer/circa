@@ -49,7 +49,7 @@ void test_simple()
     a->name = "test_simple";
 
     // Register and collect, 'a' will get released.
-    register_new_object(a, &type);
+    register_new_object(a, &type, false);
     gc_collect();
 
     test_equals(&g_recentlyDeleted, "['test_simple']");
@@ -63,9 +63,8 @@ void test_simple_root()
     Thing* a = new Thing();
     a->name = "test_simple_root";
 
-    // Register and collect, 'a' will remain because it's a root.
-    register_new_object(a, &type);
-    set_object_permanent(a, true);
+    // Register and collect, 'a' will remain because it's permanent.
+    register_new_object(a, &type, true);
     gc_collect();
 
     test_equals(&g_recentlyDeleted, "[]");
@@ -83,20 +82,19 @@ void test_with_refs()
 
     Thing* thing1 = new Thing();
     thing1->name = "thing_1";
-    register_new_object(thing1, &type);
-    set_object_permanent(thing1, true);
+    register_new_object(thing1, &type, true);
 
     Thing* thing2 = new Thing();
     thing2->name = "thing_2";
-    register_new_object(thing2, &type);
+    register_new_object(thing2, &type, false);
 
     Thing* thing3 = new Thing();
     thing3->name = "thing_3";
-    register_new_object(thing3, &type);
+    register_new_object(thing3, &type, false);
 
     Thing* thing4 = new Thing();
     thing4->name = "thing_4";
-    register_new_object(thing4, &type);
+    register_new_object(thing4, &type, false);
     
     thing1->ref = thing2;
     thing2->ref = thing3;
@@ -123,20 +121,19 @@ void test_with_refs2()
 
     Thing* thing1 = new Thing();
     thing1->name = "thing_1";
-    register_new_object(thing1, &type);
-    set_object_permanent(thing1, true);
+    register_new_object(thing1, &type, true);
 
     Thing* thing2 = new Thing();
     thing2->name = "thing_2";
-    register_new_object(thing2, &type);
+    register_new_object(thing2, &type, false);
 
     Thing* thing3 = new Thing();
     thing3->name = "thing_3";
-    register_new_object(thing3, &type);
+    register_new_object(thing3, &type, false);
 
     Thing* thing4 = new Thing();
     thing4->name = "thing_4";
-    register_new_object(thing4, &type);
+    register_new_object(thing4, &type, false);
     
     thing1->ref = thing2;
     thing2->ref = thing3;

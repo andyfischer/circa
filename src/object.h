@@ -9,6 +9,7 @@ struct CircaObject
     Type* type;
 
     CircaObject* next;
+    CircaObject* prev;
 
     // if 'permanent' is true then this object can't be garbage collected.
     bool permanent;
@@ -17,7 +18,7 @@ struct CircaObject
     char gcColor;
 };
 
-void register_new_object(CircaObject* obj, Type* type);
+void register_new_object(CircaObject* obj, Type* type, bool permanent);
 void set_object_permanent(CircaObject* obj, bool permanent);
 
 } // namespace circa
