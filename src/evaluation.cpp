@@ -30,7 +30,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (term->function == NULL)
         return;
 
-    FunctionAttrs* function = get_function_attrs(term->function);
+    Function* function = get_function_attrs(term->function);
 
     if (function == NULL)
         return;

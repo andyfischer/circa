@@ -116,11 +116,11 @@ void recursively_finish_update_cascade(Branch* branch)
 void on_inputs_changed(Term* term)
 {
     // Update function pointer
-    FunctionAttrs* attrs = get_function_attrs(term->function);
+    Function* attrs = get_function_attrs(term->function);
     if (attrs == NULL)
         return;
 
-    FunctionAttrs::PostInputChange func = attrs->postInputChange;
+    Function::PostInputChange func = attrs->postInputChange;
 
     if (func)
         func(term);

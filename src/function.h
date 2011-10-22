@@ -10,7 +10,7 @@
 
 namespace circa {
 
-struct FunctionAttrs
+struct Function
 {
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
     typedef void (*PostInputChange)(Term*);
@@ -48,8 +48,8 @@ struct FunctionAttrs
 
     List parameters;
 
-    FunctionAttrs();
-    ~FunctionAttrs();
+    Function();
+    ~Function();
 };
 
 namespace function_attrs_t {
@@ -68,10 +68,10 @@ namespace function_t {
 
 bool is_function(Term* term);
 bool is_function_attrs(Term* term);
-FunctionAttrs& as_function_attrs(Term* term);
+Function& as_function_attrs(Term* term);
 Branch* function_contents(Term* func);
-Branch* function_contents(FunctionAttrs* func);
-FunctionAttrs* get_function_attrs(Term* func);
+Branch* function_contents(Function* func);
+Function* get_function_attrs(Term* func);
 
 // Return the placeholder name for the given input index; this is the name that
 // is used if no name is given.
@@ -104,31 +104,31 @@ bool function_call_rebinds_input(Term* term, int index);
 
 Type* function_get_input_type(Term* function, int index);
 Type* function_get_output_type(Term* function, int index);
-Type* function_get_input_type(FunctionAttrs* func, int index);
-Type* function_get_output_type(FunctionAttrs* func, int index);
-int function_num_inputs(FunctionAttrs* func);
+Type* function_get_input_type(Function* func, int index);
+Type* function_get_output_type(Function* func, int index);
+int function_num_inputs(Function* func);
 
-bool function_is_state_input(FunctionAttrs* func, int index);
-bool function_get_input_meta(FunctionAttrs* func, int index);
-bool function_get_input_optional(FunctionAttrs* func, int index);
+bool function_is_state_input(Function* func, int index);
+bool function_get_input_meta(Function* func, int index);
+bool function_get_input_optional(Function* func, int index);
 
-Term* function_get_input_placeholder(FunctionAttrs* func, int index);
-Branch* function_get_contents(FunctionAttrs* func);
-std::string function_get_input_name(FunctionAttrs* func, int index);
+Term* function_get_input_placeholder(Function* func, int index);
+Branch* function_get_contents(Function* func);
+std::string function_get_input_name(Function* func, int index);
 
-std::string function_get_documentation_string(FunctionAttrs* func);
+std::string function_get_documentation_string(Function* func);
 
 const char* get_output_name(Term* term, int outputIndex);
 const char* get_output_name_for_input(Term* term, int inputIndex);
 
 // Returns whether this function is 'native', meaning that it's not a subroutine.
-bool is_native_function(FunctionAttrs* function);
+bool is_native_function(Function* function);
 
 void function_set_evaluate_func(Term* func, EvaluateFunc eval);
 
 // Change the function's EvaluateFunc, and update any terms that are using it.
 void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeType);
 
-void function_format_header_source(StyledSource* source, FunctionAttrs* func);
+void function_format_header_source(StyledSource* source, Function* func);
 
 } // namespace circa

@@ -437,11 +437,11 @@ void post_compile_term(Term* term)
     if (term->function == NULL)
         return;
 
-    FunctionAttrs* attrs = get_function_attrs(term->function);
+    Function* attrs = get_function_attrs(term->function);
     if (attrs == NULL)
         return;
 
-    FunctionAttrs::PostCompile func = attrs->postCompile;
+    Function::PostCompile func = attrs->postCompile;
 
     if (func != NULL) {
         func(term);

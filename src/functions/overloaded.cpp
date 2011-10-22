@@ -44,7 +44,7 @@ namespace overloaded_function {
     {
         Branch* contents = nested_contents(CALLER);
         Term* func = CALLER->function;
-        FunctionAttrs* funcAttrs = get_function_attrs(func);
+        Function* funcAttrs = get_function_attrs(func);
 
         List& overloads = get_function_attrs(func)->parameters;
 
@@ -171,7 +171,7 @@ namespace overloaded_function {
         for (int i=0; i < parameters.length(); i++) {
 
             Term* overload = as_ref(parameters[i]);
-            FunctionAttrs* overloadAttrs = get_function_attrs(overload);
+            Function* overloadAttrs = get_function_attrs(overload);
 
             if (argumentCount != function_num_inputs(overloadAttrs))
                 variableArgs = true;
@@ -186,7 +186,7 @@ namespace overloaded_function {
         for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
         Type* outputType = find_common_type(&outputTypes);
-        FunctionAttrs* attrs = get_function_attrs(term);
+        Function* attrs = get_function_attrs(term);
         set_type_list(&attrs->outputTypes, outputType);
         attrs->variableArgs = variableArgs;
     }
@@ -197,7 +197,7 @@ namespace overloaded_function {
         nested_contents(term);
         initialize_function(term);
 
-        FunctionAttrs* attrs = get_function_attrs(term);
+        Function* attrs = get_function_attrs(term);
         attrs->name = name;
         attrs->evaluate = evaluate_overload;
         attrs->postInputChange = overload_post_input_change;

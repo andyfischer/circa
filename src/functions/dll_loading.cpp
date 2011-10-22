@@ -46,7 +46,7 @@ namespace dll_loading_function {
             if (!is_function(ref))
                 continue;
 
-            FunctionAttrs* attrs = get_function_attrs(ref);
+            Function* attrs = get_function_attrs(ref);
 
             if (dll->loadedFunctions.find((void*) attrs->evaluate) != dll->loadedFunctions.end())
                 attrs->evaluate = empty_evaluate_function;

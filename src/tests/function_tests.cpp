@@ -13,7 +13,7 @@ void create()
     Branch branch;
 
     Term* func = branch.eval("def mysub(int) -> string;");
-    FunctionAttrs* attrs = get_function_attrs(func);
+    Function* attrs = get_function_attrs(func);
 
     test_assert(func);
     test_assert(is_subroutine(func));

@@ -158,7 +158,7 @@ void test_function_decl()
             "  whathey = concat(what,hey)\n"
             "  return(yo > 3)\n");
 
-    FunctionAttrs* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = get_function_attrs(func);
 
     test_equals(func->name, "Myfunc");
     test_equals(funcAttrs->name, "Myfunc");

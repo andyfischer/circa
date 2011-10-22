@@ -36,7 +36,7 @@ struct CircaObject;
 struct Dict;
 struct EvalContext;
 struct FeedbackOperation;
-struct FunctionAttrs;
+struct Function;
 struct GCReferenceList;
 struct List;
 struct RawOutputPrefs;

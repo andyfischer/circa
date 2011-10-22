@@ -37,7 +37,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
 {
     int effectiveIndex = index;
 
-    FunctionAttrs* func = get_function_attrs(term->function);
+    Function* func = get_function_attrs(term->function);
 
     if (func->variableArgs)
         effectiveIndex = 0;
@@ -64,7 +64,7 @@ void check_term_for_static_error(List* errors, Term* term)
     if (term->function == NULL)
         return append_static_error(errors, term, "null_function");
 
-    FunctionAttrs* func = get_function_attrs(term->function);
+    Function* func = get_function_attrs(term->function);
 
     if (func == NULL)
         return append_static_error(errors, term, "not_a_function");

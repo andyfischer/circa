@@ -119,12 +119,12 @@ void bootstrap_kernel()
     any_t::setup_type(&ANY_T);
     KERNEL->bindName(ANY_TYPE, "any");
 
-    // Create FunctionAttrs type
-    FUNCTION_ATTRS_T.name = "FunctionAttrs";
+    // Create Function type
+    FUNCTION_ATTRS_T.name = "Function";
     FUNCTION_ATTRS_T.initialize = function_attrs_t::initialize;
     FUNCTION_ATTRS_T.copy = function_attrs_t::copy;
     FUNCTION_ATTRS_T.release = function_attrs_t::release;
-    FUNCTION_ATTRS_TYPE = create_type_value(KERNEL, &FUNCTION_ATTRS_T, "FunctionAttrs");
+    FUNCTION_ATTRS_TYPE = create_type_value(KERNEL, &FUNCTION_ATTRS_T, "Function");
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
@@ -169,7 +169,7 @@ void post_initialize_primitive_types(Branch* kernel)
     // Properly setup value() func
     initialize_function(VALUE_FUNC);
 
-    FunctionAttrs* attrs = get_function_attrs(VALUE_FUNC);
+    Function* attrs = get_function_attrs(VALUE_FUNC);
     set_type_list(&attrs->outputTypes, &ANY_T);
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);

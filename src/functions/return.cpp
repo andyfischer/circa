@@ -58,7 +58,7 @@ namespace return_function {
 
             // Check for extra outputs, if found then include their results in this output
 
-            FunctionAttrs* subAttrs = get_function_attrs(sub);
+            Function* subAttrs = get_function_attrs(sub);
 
             int numInputs = function_num_inputs(subAttrs);
             for (int i=0; i < numInputs; i++) {

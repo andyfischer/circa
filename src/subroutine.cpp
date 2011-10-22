@@ -28,7 +28,7 @@ namespace subroutine_f {
     {
         append_phrase(source, "def ", term, token::DEF);
 
-        FunctionAttrs* func = get_function_attrs(term);
+        Function* func = get_function_attrs(term);
 
         function_format_header_source(source, func);
 
@@ -227,7 +227,7 @@ void subroutine_update_state_type_from_contents(Term* func)
 
 void subroutine_change_state_type(Term* func, Term* newType)
 {
-    FunctionAttrs* attrs = get_function_attrs(func);
+    Function* attrs = get_function_attrs(func);
     Term* previousType = attrs->implicitStateType;
     if (previousType == newType)
         return;

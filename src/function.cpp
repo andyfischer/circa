@@ -17,7 +17,7 @@
 
 namespace circa {
 
-FunctionAttrs::FunctionAttrs()
+Function::Function()
   : declaringTerm(NULL),
     implicitStateType(NULL),
     variableArgs(false),
@@ -40,7 +40,7 @@ FunctionAttrs::FunctionAttrs()
     debug_register_valid_object(this, FUNCTION_ATTRS_OBJECT);
 }
 
-FunctionAttrs::~FunctionAttrs()
+Function::~Function()
 {
     debug_unregister_valid_object(this, FUNCTION_ATTRS_OBJECT);
 }
@@ -49,19 +49,19 @@ namespace function_attrs_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
-        FunctionAttrs* attrs = new FunctionAttrs();
+        Function* attrs = new Function();
         set_pointer(value, type, attrs);
     }
 
     void release(Type*, TaggedValue* value)
     {
-        delete (FunctionAttrs*) get_pointer(value);
+        delete (Function*) get_pointer(value);
     }
 
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         change_type(dest, type);
-        *((FunctionAttrs*) get_pointer(dest)) = *((FunctionAttrs*) get_pointer(source));
+        *((Function*) get_pointer(dest)) = *((Function*) get_pointer(source));
     }
 
 } // namespace function_attrs_t
@@ -89,11 +89,11 @@ bool is_function_attrs(Term* term)
     return term->type == &FUNCTION_ATTRS_T;
 }
 
-FunctionAttrs& as_function_attrs(Term* term)
+Function& as_function_attrs(Term* term)
 {
     ca_assert(is_function_attrs(term));
     ca_assert(get_pointer(term) != NULL);
-    return *((FunctionAttrs*) get_pointer(term));
+    return *((Function*) get_pointer(term));
 }
 
 Branch* function_contents(Term* func)
@@ -101,12 +101,12 @@ Branch* function_contents(Term* func)
     return nested_contents(func);
 }
 
-Branch* function_contents(FunctionAttrs* func)
+Branch* function_contents(Function* func)
 {
     return nested_contents(func->declaringTerm);
 }
 
-FunctionAttrs* get_function_attrs(Term* func)
+Function* get_function_attrs(Term* func)
 {
     if (func == NULL)
         return NULL;
@@ -128,7 +128,7 @@ void initialize_function(Term* func)
 {
     /* A function has a branch with the following structures:
       {
-        [0] FunctionAttrs #attributes
+        [0] Function #attributes
         [1..num_inputs] input terms
             .. each might have bool property 'modified' or 'meta'
         [...] function body
@@ -153,7 +153,7 @@ void finish_parsing_function_header(Term* func)
     // Here we'll look at every input declared as +out, and we'll update the function's
     // outputTypes and outputCount.
 
-    FunctionAttrs* attrs = get_function_attrs(func);
+    Function* attrs = get_function_attrs(func);
     attrs->outputCount = 1;
     attrs->outputTypes.resize(1);
 
@@ -173,7 +173,7 @@ bool is_callable(Term* term)
 
 bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 {
-    FunctionAttrs* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = get_function_attrs(func);
     bool varArgs = funcAttrs->variableArgs;
 
     // Fail if wrong # of inputs
@@ -196,7 +196,7 @@ bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 {
-    FunctionAttrs* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = get_function_attrs(func);
     bool varArgs = funcAttrs->variableArgs;
 
     // Fail if wrong # of inputs
@@ -216,7 +216,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 
 bool values_fit_function_dynamic(Term* func, List* list)
 {
-    FunctionAttrs* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = get_function_attrs(func);
     bool varArgs = funcAttrs->variableArgs;
 
     // Fail if wrong # of inputs
@@ -242,7 +242,7 @@ Term* create_overloaded_function(Branch* branch, std::string const& name,
 
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
-    FunctionAttrs* attrs = get_function_attrs(function);
+    Function* attrs = get_function_attrs(function);
 
     if (!FINISHED_BOOTSTRAP)
         return &ANY_T;
@@ -259,7 +259,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
 
 bool function_can_rebind_input(Term* func, int index)
 {
-    FunctionAttrs* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = get_function_attrs(func);
     if (funcAttrs->variableArgs)
         index = 0;
 
@@ -271,7 +271,7 @@ bool function_can_rebind_input(Term* func, int index)
 
 bool function_implicitly_rebinds_input(Term* function, int index)
 {
-    FunctionAttrs* funcAttrs = get_function_attrs(function);
+    Function* funcAttrs = get_function_attrs(function);
     Term* input = function_get_input_placeholder(funcAttrs, index);
     if (input == NULL)
         return false;
@@ -287,7 +287,7 @@ Type* function_get_input_type(Term* func, int index)
 {
     return function_get_input_type(get_function_attrs(func), index);
 }
-Type* function_get_input_type(FunctionAttrs* func, int index)
+Type* function_get_input_type(Function* func, int index)
 {
     if (func->variableArgs)
         index = 0;
@@ -299,7 +299,7 @@ Type* function_get_output_type(Term* function, int index)
     return function_get_output_type(get_function_attrs(function), index);
 }
 
-Type* function_get_output_type(FunctionAttrs* func, int index)
+Type* function_get_output_type(Function* func, int index)
 {
     if (func == NULL)
         return &ANY_T;
@@ -309,7 +309,7 @@ Type* function_get_output_type(FunctionAttrs* func, int index)
     return as_type(func->outputTypes[index]);
 }
 
-int function_num_inputs(FunctionAttrs* func)
+int function_num_inputs(Function* func)
 {
     Branch* contents = nested_contents(func->declaringTerm);
     int i = 1;
@@ -321,21 +321,21 @@ int function_num_inputs(FunctionAttrs* func)
     return i - 1;
 }
 
-bool function_is_state_input(FunctionAttrs* func, int index)
+bool function_is_state_input(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func,index);
     if (placeholder == NULL)
         return false;
     return placeholder->boolPropOptional("state", false);
 }    
-bool function_get_input_meta(FunctionAttrs* func, int index)
+bool function_get_input_meta(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
     if (placeholder == NULL)
         return false;
     return placeholder->boolPropOptional("meta", false);
 }
-bool function_get_input_optional(FunctionAttrs* func, int index)
+bool function_get_input_optional(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
     if (placeholder == NULL)
@@ -343,7 +343,7 @@ bool function_get_input_optional(FunctionAttrs* func, int index)
     return placeholder->boolPropOptional("optional", false);
 }
 
-Term* function_get_input_placeholder(FunctionAttrs* func, int index)
+Term* function_get_input_placeholder(Function* func, int index)
 {
     Branch* contents = function_get_contents(func);
     index += 1;
@@ -351,12 +351,12 @@ Term* function_get_input_placeholder(FunctionAttrs* func, int index)
         return NULL;
     return contents->get(index);
 }
-Branch* function_get_contents(FunctionAttrs* func)
+Branch* function_get_contents(Function* func)
 {
     return nested_contents(func->declaringTerm);
 }
 
-std::string function_get_input_name(FunctionAttrs* func, int index)
+std::string function_get_input_name(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
     if (placeholder == NULL)
@@ -364,7 +364,7 @@ std::string function_get_input_name(FunctionAttrs* func, int index)
     return placeholder->name;
 }
 
-std::string function_get_documentation_string(FunctionAttrs* func)
+std::string function_get_documentation_string(Function* func)
 {
     // A function can optionally have a documentation string. If present,
     // it will be the first thing defined in the function, and it'll be
@@ -387,7 +387,7 @@ const char* get_output_name(Term* term, int outputIndex)
         return term->name.c_str();
 
     Term* function = term->function;
-    FunctionAttrs* attrs = NULL;
+    Function* attrs = NULL;
 
     if (function != NULL)
         attrs = get_function_attrs(function);
@@ -395,7 +395,7 @@ const char* get_output_name(Term* term, int outputIndex)
     if (attrs == NULL)
         return "";
 
-    FunctionAttrs::GetOutputName getOutputName = attrs->getOutputName;
+    Function::GetOutputName getOutputName = attrs->getOutputName;
 
     if (getOutputName != NULL)
         return getOutputName(term, outputIndex);
@@ -430,7 +430,7 @@ const char* get_output_name_for_input(Term* term, int inputIndex)
             term->inputInfo(inputIndex)->outputIndex);
 }
 
-bool is_native_function(FunctionAttrs* func)
+bool is_native_function(Function* func)
 {
     return func->evaluate != evaluate_subroutine;
 }
@@ -445,7 +445,7 @@ void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialize
     get_function_attrs(func)->specializeType = specializeFunc;
 }
 
-void function_format_header_source(StyledSource* source, FunctionAttrs* func)
+void function_format_header_source(StyledSource* source, Function* func)
 {
     Term* term = func->declaringTerm;
     ca_assert(term != NULL);

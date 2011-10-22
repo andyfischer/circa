@@ -103,7 +103,7 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
         set_input(term, i, inputs[i]);
     Type* outputType = function_get_output_type(function, 0);
 
-    FunctionAttrs* attrs = get_function_attrs(function);
+    Function* attrs = get_function_attrs(function);
 
     if (attrs->specializeType != NULL)
         outputType = attrs->specializeType(term);

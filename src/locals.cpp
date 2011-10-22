@@ -18,12 +18,12 @@ int get_output_count(Term* term)
         return 1;
 
     // check if the function has overridden getOutputCount
-    FunctionAttrs::GetOutputCount getOutputCount = NULL;
+    Function::GetOutputCount getOutputCount = NULL;
 
     if (term->function == NULL)
         return 1;
 
-    FunctionAttrs* attrs = get_function_attrs(term->function);
+    Function* attrs = get_function_attrs(term->function);
 
     if (attrs == NULL)
         return 1;
@@ -33,7 +33,7 @@ int get_output_count(Term* term)
     if (getOutputCount != NULL)
         return getOutputCount(term);
 
-    // Default behavior, if FunctionAttrs was found.
+    // Default behavior, if Function was found.
     return attrs->outputCount;
 }
     
