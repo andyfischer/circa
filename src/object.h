@@ -19,6 +19,7 @@ struct CircaObject
 };
 
 void register_new_object(CircaObject* obj, Type* type, bool permanent);
+void on_object_deleted(CircaObject* obj);
 void set_object_permanent(CircaObject* obj, bool permanent);
 
 } // namespace circa

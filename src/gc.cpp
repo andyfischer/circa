@@ -61,7 +61,8 @@ void gc_collect()
     for (CircaObject* current = g_firstObject; current != NULL; current = current->next) {
         if (current->permanent) {
             current->gcColor = color;
-            current->type->gcListReferences(current, &toMark);
+            if (current->type->gcListReferences != NULL)
+                current->type->gcListReferences(current, &toMark);
         }
     }
 
@@ -81,7 +82,8 @@ void gc_collect()
 
             // Mark and fetch references, we'll search them on the next iteration.
             object->gcColor = color;
-            object->type->gcListReferences(object, &toMark);
+            if (object->type->gcListReferences != NULL)
+                object->type->gcListReferences(object, &toMark);
         }
     }
 

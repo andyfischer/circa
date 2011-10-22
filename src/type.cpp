@@ -113,10 +113,13 @@ Type::Type() :
     permanent(false),
     heapAllocated(false)
 {
+    // Register ourselves. Start out as 'permanent'.
+    register_new_object((CircaObject*) this, &TYPE_T, true);
 }
 
 Type::~Type()
 {
+    on_object_deleted((CircaObject*) this);
 }
 
 Type* Type::create()
