@@ -1,20 +1,19 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "gc.h"
+#include "object.h"
 #include "tagged_value.h"
 #include "type.h"
 
 namespace circa {
 
 // Global GC zone
-GCHeader* g_firstObject = NULL;
-GCHeader* g_lastObject = NULL;
-char g_lastColorUsed = 0;
+CircaObject* g_firstObject = NULL;
+CircaObject* g_lastObject = NULL;
 
-void gc_register_new_object(GCHeader* obj)
+void gc_register_object(CircaObject* obj)
 {
-    obj->next = NULL;
-    obj->color = 0;
+    ca_assert(obj->next == NULL);
 
     if (g_firstObject == NULL) {
         g_firstObject = obj;
@@ -28,49 +27,50 @@ void gc_register_new_object(GCHeader* obj)
 
 void gc_collect()
 {
+    // Alternate the color on each pass.
     char color = 1;
-    if (color == g_lastColorUsed)
+    static char s_lastColorUsed = 0;
+    if (color == s_lastColorUsed)
         color = 2;
-    g_lastColorUsed = color;
+    s_lastColorUsed = color;
 
+    // First pass: find root objects, and accumulate their references.
     GCReferenceList toMark;
-
-    // First pass: mark roots
-    for (GCHeader* current = g_firstObject; current != NULL; current = current->next) {
-        if (current->root) {
-            current->color = color;
+    for (CircaObject* current = g_firstObject; current != NULL; current = current->next) {
+        if (current->permanent) {
+            current->gcColor = color;
             current->type->gcListReferences(current, &toMark);
         }
     }
 
+    // Mark everything else with a breadth-first search.
     GCReferenceList currentlyMarking;
-
-    // Breadth first search to mark remaining things
     while (toMark.count > 0) {
 
         gc_ref_list_swap(&toMark, &currentlyMarking);
         gc_ref_list_reset(&toMark);
 
         for (int i=0; i < currentlyMarking.count; i++) {
-            GCHeader* object = currentlyMarking.refs[i];
+            CircaObject* object = currentlyMarking.refs[i];
 
             // Skip objs that are already marked
-            if (object->color == color)
+            if (object->gcColor == color)
                 continue;
 
-            object->color = color;
+            // Mark and fetch references, we'll search them on the next iteration.
+            object->gcColor = color;
             object->type->gcListReferences(object, &toMark);
         }
     }
 
-    // Last pass: delete unmarked objects
-    GCHeader* previous = NULL;
-    for (GCHeader* current = g_firstObject; current != NULL; ) {
+    // Last pass: delete unmarked objects.
+    CircaObject* previous = NULL;
+    for (CircaObject* current = g_firstObject; current != NULL; ) {
 
         // Save ->next pointer, in case object is destroyed
-        GCHeader* next = current->next;
+        CircaObject* next = current->next;
 
-        if (current->color != color) {
+        if (current->gcColor != color) {
 
             // Remove from linked list
             if (current == g_firstObject) {
@@ -96,13 +96,13 @@ void gc_collect()
     }
 }
 
-void gc_ref_append(GCReferenceList* list, GCHeader* item)
+void gc_ref_append(GCReferenceList* list, CircaObject* item)
 {
     if (item == NULL)
         return;
 
     list->count += 1;
-    list->refs = (GCHeader**) realloc(list->refs, sizeof(GCHeader*) * list->count);
+    list->refs = (CircaObject**) realloc(list->refs, sizeof(CircaObject*) * list->count);
     list->refs[list->count - 1] = item;
 }
 
@@ -114,7 +114,7 @@ void gc_ref_list_reset(GCReferenceList* list)
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b)
 {
     int tempCount = a->count;
-    GCHeader** tempRefs = a->refs;
+    CircaObject** tempRefs = a->refs;
     a->count = b->count;
     a->refs = b->refs;
     b->count = tempCount;

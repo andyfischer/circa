@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "gc.h"
+#include "object.h"
 #include "types/handle.h"
 
 namespace circa {
@@ -8,10 +9,8 @@ namespace gc_tests {
 
 List g_recentlyDeleted;
 
-struct Thing
+struct Thing : CircaObject
 {
-    GCHeader gcHeader;
-
     std::string name;
     Thing* ref;
 
@@ -22,7 +21,7 @@ void thingListReferences(void* obj, GCReferenceList* refs)
 {
     Thing* thing = (Thing*) obj;
     if (thing->ref != NULL)
-        gc_ref_append(refs, &thing->ref->gcHeader);
+        gc_ref_append(refs, thing->ref);
 }
 
 void releaseThing(void* obj)
@@ -34,6 +33,7 @@ void releaseThing(void* obj)
 
 void start_test(Type* type)
 {
+    type->name = "Thing";
     type->gcListReferences = thingListReferences;
     type->gcRelease = releaseThing;
 
@@ -47,10 +47,9 @@ void test_simple()
 
     Thing* a = new Thing();
     a->name = "test_simple";
-    a->gcHeader.type = &type;
 
     // Register and collect, 'a' will get released.
-    gc_register_new_object(&a->gcHeader);
+    register_new_object(a, &type);
     gc_collect();
 
     test_equals(&g_recentlyDeleted, "['test_simple']");
@@ -63,17 +62,16 @@ void test_simple_root()
 
     Thing* a = new Thing();
     a->name = "test_simple_root";
-    a->gcHeader.type = &type;
-    a->gcHeader.root = true;
 
     // Register and collect, 'a' will remain because it's a root.
-    gc_register_new_object(&a->gcHeader);
+    register_new_object(a, &type);
+    set_object_permanent(a, true);
     gc_collect();
 
     test_equals(&g_recentlyDeleted, "[]");
 
     // Clean up the mess..
-    a->gcHeader.root = false;
+    set_object_permanent(a, false);
     gc_collect();
     test_equals(&g_recentlyDeleted, "['test_simple_root']");
 }
@@ -85,24 +83,20 @@ void test_with_refs()
 
     Thing* thing1 = new Thing();
     thing1->name = "thing_1";
-    thing1->gcHeader.type = &type;
-    thing1->gcHeader.root = true;
-    gc_register_new_object(&thing1->gcHeader);
+    register_new_object(thing1, &type);
+    set_object_permanent(thing1, true);
 
     Thing* thing2 = new Thing();
     thing2->name = "thing_2";
-    thing2->gcHeader.type = &type;
-    gc_register_new_object(&thing2->gcHeader);
+    register_new_object(thing2, &type);
 
     Thing* thing3 = new Thing();
     thing3->name = "thing_3";
-    thing3->gcHeader.type = &type;
-    gc_register_new_object(&thing3->gcHeader);
+    register_new_object(thing3, &type);
 
     Thing* thing4 = new Thing();
     thing4->name = "thing_4";
-    thing4->gcHeader.type = &type;
-    gc_register_new_object(&thing4->gcHeader);
+    register_new_object(thing4, &type);
     
     thing1->ref = thing2;
     thing2->ref = thing3;
@@ -116,7 +110,7 @@ void test_with_refs()
     gc_collect();
     test_equals(&g_recentlyDeleted, "['thing_3']");
 
-    thing1->gcHeader.root = false;
+    set_object_permanent(thing1, false);
     set_list(&g_recentlyDeleted, 0);
     gc_collect();
     test_equals(&g_recentlyDeleted, "['thing_1', 'thing_2']");
@@ -129,24 +123,20 @@ void test_with_refs2()
 
     Thing* thing1 = new Thing();
     thing1->name = "thing_1";
-    thing1->gcHeader.type = &type;
-    thing1->gcHeader.root = true;
-    gc_register_new_object(&thing1->gcHeader);
+    register_new_object(thing1, &type);
+    set_object_permanent(thing1, true);
 
     Thing* thing2 = new Thing();
     thing2->name = "thing_2";
-    thing2->gcHeader.type = &type;
-    gc_register_new_object(&thing2->gcHeader);
+    register_new_object(thing2, &type);
 
     Thing* thing3 = new Thing();
     thing3->name = "thing_3";
-    thing3->gcHeader.type = &type;
-    gc_register_new_object(&thing3->gcHeader);
+    register_new_object(thing3, &type);
 
     Thing* thing4 = new Thing();
     thing4->name = "thing_4";
-    thing4->gcHeader.type = &type;
-    gc_register_new_object(&thing4->gcHeader);
+    register_new_object(thing4, &type);
     
     thing1->ref = thing2;
     thing2->ref = thing3;
@@ -155,7 +145,7 @@ void test_with_refs2()
     gc_collect();
     test_equals(&g_recentlyDeleted, "[]");
 
-    thing1->gcHeader.root = false;
+    set_object_permanent(thing1, false);
     set_list(&g_recentlyDeleted, 0);
     gc_collect();
     test_equals(&g_recentlyDeleted, "['thing_1', 'thing_2', 'thing_3', 'thing_4']");

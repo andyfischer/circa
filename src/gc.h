@@ -6,36 +6,25 @@
 
 namespace circa {
 
-struct GCHeader
-{
-    Type *type;
-
-    // Linked list of all GC objects in this zone
-    GCHeader* next;
-
-    // Whether this object is a 'root', meaning that it cannot be collected.
-    bool root;
-
-    // Used during collection
-    char color;
-
-    GCHeader() : type(NULL), root(false) {}
-};
-
+// Structure used during GC traversal
 struct GCReferenceList
 {
     int count;
-    GCHeader** refs;
+    CircaObject** refs;
 
     GCReferenceList() : count(0), refs(NULL) {}
     ~GCReferenceList() { free(refs); }
 };
 
-void gc_register_new_object(GCHeader* obj);
 void gc_collect();
 
-void gc_ref_append(GCReferenceList* list, GCHeader* item);
+// Add object to the global list. Should call this on object creation.
+void gc_register_object(CircaObject* object);
+
+void gc_ref_append(GCReferenceList* list, CircaObject* item);
 void gc_ref_list_reset(GCReferenceList* list);
+
+// Swap the contents of 'a' with 'b'
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b);
 
 } // namespace circa
