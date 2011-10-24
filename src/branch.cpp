@@ -9,7 +9,6 @@
 #include "evaluation.h"
 #include "filesystem.h"
 #include "function.h"
-#include "heap_debugging.h"
 #include "importing_macros.h"
 #include "introspection.h"
 #include "list_shared.h"
@@ -28,7 +27,7 @@ namespace circa {
 
 void assert_valid_branch(Branch const* obj)
 {
-    debug_assert_valid_object((void*) obj, BRANCH_OBJECT);
+    // this once did something
 }
 
 Branch::Branch()
@@ -38,13 +37,13 @@ Branch::Branch()
     inuse(false),
     currentlyCascadingUpdates(false)
 {
-    debug_register_valid_object((void*) this, BRANCH_OBJECT);
+    register_new_object((CircaObject*) this, &BRANCH_T, true);
 }
 
 Branch::~Branch()
 {
     clear_branch(this);
-    debug_unregister_valid_object(this, BRANCH_OBJECT);
+    on_object_deleted((CircaObject*) this);
 }
 
 int Branch::length()

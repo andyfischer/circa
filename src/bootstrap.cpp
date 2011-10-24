@@ -123,7 +123,6 @@ void bootstrap_kernel()
     FUNCTION_ATTRS_T.name = "Function";
     FUNCTION_ATTRS_T.initialize = function_attrs_t::initialize;
     FUNCTION_ATTRS_T.copy = function_attrs_t::copy;
-    FUNCTION_ATTRS_T.release = function_attrs_t::release;
     FUNCTION_ATTRS_TYPE = create_type_value(KERNEL, &FUNCTION_ATTRS_T, "Function");
 
     // Create Function type

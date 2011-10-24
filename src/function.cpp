@@ -4,7 +4,6 @@
 #include "builtins.h"
 #include "evaluation.h"
 #include "function.h"
-#include "heap_debugging.h"
 #include "introspection.h"
 #include "source_repro.h"
 #include "subroutine.h"
@@ -37,12 +36,12 @@ Function::Function()
     assignRegisters(NULL),
     postCompile(NULL)
 {
-    debug_register_valid_object(this, FUNCTION_ATTRS_OBJECT);
+    register_new_object((CircaObject*) this, &FUNCTION_T, true);
 }
 
 Function::~Function()
 {
-    debug_unregister_valid_object(this, FUNCTION_ATTRS_OBJECT);
+    on_object_deleted((CircaObject*) this);
 }
 
 namespace function_attrs_t {
@@ -51,11 +50,6 @@ namespace function_attrs_t {
     {
         Function* attrs = new Function();
         set_pointer(value, type, attrs);
-    }
-
-    void release(Type*, TaggedValue* value)
-    {
-        delete (Function*) get_pointer(value);
     }
 
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)

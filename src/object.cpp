@@ -18,6 +18,7 @@ void register_new_object(CircaObject* obj, Type* type, bool permanent)
     obj->prev = NULL;
     obj->permanent = permanent;
     obj->gcColor = 0;
+
     gc_register_object(header);
 }
 

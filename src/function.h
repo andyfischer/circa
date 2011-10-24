@@ -4,9 +4,10 @@
 
 #include "common_headers.h"
 
-#include "types/list.h"
 #include "branch.h"
+#include "object.h"
 #include "term.h"
+#include "types/list.h"
 
 namespace circa {
 
@@ -19,6 +20,8 @@ struct Function
     typedef Type* (*GetOutputType)(Term*, int index);
     typedef void (*AssignRegisters)(Term*);
     typedef void (*PostCompile)(Term*);
+
+    CircaObject header;
 
     Term* declaringTerm;
 

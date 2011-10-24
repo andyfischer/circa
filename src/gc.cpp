@@ -8,22 +8,23 @@
 namespace circa {
 
 // Global GC zone
-CircaObject* g_firstObject = NULL;
-CircaObject* g_lastObject = NULL;
+CircaObject* g_first = NULL;
+bool g_currentlyCollecting = false;
 
 void gc_register_object(CircaObject* obj)
 {
     ca_assert(obj->next == NULL);
     ca_assert(obj->prev == NULL);
 
-    if (g_firstObject == NULL) {
-        g_firstObject = obj;
-        g_lastObject = obj;
+    // Can't create an object while collecting
+    ca_assert(!g_currentlyCollecting);
+
+    if (g_first == NULL) {
+        g_first = obj;
     } else {
-        ca_assert(g_lastObject->next == NULL);
-        obj->prev = g_lastObject;
-        g_lastObject->next = obj;
-        g_lastObject = obj;
+        obj->next = g_first;
+        g_first->prev = obj;
+        g_first = obj;
     }
 }
 
@@ -34,18 +35,13 @@ void gc_on_object_deleted(CircaObject* obj)
     if (obj->prev != NULL)
         obj->prev->next = obj->next;
 
-    // Check if 'obj' was first object
-    if (obj == g_firstObject)
-        g_firstObject = obj->next;
-
-    // Check if 'obj' was last object
-    if (obj == g_lastObject)
-        g_lastObject = obj->prev;
+    // Check if 'obj' is the first object
+    if (obj == g_first)
+        g_first = g_first->next;
 
     obj->next = NULL;
     obj->prev = NULL;
 }
-
 
 void gc_collect()
 {
@@ -55,10 +51,11 @@ void gc_collect()
     if (color == s_lastColorUsed)
         color = 2;
     s_lastColorUsed = color;
+    g_currentlyCollecting = true;
 
     // First pass: find root objects, and accumulate their references.
     GCReferenceList toMark;
-    for (CircaObject* current = g_firstObject; current != NULL; current = current->next) {
+    for (CircaObject* current = g_first; current != NULL; current = current->next) {
         if (current->permanent) {
             current->gcColor = color;
             if (current->type->gcListReferences != NULL)
@@ -88,7 +85,7 @@ void gc_collect()
     }
 
     // Last pass: delete unmarked objects.
-    for (CircaObject* current = g_firstObject; current != NULL; ) {
+    for (CircaObject* current = g_first; current != NULL; ) {
 
         // Save 'next' pointer, in case the object is destroyed
         CircaObject* next = current->next;
@@ -105,6 +102,8 @@ void gc_collect()
 
         current = next;
     }
+    
+    g_currentlyCollecting = false;
 }
 
 void gc_ref_append(GCReferenceList* list, CircaObject* item)

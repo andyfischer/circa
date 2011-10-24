@@ -5,6 +5,7 @@
 #include "common_headers.h"
 
 #include "names.h"
+#include "object.h"
 #include "term_list.h"
 #include "term_namespace.h"
 #include "types/list.h"
@@ -15,6 +16,8 @@ struct BrokenLinkList;
 
 struct Branch
 {
+    CircaObject header;
+
     // List of content terms. This branch owns all the Term objects in this list.
     TermList _terms;
 
