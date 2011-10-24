@@ -46,6 +46,24 @@ Branch::~Branch()
     on_object_deleted((CircaObject*) this);
 }
 
+void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
+{
+    Branch* branch = (Branch*) object;
+
+    // Follow each term
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        gc_mark(list, (CircaObject*) term->type, color);
+        gc_mark(list, (CircaObject*) term->nestedContents, color);
+    }
+}
+
+void branch_setup_type(Type* type)
+{
+    type->name = "Branch";
+    type->gcListReferences = branch_list_references;
+}
+
 int Branch::length()
 {
     assert_valid_branch(this);

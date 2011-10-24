@@ -21,6 +21,26 @@
 
 namespace circa {
 
+EvalContext::EvalContext()
+ : interruptSubroutine(false), errorOccurred(false)
+{
+    register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
+}
+
+EvalContext::~EvalContext()
+{
+    on_object_deleted((CircaObject*) this);
+}
+
+void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
+{
+}
+
+void eval_context_setup_type(Type* type)
+{
+    type->gcListReferences = eval_context_list_references;
+}
+
 void evaluate_single_term(EvalContext* context, Term* term)
 {
     #if CIRCA_THROW_ON_ERROR

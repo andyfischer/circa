@@ -21,7 +21,6 @@
 
 #include "types/any.h"
 #include "types/bool.h"
-#include "types/branch.h"
 #include "types/callable.h"
 #include "types/color.h"
 #include "types/common.h"
@@ -62,7 +61,7 @@ void create_primitive_types()
 {
     null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
-    branch_t::setup_type(&BRANCH_T);
+    branch_setup_type(&BRANCH_T);
     dict_t::setup_type(&DICT_T);
     eval_context_t::setup_type(&EVAL_CONTEXT_T);
     float_t::setup_type(&FLOAT_T);
@@ -74,6 +73,7 @@ void create_primitive_types()
     ref_t::setup_type(&REF_T);
     void_t::setup_type(&VOID_T);
     opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
+    eval_context_setup_type(&EVAL_CONTEXT_T);
 
     // errors are just stored as strings for now
     string_t::setup_type(&ERROR_T);

@@ -25,10 +25,15 @@ void gc_collect();
 // Add object to the global list. Should call this on object creation.
 void gc_register_object(CircaObject* object);
 
-void gc_ref_append(GCReferenceList* list, CircaObject* item);
+// Calls used during mark and sweep.
+void gc_mark(GCReferenceList* list, CircaObject* item, GCColor color);
+void gc_mark_tagged_value(GCReferenceList* list, TaggedValue* value, GCColor color);
+
 void gc_ref_list_reset(GCReferenceList* list);
+
 
 // Swap the contents of 'a' with 'b'
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b);
+
 
 } // namespace circa

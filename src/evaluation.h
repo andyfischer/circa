@@ -4,6 +4,7 @@
 
 #include "common_headers.h"
 #include "for_loop.h"
+#include "object.h"
 #include "tagged_value.h"
 #include "term_list.h"
 #include "types/list.h"
@@ -18,6 +19,8 @@ struct Frame
 
 struct EvalContext
 {
+    CircaObject header;
+
     bool interruptSubroutine;
 
     TaggedValue subroutineOutput;
@@ -51,9 +54,11 @@ struct EvalContext
     // List of values that are being passed from the EvalContext owner to the script.
     List argumentList;
 
-    EvalContext() : interruptSubroutine(false), errorOccurred(false) {}
+    EvalContext();
+    ~EvalContext();
 };
 
+void eval_context_setup_type(Type* type);
 
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.

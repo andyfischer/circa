@@ -56,11 +56,8 @@ void gc_collect()
     // First pass: find root objects, and accumulate their references.
     GCReferenceList toMark;
     for (CircaObject* current = g_first; current != NULL; current = current->next) {
-        if (current->permanent) {
-            current->gcColor = color;
-            if (current->type->gcListReferences != NULL)
-                current->type->gcListReferences(current, &toMark);
-        }
+        if (current->permanent)
+            gc_mark(&toMark, current, color);
     }
 
     // Mark everything else with a breadth-first search.
@@ -73,14 +70,7 @@ void gc_collect()
         for (int i=0; i < currentlyMarking.count; i++) {
             CircaObject* object = currentlyMarking.refs[i];
 
-            // Skip objs that are already marked
-            if (object->gcColor == color)
-                continue;
-
-            // Mark and fetch references, we'll search them on the next iteration.
-            object->gcColor = color;
-            if (object->type->gcListReferences != NULL)
-                object->type->gcListReferences(object, &toMark);
+            gc_mark(&toMark, object, color);
         }
     }
 
@@ -106,19 +96,40 @@ void gc_collect()
     g_currentlyCollecting = false;
 }
 
-void gc_ref_append(GCReferenceList* list, CircaObject* item)
-{
-    if (item == NULL)
-        return;
-
-    list->count += 1;
-    list->refs = (CircaObject**) realloc(list->refs, sizeof(CircaObject*) * list->count);
-    list->refs[list->count - 1] = item;
-}
-
 void gc_ref_list_reset(GCReferenceList* list)
 {
     list->count = 0;
+}
+
+void gc_mark(GCReferenceList* refList, CircaObject* object, GCColor color)
+{
+    if (object == NULL)
+        return;
+
+    if (strcmp(object->magicalHeader, "caobj") != 0)
+        internal_error("called gc_mark on not a CircaObject");
+    
+    if (object->gcColor == color)
+        return;
+
+    object->gcColor = color;
+
+    gc_mark(refList, (CircaObject*) object->type, color);
+
+    if (object->type->gcListReferences != NULL)
+        object->type->gcListReferences(object, refList, color);
+
+    refList->count += 1;
+    refList->refs = (CircaObject**) realloc(refList->refs, sizeof(CircaObject*) * refList->count);
+    refList->refs[refList->count - 1] = object;
+}
+
+void gc_mark_tagged_value(GCReferenceList* list, TaggedValue* value, GCColor color)
+{
+    if (value->value_type != NULL)
+        gc_mark(list, (CircaObject*) value->value_type, color);
+
+    // TODO: Follow the value as well
 }
 
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b)

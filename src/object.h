@@ -6,6 +6,8 @@ namespace circa {
 
 struct CircaObject
 {
+    char magicalHeader[6];
+
     Type* type;
 
     CircaObject* next;
@@ -15,7 +17,7 @@ struct CircaObject
     bool permanent;
 
     // Used during GC collection
-    char gcColor;
+    GCColor gcColor;
 };
 
 void register_new_object(CircaObject* obj, Type* type, bool permanent);

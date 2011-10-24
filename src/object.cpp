@@ -11,6 +11,8 @@ void register_new_object(CircaObject* obj, Type* type, bool permanent)
 {
     CircaObject* header = (CircaObject*) obj;
 
+    strcpy(header->magicalHeader, "caobj");
+
     ca_assert(type != NULL);
 
     obj->type = type;
@@ -24,6 +26,8 @@ void register_new_object(CircaObject* obj, Type* type, bool permanent)
 
 void on_object_deleted(CircaObject* obj)
 {
+    memset(obj->magicalHeader, 0, 6);
+
     gc_on_object_deleted(obj);
 }
 

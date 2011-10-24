@@ -17,11 +17,11 @@ struct Thing : CircaObject
     Thing() : ref(NULL) {}
 };
 
-void thingListReferences(void* obj, GCReferenceList* refs)
+void thingListReferences(CircaObject* obj, GCReferenceList* refs, GCColor color)
 {
     Thing* thing = (Thing*) obj;
     if (thing->ref != NULL)
-        gc_ref_append(refs, thing->ref);
+        gc_mark(refs, thing->ref, color);
 }
 
 void releaseThing(void* obj)

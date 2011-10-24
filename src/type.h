@@ -72,7 +72,7 @@ struct Type
     typedef void (*VisitHeap)(Type* type, TaggedValue* value,
             VisitHeapCallback callback, TaggedValue* context);
 
-    typedef void (*GCListReferences)(void* object, GCReferenceList* list);
+    typedef void (*GCListReferences)(CircaObject* object, GCReferenceList* list, GCColor color);
     typedef void (*GCRelease)(void* object);
 
     // CircaObject header, must be the first field.

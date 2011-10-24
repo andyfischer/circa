@@ -135,6 +135,7 @@ private:
     Branch& operator=(Branch const&) { return *this; }
 };
 
+void branch_setup_type(Type* type);
 void assert_valid_branch(Branch const* obj);
 
 bool is_namespace(Term* term);
