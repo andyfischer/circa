@@ -134,8 +134,6 @@ CA_FUNCTION(evaluate_if_block)
     int acceptedBranchIndex = 0;
     Branch* acceptedBranch = NULL;
 
-    context->callStack.append(CALLER);
-
     TaggedValue output;
 
     TaggedValue localState;
@@ -160,8 +158,7 @@ CA_FUNCTION(evaluate_if_block)
 
             ca_assert(acceptedBranch != NULL);
 
-            context->callStack.append(branch);
-            start_using(acceptedBranch);
+            push_frame(context, acceptedBranch);
 
             if (useState)
                 swap(state->get(branchIndex), &context->currentScopeState);
@@ -208,13 +205,7 @@ CA_FUNCTION(evaluate_if_block)
         copy(value, EXTRA_OUTPUT(i));
     }
 
-    // Finish using the branch, this will pop its stack frame. Need to do this after
-    // copying joined values.
-    finish_using(acceptedBranch);
-
-    context->callStack.pop();
-
-    context->callStack.pop();
+    pop_frame(context);
 
     swap(&output, OUTPUT);
 }

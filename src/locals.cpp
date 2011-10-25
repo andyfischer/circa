@@ -98,24 +98,6 @@ void update_output_count(Term* term)
     term->outputCount = get_output_count(term);
 }
 
-int get_frame_distance(Term* term, Term* input)
-{
-    if (input == NULL)
-        return -1;
-
-    // TODO: Walk 'input' upwards as long as it's in a function that shares registers.
-
-    // Walk upward from 'term' until we find the common branch.
-    int distance = 0;
-    while (term->owningBranch != input->owningBranch) {
-        term = get_parent_term(term);
-
-        if (term == NULL)
-            return -1;
-    }
-    return distance;
-}
-
 void update_input_instructions(Term* term)
 {
     InputInstructionList& list = term->inputIsns;

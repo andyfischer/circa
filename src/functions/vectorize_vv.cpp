@@ -31,7 +31,7 @@ namespace vectorize_vv_function {
         Term* input1_placeholder = contents->get(1); 
         Term* content_output = contents->get(2); 
 
-        start_using(contents);
+        push_frame(CONTEXT, contents);
 
         // Prepare output
         TaggedValue outputTv;
@@ -49,7 +49,7 @@ namespace vectorize_vv_function {
             swap(get_local(content_output), output->get(i));
         }
 
-        finish_using(contents);
+        pop_frame(CONTEXT);
 
         swap(output, OUTPUT);
     }

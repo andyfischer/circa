@@ -41,7 +41,7 @@ CA_FUNCTION(evaluate_switch)
 
         if (succeeds) {
             Branch* caseContents = nested_contents(caseTerm);
-            start_using(caseContents);
+            push_frame(context, caseContents);
 
             for (int i=0; i < caseContents->length(); i++) {
                 evaluate_single_term(context, caseContents->get(i));
@@ -62,7 +62,7 @@ CA_FUNCTION(evaluate_switch)
                 copy(value, EXTRA_OUTPUT(i));
             }
 
-            finish_using(caseContents);
+            pop_frame(context);
             break;
         }
     }

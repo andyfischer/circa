@@ -117,7 +117,6 @@ void test_with_state()
     test_equals(&g_slots, "[true, false, false]");
 
     reset(&context.state);
-    reset_locals(&branch);
     test_equals(&g_slots, "[false, false, false]");
 }
 
@@ -160,7 +159,6 @@ void test_in_subroutine_state()
     test_equals(&g_slots, "[true, false, false]");
 
     set_null(&context.state);
-    reset_locals(&branch);
 
     test_equals(&g_slots, "[false, false, false]");
 }
@@ -178,7 +176,6 @@ void test_state_inside_if_block()
 
     test_equals(&g_slots, "[true, false, false]");
     clear_branch(&branch);
-    reset_locals(&branch);
     strip_orphaned_state(&branch, &context.state);
 
     test_equals(&g_slots, "[false, false, false]");

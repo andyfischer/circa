@@ -13,10 +13,10 @@ namespace return_function {
         CONTEXT->interruptSubroutine = true;
 
         Branch* contents = nested_contents(CALLER);
-        start_using(contents);
+        push_frame(CONTEXT, contents);
         for (int i=0; i < contents->length(); i++)
             evaluate_single_term(CONTEXT, contents->get(i));
-        finish_using(contents);
+        pop_frame(CONTEXT);
     }
 
     void returnPostCompile(Term* returnCall)

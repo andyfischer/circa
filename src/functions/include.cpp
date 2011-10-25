@@ -72,7 +72,6 @@ namespace include_function {
         if (fileChanged) {
             TaggedValue trash;
             strip_orphaned_state(contents, &context->currentScopeState, &trash);
-            reset_locals(contents);
         }
 
         context->callStack.append(CALLER);

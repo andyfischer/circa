@@ -23,7 +23,7 @@ Function::Function()
     feedbackFunc(NULL),
     throws(false),
     outputCount(1),
-    simpleEvaluate(NULL),
+    createsStackFrame(false),
     evaluate(NULL),
     specializeType(NULL),
     formatSource(NULL),

@@ -102,7 +102,8 @@ namespace overloaded_function {
     {
         Branch* contents = nested_contents(CALLER);
         if (contents->length() == 0) {
-            evaluate_dynamic_overload(CONTEXT, CALLER);
+            //FIXME
+            //evaluate_dynamic_overload(CONTEXT, CALLER);
             contents->clear();
         } else {
             TaggedValue output;

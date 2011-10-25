@@ -84,4 +84,8 @@ void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm);
 void update_branch_finish_term(Term* term);
 Term* find_last_non_comment_expression(Branch* branch);
 
+bool branch_creates_stack_frame(Branch* branch);
+int get_frame_distance(Branch* frame, Term* input);
+int get_frame_distance(Term* term, Term* input);
+
 } // namespace circa

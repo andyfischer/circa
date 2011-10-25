@@ -91,6 +91,7 @@ namespace for_function {
         get_function_attrs(FOR_FUNC)->getOutputCount = getOutputCount;
         get_function_attrs(FOR_FUNC)->getOutputName = getOutputName;
         get_function_attrs(FOR_FUNC)->getOutputType = getOutputType;
+        get_function_attrs(FOR_FUNC)->createsStackFrame = true;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         get_function_attrs(DISCARD_FUNC)->formatSource = discard_formatSource;

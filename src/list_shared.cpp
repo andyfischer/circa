@@ -199,6 +199,10 @@ TaggedValue* list_insert(ListData** dataPtr, int index)
 
     return &data->items[index];
 }
+int list_size(ListData* data)
+{
+    return data->count;
+}
 
 TaggedValue* list_get_index(ListData* data, int index)
 {

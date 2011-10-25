@@ -51,8 +51,7 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
         Branch* contents, List* inputs, List* outputs)
 {
     context->interruptSubroutine = false;
-    context->callStack.append(caller);
-    start_using(contents);
+    push_frame(context, contents);
 
     int numInputs = inputs->length();
 
@@ -110,13 +109,14 @@ void evaluate_subroutine_internal(EvalContext* context, Term* caller,
     }
 
     // Clean up
-    finish_using(contents);
-    context->callStack.pop();
+    pop_frame(context);
     context->interruptSubroutine = false;
 }
 
-void evaluate_subroutine(EvalContext* context, Term* caller)
+CA_FUNCTION(evaluate_subroutine)
 {
+    EvalContext* context = CONTEXT;
+    Term* caller = CALLER;
     Term* function = caller->function;
     Branch* contents = nested_contents(function);
     int numInputs = caller->numInputInstructions();
@@ -203,6 +203,7 @@ void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
     get_function_attrs(sub)->evaluate = evaluate_subroutine;
+    get_function_attrs(sub)->createsStackFrame = true;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)

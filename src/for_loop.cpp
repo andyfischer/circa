@@ -173,8 +173,7 @@ CA_FUNCTION(evaluate_for_loop)
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
 
-    start_using(forContents);
-    start_using(innerRebinds);
+    push_frame(context, forContents);
     context->callStack.append(CALLER);
 
     // Prepare state container
@@ -270,8 +269,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     context->callStack.pop();
-    finish_using(forContents);
-    finish_using(innerRebinds);
+    pop_frame(context);
 }
 
 } // namespace circa

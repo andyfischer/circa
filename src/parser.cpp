@@ -2151,9 +2151,6 @@ void post_parse_branch(Branch* branch)
     // Remove NULLs
     branch->removeNulls();
 
-    // Make sure the inputs array has the correct size
-    branch->locals.resize(get_locals_count(branch));
-
     finish_update_cascade(branch);
 }
 

@@ -33,9 +33,9 @@ struct Function
     TaggedValue parameter;
     bool throws;
     int outputCount;
+    bool createsStackFrame;
 
     // Functions
-    SimpleEvaluateFunc simpleEvaluate;
     EvaluateFunc evaluate;
     
     SpecializeTypeFunc specializeType;

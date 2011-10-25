@@ -39,6 +39,7 @@ struct FeedbackOperation;
 struct Function;
 struct GCReferenceList;
 struct List;
+struct ListData;
 struct RawOutputPrefs;
 struct TermMap;
 struct StaticTypeQuery;
@@ -62,10 +63,9 @@ union VariantValue {
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \
-    void fname(circa::EvalContext* _context, circa::Term* _caller)
+    void fname(circa::EvalContext* _cxt, int _count, circa::TaggedValue* _args)
 
-typedef void (*SimpleEvaluateFunc)(List* args);
-typedef void (*EvaluateFunc)(EvalContext* cxt, Term* caller);
+typedef void (*EvaluateFunc)(EvalContext* cxt, int count, TaggedValue* args);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
@@ -73,12 +73,11 @@ typedef bool (*CheckInvariants)(Term* term, std::string* output);
 // Garbage collection
 typedef char GCColor;
 
-// Possibly enable ca_assert and/or ca_test_assert
-
-// when enabled, ca_assert will call internal_error if the condition is false.
+// Possibly enable ca_assert and/or ca_test_assert. When enabled, ca_assert will
+// call internal_error() if the condition is false.
 //
 // ca_test_assert does the same thing, but it is only enabled in "test" builds, so it's
-// intended to be used in situations that would kill performance.
+// intended to be called in places that significantly harm performance.
 #ifdef DEBUG
 
 #ifdef CIRCA_TEST_BUILD

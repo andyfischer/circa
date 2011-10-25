@@ -547,4 +547,44 @@ Term* find_last_non_comment_expression(Branch* branch)
     return NULL;
 }
 
+bool branch_creates_stack_frame(Branch* branch)
+{
+    if (branch->owningTerm == NULL)
+        return true;
+
+    return get_function_attrs(branch->owningTerm->function)->createsStackFrame;
+}
+
+int get_frame_distance(Branch* frame, Term* input)
+{
+    if (input == NULL)
+        return -1;
+
+    Branch* inputFrame = input->owningBranch;
+
+    // If the input's branch doesn't create a separate stack frame, then look
+    // at the parent branch.
+    if (!branch_creates_stack_frame(inputFrame))
+        inputFrame = get_parent_branch(inputFrame);
+
+    // Walk upward from 'term' until we find the common branch.
+    int distance = 0;
+    while (frame != inputFrame) {
+
+        if (branch_creates_stack_frame(frame))
+            distance++;
+
+        frame = get_parent_branch(frame);
+
+        if (frame == NULL)
+            return -1;
+    }
+    return distance;
+}
+
+int get_frame_distance(Term* term, Term* input)
+{
+    return get_frame_distance(term->owningBranch, input);
+}
+
 } // namespace circa

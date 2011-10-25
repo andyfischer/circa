@@ -61,6 +61,8 @@ struct EvalContext
     int numFrames;
     Frame* stack2;
 
+    Term* currentTerm;
+
     EvalContext();
     ~EvalContext();
 
@@ -74,7 +76,7 @@ void eval_context_setup_type(Type* type);
 
 // Stack frames
 Frame* get_frame(EvalContext* context, int depth);
-Frame* push_frame(EvalContext* context);
+Frame* push_frame(EvalContext* context, Branch* branch);
 void pop_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
 
@@ -122,6 +124,8 @@ TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term, int outputIndex);
 
+TaggedValue* get_arg(EvalContext* context, TaggedValue* args, int index);
+
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
@@ -138,17 +142,7 @@ void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* res
 // 'break' statement, or a runtime error.
 bool evaluation_interrupted(EvalContext* context);
 
-// Start using the given branch- this will push a new frame onto the locals stack, if
-// the branch is already in use.
-void start_using(Branch* branch);
-
-// Finish using the given branch- this may pop a frame from the locals stack.
-void finish_using(Branch* branch);
-
 void clear_error(EvalContext* cxt);
-
-// Recursively clear local values for this branch and all nested branches.
-void reset_locals(Branch* branch);
 
 std::string context_get_error_message(EvalContext* cxt);
 

@@ -21,11 +21,20 @@
 
 namespace circa {
 
+Type stackVariableIsn_t;
+Type globalVariableIsn_t;
+
+struct StackVariable {
+    short relativeFrame;
+    short index;
+};
+
 EvalContext::EvalContext()
  : interruptSubroutine(false),
    errorOccurred(false),
    numFrames(0),
-   stack2(NULL)
+   stack2(NULL),
+   currentTerm(NULL)
 {
     register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
@@ -37,11 +46,28 @@ EvalContext::~EvalContext()
 
 void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
+    // todo
+}
+
+std::string stackVariable_toString(TaggedValue* value)
+{
+    short relativeFrame = value->value_data.asint << 16;
+    short index = (value->value_data.asint & 0xffff);
+    std::stringstream strm;
+    strm << "[frame:" << relativeFrame << ", index:" << index << "]";
+    return strm.str();
 }
 
 void eval_context_setup_type(Type* type)
 {
+    type->name = "EvalContext";
     type->gcListReferences = eval_context_list_references;
+
+    stackVariableIsn_t.name = "stackVariableIsn";
+    stackVariableIsn_t.storageType = STORAGE_TYPE_INT;
+    stackVariableIsn_t.toString = stackVariable_toString;
+    globalVariableIsn_t.name = "globalVariableIsn";
+    globalVariableIsn_t.storageType = STORAGE_TYPE_REF;
 }
 
 Frame* get_frame(EvalContext* context, int depth)
@@ -49,16 +75,16 @@ Frame* get_frame(EvalContext* context, int depth)
     ca_assert(depth < context->numFrames);
     return &context->stack2[context->numFrames - 1 - depth];
 }
-Frame* push_frame(EvalContext* context)
+Frame* push_frame(EvalContext* context, Branch* branch)
 {
     context->numFrames++;
     context->stack2 = (Frame*) realloc(context->stack2, sizeof(Frame) * context->numFrames);
     Frame* top = &context->stack2[context->numFrames - 1];
     initialize_null(&top->registers);
     initialize_null(&top->state);
-    set_list(&top->registers, 0);
+    set_list(&top->registers, get_locals_count(branch));
     set_dict(&top->state);
-    top->branch = NULL;
+    top->branch = branch;
     return top;
 }
 void pop_frame(EvalContext* context)
@@ -73,12 +99,18 @@ Frame* top_frame(EvalContext* context)
     return get_frame(context, 0);
 }
 
+void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn)
+{
+    change_type_no_initialize(isn, &stackVariableIsn_t);
+    int relativeFrame = get_frame_distance(callingFrame, input);
+    
+    isn->value_data.asint = 0;
+    isn->value_data.asint += relativeFrame << 16;
+    isn->value_data.asint += (input->localsIndex % 0xffff);
+}
+
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-    #if CIRCA_THROW_ON_ERROR
-    try {
-    #endif
-
     if (term->function == NULL)
         return;
 
@@ -87,8 +119,35 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (function == NULL)
         return;
 
-    if (function->evaluate != NULL)
-        function->evaluate(context, term);
+    if (function->evaluate == NULL)
+        return;
+
+    context->currentTerm = term;
+
+    // Prepare the argument list
+    int inputCount = term->numInputs();
+    int argCount = inputCount + 1;
+    ListData* argList = allocate_list(argCount);
+
+    for (int i=0; i < inputCount; i++) {
+        Term* input = term->input(i);
+        if (input == NULL) {
+            set_null(list_get_index(argList,i));
+        } else if (is_value(input)) {
+            set_pointer(list_get_index(argList, i), &globalVariableIsn_t, input);
+        } else {
+            write_stack_input_instruction(term->owningBranch, input, list_get_index(argList,i));
+        }
+    }
+
+    // Prepare output
+    write_stack_input_instruction(term->owningBranch, term, list_get_index(argList, inputCount));
+
+    #if CIRCA_THROW_ON_ERROR
+    try {
+    #endif
+
+    function->evaluate(context, argCount, argList->items);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
@@ -120,11 +179,13 @@ void evaluate_single_term(EvalContext* context, Term* term)
         }
     }
     #endif
+
+    free_list(argList);
 }
 
 void evaluate_branch_internal(EvalContext* context, Branch* branch)
 {
-    start_using(branch);
+    push_frame(context, branch);
 
     for (int i=0; i < branch->length(); i++) {
         evaluate_single_term(context, branch->get(i));
@@ -133,12 +194,12 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch)
               break;
     }
 
-    finish_using(branch);
+    pop_frame(context);
 }
 
 void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output)
 {
-    start_using(branch);
+    push_frame(context, branch);
 
     for (int i=0; i < branch->length(); i++)
         evaluate_single_term(context, branch->get(i));
@@ -146,7 +207,7 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue*
     if (output != NULL)
         copy(get_local(branch->get(branch->length()-1)), output);
 
-    finish_using(branch);
+    pop_frame(context);
 }
 
 void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
@@ -265,31 +326,37 @@ TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 
 TaggedValue* get_local(Term* term, int outputIndex)
 {
-    //ca_assert(!is_value(term));
-
-    ca_assert(term->owningBranch != NULL);
-
-    int index = term->localsIndex + outputIndex;
-
-    ca_assert(index < term->owningBranch->locals.length());
-
-    return term->owningBranch->locals[index];
+    internal_error("don't use get_local");
+    return NULL;
 }
 
 TaggedValue* get_local(Term* term)
 {
-    return get_local(term, 0);
+    internal_error("don't use get_local");
+    return NULL;
 }
 
 TaggedValue* get_local_safe(Term* term, int outputIndex)
 {
-    if (term->owningBranch == NULL)
-        return NULL;
-    int index = term->localsIndex + outputIndex;
-    if (index >= term->owningBranch->locals.length())
-        return NULL;
-    TaggedValue* local = term->owningBranch->locals[index];
-    return local;
+    internal_error("don't use get_local");
+    return NULL;
+}
+
+TaggedValue* get_arg(EvalContext* context, TaggedValue* args, int index)
+{
+    TaggedValue* arg = &args[index];
+    if (arg->value_type == &globalVariableIsn_t) {
+        return (TaggedValue*) get_pointer(arg);
+    } else if (arg->value_type == &stackVariableIsn_t) {
+        short relativeFrame = arg->value_data.asint << 16;
+        short index = arg->value_data.asint & 0xffff;
+
+        ca_assert(relativeFrame < context->numFrames);
+        Frame* frame = get_frame(context, relativeFrame);
+        return frame->registers[index];
+    } else {
+        return &args[index];
+    }
 }
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
@@ -350,7 +417,7 @@ bool evaluation_interrupted(EvalContext* context)
 
 void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
 {
-    start_using(branch);
+    push_frame(context, branch);
 
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch->get(i));
@@ -366,32 +433,7 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
         copy(value, term);
     }
 
-    finish_using(branch);
-}
-
-void start_using(Branch* branch)
-{
-    if (branch->inuse)
-    {
-        swap(&branch->locals, branch->localsStack.append());
-        set_list(&branch->locals, get_locals_count(branch));
-    } else {
-        branch->locals.resize(get_locals_count(branch));
-    }
-
-    branch->inuse = true;
-}
-
-void finish_using(Branch* branch)
-{
-    ca_assert(branch->inuse);
-
-    if (branch->localsStack.length() == 0) {
-        branch->inuse = false;
-    } else {
-        swap(&branch->locals, branch->localsStack.getLast());
-        branch->localsStack.pop();
-    }
+    pop_frame(context);
 }
 
 void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
@@ -401,7 +443,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
     
     Branch* branch = term->owningBranch;
 
-    start_using(branch);
+    push_frame(context, branch);
 
     bool *marked = new bool[branch->length()];
     memset(marked, false, sizeof(bool)*branch->length());
@@ -440,7 +482,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
 
     delete[] marked;
 
-    finish_using(branch);
+    pop_frame(context);
 }
 
 TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
@@ -477,19 +519,6 @@ void clear_error(EvalContext* cxt)
 {
     cxt->errorOccurred = false;
     cxt->errorTerm = NULL;
-}
-
-void reset_locals(Branch* branch)
-{
-    ca_assert(!branch->inuse);
-    reset(&branch->locals);
-    reset(&branch->localsStack);
-
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        if (term->nestedContents)
-            reset_locals(nested_contents(term));
-    }
 }
 
 std::string context_get_error_message(EvalContext* cxt)

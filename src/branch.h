@@ -30,15 +30,6 @@ struct Branch
 
     int outputIndex;
 
-    // (Deprecated) Local values for each term. These are the results of the most
-    // recent interpreted execution of this branch.
-    List locals;
-
-    // (Deprecated) While the interpreter is using a branch, it can be marked 'inuse'
-    // and it can have a list of old local lists. This is to support recursion.
-    bool inuse;
-    List localsStack;
-
     // Variant value describing where this branch came from. 
     //   If the branch came from a file, then the value will be of format:
     //     [:file, String filename, int nullable_timestamp]

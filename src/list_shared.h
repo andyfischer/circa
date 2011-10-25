@@ -28,6 +28,7 @@ ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
 TaggedValue* list_append(ListData** dataPtr);
 TaggedValue* list_insert(ListData** dataPtr, int index);
+int list_size(ListData* data);
 TaggedValue* list_get_index(ListData* data, int index);
 void list_set_index(ListData* data, int index, TaggedValue* value);
 
