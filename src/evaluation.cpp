@@ -22,7 +22,10 @@
 namespace circa {
 
 EvalContext::EvalContext()
- : interruptSubroutine(false), errorOccurred(false)
+ : interruptSubroutine(false),
+   errorOccurred(false),
+   numFrames(0),
+   stack2(NULL)
 {
     register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
@@ -39,6 +42,35 @@ void eval_context_list_references(CircaObject* object, GCReferenceList* list, GC
 void eval_context_setup_type(Type* type)
 {
     type->gcListReferences = eval_context_list_references;
+}
+
+Frame* get_frame(EvalContext* context, int depth)
+{
+    ca_assert(depth < context->numFrames);
+    return &context->stack2[context->numFrames - 1 - depth];
+}
+Frame* push_frame(EvalContext* context)
+{
+    context->numFrames++;
+    context->stack2 = (Frame*) realloc(context->stack2, sizeof(Frame) * context->numFrames);
+    Frame* top = &context->stack2[context->numFrames - 1];
+    initialize_null(&top->registers);
+    initialize_null(&top->state);
+    set_list(&top->registers, 0);
+    set_dict(&top->state);
+    top->branch = NULL;
+    return top;
+}
+void pop_frame(EvalContext* context)
+{
+    Frame* top = &context->stack2[context->numFrames - 1];
+    set_null(&top->registers);
+    set_null(&top->state);
+    context->numFrames--;
+}
+Frame* top_frame(EvalContext* context)
+{
+    return get_frame(context, 0);
 }
 
 void evaluate_single_term(EvalContext* context, Term* term)

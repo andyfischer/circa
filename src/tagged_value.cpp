@@ -60,6 +60,12 @@ void TaggedValue::reset()
     circa::reset(this);
 }
 
+void initialize_null(TaggedValue* value)
+{
+    value->value_type = &NULL_T;
+    value->value_data.ptr = NULL;
+}
+
 std::string
 TaggedValue::toString()
 {

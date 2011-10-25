@@ -14,7 +14,9 @@ namespace circa {
 
 struct Frame
 {
-    List stack;
+    List registers;
+    Dict state;
+    Branch* branch;
 };
 
 struct EvalContext
@@ -45,14 +47,19 @@ struct EvalContext
     // Stack of input values, used for inputs to functions & blocks.
     List inputStack;
 
-    // Local variables.
+    // Local variables. Deprecated in favor of stack2
     List stack;
 
     // Current stack of in-progress terms. Used for introspection.
+    // Deprecated in favor of stack2.
     TermList callStack;
 
     // List of values that are being passed from the EvalContext owner to the script.
     List argumentList;
+
+    // Current execution stack
+    int numFrames;
+    Frame* stack2;
 
     EvalContext();
     ~EvalContext();
@@ -64,6 +71,12 @@ private:
 };
 
 void eval_context_setup_type(Type* type);
+
+// Stack frames
+Frame* get_frame(EvalContext* context, int depth);
+Frame* push_frame(EvalContext* context);
+void pop_frame(EvalContext* context);
+Frame* top_frame(EvalContext* context);
 
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.

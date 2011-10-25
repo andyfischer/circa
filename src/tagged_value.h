@@ -73,6 +73,7 @@ void swap(TaggedValue* left, TaggedValue* right);
 // on the 'doCopy' flag.
 void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doCopy);
 
+void initialize_null(TaggedValue* value);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);
 std::string to_string_annotated(TaggedValue* value);
@@ -99,6 +100,7 @@ void* get_pointer(TaggedValue* value, Type* expectedType);
 
 void set_bool(TaggedValue* value, bool b);
 void set_branch(TaggedValue* value, Branch* branch);
+Dict* set_dict(TaggedValue* value);
 void set_float(TaggedValue* value, float f);
 void set_function_pointer(TaggedValue* value, Term* function);
 void set_int(TaggedValue* value, int i);
