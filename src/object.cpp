@@ -4,6 +4,7 @@
 
 #include "gc.h"
 #include "object.h"
+#include "type.h"
 
 namespace circa {
 
@@ -22,6 +23,8 @@ void register_new_object(CircaObject* obj, Type* type, bool permanent)
     obj->gcColor = 0;
 
     gc_register_object(header);
+    
+    ca_assert(type != NULL);
 }
 
 void on_object_deleted(CircaObject* obj)

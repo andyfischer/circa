@@ -13,6 +13,7 @@ bool g_currentlyCollecting = false;
 
 void gc_register_object(CircaObject* obj)
 {
+    ca_assert(strcmp(obj->magicalHeader, "caobj") == 0);
     ca_assert(obj->next == NULL);
     ca_assert(obj->prev == NULL);
 
@@ -51,6 +52,7 @@ void gc_collect()
     if (color == s_lastColorUsed)
         color = 2;
     s_lastColorUsed = color;
+
     g_currentlyCollecting = true;
 
     // First pass: find root objects, and accumulate their references.
@@ -101,6 +103,31 @@ void gc_ref_list_reset(GCReferenceList* list)
     list->count = 0;
 }
 
+int gc_count_live_objects()
+{
+    int count = 0;
+    for (CircaObject* current = g_first; current != NULL; current = current->next)
+        count += 1;
+    return count;
+}
+
+void gc_dump_live_objects()
+{
+    for (CircaObject* current = g_first; current != NULL; current = current->next)
+        std::cout << current->type->name << "@" << current << std::endl;
+}
+
+bool gc_sanity_check_live_objects()
+{
+    for (CircaObject* current = g_first; current != NULL; current = current->next) {
+        if (strcmp(current->magicalHeader, "caobj") != 0) {
+            std::cout << "sanity check failed on live object:" << std::endl;
+            return false;
+        }
+    }
+    return true;
+}
+
 void gc_mark(GCReferenceList* refList, CircaObject* object, GCColor color)
 {
     if (object == NULL)
@@ -131,6 +158,7 @@ void gc_mark_tagged_value(GCReferenceList* list, TaggedValue* value, GCColor col
 
     // TODO: Follow the value as well
 }
+
 
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b)
 {

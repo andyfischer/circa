@@ -31,6 +31,10 @@ void gc_mark_tagged_value(GCReferenceList* list, TaggedValue* value, GCColor col
 
 void gc_ref_list_reset(GCReferenceList* list);
 
+// Query the live object list
+int gc_count_live_objects();
+bool gc_sanity_check_live_objects();
+void gc_dump_live_objects();
 
 // Swap the contents of 'a' with 'b'
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b);

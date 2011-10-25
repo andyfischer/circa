@@ -56,6 +56,11 @@ struct EvalContext
 
     EvalContext();
     ~EvalContext();
+
+private:
+    // Disabled calls
+    EvalContext(EvalContext const&) {}
+    EvalContext& operator=(EvalContext const&) { return *this; }
 };
 
 void eval_context_setup_type(Type* type);

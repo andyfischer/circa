@@ -16,12 +16,6 @@ namespace type_t {
         Type* type = create_type();
         set_pointer(value, type);
     }
-    void release(Type*, TaggedValue* value)
-    {
-        ca_assert(is_type(value));
-        Type* type = (Type*) get_pointer(value);
-        set_object_permanent((CircaObject*) type, false);
-    }
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
         ca_assert(is_type(source));
@@ -65,7 +59,6 @@ namespace type_t {
         type->name = "Type";
         type->storageType = STORAGE_TYPE_TYPE;
         type->initialize = type_t::initialize;
-        type->release = release;
         type->copy = copy;
         type->formatSource = formatSource;
         type->toString = toString;

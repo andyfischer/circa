@@ -254,16 +254,17 @@ void test_state_simple()
 
     // Same test with else
     branch.clear();
-    context = EvalContext();
+
+    EvalContext context2;
     block = branch.compile("if false {} else { state i = 0; i += 1 }");
-    evaluate_branch(&context, &branch);
-    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
+    evaluate_branch(&context2, &branch);
+    i = context2.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
-    evaluate_branch(&context, &branch);
-    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
+    evaluate_branch(&context2, &branch);
+    i = context2.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 2);
-    evaluate_branch(&context, &branch);
-    i = context.state.getField("_if_block")->getIndex(1)->getField("i");
+    evaluate_branch(&context2, &branch);
+    i = context2.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 3);
 }
 

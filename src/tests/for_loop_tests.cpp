@@ -104,16 +104,17 @@ void test_state_simple()
     test_equals(&context.state, "{_for: [{s: 1}, {s: 2}, {s: 3}]}");
 
     branch.clear();
-    context = EvalContext();
+
+    EvalContext context2;
 
     branch.compile("l = [1 2 3]; for i in @l { state s = 0; s += i }");
 
-    evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{l_1: [{s: 1}, {s: 2}, {s: 3}]}");
-    evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{l_1: [{s: 2}, {s: 4}, {s: 6}]}");
-    evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{l_1: [{s: 3}, {s: 6}, {s: 9}]}");
+    evaluate_branch(&context2, &branch);
+    test_equals(&context2.state, "{l_1: [{s: 1}, {s: 2}, {s: 3}]}");
+    evaluate_branch(&context2, &branch);
+    test_equals(&context2.state, "{l_1: [{s: 2}, {s: 4}, {s: 6}]}");
+    evaluate_branch(&context2, &branch);
+    test_equals(&context2.state, "{l_1: [{s: 3}, {s: 6}, {s: 9}]}");
 }
 
 void test_state_nested()

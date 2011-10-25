@@ -120,6 +120,11 @@ struct Type
 
     Type();
     ~Type();
+
+    // Disallow copy constructor
+private:
+    Type(Type const&) { internal_error(""); }
+    Type& operator=(Type const&) { internal_error(""); return *this; }
 };
 
 struct StaticTypeQuery
@@ -156,7 +161,6 @@ struct StaticTypeQuery
 namespace type_t {
 
     void initialize(Type* type, TaggedValue* value);
-    void release(Type*, TaggedValue* value);
     void copy(Type*, TaggedValue* source, TaggedValue* dest);
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);

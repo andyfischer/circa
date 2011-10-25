@@ -129,10 +129,10 @@ struct Branch
 
     std::string toString();
 
+    // Disallow copy constructor
 private:
-    // Disabled calls
-    Branch(Branch const&) {}
-    Branch& operator=(Branch const&) { return *this; }
+    Branch(Branch const&) { internal_error(""); }
+    Branch& operator=(Branch const&) { internal_error(""); return *this; }
 };
 
 void branch_setup_type(Type* type);
