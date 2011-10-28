@@ -27,6 +27,7 @@ void dump_with_props(Branch& branch);
 
 void dump(TaggedValue& value);
 void dump(TaggedValue* value);
+void dump(EvalContext* context);
 
 // Signal that an unexpected error has occurred. Depending on debug settings, this
 // will either throw an exception or trigger an assert().

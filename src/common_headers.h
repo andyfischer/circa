@@ -63,15 +63,18 @@ union VariantValue {
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \
-    void fname(circa::EvalContext* _cxt, int _count, circa::TaggedValue* _args)
+    void fname(circa::EvalContext* _cxt, circa::ListData* _args)
 
-typedef void (*EvaluateFunc)(EvalContext* cxt, int count, TaggedValue* args);
+typedef void (*EvaluateFunc)(EvalContext* cxt, ListData* args);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
 // Garbage collection
 typedef char GCColor;
+
+// Used in evaluation functions:
+int list_size(ListData* data);
 
 // Possibly enable ca_assert and/or ca_test_assert. When enabled, ca_assert will
 // call internal_error() if the condition is false.

@@ -202,6 +202,7 @@ namespace overloaded_function {
         attrs->name = name;
         attrs->evaluate = evaluate_overload;
         attrs->postInputChange = overload_post_input_change;
+        attrs->createsStackFrame = true;
         // attrs->specializeType = overload_specialize_type;
 
         List& parameters = get_function_attrs(term)->parameters;

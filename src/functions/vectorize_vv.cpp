@@ -40,13 +40,16 @@ namespace vectorize_vv_function {
         // Evaluate vectorized call, once for each input
         for (int i=0; i < listLength; i++) {
             // Copy inputs into placeholder
-            swap(input0.getIndex(i), get_local(input0_placeholder));
-            swap(input1.getIndex(i), get_local(input1_placeholder));
+            swap(input0.getIndex(i),
+                top_frame(CONTEXT)->registers[input0_placeholder->localsIndex]);
+            swap(input1.getIndex(i),
+                top_frame(CONTEXT)->registers[input1_placeholder->localsIndex]);
 
             evaluate_single_term(CONTEXT, content_output);
 
             // Save output
-            swap(get_local(content_output), output->get(i));
+            swap(top_frame(CONTEXT)->registers[content_output->localsIndex],
+                output->get(i));
         }
 
         pop_frame(CONTEXT);
@@ -86,6 +89,7 @@ namespace vectorize_vv_function {
                 "vectorize_vv(List,List) -> List");
         get_function_attrs(func)->specializeType = specializeType;
         get_function_attrs(func)->postInputChange = post_input_change;
+        get_function_attrs(func)->createsStackFrame = true;
     }
 }
 } // namespace circa

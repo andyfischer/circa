@@ -36,17 +36,19 @@ namespace vectorize_vs_function {
         List* output = set_list(&outputTv, listLength);
 
         // Copy right input once
-        swap(&input1, get_local(input1_placeholder));
+        swap(&input1, top_frame(CONTEXT)->registers[input1_placeholder->localsIndex]);
 
         // Evaluate vectorized call, once for each input
         for (int i=0; i < listLength; i++) {
             // Copy left into placeholder
-            swap(input0.getIndex(i), get_local(input0_placeholder));
+            swap(input0.getIndex(i),
+                top_frame(CONTEXT)->registers[input0_placeholder->localsIndex]);
 
             evaluate_single_term(CONTEXT, content_output);
 
             // Save output
-            swap(get_local(content_output), output->get(i));
+            swap(top_frame(CONTEXT)->registers[content_output->localsIndex],
+                output->get(i));
         }
 
         pop_frame(CONTEXT);
@@ -86,6 +88,7 @@ namespace vectorize_vs_function {
                 "vectorize_vs(List,any) -> List");
         get_function_attrs(func)->specializeType = specializeType;
         get_function_attrs(func)->postInputChange = post_input_change;
+        get_function_attrs(func)->createsStackFrame = true;
     }
 }
 } // namespace circa

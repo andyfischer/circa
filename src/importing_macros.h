@@ -30,7 +30,7 @@
 
 #define CALLER (_cxt->currentTerm)
 #define CONTEXT (_cxt)
-#define NUM_INPUTS (_count-1)
+#define NUM_INPUTS (list_size(_args)-1)
 #define INPUT(index) (get_arg(_cxt, _args, (index)))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))
@@ -38,7 +38,7 @@
 #define INT_INPUT(index) (circa::as_int(INPUT(index)))
 #define STATE_INPUT (get_state_input(_cxt, CALLER))
 #define INPUT_TERM(index) (CALLER->input(index))
-#define OUTPUT (get_arg(_cxt, _args, _count - 1))
+#define OUTPUT (get_arg(_cxt, _args, NUM_INPUTS))
 #define EXTRA_OUTPUT(index) (get_extra_output(_cxt, CALLER, (index)))
 #define FUNCTION (CALLER->function)
 #define ERROR_OCCURRED(msg) (error_occurred(_cxt, CALLER, (msg)))

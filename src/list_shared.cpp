@@ -7,6 +7,11 @@
 
 namespace circa {
 
+std::string ListData::toStr()
+{
+    return list_to_string(this);
+}
+
 void assert_valid_list(ListData* list)
 {
     if (list == NULL) return;
@@ -249,6 +254,21 @@ void list_remove_nulls(ListData** dataPtr)
             swap(&data->items[i - numRemoved], &data->items[i]);
     }
     *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
+}
+
+std::string list_to_string(ListData* value)
+{
+    if (value == NULL)
+        return "[]";
+
+    std::stringstream out;
+    out << "[";
+    for (int i=0; i < value->count; i++) {
+        if (i > 0) out << ", ";
+        out << to_string(&value->items[i]);
+    }
+    out << "]";
+    return out.str();
 }
 
 int list_get_length(TaggedValue* value)

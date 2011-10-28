@@ -307,6 +307,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (is_value(term))
         out << " val:" << to_string((TaggedValue*) term);
 
+#if 0
     out << " local:";
     for (int i=0; i < outputCount; i++) {
         if (i != 0) out << ",";
@@ -316,6 +317,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         else
             out << local->toString();
     }
+#endif
 
 #if 0
     out << " users = ["; 

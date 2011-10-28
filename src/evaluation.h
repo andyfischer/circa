@@ -72,6 +72,7 @@ private:
     EvalContext& operator=(EvalContext const&) { return *this; }
 };
 
+void eval_context_print_multiline(std::ostream& out, EvalContext* context);
 void eval_context_setup_type(Type* type);
 
 // Stack frames
@@ -124,7 +125,7 @@ TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term, int outputIndex);
 
-TaggedValue* get_arg(EvalContext* context, TaggedValue* args, int index);
+TaggedValue* get_arg(EvalContext* context, ListData* args, int index);
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
 

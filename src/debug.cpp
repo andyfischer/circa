@@ -6,6 +6,7 @@
 
 #include "build_options.h"
 #include "branch.h"
+#include "evaluation.h"
 #include "introspection.h"
 
 #include "debug.h"
@@ -38,6 +39,11 @@ void dump(TaggedValue& value)
 void dump(TaggedValue* value)
 {
     std::cout << value->toString() << std::endl;
+}
+
+void dump(EvalContext* context)
+{
+    eval_context_print_multiline(std::cout, context);
 }
 
 void internal_error(const char* message)

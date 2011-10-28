@@ -64,20 +64,6 @@ namespace list_t {
         return &d->items[0];
     }
 
-    std::string to_string(ListData* value)
-    {
-        if (value == NULL)
-            return "[]";
-
-        std::stringstream out;
-        out << "[";
-        for (int i=0; i < value->count; i++) {
-            if (i > 0) out << ", ";
-            out << to_string(&value->items[i]);
-        }
-        out << "]";
-        return out.str();
-    }
 
     // TaggedValue wrappers
     void tv_touch(TaggedValue* value);
@@ -243,7 +229,7 @@ namespace list_t {
     std::string tv_to_string(TaggedValue* value)
     {
         ca_assert(is_list(value));
-        return to_string((ListData*) get_pointer(value));
+        return list_to_string((ListData*) get_pointer(value));
     }
 
     void tv_touch(TaggedValue* value)

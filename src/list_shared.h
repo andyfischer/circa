@@ -14,6 +14,8 @@ struct ListData {
     int capacity;
     TaggedValue items[0];
     // items has size [capacity].
+
+    std::string toStr();
 };
 
 void assert_valid_list(ListData* list);
@@ -40,8 +42,9 @@ TaggedValue* list_append(TaggedValue* list);
 TaggedValue* list_insert(TaggedValue* list, int index);
 void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
 void list_remove_nulls(TaggedValue* list);
+std::string list_to_string(ListData* value);
 
-// Functions for working with List's parameter. Depending on the parameter,
+// Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.
 

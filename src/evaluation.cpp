@@ -44,18 +44,46 @@ EvalContext::~EvalContext()
     on_object_deleted((CircaObject*) this);
 }
 
+std::string stackVariable_toString(TaggedValue* value)
+{
+    short relativeFrame = value->value_data.asint >> 16;
+    short index = (value->value_data.asint & 0xffff);
+    std::stringstream strm;
+    strm << "[frame:" << relativeFrame << ", index:" << index << "]";
+    return strm.str();
+}
+
 void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
     // todo
 }
 
-std::string stackVariable_toString(TaggedValue* value)
+void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 {
-    short relativeFrame = value->value_data.asint << 16;
-    short index = (value->value_data.asint & 0xffff);
-    std::stringstream strm;
-    strm << "[frame:" << relativeFrame << ", index:" << index << "]";
-    return strm.str();
+    out << "[EvalContext " << context << "]" << std::endl;
+    for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
+        Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
+        Branch* branch = frame->branch;
+        out << " [Frame " << frameIndex << ", branch = " << branch << "]" << std::endl;
+
+        if (branch == NULL)
+            continue;
+
+        for (int i=0; i < branch->length(); i++) {
+            Term* term = branch->get(i);
+
+            // indent
+            for (int x = 0; x < frameIndex+1; x++)
+                out << " ";
+
+            print_term(out, term);
+
+            // current value
+            if (!is_value(term))
+                out << "  [" << frame->registers[term->localsIndex]->toString() << "]";
+            out << std::endl;
+        }
+    }
 }
 
 void eval_context_setup_type(Type* type)
@@ -147,7 +175,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     try {
     #endif
 
-    function->evaluate(context, argCount, argList->items);
+    function->evaluate(context, argList);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
@@ -158,24 +186,15 @@ void evaluate_single_term(EvalContext* context, Term* term)
     // a good test.
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term)) {
-        for (int i=0; i < get_output_count(term); i++) {
+        Type* outputType = get_output_type(term);
+        TaggedValue* output = get_arg(context, argList, inputCount);
 
-            Type* outputType = get_output_type(term, i);
-            TaggedValue* output = get_output(context, term, i);
-
-            // Special case, if the function's output type is void then we don't care
-            // if the output value is null or not.
-            if (i == 0 && outputType == &VOID_T)
-                continue;
-
-            if (!cast_possible(output, outputType)) {
-                std::stringstream msg;
-                msg << "Function " << term->function->name << " produced output "
-                    << output->toString() << " (in index " << i << ")"
-                    << " which doesn't fit output type "
-                    << outputType->name;
-                internal_error(msg.str());
-            }
+        if (outputType != &VOID_T && !cast_possible(output, outputType)) {
+            std::stringstream msg;
+            msg << "Function " << term->function->name << " produced output "
+                << output->toString() << " which doesn't fit output type "
+                << outputType->name;
+            internal_error(msg.str());
         }
     }
     #endif
@@ -204,8 +223,10 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue*
     for (int i=0; i < branch->length(); i++)
         evaluate_single_term(context, branch->get(i));
 
-    if (output != NULL)
-        copy(get_local(branch->get(branch->length()-1)), output);
+    if (output != NULL) {
+        Term* outputTerm = branch->getFromEnd(0);
+        copy(top_frame(context)->registers[outputTerm->localsIndex], output);
+    }
 
     pop_frame(context);
 }
@@ -235,18 +256,22 @@ void evaluate_branch_no_preserve_locals(EvalContext* context, Branch* branch)
     set_null(&context->currentScopeState);
 }
 
-void evaluate_branch(EvalContext* context, Branch* branch)
+void copy_locals_back_to_terms(Frame* frame, Branch* branch)
 {
-    evaluate_branch_no_preserve_locals(context, branch);
-
     // Copy stack back to the original terms. Many tests depend on this functionality.
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_value(term)) continue;
-        TaggedValue* val = get_local(term);
+        TaggedValue* val = frame->registers[term->localsIndex];
         if (val != NULL)
             copy(val, branch->get(i));
     }
+}
+
+void evaluate_branch(EvalContext* context, Branch* branch)
+{
+    evaluate_branch_no_preserve_locals(context, branch);
+
 }
 
 void evaluate_branch(Branch* branch)
@@ -342,20 +367,20 @@ TaggedValue* get_local_safe(Term* term, int outputIndex)
     return NULL;
 }
 
-TaggedValue* get_arg(EvalContext* context, TaggedValue* args, int index)
+TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
 {
-    TaggedValue* arg = &args[index];
+    TaggedValue* arg = list_get_index(args, index);
     if (arg->value_type == &globalVariableIsn_t) {
         return (TaggedValue*) get_pointer(arg);
     } else if (arg->value_type == &stackVariableIsn_t) {
-        short relativeFrame = arg->value_data.asint << 16;
+        short relativeFrame = arg->value_data.asint >> 16;
         short index = arg->value_data.asint & 0xffff;
 
         ca_assert(relativeFrame < context->numFrames);
         Frame* frame = get_frame(context, relativeFrame);
         return frame->registers[index];
     } else {
-        return &args[index];
+        return arg;
     }
 }
 
@@ -422,12 +447,15 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch->get(i));
 
+    copy_locals_back_to_terms(top_frame(context), branch);
+
     // copy locals back to terms
+    Frame* frame = top_frame(context);
     for (int i=start; i <= end; i++) {
         Term* term = branch->get(i);
         if (is_value(term))
             continue;
-        TaggedValue* value = get_local(term);
+        TaggedValue* value = frame->registers[term->localsIndex];
         if (value == NULL)
             continue;
         copy(value, term);
