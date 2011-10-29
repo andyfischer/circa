@@ -14,4 +14,4 @@ print('should be [4 8 16 0]: ' [2 4 8 0] * [2 2 2 2])
 type Point { number x, number y }
 a = [1 0] -> Point
 b = a + [0 2]
-print('should be [1.0, 0.0]: ' b)
+print('should be [1.0, 2.0]: ' b)

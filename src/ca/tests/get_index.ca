@@ -1,0 +1,4 @@
+
+l = [1 2 3]
+print('l = ' l)
+print('get_index(l, 0) == ', get_index(l, 0))

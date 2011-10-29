@@ -94,26 +94,6 @@ void test_vectorized_funcs()
     test_assert(context.errorOccurred);
 }
 
-void test_vectorized_funcs_with_points()
-{
-    // This test is similar, but we define the type Point and see if
-    // vectorized functions work against that.
-    Branch branch;
-    
-    Term* point_t = branch.compile("type Point {number x, number y}");
-
-    Term* a = branch.compile("a = [1 0] -> Point");
-
-    test_assert(a->type == as_type(point_t));
-
-    Term* b = branch.compile("b = a + [0 2]");
-
-    evaluate_branch(&branch);
-
-    test_equals(b->getIndex(0)->toFloat(), 1);
-    test_equals(b->getIndex(1)->toFloat(), 2);
-}
-
 void test_cond_with_int_and_float()
 {
     Branch branch;
@@ -123,40 +103,6 @@ void test_cond_with_int_and_float()
     test_assert(a->type != &ANY_T);
     Term* b = branch.compile("cond(true, 1.0, 1)");
     test_assert(b->type != &ANY_T);
-}
-
-void test_get_index()
-{
-    Branch branch;
-    branch.eval("l = [1 2 3]");
-    TaggedValue* get = branch.eval("get_index(l, 0)");
-
-    test_assert(get);
-    test_assert(get->value_type == unbox_type(INT_TYPE));
-    test_assert(get->asInt() == 1);
-
-    branch.eval("l = []");
-
-    EvalContext context;
-    evaluate(&context, &branch, "l = []; get_index(l, 5)");
-    test_assert(context.errorOccurred);
-}
-
-void test_set_index()
-{
-    Branch branch;
-
-    branch.eval("l = [1 2 3]");
-    TaggedValue* l2 = branch.eval("set_index(@l, 1, 5)");
-
-    test_assert(l2->getIndex(0)->asInt() == 1);
-    test_assert(l2->getIndex(1)->asInt() == 5);
-    test_assert(l2->getIndex(2)->asInt() == 3);
-
-    TaggedValue* l3 = branch.eval("l[2] = 9");
-    test_assert(l3->getIndex(0)->asInt() == 1);
-    test_assert(l3->getIndex(1)->asInt() == 5);
-    test_assert(l3->getIndex(2)->asInt() == 9);
 }
 
 void test_do_once()
@@ -349,13 +295,10 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
     REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
-    REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs_with_points);
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
-    REGISTER_TEST_CASE(builtin_function_tests::test_get_index);
-    REGISTER_TEST_CASE(builtin_function_tests::test_set_index);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
-    REGISTER_TEST_CASE(builtin_function_tests::test_changed);
-    REGISTER_TEST_CASE(builtin_function_tests::test_delta);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_changed);
+    //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_delta);
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing);
     REGISTER_TEST_CASE(builtin_function_tests::test_message_passing2);
     REGISTER_TEST_CASE(builtin_function_tests::test_run_single_statement);

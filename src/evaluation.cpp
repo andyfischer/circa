@@ -309,35 +309,6 @@ void consume_input(EvalContext* context, Term* term, int index, TaggedValue* des
     copy(get_input(context, term, index), dest);
 }
 
-TaggedValue* get_output(EvalContext* context, Term* term, int index)
-{
-    InputInstruction *instruction = &term->inputIsns.outputs[index];
-
-    switch (instruction->type) {
-    case InputInstruction::GLOBAL:
-        return (TaggedValue*) term;
-    case InputInstruction::OLD_STYLE_LOCAL:
-        return get_local(term, index);
-    case InputInstruction::EMPTY:
-        internal_error("Attempt to access NULL output");
-        return NULL;
-    case InputInstruction::LOCAL: {
-        TaggedValue* frame = list_get_index_from_end(&context->stack,
-            instruction->data.relativeFrame);
-        return list_get_index(frame, instruction->data.index);
-    }
-    case InputInstruction::LOCAL_CONSUME:
-    default:
-        internal_error("Invalid instruction in get_output: LOCAL_CONSUME");
-        return NULL;
-    }
-}
-
-TaggedValue* get_extra_output(EvalContext* context, Term* term, int index)
-{
-    return get_output(context, term, index + 1);
-}
-
 TaggedValue* get_state_input(EvalContext* cxt, Term* term)
 {
     if (term->input(0) == NULL) {
@@ -383,13 +354,22 @@ TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
         return arg;
     }
 }
+TaggedValue* get_output(EvalContext* context, ListData* args)
+{
+    return get_arg(context, args, list_size(args) - 1);
+}
+TaggedValue* get_extra_output(EvalContext* context, Term* term, int index)
+{
+    internal_error("get_extra_output no worky");
+    return NULL;
+}
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
     // Save the error as this term's output value.
-    TaggedValue* out = get_output(context, errorTerm, 0);
-    set_string(out, message);
-    out->value_type = &ERROR_T;
+    //TaggedValue* out = get_output(context, errorTerm, 0);
+    //set_string(out, message);
+    //out->value_type = &ERROR_T;
 
     // Check if there is an errored() call listening to this term. If so, then
     // continue execution.
@@ -448,19 +428,6 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
         evaluate_single_term(context, branch->get(i));
 
     copy_locals_back_to_terms(top_frame(context), branch);
-
-    // copy locals back to terms
-    Frame* frame = top_frame(context);
-    for (int i=start; i <= end; i++) {
-        Term* term = branch->get(i);
-        if (is_value(term))
-            continue;
-        TaggedValue* value = frame->registers[term->localsIndex];
-        if (value == NULL)
-            continue;
-        copy(value, term);
-    }
-
     pop_frame(context);
 }
 
@@ -506,7 +473,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
 
     // Possibly save output
     if (result != NULL)
-        copy(get_local(term), result);
+        copy(top_frame(context)->registers[term->localsIndex], result);
 
     delete[] marked;
 
@@ -518,7 +485,7 @@ TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& i
     int prevHead = branch->length();
     Term* result = parser::compile(branch, parser::statement_list, input);
     evaluate_range(context, branch, prevHead, branch->length() - 1);
-    return get_local(result);
+    return result;
 }
 
 TaggedValue* evaluate(Branch* branch, Term* function, List* inputs)
@@ -534,7 +501,7 @@ TaggedValue* evaluate(Branch* branch, Term* function, List* inputs)
     int prevHead = branch->length();
     Term* result = apply(branch, function, inputTerms);
     evaluate_range(&context, branch, prevHead, branch->length() - 1);
-    return get_local(result);
+    return result;
 }
 
 TaggedValue* evaluate(Term* function, List* inputs)
@@ -553,10 +520,8 @@ std::string context_get_error_message(EvalContext* cxt)
 {
     ca_assert(cxt != NULL);
     ca_assert(cxt->errorTerm != NULL);
-    TaggedValue* output = get_output(cxt, cxt->errorTerm, 0);
-    if (output == NULL)
-        return "error message unavailable";
-    return as_string(output);
+    // FIXME
+    return "";
 }
 
 } // namespace circa

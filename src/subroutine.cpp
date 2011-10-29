@@ -47,72 +47,6 @@ Type* get_subroutine_output_type(Branch* contents)
     return as_type(as_function_attrs(contents->get(0)).outputTypes[0]);
 }
 
-void evaluate_subroutine_internal(EvalContext* context, Term* caller,
-        Branch* contents, List* inputs, List* outputs)
-{
-    context->interruptSubroutine = false;
-    push_frame(context, contents);
-
-    int numInputs = inputs->length();
-
-    // Insert inputs into placeholders
-    for (int i=0; i < numInputs; i++) {
-        Term* placeholder = get_subroutine_input_placeholder(contents, i);
-        swap(inputs->get(i), get_local(placeholder));
-    }
-
-    // Prepare output
-    set_null(&context->subroutineOutput);
-
-    // Evaluate each term
-    for (int i=numInputs+1; i < contents->length(); i++) {
-        evaluate_single_term(context, contents->get(i));
-        if (evaluation_interrupted(context))
-            break;
-    }
-
-    // Fetch output
-    Type* outputType = get_subroutine_output_type(contents);
-
-    ca_assert(is_list(&context->subroutineOutput) || is_null(&context->subroutineOutput));
-
-    if (is_list(&context->subroutineOutput))
-        swap(&context->subroutineOutput, outputs);
-    
-    set_null(&context->subroutineOutput);
-
-    if (context->errorOccurred) {
-        outputs->resize(1);
-        set_null(outputs->get(0));
-    } else if (outputType == &VOID_T) {
-
-        set_null(outputs->get(0));
-
-    } else {
-
-        TaggedValue* output0 = outputs->get(0);
-
-        bool castSuccess = cast(output0, outputType, outputs->get(0));
-        
-        if (!castSuccess) {
-            std::stringstream msg;
-            msg << "Couldn't cast output " << output0->toString()
-                << " to type " << outputType->name;
-            error_occurred(context, caller, msg.str());
-        }
-    }
-
-    // Rescue input values
-    for (int i=0; i < numInputs; i++) {
-        Term* placeholder = get_subroutine_input_placeholder(contents, i);
-        swap(inputs->get(i), get_local(placeholder));
-    }
-
-    // Clean up
-    pop_frame(context);
-    context->interruptSubroutine = false;
-}
-
 CA_FUNCTION(evaluate_subroutine)
 {
     EvalContext* context = CONTEXT;
@@ -122,6 +56,7 @@ CA_FUNCTION(evaluate_subroutine)
     int numInputs = caller->numInputInstructions();
 
     // Copy inputs to a temporary list
+#if 0
     List inputs;
     inputs.resize(numInputs);
 
@@ -141,6 +76,7 @@ CA_FUNCTION(evaluate_subroutine)
             return error_occurred(context, caller, msg.str());
         }
     }
+#endif
 
     // Fetch state container
     TaggedValue prevScopeState;
@@ -149,25 +85,77 @@ CA_FUNCTION(evaluate_subroutine)
     if (is_function_stateful(function))
         fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
 
-    // Evaluate contents
-    List outputs;
-    evaluate_subroutine_internal(context, caller, contents, &inputs, &outputs);
+    {
+        context->interruptSubroutine = false;
+        Frame* frame = push_frame(context, contents);
 
+        // Insert inputs into placeholders
+        for (int i=0; i < NUM_INPUTS; i++) {
+            Term* placeholder = get_subroutine_input_placeholder(contents, i);
+            copy(INPUT(i), frame->registers[placeholder->localsIndex]);
+        }
+
+        // Prepare output
+        set_null(&context->subroutineOutput);
+
+        // Evaluate each term
+        for (int i=numInputs+1; i < contents->length(); i++) {
+            evaluate_single_term(context, contents->get(i));
+            if (evaluation_interrupted(context))
+                break;
+        }
+
+        // Save output
+        TaggedValue output;
+
+        Type* outputType = get_subroutine_output_type(contents);
+
+        if (context->errorOccurred) {
+            set_null(&output);
+        } else if (outputType == &VOID_T) {
+
+            set_null(&output);
+
+        } else {
+
+            bool castSuccess = cast(&context->subroutineOutput, outputType, &output);
+            
+            if (!castSuccess) {
+                std::stringstream msg;
+                msg << "Couldn't cast output " << output.toString()
+                    << " to type " << outputType->name;
+                error_occurred(context, caller, msg.str());
+            }
+        }
+
+        set_null(&context->subroutineOutput);
+
+        // Clean up
+        pop_frame(context);
+        swap(&output, OUTPUT);
+        context->interruptSubroutine = false;
+        
+    }
     // Preserve state
     if (is_function_stateful(function))
         save_and_consume_state(caller, &prevScopeState, &context->currentScopeState);
     swap(&context->currentScopeState, &prevScopeState);
 
+#if 0
     // Write output
-    TaggedValue* outputDest = get_output(context, caller, 0);
+    TaggedValue* outputDest = get_output(context, _args);
     if (outputDest != NULL)
         swap(outputs[0], outputDest);
+#endif
 
     // Write extra outputs
+#if 0
+    // FIXME
     ca_assert(outputs.length() == get_output_count(caller));
 
     for (int i=1; i < outputs.length(); i++)
         copy(outputs[i], get_output(context, caller, i));
+#endif
 }
 
 bool is_subroutine(Term* term)
@@ -298,18 +286,7 @@ void restore_locals(TaggedValue* storageTv, Branch* branch)
 void call_subroutine(Branch* sub, TaggedValue* inputs, TaggedValue* output,
                      TaggedValue* error)
 {
-    List* inputsList = List::checkCast(inputs);
-    ca_assert(inputsList != NULL);
-
-    EvalContext context;
-    List outputs;
-    evaluate_subroutine_internal(&context, NULL, sub, inputsList, &outputs);
-
-    // TODO: caller should get this whole list
-    copy(outputs.get(0), output);
-
-    if (context.errorOccurred)
-        set_string(error, context_get_error_message(&context));
+    internal_error("call_subroutine no worky");
 }
 
 void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)
