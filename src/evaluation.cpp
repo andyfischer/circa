@@ -79,8 +79,13 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
             print_term(out, term);
 
             // current value
-            if (!is_value(term))
-                out << "  [" << frame->registers[term->localsIndex]->toString() << "]";
+            if (!is_value(term)) {
+                TaggedValue* value = frame->registers[term->index];
+                if (value == NULL)
+                    out << " [<register OOB>]";
+                else
+                    out << "  [" << value->toString() << "]";
+            }
             out << std::endl;
         }
     }
@@ -134,7 +139,18 @@ void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValu
     
     isn->value_data.asint = 0;
     isn->value_data.asint += relativeFrame << 16;
-    isn->value_data.asint += (input->localsIndex % 0xffff);
+    isn->value_data.asint += (input->index % 0xffff);
+}
+
+void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
+{
+    if (input == NULL) {
+        set_null(isn);
+    } else if (is_value(input)) {
+        set_pointer(isn, &globalVariableIsn_t, input);
+    } else {
+        write_stack_input_instruction(caller->owningBranch, input, isn);
+    }
 }
 
 void evaluate_single_term(EvalContext* context, Term* term)
@@ -144,10 +160,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
     Function* function = get_function_attrs(term->function);
 
-    if (function == NULL)
-        return;
-
-    if (function->evaluate == NULL)
+    if (function == NULL || function->evaluate == NULL)
         return;
 
     context->currentTerm = term;
@@ -157,16 +170,8 @@ void evaluate_single_term(EvalContext* context, Term* term)
     int argCount = inputCount + 1;
     ListData* argList = allocate_list(argCount);
 
-    for (int i=0; i < inputCount; i++) {
-        Term* input = term->input(i);
-        if (input == NULL) {
-            set_null(list_get_index(argList,i));
-        } else if (is_value(input)) {
-            set_pointer(list_get_index(argList, i), &globalVariableIsn_t, input);
-        } else {
-            write_stack_input_instruction(term->owningBranch, input, list_get_index(argList,i));
-        }
-    }
+    for (int i=0; i < inputCount; i++)
+        write_input_instruction(term, term->input(i), list_get_index(argList, i));
 
     // Prepare output
     write_stack_input_instruction(term->owningBranch, term, list_get_index(argList, inputCount));
@@ -225,7 +230,7 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue*
 
     if (output != NULL) {
         Term* outputTerm = branch->getFromEnd(0);
-        copy(top_frame(context)->registers[outputTerm->localsIndex], output);
+        copy(top_frame(context)->registers[outputTerm->index], output);
     }
 
     pop_frame(context);
@@ -262,7 +267,7 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_value(term)) continue;
-        TaggedValue* val = frame->registers[term->localsIndex];
+        TaggedValue* val = frame->registers[term->index];
         if (val != NULL)
             copy(val, branch->get(i));
     }
@@ -338,9 +343,8 @@ TaggedValue* get_local_safe(Term* term, int outputIndex)
     return NULL;
 }
 
-TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
+TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
 {
-    TaggedValue* arg = list_get_index(args, index);
     if (arg->value_type == &globalVariableIsn_t) {
         return (TaggedValue*) get_pointer(arg);
     } else if (arg->value_type == &stackVariableIsn_t) {
@@ -353,6 +357,11 @@ TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
     } else {
         return arg;
     }
+}
+
+TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
+{
+    return get_arg(context, list_get_index(args, index));
 }
 TaggedValue* get_output(EvalContext* context, ListData* args)
 {
@@ -473,7 +482,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
 
     // Possibly save output
     if (result != NULL)
-        copy(top_frame(context)->registers[term->localsIndex], result);
+        copy(top_frame(context)->registers[term->index], result);
 
     delete[] marked;
 

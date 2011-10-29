@@ -36,61 +36,10 @@ int get_output_count(Term* term)
     // Default behavior, if Function was found.
     return attrs->outputCount;
 }
-    
-void update_locals_index_for_new_term(Term* term)
-{
-    Branch* branch = term->owningBranch;
-
-    term->outputCount = get_output_count(term);
-
-    // make sure localsIndex is -1 so that if get_locals_count looks at this
-    // term, it doesn't get confused.
-    term->localsIndex = -1;
-    if (term->outputCount > 0)
-        term->localsIndex = get_locals_count(branch);
-}
 
 int get_locals_count(Branch* branch)
 {
-    if (branch->length() == 0)
-        return 0;
-
-    int lastLocal = branch->length() - 1;
-
-    while (branch->get(lastLocal) == NULL || branch->get(lastLocal)->localsIndex == -1) {
-        lastLocal--;
-        if (lastLocal < 0)
-            return 0;
-    }
-
-    Term* last = branch->get(lastLocal);
-
-    return last->localsIndex + get_output_count(last);
-}
-
-void refresh_locals_indices(Branch* branch, int startingAt)
-{
-    int nextLocal = 0;
-    if (startingAt > 0) {
-        Term* prev = branch->get(startingAt - 1);
-        nextLocal = prev->localsIndex + get_output_count(prev);
-    }
-
-    for (int i=startingAt; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        if (term == NULL)
-            continue;
-        term->localsIndex = nextLocal;
-
-        int newOutputCount = get_output_count(term);
-        if (term->outputCount != newOutputCount) {
-            term->outputCount = newOutputCount;
-            update_input_instructions(term);
-        }
-
-        term->outputCount = get_output_count(term);
-        nextLocal += term->outputCount;
-    }
+    return branch->length();
 }
 
 void update_output_count(Term* term)

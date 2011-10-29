@@ -24,7 +24,6 @@ Term::Term()
     function(NULL),
     owningBranch(NULL),
     index(0),
-    localsIndex(0),
     outputCount(0),
     nestedContents(NULL)
 {

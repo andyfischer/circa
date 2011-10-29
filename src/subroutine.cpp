@@ -92,7 +92,7 @@ CA_FUNCTION(evaluate_subroutine)
         // Insert inputs into placeholders
         for (int i=0; i < NUM_INPUTS; i++) {
             Term* placeholder = get_subroutine_input_placeholder(contents, i);
-            copy(INPUT(i), frame->registers[placeholder->localsIndex]);
+            copy(INPUT(i), frame->registers[placeholder->index]);
         }
 
         // Prepare output

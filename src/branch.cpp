@@ -724,8 +724,6 @@ void append_internal_error(BranchInvariantCheck* result, int index, std::string 
 
 void branch_check_invariants(BranchInvariantCheck* result, Branch* branch)
 {
-    int expectedLocalIndex = 0;
-
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
 
@@ -744,18 +742,6 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch* branch)
         // Check that owningBranch is correct
         if (term->owningBranch != branch)
             append_internal_error(result, i, "Wrong owningBranch");
-
-        // Check localIndex
-        int numOutputs = get_output_count(term);
-        if (numOutputs != 0) {
-            if (term->localsIndex != expectedLocalIndex) {
-                std::stringstream msg;
-                msg << "Wrong localsIndex (found " << term->localsIndex << ", expected "
-                    << expectedLocalIndex << ")";
-                append_internal_error(result, i, msg.str());
-            }
-            expectedLocalIndex = term->localsIndex + numOutputs;
-        }
     }
 } 
 

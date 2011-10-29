@@ -137,7 +137,6 @@ void test_erase_term()
     test_assert(b->input(0) == a);
 
     erase_term(a);
-    refresh_locals_indices(&branch);
     test_assert(b->input(0) == NULL);
 
     // Erase a function that's being used
@@ -146,7 +145,6 @@ void test_erase_term()
     test_assert(f_call->function == f);
 
     erase_term(f);
-    refresh_locals_indices(&branch);
     test_assert(f_call->function == NULL);
 }
 

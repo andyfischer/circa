@@ -134,9 +134,6 @@ void bootstrap_kernel()
     VALUE_FUNC->function = VALUE_FUNC;
     change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 
-    // Update locals so that debugging checks don't complain.
-    refresh_locals_indices(KERNEL);
-
     update_bootstrapped_term(VALUE_FUNC);
     update_bootstrapped_term(TYPE_TYPE);
     update_bootstrapped_term(ANY_TYPE);

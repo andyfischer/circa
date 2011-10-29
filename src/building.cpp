@@ -58,7 +58,6 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
     update_unique_name(result);
     on_inputs_changed(result);
-    update_locals_index_for_new_term(result);
     update_input_instructions(result);
 
     if (is_get_state(result) || has_implicit_state(result))
@@ -258,7 +257,6 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     change_declared_type(term, type);
     change_type((TaggedValue*) term, type);
     update_unique_name(term);
-    update_locals_index_for_new_term(term);
     update_input_instructions(term);
 
     return term;
@@ -450,21 +448,19 @@ void post_compile_term(Term* term)
 
     // Default behavior for postCompile..
     
-    // If the function has multiple outputs, and any of these outputs have names,
-    // then copy these outputs to named terms. This is a workaround until we can
-    // fully support terms with multiple output names.
+    // If the function has multiple outputs, then create extra_output terms for all of
+    // those outputs.
     Branch* owningBranch = term->owningBranch;
     int numOutputs = get_output_count(term);
     for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
         const char* name = get_output_name(term, outputIndex);
-        if (strcmp(name, "") != 0) {
-            Term* outputCopy = apply(owningBranch, COPY_FUNC, TermList(), name);
-            set_input2(outputCopy, 0, term, outputIndex);
+        Term* outputCopy = apply(owningBranch, EXTRA_OUTPUT_FUNC, TermList(), name);
+        set_input2(outputCopy, 0, term, outputIndex);
 
-            respecialize_type(outputCopy);
-            owningBranch->bindName(outputCopy, name);
-        }
+        respecialize_type(outputCopy);
+        owningBranch->bindName(outputCopy, name);
     }
+
 
     #if 0
     int outputIndex = 1;
@@ -551,6 +547,11 @@ bool branch_creates_stack_frame(Branch* branch)
 {
     if (branch->owningTerm == NULL)
         return true;
+
+    // Special case that should be removed; #outer_rebinds doesn't create a stack
+    // frame.
+    if (branch->owningTerm->name == "#outer_rebinds")
+        return false;
 
     return get_function_attrs(branch->owningTerm->function)->createsStackFrame;
 }

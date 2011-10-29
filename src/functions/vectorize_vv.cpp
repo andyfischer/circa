@@ -41,14 +41,14 @@ namespace vectorize_vv_function {
         for (int i=0; i < listLength; i++) {
             // Copy inputs into placeholder
             swap(input0.getIndex(i),
-                top_frame(CONTEXT)->registers[input0_placeholder->localsIndex]);
+                top_frame(CONTEXT)->registers[input0_placeholder->index]);
             swap(input1.getIndex(i),
-                top_frame(CONTEXT)->registers[input1_placeholder->localsIndex]);
+                top_frame(CONTEXT)->registers[input1_placeholder->index]);
 
             evaluate_single_term(CONTEXT, content_output);
 
             // Save output
-            swap(top_frame(CONTEXT)->registers[content_output->localsIndex],
+            swap(top_frame(CONTEXT)->registers[content_output->index],
                 output->get(i));
         }
 

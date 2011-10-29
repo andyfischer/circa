@@ -71,12 +71,7 @@ struct Term : TaggedValue
     // The index that this term currently holds inside owningBranch
     int index;
 
-    // The location of this term's output in the locals list. If the term has multiple
-    // outputs then this is the first index.
-    // Deprecated with registerList
-    int localsIndex;
-
-    // Number of outputs.
+    // Number of outputs. (deprecated)
     int outputCount;
 
     // Code which is nested inside this term. This object is created on-demand.

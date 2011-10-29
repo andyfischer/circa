@@ -81,6 +81,9 @@ Frame* push_frame(EvalContext* context, Branch* branch);
 void pop_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
 
+// Pre-evaluation
+void write_input_instruction(Term* caller, Term* input, TaggedValue* isn);
+
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.
 void evaluate_single_term(EvalContext* context, Term* term);
@@ -125,6 +128,7 @@ TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term, int outputIndex);
 
 TaggedValue* get_arg(EvalContext* context, ListData* args, int index);
+TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
 TaggedValue* get_output(EvalContext* context, ListData* args);
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);

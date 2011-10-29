@@ -36,18 +36,18 @@ namespace vectorize_vs_function {
         List* output = set_list(&outputTv, listLength);
 
         // Copy right input once
-        swap(&input1, top_frame(CONTEXT)->registers[input1_placeholder->localsIndex]);
+        swap(&input1, top_frame(CONTEXT)->registers[input1_placeholder->index]);
 
         // Evaluate vectorized call, once for each input
         for (int i=0; i < listLength; i++) {
             // Copy left into placeholder
             swap(input0.getIndex(i),
-                top_frame(CONTEXT)->registers[input0_placeholder->localsIndex]);
+                top_frame(CONTEXT)->registers[input0_placeholder->index]);
 
             evaluate_single_term(CONTEXT, content_output);
 
             // Save output
-            swap(top_frame(CONTEXT)->registers[content_output->localsIndex],
+            swap(top_frame(CONTEXT)->registers[content_output->index],
                 output->get(i));
         }
 
