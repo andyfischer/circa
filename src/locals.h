@@ -8,6 +8,4 @@ int get_output_count(Term* term);
 int get_locals_count(Branch* branch);
 void update_output_count(Term* term);
 
-void update_input_instructions(Term* term);
-
 } // namespace circa

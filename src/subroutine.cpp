@@ -53,7 +53,7 @@ CA_FUNCTION(evaluate_subroutine)
     Term* caller = CALLER;
     Term* function = caller->function;
     Branch* contents = nested_contents(function);
-    int numInputs = caller->numInputInstructions();
+    int numInputs = caller->numInputs();
 
     // Copy inputs to a temporary list
 #if 0

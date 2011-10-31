@@ -112,7 +112,6 @@ void update_if_block_joining_branch(Term* ifCall)
     }
 
     finish_update_cascade(joining);
-    update_input_instructions(ifCall);
 }
 
 int if_block_num_branches(Term* ifCall)

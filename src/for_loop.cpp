@@ -112,7 +112,6 @@ void setup_for_loop_post_code(Term* forTerm)
     }
 
     for_loop_update_output_index(forTerm);
-    update_input_instructions(forTerm);
     recursively_finish_update_cascade(forContents);
 }
 

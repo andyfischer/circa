@@ -64,11 +64,6 @@ Term::numInputs() const
 {
     return this->inputs.size();
 }
-int
-Term::numInputInstructions() const
-{
-    return inputIsns.inputs.size();
-}
 
 void
 Term::inputsToList(TermList& out) const

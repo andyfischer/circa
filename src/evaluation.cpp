@@ -288,7 +288,6 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
 void evaluate_branch(EvalContext* context, Branch* branch)
 {
     evaluate_branch_no_preserve_locals(context, branch);
-
 }
 
 void evaluate_branch(Branch* branch)
