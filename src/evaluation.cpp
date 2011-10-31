@@ -33,7 +33,7 @@ EvalContext::EvalContext()
  : interruptSubroutine(false),
    errorOccurred(false),
    numFrames(0),
-   stack2(NULL),
+   stack(NULL),
    currentTerm(NULL)
 {
     register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
@@ -107,19 +107,19 @@ Frame* get_frame(EvalContext* context, int depth)
 {
     ca_assert(depth >= 0);
     ca_assert(depth < context->numFrames);
-    return &context->stack2[context->numFrames - 1 - depth];
+    return &context->stack[context->numFrames - 1 - depth];
 }
 Frame* get_frame_from_bottom(EvalContext* context, int index)
 {
     ca_assert(index >= 0);
     ca_assert(index < context->numFrames);
-    return &context->stack2[index];
+    return &context->stack[index];
 }
 Frame* push_frame(EvalContext* context, Branch* branch)
 {
     context->numFrames++;
-    context->stack2 = (Frame*) realloc(context->stack2, sizeof(Frame) * context->numFrames);
-    Frame* top = &context->stack2[context->numFrames - 1];
+    context->stack = (Frame*) realloc(context->stack, sizeof(Frame) * context->numFrames);
+    Frame* top = &context->stack[context->numFrames - 1];
     initialize_null(&top->registers);
     initialize_null(&top->state);
     set_list(&top->registers, get_locals_count(branch));
@@ -129,7 +129,7 @@ Frame* push_frame(EvalContext* context, Branch* branch)
 }
 void pop_frame(EvalContext* context)
 {
-    Frame* top = &context->stack2[context->numFrames - 1];
+    Frame* top = &context->stack[context->numFrames - 1];
     set_null(&top->registers);
     set_null(&top->state);
     context->numFrames--;

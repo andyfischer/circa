@@ -52,7 +52,7 @@ struct EvalContext
 
     // Current execution stack
     int numFrames;
-    Frame* stack2;
+    Frame* stack;
 
     Term* currentTerm;
 
