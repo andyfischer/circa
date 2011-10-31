@@ -126,8 +126,9 @@ Branch* if_block_get_branch(Term* ifCall, int index)
 
 CA_FUNCTION(evaluate_if_block)
 {
+    Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch* contents = nested_contents(CALLER);
+    Branch* contents = nested_contents(caller);
     bool useState = has_any_inlined_state(contents);
 
     int numBranches = contents->length() - 1;
@@ -141,7 +142,7 @@ CA_FUNCTION(evaluate_if_block)
     List* state = NULL;
     if (useState) {
         swap(&prevScopeState, &context->currentScopeState);
-        fetch_state_container(CALLER, &prevScopeState, &localState);
+        fetch_state_container(caller, &prevScopeState, &localState);
         state = List::lazyCast(&localState);
         state->resize(numBranches);
     }
@@ -152,7 +153,11 @@ CA_FUNCTION(evaluate_if_block)
         //std::cout << "checking: " << get_term_to_string_extended(branch) << std::endl;
         //std::cout << "with stack: " << STACK->toString() << std::endl;
 
-        if (branch->numInputs() == 0 || as_bool(get_input(context, branch, 0))) {
+        // Look at input
+        TaggedValue inputIsn;
+        write_input_instruction(branch, branch->input(0), &inputIsn);
+        
+        if (branch->numInputs() == 0 || as_bool(get_arg(context, &inputIsn))) {
 
             acceptedBranch = branch->nestedContents;
 
@@ -189,7 +194,7 @@ CA_FUNCTION(evaluate_if_block)
             if ((i != acceptedBranchIndex))
                 set_null(state->get(i));
         }
-        save_and_consume_state(CALLER, &prevScopeState, &localState);
+        save_and_consume_state(caller, &prevScopeState, &localState);
         swap(&prevScopeState, &context->currentScopeState);
     }
 
@@ -198,11 +203,14 @@ CA_FUNCTION(evaluate_if_block)
 
     for (int i=0; i < joining->length(); i++) {
         Term* joinTerm = joining->get(i);
-        TaggedValue* value = get_input(context, joinTerm, acceptedBranchIndex);
+        TaggedValue inputIsn;
+        write_input_instruction(joinTerm, joinTerm->input(acceptedBranchIndex), &inputIsn);
+        TaggedValue* value = get_arg(context, &inputIsn);
 
-        ca_test_assert(cast_possible(value, get_output_type(CALLER, i+1)));
+        Term* outputTerm = caller->owningBranch->get(caller->index + 1 + i);
+        Frame* upperFrame = get_frame(CONTEXT, 1);
 
-        copy(value, EXTRA_OUTPUT(i));
+        copy(value, upperFrame->registers[outputTerm->index]);
     }
 
     pop_frame(context);
