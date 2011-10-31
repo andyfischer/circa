@@ -1,6 +1,9 @@
+assert_failure.ca
+boolean.ca
 cast.ca
 if.ca
 for.ca
+math.ca
 set_index.ca
 subroutine.ca
 vectorized_func.ca

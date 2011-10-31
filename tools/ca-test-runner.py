@@ -36,7 +36,11 @@ def diff_command_against_file(command, filename):
     If the results are the same, we print None. If there is a difference, we return
     an instance of OutputDifference.
     """
-    expectedOutput = read_text_file(filename)
+
+    if not os.path.exists(filename):
+        expectedOutput = ""
+    else:
+        expectedOutput = read_text_file(filename)
 
     proc = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
             stdout=subprocess.PIPE, close_fds=True)
