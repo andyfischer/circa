@@ -47,13 +47,6 @@ struct EvalContext
     // Stack of input values, used for inputs to functions & blocks.
     List inputStack;
 
-    // Local variables. Deprecated in favor of stack2
-    List stack;
-
-    // Current stack of in-progress terms. Used for introspection.
-    // Deprecated in favor of stack2.
-    TermList callStack;
-
     // List of values that are being passed from the EvalContext owner to the script.
     List argumentList;
 
@@ -77,6 +70,7 @@ void eval_context_setup_type(Type* type);
 
 // Stack frames
 Frame* get_frame(EvalContext* context, int depth);
+Frame* get_frame_from_bottom(EvalContext* context, int index);
 Frame* push_frame(EvalContext* context, Branch* branch);
 void pop_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);

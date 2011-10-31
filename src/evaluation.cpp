@@ -105,8 +105,15 @@ void eval_context_setup_type(Type* type)
 
 Frame* get_frame(EvalContext* context, int depth)
 {
+    ca_assert(depth >= 0);
     ca_assert(depth < context->numFrames);
     return &context->stack2[context->numFrames - 1 - depth];
+}
+Frame* get_frame_from_bottom(EvalContext* context, int index)
+{
+    ca_assert(index >= 0);
+    ca_assert(index < context->numFrames);
+    return &context->stack2[index];
 }
 Frame* push_frame(EvalContext* context, Branch* branch)
 {
@@ -292,25 +299,8 @@ void evaluate_branch(Branch* branch)
 
 TaggedValue* get_input(EvalContext* context, Term* term, int index)
 {
-    InputInstruction *instruction = &term->inputIsns.inputs[index];
-
-    switch (instruction->type) {
-    case InputInstruction::GLOBAL:
-        return (TaggedValue*) term->input(index);
-    case InputInstruction::OLD_STYLE_LOCAL:
-        return get_local(term->input(index), term->inputInfo(index)->outputIndex);
-    case InputInstruction::EMPTY:
-        return NULL;
-    case InputInstruction::LOCAL: {
-        TaggedValue* frame = list_get_index_from_end(&context->stack,
-            instruction->data.relativeFrame);
-        return list_get_index(frame, instruction->data.index);
-    }
-    case InputInstruction::LOCAL_CONSUME:
-    default:
-        internal_error("Not yet implemented");
-        return NULL;
-    }
+    internal_error("Don't call get_input");
+    return NULL;
 }
 
 void consume_input(EvalContext* context, Term* term, int index, TaggedValue* dest)

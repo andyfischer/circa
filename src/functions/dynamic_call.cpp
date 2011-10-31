@@ -9,6 +9,7 @@ namespace dynamic_call_function {
 
     CA_DEFINE_FUNCTION(dynamic_call, "dynamic_call(Function f, List args)")
     {
+#if 0 // FIXME
         Term* function = as_function_pointer(INPUT(0));
         List* inputs = List::checkCast(INPUT(1));
 
@@ -58,6 +59,7 @@ namespace dynamic_call_function {
         stack->pop();
 
         swap(list_get_index(&finishedFrame, outputIndex), OUTPUT);
+#endif
     }
 
     void setup(Branch* kernel)

@@ -32,6 +32,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
         }
     } else if (target->function == INPUT_PLACEHOLDER_FUNC) {
 
+#if 0 // FIXME
         ca_assert(context != NULL);
 
         // Find where we are in context->stack.
@@ -54,6 +55,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
         int input = get_input_index_of_placeholder(target);
 
         handle_feedback_event(context, caller->input(input), desired);
+#endif
     } else if (target->function == LIST_FUNC) {
 
         ca_assert(is_list(desired));

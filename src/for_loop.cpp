@@ -165,7 +165,6 @@ CA_FUNCTION(evaluate_for_loop)
     int nextOutputIndex = 0;
 
     Frame *frame = push_frame(context, forContents);
-    context->callStack.append(CALLER);
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
@@ -269,7 +268,6 @@ CA_FUNCTION(evaluate_for_loop)
         swap(&prevScopeState, &context->currentScopeState);
     }
 
-    context->callStack.pop();
     pop_frame(context);
     swap(output, OUTPUT);
 }

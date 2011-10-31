@@ -74,11 +74,7 @@ namespace include_function {
             strip_orphaned_state(contents, &context->currentScopeState, &trash);
         }
 
-        context->callStack.append(CALLER);
-
         evaluate_branch_internal(context, contents);
-
-        context->callStack.pop();
 
         // Store container and replace currentScopeState
         save_and_consume_state(CALLER, &prevScopeState, &context->currentScopeState);
