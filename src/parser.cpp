@@ -778,11 +778,11 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
             ca_assert(condition != NULL);
-            currentBlock = apply(contents, IF_FUNC, TermList(condition));
+            currentBlock = apply(contents, CASE_FUNC, TermList(condition));
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            currentBlock = apply(contents, BRANCH_FUNC, TermList(), "else");
+            currentBlock = apply(contents, CASE_FUNC, TermList(NULL), "else");
         }
 
         currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);

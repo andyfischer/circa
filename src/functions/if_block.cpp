@@ -90,10 +90,13 @@ namespace if_block_function {
         get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputName = getOutputName;
         get_function_attrs(IF_BLOCK_FUNC)->getOutputType = getOutputType;
-        get_function_attrs(IF_BLOCK_FUNC)->createsStackFrame = true;
+        get_function_attrs(IF_BLOCK_FUNC)->createsStackFrame = false;
 
         JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
         get_function_attrs(JOIN_FUNC)->specializeType = joinFunc_specializeType;
+
+        CASE_FUNC = import_function(kernel, NULL, "case(bool :optional)");
+        get_function_attrs(CASE_FUNC)->createsStackFrame = true;
     }
 }
 }

@@ -157,7 +157,7 @@ CA_FUNCTION(evaluate_if_block)
         TaggedValue inputIsn;
         write_input_instruction(branch, branch->input(0), &inputIsn);
         
-        if (branch->numInputs() == 0 || as_bool(get_arg(context, &inputIsn))) {
+        if (branch->input(0) == NULL || as_bool(get_arg(context, &inputIsn))) {
 
             acceptedBranch = branch->nestedContents;
 
@@ -203,10 +203,13 @@ CA_FUNCTION(evaluate_if_block)
 
     for (int i=0; i < joining->length(); i++) {
         Term* joinTerm = joining->get(i);
+
+        // Fetch the result value using an input instruction
         TaggedValue inputIsn;
         write_input_instruction(joinTerm, joinTerm->input(acceptedBranchIndex), &inputIsn);
         TaggedValue* value = get_arg(context, &inputIsn);
 
+        // Write the result value to the corresponding place in an above frame.
         Term* outputTerm = caller->owningBranch->get(caller->index + 1 + i);
         Frame* upperFrame = get_frame(CONTEXT, 1);
 

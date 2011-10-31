@@ -136,6 +136,11 @@ void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValu
 {
     change_type_no_initialize(isn, &stackVariableIsn_t);
     int relativeFrame = get_frame_distance(callingFrame, input);
+
+    // Special case: if a term in a #joining branch is trying to reach a neighboring
+    // branch, then that's okay.
+    if (relativeFrame == -1 && callingFrame->owningTerm->name == "#joining")
+        relativeFrame = 0;
     
     isn->value_data.asint = 0;
     isn->value_data.asint += relativeFrame << 16;
@@ -352,6 +357,7 @@ TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
         short index = arg->value_data.asint & 0xffff;
 
         ca_assert(relativeFrame < context->numFrames);
+        ca_assert(relativeFrame >= 0);
         Frame* frame = get_frame(context, relativeFrame);
         return frame->registers[index];
     } else {
