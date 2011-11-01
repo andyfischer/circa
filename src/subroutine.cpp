@@ -55,29 +55,6 @@ CA_FUNCTION(evaluate_subroutine)
     Branch* contents = nested_contents(function);
     int numInputs = caller->numInputs();
 
-    // Copy inputs to a temporary list
-#if 0
-    List inputs;
-    inputs.resize(numInputs);
-
-    for (int i=0; i < numInputs; i++) {
-
-        TaggedValue* input = get_input(context, caller, i);
-
-        if (input == NULL)
-            continue;
-
-        Type* inputType = function_get_input_type(function, i);
-
-        bool success = cast(input, inputType, inputs[i]);
-        if (!success) {
-            std::stringstream msg;
-            msg << "Couldn't cast input " << i << " to " << inputType->name;
-            return error_occurred(context, caller, msg.str());
-        }
-    }
-#endif
-
     // Fetch state container
     TaggedValue prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
@@ -140,22 +117,6 @@ CA_FUNCTION(evaluate_subroutine)
     if (is_function_stateful(function))
         save_and_consume_state(caller, &prevScopeState, &context->currentScopeState);
     swap(&context->currentScopeState, &prevScopeState);
-
-#if 0
-    // Write output
-    TaggedValue* outputDest = get_output(context, _args);
-    if (outputDest != NULL)
-        swap(outputs[0], outputDest);
-#endif
-
-    // Write extra outputs
-#if 0
-    // FIXME
-    ca_assert(outputs.length() == get_output_count(caller));
-
-    for (int i=1; i < outputs.length(); i++)
-        copy(outputs[i], get_output(context, caller, i));
-#endif
 }
 
 bool is_subroutine(Term* term)

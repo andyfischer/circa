@@ -425,7 +425,7 @@ void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* res
 }
 
 // New style state manipulation:
-void fetch_stack_frame_state(EvalContext* context, const char* name)
+void fetch_stack_local_state(EvalContext* context, const char* name)
 {
     ca_assert(context->numFrames > 1);
     Frame* frame = top_frame(context);
@@ -435,7 +435,7 @@ void fetch_stack_frame_state(EvalContext* context, const char* name)
     if (!is_dict(&frame->state))
         set_dict(&frame->state);
 }
-void store_stack_frame_state(EvalContext* context, const char* name)
+void store_stack_local_state(EvalContext* context, const char* name)
 {
     ca_assert(context->numFrames > 1);
     Frame* frame = top_frame(context);

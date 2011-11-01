@@ -137,10 +137,6 @@ namespace copy_function {
     CA_FUNCTION(evaluate);
 }
 
-namespace include_function {
-    void preload_script(Term* term);
-}
-
 namespace internal_debug_function {
     void oracle_clear();
     void oracle_send(TaggedValue* value);

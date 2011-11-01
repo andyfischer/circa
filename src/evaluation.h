@@ -138,6 +138,9 @@ void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* outp
 // so 'result' will be null after this call.
 void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* result);
 
+void fetch_stack_local_state(EvalContext* context, const char* name);
+void store_stack_local_state(EvalContext* context, const char* name);
+
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.
 bool evaluation_interrupted(EvalContext* context);

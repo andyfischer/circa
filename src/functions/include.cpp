@@ -33,21 +33,6 @@ namespace include_function {
         return false;
     }
 
-    void preload_script(Term* term)
-    {
-        Term* inputTerm = term->input(0);
-
-        EvalContext context;
-        evaluate_minimum(&context, inputTerm, NULL);
-
-        TaggedValue *input = get_input(NULL, term, 0);
-
-        if (!is_string(input))
-            return;
-
-        load_script(&context, term, as_string(input), true);
-    }
-
     CA_FUNCTION(evaluate_include)
     {
         EvalContext* context = CONTEXT;
@@ -84,7 +69,11 @@ namespace include_function {
     }
     void include_post_compile(Term* term)
     {
-        preload_script(term);
+        // Pre-load the contents, if possible
+        if (!is_string(term->input(0)))
+            return;
+
+        load_script(NULL, term, as_string(term->input(0)), true);
     }
 
     CA_FUNCTION(load_script)
