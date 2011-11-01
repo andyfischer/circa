@@ -42,11 +42,6 @@ Term* get_subroutine_input_placeholder(Branch* contents, int index)
     return contents->get(index + 1);
 }
 
-Type* get_subroutine_output_type(Branch* contents)
-{
-    return as_type(as_function_attrs(contents->get(0)).outputTypes[0]);
-}
-
 CA_FUNCTION(evaluate_subroutine)
 {
     EvalContext* context = CONTEXT;
@@ -85,7 +80,7 @@ CA_FUNCTION(evaluate_subroutine)
         // Save output
         TaggedValue output;
 
-        Type* outputType = get_subroutine_output_type(contents);
+        Type* outputType = function_get_output_type(CALLER->function, 0);
 
         if (context->errorOccurred) {
             set_null(&output);
@@ -121,13 +116,7 @@ CA_FUNCTION(evaluate_subroutine)
 
 bool is_subroutine(Term* term)
 {
-    if (term->type != &FUNCTION_T)
-        return false;
-    if (!has_nested_contents(term))
-        return false;
-    if (nested_contents(term)->length() < 1)
-        return false;
-    if (term->contents(0)->type != &FUNCTION_ATTRS_T)
+    if (!is_function(term))
         return false;
     return as_function(term)->evaluate == evaluate_subroutine;
 }

@@ -631,6 +631,8 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     set_type_list(&attrs->outputTypes, as_type(outputType));
 
     finish_parsing_function_header(result);
+    ca_assert(is_value(result));
+    ca_assert(is_function(result));
 
     // If we're out of tokens, then stop here. This behavior is used when defining builtins.
     if (tokens.finished())
@@ -642,6 +644,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     finish_building_subroutine(result, outputType);
 
     ca_assert(is_value(result));
+    ca_assert(is_function(result));
     ca_assert(is_subroutine(result));
 
     set_source_location(result, startPosition, tokens);

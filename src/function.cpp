@@ -18,6 +18,7 @@ namespace circa {
 
 Function::Function()
   : declaringTerm(NULL),
+    contents(NULL),
     implicitStateType(NULL),
     variableArgs(false),
     feedbackFunc(NULL),
@@ -34,8 +35,7 @@ Function::Function()
     getOutputName(NULL),
     getOutputType(NULL),
     assignRegisters(NULL),
-    postCompile(NULL),
-    contents(NULL)
+    postCompile(NULL)
 {
     register_new_object((CircaObject*) this, &FUNCTION_T, true);
 }
@@ -62,6 +62,8 @@ namespace function_t {
     void setup_type(Type* type)
     {
         type->name = "Function";
+        type->initialize = initialize;
+        type->copy = copy;
         type->formatSource = subroutine_f::format_source;
     }
 
@@ -88,8 +90,7 @@ Function* as_function(Term* func)
 {
     if (func == NULL)
         return NULL;
-    ca_assert(is_function_attrs(term));
-    ca_assert(get_pointer(term) != NULL);
+    ca_assert(is_function(func));
     return (Function*) get_pointer(func);
 }
 
@@ -272,13 +273,13 @@ Type* function_get_output_type(Function* func, int index)
 int function_num_inputs(Function* func)
 {
     Branch* contents = nested_contents(func->declaringTerm);
-    int i = 1;
+    int i = 0;
 
     while (i < contents->length()
             && contents->get(i) != NULL
             && contents->get(i)->function == INPUT_PLACEHOLDER_FUNC)
         i++;
-    return i - 1;
+    return i;
 }
 
 bool function_is_state_input(Function* func, int index)
@@ -306,14 +307,13 @@ bool function_get_input_optional(Function* func, int index)
 Term* function_get_input_placeholder(Function* func, int index)
 {
     Branch* contents = function_get_contents(func);
-    index += 1;
     if (index >= contents->length())
         return NULL;
     return contents->get(index);
 }
 Branch* function_get_contents(Function* func)
 {
-    return nested_contents(func->declaringTerm);
+    return func->contents;
 }
 
 std::string function_get_input_name(Function* func, int index)

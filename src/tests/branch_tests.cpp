@@ -240,10 +240,10 @@ void test_duplicate_subroutine()
     //TEST_DISABLED test_assert(dupedAttrs->declaringTerm == dupedFunc);
 
     test_assert(func->nestedContents->length() == dupedFunc->nestedContents->length());
-    test_assert(func->contents(1)->function == dupedFunc->contents(1)->function);
-    test_assert(func->contents(1)->type == dupedFunc->contents(1)->type);
-    test_assert(func->contents(1)->asInt() == dupedFunc->contents(1)->asInt());
-    test_assert(dupedFunc->contents(1) == dupedFunc->contents("a"));
+    test_assert(func->contents(0)->function == dupedFunc->contents(0)->function);
+    test_assert(func->contents(0)->type == dupedFunc->contents(0)->type);
+    test_assert(func->contents(0)->asInt() == dupedFunc->contents(0)->asInt());
+    test_assert(dupedFunc->contents(0) == dupedFunc->contents("a"));
 
     test_assert(&branch);
     test_assert(&dupe);

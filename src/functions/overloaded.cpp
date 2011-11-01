@@ -182,7 +182,7 @@ namespace overloaded_function {
         }
 
         Branch* result = nested_contents(term);
-        result->shorten(1);
+        clear_branch(result);
         int placeholderCount = variableArgs ? 1 : argumentCount;
         for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());

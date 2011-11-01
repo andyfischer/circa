@@ -23,7 +23,7 @@ void test_simple()
     it.advance();
     test_assert(it.finished());
 
-    Term* sub = branch.compile("def func() { c = 3 d = 4 }");
+    Term* sub = branch.compile("def func() { c = 3; d = 4 }");
 
     it.reset(&branch);
 
@@ -33,8 +33,6 @@ void test_simple()
     it.advance();
     test_assert(it.current() == sub);
     it.advance();
-    test_assert(it.current() == sub->contents(0));
-    it.advanceSkippingBranch(); // skip over 'attributes'
     test_assert(it.current()->name == "c");
     it.advance();
     test_assert(it.current()->name == "d");

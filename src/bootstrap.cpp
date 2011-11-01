@@ -120,14 +120,13 @@ void bootstrap_kernel()
     KERNEL->bindName(ANY_TYPE, "any");
 
     // Create Function type
-    FUNCTION_ATTRS_T.name = "Function";
-    FUNCTION_ATTRS_T.initialize = function_attrs_t::initialize;
-    FUNCTION_ATTRS_T.copy = function_attrs_t::copy;
-    FUNCTION_ATTRS_TYPE = create_type_value(KERNEL, &FUNCTION_ATTRS_T, "Function");
-
-    // Create Function type
     function_t::setup_type(&FUNCTION_T);
-    FUNCTION_TYPE = create_type_value(KERNEL, &FUNCTION_T, "Function");
+    FUNCTION_TYPE = KERNEL->appendNew();
+    FUNCTION_TYPE->function = VALUE_FUNC;
+    FUNCTION_TYPE->type = &TYPE_T;
+    FUNCTION_TYPE->value_type = &TYPE_T;
+    FUNCTION_TYPE->value_data.ptr = &FUNCTION_T;
+    KERNEL->bindName(FUNCTION_TYPE, "Function");
 
     // Initialize Value func
     VALUE_FUNC->type = &FUNCTION_T;
@@ -137,8 +136,9 @@ void bootstrap_kernel()
     update_bootstrapped_term(VALUE_FUNC);
     update_bootstrapped_term(TYPE_TYPE);
     update_bootstrapped_term(ANY_TYPE);
-    update_bootstrapped_term(FUNCTION_ATTRS_TYPE);
     update_bootstrapped_term(FUNCTION_TYPE);
+
+    function_t::initialize(&FUNCTION_T, VALUE_FUNC);
 }
 
 void initialize_primitive_types(Branch* kernel)
