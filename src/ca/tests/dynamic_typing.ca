@@ -1,0 +1,25 @@
+
+-- Subroutines
+def f(any v) -> any
+  return v
+
+a = f('test')
+assert(a == 'test')
+
+def g(bool b, any v) -> any
+    if b
+        return v
+    else
+        return 5
+
+assert(g(true, 'test') == 'test')
+assert(g(false, 'test') == 5)
+
+-- Field access
+def h() -> any
+    return Point([1 2])
+
+p = h()
+assert(to_string(p) == "[1.0, 2.0]")
+assert(p.x == 1.0)
+assert(p.y == 2.0)

@@ -36,6 +36,7 @@
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))
 #define STRING_INPUT(index) (circa::as_string(INPUT(index)).c_str())
 #define INT_INPUT(index) (circa::as_int(INPUT(index)))
+#define CONSUME_INPUT(index, dest) (consume_arg(_cxt, _args, (index), (dest)));
 #define STATE_INPUT (get_state_input(_cxt, CALLER))
 #define INPUT_TERM(index) (CALLER->input(index))
 #define OUTPUT (get_arg(_cxt, _args, NUM_INPUTS))

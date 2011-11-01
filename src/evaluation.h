@@ -123,6 +123,7 @@ TaggedValue* get_local_safe(Term* term, int outputIndex);
 
 TaggedValue* get_arg(EvalContext* context, ListData* args, int index);
 TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
+void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest);
 TaggedValue* get_output(EvalContext* context, ListData* args);
 
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);

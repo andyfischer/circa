@@ -1,9 +1,13 @@
 assert_failure.ca
 boolean.ca
 cast.ca
+compound_type.ca
 if.ca
 for.ca
+list.ca
 math.ca
+set.ca
 set_index.ca
 subroutine.ca
+type_func.ca
 vectorized_func.ca

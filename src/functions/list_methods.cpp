@@ -9,9 +9,9 @@ namespace list_methods_function {
 
     CA_DEFINE_FUNCTION(append, "List.append(self :implied_rebind, any) -> List")
     {
-        consume_input(CONTEXT, CALLER, 0, OUTPUT);
+        CONSUME_INPUT(0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
-        consume_input(CONTEXT, CALLER, 1, result->append());
+        CONSUME_INPUT(1, result->append());
     }
     Type* append_specializeType(Term* term)
     {

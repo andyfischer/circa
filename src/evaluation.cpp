@@ -358,6 +358,11 @@ TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
 {
     return get_arg(context, list_get_index(args, index));
 }
+void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest)
+{
+    // TODO: Make this swap() values when possible
+    copy(get_arg(context, list_get_index(args, index)), dest);
+}
 TaggedValue* get_output(EvalContext* context, ListData* args)
 {
     return get_arg(context, args, list_size(args) - 1);
@@ -404,6 +409,7 @@ Dict* get_current_scope_state(EvalContext* cxt)
     return Dict::lazyCast(&cxt->currentScopeState);
 }
 
+// Old style state manipulation:
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output)
 {
     Dict* containerDict = Dict::lazyCast(container);
@@ -416,6 +422,26 @@ void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* res
     const char* name = term->uniqueName.name.c_str();
     swap(result, containerDict->insert(name));
     set_null(result);
+}
+
+// New style state manipulation:
+void fetch_stack_frame_state(EvalContext* context, const char* name)
+{
+    ca_assert(context->numFrames > 1);
+    Frame* frame = top_frame(context);
+    Frame* parentFrame = get_frame(context, 1);
+
+    copy(parentFrame->state.get(name), &frame->state);
+    if (!is_dict(&frame->state))
+        set_dict(&frame->state);
+}
+void store_stack_frame_state(EvalContext* context, const char* name)
+{
+    ca_assert(context->numFrames > 1);
+    Frame* frame = top_frame(context);
+    Frame* parentFrame = get_frame(context, 1);
+
+    copy(&frame->state, parentFrame->state.insert(name));
 }
 
 bool evaluation_interrupted(EvalContext* context)

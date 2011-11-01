@@ -14,6 +14,20 @@ type Composite {
   string name,
 }
 
+m = MyClass()
+m.name = "Andy"
+m.a = 1
+m.b = m.a + 2
+assert(m.name == "Andy")
+assert(m.a == 1)
+assert(m.b == 3)
+assert(to_string(m) == "[1, 3, 'Andy', 0.0]")
+
+-- test += on a field
+m.a += 5
+assert(m.a == 6)
+
+-- composite type
 c = Composite()
 assert(to_string(c) == "[[0, 0, '', 0.0], [0, 0, '', 0.0], '']")
 

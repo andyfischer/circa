@@ -41,55 +41,6 @@ void reference_type_deletion_bug()
     test_assert(INT_TYPE->type != NULL);
 }
 
-void test_set()
-{
-    Branch branch;
-
-    Term* s = branch.eval("s = Set()");
-
-    test_assert(s->numElements() == 0);
-
-    s = branch.eval("s.add(1)");
-
-    test_assert(s->numElements() == 1);
-    test_assert(s->getIndex(0)->asInt() == 1);
-
-    s = branch.eval("s.add(1)");
-    test_assert(s->numElements() == 1);
-
-    s = branch.eval("s.add(2)");
-    test_assert(&branch);
-    test_assert(s->numElements() == 2);
-
-    s = branch.eval("s.remove(1)");
-    test_assert(s->numElements() == 1);
-    test_assert(s->getIndex(0)->asInt() == 2);
-
-    // check that things are copied by value
-    Term* val = branch.eval("val = 5");
-    s = branch.eval("s.add(val)");
-
-    test_assert(s->getIndex(1)->asInt() == 5);
-    set_int(val, 6);
-    test_assert(s->getIndex(1)->asInt() == 5);
-}
-
-void test_list()
-{
-    Branch branch;
-
-    Term* l = branch.compile("l = List()");
-
-    evaluate_branch(&branch);
-    test_assert(is_list(l));
-    test_assert(l->numElements() == 0);
-
-    l = branch.compile("l.append(2)");
-    evaluate_branch(&branch);
-    test_assert(l->numElements() == 1);
-    test_assert(l->getIndex(0)->asInt() == 2);
-}
-
 void test_namespace()
 {
     TermNamespace nspace;
@@ -118,8 +69,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(builtin_type_tests::test_reference);
     REGISTER_TEST_CASE(builtin_type_tests::reference_type_deletion_bug);
-    REGISTER_TEST_CASE(builtin_type_tests::test_set);
-    REGISTER_TEST_CASE(builtin_type_tests::test_list);
     REGISTER_TEST_CASE(builtin_type_tests::test_namespace);
 }
 
