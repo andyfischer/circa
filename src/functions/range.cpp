@@ -34,7 +34,7 @@ namespace range_function {
         RANGE_FUNC = import_function(kernel, evaluate,
                 "range(int start, int max) -> List;"
                 "'Return a list of integers from start to max-1'");
-        get_function_attrs(RANGE_FUNC)->specializeType = specializeType;
+        as_function(RANGE_FUNC)->specializeType = specializeType;
     }
 }
 } // namespace circa

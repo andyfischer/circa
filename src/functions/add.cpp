@@ -45,7 +45,7 @@ namespace add_function {
         Term* add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
         Term* add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
 
-        get_function_attrs(add_f)->feedbackFunc =
+        as_function(add_f)->feedbackFunc =
             import_function(kernel, add_feedback, "add_feedback(any, number)");
 
         ADD_FUNC = create_overloaded_function(kernel, "add", TermList(add_i, add_f));

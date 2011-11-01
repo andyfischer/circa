@@ -117,7 +117,7 @@ namespace internal_debug_function {
     void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        get_function_attrs(kernel->get("dump_parse"))->postCompile = dump_parse_post_compile;
+        as_function(kernel->get("dump_parse"))->postCompile = dump_parse_post_compile;
     }
 }
 }

@@ -34,7 +34,8 @@ Function::Function()
     getOutputName(NULL),
     getOutputType(NULL),
     assignRegisters(NULL),
-    postCompile(NULL)
+    postCompile(NULL),
+    contents(NULL)
 {
     register_new_object((CircaObject*) this, &FUNCTION_T, true);
 }
@@ -44,7 +45,7 @@ Function::~Function()
     on_object_deleted((CircaObject*) this);
 }
 
-namespace function_attrs_t {
+namespace function_t {
 
     void initialize(Type* type, TaggedValue* value)
     {
@@ -58,15 +59,10 @@ namespace function_attrs_t {
         *((Function*) get_pointer(dest)) = *((Function*) get_pointer(source));
     }
 
-} // namespace function_attrs_t
-
-namespace function_t {
-
     void setup_type(Type* type)
     {
         type->name = "Function";
         type->formatSource = subroutine_f::format_source;
-        type->storageType = STORAGE_TYPE_REF;
     }
 
 } // namespace function_t
@@ -76,18 +72,6 @@ bool is_function(Term* term)
     if (term == NULL)
         return false;
     return term->type == &FUNCTION_T;
-}
-
-bool is_function_attrs(Term* term)
-{
-    return term->type == &FUNCTION_ATTRS_T;
-}
-
-Function& as_function_attrs(Term* term)
-{
-    ca_assert(is_function_attrs(term));
-    ca_assert(get_pointer(term) != NULL);
-    return *((Function*) get_pointer(term));
 }
 
 Branch* function_contents(Term* func)
@@ -100,15 +84,13 @@ Branch* function_contents(Function* func)
     return nested_contents(func->declaringTerm);
 }
 
-Function* get_function_attrs(Term* func)
+Function* as_function(Term* func)
 {
     if (func == NULL)
         return NULL;
-    if (nested_contents(func)->length() == 0)
-        return NULL;
-    if (nested_contents(func)->get(0)->type != &FUNCTION_ATTRS_T)
-        return NULL;
-    return &as_function_attrs(nested_contents(func)->get(0));
+    ca_assert(is_function_attrs(term));
+    ca_assert(get_pointer(term) != NULL);
+    return (Function*) get_pointer(func);
 }
 
 std::string get_placeholder_name_for_index(int index)
@@ -120,24 +102,8 @@ std::string get_placeholder_name_for_index(int index)
 
 void initialize_function(Term* func)
 {
-    /* A function has a branch with the following structures:
-      {
-        [0] Function #attributes
-        [1..num_inputs] input terms
-            .. each might have bool property 'modified' or 'meta'
-        [...] function body
-        [n-1] output term, type is significant
-      }
-    */
-
-    Term* attributesTerm = create_value(nested_contents(func), &FUNCTION_ATTRS_T, "#attributes");
-    hide_from_source(attributesTerm);
-
-    // Setup the term's global value to point back to the term, so that the function
-    // can be passed as a value. (Deprecated in favor of declaringTerm)
-    set_function_pointer(func, func);
-
-    get_function_attrs(func)->declaringTerm = func;
+    as_function(func)->declaringTerm = func;
+    as_function(func)->contents = nested_contents(func);
 }
 
 void finish_parsing_function_header(Term* func)
@@ -147,7 +113,7 @@ void finish_parsing_function_header(Term* func)
     // Here we'll look at every input declared as +out, and we'll update the function's
     // outputTypes and outputCount.
 
-    Function* attrs = get_function_attrs(func);
+    Function* attrs = as_function(func);
     attrs->outputCount = 1;
     attrs->outputTypes.resize(1);
 
@@ -167,7 +133,7 @@ bool is_callable(Term* term)
 
 bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 {
-    Function* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = as_function(func);
     bool varArgs = funcAttrs->variableArgs;
 
     // Fail if wrong # of inputs
@@ -190,7 +156,7 @@ bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 {
-    Function* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = as_function(func);
     bool varArgs = funcAttrs->variableArgs;
 
     // Fail if wrong # of inputs
@@ -210,7 +176,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 
 bool values_fit_function_dynamic(Term* func, List* list)
 {
-    Function* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = as_function(func);
     bool varArgs = funcAttrs->variableArgs;
 
     // Fail if wrong # of inputs
@@ -236,7 +202,7 @@ Term* create_overloaded_function(Branch* branch, std::string const& name,
 
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
-    Function* attrs = get_function_attrs(function);
+    Function* attrs = as_function(function);
 
     if (!FINISHED_BOOTSTRAP)
         return &ANY_T;
@@ -253,7 +219,7 @@ Type* derive_specialized_output_type(Term* function, Term* call)
 
 bool function_can_rebind_input(Term* func, int index)
 {
-    Function* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = as_function(func);
     if (funcAttrs->variableArgs)
         index = 0;
 
@@ -265,7 +231,7 @@ bool function_can_rebind_input(Term* func, int index)
 
 bool function_implicitly_rebinds_input(Term* function, int index)
 {
-    Function* funcAttrs = get_function_attrs(function);
+    Function* funcAttrs = as_function(function);
     Term* input = function_get_input_placeholder(funcAttrs, index);
     if (input == NULL)
         return false;
@@ -279,7 +245,7 @@ bool function_call_rebinds_input(Term* term, int index)
 
 Type* function_get_input_type(Term* func, int index)
 {
-    return function_get_input_type(get_function_attrs(func), index);
+    return function_get_input_type(as_function(func), index);
 }
 Type* function_get_input_type(Function* func, int index)
 {
@@ -290,7 +256,7 @@ Type* function_get_input_type(Function* func, int index)
 
 Type* function_get_output_type(Term* function, int index)
 {
-    return function_get_output_type(get_function_attrs(function), index);
+    return function_get_output_type(as_function(function), index);
 }
 
 Type* function_get_output_type(Function* func, int index)
@@ -384,7 +350,7 @@ const char* get_output_name(Term* term, int outputIndex)
     Function* attrs = NULL;
 
     if (function != NULL)
-        attrs = get_function_attrs(function);
+        attrs = as_function(function);
 
     if (attrs == NULL)
         return "";
@@ -431,12 +397,12 @@ bool is_native_function(Function* func)
 
 void function_set_evaluate_func(Term* function, EvaluateFunc evaluate)
 {
-    get_function_attrs(function)->evaluate = evaluate;
+    as_function(function)->evaluate = evaluate;
 }
 
 void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specializeFunc)
 {
-    get_function_attrs(func)->specializeType = specializeFunc;
+    as_function(func)->specializeType = specializeFunc;
 }
 
 void function_format_header_source(StyledSource* source, Function* func)

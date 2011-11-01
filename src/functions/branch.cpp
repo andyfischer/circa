@@ -25,11 +25,11 @@ namespace branch_function {
     void setup(Branch* kernel)
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
-        get_function_attrs(BRANCH_FUNC)->formatSource = format_source;
+        as_function(BRANCH_FUNC)->formatSource = format_source;
 
         BRANCH_UNEVALUATED_FUNC = import_function(kernel, NULL, "branch_unevaluated()");
         LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda() -> Branch");
-        get_function_attrs(LAMBDA_FUNC)->formatSource = format_source;
+        as_function(LAMBDA_FUNC)->formatSource = format_source;
     }
 }
 }

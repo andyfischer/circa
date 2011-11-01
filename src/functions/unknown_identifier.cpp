@@ -18,7 +18,7 @@ namespace unknown_identifier_function {
     void setup(Branch* kernel)
     {
         UNKNOWN_IDENTIFIER_FUNC = import_function(kernel, evaluate, "unknown_identifier() -> any");
-        get_function_attrs(UNKNOWN_IDENTIFIER_FUNC)->formatSource = formatSource;
+        as_function(UNKNOWN_IDENTIFIER_FUNC)->formatSource = formatSource;
     }
 }
 }

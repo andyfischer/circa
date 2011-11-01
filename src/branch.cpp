@@ -419,8 +419,8 @@ void pre_erase_term(Term* term)
         as_type(term)->declaringTerm = NULL;
 
     // Ditto for Function
-    if (is_value(term) && is_function(term) && get_function_attrs(term)->declaringTerm == term)
-        get_function_attrs(term)->declaringTerm = NULL;
+    if (is_value(term) && is_function(term) && as_function(term)->declaringTerm == term)
+        as_function(term)->declaringTerm = NULL;
 }
 
 void erase_term(Term* term)

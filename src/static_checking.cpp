@@ -37,7 +37,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
 {
     int effectiveIndex = index;
 
-    Function* func = get_function_attrs(term->function);
+    Function* func = as_function(term->function);
 
     if (func->variableArgs)
         effectiveIndex = 0;
@@ -64,7 +64,7 @@ void check_term_for_static_error(List* errors, Term* term)
     if (term->function == NULL)
         return append_static_error(errors, term, "null_function");
 
-    Function* func = get_function_attrs(term->function);
+    Function* func = as_function(term->function);
 
     if (func == NULL)
         return append_static_error(errors, term, "not_a_function");
@@ -160,7 +160,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     else if (strcmp(type, "unrecognized_expression") == 0)
         out << "Unrecognized expression: " << term->stringProp("message");
     else if (strcmp(type, "wrong_input_count") == 0) {
-        int funcNumInputs = function_num_inputs(get_function_attrs(term->function));
+        int funcNumInputs = function_num_inputs(as_function(term->function));
         int actualCount = term->numInputs();
         if (actualCount > funcNumInputs)
             out << "Too many inputs (" << actualCount << "), function "

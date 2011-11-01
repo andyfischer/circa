@@ -165,7 +165,7 @@ void post_initialize_primitive_types(Branch* kernel)
     // Properly setup value() func
     initialize_function(VALUE_FUNC);
 
-    Function* attrs = get_function_attrs(VALUE_FUNC);
+    Function* attrs = as_function(VALUE_FUNC);
     set_type_list(&attrs->outputTypes, &ANY_T);
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);
@@ -213,34 +213,34 @@ void post_setup_functions(Branch* kernel)
 {
     // Create vectorized add() functions
     Term* add_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "add_v");
-    set_ref(&get_function_attrs(add_v)->parameter, ADD_FUNC);
+    set_ref(&as_function(add_v)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_v);
 
     Term* add_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "add_s");
-    set_ref(&get_function_attrs(add_s)->parameter, ADD_FUNC);
+    set_ref(&as_function(add_s)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_s);
 
     // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "sub_v");
-    set_ref(&get_function_attrs(sub_v)->parameter, SUB_FUNC);
+    set_ref(&as_function(sub_v)->parameter, SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_v);
 
     Term* sub_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "sub_s");
-    set_ref(&get_function_attrs(sub_s)->parameter, SUB_FUNC);
+    set_ref(&as_function(sub_s)->parameter, SUB_FUNC);
     overloaded_function::append_overload(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "mult_v");
-    set_ref(&get_function_attrs(mult_v)->parameter, kernel->get("mult"));
+    set_ref(&as_function(mult_v)->parameter, kernel->get("mult"));
     overloaded_function::append_overload(MULT_FUNC, mult_v);
 
     Term* mult_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "mult_s");
-    set_ref(&get_function_attrs(mult_s)->parameter, kernel->get("mult"));
+    set_ref(&as_function(mult_s)->parameter, kernel->get("mult"));
     overloaded_function::append_overload(MULT_FUNC, mult_s);
 
     // Create vectorized div() function
     Term* div_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "div_s");
-    set_ref(&get_function_attrs(div_s)->parameter, DIV_FUNC);
+    set_ref(&as_function(div_s)->parameter, DIV_FUNC);
     overloaded_function::append_overload(DIV_FUNC, div_s);
 }
 

@@ -87,22 +87,22 @@ namespace for_function {
     void setup(Branch* kernel)
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
-        get_function_attrs(FOR_FUNC)->formatSource = formatSource;
-        get_function_attrs(FOR_FUNC)->getOutputCount = getOutputCount;
-        get_function_attrs(FOR_FUNC)->getOutputName = getOutputName;
-        get_function_attrs(FOR_FUNC)->getOutputType = getOutputType;
-        get_function_attrs(FOR_FUNC)->createsStackFrame = true;
+        as_function(FOR_FUNC)->formatSource = formatSource;
+        as_function(FOR_FUNC)->getOutputCount = getOutputCount;
+        as_function(FOR_FUNC)->getOutputName = getOutputName;
+        as_function(FOR_FUNC)->getOutputType = getOutputType;
+        as_function(FOR_FUNC)->createsStackFrame = true;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
-        get_function_attrs(DISCARD_FUNC)->formatSource = discard_formatSource;
+        as_function(DISCARD_FUNC)->formatSource = discard_formatSource;
         hide_from_docs(DISCARD_FUNC);
 
         BREAK_FUNC = import_function(kernel, evaluate_break, "break()");
-        get_function_attrs(BREAK_FUNC)->formatSource = break_formatSource;
+        as_function(BREAK_FUNC)->formatSource = break_formatSource;
         hide_from_docs(BREAK_FUNC);
 
         CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
-        get_function_attrs(CONTINUE_FUNC)->formatSource = continue_formatSource;
+        as_function(CONTINUE_FUNC)->formatSource = continue_formatSource;
         hide_from_docs(CONTINUE_FUNC);
     }
 }

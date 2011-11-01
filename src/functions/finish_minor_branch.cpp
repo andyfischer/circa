@@ -45,7 +45,7 @@ namespace finish_minor_branch_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
         FINISH_MINOR_BRANCH_FUNC = kernel->get("finish_minor_branch");
-        get_function_attrs(FINISH_MINOR_BRANCH_FUNC)->postCompile = postCompile;
+        as_function(FINISH_MINOR_BRANCH_FUNC)->postCompile = postCompile;
     }
 }
 }

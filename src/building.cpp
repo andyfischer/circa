@@ -43,7 +43,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // If the function takes a state input, and there aren't enough inputs, then prepend
     // a NULL input for state.
     if (is_function_stateful(function)
-            && _inputs.length() == function_num_inputs(get_function_attrs(function)) - 1) {
+            && _inputs.length() == function_num_inputs(as_function(function)) - 1) {
         // TODO: This case should be deleted, once the last of the old-style stateful
         // functions are removed.
         //std::cout << "prepending null input: " << function->name << std::endl;
@@ -222,8 +222,8 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
     // Special case for certain types, update declaringType
     if (is_value(term) && is_type(term))
         as_type(term)->declaringTerm = term;
-    if (is_value(term) && is_function(term) && get_function_attrs(term) != NULL)
-        get_function_attrs(term)->declaringTerm = term;
+    if (is_value(term) && is_function(term) && as_function(term) != NULL)
+        as_function(term)->declaringTerm = term;
 
     return term;
 }
@@ -430,7 +430,7 @@ void post_compile_term(Term* term)
     if (term->function == NULL)
         return;
 
-    Function* attrs = get_function_attrs(term->function);
+    Function* attrs = as_function(term->function);
     if (attrs == NULL)
         return;
 
@@ -548,7 +548,7 @@ bool branch_creates_stack_frame(Branch* branch)
     if (branch->owningTerm->name == "#outer_rebinds")
         return false;
 
-    return get_function_attrs(branch->owningTerm->function)->createsStackFrame;
+    return as_function(branch->owningTerm->function)->createsStackFrame;
 }
 
 int get_frame_distance(Branch* frame, Term* input)

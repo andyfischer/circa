@@ -87,8 +87,8 @@ void format_term_source(StyledSource* source, Term* term)
 
     // If the function has a formatSource function, use that.
     if (is_function(term->function) &&
-            get_function_attrs(term->function)->formatSource != NULL) {
-        get_function_attrs(term->function)->formatSource(source, term);
+            as_function(term->function)->formatSource != NULL) {
+        as_function(term->function)->formatSource(source, term);
 
     // Or, check if this is a value term.
     } else if (is_value(term)) {
@@ -274,7 +274,7 @@ bool has_implicit_name_binding(Term* term)
         return false;
     if (!is_method_call(term))
         return false;
-    return function_get_input_placeholder(get_function_attrs(term->function), 0)
+    return function_get_input_placeholder(as_function(term->function), 0)
         ->boolPropOptional("use-as-output", false);
 }
 

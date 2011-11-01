@@ -170,7 +170,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (term->function == NULL)
         return;
 
-    Function* function = get_function_attrs(term->function);
+    Function* function = as_function(term->function);
 
     if (function == NULL || function->evaluate == NULL)
         return;
@@ -488,7 +488,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
                 if (input->owningBranch != branch)
                     continue;
                 // don't follow :meta inputs
-                if (function_get_input_meta(get_function_attrs(checkTerm->function),
+                if (function_get_input_meta(as_function(checkTerm->function),
                             inputIndex))
                     continue;
                 marked[input->index] = true;

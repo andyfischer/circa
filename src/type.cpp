@@ -123,7 +123,7 @@ Type* get_output_type(Term* term, int outputIndex)
     if (term->function == NULL)
         return &ANY_T;
 
-    Function* attrs = get_function_attrs(term->function);
+    Function* attrs = as_function(term->function);
 
     Function::GetOutputType getOutputType = NULL;
     if (attrs != NULL)

@@ -13,7 +13,7 @@ void create()
     Branch branch;
 
     Term* func = branch.eval("def mysub(int) -> string;");
-    Function* attrs = get_function_attrs(func);
+    Function* attrs = as_function(func);
 
     test_assert(func);
     test_assert(is_subroutine(func));
@@ -97,25 +97,25 @@ void overloaded_function_in_script()
 
 void test_is_native_function()
 {
-    test_assert(is_native_function(get_function_attrs(KERNEL->get("assert"))));
+    test_assert(is_native_function(as_function(KERNEL->get("assert"))));
 
     Branch branch;
     Term* f = branch.eval("def f();");
 
-    test_assert(!is_native_function(get_function_attrs(f)));
+    test_assert(!is_native_function(as_function(f)));
 }
 
 void test_documentation_string()
 {
     Branch branch;
     Term* f = branch.eval("def f() { 'docs' 1 + 2 }");
-    test_assert(function_get_documentation_string(get_function_attrs(f)) == "docs");
+    test_assert(function_get_documentation_string(as_function(f)) == "docs");
 
     Term* f2 = branch.eval("def f2() { a = 'not docs' 1 + 2 }");
-    test_assert(function_get_documentation_string(get_function_attrs(f2)) == "");
+    test_assert(function_get_documentation_string(as_function(f2)) == "");
 
     Term* f3 = branch.eval("def f2() { print('not docs') 1 + 2 }");
-    test_assert(function_get_documentation_string(get_function_attrs(f3)) == "");
+    test_assert(function_get_documentation_string(as_function(f3)) == "");
 }
 
 void test_bug_with_declaring_state_argument()
@@ -123,7 +123,7 @@ void test_bug_with_declaring_state_argument()
     Branch branch;
     Term* f = branch.eval("def f(state int);");
 
-    test_assert(get_function_attrs(f)->implicitStateType == INT_TYPE);
+    test_assert(as_function(f)->implicitStateType == INT_TYPE);
 }
 
 void test_calling_manual_overloaded_function()

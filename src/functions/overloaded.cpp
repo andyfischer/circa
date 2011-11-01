@@ -27,7 +27,7 @@ namespace overloaded_function {
         if (!is_overloaded_function(func))
             return func;
 
-        List& overloads = get_function_attrs(func)->parameters;
+        List& overloads = as_function(func)->parameters;
 
         for (int i=0; i < overloads.length(); i++) {
             Term* overload = as_ref(overloads[i]);
@@ -44,9 +44,9 @@ namespace overloaded_function {
     {
         Branch* contents = nested_contents(CALLER);
         Term* func = CALLER->function;
-        Function* funcAttrs = get_function_attrs(func);
+        Function* funcAttrs = as_function(func);
 
-        List& overloads = get_function_attrs(func)->parameters;
+        List& overloads = as_function(func)->parameters;
 
         int numInputs = NUM_INPUTS;
 
@@ -137,17 +137,17 @@ namespace overloaded_function {
     bool is_overloaded_function(Term* func)
     {
         ca_assert(is_function(func));
-        return get_function_attrs(func)->evaluate == evaluate_overload;
+        return as_function(func)->evaluate == evaluate_overload;
     }
 
     int num_overloads(Term* func)
     {
-        return get_function_attrs(func)->parameters.length();
+        return as_function(func)->parameters.length();
     }
 
     Term* get_overload(Term* func, int index)
     {
-        return get_function_attrs(func)->parameters[index]->asRef();
+        return as_function(func)->parameters[index]->asRef();
     }
 
     Term* find_overload(Term* func, const char* name)
@@ -162,17 +162,17 @@ namespace overloaded_function {
 
     void update_function_signature(Term* term)
     {
-        List& parameters = get_function_attrs(term)->parameters;
+        List& parameters = as_function(term)->parameters;
 
         ca_assert(parameters.length() > 0);
-        int argumentCount = function_num_inputs(get_function_attrs(as_ref(parameters[0])));
+        int argumentCount = function_num_inputs(as_function(as_ref(parameters[0])));
         bool variableArgs = false;
         List outputTypes;
 
         for (int i=0; i < parameters.length(); i++) {
 
             Term* overload = as_ref(parameters[i]);
-            Function* overloadAttrs = get_function_attrs(overload);
+            Function* overloadAttrs = as_function(overload);
 
             if (argumentCount != function_num_inputs(overloadAttrs))
                 variableArgs = true;
@@ -187,7 +187,7 @@ namespace overloaded_function {
         for (int i=0; i < placeholderCount; i++)
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
         Type* outputType = find_common_type(&outputTypes);
-        Function* attrs = get_function_attrs(term);
+        Function* attrs = as_function(term);
         set_type_list(&attrs->outputTypes, outputType);
         attrs->variableArgs = variableArgs;
     }
@@ -198,14 +198,14 @@ namespace overloaded_function {
         nested_contents(term);
         initialize_function(term);
 
-        Function* attrs = get_function_attrs(term);
+        Function* attrs = as_function(term);
         attrs->name = name;
         attrs->evaluate = evaluate_overload;
         attrs->postInputChange = overload_post_input_change;
         attrs->createsStackFrame = true;
         // attrs->specializeType = overload_specialize_type;
 
-        List& parameters = get_function_attrs(term)->parameters;
+        List& parameters = as_function(term)->parameters;
         parameters.clear();
         parameters.resize(overloads.length());
 
@@ -234,7 +234,7 @@ namespace overloaded_function {
     {
         ca_assert(is_overloaded_function(overloadedFunction));
 
-        List& parameters = get_function_attrs(overloadedFunction)->parameters;
+        List& parameters = as_function(overloadedFunction)->parameters;
         set_ref(parameters.append(), overload);
         update_function_signature(overloadedFunction);
     }
@@ -250,7 +250,7 @@ namespace overloaded_function {
     {
         OVERLOADED_FUNCTION_FUNC = import_function(kernel, evaluate_declaration,
                 "overloaded_function(Function...) -> Function");
-        get_function_attrs(OVERLOADED_FUNCTION_FUNC)->postCompile = overloaded_func_post_compile;
+        as_function(OVERLOADED_FUNCTION_FUNC)->postCompile = overloaded_func_post_compile;
     }
 }
 }

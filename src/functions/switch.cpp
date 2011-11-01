@@ -64,13 +64,13 @@ namespace switch_function {
     void setup(Branch* kernel)
     {
         SWITCH_FUNC = import_function(kernel, evaluate_switch, "switch(any input) -> any");
-        get_function_attrs(SWITCH_FUNC)->formatSource = switch_formatSource;
-        get_function_attrs(SWITCH_FUNC)->getOutputCount = switch_getOutputCount;
-        get_function_attrs(SWITCH_FUNC)->getOutputName = switch_getOutputName;
-        get_function_attrs(SWITCH_FUNC)->getOutputType = switch_getOutputType;
+        as_function(SWITCH_FUNC)->formatSource = switch_formatSource;
+        as_function(SWITCH_FUNC)->getOutputCount = switch_getOutputCount;
+        as_function(SWITCH_FUNC)->getOutputName = switch_getOutputName;
+        as_function(SWITCH_FUNC)->getOutputType = switch_getOutputType;
 
         //CASE_FUNC = import_function(kernel, evaluate_case, "case(any input)");
-        //get_function_attrs(CASE_FUNC)->formatSource = case_formatSource;
+        //as_function(CASE_FUNC)->formatSource = case_formatSource;
 
         DEFAULT_CASE_FUNC = import_function(kernel, evaluate_default_case, "default_case()");
     }

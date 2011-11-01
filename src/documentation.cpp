@@ -54,14 +54,14 @@ bool hidden_from_documentation(Term* term)
 std::string get_header_source(Term* function)
 {
     StyledSource styled;
-    function_format_header_source(&styled, get_function_attrs(function));
+    function_format_header_source(&styled, as_function(function));
     return unformat_rich_source(&styled);
 }
 
 void generate_docs_for_function(Term* func, std::stringstream &out)
 {
     std::string header = get_header_source(func);
-    std::string description = function_get_documentation_string(get_function_attrs(func));
+    std::string description = function_get_documentation_string(as_function(func));
     if (description == "") description = "No description provided";
 
     out << "{\"name\":\"" << func->name << "\"";
@@ -73,7 +73,7 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
     if (overloaded_function::is_overloaded_function(func)) {
         out << ", \"containsOverloads\": [";
 
-        List& overloads = get_function_attrs(func)->parameters;
+        List& overloads = as_function(func)->parameters;
         for (int overload=0; overload < overloads.length(); overload++) {
             if (overload != 0)
                 out << ", ";

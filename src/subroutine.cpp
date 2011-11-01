@@ -28,7 +28,7 @@ namespace subroutine_f {
     {
         append_phrase(source, "def ", term, token::DEF);
 
-        Function* func = get_function_attrs(term);
+        Function* func = as_function(term);
 
         function_format_header_source(source, func);
 
@@ -129,7 +129,7 @@ bool is_subroutine(Term* term)
         return false;
     if (term->contents(0)->type != &FUNCTION_ATTRS_T)
         return false;
-    return get_function_attrs(term)->evaluate == evaluate_subroutine;
+    return as_function(term)->evaluate == evaluate_subroutine;
 }
 
 Term* find_enclosing_subroutine(Term* term)
@@ -151,8 +151,8 @@ int get_input_index_of_placeholder(Term* inputPlaceholder)
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
-    get_function_attrs(sub)->evaluate = evaluate_subroutine;
-    get_function_attrs(sub)->createsStackFrame = true;
+    as_function(sub)->evaluate = evaluate_subroutine;
+    as_function(sub)->createsStackFrame = true;
 }
 
 void finish_building_subroutine(Term* sub, Term* outputType)
@@ -165,7 +165,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
 void subroutine_update_state_type_from_contents(Term* func)
 {
     // Check if a stateful argument was declared
-    Term* firstInput = function_get_input_placeholder(get_function_attrs(func), 0);
+    Term* firstInput = function_get_input_placeholder(as_function(func), 0);
     if (firstInput != NULL && firstInput->boolPropOptional("state", false)) {
         // already updated state
         return;
@@ -177,7 +177,7 @@ void subroutine_update_state_type_from_contents(Term* func)
 
 void subroutine_change_state_type(Term* func, Term* newType)
 {
-    Function* attrs = get_function_attrs(func);
+    Function* attrs = as_function(func);
     Term* previousType = attrs->implicitStateType;
     if (previousType == newType)
         return;

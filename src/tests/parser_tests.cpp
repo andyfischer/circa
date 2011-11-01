@@ -158,7 +158,7 @@ void test_function_decl()
             "  whathey = concat(what,hey)\n"
             "  return(yo > 3)\n");
 
-    Function* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = as_function(func);
 
     test_equals(func->name, "Myfunc");
     test_equals(funcAttrs->name, "Myfunc");
@@ -260,7 +260,7 @@ void test_dot_concatenation()
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
     test_assert(branch[1]->asInt() == 1);
-    test_equals(get_function_attrs(branch[2]->function)->name, "Set.add");
+    test_equals(as_function(branch[2]->function)->name, "Set.add");
     test_assert(branch["s"] == s);
 }
 

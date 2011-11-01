@@ -86,17 +86,17 @@ namespace if_block_function {
     void setup(Branch* kernel)
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
-        get_function_attrs(IF_BLOCK_FUNC)->formatSource = formatSource;
-        get_function_attrs(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
-        get_function_attrs(IF_BLOCK_FUNC)->getOutputName = getOutputName;
-        get_function_attrs(IF_BLOCK_FUNC)->getOutputType = getOutputType;
-        get_function_attrs(IF_BLOCK_FUNC)->createsStackFrame = false;
+        as_function(IF_BLOCK_FUNC)->formatSource = formatSource;
+        as_function(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
+        as_function(IF_BLOCK_FUNC)->getOutputName = getOutputName;
+        as_function(IF_BLOCK_FUNC)->getOutputType = getOutputType;
+        as_function(IF_BLOCK_FUNC)->createsStackFrame = false;
 
         JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
-        get_function_attrs(JOIN_FUNC)->specializeType = joinFunc_specializeType;
+        as_function(JOIN_FUNC)->specializeType = joinFunc_specializeType;
 
         CASE_FUNC = import_function(kernel, NULL, "case(bool :optional)");
-        get_function_attrs(CASE_FUNC)->createsStackFrame = true;
+        as_function(CASE_FUNC)->createsStackFrame = true;
     }
 }
 }

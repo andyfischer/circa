@@ -93,7 +93,7 @@ namespace list_methods_function {
         CA_SETUP_FUNCTIONS(kernel);
 
         LIST_APPEND_FUNC = kernel->get("List.append");
-        get_function_attrs(LIST_APPEND_FUNC)->specializeType = append_specializeType;
+        as_function(LIST_APPEND_FUNC)->specializeType = append_specializeType;
     }
 
 } // namespace list_methods_function

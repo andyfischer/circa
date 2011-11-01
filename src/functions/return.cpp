@@ -58,7 +58,7 @@ namespace return_function {
 
             // Check for extra outputs, if found then include their results in this output
 
-            Function* subAttrs = get_function_attrs(sub);
+            Function* subAttrs = as_function(sub);
 
             int numInputs = function_num_inputs(subAttrs);
             for (int i=0; i < numInputs; i++) {
@@ -98,8 +98,8 @@ namespace return_function {
 
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel->get("return");
-        get_function_attrs(RETURN_FUNC)->postCompile = returnPostCompile;
-        get_function_attrs(RETURN_FUNC)->formatSource = formatSource;
+        as_function(RETURN_FUNC)->postCompile = returnPostCompile;
+        as_function(RETURN_FUNC)->formatSource = formatSource;
     }
 }
 }

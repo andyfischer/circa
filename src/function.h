@@ -25,6 +25,8 @@ struct Function
 
     Term* declaringTerm;
 
+    Branch* contents;
+
     std::string name;
     List outputTypes;
     Term* implicitStateType;
@@ -55,13 +57,10 @@ struct Function
     ~Function();
 };
 
-namespace function_attrs_t {
+namespace function_t {
     void initialize(Type* type, TaggedValue* value);
     void release(Type*, TaggedValue* value);
     void copy(Type*, TaggedValue* source, TaggedValue* dest);
-}
-
-namespace function_t {
 
     void setup_type(Type* type);
 
@@ -71,10 +70,9 @@ namespace function_t {
 
 bool is_function(Term* term);
 bool is_function_attrs(Term* term);
-Function& as_function_attrs(Term* term);
 Branch* function_contents(Term* func);
 Branch* function_contents(Function* func);
-Function* get_function_attrs(Term* func);
+Function* as_function(Term* func);
 
 // Return the placeholder name for the given input index; this is the name that
 // is used if no name is given.

@@ -486,7 +486,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     initialize_function(result);
     initialize_subroutine(result);
 
-    Function* attrs = get_function_attrs(result);
+    Function* attrs = as_function(result);
     attrs->implicitStateType = VOID_TYPE;
     set_starting_source_location(result, startPosition, tokens);
     attrs->name = functionName;

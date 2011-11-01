@@ -16,7 +16,7 @@ namespace do_once_function {
     void setup(Branch* kernel)
     {
         DO_ONCE_FUNC = import_function(kernel, NULL, "do_once(state bool)");
-        get_function_attrs(DO_ONCE_FUNC)->formatSource = formatSource;
+        as_function(DO_ONCE_FUNC)->formatSource = formatSource;
     }
 }
 }

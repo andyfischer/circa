@@ -23,7 +23,7 @@ namespace namespace_function {
     void early_setup(Branch* kernel)
     {
         NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
-        get_function_attrs(NAMESPACE_FUNC)->formatSource = format_source;
+        as_function(NAMESPACE_FUNC)->formatSource = format_source;
     }
     void setup(Branch* kernel) {}
 }

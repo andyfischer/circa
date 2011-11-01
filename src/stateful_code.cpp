@@ -31,7 +31,7 @@ bool is_function_stateful(Term* func)
 {
     if (!is_function(func))
         return false;
-    Function* attrs = get_function_attrs(func);
+    Function* attrs = as_function(func);
     if (attrs == NULL)
         return false;
     Term* stateType = attrs->implicitStateType;

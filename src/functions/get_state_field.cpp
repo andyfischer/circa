@@ -88,7 +88,7 @@ namespace get_state_field_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
         GET_STATE_FIELD_FUNC = kernel->get("get_state_field");
-        get_function_attrs(GET_STATE_FIELD_FUNC)->formatSource = formatSource;
+        as_function(GET_STATE_FIELD_FUNC)->formatSource = formatSource;
     }
 }
 }

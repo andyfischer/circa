@@ -26,11 +26,11 @@ namespace neg_function  {
         Term* neg_i = import_function(kernel, evaluate_i, "neg_i(int) -> int");
         Term* neg_f = import_function(kernel, evaluate_f, "neg_f(number) -> number");
 
-        get_function_attrs(neg_i)->formatSource = formatSource;
-        get_function_attrs(neg_f)->formatSource = formatSource;
+        as_function(neg_i)->formatSource = formatSource;
+        as_function(neg_f)->formatSource = formatSource;
 
         NEG_FUNC = create_overloaded_function(kernel, "neg", TermList(neg_i, neg_f));
-        get_function_attrs(NEG_FUNC)->formatSource = formatSource;
+        as_function(NEG_FUNC)->formatSource = formatSource;
     }
 }
 }

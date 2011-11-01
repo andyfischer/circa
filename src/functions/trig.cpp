@@ -78,12 +78,12 @@ namespace trig_function {
     {
         Term* sin_func = import_function(kernel, evaluate_sin, "sin(number degrees) -> number;"
             "'Trigonometric sin() function");
-        get_function_attrs(sin_func)->feedbackFunc = 
+        as_function(sin_func)->feedbackFunc = 
             import_function(kernel, feedback_evaluate_sin, "sin_feedback(any, number) -> number");
 
         Term* cos_func = import_function(kernel, evaluate_cos, "cos(number degrees) -> number;"
             "'Trigonometric cos() function'");
-        get_function_attrs(cos_func)->feedbackFunc = 
+        as_function(cos_func)->feedbackFunc = 
             import_function(kernel, feedback_evaluate_cos, "cos_feedback(any, number) -> number");
 
         import_function(kernel, evaluate_tan, "tan(number degrees) -> number;"

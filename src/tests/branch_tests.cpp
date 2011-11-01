@@ -222,7 +222,7 @@ void test_duplicate_subroutine()
     Branch branch;
 
     Term* func = branch.compile("def func() { a = 1 }");
-    Function* funcAttrs = get_function_attrs(func);
+    Function* funcAttrs = as_function(func);
 
     // sanity check:
     test_assert(funcAttrs->name == "func");
@@ -235,7 +235,7 @@ void test_duplicate_subroutine()
     test_assert(dupe.contains("func"));
 
     Term* dupedFunc = dupe["func"];
-    Function* dupedAttrs = get_function_attrs(dupedFunc);
+    Function* dupedAttrs = as_function(dupedFunc);
     test_assert(dupedAttrs->name == "func");
     //TEST_DISABLED test_assert(dupedAttrs->declaringTerm == dupedFunc);
 

@@ -22,7 +22,7 @@ namespace instance_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
         INSTANCE_FUNC = kernel->get("instance");
-        get_function_attrs(INSTANCE_FUNC)->specializeType = specializeType;
+        as_function(INSTANCE_FUNC)->specializeType = specializeType;
     }
 }
 } // namespace circa

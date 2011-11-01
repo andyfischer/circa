@@ -62,7 +62,7 @@ namespace vectorize_vs_function {
         Branch* contents = nested_contents(term);
         contents->clear();
 
-        TaggedValue* funcParam = &get_function_attrs(term->function)->parameter;
+        TaggedValue* funcParam = &as_function(term->function)->parameter;
         if (funcParam == NULL || !is_ref(funcParam))
             return;
 
@@ -86,9 +86,9 @@ namespace vectorize_vs_function {
     {
         Term* func = import_function(kernel, evaluate,
                 "vectorize_vs(List,any) -> List");
-        get_function_attrs(func)->specializeType = specializeType;
-        get_function_attrs(func)->postInputChange = post_input_change;
-        get_function_attrs(func)->createsStackFrame = true;
+        as_function(func)->specializeType = specializeType;
+        as_function(func)->postInputChange = post_input_change;
+        as_function(func)->createsStackFrame = true;
     }
 }
 } // namespace circa

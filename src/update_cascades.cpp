@@ -116,7 +116,7 @@ void recursively_finish_update_cascade(Branch* branch)
 void on_inputs_changed(Term* term)
 {
     // Update function pointer
-    Function* attrs = get_function_attrs(term->function);
+    Function* attrs = as_function(term->function);
     if (attrs == NULL)
         return;
 

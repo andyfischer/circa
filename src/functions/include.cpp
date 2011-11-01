@@ -87,11 +87,11 @@ namespace include_function {
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
                 "include(string filename) -> Branch");
-        get_function_attrs(INCLUDE_FUNC)->postCompile = include_post_compile;
+        as_function(INCLUDE_FUNC)->postCompile = include_post_compile;
 
         LOAD_SCRIPT_FUNC = import_function(kernel, load_script,
                 "load_script(string filename) -> Branch");
-        get_function_attrs(LOAD_SCRIPT_FUNC)->postCompile = include_post_compile;
+        as_function(LOAD_SCRIPT_FUNC)->postCompile = include_post_compile;
     }
 }
 } // namespace circa

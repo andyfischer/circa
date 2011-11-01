@@ -70,8 +70,8 @@ namespace list_function {
 
         LIST_FUNC = kernel->get("list");
 
-        get_function_attrs(LIST_FUNC)->specializeType = specializeType;
-        get_function_attrs(LIST_FUNC)->formatSource = list_formatSource;
+        as_function(LIST_FUNC)->specializeType = specializeType;
+        as_function(LIST_FUNC)->formatSource = list_formatSource;
     }
 }
 }

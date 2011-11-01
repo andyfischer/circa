@@ -23,7 +23,7 @@ int get_output_count(Term* term)
     if (term->function == NULL)
         return 1;
 
-    Function* attrs = get_function_attrs(term->function);
+    Function* attrs = as_function(term->function);
 
     if (attrs == NULL)
         return 1;
