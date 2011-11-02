@@ -90,8 +90,9 @@ void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
 
 void evaluate_branch_no_preserve_locals(EvalContext* context, Branch* branch);
 
-// Top-level call. Evalaute the branch and then preserve stack outputs back to terms.
 void evaluate_branch(EvalContext* context, Branch* branch);
+
+void evaluate_save_locals(EvalContext* context, Branch* branch);
 
 // Shorthand to call evaluate_branch with a new EvalContext:
 void evaluate_branch(Branch* branch);
@@ -126,7 +127,9 @@ TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
 void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest);
 TaggedValue* get_output(EvalContext* context, ListData* args);
 
+// Deprecated version:
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
+void error_occurred(EvalContext* context, ListData* args, const char* msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 

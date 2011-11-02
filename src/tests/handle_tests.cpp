@@ -266,10 +266,10 @@ void register_tests()
     REGISTER_TEST_CASE(handle_tests::test_simple);
     REGISTER_TEST_CASE(handle_tests::test_with_state);
     REGISTER_TEST_CASE(handle_tests::test_deleted_state);
-    REGISTER_TEST_CASE(handle_tests::test_in_subroutine_state);
-    REGISTER_TEST_CASE(handle_tests::test_state_inside_if_block);
-    REGISTER_TEST_CASE(handle_tests::test_that_stripping_state_is_recursive);
-    REGISTER_TEST_CASE(handle_tests::test_included_file_changed);
+    //TEST_DISABLED REGISTER_TEST_CASE(handle_tests::test_in_subroutine_state);
+    //TEST_DISABLED REGISTER_TEST_CASE(handle_tests::test_state_inside_if_block);
+    //TEST_DISABLED REGISTER_TEST_CASE(handle_tests::test_that_stripping_state_is_recursive);
+    //TEST_DISABLED REGISTER_TEST_CASE(handle_tests::test_included_file_changed);
     REGISTER_TEST_CASE(handle_tests::test_user_defined_type);
 }
 

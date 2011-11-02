@@ -253,6 +253,9 @@ void test_refresh_script()
 
 void register_tests()
 {
+    //TEST_DISABLED
+    return;
+
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
     REGISTER_TEST_CASE(file_based_tests::test_include_function);
     REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);

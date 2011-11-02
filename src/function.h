@@ -29,7 +29,6 @@ struct Function
 
     std::string name;
     List outputTypes;
-    Term* implicitStateType;
     bool variableArgs;
     Term* feedbackFunc;
     TaggedValue parameter;

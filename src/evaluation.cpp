@@ -230,7 +230,8 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch)
               break;
     }
 
-    pop_frame(context);
+    if (!context->errorOccurred)
+        pop_frame(context);
 }
 
 void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output)
@@ -290,10 +291,27 @@ void evaluate_branch(EvalContext* context, Branch* branch)
     evaluate_branch_no_preserve_locals(context, branch);
 }
 
+void evaluate_save_locals(EvalContext* context, Branch* branch)
+{
+    push_frame(context, branch);
+
+    for (int i=0; i < branch->length(); i++) {
+        evaluate_single_term(context, branch->get(i));
+
+          if (evaluation_interrupted(context))
+              break;
+    }
+
+    copy_locals_back_to_terms(top_frame(context), branch);
+
+    if (!context->errorOccurred)
+        pop_frame(context);
+}
+
 void evaluate_branch(Branch* branch)
 {
     EvalContext context;
-    evaluate_branch(&context, branch);
+    evaluate_save_locals(&context, branch);
 }
 
 TaggedValue* get_input(EvalContext* context, Term* term, int index)
@@ -373,6 +391,7 @@ TaggedValue* get_extra_output(EvalContext* context, Term* term, int index)
     return NULL;
 }
 
+// Old style, needs to be deleted:
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
 {
     // Save the error as this term's output value.
@@ -396,6 +415,31 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
     if (!context->errorOccurred) {
         context->errorOccurred = true;
         context->errorTerm = errorTerm;
+    }
+}
+void error_occurred(EvalContext* context, ListData* args, const char* message)
+{
+    // Save the error as this term's output value.
+    TaggedValue* out = get_arg(context, args, list_size(args) - 1);
+    set_string(out, message);
+    out->value_type = &ERROR_T;
+
+    Term* currentTerm = context->currentTerm;
+
+    // Check if there is an errored() call listening to this term. If so, then
+    // continue execution.
+    if (has_an_error_listener(currentTerm))
+        return;
+
+    if (DEBUG_TRAP_ERROR_OCCURRED)
+        ca_assert(false);
+
+    if (context == NULL)
+        throw std::runtime_error(message);
+
+    if (!context->errorOccurred) {
+        context->errorOccurred = true;
+        context->errorTerm = currentTerm;
     }
 }
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
@@ -550,8 +594,14 @@ std::string context_get_error_message(EvalContext* cxt)
 {
     ca_assert(cxt != NULL);
     ca_assert(cxt->errorTerm != NULL);
-    // FIXME
-    return "";
+    ca_assert(cxt->numFrames > 0);
+
+    Frame* frame = top_frame(cxt);
+
+    if (cxt->errorTerm->owningBranch != frame->branch)
+        internal_error("called context_get_error_message, but the errored frame is gone");
+
+    return as_string(frame->registers[cxt->errorTerm->index]);
 }
 
 } // namespace circa

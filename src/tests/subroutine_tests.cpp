@@ -77,7 +77,6 @@ void subroutine_stateful_term()
     // Make sure that stateful terms work correctly
     Term* call = branch.compile("call = mysub()");
     test_assert(call);
-    test_assert(as_function(branch["mysub"])->implicitStateType != VOID_TYPE);
     test_assert(is_function_stateful(branch["mysub"]));
 
     evaluate_branch(&context, &branch);
@@ -119,17 +118,6 @@ void test_recursion_with_state()
     test_equals(&context.state,
         "{result: {_recr: {_recr: {_recr: {s: 45}, s: 33}, s: 21}, s: 10}}");
     test_equals(get_local(branch["result"]), 4);
-}
-
-void initialize_state_type()
-{
-    Branch branch;
-
-    Term* a = branch.compile("def a() -> number { return(1 + 1) }");
-    test_assert(as_function(a)->implicitStateType == VOID_TYPE);
-
-    Term* b = branch.compile("def b() { state i }");
-    test_assert(as_function(b)->implicitStateType != VOID_TYPE);
 }
 
 void shadow_input()
@@ -356,7 +344,6 @@ void register_tests()
     REGISTER_TEST_CASE(subroutine_tests::test_recursion);
     REGISTER_TEST_CASE(subroutine_tests::subroutine_stateful_term);
     REGISTER_TEST_CASE(subroutine_tests::test_recursion_with_state);
-    REGISTER_TEST_CASE(subroutine_tests::initialize_state_type);
     REGISTER_TEST_CASE(subroutine_tests::shadow_input);
     REGISTER_TEST_CASE(subroutine_tests::specialization_to_output_type);
     REGISTER_TEST_CASE(subroutine_tests::stateful_function_with_arguments);

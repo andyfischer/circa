@@ -135,7 +135,7 @@ void test_produce_output()
     Branch branch;
     branch.compile("x = for i in 0..5; i + 1");
     evaluate_branch(&branch);
-    List* x = List::checkCast(get_local(branch["x"]));
+    List* x = List::checkCast(branch["x"]);
     test_equals(x->length(), 5);
     test_equals(x->get(0), "1");
     test_equals(x->get(1), "2");

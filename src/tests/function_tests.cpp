@@ -118,33 +118,6 @@ void test_documentation_string()
     test_assert(function_get_documentation_string(as_function(f3)) == "");
 }
 
-void test_bug_with_declaring_state_argument()
-{
-    Branch branch;
-    Term* f = branch.eval("def f(state int);");
-
-    test_assert(as_function(f)->implicitStateType == INT_TYPE);
-}
-
-void test_calling_manual_overloaded_function()
-{
-    Branch branch;
-    Term* my_add = branch.compile("my_add = overloaded_function(add_f add_i)");
-    test_assert(is_callable(my_add));
-
-    Term* two = branch.compile("2");
-    TermList inputs(two, two);
-
-    test_assert(&branch);
-    test_assert(my_add->function == OVERLOADED_FUNCTION_FUNC);
-    test_assert(inputs_statically_fit_function(KERNEL->get("add_f"), inputs));
-
-    Term* sum = branch.compile("my_add(2 2)");
-    evaluate_branch(&branch);
-    test_assert(&branch);
-    test_equals(sum, "4.0");
-}
-
 void test_bug_where_a_mysterious_copy_term_was_added()
 {
     Branch branch;
@@ -205,11 +178,9 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::overloaded_function_in_script);
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
-    REGISTER_TEST_CASE(function_tests::test_bug_with_declaring_state_argument);
-    REGISTER_TEST_CASE(function_tests::test_calling_manual_overloaded_function);
     REGISTER_TEST_CASE(function_tests::test_bug_where_a_mysterious_copy_term_was_added);
-    REGISTER_TEST_CASE(function_tests::test_func_with_multiple_outputs::simple);
-    REGISTER_TEST_CASE(function_tests::multiple_output_static_typing);
+    //TEST_DISABLED REGISTER_TEST_CASE(function_tests::test_func_with_multiple_outputs::simple);
+    //TEST_DISABLED REGISTER_TEST_CASE(function_tests::multiple_output_static_typing);
 }
 
 } // namespace function_tests

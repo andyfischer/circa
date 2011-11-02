@@ -19,7 +19,6 @@ namespace circa {
 Function::Function()
   : declaringTerm(NULL),
     contents(NULL),
-    implicitStateType(NULL),
     variableArgs(false),
     feedbackFunc(NULL),
     throws(false),
@@ -272,7 +271,7 @@ Type* function_get_output_type(Function* func, int index)
 
 int function_num_inputs(Function* func)
 {
-    Branch* contents = nested_contents(func->declaringTerm);
+    Branch* contents = function_get_contents(func);
     int i = 0;
 
     while (i < contents->length()
@@ -329,7 +328,7 @@ std::string function_get_documentation_string(Function* func)
     // A function can optionally have a documentation string. If present,
     // it will be the first thing defined in the function, and it'll be
     // anonymous and be a statement.
-    int expected_index = function_num_inputs(func) + 1;
+    int expected_index = function_num_inputs(func);
     Branch* contents = function_get_contents(func);
 
     if (expected_index >= contents->length()) return "";

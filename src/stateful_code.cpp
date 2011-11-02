@@ -34,8 +34,9 @@ bool is_function_stateful(Term* func)
     Function* attrs = as_function(func);
     if (attrs == NULL)
         return false;
-    Term* stateType = attrs->implicitStateType;
-    return (stateType != NULL && stateType != VOID_TYPE);
+
+    // FIXME
+    return false;
 }
 
 bool has_any_inlined_state(Branch* branch)

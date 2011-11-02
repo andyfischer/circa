@@ -39,7 +39,7 @@ namespace subroutine_f {
 
 Term* get_subroutine_input_placeholder(Branch* contents, int index)
 {
-    return contents->get(index + 1);
+    return contents->get(index);
 }
 
 CA_FUNCTION(evaluate_subroutine)
@@ -64,6 +64,18 @@ CA_FUNCTION(evaluate_subroutine)
         // Insert inputs into placeholders
         for (int i=0; i < NUM_INPUTS; i++) {
             Term* placeholder = get_subroutine_input_placeholder(contents, i);
+
+            bool castSuccess = cast(INPUT(i), placeholder->type, frame->registers[i]);
+
+            if (!castSuccess) {
+                std::stringstream msg;
+                msg << "Couldn't cast input " << INPUT(i)->toString()
+                    << " (at index " << i << ")"
+                    << " to type " << placeholder->type->name;
+                pop_frame(context);
+                ERROR_OCCURRED(msg.str().c_str());
+                return;
+            }
             copy(INPUT(i), frame->registers[placeholder->index]);
         }
 
@@ -96,7 +108,7 @@ CA_FUNCTION(evaluate_subroutine)
                 std::stringstream msg;
                 msg << "Couldn't cast output " << output.toString()
                     << " to type " << outputType->name;
-                error_occurred(context, caller, msg.str());
+                ERROR_OCCURRED(msg.str().c_str());
             }
         }
 
@@ -166,12 +178,7 @@ void subroutine_update_state_type_from_contents(Term* func)
 
 void subroutine_change_state_type(Term* func, Term* newType)
 {
-    Function* attrs = as_function(func);
-    Term* previousType = attrs->implicitStateType;
-    if (previousType == newType)
-        return;
-
-    attrs->implicitStateType = newType;
+    // TODO
 }
 
 void subroutine_check_to_append_implicit_return(Term* sub)
