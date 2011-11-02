@@ -403,32 +403,6 @@ TaggedValue* get_extra_output(EvalContext* context, Term* term, int index)
     return NULL;
 }
 
-// Old style, needs to be deleted:
-void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message)
-{
-    // Save the error as this term's output value.
-    //TaggedValue* out = get_output(context, errorTerm, 0);
-    //set_string(out, message);
-    //out->value_type = &ERROR_T;
-
-    // Check if there is an errored() call listening to this term. If so, then
-    // continue execution.
-    if (has_an_error_listener(errorTerm))
-        return;
-
-    if (DEBUG_TRAP_ERROR_OCCURRED)
-        ca_assert(false);
-
-    ca_assert(errorTerm != NULL);
-
-    if (context == NULL)
-        throw std::runtime_error(message);
-
-    if (!context->errorOccurred) {
-        context->errorOccurred = true;
-        context->errorTerm = errorTerm;
-    }
-}
 void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* message)
 {
     // Save the error as this term's output value.

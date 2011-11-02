@@ -14,18 +14,18 @@ namespace string_methods_function {
         int end = INT_INPUT(2);
         std::string const& s = as_string(INPUT(0));
 
-        if (start < 0) return error_occurred(CONTEXT, CALLER, "Negative index");
-        if (end < 0) return error_occurred(CONTEXT, CALLER, "Negative index");
+        if (start < 0) return ERROR_OCCURRED("Negative index");
+        if (end < 0) return ERROR_OCCURRED("Negative index");
 
         if ((unsigned) start > s.length()) {
             std::stringstream msg;
             msg << "Start index is too high: " << start;
-            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
+            return ERROR_OCCURRED(msg.str().c_str());
         }
         if ((unsigned) (start+end) > s.length()) {
             std::stringstream msg;
             msg << "End index is too high: " << start;
-            return error_occurred(CONTEXT, CALLER, msg.str().c_str());
+            return ERROR_OCCURRED(msg.str().c_str());
         }
 
         set_string(OUTPUT, s.substr(start, end));

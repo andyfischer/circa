@@ -33,8 +33,10 @@ namespace hashtable_methods_function {
         TaggedValue* table = INPUT(0);
         TaggedValue* key = INPUT(1);
         TaggedValue* value = hashtable_t::get_value(table, key);
-        if (value == NULL)
-            return error_occurred(CONTEXT, CALLER, "Key not found: " + to_string(key));
+        if (value == NULL) {
+            std::string msg = "Key not found: " + to_string(key);
+            return ERROR_OCCURRED(msg.c_str());
+        }
         copy(value, OUTPUT);
     }
 

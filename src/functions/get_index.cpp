@@ -14,7 +14,7 @@ namespace get_index_function {
         if (index < 0) {
             char indexStr[40];
             sprintf(indexStr, "Negative index: %d", index);
-            return error_occurred(CONTEXT, CALLER, indexStr);
+            return ERROR_OCCURRED(indexStr);
         }
 
         TaggedValue* result = get_index(INPUT(0), index);
@@ -22,7 +22,7 @@ namespace get_index_function {
         if (result == NULL) {
             std::stringstream err;
             err << "Index out of range: " << index;
-            return error_occurred(CONTEXT, CALLER, err.str());
+            return ERROR_OCCURRED(err.str().c_str());
         }
 
         copy(result, OUTPUT);
@@ -41,7 +41,7 @@ namespace get_index_function {
         if (index >= branch->length()) {
             std::stringstream err;
             err << "Index out of range: " << index;
-            return error_occurred(CONTEXT, CALLER, err.str());
+            return ERROR_OCCURRED(err.str().c_str());
         }
 
         copy(branch->get(index), OUTPUT);

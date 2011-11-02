@@ -86,7 +86,7 @@ namespace cppbuild_function {
 
         int ret = system(cmd.c_str());
         if (ret != 0)
-            return error_occurred(CONTEXT, CALLER, "g++ returned error");
+            return ERROR_OCCURRED("g++ returned error");
     }
 
     void setup(Branch* kernel)

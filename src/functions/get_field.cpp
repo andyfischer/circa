@@ -14,8 +14,10 @@ namespace get_field_function {
 
             int fieldIndex = list_find_field_index_by_name(head->value_type, name);
 
-            if (fieldIndex == -1)
-                return error_occurred(CONTEXT, CALLER, "field not found: " + name);
+            if (fieldIndex == -1) {
+                std::string msg = "field not found: " + name;
+                return ERROR_OCCURRED(msg.c_str());
+            }
 
             head = head->getIndex(fieldIndex);
         }

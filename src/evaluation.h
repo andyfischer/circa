@@ -128,8 +128,7 @@ TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
 void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest);
 TaggedValue* get_output(EvalContext* context, ListData* args);
 
-// Deprecated version:
-void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
+// Signal that a runtime error has occurred.
 void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);

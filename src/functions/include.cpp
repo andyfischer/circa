@@ -38,15 +38,15 @@ namespace include_function {
         EvalContext* context = CONTEXT;
         Branch* contents = nested_contents(CALLER);
 
-        bool fileChanged =
-            load_script(CONTEXT, CALLER, STRING_INPUT(0), true);
+        bool fileChanged = load_script(CONTEXT, CALLER, STRING_INPUT(0), true);
 
         if (CONTEXT->errorOccurred)
             return;
 
-        if (fileChanged && has_static_errors(contents))
-            return error_occurred(CONTEXT, CALLER,
-                    get_static_errors_formatted(contents));
+        if (fileChanged && has_static_errors(contents)) {
+            std::string msg = get_static_errors_formatted(contents);
+            return ERROR_OCCURRED(msg.c_str());
+        }
 
         // Store currentScopeState and fetch the container for this branch
         TaggedValue prevScopeState;

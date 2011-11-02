@@ -175,7 +175,7 @@ namespace dll_loading_function {
         patch_with_dll(filename, branch, &error);
 
         if (!is_null(&error))
-            error_occurred(CONTEXT, CALLER, as_string(&error));
+            ERROR_OCCURRED(as_cstring(&error));
     }
 
     CA_FUNCTION(dll_filename)

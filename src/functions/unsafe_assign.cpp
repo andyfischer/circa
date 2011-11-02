@@ -15,9 +15,9 @@ namespace unsafe_assign_function {
         Term* source = INPUT_TERM(1);
 
         if (!cast_possible(source, declared_type(destination))) {
-            error_occurred(CONTEXT, CALLER,
-                    "Tried to assign a " + source->type->name + " to a "
-                    + destination->type->name);
+            std::string msg = "Tried to assign a " + source->type->name + " to a "
+                    + destination->type->name;
+            ERROR_OCCURRED(msg.c_str());
             return;
         }
 

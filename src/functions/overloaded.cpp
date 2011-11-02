@@ -94,7 +94,7 @@ namespace overloaded_function {
         } else {
             std::stringstream msg;
             msg << "specialized func not found for: " << CALLER->function->name;
-            return error_occurred(CONTEXT, CALLER, msg.str());
+            return ERROR_OCCURRED(msg.str().c_str());
         }
     }
 

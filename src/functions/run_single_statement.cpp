@@ -11,7 +11,7 @@ namespace run_single_statement_function {
         int index = INT_INPUT(1);
 
         if (branchPtr == NULL)
-            return error_occurred(CONTEXT, CALLER, "NULL branch");
+            return ERROR_OCCURRED("NULL branch");
 
         Branch* branch = branchPtr;
 
@@ -37,7 +37,7 @@ namespace run_single_statement_function {
         Branch* branchPtr = as_branch(INPUT(0));
 
         if (branchPtr == NULL)
-            return error_occurred(CONTEXT, CALLER, "NULL branch");
+            return ERROR_OCCURRED("NULL branch");
 
         Branch* branch = branchPtr;
 

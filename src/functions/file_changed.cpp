@@ -9,7 +9,10 @@ namespace file_changed_function {
             std::string const& filename)
     {
         if (!file_exists(filename.c_str()) && filename != "") {
-            error_occurred(cxt, caller, "File not found: " + filename);
+            std::string msg = "File not found: " + filename;
+            //error_occurred(cxt, caller, msg.c_str());
+            // FIXME: Caller needs to pass in 'output' for error_occurred
+            internal_error(msg.c_str());
             return false;
         }
 

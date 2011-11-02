@@ -12,7 +12,7 @@ namespace read_text_file_function {
         read_text_file_to_value(filename.c_str(), OUTPUT, &error);
 
         if (!is_null(&error))
-            error_occurred(CONTEXT, CALLER, as_string(&error));
+            ERROR_OCCURRED(as_cstring(&error));
     }
 
     void setup(Branch* kernel)
