@@ -130,7 +130,7 @@ TaggedValue* get_output(EvalContext* context, ListData* args);
 
 // Deprecated version:
 void error_occurred(EvalContext* context, Term* errorTerm, std::string const& message);
-void error_occurred(EvalContext* context, ListData* args, const char* msg);
+void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 

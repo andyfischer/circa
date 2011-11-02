@@ -136,6 +136,11 @@ Frame* push_frame(EvalContext* context, Branch* branch)
 void pop_frame(EvalContext* context)
 {
     Frame* top = &context->stack[context->numFrames - 1];
+
+    // Check to make sure we aren't losing a stored runtime error.
+    if (context->errorOccurred && context->errorTerm->owningBranch == top->branch)
+        internal_error("pop_frame called to pop an errored frame");
+
     set_null(&top->registers);
     set_null(&top->state);
     context->numFrames--;
@@ -252,7 +257,8 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue*
         copy(top_frame(context)->registers[outputTerm->index], output);
     }
 
-    pop_frame(context);
+    if (!context->errorOccurred)
+        pop_frame(context);
 }
 
 void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
@@ -423,18 +429,15 @@ void error_occurred(EvalContext* context, Term* errorTerm, std::string const& me
         context->errorTerm = errorTerm;
     }
 }
-void error_occurred(EvalContext* context, ListData* args, const char* message)
+void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* message)
 {
     // Save the error as this term's output value.
-    TaggedValue* out = get_arg(context, args, list_size(args) - 1);
-    set_string(out, message);
-    out->value_type = &ERROR_T;
-
-    Term* currentTerm = context->currentTerm;
+    set_string(output, message);
+    output->value_type = &ERROR_T;
 
     // Check if there is an errored() call listening to this term. If so, then
     // continue execution.
-    if (has_an_error_listener(currentTerm))
+    if (has_an_error_listener(term))
         return;
 
     if (DEBUG_TRAP_ERROR_OCCURRED)
@@ -445,9 +448,10 @@ void error_occurred(EvalContext* context, ListData* args, const char* message)
 
     if (!context->errorOccurred) {
         context->errorOccurred = true;
-        context->errorTerm = currentTerm;
+        context->errorTerm = term;
     }
 }
+
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
 {
     output << get_short_location(context.errorTerm)

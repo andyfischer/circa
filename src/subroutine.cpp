@@ -92,10 +92,14 @@ CA_FUNCTION(evaluate_subroutine)
             break;
     }
 
+    // If an error occurred, leave context the way it is.
+    if (context->errorOccurred)
+        return;
+
     // Save output
     TaggedValue output;
 
-    Type* outputType = function_get_output_type(CALLER->function, 0);
+    Type* outputType = function_get_output_type(caller->function, 0);
 
     if (context->errorOccurred) {
         set_null(&output);
@@ -109,9 +113,9 @@ CA_FUNCTION(evaluate_subroutine)
         
         if (!castSuccess) {
             std::stringstream msg;
-            msg << "Couldn't cast output " << output.toString()
+            msg << "Couldn't cast output " << context->subroutineOutput.toString()
                 << " to type " << outputType->name;
-            ERROR_OCCURRED(msg.str().c_str());
+            error_occurred(context, caller, &output, msg.str().c_str());
         }
     }
 

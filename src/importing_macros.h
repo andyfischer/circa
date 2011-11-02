@@ -42,4 +42,4 @@
 #define OUTPUT (get_arg(_cxt, _args, NUM_INPUTS))
 #define EXTRA_OUTPUT(index) (get_extra_output(_cxt, CALLER, (index)))
 #define FUNCTION (CALLER->function)
-#define ERROR_OCCURRED(msg) (error_occurred(_cxt, _args, (msg)))
+#define ERROR_OCCURRED(msg) (error_occurred(_cxt, CALLER, OUTPUT, (msg)))
