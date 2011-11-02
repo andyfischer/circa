@@ -511,6 +511,9 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch->get(i));
 
+    if (context->errorOccurred)
+        return;
+
     copy_locals_back_to_terms(top_frame(context), branch);
     pop_frame(context);
 }

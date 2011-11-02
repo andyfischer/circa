@@ -66,8 +66,8 @@ def test_file(filename):
     diff = diff_command_against_file("circa_t "+filename, filename + ".output")
     if diff:
         desc = ['Script output differed on line '+str(diff.lineNumber)]
-        desc.append('  Expected: '+diff.fromFile)
-        desc.append('  Observed: '+diff.fromCommand)
+        desc.append('  Expected: "'+diff.fromFile+'"')
+        desc.append('  Observed: "'+diff.fromCommand+'"')
         failures.append(TestFailure(desc, filename))
 
     # Source repro test
