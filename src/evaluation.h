@@ -71,6 +71,7 @@ void eval_context_setup_type(Type* type);
 // Stack frames
 Frame* get_frame(EvalContext* context, int depth);
 Frame* get_frame_from_bottom(EvalContext* context, int index);
+Frame* push_frame(EvalContext* context, Branch* branch, List* registers);
 Frame* push_frame(EvalContext* context, Branch* branch);
 void pop_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);

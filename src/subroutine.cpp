@@ -57,69 +57,71 @@ CA_FUNCTION(evaluate_subroutine)
     if (is_function_stateful(function))
         fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
 
-    {
-        context->interruptSubroutine = false;
-        Frame* frame = push_frame(context, contents);
+    // Fetch inputs and start preparing the new stack frame.
+    List newFrame;
+    newFrame.resize(get_locals_count(contents));
+    
+    context->interruptSubroutine = false;
 
-        // Insert inputs into placeholders
-        for (int i=0; i < NUM_INPUTS; i++) {
-            Term* placeholder = get_subroutine_input_placeholder(contents, i);
+    // Insert inputs into placeholders
+    for (int i=0; i < NUM_INPUTS; i++) {
+        Term* placeholder = get_subroutine_input_placeholder(contents, i);
 
-            bool castSuccess = cast(INPUT(i), placeholder->type, frame->registers[i]);
+        bool castSuccess = cast(INPUT(i), placeholder->type, newFrame[i]);
 
-            if (!castSuccess) {
-                std::stringstream msg;
-                msg << "Couldn't cast input " << INPUT(i)->toString()
-                    << " (at index " << i << ")"
-                    << " to type " << placeholder->type->name;
-                pop_frame(context);
-                ERROR_OCCURRED(msg.str().c_str());
-                return;
-            }
-            copy(INPUT(i), frame->registers[placeholder->index]);
+        if (!castSuccess) {
+            std::stringstream msg;
+            msg << "Couldn't cast input " << INPUT(i)->toString()
+                << " (at index " << i << ")"
+                << " to type " << placeholder->type->name;
+            ERROR_OCCURRED(msg.str().c_str());
+            return;
         }
-
-        // Prepare output
-        set_null(&context->subroutineOutput);
-
-        // Evaluate each term
-        for (int i=numInputs+1; i < contents->length(); i++) {
-            evaluate_single_term(context, contents->get(i));
-            if (evaluation_interrupted(context))
-                break;
-        }
-
-        // Save output
-        TaggedValue output;
-
-        Type* outputType = function_get_output_type(CALLER->function, 0);
-
-        if (context->errorOccurred) {
-            set_null(&output);
-        } else if (outputType == &VOID_T) {
-
-            set_null(&output);
-
-        } else {
-
-            bool castSuccess = cast(&context->subroutineOutput, outputType, &output);
-            
-            if (!castSuccess) {
-                std::stringstream msg;
-                msg << "Couldn't cast output " << output.toString()
-                    << " to type " << outputType->name;
-                ERROR_OCCURRED(msg.str().c_str());
-            }
-        }
-
-        set_null(&context->subroutineOutput);
-
-        // Clean up
-        pop_frame(context);
-        swap(&output, OUTPUT);
-        context->interruptSubroutine = false;
-        
     }
+
+    // Prepare output
+    set_null(&context->subroutineOutput);
+
+    // Push our frame (with inputs) onto the stack
+    push_frame(context, contents, &newFrame);
+
+    // Evaluate each term
+    for (int i=numInputs; i < contents->length(); i++) {
+        evaluate_single_term(context, contents->get(i));
+        if (evaluation_interrupted(context))
+            break;
+    }
+
+    // Save output
+    TaggedValue output;
+
+    Type* outputType = function_get_output_type(CALLER->function, 0);
+
+    if (context->errorOccurred) {
+        set_null(&output);
+    } else if (outputType == &VOID_T) {
+
+        set_null(&output);
+
+    } else {
+
+        bool castSuccess = cast(&context->subroutineOutput, outputType, &output);
+        
+        if (!castSuccess) {
+            std::stringstream msg;
+            msg << "Couldn't cast output " << output.toString()
+                << " to type " << outputType->name;
+            ERROR_OCCURRED(msg.str().c_str());
+        }
+    }
+
+    set_null(&context->subroutineOutput);
+
+    // Clean up
+    pop_frame(context);
+    swap(&output, OUTPUT);
+    context->interruptSubroutine = false;
+        
     // Preserve state
     if (is_function_stateful(function))
         save_and_consume_state(caller, &prevScopeState, &context->currentScopeState);

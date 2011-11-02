@@ -115,17 +115,23 @@ Frame* get_frame_from_bottom(EvalContext* context, int index)
     ca_assert(index < context->numFrames);
     return &context->stack[index];
 }
-Frame* push_frame(EvalContext* context, Branch* branch)
+Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
 {
     context->numFrames++;
     context->stack = (Frame*) realloc(context->stack, sizeof(Frame) * context->numFrames);
     Frame* top = &context->stack[context->numFrames - 1];
     initialize_null(&top->registers);
     initialize_null(&top->state);
-    set_list(&top->registers, get_locals_count(branch));
+    swap(registers, &top->registers);
     set_dict(&top->state);
     top->branch = branch;
     return top;
+}
+Frame* push_frame(EvalContext* context, Branch* branch)
+{
+    List registers;
+    registers.resize(get_locals_count(branch));
+    return push_frame(context, branch, &registers);
 }
 void pop_frame(EvalContext* context)
 {
