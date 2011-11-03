@@ -8,6 +8,8 @@
 #include "introspection.h"
 #include "list_shared.h"
 #include "names.h"
+#include "subroutine.h"
+#include "stateful_code.h"
 #include "static_checking.h"
 #include "term.h"
 #include "type.h"
@@ -34,6 +36,10 @@ void change_function(Term* term, Term* function)
             && function != INPUT_PLACEHOLDER_FUNC) {
         append_user(term, function);
     }
+
+    // Possibly insert a state input for the enclosing subroutine.
+    if (is_function_stateful(function))
+        on_stateful_function_call_created(term);
 }
 
 void unsafe_change_type(Term *term, Type *type)

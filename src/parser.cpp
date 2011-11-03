@@ -523,7 +523,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     int inputIndex = 0;
     while (!tokens.nextIs(RPAREN) && !tokens.finished())
     {
-        bool isHiddenStateArgument = false;
+        bool isStateArgument = false;
 
         possible_whitespace(tokens);
 
@@ -531,7 +531,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (tokens.nextIs(STATE)) {
             tokens.consume(STATE);
             possible_whitespace(tokens);
-            isHiddenStateArgument = true;
+            isStateArgument = true;
         }
 
         // For input0 of a method, don't parse an explicit type name.
@@ -558,9 +558,8 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (is_type(typeTerm))
             change_declared_type(input, as_type(typeTerm));
 
-        if (isHiddenStateArgument) {
+        if (isStateArgument)
             input->setBoolProp("state", true);
-        }
 
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {

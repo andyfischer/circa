@@ -7,6 +7,7 @@
 #include "builtins.h"
 #include "function.h"
 #include "if_block.h"
+#include "subroutine.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -44,6 +45,20 @@ bool is_function_stateful(Term* func)
         if (function_is_state_input(placeholder))
             return true;
     }
+}
+
+void on_stateful_function_call_created(Term* call)
+{
+    Term* enclosingSub = find_enclosing_subroutine(call);
+
+    if (enclosingSub == NULL)
+        return;
+
+    if (is_function_stateful(enclosingSub))
+        return;
+
+    // insert a stateful input
+    function_insert_state_input(as_function(enclosingSub));
 }
 
 bool has_any_inlined_state(Branch* branch)

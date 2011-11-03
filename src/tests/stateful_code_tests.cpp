@@ -20,6 +20,12 @@ void test_is_function_stateful()
     Term* x = branch.compile("def x() {}");
     test_assert(!is_function_stateful(x));
     
+    // Implicit state
+    Term* g = branch.compile("def g() { f() }");
+    test_assert(is_function_stateful(g));
+
+    Term* y = branch.compile("def y() {}");
+    test_assert(!is_function_stateful(y));
 
 #if 0
     Term* f = branch.compile("def f() { state s }");

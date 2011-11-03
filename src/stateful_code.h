@@ -6,9 +6,11 @@
 
 namespace circa {
 
+bool is_function_stateful(Term* func);
+void on_stateful_function_call_created(Term* call);
+
 bool is_get_state(Term* term);
 bool has_implicit_state(Term* term);
-bool is_function_stateful(Term* func);
 bool has_any_inlined_state(Branch* branch);
 void mark_branch_as_having_inlined_state(Branch* branch);
 void mark_branch_as_possibly_not_having_inlined_state(Branch* branch);

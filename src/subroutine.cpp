@@ -141,12 +141,15 @@ bool is_subroutine(Term* term)
 
 Term* find_enclosing_subroutine(Term* term)
 {
-    Term* parent = get_parent_term(term);
-    if (parent == NULL)
-        return NULL;
-    if (is_subroutine(parent))
-        return parent;
-    return find_enclosing_subroutine(parent);
+    while (true) {
+        Term* parent = get_parent_term(term);
+        if (parent == NULL)
+            return NULL;
+        if (is_subroutine(parent))
+            return parent;
+
+        term = parent;
+    }
 }
 
 int get_input_index_of_placeholder(Term* inputPlaceholder)

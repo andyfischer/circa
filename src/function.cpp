@@ -292,7 +292,17 @@ bool function_is_state_input(Function* func, int index)
     if (placeholder == NULL)
         return false;
     return function_is_state_input(placeholder);
-}    
+}
+
+Term* function_insert_state_input(Function* func)
+{
+    Branch* branch = function_get_contents(func);
+    Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
+    branch->move(term, 0);
+    term->setBoolProp("state", true);
+    return term;
+}
+
 bool function_get_input_meta(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
@@ -311,6 +321,8 @@ bool function_get_input_optional(Function* func, int index)
 Term* function_get_input_placeholder(Function* func, int index)
 {
     Branch* contents = function_get_contents(func);
+    if (contents == NULL)
+        return NULL;
     if (index >= contents->length())
         return NULL;
     Term* term = contents->get(index);
