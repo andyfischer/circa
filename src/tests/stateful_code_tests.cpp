@@ -8,30 +8,27 @@
 namespace circa {
 namespace stateful_code_tests {
 
-void test_is_get_state()
-{
-    Branch branch;
-    Term* i = branch.compile("state int i");
-    test_assert(is_get_state(i));
-    test_equals(i->type->name, "int");
-
-    Term* j = branch.compile("state i = 0");
-    test_assert(is_get_state(j));
-}
-
 void test_is_function_stateful()
 {
     Branch branch;
-    Term* f = branch.compile("def f() { state s }");
 
+    // Explicit state argument
+    Term* f = branch.compile("def f(state any s) {}");
+    test_assert(&branch);
+    test_assert(is_function_stateful(f));
+
+    Term* x = branch.compile("def x() {}");
+    test_assert(!is_function_stateful(x));
+    
+
+#if 0
+    Term* f = branch.compile("def f() { state s }");
     test_assert(is_function_stateful(f));
 
     Term* g = branch.compile("def g() { 1 2 3 }");
 
     test_assert(!is_function_stateful(g));
-
-    test_assert(has_implicit_state(branch.compile("f()")));
-    test_assert(!has_implicit_state(branch.compile("g()")));
+#endif
 }
 
 CA_FUNCTION(_empty_evaluate) {}
@@ -417,7 +414,6 @@ void test_that_initial_value_doesnt_get_reevaluated()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(stateful_code_tests::test_is_get_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::initial_value);

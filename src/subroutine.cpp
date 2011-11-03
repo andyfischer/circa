@@ -164,27 +164,8 @@ void initialize_subroutine(Term* sub)
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
-    subroutine_update_state_type_from_contents(sub);
     subroutine_check_to_append_implicit_return(sub);
     finish_update_cascade(nested_contents(sub));
-}
-
-void subroutine_update_state_type_from_contents(Term* func)
-{
-    // Check if a stateful argument was declared
-    Term* firstInput = function_get_input_placeholder(as_function(func), 0);
-    if (firstInput != NULL && firstInput->boolPropOptional("state", false)) {
-        // already updated state
-        return;
-    }
-
-    if (has_implicit_state(func))
-        subroutine_change_state_type(func, LIST_TYPE);
-}
-
-void subroutine_change_state_type(Term* func, Term* newType)
-{
-    // TODO
 }
 
 void subroutine_check_to_append_implicit_return(Term* sub)

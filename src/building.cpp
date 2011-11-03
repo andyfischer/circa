@@ -38,29 +38,14 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     if (name != "")
         branch->bindName(result, name);
 
-    TermList _inputs = inputs;
-
-    // If the function takes a state input, and there aren't enough inputs, then prepend
-    // a NULL input for state.
-    if (is_function_stateful(function)
-            && _inputs.length() == function_num_inputs(as_function(function)) - 1) {
-        // TODO: This case should be deleted, once the last of the old-style stateful
-        // functions are removed.
-        //std::cout << "prepending null input: " << function->name << std::endl;
-        _inputs.prepend(NULL);
-    }
-
-    for (int i=0; i < _inputs.length(); i++)
-        set_input(result, i, _inputs[i]);
+    for (int i=0; i < inputs.length(); i++)
+        set_input(result, i, inputs[i]);
 
     // change_function will also update the declared type.
     change_function(result, function);
 
     update_unique_name(result);
     on_inputs_changed(result);
-
-    if (is_get_state(result) || has_implicit_state(result))
-        mark_branch_as_having_inlined_state(branch);
 
     return result;
 }

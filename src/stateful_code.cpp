@@ -35,8 +35,15 @@ bool is_function_stateful(Term* func)
     if (attrs == NULL)
         return false;
 
-    // FIXME
-    return false;
+    // Walk through inputs, try to find a stateful input.
+    int index = 0;
+    while (true) {
+        Term* placeholder = function_get_input_placeholder(attrs, index++);
+        if (placeholder == NULL)
+            return false;
+        if (function_is_state_input(placeholder))
+            return true;
+    }
 }
 
 bool has_any_inlined_state(Branch* branch)

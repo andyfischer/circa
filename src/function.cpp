@@ -281,12 +281,17 @@ int function_num_inputs(Function* func)
     return i;
 }
 
+bool function_is_state_input(Term* placeholder)
+{
+    return placeholder->boolPropOptional("state", false);
+}
+
 bool function_is_state_input(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func,index);
     if (placeholder == NULL)
         return false;
-    return placeholder->boolPropOptional("state", false);
+    return function_is_state_input(placeholder);
 }    
 bool function_get_input_meta(Function* func, int index)
 {
@@ -308,7 +313,10 @@ Term* function_get_input_placeholder(Function* func, int index)
     Branch* contents = function_get_contents(func);
     if (index >= contents->length())
         return NULL;
-    return contents->get(index);
+    Term* term = contents->get(index);
+    if (term->function != INPUT_PLACEHOLDER_FUNC)
+        return NULL;
+    return term;
 }
 Branch* function_get_contents(Function* func)
 {

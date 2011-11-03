@@ -18,8 +18,6 @@ int get_input_index_of_placeholder(Term* inputPlaceholder);
 void initialize_subroutine(Term* sub);
 void finish_building_subroutine(Term* sub, Term* outputType);
 
-void subroutine_update_state_type_from_contents(Term* sub);
-void subroutine_change_state_type(Term* func, Term* type);
 void subroutine_check_to_append_implicit_return(Term* sub);
 
 void store_locals(Branch* branch, TaggedValue* storage);
