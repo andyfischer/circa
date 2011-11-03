@@ -188,22 +188,22 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
     context->currentTerm = term;
 
-    // Prepare the argument list
+    // Prepare input list
     int inputCount = term->numInputs();
-    int argCount = inputCount + 1;
-    ListData* argList = allocate_list(argCount);
+    ListData* inputList = allocate_list(inputCount);
 
     for (int i=0; i < inputCount; i++)
-        write_input_instruction(term, term->input(i), list_get_index(argList, i));
+        write_input_instruction(term, term->input(i), list_get_index(inputList, i));
 
-    // Prepare output
-    write_stack_input_instruction(term->owningBranch, term, list_get_index(argList, inputCount));
+    // Prepare output list
+    ListData* outputList = allocate_list(1);
+    write_stack_input_instruction(term->owningBranch, term, list_get_index(outputList, 0));
 
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    function->evaluate(context, argList);
+    function->evaluate(context, inputList, outputList);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
@@ -215,7 +215,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term)) {
         Type* outputType = get_output_type(term);
-        TaggedValue* output = get_arg(context, argList, inputCount);
+        TaggedValue* output = get_arg(context, outputList, 0);
 
         if (outputType != &VOID_T && !cast_possible(output, outputType)) {
             std::stringstream msg;
@@ -227,7 +227,8 @@ void evaluate_single_term(EvalContext* context, Term* term)
     }
     #endif
 
-    free_list(argList);
+    free_list(inputList);
+    free_list(outputList);
 }
 
 void evaluate_branch_internal(EvalContext* context, Branch* branch)
