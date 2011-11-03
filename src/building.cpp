@@ -65,29 +65,6 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     return result;
 }
 
-void set_input2(Term* term, int index, Term* input, int outputIndex)
-{
-    assert_valid_term(term);
-    assert_valid_term(input);
-
-    Term* previousInput = NULL;
-    if (index < term->numInputs())
-        previousInput = term->input(index);
-
-    while (index >= term->numInputs())
-        term->inputs.push_back(NULL);
-
-    term->inputs[index] = Term::Input(input, outputIndex);
-
-    // Add 'term' to the user list of 'input'
-    append_user(term, input);
-
-    // Check if we should remove 'term' from the user list of previousInput
-    possibly_prune_user_list(term, previousInput);
-
-    mark_inputs_changed(term);
-}
-
 void set_input(Term* term, int index, Term* input)
 {
     assert_valid_term(term);

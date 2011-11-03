@@ -119,7 +119,6 @@ std::string function_get_input_name(Function* func, int index);
 std::string function_get_documentation_string(Function* func);
 
 const char* get_output_name(Term* term, int outputIndex);
-const char* get_output_name_for_input(Term* term, int inputIndex);
 
 // Returns whether this function is 'native', meaning that it's not a subroutine.
 bool is_native_function(Function* function);

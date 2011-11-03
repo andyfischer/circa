@@ -378,15 +378,9 @@ const char* get_output_name(Term* term, int outputIndex)
 
     // If a rebound input was found, use that name.
     if (reboundInputIndex != -1)
-        return get_output_name_for_input(term, reboundInputIndex);
+        return get_output_name(term->input(reboundInputIndex), 0);
 
     return "";
-}
-
-const char* get_output_name_for_input(Term* term, int inputIndex)
-{
-    return get_output_name(term->input(inputIndex),
-            term->inputInfo(inputIndex)->outputIndex);
 }
 
 bool is_native_function(Function* func)

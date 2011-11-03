@@ -146,8 +146,7 @@ Type* get_type_of_input(Term* term, int inputIndex)
         return NULL;
     if (term->input(inputIndex) == NULL)
         return NULL;
-    int outputIndex = term->inputInfo(inputIndex)->outputIndex;
-    return get_output_type(term->input(inputIndex), outputIndex);
+    return get_output_type(term->input(inputIndex), 0);
 }
 
 Type* create_type()

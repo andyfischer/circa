@@ -1544,7 +1544,7 @@ ParseResult function_call2(Branch* branch, Term* function, TokenStream& tokens, 
         if (postWhitespace != "")
             set_input_syntax_hint(result, index, "postWhitespace", postWhitespace);
 
-        set_input2(result, index, input, 0);
+        set_input(result, index, input);
 
         index++;
     }
