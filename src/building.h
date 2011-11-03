@@ -20,14 +20,12 @@ Term* apply(Branch* branch, std::string const& functionName,
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name="",
         bool copyBranches=true);
 
+// Inputs and user lists:
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, TermList const& inputs);
 void insert_input(Term* term, Term* input);
-
 bool is_actually_using(Term* user, Term* usee);
-
 void append_user(Term* user, Term* usee);
-
 void possibly_prune_user_list(Term* user, Term* usee);
 
 // This finds all the terms which have this term as a user, and removes it from
@@ -38,6 +36,18 @@ void remove_from_any_user_lists(Term* term);
 
 // This checks every user of this term, and removes it from their input lists.
 void clear_from_dependencies_of_users(Term* term);
+
+// Term's function
+void change_function(Term* term, Term* function);
+
+// Term's type
+void unsafe_change_type(Term* term, Type* type);
+void change_declared_type(Term* term, Type* type);
+void respecialize_type(Term* term);
+void specialize_type(Term* term, Type* type);
+
+// Rename term, modify the name binding of the owning branch if necessary
+void rename(Term* term, std::string const& name);
 
 // Create a new value term with the given type.
 Term* create_value(Branch* branch, Type* type, std::string const& name="");

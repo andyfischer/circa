@@ -6,17 +6,6 @@
 
 namespace circa {
 
-// Change this term to have the given function
-void change_function(Term* term, Term* newFunction);
-
-void unsafe_change_type(Term* term, Type* type);
-void change_declared_type(Term* term, Type* type);
-void respecialize_type(Term* term);
-void specialize_type(Term* term, Type* type);
-
-// Rename term, modify the name binding of the owning branch if necessary
-void rename(Term* term, std::string const& name);
-
 // Modify term so that it has the given function and inputs.
 void rewrite(Term* term, Term* function, TermList const& _inputs);
 

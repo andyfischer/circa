@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "building.h"
 #include "builtins.h"
 #include "filesystem.h"
 #include "importing.h"
