@@ -49,7 +49,7 @@ namespace dll_loading_function {
             Function* attrs = as_function(ref);
 
             if (dll->loadedFunctions.find((void*) attrs->evaluate) != dll->loadedFunctions.end())
-                attrs->evaluate = empty_evaluate_function;
+                attrs->evaluate = NULL;
         }
 
         // Platform specific

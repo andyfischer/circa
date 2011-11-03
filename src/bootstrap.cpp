@@ -52,11 +52,6 @@ Branch* kernel()
     return KERNEL;
 }
 
-CA_FUNCTION(empty_evaluate_function)
-{
-    set_null(OUTPUT);
-}
-
 void create_primitive_types()
 {
     null_t::setup_type(&NULL_T);
@@ -175,8 +170,7 @@ void pre_setup_types(Branch* kernel)
 {
     // Declare input_placeholder first because it's used while compiling functions
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
-    ADDITIONAL_OUTPUT_FUNC = import_function(kernel, empty_evaluate_no_touch_output,
-            "additional_output() -> any");
+    ADDITIONAL_OUTPUT_FUNC = import_function(kernel, NULL, "additional_output() -> any");
 
     // FileSignature is used in some builtin functions
     FILE_SIGNATURE_T = unbox_type(parse_type(kernel,

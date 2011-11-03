@@ -449,13 +449,11 @@ void post_compile_term(Term* term)
     int numOutputs = get_output_count(term);
     for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
         const char* name = get_output_name(term, outputIndex);
-        Term* outputCopy = apply(owningBranch, EXTRA_OUTPUT_FUNC, TermList(), name);
-        set_input2(outputCopy, 0, term, outputIndex);
+        Term* outputCopy = apply(owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
 
         respecialize_type(outputCopy);
         owningBranch->bindName(outputCopy, name);
     }
-
 
     #if 0
     int outputIndex = 1;

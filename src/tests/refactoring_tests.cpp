@@ -6,7 +6,6 @@
 namespace circa {
 namespace refactoring_tests {
 
-CA_FUNCTION(_empty_evaluate) {}
 
 void repro_source_after_rename()
 {
@@ -28,7 +27,7 @@ void repro_source_after_rename()
     test_equals(get_term_source_text(add), "add( banana , 10)");
 
     // Rename a function
-    Term* myfunc = import_function(&branch, _empty_evaluate, "def myfunc(int)");
+    Term* myfunc = import_function(&branch, NULL, "def myfunc(int)");
     Term* myfunc_call = branch.compile("myfunc(555)");
 
     rename(myfunc, "my_renamed_func");

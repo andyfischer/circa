@@ -25,6 +25,9 @@ void run_all()
 
 void register_tests()
 {
+    // TEST_DISABLED because most of the hosted unit tests rely on subroutines using
+    // outer locals.
+    return;
     REGISTER_TEST_CASE(hosted_unit_tests::run_all);
 }
 
