@@ -70,6 +70,9 @@ void list_incref(ListData* data)
 
 void free_list(ListData* data)
 {
+    if (data == NULL)
+        return;
+
     // Release all elements
     for (int i=0; i < data->count; i++)
         set_null(&data->items[i]);

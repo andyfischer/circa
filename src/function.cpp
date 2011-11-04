@@ -302,6 +302,13 @@ Term* function_insert_state_input(Function* func)
     term->setBoolProp("state", true);
     return term;
 }
+bool function_is_multiple_input(Function* func, int index)
+{
+    Term* placeholder = function_get_input_placeholder(func, index);
+    if (placeholder == NULL)
+        return false;
+    return placeholder->boolPropOptional("multiple", false);
+}
 
 bool function_get_input_meta(Function* func, int index)
 {

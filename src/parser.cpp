@@ -564,6 +564,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         // Variable args when ... is appended
         if (tokens.nextIs(ELLIPSIS)) {
             tokens.consume(ELLIPSIS);
+            input->setBoolProp("multiple", true);
             attrs->variableArgs = true;
         }
 
@@ -579,6 +580,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             } else if (symbolText == ":output" || symbolText == ":out") {
                 input->setBoolProp("output", true);
             } else if (symbolText == ":multiple") {
+                input->setBoolProp("multiple", true);
                 attrs->variableArgs = true;
             } else if (symbolText == ":implied_rebind") {
                 input->setBoolProp("use-as-output", true);
