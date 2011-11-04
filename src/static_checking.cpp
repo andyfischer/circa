@@ -70,10 +70,10 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, "not_a_function");
 
     bool varArgs = func->variableArgs;
-    int funcNumInputs = function_num_inputs(func);
+    int expectedInputCount = function_num_explicit_inputs(func);
 
     // Check # of inputs
-    if (!varArgs && (term->numInputs() != funcNumInputs))
+    if (!varArgs && (term->numInputs() != expectedInputCount))
         return append_static_error(errors, term, "wrong_input_count");
 
     for (int input=0; input < term->numInputs(); input++)
@@ -160,7 +160,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     else if (strcmp(type, "unrecognized_expression") == 0)
         out << "Unrecognized expression: " << term->stringProp("message");
     else if (strcmp(type, "wrong_input_count") == 0) {
-        int funcNumInputs = function_num_inputs(as_function(term->function));
+        int funcNumInputs = function_num_explicit_inputs(as_function(term->function));
         int actualCount = term->numInputs();
         if (actualCount > funcNumInputs)
             out << "Too many inputs (" << actualCount << "), function "

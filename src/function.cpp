@@ -272,13 +272,36 @@ Type* function_get_output_type(Function* func, int index)
 int function_num_inputs(Function* func)
 {
     Branch* contents = function_get_contents(func);
-    int i = 0;
 
-    while (i < contents->length()
-            && contents->get(i) != NULL
-            && contents->get(i)->function == INPUT_PLACEHOLDER_FUNC)
-        i++;
-    return i;
+    int count = 0;
+
+    for (int i=0; i < contents->length(); i++) {
+        if (contents->get(i) == NULL)
+            break;
+        if (contents->get(i)->function != INPUT_PLACEHOLDER_FUNC)
+            break;
+
+        count++;
+    }
+    return count;
+}
+
+int function_num_explicit_inputs(Function* func)
+{
+    Branch* contents = function_get_contents(func);
+
+    int count = 0;
+
+    for (int i=0; i < contents->length(); i++) {
+        if (contents->get(i) == NULL)
+            break;
+        if (contents->get(i)->function != INPUT_PLACEHOLDER_FUNC)
+            break;
+
+        if (!function_is_state_input(func, i))
+            count++;
+    }
+    return count;
 }
 
 bool function_is_state_input(Term* placeholder)

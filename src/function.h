@@ -106,7 +106,14 @@ Type* function_get_input_type(Term* function, int index);
 Type* function_get_output_type(Term* function, int index);
 Type* function_get_input_type(Function* func, int index);
 Type* function_get_output_type(Function* func, int index);
+
+// Returns the number of input placeholders. This might not correspond to the actual
+// number of inputs on a caller of this function, because 1) some inputs may be
+// implicit, and 2) the function may support a variable number of inputs.
 int function_num_inputs(Function* func);
+
+// Number of non-implicit inputs (ie, not counting the implicit state input).
+int function_num_explicit_inputs(Function* func);
 
 // Stateful inputs
 bool function_is_state_input(Term* placeholder);

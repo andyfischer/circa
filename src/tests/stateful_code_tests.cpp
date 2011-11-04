@@ -26,18 +26,7 @@ void test_is_function_stateful()
 
     Term* y = branch.compile("def y() {}");
     test_assert(!is_function_stateful(y));
-
-#if 0
-    Term* f = branch.compile("def f() { state s }");
-    test_assert(is_function_stateful(f));
-
-    Term* g = branch.compile("def g() { 1 2 3 }");
-
-    test_assert(!is_function_stateful(g));
-#endif
 }
-
-CA_FUNCTION(_empty_evaluate) {}
 
 void test_get_type_from_branches_stateful_terms()
 {
