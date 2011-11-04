@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "building.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "evaluation.h"
 #include "function.h"
 #include "introspection.h"

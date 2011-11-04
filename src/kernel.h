@@ -6,8 +6,6 @@
 
 namespace circa {
 
-extern "C" {
-
 extern Branch* KERNEL;
 
 extern Term* ADD_FUNC;
@@ -93,8 +91,6 @@ extern Term* RECT_I_TYPE_TERM;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
 extern Term* OPAQUE_POINTER_TYPE;
-
-} // extern "C"
 
 extern Type ANY_T;
 extern Type BOOL_T;

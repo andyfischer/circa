@@ -4,7 +4,7 @@
 
 #include "building.h"
 #include "build_options.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "branch.h"
 #include "code_iterators.h"
 #include "evaluation.h"

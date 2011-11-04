@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtins.h"
+#include "kernel.h"
 #include "building.h"
 #include "circa.h"
 #include "heap_debugging.h"

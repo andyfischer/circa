@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "builtins.h"
+#include "kernel.h"
 #include "importing.h"
 #include "evaluation.h"
 #include "source_repro.h"

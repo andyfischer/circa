@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "branch.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "term.h"
 #include "type.h"
 

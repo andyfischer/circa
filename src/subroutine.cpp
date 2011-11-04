@@ -5,7 +5,7 @@
 #include "branch.h"
 #include "code_iterators.h"
 #include "building.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "evaluation.h"
 #include "function.h"
 #include "importing_macros.h"

@@ -2,14 +2,46 @@
 
 #include "common_headers.h"
 
-namespace circa {
+#include "branch.h"
+#include "building.h"
+#include "evaluation.h"
+#include "filesystem.h"
+#include "function.h"
+#include "kernel.h"
+#include "gc.h"
+#include "importing.h"
+#include "importing_macros.h"
+#include "parser.h"
+#include "static_checking.h"
+#include "term.h"
+#include "type.h"
 
-extern "C" {
+#include "types/any.h"
+#include "types/bool.h"
+#include "types/callable.h"
+#include "types/color.h"
+#include "types/common.h"
+#include "types/dict.h"
+#include "types/eval_context.h"
+#include "types/float.h"
+#include "types/handle.h"
+#include "types/hashtable.h"
+#include "types/indexable.h"
+#include "types/int.h"
+#include "types/ref.h"
+#include "types/set.h"
+#include "types/string.h"
+#include "types/symbol.h"
+#include "types/void.h"
+
+namespace circa {
 
 Branch* KERNEL = NULL;
 
 // STDLIB_CA_TEXT is defined in generated/stdlib_script_text.cpp
-extern const char* STDLIB_CA_TEXT;
+extern "C" {
+    extern const char* STDLIB_CA_TEXT;
+}
 
 // setup_functions is defined in generated/setup_builtin_functions.cpp
 void setup_builtin_functions(Branch*);
@@ -101,8 +133,6 @@ Term* SYMBOL_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* OPAQUE_POINTER_TYPE;
-
-} // extern "C"
 
 // Builtin type objects:
 Type ANY_T;

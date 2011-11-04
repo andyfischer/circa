@@ -7,7 +7,6 @@
 #include <typeinfo>
 
 #include "branch.h"
-#include "bootstrap.h"
 #include "heap_debugging.h"
 #include "object.h"
 #include "term_map.h"

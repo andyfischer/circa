@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "testing.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "circa.h"
 #include "importing.h"
 #include "importing_macros.h"

@@ -3,7 +3,7 @@
 #include "common_headers.h"
 #include "branch.h"
 #include "building.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "codegen.h"
 #include "evaluation.h"
 #include "feedback.h"

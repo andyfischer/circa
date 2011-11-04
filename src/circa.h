@@ -4,10 +4,8 @@
 
 #include "common_headers.h"
 
-#include "bootstrap.h"
 #include "branch.h"
 #include "building.h"
-#include "builtins.h"
 #include "code_iterators.h"
 #include "codegen.h"
 #include "command_line.h"
@@ -19,6 +17,7 @@
 #include "for_loop.h"
 #include "function.h"
 #include "if_block.h"
+#include "kernel.h"
 #include "importing.h"
 #include "importing_macros.h"
 #include "introspection.h"

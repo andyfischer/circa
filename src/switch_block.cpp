@@ -4,7 +4,7 @@
 
 #include "branch.h"
 #include "building.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "if_block.h"
 #include "importing_macros.h"
 #include "term.h"

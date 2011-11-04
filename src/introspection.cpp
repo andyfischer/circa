@@ -4,7 +4,7 @@
 
 #include "branch.h"
 #include "code_iterators.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "evaluation.h"
 #include "heap_debugging.h"
 #include "introspection.h"

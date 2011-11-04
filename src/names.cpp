@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "heap_debugging.h"
 #include "if_block.h"
 #include "source_repro.h"

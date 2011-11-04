@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "builtins.h"
+#include "kernel.h"
 #include "circa.h"
 
 namespace circa {

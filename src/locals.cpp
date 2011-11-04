@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "builtins.h"
+#include "kernel.h"
 #include "function.h"
 #include "introspection.h"
 #include "term.h"
