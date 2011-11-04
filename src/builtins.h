@@ -54,6 +54,7 @@ extern Term* NAMESPACE_FUNC;
 extern Term* NEG_FUNC;
 extern Term* NOT_FUNC;
 extern Term* ONE_TIME_ASSIGN_FUNC;
+extern Term* OUTPUT_PLACEHOLDER_FUNC;
 extern Term* OVERLOADED_FUNCTION_FUNC;
 extern Term* PRESERVE_STATE_RESULT_FUNC;
 extern Term* SET_FIELD_FUNC;

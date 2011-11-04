@@ -168,8 +168,9 @@ void post_initialize_primitive_types(Branch* kernel)
 
 void pre_setup_types(Branch* kernel)
 {
-    // Declare input_placeholder first because it's used while compiling functions
+    // Declare some placeholder functions, because they're used while compiling
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
+    OUTPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "output_placeholder() -> any");
     ADDITIONAL_OUTPUT_FUNC = import_function(kernel, NULL, "additional_output() -> any");
 
     // FileSignature is used in some builtin functions
