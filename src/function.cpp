@@ -126,6 +126,27 @@ void finish_parsing_function_header(Term* func)
     }
 }
 
+void finish_building_function(Function* func, Type* declaredOutputType)
+{
+    // Write a list of output_placeholder terms.
+
+    // First look at every input declared as :output, these will be used to declare
+    // extra outputs.
+    // TODO is a way to declare extra outputs that are not rebound inputs.
+    for (int i = function_num_inputs(func) - 1; i >= 0; i--) {
+        Term* input = function_get_input_placeholder(func, i);
+        if (input->boolPropOptional("output", false)) {
+            Term* output = apply(function_contents(func),
+                OUTPUT_PLACEHOLDER_FUNC, TermList(), input->name);
+            change_declared_type(output, input->type);
+        }
+    }
+
+    // Finally, write a final output_placeholder() term for the primary output.
+    Term* output = apply(function_contents(func), OUTPUT_PLACEHOLDER_FUNC, TermList());
+    change_declared_type(output, declaredOutputType);
+}
+
 bool is_callable(Term* term)
 {
     return (term->type == &FUNCTION_T || term->type == &TYPE_T);
@@ -262,6 +283,11 @@ Type* function_get_output_type(Term* function, int index)
 Type* function_get_output_type(Function* func, int index)
 {
     if (func == NULL)
+        return &ANY_T;
+
+    // If we don't have any declared output types, then we are probably still building
+    // this function.
+    if (func->outputTypes.length() == 0)
         return &ANY_T;
 
     ca_assert(index < func->outputTypes.length());

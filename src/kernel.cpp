@@ -245,65 +245,55 @@ void create_primitive_types()
     symbol_t::assign_new_symbol("unknown", &UNKNOWN_SYMBOL);
 }
 
-void update_bootstrapped_term(Term* term)
-{
-    // This once did something
-}
-
 void bootstrap_kernel()
 {
-    // Create the very first building blocks. Most of the building functions in Circa
-    // require a few kernel terms to already be defined. So in this function, we
-    // create these required terms manually.
+    // Create the very first building blocks. These elements need to be in place
+    // before we can parse code in the proper way.
 
     KERNEL = new Branch();
 
+    Branch* kernel = KERNEL;
+
     // Create value function
-    VALUE_FUNC = KERNEL->appendNew();
-    KERNEL->bindName(VALUE_FUNC, "value");
+    VALUE_FUNC = kernel->appendNew();
+    kernel->bindName(VALUE_FUNC, "value");
 
     // Create Type type
-    TYPE_TYPE = KERNEL->appendNew();
+    TYPE_TYPE = kernel->appendNew();
     TYPE_TYPE->function = VALUE_FUNC;
     TYPE_TYPE->type = &TYPE_T;
     TYPE_TYPE->value_type = &TYPE_T;
     TYPE_TYPE->value_data.ptr = &TYPE_T;
     type_t::setup_type(&TYPE_T);
-    KERNEL->bindName(TYPE_TYPE, "Type");
+    kernel->bindName(TYPE_TYPE, "Type");
 
     // Create Any type
-    ANY_TYPE = KERNEL->appendNew();
+    ANY_TYPE = kernel->appendNew();
     ANY_TYPE->function = VALUE_FUNC;
     ANY_TYPE->type = &TYPE_T;
     ANY_TYPE->value_type = &TYPE_T;
     ANY_TYPE->value_data.ptr = &ANY_T;
     any_t::setup_type(&ANY_T);
-    KERNEL->bindName(ANY_TYPE, "any");
+    kernel->bindName(ANY_TYPE, "any");
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
-    FUNCTION_TYPE = KERNEL->appendNew();
+    FUNCTION_TYPE = kernel->appendNew();
     FUNCTION_TYPE->function = VALUE_FUNC;
     FUNCTION_TYPE->type = &TYPE_T;
     FUNCTION_TYPE->value_type = &TYPE_T;
     FUNCTION_TYPE->value_data.ptr = &FUNCTION_T;
-    KERNEL->bindName(FUNCTION_TYPE, "Function");
+    kernel->bindName(FUNCTION_TYPE, "Function");
 
-    // Initialize Value func
+    // Initialize value() func
     VALUE_FUNC->type = &FUNCTION_T;
     VALUE_FUNC->function = VALUE_FUNC;
     change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
 
-    update_bootstrapped_term(VALUE_FUNC);
-    update_bootstrapped_term(TYPE_TYPE);
-    update_bootstrapped_term(ANY_TYPE);
-    update_bootstrapped_term(FUNCTION_TYPE);
-
     function_t::initialize(&FUNCTION_T, VALUE_FUNC);
-}
+    initialize_function(VALUE_FUNC);
 
-void initialize_primitive_types(Branch* kernel)
-{
+    // Initialize primitive types (this requires value() function)
     BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
     FLOAT_TYPE = create_type_value(kernel, &FLOAT_T, "number");
     INT_TYPE = create_type_value(kernel, &INT_T, "int");
@@ -317,26 +307,21 @@ void initialize_primitive_types(Branch* kernel)
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
     create_type_value(kernel, &BRANCH_T, "Branch");
 
-    initialize_function(VALUE_FUNC);
-    // ANY_TYPE was created in bootstrap_kernel
-}
+    // Setup output_placeholder() function, needed to declare functions properly.
+    OUTPUT_PLACEHOLDER_FUNC = create_value(kernel, &FUNCTION_T, "output_placeholder");
+    function_t::initialize(&FUNCTION_T, OUTPUT_PLACEHOLDER_FUNC);
+    initialize_function(OUTPUT_PLACEHOLDER_FUNC);
+    as_function(OUTPUT_PLACEHOLDER_FUNC)->name = "output_placeholder";
+    ca_assert(function_get_output_type(OUTPUT_PLACEHOLDER_FUNC, 0) == &ANY_T);
 
-void post_initialize_primitive_types(Branch* kernel)
-{
-    // Properly setup value() func
-    initialize_function(VALUE_FUNC);
-
+    // Fix some holes in value() function
     Function* attrs = as_function(VALUE_FUNC);
     set_type_list(&attrs->outputTypes, &ANY_T);
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);
-}
 
-void pre_setup_types(Branch* kernel)
-{
-    // Declare some placeholder functions, because they're used while compiling
+    // input_placeholder() is needed before we can declare a function with inputs
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
-    OUTPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "output_placeholder() -> any");
     ADDITIONAL_OUTPUT_FUNC = import_function(kernel, NULL, "additional_output() -> any");
 
     // FileSignature is used in some builtin functions
@@ -447,9 +432,6 @@ export_func void circa_initialize()
 
     Branch* kernel = KERNEL;
 
-    initialize_primitive_types(kernel);
-    post_initialize_primitive_types(kernel);
-    pre_setup_types(kernel);
     initialize_compound_types(kernel);
 
     FINISHED_BOOTSTRAP = true;

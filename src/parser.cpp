@@ -633,14 +633,19 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     ca_assert(is_value(result));
     ca_assert(is_function(result));
 
-    // If we're out of tokens, then stop here. This behavior is used when defining builtins.
-    if (tokens.finished())
+    // If we're out of tokens, then stop here. This behavior is used when declaring builtins.
+    if (tokens.finished()) {
+        finish_building_function(as_function(result), as_type(outputType));
         return ParseResult(result);
+    }
 
-    // Parse this as a subroutine call
+    // If we reach this point then the function will be a subroutine.
+
+    // Parse subroutine contents.
     consume_branch(contents, tokens, context);
 
     finish_building_subroutine(result, outputType);
+    finish_building_function(as_function(result), as_type(outputType));
 
     ca_assert(is_value(result));
     ca_assert(is_function(result));

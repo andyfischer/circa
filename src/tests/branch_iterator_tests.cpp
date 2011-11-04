@@ -39,6 +39,8 @@ void test_simple()
     it.advance();
     test_assert(it.current()->function->name == "return");
     it.advanceSkippingBranch();
+    test_assert(it.current()->function->name == "output_placeholder");
+    it.advance();
     test_assert(it.finished());
 }
 
