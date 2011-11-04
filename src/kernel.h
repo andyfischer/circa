@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "common_headers.h"
+
 namespace circa {
 
 extern "C" {
@@ -182,3 +184,10 @@ namespace value_function {
 void install_standard_library(Branch* kernel);
 
 } // namespace circa
+
+extern "C" {
+
+export_func void circa_initialize();
+export_func void circa_shutdown();
+
+}
