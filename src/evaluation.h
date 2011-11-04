@@ -15,7 +15,6 @@ namespace circa {
 struct Frame
 {
     List registers;
-    Dict state;
     Branch* branch;
 };
 

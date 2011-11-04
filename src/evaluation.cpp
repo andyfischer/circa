@@ -123,9 +123,9 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     context->stack = (Frame*) realloc(context->stack, sizeof(Frame) * context->numFrames);
     Frame* top = &context->stack[context->numFrames - 1];
     initialize_null(&top->registers);
-    initialize_null(&top->state);
     swap(registers, &top->registers);
-    set_dict(&top->state);
+    //initialize_null(&top->state);
+    //set_dict(&top->state);
     top->branch = branch;
     return top;
 }
@@ -144,7 +144,7 @@ void pop_frame(EvalContext* context)
         internal_error("pop_frame called to pop an errored frame");
 
     set_null(&top->registers);
-    set_null(&top->state);
+    //set_null(&top->state);
     context->numFrames--;
 }
 Frame* top_frame(EvalContext* context)
@@ -501,6 +501,7 @@ void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* res
     set_null(result);
 }
 
+#if 0
 // New style state manipulation:
 void fetch_stack_local_state(EvalContext* context, const char* name)
 {
@@ -520,6 +521,7 @@ void store_stack_local_state(EvalContext* context, const char* name)
 
     copy(&frame->state, parentFrame->state.insert(name));
 }
+#endif
 
 bool evaluation_interrupted(EvalContext* context)
 {
