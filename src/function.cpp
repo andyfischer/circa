@@ -292,6 +292,12 @@ Type* function_get_output_type(Function* func, int index)
 
     ca_assert(index < func->outputTypes.length());
 
+    Term* placeholder = function_get_output_placeholder(func, index);
+    if (placeholder == NULL)
+        return &ANY_T;
+
+    ca_assert(placeholder->type == as_type(func->outputTypes[index]));
+
     return as_type(func->outputTypes[index]);
 }
 
@@ -383,6 +389,19 @@ Term* function_get_input_placeholder(Function* func, int index)
         return NULL;
     Term* term = contents->get(index);
     if (term->function != INPUT_PLACEHOLDER_FUNC)
+        return NULL;
+    return term;
+}
+
+Term* function_get_output_placeholder(Function* func, int index)
+{
+    Branch* contents = function_get_contents(func);
+    if (contents == NULL)
+        return NULL;
+    if (index >= contents->length())
+        return NULL;
+    Term* term = contents->getFromEnd(index);
+    if (term->function != OUTPUT_PLACEHOLDER_FUNC)
         return NULL;
     return term;
 }

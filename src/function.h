@@ -126,6 +126,8 @@ bool function_get_input_meta(Function* func, int index);
 bool function_get_input_optional(Function* func, int index);
 
 Term* function_get_input_placeholder(Function* func, int index);
+Term* function_get_output_placeholder(Function* func, int index);
+
 Branch* function_get_contents(Function* func);
 std::string function_get_input_name(Function* func, int index);
 
