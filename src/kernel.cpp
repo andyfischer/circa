@@ -316,7 +316,6 @@ void bootstrap_kernel()
 
     // Fix some holes in value() function
     Function* attrs = as_function(VALUE_FUNC);
-    set_type_list(&attrs->outputTypes, &ANY_T);
     finish_building_function(attrs, &ANY_T);
 
     ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);

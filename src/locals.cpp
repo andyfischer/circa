@@ -34,7 +34,7 @@ int get_output_count(Term* term)
         return getOutputCount(term);
 
     // Default behavior, if Function was found.
-    return attrs->outputCount;
+    return function_num_outputs(attrs);
 }
 
 int get_locals_count(Branch* branch)

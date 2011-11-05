@@ -188,7 +188,6 @@ namespace overloaded_function {
             apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
         Type* outputType = find_common_type(&outputTypes);
         Function* func = as_function(term);
-        set_type_list(&func->outputTypes, outputType);
         func->variableArgs = variableArgs;
         finish_building_function(func, outputType);
     }

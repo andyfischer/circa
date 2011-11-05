@@ -28,12 +28,10 @@ struct Function
     Branch* contents;
 
     std::string name;
-    List outputTypes;
     bool variableArgs;
     Term* feedbackFunc;
     TaggedValue parameter;
     bool throws;
-    int outputCount;
     bool createsStackFrame;
 
     // Functions
@@ -62,9 +60,6 @@ namespace function_t {
     void copy(Type*, TaggedValue* source, TaggedValue* dest);
 
     void setup_type(Type* type);
-
-    // accessors
-    Term* get_feedback_func(Term* function);
 }
 
 bool is_function(Term* term);
@@ -78,7 +73,6 @@ Function* as_function(Term* func);
 std::string get_placeholder_name_for_index(int index);
 
 void initialize_function(Term* func);
-void finish_parsing_function_header(Term* func);
 void finish_building_function(Function* func, Type* declaredOutputType);
 
 // Returns whether this term can be called as a function
@@ -112,6 +106,8 @@ Type* function_get_output_type(Function* func, int index);
 // number of inputs on a caller of this function, because 1) some inputs may be
 // implicit, and 2) the function may support a variable number of inputs.
 int function_num_inputs(Function* func);
+
+int function_num_outputs(Function* func);
 
 // Number of non-implicit inputs (ie, not counting the implicit state input).
 int function_num_explicit_inputs(Function* func);

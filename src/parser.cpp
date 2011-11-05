@@ -627,9 +627,8 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    set_type_list(&attrs->outputTypes, as_type(outputType));
-
-    finish_parsing_function_header(result);
+    //set_type_list(&attrs->outputTypes, as_type(outputType));
+    //finish_parsing_function_header(result);
     ca_assert(is_value(result));
     ca_assert(is_function(result));
 

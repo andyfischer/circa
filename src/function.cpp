@@ -22,7 +22,6 @@ Function::Function()
     variableArgs(false),
     feedbackFunc(NULL),
     throws(false),
-    outputCount(1),
     createsStackFrame(false),
     evaluate(NULL),
     specializeType(NULL),
@@ -104,26 +103,6 @@ void initialize_function(Term* func)
 {
     as_function(func)->declaringTerm = func;
     as_function(func)->contents = nested_contents(func);
-}
-
-void finish_parsing_function_header(Term* func)
-{
-    // Called by parser when we finish reading this function's list of inputs.
-    //
-    // Here we'll look at every input declared as +out, and we'll update the function's
-    // outputTypes and outputCount.
-
-    Function* attrs = as_function(func);
-    attrs->outputCount = 1;
-    attrs->outputTypes.resize(1);
-
-    for (int i=0; i < function_num_inputs(attrs); i++) {
-        Term* input = function_get_input_placeholder(attrs, i);
-        if (input->boolPropOptional("output", false)) {
-            attrs->outputCount++;
-            set_type(attrs->outputTypes.append(), get_output_type(input));
-        }
-    }
 }
 
 void finish_building_function(Function* func, Type* declaredOutputType)
@@ -285,20 +264,13 @@ Type* function_get_output_type(Function* func, int index)
     if (func == NULL)
         return &ANY_T;
 
-    // If we don't have any declared output types, then we are probably still building
-    // this function.
-    if (func->outputTypes.length() == 0)
-        return &ANY_T;
-
-    ca_assert(index < func->outputTypes.length());
-
+    // If there's no output_placeholder, then we are probably still building this
+    // function.
     Term* placeholder = function_get_output_placeholder(func, index);
     if (placeholder == NULL)
         return &ANY_T;
 
-    ca_assert(placeholder->type == as_type(func->outputTypes[index]));
-
-    return as_type(func->outputTypes[index]);
+    return placeholder->type;
 }
 
 int function_num_inputs(Function* func)
@@ -306,11 +278,24 @@ int function_num_inputs(Function* func)
     Branch* contents = function_get_contents(func);
 
     int count = 0;
-
     for (int i=0; i < contents->length(); i++) {
-        if (contents->get(i) == NULL)
+        Term* term = contents->get(i);
+        if (term == NULL || term->function != INPUT_PLACEHOLDER_FUNC)
             break;
-        if (contents->get(i)->function != INPUT_PLACEHOLDER_FUNC)
+
+        count++;
+    }
+    return count;
+}
+
+int function_num_outputs(Function* func)
+{
+    Branch* contents = function_get_contents(func);
+
+    int count = 0;
+    for (int i=contents->length() - 1; i >= 0; i--) {
+        Term* term = contents->get(i);
+        if (term == NULL || term->function != OUTPUT_PLACEHOLDER_FUNC)
             break;
 
         count++;
