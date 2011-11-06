@@ -115,6 +115,7 @@ int function_num_explicit_inputs(Function* func);
 // Stateful inputs
 bool function_is_state_input(Term* placeholder);
 bool function_is_state_input(Function* func, int index);
+bool function_has_state_input(Function* func);
 Term* function_insert_state_input(Function* func);
 
 bool function_is_multiple_input(Function* func, int index);

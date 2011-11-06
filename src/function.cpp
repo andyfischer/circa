@@ -109,8 +109,13 @@ void finish_building_function(Function* func, Type* declaredOutputType)
 {
     // Write a list of output_placeholder terms.
 
-    // First look at every input declared as :output, these will be used to declare
-    // extra outputs.
+    // If the function has any state, then create an output for that.
+    if (function_has_state_input(func)) {
+        Term* stateOutput = apply(function_contents(func), OUTPUT_PLACEHOLDER_FUNC, TermList());
+        stateOutput->setBoolProp("state", true);
+    }
+
+    // Look at every input declared as :output, these will be used to declare extra outputs.
     // TODO is a way to declare extra outputs that are not rebound inputs.
     for (int i = function_num_inputs(func) - 1; i >= 0; i--) {
         Term* input = function_get_input_placeholder(func, i);
@@ -334,6 +339,19 @@ bool function_is_state_input(Function* func, int index)
     return function_is_state_input(placeholder);
 }
 
+bool function_has_state_input(Function* func)
+{
+    // Walk through inputs, try to find a stateful input.
+    int index = 0;
+    while (true) {
+        Term* placeholder = function_get_input_placeholder(func, index++);
+        if (placeholder == NULL)
+            return false;
+        if (function_is_state_input(placeholder))
+            return true;
+    }
+}    
+
 Term* function_insert_state_input(Function* func)
 {
     Branch* branch = function_get_contents(func);
@@ -342,6 +360,7 @@ Term* function_insert_state_input(Function* func)
     term->setBoolProp("state", true);
     return term;
 }
+
 bool function_is_multiple_input(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);

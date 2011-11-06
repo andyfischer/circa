@@ -28,6 +28,18 @@ void test_is_function_stateful()
     test_assert(!is_function_stateful(y));
 }
 
+CA_FUNCTION(simple_func_with_state_arg)
+{
+    int i = INT_INPUT(0);
+    set_int(EXTRA_OUTPUT(0), i + 1);
+}
+
+void test_simple_func_with_state_arg()
+{
+    Branch branch;
+    import_function(&branch, simple_func_with_state_arg, "simple(state int i)");
+}
+
 void test_get_type_from_branches_stateful_terms()
 {
     Branch branch;

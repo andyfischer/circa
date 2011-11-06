@@ -36,15 +36,7 @@ bool is_function_stateful(Term* func)
     if (attrs == NULL)
         return false;
 
-    // Walk through inputs, try to find a stateful input.
-    int index = 0;
-    while (true) {
-        Term* placeholder = function_get_input_placeholder(attrs, index++);
-        if (placeholder == NULL)
-            return false;
-        if (function_is_state_input(placeholder))
-            return true;
-    }
+    return function_has_state_input(attrs);
 }
 
 void on_stateful_function_call_created(Term* call)
