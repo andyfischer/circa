@@ -474,7 +474,7 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
 
 void post_compile_term(Term* term)
 {
-    if (term->function == NULL)
+    if (term->function == NULL || !is_function(term->function))
         return;
 
     Function* attrs = as_function(term->function);

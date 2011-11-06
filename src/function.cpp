@@ -207,12 +207,12 @@ Term* create_overloaded_function(Branch* branch, std::string const& name,
 
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
-    Function* attrs = as_function(function);
-
     if (!FINISHED_BOOTSTRAP)
         return &ANY_T;
     if (!is_function(function))
         return &ANY_T;
+
+    Function* attrs = as_function(function);
     Type* outputType = function_get_output_type(attrs, 0);
 
     if (attrs->specializeType != NULL)
