@@ -387,6 +387,12 @@ void set_input_syntax_hint(Term* term, int index, const char* field,
     term->inputInfo(index)->properties.setString(field, value.c_str());
 }
 
+void set_input_syntax_hint(Term* term, int index, const char* field, TaggedValue* value)
+{
+    ca_assert(term->inputInfo(index) != NULL);
+    term->inputInfo(index)->properties.set(field, value);
+}
+
 void hide_from_source(Term* term)
 {
     ca_assert(term != NULL);

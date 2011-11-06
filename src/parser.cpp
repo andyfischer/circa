@@ -64,17 +64,6 @@ TermPtr evaluate(Branch* branch, ParsingStep step, std::string const& input)
 struct ListSyntaxHints {
     List inputs;
 
-#if 0
-    struct Input {
-        int index;
-        Dict dict;
-        std::string field;
-        std::string value;
-        Input(int i, std::string const& f, std::string const& v)
-            : index(i), field(f), value(v) {}
-    };
-#endif
-
     void set(int index, std::string const& field, std::string const& value)
     {
         while (index >= inputs.length())
@@ -82,6 +71,14 @@ struct ListSyntaxHints {
 
         Dict* dict = as_dict(inputs[index]);
         set_string(dict->insert(field.c_str()), value.c_str());
+    }
+    void set(int index, const char* field, TaggedValue* value)
+    {
+        while (index >= inputs.length())
+            set_dict(inputs.append());
+
+        Dict* dict = as_dict(inputs[index]);
+        copy(dict->insert(field), value);
     }
 
     void append(int index, std::string const& field, std::string const& value)
@@ -109,7 +106,7 @@ struct ListSyntaxHints {
                 TaggedValue* value;
                 dict->iteratorGet(&it, &key, &value);
 
-                set_input_syntax_hint(term, i, key, as_string(value));
+                set_input_syntax_hint(term, i, key, value);
             }
         }
     }
