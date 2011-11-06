@@ -593,6 +593,11 @@ bool is_dict(TaggedValue* value)
 {
     return value->value_type == &DICT_T;
 }
+Dict* as_dict(TaggedValue* value)
+{
+    ca_assert(is_dict(value));
+    return (Dict*) value;
+}
 Dict* make_dict(TaggedValue* value)
 {
     change_type(value, &DICT_T);

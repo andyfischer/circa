@@ -62,43 +62,57 @@ TermPtr evaluate(Branch* branch, ParsingStep step, std::string const& input)
 // you usually don't have a comprehension term while you are parsing the list
 // arguments, so you need to temporarily store syntax hints until you create one.
 struct ListSyntaxHints {
+    List inputs;
+
+#if 0
     struct Input {
         int index;
+        Dict dict;
         std::string field;
         std::string value;
         Input(int i, std::string const& f, std::string const& v)
             : index(i), field(f), value(v) {}
     };
+#endif
 
     void set(int index, std::string const& field, std::string const& value)
     {
-        mPending.push_back(Input(index, field, value));
+        while (index >= inputs.length())
+            set_dict(inputs.append());
+
+        Dict* dict = as_dict(inputs[index]);
+        set_string(dict->insert(field.c_str()), value.c_str());
     }
 
     void append(int index, std::string const& field, std::string const& value)
     {
-        // try to find a matching entry
-        std::vector<Input>::iterator it;
+        while (index >= inputs.length())
+            set_dict(inputs.append());
 
-        for (it = mPending.begin(); it != mPending.end(); ++it) {
-            if (it->index == index && it->field == field) {
-                it->value += value;
-                return;
-            }
-        }
+        Dict* dict = as_dict(inputs[index]);
 
-        // otherwise make a new one
-        set(index, field, value);
+        TaggedValue* existing = dict->insert(field.c_str());
+        if (!is_string(existing))
+            set_string(existing, "");
+
+        set_string(existing, as_string(existing) + value);
     }
 
     void apply(Term* term)
     {
-        std::vector<Input>::const_iterator it;
-        for (it = mPending.begin(); it != mPending.end(); ++it)
-            set_input_syntax_hint(term, it->index, it->field.c_str(), it->value);
-    }
+        for (int i=0; i < inputs.length(); i++) {
+            Dict* dict = as_dict(inputs[i]);
+            TaggedValue it;
+            for (dict->iteratorStart(&it);
+                    !dict->iteratorFinished(&it); dict->iteratorNext(&it)) {
+                const char* key;
+                TaggedValue* value;
+                dict->iteratorGet(&it, &key, &value);
 
-    std::vector<Input> mPending;
+                set_input_syntax_hint(term, i, key, as_string(value));
+            }
+        }
+    }
 };
 
 void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
@@ -1426,6 +1440,13 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
     while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
 
         inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
+
+        if (tokens.nextIs(STATE)) {
+            tokens.consume(STATE);
+            possible_whitespace(tokens);
+            tokens.consume(EQUALS);
+            inputHints.set(index, "state", "t");
+        }
 
         if (lookahead_match_rebind_argument(tokens)) {
             tokens.consume(AMPERSAND);

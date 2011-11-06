@@ -75,5 +75,6 @@ struct Dict : TaggedValue
 
 Dict* make_dict(TaggedValue* value);
 bool is_dict(TaggedValue* value);
+Dict* as_dict(TaggedValue* value);
 
 } // namespace circa
