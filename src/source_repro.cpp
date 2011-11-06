@@ -368,10 +368,7 @@ std::string get_input_syntax_hint(Term* term, int index, const char* field)
     if (term->inputInfo(index) == NULL)
         return "";
 
-    //return term->inputInfo(index)->properties.getString(field, "");
-    std::stringstream fieldName;
-    fieldName << "syntax:input-" << index << ":" << field;
-    return term->stringProp(fieldName.str());
+    return term->inputInfo(index)->properties.getString(field, "");
 }
 
 std::string get_input_syntax_hint_optional(Term* term, int index, const char* field,
@@ -379,24 +376,15 @@ std::string get_input_syntax_hint_optional(Term* term, int index, const char* fi
 {
     if (term->inputInfo(index) == NULL)
         return defaultValue;
-    //return term->inputInfo(index)->properties.getString(field, defaultValue.c_str());
-    std::stringstream fieldName;
-    fieldName << "syntax:input-" << index << ":" << field;
-    return term->stringPropOptional(fieldName.str(), defaultValue);
 
+    return term->inputInfo(index)->properties.getString(field, defaultValue.c_str());
 }
 
 void set_input_syntax_hint(Term* term, int index, const char* field,
         std::string const& value)
 {
-    //std::cout << "set_input_syntax_hint " << term << " " << index << " " << field << " " << value << std::endl;
     ca_assert(term->inputInfo(index) != NULL);
     term->inputInfo(index)->properties.setString(field, value.c_str());
-
-    std::stringstream fieldName;
-    fieldName << "syntax:input-" << index << ":" << field;
-    term->setStringProp(fieldName.str(), value);
-
 }
 
 void hide_from_source(Term* term)

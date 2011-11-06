@@ -250,6 +250,14 @@ void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)
         copy(left, right);
 }
 
+void move(TaggedValue* source, TaggedValue* dest)
+{
+    set_null(dest);
+    dest->value_type = source->value_type;
+    dest->value_data = source->value_data;
+    initialize_null(source);
+}
+
 void reset(TaggedValue* value)
 {
     // Check for NULL. Most TaggedValue functions don't do this, but reset() is

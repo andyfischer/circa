@@ -73,6 +73,8 @@ void swap(TaggedValue* left, TaggedValue* right);
 // on the 'doCopy' flag.
 void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doCopy);
 
+void move(TaggedValue* source, TaggedValue* dest);
+
 void initialize_null(TaggedValue* value);
 void reset(TaggedValue* value);
 std::string to_string(TaggedValue* value);

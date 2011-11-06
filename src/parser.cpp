@@ -1382,7 +1382,14 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                 else {
                     Term* assignTerm = apply(branch, ASSIGN_FUNC, TermList(leftExpr.term, term));
                     assignTerm->setStringProp("syntax:rebindOperator", operatorStr);
-                    term_move_property(assignTerm->input(1), assignTerm, "syntax:input-0:postWhitespace");
+
+                    // Move an input's post-whitespace to this term.
+                    TaggedValue* existingPostWhitespace =
+                        assignTerm->input(1)->inputInfo(0)->properties.get("postWhitespace");
+
+                    if (existingPostWhitespace != NULL)
+                        move(existingPostWhitespace,
+                            assignTerm->inputInfo(0)->properties.insert("postWhitespace"));
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
                     if (lexprRoot != NULL && lexprRoot->name != "")
                         branch->bindName(assignTerm, lexprRoot->name);
