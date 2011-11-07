@@ -195,7 +195,6 @@ ListData* write_input_instruction_list(Term* caller, ListData* list)
 
     for (int declaredIndex=0; declaredIndex < declaredCount; declaredIndex++) {
 
-
         if (function_is_state_input(func, declaredIndex)) {
             list = list_resize(list, writeIndex + 1);
             TaggedValue* isn = list_get_index(list, writeIndex);

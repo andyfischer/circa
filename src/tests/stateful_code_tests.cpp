@@ -38,6 +38,15 @@ void test_simple_func_with_state_arg()
 {
     Branch branch;
     import_function(&branch, simple_func_with_state_arg, "simple(state int i)");
+
+    // Test with manual call
+    ListData* inputs = allocate_list(1);
+    ListData* outputs = allocate_list(2);
+    set_int(list_get_index(inputs, 0), 3);
+    simple_func_with_state_arg(NULL, inputs, outputs);
+    test_equals(list_get_index(outputs, 1), 4);
+    free_list(inputs);
+    free_list(outputs);
 }
 
 void test_get_type_from_branches_stateful_terms()
@@ -422,6 +431,7 @@ void test_that_initial_value_doesnt_get_reevaluated()
 void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
+    REGISTER_TEST_CASE(stateful_code_tests::test_simple_func_with_state_arg);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::initial_value);
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);

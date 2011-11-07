@@ -5,7 +5,6 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "name_list.h"
 #include "term_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
@@ -44,9 +43,6 @@ struct Term : TaggedValue
 
     // Our name binding.
     std::string name;
-
-    // Names for extra outputs
-    NameList additionalOutputNames;
 
     // A name which is unique across this branch.
     struct UniqueName
@@ -100,9 +96,6 @@ struct Term : TaggedValue
     void setDependency(int index, Term* term);
 
     int numOutputs() const;
-
-    const char* getName(int index) const;
-    int nameCount() const;
 
     // Shorthand for nested_contents()
     Branch* contents();

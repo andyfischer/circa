@@ -98,26 +98,6 @@ Term::setDependency(int index, Term* term)
 }
 int Term::numOutputs() const { return outputCount; }
 
-const char*
-Term::getName(int index) const
-{
-    if (index == 0)
-        return name.c_str();
-
-    index -= 1;
-
-    if (index >= additionalOutputNames.count())
-        return "";
-
-    return additionalOutputNames[index];
-}
-
-int
-Term::nameCount() const
-{
-    return 1 + additionalOutputNames.count();
-}
-
 Branch*
 Term::contents()
 {
