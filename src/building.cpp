@@ -503,30 +503,6 @@ void post_compile_term(Term* term)
         respecialize_type(outputCopy);
         owningBranch->bindName(outputCopy, name);
     }
-
-    #if 0
-    int outputIndex = 1;
-    for (int i=0; i < term->numInputs(); i++) {
-        if (function_can_rebind_input(term->function, i)) {
-            if (function_call_rebinds_input(term, i)
-                    && term->input(i) != NULL
-                    && term->input(i)->name != "") {
-
-                std::string name = term->input(i)->name;
-
-                ca_assert(name == get_output_name(term, outputIndex));
-
-                Term* output = apply(owningBranch, COPY_FUNC, TermList(), name);
-                set_input2(output, 0, term, outputIndex);
-
-                respecialize_type(output);
-                owningBranch.bindName(output, term->input(i)->name);
-
-            }
-            outputIndex++;
-        }
-    }
-    #endif
 }
 
 void finish_minor_branch(Branch* branch)
@@ -629,5 +605,80 @@ int get_frame_distance(Term* term, Term* input)
 {
     return get_frame_distance(term->owningBranch, input);
 }
+
+void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn)
+{
+    change_type_no_initialize(isn, &StackVariableIsn_t);
+    int relativeFrame = get_frame_distance(callingFrame, input);
+
+    // Special case: if a term in a #joining branch is trying to reach a neighboring
+    // branch, then that's okay.
+    if (relativeFrame == -1 && callingFrame->owningTerm->name == "#joining")
+        relativeFrame = 0;
+    
+    isn->value_data.asint = 0;
+    isn->value_data.asint += relativeFrame << 16;
+    isn->value_data.asint += (input->index % 0xffff);
+}
+
+void write_state_input_instruction(TaggedValue* isn)
+{
+    change_type_no_initialize(isn, &StateInputIsn_t);
+}
+
+void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
+{
+    if (input == NULL) {
+        set_null(isn);
+    } else if (is_value(input)) {
+        set_pointer(isn, &GlobalVariableIsn_t, input);
+    } else {
+        write_stack_input_instruction(caller->owningBranch, input, isn);
+    }
+}
+
+ListData* write_input_instruction_list(Term* caller, ListData* list)
+{
+    Function* func = as_function(caller->function);
+
+    // Walk through each of the function's declared inputs, and write appropriate
+    // instructions.
+    int callerIndex = 0;
+    int writeIndex = 0;
+    int declaredCount = function_num_inputs(func);
+
+    for (int declaredIndex=0; declaredIndex < declaredCount; declaredIndex++) {
+
+        if (function_is_state_input(func, declaredIndex)) {
+            list = list_resize(list, writeIndex + 1);
+            TaggedValue* isn = list_get_index(list, writeIndex);
+            write_state_input_instruction(isn);
+
+        } else if (function_is_multiple_input(func, declaredIndex)) {
+
+            // Write the remainder of caller's arguments.
+            while (callerIndex < caller->numInputs()) {
+
+                list = list_resize(list, writeIndex + 1);
+                TaggedValue* isn = list_get_index(list, writeIndex);
+                write_input_instruction(caller, caller->input(callerIndex), isn);
+                callerIndex++;
+                writeIndex++;
+            }
+            break;
+
+        } else {
+            // Write a normal input.
+            list = list_resize(list, writeIndex + 1);
+            TaggedValue* isn = list_get_index(list, writeIndex);
+            write_input_instruction(caller, caller->input(callerIndex), isn);
+            callerIndex++;
+        }
+
+        writeIndex++;
+    }
+    return list;
+}
+
 
 } // namespace circa

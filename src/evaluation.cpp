@@ -21,15 +21,6 @@
 
 namespace circa {
 
-Type stackVariableIsn_t;
-Type globalVariableIsn_t;
-Type stateInputIsn_t;
-
-struct StackVariable {
-    short relativeFrame;
-    short index;
-};
-
 EvalContext::EvalContext()
  : interruptSubroutine(false),
    errorOccurred(false),
@@ -45,14 +36,6 @@ EvalContext::~EvalContext()
     on_object_deleted((CircaObject*) this);
 }
 
-std::string stackVariable_toString(TaggedValue* value)
-{
-    short relativeFrame = value->value_data.asint >> 16;
-    short index = (value->value_data.asint & 0xffff);
-    std::stringstream strm;
-    strm << "[frame:" << relativeFrame << ", index:" << index << "]";
-    return strm.str();
-}
 
 void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
@@ -96,13 +79,6 @@ void eval_context_setup_type(Type* type)
 {
     type->name = "EvalContext";
     type->gcListReferences = eval_context_list_references;
-
-    stackVariableIsn_t.name = "StackVariableIsn";
-    stackVariableIsn_t.storageType = STORAGE_TYPE_INT;
-    stackVariableIsn_t.toString = stackVariable_toString;
-    globalVariableIsn_t.name = "GlobalVariableIsn";
-    globalVariableIsn_t.storageType = STORAGE_TYPE_REF;
-    stateInputIsn_t.name = "StateInputIsn";
 }
 
 Frame* get_frame(EvalContext* context, int depth)
@@ -150,80 +126,6 @@ void pop_frame(EvalContext* context)
 Frame* top_frame(EvalContext* context)
 {
     return get_frame(context, 0);
-}
-
-void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn)
-{
-    change_type_no_initialize(isn, &stackVariableIsn_t);
-    int relativeFrame = get_frame_distance(callingFrame, input);
-
-    // Special case: if a term in a #joining branch is trying to reach a neighboring
-    // branch, then that's okay.
-    if (relativeFrame == -1 && callingFrame->owningTerm->name == "#joining")
-        relativeFrame = 0;
-    
-    isn->value_data.asint = 0;
-    isn->value_data.asint += relativeFrame << 16;
-    isn->value_data.asint += (input->index % 0xffff);
-}
-
-void write_state_input_instruction(TaggedValue* isn)
-{
-    change_type_no_initialize(isn, &stateInputIsn_t);
-}
-
-void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
-{
-    if (input == NULL) {
-        set_null(isn);
-    } else if (is_value(input)) {
-        set_pointer(isn, &globalVariableIsn_t, input);
-    } else {
-        write_stack_input_instruction(caller->owningBranch, input, isn);
-    }
-}
-
-ListData* write_input_instruction_list(Term* caller, ListData* list)
-{
-    Function* func = as_function(caller->function);
-
-    // Walk through each of the function's declared inputs, and write appropriate
-    // instructions.
-    int callerIndex = 0;
-    int writeIndex = 0;
-    int declaredCount = function_num_inputs(func);
-
-    for (int declaredIndex=0; declaredIndex < declaredCount; declaredIndex++) {
-
-        if (function_is_state_input(func, declaredIndex)) {
-            list = list_resize(list, writeIndex + 1);
-            TaggedValue* isn = list_get_index(list, writeIndex);
-            write_state_input_instruction(isn);
-
-        } else if (function_is_multiple_input(func, declaredIndex)) {
-
-            // Write the remainder of caller's arguments.
-            while (callerIndex < caller->numInputs()) {
-
-                list = list_resize(list, writeIndex + 1);
-                TaggedValue* isn = list_get_index(list, writeIndex);
-                write_input_instruction(caller, caller->input(callerIndex), isn);
-                callerIndex++;
-                writeIndex++;
-            }
-            break;
-
-        } else {
-            // Write a normal input.
-            list = list_resize(list, writeIndex + 1);
-            TaggedValue* isn = list_get_index(list, writeIndex);
-            write_input_instruction(caller, caller->input(callerIndex), isn);
-            callerIndex++;
-        }
-
-        writeIndex++;
-    }
-    return list;
 }
 
 void evaluate_single_term(EvalContext* context, Term* term)
@@ -416,9 +318,9 @@ TaggedValue* get_local_safe(Term* term, int outputIndex)
 
 TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
 {
-    if (arg->value_type == &globalVariableIsn_t) {
+    if (arg->value_type == &GlobalVariableIsn_t) {
         return (TaggedValue*) get_pointer(arg);
-    } else if (arg->value_type == &stackVariableIsn_t) {
+    } else if (arg->value_type == &StackVariableIsn_t) {
         short relativeFrame = arg->value_data.asint >> 16;
         short index = arg->value_data.asint & 0xffff;
 

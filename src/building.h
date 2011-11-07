@@ -97,4 +97,8 @@ bool branch_creates_stack_frame(Branch* branch);
 int get_frame_distance(Branch* frame, Term* input);
 int get_frame_distance(Term* term, Term* input);
 
+// Input instructions:
+ListData* write_input_instruction_list(Term* caller, ListData* list);
+void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn);
+
 } // namespace circa

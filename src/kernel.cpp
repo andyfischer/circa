@@ -155,6 +155,11 @@ Type SYMBOL_T;
 Type TYPE_T;
 Type VOID_T;
 
+// Input instructions:
+Type StackVariableIsn_t;
+Type GlobalVariableIsn_t;
+Type StateInputIsn_t;
+
 // Builtin symbols:
 TaggedValue FILE_SYMBOL;
 TaggedValue OUT_SYMBOL;
@@ -211,7 +216,14 @@ CA_FUNCTION(typename_func)
     set_string(OUTPUT, declared_type(INPUT_TERM(0))->name);
 }
 
-
+std::string stackVariable_toString(TaggedValue* value)
+{
+    short relativeFrame = value->value_data.asint >> 16;
+    short index = (value->value_data.asint & 0xffff);
+    std::stringstream strm;
+    strm << "[frame:" << relativeFrame << ", index:" << index << "]";
+    return strm.str();
+}
 
 Branch* kernel()
 {
@@ -243,6 +255,14 @@ void create_primitive_types()
     symbol_t::assign_new_symbol("repeat", &REPEAT_SYMBOL);
     symbol_t::assign_new_symbol("out", &OUT_SYMBOL);
     symbol_t::assign_new_symbol("unknown", &UNKNOWN_SYMBOL);
+
+    // input instructions
+    StackVariableIsn_t.name = "StackVariableIsn";
+    StackVariableIsn_t.storageType = STORAGE_TYPE_INT;
+    StackVariableIsn_t.toString = stackVariable_toString;
+    GlobalVariableIsn_t.name = "GlobalVariableIsn";
+    GlobalVariableIsn_t.storageType = STORAGE_TYPE_REF;
+    StateInputIsn_t.name = "StateInputIsn";
 }
 
 void bootstrap_kernel()
