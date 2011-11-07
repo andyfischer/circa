@@ -209,6 +209,8 @@ TaggedValue* list_insert(ListData** dataPtr, int index)
 }
 int list_size(ListData* data)
 {
+    if (data == NULL)
+        return 0;
     return data->count;
 }
 

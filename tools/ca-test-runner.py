@@ -90,14 +90,20 @@ def run_all_tests():
     if 'CIRCA_HOME' in os.environ:
         os.chdir(os.environ['CIRCA_HOME'])
 
+    totalFailureCount = 0
+
     for file in ['src/ca/tests/'+f for f in get_list_of_enabled_tests()]:
         print "Testing "+file
         failures = test_file(file)
+        totalFailureCount += len(failures)
         if failures:
             print str(len(failures)) + " failure(s) in "+file+":"
         for failure in failures:
             for line in failure.description:
                 print " "+line
+
+    if totalFailureCount > 0:
+        exit(-1)
 
 if __name__ == '__main__':
     run_all_tests()

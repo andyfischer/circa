@@ -241,8 +241,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     // Prepare input list
     ListData* inputList = write_input_instruction_list(term, NULL);
 
-    // std::cout << "running " << inputList->toStr() << std::endl;
-
     // Prepare output list
     ListData* outputList = allocate_list(1);
     write_stack_input_instruction(term->owningBranch, term, list_get_index(outputList, 0));
