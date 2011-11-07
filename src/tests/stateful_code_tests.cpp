@@ -60,7 +60,8 @@ void test_simple_func_with_state_arg()
     branch.compile("simple(state = a)");
     EvalContext context;
     evaluate_save_locals(&context, &branch);
-    dump(branch);
+
+    test_equals(branch["a"], "4");
 }
 
 void test_get_type_from_branches_stateful_terms()

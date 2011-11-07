@@ -109,19 +109,22 @@ void finish_building_function(Function* func, Type* declaredOutputType)
 {
     // Write a list of output_placeholder terms.
 
-    // If the function has any state, then create an output for that.
-    if (function_has_state_input(func)) {
-        Term* stateOutput = apply(function_contents(func), OUTPUT_PLACEHOLDER_FUNC, TermList());
-        stateOutput->setBoolProp("state", true);
-    }
-
     // Look at every input declared as :output, these will be used to declare extra outputs.
     // TODO is a way to declare extra outputs that are not rebound inputs.
     for (int i = function_num_inputs(func) - 1; i >= 0; i--) {
         Term* input = function_get_input_placeholder(func, i);
+
+        if (input->boolPropOptional("state", false)) {
+            Term* stateOutput = apply(function_contents(func),
+                OUTPUT_PLACEHOLDER_FUNC, TermList(), input->name);
+            stateOutput->setBoolProp("state", true);
+            stateOutput->setIntProp("rebindsInput", i);
+        }
+
         if (input->boolPropOptional("output", false)) {
             Term* output = apply(function_contents(func),
                 OUTPUT_PLACEHOLDER_FUNC, TermList(), input->name);
+            output->setIntProp("rebindsInput", i);
             change_declared_type(output, input->type);
         }
     }
@@ -463,7 +466,13 @@ const char* get_output_name(Term* term, int outputIndex)
         return getOutputName(term, outputIndex);
 
     // Default behavior, if the call is rebinding an input name, then use that name.
+    Term* outputPlaceholder = function_get_output_placeholder(attrs, outputIndex);
+    int rebindsInput = outputPlaceholder->intPropOptional("rebindsInput", -1);
+    
+    if (rebindsInput != -1)
+        return term->input(rebindsInput)->name.c_str();
 
+#if 0
     // First we need to figure out what the corresponding input index is for this
     // rebound output.
     int checkOutputIndex = 1;
@@ -482,6 +491,7 @@ const char* get_output_name(Term* term, int outputIndex)
     // If a rebound input was found, use that name.
     if (reboundInputIndex != -1)
         return get_output_name(term->input(reboundInputIndex), 0);
+#endif
 
     return "";
 }
