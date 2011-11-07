@@ -195,11 +195,10 @@ ListData* write_input_instruction_list(Term* caller, ListData* list)
 
     for (int declaredIndex=0; declaredIndex < declaredCount; declaredIndex++) {
 
-        list = list_resize(list, writeIndex + 1);
-        TaggedValue* isn = list_get_index(list, writeIndex);
 
         if (function_is_state_input(func, declaredIndex)) {
-
+            list = list_resize(list, writeIndex + 1);
+            TaggedValue* isn = list_get_index(list, writeIndex);
             write_state_input_instruction(isn);
 
         } else if (function_is_multiple_input(func, declaredIndex)) {
@@ -217,6 +216,8 @@ ListData* write_input_instruction_list(Term* caller, ListData* list)
 
         } else {
             // Write a normal input.
+            list = list_resize(list, writeIndex + 1);
+            TaggedValue* isn = list_get_index(list, writeIndex);
             write_input_instruction(caller, caller->input(callerIndex), isn);
             callerIndex++;
         }
