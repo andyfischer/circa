@@ -116,10 +116,12 @@ extern Type StackVariableIsn_t;
 extern Type GlobalVariableIsn_t;
 extern Type StateInputIsn_t;
 
-extern TaggedValue FILE_SYMBOL;
-extern TaggedValue OUT_SYMBOL;
-extern TaggedValue REPEAT_SYMBOL;
-extern TaggedValue UNKNOWN_SYMBOL;
+extern TaggedValue FileSymbol;
+extern TaggedValue OutSymbol;
+extern TaggedValue RepeatSymbol;
+extern TaggedValue UnknownSymbol;
+extern TaggedValue NotEnoughInputsSymbol;
+extern TaggedValue TooManyInputsSymbol;
 
 extern TaggedValue TrueValue;
 extern TaggedValue FalseValue;

@@ -141,7 +141,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     context->currentTerm = term;
 
     // Prepare input list
-    ListData* inputList = write_input_instruction_list(term, NULL);
+    ListData* inputList = write_input_instruction_list(term, NULL, NULL);
 
     // Prepare output list
     ListData* outputList = allocate_list(1);

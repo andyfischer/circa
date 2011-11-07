@@ -118,6 +118,7 @@ bool function_is_state_input(Function* func, int index);
 bool function_has_state_input(Function* func);
 Term* function_insert_state_input(Function* func);
 
+bool function_is_multiple_input(Term* placeholder);
 bool function_is_multiple_input(Function* func, int index);
 bool function_get_input_meta(Function* func, int index);
 bool function_get_input_optional(Function* func, int index);

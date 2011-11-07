@@ -98,7 +98,7 @@ int get_frame_distance(Branch* frame, Term* input);
 int get_frame_distance(Term* term, Term* input);
 
 // Input instructions:
-ListData* write_input_instruction_list(Term* caller, ListData* list);
+ListData* write_input_instruction_list(Term* caller, ListData* list, List* errors);
 void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn);
 
 } // namespace circa

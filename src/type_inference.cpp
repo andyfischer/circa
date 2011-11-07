@@ -111,7 +111,7 @@ Term* statically_infer_length_func(Branch* branch, Term* term)
     // Give up
     std::cout << "statically_infer_length_func didn't understand: "
         << input->function->name << std::endl;
-    return create_symbol_value(branch, &UNKNOWN_SYMBOL);
+    return create_symbol_value(branch, &UnknownSymbol);
 }
 
 Term* statically_infer_result(Branch* branch, Term* term)
@@ -128,7 +128,7 @@ Term* statically_infer_result(Branch* branch, Term* term)
     // Function not recognized
     std::cout << "statically_infer_result didn't recognize: "
         << term->function->name << std::endl;
-    return create_symbol_value(branch, &UNKNOWN_SYMBOL);
+    return create_symbol_value(branch, &UnknownSymbol);
 }
 
 void statically_infer_result(Term* term, TaggedValue* result)

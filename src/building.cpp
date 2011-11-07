@@ -621,11 +621,6 @@ void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValu
     isn->value_data.asint += (input->index % 0xffff);
 }
 
-void write_state_input_instruction(TaggedValue* isn)
-{
-    change_type_no_initialize(isn, &StateInputIsn_t);
-}
-
 void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
 {
     if (input == NULL) {
@@ -637,48 +632,70 @@ void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
     }
 }
 
-ListData* write_input_instruction_list(Term* caller, ListData* list)
+bool term_is_state_input(Term* term, int index)
+{
+    TaggedValue* prop = term->inputInfo(index)->properties.get("state");
+    if (prop == NULL)
+        return false;
+    return as_bool(prop);
+}
+
+void append_input_instruction_error(List* errors, TaggedValue* type)
+{
+    if (errors == NULL)
+        return;
+
+    copy(type, errors->append());
+}
+
+ListData* write_input_instruction_list(Term* caller, ListData* list, List* errors)
 {
     Function* func = as_function(caller->function);
+    list = list_resize(list, 0);
 
     // Walk through each of the function's declared inputs, and write appropriate
     // instructions.
     int callerIndex = 0;
-    int writeIndex = 0;
     int declaredCount = function_num_inputs(func);
 
     for (int declaredIndex=0; declaredIndex < declaredCount; declaredIndex++) {
+        Term* inputPlaceholder = function_get_input_placeholder(func, declaredIndex);
 
-        if (function_is_state_input(func, declaredIndex)) {
-            list = list_resize(list, writeIndex + 1);
-            TaggedValue* isn = list_get_index(list, writeIndex);
-            write_state_input_instruction(isn);
+        if (function_is_state_input(inputPlaceholder)) {
 
-        } else if (function_is_multiple_input(func, declaredIndex)) {
+            // Explicit state input
+            if (term_is_state_input(caller, callerIndex)) {
+                write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
+                callerIndex++;
+            }
+
+        } else if (function_is_multiple_input(inputPlaceholder)) {
 
             // Write the remainder of caller's arguments.
             while (callerIndex < caller->numInputs()) {
 
-                list = list_resize(list, writeIndex + 1);
-                TaggedValue* isn = list_get_index(list, writeIndex);
-                write_input_instruction(caller, caller->input(callerIndex), isn);
+                write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
                 callerIndex++;
-                writeIndex++;
             }
             break;
 
         } else {
             // Write a normal input.
-            list = list_resize(list, writeIndex + 1);
-            TaggedValue* isn = list_get_index(list, writeIndex);
-            write_input_instruction(caller, caller->input(callerIndex), isn);
+            if (callerIndex >= caller->numInputs()) {
+                append_input_instruction_error(errors, &NotEnoughInputsSymbol);
+                break;
+            }
+
+            write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
             callerIndex++;
         }
-
-        writeIndex++;
     }
+
+    // Check if we didn't look at all of the caller's inputs.
+    if (callerIndex+1 < caller->numInputs())
+        append_input_instruction_error(errors, &TooManyInputsSymbol);
+
     return list;
 }
-
 
 } // namespace circa

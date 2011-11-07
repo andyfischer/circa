@@ -161,10 +161,14 @@ Type GlobalVariableIsn_t;
 Type StateInputIsn_t;
 
 // Builtin symbols:
-TaggedValue FILE_SYMBOL;
-TaggedValue OUT_SYMBOL;
-TaggedValue REPEAT_SYMBOL;
-TaggedValue UNKNOWN_SYMBOL;
+TaggedValue FileSymbol;
+TaggedValue OutSymbol;
+TaggedValue RepeatSymbol;
+TaggedValue UnknownSymbol;
+
+// Symbols for static errors
+TaggedValue NotEnoughInputsSymbol;
+TaggedValue TooManyInputsSymbol;
 
 TaggedValue TrueValue;
 TaggedValue FalseValue;
@@ -254,10 +258,12 @@ void create_primitive_types()
     // errors are just stored as strings for now
     string_t::setup_type(&ERROR_T);
 
-    symbol_t::assign_new_symbol("file", &FILE_SYMBOL);
-    symbol_t::assign_new_symbol("repeat", &REPEAT_SYMBOL);
-    symbol_t::assign_new_symbol("out", &OUT_SYMBOL);
-    symbol_t::assign_new_symbol("unknown", &UNKNOWN_SYMBOL);
+    symbol_t::assign_new_symbol("file", &FileSymbol);
+    symbol_t::assign_new_symbol("repeat", &RepeatSymbol);
+    symbol_t::assign_new_symbol("out", &OutSymbol);
+    symbol_t::assign_new_symbol("unknown", &UnknownSymbol);
+    symbol_t::assign_new_symbol("not_enough_inputs", &NotEnoughInputsSymbol);
+    symbol_t::assign_new_symbol("too_many_inputs", &TooManyInputsSymbol);
 
     set_bool(&TrueValue, true);
     set_bool(&FalseValue, false);

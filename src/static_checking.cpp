@@ -3,10 +3,12 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "building.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "function.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "static_checking.h"
 #include "term.h"
 #include "type.h"
@@ -69,6 +71,15 @@ void check_term_for_static_error(List* errors, Term* term)
     if (func == NULL)
         return append_static_error(errors, term, "not_a_function");
 
+    // Check inputs, this checking is done by writing an input instruction list.
+    List inputErrors;
+    free_list(write_input_instruction_list(term, NULL, &inputErrors));
+    
+    if (inputErrors.length() > 0) {
+        std::string msg = "input errors: " + to_string(&inputErrors);
+        return append_static_error(errors, term, msg.c_str());
+    }
+#if 0
     bool varArgs = func->variableArgs;
     int expectedInputCount = function_num_explicit_inputs(func);
 
@@ -78,6 +89,7 @@ void check_term_for_static_error(List* errors, Term* term)
 
     for (int input=0; input < term->numInputs(); input++)
         check_input_for_static_error(errors, term, input);
+#endif
 
     if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
         return append_static_error(errors, term, "not_a_function");
@@ -186,7 +198,8 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     else if (term->function == STATIC_ERROR_FUNC)
         out << to_string(term->input(0));
     else
-        out << "(unrecognized error type: " << type << ")";
+        //out << "(unrecognized error type: " << type << ")";
+        out << type;
 
     set_string(stringOutput, out.str());
 }

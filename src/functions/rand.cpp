@@ -55,13 +55,13 @@ namespace rand_function {
 
     void setup(Branch* kernel)
     {
-        Term* rand_f = import_function(kernel, evaluate_f, "rand_f() -> number");
-        Term* rand_range = import_function(kernel, evaluate_f_range,
+        import_function(kernel, evaluate_f, "rand() -> number");
+        import_function(kernel, evaluate_f_range,
                 "rand_range(number min,number max) -> number");
         import_function(kernel, evaluate_i, "rand_i() -> int");
         //import_function(kernel, evaluate_i_i, "rand_i(int) : int");
         
-        create_overloaded_function(kernel, "rand", TermList(rand_f, rand_range));
+        //create_overloaded_function(kernel, "rand", TermList(rand_f, rand_range));
     }
 }
 } // namespace circa
