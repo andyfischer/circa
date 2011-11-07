@@ -166,6 +166,9 @@ TaggedValue OUT_SYMBOL;
 TaggedValue REPEAT_SYMBOL;
 TaggedValue UNKNOWN_SYMBOL;
 
+TaggedValue TrueValue;
+TaggedValue FalseValue;
+
 Type* FILE_SIGNATURE_T;
 
 namespace cppbuild_function { CA_FUNCTION(build_module); }
@@ -255,6 +258,9 @@ void create_primitive_types()
     symbol_t::assign_new_symbol("repeat", &REPEAT_SYMBOL);
     symbol_t::assign_new_symbol("out", &OUT_SYMBOL);
     symbol_t::assign_new_symbol("unknown", &UNKNOWN_SYMBOL);
+
+    set_bool(&TrueValue, true);
+    set_bool(&FalseValue, false);
 
     // input instructions
     StackVariableIsn_t.name = "StackVariableIsn";

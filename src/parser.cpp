@@ -1449,7 +1449,7 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
             tokens.consume(STATE);
             possible_whitespace(tokens);
             tokens.consume(EQUALS);
-            inputHints.set(index, "state", "t");
+            inputHints.set(index, "state", &TrueValue);
         }
 
         if (lookahead_match_rebind_argument(tokens)) {

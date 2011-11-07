@@ -121,6 +121,9 @@ extern TaggedValue OUT_SYMBOL;
 extern TaggedValue REPEAT_SYMBOL;
 extern TaggedValue UNKNOWN_SYMBOL;
 
+extern TaggedValue TrueValue;
+extern TaggedValue FalseValue;
+
 extern Type* FILE_SIGNATURE_T;
 
 extern bool STATIC_INITIALIZATION_FINISHED;
