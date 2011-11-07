@@ -169,6 +169,7 @@ TaggedValue UnknownSymbol;
 // Symbols for static errors
 TaggedValue NotEnoughInputsSymbol;
 TaggedValue TooManyInputsSymbol;
+TaggedValue ExtraOutputNotFoundSymbol;
 
 TaggedValue TrueValue;
 TaggedValue FalseValue;
@@ -264,9 +265,8 @@ void create_primitive_types()
     symbol_t::assign_new_symbol("unknown", &UnknownSymbol);
     symbol_t::assign_new_symbol("not_enough_inputs", &NotEnoughInputsSymbol);
     symbol_t::assign_new_symbol("too_many_inputs", &TooManyInputsSymbol);
+    symbol_t::assign_new_symbol("extra_output_not_found", &ExtraOutputNotFoundSymbol);
 
-    set_bool(&TrueValue, true);
-    set_bool(&FalseValue, false);
 
     // input instructions
     StackVariableIsn_t.name = "StackVariableIsn";
@@ -361,6 +361,10 @@ void bootstrap_kernel()
             "type FileSignature { string filename, int time_modified }"));
 
     namespace_function::early_setup(kernel);
+
+    // Set up some global constants
+    set_bool(&TrueValue, true);
+    set_bool(&FalseValue, false);
 }
 
 void initialize_compound_types(Branch* kernel)

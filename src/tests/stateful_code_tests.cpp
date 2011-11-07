@@ -39,6 +39,13 @@ void test_simple_func_with_state_arg()
     Branch branch;
     import_function(&branch, simple_func_with_state_arg, "simple(state int i)");
 
+    // Test some static checks
+    Function* func = as_function(branch["simple"]);
+
+    Term* stateOutput = function_get_output_placeholder(func, 1);
+    test_assert(function_is_state_input(stateOutput));
+    test_equals(stateOutput->name, "i");
+
     // Test with manual call
     ListData* inputs = allocate_list(1);
     ListData* outputs = allocate_list(2);
@@ -47,6 +54,13 @@ void test_simple_func_with_state_arg()
     test_equals(list_get_index(outputs, 1), 4);
     free_list(inputs);
     free_list(outputs);
+
+    // Now test with a normal call
+    branch.compile("a = 3");
+    branch.compile("simple(state = a)");
+    EvalContext context;
+    evaluate_save_locals(&context, &branch);
+    dump(branch);
 }
 
 void test_get_type_from_branches_stateful_terms()

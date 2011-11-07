@@ -140,12 +140,9 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
     context->currentTerm = term;
 
-    // Prepare input list
+    // Prepare input & output lists.
     ListData* inputList = write_input_instruction_list(term, NULL, NULL);
-
-    // Prepare output list
-    ListData* outputList = allocate_list(1);
-    write_stack_input_instruction(term->owningBranch, term, list_get_index(outputList, 0));
+    ListData* outputList = write_output_instruction_list(term, NULL, NULL);
 
     #if CIRCA_THROW_ON_ERROR
     try {
@@ -335,6 +332,7 @@ TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
 
 TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
 {
+    ca_assert(index < list_size(args));
     return get_arg(context, list_get_index(args, index));
 }
 void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest)

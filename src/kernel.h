@@ -122,6 +122,7 @@ extern TaggedValue RepeatSymbol;
 extern TaggedValue UnknownSymbol;
 extern TaggedValue NotEnoughInputsSymbol;
 extern TaggedValue TooManyInputsSymbol;
+extern TaggedValue ExtraOutputNotFoundSymbol;
 
 extern TaggedValue TrueValue;
 extern TaggedValue FalseValue;

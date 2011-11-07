@@ -656,10 +656,11 @@ ListData* write_input_instruction_list(Term* caller, ListData* list, List* error
     // Walk through each of the function's declared inputs, and write appropriate
     // instructions.
     int callerIndex = 0;
-    int declaredCount = function_num_inputs(func);
 
-    for (int declaredIndex=0; declaredIndex < declaredCount; declaredIndex++) {
+    for (int declaredIndex=0; ; declaredIndex++) {
         Term* inputPlaceholder = function_get_input_placeholder(func, declaredIndex);
+        if (inputPlaceholder == NULL)
+            break;
 
         if (function_is_state_input(inputPlaceholder)) {
 
@@ -694,6 +695,37 @@ ListData* write_input_instruction_list(Term* caller, ListData* list, List* error
     // Check if we didn't look at all of the caller's inputs.
     if (callerIndex+1 < caller->numInputs())
         append_input_instruction_error(errors, &TooManyInputsSymbol);
+
+    return list;
+}
+
+ListData* write_output_instruction_list(Term* caller, ListData* list, List* errors)
+{
+    Function* func = as_function(caller->function);
+    list = list_resize(list, 1);
+
+    // Always write a primary output that corresponds to the caller's register.
+    write_input_instruction(caller, caller, list_get_index(list, 0));
+
+    // Walk through the function's declared outputs to find "extra" outputs, write
+    // appropriate instructions for those.
+    for (int declaredIndex=1; ; declaredIndex++) {
+        Term* outputPlaceholder = function_get_output_placeholder(func, declaredIndex);
+        if (outputPlaceholder == NULL)
+            break;
+
+        int receiverIndex = caller->index + declaredIndex;
+        Term* receiver = NULL;
+        if (receiverIndex < caller->owningBranch->length())
+            receiver = caller->owningBranch->get(receiverIndex);
+
+        if (receiver == NULL || receiver->function != EXTRA_OUTPUT_FUNC) {
+            append_input_instruction_error(errors, &ExtraOutputNotFoundSymbol);
+            break;
+        }
+
+        write_input_instruction(caller, receiver, list_append(&list));
+    }
 
     return list;
 }

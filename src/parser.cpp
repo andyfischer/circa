@@ -78,7 +78,7 @@ struct ListSyntaxHints {
             set_dict(inputs.append());
 
         Dict* dict = as_dict(inputs[index]);
-        copy(dict->insert(field), value);
+        copy(value, dict->insert(field));
     }
 
     void append(int index, std::string const& field, std::string const& value)
@@ -1450,6 +1450,7 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
             possible_whitespace(tokens);
             tokens.consume(EQUALS);
             inputHints.set(index, "state", &TrueValue);
+            inputHints.set(index, "rebindInput", "t");
         }
 
         if (lookahead_match_rebind_argument(tokens)) {
