@@ -34,7 +34,7 @@ ListData* allocate_empty_list(int capacity)
     result->capacity = capacity;
     memset(result->items, 0, capacity * sizeof(TaggedValue));
     for (int i=0; i < capacity; i++)
-        result->items[i].initializeNull();
+        initialize_null(&result->items[i]);
 
     //std::cout << "created list " << result << std::endl;
 

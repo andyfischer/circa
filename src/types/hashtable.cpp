@@ -47,8 +47,8 @@ Hashtable* create_table(int capacity)
     result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
     for (int s=0; s < capacity; s++) {
-        result->slots[s].key.initializeNull();
-        result->slots[s].value.initializeNull();
+        initialize_null(&result->slots[s].key);
+        initialize_null(&result->slots[s].value);
     }
     return result;
 }
@@ -167,7 +167,12 @@ int table_insert(Hashtable** dataPtr, TaggedValue* key, bool swapKey)
     }
 
     Slot* slot = &data->slots[index];
-    swap_or_copy(key, &slot->key, swapKey);
+
+    if (swapKey)
+        swap(key, &slot->key);
+    else
+        copy(key, &slot->key);
+
     data->count++;
 
     return index;
@@ -377,7 +382,12 @@ void table_insert(TaggedValue* tableTv, TaggedValue* key, TaggedValue* value,
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     int index = table_insert(&table, key, swapKey);
-    swap_or_copy(value, &table->slots[index].value, swapTaggedValue);
+
+    TaggedValue* slot = &table->slots[index].value;
+    if (swapKey)
+        swap(value, slot);
+    else
+        copy(value, slot);
 }
 
 void table_remove(TaggedValue* tableTv, TaggedValue* key)

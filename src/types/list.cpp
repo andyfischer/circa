@@ -102,7 +102,7 @@ namespace list_t {
             List& result = *List::checkCast(value);
             result.resize(types.length());
             for (int i=0; i < types.length(); i++)
-                change_type(result[i], as_type(types[i]));
+                create(as_type(types[i]), result[i]);
         }
     }
 
@@ -118,10 +118,10 @@ namespace list_t {
     {
         ca_assert(is_list(source));
         set_null(dest);
+        change_type_no_initialize(dest, type);
 
         ListData* s = (ListData*) get_pointer(source);
         set_pointer(dest, list_duplicate(s));
-        change_type_no_initialize(dest, type);
 
         #if 0
     #if CIRCA_DISABLE_LIST_SHARING
@@ -354,7 +354,7 @@ bool is_list_based_type(Type* type)
 List::List()
   : TaggedValue()
 {
-    change_type(this, &LIST_T);
+    create(&LIST_T, this);
 }
 
 TaggedValue*

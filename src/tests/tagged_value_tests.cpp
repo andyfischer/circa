@@ -41,7 +41,7 @@ namespace toy_refcounted_pool {
 
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        change_type(dest, type);
+        create(type, dest);
         int prev = dest->value_data.asint;
         dest->value_data.asint = source->value_data.asint;
         refcount[dest->value_data.asint]++;
@@ -95,25 +95,6 @@ void test_polymorphic()
     test_assert(is_bool(&v));
 }
 
-void test_term_value()
-{
-    Branch branch;
-    Term* i = create_int(&branch, 5);
-    test_assert(is_int(i));
-    test_assert(is_int(i));
-
-    TaggedValue* a = branch.eval("a = [1 2 3]");
-    test_assert(a->numElements() == 3);
-    test_assert(a->getIndex(1)->asInt() == 2);
-
-    TaggedValue* b = branch.eval("b = a");
-    test_assert(b->numElements() == 3);
-    test_assert(b->getIndex(1)->asInt() == 2);
-    
-    Term* c = create_value(&branch, &INT_T);
-    test_assert(is_int(c));
-}
-
 namespace subroutine_call_test_helper {
     CA_FUNCTION(assert_ints)
     {
@@ -135,8 +116,7 @@ void test_reset()
     Term* a = create_int(&branch, 5);
     test_assert(as_int(a) == 5);
     reset(a);
-    test_assert(as_int(a) == 0);
-}
+    test_assert(as_int(a) == 0);}
 
 void test_constructor_syntax()
 {
@@ -201,7 +181,7 @@ namespace manual_memory_management_test {
         test_assert(!pool_allocated[0]);
         test_assert(!pool_allocated[1]);
 
-        change_type(&value, myType);
+        create(myType, &value);
 
         test_assert(pool_allocated[0]);
         test_assert(!pool_allocated[1]);
@@ -214,7 +194,7 @@ namespace manual_memory_management_test {
         // scope 1:
         {
             TaggedValue scoped_value;
-            change_type(&scoped_value, myType);
+            create(myType, &scoped_value);
             test_assert(pool_allocated[0]);
         }
         test_assert(!pool_allocated[0]);
@@ -222,7 +202,7 @@ namespace manual_memory_management_test {
         // scope 2
         {
             TaggedValue scoped_value;
-            change_type(&scoped_value, myType);
+            create(myType, &scoped_value);
             test_assert(pool_allocated[0]);
             set_null(&scoped_value);
             test_assert(!pool_allocated[0]);
@@ -286,9 +266,9 @@ void list_memory_management()
 
     test_assert(toy_refcounted_pool::refcount[0] == 0);
 
-    change_type(list.append(), t);
-    change_type(list.append(), t);
-    change_type(list.append(), t);
+    create(t, list.append());
+    create(t, list.append());
+    create(t, list.append());
 
     test_assert(toy_refcounted_pool::refcount[0] == 1);
     test_assert(toy_refcounted_pool::refcount[1] == 1);
@@ -351,7 +331,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(tagged_value_tests::test_int_simple);
     REGISTER_TEST_CASE(tagged_value_tests::test_polymorphic);
-    REGISTER_TEST_CASE(tagged_value_tests::test_term_value);
     REGISTER_TEST_CASE(tagged_value_tests::subroutine_call_test);
     REGISTER_TEST_CASE(tagged_value_tests::test_reset);
     REGISTER_TEST_CASE(tagged_value_tests::test_constructor_syntax);

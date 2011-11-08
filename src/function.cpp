@@ -53,7 +53,7 @@ namespace function_t {
 
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        change_type(dest, type);
+        create(type, dest);
         *((Function*) get_pointer(dest)) = *((Function*) get_pointer(source));
     }
 

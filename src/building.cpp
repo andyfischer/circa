@@ -680,8 +680,8 @@ ListData* write_input_instruction_list(Term* caller, ListData* list, List* error
                 callerIndex++;
             } else {
                 // Implicit state input
-                write_implicit_state_instruction(caller);
-                callerIndex++;
+                //write_implicit_state_instruction(caller);
+                //callerIndex++;
             }
 
         } else if (function_is_multiple_input(inputPlaceholder)) {

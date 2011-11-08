@@ -4,7 +4,6 @@
 
 #include "kernel.h"
 #include "debug.h"
-#include "heap_debugging.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -14,30 +13,24 @@ namespace circa {
 
 TaggedValue::TaggedValue()
 {
-    debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
-    initializeNull();
+    initialize_null(this);
 }
 
-void
-TaggedValue::initializeNull()
+TaggedValue::TaggedValue(Type* type)
 {
-    value_type = &NULL_T;
-    value_data.ptr = 0;
+    initialize_null(this);
+    create(type, this);
 }
 
 TaggedValue::~TaggedValue()
 {
     // Deallocate this value
-    change_type(this, &NULL_T);
-    debug_unregister_valid_object(this, TAGGED_VALUE_OBJECT);
+    set_null(this);
 }
 
 TaggedValue::TaggedValue(TaggedValue const& original)
 {
-    debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
-
-    initializeNull();
-
+    initialize_null(this);
     copy(&const_cast<TaggedValue&>(original), this);
 }
 
@@ -48,22 +41,9 @@ TaggedValue::operator=(TaggedValue const& rhs)
     return *this;
 }
 
-TaggedValue::TaggedValue(Type* type)
-{
-    debug_register_valid_object(this, TAGGED_VALUE_OBJECT);
-    initializeNull();
-    change_type(this, type);
-}
-
 void TaggedValue::reset()
 {
     circa::reset(this);
-}
-
-void initialize_null(TaggedValue* value)
-{
-    value->value_type = &NULL_T;
-    value->value_data.ptr = NULL;
 }
 
 std::string
@@ -116,6 +96,7 @@ float TaggedValue::toFloat()
 {
     return to_float(this);
 }
+
 const char* TaggedValue::asCString()
 {
     return as_string(this).c_str();
@@ -149,6 +130,7 @@ TaggedValue TaggedValue::fromFloat(float f)
     set_float(&tv, f);
     return tv;
 }
+
 TaggedValue TaggedValue::fromString(const char* s)
 {
     TaggedValue tv;
@@ -161,6 +143,58 @@ TaggedValue TaggedValue::fromBool(bool b)
     TaggedValue tv;
     set_bool(&tv, b);
     return tv;
+}
+
+void initialize_null(TaggedValue* value)
+{
+    value->value_type = &NULL_T;
+    value->value_data.ptr = NULL;
+}
+
+void create(Type* type, TaggedValue* value)
+{
+    set_null(value);
+
+    value->value_type = type;
+
+    if (type->initialize != NULL)
+        type->initialize(type, value);
+}
+
+void change_type(TaggedValue* v, Type* type)
+{
+    if (v->value_type == type)
+        return;
+
+    // Release old value.
+    set_null(v);
+
+    // Initialize to the new type.
+    v->value_type = type;
+
+    if (type != NULL) {
+        Type::Initialize initialize = type->initialize;
+        if (initialize != NULL)
+            initialize(type, v);
+    }
+}
+
+void change_type_no_initialize(TaggedValue* v, Type* t)
+{
+    set_null(v);
+    v->value_type = t;
+}
+
+void set_null(TaggedValue* value)
+{
+    if (value->value_type == NULL)
+        return;
+
+    if (value->value_type->release != NULL)
+        value->value_type->release(value->value_type, value);
+
+    value->value_type = &NULL_T;
+    value->value_data.ptr = NULL;
 }
 
 void release(TaggedValue* value)
@@ -242,14 +276,6 @@ void swap(TaggedValue* left, TaggedValue* right)
     right->value_data = temp_data;
 }
 
-void swap_or_copy(TaggedValue* left, TaggedValue* right, bool doSwap)
-{
-    if (doSwap)
-        swap(left, right);
-    else
-        copy(left, right);
-}
-
 void move(TaggedValue* source, TaggedValue* dest)
 {
     set_null(dest);
@@ -274,10 +300,18 @@ void reset(TaggedValue* value)
     }
 
     // No reset() function, just change type to null and back.
-    change_type(value, &NULL_T);
-    change_type(value, type);
+    set_null(value);
+    create(type, value);
 }
 
+void touch(TaggedValue* value)
+{
+    Type::Touch touch = value->value_type->touch;
+    if (touch != NULL)
+        touch(value);
+
+    // Default behavior: no-op.
+}
 
 std::string to_string(TaggedValue* value)
 {
@@ -374,42 +408,8 @@ int num_elements(TaggedValue* value)
     return numElements(value);
 }
 
-void touch(TaggedValue* value)
-{
-    Type::Touch touch = value->value_type->touch;
-    if (touch != NULL)
-        touch(value);
 
-    // Default behavior: no-op.
-}
 
-void change_type(TaggedValue* v, Type* type)
-{
-    // 'type' may be null
-    ca_assert(v != NULL);
-    debug_assert_valid_object(type, TYPE_OBJECT);
-
-    if (v->value_type == type)
-        return;
-
-    // Release old value.
-    release(v);
-
-    // Initialize to the new type.
-    v->value_type = type;
-
-    if (type != NULL) {
-        Type::Initialize initialize = type->initialize;
-        if (initialize != NULL)
-            initialize(type, v);
-    }
-}
-
-void change_type_no_initialize(TaggedValue* v, Type* t)
-{
-    set_null(v);
-    v->value_type = t;
-}
 
 bool equals(TaggedValue* lhs, TaggedValue* rhs)
 {
@@ -446,31 +446,31 @@ bool equals_int(TaggedValue* value, int i)
 
 void set_bool(TaggedValue* value, bool b)
 {
-    change_type(value, &BOOL_T);
+    change_type_no_initialize(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
 Dict* set_dict(TaggedValue* value)
 {
-    change_type(value, &DICT_T);
+    create(&DICT_T, value);
     return (Dict*) value;
 }
 
 void set_int(TaggedValue* value, int i)
 {
-    change_type(value, &INT_T);
+    change_type_no_initialize(value, &INT_T);
     value->value_data.asint = i;
 }
 
 void set_float(TaggedValue* value, float f)
 {
-    change_type(value, &FLOAT_T);
+    change_type_no_initialize(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
 void set_string(TaggedValue* value, const char* s)
 {
-    change_type(value, &STRING_T);
+    create(&STRING_T, value);
     *((std::string*) value->value_data.ptr) = s;
 }
 
@@ -481,8 +481,8 @@ void set_string(TaggedValue* value, std::string const& s)
 
 List* set_list(TaggedValue* value)
 {
-    change_type(value, &NULL_T); // substitute for 'reset'
-    change_type(value, &LIST_T);
+    set_null(value);
+    create(&LIST_T, value);
     return List::checkCast(value);
 }
 
@@ -506,10 +506,7 @@ void set_function_pointer(TaggedValue* value, Term* function)
     value->value_data.ptr = function;
 }
 
-void set_null(TaggedValue* value)
-{
-    change_type(value, &NULL_T);
-}
+
 void set_opaque_pointer(TaggedValue* value, void* addr)
 {
     change_type_no_initialize(value, &OPAQUE_POINTER_T);
@@ -661,7 +658,7 @@ void set_transient_value(TaggedValue* value, void* data, Type* type)
 }
 void cleanup_transient_value(TaggedValue* value)
 {
-    value->initializeNull();
+    initialize_null(value);
 }
 
 } // namespace circa

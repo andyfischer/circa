@@ -142,9 +142,9 @@ void test_create_implicit_tuple_type()
     Term* result = create_tuple_type(&typeList);
 
     TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
-    TaggedValue* b = branch.eval("['hi', 3.0, 1]");
-
     test_assert(cast_possible(a, unbox_type(result)));
+
+    TaggedValue* b = branch.eval("['hi', 3.0, 1]");
     test_assert(!cast_possible(b, unbox_type(result)));
 }
 
@@ -192,7 +192,7 @@ void test_declaring_term()
     Branch branch;
     Term* myType = branch.compile("type MyType {}");
     TaggedValue myValue;
-    change_type(&myValue, as_type(myType));
+    create(as_type(myType), &myValue);
     test_equals(myValue.value_type->name, "MyType");
     test_assert(myValue.value_type->declaringTerm == myType);
 

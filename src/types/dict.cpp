@@ -49,7 +49,7 @@ DictData* create_dict(int capacity)
     result->count = 0;
     memset(result->slots, 0, capacity * sizeof(Slot));
     for (int s=0; s < capacity; s++)
-        result->slots[s].value.initializeNull();
+        initialize_null(&result->slots[s].value);
 
     #if VERBOSE_LOG
     std::cout << "create_dict: " << result << std::endl;
