@@ -158,7 +158,7 @@ Type VOID_T;
 // Input instructions:
 Type StackVariableIsn_t;
 Type GlobalVariableIsn_t;
-Type StateInputIsn_t;
+Type ImplicitStateInputIsn_t;
 
 // Builtin symbols:
 TaggedValue FileSymbol;
@@ -274,7 +274,8 @@ void create_primitive_types()
     StackVariableIsn_t.toString = stackVariable_toString;
     GlobalVariableIsn_t.name = "GlobalVariableIsn";
     GlobalVariableIsn_t.storageType = STORAGE_TYPE_REF;
-    StateInputIsn_t.name = "StateInputIsn";
+    ImplicitStateInputIsn_t.name = "ImplicitStateInputIsn";
+    ImplicitStateInputIsn_t.storageType = STORAGE_TYPE_INT;
 }
 
 void bootstrap_kernel()

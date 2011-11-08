@@ -1,0 +1,48 @@
+
+When talking about inputs and outputs, there are several layers involved.
+
+Layer 1: AST form (Branches and Terms)
+ - Every Term has a list of Terms as inputs
+ - This format corresponds with how the code was written. This input list might not
+   correspond with how the function expects to receive the inputs.
+     Example: If the call uses named inputs, the AST will list each input in the order
+       that it appeared in the code, even though the names might be out of order.
+     
+Layer 2: Input instructions
+ - For each term there is a generated piece of data called the Input Instruction List.
+   (Technically there are two lists: one for inputs and one for outputs. But we'll talk
+   about these as two halves of one object, the input instruction list). This list is
+   generated from:
+    - The term's AST inputs
+    - The function's expected inputs, including implicit inputs
+    - The register locations of all inputs (also, whether or not each input actually
+      uses a register. value() terms don't use registers).
+
+So one question is.. Should layer 1 include implicit inputs?
+
+Reasons against:
+ - There needs to be some piece of data that includes the original code as typed by the user.
+   - Counter: We can preserve this data with sufficient annotations
+ - Looking at the AST will be confusing with all those extra outputs
+
+Reasons for:
+ - Introspection is a crucial ability, and our plan is to use the AST as a dataflow graph.
+   This ability needs to be preserved for implicit inputs. So, whereever the connectivity
+   information for implicit inputs is hiding, we'll need to look at it anyway.
+
+   It's true that for an implicit input, we can always work backwards against the logic
+   that was used to generate the input in the first place, and use that to figure out the
+   source of the data. But, this doesn't seem right.
+
+Question: If I decide to change a term's inputs, how do I do that? What if I want to be
+ignorant of implicit inputs, will there be an API that I can use?
+ - There will need to be a way to dirty & regenerate implicits
+
+Question: What if I want to reorder terms that are affected by implicits? Is this always
+safe?
+ - The reorder function will need to understand that implicits can be ignored and regenerated.
+ - Although, sometimes reordering will cause different behavior, in which case the right
+   thing to do is check those cases.
+
+Who owns the logic for creating implicits:
+ - The Function dictates which implicits it wants, and the runtime makes it happen.

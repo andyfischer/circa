@@ -1,0 +1,52 @@
+
+def f(int i, int j) -> int
+  return i + j
+
+-- Introspect on output
+assert(f.output.function.name == "add")
+assert(f.output.type.name == "int")
+assert(f.output.inputs[0].name == "i")
+assert(f.output.inputs[1].name == "j")
+assert(f.output.inputs[1] == f.inputs[0])
+
+-- Test rename
+assert(f.output.inputs[0].name == "i")
+def f(int i, int j) -> int
+  return i + j
+
+f.rename("i", "k")
+
+print(f.to_source)
+
+-- Walk up a dataflow chain
+def g(int i) -> int
+  add(@i 1)
+  add(@i 2)
+  add(@i 3)
+  return i
+  
+def walk(f) -> Set
+  searched = new(Set)
+  searching = [f.output]
+  while !searching.empty()
+      next_searching = []
+      for s in searching
+          for i in s.inputs
+              if !searched.contains(i)
+                  next_searching.append(i)
+          searched.insert(s)
+      searching = next_searching
+  return searched
+
+walk(g)
+
+-- Concatenate two functions
+def f1(int i) -> int
+  return i + 3
+def f2(int j) -> int
+  return j // 2
+
+f3 = concat(f1 f2)
+assert(f3(3) == 2)
+assert(f3(7) == 5)
+assert(f3(-1) == 1)

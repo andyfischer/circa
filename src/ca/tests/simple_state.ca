@@ -1,0 +1,47 @@
+
+def f() -> int
+  state s = 0
+  s += 1
+  return s
+  
+f_state = null
+result = f(state = f_state)
+print('should be 1: ' result)
+
+result = f(state = f_state)
+print('should be 2: ' result)
+
+result = f(state = f_state)
+print('should be 3: ' result)
+
+print('should be {i: 3} ' f_state)
+
+-- if block
+
+def g(bool b)
+  if b
+     state i = 0
+     i += 1
+  else
+     state j = 0
+     j += 1
+
+g_state = null
+g(state = g_state, true)
+print('should be [{i: 1}, null]: ' g_state)
+g(state = g_state, true)
+print('should be [{i: 2}, null]: ' g_state)
+g(state = g_state, false)
+print('should be [null, {j: 1}]: ' g_state)
+g(state = g_state, false)
+print('should be [null, {j: 2}]: ' g_state)
+
+-- for loop
+
+def h(int i)
+  for x in [0..i]
+    state s = x
+
+h_state = null
+h(state = h_state, 3)
+print('should be [{s: 1}, {s: 2}, {s: 3}]: ' h_state)

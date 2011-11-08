@@ -632,6 +632,16 @@ void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
     }
 }
 
+void write_implicit_state_input_instruction(Term* caller, TaggedValue* isn)
+{
+    set_null(isn);
+    change_type_no_initialize(isn, &ImplicitStateInputIsn_t);
+
+    // Save the register index of the state input. Currently the state value
+    // is read & written to the same register.
+
+}
+
 bool term_is_state_input(Term* term, int index)
 {
     TaggedValue* prop = term->inputInfo(index)->properties.get("state");
@@ -664,9 +674,13 @@ ListData* write_input_instruction_list(Term* caller, ListData* list, List* error
 
         if (function_is_state_input(inputPlaceholder)) {
 
-            // Explicit state input
             if (term_is_state_input(caller, callerIndex)) {
+                // Explicit state input
                 write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
+                callerIndex++;
+            } else {
+                // Implicit state input
+                write_implicit_state_instruction(caller);
                 callerIndex++;
             }
 

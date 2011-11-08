@@ -117,6 +117,7 @@ bool function_is_state_input(Term* placeholder);
 bool function_is_state_input(Function* func, int index);
 bool function_has_state_input(Function* func);
 Term* function_insert_state_input(Function* func);
+Term* function_find_state_input(Function* func);
 
 bool function_is_multiple_input(Term* placeholder);
 bool function_is_multiple_input(Function* func, int index);

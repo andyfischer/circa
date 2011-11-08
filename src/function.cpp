@@ -364,6 +364,17 @@ Term* function_insert_state_input(Function* func)
     return term;
 }
 
+Term* function_find_state_input(Function* func)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = function_get_input_placeholder(func,i);
+        if (placeholder == NULL)
+            return NULL;
+        if (function_is_state_input(placeholder))
+            return placeholder;
+    }
+}
+
 bool function_is_multiple_input(Term* placeholder)
 {
     return placeholder->boolPropOptional("multiple", false);
