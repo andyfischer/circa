@@ -36,13 +36,13 @@ Branch::Branch()
     outputIndex(0),
     currentlyCascadingUpdates(false)
 {
-    register_new_object((CircaObject*) this, &BRANCH_T, true);
+    gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
 }
 
 Branch::~Branch()
 {
     clear_branch(this);
-    on_object_deleted((CircaObject*) this);
+    gc_on_object_deleted((CircaObject*) this);
 }
 
 void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor color)

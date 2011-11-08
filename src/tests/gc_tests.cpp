@@ -1,7 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "gc.h"
-#include "object.h"
 #include "types/handle.h"
 
 namespace circa {
@@ -49,7 +48,7 @@ void test_simple()
     a->name = "test_simple";
 
     // Register and collect, 'a' will get released.
-    register_new_object(a, &type, false);
+    gc_register_new_object(a, &type, false);
     gc_collect();
 
     test_equals(&g_recentlyDeleted, "['test_simple']");
@@ -64,13 +63,13 @@ void test_simple_root()
     a->name = "test_simple_root";
 
     // Register and collect, 'a' will remain because it's permanent.
-    register_new_object(a, &type, true);
+    gc_register_new_object(a, &type, true);
     gc_collect();
 
     test_equals(&g_recentlyDeleted, "[]");
 
     // Clean up the mess..
-    set_object_permanent(a, false);
+    gc_set_object_permanent(a, false);
     gc_collect();
     test_equals(&g_recentlyDeleted, "['test_simple_root']");
 }
@@ -82,19 +81,19 @@ void test_with_refs()
 
     Thing* thing1 = new Thing();
     thing1->name = "thing_1";
-    register_new_object(thing1, &type, true);
+    gc_register_new_object(thing1, &type, true);
 
     Thing* thing2 = new Thing();
     thing2->name = "thing_2";
-    register_new_object(thing2, &type, false);
+    gc_register_new_object(thing2, &type, false);
 
     Thing* thing3 = new Thing();
     thing3->name = "thing_3";
-    register_new_object(thing3, &type, false);
+    gc_register_new_object(thing3, &type, false);
 
     Thing* thing4 = new Thing();
     thing4->name = "thing_4";
-    register_new_object(thing4, &type, false);
+    gc_register_new_object(thing4, &type, false);
     
     thing1->ref = thing2;
     thing2->ref = thing3;
@@ -108,7 +107,7 @@ void test_with_refs()
     gc_collect();
     test_equals(&g_recentlyDeleted, "['thing_3']");
 
-    set_object_permanent(thing1, false);
+    gc_set_object_permanent(thing1, false);
     set_list(&g_recentlyDeleted, 0);
     gc_collect();
     test_equals(&g_recentlyDeleted, "['thing_1', 'thing_2']");
@@ -121,19 +120,19 @@ void test_with_refs2()
 
     Thing* thing1 = new Thing();
     thing1->name = "thing_1";
-    register_new_object(thing1, &type, true);
+    gc_register_new_object(thing1, &type, true);
 
     Thing* thing2 = new Thing();
     thing2->name = "thing_2";
-    register_new_object(thing2, &type, false);
+    gc_register_new_object(thing2, &type, false);
 
     Thing* thing3 = new Thing();
     thing3->name = "thing_3";
-    register_new_object(thing3, &type, false);
+    gc_register_new_object(thing3, &type, false);
 
     Thing* thing4 = new Thing();
     thing4->name = "thing_4";
-    register_new_object(thing4, &type, false);
+    gc_register_new_object(thing4, &type, false);
     
     thing1->ref = thing2;
     thing2->ref = thing3;
@@ -142,7 +141,7 @@ void test_with_refs2()
     gc_collect();
     test_equals(&g_recentlyDeleted, "[]");
 
-    set_object_permanent(thing1, false);
+    gc_set_object_permanent(thing1, false);
     set_list(&g_recentlyDeleted, 0);
     gc_collect();
     test_equals(&g_recentlyDeleted, "['thing_1', 'thing_2', 'thing_3', 'thing_4']");

@@ -4,7 +4,7 @@
 
 #include "common_headers.h"
 #include "for_loop.h"
-#include "object.h"
+#include "gc.h"
 #include "tagged_value.h"
 #include "term_list.h"
 #include "types/list.h"

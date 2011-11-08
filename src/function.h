@@ -5,7 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "object.h"
+#include "gc.h"
 #include "term.h"
 #include "types/list.h"
 

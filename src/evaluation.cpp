@@ -28,7 +28,7 @@ EvalContext::EvalContext()
    stack(NULL),
    currentTerm(NULL)
 {
-    register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
+    gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
 
 EvalContext::~EvalContext()
@@ -39,7 +39,8 @@ EvalContext::~EvalContext()
     while (numFrames > 0)
         pop_frame(this);
     free(stack);
-    on_object_deleted((CircaObject*) this);
+
+    gc_on_object_deleted((CircaObject*) this);
 }
 
 void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)

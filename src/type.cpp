@@ -100,12 +100,12 @@ Type::Type() :
     parent(NULL)
 {
     // Register ourselves. Start out as 'permanent'.
-    register_new_object((CircaObject*) this, &TYPE_T, true);
+    gc_register_new_object((CircaObject*) this, &TYPE_T, true);
 }
 
 Type::~Type()
 {
-    on_object_deleted((CircaObject*) this);
+    gc_on_object_deleted((CircaObject*) this);
 }
 
 Type* declared_type(Term* term)
@@ -152,7 +152,7 @@ Type* get_type_of_input(Term* term, int inputIndex)
 Type* create_type()
 {
     Type* t = new Type();
-    set_object_permanent((CircaObject*) t, false);
+    gc_set_object_permanent((CircaObject*) t, false);
     return t;
 }
 

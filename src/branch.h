@@ -5,7 +5,7 @@
 #include "common_headers.h"
 
 #include "names.h"
-#include "object.h"
+#include "gc.h"
 #include "term_list.h"
 #include "term_namespace.h"
 #include "types/list.h"

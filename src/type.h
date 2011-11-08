@@ -8,7 +8,7 @@
 
 #include "branch.h"
 #include "heap_debugging.h"
-#include "object.h"
+#include "gc.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"

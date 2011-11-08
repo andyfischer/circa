@@ -35,12 +35,12 @@ Function::Function()
     assignRegisters(NULL),
     postCompile(NULL)
 {
-    register_new_object((CircaObject*) this, &FUNCTION_T, true);
+    gc_register_new_object((CircaObject*) this, &FUNCTION_T, true);
 }
 
 Function::~Function()
 {
-    on_object_deleted((CircaObject*) this);
+    gc_on_object_deleted((CircaObject*) this);
 }
 
 namespace function_t {

@@ -1,7 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "gc.h"
-#include "object.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -168,6 +167,37 @@ void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b)
     a->refs = b->refs;
     b->count = tempCount;
     b->refs = tempRefs;
+}
+
+void gc_register_new_object(CircaObject* obj, Type* type, bool permanent)
+{
+    CircaObject* header = (CircaObject*) obj;
+
+    strcpy(header->magicalHeader, "caobj");
+
+    ca_assert(type != NULL);
+
+    obj->type = type;
+    obj->next = NULL;
+    obj->prev = NULL;
+    obj->permanent = permanent;
+    obj->gcColor = 0;
+
+    gc_register_object(header);
+    
+    ca_assert(type != NULL);
+}
+
+void ogc_n_object_deleted(CircaObject* obj)
+{
+    memset(obj->magicalHeader, 0, 6);
+
+    gc_on_object_deleted(obj);
+}
+
+void gc_set_object_permanent(CircaObject* obj, bool permanent)
+{
+    obj->permanent = permanent;
 }
 
 } // namespace circa
