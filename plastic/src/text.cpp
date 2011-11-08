@@ -68,7 +68,7 @@ struct RenderedText : public TaggedValue
 
     static RenderedText* cast(TaggedValue* val)
     {
-        change_type(val, singleton);
+        create(singleton, val);
         return (RenderedText*) val;
     }
 

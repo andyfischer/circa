@@ -17,7 +17,7 @@ namespace file_changed_function {
         }
 
         if (fileSignature->value_type != FILE_SIGNATURE_T)
-            change_type(fileSignature, FILE_SIGNATURE_T);
+            create(FILE_SIGNATURE_T, fileSignature);
         
         TaggedValue* sigFilename = fileSignature->getIndex(0);
         TaggedValue* sigModified = fileSignature->getIndex(1);

@@ -243,7 +243,7 @@ namespace overloaded_function {
     {
         // Make our output of type Function so that the type checker doesn't
         // get mad. This value isn't used.
-        change_type(OUTPUT, unbox_type(FUNCTION_TYPE));
+        create(unbox_type(FUNCTION_TYPE), OUTPUT);
     }
 
     void setup(Branch* kernel)

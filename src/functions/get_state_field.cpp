@@ -54,7 +54,7 @@ namespace get_state_field_function {
         }
 
         // Otherwise, reset to default value of type
-        change_type(OUTPUT, declared_type(CALLER));
+        create(declared_type(CALLER), OUTPUT);
         reset(OUTPUT);
     }
 

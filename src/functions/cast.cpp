@@ -20,7 +20,7 @@ namespace cast_function {
             return ERROR_OCCURRED(message.str().c_str());
         }
 
-        change_type(OUTPUT, type);
+        //change_type(OUTPUT, type);
         bool success = cast(source, type, OUTPUT);
 
         if (!success)

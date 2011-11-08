@@ -33,9 +33,14 @@ EvalContext::EvalContext()
 
 EvalContext::~EvalContext()
 {
+    // clear error so that pop_frame doesn't complain about losing an errored frame.
+    clear_error(this);
+
+    while (numFrames > 0)
+        pop_frame(this);
+    free(stack);
     on_object_deleted((CircaObject*) this);
 }
-
 
 void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {

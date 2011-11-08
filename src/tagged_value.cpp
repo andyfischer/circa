@@ -161,24 +161,6 @@ void create(Type* type, TaggedValue* value)
         type->initialize(type, value);
 }
 
-void change_type(TaggedValue* v, Type* type)
-{
-    if (v->value_type == type)
-        return;
-
-    // Release old value.
-    set_null(v);
-
-    // Initialize to the new type.
-    v->value_type = type;
-
-    if (type != NULL) {
-        Type::Initialize initialize = type->initialize;
-        if (initialize != NULL)
-            initialize(type, v);
-    }
-}
-
 void change_type_no_initialize(TaggedValue* v, Type* t)
 {
     set_null(v);

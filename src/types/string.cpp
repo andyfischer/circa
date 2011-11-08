@@ -88,7 +88,7 @@ namespace string_t {
 
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        change_type(dest, type);
+        create(type, dest);
         *((std::string*) dest->value_data.ptr) = as_string(source);
     }
     void reset(TaggedValue* v)

@@ -146,7 +146,7 @@ void test_tagged_value()
     list_t::setup_type(list);
 
     TaggedValue value;
-    change_type(&value, list);
+    create(list, &value);
 
     test_equals(to_string(&value), "[]");
     test_assert(get_index(&value, 1) == NULL);

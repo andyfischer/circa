@@ -206,8 +206,8 @@ void change_declared_type(Term *term, Type *newType)
 
     set_null((TaggedValue*) term);
 
-    // TODO: Don't call change_type here
-    change_type(term, newType);
+    // TODO: Don't call create() here
+    create(newType, term);
 
     // TODO: Use update_cascades to update inferred type on all users.
 }
@@ -256,7 +256,7 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, inputs, name);
     change_declared_type(term, original->type);
-    change_type((TaggedValue*) term, original->value_type);
+    //create(original->value_type, (TaggedValue*) term);
 
     copy(original, term);
 
@@ -298,7 +298,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
 
     change_function(term, VALUE_FUNC);
     change_declared_type(term, type);
-    change_type((TaggedValue*) term, type);
+    create(type, (TaggedValue*) term);
     update_unique_name(term);
 
     return term;

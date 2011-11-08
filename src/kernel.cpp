@@ -321,7 +321,7 @@ void bootstrap_kernel()
     // Initialize value() func
     VALUE_FUNC->type = &FUNCTION_T;
     VALUE_FUNC->function = VALUE_FUNC;
-    change_type((TaggedValue*)VALUE_FUNC, unbox_type(FUNCTION_TYPE));
+    create(&FUNCTION_T, (TaggedValue*)VALUE_FUNC);
 
     function_t::initialize(&FUNCTION_T, VALUE_FUNC);
     initialize_function(VALUE_FUNC);

@@ -10,7 +10,7 @@ namespace instance_function {
 
     CA_DEFINE_FUNCTION(instance, "instance(Type t) -> any")
     {
-        change_type(OUTPUT, unbox_type(INPUT(0)));
+        create(unbox_type(INPUT(0)), OUTPUT);
     }
 
     Type* specializeType(Term* caller)

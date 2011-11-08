@@ -463,7 +463,7 @@ void setup_type(Type* type)
 Dict::Dict()
   : TaggedValue()
 {
-    change_type(this, &DICT_T);
+    create(&DICT_T, this);
 }
 
 Dict* Dict::checkCast(TaggedValue* value)
@@ -600,7 +600,7 @@ Dict* as_dict(TaggedValue* value)
 }
 Dict* make_dict(TaggedValue* value)
 {
-    change_type(value, &DICT_T);
+    create(&DICT_T, value);
     return (Dict*) value;
 }
 
