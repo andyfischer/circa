@@ -133,7 +133,9 @@ TaggedValue* Term::addProperty(std::string const& name, Term* type)
     if (!is_null(prop) && prop->value_type != valueType)
         internal_error("Property "+name+" exists with different type");
 
-    create(valueType, prop);
+    if (prop->value_type != valueType)
+        create(valueType, prop);
+
     return prop;
 }
 
