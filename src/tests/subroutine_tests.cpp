@@ -253,7 +253,7 @@ namespace copy_counting_tests
 
     void t_copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        change_type_no_initialize(dest, type);
+        change_type(dest, type);
         dest->value_data = source->value_data;
         Slot& slot = slots[dest->value_data.asint];
         slot.copies++;

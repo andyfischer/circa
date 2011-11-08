@@ -118,7 +118,7 @@ namespace list_t {
     {
         ca_assert(is_list(source));
         set_null(dest);
-        change_type_no_initialize(dest, type);
+        change_type(dest, type);
 
         ListData* s = (ListData*) get_pointer(source);
         set_pointer(dest, list_duplicate(s));

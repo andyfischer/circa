@@ -22,7 +22,7 @@ namespace symbol_t {
     {
         int index = g_nextFreeSymbol++;
         g_symbols[index].name = name;
-        change_type_no_initialize(result, &SYMBOL_T);
+        change_type(result, &SYMBOL_T);
         result->value_data.asint = index;
     }
 

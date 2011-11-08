@@ -49,7 +49,7 @@ void initialize_null(TaggedValue* value);
 // Call the type's create() function to initialize 'value' to a new instance of the type.
 void create(Type* type, TaggedValue* value);
 
-void change_type_no_initialize(TaggedValue* v, Type* t);
+void change_type(TaggedValue* v, Type* t);
 
 // Set this value to null. This will call the type's destructor if necessary.
 void set_null(TaggedValue* value);

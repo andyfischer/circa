@@ -161,7 +161,7 @@ void create(Type* type, TaggedValue* value)
         type->initialize(type, value);
 }
 
-void change_type_no_initialize(TaggedValue* v, Type* t)
+void change_type(TaggedValue* v, Type* t)
 {
     set_null(v);
     v->value_type = t;
@@ -428,7 +428,7 @@ bool equals_int(TaggedValue* value, int i)
 
 void set_bool(TaggedValue* value, bool b)
 {
-    change_type_no_initialize(value, &BOOL_T);
+    change_type(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
@@ -440,13 +440,13 @@ Dict* set_dict(TaggedValue* value)
 
 void set_int(TaggedValue* value, int i)
 {
-    change_type_no_initialize(value, &INT_T);
+    change_type(value, &INT_T);
     value->value_data.asint = i;
 }
 
 void set_float(TaggedValue* value, float f)
 {
-    change_type_no_initialize(value, &FLOAT_T);
+    change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
@@ -484,19 +484,19 @@ void set_type(TaggedValue* value, Type* type)
 
 void set_function_pointer(TaggedValue* value, Term* function)
 {
-    change_type_no_initialize(value, &FUNCTION_T);
+    change_type(value, &FUNCTION_T);
     value->value_data.ptr = function;
 }
 
 
 void set_opaque_pointer(TaggedValue* value, void* addr)
 {
-    change_type_no_initialize(value, &OPAQUE_POINTER_T);
+    change_type(value, &OPAQUE_POINTER_T);
     value->value_data.ptr = addr;
 }
 void set_branch(TaggedValue* value, Branch* branch)
 {
-    change_type_no_initialize(value, &BRANCH_T);
+    change_type(value, &BRANCH_T);
     value->value_data.ptr = branch;
 }
 

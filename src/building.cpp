@@ -608,7 +608,7 @@ int get_frame_distance(Term* term, Term* input)
 
 void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn)
 {
-    change_type_no_initialize(isn, &StackVariableIsn_t);
+    change_type(isn, &StackVariableIsn_t);
     int relativeFrame = get_frame_distance(callingFrame, input);
 
     // Special case: if a term in a #joining branch is trying to reach a neighboring
@@ -635,7 +635,7 @@ void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
 void write_implicit_state_input_instruction(Term* caller, TaggedValue* isn)
 {
     set_null(isn);
-    change_type_no_initialize(isn, &ImplicitStateInputIsn_t);
+    change_type(isn, &ImplicitStateInputIsn_t);
 
     // Save the register index of the state input. Currently the state value
     // is read & written to the same register.

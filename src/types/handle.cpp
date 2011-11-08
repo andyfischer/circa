@@ -24,7 +24,7 @@ namespace handle_t {
 
     void set(TaggedValue* handle, Type* type, TaggedValue* userdata)
     {
-        change_type_no_initialize(handle, type);
+        change_type(handle, type);
         handle->value_data.ptr = allocate_list(1);
         swap(userdata, list_get_index(handle, 0));
 
@@ -104,7 +104,7 @@ namespace handle_t {
     }
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        change_type_no_initialize(dest, type);
+        change_type(dest, type);
         dest->value_data = source->value_data;
 
         ListData* data = (ListData*) source->value_data.ptr;

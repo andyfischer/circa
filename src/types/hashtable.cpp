@@ -349,7 +349,7 @@ namespace tagged_value_wrappers {
     }
     void copy(Type* type, TaggedValue* source, TaggedValue* dest)
     {
-        change_type_no_initialize(dest, type);
+        change_type(dest, type);
         dest->value_data.ptr = duplicate((Hashtable*) source->value_data.ptr);
     }
     std::string to_string(TaggedValue* value)

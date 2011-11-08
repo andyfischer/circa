@@ -38,7 +38,7 @@ namespace ref_t {
     }
     void copy(Type*, TaggedValue* source, TaggedValue* dest)
     {
-        change_type_no_initialize(dest, &REF_T);
+        change_type(dest, &REF_T);
         RobustRef* dupe = new RobustRef();
         *dupe = *(RobustRef*) source->value_data.ptr;
         dest->value_data.ptr = dupe;
@@ -106,7 +106,7 @@ void set_ref(TaggedValue* value, Term* t)
         std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
     #endif
 
-    change_type_no_initialize(value, &REF_T);
+    change_type(value, &REF_T);
 
     ref_t::RobustRef* robustRef = new ref_t::RobustRef();
     value->value_data.ptr = robustRef;
