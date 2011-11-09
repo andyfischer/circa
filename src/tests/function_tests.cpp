@@ -175,15 +175,12 @@ void test_num_explicit_inputs()
 
     Function* f = as_function(branch.compile("def f(int i)"));
     test_equals(function_num_inputs(f), 1);
-    test_equals(function_num_explicit_inputs(f), 1);
 
     function_insert_state_input(f);
     test_equals(function_num_inputs(f), 2);
-    test_equals(function_num_explicit_inputs(f), 1);
 
     Function* g = as_function(branch.compile("def g(state any s, int i)"));
     test_equals(function_num_inputs(g), 2);
-    test_equals(function_num_explicit_inputs(g), 1);
 }
 
 void register_tests()

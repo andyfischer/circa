@@ -311,24 +311,6 @@ int function_num_outputs(Function* func)
     return count;
 }
 
-int function_num_explicit_inputs(Function* func)
-{
-    Branch* contents = function_get_contents(func);
-
-    int count = 0;
-
-    for (int i=0; i < contents->length(); i++) {
-        if (contents->get(i) == NULL)
-            break;
-        if (contents->get(i)->function != INPUT_PLACEHOLDER_FUNC)
-            break;
-
-        if (!function_is_state_input(func, i))
-            count++;
-    }
-    return count;
-}
-
 bool function_is_state_input(Term* placeholder)
 {
     return placeholder->boolPropOptional("state", false);
@@ -357,28 +339,14 @@ bool function_has_state_input(Function* func)
 
 Term* function_insert_state_input(Function* func)
 {
-    Branch* branch = function_get_contents(func);
-    Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
-    branch->move(term, 0);
-    term->setBoolProp("state", true);
-    return term;
-}
-
-Term* function_find_state_input(Function* func)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = function_get_input_placeholder(func,i);
-        if (placeholder == NULL)
-            return NULL;
-        if (function_is_state_input(placeholder))
-            return placeholder;
-    }
+    return insert_state_input(function_contents(func));
 }
 
 bool function_is_multiple_input(Term* placeholder)
 {
     return placeholder->boolPropOptional("multiple", false);
 }
+
 bool function_is_multiple_input(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
@@ -480,8 +448,11 @@ const char* get_output_name(Term* term, int outputIndex)
     Term* outputPlaceholder = function_get_output_placeholder(attrs, outputIndex);
     int rebindsInput = outputPlaceholder->intPropOptional("rebindsInput", -1);
     
-    if (rebindsInput != -1 && rebindsInput < term->numInputs())
-        return term->input(rebindsInput)->name.c_str();
+    if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
+        Term* input = term->input(rebindsInput);
+        if (input != NULL)
+            return input->name.c_str();
+    }
 
 #if 0
     // First we need to figure out what the corresponding input index is for this

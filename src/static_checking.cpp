@@ -72,6 +72,7 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, "not_a_function");
 
     // Check inputs, this checking is done by writing an input instruction list.
+#if 0
     List inputErrors;
     free_list(write_input_instruction_list(term, NULL, &inputErrors));
     free_list(write_output_instruction_list(term, NULL, &inputErrors));
@@ -80,9 +81,10 @@ void check_term_for_static_error(List* errors, Term* term)
         std::string msg = "input errors: " + to_string(&inputErrors);
         return append_static_error(errors, term, msg.c_str());
     }
-#if 0
+#endif
+
     bool varArgs = func->variableArgs;
-    int expectedInputCount = function_num_explicit_inputs(func);
+    int expectedInputCount = function_num_inputs(func);
 
     // Check # of inputs
     if (!varArgs && (term->numInputs() != expectedInputCount))
@@ -90,7 +92,6 @@ void check_term_for_static_error(List* errors, Term* term)
 
     for (int input=0; input < term->numInputs(); input++)
         check_input_for_static_error(errors, term, input);
-#endif
 
     if (!is_function(term->function) && !is_an_unknown_identifier(term->function))
         return append_static_error(errors, term, "not_a_function");
@@ -173,7 +174,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     else if (strcmp(type, "unrecognized_expression") == 0)
         out << "Unrecognized expression: " << term->stringProp("message");
     else if (strcmp(type, "wrong_input_count") == 0) {
-        int funcNumInputs = function_num_explicit_inputs(as_function(term->function));
+        int funcNumInputs = function_num_inputs(as_function(term->function));
         int actualCount = term->numInputs();
         if (actualCount > funcNumInputs)
             out << "Too many inputs (" << actualCount << "), function "

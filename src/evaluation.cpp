@@ -147,8 +147,8 @@ void evaluate_single_term(EvalContext* context, Term* term)
     context->currentTerm = term;
 
     // Prepare input & output lists.
-    ListData* inputList = write_input_instruction_list(term, NULL, NULL);
-    ListData* outputList = write_output_instruction_list(term, NULL, NULL);
+    ListData* inputList = write_input_instruction_list(term, NULL);
+    ListData* outputList = write_output_instruction_list(term, NULL);
 
     #if CIRCA_THROW_ON_ERROR
     try {

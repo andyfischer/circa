@@ -1503,6 +1503,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
         branch->bindName(term, root.term->name);
 
     inputHints.apply(term);
+    check_to_insert_implicit_inputs(term);
     //set_input_syntax_hint(term, 0, "postWhitespace", "");
     term->setStringProp("syntax:functionName", functionName);
     term->setStringProp("syntax:declarationStyle", "method-call");
@@ -1536,7 +1537,7 @@ ParseResult function_call(Branch* branch, ParseResult head, TokenStream& tokens,
         result->setStringProp("syntax:functionName", head.identifierName);
 
     inputHints.apply(result);
-
+    check_to_insert_implicit_inputs(result);
     return ParseResult(result);
 }
 
@@ -2005,6 +2006,7 @@ ParseResult literal_list(Branch* branch, TokenStream& tokens, ParserCxt* context
 
     Term* term = apply(branch, LIST_FUNC, inputs);
     listHints.apply(term);
+    check_to_insert_implicit_inputs(term);
 
     term->setBoolProp("syntax:literal-list", true);
     set_source_location(term, startPosition, tokens);

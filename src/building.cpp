@@ -443,6 +443,30 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
+Term* find_open_state_result(Term* location)
+{
+    Branch* branch = location->owningBranch;
+    for (int i = location->index - 1; i >= 0; i--) {
+        Term* term = branch->get(i);
+        if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
+            return term;
+        i--;
+    }
+    return NULL;
+}
+
+void check_to_insert_implicit_inputs(Term* term)
+{
+    if (function_has_state_input(as_function(term->function))
+        && !term_is_state_input(term, 0)) {
+
+        Term* input = find_open_state_result(term);
+
+        insert_input(term, input);
+        set_bool(term->inputInfo(0)->properties.insert("state"), true);
+    }
+}
+
 void set_step(Term* term, float step)
 {
     term->setFloatProp("step", step);
@@ -496,12 +520,8 @@ void post_compile_term(Term* term)
     int numOutputs = get_output_count(term);
     for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
         const char* name = get_output_name(term, outputIndex);
-        if (strcmp(name, "") == 0)
-            continue;
         Term* outputCopy = apply(owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
-
         respecialize_type(outputCopy);
-        owningBranch->bindName(outputCopy, name);
     }
 }
 
@@ -632,6 +652,7 @@ void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
     }
 }
 
+#if 0
 void write_implicit_state_input_instruction(Term* caller, TaggedValue* isn)
 {
     set_null(isn);
@@ -639,30 +660,53 @@ void write_implicit_state_input_instruction(Term* caller, TaggedValue* isn)
 
     // Save the register index of the state input. Currently the state value
     // is read & written to the same register.
-
 }
+#endif
 
 bool term_is_state_input(Term* term, int index)
 {
+    if (index >= term->numInputs())
+        return false;
     TaggedValue* prop = term->inputInfo(index)->properties.get("state");
     if (prop == NULL)
         return false;
     return as_bool(prop);
 }
 
-void append_input_instruction_error(List* errors, TaggedValue* type)
+Term* find_state_input(Branch* branch)
 {
-    if (errors == NULL)
-        return;
-
-    copy(type, errors->append());
+    for (int i=0; i < branch->length(); i++) {
+        Term* placeholder = branch->get(i);
+        if (placeholder->function != INPUT_PLACEHOLDER_FUNC)
+            break;
+        if (function_is_state_input(placeholder))
+            return placeholder;
+    }
+    return NULL;
 }
 
-ListData* write_input_instruction_list(Term* caller, ListData* list, List* errors)
+ListData* write_input_instruction_list(Term* caller, ListData* list)
 {
     Function* func = as_function(caller->function);
     list = list_resize(list, 0);
 
+    int declaredIndex = 0;
+
+    for (int i=0; i < caller->numInputs(); i++) {
+
+        Term* placeholder = function_get_input_placeholder(func, declaredIndex);
+        ca_assert(placeholder != NULL);
+
+        write_input_instruction(caller, caller->input(i), list_append(&list));
+
+        // Advance to the next declaredIndex, unless we found a :multiple input.
+        if (!function_is_multiple_input(placeholder))
+            declaredIndex++;
+    }
+
+    return list;
+
+#if 0
     // Walk through each of the function's declared inputs, and write appropriate
     // instructions.
     int callerIndex = 0;
@@ -711,9 +755,10 @@ ListData* write_input_instruction_list(Term* caller, ListData* list, List* error
         append_input_instruction_error(errors, &TooManyInputsSymbol);
 
     return list;
+#endif
 }
 
-ListData* write_output_instruction_list(Term* caller, ListData* list, List* errors)
+ListData* write_output_instruction_list(Term* caller, ListData* list)
 {
     Function* func = as_function(caller->function);
     list = list_resize(list, 1);
@@ -734,7 +779,7 @@ ListData* write_output_instruction_list(Term* caller, ListData* list, List* erro
             receiver = caller->owningBranch->get(receiverIndex);
 
         if (receiver == NULL || receiver->function != EXTRA_OUTPUT_FUNC) {
-            append_input_instruction_error(errors, &ExtraOutputNotFoundSymbol);
+            internal_error("didn't find a necessary extra_output() term");
             break;
         }
 

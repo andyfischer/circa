@@ -37,10 +37,10 @@ void remove_from_any_user_lists(Term* term);
 // This checks every user of this term, and removes it from their input lists.
 void clear_from_dependencies_of_users(Term* term);
 
-// Term's function
+// Change a term's function
 void change_function(Term* term, Term* function);
 
-// Term's type
+// Change a term's declared type
 void unsafe_change_type(Term* term, Type* type);
 void change_declared_type(Term* term, Type* type);
 void respecialize_type(Term* term);
@@ -80,6 +80,14 @@ Term* procure_int(Branch* branch, std::string const& name);
 Term* procure_float(Branch* branch, std::string const& name);
 Term* procure_bool(Branch* branch, std::string const& name);
 
+// Check the term's inputs to see if it's missing an implicit input (such as the state
+// input). If one is missing, it will be inserted. This should be called after creating
+// a term and updating the input properties.
+void check_to_insert_implicit_inputs(Term* term);
+bool term_is_state_input(Term* term, int index);
+Term* find_state_input(Branch* branch);
+Term* insert_state_input(Branch* branch);
+
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
@@ -99,7 +107,7 @@ int get_frame_distance(Term* term, Term* input);
 
 // Input instructions:
 void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn);
-ListData* write_input_instruction_list(Term* caller, ListData* list, List* errors);
-ListData* write_output_instruction_list(Term* caller, ListData* list, List* errors);
+ListData* write_input_instruction_list(Term* caller, ListData* list);
+ListData* write_output_instruction_list(Term* caller, ListData* list);
 
 } // namespace circa

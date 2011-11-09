@@ -184,8 +184,11 @@ namespace overloaded_function {
         Branch* result = nested_contents(term);
         clear_branch(result);
         int placeholderCount = variableArgs ? 1 : argumentCount;
-        for (int i=0; i < placeholderCount; i++)
-            apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
+        for (int i=0; i < placeholderCount; i++) {
+            Term* term = apply(result, INPUT_PLACEHOLDER_FUNC, TermList());
+            if (variableArgs)
+                term->setBoolProp("multiple", true);
+        }
         Type* outputType = find_common_type(&outputTypes);
         Function* func = as_function(term);
         func->variableArgs = variableArgs;

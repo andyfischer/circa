@@ -41,16 +41,23 @@ bool is_function_stateful(Term* func)
 
 void on_stateful_function_call_created(Term* call)
 {
-    Term* enclosingSub = find_enclosing_subroutine(call);
+    Branch* branch = call->owningBranch;
 
-    if (enclosingSub == NULL)
+    // check if there is already a stateful input
+    Term* existing = find_state_input(branch);
+    if (existing != NULL)
         return;
 
-    if (is_function_stateful(enclosingSub))
-        return;
+    // None yet, insert one
+    insert_state_input(branch);
+}
 
-    // insert a stateful input
-    function_insert_state_input(as_function(enclosingSub));
+Term* insert_state_input(Branch* branch)
+{
+    Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
+    branch->move(term, 0);
+    term->setBoolProp("state", true);
+    return term;
 }
 
 bool has_any_inlined_state(Branch* branch)
