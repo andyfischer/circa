@@ -61,9 +61,6 @@ struct Term : TaggedValue
     // The index that this term currently holds inside owningBranch
     int index;
 
-    // Number of outputs. (deprecated)
-    int outputCount;
-
     // Code which is nested inside this term. This object is created on-demand.
     Branch* nestedContents;
 
@@ -94,8 +91,6 @@ struct Term : TaggedValue
     Term* dependency(int index) const;
     int numDependencies() const;
     void setDependency(int index, Term* term);
-
-    int numOutputs() const;
 
     // Shorthand for nested_contents()
     Branch* contents();

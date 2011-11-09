@@ -42,9 +42,4 @@ int get_locals_count(Branch* branch)
     return branch->length();
 }
 
-void update_output_count(Term* term)
-{
-    term->outputCount = get_output_count(term);
-}
-
 } // namespace circa

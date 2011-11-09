@@ -232,8 +232,6 @@ CA_FUNCTION(evaluate_for_loop)
     output->resize(nextOutputIndex);
 
     // Copy outer rebinds
-    ca_assert(caller->numOutputs() == outerRebinds->length() + 1);
-    
     for (int i=0; i < outerRebinds->length(); i++) {
 
         Term* rebindTerm = outerRebinds->get(i);

@@ -480,7 +480,7 @@ const char* get_output_name(Term* term, int outputIndex)
     Term* outputPlaceholder = function_get_output_placeholder(attrs, outputIndex);
     int rebindsInput = outputPlaceholder->intPropOptional("rebindsInput", -1);
     
-    if (rebindsInput != -1)
+    if (rebindsInput != -1 && rebindsInput < term->numInputs())
         return term->input(rebindsInput)->name.c_str();
 
 #if 0

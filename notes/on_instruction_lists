@@ -24,6 +24,7 @@ Reasons against:
  - There needs to be some piece of data that includes the original code as typed by the user.
    - Counter: We can preserve this data with sufficient annotations
  - Looking at the AST will be confusing with all those extra outputs
+   - Maybe there should be a separate list of inputs?
 
 Reasons for:
  - Introspection is a crucial ability, and our plan is to use the AST as a dataflow graph.
@@ -33,6 +34,9 @@ Reasons for:
    It's true that for an implicit input, we can always work backwards against the logic
    that was used to generate the input in the first place, and use that to figure out the
    source of the data. But, this doesn't seem right.
+
+   - Counter: If we want state to be introspectable, we could translate the code into
+     a format that has explicit state.
 
 Question: If I decide to change a term's inputs, how do I do that? What if I want to be
 ignorant of implicit inputs, will there be an API that I can use?

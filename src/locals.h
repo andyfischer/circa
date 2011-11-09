@@ -6,6 +6,5 @@ namespace circa {
     
 int get_output_count(Term* term);
 int get_locals_count(Branch* branch);
-void update_output_count(Term* term);
 
 } // namespace circa
