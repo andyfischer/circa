@@ -14,3 +14,6 @@ LIBS += -L../build -lcirca_d
 CONFIG += debug
 
 QT += opengl
+
+MOC_DIR = build
+OBJECTS_DIR = build

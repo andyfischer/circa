@@ -8,5 +8,3 @@ def Viewport.resize(w, Point size)
 namespace viewport
     def size() -> Point
     def mouse() -> Point
-
-
