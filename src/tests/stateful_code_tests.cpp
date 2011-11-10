@@ -68,7 +68,7 @@ CA_FUNCTION(simple_stateful_func)
     copy(INPUT(0), EXTRA_OUTPUT(0));
     Dict* state = Dict::lazyCast(EXTRA_OUTPUT(0));
 
-
+#if 0
     TaggedValue currentValue;
     get_state_field(INPUT(0), CALLER->uniqueName.name.c_str(), &currentValue);
 
@@ -76,6 +76,7 @@ CA_FUNCTION(simple_stateful_func)
 
     copy(INPUT(0), EXTRA_OUTPUT(0));
     save_state_field(EXTRA_OUTPUT(0), CALLER->uniqueName.name.c_str(), &currentValue);
+#endif
 }
 
 void test_simple_stateful_func()

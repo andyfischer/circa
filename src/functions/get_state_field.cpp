@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "circa.h"
-#include "types/dict.h"
+#include "dict.h"
 
 namespace circa {
 namespace get_state_field_function {

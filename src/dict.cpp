@@ -2,22 +2,27 @@
 
 #include <set>
 
+#include "common_headers.h"
+
 #include "dict.h"
+#include "kernel.h"
+#include "type.h"
 
 namespace circa {
-namespace dict_t {
-
-struct Slot {
-    char* key;
-    TaggedValue value;
-};
 
 struct DictData {
+    struct Slot {
+        char* key;
+        TaggedValue value;
+    };
+
     int capacity;
     int count;
     Slot slots[0];
     // slots has size [capacity].
 };
+
+namespace dict_t {
 
 // How many slots to create for a brand new dictionary.
 const int INITIAL_SIZE = 10;
@@ -44,10 +49,10 @@ int hash_string(const char* str)
 DictData* create_dict(int capacity)
 {
     ca_assert(capacity > 0);
-    DictData* result = (DictData*) malloc(sizeof(DictData) + capacity * sizeof(Slot));
+    DictData* result = (DictData*) malloc(sizeof(DictData) + capacity * sizeof(DictData::Slot));
     result->capacity = capacity;
     result->count = 0;
-    memset(result->slots, 0, capacity * sizeof(Slot));
+    memset(result->slots, 0, capacity * sizeof(DictData::Slot));
     for (int s=0; s < capacity; s++)
         initialize_null(&result->slots[s].value);
 
@@ -89,7 +94,7 @@ DictData* grow(DictData* data, int new_capacity)
 
     // Move all the keys & values over.
     for (int i=0; i < existingCapacity; i++) {
-        Slot* old_slot = &data->slots[i];
+        DictData::Slot* old_slot = &data->slots[i];
 
         if (old_slot->key == NULL)
             continue;
@@ -125,7 +130,7 @@ DictData* duplicate(DictData* original)
 
     // Copy all items
     for (int i=0; i < original->capacity; i++) {
-        Slot* slot = &original->slots[i];
+        DictData::Slot* slot = &original->slots[i];
 
         if (slot->key == NULL)
             continue;
@@ -177,7 +182,7 @@ int insert(DictData** dataPtr, const char* key)
         }
     }
 
-    Slot* slot = &data->slots[index];
+    DictData::Slot* slot = &data->slots[index];
     slot->key = strdup(key);
     data->count++;
 
@@ -246,7 +251,7 @@ void remove_at(DictData* data, int index)
         int prevIndex = index;
         index = (index+1) % data->capacity;
 
-        Slot* slot = &data->slots[index];
+        DictData::Slot* slot = &data->slots[index];
 
         if (slot->key == NULL)
             break;
@@ -254,7 +259,7 @@ void remove_at(DictData* data, int index)
         // If a slot isn't in its ideal index, then we assume that it would rather be in
         // this slot.
         if (find_ideal_slot_index(data, slot->key) != index) {
-            Slot* prevSlot = &data->slots[prevIndex];
+            DictData::Slot* prevSlot = &data->slots[prevIndex];
             prevSlot->key = slot->key;
             slot->key = NULL;
             swap(&slot->value, &prevSlot->value);
@@ -281,7 +286,7 @@ int count(DictData* data)
 void clear(DictData* data)
 {
     for (int i=0; i < data->capacity; i++) {
-        Slot* slot = &data->slots[i];
+        DictData::Slot* slot = &data->slots[i];
         if (slot->key == NULL)
             continue;
         free(slot->key);
@@ -319,7 +324,7 @@ void visit_sorted(DictData* data, DictVisitor visitor, void* context)
     std::set<SortedVisitItem, SortedVisitItemCompare> set;
 
     for (int i=0; i < data->capacity; i++) {
-        Slot* slot = &data->slots[i];
+        DictData::Slot* slot = &data->slots[i];
         if (slot->key == NULL)
             continue;
 
@@ -331,35 +336,12 @@ void visit_sorted(DictData* data, DictVisitor visitor, void* context)
         visitor(context, it->key, it->value);
 }
 
-std::string to_string(DictData* data)
-{
-    struct Visitor {
-        std::stringstream strm;
-        bool first;
-        Visitor() : first(true) {}
-        static void visit(void* context, const char* key, TaggedValue* value)
-        {
-            Visitor& obj = *((Visitor*) context);
-            if (!obj.first)
-                obj.strm << ", ";
-            obj.first = false;
-            obj.strm << key << ": " << to_string(value);
-        }
-    };
-
-    Visitor visitor;
-    visitor.strm << "{";
-    visit_sorted(data, Visitor::visit, &visitor);
-    visitor.strm << "}";
-    return visitor.strm.str();
-}
-
 void debug_print(DictData* data)
 {
     printf("dict: %p\n", data);
     printf("count: %d, capacity: %d\n", data->count, data->capacity);
     for (int i=0; i < data->capacity; i++) {
-        Slot* slot = &data->slots[i];
+        DictData::Slot* slot = &data->slots[i];
         const char* key = "<null>";
         if (slot->key != NULL) key = slot->key;
         printf("[%d] %s = %s\n", i, key, to_string(&data->slots[i].value).c_str());
@@ -424,7 +406,7 @@ namespace tagged_value_wrappers {
     }
     std::string to_string(TaggedValue* value)
     {
-        return to_string((DictData*) value->value_data.ptr);
+        return dict_to_string((DictData*) value->value_data.ptr);
     }
     TaggedValue* get_field(TaggedValue* value, const char* field)
     {
@@ -492,12 +474,12 @@ Dict::cast(TaggedValue* v)
 
 std::string Dict::toString()
 {
-    return dict_t::to_string((dict_t::DictData*) this->value_data.ptr);
+    return dict_to_string((DictData*) this->value_data.ptr);
 }
 
 TaggedValue* Dict::get(const char* key)
 {
-    return dict_t::get_value((dict_t::DictData*) this->value_data.ptr, key);
+    return dict_t::get_value((DictData*) this->value_data.ptr, key);
 }
 TaggedValue* Dict::operator[](const char* key)
 {
@@ -509,51 +491,51 @@ bool Dict::contains(const char* key)
 }
 TaggedValue* Dict::insert(const char* key)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     int newIndex = dict_t::insert(&data, key);
     this->value_data.ptr = data;
     return &data->slots[newIndex].value;
 }
 void Dict::remove(const char* key)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::remove(data, key);
 }
 void Dict::set(const char* key, TaggedValue* value)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::insert_value(&data, key, value);
     this->value_data.ptr = data;
 }
 void Dict::clear()
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::clear(data);
 }
 bool Dict::empty()
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     return dict_t::count(data) == 0;
 }
 
 void Dict::iteratorStart(TaggedValue* iterator)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_start(data, iterator);
 }
 void Dict::iteratorNext(TaggedValue* iterator)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_next(data, iterator);
 }
 void Dict::iteratorGet(TaggedValue* iterator, const char** key, TaggedValue** value)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_get(data, iterator, key, value);
 }
 void Dict::iteratorDelete(TaggedValue* iterator)
 {
-    dict_t::DictData* data = (dict_t::DictData*) this->value_data.ptr;
+    DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_delete(data, iterator);
 }
 bool Dict::iteratorFinished(TaggedValue* iterator)
@@ -598,10 +580,57 @@ Dict* as_dict(TaggedValue* value)
     ca_assert(is_dict(value));
     return (Dict*) value;
 }
+
+TaggedValue* dict_get(DictData* data, const char* key)
+{
+    return dict_t::get_value(data, key);
+}
+
+TaggedValue* dict_insert(DictData** dataPtr, const char* key)
+{
+    int index = dict_t::insert(dataPtr, key);
+    return &(*dataPtr)->slots[index].value;
+}
+
+std::string dict_to_string(DictData* data)
+{
+    struct Visitor {
+        std::stringstream strm;
+        bool first;
+        Visitor() : first(true) {}
+        static void visit(void* context, const char* key, TaggedValue* value)
+        {
+            Visitor& obj = *((Visitor*) context);
+            if (!obj.first)
+                obj.strm << ", ";
+            obj.first = false;
+            obj.strm << key << ": " << to_string(value);
+        }
+    };
+
+    Visitor visitor;
+    visitor.strm << "{";
+    dict_t::visit_sorted(data, Visitor::visit, &visitor);
+    visitor.strm << "}";
+    return visitor.strm.str();
+}
+
 Dict* make_dict(TaggedValue* value)
 {
     create(&DICT_T, value);
     return (Dict*) value;
+}
+
+TaggedValue* dict_get(TaggedValue* dict, const char* field)
+{
+    ca_assert(is_dict(dict));
+    return dict_get((DictData*) dict->value_data.ptr, field);
+}
+
+TaggedValue* dict_insert(TaggedValue* dict, const char* field)
+{
+    ca_assert(is_dict(dict));
+    return dict_insert((DictData**) &dict->value_data.ptr, field);
 }
 
 } // namespace circa

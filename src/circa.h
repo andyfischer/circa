@@ -10,6 +10,7 @@
 #include "codegen.h"
 #include "command_line.h"
 #include "debug.h"
+#include "dict.h"
 #include "documentation.h"
 #include "evaluation.h"
 #include "feedback.h"
@@ -39,7 +40,6 @@
 #include "type.h"
 #include "type_inference.h"
 
-#include "types/dict.h"
 #include "types/handle.h"
 #include "types/list.h"
 #include "types/point.h"

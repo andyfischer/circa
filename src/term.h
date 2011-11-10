@@ -5,11 +5,11 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "dict.h"
 #include "term_list.h"
 #include "tagged_value.h"
 #include "term_source_location.h"
 #include "weak_ptrs.h"
-#include "types/dict.h"
 
 namespace circa {
 

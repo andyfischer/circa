@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "building.h"
+#include "dict.h"
 #include "evaluation.h"
 #include "filesystem.h"
 #include "function.h"
@@ -21,7 +22,6 @@
 #include "types/callable.h"
 #include "types/color.h"
 #include "types/common.h"
-#include "types/dict.h"
 #include "types/eval_context.h"
 #include "types/float.h"
 #include "types/handle.h"

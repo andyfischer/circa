@@ -6,9 +6,9 @@
 
 namespace circa {
 
-namespace dict_t {
+struct DictData;
 
-    struct DictData;
+namespace dict_t {
 
     typedef void (*DictVisitor)(void* context, const char* key, TaggedValue* value);
 
@@ -27,7 +27,6 @@ namespace dict_t {
     int count(DictData* data);
     void clear(DictData* data);
     void visit_sorted(DictData* data, DictVisitor visitor, void* context);
-    std::string to_string(DictData* data);
     void debug_print(DictData* data);
 
     void iterator_start(DictData* data, TaggedValue* iterator);
@@ -73,8 +72,17 @@ struct Dict : TaggedValue
     static Dict* cast(TaggedValue* value);
 };
 
+// DictData functions
+TaggedValue* dict_get(DictData* data, const char* key);
+TaggedValue* dict_insert(DictData** dataPtr, const char* key);
+std::string dict_to_string(DictData* data);
+
+// TaggedValue functions
 Dict* make_dict(TaggedValue* value);
 bool is_dict(TaggedValue* value);
 Dict* as_dict(TaggedValue* value);
+
+TaggedValue* dict_get(TaggedValue* dict, const char* field);
+TaggedValue* dict_insert(TaggedValue* dict, const char* field);
 
 } // namespace circa

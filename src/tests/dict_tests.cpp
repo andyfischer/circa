@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "dict.h"
 #include "testing.h"
-#include "types/dict.h"
 
 namespace circa {
 namespace dict_tests {
@@ -13,13 +13,13 @@ void test_simple()
     TaggedValue ten;
     set_int(&ten, 10);
 
-    dict_t::DictData* data = dict_t::create_dict();
+    DictData* data = dict_t::create_dict();
     dict_t::insert_value(&data, "a", &five);
     dict_t::insert_value(&data, "b", &ten);
 
     test_assert(dict_t::get_value(data, "a")->asInt() == 5);
     test_assert(dict_t::get_value(data, "b")->asInt() == 10);
-    test_equals(dict_t::to_string(data), "{a: 5, b: 10}");
+    test_equals(dict_to_string(data), "{a: 5, b: 10}");
     dict_t::free_dict(data);
 }
 
@@ -38,7 +38,7 @@ void test_insert()
 
 void dont_insert_same_key_multiple_times()
 {
-    dict_t::DictData* data = dict_t::create_dict();
+    DictData* data = dict_t::create_dict();
 
     TaggedValue val;
     set_int(&val, 5);
@@ -56,7 +56,7 @@ void dont_insert_same_key_multiple_times()
 
 void handle_missing_keys()
 {
-    dict_t::DictData* data = dict_t::create_dict();
+    DictData* data = dict_t::create_dict();
 
     test_assert(dict_t::find_key(data, "a") == -1);
     test_assert(dict_t::get_value(data, "xyz") == NULL);
@@ -72,7 +72,7 @@ void hash_collision()
     // This test doesn't assume knowledge of the hashing function, instead we'll
     // try a bunch of strings and see where they end up.
 
-    dict_t::DictData* dict = dict_t::create_dict();
+    DictData* dict = dict_t::create_dict();
 
     std::map<int, std::vector<std::string> > bucketToStr;
 
@@ -187,7 +187,7 @@ void many_items()
 {
     const int count = 100;
 
-    dict_t::DictData* data = dict_t::create_dict();
+    DictData* data = dict_t::create_dict();
 
     // Insert lots of items
     for (int i=0; i < count; i++) {
@@ -236,22 +236,22 @@ void test_duplicate()
     TaggedValue t = TaggedValue::fromBool(true);
     TaggedValue hello = TaggedValue::fromString("hello");
 
-    dict_t::DictData* data = dict_t::create_dict();
+    DictData* data = dict_t::create_dict();
     dict_t::insert_value(&data, "a", &eleven);
     dict_t::insert_value(&data, "b", &one_and_change);
     dict_t::insert_value(&data, "c", &t);
 
-    test_equals(dict_t::to_string(data), "{a: 11, b: 1.2, c: true}");
+    test_equals(dict_to_string(data), "{a: 11, b: 1.2, c: true}");
 
-    dict_t::DictData* dupe = dict_t::duplicate(data);
+    DictData* dupe = dict_t::duplicate(data);
 
-    test_equals(dict_t::to_string(dupe), "{a: 11, b: 1.2, c: true}");
+    test_equals(dict_to_string(dupe), "{a: 11, b: 1.2, c: true}");
 
     // Modify original, make sure that dupe is unaffected
     dict_t::remove(data, "b");
     dict_t::insert_value(&data, "d", &hello);
-    test_equals(dict_t::to_string(data), "{a: 11, c: true, d: 'hello'}");
-    test_equals(dict_t::to_string(dupe), "{a: 11, b: 1.2, c: true}");
+    test_equals(dict_to_string(data), "{a: 11, c: true, d: 'hello'}");
+    test_equals(dict_to_string(dupe), "{a: 11, b: 1.2, c: true}");
 
     dict_t::free_dict(data);
     dict_t::free_dict(dupe);

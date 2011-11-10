@@ -4,12 +4,13 @@
 
 #include "building.h"
 #include "build_options.h"
-#include "kernel.h"
 #include "branch.h"
 #include "code_iterators.h"
+#include "dict.h"
 #include "evaluation.h"
 #include "function.h"
 #include "introspection.h"
+#include "kernel.h"
 #include "list_shared.h"
 #include "locals.h"
 #include "parser.h"
@@ -17,7 +18,6 @@
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
-#include "types/dict.h"
 
 namespace circa {
 
