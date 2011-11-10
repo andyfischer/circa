@@ -527,25 +527,12 @@ void post_compile_term(Term* term)
 
 void finish_minor_branch(Branch* branch)
 {
-    if (branch->length() > 0
-            && branch->get(branch->length()-1)->function == FINISH_MINOR_BRANCH_FUNC)
-        return;
-
-    // Check if there are any state vars in this branch
-    bool anyStateVars = false;
-
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        if (term->function == GET_STATE_FIELD_FUNC) {
-            anyStateVars = true;
-            break;
-        }
+    // Create an output_placeholder for state, if necessary
+    Term* openState = find_open_state_result(branch->getFromEnd(0));
+    if (openState != NULL) {
+        Term* term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(openState));
+        term->setBoolProp("state", true);
     }
-
-    if (!anyStateVars)
-        return;
-
-    post_compile_term(apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList()));
 }
 
 void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm)
@@ -652,17 +639,6 @@ void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
     }
 }
 
-#if 0
-void write_implicit_state_input_instruction(Term* caller, TaggedValue* isn)
-{
-    set_null(isn);
-    change_type(isn, &ImplicitStateInputIsn_t);
-
-    // Save the register index of the state input. Currently the state value
-    // is read & written to the same register.
-}
-#endif
-
 bool term_is_state_input(Term* term, int index)
 {
     if (index >= term->numInputs())
@@ -678,6 +654,18 @@ Term* find_state_input(Branch* branch)
     for (int i=0; i < branch->length(); i++) {
         Term* placeholder = branch->get(i);
         if (placeholder->function != INPUT_PLACEHOLDER_FUNC)
+            break;
+        if (function_is_state_input(placeholder))
+            return placeholder;
+    }
+    return NULL;
+}
+
+Term* find_state_output(Branch* branch)
+{
+    for (int i=branch->length() - 1; i >= 0; i--) {
+        Term* placeholder = branch->get(i);
+        if (placeholder->function != OUTPUT_PLACEHOLDER_FUNC)
             break;
         if (function_is_state_input(placeholder))
             return placeholder;

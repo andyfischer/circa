@@ -37,10 +37,10 @@ CA_FUNCTION(simple_func_with_state_arg)
 void test_simple_func_with_state_arg()
 {
     Branch branch;
-    import_function(&branch, simple_func_with_state_arg, "simple(state int i)");
+    import_function(&branch, simple_func_with_state_arg, "f(state int i)");
 
     // Test some static checks
-    Function* func = as_function(branch["simple"]);
+    Function* func = as_function(branch["f"]);
 
     Term* stateOutput = function_get_output_placeholder(func, 1);
     test_assert(function_is_state_input(stateOutput));
@@ -55,13 +55,34 @@ void test_simple_func_with_state_arg()
     free_list(inputs);
     free_list(outputs);
 
-    // Now test with a normal call
+    // Test with a normal call, explicit argument.
     branch.compile("a = 3");
-    branch.compile("simple(state = a)");
+    branch.compile("f(state = a)");
     EvalContext context;
     evaluate_save_locals(&context, &branch);
-
     test_equals(branch["a"], "4");
+}
+
+CA_FUNCTION(simple_stateful_func)
+{
+    copy(INPUT(0), EXTRA_OUTPUT(0));
+    Dict* state = Dict::lazyCast(EXTRA_OUTPUT(0));
+
+
+    TaggedValue currentValue;
+    get_state_field(INPUT(0), CALLER->uniqueName.name.c_str(), &currentValue);
+
+    set_int(currentValue, as_int(currentValue) + 1);
+
+    copy(INPUT(0), EXTRA_OUTPUT(0));
+    save_state_field(EXTRA_OUTPUT(0), CALLER->uniqueName.name.c_str(), &currentValue);
+}
+
+void test_simple_stateful_func()
+{
+    Branch branch;
+    import_function(&branch, simple_stateful_func, "f(state int i)");
+
 }
 
 void test_get_type_from_branches_stateful_terms()

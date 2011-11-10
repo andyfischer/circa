@@ -86,6 +86,7 @@ Term* procure_bool(Branch* branch, std::string const& name);
 void check_to_insert_implicit_inputs(Term* term);
 bool term_is_state_input(Term* term, int index);
 Term* find_state_input(Branch* branch);
+Term* find_state_output(Branch* branch);
 Term* insert_state_input(Branch* branch);
 
 void set_step(Term* term, float step);

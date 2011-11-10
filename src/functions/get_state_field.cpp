@@ -11,17 +11,9 @@ namespace get_state_field_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(get_state_field,
-        "get_state_field(any container :optional, any default_value :optional) -> any")
+        "get_state_field(any container, any default_value :optional) -> any")
     {
-        Dict* stateContainer = NULL;
-
-        // Check if a container was passed as input0
-        if (INPUT_TERM(0) != NULL)
-            stateContainer = Dict::checkCast(INPUT(0));
-
-        if (stateContainer == NULL)
-            stateContainer = Dict::lazyCast(&CONTEXT->currentScopeState);
-
+        Dict* stateContainer = Dict::checkCast(INPUT(0));
         ca_assert(stateContainer != NULL);
 
         const char* name = CALLER->name.c_str();
@@ -30,6 +22,9 @@ namespace get_state_field_function {
         // Try to cast 'value' to the declared type.
         if (value != NULL) {
             bool cast_success = cast(value, declared_type(CALLER), OUTPUT);
+
+            // If this cast succeeded then we're done. If it failed then continue on
+            // to use a default value.
             if (cast_success)
                 return;
         }
@@ -47,15 +42,13 @@ namespace get_state_field_function {
                 msg << "Couldn't cast default value to type " <<
                     declared_type(CALLER)->name;
                 ERROR_OCCURRED(msg.str().c_str());
-                return;
             }
+        } else {
 
-            return;
+            // Otherwise, reset to the type's default value
+            create(declared_type(CALLER), OUTPUT);
+            reset(OUTPUT);
         }
-
-        // Otherwise, reset to default value of type
-        create(declared_type(CALLER), OUTPUT);
-        reset(OUTPUT);
     }
 
     void formatSource(StyledSource* source, Term* term)

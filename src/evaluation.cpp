@@ -250,14 +250,31 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
     }
 }
 
-void evaluate_branch(EvalContext* context, Branch* branch)
+void insert_top_level_state(EvalContext* context, Branch* branch)
 {
-    evaluate_branch_no_preserve_locals(context, branch);
+    Term* input = find_state_input(branch);
+    if (input == NULL)
+        return;
+
+    copy(&context->state, top_frame(context)->registers[input->index]);
 }
 
-void evaluate_save_locals(EvalContext* context, Branch* branch)
+void save_top_level_state(EvalContext* context, Branch* branch)
 {
+    Term* output = find_state_output(branch);
+    if (output == NULL)
+        return;
+
+    move(top_frame(context)->registers[output->index], &context->state);
+}
+
+void evaluate_branch(EvalContext* context, Branch* branch)
+{
+    // Top-level call
     push_frame(context, branch);
+
+    // Check to insert top-level state
+    insert_top_level_state(context, branch);
 
     for (int i=0; i < branch->length(); i++) {
         evaluate_single_term(context, branch->get(i));
@@ -265,6 +282,29 @@ void evaluate_save_locals(EvalContext* context, Branch* branch)
           if (evaluation_interrupted(context))
               break;
     }
+
+    save_top_level_state(context, branch);
+
+    if (!context->errorOccurred)
+        pop_frame(context);
+}
+
+void evaluate_save_locals(EvalContext* context, Branch* branch)
+{
+    // Top-level call
+    push_frame(context, branch);
+
+    // Check to insert top-level state
+    insert_top_level_state(context, branch);
+
+    for (int i=0; i < branch->length(); i++) {
+        evaluate_single_term(context, branch->get(i));
+
+          if (evaluation_interrupted(context))
+              break;
+    }
+
+    save_top_level_state(context, branch);
 
     copy_locals_back_to_terms(top_frame(context), branch);
 
@@ -390,7 +430,6 @@ Dict* get_current_scope_state(EvalContext* cxt)
     return Dict::lazyCast(&cxt->currentScopeState);
 }
 
-// Old style state manipulation:
 void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output)
 {
     Dict* containerDict = Dict::lazyCast(container);
@@ -401,7 +440,7 @@ void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* res
 {
     Dict* containerDict = Dict::lazyCast(container);
     const char* name = term->uniqueName.name.c_str();
-    swap(result, containerDict->insert(name));
+    move(result, containerDict->insert(name));
     set_null(result);
 }
 

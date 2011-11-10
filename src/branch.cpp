@@ -578,6 +578,8 @@ void load_script(Branch* branch, const char* filename)
     }
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
+
+    finish_minor_branch(branch);
 }
 
 void evaluate_script(Branch* branch, const char* filename)
