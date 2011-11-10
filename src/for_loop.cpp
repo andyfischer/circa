@@ -4,6 +4,7 @@
 #include "building.h"
 #include "kernel.h"
 #include "evaluation.h"
+#include "function.h"
 #include "importing_macros.h"
 #include "introspection.h"
 #include "locals.h"
@@ -20,27 +21,31 @@
 namespace circa {
 
 /* Organization of for loop contents:
-   [0] #attributes
-     [0] #modify_list
-   [1] iterator
-   [2..] join terms for inner rebinds
+   [0..] input placeholders (iterator and possibly state)
+   [n..] join terms for inner rebinds
    [...] contents
-   [n-1] #outer_rebinds
+   [m-1] #outer_rebinds
 */
 
-static const int iterator_location = 1;
-static const int inner_rebinds_location = 2;
 
 Term* get_for_loop_iterator(Term* forTerm)
 {
-    return forTerm->contents(iterator_location);
+    Branch* contents = nested_contents(forTerm);
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function != INPUT_PLACEHOLDER_FUNC)
+            return NULL;
+        if (function_is_state_input(term))
+            continue;
+
+        return term;
+    }
+    return NULL;
 }
 
-Term* get_for_loop_modify_list(Term* forTerm)
+bool for_loop_modifies_list(Term* forTerm)
 {
-    Term* term = forTerm->contents(0)->contents(0);
-    ca_assert(term != NULL);
-    return term;
+    return forTerm->boolPropOptional("modifyList", false);
 }
 
 Branch* get_for_loop_outer_rebinds(Term* forTerm)
@@ -51,9 +56,7 @@ Branch* get_for_loop_outer_rebinds(Term* forTerm)
 
 void setup_for_loop_pre_code(Term* forTerm)
 {
-    Branch* forContents = nested_contents(forTerm);
-    Branch* attributes = create_branch(forContents, "#attributes");
-    create_bool(attributes, false, "#modify_list");
+    // this once did something
 }
 
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
@@ -69,7 +72,8 @@ void setup_for_loop_post_code(Term* forTerm)
 {
     Branch* forContents = nested_contents(forTerm);
     std::string listName = forTerm->input(0)->name;
-    std::string iteratorName = get_for_loop_iterator(forTerm)->name;
+    Term* iterator = get_for_loop_iterator(forTerm);
+    std::string iteratorName = iterator->name;
 
     finish_minor_branch(forContents);
 
@@ -97,7 +101,7 @@ void setup_for_loop_post_code(Term* forTerm)
         // First input to both of these should be 'original', but we need to wait until
         // after remap_pointers before setting this.
         Term* innerRebind = apply(forContents, JOIN_FUNC, TermList(NULL, loopResult), name);
-        forContents->move(innerRebind, 2 + i);
+        forContents->move(innerRebind, iterator->index + 1 + i);
 
         change_declared_type(innerRebind, original->type);
         Term* outerRebind = apply(outerRebinds, JOIN_FUNC, TermList(NULL, loopResult), name);
@@ -136,7 +140,7 @@ void for_loop_update_output_index(Term* forTerm)
 
     // If this is a list-rewrite, then the output is the last term that has the iterator's
     // name binding. Otherwise the output is the last expression.
-    if (as_bool(get_for_loop_modify_list(forTerm))) {
+    if (for_loop_modifies_list(forTerm)) {
         Term* output = contents->get(get_for_loop_iterator(forTerm)->name);
         ca_assert(output != NULL);
         contents->outputIndex = output->index;
@@ -195,7 +199,7 @@ CA_FUNCTION(evaluate_for_loop)
         copy(inputList->getIndex(iteration), frame->registers[iterator->index]);
 
         // copy inner rebinds
-        int contentIndex = inner_rebinds_location;
+        int contentIndex = iterator->index + 1;
         for (;; contentIndex++) {
             Term* rebindTerm = forContents->get(contentIndex);
             if (rebindTerm->function != JOIN_FUNC)

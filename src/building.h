@@ -80,6 +80,9 @@ Term* procure_int(Branch* branch, std::string const& name);
 Term* procure_float(Branch* branch, std::string const& name);
 Term* procure_bool(Branch* branch, std::string const& name);
 
+Term* find_open_state_result(Branch* branch, int position);
+Term* find_or_create_open_state_result(Branch* branch, int position);
+
 // Check the term's inputs to see if it's missing an implicit input (such as the state
 // input). If one is missing, it will be inserted. This should be called after creating
 // a term and updating the input properties.

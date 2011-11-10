@@ -326,8 +326,8 @@ Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const&
 Term* create_stateful_value(Branch* branch, Type* type, Term* defaultValue,
         std::string const& name)
 {
-    Term* result = apply(branch, GET_STATE_FIELD_FUNC,
-            TermList(NULL, defaultValue), name);
+    Term* input = find_or_create_open_state_result(branch, branch->length());
+    Term* result = apply(branch, GET_STATE_FIELD_FUNC, TermList(input, defaultValue), name);
     change_declared_type(result, type);
     return result;
 }
@@ -443,11 +443,12 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
-Term* find_open_state_result(Term* location)
+Term* find_open_state_result(Branch* branch, int position)
 {
-    Branch* branch = location->owningBranch;
-    for (int i = location->index - 1; i >= 0; i--) {
+    for (int i = position - 1; i >= 0; i--) {
         Term* term = branch->get(i);
+        if (term == NULL)
+            continue;
         if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
             return term;
         i--;
@@ -455,12 +456,21 @@ Term* find_open_state_result(Term* location)
     return NULL;
 }
 
+Term* find_or_create_open_state_result(Branch* branch, int position)
+{
+    Term* term = find_open_state_result(branch, position);
+    if (term == NULL)
+        return insert_state_input(branch);
+    else
+        return term;
+}
+
 void check_to_insert_implicit_inputs(Term* term)
 {
     if (function_has_state_input(as_function(term->function))
         && !term_is_state_input(term, 0)) {
 
-        Term* input = find_open_state_result(term);
+        Term* input = find_open_state_result(term->owningBranch, term->index);
 
         insert_input(term, input);
         set_bool(term->inputInfo(0)->properties.insert("state"), true);
@@ -528,7 +538,7 @@ void post_compile_term(Term* term)
 void finish_minor_branch(Branch* branch)
 {
     // Create an output_placeholder for state, if necessary
-    Term* openState = find_open_state_result(branch->getFromEnd(0));
+    Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL) {
         Term* term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(openState));
         term->setBoolProp("state", true);

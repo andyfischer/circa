@@ -16,7 +16,7 @@ struct ForLoopContext
 };
 
 Term* get_for_loop_iterator(Term* forTerm);
-Term* get_for_loop_modify_list(Term* forTerm);
+bool for_loop_modifies_list(Term* forTerm);
 void setup_for_loop_pre_code(Term* forTerm);
 Term* setup_for_loop_iterator(Term* forTerm, const char* name);
 void setup_for_loop_post_code(Term* forTerm);

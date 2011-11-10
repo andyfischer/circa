@@ -13,11 +13,15 @@ namespace get_state_field_function {
     CA_DEFINE_FUNCTION(get_state_field,
         "get_state_field(any container, any default_value :optional) -> any")
     {
-        Dict* stateContainer = Dict::checkCast(INPUT(0));
-        ca_assert(stateContainer != NULL);
+        //TaggedValue* container = EXTRA_OUTPUT(0);
+        //copy(INPUT(0), container);
+
+        //Dict* containerDict = Dict::lazyCast(container);
 
         const char* name = CALLER->name.c_str();
-        TaggedValue* value = stateContainer->get(name);
+        //TaggedValue* value = containerDict->get(name);
+
+        TaggedValue* value = NULL; // FIXME
 
         // Try to cast 'value' to the declared type.
         if (value != NULL) {

@@ -936,7 +936,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     setup_for_loop_pre_code(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
 
-    set_bool(get_for_loop_modify_list(forTerm), rebindListName);
+    forTerm->setBoolProp("modifyList", rebindListName);
 
     if (rebindListName)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
