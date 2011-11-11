@@ -70,7 +70,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
     }
 
     EvalContext result;
-    evaluate_branch(&result, code);
+    evaluate_save_locals(&result, code);
 
     if (result.errorOccurred) {
         std::cout << "Runtime error in: " << get_current_test_name() << std::endl;
@@ -109,7 +109,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         if (!is_statement(assertions->get(i)))
             continue;
 
-        TaggedValue* result = get_local(assertions->get(i));
+        TaggedValue* result = assertions->get(i);
 
         if (!is_bool(result))
             continue;

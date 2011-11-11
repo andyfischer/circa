@@ -216,7 +216,8 @@ void Branch::move(Term* term, int index)
 
     for (int i=term->index; i != index; i += dir) {
         _terms.setAt(i, _terms[i+dir]);
-        _terms[i]->index = i;
+        if (_terms[i] != NULL)
+            _terms[i]->index = i;
     }
     _terms.setAt(index, term);
     term->index = index;

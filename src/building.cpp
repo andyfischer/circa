@@ -451,6 +451,8 @@ Term* find_open_state_result(Branch* branch, int position)
             continue;
         if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
             return term;
+        if (term->function == EXTRA_OUTPUT_FUNC && function_is_state_input(term))
+            return term;
         i--;
     }
     return NULL;
@@ -473,7 +475,7 @@ void check_to_insert_implicit_inputs(Term* term)
     if (function_has_state_input(as_function(term->function))
         && !term_is_state_input(term, 0)) {
 
-        Term* input = find_open_state_result(term->owningBranch, term->index);
+        Term* input = find_or_create_open_state_result(term->owningBranch, term->index);
 
         insert_input(term, input);
         set_bool(term->inputInfo(0)->properties.insert("state"), true);
@@ -536,6 +538,7 @@ void post_compile_term(Term* term)
         const char* name = get_output_name(term, outputIndex);
         Term* outputCopy = apply(owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
         respecialize_type(outputCopy);
+
     }
 }
 

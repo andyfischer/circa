@@ -79,6 +79,11 @@ std::string global_id(Term* term)
     return out.str();
 }
 
+const char* unique_name(Term* term)
+{
+    return term->uniqueName.name.c_str();
+}
+
 std::string get_short_local_name(Term* term)
 {
     if (term == NULL)
