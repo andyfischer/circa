@@ -368,6 +368,11 @@ List::append(TaggedValue* val)
     copy(val, append());
 }
 
+TaggedValue* List::insert(int index)
+{
+    return list_insert((ListData**) &this->value_data.ptr, index);
+}
+
 TaggedValue*
 List::prepend()
 {

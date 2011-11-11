@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "function.h"
 #include "if_block.h"
+#include "source_repro.h"
 #include "subroutine.h"
 #include "stateful_code.h"
 #include "term.h"
@@ -57,6 +58,7 @@ Term* insert_state_input(Branch* branch)
     Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
     branch->move(term, 0);
     term->setBoolProp("state", true);
+    term->setBoolProp("hiddenInput", true);
     return term;
 }
 

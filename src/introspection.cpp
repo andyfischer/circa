@@ -268,6 +268,11 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     for (int i=0; i < term->numInputs(); i++) {
         if (i != 0) out << " ";
         out << global_id(term->input(i));
+
+        if (prefs->showProperties) {
+            out << " ";
+            out << term->inputInfo(i)->properties.toString();
+        }
     }
     out << ")";
 

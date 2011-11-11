@@ -205,13 +205,13 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, ")", term, token::RPAREN);
 }
 
-
 void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
 {
     const char* defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
     const char* defaultPre = inputIndex > 0 ? " " : "";
     format_source_for_input(source, term, inputIndex, defaultPre, defaultPost);
 }
+
 void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
         const char* defaultPre, const char* defaultPost)
 {
@@ -223,22 +223,12 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
     bool methodCall =
         term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
 
-    int firstVisible = get_first_visible_input_index(term);
-
-    if (inputIndex < firstVisible)
-        return;
-
-    int visibleIndex = inputIndex - firstVisible;
-    if (methodCall)
-        visibleIndex--;
-
     if (methodCall && inputIndex == 0)
         defaultPost = "";
 
-    if (visibleIndex >= 0)
-        append_phrase(source,
-            get_input_syntax_hint_optional(term, visibleIndex, "preWhitespace", defaultPre), 
-            term, phrase_type::WHITESPACE);
+    append_phrase(source,
+        get_input_syntax_hint_optional(term, inputIndex, "preWhitespace", defaultPre), 
+        term, phrase_type::WHITESPACE);
 
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
@@ -257,10 +247,9 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
         append_phrase(source, get_relative_name_at(term, input), term, phrase_type::TERM_NAME);
     }
 
-    if (visibleIndex >= 0)
-        append_phrase(source,
-            get_input_syntax_hint_optional(term, visibleIndex, "postWhitespace", defaultPost), 
-            term, phrase_type::WHITESPACE);
+    append_phrase(source,
+        get_input_syntax_hint_optional(term, inputIndex, "postWhitespace", defaultPost), 
+        term, phrase_type::WHITESPACE);
 }
 
 bool is_method_call(Term* term)
@@ -357,10 +346,14 @@ bool should_print_term_source_line(Term* term)
 
 int get_first_visible_input_index(Term* term)
 {
-    if (get_input_syntax_hint_optional(term, 0, "hidden", "") == "true")
-        return 1;
-    else
-        return 0;
+    int i = 0;
+    for (; i < term->numInputs(); i++) {
+        if (term->inputInfo(i)->properties.contains("hidden"))
+            continue;
+        else
+            break;
+    }
+    return i;
 }
 
 std::string get_input_syntax_hint(Term* term, int index, const char* field)

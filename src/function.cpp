@@ -512,10 +512,10 @@ void function_format_header_source(StyledSource* source, Function* func)
     for (int i=0; i < numInputs; i++) {
         std::string name = function_get_input_name(func, i);
 
-        if (name == "#state")
-            continue;
-
         Term* input = function_get_input_placeholder(func, i);
+
+        if (input->boolPropOptional("hiddenInput", false))
+            continue;
 
         if (input->boolPropOptional("state", false))
             append_phrase(source, "state ", term, phrase_type::UNDEFINED);

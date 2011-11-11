@@ -467,6 +467,9 @@ Term* find_or_create_open_state_result(Branch* branch, int position)
 
 void check_to_insert_implicit_inputs(Term* term)
 {
+    if (!is_function(term->function))
+        return;
+
     if (function_has_state_input(as_function(term->function))
         && !term_is_state_input(term, 0)) {
 
@@ -474,6 +477,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
         insert_input(term, input);
         set_bool(term->inputInfo(0)->properties.insert("state"), true);
+        set_bool(term->inputInfo(0)->properties.insert("hidden"), true);
     }
 }
 

@@ -64,6 +64,11 @@ TermPtr evaluate(Branch* branch, ParsingStep step, std::string const& input)
 struct ListSyntaxHints {
     List inputs;
 
+    void insert(int index)
+    {
+        set_dict(inputs.insert(index));
+    }
+
     void set(int index, std::string const& field, std::string const& value)
     {
         while (index >= inputs.length())
@@ -1485,6 +1490,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     tokens.consume(RPAREN);
 
     inputs.prepend(root.term);
+    inputHints.insert(0);
 
     // Find the function
     Term* function = find_method(branch, root.term->type, functionName);
