@@ -443,6 +443,13 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
+Term* term_get_output_placeholder(Term* call, int index)
+{
+    // TODO: Support if/for
+
+    return function_get_output_placeholder(as_function(call->function), index);
+}
+
 Term* find_open_state_result(Branch* branch, int position)
 {
     for (int i = position - 1; i >= 0; i--) {
@@ -523,22 +530,19 @@ void post_compile_term(Term* term)
 
     Function::PostCompile func = attrs->postCompile;
 
-    if (func != NULL) {
+    if (func != NULL)
         func(term);
-        return;
-    }
 
-    // Default behavior for postCompile..
-    
     // If the function has multiple outputs, then create extra_output terms for all of
     // those outputs.
-    Branch* owningBranch = term->owningBranch;
-    int numOutputs = get_output_count(term);
-    for (int outputIndex=1; outputIndex < numOutputs; outputIndex++) {
-        const char* name = get_output_name(term, outputIndex);
-        Term* outputCopy = apply(owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
-        respecialize_type(outputCopy);
+    for (int index=1; ; index++) {
+        Term* placeholder = term_get_output_placeholder(term, index);
+        if (placeholder == NULL)
+            break;
 
+        Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), placeholder->name);
+        if (function_is_state_input(placeholder))
+            output->setBoolProp("state", true);
     }
 }
 
