@@ -76,8 +76,6 @@ CA_FUNCTION(simple_stateful_func)
         set_int(value, 0);
 
     set_int(value, as_int(value) + 1);
-
-    dump(CONTEXT);
 }
 
 void test_simple_stateful_func()
@@ -89,7 +87,6 @@ void test_simple_stateful_func()
 
     EvalContext context;
     evaluate_save_locals(&context, &branch);
-    dump(branch);
     test_equals(&context.state, "{_f: 1}");
 
     evaluate_save_locals(&context, &branch);
@@ -122,13 +119,10 @@ void initial_value()
 
     Term* i = branch.compile("state i = 3");
     Term* j = branch.compile("state int j = 4");
-    evaluate_branch(&context, &branch);
+    evaluate_save_locals(&context, &branch);
 
-    test_assert(is_int(get_local(i)));
-    test_equals(get_local(i)->asInt(), 3);
-
-    test_assert(is_int(get_local(j)));
-    test_equals(get_local(j)->asInt(), 4);
+    test_equals(i, "3");
+    test_equals(j, "4");
 }
 
 void initialize_from_expression()
@@ -148,8 +142,8 @@ void initialize_from_expression()
     Term* d = branch.compile("d = 5");
     Term* e = branch.compile("state e = d");
     EvalContext context;
-    evaluate_branch(&context, &branch);
-    test_equals(e->asInt(), 5);
+    evaluate_save_locals(&context, &branch);
+    test_equals(e, "5");
 
     set_int(d, 10);
     evaluate_branch(&context, &branch);

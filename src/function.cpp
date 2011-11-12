@@ -116,21 +116,21 @@ void finish_building_function(Function* func, Type* declaredOutputType)
 
         if (input->boolPropOptional("state", false)) {
             Term* stateOutput = apply(function_contents(func),
-                OUTPUT_PLACEHOLDER_FUNC, TermList(), input->name);
+                OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
             stateOutput->setBoolProp("state", true);
             stateOutput->setIntProp("rebindsInput", i);
         }
 
         if (input->boolPropOptional("output", false)) {
             Term* output = apply(function_contents(func),
-                OUTPUT_PLACEHOLDER_FUNC, TermList(), input->name);
+                OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
             output->setIntProp("rebindsInput", i);
             change_declared_type(output, input->type);
         }
     }
 
     // Finally, write a final output_placeholder() term for the primary output.
-    Term* output = apply(function_contents(func), OUTPUT_PLACEHOLDER_FUNC, TermList());
+    Term* output = apply(function_contents(func), OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
     change_declared_type(output, declaredOutputType);
 }
 

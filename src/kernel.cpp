@@ -357,6 +357,10 @@ void bootstrap_kernel()
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
     ADDITIONAL_OUTPUT_FUNC = import_function(kernel, NULL, "additional_output() -> any");
 
+    // Now that we have input_placeholder() let's declare one input on output_placeholder()
+    apply(function_contents(as_function(OUTPUT_PLACEHOLDER_FUNC)),
+        INPUT_PLACEHOLDER_FUNC, TermList())->setBoolProp("optional", true);
+
     // FileSignature is used in some builtin functions
     FILE_SIGNATURE_T = unbox_type(parse_type(kernel,
             "type FileSignature { string filename, int time_modified }"));

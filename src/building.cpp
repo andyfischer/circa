@@ -443,10 +443,15 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
+Term* term_get_input_placeholder(Term* call, int index)
+{
+    // TODO: Support if/for
+    return function_get_input_placeholder(as_function(call->function), index);
+}
+
 Term* term_get_output_placeholder(Term* call, int index)
 {
     // TODO: Support if/for
-
     return function_get_output_placeholder(as_function(call->function), index);
 }
 
@@ -539,7 +544,14 @@ void post_compile_term(Term* term)
         if (placeholder == NULL)
             break;
 
-        Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), placeholder->name);
+        const char* name = "";
+
+        int rebindsInput = placeholder->intPropOptional("rebindsInput", -1);
+        if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
+            name = term->input(rebindsInput)->name.c_str();
+        }
+
+        Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
         if (function_is_state_input(placeholder))
             output->setBoolProp("state", true);
     }
