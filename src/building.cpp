@@ -463,7 +463,7 @@ Term* find_open_state_result(Branch* branch, int position)
             continue;
         if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
             return term;
-        if (term->function == EXTRA_OUTPUT_FUNC && function_is_state_input(term))
+        if (term->function == PACK_STATE_FUNC)
             return term;
     }
     return NULL;
@@ -486,9 +486,14 @@ void check_to_insert_implicit_inputs(Term* term)
     if (function_has_state_input(as_function(term->function))
         && !term_is_state_input(term, 0)) {
 
-        Term* input = find_or_create_open_state_result(term->owningBranch, term->index);
+        Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
-        insert_input(term, input);
+        Term* unpack = apply(term->owningBranch, UNPACK_STATE_FUNC, TermList(container));
+        unpack->setStringProp("field", unique_name(term));
+        hide_from_source(unpack);
+        term->owningBranch->move(unpack, term->index);
+
+        insert_input(term, unpack);
         set_bool(term->inputInfo(0)->properties.insert("state"), true);
         set_bool(term->inputInfo(0)->properties.insert("hidden"), true);
     }
@@ -537,6 +542,8 @@ void post_compile_term(Term* term)
     if (func != NULL)
         func(term);
 
+    Term* stateOutput = NULL;
+
     // If the function has multiple outputs, then create extra_output terms for all of
     // those outputs.
     for (int index=1; ; index++) {
@@ -552,8 +559,19 @@ void post_compile_term(Term* term)
         }
 
         Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
-        if (function_is_state_input(placeholder))
+        if (function_is_state_input(placeholder)) {
             output->setBoolProp("state", true);
+            stateOutput = output;
+        }
+    }
+
+    // Possibly append a pack_state() call
+    if (stateOutput != NULL && term->input(0)->function == UNPACK_STATE_FUNC) {
+        Term* unpack = term->input(0);
+        Term* container = unpack->input(0);
+        Term* pack = apply(term->owningBranch, PACK_STATE_FUNC, TermList(container, stateOutput));
+        pack->setStringProp("field", unpack->stringProp("field"));
+        hide_from_source(pack);
     }
 
     // Special code for if-block join terms. It would be sweet if this code wasn't

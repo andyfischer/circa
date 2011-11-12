@@ -1,0 +1,28 @@
+
+def f() -> int
+  state s = 0
+  s += 1
+  return s
+  
+f_state = null
+result = f(state = f_state)
+print('should be 1: ' result)
+
+result = f(state = f_state)
+print('should be 2: ' result)
+
+result = f(state = f_state)
+print('should be 3: ' result)
+print('should be {i: 3} ' f_state)
+
+-- Nested
+def a()
+  state s
+def b()
+  a()
+def c()
+  b()
+
+c_state = null
+c(state = c_state)
+print(c_state)

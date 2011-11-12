@@ -18,7 +18,7 @@ namespace get_state_field_function {
 
         //Dict* containerDict = Dict::lazyCast(container);
 
-        const char* name = CALLER->name.c_str();
+        //const char* name = CALLER->name.c_str();
         //TaggedValue* value = containerDict->get(name);
 
         TaggedValue* value = NULL; // FIXME

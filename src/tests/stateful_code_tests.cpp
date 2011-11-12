@@ -30,7 +30,10 @@ void test_is_function_stateful()
 
 CA_FUNCTION(simple_func_with_state_arg)
 {
-    int i = INT_INPUT(0);
+    TaggedValue* in = INPUT(0);
+    int i = 0;
+    if (is_int(in))
+        i = as_int(in);
     set_int(EXTRA_OUTPUT(0), i + 1);
 }
 
@@ -58,39 +61,22 @@ void test_simple_func_with_state_arg()
     // Test with a normal call, explicit argument.
     branch.compile("a = 3");
     branch.compile("f(state = a)");
+    dump(branch);
     EvalContext context;
     evaluate_save_locals(&context, &branch);
     test_equals(branch["a"], "4");
-}
 
-CA_FUNCTION(simple_stateful_func)
-{
-    copy(INPUT(0), EXTRA_OUTPUT(0));
-    TaggedValue* state = EXTRA_OUTPUT(0);
-    if (!is_dict(state))
-        set_dict(state);
-
-    TaggedValue* value = dict_insert(state, unique_name(CALLER));
-
-    if (!is_int(value))
-        set_int(value, 0);
-
-    set_int(value, as_int(value) + 1);
-}
-
-void test_simple_stateful_func()
-{
-    Branch branch;
-    import_function(&branch, simple_stateful_func, "f(state int i)");
+    // Test with an implicit argument
     branch.compile("f()");
     finish_minor_branch(&branch);
 
-    EvalContext context;
-    evaluate_save_locals(&context, &branch);
-    test_equals(&context.state, "{_f: 1}");
+    dump(branch);
 
     evaluate_save_locals(&context, &branch);
-    test_equals(&context.state, "{_f: 2}");
+    test_equals(&context.state, "{_f_1: 1}");
+
+    evaluate_save_locals(&context, &branch);
+    test_equals(&context.state, "{_f_1: 2}");
 }
 
 void test_get_type_from_branches_stateful_terms()
@@ -473,7 +459,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
     REGISTER_TEST_CASE(stateful_code_tests::test_simple_func_with_state_arg);
-    REGISTER_TEST_CASE(stateful_code_tests::test_simple_stateful_func);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::initial_value);
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);

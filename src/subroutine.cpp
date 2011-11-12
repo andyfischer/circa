@@ -51,11 +51,12 @@ CA_FUNCTION(evaluate_subroutine)
     int numInputs = caller->numInputs();
 
     // Fetch state container
-    TaggedValue prevScopeState;
+    /*TaggedValue prevScopeState;
     swap(&context->currentScopeState, &prevScopeState);
 
     if (is_function_stateful(function))
         fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
+        */
 
     // Fetch inputs and start preparing the new stack frame.
     List newFrame;
@@ -127,9 +128,11 @@ CA_FUNCTION(evaluate_subroutine)
     context->interruptSubroutine = false;
         
     // Preserve state
+    /*
     if (is_function_stateful(function))
         save_and_consume_state(caller, &prevScopeState, &context->currentScopeState);
     swap(&context->currentScopeState, &prevScopeState);
+    */
 }
 
 bool is_subroutine(Term* term)
