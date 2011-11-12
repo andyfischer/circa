@@ -555,6 +555,21 @@ void post_compile_term(Term* term)
         if (function_is_state_input(placeholder))
             output->setBoolProp("state", true);
     }
+
+    // Special code for if-block join terms. It would be sweet if this code wasn't
+    // necessary.
+    if (term->function == IF_BLOCK_FUNC) {
+        Branch* joins = nested_contents(term)->getFromEnd(0)->contents();
+        for (int i=0; i < joins->length(); i++)
+            apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), joins->get(i)->name);
+    }
+
+    // Ditto on for-loops
+    if (term->function == FOR_FUNC) {
+        Branch* joins = nested_contents(term)->get("#outer_rebinds")->contents(); 
+        for (int i=0; i < joins->length(); i++)
+            apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), joins->get(i)->name);
+    }
 }
 
 void finish_minor_branch(Branch* branch)
