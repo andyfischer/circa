@@ -279,11 +279,24 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
             out << term->inputInfo(i)->properties.toString();
         }
     }
-    out << ")";
+    out << ") ";
 
-    int outputCount = get_output_count(term);
+    // Print out certain properties
+    if (term->boolPropOptional("state", false))
+        out << ":state ";
 
-    out << " -> (";
+    //int outputCount = get_output_count(term);
+
+    out << "-> ";
+    
+    if (term->type == NULL)
+        out << "<NULL type";
+    else
+        out << term->type->name;
+
+#if 0
+    if (outputCount > 1)
+        out << "(";
 
     if (term->function != NULL) {
         for (int i=0; i < outputCount; i++) {
@@ -295,7 +308,9 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
                 out << type->name;
         }
     }
-    out << ")";
+    if (outputCount > 1)
+        out << ")";
+#endif
 
     #if 0
     if (term->type == NULL)

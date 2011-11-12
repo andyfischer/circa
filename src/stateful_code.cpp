@@ -55,6 +55,15 @@ void on_stateful_function_call_created(Term* call)
 
 Term* insert_state_input(Branch* branch)
 {
+    // Make sure that a state input doesn't already exist
+    for (int i=0;; i++) {
+        if (i >= branch->length())
+            break;
+        Term* placeholder = branch->get(i);
+        if (placeholder->function != INPUT_PLACEHOLDER_FUNC)
+            break;
+
+    }
     Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
     branch->move(term, 0);
     term->setBoolProp("state", true);

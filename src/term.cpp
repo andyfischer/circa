@@ -28,8 +28,6 @@ Term::Term()
 {
     globalID = gNextGlobalID++;
 
-    //ca_assert(global_id(this) != "$9a0");
-
     debug_register_valid_object(this, TERM_OBJECT);
 }
 

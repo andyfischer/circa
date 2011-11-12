@@ -262,10 +262,10 @@ void insert_top_level_state(EvalContext* context, Branch* branch)
 void save_top_level_state(EvalContext* context, Branch* branch)
 {
     Term* output = find_state_output(branch);
-    if (output == NULL)
+    if (output == NULL || output->numInputs() < 1 || output->input(0) == NULL)
         return;
 
-    move(top_frame(context)->registers[output->index], &context->state);
+    move(top_frame(context)->registers[output->input(0)->index], &context->state);
 }
 
 void evaluate_branch(EvalContext* context, Branch* branch)

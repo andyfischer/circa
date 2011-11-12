@@ -460,7 +460,6 @@ Term* find_open_state_result(Branch* branch, int position)
             return term;
         if (term->function == EXTRA_OUTPUT_FUNC && function_is_state_input(term))
             return term;
-        i--;
     }
     return NULL;
 }

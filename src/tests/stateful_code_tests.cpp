@@ -90,10 +90,10 @@ void test_simple_stateful_func()
     EvalContext context;
     evaluate_save_locals(&context, &branch);
     dump(branch);
-    test_equals(&context.state, "{f: 1}");
+    test_equals(&context.state, "{_f: 1}");
 
     evaluate_save_locals(&context, &branch);
-    test_equals(&context.state, "{f: 2}");
+    test_equals(&context.state, "{_f: 2}");
 }
 
 void test_get_type_from_branches_stateful_terms()
