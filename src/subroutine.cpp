@@ -50,17 +50,9 @@ CA_FUNCTION(evaluate_subroutine)
     Branch* contents = nested_contents(function);
     int numInputs = caller->numInputs();
 
-    // Fetch state container
-    /*TaggedValue prevScopeState;
-    swap(&context->currentScopeState, &prevScopeState);
-
-    if (is_function_stateful(function))
-        fetch_state_container(caller, &prevScopeState, &context->currentScopeState);
-        */
-
     // Fetch inputs and start preparing the new stack frame.
-    List newFrame;
-    newFrame.resize(get_locals_count(contents));
+    List registers;
+    registers.resize(get_locals_count(contents));
     
     context->interruptSubroutine = false;
 
@@ -68,7 +60,7 @@ CA_FUNCTION(evaluate_subroutine)
     for (int i=0; i < NUM_INPUTS; i++) {
         Term* placeholder = get_subroutine_input_placeholder(contents, i);
 
-        bool castSuccess = cast(INPUT(i), placeholder->type, newFrame[i]);
+        bool castSuccess = cast(INPUT(i), placeholder->type, registers[i]);
 
         if (!castSuccess) {
             std::stringstream msg;
@@ -84,7 +76,7 @@ CA_FUNCTION(evaluate_subroutine)
     set_null(&context->subroutineOutput);
 
     // Push our frame (with inputs) onto the stack
-    push_frame(context, contents, &newFrame);
+    push_frame(context, contents, &registers);
 
     // Evaluate each term
     for (int i=numInputs; i < contents->length(); i++) {
@@ -93,46 +85,57 @@ CA_FUNCTION(evaluate_subroutine)
             break;
     }
 
+    context->interruptSubroutine = false;
+
     // If an error occurred, leave context the way it is.
     if (context->errorOccurred)
         return;
 
-    // Save output
-    TaggedValue output;
+    // Save registers and pop frame
+    swap(&registers, &top_frame(context)->registers);
+    pop_frame(context);
 
-    Type* outputType = function_get_output_type(caller->function, 0);
+    Type* outputType = function_get_output_type(function, 0);
 
     if (context->errorOccurred) {
-        set_null(&output);
+        set_null(OUTPUT);
     } else if (outputType == &VOID_T) {
 
-        set_null(&output);
+        set_null(OUTPUT);
 
     } else {
 
-        bool castSuccess = cast(&context->subroutineOutput, outputType, &output);
+        bool castSuccess = cast(&context->subroutineOutput, outputType, OUTPUT);
         
         if (!castSuccess) {
             std::stringstream msg;
             msg << "Couldn't cast output " << context->subroutineOutput.toString()
                 << " to type " << outputType->name;
-            error_occurred(context, caller, &output, msg.str().c_str());
+            error_occurred(context, caller, OUTPUT, msg.str().c_str());
         }
     }
 
     set_null(&context->subroutineOutput);
 
-    // Clean up
-    pop_frame(context);
-    swap(&output, OUTPUT);
-    context->interruptSubroutine = false;
-        
-    // Preserve state
-    /*
-    if (is_function_stateful(function))
-        save_and_consume_state(caller, &prevScopeState, &context->currentScopeState);
-    swap(&context->currentScopeState, &prevScopeState);
-    */
+    // Copy each extra output from registers.
+    // TODO: Use this loop for the primary output as well.
+    for (int i=1;; i++) {
+        Term* placeholder = function_get_output_placeholder(as_function(function), i);
+        if (placeholder == NULL)
+            break;
+            
+        TaggedValue* result = registers[placeholder->input(0)->index];
+
+        bool castSuccess = cast(result, placeholder->type, EXTRA_OUTPUT(i-1));
+
+        if (!castSuccess) {
+            std::stringstream msg;
+            msg << "Couldn't cast extra output " << i
+                << " (" << context->subroutineOutput.toString() << ")"
+                << " to type " << outputType->name;
+            error_occurred(context, caller, OUTPUT, msg.str().c_str());
+        }
+    }
 }
 
 bool is_subroutine(Term* term)

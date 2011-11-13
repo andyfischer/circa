@@ -11,21 +11,14 @@ namespace get_state_field_function {
     CA_START_FUNCTIONS;
 
     CA_DEFINE_FUNCTION(get_state_field,
-        "get_state_field(any container, any default_value :optional) -> any")
+        "get_state_field(state any value, any default_value :optional) -> any")
     {
-        //TaggedValue* container = EXTRA_OUTPUT(0);
-        //copy(INPUT(0), container);
-
-        //Dict* containerDict = Dict::lazyCast(container);
-
-        //const char* name = CALLER->name.c_str();
-        //TaggedValue* value = containerDict->get(name);
-
-        TaggedValue* value = NULL; // FIXME
+        TaggedValue* value = INPUT(0);
+        TaggedValue* output = OUTPUT;
 
         // Try to cast 'value' to the declared type.
         if (value != NULL) {
-            bool cast_success = cast(value, declared_type(CALLER), OUTPUT);
+            bool cast_success = cast(value, declared_type(CALLER), output);
 
             // If this cast succeeded then we're done. If it failed then continue on
             // to use a default value.
@@ -33,13 +26,14 @@ namespace get_state_field_function {
                 return;
         }
 
-        // Try to use initialValue from an input.
-        if (INPUT_TERM(1) != NULL) {
+        // Try to use default_value from an input.
+        TaggedValue* defaultValue = INPUT(1);
+        if (defaultValue != NULL) {
             // Evaluate nested contents first, since the initial value might come from there.
             if (CALLER->nestedContents) 
                 evaluate_branch_internal(CONTEXT, nested_contents(CALLER));
             
-            bool cast_success = cast(INPUT(1), declared_type(CALLER), OUTPUT);
+            bool cast_success = cast(defaultValue, declared_type(CALLER), output);
 
             if (!cast_success) {
                 std::stringstream msg;
@@ -50,8 +44,7 @@ namespace get_state_field_function {
         } else {
 
             // Otherwise, reset to the type's default value
-            create(declared_type(CALLER), OUTPUT);
-            reset(OUTPUT);
+            create(declared_type(CALLER), output);
         }
     }
 

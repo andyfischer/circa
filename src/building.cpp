@@ -326,8 +326,8 @@ Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const&
 Term* create_stateful_value(Branch* branch, Type* type, Term* defaultValue,
         std::string const& name)
 {
-    Term* input = find_or_create_open_state_result(branch, branch->length());
-    Term* result = apply(branch, GET_STATE_FIELD_FUNC, TermList(input, defaultValue), name);
+    Term* result = apply(branch, GET_STATE_FIELD_FUNC, TermList(defaultValue), name);
+    check_to_insert_implicit_inputs(result);
     change_declared_type(result, type);
     return result;
 }

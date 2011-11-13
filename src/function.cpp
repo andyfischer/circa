@@ -107,6 +107,8 @@ void initialize_function(Term* func)
 
 void finish_building_function(Function* func, Type* declaredOutputType)
 {
+    Branch* contents = function_contents(func);
+
     // Write a list of output_placeholder terms.
 
     // Look at every input declared as :output, these will be used to declare extra outputs.
@@ -115,14 +117,15 @@ void finish_building_function(Function* func, Type* declaredOutputType)
         Term* input = function_get_input_placeholder(func, i);
 
         if (input->boolPropOptional("state", false)) {
-            Term* stateOutput = apply(function_contents(func),
-                OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
+            Term* stateContainer = find_open_state_result(contents, contents->length());
+            Term* stateOutput = apply(contents,
+                OUTPUT_PLACEHOLDER_FUNC, TermList(stateContainer), input->name);
             stateOutput->setBoolProp("state", true);
             stateOutput->setIntProp("rebindsInput", i);
         }
 
         if (input->boolPropOptional("output", false)) {
-            Term* output = apply(function_contents(func),
+            Term* output = apply(contents,
                 OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
             output->setIntProp("rebindsInput", i);
             change_declared_type(output, input->type);
@@ -130,7 +133,7 @@ void finish_building_function(Function* func, Type* declaredOutputType)
     }
 
     // Finally, write a final output_placeholder() term for the primary output.
-    Term* output = apply(function_contents(func), OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+    Term* output = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
     change_declared_type(output, declaredOutputType);
 }
 
