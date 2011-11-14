@@ -32,27 +32,6 @@ namespace return_function {
         if (sub == NULL)
             return;
 
-#if 0
-        UpwardIterator it(returnCall);
-        it.stopAt(sub->owningBranch);
-
-        for ( ; it.unfinished(); it.advance()) {
-            Term* previousTerm = *it;
-            if (previousTerm == NULL)
-                continue;
-
-            if (previousTerm == returnCall)
-                break;
-
-            if (previousTerm->function == GET_STATE_FIELD_FUNC) {
-                if (previousTerm->name == "")
-                    continue;
-                Term* outcome = get_named_at(returnCall, previousTerm->name);
-                apply(contents, PRESERVE_STATE_RESULT_FUNC, TermList(outcome));
-            }
-        }
-#endif
-
         // Look for the enclosing subroutine, if found then add a call to
         // subroutine_output()
         {

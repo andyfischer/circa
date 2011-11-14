@@ -1450,6 +1450,7 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
             tokens.consume(STATE);
             possible_whitespace(tokens);
             tokens.consume(EQUALS);
+            possible_whitespace(tokens);
             inputHints.set(index, "state", &TrueValue);
             inputHints.set(index, "rebindInput", "t");
         }
