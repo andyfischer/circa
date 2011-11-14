@@ -992,15 +992,11 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         possible_whitespace(tokens);
     }
 
-    Term* type = ANY_TYPE;
+    Type* type = &ANY_T;
     if (typeName != "")
-        type = find_type(branch, typeName);
+        type = as_type(find_type(branch, typeName));
 
-    if (!is_type(type))
-        return compile_error_for_line(branch, tokens, startPosition, "Not a type: "+type->name);
-
-    // Create the get_state_field() term.
-    Term* result = create_stateful_value(branch, as_type(type), NULL, name);
+    Term* initialValue = NULL;
 
     // Possibly consume an expression for the initial value.
     if (tokens.nextIs(EQUALS)) {
@@ -1010,16 +1006,16 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         // If the initial value contains any new expressions, then those live inside
         // nestedContents.
 
-        Term* initialValue = infix_expression(nested_contents(result), tokens, context).term;
-        post_parse_branch(nested_contents(result));
-
-        set_input(result, 1, initialValue);
+        initialValue = infix_expression(branch, tokens, context).term;
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
         if (typeName == "" && initialValue->type != &NULL_T)
-            change_declared_type(result, initialValue->type);
+            type = initialValue->type;
     }
+
+    // Create the get_state_field() term.
+    Term* result = create_stateful_value(branch, type, initialValue, name);
 
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);

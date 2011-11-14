@@ -29,10 +29,6 @@ namespace get_state_field_function {
         // Try to use default_value from an input.
         TaggedValue* defaultValue = INPUT(1);
         if (defaultValue != NULL) {
-            // Evaluate nested contents first, since the initial value might come from there.
-            if (CALLER->nestedContents) 
-                evaluate_branch_internal(CONTEXT, nested_contents(CALLER));
-            
             bool cast_success = cast(defaultValue, declared_type(CALLER), output);
 
             if (!cast_success) {
