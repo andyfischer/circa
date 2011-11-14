@@ -6,8 +6,7 @@
 
 namespace circa {
 
-void finish_if_block_minor_branch(Term* branch);
-void update_if_block_joining_branch(Term* ifCall);
+void finish_if_block(Term* ifCall);
 
 int if_block_num_branches(Term* ifCall);
 Branch* if_block_get_branch(Term* ifCall, int index);

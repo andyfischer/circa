@@ -443,16 +443,37 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
+Branch* term_get_function_details(Term* call)
+{
+    if (call->function == IF_BLOCK_FUNC)// || call->function == FOR_FUNC)
+        return nested_contents(call);
+    return function_get_contents(as_function(call->function));
+}
+
 Term* term_get_input_placeholder(Term* call, int index)
 {
-    // TODO: Support if/for
-    return function_get_input_placeholder(as_function(call->function), index);
+    Branch* contents = term_get_function_details(call);
+    if (contents == NULL)
+        return NULL;
+    if (index >= contents->length())
+        return NULL;
+    Term* term = contents->get(index);
+    if (term->function != INPUT_PLACEHOLDER_FUNC)
+        return NULL;
+    return term;
 }
 
 Term* term_get_output_placeholder(Term* call, int index)
 {
-    // TODO: Support if/for
-    return function_get_output_placeholder(as_function(call->function), index);
+    Branch* contents = term_get_function_details(call);
+    if (contents == NULL)
+        return NULL;
+    if (index >= contents->length())
+        return NULL;
+    Term* term = contents->getFromEnd(index);
+    if (term->function != OUTPUT_PLACEHOLDER_FUNC)
+        return NULL;
+    return term;
 }
 
 Term* find_open_state_result(Branch* branch, int position)
@@ -558,6 +579,10 @@ void post_compile_term(Term* term)
             name = term->input(rebindsInput)->name.c_str();
         }
 
+        // Temporary step to make if_block work
+        if (term->function == IF_BLOCK_FUNC)
+            name = placeholder->name.c_str();
+
         Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
         if (function_is_state_input(placeholder)) {
             output->setBoolProp("state", true);
@@ -574,6 +599,7 @@ void post_compile_term(Term* term)
         hide_from_source(pack);
     }
 
+#if 0
     // Special code for if-block join terms. It would be sweet if this code wasn't
     // necessary.
     if (term->function == IF_BLOCK_FUNC) {
@@ -581,6 +607,7 @@ void post_compile_term(Term* term)
         for (int i=0; i < joins->length(); i++)
             apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), joins->get(i)->name);
     }
+#endif
 
     // Ditto on for-loops
     if (term->function == FOR_FUNC) {

@@ -35,45 +35,6 @@ namespace if_block_function {
         }
     }
 
-    int getOutputCount(Term* term)
-    {
-        Branch* contents = nested_contents(term);
-
-        // check if term is still being initialized:
-        if (contents->length() == 0)
-            return 1;
-
-        Branch* outerRebinds = contents->getFromEnd(0)->contents();
-        return outerRebinds->length() + 1;
-    }
-
-    const char* getOutputName(Term* term, int outputIndex)
-    {
-        Branch* contents = nested_contents(term);
-
-        // check if term is still being initialized:
-        if (contents->length() == 0)
-            return "";
-
-        Branch* outerRebinds = contents->getFromEnd(0)->contents();
-        return outerRebinds->get(outputIndex - 1)->name.c_str();
-    }
-
-    Type* getOutputType(Term* term, int outputIndex)
-    {
-        if (outputIndex == 0)
-            return &VOID_T;
-
-        Branch* contents = nested_contents(term);
-
-        // check if term is still being initialized:
-        if (contents->length() == 0)
-            return &ANY_T;
-
-        Branch* outerRebinds = contents->getFromEnd(0)->contents();
-        return outerRebinds->get(outputIndex - 1)->type;
-    }
-
     Type* joinFunc_specializeType(Term* term)
     {
         if (term->input(0) == NULL || term->input(1) == NULL)
@@ -87,9 +48,9 @@ namespace if_block_function {
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         as_function(IF_BLOCK_FUNC)->formatSource = formatSource;
-        as_function(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
-        as_function(IF_BLOCK_FUNC)->getOutputName = getOutputName;
-        as_function(IF_BLOCK_FUNC)->getOutputType = getOutputType;
+        //as_function(IF_BLOCK_FUNC)->getOutputCount = getOutputCount;
+        //as_function(IF_BLOCK_FUNC)->getOutputName = getOutputName;
+        //as_function(IF_BLOCK_FUNC)->getOutputType = getOutputType;
         as_function(IF_BLOCK_FUNC)->createsStackFrame = false;
 
         JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");

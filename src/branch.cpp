@@ -78,7 +78,13 @@ Term* Branch::get(int index)
 {
     assert_valid_branch(this);
     if (index >= length())
-        throw std::runtime_error("index out of range");
+        internal_error("index out of range");
+    return _terms[index];
+}
+Term* Branch::getSafe(int index)
+{
+    if (index >= length())
+        return NULL;
     return _terms[index];
 }
 

@@ -844,7 +844,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     // Move the if_block term to be after the condition terms.
     branch->moveToEnd(result);
 
-    update_if_block_joining_branch(result);
+    finish_if_block(result);
     set_source_location(result, startPosition, tokens);
 
     return ParseResult(result);

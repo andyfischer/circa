@@ -60,6 +60,7 @@ struct Branch
     int length();
 
     Term* get(int index);
+    Term* getSafe(int index);
 
     // Get an index counting from the end; equivalent to get(length() - index - 1)
     Term* getFromEnd(int index);

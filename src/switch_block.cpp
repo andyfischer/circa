@@ -16,7 +16,7 @@ void switch_block_post_compile(Term* term)
 {
     // Add a default case
     apply(nested_contents(term), DEFAULT_CASE_FUNC, TermList());
-    update_if_block_joining_branch(term);
+    finish_if_block(term);
 }
 
 CA_FUNCTION(evaluate_switch)

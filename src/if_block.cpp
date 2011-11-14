@@ -19,28 +19,9 @@
 
 namespace circa {
 
-// The format of if_block is as follows:
-//
-// N = branch length
-//
-// {
-//   [0] if(cond0) : Branch
-//   [1] if(cond1) : Branch
-//   ...
-//   [N-2] branch()  (this corresponds to the 'else' block)
-//   [N-1] #joining = branch() 
-//
-
-void update_if_block_joining_branch(Term* ifCall)
+void finish_if_block(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
-
-    // Create the joining contents if necessary
-    if (!contents->contains("#joining"))
-        create_branch(contents, "#joining");
-
-    Branch* joining = nested_contents(contents->get("#joining"));
-    clear_branch(joining);
 
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
@@ -89,7 +70,8 @@ void update_if_block_joining_branch(Term* ifCall)
             ++it;
     }
 
-    int numBranches = contents->length() - 1;
+    int firstCaseLocation = 0;
+    int firstJoinLocation = contents->length();
 
     // For each name, create a term that selects the correct version of this name.
     for (std::set<std::string>::const_iterator it = boundNames.begin();
@@ -99,19 +81,33 @@ void update_if_block_joining_branch(Term* ifCall)
         std::string const& name = *it;
 
         TermList inputs;
-        inputs.resize(numBranches);
 
         Term* outerVersion = get_named_at(ifCall, name);
 
-        for (int i=0; i < numBranches; i++) {
-            Term* local = contents->get(i)->contents(name.c_str());
-            inputs.setAt(i, local == NULL ? outerVersion : local);
+        for (int i = 0; ; i++) {
+            Term* caseTerm = contents->getSafe(firstCaseLocation + i);
+            if (caseTerm == NULL
+                || (caseTerm->function != CASE_FUNC) && (caseTerm->function != BRANCH_FUNC))
+                break;
+
+            Term* local = caseTerm->contents(name.c_str());
+            inputs.append(local == NULL ? outerVersion : local);
         }
 
-        apply(joining, JOIN_FUNC, inputs, name);
+        apply(contents, JOIN_FUNC, inputs, name);
     }
 
-    finish_update_cascade(joining);
+    // Append output_placeholder() terms
+    int lastJoinLocation = contents->length();
+
+    for (int i=firstJoinLocation; i < lastJoinLocation; i++) {
+        Term* placeholder = apply(contents, OUTPUT_PLACEHOLDER_FUNC,
+            TermList(contents->get(i)), contents->get(i)->name);
+        change_declared_type(placeholder, contents->get(i)->type);
+    }
+
+    // Append the primary output
+    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 }
 
 int if_block_num_branches(Term* ifCall)
@@ -128,7 +124,6 @@ CA_FUNCTION(evaluate_if_block)
     Term* caller = CALLER;
     EvalContext* context = CONTEXT;
     Branch* contents = nested_contents(caller);
-    bool useState = has_any_inlined_state(contents);
 
     int numBranches = contents->length() - 1;
     int acceptedBranchIndex = 0;
@@ -138,13 +133,6 @@ CA_FUNCTION(evaluate_if_block)
 
     TaggedValue localState;
     TaggedValue prevScopeState;
-    List* state = NULL;
-    if (useState) {
-        swap(&prevScopeState, &context->currentScopeState);
-        fetch_state_container(caller, &prevScopeState, &localState);
-        state = List::lazyCast(&localState);
-        state->resize(numBranches);
-    }
 
     for (int branchIndex=0; branchIndex < numBranches; branchIndex++) {
         Term* branch = contents->get(branchIndex);
@@ -164,9 +152,6 @@ CA_FUNCTION(evaluate_if_block)
 
             push_frame(context, acceptedBranch);
 
-            if (useState)
-                swap(state->get(branchIndex), &context->currentScopeState);
-
             // Evaluate each term
             for (int j=0; j < acceptedBranch->length(); j++) {
                 evaluate_single_term(context, acceptedBranch->get(j));
@@ -179,25 +164,31 @@ CA_FUNCTION(evaluate_if_block)
             if (outputTerm != NULL)
                 copy(outputTerm, &output);
 
-            if (useState)
-                swap(state->get(branchIndex), &context->currentScopeState);
-
             acceptedBranchIndex = branchIndex;
             break;
         }
     }
 
-    // Reset state for all non-accepted branches
-    if (useState) {
-        for (int i=0; i < numBranches; i++) {
-            if ((i != acceptedBranchIndex))
-                set_null(state->get(i));
+    // Evaluate all join() terms
+#if 0
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function == JOIN_FUNC) {
+            TaggedValue inputIsn;
+            write_input_instruction(term, term->input(acceptedBranchIndex), &inputIsn);
+            TaggedValue* value = get_arg(context, &inputIsn);
+
+            // Write the result value to the corresponding place in an above frame.
+            Term* outputTerm = caller->owningBranch->get(caller->index + 1 + i);
+            Frame* upperFrame = get_frame(CONTEXT, 1);
+
+            copy(value, upperFrame->registers[outputTerm->index]);
         }
-        save_and_consume_state(caller, &prevScopeState, &localState);
-        swap(&prevScopeState, &context->currentScopeState);
     }
+#endif
 
     // Copy joined values to output slots
+#if 0
     Branch* joining = nested_contents(contents->get(contents->length()-1));
 
     for (int i=0; i < joining->length(); i++) {
@@ -214,6 +205,7 @@ CA_FUNCTION(evaluate_if_block)
 
         copy(value, upperFrame->registers[outputTerm->index]);
     }
+#endif
 
     pop_frame(context);
 
