@@ -13,11 +13,21 @@ print('should be 2: ' result)
 
 result = f(state = f_state)
 print('should be 3: ' result)
-print('should be {i: 3} ' f_state)
+print('should be {s: 3} ' f_state)
+
+-- Multiple state fields
+def g()
+  state a = 'apple'
+  state b = 1.0
+  --state c = [1 2 3]
+
+g_state = null
+g(state = g_state)
+print("should be {a: 'apple', b: 1.0}: " g_state)
 
 -- Nested
 def a()
-  state s
+  state s = 123
 def b()
   a()
 def c()
@@ -25,4 +35,4 @@ def c()
 
 c_state = null
 c(state = c_state)
-print(c_state)
+print('should be {_b: {_a: {s: 123}}}: ' c_state)

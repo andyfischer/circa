@@ -1,6 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "branch.h"
+#include "building.h"
 #include "kernel.h"
 #include "function.h"
 #include "introspection.h"
@@ -236,8 +237,13 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
         append_phrase(source, "@", term, token::AT_SIGN);
 
     // Also, possibly insert the & operator.
-    if (input->name != "" && function_call_rebinds_input(term, inputIndex)) 
-        append_phrase(source, "&", term, token::AMPERSAND);
+    if (input->name != ""
+            && function_call_rebinds_input(term, inputIndex)) {
+        if (term_is_state_input(term, inputIndex))
+            append_phrase(source, "state = ", term, phrase_type::UNDEFINED);
+        else
+            append_phrase(source, "&", term, token::AMPERSAND);
+    }
 
     bool byValue = input->name == "";
 

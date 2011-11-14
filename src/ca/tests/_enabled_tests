@@ -10,5 +10,6 @@ math.ca
 set.ca
 set_index.ca
 subroutine.ca
+subroutine_state.ca
 type_func.ca
 vectorized_func.ca

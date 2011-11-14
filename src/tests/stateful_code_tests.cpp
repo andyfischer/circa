@@ -40,7 +40,7 @@ CA_FUNCTION(simple_func_with_state_arg)
 void test_simple_func_with_state_arg()
 {
     Branch branch;
-    import_function(&branch, simple_func_with_state_arg, "f(state int i)");
+    import_function(&branch, simple_func_with_state_arg, "f(state int i :output)");
 
     // Test some static checks
     Function* func = as_function(branch["f"]);

@@ -9,6 +9,7 @@ namespace circa {
 bool is_function_stateful(Term* func);
 void on_stateful_function_call_created(Term* call);
 Term* insert_state_input(Branch* branch);
+void pack_any_open_state_vars(Branch* branch);
 
 bool is_get_state(Term* term);
 bool has_implicit_state(Term* term);

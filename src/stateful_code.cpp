@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "function.h"
 #include "if_block.h"
+#include "introspection.h"
 #include "source_repro.h"
 #include "subroutine.h"
 #include "stateful_code.h"
@@ -68,7 +69,25 @@ Term* insert_state_input(Branch* branch)
     branch->move(term, 0);
     term->setBoolProp("state", true);
     term->setBoolProp("hiddenInput", true);
+    term->setBoolProp("output", true);
     return term;
+}
+
+void pack_any_open_state_vars(Branch* branch)
+{
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        if (term == NULL)
+            continue;
+        if (term->function == GET_STATE_FIELD_FUNC) {
+            Term* result = branch->get(term->name);
+            Term* pack = apply(branch, PACK_STATE_FUNC, TermList(
+                find_open_state_result(branch, branch->length()),
+                result));
+            pack->setStringProp("field", unique_name(term));
+            branch->move(pack, result->index + 1);
+        }
+    }
 }
 
 bool has_any_inlined_state(Branch* branch)

@@ -32,6 +32,7 @@ namespace return_function {
         if (sub == NULL)
             return;
 
+#if 0
         UpwardIterator it(returnCall);
         it.stopAt(sub->owningBranch);
 
@@ -50,6 +51,7 @@ namespace return_function {
                 apply(contents, PRESERVE_STATE_RESULT_FUNC, TermList(outcome));
             }
         }
+#endif
 
         // Look for the enclosing subroutine, if found then add a call to
         // subroutine_output()

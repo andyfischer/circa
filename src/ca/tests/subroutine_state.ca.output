@@ -1,0 +1,6 @@
+should be 1: 1
+should be 2: 2
+should be 3: 3
+should be {s: 3} {s: 3}
+should be {a: 'apple', b: 1.0}: {a: 'apple', b: 1.0}
+should be {_b: {_a: {s: 123}}}: {_b: {_a: {s: 123}}}

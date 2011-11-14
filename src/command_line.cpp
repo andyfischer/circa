@@ -132,7 +132,7 @@ int run_command_line(std::vector<std::string> args)
     if (args[0] == "-s") {
         Branch branch;
         load_script(&branch, args[1].c_str());
-        std::cout << get_branch_source_text(&branch) << std::endl;
+        std::cout << get_branch_source_text(&branch);
         return 0;
     }
 

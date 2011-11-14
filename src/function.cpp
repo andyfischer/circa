@@ -6,6 +6,7 @@
 #include "function.h"
 #include "introspection.h"
 #include "source_repro.h"
+#include "stateful_code.h"
 #include "subroutine.h"
 #include "term.h"
 #include "term_list.h"
@@ -109,6 +110,8 @@ void finish_building_function(Function* func, Type* declaredOutputType)
 {
     Branch* contents = function_contents(func);
 
+    pack_any_open_state_vars(contents);
+
     // Write a list of output_placeholder terms.
 
     // Look at every input declared as :output, these will be used to declare extra outputs.
@@ -116,19 +119,16 @@ void finish_building_function(Function* func, Type* declaredOutputType)
     for (int i = function_num_inputs(func) - 1; i >= 0; i--) {
         Term* input = function_get_input_placeholder(func, i);
 
-        if (input->boolPropOptional("state", false)) {
-            Term* stateContainer = find_open_state_result(contents, contents->length());
-            Term* stateOutput = apply(contents,
-                OUTPUT_PLACEHOLDER_FUNC, TermList(stateContainer), input->name);
-            stateOutput->setBoolProp("state", true);
-            stateOutput->setIntProp("rebindsInput", i);
-        }
-
         if (input->boolPropOptional("output", false)) {
             Term* output = apply(contents,
                 OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
-            output->setIntProp("rebindsInput", i);
             change_declared_type(output, input->type);
+            output->setIntProp("rebindsInput", i);
+
+            if (input->boolPropOptional("state", false)) {
+                set_input(output, 0, find_open_state_result(contents, contents->length()));
+                output->setBoolProp("state", true);
+            }
         }
     }
 
