@@ -73,27 +73,39 @@ void finish_if_block(Term* ifCall)
 
     int numOutputs = boundNames.size() + 1;
 
-    // For each case branch, create a list of output_placeholder() terms. This list
-    // should be equivalent across all cases.
+    // For each case branch, create a list of input_placeholder() and output_placeholder()
+    // terms. This list should be equivalent across all cases.
     for (int caseIndex=0;; caseIndex++) {
         Term* caseTerm = contents->getSafe(caseIndex);
         if (caseTerm == NULL
                 || (caseTerm->function != CASE_FUNC && caseTerm->function != BRANCH_FUNC))
             break;
 
+        Branch* caseContents = nested_contents(caseTerm);
+
+        // Add an input_placeholder for the primary input
+        Term* primaryInput = apply(caseContents, INPUT_PLACEHOLDER_FUNC, TermList());
+        caseContents->move(primaryInput, 0);
+
+        int inputPos = 1;
+
         for (std::set<std::string>::const_iterator it = boundNames.begin();
                 it != boundNames.end();
                 ++it) {
             std::string const& name = *it;
 
-            Term* input = find_name(nested_contents(caseTerm), name.c_str());
-            Term* placeholder = apply(nested_contents(caseTerm), OUTPUT_PLACEHOLDER_FUNC,
-                TermList(input), name);
-            change_declared_type(placeholder, input->type);
+            Term* inputPlaceholder = apply(caseContents, INPUT_PLACEHOLDER_FUNC,
+                TermList(), name);
+            caseContents->move(inputPlaceholder, inputPos++);
+
+            Term* nameResult = find_name(caseContents, name.c_str());
+            Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
+                TermList(nameResult), name);
+            change_declared_type(placeholder, nameResult->type);
         }
 
         // Also add an output_placeholder for the primary output.
-        apply(nested_contents(caseTerm), OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+        apply(caseContents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
     }
 
     // Now that each case branch has an output_placeholder list, create a master list
@@ -135,7 +147,6 @@ CA_FUNCTION(evaluate_if_block)
     Branch* contents = nested_contents(caller);
 
     int numBranches = contents->length() - 1;
-    int acceptedBranchIndex = 0;
     Branch* acceptedBranch = NULL;
 
     TaggedValue output;
@@ -189,44 +200,6 @@ CA_FUNCTION(evaluate_if_block)
             return;
         }
     }
-
-    // Evaluate all join() terms
-#if 0
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function == JOIN_FUNC) {
-            TaggedValue inputIsn;
-            write_input_instruction(term, term->input(acceptedBranchIndex), &inputIsn);
-            TaggedValue* value = get_arg(context, &inputIsn);
-
-            // Write the result value to the corresponding place in an above frame.
-            Term* outputTerm = caller->owningBranch->get(caller->index + 1 + i);
-            Frame* upperFrame = get_frame(CONTEXT, 1);
-
-            copy(value, upperFrame->registers[outputTerm->index]);
-        }
-    }
-#endif
-
-    // Copy joined values to output slots
-#if 0
-    Branch* joining = nested_contents(contents->get(contents->length()-1));
-
-    for (int i=0; i < joining->length(); i++) {
-        Term* joinTerm = joining->get(i);
-
-        // Fetch the result value using an input instruction
-        TaggedValue inputIsn;
-        write_input_instruction(joinTerm, joinTerm->input(acceptedBranchIndex), &inputIsn);
-        TaggedValue* value = get_arg(context, &inputIsn);
-
-        // Write the result value to the corresponding place in an above frame.
-        Term* outputTerm = caller->owningBranch->get(caller->index + 1 + i);
-        Frame* upperFrame = get_frame(CONTEXT, 1);
-
-        copy(value, upperFrame->registers[outputTerm->index]);
-    }
-#endif
 }
 
 } // namespace circa
