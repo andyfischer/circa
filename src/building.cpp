@@ -443,6 +443,16 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
+Term* get_output_placeholder(Branch* branch, int index)
+{
+    if (index >= branch->length())
+        return NULL;
+    Term* term = branch->getFromEnd(index);
+    if (term->function != OUTPUT_PLACEHOLDER_FUNC)
+        return NULL;
+    return term;
+}
+
 Branch* term_get_function_details(Term* call)
 {
     if (call->function == IF_BLOCK_FUNC)// || call->function == FOR_FUNC)

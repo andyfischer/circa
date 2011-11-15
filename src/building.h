@@ -80,6 +80,8 @@ Term* procure_int(Branch* branch, std::string const& name);
 Term* procure_float(Branch* branch, std::string const& name);
 Term* procure_bool(Branch* branch, std::string const& name);
 
+Term* get_output_placeholder(Branch* branch, int index);
+
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes
 // found inside the function definition, but for 'if' and 'for' blocks the placeholder
 // is inside nested contents.

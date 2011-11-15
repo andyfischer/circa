@@ -13,6 +13,7 @@
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
+#include "type_inference.h"
 #include "update_cascades.h"
 
 #include "if_block.h"
@@ -70,44 +71,52 @@ void finish_if_block(Term* ifCall)
             ++it;
     }
 
-    int firstCaseLocation = 0;
-    int firstJoinLocation = contents->length();
+    int numOutputs = boundNames.size() + 1;
 
-    // For each name, create a term that selects the correct version of this name.
-    for (std::set<std::string>::const_iterator it = boundNames.begin();
-            it != boundNames.end();
-            ++it)
-    {
-        std::string const& name = *it;
+    // For each case branch, create a list of output_placeholder() terms. This list
+    // should be equivalent across all cases.
+    for (int caseIndex=0;; caseIndex++) {
+        Term* caseTerm = contents->getSafe(caseIndex);
+        if (caseTerm == NULL
+                || (caseTerm->function != CASE_FUNC && caseTerm->function != BRANCH_FUNC))
+            break;
 
-        TermList inputs;
+        for (std::set<std::string>::const_iterator it = boundNames.begin();
+                it != boundNames.end();
+                ++it) {
+            std::string const& name = *it;
 
-        Term* outerVersion = get_named_at(ifCall, name);
-
-        for (int i = 0; ; i++) {
-            Term* caseTerm = contents->getSafe(firstCaseLocation + i);
-            if (caseTerm == NULL
-                || (caseTerm->function != CASE_FUNC) && (caseTerm->function != BRANCH_FUNC))
-                break;
-
-            Term* local = caseTerm->contents(name.c_str());
-            inputs.append(local == NULL ? outerVersion : local);
+            Term* input = find_name(nested_contents(caseTerm), name.c_str());
+            Term* placeholder = apply(nested_contents(caseTerm), OUTPUT_PLACEHOLDER_FUNC,
+                TermList(input), name);
+            change_declared_type(placeholder, input->type);
         }
 
-        apply(contents, JOIN_FUNC, inputs, name);
+        // Also add an output_placeholder for the primary output.
+        apply(nested_contents(caseTerm), OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
     }
 
-    // Append output_placeholder() terms
-    int lastJoinLocation = contents->length();
+    // Now that each case branch has an output_placeholder list, create a master list
+    // in the above if_block branch.
+    for (int outputIndex=0; outputIndex < numOutputs; outputIndex++) {
 
-    for (int i=firstJoinLocation; i < lastJoinLocation; i++) {
-        Term* placeholder = apply(contents, OUTPUT_PLACEHOLDER_FUNC,
-            TermList(contents->get(i)), contents->get(i)->name);
-        change_declared_type(placeholder, contents->get(i)->type);
+        List typeList;
+        std::string name;
+
+        for (int caseIndex=0;; caseIndex++) {
+            Term* caseTerm = contents->getSafe(caseIndex);
+            if (caseTerm == NULL || (caseTerm->function != CASE_FUNC
+                    && caseTerm->function != BRANCH_FUNC))
+                break;
+
+            Term* placeholder = caseTerm->contents()->getFromEnd(numOutputs - outputIndex - 1);
+            set_type(typeList.append(), placeholder->type);
+            name = placeholder->name;
+        }
+
+        Term* masterPlaceholder = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), name);
+        change_declared_type(masterPlaceholder, find_common_type(&typeList));
     }
-
-    // Append the primary output
-    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 }
 
 int if_block_num_branches(Term* ifCall)
@@ -153,19 +162,31 @@ CA_FUNCTION(evaluate_if_block)
             push_frame(context, acceptedBranch);
 
             // Evaluate each term
-            for (int j=0; j < acceptedBranch->length(); j++) {
-                evaluate_single_term(context, acceptedBranch->get(j));
+            for (int i=0; i < acceptedBranch->length(); i++) {
+                evaluate_single_term(context, acceptedBranch->get(i));
                 if (evaluation_interrupted(context))
                     break;
             }
 
-            // Save result
+            List registers;
+            swap(&registers, &top_frame(context)->registers);
+            pop_frame(context);
+
+            // Save primary output
             Term* outputTerm = find_last_non_comment_expression(acceptedBranch);
             if (outputTerm != NULL)
-                copy(outputTerm, &output);
+                copy(registers[outputTerm->index], OUTPUT);
 
-            acceptedBranchIndex = branchIndex;
-            break;
+            // Save extra outputs
+            for (int i=1;; i++) {
+                Term* placeholder = get_output_placeholder(acceptedBranch, i);
+                if (placeholder == NULL)
+                    break;
+
+                copy(registers[placeholder->input(0)->index], EXTRA_OUTPUT(i-1));
+            }
+
+            return;
         }
     }
 
@@ -206,10 +227,6 @@ CA_FUNCTION(evaluate_if_block)
         copy(value, upperFrame->registers[outputTerm->index]);
     }
 #endif
-
-    pop_frame(context);
-
-    swap(&output, OUTPUT);
 }
 
 } // namespace circa
