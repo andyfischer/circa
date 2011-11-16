@@ -86,6 +86,7 @@ Term* get_output_placeholder(Branch* branch, int index);
 // found inside the function definition, but for 'if' and 'for' blocks the placeholder
 // is inside nested contents.
 Term* term_get_input_placeholder(Term* call, int index);
+int term_count_input_placeholders(Term* term);
 Term* term_get_output_placeholder(Term* call, int index);
 
 Term* find_open_state_result(Branch* branch, int position);

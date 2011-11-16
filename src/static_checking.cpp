@@ -45,10 +45,10 @@ void check_input_for_static_error(List* errors, Term* term, int index)
         effectiveIndex = 0;
 
     Term* input = term->input(index);
-    bool meta = function_get_input_meta(func, effectiveIndex);
-    bool optional = function_get_input_optional(func, effectiveIndex);
-    optional = optional || function_is_state_input(func, effectiveIndex);
-    Type* type = function_get_input_type(term->function, effectiveIndex);
+    Term* placeholder = term_get_input_placeholder(term, effectiveIndex);
+    bool meta = placeholder->boolPropOptional("meta", false);
+    bool optional = placeholder->boolPropOptional("optional", false);
+    Type* type = placeholder->type;
 
     if (input == NULL) {
         if (!meta && !optional)
@@ -84,7 +84,7 @@ void check_term_for_static_error(List* errors, Term* term)
 #endif
 
     bool varArgs = func->variableArgs;
-    int expectedInputCount = function_num_inputs(func);
+    int expectedInputCount = term_count_input_placeholders(term);
 
     // Check # of inputs
     if (!varArgs && (term->numInputs() != expectedInputCount))

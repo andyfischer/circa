@@ -181,6 +181,10 @@ Type* FILE_SIGNATURE_T;
 namespace cppbuild_function { CA_FUNCTION(build_module); }
 
 // Standard library functions
+CA_FUNCTION(evaluate_output_placeholder)
+{
+    copy(INPUT(0), OUTPUT);
+}
 
 CA_FUNCTION(file__modified_time)
 {
@@ -347,6 +351,7 @@ void bootstrap_kernel()
     function_t::initialize(&FUNCTION_T, OUTPUT_PLACEHOLDER_FUNC);
     initialize_function(OUTPUT_PLACEHOLDER_FUNC);
     as_function(OUTPUT_PLACEHOLDER_FUNC)->name = "output_placeholder";
+    as_function(OUTPUT_PLACEHOLDER_FUNC)->evaluate = evaluate_output_placeholder;
     ca_assert(function_get_output_type(OUTPUT_PLACEHOLDER_FUNC, 0) == &ANY_T);
 
     // Fix some holes in value() function

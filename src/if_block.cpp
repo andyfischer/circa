@@ -71,11 +71,31 @@ void finish_if_block(Term* ifCall)
             ++it;
     }
 
+    // Add each name as an input to the if_block
+    int inputIndex = 0;
+    for (std::set<std::string>::const_iterator it = boundNames.begin();
+            it != boundNames.end();
+            ++it) {
+
+        std::string const& name = *it;
+        Term* outer = get_named_at(ifCall, name);
+        set_input(ifCall, inputIndex, outer);
+
+        Term* placeholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
+        contents->move(placeholder, inputIndex);
+
+        inputIndex++;
+    }
+
+    int firstCaseIndex = 0;
+    while (contents->get(firstCaseIndex)->function == INPUT_PLACEHOLDER_FUNC)
+        firstCaseIndex++;
+
     int numOutputs = boundNames.size() + 1;
 
     // For each case branch, create a list of input_placeholder() and output_placeholder()
     // terms. This list should be equivalent across all cases.
-    for (int caseIndex=0;; caseIndex++) {
+    for (int caseIndex=firstCaseIndex;; caseIndex++) {
         Term* caseTerm = contents->getSafe(caseIndex);
         if (caseTerm == NULL
                 || (caseTerm->function != CASE_FUNC && caseTerm->function != BRANCH_FUNC))
@@ -83,22 +103,19 @@ void finish_if_block(Term* ifCall)
 
         Branch* caseContents = nested_contents(caseTerm);
 
-        // Add an input_placeholder for the primary input
-        Term* primaryInput = apply(caseContents, INPUT_PLACEHOLDER_FUNC, TermList());
-        caseContents->move(primaryInput, 0);
-
-        int inputPos = 1;
+        int inputPos = 0;
 
         for (std::set<std::string>::const_iterator it = boundNames.begin();
                 it != boundNames.end();
                 ++it) {
             std::string const& name = *it;
 
+            Term* nameResult = find_name(caseContents, name.c_str());
+
             Term* inputPlaceholder = apply(caseContents, INPUT_PLACEHOLDER_FUNC,
                 TermList(), name);
             caseContents->move(inputPlaceholder, inputPos++);
 
-            Term* nameResult = find_name(caseContents, name.c_str());
             Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
                 TermList(nameResult), name);
             change_declared_type(placeholder, nameResult->type);
@@ -115,7 +132,7 @@ void finish_if_block(Term* ifCall)
         List typeList;
         std::string name;
 
-        for (int caseIndex=0;; caseIndex++) {
+        for (int caseIndex=firstCaseIndex;; caseIndex++) {
             Term* caseTerm = contents->getSafe(caseIndex);
             if (caseTerm == NULL || (caseTerm->function != CASE_FUNC
                     && caseTerm->function != BRANCH_FUNC))
@@ -146,7 +163,6 @@ CA_FUNCTION(evaluate_if_block)
     EvalContext* context = CONTEXT;
     Branch* contents = nested_contents(caller);
 
-    int numBranches = contents->length() - 1;
     Branch* acceptedBranch = NULL;
 
     TaggedValue output;
@@ -154,23 +170,34 @@ CA_FUNCTION(evaluate_if_block)
     TaggedValue localState;
     TaggedValue prevScopeState;
 
-    for (int branchIndex=0; branchIndex < numBranches; branchIndex++) {
-        Term* branch = contents->get(branchIndex);
+    int termIndex = 0;
+    while (contents->get(termIndex)->function == INPUT_PLACEHOLDER_FUNC)
+        termIndex++;
 
-        //std::cout << "checking: " << get_term_to_string_extended(branch) << std::endl;
+    for (; termIndex < contents->length(); termIndex++) {
+        Term* caseTerm = contents->get(termIndex);
+
+        //std::cout << "checking: " << get_term_to_string_extended(caseTerm) << std::endl;
         //std::cout << "with stack: " << STACK->toString() << std::endl;
 
         // Look at input
         TaggedValue inputIsn;
-        write_input_instruction(branch, branch->input(0), &inputIsn);
+        write_input_instruction(caseTerm, caseTerm->input(0), &inputIsn);
         
-        if (branch->input(0) == NULL || as_bool(get_arg(context, &inputIsn))) {
+        if (caseTerm->input(0) == NULL || as_bool(get_arg(context, &inputIsn))) {
 
-            acceptedBranch = branch->nestedContents;
+            acceptedBranch = caseTerm->nestedContents;
 
             ca_assert(acceptedBranch != NULL);
 
-            push_frame(context, acceptedBranch);
+            // Copy inputs
+            List registers;
+            registers.resize(acceptedBranch->length());
+            int numInputs = NUM_INPUTS;
+            for (int inputIndex=0; inputIndex < numInputs; inputIndex++)
+                copy(INPUT(inputIndex), registers[inputIndex]);
+
+            push_frame(context, acceptedBranch, &registers);
 
             // Evaluate each term
             for (int i=0; i < acceptedBranch->length(); i++) {
@@ -179,7 +206,6 @@ CA_FUNCTION(evaluate_if_block)
                     break;
             }
 
-            List registers;
             swap(&registers, &top_frame(context)->registers);
             pop_frame(context);
 
@@ -194,7 +220,7 @@ CA_FUNCTION(evaluate_if_block)
                 if (placeholder == NULL)
                     break;
 
-                copy(registers[placeholder->input(0)->index], EXTRA_OUTPUT(i-1));
+                copy(registers[placeholder->index], EXTRA_OUTPUT(i-1));
             }
 
             return;

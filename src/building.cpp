@@ -473,6 +473,14 @@ Term* term_get_input_placeholder(Term* call, int index)
     return term;
 }
 
+int term_count_input_placeholders(Term* term)
+{
+    int result = 0;
+    while (term_get_input_placeholder(term, result) != NULL)
+        result++;
+    return result;
+}
+
 Term* term_get_output_placeholder(Term* call, int index)
 {
     Branch* contents = term_get_function_details(call);
@@ -777,14 +785,13 @@ Term* find_state_output(Branch* branch)
 
 ListData* write_input_instruction_list(Term* caller, ListData* list)
 {
-    Function* func = as_function(caller->function);
     list = list_resize(list, 0);
 
     int declaredIndex = 0;
 
     for (int i=0; i < caller->numInputs(); i++) {
 
-        Term* placeholder = function_get_input_placeholder(func, declaredIndex);
+        Term* placeholder = term_get_input_placeholder(caller, declaredIndex);
         ca_assert(placeholder != NULL);
 
         write_input_instruction(caller, caller->input(i), list_append(&list));
@@ -850,28 +857,16 @@ ListData* write_input_instruction_list(Term* caller, ListData* list)
 
 ListData* write_output_instruction_list(Term* caller, ListData* list)
 {
-    Function* func = as_function(caller->function);
     list = list_resize(list, 1);
 
     // Always write a primary output that corresponds to the caller's register.
     write_input_instruction(caller, caller, list_get_index(list, 0));
 
-    // Walk through the function's declared outputs to find "extra" outputs, write
-    // appropriate instructions for those.
-    for (int declaredIndex=1; ; declaredIndex++) {
-        Term* outputPlaceholder = function_get_output_placeholder(func, declaredIndex);
-        if (outputPlaceholder == NULL)
+    // Write instructions for nearby extra_output() calls.
+    for (int i=1; ; i++) {
+        Term* receiver = caller->owningBranch->getSafe(caller->index + i);
+        if (receiver == NULL)
             break;
-
-        int receiverIndex = caller->index + declaredIndex;
-        Term* receiver = NULL;
-        if (receiverIndex < caller->owningBranch->length())
-            receiver = caller->owningBranch->get(receiverIndex);
-
-        if (receiver == NULL || receiver->function != EXTRA_OUTPUT_FUNC) {
-            internal_error("didn't find a necessary extra_output() term");
-            break;
-        }
 
         write_input_instruction(caller, receiver, list_append(&list));
     }

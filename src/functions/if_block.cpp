@@ -11,27 +11,37 @@ namespace if_block_function {
 
         Branch* contents = nested_contents(term);
 
-        for (int branch_index=0; branch_index < contents->length(); branch_index++) {
-            Term* branch_term = contents->get(branch_index);
+        int index = 0;
+        while (contents->get(index)->function == INPUT_PLACEHOLDER_FUNC)
+            index++;
 
-            if (is_hidden(branch_term))
+        bool firstCase = true;
+
+        for (; index < contents->length(); index++) {
+            Term* caseTerm = contents->get(index);
+
+            if (caseTerm->function != CASE_FUNC && caseTerm->function != BRANCH_FUNC)
+                break;
+
+            if (is_hidden(caseTerm))
                 continue;
 
             append_phrase(source,
-                    branch_term->stringPropOptional("syntax:preWhitespace", ""),
-                    branch_term, token::WHITESPACE);
+                    caseTerm->stringPropOptional("syntax:preWhitespace", ""),
+                    caseTerm, token::WHITESPACE);
 
-            if (branch_index == 0) {
-                append_phrase(source, "if ", branch_term, phrase_type::KEYWORD);
-                format_source_for_input(source, branch_term, 0);
-            } else if (branch_index < (contents->length()-2)) {
-                append_phrase(source, "elif ", branch_term, phrase_type::KEYWORD);
-                format_source_for_input(source, branch_term, 0);
+            if (firstCase) {
+                append_phrase(source, "if ", caseTerm, phrase_type::KEYWORD);
+                format_source_for_input(source, caseTerm, 0);
+                firstCase = false;
+            } else if (caseTerm->input(0) != NULL) {
+                append_phrase(source, "elif ", caseTerm, phrase_type::KEYWORD);
+                format_source_for_input(source, caseTerm, 0);
             }
             else
-                append_phrase(source, "else", branch_term, phrase_type::UNDEFINED);
+                append_phrase(source, "else", caseTerm, phrase_type::UNDEFINED);
 
-            format_branch_source(source, nested_contents(branch_term), branch_term);
+            format_branch_source(source, nested_contents(caseTerm), caseTerm);
         }
     }
 
