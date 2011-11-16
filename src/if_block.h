@@ -6,11 +6,9 @@
 
 namespace circa {
 
+int if_block_count_cases(Term* term);
+Term* if_block_get_case(Term* term, int index);
 void finish_if_block(Term* ifCall);
-
-int if_block_num_branches(Term* ifCall);
-Branch* if_block_get_branch(Term* ifCall, int index);
-
 CA_FUNCTION(evaluate_if_block);
 
 } // namespace circa

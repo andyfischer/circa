@@ -156,12 +156,12 @@ void get_state_description(Term* term, TaggedValue* output)
         describe_state_shape(nested_contents(term), list[0]);
         copy(&RepeatSymbol, list[1]);
     } else if (term->function == IF_BLOCK_FUNC) {
-        int numBranches = if_block_num_branches(term);
+        int numBranches = if_block_count_cases(term);
 
         List& list = *List::cast(output, numBranches);
 
         for (int bindex=0; bindex < numBranches; bindex++) {
-            Branch* branch = if_block_get_branch(term, bindex);
+            Branch* branch = nested_contents(if_block_get_case(term, bindex));
             describe_state_shape(branch, list[bindex]);
         }
     } else if (is_get_state(term)) {

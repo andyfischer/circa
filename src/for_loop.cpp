@@ -98,6 +98,7 @@ void setup_for_loop_post_code(Term* forTerm)
 
         Term* loopResult = forContents->get(name);
 
+#if 0 // JOIN_FUNC is gone
         // First input to both of these should be 'original', but we need to wait until
         // after remap_pointers before setting this.
         Term* innerRebind = apply(forContents, JOIN_FUNC, TermList(NULL, loopResult), name);
@@ -113,6 +114,7 @@ void setup_for_loop_post_code(Term* forTerm)
         set_input(outerRebind, 0, original);
 
         respecialize_type(outerRebind);
+#endif
     }
 
     for_loop_update_output_index(forTerm);
@@ -202,8 +204,8 @@ CA_FUNCTION(evaluate_for_loop)
         int contentIndex = iterator->index + 1;
         for (;; contentIndex++) {
             Term* rebindTerm = forContents->get(contentIndex);
-            if (rebindTerm->function != JOIN_FUNC)
-                break;
+            /*if (rebindTerm->function != JOIN_FUNC)
+                break;*/
             Term* rebindInput = rebindTerm->input(firstIter ? 0 : 1);
             TaggedValue* dest = frame->registers[rebindTerm->index];
 

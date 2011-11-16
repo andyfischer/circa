@@ -45,15 +45,6 @@ namespace if_block_function {
         }
     }
 
-    Type* joinFunc_specializeType(Term* term)
-    {
-        if (term->input(0) == NULL || term->input(1) == NULL)
-            return &ANY_T;
-        List types;
-        set_type_list(&types, get_type_of_input(term, 0), get_type_of_input(term, 1));
-        return find_common_type(&types);
-    }
-
     void setup(Branch* kernel)
     {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
@@ -62,9 +53,6 @@ namespace if_block_function {
         //as_function(IF_BLOCK_FUNC)->getOutputName = getOutputName;
         //as_function(IF_BLOCK_FUNC)->getOutputType = getOutputType;
         as_function(IF_BLOCK_FUNC)->createsStackFrame = false;
-
-        JOIN_FUNC = import_function(kernel, NULL, "join(any...) -> any");
-        as_function(JOIN_FUNC)->specializeType = joinFunc_specializeType;
 
         CASE_FUNC = import_function(kernel, NULL, "case(bool :optional)");
         as_function(CASE_FUNC)->createsStackFrame = true;

@@ -21,6 +21,31 @@
 
 namespace circa {
 
+int if_block_count_cases(Term* term)
+{
+    Branch* contents = nested_contents(term);
+    int result = 0;
+    for (int i=0; i < contents->length(); i++)
+        if (contents->get(i) != NULL && contents->get(i)->function == CASE_FUNC)
+            result++;
+    return result;
+}
+
+Term* if_block_get_case(Term* term, int index)
+{
+    Branch* contents = nested_contents(term);
+    for (int i=0; i < contents->length(); i++) {
+        if (contents->get(i) == NULL || contents->get(i)->function != CASE_FUNC)
+            continue;
+
+        if (index == 0)
+            return contents->get(i);
+
+        index--;
+    }
+    return NULL;
+}
+
 void finish_if_block(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
@@ -155,15 +180,6 @@ void finish_if_block(Term* ifCall)
         Term* masterPlaceholder = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), name);
         change_declared_type(masterPlaceholder, find_common_type(&typeList));
     }
-}
-
-int if_block_num_branches(Term* ifCall)
-{
-    return nested_contents(ifCall)->length() - 1;
-}
-Branch* if_block_get_branch(Term* ifCall, int index)
-{
-    return ifCall->contents(index)->contents();
 }
 
 CA_FUNCTION(evaluate_if_block)
