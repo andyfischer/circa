@@ -80,6 +80,7 @@ Term* procure_int(Branch* branch, std::string const& name);
 Term* procure_float(Branch* branch, std::string const& name);
 Term* procure_bool(Branch* branch, std::string const& name);
 
+Term* get_input_placeholder(Branch* branch, int index);
 Term* get_output_placeholder(Branch* branch, int index);
 
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes
@@ -98,8 +99,11 @@ Term* find_or_create_open_state_result(Branch* branch, int position);
 void check_to_insert_implicit_inputs(Term* term);
 bool term_is_state_input(Term* term, int index);
 Term* find_state_input(Branch* branch);
+bool has_state_input(Branch* branch);
 Term* find_state_output(Branch* branch);
 Term* insert_state_input(Branch* branch);
+Term* insert_state_output(Branch* branch);
+bool is_state_input(Term* placeholder);
 
 void set_step(Term* term, float step);
 float get_step(Term* term);

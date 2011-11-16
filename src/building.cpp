@@ -443,6 +443,16 @@ Term* procure_bool(Branch* branch, std::string const& name)
     return procure_value(branch, &BOOL_T, name);
 }
 
+Term* get_input_placeholder(Branch* branch, int index)
+{
+    if (index >= branch->length())
+        return NULL;
+    Term* term = branch->get(index);
+    if (term->function != INPUT_PLACEHOLDER_FUNC)
+        return NULL;
+    return term;
+}
+
 Term* get_output_placeholder(Branch* branch, int index)
 {
     if (index >= branch->length())
@@ -639,10 +649,8 @@ void finish_minor_branch(Branch* branch)
 {
     // Create an output_placeholder for state, if necessary
     Term* openState = find_open_state_result(branch, branch->length());
-    if (openState != NULL) {
-        Term* term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(openState));
-        term->setBoolProp("state", true);
-    }
+    if (openState != NULL)
+        insert_state_output(branch);
 }
 
 void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm)
@@ -772,6 +780,10 @@ Term* find_state_input(Branch* branch)
     }
     return NULL;
 }
+bool has_state_input(Branch* branch)
+{
+    return find_state_input(branch) != NULL;
+}
 
 Term* find_state_output(Branch* branch)
 {
@@ -783,6 +795,36 @@ Term* find_state_output(Branch* branch)
             return placeholder;
     }
     return NULL;
+}
+Term* insert_state_input(Branch* branch)
+{
+    // Make sure that a state input doesn't already exist
+    Term* term = find_state_input(branch);
+    if (term != NULL)
+        return term;
+
+    term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
+    branch->move(term, 0);
+    term->setBoolProp("state", true);
+    term->setBoolProp("hiddenInput", true);
+    term->setBoolProp("output", true);
+    return term;
+}
+Term* insert_state_output(Branch* branch)
+{
+    // Make sure that a state input doesn't already exist
+    Term* term = find_state_output(branch);
+    if (term != NULL)
+        return term;
+    term = apply(branch, OUTPUT_PLACEHOLDER_FUNC,
+        TermList(find_open_state_result(branch, branch->length())));
+    term->setBoolProp("state", true);
+    hide_from_source(term);
+    return term;
+}
+bool is_state_input(Term* placeholder)
+{
+    return placeholder->boolPropOptional("state", false);
 }
 
 ListData* write_input_instruction_list(Term* caller, ListData* list)

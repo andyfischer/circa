@@ -120,15 +120,17 @@ void finish_building_function(Function* func, Type* declaredOutputType)
         Term* input = function_get_input_placeholder(func, i);
 
         if (input->boolPropOptional("output", false)) {
+
+            if (is_state_input(input)) {
+                Term* term = insert_state_output(contents);
+                term->setIntProp("rebindsInput", i);
+                continue;
+            }
+
             Term* output = apply(contents,
                 OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
             change_declared_type(output, input->type);
             output->setIntProp("rebindsInput", i);
-
-            if (input->boolPropOptional("state", false)) {
-                set_input(output, 0, find_open_state_result(contents, contents->length()));
-                output->setBoolProp("state", true);
-            }
         }
     }
 

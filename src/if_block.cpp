@@ -46,16 +46,36 @@ Term* if_block_get_case(Term* term, int index)
     return NULL;
 }
 
-void finish_if_block(Term* ifCall)
+bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
+{
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function == CASE_FUNC)
+            if (!nested_contents(term)->contains(name))
+                return false;
+    }
+    return true;
+}
+
+void if_block_update_master_placeholders(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
 
     // Find the set of all names bound in every branch.
     std::set<std::string> boundNames;
+    bool hasState = false;
 
-    for (int branch_index=0; branch_index < contents->length()-1; branch_index++) {
-        Term* term = contents->get(branch_index);
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+
+        if (term->function == INPUT_PLACEHOLDER_FUNC)
+            continue;
+        if (term->function != CASE_FUNC)
+            break;
+
         Branch* branch = nested_contents(term);
+
+        hasState = hasState || find_state_input(branch) != NULL;
 
         TermNamespace::const_iterator it;
         for (it = branch->names.begin(); it != branch->names.end(); ++it) {
@@ -83,13 +103,7 @@ void finish_if_block(Term* ifCall)
         
         bool boundInOuterScope = find_name(outerScope, name.c_str()) != NULL;
 
-        bool boundInEveryBranch = true;
-
-        for (int branch_index=0; branch_index < contents->length()-1; branch_index++) {
-            Branch* branch = nested_contents(contents->get(branch_index));
-            if (!branch->contains(name))
-                boundInEveryBranch = false;
-        }
+        bool boundInEveryBranch = if_block_is_name_bound_in_every_case(contents, name.c_str());;
 
         if (!boundInOuterScope && !boundInEveryBranch)
             boundNames.erase(it++);
@@ -97,7 +111,7 @@ void finish_if_block(Term* ifCall)
             ++it;
     }
 
-    // Add each name as an input to the if_block
+    // Add each name as an input and output to the if_block
     int inputIndex = 0;
     for (std::set<std::string>::const_iterator it = boundNames.begin();
             it != boundNames.end();
@@ -109,16 +123,54 @@ void finish_if_block(Term* ifCall)
 
         Term* placeholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
         contents->move(placeholder, inputIndex);
-
         inputIndex++;
+
+        apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), name);
     }
 
-    int firstCaseIndex = 0;
-    while (contents->get(firstCaseIndex)->function == INPUT_PLACEHOLDER_FUNC)
-        firstCaseIndex++;
+    // If any branches have a state input, then add a master state input too.
+    if (hasState) {
+        insert_state_input(contents);
+        insert_state_output(contents);
+    }
+}
 
-    int numOutputs = boundNames.size() + 1;
+void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
+{
+    Branch* masterContents = nested_contents(ifCall);
+    Branch* caseContents = nested_contents(caseTerm);
 
+    // Create input placeholders
+    for (int i=0;; i++) {
+        Term* masterPlaceholder = get_input_placeholder(masterContents, i);
+        if (masterPlaceholder == NULL)
+            break;
+
+        if (is_state_input(masterPlaceholder) && has_state_input(caseContents))
+            continue;
+
+        Term* placeholder = apply(caseContents, INPUT_PLACEHOLDER_FUNC, TermList(),
+            masterPlaceholder->name);
+        copy(&masterPlaceholder->properties, &placeholder->properties);
+        caseContents->move(placeholder, i);
+    }
+
+    // Create output placeholders
+    for (int i=0;; i++) {
+        Term* masterPlaceholder = get_output_placeholder(masterContents, i);
+        if (masterPlaceholder == NULL)
+            break;
+
+        Term* nameResult = get_named_at(caseContents, caseContents->length(),
+            masterPlaceholder->name.c_str());
+
+        Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
+            TermList(nameResult), masterPlaceholder->name);
+        change_declared_type(placeholder, nameResult->type);
+        copy(&masterPlaceholder->properties, &placeholder->properties);
+    }
+
+#if 0
     // For each case branch, create a list of input_placeholder() and output_placeholder()
     // terms. This list should be equivalent across all cases.
     for (int caseIndex=firstCaseIndex;; caseIndex++) {
@@ -180,6 +232,26 @@ void finish_if_block(Term* ifCall)
         Term* masterPlaceholder = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), name);
         change_declared_type(masterPlaceholder, find_common_type(&typeList));
     }
+#endif
+}
+
+void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
+{
+    // TODO
+}
+
+void finish_if_block(Term* ifBlock)
+{
+    if_block_update_master_placeholders(ifBlock);
+
+    Branch* contents = nested_contents(ifBlock);
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function == CASE_FUNC)
+            if_block_update_case_placeholders_from_master(ifBlock, term);
+    }
+
+    if_block_update_output_placeholder_types_from_cases(ifBlock);
 }
 
 CA_FUNCTION(evaluate_if_block)
