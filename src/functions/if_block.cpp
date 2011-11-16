@@ -20,7 +20,7 @@ namespace if_block_function {
         for (; index < contents->length(); index++) {
             Term* caseTerm = contents->get(index);
 
-            if (caseTerm->function != CASE_FUNC && caseTerm->function != BRANCH_FUNC)
+            if (caseTerm->function != CASE_FUNC)
                 break;
 
             if (is_hidden(caseTerm))

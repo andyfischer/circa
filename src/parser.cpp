@@ -837,8 +837,8 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
-        Branch* branch = create_branch(contents, "else");
-        hide_from_source(branch->owningTerm);
+        Term* elseTerm = apply(contents, CASE_FUNC, TermList(NULL), "else");
+        hide_from_source(elseTerm);
     }
 
     // Move the if_block term to be after the condition terms.

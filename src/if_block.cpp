@@ -97,8 +97,7 @@ void finish_if_block(Term* ifCall)
     // terms. This list should be equivalent across all cases.
     for (int caseIndex=firstCaseIndex;; caseIndex++) {
         Term* caseTerm = contents->getSafe(caseIndex);
-        if (caseTerm == NULL
-                || (caseTerm->function != CASE_FUNC && caseTerm->function != BRANCH_FUNC))
+        if (caseTerm == NULL || caseTerm->function != CASE_FUNC)
             break;
 
         Branch* caseContents = nested_contents(caseTerm);
@@ -134,8 +133,7 @@ void finish_if_block(Term* ifCall)
 
         for (int caseIndex=firstCaseIndex;; caseIndex++) {
             Term* caseTerm = contents->getSafe(caseIndex);
-            if (caseTerm == NULL || (caseTerm->function != CASE_FUNC
-                    && caseTerm->function != BRANCH_FUNC))
+            if (caseTerm == NULL || caseTerm->function != CASE_FUNC)
                 break;
 
             Term* placeholder = caseTerm->contents()->getFromEnd(numOutputs - outputIndex - 1);
