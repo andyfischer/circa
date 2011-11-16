@@ -40,6 +40,7 @@
 #define STATE_INPUT (get_state_input(_cxt, CALLER))
 #define INPUT_TERM(index) (CALLER->input(index))
 #define OUTPUT (get_arg(_cxt, _outs, 0))
+#define OUTPUT_NTH(index) (get_arg(_cxt, _outs, (index)))
 #define EXTRA_OUTPUT(index) (get_arg(_cxt, _outs, (index)+1))
 #define FUNCTION (CALLER->function)
 #define ERROR_OCCURRED(msg) (error_occurred(_cxt, CALLER, OUTPUT, (msg)))

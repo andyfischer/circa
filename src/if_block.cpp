@@ -10,6 +10,7 @@
 #include "evaluation.h"
 #include "importing_macros.h"
 #include "locals.h"
+#include "refactoring.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"
@@ -109,19 +110,29 @@ void finish_if_block(Term* ifCall)
                 ++it) {
             std::string const& name = *it;
 
+            Term* outerVersion = get_named_at(ifCall, name.c_str());
             Term* nameResult = find_name(caseContents, name.c_str());
 
             Term* inputPlaceholder = apply(caseContents, INPUT_PLACEHOLDER_FUNC,
                 TermList(), name);
             caseContents->move(inputPlaceholder, inputPos++);
 
+            if (nameResult->owningBranch != caseContents)
+                nameResult = inputPlaceholder;
+
             Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
                 TermList(nameResult), name);
             change_declared_type(placeholder, nameResult->type);
+
+            // Also, now that we have an input_placeholder(), go through our terms
+            // and rebind anyone that is using the outer version.
+            for (int i=0; i < caseContents->length(); i++)
+                remap_pointers_quick(caseContents->get(i), outerVersion, inputPlaceholder);
         }
 
         // Also add an output_placeholder for the primary output.
-        apply(caseContents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+        apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
+            TermList(find_last_non_comment_expression(caseContents)));
     }
 
     // Now that each case branch has an output_placeholder list, create a master list
@@ -207,18 +218,13 @@ CA_FUNCTION(evaluate_if_block)
             swap(&registers, &top_frame(context)->registers);
             pop_frame(context);
 
-            // Save primary output
-            Term* outputTerm = find_last_non_comment_expression(acceptedBranch);
-            if (outputTerm != NULL)
-                copy(registers[outputTerm->index], OUTPUT);
-
-            // Save extra outputs
-            for (int i=1;; i++) {
+            // Save outputs
+            for (int i=0;; i++) {
                 Term* placeholder = get_output_placeholder(acceptedBranch, i);
                 if (placeholder == NULL)
                     break;
 
-                copy(registers[placeholder->index], EXTRA_OUTPUT(i-1));
+                copy(registers[placeholder->index], OUTPUT_NTH(i));
             }
 
             return;

@@ -69,6 +69,13 @@ void remove_term(Term* term)
         list_remove_index(&branch->pendingUpdates, index);
 }
 
+void remap_pointers_quick(Term* term, Term* old, Term* newTerm)
+{
+    for (int i=0; i < term->numInputs(); i++)
+        if (term->input(i) == old)
+            set_input(term, i, newTerm);
+}
+
 void remap_pointers(Term* term, TermMap const& map)
 {
     assert_valid_term(term);

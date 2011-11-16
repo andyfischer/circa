@@ -62,7 +62,7 @@ void set_input(Term* term, int index, Term* input)
     while (index >= term->numInputs())
         term->inputs.push_back(NULL);
 
-    term->inputs[index] = Term::Input(input);
+    term->inputs[index].term = input;
 
     // Add 'term' to the user list of 'input'
     append_user(term, input);
@@ -669,6 +669,8 @@ Term* find_last_non_comment_expression(Branch* branch)
 {
     for (int i = branch->length() - 1; i >= 0; i--) {
         if (branch->get(i) == NULL)
+            continue;
+        if (branch->get(i)->function == OUTPUT_PLACEHOLDER_FUNC)
             continue;
         if (branch->get(i)->name == "#outer_rebinds")
             continue;
