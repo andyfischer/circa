@@ -18,6 +18,8 @@ bool DEBUG_TRAP_ERROR_OCCURRED = false;
 bool DEBUG_TRACE_ALL_REF_WRITES = false;
 bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS = false;
 
+const char* DEBUG_BREAK_ON_TERM = "";
+
 void dump(Branch& branch)
 {
     print_branch(std::cout, &branch);
@@ -68,6 +70,15 @@ void ca_assert_function(bool expr, const char* exprStr, int line, const char* fi
         msg << "ca_assert(" << exprStr << ") failed in " << file << " line " << line;
         internal_error(msg.str().c_str());
     }
+}
+
+void ca_debugger_break()
+{
+#if CIRCA_TEST_BUILD
+    asm { int 3 };
+#else
+    internal_error("debugger break");
+#endif
 }
 
 } // namespace circa

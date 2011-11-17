@@ -47,6 +47,15 @@ int run_command_line(std::vector<std::string> args)
         return 0;
     }
 
+    // Check for prepend options
+    if (args[0] == "-breakon") {
+        std::string name = "$" + args[1];
+        DEBUG_BREAK_ON_TERM = strdup(name.c_str());
+        args.erase(args.begin());
+        args.erase(args.begin());
+        std::cout << "breaking on creation of term: " << DEBUG_BREAK_ON_TERM << std::endl;
+    }
+
     // Run unit tests
     if (args[0] == "-test") {
         if (args.size() > 1)

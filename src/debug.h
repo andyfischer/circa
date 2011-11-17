@@ -20,6 +20,8 @@ extern bool DEBUG_TRACE_ALL_REF_WRITES;
 
 extern bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS;
 
+extern const char* DEBUG_BREAK_ON_TERM;
+
 // Spit out this branch's raw contents to std::cout
 void dump(Branch& branch);
 void dump(Branch* branch);
@@ -33,5 +35,7 @@ void dump(EvalContext* context);
 // will either throw an exception or trigger an assert().
 void internal_error(const char* message);
 void internal_error(std::string const& message);
+
+void ca_debugger_break();
 
 } // namespace circa

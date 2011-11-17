@@ -29,6 +29,11 @@ Term::Term()
     globalID = gNextGlobalID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
+
+#if CIRCA_TEST_BUILD
+    if (global_id(this) == DEBUG_BREAK_ON_TERM)
+        ca_debugger_break();
+#endif
 }
 
 Term::~Term()

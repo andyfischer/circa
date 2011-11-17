@@ -448,6 +448,8 @@ Term* get_input_placeholder(Branch* branch, int index)
     if (index >= branch->length())
         return NULL;
     Term* term = branch->get(index);
+    if (term == NULL)
+        return NULL;
     if (term->function != INPUT_PLACEHOLDER_FUNC)
         return NULL;
     return term;
@@ -532,7 +534,7 @@ void check_to_insert_implicit_inputs(Term* term)
     if (!is_function(term->function))
         return;
 
-    if (function_has_state_input(as_function(term->function))
+    if (has_state_input(term_get_function_details(term))
         && !term_is_state_input(term, 0)) {
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
@@ -627,16 +629,6 @@ void post_compile_term(Term* term)
         hide_from_source(pack);
     }
 
-#if 0
-    // Special code for if-block join terms. It would be sweet if this code wasn't
-    // necessary.
-    if (term->function == IF_BLOCK_FUNC) {
-        Branch* joins = nested_contents(term)->getFromEnd(0)->contents();
-        for (int i=0; i < joins->length(); i++)
-            apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), joins->get(i)->name);
-    }
-#endif
-
     // Ditto on for-loops
     if (term->function == FOR_FUNC) {
         Branch* joins = nested_contents(term)->get("#outer_rebinds")->contents(); 
@@ -647,6 +639,8 @@ void post_compile_term(Term* term)
 
 void finish_minor_branch(Branch* branch)
 {
+    pack_any_open_state_vars(branch);
+
     // Create an output_placeholder for state, if necessary
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)
@@ -771,11 +765,11 @@ bool term_is_state_input(Term* term, int index)
 
 Term* find_state_input(Branch* branch)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* placeholder = branch->get(i);
-        if (placeholder->function != INPUT_PLACEHOLDER_FUNC)
-            break;
-        if (function_is_state_input(placeholder))
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (is_state_input(placeholder))
             return placeholder;
     }
     return NULL;

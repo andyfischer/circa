@@ -133,6 +133,21 @@ void if_block_update_master_placeholders(Term* ifCall)
         insert_state_input(contents);
         insert_state_output(contents);
     }
+
+    // Finally, add a primary output
+    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+}
+
+bool does_output_placeholder_exist(Branch* branch, Term* placeholder)
+{
+    for (int i=0;; i++) {
+        Term* existingPlaceholder = get_output_placeholder(branch, i);
+        if (existingPlaceholder == NULL)
+            return false;
+
+        if (is_state_input(placeholder) && is_state_input(placeholder))
+            return true;
+    }
 }
 
 void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
@@ -161,78 +176,20 @@ void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
         if (masterPlaceholder == NULL)
             break;
 
+        if (does_output_placeholder_exist(caseContents, masterPlaceholder))
+            continue;
+
         Term* nameResult = get_named_at(caseContents, caseContents->length(),
             masterPlaceholder->name.c_str());
+
+        if (is_state_input(masterPlaceholder))
+            nameResult = find_open_state_result(caseContents, caseContents->length());
 
         Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
             TermList(nameResult), masterPlaceholder->name);
         change_declared_type(placeholder, nameResult->type);
         copy(&masterPlaceholder->properties, &placeholder->properties);
     }
-
-#if 0
-    // For each case branch, create a list of input_placeholder() and output_placeholder()
-    // terms. This list should be equivalent across all cases.
-    for (int caseIndex=firstCaseIndex;; caseIndex++) {
-        Term* caseTerm = contents->getSafe(caseIndex);
-        if (caseTerm == NULL || caseTerm->function != CASE_FUNC)
-            break;
-
-        Branch* caseContents = nested_contents(caseTerm);
-
-        int inputPos = 0;
-
-        for (std::set<std::string>::const_iterator it = boundNames.begin();
-                it != boundNames.end();
-                ++it) {
-            std::string const& name = *it;
-
-            Term* outerVersion = get_named_at(ifCall, name.c_str());
-            Term* nameResult = find_name(caseContents, name.c_str());
-
-            Term* inputPlaceholder = apply(caseContents, INPUT_PLACEHOLDER_FUNC,
-                TermList(), name);
-            caseContents->move(inputPlaceholder, inputPos++);
-
-            if (nameResult->owningBranch != caseContents)
-                nameResult = inputPlaceholder;
-
-            Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
-                TermList(nameResult), name);
-            change_declared_type(placeholder, nameResult->type);
-
-            // Also, now that we have an input_placeholder(), go through our terms
-            // and rebind anyone that is using the outer version.
-            for (int i=0; i < caseContents->length(); i++)
-                remap_pointers_quick(caseContents->get(i), outerVersion, inputPlaceholder);
-        }
-
-        // Also add an output_placeholder for the primary output.
-        apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
-            TermList(find_last_non_comment_expression(caseContents)));
-    }
-
-    // Now that each case branch has an output_placeholder list, create a master list
-    // in the above if_block branch.
-    for (int outputIndex=0; outputIndex < numOutputs; outputIndex++) {
-
-        List typeList;
-        std::string name;
-
-        for (int caseIndex=firstCaseIndex;; caseIndex++) {
-            Term* caseTerm = contents->getSafe(caseIndex);
-            if (caseTerm == NULL || caseTerm->function != CASE_FUNC)
-                break;
-
-            Term* placeholder = caseTerm->contents()->getFromEnd(numOutputs - outputIndex - 1);
-            set_type(typeList.append(), placeholder->type);
-            name = placeholder->name;
-        }
-
-        Term* masterPlaceholder = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), name);
-        change_declared_type(masterPlaceholder, find_common_type(&typeList));
-    }
-#endif
 }
 
 void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
@@ -252,6 +209,7 @@ void finish_if_block(Term* ifBlock)
     }
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);
+    check_to_insert_implicit_inputs(ifBlock);
 }
 
 CA_FUNCTION(evaluate_if_block)

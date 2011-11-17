@@ -46,6 +46,8 @@ if POSIX:
     for env in [DEBUG,TEST]:
         env.Append(CPPDEFINES = ["DEBUG"])
 
+    TEST.Append(CPPFLAGS=['-fasm-blocks'])
+
     RELEASE.Append(CPPFLAGS=['-O1'])
 
 if WINDOWS:
