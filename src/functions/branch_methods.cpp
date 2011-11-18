@@ -89,7 +89,7 @@ namespace branch_methods_function {
         if (term == NULL) return false;
         if (term->name == "") return false;
         if (!is_value(term)) return false;
-        if (is_get_state(term)) return false;
+        if (is_declared_state(term)) return false;
         if (is_hidden(term)) return false;
         if (is_function(term)) return false;
 

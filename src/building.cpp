@@ -323,15 +323,6 @@ Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const&
     return term;
 }
 
-Term* create_stateful_value(Branch* branch, Type* type, Term* defaultValue,
-        std::string const& name)
-{
-    Term* result = apply(branch, GET_STATE_FIELD_FUNC, TermList(defaultValue), name);
-    check_to_insert_implicit_inputs(result);
-    change_declared_type(result, type);
-    return result;
-}
-
 Term* create_string(Branch* branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, &STRING_T, name);
@@ -654,7 +645,7 @@ void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm)
         if (branch->get(i) == NULL)
             continue;
 
-        if (branch->get(i)->function == GET_STATE_FIELD_FUNC) {
+        if (branch->get(i)->function == DECLARED_STATE_FUNC) {
             Term* term = apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList());
             update_branch_finish_term(term);
             break;

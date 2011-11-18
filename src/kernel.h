@@ -36,7 +36,7 @@ extern Term* FOR_FUNC;
 extern Term* GET_FIELD_FUNC;
 extern Term* GET_INDEX_FUNC;
 extern Term* GET_INDEX_FROM_BRANCH_FUNC;
-extern Term* GET_STATE_FIELD_FUNC;
+extern Term* DECLARED_STATE_FUNC;
 extern Term* IF_BLOCK_FUNC;
 extern Term* COND_FUNC;
 extern Term* INCLUDE_FUNC;

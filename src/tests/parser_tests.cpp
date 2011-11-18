@@ -198,14 +198,14 @@ void test_stateful_value_decl()
     Branch branch;
     Term* a = parser::compile(&branch, parser::statement, "state int a");
 
-    test_assert(is_get_state(a));
+    test_assert(is_declared_state(a));
     test_assert(a->name == "a");
     test_equals(a->type->name, "int");
     test_assert(branch["a"] == a);
 
     Term* b = parser::compile(&branch, parser::statement, "state b = 5.0");
     test_assert(b->name == "b");
-    test_assert(is_get_state(b));
+    test_assert(is_declared_state(b));
 
     test_equals(b->type->name, "number");
     test_assert(branch["b"] == b);
@@ -213,7 +213,7 @@ void test_stateful_value_decl()
 
     Term* c = parser::compile(&branch, parser::statement, "state number c = 7.5");
     test_assert(c->name == "c");
-    test_assert(is_get_state(c));
+    test_assert(is_declared_state(c));
     test_equals(c->type->name, "number");
     test_assert(branch["c"] == c);
     test_assert(!is_float(c) || as_float(b) == 0); // shouldn't have this value yet

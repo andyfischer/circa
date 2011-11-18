@@ -32,7 +32,7 @@ namespace finish_minor_branch_function {
             if (term == NULL)
                 continue;
 
-            if (term->function == GET_STATE_FIELD_FUNC) {
+            if (term->function == DECLARED_STATE_FUNC) {
                 if (term->name == "")
                     continue;
                 Term* outcome = get_named_at(finishBranchTerm, term->name);

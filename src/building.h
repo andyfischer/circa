@@ -54,9 +54,6 @@ Term* create_value(Branch* branch, Type* type, std::string const& name="");
 Term* create_value(Branch* branch, std::string const& typeName, std::string const& name="");
 Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const& name="");
 
-Term* create_stateful_value(Branch* branch, Type* type, Term* defaultValue,
-        std::string const& name);
-
 // Create values with a specified value.
 Term* create_string(Branch* branch, std::string const& s, std::string const& name="");
 Term* create_int(Branch* branch, int i, std::string const& name="");

@@ -1014,9 +1014,11 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
             type = initialValue->type;
     }
 
-    // Create the get_state_field() term.
-    Term* result = create_stateful_value(branch, type, initialValue, name);
-
+    // Create the declared_state() term.
+    Term* result = apply(branch, DECLARED_STATE_FUNC, TermList(initialValue), name);
+    check_to_insert_implicit_inputs(result);
+    change_declared_type(result, type);
+    
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);
 

@@ -6,12 +6,9 @@
 #include "dict.h"
 
 namespace circa {
-namespace get_state_field_function {
+namespace declared_state_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(get_state_field,
-        "get_state_field(state any value, any default_value :optional) -> any")
+    CA_FUNCTION(get_declared_state)
     {
         TaggedValue* value = INPUT(0);
         TaggedValue* output = OUTPUT;
@@ -73,9 +70,9 @@ namespace get_state_field_function {
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
-        GET_STATE_FIELD_FUNC = kernel->get("get_state_field");
-        as_function(GET_STATE_FIELD_FUNC)->formatSource = formatSource;
+        DECLARED_STATE_FUNC = import_function(kernel, get_declared_state,
+            "declared_state(state any value, any default_value :optional) -> any");
+        as_function(DECLARED_STATE_FUNC)->formatSource = formatSource;
     }
 }
 }

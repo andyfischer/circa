@@ -16,9 +16,9 @@
 
 namespace circa {
 
-bool is_get_state(Term* term)
+bool is_declared_state(Term* term)
 {
-    return term->function->name == "get_state_field";
+    return term->function == DECLARED_STATE_FUNC;
 }
 
 bool has_implicit_state(Term* term)
@@ -60,7 +60,7 @@ void pack_any_open_state_vars(Branch* branch)
         Term* term = branch->get(i);
         if (term == NULL)
             continue;
-        if (term->function == GET_STATE_FIELD_FUNC) {
+        if (term->function == DECLARED_STATE_FUNC) {
             Term* result = branch->get(term->name);
             Term* pack = apply(branch, PACK_STATE_FUNC, TermList(
                 find_open_state_result(branch, branch->length()),
@@ -81,7 +81,7 @@ bool has_any_inlined_state(Branch* branch)
     // No valid value, recalculate.
     bool result = false;
     for (int i=0; i < branch->length(); i++) {
-        if (is_get_state(branch->get(i))) {
+        if (is_declared_state(branch->get(i))) {
             result = true;
             break;
         }
@@ -123,7 +123,7 @@ void get_type_from_branches_stateful_terms(Branch* branch, Branch* type)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
 
-        if (!is_get_state(term))
+        if (!is_declared_state(term))
             continue;
 
         create_value(type, term->type, term->name);
@@ -145,7 +145,7 @@ void get_state_description(Term* term, TaggedValue* output)
             Branch* branch = nested_contents(if_block_get_case(term, bindex));
             describe_state_shape(branch, list[bindex]);
         }
-    } else if (is_get_state(term)) {
+    } else if (is_declared_state(term)) {
         set_string(output, declared_type(term)->name);
     } else if (is_function_stateful(term->function)) {
         describe_state_shape(nested_contents(term->function), output);
@@ -165,7 +165,7 @@ void describe_state_shape(Branch* branch, TaggedValue* output)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
 
-        if (has_implicit_state(term) || is_get_state(term)) {
+        if (has_implicit_state(term) || is_declared_state(term)) {
             if (dict == NULL)
                 dict = Dict::cast(output);
 

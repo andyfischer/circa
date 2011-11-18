@@ -11,7 +11,7 @@ void on_stateful_function_call_created(Term* call);
 Term* insert_state_input(Branch* branch);
 void pack_any_open_state_vars(Branch* branch);
 
-bool is_get_state(Term* term);
+bool is_declared_state(Term* term);
 bool has_implicit_state(Term* term);
 bool has_any_inlined_state(Branch* branch);
 void mark_branch_as_having_inlined_state(Branch* branch);
