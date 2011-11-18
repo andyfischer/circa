@@ -267,34 +267,6 @@ void subroutine_early_return()
     test_equals(&context.state, "{_f: {s: 2}}");
 }
 
-void test_branch_has_inlined_state()
-{
-    Branch branch;
-
-    test_assert(is_null(&branch.hasInlinedState));
-    test_assert(!has_any_inlined_state(&branch));
-    test_assert(as_bool(&branch.hasInlinedState) == false);
-    set_null(&branch.hasInlinedState);
-
-    branch.compile("state int i");
-    test_assert(has_any_inlined_state(&branch));
-
-    branch.clear();
-    test_assert(!has_any_inlined_state(&branch));
-
-    Branch* nested = create_branch(&branch);
-    test_assert(!has_any_inlined_state(&branch));
-    test_assert(!has_any_inlined_state(nested));
-
-    nested->compile("state i");
-    test_assert(has_any_inlined_state(&branch));
-    test_assert(has_any_inlined_state(nested));
-
-    nested->clear();
-    test_assert(!has_any_inlined_state(nested));
-    test_assert(!has_any_inlined_state(&branch));
-}
-
 void test_state_var_needs_cast()
 {
     Branch branch;
@@ -470,7 +442,6 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_state_and_plus_equals);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_unique_name_usage);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_early_return);
-    REGISTER_TEST_CASE(stateful_code_tests::test_branch_has_inlined_state);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_needs_cast);
     REGISTER_TEST_CASE(stateful_code_tests::test_state_var_default_needs_cast);
     REGISTER_TEST_CASE(stateful_code_tests::test_describe_state_shape);

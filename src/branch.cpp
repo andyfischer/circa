@@ -469,7 +469,6 @@ void clear_branch(Branch* branch)
 {
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
-    mark_branch_as_possibly_not_having_inlined_state(branch);
     set_null(&branch->pendingUpdates);
 
     branch->names.clear();

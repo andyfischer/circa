@@ -13,9 +13,6 @@ void pack_any_open_state_vars(Branch* branch);
 
 bool is_declared_state(Term* term);
 bool has_implicit_state(Term* term);
-bool has_any_inlined_state(Branch* branch);
-void mark_branch_as_having_inlined_state(Branch* branch);
-void mark_branch_as_possibly_not_having_inlined_state(Branch* branch);
 void get_type_from_branches_stateful_terms(Branch* branch, Branch* type);
 void describe_state_shape(Branch* branch, TaggedValue* output);
 

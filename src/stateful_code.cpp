@@ -23,11 +23,7 @@ bool is_declared_state(Term* term)
 
 bool has_implicit_state(Term* term)
 {
-    if (is_function_stateful(term->function))
-        return true;
-    if (has_nested_contents(term) && has_any_inlined_state(nested_contents(term)))
-        return true;
-    return false;
+    return has_state_input(term_get_function_details(term));
 }
 
 bool is_function_stateful(Term* func)
@@ -71,53 +67,6 @@ void pack_any_open_state_vars(Branch* branch)
     }
 }
 
-bool has_any_inlined_state(Branch* branch)
-{
-    // This result is cached on the branch. Check if branch.hasInlinedState has
-    // a valid value.
-    if (is_bool(&branch->hasInlinedState))
-        return as_bool(&branch->hasInlinedState);
-
-    // No valid value, recalculate.
-    bool result = false;
-    for (int i=0; i < branch->length(); i++) {
-        if (is_declared_state(branch->get(i))) {
-            result = true;
-            break;
-        }
-
-        if (has_implicit_state(branch->get(i))) {
-            result = true;
-            break;
-        }
-    }
-
-    set_bool(&branch->hasInlinedState, result);
-    return result;
-}
-
-void mark_branch_as_having_inlined_state(Branch* branch)
-{
-    if (is_bool(&branch->hasInlinedState) && as_bool(&branch->hasInlinedState))
-        return;
-
-    set_bool(&branch->hasInlinedState, true);
-    Branch* parent = get_parent_branch(branch);
-    if (parent != NULL)
-        mark_branch_as_having_inlined_state(parent);
-}
-
-void mark_branch_as_possibly_not_having_inlined_state(Branch* branch)
-{
-    if (is_null(&branch->hasInlinedState))
-        return;
-
-    set_null(&branch->hasInlinedState);
-    Branch* parent = get_parent_branch(branch);
-    if (parent != NULL)
-        mark_branch_as_possibly_not_having_inlined_state(parent);
-}
-
 void get_type_from_branches_stateful_terms(Branch* branch, Branch* type)
 {
     for (int i=0; i < branch->length(); i++) {
@@ -149,8 +98,6 @@ void get_state_description(Term* term, TaggedValue* output)
         set_string(output, declared_type(term)->name);
     } else if (is_function_stateful(term->function)) {
         describe_state_shape(nested_contents(term->function), output);
-    } else if (has_any_inlined_state(nested_contents(term))) {
-        describe_state_shape(nested_contents(term), output);
     }
 }
 
