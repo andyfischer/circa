@@ -93,6 +93,14 @@ extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
 extern Term* OPAQUE_POINTER_TYPE;
 
+enum BuiltinFunc {
+    UNPACK_STATE_LIST = 0,
+    PACK_STATE_TO_LIST,
+    NUM_BUILTIN_FUNCS
+};
+
+extern Term* BUILTIN_FUNCS[NUM_BUILTIN_FUNCS];
+
 extern Type ANY_T;
 extern Type BOOL_T;
 extern Type BRANCH_T;

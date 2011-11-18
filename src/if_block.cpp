@@ -197,15 +197,49 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
     // TODO
 }
 
+void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
+{
+    Term* stateInput = find_state_input(branch);
+    if (stateInput == NULL)
+        return;
+
+    Term* unpack = find_user_with_function(stateInput, "unpack_state");
+    if (unpack == NULL)
+        return;
+
+    Term* unpackList = apply_before(unpack, BUILTIN_FUNCS[UNPACK_STATE_LIST], 0);
+    unpackList->setIntProp("index", index);
+
+    for (int i=0; i < stateInput->users.length(); i++) {
+        Term* term = stateInput->users[i];
+        if (term == unpackList)
+            continue;
+        remap_pointers_quick(term, stateInput, unpackList);
+    }
+
+    Term* stateOutput = find_state_output(branch);
+    Term* pack = stateOutput->input(0);
+    if (pack->function != PACK_STATE_FUNC)
+        return;
+
+    Term* packList = apply_after(pack, BUILTIN_FUNCS[PACK_STATE_TO_LIST]);
+    packList->setIntProp("index", index);
+    insert_input(packList, stateInput);
+}
+
 void finish_if_block(Term* ifBlock)
 {
     if_block_update_master_placeholders(ifBlock);
 
     Branch* contents = nested_contents(ifBlock);
+    int caseIndex = 0;
     for (int i=0; i < contents->length(); i++) {
         Term* term = contents->get(i);
-        if (term->function == CASE_FUNC)
+        if (term->function == CASE_FUNC) {
             if_block_update_case_placeholders_from_master(ifBlock, term);
+            modify_branch_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
+            caseIndex++;
+        }
     }
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);

@@ -133,7 +133,10 @@ Term* MAP_TYPE = NULL;
 Term* SYMBOL_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
-Term* OPAQUE_POINTER_TYPE;
+Term* OPAQUE_POINTER_TYPE = NULL;
+
+// New style, use an array instead of a bunch of variables:
+Term* BUILTIN_FUNCS[NUM_BUILTIN_FUNCS] = {NULL,};
 
 // Builtin type objects:
 Type ANY_T;

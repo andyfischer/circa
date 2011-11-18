@@ -323,6 +323,14 @@ void list_remove_index(TaggedValue* list, int index)
     list->value_data.ptr = data;
 }
 
+void list_resize(TaggedValue* list, int size)
+{
+    ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
+    ListData* data = (ListData*) list->value_data.ptr;
+    data = list_resize(data, size);
+    list->value_data.ptr = data;
+}
+
 TaggedValue* list_append(TaggedValue* list)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);

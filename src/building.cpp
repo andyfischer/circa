@@ -912,4 +912,40 @@ ListData* write_output_instruction_list(Term* caller, ListData* list)
     return list;
 }
 
+Term* find_user_with_function(Term* term, const char* funcName)
+{
+    for (int i=0; i < term->users.length(); i++) {
+        Term* user = term->users[i];
+        if (user->function->name == funcName)
+            return user;
+    }
+    return NULL;
+}
+Term* apply_before(Term* existing, Term* function, int input)
+{
+    Branch* branch = existing->owningBranch;
+    Term* newTerm = apply(branch, function, TermList(existing->input(input)));
+    branch->move(newTerm, existing->index);
+    set_input(existing, input, newTerm);
+    return newTerm;
+}
+Term* apply_after(Term* existing, Term* function)
+{
+    Branch* branch = existing->owningBranch;
+
+    // Grab a copy of users before we start messing with it
+    TermList users = existing->users;
+
+    Term* newTerm = apply(branch, function, TermList(existing));
+    branch->move(newTerm, existing->index + 1);
+
+    // Rewrite users to use the new term
+    for (int i=0; i < users.length(); i++) {
+        Term* user = users[i];
+        remap_pointers_quick(user, existing, newTerm);
+    }
+
+    return newTerm;
+}
+
 } // namespace circa

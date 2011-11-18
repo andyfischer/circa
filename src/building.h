@@ -127,4 +127,9 @@ void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValu
 ListData* write_input_instruction_list(Term* caller, ListData* list);
 ListData* write_output_instruction_list(Term* caller, ListData* list);
 
+// Code modification
+Term* find_user_with_function(Term* term, const char* funcName);
+Term* apply_before(Term* existing, Term* function, int input);
+Term* apply_after(Term* existing, Term* function);
+
 } // namespace circa

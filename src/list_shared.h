@@ -38,6 +38,7 @@ int list_get_length(TaggedValue* value);
 TaggedValue* list_get_index(TaggedValue* value, int index);
 TaggedValue* list_get_index_from_end(TaggedValue* value, int index);
 void list_remove_index(TaggedValue* list, int index);
+void list_resize(TaggedValue* list, int size);
 TaggedValue* list_append(TaggedValue* list);
 TaggedValue* list_insert(TaggedValue* list, int index);
 void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
