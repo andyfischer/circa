@@ -26,6 +26,7 @@ void test_if_joining()
 
     // Test that the type of the joined name is correct
     branch.compile("if true { a = 4 } else { a = 5 }; a = a");
+    dump(branch);
     test_equals(get_output_type(branch["a"])->name, "int");
 }
 

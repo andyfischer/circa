@@ -179,22 +179,50 @@ void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
         if (does_output_placeholder_exist(caseContents, masterPlaceholder))
             continue;
 
-        Term* nameResult = get_named_at(caseContents, caseContents->length(),
-            masterPlaceholder->name.c_str());
+        Term* nameResult = NULL;
+        
+        if (masterPlaceholder->name != "")
+            nameResult = get_named_at(caseContents, caseContents->length(),
+                masterPlaceholder->name.c_str());
 
         if (is_state_input(masterPlaceholder))
             nameResult = find_open_state_result(caseContents, caseContents->length());
 
+        // Find the appropriate result for the primary output
+        if (i == 0 && masterPlaceholder->name == "")
+            nameResult = find_last_non_comment_expression(caseContents);
+
         Term* placeholder = apply(caseContents, OUTPUT_PLACEHOLDER_FUNC,
             TermList(nameResult), masterPlaceholder->name);
-        change_declared_type(placeholder, nameResult->type);
+        caseContents->move(placeholder, caseContents->length() - i - 1);
+        if (nameResult != NULL)
+            change_declared_type(placeholder, nameResult->type);
         copy(&masterPlaceholder->properties, &placeholder->properties);
     }
 }
 
 void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
 {
-    // TODO
+    Branch* masterContents = nested_contents(ifBlock);
+
+    for (int outputIndex=0;; outputIndex++) {
+        Term* masterPlaceholder = get_output_placeholder(masterContents, outputIndex);
+        if (masterPlaceholder == NULL)
+            return;
+
+        List types;
+
+        // Iterate through each case, and collect the output types
+        for (int i=0; i < masterContents->length(); i++) {
+            Term* term = masterContents->get(i);
+            if (term->function != CASE_FUNC)
+                continue;
+            Term* placeholder = get_output_placeholder(nested_contents(term), outputIndex);
+            set_type(types.append(), placeholder->type);
+        }
+
+        change_declared_type(masterPlaceholder, find_common_type(&types));
+    }
 }
 
 void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)

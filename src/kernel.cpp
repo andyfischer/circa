@@ -494,7 +494,7 @@ export_func void circa_initialize()
     type_initialize_kernel(kernel);
 
     // Install C functions into stdlib
-    //install_standard_library(kernel);
+    install_standard_library(kernel);
 
 #if CIRCA_TEST_BUILD
     // Create a space for unit tests.

@@ -605,6 +605,8 @@ void post_compile_term(Term* term)
             name = placeholder->name.c_str();
 
         Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
+        change_declared_type(output, placeholder->type);
+
         if (function_is_state_input(placeholder)) {
             output->setBoolProp("state", true);
             stateOutput = output;
