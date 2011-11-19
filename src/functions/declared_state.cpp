@@ -14,7 +14,7 @@ namespace declared_state_function {
         TaggedValue* output = OUTPUT;
 
         // Try to cast 'value' to the declared type.
-        if (value != NULL) {
+        if (value != NULL && !is_null(value)) {
             bool cast_success = cast(value, declared_type(CALLER), output);
 
             // If this cast succeeded then we're done. If it failed then continue on

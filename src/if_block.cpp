@@ -122,6 +122,8 @@ void if_block_update_master_placeholders(Term* ifCall)
         set_input(ifCall, inputIndex, outer);
 
         Term* placeholder = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
+        if (outer != NULL)
+            change_declared_type(placeholder, outer->type);
         contents->move(placeholder, inputIndex);
         inputIndex++;
 
@@ -145,7 +147,7 @@ bool does_output_placeholder_exist(Branch* branch, Term* placeholder)
         if (existingPlaceholder == NULL)
             return false;
 
-        if (is_state_input(placeholder) && is_state_input(placeholder))
+        if (is_state_input(placeholder) && is_state_input(existingPlaceholder))
             return true;
     }
 }
@@ -166,6 +168,7 @@ void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
 
         Term* placeholder = apply(caseContents, INPUT_PLACEHOLDER_FUNC, TermList(),
             masterPlaceholder->name);
+        change_declared_type(placeholder, masterPlaceholder->type);
         copy(&masterPlaceholder->properties, &placeholder->properties);
         caseContents->move(placeholder, i);
     }
@@ -185,6 +188,7 @@ void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
             nameResult = get_named_at(caseContents, caseContents->length(),
                 masterPlaceholder->name.c_str());
 
+        // Find appropriate result for state output
         if (is_state_input(masterPlaceholder))
             nameResult = find_open_state_result(caseContents, caseContents->length());
 
@@ -231,12 +235,9 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     if (stateInput == NULL)
         return;
 
-    Term* unpack = find_user_with_function(stateInput, "unpack_state");
-    if (unpack == NULL)
-        return;
-
-    Term* unpackList = apply_before(unpack, BUILTIN_FUNCS[UNPACK_STATE_LIST], 0);
+    Term* unpackList = apply(branch, BUILTIN_FUNCS[UNPACK_STATE_LIST], TermList(stateInput));
     unpackList->setIntProp("index", index);
+    move_after_inputs(unpackList);
 
     for (int i=0; i < stateInput->users.length(); i++) {
         Term* term = stateInput->users[i];
@@ -246,13 +247,12 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     }
 
     Term* stateOutput = find_state_output(branch);
-    Term* pack = stateOutput->input(0);
-    if (pack->function != PACK_STATE_FUNC)
-        return;
+    ca_assert(stateOutput->input(0) != stateInput);
 
-    Term* packList = apply_after(pack, BUILTIN_FUNCS[PACK_STATE_TO_LIST]);
+    Term* packList = apply(branch, BUILTIN_FUNCS[PACK_STATE_TO_LIST],
+        TermList(stateInput, stateOutput->input(0)));
     packList->setIntProp("index", index);
-    insert_input(packList, stateInput);
+    set_input(stateOutput, 0, packList);
 }
 
 void finish_if_block(Term* ifBlock)

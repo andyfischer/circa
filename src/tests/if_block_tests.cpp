@@ -26,7 +26,6 @@ void test_if_joining()
 
     // Test that the type of the joined name is correct
     branch.compile("if true { a = 4 } else { a = 5 }; a = a");
-    dump(branch);
     test_equals(get_output_type(branch["a"])->name, "int");
 }
 
@@ -228,6 +227,7 @@ void test_state_simple()
 
     // Simple test, condition never changes
     Term* block = branch.compile("if true { state i = 0; i += 1 }");
+    finish_minor_branch(&branch);
     evaluate_branch(&context, &branch);
 
     TaggedValue *i = context.state.getField("_if_block")->getIndex(0)->getField("i");
@@ -243,6 +243,7 @@ void test_state_simple()
     // Same test with elif
     branch.clear();
     block = branch.compile("if false {} elif true { state i = 0; i += 1 }");
+    finish_minor_branch(&branch);
     evaluate_branch(&context, &branch);
     i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
@@ -258,6 +259,7 @@ void test_state_simple()
 
     EvalContext context2;
     block = branch.compile("if false {} else { state i = 0; i += 1 }");
+    finish_minor_branch(&branch);
     evaluate_branch(&context2, &branch);
     i = context2.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
@@ -269,32 +271,6 @@ void test_state_simple()
     test_assert(as_int(i) == 3);
 }
 
-void test_state_in_function()
-{
-    // Use state in an if block in a function, this should verify that state
-    // is being swapped in and out.
-    Branch branch;
-    EvalContext context;
-
-    Term* my_func = branch.compile("def my_func() -> int {"
-           " if true { state i = 0; i += 1; return(i) } else { return(0) } }");
-
-    test_assert(is_function_stateful(my_func));
-
-    Term* call1 = branch.compile("my_func()");
-
-    evaluate_branch(&context, &branch);
-
-    test_assert(as_int(call1) == 1);
-
-    evaluate_branch(&context, &branch);
-    evaluate_branch(&context, &branch);
-
-    test_assert(context);
-
-    test_equals(as_int(call1), 3);
-}
-
 void test_state_is_reset_when_if_fails()
 {
     Branch branch;
@@ -302,15 +278,16 @@ void test_state_is_reset_when_if_fails()
 
     Term* c = branch.compile("c = true");
     branch.compile("if c { state i = 0; i += 1 } else { 'hi' }");
+    finish_minor_branch(&branch);
 
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{i: 1}, null]}");
+    test_equals(&context.state, "{_if_block: [{i: 1}]}");
 
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{i: 2}, null]}");
+    test_equals(&context.state, "{_if_block: [{i: 2}]}");
 
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{i: 3}, null]}");
+    test_equals(&context.state, "{_if_block: [{i: 3}]}");
 
     set_bool(c, false);
 
@@ -320,7 +297,7 @@ void test_state_is_reset_when_if_fails()
     set_bool(c, true);
 
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{i: 1}, null]}");
+    test_equals(&context.state, "{_if_block: [{i: 1}]}");
 }
 
 void test_state_is_reset_when_if_fails2()
@@ -334,6 +311,7 @@ void test_state_is_reset_when_if_fails2()
     Term* a = branch.compile("a = true");
     
     branch.compile("if a { state s = test_oracle() }");
+    finish_minor_branch(&branch);
 
     internal_debug_function::oracle_send(1);
     internal_debug_function::oracle_send(2);
@@ -341,10 +319,10 @@ void test_state_is_reset_when_if_fails2()
 
     EvalContext context;
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{s: 1}, null]}");
+    test_equals(&context.state, "{_if_block: [{s: 1}]}");
 
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{s: 1}, null]}");
+    test_equals(&context.state, "{_if_block: [{s: 1}]}");
 
     set_bool(a, false);
     evaluate_branch(&context, &branch);
@@ -352,7 +330,7 @@ void test_state_is_reset_when_if_fails2()
 
     set_bool(a, true);
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{s: 2}, null]}");
+    test_equals(&context.state, "{_if_block: [{s: 3}]}");
 }
 
 void test_nested_state()
@@ -382,7 +360,6 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_execution_with_elif);
     REGISTER_TEST_CASE(if_block_tests::test_parse_with_no_line_endings);
     REGISTER_TEST_CASE(if_block_tests::test_state_simple);
-    REGISTER_TEST_CASE(if_block_tests::test_state_in_function);
     REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
     REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails2);
     REGISTER_TEST_CASE(if_block_tests::test_nested_state);

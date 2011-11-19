@@ -33,10 +33,11 @@ namespace implicit_state_function {
     CA_FUNCTION(unpack_state_list)
     {
         TaggedValue* container = INPUT(0);
-        if (!is_list(container))
+        int index = CALLER->intProp("index");
+        if (!is_list(container) || index >= list_get_length(container))
             set_null(OUTPUT);
         else
-            copy(list_get_index(container, CALLER->intProp("index")), OUTPUT);
+            copy(list_get_index(container, index), OUTPUT);
     }
 
     CA_FUNCTION(pack_state_to_list)
@@ -49,9 +50,10 @@ namespace implicit_state_function {
 
         if (!is_list(container))
             set_list(container, index+1);
-        else
-            if (list_get_length(container) <= index)
-                list_resize(container, index+1);
+
+        // Set all other elements to null
+        list_resize(container, 0);
+        list_resize(container, index+1);
 
         copy(value, list_get_index(container, index));
     }
@@ -64,7 +66,8 @@ namespace implicit_state_function {
         BUILTIN_FUNCS[UNPACK_STATE_LIST] =
             import_function(kernel, unpack_state_list, "unpack_state_list(any container) -> any");
         BUILTIN_FUNCS[PACK_STATE_TO_LIST] =
-            import_function(kernel, pack_state_to_list, "pack_state_to_list(any container, any value) -> any");
+            import_function(kernel, pack_state_to_list,
+                "pack_state_to_list(any container, any value :optional) -> any");
     }
 }
 }

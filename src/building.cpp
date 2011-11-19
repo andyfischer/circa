@@ -2,10 +2,10 @@
 
 #include "common_headers.h"
 
-#include "kernel.h"
 #include "building.h"
 #include "circa.h"
 #include "heap_debugging.h"
+#include "kernel.h"
 #include "locals.h"
 #include "names.h"
 #include "parser.h"
@@ -32,8 +32,14 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
         }
     }
 
+    int outputCount = count_output_placeholders(branch);
+
     // Create the term
     Term* result = branch->appendNew();
+
+    // Position the term before any output_placeholder terms.
+    if (function != OUTPUT_PLACEHOLDER_FUNC && outputCount > 0)
+        branch->move(result, branch->length() - outputCount - 1);
 
     if (name != "")
         branch->bindName(result, name);
@@ -456,6 +462,21 @@ Term* get_output_placeholder(Branch* branch, int index)
     return term;
 }
 
+int count_input_placeholders(Branch* branch)
+{
+    int result = 0;
+    while (get_input_placeholder(branch, result) != NULL)
+        result++;
+    return result;
+}
+int count_output_placeholders(Branch* branch)
+{
+    int result = 0;
+    while (get_output_placeholder(branch, result) != NULL)
+        result++;
+    return result;
+}
+
 Branch* term_get_function_details(Term* call)
 {
     if (call->function == IF_BLOCK_FUNC)// || call->function == FOR_FUNC)
@@ -666,6 +687,8 @@ Term* find_last_non_comment_expression(Branch* branch)
         if (branch->get(i) == NULL)
             continue;
         if (branch->get(i)->function == OUTPUT_PLACEHOLDER_FUNC)
+            continue;
+        if (branch->get(i)->function == INPUT_PLACEHOLDER_FUNC)
             continue;
         if (branch->get(i)->name == "#outer_rebinds")
             continue;
@@ -896,7 +919,7 @@ ListData* write_output_instruction_list(Term* caller, ListData* list)
     // Write instructions for nearby extra_output() calls.
     for (int i=1; ; i++) {
         Term* receiver = caller->owningBranch->getSafe(caller->index + i);
-        if (receiver == NULL)
+        if (receiver == NULL || receiver->function != EXTRA_OUTPUT_FUNC)
             break;
 
         write_input_instruction(caller, receiver, list_append(&list));
@@ -939,6 +962,18 @@ Term* apply_after(Term* existing, Term* function)
     }
 
     return newTerm;
+}
+void move_after_inputs(Term* term)
+{
+    Branch* branch = term->owningBranch;
+    int inputCount = count_input_placeholders(branch);
+    branch->move(term, inputCount);
+}
+void move_before_outputs(Term* term)
+{
+    Branch* branch = term->owningBranch;
+    int outputCount = count_output_placeholders(branch);
+    branch->move(term, branch->length() - outputCount - 1);
 }
 
 } // namespace circa

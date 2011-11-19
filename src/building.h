@@ -79,6 +79,8 @@ Term* procure_bool(Branch* branch, std::string const& name);
 
 Term* get_input_placeholder(Branch* branch, int index);
 Term* get_output_placeholder(Branch* branch, int index);
+int count_input_placeholders(Branch* branch);
+int count_output_placeholders(Branch* branch);
 Branch* term_get_function_details(Term* call);
 
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes
@@ -129,5 +131,7 @@ ListData* write_output_instruction_list(Term* caller, ListData* list);
 Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);
 Term* apply_after(Term* existing, Term* function);
+void move_after_inputs(Term* term);
+void move_before_outputs(Term* term);
 
 } // namespace circa
