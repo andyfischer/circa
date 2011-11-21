@@ -17,9 +17,8 @@ struct ForLoopContext
 
 Term* get_for_loop_iterator(Term* forTerm);
 bool for_loop_modifies_list(Term* forTerm);
-void setup_for_loop_pre_code(Term* forTerm);
 Term* setup_for_loop_iterator(Term* forTerm, const char* name);
-void setup_for_loop_post_code(Term* forTerm);
+void finish_for_loop(Term* forTerm);
 
 Term* find_enclosing_for_loop(Term* term);
 

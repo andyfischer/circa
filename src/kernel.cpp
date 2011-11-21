@@ -97,7 +97,6 @@ Term* NOT_FUNC = NULL;
 Term* ONE_TIME_ASSIGN_FUNC = NULL;
 Term* OUTPUT_PLACEHOLDER_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
-Term* PACK_STATE_FUNC = NULL;
 Term* PRESERVE_STATE_RESULT_FUNC = NULL;
 Term* RANGE_FUNC = NULL;
 Term* REF_FUNC = NULL;
@@ -112,10 +111,8 @@ Term* SUB_FUNC = NULL;
 Term* TYPE_FUNC = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* UNKNOWN_TYPE_FUNC = NULL;
-Term* UNPACK_STATE_FUNC = NULL;
 Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
 Term* UNSAFE_ASSIGN_FUNC = NULL;
-Term* VALUE_FUNC = NULL;
 
 Term* ANY_TYPE = NULL;
 Term* BOOL_TYPE = NULL;
@@ -135,8 +132,8 @@ Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* OPAQUE_POINTER_TYPE = NULL;
 
-// New style, use an array instead of a bunch of variables:
-Term* BUILTIN_FUNCS[NUM_BUILTIN_FUNCS] = {NULL,};
+// New style for builtin function pointers
+BuiltinFuncs BUILTIN_FUNCS;
 
 // Builtin type objects:
 Type ANY_T;
@@ -296,12 +293,13 @@ void bootstrap_kernel()
     Branch* kernel = KERNEL;
 
     // Create value function
-    VALUE_FUNC = kernel->appendNew();
-    kernel->bindName(VALUE_FUNC, "value");
+    Term* valueFunc = kernel->appendNew();
+    kernel->bindName(valueFunc, "value");
+    BUILTIN_FUNCS.value = valueFunc;
 
     // Create Type type
     TYPE_TYPE = kernel->appendNew();
-    TYPE_TYPE->function = VALUE_FUNC;
+    TYPE_TYPE->function = BUILTIN_FUNCS.value;
     TYPE_TYPE->type = &TYPE_T;
     TYPE_TYPE->value_type = &TYPE_T;
     TYPE_TYPE->value_data.ptr = &TYPE_T;
@@ -310,7 +308,7 @@ void bootstrap_kernel()
 
     // Create Any type
     ANY_TYPE = kernel->appendNew();
-    ANY_TYPE->function = VALUE_FUNC;
+    ANY_TYPE->function = valueFunc;
     ANY_TYPE->type = &TYPE_T;
     ANY_TYPE->value_type = &TYPE_T;
     ANY_TYPE->value_data.ptr = &ANY_T;
@@ -320,19 +318,19 @@ void bootstrap_kernel()
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
     FUNCTION_TYPE = kernel->appendNew();
-    FUNCTION_TYPE->function = VALUE_FUNC;
+    FUNCTION_TYPE->function = valueFunc;
     FUNCTION_TYPE->type = &TYPE_T;
     FUNCTION_TYPE->value_type = &TYPE_T;
     FUNCTION_TYPE->value_data.ptr = &FUNCTION_T;
     kernel->bindName(FUNCTION_TYPE, "Function");
 
     // Initialize value() func
-    VALUE_FUNC->type = &FUNCTION_T;
-    VALUE_FUNC->function = VALUE_FUNC;
-    create(&FUNCTION_T, (TaggedValue*)VALUE_FUNC);
+    valueFunc->type = &FUNCTION_T;
+    valueFunc->function = valueFunc;
+    create(&FUNCTION_T, (TaggedValue*)valueFunc);
 
-    function_t::initialize(&FUNCTION_T, VALUE_FUNC);
-    initialize_function(VALUE_FUNC);
+    function_t::initialize(&FUNCTION_T, valueFunc);
+    initialize_function(valueFunc);
 
     // Initialize primitive types (this requires value() function)
     BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
@@ -357,10 +355,10 @@ void bootstrap_kernel()
     ca_assert(function_get_output_type(OUTPUT_PLACEHOLDER_FUNC, 0) == &ANY_T);
 
     // Fix some holes in value() function
-    Function* attrs = as_function(VALUE_FUNC);
+    Function* attrs = as_function(valueFunc);
     finish_building_function(attrs, &ANY_T);
 
-    ca_assert(function_get_output_type(VALUE_FUNC, 0) == &ANY_T);
+    ca_assert(function_get_output_type(valueFunc, 0) == &ANY_T);
 
     // input_placeholder() is needed before we can declare a function with inputs
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
@@ -476,6 +474,8 @@ export_func void circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
+
+    memset(&BUILTIN_FUNCS, 0, sizeof(BUILTIN_FUNCS));
 
     create_primitive_types();
     bootstrap_kernel();

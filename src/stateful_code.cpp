@@ -58,7 +58,7 @@ void pack_any_open_state_vars(Branch* branch)
             continue;
         if (term->function == DECLARED_STATE_FUNC) {
             Term* result = branch->get(term->name);
-            Term* pack = apply(branch, PACK_STATE_FUNC, TermList(
+            Term* pack = apply(branch, BUILTIN_FUNCS.pack_state, TermList(
                 find_open_state_result(branch, branch->length()),
                 result));
             pack->setStringProp("field", unique_name(term));

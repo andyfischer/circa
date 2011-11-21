@@ -82,9 +82,8 @@ void if_block_update_master_placeholders(Term* ifCall)
             std::string const& name = it->first;
 
             // Ignore empty or hidden names
-            if (name == "" || name[0] == '#') {
+            if (name == "" || name[0] == '#')
                 continue;
-            }
 
             boundNames.insert(it->first);
         }
@@ -235,7 +234,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     if (stateInput == NULL)
         return;
 
-    Term* unpackList = apply(branch, BUILTIN_FUNCS[UNPACK_STATE_LIST], TermList(stateInput));
+    Term* unpackList = apply(branch, BUILTIN_FUNCS.unpack_state_list, TermList(stateInput));
     unpackList->setIntProp("index", index);
     move_after_inputs(unpackList);
 
@@ -249,7 +248,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     Term* stateOutput = find_state_output(branch);
     ca_assert(stateOutput->input(0) != stateInput);
 
-    Term* packList = apply(branch, BUILTIN_FUNCS[PACK_STATE_TO_LIST],
+    Term* packList = apply(branch, BUILTIN_FUNCS.pack_state_to_list,
         TermList(stateInput, stateOutput->input(0)));
     packList->setIntProp("index", index);
     set_input(stateOutput, 0, packList);

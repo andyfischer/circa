@@ -55,7 +55,6 @@ extern Term* NOT_FUNC;
 extern Term* ONE_TIME_ASSIGN_FUNC;
 extern Term* OUTPUT_PLACEHOLDER_FUNC;
 extern Term* OVERLOADED_FUNCTION_FUNC;
-extern Term* PACK_STATE_FUNC;
 extern Term* PRESERVE_STATE_RESULT_FUNC;
 extern Term* RANGE_FUNC;
 extern Term* REF_FUNC;
@@ -71,10 +70,8 @@ extern Term* SYMBOL_TYPE;
 extern Term* TYPE_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
-extern Term* UNPACK_STATE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
 extern Term* UNSAFE_ASSIGN_FUNC;
-extern Term* VALUE_FUNC;
 
 extern Term* ANY_TYPE;
 extern Term* BOOL_TYPE;
@@ -93,13 +90,17 @@ extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
 extern Term* OPAQUE_POINTER_TYPE;
 
-enum BuiltinFunc {
-    UNPACK_STATE_LIST = 0,
-    PACK_STATE_TO_LIST,
-    NUM_BUILTIN_FUNCS
+struct BuiltinFuncs {
+    Term* loop_index;
+    Term* loop_iterator;
+    Term* pack_state;
+    Term* pack_state_to_list;
+    Term* unpack_state;
+    Term* unpack_state_list;
+    Term* value;
 };
 
-extern Term* BUILTIN_FUNCS[NUM_BUILTIN_FUNCS];
+extern BuiltinFuncs BUILTIN_FUNCS;
 
 extern Type ANY_T;
 extern Type BOOL_T;

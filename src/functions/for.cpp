@@ -23,42 +23,6 @@ namespace for_function {
             term, token::WHITESPACE);
     }
 
-    int getOutputCount(Term* term)
-    {
-        Branch* contents = nested_contents(term);
-        
-        // Check if we're still building
-        if (contents->length() == 0)
-            return 1;
-
-        Branch* outerRebinds = nested_contents(contents->get("#outer_rebinds"));
-        return 1 + outerRebinds->length();
-    }
-
-    const char* getOutputName(Term* term, int outputIndex)
-    {
-        Branch* contents = nested_contents(term);
-
-        // Check if we're still building
-        if (contents->length() == 0)
-            return "";
-
-        Branch* outerRebinds = nested_contents(contents->get("#outer_rebinds"));
-        return outerRebinds->get(outputIndex - 1)->name.c_str();
-    }
-
-    Type* getOutputType(Term* term, int outputIndex)
-    {
-        Branch* contents = nested_contents(term);
-
-        // Check if we're still building
-        if (contents->length() == 0)
-            return &ANY_T;
-
-        Branch* outerRebinds = nested_contents(contents->get("#outer_rebinds"));
-        return outerRebinds->get(outputIndex - 1)->type;
-    }
-
     CA_FUNCTION(evaluate_break)
     {
         CONTEXT->forLoopContext.breakCalled = true;
@@ -88,10 +52,10 @@ namespace for_function {
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         as_function(FOR_FUNC)->formatSource = formatSource;
-        as_function(FOR_FUNC)->getOutputCount = getOutputCount;
-        as_function(FOR_FUNC)->getOutputName = getOutputName;
-        as_function(FOR_FUNC)->getOutputType = getOutputType;
         as_function(FOR_FUNC)->createsStackFrame = true;
+
+        BUILTIN_FUNCS.loop_index = import_function(kernel, NULL, "loop_index() -> int");
+        BUILTIN_FUNCS.loop_iterator = import_function(kernel, NULL, "loop_iterator() -> int");
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         as_function(DISCARD_FUNC)->formatSource = discard_formatSource;

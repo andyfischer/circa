@@ -17,7 +17,7 @@ namespace meta_function {
                 EvalContext context;
                 evaluate_minimum(&context, input, NULL);
 
-                change_function(term, VALUE_FUNC);
+                change_function(term, BUILTIN_FUNCS.value);
             }
         }
     }

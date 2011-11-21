@@ -33,7 +33,7 @@ bool is_comment(Term* term)
 
 bool is_value(Term* term)
 {
-    return term->function == VALUE_FUNC;
+    return term->function == BUILTIN_FUNCS.value;
 }
 
 bool is_hidden(Term* term)
@@ -265,7 +265,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << " <NULL function>";
     } else {
         out << " " << term->function->name;
-        out << global_id(term->function);
+        //out << global_id(term->function);
     }
 
     // Arguments

@@ -60,12 +60,12 @@ namespace implicit_state_function {
 
     void setup(Branch* kernel)
     {
-        UNPACK_STATE_FUNC = import_function(kernel, unpack_state, "unpack_state(any container) -> any");
-        PACK_STATE_FUNC = import_function(kernel, pack_state, "pack_state(any container, any value) -> any");
+        BUILTIN_FUNCS.unpack_state = import_function(kernel, unpack_state, "unpack_state(any container) -> any");
+        BUILTIN_FUNCS.pack_state = import_function(kernel, pack_state, "pack_state(any container, any value) -> any");
 
-        BUILTIN_FUNCS[UNPACK_STATE_LIST] =
+        BUILTIN_FUNCS.unpack_state_list =
             import_function(kernel, unpack_state_list, "unpack_state_list(any container) -> any");
-        BUILTIN_FUNCS[PACK_STATE_TO_LIST] =
+        BUILTIN_FUNCS.pack_state_to_list =
             import_function(kernel, pack_state_to_list,
                 "pack_state_to_list(any container, any value :optional) -> any");
     }

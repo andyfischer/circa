@@ -23,7 +23,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
 
     if (target->function == COPY_FUNC) {
         return handle_feedback_event(context, target->input(0), desired);
-    } else if (target->function == VALUE_FUNC) {
+    } else if (target->function == BUILTIN_FUNCS.value) {
         bool success = cast(desired, declared_type(target), target);
         if (!success) {
             std::cout << "in handle_feedback, failed to cast "

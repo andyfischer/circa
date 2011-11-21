@@ -20,14 +20,6 @@
 
 namespace circa {
 
-/* Organization of for loop contents:
-   [0..] input placeholders (iterator and possibly state)
-   [n..] join terms for inner rebinds
-   [...] contents
-   [m-1] #outer_rebinds
-*/
-
-
 Term* get_for_loop_iterator(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
@@ -54,11 +46,6 @@ Branch* get_for_loop_outer_rebinds(Term* forTerm)
     return contents->getFromEnd(0)->contents();
 }
 
-void setup_for_loop_pre_code(Term* forTerm)
-{
-    // this once did something
-}
-
 Term* setup_for_loop_iterator(Term* forTerm, const char* name)
 {
     Type* iteratorType = infer_type_of_get_index(forTerm->input(0));
@@ -68,20 +55,17 @@ Term* setup_for_loop_iterator(Term* forTerm, const char* name)
     return result;
 }
 
-void setup_for_loop_post_code(Term* forTerm)
+void add_implicit_placeholders(Term* forTerm)
 {
-    Branch* forContents = nested_contents(forTerm);
+    Branch* contents = nested_contents(forTerm);
     std::string listName = forTerm->input(0)->name;
     Term* iterator = get_for_loop_iterator(forTerm);
     std::string iteratorName = iterator->name;
 
-    finish_minor_branch(forContents);
-
-    // Create a branch that has all the names which are rebound in this loop
-    Branch* outerRebinds = create_branch(forContents, "#outer_rebinds");
-
     std::vector<std::string> reboundNames;
-    list_names_that_this_branch_rebinds(forContents, reboundNames);
+    list_names_that_this_branch_rebinds(contents, reboundNames);
+
+    int inputIndex = 1;
 
     for (size_t i=0; i < reboundNames.size(); i++) {
         std::string const& name = reboundNames[i];
@@ -96,29 +80,31 @@ void setup_for_loop_post_code(Term* forTerm)
         if (original == NULL)
             continue;
 
-        Term* loopResult = forContents->get(name);
+        Term* result = contents->get(name);
 
-#if 0 // JOIN_FUNC is gone
-        // First input to both of these should be 'original', but we need to wait until
-        // after remap_pointers before setting this.
-        Term* innerRebind = apply(forContents, JOIN_FUNC, TermList(NULL, loopResult), name);
-        forContents->move(innerRebind, iterator->index + 1 + i);
+        Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
+        change_declared_type(input, original->type);
+        contents->move(input, inputIndex);
 
-        change_declared_type(innerRebind, original->type);
-        Term* outerRebind = apply(outerRebinds, JOIN_FUNC, TermList(NULL, loopResult), name);
+        // Repoint terms to use our new input_placeholder
+        for (int i=0; i < contents->length(); i++)
+            remap_pointers_quick(contents->get(i), original, input);
 
-        // Rewrite the loop code to use the inner rebinds
-        remap_pointers(forContents, original, innerRebind);
-
-        set_input(innerRebind, 0, original);
-        set_input(outerRebind, 0, original);
-
-        respecialize_type(outerRebind);
-#endif
+        apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result), name);
     }
+}
 
-    for_loop_update_output_index(forTerm);
-    recursively_finish_update_cascade(forContents);
+void finish_for_loop(Term* forTerm)
+{
+    Branch* contents = nested_contents(forTerm);
+
+    add_implicit_placeholders(forTerm);
+
+    // Add a primary output
+    apply(contents, OUTPUT_PLACEHOLDER_FUNC,
+        TermList(find_last_non_comment_expression(contents)));
+
+    check_to_insert_implicit_inputs(forTerm);
 }
 
 Term* find_enclosing_for_loop(Term* term)
@@ -157,7 +143,7 @@ CA_FUNCTION(evaluate_for_loop)
 {
     Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch* forContents = nested_contents(caller);
+    Branch* contents = nested_contents(caller);
     Branch* outerRebinds = get_for_loop_outer_rebinds(caller);
     Term* iterator = get_for_loop_iterator(caller);
 
@@ -165,11 +151,10 @@ CA_FUNCTION(evaluate_for_loop)
     int inputListLength = inputList->numElements();
 
     TaggedValue outputTv;
-    bool saveOutput = forContents->outputIndex != -1;
     List* output = set_list(&outputTv, inputListLength);
     int nextOutputIndex = 0;
 
-    Frame *frame = push_frame(context, forContents);
+    Frame *frame = push_frame(context, contents);
 
     // Prepare state container
     bool useState = has_implicit_state(CALLER);
@@ -191,47 +176,29 @@ CA_FUNCTION(evaluate_for_loop)
     for (int iteration=0; iteration < inputListLength; iteration++) {
         context->forLoopContext.continueCalled = false;
 
-        bool firstIter = iteration == 0;
-
-        // load state for this iteration
-        if (useState)
-            swap(state->get(iteration), &context->currentScopeState);
-
         // copy iterator
         copy(inputList->getIndex(iteration), frame->registers[iterator->index]);
 
-        // copy inner rebinds
-        int contentIndex = iterator->index + 1;
-        for (;; contentIndex++) {
-            Term* rebindTerm = forContents->get(contentIndex);
-            /*if (rebindTerm->function != JOIN_FUNC)
-                break;*/
-            Term* rebindInput = rebindTerm->input(firstIter ? 0 : 1);
-            TaggedValue* dest = frame->registers[rebindTerm->index];
-
-            TaggedValue inputIsn;
-            write_input_instruction(rebindTerm, rebindInput, &inputIsn);
-            copy(get_arg(CONTEXT, &inputIsn), dest);
-        }
-
-        for (; contentIndex < forContents->length() - 1; contentIndex++) {
+        for (int i=0; i < contents->length(); i++) {
             if (evaluation_interrupted(context))
                 break;
 
-            evaluate_single_term(context, forContents->get(contentIndex));
+            evaluate_single_term(context, contents->get(i));
         }
 
+#if 0
         frame = top_frame(context);
 
         // Save output
         if (saveOutput && !context->forLoopContext.discard) {
-            Term* localResult = forContents->get(forContents->outputIndex);
+            Term* localResult = contents->get(contents->outputIndex);
             copy(frame->registers[localResult->index], output->get(nextOutputIndex++));
         }
 
         // Unload state
         if (useState)
             swap(&context->currentScopeState, state->get(iteration));
+#endif
     }
 
     // Resize output, in case some elements were discarded

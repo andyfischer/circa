@@ -182,7 +182,7 @@ void change_function(Term* term, Term* function)
 
     // Don't append user for certain functions. Need to make this more robust.
     if (function != NULL
-            && function != VALUE_FUNC
+            && function != BUILTIN_FUNCS.value
             && function != INPUT_PLACEHOLDER_FUNC) {
         append_user(term, function);
     }
@@ -302,7 +302,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     if (name != "")
         branch->bindName(term, name);
 
-    change_function(term, VALUE_FUNC);
+    change_function(term, BUILTIN_FUNCS.value);
     change_declared_type(term, type);
     create(type, (TaggedValue*) term);
     update_unique_name(term);
@@ -479,7 +479,7 @@ int count_output_placeholders(Branch* branch)
 
 Branch* term_get_function_details(Term* call)
 {
-    if (call->function == IF_BLOCK_FUNC)// || call->function == FOR_FUNC)
+    if (call->function == IF_BLOCK_FUNC || call->function == FOR_FUNC)
         return nested_contents(call);
     return function_get_contents(as_function(call->function));
 }
@@ -526,7 +526,7 @@ Term* find_open_state_result(Branch* branch, int position)
             continue;
         if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
             return term;
-        if (term->function == PACK_STATE_FUNC)
+        if (term->function == BUILTIN_FUNCS.pack_state)
             return term;
     }
     return NULL;
@@ -551,7 +551,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
-        Term* unpack = apply(term->owningBranch, UNPACK_STATE_FUNC, TermList(container));
+        Term* unpack = apply(term->owningBranch, BUILTIN_FUNCS.unpack_state, TermList(container));
         unpack->setStringProp("field", unique_name(term));
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
@@ -635,19 +635,12 @@ void post_compile_term(Term* term)
     }
 
     // Possibly append a pack_state() call
-    if (stateOutput != NULL && term->input(0)->function == UNPACK_STATE_FUNC) {
+    if (stateOutput != NULL && term->input(0)->function == BUILTIN_FUNCS.unpack_state) {
         Term* unpack = term->input(0);
         Term* container = unpack->input(0);
-        Term* pack = apply(term->owningBranch, PACK_STATE_FUNC, TermList(container, stateOutput));
+        Term* pack = apply(term->owningBranch, BUILTIN_FUNCS.pack_state, TermList(container, stateOutput));
         pack->setStringProp("field", unpack->stringProp("field"));
         hide_from_source(pack);
-    }
-
-    // Ditto on for-loops
-    if (term->function == FOR_FUNC) {
-        Branch* joins = nested_contents(term)->get("#outer_rebinds")->contents(); 
-        for (int i=0; i < joins->length(); i++)
-            apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), joins->get(i)->name);
     }
 }
 
