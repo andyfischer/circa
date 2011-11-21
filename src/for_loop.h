@@ -16,6 +16,7 @@ struct ForLoopContext
 };
 
 Term* get_for_loop_iterator(Term* forTerm);
+const char* for_loop_get_iterator_name(Term* forTerm);
 bool for_loop_modifies_list(Term* forTerm);
 
 Term* start_building_for_loop(Term* forTerm, const char* iteratorName);

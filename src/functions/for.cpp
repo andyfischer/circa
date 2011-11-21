@@ -9,7 +9,7 @@ namespace for_function {
     {
         format_name_binding(source, term);
         append_phrase(source, "for ", term, phrase_type::KEYWORD);
-        append_phrase(source, get_for_loop_iterator(term)->name.c_str(),
+        append_phrase(source, for_loop_get_iterator_name(term),
                 term, phrase_type::UNDEFINED);
         append_phrase(source, " in ", term, phrase_type::KEYWORD);
         format_source_for_input(source, term, 0);

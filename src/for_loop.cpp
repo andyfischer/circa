@@ -35,6 +35,15 @@ Term* get_for_loop_iterator(Term* forTerm)
     return NULL;
 }
 
+const char* for_loop_get_iterator_name(Term* forTerm)
+{
+    Branch* contents = nested_contents(forTerm);
+    for (int i=0; i < contents->length(); i++)
+        if (contents->get(i)->function == GET_INDEX_FUNC)
+            return contents->get(i)->name.c_str();
+    return "";
+}
+
 bool for_loop_modifies_list(Term* forTerm)
 {
     return forTerm->boolPropOptional("modifyList", false);
@@ -184,7 +193,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     // Create a stack frame
-    Frame *frame = push_frame(context, contents, &registers);
+    push_frame(context, contents, &registers);
 
     // Walk forward until we find the loop_index() term.
     int loopIndexPos = 0;
@@ -207,7 +216,7 @@ CA_FUNCTION(evaluate_for_loop)
         context->forLoopContext.continueCalled = false;
 
         // Set the loop index
-        set_int(frame->registers[loopIndexPos], iteration);
+        set_int(top_frame(context)->registers[loopIndexPos], iteration);
 
         // Evaluate contents, skipping past loopIndexPos
         for (int i=loopIndexPos+1; i < contents->length(); i++) {
@@ -218,7 +227,7 @@ CA_FUNCTION(evaluate_for_loop)
         }
 
         // Copy loop output
-        copy(frame->registers[loopOutputPos], loopOutput.append());
+        copy(top_frame(context)->registers[loopOutputPos], loopOutput.append());
 
         // Check if we are finished
         if (iteration >= inputListLength)
@@ -259,7 +268,7 @@ CA_FUNCTION(evaluate_for_loop)
     // Restore loop context
     context->forLoopContext = prevLoopContext;
 
-    swap(&frame->registers, &registers);
+    swap(&top_frame(context)->registers, &registers);
     pop_frame(context);
 
     // Save outputs
