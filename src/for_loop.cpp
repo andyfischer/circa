@@ -46,13 +46,30 @@ Branch* get_for_loop_outer_rebinds(Term* forTerm)
     return contents->getFromEnd(0)->contents();
 }
 
-Term* setup_for_loop_iterator(Term* forTerm, const char* name)
+Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
 {
-    Type* iteratorType = infer_type_of_get_index(forTerm->input(0));
-    Term* result = apply(nested_contents(forTerm), INPUT_PLACEHOLDER_FUNC, TermList(), name);
-    change_declared_type(result, iteratorType);
-    hide_from_source(result);
-    return result;
+    Branch* contents = nested_contents(forTerm);
+
+    // Add input placeholder for the list input
+    Term* listInput = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
+
+    // Add loop_index()
+    Term* index = apply(contents, BUILTIN_FUNCS.loop_index, TermList(listInput));
+    hide_from_source(index);
+
+    // Add loop_iterator()
+    Term* iterator = apply(contents, GET_INDEX_FUNC, TermList(listInput, index),
+        iteratorName);
+    change_declared_type(iterator, infer_type_of_get_index(forTerm->input(0)));
+    hide_from_source(iterator);
+    return iterator;
+}
+
+void add_loop_output_term(Branch* branch)
+{
+    Term* result = find_last_non_comment_expression(branch);
+    Term* term = apply(branch, BUILTIN_FUNCS.loop_output, TermList(result));
+    move_before_outputs(term);
 }
 
 void add_implicit_placeholders(Term* forTerm)
@@ -86,6 +103,8 @@ void add_implicit_placeholders(Term* forTerm)
         change_declared_type(input, original->type);
         contents->move(input, inputIndex);
 
+        set_input(forTerm, inputIndex, original);
+
         // Repoint terms to use our new input_placeholder
         for (int i=0; i < contents->length(); i++)
             remap_pointers_quick(contents->get(i), original, input);
@@ -98,11 +117,12 @@ void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
+    add_loop_output_term(contents);
+
     add_implicit_placeholders(forTerm);
 
     // Add a primary output
-    apply(contents, OUTPUT_PLACEHOLDER_FUNC,
-        TermList(find_last_non_comment_expression(contents)));
+    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 
     check_to_insert_implicit_inputs(forTerm);
 }
@@ -144,66 +164,71 @@ CA_FUNCTION(evaluate_for_loop)
     Term* caller = CALLER;
     EvalContext* context = CONTEXT;
     Branch* contents = nested_contents(caller);
-    Branch* outerRebinds = get_for_loop_outer_rebinds(caller);
-    Term* iterator = get_for_loop_iterator(caller);
 
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
-
-    TaggedValue outputTv;
-    List* output = set_list(&outputTv, inputListLength);
-    int nextOutputIndex = 0;
-
-    Frame *frame = push_frame(context, contents);
-
-    // Prepare state container
-    bool useState = has_implicit_state(CALLER);
-    TaggedValue localState;
-    TaggedValue prevScopeState;
-    List* state = NULL;
-    if (useState) {
-        swap(&context->currentScopeState, &prevScopeState);
-        fetch_state_container(CALLER, &prevScopeState, &localState);
-
-        state = List::lazyCast(&localState);
-        state->resize(inputListLength);
-    }
 
     // Preserve old for-loop context
     ForLoopContext prevLoopContext = context->forLoopContext;
     context->forLoopContext.discard = false;
 
+    List registers;
+    registers.resize(contents->length());
+
+    // Copy inputs (first time)
+    for (int i=0;; i++) {
+        if (get_input_placeholder(contents, i) != NULL)
+            copy(INPUT(i), registers[i]);
+        else
+            break;
+    }
+
+    // Create a stack frame
+    Frame *frame = push_frame(context, contents, &registers);
+
+    // Walk forward until we find the loop_index() term.
+    int loopIndexPos = 0;
+    for (; loopIndexPos < contents->length(); loopIndexPos++) {
+        if (contents->get(loopIndexPos)->function == BUILTIN_FUNCS.loop_index)
+            break;
+    }
+    ca_assert(contents->get(loopIndexPos)->function == BUILTIN_FUNCS.loop_index);
+
+    // Find the loop_output() term.
+    int loopOutputPos = 0;
+    for (; loopOutputPos < contents->length(); loopOutputPos++) {
+        if (contents->get(loopOutputPos)->function == BUILTIN_FUNCS.loop_output)
+            break;
+    }
+
+    List loopOutput;
+
     for (int iteration=0; iteration < inputListLength; iteration++) {
         context->forLoopContext.continueCalled = false;
 
-        // copy iterator
-        copy(inputList->getIndex(iteration), frame->registers[iterator->index]);
+        // Set the loop index
+        set_int(frame->registers[loopIndexPos], iteration);
 
-        for (int i=0; i < contents->length(); i++) {
+        // Evaluate contents, skipping past loopIndexPos
+        for (int i=loopIndexPos+1; i < contents->length(); i++) {
             if (evaluation_interrupted(context))
                 break;
 
             evaluate_single_term(context, contents->get(i));
         }
 
-#if 0
-        frame = top_frame(context);
+        // Copy loop output
+        copy(frame->registers[loopOutputPos], loopOutput.append());
 
-        // Save output
-        if (saveOutput && !context->forLoopContext.discard) {
-            Term* localResult = contents->get(contents->outputIndex);
-            copy(frame->registers[localResult->index], output->get(nextOutputIndex++));
-        }
+        // Check if we are finished
+        if (iteration >= inputListLength)
+            break;
 
-        // Unload state
-        if (useState)
-            swap(&context->currentScopeState, state->get(iteration));
-#endif
+        // If we're not finished yet, copy rebound outputs back to inputs.
+        // TODO
     }
 
-    // Resize output, in case some elements were discarded
-    output->resize(nextOutputIndex);
-
+#if 0
     // Copy outer rebinds
     for (int i=0; i < outerRebinds->length(); i++) {
 
@@ -229,17 +254,24 @@ CA_FUNCTION(evaluate_for_loop)
 
         copy(get_arg(CONTEXT, &inputIsn), upperFrame->registers[outputTerm->index]);
     }
+#endif
 
     // Restore loop context
     context->forLoopContext = prevLoopContext;
 
-    if (useState) {
-        save_and_consume_state(caller, &prevScopeState, &localState);
-        swap(&prevScopeState, &context->currentScopeState);
+    swap(&frame->registers, &registers);
+    pop_frame(context);
+
+    // Save outputs
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(contents, i);
+        if (placeholder == NULL)
+            break;
+
+        copy(registers[placeholder->index], OUTPUT_NTH(i));
     }
 
-    pop_frame(context);
-    swap(output, OUTPUT);
+    copy(&loopOutput, OUTPUT);
 }
 
 } // namespace circa

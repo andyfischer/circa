@@ -945,7 +945,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     if (rebindListName)
         forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
 
-    setup_for_loop_iterator(forTerm, iterator_name.c_str());
+    start_building_for_loop(forTerm, iterator_name.c_str());
 
     consume_branch(contents, tokens, context);
 

@@ -622,7 +622,7 @@ void post_compile_term(Term* term)
         }
 
         // Temporary step to make if_block work
-        if (term->function == IF_BLOCK_FUNC)
+        if (term->function == IF_BLOCK_FUNC || term->function == FOR_FUNC)
             name = placeholder->name.c_str();
 
         Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);

@@ -54,8 +54,10 @@ namespace for_function {
         as_function(FOR_FUNC)->formatSource = formatSource;
         as_function(FOR_FUNC)->createsStackFrame = true;
 
-        BUILTIN_FUNCS.loop_index = import_function(kernel, NULL, "loop_index() -> int");
-        BUILTIN_FUNCS.loop_iterator = import_function(kernel, NULL, "loop_iterator() -> int");
+        BUILTIN_FUNCS.loop_iterator = import_function(kernel, NULL,
+            "loop_iterator(any, any) -> int");
+        BUILTIN_FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
+        BUILTIN_FUNCS.loop_output = import_function(kernel, NULL, "loop_output(any)");
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         as_function(DISCARD_FUNC)->formatSource = discard_formatSource;
