@@ -124,6 +124,32 @@ void add_implicit_placeholders(Term* forTerm)
     }
 }
 
+void repoint_terms_to_use_input_placeholders(Branch* contents)
+{
+    // Visit every term
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+
+        // Visit every input
+        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            Term* input = term->input(inputIndex);
+            if (input == NULL)
+                continue;
+            
+            // If the input is outside this branch, then see if we have a named
+            // input that could be used instead.
+            if (input->owningBranch == contents || input->name == "")
+                continue;
+
+            Term* replacement = find_input_placeholder_with_name(contents, input->name.c_str());
+            if (replacement == NULL)
+                continue;
+
+            set_input(term, inputIndex, replacement);
+        }
+    }
+}
+
 void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
@@ -131,6 +157,7 @@ void finish_for_loop(Term* forTerm)
     add_loop_output_term(contents);
 
     add_implicit_placeholders(forTerm);
+    repoint_terms_to_use_input_placeholders(contents);
 
     // Add a primary output
     apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
@@ -206,11 +233,14 @@ CA_FUNCTION(evaluate_for_loop)
     ca_assert(contents->get(loopIndexPos)->function == BUILTIN_FUNCS.loop_index);
 
     // Find the loop_output() term.
-    int loopOutputPos = 0;
-    for (; loopOutputPos < contents->length(); loopOutputPos++) {
-        if (contents->get(loopOutputPos)->function == BUILTIN_FUNCS.loop_output)
+    int loopOutputPos = -1;
+    for (int i=0; i < contents->length(); i++) {
+        if (contents->get(i)->function == BUILTIN_FUNCS.loop_output) {
+            loopOutputPos = contents->get(i)->input(0)->index;
             break;
+        }
     }
+    ca_assert(loopOutputPos > 0);
 
     List loopOutput;
 

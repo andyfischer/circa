@@ -81,6 +81,8 @@ Term* get_input_placeholder(Branch* branch, int index);
 Term* get_output_placeholder(Branch* branch, int index);
 int count_input_placeholders(Branch* branch);
 int count_output_placeholders(Branch* branch);
+Term* find_input_placeholder_with_name(Branch* branch, const char* name);
+
 Branch* term_get_function_details(Term* call);
 
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes

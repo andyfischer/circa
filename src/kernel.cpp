@@ -406,6 +406,7 @@ void pre_setup_builtin_functions(Branch* kernel)
 void post_setup_functions(Branch* kernel)
 {
     // Create vectorized add() functions
+#if 0
     Term* add_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "add_v");
     set_ref(&as_function(add_v)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_v);
@@ -413,6 +414,7 @@ void post_setup_functions(Branch* kernel)
     Term* add_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "add_s");
     set_ref(&as_function(add_s)->parameter, ADD_FUNC);
     overloaded_function::append_overload(ADD_FUNC, add_s);
+#endif
 
     // Create vectorized sub() functions
     Term* sub_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "sub_v");

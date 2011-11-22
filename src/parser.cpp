@@ -939,6 +939,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     Term* forTerm = apply(branch, FOR_FUNC, TermList(listExpr), name);
     Branch* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
+    set_input_syntax_hint(forTerm, 0, "postWhitespace", "");
 
     forTerm->setBoolProp("modifyList", rebindListName);
 

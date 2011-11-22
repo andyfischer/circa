@@ -476,6 +476,16 @@ int count_output_placeholders(Branch* branch)
         result++;
     return result;
 }
+Term* find_input_placeholder_with_name(Branch* branch, const char* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (placeholder->name == name)
+            return placeholder;
+    }
+}
 
 Branch* term_get_function_details(Term* call)
 {
