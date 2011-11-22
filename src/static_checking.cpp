@@ -174,7 +174,7 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     else if (strcmp(type, "unrecognized_expression") == 0)
         out << "Unrecognized expression: " << term->stringProp("message");
     else if (strcmp(type, "wrong_input_count") == 0) {
-        int funcNumInputs = function_num_inputs(as_function(term->function));
+        int funcNumInputs = term_count_input_placeholders(term);
         int actualCount = term->numInputs();
         if (actualCount > funcNumInputs)
             out << "Too many inputs (" << actualCount << "), function "

@@ -119,6 +119,8 @@ void add_implicit_placeholders(Term* forTerm)
             remap_pointers_quick(contents->get(i), original, input);
 
         apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result), name);
+
+        inputIndex++;
     }
 }
 
@@ -212,6 +214,18 @@ CA_FUNCTION(evaluate_for_loop)
 
     List loopOutput;
 
+    // For a zero-iteration loop, copy over inputs to their respective outputs.
+    if (inputListLength == 0) {
+        List* registers = &top_frame(context)->registers;
+        for (int i=1;; i++) {
+            Term* input = get_input_placeholder(contents, i);
+            if (input == NULL)
+                break;
+            Term* output = get_output_placeholder(contents, i);
+            copy(registers->get(input->index), registers->get(output->index));
+        }
+    }
+
     for (int iteration=0; iteration < inputListLength; iteration++) {
         context->forLoopContext.continueCalled = false;
 
@@ -234,36 +248,15 @@ CA_FUNCTION(evaluate_for_loop)
             break;
 
         // If we're not finished yet, copy rebound outputs back to inputs.
-        // TODO
-    }
-
-#if 0
-    // Copy outer rebinds
-    for (int i=0; i < outerRebinds->length(); i++) {
-
-        Term* rebindTerm = outerRebinds->get(i);
-
-        Term* rebindInput = NULL;
-
-        if (inputListLength == 0) {
-            // No iterations, use the outer rebind
-            rebindInput = rebindTerm->input(0);
-
-        } else {
-            // At least one iteration, use our local rebind
-            rebindInput = rebindTerm->input(1);
+        for (int i=1;; i++) {
+            List* registers = &top_frame(context)->registers;
+            Term* input = get_input_placeholder(contents, i);
+            if (input == NULL)
+                break;
+            Term* output = get_output_placeholder(contents, i);
+            copy(registers->get(output->index), registers->get(input->index));
         }
-
-        // Currently this is fairly awkward..
-        TaggedValue inputIsn;
-        write_input_instruction(rebindTerm, rebindInput, &inputIsn);
-
-        Term* outputTerm = caller->owningBranch->get(caller->index + 1 + i);
-        Frame* upperFrame = get_frame(CONTEXT, 1);
-
-        copy(get_arg(CONTEXT, &inputIsn), upperFrame->registers[outputTerm->index]);
     }
-#endif
 
     // Restore loop context
     context->forLoopContext = prevLoopContext;
