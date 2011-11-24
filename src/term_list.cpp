@@ -171,7 +171,7 @@ TermList::clear()
 }
 
 Term*
-TermList::operator[] (int index) const
+TermList::get(int index) const
 {
     ca_assert(index < int(_terms.size()));
     return _terms[index];

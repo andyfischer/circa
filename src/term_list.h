@@ -23,7 +23,8 @@ struct TermList
     void set(Term* t1, Term* t2, Term* t3);
 
     int length() const { return (int) _terms.size(); }
-    Term* operator[] (int index) const;
+    Term* operator[] (int index) const { return get(index); }
+    Term* get(int index) const;
     bool empty() const { return length() == 0; }
     bool contains(Term* t) const;
 

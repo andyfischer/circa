@@ -8,11 +8,13 @@
 #include "evaluation.h"
 #include "filesystem.h"
 #include "function.h"
-#include "kernel.h"
 #include "gc.h"
+#include "generic.h"
 #include "importing.h"
 #include "importing_macros.h"
+#include "kernel.h"
 #include "parser.h"
+#include "subroutine.h"
 #include "static_checking.h"
 #include "term.h"
 #include "type.h"
@@ -406,38 +408,24 @@ void pre_setup_builtin_functions(Branch* kernel)
 void post_setup_functions(Branch* kernel)
 {
     // Create vectorized add() functions
-#if 0
-    Term* add_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "add_v");
-    set_ref(&as_function(add_v)->parameter, ADD_FUNC);
-    overloaded_function::append_overload(ADD_FUNC, add_v);
+    Term* add_v = create_subroutine(kernel, "add_v");
+    create_function_vectorized_vv(function_contents(add_v), ADD_FUNC, &LIST_T, &LIST_T);
+    Term* add_s = create_subroutine(kernel, "add_s");
+    create_function_vectorized_vs(function_contents(add_s), ADD_FUNC, &LIST_T, &ANY_T);
 
-    Term* add_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "add_s");
-    set_ref(&as_function(add_s)->parameter, ADD_FUNC);
-    overloaded_function::append_overload(ADD_FUNC, add_s);
-#endif
-
-    // Create vectorized sub() functions
-    Term* sub_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "sub_v");
-    set_ref(&as_function(sub_v)->parameter, SUB_FUNC);
-    overloaded_function::append_overload(SUB_FUNC, sub_v);
-
-    Term* sub_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "sub_s");
-    set_ref(&as_function(sub_s)->parameter, SUB_FUNC);
-    overloaded_function::append_overload(SUB_FUNC, sub_s);
+    Term* sub_v = create_subroutine(kernel, "sub_v");
+    create_function_vectorized_vs(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
+    Term* sub_s = create_subroutine(kernel, "sub_s");
+    create_function_vectorized_vs(function_contents(sub_s), SUB_FUNC, &LIST_T, &ANY_T);
 
     // Create vectorized mult() functions
-    Term* mult_v = create_duplicate(kernel, kernel->get("vectorize_vv"), "mult_v");
-    set_ref(&as_function(mult_v)->parameter, kernel->get("mult"));
-    overloaded_function::append_overload(MULT_FUNC, mult_v);
+    Term* mult_v = create_subroutine(kernel, "mult_v");
+    create_function_vectorized_vs(function_contents(mult_v), MULT_FUNC, &LIST_T, &LIST_T);
+    Term* mult_s = create_subroutine(kernel, "mult_s");
+    create_function_vectorized_vs(function_contents(mult_s), MULT_FUNC, &LIST_T, &ANY_T);
 
-    Term* mult_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "mult_s");
-    set_ref(&as_function(mult_s)->parameter, kernel->get("mult"));
-    overloaded_function::append_overload(MULT_FUNC, mult_s);
-
-    // Create vectorized div() function
-    Term* div_s = create_duplicate(kernel, kernel->get("vectorize_vs"), "div_s");
-    set_ref(&as_function(div_s)->parameter, DIV_FUNC);
-    overloaded_function::append_overload(DIV_FUNC, div_s);
+    Term* div_s = create_subroutine(kernel, "div_s");
+    create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);
 }
 
 void parse_hosted_types(Branch* kernel)

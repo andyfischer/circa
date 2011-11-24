@@ -498,9 +498,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             return compile_error_for_line(branch, tokens, startPosition, "Not a type: " + typeName);
     }
 
-    Term* result = create_value(branch, &FUNCTION_T, functionName);
-    initialize_function(result);
-    initialize_subroutine(result);
+    Term* result = create_subroutine(branch, functionName.c_str());
 
     Function* attrs = as_function(result);
     set_starting_source_location(result, startPosition, tokens);

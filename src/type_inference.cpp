@@ -62,6 +62,15 @@ Type* find_common_type(List* typeList)
 
 Type* find_common_type(Type* type1, Type* type2)
 {
+    if (type1 == NULL)
+        return type2;
+
+    if (type1 == type2)
+        return type1;
+
+    if (type1 == &ANY_T || type2 == &ANY_T)
+        return &ANY_T;
+
     List list;
     set_type_list(&list, type1, type2);
     return find_common_type(&list);

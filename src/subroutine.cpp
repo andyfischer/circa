@@ -97,6 +97,7 @@ CA_FUNCTION(evaluate_subroutine)
 
     Type* outputType = function_get_output_type(function, 0);
 
+#if 0
     if (context->errorOccurred) {
         set_null(OUTPUT);
     } else if (outputType == &VOID_T) {
@@ -116,17 +117,17 @@ CA_FUNCTION(evaluate_subroutine)
     }
 
     set_null(&context->subroutineOutput);
+#endif
 
     // Copy each extra output from registers.
-    // TODO: Use this loop for the primary output as well.
-    for (int i=1;; i++) {
+    for (int i=0;; i++) {
         Term* placeholder = function_get_output_placeholder(as_function(function), i);
         if (placeholder == NULL)
             break;
             
         TaggedValue* result = registers[placeholder->input(0)->index];
 
-        bool castSuccess = cast(result, placeholder->type, EXTRA_OUTPUT(i-1));
+        bool castSuccess = cast(result, placeholder->type, OUTPUT_NTH(i));
 
         if (!castSuccess) {
             std::stringstream msg;
@@ -162,6 +163,14 @@ int get_input_index_of_placeholder(Term* inputPlaceholder)
 {
     ca_assert(inputPlaceholder->function == INPUT_PLACEHOLDER_FUNC);
     return inputPlaceholder->index - 1;
+}
+
+Term* create_subroutine(Branch* branch, const char* name)
+{
+    Term* term = create_value(branch, &FUNCTION_T, name);
+    initialize_function(term);
+    initialize_subroutine(term);
+    return term;
 }
 
 void initialize_subroutine(Term* sub)

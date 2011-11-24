@@ -105,7 +105,6 @@ Type* function_get_output_type(Function* func, int index);
 // Returns the number of input placeholders. Note that a function might have one
 // input placeholder, but accept a variable number of inputs.
 int function_num_inputs(Function* func);
-
 int function_num_outputs(Function* func);
 
 // Stateful inputs

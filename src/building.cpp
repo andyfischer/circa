@@ -701,6 +701,18 @@ Term* find_last_non_comment_expression(Branch* branch)
     return NULL;
 }
 
+Term* find_term_with_function(Branch* branch, Term* func)
+{
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->getFromEnd(i);
+        if (term == NULL)
+            continue;
+        if (term->function == func)
+            return term;
+    }
+    return NULL;
+}
+
 bool branch_creates_stack_frame(Branch* branch)
 {
     if (branch->owningTerm == NULL)

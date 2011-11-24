@@ -5,7 +5,6 @@
 namespace circa {
 namespace add_function {
 
-
     CA_FUNCTION(add_i_evaluate)
     {
         int result = 0;
@@ -57,8 +56,8 @@ namespace add_function {
 
     void setup(Branch* kernel)
     {
-        Term* add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
-        Term* add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
+        BUILTIN_FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
+        BUILTIN_FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
 
 #if 0
         as_function(add_f)->feedbackFunc =

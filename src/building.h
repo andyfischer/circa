@@ -119,6 +119,7 @@ void finish_minor_branch(Branch* branch);
 void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm);
 void update_branch_finish_term(Term* term);
 Term* find_last_non_comment_expression(Branch* branch);
+Term* find_term_with_function(Branch* branch, Term* func);
 
 bool branch_creates_stack_frame(Branch* branch);
 int get_frame_distance(Branch* frame, Term* input);
