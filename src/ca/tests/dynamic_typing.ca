@@ -7,10 +7,7 @@ a = f('test')
 assert(a == 'test')
 
 def g(bool b, any v) -> any
-    if b
-        return v
-    else
-        return 5
+    return cond(b, v, 5)
 
 assert(g(true, 'test') == 'test')
 assert(g(false, 'test') == 5)

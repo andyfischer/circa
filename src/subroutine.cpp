@@ -46,7 +46,7 @@ CA_FUNCTION(evaluate_subroutine)
     Branch* contents = NULL;
 
     if (caller->nestedContents != NULL)
-        contents = caller->nestedContents;
+        contents = nested_contents(caller);
     else
         contents = nested_contents(function);
     
@@ -99,42 +99,19 @@ CA_FUNCTION(evaluate_subroutine)
 
     Type* outputType = function_get_output_type(function, 0);
 
-#if 0
-    if (context->errorOccurred) {
-        set_null(OUTPUT);
-    } else if (outputType == &VOID_T) {
-
-        set_null(OUTPUT);
-
-    } else {
-
-        bool castSuccess = cast(&context->subroutineOutput, outputType, OUTPUT);
-        
-        if (!castSuccess) {
-            std::stringstream msg;
-            msg << "Couldn't cast output " << context->subroutineOutput.toString()
-                << " to type " << outputType->name;
-            error_occurred(context, caller, OUTPUT, msg.str().c_str());
-        }
-    }
-
-    set_null(&context->subroutineOutput);
-#endif
-
     // Copy each extra output from registers.
     for (int i=0;; i++) {
         Term* placeholder = get_output_placeholder(contents, i);
         if (placeholder == NULL)
             break;
             
-        TaggedValue* result = registers[placeholder->input(0)->index];
-
+        TaggedValue* result = registers[placeholder->index];
         bool castSuccess = cast(result, placeholder->type, OUTPUT_NTH(i));
 
         if (!castSuccess) {
             std::stringstream msg;
             msg << "Couldn't cast extra output " << i
-                << " (" << context->subroutineOutput.toString() << ")"
+                << " (" << result << ")"
                 << " to type " << outputType->name;
             error_occurred(context, caller, OUTPUT, msg.str().c_str());
         }

@@ -12,48 +12,12 @@ namespace return_function {
     {
         CONTEXT->interruptSubroutine = true;
 
-        Branch* contents = nested_contents(CALLER);
-        push_frame(CONTEXT, contents);
-        for (int i=0; i < contents->length(); i++)
-            evaluate_single_term(CONTEXT, contents->get(i));
-        pop_frame(CONTEXT);
-    }
+        // TODO: Pop stack frames
 
-    void returnPostCompile(Term* returnCall)
-    {
-        Branch* contents = nested_contents(returnCall);
-        contents->clear();
-
-        // Iterate through every open state var in the subroutine that occurs before
-        // the return(). If any were found, append a call to preserve_state_result().
-
-        Term* sub = find_enclosing_subroutine(returnCall);
-
-        if (sub == NULL)
-            return;
-
-        // Look for the enclosing subroutine, if found then add a call to
-        // subroutine_output()
-        {
-            TermList inputs(returnCall->input(0));
-
-            // Check for extra outputs, if found then include their results in this output
-
-            Function* subAttrs = as_function(sub);
-
-            int numInputs = function_num_inputs(subAttrs);
-            for (int i=0; i < numInputs; i++) {
-                if (function_can_rebind_input(sub, i)) {
-                    std::string const& name =
-                        function_get_input_placeholder(subAttrs, i)->name;
-                    Term* result = get_named_at(returnCall, name);
-                    inputs.append(result);
-                }
-            }
-
-            if (SUBROUTINE_OUTPUT_FUNC != NULL)
-                apply(contents, SUBROUTINE_OUTPUT_FUNC, inputs);
-        }
+        // Copy this value to the last output_placeholder()
+        TaggedValue* result = INPUT(0);
+        List* registers = &top_frame(CONTEXT)->registers;
+        copy(result, registers->get(registers->length()-1));
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -79,7 +43,6 @@ namespace return_function {
 
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel->get("return");
-        as_function(RETURN_FUNC)->postCompile = returnPostCompile;
         as_function(RETURN_FUNC)->formatSource = formatSource;
     }
 }
