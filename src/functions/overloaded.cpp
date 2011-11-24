@@ -100,6 +100,8 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_overload)
     {
+        evaluate_subroutine(_cxt, _ins, _outs);
+#if 0
         Branch* contents = nested_contents(CALLER);
         if (contents->length() == 0) {
             //FIXME
@@ -111,6 +113,7 @@ namespace overloaded_function {
             if (OUTPUT != NULL)
                 swap(&output, OUTPUT);
         }
+#endif
     }
 
     void overload_post_input_change(Term* term)
@@ -123,9 +126,12 @@ namespace overloaded_function {
         Term* specializedFunc = statically_specialize_function(term->function, inputs);
 
         if (specializedFunc != NULL) {
-            apply(contents, specializedFunc, inputs);
+            Term* result = apply(contents, specializedFunc, inputs);
+            repoint_outer_inputs_to_new_placeholders(contents);
             change_declared_type(term, contents->get(0)->type);
+            apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
         }
+        //dump(contents);
     }
 
     Type* overload_specialize_type(Term* term)

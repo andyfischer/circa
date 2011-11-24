@@ -486,11 +486,26 @@ Term* find_input_placeholder_with_name(Branch* branch, const char* name)
             return placeholder;
     }
 }
+Term* append_input_placeholder(Branch* branch)
+{
+    int count = count_input_placeholders(branch);
+    Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
+    branch->move(term, count);
+    return term;
+}
 
 Branch* term_get_function_details(Term* call)
 {
     if (call->function == IF_BLOCK_FUNC || call->function == FOR_FUNC)
         return nested_contents(call);
+
+#if 0
+    if (call->nestedContents != NULL) {
+        std::cout << "term has nested contents: ";
+        print_term(std::cout, call);
+        std::cout << std::endl;
+    }
+#endif
     return function_get_contents(as_function(call->function));
 }
 
@@ -989,6 +1004,18 @@ void move_before_outputs(Term* term)
     Branch* branch = term->owningBranch;
     int outputCount = count_output_placeholders(branch);
     branch->move(term, branch->length() - outputCount - 1);
+}
+void repoint_outer_inputs_to_new_placeholders(Branch* branch)
+{
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        for (int input=0; input < term->numInputs(); input++) {
+            if (term->input(input)->owningBranch != branch) {
+                Term* placeholder = append_input_placeholder(branch);
+                remap_pointers_quick(branch, term->input(input), placeholder);
+            }
+        }
+    }
 }
 
 } // namespace circa

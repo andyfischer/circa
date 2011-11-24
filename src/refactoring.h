@@ -19,6 +19,7 @@ void rewrite_as_value(Branch* branch, int index, Type* type);
 void remove_term(Term* term);
 
 void remap_pointers_quick(Term* term, Term* old, Term* newTerm);
+void remap_pointers_quick(Branch* branch, Term* old, Term* newTerm);
 void remap_pointers(Term* term, TermMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void remap_pointers(Branch* branch, Term* original, Term* replacement);

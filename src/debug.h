@@ -26,7 +26,7 @@ extern const char* DEBUG_BREAK_ON_TERM;
 void dump(Branch& branch);
 void dump(Branch* branch);
 void dump_with_props(Branch& branch);
-
+void dump(Term* term);
 void dump(TaggedValue& value);
 void dump(TaggedValue* value);
 void dump(EvalContext* context);

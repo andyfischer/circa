@@ -37,17 +37,19 @@ namespace subroutine_f {
     }
 }
 
-Term* get_subroutine_input_placeholder(Branch* contents, int index)
-{
-    return contents->get(index);
-}
-
 CA_FUNCTION(evaluate_subroutine)
 {
     EvalContext* context = CONTEXT;
     Term* caller = CALLER;
     Term* function = caller->function;
-    Branch* contents = nested_contents(function);
+
+    Branch* contents = NULL;
+
+    if (caller->nestedContents != NULL)
+        contents = caller->nestedContents;
+    else
+        contents = nested_contents(function);
+    
     int numInputs = caller->numInputs();
 
     // Fetch inputs and start preparing the new stack frame.
@@ -58,7 +60,7 @@ CA_FUNCTION(evaluate_subroutine)
 
     // Insert inputs into placeholders
     for (int i=0; i < NUM_INPUTS; i++) {
-        Term* placeholder = get_subroutine_input_placeholder(contents, i);
+        Term* placeholder = get_input_placeholder(contents, i);
 
         bool castSuccess = cast(INPUT(i), placeholder->type, registers[i]);
 
@@ -121,7 +123,7 @@ CA_FUNCTION(evaluate_subroutine)
 
     // Copy each extra output from registers.
     for (int i=0;; i++) {
-        Term* placeholder = function_get_output_placeholder(as_function(function), i);
+        Term* placeholder = get_output_placeholder(contents, i);
         if (placeholder == NULL)
             break;
             

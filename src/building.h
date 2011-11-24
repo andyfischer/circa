@@ -83,6 +83,9 @@ int count_input_placeholders(Branch* branch);
 int count_output_placeholders(Branch* branch);
 Term* find_input_placeholder_with_name(Branch* branch, const char* name);
 
+// Add an input_placeholder() term after the existing placeholders.
+Term* append_input_placeholder(Branch* branch);
+
 Branch* term_get_function_details(Term* call);
 
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes
@@ -136,5 +139,7 @@ Term* apply_before(Term* existing, Term* function, int input);
 Term* apply_after(Term* existing, Term* function);
 void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
+
+void repoint_outer_inputs_to_new_placeholders(Branch* branch);
 
 } // namespace circa

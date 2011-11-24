@@ -34,6 +34,11 @@ void dump_with_props(Branch& branch)
     print_branch_with_properties(std::cout, &branch);
 }
 
+void dump(Term* term)
+{
+    print_term(std::cout, term);
+}
+
 void dump(TaggedValue& value)
 {
     std::cout << value.toString() << std::endl;
