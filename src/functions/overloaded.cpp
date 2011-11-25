@@ -56,7 +56,7 @@ namespace overloaded_function {
             Term* overload = as_ref(overloads[i]);
 
             // Fail if wrong # of inputs
-            if (!funcAttrs->variableArgs && (function_num_inputs(funcAttrs) != numInputs))
+            if (function_num_inputs(funcAttrs) != numInputs)
                 continue;
 
             // Check each input
@@ -168,6 +168,7 @@ namespace overloaded_function {
 
     void update_function_signature(Term* term)
     {
+#if 0
         List& parameters = as_function(term)->parameters;
 
         ca_assert(parameters.length() > 0);
@@ -199,6 +200,7 @@ namespace overloaded_function {
         Function* func = as_function(term);
         func->variableArgs = variableArgs;
         finish_building_function(func, outputType);
+#endif
     }
 
     void setup_overloaded_function(Term* term, std::string const& name,

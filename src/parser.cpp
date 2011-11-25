@@ -579,7 +579,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (tokens.nextIs(ELLIPSIS)) {
             tokens.consume(ELLIPSIS);
             input->setBoolProp("multiple", true);
-            attrs->variableArgs = true;
         }
 
         // Optional list of qualifiers
@@ -595,7 +594,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
                 input->setBoolProp("output", true);
             } else if (symbolText == ":multiple") {
                 input->setBoolProp("multiple", true);
-                attrs->variableArgs = true;
             } else if (symbolText == ":implied_rebind") {
                 input->setBoolProp("use-as-output", true);
             } else if (symbolText == ":meta") {

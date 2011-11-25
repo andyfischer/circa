@@ -476,6 +476,13 @@ int count_output_placeholders(Branch* branch)
         result++;
     return result;
 }
+bool has_variable_args(Branch* branch)
+{
+    Term* input0 = get_input_placeholder(branch, 0);
+    if (input0 == NULL)
+        return false;
+    return input0->boolPropOptional("multiple", false);
+}    
 Term* find_input_placeholder_with_name(Branch* branch, const char* name)
 {
     for (int i=0;; i++) {
@@ -541,6 +548,10 @@ Term* term_get_output_placeholder(Term* call, int index)
     if (term->function != OUTPUT_PLACEHOLDER_FUNC)
         return NULL;
     return term;
+}
+bool term_has_variable_args(Term* term)
+{
+    return has_variable_args(term_get_function_details(term));
 }
 
 Term* find_open_state_result(Branch* branch, int position)

@@ -20,7 +20,6 @@ namespace circa {
 Function::Function()
   : declaringTerm(NULL),
     contents(NULL),
-    variableArgs(false),
     feedbackFunc(NULL),
     throws(false),
     createsStackFrame(false),
@@ -147,7 +146,7 @@ bool is_callable(Term* term)
 bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 {
     Function* funcAttrs = as_function(func);
-    bool varArgs = funcAttrs->variableArgs;
+    bool varArgs = function_has_variable_args(func);
 
     // Fail if wrong # of inputs
     if (!varArgs && (function_num_inputs(funcAttrs) != inputs.length()))
@@ -170,7 +169,7 @@ bool inputs_statically_fit_function(Term* func, TermList const& inputs)
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 {
     Function* funcAttrs = as_function(func);
-    bool varArgs = funcAttrs->variableArgs;
+    bool varArgs = function_has_variable_args(func);
 
     // Fail if wrong # of inputs
     if (!varArgs && (function_num_inputs(funcAttrs) != inputs.length()))
@@ -190,7 +189,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 bool values_fit_function_dynamic(Term* func, List* list)
 {
     Function* funcAttrs = as_function(func);
-    bool varArgs = funcAttrs->variableArgs;
+    bool varArgs = function_has_variable_args(func);
 
     // Fail if wrong # of inputs
     if (!varArgs && (function_num_inputs(funcAttrs) != list->length()))
@@ -227,8 +226,6 @@ Type* derive_specialized_output_type(Term* function, Term* call)
 bool function_can_rebind_input(Term* func, int index)
 {
     Function* funcAttrs = as_function(func);
-    if (funcAttrs->variableArgs)
-        index = 0;
 
     Term* input = function_get_input_placeholder(funcAttrs, index);
     if (input == NULL)
@@ -256,7 +253,8 @@ Type* function_get_input_type(Term* func, int index)
 }
 Type* function_get_input_type(Function* func, int index)
 {
-    if (func->variableArgs)
+    bool varArgs = function_has_variable_args(func);
+    if (varArgs)
         index = 0;
     return function_get_input_placeholder(func, index)->type;
 }
@@ -367,6 +365,14 @@ bool function_get_input_optional(Function* func, int index)
     if (placeholder == NULL)
         return false;
     return placeholder->boolPropOptional("optional", false);
+}
+bool function_has_variable_args(Function* func)
+{
+    return has_variable_args(function_get_contents(func));
+}
+bool function_has_variable_args(Term* func)
+{
+    return function_has_variable_args(as_function(func));
 }
 
 Term* function_get_input_placeholder(Function* func, int index)
@@ -543,7 +549,8 @@ void function_format_header_source(StyledSource* source, Function* func)
         }
     }
 
-    if (func->variableArgs)
+    bool varArgs = function_has_variable_args(func);
+    if (varArgs)
         append_phrase(source, "...", term, phrase_type::UNDEFINED);
 
     append_phrase(source, ")", term, token::LPAREN);

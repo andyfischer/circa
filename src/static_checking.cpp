@@ -39,9 +39,8 @@ void check_input_for_static_error(List* errors, Term* term, int index)
 {
     int effectiveIndex = index;
 
-    Function* func = as_function(term->function);
-
-    if (func->variableArgs)
+    bool varArgs = term_has_variable_args(term);
+    if (varArgs)
         effectiveIndex = 0;
 
     Term* input = term->input(index);
@@ -83,7 +82,7 @@ void check_term_for_static_error(List* errors, Term* term)
     }
 #endif
 
-    bool varArgs = func->variableArgs;
+    bool varArgs = term_has_variable_args(term);
     int expectedInputCount = term_count_input_placeholders(term);
 
     // Check # of inputs
