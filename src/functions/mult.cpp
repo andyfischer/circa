@@ -51,13 +51,8 @@ OLD_FEEDBACK_IMPL_DISABLED
         Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
         Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) -> number");
 
-        #if 0
-        FIXME
-        function_t::get_feedback_func(mult_f) = 
-            import_function(kernel, feedback_evaluate, "mult_feedback(any, number) -> Branch");
-        #endif
-
-        MULT_FUNC = create_overloaded_function(kernel, "mult", TermList(mult_i, mult_f));
+        TermList overloads(mult_i, mult_f);
+        MULT_FUNC = create_overloaded_function(kernel, "mult", &overloads);
     }
 }
 } // namespace circa

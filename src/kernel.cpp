@@ -413,6 +413,10 @@ void post_setup_functions(Branch* kernel)
     Term* add_s = create_subroutine(kernel, "add_s");
     create_function_vectorized_vs(function_contents(add_s), ADD_FUNC, &LIST_T, &ANY_T);
 
+#if 0
+    overloaded_function::append_overload(ADD_FUNC, add_s);
+    overloaded_function::append_overload(ADD_FUNC, add_v);
+
     Term* sub_v = create_subroutine(kernel, "sub_v");
     create_function_vectorized_vs(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
     Term* sub_s = create_subroutine(kernel, "sub_s");
@@ -426,6 +430,7 @@ void post_setup_functions(Branch* kernel)
 
     Term* div_s = create_subroutine(kernel, "div_s");
     create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);
+#endif
 }
 
 void parse_hosted_types(Branch* kernel)
@@ -484,7 +489,8 @@ export_func void circa_initialize()
     type_initialize_kernel(kernel);
 
     // Install C functions into stdlib
-    install_standard_library(kernel);
+    // TEMP DISABLED
+    //install_standard_library(kernel);
 
 #if CIRCA_TEST_BUILD
     // Create a space for unit tests.

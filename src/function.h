@@ -82,8 +82,6 @@ bool inputs_statically_fit_function(Term* func, TermList const& inputs);
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs);
 bool values_fit_function_dynamic(Term* func, List* list);
 
-Term* create_overloaded_function(Branch* branch, std::string const& name,
-        TermList const& overloads);
 Type* derive_specialized_output_type(Term* function, Term* call);
 
 // Returns whether the given function can rebind the input at 'index'. (The

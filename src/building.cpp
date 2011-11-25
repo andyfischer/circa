@@ -1009,10 +1009,12 @@ void repoint_outer_inputs_to_new_placeholders(Branch* branch)
 {
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
-        for (int input=0; input < term->numInputs(); input++) {
-            if (term->input(input)->owningBranch != branch) {
+        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            Term* input = term->input(inputIndex);
+            if (input == NULL) continue;
+            if (input->owningBranch != branch) {
                 Term* placeholder = append_input_placeholder(branch);
-                remap_pointers_quick(branch, term->input(input), placeholder);
+                remap_pointers_quick(branch, input, placeholder);
             }
         }
     }

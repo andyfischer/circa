@@ -207,12 +207,6 @@ bool values_fit_function_dynamic(Term* func, List* list)
     return true;
 }
 
-Term* create_overloaded_function(Branch* branch, std::string const& name,
-        TermList const& overloads)
-{
-    return overloaded_function::create_overloaded_function(branch, name, overloads);
-}
-
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
     if (!FINISHED_BOOTSTRAP)

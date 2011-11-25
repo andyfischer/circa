@@ -52,14 +52,17 @@ namespace comparison_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
 
-        create_overloaded_function(kernel, "less_than",
-                TermList(kernel->get("less_than_i"), kernel->get("less_than_f")));
-        create_overloaded_function(kernel, "less_than_eq",
-                TermList(kernel->get("less_than_eq_i"), kernel->get("less_than_eq_f")));
-        create_overloaded_function(kernel, "greater_than",
-                TermList(kernel->get("greater_than_i"), kernel->get("greater_than_f")));
-        create_overloaded_function(kernel, "greater_than_eq",
-                TermList(kernel->get("greater_than_eq_i"), kernel->get("greater_than_eq_f")));
+        TermList lt_overloads(kernel->get("less_than_i"), kernel->get("less_than_f"));
+        create_overloaded_function(kernel, "less_than", &lt_overloads);
+
+        TermList lte_overloads(kernel->get("less_than_eq_i"), kernel->get("less_than_eq_f"));
+        create_overloaded_function(kernel, "less_than_eq", &lte_overloads);
+
+        TermList gt_overloads(kernel->get("greater_than_i"), kernel->get("greater_than_f"));
+        create_overloaded_function(kernel, "greater_than", &gt_overloads);
+
+        TermList gte_overloads(kernel->get("greater_than_eq_i"), kernel->get("greater_than_eq_f"));
+        create_overloaded_function(kernel, "greater_than_eq", &gte_overloads);
     }
 }
 }

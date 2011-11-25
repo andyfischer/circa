@@ -8,6 +8,7 @@
 #include "function.h"
 #include "generic.h"
 #include "kernel.h"
+#include "subroutine.h"
 #include "type_inference.h"
 
 namespace circa {
@@ -55,6 +56,13 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     finish_for_loop(loop);
 
     apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(loop));
+}
+
+Term* create_overloaded_function(Branch* branch, const char* name, TermList* functions)
+{
+    Term* term = create_subroutine(branch, name);
+    create_overloaded_function(function_get_contents(as_function(term)), functions);
+    return term;
 }
 
 void create_overloaded_function(Branch* out, TermList* functions)

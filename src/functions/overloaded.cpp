@@ -250,8 +250,6 @@ namespace overloaded_function {
 
     CA_FUNCTION(evaluate_declaration)
     {
-        // Make our output of type Function so that the type checker doesn't
-        // get mad. This value isn't used.
         create(unbox_type(FUNCTION_TYPE), OUTPUT);
     }
 

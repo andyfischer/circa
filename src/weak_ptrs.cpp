@@ -27,10 +27,14 @@ void* get_weak_ptr(WeakPtr ptr)
 
 void weak_ptr_set_null(WeakPtr ptr)
 {
+    if (ptr == 0)
+        return;
     g_everyWeakPtr[ptr] = NULL;
 }
 bool is_weak_ptr_null(WeakPtr ptr)
 {
+    if (ptr == 0)
+        return true;
     return ptr == 0;
 }
 

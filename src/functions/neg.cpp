@@ -29,7 +29,8 @@ namespace neg_function  {
         as_function(neg_i)->formatSource = formatSource;
         as_function(neg_f)->formatSource = formatSource;
 
-        NEG_FUNC = create_overloaded_function(kernel, "neg", TermList(neg_i, neg_f));
+        TermList overloads(neg_i, neg_f);
+        NEG_FUNC = create_overloaded_function(kernel, "neg", &overloads);
         as_function(NEG_FUNC)->formatSource = formatSource;
     }
 }

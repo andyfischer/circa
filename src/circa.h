@@ -17,6 +17,7 @@
 #include "filesystem.h"
 #include "for_loop.h"
 #include "function.h"
+#include "generic.h"
 #include "if_block.h"
 #include "kernel.h"
 #include "importing.h"

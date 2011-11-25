@@ -21,6 +21,7 @@ namespace add_function {
         set_float(OUTPUT, result);
     }
 
+#if 0
     CA_FUNCTION(add_dynamic)
     {
         bool allInts = true;
@@ -34,6 +35,7 @@ namespace add_function {
         else
             add_f_evaluate(_cxt, _ins, _outs);
     }
+#endif
 
     CA_FUNCTION(add_feedback)
     {
@@ -59,13 +61,9 @@ namespace add_function {
         BUILTIN_FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
         BUILTIN_FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
 
-#if 0
-        as_function(add_f)->feedbackFunc =
-            import_function(kernel, add_feedback, "add_feedback(any, number)");
-
-        ADD_FUNC = create_overloaded_function(kernel, "add", TermList(add_i, add_f));
-#endif
-        ADD_FUNC = import_function(kernel, add_dynamic, "add(any...) -> any");
+        TermList addOverloads(BUILTIN_FUNCS.add_i, BUILTIN_FUNCS.add_f);
+        ADD_FUNC = create_overloaded_function(kernel, "add", &addOverloads);
+        //as_function(add_f)->feedbackFunc = import_function(kernel, add_feedback, "add_feedback(any, number)");
     }
 } // namespace add_function
 } // namespace circa

@@ -139,15 +139,17 @@ namespace math_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
 
-        create_overloaded_function(kernel, "max",
-                TermList(kernel->get("max_i"), kernel->get("max_f")));
-        create_overloaded_function(kernel, "min",
-                TermList(kernel->get("min_i"), kernel->get("min_f")));
-        create_overloaded_function(kernel, "remainder",
-                TermList(kernel->get("remainder_i"), kernel->get("remainder_f")));
+        TermList max_overloads(kernel->get("max_i"), kernel->get("max_f"));
+        create_overloaded_function(kernel, "max", &max_overloads);
 
-        create_overloaded_function(kernel, "mod",
-                TermList(kernel->get("mod_i"), kernel->get("mod_f")));
+        TermList min_overloads(kernel->get("min_i"), kernel->get("min_f"));
+        create_overloaded_function(kernel, "min", &min_overloads);
+
+        TermList remainder_overloads(kernel->get("remainder_i"), kernel->get("remainder_f"));
+        create_overloaded_function(kernel, "remainder", &remainder_overloads);
+
+        TermList mod_overloads(kernel->get("mod_i"), kernel->get("mod_f"));
+        create_overloaded_function(kernel, "mod", &mod_overloads);
     }
 }
 } // namespace circa
