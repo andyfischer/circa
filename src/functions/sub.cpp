@@ -18,11 +18,8 @@ namespace sub_function {
 
     void setup(Branch* kernel)
     {
-        Term* sub_i = import_function(kernel, evaluate_i, "sub_i(int,int) -> int");
-        Term* sub_f = import_function(kernel, evaluate_f, "sub_f(number,number) -> number");
-
-        TermList overloads(sub_i, sub_f);
-        SUB_FUNC = create_overloaded_function(kernel, "sub", &overloads);
+        import_function(kernel, evaluate_i, "sub_i(int,int) -> int");
+        import_function(kernel, evaluate_f, "sub_f(number,number) -> number");
     }
 }
 } // namespace circa

@@ -19,8 +19,6 @@ Term* create_subroutine(Branch* branch, const char* name);
 void initialize_subroutine(Term* sub);
 void finish_building_subroutine(Term* sub, Term* outputType);
 
-void subroutine_check_to_append_implicit_return(Term* sub);
-
 void store_locals(Branch* branch, TaggedValue* storage);
 void restore_locals(TaggedValue* storageTv, Branch* branch);
 

@@ -139,6 +139,7 @@ ListData* write_output_instruction_list(Term* caller, ListData* list);
 Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);
 Term* apply_after(Term* existing, Term* function);
+void move_before(Term* movee, Term* pivot);
 void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
 

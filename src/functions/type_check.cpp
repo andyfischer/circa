@@ -32,9 +32,17 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_null(INPUT(0)));
     }
+    CA_FUNCTION(inputs_fit_function)
+    {
+        // TODO
+        set_bool(OUTPUT, true);
+    }
+
     void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
+        BUILTIN_FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
+            "inputs_fit_function(List,Function) -> bool");
     }
 
 } // namespace type_check_function

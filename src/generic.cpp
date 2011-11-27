@@ -7,6 +7,7 @@
 #include "for_loop.h"
 #include "function.h"
 #include "generic.h"
+#include "if_block.h"
 #include "kernel.h"
 #include "subroutine.h"
 #include "type_inference.h"
@@ -58,6 +59,10 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(loop));
 }
 
+Term* create_overloaded_function(Branch* branch, const char* name, TermList const& functions)
+{
+    return create_overloaded_function(branch, name, (TermList*) &functions);
+}
 Term* create_overloaded_function(Branch* branch, const char* name, TermList* functions)
 {
     Term* term = create_subroutine(branch, name);
@@ -75,6 +80,8 @@ void create_overloaded_function(Branch* out, TermList* functions)
         ca_assert(inputCount == function_num_inputs(as_function(functions->get(i))));
     }
 
+    TermList inputPlaceholders;
+
     // Add input placeholders
     for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
 
@@ -88,20 +95,27 @@ void create_overloaded_function(Branch* out, TermList* functions)
 
         Term* placeholder = apply(out, INPUT_PLACEHOLDER_FUNC, TermList());
         change_declared_type(placeholder, type);
+
+        inputPlaceholders.append(placeholder);
     }
 
-#if 0
+    // Take the (possibly variadic) args and create a proper list.
+    Term* inputsAsList = apply(out, LIST_FUNC, inputPlaceholders);
+
     // Add the switch block
     Term* block = apply(out, IF_BLOCK_FUNC, TermList());
     Branch* blockContents = nested_contents(block);
 
     for (int i=0; i < functions->length(); i++) {
         Term* function = functions->get(i);
-
-        Term* condition = apply(out, BUILTIN_FUNCS.inputs_fit_function, TermList());
-
+        Term* condition = apply(out, BUILTIN_FUNCS.inputs_fit_function,
+            TermList(inputsAsList, function));
+        move_before(condition, block);
+        Term* caseTerm = apply(blockContents, CASE_FUNC, TermList(condition));
+        apply(nested_contents(caseTerm), function, inputPlaceholders);
     }
-#endif
+
+    finish_if_block(block);
 }
 
 } // namespace circa

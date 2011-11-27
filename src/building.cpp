@@ -1004,6 +1004,12 @@ Term* apply_after(Term* existing, Term* function)
 
     return newTerm;
 }
+void move_before(Term* movee, Term* pivot)
+{
+    ca_assert(movee->owningBranch == pivot->owningBranch);
+    movee->owningBranch->move(movee, pivot->index);
+}
+
 void move_after_inputs(Term* term)
 {
     Branch* branch = term->owningBranch;

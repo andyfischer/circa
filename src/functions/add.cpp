@@ -60,10 +60,6 @@ namespace add_function {
     {
         BUILTIN_FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
         BUILTIN_FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
-
-        TermList addOverloads(BUILTIN_FUNCS.add_i, BUILTIN_FUNCS.add_f);
-        ADD_FUNC = create_overloaded_function(kernel, "add", &addOverloads);
-        //as_function(add_f)->feedbackFunc = import_function(kernel, add_feedback, "add_feedback(any, number)");
     }
 } // namespace add_function
 } // namespace circa

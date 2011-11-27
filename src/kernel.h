@@ -93,6 +93,7 @@ extern Term* OPAQUE_POINTER_TYPE;
 struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
+    Term* inputs_fit_function;
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output;
@@ -177,6 +178,10 @@ namespace for_function {
 
 namespace namespace_function {
     void early_setup(Branch* kernel);
+}
+
+namespace neg_function {
+    void formatSource(StyledSource* source, Term* term);
 }
 
 namespace overloaded_function {

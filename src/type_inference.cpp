@@ -71,9 +71,10 @@ Type* find_common_type(Type* type1, Type* type2)
     if (type1 == &ANY_T || type2 == &ANY_T)
         return &ANY_T;
 
-    List list;
-    set_type_list(&list, type1, type2);
-    return find_common_type(&list);
+    if (is_list_based_type(type1) && is_list_based_type(type2))
+        return &LIST_T;
+
+    return &ANY_T;
 }
 
 Type* find_common_type(Type* type1, Type* type2, Type* type3)

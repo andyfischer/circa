@@ -161,28 +161,7 @@ void initialize_subroutine(Term* sub)
 
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
-    subroutine_check_to_append_implicit_return(sub);
     finish_update_cascade(nested_contents(sub));
-}
-
-void subroutine_check_to_append_implicit_return(Term* sub)
-{
-    // Do nothing if this subroutine already ends with a return
-    Branch* contents = nested_contents(sub);
-    for (int i=contents->length()-1; i >= 0; i--) {
-        Term* term = contents->get(i);
-        if (term->function == RETURN_FUNC)
-            return;
-
-        // if we found a comment() then keep searching
-        if (term->function == COMMENT_FUNC)
-            continue;
-
-        // otherwise, break so that we'll insert a return()
-        break;
-    }
-
-    post_compile_term(apply(contents, RETURN_FUNC, TermList(NULL)));
 }
 
 void store_locals(Branch* branch, TaggedValue* storageTv)

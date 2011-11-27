@@ -48,11 +48,8 @@ OLD_FEEDBACK_IMPL_DISABLED
 
     void setup(Branch* kernel)
     {
-        Term* mult_i = import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
-        Term* mult_f = import_function(kernel, evaluate_f, "mult_f(number,number) -> number");
-
-        TermList overloads(mult_i, mult_f);
-        MULT_FUNC = create_overloaded_function(kernel, "mult", &overloads);
+        import_function(kernel, evaluate_i, "mult_i(int,int) -> int");
+        import_function(kernel, evaluate_f, "mult_f(number,number) -> number");
     }
 }
 } // namespace circa

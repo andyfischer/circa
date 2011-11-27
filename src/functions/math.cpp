@@ -138,18 +138,6 @@ namespace math_function {
     void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-
-        TermList max_overloads(kernel->get("max_i"), kernel->get("max_f"));
-        create_overloaded_function(kernel, "max", &max_overloads);
-
-        TermList min_overloads(kernel->get("min_i"), kernel->get("min_f"));
-        create_overloaded_function(kernel, "min", &min_overloads);
-
-        TermList remainder_overloads(kernel->get("remainder_i"), kernel->get("remainder_f"));
-        create_overloaded_function(kernel, "remainder", &remainder_overloads);
-
-        TermList mod_overloads(kernel->get("mod_i"), kernel->get("mod_f"));
-        create_overloaded_function(kernel, "mod", &mod_overloads);
     }
 }
 } // namespace circa
