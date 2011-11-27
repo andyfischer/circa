@@ -523,6 +523,11 @@ float as_float(TaggedValue* value)
     ca_assert(is_float(value));
     return value->value_data.asfloat;
 }
+Function* as_function(TaggedValue* value)
+{
+    ca_assert(is_function(value));
+    return (Function*) value->value_data.ptr;
+}
 
 std::string const& as_string(TaggedValue* value)
 {
@@ -597,6 +602,7 @@ bool is_bool(TaggedValue* value) { return value->value_type->storageType == STOR
 bool is_branch(TaggedValue* value) { return value->value_type == &BRANCH_T; }
 bool is_error(TaggedValue* value) { return value->value_type == &ERROR_T; }
 bool is_float(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool is_function(TaggedValue* value) { return value->value_type == &FUNCTION_T; }
 bool is_function_pointer(TaggedValue* value) { return value->value_type == &FUNCTION_T; }
 bool is_int(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
 bool is_list(TaggedValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }

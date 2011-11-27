@@ -116,6 +116,7 @@ void create_overloaded_function(Branch* out, TermList* functions)
     }
 
     finish_if_block(block);
+    apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(block));
 }
 
 } // namespace circa

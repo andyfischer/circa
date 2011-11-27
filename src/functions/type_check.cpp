@@ -34,7 +34,28 @@ namespace type_check_function {
     }
     CA_FUNCTION(inputs_fit_function)
     {
-        // TODO
+        List* inputs = as_list(INPUT(0));
+        Function* function = as_function(INPUT(1));
+
+        bool varArgs = function_has_variable_args(function);
+
+        // Fail if wrong # of inputs
+        if (!varArgs && (function_num_inputs(function) != inputs->length())) {
+            set_bool(OUTPUT, false);
+            return;
+        }
+
+        for (int i=0; i < inputs->length(); i++) {
+            Type* type = function_get_input_type(function, i);
+            TaggedValue* value = inputs->get(i);
+            if (value == NULL)
+                continue;
+            if (!cast_possible(value, type)) {
+                set_bool(OUTPUT, false);
+                return;
+            }
+        }
+
         set_bool(OUTPUT, true);
     }
 
