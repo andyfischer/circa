@@ -115,6 +115,11 @@ void create_overloaded_function(Branch* out, TermList* functions)
         apply(nested_contents(caseTerm), function, inputPlaceholders);
     }
 
+    // Fallback case
+    Term* elseTerm = apply(blockContents, CASE_FUNC, TermList(NULL));
+    Term* errorMsg = create_string(nested_contents(elseTerm), "No overload fit inputs");
+    apply(nested_contents(elseTerm), BUILTIN_FUNCS.error, TermList(errorMsg));
+
     finish_if_block(block);
     apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(block));
 }

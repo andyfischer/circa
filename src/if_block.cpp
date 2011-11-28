@@ -322,6 +322,9 @@ CA_FUNCTION(evaluate_if_block)
                     break;
             }
 
+            if (context->errorOccurred)
+                return;
+
             swap(&registers, &top_frame(context)->registers);
             pop_frame(context);
 
