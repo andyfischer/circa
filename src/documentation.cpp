@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "kernel.h"
+#include "generic.h"
 #include "function.h"
 #include "source_repro.h"
 #include "term.h"
@@ -70,7 +71,7 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
     out << ", \"declaration\": \"" << header << "\"";
     //escape_string_for_json(get_term_source(func), out);
 
-    if (overloaded_function::is_overloaded_function(func)) {
+    if (is_overloaded_function(as_function(func))) {
         out << ", \"containsOverloads\": [";
 
         List& overloads = as_function(func)->parameters;

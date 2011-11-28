@@ -1036,5 +1036,9 @@ void repoint_outer_inputs_to_new_placeholders(Branch* branch)
         }
     }
 }
+void specialize_overload_for_call(Term* call)
+{
+    //Branch* original = function_contents(call->function);
+}
 
 } // namespace circa

@@ -119,4 +119,15 @@ void create_overloaded_function(Branch* out, TermList* functions)
     apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(block));
 }
 
+void append_to_overloaded_function(Branch* func, Term* function)
+{
+    // TODO
+}
+
+bool is_overloaded_function(Function* func)
+{
+    // TODO
+    return false;
+}
+
 } // namespace circa

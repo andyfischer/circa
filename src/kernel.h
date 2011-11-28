@@ -184,19 +184,6 @@ namespace neg_function {
     void formatSource(StyledSource* source, Term* term);
 }
 
-namespace overloaded_function {
-
-    bool is_overloaded_function(Term* func);
-    int num_overloads(Term* func);
-    Term* get_overload(Term* func, int index);
-    Term* find_overload(Term* func, const char* name);
-    Term* create_overloaded_function(Branch* branch, std::string const& name,
-        TermList const& overloads);
-    void append_overload(Term* overloadedFunction, Term* overload);
-    Term* statically_specialize_function(Term* func, TermList const& inputs);
-    void post_compile_setup_overloaded_function(Term* term);
-}
-
 namespace return_function {
     void setup(Branch* kernel);
 }

@@ -144,5 +144,6 @@ void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
 
 void repoint_outer_inputs_to_new_placeholders(Branch* branch);
+void specialize_overload_for_call(Term* call);
 
 } // namespace circa

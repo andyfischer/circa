@@ -440,8 +440,6 @@ void bootstrap_kernel()
     SUB_FUNC = create_overloaded_function(kernel, "sub",
         TermList(kernel->get("sub_i"), kernel->get("sub_f")));
 
-    dump(kernel);
-
     // Create vectorized functions
     Term* add_v = create_subroutine(kernel, "add_v");
     create_function_vectorized_vv(function_contents(add_v), ADD_FUNC, &LIST_T, &LIST_T);

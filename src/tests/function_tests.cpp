@@ -53,48 +53,6 @@ void test_inputs_fit_function()
     test_assert(!inputs_statically_fit_function(KERNEL->get("add_i"), inputs));
 }
 
-void overloaded_function()
-{
-    Branch branch;
-
-    Term* floatInput = branch.eval("5.2");
-    Term* intInput = branch.eval("11");
-
-    test_assert(overloaded_function::is_overloaded_function(MULT_FUNC));
-
-    // Test statically_specialize_function
-    test_equals(overloaded_function::statically_specialize_function(
-                    MULT_FUNC, TermList(floatInput, intInput))
-            ->name, "mult_f");
-
-    Term* add_i = branch.eval("add(1 2)");
-    test_equals(add_i->contents(0)->function->name, "add_i");
-    Term* add_f = branch.eval("add(1.0 2)");
-    test_equals(add_f->contents(0)->function->name, "add_f");
-
-    Term* mult_f = branch.eval("mult(1.0 3)");
-    test_equals(mult_f->contents(0)->function->name, "mult_f");
-    Term* mult_f_2 = branch.eval("mult(3 1.0)");
-    test_equals(mult_f_2->contents(0)->function->name, "mult_f");
-}
-
-void overloaded_function_in_script()
-{
-    Branch branch;
-    Term* f1 = branch.compile("def f1(int i);");
-    Term* f2 = branch.compile("def f2(int i);");
-    
-    branch.compile("g = overloaded_function(f1 f2)");
-    Term* g_call = branch.compile("g(1)");
-
-    test_assert(g_call->contents(0)->function == f1);
-
-    branch.compile("h = overloaded_function(f2 f1)");
-    Term* h_call = branch.compile("h(1)");
-
-    test_assert(h_call->contents(0)->function == f2);
-}
-
 void test_is_native_function()
 {
     test_assert(is_native_function(as_function(KERNEL->get("assert"))));
@@ -188,8 +146,6 @@ void register_tests()
     REGISTER_TEST_CASE(function_tests::create);
     REGISTER_TEST_CASE(function_tests::test_is_callable);
     REGISTER_TEST_CASE(function_tests::test_inputs_fit_function);
-    REGISTER_TEST_CASE(function_tests::overloaded_function);
-    REGISTER_TEST_CASE(function_tests::overloaded_function_in_script);
     REGISTER_TEST_CASE(function_tests::test_is_native_function);
     REGISTER_TEST_CASE(function_tests::test_documentation_string);
     REGISTER_TEST_CASE(function_tests::test_bug_where_a_mysterious_copy_term_was_added);

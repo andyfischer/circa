@@ -10,5 +10,7 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
 Term* create_overloaded_function(Branch* branch, const char* name, TermList const& functions);
 Term* create_overloaded_function(Branch* branch, const char* name, TermList* functions);
 void create_overloaded_function(Branch* out, TermList* functions);
+void append_to_overloaded_function(Branch* func, Term* function);
+bool is_overloaded_function(Function* func);
 
 } // namespace circa

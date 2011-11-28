@@ -45,6 +45,7 @@ namespace type_check_function {
             return;
         }
 
+        // Check each input
         for (int i=0; i < inputs->length(); i++) {
             Type* type = function_get_input_type(function, i);
             TaggedValue* value = inputs->get(i);
