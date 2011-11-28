@@ -1036,9 +1036,31 @@ void repoint_outer_inputs_to_new_placeholders(Branch* branch)
         }
     }
 }
-void specialize_overload_for_call(Term* call)
+void expand_variadic_inputs_for_call(Branch* branch, Term* call)
 {
-    //Branch* original = function_contents(call->function);
+    Term* input0 = get_input_placeholder(branch, 0);
+    if (input0 == NULL || !input0->boolPropOptional("multiple", false))
+        return;
+
+    // Add extra input_placeholder term
+    int inputCount = call->numInputs();
+    input0->removeProperty("multiple");
+
+    for (int i=1; i < inputCount; i++) {
+        append_input_placeholder(branch);
+    }
+
+    // Modify calls to use these placeholders
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
+            if (term->input(inputIndex) == input0) {
+
+                for (int extraInput=1; extraInput < inputCount; extraInput++)
+                    set_input(term, extraInput, get_input_placeholder(branch, extraInput));
+            }
+        }
+    }
 }
 
 } // namespace circa

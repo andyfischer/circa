@@ -10,6 +10,7 @@
 #include "if_block.h"
 #include "kernel.h"
 #include "subroutine.h"
+#include "type.h"
 #include "type_inference.h"
 
 namespace circa {
@@ -127,6 +128,53 @@ void create_overloaded_function(Branch* out, TermList* functions)
 void append_to_overloaded_function(Branch* func, Term* function)
 {
     // TODO
+}
+
+void specialize_overload_for_call(Term* call)
+{
+    Branch* original = function_contents(call->function);
+    Term* switchTerm = find_term_with_function(original, IF_BLOCK_FUNC);
+    ca_assert(switchTerm != NULL);
+    Branch* switchBranch = nested_contents(switchTerm);
+
+    // Find which case will succeed
+    Branch* successCase = NULL;
+    for (int i=0; i < switchBranch->length(); i++) {
+        Term* term = switchBranch->get(i);
+        if (term->function != CASE_FUNC)
+            continue;
+
+        // Check if we have reached the fallback case.
+        if (term->input(0) == NULL) {
+            successCase = NULL;
+            break;
+        }
+
+        Term* inputCheck = term->input(0);
+        Term* func = inputCheck->input(1);
+
+        // Check if this function statically fits
+        for (int inputIndex=0; inputIndex < call->numInputs(); inputIndex++) {
+            if (term_output_always_satisfies_type(call->input(inputIndex),
+                function_get_input_type(func, inputIndex))) {
+
+                successCase = nested_contents(term);
+                break;
+            }
+        }
+    }
+
+    // If successCase is NULL then no static specialization is possible.
+    if (successCase == NULL) {
+        remove_nested_contents(call);
+        return;
+    }
+
+    // Copy the successful case
+    clear_branch(nested_contents(call));
+    duplicate_branch(successCase, nested_contents(call));
+
+    expand_variadic_inputs_for_call(nested_contents(call), call);
 }
 
 bool is_overloaded_function(Function* func)

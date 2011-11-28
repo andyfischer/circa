@@ -401,6 +401,16 @@ Branch* nested_contents(Term* term)
     return term->nestedContents;
 }
 
+void remove_nested_contents(Term* term)
+{
+    if (term->nestedContents == NULL)
+        return;
+
+    clear_branch(term->nestedContents);
+    delete term->nestedContents;
+    term->nestedContents = NULL;
+}
+
 std::string get_branch_source_filename(Branch* branch)
 {
     List* fileOrigin = branch_get_file_origin(branch);

@@ -1,0 +1,42 @@
+
+When adding a lot of high-level concepts and operations, it's easy to end up with code
+that is really inefficient but easily optimized. For example, the naive way to do
+dataflow is to copy every value as it passes across the system, but analysis can remove
+most/all copying.
+
+Traditionally we expect the compiler to do all the optimization, so it becomes a
+one-size-fits-all program for optimizing whatever you throw at it.
+
+But what if we want optimizations that are specifically tailored to a certain piece of
+code. Maybe a human is able to recognize a pattern that the optimizer can't (or maybe
+the human knows more about the context in which the code will be run, and he knows that
+a certain change will improve the code later). Instead of expecting that the compiler
+is infinitely smart, we could provide an API where the user can write their own optimizations.
+
+In order for this to work:
+ 1) The data model and API for code would have to be really easy to work with
+ 2) We would provide a smattering of utility functions for code transformation and introspection
+
+The user's code would basically consist of:
+ 1) Assumptions that the user is making about the structure of the code. If an assumption
+    is violated then we can't safely do the optimization.
+ 2) A transformation pass that turns the code into some less-safe code. Maybe this format
+    is also a Circa data structure or maybe it's a lower level format.
+
+So the workflow would be:
+ - Write the program's logic in Circa
+ - Figure out what optimizations need to be made
+ - Write the optimization code
+ - As the program evolves, it may change in a way that makes the custom optimization invalid.
+   The assumption checker would need to catch this. Bonus points if the system can tell the
+   user which assumption is the problem, and which part of the code is in violation.
+   (This idea of having static assertions on code is something that I wanted to pursue anyway).
+
+If things go well then we might have a public library of custom Circa optimizers, that
+uses could plug-and-play with. As long as the assumption checker is valid, it will all work.
+
+Some questions:
+ - How annoying will it be to write a custom optimization? Will it be worth it?
+ - Will it be possible to write a custom optimization without deep knowledge of Circa?
+ - How durable will custom optimizations be? (that is, how often will a typical code change
+   cause an optimization to be invalid?)
