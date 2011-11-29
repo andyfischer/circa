@@ -60,5 +60,27 @@ struct UpwardIterator
     void operator++() { advance(); }
 };
 
+struct BranchInputIterator
+{
+    Branch* branch;
+    int index;
+    int inputIndex;
+
+    BranchInputIterator(Branch* branch);
+
+    bool finished();
+    void advance();
+
+    Term* currentTerm();
+    Term* currentInput();
+    int currentInputIndex();
+
+    bool unfinished() { return !finished(); }
+    void operator++() { advance(); }
+
+private:
+    void advanceWhileInvalid();
+};
+
     
 } // namespace circa

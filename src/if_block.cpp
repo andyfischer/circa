@@ -57,6 +57,40 @@ bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
     return true;
 }
 
+void if_block_repoint_outer_pointers(Term* ifCall)
+{
+    Branch* contents = nested_contents(ifCall);
+    TermList outerTerms;
+
+    // Find outer pointers across each case
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function != CASE_FUNC)
+            continue;
+
+        list_outer_pointers(nested_contents(term), &outerTerms);
+    }
+
+    ca_assert(ifCall->numInputs() == 0);
+
+    // Create input placeholders and add inputs for all outer pointers
+    for (int i=0; i < outerTerms.length(); i++) {
+        Term* outer = outerTerms[i];
+
+        set_input(ifCall, i, outer);
+        Term* placeholder = append_input_placeholder(nested_contents(ifCall));
+
+        // Go through each case and repoint to this new placeholder
+        for (int j=0; j < contents->length(); j++) {
+            Term* term = contents->get(j);
+            if (term->function != CASE_FUNC)
+                continue;
+
+            remap_pointers_quick(nested_contents(term), outer, placeholder);
+        }
+    }
+}
+
 void if_block_update_master_placeholders(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
@@ -170,6 +204,7 @@ void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
         change_declared_type(placeholder, masterPlaceholder->type);
         copy(&masterPlaceholder->properties, &placeholder->properties);
         caseContents->move(placeholder, i);
+        remap_pointers_quick(caseContents, masterPlaceholder, placeholder);
     }
 
     // Create output placeholders
@@ -256,6 +291,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
 
 void finish_if_block(Term* ifBlock)
 {
+    if_block_repoint_outer_pointers(ifBlock);
     if_block_update_master_placeholders(ifBlock);
 
     Branch* contents = nested_contents(ifBlock);

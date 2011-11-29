@@ -137,6 +137,68 @@ void UpwardIterator::advance()
 }
 
 
+BranchInputIterator::BranchInputIterator(Branch* branchIn)
+ : branch(branchIn)
+{
+    index = 0;
+    inputIndex = 0;
+    advanceWhileInvalid();
+}
+
+bool
+BranchInputIterator::finished()
+{
+    return index >= branch->length();
+}
+
+void BranchInputIterator::advance()
+{
+    inputIndex++;
+    advanceWhileInvalid();
+}
+
+void BranchInputIterator::advanceWhileInvalid()
+{
+possibly_invalid:
+
+    if (finished())
+        return;
+
+    Term* current = branch->get(index);
+
+    if (current == NULL) {
+        index++;
+        inputIndex = 0;
+        goto possibly_invalid;
+    }
+
+    if (inputIndex >= current->numInputs()) {
+        index++;
+        inputIndex = 0;
+        goto possibly_invalid;
+    }
+
+    if (current->input(inputIndex) == NULL) {
+        inputIndex++;
+        goto possibly_invalid;
+    }
+}
+
+Term* BranchInputIterator::currentTerm()
+{
+    return branch->get(index);
+}
+
+Term* BranchInputIterator::currentInput()
+{
+    return branch->get(index)->input(inputIndex);
+}
+
+int BranchInputIterator::currentInputIndex()
+{
+    return inputIndex;
+}
+
 
 
 } // namespace circa

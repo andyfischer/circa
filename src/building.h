@@ -143,7 +143,7 @@ void move_before(Term* movee, Term* pivot);
 void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
 
-void repoint_outer_inputs_to_new_placeholders(Branch* branch);
+void list_outer_pointers(Branch* branch, TermList* list);
 void expand_variadic_inputs_for_call(Branch* branch, Term* call);
 
 } // namespace circa

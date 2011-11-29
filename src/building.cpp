@@ -1022,20 +1022,15 @@ void move_before_outputs(Term* term)
     int outputCount = count_output_placeholders(branch);
     branch->move(term, branch->length() - outputCount - 1);
 }
-void repoint_outer_inputs_to_new_placeholders(Branch* branch)
+
+void list_outer_pointers(Branch* branch, TermList* list)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
-            Term* input = term->input(inputIndex);
-            if (input == NULL) continue;
-            if (input->owningBranch != branch) {
-                Term* placeholder = append_input_placeholder(branch);
-                remap_pointers_quick(branch, input, placeholder);
-            }
-        }
+    for (BranchInputIterator it(branch); it.unfinished(); it.advance()) {
+        if (it.currentInput()->owningBranch != branch)
+            list->appendUnique(it.currentInput());
     }
 }
+
 void expand_variadic_inputs_for_call(Branch* branch, Term* call)
 {
     Term* input0 = get_input_placeholder(branch, 0);
