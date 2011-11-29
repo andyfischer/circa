@@ -61,7 +61,7 @@ void if_block_update_master_placeholders(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
 
-    // Find the set of all names bound in every branch.
+    // Find the set of all names that are bound in every branch.
     std::set<std::string> boundNames;
     bool hasState = false;
 

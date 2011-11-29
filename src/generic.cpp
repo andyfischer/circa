@@ -68,6 +68,7 @@ Term* create_overloaded_function(Branch* branch, const char* name, TermList* fun
 {
     Term* term = create_subroutine(branch, name);
     create_overloaded_function(function_get_contents(as_function(term)), functions);
+    as_function(term)->postInputChange = overload_post_input_change;
     return term;
 }
 
@@ -162,6 +163,9 @@ void specialize_overload_for_call(Term* call)
                 break;
             }
         }
+
+        if (successCase != NULL)
+            break;
     }
 
     // If successCase is NULL then no static specialization is possible.
@@ -175,6 +179,11 @@ void specialize_overload_for_call(Term* call)
     duplicate_branch(successCase, nested_contents(call));
 
     expand_variadic_inputs_for_call(nested_contents(call), call);
+}
+
+void overload_post_input_change(Term* term)
+{
+    specialize_overload_for_call(term);
 }
 
 bool is_overloaded_function(Function* func)

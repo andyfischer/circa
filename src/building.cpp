@@ -1056,8 +1056,9 @@ void expand_variadic_inputs_for_call(Branch* branch, Term* call)
         for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
             if (term->input(inputIndex) == input0) {
 
-                for (int extraInput=1; extraInput < inputCount; extraInput++)
+                for (int extraInput=1; extraInput < inputCount; extraInput++) {
                     set_input(term, extraInput, get_input_placeholder(branch, extraInput));
+                }
             }
         }
     }
