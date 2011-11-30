@@ -50,8 +50,6 @@ CA_FUNCTION(evaluate_subroutine)
     else
         contents = nested_contents(function);
     
-    int numInputs = caller->numInputs();
-
     // Fetch inputs and start preparing the new stack frame.
     List registers;
     registers.resize(get_locals_count(contents));
@@ -61,6 +59,8 @@ CA_FUNCTION(evaluate_subroutine)
     // Insert inputs into placeholders
     for (int i=0; i < NUM_INPUTS; i++) {
         Term* placeholder = get_input_placeholder(contents, i);
+        if (placeholder == NULL)
+            break;
 
         bool castSuccess = cast(INPUT(i), placeholder->type, registers[i]);
 
@@ -81,7 +81,7 @@ CA_FUNCTION(evaluate_subroutine)
     push_frame(context, contents, &registers);
 
     // Evaluate each term
-    for (int i=numInputs; i < contents->length(); i++) {
+    for (int i=0; i < contents->length(); i++) {
         evaluate_single_term(context, contents->get(i));
         if (evaluation_interrupted(context))
             break;

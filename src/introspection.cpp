@@ -282,6 +282,8 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     out << ") ";
 
     // Print out certain properties
+    if (term->boolPropOptional("multiple", false))
+        out << ":multiple ";
     if (term->boolPropOptional("output", false))
         out << ":output ";
     if (term->boolPropOptional("state", false))

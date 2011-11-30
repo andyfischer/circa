@@ -227,6 +227,8 @@ StaticTypeQuery::Result run_static_type_query(Type* type, Term* term)
 
 bool term_output_always_satisfies_type(Term* term, Type* type)
 {
+    ca_assert(term != NULL);
+    ca_assert(type != NULL);
     return run_static_type_query(type, term) == StaticTypeQuery::SUCCEED;
 }
 

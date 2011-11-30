@@ -88,15 +88,22 @@ void create_overloaded_function(Branch* out, TermList* functions)
     for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
 
         Type* type = NULL;
+        bool multiple = false;
 
         for (int i=0; i < functions->length(); i++) {
             Term* placeholder = function_get_input_placeholder(
                 as_function(functions->get(i)), inputIndex);
             type = find_common_type(type, placeholder->type);
+
+            if (placeholder->boolPropOptional("multiple", false))
+                multiple = true;
         }
 
         Term* placeholder = apply(out, INPUT_PLACEHOLDER_FUNC, TermList());
         change_declared_type(placeholder, type);
+
+        if (multiple)
+            placeholder->setBoolProp("multiple", true);
 
         inputPlaceholders.append(placeholder);
     }
@@ -155,17 +162,22 @@ void specialize_overload_for_call(Term* call)
         Term* func = inputCheck->input(1);
 
         // Check if this function statically fits
+        bool allInputsFit = true;
         for (int inputIndex=0; inputIndex < call->numInputs(); inputIndex++) {
-            if (term_output_always_satisfies_type(call->input(inputIndex),
-                function_get_input_type(func, inputIndex))) {
+            if (call->input(inputIndex) == NULL)
+                continue;
 
-                successCase = nested_contents(term);
+            if (!term_output_always_satisfies_type(call->input(inputIndex),
+                function_get_input_type(func, inputIndex))) {
+                allInputsFit = false;
                 break;
             }
         }
 
-        if (successCase != NULL)
+        if (allInputsFit) {
+            successCase = nested_contents(term);
             break;
+        }
     }
 
     // If successCase is NULL then no static specialization is possible.
@@ -177,6 +189,19 @@ void specialize_overload_for_call(Term* call)
     // Copy the successful case
     clear_branch(nested_contents(call));
     duplicate_branch(successCase, nested_contents(call));
+
+    // Pass along the :multiple property
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(original, i);
+        if (placeholder == NULL)
+            break;
+        Term* localPlaceholder = get_input_placeholder(nested_contents(call), i);
+
+        ca_assert(localPlaceholder != NULL);
+
+        if (placeholder->boolPropOptional("multiple", false))
+            localPlaceholder->setBoolProp("multiple", true);
+    }
 
     expand_variadic_inputs_for_call(nested_contents(call), call);
 }
