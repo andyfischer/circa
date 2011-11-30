@@ -6,11 +6,6 @@ def input(int index) -> any
 def length(List) -> int
     "Return the number of items in the given list"
 
-def type(any :meta) -> Type
-    "Returns the type of the given term"
-def typename(any :meta) -> string
-    "Returns the type name of the given term"
-
 namespace cppbuild
     def build_module(string baseFilename)
 

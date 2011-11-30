@@ -32,6 +32,14 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_null(INPUT(0)));
     }
+    CA_FUNCTION(typeof_func)
+    {
+        set_type(OUTPUT, declared_type(INPUT_TERM(0)));
+    }
+    CA_FUNCTION(typename_func)
+    {
+        set_string(OUTPUT, declared_type(INPUT_TERM(0))->name);
+    }
     CA_FUNCTION(inputs_fit_function)
     {
         List* inputs = as_list(INPUT(0));
@@ -65,6 +73,8 @@ namespace type_check_function {
         CA_SETUP_FUNCTIONS(kernel);
         BUILTIN_FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
             "inputs_fit_function(List,Function) -> bool");
+        import_function(kernel, typeof_func, "type(any :meta) -> Type");
+        import_function(kernel, typename_func, "typename(any :meta) -> string");
     }
 
 } // namespace type_check_function

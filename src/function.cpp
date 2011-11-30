@@ -101,6 +101,7 @@ std::string get_placeholder_name_for_index(int index)
 
 void initialize_function(Term* func)
 {
+    func->value_type = &FUNCTION_T;
     as_function(func)->declaringTerm = func;
     as_function(func)->contents = nested_contents(func);
 }
