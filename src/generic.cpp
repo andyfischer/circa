@@ -204,6 +204,7 @@ void specialize_overload_for_call(Term* call)
     }
 
     expand_variadic_inputs_for_call(nested_contents(call), call);
+    change_declared_type(call, get_output_placeholder(nested_contents(call), 0)->type);
 }
 
 void overload_post_input_change(Term* term)
