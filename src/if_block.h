@@ -8,7 +8,9 @@ namespace circa {
 
 int if_block_count_cases(Term* term);
 Term* if_block_get_case(Term* term, int index);
-void finish_if_block(Term* ifCall);
+Term* if_block_append_case(Term* ifBlock, Term* input);
+void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm);
+void finish_if_block(Term* ifBlock);
 CA_FUNCTION(evaluate_if_block);
 
 } // namespace circa

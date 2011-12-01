@@ -82,11 +82,65 @@ void test_upwards_iterator_nulls()
     test_equals(&names, "['d', 'c', 'b', 'a']");
 }
 
+void test_input_iterator()
+{
+    Branch branch;
+
+    branch.compile("a = 1");
+    branch.compile("b = 2");
+    branch.compile("c = add_i(a b)");
+    branch.compile("nullthis = 1");
+    branch.setNull(3);
+    Term* d = branch.compile("d = add_i(a b c)");
+    set_input(d, 1, NULL);
+
+    BranchInputIterator it(&branch);
+    test_assert(it.currentTerm()->name == "c");
+    test_assert(it.currentInput()->name == "a");
+    it.advance();
+    test_assert(it.currentTerm()->name == "c");
+    test_assert(it.currentInput()->name == "b");
+    it.advance();
+    test_assert(it.currentTerm()->name == "d");
+    test_assert(it.currentInput()->name == "a");
+    it.advance();
+    test_assert(it.currentTerm()->name == "d");
+    test_assert(it.currentInput()->name == "c");
+    it.advance();
+    test_assert(it.finished());
+}
+
+void test_outer_input_iterator()
+{
+    Branch branch;
+    branch.compile("a = 1");
+    branch.compile("b = 2");
+    Branch* inner = branch.compile("inner = branch()")->contents();
+    inner->compile("c = 3");
+    inner->compile("d = add_i(a b c)");
+    inner->compile("e = add_i(c)");
+    inner->compile("f = add_i(c a)");
+
+    OuterInputIterator it(inner);
+    test_assert(it.currentTerm()->name == "d");
+    test_assert(it.currentInput()->name == "a");
+    it.advance();
+    test_assert(it.currentTerm()->name == "d");
+    test_assert(it.currentInput()->name == "b");
+    it.advance();
+    test_assert(it.currentTerm()->name == "f");
+    test_assert(it.currentInput()->name == "a");
+    it.advance();
+    test_assert(it.finished());
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_iterator_tests::test_simple);
     REGISTER_TEST_CASE(branch_iterator_tests::test_upwards_iterator);
     REGISTER_TEST_CASE(branch_iterator_tests::test_upwards_iterator_nulls);
+    REGISTER_TEST_CASE(branch_iterator_tests::test_input_iterator);
+    REGISTER_TEST_CASE(branch_iterator_tests::test_outer_input_iterator);
 }
 
 } // namespace branch_iterator_tests

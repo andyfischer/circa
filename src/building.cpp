@@ -445,9 +445,7 @@ Term* get_input_placeholder(Branch* branch, int index)
     if (index >= branch->length())
         return NULL;
     Term* term = branch->get(index);
-    if (term == NULL)
-        return NULL;
-    if (term->function != INPUT_PLACEHOLDER_FUNC)
+    if (term == NULL || term->function != INPUT_PLACEHOLDER_FUNC)
         return NULL;
     return term;
 }
@@ -457,7 +455,7 @@ Term* get_output_placeholder(Branch* branch, int index)
     if (index >= branch->length())
         return NULL;
     Term* term = branch->getFromEnd(index);
-    if (term->function != OUTPUT_PLACEHOLDER_FUNC)
+    if (term == NULL || term->function != OUTPUT_PLACEHOLDER_FUNC)
         return NULL;
     return term;
 }
@@ -1021,6 +1019,16 @@ void move_before_outputs(Term* term)
     Branch* branch = term->owningBranch;
     int outputCount = count_output_placeholders(branch);
     branch->move(term, branch->length() - outputCount - 1);
+}
+
+void input_placeholders_to_list(Branch* branch, TermList* list)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            break;
+        list->append(placeholder);
+    }
 }
 
 void list_outer_pointers(Branch* branch, TermList* list)

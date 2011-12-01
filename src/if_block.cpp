@@ -21,6 +21,8 @@
 
 namespace circa {
 
+void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm);
+
 int if_block_count_cases(Term* term)
 {
     Branch* contents = nested_contents(term);
@@ -46,6 +48,28 @@ Term* if_block_get_case(Term* term, int index)
     return NULL;
 }
 
+Term* if_block_append_case(Term* ifBlock, Term* input)
+{
+    Branch* contents = nested_contents(ifBlock);
+    int insertPos = 0;
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+
+        // Insert position is right after the last non-default case.
+        if (term->function == CASE_FUNC && term->input(0) != NULL)
+            insertPos = term->index + 1;
+    }
+
+    Term* newCase = apply(contents, CASE_FUNC, TermList(input));
+    contents->move(newCase, insertPos);
+    return newCase;
+}
+
+void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
+{
+    if_block_update_case_placeholders_from_master(ifBlock, caseTerm);
+}
+
 bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
 {
     for (int i=0; i < contents->length(); i++) {
@@ -57,7 +81,7 @@ bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
     return true;
 }
 
-void if_block_repoint_outer_pointers(Term* ifCall)
+void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
     TermList outerTerms;
@@ -89,6 +113,10 @@ void if_block_repoint_outer_pointers(Term* ifCall)
             remap_pointers_quick(nested_contents(term), outer, placeholder);
         }
     }
+}
+
+void if_block_repoint_outer_pointers_to_existing_placeholders(Term* ifCall)
+{
 }
 
 void if_block_update_master_placeholders(Term* ifCall)
@@ -291,7 +319,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
 
 void finish_if_block(Term* ifBlock)
 {
-    if_block_repoint_outer_pointers(ifBlock);
+    if_block_create_input_placeholders_for_outer_pointers(ifBlock);
     if_block_update_master_placeholders(ifBlock);
 
     Branch* contents = nested_contents(ifBlock);

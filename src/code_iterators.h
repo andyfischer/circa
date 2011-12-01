@@ -60,6 +60,8 @@ struct UpwardIterator
     void operator++() { advance(); }
 };
 
+// This iterator steps over each input of each term in the branch. It will skip
+// over any NULL terms, and it will skip over NULL inputs.
 struct BranchInputIterator
 {
     Branch* branch;
@@ -70,6 +72,7 @@ struct BranchInputIterator
 
     bool finished();
     void advance();
+    void advanceWhileInvalid();
 
     Term* currentTerm();
     Term* currentInput();
@@ -77,9 +80,26 @@ struct BranchInputIterator
 
     bool unfinished() { return !finished(); }
     void operator++() { advance(); }
+};
 
-private:
+// This iterator is a filtered version of BranchInputIterator. It will only return
+// "outer inputs"- inputs to terms that are outside of the provided branch.
+struct OuterInputIterator
+{
+    BranchInputIterator branchInputIterator;
+
+    OuterInputIterator(Branch* branch);
+
+    bool finished();
+    void advance();
     void advanceWhileInvalid();
+
+    Term* currentTerm();
+    Term* currentInput();
+    int currentInputIndex();
+
+    bool unfinished() { return !finished(); }
+    void operator++() { advance(); }
 };
 
     

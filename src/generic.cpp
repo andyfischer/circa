@@ -135,7 +135,19 @@ void create_overloaded_function(Branch* out, TermList* functions)
 
 void append_to_overloaded_function(Branch* func, Term* function)
 {
-    // TODO
+    TermList inputPlaceholders;
+    input_placeholders_to_list(func, &inputPlaceholders);
+
+    Term* inputsAsList = find_term_with_function(func, LIST_FUNC);
+    Term* ifBlock = find_term_with_function(func, IF_BLOCK_FUNC);
+
+    Term* condition = apply(func, BUILTIN_FUNCS.inputs_fit_function,
+        TermList(inputsAsList, function));
+    move_before(condition, ifBlock);
+
+    Term* caseTerm = if_block_append_case(ifBlock, condition);
+    apply(nested_contents(caseTerm), function, inputPlaceholders);
+    if_block_finish_appended_case(ifBlock, caseTerm);
 }
 
 void specialize_overload_for_call(Term* call)

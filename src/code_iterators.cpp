@@ -199,7 +199,53 @@ int BranchInputIterator::currentInputIndex()
     return inputIndex;
 }
 
+OuterInputIterator::OuterInputIterator(Branch* branch)
+ : branchInputIterator(branch)
+{
+    advanceWhileInvalid();
+}
 
+bool
+OuterInputIterator::finished()
+{
+    return branchInputIterator.finished();
+}
+
+void OuterInputIterator::advance()
+{
+    branchInputIterator.inputIndex++;
+    advanceWhileInvalid();
+}
+
+void OuterInputIterator::advanceWhileInvalid()
+{
+possibly_invalid:
+    branchInputIterator.advanceWhileInvalid();
+
+    if (finished())
+        return;
+
+    // Only stop on outer inputs
+    if (branchInputIterator.currentInput()->owningBranch == branchInputIterator.branch) {
+        branchInputIterator.inputIndex++;
+        goto possibly_invalid;
+    }
+}
+
+Term* OuterInputIterator::currentTerm()
+{
+    return branchInputIterator.currentTerm();
+}
+
+Term* OuterInputIterator::currentInput()
+{
+    return branchInputIterator.currentInput();
+}
+
+int OuterInputIterator::currentInputIndex()
+{
+    return branchInputIterator.currentInputIndex();
+}
 
 } // namespace circa
 

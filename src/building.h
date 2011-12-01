@@ -143,6 +143,7 @@ void move_before(Term* movee, Term* pivot);
 void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
 
+void input_placeholders_to_list(Branch* branch, TermList* list);
 void list_outer_pointers(Branch* branch, TermList* list);
 void expand_variadic_inputs_for_call(Branch* branch, Term* call);
 
