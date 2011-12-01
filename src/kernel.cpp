@@ -436,9 +436,10 @@ void bootstrap_kernel()
     Term* add_s = create_subroutine(kernel, "add_s");
     create_function_vectorized_vs(function_contents(add_s), ADD_FUNC, &LIST_T, &ANY_T);
 
-    append_to_overloaded_function(function_contents(ADD_FUNC), add_s);
     append_to_overloaded_function(function_contents(ADD_FUNC), add_v);
+    append_to_overloaded_function(function_contents(ADD_FUNC), add_s);
 
+    dump(function_contents(add_v));
     dump(function_contents(ADD_FUNC));
 
     Term* sub_v = create_subroutine(kernel, "sub_v");

@@ -146,5 +146,6 @@ void move_before_outputs(Term* term);
 void input_placeholders_to_list(Branch* branch, TermList* list);
 void list_outer_pointers(Branch* branch, TermList* list);
 void expand_variadic_inputs_for_call(Branch* branch, Term* call);
+int find_input_index_for_pointer(Term* call, Term* input);
 
 } // namespace circa

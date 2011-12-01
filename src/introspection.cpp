@@ -138,7 +138,7 @@ std::string get_short_location(Term* term)
     if (term->sourceLoc.defined())
         out << term->sourceLoc.line << "," << term->sourceLoc.col;
     else
-        out << "loc?";
+        out << global_id(term);
 
     //out << " ";
     //out << global_id(term);

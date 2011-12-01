@@ -5,6 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "code_iterators.h"
 #include "kernel.h"
 #include "building.h"
 #include "evaluation.h"
@@ -22,6 +23,7 @@
 namespace circa {
 
 void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm);
+void if_block_repoint_outer_pointers_to_existing_placeholders(Term* ifCall);
 
 int if_block_count_cases(Term* term)
 {
@@ -68,6 +70,7 @@ Term* if_block_append_case(Term* ifBlock, Term* input)
 void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
 {
     if_block_update_case_placeholders_from_master(ifBlock, caseTerm);
+    if_block_repoint_outer_pointers_to_existing_placeholders(ifBlock);
 }
 
 bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
@@ -117,6 +120,39 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 
 void if_block_repoint_outer_pointers_to_existing_placeholders(Term* ifCall)
 {
+    Branch* contents = nested_contents(ifCall);
+
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function != CASE_FUNC)
+            continue;
+
+        Branch* caseContents = nested_contents(term);
+
+        for (OuterInputIterator it(caseContents); it.unfinished(); it.advance()) {
+            Term* input = it.currentInput();
+
+            // If this input is outside the if-block then find the corresponding
+            // placeholder inside the block.
+            if (input->owningBranch != contents) {
+                int inputIndex = find_input_index_for_pointer(ifCall, input);
+                ca_assert(inputIndex != -1);
+
+                // Redirect to if-block placeholder (this will get redirected again
+                // to the case-local placeholder).
+                input = get_input_placeholder(contents, inputIndex);
+                ca_assert(input != NULL);
+            }
+
+            // This input should now be one of the if-block placeholders
+            ca_assert(input == get_input_placeholder(contents, input->index));
+
+            Term* caseLocal = get_input_placeholder(caseContents, input->index);
+            ca_assert(caseLocal != NULL);
+
+            set_input(it.currentTerm(), it.currentInputIndex(), caseLocal);
+        }
+    }
 }
 
 void if_block_update_master_placeholders(Term* ifCall)

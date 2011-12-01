@@ -1067,4 +1067,13 @@ void expand_variadic_inputs_for_call(Branch* branch, Term* call)
     }
 }
 
+int find_input_index_for_pointer(Term* call, Term* input)
+{
+    for (int i=0; i < call->numInputs(); i++) {
+        if (call->input(i) == input)
+            return i;
+    }
+    return -1;
+}
+
 } // namespace circa
