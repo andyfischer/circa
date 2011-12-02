@@ -98,6 +98,7 @@ struct BuiltinFuncs {
     Term* loop_index;
     Term* loop_iterator;
     Term* loop_output;
+    Term* overload_error_no_match;
     Term* pack_state;
     Term* pack_state_to_list;
     Term* unpack_state;

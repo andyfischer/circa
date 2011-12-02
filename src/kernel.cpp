@@ -396,39 +396,55 @@ void bootstrap_kernel()
     // Now we can build derived functions
 
     // Create overloaded functions
-    ADD_FUNC = create_overloaded_function(kernel, "add",
-        TermList(BUILTIN_FUNCS.add_i, BUILTIN_FUNCS.add_f));
+    ADD_FUNC = create_overloaded_function(kernel, "add(any,any) -> any");
+    append_to_overloaded_function(ADD_FUNC, BUILTIN_FUNCS.add_i);
+    append_to_overloaded_function(ADD_FUNC, BUILTIN_FUNCS.add_f);
 
-    create_overloaded_function(kernel, "less_than",
-        TermList(kernel->get("less_than_i"), kernel->get("less_than_f")));
+    Term* less_than = create_overloaded_function(kernel, "less_than(any,any) -> bool");
+    append_to_overloaded_function(less_than, kernel->get("less_than_i"));
+    append_to_overloaded_function(less_than, kernel->get("less_than_f"));
 
-    create_overloaded_function(kernel, "less_than_eq",
-        TermList(kernel->get("less_than_eq_i"), kernel->get("less_than_eq_f")));
+    Term* less_than_eq = create_overloaded_function(kernel, "less_than_eq(any,any) -> bool");
+    append_to_overloaded_function(less_than_eq, kernel->get("less_than_eq_i"));
+    append_to_overloaded_function(less_than_eq, kernel->get("less_than_eq_f"));
 
-    create_overloaded_function(kernel, "greater_than",
-        TermList(kernel->get("greater_than_i"), kernel->get("greater_than_f")));
+    Term* greater_than = create_overloaded_function(kernel, "greater_than(any,any) -> bool");
+    append_to_overloaded_function(greater_than, kernel->get("greater_than_i"));
+    append_to_overloaded_function(greater_than, kernel->get("greater_than_f"));
 
-    create_overloaded_function(kernel, "greater_than_eq",
-        TermList(kernel->get("greater_than_eq_i"), kernel->get("greater_than_eq_f")));
+    Term* greater_than_eq = create_overloaded_function(kernel, "greater_than_eq(any,any) -> bool");
+    append_to_overloaded_function(greater_than_eq, kernel->get("greater_than_eq_i"));
+    append_to_overloaded_function(greater_than_eq, kernel->get("greater_than_eq_f"));
 
-    create_overloaded_function(kernel, "max",
-        TermList(kernel->get("max_i"), kernel->get("max_f")));
-    create_overloaded_function(kernel, "min",
-        TermList(kernel->get("min_i"), kernel->get("min_f")));
-    create_overloaded_function(kernel, "remainder",
-        TermList(kernel->get("remainder_i"), kernel->get("remainder_f")));
-    create_overloaded_function(kernel, "mod",
-        TermList(kernel->get("mod_i"), kernel->get("mod_f")));
+    Term* max_func = create_overloaded_function(kernel, "max(any,any) -> any");
+    append_to_overloaded_function(max_func, kernel->get("max_i"));
+    append_to_overloaded_function(max_func, kernel->get("max_f"));
 
-    MULT_FUNC = create_overloaded_function(kernel, "mult",
-        TermList(kernel->get("mult_i"), kernel->get("mult_f")));
+    Term* min_func = create_overloaded_function(kernel, "min(any,any) -> any");
+    append_to_overloaded_function(min_func, kernel->get("min_i"));
+    append_to_overloaded_function(min_func, kernel->get("min_f"));
 
-    NEG_FUNC = create_overloaded_function(kernel, "neg",
-        TermList(kernel->get("neg_i"), kernel->get("neg_f")));
+    Term* remainder_func = create_overloaded_function(kernel, "remainder(any,any) -> any");
+    append_to_overloaded_function(remainder_func, kernel->get("remainder_i"));
+    append_to_overloaded_function(remainder_func, kernel->get("remainder_f"));
+
+    Term* mod_func = create_overloaded_function(kernel, "max(any,any) -> any");
+    append_to_overloaded_function(mod_func, kernel->get("max_i"));
+    append_to_overloaded_function(mod_func, kernel->get("max_f"));
+
+    MULT_FUNC = create_overloaded_function(kernel, "mult(any,any) -> any");
+    //dump(nested_contents(MULT_FUNC));
+    append_to_overloaded_function(MULT_FUNC, kernel->get("mult_i"));
+    append_to_overloaded_function(MULT_FUNC, kernel->get("mult_f"));
+
+    NEG_FUNC = create_overloaded_function(kernel, "neg(any) -> any");
+    append_to_overloaded_function(NEG_FUNC, kernel->get("neg_i"));
+    append_to_overloaded_function(NEG_FUNC, kernel->get("neg_f"));
     as_function(NEG_FUNC)->formatSource = neg_function::formatSource;
 
-    SUB_FUNC = create_overloaded_function(kernel, "sub",
-        TermList(kernel->get("sub_i"), kernel->get("sub_f")));
+    SUB_FUNC = create_overloaded_function(kernel, "sub(any,any) -> any");
+    append_to_overloaded_function(SUB_FUNC, kernel->get("sub_i"));
+    append_to_overloaded_function(SUB_FUNC, kernel->get("sub_f"));
 
     // Create vectorized functions
     Term* add_v = create_subroutine(kernel, "add_v");
@@ -436,22 +452,29 @@ void bootstrap_kernel()
     Term* add_s = create_subroutine(kernel, "add_s");
     create_function_vectorized_vs(function_contents(add_s), ADD_FUNC, &LIST_T, &ANY_T);
 
-    append_to_overloaded_function(function_contents(ADD_FUNC), add_v);
-    append_to_overloaded_function(function_contents(ADD_FUNC), add_s);
+    append_to_overloaded_function(ADD_FUNC, add_v);
+    append_to_overloaded_function(ADD_FUNC, add_s);
 
-    dump(function_contents(add_v));
-    dump(function_contents(ADD_FUNC));
+    //dump(function_contents(add_v));
+    //dump(function_contents(ADD_FUNC));
 
     Term* sub_v = create_subroutine(kernel, "sub_v");
     create_function_vectorized_vs(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
     Term* sub_s = create_subroutine(kernel, "sub_s");
     create_function_vectorized_vs(function_contents(sub_s), SUB_FUNC, &LIST_T, &ANY_T);
+    
+    append_to_overloaded_function(SUB_FUNC, sub_v);
+    append_to_overloaded_function(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_subroutine(kernel, "mult_v");
     create_function_vectorized_vs(function_contents(mult_v), MULT_FUNC, &LIST_T, &LIST_T);
     Term* mult_s = create_subroutine(kernel, "mult_s");
     create_function_vectorized_vs(function_contents(mult_s), MULT_FUNC, &LIST_T, &ANY_T);
+
+    //dump(nested_contents(MULT_FUNC));
+    append_to_overloaded_function(MULT_FUNC, mult_v);
+    append_to_overloaded_function(MULT_FUNC, mult_s);
 
     Term* div_s = create_subroutine(kernel, "div_s");
     create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);

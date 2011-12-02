@@ -24,6 +24,7 @@ Term* get_global(std::string name);
 
 Branch* get_parent_branch(Branch* branch);
 Term* get_parent_term(Term* term);
+Term* get_parent_term(Term* term, int levels);
 bool name_is_reachable_from(Term* term, Branch* branch);
 Branch* find_first_common_branch(Term* left, Term* right);
 

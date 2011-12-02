@@ -252,6 +252,7 @@ CA_FUNCTION(evaluate_for_loop)
             if (input == NULL)
                 break;
             Term* output = get_output_placeholder(contents, i);
+            ca_assert(output != NULL);
             copy(registers->get(input->index), registers->get(output->index));
         }
     }
@@ -287,6 +288,10 @@ CA_FUNCTION(evaluate_for_loop)
             copy(registers->get(output->index), registers->get(input->index));
         }
     }
+
+    // If an error occurred, leave context the way it was.
+    if (context->errorOccurred)
+        return;
 
     // Restore loop context
     context->forLoopContext = prevLoopContext;

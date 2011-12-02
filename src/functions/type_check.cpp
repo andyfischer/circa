@@ -67,12 +67,31 @@ namespace type_check_function {
 
         set_bool(OUTPUT, true);
     }
+    CA_FUNCTION(overload_error_no_match)
+    {
+        List* inputs = as_list(INPUT(0));
+
+        Term* caller = CALLER;
+        Term* func = get_parent_term(caller, 3);
+
+        std::stringstream out;
+        out << "In overloaded function ";
+        if (func == NULL)
+            out << "<name not found>";
+        else
+            out << func->name;
+        out << ", no func could handle inputs: ";
+        out << inputs->toString();
+        ERROR_OCCURRED(out.str().c_str());
+    }
 
     void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
         BUILTIN_FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
             "inputs_fit_function(List,Function) -> bool");
+        BUILTIN_FUNCS.overload_error_no_match = import_function(kernel,
+            overload_error_no_match, "overload_error_no_match(List)");
         import_function(kernel, typeof_func, "type(any :meta) -> Type");
         import_function(kernel, typename_func, "typename(any :meta) -> string");
     }

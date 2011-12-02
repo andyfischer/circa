@@ -9,6 +9,7 @@
 #include "generic.h"
 #include "if_block.h"
 #include "kernel.h"
+#include "parser.h"
 #include "subroutine.h"
 #include "type.h"
 #include "type_inference.h"
@@ -60,94 +61,54 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(loop));
 }
 
-Term* create_overloaded_function(Branch* branch, const char* name, TermList const& functions)
+Term* create_overloaded_function(Branch* branch, const char* header)
 {
-    return create_overloaded_function(branch, name, (TermList*) &functions);
-}
-Term* create_overloaded_function(Branch* branch, const char* name, TermList* functions)
-{
-    Term* term = create_subroutine(branch, name);
-    create_overloaded_function(function_get_contents(as_function(term)), functions);
-    as_function(term)->postInputChange = overload_post_input_change;
-    return term;
-}
+    Term* function = parser::compile(branch, parser::function_decl, header);
+    Branch* contents = nested_contents(function);
 
-void create_overloaded_function(Branch* out, TermList* functions)
-{
-    ca_assert(functions->length() > 0);
-
-    int inputCount = function_num_inputs(as_function(functions->get(0)));
-
-    for (int i=0; i < functions->length(); i++) {
-        ca_assert(inputCount == function_num_inputs(as_function(functions->get(i))));
-    }
-
+    // Box the inputs in a list (used in calls to inputs_fit_function)
     TermList inputPlaceholders;
-
-    // Add input placeholders
-    for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
-
-        Type* type = NULL;
-        bool multiple = false;
-
-        for (int i=0; i < functions->length(); i++) {
-            Term* placeholder = function_get_input_placeholder(
-                as_function(functions->get(i)), inputIndex);
-            type = find_common_type(type, placeholder->type);
-
-            if (placeholder->boolPropOptional("multiple", false))
-                multiple = true;
-        }
-
-        Term* placeholder = apply(out, INPUT_PLACEHOLDER_FUNC, TermList());
-        change_declared_type(placeholder, type);
-
-        if (multiple)
-            placeholder->setBoolProp("multiple", true);
-
-        inputPlaceholders.append(placeholder);
-    }
-
-    // Take the (possibly variadic) args and create a proper list.
-    Term* inputsAsList = apply(out, LIST_FUNC, inputPlaceholders);
+    input_placeholders_to_list(contents, &inputPlaceholders);
+    Term* inputsAsList = apply(contents, LIST_FUNC, inputPlaceholders);
 
     // Add the switch block
-    Term* block = apply(out, IF_BLOCK_FUNC, TermList());
-    Branch* blockContents = nested_contents(block);
+    Term* block = apply(contents, IF_BLOCK_FUNC, TermList());
 
-    for (int i=0; i < functions->length(); i++) {
-        Term* function = functions->get(i);
-        Term* condition = apply(out, BUILTIN_FUNCS.inputs_fit_function,
-            TermList(inputsAsList, function));
-        move_before(condition, block);
-        Term* caseTerm = apply(blockContents, CASE_FUNC, TermList(condition));
-        apply(nested_contents(caseTerm), function, inputPlaceholders);
-    }
+    // Cases are added with append_to_overloaded_function()
 
-    // Fallback case
-    Term* elseTerm = apply(blockContents, CASE_FUNC, TermList(NULL));
-    Term* errorMsg = create_string(nested_contents(elseTerm), "No overload fit inputs");
-    apply(nested_contents(elseTerm), BUILTIN_FUNCS.error, TermList(errorMsg));
+    // Setup the fallback case
+    Term* elseTerm = if_block_append_case(block, NULL);
+    apply(nested_contents(elseTerm), BUILTIN_FUNCS.overload_error_no_match,
+        TermList(inputsAsList));
+    if_block_post_setup(block);
+    //dump(contents);
+    if_block_finish_appended_case(block, elseTerm);
+    //finish_if_block(block);
 
-    finish_if_block(block);
-    apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(block));
+    set_input(get_output_placeholder(contents, 0), 0, block);
+    return function;
 }
 
-void append_to_overloaded_function(Branch* func, Term* function)
+void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc)
 {
     TermList inputPlaceholders;
-    input_placeholders_to_list(func, &inputPlaceholders);
+    input_placeholders_to_list(overloadedFunc, &inputPlaceholders);
 
-    Term* inputsAsList = find_term_with_function(func, LIST_FUNC);
-    Term* ifBlock = find_term_with_function(func, IF_BLOCK_FUNC);
+    Term* inputsAsList = find_term_with_function(overloadedFunc, LIST_FUNC);
+    Term* ifBlock = find_term_with_function(overloadedFunc, IF_BLOCK_FUNC);
 
-    Term* condition = apply(func, BUILTIN_FUNCS.inputs_fit_function,
-        TermList(inputsAsList, function));
+    Term* condition = apply(overloadedFunc, BUILTIN_FUNCS.inputs_fit_function,
+        TermList(inputsAsList, specializedFunc));
     move_before(condition, ifBlock);
 
     Term* caseTerm = if_block_append_case(ifBlock, condition);
-    apply(nested_contents(caseTerm), function, inputPlaceholders);
+    apply(nested_contents(caseTerm), specializedFunc, inputPlaceholders);
     if_block_finish_appended_case(ifBlock, caseTerm);
+}
+
+void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
+{
+    return append_to_overloaded_function(nested_contents(overloadedFunc), specializedFunc);
 }
 
 void specialize_overload_for_call(Term* call)

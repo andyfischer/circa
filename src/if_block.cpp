@@ -10,6 +10,7 @@
 #include "building.h"
 #include "evaluation.h"
 #include "importing_macros.h"
+#include "introspection.h"
 #include "locals.h"
 #include "refactoring.h"
 #include "stateful_code.h"
@@ -24,6 +25,7 @@ namespace circa {
 
 void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm);
 void if_block_repoint_outer_pointers_to_existing_placeholders(Term* ifCall);
+void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents);
 
 int if_block_count_cases(Term* term)
 {
@@ -33,6 +35,35 @@ int if_block_count_cases(Term* term)
         if (contents->get(i) != NULL && contents->get(i)->function == CASE_FUNC)
             result++;
     return result;
+}
+
+Term* if_block_add_input(Term* ifBlock, Term* input)
+{
+    Branch* contents = nested_contents(ifBlock);
+    //std::cout << "adding input.." << std::endl;
+    //dump(contents);
+
+    int existingInputCount = ifBlock->numInputs();
+
+    Term* placeholder = append_input_placeholder(contents);
+    ca_assert(placeholder->index == existingInputCount);
+    change_declared_type(placeholder, input->type);
+
+    set_input(ifBlock, existingInputCount, input);
+
+    // Add a corresponding input placeholder to each case
+    for (int i=0; i < contents->length(); i++) {
+        Term* term = contents->get(i);
+        if (term->function != CASE_FUNC)
+            continue;
+
+        Branch* caseContents = nested_contents(term);
+        ca_assert(count_input_placeholders(caseContents) == existingInputCount);
+        Term* casePlaceholder = append_input_placeholder(caseContents);
+        change_declared_type(casePlaceholder, placeholder->type);
+    }
+
+    return placeholder;
 }
 
 Term* if_block_get_case(Term* term, int index)
@@ -57,6 +88,9 @@ Term* if_block_append_case(Term* ifBlock, Term* input)
     for (int i=0; i < contents->length(); i++) {
         Term* term = contents->get(i);
 
+        if (term->function == INPUT_PLACEHOLDER_FUNC)
+            insertPos = term->index + 1;
+
         // Insert position is right after the last non-default case.
         if (term->function == CASE_FUNC && term->input(0) != NULL)
             insertPos = term->index + 1;
@@ -64,13 +98,28 @@ Term* if_block_append_case(Term* ifBlock, Term* input)
 
     Term* newCase = apply(contents, CASE_FUNC, TermList(input));
     contents->move(newCase, insertPos);
+
+    // Add existing input placeholders to this case
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(contents, i);
+        if (placeholder == NULL) break;
+        Term* localPlaceholder = append_input_placeholder(nested_contents(newCase));
+        change_declared_type(localPlaceholder, placeholder->type);
+    }
+
     return newCase;
 }
 
 void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
 {
-    if_block_update_case_placeholders_from_master(ifBlock, caseTerm);
-    if_block_repoint_outer_pointers_to_existing_placeholders(ifBlock);
+    //if_block_update_case_placeholders_from_master(ifBlock, caseTerm);
+    if_block_fix_outer_pointers(ifBlock, nested_contents(caseTerm));
+
+    // Add an output placeholder
+    apply(nested_contents(caseTerm), OUTPUT_PLACEHOLDER_FUNC,
+        TermList(find_last_non_comment_expression(nested_contents(caseTerm))));
+
+    //std::cout << "finished appended case.." << std::endl;
 }
 
 bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
@@ -152,6 +201,51 @@ void if_block_repoint_outer_pointers_to_existing_placeholders(Term* ifCall)
 
             set_input(it.currentTerm(), it.currentInputIndex(), caseLocal);
         }
+    }
+}
+
+void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
+{
+    Branch* contents = nested_contents(ifCall);
+
+    for (OuterInputIterator it(caseContents); it.unfinished(); ++it) {
+
+        // Don't worry about outer pointers to values. (This should probably be
+        // standard behavior)
+        if (is_value(it.currentTerm()))
+            continue;
+
+        // Fetch values from OuterInputIterator, while it's safe. The iterator
+        // may get confused soon, due to inserted terms.
+        Term* currentTerm = it.currentTerm();
+        Term* input = it.currentInput();
+        int currentInputIndex = it.currentInputIndex();
+
+        // Check if this pointer goes outside the if-block. If so, we'll have to
+        // find the corresponding placeholder (or create a new one).
+        if (input->owningBranch != contents) {
+
+            Term* placeholder = NULL;
+
+            int inputIndex = find_input_index_for_pointer(ifCall, input);
+            if (inputIndex >= 0) {
+                placeholder = get_input_placeholder(contents, inputIndex);
+            } else {
+                // Create a new placeholder
+                // This call will result in an inserted term, which will confuse
+                // our OuterInputIterator. So, don't use the iterator again until
+                // the next iteration.
+                placeholder = if_block_add_input(ifCall, input);
+            }
+
+            input = placeholder;
+        }
+
+        // Now 'input' points to an if-block placeholder, remap it to the case-local
+        // placeholder.
+        Term* caseLocal = get_input_placeholder(caseContents, input->index);
+        ca_assert(caseLocal != NULL);
+        set_input(currentTerm, currentInputIndex, caseLocal);
     }
 }
 
@@ -355,7 +449,8 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
 
 void finish_if_block(Term* ifBlock)
 {
-    if_block_create_input_placeholders_for_outer_pointers(ifBlock);
+    // if_block_create_input_placeholders_for_outer_pointers(ifBlock);
+    //dump(nested_contents(ifBlock));
     if_block_update_master_placeholders(ifBlock);
 
     Branch* contents = nested_contents(ifBlock);
@@ -371,6 +466,13 @@ void finish_if_block(Term* ifBlock)
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);
     check_to_insert_implicit_inputs(ifBlock);
+}
+
+void if_block_post_setup(Term* ifCall)
+{
+    Branch* contents = nested_contents(ifCall);
+    if (get_output_placeholder(contents, 0) == NULL)
+        apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 }
 
 CA_FUNCTION(evaluate_if_block)
