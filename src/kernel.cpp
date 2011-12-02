@@ -459,7 +459,7 @@ void bootstrap_kernel()
     //dump(function_contents(ADD_FUNC));
 
     Term* sub_v = create_subroutine(kernel, "sub_v");
-    create_function_vectorized_vs(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
     Term* sub_s = create_subroutine(kernel, "sub_s");
     create_function_vectorized_vs(function_contents(sub_s), SUB_FUNC, &LIST_T, &ANY_T);
     
@@ -468,11 +468,10 @@ void bootstrap_kernel()
 
     // Create vectorized mult() functions
     Term* mult_v = create_subroutine(kernel, "mult_v");
-    create_function_vectorized_vs(function_contents(mult_v), MULT_FUNC, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(mult_v), MULT_FUNC, &LIST_T, &LIST_T);
     Term* mult_s = create_subroutine(kernel, "mult_s");
     create_function_vectorized_vs(function_contents(mult_s), MULT_FUNC, &LIST_T, &ANY_T);
 
-    //dump(nested_contents(MULT_FUNC));
     append_to_overloaded_function(MULT_FUNC, mult_v);
     append_to_overloaded_function(MULT_FUNC, mult_s);
 
