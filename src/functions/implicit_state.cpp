@@ -30,6 +30,7 @@ namespace implicit_state_function {
         copy(value, dict_insert(container, CALLER->stringProp("field").c_str()));
     }
 
+    // Used in if_block. The index is built in as a property.
     CA_FUNCTION(unpack_state_list)
     {
         TaggedValue* container = INPUT(0);
@@ -40,6 +41,7 @@ namespace implicit_state_function {
             copy(list_get_index(container, index), OUTPUT);
     }
 
+    // Used in if_block. The index is built in as a property.
     CA_FUNCTION(pack_state_to_list)
     {
         copy(INPUT(0), OUTPUT);
@@ -58,6 +60,30 @@ namespace implicit_state_function {
         copy(value, list_get_index(container, index));
     }
 
+    // Used in for_loop
+    CA_FUNCTION(unpack_state_list_n)
+    {
+        TaggedValue* container = INPUT(0);
+        int index = INT_INPUT(1);
+        if (!is_list(container) || index >= list_get_length(container))
+            set_null(OUTPUT);
+        else
+            copy(list_get_index(container, index), OUTPUT);
+    }
+    // Used in for_loop
+    CA_FUNCTION(pack_state_list_n)
+    {
+        copy(INPUT(0), OUTPUT);
+        TaggedValue* container = OUTPUT;
+        TaggedValue* value = INPUT(1);
+        int index = INT_INPUT(2);
+
+        if (!is_list(container))
+            set_list(container, index+1);
+
+        copy(value, list_get_index(container, index));
+    }
+
     void setup(Branch* kernel)
     {
         BUILTIN_FUNCS.unpack_state = import_function(kernel, unpack_state, "unpack_state(any container) -> any");
@@ -68,6 +94,13 @@ namespace implicit_state_function {
         BUILTIN_FUNCS.pack_state_to_list =
             import_function(kernel, pack_state_to_list,
                 "pack_state_to_list(any container, any value :optional) -> any");
+
+        BUILTIN_FUNCS.unpack_state_list_n =
+            import_function(kernel, unpack_state_list_n,
+            "unpack_state_list_n(any container, int index) -> any");
+        BUILTIN_FUNCS.pack_state_list_n =
+            import_function(kernel, pack_state_list_n,
+                "pack_state_list_n(any container, any value :optional, int index) -> any");
     }
 }
 }

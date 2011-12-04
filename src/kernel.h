@@ -101,8 +101,10 @@ struct BuiltinFuncs {
     Term* overload_error_no_match;
     Term* pack_state;
     Term* pack_state_to_list;
+    Term* pack_state_list_n;
     Term* unpack_state;
     Term* unpack_state_list;
+    Term* unpack_state_list_n;
     Term* value;
 };
 

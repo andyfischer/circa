@@ -154,6 +154,8 @@ void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
+    pack_any_open_state_vars(contents);
+    check_to_add_state_output_placeholder(contents);
     add_loop_output_term(contents);
 
     add_implicit_placeholders(forTerm);
@@ -195,6 +197,16 @@ void for_loop_update_output_index(Term* forTerm)
         Term* output = find_last_non_comment_expression(contents);
         contents->outputIndex = output == NULL ? -1 : output->index;
     }
+}
+
+void for_loop_fix_state_input(Term* forTerm)
+{
+    Branch* contents = nested_contents(forTerm);
+    Term* stateInput = find_state_input(contents);
+
+    // Nothing to do if there's no state input
+    if (stateInput == NULL)
+        return;
 }
 
 CA_FUNCTION(evaluate_for_loop)

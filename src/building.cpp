@@ -1076,4 +1076,26 @@ int find_input_index_for_pointer(Term* call, Term* input)
     return -1;
 }
 
+void check_to_add_state_output_placeholder(Branch* branch)
+{
+    // No-op if a state output placeholder already exists
+    if (find_state_output(branch) != NULL)
+        return;
+
+    Term* result = find_open_state_result(branch, branch->length());
+
+    // No-op if no state is being used
+    if (result == NULL)
+        return;
+
+    int inputPos = find_state_input(branch)->index;
+
+    Term* output = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
+    output->setBoolProp("state", true);
+
+    // Move the new output to a position corresponding with the state input.
+    // (making sure to put it before the primary output)
+    branch->move(result, branch->length() - inputPos - 2);
+}
+
 } // namespace circa
