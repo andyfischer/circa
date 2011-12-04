@@ -252,7 +252,8 @@ CA_FUNCTION(evaluate_for_loop)
             if (input == NULL)
                 break;
             Term* output = get_output_placeholder(contents, i);
-            ca_assert(output != NULL);
+            if (output == NULL)
+                break;
             copy(registers->get(input->index), registers->get(output->index));
         }
     }

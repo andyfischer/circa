@@ -1,0 +1,7 @@
+def f()
+    for i in [10 12 14]
+        state s = i
+
+s = null
+f(state = s)
+print(s)

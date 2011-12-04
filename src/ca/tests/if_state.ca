@@ -1,7 +1,8 @@
 
-s = {}
-
-call_with_state(&s) {
+def f()
     if true
         state a = 1
-}
+
+s = null
+f(state = s)
+print('f state: ' s)

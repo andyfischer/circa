@@ -99,7 +99,7 @@ void test_state_simple()
     EvalContext context;
 
     branch.compile("for i in [1 2 3] { state s = i }");
-
+    //dump(branch);
     evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_for: [{s: 1}, {s: 2}, {s: 3}]}");
 

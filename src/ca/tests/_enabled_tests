@@ -4,6 +4,7 @@ cast.ca
 compound_type.ca
 dynamic_typing.ca
 if.ca
+if_state.ca
 for.ca
 list.ca
 math.ca
