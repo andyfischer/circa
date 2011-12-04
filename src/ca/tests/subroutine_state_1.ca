@@ -1,0 +1,10 @@
+def f() -> int
+  state s = 0
+  s += 1
+  return s
+  
+f_state = null
+f(state = f_state)
+result = f(state = f_state)
+print('should be 2: ' result)
+

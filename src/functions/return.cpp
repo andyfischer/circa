@@ -14,6 +14,15 @@ namespace return_function {
 
         // TODO: Pop stack frames
 
+        // Temp: Evaluate each extra output_placeholder so that it has a value
+        Branch* contents = CALLER->owningBranch;
+        for (int i=1;; i++) {
+            Term* placeholder = get_output_placeholder(contents, i);
+            if (placeholder == NULL)
+                break;
+            evaluate_single_term(CONTEXT, placeholder);
+        }
+
         // Copy this value to the last output_placeholder()
         TaggedValue* result = INPUT(0);
         List* registers = &top_frame(CONTEXT)->registers;

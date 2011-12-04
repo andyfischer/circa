@@ -97,8 +97,6 @@ CA_FUNCTION(evaluate_subroutine)
     swap(&registers, &top_frame(context)->registers);
     pop_frame(context);
 
-    Type* outputType = function_get_output_type(function, 0);
-
     // Copy each extra output from registers.
     for (int i=0;; i++) {
         Term* placeholder = get_output_placeholder(contents, i);
@@ -110,10 +108,11 @@ CA_FUNCTION(evaluate_subroutine)
 
         if (!castSuccess) {
             std::stringstream msg;
-            msg << "Couldn't cast extra output " << i
-                << " (" << result << ")"
-                << " to type " << outputType->name;
-            error_occurred(context, caller, OUTPUT, msg.str().c_str());
+            msg << "Couldn't cast output " << result->toString()
+                << " (at index " << i << ")"
+                << " to type " << placeholder->type->name;
+            ERROR_OCCURRED(msg.str().c_str());
+            return;
         }
     }
 }
