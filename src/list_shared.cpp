@@ -276,6 +276,13 @@ std::string list_to_string(ListData* value)
     return out.str();
 }
 
+int list_size(TaggedValue* value)
+{
+    ListData* s = (ListData*) get_pointer(value);
+    if (s == NULL)
+        return 0;
+    return s->count;
+}
 int list_get_length(TaggedValue* value)
 {
     ListData* s = (ListData*) get_pointer(value);

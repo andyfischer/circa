@@ -80,6 +80,8 @@ namespace implicit_state_function {
 
         if (!is_list(container))
             set_list(container, index+1);
+        if (list_size(container) <= index)
+            list_resize(container, index+1);
 
         copy(value, list_get_index(container, index));
     }

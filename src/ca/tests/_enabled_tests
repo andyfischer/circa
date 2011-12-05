@@ -6,6 +6,7 @@ dynamic_typing.ca
 if.ca
 if_state.ca
 for.ca
+for_state.ca
 list.ca
 math.ca
 set.ca

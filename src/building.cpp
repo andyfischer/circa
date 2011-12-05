@@ -112,6 +112,12 @@ void insert_input(Term* term, Term* input)
     set_input(term, 0, input);
 }
 
+void insert_input(Term* term, int index, Term* input)
+{
+    term->inputs.insert(term->inputs.begin() + index, Term::Input(NULL));
+    set_input(term, index, input);
+}
+
 bool is_actually_using(Term* user, Term* usee)
 {
     for (int i=0; i < user->numDependencies(); i++)
@@ -560,7 +566,8 @@ Term* find_open_state_result(Branch* branch, int position)
             continue;
         if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
             return term;
-        if (term->function == BUILTIN_FUNCS.pack_state)
+        if (term->function == BUILTIN_FUNCS.pack_state
+                || term->function == BUILTIN_FUNCS.pack_state_list_n)
             return term;
     }
     return NULL;
@@ -580,8 +587,9 @@ void check_to_insert_implicit_inputs(Term* term)
     if (!is_function(term->function))
         return;
 
-    if (has_state_input(term_get_function_details(term))
-        && !term_is_state_input(term, 0)) {
+    Term* stateInput = find_state_input(term_get_function_details(term));
+
+    if (stateInput != NULL && !term_is_state_input(term, 0)) {
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
@@ -590,7 +598,7 @@ void check_to_insert_implicit_inputs(Term* term)
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
 
-        insert_input(term, unpack);
+        insert_input(term, stateInput->index, unpack);
         set_bool(term->inputInfo(0)->properties.insert("state"), true);
         set_bool(term->inputInfo(0)->properties.insert("hidden"), true);
     }
@@ -669,8 +677,8 @@ void post_compile_term(Term* term)
     }
 
     // Possibly append a pack_state() call
-    if (stateOutput != NULL && term->input(0)->function == BUILTIN_FUNCS.unpack_state) {
-        Term* unpack = term->input(0);
+    Term* unpack = find_input_with_function(term, BUILTIN_FUNCS.unpack_state);
+    if (stateOutput != NULL && unpack != NULL) {
         Term* container = unpack->input(0);
         Term* pack = apply(term->owningBranch, BUILTIN_FUNCS.pack_state, TermList(container, stateOutput));
         pack->setStringProp("field", unpack->stringProp("field"));
@@ -734,6 +742,25 @@ Term* find_term_with_function(Branch* branch, Term* func)
         if (term->function == func)
             return term;
     }
+    return NULL;
+}
+
+Term* find_input_with_function(Term* target, Term* func)
+{
+    for (int i=0; i < target->numInputs(); i++) {
+        Term* input = target->input(i);
+        if (input == NULL) continue;
+        if (input->function == func)
+            return input;
+    }
+    return NULL;
+}
+
+Term* find_user_with_function(Term* target, Term* func)
+{
+    for (int i=0; i < target->users.length(); i++)
+        if (target->users[i]->function == func)
+            return target->users[i];
     return NULL;
 }
 
@@ -852,8 +879,10 @@ Term* insert_state_input(Branch* branch)
     if (term != NULL)
         return term;
 
+    int inputCount = count_input_placeholders(branch);
+
     term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
-    branch->move(term, 0);
+    branch->move(term, inputCount);
     term->setBoolProp("state", true);
     term->setBoolProp("hiddenInput", true);
     term->setBoolProp("output", true);
@@ -1002,10 +1031,19 @@ Term* apply_after(Term* existing, Term* function)
 
     return newTerm;
 }
-void move_before(Term* movee, Term* pivot)
+void move_before(Term* movee, Term* position)
 {
-    ca_assert(movee->owningBranch == pivot->owningBranch);
-    movee->owningBranch->move(movee, pivot->index);
+    ca_assert(movee->owningBranch == position->owningBranch);
+    movee->owningBranch->move(movee, position->index);
+}
+
+void move_after(Term* movee, Term* position)
+{
+    int pos = position->index + 1;
+    Branch* branch = movee->owningBranch;
+    while (branch->get(pos) != NULL && branch->get(pos)->function == EXTRA_OUTPUT_FUNC)
+        pos++;
+    branch->move(movee, pos);
 }
 
 void move_after_inputs(Term* term)
@@ -1019,6 +1057,16 @@ void move_before_outputs(Term* term)
     Branch* branch = term->owningBranch;
     int outputCount = count_output_placeholders(branch);
     branch->move(term, branch->length() - outputCount - 1);
+}
+
+void transfer_users(Term* from, Term* to)
+{
+    TermList users = from->users;
+    for (int i=0; i < users.length(); i++) {
+        if (users[i] == to)
+            continue;
+        remap_pointers_quick(users[i], from, to);
+    }
 }
 
 void input_placeholders_to_list(Branch* branch, TermList* list)

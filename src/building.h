@@ -24,6 +24,7 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name="
 void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, TermList const& inputs);
 void insert_input(Term* term, Term* input);
+void insert_input(Term* term, int index, Term* input);
 bool is_actually_using(Term* user, Term* usee);
 void append_user(Term* user, Term* usee);
 void possibly_prune_user_list(Term* user, Term* usee);
@@ -125,6 +126,8 @@ void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm);
 void update_branch_finish_term(Term* term);
 Term* find_last_non_comment_expression(Branch* branch);
 Term* find_term_with_function(Branch* branch, Term* func);
+Term* find_input_with_function(Term* target, Term* func);
+Term* find_user_with_function(Term* target, Term* func);
 
 bool branch_creates_stack_frame(Branch* branch);
 int get_frame_distance(Branch* frame, Term* input);
@@ -140,8 +143,10 @@ Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);
 Term* apply_after(Term* existing, Term* function);
 void move_before(Term* movee, Term* pivot);
+void move_after(Term* movee, Term* position);
 void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
+void transfer_users(Term* from, Term* to);
 
 void input_placeholders_to_list(Branch* branch, TermList* list);
 void list_outer_pointers(Branch* branch, TermList* list);
