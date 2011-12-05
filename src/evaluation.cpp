@@ -213,31 +213,6 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue*
         pop_frame(context);
 }
 
-void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
-        Branch* branch)
-{
-    // Store currentScopeState and fetch the container for this branch
-    TaggedValue prevScopeState;
-    swap(&context->currentScopeState, &prevScopeState);
-    fetch_state_container(term, &prevScopeState, &context->currentScopeState);
-
-    evaluate_branch_internal(context, branch);
-
-    // Store container and replace currentScopeState
-    save_and_consume_state(term, &prevScopeState, &context->currentScopeState);
-    swap(&context->currentScopeState, &prevScopeState);
-}
-
-void evaluate_branch_no_preserve_locals(EvalContext* context, Branch* branch)
-{
-    copy(&context->state, &context->currentScopeState);
-
-    evaluate_branch_internal(context, branch);
-
-    swap(&context->currentScopeState, &context->state);
-    set_null(&context->currentScopeState);
-}
-
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
 {
     // Copy stack back to the original terms. Many tests depend on this functionality.
@@ -330,17 +305,6 @@ void consume_input(EvalContext* context, Term* term, int index, TaggedValue* des
     copy(get_input(context, term, index), dest);
 }
 
-TaggedValue* get_state_input(EvalContext* cxt, Term* term)
-{
-    if (term->input(0) == NULL) {
-        Dict* currentScopeState = get_current_scope_state(cxt);
-        ca_assert(currentScopeState != NULL);
-        return currentScopeState->insert(term->uniqueName.name.c_str());
-    } else {
-        return get_input(cxt, term, 0);
-    }
-}
-
 TaggedValue* get_local(Term* term, int outputIndex)
 {
     internal_error("don't use get_local");
@@ -424,47 +388,6 @@ void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
     output << get_short_location(context.errorTerm)
         << " " << context_get_error_message(&context);
 }
-
-Dict* get_current_scope_state(EvalContext* cxt)
-{
-    return Dict::lazyCast(&cxt->currentScopeState);
-}
-
-void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output)
-{
-    Dict* containerDict = Dict::lazyCast(container);
-    copy(containerDict->insert(term->uniqueName.name.c_str()), output);
-}
-
-void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* result)
-{
-    Dict* containerDict = Dict::lazyCast(container);
-    const char* name = term->uniqueName.name.c_str();
-    move(result, containerDict->insert(name));
-    set_null(result);
-}
-
-#if 0
-// New style state manipulation:
-void fetch_stack_local_state(EvalContext* context, const char* name)
-{
-    ca_assert(context->numFrames > 1);
-    Frame* frame = top_frame(context);
-    Frame* parentFrame = get_frame(context, 1);
-
-    copy(parentFrame->state.get(name), &frame->state);
-    if (!is_dict(&frame->state))
-        set_dict(&frame->state);
-}
-void store_stack_local_state(EvalContext* context, const char* name)
-{
-    ca_assert(context->numFrames > 1);
-    Frame* frame = top_frame(context);
-    Frame* parentFrame = get_frame(context, 1);
-
-    copy(&frame->state, parentFrame->state.insert(name));
-}
-#endif
 
 bool evaluation_interrupted(EvalContext* context)
 {

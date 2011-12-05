@@ -122,8 +122,6 @@ void post_compile_term(Term* term);
 // Add a finish_minor_branch() term to this branch, if needed.
 void finish_minor_branch(Branch* branch);
 
-void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm);
-void update_branch_finish_term(Term* term);
 Term* find_last_non_comment_expression(Branch* branch);
 Term* find_term_with_function(Branch* branch, Term* func);
 Term* find_input_with_function(Term* target, Term* func);

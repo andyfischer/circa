@@ -19,22 +19,9 @@ using namespace circa::token;
 
 TermPtr compile(Branch* branch, ParsingStep step, std::string const& input)
 {
-    int prevLastIndex = branch->length() - 1;
-
     TokenStream tokens(input);
     ParserCxt context;
     Term* result = step(branch, tokens, &context).term;
-
-    // Update the finish_minor_branch() func at the end
-    Term* prevLast = NULL;
-    if (prevLastIndex >= 0)
-        prevLast = branch->get(prevLastIndex);
-    if (prevLast && prevLast->function == FINISH_MINOR_BRANCH_FUNC) {
-        branch->moveToEnd(branch->get(prevLastIndex));
-        update_branch_finish_term(branch->get(branch->length()-1));
-    } else {
-        check_to_add_branch_finish_term(branch, prevLastIndex+1);
-    }
 
     post_parse_branch(branch);
 

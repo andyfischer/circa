@@ -33,10 +33,6 @@ struct EvalContext
     // Tree of persistent state
     TaggedValue state;
 
-    // State that should be used for the current branch. This is a temporary value
-    // only used during evaluation.
-    TaggedValue currentScopeState;
-
     // State used for the current for loop
     ForLoopContext forLoopContext;
 
@@ -85,11 +81,6 @@ void evaluate_single_term(EvalContext* context, Term* term);
 void evaluate_branch_internal(EvalContext* context, Branch* branch);
 void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output);
 
-void evaluate_branch_internal_with_state(EvalContext* context, Term* term,
-        Branch* branch);
-
-void evaluate_branch_no_preserve_locals(EvalContext* context, Branch* branch);
-
 void evaluate_branch(EvalContext* context, Branch* branch);
 
 void evaluate_save_locals(EvalContext* context, Branch* branch);
@@ -117,7 +108,6 @@ TaggedValue* get_input(EvalContext* context, Term* term, int index);
 void consume_input(EvalContext* context, Term* term, int index, TaggedValue* dest);
 
 TaggedValue* get_extra_output(EvalContext* context, Term* term, int index);
-TaggedValue* get_state_input(EvalContext* cxt, Term* term);
 TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);
 TaggedValue* get_local_safe(Term* term, int outputIndex);
@@ -131,14 +121,6 @@ TaggedValue* get_output(EvalContext* context, ListData* args);
 void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
-
-Dict* get_current_scope_state(EvalContext* cxt);
-void fetch_state_container(Term* term, TaggedValue* container, TaggedValue* output);
-
-// Saves the state result inside 'result' into the given container, according to
-// the unique name of 'term'. This call will consume the value inside 'result',
-// so 'result' will be null after this call.
-void save_and_consume_state(Term* term, TaggedValue* container, TaggedValue* result);
 
 void fetch_stack_local_state(EvalContext* context, const char* name);
 void store_stack_local_state(EvalContext* context, const char* name);

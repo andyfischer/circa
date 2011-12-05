@@ -57,7 +57,7 @@ namespace branch_methods_function {
     CA_DEFINE_FUNCTION(evaluate, "Branch.evaluate()")
     {
         Branch* branch = as_branch(INPUT(0));
-        evaluate_branch_internal_with_state(CONTEXT, CALLER, branch);
+        evaluate_branch_internal(CONTEXT, branch);
     }
 
     // Reflection

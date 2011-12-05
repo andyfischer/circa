@@ -48,22 +48,15 @@ namespace include_function {
             return ERROR_OCCURRED(msg.c_str());
         }
 
-        // Store currentScopeState and fetch the container for this branch
-        TaggedValue prevScopeState;
-        swap(&context->currentScopeState, &prevScopeState);
-        fetch_state_container(CALLER, &prevScopeState, &context->currentScopeState);
-
         // Possibly strip out state that isn't referenced any more.
+#if 0
         if (fileChanged) {
             TaggedValue trash;
             strip_orphaned_state(contents, &context->currentScopeState, &trash);
         }
+#endif
 
         evaluate_branch_internal(context, contents);
-
-        // Store container and replace currentScopeState
-        save_and_consume_state(CALLER, &prevScopeState, &context->currentScopeState);
-        swap(&context->currentScopeState, &prevScopeState);
 
         set_branch(OUTPUT, contents);
     }

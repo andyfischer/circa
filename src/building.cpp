@@ -696,26 +696,6 @@ void finish_minor_branch(Branch* branch)
         insert_state_output(branch);
 }
 
-void check_to_add_branch_finish_term(Branch* branch, int previousLastTerm)
-{
-    for (int i=previousLastTerm; i < branch->length(); i++) {
-
-        if (branch->get(i) == NULL)
-            continue;
-
-        if (branch->get(i)->function == DECLARED_STATE_FUNC) {
-            Term* term = apply(branch, FINISH_MINOR_BRANCH_FUNC, TermList());
-            update_branch_finish_term(term);
-            break;
-        }
-    }
-}
-
-void update_branch_finish_term(Term* term)
-{
-    post_compile_term(term);
-}
-
 Term* find_last_non_comment_expression(Branch* branch)
 {
     for (int i = branch->length() - 1; i >= 0; i--) {

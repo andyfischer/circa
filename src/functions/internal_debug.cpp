@@ -75,11 +75,6 @@ namespace internal_debug_function {
         return &spyTaggedValues;
     }
 
-    CA_DEFINE_FUNCTION(dump_scope_state, "dump_scope_state() -> any")
-    {
-        copy(&CONTEXT->currentScopeState, OUTPUT);
-    }
-
     bool g_initializedHandleType;
     Type g_testHandleType;
     const int g_testHandleSlots = 100;

@@ -116,17 +116,6 @@ void test_set_input()
     test_assert(a->users[0] == b);
 }
 
-void test_finish_branch_is_at_end()
-{
-    Branch branch;
-    branch.compile("a = 1 + 2");
-    test_assert(branch[branch.length()-1]->function != FINISH_MINOR_BRANCH_FUNC);
-    apply(&branch, FINISH_MINOR_BRANCH_FUNC, TermList());
-    test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);
-    branch.compile("b = 3 / 4");
-    test_assert(branch[branch.length()-1]->function == FINISH_MINOR_BRANCH_FUNC);
-}
-
 void test_erase_term()
 {
     Branch branch;
@@ -196,7 +185,6 @@ void register_tests()
     REGISTER_TEST_CASE(building_tests::test_rewrite_as_value);
     REGISTER_TEST_CASE(building_tests::test_procure);
     REGISTER_TEST_CASE(building_tests::test_set_input);
-    REGISTER_TEST_CASE(building_tests::test_finish_branch_is_at_end);
     REGISTER_TEST_CASE(building_tests::test_erase_term);
     REGISTER_TEST_CASE(building_tests::test_repair_broken_links);
 }

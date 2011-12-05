@@ -21,9 +21,6 @@ namespace eval_context_t {
         set_string(&relIdent, "state");
         callback(&context->state, &relIdent, visitContext);
 
-        set_string(&relIdent, "currentScopeState");
-        callback(&context->currentScopeState, &relIdent, visitContext);
-
         set_string(&relIdent, "messages");
         callback(&context->messages, &relIdent, visitContext);
     }

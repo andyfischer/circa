@@ -198,37 +198,6 @@ void implicit_state()
     test_equals(context.state.toString(), "{_f: {s: 1}}");
 }
 
-namespace test_interpreted_state_access
-{
-    CA_FUNCTION(evaluate)
-    {
-        TaggedValue* state = get_state_input(CONTEXT, CALLER);
-        create(&INT_T, state);
-        set_int(state, as_int(state) + 1);
-    }
-
-    void test()
-    {
-        Branch branch;
-        import_function(&branch, evaluate, "func() -> void");
-        Term* a = branch.compile("a = func()");
-
-        test_equals(a->uniqueName.name, "a");
-
-        EvalContext context;
-        test_equals(context.state.toString(), "null");
-
-        evaluate_branch(&context, &branch);
-        test_equals(context.state.toString(), "{a: 1}");
-
-        evaluate_branch(&context, &branch);
-        test_equals(context.state.toString(), "{a: 2}");
-
-        evaluate_branch(&context, &branch);
-        test_equals(context.state.toString(), "{a: 3}");
-    }
-}
-
 void bug_with_top_level_state()
 {
     // This code once caused an assertion failure
@@ -437,7 +406,6 @@ void register_tests()
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state);
-    REGISTER_TEST_CASE(stateful_code_tests::test_interpreted_state_access::test);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_state_and_plus_equals);
     REGISTER_TEST_CASE(stateful_code_tests::subroutine_unique_name_usage);

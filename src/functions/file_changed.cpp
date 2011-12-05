@@ -36,8 +36,7 @@ namespace file_changed_function {
 
     CA_FUNCTION(evaluate)
     {
-        set_bool(OUTPUT, check(CONTEXT, CALLER, get_state_input(CONTEXT, CALLER),
-                    INPUT(1)->asString()));
+        set_bool(OUTPUT, check(CONTEXT, CALLER, INPUT(0), INPUT(1)->asString()));
     }
 
     void setup(Branch* kernel)
