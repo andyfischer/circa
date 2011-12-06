@@ -976,8 +976,11 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     }
 
     Type* type = &ANY_T;
-    if (typeName != "")
-        type = as_type(find_type(branch, typeName));
+    if (typeName != "") {
+        Term* typeTerm = find_type(branch, typeName);
+        if (is_type(typeTerm))
+            type = as_type(typeTerm);
+    }
 
     Term* initialValue = NULL;
 

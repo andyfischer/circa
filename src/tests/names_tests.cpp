@@ -249,7 +249,7 @@ void test_global_name()
 
     std::string b_name;
     test_assert(find_global_name(b, b_name));
-    test_equals(b_name, "_test_root:test_global_name:_if_block:_if:b");
+    test_equals(b_name, "_test_root:test_global_name:_if_block:_case:b");
 
     test_assert(find_term_from_global_name(a_name.c_str()) == a);
     test_assert(find_term_from_global_name(b_name.c_str()) == b);

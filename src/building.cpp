@@ -1120,10 +1120,6 @@ void check_to_add_state_output_placeholder(Branch* branch)
 
     Term* output = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
     output->setBoolProp("state", true);
-
-    // Move the new output to a position corresponding with the state input.
-    // (making sure to put it before the primary output)
-    branch->move(result, branch->length() - inputPos - 2);
 }
 
 } // namespace circa

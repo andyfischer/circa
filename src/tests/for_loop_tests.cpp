@@ -99,7 +99,8 @@ void test_state_simple()
     EvalContext context;
 
     branch.compile("for i in [1 2 3] { state s = i }");
-    //dump(branch);
+    finish_minor_branch(&branch);
+
     evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_for: [{s: 1}, {s: 2}, {s: 3}]}");
 
@@ -108,6 +109,7 @@ void test_state_simple()
     EvalContext context2;
 
     branch.compile("l = [1 2 3]; for i in @l { state s = 0; s += i }");
+    finish_minor_branch(&branch);
 
     evaluate_branch(&context2, &branch);
     test_equals(&context2.state, "{l_1: [{s: 1}, {s: 2}, {s: 3}]}");
@@ -123,6 +125,7 @@ void test_state_nested()
     EvalContext context;
 
     branch.compile("for a in [1 2] { for b in [3 4] { for c in [5 6] { state s = c } } }");
+    finish_minor_branch(&branch);
     evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{_for: [{_for: [{_for: [{s: 5}, {s: 6}]}, "
@@ -134,6 +137,7 @@ void test_produce_output()
 {
     Branch branch;
     branch.compile("x = for i in 0..5; i + 1");
+    finish_minor_branch(&branch);
     evaluate_branch(&branch);
     List* x = List::checkCast(branch["x"]);
     test_equals(x->length(), 5);
@@ -147,6 +151,7 @@ void test_break()
     Branch branch;
     internal_debug_function::spy_clear();
     branch.compile("for i in [1 2 3 4] { if i == 3 { break } test_spy(i) }");
+    finish_minor_branch(&branch);
     evaluate_branch(&branch);
     test_equals(internal_debug_function::spy_results(), "[1, 2]");
 }

@@ -1,0 +1,9 @@
+# This code once had a bug related to the brackets (the same code without
+# brackets didn't have the same bug).
+
+def f()
+  for i in [1 2 3] { state s = i }
+
+s = null
+f(state = s)
+print(s)

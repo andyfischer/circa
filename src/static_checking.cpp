@@ -65,22 +65,8 @@ void check_term_for_static_error(List* errors, Term* term)
     if (term->function == NULL)
         return append_static_error(errors, term, "null_function");
 
-    Function* func = as_function(term->function);
-
-    if (func == NULL)
+    if (!is_function(term->function))
         return append_static_error(errors, term, "not_a_function");
-
-    // Check inputs, this checking is done by writing an input instruction list.
-#if 0
-    List inputErrors;
-    free_list(write_input_instruction_list(term, NULL, &inputErrors));
-    free_list(write_output_instruction_list(term, NULL, &inputErrors));
-    
-    if (inputErrors.length() > 0) {
-        std::string msg = "input errors: " + to_string(&inputErrors);
-        return append_static_error(errors, term, msg.c_str());
-    }
-#endif
 
     bool varArgs = term_has_variable_args(term);
     int expectedInputCount = term_count_input_placeholders(term);

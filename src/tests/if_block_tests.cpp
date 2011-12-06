@@ -333,24 +333,6 @@ void test_state_is_reset_when_if_fails2()
     test_equals(&context.state, "{_if_block: [{s: 3}]}");
 }
 
-void test_nested_state()
-{
-    Branch branch;
-    EvalContext context;
-
-    branch.compile("t = false if true { t = toggle(true) }");
-    TaggedValue* t = get_local(branch["t"]);
-
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(t) == true);
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(t) == false);
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(t) == true);
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(t) == false);
-}
-
 void register_tests()
 {
     REGISTER_TEST_CASE(if_block_tests::test_if_joining);
@@ -362,7 +344,6 @@ void register_tests()
     REGISTER_TEST_CASE(if_block_tests::test_state_simple);
     REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails);
     REGISTER_TEST_CASE(if_block_tests::test_state_is_reset_when_if_fails2);
-    REGISTER_TEST_CASE(if_block_tests::test_nested_state);
 }
 
 } // namespace if_block_tests
