@@ -7,11 +7,16 @@ if.ca
 if_state.ca
 for.ca
 for_state.ca
+for_state_1.ca
+for_state_2.ca
+for_state_3.ca
 list.ca
 math.ca
 set.ca
 set_index.ca
 subroutine.ca
 subroutine_state.ca
+subroutine_state_1.ca
+subroutine_state_2.ca
 type_func.ca
 vectorized_func.ca

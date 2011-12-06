@@ -30,7 +30,7 @@ def read_text_file_as_lines(filename):
         yield line[:-1]
 
 def run_command(cmd):
-    proc = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
+    proc = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
             stdout=subprocess.PIPE, close_fds=True)
     (stdin, stdout) = (proc.stdin, proc.stdout)
 
@@ -143,13 +143,14 @@ def find_test_with_name(name):
 def accept_output_for_test(name):
     file = find_test_with_name(name)
     outfile = file + '.output'
-    cmd = 'circa '+file
+    cmd = 'circa_t '+file
 
     print 'Running: '+cmd
     print 'Saving results to: '+outfile
 
     out = open(outfile, 'w')
     for line in run_command(cmd):
+        print line
         out.write(line + '\n')
 
 if __name__ == '__main__':

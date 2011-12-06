@@ -589,7 +589,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
     Term* stateInput = find_state_input(term_get_function_details(term));
 
-    if (stateInput != NULL && !term_is_state_input(term, 0)) {
+    if (stateInput != NULL && !term_is_state_input(term, stateInput->index)) {
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 

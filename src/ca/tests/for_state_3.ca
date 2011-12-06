@@ -1,0 +1,9 @@
+def f()
+    for i in []
+        state s = i
+        state t = 1
+        state u = i + 2
+
+s = null
+f(state = s)
+print(s)

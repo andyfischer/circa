@@ -7,4 +7,7 @@ f_state = null
 f(state = f_state)
 result = f(state = f_state)
 print('should be 2: ' result)
-
+result = f(state = f_state)
+print('should be 3: ' result)
+result = f(state = f_state)
+print('should be 4: ' result)

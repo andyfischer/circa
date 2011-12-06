@@ -1,0 +1,17 @@
+
+# Call a function with arguments and a state arg
+
+def f(int i, int j) -> int
+  state s = j
+  s += i
+  return s
+  
+f_state = null
+result = f(1, 5, state = f_state)
+print('should be 6: ' result)
+result = f(3, 0, state = f_state)
+print('should be 9: ' result)
+result = f(-4, 0, state = f_state)
+print('should be 5: ' result)
+result = f(1, 0, state = f_state)
+print('should be 6: ' result)
