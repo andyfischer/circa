@@ -517,8 +517,7 @@ export_func void circa_initialize()
 
     Branch* kernel = KERNEL;
 
-    //FIXME: stdlib is disabled
-    //install_standard_library(kernel);
+    install_standard_library(kernel);
 
 #if CIRCA_TEST_BUILD
     // Create a space for unit tests.
