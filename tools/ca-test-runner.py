@@ -3,6 +3,8 @@
 import os,subprocess,sys
 from glob import glob
 
+TestRoot = 'src/ca/tests'
+
 class OutputDifference(object):
     def __init__(self, fromCommand, fromFile, lineNumber):
         self.fromCommand = fromCommand
@@ -25,6 +27,18 @@ def read_text_file_as_lines(filename):
         line = f.readline()
         if not line:
             return
+        yield line[:-1]
+
+def run_command(cmd):
+    proc = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, close_fds=True)
+    (stdin, stdout) = (proc.stdin, proc.stdout)
+
+    while True:
+        line = stdout.readline()
+        if not line:
+            return
+
         yield line[:-1]
 
 def diff_command_against_file(command, filename):
@@ -82,7 +96,7 @@ def test_file(filename):
 
 
 def get_list_of_enabled_tests():
-    for line in read_text_file_as_lines('src/ca/tests/_enabled_tests'):
+    for line in read_text_file_as_lines(TestRoot+'/_enabled_tests'):
         if line:
             yield line
 
@@ -92,7 +106,7 @@ def run_all_tests():
 
     totalFailureCount = 0
 
-    for file in ['src/ca/tests/'+f for f in get_list_of_enabled_tests()]:
+    for file in [TestRoot+'/'+f for f in get_list_of_enabled_tests()]:
         print "Testing "+file
         failures = test_file(file)
         totalFailureCount += len(failures)
@@ -105,5 +119,48 @@ def run_all_tests():
     if totalFailureCount > 0:
         exit(-1)
 
+def find_test_with_name(name):
+    import glob
+
+    # find all files containing the substring 'name'
+    files = glob.glob(TestRoot+'/*'+name+'*')
+    files = list(files)
+
+    # prefer an exact match
+    for file in files:
+        if file.endswith(name):
+            return file
+
+    # only look at .ca files
+    files = filter(lambda f: f.endswith('.ca'), files)
+    print files
+
+    try:
+        return files[0]
+    except IndexError:
+        return None
+
+def accept_output_for_test(name):
+    file = find_test_with_name(name)
+    outfile = file + '.output'
+    cmd = 'circa '+file
+
+    print 'Running: '+cmd
+    print 'Saving results to: '+outfile
+
+    out = open(outfile, 'w')
+    for line in run_command(cmd):
+        out.write(line + '\n')
+
 if __name__ == '__main__':
+    import optparse
+    parser = optparse.OptionParser()
+    parser.add_option('--accept', dest="accept")
+
+    (options,args) = parser.parse_args()
+
+    if options.accept:
+        accept_output_for_test(options.accept)
+        exit(0)
+
     run_all_tests()
