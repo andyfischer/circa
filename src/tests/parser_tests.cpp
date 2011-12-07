@@ -173,8 +173,7 @@ void test_function_decl()
 
     Branch* funcbranch = function_contents(func);
 
-    // index 0 has the function definition
-    int i = 1;
+    int i = 0;
     test_equals(funcbranch->get(i++)->name, "what");
     test_equals(funcbranch->get(i++)->name, "hey");
     test_equals(funcbranch->get(i++)->name, "yo");
@@ -183,13 +182,13 @@ void test_function_decl()
         i++;
     test_equals(funcbranch->get(i)->name, "whathey");
     test_equals(funcbranch->get(i)->function->name, "concat");
-    test_assert(funcbranch->get(i)->input(0) == funcbranch->get(1));
-    test_assert(funcbranch->get(i)->input(1) == funcbranch->get(2));
-    test_assert(funcbranch->get(i++)->input(1) == funcbranch->get(2));
+    test_assert(funcbranch->get(i)->input(0) == funcbranch->get(0));
+    test_assert(funcbranch->get(i)->input(1) == funcbranch->get(1));
+    i++;
     int three = i;
     test_assert(funcbranch->get(i++)->asInt() == 3);
     test_equals(funcbranch->get(i)->function->name, "greater_than");
-    test_assert(funcbranch->get(i)->input(0) == funcbranch->get(3));
+    test_assert(funcbranch->get(i)->input(0) == funcbranch->get(2));
     test_assert(funcbranch->get(i)->input(1) == funcbranch->get(three));
 }
 
@@ -343,7 +342,7 @@ void test_semicolon_as_line_ending()
 {
     Branch branch;
     branch.compile("1;2;3");
-    test_assert(!has_static_errors(&branch));
+    test_assert(&branch);
     test_assert(branch.length() == 3);
     test_assert(is_value(branch[0]));
     test_assert(is_value(branch[1]));
@@ -354,7 +353,7 @@ void test_semicolon_as_line_ending()
 
     branch.clear();
     branch.compile("a = 1+2 ; b = mult(3,4) ; b -> print");
-    test_assert(!has_static_errors(&branch));
+    test_assert(&branch);
     test_assert(branch.length() == 7);
     test_assert(branch["a"]->function->name == "add");
     test_assert(branch["b"]->function->name == "mult");
@@ -363,7 +362,7 @@ void test_semicolon_as_line_ending()
     branch.compile("cond = true; if cond { a = 1 } else { a = 2 }");
     branch.compile("a=a");
 
-    test_assert(!has_static_errors(&branch));
+    test_assert(&branch);
     evaluate_branch(&branch);
     test_assert(branch.contains("a"));
     test_assert(branch["a"]->asInt() == 1);

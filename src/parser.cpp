@@ -982,6 +982,9 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         Term* typeTerm = find_type(branch, typeName);
         if (is_type(typeTerm))
             type = as_type(typeTerm);
+        else
+            return compile_error_for_line(branch, tokens, startPosition,
+                "Not a type: "+typeTerm->name);
     }
 
     Term* initialValue = NULL;

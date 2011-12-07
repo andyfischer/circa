@@ -60,7 +60,6 @@ void register_every_possible_parse_error()
     test_case("for x %");
     test_case("for x in");
     test_case("for x in %");
-    test_case("for x in 1\n");
     test_case("namespace");
     test_case("namespace %");
     test_case("state");
