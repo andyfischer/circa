@@ -96,7 +96,6 @@ void test_misc1()
     token::TokenList results;
     token::tokenize(",()=?][<=>=", results);
 
-    test_assert(results.size() == 9);
     test_assert(results[0].text == ",");
     test_assert(results[0].match == token::COMMA);
     test_assert(results[1].text == "(");
@@ -115,6 +114,7 @@ void test_misc1()
     test_assert(results[7].match == token::LTHANEQ);
     test_assert(results[8].text == ">=");
     test_assert(results[8].match == token::GTHANEQ);
+    test_assert(results.size() == 9);
 }
 
 void test_misc2()

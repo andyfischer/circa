@@ -104,6 +104,7 @@ struct TokenizeContext
     int nextIndex;
     int linePosition;
     int charPosition;
+    int precedingIndent;
     std::vector<Token> &results;
 
     TokenizeContext(std::string const &_input, std::vector<Token> &_results)
@@ -111,22 +112,25 @@ struct TokenizeContext
           nextIndex(0),
           linePosition(1),
           charPosition(0),
+          precedingIndent(-1),
           results(_results)
     { }
 
-    char next(int lookahead=0) const {
+    char next(int lookahead=0) const
+    {
         unsigned int index = nextIndex + lookahead;
         if (index >= input.length())
             return 0;
         return input[index];
     }
 
-    char consume() {
+    char advanceChar()
+    {
         if (finished())
             return 0;
 
         char c = next();
-        nextIndex++;
+        this->nextIndex++;
 
         if (c == '\n') {
             this->linePosition++;
@@ -141,48 +145,43 @@ struct TokenizeContext
         return nextIndex >= (int) input.length();
     }
 
-    void push(int match, std::string text = "") {
-        if (text == "" && match != STRING)
-            text = get_token_text(match);
+    bool withinRange(int lookahead) const {
+        return nextIndex + lookahead < (int) input.length();
+    }
+
+    void push(int match, int len) {
 
         Token instance;
         instance.match = match;
-        instance.text = text;
+        instance.text = this->input.substr(this->nextIndex, len);
 
-        // Record where this token started
-        if (results.size() == 0) {
-            instance.lineStart = 1;
-            instance.colStart = 0;
-            instance.precedingIndent = -1;
-        } else {
-            Token& prevToken = results[results.size()-1];
-            if (prevToken.match == NEWLINE) {
-                instance.lineStart = prevToken.lineEnd + 1;
-                instance.colStart = 0;
-                instance.precedingIndent = -1;
-            } else {
-                instance.lineStart = prevToken.lineEnd;
-                instance.colStart = prevToken.colEnd;
-                instance.precedingIndent = prevToken.precedingIndent;
-            }
-        }
+        // Record where this token starts
+        instance.lineStart = this->linePosition;
+        instance.colStart = this->charPosition;
 
-        // Record where this token ended
-        if (instance.match == NEWLINE) {
-            instance.lineEnd = this->linePosition - 1;
-            instance.colEnd = instance.colStart + 1;
-        } else {
-            instance.lineEnd = this->linePosition;
-            instance.colEnd = this->charPosition;
-        }
+        for (int i=0; i < len; i++)
+            advanceChar();
+
+        // Record where this token ends
+        instance.lineEnd = this->linePosition;
+        instance.colEnd = this->charPosition;
 
         // Update precedingIndent if this is the first whitespace on a line
-        if (instance.precedingIndent == -1) {
+        if (this->precedingIndent == -1) {
             if (instance.match == WHITESPACE)
-                instance.precedingIndent = (int) instance.text.length();
+                this->precedingIndent = len;
             else
-                instance.precedingIndent = 0;
+                this->precedingIndent = 0;
         }
+
+        // NEWLINE token is a special case
+        if (instance.match == NEWLINE) {
+            instance.lineEnd = instance.lineStart;
+            instance.colEnd = instance.colStart + 1;
+            this->precedingIndent = -1;
+        }
+
+        instance.precedingIndent = this->precedingIndent;
 
         ca_assert(instance.lineStart >= 0);
         ca_assert(instance.lineEnd >= 0);
@@ -273,10 +272,7 @@ bool try_to_consume_keyword(TokenizeContext& context, int keyword)
         return false;
 
     // Keyword matches, now consume it
-    for (int i=0; i < str_len; i++)
-        context.consume();
-
-    context.push(keyword);
+    context.push(keyword, str_len);
 
     return true;
 }
@@ -335,142 +331,108 @@ void top_level_consume_token(TokenizeContext &context)
     // Check for specific characters
     switch(context.next()) {
         case '(':
-            context.consume();
-            context.push(LPAREN, "(");
+            context.push(LPAREN, 1);
             return;
         case ')':
-            context.consume();
-            context.push(RPAREN, ")");
+            context.push(RPAREN, 1);
             return;
         case '{':
-            context.consume();
-            context.push(LBRACE);
+            context.push(LBRACE, 1);
             return;
         case '}':
-            context.consume();
-            context.push(RBRACE);
+            context.push(RBRACE, 1);
             return;
         case '[':
-            context.consume();
-            context.push(LBRACKET);
+            context.push(LBRACKET, 1);
             return;
         case ']':
-            context.consume();
-            context.push(RBRACKET);
+            context.push(RBRACKET, 1);
             return;
         case ',':
-            context.consume();
-            context.push(COMMA);
+            context.push(COMMA, 1);
             return;
         case '@':
-            context.consume();
-            context.push(AT_SIGN);
+            context.push(AT_SIGN, 1);
             return;
         case '=':
-            context.consume();
-
-            if (context.next() == '=') {
-                context.consume();
-                context.push(DOUBLE_EQUALS);
+            if (context.next(1) == '=') {
+                context.push(DOUBLE_EQUALS, 2);
                 return;
             } 
 
-            context.push(EQUALS);
+            context.push(EQUALS, 1);
             return;
         case '"':
         case '\'':
             consume_string_literal(context);
             return;
         case '\n':
-            context.consume();
-            context.push(NEWLINE, "\n");
+            context.push(NEWLINE, 1);
             return;
         case '.':
-            context.consume();
-
-            if (context.next(0) == '.') {
-                context.consume();
-
-                if (context.next(0) == '.') {
-                    context.consume();
-                    context.push(ELLIPSIS); 
+            if (context.next(1) == '.') {
+                if (context.next(2) == '.') {
+                    context.push(ELLIPSIS, 3); 
                 } else {
-                    context.push(TWO_DOTS);
+                    context.push(TWO_DOTS, 2);
                 }
             } else {
-                context.push(DOT);
+                context.push(DOT, 1);
             }
             return;
         case '?':
-            context.consume();
-            context.push(QUESTION);
+            context.push(QUESTION, 1);
             return;
         case '*':
-            context.consume();
-            if (context.next() == '=') {
-                context.consume();
-                context.push(STAR_EQUALS);
+            if (context.next(1) == '=') {
+                context.push(STAR_EQUALS, 2);
                 return;
             }
 
-            context.push(STAR);
+            context.push(STAR, 1);
             return;
         case '/':
-            context.consume();
-            if (context.next() == '=') {
-                context.consume();
-                context.push(SLASH_EQUALS);
+            if (context.next(1) == '=') {
+                context.push(SLASH_EQUALS, 2);
                 return;
             }
-            if (context.next() == '/') {
-                context.consume();
-                context.push(DOUBLE_SLASH);
+            if (context.next(1) == '/') {
+                context.push(DOUBLE_SLASH, 2);
                 return;
             }
-            context.push(SLASH);
+            context.push(SLASH, 1);
             return;
         case '!':
             if (context.next(1) == '=') {
-                context.consume();
-                context.consume();
-                context.push(NOT_EQUALS);
+                context.push(NOT_EQUALS, 2);
                 return;
             }
             break;
 
         case ':':
             if (context.next(1) == '=') {
-                context.consume();
-                context.consume();
-                context.push(COLON_EQUALS);
+                context.push(COLON_EQUALS, 2);
                 return;
             }
             else if (context.next(1) == ':') {
-                context.consume();
-                context.consume();
-                context.push(DOUBLE_COLON);
+                context.push(DOUBLE_COLON, 2);
                 return;
             } else if (is_identifier_first_letter(context.next(1))) {
                 return consume_symbol(context);
             }
 
-            context.consume();
-            context.push(COLON);
+            context.push(COLON, 1);
             return;
         case '+':
-            context.consume();
-            if (context.next() == '=') {
-                context.consume();
-                context.push(PLUS_EQUALS);
+            if (context.next(1) == '=') {
+                context.push(PLUS_EQUALS, 2);
             } else {
-                context.push(PLUS);
+                context.push(PLUS, 1);
             }
             return;
         case '-':
             if (context.next(1) == '>') {
-                context.consume();
-                context.consume();
-                context.push(RIGHT_ARROW);
+                context.push(RIGHT_ARROW, 2);
                 return;
             }
 
@@ -478,14 +440,11 @@ void top_level_consume_token(TokenizeContext &context)
                 return consume_comment(context);
 
             if (context.next(1) == '=') {
-                context.consume();
-                context.consume();
-                context.push(MINUS_EQUALS);
+                context.push(MINUS_EQUALS, 2);
                 return;
             }
 
-            context.consume();
-            context.push(MINUS);
+            context.push(MINUS, 1);
             return;
 
         case '<':
@@ -494,63 +453,48 @@ void top_level_consume_token(TokenizeContext &context)
                 return;
             }
 
-            context.consume();
-            if (context.next() == '=') {
-                context.consume();
-                context.push(LTHANEQ);
+            if (context.next(1) == '=') {
+                context.push(LTHANEQ, 2);
                 return;
             }
-            if (context.next() == '-') {
-                context.consume();
-                context.push(LEFT_ARROW);
+            if (context.next(1) == '-') {
+                context.push(LEFT_ARROW, 2);
                 return;
             }
-            context.push(LTHAN);
+            context.push(LTHAN, 1);
             return;
 
         case '>':
-            context.consume();
-            if (context.next() == '=') {
-                context.consume();
-                context.push(GTHANEQ);
+            if (context.next(1) == '=') {
+                context.push(GTHANEQ, 2);
                 return;
             }
-            context.push(GTHAN);
+            context.push(GTHAN, 1);
             return;
 
         case '%':
-            context.consume();
-            context.push(PERCENT);
+            context.push(PERCENT, 1);
             return;
 
         case '|':
             if (context.next(1) == '|') {
-                context.consume();
-                context.consume();
-                context.push(DOUBLE_VERTICAL_BAR);
+                context.push(DOUBLE_VERTICAL_BAR, 2);
                 return;
             }
             break;
 
         case '&':
-            context.consume();
-
-            if (context.next() == '&') {
-                context.consume();
-                context.push(DOUBLE_AMPERSAND);
+            if (context.next(1) == '&') {
+                context.push(DOUBLE_AMPERSAND, 2);
                 return;
             }
 
-            context.push(AMPERSAND);
+            context.push(AMPERSAND, 1);
             return;
 
         case ';':
-            if (context.next() == ';') {
-                context.consume();
-                context.push(SEMICOLON);
-                return;
-            }
-            break;
+            context.push(SEMICOLON, 1);
+            return;
 
         case '#':
             if (context.next(1) == ' ')
@@ -561,40 +505,34 @@ void top_level_consume_token(TokenizeContext &context)
     }
 
     // Fall through, consume the next letter as UNRECOGNIZED
-    std::stringstream text;
-    text << context.consume();
-    context.push(UNRECOGNIZED, text.str());
+    context.push(UNRECOGNIZED, 1);
 }
 
 void consume_identifier(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
+    while (is_acceptable_inside_identifier(context.next(lookahead)))
+        lookahead++;
 
-    while (is_acceptable_inside_identifier(context.next()))
-        text << context.consume();
-
-    context.push(IDENTIFIER, text.str());
+    context.push(IDENTIFIER, lookahead);
 }
 
 void consume_whitespace(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
+    while (is_whitespace(context.next(lookahead)))
+        lookahead++;
 
-    while (is_whitespace(context.next())) {
-        text << context.consume();
-    }
-
-    context.push(WHITESPACE, text.str());
+    context.push(WHITESPACE, lookahead);
 }
 
 void consume_comment(TokenizeContext& context)
 {
-    std::stringstream text;
+    int lookahead = 0;
+    while (context.withinRange(lookahead) && !is_newline(context.next(lookahead)))
+        lookahead++;
 
-    while (!context.finished() && !is_newline(context.next()))
-        text << context.consume();
-
-    context.push(COMMENT, text.str());
+    context.push(COMMENT, lookahead);
 }
 
 bool match_number(TokenizeContext &context)
@@ -612,21 +550,19 @@ bool match_number(TokenizeContext &context)
 
 void consume_number(TokenizeContext &context)
 {
-    std::stringstream text;
-
+    int lookahead = 0;
     bool minus_sign = false;
     bool dot_encountered = false;
 
-    if (context.next() == '-') {
-        text << context.consume();
+    if (context.next(lookahead) == '-') {
+        lookahead++;
         minus_sign = true;
     }
 
     while (true) {
-        if (is_number(context.next())) {
-            text << context.consume();
-        }
-        else if (context.next() == '.') {
+        if (is_number(context.next(lookahead))) {
+            lookahead++;
+        } else if (context.next(lookahead) == '.') {
             // If we've already encountered a dot, finish and don't consume
             // this one.
             if (dot_encountered)
@@ -634,15 +570,16 @@ void consume_number(TokenizeContext &context)
 
             // Special case: if this dot is followed by another dot, then it should
             // be tokenized as TWO_DOTS, so don't consume it here.
-            if (context.next(1) == '.')
+            if (context.next(lookahead+1) == '.')
                 break;
 
             // Another special case, if the dot is followed by an identifier, then
             // don't consume it here. It might be an object call.
-            if (is_identifier_first_letter(context.next(1)))
+            if (is_identifier_first_letter(context.next(lookahead + 1)))
                 break;
 
-            text << context.consume();
+            // Otherwise, consume the dot
+            lookahead++;
             dot_encountered = true;
         }
         else {
@@ -651,36 +588,35 @@ void consume_number(TokenizeContext &context)
     }
 
     if (dot_encountered)
-        context.push(FLOAT_TOKEN, text.str());
+        context.push(FLOAT_TOKEN, lookahead);
     else
-        context.push(INTEGER, text.str());
+        context.push(INTEGER, lookahead);
 }
 
 void consume_hex_number(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
 
     // consume the 0x part
-    text << context.consume();
-    text << context.consume();
+    lookahead += 2;
 
-    while (is_hexadecimal_digit(context.next()))
-        text << context.consume();
+    while (is_hexadecimal_digit(context.next(lookahead)))
+        lookahead++;
 
-    context.push(HEX_INTEGER, text.str());
+    context.push(HEX_INTEGER, lookahead);
 }
 
 void consume_string_literal(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
 
     // Consume starting quote, this can be ' or "
-    char quote_type = context.consume();
-    text << quote_type;
+    char quote_type = context.next();
+    lookahead++;
 
     bool escapedNext = false;
-    while (!context.finished()) {
-        char c = context.next();
+    while (context.withinRange(lookahead)) {
+        char c = context.next(lookahead);
 
         if (c == quote_type && !escapedNext)
             break;
@@ -689,67 +625,63 @@ void consume_string_literal(TokenizeContext &context)
         if (c == '\\')
             escapedNext = true;
 
-        text << context.consume();
+        lookahead++;
     }
 
     // consume ending quote
-    text << context.consume();
+    lookahead++;
 
-    context.push(STRING, text.str());
+    context.push(STRING, lookahead);
 }
 
 void consume_triple_quoted_string_literal(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
 
     // Consume initial <<<
-    text << context.consume();
-    text << context.consume();
-    text << context.consume();
+    lookahead += 3;
 
-    while (!context.finished() &&
-            !(context.next() == '>' && context.next(1) == '>' && context.next(2) == '>'))
-        text << context.consume();
+    while (context.withinRange(lookahead) &&
+            !(context.next(lookahead) == '>'
+                && context.next(lookahead + 1) == '>'
+                && context.next(lookahead + 2) == '>'))
+        lookahead++;
 
     // Consume closing >>>
-    text << context.consume();
-    text << context.consume();
-    text << context.consume();
-
-    context.push(STRING, text.str());
+    lookahead += 3;
+    context.push(STRING, lookahead);
 }
 
 void consume_color_literal(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
 
     // consume #
-    text << context.consume();
+    lookahead++;
 
-    while (is_hexadecimal_digit(context.next()))
-        text << context.consume();
+    while (is_hexadecimal_digit(context.next(lookahead)))
+        lookahead++;
+
+    int hex_digits = lookahead - 1;
 
     // acceptable lengths are 3, 4, 6 or 8 characters (not including #)
-    std::string result = text.str();
-    int length = int(result.length() - 1);
-
-    if (length == 3 || length == 4 || length == 6 || length == 8)
-        context.push(COLOR, result);
+    if (hex_digits == 3 || hex_digits == 4 || hex_digits == 6 || hex_digits == 8)
+        context.push(COLOR, lookahead);
     else
-        context.push(UNRECOGNIZED, result);
+        context.push(UNRECOGNIZED, lookahead);
 }
 
 void consume_symbol(TokenizeContext &context)
 {
-    std::stringstream text;
+    int lookahead = 0;
 
     // consume the leading :
-    text << context.consume();
+    lookahead++;
 
-    while (is_acceptable_inside_identifier(context.next()))
-        text << context.consume();
+    while (is_acceptable_inside_identifier(context.next(lookahead)))
+        lookahead++;
 
-    context.push(SYMBOL, text.str());
+    context.push(SYMBOL, lookahead);
 }
 
 } // namespace token
