@@ -220,6 +220,30 @@ int run_command_line(std::vector<std::string> args)
         return run_build_tool(filename);
     }
 
+    // Stress test parser
+    if (args[0] == "-parse100") {
+
+        const char* filename = args[1].c_str();
+
+        for (int i=0; i < 100; i++) {
+            Branch branch;
+            load_script(&branch, filename);
+            evaluate_branch(&branch);
+        }
+        return true;
+    }
+    if (args[0] == "-parse1000") {
+
+        const char* filename = args[1].c_str();
+
+        for (int i=0; i < 1000; i++) {
+            Branch branch;
+            load_script(&branch, filename);
+            evaluate_branch(&branch);
+        }
+        return true;
+    }
+
     // Otherwise, load args[0] as a script and run it
     Branch* main_branch = create_branch(kernel());
     load_script(main_branch, args[0].c_str());
