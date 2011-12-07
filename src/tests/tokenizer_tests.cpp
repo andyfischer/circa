@@ -11,110 +11,129 @@ namespace tokenizer_tests {
 
 void test_identifiers()
 {
-    token::TokenList results;
-    token::tokenize("word has_underscore has_hyphen,hasnumbers183,has:colon", results);
+    TokenStream tokens("word has_underscore has_hyphen,hasnumbers183,has:colon");
 
-    test_assert(results.size() == 9);
-
-    test_assert(results[0].text == "word");
-    test_assert(results[0].match == token::IDENTIFIER);
-    test_assert(results[1].text == " ");
-    test_assert(results[1].match == token::WHITESPACE);
-    test_assert(results[2].text == "has_underscore");
-    test_assert(results[2].match == token::IDENTIFIER);
-    test_assert(results[3].text == " ");
-    test_assert(results[3].match == token::WHITESPACE);
-    test_assert(results[4].text == "has_hyphen");
-    test_assert(results[4].match == token::IDENTIFIER);
-    test_assert(results[5].text == ",");
-    test_assert(results[5].match == token::COMMA);
-    test_assert(results[6].text == "hasnumbers183");
-    test_assert(results[6].match == token::IDENTIFIER);
-    test_assert(results[7].match == token::COMMA);
-    test_assert(results[8].text == "has:colon");
-    test_assert(results[8].match == token::IDENTIFIER);
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_assert(tokens.nextStr() == "word");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_assert(tokens.nextStr() == "has_underscore");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_assert(tokens.nextStr() == "has_hyphen");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::COMMA));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_assert(tokens.nextStr() == "hasnumbers183");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::COMMA));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::IDENTIFIER));
+    test_assert(tokens.nextStr() == "has:colon");
+    tokens.consume();
+    test_assert(tokens.finished());
 }
 
 void test_integers()
 {
-    token::TokenList results;
-    token::tokenize("1 0 1234567890 0x123", results);
+    TokenStream tokens("1 0 1234567890 0x123");
 
-    test_assert(results.size() == 7);
-    test_assert(results[0].text == "1");
-    test_assert(results[0].match == token::INTEGER);
-    test_assert(results[1].text == " ");
-    test_assert(results[1].match == token::WHITESPACE);
-    test_assert(results[2].text == "0");
-    test_assert(results[2].match == token::INTEGER);
-    test_assert(results[3].text == " ");
-    test_assert(results[3].match == token::WHITESPACE);
-    test_assert(results[4].text == "1234567890");
-    test_assert(results[4].match == token::INTEGER);
-    test_assert(results[5].text == " ");
-    test_assert(results[5].match == token::WHITESPACE);
-    test_assert(results[6].text == "0x123");
-    test_assert(results[6].match == token::HEX_INTEGER);
+    test_assert(tokens.nextIs(token::INTEGER));
+    test_assert(tokens.nextStr() == "1");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::INTEGER));
+    test_assert(tokens.nextStr() == "0");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::INTEGER));
+    test_assert(tokens.nextStr() == "1234567890");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::HEX_INTEGER));
+    test_assert(tokens.nextStr() == "0x123");
+    tokens.consume();
+    test_assert(tokens.finished());
 }
 
 void test_floats()
 {
-    token::TokenList results;
-    token::tokenize("1.0 16. .483 .123.", results);
+    TokenStream tokens("1.0 16. .483 .123.");
 
-    test_assert(results.size() == 8);
-    test_assert(results[0].text == "1.0");
-    test_assert(results[0].match == token::FLOAT_TOKEN);
-    test_assert(results[2].text == "16.");
-    test_assert(results[2].match == token::FLOAT_TOKEN);
-    test_assert(results[4].text == ".483");
-    test_assert(results[4].match == token::FLOAT_TOKEN);
-    test_assert(results[6].text == ".123");
-    test_assert(results[6].match == token::FLOAT_TOKEN);
-    test_assert(results[7].text == ".");
-    test_assert(results[7].match == token::DOT);
+    test_assert(tokens.nextIs(token::FLOAT_TOKEN));
+    test_assert(tokens.nextStr() == "1.0");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::FLOAT_TOKEN));
+    test_assert(tokens.nextStr() == "16.");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::FLOAT_TOKEN));
+    test_assert(tokens.nextStr() == ".483");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::WHITESPACE));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::FLOAT_TOKEN));
+    test_assert(tokens.nextStr() == ".123");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::DOT));
+    tokens.consume();
+    test_assert(tokens.finished());
 
-    token::TokenList results2;
-    token::tokenize("5.200", results2);
+    tokens.reset("5.200");
 
-    test_assert(results2.size() == 1);
-    test_assert(results2[0].text == "5.200");
-    test_assert(results2[0].match == token::FLOAT_TOKEN);
+    test_assert(tokens.nextIs(token::FLOAT_TOKEN));
+    test_assert(tokens.nextStr() == "5.200");
+    tokens.consume();
+    test_assert(tokens.finished());
 
     // Make sure that it ignores two dots. There once was a bug where
     // 0..1 would get parsed as 0. and then .1
-    token::TokenList dotted_results;
-    token::tokenize("0..1", dotted_results);
-    test_assert(dotted_results.size() == 3);
-    test_assert(dotted_results[0].match == token::INTEGER);
-    test_assert(dotted_results[1].match == token::TWO_DOTS);
-    test_assert(dotted_results[2].match == token::INTEGER);
+    tokens.reset("0..1");
+    test_assert(tokens.nextIs(token::INTEGER));
+    test_assert(tokens.nextStr() == "0");
+    tokens.consume();
+    test_assert(tokens.nextIs(token::TWO_DOTS));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::INTEGER));
+    test_assert(tokens.nextStr() == "1");
+    tokens.consume();
+    test_assert(tokens.finished());
 }
 
 void test_misc1()
 {
-    token::TokenList results;
-    token::tokenize(",()=?][<=>=", results);
+    TokenStream tokens(",()=?][<=>=");
 
-    test_assert(results[0].text == ",");
-    test_assert(results[0].match == token::COMMA);
-    test_assert(results[1].text == "(");
-    test_assert(results[1].match == token::LPAREN);
-    test_assert(results[2].text == ")");
-    test_assert(results[2].match == token::RPAREN);
-    test_assert(results[3].text == "=");
-    test_assert(results[3].match == token::EQUALS);
-    test_assert(results[4].text == "?");
-    test_assert(results[4].match == token::QUESTION);
-    test_assert(results[5].text == "]");
-    test_assert(results[5].match == token::RBRACKET);
-    test_assert(results[6].text == "[");
-    test_assert(results[6].match == token::LBRACKET);
-    test_assert(results[7].text == "<=");
-    test_assert(results[7].match == token::LTHANEQ);
-    test_assert(results[8].text == ">=");
-    test_assert(results[8].match == token::GTHANEQ);
-    test_assert(results.size() == 9);
+    test_assert(tokens.nextIs(token::COMMA));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::LPAREN));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::RPAREN));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::EQUALS));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::QUESTION));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::RBRACKET));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::LBRACKET));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::LTHANEQ));
+    tokens.consume();
+    test_assert(tokens.nextIs(token::GTHANEQ));
+    tokens.consume();
+    test_assert(tokens.finished());
 }
 
 void test_misc2()
@@ -134,39 +153,32 @@ void test_misc2()
 
 void test_misc3()
 {
-    token::TokenList results;
-    token::tokenize("&&!=..::", results);
-    test_assert(results.size() == 4);
-    test_assert(results[0].text == "&&");
-    test_assert(results[0].match == token::DOUBLE_AMPERSAND);
-    test_assert(results[1].text == "!=");
-    test_assert(results[1].match == token::NOT_EQUALS);
-    test_assert(results[2].text == "..");
-    test_assert(results[2].match == token::TWO_DOTS);
-    test_assert(results[3].text == "::");
-    test_assert(results[3].match == token::DOUBLE_COLON);
+    TokenStream tokens("&&!=..::");
+    tokens.consume(token::DOUBLE_AMPERSAND);
+    tokens.consume(token::NOT_EQUALS);
+    tokens.consume(token::TWO_DOTS);
+    tokens.consume(token::DOUBLE_COLON);
+    test_assert(tokens.finished());
 }
 
 void test_keywords()
 {
-    token::TokenList results;
-    token::tokenize("end,if,else,for,state,do once,elif", results);
+    TokenStream tokens("end,if,else,for,state,do once,elif");
 
-    test_assert(results.size() == 13);
-    test_assert(results[0].text == "end");
-    test_assert(results[0].match == token::END);
-    test_assert(results[2].text == "if");
-    test_assert(results[2].match == token::IF);
-    test_assert(results[4].text == "else");
-    test_assert(results[4].match == token::ELSE);
-    test_assert(results[6].text == "for");
-    test_assert(results[6].match == token::FOR);
-    test_assert(results[8].text == "state");
-    test_assert(results[8].match == token::STATE);
-    test_assert(results[10].text == "do once");
-    test_assert(results[10].match == token::DO_ONCE);
-    test_assert(results[12].text == "elif");
-    test_assert(results[12].match == token::ELIF);
+    tokens.consume(token::END);
+    tokens.consume(token::COMMA);
+    tokens.consume(token::IF);
+    tokens.consume(token::COMMA);
+    tokens.consume(token::ELSE);
+    tokens.consume(token::COMMA);
+    tokens.consume(token::FOR);
+    tokens.consume(token::COMMA);
+    tokens.consume(token::STATE);
+    tokens.consume(token::COMMA);
+    tokens.consume(token::DO_ONCE);
+    tokens.consume(token::COMMA);
+    tokens.consume(token::ELIF);
+    test_assert(tokens.finished());
 }
 
 void test_keywords2()
@@ -191,30 +203,31 @@ void test_keywords2()
 
 void test_identifiers_that_look_like_keywords()
 {
-    token::TokenList results;
-    token::tokenize("endup,iffy,else_,stateful", results);
+    TokenStream tokens("endup,iffy,else_,stateful");
 
-    test_assert(results.size() == 7);
-    test_assert(results[0].text == "endup");
-    test_assert(results[0].match == token::IDENTIFIER);
-    test_assert(results[2].text == "iffy");
-    test_assert(results[2].match == token::IDENTIFIER);
-    test_assert(results[4].text == "else_");
-    test_assert(results[4].match == token::IDENTIFIER);
-    test_assert(results[6].text == "stateful");
-    test_assert(results[6].match == token::IDENTIFIER);
+    test_equals(tokens.nextStr(), "endup");
+    tokens.consume(token::IDENTIFIER);
+    tokens.consume(token::COMMA);
+    test_equals(tokens.nextStr(), "iffy");
+    tokens.consume(token::IDENTIFIER);
+    tokens.consume(token::COMMA);
+    test_equals(tokens.nextStr(), "else_");
+    tokens.consume(token::IDENTIFIER);
+    tokens.consume(token::COMMA);
+    test_equals(tokens.nextStr(), "stateful");
+    tokens.consume(token::IDENTIFIER);
+    test_assert(tokens.finished());
 }
 
 void test_string_literal()
 {
-    token::TokenList results;
-    token::tokenize("\"string literal\"'string2'", results);
+    TokenStream tokens("\"string literal\"'string2'");
 
-    test_assert(results.size() == 2);
-    test_assert(results[0].text == "\"string literal\"");
-    test_assert(results[0].match == token::STRING);
-    test_assert(results[1].text == "'string2'");
-    test_assert(results[1].match == token::STRING);
+    test_equals(tokens.nextStr(), "\"string literal\"");
+    tokens.consume(token::STRING);
+    test_equals(tokens.nextStr(), "'string2'");
+    tokens.consume(token::STRING);
+    test_assert(tokens.finished());
 }
 
 void test_triple_quote_string_literal()
@@ -241,44 +254,6 @@ void test_token_stream()
     test_assert(tstream.nextNonWhitespaceIs(token::FLOAT_TOKEN, 1));
 }
 
-void token_stream_to_string()
-{
-    TokenStream tstream("hi + 0.123");
-
-    test_assert(tstream.toString() ==
-            "{index: 0, tokens: [IDENTIFIER \"hi\", WHITESPACE \" \", + \"+\", "
-            "WHITESPACE \" \", FLOAT \"0.123\"]}");
-}
-
-bool token_location_equals(token::Token& inst, int colStart, int colEnd, int lineStart, int lineEnd)
-{
-    return (inst.colStart == colStart) && (inst.colEnd == colEnd) && (inst.lineStart == lineStart) && (inst.lineEnd == lineEnd);
-}
-
-void test_locations()
-{
-    token::TokenList results;
-    token::tokenize("hello 1234", results);
-
-    test_assert(results.size() == 3);
-    test_assert(token_location_equals(results[0], 0, 5, 1, 1));
-    test_assert(token_location_equals(results[1], 5, 6, 1, 1));
-    test_assert(token_location_equals(results[2], 6, 10, 1, 1));
-
-    // Now try with some newlines
-    results.clear();
-    token::tokenize("hey  \n87654+\n\n1", results);
-    test_assert(results.size() == 8);
-    test_assert(token_location_equals(results[0], 0, 3, 1, 1));
-    test_assert(token_location_equals(results[1], 3, 5, 1, 1));
-    test_assert(token_location_equals(results[2], 5, 6, 1, 1)); // newline
-    test_assert(token_location_equals(results[3], 0, 5, 2, 2));
-    test_assert(token_location_equals(results[4], 5, 6, 2, 2));
-    test_assert(token_location_equals(results[5], 6, 7, 2, 2)); // newline
-    test_assert(token_location_equals(results[6], 0, 1, 3, 3)); // newline
-    test_assert(token_location_equals(results[7], 0, 1, 4, 4));
-}
-
 void test_consume_line()
 {
     TokenStream tokens("for in $#!$#@ 151 poop \nfin");
@@ -302,7 +277,7 @@ void test_consume_line()
 
     test_equals(errorline, "in $#!$#@ 151 poop ");
     test_assert(tokens.nextIs(token::IDENTIFIER));
-    test_assert(tokens.next().text == "fin");
+    test_equals(tokens.nextStr(), "fin");
 }
 
 void test_color_literal()
@@ -365,7 +340,7 @@ void test_preceding_indent()
                  "      d1 + d2\n");
 
     while (!tokens.finished()) {
-        std::string const& txt = tokens.next().text;
+        std::string const& txt = tokens.nextStr();
         if (txt[0] == 'a') {
             test_assert(tokens.next().precedingIndent == 0);
         } else if (txt[0] == 'b') {
@@ -433,8 +408,6 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_triple_quote_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
-    REGISTER_TEST_CASE(tokenizer_tests::token_stream_to_string);
-    REGISTER_TEST_CASE(tokenizer_tests::test_locations);
     REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);

@@ -243,7 +243,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
 
         int nextIndent = 0;
         if (tokens.nextIs(WHITESPACE))
-            nextIndent = (int) tokens.next().text.length();
+            nextIndent = (int) tokens.next().length();
 
         // Check if the next line is just a comment/whitespace
         bool ignore = lookahead_match_whitespace_statement(tokens)
@@ -378,7 +378,7 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // Avoid an infinite loop
     if (initialPosition == tokens.getPosition())
-        internal_error("parser::statement is stuck, next token is: " + tokens.next().text);
+        internal_error("parser::statement is stuck, next token is: " + tokens.nextStr());
 
     // Some functions have a post-compile step.
     post_compile_term(result.term);

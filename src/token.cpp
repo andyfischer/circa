@@ -94,8 +94,12 @@ const char* get_token_text(int match)
 std::string Token::toString() const
 {
     std::stringstream out;
-    out << get_token_text(match) << " \"" << text << "\"";
+    out << get_token_text(match);
     return out.str();
+}
+int Token::length() const
+{
+    return colEnd - colStart;
 }
 
 struct TokenizeContext
@@ -105,9 +109,9 @@ struct TokenizeContext
     int linePosition;
     int charPosition;
     int precedingIndent;
-    std::vector<Token> &results;
+    std::vector<Token> *results;
 
-    TokenizeContext(std::string const &_input, std::vector<Token> &_results)
+    TokenizeContext(std::string const &_input, std::vector<Token> *_results)
         : input(_input),
           nextIndex(0),
           linePosition(1),
@@ -149,11 +153,11 @@ struct TokenizeContext
         return nextIndex + lookahead < (int) input.length();
     }
 
-    void push(int match, int len) {
+    void consume(int match, int len) {
 
         Token instance;
         instance.match = match;
-        instance.text = this->input.substr(this->nextIndex, len);
+        instance.charIndex = this->nextIndex;
 
         // Record where this token starts
         instance.lineStart = this->linePosition;
@@ -191,7 +195,7 @@ struct TokenizeContext
         ca_assert((instance.colEnd > instance.colStart) ||
                 instance.lineStart < instance.lineEnd);
 
-        results.push_back(instance);
+        results->push_back(instance);
     }
 };
 
@@ -207,7 +211,7 @@ void consume_string_literal(TokenizeContext &context);
 void consume_triple_quoted_string_literal(TokenizeContext &context);
 void consume_color_literal(TokenizeContext &context);
 
-void tokenize(std::string const &input, TokenList &results)
+void tokenize(std::string const &input, TokenList* results)
 {
     TokenizeContext context(input, results);
 
@@ -272,7 +276,7 @@ bool try_to_consume_keyword(TokenizeContext& context, int keyword)
         return false;
 
     // Keyword matches, now consume it
-    context.push(keyword, str_len);
+    context.consume(keyword, str_len);
 
     return true;
 }
@@ -331,108 +335,108 @@ void top_level_consume_token(TokenizeContext &context)
     // Check for specific characters
     switch(context.next()) {
         case '(':
-            context.push(LPAREN, 1);
+            context.consume(LPAREN, 1);
             return;
         case ')':
-            context.push(RPAREN, 1);
+            context.consume(RPAREN, 1);
             return;
         case '{':
-            context.push(LBRACE, 1);
+            context.consume(LBRACE, 1);
             return;
         case '}':
-            context.push(RBRACE, 1);
+            context.consume(RBRACE, 1);
             return;
         case '[':
-            context.push(LBRACKET, 1);
+            context.consume(LBRACKET, 1);
             return;
         case ']':
-            context.push(RBRACKET, 1);
+            context.consume(RBRACKET, 1);
             return;
         case ',':
-            context.push(COMMA, 1);
+            context.consume(COMMA, 1);
             return;
         case '@':
-            context.push(AT_SIGN, 1);
+            context.consume(AT_SIGN, 1);
             return;
         case '=':
             if (context.next(1) == '=') {
-                context.push(DOUBLE_EQUALS, 2);
+                context.consume(DOUBLE_EQUALS, 2);
                 return;
             } 
 
-            context.push(EQUALS, 1);
+            context.consume(EQUALS, 1);
             return;
         case '"':
         case '\'':
             consume_string_literal(context);
             return;
         case '\n':
-            context.push(NEWLINE, 1);
+            context.consume(NEWLINE, 1);
             return;
         case '.':
             if (context.next(1) == '.') {
                 if (context.next(2) == '.') {
-                    context.push(ELLIPSIS, 3); 
+                    context.consume(ELLIPSIS, 3); 
                 } else {
-                    context.push(TWO_DOTS, 2);
+                    context.consume(TWO_DOTS, 2);
                 }
             } else {
-                context.push(DOT, 1);
+                context.consume(DOT, 1);
             }
             return;
         case '?':
-            context.push(QUESTION, 1);
+            context.consume(QUESTION, 1);
             return;
         case '*':
             if (context.next(1) == '=') {
-                context.push(STAR_EQUALS, 2);
+                context.consume(STAR_EQUALS, 2);
                 return;
             }
 
-            context.push(STAR, 1);
+            context.consume(STAR, 1);
             return;
         case '/':
             if (context.next(1) == '=') {
-                context.push(SLASH_EQUALS, 2);
+                context.consume(SLASH_EQUALS, 2);
                 return;
             }
             if (context.next(1) == '/') {
-                context.push(DOUBLE_SLASH, 2);
+                context.consume(DOUBLE_SLASH, 2);
                 return;
             }
-            context.push(SLASH, 1);
+            context.consume(SLASH, 1);
             return;
         case '!':
             if (context.next(1) == '=') {
-                context.push(NOT_EQUALS, 2);
+                context.consume(NOT_EQUALS, 2);
                 return;
             }
             break;
 
         case ':':
             if (context.next(1) == '=') {
-                context.push(COLON_EQUALS, 2);
+                context.consume(COLON_EQUALS, 2);
                 return;
             }
             else if (context.next(1) == ':') {
-                context.push(DOUBLE_COLON, 2);
+                context.consume(DOUBLE_COLON, 2);
                 return;
             } else if (is_identifier_first_letter(context.next(1))) {
                 return consume_symbol(context);
             }
 
-            context.push(COLON, 1);
+            context.consume(COLON, 1);
             return;
         case '+':
             if (context.next(1) == '=') {
-                context.push(PLUS_EQUALS, 2);
+                context.consume(PLUS_EQUALS, 2);
             } else {
-                context.push(PLUS, 1);
+                context.consume(PLUS, 1);
             }
             return;
         case '-':
             if (context.next(1) == '>') {
-                context.push(RIGHT_ARROW, 2);
+                context.consume(RIGHT_ARROW, 2);
                 return;
             }
 
@@ -440,11 +444,11 @@ void top_level_consume_token(TokenizeContext &context)
                 return consume_comment(context);
 
             if (context.next(1) == '=') {
-                context.push(MINUS_EQUALS, 2);
+                context.consume(MINUS_EQUALS, 2);
                 return;
             }
 
-            context.push(MINUS, 1);
+            context.consume(MINUS, 1);
             return;
 
         case '<':
@@ -454,46 +458,46 @@ void top_level_consume_token(TokenizeContext &context)
             }
 
             if (context.next(1) == '=') {
-                context.push(LTHANEQ, 2);
+                context.consume(LTHANEQ, 2);
                 return;
             }
             if (context.next(1) == '-') {
-                context.push(LEFT_ARROW, 2);
+                context.consume(LEFT_ARROW, 2);
                 return;
             }
-            context.push(LTHAN, 1);
+            context.consume(LTHAN, 1);
             return;
 
         case '>':
             if (context.next(1) == '=') {
-                context.push(GTHANEQ, 2);
+                context.consume(GTHANEQ, 2);
                 return;
             }
-            context.push(GTHAN, 1);
+            context.consume(GTHAN, 1);
             return;
 
         case '%':
-            context.push(PERCENT, 1);
+            context.consume(PERCENT, 1);
             return;
 
         case '|':
             if (context.next(1) == '|') {
-                context.push(DOUBLE_VERTICAL_BAR, 2);
+                context.consume(DOUBLE_VERTICAL_BAR, 2);
                 return;
             }
             break;
 
         case '&':
             if (context.next(1) == '&') {
-                context.push(DOUBLE_AMPERSAND, 2);
+                context.consume(DOUBLE_AMPERSAND, 2);
                 return;
             }
 
-            context.push(AMPERSAND, 1);
+            context.consume(AMPERSAND, 1);
             return;
 
         case ';':
-            context.push(SEMICOLON, 1);
+            context.consume(SEMICOLON, 1);
             return;
 
         case '#':
@@ -505,7 +509,7 @@ void top_level_consume_token(TokenizeContext &context)
     }
 
     // Fall through, consume the next letter as UNRECOGNIZED
-    context.push(UNRECOGNIZED, 1);
+    context.consume(UNRECOGNIZED, 1);
 }
 
 void consume_identifier(TokenizeContext &context)
@@ -514,7 +518,7 @@ void consume_identifier(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.push(IDENTIFIER, lookahead);
+    context.consume(IDENTIFIER, lookahead);
 }
 
 void consume_whitespace(TokenizeContext &context)
@@ -523,7 +527,7 @@ void consume_whitespace(TokenizeContext &context)
     while (is_whitespace(context.next(lookahead)))
         lookahead++;
 
-    context.push(WHITESPACE, lookahead);
+    context.consume(WHITESPACE, lookahead);
 }
 
 void consume_comment(TokenizeContext& context)
@@ -532,7 +536,7 @@ void consume_comment(TokenizeContext& context)
     while (context.withinRange(lookahead) && !is_newline(context.next(lookahead)))
         lookahead++;
 
-    context.push(COMMENT, lookahead);
+    context.consume(COMMENT, lookahead);
 }
 
 bool match_number(TokenizeContext &context)
@@ -588,9 +592,9 @@ void consume_number(TokenizeContext &context)
     }
 
     if (dot_encountered)
-        context.push(FLOAT_TOKEN, lookahead);
+        context.consume(FLOAT_TOKEN, lookahead);
     else
-        context.push(INTEGER, lookahead);
+        context.consume(INTEGER, lookahead);
 }
 
 void consume_hex_number(TokenizeContext &context)
@@ -603,7 +607,7 @@ void consume_hex_number(TokenizeContext &context)
     while (is_hexadecimal_digit(context.next(lookahead)))
         lookahead++;
 
-    context.push(HEX_INTEGER, lookahead);
+    context.consume(HEX_INTEGER, lookahead);
 }
 
 void consume_string_literal(TokenizeContext &context)
@@ -631,7 +635,7 @@ void consume_string_literal(TokenizeContext &context)
     // consume ending quote
     lookahead++;
 
-    context.push(STRING, lookahead);
+    context.consume(STRING, lookahead);
 }
 
 void consume_triple_quoted_string_literal(TokenizeContext &context)
@@ -649,7 +653,7 @@ void consume_triple_quoted_string_literal(TokenizeContext &context)
 
     // Consume closing >>>
     lookahead += 3;
-    context.push(STRING, lookahead);
+    context.consume(STRING, lookahead);
 }
 
 void consume_color_literal(TokenizeContext &context)
@@ -666,9 +670,9 @@ void consume_color_literal(TokenizeContext &context)
 
     // acceptable lengths are 3, 4, 6 or 8 characters (not including #)
     if (hex_digits == 3 || hex_digits == 4 || hex_digits == 6 || hex_digits == 8)
-        context.push(COLOR, lookahead);
+        context.consume(COLOR, lookahead);
     else
-        context.push(UNRECOGNIZED, lookahead);
+        context.consume(UNRECOGNIZED, lookahead);
 }
 
 void consume_symbol(TokenizeContext &context)
@@ -681,7 +685,7 @@ void consume_symbol(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.push(SYMBOL, lookahead);
+    context.consume(SYMBOL, lookahead);
 }
 
 } // namespace token

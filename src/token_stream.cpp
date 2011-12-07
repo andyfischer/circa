@@ -20,6 +20,11 @@ TokenStream::next(int lookahead) const
     return tokens[i];
 }
 
+std::string TokenStream::nextStr(int lookahead) const
+{
+    return _sourceText.substr(next(lookahead).charIndex, next(lookahead).length());
+}
+
 int
 TokenStream::findNextNonWhitespace(int lookahead) const
 {
@@ -73,11 +78,13 @@ TokenStream::consume(int match)
         std::stringstream msg;
         msg << "Unexpected token (expected " << token::get_token_text(match)
             << ", found " << token::get_token_text(next().match)
-            << " '" << next().text << "')";
+            << " '" << nextStr() << "')";
         throw std::runtime_error(msg.str());
     }
 
-    return tokens[_position++].text;
+    std::string out = nextStr();
+    _position++;
+    return out;
 }
 
 bool
@@ -123,7 +130,7 @@ void print_remaining_tokens(std::ostream& out, TokenStream& tokens)
     for (int i=0; i < tokens.remaining(); i++) {
         if (i != 0) out << " ";
         out << token::get_token_text(tokens.next(i).match);
-        out << "(" << tokens.next(i).text << ")";
+        out << "(" << tokens.nextStr(i) << ")";
     }
 }
 

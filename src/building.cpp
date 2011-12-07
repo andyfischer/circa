@@ -1116,8 +1116,6 @@ void check_to_add_state_output_placeholder(Branch* branch)
     if (result == NULL)
         return;
 
-    int inputPos = find_state_input(branch)->index;
-
     Term* output = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
     output->setBoolProp("state", true);
 }

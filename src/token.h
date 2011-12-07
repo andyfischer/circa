@@ -12,16 +12,17 @@ namespace token {
 struct Token
 {
     int match;
-    std::string text;
+    int charIndex;
     int lineStart;
     int lineEnd;
     int colStart;
     int colEnd;
     int precedingIndent;
 
-    Token() : match(0), lineStart(0), lineEnd(0), colStart(0), colEnd(0), precedingIndent(0) {}
+    Token() : match(0), charIndex(0), lineStart(0), lineEnd(0), colStart(0), colEnd(0), precedingIndent(0) {}
 
     std::string toString() const;
+    int length() const;
 };
 
 typedef std::vector<Token> TokenList;
@@ -111,7 +112,7 @@ const int EOF_TOKEN = 83;
 const int UNRECOGNIZED = 90;
 
 const char* get_token_text(int match);
-void tokenize(std::string const &input, TokenList &results);
+void tokenize(std::string const &input, TokenList* results);
 
 } // namespace token
 } // namespace circa
