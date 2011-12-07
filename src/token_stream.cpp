@@ -67,7 +67,7 @@ bool TokenStream::nextIs(int match, int lookahead) const
     return next(lookahead).match == match;
 }
 
-std::string
+void
 TokenStream::consume(int match)
 {
     if (finished())
@@ -82,8 +82,13 @@ TokenStream::consume(int match)
         throw std::runtime_error(msg.str());
     }
 
-    std::string out = nextStr();
     _position++;
+}
+std::string
+TokenStream::consumeStr(int match)
+{
+    std::string out = nextStr();
+    consume(match);
     return out;
 }
 

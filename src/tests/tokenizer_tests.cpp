@@ -139,16 +139,16 @@ void test_misc1()
 void test_misc2()
 {
     TokenStream tokens("<>:;%...<-//&");
-    test_assert(tokens.consume(token::LTHAN) == "<");
-    test_assert(tokens.consume(token::GTHAN) == ">");
-    test_assert(tokens.consume(token::COLON) == ":");
-    test_assert(tokens.consume(token::SEMICOLON) == ";");
-    test_assert(tokens.consume(token::PERCENT) == "%");
-    test_assert(tokens.consume(token::ELLIPSIS) == "...");
-    test_assert(tokens.consume(token::LEFT_ARROW) == "<-");
-    test_assert(tokens.consume(token::DOUBLE_SLASH) == "//");
-    test_assert(tokens.consume(token::AMPERSAND) == "&");
-    test_assert(tokens.finished());
+    tokens.consume(token::LTHAN);
+    tokens.consume(token::GTHAN);
+    tokens.consume(token::COLON);
+    tokens.consume(token::SEMICOLON);
+    tokens.consume(token::PERCENT);
+    tokens.consume(token::ELLIPSIS);
+    tokens.consume(token::LEFT_ARROW);
+    tokens.consume(token::DOUBLE_SLASH);
+    tokens.consume(token::AMPERSAND);
+    tokens.finished();
 }
 
 void test_misc3()
@@ -185,19 +185,19 @@ void test_keywords2()
 {
     TokenStream tokens("and or discard return null switch case");
 
-    test_assert(tokens.consume(token::AND) == "and");
-    test_assert(tokens.consume(token::WHITESPACE) == " ");
-    test_assert(tokens.consume(token::OR) == "or");
-    test_assert(tokens.consume(token::WHITESPACE) == " ");
-    test_assert(tokens.consume(token::DISCARD) == "discard");
-    test_assert(tokens.consume(token::WHITESPACE) == " ");
-    test_assert(tokens.consume(token::RETURN) == "return");
-    test_assert(tokens.consume(token::WHITESPACE) == " ");
-    test_assert(tokens.consume(token::NULL_TOKEN) == "null");
-    test_assert(tokens.consume(token::WHITESPACE) == " ");
-    test_assert(tokens.consume(token::SWITCH) == "switch");
-    test_assert(tokens.consume(token::WHITESPACE) == " ");
-    test_assert(tokens.consume(token::CASE) == "case");
+    tokens.consume(token::AND);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::OR);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::DISCARD);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::RETURN);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::NULL_TOKEN);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::SWITCH);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::CASE);
     test_assert(tokens.finished());
 }
 
@@ -233,11 +233,11 @@ void test_string_literal()
 void test_triple_quote_string_literal()
 {
     TokenStream tokens("<<<a string>>>");
-    test_equals(tokens.consume(token::STRING), "<<<a string>>>");
+    test_equals(tokens.consumeStr(token::STRING), "<<<a string>>>");
     test_assert(tokens.finished());
 
     tokens.reset("<<< hi > >> >>> >>>");
-    test_equals(tokens.consume(token::STRING), "<<< hi > >> >>>");
+    test_equals(tokens.consumeStr(token::STRING), "<<< hi > >> >>>");
     tokens.consume(token::WHITESPACE);
     tokens.consume(token::GTHAN);
     tokens.consume(token::GTHAN);
@@ -283,23 +283,23 @@ void test_consume_line()
 void test_color_literal()
 {
     TokenStream tokens("#faf");
-    test_equals(tokens.consume(token::COLOR), "#faf");
+    test_equals(tokens.consumeStr(token::COLOR), "#faf");
     test_assert(tokens.finished());
 
     tokens.reset("#119f");
-    test_equals(tokens.consume(token::COLOR), "#119f");
+    test_equals(tokens.consumeStr(token::COLOR), "#119f");
     test_assert(tokens.finished());
 
     tokens.reset("#ff1100");
-    test_equals(tokens.consume(token::COLOR), "#ff1100");
+    test_equals(tokens.consumeStr(token::COLOR), "#ff1100");
 
     tokens.reset("#00112299");
-    test_equals(tokens.consume(token::COLOR), "#00112299");
+    test_equals(tokens.consumeStr(token::COLOR), "#00112299");
     test_assert(tokens.finished());
 
     // test wrong # of characters
     tokens.reset("#00111");
-    test_equals(tokens.consume(token::UNRECOGNIZED), "#00111");
+    test_equals(tokens.consumeStr(token::UNRECOGNIZED), "#00111");
     test_assert(tokens.finished());
 }
 
@@ -307,16 +307,14 @@ void test_keyword_followed_by_lparen()
 {
     TokenStream tokens("if(");
 
-    test_assert(tokens.nextIs(token::IDENTIFIER));
-    test_equals(tokens.consume(), "if");
-    test_assert(tokens.nextIs(token::LPAREN));
-    tokens.consume();
+    test_equals(tokens.consumeStr(token::IDENTIFIER), "if");
+    tokens.consume(token::LPAREN);
     test_assert(tokens.finished());
 
     tokens.reset("if (");
-    test_equals(tokens.consume(token::IF), "if");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::LPAREN), "(");
+    tokens.consume(token::IF);
+    tokens.consume(token::WHITESPACE);
+    tokens.consume(token::LPAREN);
     test_assert(tokens.finished());
 }
 
@@ -357,40 +355,40 @@ void test_preceding_indent()
 void test_comment()
 {
     TokenStream tokens("1 2 -- this is a comment");
-    test_equals(tokens.consume(token::INTEGER), "1");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::INTEGER), "2");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::COMMENT), "-- this is a comment");
+    test_equals(tokens.consumeStr(token::INTEGER), "1");
+    test_equals(tokens.consumeStr(token::WHITESPACE), " ");
+    test_equals(tokens.consumeStr(token::INTEGER), "2");
+    test_equals(tokens.consumeStr(token::WHITESPACE), " ");
+    test_equals(tokens.consumeStr(token::COMMENT), "-- this is a comment");
     test_assert(tokens.finished());
 
     tokens.reset("1 2 # this is a comment");
-    test_equals(tokens.consume(token::INTEGER), "1");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::INTEGER), "2");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::COMMENT), "# this is a comment");
+    test_equals(tokens.consumeStr(token::INTEGER), "1");
+    test_equals(tokens.consumeStr(token::WHITESPACE), " ");
+    test_equals(tokens.consumeStr(token::INTEGER), "2");
+    test_equals(tokens.consumeStr(token::WHITESPACE), " ");
+    test_equals(tokens.consumeStr(token::COMMENT), "# this is a comment");
     test_assert(tokens.finished());
 }
 
 void test_symbols()
 {
     TokenStream tokens(":abc :a :1");
-    test_equals(tokens.consume(token::SYMBOL), ":abc");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::SYMBOL), ":a");
-    test_equals(tokens.consume(token::WHITESPACE), " ");
-    test_equals(tokens.consume(token::COLON), ":");
-    test_equals(tokens.consume(token::INTEGER), "1");
+    test_equals(tokens.consumeStr(token::SYMBOL), ":abc");
+    test_equals(tokens.consumeStr(token::WHITESPACE), " ");
+    test_equals(tokens.consumeStr(token::SYMBOL), ":a");
+    test_equals(tokens.consumeStr(token::WHITESPACE), " ");
+    test_equals(tokens.consumeStr(token::COLON), ":");
+    test_equals(tokens.consumeStr(token::INTEGER), "1");
     test_assert(tokens.finished());
 }
 
 void test_number_followed_by_dot_call()
 {
     TokenStream tokens("1.something");
-    test_equals(tokens.consume(token::INTEGER), "1");
-    test_equals(tokens.consume(token::DOT), ".");
-    test_equals(tokens.consume(token::IDENTIFIER), "something");
+    test_equals(tokens.consumeStr(token::INTEGER), "1");
+    test_equals(tokens.consumeStr(token::DOT), ".");
+    test_equals(tokens.consumeStr(token::IDENTIFIER), "something");
     test_assert(tokens.finished());
 }
 

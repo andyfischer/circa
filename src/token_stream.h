@@ -58,11 +58,13 @@ struct TokenStream
 
     bool nextIs(int match, int lookahead=0) const;
 
-    // Consume the next token and return its text contents. If a token match is provided,
-    // and the next token doesn't have this match, then we throw an exception. This check
-    // should only be used as a form of assert; an expected match failure should be
-    // caught ahead of time.
-    std::string consume(int match = -1);
+    // Consume the next token. If a token match is provided, and the next token doesn't
+    // have this match, then we trigger a fatal error. This matching should be treated
+    // like an assert().
+    void consume(int match = -1);
+
+    // Like consume(), but also returns the text of the consumed token.
+    std::string consumeStr(int match = -1);
 
     bool nextNonWhitespaceIs(int match, int lookahead=0) const;
 
