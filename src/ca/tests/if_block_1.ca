@@ -1,8 +1,7 @@
 
-# Rebind a name because it's bound in every branch
+# Rebind an outer name
+a = 'outer'
 if true
-    a = 1
-else
-    a = 2
+    a = 'inner'
 
-print('should be 1: ' a)
+print('should be inner: ' a)

@@ -23,6 +23,51 @@
 
 namespace circa {
 
+struct CaseIterator
+{
+    BranchIteratorFlat branchIterator;
+
+    CaseIterator(Branch* branch)
+      : branchIterator(branch)
+    {
+        advanceWhileInvalid();
+    }
+     
+    bool finished()
+    {
+        return branchIterator.finished();
+    }
+    void advance()
+    {
+        branchIterator.index++;
+        advanceWhileInvalid();
+    }
+    void advanceWhileInvalid()
+    {
+    possibly_invalid:
+        if (finished())
+            return;
+
+        if (branchIterator.current()->function != CASE_FUNC) {
+            branchIterator.advance();
+            goto possibly_invalid;
+        }
+    }
+
+    Term* current()
+    {
+        ca_assert(branchIterator.current()->function == CASE_FUNC);
+        return branchIterator.current();
+    }
+    int index()
+    {
+        return branchIterator.index;
+    }
+
+    bool unfinished() { return !finished(); }
+    void operator++() { advance(); }
+};
+
 void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm);
 void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents);
 
@@ -39,8 +84,6 @@ int if_block_count_cases(Term* term)
 Term* if_block_add_input(Term* ifBlock, Term* input)
 {
     Branch* contents = nested_contents(ifBlock);
-    //std::cout << "adding input.." << std::endl;
-    //dump(contents);
 
     int existingInputCount = ifBlock->numInputs();
 
@@ -51,11 +94,8 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     set_input(ifBlock, existingInputCount, input);
 
     // Add a corresponding input placeholder to each case
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function != CASE_FUNC)
-            continue;
-
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        Term* term = it.current();
         Branch* caseContents = nested_contents(term);
         ca_assert(count_input_placeholders(caseContents) == existingInputCount);
         Term* casePlaceholder = append_input_placeholder(caseContents);
@@ -63,6 +103,51 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     }
 
     return placeholder;
+}
+
+Term* if_block_prepend_output(Term* ifBlock)
+{
+    Branch* contents = nested_contents(ifBlock);
+
+    Term* placeholder = prepend_output_placeholder(contents, NULL);
+    for (CaseIterator it(contents); it.unfinished(); it.advance())
+        prepend_output_placeholder(nested_contents(it.current()), NULL);
+    return placeholder;
+}
+
+Term* if_block_append_output(Term* ifBlock)
+{
+    Branch* contents = nested_contents(ifBlock);
+
+    Term* placeholder = append_output_placeholder(contents, NULL);
+
+    // Add a corresponding output placeholder to each case
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        Branch* caseContents = nested_contents(it.current());
+        /*Term* casePlaceholder =*/ append_output_placeholder(caseContents, NULL);
+    }
+
+    return placeholder;
+}
+
+Term* if_block_add_output_for_name(Term* ifCall, const char* name)
+{
+    // Fix the new output placeholders to have the correct name and input.
+    Branch* mainBranch = nested_contents(ifCall);
+    int outputCount = count_output_placeholders(mainBranch);
+    Term* outputPlaceholder = if_block_append_output(ifCall);
+    rename(outputPlaceholder, name);
+
+    for (CaseIterator it(mainBranch); it.unfinished(); it.advance()) {
+        Branch* caseContents = nested_contents(it.current());
+        Term* casePlaceholder = get_output_placeholder(caseContents, outputCount);
+        ca_assert(casePlaceholder != NULL);
+        ca_assert(casePlaceholder->name == "");
+        rename(casePlaceholder, name);
+        set_input(casePlaceholder, 0, find_name(caseContents, name));
+        respecialize_type(casePlaceholder);
+    }
+    return outputPlaceholder;
 }
 
 Term* if_block_get_case(Term* term, int index)
@@ -120,13 +205,38 @@ void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
     //std::cout << "finished appended case.." << std::endl;
 }
 
+void append_state_placeholders_if_needed(Branch* branch)
+{
+    if (!has_state_input(branch))
+        append_state_input(branch);
+    if (!has_state_output(branch))
+        append_state_output(branch);
+}
+
+void if_block_normalize_state_inputs(Term* ifBlock)
+{
+    Branch* contents = nested_contents(ifBlock);
+
+    // Check if any branches have a state input
+    bool anyState = false;
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        if (has_state_input(nested_contents(it.current())))
+            anyState = true;
+    }
+
+    if (!anyState)
+        return;
+
+    append_state_placeholders_if_needed(contents);
+    for (CaseIterator it(contents); it.unfinished(); it.advance())
+        append_state_placeholders_if_needed(nested_contents(it.current()));
+}
+
 bool if_block_is_name_bound_in_every_case(Branch* contents, const char* name)
 {
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function == CASE_FUNC)
-            if (!nested_contents(term)->contains(name))
-                return false;
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        if (!nested_contents(it.current())->contains(name))
+            return false;
     }
     return true;
 }
@@ -137,12 +247,8 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
     TermList outerTerms;
 
     // Find outer pointers across each case
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function != CASE_FUNC)
-            continue;
-
-        list_outer_pointers(nested_contents(term), &outerTerms);
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        list_outer_pointers(nested_contents(it.current()), &outerTerms);
     }
 
     ca_assert(ifCall->numInputs() == 0);
@@ -155,12 +261,8 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
         Term* placeholder = append_input_placeholder(nested_contents(ifCall));
 
         // Go through each case and repoint to this new placeholder
-        for (int j=0; j < contents->length(); j++) {
-            Term* term = contents->get(j);
-            if (term->function != CASE_FUNC)
-                continue;
-
-            remap_pointers_quick(nested_contents(term), outer, placeholder);
+        for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+            remap_pointers_quick(nested_contents(it.current()), outer, placeholder);
         }
     }
 }
@@ -210,6 +312,103 @@ void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
     }
 }
 
+void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBranch)
+{
+    Branch* mainBranch = nested_contents(ifCall);
+    Branch* outerBranch = ifCall->owningBranch;
+
+    for (int i=0; i < caseBranch->length(); i++) {
+        Term* term = caseBranch->get(i);
+        if (term->name == "")
+            continue;
+
+        const char* name = term->name.c_str();
+        Term* outer = find_name(outerBranch, name);
+        if (outer == NULL)
+            continue;
+
+        // This term rebinds an outer name.
+
+        // First, bring in the outer name as an input to the branch.
+
+        // Check if we already have an output for this name.
+        Term* inputPlaceholder = find_input_placeholder_with_name(mainBranch, name);
+
+        // Create it if necessary
+        if (inputPlaceholder == NULL) {
+            inputPlaceholder = if_block_add_input(ifCall, outer);
+            rename(inputPlaceholder, name);
+
+            // Fix the new input placeholders to have the correct name and input.
+            for (CaseIterator it(mainBranch); it.unfinished(); it.advance()) {
+                Branch* caseContents = nested_contents(it.current());
+                Term* casePlaceholder = get_input_placeholder(caseContents,
+                    inputPlaceholder->index);
+                ca_assert(casePlaceholder != NULL);
+                rename(casePlaceholder, name);
+            }
+        }
+
+        // Now make sure there is an output placeholder for this name.
+        Term* outputPlaceholder = find_output_placeholder_with_name(mainBranch, name);
+
+        if (outputPlaceholder == NULL)
+            outputPlaceholder = if_block_add_output_for_name(ifCall, name);
+    }
+}
+
+void write_all_names_to_list(Branch* branch, List* names)
+{
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        if (term->name != "")
+            set_string(names->append(), term->name);
+    }
+}
+
+void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
+{
+    // Find names which are bound in every branch (and not already outputs)
+    Branch* contents = nested_contents(ifCall);
+
+    bool firstBranch = true;
+    List names;
+
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        Branch* caseBranch = nested_contents(it.current());
+
+        if (firstBranch) {
+            firstBranch = false;
+            write_all_names_to_list(caseBranch, &names);
+
+            // remove names that are already outputs
+            for (int i=0; i < names.length(); i++) {
+                Term* existing = contents->get(as_cstring(names[i]));
+                if (existing != NULL && existing->function == OUTPUT_PLACEHOLDER_FUNC)
+                    set_null(names[i]);
+            }
+
+            continue;
+        }
+
+        // search through 'names' and remove any not in this branch.
+        for (int i=0; i < names.length(); i++) {
+            if (is_null(names[i]))
+                continue;
+            if (caseBranch->get(as_cstring(names[i])) == NULL)
+                set_null(names[i]);
+        }
+    }
+
+    names.removeNulls();
+    // std::cout << names.toString() << std::endl;
+
+    for (int i=0; i < names.length(); i++) {
+        if_block_add_output_for_name(ifCall, as_cstring(names[i]));
+    }
+}
+
+#if 0
 void if_block_update_master_placeholders(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
@@ -291,7 +490,9 @@ void if_block_update_master_placeholders(Term* ifCall)
     // Finally, add a primary output
     apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 }
+#endif
 
+#if 0
 bool does_output_placeholder_exist(Branch* branch, Term* placeholder)
 {
     for (int i=0;; i++) {
@@ -303,7 +504,9 @@ bool does_output_placeholder_exist(Branch* branch, Term* placeholder)
             return true;
     }
 }
+#endif
 
+#if 0
 void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
 {
     Branch* masterContents = nested_contents(ifCall);
@@ -357,6 +560,7 @@ void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm)
         copy(&masterPlaceholder->properties, &placeholder->properties);
     }
 }
+#endif
 
 void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
 {
@@ -410,20 +614,24 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
 
 void finish_if_block(Term* ifBlock)
 {
-    // if_block_create_input_placeholders_for_outer_pointers(ifBlock);
-    //dump(nested_contents(ifBlock));
-    if_block_update_master_placeholders(ifBlock);
-
     Branch* contents = nested_contents(ifBlock);
+
+    // Make sure there is a primary output
+    if (get_output_placeholder(contents, 0) == NULL)
+        if_block_prepend_output(ifBlock);
+
+    if_block_normalize_state_inputs(ifBlock);
+
     int caseIndex = 0;
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function == CASE_FUNC) {
-            if_block_update_case_placeholders_from_master(ifBlock, term);
-            modify_branch_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
-            caseIndex++;
-        }
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+        if_block_turn_outer_name_rebinds_into_outputs(ifBlock, nested_contents(term));
+        if_block_fix_outer_pointers(ifBlock, nested_contents(term));
+        modify_branch_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
+        caseIndex++;
     }
+
+    if_block_turn_common_rebinds_into_outputs(ifBlock);
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);
     check_to_insert_implicit_inputs(ifBlock);

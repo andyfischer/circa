@@ -136,6 +136,37 @@ void UpwardIterator::advance()
     } while (unfinished() && current() == NULL);
 }
 
+BranchIteratorFlat::BranchIteratorFlat(Branch* branchIn)
+ : branch(branchIn), index(0)
+{
+    advanceWhileInvalid();
+}
+
+bool BranchIteratorFlat::finished()
+{
+    return index >= branch->length();
+}
+void BranchIteratorFlat::advance()
+{
+    index++;
+    advanceWhileInvalid();
+}
+void BranchIteratorFlat::advanceWhileInvalid()
+{
+possibly_invalid:
+
+    if (finished())
+        return;
+
+    if (branch->get(index) == NULL) {
+        index++;
+        goto possibly_invalid;
+    }
+}
+Term* BranchIteratorFlat::current()
+{
+    return branch->get(index);
+}
 
 BranchInputIterator::BranchInputIterator(Branch* branchIn)
  : branch(branchIn)

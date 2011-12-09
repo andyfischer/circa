@@ -1,0 +1,8 @@
+
+# Rebind a name because it's bound in every branch
+if true
+    a = 1
+else
+    a = 2
+
+print('should be 1: ' a)

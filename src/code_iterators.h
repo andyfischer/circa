@@ -60,6 +60,23 @@ struct UpwardIterator
     void operator++() { advance(); }
 };
 
+struct BranchIteratorFlat
+{
+    Branch* branch;
+    int index;
+
+    BranchIteratorFlat(Branch* branch);
+
+    bool finished();
+    void advance();
+    void advanceWhileInvalid();
+
+    Term* current();
+
+    bool unfinished() { return !finished(); }
+    void operator++() { advance(); }
+};
+
 // This iterator steps over each input of each term in the branch. It will skip
 // over any NULL terms, and it will skip over NULL inputs.
 struct BranchInputIterator

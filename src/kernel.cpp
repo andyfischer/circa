@@ -185,6 +185,13 @@ CA_FUNCTION(evaluate_output_placeholder)
     copy(INPUT(0), OUTPUT);
 }
 
+Type* output_placeholder_specializeType(Term* caller)
+{
+    if (caller->input(0) == NULL)
+        return NULL;
+    return declared_type(caller->input(0));
+}
+
 CA_FUNCTION(file__modified_time)
 {
     set_int(OUTPUT, get_modified_time(STRING_INPUT(0)));
@@ -340,6 +347,7 @@ void bootstrap_kernel()
     initialize_function(OUTPUT_PLACEHOLDER_FUNC);
     as_function(OUTPUT_PLACEHOLDER_FUNC)->name = "output_placeholder";
     as_function(OUTPUT_PLACEHOLDER_FUNC)->evaluate = evaluate_output_placeholder;
+    as_function(OUTPUT_PLACEHOLDER_FUNC)->specializeType = output_placeholder_specializeType;
     ca_assert(function_get_output_type(OUTPUT_PLACEHOLDER_FUNC, 0) == &ANY_T);
 
     // Fix some holes in value() function

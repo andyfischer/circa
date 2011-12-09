@@ -84,9 +84,12 @@ int count_input_placeholders(Branch* branch);
 int count_output_placeholders(Branch* branch);
 bool has_variable_args(Branch* branch);
 Term* find_input_placeholder_with_name(Branch* branch, const char* name);
+Term* find_output_placeholder_with_name(Branch* branch, const char* name);
 
 // Add an input_placeholder() term after the existing placeholders.
 Term* append_input_placeholder(Branch* branch);
+Term* append_output_placeholder(Branch* branch, Term* result);
+Term* prepend_output_placeholder(Branch* branch, Term* result);
 
 Branch* term_get_function_details(Term* call);
 
@@ -109,8 +112,10 @@ bool term_is_state_input(Term* term, int index);
 Term* find_state_input(Branch* branch);
 bool has_state_input(Branch* branch);
 Term* find_state_output(Branch* branch);
-Term* insert_state_input(Branch* branch);
+bool has_state_output(Branch* branch);
+Term* append_state_input(Branch* branch);
 Term* insert_state_output(Branch* branch);
+Term* append_state_output(Branch* branch);
 bool is_state_input(Term* placeholder);
 
 void set_step(Term* term, float step);

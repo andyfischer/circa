@@ -497,12 +497,33 @@ Term* find_input_placeholder_with_name(Branch* branch, const char* name)
             return placeholder;
     }
 }
+Term* find_output_placeholder_with_name(Branch* branch, const char* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (placeholder->name == name)
+            return placeholder;
+    }
+}
 Term* append_input_placeholder(Branch* branch)
 {
     int count = count_input_placeholders(branch);
     Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
     branch->move(term, count);
     return term;
+}
+Term* append_output_placeholder(Branch* branch, Term* result)
+{
+    int count = count_output_placeholders(branch);
+    Term* term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
+    branch->move(term, branch->length() - count - 1);
+    return term;
+}
+Term* prepend_output_placeholder(Branch* branch, Term* result)
+{
+    return apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
 }
 
 Branch* term_get_function_details(Term* call)
@@ -577,7 +598,7 @@ Term* find_or_create_open_state_result(Branch* branch, int position)
 {
     Term* term = find_open_state_result(branch, position);
     if (term == NULL)
-        return insert_state_input(branch);
+        return append_state_input(branch);
     else
         return term;
 }
@@ -661,11 +682,9 @@ void post_compile_term(Term* term)
         int rebindsInput = placeholder->intPropOptional("rebindsInput", -1);
         if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
             name = term->input(rebindsInput)->name.c_str();
-        }
-
-        // Temporary step to make if_block work
-        if (term->function == IF_BLOCK_FUNC || term->function == FOR_FUNC)
+        } else {
             name = placeholder->name.c_str();
+        }
 
         Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
         change_declared_type(output, placeholder->type);
@@ -852,7 +871,11 @@ Term* find_state_output(Branch* branch)
     }
     return NULL;
 }
-Term* insert_state_input(Branch* branch)
+bool has_state_output(Branch* branch)
+{
+    return find_state_output(branch) != NULL;
+}
+Term* append_state_input(Branch* branch)
 {
     // Make sure that a state input doesn't already exist
     Term* term = find_state_input(branch);
@@ -876,6 +899,14 @@ Term* insert_state_output(Branch* branch)
         return term;
     term = apply(branch, OUTPUT_PLACEHOLDER_FUNC,
         TermList(find_open_state_result(branch, branch->length())));
+    term->setBoolProp("state", true);
+    hide_from_source(term);
+    return term;
+}
+Term* append_state_output(Branch* branch)
+{
+    Term* term = append_output_placeholder(branch, 
+        find_open_state_result(branch, branch->length()));
     term->setBoolProp("state", true);
     hide_from_source(term);
     return term;

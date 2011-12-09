@@ -337,7 +337,7 @@ bool function_has_state_input(Function* func)
 
 Term* function_insert_state_input(Function* func)
 {
-    return insert_state_input(function_contents(func));
+    return append_state_input(function_contents(func));
 }
 
 bool function_is_multiple_input(Term* placeholder)

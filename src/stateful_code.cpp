@@ -47,7 +47,7 @@ void on_stateful_function_call_created(Term* call)
         return;
 
     // None yet, insert one
-    insert_state_input(branch);
+    append_state_input(branch);
 }
 
 void pack_any_open_state_vars(Branch* branch)
