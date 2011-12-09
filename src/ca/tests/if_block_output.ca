@@ -1,0 +1,2 @@
+a = if true { 1 } else { 2 }
+print('Should be 1: ' a)

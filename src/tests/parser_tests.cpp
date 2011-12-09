@@ -418,7 +418,7 @@ void test_array_index_access()
 
     test_assert(b);
     test_assert(b->function == GET_INDEX_FUNC);
-    test_assert(b->asInt() == 1);
+    test_equals(b->asInt(), 1);
 }
 
 void test_float_division()

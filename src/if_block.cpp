@@ -105,13 +105,16 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     return placeholder;
 }
 
-Term* if_block_prepend_output(Term* ifBlock)
+Term* if_block_prepend_primary_output(Term* ifBlock)
 {
     Branch* contents = nested_contents(ifBlock);
 
     Term* placeholder = prepend_output_placeholder(contents, NULL);
-    for (CaseIterator it(contents); it.unfinished(); it.advance())
-        prepend_output_placeholder(nested_contents(it.current()), NULL);
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        Branch* caseContents = nested_contents(it.current());
+        prepend_output_placeholder(nested_contents(it.current()),
+            find_last_non_comment_expression(caseContents));
+    }
     return placeholder;
 }
 
@@ -618,7 +621,7 @@ void finish_if_block(Term* ifBlock)
 
     // Make sure there is a primary output
     if (get_output_placeholder(contents, 0) == NULL)
-        if_block_prepend_output(ifBlock);
+        if_block_prepend_primary_output(ifBlock);
 
     if_block_normalize_state_inputs(ifBlock);
 
