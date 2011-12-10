@@ -413,33 +413,13 @@ void test_unary_minus()
 void test_array_index_access()
 {
     Branch branch;
-    branch.eval("a = [1 2 3]");
-    Term* b = branch.eval("a[0]");
+    branch.compile("a = [1 2 3]");
+    Term* b = branch.compile("a[0]");
+    evaluate_branch(&branch);
 
     test_assert(b);
     test_assert(b->function == GET_INDEX_FUNC);
     test_equals(b->asInt(), 1);
-}
-
-void test_float_division()
-{
-    Branch branch;
-    Term* a = branch.eval("5 / 3");
-
-    test_equals(a->type->name, "number");
-    test_equals(a->function->name, "div");
-    test_equals(nested_contents(a)->get(0)->function->name, "div_f");
-    test_equals(a->toFloat(), 5.0f/3.0f);
-}
-
-void test_integer_division()
-{
-    Branch branch;
-    Term* a = branch.eval("5 // 3");
-
-    test_equals(a->type->name, "int");
-    test_equals(a->function->name, "div_i");
-    test_assert(a->asInt() == 1);
 }
 
 void test_namespace()
@@ -460,23 +440,6 @@ void test_namespace()
     Term* c = branch.eval("c = ns:myfunc(4)");
     test_assert(&branch);
     test_assert(c->asInt() == 5);
-}
-
-void test_method_calls()
-{
-    Branch branch;
-    branch.eval("x = [1 2 3]");
-    test_equals(branch.eval("x.count()"), "3");
-
-    // call a method inside a namespace
-    branch.clear();
-    branch.compile("namespace ns { type T; def T.method(t) -> string { return 'hello'}}");
-    branch.compile("v = ns:T()");
-    Term* v = branch.compile("v.method()");
-
-    test_assert(!has_static_errors(&branch));
-    evaluate_branch(&branch);
-    test_equals(v, "hello");
 }
 
 void test_subscripted_atom()
@@ -524,14 +487,15 @@ void test_significant_indentation()
 
     Branch* funcBranch = function_contents(branch["func"]);
 
-    test_assert(funcBranch->get(1)->asInt() == 1);
-    test_assert(funcBranch->get(2)->asInt() == 2);
-    test_assert(funcBranch->get(3)->name == "a");
-    test_assert(funcBranch->get(5)->name == "b");
+    test_assert(funcBranch->get("a") != NULL);
+    test_assert(funcBranch->get("b") != NULL);
+    test_assert(funcBranch->get("c") == NULL);
 
-    test_assert(branch[1]->asInt() == 3);
-    test_assert(branch[2]->asInt() == 4);
-    test_assert(branch[3]->name == "c");
+    test_assert(branch.get("a") == NULL);
+    test_assert(branch.get("b") == NULL);
+    test_assert(branch.get("c") != NULL);
+    test_assert(branch.get("c")->input(0)->owningBranch == &branch);
+    test_assert(branch.get("c")->input(1)->owningBranch == &branch);
 
     branch.clear();
 
@@ -540,9 +504,10 @@ void test_significant_indentation()
                    "\n"
                    "  \n"
                    "    a = 2\n"
-                   "    return(a)\n");
-    test_assert(&branch);
-    test_assert(branch.eval("func()")->asInt() == 2);
+                   "    return(a)\n"
+                   "b = 3");
+    test_assert(branch.get("a") == NULL);
+    test_assert(branch.get("b") != NULL);
 
     branch.clear();
 
@@ -551,9 +516,10 @@ void test_significant_indentation()
                 "  a = 5\n"
                 "\n"          // <-- Blank line doesn't have same indent
                 "  return(6)\n"
-                "b = func()");
+                "b = 7");
     test_assert(&branch);
-    test_assert(branch["b"]->asInt() == 6);
+    test_assert(branch.get("a") == NULL);
+    test_assert(branch.get("b") != NULL);
 
     branch.clear();
 
@@ -572,13 +538,14 @@ void test_significant_indentation2()
     branch.eval("def func()\n"
                 "  a = 1\n"
                 "    --comment\n"
-                "  b = 2\n");
+                "  b = 2\n"
+                "c = 3");
     test_assert(&branch);
 
     Branch* func = function_contents(branch.get("func"));
-    test_equals(func->get(1)->name, "a");
-    test_assert(func->get(2)->function == COMMENT_FUNC);
-    test_equals(func->get(3)->name, "b");
+    test_assert(func->get("a") != NULL);
+    test_assert(func->get("b") != NULL);
+    test_assert(func->get("c") == NULL);
 }
 
 void test_significant_indentation_bug_with_empty_functions()
@@ -613,16 +580,16 @@ void test_sig_indent_one_liner()
     Branch branch;
     branch.eval("def f() 'avacado'\n  'burrito'\n'cheese'");
     Branch* f_contents = function_contents(branch["f"]);
-    test_equals(f_contents->get(1)->asString(), "avacado");
-    test_assert(branch[1]->asString() == "burrito");
-    test_assert(branch[2]->asString() == "cheese");
+    test_equals(f_contents->get(0)->asString(), "avacado");
+    test_equals(branch[1], "burrito");
+    test_equals(branch[2], "cheese");
 
     branch.clear();
     branch.eval("def g() 1 2 3\n  4");
     Branch* g_contents = function_contents(branch["g"]);
-    test_equals(g_contents->get(1)->asInt(), 1);
-    test_equals(g_contents->get(2)->asInt(), 2);
-    test_equals(g_contents->get(3)->asInt(), 3);
+    test_equals(g_contents->get(0)->asInt(), 1);
+    test_equals(g_contents->get(1)->asInt(), 2);
+    test_equals(g_contents->get(2)->asInt(), 3);
     test_equals(branch[1]->asInt(), 4);
 }
 
@@ -706,7 +673,7 @@ void test_sig_indent_bug_with_for_loop_expression()
             "  i + 5\n");
 
     evaluate_branch(&branch);
-    test_equals(get_local(branch["x"]), "[5]");
+    test_equals(branch["x"], "[5]");
 }
 
 void test_namespace_with_curly_braces()
@@ -769,7 +736,7 @@ void test_bug_with_nested_ifs()
 
     test_assert(&branch);
     evaluate_branch(&branch);
-    test_equals(get_local(branch["a"]), "correct");
+    test_equals(branch["a"], "correct");
 }
 
 void test_source_location()
@@ -818,10 +785,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_semicolon_as_line_ending);
     REGISTER_TEST_CASE(parser_tests::test_unary_minus);
     REGISTER_TEST_CASE(parser_tests::test_array_index_access);
-    REGISTER_TEST_CASE(parser_tests::test_float_division);
-    REGISTER_TEST_CASE(parser_tests::test_integer_division);
     REGISTER_TEST_CASE(parser_tests::test_namespace);
-    REGISTER_TEST_CASE(parser_tests::test_method_calls);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);

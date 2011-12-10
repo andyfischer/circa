@@ -493,6 +493,9 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     set_starting_source_location(result, startPosition, tokens);
     attrs->name = functionName;
 
+    if (methodType != NULL)
+        result->setBoolProp("syntax:methodDecl", true);
+
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     // Optional list of qualifiers
@@ -692,8 +695,10 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
             possible_whitespace_or_newline(tokens));
 
     // if there's a semicolon, then finish it as an empty type.
-    if (tokens.nextIs(SEMICOLON))
+    if (tokens.nextIs(SEMICOLON)) {
+        result->setBoolProp("syntax:semicolon", true);
         return ParseResult(result);
+    }
 
     if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);

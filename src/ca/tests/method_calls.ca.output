@@ -1,0 +1,4 @@
+[1 2 3].length() == 3
+l.length() == 3
+T.method == called T.method
+U.method == called U.method

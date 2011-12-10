@@ -530,12 +530,17 @@ void function_format_header_source(StyledSource* source, Function* func)
             append_phrase(source, ", ", term, phrase_type::UNDEFINED);
         first = false;
 
-        if (!first)
+        bool showType = true;
+        if (i == 0 && term->boolPropOptional("syntax:methodDecl", false))
+            showType = false;
+
+        if (showType)
             append_phrase(source, function_get_input_type(term, i)->name,
-                    term, phrase_type::TYPE_NAME);
+                term, phrase_type::TYPE_NAME);
 
         if (name != "" && name[0] != '#') {
-            append_phrase(source, " ", term, token::WHITESPACE);
+            if (showType)
+                append_phrase(source, " ", term, token::WHITESPACE);
             append_phrase(source, name, term, phrase_type::UNDEFINED);
         }
 

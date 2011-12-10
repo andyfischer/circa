@@ -1,0 +1,16 @@
+
+print('[1 2 3].length() == ' [1 2 3].length())
+l = [4 5 6]
+print('l.length() == ' l.length())
+
+# define a new method
+type T;
+def T.method(t) -> string
+    return "called T.method"
+
+type U;
+def U.method(t) -> string
+    return "called U.method"
+
+print("T.method == " create(T).method())
+print("U.method == " create(U).method())

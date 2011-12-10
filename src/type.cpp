@@ -27,6 +27,12 @@ namespace type_t {
     {
         append_phrase(source, "type ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TYPE_NAME);
+
+        if (term->boolPropOptional("syntax:semicolon", false)) {
+            //append_phrase(source, ";", term, phrase_type::UNDEFINED);
+            return;
+        }
+
         append_phrase(source, term->stringPropOptional("syntax:preLBracketWhitespace", " "),
                 term, token::WHITESPACE);
         append_phrase(source, "{", term, token::LBRACKET);

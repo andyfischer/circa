@@ -17,6 +17,7 @@ if_block_output.ca
 if_state.ca
 list.ca
 math.ca
+method_calls.ca
 set.ca
 set_index.ca
 subroutine.ca
