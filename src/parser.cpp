@@ -1618,6 +1618,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             Term* term = apply(branch, GET_INDEX_FUNC, TermList(result.term, subscript));
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             set_input_syntax_hint(term, 1, "preWhitespace", postLbracketWs);
+            term->setBoolProp("syntax:brackets", true);
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
 
