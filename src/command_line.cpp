@@ -258,8 +258,8 @@ int run_command_line(std::vector<std::string> args)
 
         EvalContext context;
 
-        // Push any extra command-line arguments to context.inputStack
-        List* inputs = set_list(context.inputStack.append());
+        // Push any extra command-line arguments to context.argumentList
+        List* inputs = set_list(context.argumentList.append());
 
         for (size_t i=1; i < args.size(); i++)
             set_string(inputs->append(), args[i]);

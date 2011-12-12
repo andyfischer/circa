@@ -199,7 +199,7 @@ CA_FUNCTION(file__modified_time)
 CA_FUNCTION(input_func)
 {
     int index = INT_INPUT(0);
-    TaggedValue* input = CONTEXT->inputStack.getLast()->getIndex(index);
+    TaggedValue* input = CONTEXT->argumentList.getLast()->getIndex(index);
     if (input == NULL)
         return ERROR_OCCURRED("invalid input index");
     copy(input, OUTPUT);

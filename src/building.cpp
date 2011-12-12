@@ -129,14 +129,8 @@ bool is_actually_using(Term* user, Term* usee)
 
 void append_user(Term* user, Term* usee)
 {
-    if (usee != NULL && user != NULL) {
-        #if 0
-        std::cout << "adding " << global_id(user) << " as user of "
-            << global_id(usee)
-            << std::endl;
-        #endif
+    if (usee != NULL && user != NULL)
         usee->users.appendUnique(user);
-    }
 }
 
 void possibly_prune_user_list(Term* user, Term* usee)
@@ -531,13 +525,6 @@ Branch* term_get_function_details(Term* call)
     if (call->function == IF_BLOCK_FUNC || call->function == FOR_FUNC)
         return nested_contents(call);
 
-#if 0
-    if (call->nestedContents != NULL) {
-        std::cout << "term has nested contents: ";
-        print_term(std::cout, call);
-        std::cout << std::endl;
-    }
-#endif
     return function_get_contents(as_function(call->function));
 }
 
@@ -935,57 +922,6 @@ ListData* write_input_instruction_list(Term* caller, ListData* list)
     }
 
     return list;
-
-#if 0
-    // Walk through each of the function's declared inputs, and write appropriate
-    // instructions.
-    int callerIndex = 0;
-
-    for (int declaredIndex=0; ; declaredIndex++) {
-        Term* inputPlaceholder = function_get_input_placeholder(func, declaredIndex);
-        if (inputPlaceholder == NULL)
-            break;
-
-        if (function_is_state_input(inputPlaceholder)) {
-
-            if (term_is_state_input(caller, callerIndex)) {
-                // Explicit state input
-                write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
-                callerIndex++;
-            } else {
-                // Implicit state input
-                //write_implicit_state_instruction(caller);
-                //callerIndex++;
-            }
-
-        } else if (function_is_multiple_input(inputPlaceholder)) {
-
-            // Write the remainder of caller's arguments.
-            while (callerIndex < caller->numInputs()) {
-
-                write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
-                callerIndex++;
-            }
-            break;
-
-        } else {
-            // Write a normal input.
-            if (callerIndex >= caller->numInputs()) {
-                append_input_instruction_error(errors, &NotEnoughInputsSymbol);
-                break;
-            }
-
-            write_input_instruction(caller, caller->input(callerIndex), list_append(&list));
-            callerIndex++;
-        }
-    }
-
-    // Check if we didn't look at all of the caller's inputs.
-    if (callerIndex+1 < caller->numInputs())
-        append_input_instruction_error(errors, &TooManyInputsSymbol);
-
-    return list;
-#endif
 }
 
 ListData* write_output_instruction_list(Term* caller, ListData* list)
