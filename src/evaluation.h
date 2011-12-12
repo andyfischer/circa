@@ -99,14 +99,6 @@ TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& i
 TaggedValue* evaluate(Branch* branch, Term* function, List* inputs);
 TaggedValue* evaluate(Term* function, List* inputs);
 
-// Get the input value for the given term and index.
-TaggedValue* get_input(EvalContext* context, Term* term, int index);
-
-// consume_input will assign 'dest' to the value of the given input. It may copy the
-// input value. But, if it's safe to do so, this function will instead swap the value,
-// leaving a null behind and preventing the need for a copy.
-void consume_input(EvalContext* context, Term* term, int index, TaggedValue* dest);
-
 TaggedValue* get_extra_output(EvalContext* context, Term* term, int index);
 TaggedValue* get_local(Term* term, int outputIndex);
 TaggedValue* get_local(Term* term);

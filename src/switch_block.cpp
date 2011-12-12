@@ -21,6 +21,7 @@ void switch_block_post_compile(Term* term)
 
 CA_FUNCTION(evaluate_switch)
 {
+#if 0
     EvalContext* context = CONTEXT;
     Branch* contents = nested_contents(CALLER);
     TaggedValue* input = INPUT(0);
@@ -66,6 +67,7 @@ CA_FUNCTION(evaluate_switch)
             break;
         }
     }
+#endif
 }
 
 } // namespace circa

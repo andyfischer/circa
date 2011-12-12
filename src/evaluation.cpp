@@ -293,18 +293,6 @@ void evaluate_branch(Branch* branch)
     evaluate_save_locals(&context, branch);
 }
 
-TaggedValue* get_input(EvalContext* context, Term* term, int index)
-{
-    internal_error("Don't call get_input");
-    return NULL;
-}
-
-void consume_input(EvalContext* context, Term* term, int index, TaggedValue* dest)
-{
-    // Temp, don't actually consume
-    copy(get_input(context, term, index), dest);
-}
-
 TaggedValue* get_local(Term* term, int outputIndex)
 {
     internal_error("don't use get_local");

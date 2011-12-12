@@ -43,7 +43,7 @@ namespace list_methods_function {
 
     CA_DEFINE_FUNCTION(extend, "List.extend(self, List) -> List")
     {
-        consume_input(CONTEXT, CALLER, 0, OUTPUT);
+        CONSUME_INPUT(0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
 
         List* additions = List::checkCast(INPUT(1));
@@ -70,9 +70,9 @@ namespace list_methods_function {
     CA_DEFINE_FUNCTION(insert, "List.insert(self :implied_rebind, int, any) -> List")
     {
         TaggedValue result;
-        consume_input(CONTEXT, CALLER, 0, &result);
+        CONSUME_INPUT(0, &result);
         TaggedValue* newItem = list_insert(&result, INT_INPUT(1));
-        consume_input(CONTEXT, CALLER, 2, newItem);
+        CONSUME_INPUT(2, newItem);
         swap(&result, OUTPUT);
     }
 
