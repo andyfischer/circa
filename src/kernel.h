@@ -59,7 +59,6 @@ extern Term* REF_FUNC;
 extern Term* RETURN_FUNC;
 extern Term* SET_FIELD_FUNC;
 extern Term* SET_INDEX_FUNC;
-extern Term* SUBROUTINE_OUTPUT_FUNC;
 extern Term* SWITCH_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* STATIC_ERROR_FUNC;

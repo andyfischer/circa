@@ -289,8 +289,6 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (term->boolPropOptional("state", false))
         out << ":state ";
 
-    //int outputCount = get_output_count(term);
-
     out << "-> ";
     
     if (term->type == NULL)
@@ -298,73 +296,8 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     else
         out << term->type->name;
 
-#if 0
-    if (outputCount > 1)
-        out << "(";
-
-    if (term->function != NULL) {
-        for (int i=0; i < outputCount; i++) {
-            if (i != 0) out << ", ";
-            Type* type = get_output_type(term, i);
-            if (type == NULL)
-                out << "<NULL type>";
-            else
-                out << type->name;
-        }
-    }
-    if (outputCount > 1)
-        out << ")";
-#endif
-
-    #if 0
-    if (term->type == NULL)
-        out << " <NULL type>";
-    else {
-        out << " type:" << term->type->name;
-
-        if (prefs->showAllIDs)
-            out << global_id(term->type);
-
-        if (unbox_type(term->type) != term->value_type)
-            out << " vt:" << term->value_type->name;
-    }
-    #endif
-
     if (is_value(term))
         out << " val:" << to_string((TaggedValue*) term);
-
-#if 0
-    out << " local:";
-    for (int i=0; i < outputCount; i++) {
-        if (i != 0) out << ",";
-        TaggedValue* local = get_local_safe(term, i);
-        if (local == NULL)
-            out << "<NULL>";
-        else
-            out << local->toString();
-    }
-#endif
-
-#if 0
-    out << " users = ["; 
-    for (int i=0; i < term->users.length(); i++) {
-        if (i != 0) out << ", ";
-        out << global_id(term->users[i]);
-    }
-    out << "]";
-#endif
-
-    // out << " " << term->localsIndex << "+" << get_output_count(term);
-
-    #if 0
-    TaggedValue* local = get_local_safe(term);
-    if (local != NULL) {
-        out << " ";
-        if (is_value(term))
-            out << "local:";
-        out << local->toString();
-    }
-    #endif
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();
