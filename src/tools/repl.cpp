@@ -51,7 +51,7 @@ void repl_evaluate_line(Branch* branch, std::string const& input, std::ostream& 
     if (!anyErrors && resultIndex != -1) {
         Term* result = branch->get(resultIndex);
         if (result->type != as_type(VOID_TYPE)) {
-            output << get_local(result)->toString() << std::endl;
+            output << get_register(&context, result)->toString() << std::endl;
         }
     }
 }

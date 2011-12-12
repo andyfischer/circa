@@ -99,15 +99,12 @@ TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& i
 TaggedValue* evaluate(Branch* branch, Term* function, List* inputs);
 TaggedValue* evaluate(Term* function, List* inputs);
 
-TaggedValue* get_extra_output(EvalContext* context, Term* term, int index);
-TaggedValue* get_local(Term* term, int outputIndex);
-TaggedValue* get_local(Term* term);
-TaggedValue* get_local_safe(Term* term, int outputIndex);
-
 TaggedValue* get_arg(EvalContext* context, ListData* args, int index);
 TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
 void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest);
 TaggedValue* get_output(EvalContext* context, ListData* args);
+
+TaggedValue* get_register(EvalContext* context, Term* term);
 
 // Signal that a runtime error has occurred.
 void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* msg);

@@ -113,11 +113,11 @@ void test_recursion_with_state()
     internal_debug_function::oracle_send(33);
     internal_debug_function::oracle_send(45);
 
-    evaluate_branch(&context, &branch);
+    evaluate_save_locals(&context, &branch);
 
     test_equals(&context.state,
         "{result: {_recr: {_recr: {_recr: {s: 45}, s: 33}, s: 21}, s: 10}}");
-    test_equals(get_local(branch["result"]), 4);
+    test_equals(branch["result"], 4);
 }
 
 void shadow_input()

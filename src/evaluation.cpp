@@ -293,24 +293,6 @@ void evaluate_branch(Branch* branch)
     evaluate_save_locals(&context, branch);
 }
 
-TaggedValue* get_local(Term* term, int outputIndex)
-{
-    internal_error("don't use get_local");
-    return NULL;
-}
-
-TaggedValue* get_local(Term* term)
-{
-    internal_error("don't use get_local");
-    return NULL;
-}
-
-TaggedValue* get_local_safe(Term* term, int outputIndex)
-{
-    internal_error("don't use get_local");
-    return NULL;
-}
-
 TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
 {
     if (arg->value_type == &GlobalVariableIsn_t) {
@@ -342,10 +324,11 @@ TaggedValue* get_output(EvalContext* context, ListData* args)
 {
     return get_arg(context, args, list_size(args) - 1);
 }
-TaggedValue* get_extra_output(EvalContext* context, Term* term, int index)
+TaggedValue* get_register(EvalContext* context, Term* term)
 {
-    internal_error("get_extra_output no worky");
-    return NULL;
+    Frame* frame = top_frame(context);
+    ca_assert(term->owningBranch == frame->branch);
+    return frame->registers[term->index];
 }
 
 void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* message)

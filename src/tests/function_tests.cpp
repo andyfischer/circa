@@ -103,9 +103,9 @@ namespace test_func_with_multiple_outputs {
 
         test_assert(&branch);
         evaluate_branch(&branch);
-        test_equals(get_local(branch["a"]), "3");
-        test_equals(get_local(branch["b"]), "4");
-        test_equals(get_local(branch["c"]), "4");
+        test_equals(branch["a"], "3");
+        test_equals(branch["b"], "4");
+        test_equals(branch["c"], "4");
     }
 }
 
