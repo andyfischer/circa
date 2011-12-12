@@ -122,8 +122,8 @@ void pop_frame(EvalContext* context)
     Frame* top = &context->stack[context->numFrames - 1];
 
     // Check to make sure we aren't losing a stored runtime error.
-    if (context->errorOccurred && context->errorTerm->owningBranch == top->branch)
-        internal_error("pop_frame called to pop an errored frame");
+    if (context->errorOccurred)
+        internal_error("pop_frame called on an errored context");
 
     set_null(&top->registers);
     //set_null(&top->state);
@@ -136,12 +136,12 @@ Frame* top_frame(EvalContext* context)
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-    if (term->function == NULL)
+    if (term->function == NULL || !is_function(term->function))
         return;
 
     Function* function = as_function(term->function);
 
-    if (function == NULL || function->evaluate == NULL)
+    if (function->evaluate == NULL)
         return;
 
     context->currentTerm = term;

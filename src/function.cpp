@@ -378,28 +378,12 @@ bool function_has_variable_args(Term* func)
 
 Term* function_get_input_placeholder(Function* func, int index)
 {
-    Branch* contents = function_get_contents(func);
-    if (contents == NULL)
-        return NULL;
-    if (index >= contents->length())
-        return NULL;
-    Term* term = contents->get(index);
-    if (term->function != INPUT_PLACEHOLDER_FUNC)
-        return NULL;
-    return term;
+    return get_input_placeholder(function_get_contents(func), index);
 }
 
 Term* function_get_output_placeholder(Function* func, int index)
 {
-    Branch* contents = function_get_contents(func);
-    if (contents == NULL)
-        return NULL;
-    if (index >= contents->length())
-        return NULL;
-    Term* term = contents->getFromEnd(index);
-    if (term->function != OUTPUT_PLACEHOLDER_FUNC)
-        return NULL;
-    return term;
+    return get_output_placeholder(function_get_contents(func), index);
 }
 Branch* function_get_contents(Function* func)
 {

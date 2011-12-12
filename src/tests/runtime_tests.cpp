@@ -29,10 +29,10 @@ void test_errored_function()
     Term* t = branch.compile("t = errored(e)");
 
     EvalContext context;
-    evaluate_branch(&context, &branch);
+    evaluate_save_locals(&context, &branch);
 
     test_assert(!context.errorOccurred);
-    test_assert(as_bool(get_local(t)));
+    test_assert(as_bool(t));
 }
 
 void test_misc()
