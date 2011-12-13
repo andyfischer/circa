@@ -474,6 +474,14 @@ int count_output_placeholders(Branch* branch)
         result++;
     return result;
 }
+bool is_input_placeholder(Term* term)
+{
+    return term->function == INPUT_PLACEHOLDER_FUNC;
+}
+bool is_output_placeholder(Term* term)
+{
+    return term->function == OUTPUT_PLACEHOLDER_FUNC;
+}
 bool has_variable_args(Branch* branch)
 {
     Term* input0 = get_input_placeholder(branch, 0);

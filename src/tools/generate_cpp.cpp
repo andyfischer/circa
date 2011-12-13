@@ -83,6 +83,8 @@ struct SourceWriter
     }
 };
 
+void write_branch_contents(SourceWriter* writer, Branch* branch);
+
 void write_term_value(SourceWriter* writer, Term* term)
 {
     if (is_int(term)) {
@@ -94,6 +96,41 @@ void write_term_value(SourceWriter* writer, Term* term)
         writer->write(as_cstring(term));
         writer->write("\"");
     }
+}
+
+void write_type_name(SourceWriter* writer, Type* type)
+{
+    writer->write(type->name);
+}
+
+void write_function(SourceWriter* writer, Term* term)
+{
+    Function* func = as_function(term);
+    write_type_name(writer, function_get_output_type(func, 0));
+
+    writer->write(term->name);
+
+    int inputCount = function_num_inputs(func);
+
+    writer->write("(");
+
+    for (int i=0; i < inputCount; i++) {
+        if (i > 0)
+            writer->write(", ");
+
+        Term* placeholder = function_get_input_placeholder(func, i);
+        write_type_name(placeholder->type);
+        writer->write(" ");
+        writer->write(get_unique_name(placeholder));
+    }
+
+    writer->write(")");
+    writer->newline();
+    writer->write("{");
+    writer->indent();
+    writer->unindent();
+    writer->write("}");
+    writer->newline();
 }
 
 void write_term(SourceWriter* writer, Term* term)
@@ -121,13 +158,20 @@ void write_term(SourceWriter* writer, Term* term)
     writer->newline();
 }
 
+void write_branch_contents(SourceWriter* writer, Branch* branch)
+{
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        if (is_input_placeholder(term) || is_output_placeholder(term))
+            continue;
+        write_term(writer, term);
+    }
+}
+
 void write_program(Branch* branch, TaggedValue* out)
 {
     SourceWriter sourceWriter;
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        write_term(&sourceWriter, term);
-    }
+    write_branch_contents(&sourceWriter, branch);
     swap(&sourceWriter.output, out);
 }
 
