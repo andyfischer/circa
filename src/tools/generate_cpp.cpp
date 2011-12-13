@@ -25,7 +25,9 @@ struct SourceWriter
     bool startNewLine;
     TaggedValue indentStr;
 
-    SourceWriter() : currentIndent(0), startNewLine(true) {}
+    SourceWriter() : currentIndent(0), startNewLine(true) {
+        repeat_string(" ", currentIndent * kSpacesPerIndent, &indentStr);
+    }
 
     void possiblyStartNewLine()
     {
@@ -100,7 +102,7 @@ void write_term_value(SourceWriter* writer, Term* term)
 
 void write_type_name(SourceWriter* writer, Type* type)
 {
-    writer->write(type->name);
+    writer->write(type->name.c_str());
 }
 
 void write_function(SourceWriter* writer, Term* term)
@@ -108,7 +110,7 @@ void write_function(SourceWriter* writer, Term* term)
     Function* func = as_function(term);
     write_type_name(writer, function_get_output_type(func, 0));
 
-    writer->write(term->name);
+    writer->write(term->name.c_str());
 
     int inputCount = function_num_inputs(func);
 
@@ -119,7 +121,7 @@ void write_function(SourceWriter* writer, Term* term)
             writer->write(", ");
 
         Term* placeholder = function_get_input_placeholder(func, i);
-        write_type_name(placeholder->type);
+        write_type_name(writer, placeholder->type);
         writer->write(" ");
         writer->write(get_unique_name(placeholder));
     }
@@ -135,6 +137,21 @@ void write_function(SourceWriter* writer, Term* term)
 
 void write_term(SourceWriter* writer, Term* term)
 {
+    if (is_comment(term)) {
+        if (is_empty_comment(term))
+            return;
+
+        writer->write("// ");
+        writer->write(term->stringProp("comment"));
+        writer->newline();
+        return;
+    }
+
+    if (is_function(term)) {
+        write_function(writer, term);
+        return;
+    }
+
     writer->write(get_unique_name(term));
     writer->write(" = ");
     
