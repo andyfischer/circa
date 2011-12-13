@@ -283,12 +283,33 @@ int list_size(TaggedValue* value)
         return 0;
     return s->count;
 }
+void list_slice(TaggedValue* original, int start, int end, TaggedValue* result)
+{
+    if (end == -2)
+        end = list_length(original);
+
+    int count = end - start;
+    set_list(result, count);
+
+    for (int i=0; i < count; i++)
+        copy(list_get(original, i + start), list_get(result, i));
+}
+
 int list_get_length(TaggedValue* value)
 {
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
         return 0;
     return s->count;
+}
+
+int list_length(TaggedValue* value)
+{
+    return list_get_length(value);
+}
+TaggedValue* list_get(TaggedValue* value, int index)
+{
+    return list_get_index(value, index);
 }
 
 TaggedValue* list_get_index(TaggedValue* value, int index)

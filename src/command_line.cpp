@@ -8,12 +8,14 @@
 #include "evaluation.h"
 #include "feedback.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
 #include "testing.h"
 
 #include "tools/build_tool.h"
+#include "tools/generate_cpp.h"
 #include "tools/debugger_repl.h"
 #include "tools/exporting_parser.h"
 #include "tools/file_checker.h"
@@ -41,6 +43,11 @@ void print_usage()
 
 int run_command_line(std::vector<std::string> args)
 {
+    TaggedValue args_v;
+    set_list(&args_v, 0);
+    for (int i=0; i < (int) args.size(); i++)
+        set_string(list_append(&args_v), args[i]);
+
     // No arguments, run tests
     if (args.size() == 0) {
         run_all_tests();
@@ -242,6 +249,14 @@ int run_command_line(std::vector<std::string> args)
             evaluate_branch(&branch);
         }
         return true;
+    }
+
+    // C++ gen
+    if (args[0] == "-cppgen") {
+        TaggedValue remainingArgs;
+        list_slice(&args_v, 1, -2, &remainingArgs);
+        run_generate_cpp(&remainingArgs);
+        return 0;
     }
 
     // Otherwise, load args[0] as a script and run it

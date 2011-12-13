@@ -1,0 +1,168 @@
+
+#include "circa.h"
+
+#include "list_shared.h"
+#include "symbols.h"
+
+#include "generate_cpp.h"
+
+namespace circa {
+
+void repeat_string(const char* str, int times, TaggedValue* output)
+{
+    std::stringstream out;
+    for (int i=0; i < times; i++)
+        out << str;
+    set_string(output, out.str());
+}
+
+const int kSpacesPerIndent = 4;
+
+struct SourceWriter
+{
+    List output;
+    int currentIndent;
+    bool startNewLine;
+    TaggedValue indentStr;
+
+    SourceWriter() : currentIndent(0), startNewLine(true) {}
+
+    void possiblyStartNewLine()
+    {
+        if (startNewLine) {
+            startNewLine = false;
+            TaggedValue* space = list_append(&output);
+            copy(&indentStr, space);
+        }
+    }
+
+    void write(TaggedValue* item)
+    {
+        possiblyStartNewLine();
+
+        if (as_symbol(item) == Newline) {
+            set_string(output.append(), "\n");
+            startNewLine = true;
+            return;
+        }
+
+        copy(item, output.append());
+    }
+
+    void write(const char* str)
+    {
+        possiblyStartNewLine();
+        set_string(output.append(), str);
+    }
+
+    void newline()
+    {
+        TaggedValue val;
+        symbol_value(&val, Newline);
+        write(&val);
+    }
+
+    void writeList(TaggedValue* list)
+    {
+        possiblyStartNewLine();
+        int listLength = list_length(list);
+        for (int i=0; i < listLength; i++) {
+            TaggedValue* item = list_get(list, i);
+            copy(item, list_append(&output));
+        }
+    }
+    void indent()
+    {
+        currentIndent++;
+        repeat_string(" ", currentIndent * kSpacesPerIndent, &indentStr);
+    }
+    void unindent()
+    {
+        currentIndent--;
+        repeat_string(" ", currentIndent * kSpacesPerIndent, &indentStr);
+    }
+};
+
+void write_term_value(SourceWriter* writer, Term* term)
+{
+    if (is_int(term)) {
+        writer->write(term->toString().c_str());
+    } else if (is_float(term)) {
+        writer->write(term->toString().c_str());
+    } else if (is_string(term)) {
+        writer->write("\"");
+        writer->write(as_cstring(term));
+        writer->write("\"");
+    }
+}
+
+void write_term(SourceWriter* writer, Term* term)
+{
+    writer->write(get_unique_name(term));
+    writer->write(" = ");
+    
+    if (is_value(term)) {
+        write_term_value(writer, term);
+    } else {
+        // function call syntax
+        writer->write(term->function->name.c_str());
+        writer->write("(");
+
+        // write inputs
+        for (int i=0; i < term->numInputs(); i++) {
+            if (i > 0) {
+                writer->write(", ");
+            }
+            writer->write(get_unique_name(term));
+        }
+    }
+
+    writer->write(";");
+    writer->newline();
+}
+
+void write_program(Branch* branch, TaggedValue* out)
+{
+    SourceWriter sourceWriter;
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        write_term(&sourceWriter, term);
+    }
+    swap(&sourceWriter.output, out);
+}
+
+void write_program_to_file(Branch* branch, const char* filename)
+{
+    TaggedValue strs;
+    write_program(branch, &strs);
+
+    FILE* file = fopen(filename, "w");
+
+    int str_count = list_length(&strs);
+    for (int i=0; i < str_count; i++) {
+        TaggedValue* str = list_get(&strs, i);
+        const char* cstr = as_cstring(str);
+        fwrite(cstr, 1, strlen(cstr), file);
+    }
+    fclose(file);
+}
+
+void run_generate_cpp(TaggedValue* args)
+{
+    if (list_length(args) < 2) {
+        std::cout << "Expected 2 arguments";
+        return;
+    }
+
+    const char* source_file = as_cstring(list_get(args, 0));
+    const char* output_file = as_cstring(list_get(args, 1));
+
+    std::cout << "Loading source from: " << source_file << std::endl;
+    std::cout << "Will write to: " << output_file << std::endl;
+    
+    Branch branch;
+    load_script(&branch, source_file);
+    write_program_to_file(&branch, output_file);
+}
+
+} // namespace circa

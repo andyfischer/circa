@@ -36,6 +36,8 @@ void list_set_index(ListData* data, int index, TaggedValue* value);
 
 int list_get_length(TaggedValue* value);
 int list_size(TaggedValue* value);
+int list_length(TaggedValue* value);
+TaggedValue* list_get(TaggedValue* value, int index);
 TaggedValue* list_get_index(TaggedValue* value, int index);
 TaggedValue* list_get_index_from_end(TaggedValue* value, int index);
 void list_remove_index(TaggedValue* list, int index);
@@ -45,6 +47,7 @@ TaggedValue* list_insert(TaggedValue* list, int index);
 void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
 void list_remove_nulls(TaggedValue* list);
 std::string list_to_string(ListData* value);
+void list_slice(TaggedValue* original, int start, int end, TaggedValue* result);
 
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with

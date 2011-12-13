@@ -1,0 +1,7 @@
+
+def my_function(int a, int b) -> int
+  print("adding " a " and " b)
+  return a + b
+
+a = 2
+my_function(a, 3)

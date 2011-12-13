@@ -80,7 +80,8 @@ void ca_assert_function(bool expr, const char* exprStr, int line, const char* fi
 void ca_debugger_break()
 {
 #if CIRCA_TEST_BUILD
-    asm { int 3 };
+    //asm { int 3 };
+    internal_error("debugger break");
 #else
     internal_error("debugger break");
 #endif
