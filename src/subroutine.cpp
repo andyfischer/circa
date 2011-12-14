@@ -13,6 +13,7 @@
 #include "refactoring.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "symbols.h"
 #include "update_cascades.h"
 #include "token.h"
 #include "term.h"
@@ -157,6 +158,7 @@ void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
     as_function(sub)->evaluate = evaluate_subroutine;
+    as_function(sub)->vmInstruction = ControlFlowCall;
     as_function(sub)->createsStackFrame = true;
 }
 

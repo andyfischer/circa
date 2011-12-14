@@ -27,6 +27,10 @@ namespace return_function {
         TaggedValue* result = INPUT(0);
         List* registers = &top_frame(CONTEXT)->registers;
         copy(result, registers->get(registers->length()-1));
+
+        // Move PC to end
+        Frame* top = top_frame(CONTEXT);
+        top->pc = top->branch->length();
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -53,6 +57,7 @@ namespace return_function {
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel->get("return");
         as_function(RETURN_FUNC)->formatSource = formatSource;
+        as_function(RETURN_FUNC)->vmInstruction = ControlFlowCall;
     }
 }
 }

@@ -16,6 +16,8 @@
 #include "parser.h"
 #include "refactoring.h"
 #include "stateful_code.h"
+#include "subroutine.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 
@@ -54,7 +56,8 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
     for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
         Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
         Branch* branch = frame->branch;
-        out << " [Frame " << frameIndex << ", branch = " << branch << "]" << std::endl;
+        out << " [Frame " << frameIndex << ", branch = " << branch
+             << ", pc = " << frame->pc << "]" << std::endl;
 
         if (branch == NULL)
             continue;
@@ -64,6 +67,11 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 
             // indent
             for (int x = 0; x < frameIndex+1; x++)
+                out << " ";
+
+            if (frame->pc == i)
+                out << ">";
+            else
                 out << " ";
 
             print_term(out, term);
@@ -137,8 +145,6 @@ void finish_frame(EvalContext* context)
     List registers;
     swap(&registers, &top->registers);
     pop_frame(context);
-
-    std::cout << "registers: " << registers.toString() << std::endl;
 
     Frame* parentFrame = top_frame(context);
     Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
@@ -528,11 +534,11 @@ do_instruction:
     }
 
     Term* term = branch->get(pc);
+    Function* func = as_function(term->function);
 
-    int existingFrameCount = context->numFrames;
     evaluate_single_term(context, term);
 
-    if (context->numFrames == existingFrameCount)
+    if (func->vmInstruction == PureCall)
         top_frame(context)->pc++;
 
     // at this point, 'frame' pointer may be invalid.

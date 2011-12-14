@@ -8,6 +8,7 @@
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "subroutine.h"
+#include "symbols.h"
 #include "term.h"
 #include "term_list.h"
 #include "token.h"
@@ -24,6 +25,7 @@ Function::Function()
     throws(false),
     createsStackFrame(false),
     evaluate(NULL),
+    vmInstruction(PureCall),
     specializeType(NULL),
     formatSource(NULL),
     checkInvariants(NULL),

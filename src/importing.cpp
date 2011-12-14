@@ -10,6 +10,7 @@
 #include "importing_macros.h"
 #include "refactoring.h"
 #include "parser.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -20,6 +21,7 @@ Term* import_function(Branch* branch, EvaluateFunc evaluate, std::string const& 
     Term* result = parser::compile(branch, parser::function_decl, header);
 
     as_function(result)->evaluate = evaluate;
+    as_function(result)->vmInstruction = PureCall;
     return result;
 }
 
@@ -27,12 +29,14 @@ void install_function(Term* function, EvaluateFunc evaluate)
 {
     ca_assert(is_function(function));
     as_function(function)->evaluate = evaluate;
+    as_function(function)->vmInstruction = PureCall;
 }
 
 void install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 {
     Term* term = find_name(branch, name);
     as_function(term)->evaluate = evaluate;
+    as_function(term)->vmInstruction = PureCall;
 }
 
 Term* import_type(Branch* branch, Type* type)

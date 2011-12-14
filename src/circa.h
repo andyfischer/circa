@@ -32,6 +32,7 @@
 #include "static_checking.h"
 #include "source_repro.h"
 #include "subroutine.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "term_source_location.h"

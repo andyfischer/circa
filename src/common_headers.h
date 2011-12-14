@@ -29,6 +29,8 @@
 
 namespace circa {
 
+typedef int symbol;
+
 struct Branch;
 struct BrokenLinkList;
 struct CastResult;
