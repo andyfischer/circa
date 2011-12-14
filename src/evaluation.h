@@ -16,6 +16,7 @@ struct Frame
 {
     List registers;
     Branch* branch;
+    int pc;
 };
 
 struct EvalContext
@@ -118,5 +119,7 @@ bool evaluation_interrupted(EvalContext* context);
 void clear_error(EvalContext* cxt);
 
 std::string context_get_error_message(EvalContext* cxt);
+
+void run_vm(EvalContext* context);
 
 } // namespace circa

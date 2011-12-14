@@ -105,9 +105,8 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     context->stack = (Frame*) realloc(context->stack, sizeof(Frame) * context->numFrames);
     Frame* top = &context->stack[context->numFrames - 1];
     initialize_null(&top->registers);
+    top->pc = 0;
     swap(registers, &top->registers);
-    //initialize_null(&top->state);
-    //set_dict(&top->state);
     top->branch = branch;
     return top;
 }
@@ -119,16 +118,43 @@ Frame* push_frame(EvalContext* context, Branch* branch)
 }
 void pop_frame(EvalContext* context)
 {
-    Frame* top = &context->stack[context->numFrames - 1];
+    Frame* top = top_frame(context);
 
     // Check to make sure we aren't losing a stored runtime error.
     if (context->errorOccurred)
         internal_error("pop_frame called on an errored context");
 
     set_null(&top->registers);
-    //set_null(&top->state);
     context->numFrames--;
 }
+
+void finish_frame(EvalContext* context)
+{
+    Frame* top = top_frame(context);
+    Branch* finishedBranch = top->branch;
+
+    // Copy outputs
+    List registers;
+    swap(&registers, &top->registers);
+    pop_frame(context);
+
+    std::cout << "registers: " << registers.toString() << std::endl;
+
+    Frame* parentFrame = top_frame(context);
+    Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+    List* parentRegisters = &top_frame(context)->registers;
+
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(finishedBranch, i);
+        if (placeholder == NULL)
+            break;
+
+        swap(registers[placeholder->index], parentRegisters->get(finishedTerm->index + i));
+    }
+
+    parentFrame->pc++;
+}
+
 Frame* top_frame(EvalContext* context)
 {
     return get_frame(context, 0);
@@ -160,6 +186,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
     #endif
 
+#if 0
     // For a test build, we check the type of the output of every single call. This is
     // slow, and it should be unnecessary if the function is written correctly. But it's
     // a good test.
@@ -177,6 +204,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
         }
     }
     #endif
+#endif
 
     free_list(inputList);
     free_list(outputList);
@@ -215,7 +243,7 @@ void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue*
 
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
 {
-    // Copy stack back to the original terms. Many tests depend on this functionality.
+    // Copy stack back to the original terms.
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_value(term)) continue;
@@ -251,12 +279,7 @@ void evaluate_branch(EvalContext* context, Branch* branch)
     // Check to insert top-level state
     insert_top_level_state(context, branch);
 
-    for (int i=0; i < branch->length(); i++) {
-        evaluate_single_term(context, branch->get(i));
-
-          if (evaluation_interrupted(context))
-              break;
-    }
+    run_vm(context);
 
     save_top_level_state(context, branch);
 
@@ -477,6 +500,47 @@ std::string context_get_error_message(EvalContext* cxt)
         internal_error("called context_get_error_message, but the errored frame is gone");
 
     return as_string(frame->registers[cxt->errorTerm->index]);
+}
+
+void run_vm(EvalContext* context)
+{
+    Branch* topBranch = top_frame(context)->branch;
+
+do_instruction:
+    ca_assert(!context->errorOccurred);
+
+    Frame* frame = top_frame(context);
+    Branch* branch = frame->branch;
+    int pc = frame->pc;
+
+    // Check if we have finished this branch
+    if (pc >= branch->length()) {
+
+        if (branch == topBranch)
+            return;
+
+        finish_frame(context);
+
+        if (context->numFrames == 0)
+            return;
+
+        goto do_instruction;
+    }
+
+    Term* term = branch->get(pc);
+
+    int existingFrameCount = context->numFrames;
+    evaluate_single_term(context, term);
+
+    if (context->numFrames == existingFrameCount)
+        top_frame(context)->pc++;
+
+    // at this point, 'frame' pointer may be invalid.
+
+    if (context->errorOccurred)
+        return;
+
+    goto do_instruction;
 }
 
 } // namespace circa

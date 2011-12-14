@@ -80,6 +80,7 @@ CA_FUNCTION(evaluate_subroutine)
     // Push our frame (with inputs) onto the stack
     push_frame(context, contents, &registers);
 
+/*
     // Evaluate each term
     for (int i=0; i < contents->length(); i++) {
         evaluate_single_term(context, contents->get(i));
@@ -115,6 +116,7 @@ CA_FUNCTION(evaluate_subroutine)
             return;
         }
     }
+    */
 }
 
 bool is_subroutine(Term* term)
