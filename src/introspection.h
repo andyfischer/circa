@@ -28,6 +28,7 @@ void set_is_statement(Term* term, bool value);
 bool is_statement(Term* term);
 
 bool is_comment(Term* term);
+bool is_empty_comment(Term* term);
 bool is_value(Term* term);
 bool is_hidden(Term* term);
 

@@ -31,6 +31,11 @@ bool is_comment(Term* term)
     return term->function == COMMENT_FUNC;
 }
 
+bool is_empty_comment(Term* term)
+{
+    return is_comment(term) && term->stringProp("comment") == "";
+}
+
 bool is_value(Term* term)
 {
     return term->function == BUILTIN_FUNCS.value;
