@@ -50,6 +50,7 @@ namespace if_block_function {
         IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         as_function(IF_BLOCK_FUNC)->formatSource = formatSource;
         as_function(IF_BLOCK_FUNC)->createsStackFrame = false;
+        as_function(IF_BLOCK_FUNC)->vmInstruction = ControlFlowCall;
 
         CASE_FUNC = import_function(kernel, NULL, "case(bool :optional)");
         as_function(CASE_FUNC)->createsStackFrame = true;

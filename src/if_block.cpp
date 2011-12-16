@@ -528,29 +528,6 @@ CA_FUNCTION(evaluate_if_block)
                 copy(INPUT(inputIndex), registers[inputIndex]);
 
             push_frame(context, acceptedBranch, &registers);
-
-            // Evaluate each term
-            for (int i=0; i < acceptedBranch->length(); i++) {
-                evaluate_single_term(context, acceptedBranch->get(i));
-                if (evaluation_interrupted(context))
-                    break;
-            }
-
-            if (context->errorOccurred)
-                return;
-
-            swap(&registers, &top_frame(context)->registers);
-            pop_frame(context);
-
-            // Save outputs
-            for (int i=0;; i++) {
-                Term* placeholder = get_output_placeholder(acceptedBranch, i);
-                if (placeholder == NULL)
-                    break;
-
-                copy(registers[placeholder->index], OUTPUT_NTH(i));
-            }
-
             return;
         }
     }
