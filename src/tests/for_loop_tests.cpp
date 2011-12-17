@@ -136,7 +136,7 @@ void test_state_nested()
 void test_produce_output()
 {
     Branch branch;
-    branch.compile("x = for i in 0..5; i + 1");
+    branch.compile("x = for i in 0..5 { i + 1 }");
     finish_minor_branch(&branch);
     evaluate_branch(&branch);
     List* x = List::checkCast(branch["x"]);

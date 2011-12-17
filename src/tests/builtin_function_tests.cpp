@@ -69,31 +69,6 @@ void test_list()
     test_assert(l->getIndex(2)->asString() == "foo");
 }
 
-void test_vectorized_funcs()
-{
-    Branch branch;
-    TaggedValue* t = branch.eval("[1 2 3] + [4 5 6]");
-    test_assert(t);
-
-    test_assert(t->numElements() == 3);
-    test_assert(t->getIndex(0)->asInt() == 5);
-    test_assert(t->getIndex(1)->asInt() == 7);
-    test_assert(t->getIndex(2)->asInt() == 9);
-
-    // Test mult_s (multiply a vector to a scalar)
-    t = branch.eval("[10 20 30] * 1.1");
-
-    test_assert(t->numElements() == 3);
-    test_equals(t->getIndex(0)->asFloat(), 11);
-    test_equals(t->getIndex(1)->asFloat(), 22);
-    test_equals(t->getIndex(2)->asFloat(), 33);
-
-    // Test error handling
-    EvalContext context;
-    evaluate(&context, &branch, "[1 1 1] + [1 1]");
-    test_assert(context.errorOccurred);
-}
-
 void test_cond_with_int_and_float()
 {
     Branch branch;
@@ -278,7 +253,6 @@ void register_tests()
     REGISTER_TEST_CASE(builtin_function_tests::test_bool);
     REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
     REGISTER_TEST_CASE(builtin_function_tests::test_list);
-    REGISTER_TEST_CASE(builtin_function_tests::test_vectorized_funcs);
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_changed);

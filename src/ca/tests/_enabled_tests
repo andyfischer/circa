@@ -4,6 +4,8 @@ cast.ca
 compound_type.ca
 dynamic_typing.ca
 for.ca
+for_break.ca
+for_continue.ca
 for_state.ca
 for_state_1.ca
 for_state_2.ca

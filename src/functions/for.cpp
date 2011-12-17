@@ -25,11 +25,19 @@ namespace for_function {
 
     CA_FUNCTION(evaluate_break)
     {
-        CONTEXT->forLoopContext.breakCalled = true;
+        while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
+            finish_frame(CONTEXT);
+        finish_frame(CONTEXT);
     }
     CA_FUNCTION(evaluate_continue)
     {
-        CONTEXT->forLoopContext.continueCalled = true;
+        while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
+            finish_frame(CONTEXT);
+        
+        Term* index = for_loop_find_index(top_frame(CONTEXT)->branch);
+        TaggedValue* indexVal = get_register(CONTEXT, index);
+        set_int(indexVal, as_int(indexVal) + 1);
+        top_frame(CONTEXT)->pc = 0;
     }
     CA_FUNCTION(evaluate_discard)
     {
@@ -67,10 +75,12 @@ namespace for_function {
 
         BREAK_FUNC = import_function(kernel, evaluate_break, "break()");
         as_function(BREAK_FUNC)->formatSource = break_formatSource;
+        as_function(BREAK_FUNC)->vmInstruction = ControlFlowCall;
         hide_from_docs(BREAK_FUNC);
 
         CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
         as_function(CONTINUE_FUNC)->formatSource = continue_formatSource;
+        as_function(CONTINUE_FUNC)->vmInstruction = ControlFlowCall;
         hide_from_docs(CONTINUE_FUNC);
     }
 }

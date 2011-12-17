@@ -191,6 +191,13 @@ Term* find_enclosing_for_loop(Term* term)
 
     return find_enclosing_for_loop(branch->owningTerm);
 }
+Branch* find_enclosing_for_loop_contents(Term* term)
+{
+    Term* loop = find_enclosing_for_loop(term);
+    if (loop == NULL)
+        return NULL;
+    return nested_contents(loop);
+}
 
 void for_loop_update_output_index(Term* forTerm)
 {

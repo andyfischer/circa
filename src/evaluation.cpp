@@ -301,12 +301,7 @@ void evaluate_save_locals(EvalContext* context, Branch* branch)
     // Check to insert top-level state
     insert_top_level_state(context, branch);
 
-    for (int i=0; i < branch->length(); i++) {
-        evaluate_single_term(context, branch->get(i));
-
-          if (evaluation_interrupted(context))
-              break;
-    }
+    run_vm(context);
 
     save_top_level_state(context, branch);
 

@@ -1,0 +1,11 @@
+
+for i in [0, 1, 2, 3]
+    print('first loop reached top: ' i)
+    continue
+    print('don\'t print this')
+
+for i in [0, 1, 2, 3]
+    print('first loop reached top: ' i)
+    if i == 2
+      continue
+    print('first loop reached bottom: ' i)
