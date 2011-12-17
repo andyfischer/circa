@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    printf("Started looseleaf\n");
+
     // Walk upwards till we find the "runtime" directory. This way things will work
     // fine when we are launched from an app bundle.
     int steps = 0;
@@ -52,8 +54,10 @@ int main(int argc, char *argv[])
     Branch* filesBranch = create_branch_unevaluated(&kernel, "files");
     set_files_branch_global(filesBranch);
 
-    if (has_static_errors(&kernel))
+    if (has_static_errors(&kernel)) {
+        print_static_errors_formatted(&kernel);
         return -1;
+    }
 
     kernelRunner.start();
 

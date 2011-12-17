@@ -1,0 +1,20 @@
+def once() -> bool
+    state bool s = true
+    print(s)
+    result = s
+    s = false
+    return result
+
+if once()
+    print("check 1")
+
+def f()
+  if once()
+      print("check 2")
+
+s = null
+f(state = s)
+f(state = s)
+f(state = s)
+f(state = s)
+print(s)

@@ -20,6 +20,7 @@ bool has_static_errors_cached(Branch* branch);
 int count_static_errors(Branch* branch);
 
 bool print_static_errors_formatted(Branch* branch, std::ostream& out);
+bool print_static_errors_formatted(Branch* branch);
 void print_static_error(Term* term, std::ostream& out);
 std::string get_static_errors_formatted(Branch* branch);
 std::string get_static_error_message(Term* term);

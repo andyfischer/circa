@@ -37,7 +37,7 @@ const char* gl_to_string(GLenum glenum)
     return "";
 }
 
-bool gl_check_error(circa::EvalContext* cxt, circa::Term* term)
+bool gl_check_error(circa::EvalContext* cxt)
 {
     GLenum errcode = glGetError();
     if (errcode == GL_NO_ERROR)
@@ -45,7 +45,9 @@ bool gl_check_error(circa::EvalContext* cxt, circa::Term* term)
 
     const char* err = gl_to_string(errcode);
 
-    circa::error_occurred(cxt, term, std::string("OpenGL reported error: ") + err);
+    std::string msg("OpenGL reported error: ");
+    msg += err;
+    circa::error_occurred(cxt, msg.c_str());
     return true;
 }
 
@@ -124,7 +126,7 @@ CA_FUNCTION(gl__triangles)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 
     free(buffer);
 }
@@ -147,7 +149,7 @@ CA_FUNCTION(gl__line_strip)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 
     free(buffer);
 }
@@ -170,7 +172,7 @@ CA_FUNCTION(gl__line_loop)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
     free(buffer);
 }
 
@@ -192,7 +194,7 @@ CA_FUNCTION(gl__lines)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
     free(buffer);
 }
 
@@ -214,7 +216,7 @@ CA_FUNCTION(gl__points)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
     free(buffer);
 }
 
@@ -257,7 +259,7 @@ CA_FUNCTION(gl__circle)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
     free(buffer);
 }
 
@@ -313,7 +315,7 @@ CA_FUNCTION(gl__pie)
 
     clear_gl_color();
     glDisableClientState(GL_VERTEX_ARRAY);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 
 CA_FUNCTION(gl__draw_texture_as_quad)
@@ -477,7 +479,7 @@ CA_FUNCTION(opengl__shader_quad)
     glEnd();
 
     glUseProgram(0);
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 
 CA_FUNCTION(opengl__get_uniform_location)
@@ -485,7 +487,7 @@ CA_FUNCTION(opengl__get_uniform_location)
 //std::cout << "name: " << STRING_INPUT(1) << std::endl;
     set_int(OUTPUT, glGetUniformLocation(INT_INPUT(0), STRING_INPUT(1)));
 //std::cout << "result: " << OUTPUT->toString() << std::endl;
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 CA_FUNCTION(opengl__uniform)
 {
@@ -498,12 +500,12 @@ CA_FUNCTION(opengl__uniform)
     else
         return ERROR_OCCURRED("unrecognized type as a uniform value");
 
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 CA_FUNCTION(opengl__use_program)
 {
     glUseProgram(INT_INPUT(0));
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 
 #if 0
@@ -514,7 +516,7 @@ CA_FUNCTION(set_uniform)
 
     GLint loc = glGetUniformLocation(current_program, name);
 
-    if (gl_check_error(CONTEXT, CALLER))
+    if (gl_check_error(CONTEXT))
         return;
 
     if (is_int(input)) {
@@ -528,7 +530,7 @@ CA_FUNCTION(set_uniform)
         return;
     }
 
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 #endif
 
@@ -553,7 +555,7 @@ CA_FUNCTION(opengl__generate_frame_buffer)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    if (gl_check_error(CONTEXT, CALLER))
+    if (gl_check_error(CONTEXT))
         return;
 
     // Create FBO
@@ -570,11 +572,11 @@ CA_FUNCTION(opengl__generate_frame_buffer)
     glOrtho(0, width, height, 0, -1000.0f, 1000.0f);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
 
-    if (gl_check_error(CONTEXT, CALLER))
+    if (gl_check_error(CONTEXT))
         return;
 
     FrameBuffer* buffer = handle_t::create<FrameBuffer>(OUTPUT, g_frameBuffer_t);
@@ -592,7 +594,7 @@ CA_FUNCTION(opengl__FrameBuffer_bind)
 
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, buffer->fbo_id);
 
-    if (gl_check_error(CONTEXT, CALLER)) {
+    if (gl_check_error(CONTEXT)) {
         ERROR_OCCURRED("glBindFramebufferEXT failed");
         return;
     }
@@ -623,7 +625,7 @@ CA_FUNCTION(opengl__FrameBuffer_draw_quad)
     // Cleanup
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    gl_check_error(CONTEXT, CALLER);
+    gl_check_error(CONTEXT);
 }
 CA_FUNCTION(opengl__FrameBuffer_get_tex_id)
 {

@@ -348,6 +348,12 @@ TaggedValue* get_output(EvalContext* context, ListData* args)
 {
     return get_arg(context, args, list_size(args) - 1);
 }
+
+Term* current_term(EvalContext* context)
+{
+    return context->currentTerm;
+}
+
 TaggedValue* get_register(EvalContext* context, Term* term)
 {
     Frame* frame = top_frame(context);
@@ -376,6 +382,17 @@ void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const
         context->errorOccurred = true;
         context->errorTerm = term;
     }
+}
+
+void error_occurred(EvalContext* context, const char* msg)
+{
+    Term* term = current_term(context);
+    error_occurred(context, term, get_register(context, term), msg);
+}
+
+void error_occurred(EvalContext* context, std::string const& msg)
+{
+    error_occurred(context, msg.c_str());
 }
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output)

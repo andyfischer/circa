@@ -38,6 +38,7 @@ void print_usage()
         "  circa -pp <filename>    : Like -p but also print term properties\n"
         "  circa -s <filename>     : Compile the source file and reproduce its source code\n"
         "  circa -check <filename> : Statically check the script for any errors\n"
+        "  circa -build <dir>      : Rebuild a module using a build.ca file\n"
         << std::endl;
 }
 

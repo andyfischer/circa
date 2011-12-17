@@ -103,10 +103,13 @@ TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
 void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest);
 TaggedValue* get_output(EvalContext* context, ListData* args);
 
+Term* current_term(EvalContext* context);
 TaggedValue* get_register(EvalContext* context, Term* term);
 
 // Signal that a runtime error has occurred.
 void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
+void error_occurred(EvalContext* context, const char* msg);
+void error_occurred(EvalContext* context, std::string const& msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 

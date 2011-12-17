@@ -224,6 +224,11 @@ bool print_static_errors_formatted(Branch* branch, std::ostream& out)
     return print_static_errors_formatted(List::checkCast(&branch->staticErrors), out);
 }
 
+bool print_static_errors_formatted(Branch* branch)
+{
+    return print_static_errors_formatted(branch, std::cout);
+}
+
 void print_static_error(Term* term, std::ostream& out)
 {
     // delete this
