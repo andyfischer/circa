@@ -17,5 +17,6 @@ should be 3: 3
 should be 0: 0
 For loop output value:
 should be 4,5,6: [4, 5, 6]
+should be []: []
 For loop list rebinding:
 should be 2,4,6: [2, 4, 6]

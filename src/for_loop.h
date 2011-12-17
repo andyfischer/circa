@@ -27,5 +27,6 @@ Term* find_enclosing_for_loop(Term* term);
 void for_loop_update_output_index(Term* forTerm);
 
 CA_FUNCTION(evaluate_for_loop);
+CA_FUNCTION(evaluate_loop_output);
 
 } // namespace circa

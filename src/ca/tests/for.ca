@@ -55,6 +55,9 @@ print('For loop output value:')
 output = for i in [1 2 3] { i+3 }
 print('should be 4,5,6: ' output)
 
+output = for i in [] { i + 3 }
+print('should be []: ' output)
+
 print('For loop list rebinding:')
 
 list = [1 2 3]

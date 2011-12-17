@@ -53,11 +53,13 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         as_function(FOR_FUNC)->formatSource = formatSource;
         as_function(FOR_FUNC)->createsStackFrame = true;
+        as_function(FOR_FUNC)->vmInstruction = ControlFlowCall;
 
         BUILTIN_FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");
         BUILTIN_FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
-        BUILTIN_FUNCS.loop_output = import_function(kernel, NULL, "loop_output(any)");
+        BUILTIN_FUNCS.loop_output = import_function(kernel, evaluate_loop_output, "loop_output(int,any)");
+        as_function(BUILTIN_FUNCS.loop_output)->vmInstruction = ControlFlowCall;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         as_function(DISCARD_FUNC)->formatSource = discard_formatSource;

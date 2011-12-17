@@ -67,6 +67,7 @@ Frame* get_frame_from_bottom(EvalContext* context, int index);
 Frame* push_frame(EvalContext* context, Branch* branch, List* registers);
 Frame* push_frame(EvalContext* context, Branch* branch);
 void pop_frame(EvalContext* context);
+void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
 
 // Pre-evaluation

@@ -7,6 +7,7 @@
 #include "function.h"
 #include "importing_macros.h"
 #include "introspection.h"
+#include "list_shared.h"
 #include "locals.h"
 #include "source_repro.h"
 #include "stateful_code.h"
@@ -84,7 +85,8 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
 void add_loop_output_term(Branch* branch)
 {
     Term* result = find_last_non_comment_expression(branch);
-    Term* term = apply(branch, BUILTIN_FUNCS.loop_output, TermList(result));
+    Term* term = apply(branch, BUILTIN_FUNCS.loop_output,
+        TermList(for_loop_find_index(branch), result));
     move_before_outputs(term);
 }
 
@@ -261,10 +263,6 @@ CA_FUNCTION(evaluate_for_loop)
     TaggedValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
-    // Preserve old for-loop context
-    ForLoopContext prevLoopContext = context->forLoopContext;
-    context->forLoopContext.discard = false;
-
     List registers;
     registers.resize(contents->length());
 
@@ -279,6 +277,9 @@ CA_FUNCTION(evaluate_for_loop)
     // Create a stack frame
     push_frame(context, contents, &registers);
 
+    // Set up a blank list for output
+    set_list(top_frame(context)->registers[contents->length()-1], inputListLength);
+
     // Walk forward until we find the loop_index() term.
     int loopIndexPos = 0;
     for (; loopIndexPos < contents->length(); loopIndexPos++) {
@@ -287,19 +288,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
     ca_assert(contents->get(loopIndexPos)->function == BUILTIN_FUNCS.loop_index);
 
-    // Find the loop_output() term.
-    int loopOutputPos = -1;
-    for (int i=0; i < contents->length(); i++) {
-        if (contents->get(i)->function == BUILTIN_FUNCS.loop_output) {
-            loopOutputPos = contents->get(i)->input(0)->index;
-            break;
-        }
-    }
-    ca_assert(loopOutputPos > 0);
-
-    List loopOutput;
-
-    // For a zero-iteration loop, copy over inputs to their respective outputs.
+    // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {
         List* registers = &top_frame(context)->registers;
         for (int i=1;; i++) {
@@ -311,60 +300,63 @@ CA_FUNCTION(evaluate_for_loop)
                 break;
             copy(registers->get(input->index), registers->get(output->index));
         }
-    }
-
-    for (int iteration=0; iteration < inputListLength; iteration++) {
-        context->forLoopContext.continueCalled = false;
-
-        // Set the loop index
-        set_int(top_frame(context)->registers[loopIndexPos], iteration);
-
-        // Evaluate contents, skipping past loopIndexPos
-        for (int i=loopIndexPos+1; i < contents->length(); i++) {
-            if (evaluation_interrupted(context))
-                break;
-
-            evaluate_single_term(context, contents->get(i));
-        }
-
-        // Copy loop output
-        copy(top_frame(context)->registers[loopOutputPos], loopOutput.append());
-
-        // Check if we are finished
-        if (iteration >= inputListLength)
-            break;
-
-        // If we're not finished yet, copy rebound outputs back to inputs.
-        for (int i=1;; i++) {
-            List* registers = &top_frame(context)->registers;
-            Term* input = get_input_placeholder(contents, i);
-            if (input == NULL)
-                break;
-            Term* output = get_output_placeholder(contents, i);
-            copy(registers->get(output->index), registers->get(input->index));
-        }
-    }
-
-    // If an error occurred, leave context the way it was.
-    if (context->errorOccurred)
+        finish_frame(context);
         return;
-
-    // Restore loop context
-    context->forLoopContext = prevLoopContext;
-
-    swap(&top_frame(context)->registers, &registers);
-    pop_frame(context);
-
-    // Save outputs
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(contents, i);
-        if (placeholder == NULL)
-            break;
-
-        copy(registers[placeholder->index], OUTPUT_NTH(i));
     }
 
-    copy(&loopOutput, OUTPUT);
+    // Set the loop index
+    set_int(top_frame(context)->registers[loopIndexPos], 0);
+
+    // Interpreter will run the contents of the branch
+}
+
+CA_FUNCTION(evaluate_loop_output)
+{
+    // Check if we are finished
+    Term* caller = CALLER;
+    Branch* contents = caller->owningBranch;
+    EvalContext* context = CONTEXT;
+    Frame* topFrame = top_frame(context);
+
+    TaggedValue* index = INPUT(0);
+    TaggedValue* result = INPUT(1);
+    
+    // Copy loop output
+    Term* primaryOutput = get_output_placeholder(contents, 0);
+    copy(result, list_get(topFrame->registers[primaryOutput->index], as_int(index)));
+
+    // Hack: make sure the output_placeholder terms are evaluated
+    for (int i=1;; i++) {
+        Term* output = get_output_placeholder(contents, i);
+        if (output == NULL)
+            break;
+        evaluate_single_term(context, output);
+    }
+
+    // Find list length
+    TaggedValue* listInput = topFrame->registers[0];
+
+    // Increment the loop index
+    set_int(index, as_int(index) + 1);
+
+    // Check if we are finished
+    if (as_int(index) >= list_length(listInput)) {
+        finish_frame(CONTEXT);
+        return;
+    }
+
+    // If we're not finished yet, copy rebound outputs back to inputs.
+    for (int i=1;; i++) {
+        List* registers = &topFrame->registers;
+        Term* input = get_input_placeholder(contents, i);
+        if (input == NULL)
+            break;
+        Term* output = get_output_placeholder(contents, i);
+        copy(registers->get(output->index), registers->get(input->index));
+    }
+
+    // Return to start of loop body
+    topFrame->pc = 0;
 }
 
 } // namespace circa
