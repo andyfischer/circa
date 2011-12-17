@@ -401,10 +401,10 @@ Term* create_type_value(Branch* branch, Type* value, std::string const& name)
     return term;
 }
 
-Term* create_symbol_value(Branch* branch, TaggedValue* value, std::string const& name)
+Term* create_symbol_value(Branch* branch, int value, std::string const& name)
 {
     Term* term = create_value(branch, &SYMBOL_T, name);
-    copy(value, term);
+    set_symbol(term, value);
     return term;
 }
 

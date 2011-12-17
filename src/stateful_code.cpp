@@ -84,7 +84,7 @@ void get_state_description(Term* term, TaggedValue* output)
     if (term->function == FOR_FUNC) {
         List& list = *List::cast(output, 2);
         describe_state_shape(nested_contents(term), list[0]);
-        copy(&RepeatSymbol, list[1]);
+        set_symbol(list[1], Repeat);
     } else if (term->function == IF_BLOCK_FUNC) {
         int numBranches = if_block_count_cases(term);
 

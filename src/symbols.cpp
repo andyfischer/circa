@@ -23,4 +23,11 @@ void symbol_value(TaggedValue* tv, int name)
     symbol_value(name, tv);
 }
 
+void set_symbol(TaggedValue* tv, int val)
+{
+    set_null(tv);
+    tv->value_type = &SYMBOL_T;
+    tv->value_data.asint = val;
+}
+
 } // namespace circa

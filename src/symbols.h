@@ -1,7 +1,10 @@
+// Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #pragma once
 
 namespace circa {
+
+struct TaggedValue;
 
 // Builtin symbols:
 
@@ -9,6 +12,7 @@ const int File = 1;
 const int Newline = 2;
 const int Out = 3;
 const int Unknown = 4;
+const int Repeat = 10;
 
 // Related to static errors
 const int NotEnoughInputs = 5;
@@ -24,5 +28,6 @@ const int HighestBuiltinSymbol = 9;
 int as_symbol(TaggedValue* tv);
 void symbol_value(int name, TaggedValue* tv);
 void symbol_value(TaggedValue* tv, int name);
+void set_symbol(TaggedValue* tv, int name);
 
 } // namespace circa

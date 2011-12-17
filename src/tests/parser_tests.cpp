@@ -380,7 +380,6 @@ void test_unary_minus()
 
     test_assert(b->function->name == "neg");
     test_assert(b->input(0) == a);
-    test_equals(b->toFloat(), -1.0);
 
     // - on a literal value should just modify that value, and not create a neg() operation.
     Term* c = branch.eval("-1");
@@ -392,12 +391,10 @@ void test_unary_minus()
     // This is the case if there are no spaces around the -
     Term* d = branch.eval("2-1");
     test_assert(d->function->name == "sub");
-    test_assert(d->asInt() == 1);
 
     // Or if there are spaces on both sides of the -
     Term* e = branch.eval("2 - 1");
     test_assert(e->function->name == "sub");
-    test_assert(e->asInt() == 1);
 
     // But if there's a space before the - and not after it, that should be parsed as
     // two separate expressions.

@@ -216,37 +216,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     free_list(outputList);
 }
 
-void evaluate_branch_internal(EvalContext* context, Branch* branch)
-{
-    push_frame(context, branch);
-
-    for (int i=0; i < branch->length(); i++) {
-        evaluate_single_term(context, branch->get(i));
-
-          if (evaluation_interrupted(context))
-              break;
-    }
-
-    if (!context->errorOccurred)
-        pop_frame(context);
-}
-
-void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output)
-{
-    push_frame(context, branch);
-
-    for (int i=0; i < branch->length(); i++)
-        evaluate_single_term(context, branch->get(i));
-
-    if (output != NULL) {
-        Term* outputTerm = branch->getFromEnd(0);
-        copy(top_frame(context)->registers[outputTerm->index], output);
-    }
-
-    if (!context->errorOccurred)
-        pop_frame(context);
-}
-
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
 {
     // Copy stack back to the original terms.

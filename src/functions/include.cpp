@@ -56,9 +56,9 @@ namespace include_function {
         }
 #endif
 
-        evaluate_branch_internal(context, contents);
-
         set_branch(OUTPUT, contents);
+
+        push_frame(context, contents);
     }
     void include_post_compile(Term* term)
     {
@@ -79,7 +79,7 @@ namespace include_function {
     void setup(Branch* kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
-                "include(string filename) -> Branch");
+                "include(string filename) :controlflow -> Branch");
         as_function(INCLUDE_FUNC)->postCompile = include_post_compile;
 
         LOAD_SCRIPT_FUNC = import_function(kernel, load_script,

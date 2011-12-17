@@ -8,7 +8,7 @@ namespace namespace_function {
 
     CA_FUNCTION(evaluate)
     {
-        evaluate_branch_internal(CONTEXT, nested_contents(CALLER));
+        push_frame(CONTEXT, nested_contents(CALLER));
     }
 
     void format_source(StyledSource* source, Term* term)
@@ -22,7 +22,7 @@ namespace namespace_function {
 
     void early_setup(Branch* kernel)
     {
-        NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
+        NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace() :controlflow");
         as_function(NAMESPACE_FUNC)->formatSource = format_source;
     }
     void setup(Branch* kernel) {}

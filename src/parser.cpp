@@ -615,6 +615,20 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(result, tokens, startPosition);
     tokens.consume(RPAREN);
 
+    // Another optional list of symbols
+    if (tokens.nextNonWhitespaceIs(SYMBOL)) {
+        possible_whitespace(tokens);
+        std::string symbolText = tokens.consumeStr(SYMBOL);
+        if (symbolText == ":controlflow") {
+            as_function(result)->vmInstruction = ControlFlowCall;
+            result->setBoolProp("controlflow", true);
+        }
+        else {
+            return compile_error_for_line(result, tokens, startPosition,
+                "Unrecognized symbol: " + symbolText);
+        }
+    }
+
     // Output type
     Term* outputType = VOID_TYPE;
 

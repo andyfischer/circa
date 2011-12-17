@@ -8,7 +8,7 @@ namespace branch_function {
 
     CA_FUNCTION(branch_evaluate)
     {
-        evaluate_branch_internal(CONTEXT, nested_contents(CALLER));
+        push_frame(CONTEXT, nested_contents(CALLER));
     }
 
     CA_FUNCTION(lambda_evaluate)
@@ -26,6 +26,7 @@ namespace branch_function {
     {
         BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
         as_function(BRANCH_FUNC)->formatSource = format_source;
+        as_function(BRANCH_FUNC)->vmInstruction = ControlFlowCall;
 
         BRANCH_UNEVALUATED_FUNC = import_function(kernel, NULL, "branch_unevaluated()");
         LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda() -> Branch");

@@ -13,6 +13,7 @@
 
 #endif // WINDOWS
 
+// standard libraries
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -24,6 +25,9 @@
 #include <string>
 #include <sstream>
 #include <stdlib.h>
+
+// Circa headers
+#include "symbols.h"
 
 #define export_func extern "C"
 

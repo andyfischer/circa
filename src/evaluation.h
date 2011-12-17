@@ -77,9 +77,6 @@ void write_input_instruction(Term* caller, Term* input, TaggedValue* isn);
 // by the interpreter.
 void evaluate_single_term(EvalContext* context, Term* term);
 
-void evaluate_branch_internal(EvalContext* context, Branch* branch);
-void evaluate_branch_internal(EvalContext* context, Branch* branch, TaggedValue* output);
-
 void evaluate_branch(EvalContext* context, Branch* branch);
 
 void evaluate_save_locals(EvalContext* context, Branch* branch);

@@ -54,10 +54,10 @@ namespace branch_methods_function {
             format_static_error(list[i], out[i]);
     }
 
-    CA_DEFINE_FUNCTION(evaluate, "Branch.evaluate()")
+    CA_DEFINE_FUNCTION(evaluate, "Branch.evaluate() :controlflow")
     {
         Branch* branch = as_branch(INPUT(0));
-        evaluate_branch_internal(CONTEXT, branch);
+        push_frame(CONTEXT, branch);
     }
 
     // Reflection

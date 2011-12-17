@@ -9,10 +9,7 @@ namespace assign_function {
     CA_FUNCTION(assign)
     {
         Branch* contents = nested_contents(CALLER);
-
-        TaggedValue output;
-        evaluate_branch_internal(CONTEXT, contents, &output);
-        swap(&output, OUTPUT);
+        push_frame(CONTEXT, contents);
     }
 
     Type* specializeType(Term* term)
@@ -89,12 +86,13 @@ namespace assign_function {
         // Walk upwards and append a series of set_terms.
         Term* getter = term->input(0);
         Term* desired = term->input(1);
+        Term* result = NULL;
 
         if (getter == NULL || desired == NULL)
             return;
 
         while (true) {
-            Term* result = write_setter_from_getter(contents, getter, desired);
+            result = write_setter_from_getter(contents, getter, desired);
 
             if (result == NULL)
                 break;
@@ -105,6 +103,8 @@ namespace assign_function {
             if (getter->name != "")
                 break;
         }
+
+        append_output_placeholder(contents, result);
     }
 
     void postInputChange(Term* term)
@@ -115,7 +115,7 @@ namespace assign_function {
 
     void setup(Branch* kernel)
     {
-        ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) -> any");
+        ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) :controlflow -> any");
         as_function(ASSIGN_FUNC)->specializeType = specializeType;
         as_function(ASSIGN_FUNC)->formatSource = formatSource;
         as_function(ASSIGN_FUNC)->postInputChange = postInputChange;

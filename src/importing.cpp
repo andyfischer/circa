@@ -21,7 +21,8 @@ Term* import_function(Branch* branch, EvaluateFunc evaluate, std::string const& 
     Term* result = parser::compile(branch, parser::function_decl, header);
 
     as_function(result)->evaluate = evaluate;
-    as_function(result)->vmInstruction = PureCall;
+    if (!result->boolPropOptional("controlflow", false))
+        as_function(result)->vmInstruction = PureCall;
     return result;
 }
 

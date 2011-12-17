@@ -578,7 +578,7 @@ void load_script(Branch* branch, const char* filename)
 {
     // Store the file origin
     List* fileOrigin = set_list(&branch->origin, 3);
-    copy(&FileSymbol, fileOrigin->get(0));
+    set_symbol(fileOrigin->get(0), File);
     set_string(fileOrigin->get(1), filename);
     set_int(fileOrigin->get(2), get_modified_time(filename));
 
@@ -666,7 +666,7 @@ List* branch_get_file_origin(Branch* branch)
     if (list->length() != 3)
         return NULL;
 
-    if (!equals(list->get(0), &FileSymbol))
+    if (as_symbol(list->get(0)) != File)
         return NULL;
 
     return list;
@@ -680,7 +680,7 @@ bool check_and_update_file_origin(Branch* branch, const char* filename)
 
     if (fileOrigin == NULL) {
         fileOrigin = set_list(&branch->origin, 3);
-        copy(&FileSymbol, fileOrigin->get(0));
+        set_symbol(fileOrigin->get(0), File);
         set_string(fileOrigin->get(1), filename);
         set_int(fileOrigin->get(2), modifiedTime);
         return true;
