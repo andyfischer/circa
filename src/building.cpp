@@ -52,6 +52,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
     update_unique_name(result);
     on_inputs_changed(result);
+    update_extra_outputs(result);
 
     return result;
 }
@@ -536,6 +537,61 @@ Branch* term_get_function_details(Term* call)
     return function_get_contents(as_function(call->function));
 }
 
+void update_extra_outputs(Term* term)
+{
+    Branch* branch = term->owningBranch;
+
+    for (int index=1; ; index++) {
+        Term* placeholder = term_get_output_placeholder(term, index);
+        if (placeholder == NULL)
+            break;
+
+        const char* name = "";
+
+        int rebindsInput = placeholder->intPropOptional("rebindsInput", -1);
+        if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
+            name = term->input(rebindsInput)->name.c_str();
+        } else {
+            name = placeholder->name.c_str();
+        }
+
+        Term* extra_output = NULL;
+
+        // Check if this extra_output() already exists
+        Term* existing = branch->getSafe(term->index + index);
+        if (existing != NULL && existing->function == EXTRA_OUTPUT_FUNC)
+            extra_output = existing;
+        
+        if (extra_output == NULL)
+            extra_output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
+        change_declared_type(extra_output, placeholder->type);
+
+        if (function_is_state_input(placeholder))
+            extra_output->setBoolProp("state", true);
+    }
+}
+
+Term* get_extra_output(Term* term, int index)
+{
+    Term* position = term->owningBranch->getSafe(term->index + index + 1);
+    if (position != NULL && position->function == EXTRA_OUTPUT_FUNC)
+        return position;
+    return NULL;
+}
+
+Term* find_extra_output_for_state(Term* term)
+{
+    for (int i=0;; i++) {
+        Term* extra_output = get_extra_output(term, i);
+        if (extra_output == NULL)
+            break;
+
+        if (extra_output->boolPropOptional("state", false))
+            return extra_output;
+    }
+    return NULL;
+}
+
 Term* term_get_input_placeholder(Term* call, int index)
 {
     Branch* contents = term_get_function_details(call);
@@ -668,34 +724,11 @@ void post_compile_term(Term* term)
     if (func != NULL)
         func(term);
 
-    Term* stateOutput = NULL;
+    update_extra_outputs(term);
 
-    // If the function has multiple outputs, then create extra_output terms for all of
-    // those outputs.
-    for (int index=1; ; index++) {
-        Term* placeholder = term_get_output_placeholder(term, index);
-        if (placeholder == NULL)
-            break;
+    Term* stateOutput = find_extra_output_for_state(term);
 
-        const char* name = "";
-
-        int rebindsInput = placeholder->intPropOptional("rebindsInput", -1);
-        if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
-            name = term->input(rebindsInput)->name.c_str();
-        } else {
-            name = placeholder->name.c_str();
-        }
-
-        Term* output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
-        change_declared_type(output, placeholder->type);
-
-        if (function_is_state_input(placeholder)) {
-            output->setBoolProp("state", true);
-            stateOutput = output;
-        }
-    }
-
-    // Possibly append a pack_state() call
+    // Possibly append a pack_state() call for a state extra output.
     Term* unpack = find_input_with_function(term, BUILTIN_FUNCS.unpack_state);
     if (stateOutput != NULL && unpack != NULL) {
         Term* container = unpack->input(0);
@@ -703,12 +736,23 @@ void post_compile_term(Term* term)
         pack->setStringProp("field", unpack->stringProp("field"));
         hide_from_source(pack);
     }
+
+    // If this term rebinds the name of a declared state var, then it also needs
+    // a pack_state() call.
+    Branch* branch = term->owningBranch;
+    if (term->name != "") {
+        if (branch->findFirstBinding(term->name)->function == DECLARED_STATE_FUNC) {
+            Term* pack = apply(branch, BUILTIN_FUNCS.pack_state, TermList(
+                find_open_state_result(branch, branch->length()),
+                term));
+            pack->setStringProp("field", term->name);
+            move_after(pack, term);
+        }
+    }
 }
 
 void finish_minor_branch(Branch* branch)
 {
-    pack_any_open_state_vars(branch);
-
     // Create an output_placeholder for state, if necessary
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)

@@ -37,7 +37,7 @@ namespace return_function {
                     term, phrase_type::WHITESPACE);
 
             if (term->input(0) != NULL)
-                format_source_for_input(source, term, 0);
+                format_source_for_input(source, term, 0, "", "");
         } else {
             format_term_source_default_formatting(source, term);
         }

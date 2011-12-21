@@ -95,6 +95,11 @@ Term* prepend_output_placeholder(Branch* branch, Term* result);
 
 Branch* term_get_function_details(Term* call);
 
+// Extra outputs
+void update_extra_outputs(Term* term);
+Term* get_extra_output(Term* term, int index);
+Term* find_extra_output_for_state(Term* term);
+
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes
 // found inside the function definition, but for 'if' and 'for' blocks the placeholder
 // is inside nested contents.
