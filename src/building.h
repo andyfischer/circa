@@ -104,6 +104,7 @@ Term* term_get_output_placeholder(Term* call, int index);
 bool term_has_variable_args(Term* term);
 
 Term* find_open_state_result(Branch* branch, int position);
+Term* find_open_state_result(Term* location);
 Term* find_or_create_open_state_result(Branch* branch, int position);
 
 // Check the term's inputs to see if it's missing an implicit input (such as the state
@@ -158,5 +159,7 @@ void list_outer_pointers(Branch* branch, TermList* list);
 void expand_variadic_inputs_for_call(Branch* branch, Term* call);
 int find_input_index_for_pointer(Term* call, Term* input);
 void check_to_add_state_output_placeholder(Branch* branch);
+Term* find_intermediate_result_for_output(Term* location, Term* output);
+void update_exit_points(Branch* branch);
 
 } // namespace circa

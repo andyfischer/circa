@@ -589,6 +589,11 @@ Term* find_open_state_result(Branch* branch, int position)
     return NULL;
 }
 
+Term* find_open_state_result(Term* location)
+{
+    return find_open_state_result(location->owningBranch, location->index);
+}
+
 Term* find_or_create_open_state_result(Branch* branch, int position)
 {
     Term* term = find_open_state_result(branch, position);
@@ -1093,6 +1098,33 @@ void check_to_add_state_output_placeholder(Branch* branch)
 
     Term* output = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
     output->setBoolProp("state", true);
+}
+
+Term* find_intermediate_result_for_output(Term* location, Term* output)
+{
+    if (is_state_input(output)) {
+        return find_open_state_result(location);
+    } else if (output->name != "") {
+        return get_named_at(location->owningBranch, location->index, output->name);
+    } else {
+        return NULL;
+    }
+}
+
+void update_exit_points(Branch* branch)
+{
+    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+
+        if (term->function == RETURN_FUNC) {
+            for (int i=1;; i++) {
+                Term* output = get_output_placeholder(branch, i);
+                if (output == NULL)
+                    break;
+                set_input(term, i, find_intermediate_result_for_output(term, output));
+            }
+        }
+    }
 }
 
 } // namespace circa

@@ -139,6 +139,8 @@ void finish_building_function(Function* func, Type* declaredOutputType)
     // Finally, write a final output_placeholder() term for the primary output.
     Term* output = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
     change_declared_type(output, declaredOutputType);
+
+    update_exit_points(contents);
 }
 
 bool is_callable(Term* term)

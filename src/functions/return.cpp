@@ -8,25 +8,20 @@ namespace return_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(return_func, "return(any :optional)")
+    CA_DEFINE_FUNCTION(return_func, "return(any :multiple :optional)")
     {
-        CONTEXT->interruptSubroutine = true;
+        while (!is_subroutine(top_frame(CONTEXT)->branch->owningTerm))
+            finish_frame(CONTEXT);
 
-        // TODO: Pop stack frames
+        Branch* branch = top_frame(CONTEXT)->branch;
 
-        // Temp: Evaluate each extra output_placeholder so that it has a value
-        Branch* contents = CALLER->owningBranch;
-        for (int i=1;; i++) {
-            Term* placeholder = get_output_placeholder(contents, i);
-            if (placeholder == NULL)
+        // Copy values to their output placeholders.
+        for (int i=0;; i++) {
+            Term* output = get_output_placeholder(branch, i);
+            if (output == NULL)
                 break;
-            evaluate_single_term(CONTEXT, placeholder);
+            copy(INPUT(i), get_register(CONTEXT, output));
         }
-
-        // Copy this value to the last output_placeholder()
-        TaggedValue* result = INPUT(0);
-        List* registers = &top_frame(CONTEXT)->registers;
-        copy(result, registers->get(registers->length()-1));
 
         // Move PC to end
         Frame* top = top_frame(CONTEXT);
