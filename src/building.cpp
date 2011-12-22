@@ -594,6 +594,9 @@ Term* find_extra_output_for_state(Term* term)
 
 Term* term_get_input_placeholder(Term* call, int index)
 {
+    if (!is_function(call->function))
+        return NULL;
+
     Branch* contents = term_get_function_details(call);
     if (contents == NULL)
         return NULL;
@@ -615,6 +618,9 @@ int term_count_input_placeholders(Term* term)
 
 Term* term_get_output_placeholder(Term* call, int index)
 {
+    if (!is_function(call->function))
+        return NULL;
+
     Branch* contents = term_get_function_details(call);
     if (contents == NULL)
         return NULL;
