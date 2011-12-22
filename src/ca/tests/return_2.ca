@@ -1,0 +1,9 @@
+
+def f(bool b) -> int
+  if b
+    return 1
+  else
+    return 2
+
+f(true) -> print
+f(false) -> print

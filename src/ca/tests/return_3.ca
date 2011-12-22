@@ -1,0 +1,9 @@
+
+def f() -> int
+  state s
+  s = 2
+  return 3
+
+s = null
+f(state = s) -> print
+s -> print

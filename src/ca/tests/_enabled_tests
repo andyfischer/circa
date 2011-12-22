@@ -25,5 +25,9 @@ subroutine.ca
 subroutine_state.ca
 subroutine_state_1.ca
 subroutine_state_2.ca
+return_1.ca
+return_2.ca
+return_3.ca
+return_4.ca
 type_func.ca
 vectorized_func.ca
