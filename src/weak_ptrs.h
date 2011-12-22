@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <cstddef>
+
 namespace circa {
 
 typedef size_t WeakPtr;
