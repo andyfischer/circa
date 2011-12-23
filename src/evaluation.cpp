@@ -256,10 +256,10 @@ void evaluate_branch(EvalContext* context, Branch* branch)
 
     run_vm(context);
 
-    save_top_level_state(context, branch);
-
-    if (!context->errorOccurred)
+    if (!context->errorOccurred) {
+        save_top_level_state(context, branch);
         pop_frame(context);
+    }
 }
 
 void evaluate_save_locals(EvalContext* context, Branch* branch)
@@ -521,8 +521,6 @@ do_instruction:
 
     if (func->vmInstruction == PureCall)
         top_frame(context)->pc++;
-
-    // at this point, 'frame' pointer may be invalid.
 
     if (context->errorOccurred)
         return;
