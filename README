@@ -1,23 +1,25 @@
 
-Circa is a programming language designed for live coding. Most programming languages try
-to improve *what* you can express, with Circa we instead try to improve the process by
-which code is created.
+Introduction
+============
 
-Some features of Circa are:
+Circa is a programming language designed for live coding. Most programming languages try to
+improve *what* you can express, with Circa we instead try to improve *how* you create code.
+
+Features
+========
 
  - Live coding. Has a rich API for examining or modifying code at runtime.
  - State is preserved across most code changes.
- - Supports live code changes made by external tools (such as separate text editors), as
-   well as changes made within the system.
+ - Supports live code changes made by external tools (such as separate text editors), as well
+   as changes made within the system.
  - Code is stored in a (relatively) simple format, allowing for easy introspection and
    static reasoning.
  - Visual programming is supported.
  - Compiled code can be unparsed back to text, with all comments and formatting preserved.
    This allows for a hybrid approach of textual and visual code editing.
 
-This project is currently alpha-level. Curious people, or people interested in hacking along,
-are welcome to try it out. People who want to use it for serious projects, or people who don't
-like bugs, are recommended to wait for a beta release.
+Implementation
+==============
 
 Some implementation details:
 
@@ -28,7 +30,30 @@ Some implementation details:
  - Interpreted execution. (an LLVM backend is planned for the future)
  - Currently supported on XP and OSX. A Linux port would probably not be hard.
 
-For more information, see the /docs folder.
+Current status
+==============
+
+This project is currently alpha-level. Curious people, or people interested in hacking along,
+are welcome to try it out. People who want to use it for serious projects, or people who don't
+like bugs, are recommended to wait for a beta release.
+
+Building
+========
+
+Instructions for building on a Unixy system. For building on Windows, see docs/building.md .
+
+Make sure you have Python, Scons, and a C++ compiler installed.
+
+From the project's root directory, run:
+
+./make
+
+which will produce a binary at build/circa
+
+Documentation
+=============
+
+Refer to the /docs folder.
 
 Unless otherwise specified, the contents of this project are freely available to the
 public under the MIT licence. See the LICENSE file for more information.

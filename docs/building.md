@@ -1,48 +1,41 @@
 
-This project has two primary build targets:
+Here are instructions for building circa.lib and 'circa' the command-line tool.
 
-1. Circa command-line app
-  - This tool can run scripts from a file or from an interactive REPL. It does not create
-    a window and doesn't have support for graphics or sound. Has very few 3rd party dependencies.
-2. Plastic
-  - This application creates a window, and supports graphics and sound and other fancy things.
-    Has many 3rd party dependencies.
+(There are other binaries in this repo (such as "plastic" and "looseleaf"); instructions
+for building those can be found in their respective folders.)
 
-# Building the command-line app #
+# Requirements #
 
- - First, install a C++ compiler as well as Python and SCons
- - Open a command prompt (sometimes called a Terminal) in the Circa directory, and then run the following commands:
-   - python tools/prebuild.py
-   - scons build/circa_t
-   - build/circa_t (this will run Circa's unit tests)
-  
- - This build has been tested on the following platforms:
-   - Windows Vista (using Visual Studio 2005)
-   - OSX 10.6 (with Xcode 3.2)
-   - Ubuntu 10.04
+You'll need:
+ - A C++ compiler. Tested on GCC on Mac/Linux, and Visual Studio 2008 on Windows.
+ - Python
+ - Scons
 
-# Building Plastic #
+# Building #
 
- - Install the following dependencies with your package manager. (Windows instructions are coming soon)
-   - box2d
-   - liblo
-   - SDL-devel
-   - SDL_gfx
-   - SDL_image
-   - SDL_ttf
- - Follow the above instructions to build the command-line app
- - Open a command prompt and run:
-   - scons build/plas_r
+Open a command prompt in the project's root directory.
 
- - This build has only been tested on OSX 10.6 (with Xcode 3.2)
+For the first build, and every time a source file is added or removed, you'll need to run
+the prebuild.py script. Example:
 
-# Build variants #
+    python tools/prebuild.py
 
-Each target has three build variants:
- - 'Test' build (ends in _t). Has every assertion enabled, including checks that have a major performance penalty. Runs slowly, but is good for checking for correctness.
- - 'Debug' build (ends in _d). Has some assertions enabled, and includes debugging symbols. Faster than a 'test' build, and can be used in a debugger.
- - 'Release' build (ends in _r). Assertions are disabled. This is the fastest build.
+Then, use "scons" to build the target that you want. For example, to build the command-line tool
+in test mode, run:
 
-## Platform-specific instructions ##
+    scons build/circa_t
 
-Instructions are coming sooner or later.
+Available targets are:
+
+ - Command line tool (release variant): build/circa
+ - Command line tool (debug variant): build/circa_d
+ - Command line tool (test variant): build/circa_t
+ - Static library (releaase variant): build/circa.lib
+ - Static library (debug variant): build/circa_d.lib
+ - Static library (test variant): build/circa_t.lib
+
+# Variants #
+
+ - Test (ends in _t). Every assertion in the world is enabled. Unit tests are also included. The slowest option, but is good for checking for correctness.
+ - Debug (ends in _d). Some assertions enabled, and optimizations disabled. No unit tests.
+ - Release (no suffix). Assertions are disabled and optimizations enabled.

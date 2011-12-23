@@ -9,10 +9,6 @@ def fatal(msg):
     print "fatal:",msg
     exit(1)
 
-# Load build.config
-config = ConfigParser.ConfigParser()
-config.read('build.config')
-
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
 
@@ -24,22 +20,16 @@ OSX = os.path.exists('/Library/Frameworks')
 DEBUG = Environment(tools = ["default"], toolpath=".",
         variant_name = 'debug', variant_suffix='_d')
 RELEASE = Environment(tools = ["default"], toolpath=".",
-        variant_name = 'release', variant_suffix='_r')
+        variant_name = 'release', variant_suffix='')
 TEST = Environment(tools = ["default"], toolpath=".",
         variant_name = 'test', variant_suffix='_t')
 all_envs = [DEBUG, RELEASE, TEST]
-
-SHARED_LIBRARY = config.get('circa', 'shared_library') == 'true'
 
 # Build flags
 if POSIX:
     for env in all_envs:
         env.Append(CPPFLAGS=['-ggdb', '-Wall'])
         env.Append(LINKFLAGS=['-ldl'])
-
-        if config.get('circa', 'gprof_support') == 'true':
-            env.Append(CPPFLAGS=['-pg'])
-            env.Append(LINKFLAGS=['-pg'])
 
         env.SetOption('num_jobs', 2)
 
@@ -98,15 +88,13 @@ for env in all_envs:
     fullPath = 'build/'+baseName
     sources = ['build/'+variant_name+'/src/'+filename for filename in source_files]
 
-    buildStep = env.SharedLibrary if SHARED_LIBRARY else env.StaticLibrary
-
-    result = buildStep(fullPath, sources)
+    result = env.StaticLibrary(fullPath, sources)
     circa_libs[variant_name] = result[0]
 
-    if OSX and SHARED_LIBRARY:
-        actualFile = 'lib'+baseName+'.dylib'
-        env.AddPostAction(result, 'install_name_tool -id @executable_path/'+actualFile
-                + ' build/'+actualFile)
+    #if OSX and SHARED_LIBRARY:
+    #    actualFile = 'lib'+baseName+'.dylib'
+    #    env.AddPostAction(result, 'install_name_tool -id @executable_path/'+actualFile
+    #            + ' build/'+actualFile)
 
 # Define command-line app builds at build/circa_x
 circa_cl_apps = {}
@@ -122,12 +110,12 @@ for env in all_envs:
             LIBS=libs)
     circa_cl_apps[variant_name] = result
 
-    if OSX and SHARED_LIBRARY:
-        env.AddPostAction(result, 'install_name_tool -change build/libcirca_d.dylib '
-                + '@executable_path/libcirca_d.dylib '+binaryFile)
-    
-# Default build target is command-line binary that supports unit tests.
-Default(circa_cl_apps['test'])
+    #if OSX and SHARED_LIBRARY:
+    #    env.AddPostAction(result, 'install_name_tool -change build/libcirca_d.dylib '
+    #            + '@executable_path/libcirca_d.dylib '+binaryFile)
+
+# Default build target is release mode command-line app
+Default(circa_cl_apps['release'])
 
 ########################### Plastic ###############################
 

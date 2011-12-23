@@ -1,4 +1,6 @@
 
-looseleaf is a graphical app for running Circa scripts.
+Looseleaf is a graphical app for running Circa scripts.
 
-One distinguishing trait is that it uses Qt for all GUI widgets. (compared to Plastic which uses pure SDL). It's also newer than Plastic, so some of its habits are more up-to-date.
+It is build against Qt, and is built as a Qt project.
+
+Build instructions are not yet available.
