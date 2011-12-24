@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "subroutine.h"
 #include "static_checking.h"
+#include "string_type.h"
 #include "term.h"
 #include "type.h"
 
@@ -32,7 +33,6 @@
 #include "types/int.h"
 #include "types/ref.h"
 #include "types/set.h"
-#include "types/string.h"
 #include "types/symbol.h"
 #include "types/void.h"
 
@@ -239,7 +239,7 @@ void create_primitive_types()
     handle_t::setup_type(&HANDLE_T);
     int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);
-    string_t::setup_type(&STRING_T);
+    string_setup_type(&STRING_T);
     symbol_t::setup_type(&SYMBOL_T);
     ref_t::setup_type(&REF_T);
     void_t::setup_type(&VOID_T);
@@ -247,7 +247,7 @@ void create_primitive_types()
     eval_context_setup_type(&EVAL_CONTEXT_T);
 
     // errors are just stored as strings for now
-    string_t::setup_type(&ERROR_T);
+    string_setup_type(&ERROR_T);
 
     // input instructions
     StackVariableIsn_t.name = "StackVariableIsn";

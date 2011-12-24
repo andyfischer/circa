@@ -2,6 +2,7 @@
 
 #include "branch.h"
 #include "filesystem.h"
+#include "string_type.h"
 #include "term.h"
 
 namespace circa {
@@ -154,6 +155,34 @@ bool file_exists(const char* filename)
     if (g_storageInterface.fileExists == NULL)
         return false;
     return g_storageInterface.fileExists(filename);
+}
+
+bool is_path_seperator(char c)
+{
+    // Not UTF safe.
+    return c == '/' || c == '\\';
+}
+
+void join_path(String* left, String* right)
+{
+    const char* leftStr = as_cstring(left);
+    const char* rightStr = as_cstring(right);
+    int left_len = strlen(leftStr);
+    int right_len = strlen(leftStr);
+
+    int seperatorCount = 0;
+    if (left_len > 0 && is_path_seperator(leftStr[left_len-1]))
+        seperatorCount++;
+
+    if (right_len > 0 && is_path_seperator(rightStr[0]))
+        seperatorCount++;
+
+    if (seperatorCount == 2)
+        string_resize(left, left_len - 1);
+    else if (seperatorCount == 0)
+        string_append(left, "/");
+
+    string_append(left, right);
 }
 
 } // namespace circa

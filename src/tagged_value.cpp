@@ -529,18 +529,6 @@ Function* as_function(TaggedValue* value)
     return (Function*) value->value_data.ptr;
 }
 
-std::string const& as_string(TaggedValue* value)
-{
-    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
-    return *((std::string*) value->value_data.ptr);
-}
-
-const char* as_cstring(TaggedValue* value)
-{
-    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
-    return ((std::string*) value->value_data.ptr)->c_str();
-}
-
 bool as_bool(TaggedValue* value)
 {
     ca_assert(is_bool(value));

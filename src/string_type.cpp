@@ -5,13 +5,15 @@
 #include "kernel.h"
 #include "importing.h"
 #include "evaluation.h"
+#include "string_type.h"
 #include "source_repro.h"
-#include "string_t.h"
 #include "tagged_value.h"
 #include "token.h"
 #include "type.h"
 
 namespace circa {
+
+std::string& as_std_string(TaggedValue* value);
 
 #if 0
 namespace new_string_t {
@@ -140,20 +142,51 @@ namespace string_t {
 
         append_phrase(source, result, term, token::STRING);
     }
+}
 
-    void setup_type(Type* type)
-    {
-        reset_type(type);
-        type->name = "string";
-        type->storageType = STORAGE_TYPE_STRING;
-        type->initialize = initialize;
-        type->release = release;
-        type->copy = copy;
-        type->equals = equals;
-        type->hashFunc = hashFunc;
-        type->toString = to_string;
-        type->formatSource = format_source;
-    }
+void string_setup_type(Type* type)
+{
+    reset_type(type);
+    type->name = "string";
+    type->storageType = STORAGE_TYPE_STRING;
+    type->initialize = string_t::initialize;
+    type->release = string_t::release;
+    type->copy = string_t::copy;
+    type->equals = string_t::equals;
+    type->hashFunc = string_t::hashFunc;
+    type->toString = string_t::to_string;
+    type->formatSource = string_t::format_source;
+}
+
+void string_append(String* left, String* right)
+{
+    as_std_string(left) += as_string(right);
+}
+void string_append(String* left, const char* right)
+{
+    as_std_string(left) += right;
+}
+void string_resize(String* s, int length)
+{
+    as_std_string(s).resize(length, ' ');
+}
+
+std::string& as_std_string(TaggedValue* value)
+{
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
+    return *((std::string*) value->value_data.ptr);
+}
+
+std::string const& as_string(TaggedValue* value)
+{
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
+    return *((std::string*) value->value_data.ptr);
+}
+
+const char* as_cstring(TaggedValue* value)
+{
+    ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
+    return ((std::string*) value->value_data.ptr)->c_str();
 }
 
 } // namespace circa

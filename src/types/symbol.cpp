@@ -5,7 +5,7 @@ namespace symbol_t {
 
     std::string to_string(TaggedValue* value)
     {
-        return std::string(":") + symbol_text(as_int(value));
+        return std::string(":") + symbol_get_text(as_int(value));
     }
 
     void setup_type(Type* type)

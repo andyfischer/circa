@@ -148,7 +148,7 @@ void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch* source, Branch* dest);
 
-void load_script(Branch* branch, const char* filename);
+Symbol load_script(Branch* branch, const char* filename);
 void evaluate_script(Branch* branch, const char* filename);
 
 // Create an include() call that loads the given file. Returns the included

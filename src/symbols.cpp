@@ -1,45 +1,54 @@
 
+#include <map>
+
 #include "common_headers.h"
 
 #include "kernel.h"
+#include "symbols.h"
 #include "tagged_value.h"
 
 namespace circa {
 
-const int c_maxSymbolCount = 2000;
-struct Symbol
+const int c_maxRuntimeSymbols = 2000;
+struct RuntimeSymbol
 {
     std::string name;
 };
-Symbol g_symbols[c_maxSymbolCount];
-int g_nextFreeSymbol = 0;
 
-const char* symbol_text(int symbol)
+RuntimeSymbol g_runtimeSymbols[c_maxRuntimeSymbols];
+int g_nextFreeSymbol = 0;
+std::map<std::string,Symbol> g_stringToSymbol;
+
+const char* symbol_get_text(Symbol symbol)
 {
     if (symbol >= FirstRuntimeSymbol)
-        return g_symbols[symbol - FirstRuntimeSymbol].name.c_str();
+        return g_runtimeSymbols[symbol - FirstRuntimeSymbol].name.c_str();
     else
         return "";
 }
+void symbol_get_text(Symbol symbol, String* string)
+{
+    set_string((TaggedValue*) string, symbol_get_text(symbol));
+}
 
-int as_symbol(TaggedValue* tv)
+Symbol as_symbol(TaggedValue* tv)
 {
     return tv->value_data.asint;
 }
 
-void symbol_value(int name, TaggedValue* tv)
+void symbol_value(Symbol name, TaggedValue* tv)
 {
     set_null(tv);
     tv->value_type = &SYMBOL_T;
     tv->value_data.asint = name;
 }
 
-void symbol_value(TaggedValue* tv, int name)
+void symbol_value(TaggedValue* tv, Symbol name)
 {
     symbol_value(name, tv);
 }
 
-void set_symbol(TaggedValue* tv, int val)
+void set_symbol(TaggedValue* tv, Symbol val)
 {
     set_null(tv);
     tv->value_type = &SYMBOL_T;
@@ -48,11 +57,27 @@ void set_symbol(TaggedValue* tv, int val)
 
 // Runtime symbols
 
-int register_new_symbol(const char* str)
+Symbol register_symbol(const char* str)
 {
-    int index = g_nextFreeSymbol++;
-    g_symbols[index].name = str;
-    return index + FirstRuntimeSymbol;
+    Symbol existing = string_to_symbol(str);
+    if (existing != InvalidSymbol)
+        return existing;
+
+    Symbol index = g_nextFreeSymbol++;
+    g_runtimeSymbols[index].name = str;
+    Symbol symbol = index + FirstRuntimeSymbol;
+    g_stringToSymbol[str] = symbol;
+    return symbol;
+}
+
+Symbol string_to_symbol(const char* str)
+{
+    std::map<std::string,Symbol>::const_iterator it;
+    it = g_stringToSymbol.find(str);
+    if (it == g_stringToSymbol.end())
+        return InvalidSymbol;
+    else
+        return it->second;
 }
 
 } // namespace circa

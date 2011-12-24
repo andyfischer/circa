@@ -6,32 +6,44 @@ namespace circa {
 
 struct TaggedValue;
 
-// Core symbols
-const int File = 1;
-const int Newline = 2;
-const int Out = 3;
-const int Unknown = 4;
-const int Repeat = 10;
+typedef int Symbol;
 
-// Related to static errors
-const int NotEnoughInputs = 5;
-const int TooManyInputs = 6;
-const int ExtraOutputNotFound = 7;
+const Symbol InvalidSymbol = 0;
+
+// Core symbols
+const Symbol File = 1;
+const Symbol Newline = 2;
+const Symbol Out = 3;
+const Symbol Unknown = 4;
+const Symbol Repeat = 10;
+const Symbol Success = 12;
+const Symbol Failure = 13;
+
+// Misc errors
+const Symbol FileNotFound = 11;
+
+// Static errors
+const Symbol NotEnoughInputs = 5;
+const Symbol TooManyInputs = 6;
+const Symbol ExtraOutputNotFound = 7;
 
 // VM instructions (used in Function)
-const int PureCall = 8;
-const int ControlFlowCall = 9;
+const Symbol PureCall = 8;
+const Symbol ControlFlowCall = 9;
 
-const int HighestBuiltinSymbol = 9;
+const Symbol HighestBuiltinSymbol = 13;
 
-const int FirstRuntimeSymbol = 1000;
+const Symbol FirstRuntimeSymbol = 1000;
 
-const char* symbol_text(int symbol);
-int as_symbol(TaggedValue* tv);
-void symbol_value(int name, TaggedValue* tv);
-void symbol_value(TaggedValue* tv, int name);
-void set_symbol(TaggedValue* tv, int name);
+const char* symbol_get_text(Symbol symbol);
+void symbol_get_text(Symbol symbol, String* string);
 
-int register_new_symbol(const char* str);
+Symbol as_symbol(TaggedValue* tv);
+void symbol_value(Symbol name, TaggedValue* tv);
+void symbol_value(TaggedValue* tv, Symbol name);
+void set_symbol(TaggedValue* tv, Symbol name);
+
+Symbol register_symbol(const char* str);
+Symbol string_to_symbol(const char* str);
 
 } // namespace circa

@@ -18,6 +18,8 @@
 #include "stateful_code.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "string_type.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "type.h"
@@ -574,7 +576,7 @@ void duplicate_branch(Branch* source, Branch* dest)
     dest->names.remapPointers(newTermMap);
 }
 
-void load_script(Branch* branch, const char* filename)
+Symbol load_script(Branch* branch, const char* filename)
 {
     // Store the file origin
     List* fileOrigin = set_list(&branch->origin, 3);
@@ -590,12 +592,13 @@ void load_script(Branch* branch, const char* filename)
     if (!is_null(&fileReadError)) {
         Term* msg = create_value(branch, &fileReadError, "fileReadError");
         apply(branch, STATIC_ERROR_FUNC, TermList(msg));
-        return;
+        return Failure;
     }
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
 
     finish_minor_branch(branch);
+    return Success;
 }
 
 void evaluate_script(Branch* branch, const char* filename)

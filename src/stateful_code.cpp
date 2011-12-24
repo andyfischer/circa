@@ -11,6 +11,7 @@
 #include "source_repro.h"
 #include "subroutine.h"
 #include "stateful_code.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 

@@ -7,6 +7,7 @@
 #include "evaluation.h"
 #include "introspection.h"
 #include "list_shared.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"

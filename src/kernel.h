@@ -91,6 +91,7 @@ struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
     Term* error;
+    Term* import;
     Term* inputs_fit_function;
     Term* loop_index;
     Term* loop_iterator;

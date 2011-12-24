@@ -26,14 +26,11 @@
 #include <sstream>
 #include <stdlib.h>
 
-// Circa headers
-#include "symbols.h"
-
 #define export_func extern "C"
 
 namespace circa {
 
-typedef int symbol;
+typedef int Symbol;
 
 struct Branch;
 struct BrokenLinkList;
@@ -49,6 +46,7 @@ struct ListData;
 struct RawOutputPrefs;
 struct TermMap;
 struct StaticTypeQuery;
+struct String;
 struct StyledSource;
 struct TaggedValue;
 struct Term;
