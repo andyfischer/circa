@@ -139,8 +139,8 @@ CA_FUNCTION(cairo__create_image_surface)
 {
     // user can't currently specify the format
     TaggedValue* size = INPUT(0);
-    int width = as_int(list_get_index(size, 0));
-    int height = as_int(list_get_index(size, 1));
+    int width = to_int(list_get_index(size, 0));
+    int height = to_int(list_get_index(size, 1));
 
     cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
     set_pointer(OUTPUT, g_cairoSurface_t, surface);
@@ -291,35 +291,6 @@ void on_load(Branch* branch)
     g_cairoSurface_t->release = cairoSurface_release;
     g_cairoFontFace_t->copy = cairoFontFace_copy;
     g_cairoFontFace_t->release = cairoFontFace_release;
-
-#if 0
-    install_function(ns["create_context_for_surface"], create_context_for_surface);
-    install_function(ns["Context.save"], save);
-    install_function(ns["Context.restore"], restore);
-    install_function(ns["Context.stroke"], stroke);
-    install_function(ns["Context.paint"], paint);
-    install_function(ns["Context.clip"], clip);
-    install_function(ns["Context.clip_preserve"], clip_preserve);
-    install_function(ns["Context.reset_clip"], reset_clip);
-    install_function(ns["Context.set_source_color"], set_source_color);
-    install_function(ns["Context.fill_preserve"], fill_preserve);
-    install_function(ns["Context.set_operator"], set_operator);
-    install_function(ns["create_image_surface"], create_image_surface);
-    install_function(ns["Context.select_font_face"], select_font_face);
-    install_function(ns["Context.set_font_size"], set_font_size);
-    install_function(ns["Context.set_font_face"], set_font_face);
-    install_function(ns["Context.show_text"], show_text);
-    install_function(ns["Context.text_extents"], text_extents);
-    install_function(ns["Context.move_to"], move_to);
-    install_function(ns["Context.rectangle"], rectangle);
-    install_function(ns["Context.curve_to"], curve_to);
-    install_function(ns["Context.line_to"], line_to);
-    install_function(ns["Context.arc"], arc);
-    install_function(ns["Context.new_sub_path"], new_sub_path);
-    install_function(ns["Context.close_path"], close_path);
-    install_function(ns["Context.set_line_width"], set_line_width);
-    install_function(ns["upload_surface_to_opengl"], upload_surface_to_opengl);
-#endif
 }
 
 } // extern "C"

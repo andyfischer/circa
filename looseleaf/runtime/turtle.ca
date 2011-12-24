@@ -1,11 +1,21 @@
 
+include("../libs/cairo/cairo.ca")
+
 mouse = viewport:mouse()
 
-def draw_turtle(Point loc, number facing)
+def poly(cairo:Context cxt, Color color, List points)
+    cxt.new_sub_path()
+    cxt.set_source_color(color)
+    for p in points
+        cxt.line_to(p)
+    cxt.paint()
+    cxt.close_path()
+
+def draw_turtle(cairo:Context cxt, Point loc, number facing)
     points = [loc + polar(facing) * 10.0,
       loc + polar(facing+140) * 10.0,
       loc + polar(facing-140) * 10.0]
-    gl:triangles(points #fff)
+    poly(cxt, #fff, points)
 
 state Point turtle_loc = [200 200]
 
@@ -23,4 +33,7 @@ trace('a: ' turtle_loc)
 wrap_around_screen(@turtle_loc)
 trace('b: ' turtle_loc)
 
-draw_turtle(turtle_loc 1.0)
+def redraw(cairo:Context cxt)
+    draw_turtle(cxt turtle_loc 1.0)
+
+cairo:use_render_function(redraw, viewport:size(), [0 0], true)

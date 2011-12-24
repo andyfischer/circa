@@ -448,27 +448,6 @@ const char* get_output_name(Term* term, int outputIndex)
             return input->name.c_str();
     }
 
-#if 0
-    // First we need to figure out what the corresponding input index is for this
-    // rebound output.
-    int checkOutputIndex = 1;
-    int reboundInputIndex = -1;
-    for (int inputIndex=0; inputIndex < function_num_inputs(attrs); inputIndex++) {
-        if (function_can_rebind_input(function, inputIndex)) {
-            if (function_call_rebinds_input(term, inputIndex)
-                    && (checkOutputIndex == outputIndex)) {
-                reboundInputIndex = inputIndex;
-                break;
-            }
-            checkOutputIndex++;
-        }
-    }
-
-    // If a rebound input was found, use that name.
-    if (reboundInputIndex != -1)
-        return get_output_name(term->input(reboundInputIndex), 0);
-#endif
-
     return "";
 }
 

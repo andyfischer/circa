@@ -26,7 +26,7 @@ namespace cairo
     def Context.set_operator(self, int operator)
 
     -- Surfaces
-    def create_image_surface(Point_i size) -> Surface
+    def create_image_surface(Point size) -> Surface
 
     -- Text
     def Context.select_font_face(self, string family)
@@ -52,7 +52,7 @@ namespace cairo
     def upload_surface_to_opengl(Surface surface, int texture_id)
 
     -- Helper functions
-    def use_render_function(any func, Point_i bufferSize, Point location, bool redraw)
+    def use_render_function(any func, Point bufferSize, Point location, bool redraw)
         state texture = opengl:new_texture_handle()
 
         if redraw or changed(bufferSize)

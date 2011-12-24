@@ -44,4 +44,3 @@ namespace opengl
     def VertexBuffer.bufferData(buffer, int size)
     def VertexBuffer.bufferSubData(buffer, int size)
     def bufferData(int buffer_type, int size)
-    def bufferSubData(int buffer_type, 
