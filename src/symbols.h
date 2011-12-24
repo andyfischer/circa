@@ -6,8 +6,7 @@ namespace circa {
 
 struct TaggedValue;
 
-// Builtin symbols:
-
+// Core symbols
 const int File = 1;
 const int Newline = 2;
 const int Out = 3;
@@ -25,9 +24,14 @@ const int ControlFlowCall = 9;
 
 const int HighestBuiltinSymbol = 9;
 
+const int FirstRuntimeSymbol = 1000;
+
+const char* symbol_text(int symbol);
 int as_symbol(TaggedValue* tv);
 void symbol_value(int name, TaggedValue* tv);
 void symbol_value(TaggedValue* tv, int name);
 void set_symbol(TaggedValue* tv, int name);
+
+int register_new_symbol(const char* str);
 
 } // namespace circa
