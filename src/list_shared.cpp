@@ -285,8 +285,8 @@ int list_size(TaggedValue* value)
 }
 void list_slice(TaggedValue* original, int start, int end, TaggedValue* result)
 {
-    if (end == -2)
-        end = list_length(original);
+    if (end < 0)
+        end = list_length(original) - end;
 
     int count = end - start;
     set_list(result, count);

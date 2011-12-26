@@ -158,17 +158,21 @@ void string_setup_type(Type* type)
     type->formatSource = string_t::format_source;
 }
 
-void string_append(String* left, String* right)
+void string_append(TaggedValue* left, TaggedValue* right)
 {
     as_std_string(left) += as_string(right);
 }
-void string_append(String* left, const char* right)
+void string_append(TaggedValue* left, const char* right)
 {
     as_std_string(left) += right;
 }
-void string_resize(String* s, int length)
+void string_resize(TaggedValue* s, int length)
 {
     as_std_string(s).resize(length, ' ');
+}
+bool string_eq(TaggedValue* s, const char* str)
+{
+    return as_std_string(s) == str;
 }
 
 std::string& as_std_string(TaggedValue* value)

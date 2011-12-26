@@ -12,6 +12,7 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "string_type.h"
 #include "testing.h"
 
 #include "tools/build_tool.h"
@@ -42,62 +43,63 @@ void print_usage()
         << std::endl;
 }
 
-int run_command_line(std::vector<std::string> args)
+int run_command_line(List* args)
 {
-    TaggedValue args_v;
-    set_list(&args_v, 0);
-    for (int i=0; i < (int) args.size(); i++)
-        set_string(list_append(&args_v), args[i]);
-
     // No arguments, run tests
-    if (args.size() == 0) {
+    if (list_length(args) == 0) {
         run_all_tests();
         return 0;
     }
 
     // Check for prepend options
-    if (args[0] == "-breakon") {
-        std::string name = "$" + args[1];
-        DEBUG_BREAK_ON_TERM = strdup(name.c_str());
-        args.erase(args.begin());
-        args.erase(args.begin());
+    if (string_eq(args->get(0), "-breakon")) {
+        String name;
+        string_append(&name, "$");
+        string_append(&name, (String*) args->get(1));
+        DEBUG_BREAK_ON_TERM = strdup(as_cstring(&name));
+
+        list_remove_index(args, 0);
+        list_remove_index(args, 0);
         std::cout << "breaking on creation of term: " << DEBUG_BREAK_ON_TERM << std::endl;
     }
 
     // Run unit tests
-    if (args[0] == "-test") {
-        if (args.size() > 1)
-            run_tests(args[1]);
+    if (string_eq(args->get(0), "-test")) {
+        if (args->length() > 1)
+            run_tests(as_cstring(args->get(1)));
         else
             run_all_tests();
         return 0;
     }
 
     // Print help
-    if (args[0] == "-help") {
+    if (string_eq(args->get(0), "-help")) {
         print_usage();
         return 0;
     }
 
     // Eval mode
-    if (args[0] == "-e") {
-        args.erase(args.begin());
-        std::stringstream command;
+    if (string_eq(args->get(0), "-e")) {
+        list_remove_index(args, 0);
+
+        String command;
+
         bool firstArg = true;
-        while (!args.empty()) {
-            if (!firstArg) command << " ";
-            command << args[0];
-            args.erase(args.begin());
+        while (!args->empty()) {
+            if (!firstArg)
+                string_append(&command, " ");
+            string_append(&command, args->get(0));
+            list_remove_index(args, 0);
             firstArg = false;
         }
 
         Branch workspace;
-        TaggedValue* result = workspace.eval(command.str());
+        TaggedValue* result = workspace.eval(as_cstring(&command));
         std::cout << result->toString() << std::endl;
         return 0;
     }
 
-    if (args[0] == "-list-tests") {
+    if (string_eq(args->get(0), "-list-tests")) {
         std::vector<std::string> testNames = list_all_test_names();
 
         std::vector<std::string>::const_iterator it;
@@ -108,17 +110,17 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Show compiled code
-    if (args[0] == "-p") {
+    if (string_eq(args->get(0), "-p")) {
         Branch branch;
-        load_script(&branch, args[1].c_str());
+        load_script(&branch, as_cstring(args->get(1)));
         print_branch(std::cout, &branch);
         return 0;
     }
 
     // Show compiled code then evaluate
-    if (args[0] == "-pe") {
+    if (string_eq(args->get(0), "-pe")) {
         Branch branch;
-        load_script(&branch, args[1].c_str());
+        load_script(&branch, as_cstring(args->get(1)));
 
         print_branch(std::cout, &branch);
 
@@ -127,9 +129,9 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Evaluate and show compiled code
-    if (args[0] == "-ep") {
+    if (string_eq(args->get(0), "-ep")) {
         Branch branch;
-        load_script(&branch, args[1].c_str());
+        load_script(&branch, as_cstring(args->get(1)));
 
         evaluate_branch(&branch);
 
@@ -138,30 +140,30 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Show compiled code with properties
-    if (args[0] == "-pp") {
+    if (string_eq(args->get(0), "-pp")) {
         Branch branch;
-        load_script(&branch, args[1].c_str());
+        load_script(&branch, as_cstring(args->get(1)));
         print_branch_with_properties(std::cout, &branch);
         return 0;
     }
 
     // Reproduce source
-    if (args[0] == "-s") {
+    if (string_eq(args->get(0), "-s")) {
         Branch branch;
-        load_script(&branch, args[1].c_str());
+        load_script(&branch, as_cstring(args->get(1)));
         std::cout << get_branch_source_text(&branch);
         return 0;
     }
 
     // Start repl
-    if (args[0] == "-repl")
+    if (string_eq(args->get(0), "-repl"))
         return run_repl();
 
     // Start debugger repl
-    if (args[0] == "-d")
-        return run_debugger_repl(args[1]);
+    if (string_eq(args->get(0), "-d"))
+        return run_debugger_repl(as_cstring(args->get(1)));
 
-    // Do a feedback test
+    // Do a feedback test (disabled)
     #if 0
     if (args[0] == "-f") {
         Branch branch;
@@ -191,9 +193,9 @@ int run_command_line(std::vector<std::string> args)
     #endif
 
     // Generate cpp headers
-    if (args[0] == "-gh") {
+    if (string_eq(args->get(0), "-gh")) {
         Branch branch;
-        load_script(&branch, args[1].c_str());
+        load_script(&branch, as_cstring(args->get(1)));
 
         if (has_static_errors(&branch)) {
             print_static_errors_formatted(&branch, std::cout);
@@ -206,32 +208,32 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // Run file checker
-    if (args[0] == "-check")
-        return run_file_checker(args[1].c_str());
+    if (string_eq(args->get(0), "-check"))
+        return run_file_checker(as_cstring(args->get(1)));
 
     // Export parsed information
-    if (args[0] == "-export") {
+    if (string_eq(args->get(0), "-export")) {
         const char* filename = "";
         const char* format = "";
-        if (args.size() >= 2)
-            format = args[1].c_str();
-        if (args.size() >= 3)
-            filename = args[2].c_str();
+        if (args->length() >= 2)
+            format = as_cstring(args->get(1));
+        if (args->length() >= 3)
+            filename = as_cstring(args->get(2));
         return run_exporting_parser(format, filename);
     }
 
     // Build tool
-    if (args[0] == "-build") {
+    if (string_eq(args->get(0), "-build")) {
         const char* filename = "";
-        if (args.size() >= 2)
-            filename = args[1].c_str();
+        if (args->length() >= 2)
+            filename = as_cstring(args->get(1));
         return run_build_tool(filename);
     }
 
     // Stress test parser
-    if (args[0] == "-parse100") {
+    if (string_eq(args->get(0), "-parse100")) {
 
-        const char* filename = args[1].c_str();
+        const char* filename = as_cstring(args->get(1));
 
         for (int i=0; i < 100; i++) {
             Branch branch;
@@ -240,9 +242,9 @@ int run_command_line(std::vector<std::string> args)
         }
         return true;
     }
-    if (args[0] == "-parse1000") {
+    if (string_eq(args->get(0), "-parse1000")) {
 
-        const char* filename = args[1].c_str();
+        const char* filename = as_cstring(args->get(1));
 
         for (int i=0; i < 1000; i++) {
             Branch branch;
@@ -253,16 +255,16 @@ int run_command_line(std::vector<std::string> args)
     }
 
     // C++ gen
-    if (args[0] == "-cppgen") {
+    if (string_eq(args->get(0), "-cppgen")) {
         TaggedValue remainingArgs;
-        list_slice(&args_v, 1, -2, &remainingArgs);
+        list_slice(args, 1, -1, &remainingArgs);
         run_generate_cpp(&remainingArgs);
         return 0;
     }
 
-    // Otherwise, load args[0] as a script and run it
+    // Default behavior with no flags: load args[0] as a script and run it.
     Branch* main_branch = create_branch(kernel());
-    load_script(main_branch, args[0].c_str());
+    load_script(main_branch, as_cstring(args->get(0)));
 
     if (has_static_errors(main_branch)) {
         print_static_errors_formatted(main_branch, std::cout);
@@ -277,8 +279,8 @@ int run_command_line(std::vector<std::string> args)
         // Push any extra command-line arguments to context.argumentList
         List* inputs = set_list(context.argumentList.append());
 
-        for (size_t i=1; i < args.size(); i++)
-            set_string(inputs->append(), args[i]);
+        for (int i=1; i < args->length(); i++)
+            copy(args->get(i), inputs->append());
 
         evaluate_branch(&context, main_branch);
 
@@ -295,12 +297,14 @@ int run_command_line(std::vector<std::string> args)
 
 } // namespace circa
 
+using namespace circa;
+
 export_func int circa_run_command_line(int argc, const char* args[])
 {
-    std::vector<std::string> argv;
+    List args_v;
+    set_list(&args_v, 0);
+    for (int i=1; i < argc; i++)
+        set_string(list_append(&args_v), args[i]);
 
-    for (int i = 1; i < argc; i++)
-        argv.push_back(args[i]);
-
-    return circa::run_command_line(argv);
+    return circa::run_command_line(&args_v);
 }
