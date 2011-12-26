@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "symbols.h"
 #include "token_stream.h"
 
 namespace circa {
@@ -90,6 +91,14 @@ TokenStream::consumeStr(int match)
     std::string out = nextStr();
     consume(match);
     return out;
+}
+
+Symbol
+TokenStream::consumeSymbol(int match)
+{
+    Symbol value = register_symbol(nextStr().c_str());
+    consume(match);
+    return value;
 }
 
 bool

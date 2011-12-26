@@ -60,6 +60,7 @@ ParseResult do_once_block(Branch* branch, TokenStream& tokens, ParserCxt* contex
 ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult include_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
+ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult return_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult discard_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult break_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);

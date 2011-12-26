@@ -76,6 +76,12 @@ namespace include_function {
         set_branch(OUTPUT, CALLER->nestedContents);
     }
 
+    void import_formatSource(StyledSource* source, Term* term)
+    {
+        append_phrase(source, "import ", term, phrase_type::UNDEFINED);
+        append_phrase(source, term->stringProp("module"), term, phrase_type::UNDEFINED);
+    }
+
     void setup(Branch* kernel)
     {
         INCLUDE_FUNC = import_function(kernel, evaluate_include,
@@ -86,7 +92,9 @@ namespace include_function {
                 "load_script(string filename) -> Branch");
         as_function(LOAD_SCRIPT_FUNC)->postCompile = include_post_compile;
 
-        BUILTIN_FUNCS.import = import_function(kernel, NULL, "import() -> Branch");
+        BUILTIN_FUNCS.import = import_function(kernel, NULL, "import()");
+        as_function(BUILTIN_FUNCS.import)->formatSource = import_formatSource;
+        BUILTIN_FUNCS.imported_file = import_function(kernel, NULL, "imported_file() -> Branch");
     }
 }
 } // namespace circa

@@ -31,7 +31,7 @@ Term* find_loaded_module(Symbol name)
 
     for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (term->function == BUILTIN_FUNCS.import && term->name == as_string(&nameStr))
+        if (term->function == BUILTIN_FUNCS.imported_file && term->name == as_string(&nameStr))
             return term;
     }
     return NULL;
@@ -56,7 +56,8 @@ Symbol load_module(Symbol module_name)
         string_append(&searchPath, ".ca");
 
         if (file_exists(as_cstring(&searchPath))) {
-            Term* import = apply(kernel(), BUILTIN_FUNCS.import, TermList());
+            Term* import = apply(kernel(), BUILTIN_FUNCS.imported_file, TermList(),
+                as_cstring(&module));
             load_script(nested_contents(import), as_cstring(&searchPath));
             return Success;
         }

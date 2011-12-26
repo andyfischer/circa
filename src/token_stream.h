@@ -66,6 +66,9 @@ struct TokenStream
     // Like consume(), but also returns the text of the consumed token.
     std::string consumeStr(int match = -1);
 
+    // Like consume(), but registers the string as a runtime symbol.
+    Symbol consumeSymbol(int match = -1);
+
     bool nextNonWhitespaceIs(int match, int lookahead=0) const;
 
     bool finished() const

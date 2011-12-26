@@ -6,6 +6,7 @@
 
 #include "branch.h"
 #include "list_shared.h"
+#include "modules.h"
 #include "parser.h"
 #include "switch_block.h"
 #include "term.h"
@@ -352,6 +353,11 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
     // Case statement
     else if (tokens.nextIs(CASE)) {
         result = case_statement(branch, tokens, context);
+    }
+
+    // Import statement
+    else if (tokens.nextIs(IMPORT)) {
+        result = import_statement(branch, tokens, context);
     }
 
     // Otherwise, expression statement
@@ -1094,6 +1100,30 @@ ParseResult include_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
     hide_from_source(filenameTerm);
 
     Term* result = apply(branch, INCLUDE_FUNC, TermList(filenameTerm));
+
+    return ParseResult(result);
+}
+
+ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(IMPORT);
+
+    possible_whitespace(tokens);
+
+    if (!tokens.nextIs(IDENTIFIER))
+        return compile_error_for_line(branch, tokens, startPosition,
+                "Expected string after 'import'");
+
+    Symbol module = tokens.consumeSymbol(IDENTIFIER);
+
+    Term* result = apply(branch, BUILTIN_FUNCS.import, TermList());
+    result->setStringProp("module", symbol_get_text(module));
+    Symbol loadResult = load_module(module);
+
+    if (loadResult != Success)
+        std::cout << "Failed to import " << symbol_get_text(module) << ": " << symbol_get_text(loadResult) << std::endl;
 
     return ParseResult(result);
 }
