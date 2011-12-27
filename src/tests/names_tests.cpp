@@ -112,13 +112,6 @@ void test_get_named_at()
     Term* fsub = create_int(subBranch2, 1, "f");
     create_int(&branch, 1, "f");
     test_assert(get_named_at(fsub, "f") == f1);
-
-    // Find names in exposed-name branches
-    Branch* subBranch3 = create_branch(&branch);
-    Term* h = create_int(subBranch3, 1, "h");
-    subBranch3->owningTerm->setBoolProp("exposesNames", true);
-    Term* i = create_int(&branch, 1, "i");
-    test_assert(get_named_at(i, "h") == h);
 }
 
 void test_get_named_at_after_if_block()

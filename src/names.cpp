@@ -80,8 +80,6 @@ bool exposes_nested_names(Term* term)
         return false;
     if (nested_contents(term)->length() == 0)
         return false;
-    if (term->boolPropOptional("exposesNames", false))
-        return true;
     if (term->function == INCLUDE_FUNC)
         return true;
     if (term->function == BUILTIN_FUNCS.imported_file)

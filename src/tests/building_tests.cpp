@@ -165,9 +165,6 @@ void test_repair_broken_links()
     clear_branch(&br->nestedContents);
     br->nestedContents.compile("something_else = 1, a = 2");
 
-    // bit of a hack:
-    br->setBoolProp("exposesNames", true);
-
     Term* new_a = br->nestedContents["a"];
     finish_update_cascade(branch);
 
