@@ -1,0 +1,5 @@
+
+import a
+
+def some_function_from_b() -> int
+  return some_function_from_a()

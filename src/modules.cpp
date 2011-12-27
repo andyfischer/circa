@@ -37,6 +37,18 @@ Term* find_loaded_module(Symbol name)
     return NULL;
 }
 
+static Symbol load_module_from_file(Symbol module_name, const char* filename)
+{
+    String name;
+    symbol_get_text(module_name, &name);
+
+    Term* import = apply(kernel(), BUILTIN_FUNCS.imported_file, TermList(),
+        as_cstring(&name));
+    load_script(nested_contents(import), filename);
+
+    return Success;
+}
+
 Symbol load_module(Symbol module_name)
 {
     Term* existing = find_loaded_module(module_name);
@@ -48,19 +60,27 @@ Symbol load_module(Symbol module_name)
 
     int count = list_length(&g_moduleSearchPaths);
     for (int i=0; i < count; i++) {
+
+        // For each search path we'll check two places.
+
+        // Look under searchPath/moduleName.ca
         String searchPath;
+        copy(g_moduleSearchPaths[i], &searchPath);
+        join_path(&searchPath, &module);
+        string_append(&searchPath, ".ca");
+
+        if (file_exists(as_cstring(&searchPath)))
+            return load_module_from_file(module_name, as_cstring(&searchPath));
+
+        // Look under searchPath/moduleName/moduleName.ca
         copy(g_moduleSearchPaths[i], &searchPath);
 
         join_path(&searchPath, &module);
         join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (file_exists(as_cstring(&searchPath))) {
-            Term* import = apply(kernel(), BUILTIN_FUNCS.imported_file, TermList(),
-                as_cstring(&module));
-            load_script(nested_contents(import), as_cstring(&searchPath));
-            return Success;
-        }
+        if (file_exists(as_cstring(&searchPath)))
+            return load_module_from_file(module_name, as_cstring(&searchPath));
     }
     return FileNotFound;
 }
