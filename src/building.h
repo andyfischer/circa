@@ -126,6 +126,10 @@ Term* insert_state_output(Branch* branch);
 Term* append_state_output(Branch* branch);
 bool is_state_input(Term* placeholder);
 
+// Search upwards starting at 'term', and returns the parent (or the term itself) found
+// in 'branch'. Returns NULL if not found.
+Term* find_parent_term_in_branch(Term* term, Branch* branch);
+
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
@@ -154,8 +158,7 @@ Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);
 Term* apply_after(Term* existing, Term* function);
 void move_before(Term* movee, Term* pivot);
-void move_after(Term* movee, Term* position);
-void move_after_inputs(Term* term);
+void move_after(Term* movee, Term* position); void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
 void transfer_users(Term* from, Term* to);
 

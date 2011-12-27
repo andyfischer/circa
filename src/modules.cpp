@@ -17,7 +17,11 @@
 namespace circa {
 
 List g_moduleSearchPaths;
-List g_loadedModules;
+
+List* modules_get_search_paths()
+{
+    return &g_moduleSearchPaths;
+}
 
 void modules_add_search_path(const char* str)
 {
@@ -37,7 +41,7 @@ Term* find_loaded_module(Symbol name)
     return NULL;
 }
 
-static Symbol load_module_from_file(Symbol module_name, const char* filename)
+static Term* load_module_from_file(Symbol module_name, const char* filename)
 {
     String name;
     symbol_get_text(module_name, &name);
@@ -46,15 +50,11 @@ static Symbol load_module_from_file(Symbol module_name, const char* filename)
         as_cstring(&name));
     load_script(nested_contents(import), filename);
 
-    return Success;
+    return import;
 }
 
-Symbol load_module(Symbol module_name)
+static bool find_module_file(Symbol module_name, String* filenameOut)
 {
-    Term* existing = find_loaded_module(module_name);
-    if (existing != NULL)
-        return Success;
-    
     String module;
     symbol_get_text(module_name, &module);
 
@@ -69,8 +69,10 @@ Symbol load_module(Symbol module_name)
         join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (file_exists(as_cstring(&searchPath)))
-            return load_module_from_file(module_name, as_cstring(&searchPath));
+        if (file_exists(as_cstring(&searchPath))) {
+            swap(&searchPath, filenameOut);
+            return true;
+        }
 
         // Look under searchPath/moduleName/moduleName.ca
         copy(g_moduleSearchPaths[i], &searchPath);
@@ -79,10 +81,37 @@ Symbol load_module(Symbol module_name)
         join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (file_exists(as_cstring(&searchPath)))
-            return load_module_from_file(module_name, as_cstring(&searchPath));
+        if (file_exists(as_cstring(&searchPath))) {
+            swap(&searchPath, filenameOut);
+            return true;
+        }
     }
-    return FileNotFound;
+    return false;
+}
+
+Symbol load_module(Symbol module_name, Term* loadCall)
+{
+    Term* existing = find_loaded_module(module_name);
+    if (existing != NULL)
+        return Success;
+    
+    String filename;
+    bool found = find_module_file(module_name, &filename);
+
+    if (!found)
+        return FileNotFound;
+
+    Term* import = load_module_from_file(module_name, as_cstring(&filename));
+
+    // If a loadCall is provided, possibly move the new import to be before the loadCall.
+    if (loadCall != NULL) {
+        Term* callersModule = find_parent_term_in_branch(loadCall, import->owningBranch);
+
+        if (callersModule != NULL && (import->index > callersModule->index))
+            move_before(import, callersModule);
+    }
+
+    return Success;
 }
 
 } // namespace circa

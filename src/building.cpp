@@ -966,6 +966,19 @@ bool is_state_input(Term* placeholder)
     return placeholder->boolPropOptional("state", false);
 }
 
+Term* find_parent_term_in_branch(Term* term, Branch* branch)
+{
+    while (true) {
+        if (term == NULL)
+            return NULL;
+
+        if (term->owningBranch == branch)
+            return term;
+
+        term = get_parent_term(term);
+    }
+}
+
 ListData* write_input_instruction_list(Term* caller, ListData* list)
 {
     list = list_resize(list, 0);

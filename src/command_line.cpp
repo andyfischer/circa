@@ -54,19 +54,16 @@ void print_usage()
 
 int run_command_line(List* args)
 {
-    // No arguments, run tests
-    if (list_length(args) == 0) {
-        run_all_tests();
-        return 0;
-    }
-
     bool printRaw = false;
     bool printRawWithProps = false;
     bool printSource = false;
     bool dontRunScript = false;
 
     // Prepended options
-    consuming_prepends: {
+    while (true) {
+
+        if (list_length(args) == 0)
+            break;
 
         if (string_eq(args->get(0), "-breakon")) {
             String name;
@@ -77,7 +74,7 @@ int run_command_line(List* args)
             list_remove_index(args, 0);
             list_remove_index(args, 0);
             std::cout << "breaking on creation of term: " << DEBUG_BREAK_ON_TERM << std::endl;
-            goto consuming_prepends;
+            continue;
         }
 
         if (string_eq(args->get(0), "-libpath")) {
@@ -85,32 +82,42 @@ int run_command_line(List* args)
             modules_add_search_path(as_cstring(args->get(1)));
             list_remove_index(args, 0);
             list_remove_index(args, 0);
-            goto consuming_prepends;
+            continue;
         }
 
         if (string_eq(args->get(0), "-p")) {
             printRaw = true;
             list_remove_index(args, 0);
-            goto consuming_prepends;
+            continue;
         }
 
         if (string_eq(args->get(0), "-pp")) {
             printRawWithProps = true;
             list_remove_index(args, 0);
-            goto consuming_prepends;
+            continue;
         }
 
         if (string_eq(args->get(0), "-s")) {
             printSource = true;
             list_remove_index(args, 0);
-            goto consuming_prepends;
+            continue;
         }
         if (string_eq(args->get(0), "-n")) {
             dontRunScript = true;
             list_remove_index(args, 0);
-            goto consuming_prepends;
+            continue;
         }
+
+        break;
     }
+
+    // No arguments remaining, run tests.
+    if (list_length(args) == 0) {
+        run_all_tests();
+        return 0;
+    }
+
+    // Check to handle args[0] as a dash-command.
 
     // Run unit tests
     if (string_eq(args->get(0), "-test")) {

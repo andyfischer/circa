@@ -1120,10 +1120,8 @@ ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 
     Term* result = apply(branch, BUILTIN_FUNCS.import, TermList());
     result->setStringProp("module", symbol_get_text(module));
-    Symbol loadResult = load_module(module);
 
-    if (loadResult != Success)
-        std::cout << "Failed to import " << symbol_get_text(module) << ": " << symbol_get_text(loadResult) << std::endl;
+    load_module(module, result);
 
     return ParseResult(result);
 }
@@ -2145,7 +2143,6 @@ ParseResult identifier_with_rebind(Branch* branch, TokenStream& tokens, ParserCx
 }
 
 // --- More Utility functions ---
-
 
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {

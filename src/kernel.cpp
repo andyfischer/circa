@@ -210,6 +210,21 @@ CA_FUNCTION(reflect__this_branch)
     set_branch(OUTPUT, CALLER->owningBranch);
 }
 
+CA_FUNCTION(reflect__kernel)
+{
+    set_branch(OUTPUT, kernel());
+}
+
+CA_FUNCTION(sys__module_search_paths)
+{
+    copy(modules_get_search_paths(), OUTPUT);
+}
+
+CA_FUNCTION(Branch__dump)
+{
+    dump(as_branch(INPUT(0)));
+}
+
 CA_FUNCTION(length)
 {
     set_int(OUTPUT, num_elements(INPUT(0)));
@@ -481,14 +496,16 @@ void install_standard_library(Branch* kernel)
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 
     // Install each function
+    install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
     install_function(kernel->get("file:modified_time"), file__modified_time);
     install_function(kernel->get("input"), input_func);
     install_function(kernel->get("length"), length);
     install_function(kernel->get("refactor:rename"), refactor__rename);
     install_function(kernel->get("refactor:change_function"), refactor__change_function);
     install_function(kernel->get("reflect:this_branch"), reflect__this_branch);
-
-    install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
+    install_function(kernel->get("reflect:kernel"), reflect__kernel);
+    install_function(kernel->get("sys:module_search_paths"), sys__module_search_paths);
+    install_function(kernel->get("Branch.dump"), Branch__dump);
 
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");

@@ -21,9 +21,13 @@ namespace refactor
 
 namespace reflect
     def this_branch() -> Branch
+    def kernel() -> Branch
 
 namespace sys
     def arg(int index) -> string
+    def module_search_paths() -> List
+
+def Branch.dump(b)
 
 -- Stateful functions
 

@@ -1,3 +1,5 @@
 
 def function_from_a() -> string
   return "Success"
+
+reflect:kernel().dump()
