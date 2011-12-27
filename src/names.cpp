@@ -38,12 +38,17 @@ Term* find_local_name(Branch* branch, const char* name)
         return NULL;
 
     // First, check for an exact match
-    TermNamespace::const_iterator it;
-    it = branch->names.find(name);
-    if (it != branch->names.end())
-        return it->second;
+    for (int i = branch->length() - 1; i >= 0; i--) {
+        Term* term = branch->get(i);
+        if (term == NULL)
+            continue;
+        if (term->name == name)
+            return term;
+    }
 
-    // 'name' can be a qualified name. Find the end of the first identifier.
+    // Check if 'name' is a qualified name.
+
+    // Find the end of the first identifier.
     int separatorLoc = find_qualified_name_separator(name);
 
     // Give up if no separator found

@@ -70,13 +70,13 @@ void test_rebind_internally()
     test_equals(branch["a"], "3");
 
     branch.compile("found_3 = false");
-    branch.compile("for n in [5 3 1 9 0] { if n == 3 { found_3 = true } }; found_3=found_3");
+    branch.compile("for n in [5 3 1 9 0] { if n == 3 { found_3 = true } }");
     evaluate_branch(&branch);
 
     test_assert(branch["found_3"]->asBool());
 
     branch.compile("found_3 = false");
-    branch.compile("for n in [2 4 6 8] { if n == 3 { found_3 = true } } found_3=found_3");
+    branch.compile("for n in [2 4 6 8] { if n == 3 { found_3 = true } }");
     evaluate_branch(&branch);
     test_assert(branch["found_3"]->asBool() == false);
 }
