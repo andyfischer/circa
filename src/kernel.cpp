@@ -13,6 +13,7 @@
 #include "importing.h"
 #include "importing_macros.h"
 #include "kernel.h"
+#include "modules.h"
 #include "parser.h"
 #include "subroutine.h"
 #include "static_checking.h"
@@ -541,6 +542,11 @@ export_func void circa_shutdown()
 
     delete KERNEL;
     KERNEL = NULL;
+}
+
+export_func void circa_add_module_search_path(const char* path)
+{
+    modules_add_search_path(path);
 }
 
 } // namespace circa

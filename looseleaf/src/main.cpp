@@ -38,17 +38,18 @@ int main(int argc, char *argv[])
         }
     } 
 
+    // Initialize Circa runtime
     circa_initialize();
-    circa_use_default_filesystem_interface();
+    circa_use_standard_filesystem();
+    circa_add_module_search_path("../libs");
 
     Branch kernel;
     BackgroundScript kernelRunner(&kernel);
 
     // Install Looseleaf bindings
-    load_script_term(&kernel, "src/viewport.ca");
+    load_script_term(&kernel, "runtime/viewport.ca");
     viewport_static_setup(&kernel);
 
-    include_script(&kernel, "../libs/opengl/opengl.ca");
     include_script(&kernel, "runtime/main.ca");
 
     Branch* filesBranch = create_branch_unevaluated(&kernel, "files");

@@ -72,5 +72,3 @@ void get_current_storage_interface(StorageInterface* interface);
 void join_path(String* left, String* right);
 
 } // namespace circa
-
-void circa_use_default_filesystem_interface();

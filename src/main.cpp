@@ -5,7 +5,7 @@
 int main(int argc, const char * args[])
 {
     circa_initialize();
-    circa_use_default_filesystem_interface();
+    circa_use_standard_filesystem();
 
     int result = 0;
     result = circa_run_command_line(argc, args);

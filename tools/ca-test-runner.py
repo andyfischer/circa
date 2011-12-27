@@ -3,7 +3,7 @@
 import os,subprocess,sys
 from glob import glob
 
-TestRoot = 'src/ca/tests'
+TestRoot = 'tests'
 
 class OutputDifference(object):
     def __init__(self, fromCommand, fromFile, lineNumber):

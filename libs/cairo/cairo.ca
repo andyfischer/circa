@@ -1,4 +1,6 @@
 
+import opengl
+
 -- cairo bindings
 patch_with_dll(reflect:this_branch(), 'cairo' -> rpath)
 

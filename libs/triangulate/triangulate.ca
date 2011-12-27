@@ -3,7 +3,3 @@ patch_with_dll(reflect:this_branch(), 'triangulate' -> rpath)
 
 namespace triangulate
     def process(List points) -> List
-
-# temp
-if once()
-    print(triangulate:process([[0 6] [0 0] [3 0] [4 1]]))
