@@ -9,6 +9,7 @@
 #include "feedback.h"
 #include "introspection.h"
 #include "list_shared.h"
+#include "modules.h"
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
@@ -28,18 +29,26 @@ void print_usage()
 {
     std::cout <<
         "Usage:\n"
-        "  circa <filename>        : Evaluate the given Circa source file\n"
-        "  circa -repl             : Start an interactive read-eval-print-loop\n"
-        "  circa -e <expression>   : Evaluate an expression on the command line\n"
-        "  circa -test             : Run unit tests\n"
-        "  circa -test <name>      : Run unit test of a certain name\n"
-        "  circa -list-tests       : List every unit test name\n"
-        "  circa -p <filename>     : Show the raw display of a source file\n"
-        "  circa -ep <filename>    : Evaluate a source file and then show raw display\n"
-        "  circa -pp <filename>    : Like -p but also print term properties\n"
-        "  circa -s <filename>     : Compile the source file and reproduce its source code\n"
-        "  circa -check <filename> : Statically check the script for any errors\n"
-        "  circa -build <dir>      : Rebuild a module using a build.ca file\n"
+        "  circa <options> <dash-command> <args>\n"
+        "\n"
+        "Available options:\n"
+        "  -libpath <path>     : Add a module search path\n"
+        "  -p                  : Print out raw source\n"
+        "  -pp                 : Print out raw source with properties\n"
+        "  -s                  : Print out reconstructed source code (for testing)\n"
+        "  -n                  : Don't actually run the script (use with -p or -s)\n"
+        "  -breakon <id>       : Debugger break when term <id> is created\n"
+        "\n"
+        "Available commands:\n"
+        "  -repl             : Start an interactive read-eval-print-loop\n"
+        "  -e <expression>   : Evaluate an expression on the command line\n"
+        "  -test             : Run unit tests\n"
+        "  -test <name>      : Run unit test of a certain name\n"
+        "  -list-tests       : List every unit test name\n"
+        "  -check <filename> : Statically check the script for any errors\n"
+        "  -build <dir>      : Rebuild a module using a build.ca file\n"
+        "\n"
+        "If no <dash-command> is given, simply load and run the file as a script.\n"
         << std::endl;
 }
 
@@ -51,16 +60,56 @@ int run_command_line(List* args)
         return 0;
     }
 
-    // Check for prepend options
-    if (string_eq(args->get(0), "-breakon")) {
-        String name;
-        string_append(&name, "$");
-        string_append(&name, (String*) args->get(1));
-        DEBUG_BREAK_ON_TERM = strdup(as_cstring(&name));
+    bool printRaw = false;
+    bool printRawWithProps = false;
+    bool printSource = false;
+    bool dontRunScript = false;
 
-        list_remove_index(args, 0);
-        list_remove_index(args, 0);
-        std::cout << "breaking on creation of term: " << DEBUG_BREAK_ON_TERM << std::endl;
+    // Prepended options
+    consuming_prepends: {
+
+        if (string_eq(args->get(0), "-breakon")) {
+            String name;
+            string_append(&name, "$");
+            string_append(&name, (String*) args->get(1));
+            DEBUG_BREAK_ON_TERM = strdup(as_cstring(&name));
+
+            list_remove_index(args, 0);
+            list_remove_index(args, 0);
+            std::cout << "breaking on creation of term: " << DEBUG_BREAK_ON_TERM << std::endl;
+            goto consuming_prepends;
+        }
+
+        if (string_eq(args->get(0), "-libpath")) {
+            // Add a module path
+            modules_add_search_path(as_cstring(args->get(1)));
+            list_remove_index(args, 0);
+            list_remove_index(args, 0);
+            goto consuming_prepends;
+        }
+
+        if (string_eq(args->get(0), "-p")) {
+            printRaw = true;
+            list_remove_index(args, 0);
+            goto consuming_prepends;
+        }
+
+        if (string_eq(args->get(0), "-pp")) {
+            printRawWithProps = true;
+            list_remove_index(args, 0);
+            goto consuming_prepends;
+        }
+
+        if (string_eq(args->get(0), "-s")) {
+            printSource = true;
+            list_remove_index(args, 0);
+            goto consuming_prepends;
+        }
+        if (string_eq(args->get(0), "-n")) {
+            dontRunScript = true;
+            list_remove_index(args, 0);
+            goto consuming_prepends;
+        }
     }
 
     // Run unit tests
@@ -106,52 +155,6 @@ int run_command_line(List* args)
         for (it = testNames.begin(); it != testNames.end(); ++it) {
             std::cout << *it << std::endl;
         }
-        return 0;
-    }
-
-    // Show compiled code
-    if (string_eq(args->get(0), "-p")) {
-        Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
-        print_branch(std::cout, &branch);
-        return 0;
-    }
-
-    // Show compiled code then evaluate
-    if (string_eq(args->get(0), "-pe")) {
-        Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
-
-        print_branch(std::cout, &branch);
-
-        evaluate_branch(&branch);
-        return 0;
-    }
-
-    // Evaluate and show compiled code
-    if (string_eq(args->get(0), "-ep")) {
-        Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
-
-        evaluate_branch(&branch);
-
-        print_branch(std::cout, &branch);
-        return 0;
-    }
-
-    // Show compiled code with properties
-    if (string_eq(args->get(0), "-pp")) {
-        Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
-        print_branch_with_properties(std::cout, &branch);
-        return 0;
-    }
-
-    // Reproduce source
-    if (string_eq(args->get(0), "-s")) {
-        Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
-        std::cout << get_branch_source_text(&branch);
         return 0;
     }
 
@@ -266,30 +269,40 @@ int run_command_line(List* args)
     Branch* main_branch = create_branch(kernel());
     load_script(main_branch, as_cstring(args->get(0)));
 
+    if (printRawWithProps)
+        print_branch_with_properties(std::cout, main_branch);
+    else if (printRaw)
+        print_branch(std::cout, main_branch);
+
+    if (printSource)
+        std::cout << get_branch_source_text(main_branch);
+
     if (has_static_errors(main_branch)) {
         print_static_errors_formatted(main_branch, std::cout);
         //dump(main_branch);
         return 1;
-    } else {
+    }
 
-        Term error_listener;
+    if (dontRunScript)
+        return 0;
 
-        EvalContext context;
+    Term error_listener;
 
-        // Push any extra command-line arguments to context.argumentList
-        List* inputs = set_list(context.argumentList.append());
+    EvalContext context;
 
-        for (int i=1; i < args->length(); i++)
-            copy(args->get(i), inputs->append());
+    // Push any extra command-line arguments to context.argumentList
+    List* inputs = set_list(context.argumentList.append());
 
-        evaluate_branch(&context, main_branch);
+    for (int i=1; i < args->length(); i++)
+        copy(args->get(i), inputs->append());
 
-        if (context.errorOccurred) {
-            std::cout << "Error occurred:\n";
-            print_runtime_error_formatted(context, std::cout);
-            std::cout << std::endl;
-            return 1;
-        }
+    evaluate_branch(&context, main_branch);
+
+    if (context.errorOccurred) {
+        std::cout << "Error occurred:\n";
+        print_runtime_error_formatted(context, std::cout);
+        std::cout << std::endl;
+        return 1;
     }
 
     return 0;

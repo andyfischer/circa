@@ -85,7 +85,7 @@ def test_file(filename):
         failures.append(TestFailure(desc, filename))
 
     # Source repro test
-    diff = diff_command_against_file("circa_t -s "+filename, filename)
+    diff = diff_command_against_file("circa_t -n -s "+filename, filename)
     if diff:
         desc = ['Source repro failed on line '+str(diff.lineNumber)]
         desc.append(' Expected: '+diff.fromFile)
