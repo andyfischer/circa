@@ -515,6 +515,12 @@ do_instruction:
     }
 
     Term* term = branch->get(pc);
+
+    if (!is_function(term->function)) {
+        top_frame(context)->pc++;
+        goto do_instruction;
+    }
+
     Function* func = as_function(term->function);
 
     evaluate_single_term(context, term);

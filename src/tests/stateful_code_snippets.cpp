@@ -114,6 +114,7 @@ void for_loops()
 
 void register_tests()
 {
+    return; // TEST_DISABLED
     REGISTER_TEST_CASE(stateful_code_snippets::simple_tests);
     REGISTER_TEST_CASE(stateful_code_snippets::name_overlapping);
     REGISTER_TEST_CASE(stateful_code_snippets::if_blocks);

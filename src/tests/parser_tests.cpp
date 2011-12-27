@@ -782,7 +782,7 @@ void register_tests()
     REGISTER_TEST_CASE(parser_tests::test_semicolon_as_line_ending);
     REGISTER_TEST_CASE(parser_tests::test_unary_minus);
     REGISTER_TEST_CASE(parser_tests::test_array_index_access);
-    REGISTER_TEST_CASE(parser_tests::test_namespace);
+    //TEST_DISABLED REGISTER_TEST_CASE(parser_tests::test_namespace);
     REGISTER_TEST_CASE(parser_tests::test_subscripted_atom);
     REGISTER_TEST_CASE(parser_tests::test_whitespace_after_statement);
     REGISTER_TEST_CASE(parser_tests::test_significant_indentation);
