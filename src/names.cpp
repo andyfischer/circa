@@ -114,35 +114,6 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
-Term* get_named_at(Branch* branch, int index, std::string const& name)
-{
-    for (int i=index - 1; i >= 0; i--) {
-        Term* term = branch->get(i);
-        if (term == NULL) continue;
-        if (term->name == name)
-            return term;
-
-        if (term->nestedContents && exposes_nested_names(term))
-        {
-            Term* nested = nested_contents(term)->get(name);
-            if (nested != NULL)
-                return nested;
-        }
-    }
-
-    // Look in outer scopes
-    if (branch->owningTerm == NULL)
-        return NULL;
-
-    return get_named_at(branch->owningTerm, name);
-}
-Term* get_named_at(Term* location, std::string const& name)
-{
-    assert_valid_term(location);
-    if (location->owningBranch == NULL) return NULL;
-    return get_named_at(location->owningBranch, location->index, name);
-}
-
 Term* get_global(std::string name)
 {
     if (KERNEL->contains(name))

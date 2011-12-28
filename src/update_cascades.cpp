@@ -138,7 +138,7 @@ void on_repairable_link(Term* term, List& brokenLinks)
         if (term->dependency(dependencyIndex) != NULL)
             continue;
 
-        Term* fixedLink = get_named_at(term, as_string(linkInfo[0]));
+        Term* fixedLink = find_name_at(term, as_cstring(linkInfo[0]));
         term->setDependency(dependencyIndex, fixedLink);
     }
 }

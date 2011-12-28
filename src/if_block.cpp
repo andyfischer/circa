@@ -147,7 +147,7 @@ Term* if_block_add_output_for_name(Term* ifCall, const char* name)
         ca_assert(casePlaceholder != NULL);
         ca_assert(casePlaceholder->name == "");
         rename(casePlaceholder, name);
-        set_input(casePlaceholder, 0, get_named_at(casePlaceholder, name));
+        set_input(casePlaceholder, 0, find_name_at(casePlaceholder, name));
         respecialize_type(casePlaceholder);
     }
     return outputPlaceholder;

@@ -109,7 +109,7 @@ void add_implicit_placeholders(Term* forTerm)
         if (name == iteratorName)
             continue;
 
-        Term* original = get_named_at(forTerm, name);
+        Term* original = find_name_at(forTerm, name.c_str());
 
         // The name might not be found, for certain parser errors.
         if (original == NULL)

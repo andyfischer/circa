@@ -1168,7 +1168,7 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     if (is_state_input(output)) {
         return find_open_state_result(location);
     } else if (output->name != "") {
-        return get_named_at(location->owningBranch, location->index, output->name);
+        return find_name_at(location, output->name.c_str());
     } else {
         return NULL;
     }

@@ -88,51 +88,6 @@ void test_lookup_qualified_name()
     test_assert(branch["x:y:z:w"] == w);
 }
 
-void test_get_named_at()
-{
-    Branch branch;
-
-    // Simple case
-    Term* a = create_int(&branch, 1, "a");
-    Term* b = create_int(&branch, 1, "b");
-    create_int(&branch, 1, "a");
-
-    test_assert(get_named_at(b, "a") == a);
-
-    // Make sure that the location term is not checked, should only check
-    // things before that.
-    Term* c1 = create_int(&branch, 1, "c");
-    Term* c2 = create_int(&branch, 1, "c");
-    create_int(&branch, 1, "c");
-    test_assert(get_named_at(c2, "c") != c2);
-    test_assert(get_named_at(c2, "c") == c1);
-
-    // Find names in outer scopes
-    Term* d = create_int(&branch, 1, "d");
-    Branch* subBranch = create_branch(&branch);
-    Term* e = create_int(subBranch, 1, "e");
-    test_assert(get_named_at(e, "d") == d);
-
-    // Make sure that when we look into outer scopes, we don't check the name of
-    // our enclosing branch, or any names after that.
-    Term* f1 = create_int(&branch, 1, "f");
-    Branch* subBranch2 = create_branch(&branch, "f");
-    Term* fsub = create_int(subBranch2, 1, "f");
-    create_int(&branch, 1, "f");
-    test_assert(get_named_at(fsub, "f") == f1);
-}
-
-void test_get_named_at_after_if_block()
-{
-    Branch branch;
-    Term* originalA = branch.compile("a = 1");
-    branch.compile("if true { a = 2 }");
-    Term* b = branch.compile("b = 1");
-    test_assert(branch["a"] != originalA); // sanity check
-    test_assert(get_named_at(b, "a") != originalA);
-    test_assert(get_named_at(b, "a") == branch["a"]);
-}
-
 void test_find_first_common_branch()
 {
     Branch branch;
@@ -273,8 +228,6 @@ void register_tests()
     REGISTER_TEST_CASE(names_tests::test_get_relative_name);
     REGISTER_TEST_CASE(names_tests::test_get_relative_name_from_hidden_branch);
     //TEST_DISABLED REGISTER_TEST_CASE(names_tests::test_lookup_qualified_name);
-    REGISTER_TEST_CASE(names_tests::test_get_named_at);
-    REGISTER_TEST_CASE(names_tests::test_get_named_at_after_if_block);
     REGISTER_TEST_CASE(names_tests::test_find_first_common_branch);
     REGISTER_TEST_CASE(names_tests::test_unique_names);
     REGISTER_TEST_CASE(names_tests::test_unique_names_for_anons);

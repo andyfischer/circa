@@ -17,10 +17,6 @@ Term* find_local_name(Branch* branch, const char* name);
 // -1.
 int find_qualified_name_separator(const char* name);
 
-// Find the name binding that is active at the given branch index.
-Term* get_named_at(Branch* branch, int index, std::string const& name);
-Term* get_named_at(Term* location, std::string const& name);
-
 // Get a named term from the global namespace.
 Term* get_global(std::string name);
 
