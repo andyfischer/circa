@@ -41,7 +41,7 @@ Term* find_loaded_module(Symbol name)
     return NULL;
 }
 
-static Term* load_module_from_file(Symbol module_name, const char* filename)
+Term* load_module_from_file(Symbol module_name, const char* filename)
 {
     String name;
     symbol_get_text(module_name, &name);

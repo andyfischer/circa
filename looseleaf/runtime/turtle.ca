@@ -1,5 +1,5 @@
 
-include("../libs/cairo/cairo.ca")
+import cairo
 
 mouse = viewport:mouse()
 

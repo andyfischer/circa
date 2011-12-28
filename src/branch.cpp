@@ -719,15 +719,6 @@ bool refresh_script(Branch* branch)
     clear_branch(branch);
     load_script(branch, filename.c_str());
 
-#if 0 // TODO: Logic for exposing names
-    Branch* parent = get_parent_branch(branch);
-
-    if (caller->owningBranch != NULL && exposeNames) {
-        expose_all_names(contents, *caller->owningBranch);
-        finish_update_cascade(*caller->owningBranch);
-    }
-#endif
-
     mark_static_errors_invalid(branch);
     update_static_error_list(branch);
     return true;

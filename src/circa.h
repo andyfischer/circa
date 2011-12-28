@@ -67,4 +67,7 @@ void circa_add_module_search_path(const char* path);
 // Execute with the given command-line args.
 int circa_run_command_line(int argc, const char* args[]);
 
+circa::Term* circa_load_module_from_file(circa::Symbol module_name, const char* filename);
+circa::Symbol circa_string_to_symbol(const char* str);
+
 }

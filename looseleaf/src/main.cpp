@@ -46,9 +46,9 @@ int main(int argc, char *argv[])
     Branch kernel;
     BackgroundScript kernelRunner(&kernel);
 
-    // Install Looseleaf bindings
-    load_script_term(&kernel, "runtime/viewport.ca");
-    viewport_static_setup(&kernel);
+    // Install our libraries
+    Term* viewportModule = circa_load_module_from_file(circa_string_to_symbol("viewport"), "runtime/viewport.ca");
+    viewport_static_setup(nested_contents(viewportModule));
 
     include_script(&kernel, "runtime/main.ca");
 

@@ -69,6 +69,7 @@ Frame* push_frame(EvalContext* context, Branch* branch);
 void pop_frame(EvalContext* context);
 void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
+void reset_stack(EvalContext* context);
 
 // Pre-evaluation
 void write_input_instruction(Term* caller, Term* input, TaggedValue* isn);
@@ -120,6 +121,7 @@ bool evaluation_interrupted(EvalContext* context);
 void clear_error(EvalContext* cxt);
 
 std::string context_get_error_message(EvalContext* cxt);
+void context_print_error_stack(std::ostream& out, EvalContext* cxt);
 
 void run_vm(EvalContext* context);
 

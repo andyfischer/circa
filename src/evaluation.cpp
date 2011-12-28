@@ -166,6 +166,12 @@ Frame* top_frame(EvalContext* context)
     return get_frame(context, 0);
 }
 
+void reset_stack(EvalContext* context)
+{
+    while (context->numFrames > 0)
+        pop_frame(context);
+}
+
 void evaluate_single_term(EvalContext* context, Term* term)
 {
     if (term->function == NULL || !is_function(term->function))
@@ -489,6 +495,27 @@ std::string context_get_error_message(EvalContext* cxt)
     return as_string(frame->registers[cxt->errorTerm->index]);
 }
 
+void print_term_on_error_stack(std::ostream& out, EvalContext* context, Term* term)
+{
+    out << get_short_location(term) << " ";
+    if (term->name != "")
+        out << term->name << " = ";
+    out << term->function->name;
+    out << "()";
+}
+
+void context_print_error_stack(std::ostream& out, EvalContext* context)
+{
+    out << "[EvalContext " << context << "]" << std::endl;
+    for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
+        Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
+
+        print_term_on_error_stack(out, context, frame->branch->get(frame->pc));
+        std::cout << std::endl;
+    }
+    out << "Error: " << context_get_error_message(context) << std::endl;
+}
+
 void run_vm(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
@@ -525,11 +552,11 @@ do_instruction:
 
     evaluate_single_term(context, term);
 
-    if (func->vmInstruction == PureCall)
-        top_frame(context)->pc++;
-
     if (context->errorOccurred)
         return;
+
+    if (func->vmInstruction == PureCall)
+        top_frame(context)->pc++;
 
     goto do_instruction;
 }

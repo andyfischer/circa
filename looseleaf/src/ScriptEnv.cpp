@@ -32,9 +32,18 @@ Branch* ScriptEnv::loadScript(const char* filename)
 
 void ScriptEnv::tick()
 {
-    refresh_script(branch);
+    bool refreshed = refresh_script(branch);
+
+    if (context.errorOccurred && refreshed) {
+        clear_error(&context);
+        reset_stack(&context);
+    }
+
+    if (context.errorOccurred)
+        return;
+
     evaluate_branch(&context, branch);
 
     if (context.errorOccurred)
-        std::cout << context_get_error_message(&context) << std::endl;
+        context_print_error_stack(std::cout, &context);
 }

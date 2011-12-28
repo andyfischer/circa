@@ -56,28 +56,19 @@ void set_symbol(TaggedValue* tv, Symbol val)
 }
 
 // Runtime symbols
-
-Symbol register_symbol(const char* str)
+Symbol string_to_symbol(const char* str)
 {
-    Symbol existing = string_to_symbol(str);
-    if (existing != InvalidSymbol)
-        return existing;
+    // Check if symbol is already registered
+    std::map<std::string,Symbol>::const_iterator it;
+    it = g_stringToSymbol.find(str);
+    if (it != g_stringToSymbol.end())
+        return it->second;
 
     Symbol index = g_nextFreeSymbol++;
     g_runtimeSymbols[index].name = str;
     Symbol symbol = index + FirstRuntimeSymbol;
     g_stringToSymbol[str] = symbol;
     return symbol;
-}
-
-Symbol string_to_symbol(const char* str)
-{
-    std::map<std::string,Symbol>::const_iterator it;
-    it = g_stringToSymbol.find(str);
-    if (it == g_stringToSymbol.end())
-        return InvalidSymbol;
-    else
-        return it->second;
 }
 
 } // namespace circa

@@ -43,7 +43,6 @@ void symbol_value(Symbol name, TaggedValue* tv);
 void symbol_value(TaggedValue* tv, Symbol name);
 void set_symbol(TaggedValue* tv, Symbol name);
 
-Symbol register_symbol(const char* str);
 Symbol string_to_symbol(const char* str);
 
 } // namespace circa

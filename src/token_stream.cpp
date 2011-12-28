@@ -96,7 +96,7 @@ TokenStream::consumeStr(int match)
 Symbol
 TokenStream::consumeSymbol(int match)
 {
-    Symbol value = register_symbol(nextStr().c_str());
+    Symbol value = string_to_symbol(nextStr().c_str());
     consume(match);
     return value;
 }

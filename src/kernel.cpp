@@ -18,6 +18,7 @@
 #include "subroutine.h"
 #include "static_checking.h"
 #include "string_type.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 
@@ -564,6 +565,16 @@ export_func void circa_shutdown()
 export_func void circa_add_module_search_path(const char* path)
 {
     modules_add_search_path(path);
+}
+
+export_func Term* circa_load_module_from_file(Symbol module_name, const char* filename)
+{
+    return load_module_from_file(module_name, filename);
+}
+
+export_func Symbol circa_string_to_symbol(const char* str)
+{
+    return string_to_symbol(str);
 }
 
 } // namespace circa
