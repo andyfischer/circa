@@ -153,10 +153,12 @@ def rect(Point topleft, Point bottomright) -> Rect
 
 def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     "Return whether the two rectangles intersect."
+    <<<
     def unit_tests()
         rect_intersects_rect([0 0 10 10] [1 1 2 2])
         rect_intersects_rect([0 0 2 1] [1 0 3 1])
         rect_intersects_rect([1 0 3 1] [0 0 2 1])
+    >>>
 
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
@@ -202,12 +204,14 @@ def random_color() -> Color
     return [rand() rand() rand() 1.0]
 
 def blend_color(Color a, Color b, number ratio) -> Color
+    <<<
     def unit_tests()
         blend_color(#abc #123 0.0) == #abc
         blend_color(#abc #123 1.0) == #123
         blend_color(#abc #123 2.0) == #123
         blend_color(#abc #123 -1.0) == #abc
         blend_color(#fff #fff 0.5) == #fff
+    >>>
 
     max(@ratio, 0.0)
     min(@ratio, 1.0)

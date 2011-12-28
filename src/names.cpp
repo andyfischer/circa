@@ -13,37 +13,54 @@
 
 namespace circa {
 
-Term* find_name(Branch* branch, const char* name)
+bool exposes_nested_names(Term* term);
+
+Term* find_name(Branch* branch, int location, const char* name)
 {
     if (branch == NULL)
         return get_global(name);
 
-    Term* result = find_local_name(branch, name);
+    Term* result = find_local_name(branch, location, name);
     if (result != NULL)
         return result;
 
     // Name not found in this branch, check the outer scope.
-    Branch* outerScope = get_outer_scope(branch);
+    Term* parent = branch->owningTerm;
+    if (parent == NULL)
+        return get_global(name);
 
-    // Avoid infinite loop
-    if (outerScope == branch)
-        internal_error("Branch's outer scope is a circular reference");
-
-    return find_name(outerScope, name);
+    return find_name(parent->owningBranch, parent->index, name);
 }
 
-Term* find_local_name(Branch* branch, const char* name)
+Term* find_name(Branch* branch, const char* name)
+{
+    return find_name(branch, branch->length(), name);
+}
+
+Term* find_name_at(Term* location, const char* name)
+{
+    return find_name(location->owningBranch, location->index, name);
+}
+
+Term* find_local_name(Branch* branch, int index, const char* name)
 {
     if (branch == NULL)
         return NULL;
 
-    // First, check for an exact match
-    for (int i = branch->length() - 1; i >= 0; i--) {
+    // First, look for an exact match.
+    for (int i = index - 1; i >= 0; i--) {
         Term* term = branch->get(i);
         if (term == NULL)
             continue;
+
         if (term->name == name)
             return term;
+
+        if (term->nestedContents && exposes_nested_names(term)) {
+            Term* nested = find_local_name(term->nestedContents, name);
+            if (nested != NULL)
+                return nested;
+        }
     }
 
     // Check if 'name' is a qualified name.
@@ -57,7 +74,7 @@ Term* find_local_name(Branch* branch, const char* name)
 
     // Find the namespace term
     std::string namespaceName(name, separatorLoc);
-    Term* prefix = find_local_name(branch, namespaceName.c_str());
+    Term* prefix = find_local_name(branch, index, namespaceName.c_str());
 
     // Give up if prefix not found
     if (prefix == NULL)
@@ -68,6 +85,11 @@ Term* find_local_name(Branch* branch, const char* name)
     return find_local_name(nested_contents(prefix), suffix.c_str());
 
     return NULL;
+}
+
+Term* find_local_name(Branch* branch, const char* name)
+{
+    return find_local_name(branch, branch->length(), name);
 }
 
 int find_qualified_name_separator(const char* name)

@@ -17,6 +17,14 @@ void test_find_name()
 
     Branch* sub = create_branch(&branch, "sub");
     test_assert(find_name(sub, "a") == a);
+
+    Term* c = create_int(&branch, 3, "c");
+    Term* another_a = create_int(&branch, 4, "a");
+
+    // Check that find_name_at will ignore a second "a" definition
+    test_assert(find_name(&branch, "a") == another_a);
+    test_assert(find_name_at(c, "a") == a);
+    test_assert(find_name(sub, "a") == a);
 }
 
 void test_name_is_reachable_from()
