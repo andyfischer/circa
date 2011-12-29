@@ -4,52 +4,23 @@
 
 #include "branch.h"
 #include "filesystem.h"
+#include "string_type.h"
 #include "tagged_value.h"
-
-#if 0
-bool is_separator(char c)
-{
-#if WINDOWS
-    if (c == '\\')
-        return true;
-#endif
-    return c == '/';
-}
-
-static std::string get_path_base_name(std::string p)
-{
-    if (p.length() == 0)
-        return "";
-
-    int index = p.length() - 1;
-
-    if (is_separator(p[index])) {
-        index--;
-
-        if (index < 0)
-            return "";
-    }
-
-    int end = index;
-    index--;
-
-    while (index >= 0 && !is_separator(p[index]))
-        index--;
-
-    return p.substr(index+1, end+1);
-}
-#endif
 
 namespace circa {
 namespace cppbuild_function {
 
     CA_FUNCTION(build_module)
     {
-        std::string moduleDir = STRING_INPUT(0);
+        String* moduleDir = (String*) INPUT(0);
+        String filename;
+        copy(moduleDir, &filename);
+        String build_ca;
+        set_string(&build_ca, "build.ca");
+        join_path(&filename, &build_ca);
 
         Branch buildFile;
-        std::string filename = moduleDir + "/build.ca";
-        load_script(&buildFile, filename.c_str());
+        load_script(&buildFile, as_cstring(&filename));
 
         TaggedValue* moduleName = buildFile["name"];
         if (moduleName == NULL)
@@ -80,7 +51,7 @@ namespace cppbuild_function {
         // Output file
         args += " -o " + name + ".so";
 
-        std::string cmd = "cd " + moduleDir + "; g++ " + args;
+        std::string cmd = "cd " + as_string(moduleDir) + "; g++ " + args;
 
         std::cout << cmd << std::endl;
 

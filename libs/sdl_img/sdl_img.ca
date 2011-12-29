@@ -1,7 +1,7 @@
 
-namespace sdl_img
-    patch_with_dll(reflect:this_branch(), 'sdl_img' -> rpath)
+sys:dll_patch()
 
+namespace sdl_img
     type Image;
     type ImageTexture;
 

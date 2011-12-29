@@ -62,7 +62,10 @@ int main(int argc, char *argv[])
 
     kernelRunner.start();
 
+    printf("Calling app.exec..\n");
     int result = app.exec();
+
+    printf("Shutting down, result = %d\n", result);
 
     clear_branch(&kernel);
     circa_shutdown();

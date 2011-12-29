@@ -1,8 +1,9 @@
 
 import opengl
 
+sys:dll_patch()
+
 -- cairo bindings
-patch_with_dll(reflect:this_branch(), 'cairo' -> rpath)
 
 namespace cairo
     type Context;

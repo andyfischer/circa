@@ -1,7 +1,7 @@
 
 -- liblo bindings
 
-patch_with_dll(reflect:this_branch(), 'osc' -> rpath)
+sys:dll_patch()
 
 namespace osc
     type ServerContext;

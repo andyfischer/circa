@@ -29,6 +29,7 @@ Viewport::Viewport(QWidget* parent)
 
 Viewport::~Viewport()
 {
+    std::cout << "closing window: " << this->objectName().toStdString() << std::endl;
 }
 
 void Viewport::initializeGL()
@@ -103,8 +104,8 @@ CA_FUNCTION(create_window)
     viewport->setWindowTitle(title.c_str());
     viewport->setMouseTracking(true);
     viewport->loadScript(STRING_INPUT(0));
-    viewport_t.set(OUTPUT, viewport);
     viewport->show();
+    viewport_t.set(OUTPUT, viewport);
 }
 
 CA_FUNCTION(Viewport__resize)

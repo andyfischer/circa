@@ -198,7 +198,6 @@ void find_dll_for_script(Branch* branch, TaggedValue* resultOut)
 
 void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
 {
-    std::cout << "check for patches on: " << get_branch_source_filename(branch) << std::endl;
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         if (it.current()->function == BUILTIN_FUNCS.dll_patch) {
             Term* caller = it.current();

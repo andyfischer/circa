@@ -1,6 +1,6 @@
 
 
-patch_with_dll(reflect:this_branch(), 'imagemanip' -> rpath)
+sys:dll_patch()
 
 namespace imagemanip
     def warp(sdl_img:Image image)
