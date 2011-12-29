@@ -5,5 +5,9 @@ assert("1234" != "123")
 assert("".length() == 0)
 assert("hello there".length() == 11)
 
+assert("hi there".starts_with("hi"))
+assert(not("hi there".starts_with("hello")))
+
 assert("1234".ends_with("34"))
 assert(not("1234".ends_with("3")))
+

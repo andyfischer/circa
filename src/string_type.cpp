@@ -174,6 +174,17 @@ bool string_eq(TaggedValue* s, const char* str)
 {
     return as_std_string(s) == str;
 }
+
+bool string_starts_with(TaggedValue* s, const char* beginning)
+{
+    const char* left = as_cstring(s);
+    for (int i=0;; i++) {
+        if (beginning[i] == 0)
+            return true;
+        if (left[i] != beginning[i])
+            return false;
+    }
+}
 bool string_ends_with(TaggedValue* s, const char* ending)
 {
     int ending_len = strlen(ending);

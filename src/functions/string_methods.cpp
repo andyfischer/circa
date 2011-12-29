@@ -62,6 +62,10 @@ namespace string_methods_function {
     {
         set_bool(OUTPUT, string_ends_with(INPUT(0), as_cstring(INPUT(1))));
     }
+    CA_FUNCTION(starts_with)
+    {
+        set_bool(OUTPUT, string_starts_with(INPUT(0), as_cstring(INPUT(1))));
+    }
 
     void setup(Branch* kernel)
     {
@@ -69,6 +73,7 @@ namespace string_methods_function {
         import_function(kernel, substr, "string.substr(_,int,int) -> string");
         import_function(kernel, slice, "string.slice(_,int,int) -> string");
         import_function(kernel, ends_with, "string.ends_with(_,string) -> bool");
+        import_function(kernel, starts_with, "string.starts_with(_,string) -> bool");
     }
 
 }
