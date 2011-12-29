@@ -6,6 +6,7 @@
 #include "building.h"
 #include "kernel.h"
 #include "code_iterators.h"
+#include "dll_loading.h"
 #include "evaluation.h"
 #include "filesystem.h"
 #include "function.h"
@@ -610,6 +611,10 @@ Symbol load_script(Branch* branch, const char* filename)
     parser::compile(branch, parser::statement_list, as_string(&contents));
 
     finish_minor_branch(branch);
+
+    // Post-load steps
+    dll_loading_check_for_patches_on_loaded_branch(branch);
+
     return Success;
 }
 

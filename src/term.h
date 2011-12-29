@@ -112,6 +112,7 @@ struct Term : TaggedValue
     bool boolProp(std::string const& name);
     std::string const& stringProp(std::string const& name);
 
+    void setProp(const char* name, TaggedValue* value);
     void setIntProp(std::string const& name, int i);
     void setFloatProp(std::string const& name, float f);
     void setBoolProp(std::string const& name, bool b);

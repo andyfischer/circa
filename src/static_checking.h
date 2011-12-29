@@ -25,4 +25,7 @@ void print_static_error(Term* term, std::ostream& out);
 std::string get_static_errors_formatted(Branch* branch);
 std::string get_static_error_message(Term* term);
 
+void mark_static_error(Term* term, const char* msg);
+void mark_static_error(Term* term, TaggedValue* error);
+
 } // namespace circ

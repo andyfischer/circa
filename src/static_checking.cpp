@@ -252,4 +252,14 @@ std::string get_static_error_message(Term* term)
     return out.str();
 }
 
+void mark_static_error(Term* term, const char* msg)
+{
+    term->setStringProp("error", msg);
+}
+
+void mark_static_error(Term* term, TaggedValue* error)
+{
+    term->setProp("error", error);
+}
+
 } // namespace circa

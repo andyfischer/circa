@@ -168,6 +168,9 @@ void string_append(TaggedValue* left, const char* right)
 }
 void string_resize(TaggedValue* s, int length)
 {
+    if (length < 0)
+        length = as_std_string(s).size() + length;
+
     as_std_string(s).resize(length, ' ');
 }
 bool string_eq(TaggedValue* s, const char* str)

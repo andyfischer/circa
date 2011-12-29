@@ -168,6 +168,12 @@ std::string const& Term::stringProp(std::string const& name)
     return as_string(t);
 }
 
+void Term::setProp(const char* name, TaggedValue* value)
+{
+    TaggedValue* t = addProperty(name, INT_TYPE);
+    copy(value, t);
+}
+
 void Term::setIntProp(std::string const& name, int i)
 {
     TaggedValue* t = addProperty(name, INT_TYPE);

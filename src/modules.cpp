@@ -8,6 +8,7 @@
 #include "list_shared.h"
 #include "kernel.h"
 #include "modules.h"
+#include "static_checking.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -110,6 +111,9 @@ Symbol load_module(Symbol module_name, Term* loadCall)
         if (callersModule != NULL && (import->index > callersModule->index))
             move_before(import, callersModule);
     }
+
+    // If the module has static errors, print them now.
+    print_static_errors_formatted(nested_contents(import));
 
     return Success;
 }

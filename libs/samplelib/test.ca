@@ -1,0 +1,5 @@
+
+import samplelib
+
+sample_a() -> print
+ns:b() -> print

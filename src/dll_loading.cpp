@@ -12,6 +12,7 @@
 #include "code_iterators.h"
 #include "function.h"
 #include "kernel.h"
+#include "static_checking.h"
 #include "string_type.h"
 #include "symbols.h"
 #include "term.h"
@@ -30,6 +31,12 @@ typedef void (*OnLoadFunc)(Branch* branch);
 
 typedef std::map<std::string, Dll*> LoadedDllMap;
 LoadedDllMap g_loadedDlls;
+
+#if WINDOWS
+const char* DLL_SUFFIX = ".dll";
+#else
+const char* DLL_SUFFIX = ".so";
+#endif
 
 void* find_func_in_dll(Dll* dll, const char* funcName);
 
@@ -179,22 +186,39 @@ void find_dll_for_script(Branch* branch, TaggedValue* resultOut)
         return;
     }
 
-    if (string_ends_with(&filename, ".ca")) {
-        // ...
-    }
+    String dllFilename;
+    copy(&filename, &dllFilename);
+
+    if (string_ends_with(&dllFilename, ".ca"))
+        string_resize(&dllFilename, -3);
+
+    //string_append(&dllFilename, DLL_SUFFIX);
+    swap(&dllFilename, resultOut);
 }
 
 void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
 {
+    std::cout << "check for patches on: " << get_branch_source_filename(branch) << std::endl;
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         if (it.current()->function == BUILTIN_FUNCS.dll_patch) {
             Term* caller = it.current();
 
             // Find the DLL.
+            String filename;
+            find_dll_for_script(branch, &filename);
 
+            if (!is_string(&filename)) {
+                mark_static_error(caller, "Couldn't find DLL");
+                continue;
+            }
 
-            //dll_loading_patch_dll_default(branch);
-            return;
+            TaggedValue error;
+            patch_with_dll(as_cstring(&filename), branch, &error);
+
+            if (!is_null(&error)) {
+                mark_static_error(caller, &error);
+                continue;
+            }
         }
     }
 }

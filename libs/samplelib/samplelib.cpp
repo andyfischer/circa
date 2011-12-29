@@ -14,17 +14,12 @@ void on_load(Branch* branch)
 
 CA_FUNCTION(sample_a)
 {
-    set_string(OUTPUT, "hi");
+    set_string(OUTPUT, "patched function a()");
 }
 
-CA_FUNCTION(ns__concat)
+CA_FUNCTION(ns__b)
 {
-    set_string(OUTPUT, std::string(STRING_INPUT(0)) + STRING_INPUT(1));
-}
-
-CA_FUNCTION(get_number)
-{
-    set_int(OUTPUT, 0);
+    set_string(OUTPUT, "patched function b()");
 }
 
 } // extern "C"
