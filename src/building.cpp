@@ -876,7 +876,7 @@ void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValu
 void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
 {
     if (input == NULL) {
-        set_null(isn);
+        set_pointer(isn, &NullInputIsn_t, NULL);
     } else if (is_value(input)) {
         set_pointer(isn, &GlobalVariableIsn_t, input);
     } else {

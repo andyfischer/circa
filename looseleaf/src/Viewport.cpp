@@ -45,6 +45,7 @@ void Viewport::initializeGL()
     glPolygonMode(GL_FRONT, GL_FILL);
     glDisable(GL_CULL_FACE);
 }
+
 void Viewport::resizeGL(int width, int height)
 {
     glViewport(0, 0, width, height);

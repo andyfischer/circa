@@ -132,6 +132,7 @@ extern Type VOID_T;
 
 extern Type StackVariableIsn_t;
 extern Type GlobalVariableIsn_t;
+extern Type NullInputIsn_t;
 extern Type ImplicitStateInputIsn_t;
 
 extern TaggedValue TrueValue;

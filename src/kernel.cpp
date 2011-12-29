@@ -160,6 +160,7 @@ Type VOID_T;
 // Input instructions:
 Type StackVariableIsn_t;
 Type GlobalVariableIsn_t;
+Type NullInputIsn_t;
 Type ImplicitStateInputIsn_t;
 
 TaggedValue TrueValue;
@@ -172,7 +173,11 @@ namespace cppbuild_function { CA_FUNCTION(build_module); }
 // Standard library functions
 CA_FUNCTION(evaluate_output_placeholder)
 {
-    copy(INPUT(0), OUTPUT);
+    TaggedValue* in = INPUT(0);
+    if (in == NULL)
+        set_null(OUTPUT);
+    else
+        copy(in, OUTPUT);
 }
 
 Type* output_placeholder_specializeType(Term* caller)
@@ -272,6 +277,8 @@ void create_primitive_types()
     StackVariableIsn_t.toString = stackVariable_toString;
     GlobalVariableIsn_t.name = "GlobalVariableIsn";
     GlobalVariableIsn_t.storageType = STORAGE_TYPE_REF;
+    NullInputIsn_t.name = "NullInputIsn";
+    NullInputIsn_t.storageType = STORAGE_TYPE_REF;
     ImplicitStateInputIsn_t.name = "ImplicitStateInputIsn";
     ImplicitStateInputIsn_t.storageType = STORAGE_TYPE_INT;
 }

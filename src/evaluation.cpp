@@ -304,6 +304,8 @@ TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
         ca_assert(relativeFrame >= 0);
         Frame* frame = get_frame(context, relativeFrame);
         return frame->registers[index];
+    } else if (arg->value_type == &NullInputIsn_t) {
+        return NULL;
     } else {
         return arg;
     }

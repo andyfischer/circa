@@ -11,6 +11,7 @@ void test_snippet(std::string const& source)
 {
     Branch branch;
     branch.compile(source);
+    finish_minor_branch(&branch);
 
     if (test_fail_on_static_error(&branch))
         return;
@@ -39,6 +40,7 @@ void test_trimmed_state(std::string const& source, std::string const& dest,
 {
     Branch sourceBranch;
     sourceBranch.compile(source);
+    finish_minor_branch(&sourceBranch);
 
     if (test_fail_on_static_error(&sourceBranch))
         return;
@@ -91,7 +93,7 @@ void if_blocks()
     test_snippet("if true { state a }");
     test_snippet("if true { state a } else { state b }");
 
-    test_trimmed_state("if true { state a }", "", "{_if_block: [{a: <any>}, null]}");
+    test_trimmed_state("if true { state a }", "", "{_if_block: [{a: <any>}]}");
 }
 
 void function_calls()
@@ -114,7 +116,6 @@ void for_loops()
 
 void register_tests()
 {
-    return; // TEST_DISABLED
     REGISTER_TEST_CASE(stateful_code_snippets::simple_tests);
     REGISTER_TEST_CASE(stateful_code_snippets::name_overlapping);
     REGISTER_TEST_CASE(stateful_code_snippets::if_blocks);
