@@ -9,7 +9,11 @@
 
 #include <set>
 
+#include "code_iterators.h"
 #include "function.h"
+#include "kernel.h"
+#include "string_type.h"
+#include "symbols.h"
 #include "term.h"
 
 namespace circa {
@@ -163,6 +167,36 @@ void patch_with_dll(const char* dll_filename, Branch* branch, TaggedValue* error
     // Iterate through every function inside 'branch', and possibly replace
     // its evaluate function with one from the dll.
     patch_branch_recr(dll, branch, "");
+}
+
+void find_dll_for_script(Branch* branch, TaggedValue* resultOut)
+{
+    String filename;
+    branch_get_source_filename(branch, &filename);
+
+    if (!is_string(&filename)) {
+        set_symbol(resultOut, Failure);
+        return;
+    }
+
+    if (string_ends_with(&filename, ".ca")) {
+        // ...
+    }
+}
+
+void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
+{
+    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
+        if (it.current()->function == BUILTIN_FUNCS.dll_patch) {
+            Term* caller = it.current();
+
+            // Find the DLL.
+
+
+            //dll_loading_patch_dll_default(branch);
+            return;
+        }
+    }
 }
 
 } // namespace circa

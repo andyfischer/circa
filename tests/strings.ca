@@ -1,0 +1,9 @@
+
+assert("1234" == "1234")
+assert("1234" != "123")
+
+assert("".length() == 0)
+assert("hello there".length() == 11)
+
+assert("1234".ends_with("34"))
+assert(not("1234".ends_with("3")))

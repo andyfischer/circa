@@ -21,6 +21,7 @@ math.ca
 method_calls.ca
 set.ca
 set_index.ca
+strings.ca
 subroutine.ca
 subroutine_state.ca
 subroutine_state_1.ca

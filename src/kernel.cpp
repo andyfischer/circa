@@ -510,6 +510,8 @@ void install_standard_library(Branch* kernel)
 
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");
+
+    BUILTIN_FUNCS.dll_patch = kernel->get("sys:dll_patch");
 }
 
 export_func void circa_initialize()

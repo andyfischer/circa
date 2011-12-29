@@ -15,6 +15,7 @@ void string_append(TaggedValue* left, TaggedValue* right);
 void string_append(TaggedValue* left, const char* right);
 void string_resize(TaggedValue* s, int length);
 bool string_eq(TaggedValue* s, const char* str);
+bool string_ends_with(TaggedValue* s, const char* str);
 
 const char* as_cstring(TaggedValue* value);
 std::string const& as_string(TaggedValue* value);

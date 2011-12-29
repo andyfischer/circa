@@ -1,7 +1,6 @@
 -- Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-
-patch_with_dll(reflect:this_branch(), 'opengl' -> rpath)
+sys:dll_patch()
 
 namespace opengl
     def draw_quad(Rect rect)

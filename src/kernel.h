@@ -90,6 +90,7 @@ extern Term* OPAQUE_POINTER_TYPE;
 struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
+    Term* dll_patch;
     Term* error;
     Term* import;
     Term* imported_file;

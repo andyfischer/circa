@@ -413,14 +413,26 @@ void remove_nested_contents(Term* term)
     term->nestedContents = NULL;
 }
 
-std::string get_branch_source_filename(Branch* branch)
+void branch_get_source_filename(Branch* branch, TaggedValue* result)
 {
     List* fileOrigin = branch_get_file_origin(branch);
 
-    if (fileOrigin == NULL)
-        return "";
+    if (fileOrigin == NULL) {
+        set_null(result);
+        return;
+    }
 
-    return as_string(fileOrigin->get(1));
+    copy(fileOrigin->get(1), result);
+}
+
+std::string get_branch_source_filename(Branch* branch)
+{
+    TaggedValue val;
+    branch_get_source_filename(branch, &val);
+    if (is_string(&val))
+        return as_string(&val);
+    else
+        return "";
 }
 
 Branch* get_outer_scope(Branch* branch)

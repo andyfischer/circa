@@ -33,11 +33,12 @@ void install_function(Term* function, EvaluateFunc evaluate)
     as_function(function)->vmInstruction = PureCall;
 }
 
-void install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
+Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 {
     Term* term = find_name(branch, name);
     as_function(term)->evaluate = evaluate;
     as_function(term)->vmInstruction = PureCall;
+    return term;
 }
 
 Term* import_type(Branch* branch, Type* type)

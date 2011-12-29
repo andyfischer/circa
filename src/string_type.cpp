@@ -174,6 +174,18 @@ bool string_eq(TaggedValue* s, const char* str)
 {
     return as_std_string(s) == str;
 }
+bool string_ends_with(TaggedValue* s, const char* ending)
+{
+    int ending_len = strlen(ending);
+    std::string& str = as_std_string(s);
+    int len = str.size();
+
+    for (int i=0; i < ending_len; i++)
+        if (str[len - ending_len + i] != ending[i])
+            return false;
+
+    return true;
+}
 
 std::string& as_std_string(TaggedValue* value)
 {
