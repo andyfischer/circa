@@ -18,9 +18,9 @@ namespace include_function {
         {
             clear_branch(contents);
             load_script(contents, filename.c_str());
-
             mark_static_errors_invalid(contents);
             update_static_error_list(contents);
+            check_to_add_primary_output_placeholder(contents);
 
             return true;
         }

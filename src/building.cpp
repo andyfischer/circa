@@ -1147,6 +1147,14 @@ int find_input_index_for_pointer(Term* call, Term* input)
     return -1;
 }
 
+void check_to_add_primary_output_placeholder(Branch* branch)
+{
+    Term* output = get_output_placeholder(branch, 0);
+
+    if (output == NULL || is_state_input(output))
+        prepend_output_placeholder(branch, find_last_non_comment_expression(branch));
+}
+
 void check_to_add_state_output_placeholder(Branch* branch)
 {
     // No-op if a state output placeholder already exists

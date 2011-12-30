@@ -166,6 +166,7 @@ void input_placeholders_to_list(Branch* branch, TermList* list);
 void list_outer_pointers(Branch* branch, TermList* list);
 void expand_variadic_inputs_for_call(Branch* branch, Term* call);
 int find_input_index_for_pointer(Term* call, Term* input);
+void check_to_add_primary_output_placeholder(Branch* branch);
 void check_to_add_state_output_placeholder(Branch* branch);
 Term* find_intermediate_result_for_output(Term* location, Term* output);
 void update_exit_points(Branch* branch);
