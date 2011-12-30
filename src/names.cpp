@@ -309,21 +309,6 @@ const char* get_unique_name(Term* term)
     return term->uniqueName.name.c_str();
 }
 
-void expose_all_names(Branch* source, Branch* destination)
-{
-    for (TermNamespace::iterator it = source->names.begin(); it != source->names.end(); ++it)
-    {
-        std::string const& name = it->first;
-        Term* term = it->second;
-
-        ca_assert(term != NULL);
-        if (name == "") continue;
-        if (name[0] == '#' && name != "#out") continue;
-
-        destination->bindName(term, name);
-    }
-}
-
 Term* find_from_unique_name(Branch* branch, const char* name)
 {
     // O(n) search, maybe this should be made more efficient.

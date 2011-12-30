@@ -7,7 +7,7 @@
 namespace circa {
 namespace include_function {
 
-    bool load_script(EvalContext* cxt, Term* caller, const std::string& filename, bool exposeNames)
+    bool load_script(EvalContext* cxt, Term* caller, const std::string& filename)
     {
         Branch* contents = nested_contents(caller);
 
@@ -17,13 +17,7 @@ namespace include_function {
         if (fileChanged)
         {
             clear_branch(contents);
-
             load_script(contents, filename.c_str());
-
-            if (caller->owningBranch != NULL && exposeNames) {
-                expose_all_names(contents, caller->owningBranch);
-                finish_update_cascade(caller->owningBranch);
-            }
 
             mark_static_errors_invalid(contents);
             update_static_error_list(contents);
@@ -38,7 +32,7 @@ namespace include_function {
         EvalContext* context = CONTEXT;
         Branch* contents = nested_contents(CALLER);
 
-        bool fileChanged = load_script(CONTEXT, CALLER, STRING_INPUT(0), true);
+        bool fileChanged = load_script(CONTEXT, CALLER, STRING_INPUT(0));
 
         if (CONTEXT->errorOccurred)
             return;
@@ -66,12 +60,12 @@ namespace include_function {
         if (!is_string(term->input(0)))
             return;
 
-        load_script(NULL, term, as_string(term->input(0)), true);
+        load_script(NULL, term, as_string(term->input(0)));
     }
 
     CA_FUNCTION(load_script)
     {
-        load_script(CONTEXT, CALLER, STRING_INPUT(0), false);
+        load_script(CONTEXT, CALLER, STRING_INPUT(0));
 
         set_branch(OUTPUT, CALLER->nestedContents);
     }

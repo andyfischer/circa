@@ -34,10 +34,6 @@ std::string get_relative_name_at(Term* location, Term* term);
 void update_unique_name(Term* term);
 const char* get_unique_name(Term* term);
 
-// Take all named terms in 'source' and bind them to the same name in 'destination'.
-// This is used for joining branches in if/for blocks.
-void expose_all_names(Branch* source, Branch* destination);
-
 Term* find_from_unique_name(Branch* branch, const char* name);
 
 // Attempts to find a global name for the term. If successful, returns true
