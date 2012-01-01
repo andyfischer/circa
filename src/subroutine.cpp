@@ -55,8 +55,6 @@ CA_FUNCTION(evaluate_subroutine)
     List registers;
     registers.resize(get_locals_count(contents));
     
-    context->interruptSubroutine = false;
-
     // Insert inputs into placeholders
     for (int i=0; i < NUM_INPUTS; i++) {
         Term* placeholder = get_input_placeholder(contents, i);
@@ -75,9 +73,6 @@ CA_FUNCTION(evaluate_subroutine)
         }
     }
 
-    // Prepare output
-    set_null(&context->subroutineOutput);
-
     // Push our frame (with inputs) onto the stack
     push_frame(context, contents, &registers);
 
@@ -88,8 +83,6 @@ CA_FUNCTION(evaluate_subroutine)
         if (evaluation_interrupted(context))
             break;
     }
-
-    context->interruptSubroutine = false;
 
     // If an error occurred, leave context the way it is.
     if (context->errorOccurred)

@@ -23,19 +23,12 @@ struct EvalContext
 {
     CircaObject header;
 
-    bool interruptSubroutine;
-
-    TaggedValue subroutineOutput;
-
     // Error information:
     bool errorOccurred;
     Term* errorTerm;
 
     // Tree of persistent state
     TaggedValue state;
-
-    // State used for the current for loop
-    ForLoopContext forLoopContext;
 
     // Intra-program messages
     Dict messages;

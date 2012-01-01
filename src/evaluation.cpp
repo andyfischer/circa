@@ -24,8 +24,7 @@
 namespace circa {
 
 EvalContext::EvalContext()
- : interruptSubroutine(false),
-   errorOccurred(false),
+ : errorOccurred(false),
    numFrames(0),
    stack(NULL),
    currentTerm(NULL)
@@ -380,8 +379,7 @@ void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
 
 bool evaluation_interrupted(EvalContext* context)
 {
-    return context->errorOccurred || context->interruptSubroutine
-        || context->forLoopContext.breakCalled || context->forLoopContext.continueCalled;
+    return context->errorOccurred;
 }
 
 void evaluate_range(EvalContext* context, Branch* branch, int start, int end)

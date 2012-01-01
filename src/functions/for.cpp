@@ -41,7 +41,7 @@ namespace for_function {
     }
     CA_FUNCTION(evaluate_discard)
     {
-        CONTEXT->forLoopContext.discard = true;
+        // FIXME
     }
     void break_formatSource(StyledSource* source, Term* term)
     {

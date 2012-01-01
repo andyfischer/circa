@@ -15,9 +15,6 @@ namespace eval_context_t {
         EvalContext* context = get(value);
         TaggedValue relIdent;
 
-        set_string(&relIdent, "subroutineOutput");
-        callback(&context->subroutineOutput, &relIdent, visitContext);
-
         set_string(&relIdent, "state");
         callback(&context->state, &relIdent, visitContext);
 
