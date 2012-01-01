@@ -17,10 +17,16 @@ namespace include_function {
         if (fileChanged)
         {
             clear_branch(contents);
+            
+            // Add an input placeholder to catch the filename argument. Kind of a hack.
+            append_input_placeholder(contents);
+
             load_script(contents, filename.c_str());
+
             mark_static_errors_invalid(contents);
             update_static_error_list(contents);
             check_to_add_primary_output_placeholder(contents);
+            check_to_insert_implicit_inputs(caller);
 
             return true;
         }

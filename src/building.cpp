@@ -531,7 +531,10 @@ Term* prepend_output_placeholder(Branch* branch, Term* result)
 
 Branch* term_get_function_details(Term* call)
 {
-    if (call->function == IF_BLOCK_FUNC || call->function == FOR_FUNC)
+    // TODO: Shouldn't need to special case these functions.
+    if (call->function == IF_BLOCK_FUNC
+        || call->function == FOR_FUNC
+        || call->function == INCLUDE_FUNC)
         return nested_contents(call);
 
     return function_get_contents(as_function(call->function));
