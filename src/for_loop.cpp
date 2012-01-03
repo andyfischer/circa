@@ -199,23 +199,6 @@ Branch* find_enclosing_for_loop_contents(Term* term)
     return nested_contents(loop);
 }
 
-void for_loop_update_output_index(Term* forTerm)
-{
-    Branch* contents = nested_contents(forTerm);
-
-    // If this is a list-rewrite, then the output is the last term that has the iterator's
-    // name binding. Otherwise the output is the last expression.
-    if (for_loop_modifies_list(forTerm)) {
-        Term* output = contents->get(get_for_loop_iterator(forTerm)->name);
-        ca_assert(output != NULL);
-        contents->outputIndex = output->index;
-    } else {
-        // Find the first non-comment expression before #outer_rebinds
-        Term* output = find_last_non_comment_expression(contents);
-        contents->outputIndex = output == NULL ? -1 : output->index;
-    }
-}
-
 void for_loop_fix_state_input(Branch* contents)
 {
     // This function will look at the state access inside for-loop contents.

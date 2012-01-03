@@ -28,9 +28,6 @@ struct Branch
 
     int _refCount;
 
-    // Deprecated:
-    int outputIndex;
-
     // Whether this branch needs some wrap-up before it can be executed (see
     // finish_minor_branch).
     bool needsFinish;
@@ -39,11 +36,6 @@ struct Branch
     //   If the branch came from a file, then the value will be of format:
     //     [:file, String filename, int nullable_timestamp]
     TaggedValue origin;
-
-    // Whether this branch has inlined state inside its contents or any nested contents.
-    // This value will either be a boolean, or a null (indicating that the value needs to
-    // be recalculated).
-    TaggedValue hasInlinedState;
 
     // If this branch has any static errors, then they are listed here. If there
     // are no errors then this value is null.
