@@ -36,7 +36,7 @@ void assert_valid_branch(Branch const* obj)
 Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
-    needsFinish(0),
+    needsFinish(true),
     currentlyCascadingUpdates(false)
 {
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
@@ -497,6 +497,7 @@ void clear_branch(Branch* branch)
     set_null(&branch->pendingUpdates);
 
     branch->names.clear();
+    branch->needsFinish = true;
 
     // Iterate through the branch and tear down any term references, so that we
     // don't have to worry about stale pointers later.
@@ -610,7 +611,7 @@ Symbol load_script(Branch* branch, const char* filename)
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
 
-    finish_minor_branch(branch);
+    finish_branch(branch);
 
     // Post-load steps
     dll_loading_check_for_patches_on_loaded_branch(branch);

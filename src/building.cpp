@@ -50,6 +50,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // change_function will also update the declared type.
     change_function(result, function);
 
+    branch->needsFinish = true;
     update_unique_name(result);
     on_inputs_changed(result);
     update_extra_outputs(result);
@@ -677,6 +678,8 @@ void check_to_insert_implicit_inputs(Term* term)
 
     if (stateInput != NULL && !term_is_state_input(term, stateInput->index)) {
 
+        int inputIndex = stateInput->index;
+
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
         Term* unpack = apply(term->owningBranch, BUILTIN_FUNCS.unpack_state, TermList(container));
@@ -684,9 +687,9 @@ void check_to_insert_implicit_inputs(Term* term)
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
 
-        insert_input(term, stateInput->index, unpack);
-        set_bool(term->inputInfo(0)->properties.insert("state"), true);
-        set_bool(term->inputInfo(0)->properties.insert("hidden"), true);
+        insert_input(term, inputIndex, unpack);
+        set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
+        set_bool(term->inputInfo(inputIndex)->properties.insert("hidden"), true);
     }
 }
 
@@ -760,8 +763,13 @@ void post_compile_term(Term* term)
     }
 }
 
-void finish_minor_branch(Branch* branch)
+void finish_branch(Branch* branch)
 {
+    if (!branch->needsFinish)
+        return;
+
+    branch->needsFinish = false;
+
     // Create an output_placeholder for state, if necessary
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)
@@ -948,10 +956,13 @@ Term* insert_state_output(Branch* branch)
 {
     // Make sure that a state input doesn't already exist
     Term* term = find_state_output(branch);
-    if (term != NULL)
+    Term* openStateResult = find_open_state_result(branch, branch->length());
+
+    if (term != NULL) {
+        set_input(term, 0, openStateResult);
         return term;
-    term = apply(branch, OUTPUT_PLACEHOLDER_FUNC,
-        TermList(find_open_state_result(branch, branch->length())));
+    }
+    term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(openStateResult));
     term->setBoolProp("state", true);
     hide_from_source(term);
     return term;

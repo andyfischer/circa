@@ -820,7 +820,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
         set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
         consume_branch(nested_contents(currentBlock), tokens, context);
-        finish_minor_branch(nested_contents(currentBlock));
+        finish_branch(nested_contents(currentBlock));
 
         if (tokens.nextNonWhitespaceIs(ELIF)
                 || (tokens.nextNonWhitespaceIs(ELSE) && !encounteredElse)) {
@@ -2084,7 +2084,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
 
     consume_branch(nested_contents(term), tokens, context);
 
-    finish_minor_branch(nested_contents(term));
+    finish_branch(nested_contents(term));
     mark_inputs_changed(term);
     finish_update_cascade(branch);
 

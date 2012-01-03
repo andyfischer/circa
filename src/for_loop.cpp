@@ -254,7 +254,7 @@ CA_FUNCTION(evaluate_for_loop)
     int inputListLength = inputList->numElements();
 
     List registers;
-    registers.resize(contents->length());
+    registers.resize(get_locals_count(contents));
 
     // Copy inputs (first time)
     for (int i=0;; i++) {

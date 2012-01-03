@@ -522,7 +522,7 @@ CA_FUNCTION(evaluate_if_block)
 
             // Copy inputs
             List registers;
-            registers.resize(acceptedBranch->length());
+            registers.resize(get_locals_count(acceptedBranch));
             int numInputs = NUM_INPUTS;
             for (int inputIndex=0; inputIndex < numInputs; inputIndex++)
                 copy(INPUT(inputIndex), registers[inputIndex]);

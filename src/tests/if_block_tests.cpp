@@ -227,7 +227,7 @@ void test_state_simple()
 
     // Simple test, condition never changes
     Term* block = branch.compile("if true { state i = 0; i += 1 }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
     evaluate_branch(&context, &branch);
 
     TaggedValue *i = context.state.getField("_if_block")->getIndex(0)->getField("i");
@@ -243,7 +243,7 @@ void test_state_simple()
     // Same test with elif
     branch.clear();
     block = branch.compile("if false {} elif true { state i = 0; i += 1 }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
     evaluate_branch(&context, &branch);
     i = context.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
@@ -259,7 +259,7 @@ void test_state_simple()
 
     EvalContext context2;
     block = branch.compile("if false {} else { state i = 0; i += 1 }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
     evaluate_branch(&context2, &branch);
     i = context2.state.getField("_if_block")->getIndex(1)->getField("i");
     test_assert(as_int(i) == 1);
@@ -278,7 +278,7 @@ void test_state_is_reset_when_if_fails()
 
     Term* c = branch.compile("c = true");
     branch.compile("if c { state i = 0; i += 1 } else { 'hi' }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_if_block: [{i: 1}]}");
@@ -311,7 +311,7 @@ void test_state_is_reset_when_if_fails2()
     Term* a = branch.compile("a = true");
     
     branch.compile("if a { state s = test_oracle() }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     internal_debug_function::oracle_send(1);
     internal_debug_function::oracle_send(2);

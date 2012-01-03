@@ -11,7 +11,7 @@ void test_snippet(std::string const& source)
 {
     Branch branch;
     branch.compile(source);
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     if (test_fail_on_static_error(&branch))
         return;
@@ -40,7 +40,7 @@ void test_trimmed_state(std::string const& source, std::string const& dest,
 {
     Branch sourceBranch;
     sourceBranch.compile(source);
-    finish_minor_branch(&sourceBranch);
+    finish_branch(&sourceBranch);
 
     if (test_fail_on_static_error(&sourceBranch))
         return;

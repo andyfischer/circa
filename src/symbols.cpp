@@ -3,6 +3,7 @@
 
 #include "common_headers.h"
 
+#include "debug.h"
 #include "kernel.h"
 #include "symbols.h"
 #include "tagged_value.h"
@@ -21,11 +22,32 @@ std::map<std::string,Symbol> g_stringToSymbol;
 
 const char* symbol_get_text(Symbol symbol)
 {
+    // Runtime symbols
     if (symbol >= FirstRuntimeSymbol)
         return g_runtimeSymbols[symbol - FirstRuntimeSymbol].name.c_str();
-    else
-        return "";
+
+    // Builtin symbols
+    switch (symbol) {
+        case InvalidSymbol: return "InvalidSymbol";
+        case File: return "File";
+        case Newline: return "Newline";
+        case Out: return "Out";
+        case Unknown: return "Unknown";
+        case Repeat: return "Repeat";
+        case Success: return "Success";
+        case Failure: return "Failure";
+        case FileNotFound: return "FileNotFound";
+        case NotEnoughInputs: return "NotEnoughInputs";
+        case TooManyInputs: return "TooManyInputs";
+        case ExtraOutputNotFound: return "ExtraOutputNotFound";
+        case PureCall: return "PureCall";
+        case ControlFlowCall: return "ControlFlowCall";
+    }
+
+    internal_error("Unknown symbol in symbol_get_text");
+    return "";
 }
+
 void symbol_get_text(Symbol symbol, String* string)
 {
     set_string((TaggedValue*) string, symbol_get_text(symbol));

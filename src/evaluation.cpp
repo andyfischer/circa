@@ -141,7 +141,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, ListData* args
     int inputCount = list_size(args);
 
     List registers;
-    registers.resize(inputCount);
+    registers.resize(get_locals_count(branch));
     
     // Insert inputs into placeholders
     for (int i=0; i < inputCount; i++) {
@@ -285,6 +285,8 @@ void save_top_level_state(EvalContext* context, Branch* branch)
 
 void evaluate_branch(EvalContext* context, Branch* branch)
 {
+    finish_branch(branch);
+
     // Top-level call
     push_frame(context, branch);
 
@@ -301,6 +303,8 @@ void evaluate_branch(EvalContext* context, Branch* branch)
 
 void evaluate_save_locals(EvalContext* context, Branch* branch)
 {
+    finish_branch(branch);
+
     // Top-level call
     push_frame(context, branch);
 

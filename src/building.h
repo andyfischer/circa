@@ -136,8 +136,8 @@ float get_step(Term* term);
 // Call the term's postCompile handler, if there is one.
 void post_compile_term(Term* term);
 
-// Add a finish_minor_branch() term to this branch, if needed.
-void finish_minor_branch(Branch* branch);
+// Add a finish_branch() term to this branch, if needed.
+void finish_branch(Branch* branch);
 
 Term* find_last_non_comment_expression(Branch* branch);
 Term* find_term_with_function(Branch* branch, Term* func);

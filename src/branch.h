@@ -29,7 +29,7 @@ struct Branch
     int _refCount;
 
     // Whether this branch needs some wrap-up before it can be executed (see
-    // finish_minor_branch).
+    // finish_branch).
     bool needsFinish;
 
     // Variant value describing where this branch came from. 

@@ -107,7 +107,7 @@ void test_with_state()
 
     branch.compile("state s");
     branch.compile("alloc_handle(@s)");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     EvalContext context;
     evaluate_branch(&context, &branch);
@@ -131,7 +131,7 @@ void test_deleted_state()
 
     branch.compile("state t");
     branch.compile("alloc_handle(@t)");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     EvalContext context;
     evaluate_branch(&context, &branch);
@@ -154,7 +154,7 @@ void test_in_subroutine_state()
     branch.compile("state s");
     branch.compile("alloc_handle(@s)");
     branch.compile("hi(s)");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     EvalContext context;
     evaluate_branch(&context, &branch);
@@ -173,7 +173,7 @@ void test_state_inside_if_block()
 
     branch.compile("state s = null");
     branch.compile("if is_null(s) { s = alloc_handle(s) }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     EvalContext context;
     evaluate_branch(&context, &branch);
@@ -191,7 +191,7 @@ void test_that_stripping_state_is_recursive()
     setup(branch);
 
     branch.compile("if true { state a = 1; state s; s = alloc_handle(s) }");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     EvalContext context;
     evaluate_branch(&context, &branch);
@@ -213,7 +213,7 @@ void test_included_file_changed()
     files["f"] = "state s; alloc_handle(@s)";
 
     branch.compile("include('f')");
-    finish_minor_branch(&branch);
+    finish_branch(&branch);
 
     EvalContext context;
     evaluate_branch(&context, &branch);
