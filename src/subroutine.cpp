@@ -75,42 +75,6 @@ CA_FUNCTION(evaluate_subroutine)
 
     // Push our frame (with inputs) onto the stack
     push_frame(context, contents, &registers);
-
-/*
-    // Evaluate each term
-    for (int i=0; i < contents->length(); i++) {
-        evaluate_single_term(context, contents->get(i));
-        if (evaluation_interrupted(context))
-            break;
-    }
-
-    // If an error occurred, leave context the way it is.
-    if (context->errorOccurred)
-        return;
-
-    // Save registers and pop frame
-    swap(&registers, &top_frame(context)->registers);
-    pop_frame(context);
-
-    // Copy each extra output from registers.
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(contents, i);
-        if (placeholder == NULL)
-            break;
-            
-        TaggedValue* result = registers[placeholder->index];
-        bool castSuccess = cast(result, placeholder->type, OUTPUT_NTH(i));
-
-        if (!castSuccess) {
-            std::stringstream msg;
-            msg << "Couldn't cast output " << result->toString()
-                << " (at index " << i << ")"
-                << " to type " << placeholder->type->name;
-            ERROR_OCCURRED(msg.str().c_str());
-            return;
-        }
-    }
-    */
 }
 
 bool is_subroutine(Term* term)

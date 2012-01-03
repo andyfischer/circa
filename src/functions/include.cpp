@@ -48,17 +48,11 @@ namespace include_function {
             return ERROR_OCCURRED(msg.c_str());
         }
 
-        // Possibly strip out state that isn't referenced any more.
-#if 0
-        if (fileChanged) {
-            TaggedValue trash;
-            strip_orphaned_state(contents, &context->currentScopeState, &trash);
-        }
-#endif
+        // TODO: strip out state that isn't referenced any more.
 
         set_branch(OUTPUT, contents);
 
-        push_frame(context, contents);
+        push_frame_with_inputs(context, contents, INPUT_LIST);
     }
     void include_post_compile(Term* term)
     {

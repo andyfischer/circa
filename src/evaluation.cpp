@@ -135,6 +135,38 @@ void pop_frame(EvalContext* context)
     context->numFrames--;
 }
 
+void push_frame_with_inputs(EvalContext* context, Branch* branch, ListData* args)
+{
+    // Fetch inputs and start preparing the new stack frame.
+    int inputCount = list_size(args);
+
+    List registers;
+    registers.resize(inputCount);
+    
+    // Insert inputs into placeholders
+    for (int i=0; i < inputCount; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            break;
+
+        TaggedValue* input = get_arg(context, args, i);
+
+        bool castSuccess = cast(input, placeholder->type, registers[i]);
+
+        if (!castSuccess) {
+            std::stringstream msg;
+            msg << "Couldn't cast input " << input->toString()
+                << " (at index " << i << ")"
+                << " to type " << placeholder->type->name;
+            error_occurred(context, msg.str().c_str());
+            return;
+        }
+    }
+
+    // Push our frame (with inputs) onto the stack
+    push_frame(context, branch, &registers);
+}
+
 void finish_frame(EvalContext* context)
 {
     Frame* top = top_frame(context);

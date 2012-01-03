@@ -37,6 +37,7 @@ Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
     outputIndex(0),
+    needsFinish(0),
     currentlyCascadingUpdates(false)
 {
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);

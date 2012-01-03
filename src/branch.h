@@ -28,7 +28,12 @@ struct Branch
 
     int _refCount;
 
+    // Deprecated:
     int outputIndex;
+
+    // Whether this branch needs some wrap-up before it can be executed (see
+    // finish_minor_branch).
+    bool needsFinish;
 
     // Variant value describing where this branch came from. 
     //   If the branch came from a file, then the value will be of format:

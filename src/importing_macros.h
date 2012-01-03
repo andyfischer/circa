@@ -31,6 +31,7 @@
 #define CALLER (_cxt->currentTerm)
 #define CONTEXT (_cxt)
 #define NUM_INPUTS (list_size(_ins))
+#define INPUT_LIST (_ins)
 #define INPUT(index) (get_arg(_cxt, _ins, (index)))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))

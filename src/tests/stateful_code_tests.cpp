@@ -47,7 +47,6 @@ void test_simple_func_with_state_arg()
 
     Term* stateOutput = function_get_output_placeholder(func, 1);
     test_assert(function_is_state_input(stateOutput));
-    test_equals(stateOutput->name, "i");
 
     // Test with manual call
     ListData* inputs = allocate_list(1);
@@ -61,7 +60,6 @@ void test_simple_func_with_state_arg()
     // Test with a normal call, explicit argument.
     branch.compile("a = 3");
     branch.compile("f(state = a)");
-    dump(branch);
     EvalContext context;
     evaluate_save_locals(&context, &branch);
     test_equals(branch["a"], "4");
@@ -69,8 +67,6 @@ void test_simple_func_with_state_arg()
     // Test with an implicit argument
     branch.compile("f()");
     finish_minor_branch(&branch);
-
-    dump(branch);
 
     evaluate_save_locals(&context, &branch);
     test_equals(&context.state, "{_f_1: 1}");
@@ -136,7 +132,6 @@ void initialize_from_expression()
     test_equals(e->asInt(), 5);
 }
 
-
 int NEXT_UNIQUE_OUTPUT = 0;
 
 CA_FUNCTION(_unique_output)
@@ -158,6 +153,7 @@ void one_time_assignment_inside_for_loop()
     import_function(&branch, _unique_output, "unique_output() -> int");
     import_function(&branch, _spy, "spy(int)");
     branch.compile("for i in [1 1 1] { state s = unique_output(); spy(s) }");
+    finish_minor_branch(&branch);
     test_assert(&branch);
 
     NEXT_UNIQUE_OUTPUT = 0;
@@ -398,13 +394,13 @@ void test_that_initial_value_doesnt_get_reevaluated()
 
 void register_tests()
 {
-    return; // TEST_DISABLED
     REGISTER_TEST_CASE(stateful_code_tests::test_is_function_stateful);
     REGISTER_TEST_CASE(stateful_code_tests::test_simple_func_with_state_arg);
     REGISTER_TEST_CASE(stateful_code_tests::test_get_type_from_branches_stateful_terms);
     REGISTER_TEST_CASE(stateful_code_tests::initial_value);
     REGISTER_TEST_CASE(stateful_code_tests::initialize_from_expression);
     REGISTER_TEST_CASE(stateful_code_tests::one_time_assignment_inside_for_loop);
+    return; // TEST_DISABLED
     REGISTER_TEST_CASE(stateful_code_tests::explicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::implicit_state);
     REGISTER_TEST_CASE(stateful_code_tests::bug_with_top_level_state);
