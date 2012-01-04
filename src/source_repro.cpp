@@ -142,7 +142,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
     }
 
     // Name binding (but not for assign() terms)
-    if (term->function != ASSIGN_FUNC)
+    if (term->function != FUNCS.assign)
         format_name_binding(source, term);
 
     // possibly add parens

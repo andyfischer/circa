@@ -48,7 +48,7 @@ struct CaseIterator
         if (finished())
             return;
 
-        if (branchIterator.current()->function != CASE_FUNC) {
+        if (branchIterator.current()->function != FUNCS.case_func) {
             branchIterator.advance();
             goto possibly_invalid;
         }
@@ -56,7 +56,7 @@ struct CaseIterator
 
     Term* current()
     {
-        ca_assert(branchIterator.current()->function == CASE_FUNC);
+        ca_assert(branchIterator.current()->function == FUNCS.case_func);
         return branchIterator.current();
     }
     int index()
@@ -76,7 +76,7 @@ int if_block_count_cases(Term* term)
     Branch* contents = nested_contents(term);
     int result = 0;
     for (int i=0; i < contents->length(); i++)
-        if (contents->get(i) != NULL && contents->get(i)->function == CASE_FUNC)
+        if (contents->get(i) != NULL && contents->get(i)->function == FUNCS.case_func)
             result++;
     return result;
 }
@@ -157,7 +157,7 @@ Term* if_block_get_case(Term* term, int index)
 {
     Branch* contents = nested_contents(term);
     for (int i=0; i < contents->length(); i++) {
-        if (contents->get(i) == NULL || contents->get(i)->function != CASE_FUNC)
+        if (contents->get(i) == NULL || contents->get(i)->function != FUNCS.case_func)
             continue;
 
         if (index == 0)
@@ -179,11 +179,11 @@ Term* if_block_append_case(Term* ifBlock, Term* input)
             insertPos = term->index + 1;
 
         // Insert position is right after the last non-default case.
-        if (term->function == CASE_FUNC && term->input(0) != NULL)
+        if (term->function == FUNCS.case_func && term->input(0) != NULL)
             insertPos = term->index + 1;
     }
 
-    Term* newCase = apply(contents, CASE_FUNC, TermList(input));
+    Term* newCase = apply(contents, FUNCS.case_func, TermList(input));
     contents->move(newCase, insertPos);
 
     // Add existing input placeholders to this case
@@ -425,7 +425,7 @@ void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)
         // Iterate through each case, and collect the output types
         for (int i=0; i < masterContents->length(); i++) {
             Term* term = masterContents->get(i);
-            if (term->function != CASE_FUNC)
+            if (term->function != FUNCS.case_func)
                 continue;
             Term* placeholder = get_output_placeholder(nested_contents(term), outputIndex);
             set_type(types.append(), placeholder->type);
@@ -441,7 +441,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     if (stateInput == NULL)
         return;
 
-    Term* unpackList = apply(branch, BUILTIN_FUNCS.unpack_state_list, TermList(stateInput));
+    Term* unpackList = apply(branch, FUNCS.unpack_state_list, TermList(stateInput));
     unpackList->setIntProp("index", index);
     move_after_inputs(unpackList);
 
@@ -455,7 +455,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     Term* stateOutput = find_state_output(branch);
     ca_assert(stateOutput->input(0) != stateInput);
 
-    Term* packList = apply(branch, BUILTIN_FUNCS.pack_state_to_list,
+    Term* packList = apply(branch, FUNCS.pack_state_to_list,
         TermList(stateInput, stateOutput->input(0)));
     packList->setIntProp("index", index);
     set_input(stateOutput, 0, packList);

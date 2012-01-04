@@ -17,7 +17,7 @@ namespace error_function {
     }
     void setup(Branch* kernel)
     {
-        BUILTIN_FUNCS.error = import_function(kernel, error, "error(string)");
+        FUNCS.error = import_function(kernel, error, "error(string)");
         ERRORED_FUNC = import_function(kernel, errored, "errored(any) -> bool");
     }
 }

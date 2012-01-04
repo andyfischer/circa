@@ -86,9 +86,9 @@ namespace include_function {
                 "load_script(string filename) -> Branch");
         as_function(LOAD_SCRIPT_FUNC)->postCompile = include_post_compile;
 
-        BUILTIN_FUNCS.import = import_function(kernel, NULL, "import()");
-        as_function(BUILTIN_FUNCS.import)->formatSource = import_formatSource;
-        BUILTIN_FUNCS.imported_file = import_function(kernel, NULL, "imported_file() -> Branch");
+        FUNCS.import = import_function(kernel, NULL, "import()");
+        as_function(FUNCS.import)->formatSource = import_formatSource;
+        FUNCS.imported_file = import_function(kernel, NULL, "imported_file() -> Branch");
     }
 }
 } // namespace circa

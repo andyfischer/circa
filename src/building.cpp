@@ -24,7 +24,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
             result->setBoolProp("constructor", true);
             return result;
         } else if (inputs.length() == 1) {
-            Term* result = apply(branch, CAST_FUNC, inputs);
+            Term* result = apply(branch, FUNCS.cast, inputs);
             change_declared_type(result, as_type(function));
             return result;
         } else {
@@ -184,7 +184,7 @@ void change_function(Term* term, Term* function)
 
     // Don't append user for certain functions. Need to make this more robust.
     if (function != NULL
-            && function != BUILTIN_FUNCS.value
+            && function != FUNCS.value
             && function != INPUT_PLACEHOLDER_FUNC) {
         append_user(term, function);
     }
@@ -304,7 +304,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     if (name != "")
         branch->bindName(term, name);
 
-    change_function(term, BUILTIN_FUNCS.value);
+    change_function(term, FUNCS.value);
     change_declared_type(term, type);
     create(type, (TaggedValue*) term);
     update_unique_name(term);
@@ -648,8 +648,8 @@ Term* find_open_state_result(Branch* branch, int position)
             continue;
         if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
             return term;
-        if (term->function == BUILTIN_FUNCS.pack_state
-                || term->function == BUILTIN_FUNCS.pack_state_list_n)
+        if (term->function == FUNCS.pack_state
+                || term->function == FUNCS.pack_state_list_n)
             return term;
     }
     return NULL;
@@ -682,7 +682,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
-        Term* unpack = apply(term->owningBranch, BUILTIN_FUNCS.unpack_state, TermList(container));
+        Term* unpack = apply(term->owningBranch, FUNCS.unpack_state, TermList(container));
         unpack->setStringProp("field", unique_name(term));
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
@@ -741,10 +741,10 @@ void post_compile_term(Term* term)
     Term* stateOutput = find_extra_output_for_state(term);
 
     // Possibly append a pack_state() call for a state extra output.
-    Term* unpack = find_input_with_function(term, BUILTIN_FUNCS.unpack_state);
+    Term* unpack = find_input_with_function(term, FUNCS.unpack_state);
     if (stateOutput != NULL && unpack != NULL) {
         Term* container = unpack->input(0);
-        Term* pack = apply(term->owningBranch, BUILTIN_FUNCS.pack_state, TermList(container, stateOutput));
+        Term* pack = apply(term->owningBranch, FUNCS.pack_state, TermList(container, stateOutput));
         pack->setStringProp("field", unpack->stringProp("field"));
         hide_from_source(pack);
     }
@@ -754,7 +754,7 @@ void post_compile_term(Term* term)
     Branch* branch = term->owningBranch;
     if (term->name != "") {
         if (branch->findFirstBinding(term->name)->function == DECLARED_STATE_FUNC) {
-            Term* pack = apply(branch, BUILTIN_FUNCS.pack_state, TermList(
+            Term* pack = apply(branch, FUNCS.pack_state, TermList(
                 find_open_state_result(branch, branch->length()),
                 term));
             pack->setStringProp("field", term->name);

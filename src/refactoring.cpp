@@ -43,7 +43,7 @@ void rewrite_as_value(Branch* branch, int index, Type* type)
     } else {
         Term* term = branch->get(index);
 
-        change_function(term, BUILTIN_FUNCS.value);
+        change_function(term, FUNCS.value);
         change_declared_type(term, type);
         set_inputs(term, TermList());
     }

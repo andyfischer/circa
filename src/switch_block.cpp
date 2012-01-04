@@ -15,7 +15,7 @@ namespace circa {
 void switch_block_post_compile(Term* term)
 {
     // Add a default case
-    apply(nested_contents(term), DEFAULT_CASE_FUNC, TermList());
+    apply(nested_contents(term), FUNCS.default_case, TermList());
     finish_if_block(term);
 }
 
@@ -31,9 +31,9 @@ CA_FUNCTION(evaluate_switch)
         Term* caseTerm = contents->get(caseIndex);
 
         bool succeeds = false;
-        if (caseTerm->function == DEFAULT_CASE_FUNC) {
+        if (caseTerm->function == DEFAULT_FUNCS.case_func) {
             succeeds = true;
-        } else if (caseTerm->function == CASE_FUNC) {
+        } else if (caseTerm->function == FUNCS.case_func) {
             TaggedValue* caseValue = get_input(context, caseTerm, 0);
             succeeds = equals(input, caseValue);
         } else {

@@ -810,11 +810,11 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
             ca_assert(condition != NULL);
-            currentBlock = apply(contents, CASE_FUNC, TermList(condition));
+            currentBlock = apply(contents, FUNCS.case_func, TermList(condition));
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            currentBlock = apply(contents, CASE_FUNC, TermList(NULL), "else");
+            currentBlock = apply(contents, FUNCS.case_func, TermList(NULL), "else");
         }
 
         currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
@@ -847,7 +847,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
-        Term* elseTerm = apply(contents, CASE_FUNC, TermList(NULL), "else");
+        Term* elseTerm = apply(contents, FUNCS.case_func, TermList(NULL), "else");
         hide_from_source(elseTerm);
     }
 
@@ -903,7 +903,7 @@ ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* conte
     // Parse the 'case' input, using the branch that the 'switch' is in.
     Term* input = infix_expression(parentBranch, tokens, context).term;
 
-    Term* result = apply(branch, CASE_FUNC, TermList(input));
+    Term* result = apply(branch, FUNCS.case_func, TermList(input));
 
     set_starting_source_location(result, startPosition, tokens);
     consume_branch(nested_contents(result), tokens, context);
@@ -1065,7 +1065,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
     }
 
     // If the term was an assign() term, then we may need to rebind the root name.
-    if (term->function == ASSIGN_FUNC) {
+    if (term->function == FUNCS.assign) {
         Term* lexprRoot = find_lexpr_root(term->input(0));
         if (lexprRoot != NULL && lexprRoot->name != "") {
             branch->bindName(term, lexprRoot->name);
@@ -1118,7 +1118,7 @@ ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 
     Symbol module = tokens.consumeSymbol(IDENTIFIER);
 
-    Term* result = apply(branch, BUILTIN_FUNCS.import, TermList());
+    Term* result = apply(branch, FUNCS.import, TermList());
     result->setStringProp("module", symbol_get_text(module));
 
     load_module(module, result);
@@ -1414,7 +1414,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                 // Set up an assign() term if left side is complex
                 // Example: a[0] += 1
                 else {
-                    Term* assignTerm = apply(branch, ASSIGN_FUNC, TermList(leftExpr.term, term));
+                    Term* assignTerm = apply(branch, FUNCS.assign, TermList(leftExpr.term, term));
                     assignTerm->setStringProp("syntax:rebindOperator", operatorStr);
 
                     // Move an input's post-whitespace to this term.

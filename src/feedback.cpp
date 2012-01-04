@@ -23,7 +23,7 @@ void handle_feedback_event(EvalContext* context, Term* target, TaggedValue* desi
 
     if (target->function == COPY_FUNC) {
         return handle_feedback_event(context, target->input(0), desired);
-    } else if (target->function == BUILTIN_FUNCS.value) {
+    } else if (target->function == FUNCS.value) {
         bool success = cast(desired, declared_type(target), target);
         if (!success) {
             std::cout << "in handle_feedback, failed to cast "
@@ -153,7 +153,7 @@ void normalize_feedback_branch(Branch& branch)
 
     for (int i=0; i < branch.length(); i++) {
         Term* term = branch[i];
-        if (term->function == UNSAFE_ASSIGN_FUNC) {
+        if (term->function == UNSAFE_FUNCS.assign) {
             Term* target = term->input(0);
             termToAssignTerms[target].push_back(i);
         }
@@ -184,7 +184,7 @@ void normalize_feedback_branch(Branch& branch)
             Term* accumulator = apply(branch, AVERAGE_FUNC, accumulatorInputs);
 
             // assign() this
-            apply(branch, UNSAFE_ASSIGN_FUNC, TermList(accumulator, target));
+            apply(branch, UNSAFE_FUNCS.assign, TermList(accumulator, target));
         }
     }
 

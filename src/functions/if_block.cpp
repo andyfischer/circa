@@ -20,7 +20,7 @@ namespace if_block_function {
         for (; index < contents->length(); index++) {
             Term* caseTerm = contents->get(index);
 
-            if (caseTerm->function != CASE_FUNC)
+            if (caseTerm->function != FUNCS.case_func)
                 break;
 
             if (is_hidden(caseTerm))
@@ -51,8 +51,8 @@ namespace if_block_function {
         as_function(IF_BLOCK_FUNC)->formatSource = formatSource;
         as_function(IF_BLOCK_FUNC)->createsStackFrame = false;
 
-        CASE_FUNC = import_function(kernel, NULL, "case(bool :optional)");
-        as_function(CASE_FUNC)->createsStackFrame = true;
+        FUNCS.case_func = import_function(kernel, NULL, "case(bool :optional)");
+        as_function(FUNCS.case_func)->createsStackFrame = true;
     }
 }
 }

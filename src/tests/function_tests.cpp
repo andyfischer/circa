@@ -31,7 +31,7 @@ void test_is_callable()
     test_assert(is_callable(COPY_FUNC));
 
     // overloaded function
-    test_assert(is_callable(ADD_FUNC));
+    test_assert(is_callable(FUNCS.add));
 
     // subroutine
     Branch branch;

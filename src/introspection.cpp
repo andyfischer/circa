@@ -38,7 +38,7 @@ bool is_empty_comment(Term* term)
 
 bool is_value(Term* term)
 {
-    return term->function == BUILTIN_FUNCS.value;
+    return term->function == FUNCS.value;
 }
 
 bool is_hidden(Term* term)

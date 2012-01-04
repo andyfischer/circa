@@ -115,10 +115,10 @@ namespace assign_function {
 
     void setup(Branch* kernel)
     {
-        ASSIGN_FUNC = import_function(kernel, assign, "assign(any, any) :controlflow -> any");
-        as_function(ASSIGN_FUNC)->specializeType = specializeType;
-        as_function(ASSIGN_FUNC)->formatSource = formatSource;
-        as_function(ASSIGN_FUNC)->postInputChange = postInputChange;
+        FUNCS.assign = import_function(kernel, assign, "assign(any, any) :controlflow -> any");
+        as_function(FUNCS.assign)->specializeType = specializeType;
+        as_function(FUNCS.assign)->formatSource = formatSource;
+        as_function(FUNCS.assign)->postInputChange = postInputChange;
     }
 }
 }

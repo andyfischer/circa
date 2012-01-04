@@ -88,9 +88,9 @@ namespace type_check_function {
     void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        BUILTIN_FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
+        FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
             "inputs_fit_function(List,Function) -> bool");
-        BUILTIN_FUNCS.overload_error_no_match = import_function(kernel,
+        FUNCS.overload_error_no_match = import_function(kernel,
             overload_error_no_match, "overload_error_no_match(List)");
         import_function(kernel, typeof_func, "type(any :meta) -> Type");
         import_function(kernel, typename_func, "typename(any :meta) -> string");

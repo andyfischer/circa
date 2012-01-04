@@ -54,21 +54,16 @@ bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
-Term* ADD_FUNC = NULL;
 Term* ADDITIONAL_OUTPUT_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
-Term* ASSIGN_FUNC = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
 Term* BRANCH_FUNC = NULL;
 Term* BRANCH_UNEVALUATED_FUNC = NULL;
 Term* BREAK_FUNC = NULL;
-Term* CASE_FUNC = NULL;
-Term* CAST_FUNC = NULL;
 Term* COMMENT_FUNC = NULL;
 Term* CONTINUE_FUNC = NULL;
 Term* COPY_FUNC = NULL;
-Term* DEFAULT_CASE_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
 Term* DISCARD_FUNC = NULL;
 Term* DIV_FUNC = NULL;
@@ -97,7 +92,6 @@ Term* MULT_FUNC = NULL;
 Term* NAMESPACE_FUNC = NULL;
 Term* NEG_FUNC = NULL;
 Term* NOT_FUNC = NULL;
-Term* ONE_TIME_ASSIGN_FUNC = NULL;
 Term* OUTPUT_PLACEHOLDER_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
 Term* RANGE_FUNC = NULL;
@@ -113,7 +107,6 @@ Term* TYPE_FUNC = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* UNKNOWN_TYPE_FUNC = NULL;
 Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
-Term* UNSAFE_ASSIGN_FUNC = NULL;
 
 Term* ANY_TYPE = NULL;
 Term* BOOL_TYPE = NULL;
@@ -134,7 +127,7 @@ Term* VOID_TYPE = NULL;
 Term* OPAQUE_POINTER_TYPE = NULL;
 
 // New style for builtin function pointers
-BuiltinFuncs BUILTIN_FUNCS;
+BuiltinFuncs FUNCS;
 
 // Builtin type objects:
 Type ANY_T;
@@ -294,11 +287,11 @@ void bootstrap_kernel()
     // Create value function
     Term* valueFunc = kernel->appendNew();
     kernel->bindName(valueFunc, "value");
-    BUILTIN_FUNCS.value = valueFunc;
+    FUNCS.value = valueFunc;
 
     // Create Type type
     TYPE_TYPE = kernel->appendNew();
-    TYPE_TYPE->function = BUILTIN_FUNCS.value;
+    TYPE_TYPE->function = FUNCS.value;
     TYPE_TYPE->type = &TYPE_T;
     TYPE_TYPE->value_type = &TYPE_T;
     TYPE_TYPE->value_data.ptr = &TYPE_T;
@@ -406,9 +399,9 @@ void bootstrap_kernel()
     // Now we can build derived functions
 
     // Create overloaded functions
-    ADD_FUNC = create_overloaded_function(kernel, "add(any,any) -> any");
-    append_to_overloaded_function(ADD_FUNC, BUILTIN_FUNCS.add_i);
-    append_to_overloaded_function(ADD_FUNC, BUILTIN_FUNCS.add_f);
+    FUNCS.add = create_overloaded_function(kernel, "add(any,any) -> any");
+    append_to_overloaded_function(FUNCS.add, FUNCS.add_i);
+    append_to_overloaded_function(FUNCS.add, FUNCS.add_f);
 
     Term* less_than = create_overloaded_function(kernel, "less_than(any,any) -> bool");
     append_to_overloaded_function(less_than, kernel->get("less_than_i"));
@@ -458,15 +451,15 @@ void bootstrap_kernel()
 
     // Create vectorized functions
     Term* add_v = create_subroutine(kernel, "add_v");
-    create_function_vectorized_vv(function_contents(add_v), ADD_FUNC, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(add_v), FUNCS.add, &LIST_T, &LIST_T);
     Term* add_s = create_subroutine(kernel, "add_s");
-    create_function_vectorized_vs(function_contents(add_s), ADD_FUNC, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(add_s), FUNCS.add, &LIST_T, &ANY_T);
 
-    append_to_overloaded_function(ADD_FUNC, add_v);
-    append_to_overloaded_function(ADD_FUNC, add_s);
+    append_to_overloaded_function(FUNCS.add, add_v);
+    append_to_overloaded_function(FUNCS.add, add_s);
 
     //dump(function_contents(add_v));
-    //dump(function_contents(ADD_FUNC));
+    //dump(function_contents(FUNCS.add));
 
     Term* sub_v = create_subroutine(kernel, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
@@ -518,7 +511,7 @@ void install_standard_library(Branch* kernel)
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");
 
-    BUILTIN_FUNCS.dll_patch = kernel->get("sys:dll_patch");
+    FUNCS.dll_patch = kernel->get("sys:dll_patch");
 }
 
 export_func void circa_initialize()
@@ -526,7 +519,7 @@ export_func void circa_initialize()
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
 
-    memset(&BUILTIN_FUNCS, 0, sizeof(BUILTIN_FUNCS));
+    memset(&FUNCS, 0, sizeof(FUNCS));
 
     create_primitive_types();
     bootstrap_kernel();

@@ -40,7 +40,7 @@ Term* get_for_loop_iterator(Term* forTerm)
 
 Term* for_loop_find_index(Branch* contents)
 {
-    return find_term_with_function(contents, BUILTIN_FUNCS.loop_index);
+    return find_term_with_function(contents, FUNCS.loop_index);
 }
 
 const char* for_loop_get_iterator_name(Term* forTerm)
@@ -71,7 +71,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
     Term* listInput = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
 
     // Add loop_index()
-    Term* index = apply(contents, BUILTIN_FUNCS.loop_index, TermList(listInput));
+    Term* index = apply(contents, FUNCS.loop_index, TermList(listInput));
     hide_from_source(index);
 
     // Add loop_iterator()
@@ -85,7 +85,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
 void add_loop_output_term(Branch* branch)
 {
     Term* result = find_last_non_comment_expression(branch);
-    Term* term = apply(branch, BUILTIN_FUNCS.loop_output,
+    Term* term = apply(branch, FUNCS.loop_output,
         TermList(for_loop_find_index(branch), result));
     move_before_outputs(term);
 }
@@ -222,15 +222,15 @@ void for_loop_fix_state_input(Branch* contents)
         return;
 
     // Nothing to do if unpack_state_list_n term already exists
-    if (find_user_with_function(stateInput, BUILTIN_FUNCS.unpack_state_list_n) != NULL)
+    if (find_user_with_function(stateInput, FUNCS.unpack_state_list_n) != NULL)
         return;
 
-    Term* unpackState = find_user_with_function(stateInput, BUILTIN_FUNCS.unpack_state);
+    Term* unpackState = find_user_with_function(stateInput, FUNCS.unpack_state);
     ca_assert(unpackState != NULL);
 
     Term* index = for_loop_find_index(contents);
 
-    Term* unpackStateList = apply(contents, BUILTIN_FUNCS.unpack_state_list_n,
+    Term* unpackStateList = apply(contents, FUNCS.unpack_state_list_n,
         TermList(stateInput, index));
     transfer_users(stateInput, unpackStateList);
     move_before(unpackStateList, unpackState);
@@ -239,7 +239,7 @@ void for_loop_fix_state_input(Branch* contents)
     // Now insert the pack_state_list_n call
     Term* stateResult = find_open_state_result(contents, contents->length());
 
-    Term* packStateList = apply(contents, BUILTIN_FUNCS.pack_state_list_n,
+    Term* packStateList = apply(contents, FUNCS.pack_state_list_n,
         TermList(stateInput, stateResult, index));
     move_after(packStateList, stateResult);
 }
@@ -273,10 +273,10 @@ CA_FUNCTION(evaluate_for_loop)
     // Walk forward until we find the loop_index() term.
     int loopIndexPos = 0;
     for (; loopIndexPos < contents->length(); loopIndexPos++) {
-        if (contents->get(loopIndexPos)->function == BUILTIN_FUNCS.loop_index)
+        if (contents->get(loopIndexPos)->function == FUNCS.loop_index)
             break;
     }
-    ca_assert(contents->get(loopIndexPos)->function == BUILTIN_FUNCS.loop_index);
+    ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
 
     // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {

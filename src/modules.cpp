@@ -36,7 +36,7 @@ Term* find_loaded_module(Symbol name)
 
     for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (term->function == BUILTIN_FUNCS.imported_file && term->name == as_string(&nameStr))
+        if (term->function == FUNCS.imported_file && term->name == as_string(&nameStr))
             return term;
     }
     return NULL;
@@ -47,7 +47,7 @@ Term* load_module_from_file(Symbol module_name, const char* filename)
     String name;
     symbol_get_text(module_name, &name);
 
-    Term* import = apply(kernel(), BUILTIN_FUNCS.imported_file, TermList(),
+    Term* import = apply(kernel(), FUNCS.imported_file, TermList(),
         as_cstring(&name));
     load_script(nested_contents(import), filename);
 

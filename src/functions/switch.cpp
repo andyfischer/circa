@@ -69,10 +69,10 @@ namespace switch_function {
         as_function(SWITCH_FUNC)->getOutputName = switch_getOutputName;
         as_function(SWITCH_FUNC)->getOutputType = switch_getOutputType;
 
-        //CASE_FUNC = import_function(kernel, evaluate_case, "case(any input)");
-        //as_function(CASE_FUNC)->formatSource = case_formatSource;
+        //FUNCS.case_func = import_function(kernel, evaluate_case, "case(any input)");
+        //as_function(FUNCS.case_func)->formatSource = case_formatSource;
 
-        DEFAULT_CASE_FUNC = import_function(kernel, evaluate_default_case, "default_case()");
+        FUNCS.default_case = import_function(kernel, evaluate_default_case, "default_case()");
     }
 
 } // namespace switch_function

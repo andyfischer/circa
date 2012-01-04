@@ -8,20 +8,15 @@ namespace circa {
 
 extern Branch* KERNEL;
 
-extern Term* ADD_FUNC;
 extern Term* ADDITIONAL_OUTPUT_FUNC;
-extern Term* ASSIGN_FUNC;
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
 extern Term* BRANCH_FUNC;
 extern Term* BRANCH_UNEVALUATED_FUNC;
 extern Term* BREAK_FUNC;
-extern Term* CASE_FUNC;
-extern Term* CAST_FUNC;
 extern Term* COMMENT_FUNC;
 extern Term* CONTINUE_FUNC;
 extern Term* COPY_FUNC;
-extern Term* DEFAULT_CASE_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DISCARD_FUNC;
 extern Term* DIV_FUNC;
@@ -51,7 +46,6 @@ extern Term* MULT_FUNC;
 extern Term* NAMESPACE_FUNC;
 extern Term* NEG_FUNC;
 extern Term* NOT_FUNC;
-extern Term* ONE_TIME_ASSIGN_FUNC;
 extern Term* OUTPUT_PLACEHOLDER_FUNC;
 extern Term* OVERLOADED_FUNCTION_FUNC;
 extern Term* RANGE_FUNC;
@@ -68,7 +62,6 @@ extern Term* TYPE_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
-extern Term* UNSAFE_ASSIGN_FUNC;
 
 extern Term* ANY_TYPE;
 extern Term* BOOL_TYPE;
@@ -88,8 +81,15 @@ extern Term* VOID_TYPE;
 extern Term* OPAQUE_POINTER_TYPE;
 
 struct BuiltinFuncs {
+    Term* add;
     Term* add_i;
     Term* add_f;
+    Term* assign;
+    Term* break_func;
+    Term* case_func;
+    Term* cast;
+    Term* comment;
+    Term* default_case;
     Term* dll_patch;
     Term* error;
     Term* import;
@@ -102,13 +102,14 @@ struct BuiltinFuncs {
     Term* pack_state;
     Term* pack_state_to_list;
     Term* pack_state_list_n;
+    Term* unsafe_assign;
     Term* unpack_state;
     Term* unpack_state_list;
     Term* unpack_state_list_n;
     Term* value;
 };
 
-extern BuiltinFuncs BUILTIN_FUNCS;
+extern BuiltinFuncs FUNCS;
 
 extern Type ANY_T;
 extern Type BOOL_T;

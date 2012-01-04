@@ -26,7 +26,7 @@ namespace unsafe_assign_function {
 
     void setup(Branch* kernel)
     {
-        UNSAFE_ASSIGN_FUNC = import_function(kernel, evaluate, "unsafe_assign(any, any)");
+        FUNCS.unsafe_assign = import_function(kernel, evaluate, "unsafe_assign(any, any)");
     }
 }
 }

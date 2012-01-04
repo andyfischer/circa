@@ -88,19 +88,19 @@ namespace implicit_state_function {
 
     void setup(Branch* kernel)
     {
-        BUILTIN_FUNCS.unpack_state = import_function(kernel, unpack_state, "unpack_state(any container) -> any");
-        BUILTIN_FUNCS.pack_state = import_function(kernel, pack_state, "pack_state(any container, any value) -> any");
+        FUNCS.unpack_state = import_function(kernel, unpack_state, "unpack_state(any container) -> any");
+        FUNCS.pack_state = import_function(kernel, pack_state, "pack_state(any container, any value) -> any");
 
-        BUILTIN_FUNCS.unpack_state_list =
+        FUNCS.unpack_state_list =
             import_function(kernel, unpack_state_list, "unpack_state_list(any container) -> any");
-        BUILTIN_FUNCS.pack_state_to_list =
+        FUNCS.pack_state_to_list =
             import_function(kernel, pack_state_to_list,
                 "pack_state_to_list(any container, any value :optional) -> any");
 
-        BUILTIN_FUNCS.unpack_state_list_n =
+        FUNCS.unpack_state_list_n =
             import_function(kernel, unpack_state_list_n,
             "unpack_state_list_n(any container, int index) -> any");
-        BUILTIN_FUNCS.pack_state_list_n =
+        FUNCS.pack_state_list_n =
             import_function(kernel, pack_state_list_n,
                 "pack_state_list_n(any container, any value :optional, int index) -> any");
     }

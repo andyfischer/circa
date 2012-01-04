@@ -199,7 +199,7 @@ void find_dll_for_script(Branch* branch, TaggedValue* resultOut)
 void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
 {
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
-        if (it.current()->function == BUILTIN_FUNCS.dll_patch) {
+        if (it.current()->function == FUNCS.dll_patch) {
             Term* caller = it.current();
 
             // Find the DLL.

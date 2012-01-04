@@ -52,7 +52,7 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
 
     Term* iterator = loopContents->get("it");
 
-    Term* index = find_term_with_function(loopContents, BUILTIN_FUNCS.loop_index);
+    Term* index = find_term_with_function(loopContents, FUNCS.loop_index);
     Term* get_index = apply(loopContents, GET_INDEX_FUNC, TermList(input1, index));
     apply(loopContents, func, TermList(iterator, get_index));
 
@@ -78,7 +78,7 @@ Term* create_overloaded_function(Branch* branch, const char* header)
 
     // Setup the fallback case
     Term* elseTerm = if_block_append_case(block, NULL);
-    apply(nested_contents(elseTerm), BUILTIN_FUNCS.overload_error_no_match,
+    apply(nested_contents(elseTerm), FUNCS.overload_error_no_match,
         TermList(inputsAsList));
     if_block_post_setup(block);
     if_block_finish_appended_case(block, elseTerm);
@@ -95,7 +95,7 @@ void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc
     Term* inputsAsList = find_term_with_function(overloadedFunc, LIST_FUNC);
     Term* ifBlock = find_term_with_function(overloadedFunc, IF_BLOCK_FUNC);
 
-    Term* condition = apply(overloadedFunc, BUILTIN_FUNCS.inputs_fit_function,
+    Term* condition = apply(overloadedFunc, FUNCS.inputs_fit_function,
         TermList(inputsAsList, specializedFunc));
     move_before(condition, ifBlock);
 
@@ -120,7 +120,7 @@ void specialize_overload_for_call(Term* call)
     Branch* successCase = NULL;
     for (int i=0; i < switchBranch->length(); i++) {
         Term* term = switchBranch->get(i);
-        if (term->function != CASE_FUNC)
+        if (term->function != FUNCS.case_func)
             continue;
 
         // Check if we have reached the fallback case.

@@ -61,10 +61,10 @@ void pack_any_open_state_vars(Branch* branch)
             Term* result = branch->get(term->name);
 
             // If this result already has a pack_state() term then leave it alone.
-            if (find_user_with_function(result, BUILTIN_FUNCS.pack_state) != NULL)
+            if (find_user_with_function(result, FUNCS.pack_state) != NULL)
                 continue;
 
-            Term* pack = apply(branch, BUILTIN_FUNCS.pack_state, TermList(
+            Term* pack = apply(branch, FUNCS.pack_state, TermList(
                 find_open_state_result(branch, branch->length()),
                 result));
             pack->setStringProp("field", unique_name(term));

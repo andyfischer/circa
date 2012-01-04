@@ -109,7 +109,7 @@ bool exposes_nested_names(Term* term)
         return false;
     if (term->function == INCLUDE_FUNC)
         return true;
-    if (term->function == BUILTIN_FUNCS.imported_file)
+    if (term->function == FUNCS.imported_file)
         return true;
     return false;
 }

@@ -467,7 +467,7 @@ void test_whitespace_after_statement()
     TokenStream tokens("a = 1\n\n");
     parser::ParserCxt context;
     Term* term = parser::statement(&branch, tokens, &context).term;
-    test_assert(term->function == BUILTIN_FUNCS.value);
+    test_assert(term->function == FUNCS.value);
     test_assert(term->name == "a");
     test_assert(tokens.nextIs(token::NEWLINE));
     tokens.consume();

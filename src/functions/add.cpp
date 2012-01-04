@@ -58,8 +58,8 @@ namespace add_function {
 
     void setup(Branch* kernel)
     {
-        BUILTIN_FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
-        BUILTIN_FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
+        FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
+        FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
     }
 } // namespace add_function
 } // namespace circa

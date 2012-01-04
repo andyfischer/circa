@@ -47,7 +47,7 @@ void test_duplicate_value()
     Term* a_dup = duplicate_value(&branch, a);
     test_assert(a_dup->asInt() == 5);
     test_assert(a_dup->name == "");
-    test_assert(a_dup->function == BUILTIN_FUNCS.value);
+    test_assert(a_dup->function == FUNCS.value);
 }
 
 void test_rewrite_as_value()
@@ -55,7 +55,7 @@ void test_rewrite_as_value()
     Branch branch;
 
     Term* a = create_value(&branch, &INT_T);
-    Term* b = apply(&branch, ADD_FUNC, TermList(a,a));
+    Term* b = apply(&branch, FUNCS.add, TermList(a,a));
 
     test_assert(branch[1] == b);
 
@@ -63,7 +63,7 @@ void test_rewrite_as_value()
     rewrite_as_value(&branch, 1, &FLOAT_T);
 
     test_assert(b->type == &FLOAT_T);
-    test_assert(b->function == BUILTIN_FUNCS.value);
+    test_assert(b->function == FUNCS.value);
     test_assert(is_value(b));
 
     // add new term
