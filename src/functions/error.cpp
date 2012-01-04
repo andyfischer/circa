@@ -8,7 +8,7 @@ namespace error_function {
 
     CA_FUNCTION(error)
     {
-        ERROR_OCCURRED(STRING_INPUT(0));
+        RAISE_ERROR(STRING_INPUT(0));
     }
 
     CA_FUNCTION(errored)

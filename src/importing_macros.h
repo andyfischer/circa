@@ -44,4 +44,4 @@
 #define OUTPUT_NTH(index) (get_arg(_cxt, _outs, (index)))
 #define EXTRA_OUTPUT(index) (get_arg(_cxt, _outs, (index)+1))
 #define FUNCTION (CALLER->function)
-#define ERROR_OCCURRED(msg) (error_occurred(_cxt, (msg)))
+#define RAISE_ERROR(msg) (raise_error(_cxt, (msg)))

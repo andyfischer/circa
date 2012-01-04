@@ -2,6 +2,6 @@
 
 namespace circa {
 
-int run_build_tool(const char* filename);
+int run_build_tool(List* args);
 
 }

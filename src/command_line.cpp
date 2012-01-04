@@ -234,10 +234,8 @@ int run_command_line(List* args)
 
     // Build tool
     if (string_eq(args->get(0), "-build")) {
-        const char* filename = "";
-        if (args->length() >= 2)
-            filename = as_cstring(args->get(1));
-        return run_build_tool(filename);
+
+        return run_build_tool(args);
     }
 
     // Stress test parser

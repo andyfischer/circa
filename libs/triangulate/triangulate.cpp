@@ -160,7 +160,7 @@ CA_FUNCTION(triangulate__process)
 {
     bool result = Process((List*) INPUT(0), (List*) OUTPUT);
     if (!result)
-        ERROR_OCCURRED("Bad input");
+        RAISE_ERROR("Bad input");
 }
 
 }

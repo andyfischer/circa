@@ -24,7 +24,7 @@ bool gl_check_error(circa::EvalContext* cxt, circa::Term* term)
     const char* err = gl_check_error();
 
     if (err != NULL) {
-        circa::error_occurred(cxt, term, std::string("OpenGL reported error: ") + err);
+        circa::raise_error(cxt, term, std::string("OpenGL reported error: ") + err);
         return true;
     }
 

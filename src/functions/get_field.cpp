@@ -16,7 +16,7 @@ namespace get_field_function {
 
             if (fieldIndex == -1) {
                 std::string msg = "field not found: " + name;
-                return ERROR_OCCURRED(msg.c_str());
+                return RAISE_ERROR(msg.c_str());
             }
 
             head = head->getIndex(fieldIndex);

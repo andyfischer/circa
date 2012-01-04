@@ -45,7 +45,7 @@ namespace include_function {
 
         if (fileChanged && has_static_errors(contents)) {
             std::string msg = get_static_errors_formatted(contents);
-            return ERROR_OCCURRED(msg.c_str());
+            return RAISE_ERROR(msg.c_str());
         }
 
         // TODO: strip out state that isn't referenced any more.

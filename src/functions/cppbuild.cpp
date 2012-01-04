@@ -24,7 +24,7 @@ namespace cppbuild_function {
 
         TaggedValue* moduleName = buildFile["name"];
         if (moduleName == NULL)
-            return ERROR_OCCURRED("'name' missing from build.ca'");
+            return RAISE_ERROR("'name' missing from build.ca'");
 
         std::string name = as_string(moduleName);
 
@@ -57,7 +57,7 @@ namespace cppbuild_function {
 
         int ret = system(cmd.c_str());
         if (ret != 0)
-            return ERROR_OCCURRED("g++ returned error");
+            return RAISE_ERROR("g++ returned error");
     }
 
     void setup(Branch* kernel)

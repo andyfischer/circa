@@ -48,7 +48,7 @@ CA_FUNCTION(load_font)
         std::stringstream err;
         err << "TTF_OpenFont failed to load " << path << " with error: " << TTF_GetError();
         delete output;
-        return error_occurred(CONTEXT, CALLER, err.str());
+        return raise_error(CONTEXT, CALLER, err.str());
     }
 
     handle_t::set(OUTPUT, g_font_t, output);

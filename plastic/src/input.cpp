@@ -38,7 +38,7 @@ CA_FUNCTION(key_down)
         if (is_string(INPUT(0))) {
             std::string const& key = INPUT(0)->asString();
             if (key.length() != 1)
-                return error_occurred(CONTEXT, CALLER, "Expected a string of length 1");
+                return raise_error(CONTEXT, CALLER, "Expected a string of length 1");
             char c = key[0];
 
             set_bool(OUTPUT, KEY_DOWN[(int) c]);
@@ -63,7 +63,7 @@ CA_FUNCTION(key_pressed)
     if (is_string(INPUT(0))) {
         std::string const& key = INPUT(0)->asString();
         if (key.length() != 1)
-            return error_occurred(CONTEXT, CALLER, "Expected a string of length 1");
+            return raise_error(CONTEXT, CALLER, "Expected a string of length 1");
 
         for (size_t index=0; index < KEYS_JUST_PRESSED.size(); index++)  {
             if (key[0] == KEYS_JUST_PRESSED[index].unicode) {

@@ -47,7 +47,7 @@ bool gl_check_error(circa::EvalContext* cxt)
 
     std::string msg("OpenGL reported error: ");
     msg += err;
-    circa::error_occurred(cxt, msg.c_str());
+    circa::raise_error(cxt, msg.c_str());
     return true;
 }
 
@@ -366,7 +366,7 @@ CA_FUNCTION(opengl__load_shader)
     {
         GLchar buf[2024];
         glGetShaderInfoLog(vertShader, sizeof(buf), 0, buf);
-        ERROR_OCCURRED(std::string("Unable to compile vertex shader: ")+buf);
+        RAISE_ERROR(std::string("Unable to compile vertex shader: ")+buf);
         set_int(OUTPUT, 0);
     }
 
@@ -378,7 +378,7 @@ CA_FUNCTION(opengl__load_shader)
     {
         GLchar buf[2024];
         glGetShaderInfoLog(fragShader, sizeof(buf), 0, buf);
-        ERROR_OCCURRED(std::string("Unable to compile fragment shader: ")+buf);
+        RAISE_ERROR(std::string("Unable to compile fragment shader: ")+buf);
         set_int(OUTPUT, 0);
     }
 
@@ -392,7 +392,7 @@ CA_FUNCTION(opengl__load_shader)
     {
         GLchar buf[256];
         glGetProgramInfoLog(program, sizeof(buf), 0, buf);
-        ERROR_OCCURRED("Unable to link shaders.");
+        RAISE_ERROR("Unable to link shaders.");
         set_int(OUTPUT, 0);
     }
 
@@ -413,7 +413,7 @@ CA_FUNCTION(opengl__load_shader_text)
     {
         GLchar buf[2024];
         glGetShaderInfoLog(vertShader, sizeof(buf), 0, buf);
-        ERROR_OCCURRED(std::string("Unable to compile vertex shader: ")+buf);
+        RAISE_ERROR(std::string("Unable to compile vertex shader: ")+buf);
         set_int(OUTPUT, 0);
     }
 
@@ -425,7 +425,7 @@ CA_FUNCTION(opengl__load_shader_text)
     {
         GLchar buf[2024];
         glGetShaderInfoLog(fragShader, sizeof(buf), 0, buf);
-        ERROR_OCCURRED(std::string("Unable to compile fragment shader: ")+buf);
+        RAISE_ERROR(std::string("Unable to compile fragment shader: ")+buf);
         set_int(OUTPUT, 0);
     }
 
@@ -439,7 +439,7 @@ CA_FUNCTION(opengl__load_shader_text)
     {
         GLchar buf[256];
         glGetProgramInfoLog(program, sizeof(buf), 0, buf);
-        ERROR_OCCURRED("Unable to link shaders.");
+        RAISE_ERROR("Unable to link shaders.");
         set_int(OUTPUT, 0);
     }
 
@@ -453,7 +453,7 @@ CA_FUNCTION(opengl__shader_quad)
     List& uniforms = *as_list(INPUT(2));
     for (int i=0; i < uniforms.length(); i++) {
         if (!is_list(uniforms[i]))
-            return ERROR_OCCURRED("uniform pair isn't a list");
+            return RAISE_ERROR("uniform pair isn't a list");
         GLuint uniform = as_int(list_get_index(uniforms[i], 0));
         TaggedValue* value = list_get_index(uniforms[i], 1);
         if (is_int(value))
@@ -461,7 +461,7 @@ CA_FUNCTION(opengl__shader_quad)
         else if (is_float(value))
             glUniform1f(uniform, as_float(value));
         else
-            return ERROR_OCCURRED("unrecognized type as a uniform value");
+            return RAISE_ERROR("unrecognized type as a uniform value");
     }
 
     float x1(0), y1(0), x2(0), y2(0);
@@ -498,7 +498,7 @@ CA_FUNCTION(opengl__uniform)
     else if (is_float(value))
         glUniform1f(uniform, as_float(value));
     else
-        return ERROR_OCCURRED("unrecognized type as a uniform value");
+        return RAISE_ERROR("unrecognized type as a uniform value");
 
     gl_check_error(CONTEXT);
 }
@@ -526,7 +526,7 @@ CA_FUNCTION(set_uniform)
         glUniform1f(loc, as_float(input));
     }
     else {
-        error_occurred(CONTEXT, CALLER, "Unsupported type: " + input->value_type->name)
+        raise_error(CONTEXT, CALLER, "Unsupported type: " + input->value_type->name)
         return;
     }
 
@@ -595,7 +595,7 @@ CA_FUNCTION(opengl__FrameBuffer_bind)
     glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, buffer->fbo_id);
 
     if (gl_check_error(CONTEXT)) {
-        ERROR_OCCURRED("glBindFramebufferEXT failed");
+        RAISE_ERROR("glBindFramebufferEXT failed");
         return;
     }
 }

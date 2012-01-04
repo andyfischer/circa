@@ -15,7 +15,7 @@ namespace filter_function {
         int numBools = bools->numElements();
 
         if (numInputs != numBools)
-            return ERROR_OCCURRED("Lists have different lengths");
+            return RAISE_ERROR("Lists have different lengths");
 
         // Run through once to count # of trues
         int count = 0;

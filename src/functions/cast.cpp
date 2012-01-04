@@ -17,14 +17,14 @@ namespace cast_function {
             std::stringstream message;
             message << "Can't cast value " << source->toString()
                 << " to type " << type->name;
-            return ERROR_OCCURRED(message.str().c_str());
+            return RAISE_ERROR(message.str().c_str());
         }
 
         //change_type(OUTPUT, type);
         bool success = cast(source, type, OUTPUT);
 
         if (!success)
-            return ERROR_OCCURRED("cast failed");
+            return RAISE_ERROR("cast failed");
     }
 
     void setup(Branch* kernel)

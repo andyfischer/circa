@@ -99,9 +99,9 @@ Term* current_term(EvalContext* context);
 TaggedValue* get_register(EvalContext* context, Term* term);
 
 // Signal that a runtime error has occurred.
-void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
-void error_occurred(EvalContext* context, const char* msg);
-void error_occurred(EvalContext* context, std::string const& msg);
+void raise_error(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
+void raise_error(EvalContext* context, const char* msg);
+void raise_error(EvalContext* context, std::string const& msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 

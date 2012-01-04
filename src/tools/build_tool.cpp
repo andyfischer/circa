@@ -9,16 +9,21 @@
 
 namespace circa {
 
-int run_build_tool(const char* filename)
+int run_build_tool(List* args)
 {
-    List buildArgs;
-    set_string(buildArgs.append(), filename);
+    for (int i=0; i < args->length(); i++) {
 
-    TaggedValue* result = evaluate(get_global("cppbuild:build_module"), &buildArgs);
+        const char* filename = as_cstring(args->get(i));
+    
+        List buildArgs;
+        set_string(buildArgs.append(), filename);
 
-    if (is_error(result)) {
-        std::cout << as_cstring(result) << std::endl;
-        return -1;
+        TaggedValue* result = evaluate(get_global("cppbuild:build_module"), &buildArgs);
+
+        if (is_error(result)) {
+            std::cout << as_cstring(result) << std::endl;
+            return -1;
+        }
     }
 
     return 0;

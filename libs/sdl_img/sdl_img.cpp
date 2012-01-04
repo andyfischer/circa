@@ -107,7 +107,7 @@ CA_FUNCTION(load_image)
     if (surface == NULL) {
         std::stringstream msg;
         msg << "Error loading " << filename << ": " << SDL_GetError();
-        return error_occurred(CONTEXT, CALLER, msg.str().c_str());
+        return raise_error(CONTEXT, CALLER, msg.str().c_str());
     }
 
     if (has_indexed_color(surface))

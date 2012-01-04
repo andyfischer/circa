@@ -19,7 +19,7 @@ namespace branch_methods_function {
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
-            return ERROR_OCCURRED("NULL branch");
+            return RAISE_ERROR("NULL branch");
 
         List* output = List::cast(OUTPUT, 0);
         format_branch_source((StyledSource*) output, branch);
@@ -66,7 +66,7 @@ namespace branch_methods_function {
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
-            return ERROR_OCCURRED("NULL branch");
+            return RAISE_ERROR("NULL branch");
 
         List& output = *List::cast(OUTPUT, branch->length());
 
@@ -78,7 +78,7 @@ namespace branch_methods_function {
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
-            return ERROR_OCCURRED("NULL branch");
+            return RAISE_ERROR("NULL branch");
 
         int index = INT_INPUT(1);
         set_ref(OUTPUT, branch->get(index));
@@ -104,7 +104,7 @@ namespace branch_methods_function {
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
-            return ERROR_OCCURRED("NULL branch");
+            return RAISE_ERROR("NULL branch");
 
         List& output = *List::cast(OUTPUT, 0);
 
@@ -119,7 +119,7 @@ namespace branch_methods_function {
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
-            return ERROR_OCCURRED("NULL branch");
+            return RAISE_ERROR("NULL branch");
         List* fileOrigin = branch_get_file_origin(branch);
         if (fileOrigin == NULL)
             set_null(OUTPUT);

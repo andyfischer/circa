@@ -82,7 +82,7 @@ namespace type_check_function {
             out << func->name;
         out << ", no func could handle inputs: ";
         out << inputs->toString();
-        ERROR_OCCURRED(out.str().c_str());
+        RAISE_ERROR(out.str().c_str());
     }
 
     void setup(Branch* kernel)

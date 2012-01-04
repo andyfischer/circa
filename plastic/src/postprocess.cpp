@@ -84,14 +84,14 @@ namespace postprocess_functions
         int height = surface_t::get_height(surface);
 
         if (width <= 0)
-            return error_occurred(cxt, caller, "width must be > 0");
+            return raise_error(cxt, caller, "width must be > 0");
         if (height <= 0)
-            return error_occurred(cxt, caller, "height must be > 0");
+            return raise_error(cxt, caller, "height must be > 0");
 
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, surface_t::get_fbo_id(surface));
 
         if (gl_check_error(cxt, caller)) {
-            error_occurred(cxt, caller, "glBindFramebufferEXT failed");
+            raise_error(cxt, caller, "glBindFramebufferEXT failed");
             return;
         }
 

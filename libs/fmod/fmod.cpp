@@ -31,7 +31,7 @@ CA_FUNCTION(load_sound)
             FMOD_SOFTWARE, 0, &sound);
 
     if (result != FMOD_OK) {
-        circa::error_occurred(CONTEXT, CALLER, FMOD_ErrorString(result));
+        circa::raise_error(CONTEXT, CALLER, FMOD_ErrorString(result));
         circa::set_null(OUTPUT);
     } else {
         circa::set_pointer(OUTPUT, g_soundType, sound);

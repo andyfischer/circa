@@ -88,7 +88,7 @@ CA_FUNCTION(osc__create_server_thread)
     context->server_thread = lo_server_thread_new(portStr, error_callback);
 
     if (context->server_thread == NULL) {
-        error_occurred(CONTEXT, CALLER, "lo_server_thread_new failed");
+        RAISE_ERROR("lo_server_thread_new failed");
         set_null(OUTPUT);
         return;
     }
@@ -131,7 +131,7 @@ CA_FUNCTION(osc__send)
     const int c_maxArguments = 15;
 
     if ((NUM_INPUTS + 2) > c_maxArguments)
-        return error_occurred(CONTEXT, CALLER, "too many arguments");
+        return RAISE_ERROR("too many arguments");
 
     lo_message message = lo_message_new();
 
@@ -150,7 +150,7 @@ CA_FUNCTION(osc__send)
             std::stringstream error;
             error << "Don't know how to send value " << val->toString()
                 << " (with type " << val->value_type->name << ")";
-            error_occurred(CONTEXT, CALLER, error.str());
+            RAISE_ERROR(error.str());
             failed = true;
             break;
         }
@@ -160,7 +160,7 @@ CA_FUNCTION(osc__send)
         int result = lo_send_message(address->address, destination, message);
 
         if (result == -1)
-            error_occurred(CONTEXT, CALLER, "lo_send_message returned -1");
+            RAISE_ERROR("lo_send_message returned -1");
     }
 
     lo_message_free(message);

@@ -12,7 +12,7 @@ namespace assert_function {
             "'Raises a runtime error if condition is false'")
     {
         if (!BOOL_INPUT(0))
-            ERROR_OCCURRED("Assert failed");
+            RAISE_ERROR("Assert failed");
     }
 
     void setup(Branch* kernel)

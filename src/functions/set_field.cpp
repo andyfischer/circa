@@ -13,7 +13,7 @@ namespace set_field_function {
         int index = list_find_field_index_by_name(OUTPUT->value_type, name);
         if (index == -1) {
             std::string msg = std::string("field not found: ") + name;
-            return ERROR_OCCURRED(msg.c_str());
+            return RAISE_ERROR(msg.c_str());
         }
         copy(INPUT(2), OUTPUT->getIndex(index));
     }

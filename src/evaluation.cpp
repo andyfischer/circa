@@ -158,7 +158,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, ListData* args
             msg << "Couldn't cast input " << input->toString()
                 << " (at index " << i << ")"
                 << " to type " << placeholder->type->name;
-            error_occurred(context, msg.str().c_str());
+            raise_error(context, msg.str().c_str());
             return;
         }
     }
@@ -226,7 +226,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     function->evaluate(context, inputList, outputList);
 
     #if CIRCA_THROW_ON_ERROR
-    } catch (std::exception const& e) { return error_occurred(context, term, e.what()); }
+    } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
 
 #if 0
@@ -373,7 +373,7 @@ TaggedValue* get_register(EvalContext* context, Term* term)
     return frame->registers[term->index];
 }
 
-void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const char* message)
+void raise_error(EvalContext* context, Term* term, TaggedValue* output, const char* message)
 {
     // Save the error as this term's output value.
     set_string(output, message);
@@ -384,7 +384,7 @@ void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const
     if (has_an_error_listener(term))
         return;
 
-    if (DEBUG_TRAP_ERROR_OCCURRED)
+    if (DEBUG_TRAP_RAISE_ERROR)
         ca_assert(false);
 
     if (context == NULL)
@@ -396,15 +396,15 @@ void error_occurred(EvalContext* context, Term* term, TaggedValue* output, const
     }
 }
 
-void error_occurred(EvalContext* context, const char* msg)
+void raise_error(EvalContext* context, const char* msg)
 {
     Term* term = current_term(context);
-    error_occurred(context, term, get_register(context, term), msg);
+    raise_error(context, term, get_register(context, term), msg);
 }
 
-void error_occurred(EvalContext* context, std::string const& msg)
+void raise_error(EvalContext* context, std::string const& msg)
 {
-    error_occurred(context, msg.c_str());
+    raise_error(context, msg.c_str());
 }
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output)

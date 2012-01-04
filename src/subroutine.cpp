@@ -68,7 +68,7 @@ CA_FUNCTION(evaluate_subroutine)
             msg << "Couldn't cast input " << INPUT(i)->toString()
                 << " (at index " << i << ")"
                 << " to type " << placeholder->type->name;
-            ERROR_OCCURRED(msg.str().c_str());
+            RAISE_ERROR(msg.str().c_str());
             return;
         }
     }

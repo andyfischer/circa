@@ -31,7 +31,7 @@ namespace rand_function {
         float max = INPUT(1)->toFloat();
 
         if (min >= max) {
-            ERROR_OCCURRED("min is >= max");
+            RAISE_ERROR("min is >= max");
             return;
         }
 

@@ -10,42 +10,42 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
         set_string(OUTPUT, t->name);
     }
     CA_FUNCTION(hosted_to_string)
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
         set_string(OUTPUT, circa::to_string(t));
     }
     CA_FUNCTION(hosted_to_source_string)
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
         set_string(OUTPUT, circa::get_term_source_text(t));
     }
     CA_FUNCTION(get_function)
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
         set_ref(OUTPUT, t->function);
     }
     CA_FUNCTION(assign)
     {
         Term* target = INPUT(0)->asRef();
         if (target == NULL) {
-            ERROR_OCCURRED("NULL reference");
+            RAISE_ERROR("NULL reference");
             return;
         }
 
         TaggedValue* source = INPUT(1);
 
         if (!cast_possible(source, declared_type(target))) {
-            ERROR_OCCURRED("Can't assign, type mismatch");
+            RAISE_ERROR("Can't assign, type mismatch");
             return;
         }
 
@@ -60,7 +60,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
 
         int steps = round(INPUT(1)->toFloat());
 
@@ -77,18 +77,18 @@ namespace ref_methods_function {
         } else if (is_int(t))
             set_int(t, as_int(t) + steps);
         else
-            ERROR_OCCURRED("Ref is not an int or number");
+            RAISE_ERROR("Ref is not an int or number");
     }
 
     CA_FUNCTION(asint)
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            ERROR_OCCURRED("NULL reference");
+            RAISE_ERROR("NULL reference");
             return;
         }
         if (!is_int(t)) {
-            ERROR_OCCURRED("Not an int");
+            RAISE_ERROR("Not an int");
             return;
         }
         set_int(OUTPUT, as_int(t));
@@ -97,7 +97,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            ERROR_OCCURRED("NULL reference");
+            RAISE_ERROR("NULL reference");
             return;
         }
         
@@ -107,7 +107,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            ERROR_OCCURRED("NULL reference");
+            RAISE_ERROR("NULL reference");
             return;
         }
         int index = INPUT(1)->asInt();
@@ -120,7 +120,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
 
         List& output = *List::cast(OUTPUT, t->numInputs());
 
@@ -131,7 +131,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL) {
-            ERROR_OCCURRED("NULL reference");
+            RAISE_ERROR("NULL reference");
             return;
         }
         set_int(OUTPUT, t->numInputs());
@@ -141,7 +141,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
 
         Rect_i* output = Rect_i::cast(OUTPUT);
         output->set(t->sourceLoc.col, t->sourceLoc.line,
@@ -151,7 +151,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
 
         set_string(OUTPUT, global_id(t));
     }
@@ -159,7 +159,7 @@ namespace ref_methods_function {
     {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
-            return ERROR_OCCURRED("NULL reference");
+            return RAISE_ERROR("NULL reference");
         circa::copy(&t->properties, OUTPUT);
     }
 

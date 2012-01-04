@@ -32,7 +32,7 @@ namespace declared_state_function {
                 std::stringstream msg;
                 msg << "Couldn't cast default value to type " <<
                     declared_type(CALLER)->name;
-                ERROR_OCCURRED(msg.str().c_str());
+                RAISE_ERROR(msg.str().c_str());
             }
         } else {
 

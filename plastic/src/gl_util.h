@@ -6,7 +6,7 @@
 
 void gl_clear_error();
 
-// If OpenGL reports an error, we'll call error_occurred and return true.
+// If OpenGL reports an error, we'll call raise_error and return true.
 bool gl_check_error(circa::EvalContext* cxt, circa::Term* term);
 
 const char* gl_check_error();

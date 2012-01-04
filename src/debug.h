@@ -12,8 +12,8 @@ namespace circa {
 // Setting this to true will make us abort trap on the next name lookup.
 extern bool DEBUG_TRAP_NAME_LOOKUP;
 
-// Setting this to true will make us abort trap on the next call to error_occurred()
-extern bool DEBUG_TRAP_ERROR_OCCURRED;
+// Setting this to true will make us abort trap on the next call to raise_error()
+extern bool DEBUG_TRAP_RAISE_ERROR;
 
 // Setting this to true will write to stdout for every write to a Ref value.
 extern bool DEBUG_TRACE_ALL_REF_WRITES;

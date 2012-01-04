@@ -56,7 +56,7 @@ CA_FUNCTION(draw_string)
 CA_FUNCTION(get_string_dimensions)
 {
     if (mainFont == NULL)
-        return error_occurred(CONTEXT, CALLER, "no font loaded");
+        return raise_error(CONTEXT, CALLER, "no font loaded");
         
     float width = mainFont->stringWidth(STRING_INPUT(0));
     

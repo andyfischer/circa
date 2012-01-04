@@ -193,7 +193,7 @@ CA_FUNCTION(box2d__Body_set_fixtures)
     b2Body* body = get_body_from_handle(INPUT(0));
 
     if (body == NULL)
-        return error_occurred(CONTEXT, CALLER, "invalid body handle");
+        return raise_error(CONTEXT, CALLER, "invalid body handle");
 
     // Remove any old fixtures
     while (body->GetFixtureList())
