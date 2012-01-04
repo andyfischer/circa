@@ -17,6 +17,8 @@ struct Frame
     List registers;
     Branch* branch;
     int pc;
+    symobl strategy;
+    int endPc;
 };
 
 struct EvalContext

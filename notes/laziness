@@ -80,6 +80,23 @@ This could be:
 This plan only really accomplishes conditional evaluation within the same branch, and
 the only advantage is that the term is implicitly in a condition instead of being
 in an explicit if-block.
+ - Although, this isn't a terrible thing by itself. This would also help solve the
+   problem of short-circuited conditionals.
 
 With real lazy evaluation, we would be able to pass the lazy-value around as a regular
-value, and only unbox it at the moment it was necessary.
+value, and only unbox it at the moment it was necessary. So the lazy call would create
+a thunk, and when the thunk is used by a non-lazy call, it would be evaluated.
+
+Whether or not we create thunks, we need an evaluation strategy that can just pick one
+term out of a branch. This strategy will also need to handle the case where input values
+are in an upper frame.
+
+So, the plan:
+ - There are now two evaluation strategies:
+   - 'eager' will iterate through every term in the branch, and only evaluate the non-lazy terms
+   - 'range' will iterate across a specific range. Doesn't care about laziness
+
+ - Each Frame has an evaluation strategy
+ - run_interpreter uses frame->strategy to find the finishing term index (currently it
+   uses branch->length)
+ - run_interpreter also uses strategy_next() to advance the PC

@@ -31,7 +31,11 @@ const Symbol ExtraOutputNotFound = 7;
 const Symbol PureCall = 8;
 const Symbol ControlFlowCall = 9;
 
-const Symbol HighestBuiltinSymbol = 13;
+// Evaluation strategies
+const Symbol Eager = 14;
+const Symbol Range = 15;
+
+const Symbol HighestBuiltinSymbol = 15;
 
 const Symbol FirstRuntimeSymbol = 1000;
 

@@ -115,6 +115,8 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     top->pc = 0;
     swap(registers, &top->registers);
     top->branch = branch;
+    top->strategy = Eager;
+    top->endPc = branch->length();
     return top;
 }
 Frame* push_frame(EvalContext* context, Branch* branch)
@@ -552,6 +554,11 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
     out << "Error: " << context_get_error_message(context) << std::endl;
 }
 
+void advance_pc(Frame* frame)
+{
+    frame->pc++;
+}
+
 void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
@@ -564,8 +571,9 @@ do_instruction:
     int pc = frame->pc;
 
     // Check if we have finished this branch
-    if (pc >= branch->length()) {
+    if (pc >= frame->endPc) {
 
+        // If we've finished the top branch then end this interpreter session
         if (branch == topBranch)
             return;
 
@@ -580,19 +588,61 @@ do_instruction:
     Term* term = branch->get(pc);
 
     if (!is_function(term->function)) {
-        top_frame(context)->pc++;
+        advance_pc(frame);
         goto do_instruction;
     }
 
     Function* func = as_function(term->function);
 
-    evaluate_single_term(context, term);
+    if (func->evaluate == NULL) {
+        advance_pc(frame);
+        goto do_instruction;
+    }
 
+    context->currentTerm = term;
+
+    // Prepare input & output lists.
+    ListData* inputList = write_input_instruction_list(term, NULL);
+    ListData* outputList = write_output_instruction_list(term, NULL);
+
+    #if CIRCA_THROW_ON_ERROR
+    try {
+    #endif
+
+    func->evaluate(context, inputList, outputList);
+
+    #if CIRCA_THROW_ON_ERROR
+    } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
+    #endif
+
+#if 0
+    // For a test build, we check the type of the output of every single call. This is
+    // slow, and it should be unnecessary if the function is written correctly. But it's
+    // a good test.
+    #ifdef CIRCA_TEST_BUILD
+    if (!context->errorOccurred && !is_value(term)) {
+        Type* outputType = get_output_type(term);
+        TaggedValue* output = get_arg(context, outputList, 0);
+
+        if (outputType != &VOID_T && !cast_possible(output, outputType)) {
+            std::stringstream msg;
+            msg << "Function " << term->function->name << " produced output "
+                << output->toString() << " which doesn't fit output type "
+                << outputType->name;
+            internal_error(msg.str());
+        }
+    }
+    #endif
+#endif
+
+    free_list(inputList);
+    free_list(outputList);
+    
     if (error_occurred(context))
         return;
 
     if (func->vmInstruction == PureCall)
-        top_frame(context)->pc++;
+        advance_pc(top_frame(context));
 
     goto do_instruction;
 }
