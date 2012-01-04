@@ -303,7 +303,7 @@ int run_command_line(List* args)
 
     evaluate_branch(&context, main_branch);
 
-    if (context.errorOccurred) {
+    if (error_occurred(&context)) {
         std::cout << "Error occurred:\n";
         print_runtime_error_formatted(context, std::cout);
         std::cout << std::endl;

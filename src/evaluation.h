@@ -107,7 +107,7 @@ void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.
-bool evaluation_interrupted(EvalContext* context);
+bool error_occurred(EvalContext* context);
 
 void clear_error(EvalContext* cxt);
 

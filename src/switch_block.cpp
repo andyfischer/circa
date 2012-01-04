@@ -47,7 +47,7 @@ CA_FUNCTION(evaluate_switch)
             for (int i=0; i < caseContents->length(); i++) {
                 evaluate_single_term(context, caseContents->get(i));
 
-                  if (evaluation_interrupted(context))
+                  if (error_occurred(context))
                       break;
             }
 

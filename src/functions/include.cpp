@@ -40,7 +40,7 @@ namespace include_function {
 
         bool fileChanged = load_script(CONTEXT, CALLER, STRING_INPUT(0));
 
-        if (CONTEXT->errorOccurred)
+        if (error_occurred(CONTEXT))
             return;
 
         if (fileChanged && has_static_errors(contents)) {

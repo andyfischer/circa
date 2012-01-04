@@ -128,7 +128,7 @@ void pop_frame(EvalContext* context)
     Frame* top = top_frame(context);
 
     // Check to make sure we aren't losing a stored runtime error.
-    if (context->errorOccurred)
+    if (error_occurred(context))
         internal_error("pop_frame called on an errored context");
 
     set_null(&top->registers);
@@ -295,7 +295,7 @@ void evaluate_branch(EvalContext* context, Branch* branch)
 
     run_interpreter(context);
 
-    if (!context->errorOccurred) {
+    if (!error_occurred(context)) {
         save_top_level_state(context, branch);
         pop_frame(context);
     }
@@ -317,7 +317,7 @@ void evaluate_save_locals(EvalContext* context, Branch* branch)
 
     copy_locals_back_to_terms(top_frame(context), branch);
 
-    if (!context->errorOccurred)
+    if (!error_occurred(context))
         pop_frame(context);
 }
 
@@ -413,7 +413,7 @@ void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
         << " " << context_get_error_message(&context);
 }
 
-bool evaluation_interrupted(EvalContext* context)
+bool error_occurred(EvalContext* context)
 {
     return context->errorOccurred;
 }
@@ -425,7 +425,7 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
     for (int i=start; i <= end; i++)
         evaluate_single_term(context, branch->get(i));
 
-    if (context->errorOccurred)
+    if (error_occurred(context))
         return;
 
     copy_locals_back_to_terms(top_frame(context), branch);
@@ -557,7 +557,7 @@ void run_interpreter(EvalContext* context)
     Branch* topBranch = top_frame(context)->branch;
 
 do_instruction:
-    ca_assert(!context->errorOccurred);
+    ca_assert(!error_occurred(context));
 
     Frame* frame = top_frame(context);
     Branch* branch = frame->branch;
@@ -588,7 +588,7 @@ do_instruction:
 
     evaluate_single_term(context, term);
 
-    if (context->errorOccurred)
+    if (error_occurred(context))
         return;
 
     if (func->vmInstruction == PureCall)
