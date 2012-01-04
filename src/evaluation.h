@@ -114,6 +114,6 @@ void clear_error(EvalContext* cxt);
 std::string context_get_error_message(EvalContext* cxt);
 void context_print_error_stack(std::ostream& out, EvalContext* cxt);
 
-void run_vm(EvalContext* context);
+void run_interpreter(EvalContext* context);
 
 } // namespace circa

@@ -293,7 +293,7 @@ void evaluate_branch(EvalContext* context, Branch* branch)
     // Check to insert top-level state
     insert_top_level_state(context, branch);
 
-    run_vm(context);
+    run_interpreter(context);
 
     if (!context->errorOccurred) {
         save_top_level_state(context, branch);
@@ -311,7 +311,7 @@ void evaluate_save_locals(EvalContext* context, Branch* branch)
     // Check to insert top-level state
     insert_top_level_state(context, branch);
 
-    run_vm(context);
+    run_interpreter(context);
 
     save_top_level_state(context, branch);
 
@@ -552,7 +552,7 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
     out << "Error: " << context_get_error_message(context) << std::endl;
 }
 
-void run_vm(EvalContext* context)
+void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
 
