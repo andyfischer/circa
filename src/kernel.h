@@ -102,7 +102,6 @@ struct BuiltinFuncs {
     Term* pack_state;
     Term* pack_state_to_list;
     Term* pack_state_list_n;
-    Term* unsafe_assign;
     Term* unpack_state;
     Term* unpack_state_list;
     Term* unpack_state_list_n;
