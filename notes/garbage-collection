@@ -1,0 +1,11 @@
+
+Garbage collection isn't ubiquitous- it's possible for a custom type to implement manual
+memory management.
+
+Some data structures used by the runtime *are* garbage collected (because it would be
+too messy otherwise). Garbage collected data structures include:
+
+  Type
+  Branch and Term
+  Function
+  EvalContext

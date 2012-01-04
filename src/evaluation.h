@@ -27,7 +27,7 @@ struct EvalContext
     bool errorOccurred;
     Term* errorTerm;
 
-    // Tree of persistent state
+    // Persistent state
     TaggedValue state;
 
     // Intra-program messages
@@ -104,9 +104,6 @@ void error_occurred(EvalContext* context, const char* msg);
 void error_occurred(EvalContext* context, std::string const& msg);
 
 void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
-
-void fetch_stack_local_state(EvalContext* context, const char* name);
-void store_stack_local_state(EvalContext* context, const char* name);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.
