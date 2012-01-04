@@ -8,7 +8,6 @@ namespace circa {
 
 extern Branch* KERNEL;
 
-extern Term* ADDITIONAL_OUTPUT_FUNC;
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
 extern Term* BRANCH_FUNC;

@@ -54,7 +54,6 @@ bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
-Term* ADDITIONAL_OUTPUT_FUNC = NULL;
 Term* ALIAS_FUNC = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
@@ -355,7 +354,6 @@ void bootstrap_kernel()
 
     // input_placeholder() is needed before we can declare a function with inputs
     INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
-    ADDITIONAL_OUTPUT_FUNC = import_function(kernel, NULL, "additional_output() -> any");
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
     apply(function_contents(as_function(OUTPUT_PLACEHOLDER_FUNC)),
