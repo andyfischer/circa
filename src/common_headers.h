@@ -74,6 +74,9 @@ typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
+const int MAX_INPUTS = 64;
+const int MAX_OUTPUTS = 64;
+
 // Garbage collection
 typedef char GCColor;
 

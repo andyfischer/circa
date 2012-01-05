@@ -329,6 +329,25 @@ void evaluate_branch(Branch* branch)
     evaluate_save_locals(&context, branch);
 }
 
+TaggedValue* get_input(EvalContext* context, Term* term)
+{
+    if (term == NULL)
+        return NULL;
+
+    if (is_value(term))
+        return (TaggedValue*) term;
+
+    for (int i=0; i < context->numFrames; i++) {
+        Frame* frame = get_frame(context, i);
+        if (frame->branch != term->owningBranch)
+            continue;
+        return frame->registers[term->index];
+    }
+
+    internal_error("couldn't find input value");
+    return NULL;
+}
+
 TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
 {
     if (arg->value_type == &GlobalVariableIsn_t) {
@@ -562,6 +581,8 @@ void advance_pc(Frame* frame)
 void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
+    TaggedValue* inputBuffer[MAX_INPUTS];
+    TaggedValue* outputBuffer[MAX_OUTPUTS];
 
 do_instruction:
     ca_assert(!error_occurred(context));
@@ -601,7 +622,28 @@ do_instruction:
 
     context->currentTerm = term;
 
-    // Prepare input & output lists.
+    // Prepare input list
+    int inputCount = term->numInputs();
+
+    for (int i=0; i < inputCount; i++) {
+        inputBuffer[i] = get_input(context, term->input(i));
+    }
+
+    // Prepare output list
+    outputBuffer[0] = frame->registers[term->index];
+    
+    int outputCount = 1;
+    for (;; outputCount++) {
+        int index = term->index + outputCount;
+        if (index >= branch->length())
+            break;
+
+        if (branch->get(index)->function != EXTRA_OUTPUT_FUNC)
+            break;
+
+        outputBuffer[outputCount] = frame->registers[index];
+    }
+
     ListData* inputList = write_input_instruction_list(term, NULL);
     ListData* outputList = write_output_instruction_list(term, NULL);
 

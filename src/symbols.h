@@ -35,7 +35,11 @@ const Symbol ControlFlowCall = 9;
 const Symbol Eager = 14;
 const Symbol Range = 15;
 
-const Symbol HighestBuiltinSymbol = 15;
+// Temporary register values
+const Symbol Unevaluated = 16;
+const Symbol Lazy = 17;
+
+const Symbol HighestBuiltinSymbol = 17;
 
 const Symbol FirstRuntimeSymbol = 1000;
 

@@ -99,4 +99,8 @@ So, the plan:
  - Each Frame has an evaluation strategy
  - run_interpreter uses frame->strategy to find the finishing term index (currently it
    uses branch->length)
- - run_interpreter also uses strategy_next() to advance the PC
+ - Need a solution when fetching inputs
+   - Initialize all registers to Unevaluated
+   - When looking for an input, walk up the frame stack, looking for Frames that have the same
+     branch as the input. When found, check if the register is Unevaluated. If not, use that
+     value.

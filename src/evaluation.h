@@ -17,7 +17,7 @@ struct Frame
     List registers;
     Branch* branch;
     int pc;
-    symobl strategy;
+    Symbol strategy;
     int endPc;
 };
 
@@ -92,6 +92,7 @@ TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& i
 TaggedValue* evaluate(Branch* branch, Term* function, List* inputs);
 TaggedValue* evaluate(Term* function, List* inputs);
 
+TaggedValue* get_input(EvalContext* context, Term* term);
 TaggedValue* get_arg(EvalContext* context, ListData* args, int index);
 TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
 void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest);

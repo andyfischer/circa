@@ -42,6 +42,10 @@ const char* symbol_get_text(Symbol symbol)
         case ExtraOutputNotFound: return "ExtraOutputNotFound";
         case PureCall: return "PureCall";
         case ControlFlowCall: return "ControlFlowCall";
+        case Eager: return "Eager";
+        case Range: return "Range";
+        case Unevaluated: return "Unevaluated";
+        case Lazy: return "Lazy";
     }
 
     internal_error("Unknown symbol in symbol_get_text");
