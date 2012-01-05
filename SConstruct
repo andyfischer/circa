@@ -17,17 +17,18 @@ WINDOWS = os.name == 'nt'
 # provided by Xcode.
 OSX = os.path.exists('/Library/Frameworks')
 
+TEST = Environment(tools = ["default"], toolpath=".",
+        variant_name = 'test', variant_suffix='_t')
 DEBUG = Environment(tools = ["default"], toolpath=".",
         variant_name = 'debug', variant_suffix='_d')
 RELEASE = Environment(tools = ["default"], toolpath=".",
         variant_name = 'release', variant_suffix='')
-TEST = Environment(tools = ["default"], toolpath=".",
-        variant_name = 'test', variant_suffix='_t')
 all_envs = [DEBUG, RELEASE, TEST]
 
 # Build flags
 if POSIX:
     for env in all_envs:
+        env.Replace(CXX='clang++')
         env.Append(CPPFLAGS=['-ggdb', '-Wall'])
         env.Append(LINKFLAGS=['-ldl'])
 
