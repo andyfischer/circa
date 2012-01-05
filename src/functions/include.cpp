@@ -52,7 +52,7 @@ namespace include_function {
 
         set_branch(OUTPUT, contents);
 
-        push_frame_with_inputs(context, contents, INPUT_LIST);
+        push_frame_with_inputs(context, contents, NUM_INPUTS, INPUTS);
     }
     void include_post_compile(Term* term)
     {

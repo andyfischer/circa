@@ -3,6 +3,7 @@
 import os,subprocess,sys
 from glob import glob
 
+ExecutableName = 'circa_t'
 TestRoot = 'tests'
 
 class OutputDifference(object):
@@ -77,7 +78,7 @@ def test_file(filename):
     failures = []
 
     # Diff test
-    diff = diff_command_against_file("circa_t "+filename, filename + ".output")
+    diff = diff_command_against_file(ExecutableName +" "+filename, filename + ".output")
     if diff:
         desc = ['Script output differed on line '+str(diff.lineNumber)]
         desc.append('  Expected: "'+diff.fromFile+'"')
@@ -85,7 +86,7 @@ def test_file(filename):
         failures.append(TestFailure(desc, filename))
 
     # Source repro test
-    diff = diff_command_against_file("circa_t -n -s "+filename, filename)
+    diff = diff_command_against_file(ExecutableName +" -n -s "+filename, filename)
     if diff:
         desc = ['Source repro failed on line '+str(diff.lineNumber)]
         desc.append(' Expected: '+diff.fromFile)
@@ -143,7 +144,7 @@ def find_test_with_name(name):
 def accept_output_for_test(name):
     file = find_test_with_name(name)
     outfile = file + '.output'
-    cmd = 'circa_t '+file
+    cmd = ExecutableName+' '+file
 
     print 'Running: '+cmd
     print 'Saving results to: '+outfile

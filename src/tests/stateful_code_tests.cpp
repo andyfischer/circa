@@ -48,15 +48,6 @@ void test_simple_func_with_state_arg()
     Term* stateOutput = function_get_output_placeholder(func, 1);
     test_assert(function_is_state_input(stateOutput));
 
-    // Test with manual call
-    ListData* inputs = allocate_list(1);
-    ListData* outputs = allocate_list(2);
-    set_int(list_get_index(inputs, 0), 3);
-    simple_func_with_state_arg(NULL, inputs, outputs);
-    test_equals(list_get_index(outputs, 1), 4);
-    free_list(inputs);
-    free_list(outputs);
-
     // Test with a normal call, explicit argument.
     branch.compile("a = 3");
     branch.compile("f(state = a)");

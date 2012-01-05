@@ -28,7 +28,7 @@ all_envs = [DEBUG, RELEASE, TEST]
 # Build flags
 if POSIX:
     for env in all_envs:
-        env.Replace(CXX='clang++')
+        #env.Replace(CXX='clang++')
         env.Append(CPPFLAGS=['-ggdb', '-Wall'])
         env.Append(LINKFLAGS=['-ldl'])
 

@@ -137,21 +137,19 @@ void pop_frame(EvalContext* context)
     context->numFrames--;
 }
 
-void push_frame_with_inputs(EvalContext* context, Branch* branch, ListData* args)
+void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, TaggedValue** inputs)
 {
     // Fetch inputs and start preparing the new stack frame.
-    int inputCount = list_size(args);
-
     List registers;
     registers.resize(get_locals_count(branch));
     
     // Insert inputs into placeholders
-    for (int i=0; i < inputCount; i++) {
+    for (int i=0; i < ninputs; i++) {
         Term* placeholder = get_input_placeholder(branch, i);
         if (placeholder == NULL)
             break;
 
-        TaggedValue* input = get_arg(context, args, i);
+        TaggedValue* input = inputs[i];
 
         bool castSuccess = cast(input, placeholder->type, registers[i]);
 
@@ -207,6 +205,7 @@ void reset_stack(EvalContext* context)
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
+#if 0
     if (term->function == NULL || !is_function(term->function))
         return;
 
@@ -253,6 +252,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
     free_list(inputList);
     free_list(outputList);
+#endif
 }
 
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
@@ -372,10 +372,10 @@ TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
     ca_assert(index < list_size(args));
     return get_arg(context, list_get_index(args, index));
 }
-void consume_arg(EvalContext* context, ListData* args, int index, TaggedValue* dest)
+void consume_arg(EvalContext* context, TaggedValue** inputs, int index, TaggedValue* dest)
 {
     // TODO: Make this swap() values when possible
-    copy(get_arg(context, list_get_index(args, index)), dest);
+    copy(inputs[index], dest);
 }
 TaggedValue* get_output(EvalContext* context, ListData* args)
 {
@@ -625,9 +625,8 @@ do_instruction:
     // Prepare input list
     int inputCount = term->numInputs();
 
-    for (int i=0; i < inputCount; i++) {
+    for (int i=0; i < inputCount; i++)
         inputBuffer[i] = get_input(context, term->input(i));
-    }
 
     // Prepare output list
     outputBuffer[0] = frame->registers[term->index];
@@ -644,14 +643,11 @@ do_instruction:
         outputBuffer[outputCount] = frame->registers[index];
     }
 
-    ListData* inputList = write_input_instruction_list(term, NULL);
-    ListData* outputList = write_output_instruction_list(term, NULL);
-
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    func->evaluate(context, inputList, outputList);
+    func->evaluate(context, inputCount, inputBuffer, outputCount, outputBuffer);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
@@ -676,9 +672,6 @@ do_instruction:
     }
     #endif
 #endif
-
-    free_list(inputList);
-    free_list(outputList);
     
     if (error_occurred(context))
         return;

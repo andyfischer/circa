@@ -315,12 +315,12 @@ CA_FUNCTION(evaluate_loop_output)
     Term* primaryOutput = get_output_placeholder(contents, 0);
     copy(result, list_get(topFrame->registers[primaryOutput->index], as_int(index)));
 
-    // Hack: make sure the output_placeholder terms are evaluated
+    // Hack: make sure the output_placeholder terms have their values
     for (int i=1;; i++) {
         Term* output = get_output_placeholder(contents, i);
         if (output == NULL)
             break;
-        evaluate_single_term(context, output);
+        copy(get_input(context, output->input(0)), get_input(context, output));
     }
 
     // Find list length
