@@ -94,10 +94,7 @@ TaggedValue* evaluate(Branch* branch, Term* function, List* inputs);
 TaggedValue* evaluate(Term* function, List* inputs);
 
 TaggedValue* get_input(EvalContext* context, Term* term);
-TaggedValue* get_arg(EvalContext* context, ListData* args, int index);
-TaggedValue* get_arg(EvalContext* context, TaggedValue* arg);
-void consume_arg(EvalContext* context, TaggedValue** inputs, int index, TaggedValue* dest);
-TaggedValue* get_output(EvalContext* context, ListData* args);
+void consume_input(EvalContext* context, Term* term, TaggedValue* dest);
 
 Term* current_term(EvalContext* context);
 TaggedValue* get_register(EvalContext* context, Term* term);

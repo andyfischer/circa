@@ -349,38 +349,10 @@ TaggedValue* get_input(EvalContext* context, Term* term)
     return NULL;
 }
 
-TaggedValue* get_arg(EvalContext* context, TaggedValue* arg)
-{
-    if (arg->value_type == &GlobalVariableIsn_t) {
-        return (TaggedValue*) get_pointer(arg);
-    } else if (arg->value_type == &StackVariableIsn_t) {
-        short relativeFrame = arg->value_data.asint >> 16;
-        short index = arg->value_data.asint & 0xffff;
-
-        ca_assert(relativeFrame < context->numFrames);
-        ca_assert(relativeFrame >= 0);
-        Frame* frame = get_frame(context, relativeFrame);
-        return frame->registers[index];
-    } else if (arg->value_type == &NullInputIsn_t) {
-        return NULL;
-    } else {
-        return arg;
-    }
-}
-
-TaggedValue* get_arg(EvalContext* context, ListData* args, int index)
-{
-    ca_assert(index < list_size(args));
-    return get_arg(context, list_get_index(args, index));
-}
-void consume_arg(EvalContext* context, TaggedValue** inputs, int index, TaggedValue* dest)
+void consume_input(EvalContext* context, Term* term, TaggedValue* dest)
 {
     // TODO: Make this swap() values when possible
-    copy(inputs[index], dest);
-}
-TaggedValue* get_output(EvalContext* context, ListData* args)
-{
-    return get_arg(context, args, list_size(args) - 1);
+    copy(get_input(context, term), dest);
 }
 
 Term* current_term(EvalContext* context)
