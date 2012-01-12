@@ -205,7 +205,8 @@ void reset_stack(EvalContext* context)
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-#if 0
+    TaggedValue* inputBuffer[MAX_INPUTS];
+
     if (term->function == NULL || !is_function(term->function))
         return;
 
@@ -216,15 +217,19 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
     context->currentTerm = term;
 
-    // Prepare input & output lists.
-    ListData* inputList = write_input_instruction_list(term, NULL);
-    ListData* outputList = write_output_instruction_list(term, NULL);
+    #if CIRCA_THROW_ON_ERROR
+    try {
+    #endif
+
+    int inputCount;
+    int outputCount;
+    fetch_input_pointers(context, term, inputBuffer, &inputCount, &outputCount);
 
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    function->evaluate(context, inputList, outputList);
+    function->evaluate(context, inputCount, outputCount, inputBuffer);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
@@ -248,10 +253,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
         }
     }
     #endif
-#endif
-
-    free_list(inputList);
-    free_list(outputList);
 #endif
 }
 
@@ -578,11 +579,39 @@ void advance_pc(Frame* frame)
     frame->pc++;
 }
 
+void fetch_input_pointers(EvalContext* context, Term* term, TaggedValue** buffer,
+    int* ninputs, int* noutputs)
+{
+    Frame* frame = top_frame(context);
+
+    int inputCount = term->numInputs();
+
+    for (int i=0; i < inputCount; i++)
+        buffer[i] = get_input(context, term->input(i));
+
+    // Prepare output list
+    buffer[inputCount] = frame->registers[term->index];
+    
+    int outputCount = 1;
+    for (;; outputCount++) {
+        int index = term->index + outputCount;
+        if (index >= frame->branch->length())
+            break;
+
+        if (frame->branch->get(index)->function != EXTRA_OUTPUT_FUNC)
+            break;
+
+        buffer[inputCount + outputCount] = frame->registers[index];
+    }
+
+    *ninputs = inputCount;
+    *noutputs = outputCount;
+}
+
 void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
     TaggedValue* inputBuffer[MAX_INPUTS];
-    TaggedValue* outputBuffer[MAX_OUTPUTS];
 
 do_instruction:
     ca_assert(!error_occurred(context));
@@ -613,50 +642,32 @@ do_instruction:
         goto do_instruction;
     }
 
-    Function* func = as_function(term->function);
+    Function* function = as_function(term->function);
 
-    if (func->evaluate == NULL) {
+    if (function->evaluate == NULL) {
         advance_pc(frame);
         goto do_instruction;
     }
 
     context->currentTerm = term;
 
-    // Prepare input list
-    int inputCount = term->numInputs();
-
-    for (int i=0; i < inputCount; i++)
-        inputBuffer[i] = get_input(context, term->input(i));
-
-    // Prepare output list
-    outputBuffer[0] = frame->registers[term->index];
-    
-    int outputCount = 1;
-    for (;; outputCount++) {
-        int index = term->index + outputCount;
-        if (index >= branch->length())
-            break;
-
-        if (branch->get(index)->function != EXTRA_OUTPUT_FUNC)
-            break;
-
-        outputBuffer[outputCount] = frame->registers[index];
-    }
+    int inputCount;
+    int outputCount;
+    fetch_input_pointers(context, term, inputBuffer, &inputCount, &outputCount);
 
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    func->evaluate(context, inputCount, inputBuffer, outputCount, outputBuffer);
+    function->evaluate(context, inputCount, outputCount, inputBuffer);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
 
 #if 0
-    // For a test build, we check the type of the output of every single call. This is
-    // slow, and it should be unnecessary if the function is written correctly. But it's
-    // a good test.
+    // Check the type of the output value of every single call. This is slow, and it should
+    // be unnecessary, but it's a good test.
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term)) {
         Type* outputType = get_output_type(term);
@@ -676,7 +687,7 @@ do_instruction:
     if (error_occurred(context))
         return;
 
-    if (func->vmInstruction == PureCall)
+    if (function->vmInstruction == PureCall)
         advance_pc(top_frame(context));
 
     goto do_instruction;

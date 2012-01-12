@@ -67,15 +67,14 @@ union VariantValue {
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \
-    void fname(circa::EvalContext* _cxt, int _ninputs, TaggedValue** _ins, int _nouts, TaggedValue** _outs)
+    void fname(circa::EvalContext* _cxt, int _ninputs, int _noutputs, TaggedValue** _vals)
 
-typedef void (*EvaluateFunc)(EvalContext* cxt, int ninputs, TaggedValue** inputs, int noutputs, TaggedValue** outputs);
+typedef void (*EvaluateFunc)(EvalContext* cxt, int ninputs, int noutputs, TaggedValue** values);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 
 const int MAX_INPUTS = 64;
-const int MAX_OUTPUTS = 64;
 
 // Garbage collection
 typedef char GCColor;
