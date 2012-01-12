@@ -345,7 +345,6 @@ TaggedValue* get_input(EvalContext* context, Term* term)
         return frame->registers[term->index];
     }
 
-    internal_error("couldn't find input value");
     return NULL;
 }
 
@@ -622,6 +621,7 @@ do_instruction:
     }
 
     context->currentTerm = term;
+    int startingFrameCount = context->numFrames;
 
     int inputCount;
     int outputCount;
@@ -633,19 +633,20 @@ do_instruction:
 
     function->evaluate(context, inputCount, outputCount, inputBuffer);
 
+    bool framePushed = context->numFrames > startingFrameCount;
+
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
 
-#if 0
     // Check the type of the output value of every single call. This is slow, and it should
     // be unnecessary, but it's a good test.
     #ifdef CIRCA_TEST_BUILD
-    if (!context->errorOccurred && !is_value(term)) {
+    if (!context->errorOccurred && !is_value(term) && !framePushed) {
         Type* outputType = get_output_type(term);
-        TaggedValue* output = get_arg(context, outputList, 0);
+        TaggedValue* output = get_input(context, term);
 
-        if (outputType != &VOID_T && !cast_possible(output, outputType)) {
+        if (output != NULL && outputType != &VOID_T && !cast_possible(output, outputType)) {
             std::stringstream msg;
             msg << "Function " << term->function->name << " produced output "
                 << output->toString() << " which doesn't fit output type "
@@ -654,7 +655,6 @@ do_instruction:
         }
     }
     #endif
-#endif
     
     if (error_occurred(context))
         return;

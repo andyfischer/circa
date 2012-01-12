@@ -19,89 +19,83 @@ void post_test_sanity_check();
 void test_assert_function(bool condition, int line, const char* file)
 {
     if (!condition) {
-        std::stringstream msg;
-        msg << "Assert failure in " << file << ", line " << line;
-        throw std::runtime_error(msg.str());
+        std::cout << "Assert failure in " << file << ", line " << line << std::endl;
+        declare_current_test_failed();
     }
 }
 
 void test_assert_function(Term* term, int line, const char* file)
 {
     if (term == NULL) {
-        std::stringstream msg;
-        msg << "NULL term in " << file << ", line " << line;
-        throw std::runtime_error(msg.str());
+        std::cout << "NULL term in " << file << ", line " << line << std::endl;
+        declare_current_test_failed();
+        return;
     }
 
     if (has_static_error(term)) {
-        std::stringstream msg;
-        msg << "Compile error on term " << global_id(term) << std::endl;
-        print_static_error(term, msg);
-        msg << std::endl;
-        msg << "Occurred in " << file << ", line " << line << std::endl;
-        throw std::runtime_error(msg.str());
+        std::cout << "Compile error on term " << global_id(term) << std::endl;
+        print_static_error(term, std::cout);
+        std::cout << std::endl;
+        std::cout << "Occurred in " << file << ", line " << line << std::endl;
+        declare_current_test_failed();
     }
 
     if (is_bool(term) && !as_bool(term)) {
-        std::stringstream msg;
-        msg << "Assertion failed: " << get_term_source_text(term) << std::endl;
-        msg << "Occurred in " << file << ", line " << line << std::endl;
-        throw std::runtime_error(msg.str());
-
+        std::cout << "Assertion failed: " << get_term_source_text(term) << std::endl;
+        std::cout << "Occurred in " << file << ", line " << line << std::endl;
+        declare_current_test_failed();
     }
 }
 
 void test_assert_function(Branch* branch, int line, const char* file)
 {
     if (!branch_check_invariants_print_result(branch, std::cout)) {
+        std::cout << "Branch failed invariant check in " << file << ", line " << line << std::endl;
         declare_current_test_failed();
-        throw std::runtime_error("");
     }
 
     List errors;
     check_for_static_errors(&errors, branch);
     if (!errors.empty()) {
-        std::stringstream msg;
-        msg << "Branch has static errors at " << file << ", line " << line << std::endl;
-        print_static_errors_formatted(&errors, msg);
-        throw std::runtime_error(msg.str());
+        std::cout << "Branch has static errors at " << file << ", line " << line << std::endl;
+        print_static_errors_formatted(&errors, std::cout);
+        declare_current_test_failed();
     }
 }
 
 void test_assert_function(EvalContext& context, int line, const char* file)
 {
     if (context.errorOccurred) {
-        std::stringstream msg;
-        msg << "Runtime error at " << file << ", line " << line << std::endl;
-        print_runtime_error_formatted(context, msg);
-        throw std::runtime_error(msg.str());
+        std::cout << "Runtime error at " << file << ", line " << line << std::endl;
+        print_runtime_error_formatted(context, std::cout);
+        declare_current_test_failed();
     }
 }
 
 void test_fail_function(int line, const char* file)
 {
-    std::stringstream msg;
-    msg << "Test fail in " << file << ", line " << line;
-    throw std::runtime_error(msg.str());
+    std::cout << "Test fail in " << file << ", line " << line << std::endl;
+    declare_current_test_failed();
 }
 
 void test_equals_function(TermList const& a, TermList const& b,
         const char* aText, const char* bText, int line, const char* file)
 {
-    std::stringstream msg;
-
     if (a.length() != b.length()) {
-        msg << "List equality fail in " << file << ", line " << line << std::endl;
-        msg << "  " << aText << " has " << a.length() << " items, ";
-        msg << bText << " has " << b.length() << " items.";
-        throw std::runtime_error(msg.str());
+        std::cout << "List equality fail in " << file << ", line " << line << std::endl;
+        std::cout << "  " << aText << " has " << a.length() << " items, ";
+        std::cout << bText << " has " << b.length() << " items." << std::endl;
+        declare_current_test_failed();
+        return;
     }
 
     for (int i=0; i < a.length(); i++) {
         if (a[i] != b[i]) {
-            msg << "List equality fail in " << file << ", line " << line << std::endl;
-            msg << "  " << aText << " != " << bText << " (index " << i << " differs)";
-            throw std::runtime_error(msg.str());
+            std::cout << "List equality fail in " << file << ", line " << line << std::endl;
+            std::cout << "  " << aText << " != " << bText
+                << " (index " << i << " differs)" << std::endl;
+            declare_current_test_failed();
+            return;
         }
     }
 }
@@ -113,10 +107,10 @@ void test_equals_function(float a, float b,
     const float EPSILON = 0.0001f;
 
     if (fabs(a-b) > EPSILON) {
-        std::stringstream msg;
-        msg << "Equality fail in " << file << ", line " << line << std::endl;
-        msg << aText << " [" << a << "] != " << bText << " [" << b << "]";
-        throw std::runtime_error(msg.str());
+        std::cout << "Equality fail in " << file << ", line " << line << std::endl;
+        std::cout << aText << " [" << a << "] != " << bText << " [" << b << "]" << std::endl;
+        declare_current_test_failed();
+        return;
     }
 }
 
@@ -125,10 +119,10 @@ void test_equals_function(std::string a, std::string b,
         int line, const char* file)
 {
     if (a != b) {
-        std::stringstream msg;
-        msg << "Failed assert: " << a << " != " << b;
-        msg << ", in " << file << ", line " << line << std::endl;
-        throw std::runtime_error(msg.str());
+        std::cout << "Failed assert: " << a << " != " << b;
+        std::cout << ", in " << file << ", line " << line << std::endl;
+        declare_current_test_failed();
+        return;
     }
 }
 
