@@ -35,7 +35,7 @@ namespace for_function {
             finish_frame(CONTEXT);
         
         Term* index = for_loop_find_index(top_frame(CONTEXT)->branch);
-        TaggedValue* indexVal = get_register(CONTEXT, index);
+        TValue* indexVal = get_register(CONTEXT, index);
         set_int(indexVal, as_int(indexVal) + 1);
         top_frame(CONTEXT)->pc = 0;
     }

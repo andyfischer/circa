@@ -24,7 +24,7 @@ namespace list_t {
         *data = NULL;
     }
 
-    TaggedValue* append(ListData** data)
+    TValue* append(ListData** data)
     {
         if (*data == NULL) {
             *data = allocate_empty_list(1);
@@ -52,7 +52,7 @@ namespace list_t {
         return value->refCount;
     }
 
-    TaggedValue* prepend(ListData** data)
+    TValue* prepend(ListData** data)
     {
         append(data);
 
@@ -65,39 +65,39 @@ namespace list_t {
     }
 
 
-    // TaggedValue wrappers
-    void tv_touch(TaggedValue* value);
+    // TValue wrappers
+    void tv_touch(TValue* value);
 
-    void resize(TaggedValue* list, int newSize)
+    void resize(TValue* list, int newSize)
     {
         ca_assert(is_list(list));
         set_pointer(list, list_resize((ListData*) get_pointer(list), newSize));
     }
 
-    void clear(TaggedValue* list)
+    void clear(TValue* list)
     {
         ca_assert(is_list(list));
         clear((ListData**) &list->value_data);
     }
 
-    TaggedValue* append(TaggedValue* list)
+    TValue* append(TValue* list)
     {
         ca_assert(is_list(list));
         return append((ListData**) &list->value_data);
     }
-    TaggedValue* prepend(TaggedValue* list)
+    TValue* prepend(TValue* list)
     {
         ca_assert(is_list(list));
         return prepend((ListData**) &list->value_data);
     }
 
-    void tv_initialize(Type* type, TaggedValue* value)
+    void tv_initialize(Type* type, TValue* value)
     {
         ca_assert(value->value_data.ptr == NULL);
 
         // If the parameter has a fixed size list, then initialize to that.
         if (list_type_has_specific_size(&type->parameter)) {
-            TaggedValue* typeList = list_get_type_list_from_type(type);
+            TValue* typeList = list_get_type_list_from_type(type);
             List& types = *List::checkCast(typeList);
             List& result = *List::checkCast(value);
             result.resize(types.length());
@@ -106,7 +106,7 @@ namespace list_t {
         }
     }
 
-    void tv_release(Type*, TaggedValue* value)
+    void tv_release(Type*, TValue* value)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -114,7 +114,7 @@ namespace list_t {
         list_decref(data);
     }
 
-    void tv_copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void tv_copy(Type* type, TValue* source, TValue* dest)
     {
         ca_assert(is_list(source));
         set_null(dest);
@@ -134,14 +134,14 @@ namespace list_t {
         #endif
     }
 
-    bool tv_equals(Type*, TaggedValue* leftTaggedValue, TaggedValue* right)
+    bool tv_equals(Type*, TValue* leftTValue, TValue* right)
     {
-        ca_assert(is_list(leftTaggedValue));
+        ca_assert(is_list(leftTValue));
         Type* rhsType = right->value_type;
         if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
             return false;
 
-        List* left = List::checkCast(leftTaggedValue);
+        List* left = List::checkCast(leftTValue);
 
         int leftCount = left->numElements();
 
@@ -155,8 +155,8 @@ namespace list_t {
         return true;
     }
 
-    void tv_cast(CastResult* result, TaggedValue* source, Type* type,
-        TaggedValue* dest, bool checkOnly)
+    void tv_cast(CastResult* result, TValue* source, Type* type,
+        TValue* dest, bool checkOnly)
     {
         List* sourceList = List::checkCast(source);
 
@@ -194,10 +194,10 @@ namespace list_t {
         }
 
         for (int i=0; i < sourceLength; i++) {
-            TaggedValue* sourceElement = sourceList->get(i);
+            TValue* sourceElement = sourceList->get(i);
             Type* expectedType = as_type(destTypes[i]);
 
-            TaggedValue* destElement = NULL;
+            TValue* destElement = NULL;
             if (!checkOnly)
                 destElement = destList->get(i);
         
@@ -211,14 +211,14 @@ namespace list_t {
             dest->value_type = type;
     }
 
-    void tv_set_index(TaggedValue* value, int index, TaggedValue* element)
+    void tv_set_index(TValue* value, int index, TValue* element)
     {
         ca_assert(is_list(value));
         ListData* s = (ListData*) get_pointer(value);
         list_set_index(s, index, element);
     }
 
-    TaggedValue* tv_get_field(TaggedValue* value, const char* fieldName)
+    TValue* tv_get_field(TValue* value, const char* fieldName)
     {
         int index = list_find_field_index_by_name(value->value_type, fieldName);
         if (index < 0)
@@ -226,13 +226,13 @@ namespace list_t {
         return list_get_index(value, index);
     }
 
-    std::string tv_to_string(TaggedValue* value)
+    std::string tv_to_string(TValue* value)
     {
         ca_assert(is_list(value));
         return list_to_string((ListData*) get_pointer(value));
     }
 
-    void tv_touch(TaggedValue* value)
+    void tv_touch(TValue* value)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
@@ -298,12 +298,12 @@ namespace list_t {
             return query->succeed();
     }
 
-    void tv_visit_heap(Type*, TaggedValue* value, Type::VisitHeapCallback callback, TaggedValue* context)
+    void tv_visit_heap(Type*, TValue* value, Type::VisitHeapCallback callback, TValue* context)
     {
         ListData* data = (ListData*) value->value_data.ptr;
         if (data == NULL)
             return;
-        TaggedValue relativeIdentifier;
+        TValue relativeIdentifier;
         for (int i=0; i < data->count; i++) {
             set_int(&relativeIdentifier, i);
             callback(&data->items[i], &relativeIdentifier, context);
@@ -334,7 +334,7 @@ namespace list_t {
     {
         copy(INPUT(0), OUTPUT);
         List* result = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
+        TValue* value = INPUT(1);
         copy(value, result->append());
     }
 
@@ -352,37 +352,37 @@ bool is_list_based_type(Type* type)
 }
 
 List::List()
-  : TaggedValue()
+  : TValue()
 {
     create(&LIST_T, this);
 }
 
-TaggedValue*
+TValue*
 List::append()
 {
-    return list_t::append((TaggedValue*) this);
+    return list_t::append((TValue*) this);
 }
 void
-List::append(TaggedValue* val)
+List::append(TValue* val)
 {
     copy(val, append());
 }
 
-TaggedValue* List::insert(int index)
+TValue* List::insert(int index)
 {
     return list_insert((ListData**) &this->value_data.ptr, index);
 }
 
-TaggedValue*
+TValue*
 List::prepend()
 {
-    return list_t::prepend((TaggedValue*) this);
+    return list_t::prepend((TValue*) this);
 }
 
 void
 List::clear()
 {
-    list_t::clear((TaggedValue*) this);
+    list_t::clear((TValue*) this);
 }
 
 int
@@ -397,16 +397,16 @@ List::empty()
     return length() == 0;
 }
 
-TaggedValue*
+TValue*
 List::get(int index)
 {
-    return list_get_index((TaggedValue*) this, index);
+    return list_get_index((TValue*) this, index);
 }
 
 void
-List::set(int index, TaggedValue* value)
+List::set(int index, TValue* value)
 {
-    list_t::tv_set_index((TaggedValue*) this, index, value);
+    list_t::tv_set_index((TValue*) this, index, value);
 }
 
 void
@@ -415,7 +415,7 @@ List::resize(int newSize)
     list_t::resize(this, newSize); 
 }
 
-TaggedValue*
+TValue*
 List::getLast()
 {
     return get(length() - 1);
@@ -441,20 +441,20 @@ List::removeNulls()
 void
 List::appendString(const char* str)
 {
-    TaggedValue val;
+    TValue val;
     set_string(&val, str);
     swap(&val, append());
 }
 void
 List::appendString(const std::string& str)
 {
-    TaggedValue val;
+    TValue val;
     set_string(&val, str);
     swap(&val, append());
 }
 
 List*
-List::checkCast(TaggedValue* v)
+List::checkCast(TValue* v)
 {
     if (is_list(v))
         return (List*) v;
@@ -463,14 +463,14 @@ List::checkCast(TaggedValue* v)
 }
 
 List*
-List::lazyCast(TaggedValue* v)
+List::lazyCast(TValue* v)
 {
     if (!is_list(v))
         set_list(v, 0);
     return (List*) v;
 }
 List*
-List::cast(TaggedValue* v, int length)
+List::cast(TValue* v, int length)
 {
     set_list(v, length);
     return (List*) v;

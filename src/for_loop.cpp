@@ -250,7 +250,7 @@ CA_FUNCTION(evaluate_for_loop)
     EvalContext* context = CONTEXT;
     Branch* contents = nested_contents(caller);
 
-    TaggedValue* inputList = INPUT(0);
+    TValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
     List registers;
@@ -308,8 +308,8 @@ CA_FUNCTION(evaluate_loop_output)
     EvalContext* context = CONTEXT;
     Frame* topFrame = top_frame(context);
 
-    TaggedValue* index = INPUT(0);
-    TaggedValue* result = INPUT(1);
+    TValue* index = INPUT(0);
+    TValue* result = INPUT(1);
     
     // Copy loop output
     Term* primaryOutput = get_output_placeholder(contents, 0);
@@ -324,7 +324,7 @@ CA_FUNCTION(evaluate_loop_output)
     }
 
     // Find list length
-    TaggedValue* listInput = topFrame->registers[0];
+    TValue* listInput = topFrame->registers[0];
 
     // Increment the loop index
     set_int(index, as_int(index) + 1);

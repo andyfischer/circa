@@ -77,7 +77,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 
             // current value
             if (!is_value(term)) {
-                TaggedValue* value = frame->registers[term->index];
+                TValue* value = frame->registers[term->index];
                 if (value == NULL)
                     out << " [<register OOB>]";
                 else
@@ -137,7 +137,7 @@ void pop_frame(EvalContext* context)
     context->numFrames--;
 }
 
-void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, TaggedValue** inputs)
+void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, TValue** inputs)
 {
     // Fetch inputs and start preparing the new stack frame.
     List registers;
@@ -149,7 +149,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, T
         if (placeholder == NULL)
             break;
 
-        TaggedValue* input = inputs[i];
+        TValue* input = inputs[i];
 
         bool castSuccess = cast(input, placeholder->type, registers[i]);
 
@@ -205,7 +205,7 @@ void reset_stack(EvalContext* context)
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-    TaggedValue* inputBuffer[MAX_INPUTS];
+    TValue* inputBuffer[MAX_INPUTS];
 
     if (term->function == NULL || !is_function(term->function))
         return;
@@ -242,7 +242,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term)) {
         Type* outputType = get_output_type(term);
-        TaggedValue* output = get_arg(context, outputList, 0);
+        TValue* output = get_arg(context, outputList, 0);
 
         if (outputType != &VOID_T && !cast_possible(output, outputType)) {
             std::stringstream msg;
@@ -262,7 +262,7 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_value(term)) continue;
-        TaggedValue* val = frame->registers[term->index];
+        TValue* val = frame->registers[term->index];
         if (val != NULL)
             copy(val, branch->get(i));
     }
@@ -330,13 +330,13 @@ void evaluate_branch(Branch* branch)
     evaluate_save_locals(&context, branch);
 }
 
-TaggedValue* get_input(EvalContext* context, Term* term)
+TValue* get_input(EvalContext* context, Term* term)
 {
     if (term == NULL)
         return NULL;
 
     if (is_value(term))
-        return (TaggedValue*) term;
+        return (TValue*) term;
 
     for (int i=0; i < context->numFrames; i++) {
         Frame* frame = get_frame(context, i);
@@ -348,7 +348,7 @@ TaggedValue* get_input(EvalContext* context, Term* term)
     return NULL;
 }
 
-void consume_input(EvalContext* context, Term* term, TaggedValue* dest)
+void consume_input(EvalContext* context, Term* term, TValue* dest)
 {
     // TODO: Make this swap() values when possible
     copy(get_input(context, term), dest);
@@ -359,14 +359,14 @@ Term* current_term(EvalContext* context)
     return context->currentTerm;
 }
 
-TaggedValue* get_register(EvalContext* context, Term* term)
+TValue* get_register(EvalContext* context, Term* term)
 {
     Frame* frame = top_frame(context);
     ca_assert(term->owningBranch == frame->branch);
     return frame->registers[term->index];
 }
 
-void raise_error(EvalContext* context, Term* term, TaggedValue* output, const char* message)
+void raise_error(EvalContext* context, Term* term, TValue* output, const char* message)
 {
     // Save the error as this term's output value.
     set_string(output, message);
@@ -425,7 +425,7 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
     pop_frame(context);
 }
 
-void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
+void evaluate_minimum(EvalContext* context, Term* term, TValue* result)
 {
     // Get a list of every term that this term depends on. Also, limit this
     // search to terms inside the current branch.
@@ -474,7 +474,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result)
     pop_frame(context);
 }
 
-TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
+TValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
 {
     int prevHead = branch->length();
     Term* result = parser::compile(branch, parser::statement_list, input);
@@ -482,7 +482,7 @@ TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& i
     return result;
 }
 
-TaggedValue* evaluate(Branch* branch, Term* function, List* inputs)
+TValue* evaluate(Branch* branch, Term* function, List* inputs)
 {
     EvalContext context;
 
@@ -498,7 +498,7 @@ TaggedValue* evaluate(Branch* branch, Term* function, List* inputs)
     return result;
 }
 
-TaggedValue* evaluate(Term* function, List* inputs)
+TValue* evaluate(Term* function, List* inputs)
 {
     Branch scratch;
     return evaluate(&scratch, function, inputs);
@@ -550,7 +550,7 @@ void advance_pc(Frame* frame)
     frame->pc++;
 }
 
-void fetch_input_pointers(EvalContext* context, Term* term, TaggedValue** buffer,
+void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer,
     int* ninputs, int* noutputs)
 {
     Frame* frame = top_frame(context);
@@ -582,7 +582,7 @@ void fetch_input_pointers(EvalContext* context, Term* term, TaggedValue** buffer
 void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
-    TaggedValue* inputBuffer[MAX_INPUTS];
+    TValue* inputBuffer[MAX_INPUTS];
 
 do_instruction:
     ca_assert(!error_occurred(context));
@@ -644,7 +644,7 @@ do_instruction:
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term) && !framePushed) {
         Type* outputType = get_output_type(term);
-        TaggedValue* output = get_input(context, term);
+        TValue* output = get_input(context, term);
 
         if (output != NULL && outputType != &VOID_T && !cast_possible(output, outputType)) {
             std::stringstream msg;

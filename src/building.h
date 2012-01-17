@@ -53,7 +53,7 @@ void rename(Term* term, std::string const& name);
 // Create a new value term with the given type.
 Term* create_value(Branch* branch, Type* type, std::string const& name="");
 Term* create_value(Branch* branch, std::string const& typeName, std::string const& name="");
-Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const& name="");
+Term* create_value(Branch* branch, TValue* initialValue, std::string const& name="");
 
 // Create values with a specified value.
 Term* create_string(Branch* branch, std::string const& s, std::string const& name="");
@@ -149,7 +149,7 @@ int get_frame_distance(Branch* frame, Term* input);
 int get_frame_distance(Term* term, Term* input);
 
 // Input instructions:
-void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn);
+void write_stack_input_instruction(Branch* callingFrame, Term* input, TValue* isn);
 ListData* write_input_instruction_list(Term* caller, ListData* list);
 ListData* write_output_instruction_list(Term* caller, ListData* list);
 

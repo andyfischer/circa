@@ -30,7 +30,7 @@ void test_is_function_stateful()
 
 CA_FUNCTION(simple_func_with_state_arg)
 {
-    TaggedValue* in = INPUT(0);
+    TValue* in = INPUT(0);
     int i = 0;
     if (is_int(in))
         i = as_int(in);
@@ -267,7 +267,7 @@ std::string code_to_state_shape(const char* code)
 {
     Branch branch;
     branch.compile(code);
-    TaggedValue description;
+    TValue description;
     describe_state_shape(&branch, &description);
     return description.toString();
 }
@@ -299,7 +299,7 @@ void test_strip_abandoned_state()
     EvalContext context;
     evaluate_branch(&context, &branch);
 
-    TaggedValue trash;
+    TValue trash;
 
     test_equals(&context.state, "{s: 1, t: 2, x: 'hi'}");
 
@@ -339,7 +339,7 @@ void test_preserve_state_in_nested_include_file()
     files.set("b", "state x = test_oracle()");
     branch.compile("include('a')");
 
-    TaggedValue desc;
+    TValue desc;
     describe_state_shape(&branch, &desc);
     
     EvalContext context;

@@ -62,7 +62,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         if (!is_statement(assertions->get(i)))
             continue;
 
-        TaggedValue* result = assertions->get(i);
+        TValue* result = assertions->get(i);
 
         if (!is_bool(result))
             continue;
@@ -103,7 +103,7 @@ void migrate_across_user_defined_types()
     // Pre-test work, make sure that 'state T t = [1]' works
     Branch branch;
     Term* typeT = branch.compile("type T { int x }");
-    TaggedValue* x = branch.eval("x = [1]");
+    TValue* x = branch.eval("x = [1]");
     test_assert(cast_possible(x, unbox_type(typeT)));
 
     // Type T is defined the same way

@@ -126,7 +126,7 @@ void test_equals_function(std::string a, std::string b,
     }
 }
 
-void test_equals_function(TaggedValue* a, std::string b,
+void test_equals_function(TValue* a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
@@ -134,7 +134,7 @@ void test_equals_function(TaggedValue* a, std::string b,
             b, aText, bText, line, file);
 }
 
-void test_equals_function(TaggedValue* a, float b,
+void test_equals_function(TValue* a, float b,
         const char* aText, const char* bText,
         int line, const char* file)
 {

@@ -139,7 +139,7 @@ int count_static_errors(Branch* branch)
     return List::checkCast(&branch->staticErrors)->length();
 }
 
-void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
+void format_static_error(TValue* error, TValue* stringOutput)
 {
     List* item = List::checkCast(error);
     Term* term = as_ref(item->get(0));
@@ -191,9 +191,9 @@ void format_static_error(TaggedValue* error, TaggedValue* stringOutput)
     set_string(stringOutput, out.str());
 }
 
-void print_static_error(TaggedValue* value, std::ostream& out)
+void print_static_error(TValue* value, std::ostream& out)
 {
-    TaggedValue str;
+    TValue str;
     format_static_error(value, &str);
     out << as_string(&str);
 }
@@ -257,7 +257,7 @@ void mark_static_error(Term* term, const char* msg)
     term->setStringProp("error", msg);
 }
 
-void mark_static_error(Term* term, TaggedValue* error)
+void mark_static_error(Term* term, TValue* error)
 {
     term->setProp("error", error);
 }

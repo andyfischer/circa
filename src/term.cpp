@@ -128,9 +128,9 @@ bool Term::hasProperty(std::string const& name)
     return properties.contains(name.c_str());
 }
 
-TaggedValue* Term::addProperty(std::string const& name, Term* type)
+TValue* Term::addProperty(std::string const& name, Term* type)
 {
-    TaggedValue* prop = properties.insert(name.c_str());
+    TValue* prop = properties.insert(name.c_str());
     Type* valueType = unbox_type(type);
 
     if (!is_null(prop) && prop->value_type != valueType)
@@ -149,58 +149,58 @@ void Term::removeProperty(std::string const& name)
 
 bool Term::boolProp(std::string const& name)
 {
-    TaggedValue* t = addProperty(name, BOOL_TYPE);
+    TValue* t = addProperty(name, BOOL_TYPE);
     return as_bool(t);
 }
 int Term::intProp(std::string const& name)
 {
-    TaggedValue* t = addProperty(name, INT_TYPE);
+    TValue* t = addProperty(name, INT_TYPE);
     return as_int(t);
 }
 float Term::floatProp(std::string const& name)
 {
-    TaggedValue* t = addProperty(name, FLOAT_TYPE);
+    TValue* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
 std::string const& Term::stringProp(std::string const& name)
 {
-    TaggedValue* t = addProperty(name, STRING_TYPE);
+    TValue* t = addProperty(name, STRING_TYPE);
     return as_string(t);
 }
 
-void Term::setProp(const char* name, TaggedValue* value)
+void Term::setProp(const char* name, TValue* value)
 {
-    TaggedValue* t = addProperty(name, INT_TYPE);
+    TValue* t = addProperty(name, INT_TYPE);
     copy(value, t);
 }
 
 void Term::setIntProp(std::string const& name, int i)
 {
-    TaggedValue* t = addProperty(name, INT_TYPE);
+    TValue* t = addProperty(name, INT_TYPE);
     set_int(t, i);
 }
 
 void Term::setFloatProp(std::string const& name, float f)
 {
-    TaggedValue* t = addProperty(name, FLOAT_TYPE);
+    TValue* t = addProperty(name, FLOAT_TYPE);
     set_float(t, f);
 }
 
 void Term::setBoolProp(std::string const& name, bool b)
 {
-    TaggedValue* t = addProperty(name, BOOL_TYPE);
+    TValue* t = addProperty(name, BOOL_TYPE);
     set_bool(t, b);
 }
 
 void Term::setStringProp(std::string const& name, std::string const& s)
 {
-    TaggedValue* t = addProperty(name, STRING_TYPE);
+    TValue* t = addProperty(name, STRING_TYPE);
     set_string(t, s);
 }
 
 bool Term::boolPropOptional(std::string const& name, bool defaultValue)
 {
-    TaggedValue* value = term_get_property(this, name.c_str());
+    TValue* value = term_get_property(this, name.c_str());
     if (value == NULL)
         return defaultValue;
     else
@@ -209,7 +209,7 @@ bool Term::boolPropOptional(std::string const& name, bool defaultValue)
 
 float Term::floatPropOptional(std::string const& name, float defaultValue)
 {
-    TaggedValue* value = term_get_property(this, name.c_str());
+    TValue* value = term_get_property(this, name.c_str());
     if (value == NULL)
         return defaultValue;
     else
@@ -218,7 +218,7 @@ float Term::floatPropOptional(std::string const& name, float defaultValue)
 
 int Term::intPropOptional(std::string const& name, int defaultValue)
 {
-    TaggedValue* value = term_get_property(this, name.c_str());
+    TValue* value = term_get_property(this, name.c_str());
     if (value == NULL)
         return defaultValue;
     else
@@ -226,7 +226,7 @@ int Term::intPropOptional(std::string const& name, int defaultValue)
 }
 std::string Term::stringPropOptional(std::string const& name, std::string const& defaultValue)
 {
-    TaggedValue* value = term_get_property(this, name.c_str());
+    TValue* value = term_get_property(this, name.c_str());
     if (value == NULL)
         return defaultValue;
     else
@@ -260,7 +260,7 @@ static void append_term_invariant_error(List* errors, Term* term,
 void term_check_invariants(List* errors, Term* term)
 {
     if (term->value_type == NULL)
-        append_term_invariant_error(errors, term, "TaggedValue has null type");
+        append_term_invariant_error(errors, term, "TValue has null type");
 
     if (term->type != NULL) {
 
@@ -270,7 +270,7 @@ void term_check_invariants(List* errors, Term* term)
 
         if (!typeOk) {
             std::string msg;
-            msg += "TaggedValue has wrong type: term->type is " + term->type->name
+            msg += "TValue has wrong type: term->type is " + term->type->name
                 + ", tag is " + term->value_type->name;
             append_term_invariant_error(errors, term, msg);
         }
@@ -290,11 +290,11 @@ void term_check_invariants(List* errors, Term* term)
     }
 }
 
-void term_set_property(Term* term, const char* name, TaggedValue* value)
+void term_set_property(Term* term, const char* name, TValue* value)
 {
     swap(value, term->properties.insert(name));
 }
-TaggedValue* term_get_property(Term* term, const char* name)
+TValue* term_get_property(Term* term, const char* name)
 {
     return term->properties[name];
 }

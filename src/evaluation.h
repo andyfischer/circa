@@ -30,7 +30,7 @@ struct EvalContext
     Term* errorTerm;
 
     // Persistent state
-    TaggedValue state;
+    TValue state;
 
     // Intra-program messages
     Dict messages;
@@ -61,14 +61,14 @@ Frame* get_frame(EvalContext* context, int depth);
 Frame* get_frame_from_bottom(EvalContext* context, int index);
 Frame* push_frame(EvalContext* context, Branch* branch, List* registers);
 Frame* push_frame(EvalContext* context, Branch* branch);
-void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, TaggedValue** inputs);
+void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, TValue** inputs);
 void pop_frame(EvalContext* context);
 void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
 void reset_stack(EvalContext* context);
 
 // Pre-evaluation
-void fetch_input_pointers(EvalContext* context, Term* term, TaggedValue** buffer,
+void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer,
     int* ninputs, int* noutputs);
 
 // Evaluate a single term. This is not usually called directly, it's called
@@ -86,21 +86,21 @@ void evaluate_branch(Branch* branch);
 void evaluate_range(EvalContext* context, Branch* branch, int start, int end);
 
 // Evaluate 'term' and every term that it depends on.
-void evaluate_minimum(EvalContext* context, Term* term, TaggedValue* result);
+void evaluate_minimum(EvalContext* context, Term* term, TValue* result);
 
 // Parse input and immediately evaluate it, returning the result value.
-TaggedValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
-TaggedValue* evaluate(Branch* branch, Term* function, List* inputs);
-TaggedValue* evaluate(Term* function, List* inputs);
+TValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
+TValue* evaluate(Branch* branch, Term* function, List* inputs);
+TValue* evaluate(Term* function, List* inputs);
 
-TaggedValue* get_input(EvalContext* context, Term* term);
-void consume_input(EvalContext* context, Term* term, TaggedValue* dest);
+TValue* get_input(EvalContext* context, Term* term);
+void consume_input(EvalContext* context, Term* term, TValue* dest);
 
 Term* current_term(EvalContext* context);
-TaggedValue* get_register(EvalContext* context, Term* term);
+TValue* get_register(EvalContext* context, Term* term);
 
 // Signal that a runtime error has occurred.
-void raise_error(EvalContext* context, Term* term, TaggedValue* output, const char* msg);
+void raise_error(EvalContext* context, Term* term, TValue* output, const char* msg);
 void raise_error(EvalContext* context, const char* msg);
 void raise_error(EvalContext* context, std::string const& msg);
 

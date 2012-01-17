@@ -109,7 +109,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         if (!is_statement(assertions->get(i)))
             continue;
 
-        TaggedValue* result = assertions->get(i);
+        TValue* result = assertions->get(i);
 
         if (!is_bool(result))
             continue;

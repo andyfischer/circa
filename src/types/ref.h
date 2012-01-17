@@ -9,8 +9,8 @@ namespace ref_t {
 
 } // namespace ref_t
 
-Term* as_ref(TaggedValue* value);
-void set_ref(TaggedValue* value, Term* t);
+Term* as_ref(TValue* value);
+void set_ref(TValue* value, Term* t);
 
 } // namespace circa
 

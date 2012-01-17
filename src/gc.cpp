@@ -150,7 +150,7 @@ void gc_mark(GCReferenceList* refList, CircaObject* object, GCColor color)
     refList->refs[refList->count - 1] = object;
 }
 
-void gc_mark_tagged_value(GCReferenceList* list, TaggedValue* value, GCColor color)
+void gc_mark_tagged_value(GCReferenceList* list, TValue* value, GCColor color)
 {
     if (value->value_type != NULL)
         gc_mark(list, (CircaObject*) value->value_type, color);

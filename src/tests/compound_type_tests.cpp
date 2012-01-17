@@ -13,11 +13,11 @@ void test_cast()
 {
     Branch branch;
     Term* t = branch.compile("type T { string a }");
-    TaggedValue* a = branch.eval("['hi']");
+    TValue* a = branch.eval("['hi']");
     test_assert(is_list(a));
     test_assert(a->value_type != unbox_type(t));
 
-    TaggedValue casted;
+    TValue casted;
     test_assert(cast(a, unbox_type(t), &casted));
     test_assert(is_list(&casted));
     test_assert(casted.value_type == unbox_type(t));
@@ -36,7 +36,7 @@ void test_bug_with_cast()
     Branch branch;
     Term* type = branch.compile("type T {int x, int y, int z}");
 
-    TaggedValue castResult;
+    TValue castResult;
     cast(&value, unbox_type(type), &castResult);
 
     test_equals(&castResult, "[1, 72, 18]");

@@ -8,12 +8,12 @@
 
 namespace circa {
 namespace int_t {
-    void reset(Type*, TaggedValue* v)
+    void reset(Type*, TValue* v)
     {
         set_int(v, 0);
     }
 
-    bool equals(Type* type, TaggedValue* a, TaggedValue* b)
+    bool equals(Type* type, TValue* a, TValue* b)
     {
         if (is_float(b))
             return float_t::equals(type, a, b);
@@ -21,11 +21,11 @@ namespace int_t {
             return false;
         return as_int(a) == as_int(b);
     }
-    int hashFunc(TaggedValue* a)
+    int hashFunc(TValue* a)
     {
         return as_int(a);
     }
-    std::string to_string(TaggedValue* value)
+    std::string to_string(TValue* value)
     {
         std::stringstream strm;
         strm << as_int(value);

@@ -21,7 +21,7 @@ void Point::set(float x, float y)
     set_float(getIndex(1), y);
 }
 
-Point* Point::checkCast(TaggedValue* tv)
+Point* Point::checkCast(TValue* tv)
 {
     if (!is_list(tv)) return NULL;
     if (tv->numElements() != 2) return NULL;
@@ -31,7 +31,7 @@ Point* Point::checkCast(TaggedValue* tv)
 }
 
 Point*
-Point::cast(TaggedValue* val)
+Point::cast(TValue* val)
 {
     set_list(val, 2);
     set_float(val->getIndex(0), 0);
@@ -39,13 +39,13 @@ Point::cast(TaggedValue* val)
     return (Point*) val;
 }
 
-void set_point(TaggedValue* val, float x, float y)
+void set_point(TValue* val, float x, float y)
 {
     set_list(val, 2);
     set_float(val->getIndex(0), x);
     set_float(val->getIndex(1), y);
 }
-void get_point(TaggedValue* val, float* x, float* y)
+void get_point(TValue* val, float* x, float* y)
 {
     *x = to_float(get_index(val, 0));
     *y = to_float(get_index(val, 1));

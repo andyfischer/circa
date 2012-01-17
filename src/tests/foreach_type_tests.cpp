@@ -5,30 +5,30 @@
 namespace circa {
 namespace foreach_type_tests {
 
-bool run_test_for_type(Type* type, List& exampleTaggedValues)
+bool run_test_for_type(Type* type, List& exampleTValues)
 {
     Branch branch;
 
     // Copy to x
-    TaggedValue x;
-    copy(exampleTaggedValues[0], &x);
+    TValue x;
+    copy(exampleTValues[0], &x);
 
     // Copy again to cpy, check they are equal
-    TaggedValue cpy;
+    TValue cpy;
     copy(&x, &cpy);
     test_assert(equals(&x, &cpy));
     test_assert(equals(&cpy, &x));
 
     // Check if example 0 != example 1
-    TaggedValue y;
-    copy(exampleTaggedValues[1], &y);
+    TValue y;
+    copy(exampleTValues[1], &y);
     test_assert(!equals(&x,&y));
     test_assert(!equals(&y,&x));
 
     // Use 'equals' on a different type, check if we die
-    TaggedValue nullTaggedValue;
-    test_assert(!equals(&nullTaggedValue, &x));
-    test_assert(!equals(&x, &nullTaggedValue));
+    TValue nullTValue;
+    test_assert(!equals(&nullTValue, &x));
+    test_assert(!equals(&x, &nullTValue));
 
     // Reset, check equality.
     reset(&x);
@@ -36,7 +36,7 @@ bool run_test_for_type(Type* type, List& exampleTaggedValues)
     test_assert(equals(&x,&y));
 
     // use cast(), make sure the output is equal
-    TaggedValue castResult;
+    TValue castResult;
     cast(&x, type, &castResult);
     test_assert(equals(&x, &castResult));
 
@@ -46,7 +46,7 @@ bool run_test_for_type(Type* type, List& exampleTaggedValues)
 
     // Cast an integer to this type. This might cause an error but it shouldn't
     // crash.
-    TaggedValue one;
+    TValue one;
     set_int(&one, 1);
     cast(&one, type, &castResult);
 

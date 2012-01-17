@@ -9,13 +9,13 @@ namespace hashtable_methods_function {
 
     CA_FUNCTION(contains)
     {
-        TaggedValue* value = hashtable_t::get_value(INPUT(0), INPUT(1));
+        TValue* value = hashtable_t::get_value(INPUT(0), INPUT(1));
         set_bool(OUTPUT, value != NULL);
     }
 
     CA_FUNCTION(insert)
     {
-        TaggedValue key, value;
+        TValue key, value;
         CONSUME_INPUT(0, OUTPUT);
         CONSUME_INPUT(1, &key);
         CONSUME_INPUT(2, &value);
@@ -30,9 +30,9 @@ namespace hashtable_methods_function {
 
     CA_FUNCTION(get)
     {
-        TaggedValue* table = INPUT(0);
-        TaggedValue* key = INPUT(1);
-        TaggedValue* value = hashtable_t::get_value(table, key);
+        TValue* table = INPUT(0);
+        TValue* key = INPUT(1);
+        TValue* value = hashtable_t::get_value(table, key);
         if (value == NULL) {
             std::string msg = "Key not found: " + to_string(key);
             return RAISE_ERROR(msg.c_str());

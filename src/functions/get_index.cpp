@@ -17,7 +17,7 @@ namespace get_index_function {
             return RAISE_ERROR(indexStr);
         }
 
-        TaggedValue* result = get_index(INPUT(0), index);
+        TValue* result = get_index(INPUT(0), index);
 
         if (result == NULL) {
             std::stringstream err;

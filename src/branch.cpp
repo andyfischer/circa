@@ -414,7 +414,7 @@ void remove_nested_contents(Term* term)
     term->nestedContents = NULL;
 }
 
-void branch_get_source_filename(Branch* branch, TaggedValue* result)
+void branch_get_source_filename(Branch* branch, TValue* result)
 {
     List* fileOrigin = branch_get_file_origin(branch);
 
@@ -428,7 +428,7 @@ void branch_get_source_filename(Branch* branch, TaggedValue* result)
 
 std::string get_branch_source_filename(Branch* branch)
 {
-    TaggedValue val;
+    TValue val;
     branch_get_source_filename(branch, &val);
     if (is_string(&val))
         return as_string(&val);
@@ -461,7 +461,7 @@ void erase_term(Term* term)
 
     pre_erase_term(term);
 
-    set_null((TaggedValue*) term);
+    set_null((TValue*) term);
     set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;
@@ -599,8 +599,8 @@ Symbol load_script(Branch* branch, const char* filename)
     set_int(fileOrigin->get(2), get_modified_time(filename));
 
     // Read the text file
-    TaggedValue contents;
-    TaggedValue fileReadError;
+    TValue contents;
+    TValue fileReadError;
     read_text_file_to_value(filename, &contents, &fileReadError);
 
     if (!is_null(&fileReadError)) {

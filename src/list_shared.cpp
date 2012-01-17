@@ -26,13 +26,13 @@ void assert_valid_list(ListData* list)
 
 ListData* allocate_empty_list(int capacity)
 {
-    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TaggedValue));
+    ListData* result = (ListData*) malloc(sizeof(ListData) + capacity * sizeof(TValue));
     debug_register_valid_object(result, LIST_OBJECT);
 
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
-    memset(result->items, 0, capacity * sizeof(TaggedValue));
+    memset(result->items, 0, capacity * sizeof(TValue));
     for (int i=0; i < capacity; i++)
         initialize_null(&result->items[i]);
 
@@ -122,8 +122,8 @@ ListData* list_increase_capacity(ListData* original, int new_capacity)
 
     result->count = original->count;
     for (int i=0; i < result->count; i++) {
-        TaggedValue* left = &original->items[i];
-        TaggedValue* right = &result->items[i];
+        TValue* left = &original->items[i];
+        TValue* right = &result->items[i];
         if (createCopy)
             copy(left, right);
         else
@@ -179,7 +179,7 @@ ListData* list_resize(ListData* original, int numElements)
 
     return result;
 }
-TaggedValue* list_append(ListData** dataPtr)
+TValue* list_append(ListData** dataPtr)
 {
     if (*dataPtr == NULL) {
         *dataPtr = allocate_empty_list(1);
@@ -195,7 +195,7 @@ TaggedValue* list_append(ListData** dataPtr)
     return &data->items[data->count - 1];
 }
 
-TaggedValue* list_insert(ListData** dataPtr, int index)
+TValue* list_insert(ListData** dataPtr, int index)
 {
     list_append(dataPtr);
 
@@ -214,7 +214,7 @@ int list_size(ListData* data)
     return data->count;
 }
 
-TaggedValue* list_get_index(ListData* data, int index)
+TValue* list_get_index(ListData* data, int index)
 {
     if (data == NULL)
         return NULL;
@@ -222,9 +222,9 @@ TaggedValue* list_get_index(ListData* data, int index)
         return NULL;
     return &data->items[index];
 }
-void list_set_index(ListData* data, int index, TaggedValue* value)
+void list_set_index(ListData* data, int index, TValue* value)
 {
-    TaggedValue* dest = list_get_index(data, index);
+    TValue* dest = list_get_index(data, index);
     ca_assert(dest != NULL);
     copy(value, dest);
 }
@@ -276,14 +276,14 @@ std::string list_to_string(ListData* value)
     return out.str();
 }
 
-int list_size(TaggedValue* value)
+int list_size(TValue* value)
 {
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
         return 0;
     return s->count;
 }
-void list_slice(TaggedValue* original, int start, int end, TaggedValue* result)
+void list_slice(TValue* original, int start, int end, TValue* result)
 {
     if (end < 0)
         end = list_length(original) - end;
@@ -295,7 +295,7 @@ void list_slice(TaggedValue* original, int start, int end, TaggedValue* result)
         copy(list_get(original, i + start), list_get(result, i));
 }
 
-int list_get_length(TaggedValue* value)
+int list_get_length(TValue* value)
 {
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
@@ -303,22 +303,22 @@ int list_get_length(TaggedValue* value)
     return s->count;
 }
 
-int list_length(TaggedValue* value)
+int list_length(TValue* value)
 {
     return list_get_length(value);
 }
-TaggedValue* list_get(TaggedValue* value, int index)
+TValue* list_get(TValue* value, int index)
 {
     return list_get_index(value, index);
 }
 
-TaggedValue* list_get_index(TaggedValue* value, int index)
+TValue* list_get_index(TValue* value, int index)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
     return list_get_index((ListData*) value->value_data.ptr, index);
 }
 
-TaggedValue* list_get_index_from_end(TaggedValue* value, int reverseIndex)
+TValue* list_get_index_from_end(TValue* value, int reverseIndex)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
 
@@ -343,7 +343,7 @@ ListData* list_remove_index(ListData* original, int index)
     return result;
 }
 
-void list_remove_index(TaggedValue* list, int index)
+void list_remove_index(TValue* list, int index)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
     ListData* data = (ListData*) list->value_data.ptr;
@@ -351,7 +351,7 @@ void list_remove_index(TaggedValue* list, int index)
     list->value_data.ptr = data;
 }
 
-void list_resize(TaggedValue* list, int size)
+void list_resize(TValue* list, int size)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
     ListData* data = (ListData*) list->value_data.ptr;
@@ -359,36 +359,36 @@ void list_resize(TaggedValue* list, int size)
     list->value_data.ptr = data;
 }
 
-TaggedValue* list_append(TaggedValue* list)
+TValue* list_append(TValue* list)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
     ListData* data = (ListData*) list->value_data.ptr;
-    TaggedValue* result = list_append(&data);
+    TValue* result = list_append(&data);
     list->value_data.ptr = data;
     return result;
 }
-TaggedValue* list_insert(TaggedValue* list, int index)
+TValue* list_insert(TValue* list, int index)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
     ListData* data = (ListData*) list->value_data.ptr;
-    TaggedValue* result = list_insert(&data, index);
+    TValue* result = list_insert(&data, index);
     list->value_data.ptr = data;
     return result;
 }
 
-void list_remove_and_replace_with_last_element(TaggedValue* value, int index)
+void list_remove_and_replace_with_last_element(TValue* value, int index)
 {
     ca_assert(is_list(value));
     list_remove_and_replace_with_last_element((ListData**) &value->value_data, index);
 }
 
-void list_remove_nulls(TaggedValue* value)
+void list_remove_nulls(TValue* value)
 {
     ca_assert(is_list(value));
     list_remove_nulls((ListData**) &value->value_data);
 }
 
-ListType list_get_parameter_type(TaggedValue* parameter)
+ListType list_get_parameter_type(TValue* parameter)
 {
     if (is_null(parameter))
         return LIST_UNTYPED;
@@ -404,12 +404,12 @@ ListType list_get_parameter_type(TaggedValue* parameter)
     return LIST_INVALID_PARAMETER;
 }
 
-bool list_type_has_specific_size(TaggedValue* parameter)
+bool list_type_has_specific_size(TValue* parameter)
 {
     return is_list(parameter);
 }
 
-void list_initialize_parameter_from_type_decl(Branch* typeDecl, TaggedValue* parameter)
+void list_initialize_parameter_from_type_decl(Branch* typeDecl, TValue* parameter)
 {
     List& param = *set_list(parameter, 2);
     List& types = *set_list(param[0], typeDecl->length());
@@ -421,10 +421,10 @@ void list_initialize_parameter_from_type_decl(Branch* typeDecl, TaggedValue* par
     }
 }
 
-TaggedValue* list_get_type_list_from_type(Type* type)
+TValue* list_get_type_list_from_type(Type* type)
 {
     ca_assert(is_list_based_type(type));
-    TaggedValue* parameter = &type->parameter;
+    TValue* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
     case LIST_TYPED_SIZED:
@@ -440,10 +440,10 @@ TaggedValue* list_get_type_list_from_type(Type* type)
     return NULL;
 }
 
-TaggedValue* list_get_name_list_from_type(Type* type)
+TValue* list_get_name_list_from_type(Type* type)
 {
     ca_assert(is_list_based_type(type));
-    TaggedValue* parameter = &type->parameter;
+    TValue* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
     case LIST_TYPED_SIZED_NAMED:
@@ -464,7 +464,7 @@ Type* list_get_repeated_type_from_type(Type* type)
 }
 int list_find_field_index_by_name(Type* listType, std::string const& name)
 {
-    TaggedValue* nameList = list_get_name_list_from_type(listType);
+    TValue* nameList = list_get_name_list_from_type(listType);
     if (nameList == NULL)
         return -1;
 

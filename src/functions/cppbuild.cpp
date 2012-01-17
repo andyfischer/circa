@@ -22,7 +22,7 @@ namespace cppbuild_function {
         Branch buildFile;
         load_script(&buildFile, as_cstring(&filename));
 
-        TaggedValue* moduleName = buildFile["name"];
+        TValue* moduleName = buildFile["name"];
         if (moduleName == NULL)
             return RAISE_ERROR("'name' missing from build.ca'");
 
@@ -34,7 +34,7 @@ namespace cppbuild_function {
         std::string args = "-I${CIRCA_HOME}/src -rdynamic";
 
         // Compile flags
-        TaggedValue* cppflags = buildFile["cflags"];
+        TValue* cppflags = buildFile["cflags"];
         if (cppflags != NULL)
             args += " " + as_string(cppflags);
 
@@ -44,7 +44,7 @@ namespace cppbuild_function {
         args += " " + name + ".cpp";
 
         // Link flags
-        TaggedValue* linkflags = buildFile["linkflags"];
+        TValue* linkflags = buildFile["linkflags"];
         if (linkflags != NULL)
             args += " " + as_string(linkflags);
 

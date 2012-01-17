@@ -9,7 +9,7 @@ namespace set_methods_function {
     {
         copy(INPUT(0), OUTPUT);
         List* output = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
+        TValue* value = INPUT(1);
         if (!set_t::contains(output, value))
             copy(value, output->append());
     }
@@ -17,7 +17,7 @@ namespace set_methods_function {
     CA_FUNCTION(contains)
     {
         List* list = List::checkCast(INPUT(0));
-        TaggedValue* value = INPUT(1);
+        TValue* value = INPUT(1);
         set_bool(OUTPUT, set_t::contains(list, value));
     }
 
@@ -25,7 +25,7 @@ namespace set_methods_function {
     {
         copy(INPUT(0), OUTPUT);
         List* list = List::checkCast(OUTPUT);
-        TaggedValue* value = INPUT(1);
+        TValue* value = INPUT(1);
 
         int numElements = list->numElements();
         for (int index=0; index < numElements; index++) {

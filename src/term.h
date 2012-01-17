@@ -13,10 +13,10 @@
 
 namespace circa {
 
-struct Term : TaggedValue
+struct Term : TValue
 {
-    // Fields inherited from TaggedValue:
-    //   TaggedValue::Data value_data
+    // Fields inherited from TValue:
+    //   TValue::Data value_data
     //   Type* value_type
 
     // A WeakPtr to this object, this is lazily initialized.
@@ -104,7 +104,7 @@ struct Term : TaggedValue
     std::string toString();
 
     bool hasProperty(std::string const& name);
-    TaggedValue* addProperty(std::string const& name, Term* type);
+    TValue* addProperty(std::string const& name, Term* type);
     void removeProperty(std::string const& name);
 
     int intProp(std::string const& name);
@@ -112,7 +112,7 @@ struct Term : TaggedValue
     bool boolProp(std::string const& name);
     std::string const& stringProp(std::string const& name);
 
-    void setProp(const char* name, TaggedValue* value);
+    void setProp(const char* name, TValue* value);
     void setIntProp(std::string const& name, int i);
     void setFloatProp(std::string const& name, float f);
     void setBoolProp(std::string const& name, bool b);
@@ -129,11 +129,11 @@ Term* alloc_term();
 void dealloc_term(Term*);
 
 // Fetches a term property.
-TaggedValue* term_get_property(Term* term, const char* name);
+TValue* term_get_property(Term* term, const char* name);
 
 // Assigns a property with the given name and value. The argument 'value' is
 // consumed.
-void term_set_property(Term* term, const char* name, TaggedValue* value);
+void term_set_property(Term* term, const char* name, TValue* value);
 
 // Removes a term property.
 void term_remove_property(Term* term, const char* name);

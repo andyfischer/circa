@@ -124,7 +124,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
     finish_update_cascade(nested_contents(sub));
 }
 
-void store_locals(Branch* branch, TaggedValue* storageTv)
+void store_locals(Branch* branch, TValue* storageTv)
 {
     touch(storageTv);
     set_list(storageTv);
@@ -142,7 +142,7 @@ void store_locals(Branch* branch, TaggedValue* storageTv)
     }
 }
 
-void restore_locals(TaggedValue* storageTv, Branch* branch)
+void restore_locals(TValue* storageTv, Branch* branch)
 {
     if (!is_list(storageTv))
         internal_error("storageTv is not a list");
@@ -163,13 +163,13 @@ void restore_locals(TaggedValue* storageTv, Branch* branch)
     }
 }
 
-void call_subroutine(Branch* sub, TaggedValue* inputs, TaggedValue* output,
-                     TaggedValue* error)
+void call_subroutine(Branch* sub, TValue* inputs, TValue* output,
+                     TValue* error)
 {
     internal_error("call_subroutine no worky");
 }
 
-void call_subroutine(Term* sub, TaggedValue* inputs, TaggedValue* output, TaggedValue* error)
+void call_subroutine(Term* sub, TValue* inputs, TValue* output, TValue* error)
 {
     return call_subroutine(nested_contents(sub), inputs, output, error);
 }

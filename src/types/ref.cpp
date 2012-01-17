@@ -18,7 +18,7 @@ namespace ref_t {
         std::string globalName;
     };
 
-    std::string toString(TaggedValue* term)
+    std::string toString(TValue* term)
     {
         Term* t = as_ref(term);
         if (t == NULL)
@@ -26,36 +26,36 @@ namespace ref_t {
         else
             return global_id(t);
     }
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, TValue* value)
     {
         RobustRef* dupe = new RobustRef();
         dupe->weakPtr = 0;
         value->value_data.ptr = dupe;
     }
-    void release(Type*, TaggedValue* value)
+    void release(Type*, TValue* value)
     {
         delete (RobustRef*) value->value_data.ptr;
     }
-    void copy(Type*, TaggedValue* source, TaggedValue* dest)
+    void copy(Type*, TValue* source, TValue* dest)
     {
         change_type(dest, &REF_T);
         RobustRef* dupe = new RobustRef();
         *dupe = *(RobustRef*) source->value_data.ptr;
         dest->value_data.ptr = dupe;
     }
-    void reset(Type*, TaggedValue* value)
+    void reset(Type*, TValue* value)
     {
         RobustRef* robustRef = (RobustRef*) value->value_data.ptr;
         robustRef->weakPtr = 0;
         robustRef->globalName = "";
     }
-    bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
+    bool equals(Type*, TValue* lhs, TValue* rhs)
     {
         if (!is_ref(lhs) || !is_ref(rhs))
             return false;
         return as_ref(lhs) == as_ref(rhs);
     }
-    int hashFunc(TaggedValue* value)
+    int hashFunc(TValue* value)
     {
         return (int) (long(as_ref(value)) >> 3);
     }
@@ -79,7 +79,7 @@ namespace ref_t {
     }
 }
 
-Term* as_ref(TaggedValue* value)
+Term* as_ref(TValue* value)
 {
     ca_assert(is_ref(value));
     ref_t::RobustRef* robustRef = (ref_t::RobustRef*) value->value_data.ptr;
@@ -99,11 +99,11 @@ Term* as_ref(TaggedValue* value)
     return result;
 }
 
-void set_ref(TaggedValue* value, Term* t)
+void set_ref(TValue* value, Term* t)
 {
     #if DEBUG
     if (DEBUG_TRACE_ALL_REF_WRITES)
-        std::cout << "Writing " << t << " to TaggedValue " << value << std::endl;
+        std::cout << "Writing " << t << " to TValue " << value << std::endl;
     #endif
 
     change_type(value, &REF_T);

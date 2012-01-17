@@ -4,21 +4,21 @@
 
 namespace circa {
 
-struct String : public TaggedValue
+struct String : public TValue
 {
 };
 
 void string_setup_type(Type* type);
 
 // Append the two strings, saving the result in 'left'.
-void string_append(TaggedValue* left, TaggedValue* right);
-void string_append(TaggedValue* left, const char* right);
-void string_resize(TaggedValue* s, int length);
-bool string_eq(TaggedValue* s, const char* str);
-bool string_starts_with(TaggedValue* s, const char* beginning);
-bool string_ends_with(TaggedValue* s, const char* str);
+void string_append(TValue* left, TValue* right);
+void string_append(TValue* left, const char* right);
+void string_resize(TValue* s, int length);
+bool string_eq(TValue* s, const char* str);
+bool string_starts_with(TValue* s, const char* beginning);
+bool string_ends_with(TValue* s, const char* str);
 
-const char* as_cstring(TaggedValue* value);
-std::string const& as_string(TaggedValue* value);
+const char* as_cstring(TValue* value);
+std::string const& as_string(TValue* value);
 
 } // namespace circa

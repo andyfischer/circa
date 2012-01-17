@@ -29,7 +29,7 @@ struct Function
 
     std::string name;
     Term* feedbackFunc;
-    TaggedValue parameter;
+    TValue parameter;
     bool throws;
     bool createsStackFrame;
 
@@ -55,9 +55,9 @@ struct Function
 };
 
 namespace function_t {
-    void initialize(Type* type, TaggedValue* value);
-    void release(Type*, TaggedValue* value);
-    void copy(Type*, TaggedValue* source, TaggedValue* dest);
+    void initialize(Type* type, TValue* value);
+    void release(Type*, TValue* value);
+    void copy(Type*, TValue* source, TValue* dest);
 
     void setup_type(Type* type);
 }

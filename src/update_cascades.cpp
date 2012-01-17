@@ -32,7 +32,7 @@ List& initialize_pending_update_item(Term* term)
     }
 
     // Initialize the element at 'term'
-    TaggedValue* item = pendingUpdates->get(term->index);
+    TValue* item = pendingUpdates->get(term->index);
     if (is_null(item)) {
         List* itemList = List::cast(item, 2);
         set_int(itemList->get(0), 0);
@@ -77,7 +77,7 @@ void finish_update_cascade(Branch* branch)
             continue;
 
         Term* term = branch->get(index);
-        TaggedValue* item = pendingUpdates[index];
+        TValue* item = pendingUpdates[index];
         if (is_null(item))
             continue;
         List& itemList = *List::checkCast(item);

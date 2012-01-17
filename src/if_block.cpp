@@ -511,7 +511,7 @@ CA_FUNCTION(evaluate_if_block)
         //std::cout << "with stack: " << STACK->toString() << std::endl;
 
         // Look at input
-        TaggedValue* caseInput = get_input(context, caseTerm->input(0));
+        TValue* caseInput = get_input(context, caseTerm->input(0));
         
         if (caseTerm->input(0) == NULL || as_bool(caseInput)) {
 

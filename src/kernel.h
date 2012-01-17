@@ -134,8 +134,8 @@ extern Type GlobalVariableIsn_t;
 extern Type NullInputIsn_t;
 extern Type ImplicitStateInputIsn_t;
 
-extern TaggedValue TrueValue;
-extern TaggedValue FalseValue;
+extern TValue TrueValue;
+extern TValue FalseValue;
 
 extern Type* FILE_SIGNATURE_T;
 
@@ -157,14 +157,14 @@ namespace copy_function {
 
 namespace internal_debug_function {
     void oracle_clear();
-    void oracle_send(TaggedValue* value);
+    void oracle_send(TValue* value);
     void oracle_send(int i);
     void spy_clear();
     List* spy_results();
 }
 
 namespace file_changed_function {
-    bool check(EvalContext*, Term* caller, TaggedValue* fileSignature,
+    bool check(EvalContext*, Term* caller, TValue* fileSignature,
             std::string const& filename);
 }
 

@@ -26,12 +26,12 @@ double world_to_screen(double world) { return world * 10.0; }
 double radians_to_degrees(double radians) { return radians * 180.0 / M_PI; }
 double degrees_to_radians(double unit) { return unit * M_PI / 180.0; }
 
-void b2Vec2_to_point(b2Vec2 const& vec, TaggedValue* point)
+void b2Vec2_to_point(b2Vec2 const& vec, TValue* point)
 {
     set_point(point, world_to_screen(vec.x), world_to_screen(vec.y));
 }
 
-b2Vec2 point_to_b2Vec2(TaggedValue* point)
+b2Vec2 point_to_b2Vec2(TValue* point)
 {
     float x,y;
     get_point(point, &x, &y);
@@ -112,7 +112,7 @@ void initialize_world()
     }
 }
 
-b2Body* get_body_from_handle(TaggedValue* value)
+b2Body* get_body_from_handle(TValue* value)
 {
     Body* bodyHandle = (Body*) handle_t::get_ptr(value);
     if (bodyHandle == NULL)
@@ -120,7 +120,7 @@ b2Body* get_body_from_handle(TaggedValue* value)
     return bodyHandle->body;
 }
 
-bool is_valid_body_handle(TaggedValue* value)
+bool is_valid_body_handle(TValue* value)
 {
     return value->value_type == g_body_t
         && get_body_from_handle(value) != NULL;
@@ -156,7 +156,7 @@ CA_FUNCTION(box2d__create_body)
 
     int bodyType = INT_INPUT(0);
 
-    TaggedValue* initialPosition = INPUT(1);
+    TValue* initialPosition = INPUT(1);
     float initialRotation = as_float(INPUT(2));
 
     // Create a b2Body
@@ -401,9 +401,9 @@ void run_global_refcount_check()
 {
     std::cout << "run_global_refcount_check" << std::endl;
 
-    TaggedValue evalContext;
-    TaggedValue usersBranch;
-    TaggedValue runtimeBranch;
+    TValue evalContext;
+    TValue usersBranch;
+    TValue runtimeBranch;
         
     app::App* app = &app::get_global_app();
     set_transient_value(&evalContext, &app->_evalContext, &EVAL_CONTEXT_T);

@@ -142,7 +142,7 @@ Term* statically_infer_result(Branch* branch, Term* term)
     return create_symbol_value(branch, Unknown);
 }
 
-void statically_infer_result(Term* term, TaggedValue* result)
+void statically_infer_result(Term* term, TValue* result)
 {
     Branch scratch;
 

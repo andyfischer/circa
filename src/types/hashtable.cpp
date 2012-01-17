@@ -8,8 +8,8 @@ namespace circa {
 namespace hashtable_t {
 
 struct Slot {
-    TaggedValue key;
-    TaggedValue value;
+    TValue key;
+    TValue value;
 };
 
 struct Hashtable {
@@ -28,7 +28,7 @@ const float INITIAL_LOAD_FACTOR = 0.3;
 // The load at which we'll trigger a reallocation.
 const float MAX_LOAD_FACTOR = 0.75;
 
-int get_hash_value(TaggedValue* value)
+int get_hash_value(TValue* value)
 {
     Type::HashFunc f = value->value_type->hashFunc;
     if (f == NULL) {
@@ -127,7 +127,7 @@ Hashtable* duplicate(Hashtable* original)
 
 // Get the 'ideal' slot index, the place we would put this key if there is no
 // collision.
-int find_ideal_slot_index(Hashtable* data, TaggedValue* key)
+int find_ideal_slot_index(Hashtable* data, TValue* key)
 {
     ca_assert(data->capacity > 0);
     unsigned int hash = get_hash_value(key);
@@ -137,7 +137,7 @@ int find_ideal_slot_index(Hashtable* data, TaggedValue* key)
 // Insert the given key into the dictionary, returns the index.
 // This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int table_insert(Hashtable** dataPtr, TaggedValue* key, bool swapKey)
+int table_insert(Hashtable** dataPtr, TValue* key, bool swapKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
@@ -178,13 +178,13 @@ int table_insert(Hashtable** dataPtr, TaggedValue* key, bool swapKey)
     return index;
 }
 
-void insert_value(Hashtable** dataPtr, TaggedValue* key, TaggedValue* value)
+void insert_value(Hashtable** dataPtr, TValue* key, TValue* value)
 {
     int index = table_insert(dataPtr, key, false);
     copy(value, &(*dataPtr)->slots[index].value);
 }
 
-int find_key(Hashtable* data, TaggedValue* key)
+int find_key(Hashtable* data, TValue* key)
 {
     if (data == NULL)
         return -1;
@@ -206,20 +206,20 @@ int find_key(Hashtable* data, TaggedValue* key)
     return index;
 }
 
-TaggedValue* get_value(Hashtable* data, TaggedValue* key)
+TValue* get_value(Hashtable* data, TValue* key)
 {
     int index = find_key(data, key);
     if (index == -1) return NULL;
     return &data->slots[index].value;
 }
 
-TaggedValue* get_index(Hashtable* data, int index)
+TValue* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);
     return &data->slots[index].value;
 }
 
-void remove(Hashtable* data, TaggedValue* key)
+void remove(Hashtable* data, TValue* key)
 {
     int index = find_key(data, key);
     if (index == -1)
@@ -302,7 +302,7 @@ void debug_print(Hashtable* data)
     }
 }
 
-void iterator_start(Hashtable* data, TaggedValue* iterator)
+void iterator_start(Hashtable* data, TValue* iterator)
 {
     if (data == NULL || data->count == 0)
         return set_null(iterator);
@@ -314,7 +314,7 @@ void iterator_start(Hashtable* data, TaggedValue* iterator)
         iterator_next(data, iterator);
 }
 
-void iterator_next(Hashtable* data, TaggedValue* iterator)
+void iterator_next(Hashtable* data, TValue* iterator)
 {
     int i = as_int(iterator);
 
@@ -329,7 +329,7 @@ void iterator_next(Hashtable* data, TaggedValue* iterator)
         set_int(iterator, next);
 }
 
-void iterator_get(Hashtable* data, TaggedValue* iterator, TaggedValue** key, TaggedValue** value)
+void iterator_get(Hashtable* data, TValue* iterator, TValue** key, TValue** value)
 {
     int i = as_int(iterator);
 
@@ -339,58 +339,58 @@ void iterator_get(Hashtable* data, TaggedValue* iterator, TaggedValue** key, Tag
 
 namespace tagged_value_wrappers {
 
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, TValue* value)
     {
         value->value_data.ptr = NULL;
     }
-    void release(Type*, TaggedValue* value)
+    void release(Type*, TValue* value)
     {
         free_table((Hashtable*) value->value_data.ptr);
     }
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TValue* source, TValue* dest)
     {
         change_type(dest, type);
         dest->value_data.ptr = duplicate((Hashtable*) source->value_data.ptr);
     }
-    std::string to_string(TaggedValue* value)
+    std::string to_string(TValue* value)
     {
         return to_string((Hashtable*) value->value_data.ptr);
     }
-    TaggedValue* get_field(TaggedValue* value, const char* field)
+    TValue* get_field(TValue* value, const char* field)
     {
-        TaggedValue fieldStr;
+        TValue fieldStr;
         set_string(&fieldStr, field);
         return hashtable_t::get_value((Hashtable*) value->value_data.ptr, &fieldStr);
     }
 } // namespace tagged_value_wrappers
 
 // Public API
-bool is_hashtable(TaggedValue* value)
+bool is_hashtable(TValue* value)
 {
     return value->value_type->initialize == tagged_value_wrappers::initialize;
 }
 
-TaggedValue* get_value(TaggedValue* table, TaggedValue* key)
+TValue* get_value(TValue* table, TValue* key)
 {
     ca_assert(is_hashtable(table));
     return get_value((Hashtable*) table->value_data.ptr, key);
 }
 
-void table_insert(TaggedValue* tableTv, TaggedValue* key, TaggedValue* value,
-        bool swapKey, bool swapTaggedValue)
+void table_insert(TValue* tableTv, TValue* key, TValue* value,
+        bool swapKey, bool swapTValue)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     int index = table_insert(&table, key, swapKey);
 
-    TaggedValue* slot = &table->slots[index].value;
+    TValue* slot = &table->slots[index].value;
     if (swapKey)
         swap(value, slot);
     else
         copy(value, slot);
 }
 
-void table_remove(TaggedValue* tableTv, TaggedValue* key)
+void table_remove(TValue* tableTv, TValue* key)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;

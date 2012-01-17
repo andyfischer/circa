@@ -65,7 +65,7 @@ std::string get_input_syntax_hint_optional(Term* term, int index, const char* fi
         std::string const& defaultValue);
 void set_input_syntax_hint(Term* term, int index, const char* field,
         std::string const& value);
-void set_input_syntax_hint(Term* term, int index, const char* field, TaggedValue* value);
+void set_input_syntax_hint(Term* term, int index, const char* field, TValue* value);
 
 // Mark the given term as hidden from source reproduction.
 void hide_from_source(Term* term);

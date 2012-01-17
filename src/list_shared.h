@@ -12,7 +12,7 @@ struct ListData {
     int refCount;
     int count;
     int capacity;
-    TaggedValue items[0];
+    TValue items[0];
     // items has size [capacity].
 
     std::string toStr();
@@ -28,26 +28,26 @@ ListData* list_duplicate(ListData* source);
 ListData* list_increase_capacity(ListData* original, int new_capacity);
 ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
-TaggedValue* list_append(ListData** dataPtr);
-TaggedValue* list_insert(ListData** dataPtr, int index);
+TValue* list_append(ListData** dataPtr);
+TValue* list_insert(ListData** dataPtr, int index);
 int list_size(ListData* data);
-TaggedValue* list_get_index(ListData* data, int index);
-void list_set_index(ListData* data, int index, TaggedValue* value);
+TValue* list_get_index(ListData* data, int index);
+void list_set_index(ListData* data, int index, TValue* value);
 
-int list_get_length(TaggedValue* value);
-int list_size(TaggedValue* value);
-int list_length(TaggedValue* value);
-TaggedValue* list_get(TaggedValue* value, int index);
-TaggedValue* list_get_index(TaggedValue* value, int index);
-TaggedValue* list_get_index_from_end(TaggedValue* value, int index);
-void list_remove_index(TaggedValue* list, int index);
-void list_resize(TaggedValue* list, int size);
-TaggedValue* list_append(TaggedValue* list);
-TaggedValue* list_insert(TaggedValue* list, int index);
-void list_remove_and_replace_with_last_element(TaggedValue* list, int index);
-void list_remove_nulls(TaggedValue* list);
+int list_get_length(TValue* value);
+int list_size(TValue* value);
+int list_length(TValue* value);
+TValue* list_get(TValue* value, int index);
+TValue* list_get_index(TValue* value, int index);
+TValue* list_get_index_from_end(TValue* value, int index);
+void list_remove_index(TValue* list, int index);
+void list_resize(TValue* list, int size);
+TValue* list_append(TValue* list);
+TValue* list_insert(TValue* list, int index);
+void list_remove_and_replace_with_last_element(TValue* list, int index);
+void list_remove_nulls(TValue* list);
 std::string list_to_string(ListData* value);
-void list_slice(TaggedValue* original, int start, int end, TaggedValue* result);
+void list_slice(TValue* original, int start, int end, TValue* result);
 
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
@@ -62,18 +62,18 @@ enum ListType
     LIST_TYPED_SIZED_NAMED
 };
 
-ListType list_get_parameter_type(TaggedValue* parameter);
-bool list_type_has_specific_size(TaggedValue* parameter);
-void list_initialize_parameter_from_type_decl(Branch* typeDecl, TaggedValue* parameter);
+ListType list_get_parameter_type(TValue* parameter);
+bool list_type_has_specific_size(TValue* parameter);
+void list_initialize_parameter_from_type_decl(Branch* typeDecl, TValue* parameter);
 
 // For a List-based type, this returns the list of types that the elements will
 // have. This result is only valid for fixed-size List types, otherwise it will
 // return NULL.
-TaggedValue* list_get_type_list_from_type(Type* type);
+TValue* list_get_type_list_from_type(Type* type);
 
 // For a List-based type, this returns the list of element names. This is only
 // valid for a typed_sized_named list, otherwise it will return NULL.
-TaggedValue* list_get_name_list_from_type(Type* type);
+TValue* list_get_name_list_from_type(Type* type);
 
 // For a List-based type, this returns the type of each element. This is only
 // valid for a typed_unsized list.

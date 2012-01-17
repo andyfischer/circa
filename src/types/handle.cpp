@@ -22,7 +22,7 @@
 namespace circa {
 namespace handle_t {
 
-    void set(TaggedValue* handle, Type* type, TaggedValue* userdata)
+    void set(TValue* handle, Type* type, TValue* userdata)
     {
         change_type(handle, type);
         handle->value_data.ptr = allocate_list(1);
@@ -38,32 +38,32 @@ namespace handle_t {
             << std::endl;
         #endif
     }
-    void set(TaggedValue* handle, Type* type, void* opaquePointer)
+    void set(TValue* handle, Type* type, void* opaquePointer)
     {
-        TaggedValue value;
+        TValue value;
         set_opaque_pointer(&value, opaquePointer);
         set(handle, type, &value);
     }
-    TaggedValue* get(TaggedValue* handle)
+    TValue* get(TValue* handle)
     {
         return list_get_index(handle, 0);
     }
-    void* get_ptr(TaggedValue* value)
+    void* get_ptr(TValue* value)
     {
         return as_opaque_pointer(get(value));
     }
-    int refcount(TaggedValue* value)
+    int refcount(TValue* value)
     {
         ListData* data = (ListData*) value->value_data.ptr;
         return data->refCount;
     }
 
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, TValue* value)
     {
         value->value_data.ptr = NULL;
         //internal_error("don't call simple_handle::initialize");
     }
-    void release(Type* type, TaggedValue* value)
+    void release(Type* type, TValue* value)
     {
         ListData* data = (ListData*) value->value_data.ptr;
 
@@ -83,7 +83,7 @@ namespace handle_t {
 
         if (data->refCount == 0) {
 
-            TaggedValue* userdata = list_get_index(value, 0);
+            TValue* userdata = list_get_index(value, 0);
 
             if (!is_null(&type->parameter)) {
                 OnRelease onReleaseFunc = (OnRelease) as_opaque_pointer(&type->parameter);
@@ -102,7 +102,7 @@ namespace handle_t {
             value->value_data.ptr = NULL;
         }
     }
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TValue* source, TValue* dest)
     {
         change_type(dest, type);
         dest->value_data = source->value_data;
@@ -124,10 +124,10 @@ namespace handle_t {
             << data->refCount << std::endl;
         #endif
     }
-    void visitHeap(Type* type, TaggedValue* handle, Type::VisitHeapCallback callback,
-            TaggedValue* context)
+    void visitHeap(Type* type, TValue* handle, Type::VisitHeapCallback callback,
+            TValue* context)
     {
-        TaggedValue relativeIdentifier;
+        TValue relativeIdentifier;
         set_int(&relativeIdentifier, 0);
         callback(list_get_index(handle, 0), &relativeIdentifier, context);
     }

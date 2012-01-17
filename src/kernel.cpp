@@ -155,8 +155,8 @@ Type GlobalVariableIsn_t;
 Type NullInputIsn_t;
 Type ImplicitStateInputIsn_t;
 
-TaggedValue TrueValue;
-TaggedValue FalseValue;
+TValue TrueValue;
+TValue FalseValue;
 
 Type* FILE_SIGNATURE_T;
 
@@ -165,7 +165,7 @@ namespace cppbuild_function { CA_FUNCTION(build_module); }
 // Standard library functions
 CA_FUNCTION(evaluate_output_placeholder)
 {
-    TaggedValue* in = INPUT(0);
+    TValue* in = INPUT(0);
     if (in == NULL)
         set_null(OUTPUT);
     else
@@ -187,7 +187,7 @@ CA_FUNCTION(file__modified_time)
 CA_FUNCTION(input_func)
 {
     int index = INT_INPUT(0);
-    TaggedValue* input = CONTEXT->argumentList.getLast()->getIndex(index);
+    TValue* input = CONTEXT->argumentList.getLast()->getIndex(index);
     if (input == NULL)
         return RAISE_ERROR("invalid input index");
     copy(input, OUTPUT);
@@ -228,7 +228,7 @@ CA_FUNCTION(length)
     set_int(OUTPUT, num_elements(INPUT(0)));
 }
 
-std::string stackVariable_toString(TaggedValue* value)
+std::string stackVariable_toString(TValue* value)
 {
     short relativeFrame = value->value_data.asint >> 16;
     short index = (value->value_data.asint & 0xffff);
@@ -318,7 +318,7 @@ void bootstrap_kernel()
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;
     valueFunc->function = valueFunc;
-    create(&FUNCTION_T, (TaggedValue*)valueFunc);
+    create(&FUNCTION_T, (TValue*)valueFunc);
 
     function_t::initialize(&FUNCTION_T, valueFunc);
     initialize_function(valueFunc);

@@ -8,21 +8,21 @@
 namespace circa {
 namespace handle_t {
 
-    typedef void (*OnRelease)(TaggedValue* data);
+    typedef void (*OnRelease)(TValue* data);
 
     // Initialize the given handle with a value. The value is consumed by this call.
-    void set(TaggedValue* handle, Type* type, TaggedValue* value /* consumed */);
+    void set(TValue* handle, Type* type, TValue* value /* consumed */);
 
     // Convenience function to initalize a handle with an opaque pointer value.
-    void set(TaggedValue* handle, Type* type, void* opaquePointer);
+    void set(TValue* handle, Type* type, void* opaquePointer);
 
-    TaggedValue* get(TaggedValue* value);
-    void* get_ptr(TaggedValue* value);
-    int refcount(TaggedValue* value);
+    TValue* get(TValue* value);
+    void* get_ptr(TValue* value);
+    int refcount(TValue* value);
     void setup_type(Type* type);
 
     template <typename T>
-    T* create(TaggedValue* value, Type* type)
+    T* create(TValue* value, Type* type)
     {
         T* obj = new T();
         set(value, type, obj);
@@ -30,7 +30,7 @@ namespace handle_t {
     }
 
     template <typename T>
-    void templated_release_func(TaggedValue* value)
+    void templated_release_func(TValue* value)
     {
         T* object = (T*) as_opaque_pointer(value);
         delete object;
@@ -70,12 +70,12 @@ public:
 
         handle_t::setup_type<T>(type);
     }
-    void set(TaggedValue* tv, T* value)
+    void set(TValue* tv, T* value)
     {
         ca_assert(type != NULL);
         handle_t::set(tv, type, value);
     }
-    T* get(TaggedValue* tv)
+    T* get(TValue* tv)
     {
         return (T*) handle_t::get_ptr(tv);
     }

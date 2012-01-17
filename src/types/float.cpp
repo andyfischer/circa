@@ -7,12 +7,12 @@
 
 namespace circa {
 namespace float_t {
-    void reset(Type*, TaggedValue* value)
+    void reset(Type*, TValue* value)
     {
         set_float(value, 0);
     }
-    void cast(CastResult* result, TaggedValue* source, Type* type,
-        TaggedValue* dest, bool checkOnly)
+    void cast(CastResult* result, TValue* source, Type* type,
+        TValue* dest, bool checkOnly)
     {
         if (!(is_int(source) || is_float(source))) {
             result->success = false;
@@ -25,13 +25,13 @@ namespace float_t {
         set_float(dest, to_float(source));
     }
 
-    bool equals(Type*, TaggedValue* a, TaggedValue* b)
+    bool equals(Type*, TValue* a, TValue* b)
     {
         if (!is_float(b) && !is_int(b))
             return false;
         return to_float(a) == to_float(b);
     }
-    std::string to_string(TaggedValue* value)
+    std::string to_string(TValue* value)
     {
         std::stringstream out;
         out << as_float(value);

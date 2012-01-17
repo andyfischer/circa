@@ -54,27 +54,27 @@ const char* symbol_get_text(Symbol symbol)
 
 void symbol_get_text(Symbol symbol, String* string)
 {
-    set_string((TaggedValue*) string, symbol_get_text(symbol));
+    set_string((TValue*) string, symbol_get_text(symbol));
 }
 
-Symbol as_symbol(TaggedValue* tv)
+Symbol as_symbol(TValue* tv)
 {
     return tv->value_data.asint;
 }
 
-void symbol_value(Symbol name, TaggedValue* tv)
+void symbol_value(Symbol name, TValue* tv)
 {
     set_null(tv);
     tv->value_type = &SYMBOL_T;
     tv->value_data.asint = name;
 }
 
-void symbol_value(TaggedValue* tv, Symbol name)
+void symbol_value(TValue* tv, Symbol name)
 {
     symbol_value(name, tv);
 }
 
-void set_symbol(TaggedValue* tv, Symbol val)
+void set_symbol(TValue* tv, Symbol val)
 {
     set_null(tv);
     tv->value_type = &SYMBOL_T;

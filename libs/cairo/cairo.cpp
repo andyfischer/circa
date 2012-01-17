@@ -19,50 +19,50 @@ Type *g_cairoContext_t;
 Type *g_cairoSurface_t;
 Type *g_cairoFontFace_t;
 
-cairo_t* as_cairo_context(TaggedValue* value)
+cairo_t* as_cairo_context(TValue* value)
 {
     return (cairo_t*) get_pointer(value, g_cairoContext_t);
 }
 
-cairo_surface_t* as_cairo_surface(TaggedValue* value)
+cairo_surface_t* as_cairo_surface(TValue* value)
 {
     return (cairo_surface_t*) get_pointer(value, g_cairoSurface_t);
 }
 
-cairo_font_face_t* as_cairo_font_face(TaggedValue* value)
+cairo_font_face_t* as_cairo_font_face(TValue* value)
 {
     return (cairo_font_face_t*) get_pointer(value, g_cairoFontFace_t);
 }
 
-void cairoContext_copy(Type*, TaggedValue* source, TaggedValue* dest)
+void cairoContext_copy(Type*, TValue* source, TValue* dest)
 {
     cairo_t* context = as_cairo_context(source);
     cairo_reference(context);
     set_pointer(dest, g_cairoContext_t, context);
 }
-void cairoContext_release(Type*, TaggedValue* value)
+void cairoContext_release(Type*, TValue* value)
 {
     cairo_t* context = as_cairo_context(value);
     cairo_destroy(context);
 }
-void cairoSurface_copy(Type*, TaggedValue* source, TaggedValue* dest)
+void cairoSurface_copy(Type*, TValue* source, TValue* dest)
 {
     cairo_surface_t* surface = as_cairo_surface(source);
     cairo_surface_reference(surface);
     set_pointer(dest, g_cairoSurface_t, surface);
 }
-void cairoSurface_release(Type*, TaggedValue* value)
+void cairoSurface_release(Type*, TValue* value)
 {
     cairo_surface_t* surface = as_cairo_surface(value);
     cairo_surface_destroy(surface);
 }
-void cairoFontFace_copy(Type*, TaggedValue* source, TaggedValue* dest)
+void cairoFontFace_copy(Type*, TValue* source, TValue* dest)
 {
     cairo_font_face_t* font = as_cairo_font_face(source);
     cairo_font_face_reference(font);
     set_pointer(dest, g_cairoFontFace_t, font);
 }
-void cairoFontFace_release(Type*, TaggedValue* value)
+void cairoFontFace_release(Type*, TValue* value)
 {
     cairo_font_face_t* font = as_cairo_font_face(value);
     cairo_font_face_destroy(font);
@@ -138,7 +138,7 @@ CA_FUNCTION(cairo__Context_set_operator)
 CA_FUNCTION(cairo__create_image_surface)
 {
     // user can't currently specify the format
-    TaggedValue* size = INPUT(0);
+    TValue* size = INPUT(0);
     int width = to_int(list_get_index(size, 0));
     int height = to_int(list_get_index(size, 1));
 

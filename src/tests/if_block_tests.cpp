@@ -34,7 +34,7 @@ void test_if_joining_on_bool()
     // The following code once had a bug where cond wouldn't work
     // if one of its inputs was missing value.
     Branch branch;
-    TaggedValue* s = branch.eval("hey = true");
+    TValue* s = branch.eval("hey = true");
 
     test_assert(s->value_data.ptr != NULL);
 
@@ -230,7 +230,7 @@ void test_state_simple()
     finish_branch(&branch);
     evaluate_branch(&context, &branch);
 
-    TaggedValue *i = context.state.getField("_if_block")->getIndex(0)->getField("i");
+    TValue *i = context.state.getField("_if_block")->getIndex(0)->getField("i");
     test_assert(i != NULL);
     test_assert(as_int(i) == 1);
     evaluate_branch(&context, &branch);

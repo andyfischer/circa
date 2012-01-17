@@ -150,7 +150,7 @@ int run_command_line(List* args)
         }
 
         Branch workspace;
-        TaggedValue* result = workspace.eval(as_cstring(&command));
+        TValue* result = workspace.eval(as_cstring(&command));
         std::cout << result->toString() << std::endl;
         return 0;
     }
@@ -264,7 +264,7 @@ int run_command_line(List* args)
 
     // C++ gen
     if (string_eq(args->get(0), "-cppgen")) {
-        TaggedValue remainingArgs;
+        TValue remainingArgs;
         list_slice(args, 1, -1, &remainingArgs);
         run_generate_cpp(&remainingArgs);
         return 0;

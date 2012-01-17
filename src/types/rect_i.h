@@ -4,10 +4,10 @@
 
 namespace circa {
 
-struct Rect_i : TaggedValue
+struct Rect_i : TValue
 {
     void set(int x1, int y1, int x2, int y2);
-    static Rect_i* cast(TaggedValue* tv);
+    static Rect_i* cast(TValue* tv);
 };
 
 } // namespace circa

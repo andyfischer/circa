@@ -62,7 +62,7 @@ void test_builtin_equals()
 void test_list()
 {
     Branch branch;
-    TaggedValue* l = branch.eval("l = list(1,2,'foo')");
+    TValue* l = branch.eval("l = list(1,2,'foo')");
 
     test_assert(l->getIndex(0)->asInt() == 1);
     test_assert(l->getIndex(1)->asInt() == 2);

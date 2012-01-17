@@ -9,7 +9,7 @@ namespace circa {
 void check_for_static_errors(List* result, Branch* branch);
 void update_static_error_list(Branch* branch);
 
-void format_static_error(TaggedValue* error, TaggedValue* stringOutput);
+void format_static_error(TValue* error, TValue* stringOutput);
 
 // Print each static error to 'out'. Returns true if there were any static errors.
 bool print_static_errors_formatted(List* result, std::ostream& out);
@@ -26,6 +26,6 @@ std::string get_static_errors_formatted(Branch* branch);
 std::string get_static_error_message(Term* term);
 
 void mark_static_error(Term* term, const char* msg);
-void mark_static_error(Term* term, TaggedValue* error);
+void mark_static_error(Term* term, TValue* error);
 
 } // namespace circ

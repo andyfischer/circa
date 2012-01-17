@@ -48,15 +48,15 @@ struct TermMap;
 struct StaticTypeQuery;
 struct String;
 struct StyledSource;
-struct TaggedValue;
+struct TValue;
 struct Term;
 struct TermList;
 struct Type;
 
 typedef Term* TermPtr;
-typedef bool (*TermVisitor)(Term* term, TaggedValue* context);
+typedef bool (*TermVisitor)(Term* term, TValue* context);
 
-// Variant value used in many places, including in TaggedValue:
+// Variant value used in many places, including in TValue:
 union VariantValue {
     int asint;
     float asfloat;
@@ -67,9 +67,9 @@ union VariantValue {
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \
-    void fname(circa::EvalContext* _cxt, int _ninputs, int _noutputs, TaggedValue** _vals)
+    void fname(circa::EvalContext* _cxt, int _ninputs, int _noutputs, TValue** _vals)
 
-typedef void (*EvaluateFunc)(EvalContext* cxt, int ninputs, int noutputs, TaggedValue** values);
+typedef void (*EvaluateFunc)(EvalContext* cxt, int ninputs, int noutputs, TValue** values);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);

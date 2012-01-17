@@ -272,8 +272,8 @@ void test_duplicate_get_field_by_name()
 void test_duplicate_destination_has_different_type()
 {
     Branch source, dest;
-    TaggedValue* a = source.eval("a = any()");
-    TaggedValue* p = source.eval("p = Point()");
+    TValue* a = source.eval("a = any()");
+    TValue* p = source.eval("p = Point()");
     copy(p,a);
     // This once tripped an assert:
     duplicate_branch(&source, &dest);

@@ -35,8 +35,8 @@ void run_file_checker(const char* filename, List* errors)
     // Fetch the file as a string
     std::string actualSource;
     {
-        TaggedValue fileContents;
-        TaggedValue fileReadError;
+        TValue fileContents;
+        TValue fileReadError;
         read_text_file_to_value(filename, &fileContents, &fileReadError);
         if (!is_null(&fileReadError)) {
             std::stringstream msg;

@@ -13,7 +13,7 @@
 
 namespace circa {
 
-std::string& as_std_string(TaggedValue* value);
+std::string& as_std_string(TValue* value);
 
 #if 0
 namespace new_string_t {
@@ -78,26 +78,26 @@ StringData* touch(StringData* original)
 
 namespace string_t {
 
-    void initialize(Type* type, TaggedValue* value)
+    void initialize(Type* type, TValue* value)
     {
         set_pointer(value, new std::string());
     }
-    void release(Type*, TaggedValue* value)
+    void release(Type*, TValue* value)
     {
         delete ((std::string*) get_pointer(value));
         set_pointer(value, NULL);
     }
 
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TValue* source, TValue* dest)
     {
         create(type, dest);
         *((std::string*) dest->value_data.ptr) = as_string(source);
     }
-    void reset(TaggedValue* v)
+    void reset(TValue* v)
     {
         set_string(v, "");
     }
-    int hashFunc(TaggedValue* v)
+    int hashFunc(TValue* v)
     {
         const char* str = as_cstring(v);
 
@@ -112,13 +112,13 @@ namespace string_t {
         return result;
     }
 
-    bool equals(Type*, TaggedValue* lhs, TaggedValue* rhs)
+    bool equals(Type*, TValue* lhs, TValue* rhs)
     {
         if (!is_string(rhs)) return false;
         return as_string(lhs) == as_string(rhs);
     }
 
-    std::string to_string(TaggedValue* value)
+    std::string to_string(TValue* value)
     {
         std::stringstream result;
         result << "'" << as_string(value) << "'";
@@ -158,27 +158,27 @@ void string_setup_type(Type* type)
     type->formatSource = string_t::format_source;
 }
 
-void string_append(TaggedValue* left, TaggedValue* right)
+void string_append(TValue* left, TValue* right)
 {
     as_std_string(left) += as_string(right);
 }
-void string_append(TaggedValue* left, const char* right)
+void string_append(TValue* left, const char* right)
 {
     as_std_string(left) += right;
 }
-void string_resize(TaggedValue* s, int length)
+void string_resize(TValue* s, int length)
 {
     if (length < 0)
         length = as_std_string(s).size() + length;
 
     as_std_string(s).resize(length, ' ');
 }
-bool string_eq(TaggedValue* s, const char* str)
+bool string_eq(TValue* s, const char* str)
 {
     return as_std_string(s) == str;
 }
 
-bool string_starts_with(TaggedValue* s, const char* beginning)
+bool string_starts_with(TValue* s, const char* beginning)
 {
     const char* left = as_cstring(s);
     for (int i=0;; i++) {
@@ -188,7 +188,7 @@ bool string_starts_with(TaggedValue* s, const char* beginning)
             return false;
     }
 }
-bool string_ends_with(TaggedValue* s, const char* ending)
+bool string_ends_with(TValue* s, const char* ending)
 {
     int ending_len = strlen(ending);
     std::string& str = as_std_string(s);
@@ -201,19 +201,19 @@ bool string_ends_with(TaggedValue* s, const char* ending)
     return true;
 }
 
-std::string& as_std_string(TaggedValue* value)
+std::string& as_std_string(TValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return *((std::string*) value->value_data.ptr);
 }
 
-std::string const& as_string(TaggedValue* value)
+std::string const& as_string(TValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return *((std::string*) value->value_data.ptr);
 }
 
-const char* as_cstring(TaggedValue* value)
+const char* as_cstring(TValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return ((std::string*) value->value_data.ptr)->c_str();

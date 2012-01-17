@@ -80,7 +80,7 @@ CA_FUNCTION(opengl__new_texture_handle)
     set_int(OUTPUT, texture_id);
 }
 
-void write_2d_vector_list_to_buffer(TaggedValue* list, GLfloat* buffer)
+void write_2d_vector_list_to_buffer(TValue* list, GLfloat* buffer)
 {
     int numElements = list->numElements();
     int write = 0;
@@ -94,7 +94,7 @@ void write_2d_vector_list_to_buffer(TaggedValue* list, GLfloat* buffer)
     }
 }
 
-void set_gl_color(TaggedValue* color)
+void set_gl_color(TValue* color)
 {
     glColor4f(color->getIndex(0)->toFloat(),
               color->getIndex(1)->toFloat(),
@@ -109,8 +109,8 @@ void clear_gl_color()
 
 CA_FUNCTION(gl__triangles)
 {
-    TaggedValue* list = INPUT(0);
-    TaggedValue* color = INPUT(1);
+    TValue* list = INPUT(0);
+    TValue* color = INPUT(1);
 
     set_gl_color(color);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -133,8 +133,8 @@ CA_FUNCTION(gl__triangles)
 
 CA_FUNCTION(gl__line_strip)
 {
-    TaggedValue* list = INPUT(0);
-    TaggedValue* color = INPUT(1);
+    TValue* list = INPUT(0);
+    TValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -156,8 +156,8 @@ CA_FUNCTION(gl__line_strip)
 
 CA_FUNCTION(gl__line_loop)
 {
-    TaggedValue* list = INPUT(0);
-    TaggedValue* color = INPUT(1);
+    TValue* list = INPUT(0);
+    TValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -178,8 +178,8 @@ CA_FUNCTION(gl__line_loop)
 
 CA_FUNCTION(gl__lines)
 {
-    TaggedValue* list = INPUT(0);
-    TaggedValue* color = INPUT(1);
+    TValue* list = INPUT(0);
+    TValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -200,8 +200,8 @@ CA_FUNCTION(gl__lines)
 
 CA_FUNCTION(gl__points)
 {
-    TaggedValue* list = INPUT(0);
-    TaggedValue* color = INPUT(1);
+    TValue* list = INPUT(0);
+    TValue* color = INPUT(1);
 
     set_gl_color(color);
 
@@ -226,7 +226,7 @@ CA_FUNCTION(gl__circle)
     float x = loc->getX();
     float y = loc->getY();
     float radius = FLOAT_INPUT(1);
-    TaggedValue* color = INPUT(2);
+    TValue* color = INPUT(2);
     set_gl_color(color);
 
     // Dumb guess on how many polygons to use
@@ -271,7 +271,7 @@ CA_FUNCTION(gl__pie)
     float radius = FLOAT_INPUT(1);
     float angle_start = FLOAT_INPUT(2);
     float angle_fin = FLOAT_INPUT(3);
-    TaggedValue* color = INPUT(4);
+    TValue* color = INPUT(4);
     set_gl_color(color);
 
     if (angle_start > angle_fin) {
@@ -455,7 +455,7 @@ CA_FUNCTION(opengl__shader_quad)
         if (!is_list(uniforms[i]))
             return RAISE_ERROR("uniform pair isn't a list");
         GLuint uniform = as_int(list_get_index(uniforms[i], 0));
-        TaggedValue* value = list_get_index(uniforms[i], 1);
+        TValue* value = list_get_index(uniforms[i], 1);
         if (is_int(value))
             glUniform1i(uniform, as_int(value));
         else if (is_float(value))
@@ -492,7 +492,7 @@ CA_FUNCTION(opengl__get_uniform_location)
 CA_FUNCTION(opengl__uniform)
 {
     GLuint uniform = INT_INPUT(0);
-    TaggedValue* value = INPUT(1);
+    TValue* value = INPUT(1);
     if (is_int(value))
         glUniform1i(uniform, as_int(value));
     else if (is_float(value))
@@ -512,7 +512,7 @@ CA_FUNCTION(opengl__use_program)
 CA_FUNCTION(set_uniform)
 {
     const char* name = STRING_INPUT(0);
-    TaggedValue* input = INPUT(1);
+    TValue* input = INPUT(1);
 
     GLint loc = glGetUniformLocation(current_program, name);
 

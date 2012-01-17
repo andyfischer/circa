@@ -2,6 +2,6 @@
 
 namespace circa {
 
-void get_rect(TaggedValue* val, float* x1, float* y1, float* x2, float* y2);
+void get_rect(TValue* val, float* x1, float* y1, float* x2, float* y2);
 
 };

@@ -39,11 +39,11 @@ void dump(Term* term)
     print_term(std::cout, term);
 }
 
-void dump(TaggedValue& value)
+void dump(TValue& value)
 {
     std::cout << value.toString() << std::endl;
 }
-void dump(TaggedValue* value)
+void dump(TValue* value)
 {
     std::cout << value->toString() << std::endl;
 }

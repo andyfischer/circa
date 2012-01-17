@@ -42,7 +42,7 @@ namespace ref_methods_function {
             return;
         }
 
-        TaggedValue* source = INPUT(1);
+        TValue* source = INPUT(1);
 
         if (!cast_possible(source, declared_type(target))) {
             RAISE_ERROR("Can't assign, type mismatch");

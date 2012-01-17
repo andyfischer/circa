@@ -9,33 +9,33 @@ namespace circa {
 namespace list_t {
 
     void setup_type(Type*);
-    void tv_initialize(Type*, TaggedValue*);
-    std::string tv_to_string(TaggedValue* value);
-    TaggedValue* append(TaggedValue* list);
-    TaggedValue* prepend(TaggedValue* list);
+    void tv_initialize(Type*, TValue*);
+    std::string tv_to_string(TValue* value);
+    TValue* append(TValue* list);
+    TValue* prepend(TValue* list);
 }
 
 bool is_list_based_type(Type*);
 
-// Wrapper type to use a TaggedValue as a List.
-struct List : TaggedValue
+// Wrapper type to use a TValue as a List.
+struct List : TValue
 {
     List();
 
-    TaggedValue* append();
-    TaggedValue* prepend();
-    void append(TaggedValue* val);
-    TaggedValue* insert(int index);
+    TValue* append();
+    TValue* prepend();
+    void append(TValue* val);
+    TValue* insert(int index);
     void clear();
     int length();
     bool empty();
-    TaggedValue* get(int index);
-    void set(int index, TaggedValue* value);
-    TaggedValue* operator[](int index) { return get(index); }
+    TValue* get(int index);
+    void set(int index, TValue* value);
+    TValue* operator[](int index) { return get(index); }
     void resize(int size);
 
     // get the item at length - 1
-    TaggedValue* getLast();
+    TValue* getLast();
 
     // remove the item at length - 1
     void pop();
@@ -49,9 +49,9 @@ struct List : TaggedValue
     void appendString(const char* str);
     void appendString(const std::string& str);
 
-    static List* checkCast(TaggedValue* v);
-    static List* lazyCast(TaggedValue* v);
-    static List* cast(TaggedValue* v, int length);
+    static List* checkCast(TValue* v);
+    static List* lazyCast(TValue* v);
+    static List* cast(TValue* v, int length);
 };
 
 }

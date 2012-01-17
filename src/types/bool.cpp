@@ -4,11 +4,11 @@
 
 namespace circa {
 namespace bool_t {
-    void reset(Type*, TaggedValue* value)
+    void reset(Type*, TValue* value)
     {
         set_bool(value, false);
     }
-    std::string to_string(TaggedValue* value)
+    std::string to_string(TValue* value)
     {
         if (as_bool(value))
             return "true";

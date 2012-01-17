@@ -25,7 +25,7 @@ Term* statically_infer_result(Branch* branch, Term* term);
 // This is similar to statically_infer_result(Branch,Term), but it's used
 // if you don't care about partially known values. This will either return
 // a value result or :unknown.
-void statically_infer_result(Term* term, TaggedValue* result);
+void statically_infer_result(Term* term, TValue* result);
 
 // Create a List-based type that will have N elements, all of the same type.
 Type* create_typed_unsized_list_type(Type* elementType);

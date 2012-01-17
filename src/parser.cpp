@@ -65,7 +65,7 @@ struct ListSyntaxHints {
         Dict* dict = as_dict(inputs[index]);
         set_string(dict->insert(field.c_str()), value.c_str());
     }
-    void set(int index, const char* field, TaggedValue* value)
+    void set(int index, const char* field, TValue* value)
     {
         while (index >= inputs.length())
             set_dict(inputs.append());
@@ -81,7 +81,7 @@ struct ListSyntaxHints {
 
         Dict* dict = as_dict(inputs[index]);
 
-        TaggedValue* existing = dict->insert(field.c_str());
+        TValue* existing = dict->insert(field.c_str());
         if (!is_string(existing))
             set_string(existing, "");
 
@@ -92,11 +92,11 @@ struct ListSyntaxHints {
     {
         for (int i=0; i < inputs.length(); i++) {
             Dict* dict = as_dict(inputs[i]);
-            TaggedValue it;
+            TValue it;
             for (dict->iteratorStart(&it);
                     !dict->iteratorFinished(&it); dict->iteratorNext(&it)) {
                 const char* key;
-                TaggedValue* value;
+                TValue* value;
                 dict->iteratorGet(&it, &key, &value);
 
                 set_input_syntax_hint(term, i, key, value);
@@ -1133,10 +1133,10 @@ ParseResult return_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 
     Term* output = NULL;
 
-    bool returnsTaggedValue = !is_statement_ending(tokens.next().match) &&
+    bool returnsTValue = !is_statement_ending(tokens.next().match) &&
         tokens.next().match != RBRACE;
 
-    if (returnsTaggedValue)
+    if (returnsTValue)
         output = expression(branch, tokens, context).term;
 
     Term* result = apply(branch, RETURN_FUNC, TermList(output));
@@ -1418,7 +1418,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                     assignTerm->setStringProp("syntax:rebindOperator", operatorStr);
 
                     // Move an input's post-whitespace to this term.
-                    TaggedValue* existingPostWhitespace =
+                    TValue* existingPostWhitespace =
                         assignTerm->input(1)->inputInfo(0)->properties.get("postWhitespace");
 
                     if (existingPostWhitespace != NULL)

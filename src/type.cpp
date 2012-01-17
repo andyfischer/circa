@@ -11,12 +11,12 @@ Term* IMPLICIT_TYPES = NULL;
 
 namespace type_t {
 
-    void initialize(Type*, TaggedValue* value)
+    void initialize(Type*, TValue* value)
     {
         Type* type = create_type();
         set_pointer(value, type);
     }
-    void copy(Type* type, TaggedValue* source, TaggedValue* dest)
+    void copy(Type* type, TValue* source, TValue* dest)
     {
         ca_assert(is_type(source));
         change_type(dest, type);
@@ -56,7 +56,7 @@ namespace type_t {
         append_phrase(source, "}", term, token::RBRACKET);
     }
 
-    std::string toString(TaggedValue* value)
+    std::string toString(TValue* value)
     {
         return "<Type "+as_type(value)->name+">";
     }
@@ -168,7 +168,7 @@ Type* unbox_type(Term* term)
     return (Type*) term->value_data.ptr;
 }
 
-Type* unbox_type(TaggedValue* val)
+Type* unbox_type(TValue* val)
 {
     return (Type*) val->value_data.ptr;
 }
@@ -393,19 +393,19 @@ Type* get_declared_type(Branch* branch, const char* name)
     return as_type(term);
 }
 
-void set_type_list(TaggedValue* value, Type* type1)
+void set_type_list(TValue* value, Type* type1)
 {
     List* list = set_list(value, 1);
     set_type(list->get(0), type1);
 }
 
-void set_type_list(TaggedValue* value, Type* type1, Type* type2)
+void set_type_list(TValue* value, Type* type1, Type* type2)
 {
     List* list = set_list(value, 2);
     set_type(list->get(0), type1);
     set_type(list->get(1), type2);
 }
-void set_type_list(TaggedValue* value, Type* type1, Type* type2, Type* type3)
+void set_type_list(TValue* value, Type* type1, Type* type2, Type* type3)
 {
     List* list = set_list(value, 3);
     set_type(list->get(0), type1);

@@ -4,7 +4,7 @@
 
 namespace circa {
 
-struct TaggedValue;
+struct TValue;
 
 typedef int Symbol;
 
@@ -46,10 +46,10 @@ const Symbol FirstRuntimeSymbol = 1000;
 const char* symbol_get_text(Symbol symbol);
 void symbol_get_text(Symbol symbol, String* string);
 
-Symbol as_symbol(TaggedValue* tv);
-void symbol_value(Symbol name, TaggedValue* tv);
-void symbol_value(TaggedValue* tv, Symbol name);
-void set_symbol(TaggedValue* tv, Symbol name);
+Symbol as_symbol(TValue* tv);
+void symbol_value(Symbol name, TValue* tv);
+void symbol_value(TValue* tv, Symbol name);
+void set_symbol(TValue* tv, Symbol name);
 
 Symbol string_to_symbol(const char* str);
 

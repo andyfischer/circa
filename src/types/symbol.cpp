@@ -3,7 +3,7 @@
 namespace circa {
 namespace symbol_t {
 
-    std::string to_string(TaggedValue* value)
+    std::string to_string(TValue* value)
     {
         return std::string(":") + symbol_get_text(as_int(value));
     }

@@ -141,10 +141,10 @@ void test_create_implicit_tuple_type()
     set_type_list(&typeList, &INT_T, &FLOAT_T, &STRING_T);
     Term* result = create_tuple_type(&typeList);
 
-    TaggedValue* a = branch.eval("[1, 3.0, 'hi']");
+    TValue* a = branch.eval("[1, 3.0, 'hi']");
     test_assert(cast_possible(a, unbox_type(result)));
 
-    TaggedValue* b = branch.eval("['hi', 3.0, 1]");
+    TValue* b = branch.eval("['hi', 3.0, 1]");
     test_assert(!cast_possible(b, unbox_type(result)));
 }
 
@@ -164,7 +164,7 @@ void create_empty_type_then_populate_it()
 
 void test_copy_builtin_type()
 {
-    TaggedValue v;
+    TValue v;
     copy(INT_TYPE, &v);
     test_assert(v.value_type == &TYPE_T);
 
@@ -182,7 +182,7 @@ void test_compound_type_cast()
 
     test_equals(&a, "[0, 1]");
 
-    TaggedValue b;
+    TValue b;
     cast(&a, unbox_type(get_global("Point")), &b);
     test_equals(&b, "[0.0, 1.0]");
 }
@@ -191,7 +191,7 @@ void test_declaring_term()
 {
     Branch branch;
     Term* myType = branch.compile("type MyType {}");
-    TaggedValue myValue;
+    TValue myValue;
     create(as_type(myType), &myValue);
     test_equals(myValue.value_type->name, "MyType");
     test_assert(myValue.value_type->declaringTerm == myType);

@@ -212,7 +212,7 @@ void change_declared_type(Term *term, Type *newType)
 
     term->type = newType;
 
-    set_null((TaggedValue*) term);
+    set_null((TValue*) term);
 
     // TODO: Don't call create() here
     create(newType, term);
@@ -264,7 +264,7 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, inputs, name);
     change_declared_type(term, original->type);
-    //create(original->value_type, (TaggedValue*) term);
+    //create(original->value_type, (TValue*) term);
 
     copy(original, term);
 
@@ -306,7 +306,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
 
     change_function(term, FUNCS.value);
     change_declared_type(term, type);
-    create(type, (TaggedValue*) term);
+    create(type, (TValue*) term);
     update_unique_name(term);
 
     return term;
@@ -324,7 +324,7 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
     return create_value(branch, as_type(type), name);
 }
 
-Term* create_value(Branch* branch, TaggedValue* initialValue, std::string const& name)
+Term* create_value(Branch* branch, TValue* initialValue, std::string const& name)
 {
     Term* term = create_value(branch, initialValue->value_type, name);
     copy(initialValue, term);
@@ -869,7 +869,7 @@ int get_frame_distance(Term* term, Term* input)
     return get_frame_distance(term->owningBranch, input);
 }
 
-void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValue* isn)
+void write_stack_input_instruction(Branch* callingFrame, Term* input, TValue* isn)
 {
     change_type(isn, &StackVariableIsn_t);
     int relativeFrame = get_frame_distance(callingFrame, input);
@@ -884,7 +884,7 @@ void write_stack_input_instruction(Branch* callingFrame, Term* input, TaggedValu
     isn->value_data.asint += (input->index % 0xffff);
 }
 
-void write_input_instruction(Term* caller, Term* input, TaggedValue* isn)
+void write_input_instruction(Term* caller, Term* input, TValue* isn)
 {
     if (input == NULL) {
         set_pointer(isn, &NullInputIsn_t, NULL);
@@ -899,7 +899,7 @@ bool term_is_state_input(Term* term, int index)
 {
     if (index >= term->numInputs())
         return false;
-    TaggedValue* prop = term->inputInfo(index)->properties.get("state");
+    TValue* prop = term->inputInfo(index)->properties.get("state");
     if (prop == NULL)
         return false;
     return as_bool(prop);
