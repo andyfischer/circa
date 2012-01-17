@@ -56,14 +56,6 @@ struct Type;
 typedef Term* TermPtr;
 typedef bool (*TermVisitor)(Term* term, TValue* context);
 
-// Variant value used in many places, including in TValue:
-union VariantValue {
-    int asint;
-    float asfloat;
-    bool asbool;
-    void* ptr;
-};
-
 // Function-related typedefs:
 
 #define CA_FUNCTION(fname) \

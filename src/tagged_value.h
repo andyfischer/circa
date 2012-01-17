@@ -2,13 +2,20 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 namespace circa {
+
+struct Type;
+
+union TValueData {
+    int asint;
+    float asfloat;
+    bool asbool;
+    void* ptr;
+};
 
 struct TValue
 {
-    VariantValue value_data;
+    TValueData value_data;
     Type* value_type;
 
     TValue();
@@ -96,8 +103,11 @@ std::string to_string(TValue* value);
 // type name.
 std::string to_string_annotated(TValue* value);
 
+// Equality checking. The check is dispatched on the type of lhs, so we can't guarantee that
+// this call is reflexive. (but, the type implementor should preserve this property).
 bool equals(TValue* lhs, TValue* rhs);
 
+// Equality checking against unboxed types.
 bool equals_string(TValue* value, const char* s);
 bool equals_int(TValue* value, int i);
 
@@ -119,6 +129,7 @@ void set_pointer(TValue* value, void* ptr);
 void* get_pointer(TValue* value);
 void* get_pointer(TValue* value, Type* expectedType);
 
+// Type checking against builtin types.
 bool is_bool(TValue* value);
 bool is_branch(TValue* value);
 bool is_error(TValue* value);
@@ -135,6 +146,7 @@ bool is_string(TValue* value);
 bool is_symbol(TValue* value);
 bool is_type(TValue* value);
 
+// Unboxing using builtin types.
 bool        as_bool(TValue* value);
 Branch*     as_branch(TValue* value);
 const char* as_cstring(TValue* value);
@@ -147,6 +159,7 @@ void*       as_opaque_pointer(TValue* value);
 std::string const& as_string(TValue* value);
 Type*       as_type(TValue* value);
 
+// Boxing using builtin types.
 void set_bool(TValue* value, bool b);
 void set_branch(TValue* value, Branch* branch);
 Dict* set_dict(TValue* value);
@@ -160,7 +173,7 @@ void set_string(TValue* value, const char* s);
 void set_string(TValue* value, std::string const& s);
 void set_type(TValue* value, Type* type);
 
-// Casting accessors:
+// Complex unboxing functions.
 float to_float(TValue* value);
 int to_int(TValue* value);
 

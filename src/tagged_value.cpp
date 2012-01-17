@@ -251,7 +251,7 @@ void copy(TValue* source, TValue* dest)
 void swap(TValue* left, TValue* right)
 {
     Type* temp_type = left->value_type;
-    VariantValue temp_data = left->value_data;
+    TValueData temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;
@@ -281,7 +281,7 @@ void reset(TValue* value)
         return;
     }
 
-    // No reset() function, just change type to null and back.
+    // Default behavior: assign this value to null and create a new one.
     set_null(value);
     create(type, value);
 }
@@ -389,9 +389,6 @@ int num_elements(TValue* value)
 
     return numElements(value);
 }
-
-
-
 
 bool equals(TValue* lhs, TValue* rhs)
 {
