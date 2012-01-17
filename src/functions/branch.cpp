@@ -24,9 +24,9 @@ namespace branch_function {
 
     void setup(Branch* kernel)
     {
-        BRANCH_FUNC = import_function(kernel, branch_evaluate, "branch()");
-        as_function(BRANCH_FUNC)->formatSource = format_source;
-        as_function(BRANCH_FUNC)->vmInstruction = ControlFlowCall;
+        FUNCS.branch = import_function(kernel, branch_evaluate, "branch()");
+        as_function(FUNCS.branch)->formatSource = format_source;
+        as_function(FUNCS.branch)->vmInstruction = ControlFlowCall;
 
         BRANCH_UNEVALUATED_FUNC = import_function(kernel, NULL, "branch_unevaluated()");
         LAMBDA_FUNC = import_function(kernel, lambda_evaluate, "lambda() -> Branch");

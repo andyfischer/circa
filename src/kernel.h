@@ -10,7 +10,6 @@ extern Branch* KERNEL;
 
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
-extern Term* BRANCH_FUNC;
 extern Term* BRANCH_UNEVALUATED_FUNC;
 extern Term* BREAK_FUNC;
 extern Term* COMMENT_FUNC;
@@ -84,6 +83,7 @@ struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
     Term* assign;
+    Term* branch;
     Term* break_func;
     Term* case_func;
     Term* cast;

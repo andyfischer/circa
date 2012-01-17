@@ -114,7 +114,7 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
-Term* get_global(std::string name)
+Term* get_global(const char* name)
 {
     if (KERNEL->contains(name))
         return KERNEL->get(name);

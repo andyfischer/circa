@@ -372,7 +372,7 @@ Term* create_list(Branch* branch, std::string const& name)
 
 Branch* create_branch(Branch* owner, std::string const& name)
 {
-    return apply(owner, BRANCH_FUNC, TermList(), name)->contents();
+    return apply(owner, FUNCS.branch, TermList(), name)->contents();
 }
 
 Branch* create_namespace(Branch* branch, std::string const& name)

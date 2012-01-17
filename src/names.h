@@ -18,7 +18,7 @@ Term* find_local_name(Branch* branch, const char* name);
 int find_qualified_name_separator(const char* name);
 
 // Get a named term from the global namespace.
-Term* get_global(std::string name);
+Term* get_global(const char* name);
 
 Branch* get_parent_branch(Branch* branch);
 Term* get_parent_term(Term* term);

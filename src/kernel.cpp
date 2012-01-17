@@ -57,7 +57,6 @@ bool SHUTTING_DOWN = false;
 Term* ALIAS_FUNC = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
-Term* BRANCH_FUNC = NULL;
 Term* BRANCH_UNEVALUATED_FUNC = NULL;
 Term* BREAK_FUNC = NULL;
 Term* COMMENT_FUNC = NULL;
@@ -560,6 +559,8 @@ export_func void circa_shutdown()
 
     delete KERNEL;
     KERNEL = NULL;
+
+    memset(&FUNCS, NULL, sizeof(FUNCS));
 }
 
 export_func void circa_add_module_search_path(const char* path)

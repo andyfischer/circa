@@ -297,7 +297,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     out << "-> ";
     
     if (term->type == NULL)
-        out << "<NULL type";
+        out << "<NULL type>";
     else
         out << term->type->name;
 
