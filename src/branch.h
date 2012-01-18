@@ -73,19 +73,11 @@ struct Branch
     bool contains(std::string const& name);
 
     int getIndex(Term* term);
-    int debugFindIndex(Term* term);
 
     Term* last();
 
     // Find the first term with the given name binding.
-    Term* findFirstBinding(std::string const& name);
-
-    // Find the last term with the given name binding.
-    Term* findLastBinding(std::string const& name);
-
-    // Find a term with the given name, returns -1 if not found.
-    int findIndex(std::string const& name);
-    int findIndex(const char* name);
+    Term* findFirstBinding(Symbol name);
 
     void insert(int index, Term* term);
     void append(Term* term);

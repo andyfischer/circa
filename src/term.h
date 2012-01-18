@@ -44,7 +44,9 @@ struct Term : TValue
     Symbol nameSymbol;
 
     // Our name binding.
+#ifndef TERM_HAS_SYMBOL
     std::string name;
+#endif
 
     // A name which is unique across this branch.
     struct UniqueName

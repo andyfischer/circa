@@ -71,13 +71,11 @@ const int MAX_INPUTS = 64;
 // Garbage collection
 typedef char GCColor;
 
-// Used in evaluation functions:
-int list_size(ListData* data);
-
-// Possibly enable ca_assert and/or ca_test_assert. When enabled, ca_assert will
-// call internal_error() if the condition is false.
+// Assert macros
 //
-// ca_test_assert does the same thing, but it is only enabled in "test" builds, so it's
+// ca_assert will (when enabled) call internal_error() if the condition is false.
+//
+// ca_test_assert does the same, but it is only enabled in "test" builds, so it's
 // intended to be called in places that significantly harm performance.
 #ifdef DEBUG
 
@@ -104,5 +102,7 @@ int list_size(ListData* data);
 #endif
 
 void ca_assert_function(bool result, const char* expr, int line, const char* file);
+
+//#define TERM_HAS_SYMBOL
 
 } // namespace circa

@@ -107,38 +107,7 @@ int Branch::getIndex(Term* term)
     ca_assert(term->owningBranch == this);
     assert_valid_term(term);
 
-    //assert(term->index == debugFindIndex(term));
-
     return term->index;
-}
-
-int Branch::debugFindIndex(Term* term)
-{
-    for (int i=0; i < length(); i++) 
-        if (get(i) == term)
-            return i;
-    return -1;
-}
-
-int Branch::findIndex(std::string const& name)
-{
-    for (int i=0; i < length(); i++) {
-        if (get(i) == NULL)
-            continue;
-        if (get(i)->name == name)
-            return i;
-    }
-    return -1;
-}
-int Branch::findIndex(const char* name)
-{
-    for (int i=0; i < length(); i++) {
-        if (get(i) == NULL)
-            continue;
-        if (get(i)->name == name)
-            return i;
-    }
-    return -1;
 }
 
 void Branch::append(Term* term)
@@ -306,24 +275,12 @@ Branch::clear()
     clear_branch(this);
 }
 
-Term* Branch::findFirstBinding(std::string const& name)
+Term* Branch::findFirstBinding(Symbol name)
 {
     for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
             continue;
-        if (_terms[i]->name == name)
-            return _terms[i];
-    }
-
-    return NULL;
-}
-
-Term* Branch::findLastBinding(std::string const& name)
-{
-    for (int i = _terms.length()-1; i >= 0; i--) {
-        if (_terms[i] == NULL)
-            continue;
-        if (_terms[i]->name == name)
+        if (_terms[i]->nameSymbol == name)
             return _terms[i];
     }
 
@@ -337,7 +294,9 @@ void Branch::bindName(Term* term, std::string name)
         throw std::runtime_error("term already has name: "+term->name);
 
     names.bind(term, name);
+#ifndef TERM_HAS_SYMBOL
     term->name = name;
+#endif
     term->nameSymbol = string_to_symbol(name.c_str());
     update_unique_name(term);
 }

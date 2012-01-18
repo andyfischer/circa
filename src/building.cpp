@@ -753,7 +753,7 @@ void post_compile_term(Term* term)
     // a pack_state() call.
     Branch* branch = term->owningBranch;
     if (term->name != "") {
-        if (branch->findFirstBinding(term->name)->function == DECLARED_STATE_FUNC) {
+        if (branch->findFirstBinding(term->nameSymbol)->function == DECLARED_STATE_FUNC) {
             Term* pack = apply(branch, FUNCS.pack_state, TermList(
                 find_open_state_result(branch, branch->length()),
                 term));
