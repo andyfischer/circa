@@ -16,21 +16,34 @@ namespace circa {
 
 bool exposes_nested_names(Term* term);
 
-Term* find_name(Branch* branch, int location, const char* name)
+Term* find_name(Branch* branch, int location, Symbol name)
 {
     if (branch == NULL)
-        return get_global(name);
+        branch = KERNEL;
 
     Term* result = find_local_name(branch, location, name);
     if (result != NULL)
         return result;
 
-    // Name not found in this branch, check the outer scope.
+    // Name not found in this branch.
+    if (branch == KERNEL)
+        return NULL;
+
     Term* parent = branch->owningTerm;
     if (parent == NULL)
         return get_global(name);
 
     return find_name(parent->owningBranch, parent->index, name);
+}
+
+Term* find_name(Branch* branch, int location, const char* name)
+{
+    return find_name(branch, location, string_to_symbol(name));
+}
+
+Term* find_name(Branch* branch, Symbol name)
+{
+    return find_name(branch, branch->length(), name);
 }
 
 Term* find_name(Branch* branch, const char* name)
@@ -118,12 +131,14 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
+Term* get_global(Symbol name)
+{
+    return find_name(KERNEL, name);
+}
+
 Term* get_global(const char* name)
 {
-    if (KERNEL->contains(name))
-        return KERNEL->get(name);
-
-    return NULL;
+    return get_global(string_to_symbol(name));
 }
 
 Branch* get_parent_branch(Branch* branch)

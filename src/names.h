@@ -6,6 +6,7 @@
 
 namespace circa {
 
+Term* find_name(Branch* branch, Symbol name);
 Term* find_name(Branch* branch, const char* name);
 Term* find_name_at(Term* location, const char* name);
 
@@ -20,6 +21,7 @@ Term* find_local_name(Branch* branch, const char* name);
 int find_qualified_name_separator(const char* name);
 
 // Get a named term from the global namespace.
+Term* get_global(Symbol name);
 Term* get_global(const char* name);
 
 Branch* get_parent_branch(Branch* branch);

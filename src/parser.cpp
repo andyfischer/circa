@@ -1052,9 +1052,8 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
 
     // If the result was just the reuse of an existing identifier, create a Copy
     // term so that source is preserved.
-    if (result.isIdentifier()) {
+    if (result.isIdentifier())
         term = apply(branch, COPY_FUNC, TermList(term));
-    }
 
     // Apply a pending rebind
     if (context->pendingRebind != "") {
