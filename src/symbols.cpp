@@ -11,9 +11,11 @@
 namespace circa {
 
 const int c_maxRuntimeSymbols = 2000;
+
 struct RuntimeSymbol
 {
-    std::string name;
+    std::string str;
+    Symbol namespaceParent;
 };
 
 RuntimeSymbol g_runtimeSymbols[c_maxRuntimeSymbols];
@@ -24,7 +26,7 @@ const char* symbol_get_text(Symbol symbol)
 {
     // Runtime symbols
     if (symbol >= FirstRuntimeSymbol)
-        return g_runtimeSymbols[symbol - FirstRuntimeSymbol].name.c_str();
+        return g_runtimeSymbols[symbol - FirstRuntimeSymbol].str.c_str();
 
     // Builtin symbols
     switch (symbol) {
@@ -91,10 +93,26 @@ Symbol string_to_symbol(const char* str)
     if (it != g_stringToSymbol.end())
         return it->second;
 
+    // Not yet registered; add it to the list.
     Symbol index = g_nextFreeSymbol++;
-    g_runtimeSymbols[index].name = str;
+    g_runtimeSymbols[index].str = str;
+    g_runtimeSymbols[index].namespaceParent = 0;
     Symbol symbol = index + FirstRuntimeSymbol;
     g_stringToSymbol[str] = symbol;
+
+    // Search the string for a : symbol, from right to left. If found, the
+    // left hand side will also become a symbol, and we'll update the
+    // namespaceParent field.
+    int len = strlen(str);
+    for (int i=len - 1; i >= 0; i--) {
+        if (str[i] == ':') {
+            char* tempstr = strndup(str, i);
+            g_runtimeSymbols[index].namespaceParent = string_to_symbol(tempstr);
+            free(tempstr);
+            break;
+        }
+    }
+
     return symbol;
 }
 
