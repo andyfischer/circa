@@ -173,7 +173,7 @@ TermList::clear()
 Term*
 TermList::get(int index) const
 {
-    ca_assert(index < int(_terms.size()));
+    ca_test_assert(index < int(_terms.size()));
     return _terms[index];
 }
 

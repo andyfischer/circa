@@ -82,8 +82,8 @@ for env in all_envs:
 
     source_files.remove('main.cpp')
 
-    if variant_name != 'test':
-        source_files.remove('generated/all_tests.cpp')
+    #if variant_name != 'test':
+    #    source_files.remove('generated/all_tests.cpp')
 
     baseName = 'circa' + env['variant_suffix']
     fullPath = 'build/'+baseName

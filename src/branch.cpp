@@ -80,8 +80,7 @@ bool Branch::contains(std::string const& name)
 Term* Branch::get(int index)
 {
     assert_valid_branch(this);
-    if (index >= length())
-        internal_error("index out of range");
+    ca_test_assert(index < length());
     return _terms[index];
 }
 Term* Branch::getSafe(int index)

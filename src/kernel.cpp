@@ -525,10 +525,8 @@ export_func void circa_initialize()
 
     install_standard_library(kernel);
 
-#if CIRCA_TEST_BUILD
     // Create a space for unit tests.
     create_branch(kernel, "_test_root");
-#endif
 
     // Finally, make sure there are no static errors.
     if (has_static_errors(kernel)) {

@@ -3,7 +3,7 @@
 import os,subprocess,sys
 from glob import glob
 
-ExecutableName = 'circa_t'
+ExecutableName = 'circa_d'
 TestRoot = 'tests'
 
 class OutputDifference(object):

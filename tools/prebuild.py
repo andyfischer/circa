@@ -94,11 +94,7 @@ void register_all_tests()
 {
     gTestCases.clear();
 
-#ifdef CIRCA_TEST_BUILD
-
     %s
-
-#endif
 }
 
 } // namespace circa""" % (function_decls, function_calls)
