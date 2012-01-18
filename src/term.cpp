@@ -9,6 +9,7 @@
 #include "heap_debugging.h"
 #include "introspection.h"
 #include "refactoring.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 
@@ -22,6 +23,7 @@ Term::Term()
   : weakPtr(0),
     type(NULL),
     function(NULL),
+    nameSymbol(EmptyName),
     owningBranch(NULL),
     index(0),
     nestedContents(NULL)

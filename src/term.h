@@ -41,6 +41,8 @@ struct Term : TValue
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
+    Symbol nameSymbol;
+
     // Our name binding.
     std::string name;
 

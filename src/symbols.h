@@ -9,6 +9,7 @@ struct TValue;
 typedef int Symbol;
 
 const Symbol InvalidSymbol = 0;
+const Symbol EmptyName = 17;
 
 // Core symbols
 const Symbol File = 1;
@@ -37,9 +38,9 @@ const Symbol Range = 15;
 
 // Temporary register values
 const Symbol Unevaluated = 16;
-const Symbol Lazy = 17;
+const Symbol Lazy = 18;
 
-const Symbol HighestBuiltinSymbol = 17;
+const Symbol HighestBuiltinSymbol = 18;
 
 const Symbol FirstRuntimeSymbol = 1000;
 

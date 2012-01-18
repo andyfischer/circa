@@ -630,11 +630,11 @@ do_instruction:
     try {
     #endif
 
-    // int startingFrameCount = context->numFrames;
+    int startingFrameCount = context->numFrames;
 
     function->evaluate(context, inputCount, outputCount, inputBuffer);
 
-    // bool framePushed = context->numFrames > startingFrameCount;
+    bool framePushed = context->numFrames > startingFrameCount;
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }

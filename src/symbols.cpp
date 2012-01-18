@@ -28,6 +28,7 @@ const char* symbol_get_text(Symbol symbol)
 
     // Builtin symbols
     switch (symbol) {
+        case EmptyName: return "";
         case InvalidSymbol: return "InvalidSymbol";
         case File: return "File";
         case Newline: return "Newline";

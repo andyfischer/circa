@@ -338,6 +338,7 @@ void Branch::bindName(Term* term, std::string name)
 
     names.bind(term, name);
     term->name = name;
+    term->nameSymbol = string_to_symbol(name.c_str());
     update_unique_name(term);
 }
 
