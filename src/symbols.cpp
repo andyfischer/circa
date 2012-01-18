@@ -15,7 +15,8 @@ const int c_maxRuntimeSymbols = 2000;
 struct RuntimeSymbol
 {
     std::string str;
-    Symbol namespaceParent;
+    Symbol namespaceFirst;
+    Symbol namespaceRightRemainder;
 };
 
 RuntimeSymbol g_runtimeSymbols[c_maxRuntimeSymbols];
@@ -60,6 +61,22 @@ void symbol_get_text(Symbol symbol, String* string)
     set_string((TValue*) string, symbol_get_text(symbol));
 }
 
+Symbol symbol_get_namespace_first(Symbol symbol)
+{
+    if (symbol < FirstRuntimeSymbol)
+        return 0;
+    else
+        return g_runtimeSymbols[symbol - FirstRuntimeSymbol].namespaceFirst;
+}
+
+Symbol symbol_get_namespace_rr(Symbol symbol)
+{
+    if (symbol < FirstRuntimeSymbol)
+        return 0;
+    else
+        return g_runtimeSymbols[symbol - FirstRuntimeSymbol].namespaceRightRemainder;
+}
+
 Symbol as_symbol(TValue* tv)
 {
     return tv->value_data.asint;
@@ -96,18 +113,19 @@ Symbol string_to_symbol(const char* str)
     // Not yet registered; add it to the list.
     Symbol index = g_nextFreeSymbol++;
     g_runtimeSymbols[index].str = str;
-    g_runtimeSymbols[index].namespaceParent = 0;
+    g_runtimeSymbols[index].namespaceFirst = 0;
+    g_runtimeSymbols[index].namespaceRightRemainder = 0;
     Symbol symbol = index + FirstRuntimeSymbol;
     g_stringToSymbol[str] = symbol;
 
-    // Search the string for a : symbol, from right to left. If found, the
-    // left hand side will also become a symbol, and we'll update the
-    // namespaceParent field.
+    // Search the string for a : symbol, if found we'll update the symbol's
+    // namespace links.
     int len = strlen(str);
-    for (int i=len - 1; i >= 0; i--) {
+    for (int i=0; i < len; i++) {
         if (str[i] == ':') {
             char* tempstr = strndup(str, i);
-            g_runtimeSymbols[index].namespaceParent = string_to_symbol(tempstr);
+            g_runtimeSymbols[index].namespaceFirst = string_to_symbol(tempstr);
+            g_runtimeSymbols[index].namespaceRightRemainder = string_to_symbol(str + i + 1);
             free(tempstr);
             break;
         }

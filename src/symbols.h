@@ -46,6 +46,8 @@ const Symbol FirstRuntimeSymbol = 1000;
 
 const char* symbol_get_text(Symbol symbol);
 void symbol_get_text(Symbol symbol, String* string);
+Symbol symbol_get_namespace_first(Symbol symbol);
+Symbol symbol_get_namespace_rr(Symbol symbol);
 
 Symbol as_symbol(TValue* tv);
 void symbol_value(Symbol name, TValue* tv);

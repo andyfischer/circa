@@ -7,6 +7,7 @@
 #include "heap_debugging.h"
 #include "if_block.h"
 #include "source_repro.h"
+#include "symbols.h"
 #include "term.h"
 
 #include "names.h"
@@ -42,7 +43,7 @@ Term* find_name_at(Term* location, const char* name)
     return find_name(location->owningBranch, location->index, name);
 }
 
-Term* find_local_name(Branch* branch, int index, const char* name)
+Term* find_local_name(Branch* branch, int index, Symbol name)
 {
     if (branch == NULL)
         return NULL;
@@ -53,7 +54,7 @@ Term* find_local_name(Branch* branch, int index, const char* name)
         if (term == NULL)
             continue;
 
-        if (term->name == name)
+        if (term->nameSymbol == name)
             return term;
 
         if (term->nestedContents && exposes_nested_names(term)) {
@@ -64,27 +65,30 @@ Term* find_local_name(Branch* branch, int index, const char* name)
     }
 
     // Check if 'name' is a qualified name.
+    Symbol namespacePrefix = symbol_get_namespace_first(name);
 
-    // Find the end of the first identifier.
-    int separatorLoc = find_qualified_name_separator(name);
-
-    // Give up if no separator found
-    if (separatorLoc == -1)
+    if (namespacePrefix == InvalidSymbol)
         return NULL;
 
-    // Find the namespace term
-    std::string namespaceName(name, separatorLoc);
-    Term* prefix = find_local_name(branch, index, namespaceName.c_str());
+    Term* nsPrefixTerm = find_local_name(branch, index, namespacePrefix);
 
     // Give up if prefix not found
-    if (prefix == NULL)
+    if (nsPrefixTerm == NULL)
         return NULL;
 
     // Recursively search inside the prefix for the qualified suffix.
-    std::string suffix = name + separatorLoc + 1;
-    return find_local_name(nested_contents(prefix), suffix.c_str());
+    return find_local_name(nested_contents(nsPrefixTerm), symbol_get_namespace_rr(name));
+}
 
-    return NULL;
+Term* find_local_name(Branch* branch, int index, const char* name)
+{
+    Symbol symbol = string_to_symbol(name);
+    return find_local_name(branch, index, symbol);
+}
+
+Term* find_local_name(Branch* branch, Symbol symbol)
+{
+    return find_local_name(branch, branch->length(), symbol);
 }
 
 Term* find_local_name(Branch* branch, const char* name)

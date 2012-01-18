@@ -9,7 +9,9 @@ namespace circa {
 Term* find_name(Branch* branch, const char* name);
 Term* find_name_at(Term* location, const char* name);
 
+Term* find_local_name(Branch* branch, int index, Symbol name);
 Term* find_local_name(Branch* branch, int location, const char* name);
+Term* find_local_name(Branch* branch, Symbol symbol);
 Term* find_local_name(Branch* branch, const char* name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
