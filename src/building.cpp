@@ -17,6 +17,8 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 {
     ca_assert(function != NULL);
 
+    set_branch_in_progress(branch, true);
+
     // If 'function' is actually a type, create a value instead.
     if (is_type(function)) {
         if (inputs.length() == 0) {
@@ -50,7 +52,6 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // change_function will also update the declared type.
     change_function(result, function);
 
-    branch->needsFinish = true;
     update_unique_name(result);
     on_inputs_changed(result);
     update_extra_outputs(result);
@@ -298,6 +299,8 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
 {
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
+
+    set_branch_in_progress(branch, true);
 
     Term *term = branch->appendNew();
 
@@ -765,15 +768,27 @@ void post_compile_term(Term* term)
 
 void finish_branch(Branch* branch)
 {
-    if (!branch->needsFinish)
+}
+
+void set_branch_in_progress(Branch* branch, bool inProgress)
+{
+    if ((branch->inProgress && inProgress) || (!branch->inProgress && !inProgress))
         return;
 
-    branch->needsFinish = false;
+    if (inProgress) {
+        // Entering in-progress state
+        branch->inProgress = true;
+        return;
+    }
 
-    // Create an output_placeholder for state, if necessary
+    // Exiting in-progress state, perform cleanup.
+
+    // Create an output_placeholder for state, if necessary.
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)
         insert_state_output(branch);
+
+    branch->inProgress = false;
 }
 
 Term* find_last_non_comment_expression(Branch* branch)
@@ -962,6 +977,7 @@ Term* insert_state_output(Branch* branch)
         set_input(term, 0, openStateResult);
         return term;
     }
+    
     term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(openStateResult));
     term->setBoolProp("state", true);
     hide_from_source(term);

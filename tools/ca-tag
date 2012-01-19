@@ -1,2 +1,2 @@
 cd $CIRCA_HOME
-ctags -R -o tags src plastic/src
+ctags -R -o tags src plastic/src looseleaf/src

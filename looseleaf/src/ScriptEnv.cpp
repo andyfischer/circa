@@ -42,7 +42,13 @@ void ScriptEnv::tick()
     if (context.errorOccurred)
         return;
 
+    std::cout << "pre: " << context.state.toString() << std::endl;
+
+    dump(branch);
+
     evaluate_branch(&context, branch);
+
+    std::cout << "post: " << context.state.toString() << std::endl;
 
     if (context.errorOccurred)
         context_print_error_stack(std::cout, &context);

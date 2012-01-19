@@ -28,9 +28,9 @@ struct Branch
 
     int _refCount;
 
-    // Whether this branch needs some wrap-up before it can be executed (see
-    // finish_branch).
-    bool needsFinish;
+    // Whether this branch is "in progress". Certain cleanup actions are suspended
+    // while in this state, this is for more efficient building.
+    bool inProgress;
 
     // Variant value describing where this branch came from. 
     //   If the branch came from a file, then the value will be of format:

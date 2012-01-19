@@ -379,6 +379,11 @@ void test_move()
     test_assert(four->index == 2);
 }
 
+void test_branch_cleanup()
+{
+    Branch branch;
+}
+
 void register_tests()
 {
     REGISTER_TEST_CASE(branch_tests::test_insert);
@@ -396,5 +401,5 @@ void register_tests()
     REGISTER_TEST_CASE(branch_tests::test_move);
 }
 
-}
+} // namespace branch_tests
 } // namespace circa

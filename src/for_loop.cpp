@@ -175,6 +175,8 @@ void finish_for_loop(Term* forTerm)
     apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 
     check_to_insert_implicit_inputs(forTerm);
+
+    set_branch_in_progress(contents, false);
 }
 
 Term* find_enclosing_for_loop(Term* term)
@@ -242,6 +244,9 @@ void for_loop_fix_state_input(Branch* contents)
     Term* packStateList = apply(contents, FUNCS.pack_state_list_n,
         TermList(stateInput, stateResult, index));
     move_after(packStateList, stateResult);
+
+    //Term* stateOutput = insert_state_output(contents);
+    //set_input(stateOutput, 0, packStateList);
 }
 
 CA_FUNCTION(evaluate_for_loop)

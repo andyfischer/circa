@@ -108,6 +108,7 @@ void test_with_state()
     branch.compile("state s");
     branch.compile("alloc_handle(@s)");
     finish_branch(&branch);
+    set_branch_in_progress(&branch, false);
 
     EvalContext context;
     evaluate_branch(&context, &branch);

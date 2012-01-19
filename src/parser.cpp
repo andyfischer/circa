@@ -20,10 +20,13 @@ using namespace circa::token;
 
 TermPtr compile(Branch* branch, ParsingStep step, std::string const& input)
 {
+    set_branch_in_progress(branch, true);
+
     TokenStream tokens(input);
     ParserCxt context;
     Term* result = step(branch, tokens, &context).term;
 
+    set_branch_in_progress(branch, false);
     post_parse_branch(branch);
 
     ca_assert(branch_check_invariants_print_result(branch, std::cout));
@@ -115,6 +118,7 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
         consume_branch_with_significant_indentation(branch, tokens, context, parentTerm);
     }
 
+    set_branch_in_progress(branch, false);
     post_parse_branch(branch);
     return;
 }

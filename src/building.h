@@ -136,6 +136,8 @@ float get_step(Term* term);
 // Call the term's postCompile handler, if there is one.
 void post_compile_term(Term* term);
 
+void set_branch_in_progress(Branch* branch, bool inProgress);
+
 // Add a finish_branch() term to this branch, if needed.
 void finish_branch(Branch* branch);
 

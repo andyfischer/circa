@@ -289,6 +289,7 @@ void save_top_level_state(EvalContext* context, Branch* branch)
 void evaluate_branch(EvalContext* context, Branch* branch)
 {
     finish_branch(branch);
+    set_branch_in_progress(branch, false);
 
     // Top-level call
     push_frame(context, branch);
@@ -583,6 +584,8 @@ void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
     TValue* inputBuffer[MAX_INPUTS];
+
+    set_branch_in_progress(topBranch, false);
 
 do_instruction:
     ca_assert(!error_occurred(context));

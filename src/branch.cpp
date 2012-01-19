@@ -36,7 +36,7 @@ void assert_valid_branch(Branch const* obj)
 Branch::Branch()
   : owningTerm(NULL),
     _refCount(0),
-    needsFinish(true),
+    inProgress(false),
     currentlyCascadingUpdates(false)
 {
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
@@ -456,7 +456,7 @@ void clear_branch(Branch* branch)
     set_null(&branch->pendingUpdates);
 
     branch->names.clear();
-    branch->needsFinish = true;
+    branch->inProgress = false;
 
     // Iterate through the branch and tear down any term references, so that we
     // don't have to worry about stale pointers later.
