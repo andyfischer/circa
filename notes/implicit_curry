@@ -18,4 +18,6 @@ call_with_func() with
   mult(^ x)
 end
 
-
+Criticism:
+  Could be confusing. Difficult for the parser to understand how many expressions should
+  be included inside the lambda. Users will be surprised.

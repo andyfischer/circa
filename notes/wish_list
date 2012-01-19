@@ -9,12 +9,12 @@
  - More sanity when message passing.
      See lincoln.ca for how crazy it is
  - delta() should work on lists
- - For-loop index() function
+ X For-loop index() function
 
 # Types #
  - Collapse 'null' and 'void' into the same type
  - Remove initialize() from simple_handle
- - Deprecate the way change_type() calls initialize()
+ X Deprecate the way change_type() calls initialize()
 
 # Parser work #
  - Switch statement

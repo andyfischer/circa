@@ -8,6 +8,19 @@ much more obvious in a functional world.
 0. Completely innocent for loop
  - No local rebinds
  - No external rebinds
+1. Mapping on input list
+ - The input list gets modified, using the results from inside the loop.
+2. Rebinding of an outside value
+ - Some outer name is rebound inside the loop, so this value can be used outside
+   the loop
+2. Left-fold on input list
+ - Some name is rebound inside the loop, and the result of this rebinding
+   is used in the next iteration.
+ - Causes order of evaluation to matter
+3. Combination of 1 and 2
+4. Unknown external effect
+ - Some function inside the loop causes an external effect
+ - Can be combined with 1 and 2
 
 for i in L
   f(i)
@@ -15,7 +28,7 @@ end
 
 This can be easily implemented with the map() function
 
-1. External rebind
+# External rebind #
 
 a = x
 for i in L
@@ -32,7 +45,7 @@ for_loop_body: {
 }
 (bind a in outer scope)
 
-2. Internal rebind
+# Internal rebind #
 
 for i in L
   a = f(a)

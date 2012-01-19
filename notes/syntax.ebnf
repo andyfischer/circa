@@ -1,5 +1,4 @@
-# This is not a strict definition, it omits things like whitespace.
-# It's also unfinished and not entirely accurate. Enjoy!
+# This document is very old and wrong
 
 statement_list = { statement }
 statement = comment
