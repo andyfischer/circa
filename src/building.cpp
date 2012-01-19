@@ -766,10 +766,6 @@ void post_compile_term(Term* term)
     }
 }
 
-void finish_branch(Branch* branch)
-{
-}
-
 void set_branch_in_progress(Branch* branch, bool inProgress)
 {
     if ((branch->inProgress && inProgress) || (!branch->inProgress && !inProgress))

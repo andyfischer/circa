@@ -138,9 +138,6 @@ void post_compile_term(Term* term);
 
 void set_branch_in_progress(Branch* branch, bool inProgress);
 
-// Add a finish_branch() term to this branch, if needed.
-void finish_branch(Branch* branch);
-
 Term* find_last_non_comment_expression(Branch* branch);
 Term* find_term_with_function(Branch* branch, Term* func);
 Term* find_input_with_function(Term* target, Term* func);

@@ -570,8 +570,6 @@ Symbol load_script(Branch* branch, const char* filename)
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
 
-    finish_branch(branch);
-
     // Post-load steps
     dll_loading_check_for_patches_on_loaded_branch(branch);
 

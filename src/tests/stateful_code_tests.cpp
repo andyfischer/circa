@@ -143,7 +143,6 @@ void one_time_assignment_inside_for_loop()
     import_function(&branch, _unique_output, "unique_output() -> int");
     import_function(&branch, _spy, "spy(int)");
     branch.compile("for i in [1 1 1] { state s = unique_output(); spy(s) }");
-    finish_branch(&branch);
     test_assert(&branch);
 
     NEXT_UNIQUE_OUTPUT = 0;

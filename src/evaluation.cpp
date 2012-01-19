@@ -288,7 +288,6 @@ void save_top_level_state(EvalContext* context, Branch* branch)
 
 void evaluate_branch(EvalContext* context, Branch* branch)
 {
-    finish_branch(branch);
     set_branch_in_progress(branch, false);
 
     // Top-level call
@@ -307,7 +306,7 @@ void evaluate_branch(EvalContext* context, Branch* branch)
 
 void evaluate_save_locals(EvalContext* context, Branch* branch)
 {
-    finish_branch(branch);
+    set_branch_in_progress(branch, false);
 
     // Top-level call
     push_frame(context, branch);
