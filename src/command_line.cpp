@@ -37,7 +37,8 @@ void print_usage()
         "  -pp                 : Print out raw source with properties\n"
         "  -s                  : Print out reconstructed source code (for testing)\n"
         "  -n                  : Don't actually run the script (use with -p or -s)\n"
-        "  -breakon <id>       : Debugger break when term <id> is created\n"
+        "  -break-on <id>       : Debugger break when term <id> is created\n"
+        "  -print-state        : Print state as text after running the script\n"
         "\n"
         "Available commands:\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
@@ -57,6 +58,7 @@ int run_command_line(List* args)
     bool printRaw = false;
     bool printRawWithProps = false;
     bool printSource = false;
+    bool printState = false;
     bool dontRunScript = false;
 
     // Prepended options
@@ -65,7 +67,7 @@ int run_command_line(List* args)
         if (list_length(args) == 0)
             break;
 
-        if (string_eq(args->get(0), "-breakon")) {
+        if (string_eq(args->get(0), "-break-on")) {
             String name;
             string_append(&name, "$");
             string_append(&name, (String*) args->get(1));
@@ -104,6 +106,11 @@ int run_command_line(List* args)
         }
         if (string_eq(args->get(0), "-n")) {
             dontRunScript = true;
+            list_remove_index(args, 0);
+            continue;
+        }
+        if (string_eq(args->get(0), "-print-state")) {
+            printState = true;
             list_remove_index(args, 0);
             continue;
         }
@@ -302,6 +309,9 @@ int run_command_line(List* args)
         copy(args->get(i), inputs->append());
 
     evaluate_branch(&context, main_branch);
+
+    if (printState)
+        std::cout << context.state.toString() << std::endl;
 
     if (error_occurred(&context)) {
         std::cout << "Error occurred:\n";

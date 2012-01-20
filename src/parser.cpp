@@ -26,8 +26,8 @@ TermPtr compile(Branch* branch, ParsingStep step, std::string const& input)
     ParserCxt context;
     Term* result = step(branch, tokens, &context).term;
 
-    set_branch_in_progress(branch, false);
     post_parse_branch(branch);
+    set_branch_in_progress(branch, false);
 
     ca_assert(branch_check_invariants_print_result(branch, std::cout));
 
@@ -813,6 +813,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (expectCondition) {
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
+            post_compile_term(condition);
             ca_assert(condition != NULL);
             currentBlock = apply(contents, FUNCS.case_func, TermList(condition));
         } else {
