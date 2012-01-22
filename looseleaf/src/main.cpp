@@ -60,8 +60,6 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    dump(&kernel);
-
     kernelRunner.start();
 
     printf("Calling app.exec..\n");

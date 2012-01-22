@@ -4,6 +4,7 @@
 
 #include "kernel.h"
 #include "debug.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -409,18 +410,23 @@ bool equals(TValue* lhs, TValue* rhs)
 
 bool equals_string(TValue* value, const char* s)
 {
-    if (is_string(value))
-        return strcmp(as_cstring(value), s) == 0;
-    else
+    if (!is_string(value))
         return false;
+    return strcmp(as_cstring(value), s) == 0;
 }
 
 bool equals_int(TValue* value, int i)
 {
-    if (is_int(value))
-        return as_int(value) == i;
-    else
+    if (!is_int(value))
         return false;
+    return as_int(value) == i;
+}
+
+bool equals_symbol(TValue* value, Symbol symbol)
+{
+    if (!is_symbol(value))
+        return false;
+    return as_symbol(value) == symbol;
 }
 
 void set_bool(TValue* value, bool b)

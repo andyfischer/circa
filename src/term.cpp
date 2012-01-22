@@ -26,7 +26,8 @@ Term::Term()
     nameSymbol(EmptyName),
     owningBranch(NULL),
     index(0),
-    nestedContents(NULL)
+    nestedContents(NULL),
+    flags(0)
 {
     globalID = gNextGlobalID++;
 

@@ -47,7 +47,7 @@ const char* symbol_get_text(Symbol symbol)
         case PureCall: return "PureCall";
         case ControlFlowCall: return "ControlFlowCall";
         case Eager: return "Eager";
-        case Range: return "Range";
+        case Default: return "Default";
         case Unevaluated: return "Unevaluated";
         case Lazy: return "Lazy";
     }

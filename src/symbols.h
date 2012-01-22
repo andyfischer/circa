@@ -33,8 +33,8 @@ const Symbol PureCall = 8;
 const Symbol ControlFlowCall = 9;
 
 // Evaluation strategies
-const Symbol Eager = 14;
-const Symbol Range = 15;
+const Symbol Default = 14;
+const Symbol Eager = 15;
 
 // Temporary register values
 const Symbol Unevaluated = 16;

@@ -217,10 +217,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
 
     context->currentTerm = term;
 
-    #if CIRCA_THROW_ON_ERROR
-    try {
-    #endif
-
     int inputCount;
     int outputCount;
     fetch_input_pointers(context, term, inputBuffer, &inputCount, &outputCount);
@@ -413,6 +409,7 @@ bool error_occurred(EvalContext* context)
 
 void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
 {
+    set_branch_in_progress(branch, false);
     push_frame(context, branch);
 
     for (int i=start; i <= end; i++)
@@ -431,6 +428,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TValue* result)
     // search to terms inside the current branch.
     
     Branch* branch = term->owningBranch;
+    set_branch_in_progress(branch, false);
 
     push_frame(context, branch);
 
@@ -550,8 +548,7 @@ void advance_pc(Frame* frame)
     frame->pc++;
 }
 
-void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer,
-    int* ninputs, int* noutputs)
+void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int* ninputs, int* noutputs)
 {
     Frame* frame = top_frame(context);
 
@@ -596,28 +593,29 @@ do_instruction:
     // Check if we have finished this branch
     if (pc >= frame->endPc) {
 
-        // If we've finished the top branch then end this interpreter session
+        // If we've finished the top branch then end this interpreter session.
         if (branch == topBranch)
             return;
 
         finish_frame(context);
-
-        if (context->numFrames == 0)
-            return;
-
         goto do_instruction;
     }
 
     Term* term = branch->get(pc);
 
-    if (!is_function(term->function)) {
+    // Skip a lazy-call in Default strategy.
+    if (frame->strategy == Default && is_lazy_call(term)) {
+        set_symbol(get_register(context, term), Unevaluated);
         advance_pc(frame);
         goto do_instruction;
     }
 
-    Function* function = as_function(term->function);
+    EvaluateFunc evaluate = NULL;
 
-    if (function->evaluate == NULL) {
+    if (is_function(term->function))
+        evaluate = as_function(term->function)->evaluate;
+
+    if (evaluate == NULL) {
         advance_pc(frame);
         goto do_instruction;
     }
@@ -634,7 +632,7 @@ do_instruction:
 
     int startingFrameCount = context->numFrames;
 
-    function->evaluate(context, inputCount, outputCount, inputBuffer);
+    evaluate(context, inputCount, outputCount, inputBuffer);
 
     bool framePushed = context->numFrames > startingFrameCount;
 
@@ -642,8 +640,8 @@ do_instruction:
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
 
-    // Check the type of the output value of every single call. This is slow, and it should
-    // be unnecessary, but it's a good test.
+#if 0
+    // Check the type of the output value of every single call.
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term) && !framePushed) {
         Type* outputType = get_output_type(term);
@@ -658,11 +656,12 @@ do_instruction:
         }
     }
     #endif
+#endif
     
     if (error_occurred(context))
         return;
 
-    if (function->vmInstruction == PureCall)
+    if (as_function(term->function)->vmInstruction == PureCall)
         advance_pc(top_frame(context));
 
     goto do_instruction;

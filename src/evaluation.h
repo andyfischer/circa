@@ -68,8 +68,7 @@ Frame* top_frame(EvalContext* context);
 void reset_stack(EvalContext* context);
 
 // Pre-evaluation
-void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer,
-    int* ninputs, int* noutputs);
+void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int* ninputs, int* noutputs);
 
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.

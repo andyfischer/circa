@@ -705,6 +705,15 @@ float get_step(Term* term)
 {
     return term->floatPropOptional("step", 1.0);
 }
+bool is_lazy_call(Term* term)
+{
+    return term->flags & TERM_FLAG_LAZY;
+}
+void set_lazy_call(Term* term, bool value)
+{
+    term->setBoolProp("lazy", value);
+    term->flags = (term->flags & ~TERM_FLAG_LAZY) + (value ? TERM_FLAG_LAZY : 0);
+}
 
 void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition, bool outsidePositive)
 {

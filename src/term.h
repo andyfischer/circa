@@ -13,6 +13,8 @@
 
 namespace circa {
 
+const int TERM_FLAG_LAZY = 0x1;
+
 struct Term : TValue
 {
     // Fields inherited from TValue:
@@ -73,6 +75,8 @@ struct Term : TValue
 
     // Dynamic properties
     Dict properties;
+
+    int flags;
 
     // Terms which are using this term as an input.
     TermList users;
