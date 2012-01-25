@@ -325,7 +325,7 @@ void test_state_is_reset_when_if_fails2()
 
     set_bool(a, true);
     evaluate_branch(&context, &branch);
-    test_equals(&context.state, "{_if_block: [{s: 3}]}");
+    test_equals(&context.state, "{_if_block: [{s: 2}]}");
 }
 
 void register_tests()

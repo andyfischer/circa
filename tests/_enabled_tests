@@ -16,6 +16,7 @@ if_block_1.ca
 if_block_2.ca
 if_block_output.ca
 if_state.ca
+lazy.ca
 list.ca
 math.ca
 method_calls.ca

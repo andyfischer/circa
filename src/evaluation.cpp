@@ -708,7 +708,8 @@ do_instruction:
     if (error_occurred(context))
         return;
 
-    if (context->numFrames <= previousNumFrames)
+    if (as_function(term->function)->vmInstruction == PureCall
+            && context->numFrames <= previousNumFrames)
         advance_pc(top_frame(context));
 
     goto do_instruction;

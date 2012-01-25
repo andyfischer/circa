@@ -29,7 +29,14 @@ namespace declared_state_function {
         if (contents->length() > 0) {
             set_symbol(OUTPUT, InProgress);
             push_frame(CONTEXT, nested_contents(CALLER));
+            return;
         }
+
+        // Otherwise, reset to the type's default value
+        if (declared_type(CALLER) == &ANY_T)
+            set_null(OUTPUT);
+        else
+            create(declared_type(CALLER), OUTPUT);
 
 #if 0
         // Try to use default_value from an input.
@@ -65,8 +72,11 @@ namespace declared_state_function {
 
         Term* defaultValue = NULL;
 
-        if (nested_contents(term)->length() > 0)
+        if (nested_contents(term)->length() > 0) {
             defaultValue = nested_contents(term)->getFromEnd(0)->input(0);
+            if (defaultValue->boolPropOptional("hidden", false))
+                defaultValue = defaultValue->input(0);
+        }
 
         if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);

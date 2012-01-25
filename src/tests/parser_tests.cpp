@@ -215,7 +215,7 @@ void test_stateful_value_decl()
     test_assert(is_declared_state(c));
     test_equals(c->type->name, "number");
     test_assert(branch["c"] == c);
-    test_assert(!is_float(c) || as_float(b) == 0); // shouldn't have this value yet
+    test_assert(!is_float(c) || as_float(c) == 0); // shouldn't have this value yet
 }
 
 void test_arrow_concatenation()

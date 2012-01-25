@@ -91,7 +91,7 @@ void if_blocks()
     test_snippet("if true { state a }");
     test_snippet("if true { state a } else { state b }");
 
-    test_trimmed_state("if true { state a }", "", "{_if_block: [{a: <any>}]}");
+    test_trimmed_state("if true { state a }", "", "{_if_block: [{a: null}]}");
 }
 
 void function_calls()
@@ -109,7 +109,7 @@ void for_loops()
     test_snippet("for i in [1] { state s }");
     test_snippet("for i in [1 2 3] { state s }");
 
-    test_trimmed_state("for i in [1 2 3] { state s }", "", "{_for: [{s: <any>}, {s: <any>}, {s: <any>}]}");
+    test_trimmed_state("for i in [1 2 3] { state s }", "", "{_for: [{s: null}, {s: null}, {s: null}]}");
 }
 
 void register_tests()

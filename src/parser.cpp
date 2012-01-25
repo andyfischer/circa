@@ -1029,12 +1029,20 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         // the term's nested_contents.
 
         Term* initialValue = infix_expression(nested_contents(result), tokens, context).term;
+
+        if (type != declared_type(initialValue) && type != &ANY_T) {
+            initialValue = apply(nested_contents(result), FUNCS.cast, TermList(initialValue));
+            initialValue->setBoolProp("hidden", true);
+            change_declared_type(initialValue, type);
+        }
+
         append_output_placeholder(nested_contents(result), initialValue);
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
-        if (typeName == "" && initialValue->type != &NULL_T)
+        if (typeName == "" && initialValue->type != &NULL_T) {
             type = initialValue->type;
+        }
     }
 
     check_to_insert_implicit_inputs(result);
