@@ -1,0 +1,91 @@
+
+Currently our system for control flow is a little too simple. We need ways
+to have lazy-calls or short-circuit evaluation.
+
+Features:
+ - Allow for deferred calls (term is not evaluated until another term needs it)
+ - Allow for short-circuit evaluation in cond() function
+
+Also:
+ - Support easy correlation with AST
+ - Support runtime modification
+
+
+One strategy for runtime modification:
+ 1) Look at all the temporary values we have
+ 2) Obtain a 'signature' that defines how we arrived at each value (this will use
+   function names with versions, and signatures for input values).
+ 3) Look at the new code and determine where the signatures can match up. Reuse
+   existing values when possible, and reevaluate when necessary.
+ - This method might be too complex for what we need, it will be hard to predict
+   which functions need to be reevalauted, and doing things out of order may lead
+   to broken assumptions.
+    - Here it would help to have a side-effect-free form of evaluation
+
+Append mode:
+ - Most edits are appending to existing code
+ - We've already started to make design decisions based on this assumption- why not
+   codify it?
+ - We can statically determine, for a given function, what edits that it supports.
+   - Append (should always be supported?)
+   - Arbitrary
+
+What are some ways that runtime modification will mess up our code?
+ - With side effects, the sky is the limit
+ - Maybe we need to separate side effects into two groups: harmless (like graphics operations)
+   and harmful (like file system operations)
+
+Example of a bad modification:
+
+def func()
+  f = open_file()
+  for i in 0..3
+    f.write(i)
+    self_modify_here()
+  f.close()
+
+We can't resume an interpreter to code which is in the middle of writing a file.
+
+Any modification that would have us resume to a code point that is in between side
+effects is bad. Resuming before the first side effect is ok, as is resuming after
+the last side effect.
+
+Solution: transactions.
+
+def func()
+  transact {
+    f = open_file()
+    for i in 0..3
+      f.write(i)
+      self_modify_here()
+    f.close()
+  }
+
+We can postpone the code modification until after the transact() block.
+
+Anyway back to the original problem of deferred evaluation.
+
+We can have a BranchView object that defines how to evaluate the Branch.
+
+Each EvalContext::Frame has a BranchView*.
+
+fr = f()
+if (something)
+  hr = h(fr)
+
+-- Want to make 'f' a lazy call
+-- Turn this into:
+
+if (something)
+  call f()
+  c = h(fr)
+
+Should the lazy-behavior be placed into a derived Branch?
+
+Imagine several levels of Branch objects. At the bottom is the one as the user
+wrote. Above that are generated Branches to perform various code transformations.
+We evaluate the one at the top.
+
+If we make any changes to the bottom Branches, then we regenerate the upper ones
+and all is good. But if we want to do a code modification on an upper one, can the
+system resolve this?

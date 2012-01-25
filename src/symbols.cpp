@@ -46,9 +46,10 @@ const char* symbol_get_text(Symbol symbol)
         case ExtraOutputNotFound: return "ExtraOutputNotFound";
         case PureCall: return "PureCall";
         case ControlFlowCall: return "ControlFlowCall";
-        case Eager: return "Eager";
         case Default: return "Default";
+        case ByDemand: return "ByDemand";
         case Unevaluated: return "Unevaluated";
+        case InProgress: return "InProgress";
         case Lazy: return "Lazy";
     }
 

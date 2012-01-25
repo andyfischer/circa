@@ -1017,7 +1017,8 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
                 "Not a type: "+typeTerm->name);
     }
 
-    Term* initialValue = NULL;
+    // Create the declared_state() term.
+    Term* result = apply(branch, DECLARED_STATE_FUNC, TermList(), name);
 
     // Possibly consume an expression for the initial value.
     if (tokens.nextIs(EQUALS)) {
@@ -1025,9 +1026,10 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         possible_whitespace(tokens);
 
         // If the initial value contains any new expressions, then those live inside
-        // nestedContents.
+        // the term's nested_contents.
 
-        initialValue = infix_expression(branch, tokens, context).term;
+        Term* initialValue = infix_expression(nested_contents(result), tokens, context).term;
+        append_output_placeholder(nested_contents(result), initialValue);
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
@@ -1035,8 +1037,6 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
             type = initialValue->type;
     }
 
-    // Create the declared_state() term.
-    Term* result = apply(branch, DECLARED_STATE_FUNC, TermList(initialValue), name);
     check_to_insert_implicit_inputs(result);
     change_declared_type(result, type);
     

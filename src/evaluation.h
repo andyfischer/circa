@@ -17,8 +17,11 @@ struct Frame
     List registers;
     Branch* branch;
     int pc;
-    Symbol strategy;
+    int startPc;
     int endPc;
+#ifdef DEFERRED_CALLS_FIRST_DRAFT
+    Symbol strategy;
+#endif
 };
 
 struct EvalContext
@@ -66,6 +69,10 @@ void pop_frame(EvalContext* context);
 void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
 void reset_stack(EvalContext* context);
+
+#ifdef DEFERRED_CALLS_FIRST_DRAFT
+void push_frame_to_demand_evaluation(EvalContext* context, Term* target);
+#endif
 
 // Pre-evaluation
 void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int* ninputs, int* noutputs);

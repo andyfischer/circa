@@ -35,7 +35,6 @@ void assert_valid_branch(Branch const* obj)
 
 Branch::Branch()
   : owningTerm(NULL),
-    _refCount(0),
     inProgress(false),
     currentlyCascadingUpdates(false)
 {

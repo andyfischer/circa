@@ -1,0 +1,12 @@
+
+def lazyCall() -> int
+  print('called lazyCall')
+  return 0
+
+def run()
+  state s = lazyCall()
+
+s = null
+run(state = s)
+run(state = s)
+run(state = s)

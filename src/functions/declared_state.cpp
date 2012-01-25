@@ -23,6 +23,15 @@ namespace declared_state_function {
                 return;
         }
 
+        // We couldn't use the input value, push a frame to evaluate the default value.
+        Branch* contents = nested_contents(CALLER);
+
+        if (contents->length() > 0) {
+            set_symbol(OUTPUT, InProgress);
+            push_frame(CONTEXT, nested_contents(CALLER));
+        }
+
+#if 0
         // Try to use default_value from an input.
         TValue* defaultValue = INPUT(1);
         if (defaultValue != NULL) {
@@ -39,6 +48,7 @@ namespace declared_state_function {
             // Otherwise, reset to the type's default value
             create(declared_type(CALLER), output);
         }
+#endif
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -53,10 +63,10 @@ namespace declared_state_function {
 
         append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);
 
-        Term* defaultValue = term->input(1);
+        Term* defaultValue = NULL;
 
-        if (defaultValue == NULL && nested_contents(term)->length() > 0)
-            defaultValue = nested_contents(term)->getFromEnd(0);
+        if (nested_contents(term)->length() > 0)
+            defaultValue = nested_contents(term)->getFromEnd(0)->input(0);
 
         if (defaultValue != NULL) {
             append_phrase(source, " = ", term, phrase_type::UNDEFINED);
@@ -71,7 +81,7 @@ namespace declared_state_function {
     void setup(Branch* kernel)
     {
         DECLARED_STATE_FUNC = import_function(kernel, get_declared_state,
-            "declared_state(state any value, any default_value :optional) -> any");
+            "declared_state(state any value) -> any");
         as_function(DECLARED_STATE_FUNC)->formatSource = formatSource;
     }
 }

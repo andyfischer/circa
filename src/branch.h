@@ -26,8 +26,6 @@ struct Branch
     // Points to the Term which owns this branch as a value.
     Term* owningTerm;
 
-    int _refCount;
-
     // Whether this branch is "in progress". Certain cleanup actions are suspended
     // while in this state, this is for more efficient building.
     bool inProgress;

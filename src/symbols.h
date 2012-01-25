@@ -9,38 +9,39 @@ struct TValue;
 typedef int Symbol;
 
 const Symbol InvalidSymbol = 0;
-const Symbol EmptyName = 17;
+const Symbol EmptyName = 1;
 
 // Core symbols
-const Symbol File = 1;
-const Symbol Newline = 2;
-const Symbol Out = 3;
-const Symbol Unknown = 4;
-const Symbol Repeat = 10;
-const Symbol Success = 12;
-const Symbol Failure = 13;
+const Symbol File = 2;
+const Symbol Newline = 3;
+const Symbol Out = 4;
+const Symbol Unknown = 5;
+const Symbol Repeat = 6;
+const Symbol Success = 7;
+const Symbol Failure = 8;
 
 // Misc errors
-const Symbol FileNotFound = 11;
+const Symbol FileNotFound = 9;
 
 // Static errors
-const Symbol NotEnoughInputs = 5;
-const Symbol TooManyInputs = 6;
-const Symbol ExtraOutputNotFound = 7;
+const Symbol NotEnoughInputs = 10;
+const Symbol TooManyInputs = 11;
+const Symbol ExtraOutputNotFound = 12;
 
 // VM instructions (used in Function)
-const Symbol PureCall = 8;
-const Symbol ControlFlowCall = 9;
+const Symbol PureCall = 13;
+const Symbol ControlFlowCall = 14;
 
 // Evaluation strategies
-const Symbol Default = 14;
-const Symbol Eager = 15;
+const Symbol Default = 15;
+const Symbol ByDemand = 16;
 
 // Temporary register values
-const Symbol Unevaluated = 16;
-const Symbol Lazy = 18;
+const Symbol Unevaluated = 17;
+const Symbol InProgress = 18;
+const Symbol Lazy = 19;
 
-const Symbol HighestBuiltinSymbol = 18;
+const Symbol HighestBuiltinSymbol = 19;
 
 const Symbol FirstRuntimeSymbol = 1000;
 
