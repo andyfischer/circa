@@ -1,6 +1,4 @@
-print("Running main.ca")
 
 state window = create_window('../test_script.ca'->rpath)
 if once()
-    print("Creating window..")
     window.resize([400 400])

@@ -72,7 +72,6 @@ void Viewport::saveScript()
 }
 void Viewport::paintGL()
 {
-    printf("Viewport::paintGL\n");
     try {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         scriptEnv.tick();

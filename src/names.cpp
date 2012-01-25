@@ -33,7 +33,10 @@ Term* find_name(Branch* branch, int location, Symbol name)
     if (parent == NULL)
         return get_global(name);
 
-    return find_name(parent->owningBranch, parent->index, name);
+    // find_name with the parent's location plus one, so that we do look
+    // at the parent's branch (in case our name has a namespace prefix
+    // that refers to this branch).
+    return find_name(parent->owningBranch, parent->index + 1, name);
 }
 
 Term* find_name(Branch* branch, int location, const char* name)

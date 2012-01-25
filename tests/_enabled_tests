@@ -20,6 +20,7 @@ lazy.ca
 list.ca
 math.ca
 method_calls.ca
+namespaces.ca
 set.ca
 set_index.ca
 strings.ca

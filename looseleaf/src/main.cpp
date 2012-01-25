@@ -67,6 +67,8 @@ int main(int argc, char *argv[])
 
     printf("Shutting down, result = %d\n", result);
 
+    dump(circa::kernel());
+
     clear_branch(&kernel);
     circa_shutdown();
 

@@ -1,0 +1,10 @@
+
+namespace ns
+  def f() -> int
+    return 5
+
+  def g() -> int
+    return ns:f() # refer to namespace from within namespace
+
+assert(ns:f() == 5)
+assert(ns:g() == 5)
