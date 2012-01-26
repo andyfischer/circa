@@ -28,7 +28,7 @@ namespace if_block_function {
 
             append_phrase(source,
                     caseTerm->stringPropOptional("syntax:preWhitespace", ""),
-                    caseTerm, token::WHITESPACE);
+                    caseTerm, TK_WHITESPACE);
 
             if (firstCase) {
                 append_phrase(source, "if ", caseTerm, phrase_type::KEYWORD);

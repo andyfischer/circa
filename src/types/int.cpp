@@ -38,7 +38,7 @@ namespace int_t {
             strm << "0x" << std::hex;
 
         strm << as_int(term);
-        append_phrase(source, strm.str(), term, token::INTEGER);
+        append_phrase(source, strm.str(), term, TK_INTEGER);
     }
     void setup_type(Type* type)
     {

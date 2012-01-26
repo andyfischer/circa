@@ -7,7 +7,6 @@
 #include <vector>
 
 namespace circa {
-namespace token {
 
 struct Token
 {
@@ -27,93 +26,92 @@ struct Token
 
 typedef std::vector<Token> TokenList;
 
-const int IDENTIFIER = 1;
-const int SYMBOL = 9;
-const int INTEGER = 3;
-const int HEX_INTEGER = 4;
-const int FLOAT_TOKEN = 5;
-const int STRING = 6;
-const int COLOR = 7;
-const int BOOL = 8;
+const int TK_IDENTIFIER = 1;
+const int TK_SYMBOL = 9;
+const int TK_INTEGER = 3;
+const int TK_HEX_INTEGER = 4;
+const int TK_FLOAT = 5;
+const int TK_STRING = 6;
+const int TK_COLOR = 7;
+const int TK_BOOL = 8;
 
-const int LPAREN = 10;
-const int RPAREN = 11;
-const int LBRACE = 12;
-const int RBRACE = 13;
-const int LBRACKET = 14;
-const int RBRACKET = 15;
-const int COMMA = 16;
-const int AT_SIGN = 17;
-const int DOT = 18;
-const int STAR = 19;
-const int QUESTION = 20;
-const int SLASH = 21;
-const int DOUBLE_SLASH = 44;
-const int PLUS = 22;
-const int MINUS = 23;
-const int LTHAN = 24;
-const int LTHANEQ = 25;
-const int GTHAN = 26;
-const int GTHANEQ = 27;
-const int PERCENT = 41;
-const int COLON = 28;
-const int DOUBLE_COLON = 47;
-const int DOUBLE_EQUALS = 29;
-const int NOT_EQUALS = 30;
-const int EQUALS = 31;
-const int PLUS_EQUALS = 32;
-const int MINUS_EQUALS = 33;
-const int STAR_EQUALS = 34;
-const int SLASH_EQUALS = 35;
-const int COLON_EQUALS = 36;
-const int RIGHT_ARROW = 37;
-const int LEFT_ARROW = 43;
-const int AMPERSAND = 45;
-const int DOUBLE_AMPERSAND = 38;
-const int DOUBLE_VERTICAL_BAR = 39;
-const int SEMICOLON = 40;
-const int TWO_DOTS = 46;
-const int ELLIPSIS = 42;
-const int TRIPLE_LTHAN = 48;
-const int TRIPLE_GTHAN = 49;
-const int POUND = 50;
+const int TK_LPAREN = 10;
+const int TK_RPAREN = 11;
+const int TK_LBRACE = 12;
+const int TK_RBRACE = 13;
+const int TK_LBRACKET = 14;
+const int TK_RBRACKET = 15;
+const int TK_COMMA = 16;
+const int TK_AT_SIGN = 17;
+const int TK_DOT = 18;
+const int TK_STAR = 19;
+const int TK_QUESTION = 20;
+const int TK_SLASH = 21;
+const int TK_DOUBLE_SLASH = 44;
+const int TK_PLUS = 22;
+const int TK_MINUS = 23;
+const int TK_LTHAN = 24;
+const int TK_LTHANEQ = 25;
+const int TK_GTHAN = 26;
+const int TK_GTHANEQ = 27;
+const int TK_PERCENT = 41;
+const int TK_COLON = 28;
+const int TK_DOUBLE_COLON = 47;
+const int TK_DOUBLE_EQUALS = 29;
+const int TK_NOT_EQUALS = 30;
+const int TK_EQUALS = 31;
+const int TK_PLUS_EQUALS = 32;
+const int TK_MINUS_EQUALS = 33;
+const int TK_STAR_EQUALS = 34;
+const int TK_SLASH_EQUALS = 35;
+const int TK_COLON_EQUALS = 36;
+const int TK_RIGHT_ARROW = 37;
+const int TK_LEFT_ARROW = 43;
+const int TK_AMPERSAND = 45;
+const int TK_DOUBLE_AMPERSAND = 38;
+const int TK_DOUBLE_VERTICAL_BAR = 39;
+const int TK_SEMICOLON = 40;
+const int TK_TWO_DOTS = 46;
+const int TK_ELLIPSIS = 42;
+const int TK_TRIPLE_LTHAN = 48;
+const int TK_TRIPLE_GTHAN = 49;
+const int TK_POUND = 50;
 
-const int DEF = 51;
-const int TYPE = 52;
-const int BEGIN = 64;
-const int DO = 70;
-const int END = 53;
-const int IF = 54;
-const int ELSE = 55;
-const int ELIF = 63;
-const int FOR = 56;
-const int STATE = 57;
-const int RETURN = 58;
-const int IN_TOKEN = 59;
-const int TRUE_TOKEN = 60;
-const int FALSE_TOKEN = 61;
-const int DO_ONCE = 62;
-const int NAMESPACE = 65;
-const int INCLUDE = 66;
-const int IMPORT = 76;
-const int AND = 67;
-const int OR = 68;
-const int DISCARD = 69;
-const int NULL_TOKEN = 71;
-const int BREAK = 72;
-const int CONTINUE = 73;
-const int SWITCH = 74;
-const int CASE = 75;
+const int TK_DEF = 51;
+const int TK_TYPE = 52;
+const int TK_BEGIN = 64;
+const int TK_DO = 70;
+const int TK_END = 53;
+const int TK_IF = 54;
+const int TK_ELSE = 55;
+const int TK_ELIF = 63;
+const int TK_FOR = 56;
+const int TK_STATE = 57;
+const int TK_RETURN = 58;
+const int TK_IN = 59;
+const int TK_TRUE = 60;
+const int TK_FALSE = 61;
+const int TK_DO_ONCE = 62;
+const int TK_NAMESPACE = 65;
+const int TK_INCLUDE = 66;
+const int TK_IMPORT = 76;
+const int TK_AND = 67;
+const int TK_OR = 68;
+const int TK_DISCARD = 69;
+const int TK_NULL = 71;
+const int TK_BREAK = 72;
+const int TK_CONTINUE = 73;
+const int TK_SWITCH = 74;
+const int TK_CASE = 75;
 
-const int WHITESPACE = 80;
-const int NEWLINE = 81;
-const int COMMENT = 82;
-const int EOF_TOKEN = 83;
+const int TK_WHITESPACE = 80;
+const int TK_NEWLINE = 81;
+const int TK_COMMENT = 82;
+const int TK_EOF = 83;
 
-const int UNRECOGNIZED = 90;
+const int TK_UNRECOGNIZED = 90;
 
 const char* get_token_text(int match);
 void tokenize(std::string const &input, TokenList* results);
 
-} // namespace token
 } // namespace circa

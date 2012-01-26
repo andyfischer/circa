@@ -5,89 +5,88 @@
 #include "token.h"
 
 namespace circa {
-namespace token {
 
 const char* get_token_text(int match)
 {
     switch (match) {
-        case LPAREN: return "(";
-        case RPAREN: return ")";
-        case LBRACE: return "{";
-        case RBRACE: return "}";
-        case LBRACKET: return "[";
-        case RBRACKET: return "]";
-        case COMMA: return ",";
-        case AT_SIGN: return "@";
-        case IDENTIFIER: return "IDENTIFIER";
-        case SYMBOL: return "SYMBOL";
-        case INTEGER: return "INTEGER";
-        case HEX_INTEGER: return "HEX_INTEGER";
-        case FLOAT_TOKEN: return "FLOAT";
-        case STRING: return "STRING";
-        case COLOR: return "COLOR";
-        case COMMENT: return "COMMENT";
-        case DOT: return ".";
-        case STAR: return "*";
-        case QUESTION: return "?";
-        case SLASH: return "/";
-        case DOUBLE_SLASH: return "//";
-        case PLUS: return "+";
-        case MINUS: return "-";
-        case LTHAN: return "<";
-        case LTHANEQ: return "<=";
-        case GTHAN: return ">";
-        case GTHANEQ: return ">=";
-        case PERCENT: return "%";
-        case COLON: return ":";
-        case DOUBLE_COLON: return "::";
-        case DOUBLE_EQUALS: return "==";
-        case NOT_EQUALS: return "!=";
-        case EQUALS: return "=";
-        case PLUS_EQUALS: return "+=";
-        case MINUS_EQUALS: return "-=";
-        case STAR_EQUALS: return "*=";
-        case SLASH_EQUALS: return "/=";
-        case COLON_EQUALS: return ":=";
-        case RIGHT_ARROW: return "->";
-        case LEFT_ARROW: return "<-";
-        case AMPERSAND: return "&";
-        case DOUBLE_AMPERSAND: return "&&";
-        case DOUBLE_VERTICAL_BAR: return "||";
-        case SEMICOLON: return ";";
-        case TWO_DOTS: return "..";
-        case ELLIPSIS: return "...";
-        case TRIPLE_LTHAN: return "<<<";
-        case TRIPLE_GTHAN: return ">>>";
-        case POUND: return "#";
-        case WHITESPACE: return "WHITESPACE";
-        case NEWLINE: return "NEWLINE";
-        case BEGIN: return "begin";
-        case DO: return "do";
-        case END: return "end";
-        case IF: return "if";
-        case ELSE: return "else";
-        case ELIF: return "elif";
-        case FOR: return "for";
-        case STATE: return "state";
-        case DEF: return "def";
-        case TYPE: return "type";
-        case RETURN: return "return";
-        case IN_TOKEN: return "in";
-        case TRUE_TOKEN: return "true";
-        case FALSE_TOKEN: return "false";
-        case DO_ONCE: return "do once";
-        case NAMESPACE: return "namespace";
-        case INCLUDE: return "include";
-        case IMPORT: return "import";
-        case AND: return "and";
-        case OR: return "or";
-        case DISCARD: return "discard";
-        case NULL_TOKEN: return "null";
-        case BREAK: return "break";
-        case CONTINUE: return "continue";
-        case SWITCH: return "switch";
-        case CASE: return "case";
-        case UNRECOGNIZED: return "UNRECOGNIZED";
+        case TK_LPAREN: return "(";
+        case TK_RPAREN: return ")";
+        case TK_LBRACE: return "{";
+        case TK_RBRACE: return "}";
+        case TK_LBRACKET: return "[";
+        case TK_RBRACKET: return "]";
+        case TK_COMMA: return ",";
+        case TK_AT_SIGN: return "@";
+        case TK_IDENTIFIER: return "IDENTIFIER";
+        case TK_SYMBOL: return "SYMBOL";
+        case TK_INTEGER: return "INTEGER";
+        case TK_HEX_INTEGER: return "HEX_INTEGER";
+        case TK_FLOAT: return "FLOAT";
+        case TK_STRING: return "STRING";
+        case TK_COLOR: return "COLOR";
+        case TK_COMMENT: return "COMMENT";
+        case TK_DOT: return ".";
+        case TK_STAR: return "*";
+        case TK_QUESTION: return "?";
+        case TK_SLASH: return "/";
+        case TK_DOUBLE_SLASH: return "//";
+        case TK_PLUS: return "+";
+        case TK_MINUS: return "-";
+        case TK_LTHAN: return "<";
+        case TK_LTHANEQ: return "<=";
+        case TK_GTHAN: return ">";
+        case TK_GTHANEQ: return ">=";
+        case TK_PERCENT: return "%";
+        case TK_COLON: return ":";
+        case TK_DOUBLE_COLON: return "::";
+        case TK_DOUBLE_EQUALS: return "==";
+        case TK_NOT_EQUALS: return "!=";
+        case TK_EQUALS: return "=";
+        case TK_PLUS_EQUALS: return "+=";
+        case TK_MINUS_EQUALS: return "-=";
+        case TK_STAR_EQUALS: return "*=";
+        case TK_SLASH_EQUALS: return "/=";
+        case TK_COLON_EQUALS: return ":=";
+        case TK_RIGHT_ARROW: return "->";
+        case TK_LEFT_ARROW: return "<-";
+        case TK_AMPERSAND: return "&";
+        case TK_DOUBLE_AMPERSAND: return "&&";
+        case TK_DOUBLE_VERTICAL_BAR: return "||";
+        case TK_SEMICOLON: return ";";
+        case TK_TWO_DOTS: return "..";
+        case TK_ELLIPSIS: return "...";
+        case TK_TRIPLE_LTHAN: return "<<<";
+        case TK_TRIPLE_GTHAN: return ">>>";
+        case TK_POUND: return "#";
+        case TK_WHITESPACE: return "WHITESPACE";
+        case TK_NEWLINE: return "NEWLINE";
+        case TK_BEGIN: return "begin";
+        case TK_DO: return "do";
+        case TK_END: return "end";
+        case TK_IF: return "if";
+        case TK_ELSE: return "else";
+        case TK_ELIF: return "elif";
+        case TK_FOR: return "for";
+        case TK_STATE: return "state";
+        case TK_DEF: return "def";
+        case TK_TYPE: return "type";
+        case TK_RETURN: return "return";
+        case TK_IN: return "in";
+        case TK_TRUE: return "true";
+        case TK_FALSE: return "false";
+        case TK_DO_ONCE: return "do once";
+        case TK_NAMESPACE: return "namespace";
+        case TK_INCLUDE: return "include";
+        case TK_IMPORT: return "import";
+        case TK_AND: return "and";
+        case TK_OR: return "or";
+        case TK_DISCARD: return "discard";
+        case TK_NULL: return "null";
+        case TK_BREAK: return "break";
+        case TK_CONTINUE: return "continue";
+        case TK_SWITCH: return "switch";
+        case TK_CASE: return "case";
+        case TK_UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
 }
@@ -173,14 +172,14 @@ struct TokenizeContext
 
         // Update precedingIndent if this is the first whitespace on a line
         if (this->precedingIndent == -1) {
-            if (instance.match == WHITESPACE)
+            if (instance.match == TK_WHITESPACE)
                 this->precedingIndent = len;
             else
                 this->precedingIndent = 0;
         }
 
         // NEWLINE token is a special case
-        if (instance.match == NEWLINE) {
+        if (instance.match == TK_NEWLINE) {
             instance.lineEnd = instance.lineStart;
             instance.colEnd = instance.colStart + 1;
             this->precedingIndent = -1;
@@ -286,33 +285,33 @@ void top_level_consume_token(TokenizeContext &context)
 {
     if (is_identifier_first_letter(context.next())) {
 
-        if (try_to_consume_keyword(context, DEF)) return;
-        if (try_to_consume_keyword(context, TYPE)) return;
-        if (try_to_consume_keyword(context, BEGIN)) return;
-        if (try_to_consume_keyword(context, END)) return;
-        if (try_to_consume_keyword(context, IF)) return;
-        if (try_to_consume_keyword(context, ELSE)) return;
-        if (try_to_consume_keyword(context, ELIF)) return;
-        if (try_to_consume_keyword(context, FOR)) return;
-        if (try_to_consume_keyword(context, STATE)) return;
-        if (try_to_consume_keyword(context, IN_TOKEN)) return;
-        if (try_to_consume_keyword(context, TRUE_TOKEN)) return;
-        if (try_to_consume_keyword(context, FALSE_TOKEN)) return;
+        if (try_to_consume_keyword(context, TK_DEF)) return;
+        if (try_to_consume_keyword(context, TK_TYPE)) return;
+        if (try_to_consume_keyword(context, TK_BEGIN)) return;
+        if (try_to_consume_keyword(context, TK_END)) return;
+        if (try_to_consume_keyword(context, TK_IF)) return;
+        if (try_to_consume_keyword(context, TK_ELSE)) return;
+        if (try_to_consume_keyword(context, TK_ELIF)) return;
+        if (try_to_consume_keyword(context, TK_FOR)) return;
+        if (try_to_consume_keyword(context, TK_STATE)) return;
+        if (try_to_consume_keyword(context, TK_IN)) return;
+        if (try_to_consume_keyword(context, TK_TRUE)) return;
+        if (try_to_consume_keyword(context, TK_FALSE)) return;
         // check 'do once' before 'do'
-        if (try_to_consume_keyword(context, DO_ONCE)) return; 
-        if (try_to_consume_keyword(context, DO)) return;
-        if (try_to_consume_keyword(context, NAMESPACE)) return;
-        if (try_to_consume_keyword(context, INCLUDE)) return;
-        if (try_to_consume_keyword(context, IMPORT)) return;
-        if (try_to_consume_keyword(context, AND)) return;
-        if (try_to_consume_keyword(context, OR)) return;
-        if (try_to_consume_keyword(context, DISCARD)) return;
-        if (try_to_consume_keyword(context, NULL_TOKEN)) return;
-        if (try_to_consume_keyword(context, RETURN)) return;
-        if (try_to_consume_keyword(context, BREAK)) return;
-        if (try_to_consume_keyword(context, CONTINUE)) return;
-        if (try_to_consume_keyword(context, SWITCH)) return;
-        if (try_to_consume_keyword(context, CASE)) return;
+        if (try_to_consume_keyword(context, TK_DO_ONCE)) return; 
+        if (try_to_consume_keyword(context, TK_DO)) return;
+        if (try_to_consume_keyword(context, TK_NAMESPACE)) return;
+        if (try_to_consume_keyword(context, TK_INCLUDE)) return;
+        if (try_to_consume_keyword(context, TK_IMPORT)) return;
+        if (try_to_consume_keyword(context, TK_AND)) return;
+        if (try_to_consume_keyword(context, TK_OR)) return;
+        if (try_to_consume_keyword(context, TK_DISCARD)) return;
+        if (try_to_consume_keyword(context, TK_NULL)) return;
+        if (try_to_consume_keyword(context, TK_RETURN)) return;
+        if (try_to_consume_keyword(context, TK_BREAK)) return;
+        if (try_to_consume_keyword(context, TK_CONTINUE)) return;
+        if (try_to_consume_keyword(context, TK_SWITCH)) return;
+        if (try_to_consume_keyword(context, TK_CASE)) return;
 
         consume_identifier(context);
         return;
@@ -337,108 +336,108 @@ void top_level_consume_token(TokenizeContext &context)
     // Check for specific characters
     switch(context.next()) {
         case '(':
-            context.consume(LPAREN, 1);
+            context.consume(TK_LPAREN, 1);
             return;
         case ')':
-            context.consume(RPAREN, 1);
+            context.consume(TK_RPAREN, 1);
             return;
         case '{':
-            context.consume(LBRACE, 1);
+            context.consume(TK_LBRACE, 1);
             return;
         case '}':
-            context.consume(RBRACE, 1);
+            context.consume(TK_RBRACE, 1);
             return;
         case '[':
-            context.consume(LBRACKET, 1);
+            context.consume(TK_LBRACKET, 1);
             return;
         case ']':
-            context.consume(RBRACKET, 1);
+            context.consume(TK_RBRACKET, 1);
             return;
         case ',':
-            context.consume(COMMA, 1);
+            context.consume(TK_COMMA, 1);
             return;
         case '@':
-            context.consume(AT_SIGN, 1);
+            context.consume(TK_AT_SIGN, 1);
             return;
         case '=':
             if (context.next(1) == '=') {
-                context.consume(DOUBLE_EQUALS, 2);
+                context.consume(TK_DOUBLE_EQUALS, 2);
                 return;
             } 
 
-            context.consume(EQUALS, 1);
+            context.consume(TK_EQUALS, 1);
             return;
         case '"':
         case '\'':
             consume_string_literal(context);
             return;
         case '\n':
-            context.consume(NEWLINE, 1);
+            context.consume(TK_NEWLINE, 1);
             return;
         case '.':
             if (context.next(1) == '.') {
                 if (context.next(2) == '.') {
-                    context.consume(ELLIPSIS, 3); 
+                    context.consume(TK_ELLIPSIS, 3); 
                 } else {
-                    context.consume(TWO_DOTS, 2);
+                    context.consume(TK_TWO_DOTS, 2);
                 }
             } else {
-                context.consume(DOT, 1);
+                context.consume(TK_DOT, 1);
             }
             return;
         case '?':
-            context.consume(QUESTION, 1);
+            context.consume(TK_QUESTION, 1);
             return;
         case '*':
             if (context.next(1) == '=') {
-                context.consume(STAR_EQUALS, 2);
+                context.consume(TK_STAR_EQUALS, 2);
                 return;
             }
 
-            context.consume(STAR, 1);
+            context.consume(TK_STAR, 1);
             return;
         case '/':
             if (context.next(1) == '=') {
-                context.consume(SLASH_EQUALS, 2);
+                context.consume(TK_SLASH_EQUALS, 2);
                 return;
             }
             if (context.next(1) == '/') {
-                context.consume(DOUBLE_SLASH, 2);
+                context.consume(TK_DOUBLE_SLASH, 2);
                 return;
             }
-            context.consume(SLASH, 1);
+            context.consume(TK_SLASH, 1);
             return;
         case '!':
             if (context.next(1) == '=') {
-                context.consume(NOT_EQUALS, 2);
+                context.consume(TK_NOT_EQUALS, 2);
                 return;
             }
             break;
 
         case ':':
             if (context.next(1) == '=') {
-                context.consume(COLON_EQUALS, 2);
+                context.consume(TK_COLON_EQUALS, 2);
                 return;
             }
             else if (context.next(1) == ':') {
-                context.consume(DOUBLE_COLON, 2);
+                context.consume(TK_DOUBLE_COLON, 2);
                 return;
             } else if (is_identifier_first_letter(context.next(1))) {
                 return consume_symbol(context);
             }
 
-            context.consume(COLON, 1);
+            context.consume(TK_COLON, 1);
             return;
         case '+':
             if (context.next(1) == '=') {
-                context.consume(PLUS_EQUALS, 2);
+                context.consume(TK_PLUS_EQUALS, 2);
             } else {
-                context.consume(PLUS, 1);
+                context.consume(TK_PLUS, 1);
             }
             return;
         case '-':
             if (context.next(1) == '>') {
-                context.consume(RIGHT_ARROW, 2);
+                context.consume(TK_RIGHT_ARROW, 2);
                 return;
             }
 
@@ -446,11 +445,11 @@ void top_level_consume_token(TokenizeContext &context)
                 return consume_comment(context);
 
             if (context.next(1) == '=') {
-                context.consume(MINUS_EQUALS, 2);
+                context.consume(TK_MINUS_EQUALS, 2);
                 return;
             }
 
-            context.consume(MINUS, 1);
+            context.consume(TK_MINUS, 1);
             return;
 
         case '<':
@@ -460,46 +459,46 @@ void top_level_consume_token(TokenizeContext &context)
             }
 
             if (context.next(1) == '=') {
-                context.consume(LTHANEQ, 2);
+                context.consume(TK_LTHANEQ, 2);
                 return;
             }
             if (context.next(1) == '-') {
-                context.consume(LEFT_ARROW, 2);
+                context.consume(TK_LEFT_ARROW, 2);
                 return;
             }
-            context.consume(LTHAN, 1);
+            context.consume(TK_LTHAN, 1);
             return;
 
         case '>':
             if (context.next(1) == '=') {
-                context.consume(GTHANEQ, 2);
+                context.consume(TK_GTHANEQ, 2);
                 return;
             }
-            context.consume(GTHAN, 1);
+            context.consume(TK_GTHAN, 1);
             return;
 
         case '%':
-            context.consume(PERCENT, 1);
+            context.consume(TK_PERCENT, 1);
             return;
 
         case '|':
             if (context.next(1) == '|') {
-                context.consume(DOUBLE_VERTICAL_BAR, 2);
+                context.consume(TK_DOUBLE_VERTICAL_BAR, 2);
                 return;
             }
             break;
 
         case '&':
             if (context.next(1) == '&') {
-                context.consume(DOUBLE_AMPERSAND, 2);
+                context.consume(TK_DOUBLE_AMPERSAND, 2);
                 return;
             }
 
-            context.consume(AMPERSAND, 1);
+            context.consume(TK_AMPERSAND, 1);
             return;
 
         case ';':
-            context.consume(SEMICOLON, 1);
+            context.consume(TK_SEMICOLON, 1);
             return;
 
         case '#':
@@ -511,7 +510,7 @@ void top_level_consume_token(TokenizeContext &context)
     }
 
     // Fall through, consume the next letter as UNRECOGNIZED
-    context.consume(UNRECOGNIZED, 1);
+    context.consume(TK_UNRECOGNIZED, 1);
 }
 
 void consume_identifier(TokenizeContext &context)
@@ -520,7 +519,7 @@ void consume_identifier(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.consume(IDENTIFIER, lookahead);
+    context.consume(TK_IDENTIFIER, lookahead);
 }
 
 void consume_whitespace(TokenizeContext &context)
@@ -529,7 +528,7 @@ void consume_whitespace(TokenizeContext &context)
     while (is_whitespace(context.next(lookahead)))
         lookahead++;
 
-    context.consume(WHITESPACE, lookahead);
+    context.consume(TK_WHITESPACE, lookahead);
 }
 
 void consume_comment(TokenizeContext& context)
@@ -538,7 +537,7 @@ void consume_comment(TokenizeContext& context)
     while (context.withinRange(lookahead) && !is_newline(context.next(lookahead)))
         lookahead++;
 
-    context.consume(COMMENT, lookahead);
+    context.consume(TK_COMMENT, lookahead);
 }
 
 bool match_number(TokenizeContext &context)
@@ -594,9 +593,9 @@ void consume_number(TokenizeContext &context)
     }
 
     if (dot_encountered)
-        context.consume(FLOAT_TOKEN, lookahead);
+        context.consume(TK_FLOAT, lookahead);
     else
-        context.consume(INTEGER, lookahead);
+        context.consume(TK_INTEGER, lookahead);
 }
 
 void consume_hex_number(TokenizeContext &context)
@@ -609,7 +608,7 @@ void consume_hex_number(TokenizeContext &context)
     while (is_hexadecimal_digit(context.next(lookahead)))
         lookahead++;
 
-    context.consume(HEX_INTEGER, lookahead);
+    context.consume(TK_HEX_INTEGER, lookahead);
 }
 
 void consume_string_literal(TokenizeContext &context)
@@ -637,7 +636,7 @@ void consume_string_literal(TokenizeContext &context)
     // consume ending quote
     lookahead++;
 
-    context.consume(STRING, lookahead);
+    context.consume(TK_STRING, lookahead);
 }
 
 void consume_triple_quoted_string_literal(TokenizeContext &context)
@@ -655,7 +654,7 @@ void consume_triple_quoted_string_literal(TokenizeContext &context)
 
     // Consume closing >>>
     lookahead += 3;
-    context.consume(STRING, lookahead);
+    context.consume(TK_STRING, lookahead);
 }
 
 void consume_color_literal(TokenizeContext &context)
@@ -672,9 +671,9 @@ void consume_color_literal(TokenizeContext &context)
 
     // acceptable lengths are 3, 4, 6 or 8 characters (not including #)
     if (hex_digits == 3 || hex_digits == 4 || hex_digits == 6 || hex_digits == 8)
-        context.consume(COLOR, lookahead);
+        context.consume(TK_COLOR, lookahead);
     else
-        context.consume(UNRECOGNIZED, lookahead);
+        context.consume(TK_UNRECOGNIZED, lookahead);
 }
 
 void consume_symbol(TokenizeContext &context)
@@ -687,8 +686,7 @@ void consume_symbol(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.consume(SYMBOL, lookahead);
+    context.consume(TK_SYMBOL, lookahead);
 }
 
-} // namespace token
 } // namespace circa

@@ -10,7 +10,7 @@ namespace do_once_function {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
         format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
-                term, token::WHITESPACE);
+                term, TK_WHITESPACE);
     }
 
     void setup(Branch* kernel)

@@ -7,7 +7,7 @@ namespace comment_function {
 
     void formatSource(StyledSource* source, Term* term)
     {
-        append_phrase(source, term->stringProp("comment"), term, token::COMMENT);
+        append_phrase(source, term->stringProp("comment"), term, TK_COMMENT);
     }
 
     void setup(Branch* kernel)

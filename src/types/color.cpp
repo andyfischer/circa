@@ -50,7 +50,7 @@ namespace color_t {
 
     void format_source(StyledSource* source, Term* term)
     {
-        append_phrase(source, color_t::to_string(term), term, token::COLOR);
+        append_phrase(source, color_t::to_string(term), term, TK_COLOR);
     }
 
     void setup_type(Type* type)

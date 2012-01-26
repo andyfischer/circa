@@ -58,9 +58,9 @@ namespace get_field_function {
         //        term, phrase_type::UNDEFINED);
         format_source_for_input(source, term, 0);
         for (int i=1; i < term->numInputs(); i++) {
-            append_phrase(source, ".", term, token::DOT);
+            append_phrase(source, ".", term, TK_DOT);
             append_phrase(source, term->input(i)->asString(),
-                    term, token::IDENTIFIER);
+                    term, TK_IDENTIFIER);
         }
     }
 

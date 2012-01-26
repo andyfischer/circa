@@ -9,7 +9,7 @@ namespace null_t {
     }
     void formatSource(StyledSource* source, Term* term)
     {
-        append_phrase(source, "null", term, token::NULL_TOKEN);
+        append_phrase(source, "null", term, TK_NULL);
     }
 
     void setup_type(Type* type)

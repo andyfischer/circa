@@ -469,7 +469,7 @@ void test_whitespace_after_statement()
     Term* term = parser::statement(&branch, tokens, &context).term;
     test_assert(term->function == FUNCS.value);
     test_assert(term->name == "a");
-    test_assert(tokens.nextIs(token::NEWLINE));
+    test_assert(tokens.nextIs(TK_NEWLINE));
     tokens.consume();
     test_assert(tokens.finished());
 }

@@ -11,7 +11,7 @@ namespace circa {
 struct TokenStream
 {
     std::string _sourceText;
-    token::TokenList tokens;
+    TokenList tokens;
     unsigned int _position;
 
     TokenStream()
@@ -19,7 +19,7 @@ struct TokenStream
     {
     }
 
-    TokenStream(token::TokenList const& _tokens)
+    TokenStream(TokenList const& _tokens)
       : tokens(_tokens), _position(0)
     {
     }
@@ -27,10 +27,10 @@ struct TokenStream
     TokenStream(std::string const& input)
       : _sourceText(input), _position(0)
     {
-        token::tokenize(input, &tokens);
+        tokenize(input, &tokens);
     }
 
-    token::Token operator[](int index) {
+    Token operator[](int index) {
         return tokens[index];
     }
 
@@ -38,7 +38,7 @@ struct TokenStream
     {
         _sourceText = input;
         tokens.clear();
-        token::tokenize(input, &tokens);
+        tokenize(input, &tokens);
         _position = 0;
     }
 
@@ -46,7 +46,7 @@ struct TokenStream
     int remaining() const { return (int) tokens.size() - _position; }
     int position() const { return _position; }
 
-    token::Token const& next(int lookahead=0) const;
+    Token const& next(int lookahead=0) const;
     std::string nextStr(int lookahead=0) const;
 
     // Returns the position of the next non-whitespace token. Returns -1 if

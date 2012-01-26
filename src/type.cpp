@@ -34,10 +34,10 @@ namespace type_t {
         }
 
         append_phrase(source, term->stringPropOptional("syntax:preLBracketWhitespace", " "),
-                term, token::WHITESPACE);
-        append_phrase(source, "{", term, token::LBRACKET);
+                term, TK_WHITESPACE);
+        append_phrase(source, "{", term, TK_LBRACKET);
         append_phrase(source, term->stringPropOptional("syntax:postLBracketWhitespace", " "),
-                term, token::WHITESPACE);
+                term, TK_WHITESPACE);
 
         Branch* contents = nested_contents(term);
 
@@ -45,15 +45,15 @@ namespace type_t {
             Term* field = contents->get(i);
             ca_assert(field != NULL);
             append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
-                    term, token::WHITESPACE);
+                    term, TK_WHITESPACE);
             append_phrase(source, field->type->name, term, phrase_type::TYPE_NAME);
             append_phrase(source, field->stringPropOptional("syntax:postNameWs"," "),
-                    term, token::WHITESPACE);
-            append_phrase(source, field->name, term, token::IDENTIFIER);
+                    term, TK_WHITESPACE);
+            append_phrase(source, field->name, term, TK_IDENTIFIER);
             append_phrase(source, field->stringPropOptional("syntax:postWhitespace",""),
-                    term, token::WHITESPACE);
+                    term, TK_WHITESPACE);
         }
-        append_phrase(source, "}", term, token::RBRACKET);
+        append_phrase(source, "}", term, TK_RBRACKET);
     }
 
     std::string toString(TValue* value)

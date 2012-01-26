@@ -7,7 +7,7 @@
 
 namespace circa {
 
-token::Token const&
+Token const&
 TokenStream::next(int lookahead) const
 {
     int i = this->_position + lookahead;
@@ -36,7 +36,7 @@ TokenStream::findNextNonWhitespace(int lookahead) const
         if (index >= (int) tokens.size())
             return -1;
 
-        if (tokens[index].match == token::WHITESPACE) {
+        if (tokens[index].match == TK_WHITESPACE) {
             index++;
             continue;
         }
@@ -55,7 +55,7 @@ TokenStream::nextNonWhitespace(int lookahead) const
     int index = findNextNonWhitespace(lookahead);
 
     if (index == -1)
-        return token::EOF_TOKEN;
+        return TK_EOF;
 
     return tokens[index].match;
 }
@@ -73,12 +73,12 @@ TokenStream::consume(int match)
 {
     if (finished())
         throw std::runtime_error(std::string("Unexpected EOF while looking for ")
-                + token::get_token_text(match));
+                + get_token_text(match));
 
     if ((match != -1) && next().match != match) {
         std::stringstream msg;
-        msg << "Unexpected token (expected " << token::get_token_text(match)
-            << ", found " << token::get_token_text(next().match)
+        msg << "Unexpected token (expected " << get_token_text(match)
+            << ", found " << get_token_text(next().match)
             << " '" << nextStr() << "')";
         throw std::runtime_error(msg.str());
     }
@@ -143,7 +143,7 @@ void print_remaining_tokens(std::ostream& out, TokenStream& tokens)
 {
     for (int i=0; i < tokens.remaining(); i++) {
         if (i != 0) out << " ";
-        out << token::get_token_text(tokens.next(i).match);
+        out << get_token_text(tokens.next(i).match);
         out << "(" << tokens.nextStr(i) << ")";
     }
 }

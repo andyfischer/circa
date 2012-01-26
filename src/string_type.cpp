@@ -129,7 +129,7 @@ namespace string_t {
     {
         if (term->hasProperty("syntax:originalString")) {
             append_phrase(source, term->stringProp("syntax:originalString"),
-                    term, token::STRING);
+                    term, TK_STRING);
             return;
         }
 
@@ -140,7 +140,7 @@ namespace string_t {
         else
             result = quoteType + as_string(term) + quoteType;
 
-        append_phrase(source, result, term, token::STRING);
+        append_phrase(source, result, term, TK_STRING);
     }
 }
 

@@ -27,7 +27,7 @@ namespace subroutine_f {
 
     void format_source(StyledSource* source, Term* term)
     {
-        append_phrase(source, "def ", term, token::DEF);
+        append_phrase(source, "def ", term, TK_DEF);
 
         Function* func = as_function(term);
 

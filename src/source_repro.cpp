@@ -42,7 +42,7 @@ void format_branch_source(StyledSource* source, Branch* branch, Term* format)
             continue;
 
         if (newlineNeeded) {
-            append_phrase(source, "\n", NULL, token::NEWLINE);
+            append_phrase(source, "\n", NULL, TK_NEWLINE);
             newlineNeeded = false;
         }
 
@@ -148,7 +148,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
     // possibly add parens
     int numParens = term->intPropOptional("syntax:parens", 0);
     for (int p=0; p < numParens; p++)
-        append_phrase(source, "(", term, token::LPAREN);
+        append_phrase(source, "(", term, TK_LPAREN);
 
     if (declarationStyle == "function-call") {
 
@@ -158,13 +158,13 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
             append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, "(", term, token::LPAREN);
+            append_phrase(source, "(", term, TK_LPAREN);
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, ")", term, token::RPAREN);
+            append_phrase(source, ")", term, TK_RPAREN);
     } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
@@ -173,13 +173,13 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, "(", term, token::LPAREN);
+            append_phrase(source, "(", term, TK_LPAREN);
 
         for (int i=1; i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, ")", term, token::RPAREN);
+            append_phrase(source, ")", term, TK_RPAREN);
     } else if (declarationStyle == "dot-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, ".", term, phrase_type::UNDEFINED);
@@ -203,7 +203,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
     }
 
     for (int p=0; p < numParens; p++)
-        append_phrase(source, ")", term, token::RPAREN);
+        append_phrase(source, ")", term, TK_RPAREN);
 }
 
 void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
@@ -234,7 +234,7 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
             && input->name == term->stringPropOptional("syntax:rebindOperator",""))
-        append_phrase(source, "@", term, token::AT_SIGN);
+        append_phrase(source, "@", term, TK_AT_SIGN);
 
     // Also, possibly insert the & operator.
     if (input->name != ""
@@ -242,7 +242,7 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
         if (term_is_state_input(term, inputIndex))
             append_phrase(source, "state = ", term, phrase_type::UNDEFINED);
         else
-            append_phrase(source, "&", term, token::AMPERSAND);
+            append_phrase(source, "&", term, TK_AMPERSAND);
     }
 
     bool byValue = input->name == "";
@@ -285,7 +285,7 @@ void format_name_binding(StyledSource* source, Term* term)
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
         append_phrase(source, term->stringPropOptional("syntax:preEqualsSpace", " "),
                 term, phrase_type::WHITESPACE);
-        append_phrase(source, "=", term, token::EQUALS);
+        append_phrase(source, "=", term, TK_EQUALS);
         append_phrase(source, term->stringPropOptional("syntax:postEqualsSpace", " "),
                 term, phrase_type::WHITESPACE);
     }

@@ -52,9 +52,9 @@ namespace get_index_function {
         if (term->boolPropOptional("syntax:brackets", false)) {
             format_name_binding(source, term);
             format_source_for_input(source, term, 0);
-            append_phrase(source, "[", term, token::LBRACKET);
+            append_phrase(source, "[", term, TK_LBRACKET);
             format_source_for_input(source, term, 1);
-            append_phrase(source, "]", term, token::LBRACKET);
+            append_phrase(source, "]", term, TK_LBRACKET);
         } else {
             format_term_source_default_formatting(source, term);
         }

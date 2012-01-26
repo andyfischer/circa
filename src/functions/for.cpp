@@ -20,7 +20,7 @@ namespace for_function {
         format_heading(source, term);
         format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
-            term, token::WHITESPACE);
+            term, TK_WHITESPACE);
     }
 
     CA_FUNCTION(evaluate_break)

@@ -30,10 +30,10 @@ namespace list_function {
     void list_formatSource(StyledSource* source, Term* caller)
     {
         format_name_binding(source, caller);
-        append_phrase(source, "[", caller, token::LBRACKET);
+        append_phrase(source, "[", caller, TK_LBRACKET);
         for (int i=0; i < caller->numInputs(); i++)
             format_source_for_input(source, caller, i);
-        append_phrase(source, "]", caller, token::LBRACKET);
+        append_phrase(source, "]", caller, TK_LBRACKET);
     }
 
     CA_DEFINE_FUNCTION(repeat, "repeat(any, int) -> List")

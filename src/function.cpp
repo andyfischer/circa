@@ -475,11 +475,11 @@ void function_format_header_source(StyledSource* source, Function* func)
     append_phrase(source, term->name, term, phrase_type::TERM_NAME);
 
     append_phrase(source, term->stringPropOptional("syntax:postNameWs", ""),
-            term, token::WHITESPACE);
+            term, TK_WHITESPACE);
     append_phrase(source, term->stringPropOptional("syntax:properties", ""),
             term, phrase_type::UNDEFINED);
 
-    append_phrase(source, "(", term, token::LPAREN);
+    append_phrase(source, "(", term, TK_LPAREN);
 
     bool first = true;
     int numInputs = function_num_inputs(func);
@@ -508,17 +508,17 @@ void function_format_header_source(StyledSource* source, Function* func)
 
         if (name != "" && name[0] != '#') {
             if (showType)
-                append_phrase(source, " ", term, token::WHITESPACE);
+                append_phrase(source, " ", term, TK_WHITESPACE);
             append_phrase(source, name, term, phrase_type::UNDEFINED);
         }
 
         if (function_can_rebind_input(term, i)) {
-            append_phrase(source, " ", term, token::WHITESPACE);
+            append_phrase(source, " ", term, TK_WHITESPACE);
             append_phrase(source, ":out", term, phrase_type::UNDEFINED);
         }
 
         if (input->boolPropOptional("meta", false)) {
-            append_phrase(source, " ", term, token::WHITESPACE);
+            append_phrase(source, " ", term, TK_WHITESPACE);
             append_phrase(source, ":meta", term, phrase_type::UNDEFINED);
         }
     }
@@ -527,14 +527,14 @@ void function_format_header_source(StyledSource* source, Function* func)
     if (varArgs)
         append_phrase(source, "...", term, phrase_type::UNDEFINED);
 
-    append_phrase(source, ")", term, token::LPAREN);
+    append_phrase(source, ")", term, TK_LPAREN);
 
     if (function_get_output_type(term, 0) != &VOID_T) {
         append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
-                term, token::WHITESPACE);
+                term, TK_WHITESPACE);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
-                term, token::WHITESPACE);
+                term, TK_WHITESPACE);
         append_phrase(source, function_get_output_type(term, 0)->name,
                 term, phrase_type::TYPE_NAME);
     }

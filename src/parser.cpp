@@ -16,8 +16,6 @@
 namespace circa {
 namespace parser {
 
-using namespace circa::token;
-
 TermPtr compile(Branch* branch, ParsingStep step, std::string const& input)
 {
     set_branch_in_progress(branch, true);
@@ -112,7 +110,7 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     Term* parentTerm = branch->owningTerm;
 
-    if (tokens.nextNonWhitespaceIs(LBRACE)) {
+    if (tokens.nextNonWhitespaceIs(TK_LBRACE)) {
         consume_branch_with_braces(branch, tokens, context, parentTerm);
     } else {
         consume_branch_with_significant_indentation(branch, tokens, context, parentTerm);
@@ -128,9 +126,9 @@ int find_indentation_of_next_statement(TokenStream& tokens)
     // Lookahead and find the next non-whitespace statement.
     int lookahead = 0;
     while (!tokens.finished()) {
-        if (tokens.nextIs(WHITESPACE, lookahead))
+        if (tokens.nextIs(TK_WHITESPACE, lookahead))
             lookahead++;
-        else if (tokens.nextIs(NEWLINE, lookahead))
+        else if (tokens.nextIs(TK_NEWLINE, lookahead))
             lookahead++;
         else
             break;
@@ -167,7 +165,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
         while (!tokens.finished()) {
 
             // If we hit an if-block sepator then finish, but don't consume it
-            if (tokens.nextIs(ELSE) || tokens.nextIs(ELIF))
+            if (tokens.nextIs(TK_ELSE) || tokens.nextIs(TK_ELIF))
                 return;
 
             Term* statement = parser::statement(branch, tokens, context).term;
@@ -200,9 +198,9 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
     // Lookahead and find the next non-whitespace statement.
     int lookahead = 0;
     while (!tokens.finished()) {
-        if (tokens.nextIs(WHITESPACE, lookahead))
+        if (tokens.nextIs(TK_WHITESPACE, lookahead))
             lookahead++;
-        else if (tokens.nextIs(NEWLINE, lookahead))
+        else if (tokens.nextIs(TK_NEWLINE, lookahead))
             lookahead++;
         else
             break;
@@ -247,7 +245,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
         // Lookahead, check if the next line has the same indentation
 
         int nextIndent = 0;
-        if (tokens.nextIs(WHITESPACE))
+        if (tokens.nextIs(TK_WHITESPACE))
             nextIndent = (int) tokens.next().length();
 
         // Check if the next line is just a comment/whitespace
@@ -268,13 +266,13 @@ void consume_branch_with_braces(Branch* branch, TokenStream& tokens, ParserCxt* 
 {
     parentTerm->setStringProp("syntax:branchStyle", "braces");
 
-    if (tokens.nextIs(WHITESPACE))
+    if (tokens.nextIs(TK_WHITESPACE))
         parentTerm->setStringProp("syntax:postHeadingWs", possible_whitespace(tokens));
 
-    tokens.consume(LBRACE);
+    tokens.consume(TK_LBRACE);
 
     while (!tokens.finished()) {
-        if (tokens.nextIs(RBRACE)) {
+        if (tokens.nextIs(TK_RBRACE)) {
             tokens.consume();
             return;
         }
@@ -307,60 +305,60 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // Comment (blank lines count as comments). This should do the same thing
     // as matches_comment_statement.
-    if (tokens.nextIs(COMMENT) || tokens.nextIs(NEWLINE) || tokens.nextIs(SEMICOLON)
-        || (foundWhitespace && (tokens.nextIs(RBRACE) || tokens.nextIs(END) || tokens.finished()))) {
+    if (tokens.nextIs(TK_COMMENT) || tokens.nextIs(TK_NEWLINE) || tokens.nextIs(TK_SEMICOLON)
+        || (foundWhitespace && (tokens.nextIs(TK_RBRACE) || tokens.nextIs(TK_END) || tokens.finished()))) {
         result = comment(branch, tokens, context);
     }
 
     // Function decl
-    else if (tokens.nextIs(DEF)) {
+    else if (tokens.nextIs(TK_DEF)) {
         result = function_decl(branch, tokens, context);
     }
 
     // Type decl
-    else if (tokens.nextIs(TYPE)) {
+    else if (tokens.nextIs(TK_TYPE)) {
         result = type_decl(branch, tokens, context);
     }
 
     // Do_once block
-    else if (tokens.nextIs(DO_ONCE)) {
+    else if (tokens.nextIs(TK_DO_ONCE)) {
         result = do_once_block(branch, tokens, context);
     }
 
     // Stateful value decl
-    else if (tokens.nextIs(STATE)) {
+    else if (tokens.nextIs(TK_STATE)) {
         result = stateful_value_decl(branch, tokens, context);
     }
     // Return statement
-    else if (tokens.nextIs(RETURN)) {
+    else if (tokens.nextIs(TK_RETURN)) {
         result = return_statement(branch, tokens, context);
     }
 
     // Discard statement
-    else if (tokens.nextIs(DISCARD)) {
+    else if (tokens.nextIs(TK_DISCARD)) {
         result = discard_statement(branch, tokens, context);
     }
     // Break statement
-    else if (tokens.nextIs(BREAK)) {
+    else if (tokens.nextIs(TK_BREAK)) {
         result = break_statement(branch, tokens, context);
     }
     // Continue statement
-    else if (tokens.nextIs(CONTINUE)) {
+    else if (tokens.nextIs(TK_CONTINUE)) {
         result = continue_statement(branch, tokens, context);
     }
 
     // Namespace block
-    else if (tokens.nextIs(NAMESPACE)) {
+    else if (tokens.nextIs(TK_NAMESPACE)) {
         result = namespace_block(branch, tokens, context);
     }
 
     // Case statement
-    else if (tokens.nextIs(CASE)) {
+    else if (tokens.nextIs(TK_CASE)) {
         result = case_statement(branch, tokens, context);
     }
 
     // Import statement
-    else if (tokens.nextIs(IMPORT)) {
+    else if (tokens.nextIs(TK_IMPORT)) {
         result = import_statement(branch, tokens, context);
     }
 
@@ -400,22 +398,22 @@ bool matches_comment_statement(Branch* branch, TokenStream& tokens)
 {
     int lookahead = 0;
     bool foundWhitespace = false;
-    if (tokens.nextIs(WHITESPACE, lookahead)) {
+    if (tokens.nextIs(TK_WHITESPACE, lookahead)) {
         lookahead++;
         foundWhitespace = true;
     }
 
     int next = tokens.next(lookahead).match;
-    return (next == COMMENT || next == NEWLINE || next == SEMICOLON ||
+    return (next == TK_COMMENT || next == TK_NEWLINE || next == TK_SEMICOLON ||
         (foundWhitespace &&
-             (tokens.nextIs(RBRACE) || tokens.nextIs(END) || tokens.finished())));
+             (tokens.nextIs(TK_RBRACE) || tokens.nextIs(TK_END) || tokens.finished())));
 }
 
 ParseResult comment(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     std::string commentText;
 
-    if (tokens.nextIs(COMMENT)) {
+    if (tokens.nextIs(TK_COMMENT)) {
         commentText = tokens.nextStr();
         tokens.consume();
     }
@@ -433,13 +431,13 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
 
     ParseResult result;
 
-    if (tokens.nextIs(LBRACKET)) {
+    if (tokens.nextIs(TK_LBRACKET)) {
         result = anonymous_type_decl(branch, tokens, context);
         if (has_static_error(result.term))
             return compile_error_for_line(result.term, tokens, startPosition);
 
     } else {
-        if (!tokens.nextIs(IDENTIFIER))
+        if (!tokens.nextIs(TK_IDENTIFIER))
             return compile_error_for_line(branch, tokens, startPosition);
 
         std::string type = tokens.consumeStr();
@@ -453,7 +451,7 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
 bool token_is_allowed_as_function_name(int token)
 {
     switch (token) {
-        case FOR: case IF: case INCLUDE: case TYPE:
+        case TK_FOR: case TK_IF: case TK_INCLUDE: case TK_TYPE:
             return true;
         default:
             return false;
@@ -464,34 +462,34 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 {
     int startPosition = tokens.getPosition();
 
-    if (tokens.nextIs(DEF))
-        tokens.consume(DEF);
+    if (tokens.nextIs(TK_DEF))
+        tokens.consume(TK_DEF);
 
     possible_whitespace(tokens);
 
     if (tokens.finished()
-            || (!tokens.nextIs(IDENTIFIER)
+            || (!tokens.nextIs(TK_IDENTIFIER)
             && !token_is_allowed_as_function_name(tokens.next().match)))
         return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
 
     // Function name
-    std::string functionName = tokens.consumeStr(IDENTIFIER);
+    std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
 
     bool isMethod = false;
     Term* methodType = NULL;
 
     // Check if this is a method declaration (declared as Typename.funcname)
-    if (tokens.nextIs(DOT)) {
+    if (tokens.nextIs(TK_DOT)) {
         isMethod = true;
 
-        tokens.consume(DOT);
+        tokens.consume(TK_DOT);
 
-        if (!tokens.nextIs(IDENTIFIER))
+        if (!tokens.nextIs(TK_IDENTIFIER))
             return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after .");
 
         std::string typeName = functionName;
         methodType = find_name(branch, typeName.c_str());
-        functionName += "." + tokens.consumeStr(IDENTIFIER);
+        functionName += "." + tokens.consumeStr(TK_IDENTIFIER);
 
         if (methodType == NULL || !is_type(methodType))
             return compile_error_for_line(branch, tokens, startPosition, "Not a type: " + typeName);
@@ -509,8 +507,8 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     // Optional list of qualifiers
-    while (tokens.nextIs(SYMBOL)) {
-        std::string symbolText = tokens.consumeStr(SYMBOL);
+    while (tokens.nextIs(TK_SYMBOL)) {
+        std::string symbolText = tokens.consumeStr(TK_SYMBOL);
         if (symbolText == ":throws")
             attrs->throws = true;
         else
@@ -523,10 +521,10 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
                 + symbolText);
     }
 
-    if (!tokens.nextIs(LPAREN))
+    if (!tokens.nextIs(TK_LPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: (");
 
-    tokens.consume(LPAREN);
+    tokens.consume(TK_LPAREN);
 
     Branch* contents = nested_contents(result);
 
@@ -537,15 +535,15 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     // Consume input arguments
     int inputIndex = 0;
-    while (!tokens.nextIs(RPAREN) && !tokens.finished())
+    while (!tokens.nextIs(TK_RPAREN) && !tokens.finished())
     {
         bool isStateArgument = false;
 
         possible_whitespace(tokens);
 
         // check for 'state' keyword
-        if (tokens.nextIs(STATE)) {
-            tokens.consume(STATE);
+        if (tokens.nextIs(TK_STATE)) {
+            tokens.consume(TK_STATE);
             possible_whitespace(tokens);
             isStateArgument = true;
         }
@@ -560,7 +558,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         possible_whitespace(tokens);
 
         std::string name;
-        if (tokens.nextIs(IDENTIFIER)) {
+        if (tokens.nextIs(TK_IDENTIFIER)) {
             name = tokens.consumeStr();
             possible_whitespace(tokens);
         } else {
@@ -578,14 +576,14 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             input->setBoolProp("state", true);
 
         // Variable args when ... is appended
-        if (tokens.nextIs(ELLIPSIS)) {
-            tokens.consume(ELLIPSIS);
+        if (tokens.nextIs(TK_ELLIPSIS)) {
+            tokens.consume(TK_ELLIPSIS);
             input->setBoolProp("multiple", true);
         }
 
         // Optional list of qualifiers
-        while (tokens.nextIs(SYMBOL)) {
-            std::string symbolText = tokens.consumeStr(SYMBOL);
+        while (tokens.nextIs(TK_SYMBOL)) {
+            std::string symbolText = tokens.consumeStr(TK_SYMBOL);
 
             // TODO: store syntax hint
             if (symbolText == ":ignore_error") {
@@ -607,11 +605,11 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             possible_whitespace(tokens);
         }
 
-        if (!tokens.nextIs(RPAREN)) {
-            if (!tokens.nextIs(COMMA))
+        if (!tokens.nextIs(TK_RPAREN)) {
+            if (!tokens.nextIs(TK_COMMA))
                 return compile_error_for_line(result, tokens, startPosition, "Expected: ,");
 
-            tokens.consume(COMMA);
+            tokens.consume(TK_COMMA);
         }
 
         inputIndex++;
@@ -621,14 +619,14 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     for (int i=0; i < contents->length(); i++)
         hide_from_source(contents->get(i));
 
-    if (!tokens.nextIs(RPAREN))
+    if (!tokens.nextIs(TK_RPAREN))
         return compile_error_for_line(result, tokens, startPosition);
-    tokens.consume(RPAREN);
+    tokens.consume(TK_RPAREN);
 
     // Another optional list of symbols
-    if (tokens.nextNonWhitespaceIs(SYMBOL)) {
+    if (tokens.nextNonWhitespaceIs(TK_SYMBOL)) {
         possible_whitespace(tokens);
-        std::string symbolText = tokens.consumeStr(SYMBOL);
+        std::string symbolText = tokens.consumeStr(TK_SYMBOL);
         if (symbolText == ":controlflow") {
             as_function(result)->vmInstruction = ControlFlowCall;
             result->setBoolProp("controlflow", true);
@@ -642,9 +640,9 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // Output type
     Term* outputType = VOID_TYPE;
 
-    if (tokens.nextNonWhitespaceIs(RIGHT_ARROW)) {
+    if (tokens.nextNonWhitespaceIs(TK_RIGHT_ARROW)) {
         result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));
-        tokens.consume(RIGHT_ARROW);
+        tokens.consume(TK_RIGHT_ARROW);
         result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
 
         outputType = type_expr(branch, tokens, context).term;
@@ -687,15 +685,15 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    if (tokens.nextIs(TYPE))
+    if (tokens.nextIs(TK_TYPE))
         tokens.consume();
 
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IDENTIFIER))
+    if (!tokens.nextIs(TK_IDENTIFIER))
         return compile_error_for_line(branch, tokens, startPosition);
 
-    std::string name = tokens.consumeStr(IDENTIFIER);
+    std::string name = tokens.consumeStr(TK_IDENTIFIER);
 
     Term* result = anonymous_type_decl(branch, tokens, context).term;
 
@@ -719,17 +717,17 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
             possible_whitespace_or_newline(tokens));
 
     // if there's a semicolon, then finish it as an empty type.
-    if (tokens.nextIs(SEMICOLON)) {
+    if (tokens.nextIs(TK_SEMICOLON)) {
         result->setBoolProp("syntax:semicolon", true);
         return ParseResult(result);
     }
 
-    if (!tokens.nextIs(LBRACE) && !tokens.nextIs(LBRACKET))
+    if (!tokens.nextIs(TK_LBRACE) && !tokens.nextIs(TK_LBRACKET))
         return compile_error_for_line(result, tokens, startPosition);
 
     // Parse as compound type
     list_t::setup_type(unbox_type(result));
-    int closingToken = tokens.nextIs(LBRACE) ? RBRACE : RBRACKET;
+    int closingToken = tokens.nextIs(TK_LBRACE) ? TK_RBRACE : TK_RBRACKET;
 
     tokens.consume();
 
@@ -744,18 +742,18 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         if (tokens.nextIs(closingToken))
             break;
 
-        if (!tokens.nextIs(IDENTIFIER))
+        if (!tokens.nextIs(TK_IDENTIFIER))
             return compile_error_for_line(result, tokens, startPosition);
 
-        //std::string fieldTypeName = tokens.consume(IDENTIFIER);
+        //std::string fieldTypeName = tokens.consume(TK_IDENTIFIER);
         Term* fieldType = type_expr(branch, tokens, context).term;
 
         std::string postNameWs = possible_whitespace(tokens);
 
         std::string fieldName;
 
-        if (tokens.nextIs(IDENTIFIER))
-            fieldName = tokens.consumeStr(IDENTIFIER);
+        if (tokens.nextIs(TK_IDENTIFIER))
+            fieldName = tokens.consumeStr(TK_IDENTIFIER);
 
 
         Term* field = create_value(contents, as_type(fieldType), fieldName);
@@ -798,17 +796,17 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
         // First iteration should always be 'if'
         if (firstIteration)
-            ca_assert(leadingToken == IF);
+            ca_assert(leadingToken == TK_IF);
         else
-            ca_assert(leadingToken != IF);
+            ca_assert(leadingToken != TK_IF);
 
         // Otherwise expect 'elif' or 'else'
-        if (leadingToken != IF && leadingToken != ELIF && leadingToken != ELSE)
+        if (leadingToken != TK_IF && leadingToken != TK_ELIF && leadingToken != TK_ELSE)
             return compile_error_for_line(result, tokens, startPosition,
                     "Expected 'if' or 'elif' or 'else'");
         tokens.consume();
 
-        bool expectCondition = (leadingToken == IF || leadingToken == ELIF);
+        bool expectCondition = (leadingToken == TK_IF || leadingToken == TK_ELIF);
 
         if (expectCondition) {
             possible_whitespace(tokens);
@@ -827,8 +825,8 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         consume_branch(nested_contents(currentBlock), tokens, context);
         set_branch_in_progress(nested_contents(currentBlock), false);
 
-        if (tokens.nextNonWhitespaceIs(ELIF)
-                || (tokens.nextNonWhitespaceIs(ELSE) && !encounteredElse)) {
+        if (tokens.nextNonWhitespaceIs(TK_ELIF)
+                || (tokens.nextNonWhitespaceIs(TK_ELSE) && !encounteredElse)) {
 
             // If the previous block was multiline, then only parse the next block if
             // it has equal indentation.
@@ -869,7 +867,7 @@ ParseResult switch_block(Branch* branch, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(SWITCH);
+    tokens.consume(TK_SWITCH);
     possible_whitespace(tokens);
 
     Term* input = infix_expression(branch, tokens, context).term;
@@ -893,7 +891,7 @@ ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* conte
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(CASE);
+    tokens.consume(TK_CASE);
     possible_whitespace(tokens);
 
     // Find the parent 'switch' block.
@@ -922,25 +920,25 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(FOR);
+    tokens.consume(TK_FOR);
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IDENTIFIER))
+    if (!tokens.nextIs(TK_IDENTIFIER))
         return compile_error_for_line(branch, tokens, startPosition);
 
-    std::string iterator_name = tokens.consumeStr(IDENTIFIER);
+    std::string iterator_name = tokens.consumeStr(TK_IDENTIFIER);
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IN_TOKEN))
+    if (!tokens.nextIs(TK_IN))
         return compile_error_for_line(branch, tokens, startPosition);
 
-    tokens.consume(IN_TOKEN);
+    tokens.consume(TK_IN);
     possible_whitespace(tokens);
 
     // check for @ operator
     bool rebindListName = false;
-    if (tokens.nextIs(AT_SIGN)) {
-        tokens.consume(AT_SIGN);
+    if (tokens.nextIs(TK_AT_SIGN)) {
+        tokens.consume(TK_AT_SIGN);
         rebindListName = true;
         possible_whitespace(tokens);
     }
@@ -975,7 +973,7 @@ ParseResult do_once_block(Branch* branch, TokenStream& tokens, ParserCxt* contex
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(DO_ONCE);
+    tokens.consume(TK_DO_ONCE);
 
     Term* result = apply(branch, DO_ONCE_FUNC, TermList());
     set_starting_source_location(result, startPosition, tokens);
@@ -988,22 +986,22 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(STATE);
+    tokens.consume(TK_STATE);
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IDENTIFIER))
+    if (!tokens.nextIs(TK_IDENTIFIER))
         return compile_error_for_line(branch, tokens, startPosition,
                 "Expected identifier after 'state'");
 
-    std::string name = tokens.consumeStr(IDENTIFIER);
+    std::string name = tokens.consumeStr(TK_IDENTIFIER);
     possible_whitespace(tokens);
 
     std::string typeName;
 
     // check for "state <type> <name>" syntax
-    if (tokens.nextIs(IDENTIFIER)) {
+    if (tokens.nextIs(TK_IDENTIFIER)) {
         typeName = name;
-        name = tokens.consumeStr(IDENTIFIER);
+        name = tokens.consumeStr(TK_IDENTIFIER);
         possible_whitespace(tokens);
     }
 
@@ -1021,7 +1019,7 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     Term* result = apply(branch, DECLARED_STATE_FUNC, TermList(), name);
 
     // Possibly consume an expression for the initial value.
-    if (tokens.nextIs(EQUALS)) {
+    if (tokens.nextIs(TK_EQUALS)) {
         tokens.consume();
         possible_whitespace(tokens);
 
@@ -1095,13 +1093,13 @@ ParseResult include_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(INCLUDE);
+    tokens.consume(TK_INCLUDE);
 
     possible_whitespace(tokens);
 
     std::string filename;
-    if (tokens.nextIs(STRING)) {
-        filename = tokens.consumeStr(STRING);
+    if (tokens.nextIs(TK_STRING)) {
+        filename = tokens.consumeStr(TK_STRING);
         filename = filename.substr(1, filename.length()-2);
     } else {
         return compile_error_for_line(branch, tokens, startPosition,
@@ -1120,15 +1118,15 @@ ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(IMPORT);
+    tokens.consume(TK_IMPORT);
 
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IDENTIFIER))
+    if (!tokens.nextIs(TK_IDENTIFIER))
         return compile_error_for_line(branch, tokens, startPosition,
                 "Expected string after 'import'");
 
-    Symbol module = tokens.consumeSymbol(IDENTIFIER);
+    Symbol module = tokens.consumeSymbol(TK_IDENTIFIER);
 
     Term* result = apply(branch, FUNCS.import, TermList());
     result->setStringProp("module", symbol_get_text(module));
@@ -1140,13 +1138,13 @@ ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 
 ParseResult return_statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
-    tokens.consume(RETURN);
+    tokens.consume(TK_RETURN);
     std::string postKeywordWs = possible_whitespace(tokens);
 
     Term* output = NULL;
 
     bool returnsTValue = !is_statement_ending(tokens.next().match) &&
-        tokens.next().match != RBRACE;
+        tokens.next().match != TK_RBRACE;
 
     if (returnsTValue)
         output = expression(branch, tokens, context).term;
@@ -1164,7 +1162,7 @@ ParseResult discard_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(DISCARD);
+    tokens.consume(TK_DISCARD);
     
     Term* enclosingForLoop = find_enclosing_for_loop(branch->owningTerm);
 
@@ -1181,7 +1179,7 @@ ParseResult break_statement(Branch* branch, TokenStream& tokens, ParserCxt* cont
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(BREAK);
+    tokens.consume(TK_BREAK);
     
     Term* enclosingForLoop = find_enclosing_for_loop(branch->owningTerm);
 
@@ -1198,7 +1196,7 @@ ParseResult continue_statement(Branch* branch, TokenStream& tokens, ParserCxt* c
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(CONTINUE);
+    tokens.consume(TK_CONTINUE);
     
     Term* enclosingForLoop = find_enclosing_for_loop(branch->owningTerm);
 
@@ -1218,9 +1216,9 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
     if (lookahead_match_leading_name_binding(tokens)) {
         int startPosition = tokens.getPosition();
 
-        std::string nameBinding = tokens.consumeStr(IDENTIFIER);
+        std::string nameBinding = tokens.consumeStr(TK_IDENTIFIER);
         std::string preEqualsSpace = possible_whitespace(tokens);
-        tokens.consume(EQUALS);
+        tokens.consume(TK_EQUALS);
         std::string postEqualsSpace = possible_whitespace(tokens);
 
         ParseResult result = name_binding_expression(branch, tokens, context);
@@ -1247,11 +1245,11 @@ ParseResult expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     ParseResult result;
 
-    if (tokens.nextIs(IF))
+    if (tokens.nextIs(TK_IF))
         result = if_block(branch, tokens, context);
-    else if (tokens.nextIs(FOR))
+    else if (tokens.nextIs(TK_FOR))
         result = for_block(branch, tokens, context);
-    else if (tokens.nextIs(SWITCH))
+    else if (tokens.nextIs(TK_SWITCH))
         result = switch_block(branch, tokens, context);
     else
         result = infix_expression(branch, tokens, context);
@@ -1264,35 +1262,35 @@ const int HIGHEST_INFIX_PRECEDENCE = 8;
 int get_infix_precedence(int match)
 {
     switch(match) {
-        case token::TWO_DOTS:
-        case token::RIGHT_ARROW:
-        case token::LEFT_ARROW:
+        case TK_TWO_DOTS:
+        case TK_RIGHT_ARROW:
+        case TK_LEFT_ARROW:
             return 8;
-        case token::STAR:
-        case token::SLASH:
-        case token::DOUBLE_SLASH:
-        case token::PERCENT:
+        case TK_STAR:
+        case TK_SLASH:
+        case TK_DOUBLE_SLASH:
+        case TK_PERCENT:
             return 7;
-        case token::PLUS:
-        case token::MINUS:
+        case TK_PLUS:
+        case TK_MINUS:
             return 6;
-        case token::LTHAN:
-        case token::LTHANEQ:
-        case token::GTHAN:
-        case token::GTHANEQ:
-        case token::DOUBLE_EQUALS:
-        case token::NOT_EQUALS:
+        case TK_LTHAN:
+        case TK_LTHANEQ:
+        case TK_GTHAN:
+        case TK_GTHANEQ:
+        case TK_DOUBLE_EQUALS:
+        case TK_NOT_EQUALS:
             return 4;
-        case token::AND:
-        case token::OR:
+        case TK_AND:
+        case TK_OR:
             return 3;
-        case token::PLUS_EQUALS:
-        case token::MINUS_EQUALS:
-        case token::STAR_EQUALS:
-        case token::SLASH_EQUALS:
+        case TK_PLUS_EQUALS:
+        case TK_MINUS_EQUALS:
+        case TK_STAR_EQUALS:
+        case TK_SLASH_EQUALS:
             return 2;
-        case token::COLON_EQUALS:
-        case token::EQUALS:
+        case TK_COLON_EQUALS:
+        case TK_EQUALS:
             return 0;
         default:
             return -1;
@@ -1350,7 +1348,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
         // <lexpr><whitespace><hyphen><non-whitespace>
         // Then don't parse it as an infix expression.
         
-        if (tokens.nextIs(WHITESPACE) && tokens.nextIs(MINUS, 1) && !tokens.nextIs(WHITESPACE, 2))
+        if (tokens.nextIs(TK_WHITESPACE) && tokens.nextIs(TK_MINUS, 1) && !tokens.nextIs(TK_WHITESPACE, 2))
             break;
 
         std::string preOperatorWhitespace = possible_whitespace(tokens);
@@ -1363,10 +1361,10 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 
         // Right-apply
         if (operatorStr == "->") {
-            if (!tokens.nextIs(IDENTIFIER))
+            if (!tokens.nextIs(TK_IDENTIFIER))
                 return compile_error_for_line(branch, tokens, startPosition);
 
-            std::string functionName = tokens.consumeStr(IDENTIFIER);
+            std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
 
             Term* term = find_and_apply(branch, functionName, TermList(leftExpr.term));
 
@@ -1460,8 +1458,8 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     // Unary minus
-    if (tokens.nextIs(MINUS)) {
-        tokens.consume(MINUS);
+    if (tokens.nextIs(TK_MINUS)) {
+        tokens.consume(TK_MINUS);
         ParseResult expr = atom_with_subscripts(branch, tokens, context);
 
         // If the minus sign is on a literal number, then just negate it in place,
@@ -1490,21 +1488,21 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
 {
     // Parse function arguments
     int index = 0;
-    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
+    while (!tokens.nextIs(TK_RPAREN) && !tokens.nextIs(TK_RBRACKET) && !tokens.finished()) {
 
         inputHints.set(index, "preWhitespace", possible_whitespace_or_newline(tokens));
 
-        if (tokens.nextIs(STATE)) {
-            tokens.consume(STATE);
+        if (tokens.nextIs(TK_STATE)) {
+            tokens.consume(TK_STATE);
             possible_whitespace(tokens);
-            tokens.consume(EQUALS);
+            tokens.consume(TK_EQUALS);
             possible_whitespace(tokens);
             inputHints.set(index, "state", &TrueValue);
             inputHints.set(index, "rebindInput", "t");
         }
 
         if (lookahead_match_rebind_argument(tokens)) {
-            tokens.consume(AMPERSAND);
+            tokens.consume(TK_AMPERSAND);
             inputHints.set(index, "rebindInput", "t");
         }
 
@@ -1513,7 +1511,7 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
         arguments.append(term);
 
-        if (tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+        if (tokens.nextIs(TK_COMMA) || tokens.nextIs(TK_SEMICOLON))
             inputHints.append(index, "postWhitespace", tokens.consumeStr());
 
         index++;
@@ -1524,19 +1522,19 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(DOT);
-    std::string functionName = tokens.consumeStr(IDENTIFIER);
+    tokens.consume(TK_DOT);
+    std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
 
-    tokens.consume(LPAREN);
+    tokens.consume(TK_LPAREN);
 
     TermList inputs;
     ListSyntaxHints inputHints;
 
     // Parse inputs
     function_call_inputs(branch, tokens, context, inputs, inputHints);
-    if (!tokens.nextIs(RPAREN))
+    if (!tokens.nextIs(TK_RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-    tokens.consume(RPAREN);
+    tokens.consume(TK_RPAREN);
 
     inputs.prepend(root.term);
     inputHints.insert(0);
@@ -1570,16 +1568,16 @@ ParseResult function_call(Branch* branch, ParseResult head, TokenStream& tokens,
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(LPAREN);
+    tokens.consume(TK_LPAREN);
 
     TermList inputs;
     ListSyntaxHints inputHints;
 
     function_call_inputs(branch, tokens, context, inputs, inputHints);
 
-    if (!tokens.nextIs(RPAREN))
+    if (!tokens.nextIs(TK_RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-    tokens.consume(RPAREN);
+    tokens.consume(TK_RPAREN);
     
     Term* function = head.term;
 
@@ -1606,23 +1604,23 @@ ParseResult function_call2(Branch* branch, Term* function, TokenStream& tokens, 
 
     result = apply(branch, function, TermList());
 
-    tokens.consume(LPAREN);
+    tokens.consume(TK_LPAREN);
     int index = 0;
-    while (!tokens.nextIs(RPAREN) && !tokens.nextIs(RBRACKET) && !tokens.finished()) {
+    while (!tokens.nextIs(TK_RPAREN) && !tokens.nextIs(TK_RBRACKET) && !tokens.finished()) {
 
         std::string preWhitespace = possible_whitespace_or_newline(tokens);
         if (preWhitespace != "")
             set_input_syntax_hint(result, index, "preWhitespace", preWhitespace);
 
         if (lookahead_match_rebind_argument(tokens)) {
-            tokens.consume(AMPERSAND);
+            tokens.consume(TK_AMPERSAND);
             set_input_syntax_hint(result, index, "rebindInput", "t");
         }
 
         Term* input = expression(branch, tokens, context).term;
 
         std::string postWhitespace = possible_whitespace_or_newline(tokens);
-        if (tokens.nextIs(COMMA) || tokens.nextIs(SEMICOLON))
+        if (tokens.nextIs(TK_COMMA) || tokens.nextIs(TK_SEMICOLON))
             postWhitespace += tokens.consumeStr();
         if (postWhitespace != "")
             set_input_syntax_hint(result, index, "postWhitespace", postWhitespace);
@@ -1631,9 +1629,9 @@ ParseResult function_call2(Branch* branch, Term* function, TokenStream& tokens, 
 
         index++;
     }
-    if (!tokens.nextIs(RPAREN))
+    if (!tokens.nextIs(TK_RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-    tokens.consume(RPAREN);
+    tokens.consume(TK_RPAREN);
 
     if (result->function->name != originalName)
         result->setStringProp("syntax:functionName", originalName);
@@ -1662,17 +1660,17 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
         int startPosition = tokens.getPosition();
 
         // Check for a[0], array indexing.
-        if (tokens.nextIs(LBRACKET)) {
-            tokens.consume(LBRACKET);
+        if (tokens.nextIs(TK_LBRACKET)) {
+            tokens.consume(TK_LBRACKET);
 
             std::string postLbracketWs = possible_whitespace(tokens);
 
             Term* subscript = infix_expression(branch, tokens, context).term;
 
-            if (!tokens.nextIs(RBRACKET))
+            if (!tokens.nextIs(TK_RBRACKET))
                 return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
 
-            tokens.consume(RBRACKET);
+            tokens.consume(TK_RBRACKET);
 
             Term* term = apply(branch, GET_INDEX_FUNC, TermList(result.term, subscript));
             set_input_syntax_hint(term, 0, "postWhitespace", "");
@@ -1682,19 +1680,19 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             result = ParseResult(term);
 
         // Check for a.b, field access.
-        } else if (tokens.nextIs(DOT)) {
+        } else if (tokens.nextIs(TK_DOT)) {
 
-            if (!tokens.nextIs(IDENTIFIER, 1))
+            if (!tokens.nextIs(TK_IDENTIFIER, 1))
                 return compile_error_for_line(branch, tokens, startPosition,
                         "Expected identifier after .");
 
-            if (tokens.nextIs(LPAREN, 2)) {
+            if (tokens.nextIs(TK_LPAREN, 2)) {
                 result = method_call(branch, tokens, context, result);
                 continue;
             }
 
-            tokens.consume(DOT);
-            std::string ident = tokens.consumeStr(IDENTIFIER);
+            tokens.consume(TK_DOT);
+            std::string ident = tokens.consumeStr(TK_IDENTIFIER);
             
             Term* term = apply(branch, GET_FIELD_FUNC, TermList(result.term, create_string(branch, ident)));
             set_source_location(term, startPosition, tokens);
@@ -1702,7 +1700,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             result = ParseResult(term);
 
         // Check for a(..), function call.
-        } else if (tokens.nextIs(LPAREN)) {
+        } else if (tokens.nextIs(TK_LPAREN)) {
 
             // Function call
             result = function_call(branch, result, tokens, context);
@@ -1718,27 +1716,27 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
 bool lookahead_match_whitespace_statement(TokenStream& tokens)
 {
-    if (tokens.nextIs(NEWLINE)) return true;
-    if (tokens.nextIs(WHITESPACE) && tokens.nextIs(NEWLINE, 1)) return true;
+    if (tokens.nextIs(TK_NEWLINE)) return true;
+    if (tokens.nextIs(TK_WHITESPACE) && tokens.nextIs(TK_NEWLINE, 1)) return true;
     return false;
 }
 
 bool lookahead_match_comment_statement(TokenStream& tokens)
 {
     int lookahead = 0;
-    if (tokens.nextIs(WHITESPACE))
+    if (tokens.nextIs(TK_WHITESPACE))
         lookahead++;
-    return tokens.nextIs(COMMENT, lookahead);
+    return tokens.nextIs(TK_COMMENT, lookahead);
 }
 
 bool lookahead_match_leading_name_binding(TokenStream& tokens)
 {
     int lookahead = 0;
-    if (!tokens.nextIs(IDENTIFIER, lookahead++))
+    if (!tokens.nextIs(TK_IDENTIFIER, lookahead++))
         return false;
-    if (tokens.nextIs(WHITESPACE, lookahead))
+    if (tokens.nextIs(TK_WHITESPACE, lookahead))
         lookahead++;
-    if (!tokens.nextIs(EQUALS, lookahead++))
+    if (!tokens.nextIs(TK_EQUALS, lookahead++))
         return false;
     return true;
 }
@@ -1746,11 +1744,11 @@ bool lookahead_match_leading_name_binding(TokenStream& tokens)
 bool lookahead_match_rebind_argument(TokenStream& tokens)
 {
     int lookahead = 0;
-    if (!tokens.nextIs(AMPERSAND, lookahead++))
+    if (!tokens.nextIs(TK_AMPERSAND, lookahead++))
         return false;
-    if (tokens.nextIs(WHITESPACE, lookahead))
+    if (tokens.nextIs(TK_WHITESPACE, lookahead))
         lookahead++;
-    if (!tokens.nextIs(IDENTIFIER, lookahead++))
+    if (!tokens.nextIs(TK_IDENTIFIER, lookahead++))
         return false;
     return true;
 }
@@ -1774,57 +1772,57 @@ ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context)
     ParseResult result;
 
     // identifier with rebind?
-    if (tokens.nextIs(AT_SIGN) && tokens.nextIs(IDENTIFIER, 1))
+    if (tokens.nextIs(TK_AT_SIGN) && tokens.nextIs(TK_IDENTIFIER, 1))
         result = identifier_with_rebind(branch, tokens, context);
 
     // identifier?
-    else if (tokens.nextIs(IDENTIFIER))
+    else if (tokens.nextIs(TK_IDENTIFIER))
         result = identifier(branch, tokens, context);
 
     // literal integer?
-    else if (tokens.nextIs(INTEGER))
+    else if (tokens.nextIs(TK_INTEGER))
         result = literal_integer(branch, tokens, context);
 
     // literal string?
-    else if (tokens.nextIs(STRING))
+    else if (tokens.nextIs(TK_STRING))
         result = literal_string(branch, tokens, context);
 
     // literal bool?
-    else if (tokens.nextIs(TRUE_TOKEN) || tokens.nextIs(FALSE_TOKEN))
+    else if (tokens.nextIs(TK_TRUE) || tokens.nextIs(TK_FALSE))
         result = literal_bool(branch, tokens, context);
 
     // literal null?
-    else if (tokens.nextIs(NULL_TOKEN))
+    else if (tokens.nextIs(TK_NULL))
         result = literal_null(branch, tokens, context);
 
     // literal hex?
-    else if (tokens.nextIs(HEX_INTEGER))
+    else if (tokens.nextIs(TK_HEX_INTEGER))
         result = literal_hex(branch, tokens, context);
 
     // literal float?
-    else if (tokens.nextIs(FLOAT_TOKEN))
+    else if (tokens.nextIs(TK_FLOAT))
         result = literal_float(branch, tokens, context);
 
     // literal color?
-    else if (tokens.nextIs(COLOR))
+    else if (tokens.nextIs(TK_COLOR))
         result = literal_color(branch, tokens, context);
 
     // literal list?
-    else if (tokens.nextIs(LBRACKET))
+    else if (tokens.nextIs(TK_LBRACKET))
         result = literal_list(branch, tokens, context);
 
     // plain branch?
-    else if (tokens.nextIs(LBRACE))
+    else if (tokens.nextIs(TK_LBRACE))
         result = plain_branch(branch, tokens, context);
 
     // parenthesized expression?
-    else if (tokens.nextIs(LPAREN)) {
-        tokens.consume(LPAREN);
+    else if (tokens.nextIs(TK_LPAREN)) {
+        tokens.consume(TK_LPAREN);
         result = expression(branch, tokens, context);
 
-        if (!tokens.nextIs(RPAREN))
+        if (!tokens.nextIs(TK_RPAREN))
             return compile_error_for_line(result.term, tokens, startPosition);
-        tokens.consume(RPAREN);
+        tokens.consume(TK_RPAREN);
         result.term->setIntProp("syntax:parens", result.term->intProp("syntax:parens") + 1);
     }
     else {
@@ -1844,7 +1842,7 @@ ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context)
 ParseResult literal_integer(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    std::string text = tokens.consumeStr(INTEGER);
+    std::string text = tokens.consumeStr(TK_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = create_int(branch, value);
     set_source_location(term, startPosition, tokens);
@@ -1854,7 +1852,7 @@ ParseResult literal_integer(Branch* branch, TokenStream& tokens, ParserCxt* cont
 ParseResult literal_hex(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    std::string text = tokens.consumeStr(HEX_INTEGER);
+    std::string text = tokens.consumeStr(TK_HEX_INTEGER);
     int value = strtoul(text.c_str(), NULL, 0);
     Term* term = create_int(branch, value);
     term->setStringProp("syntax:integerFormat", "hex");
@@ -1865,7 +1863,7 @@ ParseResult literal_hex(Branch* branch, TokenStream& tokens, ParserCxt* context)
 ParseResult literal_float(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    std::string text = tokens.consumeStr(FLOAT_TOKEN);
+    std::string text = tokens.consumeStr(TK_FLOAT);
 
     // Parse value with atof
     float value = (float) atof(text.c_str());
@@ -1881,7 +1879,7 @@ ParseResult literal_float(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     float mutability = 0.0;
 
-    if (tokens.nextIs(QUESTION)) {
+    if (tokens.nextIs(TK_QUESTION)) {
         tokens.consume();
         mutability = 1.0;
     }
@@ -1897,7 +1895,7 @@ ParseResult literal_string(Branch* branch, TokenStream& tokens, ParserCxt* conte
 {
     int startPosition = tokens.getPosition();
 
-    std::string text = tokens.consumeStr(STRING);
+    std::string text = tokens.consumeStr(TK_STRING);
 
     std::string quoteType = text.substr(0,1);
 
@@ -1957,7 +1955,7 @@ ParseResult literal_string(Branch* branch, TokenStream& tokens, ParserCxt* conte
 ParseResult literal_bool(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    bool value = tokens.nextIs(TRUE_TOKEN);
+    bool value = tokens.nextIs(TK_TRUE);
 
     tokens.consume();
 
@@ -1970,7 +1968,7 @@ ParseResult literal_null(Branch* branch, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(NULL_TOKEN);
+    tokens.consume(TK_NULL);
 
     Term* term = create_value(branch, &NULL_T);
     set_source_location(term, startPosition, tokens);
@@ -1999,7 +1997,7 @@ ParseResult literal_color(Branch* branch, TokenStream& tokens, ParserCxt* contex
 {
     int startPosition = tokens.getPosition();
 
-    std::string text = tokens.consumeStr(COLOR);
+    std::string text = tokens.consumeStr(TK_COLOR);
 
     // strip leading # sign
     text = text.substr(1, text.length()-1);
@@ -2049,16 +2047,16 @@ ParseResult literal_list(Branch* branch, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(LBRACKET);
+    tokens.consume(TK_LBRACKET);
 
     TermList inputs;
     ListSyntaxHints listHints;
 
     function_call_inputs(branch, tokens, context, inputs, listHints);
 
-    if (!tokens.nextIs(RBRACKET))
+    if (!tokens.nextIs(TK_RBRACKET))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
-    tokens.consume(RBRACKET);
+    tokens.consume(TK_RBRACKET);
 
     Term* term = apply(branch, LIST_FUNC, inputs);
     listHints.apply(term);
@@ -2083,14 +2081,14 @@ ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context
 ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    tokens.consume(NAMESPACE);
+    tokens.consume(TK_NAMESPACE);
     possible_whitespace(tokens);
 
-    if (!tokens.nextIs(IDENTIFIER))
+    if (!tokens.nextIs(TK_IDENTIFIER))
         return compile_error_for_line(branch, tokens, startPosition,
             "Expected identifier after 'namespace'");
 
-    std::string name = tokens.consumeStr(IDENTIFIER);
+    std::string name = tokens.consumeStr(TK_IDENTIFIER);
     Term* term = apply(branch, NAMESPACE_FUNC, TermList(), name);
     set_starting_source_location(term, startPosition, tokens);
 
@@ -2115,7 +2113,7 @@ ParseResult identifier(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
     
-    std::string id = tokens.consumeStr(IDENTIFIER);
+    std::string id = tokens.consumeStr(TK_IDENTIFIER);
 
     Term* term = find_name(branch, id.c_str());
     if (term == NULL) {
@@ -2133,12 +2131,12 @@ ParseResult identifier_with_rebind(Branch* branch, TokenStream& tokens, ParserCx
 
     bool rebindOperator = false;
 
-    if (tokens.nextIs(AT_SIGN)) {
-        tokens.consume(AT_SIGN);
+    if (tokens.nextIs(TK_AT_SIGN)) {
+        tokens.consume(TK_AT_SIGN);
         rebindOperator = true;
     }
 
-    std::string id = tokens.consumeStr(IDENTIFIER);
+    std::string id = tokens.consumeStr(TK_IDENTIFIER);
 
     Term* head = find_name(branch, id.c_str());
     ParseResult result;
@@ -2248,7 +2246,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 
         // If we've passed our originalPosition and reached a newline, then stop
         if (tokens.getPosition() > originalPosition
-                && (tokens.nextIs(token::NEWLINE) || tokens.nextIs(token::SEMICOLON)))
+                && (tokens.nextIs(TK_NEWLINE) || tokens.nextIs(TK_SEMICOLON)))
             break;
 
         line << tokens.consumeStr();
@@ -2305,16 +2303,16 @@ bool is_infix_operator_rebinding(std::string const& infix)
 
 std::string possible_whitespace(TokenStream& tokens)
 {
-    if (tokens.nextIs(token::WHITESPACE))
-        return tokens.consumeStr(token::WHITESPACE);
+    if (tokens.nextIs(TK_WHITESPACE))
+        return tokens.consumeStr(TK_WHITESPACE);
     else
         return "";
 }
 
 std::string possible_newline(TokenStream& tokens)
 {
-    if (tokens.nextIs(token::NEWLINE))
-        return tokens.consumeStr(token::NEWLINE);
+    if (tokens.nextIs(TK_NEWLINE))
+        return tokens.consumeStr(TK_NEWLINE);
     else
         return "";
 }
@@ -2323,7 +2321,7 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 {
     std::stringstream output;
 
-    while (tokens.nextIs(token::NEWLINE) || tokens.nextIs(token::WHITESPACE))
+    while (tokens.nextIs(TK_NEWLINE) || tokens.nextIs(TK_WHITESPACE))
         output << tokens.consumeStr();
 
     return output.str();
@@ -2331,23 +2329,23 @@ std::string possible_whitespace_or_newline(TokenStream& tokens)
 
 bool is_statement_ending(int t)
 {
-    return t == token::COMMA || t == token::SEMICOLON || t == token::NEWLINE;
+    return t == TK_COMMA || t == TK_SEMICOLON || t == TK_NEWLINE;
 }
 
 std::string possible_statement_ending(TokenStream& tokens)
 {
     std::stringstream result;
-    if (tokens.nextIs(token::WHITESPACE))
+    if (tokens.nextIs(TK_WHITESPACE))
         result << tokens.consumeStr();
 
-    if (tokens.nextIs(token::COMMA) || tokens.nextIs(token::SEMICOLON))
+    if (tokens.nextIs(TK_COMMA) || tokens.nextIs(TK_SEMICOLON))
         result << tokens.consumeStr();
 
-    if (tokens.nextIs(token::WHITESPACE))
+    if (tokens.nextIs(TK_WHITESPACE))
         result << tokens.consumeStr();
 
-    if (tokens.nextIs(token::NEWLINE))
-        result << tokens.consumeStr(token::NEWLINE);
+    if (tokens.nextIs(TK_NEWLINE))
+        result << tokens.consumeStr(TK_NEWLINE);
 
     return result.str();
 }

@@ -17,7 +17,7 @@ namespace namespace_function {
         append_phrase(source, term->name, term, phrase_type::TERM_NAME);
         format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
-                term, token::WHITESPACE);
+                term, TK_WHITESPACE);
     }
 
     void early_setup(Branch* kernel)

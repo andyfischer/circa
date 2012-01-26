@@ -60,12 +60,12 @@ namespace declared_state_function {
 
     void formatSource(StyledSource* source, Term* term)
     {
-        append_phrase(source, "state ", term, token::STATE);
+        append_phrase(source, "state ", term, TK_STATE);
 
         if (term->hasProperty("syntax:explicitType")) {
             append_phrase(source, term->stringProp("syntax:explicitType"),
                     term, phrase_type::TYPE_NAME);
-            append_phrase(source, " ", term, token::WHITESPACE);
+            append_phrase(source, " ", term, TK_WHITESPACE);
         }
 
         append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);

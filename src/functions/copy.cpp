@@ -19,7 +19,7 @@ namespace copy_function {
     {
         format_name_binding(source, term);
         append_phrase(source, get_relative_name_at(term, term->input(0)),
-                term, token::IDENTIFIER);
+                term, TK_IDENTIFIER);
     }
 
     void setup(Branch* kernel)

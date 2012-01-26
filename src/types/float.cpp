@@ -93,7 +93,7 @@ namespace float_t {
     }
     void format_source(StyledSource* source, Term* term)
     {
-        append_phrase(source, float_t::to_source_string(term).c_str(), term, token::FLOAT_TOKEN);
+        append_phrase(source, float_t::to_source_string(term).c_str(), term, TK_FLOAT);
     }
     void setup_type(Type* type)
     {
