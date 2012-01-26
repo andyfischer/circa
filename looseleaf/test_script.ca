@@ -6,8 +6,10 @@ state texture = opengl:new_texture_handle()
 s = cairo:create_image_surface([300 300])
 cr = cairo:create_context_for_surface(s)
 
+cr.set_source_color(#f00)
 cr.move_to([10 10])
 cr.line_to([20 20])
+cr.paint()
 
 cairo:upload_surface_to_opengl(s texture)
 opengl:draw_texture_as_quad(texture to_rect([0 0] [300 300]))

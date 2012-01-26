@@ -2,6 +2,7 @@ assert_failure.ca
 boolean.ca
 cast.ca
 compound_type.ca
+declared_state_1.ca
 dynamic_typing.ca
 for.ca
 for_break.ca

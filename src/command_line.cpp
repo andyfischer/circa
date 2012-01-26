@@ -17,6 +17,7 @@
 #include "testing.h"
 
 #include "tools/build_tool.h"
+#include "tools/command_reader.h"
 #include "tools/generate_cpp.h"
 #include "tools/debugger_repl.h"
 #include "tools/exporting_parser.h"
@@ -274,6 +275,12 @@ int run_command_line(List* args)
         TValue remainingArgs;
         list_slice(args, 1, -1, &remainingArgs);
         run_generate_cpp(&remainingArgs);
+        return 0;
+    }
+
+    // Command reader (from stdin)
+    if (string_eq(args->get(0), "-run-stdin")) {
+        run_command_reader();
         return 0;
     }
 

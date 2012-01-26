@@ -17,6 +17,7 @@ void string_resize(TValue* s, int length);
 bool string_eq(TValue* s, const char* str);
 bool string_starts_with(TValue* s, const char* beginning);
 bool string_ends_with(TValue* s, const char* str);
+char string_get(TValue* s, int index);
 
 const char* as_cstring(TValue* value);
 std::string const& as_string(TValue* value);

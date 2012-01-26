@@ -200,6 +200,10 @@ bool string_ends_with(TValue* s, const char* ending)
 
     return true;
 }
+char string_get(TValue* s, int index)
+{
+    return as_cstring(s)[index];
+}
 
 std::string& as_std_string(TValue* value)
 {
