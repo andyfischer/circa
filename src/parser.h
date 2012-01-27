@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "common_headers.h"
-
-#include "token_stream.h"
-
 namespace circa {
+
+struct Branch;
+struct TokenStream;
+
 namespace parser {
 
 enum BranchSyntax {

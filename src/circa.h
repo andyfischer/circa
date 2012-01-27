@@ -37,7 +37,6 @@
 #include "term_source_location.h"
 #include "testing.h"
 #include "token.h"
-#include "token_stream.h"
 #include "type.h"
 #include "type_inference.h"
 

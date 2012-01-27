@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "tagged_value.h"
+
 namespace circa {
 
 struct String : public TValue

@@ -7,7 +7,6 @@
 #include "common_headers.h"
 
 #include "function.h"
-#include "token_stream.h"
 
 namespace circa {
 

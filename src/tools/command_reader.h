@@ -2,6 +2,6 @@
 
 namespace circa {
 
-void run_command_reader();
+void run_commands_from_stdin();
 
 }

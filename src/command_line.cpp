@@ -49,6 +49,7 @@ void print_usage()
         "  -list-tests       : List every unit test name\n"
         "  -check <filename> : Statically check the script for any errors\n"
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
+        "  -run-stdin        : Read and execute commands from stdin\n"
         "\n"
         "If no <dash-command> is given, simply load and run the file as a script.\n"
         << std::endl;
@@ -280,7 +281,7 @@ int run_command_line(List* args)
 
     // Command reader (from stdin)
     if (string_eq(args->get(0), "-run-stdin")) {
-        run_command_reader();
+        run_commands_from_stdin();
         return 0;
     }
 

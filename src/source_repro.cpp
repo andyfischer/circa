@@ -11,6 +11,7 @@
 #include "subroutine.h"
 #include "tagged_value.h"
 #include "term.h"
+#include "token.h"
 #include "type.h"
 
 #include "types/ref.h"
