@@ -1,6 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
-#include "circa.h"
+#include "circa_internal.h"
 
 namespace circa {
 namespace lookup_branch_ref_function {

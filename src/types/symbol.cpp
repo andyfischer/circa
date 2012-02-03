@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "symbols.h"
+
 namespace circa {
 namespace symbol_t {
 

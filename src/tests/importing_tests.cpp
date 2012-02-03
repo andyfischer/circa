@@ -4,7 +4,7 @@
 
 #include "testing.h"
 #include "kernel.h"
-#include "circa.h"
+#include "circa_internal.h"
 #include "importing.h"
 #include "importing_macros.h"
 

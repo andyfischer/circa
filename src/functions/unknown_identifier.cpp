@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "kernel.h"
-#include "circa.h"
+#include "circa_internal.h"
 
 namespace circa {
 namespace unknown_identifier_function {

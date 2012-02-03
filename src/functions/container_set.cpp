@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
+#include "circa_internal.h"
 #include "types/set.h"
 
 namespace circa {

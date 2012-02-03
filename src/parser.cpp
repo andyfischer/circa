@@ -2,15 +2,25 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
-
 #include "branch.h"
+#include "building.h"
+#include "evaluation.h"
+#include "for_loop.h"
+#include "function.h"
+#include "if_block.h"
+#include "introspection.h"
 #include "list_shared.h"
+#include "kernel.h"
 #include "modules.h"
 #include "parser.h"
+#include "source_repro.h"
+#include "static_checking.h"
+#include "subroutine.h"
 #include "switch_block.h"
+#include "symbols.h"
 #include "term.h"
 #include "token.h"
+#include "type.h"
 #include "update_cascades.h"
 
 namespace circa {

@@ -1,7 +1,5 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa.h"
-
 namespace circa {
 namespace opaque_pointer_t {
 

@@ -11,8 +11,6 @@
 // when created, and released only when all of the handles are released.
 //
 
-#include "circa.h"
-
 #include "list_shared.h"
 
 #include "handle.h"

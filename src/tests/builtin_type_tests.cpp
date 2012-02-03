@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
+#include "circa_internal.h"
 #include "heap_debugging.h"
 
 namespace circa {

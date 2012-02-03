@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "circa.h"
+#include "circa_internal.h"
 #include "importing_macros.h"
 #include "types/handle.h"
 

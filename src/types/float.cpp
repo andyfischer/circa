@@ -1,5 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "kernel.h"
 #include "source_repro.h"
 #include "tagged_value.h"
 #include "token.h"
