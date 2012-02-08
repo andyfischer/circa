@@ -4,7 +4,7 @@
 #include "tagged_value.h"
 #include "token.h"
 #include "type.h"
-#include "types/float.h"
+#include "types/number.h"
 
 namespace circa {
 namespace int_t {
@@ -16,7 +16,7 @@ namespace int_t {
     bool equals(Type* type, TValue* a, TValue* b)
     {
         if (is_float(b))
-            return float_t::equals(type, a, b);
+            return number_t::equals(type, a, b);
         if (!is_int(b))
             return false;
         return as_int(a) == as_int(b);

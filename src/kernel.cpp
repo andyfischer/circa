@@ -28,11 +28,11 @@
 #include "types/color.h"
 #include "types/common.h"
 #include "types/eval_context.h"
-#include "types/float.h"
 #include "types/handle.h"
 #include "types/hashtable.h"
 #include "types/indexable.h"
 #include "types/int.h"
+#include "types/number.h"
 #include "types/ref.h"
 #include "types/set.h"
 #include "types/symbol.h"
@@ -248,7 +248,7 @@ void create_primitive_types()
     branch_setup_type(&BRANCH_T);
     dict_t::setup_type(&DICT_T);
     eval_context_t::setup_type(&EVAL_CONTEXT_T);
-    float_t::setup_type(&FLOAT_T);
+    number_t::setup_type(&FLOAT_T);
     handle_t::setup_type(&HANDLE_T);
     int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);

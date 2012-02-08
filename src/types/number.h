@@ -3,10 +3,10 @@
 #pragma once
 
 namespace circa {
-namespace float_t {
+namespace number_t {
 
     bool equals(Type* type, TValue* a, TValue* b);
     void setup_type(Type* type);
 
-} // namespace float_t
+} // namespace number_t
 } // namespace circa

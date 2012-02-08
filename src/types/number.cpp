@@ -7,7 +7,7 @@
 #include "type.h"
 
 namespace circa {
-namespace float_t {
+namespace number_t {
     void reset(Type*, TValue* value)
     {
         set_float(value, 0);
@@ -94,7 +94,7 @@ namespace float_t {
     }
     void format_source(StyledSource* source, Term* term)
     {
-        append_phrase(source, float_t::to_source_string(term).c_str(), term, TK_FLOAT);
+        append_phrase(source, number_t::to_source_string(term).c_str(), term, TK_FLOAT);
     }
     void setup_type(Type* type)
     {
