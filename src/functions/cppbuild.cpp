@@ -4,8 +4,10 @@
 
 #include "branch.h"
 #include "filesystem.h"
+#include "importing_macros.h"
 #include "string_type.h"
 #include "tagged_value.h"
+#include "term.h"
 
 namespace circa {
 namespace cppbuild_function {

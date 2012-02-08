@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "circa_internal.h"
-#include "types/set.h"
+#include "../types/set.h"
 
 namespace circa {
 namespace container_set_function {

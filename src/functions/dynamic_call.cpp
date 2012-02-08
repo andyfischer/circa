@@ -2,6 +2,8 @@
 
 #include "list_shared.h"
 
+#include "importing_macros.h"
+
 namespace circa {
 namespace dynamic_call_function {
 
