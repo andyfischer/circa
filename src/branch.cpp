@@ -15,7 +15,6 @@
 #include "list_shared.h"
 #include "locals.h"
 #include "parser.h"
-#include "refactoring.h"
 #include "stateful_code.h"
 #include "source_repro.h"
 #include "static_checking.h"

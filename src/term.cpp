@@ -8,7 +8,6 @@
 #include "debug.h"
 #include "heap_debugging.h"
 #include "introspection.h"
-#include "refactoring.h"
 #include "symbols.h"
 #include "term.h"
 #include "type.h"

@@ -10,7 +10,6 @@
 #include "function.h"
 #include "importing_macros.h"
 #include "locals.h"
-#include "refactoring.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "symbols.h"

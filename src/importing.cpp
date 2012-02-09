@@ -8,7 +8,6 @@
 #include "evaluation.h"
 #include "function.h"
 #include "importing_macros.h"
-#include "refactoring.h"
 #include "parser.h"
 #include "symbols.h"
 #include "tagged_value.h"

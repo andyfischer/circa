@@ -12,7 +12,6 @@
 #include "importing_macros.h"
 #include "introspection.h"
 #include "locals.h"
-#include "refactoring.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"

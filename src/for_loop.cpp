@@ -11,7 +11,6 @@
 #include "locals.h"
 #include "source_repro.h"
 #include "stateful_code.h"
-#include "refactoring.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
