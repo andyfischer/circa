@@ -1,8 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "kernel.h"
-#include "type.h"
-#include "token.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace callable_t {

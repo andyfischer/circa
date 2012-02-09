@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "list_shared.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace list_methods_function {

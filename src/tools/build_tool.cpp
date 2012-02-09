@@ -1,11 +1,11 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
+#include "../common_headers.h"
 
-#include "evaluation.h"
-#include "names.h"
-#include "tagged_value.h"
-#include "types/list.h"
+#include "../evaluation.h"
+#include "../names.h"
+#include "../tagged_value.h"
+#include "../types/list.h"
 
 namespace circa {
 

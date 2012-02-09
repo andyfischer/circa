@@ -1,5 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "circa/internal/for_hosted_funcs.h"
+
 #include "rect_i.h"
 
 namespace circa {

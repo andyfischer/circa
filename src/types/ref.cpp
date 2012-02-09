@@ -1,12 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "importing_macros.h"
-#include "introspection.h"
-#include "kernel.h"
-#include "weak_ptrs.h"
-
-#include "types/common.h"
-#include "types/rect_i.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 #include "ref.h"
 

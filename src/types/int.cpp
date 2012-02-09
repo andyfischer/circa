@@ -1,10 +1,8 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "source_repro.h"
-#include "tagged_value.h"
-#include "token.h"
-#include "type.h"
-#include "types/number.h"
+#include "circa/internal/for_hosted_funcs.h"
+
+#include "./number.h"
 
 namespace circa {
 namespace int_t {

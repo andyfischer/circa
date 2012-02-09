@@ -1,8 +1,6 @@
 // Copyright (c) 2007-2010 Paul Hodge. All rights reserved
 
-#include "list_shared.h"
-
-#include "importing_macros.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace dynamic_call_function {

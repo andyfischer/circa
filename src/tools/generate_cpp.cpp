@@ -1,14 +1,14 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
+#include "../common_headers.h"
 
-#include "building.h"
-#include "function.h"
-#include "introspection.h"
-#include "list_shared.h"
-#include "names.h"
-#include "symbols.h"
-#include "type.h"
+#include "../building.h"
+#include "../function.h"
+#include "../introspection.h"
+#include "../list_shared.h"
+#include "../names.h"
+#include "../symbols.h"
+#include "../type.h"
 
 #include "generate_cpp.h"
 

@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "common_headers.h"
-#include "type.h"
+#include "../type.h"
 
 namespace circa {
 namespace handle_t {

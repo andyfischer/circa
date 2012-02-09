@@ -1,19 +1,20 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
-
 #include <cstdlib>
 #include <iostream>
 #include <dirent.h>
 #include <sys/stat.h>
 
-#include "branch.h"
+#include "../common_headers.h"
+
+#include "../branch.h"
+#include "../source_repro.h"
+#include "../static_checking.h"
+#include "../filesystem.h"
+#include "../tagged_value.h"
+#include "../types/list.h"
+
 #include "file_checker.h"
-#include "source_repro.h"
-#include "static_checking.h"
-#include "filesystem.h"
-#include "tagged_value.h"
-#include "types/list.h"
 
 namespace circa {
 

@@ -1,9 +1,8 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "source_repro.h"
-#include "tagged_value.h"
-#include "type.h"
-#include "token.h"
+#include "circa/internal/for_hosted_funcs.h"
+
+#include "bool.h"
 
 namespace circa {
 namespace bool_t {

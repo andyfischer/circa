@@ -50,9 +50,9 @@ def setup_builtin_functions():
 // This file is generated during the build process by prebuild.py .
 // You should probably not edit this file manually.
 
-#include "common_headers.h"
+#include "../common_headers.h"
 
-#include "branch.h"
+#include "../branch.h"
 
 namespace circa {
 
@@ -170,8 +170,9 @@ def include_list(items):
         generated_cpp.append('#include "'+item+'"')
     return "\n".join(generated_cpp)
 
-write_text_file('src/generated/all_tests.cpp', include_list(test_cpps()))
+write_text_file('src/generated/all_tests.cpp',
+    include_list(['../'+file for file in test_cpps()]))
 write_text_file('src/generated/all_builtin_functions.cpp',
-    include_list(builtin_function_cpps()))
+    include_list(['../'+file for file in builtin_function_cpps()]))
 write_text_file('src/generated/all_builtin_types.cpp',
-    include_list(['types/'+file for file in source_files('src/types')]))
+    include_list(['../types/'+file for file in source_files('src/types')]))

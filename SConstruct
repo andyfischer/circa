@@ -72,7 +72,7 @@ for env in all_envs:
     variant_name = env['variant_name']
 
     env.VariantDir('build/'+variant_name+'/src', 'src')
-    env.Append(CPPPATH = ['src'])
+    env.Append(CPPPATH = ['include'])
 
     generatedFiles = ['generated/'+filename for filename in list_source_files('src/generated')]
 
@@ -82,8 +82,9 @@ for env in all_envs:
 
     source_files.remove('main.cpp')
 
-    #if variant_name != 'test':
-    #    source_files.remove('generated/all_tests.cpp')
+    if variant_name != 'test':
+        source_files.remove('generated/all_tests.cpp')
+        source_files.remove('generated/register_all_tests.cpp')
 
     baseName = 'circa' + env['variant_suffix']
     fullPath = 'build/'+baseName
@@ -102,7 +103,7 @@ circa_cl_apps = {}
 
 for env in all_envs:
     variant_name = env['variant_name']
-    env.Append(CPPPATH = ['src'])
+    env.Append(CPPPATH = ['include'])
     binaryFile = 'build/circa' + env['variant_suffix']
 
     libs = [circa_libs[variant_name]]

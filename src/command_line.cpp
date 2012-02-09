@@ -30,28 +30,29 @@ void print_usage()
 {
     std::cout <<
         "Usage:\n"
-        "  circa <options> <dash-command> <args>\n"
+        "  circa <options> <filename>\n"
+        "  circa <options> <dash-command> <command args>\n"
         "\n"
         "Available options:\n"
         "  -libpath <path>     : Add a module search path\n"
         "  -p                  : Print out raw source\n"
         "  -pp                 : Print out raw source with properties\n"
         "  -s                  : Print out reconstructed source code (for testing)\n"
-        "  -n                  : Don't actually run the script (use with -p or -s)\n"
-        "  -break-on <id>       : Debugger break when term <id> is created\n"
+        "  -n                  : Don't actually run the script (for use with -p, -pp or -s)\n"
+        "  -break-on <id>      : Debugger break when term <id> is created\n"
         "  -print-state        : Print state as text after running the script\n"
         "\n"
         "Available commands:\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
         "  -e <expression>   : Evaluate an expression on the command line\n"
-        "  -test             : Run unit tests\n"
-        "  -test <name>      : Run unit test of a certain name\n"
-        "  -list-tests       : List every unit test name\n"
         "  -check <filename> : Statically check the script for any errors\n"
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
         "  -run-stdin        : Read and execute commands from stdin\n"
-        "\n"
-        "If no <dash-command> is given, simply load and run the file as a script.\n"
+#ifdef CIRCA_TEST_BUILD
+        "  -test             : Run unit tests\n"
+        "  -test <name>      : Run unit test of a certain name\n"
+        "  -list-tests       : List every unit test name\n"
+#endif
         << std::endl;
 }
 
@@ -120,14 +121,19 @@ int run_command_line(List* args)
         break;
     }
 
-    // No arguments remaining, run tests.
+    // No arguments remaining
     if (list_length(args) == 0) {
+#ifdef CIRCA_TEST_BUILD
         run_all_tests();
+#else
+        print_usage();
+#endif
         return 0;
     }
 
     // Check to handle args[0] as a dash-command.
 
+#ifdef CIRCA_TEST_BUILD
     // Run unit tests
     if (string_eq(args->get(0), "-test")) {
         if (args->length() > 1)
@@ -136,6 +142,7 @@ int run_command_line(List* args)
             run_all_tests();
         return 0;
     }
+#endif
 
     // Print help
     if (string_eq(args->get(0), "-help")) {
@@ -164,6 +171,7 @@ int run_command_line(List* args)
         return 0;
     }
 
+#ifdef CIRCA_TEST_BUILD
     if (string_eq(args->get(0), "-list-tests")) {
         std::vector<std::string> testNames = list_all_test_names();
 
@@ -173,6 +181,7 @@ int run_command_line(List* args)
         }
         return 0;
     }
+#endif
 
     // Start repl
     if (string_eq(args->get(0), "-repl"))

@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "evaluation.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace eval_context_t {

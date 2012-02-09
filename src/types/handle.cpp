@@ -11,7 +11,7 @@
 // when created, and released only when all of the handles are released.
 //
 
-#include "list_shared.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 #include "handle.h"
 

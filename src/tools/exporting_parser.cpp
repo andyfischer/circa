@@ -1,11 +1,11 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
+#include "../common_headers.h"
 
-#include "branch.h"
-#include "introspection.h"
-#include "static_checking.h"
-#include "term.h"
+#include "../branch.h"
+#include "../introspection.h"
+#include "../static_checking.h"
+#include "../term.h"
 
 namespace circa {
 

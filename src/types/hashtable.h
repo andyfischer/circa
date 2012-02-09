@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "tagged_value.h"
-
 namespace circa {
 namespace hashtable_t {
 

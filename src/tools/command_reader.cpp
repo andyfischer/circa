@@ -1,13 +1,13 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
-#include "list_shared.h"
-#include "modules.h"
-#include "string_type.h"
-#include "symbols.h"
-#include "tagged_value.h"
-#include "token.h"
-#include "types/list.h"
+#include "../common_headers.h"
+#include "../list_shared.h"
+#include "../modules.h"
+#include "../string_type.h"
+#include "../symbols.h"
+#include "../tagged_value.h"
+#include "../token.h"
+#include "../types/list.h"
 
 namespace circa {
 

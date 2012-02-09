@@ -1,7 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa_internal.h"
-#include "importing_macros.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace equals_function {

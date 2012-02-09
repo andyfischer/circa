@@ -1,9 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "circa_internal.h"
-#include "static_checking.h"
-
-#include "../types/ref.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace branch_methods_function {

@@ -1,13 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "common_headers.h"
-
-#include "branch.h"
-#include "filesystem.h"
-#include "importing_macros.h"
-#include "string_type.h"
-#include "tagged_value.h"
-#include "term.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace cppbuild_function {

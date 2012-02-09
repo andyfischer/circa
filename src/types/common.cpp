@@ -1,7 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include "tagged_value.h"
-#include "type.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
 namespace common_type_callbacks {

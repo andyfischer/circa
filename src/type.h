@@ -126,6 +126,7 @@ private:
     Type& operator=(Type const&) { internal_error(""); return *this; }
 };
 
+
 struct StaticTypeQuery
 {
     enum Result {

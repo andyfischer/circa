@@ -3,16 +3,9 @@
 #include <string>
 #include <sstream>
 
-#include "build_options.h"
-#include "heap_debugging.h"
-#include "importing_macros.h"
-#include "tagged_value.h"
-#include "testing.h"
+#include "circa/internal/for_hosted_funcs.h"
 
-#include "type.h"
-
-#include "list_shared.h"
-#include "list.h"
+#include "./list.h"
 
 namespace circa {
 namespace list_t {
