@@ -637,11 +637,12 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     if (tokens.nextNonWhitespaceIs(TK_SYMBOL)) {
         possible_whitespace(tokens);
         std::string symbolText = tokens.consumeStr(TK_SYMBOL);
-        if (symbolText == ":controlflow") {
-            as_function(result)->vmInstruction = ControlFlowCall;
-            result->setBoolProp("controlflow", true);
+        #if 0 // there was once stuff here
+        if (symbolText == ":xyz") {
         }
-        else {
+        else
+        #endif
+        {
             return compile_error_for_line(result, tokens, startPosition,
                 "Unrecognized symbol: " + symbolText);
         }

@@ -115,7 +115,7 @@ namespace assign_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.assign = import_function(kernel, assign, "assign(any, any) :controlflow -> any");
+        FUNCS.assign = import_function(kernel, assign, "assign(any, any) -> any");
         as_function(FUNCS.assign)->specializeType = specializeType;
         as_function(FUNCS.assign)->formatSource = formatSource;
         as_function(FUNCS.assign)->postInputChange = postInputChange;

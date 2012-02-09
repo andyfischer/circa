@@ -44,8 +44,6 @@ const char* symbol_get_text(Symbol symbol)
         case NotEnoughInputs: return "NotEnoughInputs";
         case TooManyInputs: return "TooManyInputs";
         case ExtraOutputNotFound: return "ExtraOutputNotFound";
-        case PureCall: return "PureCall";
-        case ControlFlowCall: return "ControlFlowCall";
         case Default: return "Default";
         case ByDemand: return "ByDemand";
         case Unevaluated: return "Unevaluated";

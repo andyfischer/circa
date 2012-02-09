@@ -24,7 +24,7 @@ namespace return_function {
 
         // Move PC to end
         Frame* top = top_frame(CONTEXT);
-        top->pc = top->branch->length();
+        top->nextPc = top->branch->length();
     }
 
     void formatSource(StyledSource* source, Term* term)
@@ -51,7 +51,6 @@ namespace return_function {
         CA_SETUP_FUNCTIONS(kernel);
         RETURN_FUNC = kernel->get("return");
         as_function(RETURN_FUNC)->formatSource = formatSource;
-        as_function(RETURN_FUNC)->vmInstruction = ControlFlowCall;
     }
 }
 }

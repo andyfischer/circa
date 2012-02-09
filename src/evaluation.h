@@ -17,6 +17,7 @@ struct Frame
     List registers;
     Branch* branch;
     int pc;
+    int nextPc;
     int startPc;
     int endPc;
 #ifdef DEFERRED_CALLS_FIRST_DRAFT

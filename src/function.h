@@ -35,7 +35,6 @@ struct Function
 
     // Functions
     EvaluateFunc evaluate;
-    Symbol vmInstruction;
     
     SpecializeTypeFunc specializeType;
     FormatSource formatSource;

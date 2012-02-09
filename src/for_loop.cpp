@@ -351,7 +351,7 @@ CA_FUNCTION(evaluate_loop_output)
     }
 
     // Return to start of loop body
-    topFrame->pc = 0;
+    topFrame->nextPc = 0;
 }
 
 } // namespace circa

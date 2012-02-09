@@ -47,7 +47,7 @@ namespace if_block_function {
 
     void setup(Branch* kernel)
     {
-        IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() :controlflow -> any");
+        IF_BLOCK_FUNC = import_function(kernel, evaluate_if_block, "if_block() -> any");
         as_function(IF_BLOCK_FUNC)->formatSource = formatSource;
         as_function(IF_BLOCK_FUNC)->createsStackFrame = false;
 

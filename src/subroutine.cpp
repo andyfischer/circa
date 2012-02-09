@@ -115,7 +115,6 @@ void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
     as_function(sub)->evaluate = evaluate_subroutine;
-    as_function(sub)->vmInstruction = ControlFlowCall;
     as_function(sub)->createsStackFrame = true;
 }
 

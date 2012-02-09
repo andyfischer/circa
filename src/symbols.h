@@ -28,10 +28,6 @@ const Symbol NotEnoughInputs = 10;
 const Symbol TooManyInputs = 11;
 const Symbol ExtraOutputNotFound = 12;
 
-// VM instructions (used in Function)
-const Symbol PureCall = 13;
-const Symbol ControlFlowCall = 14;
-
 // Evaluation strategies
 const Symbol Default = 15;
 const Symbol ByDemand = 16;

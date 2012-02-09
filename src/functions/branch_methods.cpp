@@ -51,7 +51,7 @@ namespace branch_methods_function {
             format_static_error(list[i], out[i]);
     }
 
-    CA_DEFINE_FUNCTION(evaluate, "Branch.evaluate() :controlflow")
+    CA_DEFINE_FUNCTION(evaluate, "Branch.evaluate()")
     {
         Branch* branch = as_branch(INPUT(0));
         push_frame(CONTEXT, branch);

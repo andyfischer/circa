@@ -25,7 +25,6 @@ Function::Function()
     throws(false),
     createsStackFrame(false),
     evaluate(NULL),
-    vmInstruction(PureCall),
     specializeType(NULL),
     formatSource(NULL),
     checkInvariants(NULL),
@@ -459,7 +458,6 @@ bool is_native_function(Function* func)
 void function_set_evaluate_func(Term* function, EvaluateFunc evaluate)
 {
     as_function(function)->evaluate = evaluate;
-    as_function(function)->vmInstruction = PureCall;
 }
 
 void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specializeFunc)

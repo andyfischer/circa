@@ -37,7 +37,7 @@ namespace for_function {
         Term* index = for_loop_find_index(top_frame(CONTEXT)->branch);
         TValue* indexVal = get_register(CONTEXT, index);
         set_int(indexVal, as_int(indexVal) + 1);
-        top_frame(CONTEXT)->pc = 0;
+        top_frame(CONTEXT)->nextPc = 0;
     }
     CA_FUNCTION(evaluate_discard)
     {
@@ -61,13 +61,11 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         as_function(FOR_FUNC)->formatSource = formatSource;
         as_function(FOR_FUNC)->createsStackFrame = true;
-        as_function(FOR_FUNC)->vmInstruction = ControlFlowCall;
 
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
         FUNCS.loop_output = import_function(kernel, evaluate_loop_output, "loop_output(int,any)");
-        as_function(FUNCS.loop_output)->vmInstruction = ControlFlowCall;
 
         DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
         as_function(DISCARD_FUNC)->formatSource = discard_formatSource;
@@ -75,12 +73,10 @@ namespace for_function {
 
         BREAK_FUNC = import_function(kernel, evaluate_break, "break()");
         as_function(BREAK_FUNC)->formatSource = break_formatSource;
-        as_function(BREAK_FUNC)->vmInstruction = ControlFlowCall;
         hide_from_docs(BREAK_FUNC);
 
         CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
         as_function(CONTINUE_FUNC)->formatSource = continue_formatSource;
-        as_function(CONTINUE_FUNC)->vmInstruction = ControlFlowCall;
         hide_from_docs(CONTINUE_FUNC);
     }
 }

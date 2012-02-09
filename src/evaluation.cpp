@@ -122,6 +122,7 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     top->strategy = Default;
 #endif
     top->pc = 0;
+    top->nextPc = 0;
     top->startPc = 0;
     top->endPc = branch->length();
     return top;
@@ -185,8 +186,6 @@ void finish_frame(EvalContext* context)
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
     Symbol strategy = top->strategy;
 #endif
-    int finishedPc = top->pc;
-
     pop_frame(context);
 
     Frame* parentFrame = top_frame(context);
@@ -196,7 +195,7 @@ void finish_frame(EvalContext* context)
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
     if (strategy == ByDemand) {
         // Copy the result we just produced, and don't advance PC.
-        copy(registers[finishedPc - 1], parentRegisters->get(finishedPc - 1));
+        copy(registers[top->pc - 1], parentRegisters->get(top->pc - 1));
         return;
     }
 #endif
@@ -575,11 +574,6 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
     out << "Error: " << context_get_error_message(context) << std::endl;
 }
 
-void advance_pc(Frame* frame)
-{
-    frame->pc++;
-}
-
 void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int* ninputs, int* noutputs)
 {
     Frame* frame = top_frame(context);
@@ -636,12 +630,13 @@ do_instruction:
     }
 
     Term* term = branch->get(pc);
+    frame->nextPc = pc + 1;
 
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
     // Skip a lazy-call in Default strategy.
     if (frame->strategy == Default && is_lazy_call(term)) {
         set_symbol(get_register(context, term), Unevaluated);
-        advance_pc(frame);
+        frame->pc = frame->nextPc;
         goto do_instruction;
     }
 #endif
@@ -652,7 +647,7 @@ do_instruction:
         evaluate = as_function(term->function)->evaluate;
 
     if (evaluate == NULL) {
-        advance_pc(frame);
+        frame->pc = frame->nextPc;
         goto do_instruction;
     }
 
@@ -678,8 +673,6 @@ do_instruction:
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
-
-    int previousNumFrames = context->numFrames;
 
     evaluate(context, inputCount, outputCount, inputBuffer);
 
@@ -708,10 +701,8 @@ do_instruction:
     if (error_occurred(context))
         return;
 
-    if (as_function(term->function)->vmInstruction == PureCall
-            && context->numFrames <= previousNumFrames)
-        advance_pc(top_frame(context));
-
+    frame = top_frame(context);
+    frame->pc = frame->nextPc;
     goto do_instruction;
 }
 
