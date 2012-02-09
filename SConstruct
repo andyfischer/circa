@@ -81,6 +81,7 @@ for env in all_envs:
         + ['generated/'+filename for filename in list_source_files('src/generated')])
 
     source_files.remove('main.cpp')
+    source_files.remove('generated/all_source_files.cpp')
 
     if variant_name != 'test':
         source_files.remove('generated/all_tests.cpp')

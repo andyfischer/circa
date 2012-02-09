@@ -13,7 +13,7 @@
 
 #include "filesystem.h"
 
-static void read_text_file(const char* filename, circa::ReadFileCallback receiveFile, void* context)
+static void posix_read_text_file(const char* filename, circa::ReadFileCallback receiveFile, void* context)
 {
     FILE* fp = fopen(filename, "r");
     if (fp == NULL)
@@ -38,7 +38,7 @@ static void read_text_file(const char* filename, circa::ReadFileCallback receive
     fclose(fp);
 }
 
-static void write_text_file(const char* filename, const char* contents)
+static void posix_write_text_file(const char* filename, const char* contents)
 {
     std::ofstream file;
     file.open(filename, std::ios::out | std::ios::binary);
@@ -46,7 +46,7 @@ static void write_text_file(const char* filename, const char* contents)
     file.close();
 }
 
-static time_t get_modified_time(const char* filename)
+static time_t posix_get_modified_time(const char* filename)
 {
     struct stat s;
     s.st_mtime = 0;
@@ -56,7 +56,7 @@ static time_t get_modified_time(const char* filename)
     return s.st_mtime;
 }
 
-static bool file_exists(const char* filename)
+static bool posix_file_exists(const char* filename)
 {
     FILE* fp = fopen(filename, "r");
     if (fp) {
@@ -68,7 +68,7 @@ static bool file_exists(const char* filename)
     }
 }
 
-static void read_directory(const char* dirname, circa::ReadDirectoryCallback callback,
+static void posix_read_directory(const char* dirname, circa::ReadDirectoryCallback callback,
        void* context)
 {
     DIR* dir = opendir(dirname);
@@ -99,10 +99,10 @@ static void read_directory(const char* dirname, circa::ReadDirectoryCallback cal
 void install_posix_filesystem_interface()
 {
     circa::StorageInterface interface;
-    interface.readTextFile = read_text_file;
-    interface.writeTextFile = write_text_file;
-    interface.getModifiedTime = get_modified_time;
-    interface.fileExists = file_exists;
-    interface.readDirectory = read_directory;
+    interface.readTextFile = posix_read_text_file;
+    interface.writeTextFile = posix_write_text_file;
+    interface.getModifiedTime = posix_get_modified_time;
+    interface.fileExists = posix_file_exists;
+    interface.readDirectory = posix_read_directory;
     circa::install_storage_interface(&interface);
 }

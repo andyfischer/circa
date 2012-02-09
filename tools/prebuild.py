@@ -176,3 +176,18 @@ write_text_file('src/generated/all_builtin_functions.cpp',
     include_list(['../'+file for file in builtin_function_cpps()]))
 write_text_file('src/generated/all_builtin_types.cpp',
     include_list(['../types/'+file for file in source_files('src/types')]))
+
+def all_source_files():
+    for file in get_cpp_files_in_dir('src'):
+        if file == 'main.cpp':
+            continue
+        yield "../" + file
+    for file in get_cpp_files_in_dir('src/tools'):
+        yield "../tools/" + file
+    yield "./all_builtin_functions.cpp"
+    yield "./all_builtin_types.cpp"
+    yield "./setup_builtin_functions.cpp"
+    yield "./stdlib_script_text.cpp"
+
+write_text_file('src/generated/all_source_files.cpp',
+    include_list(all_source_files()))

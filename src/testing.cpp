@@ -23,8 +23,12 @@ std::vector<TestCase> gTestCases;
 
 TestCase gCurrentTestCase;
 
+#ifdef CIRCA_TEST_BUILD
+
 // this function is defined in register_all_tests.cpp
 void register_all_tests();
+
+#endif
 
 void post_test_sanity_check();
 
@@ -208,7 +212,9 @@ bool run_test(TestCase& testCase, bool catch_exceptions)
 
 bool run_tests(std::string const& searchStr)
 {
+#ifdef CIRCA_TEST_BUILD
     register_all_tests();
+#endif
 
     int totalTestCount = 0;
     int successCount = 0;
@@ -241,7 +247,9 @@ bool run_tests(std::string const& searchStr)
 
 bool run_all_tests()
 {
+#ifdef CIRCA_TEST_BUILD
     register_all_tests();
+#endif
 
     int totalTestCount = 0;
     int successCount = 0;
@@ -276,9 +284,11 @@ void post_test_sanity_check()
 
 std::vector<std::string> list_all_test_names()
 {
-    register_all_tests();
-
     std::vector<std::string> output;
+
+#ifdef CIRCA_TEST_BUILD
+    register_all_tests();
+#endif
 
     std::vector<TestCase>::iterator it;
     for (it = gTestCases.begin(); it != gTestCases.end(); ++it)
