@@ -6,6 +6,24 @@ from glob import glob
 ExecutableName = 'circa_d'
 TestRoot = 'tests'
 
+class CircaProcess:
+    def __init__(self):
+        self.proc = subprocess.Popen("circa_d -run-stdin",
+            shell=True, stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, close_fds=True)
+
+        (self.stdin, self.stdout) = (self.proc.stdin, self.proc.stdout)
+
+    def run(self, cmd):
+        self.stdin.write(cmd + "\n")
+
+        while True:
+            line = self.stdout.readline()
+            if not line or line == ":done\n":
+                return
+            yield line[:-1]
+
+
 class OutputDifference(object):
     def __init__(self, fromCommand, fromFile, lineNumber):
         self.fromCommand = fromCommand
@@ -30,19 +48,7 @@ def read_text_file_as_lines(filename):
             return
         yield line[:-1]
 
-def run_command(cmd):
-    proc = subprocess.Popen(cmd, shell=True, stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE, close_fds=True)
-    (stdin, stdout) = (proc.stdin, proc.stdout)
-
-    while True:
-        line = stdout.readline()
-        if not line:
-            return
-
-        yield line[:-1]
-
-def diff_command_against_file(command, filename):
+def diff_command_against_file(process, command, filename):
     """
     Run the command 'command' as a separate process, and read from stdin. Also,
     open the file 'file'. Compare the results of 'command' against the contents
@@ -53,32 +59,31 @@ def diff_command_against_file(command, filename):
     """
 
     if not os.path.exists(filename):
-        expectedOutput = ""
+        expectedOutput = []
     else:
-        expectedOutput = read_text_file(filename)
-
-    proc = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE, close_fds=True)
-    (stdin, stdout) = (proc.stdin, proc.stdout)
+        expectedOutput = read_text_file_as_lines(filename)
 
     numLines = 0
-    for line in expectedOutput.split('\n'):
-        # Read a line from stdout and check it against expected
-        stdout_line = stdout.readline()
-        stdout_line = stdout_line[:-1] # remove trailing newline
+    expectedOutput = expectedOutput.__iter__()
+    actualOutput = list(process.run(command))
+    for actualLine in actualOutput:
+        expectedLine = ""
+        try:
+            expectedLine = expectedOutput.next()
+        except StopIteration:
+            pass
 
-        if line != stdout_line:
-            return OutputDifference(stdout_line, line, numLines+1)
-
+        if expectedLine != actualLine:
+            return OutputDifference(actualLine, expectedLine, numLines+1)
         numLines += 1
 
     return None
 
-def test_file(filename):
+def test_file(process, filename):
     failures = []
 
     # Diff test
-    diff = diff_command_against_file(ExecutableName +" "+filename, filename + ".output")
+    diff = diff_command_against_file(process, "file "+filename, filename + ".output")
     if diff:
         desc = ['Script output differed on line '+str(diff.lineNumber)]
         desc.append('  Expected: "'+diff.fromFile+'"')
@@ -86,7 +91,7 @@ def test_file(filename):
         failures.append(TestFailure(desc, filename))
 
     # Source repro test
-    diff = diff_command_against_file(ExecutableName +" -n -s "+filename, filename)
+    diff = diff_command_against_file(process, "file -n -s "+filename, filename)
     if diff:
         desc = ['Source repro failed on line '+str(diff.lineNumber)]
         desc.append(' Expected: '+diff.fromFile)
@@ -102,22 +107,28 @@ def get_list_of_enabled_tests():
             yield line
 
 def run_all_tests():
+
     if 'CIRCA_HOME' in os.environ:
         os.chdir(os.environ['CIRCA_HOME'])
 
-    totalFailureCount = 0
+    process = CircaProcess()
+
+    totalTestCount = 0
+    totalFailedTests = 0
 
     for file in [TestRoot+'/'+f for f in get_list_of_enabled_tests()]:
-        print "Testing "+file
-        failures = test_file(file)
-        totalFailureCount += len(failures)
+        totalTestCount += 1
+        failures = test_file(process, file)
         if failures:
+            totalFailedTests += 1
             print str(len(failures)) + " failure(s) in "+file+":"
         for failure in failures:
             for line in failure.description:
                 print " "+line
 
-    if totalFailureCount > 0:
+    print "Ran",totalTestCount,"tests,",totalFailedTests,"failed."
+    
+    if totalFailedTests > 0:
         exit(-1)
 
 def find_test_with_name(name):

@@ -216,6 +216,15 @@ bool print_static_errors_formatted(List* result, std::ostream& out)
     return true;
 }
 
+bool print_static_errors_formatted(Branch* branch, TValue* out)
+{
+    std::stringstream strm;
+    if (!print_static_errors_formatted(branch, strm))
+        return false;
+    set_string(out, strm.str());
+    return true;
+}
+
 bool print_static_errors_formatted(Branch* branch, std::ostream& out)
 {
     update_static_error_list(branch);

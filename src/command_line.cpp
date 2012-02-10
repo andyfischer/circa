@@ -315,8 +315,6 @@ int run_command_line(List* args)
     if (dontRunScript)
         return 0;
 
-    Term error_listener;
-
     EvalContext context;
 
     // Push any extra command-line arguments to context.argumentList
