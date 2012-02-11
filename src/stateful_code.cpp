@@ -11,7 +11,7 @@
 #include "source_repro.h"
 #include "subroutine.h"
 #include "stateful_code.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -90,7 +90,7 @@ void get_state_description(Term* term, TValue* output)
     if (term->function == FOR_FUNC) {
         List& list = *List::cast(output, 2);
         describe_state_shape(nested_contents(term), list[0]);
-        set_symbol(list[1], Repeat);
+        set_name(list[1], name_Repeat);
     } else if (term->function == IF_BLOCK_FUNC) {
         int numBranches = if_block_count_cases(term);
 
@@ -101,7 +101,7 @@ void get_state_description(Term* term, TValue* output)
             describe_state_shape(branch, list[bindex]);
         }
     } else if (is_declared_state(term)) {
-        set_string(output, symbol_get_text(declared_type(term)->name));
+        set_string(output, name_to_string(declared_type(term)->name));
     } else if (is_function_stateful(term->function)) {
         describe_state_shape(nested_contents(term->function), output);
     }
@@ -146,7 +146,7 @@ void strip_orphaned_state(TValue* description, TValue* state,
 
     // Handle a type name
     if (is_string(description)) {
-        if ((as_string(description) != symbol_get_text(state->value_type->name))
+        if ((as_string(description) != name_to_string(state->value_type->name))
                 && (as_string(description) != "any")) {
             swap(state, trash);
             set_null(state);
@@ -231,7 +231,7 @@ void strip_orphaned_state(TValue* description, TValue* state,
             }
 
             // check for :repeat symbol
-            if (is_symbol(descriptionList[descriptionIndex]))
+            if (is_name(descriptionList[descriptionIndex]))
                 descriptionIndex--;
 
             TValue* descriptionTValue = descriptionList[descriptionIndex];

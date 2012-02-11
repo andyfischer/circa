@@ -55,7 +55,7 @@ extern Term* SWITCH_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* STATIC_ERROR_FUNC;
 extern Term* SUB_FUNC;
-extern Term* SYMBOL_TYPE;
+extern Term* NAME_TYPE;
 extern Term* TYPE_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
@@ -125,7 +125,7 @@ extern Type NULL_T;
 extern Type OPAQUE_POINTER_T;
 extern Type REF_T;
 extern Type STRING_T;
-extern Type SYMBOL_T;
+extern Type NAME_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 

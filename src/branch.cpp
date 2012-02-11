@@ -19,7 +19,7 @@
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "symbols.h"
+#include "names.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "type.h"
@@ -60,7 +60,7 @@ void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor 
 
 void branch_setup_type(Type* type)
 {
-    type->name = string_to_symbol("Branch");
+    type->name = name_from_string("Branch");
     type->gcListReferences = branch_list_references;
 }
 
@@ -273,7 +273,7 @@ Branch::clear()
     clear_branch(this);
 }
 
-Term* Branch::findFirstBinding(Symbol name)
+Term* Branch::findFirstBinding(Name name)
 {
     for (int i = 0; i < _terms.length(); i++) {
         if (_terms[i] == NULL)
@@ -295,7 +295,7 @@ void Branch::bindName(Term* term, std::string name)
 #ifndef TERM_HAS_SYMBOL
     term->name = name;
 #endif
-    term->nameSymbol = string_to_symbol(name.c_str());
+    term->nameSymbol = name_from_string(name.c_str());
     update_unique_name(term);
 }
 
@@ -547,11 +547,11 @@ void duplicate_branch(Branch* source, Branch* dest)
     dest->names.remapPointers(newTermMap);
 }
 
-Symbol load_script(Branch* branch, const char* filename)
+Name load_script(Branch* branch, const char* filename)
 {
     // Store the file origin
     List* fileOrigin = set_list(&branch->origin, 3);
-    set_symbol(fileOrigin->get(0), File);
+    set_name(fileOrigin->get(0), name_File);
     set_string(fileOrigin->get(1), filename);
     set_int(fileOrigin->get(2), get_modified_time(filename));
 
@@ -563,7 +563,7 @@ Symbol load_script(Branch* branch, const char* filename)
     if (!is_null(&fileReadError)) {
         Term* msg = create_value(branch, &fileReadError, "fileReadError");
         apply(branch, STATIC_ERROR_FUNC, TermList(msg));
-        return Failure;
+        return name_Failure;
     }
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
@@ -571,7 +571,7 @@ Symbol load_script(Branch* branch, const char* filename)
     // Post-load steps
     dll_loading_check_for_patches_on_loaded_branch(branch);
 
-    return Success;
+    return name_Success;
 }
 
 void evaluate_script(Branch* branch, const char* filename)
@@ -642,7 +642,7 @@ List* branch_get_file_origin(Branch* branch)
     if (list->length() != 3)
         return NULL;
 
-    if (as_symbol(list->get(0)) != File)
+    if (as_name(list->get(0)) != name_File)
         return NULL;
 
     return list;
@@ -656,7 +656,7 @@ bool check_and_update_file_origin(Branch* branch, const char* filename)
 
     if (fileOrigin == NULL) {
         fileOrigin = set_list(&branch->origin, 3);
-        set_symbol(fileOrigin->get(0), File);
+        set_name(fileOrigin->get(0), name_File);
         set_string(fileOrigin->get(1), filename);
         set_int(fileOrigin->get(2), modifiedTime);
         return true;

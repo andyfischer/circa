@@ -7,7 +7,7 @@
 #include "evaluation.h"
 #include "introspection.h"
 #include "list_shared.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
@@ -122,7 +122,7 @@ Term* statically_infer_length_func(Branch* branch, Term* term)
     // Give up
     std::cout << "statically_infer_length_func didn't understand: "
         << input->function->name << std::endl;
-    return create_symbol_value(branch, Unknown);
+    return create_symbol_value(branch, name_Unknown);
 }
 
 Term* statically_infer_result(Branch* branch, Term* term)
@@ -139,7 +139,7 @@ Term* statically_infer_result(Branch* branch, Term* term)
     // Function not recognized
     std::cout << "statically_infer_result didn't recognize: "
         << term->function->name << std::endl;
-    return create_symbol_value(branch, Unknown);
+    return create_symbol_value(branch, name_Unknown);
 }
 
 void statically_infer_result(Term* term, TValue* result)
@@ -161,8 +161,8 @@ Type* create_typed_unsized_list_type(Type* elementType)
     Type* type = create_type();
     list_t::setup_type(type);
     set_type(&type->parameter, elementType);
-    std::string name = std::string("List<") + symbol_get_text(elementType->name) + ">";
-    type->name = string_to_symbol(name.c_str());
+    std::string name = std::string("List<") + name_to_string(elementType->name) + ">";
+    type->name = name_from_string(name.c_str());
     return type;
 }
 

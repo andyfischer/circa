@@ -30,7 +30,7 @@
 
 namespace circa {
 
-typedef int Symbol;
+typedef int Name;
 
 struct Branch;
 struct BrokenLinkList;

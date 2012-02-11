@@ -2,17 +2,17 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 namespace circa {
 
-Term* find_name(Branch* branch, Symbol name);
+typedef int Name;
+
+Term* find_name(Branch* branch, Name name);
 Term* find_name(Branch* branch, const char* name);
 Term* find_name_at(Term* location, const char* name);
 
-Term* find_local_name(Branch* branch, int index, Symbol name);
+Term* find_local_name(Branch* branch, int index, Name name);
 Term* find_local_name(Branch* branch, int location, const char* name);
-Term* find_local_name(Branch* branch, Symbol symbol);
+Term* find_local_name(Branch* branch, Name name);
 Term* find_local_name(Branch* branch, const char* name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
@@ -21,7 +21,7 @@ Term* find_local_name(Branch* branch, const char* name);
 int find_qualified_name_separator(const char* name);
 
 // Get a named term from the global namespace.
-Term* get_global(Symbol name);
+Term* get_global(Name name);
 Term* get_global(const char* name);
 
 Branch* get_parent_branch(Branch* branch);
@@ -50,5 +50,43 @@ bool find_global_name(Term* term, std::string& name);
 std::string find_global_name(Term* term);
 
 Term* find_term_from_global_name(const char* name);
+
+const char* name_to_string(Name name);
+void name_to_string(Name name, String* string);
+Name name_get_namespace_first(Name name);
+Name name_get_namespace_rr(Name name);
+
+Name as_name(TValue* tv);
+void set_name(TValue* tv, Name name);
+
+Name name_from_string(const char* str);
+
+const Name name_None = 0;
+const Name name_File = 2;
+const Name name_Newline = 3;
+const Name name_Out = 4;
+const Name name_Unknown = 5;
+const Name name_Repeat = 6;
+const Name name_Success = 7;
+const Name name_Failure = 8;
+
+// Misc errors
+const Name name_FileNotFound = 9;
+
+// Static errors
+const Name name_NotEnoughInputs = 10;
+const Name name_TooManyInputs = 11;
+const Name name_ExtraOutputNotFound = 12;
+
+// Evaluation strategies
+const Name name_Default = 15;
+const Name name_ByDemand = 16;
+
+// Temporary register values
+const Name name_Unevaluated = 17;
+const Name name_InProgress = 18;
+const Name name_Lazy = 19;
+
+const Name c_FirstRuntimeName = 1000;
 
 } // namespace circa

@@ -43,7 +43,7 @@ struct Term : TValue
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
-    Symbol nameSymbol;
+    Name nameSymbol;
 
     // Our name binding.
 #ifndef TERM_HAS_SYMBOL

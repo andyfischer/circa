@@ -8,7 +8,7 @@
 #include "debug.h"
 #include "heap_debugging.h"
 #include "introspection.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -22,7 +22,7 @@ Term::Term()
   : weakPtr(0),
     type(NULL),
     function(NULL),
-    nameSymbol(EmptyName),
+    nameSymbol(name_None),
     owningBranch(NULL),
     index(0),
     nestedContents(NULL),
@@ -273,9 +273,9 @@ void term_check_invariants(List* errors, Term* term)
         if (!typeOk) {
             std::string msg;
             msg += std::string("TValue has wrong type: term->type is ")
-                + symbol_get_text(term->type->name)
+                + name_to_string(term->type->name)
                 + ", tag is "
-                + symbol_get_text(term->value_type->name);
+                + name_to_string(term->value_type->name);
             append_term_invariant_error(errors, term, msg);
         }
     }

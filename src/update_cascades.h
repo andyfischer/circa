@@ -6,8 +6,6 @@
 // in other parts of the code. For example, changing an input argument to a
 // function call might change its output type.
 
-#include "common_headers.h"
-
 namespace circa {
 
 // Called when the inputs of 'term' changed. Some functions do some post-processing

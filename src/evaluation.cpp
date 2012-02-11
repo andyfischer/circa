@@ -16,7 +16,7 @@
 #include "parser.h"
 #include "stateful_code.h"
 #include "subroutine.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -57,7 +57,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
         out << " [Frame " << frameIndex << ", branch = " << branch
              << ", pc = " << frame->pc
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
-             << ", :" << symbol_get_text(frame->strategy)
+             << ", :" << name_to_string(frame->strategy)
 #endif
              << "]" << std::endl;
 
@@ -93,7 +93,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 
 void eval_context_setup_type(Type* type)
 {
-    type->name = string_to_symbol("EvalContext");
+    type->name = name_from_string("EvalContext");
     type->gcListReferences = eval_context_list_references;
 }
 
@@ -164,7 +164,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, T
             std::stringstream msg;
             msg << "Couldn't cast input " << input->toString()
                 << " (at index " << i << ")"
-                << " to type " << symbol_get_text(placeholder->type->name);
+                << " to type " << name_to_string(placeholder->type->name);
             raise_error(context, msg.str().c_str());
             return;
         }
@@ -634,7 +634,7 @@ do_instruction:
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
     // Skip a lazy-call in Default strategy.
     if (frame->strategy == Default && is_lazy_call(term)) {
-        set_symbol(get_register(context, term), Unevaluated);
+        set_name(get_register(context, term), Unevaluated);
         frame->pc = frame->nextPc;
         goto do_instruction;
     }
@@ -657,7 +657,7 @@ do_instruction:
     for (int i=0; i < term->numInputs(); i++) {
         TValue* input = get_input(context, term->input(i));
 
-        if (input != NULL && equals_symbol(input, Unevaluated)) {
+        if (input != NULL && equals_name(input, Unevaluated)) {
             // Create a ByDemand frame to evaluate this term.
             push_frame_to_demand_evaluation(context, term->input(i));
             goto do_instruction;

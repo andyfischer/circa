@@ -24,7 +24,7 @@ namespace declared_state_function {
         Branch* contents = nested_contents(CALLER);
 
         if (contents->length() > 0) {
-            set_symbol(OUTPUT, InProgress);
+            set_name(OUTPUT, name_InProgress);
             push_frame(CONTEXT, nested_contents(CALLER));
             return;
         }

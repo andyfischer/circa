@@ -9,7 +9,7 @@
 #include "function.h"
 #include "importing_macros.h"
 #include "parser.h"
-#include "symbols.h"
+#include "names.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -38,7 +38,7 @@ Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 
 Term* import_type(Branch* branch, Type* type)
 {
-    Term* term = create_value(branch, &TYPE_T, symbol_get_text(type->name));
+    Term* term = create_value(branch, &TYPE_T, name_to_string(type->name));
     set_type(term, type);
     return term;
 }

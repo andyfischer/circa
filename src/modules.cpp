@@ -8,9 +8,9 @@
 #include "list_shared.h"
 #include "kernel.h"
 #include "modules.h"
+#include "names.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "types/list.h"
@@ -29,10 +29,10 @@ void modules_add_search_path(const char* str)
     set_string(g_moduleSearchPaths.append(), str);
 }
 
-Term* find_loaded_module(Symbol name)
+Term* find_loaded_module(Name name)
 {
     String nameStr;
-    symbol_get_text(name, &nameStr);
+    name_to_string(name, &nameStr);
 
     for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
         Term* term = it.current();
@@ -42,10 +42,10 @@ Term* find_loaded_module(Symbol name)
     return NULL;
 }
 
-Term* load_module_from_file(Symbol module_name, const char* filename)
+Term* load_module_from_file(Name module_name, const char* filename)
 {
     String name;
-    symbol_get_text(module_name, &name);
+    name_to_string(module_name, &name);
 
     Term* import = apply(kernel(), FUNCS.imported_file, TermList(),
         as_cstring(&name));
@@ -54,10 +54,10 @@ Term* load_module_from_file(Symbol module_name, const char* filename)
     return import;
 }
 
-static bool find_module_file(Symbol module_name, String* filenameOut)
+static bool find_module_file(Name module_name, String* filenameOut)
 {
     String module;
-    symbol_get_text(module_name, &module);
+    name_to_string(module_name, &module);
 
     int count = list_length(&g_moduleSearchPaths);
     for (int i=0; i < count; i++) {
@@ -90,17 +90,17 @@ static bool find_module_file(Symbol module_name, String* filenameOut)
     return false;
 }
 
-Symbol load_module(Symbol module_name, Term* loadCall)
+Name load_module(Name module_name, Term* loadCall)
 {
     Term* existing = find_loaded_module(module_name);
     if (existing != NULL)
-        return Success;
+        return name_Success;
     
     String filename;
     bool found = find_module_file(module_name, &filename);
 
     if (!found)
-        return FileNotFound;
+        return name_FileNotFound;
 
     Term* import = load_module_from_file(module_name, as_cstring(&filename));
 
@@ -115,7 +115,7 @@ Symbol load_module(Symbol module_name, Term* loadCall)
     // If the module has static errors, print them now.
     print_static_errors_formatted(nested_contents(import));
 
-    return Success;
+    return name_Success;
 }
 
 } // namespace circa

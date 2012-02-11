@@ -12,7 +12,7 @@
 #include "locals.h"
 #include "source_repro.h"
 #include "stateful_code.h"
-#include "symbols.h"
+#include "names.h"
 #include "update_cascades.h"
 #include "token.h"
 #include "term.h"
@@ -66,7 +66,7 @@ CA_FUNCTION(evaluate_subroutine)
             std::stringstream msg;
             msg << "Couldn't cast input " << INPUT(i)->toString()
                 << " (at index " << i << ")"
-                << " to type " << symbol_get_text(placeholder->type->name),
+                << " to type " << name_to_string(placeholder->type->name),
             RAISE_ERROR(msg.str().c_str());
             return;
         }

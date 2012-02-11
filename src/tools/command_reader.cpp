@@ -8,7 +8,7 @@
 #include "../source_repro.h"
 #include "../static_checking.h"
 #include "../string_type.h"
-#include "../symbols.h"
+#include "../names.h"
 #include "../tagged_value.h"
 #include "../token.h"
 #include "../types/list.h"

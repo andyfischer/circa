@@ -7,7 +7,7 @@
 #include "function.h"
 #include "introspection.h"
 #include "source_repro.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -16,7 +16,7 @@ namespace cpp_codegen {
 
 void write_type_name(CppWriter& writer, Type* type)
 {
-    std::string typeName = symbol_get_text(type->name);
+    std::string typeName = name_to_string(type->name);
 
     if (typeName == "number")
         writer.write("float");

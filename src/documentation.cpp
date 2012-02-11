@@ -6,7 +6,7 @@
 #include "generic.h"
 #include "function.h"
 #include "source_repro.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -68,7 +68,7 @@ void generate_docs_for_function(Term* func, std::stringstream &out)
 
     out << "{\"name\":\"" << func->name << "\"";
     out << ", \"function\":true";
-    out << ", \"return_type\": \"" << symbol_get_text(function_get_output_type(func, 0)->name) << "\"";
+    out << ", \"return_type\": \"" << name_to_string(function_get_output_type(func, 0)->name) << "\"";
     out << ", \"declaration\": \"" << header << "\"";
     //escape_string_for_json(get_term_source(func), out);
 

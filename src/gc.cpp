@@ -1,7 +1,7 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "gc.h"
-#include "symbols.h"
+#include "names.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -114,7 +114,7 @@ int gc_count_live_objects()
 void gc_dump_live_objects()
 {
     for (CircaObject* current = g_first; current != NULL; current = current->next) {
-        std::cout << symbol_get_text(current->type->name)
+        std::cout << name_to_string(current->type->name)
             << "@" << current << std::endl;
     }
 }

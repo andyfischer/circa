@@ -33,7 +33,7 @@ int get_hash_value(TValue* value)
     Type::HashFunc f = value->value_type->hashFunc;
     if (f == NULL) {
         std::string msg;
-        msg += std::string("No hash function for type ") + symbol_get_text(value->value_type->name);
+        msg += std::string("No hash function for type ") + name_to_string(value->value_type->name);
         internal_error(msg);
     }
     return f(value);
@@ -404,7 +404,7 @@ void setup_type(Type* type)
     type->copy = tagged_value_wrappers::copy;
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
-    type->name = string_to_symbol("Map");
+    type->name = name_from_string("Map");
 }
 
 } // namespace hashtable_t

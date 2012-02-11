@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 #include <typeinfo>
 
 #include "branch.h"
@@ -78,7 +76,7 @@ struct Type
     CircaObject header;
 
     std::string nameStr;
-    Symbol name;
+    Name name;
 
     StorageType storageType;
 

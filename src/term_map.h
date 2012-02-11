@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 namespace circa {
 
 struct TermMap

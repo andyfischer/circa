@@ -7,13 +7,13 @@ namespace symbol_t {
 
     std::string to_string(TValue* value)
     {
-        return std::string(":") + symbol_get_text(as_int(value));
+        return std::string(":") + name_to_string(as_int(value));
     }
 
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = string_to_symbol("symbol");
+        type->name = name_from_string("symbol");
         type->storageType = STORAGE_TYPE_INT;
         type->toString = to_string;
     }

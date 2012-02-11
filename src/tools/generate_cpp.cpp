@@ -7,7 +7,7 @@
 #include "../introspection.h"
 #include "../list_shared.h"
 #include "../names.h"
-#include "../symbols.h"
+#include "../names.h"
 #include "../type.h"
 
 #include "generate_cpp.h"
@@ -48,7 +48,7 @@ struct SourceWriter
     {
         possiblyStartNewLine();
 
-        if (as_symbol(item) == Newline) {
+        if (as_name(item) == name_Newline) {
             set_string(output.append(), "\n");
             startNewLine = true;
             return;
@@ -66,7 +66,7 @@ struct SourceWriter
     void newline()
     {
         TValue val;
-        symbol_value(&val, Newline);
+        set_name(&val, name_Newline);
         write(&val);
     }
 
@@ -108,7 +108,7 @@ void write_term_value(SourceWriter* writer, Term* term)
 
 void write_type_name(SourceWriter* writer, Type* type)
 {
-    writer->write(symbol_get_text(type->name));
+    writer->write(name_to_string(type->name));
 }
 
 void write_function(SourceWriter* writer, Term* term)

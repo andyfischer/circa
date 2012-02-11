@@ -17,7 +17,7 @@
 #include "static_checking.h"
 #include "subroutine.h"
 #include "switch_block.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "token.h"
 #include "type.h"
@@ -712,7 +712,7 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         return ParseResult(result);
 
     branch->bindName(result, name);
-    as_type(result)->name = string_to_symbol(name.c_str());
+    as_type(result)->name = name_from_string(name.c_str());
 
     return ParseResult(result);
 }
@@ -1137,10 +1137,10 @@ ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
         return compile_error_for_line(branch, tokens, startPosition,
                 "Expected string after 'import'");
 
-    Symbol module = tokens.consumeSymbol(TK_IDENTIFIER);
+    Name module = tokens.consumeName(TK_IDENTIFIER);
 
     Term* result = apply(branch, FUNCS.import, TermList());
-    result->setStringProp("module", symbol_get_text(module));
+    result->setStringProp("module", name_to_string(module));
 
     load_module(module, result);
 

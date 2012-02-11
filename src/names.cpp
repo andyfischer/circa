@@ -7,7 +7,6 @@
 #include "heap_debugging.h"
 #include "if_block.h"
 #include "source_repro.h"
-#include "symbols.h"
 #include "term.h"
 
 #include "names.h"
@@ -16,7 +15,7 @@ namespace circa {
 
 bool exposes_nested_names(Term* term);
 
-Term* find_name(Branch* branch, int location, Symbol name)
+Term* find_name(Branch* branch, int location, Name name)
 {
     if (branch == NULL)
         branch = KERNEL;
@@ -41,10 +40,10 @@ Term* find_name(Branch* branch, int location, Symbol name)
 
 Term* find_name(Branch* branch, int location, const char* name)
 {
-    return find_name(branch, location, string_to_symbol(name));
+    return find_name(branch, location, name_from_string(name));
 }
 
-Term* find_name(Branch* branch, Symbol name)
+Term* find_name(Branch* branch, Name name)
 {
     return find_name(branch, branch->length(), name);
 }
@@ -59,7 +58,7 @@ Term* find_name_at(Term* location, const char* name)
     return find_name(location->owningBranch, location->index, name);
 }
 
-Term* find_local_name(Branch* branch, int index, Symbol name)
+Term* find_local_name(Branch* branch, int index, Name name)
 {
     if (branch == NULL)
         return NULL;
@@ -81,9 +80,9 @@ Term* find_local_name(Branch* branch, int index, Symbol name)
     }
 
     // Check if 'name' is a qualified name.
-    Symbol namespacePrefix = symbol_get_namespace_first(name);
+    Name namespacePrefix = name_get_namespace_first(name);
 
-    if (namespacePrefix == InvalidSymbol)
+    if (namespacePrefix == name_None)
         return NULL;
 
     Term* nsPrefixTerm = find_local_name(branch, index, namespacePrefix);
@@ -93,18 +92,18 @@ Term* find_local_name(Branch* branch, int index, Symbol name)
         return NULL;
 
     // Recursively search inside the prefix for the qualified suffix.
-    return find_local_name(nested_contents(nsPrefixTerm), symbol_get_namespace_rr(name));
+    return find_local_name(nested_contents(nsPrefixTerm), name_get_namespace_rr(name));
 }
 
-Term* find_local_name(Branch* branch, int index, const char* name)
+Term* find_local_name(Branch* branch, int index, const char* nameStr)
 {
-    Symbol symbol = string_to_symbol(name);
-    return find_local_name(branch, index, symbol);
+    Name name = name_from_string(nameStr);
+    return find_local_name(branch, index, name);
 }
 
-Term* find_local_name(Branch* branch, Symbol symbol)
+Term* find_local_name(Branch* branch, Name name)
 {
-    return find_local_name(branch, branch->length(), symbol);
+    return find_local_name(branch, branch->length(), name);
 }
 
 Term* find_local_name(Branch* branch, const char* name)
@@ -134,14 +133,14 @@ bool exposes_nested_names(Term* term)
     return false;
 }
 
-Term* get_global(Symbol name)
+Term* get_global(Name name)
 {
     return find_name(KERNEL, name);
 }
 
 Term* get_global(const char* name)
 {
-    return get_global(string_to_symbol(name));
+    return get_global(name_from_string(name));
 }
 
 Branch* get_parent_branch(Branch* branch)
@@ -403,6 +402,116 @@ Term* find_term_from_global_name(const char* name)
 {
     Branch* searchBranch = kernel();
     return find_term_from_global_name_recr(searchBranch, name);
+}
+
+const int c_maxRuntimeNames = 2000;
+
+struct RuntimeName
+{
+    std::string str;
+    Name namespaceFirst;
+    Name namespaceRightRemainder;
+};
+
+RuntimeName g_runtimeNames[c_maxRuntimeNames];
+int g_nextFreeNameIndex = 0;
+std::map<std::string,Name> g_stringToSymbol;
+
+const char* name_to_string(Name name)
+{
+    // Runtime symbols
+    if (name >= c_FirstRuntimeName)
+        return g_runtimeNames[name - c_FirstRuntimeName].str.c_str();
+
+    // Builtin symbols
+    switch (name) {
+        case name_None: return "";
+        case name_File: return "File";
+        case name_Newline: return "Newline";
+        case name_Out: return "Out";
+        case name_Unknown: return "Unknown";
+        case name_Repeat: return "Repeat";
+        case name_Success: return "Success";
+        case name_Failure: return "Failure";
+        case name_FileNotFound: return "FileNotFound";
+        case name_NotEnoughInputs: return "NotEnoughInputs";
+        case name_TooManyInputs: return "TooManyInputs";
+        case name_ExtraOutputNotFound: return "ExtraOutputNotFound";
+        case name_Default: return "Default";
+        case name_ByDemand: return "ByDemand";
+        case name_Unevaluated: return "Unevaluated";
+        case name_InProgress: return "InProgress";
+        case name_Lazy: return "Lazy";
+    }
+
+    internal_error("Unknown name in name_to_string");
+    return "";
+}
+
+void name_to_string(Name name, String* string)
+{
+    set_string((TValue*) string, name_to_string(name));
+}
+
+Name name_get_namespace_first(Name name)
+{
+    if (name < c_FirstRuntimeName)
+        return 0;
+    else
+        return g_runtimeNames[name - c_FirstRuntimeName].namespaceFirst;
+}
+
+Name name_get_namespace_rr(Name name)
+{
+    if (name < c_FirstRuntimeName)
+        return 0;
+    else
+        return g_runtimeNames[name - c_FirstRuntimeName].namespaceRightRemainder;
+}
+
+Name as_name(TValue* tv)
+{
+    return tv->value_data.asint;
+}
+
+void set_name(TValue* tv, Name val)
+{
+    set_null(tv);
+    tv->value_type = &NAME_T;
+    tv->value_data.asint = val;
+}
+
+// Runtime symbols
+Name name_from_string(const char* str)
+{
+    // Check if name is already registered
+    std::map<std::string,Name>::const_iterator it;
+    it = g_stringToSymbol.find(str);
+    if (it != g_stringToSymbol.end())
+        return it->second;
+
+    // Not yet registered; add it to the list.
+    Name index = g_nextFreeNameIndex++;
+    g_runtimeNames[index].str = str;
+    g_runtimeNames[index].namespaceFirst = 0;
+    g_runtimeNames[index].namespaceRightRemainder = 0;
+    Name name = index + c_FirstRuntimeName;
+    g_stringToSymbol[str] = name;
+
+    // Search the string for a : name, if found we'll update the name's
+    // namespace links.
+    int len = strlen(str);
+    for (int i=0; i < len; i++) {
+        if (str[i] == ':') {
+            char* tempstr = strndup(str, i);
+            g_runtimeNames[index].namespaceFirst = name_from_string(tempstr);
+            g_runtimeNames[index].namespaceRightRemainder = name_from_string(str + i + 1);
+            free(tempstr);
+            break;
+        }
+    }
+
+    return name;
 }
 
 } // namespace circa

@@ -4,7 +4,7 @@
 
 #include "kernel.h"
 #include "debug.h"
-#include "symbols.h"
+#include "names.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -306,7 +306,7 @@ std::string to_string(TValue* value)
         return toString(value);
 
     std::stringstream out;
-    out << "<" << symbol_get_text(value->value_type->name)
+    out << "<" << name_to_string(value->value_type->name)
         << " " << value->value_data.ptr << ">";
     return out.str();
 }
@@ -318,7 +318,7 @@ std::string to_string_annotated(TValue* value)
 
     std::stringstream out;
 
-    out << symbol_get_text(value->value_type->name) << "#";
+    out << name_to_string(value->value_type->name) << "#";
 
     if (is_list(value)) {
         out << "[";
@@ -351,7 +351,7 @@ void set_index(TValue* value, int index, TValue* element)
 
     if (setIndex == NULL) {
         std::string msg = std::string("No setIndex function available on type ")
-            + symbol_get_text(value->value_type->name);
+            + name_to_string(value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -364,7 +364,7 @@ TValue* get_field(TValue* value, const char* field)
 
     if (getField == NULL) {
         std::string msg = std::string("No getField function available on type ")
-            + symbol_get_text(value->value_type->name);
+            + name_to_string(value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -377,7 +377,7 @@ void set_field(TValue* value, const char* field, TValue* element)
 
     if (setField == NULL) {
         std::string msg = std::string("No setField function available on type ")
-            + symbol_get_text(value->value_type->name);
+            + name_to_string(value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -426,11 +426,11 @@ bool equals_int(TValue* value, int i)
     return as_int(value) == i;
 }
 
-bool equals_symbol(TValue* value, Symbol symbol)
+bool equals_name(TValue* value, Name name)
 {
-    if (!is_symbol(value))
+    if (!is_name(value))
         return false;
-    return as_symbol(value) == symbol;
+    return as_name(value) == name;
 }
 
 void set_bool(TValue* value, bool b)
@@ -578,7 +578,7 @@ const char* get_name_for_type(Type* type)
 {
     if (type == NULL)
         return "<NULL>";
-    else return symbol_get_text(type->name);
+    else return name_to_string(type->name);
 }
 
 void* get_pointer(TValue* value, Type* expectedType)
@@ -605,7 +605,7 @@ bool is_null(TValue* value) { return value->value_type == &NULL_T; }
 bool is_opaque_pointer(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER; }
 bool is_ref(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_REF; }
 bool is_string(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
-bool is_symbol(TValue* value) { return value->value_type == &SYMBOL_T; }
+bool is_name(TValue* value) { return value->value_type == &NAME_T; }
 bool is_type(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
 
 bool is_number(TValue* value)

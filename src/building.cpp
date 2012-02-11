@@ -13,7 +13,7 @@
 #include "locals.h"
 #include "names.h"
 #include "parser.h"
-#include "symbols.h"
+#include "names.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "term.h"
@@ -401,7 +401,7 @@ Term* create_type(Branch* branch, std::string name)
     Term* term = create_value(branch, &TYPE_T);
 
     if (name != "") {
-        as_type(term)->name = string_to_symbol(name.c_str());
+        as_type(term)->name = name_from_string(name.c_str());
         branch->bindName(term, name);
     }
 
@@ -417,8 +417,8 @@ Term* create_type_value(Branch* branch, Type* value, std::string const& name)
 
 Term* create_symbol_value(Branch* branch, int value, std::string const& name)
 {
-    Term* term = create_value(branch, &SYMBOL_T, name);
-    set_symbol(term, value);
+    Term* term = create_value(branch, &NAME_T, name);
+    set_name(term, value);
     return term;
 }
 

@@ -2,7 +2,7 @@
 
 #include "branch.h"
 #include "kernel.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -10,7 +10,7 @@ namespace circa {
 
 std::string get_cpp_type_name(Type* type)
 {
-    return symbol_get_text(type->name);
+    return name_to_string(type->name);
 }
 
 std::string get_cpp_type_accessor(Type* type)

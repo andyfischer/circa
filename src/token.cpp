@@ -3,7 +3,7 @@
 #include "common_headers.h"
 
 #include "string_type.h"
-#include "symbols.h"
+#include "names.h"
 #include "tagged_value.h"
 #include "token.h"
 
@@ -790,10 +790,10 @@ TokenStream::consumeStr(TValue* output, int match)
     consume(match);
 }
 
-Symbol
-TokenStream::consumeSymbol(int match)
+Name
+TokenStream::consumeName(int match)
 {
-    Symbol value = string_to_symbol(nextStr().c_str());
+    Name value = name_from_string(nextStr().c_str());
     consume(match);
     return value;
 }

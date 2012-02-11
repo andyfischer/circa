@@ -8,7 +8,7 @@
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "subroutine.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "term_list.h"
 #include "token.h"
@@ -60,7 +60,7 @@ namespace function_t {
 
     void setup_type(Type* type)
     {
-        type->name = string_to_symbol("Function");
+        type->name = name_from_string("Function");
         type->initialize = initialize;
         type->copy = copy;
         type->formatSource = subroutine_f::format_source;
@@ -502,7 +502,7 @@ void function_format_header_source(StyledSource* source, Function* func)
 
         if (showType)
             append_phrase(source,
-                symbol_get_text(function_get_input_type(term, i)->name),
+                name_to_string(function_get_input_type(term, i)->name),
                 term, phrase_type::TYPE_NAME);
 
         if (name != "" && name[0] != '#') {
@@ -535,7 +535,7 @@ void function_format_header_source(StyledSource* source, Function* func)
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
                 term, TK_WHITESPACE);
         append_phrase(source,
-            symbol_get_text(function_get_output_type(term, 0)->name),
+            name_to_string(function_get_output_type(term, 0)->name),
                 term, phrase_type::TYPE_NAME);
     }
 }

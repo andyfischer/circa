@@ -14,7 +14,7 @@
 #include "kernel.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 
 namespace circa {
@@ -182,7 +182,7 @@ void find_dll_for_script(Branch* branch, TValue* resultOut)
     branch_get_source_filename(branch, &filename);
 
     if (!is_string(&filename)) {
-        set_symbol(resultOut, Failure);
+        set_name(resultOut, name_Failure);
         return;
     }
 

@@ -18,7 +18,7 @@
 #include "subroutine.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "symbols.h"
+#include "names.h"
 #include "term.h"
 #include "type.h"
 
@@ -119,7 +119,7 @@ Term* COLOR_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
 Term* MAP_TYPE = NULL;
-Term* SYMBOL_TYPE = NULL;
+Term* NAME_TYPE = NULL;
 Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* OPAQUE_POINTER_TYPE = NULL;
@@ -144,7 +144,7 @@ Type NULL_T;
 Type OPAQUE_POINTER_T;
 Type REF_T;
 Type STRING_T;
-Type SYMBOL_T;
+Type NAME_T;
 Type TYPE_T;
 Type VOID_T;
 
@@ -253,7 +253,7 @@ void create_primitive_types()
     int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);
     string_setup_type(&STRING_T);
-    symbol_t::setup_type(&SYMBOL_T);
+    symbol_t::setup_type(&NAME_T);
     ref_t::setup_type(&REF_T);
     void_t::setup_type(&VOID_T);
     opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
@@ -328,9 +328,9 @@ void bootstrap_kernel()
     BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
     FLOAT_TYPE = create_type_value(kernel, &FLOAT_T, "number");
     INT_TYPE = create_type_value(kernel, &INT_T, "int");
+    NAME_TYPE = create_type_value(kernel, &NAME_T, "Name");
     NULL_T_TERM = create_type_value(kernel, &NULL_T, "Null");
     STRING_TYPE = create_type_value(kernel, &STRING_T, "string");
-    SYMBOL_TYPE = create_type_value(kernel, &SYMBOL_T, "Symbol");
     DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
     REF_TYPE = create_type_value(kernel, &REF_T, "Ref");
     VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
@@ -568,14 +568,14 @@ export_func void circa_add_module_search_path(const char* path)
     modules_add_search_path(path);
 }
 
-export_func Term* circa_load_module_from_file(Symbol module_name, const char* filename)
+export_func Term* circa_load_module_from_file(Name module_name, const char* filename)
 {
     return load_module_from_file(module_name, filename);
 }
 
-export_func Symbol circa_string_to_symbol(const char* str)
+export_func Name circa_name_from_string(const char* str)
 {
-    return string_to_symbol(str);
+    return name_from_string(str);
 }
 
 } // namespace circa

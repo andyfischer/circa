@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include "common_headers.h"
-
 namespace circa {
 
 // Returns a common type, which is guaranteed to hold all the types in this

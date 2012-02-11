@@ -75,7 +75,7 @@ struct Branch
     Term* last();
 
     // Find the first term with the given name binding.
-    Term* findFirstBinding(Symbol name);
+    Term* findFirstBinding(Name name);
 
     void insert(int index, Term* term);
     void append(Term* term);
@@ -136,7 +136,7 @@ void clear_branch(Branch* branch);
 
 void duplicate_branch(Branch* source, Branch* dest);
 
-Symbol load_script(Branch* branch, const char* filename);
+Name load_script(Branch* branch, const char* filename);
 void evaluate_script(Branch* branch, const char* filename);
 
 // Create an include() call that loads the given file. Returns the included

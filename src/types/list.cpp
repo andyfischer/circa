@@ -306,7 +306,7 @@ namespace list_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = string_to_symbol("List");
+        type->name = name_from_string("List");
         type->storageType = STORAGE_TYPE_LIST;
         type->initialize = tv_initialize;
         type->release = tv_release;

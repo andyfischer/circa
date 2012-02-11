@@ -110,7 +110,7 @@ bool equals(TValue* lhs, TValue* rhs);
 // Equality checking against unboxed types.
 bool equals_string(TValue* value, const char* s);
 bool equals_int(TValue* value, int i);
-bool equals_symbol(TValue* value, Symbol symbol);
+bool equals_name(TValue* value, Name name);
 
 // Get an element by index. Dispatched on type, the default behavior is to return NULL.
 TValue* get_index(TValue* value, int index);
@@ -144,7 +144,7 @@ bool is_number(TValue* value);
 bool is_opaque_pointer(TValue* value);
 bool is_ref(TValue* value);
 bool is_string(TValue* value);
-bool is_symbol(TValue* value);
+bool is_name(TValue* value);
 bool is_type(TValue* value);
 
 // Unboxing using builtin types.
