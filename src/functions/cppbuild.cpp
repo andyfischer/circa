@@ -26,7 +26,7 @@ namespace cppbuild_function {
         std::cout << "building module: " << name << std::endl;
 
         // Build a command line to call g++
-        std::string args = "-I${CIRCA_HOME}/src -rdynamic";
+        std::string args = "-I${CIRCA_HOME}/include -rdynamic";
 
         // Compile flags
         TValue* cppflags = buildFile["cflags"];

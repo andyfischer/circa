@@ -2,10 +2,7 @@
 
 #include "Box2D/Box2D.h"
 
-#include "circa.h"
-#include "gc.h"
-#include "list_shared.h"
-#include "types/handle.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 using namespace circa;
 

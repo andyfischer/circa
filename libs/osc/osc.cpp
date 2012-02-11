@@ -4,8 +4,7 @@
 
 #include "lo/lo.h"
 
-#include "circa.h"
-#include "types/handle.h"
+#include "circa/internal/for_hosted_funcs.h"
 
 using namespace circa;
 

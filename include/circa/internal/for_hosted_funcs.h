@@ -27,6 +27,7 @@
 #include "../../../src/type_inference.h"
 #include "../../../src/update_cascades.h"
 
+#include "../../../src/types/handle.h"
 #include "../../../src/types/point.h"
 #include "../../../src/types/rect_i.h"
 #include "../../../src/types/ref.h"
