@@ -263,6 +263,7 @@ void create_primitive_types()
     string_setup_type(&ERROR_T);
 
     // input instructions
+#if 0 // DELETEME
     StackVariableIsn_t.name = "StackVariableIsn";
     StackVariableIsn_t.storageType = STORAGE_TYPE_INT;
     StackVariableIsn_t.toString = stackVariable_toString;
@@ -272,6 +273,7 @@ void create_primitive_types()
     NullInputIsn_t.storageType = STORAGE_TYPE_REF;
     ImplicitStateInputIsn_t.name = "ImplicitStateInputIsn";
     ImplicitStateInputIsn_t.storageType = STORAGE_TYPE_INT;
+#endif
 }
 
 void bootstrap_kernel()

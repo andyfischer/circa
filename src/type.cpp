@@ -11,6 +11,7 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "token.h"
@@ -57,7 +58,8 @@ namespace type_t {
             ca_assert(field != NULL);
             append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
                     term, TK_WHITESPACE);
-            append_phrase(source, field->type->name, term, phrase_type::TYPE_NAME);
+            append_phrase(source, symbol_get_text(field->type->name),
+                    term, phrase_type::TYPE_NAME);
             append_phrase(source, field->stringPropOptional("syntax:postNameWs"," "),
                     term, TK_WHITESPACE);
             append_phrase(source, field->name, term, TK_IDENTIFIER);
@@ -69,11 +71,11 @@ namespace type_t {
 
     std::string toString(TValue* value)
     {
-        return "<Type "+as_type(value)->name+">";
+        return std::string("<Type ")+ symbol_get_text(as_type(value)->name)+">";
     }
     void setup_type(Type* type)
     {
-        type->name = "Type";
+        type->name = string_to_symbol("Type");
         type->storageType = STORAGE_TYPE_TYPE;
         type->initialize = type_t::initialize;
         type->copy = copy;
@@ -89,7 +91,7 @@ namespace type_t {
 } // namespace type_t
 
 Type::Type() :
-    name(""),
+    name(0),
     storageType(STORAGE_TYPE_NULL),
     cppTypeInfo(NULL),
     declaringTerm(NULL),
@@ -310,7 +312,7 @@ Term* create_tuple_type(List* types)
     typeName << "Tuple<";
     for (int i=0; i < types->length(); i++) {
         if (i != 0) typeName << ",";
-        typeName << as_type(types->get(i))->name;
+        typeName << symbol_get_text(as_type(types->get(i))->name);
     }
     typeName << ">";
 
@@ -360,10 +362,10 @@ Term* find_method_with_search_name(Branch* branch, Type* type, std::string const
 
 Term* find_method(Branch* branch, Type* type, std::string const& name)
 {
-    if (type->name == "")
+    if (type->name == 0)
         return NULL;
 
-    std::string searchName = type->name + "." + name;
+    std::string searchName = std::string(symbol_get_text(type->name)) + "." + name;
 
     Term* result = find_method_with_search_name(branch, type, searchName);
 
@@ -372,7 +374,7 @@ Term* find_method(Branch* branch, Type* type, std::string const& name)
 
     // If the type name is complex (such as List<int>), then try searching
     // for the base type name (such as List).
-    std::string baseTypeName = get_base_type_name(type->name);
+    std::string baseTypeName = get_base_type_name(symbol_get_text(type->name));
     if (baseTypeName != "") {
         result = find_method_with_search_name(branch, type, baseTypeName + "." + name);
 

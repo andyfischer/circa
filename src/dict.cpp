@@ -6,6 +6,7 @@
 
 #include "dict.h"
 #include "kernel.h"
+#include "symbols.h"
 #include "type.h"
 
 namespace circa {
@@ -437,7 +438,7 @@ void setup_type(Type* type)
     type->toString = tagged_value_wrappers::to_string;
     type->getField = tagged_value_wrappers::get_field;
     type->visitHeap = tagged_value_wrappers::visit_heap;
-    type->name = "Dict";
+    type->name = string_to_symbol("Dict");
 }
 
 } // namespace dict_t

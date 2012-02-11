@@ -37,7 +37,7 @@ namespace type_check_function {
     }
     CA_FUNCTION(typename_func)
     {
-        set_string(OUTPUT, declared_type(INPUT_TERM(0))->name);
+        set_string(OUTPUT, symbol_get_text(declared_type(INPUT_TERM(0))->name));
     }
     CA_FUNCTION(inputs_fit_function)
     {

@@ -77,7 +77,8 @@ struct Type
     // CircaObject header, must be the first field.
     CircaObject header;
 
-    std::string name;
+    std::string nameStr;
+    Symbol name;
 
     StorageType storageType;
 

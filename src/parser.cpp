@@ -712,7 +712,7 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         return ParseResult(result);
 
     branch->bindName(result, name);
-    as_type(result)->name = name;
+    as_type(result)->name = string_to_symbol(name.c_str());
 
     return ParseResult(result);
 }

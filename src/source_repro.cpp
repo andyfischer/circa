@@ -9,6 +9,7 @@
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "subroutine.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "token.h"
@@ -100,14 +101,16 @@ void format_term_source(StyledSource* source, Term* term)
 
         // Special constructor syntax
         if (term->boolPropOptional("constructor", false)) {
-            append_phrase(source, (term->type->name + "()"), term, phrase_type::UNDEFINED);
+            std::string s = symbol_get_text(term->type->name);
+            s += "()";
+            append_phrase(source, s, term, phrase_type::UNDEFINED);
 
         // Otherwise use formatSource on type
         } else {
             Type* type = declared_type(term);
             if (type->formatSource == NULL) {
                 std::stringstream out;
-                out << "Type " << type->name <<
+                out << "Type " << symbol_get_text(type->name) <<
                     " doesn't have a formatSource function";
                 throw std::runtime_error(out.str());
             }

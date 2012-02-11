@@ -101,7 +101,7 @@ void get_state_description(Term* term, TValue* output)
             describe_state_shape(branch, list[bindex]);
         }
     } else if (is_declared_state(term)) {
-        set_string(output, declared_type(term)->name);
+        set_string(output, symbol_get_text(declared_type(term)->name));
     } else if (is_function_stateful(term->function)) {
         describe_state_shape(nested_contents(term->function), output);
     }
@@ -146,7 +146,7 @@ void strip_orphaned_state(TValue* description, TValue* state,
 
     // Handle a type name
     if (is_string(description)) {
-        if ((state->value_type->name != as_string(description))
+        if ((as_string(description) != symbol_get_text(state->value_type->name))
                 && (as_string(description) != "any")) {
             swap(state, trash);
             set_null(state);

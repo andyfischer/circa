@@ -401,7 +401,7 @@ Term* create_type(Branch* branch, std::string name)
     Term* term = create_value(branch, &TYPE_T);
 
     if (name != "") {
-        as_type(term)->name = name;
+        as_type(term)->name = string_to_symbol(name.c_str());
         branch->bindName(term, name);
     }
 

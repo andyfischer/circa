@@ -10,6 +10,7 @@
 #include "introspection.h"
 #include "list_shared.h"
 #include "static_checking.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 
@@ -178,9 +179,9 @@ void format_static_error(TValue* error, TValue* stringOutput)
             out << "'" << input->name << "'";
         else
             out << "The input expression";
-        out << " has type " << input->type->name << ", but function "
+        out << " has type " << symbol_get_text(input->type->name) << ", but function "
             << term->function->name << " expects type "
-            << function_get_input_type(term->function, inputIndex)->name;
+            << symbol_get_text(function_get_input_type(term->function, inputIndex)->name);
     }
     else if (term->function == STATIC_ERROR_FUNC)
         out << to_string(term->input(0));

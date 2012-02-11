@@ -93,7 +93,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 
 void eval_context_setup_type(Type* type)
 {
-    type->name = "EvalContext";
+    type->name = string_to_symbol("EvalContext");
     type->gcListReferences = eval_context_list_references;
 }
 
@@ -164,7 +164,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, T
             std::stringstream msg;
             msg << "Couldn't cast input " << input->toString()
                 << " (at index " << i << ")"
-                << " to type " << placeholder->type->name;
+                << " to type " << symbol_get_text(placeholder->type->name);
             raise_error(context, msg.str().c_str());
             return;
         }

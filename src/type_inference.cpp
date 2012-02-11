@@ -161,7 +161,8 @@ Type* create_typed_unsized_list_type(Type* elementType)
     Type* type = create_type();
     list_t::setup_type(type);
     set_type(&type->parameter, elementType);
-    type->name = std::string("List<") + elementType->name + ">";
+    std::string name = std::string("List<") + symbol_get_text(elementType->name) + ">";
+    type->name = string_to_symbol(name.c_str());
     return type;
 }
 

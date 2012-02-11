@@ -16,7 +16,7 @@ namespace cast_function {
         if (!cast_possible(source, type)) {
             std::stringstream message;
             message << "Can't cast value " << source->toString()
-                << " to type " << type->name;
+                << " to type " << symbol_get_text(type->name);
             return RAISE_ERROR(message.str().c_str());
         }
 

@@ -13,7 +13,7 @@ namespace symbol_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = "symbol";
+        type->name = string_to_symbol("symbol");
         type->storageType = STORAGE_TYPE_INT;
         type->toString = to_string;
     }

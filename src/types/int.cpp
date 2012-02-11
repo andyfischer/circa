@@ -41,7 +41,7 @@ namespace int_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = "int";
+        type->name = string_to_symbol("int");
         type->storageType = STORAGE_TYPE_INT;
         type->reset = reset;
         type->equals = equals;

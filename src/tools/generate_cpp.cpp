@@ -108,7 +108,7 @@ void write_term_value(SourceWriter* writer, Term* term)
 
 void write_type_name(SourceWriter* writer, Type* type)
 {
-    writer->write(type->name.c_str());
+    writer->write(symbol_get_text(type->name));
 }
 
 void write_function(SourceWriter* writer, Term* term)

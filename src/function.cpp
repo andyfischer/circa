@@ -60,7 +60,7 @@ namespace function_t {
 
     void setup_type(Type* type)
     {
-        type->name = "Function";
+        type->name = string_to_symbol("Function");
         type->initialize = initialize;
         type->copy = copy;
         type->formatSource = subroutine_f::format_source;
@@ -501,7 +501,8 @@ void function_format_header_source(StyledSource* source, Function* func)
             showType = false;
 
         if (showType)
-            append_phrase(source, function_get_input_type(term, i)->name,
+            append_phrase(source,
+                symbol_get_text(function_get_input_type(term, i)->name),
                 term, phrase_type::TYPE_NAME);
 
         if (name != "" && name[0] != '#') {
@@ -533,7 +534,8 @@ void function_format_header_source(StyledSource* source, Function* func)
         append_phrase(source, "->", term, phrase_type::UNDEFINED);
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
                 term, TK_WHITESPACE);
-        append_phrase(source, function_get_output_type(term, 0)->name,
+        append_phrase(source,
+            symbol_get_text(function_get_output_type(term, 0)->name),
                 term, phrase_type::TYPE_NAME);
     }
 }

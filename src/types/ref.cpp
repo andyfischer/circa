@@ -61,7 +61,7 @@ namespace ref_t {
 
     void setup_type(Type* type)
     {
-        type->name = "Ref";
+        type->name = string_to_symbol("Ref");
         type->storageType = STORAGE_TYPE_REF;
         type->remapPointers = remapPointers;
         type->toString = toString;

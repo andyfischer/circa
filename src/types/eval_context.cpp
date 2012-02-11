@@ -24,7 +24,7 @@ namespace eval_context_t {
 
     void setup_type(Type* type)
     {
-        type->name = "EvalContext";
+        type->name = string_to_symbol("EvalContext");
         type->visitHeap = visitHeap;
     }
 }

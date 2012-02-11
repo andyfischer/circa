@@ -60,7 +60,7 @@ void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor 
 
 void branch_setup_type(Type* type)
 {
-    type->name = "Branch";
+    type->name = string_to_symbol("Branch");
     type->gcListReferences = branch_list_references;
 }
 

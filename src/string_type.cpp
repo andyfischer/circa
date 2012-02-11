@@ -7,6 +7,7 @@
 #include "evaluation.h"
 #include "string_type.h"
 #include "source_repro.h"
+#include "symbols.h"
 #include "tagged_value.h"
 #include "token.h"
 #include "type.h"
@@ -147,7 +148,7 @@ namespace string_t {
 void string_setup_type(Type* type)
 {
     reset_type(type);
-    type->name = "string";
+    type->name = string_to_symbol("string");
     type->storageType = STORAGE_TYPE_STRING;
     type->initialize = string_t::initialize;
     type->release = string_t::release;

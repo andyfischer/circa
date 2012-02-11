@@ -7,7 +7,7 @@ namespace type_methods_function {
 
     CA_FUNCTION(name_accessor)
     {
-        set_string(OUTPUT, as_type(INPUT(0))->name);
+        set_string(OUTPUT, symbol_get_text(as_type(INPUT(0))->name));
     }
 
     void setup(Branch* kernel)

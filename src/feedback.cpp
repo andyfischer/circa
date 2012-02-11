@@ -8,6 +8,7 @@
 #include "code_iterators.h"
 #include "evaluation.h"
 #include "subroutine.h"
+#include "symbols.h"
 #include "term.h"
 #include "type.h"
 
@@ -27,8 +28,8 @@ void handle_feedback_event(EvalContext* context, Term* target, TValue* desired)
         bool success = cast(desired, declared_type(target), target);
         if (!success) {
             std::cout << "in handle_feedback, failed to cast "
-                << desired->value_type->name << " to "
-                << declared_type(target)->name << std::endl;
+                << symbol_get_text(desired->value_type->name) << " to "
+                << symbol_get_text(declared_type(target)->name) << std::endl;
         }
     } else if (target->function == INPUT_PLACEHOLDER_FUNC) {
 

@@ -66,7 +66,7 @@ CA_FUNCTION(evaluate_subroutine)
             std::stringstream msg;
             msg << "Couldn't cast input " << INPUT(i)->toString()
                 << " (at index " << i << ")"
-                << " to type " << placeholder->type->name;
+                << " to type " << symbol_get_text(placeholder->type->name),
             RAISE_ERROR(msg.str().c_str());
             return;
         }

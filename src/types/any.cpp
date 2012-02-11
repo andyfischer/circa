@@ -24,7 +24,7 @@ namespace any_t {
     }
     void setup_type(Type* type)
     {
-        type->name = "any";
+        type->name = string_to_symbol("any");
         type->toString = to_string;
         type->staticTypeQuery = staticTypeQuery;
         type->cast = cast;

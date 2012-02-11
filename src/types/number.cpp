@@ -95,7 +95,7 @@ namespace number_t {
     void setup_type(Type* type)
     {
         reset_type(type);
-        type->name = "number";
+        type->name = string_to_symbol("number");
         type->storageType = STORAGE_TYPE_FLOAT;
         type->reset = reset;
         type->cast = cast;

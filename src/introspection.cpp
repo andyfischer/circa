@@ -10,6 +10,7 @@
 #include "introspection.h"
 #include "locals.h"
 #include "subroutine.h"
+#include "symbols.h"
 #include "term.h"
 #include "term_list.h"
 #include "type.h"
@@ -299,7 +300,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (term->type == NULL)
         out << "<NULL type>";
     else
-        out << term->type->name;
+        out << symbol_get_text(term->type->name);
 
     if (is_value(term))
         out << " val:" << to_string((TValue*) term);

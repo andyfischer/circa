@@ -23,7 +23,7 @@ namespace void_t {
     }
     void setup_type(Type* type)
     {
-        type->name = "void";
+        type->name = string_to_symbol("void");
         type->cast = cast;
         type->toString = to_string;
     }

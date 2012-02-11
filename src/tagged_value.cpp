@@ -306,7 +306,8 @@ std::string to_string(TValue* value)
         return toString(value);
 
     std::stringstream out;
-    out << "<" << value->value_type->name << " " << value->value_data.ptr << ">";
+    out << "<" << symbol_get_text(value->value_type->name)
+        << " " << value->value_data.ptr << ">";
     return out.str();
 }
 
@@ -317,7 +318,7 @@ std::string to_string_annotated(TValue* value)
 
     std::stringstream out;
 
-    out << value->value_type->name << "#";
+    out << symbol_get_text(value->value_type->name) << "#";
 
     if (is_list(value)) {
         out << "[";
@@ -349,7 +350,8 @@ void set_index(TValue* value, int index, TValue* element)
     Type::SetIndex setIndex = value->value_type->setIndex;
 
     if (setIndex == NULL) {
-        std::string msg = "No setIndex function available on type " + value->value_type->name;
+        std::string msg = std::string("No setIndex function available on type ")
+            + symbol_get_text(value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -361,7 +363,8 @@ TValue* get_field(TValue* value, const char* field)
     Type::GetField getField = value->value_type->getField;
 
     if (getField == NULL) {
-        std::string msg = "No getField function available on type " + value->value_type->name;
+        std::string msg = std::string("No getField function available on type ")
+            + symbol_get_text(value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -373,7 +376,8 @@ void set_field(TValue* value, const char* field, TValue* element)
     Type::SetField setField = value->value_type->setField;
 
     if (setField == NULL) {
-        std::string msg = "No setField function available on type " + value->value_type->name;
+        std::string msg = std::string("No setField function available on type ")
+            + symbol_get_text(value->value_type->name);
         internal_error(msg.c_str());
     }
 
@@ -574,7 +578,7 @@ const char* get_name_for_type(Type* type)
 {
     if (type == NULL)
         return "<NULL>";
-    else return type->name.c_str();
+    else return symbol_get_text(type->name);
 }
 
 void* get_pointer(TValue* value, Type* expectedType)

@@ -38,10 +38,7 @@ Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 
 Term* import_type(Branch* branch, Type* type)
 {
-    if (type->name == "")
-        throw std::runtime_error("In import_type, type must have a name");
-
-    Term* term = create_value(branch, &TYPE_T, type->name);
+    Term* term = create_value(branch, &TYPE_T, symbol_get_text(type->name));
     set_type(term, type);
     return term;
 }

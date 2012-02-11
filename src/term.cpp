@@ -272,8 +272,10 @@ void term_check_invariants(List* errors, Term* term)
 
         if (!typeOk) {
             std::string msg;
-            msg += "TValue has wrong type: term->type is " + term->type->name
-                + ", tag is " + term->value_type->name;
+            msg += std::string("TValue has wrong type: term->type is ")
+                + symbol_get_text(term->type->name)
+                + ", tag is "
+                + symbol_get_text(term->value_type->name);
             append_term_invariant_error(errors, term, msg);
         }
     }
