@@ -27,15 +27,6 @@ namespace list_function {
             copy(INPUT(i), (*result)[i]);
     }
 
-    void list_formatSource(StyledSource* source, Term* caller)
-    {
-        format_name_binding(source, caller);
-        append_phrase(source, "[", caller, TK_LBRACKET);
-        for (int i=0; i < caller->numInputs(); i++)
-            format_source_for_input(source, caller, i);
-        append_phrase(source, "]", caller, TK_LBRACKET);
-    }
-
     CA_DEFINE_FUNCTION(repeat, "repeat(any, int) -> List")
     {
         set_list(OUTPUT);
@@ -71,7 +62,6 @@ namespace list_function {
         LIST_FUNC = kernel->get("list");
 
         as_function(LIST_FUNC)->specializeType = specializeType;
-        as_function(LIST_FUNC)->formatSource = list_formatSource;
     }
 }
 }

@@ -2074,6 +2074,7 @@ ParseResult literal_list(Branch* branch, TokenStream& tokens, ParserCxt* context
     check_to_insert_implicit_inputs(term);
 
     term->setBoolProp("syntax:literal-list", true);
+    term->setStringProp("syntax:declarationStyle", "bracket-list");
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);

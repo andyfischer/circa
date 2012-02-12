@@ -1,0 +1,98 @@
+-- Normal call
+concat('a', 'b')
+   concat('a', 'b')
+b = concat('a', 'b')
+  b = concat('a', 'b')
+assert(true)
+list(1.0, 2.0)
+list(1, 2)
+list(1,2)
+list(1 2)
+list(1 2
+)
+list(1 2 3 4)
+list(   1   2,3 4  )
+  add(1,2)
+add(1,2)  
+d = add(1.0, 2.0)
+  d = add(1.0, 2.0)
+  d   =   add(1 2)
+d= add(1 2)
+d=add(1 2)
+d=   add(1 2)
+
+# def f(int a, int b, int c) { state s; }   f(1, 2 3)
+
+-- Infix
+1.0 + 2.0
+1.0 * 2.0
+1.0 / 2.0
+1.0 - 2.0
+blah = 1.0 + 2.0
+coersion = 1 + 2
+complex = 1 + 2 + 3.0 + 4.0
+   5 + 4
+5    + 4
+5 +    4
+5 + 4   
+5+4
+complex = (4.0 + 3.0) + 2.0
+
+-- Unary
+a = 1; -a
+a = 1.0; -a
+
+-- Methods
+'string'.length()
+Map().add(1,2)
+Map().add(1, 2)
+Point().x = 1.0
+
+-- Rebinding
+a = 1
+a += 1
+a *= 5*3+1
+  a -= 5*3+1
+a /= 5*3+1  
+
+a = [0 0] -> Point
+a.x += 1
+a.x   += 1
+a.x +=   1
+
+p = Point(); p.x += 1.0
+p = Point(); p.x   += 1.0
+p = Point(); p.x +=   1.0
+p = Point(); p.x = 1.0
+p = Point(); p.x   = 1.0
+p = Point(); p.x =   1.0
+
+-- More methods
+r = ref(1); r.name()
+r = ref(1); r.asint()
+r = ref(1); r.asint() + 5
+l = []; l.append(1)
+
+t = Point(); t.x
+t = Point(); t.x = 1.0
+t = Point(); a = t.x
+type A{int z} type B{A y} x = B(); x.y.z
+
+-- Index access
+a = [1]; a[0]
+a = [1]; b = a[0]
+
+-- Type casting
+number(1)
+Point([4 3])
+1 -> number
+
+-- Left arrow
+def f(any);
+
+f <- 1
+f    <- 1
+f <-   1
+f <- {
+    1 1 1 }
+

@@ -29,6 +29,10 @@ subroutine.ca
 subroutine_state.ca
 subroutine_state_1.ca
 subroutine_state_2.ca
+syntax_control_flow.ca
+syntax_function_calls.ca
+syntax_simple_values.ca
+syntax_subroutine.ca
 return_1.ca
 return_2.ca
 return_3.ca

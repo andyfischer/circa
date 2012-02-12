@@ -131,12 +131,12 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
 {
     std::string declarationStyle = term->stringPropOptional("syntax:declarationStyle",
             "function-call");
-    bool infix = declarationStyle == "infix";
+
     std::string functionName = term->stringPropOptional("syntax:functionName",
             term->function->name);
 
     // Check for an infix operator with implicit rebinding (like +=).
-    if (infix && 
+    if (declarationStyle == "infix" && 
             parser::is_infix_operator_rebinding(functionName)) {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);
         append_phrase(source, " ", term, phrase_type::WHITESPACE);
@@ -204,6 +204,11 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
                 term, phrase_type::WHITESPACE);
         append_phrase(source, "<-", term, phrase_type::UNDEFINED);
         format_source_for_input(source, term, 0);
+    } else if (declarationStyle == "bracket-list") {
+        append_phrase(source, "[", term, TK_LBRACKET);
+        for (int i=0; i < term->numInputs(); i++)
+            format_source_for_input(source, term, i);
+        append_phrase(source, "]", term, TK_LBRACKET);
     }
 
     for (int p=0; p < numParens; p++)

@@ -1,0 +1,53 @@
+
+def f();
+def g(any);
+
+-- If
+if true { true x = 1 }
+if true       { 1 }
+if true {     1 }
+if 5.0 > 3.0 { f() }
+if true {} else {}
+  if true {} else {}
+if true   else {}
+if true   else {}
+if true else   {}
+if true else   {}
+if true else {}  
+if true elif true {}  
+if true   elif true {}
+if true elif true   {}
+if true elif true else {}
+if true elif true   else {}
+if 1 > 2 { f() } elif 2 > 3 {}  elif 3 > 4 { f() }
+if true { 1 2 3 }
+if true{1 2 3 }
+if true{ a = 1} else { a = 2 }; b = a # once had a bug
+
+-- For
+for x in 0..1 {}
+  for x in 0..1 {}
+for x in [5] {}
+for x in [1  ,2 ;3 ] {}
+for x in [1]
+    g(x)
+
+l = [1]
+for x in l
+
+l = [1]
+for x in l
+    x += 3
+for x in [1]   {}
+for x in [1] { g(1)  }
+for x in [1] { g(1) } 
+l = [1]; for x in @l { x += 1 }
+a = for x in [1] { x + 1 }
+
+-- Blocks
+{}
+{  }
+{1}
+blah = {1}
+blah = { g(1) g(2) }
+
