@@ -6,18 +6,8 @@
 
 namespace circa {
 
-struct ForLoopContext
-{
-    bool discard;
-    bool breakCalled;
-    bool continueCalled;
-
-    ForLoopContext() : discard(false), breakCalled(false), continueCalled(false) {}
-};
-
 Term* get_for_loop_iterator(Term* forTerm);
 const char* for_loop_get_iterator_name(Term* forTerm);
-bool for_loop_modifies_list(Term* forTerm);
 Term* for_loop_find_index(Branch* contents);
 
 Term* start_building_for_loop(Term* forTerm, const char* iteratorName);

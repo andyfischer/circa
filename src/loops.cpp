@@ -51,11 +51,6 @@ const char* for_loop_get_iterator_name(Term* forTerm)
     return "";
 }
 
-bool for_loop_modifies_list(Term* forTerm)
-{
-    return forTerm->boolPropOptional("modifyList", false);
-}
-
 Branch* get_for_loop_outer_rebinds(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
