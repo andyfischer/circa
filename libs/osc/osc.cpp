@@ -8,7 +8,7 @@
 
 using namespace circa;
 
-struct ServerContext
+struct Server
 {
     lo_server_thread server_thread;
 
@@ -16,24 +16,42 @@ struct ServerContext
     pthread_mutex_t mutex;
     circa::List incomingMessages;
 
-    ServerContext() : server_thread(NULL)
+    Server() : server_thread(NULL)
     {
         pthread_mutex_init(&mutex, NULL);
     }
-    ~ServerContext() {
+    ~Server() {
         pthread_mutex_destroy(&mutex);
         if (server_thread != NULL)
             lo_server_thread_stop(server_thread);
     }
 };
 
-struct Address
-{
-    lo_address address;
-};
+Name name_Server = name_from_string("Server");
+Name name_Address = name_from_string("Address");
 
-Type* g_serverContext_t;
-Type* g_address_t;
+Server* as_server(TValue* value)
+{
+    if (value->value_type->name == name_Server)
+        return (Server*) value->value_data.ptr;
+    return NULL;
+}
+
+lo_address as_address(TValue* value)
+{
+    if (value->value_type->name == name_Address)
+        return (lo_address) value->value_data.ptr;
+    return NULL;
+}
+void server_release(Type* type, TValue* value)
+{
+    delete as_server(value);
+}
+
+void address_release(Type* type, TValue* value)
+{
+    lo_address_free(as_address(value));
+}
 
 extern "C" {
 
@@ -45,7 +63,7 @@ void error_callback(int num, const char *m, const char *path)
 int incoming_message_callback(const char *path, const char *types, lo_arg **argv,
 		    int argc, void *data, void *user_data)
 {
-    ServerContext* context = (ServerContext*) user_data;
+    Server* server = (Server*) user_data;
 
     List message;
     message.resize(argc + 1);
@@ -68,9 +86,9 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
 
     int ret = 0;
 
-    ret = pthread_mutex_lock(&context->mutex);
-    swap(&message, context->incomingMessages.append());
-    ret = pthread_mutex_unlock(&context->mutex);
+    ret = pthread_mutex_lock(&server->mutex);
+    swap(&message, server->incomingMessages.append());
+    ret = pthread_mutex_unlock(&server->mutex);
 
     return 1;
 }
@@ -81,50 +99,49 @@ CA_FUNCTION(osc__create_server_thread)
     char portStr[15];
     sprintf(portStr, "%d", port);
 
-    ServerContext* context = handle_t::create<ServerContext>(OUTPUT, g_serverContext_t);
-    // printf("opened server at %s, context = %p\n", portStr, context);
+    Server* server = new Server();
+    // printf("opened server at %s, server = %p\n", portStr, server);
 
-    context->server_thread = lo_server_thread_new(portStr, error_callback);
+    server->server_thread = lo_server_thread_new(portStr, error_callback);
 
-    if (context->server_thread == NULL) {
+    if (server->server_thread == NULL) {
         RAISE_ERROR("lo_server_thread_new failed");
         set_null(OUTPUT);
         return;
     }
 
-    lo_server_thread_add_method(context->server_thread, NULL, NULL, incoming_message_callback,
-            (void*) context);
-    lo_server_thread_start(context->server_thread);
+    lo_server_thread_add_method(server->server_thread, NULL, NULL, incoming_message_callback,
+            (void*) server);
+    lo_server_thread_start(server->server_thread);
+
+    set_pointer(OUTPUT, CALLER->type, server);
 }
 
 CA_FUNCTION(osc__read_from_server)
 {
-    ServerContext* context = (ServerContext*) handle_t::get_ptr(INPUT(0));
+    Server* server = (Server*) handle_t::get_ptr(INPUT(0));
 
     List incoming;
 
-    pthread_mutex_lock(&context->mutex);
-    swap(&incoming, &context->incomingMessages);
-    pthread_mutex_unlock(&context->mutex);
+    pthread_mutex_lock(&server->mutex);
+    swap(&incoming, &server->incomingMessages);
+    pthread_mutex_unlock(&server->mutex);
 
     swap(&incoming, OUTPUT);
 }
 
 CA_FUNCTION(osc__address)
 {
-    Address* address = handle_t::create<Address>(OUTPUT, g_address_t);
-
     int port = INT_INPUT(1);
     char portStr[20];
     sprintf(portStr, "%d", port);
 
-    address->address = lo_address_new(STRING_INPUT(0), portStr);
+    lo_address address = lo_address_new(STRING_INPUT(0), portStr);
+    set_pointer(OUTPUT, CALLER->type, address);
 }
 
 CA_FUNCTION(osc__send)
 {
-    Address* address = (Address*) handle_t::get_ptr(INPUT(0));
-
     const char* destination = STRING_INPUT(1);
 
     const int c_maxArguments = 15;
@@ -156,7 +173,7 @@ CA_FUNCTION(osc__send)
     }
 
     if (!failed) {
-        int result = lo_send_message(address->address, destination, message);
+        int result = lo_send_message(as_address(INPUT(0)), destination, message);
 
         if (result == -1)
             RAISE_ERROR("lo_send_message returned -1");
@@ -165,14 +182,14 @@ CA_FUNCTION(osc__send)
     lo_message_free(message);
 }
 
+
 void on_load(Branch* branch)
 {
-    g_serverContext_t = get_declared_type(branch, "osc:ServerContext");
-    g_address_t = get_declared_type(branch, "osc:Address");
+    Type* serverType = get_declared_type(branch, "osc:Server");
+    Type* addressType = get_declared_type(branch, "osc:Address");
 
-    handle_t::setup_type<ServerContext>(g_serverContext_t);
-    handle_t::setup_type<Address>(g_address_t);
+    serverType->release = server_release;
+    addressType->release = address_release;
 }
 
 } // extern "C"
-

@@ -4,11 +4,11 @@
 sys:dll_patch()
 
 namespace osc
-    type ServerContext;
+    type Server;
     type Address;
 
-    def create_server_thread(int port) -> ServerContext
-    def read_from_server(ServerContext context) -> List
+    def create_server_thread(int port) -> Server
+    def read_from_server(Server server) -> List
     def address(string hostname, int port) -> Address
     def send(Address address, string path, any values)
     
