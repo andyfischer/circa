@@ -16,7 +16,7 @@
 #include "type_inference.h"
 #include "update_cascades.h"
 
-#include "for_loop.h"
+#include "loops.h"
 
 namespace circa {
 
