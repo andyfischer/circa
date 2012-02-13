@@ -56,9 +56,6 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
         Branch* branch = frame->branch;
         out << " [Frame " << frameIndex << ", branch = " << branch
              << ", pc = " << frame->pc
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-             << ", :" << name_to_string(frame->strategy)
-#endif
              << "]" << std::endl;
 
         if (branch == NULL)
@@ -117,9 +114,6 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     initialize_null(&top->registers);
     swap(registers, &top->registers);
     top->branch = branch;
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-    top->strategy = Default;
-#endif
     top->pc = 0;
     top->nextPc = 0;
     top->startPc = 0;
@@ -182,23 +176,12 @@ void finish_frame(EvalContext* context)
     // Copy outputs
     List registers;
     swap(&registers, &top->registers);
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-    Symbol strategy = top->strategy;
-#endif
     pop_frame(context);
 
     Frame* parentFrame = top_frame(context);
     Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
     List* parentRegisters = &top_frame(context)->registers;
     
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-    if (strategy == ByDemand) {
-        // Copy the result we just produced, and don't advance PC.
-        copy(registers[top->pc - 1], parentRegisters->get(top->pc - 1));
-        return;
-    }
-#endif
-
     // Default evaluation, copy output placeholders and advance PC.
     for (int i=0;; i++) {
         Term* placeholder = get_output_placeholder(finishedBranch, i);
@@ -208,7 +191,7 @@ void finish_frame(EvalContext* context)
         swap(registers[placeholder->index], parentRegisters->get(finishedTerm->index + i));
     }
 
-    parentFrame->pc++;
+    parentFrame->pc = parentFrame->nextPc;
 }
 
 Frame* top_frame(EvalContext* context)
@@ -221,17 +204,6 @@ void reset_stack(EvalContext* context)
     while (context->numFrames > 0)
         pop_frame(context);
 }
-
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-void push_frame_to_demand_evaluation(EvalContext* context, Term* target)
-{
-    Frame* frame = push_frame(context, target->owningBranch);
-    frame->pc = target->index;
-    frame->startPc = frame->pc;
-    frame->endPc = frame->pc + 1;
-    frame->strategy = ByDemand;
-}
-#endif
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
@@ -615,30 +587,21 @@ do_instruction:
 
     Frame* frame = top_frame(context);
     Branch* branch = frame->branch;
-    int pc = frame->pc;
 
     // Check if we have finished this branch
-    if (pc >= frame->endPc) {
+    if (frame->pc >= frame->endPc) {
 
         // If we've finished the initial branch then end this interpreter session.
         if (context->numFrames == initialFrameCount)
             return;
 
+        // Finish this frame and continue evaluating
         finish_frame(context);
         goto do_instruction;
     }
 
-    Term* term = branch->get(pc);
-    frame->nextPc = pc + 1;
-
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-    // Skip a lazy-call in Default strategy.
-    if (frame->strategy == Default && is_lazy_call(term)) {
-        set_name(get_register(context, term), Unevaluated);
-        frame->pc = frame->nextPc;
-        goto do_instruction;
-    }
-#endif
+    Term* term = branch->get(frame->pc);
+    frame->nextPc = frame->pc + 1;
 
     EvaluateFunc evaluate = NULL;
 
@@ -651,19 +614,6 @@ do_instruction:
     }
 
     context->currentTerm = term;
-
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-    // Check each input for an unevaluated term
-    for (int i=0; i < term->numInputs(); i++) {
-        TValue* input = get_input(context, term->input(i));
-
-        if (input != NULL && equals_name(input, Unevaluated)) {
-            // Create a ByDemand frame to evaluate this term.
-            push_frame_to_demand_evaluation(context, term->input(i));
-            goto do_instruction;
-        }
-    }
-#endif
 
     int inputCount;
     int outputCount;

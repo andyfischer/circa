@@ -19,4 +19,8 @@ Branch* find_enclosing_for_loop_contents(Term* term);
 CA_FUNCTION(evaluate_for_loop);
 CA_FUNCTION(evaluate_loop_output);
 
+void finish_while_loop(Term* whileTerm);
+CA_FUNCTION(evaluate_unbounded_loop);
+CA_FUNCTION(evaluate_unbounded_loop_finish);
+
 } // namespace circa

@@ -27,6 +27,7 @@ namespace for_function {
     {
         while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
             finish_frame(CONTEXT);
+
         finish_frame(CONTEXT);
     }
     CA_FUNCTION(evaluate_continue)
@@ -78,6 +79,11 @@ namespace for_function {
         CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
         as_function(CONTINUE_FUNC)->formatSource = continue_formatSource;
         hide_from_docs(CONTINUE_FUNC);
+
+        FUNCS.unbounded_loop = import_function(kernel, evaluate_unbounded_loop,
+            "loop(bool condition)");
+        FUNCS.unbounded_loop_finish = import_function(kernel, evaluate_unbounded_loop_finish,
+            "unbounded_loop_finish()");
     }
 }
 } // namespace circa

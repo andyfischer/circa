@@ -89,6 +89,7 @@ const char* get_token_text(int match)
         case TK_CONTINUE: return "continue";
         case TK_SWITCH: return "switch";
         case TK_CASE: return "case";
+        case TK_WHILE: return "while";
         case TK_UNRECOGNIZED: return "UNRECOGNIZED";
         default: return "NOT FOUND";
     }
@@ -315,6 +316,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, TK_CONTINUE)) return;
         if (try_to_consume_keyword(context, TK_SWITCH)) return;
         if (try_to_consume_keyword(context, TK_CASE)) return;
+        if (try_to_consume_keyword(context, TK_WHILE)) return;
 
         consume_identifier(context);
         return;

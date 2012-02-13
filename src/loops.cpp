@@ -238,9 +238,6 @@ void for_loop_fix_state_input(Branch* contents)
     Term* packStateList = apply(contents, FUNCS.pack_state_list_n,
         TermList(stateInput, stateResult, index));
     move_after(packStateList, stateResult);
-
-    //Term* stateOutput = insert_state_output(contents);
-    //set_input(stateOutput, 0, packStateList);
 }
 
 CA_FUNCTION(evaluate_for_loop)
@@ -269,14 +266,6 @@ CA_FUNCTION(evaluate_for_loop)
     // Set up a blank list for output
     set_list(top_frame(context)->registers[contents->length()-1], inputListLength);
 
-    // Walk forward until we find the loop_index() term.
-    int loopIndexPos = 0;
-    for (; loopIndexPos < contents->length(); loopIndexPos++) {
-        if (contents->get(loopIndexPos)->function == FUNCS.loop_index)
-            break;
-    }
-    ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
-
     // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {
         List* registers = &top_frame(context)->registers;
@@ -293,6 +282,14 @@ CA_FUNCTION(evaluate_for_loop)
         return;
     }
 
+    // Walk forward until we find the loop_index() term.
+    int loopIndexPos = 0;
+    for (; loopIndexPos < contents->length(); loopIndexPos++) {
+        if (contents->get(loopIndexPos)->function == FUNCS.loop_index)
+            break;
+    }
+    ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
+
     // Set the loop index
     set_int(top_frame(context)->registers[loopIndexPos], 0);
 
@@ -301,7 +298,6 @@ CA_FUNCTION(evaluate_for_loop)
 
 CA_FUNCTION(evaluate_loop_output)
 {
-    // Check if we are finished
     Term* caller = CALLER;
     Branch* contents = caller->owningBranch;
     EvalContext* context = CONTEXT;
@@ -346,6 +342,33 @@ CA_FUNCTION(evaluate_loop_output)
 
     // Return to start of loop body
     topFrame->nextPc = 0;
+}
+
+void finish_while_loop(Term* whileTerm)
+{
+    Branch* branch = nested_contents(whileTerm);
+
+    // Append a call to unbounded_loop_finish()
+    Term* term = apply(branch, FUNCS.unbounded_loop_finish,
+        TermList());
+    move_before_outputs(term);
+}
+
+CA_FUNCTION(evaluate_unbounded_loop)
+{
+    EvalContext* context = CONTEXT;
+    Branch* contents = nested_contents(CALLER);
+
+    // Check for zero evaluations
+    if (!as_bool(INPUT(0))) {
+        return;
+    }
+
+    push_frame(context, contents);
+}
+
+CA_FUNCTION(evaluate_unbounded_loop_finish)
+{
 }
 
 } // namespace circa

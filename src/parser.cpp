@@ -980,6 +980,26 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     return ParseResult(forTerm);
 }
 
+ParseResult while_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    tokens.consume(TK_WHILE);
+    possible_whitespace(tokens);
+
+    Term* conditionExpr = infix_expression(branch, tokens, context).term;
+
+    Term* whileTerm = apply(branch, FUNCS.unbounded_loop, TermList(conditionExpr));
+    Branch* contents = nested_contents(whileTerm);
+    set_starting_source_location(whileTerm, startPosition, tokens);
+
+    consume_branch(contents, tokens, context);
+
+    finish_while_loop(whileTerm);
+    set_source_location(whileTerm, startPosition, tokens);
+    return ParseResult(whileTerm);
+}
+
 ParseResult do_once_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
@@ -1568,7 +1588,6 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 
     inputHints.apply(term);
     check_to_insert_implicit_inputs(term);
-    //set_input_syntax_hint(term, 0, "postWhitespace", "");
     term->setStringProp("syntax:functionName", functionName);
     term->setStringProp("syntax:declarationStyle", "method-call");
     set_source_location(term, startPosition, tokens);

@@ -103,6 +103,7 @@ const int TK_BREAK = 72;
 const int TK_CONTINUE = 73;
 const int TK_SWITCH = 74;
 const int TK_CASE = 75;
+const int TK_WHILE = 77;
 
 const int TK_WHITESPACE = 80;
 const int TK_NEWLINE = 81;

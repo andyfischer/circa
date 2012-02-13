@@ -381,12 +381,18 @@ bool function_has_variable_args(Term* func)
 
 Term* function_get_input_placeholder(Function* func, int index)
 {
-    return get_input_placeholder(function_get_contents(func), index);
+    Branch* contents = function_get_contents(func);
+    if (contents == NULL)
+        return NULL;
+    return get_input_placeholder(contents, index);
 }
 
 Term* function_get_output_placeholder(Function* func, int index)
 {
-    return get_output_placeholder(function_get_contents(func), index);
+    Branch* contents = function_get_contents(func);
+    if (contents == NULL)
+        return NULL;
+    return get_output_placeholder(contents, index);
 }
 Branch* function_get_contents(Function* func)
 {
