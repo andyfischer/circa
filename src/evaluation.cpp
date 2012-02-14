@@ -25,8 +25,7 @@ namespace circa {
 EvalContext::EvalContext()
  : errorOccurred(false),
    numFrames(0),
-   stack(NULL),
-   currentTerm(NULL)
+   stack(NULL)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
@@ -217,8 +216,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (function->evaluate == NULL)
         return;
 
-    context->currentTerm = term;
-
     int inputCount;
     int outputCount;
     fetch_input_pointers(context, term, inputBuffer, &inputCount, &outputCount);
@@ -346,6 +343,11 @@ TValue* get_input(EvalContext* context, Term* term)
     return NULL;
 }
 
+TValue* get_input(EvalContext* context, int index)
+{
+    return NULL;
+}
+
 void consume_input(EvalContext* context, Term* term, TValue* dest)
 {
     // TODO: Make this swap() values when possible
@@ -354,7 +356,8 @@ void consume_input(EvalContext* context, Term* term, TValue* dest)
 
 Term* current_term(EvalContext* context)
 {
-    return context->currentTerm;
+    Frame* top = top_frame(context);
+    return top->branch->get(top->pc);
 }
 
 TValue* get_register(EvalContext* context, Term* term)
@@ -612,8 +615,6 @@ do_instruction:
         frame->pc = frame->nextPc;
         goto do_instruction;
     }
-
-    context->currentTerm = term;
 
     int inputCount;
     int outputCount;

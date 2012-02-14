@@ -28,7 +28,7 @@
                 _circa_START_FUNCTIONS[i]->_header);\
     }
 
-#define CALLER (_cxt->currentTerm)
+#define CALLER (current_term(_cxt))
 #define CONTEXT (_cxt)
 #define NUM_INPUTS (_ninputs)
 #define INPUT(index) (_vals[index])

@@ -46,8 +46,6 @@ struct EvalContext
     int numFrames;
     Frame* stack;
 
-    Term* currentTerm;
-
     EvalContext();
     ~EvalContext();
 
