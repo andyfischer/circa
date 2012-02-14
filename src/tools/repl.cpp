@@ -12,15 +12,14 @@
 
 namespace circa {
 
-void repl_evaluate_line(Branch* branch, std::string const& input, std::ostream& output)
+void repl_evaluate_line(EvalContext* context, std::string const& input, std::ostream& output)
 {
+    Branch* branch = top_branch(context);
     int previousHead = branch->length();
     parser::compile(branch, parser::statement_list, input);
     int newHead = branch->length();
 
     bool anyErrors = false;
-
-    EvalContext context;
 
     int resultIndex = -1;
 
@@ -35,9 +34,9 @@ void repl_evaluate_line(Branch* branch, std::string const& input, std::ostream& 
             break;
         }
 
-        evaluate_single_term(&context, result);
+        evaluate_single_term(context, result);
 
-        if (context.errorOccurred) {
+        if (error_occurred(context)) {
             output << "error: ";
             print_runtime_error_formatted(context, std::cout);
             anyErrors = true;
@@ -51,15 +50,18 @@ void repl_evaluate_line(Branch* branch, std::string const& input, std::ostream& 
     if (!anyErrors && resultIndex != -1) {
         Term* result = branch->get(resultIndex);
         if (result->type != as_type(VOID_TYPE)) {
-            output << get_register(&context, result)->toString() << std::endl;
+            output << get_register(context, result)->toString() << std::endl;
         }
     }
 }
 
 int run_repl()
 {
-    Branch replState;
+    EvalContext context;
+    Branch branch;
     bool displayRaw = false;
+
+    push_frame(&context, &branch);
 
     while (true) {
         std::cout << "> ";
@@ -82,24 +84,28 @@ int run_repl()
             continue;
         }
         if (input == "/clear") {
-            clear_branch(&replState);
+            clear_branch(&branch);
             std::cout << "Cleared working area" << std::endl;
+            continue;
+        }
+        if (input == "/dump") {
+            dump(&branch);
             continue;
         }
 
         if (input == "/help") {
-            std::cout << "Special commands: /raw, /help, /exit" << std::endl;
+            std::cout << "Special commands: /raw, /help, /clear, /dump, /exit" << std::endl;
             continue;
         }
 
-        int previousHead = replState.length();
-        repl_evaluate_line(&replState, input, std::cout);
+        int previousHead = branch.length();
+        repl_evaluate_line(&context, input, std::cout);
 
         if (displayRaw) {
-            for (int i=previousHead; i < replState.length(); i++) {
-                std::cout << get_term_to_string_extended(replState[i]) << std::endl;
-                if (nested_contents(replState[i])->length() > 0)
-                    print_branch(std::cout, nested_contents(replState[i]));
+            for (int i=previousHead; i < branch.length(); i++) {
+                std::cout << get_term_to_string_extended(branch[i]) << std::endl;
+                if (nested_contents(branch[i])->length() > 0)
+                    print_branch(std::cout, nested_contents(branch[i]));
             }
         }
     }

@@ -147,7 +147,7 @@ void do_file_command(List* args, TValue* reply)
 
     if (error_occurred(&context)) {
         std::cout << "Error occurred:\n";
-        print_runtime_error_formatted(context, std::cout);
+        print_runtime_error_formatted(&context, std::cout);
         std::cout << std::endl;
         return;
     }

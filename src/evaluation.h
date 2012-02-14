@@ -67,6 +67,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, List* inputs);
 void pop_frame(EvalContext* context);
 void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
+Branch* top_branch(EvalContext* context);
 void reset_stack(EvalContext* context);
 
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
@@ -110,7 +111,7 @@ void raise_error(EvalContext* context, Term* term, TValue* output, const char* m
 void raise_error(EvalContext* context, const char* msg);
 void raise_error(EvalContext* context, std::string const& msg);
 
-void print_runtime_error_formatted(EvalContext& context, std::ostream& output);
+void print_runtime_error_formatted(EvalContext* context, std::ostream& output);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.

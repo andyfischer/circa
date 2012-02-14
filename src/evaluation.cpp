@@ -197,6 +197,13 @@ Frame* top_frame(EvalContext* context)
 {
     return get_frame(context, 0);
 }
+Branch* top_branch(EvalContext* context)
+{
+    Frame* frame = top_frame(context);
+    if (frame == NULL)
+        return NULL;
+    return frame->branch;
+}
 
 void reset_stack(EvalContext* context)
 {
@@ -206,6 +213,14 @@ void reset_stack(EvalContext* context)
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
+    Frame* frame = push_frame(context, term->owningBranch);
+    frame->startPc = term->index;
+    frame->pc = term->index;
+    frame->endPc = frame->pc + 1;
+
+    run_interpreter(context);
+
+#if 0
     if (term->function == NULL || !is_function(term->function))
         return;
 
@@ -223,6 +238,7 @@ void evaluate_single_term(EvalContext* context, Term* term)
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
+#endif
 }
 
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
@@ -399,10 +415,10 @@ void raise_error(EvalContext* context, std::string const& msg)
     raise_error(context, msg.c_str());
 }
 
-void print_runtime_error_formatted(EvalContext& context, std::ostream& output)
+void print_runtime_error_formatted(EvalContext* context, std::ostream& output)
 {
-    output << get_short_location(context.errorTerm)
-        << " " << context_get_error_message(&context);
+    output << get_short_location(context->errorTerm)
+        << " " << context_get_error_message(context);
 }
 
 bool error_occurred(EvalContext* context)
@@ -548,8 +564,10 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
 
 void run_interpreter(EvalContext* context)
 {
+    // Save the topmost branch
     Branch* topBranch = top_frame(context)->branch;
 
+    // Make sure there are no pending code updates.
     set_branch_in_progress(topBranch, false);
 
     int initialFrameCount = context->numFrames;
