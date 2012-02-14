@@ -32,7 +32,6 @@
 #define CONTEXT (_cxt)
 #define NUM_INPUTS (num_inputs(_cxt))
 #define INPUT(index) (get_input(_cxt, (index)))
-#define INPUTS (_vals)
 #define INPUT_TERM(index) (CALLER->input(index))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))
 #define BOOL_INPUT(index) (circa::as_bool(INPUT(index)))

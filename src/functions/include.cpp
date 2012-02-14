@@ -50,7 +50,9 @@ namespace include_function {
 
         set_branch(OUTPUT, contents);
 
-        push_frame_with_inputs(context, contents, NUM_INPUTS, INPUTS);
+        List inputs;
+        copy_inputs_to_list(context, &inputs);
+        push_frame_with_inputs(context, contents, &inputs);
     }
     void include_post_compile(Term* term)
     {

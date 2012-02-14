@@ -137,19 +137,19 @@ void pop_frame(EvalContext* context)
     context->numFrames--;
 }
 
-void push_frame_with_inputs(EvalContext* context, Branch* branch, int ninputs, TValue** inputs)
+void push_frame_with_inputs(EvalContext* context, Branch* branch, List* inputs)
 {
     // Fetch inputs and start preparing the new stack frame.
     List registers;
     registers.resize(get_locals_count(branch));
     
     // Insert inputs into placeholders
-    for (int i=0; i < ninputs; i++) {
+    for (int i=0; i < inputs->length(); i++) {
         Term* placeholder = get_input_placeholder(branch, i);
         if (placeholder == NULL)
             break;
 
-        TValue* input = inputs[i];
+        TValue* input = inputs->get(i);
 
         bool castSuccess = cast(input, placeholder->type, registers[i]);
 
