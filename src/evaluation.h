@@ -99,7 +99,9 @@ TValue* evaluate(Branch* branch, Term* function, List* inputs);
 TValue* evaluate(Term* function, List* inputs);
 
 TValue* get_input(EvalContext* context, Term* term);
+TValue* get_input(EvalContext* context, int index);
 void consume_input(EvalContext* context, Term* term, TValue* dest);
+int num_inputs(EvalContext* context);
 
 Term* current_term(EvalContext* context);
 TValue* get_register(EvalContext* context, Term* term);

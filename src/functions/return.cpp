@@ -19,7 +19,9 @@ namespace return_function {
             Term* output = get_output_placeholder(branch, i);
             if (output == NULL)
                 break;
-            copy(INPUT(i), get_register(CONTEXT, output));
+            TValue* val = INPUT(i);
+            if (val != NULL)
+                copy(val, get_register(CONTEXT, output));
         }
 
         // Move PC to end

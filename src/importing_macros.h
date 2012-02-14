@@ -30,8 +30,8 @@
 
 #define CALLER (current_term(_cxt))
 #define CONTEXT (_cxt)
-#define NUM_INPUTS (_ninputs)
-#define INPUT(index) (_vals[index])
+#define NUM_INPUTS (num_inputs(_cxt))
+#define INPUT(index) (get_input(_cxt, (index)))
 #define INPUTS (_vals)
 #define INPUT_TERM(index) (CALLER->input(index))
 #define FLOAT_INPUT(index) (circa::to_float(INPUT(index)))

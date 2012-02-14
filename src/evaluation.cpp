@@ -343,9 +343,14 @@ TValue* get_input(EvalContext* context, Term* term)
     return NULL;
 }
 
+int num_inputs(EvalContext* context)
+{
+    return current_term(context)->numInputs();
+}
+
 TValue* get_input(EvalContext* context, int index)
 {
-    return NULL;
+    return get_input(context, current_term(context)->input(index));
 }
 
 void consume_input(EvalContext* context, Term* term, TValue* dest)
