@@ -9,19 +9,22 @@ namespace return_function {
 
     CA_DEFINE_FUNCTION(return_func, "return(any :multiple :optional)")
     {
+        // Grab input values
+        List inputs;
+        copy_inputs_to_list(CONTEXT, &inputs);
+
+        // Pop frames
         while (!is_subroutine(top_frame(CONTEXT)->branch->owningTerm))
             finish_frame(CONTEXT);
 
         Branch* branch = top_frame(CONTEXT)->branch;
 
         // Copy values to their output placeholders.
-        for (int i=0;; i++) {
+        for (int i=0; inputs.length(); i++) {
             Term* output = get_output_placeholder(branch, i);
             if (output == NULL)
                 break;
-            TValue* val = INPUT(i);
-            if (val != NULL)
-                copy(val, get_register(CONTEXT, output));
+            copy(inputs[i], get_register(CONTEXT, output));
         }
 
         // Move PC to end

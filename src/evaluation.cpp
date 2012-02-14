@@ -348,6 +348,19 @@ int num_inputs(EvalContext* context)
     return current_term(context)->numInputs();
 }
 
+void copy_inputs_to_list(EvalContext* context, List* list)
+{
+    int count = num_inputs(context);
+    list->resize(count);
+    for (int i=0; i < count; i++) {
+        TValue* value = get_input(context, i);
+        if (value == NULL)
+            set_null(list->get(i));
+        else
+            copy(value, list->get(i));
+    }
+}
+
 TValue* get_input(EvalContext* context, int index)
 {
     return get_input(context, current_term(context)->input(index));

@@ -102,6 +102,7 @@ TValue* get_input(EvalContext* context, Term* term);
 TValue* get_input(EvalContext* context, int index);
 void consume_input(EvalContext* context, Term* term, TValue* dest);
 int num_inputs(EvalContext* context);
+void copy_inputs_to_list(EvalContext* context, List* list);
 
 Term* current_term(EvalContext* context);
 TValue* get_register(EvalContext* context, Term* term);
