@@ -372,6 +372,12 @@ void consume_input(EvalContext* context, Term* term, TValue* dest)
     copy(get_input(context, term), dest);
 }
 
+TValue* get_output(EvalContext* context, int index)
+{
+    Frame* frame = top_frame(context);
+    return frame->registers[frame->pc + index];
+}
+
 Term* current_term(EvalContext* context)
 {
     Frame* top = top_frame(context);

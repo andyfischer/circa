@@ -39,8 +39,8 @@
 #define INT_INPUT(index) (circa::as_int(INPUT(index)))
 #define CONSUME_INPUT(index, dest) (consume_input(_cxt, INPUT_TERM(index), (dest)));
 #define STATE_INPUT (get_state_input(_cxt, CALLER))
-#define OUTPUT (_vals[_ninputs])
-#define OUTPUT_NTH(index) (_vals[_ninputs+(index)])
-#define EXTRA_OUTPUT(index) (_vals[_ninputs+1+(index)])
+#define OUTPUT (get_output(_cxt, 0))
+#define OUTPUT_NTH(index) (get_output(_cxt, (index)))
+#define EXTRA_OUTPUT(index) (get_output(_cxt, 1 + (index)))
 #define FUNCTION (CALLER->function)
 #define RAISE_ERROR(msg) (raise_error(_cxt, (msg)))
