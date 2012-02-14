@@ -206,8 +206,6 @@ void reset_stack(EvalContext* context)
 
 void evaluate_single_term(EvalContext* context, Term* term)
 {
-    TValue* inputBuffer[MAX_INPUTS];
-
     if (term->function == NULL || !is_function(term->function))
         return;
 
@@ -216,15 +214,11 @@ void evaluate_single_term(EvalContext* context, Term* term)
     if (function->evaluate == NULL)
         return;
 
-    int inputCount;
-    int outputCount;
-    fetch_input_pointers(context, term, inputBuffer, &inputCount, &outputCount);
-
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    function->evaluate(context, inputCount, outputCount, inputBuffer);
+    function->evaluate(context);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
@@ -603,7 +597,6 @@ void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int
 void run_interpreter(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
-    TValue* inputBuffer[MAX_INPUTS];
 
     set_branch_in_progress(topBranch, false);
 
@@ -640,15 +633,11 @@ do_instruction:
         goto do_instruction;
     }
 
-    int inputCount;
-    int outputCount;
-    fetch_input_pointers(context, term, inputBuffer, &inputCount, &outputCount);
-
     #if CIRCA_THROW_ON_ERROR
     try {
     #endif
 
-    evaluate(context, inputCount, outputCount, inputBuffer);
+    evaluate(context);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
