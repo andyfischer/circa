@@ -1,4 +1,5 @@
 assert_failure.ca
+builtin_funcs.ca
 boolean.ca
 cast.ca
 compound_type.ca

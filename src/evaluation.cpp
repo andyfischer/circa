@@ -143,7 +143,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, List* inputs)
     List registers;
     registers.resize(get_locals_count(branch));
     
-    // Insert inputs into placeholders
+    // Cast inputs into placeholders
     for (int i=0; i < inputs->length(); i++) {
         Term* placeholder = get_input_placeholder(branch, i);
         if (placeholder == NULL)
@@ -223,26 +223,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
-
-#if 0
-    // For a test build, we check the type of the output of every single call. This is
-    // slow, and it should be unnecessary if the function is written correctly. But it's
-    // a good test.
-    #ifdef CIRCA_TEST_BUILD
-    if (!context->errorOccurred && !is_value(term)) {
-        Type* outputType = get_output_type(term);
-        TValue* output = get_arg(context, outputList, 0);
-
-        if (outputType != &VOID_T && !cast_possible(output, outputType)) {
-            std::stringstream msg;
-            msg << "Function " << term->function->name << " produced output "
-                << output->toString() << " which doesn't fit output type "
-                << outputType->name;
-            internal_error(msg.str());
-        }
-    }
-    #endif
-#endif
 }
 
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
@@ -564,34 +544,6 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
         std::cout << std::endl;
     }
     out << "Error: " << context_get_error_message(context) << std::endl;
-}
-
-void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int* ninputs, int* noutputs)
-{
-    Frame* frame = top_frame(context);
-
-    int inputCount = term->numInputs();
-
-    for (int i=0; i < inputCount; i++)
-        buffer[i] = get_input(context, term->input(i));
-
-    // Prepare output list
-    buffer[inputCount] = frame->registers[term->index];
-    
-    int outputCount = 1;
-    for (;; outputCount++) {
-        int index = term->index + outputCount;
-        if (index >= frame->branch->length())
-            break;
-
-        if (frame->branch->get(index)->function != EXTRA_OUTPUT_FUNC)
-            break;
-
-        buffer[inputCount + outputCount] = frame->registers[index];
-    }
-
-    *ninputs = inputCount;
-    *noutputs = outputCount;
 }
 
 void run_interpreter(EvalContext* context)

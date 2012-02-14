@@ -61,10 +61,10 @@ struct Term : TValue
 
     UniqueName uniqueName;
 
-    // The branch that owns this term. May be NULL
+    // The branch that owns this term. May be NULL.
     Branch* owningBranch;
 
-    // The index that this term currently holds inside owningBranch
+    // The index that this term currently holds inside owningBranch.
     int index;
 
     // Code which is nested inside this term. This object is created on-demand.

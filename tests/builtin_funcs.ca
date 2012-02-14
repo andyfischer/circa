@@ -1,0 +1,17 @@
+
+-- cond
+assert(cond(true, 'a', 'b') == 'a')
+assert(cond(true, 'a', 'b') != 'b')
+assert(cond(false, 'a', 'b') == 'b')
+assert(cond(true, 1, 2.0) == 1)
+assert(cond(true, 2.0, 1) == 2.0)
+
+-- equals
+assert(equals(1 + 2, 3))
+assert(not(equals('hello' 1)))
+
+-- list
+l = list(1 2 'foo')
+assert(l[0] == 1)
+assert(l[1] == 2)
+assert(l[2] == 'foo')

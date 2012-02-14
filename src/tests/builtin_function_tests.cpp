@@ -43,43 +43,6 @@ void test_float()
     test_equals(point_one->toString(), "0.1");
 }
 
-void test_bool()
-{
-    Branch branch;
-
-    test_assert(as_string(branch.eval("cond(true, 'a', 'b')")) == "a");
-    test_assert(as_string(branch.eval("cond(false, 'a', 'b')")) == "b");
-}
-
-void test_builtin_equals()
-{
-    Branch branch;
-    EvalContext context;
-    branch.compile("equals(5.0, 'hello')");
-    evaluate_branch(&context, &branch);
-}
-
-void test_list()
-{
-    Branch branch;
-    TValue* l = branch.eval("l = list(1,2,'foo')");
-
-    test_assert(l->getIndex(0)->asInt() == 1);
-    test_assert(l->getIndex(1)->asInt() == 2);
-    test_assert(l->getIndex(2)->asString() == "foo");
-}
-
-void test_cond_with_int_and_float()
-{
-    Branch branch;
-
-    // This code once caused a bug
-    Term* a = branch.compile("cond(true, 1, 1.0)");
-    test_assert(a->type != &ANY_T);
-    Term* b = branch.compile("cond(true, 1.0, 1)");
-    test_assert(b->type != &ANY_T);
-}
-
 void test_do_once()
 {
     Branch branch;
@@ -250,9 +213,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(builtin_function_tests::test_int);
     REGISTER_TEST_CASE(builtin_function_tests::test_float);
-    REGISTER_TEST_CASE(builtin_function_tests::test_bool);
-    REGISTER_TEST_CASE(builtin_function_tests::test_builtin_equals);
-    REGISTER_TEST_CASE(builtin_function_tests::test_list);
     REGISTER_TEST_CASE(builtin_function_tests::test_cond_with_int_and_float);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_do_once);
     //TEST_DISABLED REGISTER_TEST_CASE(builtin_function_tests::test_changed);

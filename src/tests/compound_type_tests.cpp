@@ -9,20 +9,6 @@
 namespace circa {
 namespace compound_type_tests {
 
-void test_cast()
-{
-    Branch branch;
-    Term* t = branch.compile("type T { string a }");
-    TValue* a = branch.eval("['hi']");
-    test_assert(is_list(a));
-    test_assert(a->value_type != unbox_type(t));
-
-    TValue casted;
-    test_assert(cast(a, unbox_type(t), &casted));
-    test_assert(is_list(&casted));
-    test_assert(casted.value_type == unbox_type(t));
-}
-
 void test_bug_with_cast()
 {
     // trying to repro a Plastic bug
@@ -72,7 +58,6 @@ void test_static_type_checking()
 
 void register_tests()
 {
-    REGISTER_TEST_CASE(compound_type_tests::test_cast);
     REGISTER_TEST_CASE(compound_type_tests::test_static_type_checking);
 }
 

@@ -73,9 +73,6 @@ void reset_stack(EvalContext* context);
 void push_frame_to_demand_evaluation(EvalContext* context, Term* target);
 #endif
 
-// Pre-evaluation
-void fetch_input_pointers(EvalContext* context, Term* term, TValue** buffer, int* ninputs, int* noutputs);
-
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.
 void evaluate_single_term(EvalContext* context, Term* term);
