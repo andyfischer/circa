@@ -51,7 +51,7 @@ namespace include_function {
         set_branch(OUTPUT, contents);
 
         List inputs;
-        copy_inputs_to_list(context, &inputs);
+        consume_inputs_to_list(context, &inputs);
         push_frame_with_inputs(context, contents, &inputs);
     }
     void include_post_compile(Term* term)

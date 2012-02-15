@@ -11,7 +11,7 @@ namespace return_function {
     {
         // Grab input values
         List inputs;
-        copy_inputs_to_list(CONTEXT, &inputs);
+        consume_inputs_to_list(CONTEXT, &inputs);
 
         // Pop frames
         while (!is_subroutine(top_frame(CONTEXT)->branch->owningTerm))
@@ -24,7 +24,7 @@ namespace return_function {
             Term* output = get_output_placeholder(branch, i);
             if (output == NULL)
                 break;
-            copy(inputs[i], get_register(CONTEXT, output));
+            move(inputs[i], get_register(CONTEXT, output));
         }
 
         // Move PC to end

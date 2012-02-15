@@ -34,7 +34,11 @@ void repl_evaluate_line(EvalContext* context, std::string const& input, std::ost
             break;
         }
 
-        evaluate_single_term(context, result);
+        Frame* frame = top_frame(context);
+        frame->startPc = i;
+        frame->pc = i;
+        frame->endPc = i + 1;
+        run_interpreter(context);
 
         if (error_occurred(context)) {
             output << "error: ";
@@ -50,9 +54,11 @@ void repl_evaluate_line(EvalContext* context, std::string const& input, std::ost
     if (!anyErrors && resultIndex != -1) {
         Term* result = branch->get(resultIndex);
         if (result->type != as_type(VOID_TYPE)) {
-            output << get_register(context, result)->toString() << std::endl;
+            output << get_input(context, result)->toString() << std::endl;
         }
     }
+
+    clear_error(context);
 }
 
 int run_repl()

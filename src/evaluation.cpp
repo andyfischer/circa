@@ -338,16 +338,12 @@ int num_inputs(EvalContext* context)
     return current_term(context)->numInputs();
 }
 
-void copy_inputs_to_list(EvalContext* context, List* list)
+void consume_inputs_to_list(EvalContext* context, List* list)
 {
     int count = num_inputs(context);
     list->resize(count);
     for (int i=0; i < count; i++) {
-        TValue* value = get_input(context, i);
-        if (value == NULL)
-            set_null(list->get(i));
-        else
-            copy(value, list->get(i));
+        consume_input(context, i, list->get(i));
     }
 }
 
@@ -356,26 +352,49 @@ TValue* get_input(EvalContext* context, int index)
     return get_input(context, current_term(context)->input(index));
 }
 
+bool can_consume_output(Term* term)
+{
+    return !is_value(term) && term->users.length() == 1;
+}
+
 void consume_input(EvalContext* context, Term* term, TValue* dest)
 {
-    TValue* inputValue = get_input(context, term);
+    TValue* value = get_input(context, term);
 
-    if (inputValue == NULL) {
+    if (value == NULL) {
         set_null(dest);
         return;
     }
 
-    if (!is_value(term) && term->users.length() == 1) {
-        move(inputValue, dest);
-        set_name(inputValue, name_Consumed);
+    if (can_consume_output(term)) {
+        move(value, dest);
+        set_name(value, name_Consumed);
     } else {
-        copy(inputValue, dest);
+        copy(value, dest);
     }
 }
 
 void consume_input(EvalContext* context, int index, TValue* dest)
 {
     return consume_input(context, current_term(context)->input(index), dest);
+}
+
+bool consume_cast(EvalContext* context, int index, Type* type, TValue* dest)
+{
+    Term* term = current_term(context)->input(index);
+    TValue* value = get_input(context, term);
+    if (value == NULL)
+        return false;
+
+    if (can_consume_output(term)) {
+        // Move the value and cast in place
+        move(value, dest);
+        set_name(value, name_Consumed);
+        return cast(dest, type, dest);
+    } else {
+        // Normal cast
+        return cast(value, type, dest);
+    }
 }
 
 TValue* get_output(EvalContext* context, int index)
@@ -578,6 +597,14 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
     out << "Error: " << context_get_error_message(context) << std::endl;
 }
 
+void update_context_to_latest_branches(EvalContext* context)
+{
+    for (int i=0; i < context->numFrames; i++) {
+        Frame* frame = get_frame(context, i);
+        frame->registers.resize(get_locals_count(frame->branch));
+    }
+}
+
 void run_interpreter(EvalContext* context)
 {
     // Save the topmost branch
@@ -585,6 +612,9 @@ void run_interpreter(EvalContext* context)
 
     // Make sure there are no pending code updates.
     set_branch_in_progress(topBranch, false);
+
+    // Check if our context needs to be updated following branch modification
+    update_context_to_latest_branches(context);
 
     int initialFrameCount = context->numFrames;
 

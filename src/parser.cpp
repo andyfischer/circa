@@ -725,7 +725,8 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     as_type(result)->declaringTerm = result;
 
     // Attributes
-    possible_whitespace_or_newline(tokens);
+    result->setStringProp("syntax:preLBracketWhitespace",
+            possible_whitespace_or_newline(tokens));
 
     while (tokens.nextIs(TK_SYMBOL)) {
         std::string s = tokens.consumeStr();
@@ -739,9 +740,6 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
 
         possible_whitespace_or_newline(tokens);
     }
-
-    result->setStringProp("syntax:preLBracketWhitespace",
-            possible_whitespace_or_newline(tokens));
 
     // if there's a semicolon, then finish it as an empty type.
     if (tokens.nextIs(TK_SEMICOLON)) {

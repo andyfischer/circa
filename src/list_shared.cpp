@@ -145,6 +145,7 @@ ListData* list_double_capacity(ListData* original)
 
 ListData* list_resize(ListData* original, int numElements)
 {
+    // Check if 'original' is an empty list
     if (original == NULL) {
         if (numElements == 0)
             return NULL;
@@ -153,10 +154,15 @@ ListData* list_resize(ListData* original, int numElements)
         return result;
     }
 
+    // Check to reduce 'original' to an empty list
     if (numElements == 0) {
         list_decref(original);
         return NULL;
     }
+
+    // Check if the number of elements doesn't need to change
+    if (original->count == numElements)
+        return original;
 
     // Check for not enough capacity
     if (numElements > original->capacity) {
@@ -164,9 +170,6 @@ ListData* list_resize(ListData* original, int numElements)
         result->count = numElements;
         return result;
     }
-
-    if (original->count == numElements)
-        return original;
 
     // Capacity is good, will need to modify 'count' on list and possibly
     // set some items to null. This counts as a modification.

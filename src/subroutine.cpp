@@ -60,7 +60,7 @@ CA_FUNCTION(evaluate_subroutine)
         if (placeholder == NULL)
             break;
 
-        bool castSuccess = cast(INPUT(i), placeholder->type, registers[i]);
+        bool castSuccess = consume_cast(CONTEXT, i, placeholder->type, registers[i]);
 
         if (!castSuccess) {
             std::stringstream msg;
