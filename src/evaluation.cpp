@@ -112,6 +112,7 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     Frame* top = &context->stack[context->numFrames - 1];
     initialize_null(&top->registers);
     swap(registers, &top->registers);
+    top->registers.resize(get_locals_count(branch));
     top->branch = branch;
     top->pc = 0;
     top->nextPc = 0;
@@ -122,7 +123,6 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
 Frame* push_frame(EvalContext* context, Branch* branch)
 {
     List registers;
-    registers.resize(get_locals_count(branch));
     return push_frame(context, branch, &registers);
 }
 void pop_frame(EvalContext* context)
@@ -352,9 +352,14 @@ TValue* get_input(EvalContext* context, int index)
     return get_input(context, current_term(context)->input(index));
 }
 
-bool can_consume_output(Term* term)
+bool can_consume_output(Term* consumer, Term* input)
 {
-    return !is_value(term) && term->users.length() == 1;
+    // Only consume for terms inside the same branch. This is to prevent a term
+    // that is inside a loop from wrongly consuming a value outside the loop.
+    if (consumer->owningBranch != input->owningBranch)
+        return false;
+
+    return !is_value(input) && input->users.length() == 1;
 }
 
 void consume_input(EvalContext* context, Term* term, TValue* dest)
@@ -366,7 +371,7 @@ void consume_input(EvalContext* context, Term* term, TValue* dest)
         return;
     }
 
-    if (can_consume_output(term)) {
+    if (can_consume_output(current_term(context), term)) {
         move(value, dest);
         set_name(value, name_Consumed);
     } else {
@@ -381,12 +386,13 @@ void consume_input(EvalContext* context, int index, TValue* dest)
 
 bool consume_cast(EvalContext* context, int index, Type* type, TValue* dest)
 {
-    Term* term = current_term(context)->input(index);
+    Term* currentTerm = current_term(context);
+    Term* term = currentTerm->input(index);
     TValue* value = get_input(context, term);
     if (value == NULL)
         return false;
 
-    if (can_consume_output(term)) {
+    if (can_consume_output(currentTerm, term)) {
         // Move the value and cast in place
         move(value, dest);
         set_name(value, name_Consumed);
@@ -619,6 +625,7 @@ void run_interpreter(EvalContext* context)
     int initialFrameCount = context->numFrames;
 
 do_instruction:
+
     ca_assert(!error_occurred(context));
 
     Frame* frame = top_frame(context);

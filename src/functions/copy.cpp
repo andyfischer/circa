@@ -7,7 +7,7 @@ namespace copy_function {
 
     CA_FUNCTION(evaluate)
     {
-        copy(INPUT(0), OUTPUT);
+        CONSUME_INPUT(0, OUTPUT);
     }
 
     Type* specializeType(Term* caller)

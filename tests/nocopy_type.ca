@@ -7,3 +7,18 @@ def identity(T t) -> T
   return t
 
 t = identity(t)
+
+t = if true { t } else { null }
+t = if false { null } else { t }
+
+t2 = null
+for i in []
+    t2 = t
+
+t = t2
+
+t3 = null
+for i in [1]
+    t3 = t
+
+t = t3

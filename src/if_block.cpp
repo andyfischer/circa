@@ -87,6 +87,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     int existingInputCount = ifBlock->numInputs();
 
     Term* placeholder = append_input_placeholder(contents);
+    rename(placeholder, input->name);
     ca_assert(placeholder->index == existingInputCount);
     change_declared_type(placeholder, input->type);
 
@@ -99,6 +100,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
         ca_assert(count_input_placeholders(caseContents) == existingInputCount);
         Term* casePlaceholder = append_input_placeholder(caseContents);
         change_declared_type(casePlaceholder, placeholder->type);
+        rename(casePlaceholder, input->name);
     }
 
     return placeholder;
@@ -267,6 +269,7 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 
         set_input(ifCall, i, outer);
         Term* placeholder = append_input_placeholder(nested_contents(ifCall));
+        rename(placeholder, outer->name);
 
         // Go through each case and repoint to this new placeholder
         for (CaseIterator it(contents); it.unfinished(); it.advance()) {
@@ -526,11 +529,7 @@ CA_FUNCTION(evaluate_if_block)
 
             // Copy inputs
             List registers;
-            registers.resize(get_locals_count(acceptedBranch));
-            int numInputs = NUM_INPUTS;
-            for (int inputIndex=0; inputIndex < numInputs; inputIndex++)
-                copy(INPUT(inputIndex), registers[inputIndex]);
-
+            consume_inputs_to_list(context, &registers);
             push_frame(context, acceptedBranch, &registers);
             return;
         }

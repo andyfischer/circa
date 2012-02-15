@@ -73,7 +73,7 @@ int run_command_line(List* args)
 
         if (string_eq(args->get(0), "-break-on")) {
             String name;
-            string_append(&name, "$");
+            set_string(&name, "$");
             string_append(&name, (String*) args->get(1));
             DEBUG_BREAK_ON_TERM = strdup(as_cstring(&name));
 
@@ -332,7 +332,6 @@ int run_command_line(List* args)
 
     if (has_static_errors(main_branch)) {
         print_static_errors_formatted(main_branch, std::cout);
-        //dump(main_branch);
         return 1;
     }
 
