@@ -86,9 +86,11 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
 
     int ret = 0;
 
+    printf("callback grabbing lock..");
     ret = pthread_mutex_lock(&server->mutex);
     swap(&message, server->incomingMessages.append());
     ret = pthread_mutex_unlock(&server->mutex);
+    printf("callback released lock..");
 
     return 1;
 }
@@ -115,19 +117,23 @@ CA_FUNCTION(osc__create_server_thread)
     lo_server_thread_start(server->server_thread);
 
     set_pointer(OUTPUT, CALLER->type, server);
+    printf("created\n");
 }
 
 CA_FUNCTION(osc__read_from_server)
 {
-    Server* server = (Server*) handle_t::get_ptr(INPUT(0));
+    Server* server = as_server(INPUT(0));
 
     List incoming;
 
+    printf("read grabbing lock..");
     pthread_mutex_lock(&server->mutex);
     swap(&incoming, &server->incomingMessages);
     pthread_mutex_unlock(&server->mutex);
+    printf("read released lock..");
 
     swap(&incoming, OUTPUT);
+    printf("reading\n");
 }
 
 CA_FUNCTION(osc__address)
@@ -142,6 +148,8 @@ CA_FUNCTION(osc__address)
 
 CA_FUNCTION(osc__send)
 {
+    printf("calling 'send'\n");
+
     const char* destination = STRING_INPUT(1);
 
     const int c_maxArguments = 15;
@@ -182,13 +190,19 @@ CA_FUNCTION(osc__send)
     lo_message_free(message);
 }
 
+void dont_copy(Type* type, TValue* source, TValue* dest)
+{
+    internal_error("don't copy");
+}
 
 void on_load(Branch* branch)
 {
     Type* serverType = get_declared_type(branch, "osc:Server");
     Type* addressType = get_declared_type(branch, "osc:Address");
 
+    serverType->copy = dont_copy;
     serverType->release = server_release;
+    addressType->copy = dont_copy;
     addressType->release = address_release;
 }
 

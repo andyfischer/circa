@@ -85,7 +85,8 @@ const Name name_ByDemand = 16;
 // Temporary register values
 const Name name_Unevaluated = 17;
 const Name name_InProgress = 18;
-const Name name_Lazy = 19;
+const Name name_Lazy = 13;
+const Name name_Consumed = 19;
 
 const Name c_FirstRuntimeName = 1000;
 

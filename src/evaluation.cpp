@@ -358,8 +358,24 @@ TValue* get_input(EvalContext* context, int index)
 
 void consume_input(EvalContext* context, Term* term, TValue* dest)
 {
-    // TODO: Make this swap() values when possible
-    copy(get_input(context, term), dest);
+    TValue* inputValue = get_input(context, term);
+
+    if (inputValue == NULL) {
+        set_null(dest);
+        return;
+    }
+
+    if (!is_value(term) && term->users.length() == 1) {
+        move(inputValue, dest);
+        set_name(inputValue, name_Consumed);
+    } else {
+        copy(inputValue, dest);
+    }
+}
+
+void consume_input(EvalContext* context, int index, TValue* dest)
+{
+    return consume_input(context, current_term(context)->input(index), dest);
 }
 
 TValue* get_output(EvalContext* context, int index)

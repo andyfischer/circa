@@ -440,6 +440,7 @@ const char* name_to_string(Name name)
         case name_Default: return "Default";
         case name_ByDemand: return "ByDemand";
         case name_Unevaluated: return "Unevaluated";
+        case name_Consumed: return "Consumed";
         case name_InProgress: return "InProgress";
         case name_Lazy: return "Lazy";
     }

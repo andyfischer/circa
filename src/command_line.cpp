@@ -43,6 +43,7 @@ void print_usage()
         "  -print-state        : Print state as text after running the script\n"
         "\n"
         "Available commands:\n"
+        "  -loop <filename>  : Run the script repeatedly until terminated\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
         "  -e <expression>   : Evaluate an expression on the command line\n"
         "  -check <filename> : Statically check the script for any errors\n"
@@ -186,6 +187,29 @@ int run_command_line(List* args)
     // Start repl
     if (string_eq(args->get(0), "-repl"))
         return run_repl();
+
+    // Start evaluation loop
+    if (string_eq(args->get(0), "-loop")) {
+        Branch branch;
+        load_script(&branch, as_cstring(list_get_index(args, 1)));
+
+        if (has_static_errors(&branch)) {
+            print_static_errors_formatted(&branch, std::cout);
+            return -1;
+        }
+
+        EvalContext context;
+
+        while (true) {
+            if (error_occurred(&context)) {
+                print_runtime_error_formatted(&context, std::cout);
+                return -1;
+            }
+
+            evaluate_branch(&context, &branch);
+            sleep(1);
+        }
+    }
 
     // Start debugger repl
     if (string_eq(args->get(0), "-d"))

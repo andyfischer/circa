@@ -1,0 +1,14 @@
+
+import osc
+
+print(osc:return_5())
+
+for msg in osc:listen(2222)
+    print('received: ' msg)
+
+state i = 0
+i += 1
+
+state addr = osc:address('127.0.0.1', 2222)
+print('sending: ' i)
+osc:send(addr '/' i)

@@ -164,11 +164,7 @@ namespace cppbuild_function { CA_FUNCTION(build_module); }
 // Standard library functions
 CA_FUNCTION(evaluate_output_placeholder)
 {
-    TValue* in = INPUT(0);
-    if (in == NULL)
-        set_null(OUTPUT);
-    else
-        copy(in, OUTPUT);
+    CONSUME_INPUT(0, OUTPUT);
 }
 
 Type* output_placeholder_specializeType(Term* caller)

@@ -99,6 +99,7 @@ TValue* evaluate(Term* function, List* inputs);
 TValue* get_input(EvalContext* context, Term* term);
 TValue* get_input(EvalContext* context, int index);
 void consume_input(EvalContext* context, Term* term, TValue* dest);
+void consume_input(EvalContext* context, int index, TValue* dest);
 int num_inputs(EvalContext* context);
 void copy_inputs_to_list(EvalContext* context, List* list);
 TValue* get_output(EvalContext* context, int index);

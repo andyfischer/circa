@@ -7,6 +7,9 @@ namespace osc
     type Server;
     type Address;
 
+    def return_5() -> int
+        return 5
+
     def create_server_thread(int port) -> Server
     def read_from_server(Server server) -> List
     def address(string hostname, int port) -> Address
