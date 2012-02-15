@@ -31,7 +31,6 @@ struct Function
     Term* feedbackFunc;
     TValue parameter;
     bool throws;
-    bool createsStackFrame;
 
     // Functions
     EvaluateFunc evaluate;

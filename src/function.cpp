@@ -23,7 +23,6 @@ Function::Function()
     contents(NULL),
     feedbackFunc(NULL),
     throws(false),
-    createsStackFrame(false),
     evaluate(NULL),
     specializeType(NULL),
     formatSource(NULL),

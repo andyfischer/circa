@@ -61,7 +61,6 @@ namespace for_function {
     {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         as_function(FOR_FUNC)->formatSource = formatSource;
-        as_function(FOR_FUNC)->createsStackFrame = true;
 
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");

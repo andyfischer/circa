@@ -146,15 +146,6 @@ Term* find_term_with_function(Branch* branch, Term* func);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);
 
-bool branch_creates_stack_frame(Branch* branch);
-int get_frame_distance(Branch* frame, Term* input);
-int get_frame_distance(Term* term, Term* input);
-
-// Input instructions:
-void write_stack_input_instruction(Branch* callingFrame, Term* input, TValue* isn);
-ListData* write_input_instruction_list(Term* caller, ListData* list);
-ListData* write_output_instruction_list(Term* caller, ListData* list);
-
 // Code modification
 Term* find_user_with_function(Term* term, const char* funcName);
 Term* apply_before(Term* existing, Term* function, int input);

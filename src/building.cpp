@@ -853,77 +853,6 @@ Term* find_user_with_function(Term* target, Term* func)
     return NULL;
 }
 
-bool branch_creates_stack_frame(Branch* branch)
-{
-    if (branch->owningTerm == NULL)
-        return true;
-
-    // Special case that should be removed; #outer_rebinds doesn't create a stack
-    // frame.
-    if (branch->owningTerm->name == "#outer_rebinds")
-        return false;
-
-    return as_function(branch->owningTerm->function)->createsStackFrame;
-}
-
-int get_frame_distance(Branch* frame, Term* input)
-{
-    if (input == NULL)
-        return -1;
-
-    Branch* inputFrame = input->owningBranch;
-
-    // If the input's branch doesn't create a separate stack frame, then look
-    // at the parent branch.
-    if (!branch_creates_stack_frame(inputFrame))
-        inputFrame = get_parent_branch(inputFrame);
-
-    // Walk upward from 'term' until we find the common branch.
-    int distance = 0;
-    while (frame != inputFrame) {
-
-        if (branch_creates_stack_frame(frame))
-            distance++;
-
-        frame = get_parent_branch(frame);
-
-        if (frame == NULL)
-            return -1;
-    }
-    return distance;
-}
-
-int get_frame_distance(Term* term, Term* input)
-{
-    return get_frame_distance(term->owningBranch, input);
-}
-
-void write_stack_input_instruction(Branch* callingFrame, Term* input, TValue* isn)
-{
-    change_type(isn, &StackVariableIsn_t);
-    int relativeFrame = get_frame_distance(callingFrame, input);
-
-    // Special case: if a term in a #joining branch is trying to reach a neighboring
-    // branch, then that's okay.
-    if (relativeFrame == -1 && callingFrame->owningTerm->name == "#joining")
-        relativeFrame = 0;
-    
-    isn->value_data.asint = 0;
-    isn->value_data.asint += relativeFrame << 16;
-    isn->value_data.asint += (input->index % 0xffff);
-}
-
-void write_input_instruction(Term* caller, Term* input, TValue* isn)
-{
-    if (input == NULL) {
-        set_pointer(isn, &NullInputIsn_t, NULL);
-    } else if (is_value(input)) {
-        set_pointer(isn, &GlobalVariableIsn_t, input);
-    } else {
-        write_stack_input_instruction(caller->owningBranch, input, isn);
-    }
-}
-
 bool term_is_state_input(Term* term, int index)
 {
     if (index >= term->numInputs())
@@ -945,6 +874,7 @@ Term* find_state_input(Branch* branch)
     }
     return NULL;
 }
+
 bool has_state_input(Branch* branch)
 {
     return find_state_input(branch) != NULL;
@@ -1021,46 +951,6 @@ Term* find_parent_term_in_branch(Term* term, Branch* branch)
 
         term = get_parent_term(term);
     }
-}
-
-ListData* write_input_instruction_list(Term* caller, ListData* list)
-{
-    list = list_resize(list, 0);
-
-    int declaredIndex = 0;
-
-    for (int i=0; i < caller->numInputs(); i++) {
-
-        Term* placeholder = term_get_input_placeholder(caller, declaredIndex);
-        ca_assert(placeholder != NULL);
-
-        write_input_instruction(caller, caller->input(i), list_append(&list));
-
-        // Advance to the next declaredIndex, unless we found a :multiple input.
-        if (!function_is_multiple_input(placeholder))
-            declaredIndex++;
-    }
-
-    return list;
-}
-
-ListData* write_output_instruction_list(Term* caller, ListData* list)
-{
-    list = list_resize(list, 1);
-
-    // Always write a primary output that corresponds to the caller's register.
-    write_input_instruction(caller, caller, list_get_index(list, 0));
-
-    // Write instructions for nearby extra_output() calls.
-    for (int i=1; ; i++) {
-        Term* receiver = caller->owningBranch->getSafe(caller->index + i);
-        if (receiver == NULL || receiver->function != EXTRA_OUTPUT_FUNC)
-            break;
-
-        write_input_instruction(caller, receiver, list_append(&list));
-    }
-
-    return list;
 }
 
 Term* find_user_with_function(Term* term, const char* funcName)
