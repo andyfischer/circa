@@ -40,6 +40,11 @@ namespace type_t {
         append_phrase(source, "type ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TYPE_NAME);
 
+        if (as_type(term)->nocopy) {
+            append_phrase(source, " ", term, phrase_type::WHITESPACE);
+            append_phrase(source, ":nocopy", term, phrase_type::UNDEFINED);
+        }
+
         if (term->boolPropOptional("syntax:semicolon", false)) {
             //append_phrase(source, ";", term, phrase_type::UNDEFINED);
             return;
@@ -116,7 +121,8 @@ Type::Type() :
     visitHeap(NULL),
     gcListReferences(NULL),
     gcRelease(NULL),
-    parent(NULL)
+    parent(NULL),
+    nocopy(false)
 {
     // Register ourselves. Start out as 'permanent'.
     gc_register_new_object((CircaObject*) this, &TYPE_T, true);

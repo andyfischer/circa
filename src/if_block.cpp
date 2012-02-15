@@ -111,8 +111,14 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     Term* placeholder = prepend_output_placeholder(contents, NULL);
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Branch* caseContents = nested_contents(it.current());
-        prepend_output_placeholder(nested_contents(it.current()),
-            find_last_non_comment_expression(caseContents));
+
+        Term* result = find_last_non_comment_expression(caseContents);
+
+        // If the last term already has a name then don't make it the default output.
+        if (result != NULL && result->name != "")
+            result = NULL;
+
+        prepend_output_placeholder(nested_contents(it.current()), result);
     }
     return placeholder;
 }

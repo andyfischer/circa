@@ -235,6 +235,9 @@ void copy(TValue* source, TValue* dest)
     if (source == dest)
         return;
 
+    if (source->value_type->nocopy)
+        internal_error("copy() called on a nocopy type");
+
     Type::Copy copyFunc = source->value_type->copy;
 
     if (copyFunc != NULL) {

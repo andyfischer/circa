@@ -118,17 +118,20 @@ def run_all_tests():
 
     for file in [TestRoot+'/'+f for f in get_list_of_enabled_tests()]:
         totalTestCount += 1
+
         try:
             failures = test_file(process, file)
+            if failures:
+                totalFailedTests += 1
+                print str(len(failures)) + " failure(s) in "+file+":"
+            for failure in failures:
+                for line in failure.description:
+                    print " "+line
         except Exception,e:
             print "Exception occurred during test:", file
+            import traceback
+            traceback.print_exc()
 
-        if failures:
-            totalFailedTests += 1
-            print str(len(failures)) + " failure(s) in "+file+":"
-        for failure in failures:
-            for line in failure.description:
-                print " "+line
 
     print "Ran",totalTestCount,"tests,",totalFailedTests,"failed."
     

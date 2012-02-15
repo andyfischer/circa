@@ -724,6 +724,22 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     Term* result = create_value(branch, &TYPE_T);
     as_type(result)->declaringTerm = result;
 
+    // Attributes
+    possible_whitespace_or_newline(tokens);
+
+    while (tokens.nextIs(TK_SYMBOL)) {
+        std::string s = tokens.consumeStr();
+
+        if (s == ":nocopy") {
+            as_type(result)->nocopy = true;
+        } else {
+            return compile_error_for_line(result, tokens, startPosition,
+                "Unrecognized type attribute: " + s);
+        }
+
+        possible_whitespace_or_newline(tokens);
+    }
+
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 

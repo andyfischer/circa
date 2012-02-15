@@ -115,6 +115,7 @@ struct Type
     
     // Type parameters
     TValue parameter;
+    bool nocopy;
 
     Type();
     ~Type();

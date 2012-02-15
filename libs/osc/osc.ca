@@ -20,5 +20,4 @@ namespace osc
         if server_thread == null
             server_thread = create_server_thread(port)
 
-        return read_from_server(server_thread)
-
+        read_from_server(server_thread)

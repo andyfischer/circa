@@ -1,0 +1,9 @@
+
+type T :nocopy;
+
+t = create(T)
+
+def identity(T t) -> T
+  return t
+
+t = identity(t)
