@@ -2,45 +2,44 @@
 Introduction
 ============
 
-Circa is a programming language designed for live coding. Most programming languages try to
-improve *what* you can express, with Circa we instead try to improve *how* you create code.
+Circa is a programming language designed for live coding. Most programming languages
+try to improve *what* you can express, with Circa we instead try to improve *how* you
+create code.
 
 Features
 ========
 
- - Live coding. Has a rich API for examining or modifying code at runtime.
- - State is preserved across most code changes.
- - Supports live code changes made by external tools (such as separate text editors), as well
-   as changes made within the system.
- - Code is stored in a (relatively) simple format, allowing for easy introspection and
-   static reasoning.
- - Visual programming is supported.
- - Compiled code can be unparsed back to text, with all comments and formatting preserved.
-   This allows for a hybrid approach of textual and visual code editing.
+ - Code can be modified at runtime
+ - State can be redefined at runtime, and is preserved across code changes
+ - Changes can be made by any external program that can modify text files
+ - Simple API for making code changes, enabling non-text methods for modifying code
+ - Supports a round trip where compiled code can be unparsed back to source text,
+   allowing runtime changes to be saved as text files.
+ - Supports plugins (which themselves can be recompiled and reloaded at runtime)
+ - Embeddable in a C/C++/Obj-C application
 
 Implementation
 ==============
 
 Some implementation details:
 
- - Uses static structural typing with type inference.
- - Compiled code is stored as an ordered dataflow graph.
- - Pluggable type system, each type dictates its own form of garbage collection.
  - Implemented in C++
- - Interpreted execution. (an LLVM backend is planned for the future)
- - Currently supported on XP and OSX. A Linux port would probably not be hard.
+ - Interpreted execution. (some form of JIT is planned for the future)
+ - Compiled code is stored in a normalized, unoptimized format
+ - Static typing with a pervasive 'any' type. Supports simple type inferrence.
+ - Cross-platform, primary platform is OSX
 
 Current status
 ==============
 
-This project is currently alpha-level. Curious people, or people interested in hacking along,
-are welcome to try it out. People who want to use it for serious projects, or people who don't
-like bugs, are recommended to wait for a beta release.
+This project is currently alpha-level. Curious people, or people interested in
+hacking along, are welcome to try it out. People who want to use it for serious
+projects, or people who don't like bugs, are recommended to wait for a beta release.
 
 Building
 ========
 
-Instructions for building on a Unixy system. For building on Windows, see docs/building.md .
+Instructions for building on a Unixy system:
 
 Make sure you have Python, Scons, and a C++ compiler installed.
 
@@ -49,6 +48,8 @@ From the project's root directory, run:
 ./make
 
 which will produce a binary at build/circa
+
+For building on Windows, see docs/building.md
 
 Documentation
 =============
