@@ -27,33 +27,18 @@ struct Server
     }
 };
 
+void ServerRelease(TValue* value)
+{
+    delete (Server*) as_opaque_pointer(value);
+}
+
+void AddressRelease(TValue* value)
+{
+    lo_address_free((lo_address) as_opaque_pointer(value));
+}
+
 Name name_Server = name_from_string("Server");
 Name name_Address = name_from_string("Address");
-
-Server* as_server(TValue* value)
-{
-    if (value->value_type->name == name_Server)
-        return (Server*) get_handle_as_opaque_pointer(value);
-    return NULL;
-}
-
-lo_address as_address(TValue* value)
-{
-    if (value->value_type->name == name_Address)
-        return (lo_address) get_handle_as_opaque_pointer(value);
-    return NULL;
-}
-void server_release(Type* type, TValue* value)
-{
-    delete as_server(value);
-}
-
-void address_release(Type* type, TValue* value)
-{
-    lo_address_free(as_address(value));
-}
-
-extern "C" {
 
 void error_callback(int num, const char *m, const char *path)
 {
@@ -95,11 +80,13 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
     return 1;
 }
 
-CA_FUNCTION(osc__create_server_thread)
+EXPORT CA_FUNCTION(osc__create_server_thread)
 {
     int port = INT_INPUT(0);
     char portStr[15];
     sprintf(portStr, "%d", port);
+
+    printf("create_server_thread: %d\n", port);
 
     Server* server = new Server();
     // printf("opened server at %s, server = %p\n", portStr, server);
@@ -116,37 +103,36 @@ CA_FUNCTION(osc__create_server_thread)
             (void*) server);
     lo_server_thread_start(server->server_thread);
 
-    set_handle_as_opaque_pointer(OUTPUT, CALLER->type, server);
-    printf("created\n");
+    set_handle_value_opaque_pointer(OUTPUT, CALLER->type, server, ServerRelease);
 }
 
-CA_FUNCTION(osc__read_from_server)
+EXPORT CA_FUNCTION(osc__read_from_server)
 {
-    Server* server = as_server(INPUT(0));
+    Server* server = (Server*) get_handle_value_opaque_pointer(INPUT(0));
 
     List incoming;
 
-    printf("read grabbing lock..");
+    printf("read grabbing lock..\n");
     pthread_mutex_lock(&server->mutex);
     swap(&incoming, &server->incomingMessages);
     pthread_mutex_unlock(&server->mutex);
-    printf("read released lock..");
+    printf("read released lock..\n");
 
     swap(&incoming, OUTPUT);
     printf("reading\n");
 }
 
-CA_FUNCTION(osc__address)
+EXPORT CA_FUNCTION(osc__address)
 {
     int port = INT_INPUT(1);
     char portStr[20];
     sprintf(portStr, "%d", port);
 
     lo_address address = lo_address_new(STRING_INPUT(0), portStr);
-    set_handle_as_opaque_pointer(OUTPUT, CALLER->type, address);
+    set_handle_value_opaque_pointer(OUTPUT, CALLER->type, address, AddressRelease);
 }
 
-CA_FUNCTION(osc__send)
+EXPORT CA_FUNCTION(osc__send)
 {
     printf("calling 'send'\n");
 
@@ -181,7 +167,8 @@ CA_FUNCTION(osc__send)
     }
 
     if (!failed) {
-        int result = lo_send_message(as_address(INPUT(0)), destination, message);
+        lo_address address = get_handle_value_opaque_pointer(INPUT(0));
+        int result = lo_send_message(address, destination, message);
 
         if (result == -1)
             RAISE_ERROR("lo_send_message returned -1");
@@ -190,8 +177,10 @@ CA_FUNCTION(osc__send)
     lo_message_free(message);
 }
 
-void on_load(Branch* branch)
+EXPORT void on_load(Branch* branch)
 {
+    Type* server = get_declared_type(branch, "osc:Server");
+    Type* address = get_declared_type(branch, "osc:Address");
+    setup_handle_type(server);
+    setup_handle_type(address);
 }
-
-} // extern "C"

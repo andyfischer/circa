@@ -1,0 +1,15 @@
+
+def stateful_call() -> List
+  state i = 0
+  i += 1
+  return [i]
+
+def main()
+
+  for i in stateful_call()
+      print(i)
+
+s = null
+main(state = s)
+main(state = s)
+main(state = s)

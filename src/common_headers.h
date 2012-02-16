@@ -26,7 +26,7 @@
 #include <sstream>
 #include <stdlib.h>
 
-#define export_func extern "C"
+#define EXPORT extern "C"
 
 namespace circa {
 

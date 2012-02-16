@@ -969,6 +969,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     }
 
     Term* listExpr = infix_expression(branch, tokens, context).term;
+    post_compile_term(listExpr);
 
     std::string name;
     if (rebindListName)

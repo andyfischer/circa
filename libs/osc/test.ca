@@ -1,8 +1,6 @@
 
 import osc
 
-print(osc:return_5())
-
 for msg in osc:listen(2222)
     print('received: ' msg)
 

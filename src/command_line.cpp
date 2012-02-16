@@ -207,6 +207,8 @@ int run_command_line(List* args)
             }
 
             evaluate_branch(&context, &branch);
+
+            dump(&context.state);
             sleep(1);
         }
     }
@@ -365,7 +367,7 @@ int run_command_line(List* args)
 
 using namespace circa;
 
-export_func int circa_run_command_line(int argc, const char* args[])
+EXPORT int circa_run_command_line(int argc, const char* args[])
 {
     List args_v;
     set_list(&args_v, 0);

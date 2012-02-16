@@ -495,7 +495,7 @@ void install_standard_library(Branch* kernel)
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
 }
 
-export_func void circa_initialize()
+EXPORT void circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
@@ -520,7 +520,7 @@ export_func void circa_initialize()
     }
 }
 
-export_func void circa_shutdown()
+EXPORT void circa_shutdown()
 {
     SHUTTING_DOWN = true;
 
@@ -545,17 +545,17 @@ export_func void circa_shutdown()
     memset(&FUNCS, NULL, sizeof(FUNCS));
 }
 
-export_func void circa_add_module_search_path(const char* path)
+EXPORT void circa_add_module_search_path(const char* path)
 {
     modules_add_search_path(path);
 }
 
-export_func Term* circa_load_module_from_file(Name module_name, const char* filename)
+EXPORT Term* circa_load_module_from_file(Name module_name, const char* filename)
 {
     return load_module_from_file(module_name, filename);
 }
 
-export_func Name circa_name_from_string(const char* str)
+EXPORT Name circa_name_from_string(const char* str)
 {
     return name_from_string(str);
 }

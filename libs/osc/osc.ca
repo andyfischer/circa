@@ -7,17 +7,11 @@ namespace osc
     type Server;
     type Address;
 
-    def return_5() -> int
-        return 5
-
     def create_server_thread(int port) -> Server
     def read_from_server(Server server) -> List
     def address(string hostname, int port) -> Address
     def send(Address address, string path, any values)
     
     def listen(int port) -> List
-        state server_thread = null
-        if server_thread == null
-            server_thread = create_server_thread(port)
-
-        read_from_server(server_thread)
+        state server_thread = create_server_thread(port)
+        return read_from_server(server_thread)

@@ -26,11 +26,7 @@ void ReleaseThing(TValue* value)
 
 extern "C" CA_FUNCTION(create_thing)
 {
-    ReleaseFunc r = ReleaseThing;
-
-    TValue value;
-    set_opaque_pointer(&value, new Thing());
-    set_handle_value(OUTPUT, CALLER->type, &value, ReleaseThing);
+    set_handle_value_opaque_pointer(OUTPUT, CALLER->type, new Thing(), ReleaseThing);
 }
 
 extern "C" void on_load(Branch* branch)

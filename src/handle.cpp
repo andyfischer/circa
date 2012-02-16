@@ -41,6 +41,11 @@ TValue* get_handle_value(TValue* handle)
     return &container->value;
 }
 
+void* get_handle_value_opaque_pointer(TValue* handle)
+{
+    return as_opaque_pointer(get_handle_value(handle));
+}
+
 void handle_release(TValue* value)
 {
     if (value->value_data.ptr == NULL)
@@ -82,6 +87,13 @@ void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc rel
     swap(value, &container->value);
     container->releaseFunc = releaseFunc;
     handle->value_data.ptr = container;
+}
+
+void set_handle_value_opaque_pointer(TValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)
+{
+    TValue pointerVal;
+    set_opaque_pointer(&pointerVal, ptr);
+    set_handle_value(handle, type, &pointerVal, releaseFunc);
 }
 
 } // namespace circa

@@ -354,12 +354,12 @@ TValue* get_input(EvalContext* context, int index)
 
 bool can_consume_output(Term* consumer, Term* input)
 {
-    // Only consume for terms inside the same branch. This is to prevent a term
-    // that is inside a loop from wrongly consuming a value outside the loop.
-    if (consumer->owningBranch != input->owningBranch)
-        return false;
+    // Disabled due to a few problems
+    //  - Stateful values were being lost
+    //  - Terms inside of loops were able to consume values outside the loop
+    return false;
 
-    return !is_value(input) && input->users.length() == 1;
+    //return !is_value(input) && input->users.length() == 1;
 }
 
 void consume_input(EvalContext* context, Term* term, TValue* dest)
