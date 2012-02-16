@@ -71,11 +71,9 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
 
     int ret = 0;
 
-    printf("callback grabbing lock..");
     ret = pthread_mutex_lock(&server->mutex);
     swap(&message, server->incomingMessages.append());
     ret = pthread_mutex_unlock(&server->mutex);
-    printf("callback released lock..");
 
     return 1;
 }
@@ -86,10 +84,7 @@ EXPORT CA_FUNCTION(osc__create_server_thread)
     char portStr[15];
     sprintf(portStr, "%d", port);
 
-    printf("create_server_thread: %d\n", port);
-
     Server* server = new Server();
-    // printf("opened server at %s, server = %p\n", portStr, server);
 
     server->server_thread = lo_server_thread_new(portStr, error_callback);
 
@@ -112,14 +107,11 @@ EXPORT CA_FUNCTION(osc__read_from_server)
 
     List incoming;
 
-    printf("read grabbing lock..\n");
     pthread_mutex_lock(&server->mutex);
     swap(&incoming, &server->incomingMessages);
     pthread_mutex_unlock(&server->mutex);
-    printf("read released lock..\n");
 
     swap(&incoming, OUTPUT);
-    printf("reading\n");
 }
 
 EXPORT CA_FUNCTION(osc__address)
@@ -134,8 +126,6 @@ EXPORT CA_FUNCTION(osc__address)
 
 EXPORT CA_FUNCTION(osc__send)
 {
-    printf("calling 'send'\n");
-
     const char* destination = STRING_INPUT(1);
 
     const int c_maxArguments = 15;

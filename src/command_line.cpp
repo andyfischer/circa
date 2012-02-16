@@ -208,7 +208,6 @@ int run_command_line(List* args)
 
             evaluate_branch(&context, &branch);
 
-            dump(&context.state);
             sleep(1);
         }
     }
