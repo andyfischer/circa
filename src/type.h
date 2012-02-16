@@ -24,6 +24,7 @@ const int STORAGE_TYPE_LIST = 5;
 const int STORAGE_TYPE_OPAQUE_POINTER = 6;
 const int STORAGE_TYPE_TYPE = 7;
 const int STORAGE_TYPE_REF = 8;
+const int STORAGE_TYPE_HANDLE = 9;
 
 extern Term* IMPLICIT_TYPES;
 
@@ -125,7 +126,6 @@ private:
     Type(Type const&) { internal_error(""); }
     Type& operator=(Type const&) { internal_error(""); return *this; }
 };
-
 
 struct StaticTypeQuery
 {

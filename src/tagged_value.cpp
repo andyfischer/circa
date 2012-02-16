@@ -647,4 +647,5 @@ void cleanup_transient_value(TValue* value)
     initialize_null(value);
 }
 
+
 } // namespace circa

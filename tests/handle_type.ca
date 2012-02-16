@@ -1,0 +1,2 @@
+
+type MyHandle = handle_type()
