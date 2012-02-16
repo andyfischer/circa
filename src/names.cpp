@@ -514,5 +514,9 @@ Name name_from_string(const char* str)
 
     return name;
 }
+Name name_from_string(TValue* str)
+{
+    return name_from_string(as_cstring(str));
+}
 
 } // namespace circa

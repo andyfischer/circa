@@ -206,6 +206,34 @@ char string_get(TValue* s, int index)
     return as_cstring(s)[index];
 }
 
+int string_length(TValue* s)
+{
+    return strlen(as_cstring(s));
+}
+
+void string_slice(TValue* s, int start, int end, TValue* out)
+{
+    if (end == -1)
+        end = string_length(s);
+
+    set_string(out, "");
+    int len = end - start;
+    string_resize(out, len);
+
+    for (int i=0; i < len; i++)
+        as_std_string(out)[i] = string_get(s, i + start);
+}
+
+int string_find_char(TValue* s, int start, char c)
+{
+    const char* cstr = as_cstring(s);
+
+    for (int i=start; cstr[i] != 0; i++)
+        if (cstr[i] == c)
+            return i;
+    return -1;
+}
+
 std::string& as_std_string(TValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);

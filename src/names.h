@@ -60,6 +60,7 @@ Name as_name(TValue* tv);
 void set_name(TValue* tv, Name name);
 
 Name name_from_string(const char* str);
+Name name_from_string(TValue* str);
 
 const Name name_None = 0;
 const Name name_File = 2;

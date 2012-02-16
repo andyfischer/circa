@@ -1,10 +1,13 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "../branch.h"
+#include "../building.h"
 #include "../common_headers.h"
 #include "../evaluation.h"
+#include "../kernel.h"
 #include "../list_shared.h"
 #include "../modules.h"
+#include "../parser.h"
 #include "../source_repro.h"
 #include "../static_checking.h"
 #include "../string_type.h"
@@ -37,28 +40,31 @@ void read_stdin_line(TValue* line)
     free(buf);
 }
 
-void parse_tokens_as_argument_list(TokenStream* tokens, List* output)
+void parse_string_as_argument_list(TValue* str, List* output)
 {
     // Read the tokens as a space-seperated list of strings.
     // TODO is to be more smart about word boundaries: spaces inside
     // quotes or parentheses shouldn't break apart items.
+
+    TokenStream tokens;
+    tokens.reset(as_cstring(str));
     
     TValue itemInProgress;
     set_string(&itemInProgress, "");
 
-    while (!tokens->finished()) {
+    while (!tokens.finished()) {
 
-        if (tokens->nextIs(TK_WHITESPACE)) {
+        if (tokens.nextIs(TK_WHITESPACE)) {
             if (!equals_string(&itemInProgress, "")) {
                 copy(&itemInProgress, list_append(output));
                 set_string(&itemInProgress, "");
             }
 
         } else {
-            string_append(&itemInProgress, tokens->nextStr().c_str());
+            string_append(&itemInProgress, tokens.nextStr().c_str());
         }
 
-        tokens->consume();
+        tokens.consume();
     }
 
     if (!equals_string(&itemInProgress, "")) {
@@ -85,7 +91,7 @@ void do_file_command(List* args, TValue* reply)
     bool printState = false;
     bool dontRunScript = false;
 
-    int argIndex = 0;
+    int argIndex = 1;
 
     while (true) {
 
@@ -153,37 +159,76 @@ void do_file_command(List* args, TValue* reply)
     }
 }
 
-void do_command(TValue* string, TValue* reply)
+void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
 {
-    // Tokenize the incoming string
-    TokenStream tokens;
-    tokens.reset(string);
+    Name name = name_from_string(branchName);
 
-    if (tokens.length() == 0) {
-        set_null(reply);
-        return;
+    Term* term = get_global(name);
+
+    // Create the branch if needed
+    if (term == NULL) {
+        term = apply(kernel(), FUNCS.branch, TermList(), name_to_string(name));
     }
 
+    // Import the new branch contents
+    Branch* branch = nested_contents(term);
+    clear_branch(branch);
+    parser::compile(branch, parser::statement_list, as_cstring(contents));
+
+    post_module_load(branch);
+
+    if (has_static_errors(branch)) {
+        std::stringstream errors;
+        print_static_errors_formatted(branch);
+        set_string(reply, errors.str());
+    } else {
+        set_name(reply, name_Success);
+    }
+}
+
+void do_command(TValue* string, TValue* reply)
+{
+    // Identify the command
+    int first_space = string_find_char(string, 0, ' ');
+    if (first_space == -1)
+        first_space = string_length(string);
+
     TValue command;
-    tokens.consumeStr(&command);
+    string_slice(string, 0, first_space, &command);
 
     set_null(reply);
 
     if (equals_string(&command, "add_lib_path")) {
-        List args;
-        parse_tokens_as_argument_list(&tokens, &args);
+        //List args;
+        //parse_tokens_as_argument_list(&tokens, &args);
 
     } else if (equals_string(&command, "file")) {
 
         List args;
-        parse_tokens_as_argument_list(&tokens, &args);
+        parse_string_as_argument_list(string, &args);
         do_file_command(&args, reply);
 
     } else if (equals_string(&command, "echo")) {
 
         List args;
-        parse_tokens_as_argument_list(&tokens, &args);
+        parse_string_as_argument_list(string, &args);
         do_echo(&args, reply);
+
+    } else if (equals_string(&command, "write_branch")) {
+
+        int nextSpace = string_find_char(string, first_space+1, ' ');
+        if (nextSpace == -1) {
+            set_string(reply, "Syntax error, not enough arguments");
+            return;
+        }
+        
+        TValue branchName;
+        string_slice(string, first_space+1, nextSpace, &branchName);
+
+        TValue contents;
+        string_slice(string, nextSpace+1, -1, &contents);
+
+        do_write_branch(&branchName, &contents, reply);
 
     } else {
 

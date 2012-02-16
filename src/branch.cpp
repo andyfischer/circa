@@ -568,10 +568,15 @@ Name load_script(Branch* branch, const char* filename)
 
     parser::compile(branch, parser::statement_list, as_string(&contents));
 
-    // Post-load steps
-    dll_loading_check_for_patches_on_loaded_branch(branch);
+    post_module_load(branch);
 
     return name_Success;
+}
+
+void post_module_load(Branch* branch)
+{
+    // Post-load steps
+    dll_loading_check_for_patches_on_loaded_branch(branch);
 }
 
 void evaluate_script(Branch* branch, const char* filename)

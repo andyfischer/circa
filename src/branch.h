@@ -137,6 +137,7 @@ void clear_branch(Branch* branch);
 void duplicate_branch(Branch* source, Branch* dest);
 
 Name load_script(Branch* branch, const char* filename);
+void post_module_load(Branch* branch);
 void evaluate_script(Branch* branch, const char* filename);
 
 // Create an include() call that loads the given file. Returns the included

@@ -2423,4 +2423,6 @@ int get_number_of_decimal_figures(std::string const& str)
 }
 
 } // namespace parser
+
+
 } // namespace circa
