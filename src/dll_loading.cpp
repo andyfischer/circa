@@ -215,6 +215,8 @@ void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
             patch_with_dll(as_cstring(&filename), branch, &error);
 
             if (!is_null(&error)) {
+                std::cout << as_string(&error) << std::endl;
+
                 mark_static_error(caller, &error);
                 continue;
             }

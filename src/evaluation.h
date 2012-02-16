@@ -70,6 +70,7 @@ Frame* top_frame(EvalContext* context);
 Branch* top_branch(EvalContext* context);
 void reset_stack(EvalContext* context);
 
+
 #ifdef DEFERRED_CALLS_FIRST_DRAFT
 void push_frame_to_demand_evaluation(EvalContext* context, Term* target);
 #endif
@@ -107,6 +108,10 @@ TValue* get_output(EvalContext* context, int index);
 
 Term* current_term(EvalContext* context);
 TValue* get_register(EvalContext* context, Term* term);
+
+// Create an output value for the current term, using the declared type's
+// initialize function.
+void create_output(EvalContext* context);
 
 // Signal that a runtime error has occurred.
 void raise_error(EvalContext* context, Term* term, TValue* output, const char* msg);

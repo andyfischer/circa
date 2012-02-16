@@ -64,6 +64,7 @@ typedef void (*EvaluateFunc)(EvalContext* cxt);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
+typedef void (*ReleaseFunc)(TValue* value);
 
 const int MAX_INPUTS = 64;
 

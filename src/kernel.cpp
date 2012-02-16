@@ -28,7 +28,6 @@
 #include "types/color.h"
 #include "types/common.h"
 #include "types/eval_context.h"
-#include "types/handle.h"
 #include "types/hashtable.h"
 #include "types/indexable.h"
 #include "types/int.h"
@@ -245,7 +244,7 @@ void create_primitive_types()
     dict_t::setup_type(&DICT_T);
     eval_context_t::setup_type(&EVAL_CONTEXT_T);
     number_t::setup_type(&FLOAT_T);
-    handle_t::setup_type(&HANDLE_T);
+    // handle_t::setup_type(&HANDLE_T);
     int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);
     string_setup_type(&STRING_T);
@@ -257,19 +256,6 @@ void create_primitive_types()
 
     // errors are just stored as strings for now
     string_setup_type(&ERROR_T);
-
-    // input instructions
-#if 0 // DELETEME
-    StackVariableIsn_t.name = "StackVariableIsn";
-    StackVariableIsn_t.storageType = STORAGE_TYPE_INT;
-    StackVariableIsn_t.toString = stackVariable_toString;
-    GlobalVariableIsn_t.name = "GlobalVariableIsn";
-    GlobalVariableIsn_t.storageType = STORAGE_TYPE_REF;
-    NullInputIsn_t.name = "NullInputIsn";
-    NullInputIsn_t.storageType = STORAGE_TYPE_REF;
-    ImplicitStateInputIsn_t.name = "ImplicitStateInputIsn";
-    ImplicitStateInputIsn_t.storageType = STORAGE_TYPE_INT;
-#endif
 }
 
 void bootstrap_kernel()
@@ -575,3 +561,5 @@ export_func Name circa_name_from_string(const char* str)
 }
 
 } // namespace circa
+
+#include "handle.cpp"

@@ -183,7 +183,7 @@ void set_null(TValue* value)
 void release(TValue* value)
 {
     if (value->value_type != NULL) {
-        Type::Release release = value->value_type->release;
+        ReleaseFunc release = value->value_type->release;
         if (release != NULL)
             release(value);
     }

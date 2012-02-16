@@ -13,15 +13,15 @@ struct HandleContainer
 {
     int refcount;
     TValue value;
-    Type::Release releaseFunc;
+    ReleaseFunc releaseFunc;
 };
 
-HandleContainer* alloc_handle_container(Type::Release releaseFunc)
+HandleContainer* alloc_handle_container()
 {
     HandleContainer* c = (HandleContainer*) malloc(sizeof(HandleContainer));
     c->refcount = 1;
-    c->releaseFunc = releaseFunc;
-    set_null(&c->value);
+    c->releaseFunc = NULL;
+    initialize_null(&c->value);
     return c;
 }
 
@@ -33,31 +33,55 @@ HandleContainer* get_handle_container(TValue* handle)
     return (HandleContainer*) handle->value_data.ptr;
 }
 
+TValue* get_handle_value(TValue* handle)
+{
+    HandleContainer* container = get_handle_container(handle);
+    if (container == NULL)
+        return NULL;
+    return &container->value;
+}
+
 void handle_release(TValue* value)
 {
+    if (value->value_data.ptr == NULL)
+        return;
+
     HandleContainer* container = get_handle_container(value);
     ca_assert(container != NULL);
 
     container->refcount--;
+
     if (container->refcount <= 0) {
         if (container->releaseFunc != NULL)
             container->releaseFunc(&container->value);
         free(container);
-        set_null(value);
     }
+}
+
+void handle_copy(Type* type, TValue* source, TValue* dest)
+{
+    set_null(dest);
+    get_handle_container(source)->refcount++;
+    dest->value_type = source->value_type;
+    dest->value_data = source->value_data;
 }
 
 void setup_handle_type(Type* type)
 {
     type->storageType = STORAGE_TYPE_HANDLE;
     type->initialize = NULL;
+    type->copy = handle_copy;
     type->release = handle_release;
 }
 
-
-void set_handle_value(TValue* handle, TValue* value)
+void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc releaseFunc)
 {
-    
+    set_null(handle);
+    change_type(handle, type);
+    HandleContainer* container = alloc_handle_container();
+    swap(value, &container->value);
+    container->releaseFunc = releaseFunc;
+    handle->value_data.ptr = container;
 }
 
 } // namespace circa

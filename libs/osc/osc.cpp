@@ -33,14 +33,14 @@ Name name_Address = name_from_string("Address");
 Server* as_server(TValue* value)
 {
     if (value->value_type->name == name_Server)
-        return (Server*) value->value_data.ptr;
+        return (Server*) get_handle_as_opaque_pointer(value);
     return NULL;
 }
 
 lo_address as_address(TValue* value)
 {
     if (value->value_type->name == name_Address)
-        return (lo_address) value->value_data.ptr;
+        return (lo_address) get_handle_as_opaque_pointer(value);
     return NULL;
 }
 void server_release(Type* type, TValue* value)
@@ -116,7 +116,7 @@ CA_FUNCTION(osc__create_server_thread)
             (void*) server);
     lo_server_thread_start(server->server_thread);
 
-    set_pointer(OUTPUT, CALLER->type, server);
+    set_handle_as_opaque_pointer(OUTPUT, CALLER->type, server);
     printf("created\n");
 }
 
@@ -143,7 +143,7 @@ CA_FUNCTION(osc__address)
     sprintf(portStr, "%d", port);
 
     lo_address address = lo_address_new(STRING_INPUT(0), portStr);
-    set_pointer(OUTPUT, CALLER->type, address);
+    set_handle_as_opaque_pointer(OUTPUT, CALLER->type, address);
 }
 
 CA_FUNCTION(osc__send)
@@ -190,20 +190,8 @@ CA_FUNCTION(osc__send)
     lo_message_free(message);
 }
 
-void dont_copy(Type* type, TValue* source, TValue* dest)
-{
-    internal_error("don't copy");
-}
-
 void on_load(Branch* branch)
 {
-    Type* serverType = get_declared_type(branch, "osc:Server");
-    Type* addressType = get_declared_type(branch, "osc:Address");
-
-    serverType->copy = dont_copy;
-    serverType->release = server_release;
-    addressType->copy = dont_copy;
-    addressType->release = address_release;
 }
 
 } // extern "C"

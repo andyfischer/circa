@@ -7,6 +7,7 @@
 #include "../../../src/evaluation.h"
 #include "../../../src/feedback.h"
 #include "../../../src/filesystem.h"
+#include "../../../src/handle.h"
 #include "../../../src/if_block.h"
 #include "../../../src/importing.h"
 #include "../../../src/importing_macros.h"
@@ -27,7 +28,6 @@
 #include "../../../src/type_inference.h"
 #include "../../../src/update_cascades.h"
 
-#include "../../../src/types/handle.h"
 #include "../../../src/types/point.h"
 #include "../../../src/types/rect_i.h"
 #include "../../../src/types/ref.h"

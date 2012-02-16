@@ -422,6 +422,13 @@ TValue* get_register(EvalContext* context, Term* term)
     return frame->registers[term->index];
 }
 
+void create_output(EvalContext* context)
+{
+    Term* caller = current_term(context);
+    TValue* output = get_output(context, 0);
+    create(caller->type, output);
+}
+
 void raise_error(EvalContext* context, Term* term, TValue* output, const char* message)
 {
     // Save the error as this term's output value.
