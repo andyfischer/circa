@@ -38,7 +38,7 @@ struct CastResult
 struct Type
 {
     typedef void (*Initialize)(Type* type, TValue* value);
-    typedef void (*Release)(Type* type, TValue* value);
+    typedef void (*Release)(TValue* value);
     typedef void (*Copy)(Type* type, TValue* source, TValue* dest);
     typedef void (*Reset)(Type* type, TValue* value);
     typedef bool (*Equals)(Type* type, TValue* lhs, TValue* rhs);

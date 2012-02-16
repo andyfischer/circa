@@ -83,7 +83,7 @@ namespace string_t {
     {
         set_pointer(value, new std::string());
     }
-    void release(Type*, TValue* value)
+    void release(TValue* value)
     {
         delete ((std::string*) get_pointer(value));
         set_pointer(value, NULL);

@@ -33,7 +33,7 @@ HandleContainer* get_handle_container(TValue* handle)
     return (HandleContainer*) handle->value_data.ptr;
 }
 
-void handle_release(Type* type, TValue* value)
+void handle_release(TValue* value)
 {
     HandleContainer* container = get_handle_container(value);
     ca_assert(container != NULL);
@@ -41,7 +41,7 @@ void handle_release(Type* type, TValue* value)
     container->refcount--;
     if (container->refcount <= 0) {
         if (container->releaseFunc != NULL)
-            container->releaseFunc(NULL, &container->value);
+            container->releaseFunc(&container->value);
         free(container);
         set_null(value);
     }

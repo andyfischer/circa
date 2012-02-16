@@ -174,7 +174,7 @@ void set_null(TValue* value)
         return;
 
     if (value->value_type->release != NULL)
-        value->value_type->release(value->value_type, value);
+        value->value_type->release(value);
 
     value->value_type = &NULL_T;
     value->value_data.ptr = NULL;
@@ -185,7 +185,7 @@ void release(TValue* value)
     if (value->value_type != NULL) {
         Type::Release release = value->value_type->release;
         if (release != NULL)
-            release(value->value_type, value);
+            release(value);
     }
     value->value_type = &NULL_T;
     value->value_data.ptr = 0;

@@ -343,7 +343,7 @@ namespace tagged_value_wrappers {
     {
         value->value_data.ptr = NULL;
     }
-    void release(Type*, TValue* value)
+    void release(TValue* value)
     {
         free_table((Hashtable*) value->value_data.ptr);
     }

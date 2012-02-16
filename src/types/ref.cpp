@@ -27,7 +27,7 @@ namespace ref_t {
         dupe->weakPtr = 0;
         value->value_data.ptr = dupe;
     }
-    void release(Type*, TValue* value)
+    void release(TValue* value)
     {
         delete (RobustRef*) value->value_data.ptr;
     }

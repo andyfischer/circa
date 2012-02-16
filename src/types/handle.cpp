@@ -61,8 +61,9 @@ namespace handle_t {
         value->value_data.ptr = NULL;
         //internal_error("don't call simple_handle::initialize");
     }
-    void release(Type* type, TValue* value)
+    void release(TValue* value)
     {
+        Type* type = value->value_type;
         ListData* data = (ListData*) value->value_data.ptr;
 
         if (data == NULL)

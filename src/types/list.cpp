@@ -99,7 +99,7 @@ namespace list_t {
         }
     }
 
-    void tv_release(Type*, TValue* value)
+    void tv_release(TValue* value)
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
