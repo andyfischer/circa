@@ -20,4 +20,5 @@ z.ca
 .DS_Store
 *.os
 *.so
-*.so.dSYM
+*.dSYM
+*.dylib

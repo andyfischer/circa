@@ -252,4 +252,10 @@ const char* as_cstring(TValue* value)
     return ((std::string*) value->value_data.ptr)->c_str();
 }
 
+void set_string(TValue* value, const char* s, int length)
+{
+    create(&STRING_T, value);
+    as_std_string(value).assign(s, length);
+}
+
 } // namespace circa

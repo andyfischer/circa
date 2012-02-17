@@ -27,4 +27,6 @@ int string_find_char(TValue* s, int start, char c);
 const char* as_cstring(TValue* value);
 std::string const& as_string(TValue* value);
 
+void set_string(TValue* value, const char* s, int length);
+
 } // namespace circa

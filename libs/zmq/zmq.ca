@@ -1,0 +1,13 @@
+
+sys:dll_patch()
+
+namespace zmq
+    type Requester;
+    type Responder;
+
+    def create_responder(int port) -> Responder
+    def create_requester() -> Requester
+
+    def Responder.read(r) -> any
+    def Responder.reply(r, any)
+    def Requester.send(r) -> any

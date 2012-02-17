@@ -1,0 +1,4 @@
+
+name = 'zmq'
+cflags = '-I../../../zeromq-2.1.11/include'
+linkflags = '-lzmq'
