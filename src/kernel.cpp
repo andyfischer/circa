@@ -37,6 +37,8 @@
 #include "types/symbol.h"
 #include "types/void.h"
 
+#include "tools/command_reader.h"
+
 namespace circa {
 
 Branch* KERNEL = NULL;
@@ -210,6 +212,11 @@ CA_FUNCTION(reflect__kernel)
 CA_FUNCTION(sys__module_search_paths)
 {
     copy(modules_get_search_paths(), OUTPUT);
+}
+
+CA_FUNCTION(sys__do_admin_command)
+{
+    do_admin_command(INPUT(0), OUTPUT);
 }
 
 CA_FUNCTION(Branch__dump)
@@ -487,6 +494,7 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("reflect:this_branch"), reflect__this_branch);
     install_function(kernel->get("reflect:kernel"), reflect__kernel);
     install_function(kernel->get("sys:module_search_paths"), sys__module_search_paths);
+    install_function(kernel->get("sys:do_admin_command"), sys__do_admin_command);
     install_function(kernel->get("Branch.dump"), Branch__dump);
 
     LENGTH_FUNC = kernel->get("length");

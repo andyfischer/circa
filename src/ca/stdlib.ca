@@ -27,6 +27,7 @@ namespace sys
     def arg(int index) -> string
     def dll_patch()
     def module_search_paths() -> List
+    def do_admin_command(string cmd) -> string
 
 def Branch.dump(b)
 

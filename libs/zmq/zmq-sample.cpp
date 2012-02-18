@@ -42,9 +42,7 @@ int main(int nargs, const char** args)
         zmq_close(responder);
 
 
-
     } else {
-        printf("Starting requester\n");
 
         void *socket = zmq_socket(context, ZMQ_REQ);
         printf("Connecting to %s\n", args[1]);
@@ -54,8 +52,9 @@ int main(int nargs, const char** args)
 
         zmq_msg_t request;
         zmq_msg_init_size(&request, 5);
-        memcpy(zmq_msg_data(&request), "Hello", 5);
-        printf("Sending hello\n");
+        const char* msg_str = args[2];
+        memcpy(zmq_msg_data(&request), msg_str, strlen(msg_str));
+        printf("Sending: %s\n", msg_str);
         zmq_send(socket, &request, 0);
         zmq_msg_close(&request);
 
@@ -65,7 +64,7 @@ int main(int nargs, const char** args)
 
         std::string msg;
         msg.assign((char*) zmq_msg_data(&reply), zmq_msg_size(&reply));
-        printf("Received: %s\n", msg.c_str());
+        printf("Reply: %s\n", msg.c_str());
         zmq_msg_close(&reply);
 
         zmq_close(socket);

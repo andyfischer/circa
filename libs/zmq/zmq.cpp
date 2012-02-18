@@ -36,8 +36,19 @@ void ResponderRelease(TValue* value)
 struct Requester
 {
     void* socket;
+
+    Requester()
+    {
+        socket = NULL;
+    }
 };
 
+void RequesterRelease(TValue* value)
+{
+    Requester* requester = (Requester*) as_opaque_pointer(value);
+    zmq_close(requester->socket);
+    delete requester;
+}
 
 EXPORT CA_FUNCTION(zmq__create_responder)
 {
@@ -104,7 +115,7 @@ EXPORT CA_FUNCTION(zmq__Responder_reply)
     int len = strlen(msg_str);
     zmq_msg_init_size(&msg, len);
     memcpy(zmq_msg_data(&msg), msg_str, len);
-    printf("Sending: %s\n", msg_str);
+
     if (zmq_send(responder->socket, &msg, 0) == -1) {
         printf("zmq_reply failed with error: %s\n", strerror(errno));
     }
@@ -116,7 +127,16 @@ EXPORT CA_FUNCTION(zmq__create_requester)
     Requester* requester = new Requester();
     requester->socket = zmq_socket(g_context, ZMQ_REQ);
     
+    const char* addr = STRING_INPUT(0);
 
+    if (zmq_bind(requester->socket, addr) == -1) {
+        printf("zmq_bind failed with error: %s\n", strerror(errno));
+        RAISE_ERROR("zmq_bind failed\n");
+        delete requester;
+        return;
+    }
+
+    set_handle_value_opaque_pointer(OUTPUT, CALLER->type, requester, RequesterRelease);
 }
 
 EXPORT CA_FUNCTION(zmq__Requester_read)

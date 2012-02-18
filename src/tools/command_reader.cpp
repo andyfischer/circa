@@ -186,7 +186,7 @@ void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
     }
 }
 
-void do_command(TValue* string, TValue* reply)
+void do_admin_command(TValue* string, TValue* reply)
 {
     // Identify the command
     int first_space = string_find_char(string, 0, ' ');
@@ -246,7 +246,7 @@ void run_commands_from_stdin()
             break;
 
         TValue reply;
-        do_command(&line, &reply);
+        do_admin_command(&line, &reply);
 
         if (is_null(&reply))
             ; // no op

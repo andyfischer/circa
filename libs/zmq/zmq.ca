@@ -6,7 +6,7 @@ namespace zmq
     type Responder;
 
     def create_responder(int port) -> Responder
-    def create_requester() -> Requester
+    def create_requester(string addr) -> Requester
 
     def Responder.read(r) -> any
     def Responder.reply(r, any)
