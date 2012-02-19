@@ -11,7 +11,7 @@ namespace circa {
 
 struct TermNamespace
 {
-    typedef std::map<std::string, TermPtr> StringToTermMap;
+    typedef std::map<std::string, Term*> StringToTermMap;
     typedef StringToTermMap::iterator iterator;
     typedef StringToTermMap::const_iterator const_iterator;
 

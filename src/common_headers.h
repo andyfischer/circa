@@ -53,7 +53,6 @@ struct Term;
 struct TermList;
 struct Type;
 
-typedef Term* TermPtr;
 typedef bool (*TermVisitor)(Term* term, TValue* context);
 
 // Function-related typedefs:

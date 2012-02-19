@@ -27,7 +27,7 @@
 namespace circa {
 namespace parser {
 
-TermPtr compile(Branch* branch, ParsingStep step, std::string const& input)
+Term* compile(Branch* branch, ParsingStep step, std::string const& input)
 {
     set_branch_in_progress(branch, true);
 
@@ -43,7 +43,7 @@ TermPtr compile(Branch* branch, ParsingStep step, std::string const& input)
     return result;
 }
 
-TermPtr evaluate(Branch* branch, ParsingStep step, std::string const& input)
+Term* evaluate(Branch* branch, ParsingStep step, std::string const& input)
 {
     int prevHead = branch->length();
 

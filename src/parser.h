@@ -39,8 +39,8 @@ struct ParseResult {
 
 typedef ParseResult (*ParsingStep)(Branch* branch, TokenStream& tokens, ParserCxt* context);
 
-TermPtr compile(Branch* branch, ParsingStep step, std::string const& input);
-TermPtr evaluate(Branch* branch, ParsingStep step, std::string const& input);
+Term* compile(Branch* branch, ParsingStep step, std::string const& input);
+Term* evaluate(Branch* branch, ParsingStep step, std::string const& input);
 
 Term* evaluate(Branch* branch, std::string const& input);
 
