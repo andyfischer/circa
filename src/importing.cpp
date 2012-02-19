@@ -32,6 +32,8 @@ void install_function(Term* function, EvaluateFunc evaluate)
 Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 {
     Term* term = find_name(branch, name);
+    if (term == NULL)
+        internal_error("Name not found in install_function");
     as_function(term)->evaluate = evaluate;
     return term;
 }

@@ -553,21 +553,5 @@ EXPORT void circa_shutdown()
     memset(&FUNCS, NULL, sizeof(FUNCS));
 }
 
-EXPORT void circa_add_module_search_path(const char* path)
-{
-    modules_add_search_path(path);
-}
-
-EXPORT Term* circa_load_module_from_file(Name module_name, const char* filename)
-{
-    return load_module_from_file(module_name, filename);
-}
-
-EXPORT Name circa_name_from_string(const char* str)
-{
-    return name_from_string(str);
-}
 
 } // namespace circa
-
-#include "handle.cpp"

@@ -95,5 +95,10 @@ void set_handle_value_opaque_pointer(TValue* handle, Type* type, void* ptr, Rele
     set_opaque_pointer(&pointerVal, ptr);
     set_handle_value(handle, type, &pointerVal, releaseFunc);
 }
+void handle_set_release_func(TValue* handle, ReleaseFunc releaseFunc)
+{
+    HandleContainer* container = get_handle_container(handle);
+    container->releaseFunc = releaseFunc;
+}
 
 } // namespace circa

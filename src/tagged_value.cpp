@@ -466,7 +466,6 @@ void set_string(TValue* value, const char* s)
     *((std::string*) value->value_data.ptr) = s;
 }
 
-
 void set_string(TValue* value, std::string const& s)
 {
     set_string(value, s.c_str());

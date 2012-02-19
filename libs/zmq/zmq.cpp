@@ -8,9 +8,9 @@
 #include "unistd.h"
 #include "string.h"
 
-#include "circa/internal/for_hosted_funcs.h"
+#include "circa/circa.h"
 
-using namespace circa;
+extern "C" {
 
 void *g_context = zmq_init(1);
 
@@ -26,9 +26,9 @@ struct Responder
     }
 };
 
-void ResponderRelease(TValue* value)
+void ResponderRelease(caValue* value)
 {
-    Responder* responder = (Responder*) as_opaque_pointer(value);
+    Responder* responder = (Responder*) circa_as_pointer(value);
     zmq_close(responder->socket);
     delete responder;
 }
@@ -43,39 +43,42 @@ struct Requester
     }
 };
 
-void RequesterRelease(TValue* value)
+void RequesterRelease(caValue* value)
 {
-    Requester* requester = (Requester*) as_opaque_pointer(value);
+    Requester* requester = (Requester*) circa_as_pointer(value);
     zmq_close(requester->socket);
     delete requester;
 }
 
-EXPORT CA_FUNCTION(zmq__create_responder)
+void zmq__create_responder(caStack* stack)
 {
     Responder* responder = new Responder();
     responder->socket = zmq_socket(g_context, ZMQ_REP);
 
-    int port = INT_INPUT(0);
+    int port = circa_int_input(stack, 0);
     char addr[50];
     sprintf(addr, "tcp://*:%d", port);
 
     if (zmq_bind(responder->socket, addr) == -1) {
         printf("zmq_bind failed with error: %s\n", strerror(errno));
-        RAISE_ERROR("zmq_bind failed\n");
+        circa_raise_error(stack, "zmq_bind failed\n");
         delete responder;
         return;
     }
 
-    set_handle_value_opaque_pointer(OUTPUT, CALLER->type, responder, ResponderRelease);
+    caValue* out = circa_create_default_output(stack, 0);
+    circa_set_pointer(out, responder);
+    circa_handle_set_release_func(out, ResponderRelease);
 }
 
-EXPORT CA_FUNCTION(zmq__Responder_read)
+void zmq__Responder_read(caStack* stack)
 {
-    Responder* responder = (Responder*) get_handle_value_opaque_pointer(INPUT(0));
+    Responder* responder = (Responder*) circa_as_pointer(
+        circa_handle_get_value(circa_input(stack, 0)));
 
     // Don't allow a read if we never replied to the last message
     if (responder->expectingReply) {
-        RAISE_ERROR("read() called but we never sent a reply() to previous message");
+        circa_raise_error(stack, "read() called but we never sent a reply() to previous message");
         return;
     }
 
@@ -84,32 +87,33 @@ EXPORT CA_FUNCTION(zmq__Responder_read)
     if (zmq_recv(responder->socket, &msg, ZMQ_NOBLOCK) == -1) {
         if (errno == EAGAIN) {
             // No message available right now; this is normal.
-            set_null(OUTPUT);
+            circa_set_null(circa_output(stack, 0));
         } else {
             printf("zmq_recv failed with error: %s\n", strerror(errno));
         }
     } else {
 
         // Successfully received a message
-        set_string(OUTPUT, (char*) zmq_msg_data(&msg), zmq_msg_size(&msg));
+        circa_set_string_size(circa_output(stack, 0), (char*) zmq_msg_data(&msg), zmq_msg_size(&msg));
         responder->expectingReply = true;
     }
 
     zmq_msg_close(&msg);
 }
 
-EXPORT CA_FUNCTION(zmq__Responder_reply)
+void zmq__Responder_reply(caStack* stack)
 {
-    Responder* responder = (Responder*) get_handle_value_opaque_pointer(INPUT(0));
+    Responder* responder = (Responder*)  circa_as_pointer(
+        circa_handle_get_value(circa_input(stack, 0)));
 
     if (!responder->expectingReply) {
-        RAISE_ERROR("reply() called but there's no message to reply to");
+        circa_raise_error(stack, "reply() called but there's no message to reply to");
         return;
     }
 
     responder->expectingReply = false;
 
-    const char* msg_str = STRING_INPUT(1);
+    const char* msg_str = circa_string_input(stack, 1);
 
     zmq_msg_t msg;
     int len = strlen(msg_str);
@@ -122,29 +126,33 @@ EXPORT CA_FUNCTION(zmq__Responder_reply)
     zmq_msg_close(&msg);
 }
 
-EXPORT CA_FUNCTION(zmq__create_requester)
+void zmq__create_requester(caStack* stack)
 {
     Requester* requester = new Requester();
     requester->socket = zmq_socket(g_context, ZMQ_REQ);
     
-    const char* addr = STRING_INPUT(0);
+    const char* addr = circa_string_input(stack, 0);
 
     if (zmq_bind(requester->socket, addr) == -1) {
         printf("zmq_bind failed with error: %s\n", strerror(errno));
-        RAISE_ERROR("zmq_bind failed\n");
+        circa_raise_error(stack, "zmq_bind failed");
         delete requester;
         return;
     }
 
-    set_handle_value_opaque_pointer(OUTPUT, CALLER->type, requester, RequesterRelease);
+    caValue* out = circa_create_default_output(stack, 0);
+    circa_set_pointer(out, requester);
+    circa_handle_set_release_func(out, RequesterRelease);
 }
 
-EXPORT CA_FUNCTION(zmq__Requester_read)
+void zmq__Requester_read(caStack* stack)
 {
 }
 
-EXPORT void on_load(Branch* branch)
+void on_load(caBranch* branch)
 {
-    setup_handle_type(get_declared_type(branch, "zmq:Requester"));
-    setup_handle_type(get_declared_type(branch, "zmq:Responder"));
+    // setup_handle_type(get_declared_type(branch, "zmq:Requester"));
+    // setup_handle_type(get_declared_type(branch, "zmq:Responder"));
 }
+
+} // extern "C"
