@@ -8,6 +8,7 @@
 #include "loops.h"
 #include "function.h"
 #include "if_block.h"
+#include "handle.h"
 #include "introspection.h"
 #include "list_shared.h"
 #include "kernel.h"
@@ -733,6 +734,9 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
 
         if (s == ":nocopy") {
             as_type(result)->nocopy = true;
+        } else if (s == ":handle") {
+            // :handle is a temporary way to declare a handle type
+            setup_handle_type(as_type(result));
         } else {
             return compile_error_for_line(result, tokens, startPosition,
                 "Unrecognized type attribute: " + s);

@@ -104,9 +104,9 @@ void circa_set_string_size(caValue* container, const char* str, int size);
 void circa_set_null(caValue* container);
 
 // Assign a handle to a caValue
-void circa_set_handle(caValue* container, caValue* value, caReleaseFunc releaseFunc);
+void circa_handle_set(caValue* container, caValue* value, caReleaseFunc releaseFunc);
 
-void circa_handle_set_release_func(caValue* handle, caReleaseFunc releaseFunc);
+void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc);
 
 // Assign a Value using the Type's default create() handler.
 void circa_create_value(caValue* value, caType* type);

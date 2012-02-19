@@ -44,6 +44,11 @@ caValue* circa_create_default_output(caStack* stack, int index)
     return val;
 }
 
+caTerm* circa_current_term(caStack* stack)
+{
+    return (caTerm*) current_term((EvalContext*) stack);
+}
+
 // Values
 int circa_as_int(caValue* container)
 {
@@ -69,14 +74,22 @@ void circa_set_null(caValue* container)
 {
     set_null((TValue*) container);
 }
+
+void circa_handle_set(caValue* handle, caValue* value, caReleaseFunc releaseFunc)
+{
+    set_handle_value((TValue*) handle, (TValue*) value, (ReleaseFunc) releaseFunc);
+}
+
+void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc)
+{
+    TValue value;
+    set_opaque_pointer(&value, object);
+    circa_handle_set(handle, (caValue*) &value, releaseFunc);
+}
+
 void circa_set_pointer(caValue* container, void* ptr)
 {
     set_opaque_pointer((TValue*) container, ptr);
-}
-
-void circa_handle_set_release_func(caValue* handle, caReleaseFunc releaseFunc)
-{
-    handle_set_release_func((TValue*) handle, (ReleaseFunc) releaseFunc);
 }
 
 caValue* circa_handle_get_value(caValue* handle)

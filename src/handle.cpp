@@ -46,6 +46,11 @@ void* get_handle_value_opaque_pointer(TValue* handle)
     return as_opaque_pointer(get_handle_value(handle));
 }
 
+void handle_initialize(Type* type, TValue* value)
+{
+    value->value_data.ptr = alloc_handle_container();
+}
+
 void handle_release(TValue* value)
 {
     if (value->value_data.ptr == NULL)
@@ -74,7 +79,7 @@ void handle_copy(Type* type, TValue* source, TValue* dest)
 void setup_handle_type(Type* type)
 {
     type->storageType = STORAGE_TYPE_HANDLE;
-    type->initialize = NULL;
+    type->initialize = handle_initialize;
     type->copy = handle_copy;
     type->release = handle_release;
 }
@@ -87,6 +92,13 @@ void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc rel
     swap(value, &container->value);
     container->releaseFunc = releaseFunc;
     handle->value_data.ptr = container;
+}
+
+void set_handle_value(TValue* handle, TValue* value, ReleaseFunc releaseFunc)
+{
+    HandleContainer* container = get_handle_container(handle);
+    swap(value, &container->value);
+    container->releaseFunc = releaseFunc;
 }
 
 void set_handle_value_opaque_pointer(TValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)

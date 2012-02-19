@@ -2,8 +2,8 @@
 sys:dll_patch()
 
 namespace zmq
-    type Requester;
-    type Responder;
+    type Requester :handle;
+    type Responder :handle;
 
     def create_responder(int port) -> Responder
     def create_requester(string addr) -> Requester

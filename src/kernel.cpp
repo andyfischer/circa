@@ -553,5 +553,4 @@ EXPORT void circa_shutdown()
     memset(&FUNCS, NULL, sizeof(FUNCS));
 }
 
-
 } // namespace circa

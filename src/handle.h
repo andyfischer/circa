@@ -7,6 +7,7 @@ namespace circa {
 TValue* get_handle_value(TValue* handle);
 void* get_handle_value_opaque_pointer(TValue* handle);
 void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc releaseFunc);
+void set_handle_value(TValue* handle, TValue* value, ReleaseFunc releaseFunc);
 void set_handle_value_opaque_pointer(TValue* handle, Type* type, void* value,
     ReleaseFunc releaseFunc);
 void handle_set_release_func(TValue* handle, ReleaseFunc releaseFunc);

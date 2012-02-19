@@ -67,8 +67,7 @@ void zmq__create_responder(caStack* stack)
     }
 
     caValue* out = circa_create_default_output(stack, 0);
-    circa_set_pointer(out, responder);
-    circa_handle_set_release_func(out, ResponderRelease);
+    circa_handle_set_object(out, responder, ResponderRelease);
 }
 
 void zmq__Responder_read(caStack* stack)
@@ -141,8 +140,7 @@ void zmq__create_requester(caStack* stack)
     }
 
     caValue* out = circa_create_default_output(stack, 0);
-    circa_set_pointer(out, requester);
-    circa_handle_set_release_func(out, RequesterRelease);
+    circa_handle_set_object(out, requester, RequesterRelease);
 }
 
 void zmq__Requester_read(caStack* stack)
