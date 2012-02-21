@@ -57,11 +57,10 @@ void circa_add_module_search_path(const char* path);
 int circa_run_command_line(int argc, const char* args[]);
 
 // Load a module by opening the given filename as a source file.
-caTerm* circa_load_module_from_file(caName module_name, const char* filename);
+caBranch* circa_load_module_from_file(caName module_name, const char* filename);
 
-// Convert a string to a symbol value, creating it if necessary. Symbols are used
-// internally as names.
-caName circa_string_to_symbol(const char* str);
+// Convert a string to a Circa name (an interned string that is referenced by integer).
+caName circa_name(const char* str);
 
 // Evaluation functions
 
@@ -88,13 +87,16 @@ int circa_as_int(caValue* container);
 
 const char* circa_as_string(caValue* container);
 
+void circa_get_point(caValue* point, float* xOut, float* yOut);
+void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, float* aOut);
+
 // Read an opaque pointer from a caValue
 void* circa_as_pointer(caValue* container);
 
-caValue* circa_handle_get_value(caValue* handle);
-
 // Assign an integer to a caValue
 void circa_set_int(caValue* container, int value);
+
+void circa_set_float(caValue* container, float value);
 
 // Assign an opaque pointer to a caValue
 void circa_set_pointer(caValue* container, void* ptr);
@@ -103,10 +105,12 @@ void circa_set_string_size(caValue* container, const char* str, int size);
 
 void circa_set_null(caValue* container);
 
-// Assign a handle to a caValue
+caValue* circa_handle_get_value(caValue* handle);
 void circa_handle_set(caValue* container, caValue* value, caReleaseFunc releaseFunc);
 
 void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc);
+
+void* circa_handle_get_object(caValue* handle);
 
 // Assign a Value using the Type's default create() handler.
 void circa_create_value(caValue* value, caType* type);
@@ -119,6 +123,10 @@ caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFun
 
 // Fetch the Term's declared type.
 caType* circa_term_declared_type(caTerm* term);
+
+caStack* circa_new_stack();
+
+void circa_run_module(caStack* stack, caName moduleName);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -58,13 +58,29 @@ const char* circa_as_string(caValue* container)
 {
     return as_cstring((TValue*) container);
 }
+void circa_get_point(caValue* point, float* xOut, float* yOut)
+{
+    *xOut = to_float(get_index((TValue*) point, 0));
+    *yOut = to_float(get_index((TValue*) point, 1));
+}
+void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, float* aOut)
+{
+    *rOut = to_float(get_index((TValue*) color, 0));
+    *gOut = to_float(get_index((TValue*) color, 1));
+    *bOut = to_float(get_index((TValue*) color, 2));
+    *aOut = to_float(get_index((TValue*) color, 3));
+}
 void* circa_as_pointer(caValue* container)
 {
     return as_opaque_pointer((TValue*) container);
 }
 void circa_set_int(caValue* container, int value)
 {
-    set_int((TValue*) value, value);
+    set_int((TValue*) container, value);
+}
+void circa_set_float(caValue* container, float value)
+{
+    set_float((TValue*) container, value);
 }
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
@@ -73,6 +89,11 @@ void circa_set_string_size(caValue* container, const char* str, int size)
 void circa_set_null(caValue* container)
 {
     set_null((TValue*) container);
+}
+
+caValue* circa_handle_get_value(caValue* handle)
+{
+    return (caValue*) get_handle_value((TValue*) handle);
 }
 
 void circa_handle_set(caValue* handle, caValue* value, caReleaseFunc releaseFunc)
@@ -87,14 +108,14 @@ void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releas
     circa_handle_set(handle, (caValue*) &value, releaseFunc);
 }
 
+void* circa_handle_get_object(caValue* handle)
+{
+    return circa_as_pointer(circa_handle_get_value(handle));
+}
+
 void circa_set_pointer(caValue* container, void* ptr)
 {
     set_opaque_pointer((TValue*) container, ptr);
-}
-
-caValue* circa_handle_get_value(caValue* handle)
-{
-    return (caValue*) get_handle_value((TValue*) handle);
 }
 
 void circa_create_value(caValue* value, caType* type)
@@ -118,12 +139,12 @@ void circa_add_module_search_path(const char* path)
     modules_add_search_path(path);
 }
 
-caTerm* circa_load_module_from_file(caName module_name, const char* filename)
+caBranch* circa_load_module_from_file(caName module_name, const char* filename)
 {
-    return (caTerm*) load_module_from_file(module_name, filename);
+    return (caBranch*) nested_contents(load_module_from_file(module_name, filename));
 }
 
-caName circa_name_from_string(const char* str)
+caName circa_name(const char* str)
 {
     return name_from_string(str);
 }
@@ -131,6 +152,19 @@ caName circa_name_from_string(const char* str)
 caType* circa_term_declared_type(caTerm* term)
 {
     return (caType*) ((Term*) term)->type;
+}
+
+caStack* circa_new_stack()
+{
+    return (caStack*) new EvalContext();
+}
+
+void circa_run_module(caStack* stack, caName moduleName)
+{
+    EvalContext* context = (EvalContext*) stack;
+    Branch* branch = nested_contents(get_global(moduleName));
+
+    evaluate_branch(context, branch);
 }
 
 } // extern "C"
