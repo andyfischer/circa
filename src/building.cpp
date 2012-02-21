@@ -749,6 +749,8 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
 
 void post_compile_term(Term* term)
 {
+    // TODO: The fact that this function needs to be called manually is silly. Probably should move this
+    // behavior into apply().
     if (term->function == NULL || !is_function(term->function))
         return;
 

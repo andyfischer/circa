@@ -1557,6 +1557,7 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
         }
 
         Term* term = expression(branch, tokens, context).term;
+        post_compile_term(term);
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
         arguments.append(term);

@@ -30,6 +30,7 @@ set_index.ca
 # simple_state.ca
 simple_state_1.ca
 state_unique_naming.ca
+stateful_call_as_input.ca
 strings.ca
 subroutine.ca
 subroutine_state.ca

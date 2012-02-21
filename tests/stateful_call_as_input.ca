@@ -1,0 +1,11 @@
+
+def f(int i)
+  state s = i
+
+def g()
+  -- Use state as an input to a function
+  list(f(1) f(2) f(3))
+
+s = null
+g(state = s)
+print(s)
