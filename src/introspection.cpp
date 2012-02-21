@@ -294,6 +294,8 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << ":output ";
     if (term->boolPropOptional("state", false))
         out << ":state ";
+    if (term->hasProperty("field"))
+        out << ":field(" << term->stringProp("field") << ")";
 
     out << "-> ";
     

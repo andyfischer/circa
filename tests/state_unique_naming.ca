@@ -1,0 +1,16 @@
+
+def f(int i)
+  state s = i
+
+def g()
+  a = f(1)
+  a = f(2)
+  a = f(3)
+  f(4)
+  f(5)
+  f(6)
+
+s = null
+g(state = s)
+print(s)
+  

@@ -548,28 +548,37 @@ void Dict::setString(const char* key, const char* value)
     TValue* dest = insert(key);
     set_string(dest, value);
 }
-const char* Dict::getString(const char* key, const char* defaultTValue)
+const char* Dict::getString(const char* key, const char* defaultValue)
 {
     TValue* val = get(key);
     if (val == NULL)
-        return defaultTValue;
+        return defaultValue;
     if (is_string(val))
         return as_cstring(val);
-    return defaultTValue;
+    return defaultValue;
 }
 void Dict::setInt(const char* key, int value)
 {
     TValue* dest = insert(key);
     set_int(dest, value);
 }
-int Dict::getInt(const char* key, int defaultTValue)
+int Dict::getInt(const char* key, int defaultValue)
 {
     TValue* val = get(key);
     if (val == NULL)
-        return defaultTValue;
+        return defaultValue;
     if (is_int(val))
         return as_int(val);
-    return defaultTValue;
+    return defaultValue;
+}
+bool Dict::getBool(const char* key, bool defaultValue)
+{
+    TValue* val = get(key);
+    if (val == NULL)
+        return defaultValue;
+    if (is_bool(val))
+        return as_bool(val);
+    return defaultValue;
 }
 
 bool is_dict(TValue* value)

@@ -4,9 +4,11 @@ boolean.ca
 cast.ca
 compound_type.ca
 declared_state_1.ca
+do_once.ca
 dynamic_typing.ca
 for.ca
 for_break.ca
+for_input_stateful.ca
 for_state.ca
 for_state_1.ca
 for_state_2.ca
@@ -25,6 +27,9 @@ method_calls.ca
 namespaces.ca
 set.ca
 set_index.ca
+# simple_state.ca
+simple_state_1.ca
+state_unique_naming.ca
 strings.ca
 subroutine.ca
 subroutine_state.ca
@@ -34,9 +39,11 @@ syntax_control_flow.ca
 syntax_function_calls.ca
 syntax_simple_values.ca
 syntax_subroutine.ca
+recursion.ca
 return_1.ca
 return_2.ca
 return_3.ca
 return_4.ca
 type_func.ca
 vectorized_func.ca
+wrap_around.ca

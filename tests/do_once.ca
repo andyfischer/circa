@@ -1,6 +1,5 @@
 def once() -> bool
     state bool s = true
-    print(s)
     result = s
     s = false
     return result

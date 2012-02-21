@@ -65,6 +65,9 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     on_inputs_changed(result);
     update_extra_outputs(result);
 
+    if (function == FUNCS.pack_state && inputs.length() == 2)
+        ca_assert(false);
+
     return result;
 }
 
@@ -263,6 +266,7 @@ void rename(Term* term, std::string const& name)
     }
 
     term->name = name;
+    update_unique_name(term);
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
@@ -694,14 +698,14 @@ void check_to_insert_implicit_inputs(Term* term)
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
-        Term* unpack = apply(term->owningBranch, FUNCS.unpack_state, TermList(container));
-        unpack->setStringProp("field", unique_name(term));
+        Term* unpack = apply(term->owningBranch, FUNCS.unpack_state,
+            TermList(container, term));
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
 
         insert_input(term, inputIndex, unpack);
         set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
-        set_bool(term->inputInfo(inputIndex)->properties.insert("hidden"), true);
+        set_input_hidden(term, inputIndex, true);
     }
 }
 
@@ -765,8 +769,8 @@ void post_compile_term(Term* term)
     Term* unpack = find_input_with_function(term, FUNCS.unpack_state);
     if (stateOutput != NULL && unpack != NULL) {
         Term* container = unpack->input(0);
-        Term* pack = apply(term->owningBranch, FUNCS.pack_state, TermList(container, stateOutput));
-        pack->setStringProp("field", unpack->stringProp("field"));
+        Term* pack = apply(term->owningBranch, FUNCS.pack_state,
+            TermList(container, stateOutput, term));
         hide_from_source(pack);
     }
 
@@ -774,11 +778,10 @@ void post_compile_term(Term* term)
     // a pack_state() call.
     Branch* branch = term->owningBranch;
     if (term->name != "") {
-        if (branch->findFirstBinding(term->nameSymbol)->function == DECLARED_STATE_FUNC) {
-            Term* pack = apply(branch, FUNCS.pack_state, TermList(
-                find_open_state_result(branch, branch->length()),
-                term));
-            pack->setStringProp("field", term->name);
+        Term* firstBinding = branch->findFirstBinding(term->nameSymbol);
+        if (firstBinding->function == DECLARED_STATE_FUNC) {
+            Term* pack = apply(branch, FUNCS.pack_state,
+                TermList(find_open_state_result(branch, branch->length()), term, firstBinding));
             move_after(pack, term);
         }
     }

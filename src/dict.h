@@ -59,9 +59,10 @@ struct Dict : TValue
     bool iteratorFinished(TValue* iterator);
 
     void setString(const char* key, const char* value);
-    const char* getString(const char* key, const char* defaultTValue);
+    const char* getString(const char* key, const char* defaultValue);
     void setInt(const char* key, int value);
-    int getInt(const char* key, int defaultTValue);
+    int getInt(const char* key, int defaultValue);
+    bool getBool(const char* key, bool defaultValue);
 
     static Dict* checkCast(TValue* value);
 

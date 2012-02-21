@@ -8,11 +8,15 @@ namespace implicit_state_function {
     CA_FUNCTION(unpack_state)
     {
         TValue* container = INPUT(0);
+        Term* identifyingTerm = INPUT_TERM(1);
 
-        if (!is_dict(container))
+        if (!is_dict(container)) {
             set_null(OUTPUT);
-        else
-            copy(dict_insert(container, CALLER->stringProp("field").c_str()), OUTPUT);
+            return;
+        }
+
+        const char* fieldName = unique_name(identifyingTerm);
+        copy(dict_insert(container, fieldName), OUTPUT);
     }
 
     CA_FUNCTION(pack_state)
@@ -20,11 +24,13 @@ namespace implicit_state_function {
         copy(INPUT(0), OUTPUT);
         TValue* container = OUTPUT;
         TValue* value = INPUT(1);
+        Term* identifyingTerm = INPUT_TERM(2);
 
         if (!is_dict(container))
             set_dict(container);
 
-        copy(value, dict_insert(container, CALLER->stringProp("field").c_str()));
+        const char* fieldName = unique_name(identifyingTerm);
+        copy(value, dict_insert(container, fieldName));
     }
 
     // Used in if_block. The index is built in as a property.
@@ -85,8 +91,10 @@ namespace implicit_state_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.unpack_state = import_function(kernel, unpack_state, "unpack_state(any container) -> any");
-        FUNCS.pack_state = import_function(kernel, pack_state, "pack_state(any container, any value) -> any");
+        FUNCS.unpack_state = import_function(kernel, unpack_state,
+            "unpack_state(any container, any identifier :meta) -> any");
+        FUNCS.pack_state = import_function(kernel, pack_state,
+            "pack_state(any container, any value, any identifier :meta) -> any");
 
         FUNCS.unpack_state_list =
             import_function(kernel, unpack_state_list, "unpack_state_list(any container) -> any");

@@ -65,8 +65,7 @@ void pack_any_open_state_vars(Branch* branch)
                 continue;
 
             Term* pack = apply(branch, FUNCS.pack_state, TermList(
-                find_open_state_result(branch, branch->length()),
-                result));
+                find_open_state_result(branch, branch->length()), result, term));
             pack->setStringProp("field", unique_name(term));
             branch->move(pack, result->index + 1);
         }

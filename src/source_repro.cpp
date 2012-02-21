@@ -230,6 +230,19 @@ void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
     if (input == NULL)
         return;
 
+    // Check if this input is hidden
+    if (term->inputInfo(inputIndex)->properties.getBool("hidden", false))
+        return;
+
+    // Prevent infinite recursion; don't try to format input source when the input
+    // occurs later in the code than the term. Forward-references should all be
+    // hidden.
+    if (input->owningBranch == term->owningBranch
+            && input->index > term->index) {
+        internal_error("Caught forward reference in format_source_for_input. "
+                       "(forward references should be hidden from source");
+    }
+
     bool methodCall =
         term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
 
@@ -405,6 +418,11 @@ void hide_from_source(Term* term)
 {
     ca_assert(term != NULL);
     term->setBoolProp("syntax:hidden", true);
+}
+
+void set_input_hidden(Term* term, int inputIndex, bool hidden)
+{
+    set_bool(term->inputInfo(inputIndex)->properties.insert("hidden"), hidden);
 }
 
 } // namespace circa

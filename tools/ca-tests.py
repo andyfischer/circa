@@ -65,6 +65,7 @@ def diff_command_against_file(process, command, filename):
 
     numLines = 0
     expectedOutput = expectedOutput.__iter__()
+
     actualOutput = list(process.run(command))
     for actualLine in actualOutput:
         expectedLine = ""
@@ -103,8 +104,11 @@ def test_file(process, filename):
 
 def get_list_of_enabled_tests():
     for line in read_text_file_as_lines(TestRoot+'/_enabled_tests'):
-        if line:
-            yield line
+        if not line:
+            continue
+        if line[0] == "#":
+            continue
+        yield line
 
 def run_all_tests():
 
@@ -119,10 +123,11 @@ def run_all_tests():
     for file in [TestRoot+'/'+f for f in get_list_of_enabled_tests()]:
         totalTestCount += 1
 
+        failed = False
         try:
             failures = test_file(process, file)
             if failures:
-                totalFailedTests += 1
+                failed = True
                 print str(len(failures)) + " failure(s) in "+file+":"
             for failure in failures:
                 for line in failure.description:
@@ -131,6 +136,10 @@ def run_all_tests():
             print "Exception occurred during test:", file
             import traceback
             traceback.print_exc()
+            failed = True
+
+        if failed:
+            totalFailedTests += 1
 
 
     print "Ran",totalTestCount,"tests,",totalFailedTests,"failed."

@@ -70,4 +70,6 @@ void set_input_syntax_hint(Term* term, int index, const char* field, TValue* val
 // Mark the given term as hidden from source reproduction.
 void hide_from_source(Term* term);
 
+void set_input_hidden(Term* term, int inputIndex, bool hidden);
+
 } // namespace circa
