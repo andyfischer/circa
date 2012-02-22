@@ -1,0 +1,12 @@
+
+red = #f00
+
+assert(red == #f00)
+assert(red == #f00f)
+assert(red != #00f)
+
+c = #888
+print("c = " c)
+print("c.r = " c.r)
+c.r = 1.0
+print("c = " c)

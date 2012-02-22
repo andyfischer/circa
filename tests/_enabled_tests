@@ -2,6 +2,7 @@ assert_failure.ca
 builtin_funcs.ca
 boolean.ca
 cast.ca
+color_values.ca
 compound_type.ca
 declared_state_1.ca
 do_once.ca

@@ -153,8 +153,6 @@ BuiltinTypes TYPES;
 TValue TrueValue;
 TValue FalseValue;
 
-Type* FILE_SIGNATURE_T;
-
 namespace cppbuild_function { CA_FUNCTION(build_module); }
 
 // Standard library functions
@@ -345,7 +343,7 @@ void bootstrap_kernel()
         INPUT_PLACEHOLDER_FUNC, TermList())->setBoolProp("optional", true);
 
     // FileSignature is used in some builtin functions
-    FILE_SIGNATURE_T = unbox_type(parse_type(kernel,
+    TYPES.file_signature = unbox_type(parse_type(kernel,
             "type FileSignature { string filename, int time_modified }"));
 
     namespace_function::early_setup(kernel);
@@ -513,9 +511,6 @@ EXPORT void circa_initialize()
     Branch* kernel = KERNEL;
 
     install_standard_library(kernel);
-
-    // Create a space for unit tests.
-    create_branch(kernel, "_test_root");
 
     // Finally, make sure there are no static errors.
     if (has_static_errors(kernel)) {

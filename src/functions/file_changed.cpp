@@ -16,8 +16,8 @@ namespace file_changed_function {
             return false;
         }
 
-        if (fileSignature->value_type != FILE_SIGNATURE_T)
-            create(FILE_SIGNATURE_T, fileSignature);
+        if (fileSignature->value_type != TYPES.file_signature)
+            create(TYPES.file_signature, fileSignature);
         
         TValue* sigFilename = fileSignature->getIndex(0);
         TValue* sigModified = fileSignature->getIndex(1);

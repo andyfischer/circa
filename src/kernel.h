@@ -134,6 +134,7 @@ extern Type VOID_T;
 
 struct BuiltinTypes {
     Type* color;
+    Type* file_signature;
     Type* point;
 };
 
@@ -141,8 +142,6 @@ extern BuiltinTypes TYPES;
 
 extern TValue TrueValue;
 extern TValue FalseValue;
-
-extern Type* FILE_SIGNATURE_T;
 
 extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;
