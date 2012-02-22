@@ -1,0 +1,4 @@
+3 static errors:
+[tests/nonexistant_function.ca:2,0] Unknown identifier: nonexistant
+[tests/nonexistant_function.ca:2,0] Not a function: nonexistant
+[tests/nonexistant_function.ca:4,0] Not a function: nonexistant

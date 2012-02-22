@@ -1,0 +1,10 @@
+
+L = [1 2 3 4]
+
+print('initial L = ' L)
+
+for i in @L
+    if i == 3
+        discard
+
+print('result L = ' L)

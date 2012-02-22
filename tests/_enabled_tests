@@ -28,6 +28,7 @@ list.ca
 math.ca
 method_calls.ca
 namespaces.ca
+nonexistant_function.ca
 set.ca
 set_index.ca
 # simple_state.ca

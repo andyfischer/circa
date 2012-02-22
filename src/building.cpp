@@ -69,11 +69,12 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // Post-compile steps
 
     // Possibly run the function's postCompile handler
-    Function::PostCompile func = as_function(function)->postCompile;
+    if (is_function(function)) {
+        Function::PostCompile func = as_function(function)->postCompile;
 
-    if (func != NULL)
-        func(term);
-
+        if (func != NULL)
+            func(term);
+    }
 
     return term;
 }

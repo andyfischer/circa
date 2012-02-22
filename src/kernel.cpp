@@ -512,12 +512,15 @@ EXPORT void circa_initialize()
 
     install_standard_library(kernel);
 
-    // Finally, make sure there are no static errors.
+    // Make sure there are no static errors. This shouldn't happen.
     if (has_static_errors(kernel)) {
         std::cout << "Static errors found in kernel:" << std::endl;
         print_static_errors_formatted(kernel, std::cout);
-        return;
+        internal_error("circa fatal: static errors found in kernel");
     }
+
+    // Use standard filesystem by default
+    circa_use_standard_filesystem();
 }
 
 EXPORT void circa_shutdown()

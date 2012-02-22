@@ -1,0 +1,17 @@
+
+-- c functions
+def on_file_changed(string filename)
+
+files_to_watch = ['test'] -- input from C++ land
+
+for file in @files_to_watch
+    if not(file_exists(file))
+        print('file not found: ' file)
+        discard
+
+state List watched_files = []
+watched_files.append_all(files_to_watch)
+
+for file in watched_files
+    if file_changed(file)
+        on_file_changed(file)
