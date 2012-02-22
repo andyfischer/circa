@@ -41,7 +41,7 @@ namespace list_methods_function {
         }
     }
 
-    CA_DEFINE_FUNCTION(extend, "List.extend(self, List) -> List")
+    CA_DEFINE_FUNCTION(extend, "List.extend(self :implied_rebind, List) -> List")
     {
         CONSUME_INPUT(0, OUTPUT);
         List* result = List::checkCast(OUTPUT);

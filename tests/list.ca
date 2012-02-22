@@ -13,3 +13,6 @@ assert(l.count() == 3)
 assert(l[0] == 1)
 assert(l[1] == 2)
 assert(l[2] == 3)
+
+l.extend([4 5])
+assert(to_string(l) == "[1, 2, 3, 4, 5]");

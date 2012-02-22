@@ -11,6 +11,7 @@ namespace cppbuild
 
 namespace file
     def modified_time(string filename) -> int
+    def exists(string filename) -> bool
 
     def is_newer(string left, string right) -> bool
         return modified_time(left) > modified_time(right)
