@@ -268,7 +268,7 @@ void bootstrap_kernel()
 
     // Create value function
     Term* valueFunc = kernel->appendNew();
-    kernel->bindName(valueFunc, "value");
+    rename(valueFunc, "value");
     FUNCS.value = valueFunc;
 
     // Create Type type
@@ -278,7 +278,7 @@ void bootstrap_kernel()
     TYPE_TYPE->value_type = &TYPE_T;
     TYPE_TYPE->value_data.ptr = &TYPE_T;
     type_t::setup_type(&TYPE_T);
-    kernel->bindName(TYPE_TYPE, "Type");
+    rename(TYPE_TYPE, "Type");
 
     // Create Any type
     ANY_TYPE = kernel->appendNew();
@@ -287,7 +287,7 @@ void bootstrap_kernel()
     ANY_TYPE->value_type = &TYPE_T;
     ANY_TYPE->value_data.ptr = &ANY_T;
     any_t::setup_type(&ANY_T);
-    kernel->bindName(ANY_TYPE, "any");
+    rename(ANY_TYPE, "any");
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
@@ -296,7 +296,7 @@ void bootstrap_kernel()
     FUNCTION_TYPE->type = &TYPE_T;
     FUNCTION_TYPE->value_type = &TYPE_T;
     FUNCTION_TYPE->value_data.ptr = &FUNCTION_T;
-    kernel->bindName(FUNCTION_TYPE, "Function");
+    rename(FUNCTION_TYPE, "Function");
 
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;

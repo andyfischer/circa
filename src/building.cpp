@@ -53,7 +53,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
         branch->move(term, branch->length() - outputCount - 1);
 
     if (name != "")
-        branch->bindName(term, name);
+        rename(term, name);
 
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
@@ -329,7 +329,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     Term *term = branch->appendNew();
 
     if (name != "")
-        branch->bindName(term, name);
+        rename(term, name);
 
     change_function(term, FUNCS.value);
     change_declared_type(term, type);
@@ -418,7 +418,7 @@ Term* create_type(Branch* branch, std::string name)
 
     if (name != "") {
         as_type(term)->name = name_from_string(name.c_str());
-        branch->bindName(term, name);
+        rename(term, name);
     }
 
     return term;
@@ -741,6 +741,9 @@ void check_to_insert_implicit_inputs(Term* term)
 
 void update_implicit_pack_call(Term* term)
 {
+    if (term->function == NULL)
+        return;
+
     Term* existingPack = find_user_with_function(term, FUNCS.pack_state);
     if (existingPack != NULL)
         return;

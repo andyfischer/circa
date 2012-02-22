@@ -712,7 +712,7 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
     if (has_static_error(result))
         return ParseResult(result);
 
-    branch->bindName(result, name);
+    rename(result, name);
     as_type(result)->name = name_from_string(name.c_str());
 
     return ParseResult(result);
@@ -1120,7 +1120,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
     if (context->pendingRebind != "") {
         std::string name = context->pendingRebind;
         context->pendingRebind = "";
-        branch->bindName(term, name);
+        rename(term, name);
         term->setStringProp("syntax:rebindOperator", name);
     }
 
@@ -1128,7 +1128,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
     if (term->function == FUNCS.assign) {
         Term* lexprRoot = find_lexpr_root(term->input(0));
         if (lexprRoot != NULL && lexprRoot->name != "") {
-            branch->bindName(term, lexprRoot->name);
+            rename(term, lexprRoot->name);
         }
         assign_function::update_assign_contents(term);
     }
@@ -1469,7 +1469,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                 // Just bind the name if left side is an identifier.
                 // Example: a += 1
                 if (leftExpr.isIdentifier())
-                    branch->bindName(term, leftExpr.term->name);
+                    rename(term, leftExpr.term->name);
 
                 // Set up an assign() term if left side is complex
                 // Example: a[0] += 1
@@ -1486,7 +1486,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                             assignTerm->inputInfo(0)->properties.insert("postWhitespace"));
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
                     if (lexprRoot != NULL && lexprRoot->name != "")
-                        branch->bindName(assignTerm, lexprRoot->name);
+                        rename(assignTerm, lexprRoot->name);
                     
                     assign_function::update_assign_contents(assignTerm);
                     term = assignTerm;
@@ -1604,7 +1604,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Term* term = apply(branch, function, inputs);
 
     if (root.term->name != "" && function_implicitly_rebinds_input(function, 0))
-        branch->bindName(term, root.term->name);
+        rename(term, root.term->name);
 
     inputHints.apply(term);
     check_to_insert_implicit_inputs(term);
