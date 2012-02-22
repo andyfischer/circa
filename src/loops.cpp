@@ -169,6 +169,7 @@ void finish_for_loop(Term* forTerm)
     apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 
     check_to_insert_implicit_inputs(forTerm);
+    update_extra_outputs(forTerm);
 
     set_branch_in_progress(contents, false);
 }

@@ -1,2 +1,1 @@
-
-state s = add(1 2) + add(3 4)
+state s = 1

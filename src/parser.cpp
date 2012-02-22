@@ -1282,7 +1282,7 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
         term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-        branch->bindName(term, nameBinding);
+        rename(term, nameBinding);
         set_source_location(term, startPosition, tokens);
         return ParseResult(term);
     }

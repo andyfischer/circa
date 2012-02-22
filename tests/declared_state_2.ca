@@ -1,0 +1,7 @@
+
+def main()
+  state s = add(1 2) + add(3 4)
+
+s = null
+main(state = s)
+print(s)

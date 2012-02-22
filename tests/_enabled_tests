@@ -1,10 +1,12 @@
 assert_failure.ca
 builtin_funcs.ca
+bug_with_double_pack_state.ca
 boolean.ca
 cast.ca
 color_values.ca
 compound_type.ca
 declared_state_1.ca
+declared_state_2.ca
 do_once.ca
 dynamic_typing.ca
 for.ca

@@ -31,13 +31,13 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // If 'function' is actually a type, create a value instead.
     if (is_type(function)) {
         if (inputs.length() == 0) {
-            Term* result = create_value(branch, as_type(function));
-            result->setBoolProp("constructor", true);
-            return result;
+            Term* term = create_value(branch, as_type(function));
+            term->setBoolProp("constructor", true);
+            return term;
         } else if (inputs.length() == 1) {
-            Term* result = apply(branch, FUNCS.cast, inputs);
-            change_declared_type(result, as_type(function));
-            return result;
+            Term* term = apply(branch, FUNCS.cast, inputs);
+            change_declared_type(term, as_type(function));
+            return term;
         } else {
             internal_error("Constructors with multiple arguments not yet supported.");
         }
@@ -46,29 +46,36 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     int outputCount = count_output_placeholders(branch);
 
     // Create the term
-    Term* result = branch->appendNew();
+    Term* term = branch->appendNew();
 
     // Position the term before any output_placeholder terms.
     if (function != OUTPUT_PLACEHOLDER_FUNC && outputCount > 0)
-        branch->move(result, branch->length() - outputCount - 1);
+        branch->move(term, branch->length() - outputCount - 1);
 
     if (name != "")
-        branch->bindName(result, name);
+        branch->bindName(term, name);
 
     for (int i=0; i < inputs.length(); i++)
-        set_input(result, i, inputs[i]);
+        set_input(term, i, inputs[i]);
 
     // change_function will also update the declared type.
-    change_function(result, function);
+    change_function(term, function);
 
-    update_unique_name(result);
-    on_inputs_changed(result);
-    update_extra_outputs(result);
+    update_unique_name(term);
+    on_inputs_changed(term);
+    update_extra_outputs(term);
+    update_implicit_pack_call(term);
 
-    if (function == FUNCS.pack_state && inputs.length() == 2)
-        ca_assert(false);
+    // Post-compile steps
 
-    return result;
+    // Possibly run the function's postCompile handler
+    Function::PostCompile func = as_function(function)->postCompile;
+
+    if (func != NULL)
+        func(term);
+
+
+    return term;
 }
 
 void set_input(Term* term, int index, Term* input)
@@ -258,15 +265,19 @@ void rename(Term* term, std::string const& name)
     if (term->name == name)
         return;
 
-    if ((term->owningBranch != NULL) &&
-            (term->owningBranch->get(term->name) == term)) {
-        term->owningBranch->names.remove(term->name);
-        term->name = "";
+    if (term->owningBranch != NULL) {
+        if (term->name != "") {
+            term->owningBranch->names.remove(term->name);
+            term->name = "";
+        }
         term->owningBranch->bindName(term, name);
     }
 
     term->name = name;
     update_unique_name(term);
+
+    // A rename can cause us to gain an implicit pack_state
+    update_implicit_pack_call(term);
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
@@ -324,6 +335,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     change_declared_type(term, type);
     create(type, (TValue*) term);
     update_unique_name(term);
+    update_implicit_pack_call(term);
 
     return term;
 }
@@ -560,6 +572,7 @@ Branch* term_get_function_details(Term* call)
 void update_extra_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
+    bool anyAdded = false;
 
     for (int index=1; ; index++) {
         Term* placeholder = term_get_output_placeholder(term, index);
@@ -582,12 +595,20 @@ void update_extra_outputs(Term* term)
         if (existing != NULL && existing->function == EXTRA_OUTPUT_FUNC)
             extra_output = existing;
         
-        if (extra_output == NULL)
+        if (extra_output == NULL) {
             extra_output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
+            anyAdded = true;
+        }
         change_declared_type(extra_output, placeholder->type);
 
         if (function_is_state_input(placeholder))
             extra_output->setBoolProp("state", true);
+    }
+
+    // If any extra outputs were added, we might need to now add
+    // an implicit pack_state call.
+    if (anyAdded) {
+        update_implicit_pack_call(term);
     }
 }
 
@@ -698,6 +719,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
         Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
 
+        // Add a unpack_state() call
         Term* unpack = apply(term->owningBranch, FUNCS.unpack_state,
             TermList(container, term));
         hide_from_source(unpack);
@@ -706,6 +728,44 @@ void check_to_insert_implicit_inputs(Term* term)
         insert_input(term, inputIndex, unpack);
         set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
         set_input_hidden(term, inputIndex, true);
+
+        // Add a corresponding pack_state() call
+        Term* stateOutput = find_extra_output_for_state(term);
+        if (stateOutput != NULL) {
+            Term* pack = apply(term->owningBranch, FUNCS.pack_state,
+                TermList(container, stateOutput, term));
+            hide_from_source(pack);
+        }
+    }
+}
+
+void update_implicit_pack_call(Term* term)
+{
+    Term* existingPack = find_user_with_function(term, FUNCS.pack_state);
+    if (existingPack != NULL)
+        return;
+
+    Branch* branch = term->owningBranch;
+
+    // Possibly append a pack_state() call for a state extra output.
+    Term* stateOutput = find_extra_output_for_state(term);
+    Term* unpack = find_input_with_function(term, FUNCS.unpack_state);
+    if (stateOutput != NULL && unpack != NULL) {
+        Term* container = unpack->input(0);
+        Term* pack = apply(term->owningBranch, FUNCS.pack_state,
+            TermList(container, stateOutput, term));
+        hide_from_source(pack);
+    }
+
+    // If this term rebinds the name of a declared state var, then it also needs
+    // a pack_state() call.
+    if (term->name != "") {
+        Term* firstBinding = branch->findFirstBinding(term->nameSymbol);
+        if (firstBinding->function == DECLARED_STATE_FUNC) {
+            Term* pack = apply(branch, FUNCS.pack_state,
+                TermList(find_open_state_result(branch, branch->length()), term, firstBinding));
+            move_after(pack, term);
+        }
     }
 }
 
@@ -749,44 +809,7 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
 
 void post_compile_term(Term* term)
 {
-    // TODO: The fact that this function needs to be called manually is silly. Probably should move this
-    // behavior into apply().
-    if (term->function == NULL || !is_function(term->function))
-        return;
-
-    Function* attrs = as_function(term->function);
-    if (attrs == NULL)
-        return;
-
-    Function::PostCompile func = attrs->postCompile;
-
-    if (func != NULL)
-        func(term);
-
-    update_extra_outputs(term);
-
-    Term* stateOutput = find_extra_output_for_state(term);
-
-    // Possibly append a pack_state() call for a state extra output.
-    Term* unpack = find_input_with_function(term, FUNCS.unpack_state);
-    if (stateOutput != NULL && unpack != NULL) {
-        Term* container = unpack->input(0);
-        Term* pack = apply(term->owningBranch, FUNCS.pack_state,
-            TermList(container, stateOutput, term));
-        hide_from_source(pack);
-    }
-
-    // If this term rebinds the name of a declared state var, then it also needs
-    // a pack_state() call.
-    Branch* branch = term->owningBranch;
-    if (term->name != "") {
-        Term* firstBinding = branch->findFirstBinding(term->nameSymbol);
-        if (firstBinding->function == DECLARED_STATE_FUNC) {
-            Term* pack = apply(branch, FUNCS.pack_state,
-                TermList(find_open_state_result(branch, branch->length()), term, firstBinding));
-            move_after(pack, term);
-        }
-    }
+    // TODO: delete me
 }
 
 void set_branch_in_progress(Branch* branch, bool inProgress)

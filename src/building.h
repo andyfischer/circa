@@ -116,6 +116,7 @@ Term* find_or_create_open_state_result(Branch* branch, int position);
 // input). If one is missing, it will be inserted. This should be called after creating
 // a term and updating the input properties.
 void check_to_insert_implicit_inputs(Term* term);
+void update_implicit_pack_call(Term* term);
 bool term_is_state_input(Term* term, int index);
 Term* find_state_input(Branch* branch);
 bool has_state_input(Branch* branch);

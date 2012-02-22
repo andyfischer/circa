@@ -1,0 +1,14 @@
+
+def g(string s) 
+
+def main()
+    state a = 'first value'
+    a = 'second value'
+
+    -- There was a bug where this call would generate an extra pack_state()
+    -- call for 'a', causing 'a' to go back to 'first value'.
+    b = g(a)
+
+s = null
+main(state = s)
+print(s)

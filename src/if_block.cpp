@@ -492,6 +492,7 @@ void finish_if_block(Term* ifBlock)
 
     if_block_update_output_placeholder_types_from_cases(ifBlock);
     check_to_insert_implicit_inputs(ifBlock);
+    update_extra_outputs(ifBlock);
 }
 
 void if_block_post_setup(Term* ifCall)
