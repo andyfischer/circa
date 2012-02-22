@@ -103,6 +103,8 @@ void circa_set_pointer(caValue* container, void* ptr);
 
 void circa_set_string_size(caValue* container, const char* str, int size);
 
+void circa_set_point(caValue* point, float x, float y);
+
 void circa_set_null(caValue* container);
 
 caValue* circa_handle_get_value(caValue* handle);
@@ -127,6 +129,12 @@ caType* circa_term_declared_type(caTerm* term);
 caStack* circa_new_stack();
 
 void circa_run_module(caStack* stack, caName moduleName);
+
+// Return whether a runtime error occurred
+bool circa_error_occurred(caStack* stack);
+
+// Clear a runtime error from the stack
+void circa_clear_error(caStack* stack);
 
 #ifdef __cplusplus
 } // extern "C"

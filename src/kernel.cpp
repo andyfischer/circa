@@ -116,7 +116,6 @@ Term* NULL_T_TERM = NULL;
 Term* RECT_I_TYPE_TERM = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
-Term* COLOR_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
 Term* FUNCTION_TYPE = NULL;
 Term* MAP_TYPE = NULL;
@@ -149,11 +148,7 @@ Type NAME_T;
 Type TYPE_T;
 Type VOID_T;
 
-// Input instructions:
-Type StackVariableIsn_t;
-Type GlobalVariableIsn_t;
-Type NullInputIsn_t;
-Type ImplicitStateInputIsn_t;
+BuiltinTypes TYPES;
 
 TValue TrueValue;
 TValue FalseValue;
@@ -470,13 +465,14 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);
 
     // Create some hosted types
-    parse_type(kernel, "type Point { number x, number y }");
+    TYPES.point = as_type(parse_type(kernel, "type Point { number x, number y }"));
     parse_type(kernel, "type Point_i { int x, int y }");
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
 
-    COLOR_TYPE = parse_type(kernel, "type Color { number r, number g, number b, number a }");
+    TYPES.color = unbox_type(parse_type(kernel,
+                    "type Color { number r, number g, number b, number a }"));
 
-    color_t::setup_type(unbox_type(COLOR_TYPE));
+    color_t::setup_type(TYPES.color);
 }
 
 void install_standard_library(Branch* kernel)
@@ -509,6 +505,7 @@ EXPORT void circa_initialize()
     STATIC_INITIALIZATION_FINISHED = true;
 
     memset(&FUNCS, 0, sizeof(FUNCS));
+    memset(&TYPES, 0, sizeof(TYPES));
 
     create_primitive_types();
     bootstrap_kernel();

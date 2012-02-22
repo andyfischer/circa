@@ -125,16 +125,19 @@ extern Type INT_T;
 extern Type LIST_T;
 extern Type NULL_T;
 extern Type OPAQUE_POINTER_T;
+extern Type POINT_T;
 extern Type REF_T;
 extern Type STRING_T;
 extern Type NAME_T;
 extern Type TYPE_T;
 extern Type VOID_T;
 
-extern Type StackVariableIsn_t;
-extern Type GlobalVariableIsn_t;
-extern Type NullInputIsn_t;
-extern Type ImplicitStateInputIsn_t;
+struct BuiltinTypes {
+    Type* color;
+    Type* point;
+};
+
+extern BuiltinTypes TYPES;
 
 extern TValue TrueValue;
 extern TValue FalseValue;

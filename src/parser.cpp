@@ -2052,7 +2052,7 @@ ParseResult literal_color(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // strip leading # sign
     text = text.substr(1, text.length()-1);
 
-    Term* resultTerm = create_value(branch, as_type(COLOR_TYPE));
+    Term* resultTerm = create_value(branch, TYPES.color);
     List* result = List::checkCast(resultTerm);
 
     float r = 0;

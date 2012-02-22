@@ -7,6 +7,8 @@
 #include "evaluation.h"
 #include "handle.h"
 #include "importing.h"
+#include "kernel.h"
+#include "list_shared.h"
 #include "modules.h"
 #include "names.h"
 #include "string_type.h"
@@ -85,6 +87,13 @@ void circa_set_float(caValue* container, float value)
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
     set_string((TValue*) container, str, size);
+}
+void circa_set_point(caValue* point, float x, float y)
+{
+    change_type((TValue*) point, TYPES.point);
+    list_resize((TValue*) point, 2);
+    set_float(get_index((TValue*) point, 0), x);
+    set_float(get_index((TValue*) point, 1), y);
 }
 void circa_set_null(caValue* container)
 {
@@ -165,6 +174,24 @@ void circa_run_module(caStack* stack, caName moduleName)
     Branch* branch = nested_contents(get_global(moduleName));
 
     evaluate_branch(context, branch);
+}
+bool circa_has_error(caStack* stack)
+{
+    EvalContext* context = (EvalContext*) stack;
+    return error_occurred(context);
+}
+
+// Clear a runtime error from the stack
+void circa_clear_error(caStack* stack)
+{
+    EvalContext* context = (EvalContext*) stack;
+    clear_error(context);
+}
+
+void circa_print_error_to_stdout(caStack* stack)
+{
+    EvalContext* context = (EvalContext*) stack;
+    context_print_error_stack(std::cout, context);
 }
 
 } // extern "C"
