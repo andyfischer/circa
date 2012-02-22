@@ -1,0 +1,8 @@
+
+L = [1 2 3]
+-- This had a bug where each element in the list was being assigned '5' because
+-- 'some_other_thing' occurred last.
+for i in @L
+    i = 4 - i
+    some_other_thing = 5
+print(L)

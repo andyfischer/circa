@@ -1,6 +1,7 @@
 assert_failure.ca
 builtin_funcs.ca
 bug_with_double_pack_state.ca
+bug_with_for_loop_output.ca
 boolean.ca
 cast.ca
 color_values.ca

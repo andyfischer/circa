@@ -22,18 +22,11 @@ namespace circa {
 
 void for_loop_fix_state_input(Branch* contents);
 
-Term* get_for_loop_iterator(Term* forTerm)
+Term* for_loop_get_iterator(Branch* contents)
 {
-    Branch* contents = nested_contents(forTerm);
-    for (int i=0; i < contents->length(); i++) {
-        Term* term = contents->get(i);
-        if (term->function != INPUT_PLACEHOLDER_FUNC)
-            return NULL;
-        if (function_is_state_input(term))
-            continue;
-
-        return term;
-    }
+    for (int i=0; i < contents->length(); i++)
+        if (contents->get(i)->function == GET_INDEX_FUNC)
+            return contents->get(i);
     return NULL;
 }
 
@@ -44,11 +37,11 @@ Term* for_loop_find_index(Branch* contents)
 
 const char* for_loop_get_iterator_name(Term* forTerm)
 {
-    Branch* contents = nested_contents(forTerm);
-    for (int i=0; i < contents->length(); i++)
-        if (contents->get(i)->function == GET_INDEX_FUNC)
-            return contents->get(i)->name.c_str();
-    return "";
+    Term* iterator = for_loop_get_iterator(nested_contents(forTerm));
+    if (iterator == NULL)
+        return "";
+
+    return iterator->name.c_str();
 }
 
 Branch* get_for_loop_outer_rebinds(Term* forTerm)
@@ -78,7 +71,20 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
 
 void add_loop_output_term(Branch* branch)
 {
-    Term* result = find_last_non_comment_expression(branch);
+    Term* result = NULL;
+
+    // Find the term to use for the for-loop output. If the loop iterater name
+    // was rebound then use that.
+    Term* iterator = for_loop_get_iterator(branch);
+
+    Term* lastWithIteratorName = branch->get(iterator->name);
+    if (lastWithIteratorName != NULL && lastWithIteratorName != iterator)
+        result = lastWithIteratorName;
+
+    // Otherwise, use the last expression as the output.
+    if (result == NULL)
+        result = find_last_non_comment_expression(branch);
+
     Term* term = apply(branch, FUNCS.loop_output,
         TermList(for_loop_find_index(branch), result));
     move_before_outputs(term);
@@ -88,7 +94,7 @@ void add_implicit_placeholders(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
     std::string listName = forTerm->input(0)->name;
-    Term* iterator = get_for_loop_iterator(forTerm);
+    Term* iterator = for_loop_get_iterator(contents);
     std::string iteratorName = iterator->name;
 
     std::vector<std::string> reboundNames;

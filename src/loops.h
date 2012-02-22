@@ -6,7 +6,6 @@
 
 namespace circa {
 
-Term* get_for_loop_iterator(Term* forTerm);
 const char* for_loop_get_iterator_name(Term* forTerm);
 Term* for_loop_find_index(Branch* contents);
 
