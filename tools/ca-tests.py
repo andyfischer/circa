@@ -92,7 +92,7 @@ def test_file(process, filename):
         failures.append(TestFailure(desc, filename))
 
     # Source repro test
-    diff = diff_command_against_file(process, "file -n -s "+filename, filename)
+    diff = diff_command_against_file(process, "source_repro "+filename, filename)
     if diff:
         desc = ['Source repro failed on line '+str(diff.lineNumber)]
         desc.append(' Expected: '+diff.fromFile)

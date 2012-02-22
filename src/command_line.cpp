@@ -319,6 +319,15 @@ int run_command_line(List* args)
         return 0;
     }
 
+    // Reproduce source text
+    if (string_eq(args->get(0), "-source-repro")) {
+        Branch branch;
+        load_script(&branch, as_cstring(args->get(1)));
+        std::cout << get_branch_source_text(&branch);
+        return 0;
+    }
+
+
     // Default behavior with no flags: load args[0] as a script and run it.
     Branch* main_branch = create_branch(kernel());
     load_script(main_branch, as_cstring(args->get(0)));
@@ -328,9 +337,7 @@ int run_command_line(List* args)
     else if (printRaw)
         print_branch(std::cout, main_branch);
 
-    if (printSource)
-        std::cout << get_branch_source_text(main_branch);
-
+    // Don't show static errors if we're only printing source
     if (has_static_errors(main_branch)) {
         print_static_errors_formatted(main_branch, std::cout);
         return 1;

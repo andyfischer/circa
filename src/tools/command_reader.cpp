@@ -127,7 +127,6 @@ void do_file_command(List* args, TValue* reply)
             argIndex++;
             continue;
         }
-
         break;
     }
 
@@ -186,15 +185,15 @@ void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
     }
 }
 
-void do_admin_command(TValue* string, TValue* reply)
+void do_admin_command(TValue* input, TValue* reply)
 {
     // Identify the command
-    int first_space = string_find_char(string, 0, ' ');
+    int first_space = string_find_char(input, 0, ' ');
     if (first_space == -1)
-        first_space = string_length(string);
+        first_space = string_length(input);
 
     TValue command;
-    string_slice(string, 0, first_space, &command);
+    string_slice(input, 0, first_space, &command);
 
     set_null(reply);
 
@@ -205,30 +204,37 @@ void do_admin_command(TValue* string, TValue* reply)
     } else if (equals_string(&command, "file")) {
 
         List args;
-        parse_string_as_argument_list(string, &args);
+        parse_string_as_argument_list(input, &args);
         do_file_command(&args, reply);
 
     } else if (equals_string(&command, "echo")) {
 
         List args;
-        parse_string_as_argument_list(string, &args);
+        parse_string_as_argument_list(input, &args);
         do_echo(&args, reply);
 
     } else if (equals_string(&command, "write_branch")) {
 
-        int nextSpace = string_find_char(string, first_space+1, ' ');
+        int nextSpace = string_find_char(input, first_space+1, ' ');
         if (nextSpace == -1) {
             set_string(reply, "Syntax error, not enough arguments");
             return;
         }
         
         TValue branchName;
-        string_slice(string, first_space+1, nextSpace, &branchName);
+        string_slice(input, first_space+1, nextSpace, &branchName);
 
         TValue contents;
-        string_slice(string, nextSpace+1, -1, &contents);
+        string_slice(input, nextSpace+1, -1, &contents);
 
         do_write_branch(&branchName, &contents, reply);
+
+    } else if (equals_string(&command, "source_repro")) {
+        List args;
+        parse_string_as_argument_list(input, &args);
+        Branch branch;
+        load_script(&branch, as_cstring(args[1]));
+        std::cout << get_branch_source_text(&branch);
 
     } else {
 
