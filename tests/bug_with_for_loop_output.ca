@@ -5,4 +5,5 @@ L = [1 2 3]
 for i in @L
     i = 4 - i
     some_other_thing = 5
-print(L)
+
+print('should be [3 2 1]: ' L)

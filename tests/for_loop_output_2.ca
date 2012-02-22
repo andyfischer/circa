@@ -1,0 +1,7 @@
+
+L = [1 2 3]
+for i in @L
+    -- nothing
+
+-- L should remain unchanged
+print('should be [1 2 3]: ' L)

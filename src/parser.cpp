@@ -175,7 +175,8 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
     if (!foundNewline) {
         while (!tokens.finished()) {
 
-            // If we hit an if-block sepator then finish, but don't consume it
+            // Special case for if-blocks. If we hit an if-block seperator then finish,
+            // but don't consume it.
             if (tokens.nextIs(TK_ELSE) || tokens.nextIs(TK_ELIF))
                 return;
 
@@ -218,7 +219,8 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
     }
 
     // Check if the next statement has an indentation level that is higher
-    // or equal to the parent indentation. If so then stop here.
+    // or equal to the parent indentation. If so then stop and don't consume
+    // any more.
 
     if (find_indentation_of_next_statement(tokens) <= parentTermIndent) {
         // Take the line ending that we parsed as postHeadingWs, and move it over
@@ -229,7 +231,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
         return;
     }
 
-    // Okay, at this point we're ready to parse some statements. The first statement
+    // At this point we're ready to parse some statements. The first statement
     // will tell us the indentation level for the whole block. But, we'll ignore
     // comments when figuring this out. Example:
     //     def f()
@@ -238,8 +240,21 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
     //         a = 1
     //         return a + 2
 
+    parentTerm->setBoolProp("syntax:multiline", true);
+
     int indentationLevel = 0;
     while (!tokens.finished()) {
+
+        // Don't consume if the next identation is less than or equal to our starting
+        // indent. We can get into this situation by the following code fragment:
+        // 
+        //     for i in []
+        //         -- a comment
+        //     next_line
+        //
+        if (find_indentation_of_next_statement(tokens) <= parentTermIndent)
+            return;
+        
         Term* statement = parser::statement(branch, tokens, context).term;
 
         if (statement->function != COMMENT_FUNC) {
@@ -250,7 +265,6 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
     }
 
     // Now keep parsing lines which have the same indentation level
-    // TODO: Error if we find a line that has greater indentation
     while (!tokens.finished()) {
 
         // Lookahead, check if the next line has the same indentation
@@ -268,8 +282,6 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
 
         parser::statement(branch, tokens, context);
     }
-
-    parentTerm->setBoolProp("syntax:multiline", true);
 }
 
 void consume_branch_with_braces(Branch* branch, TokenStream& tokens, ParserCxt* context,
