@@ -17,6 +17,7 @@ Branch* find_enclosing_for_loop_contents(Term* term);
 
 CA_FUNCTION(evaluate_for_loop);
 CA_FUNCTION(evaluate_loop_output);
+void for_loop_finish_iteration(EvalContext* context);
 
 void finish_while_loop(Term* whileTerm);
 CA_FUNCTION(evaluate_unbounded_loop);

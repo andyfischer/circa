@@ -78,7 +78,13 @@ void add_loop_output_term(Branch* branch)
     Term* iterator = for_loop_get_iterator(branch);
 
     Term* lastWithIteratorName = branch->get(iterator->name);
-    if (lastWithIteratorName != NULL && lastWithIteratorName != iterator)
+
+    // For a rebound list, always use the last-with-iterator-name, even if it's
+    // the iterator itself.
+    if (branch->owningTerm->boolPropOptional("modifyList", false))
+        result = lastWithIteratorName;
+    
+    if (result == NULL && lastWithIteratorName != iterator)
         result = lastWithIteratorName;
 
     // Otherwise, use the last expression as the output.
@@ -271,7 +277,7 @@ CA_FUNCTION(evaluate_for_loop)
     push_frame(context, contents, &registers);
 
     // Set up a blank list for output
-    set_list(top_frame(context)->registers[contents->length()-1], inputListLength);
+    set_list(top_frame(context)->registers[contents->length()-1], 0);
 
     // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {
@@ -303,19 +309,10 @@ CA_FUNCTION(evaluate_for_loop)
     // Interpreter will run the contents of the branch
 }
 
-CA_FUNCTION(evaluate_loop_output)
+void for_loop_finish_iteration(EvalContext* context)
 {
-    Term* caller = CALLER;
-    Branch* contents = caller->owningBranch;
-    EvalContext* context = CONTEXT;
-    Frame* topFrame = top_frame(context);
-
-    TValue* index = INPUT(0);
-    TValue* result = INPUT(1);
-    
-    // Copy loop output
-    Term* primaryOutput = get_output_placeholder(contents, 0);
-    copy(result, list_get(topFrame->registers[primaryOutput->index], as_int(index)));
+    Frame* frame = top_frame(context);
+    Branch* contents = frame->branch;
 
     // Hack: make sure the output_placeholder terms have their values
     for (int i=1;; i++) {
@@ -326,20 +323,21 @@ CA_FUNCTION(evaluate_loop_output)
     }
 
     // Find list length
-    TValue* listInput = topFrame->registers[0];
+    TValue* listInput = frame->registers[0];
 
     // Increment the loop index
+    TValue* index = frame->registers[for_loop_find_index(contents)->index];
     set_int(index, as_int(index) + 1);
 
     // Check if we are finished
     if (as_int(index) >= list_length(listInput)) {
-        finish_frame(CONTEXT);
+        finish_frame(context);
         return;
     }
 
     // If we're not finished yet, copy rebound outputs back to inputs.
     for (int i=1;; i++) {
-        List* registers = &topFrame->registers;
+        List* registers = &frame->registers;
         Term* input = get_input_placeholder(contents, i);
         if (input == NULL)
             break;
@@ -348,7 +346,23 @@ CA_FUNCTION(evaluate_loop_output)
     }
 
     // Return to start of loop body
-    topFrame->nextPc = 0;
+    frame->nextPc = 0;
+}
+
+CA_FUNCTION(evaluate_loop_output)
+{
+    Term* caller = CALLER;
+    Branch* contents = caller->owningBranch;
+    Frame* topFrame = top_frame(CONTEXT);
+
+    TValue* result = INPUT(1);
+    
+    // Copy loop output
+    Term* primaryOutput = get_output_placeholder(contents, 0);
+    TValue* output = topFrame->registers[primaryOutput->index];
+    copy(result, list_append(output));
+
+    for_loop_finish_iteration(CONTEXT);
 }
 
 void finish_while_loop(Term* whileTerm)

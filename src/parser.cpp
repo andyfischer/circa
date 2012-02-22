@@ -1232,7 +1232,7 @@ ParseResult discard_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
         return compile_error_for_line(branch, tokens, startPosition,
                 "'discard' can only be used inside a for loop");
 
-    Term* result = apply(branch, DISCARD_FUNC, TermList(enclosingForLoop));
+    Term* result = apply(branch, DISCARD_FUNC, TermList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);

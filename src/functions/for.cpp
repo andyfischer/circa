@@ -42,7 +42,10 @@ namespace for_function {
     }
     CA_FUNCTION(evaluate_discard)
     {
-        // FIXME
+        while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
+            finish_frame(CONTEXT);
+
+        for_loop_finish_iteration(CONTEXT);
     }
     void break_formatSource(StyledSource* source, Term* term)
     {
@@ -65,9 +68,9 @@ namespace for_function {
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
-        FUNCS.loop_output = import_function(kernel, evaluate_loop_output, "loop_output(int,any)");
+        FUNCS.loop_output = import_function(kernel, evaluate_loop_output, "loop_output(int, any)");
 
-        DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard(any)");
+        DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard()");
         as_function(DISCARD_FUNC)->formatSource = discard_formatSource;
         hide_from_docs(DISCARD_FUNC);
 

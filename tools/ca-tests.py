@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os,subprocess,sys
+import traceback
 from glob import glob
 
 ExecutableName = 'circa_d'
@@ -8,13 +9,17 @@ TestRoot = 'tests'
 
 class CircaProcess:
     def __init__(self):
-        self.proc = subprocess.Popen("circa_d -run-stdin",
-            shell=True, stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE, close_fds=True)
-
-        (self.stdin, self.stdout) = (self.proc.stdin, self.proc.stdout)
+        self.proc = None
 
     def run(self, cmd):
+        # Create proc if necessary
+        if self.proc is None:
+            self.proc = subprocess.Popen("circa_d -run-stdin",
+                shell=True, stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE, close_fds=True)
+
+            (self.stdin, self.stdout) = (self.proc.stdin, self.proc.stdout)
+            
         self.stdin.write(cmd + "\n")
 
         while True:
@@ -22,6 +27,10 @@ class CircaProcess:
             if not line or line == ":done\n":
                 return
             yield line[:-1]
+
+    def kill(self):
+        self.proc.kill()
+        self.proc = None
 
 
 class OutputDifference(object):
@@ -66,7 +75,12 @@ def diff_command_against_file(process, command, filename):
     numLines = 0
     expectedOutput = expectedOutput.__iter__()
 
-    actualOutput = list(process.run(command))
+    try:
+        actualOutput = list(process.run(command))
+    except Exception,e:
+        process.kill()
+        raise e
+
     for actualLine in actualOutput:
         expectedLine = ""
         try:
@@ -84,7 +98,13 @@ def test_file(process, filename):
     failures = []
 
     # Diff test
-    diff = diff_command_against_file(process, "file "+filename, filename + ".output")
+    try:
+        diff = diff_command_against_file(process, "file "+filename, filename + ".output")
+    except Exception,e:
+        traceback.print_exc()
+        failures.append(TestFailure(["Exception running file"], filename))
+        return failures
+
     if diff:
         desc = ['Script output differed on line '+str(diff.lineNumber)]
         desc.append('  Expected: "'+diff.fromFile+'"')
@@ -92,7 +112,13 @@ def test_file(process, filename):
         failures.append(TestFailure(desc, filename))
 
     # Source repro test
-    diff = diff_command_against_file(process, "source_repro "+filename, filename)
+    try:
+        diff = diff_command_against_file(process, "source_repro "+filename, filename)
+    except Exception,e:
+        traceback.print_exc()
+        failures.append(TestFailure(["Exception running source repro"], filename))
+        return failures
+
     if diff:
         desc = ['Source repro failed on line '+str(diff.lineNumber)]
         desc.append(' Expected: '+diff.fromFile)
