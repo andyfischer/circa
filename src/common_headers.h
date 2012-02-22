@@ -102,6 +102,4 @@ typedef char GCColor;
 
 void ca_assert_function(bool result, const char* expr, int line, const char* file);
 
-// #define DEFERRED_CALLS_FIRST_DRAFT
-
 } // namespace circa

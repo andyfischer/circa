@@ -20,9 +20,6 @@ struct Frame
     int nextPc;
     int startPc;
     int endPc;
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-    Symbol strategy;
-#endif
 };
 
 struct EvalContext
@@ -69,11 +66,6 @@ void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);
 Branch* top_branch(EvalContext* context);
 void reset_stack(EvalContext* context);
-
-
-#ifdef DEFERRED_CALLS_FIRST_DRAFT
-void push_frame_to_demand_evaluation(EvalContext* context, Term* target);
-#endif
 
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.
