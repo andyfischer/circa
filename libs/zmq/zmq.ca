@@ -3,11 +3,22 @@ sys:dll_patch()
 
 namespace zmq
     type Requester :handle;
+
+    def create_requester(string addr) -> Requester
+    def Requester.send(r) -> any
+
     type Responder :handle;
+    def Responder.read(r) -> any
+    def Responder.reply(r, any msg)
 
     def create_responder(int port) -> Responder
-    def create_requester(string addr) -> Requester
 
-    def Responder.read(r) -> any
-    def Responder.reply(r, any)
-    def Requester.send(r) -> any
+    type Publisher :handle;
+    def Publisher.send(r, any msg)
+
+    def create_publisher(int port) -> Publisher
+
+    type Subscriber :handle;
+    def Subscriber.poll() -> any
+
+    def create_subscriber(string addr) -> Subscriber

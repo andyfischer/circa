@@ -6,6 +6,12 @@ def input(int index) -> any
 def length(List) -> int
     "Return the number of items in the given list"
 
+def changed(any current) -> bool
+    state any prev = null
+    result = prev != current
+    prev = current
+    return result
+
 namespace cppbuild
     def build_module(string baseFilename)
 
@@ -15,6 +21,10 @@ namespace file
 
     def is_newer(string left, string right) -> bool
         return modified_time(left) > modified_time(right)
+
+    def file_changed(string filename) -> bool
+        mtime = modified_time(filename)
+        return changed([filename mtime])
 
 namespace refactor
     def rename(Ref r, string s)
@@ -32,13 +42,6 @@ namespace sys
 
 def Branch.dump(b)
 
--- Stateful functions
-
-def changed(any current) -> bool
-    state any prev = null
-    result = prev != current
-    prev = current
-    return result
 
 def toggle(bool tog) -> bool
     <<<

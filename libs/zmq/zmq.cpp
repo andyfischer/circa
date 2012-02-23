@@ -5,6 +5,7 @@
 #include "zmq.h"
 
 #include "stdio.h"
+#include "stdlib.h"
 #include "unistd.h"
 #include "string.h"
 
@@ -37,10 +38,7 @@ struct Requester
 {
     void* socket;
 
-    Requester()
-    {
-        socket = NULL;
-    }
+    Requester() : socket(NULL) {}
 };
 
 void RequesterRelease(caValue* value)
@@ -48,6 +46,12 @@ void RequesterRelease(caValue* value)
     Requester* requester = (Requester*) circa_as_pointer(value);
     zmq_close(requester->socket);
     delete requester;
+}
+
+void SocketRelease(caValue* value)
+{
+    void* socket = (Requester*) circa_as_pointer(value);
+    zmq_close(socket);
 }
 
 void zmq__create_responder(caStack* stack)
@@ -120,7 +124,7 @@ void zmq__Responder_reply(caStack* stack)
     memcpy(zmq_msg_data(&msg), msg_str, len);
 
     if (zmq_send(responder->socket, &msg, 0) == -1) {
-        printf("zmq_reply failed with error: %s\n", strerror(errno));
+        printf("zmq_send failed with error: %s\n", strerror(errno));
     }
     zmq_msg_close(&msg);
 }
@@ -133,7 +137,7 @@ void zmq__create_requester(caStack* stack)
     const char* addr = circa_string_input(stack, 0);
 
     if (zmq_bind(requester->socket, addr) == -1) {
-        printf("zmq_bind failed with error: %s\n", strerror(errno));
+        printf("in create_requester, zmq_bind failed with: %s\n", strerror(errno));
         circa_raise_error(stack, "zmq_bind failed");
         delete requester;
         return;
@@ -145,6 +149,83 @@ void zmq__create_requester(caStack* stack)
 
 void zmq__Requester_read(caStack* stack)
 {
+    Requester* requester = (Requester*) circa_handle_get_object(circa_input(stack, 0));
+    // TODO
+}
+
+void zmq__create_publisher(caStack* stack)
+{
+    int port = circa_int_input(stack, 0);
+
+    void* socket = zmq_socket(g_context, ZMQ_PUB);
+
+    char addr[50];
+    sprintf(addr, "tcp://localhost:%d", port);
+    if (zmq_bind(socket, addr) == -1) {
+        printf("in create_publisher, zmq_bind failed with: %s\n", strerror(errno));
+        circa_raise_error(stack, "zmq_bind failed");
+        zmq_close(socket);
+    }
+
+    caValue* out = circa_create_default_output(stack, 0);
+    circa_handle_set_object(out, socket, SocketRelease);
+}
+
+void zmq__Publisher_send(caStack* stack)
+{
+    void* socket = circa_handle_get_object(circa_input(stack, 0));
+    char* msg_str = circa_to_string(circa_input(stack, 1));
+
+    zmq_msg_t msg;
+    int len = strlen(msg_str);
+    zmq_msg_init_size(&msg, len);
+    memcpy(zmq_msg_data(&msg), msg_str, len);
+
+    if (zmq_send(socket, &msg, 0) == -1) {
+        printf("zmq_send failed with error: %s\n", strerror(errno));
+    }
+    zmq_msg_close(&msg);
+
+    free(msg_str);
+}
+
+void zmq__create_subscriber(caStack* stack)
+{
+    const char* addr = circa_string_input(stack, 0);
+
+    void* socket = zmq_socket(g_context, ZMQ_PUB);
+
+    if (zmq_bind(socket, addr) == -1) {
+        printf("in create_subscriber, zmq_bind failed with: %s\n", strerror(errno));
+        circa_raise_error(stack, "zmq_bind failed");
+        zmq_close(socket);
+    }
+
+    caValue* out = circa_create_default_output(stack, 0);
+    circa_handle_set_object(out, socket, SocketRelease);
+}
+
+void zmq__Subscriber_poll(caStack* stack)
+{
+    void* socket = circa_handle_get_object(circa_input(stack, 0));
+
+    zmq_msg_t msg;
+    zmq_msg_init(&msg);
+
+    if (zmq_recv(socket, &msg, ZMQ_NOBLOCK) == -1) {
+        if (errno == EAGAIN) {
+            // No message available right now; this is normal.
+            circa_set_null(circa_output(stack, 0));
+        } else {
+            printf("zmq_recv failed with error: %s\n", strerror(errno));
+        }
+    } else {
+
+        // Successfully received a message
+        circa_set_string_size(circa_output(stack, 0), (char*) zmq_msg_data(&msg), zmq_msg_size(&msg));
+    }
+
+    zmq_msg_close(&msg);
 }
 
 void on_load(caBranch* branch)

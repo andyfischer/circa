@@ -1,17 +1,26 @@
 
+import zmq
+
 -- c functions
 def on_file_changed(string filename)
 
-files_to_watch = ['test'] -- input from C++ land
+files_to_watch = [] -- input from C++ land
 
 for file in @files_to_watch
     if not(file:exists(file))
         print('file not found: ' file)
         discard
 
-state List watched_files = []
+state List watched_files = ['x.ca']
 watched_files.extend(files_to_watch)
 
 for file in watched_files
-    if file_changed(file)
+    if file:file_changed(file)
+        print('file changed: ' file)
         on_file_changed(file)
+
+-- ZMQ request socket. This socket handles requests for full file copies (used by
+-- new connections).
+
+-- ZMQ publish socket. This socket pushes out file changes.
+state publishSocket = zmq:create

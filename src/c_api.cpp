@@ -60,6 +60,16 @@ const char* circa_as_string(caValue* container)
 {
     return as_cstring((TValue*) container);
 }
+
+char* circa_to_string(caValue* value)
+{
+    if (is_string((TValue*) value))
+        return strdup(circa_as_string(value));
+
+    std::string s = to_string((TValue*) value);
+    return strdup(s.c_str());
+}
+
 void circa_get_point(caValue* point, float* xOut, float* yOut)
 {
     *xOut = to_float(get_index((TValue*) point, 0));

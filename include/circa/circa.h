@@ -81,7 +81,14 @@ caTerm* circa_current_term(caStack* stack);
 // Read an integer from a caValue
 int circa_as_int(caValue* container);
 
+// Read a caValue as a string
 const char* circa_as_string(caValue* container);
+
+// Convert this caValue to a new string. If the value is already string, then this
+// returns an exact copy (no quote marks are added). Otherwise it uses the type's
+// to string handler. Either way, the result is a newly allocated string and the
+// caller must free() it when finished.
+char* circa_to_string(caValue* value);
 
 void circa_get_point(caValue* point, float* xOut, float* yOut);
 void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, float* aOut);
