@@ -14,13 +14,21 @@ for file in @files_to_watch
 state List watched_files = ['x.ca']
 watched_files.extend(files_to_watch)
 
+-- ZMQ request socket. This socket handles requests for full file copies (used by
+-- new connections).
+state responder = zmq:create_responder(2778)
+
+incoming_req = responder.read()
+if incoming_req != null
+    responder.reply('here is your response')
+
+-- ZMQ publish socket. This socket pushes out file changes.
+state publisher = zmq:create_publisher(2779)
+
 for file in watched_files
     if file:file_changed(file)
         print('file changed: ' file)
-        on_file_changed(file)
+        publisher.send(concat('file changed: ' file))
 
--- ZMQ request socket. This socket handles requests for full file copies (used by
--- new connections).
-
--- ZMQ publish socket. This socket pushes out file changes.
-state publishSocket = zmq:create
+def f()
+  file:file_changed('x.ca')

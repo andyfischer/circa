@@ -86,44 +86,6 @@ void test_include_static_error_after_reload()
     test_assert(result.errorOccurred);
 }
 
-void test_file_changed()
-{
-    Branch branch;
-    FakeFileSystem files;
-    files["x"] = "1";
-    files["y"] = "2";
-
-    Term* filename = branch.compile("filename = 'x'");
-    Term* changed = branch.compile("file_changed(filename)");
-
-    // First time through should always return true
-    EvalContext context;
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(changed));
-
-    // Subsequent call should return false
-    evaluate_branch(&context, &branch);
-    //dump(branch);
-    //std::cout << context.state.toString();
-    test_assert(!as_bool(changed));
-    evaluate_branch(&context, &branch);
-    test_assert(!as_bool(changed));
-
-    // Change the modified time
-    files.last_modified("x")++;
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(changed));
-    evaluate_branch(&context, &branch);
-    test_assert(!as_bool(changed));
-
-    // Change the filename
-    set_string(filename, "y");
-    evaluate_branch(&context, &branch);
-    test_assert(as_bool(changed));
-    evaluate_branch(&context, &branch);
-    test_assert(!as_bool(changed));
-}
-
 void test_include_namespace()
 {
     Branch branch;
@@ -260,7 +222,6 @@ void register_tests()
     REGISTER_TEST_CASE(file_based_tests::test_the_test);
     REGISTER_TEST_CASE(file_based_tests::test_include_function);
     REGISTER_TEST_CASE(file_based_tests::test_include_static_error_after_reload);
-    //TEST_DISABLED REGISTER_TEST_CASE(file_based_tests::test_file_changed);
     REGISTER_TEST_CASE(file_based_tests::test_include_namespace);
     REGISTER_TEST_CASE(file_based_tests::test_include_with_error);
     REGISTER_TEST_CASE(file_based_tests::test_include_from_expression);

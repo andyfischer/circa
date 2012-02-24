@@ -11,6 +11,7 @@ declared_state_2.ca
 discard.ca
 do_once.ca
 dynamic_typing.ca
+file_changed.ca
 for.ca
 for_break.ca
 for_input_stateful.ca
