@@ -1,9 +1,6 @@
 
 import zmq
 
--- c functions
-def on_file_changed(string filename)
-
 files_to_watch = [] -- input from C++ land
 
 for file in @files_to_watch
@@ -26,7 +23,6 @@ if incoming_req != null
 state publisher = zmq:create_publisher(2779)
 
 for file in watched_files
-    print('file changed: ' file:file_changed(file))
     if file:file_changed(file)
         print('file changed: ' file)
         publisher.send(concat('file changed: ' file))
