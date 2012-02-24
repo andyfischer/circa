@@ -160,11 +160,12 @@ void zmq__create_publisher(caStack* stack)
     void* socket = zmq_socket(g_context, ZMQ_PUB);
 
     char addr[50];
-    sprintf(addr, "tcp://localhost:%d", port);
+    sprintf(addr, "tcp://*:%d", port);
     if (zmq_bind(socket, addr) == -1) {
         printf("in create_publisher, zmq_bind failed with: %s\n", strerror(errno));
         circa_raise_error(stack, "zmq_bind failed");
         zmq_close(socket);
+        return;
     }
 
     caValue* out = circa_create_default_output(stack, 0);
@@ -193,13 +194,17 @@ void zmq__create_subscriber(caStack* stack)
 {
     const char* addr = circa_string_input(stack, 0);
 
-    void* socket = zmq_socket(g_context, ZMQ_PUB);
+    void* socket = zmq_socket(g_context, ZMQ_SUB);
 
-    if (zmq_bind(socket, addr) == -1) {
-        printf("in create_subscriber, zmq_bind failed with: %s\n", strerror(errno));
-        circa_raise_error(stack, "zmq_bind failed");
+    if (zmq_connect(socket, addr) == -1) {
+        printf("in create_subscriber, zmq_connect failed with: %s\n", strerror(errno));
+        circa_raise_error(stack, "zmq_connect failed");
         zmq_close(socket);
+        return;
     }
+    
+    // Subscribe to all incoming messages (don't use ZMQ filtering)
+    zmq_setsockopt(socket, ZMQ_SUBSCRIBE, "", 0);
 
     caValue* out = circa_create_default_output(stack, 0);
     circa_handle_set_object(out, socket, SocketRelease);

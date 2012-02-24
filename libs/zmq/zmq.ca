@@ -19,6 +19,6 @@ namespace zmq
     def create_publisher(int port) -> Publisher
 
     type Subscriber :handle;
-    def Subscriber.poll() -> any
+    def Subscriber.poll(s) -> any
 
     def create_subscriber(string addr) -> Subscriber
