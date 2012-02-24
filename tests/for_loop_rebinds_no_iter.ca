@@ -1,0 +1,24 @@
+
+-- Test that the for-loop correctly rebinds outer bindings when there are no
+-- iterations. The zero-iteration path is a different path than one-or-more
+-- iterations.
+--
+
+a = 1
+b = 2
+c = 3
+d = 4
+e = 5
+
+for i in []
+    a = 6
+    b = 7
+    c = 8
+    d = 9
+    e = 10
+
+assert(a == 1)
+assert(b == 2)
+assert(c == 3)
+assert(d == 4)
+assert(e == 5)

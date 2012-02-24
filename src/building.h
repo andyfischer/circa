@@ -154,6 +154,7 @@ Term* apply_after(Term* existing, Term* function);
 void move_before(Term* movee, Term* pivot);
 void move_after(Term* movee, Term* position); void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
+void move_to_index(Term* term, int index);
 void transfer_users(Term* from, Term* to);
 
 void input_placeholders_to_list(Branch* branch, TermList* list);

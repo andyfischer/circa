@@ -592,14 +592,16 @@ void update_extra_outputs(Term* term)
         Term* extra_output = NULL;
 
         // Check if this extra_output() already exists
-        Term* existing = branch->getSafe(term->index + index);
-        if (existing != NULL && existing->function == EXTRA_OUTPUT_FUNC)
-            extra_output = existing;
+        Term* existingSlot = branch->getSafe(term->index + index);
+        if (existingSlot != NULL && existingSlot->function == EXTRA_OUTPUT_FUNC)
+            extra_output = existingSlot;
         
         if (extra_output == NULL) {
             extra_output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
+            move_to_index(extra_output, term->index + index);
             anyAdded = true;
         }
+
         change_declared_type(extra_output, placeholder->type);
 
         if (function_is_state_input(placeholder))
@@ -1045,7 +1047,20 @@ void move_before_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
     int outputCount = count_output_placeholders(branch);
-    branch->move(term, branch->length() - outputCount - 1);
+
+    int desiredIndex = branch->length() - outputCount - 1;
+
+    // If the term is itself an output, then we can't expect it to go before
+    // all the outputs, so instead make it the first output.
+    if (is_output_placeholder(term))
+        desiredIndex += 1;
+
+    branch->move(term, desiredIndex);
+}
+
+void move_to_index(Term* term, int index)
+{
+    term->owningBranch->move(term, index);
 }
 
 void transfer_users(Term* from, Term* to)

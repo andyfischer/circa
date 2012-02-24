@@ -1,0 +1,38 @@
+
+-- This script checks for problems with lots of extra outputs. There was a bug
+-- where the extra_output terms after for() were interleaved like this:
+--
+--   extra_output()
+--   pack_state()
+--   extra_output()
+--   pack_state()
+--   extra_output()
+--   pack_state()
+--
+-- But the extra_outputs shouldn't be separated, so we want it to look like:
+--
+--   extra_output()
+--   extra_output()
+--   extra_output()
+--   pack_state()
+--   pack_state()
+--   pack_state()
+
+state a = 1
+state b = 2
+state c = 3
+state d = 4
+state e = 5
+
+for i in [1]
+    a = 6
+    b = 7
+    c = 8
+    d = 9
+    e = 10
+
+assert(a == 6)
+assert(b == 7)
+assert(c == 8)
+assert(d == 9)
+assert(e == 10)

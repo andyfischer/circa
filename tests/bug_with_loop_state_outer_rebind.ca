@@ -1,0 +1,16 @@
+
+-- There was a bug in for() loop; if it used a implicit input that was a state var,
+-- then this would mess up the loop's own state.
+
+def main()
+    state a = 1
+
+    for i in [1]
+        state s = a
+        s += 1
+
+s = null
+main(state = s)
+print(s)
+main(state = s)
+print(s)

@@ -1,0 +1,21 @@
+
+-- Test that the for-loop correctly rebinds outer bindings.
+
+a = 1
+b = 2
+c = 3
+d = 4
+e = 5
+
+for i in [1]
+    a = 6
+    b = 7
+    c = 8
+    d = 9
+    e = 10
+
+assert(a == 6)
+assert(b == 7)
+assert(c == 8)
+assert(d == 9)
+assert(e == 10)

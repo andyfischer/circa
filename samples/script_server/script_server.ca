@@ -26,9 +26,7 @@ if incoming_req != null
 state publisher = zmq:create_publisher(2779)
 
 for file in watched_files
+    print('file changed: ' file:file_changed(file))
     if file:file_changed(file)
         print('file changed: ' file)
         publisher.send(concat('file changed: ' file))
-
-def f()
-  file:file_changed('x.ca')

@@ -133,7 +133,8 @@ void add_implicit_placeholders(Term* forTerm)
         for (int i=0; i < contents->length(); i++)
             remap_pointers_quick(contents->get(i), original, input);
 
-        apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result), name);
+        Term* term = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result), name);
+        move_before_outputs(term);
 
         inputIndex++;
     }

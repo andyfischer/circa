@@ -2,6 +2,7 @@ assert_failure.ca
 builtin_funcs.ca
 bug_with_double_pack_state.ca
 bug_with_for_loop_output.ca
+bug_with_loop_state_outer_rebind.ca
 boolean.ca
 cast.ca
 color_values.ca
@@ -18,6 +19,9 @@ for_input_stateful.ca
 for_loop_output.ca
 for_loop_output_2.ca
 for_loop_output_3.ca
+for_loop_rebinds_no_iter.ca
+for_loop_rebinds_one_iter.ca
+for_loop_lots_of_stateful_rebinds.ca
 for_state.ca
 for_state_1.ca
 for_state_2.ca
