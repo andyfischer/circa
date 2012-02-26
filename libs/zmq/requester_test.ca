@@ -1,0 +1,8 @@
+
+import zmq
+
+state client = zmq:create_requester('tcp://localhost:2222')
+
+client.send('hi')
+
+print(client.receive())

@@ -136,7 +136,7 @@ void zmq__create_requester(caStack* stack)
     
     const char* addr = circa_string_input(stack, 0);
 
-    if (zmq_bind(requester->socket, addr) == -1) {
+    if (zmq_connect(requester->socket, addr) == -1) {
         printf("in create_requester, zmq_bind failed with: %s\n", strerror(errno));
         circa_raise_error(stack, "zmq_bind failed");
         delete requester;
@@ -147,10 +147,38 @@ void zmq__create_requester(caStack* stack)
     circa_handle_set_object(out, requester, RequesterRelease);
 }
 
-void zmq__Requester_read(caStack* stack)
+void zmq__Requester_send(caStack* stack)
 {
     Requester* requester = (Requester*) circa_handle_get_object(circa_input(stack, 0));
-    // TODO
+    const char* msg_str = circa_as_string(circa_input(stack, 1));
+
+    zmq_msg_t msg;
+    int len = strlen(msg_str);
+    zmq_msg_init_size(&msg, len);
+    memcpy(zmq_msg_data(&msg), msg_str, len);
+
+    if (zmq_send(requester->socket, &msg, 0) == -1) {
+        printf("zmq_send failed with error: %s\n", strerror(errno));
+        circa_raise_error(stack, "zmq_send failed");
+    }
+    zmq_msg_close(&msg);
+}
+
+void zmq__Requester_receive(caStack* stack)
+{
+    Requester* requester = (Requester*) circa_handle_get_object(circa_input(stack, 0));
+
+    zmq_msg_t msg;
+    zmq_msg_init(&msg);
+
+    if (zmq_recv(requester->socket, &msg, 0) == -1) {
+        printf("zmq_recv failed with error: %s\n", strerror(errno));
+        circa_raise_error(stack, "zmq_recv failed");
+
+    } else {
+        circa_set_string_size(circa_output(stack, 0), (char*) zmq_msg_data(&msg), zmq_msg_size(&msg));
+    }
+    zmq_msg_close(&msg);
 }
 
 void zmq__create_publisher(caStack* stack)
@@ -175,7 +203,7 @@ void zmq__create_publisher(caStack* stack)
 void zmq__Publisher_send(caStack* stack)
 {
     void* socket = circa_handle_get_object(circa_input(stack, 0));
-    char* msg_str = circa_to_string(circa_input(stack, 1));
+    const char* msg_str = circa_as_string(circa_input(stack, 1));
 
     zmq_msg_t msg;
     int len = strlen(msg_str);
@@ -186,8 +214,6 @@ void zmq__Publisher_send(caStack* stack)
         printf("zmq_send failed with error: %s\n", strerror(errno));
     }
     zmq_msg_close(&msg);
-
-    free(msg_str);
 }
 
 void zmq__create_subscriber(caStack* stack)
@@ -237,6 +263,21 @@ void on_load(caBranch* branch)
 {
     // setup_handle_type(get_declared_type(branch, "zmq:Requester"));
     // setup_handle_type(get_declared_type(branch, "zmq:Responder"));
+}
+
+// For static linking:
+void zmq_install_functions(caBranch* branch)
+{
+    circa_install_function(branch, "zmq:create_responder", zmq__create_responder);
+    circa_install_function(branch, "zmq:Responder.read", zmq__Responder_read);
+    circa_install_function(branch, "zmq:Responder.reply", zmq__Responder_reply);
+    circa_install_function(branch, "zmq:create_requester", zmq__create_requester);
+    circa_install_function(branch, "zmq:Requester.send", zmq__Requester_send);
+    circa_install_function(branch, "zmq:Requester.receive", zmq__Requester_receive);
+    circa_install_function(branch, "zmq:create_publisher", zmq__create_publisher);
+    circa_install_function(branch, "zmq:Publisher.send", zmq__Publisher_send);
+    circa_install_function(branch, "zmq:create_subscriber", zmq__create_subscriber);
+    circa_install_function(branch, "zmq:Subscriber.poll", zmq__Subscriber_poll);
 }
 
 } // extern "C"

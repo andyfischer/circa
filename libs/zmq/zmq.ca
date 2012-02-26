@@ -5,20 +5,21 @@ namespace zmq
     type Requester :handle;
 
     def create_requester(string addr) -> Requester
-    def Requester.send(r) -> any
+    def Requester.send(_, string msg)
+    def Requester.receive(_) -> string
 
     type Responder :handle;
-    def Responder.read(r) -> any
-    def Responder.reply(r, any msg)
+    def Responder.read(_) -> string
+    def Responder.reply(_, string msg)
 
     def create_responder(int port) -> Responder
 
     type Publisher :handle;
-    def Publisher.send(r, any msg)
+    def Publisher.send(_, string msg)
 
     def create_publisher(int port) -> Publisher
 
     type Subscriber :handle;
-    def Subscriber.poll(s) -> any
+    def Subscriber.poll(_) -> string
 
     def create_subscriber(string addr) -> Subscriber
