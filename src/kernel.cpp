@@ -528,7 +528,6 @@ EXPORT void circa_initialize()
     // Use standard filesystem by default
     circa_use_standard_filesystem();
 
-#if 0
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");
     if (libPathEnv != NULL) {
@@ -540,11 +539,11 @@ EXPORT void circa_initialize()
 
         for (int i=0; i < list_length(&libPaths); i++) {
             TValue* path = list_get_index(&libPaths, i);
-            std::cout << "adding module path: " << path->toString() << std::endl;
+            if (string_eq(path, ""))
+                continue;
             modules_add_search_path(as_cstring(path));
         }
     }
-#endif
 }
 
 EXPORT void circa_shutdown()
