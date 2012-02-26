@@ -67,6 +67,11 @@ namespace string_methods_function {
         set_bool(OUTPUT, string_starts_with(INPUT(0), as_cstring(INPUT(1))));
     }
 
+    CA_FUNCTION(split)
+    {
+        string_split(INPUT(0), string_get(INPUT(1), 0), OUTPUT);
+    }
+
     void setup(Branch* kernel)
     {
         import_function(kernel, length, "string.length(_) -> int");
@@ -74,6 +79,7 @@ namespace string_methods_function {
         import_function(kernel, slice, "string.slice(_,int,int) -> string");
         import_function(kernel, ends_with, "string.ends_with(_,string) -> bool");
         import_function(kernel, starts_with, "string.starts_with(_,string) -> bool");
+        import_function(kernel, split, "string.split(_,string sep) -> List");
     }
 
 }

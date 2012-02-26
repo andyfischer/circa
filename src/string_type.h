@@ -24,6 +24,8 @@ int string_length(TValue* s);
 void string_slice(TValue* s, int start, int end, TValue* out);
 int string_find_char(TValue* s, int start, char c);
 
+void string_split(TValue* s, char sep, TValue* listOut);
+
 const char* as_cstring(TValue* value);
 std::string const& as_string(TValue* value);
 

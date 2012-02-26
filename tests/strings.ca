@@ -11,3 +11,8 @@ assert(not("hi there".starts_with("hello")))
 assert("1234".ends_with("34"))
 assert(not("1234".ends_with("3")))
 
+assert("1".split(" ") == ["1"])
+assert("1 ".split(" ") == ["1", ""])
+assert("1 2".split(" ") == ["1", "2"])
+assert("1 2 3".split(" ") == ["1", "2", "3"])
+assert("1;2;3".split(";") == ["1", "2", "3"])

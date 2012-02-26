@@ -26,6 +26,9 @@ List* modules_get_search_paths()
 
 void modules_add_search_path(const char* str)
 {
+    if (strcmp(str, "") == 0)
+        internal_error("blank path in modules_add_search_path");
+
     set_string(g_moduleSearchPaths.append(), str);
 }
 

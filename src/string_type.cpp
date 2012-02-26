@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "importing.h"
 #include "evaluation.h"
+#include "list_shared.h"
 #include "string_type.h"
 #include "source_repro.h"
 #include "names.h"
@@ -213,6 +214,9 @@ int string_length(TValue* s)
 
 void string_slice(TValue* s, int start, int end, TValue* out)
 {
+    if (s == out)
+        internal_error("Usage error in string_slice, 's' cannot be 'out'");
+
     if (end == -1)
         end = string_length(s);
 
@@ -232,6 +236,20 @@ int string_find_char(TValue* s, int start, char c)
         if (cstr[i] == c)
             return i;
     return -1;
+}
+
+void string_split(TValue* s, char sep, TValue* listOut)
+{
+    set_list(listOut, 0);
+
+    int len = string_length(s);
+    int wordStart = 0;
+    for (int pos=0; pos <= len; pos++) {
+        if (pos == len || string_get(s, pos) == sep) {
+            string_slice(s, wordStart, pos, list_append(listOut));
+            wordStart = pos + 1;
+        }
+    }
 }
 
 std::string& as_std_string(TValue* value)
