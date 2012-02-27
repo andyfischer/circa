@@ -23,3 +23,9 @@ namespace zmq
     def Subscriber.poll(_) -> string
 
     def create_subscriber(string addr) -> Subscriber
+
+    def admin_command_subscribe(string addr)
+        state sub = create_subscriber(addr)
+        msg = sub.poll()
+        if msg != null
+            sys:do_admin_command(msg)

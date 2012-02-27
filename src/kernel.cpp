@@ -177,6 +177,14 @@ CA_FUNCTION(file__exists)
 {
     set_bool(OUTPUT, file_exists(STRING_INPUT(0)));
 }
+CA_FUNCTION(file__read_text)
+{
+    TValue error;
+    read_text_file_to_value(STRING_INPUT(0), OUTPUT, &error);
+
+    if (!is_null(&error))
+        RAISE_ERROR(as_cstring(&error));
+}
 
 CA_FUNCTION(input_func)
 {
@@ -487,6 +495,7 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
     install_function(kernel->get("file:modified_time"), file__modified_time);
     install_function(kernel->get("file:exists"), file__exists);
+    install_function(kernel->get("file:read_text"), file__read_text);
     install_function(kernel->get("input"), input_func);
     install_function(kernel->get("length"), length);
     install_function(kernel->get("refactor:rename"), refactor__rename);

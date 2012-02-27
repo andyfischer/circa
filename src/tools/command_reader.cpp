@@ -158,6 +158,22 @@ void do_file_command(List* args, TValue* reply)
     }
 }
 
+void rewrite_branch(Branch* branch, TValue* contents, TValue* reply)
+{
+    clear_branch(branch);
+    parser::compile(branch, parser::statement_list, as_cstring(contents));
+
+    post_module_load(branch);
+
+    if (has_static_errors(branch)) {
+        std::stringstream errors;
+        print_static_errors_formatted(branch);
+        set_string(reply, errors.str());
+    } else {
+        set_name(reply, name_Success);
+    }
+}
+
 void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
 {
     Name name = name_from_string(branchName);
@@ -171,18 +187,19 @@ void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
 
     // Import the new branch contents
     Branch* branch = nested_contents(term);
-    clear_branch(branch);
-    parser::compile(branch, parser::statement_list, as_cstring(contents));
+    rewrite_branch(branch, contents, reply);
+}
 
-    post_module_load(branch);
+void do_update_file(TValue* filename, TValue* contents, TValue* reply)
+{
+    Branch* branch = find_module_from_filename(as_cstring(filename));
 
-    if (has_static_errors(branch)) {
-        std::stringstream errors;
-        print_static_errors_formatted(branch);
-        set_string(reply, errors.str());
-    } else {
-        set_name(reply, name_Success);
+    if (branch == NULL) {
+        set_string(reply, "Module not found");
+        return;
     }
+
+    rewrite_branch(branch, contents, reply);
 }
 
 void do_admin_command(TValue* input, TValue* reply)
@@ -228,6 +245,22 @@ void do_admin_command(TValue* input, TValue* reply)
         string_slice(input, nextSpace+1, -1, &contents);
 
         do_write_branch(&branchName, &contents, reply);
+
+    } else if (equals_string(&command, "update_file")) {
+
+        int nextSpace = string_find_char(input, first_space+1, ' ');
+        if (nextSpace == -1) {
+            set_string(reply, "Syntax error, not enough arguments");
+            return;
+        }
+        
+        TValue filename;
+        string_slice(input, first_space+1, nextSpace, &filename);
+
+        TValue contents;
+        string_slice(input, nextSpace+1, -1, &contents);
+
+        do_update_file(&filename, &contents, reply);
 
     } else if (equals_string(&command, "source_repro")) {
         List args;

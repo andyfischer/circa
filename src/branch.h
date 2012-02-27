@@ -124,7 +124,7 @@ bool has_nested_contents(Term* term);
 Branch* nested_contents(Term* term);
 void remove_nested_contents(Term* term);
 
-void branch_get_source_filename(Branch* branch, TValue* filenameOut);
+TValue* branch_get_source_filename(Branch* branch);
 std::string get_branch_source_filename(Branch* branch);
 Branch* get_outer_scope(Branch* branch);
 

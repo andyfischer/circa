@@ -18,6 +18,7 @@ namespace cppbuild
 namespace file
     def modified_time(string filename) -> int
     def exists(string filename) -> bool
+    def read_text(string filename) -> string
 
     def is_newer(string left, string right) -> bool
         return modified_time(left) > modified_time(right)
@@ -25,6 +26,7 @@ namespace file
     def file_changed(string filename) -> bool
         mtime = modified_time(filename)
         return changed([filename mtime])
+
 
 namespace refactor
     def rename(Ref r, string s)

@@ -178,16 +178,15 @@ void patch_with_dll(const char* dll_filename, Branch* branch, TValue* errorOut)
 
 void find_dll_for_script(Branch* branch, TValue* resultOut)
 {
-    String filename;
-    branch_get_source_filename(branch, &filename);
+    String* filename = (String*) branch_get_source_filename(branch);
 
-    if (!is_string(&filename)) {
+    if (!is_string(filename)) {
         set_name(resultOut, name_Failure);
         return;
     }
 
     String dllFilename;
-    copy(&filename, &dllFilename);
+    copy(filename, &dllFilename);
 
     if (string_ends_with(&dllFilename, ".ca"))
         string_resize(&dllFilename, -3);

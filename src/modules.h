@@ -15,4 +15,6 @@ Term* load_module_from_file(Name module_name, const char* filename);
 // returns either Success or FileNotFound
 Name load_module(Name module_name, Term* loadCall);
 
+Branch* find_module_from_filename(const char* filename);
+
 } // namespace circa

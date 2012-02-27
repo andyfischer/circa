@@ -121,4 +121,23 @@ Name load_module(Name module_name, Term* loadCall)
     return name_Success;
 }
 
+Branch* find_module_from_filename(const char* filename)
+{
+    // O(n) search for a module with this filename. Could stand to be more efficient.
+    for (int i=0; i < kernel()->length(); i++) {
+        Term* term = kernel()->get(i);
+        if (term->nestedContents == NULL)
+            continue;
+
+        TValue* branchFilename = branch_get_source_filename(nested_contents(term));
+        if (branchFilename == NULL)
+            continue;
+
+        if (string_eq(branchFilename, filename))
+            return nested_contents(term);
+    }
+
+    return NULL;
+}
+
 } // namespace circa

@@ -1,0 +1,4 @@
+
+namespace imported
+    def f()
+        print('imported version 1')
