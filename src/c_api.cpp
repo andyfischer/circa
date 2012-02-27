@@ -86,6 +86,12 @@ void* circa_as_pointer(caValue* container)
 {
     return as_opaque_pointer((TValue*) container);
 }
+
+void circa_init_value(caValue* container)
+{
+    initialize_null((TValue*) container);
+}
+
 void circa_set_int(caValue* container, int value)
 {
     set_int((TValue*) container, value);

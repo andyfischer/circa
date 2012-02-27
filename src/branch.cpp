@@ -385,7 +385,7 @@ std::string get_branch_source_filename(Branch* branch)
 {
     TValue* val = branch_get_source_filename(branch);
     
-    if (val == NULL || is_string(val))
+    if (val == NULL || !is_string(val))
         return "";
     else
         return as_string(val);

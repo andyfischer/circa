@@ -140,7 +140,7 @@ std::string get_short_location(Term* term)
     out << "[";
     std::string filename = get_source_filename(term);
     if (filename != "")
-        out << get_source_filename(term) << ":";
+        out << filename << ":";
     if (term->sourceLoc.defined())
         out << term->sourceLoc.line << "," << term->sourceLoc.col;
     else

@@ -96,6 +96,10 @@ void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, floa
 // Read an opaque pointer from a caValue
 void* circa_as_pointer(caValue* container);
 
+// Initialize a newly allocated caValue container. This must be called before any set()
+// functions.
+void circa_init_value(caValue* container);
+
 // Assign an integer to a caValue
 void circa_set_int(caValue* container, int value);
 
