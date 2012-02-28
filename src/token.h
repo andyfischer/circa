@@ -179,7 +179,7 @@ struct TokenStream
     void consumeStr(caValue* output, int match = -1);
 
     // Like consume(), but registers the string as a runtime symbol.
-    Name consumeName(int match = -1);
+    caName consumeName(int match = -1);
 
     bool nextNonWhitespaceIs(int match, int lookahead=0) const;
 

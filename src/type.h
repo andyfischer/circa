@@ -76,7 +76,7 @@ struct Type
     CircaObject header;
 
     std::string nameStr;
-    Name name;
+    caName name;
 
     StorageType storageType;
 

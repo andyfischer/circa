@@ -93,7 +93,7 @@ static bool find_module_file(Name module_name, String* filenameOut)
     return false;
 }
 
-Name load_module(Name module_name, Term* loadCall)
+caName load_module(caName module_name, Term* loadCall)
 {
     Term* existing = find_loaded_module(module_name);
     if (existing != NULL)

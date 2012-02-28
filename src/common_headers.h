@@ -32,8 +32,6 @@
 
 namespace circa {
 
-typedef int Name;
-
 struct Branch;
 struct BrokenLinkList;
 struct CastResult;
