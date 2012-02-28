@@ -133,7 +133,7 @@ caFileRecord* circa_get_file_record(const char* filename)
     return NULL;
 }
 
-char* circa_read_file(const char* filename)
+const char* circa_read_file(const char* filename)
 {
     file_init_globals();
 

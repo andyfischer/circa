@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include "circa/file.h"
+
 #include "branch.h"
 #include "building.h"
 #include "kernel.h"
@@ -554,17 +556,15 @@ Name load_script(Branch* branch, const char* filename)
     set_int(fileOrigin->get(2), get_modified_time(filename));
 
     // Read the text file
-    TValue contents;
-    TValue fileReadError;
-    read_text_file_to_value(filename, &contents, &fileReadError);
+    const char* contents = circa_read_file(filename);
 
-    if (!is_null(&fileReadError)) {
-        Term* msg = create_value(branch, &fileReadError, "fileReadError");
+    if (contents == NULL) {
+        Term* msg = create_string(branch, "file not found");
         apply(branch, STATIC_ERROR_FUNC, TermList(msg));
         return name_Failure;
     }
 
-    parser::compile(branch, parser::statement_list, as_string(&contents));
+    parser::compile(branch, parser::statement_list, contents);
 
     post_module_load(branch);
 

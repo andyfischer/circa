@@ -7,6 +7,8 @@
 
 #include "../common_headers.h"
 
+#include "circa/file.h"
+
 #include "../branch.h"
 #include "../source_repro.h"
 #include "../static_checking.h"
@@ -38,14 +40,15 @@ void run_file_checker(const char* filename, List* errors)
     {
         TValue fileContents;
         TValue fileReadError;
-        read_text_file_to_value(filename, &fileContents, &fileReadError);
-        if (!is_null(&fileReadError)) {
+
+        const char* contents = circa_read_file(filename);
+        if (contents == NULL) {
             std::stringstream msg;
-            msg << "File read error: " << fileReadError.toString();
+            msg << "File not found: " << filename;
             errors->appendString(msg.str());
             return;
         }
-        actualSource = as_cstring(&fileContents);
+        actualSource = contents;
     }
 
     // Run a source-repro test

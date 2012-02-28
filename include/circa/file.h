@@ -79,7 +79,7 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source);
 // currently exist.
 caFileRecord* circa_get_file_record(const char* filename);
 
-char* circa_read_file(const char* filename);
+const char* circa_read_file(const char* filename);
 
 #ifdef __cplusplus
 } // extern "C"
