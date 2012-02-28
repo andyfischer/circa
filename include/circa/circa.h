@@ -115,6 +115,7 @@ void circa_set_float(caValue* container, float value);
 // Assign an opaque pointer to a caValue
 void circa_set_pointer(caValue* container, void* ptr);
 
+void circa_set_string(caValue* container, const char* str);
 void circa_set_string_size(caValue* container, const char* str, int size);
 
 void circa_set_point(caValue* point, float x, float y);

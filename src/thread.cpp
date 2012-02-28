@@ -12,8 +12,9 @@ typedef struct caMutex {
     pthread_mutex_t mutex;
 } caMutex;
 
-void circa_thread_create(caThreadMainFunc func, void* data)
+void circa_spawn_thread(caThreadMainFunc func, void* data)
 {
+    // TODO
 }
 
 caMutex* circa_create_mutex()

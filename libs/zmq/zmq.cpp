@@ -10,6 +10,7 @@
 #include "string.h"
 
 #include "circa/circa.h"
+#include "circa/thread.h"
 
 extern "C" {
 
@@ -263,6 +264,65 @@ void on_load(caBranch* branch)
 {
     // setup_handle_type(get_declared_type(branch, "zmq:Requester"));
     // setup_handle_type(get_declared_type(branch, "zmq:Responder"));
+}
+
+namespace zmq_file_source {
+    struct ZmqFileClient
+    {
+        void* subscriberSocket;
+        bool subscriberAlive;
+    };
+
+    void zmq_subscriber_thread(void* context);
+
+    void zmq_init_file_source(const char* addr, caValue* error)
+    {
+        ZmqFileClient* client = new ZmqFileClient();
+
+        // Connect to responder
+        void* requester = zmq_socket(g_context, ZMQ_REQ);
+
+        if (zmq_connect(requester, addr) == -1) {
+            circa_set_string(error, "zmq_bind failed");
+            return;
+        }
+
+        // Request manifest
+        zmq_msg_t manifest_request;
+        const char manifest_request_str[] = "get_manifest";
+        zmq_msg_init_size(&manifest_request, sizeof(manifest_request_str));
+        memcpy(zmq_msg_data(&manifest_request), manifest_request_str, sizeof(manifest_request_str));
+        
+        if (zmq_send(requester, &manifest_request, 0) == -1) {
+            circa_set_string(error, "zmq_send failed");
+            return;
+        }
+
+        zmq_msg_close(&manifest_request);
+
+        // Receive manifest
+        zmq_msg_t manifest_response;
+        zmq_msg_init(&manifest_response);
+
+        if (zmq_recv(requester, &manifest_response, 0) == -1) {
+            circa_set_string(error, "zmq_recv failed");
+            return;
+        }
+
+        // TODO: parse the incoming value
+
+        // Register each file with Circa
+        // Done with responder
+
+        // Start subscriber thread
+        client->subscriberAlive = true;
+        circa_spawn_thread(zmq_subscriber_thread, client);
+    }
+
+    void zmq_subscriber_thread(void* context)
+    {
+        ZmqFileClient* client = (ZmqFileClient*) context;
+    }
 }
 
 // For static linking:

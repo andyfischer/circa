@@ -120,6 +120,10 @@ void circa_set_float(caValue* container, float value)
 {
     set_float((TValue*) container, value);
 }
+void circa_set_string(caValue* container, const char* str)
+{
+    set_string((TValue*) container, str);
+}
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
     set_string((TValue*) container, str, size);

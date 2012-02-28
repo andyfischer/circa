@@ -15,7 +15,7 @@ typedef void (*caThreadMainFunc)(void* data);
 
 typedef struct caMutex;
 
-void circa_thread_create(caThreadMainFunc func, void* data);
+void circa_spawn_thread(caThreadMainFunc func, void* data);
 caMutex* circa_create_mutex();
 void circa_destroy_mutex(caMutex*);
 void circa_thread_mutex_lock(caMutex* mutex);
