@@ -81,6 +81,8 @@ caFileRecord* circa_get_file_record(const char* filename);
 
 const char* circa_read_file(const char* filename);
 
+int circa_file_get_version(const char* filename);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif

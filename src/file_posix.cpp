@@ -8,6 +8,16 @@
 
 extern "C" {
 
+static int get_modified_time(const char* filename)
+{
+    struct stat s;
+    s.st_mtime = 0;
+
+    stat(filename, &s);
+
+    return s.st_mtime;
+}
+
 static void update_file(caFileSource*, caFileRecord* record)
 {
     FILE* fp = fopen(record->filename, "r");
@@ -18,6 +28,19 @@ static void update_file(caFileSource*, caFileRecord* record)
         return;
     }
 
+    // Check the last modified time to see if we need to reload the file.
+    int modifiedTime = get_modified_time(record->filename);
+    if (circa_is_int(record->sourceMetadata) &&
+        modifiedTime == circa_as_int(record->sourceMetadata)) {
+
+        return;
+    }
+
+    // If we reach this point then we'll read the file
+
+    // Store modified time
+    circa_set_int(record->sourceMetadata, modifiedTime);
+
     // Get file size
     fseek(fp, 0, SEEK_END);
     size_t size = ftell(fp);
@@ -26,6 +49,7 @@ static void update_file(caFileSource*, caFileRecord* record)
     record->data = (char*) realloc(record->data, size + 1);
     fread(record->data, 1, size, fp);
     record->data[size] = 0;
+    record->version++;
 
     fclose(fp);
 }

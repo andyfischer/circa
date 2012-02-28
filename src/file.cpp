@@ -115,6 +115,7 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source)
             return record;
 
         // Existing record is for a different source; change its ownership.
+        circa_set_null(record->sourceMetadata);
         record->source = source;
         return record;
     }
@@ -133,7 +134,7 @@ caFileRecord* circa_get_file_record(const char* filename)
     return NULL;
 }
 
-const char* circa_read_file(const char* filename)
+static caFileRecord* circa_open_file(const char* filename)
 {
     file_init_globals();
 
@@ -144,12 +145,12 @@ const char* circa_read_file(const char* filename)
         for (int i=0;; i++) {
             caFileSource* source = get_source_by_precedence(i);
             if (source == NULL)
-                continue;
+                break;
 
             if (source->openFile != NULL) {
                 record = source->openFile(source, filename);
                 if (record != NULL)
-                    return record->data;
+                    return record;
             }
         }
 
@@ -162,8 +163,24 @@ const char* circa_read_file(const char* filename)
     // Call the source's updateFile handler (optional)
     if (source->updateFile != NULL)
         source->updateFile(source, record);
+    
+    return record;
+}
 
+const char* circa_read_file(const char* filename)
+{
+    caFileRecord* record = circa_open_file(filename);
+    if (record == NULL)
+        return NULL;
     return record->data;
+}
+
+int circa_file_get_version(const char* filename)
+{
+    caFileRecord* record = circa_open_file(filename);
+    if (record == NULL)
+        return -1;
+    return record->version;
 }
 
 } // extern "C"

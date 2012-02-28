@@ -18,14 +18,15 @@ namespace cppbuild
 namespace file
     def modified_time(string filename) -> int
     def exists(string filename) -> bool
+    def version(string filename) -> int
     def read_text(string filename) -> string
 
     def is_newer(string left, string right) -> bool
         return modified_time(left) > modified_time(right)
 
     def file_changed(string filename) -> bool
-        mtime = modified_time(filename)
-        return changed([filename mtime])
+        ver = version(filename)
+        return changed([filename ver])
 
 
 namespace refactor

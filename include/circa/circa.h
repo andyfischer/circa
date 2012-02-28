@@ -78,6 +78,10 @@ caValue* circa_create_default_output(caStack* stack, int index);
 // Fetch the caTerm that is currently being evaluated.
 caTerm* circa_current_term(caStack* stack);
 
+bool circa_is_int(caValue* container);
+bool circa_is_float(caValue* container);
+bool circa_is_string(caValue* container);
+
 // Read an integer from a caValue
 int circa_as_int(caValue* container);
 

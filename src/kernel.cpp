@@ -180,6 +180,10 @@ CA_FUNCTION(file__exists)
 {
     set_bool(OUTPUT, file_exists(STRING_INPUT(0)));
 }
+CA_FUNCTION(file__version)
+{
+    set_int(OUTPUT, circa_file_get_version(STRING_INPUT(0)));
+}
 CA_FUNCTION(file__read_text)
 {
     set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
@@ -493,6 +497,7 @@ void install_standard_library(Branch* kernel)
     // Install each function
     install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
     install_function(kernel->get("file:modified_time"), file__modified_time);
+    install_function(kernel->get("file:version"), file__version);
     install_function(kernel->get("file:exists"), file__exists);
     install_function(kernel->get("file:read_text"), file__read_text);
     install_function(kernel->get("input"), input_func);

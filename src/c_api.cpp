@@ -52,6 +52,19 @@ caTerm* circa_current_term(caStack* stack)
 }
 
 // Values
+bool circa_is_int(caValue* container)
+{
+    return is_int((TValue*) container);
+}
+
+bool circa_is_float(caValue* container)
+{
+    return is_float((TValue*) container);
+}
+bool circa_is_string(caValue* container)
+{
+    return is_string((TValue*) container);
+}
 int circa_as_int(caValue* container)
 {
     return as_int((TValue*) container);
