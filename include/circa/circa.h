@@ -84,6 +84,7 @@ bool circa_is_string(caValue* container);
 
 // Read an integer from a caValue
 int circa_as_int(caValue* container);
+float circa_as_float(caValue* container);
 
 // Read a caValue as a string
 const char* circa_as_string(caValue* container);

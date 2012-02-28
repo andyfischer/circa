@@ -1526,7 +1526,6 @@ ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
 
         // If the minus sign is on a literal number, then just negate it in place,
         // rather than introduce a neg() operation.
-        // TODO: delete this, handle this in tokenizer
         if (is_value(expr.term) && expr.term->name == "") {
             if (is_int(expr.term)) {
                 set_int(expr.term, as_int(expr.term) * -1);

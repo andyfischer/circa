@@ -62,6 +62,19 @@ static void parse_value(TokenStream* tokens, caValue* out)
     } else if (tokens->nextIs(TK_FALSE)) {
         circa_set_bool(out, false);
         tokens->consume();
+    } else if (tokens->nextIs(TK_MINUS)) {
+        tokens->consume(TK_MINUS);
+
+        parse_value(tokens, out);
+
+        if (circa_is_int(out)) {
+            circa_set_int(out, -1 * circa_as_int(out));
+        } else if (circa_is_float(out)) {
+            circa_set_float(out, -1 * circa_as_float(out));
+        } else {
+            circa_set_string(out, "error, minus sign must preceed number");
+        }
+
     } else {
         circa_set_string(out, "unrecognized token: ");
         circa_string_append(out, tokens->nextStr().c_str());

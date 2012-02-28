@@ -69,6 +69,10 @@ int circa_as_int(caValue* container)
 {
     return as_int((TValue*) container);
 }
+float circa_as_float(caValue* container)
+{
+    return as_float((TValue*) container);
+}
 const char* circa_as_string(caValue* container)
 {
     return as_cstring((TValue*) container);
