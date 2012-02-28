@@ -16,6 +16,7 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "string_type.h"
 #include "subroutine.h"
 #include "switch_block.h"
 #include "names.h"
@@ -1961,55 +1962,15 @@ ParseResult literal_string(Branch* branch, TokenStream& tokens, ParserCxt* conte
 
     std::string quoteType = text.substr(0,1);
 
-    // strip quote marks
-    int quoteSize = 1;
-    if (quoteType == "<")
-        quoteSize = 3;
+    TValue escaped;
+    unquote_and_unescape_string(text.c_str(), &escaped);
 
-    int end = text.length() - quoteSize;
-    bool anyEscaped = false;
-
-    // Unescape any escaped characters
-    std::stringstream escapedStrm;
-    for (int i=quoteSize; i < end; i++) {
-        char c = text[i];
-        char next = 0;
-        if (i + 1 < end)
-            next = text[i+1];
-
-        if (c == '\\') {
-            if (next == 'n') {
-                escapedStrm << '\n';
-                i++;
-                anyEscaped = true;
-            } else if (next == '\'') {
-                escapedStrm << '\'';
-                i++;
-                anyEscaped = true;
-            } else if (next == '\"') {
-                escapedStrm << '\"';
-                i++;
-                anyEscaped = true;
-            } else if (next == '\\') {
-                escapedStrm << '\\';
-                i++;
-                anyEscaped = true;
-            } else {
-                escapedStrm << c;
-            }
-        } else {
-            escapedStrm << c;
-        }
-    }
-
-    std::string escaped = escapedStrm.str();
-
-    Term* term = create_string(branch, escaped);
+    Term* term = create_string(branch, as_cstring(&escaped));
     set_source_location(term, startPosition, tokens);
 
     if (quoteType != "'")
         term->setStringProp("syntax:quoteType", quoteType);
-    if (text != escaped)
+    if (!string_eq(&escaped, text.c_str()))
         term->setStringProp("syntax:originalString", text);
 
     return ParseResult(term);
@@ -2440,7 +2401,51 @@ int get_number_of_decimal_figures(std::string const& str)
     return result;
 }
 
-} // namespace parser
+void unquote_and_unescape_string(const char* input, TValue* out)
+{
+    if (input[0] == 0)
+        return;
 
+    char quote = input[0];
+
+    int quoteSize = 1;
+    if (quote == '<')
+        quoteSize = 3;
+
+    int end = strlen(input) - quoteSize;
+
+    // Unescape any escaped characters
+    std::stringstream result;
+    for (int i=quoteSize; i < end; i++) {
+        char c = input[i];
+        char next = 0;
+        if (i + 1 < end)
+            next = input[i+1];
+
+        if (c == '\\') {
+            if (next == 'n') {
+                result << '\n';
+                i++;
+            } else if (next == '\'') {
+                result << '\'';
+                i++;
+            } else if (next == '\"') {
+                result << '\"';
+                i++;
+            } else if (next == '\\') {
+                result << '\\';
+                i++;
+            } else {
+                result << c;
+            }
+        } else {
+            result << c;
+        }
+    }
+
+    set_string(out, result.str());
+}
+
+} // namespace parser
 
 } // namespace circa

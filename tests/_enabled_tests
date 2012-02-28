@@ -46,6 +46,7 @@ simple_state_1.ca
 state_unique_naming.ca
 stateful_call_as_input.ca
 strings.ca
+string_repr.ca
 subroutine.ca
 subroutine_state.ca
 subroutine_state_1.ca
