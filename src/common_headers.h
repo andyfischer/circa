@@ -28,7 +28,7 @@
 
 #define EXPORT extern "C"
 
-struct caValue;
+#include "circa/circa.h"
 
 namespace circa {
 
