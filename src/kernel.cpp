@@ -189,6 +189,11 @@ CA_FUNCTION(file__read_text)
     set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
 }
 
+CA_FUNCTION(from_string)
+{
+    circa_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
+}
+
 CA_FUNCTION(input_func)
 {
     int index = INT_INPUT(0);
@@ -502,6 +507,7 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("file:read_text"), file__read_text);
     install_function(kernel->get("input"), input_func);
     install_function(kernel->get("length"), length);
+    install_function(kernel->get("from_string"), from_string);
     install_function(kernel->get("refactor:rename"), refactor__rename);
     install_function(kernel->get("refactor:change_function"), refactor__change_function);
     install_function(kernel->get("reflect:this_branch"), reflect__this_branch);

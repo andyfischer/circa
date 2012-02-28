@@ -120,6 +120,10 @@ void circa_set_float(caValue* container, float value)
 {
     set_float((TValue*) container, value);
 }
+void circa_set_bool(caValue* container, bool value)
+{
+    set_bool((TValue*) container, value);
+}
 void circa_set_string(caValue* container, const char* str)
 {
     set_string((TValue*) container, str);
@@ -127,6 +131,18 @@ void circa_set_string(caValue* container, const char* str)
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
     set_string((TValue*) container, str, size);
+}
+void circa_string_append(caValue* container, const char* str)
+{
+    string_append((TValue*) container, str);
+}
+void circa_set_list(caValue* list, int numElements)
+{
+    set_list((TValue*) list, numElements);
+}
+caValue* circa_list_append(caValue* list)
+{
+    return (caValue*) list_append((TValue*) list);
 }
 void circa_set_point(caValue* point, float x, float y)
 {

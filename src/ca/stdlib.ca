@@ -6,6 +6,9 @@ def input(int index) -> any
 def length(List) -> int
     "Return the number of items in the given list"
 
+def from_string(string s) -> any
+    "Parse a string representation to a Circa value"
+
 def changed(any current) -> bool
     state any prev = null
     result = prev != current

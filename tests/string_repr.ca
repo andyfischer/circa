@@ -1,0 +1,19 @@
+
+assert(from_string("1") == 1)
+assert(from_string("1.2") == 1.2)
+assert(from_string("true") == true)
+assert(from_string("false") == false)
+assert(from_string("[1 2 true 3.0]") == [1 2 true 3.0])
+
+def round_trip(any val)
+    if from_string(to_string(val)) != val
+        print('round trip failed on: ' val)
+
+
+round_trip(1)
+round_trip(true)
+round_trip(false)
+round_trip([])
+round_trip([1])
+round_trip([1 1 1 1 1 1])
+round_trip(-1)

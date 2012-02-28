@@ -112,12 +112,17 @@ void circa_set_int(caValue* container, int value);
 
 void circa_set_float(caValue* container, float value);
 
+void circa_set_bool(caValue* container, bool value);
+
 // Assign an opaque pointer to a caValue
 void circa_set_pointer(caValue* container, void* ptr);
 
 void circa_set_string(caValue* container, const char* str);
 void circa_set_string_size(caValue* container, const char* str, int size);
+void circa_string_append(caValue* str, const char* str);
 
+void circa_set_list(caValue* list, int numElements);
+caValue* circa_list_append(caValue* list);
 void circa_set_point(caValue* point, float x, float y);
 
 void circa_set_null(caValue* container);
@@ -135,12 +140,19 @@ void circa_create_value(caValue* value, caType* type);
 // Signal that an error has occurred
 void circa_raise_error(caStack* stack, const char* msg);
 
+// Load a Circa value from a string representation. The result will be written to 'out'.
+// 
+// If there is a parsing error, an error value will be saved to 'out'. (the caller should
+// check for this).
+void circa_parse_string(const char* str, caValue* out);
+
 // Install an evaluation function to the given named term. Returns the affected Term.
 caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
 
 // Fetch the Term's declared type.
 caType* circa_term_declared_type(caTerm* term);
 
+// Create a new Stack object
 caStack* circa_new_stack();
 
 void circa_run_module(caStack* stack, caName moduleName);
