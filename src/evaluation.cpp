@@ -76,7 +76,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 
             // current value
             if (!is_value(term)) {
-                TValue* value = frame->registers[term->index];
+                caValue* value = frame->registers[term->index];
                 if (value == NULL)
                     out << " [<register OOB>]";
                 else
@@ -149,7 +149,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, List* inputs)
         if (placeholder == NULL)
             break;
 
-        TValue* input = inputs->get(i);
+        caValue* input = inputs->get(i);
 
         bool castSuccess = cast(input, placeholder->type, registers[i]);
 
@@ -247,7 +247,7 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_value(term)) continue;
-        TValue* val = frame->registers[term->index];
+        caValue* val = frame->registers[term->index];
         if (val != NULL)
             copy(val, branch->get(i));
     }
@@ -315,13 +315,13 @@ void evaluate_branch(Branch* branch)
     evaluate_save_locals(&context, branch);
 }
 
-TValue* get_input(EvalContext* context, Term* term)
+caValue* get_input(EvalContext* context, Term* term)
 {
     if (term == NULL)
         return NULL;
 
     if (is_value(term))
-        return (TValue*) term;
+        return (caValue*) term;
 
     for (int i=0; i < context->numFrames; i++) {
         Frame* frame = get_frame(context, i);
@@ -347,7 +347,7 @@ void consume_inputs_to_list(EvalContext* context, List* list)
     }
 }
 
-TValue* get_input(EvalContext* context, int index)
+caValue* get_input(EvalContext* context, int index)
 {
     return get_input(context, current_term(context)->input(index));
 }
@@ -362,9 +362,9 @@ bool can_consume_output(Term* consumer, Term* input)
     //return !is_value(input) && input->users.length() == 1;
 }
 
-void consume_input(EvalContext* context, Term* term, TValue* dest)
+void consume_input(EvalContext* context, Term* term, caValue* dest)
 {
-    TValue* value = get_input(context, term);
+    caValue* value = get_input(context, term);
 
     if (value == NULL) {
         set_null(dest);
@@ -379,16 +379,16 @@ void consume_input(EvalContext* context, Term* term, TValue* dest)
     }
 }
 
-void consume_input(EvalContext* context, int index, TValue* dest)
+void consume_input(EvalContext* context, int index, caValue* dest)
 {
     return consume_input(context, current_term(context)->input(index), dest);
 }
 
-bool consume_cast(EvalContext* context, int index, Type* type, TValue* dest)
+bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest)
 {
     Term* currentTerm = current_term(context);
     Term* term = currentTerm->input(index);
-    TValue* value = get_input(context, term);
+    caValue* value = get_input(context, term);
     if (value == NULL)
         return false;
 
@@ -403,7 +403,7 @@ bool consume_cast(EvalContext* context, int index, Type* type, TValue* dest)
     }
 }
 
-TValue* get_output(EvalContext* context, int index)
+caValue* get_output(EvalContext* context, int index)
 {
     Frame* frame = top_frame(context);
     return frame->registers[frame->pc + index];
@@ -415,7 +415,7 @@ Term* current_term(EvalContext* context)
     return top->branch->get(top->pc);
 }
 
-TValue* get_register(EvalContext* context, Term* term)
+caValue* get_register(EvalContext* context, Term* term)
 {
     Frame* frame = top_frame(context);
     ca_assert(term->owningBranch == frame->branch);
@@ -425,11 +425,11 @@ TValue* get_register(EvalContext* context, Term* term)
 void create_output(EvalContext* context)
 {
     Term* caller = current_term(context);
-    TValue* output = get_output(context, 0);
+    caValue* output = get_output(context, 0);
     create(caller->type, output);
 }
 
-void raise_error(EvalContext* context, Term* term, TValue* output, const char* message)
+void raise_error(EvalContext* context, Term* term, caValue* output, const char* message)
 {
     // Save the error as this term's output value.
     set_string(output, message);
@@ -489,7 +489,7 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
     pop_frame(context);
 }
 
-void evaluate_minimum(EvalContext* context, Term* term, TValue* result)
+void evaluate_minimum(EvalContext* context, Term* term, caValue* result)
 {
     // Get a list of every term that this term depends on. Also, limit this
     // search to terms inside the current branch.
@@ -539,7 +539,7 @@ void evaluate_minimum(EvalContext* context, Term* term, TValue* result)
     pop_frame(context);
 }
 
-TValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
+caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
 {
     int prevHead = branch->length();
     Term* result = parser::compile(branch, parser::statement_list, input);
@@ -547,7 +547,7 @@ TValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
     return result;
 }
 
-TValue* evaluate(Branch* branch, Term* function, List* inputs)
+caValue* evaluate(Branch* branch, Term* function, List* inputs)
 {
     EvalContext context;
 
@@ -563,7 +563,7 @@ TValue* evaluate(Branch* branch, Term* function, List* inputs)
     return result;
 }
 
-TValue* evaluate(Term* function, List* inputs)
+caValue* evaluate(Term* function, List* inputs)
 {
     Branch scratch;
     return evaluate(&scratch, function, inputs);
@@ -678,7 +678,7 @@ do_instruction:
     #ifdef CIRCA_TEST_BUILD
     if (!context->errorOccurred && !is_value(term)) {
         Type* outputType = get_output_type(term);
-        TValue* output = get_input(context, term);
+        caValue* output = get_input(context, term);
 
         if (output != NULL && outputType != &VOID_T && !cast_possible(output, outputType)) {
             std::stringstream msg;

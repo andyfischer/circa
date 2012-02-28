@@ -69,9 +69,9 @@ namespace list_methods_function {
 
     CA_DEFINE_FUNCTION(insert, "List.insert(self :implied_rebind, int, any) -> List")
     {
-        TValue result;
+        caValue result;
         CONSUME_INPUT(0, &result);
-        TValue* newItem = list_insert(&result, INT_INPUT(1));
+        caValue* newItem = list_insert(&result, INT_INPUT(1));
         CONSUME_INPUT(2, newItem);
         swap(&result, OUTPUT);
     }

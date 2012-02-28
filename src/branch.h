@@ -33,7 +33,7 @@ struct Branch
     // Variant value describing where this branch came from. 
     //   If the branch came from a file, then the value will be of format:
     //     [:file, String filename, int nullable_timestamp]
-    TValue origin;
+    caValue origin;
 
     // If this branch has any static errors, then they are listed here. If there
     // are no errors then this value is null.
@@ -41,12 +41,12 @@ struct Branch
     //  [0] int index
     //  [1] string type
     //  [2] int inputIndex (only used for errors related to inputs)
-    TValue staticErrors;
+    caValue staticErrors;
 
     // This value stores information about pending code changes. This is populated
     // when someone makes a term change that will force other terms to be updated.
     // See update_cascades.cpp
-    TValue pendingUpdates;
+    caValue pendingUpdates;
     bool currentlyCascadingUpdates;
 
     Branch();
@@ -124,7 +124,7 @@ bool has_nested_contents(Term* term);
 Branch* nested_contents(Term* term);
 void remove_nested_contents(Term* term);
 
-TValue* branch_get_source_filename(Branch* branch);
+caValue* branch_get_source_filename(Branch* branch);
 std::string get_branch_source_filename(Branch* branch);
 Branch* get_outer_scope(Branch* branch);
 

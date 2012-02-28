@@ -7,7 +7,7 @@ namespace cast_function {
 
     CA_FUNCTION(cast_evaluate)
     {
-        TValue* source = INPUT(0);
+        caValue* source = INPUT(0);
 
         if (CALLER->type == &ANY_T)
             return copy(source, OUTPUT);

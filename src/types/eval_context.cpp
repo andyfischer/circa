@@ -5,15 +5,15 @@
 namespace circa {
 namespace eval_context_t {
 
-    EvalContext* get(TValue* value)
+    EvalContext* get(caValue* value)
     {
         return ((EvalContext*) value->value_data.ptr);
     }
 
-    void visitHeap(Type*, TValue* value, Type::VisitHeapCallback callback, TValue* visitContext)
+    void visitHeap(Type*, caValue* value, Type::VisitHeapCallback callback, caValue* visitContext)
     {
         EvalContext* context = get(value);
-        TValue relIdent;
+        caValue relIdent;
 
         set_string(&relIdent, "state");
         callback(&context->state, &relIdent, visitContext);

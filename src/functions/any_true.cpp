@@ -7,7 +7,7 @@ namespace any_true_function {
 
     CA_FUNCTION(any_true)
     {
-        TValue* input = INPUT(0);
+        caValue* input = INPUT(0);
 
         int numElements = input->numElements();
 

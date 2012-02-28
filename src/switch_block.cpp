@@ -24,7 +24,7 @@ CA_FUNCTION(evaluate_switch)
 #if 0
     EvalContext* context = CONTEXT;
     Branch* contents = nested_contents(CALLER);
-    TValue* input = INPUT(0);
+    caValue* input = INPUT(0);
 
     // Iterate through each 'case' and find one that succeeds.
     for (int caseIndex=0; caseIndex < contents->length()-1; caseIndex++) {
@@ -34,7 +34,7 @@ CA_FUNCTION(evaluate_switch)
         if (caseTerm->function == DEFAULT_FUNCS.case_func) {
             succeeds = true;
         } else if (caseTerm->function == FUNCS.case_func) {
-            TValue* caseValue = get_input(context, caseTerm, 0);
+            caValue* caseValue = get_input(context, caseTerm, 0);
             succeeds = equals(input, caseValue);
         } else {
             internal_error("unrecognized function inside switch()");
@@ -56,7 +56,7 @@ CA_FUNCTION(evaluate_switch)
 
             for (int i=0; i < joining->length(); i++) {
                 Term* joinTerm = joining->get(i);
-                TValue* value = get_input(context, joinTerm, caseIndex);
+                caValue* value = get_input(context, joinTerm, caseIndex);
 
                 ca_test_assert(cast_possible(value, get_output_type(CALLER, i+1)));
 

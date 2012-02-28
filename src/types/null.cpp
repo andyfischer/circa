@@ -3,7 +3,7 @@
 namespace circa {
 namespace null_t {
 
-    std::string toString(TValue* value)
+    std::string toString(caValue* value)
     {
         return "null";
     }

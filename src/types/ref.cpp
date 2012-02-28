@@ -13,7 +13,7 @@ namespace ref_t {
         std::string globalName;
     };
 
-    std::string toString(TValue* term)
+    std::string toString(caValue* term)
     {
         Term* t = as_ref(term);
         if (t == NULL)
@@ -21,36 +21,36 @@ namespace ref_t {
         else
             return global_id(t);
     }
-    void initialize(Type* type, TValue* value)
+    void initialize(Type* type, caValue* value)
     {
         RobustRef* dupe = new RobustRef();
         dupe->weakPtr = 0;
         value->value_data.ptr = dupe;
     }
-    void release(TValue* value)
+    void release(caValue* value)
     {
         delete (RobustRef*) value->value_data.ptr;
     }
-    void copy(Type*, TValue* source, TValue* dest)
+    void copy(Type*, caValue* source, caValue* dest)
     {
         change_type(dest, &REF_T);
         RobustRef* dupe = new RobustRef();
         *dupe = *(RobustRef*) source->value_data.ptr;
         dest->value_data.ptr = dupe;
     }
-    void reset(Type*, TValue* value)
+    void reset(Type*, caValue* value)
     {
         RobustRef* robustRef = (RobustRef*) value->value_data.ptr;
         robustRef->weakPtr = 0;
         robustRef->globalName = "";
     }
-    bool equals(Type*, TValue* lhs, TValue* rhs)
+    bool equals(Type*, caValue* lhs, caValue* rhs)
     {
         if (!is_ref(lhs) || !is_ref(rhs))
             return false;
         return as_ref(lhs) == as_ref(rhs);
     }
-    int hashFunc(TValue* value)
+    int hashFunc(caValue* value)
     {
         return (int) (long(as_ref(value)) >> 3);
     }
@@ -74,7 +74,7 @@ namespace ref_t {
     }
 }
 
-Term* as_ref(TValue* value)
+Term* as_ref(caValue* value)
 {
     ca_assert(is_ref(value));
     ref_t::RobustRef* robustRef = (ref_t::RobustRef*) value->value_data.ptr;
@@ -94,11 +94,11 @@ Term* as_ref(TValue* value)
     return result;
 }
 
-void set_ref(TValue* value, Term* t)
+void set_ref(caValue* value, Term* t)
 {
     #if DEBUG
     if (DEBUG_TRACE_ALL_REF_WRITES)
-        std::cout << "Writing " << t << " to TValue " << value << std::endl;
+        std::cout << "Writing " << t << " to caValue " << value << std::endl;
     #endif
 
     change_type(value, &REF_T);

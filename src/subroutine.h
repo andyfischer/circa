@@ -19,11 +19,11 @@ Term* create_subroutine(Branch* branch, const char* name);
 void initialize_subroutine(Term* sub);
 void finish_building_subroutine(Term* sub, Term* outputType);
 
-void store_locals(Branch* branch, TValue* storage);
-void restore_locals(TValue* storageTv, Branch* branch);
+void store_locals(Branch* branch, caValue* storage);
+void restore_locals(caValue* storageTv, Branch* branch);
 
-void call_subroutine(Branch* sub, TValue* inputs, TValue* output, TValue* error);
-void call_subroutine(Term* sub, TValue* inputs, TValue* output, TValue* error);
+void call_subroutine(Branch* sub, caValue* inputs, caValue* output, caValue* error);
+void call_subroutine(Term* sub, caValue* inputs, caValue* output, caValue* error);
 
 
 } // namespace circa

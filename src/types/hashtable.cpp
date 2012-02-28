@@ -1,5 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "circa/circa.h"
 #include "circa/internal/for_hosted_funcs.h"
 
 #include "hashtable.h"
@@ -8,8 +9,8 @@ namespace circa {
 namespace hashtable_t {
 
 struct Slot {
-    TValue key;
-    TValue value;
+    caValue key;
+    caValue value;
 };
 
 struct Hashtable {
@@ -28,7 +29,7 @@ const float INITIAL_LOAD_FACTOR = 0.3;
 // The load at which we'll trigger a reallocation.
 const float MAX_LOAD_FACTOR = 0.75;
 
-int get_hash_value(TValue* value)
+int get_hash_value(caValue* value)
 {
     Type::HashFunc f = value->value_type->hashFunc;
     if (f == NULL) {
@@ -127,7 +128,7 @@ Hashtable* duplicate(Hashtable* original)
 
 // Get the 'ideal' slot index, the place we would put this key if there is no
 // collision.
-int find_ideal_slot_index(Hashtable* data, TValue* key)
+int find_ideal_slot_index(Hashtable* data, caValue* key)
 {
     ca_assert(data->capacity > 0);
     unsigned int hash = get_hash_value(key);
@@ -137,7 +138,7 @@ int find_ideal_slot_index(Hashtable* data, TValue* key)
 // Insert the given key into the dictionary, returns the index.
 // This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int table_insert(Hashtable** dataPtr, TValue* key, bool swapKey)
+int table_insert(Hashtable** dataPtr, caValue* key, bool swapKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
@@ -178,13 +179,13 @@ int table_insert(Hashtable** dataPtr, TValue* key, bool swapKey)
     return index;
 }
 
-void insert_value(Hashtable** dataPtr, TValue* key, TValue* value)
+void insert_value(Hashtable** dataPtr, caValue* key, caValue* value)
 {
     int index = table_insert(dataPtr, key, false);
     copy(value, &(*dataPtr)->slots[index].value);
 }
 
-int find_key(Hashtable* data, TValue* key)
+int find_key(Hashtable* data, caValue* key)
 {
     if (data == NULL)
         return -1;
@@ -206,20 +207,20 @@ int find_key(Hashtable* data, TValue* key)
     return index;
 }
 
-TValue* get_value(Hashtable* data, TValue* key)
+caValue* get_value(Hashtable* data, caValue* key)
 {
     int index = find_key(data, key);
     if (index == -1) return NULL;
     return &data->slots[index].value;
 }
 
-TValue* get_index(Hashtable* data, int index)
+caValue* get_index(Hashtable* data, int index)
 {
     ca_assert(index < data->capacity);
     return &data->slots[index].value;
 }
 
-void remove(Hashtable* data, TValue* key)
+void remove(Hashtable* data, caValue* key)
 {
     int index = find_key(data, key);
     if (index == -1)
@@ -285,8 +286,8 @@ std::string to_string(Hashtable* data)
             strm << ", ";
         first = false;
 
-        strm << to_string(&data->slots[i].key);
-        strm << ": " << to_string(&data->slots[i].value);
+        strm << circa::to_string(&data->slots[i].key);
+        strm << ": " << circa::to_string(&data->slots[i].value);
     }
     strm << "]";
     return strm.str();
@@ -297,12 +298,12 @@ void debug_print(Hashtable* data)
     printf("dict: %p\n", data);
     printf("count: %d, capacity: %d\n", data->count, data->capacity);
     for (int i=0; i < data->capacity; i++) {
-        printf("[%d] %s = %s\n", i, to_string(&data->slots[i].key).c_str(),
-                to_string(&data->slots[i].value).c_str());
+        printf("[%d] %s = %s\n", i, circa::to_string(&data->slots[i].key).c_str(),
+                circa::to_string(&data->slots[i].value).c_str());
     }
 }
 
-void iterator_start(Hashtable* data, TValue* iterator)
+void iterator_start(Hashtable* data, caValue* iterator)
 {
     if (data == NULL || data->count == 0)
         return set_null(iterator);
@@ -314,7 +315,7 @@ void iterator_start(Hashtable* data, TValue* iterator)
         iterator_next(data, iterator);
 }
 
-void iterator_next(Hashtable* data, TValue* iterator)
+void iterator_next(Hashtable* data, caValue* iterator)
 {
     int i = as_int(iterator);
 
@@ -329,7 +330,7 @@ void iterator_next(Hashtable* data, TValue* iterator)
         set_int(iterator, next);
 }
 
-void iterator_get(Hashtable* data, TValue* iterator, TValue** key, TValue** value)
+void iterator_get(Hashtable* data, caValue* iterator, caValue** key, caValue** value)
 {
     int i = as_int(iterator);
 
@@ -339,58 +340,58 @@ void iterator_get(Hashtable* data, TValue* iterator, TValue** key, TValue** valu
 
 namespace tagged_value_wrappers {
 
-    void initialize(Type* type, TValue* value)
+    void initialize(Type* type, caValue* value)
     {
         value->value_data.ptr = NULL;
     }
-    void release(TValue* value)
+    void release(caValue* value)
     {
         free_table((Hashtable*) value->value_data.ptr);
     }
-    void copy(Type* type, TValue* source, TValue* dest)
+    void copy(Type* type, caValue* source, caValue* dest)
     {
         change_type(dest, type);
         dest->value_data.ptr = duplicate((Hashtable*) source->value_data.ptr);
     }
-    std::string to_string(TValue* value)
+    std::string to_string(caValue* value)
     {
         return to_string((Hashtable*) value->value_data.ptr);
     }
-    TValue* get_field(TValue* value, const char* field)
+    caValue* get_field(caValue* value, const char* field)
     {
-        TValue fieldStr;
+        caValue fieldStr;
         set_string(&fieldStr, field);
         return hashtable_t::get_value((Hashtable*) value->value_data.ptr, &fieldStr);
     }
 } // namespace tagged_value_wrappers
 
 // Public API
-bool is_hashtable(TValue* value)
+bool is_hashtable(caValue* value)
 {
     return value->value_type->initialize == tagged_value_wrappers::initialize;
 }
 
-TValue* get_value(TValue* table, TValue* key)
+caValue* get_value(caValue* table, caValue* key)
 {
     ca_assert(is_hashtable(table));
     return get_value((Hashtable*) table->value_data.ptr, key);
 }
 
-void table_insert(TValue* tableTv, TValue* key, TValue* value,
-        bool swapKey, bool swapTValue)
+void table_insert(caValue* tableTv, caValue* key, caValue* value,
+        bool swapKey, bool swapcaValue)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
     int index = table_insert(&table, key, swapKey);
 
-    TValue* slot = &table->slots[index].value;
+    caValue* slot = &table->slots[index].value;
     if (swapKey)
         swap(value, slot);
     else
         copy(value, slot);
 }
 
-void table_remove(TValue* tableTv, TValue* key)
+void table_remove(caValue* tableTv, caValue* key)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;

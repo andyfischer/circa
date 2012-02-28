@@ -41,7 +41,7 @@ namespace ref_methods_function {
             return;
         }
 
-        TValue* source = INPUT(1);
+        caValue* source = INPUT(1);
 
         if (!cast_possible(source, declared_type(target))) {
             RAISE_ERROR("Can't assign, type mismatch");

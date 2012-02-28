@@ -233,7 +233,7 @@ void change_declared_type(Term *term, Type *newType)
 
     term->type = newType;
 
-    set_null((TValue*) term);
+    set_null((caValue*) term);
 
     // TODO: Don't call create() here
     create(newType, term);
@@ -290,7 +290,7 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, inputs, name);
     change_declared_type(term, original->type);
-    //create(original->value_type, (TValue*) term);
+    //create(original->value_type, (caValue*) term);
 
     copy(original, term);
 
@@ -334,7 +334,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
 
     change_function(term, FUNCS.value);
     change_declared_type(term, type);
-    create(type, (TValue*) term);
+    create(type, (caValue*) term);
     update_unique_name(term);
     update_implicit_pack_call(term);
 
@@ -353,7 +353,7 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
     return create_value(branch, as_type(type), name);
 }
 
-Term* create_value(Branch* branch, TValue* initialValue, std::string const& name)
+Term* create_value(Branch* branch, caValue* initialValue, std::string const& name)
 {
     Term* term = create_value(branch, initialValue->value_type, name);
     copy(initialValue, term);
@@ -891,7 +891,7 @@ bool term_is_state_input(Term* term, int index)
 {
     if (index >= term->numInputs())
         return false;
-    TValue* prop = term->inputInfo(index)->properties.get("state");
+    caValue* prop = term->inputInfo(index)->properties.get("state");
     if (prop == NULL)
         return false;
     return as_bool(prop);

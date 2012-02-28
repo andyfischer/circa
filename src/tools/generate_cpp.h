@@ -5,6 +5,6 @@
 
 namespace circa {
 
-void run_generate_cpp(TValue* args);
+void run_generate_cpp(caValue* args);
 
 } // namespace circa

@@ -25,7 +25,7 @@ struct Font
     Font() : ttfFont(NULL) {}
 };
 
-SDL_Color unpack_sdl_color(TValue* color)
+SDL_Color unpack_sdl_color(caValue* color)
 {
     SDL_Color c = {};
     c.r = Uint8(color->getIndex(0)->asFloat() * 255.0);
@@ -54,19 +54,19 @@ CA_FUNCTION(load_font)
     handle_t::set(OUTPUT, g_font_t, output);
 }
 
-struct RenderedText : public TValue
+struct RenderedText : public caValue
 {
     int texid() { return getIndex(0)->asInt(); }
     int width() { return getIndex(1)->asInt(); }
     int height() { return getIndex(2)->asInt(); }
-    TValue* texidContainer() { return getIndex(0); }
-    TValue* widthContainer() { return getIndex(1); }
-    TValue* heightContainer() { return getIndex(2); }
-    TValue* color() { return getIndex(3); }
+    caValue* texidContainer() { return getIndex(0); }
+    caValue* widthContainer() { return getIndex(1); }
+    caValue* heightContainer() { return getIndex(2); }
+    caValue* color() { return getIndex(3); }
     std::string const& text() { return getIndex(4)->asString(); }
-    TValue* textContainer() { return getIndex(4); }
+    caValue* textContainer() { return getIndex(4); }
 
-    static RenderedText* cast(TValue* val)
+    static RenderedText* cast(caValue* val)
     {
         create(singleton, val);
         return (RenderedText*) val;
@@ -80,7 +80,7 @@ Type* RenderedText::singleton;
 CA_FUNCTION(render_text)
 {
     std::string const& inputText = as_string(INPUT(1));
-    TValue* inputColor = INPUT(2);
+    caValue* inputColor = INPUT(2);
 
     RenderedText* output = RenderedText::cast(OUTPUT);
 

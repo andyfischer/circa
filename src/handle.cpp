@@ -12,7 +12,7 @@ namespace circa {
 struct HandleContainer
 {
     int refcount;
-    TValue value;
+    caValue value;
     ReleaseFunc releaseFunc;
 };
 
@@ -25,7 +25,7 @@ HandleContainer* alloc_handle_container()
     return c;
 }
 
-HandleContainer* get_handle_container(TValue* handle)
+HandleContainer* get_handle_container(caValue* handle)
 {
     if (handle->value_type->storageType != STORAGE_TYPE_HANDLE)
         return NULL;
@@ -33,7 +33,7 @@ HandleContainer* get_handle_container(TValue* handle)
     return (HandleContainer*) handle->value_data.ptr;
 }
 
-TValue* get_handle_value(TValue* handle)
+caValue* get_handle_value(caValue* handle)
 {
     HandleContainer* container = get_handle_container(handle);
     if (container == NULL)
@@ -41,17 +41,17 @@ TValue* get_handle_value(TValue* handle)
     return &container->value;
 }
 
-void* get_handle_value_opaque_pointer(TValue* handle)
+void* get_handle_value_opaque_pointer(caValue* handle)
 {
     return as_opaque_pointer(get_handle_value(handle));
 }
 
-void handle_initialize(Type* type, TValue* value)
+void handle_initialize(Type* type, caValue* value)
 {
     value->value_data.ptr = alloc_handle_container();
 }
 
-void handle_release(TValue* value)
+void handle_release(caValue* value)
 {
     if (value->value_data.ptr == NULL)
         return;
@@ -68,7 +68,7 @@ void handle_release(TValue* value)
     }
 }
 
-void handle_copy(Type* type, TValue* source, TValue* dest)
+void handle_copy(Type* type, caValue* source, caValue* dest)
 {
     set_null(dest);
     get_handle_container(source)->refcount++;
@@ -84,7 +84,7 @@ void setup_handle_type(Type* type)
     type->release = handle_release;
 }
 
-void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc releaseFunc)
+void set_handle_value(caValue* handle, Type* type, caValue* value, ReleaseFunc releaseFunc)
 {
     set_null(handle);
     change_type(handle, type);
@@ -94,20 +94,20 @@ void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc rel
     handle->value_data.ptr = container;
 }
 
-void set_handle_value(TValue* handle, TValue* value, ReleaseFunc releaseFunc)
+void set_handle_value(caValue* handle, caValue* value, ReleaseFunc releaseFunc)
 {
     HandleContainer* container = get_handle_container(handle);
     swap(value, &container->value);
     container->releaseFunc = releaseFunc;
 }
 
-void set_handle_value_opaque_pointer(TValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)
+void set_handle_value_opaque_pointer(caValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)
 {
-    TValue pointerVal;
+    caValue pointerVal;
     set_opaque_pointer(&pointerVal, ptr);
     set_handle_value(handle, type, &pointerVal, releaseFunc);
 }
-void handle_set_release_func(TValue* handle, ReleaseFunc releaseFunc)
+void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc)
 {
     HandleContainer* container = get_handle_container(handle);
     container->releaseFunc = releaseFunc;

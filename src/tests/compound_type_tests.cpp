@@ -22,7 +22,7 @@ void test_bug_with_cast()
     Branch branch;
     Term* type = branch.compile("type T {int x, int y, int z}");
 
-    TValue castResult;
+    caValue castResult;
     cast(&value, unbox_type(type), &castResult);
 
     test_equals(&castResult, "[1, 72, 18]");

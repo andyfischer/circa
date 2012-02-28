@@ -5,7 +5,7 @@
 namespace circa {
 namespace symbol_t {
 
-    std::string to_string(TValue* value)
+    std::string to_string(caValue* value)
     {
         return std::string(":") + name_to_string(as_int(value));
     }

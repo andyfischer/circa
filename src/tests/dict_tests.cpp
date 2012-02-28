@@ -8,9 +8,9 @@ namespace dict_tests {
 
 void test_simple()
 {
-    TValue five;
+    caValue five;
     set_int(&five, 5);
-    TValue ten;
+    caValue ten;
     set_int(&ten, 10);
 
     DictData* data = dict_t::create_dict();
@@ -26,10 +26,10 @@ void test_simple()
 void test_insert()
 {
     Dict dict;
-    TValue v;
+    caValue v;
     set_int(&v, 5);
 
-    TValue* a_inserted = dict.insert("a");
+    caValue* a_inserted = dict.insert("a");
     test_equals(dict.toString(), "{a: null}");
 
     set_int(a_inserted, 7);
@@ -40,9 +40,9 @@ void dont_insert_same_key_multiple_times()
 {
     DictData* data = dict_t::create_dict();
 
-    TValue val;
+    caValue val;
     set_int(&val, 5);
-    TValue val2;
+    caValue val2;
     set_string(&val2, "a");
 
     dict_t::insert_value(&data, "key", &val);
@@ -192,7 +192,7 @@ void many_items()
     // Insert lots of items
     for (int i=0; i < count; i++) {
         char key[10]; sprintf(key, "%d", i);
-        TValue val; set_int(&val, i);
+        caValue val; set_int(&val, i);
         dict_t::insert_value(&data, key, &val);
     }
 
@@ -231,10 +231,10 @@ void many_items()
 
 void test_duplicate()
 {
-    TValue eleven = TValue::fromInt(11);
-    TValue one_and_change = TValue::fromFloat(1.2);
-    TValue t = TValue::fromBool(true);
-    TValue hello = TValue::fromString("hello");
+    caValue eleven = caValue::fromInt(11);
+    caValue one_and_change = caValue::fromFloat(1.2);
+    caValue t = caValue::fromBool(true);
+    caValue hello = caValue::fromString("hello");
 
     DictData* data = dict_t::create_dict();
     dict_t::insert_value(&data, "a", &eleven);
@@ -261,7 +261,7 @@ void test_reset()
 {
     Dict dict;
 
-    TValue a;
+    caValue a;
     set_int(&a, 4);
     dict.set("a", &a);
 
@@ -275,18 +275,18 @@ void test_reset()
 void test_iterate()
 {
     Dict dict;
-    TValue iterator;
+    caValue iterator;
 
-    TValue one;
+    caValue one;
     set_int(&one, 1);
-    TValue two;
+    caValue two;
     set_int(&two, 2);
 
     dict.set("one", &one);
     dict.set("two", &two);
 
     const char* currentKey;
-    TValue* currentTValue;
+    caValue* currentcaValue;
 
     bool foundOne = false;
     bool foundTwo = false;
@@ -294,17 +294,17 @@ void test_iterate()
             !dict.iteratorFinished(&iterator);
             dict.iteratorNext(&iterator)) {
 
-        dict.iteratorGet(&iterator, &currentKey, &currentTValue);
+        dict.iteratorGet(&iterator, &currentKey, &currentcaValue);
 
-        test_assert(currentTValue != NULL);
+        test_assert(currentcaValue != NULL);
 
         if (std::string(currentKey) == "one") {
             test_assert(!foundOne);
-            test_equals(currentTValue->asInt(), 1);
+            test_equals(currentcaValue->asInt(), 1);
             foundOne = true;
         } else if (std::string(currentKey) == "two") {
             test_assert(!foundTwo);
-            test_equals(currentTValue->asInt(), 2);
+            test_equals(currentcaValue->asInt(), 2);
             foundTwo = true;
         } else {
             test_assert(false);
@@ -317,12 +317,12 @@ void test_iterate()
 void test_delete_from_iterator()
 {
     Dict dict;
-    TValue iterator;
+    caValue iterator;
 
     const char* names[] = {"a","b","c","d","e"};
 
     for (int i=0; i < 5; i++) {
-        TValue val;
+        caValue val;
         set_int(&val, i);
         dict.set(names[i], &val);
     }
@@ -334,13 +334,13 @@ void test_delete_from_iterator()
             dict.iteratorNext(&iterator)) {
 
         const char* currentKey;
-        TValue* currentTValue;
+        caValue* currentcaValue;
 
-        dict.iteratorGet(&iterator, &currentKey, &currentTValue);
+        dict.iteratorGet(&iterator, &currentKey, &currentcaValue);
 
-        if ((as_int(currentTValue) % 2) == 1) {
+        if ((as_int(currentcaValue) % 2) == 1) {
             dict.iteratorDelete(&iterator);
-            test_assert(is_null(currentTValue));
+            test_assert(is_null(currentcaValue));
         }
     }
 

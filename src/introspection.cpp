@@ -305,7 +305,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << name_to_string(term->type->name);
 
     if (is_value(term))
-        out << " val:" << to_string((TValue*) term);
+        out << " val:" << to_string((caValue*) term);
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();
@@ -347,7 +347,7 @@ std::string get_term_to_string_extended_with_props(Term* term)
     return out.str();
 }
 
-void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, TValue* context)
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context)
 {
     if (location->owningBranch == NULL)
         return;

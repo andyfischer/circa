@@ -82,7 +82,7 @@ void* find_func_in_dll(Dll* dll, const char* funcName)
     #endif
 }
 
-Dll* load_dll(const char* filename, TValue* errorOut)
+Dll* load_dll(const char* filename, caValue* errorOut)
 {
     Dll* dll = new Dll();
 
@@ -150,7 +150,7 @@ void patch_branch_recr(Dll* dll, Branch* branch, std::string namespacePrefix)
     }
 }
 
-void patch_with_dll(const char* dll_filename, Branch* branch, TValue* errorOut)
+void patch_with_dll(const char* dll_filename, Branch* branch, caValue* errorOut)
 {
     // Check to unload this file, if it's already loaded
     unload_dll(dll_filename);
@@ -176,7 +176,7 @@ void patch_with_dll(const char* dll_filename, Branch* branch, TValue* errorOut)
     patch_branch_recr(dll, branch, "");
 }
 
-void find_dll_for_script(Branch* branch, TValue* resultOut)
+void find_dll_for_script(Branch* branch, caValue* resultOut)
 {
     String* filename = (String*) branch_get_source_filename(branch);
 
@@ -210,7 +210,7 @@ void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
                 continue;
             }
 
-            TValue error;
+            caValue error;
             patch_with_dll(as_cstring(&filename), branch, &error);
 
             if (!is_null(&error)) {

@@ -74,7 +74,7 @@ void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string
 // as descendants.
 TermList get_involved_terms(TermList inputs, TermList outputs);
 
-typedef bool (*NamedTermVisitor) (Term* term, const char* name, TValue* context);
-void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, TValue* context);
+typedef bool (*NamedTermVisitor) (Term* term, const char* name, caValue* context);
+void visit_name_accessible_terms(Term* location, NamedTermVisitor visitor, caValue* context);
 
 }

@@ -45,13 +45,13 @@ Function::~Function()
 
 namespace function_t {
 
-    void initialize(Type* type, TValue* value)
+    void initialize(Type* type, caValue* value)
     {
         Function* attrs = new Function();
         set_pointer(value, type, attrs);
     }
 
-    void copy(Type* type, TValue* source, TValue* dest)
+    void copy(Type* type, caValue* source, caValue* dest)
     {
         create(type, dest);
         *((Function*) get_pointer(dest)) = *((Function*) get_pointer(source));
@@ -180,7 +180,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 
     for (int i=0; i < inputs.length(); i++) {
         Type* type = function_get_input_type(func, i);
-        TValue* value = inputs[i];
+        caValue* value = inputs[i];
         if (value == NULL)
             continue;
         if (!cast_possible(value, type))
@@ -200,7 +200,7 @@ bool values_fit_function_dynamic(Term* func, List* list)
 
     for (int i=0; i < list->length(); i++) {
         Type* type = function_get_input_type(func, i);
-        TValue* value = list->get(i);
+        caValue* value = list->get(i);
         if (value == NULL)
             continue;
         if (!cast_possible(value, type))

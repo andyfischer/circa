@@ -12,7 +12,7 @@ using namespace circa;
 
 extern "C" {
 
-TValue* g_fileServices = NULL;
+caValue* g_fileServices = NULL;
 Type* g_fileServiceType = NULL;
 
 std::map<std::string, caFileRecord*> g_fileRecords;
@@ -23,7 +23,7 @@ static void file_init_globals()
     if (g_fileServices != NULL)
         return;
 
-    g_fileServices = new TValue();
+    g_fileServices = new caValue();
     set_list(g_fileServices, 0);
 
     g_fileServiceType = create_type();
@@ -46,7 +46,7 @@ void circa_install_file_source(caFileSource* source)
 {
     file_init_globals();
 
-    TValue* entry = list_append(g_fileServices);
+    caValue* entry = list_append(g_fileServices);
 
     caFileSource* serviceCopy = (caFileSource*) malloc(sizeof(caFileSource));
     memcpy(serviceCopy, source, sizeof(caFileSource));

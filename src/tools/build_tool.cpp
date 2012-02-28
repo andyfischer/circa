@@ -18,7 +18,7 @@ int run_build_tool(List* args)
         List buildArgs;
         set_string(buildArgs.append(), filename);
 
-        TValue* result = evaluate(get_global("cppbuild:build_module"), &buildArgs);
+        caValue* result = evaluate(get_global("cppbuild:build_module"), &buildArgs);
 
         if (is_error(result)) {
             std::cout << as_cstring(result) << std::endl;

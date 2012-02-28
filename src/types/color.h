@@ -9,6 +9,6 @@ namespace color_t {
 
 } // namespace color_t
 
-void get_color(TValue* value, float* r, float* g, float* b, float* a);
+void get_color(caValue* value, float* r, float* g, float* b, float* a);
 
 } // namespace circa

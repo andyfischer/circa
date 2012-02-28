@@ -141,7 +141,7 @@ struct TokenStream
         return tokens[index];
     }
 
-    void reset(TValue* inputString);
+    void reset(caValue* inputString);
 
     void reset(std::string const& input)
     {
@@ -175,8 +175,8 @@ struct TokenStream
     // Like consume(), but also returns the text of the consumed token.
     std::string consumeStr(int match = -1);
 
-    // Like consume(), but saves the text of the consumed token in a TValue.
-    void consumeStr(TValue* output, int match = -1);
+    // Like consume(), but saves the text of the consumed token in a caValue.
+    void consumeStr(caValue* output, int match = -1);
 
     // Like consume(), but registers the string as a runtime symbol.
     Name consumeName(int match = -1);

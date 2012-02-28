@@ -4,7 +4,7 @@ namespace circa {
 namespace symbol_t {
 
     // Create a symbol with the given name, and copy it to 'result'.
-    void assign_new_symbol(const char* name, TValue* result);
+    void assign_new_symbol(const char* name, caValue* result);
 
     void setup_type(Type* type);
 

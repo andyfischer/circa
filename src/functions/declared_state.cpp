@@ -7,8 +7,8 @@ namespace declared_state_function {
 
     CA_FUNCTION(get_declared_state)
     {
-        TValue* value = INPUT(0);
-        TValue* output = OUTPUT;
+        caValue* value = INPUT(0);
+        caValue* output = OUTPUT;
 
         // Try to cast 'value' to the declared type.
         if (value != NULL && !is_null(value)) {
@@ -37,7 +37,7 @@ namespace declared_state_function {
 
 #if 0
         // Try to use default_value from an input.
-        TValue* defaultValue = INPUT(1);
+        caValue* defaultValue = INPUT(1);
         if (defaultValue != NULL) {
             bool cast_success = cast(defaultValue, declared_type(CALLER), output);
 

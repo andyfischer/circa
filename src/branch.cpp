@@ -373,7 +373,7 @@ void remove_nested_contents(Term* term)
     term->nestedContents = NULL;
 }
 
-TValue* branch_get_source_filename(Branch* branch)
+caValue* branch_get_source_filename(Branch* branch)
 {
     List* fileOrigin = branch_get_file_origin(branch);
 
@@ -385,7 +385,7 @@ TValue* branch_get_source_filename(Branch* branch)
 
 std::string get_branch_source_filename(Branch* branch)
 {
-    TValue* val = branch_get_source_filename(branch);
+    caValue* val = branch_get_source_filename(branch);
     
     if (val == NULL || !is_string(val))
         return "";
@@ -418,7 +418,7 @@ void erase_term(Term* term)
 
     pre_erase_term(term);
 
-    set_null((TValue*) term);
+    set_null((caValue*) term);
     set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;

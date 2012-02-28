@@ -27,8 +27,8 @@ void dump(Branch& branch);
 void dump(Branch* branch);
 void dump_with_props(Branch& branch);
 void dump(Term* term);
-void dump(TValue& value);
-void dump(TValue* value);
+void dump(caValue& value);
+void dump(caValue* value);
 void dump(EvalContext* context);
 
 // Signal that an unexpected error has occurred. Depending on debug settings, this

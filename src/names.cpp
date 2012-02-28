@@ -451,7 +451,7 @@ const char* name_to_string(Name name)
 
 void name_to_string(Name name, String* string)
 {
-    set_string((TValue*) string, name_to_string(name));
+    set_string((caValue*) string, name_to_string(name));
 }
 
 Name name_get_namespace_first(Name name)
@@ -470,12 +470,12 @@ Name name_get_namespace_rr(Name name)
         return g_runtimeNames[name - c_FirstRuntimeName].namespaceRightRemainder;
 }
 
-Name as_name(TValue* tv)
+Name as_name(caValue* tv)
 {
     return tv->value_data.asint;
 }
 
-void set_name(TValue* tv, Name val)
+void set_name(caValue* tv, Name val)
 {
     set_null(tv);
     tv->value_type = &NAME_T;
@@ -514,7 +514,7 @@ Name name_from_string(const char* str)
 
     return name;
 }
-Name name_from_string(TValue* str)
+Name name_from_string(caValue* str)
 {
     return name_from_string(as_cstring(str));
 }

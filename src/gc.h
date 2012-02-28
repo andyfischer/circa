@@ -44,7 +44,7 @@ void gc_register_object(CircaObject* object);
 
 // Calls used during mark and sweep.
 void gc_mark(GCReferenceList* list, CircaObject* item, GCColor color);
-void gc_mark_tagged_value(GCReferenceList* list, TValue* value, GCColor color);
+void gc_mark_tagged_value(GCReferenceList* list, caValue* value, GCColor color);
 
 void gc_ref_list_reset(GCReferenceList* list);
 

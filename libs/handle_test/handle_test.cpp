@@ -19,7 +19,7 @@ public:
     }
 };
 
-void ReleaseThing(TValue* value)
+void ReleaseThing(caValue* value)
 {
     delete (Thing*) as_opaque_pointer(value);
 }

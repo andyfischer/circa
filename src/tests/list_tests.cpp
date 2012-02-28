@@ -17,7 +17,7 @@ void test_parse_type()
     test_equals(&as_type(myType)->parameter, "[[<Type string>, <Type int>], ['s', 'i']]");
 
     // Check an instanciated value
-    TValue* val = branch.eval("MyType()");
+    caValue* val = branch.eval("MyType()");
     test_assert(is_string(val->getIndex(0)));
     test_assert(is_int(val->getIndex(1)));
 
@@ -42,27 +42,27 @@ void test_cast()
 {
     Branch branch;
 
-    TValue a;
+    caValue a;
     set_list(&a);
 
-    TValue b;
+    caValue b;
     set_list(&b, 2);
     set_int(b.getIndex(0), 1);
     set_int(b.getIndex(1), 2);
     test_equals(b.toString(), "[1, 2]");
 
-    TValue c;
+    caValue c;
     set_list(&c, 2);
     set_int(c.getIndex(0), 1);
     set_string(c.getIndex(1), "hi");
     test_equals(c.toString(), "[1, 'hi']");
 
-    TValue d;
+    caValue d;
     set_list(&d, 1);
     set_float(d.getIndex(0), 1);
     test_equals(d.toString(), "[1.0]");
 
-    TValue x;
+    caValue x;
 
     test_assert(!cast_possible(&a, &INT_T));
     test_assert(cast_possible(&a, &LIST_T));
@@ -85,7 +85,7 @@ void test_cast()
 
 void test_remove_nulls()
 {
-    TValue v;
+    caValue v;
     List list;
     test_equals(list.toString(), "[]");
 
@@ -145,7 +145,7 @@ void test_tagged_value()
     Type* list = create_type();
     list_t::setup_type(list);
 
-    TValue value;
+    caValue value;
     create(list, &value);
 
     test_equals(to_string(&value), "[]");
@@ -167,7 +167,7 @@ void test_tagged_value_copy()
     Type* list = create_type();
     list_t::setup_type(list);
 
-    TValue value(list);
+    caValue value(list);
 
     set_int(list_t::append(&value), 1);
     set_int(list_t::append(&value), 2);
@@ -175,7 +175,7 @@ void test_tagged_value_copy()
 
     test_equals(to_string(&value), "[1, 2, 3]");
 
-    TValue value2;
+    caValue value2;
     test_assert(value.value_type->copy != NULL);
     copy(&value, &value2);
 
@@ -192,12 +192,12 @@ void test_touch()
     Type* list = create_type();
     list_t::setup_type(list);
 
-    TValue value(list);
+    caValue value(list);
 
     set_int(list_t::append(&value), 1);
     set_int(list_t::append(&value), 2);
 
-    TValue value2(list);
+    caValue value2(list);
     copy(&value, &value2);
 
     #if !CIRCA_DISABLE_LIST_SHARING
@@ -212,7 +212,7 @@ void test_prepend()
     Type* list = create_type();
     list_t::setup_type(list);
 
-    TValue value(list);
+    caValue value(list);
 
     set_int(list_t::append(&value), 1);
     set_int(list_t::append(&value), 2);

@@ -5,7 +5,7 @@
 namespace circa {
 namespace any_t {
 
-    std::string to_string(TValue*)
+    std::string to_string(caValue*)
     {
         return "<any>";
     }
@@ -13,8 +13,8 @@ namespace any_t {
     {
         return query->succeed();
     }
-    void cast(CastResult* result, TValue* source, Type* type,
-        TValue* dest, bool checkOnly)
+    void cast(CastResult* result, caValue* source, Type* type,
+        caValue* dest, bool checkOnly)
     {
         // casting to 'any' always succeeds.
         if (checkOnly)

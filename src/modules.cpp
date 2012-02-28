@@ -129,7 +129,7 @@ Branch* find_module_from_filename(const char* filename)
         if (term->nestedContents == NULL)
             continue;
 
-        TValue* branchFilename = branch_get_source_filename(nested_contents(term));
+        caValue* branchFilename = branch_get_source_filename(nested_contents(term));
         if (branchFilename == NULL)
             continue;
 

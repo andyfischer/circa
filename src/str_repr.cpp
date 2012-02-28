@@ -13,7 +13,7 @@ using namespace circa;
 struct ParseContext
 {
     TokenStream* tokens;
-    TValue* out;
+    caValue* out;
 };
 
 static void drop_whitespace(TokenStream* tokens)
@@ -35,7 +35,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
         tokens->consume(TK_FLOAT);
     } else if (tokens->nextIs(TK_STRING)) {
         std::string s = tokens->nextStr();
-        parser::unquote_and_unescape_string(s.c_str(), (TValue*) out);
+        parser::unquote_and_unescape_string(s.c_str(), (caValue*) out);
         tokens->consume(TK_STRING);
     } else if (tokens->nextIs(TK_LBRACKET)) {
         tokens->consume(TK_LBRACKET);

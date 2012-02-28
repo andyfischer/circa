@@ -31,7 +31,7 @@ struct EvalContext
     Term* errorTerm;
 
     // Persistent state
-    TValue state;
+    caValue state;
 
     // Intra-program messages
     Dict messages;
@@ -82,31 +82,31 @@ void evaluate_branch(Branch* branch);
 void evaluate_range(EvalContext* context, Branch* branch, int start, int end);
 
 // Evaluate 'term' and every term that it depends on.
-void evaluate_minimum(EvalContext* context, Term* term, TValue* result);
+void evaluate_minimum(EvalContext* context, Term* term, caValue* result);
 
 // Parse input and immediately evaluate it, returning the result value.
-TValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
-TValue* evaluate(Branch* branch, Term* function, List* inputs);
-TValue* evaluate(Term* function, List* inputs);
+caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
+caValue* evaluate(Branch* branch, Term* function, List* inputs);
+caValue* evaluate(Term* function, List* inputs);
 
-TValue* get_input(EvalContext* context, Term* term);
-TValue* get_input(EvalContext* context, int index);
-void consume_input(EvalContext* context, Term* term, TValue* dest);
-void consume_input(EvalContext* context, int index, TValue* dest);
-bool consume_cast(EvalContext* context, int index, Type* type, TValue* dest);
+caValue* get_input(EvalContext* context, Term* term);
+caValue* get_input(EvalContext* context, int index);
+void consume_input(EvalContext* context, Term* term, caValue* dest);
+void consume_input(EvalContext* context, int index, caValue* dest);
+bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest);
 int num_inputs(EvalContext* context);
 void consume_inputs_to_list(EvalContext* context, List* list);
-TValue* get_output(EvalContext* context, int index);
+caValue* get_output(EvalContext* context, int index);
 
 Term* current_term(EvalContext* context);
-TValue* get_register(EvalContext* context, Term* term);
+caValue* get_register(EvalContext* context, Term* term);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.
 void create_output(EvalContext* context);
 
 // Signal that a runtime error has occurred.
-void raise_error(EvalContext* context, Term* term, TValue* output, const char* msg);
+void raise_error(EvalContext* context, Term* term, caValue* output, const char* msg);
 void raise_error(EvalContext* context, const char* msg);
 void raise_error(EvalContext* context, std::string const& msg);
 

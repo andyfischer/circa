@@ -14,7 +14,7 @@
 
 namespace circa {
 
-void repeat_string(const char* str, int times, TValue* output)
+void repeat_string(const char* str, int times, caValue* output)
 {
     std::stringstream out;
     for (int i=0; i < times; i++)
@@ -29,7 +29,7 @@ struct SourceWriter
     List output;
     int currentIndent;
     bool startNewLine;
-    TValue indentStr;
+    caValue indentStr;
 
     SourceWriter() : currentIndent(0), startNewLine(true) {
         repeat_string(" ", currentIndent * kSpacesPerIndent, &indentStr);
@@ -39,12 +39,12 @@ struct SourceWriter
     {
         if (startNewLine) {
             startNewLine = false;
-            TValue* space = list_append(&output);
+            caValue* space = list_append(&output);
             copy(&indentStr, space);
         }
     }
 
-    void write(TValue* item)
+    void write(caValue* item)
     {
         possiblyStartNewLine();
 
@@ -65,17 +65,17 @@ struct SourceWriter
 
     void newline()
     {
-        TValue val;
+        caValue val;
         set_name(&val, name_Newline);
         write(&val);
     }
 
-    void writeList(TValue* list)
+    void writeList(caValue* list)
     {
         possiblyStartNewLine();
         int listLength = list_length(list);
         for (int i=0; i < listLength; i++) {
-            TValue* item = list_get(list, i);
+            caValue* item = list_get(list, i);
             copy(item, list_append(&output));
         }
     }
@@ -191,7 +191,7 @@ void write_branch_contents(SourceWriter* writer, Branch* branch)
     }
 }
 
-void write_program(Branch* branch, TValue* out)
+void write_program(Branch* branch, caValue* out)
 {
     SourceWriter sourceWriter;
     write_branch_contents(&sourceWriter, branch);
@@ -200,21 +200,21 @@ void write_program(Branch* branch, TValue* out)
 
 void write_program_to_file(Branch* branch, const char* filename)
 {
-    TValue strs;
+    caValue strs;
     write_program(branch, &strs);
 
     FILE* file = fopen(filename, "w");
 
     int str_count = list_length(&strs);
     for (int i=0; i < str_count; i++) {
-        TValue* str = list_get(&strs, i);
+        caValue* str = list_get(&strs, i);
         const char* cstr = as_cstring(str);
         fwrite(cstr, 1, strlen(cstr), file);
     }
     fclose(file);
 }
 
-void run_generate_cpp(TValue* args)
+void run_generate_cpp(caValue* args)
 {
     if (list_length(args) < 2) {
         std::cout << "Expected 2 arguments";

@@ -9,7 +9,7 @@ void test_refs_are_destruction_safe()
 {
     Branch branch;
     Term* a = branch.compile("a = 1");
-    TValue ref;
+    caValue ref;
     set_ref(&ref, a);
     test_assert(as_ref(&ref) == a);
     clear_branch(&branch);

@@ -39,7 +39,7 @@ namespace assign_function {
         }
     }
 
-    Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredTValue)
+    Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredcaValue)
     {
         Term* set = NULL;
 
@@ -51,7 +51,7 @@ namespace assign_function {
             return NULL;
         }
 
-        return apply(branch, set, TermList(term->input(0), term->input(1), desiredTValue));
+        return apply(branch, set, TermList(term->input(0), term->input(1), desiredcaValue));
     }
 
     /*

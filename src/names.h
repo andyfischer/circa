@@ -56,11 +56,11 @@ void name_to_string(Name name, String* string);
 Name name_get_namespace_first(Name name);
 Name name_get_namespace_rr(Name name);
 
-Name as_name(TValue* tv);
-void set_name(TValue* tv, Name name);
+Name as_name(caValue* tv);
+void set_name(caValue* tv, Name name);
 
 Name name_from_string(const char* str);
-Name name_from_string(TValue* str);
+Name name_from_string(caValue* str);
 
 const Name name_None = 0;
 const Name name_File = 2;

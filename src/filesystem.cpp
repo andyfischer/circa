@@ -9,11 +9,11 @@ namespace circa {
 
 StorageInterface g_storageInterface;
 
-void read_text_file_to_value(const char* filename, TValue* contents, TValue* error)
+void read_text_file_to_value(const char* filename, caValue* contents, caValue* error)
 {
     struct ReceiveFile {
-        TValue* _contents;
-        TValue* _error;
+        caValue* _contents;
+        caValue* _error;
         static void Func(void* context, const char* contents, const char* error) {
             ReceiveFile* obj = (ReceiveFile*) context;
 
@@ -40,7 +40,7 @@ void read_text_file_to_value(const char* filename, TValue* contents, TValue* err
 
 std::string read_text_file_as_str(const char* filename)
 {
-    TValue contents;
+    caValue contents;
     read_text_file_to_value(filename, &contents, NULL);
 
     if (is_string(&contents))

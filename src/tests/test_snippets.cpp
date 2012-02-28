@@ -109,7 +109,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         if (!is_statement(assertions->get(i)))
             continue;
 
-        TValue* result = assertions->get(i);
+        caValue* result = assertions->get(i);
 
         if (!is_bool(result))
             continue;

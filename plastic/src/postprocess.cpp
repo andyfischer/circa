@@ -17,21 +17,21 @@ using namespace circa;
 namespace postprocess_functions
 {
     namespace surface_t {
-        int get_tex_id(TValue* v) { return as_int(v->getIndex(0)); }
-        int get_fbo_id(TValue* v) { return as_int(v->getIndex(1)); }
-        int get_width(TValue* v) { return as_int(v->getIndex(2)); }
-        int get_height(TValue* v) { return as_int(v->getIndex(3)); }
+        int get_tex_id(caValue* v) { return as_int(v->getIndex(0)); }
+        int get_fbo_id(caValue* v) { return as_int(v->getIndex(1)); }
+        int get_width(caValue* v) { return as_int(v->getIndex(2)); }
+        int get_height(caValue* v) { return as_int(v->getIndex(3)); }
 
-        void set_tex_id(TValue* v, int id) { touch(v); set_int(v->getIndex(0), id); }
-        void set_fbo_id(TValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
-        void set_width(TValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
-        void set_height(TValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
+        void set_tex_id(caValue* v, int id) { touch(v); set_int(v->getIndex(0), id); }
+        void set_fbo_id(caValue* v, int id) { touch(v); set_int(v->getIndex(1), id); }
+        void set_width(caValue* v, int w) { touch(v); set_int(v->getIndex(2), w); }
+        void set_height(caValue* v, int h) { touch(v); set_int(v->getIndex(3), h); }
     }
     
     CA_FUNCTION(make_surface)
     {
         gl_clear_error();
-        TValue* surface = INPUT(0);
+        caValue* surface = INPUT(0);
         List* size = List::checkCast(INPUT(1));
 
         if (surface_t::get_tex_id(surface) == 0) {
@@ -78,7 +78,7 @@ namespace postprocess_functions
     static int bound_surface_width = 0;
     static int bound_surface_height = 0;
 
-    void bind_surface(EvalContext* cxt, Term* caller, TValue* surface)
+    void bind_surface(EvalContext* cxt, Term* caller, caValue* surface)
     {
         int width = surface_t::get_width(surface);
         int height = surface_t::get_height(surface);
@@ -115,7 +115,7 @@ namespace postprocess_functions
 
     CA_FUNCTION(draw_surface)
     {
-        TValue* surface = INPUT(0);
+        caValue* surface = INPUT(0);
         int tex_id = surface_t::get_tex_id(surface);
 
         glEnable(GL_TEXTURE_2D);
@@ -140,7 +140,7 @@ namespace postprocess_functions
 
     CA_FUNCTION(draw_surface_at)
     {
-        TValue* surface = INPUT(0);
+        caValue* surface = INPUT(0);
         List* location = List::checkCast(INPUT(1));
         int tex_id = surface_t::get_tex_id(surface);
 
@@ -167,8 +167,8 @@ namespace postprocess_functions
 
     CA_FUNCTION(copy_surface)
     {
-        TValue* source_surface = INPUT(0);
-        TValue* dest_surface = INPUT(1);
+        caValue* source_surface = INPUT(0);
+        caValue* dest_surface = INPUT(1);
 
         bind_surface(CONTEXT, CALLER, dest_surface);
 

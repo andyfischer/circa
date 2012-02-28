@@ -2,7 +2,7 @@
 
 namespace circa {
 
-void get_rect(TValue* val, float* x1, float* y1, float* x2, float* y2)
+void get_rect(caValue* val, float* x1, float* y1, float* x2, float* y2)
 {
     *x1 = to_float(get_index(val, 0));
     *y1 = to_float(get_index(val, 1));

@@ -14,7 +14,7 @@ namespace circa {
 struct DictData {
     struct Slot {
         char* key;
-        TValue value;
+        caValue value;
     };
 
     int capacity;
@@ -190,7 +190,7 @@ int insert(DictData** dataPtr, const char* key)
     return index;
 }
 
-void insert_value(DictData** dataPtr, const char* key, TValue* value)
+void insert_value(DictData** dataPtr, const char* key, caValue* value)
 {
     int index = insert(dataPtr, key);
     copy(value, &(*dataPtr)->slots[index].value);
@@ -225,14 +225,14 @@ int find_key(DictData* data, const char* key)
     return index;
 }
 
-TValue* get_value(DictData* data, const char* key)
+caValue* get_value(DictData* data, const char* key)
 {
     int index = find_key(data, key);
     if (index == -1) return NULL;
     return &data->slots[index].value;
 }
 
-TValue* get_index(DictData* data, int index)
+caValue* get_index(DictData* data, int index)
 {
     ca_assert(index < data->capacity);
     ca_assert(data->slots[index].key != NULL);
@@ -303,8 +303,8 @@ void clear(DictData* data)
 
 struct SortedVisitItem {
     char* key;
-    TValue* value;
-    SortedVisitItem(char* k, TValue* v) : key(k), value(v) {}
+    caValue* value;
+    SortedVisitItem(char* k, caValue* v) : key(k), value(v) {}
 };
 
 struct SortedVisitItemCompare {
@@ -349,7 +349,7 @@ void debug_print(DictData* data)
     }
 }
 
-void iterator_start(DictData* data, TValue* iterator)
+void iterator_start(DictData* data, caValue* iterator)
 {
     if (data == NULL || data->count == 0)
         return set_null(iterator);
@@ -361,7 +361,7 @@ void iterator_start(DictData* data, TValue* iterator)
         iterator_next(data, iterator);
 }
 
-void iterator_next(DictData* data, TValue* iterator)
+void iterator_next(DictData* data, caValue* iterator)
 {
     int i = as_int(iterator);
 
@@ -376,7 +376,7 @@ void iterator_next(DictData* data, TValue* iterator)
         set_int(iterator, next);
 }
 
-void iterator_get(DictData* data, TValue* iterator, const char** key, TValue** value)
+void iterator_get(DictData* data, caValue* iterator, const char** key, caValue** value)
 {
     int i = as_int(iterator);
 
@@ -384,7 +384,7 @@ void iterator_get(DictData* data, TValue* iterator, const char** key, TValue** v
     *value = &data->slots[i].value;
 }
 
-void iterator_delete(DictData* data, TValue* iterator)
+void iterator_delete(DictData* data, caValue* iterator)
 {
     int i = as_int(iterator);
     remove_at(data, i);
@@ -392,33 +392,33 @@ void iterator_delete(DictData* data, TValue* iterator)
 
 namespace tagged_value_wrappers {
 
-    void initialize(Type* type, TValue* value)
+    void initialize(Type* type, caValue* value)
     {
         value->value_data.ptr = NULL;
     }
-    void release(TValue* value)
+    void release(caValue* value)
     {
         free_dict((DictData*) value->value_data.ptr);
     }
-    void copy(Type* type, TValue* source, TValue* dest)
+    void copy(Type* type, caValue* source, caValue* dest)
     {
         change_type(dest, type);
         dest->value_data.ptr = duplicate((DictData*) source->value_data.ptr);
     }
-    std::string to_string(TValue* value)
+    std::string to_string(caValue* value)
     {
         return dict_to_string((DictData*) value->value_data.ptr);
     }
-    TValue* get_field(TValue* value, const char* field)
+    caValue* get_field(caValue* value, const char* field)
     {
         return dict_t::get_value((DictData*) value->value_data.ptr, field);
     }
-    void visit_heap(Type*, TValue* value, Type::VisitHeapCallback callback, TValue* context)
+    void visit_heap(Type*, caValue* value, Type::VisitHeapCallback callback, caValue* context)
     {
         DictData* data = (DictData*) value->value_data.ptr;
         if (data == NULL)
             return;
-        TValue relativeIdentifier;
+        caValue relativeIdentifier;
         for (int i=0; i < data->capacity; i++) {
             if (data->slots[i].key == NULL)
                 continue;
@@ -444,12 +444,12 @@ void setup_type(Type* type)
 } // namespace dict_t
 
 Dict::Dict()
-  : TValue()
+  : caValue()
 {
     create(&DICT_T, this);
 }
 
-Dict* Dict::checkCast(TValue* value)
+Dict* Dict::checkCast(caValue* value)
 {
     if (value == NULL)
         return NULL;
@@ -460,7 +460,7 @@ Dict* Dict::checkCast(TValue* value)
         return NULL;
 }
 
-Dict* Dict::lazyCast(TValue* value)
+Dict* Dict::lazyCast(caValue* value)
 {
     if (is_dict(value))
         return (Dict*) value;
@@ -468,7 +468,7 @@ Dict* Dict::lazyCast(TValue* value)
 }
 
 Dict*
-Dict::cast(TValue* v)
+Dict::cast(caValue* v)
 {
     return make_dict(v);
 }
@@ -478,11 +478,11 @@ std::string Dict::toString()
     return dict_to_string((DictData*) this->value_data.ptr);
 }
 
-TValue* Dict::get(const char* key)
+caValue* Dict::get(const char* key)
 {
     return dict_t::get_value((DictData*) this->value_data.ptr, key);
 }
-TValue* Dict::operator[](const char* key)
+caValue* Dict::operator[](const char* key)
 {
     return get(key);
 }
@@ -490,7 +490,7 @@ bool Dict::contains(const char* key)
 {
     return get(key) != NULL;
 }
-TValue* Dict::insert(const char* key)
+caValue* Dict::insert(const char* key)
 {
     DictData* data = (DictData*) this->value_data.ptr;
     int newIndex = dict_t::insert(&data, key);
@@ -502,7 +502,7 @@ void Dict::remove(const char* key)
     DictData* data = (DictData*) this->value_data.ptr;
     dict_t::remove(data, key);
 }
-void Dict::set(const char* key, TValue* value)
+void Dict::set(const char* key, caValue* value)
 {
     DictData* data = (DictData*) this->value_data.ptr;
     dict_t::insert_value(&data, key, value);
@@ -519,38 +519,38 @@ bool Dict::empty()
     return dict_t::count(data) == 0;
 }
 
-void Dict::iteratorStart(TValue* iterator)
+void Dict::iteratorStart(caValue* iterator)
 {
     DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_start(data, iterator);
 }
-void Dict::iteratorNext(TValue* iterator)
+void Dict::iteratorNext(caValue* iterator)
 {
     DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_next(data, iterator);
 }
-void Dict::iteratorGet(TValue* iterator, const char** key, TValue** value)
+void Dict::iteratorGet(caValue* iterator, const char** key, caValue** value)
 {
     DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_get(data, iterator, key, value);
 }
-void Dict::iteratorDelete(TValue* iterator)
+void Dict::iteratorDelete(caValue* iterator)
 {
     DictData* data = (DictData*) this->value_data.ptr;
     dict_t::iterator_delete(data, iterator);
 }
-bool Dict::iteratorFinished(TValue* iterator)
+bool Dict::iteratorFinished(caValue* iterator)
 {
     return is_null(iterator);
 }
 void Dict::setString(const char* key, const char* value)
 {
-    TValue* dest = insert(key);
+    caValue* dest = insert(key);
     set_string(dest, value);
 }
 const char* Dict::getString(const char* key, const char* defaultValue)
 {
-    TValue* val = get(key);
+    caValue* val = get(key);
     if (val == NULL)
         return defaultValue;
     if (is_string(val))
@@ -559,12 +559,12 @@ const char* Dict::getString(const char* key, const char* defaultValue)
 }
 void Dict::setInt(const char* key, int value)
 {
-    TValue* dest = insert(key);
+    caValue* dest = insert(key);
     set_int(dest, value);
 }
 int Dict::getInt(const char* key, int defaultValue)
 {
-    TValue* val = get(key);
+    caValue* val = get(key);
     if (val == NULL)
         return defaultValue;
     if (is_int(val))
@@ -573,7 +573,7 @@ int Dict::getInt(const char* key, int defaultValue)
 }
 bool Dict::getBool(const char* key, bool defaultValue)
 {
-    TValue* val = get(key);
+    caValue* val = get(key);
     if (val == NULL)
         return defaultValue;
     if (is_bool(val))
@@ -581,22 +581,22 @@ bool Dict::getBool(const char* key, bool defaultValue)
     return defaultValue;
 }
 
-bool is_dict(TValue* value)
+bool is_dict(caValue* value)
 {
     return value->value_type == &DICT_T;
 }
-Dict* as_dict(TValue* value)
+Dict* as_dict(caValue* value)
 {
     ca_assert(is_dict(value));
     return (Dict*) value;
 }
 
-TValue* dict_get(DictData* data, const char* key)
+caValue* dict_get(DictData* data, const char* key)
 {
     return dict_t::get_value(data, key);
 }
 
-TValue* dict_insert(DictData** dataPtr, const char* key)
+caValue* dict_insert(DictData** dataPtr, const char* key)
 {
     int index = dict_t::insert(dataPtr, key);
     return &(*dataPtr)->slots[index].value;
@@ -608,7 +608,7 @@ std::string dict_to_string(DictData* data)
         std::stringstream strm;
         bool first;
         Visitor() : first(true) {}
-        static void visit(void* context, const char* key, TValue* value)
+        static void visit(void* context, const char* key, caValue* value)
         {
             Visitor& obj = *((Visitor*) context);
             if (!obj.first)
@@ -625,19 +625,19 @@ std::string dict_to_string(DictData* data)
     return visitor.strm.str();
 }
 
-Dict* make_dict(TValue* value)
+Dict* make_dict(caValue* value)
 {
     create(&DICT_T, value);
     return (Dict*) value;
 }
 
-TValue* dict_get(TValue* dict, const char* field)
+caValue* dict_get(caValue* dict, const char* field)
 {
     ca_assert(is_dict(dict));
     return dict_get((DictData*) dict->value_data.ptr, field);
 }
 
-TValue* dict_insert(TValue* dict, const char* field)
+caValue* dict_insert(caValue* dict, const char* field)
 {
     ca_assert(is_dict(dict));
     return dict_insert((DictData**) &dict->value_data.ptr, field);

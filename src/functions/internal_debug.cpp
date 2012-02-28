@@ -23,53 +23,53 @@ namespace internal_debug_function {
         std::cout << std::endl;
     }
 
-    List oracleTValues;
+    List oraclecaValues;
 
     CA_DEFINE_FUNCTION(oracle, "test_oracle() -> any"
         "'For internal testing. This function will output values that are manually "
         "inserted with the c++ function oracle_send'")
     {
-        if (oracleTValues.length() == 0)
+        if (oraclecaValues.length() == 0)
             set_null(OUTPUT);
         else {
-            copy(oracleTValues[0], OUTPUT);
-            oracleTValues.remove(0);
+            copy(oraclecaValues[0], OUTPUT);
+            oraclecaValues.remove(0);
         }
     }
 
     void oracle_clear()
     {
-        oracleTValues.clear();
+        oraclecaValues.clear();
     }
 
-    void oracle_send(TValue* value)
+    void oracle_send(caValue* value)
     {
-        copy(value, oracleTValues.append());
+        copy(value, oraclecaValues.append());
     }
 
     void oracle_send(int i)
     {
-        TValue v;
+        caValue v;
         set_int(&v, i);
         oracle_send(&v);
     }
 
-    List spyTValues;
+    List spycaValues;
 
     CA_DEFINE_FUNCTION(spy, "test_spy(any)"
             "'For internal testing. This function will save every inputs to a static list, "
             "and the contents of this list can be checked from C++ code.")
     {
-        copy(INPUT(0), spyTValues.append());
+        copy(INPUT(0), spycaValues.append());
     }
 
     void spy_clear()
     {
-        spyTValues.clear();
+        spycaValues.clear();
     }
     List* spy_results()
     {
-        return &spyTValues;
+        return &spycaValues;
     }
 
     bool g_initializedHandleType;

@@ -21,10 +21,10 @@ void test_equals_function(float a, float b,
 void test_equals_function(std::string a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file);
-void test_equals_function(TValue* a, std::string b,
+void test_equals_function(caValue* a, std::string b,
         const char* aText, const char* bText,
         int line, const char* file);
-void test_equals_function(TValue* a, float b,
+void test_equals_function(caValue* a, float b,
         const char* aText, const char* bText,
         int line, const char* file);
 

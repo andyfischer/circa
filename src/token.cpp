@@ -694,7 +694,7 @@ void consume_symbol(TokenizeContext &context)
     context.consume(TK_SYMBOL, lookahead);
 }
 
-void TokenStream::reset(TValue* inputString)
+void TokenStream::reset(caValue* inputString)
 {
     reset(as_string(inputString));
 }
@@ -786,7 +786,7 @@ TokenStream::consumeStr(int match)
 }
 
 void
-TokenStream::consumeStr(TValue* output, int match)
+TokenStream::consumeStr(caValue* output, int match)
 {
     set_string(output, nextStr());
     consume(match);

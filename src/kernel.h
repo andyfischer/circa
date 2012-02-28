@@ -140,8 +140,8 @@ struct BuiltinTypes {
 
 extern BuiltinTypes TYPES;
 
-extern TValue TrueValue;
-extern TValue FalseValue;
+extern caValue TrueValue;
+extern caValue FalseValue;
 
 extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;
@@ -161,14 +161,14 @@ namespace copy_function {
 
 namespace internal_debug_function {
     void oracle_clear();
-    void oracle_send(TValue* value);
+    void oracle_send(caValue* value);
     void oracle_send(int i);
     void spy_clear();
     List* spy_results();
 }
 
 namespace file_changed_function {
-    bool check(EvalContext*, Term* caller, TValue* fileSignature,
+    bool check(EvalContext*, Term* caller, caValue* fileSignature,
             std::string const& filename);
 }
 

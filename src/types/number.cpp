@@ -4,12 +4,12 @@
 
 namespace circa {
 namespace number_t {
-    void reset(Type*, TValue* value)
+    void reset(Type*, caValue* value)
     {
         set_float(value, 0);
     }
-    void cast(CastResult* result, TValue* source, Type* type,
-        TValue* dest, bool checkOnly)
+    void cast(CastResult* result, caValue* source, Type* type,
+        caValue* dest, bool checkOnly)
     {
         if (!(is_int(source) || is_float(source))) {
             result->success = false;
@@ -22,13 +22,13 @@ namespace number_t {
         set_float(dest, to_float(source));
     }
 
-    bool equals(Type*, TValue* a, TValue* b)
+    bool equals(Type*, caValue* a, caValue* b)
     {
         if (!is_float(b) && !is_int(b))
             return false;
         return to_float(a) == to_float(b);
     }
-    std::string to_string(TValue* value)
+    std::string to_string(caValue* value)
     {
         std::stringstream out;
         out << as_float(value);

@@ -29,7 +29,7 @@ struct Function
 
     std::string name;
     Term* feedbackFunc;
-    TValue parameter;
+    caValue parameter;
     bool throws;
 
     // Functions
@@ -53,9 +53,9 @@ struct Function
 };
 
 namespace function_t {
-    void initialize(Type* type, TValue* value);
-    void release(Type*, TValue* value);
-    void copy(Type*, TValue* source, TValue* dest);
+    void initialize(Type* type, caValue* value);
+    void release(Type*, caValue* value);
+    void copy(Type*, caValue* source, caValue* dest);
 
     void setup_type(Type* type);
 }

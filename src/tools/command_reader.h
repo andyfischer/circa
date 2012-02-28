@@ -2,7 +2,7 @@
 
 namespace circa {
 
-void do_admin_command(TValue* string, TValue* reply);
+void do_admin_command(caValue* string, caValue* reply);
 void run_commands_from_stdin();
 
 }

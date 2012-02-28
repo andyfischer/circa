@@ -18,7 +18,7 @@
 
 namespace circa {
 
-void read_stdin_line(TValue* line)
+void read_stdin_line(caValue* line)
 {
     char* buf = NULL;
     size_t size = 0;
@@ -40,7 +40,7 @@ void read_stdin_line(TValue* line)
     free(buf);
 }
 
-void parse_string_as_argument_list(TValue* str, List* output)
+void parse_string_as_argument_list(caValue* str, List* output)
 {
     // Read the tokens as a space-seperated list of strings.
     // TODO is to be more smart about word boundaries: spaces inside
@@ -49,7 +49,7 @@ void parse_string_as_argument_list(TValue* str, List* output)
     TokenStream tokens;
     tokens.reset(as_cstring(str));
     
-    TValue itemInProgress;
+    caValue itemInProgress;
     set_string(&itemInProgress, "");
 
     while (!tokens.finished()) {
@@ -73,17 +73,17 @@ void parse_string_as_argument_list(TValue* str, List* output)
     }
 }
 
-void do_add_lib_path(List* args, TValue* reply)
+void do_add_lib_path(List* args, caValue* reply)
 {
     modules_add_search_path(as_cstring(list_get(args, 0)));
 }
 
-void do_echo(List* args, TValue* reply)
+void do_echo(List* args, caValue* reply)
 {
     set_string(reply, to_string(args));
 }
 
-void do_file_command(List* args, TValue* reply)
+void do_file_command(List* args, caValue* reply)
 {
     bool printRaw = false;
     bool printRawWithProps = false;
@@ -158,7 +158,7 @@ void do_file_command(List* args, TValue* reply)
     }
 }
 
-void rewrite_branch(Branch* branch, TValue* contents, TValue* reply)
+void rewrite_branch(Branch* branch, caValue* contents, caValue* reply)
 {
     clear_branch(branch);
     parser::compile(branch, parser::statement_list, as_cstring(contents));
@@ -174,7 +174,7 @@ void rewrite_branch(Branch* branch, TValue* contents, TValue* reply)
     }
 }
 
-void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
+void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
 {
     Name name = name_from_string(branchName);
 
@@ -190,7 +190,7 @@ void do_write_branch(TValue* branchName, TValue* contents, TValue* reply)
     rewrite_branch(branch, contents, reply);
 }
 
-void do_update_file(TValue* filename, TValue* contents, TValue* reply)
+void do_update_file(caValue* filename, caValue* contents, caValue* reply)
 {
     Branch* branch = find_module_from_filename(as_cstring(filename));
 
@@ -202,14 +202,14 @@ void do_update_file(TValue* filename, TValue* contents, TValue* reply)
     rewrite_branch(branch, contents, reply);
 }
 
-void do_admin_command(TValue* input, TValue* reply)
+void do_admin_command(caValue* input, caValue* reply)
 {
     // Identify the command
     int first_space = string_find_char(input, 0, ' ');
     if (first_space == -1)
         first_space = string_length(input);
 
-    TValue command;
+    caValue command;
     string_slice(input, 0, first_space, &command);
 
     set_null(reply);
@@ -238,10 +238,10 @@ void do_admin_command(TValue* input, TValue* reply)
             return;
         }
         
-        TValue branchName;
+        caValue branchName;
         string_slice(input, first_space+1, nextSpace, &branchName);
 
-        TValue contents;
+        caValue contents;
         string_slice(input, nextSpace+1, -1, &contents);
 
         do_write_branch(&branchName, &contents, reply);
@@ -254,10 +254,10 @@ void do_admin_command(TValue* input, TValue* reply)
             return;
         }
         
-        TValue filename;
+        caValue filename;
         string_slice(input, first_space+1, nextSpace, &filename);
 
-        TValue contents;
+        caValue contents;
         string_slice(input, nextSpace+1, -1, &contents);
 
         do_update_file(&filename, &contents, reply);
@@ -279,12 +279,12 @@ void do_admin_command(TValue* input, TValue* reply)
 void run_commands_from_stdin()
 {
     while (true) {
-        TValue line;
+        caValue line;
         read_stdin_line(&line);
         if (!is_string(&line))
             break;
 
-        TValue reply;
+        caValue reply;
         do_admin_command(&line, &reply);
 
         if (is_null(&reply))

@@ -37,10 +37,10 @@ struct CastResult
 
 struct Type
 {
-    typedef void (*Initialize)(Type* type, TValue* value);
-    typedef void (*Copy)(Type* type, TValue* source, TValue* dest);
-    typedef void (*Reset)(Type* type, TValue* value);
-    typedef bool (*Equals)(Type* type, TValue* lhs, TValue* rhs);
+    typedef void (*Initialize)(Type* type, caValue* value);
+    typedef void (*Copy)(Type* type, caValue* source, caValue* dest);
+    typedef void (*Reset)(Type* type, caValue* value);
+    typedef bool (*Equals)(Type* type, caValue* lhs, caValue* rhs);
 
     // Attempts to write a value to 'dest' which is of type 'type', and has a value
     // that comes from 'source'. If the cast isn't possible, callee will record the
@@ -49,25 +49,25 @@ struct Type
     // If checkOnly is true, then callee should only record whether the cast is possible,
     // and not actually write to 'dest'. Caller is allowed to pass NULL for 'dest' when
     // checkOnly is true.
-    typedef void (*Cast)(CastResult* result, TValue* source, Type* type,
-            TValue* dest, bool checkOnly);
+    typedef void (*Cast)(CastResult* result, caValue* source, Type* type,
+            caValue* dest, bool checkOnly);
 
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
-    typedef std::string (*ToString)(TValue* value);
+    typedef std::string (*ToString)(caValue* value);
     typedef void (*FormatSource)(StyledSource*, Term* term);
-    typedef void (*Touch)(TValue* value);
-    typedef TValue* (*GetIndex)(TValue* value, int index);
-    typedef void (*SetIndex)(TValue* value, int index, TValue* element);
-    typedef TValue* (*GetField)(TValue* value, const char* field);
-    typedef void (*SetField)(TValue* value, const char* field, TValue* element);
-    typedef int (*NumElements)(TValue* value);
+    typedef void (*Touch)(caValue* value);
+    typedef caValue* (*GetIndex)(caValue* value, int index);
+    typedef void (*SetIndex)(caValue* value, int index, caValue* element);
+    typedef caValue* (*GetField)(caValue* value, const char* field);
+    typedef void (*SetField)(caValue* value, const char* field, caValue* element);
+    typedef int (*NumElements)(caValue* value);
     typedef bool (*CheckInvariants)(Term* term, std::string* output);
     typedef void (*RemapPointers)(Term* term, TermMap const& map);
-    typedef int (*HashFunc)(TValue* value);
-    typedef void (*VisitHeapCallback)(TValue* value, TValue* relativeIdentifier,
-            TValue* context);
-    typedef void (*VisitHeap)(Type* type, TValue* value,
-            VisitHeapCallback callback, TValue* context);
+    typedef int (*HashFunc)(caValue* value);
+    typedef void (*VisitHeapCallback)(caValue* value, caValue* relativeIdentifier,
+            caValue* context);
+    typedef void (*VisitHeap)(Type* type, caValue* value,
+            VisitHeapCallback callback, caValue* context);
 
     typedef void (*GCListReferences)(CircaObject* object, GCReferenceList* list, GCColor color);
     typedef void (*GCRelease)(void* object);
@@ -114,7 +114,7 @@ struct Type
     Type* parent;
     
     // Type parameters
-    TValue parameter;
+    caValue parameter;
     bool nocopy;
 
     Type();
@@ -159,8 +159,8 @@ struct StaticTypeQuery
 
 namespace type_t {
 
-    void initialize(Type* type, TValue* value);
-    void copy(Type*, TValue* source, TValue* dest);
+    void initialize(Type* type, caValue* value);
+    void copy(Type*, caValue* source, caValue* dest);
     std::string to_string(Term *caller);
     void formatSource(StyledSource* source, Term* term);
     void remap_pointers(Term *term, TermMap const& map);
@@ -174,7 +174,7 @@ namespace type_t {
 Type* create_type();
 
 Type* unbox_type(Term* type);
-Type* unbox_type(TValue* val);
+Type* unbox_type(caValue* val);
 Type* declared_type(Term* term);
 
 Type* get_output_type(Term* term, int outputIndex);
@@ -203,8 +203,8 @@ void install_type(Term* term, Type* type);
 
 Type* get_declared_type(Branch* branch, const char* name);
 
-void set_type_list(TValue* value, Type* type1);
-void set_type_list(TValue* value, Type* type1, Type* type2);
-void set_type_list(TValue* value, Type* type1, Type* type2, Type* type3);
+void set_type_list(caValue* value, Type* type1);
+void set_type_list(caValue* value, Type* type1, Type* type2);
+void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3);
 
 } // namespace circa

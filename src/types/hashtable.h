@@ -7,18 +7,18 @@ namespace hashtable_t {
 
 struct Hashtable;
 
-int table_insert(Hashtable** dataPtr, TValue* key, bool swapKey);
-int find_key(Hashtable* data, TValue* key);
-TValue* get_value(Hashtable* data, TValue* key);
+int table_insert(Hashtable** dataPtr, caValue* key, bool swapKey);
+int find_key(Hashtable* data, caValue* key);
+caValue* get_value(Hashtable* data, caValue* key);
 
-void iterator_start(Hashtable* data, TValue* iterator);
-void iterator_next(Hashtable* data, TValue* iterator);
+void iterator_start(Hashtable* data, caValue* iterator);
+void iterator_next(Hashtable* data, caValue* iterator);
 
-bool is_hashtable(TValue* value);
-TValue* get_value(TValue* table, TValue* key);
-void table_insert(TValue* table, TValue* key, TValue* value,
-        bool swapKey, bool swapTValue);
-void table_remove(TValue* tableTv, TValue* key);
+bool is_hashtable(caValue* value);
+caValue* get_value(caValue* table, caValue* key);
+void table_insert(caValue* table, caValue* key, caValue* value,
+        bool swapKey, bool swapcaValue);
+void table_remove(caValue* tableTv, caValue* key);
 
 void setup_type(Type* type);
 

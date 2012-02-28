@@ -29,7 +29,7 @@ void read_text_file(const char* filename, ReadFileCallback callback, void* conte
 // Read the file as a text file, and write the entire contents to 'contents' as a
 // string. If there are any problems, and 'error' is non-NULL, then an error message is
 // written to 'error'. (The caller can ignore errors by passing NULL for 'error').
-void read_text_file_to_value(const char* filename, TValue* contents, TValue* error);
+void read_text_file_to_value(const char* filename, caValue* contents, caValue* error);
 
 // Read the file as a text file, return contents as a std::string.
 std::string read_text_file_as_str(const char* filename);

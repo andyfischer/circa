@@ -5,7 +5,7 @@
 namespace circa {
 namespace set_t {
 
-    bool contains(List* list, TValue* value)
+    bool contains(List* list, caValue* value)
     {
         int numElements = list->numElements();
         for (int i=0; i < numElements; i++) {
@@ -14,13 +14,13 @@ namespace set_t {
         }
         return false;
     }
-    void add(List* list, TValue* value)
+    void add(List* list, caValue* value)
     {
         if (contains(list, value))
             return;
         copy(value, list->append());
     }
-    std::string to_string(TValue* value)
+    std::string to_string(caValue* value)
     {
         List* list = List::checkCast(value);
         std::stringstream output;

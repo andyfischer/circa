@@ -7,7 +7,7 @@ namespace implicit_state_function {
 
     CA_FUNCTION(unpack_state)
     {
-        TValue* container = INPUT(0);
+        caValue* container = INPUT(0);
         Term* identifyingTerm = INPUT_TERM(1);
 
         if (!is_dict(container)) {
@@ -22,8 +22,8 @@ namespace implicit_state_function {
     CA_FUNCTION(pack_state)
     {
         copy(INPUT(0), OUTPUT);
-        TValue* container = OUTPUT;
-        TValue* value = INPUT(1);
+        caValue* container = OUTPUT;
+        caValue* value = INPUT(1);
         Term* identifyingTerm = INPUT_TERM(2);
 
         if (!is_dict(container))
@@ -36,7 +36,7 @@ namespace implicit_state_function {
     // Used in if_block. The index is built in as a property.
     CA_FUNCTION(unpack_state_list)
     {
-        TValue* container = INPUT(0);
+        caValue* container = INPUT(0);
         int index = CALLER->intProp("index");
         if (!is_list(container) || index >= list_get_length(container))
             set_null(OUTPUT);
@@ -48,8 +48,8 @@ namespace implicit_state_function {
     CA_FUNCTION(pack_state_to_list)
     {
         copy(INPUT(0), OUTPUT);
-        TValue* container = OUTPUT;
-        TValue* value = INPUT(1);
+        caValue* container = OUTPUT;
+        caValue* value = INPUT(1);
 
         int index = CALLER->intProp("index");
 
@@ -66,7 +66,7 @@ namespace implicit_state_function {
     // Used in for_loop
     CA_FUNCTION(unpack_state_list_n)
     {
-        TValue* container = INPUT(0);
+        caValue* container = INPUT(0);
         int index = INT_INPUT(1);
         if (!is_list(container) || index >= list_get_length(container))
             set_null(OUTPUT);
@@ -77,8 +77,8 @@ namespace implicit_state_function {
     CA_FUNCTION(pack_state_list_n)
     {
         copy(INPUT(0), OUTPUT);
-        TValue* container = OUTPUT;
-        TValue* value = INPUT(1);
+        caValue* container = OUTPUT;
+        caValue* value = INPUT(1);
         int index = INT_INPUT(2);
 
         if (!is_list(container))

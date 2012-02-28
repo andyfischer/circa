@@ -8,7 +8,7 @@
 
 namespace circa {
 
-void handle_feedback_event(EvalContext* context, Term* target, TValue* desired);
+void handle_feedback_event(EvalContext* context, Term* target, caValue* desired);
 
 #if 0
 OLD_FEEDBACK_IMPL_DISABLED

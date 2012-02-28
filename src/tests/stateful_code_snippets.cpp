@@ -22,7 +22,7 @@ void test_snippet(std::string const& source)
         return;
 
     // Try stripping orphaned state, this should not have an effect.
-    TValue trash;
+    caValue trash;
     strip_orphaned_state(&branch, &context.state, &trash);
 
     if (!is_null(&trash)) {
@@ -55,7 +55,7 @@ void test_trimmed_state(std::string const& source, std::string const& dest,
     if (test_fail_on_static_error(&destBranch))
         return;
 
-    TValue trash;
+    caValue trash;
     strip_orphaned_state(&destBranch, &context.state, &trash);
 
     if (expectedTrash != trash.toString()) {

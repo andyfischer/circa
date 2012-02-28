@@ -38,8 +38,8 @@ void run_file_checker(const char* filename, List* errors)
     // Fetch the file as a string
     std::string actualSource;
     {
-        TValue fileContents;
-        TValue fileReadError;
+        caValue fileContents;
+        caValue fileReadError;
 
         const char* contents = circa_read_file(filename);
         if (contents == NULL) {

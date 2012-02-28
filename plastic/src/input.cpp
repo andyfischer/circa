@@ -222,7 +222,7 @@ CA_FUNCTION(mouse_location)
     set_float(output->get(1), MOUSE_Y);
 }
 
-bool mouse_in(TValue* box)
+bool mouse_in(caValue* box)
 {
     float x1 = box->getIndex(0)->toFloat();
     float y1 = box->getIndex(1)->toFloat();

@@ -10,149 +10,151 @@
 
 #include "types/ref.h"
 
-namespace circa {
+using namespace circa;
 
-TValue::TValue()
+caValue::caValue()
 {
     initialize_null(this);
 }
 
-TValue::TValue(Type* type)
+caValue::caValue(Type* type)
 {
     initialize_null(this);
     create(type, this);
 }
 
-TValue::~TValue()
+caValue::~caValue()
 {
     // Deallocate this value
     set_null(this);
 }
 
-TValue::TValue(TValue const& original)
+caValue::caValue(caValue const& original)
 {
     initialize_null(this);
-    copy(&const_cast<TValue&>(original), this);
+    copy(&const_cast<caValue&>(original), this);
 }
 
-TValue&
-TValue::operator=(TValue const& rhs)
+caValue&
+caValue::operator=(caValue const& rhs)
 {
-    copy(&const_cast<TValue&>(rhs), this);
+    copy(&const_cast<caValue&>(rhs), this);
     return *this;
 }
 
-void TValue::reset()
+void caValue::reset()
 {
     circa::reset(this);
 }
 
 std::string
-TValue::toString()
+caValue::toString()
 {
     return to_string(this);
 }
 
-TValue*
-TValue::getIndex(int index)
+caValue*
+caValue::getIndex(int index)
 {
     return get_index(this, index);
 }
 
-TValue*
-TValue::getField(const char* fieldName)
+caValue*
+caValue::getField(const char* fieldName)
 {
     return get_field(this, fieldName);
 }
 
-TValue*
-TValue::getField(std::string const& fieldName)
+caValue*
+caValue::getField(std::string const& fieldName)
 {
     return get_field(this, fieldName.c_str());
 }
 
 int
-TValue::numElements()
+caValue::numElements()
 {
     return num_elements(this);
 }
 
 bool
-TValue::equals(TValue* rhs)
+caValue::equals(caValue* rhs)
 {
     return circa::equals(this, rhs);
 }
 
-int TValue::asInt()
+int caValue::asInt()
 {
     return as_int(this);
 }
 
-float TValue::asFloat()
+float caValue::asFloat()
 {
     return as_float(this);
 }
 
-float TValue::toFloat()
+float caValue::toFloat()
 {
     return to_float(this);
 }
 
-const char* TValue::asCString()
+const char* caValue::asCString()
 {
     return as_string(this).c_str();
 }
 
-std::string const& TValue::asString()
+std::string const& caValue::asString()
 {
     return as_string(this);
 }
 
-bool TValue::asBool()
+bool caValue::asBool()
 {
     return as_bool(this);
 }
 
-Term* TValue::asRef()
+Term* caValue::asRef()
 {
     return as_ref(this);
 }
 
-TValue TValue::fromInt(int i)
+caValue caValue::fromInt(int i)
 {
-    TValue tv;
+    caValue tv;
     set_int(&tv, i);
     return tv;
 }
 
-TValue TValue::fromFloat(float f)
+caValue caValue::fromFloat(float f)
 {
-    TValue tv;
+    caValue tv;
     set_float(&tv, f);
     return tv;
 }
 
-TValue TValue::fromString(const char* s)
+caValue caValue::fromString(const char* s)
 {
-    TValue tv;
+    caValue tv;
     set_string(&tv, s);
     return tv;
 }
 
-TValue TValue::fromBool(bool b)
+caValue caValue::fromBool(bool b)
 {
-    TValue tv;
+    caValue tv;
     set_bool(&tv, b);
     return tv;
 }
 
-void initialize_null(TValue* value)
+namespace circa {
+
+void initialize_null(caValue* value)
 {
     value->value_type = &NULL_T;
     value->value_data.ptr = NULL;
 }
 
-void create(Type* type, TValue* value)
+void create(Type* type, caValue* value)
 {
     set_null(value);
 
@@ -162,13 +164,13 @@ void create(Type* type, TValue* value)
         type->initialize(type, value);
 }
 
-void change_type(TValue* v, Type* t)
+void change_type(caValue* v, Type* t)
 {
     set_null(v);
     v->value_type = t;
 }
 
-void set_null(TValue* value)
+void set_null(caValue* value)
 {
     if (value->value_type == NULL)
         return;
@@ -180,7 +182,7 @@ void set_null(TValue* value)
     value->value_data.ptr = NULL;
 }
 
-void release(TValue* value)
+void release(caValue* value)
 {
     if (value->value_type != NULL) {
         ReleaseFunc release = value->value_type->release;
@@ -191,7 +193,7 @@ void release(TValue* value)
     value->value_data.ptr = 0;
 }
 
-void cast(CastResult* result, TValue* source, Type* type, TValue* dest, bool checkOnly)
+void cast(CastResult* result, caValue* source, Type* type, caValue* dest, bool checkOnly)
 {
     if (type->cast != NULL) {
         type->cast(result, source, type, dest, checkOnly);
@@ -213,21 +215,21 @@ void cast(CastResult* result, TValue* source, Type* type, TValue* dest, bool che
     result->success = true;
 }
 
-bool cast(TValue* source, Type* type, TValue* dest)
+bool cast(caValue* source, Type* type, caValue* dest)
 {
     CastResult result;
     cast(&result, source, type, dest, false);
     return result.success;
 }
 
-bool cast_possible(TValue* source, Type* type)
+bool cast_possible(caValue* source, Type* type)
 {
     CastResult result;
     cast(&result, source, type, NULL, true);
     return result.success;
 }
 
-void copy(TValue* source, TValue* dest)
+void copy(caValue* source, caValue* dest)
 {
     ca_assert(source);
     ca_assert(dest);
@@ -252,17 +254,17 @@ void copy(TValue* source, TValue* dest)
     dest->value_data = source->value_data;
 }
 
-void swap(TValue* left, TValue* right)
+void swap(caValue* left, caValue* right)
 {
     Type* temp_type = left->value_type;
-    TValueData temp_data = left->value_data;
+    caValueData temp_data = left->value_data;
     left->value_type = right->value_type;
     left->value_data = right->value_data;
     right->value_type = temp_type;
     right->value_data = temp_data;
 }
 
-void move(TValue* source, TValue* dest)
+void move(caValue* source, caValue* dest)
 {
     set_null(dest);
     dest->value_type = source->value_type;
@@ -270,9 +272,9 @@ void move(TValue* source, TValue* dest)
     initialize_null(source);
 }
 
-void reset(TValue* value)
+void reset(caValue* value)
 {
-    // Check for NULL. Most TValue functions don't do this, but reset() is
+    // Check for NULL. Most caValue functions don't do this, but reset() is
     // a convenient special case.
     if (value->value_type == NULL)
         return set_null(value);
@@ -290,7 +292,7 @@ void reset(TValue* value)
     create(type, value);
 }
 
-void touch(TValue* value)
+void touch(caValue* value)
 {
     Type::Touch touch = value->value_type->touch;
     if (touch != NULL)
@@ -299,7 +301,7 @@ void touch(TValue* value)
     // Default behavior: no-op.
 }
 
-std::string to_string(TValue* value)
+std::string to_string(caValue* value)
 {
     if (value->value_type == NULL)
         return "<type is NULL>";
@@ -314,7 +316,7 @@ std::string to_string(TValue* value)
     return out.str();
 }
 
-std::string to_string_annotated(TValue* value)
+std::string to_string_annotated(caValue* value)
 {
     if (value->value_type == NULL)
         return "<type is NULL>";
@@ -337,7 +339,7 @@ std::string to_string_annotated(TValue* value)
     return out.str();
 }
 
-TValue* get_index(TValue* value, int index)
+caValue* get_index(caValue* value, int index)
 {
     Type::GetIndex getIndex = value->value_type->getIndex;
 
@@ -348,7 +350,7 @@ TValue* get_index(TValue* value, int index)
     return getIndex(value, index);
 }
 
-void set_index(TValue* value, int index, TValue* element)
+void set_index(caValue* value, int index, caValue* element)
 {
     Type::SetIndex setIndex = value->value_type->setIndex;
 
@@ -361,7 +363,7 @@ void set_index(TValue* value, int index, TValue* element)
     setIndex(value, index, element);
 }
 
-TValue* get_field(TValue* value, const char* field)
+caValue* get_field(caValue* value, const char* field)
 {
     Type::GetField getField = value->value_type->getField;
 
@@ -374,7 +376,7 @@ TValue* get_field(TValue* value, const char* field)
     return getField(value, field);
 }
 
-void set_field(TValue* value, const char* field, TValue* element)
+void set_field(caValue* value, const char* field, caValue* element)
 {
     Type::SetField setField = value->value_type->setField;
 
@@ -387,7 +389,7 @@ void set_field(TValue* value, const char* field, TValue* element)
     setField(value, field, element);
 }
 
-int num_elements(TValue* value)
+int num_elements(caValue* value)
 {
     Type::NumElements numElements = value->value_type->numElements;
 
@@ -398,7 +400,7 @@ int num_elements(TValue* value)
     return numElements(value);
 }
 
-bool equals(TValue* lhs, TValue* rhs)
+bool equals(caValue* lhs, caValue* rhs)
 {
     ca_assert(lhs->value_type != NULL);
 
@@ -415,164 +417,164 @@ bool equals(TValue* lhs, TValue* rhs)
     return lhs->value_data.asint == rhs->value_data.asint;
 }
 
-bool equals_string(TValue* value, const char* s)
+bool equals_string(caValue* value, const char* s)
 {
     if (!is_string(value))
         return false;
     return strcmp(as_cstring(value), s) == 0;
 }
 
-bool equals_int(TValue* value, int i)
+bool equals_int(caValue* value, int i)
 {
     if (!is_int(value))
         return false;
     return as_int(value) == i;
 }
 
-bool equals_name(TValue* value, Name name)
+bool equals_name(caValue* value, Name name)
 {
     if (!is_name(value))
         return false;
     return as_name(value) == name;
 }
 
-void set_bool(TValue* value, bool b)
+void set_bool(caValue* value, bool b)
 {
     change_type(value, &BOOL_T);
     value->value_data.asbool = b;
 }
 
-Dict* set_dict(TValue* value)
+Dict* set_dict(caValue* value)
 {
     create(&DICT_T, value);
     return (Dict*) value;
 }
 
-void set_int(TValue* value, int i)
+void set_int(caValue* value, int i)
 {
     change_type(value, &INT_T);
     value->value_data.asint = i;
 }
 
-void set_float(TValue* value, float f)
+void set_float(caValue* value, float f)
 {
     change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
 
-void set_string(TValue* value, const char* s)
+void set_string(caValue* value, const char* s)
 {
     create(&STRING_T, value);
     *((std::string*) value->value_data.ptr) = s;
 }
 
-void set_string(TValue* value, std::string const& s)
+void set_string(caValue* value, std::string const& s)
 {
     set_string(value, s.c_str());
 }
 
-List* set_list(TValue* value)
+List* set_list(caValue* value)
 {
     set_null(value);
     create(&LIST_T, value);
     return List::checkCast(value);
 }
 
-List* set_list(TValue* value, int size)
+List* set_list(caValue* value, int size)
 {
     List* list = set_list(value);
     list->resize(size);
     return list;
 }
 
-void set_type(TValue* value, Type* type)
+void set_type(caValue* value, Type* type)
 {
     set_null(value);
     value->value_type = &TYPE_T;
     value->value_data.ptr = type;
 }
 
-void set_function_pointer(TValue* value, Term* function)
+void set_function_pointer(caValue* value, Term* function)
 {
     change_type(value, &FUNCTION_T);
     value->value_data.ptr = function;
 }
 
 
-void set_opaque_pointer(TValue* value, void* addr)
+void set_opaque_pointer(caValue* value, void* addr)
 {
     change_type(value, &OPAQUE_POINTER_T);
     value->value_data.ptr = addr;
 }
-void set_branch(TValue* value, Branch* branch)
+void set_branch(caValue* value, Branch* branch)
 {
     change_type(value, &BRANCH_T);
     value->value_data.ptr = branch;
 }
 
-void set_pointer(TValue* value, Type* type, void* p)
+void set_pointer(caValue* value, Type* type, void* p)
 {
     set_null(value);
     value->value_type = type;
     value->value_data.ptr = p;
 }
 
-void set_pointer(TValue* value, void* ptr)
+void set_pointer(caValue* value, void* ptr)
 {
     value->value_data.ptr = ptr;
 }
 
-int as_int(TValue* value)
+int as_int(caValue* value)
 {
     ca_assert(is_int(value));
     return value->value_data.asint;
 }
 
-float as_float(TValue* value)
+float as_float(caValue* value)
 {
     ca_assert(is_float(value));
     return value->value_data.asfloat;
 }
-Function* as_function(TValue* value)
+Function* as_function(caValue* value)
 {
     ca_assert(is_function(value));
     return (Function*) value->value_data.ptr;
 }
 
-bool as_bool(TValue* value)
+bool as_bool(caValue* value)
 {
     ca_assert(is_bool(value));
     return value->value_data.asbool;
 }
 
-Branch* as_branch(TValue* value)
+Branch* as_branch(caValue* value)
 {
     ca_assert(is_branch(value));
     return (Branch*) value->value_data.ptr;
 }
 
-void* as_opaque_pointer(TValue* value)
+void* as_opaque_pointer(caValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER);
     return value->value_data.ptr;
 }
 
-Type* as_type(TValue* value)
+Type* as_type(caValue* value)
 {
     ca_assert(is_type(value));
     return (Type*) value->value_data.ptr;
 }
-Term* as_function_pointer(TValue* value)
+Term* as_function_pointer(caValue* value)
 {
     ca_assert(is_function_pointer(value));
     return (Term*) value->value_data.ptr;
 }
-List* as_list(TValue* value)
+List* as_list(caValue* value)
 {
     return List::checkCast(value);
 }
 
-void* get_pointer(TValue* value)
+void* get_pointer(caValue* value)
 {
     return value->value_data.ptr;
 }
@@ -584,7 +586,7 @@ const char* get_name_for_type(Type* type)
     else return name_to_string(type->name);
 }
 
-void* get_pointer(TValue* value, Type* expectedType)
+void* get_pointer(caValue* value, Type* expectedType)
 {
     if (value->value_type != expectedType) {
         std::stringstream strm;
@@ -596,27 +598,27 @@ void* get_pointer(TValue* value, Type* expectedType)
     return value->value_data.ptr;
 }
 
-bool is_bool(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
-bool is_branch(TValue* value) { return value->value_type == &BRANCH_T; }
-bool is_error(TValue* value) { return value->value_type == &ERROR_T; }
-bool is_float(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
-bool is_function(TValue* value) { return value->value_type == &FUNCTION_T; }
-bool is_function_pointer(TValue* value) { return value->value_type == &FUNCTION_T; }
-bool is_int(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
-bool is_list(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
-bool is_null(TValue* value) { return value->value_type == &NULL_T; }
-bool is_opaque_pointer(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER; }
-bool is_ref(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_REF; }
-bool is_string(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
-bool is_name(TValue* value) { return value->value_type == &NAME_T; }
-bool is_type(TValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
+bool is_bool(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
+bool is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
+bool is_error(caValue* value) { return value->value_type == &ERROR_T; }
+bool is_float(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
+bool is_function_pointer(caValue* value) { return value->value_type == &FUNCTION_T; }
+bool is_int(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
+bool is_list(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
+bool is_null(caValue* value) { return value->value_type == &NULL_T; }
+bool is_opaque_pointer(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_OPAQUE_POINTER; }
+bool is_ref(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_REF; }
+bool is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
+bool is_name(caValue* value) { return value->value_type == &NAME_T; }
+bool is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
 
-bool is_number(TValue* value)
+bool is_number(caValue* value)
 {
     return is_int(value) || is_float(value);
 }
 
-float to_float(TValue* value)
+float to_float(caValue* value)
 {
     if (is_int(value))
         return (float) as_int(value);
@@ -626,7 +628,7 @@ float to_float(TValue* value)
         throw std::runtime_error("In to_float, type is not an int or float");
 }
 
-int to_int(TValue* value)
+int to_int(caValue* value)
 {
     if (is_int(value))
         return as_int(value);
@@ -636,13 +638,13 @@ int to_int(TValue* value)
         throw std::runtime_error("In to_float, type is not an int or float");
 }
 
-void set_transient_value(TValue* value, void* data, Type* type)
+void set_transient_value(caValue* value, void* data, Type* type)
 {
     set_null(value);
     value->value_data.ptr = data;
     value->value_type = type;
 }
-void cleanup_transient_value(TValue* value)
+void cleanup_transient_value(caValue* value)
 {
     initialize_null(value);
 }

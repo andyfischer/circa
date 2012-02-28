@@ -15,7 +15,7 @@
 
 namespace circa {
 
-std::string& as_std_string(TValue* value);
+std::string& as_std_string(caValue* value);
 
 #if 0
 namespace new_string_t {
@@ -80,26 +80,26 @@ StringData* touch(StringData* original)
 
 namespace string_t {
 
-    void initialize(Type* type, TValue* value)
+    void initialize(Type* type, caValue* value)
     {
         set_pointer(value, new std::string());
     }
-    void release(TValue* value)
+    void release(caValue* value)
     {
         delete ((std::string*) get_pointer(value));
         set_pointer(value, NULL);
     }
 
-    void copy(Type* type, TValue* source, TValue* dest)
+    void copy(Type* type, caValue* source, caValue* dest)
     {
         create(type, dest);
         *((std::string*) dest->value_data.ptr) = as_string(source);
     }
-    void reset(TValue* v)
+    void reset(caValue* v)
     {
         set_string(v, "");
     }
-    int hashFunc(TValue* v)
+    int hashFunc(caValue* v)
     {
         const char* str = as_cstring(v);
 
@@ -114,13 +114,13 @@ namespace string_t {
         return result;
     }
 
-    bool equals(Type*, TValue* lhs, TValue* rhs)
+    bool equals(Type*, caValue* lhs, caValue* rhs)
     {
         if (!is_string(rhs)) return false;
         return as_string(lhs) == as_string(rhs);
     }
 
-    std::string to_string(TValue* value)
+    std::string to_string(caValue* value)
     {
         std::stringstream result;
         result << "'" << as_string(value) << "'";
@@ -160,27 +160,27 @@ void string_setup_type(Type* type)
     type->formatSource = string_t::format_source;
 }
 
-void string_append(TValue* left, TValue* right)
+void string_append(caValue* left, caValue* right)
 {
     as_std_string(left) += as_string(right);
 }
-void string_append(TValue* left, const char* right)
+void string_append(caValue* left, const char* right)
 {
     as_std_string(left) += right;
 }
-void string_resize(TValue* s, int length)
+void string_resize(caValue* s, int length)
 {
     if (length < 0)
         length = as_std_string(s).size() + length;
 
     as_std_string(s).resize(length, ' ');
 }
-bool string_eq(TValue* s, const char* str)
+bool string_eq(caValue* s, const char* str)
 {
     return as_std_string(s) == str;
 }
 
-bool string_starts_with(TValue* s, const char* beginning)
+bool string_starts_with(caValue* s, const char* beginning)
 {
     const char* left = as_cstring(s);
     for (int i=0;; i++) {
@@ -190,7 +190,7 @@ bool string_starts_with(TValue* s, const char* beginning)
             return false;
     }
 }
-bool string_ends_with(TValue* s, const char* ending)
+bool string_ends_with(caValue* s, const char* ending)
 {
     int ending_len = strlen(ending);
     std::string& str = as_std_string(s);
@@ -202,17 +202,17 @@ bool string_ends_with(TValue* s, const char* ending)
 
     return true;
 }
-char string_get(TValue* s, int index)
+char string_get(caValue* s, int index)
 {
     return as_cstring(s)[index];
 }
 
-int string_length(TValue* s)
+int string_length(caValue* s)
 {
     return strlen(as_cstring(s));
 }
 
-void string_slice(TValue* s, int start, int end, TValue* out)
+void string_slice(caValue* s, int start, int end, caValue* out)
 {
     if (s == out)
         internal_error("Usage error in string_slice, 's' cannot be 'out'");
@@ -228,7 +228,7 @@ void string_slice(TValue* s, int start, int end, TValue* out)
         as_std_string(out)[i] = string_get(s, i + start);
 }
 
-int string_find_char(TValue* s, int start, char c)
+int string_find_char(caValue* s, int start, char c)
 {
     const char* cstr = as_cstring(s);
 
@@ -238,7 +238,7 @@ int string_find_char(TValue* s, int start, char c)
     return -1;
 }
 
-void string_split(TValue* s, char sep, TValue* listOut)
+void string_split(caValue* s, char sep, caValue* listOut)
 {
     set_list(listOut, 0);
 
@@ -252,25 +252,25 @@ void string_split(TValue* s, char sep, TValue* listOut)
     }
 }
 
-std::string& as_std_string(TValue* value)
+std::string& as_std_string(caValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return *((std::string*) value->value_data.ptr);
 }
 
-std::string const& as_string(TValue* value)
+std::string const& as_string(caValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return *((std::string*) value->value_data.ptr);
 }
 
-const char* as_cstring(TValue* value)
+const char* as_cstring(caValue* value)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_STRING);
     return ((std::string*) value->value_data.ptr)->c_str();
 }
 
-void set_string(TValue* value, const char* s, int length)
+void set_string(caValue* value, const char* s, int length)
 {
     create(&STRING_T, value);
     as_std_string(value).assign(s, length);

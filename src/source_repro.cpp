@@ -74,7 +74,7 @@ std::string unformat_rich_source(StyledSource* source)
     std::stringstream strm;
 
     for (int i=0; i < source->_phrases.numElements(); i++) {
-        TValue* phrase = source->_phrases[i];
+        caValue* phrase = source->_phrases[i];
         strm << as_string((*phrase)[0]);
     }
     return strm.str();
@@ -408,7 +408,7 @@ void set_input_syntax_hint(Term* term, int index, const char* field,
     term->inputInfo(index)->properties.setString(field, value.c_str());
 }
 
-void set_input_syntax_hint(Term* term, int index, const char* field, TValue* value)
+void set_input_syntax_hint(Term* term, int index, const char* field, caValue* value)
 {
     ca_assert(term->inputInfo(index) != NULL);
     term->inputInfo(index)->properties.set(field, value);

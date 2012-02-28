@@ -20,7 +20,7 @@ namespace toy_refcounted_pool {
         return true;
     }
 
-    void initialize(Type*, TValue* value)
+    void initialize(Type*, caValue* value)
     {
         for (int i=0; i < pool_size; i++) {
             if (refcount[i] == 0) {
@@ -32,14 +32,14 @@ namespace toy_refcounted_pool {
         ca_assert(false);
     }
 
-    void release(Type*, TValue* value)
+    void release(Type*, caValue* value)
     {
         int index = value->value_data.asint;
         ca_assert(refcount[index] > 0);
         refcount[index]--;
     }
 
-    void copy(Type* type, TValue* source, TValue* dest)
+    void copy(Type* type, caValue* source, caValue* dest)
     {
         create(type, dest);
         int prev = dest->value_data.asint;
@@ -58,7 +58,7 @@ namespace toy_refcounted_pool {
 
 void test_int_simple()
 {
-    TValue v;
+    caValue v;
     set_int(&v, 4);
 
     test_assert(is_int(&v));
@@ -74,7 +74,7 @@ void test_int_simple()
 
 void test_polymorphic()
 {
-    TValue v;
+    caValue v;
     test_assert(!is_int(&v));
     test_assert(!is_float(&v));
     test_assert(!is_bool(&v));
@@ -124,7 +124,7 @@ void test_constructor_syntax()
     Type* myType = create_type();
     myType->name = "T";
     import_type(&branch, myType);
-    TValue* a = branch.eval("a = T()");
+    caValue* a = branch.eval("a = T()");
     test_assert(a->value_type == myType);
     test_assert(a->value_data.ptr == NULL);
     reset(a);
@@ -159,12 +159,12 @@ namespace manual_memory_management_test {
     }
 
     // Type functions:
-    void initialize(Type* type, TValue* value)
+    void initialize(Type* type, caValue* value)
     {
         value->value_data.asint = pool_allocate();
     }
 
-    void release(Type*, TValue* value)
+    void release(Type*, caValue* value)
     {
         pool_deallocate(value->value_data.asint);
     }
@@ -175,7 +175,7 @@ namespace manual_memory_management_test {
         myType->initialize = initialize;
         myType->release = release;
 
-        TValue value;
+        caValue value;
 
         test_assert(is_null(&value));
         test_assert(!pool_allocated[0]);
@@ -193,7 +193,7 @@ namespace manual_memory_management_test {
 
         // scope 1:
         {
-            TValue scoped_value;
+            caValue scoped_value;
             create(myType, &scoped_value);
             test_assert(pool_allocated[0]);
         }
@@ -201,7 +201,7 @@ namespace manual_memory_management_test {
 
         // scope 2
         {
-            TValue scoped_value;
+            caValue scoped_value;
             create(myType, &scoped_value);
             test_assert(pool_allocated[0]);
             set_null(&scoped_value);
@@ -217,7 +217,7 @@ void refcount_test()
     toy_refcounted_pool::setup_type(t);
 
     {
-        TValue value(t);
+        caValue value(t);
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
     }
@@ -225,7 +225,7 @@ void refcount_test()
     test_assert(toy_refcounted_pool::nothing_allocated());
 
     {
-        TValue value1(t), value2(t);
+        caValue value1(t), value2(t);
 
         test_assert(toy_refcounted_pool::refcount[0] == 1);
 
@@ -246,7 +246,7 @@ void list_memory_management()
     Type* t = create_type();
     toy_refcounted_pool::setup_type(t);
 
-    TValue v(t);
+    caValue v(t);
 
     test_assert(toy_refcounted_pool::refcount[0] == 1);
 
@@ -293,7 +293,7 @@ void list_memory_management()
 
 void reset_null()
 {
-    TValue value;
+    caValue value;
     set_null(&value);
     reset(&value);
     debug_assert_valid_object(value.value_type, TYPE_OBJECT);
@@ -301,11 +301,11 @@ void reset_null()
 
 void resize_list_maintains_existing_data()
 {
-    TValue outerTv;
+    caValue outerTv;
     List* outer = set_list(&outerTv, 3);
 
     List* inner = set_list(outer->get(1), 4);
-    TValue* a = inner->get(1);
+    caValue* a = inner->get(1);
     set_int(a, 5);
 
     test_assert(outer->get(1)->getIndex(1) == a);
@@ -317,7 +317,7 @@ void resize_list_maintains_existing_data()
 
 void test_to_string_annotated()
 {
-    TValue v;
+    caValue v;
     set_int(&v, 5);
     test_equals(to_string_annotated(&v), "int#5");
 

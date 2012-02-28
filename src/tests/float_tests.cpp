@@ -7,16 +7,16 @@ namespace float_tests {
 
 void test_cast()
 {
-    TValue f;
+    caValue f;
     set_float(&f, 5.0);
-    TValue s;
+    caValue s;
     set_string(&s, "hello");
 
 
     test_assert(cast_possible(&f, &FLOAT_T));
     test_assert(!cast_possible(&s, &FLOAT_T));
 
-    TValue f2;
+    caValue f2;
     test_assert(cast(&f, &FLOAT_T, &f2));
 
     test_assert(equals(&f, &f2));

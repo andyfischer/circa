@@ -28,6 +28,8 @@
 
 #define EXPORT extern "C"
 
+struct caValue;
+
 namespace circa {
 
 typedef int Name;
@@ -48,12 +50,11 @@ struct TermMap;
 struct StaticTypeQuery;
 struct String;
 struct StyledSource;
-struct TValue;
 struct Term;
 struct TermList;
 struct Type;
 
-typedef bool (*TermVisitor)(Term* term, TValue* context);
+typedef bool (*TermVisitor)(Term* term, caValue* context);
 
 // Function-related typedefs:
 
@@ -63,7 +64,7 @@ typedef void (*EvaluateFunc)(EvalContext* cxt);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
-typedef void (*ReleaseFunc)(TValue* value);
+typedef void (*ReleaseFunc)(caValue* value);
 
 const int MAX_INPUTS = 64;
 

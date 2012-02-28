@@ -54,125 +54,125 @@ caTerm* circa_current_term(caStack* stack)
 // Values
 bool circa_is_int(caValue* container)
 {
-    return is_int((TValue*) container);
+    return is_int((caValue*) container);
 }
 
 bool circa_is_float(caValue* container)
 {
-    return is_float((TValue*) container);
+    return is_float((caValue*) container);
 }
 bool circa_is_string(caValue* container)
 {
-    return is_string((TValue*) container);
+    return is_string((caValue*) container);
 }
 int circa_as_int(caValue* container)
 {
-    return as_int((TValue*) container);
+    return as_int((caValue*) container);
 }
 float circa_as_float(caValue* container)
 {
-    return as_float((TValue*) container);
+    return as_float((caValue*) container);
 }
 const char* circa_as_string(caValue* container)
 {
-    return as_cstring((TValue*) container);
+    return as_cstring((caValue*) container);
 }
 
 char* circa_to_string(caValue* value)
 {
-    if (is_string((TValue*) value))
+    if (is_string((caValue*) value))
         return strdup(circa_as_string(value));
 
-    std::string s = to_string((TValue*) value);
+    std::string s = to_string((caValue*) value);
     return strdup(s.c_str());
 }
 
 void circa_get_point(caValue* point, float* xOut, float* yOut)
 {
-    *xOut = to_float(get_index((TValue*) point, 0));
-    *yOut = to_float(get_index((TValue*) point, 1));
+    *xOut = to_float(get_index((caValue*) point, 0));
+    *yOut = to_float(get_index((caValue*) point, 1));
 }
 void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, float* aOut)
 {
-    *rOut = to_float(get_index((TValue*) color, 0));
-    *gOut = to_float(get_index((TValue*) color, 1));
-    *bOut = to_float(get_index((TValue*) color, 2));
-    *aOut = to_float(get_index((TValue*) color, 3));
+    *rOut = to_float(get_index((caValue*) color, 0));
+    *gOut = to_float(get_index((caValue*) color, 1));
+    *bOut = to_float(get_index((caValue*) color, 2));
+    *aOut = to_float(get_index((caValue*) color, 3));
 }
 void* circa_as_pointer(caValue* container)
 {
-    return as_opaque_pointer((TValue*) container);
+    return as_opaque_pointer((caValue*) container);
 }
 
 void circa_init_value(caValue* container)
 {
-    initialize_null((TValue*) container);
+    initialize_null((caValue*) container);
 }
 
 caValue* circa_alloc_value()
 {
-    caValue* value = (caValue*) new TValue();
+    caValue* value = (caValue*) new caValue();
     circa_init_value(value);
     return value;
 }
 
 void circa_set_int(caValue* container, int value)
 {
-    set_int((TValue*) container, value);
+    set_int((caValue*) container, value);
 }
 void circa_set_float(caValue* container, float value)
 {
-    set_float((TValue*) container, value);
+    set_float((caValue*) container, value);
 }
 void circa_set_bool(caValue* container, bool value)
 {
-    set_bool((TValue*) container, value);
+    set_bool((caValue*) container, value);
 }
 void circa_set_string(caValue* container, const char* str)
 {
-    set_string((TValue*) container, str);
+    set_string((caValue*) container, str);
 }
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
-    set_string((TValue*) container, str, size);
+    set_string((caValue*) container, str, size);
 }
 void circa_string_append(caValue* container, const char* str)
 {
-    string_append((TValue*) container, str);
+    string_append((caValue*) container, str);
 }
 void circa_set_list(caValue* list, int numElements)
 {
-    set_list((TValue*) list, numElements);
+    set_list((caValue*) list, numElements);
 }
 caValue* circa_list_append(caValue* list)
 {
-    return (caValue*) list_append((TValue*) list);
+    return (caValue*) list_append((caValue*) list);
 }
 void circa_set_point(caValue* point, float x, float y)
 {
-    change_type((TValue*) point, TYPES.point);
-    list_resize((TValue*) point, 2);
-    set_float(get_index((TValue*) point, 0), x);
-    set_float(get_index((TValue*) point, 1), y);
+    change_type((caValue*) point, TYPES.point);
+    list_resize((caValue*) point, 2);
+    set_float(get_index((caValue*) point, 0), x);
+    set_float(get_index((caValue*) point, 1), y);
 }
 void circa_set_null(caValue* container)
 {
-    set_null((TValue*) container);
+    set_null((caValue*) container);
 }
 
 caValue* circa_handle_get_value(caValue* handle)
 {
-    return (caValue*) get_handle_value((TValue*) handle);
+    return (caValue*) get_handle_value((caValue*) handle);
 }
 
 void circa_handle_set(caValue* handle, caValue* value, caReleaseFunc releaseFunc)
 {
-    set_handle_value((TValue*) handle, (TValue*) value, (ReleaseFunc) releaseFunc);
+    set_handle_value((caValue*) handle, (caValue*) value, (ReleaseFunc) releaseFunc);
 }
 
 void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc)
 {
-    TValue value;
+    caValue value;
     set_opaque_pointer(&value, object);
     circa_handle_set(handle, (caValue*) &value, releaseFunc);
 }
@@ -184,12 +184,12 @@ void* circa_handle_get_object(caValue* handle)
 
 void circa_set_pointer(caValue* container, void* ptr)
 {
-    set_opaque_pointer((TValue*) container, ptr);
+    set_opaque_pointer((caValue*) container, ptr);
 }
 
 void circa_create_value(caValue* value, caType* type)
 {
-    create((Type*) type, (TValue*) value);
+    create((Type*) type, (caValue*) value);
 }
 
 void circa_raise_error(caStack* stack, const char* msg)

@@ -4,13 +4,13 @@
 
 namespace circa {
 
-TValue* get_handle_value(TValue* handle);
-void* get_handle_value_opaque_pointer(TValue* handle);
-void set_handle_value(TValue* handle, Type* type, TValue* value, ReleaseFunc releaseFunc);
-void set_handle_value(TValue* handle, TValue* value, ReleaseFunc releaseFunc);
-void set_handle_value_opaque_pointer(TValue* handle, Type* type, void* value,
+caValue* get_handle_value(caValue* handle);
+void* get_handle_value_opaque_pointer(caValue* handle);
+void set_handle_value(caValue* handle, Type* type, caValue* value, ReleaseFunc releaseFunc);
+void set_handle_value(caValue* handle, caValue* value, ReleaseFunc releaseFunc);
+void set_handle_value_opaque_pointer(caValue* handle, Type* type, void* value,
     ReleaseFunc releaseFunc);
-void handle_set_release_func(TValue* handle, ReleaseFunc releaseFunc);
+void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc);
 void setup_handle_type(Type* type);
 
 } // namespace circa

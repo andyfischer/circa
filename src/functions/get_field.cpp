@@ -7,7 +7,7 @@ namespace get_field_function {
 
     CA_FUNCTION(evaluate)
     {
-        TValue* head = INPUT(0);
+        caValue* head = INPUT(0);
 
         for (int nameIndex=1; nameIndex < NUM_INPUTS; nameIndex++) {
             std::string const& name = INPUT(nameIndex)->asString();

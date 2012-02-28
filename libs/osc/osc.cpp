@@ -27,12 +27,12 @@ struct Server
     }
 };
 
-void ServerRelease(TValue* value)
+void ServerRelease(caValue* value)
 {
     delete (Server*) as_opaque_pointer(value);
 }
 
-void AddressRelease(TValue* value)
+void AddressRelease(caValue* value)
 {
     lo_address_free((lo_address) as_opaque_pointer(value));
 }
@@ -56,7 +56,7 @@ int incoming_message_callback(const char *path, const char *types, lo_arg **argv
 
     for (int i=0; i < argc; i++) {
         char type = types[i];
-        TValue* val = message[i + 1];
+        caValue* val = message[i + 1];
         if (type == 'i')
             set_int(val, argv[i]->i);
         else if (type == 'f')
@@ -138,7 +138,7 @@ EXPORT CA_FUNCTION(osc__send)
     bool failed = false;
 
     for (int i=2; i < NUM_INPUTS; i++) {
-        TValue* val = INPUT(i);
+        caValue* val = INPUT(i);
 
         if (is_int(val))
             lo_message_add(message, "i", as_int(val));

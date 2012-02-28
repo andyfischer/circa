@@ -5,7 +5,7 @@
 namespace circa {
 
 namespace common_type_callbacks {
-    int shallow_hash_func(TValue* value);
+    int shallow_hash_func(caValue* value);
 } // namespace common_functions_t
 
 namespace null_t {

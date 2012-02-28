@@ -154,8 +154,8 @@ Type VOID_T;
 
 BuiltinTypes TYPES;
 
-TValue TrueValue;
-TValue FalseValue;
+caValue TrueValue;
+caValue FalseValue;
 
 namespace cppbuild_function { CA_FUNCTION(build_module); }
 
@@ -197,7 +197,7 @@ CA_FUNCTION(from_string)
 CA_FUNCTION(input_func)
 {
     int index = INT_INPUT(0);
-    TValue* input = CONTEXT->argumentList.getLast()->getIndex(index);
+    caValue* input = CONTEXT->argumentList.getLast()->getIndex(index);
     if (input == NULL)
         return RAISE_ERROR("invalid input index");
     copy(input, OUTPUT);
@@ -243,7 +243,7 @@ CA_FUNCTION(length)
     set_int(OUTPUT, num_elements(INPUT(0)));
 }
 
-std::string stackVariable_toString(TValue* value)
+std::string stackVariable_toString(caValue* value)
 {
     short relativeFrame = value->value_data.asint >> 16;
     short index = (value->value_data.asint & 0xffff);
@@ -322,7 +322,7 @@ void bootstrap_kernel()
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;
     valueFunc->function = valueFunc;
-    create(&FUNCTION_T, (TValue*)valueFunc);
+    create(&FUNCTION_T, (caValue*)valueFunc);
 
     function_t::initialize(&FUNCTION_T, valueFunc);
     initialize_function(valueFunc);
@@ -550,14 +550,14 @@ EXPORT void circa_initialize()
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");
     if (libPathEnv != NULL) {
-        TValue libPathStr;
+        caValue libPathStr;
         set_string(&libPathStr, libPathEnv);
 
-        TValue libPaths;
+        caValue libPaths;
         string_split(&libPathStr, ';', &libPaths);
 
         for (int i=0; i < list_length(&libPaths); i++) {
-            TValue* path = list_get_index(&libPaths, i);
+            caValue* path = list_get_index(&libPaths, i);
             if (string_eq(path, ""))
                 continue;
             modules_add_search_path(as_cstring(path));

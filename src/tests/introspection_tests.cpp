@@ -42,7 +42,7 @@ void test_term_to_raw_string()
     delete term;
 }
 
-bool name_visitor_that_appends_to_list(Term* term, const char* name, TValue* list)
+bool name_visitor_that_appends_to_list(Term* term, const char* name, caValue* list)
 {
     set_ref(List::checkCast(list)->append(), term);
     return false;
@@ -59,7 +59,7 @@ void test_visit_name_accessible_terms()
     /*Term* e =*/ ns->compile("e = 1");
     branch.compile("f = 1");
 
-    TValue results;
+    caValue results;
     set_list(&results);
     visit_name_accessible_terms(d, name_visitor_that_appends_to_list, &results);
 

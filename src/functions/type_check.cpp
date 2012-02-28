@@ -55,7 +55,7 @@ namespace type_check_function {
         // Check each input
         for (int i=0; i < inputs->length(); i++) {
             Type* type = function_get_input_type(function, i);
-            TValue* value = inputs->get(i);
+            caValue* value = inputs->get(i);
             if (value == NULL)
                 continue;
             if (!cast_possible(value, type)) {

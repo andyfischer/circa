@@ -73,7 +73,7 @@ void infer_length()
 {
     Branch branch;
 
-    TValue result;
+    caValue result;
 
     statically_infer_result(branch.compile("length([])"), &result);
     test_equals(&result, "0");
