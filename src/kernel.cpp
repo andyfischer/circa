@@ -2,6 +2,9 @@
 
 #include "common_headers.h"
 
+#include "circa/circa.h"
+#include "circa/file.h"
+
 #include "branch.h"
 #include "building.h"
 #include "dict.h"
@@ -179,11 +182,7 @@ CA_FUNCTION(file__exists)
 }
 CA_FUNCTION(file__read_text)
 {
-    TValue error;
-    read_text_file_to_value(STRING_INPUT(0), OUTPUT, &error);
-
-    if (!is_null(&error))
-        RAISE_ERROR(as_cstring(&error));
+    set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
 }
 
 CA_FUNCTION(input_func)

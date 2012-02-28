@@ -56,6 +56,8 @@ void circa_install_file_source(caFileSource* source)
 
 static caFileSource* get_source_by_precedence(int precedence)
 {
+    file_init_globals();
+
     int index = list_length(g_fileServices) - precedence - 1;
     if (index < 0)
         return NULL;
@@ -64,6 +66,8 @@ static caFileSource* get_source_by_precedence(int precedence)
 
 static caFileSource* get_source_by_name(caName name)
 {
+    file_init_globals();
+
     for (int i=0;; i++) {
         caFileSource* source = get_source_by_precedence(i);
         if (source->name == name)
@@ -74,6 +78,8 @@ static caFileSource* get_source_by_name(caName name)
 
 caFileRecord* circa_fetch_file_record(const char* filename, caName source)
 {
+    file_init_globals();
+
     std::map<std::string, caFileRecord*>::const_iterator it;
 
     it = g_fileRecords.find(filename);
@@ -87,7 +93,7 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source)
         record->data = NULL;
         record->mutex = circa_create_mutex();
         record->filename = strdup(filename);
-        circa_init_value(record->sourceMetadata);
+        record->sourceMetadata = circa_alloc_value();
 
         g_fileRecords[filename] = record;
         return record;
@@ -116,6 +122,8 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source)
 
 caFileRecord* circa_get_file_record(const char* filename)
 {
+    file_init_globals();
+
     std::map<std::string, caFileRecord*>::const_iterator it;
     it = g_fileRecords.find(filename);
 
@@ -127,6 +135,8 @@ caFileRecord* circa_get_file_record(const char* filename)
 
 char* circa_read_file(const char* filename)
 {
+    file_init_globals();
+
     caFileRecord* record = circa_get_file_record(filename);
 
     if (record == NULL) {

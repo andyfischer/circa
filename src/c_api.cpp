@@ -92,6 +92,13 @@ void circa_init_value(caValue* container)
     initialize_null((TValue*) container);
 }
 
+caValue* circa_alloc_value()
+{
+    caValue* value = (caValue*) new TValue();
+    circa_init_value(value);
+    return value;
+}
+
 void circa_set_int(caValue* container, int value)
 {
     set_int((TValue*) container, value);

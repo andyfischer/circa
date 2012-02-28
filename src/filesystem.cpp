@@ -190,7 +190,14 @@ void join_path(String* left, String* right)
 // defined in filesystem_posix.cpp:
 void install_posix_filesystem_interface();
 
+// defined in file_posix.cpp
+EXPORT void install_posix_file_source();
+
 EXPORT void circa_use_standard_filesystem()
 {
+    // Old version
     install_posix_filesystem_interface();
+    
+    // New version
+    install_posix_file_source();
 }

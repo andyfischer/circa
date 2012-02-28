@@ -100,6 +100,9 @@ void* circa_as_pointer(caValue* container);
 // functions.
 void circa_init_value(caValue* container);
 
+// Allocate a new caValue container on the heap. This will call circa_init_value for you.
+caValue* circa_alloc_value();
+
 // Assign an integer to a caValue
 void circa_set_int(caValue* container, int value);
 
