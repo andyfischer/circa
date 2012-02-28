@@ -127,14 +127,10 @@ def test_file(process, filename):
 
     return failures
 
-
-def get_list_of_enabled_tests():
-    for line in read_text_file_as_lines(TestRoot+'/_enabled_tests'):
-        if not line:
-            continue
-        if line[0] == "#":
-            continue
-        yield line
+def list_files_recr(dir):
+    for root, _, files in os.walk(TestRoot):
+        for file in files:
+            yield os.path.join(root,file)
 
 def run_all_tests():
 
@@ -145,8 +141,22 @@ def run_all_tests():
 
     totalTestCount = 0
     totalFailedTests = 0
+    totalDisabledTests = 0
 
-    for file in [TestRoot+'/'+f for f in get_list_of_enabled_tests()]:
+    # Fetch list of disabled tests
+    disabled_tests = [os.path.join(TestRoot,f)
+        for f in read_text_file_as_lines(TestRoot+'/_disabled_tests')]
+
+    # Iterate through each test file
+    # Future: support test files in subdirectories
+    for file in [os.path.join(TestRoot, f) for f in os.listdir(TestRoot)]:
+        if not file.endswith('.ca'):
+            continue
+
+        if file in disabled_tests:
+            totalDisabledTests += 1
+            continue
+
         totalTestCount += 1
 
         failed = False
@@ -168,7 +178,7 @@ def run_all_tests():
             totalFailedTests += 1
 
 
-    print "Ran",totalTestCount,"tests,",totalFailedTests,"failed."
+    print "Ran",totalTestCount,"tests,",totalFailedTests,"failed,",totalDisabledTests,"disabled."
     
     if totalFailedTests > 0:
         exit(-1)
