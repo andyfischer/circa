@@ -88,3 +88,7 @@ extern "C" void circa_parse_string(const char* str, caValue* out)
     TokenStream tokens(str);
     parse_value(&tokens, out);
 }
+
+extern "C" void circa_to_string_repr(const char* str, caValue* out)
+{
+}
