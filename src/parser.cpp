@@ -531,8 +531,8 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     result->setStringProp("syntax:postNameWs", possible_whitespace(tokens));
 
     // Optional list of qualifiers
-    while (tokens.nextIs(TK_SYMBOL)) {
-        std::string symbolText = tokens.consumeStr(TK_SYMBOL);
+    while (tokens.nextIs(TK_NAME)) {
+        std::string symbolText = tokens.consumeStr(TK_NAME);
         if (symbolText == ":throws")
             attrs->throws = true;
         else
@@ -606,8 +606,8 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         }
 
         // Optional list of qualifiers
-        while (tokens.nextIs(TK_SYMBOL)) {
-            std::string symbolText = tokens.consumeStr(TK_SYMBOL);
+        while (tokens.nextIs(TK_NAME)) {
+            std::string symbolText = tokens.consumeStr(TK_NAME);
 
             // TODO: store syntax hint
             if (symbolText == ":ignore_error") {
@@ -648,9 +648,9 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     tokens.consume(TK_RPAREN);
 
     // Another optional list of symbols
-    if (tokens.nextNonWhitespaceIs(TK_SYMBOL)) {
+    if (tokens.nextNonWhitespaceIs(TK_NAME)) {
         possible_whitespace(tokens);
-        std::string symbolText = tokens.consumeStr(TK_SYMBOL);
+        std::string symbolText = tokens.consumeStr(TK_NAME);
         #if 0 // there was once stuff here
         if (symbolText == ":xyz") {
         }
@@ -742,7 +742,7 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     result->setStringProp("syntax:preLBracketWhitespace",
             possible_whitespace_or_newline(tokens));
 
-    while (tokens.nextIs(TK_SYMBOL)) {
+    while (tokens.nextIs(TK_NAME)) {
         std::string s = tokens.consumeStr();
 
         if (s == ":nocopy") {
@@ -1874,6 +1874,10 @@ ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(TK_LBRACKET))
         result = literal_list(branch, tokens, context);
 
+    // literal name?
+    else if (tokens.nextIs(TK_NAME))
+        result = literal_name(branch, tokens, context);
+
     // plain branch?
     else if (tokens.nextIs(TK_LBRACE))
         result = plain_branch(branch, tokens, context);
@@ -2088,6 +2092,22 @@ ParseResult literal_list(Branch* branch, TokenStream& tokens, ParserCxt* context
 
     term->setBoolProp("syntax:literal-list", true);
     term->setStringProp("syntax:declarationStyle", "bracket-list");
+    set_source_location(term, startPosition, tokens);
+
+    return ParseResult(term);
+}
+
+ParseResult literal_name(Branch* branch, TokenStream& tokens, ParserCxt* context)
+{
+    int startPosition = tokens.getPosition();
+
+    std::string s = tokens.nextStr();
+    tokens.consume(TK_NAME);
+
+    Term* term = create_value(branch, &NAME_T);
+
+    // Skip the leading ':' in the name string
+    set_name(term, name_from_string(s.c_str() + 1));
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);

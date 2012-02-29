@@ -189,6 +189,14 @@ CA_FUNCTION(file__read_text)
     set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
 }
 
+CA_FUNCTION(file__fetch_record)
+{
+    const char* filename = STRING_INPUT(0);
+    Name name = INT_INPUT(1);
+    circa_create_default_output((caStack*) CONTEXT, 0);
+    set_pointer(OUTPUT, circa_fetch_file_record(filename, name));
+}
+
 CA_FUNCTION(from_string)
 {
     circa_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
@@ -510,6 +518,7 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("file:version"), file__version);
     install_function(kernel->get("file:exists"), file__exists);
     install_function(kernel->get("file:read_text"), file__read_text);
+    install_function(kernel->get("file:fetch_record"), file__fetch_record);
     install_function(kernel->get("input"), input_func);
     install_function(kernel->get("length"), length);
     install_function(kernel->get("from_string"), from_string);

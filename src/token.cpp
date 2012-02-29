@@ -21,7 +21,7 @@ const char* get_token_text(int match)
         case TK_COMMA: return ",";
         case TK_AT_SIGN: return "@";
         case TK_IDENTIFIER: return "IDENTIFIER";
-        case TK_SYMBOL: return "SYMBOL";
+        case TK_NAME: return "NAME";
         case TK_INTEGER: return "INTEGER";
         case TK_HEX_INTEGER: return "HEX_INTEGER";
         case TK_FLOAT: return "FLOAT";
@@ -205,7 +205,7 @@ struct TokenizeContext
 
 void top_level_consume_token(TokenizeContext &context);
 void consume_identifier(TokenizeContext &context);
-void consume_symbol(TokenizeContext &context);
+void consume_name(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_comment(TokenizeContext& context);
 bool match_number(TokenizeContext &context);
@@ -428,7 +428,7 @@ void top_level_consume_token(TokenizeContext &context)
                 context.consume(TK_DOUBLE_COLON, 2);
                 return;
             } else if (is_identifier_first_letter(context.next(1))) {
-                return consume_symbol(context);
+                return consume_name(context);
             }
 
             context.consume(TK_COLON, 1);
@@ -683,7 +683,7 @@ void consume_color_literal(TokenizeContext &context)
         context.consume(TK_UNRECOGNIZED, lookahead);
 }
 
-void consume_symbol(TokenizeContext &context)
+void consume_name(TokenizeContext &context)
 {
     int lookahead = 0;
 
@@ -693,7 +693,7 @@ void consume_symbol(TokenizeContext &context)
     while (is_acceptable_inside_identifier(context.next(lookahead)))
         lookahead++;
 
-    context.consume(TK_SYMBOL, lookahead);
+    context.consume(TK_NAME, lookahead);
 }
 
 void TokenStream::reset(caValue* inputString)

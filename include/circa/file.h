@@ -26,6 +26,8 @@ typedef void (*caFileSourceUpdateFile) (caFileSource* source, caFileRecord* reco
 
 typedef struct caFileSource {
 
+    caName name;
+
     // openFile is called when we are trying to open a file that has no existing record.
     // If the file source successfully opens the file, it should create a new FileRecord
     // and return it. Otherwise it can return NULL.
@@ -40,8 +42,6 @@ typedef struct caFileSource {
     //
     // This function is optional
     caFileSourceUpdateFile updateFile;
-
-    caName name;
 
 } caFileSource;
 

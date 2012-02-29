@@ -82,6 +82,7 @@ ParseResult literal_bool(Branch* branch, TokenStream& tokens, ParserCxt* context
 ParseResult literal_null(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_color(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_list(Branch* branch, TokenStream& tokens, ParserCxt* context);
+ParseResult literal_name(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult unknown_identifier(Branch* branch, std::string const& name);

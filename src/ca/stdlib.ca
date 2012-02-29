@@ -34,6 +34,10 @@ namespace file
         ver = version(filename)
         return changed([filename ver])
 
+    type FileSource;
+    type FileRecord;
+
+    def fetch_record(string filename, Name source) -> FileRecord
 
 namespace refactor
     def rename(Ref r, string s)
