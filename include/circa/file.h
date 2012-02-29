@@ -4,7 +4,6 @@
 #define CIRCA_FILE_H_INCLUDED
 
 #include "circa.h"
-#include "thread.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -60,7 +59,6 @@ typedef struct caFileRecord {
     caName source;
 
     caValue* sourceMetadata;
-    caMutex* mutex;
     char* data;
 
 } caFileRecord;

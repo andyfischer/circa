@@ -1,7 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "common_headers.h"
-#include "circa/thread.h"
 #include "circa/file.h"
 
 #include "list_shared.h"
@@ -91,7 +90,6 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source)
         record->version = 1;
         record->source = source;
         record->data = NULL;
-        record->mutex = circa_create_mutex();
         record->filename = strdup(filename);
         record->sourceMetadata = circa_alloc_value();
 
