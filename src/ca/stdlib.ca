@@ -9,6 +9,9 @@ def length(List) -> int
 def from_string(string s) -> any
     "Parse a string representation to a Circa value"
 
+def to_string_repr(any val) -> string
+    "Encode a Circa value as a string representation"
+
 def changed(any current) -> bool
     state any prev = null
     result = prev != current

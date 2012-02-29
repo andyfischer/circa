@@ -8,7 +8,7 @@ assert(from_string("'hi'") == 'hi')
 assert(from_string("\"hi\"") == 'hi')
 
 def round_trip(any val)
-    if from_string(to_string(val)) != val
+    if from_string(to_string_repr(val)) != val
         print('round trip failed on: ' val)
 
 
@@ -22,4 +22,7 @@ round_trip(-1)
 round_trip(-100)
 round_trip(-100.0)
 round_trip("hi")
--- round_trip("hi\n\nthere")
+round_trip("hi\n\nthere")
+round_trip("quotemarks'''\"\"\"")
+round_trip('quotemarks"""\'\'\'')
+round_trip('backslashes \\\\\\')

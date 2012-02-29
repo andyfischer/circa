@@ -4,9 +4,13 @@
 
 #include "circa/circa.h"
 
+#include "list_shared.h"
+#include "names.h"
 #include "parser.h"
+#include "string_type.h"
 #include "tagged_value.h"
 #include "token.h"
+#include "type.h"
 
 using namespace circa;
 
@@ -27,7 +31,10 @@ static void parse_value(TokenStream* tokens, caValue* out)
     // ignore leading whitespace
     drop_whitespace(tokens);
 
-    if (tokens->nextIs(TK_INTEGER)) {
+    if (tokens->finished()) {
+        circa_set_string(out, "unexpected end of string");
+
+    } else if (tokens->nextIs(TK_INTEGER)) {
         circa_set_int(out, atoi(tokens->nextStr().c_str()));
         tokens->consume(TK_INTEGER);
     } else if (tokens->nextIs(TK_FLOAT)) {
@@ -89,6 +96,29 @@ extern "C" void circa_parse_string(const char* str, caValue* out)
     parse_value(&tokens, out);
 }
 
-extern "C" void circa_to_string_repr(const char* str, caValue* out)
+extern "C" void circa_to_string_repr(caValue* value, caValue* out)
 {
+    // For certain types, just use to_string
+    if (is_int(value) || is_float(value) || is_bool(value)) {
+        set_string(out, to_string(value).c_str());
+    } else if (is_list(value)) {
+        set_string(out, "");
+        string_append(out, "[");
+
+        for (int i=0; i < list_length(value); i++) {
+            if (i > 0)
+                string_append(out, ", ");
+
+            caValue elementStr;
+            circa_to_string_repr(list_get_index(value, i), &elementStr);
+            string_append(out, &elementStr);
+        }
+
+        string_append(out, "]");
+    } else if (is_string(value)) {
+        parser::quote_and_escape_string(as_cstring(value), out);
+    } else {
+        set_string(out, "error: no string repr for type ");
+        string_append(out, name_to_string(value->value_type->name));
+    }
 }

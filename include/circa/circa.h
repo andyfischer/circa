@@ -147,6 +147,9 @@ void circa_raise_error(caStack* stack, const char* msg);
 // check for this).
 void circa_parse_string(const char* str, caValue* out);
 
+// Write a string representation of 'value' to 'out'.
+void circa_to_string_repr(caValue* value, caValue* out);
+
 // Install an evaluation function to the given named term. Returns the affected Term.
 caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
 

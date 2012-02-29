@@ -626,14 +626,16 @@ void consume_string_literal(TokenizeContext &context)
 
     bool escapedNext = false;
     while (context.withinRange(lookahead)) {
+
         char c = context.next(lookahead);
 
         if (c == quote_type && !escapedNext)
             break;
 
-        escapedNext = false;
-        if (c == '\\')
+        if (c == '\\' && !escapedNext)
             escapedNext = true;
+        else
+            escapedNext = false;
 
         lookahead++;
     }

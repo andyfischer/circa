@@ -2446,6 +2446,30 @@ void unquote_and_unescape_string(const char* input, caValue* out)
     set_string(out, result.str());
 }
 
+void quote_and_escape_string(const char* input, caValue* out)
+{
+    std::stringstream result;
+
+    result << '"';
+
+    for (int i=0; input[i] != 0; i++) {
+        if (input[i] == '\n')
+            result << "\\n";
+        else if (input[i] == '\'')
+            result << "\\'";
+        else if (input[i] == '"')
+            result << "\\\"";
+        else if (input[i] == '\\')
+            result << "\\\\";
+        else
+            result << input[i];
+    }
+
+    result << '"';
+
+    set_string(out, result.str());
+}
+
 } // namespace parser
 
 } // namespace circa
