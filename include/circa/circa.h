@@ -30,6 +30,9 @@ typedef struct caTerm caTerm;
 // a Type holds data for a single Circa type.
 typedef struct caType caType;
 
+// Function object
+typedef struct caFunction caFunction;
+
 // EvaluateFunc is the signature for a C evaluation function. The function will access the stack
 // to read inputs (if any), perform some action (sometimes), and write output values back to the
 // stack (if it has any outputs).
@@ -175,10 +178,26 @@ void circa_clear_error(caStack* stack);
 // Get a Term from a Branch by index.
 caTerm* circa_get_term(caBranch* branch, int index);
 
+caBranch* circa_nested_branch(caTerm* term);
+caBranch* circa_get_nested_branch(caBranch* branch, const char* name);
+
+caBranch* circa_function_contents(caFunction* func);
+
 // Access the fixed value of the given Term.
 caValue* circa_term_value(caTerm* term);
+int circa_term_get_index(caTerm* term);
 
-caTerm* circa_declare_function(caBranch* branch, const char* name);
+// Building code
+caFunction* circa_declare_function(caBranch* branch, const char* name);
+caValue* circa_declare_value(caBranch* branch, const char* name);
+
+void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate);
+
+// Debugging helpers
+
+// 'dump' commands will print a representation to stdout
+void circa_dump_s(caStack* stack);
+void circa_dump_b(caBranch* branch);
 
 #ifdef __cplusplus
 } // extern "C"

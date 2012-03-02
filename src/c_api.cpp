@@ -54,7 +54,8 @@ caTerm* circa_current_term(caStack* stack)
 }
 caBranch* circa_callee_branch(caStack* stack)
 {
-    return (caBranch*) nested_contents(current_term((EvalContext*) stack));
+    Term* currentFunction = current_term((EvalContext*) stack)->function;
+    return (caBranch*) function_contents(currentFunction);
 }
 
 // Values
@@ -263,6 +264,22 @@ caTerm* circa_get_term(caBranch* branch, int index)
 {
     return (caTerm*) ((Branch*) branch)->get(index);
 }
+caBranch* circa_nested_branch(caTerm* term)
+{
+    return (caBranch*) ((Term*)term)->nestedContents;
+}
+caBranch* circa_get_nested_branch(caBranch* branch, const char* name)
+{
+    Term* term = (Term*) find_name((Branch*)branch, name);
+    if (term == NULL)
+        return NULL;
+    return (caBranch*) term->nestedContents;
+}
+
+caBranch* circa_function_contents(caFunction* func)
+{
+    return (caBranch*) function_contents((Function*) func);
+}
 
 // Access the fixed value of the given Term.
 caValue* circa_term_value(caTerm* term)
@@ -271,10 +288,38 @@ caValue* circa_term_value(caTerm* term)
         return NULL;
     return (caValue*) term;
 }
-
-caTerm* circa_declare_function(caBranch* branch, const char* name)
+int circa_term_get_index(caTerm* term)
 {
-    return (caTerm*) create_function((Branch*) branch, name);
+    return ((Term*)term)->index;
+}
+
+caFunction* circa_declare_function(caBranch* branch, const char* name)
+{
+    return (caFunction*) as_function(create_function((Branch*) branch, name));
+}
+
+caValue* circa_declare_value(caBranch* branch, const char* name)
+{
+    std::string nameStr;
+    if (name != NULL)
+        nameStr = name;
+    Term* term = create_value((Branch*) branch, &ANY_T, nameStr);
+    return (caValue*) term;
+}
+
+void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate)
+{
+    ((Function*) func)->evaluate = (EvaluateFunc) evaluate;
+}
+
+void circa_dump_s(caStack* stack)
+{
+    dump((EvalContext*) stack);
+}
+
+void circa_dump_b(caBranch* branch)
+{
+    dump((Branch*) branch);
 }
 
 } // extern "C"
