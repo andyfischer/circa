@@ -1,0 +1,14 @@
+
+namespace ns
+  a = 1
+
+assert(ns:a == 1)
+
+-- Test that state works inside a namespace
+def f()
+  namespace ns2
+    state s = 1
+
+s = null
+f(state = s)
+print(s)

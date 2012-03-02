@@ -465,9 +465,9 @@ void bootstrap_kernel()
     append_to_overloaded_function(SUB_FUNC, kernel->get("sub_f"));
 
     // Create vectorized functions
-    Term* add_v = create_subroutine(kernel, "add_v");
+    Term* add_v = create_function(kernel, "add_v");
     create_function_vectorized_vv(function_contents(add_v), FUNCS.add, &LIST_T, &LIST_T);
-    Term* add_s = create_subroutine(kernel, "add_s");
+    Term* add_s = create_function(kernel, "add_s");
     create_function_vectorized_vs(function_contents(add_s), FUNCS.add, &LIST_T, &ANY_T);
 
     append_to_overloaded_function(FUNCS.add, add_v);
@@ -476,24 +476,24 @@ void bootstrap_kernel()
     //dump(function_contents(add_v));
     //dump(function_contents(FUNCS.add));
 
-    Term* sub_v = create_subroutine(kernel, "sub_v");
+    Term* sub_v = create_function(kernel, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
-    Term* sub_s = create_subroutine(kernel, "sub_s");
+    Term* sub_s = create_function(kernel, "sub_s");
     create_function_vectorized_vs(function_contents(sub_s), SUB_FUNC, &LIST_T, &ANY_T);
     
     append_to_overloaded_function(SUB_FUNC, sub_v);
     append_to_overloaded_function(SUB_FUNC, sub_s);
 
     // Create vectorized mult() functions
-    Term* mult_v = create_subroutine(kernel, "mult_v");
+    Term* mult_v = create_function(kernel, "mult_v");
     create_function_vectorized_vv(function_contents(mult_v), MULT_FUNC, &LIST_T, &LIST_T);
-    Term* mult_s = create_subroutine(kernel, "mult_s");
+    Term* mult_s = create_function(kernel, "mult_s");
     create_function_vectorized_vs(function_contents(mult_s), MULT_FUNC, &LIST_T, &ANY_T);
 
     append_to_overloaded_function(MULT_FUNC, mult_v);
     append_to_overloaded_function(MULT_FUNC, mult_s);
 
-    Term* div_s = create_subroutine(kernel, "div_s");
+    Term* div_s = create_function(kernel, "div_s");
     create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);
 
     // Create some hosted types

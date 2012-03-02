@@ -13,7 +13,7 @@ extern "C" {
 
 typedef void (*caThreadMainFunc)(void* data);
 
-typedef struct caMutex;
+typedef struct caMutex caMutex;
 
 void circa_spawn_thread(caThreadMainFunc func, void* data);
 caMutex* circa_create_mutex();

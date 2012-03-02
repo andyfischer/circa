@@ -75,8 +75,11 @@ caValue* circa_output(caStack* stack, int index);
 // Term's declared type. Also returns the output slot.
 caValue* circa_create_default_output(caStack* stack, int index);
 
-// Fetch the caTerm that is currently being evaluated.
+// Fetch the Term that is currently being evaluated.
 caTerm* circa_current_term(caStack* stack);
+
+// Fetch the Branch for the function that is currently being evaluated
+caBranch* circa_callee_branch(caStack* stack);
 
 bool circa_is_int(caValue* container);
 bool circa_is_float(caValue* container);
@@ -120,7 +123,7 @@ void circa_set_pointer(caValue* container, void* ptr);
 
 void circa_set_string(caValue* container, const char* str);
 void circa_set_string_size(caValue* container, const char* str, int size);
-void circa_string_append(caValue* str, const char* str);
+void circa_string_append(caValue* container, const char* str);
 
 void circa_set_list(caValue* list, int numElements);
 caValue* circa_list_append(caValue* list);
@@ -161,11 +164,21 @@ caStack* circa_new_stack();
 
 void circa_run_module(caStack* stack, caName moduleName);
 
-// Return whether a runtime error occurred
+// Return whether a runtime error occurred.
 bool circa_error_occurred(caStack* stack);
 
-// Clear a runtime error from the stack
+// Clear a runtime error from the stack.
 void circa_clear_error(caStack* stack);
+
+// Accessing code data
+
+// Get a Term from a Branch by index.
+caTerm* circa_get_term(caBranch* branch, int index);
+
+// Access the fixed value of the given Term.
+caValue* circa_term_value(caTerm* term);
+
+caTerm* circa_declare_function(caBranch* branch, const char* name);
 
 #ifdef __cplusplus
 } // extern "C"

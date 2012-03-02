@@ -3,7 +3,7 @@
 #include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
-namespace create_function {
+namespace create__function {
 
     CA_FUNCTION(create_func)
     {

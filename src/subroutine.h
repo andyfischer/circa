@@ -15,7 +15,7 @@ Term* find_enclosing_subroutine(Term* term);
 int get_input_index_of_placeholder(Term* inputPlaceholder);
 
 // Perform various steps to finish creating a subroutine
-Term* create_subroutine(Branch* branch, const char* name);
+Term* create_function(Branch* branch, const char* name);
 void initialize_subroutine(Term* sub);
 void finish_building_subroutine(Term* sub, Term* outputType);
 

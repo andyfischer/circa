@@ -102,7 +102,7 @@ int get_input_index_of_placeholder(Term* inputPlaceholder)
     return inputPlaceholder->index - 1;
 }
 
-Term* create_subroutine(Branch* branch, const char* name)
+Term* create_function(Branch* branch, const char* name)
 {
     Term* term = create_value(branch, &FUNCTION_T, name);
     initialize_function(term);

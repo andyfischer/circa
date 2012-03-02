@@ -7,10 +7,12 @@
 #include "evaluation.h"
 #include "handle.h"
 #include "importing.h"
+#include "introspection.h"
 #include "kernel.h"
 #include "list_shared.h"
 #include "modules.h"
 #include "names.h"
+#include "subroutine.h"
 #include "string_type.h"
 #include "tagged_value.h"
 
@@ -49,6 +51,10 @@ caValue* circa_create_default_output(caStack* stack, int index)
 caTerm* circa_current_term(caStack* stack)
 {
     return (caTerm*) current_term((EvalContext*) stack);
+}
+caBranch* circa_callee_branch(caStack* stack)
+{
+    return (caBranch*) nested_contents(current_term((EvalContext*) stack));
 }
 
 // Values
@@ -252,6 +258,23 @@ void circa_print_error_to_stdout(caStack* stack)
 {
     EvalContext* context = (EvalContext*) stack;
     context_print_error_stack(std::cout, context);
+}
+caTerm* circa_get_term(caBranch* branch, int index)
+{
+    return (caTerm*) ((Branch*) branch)->get(index);
+}
+
+// Access the fixed value of the given Term.
+caValue* circa_term_value(caTerm* term)
+{
+    if (!is_value((Term*) term))
+        return NULL;
+    return (caValue*) term;
+}
+
+caTerm* circa_declare_function(caBranch* branch, const char* name)
+{
+    return (caTerm*) create_function((Branch*) branch, name);
 }
 
 } // extern "C"

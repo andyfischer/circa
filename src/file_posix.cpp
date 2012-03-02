@@ -8,7 +8,7 @@
 
 extern "C" {
 
-static int get_modified_time(const char* filename)
+static int get_modified_time2(const char* filename)
 {
     struct stat s;
     s.st_mtime = 0;
@@ -29,7 +29,7 @@ static void update_file(caFileSource*, caFileRecord* record)
     }
 
     // Check the last modified time to see if we need to reload the file.
-    int modifiedTime = get_modified_time(record->filename);
+    int modifiedTime = get_modified_time2(record->filename);
     if (circa_is_int(record->sourceMetadata) &&
         modifiedTime == circa_as_int(record->sourceMetadata)) {
 
