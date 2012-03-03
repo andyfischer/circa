@@ -4,6 +4,7 @@
 
 #include "common_headers.h"
 #include "branch.h"
+#include "building.h"
 #include "evaluation.h"
 #include "handle.h"
 #include "importing.h"
@@ -98,6 +99,19 @@ void circa_get_point(caValue* point, float* xOut, float* yOut)
 {
     *xOut = to_float(get_index(point, 0));
     *yOut = to_float(get_index(point, 1));
+}
+void circa_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
+{
+    *xOut = to_float(get_index(vec3, 0));
+    *yOut = to_float(get_index(vec3, 1));
+    *zOut = to_float(get_index(vec3, 2));
+}
+void circa_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
+{
+    *xOut = to_float(get_index(vec4, 0));
+    *yOut = to_float(get_index(vec4, 1));
+    *zOut = to_float(get_index(vec4, 2));
+    *wOut = to_float(get_index(vec4, 3));
 }
 void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, float* aOut)
 {
@@ -223,6 +237,10 @@ caBranch* circa_load_module_from_file(caName module_name, const char* filename)
 caName circa_name(const char* str)
 {
     return name_from_string(str);
+}
+const char* circa_name_string(caName name)
+{
+    return name_to_string(name);
 }
 
 caType* circa_term_declared_type(caTerm* term)

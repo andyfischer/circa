@@ -134,7 +134,9 @@ void add_implicit_placeholders(Term* forTerm)
             remap_pointers_quick(contents->get(i), original, input);
 
         Term* term = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result), name);
-        move_before_outputs(term);
+
+        // Move output into the correct output slot
+        contents->move(term, contents->length() - 1 - inputIndex);
 
         inputIndex++;
     }
@@ -170,6 +172,9 @@ void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
+    // Add a primary output
+    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+
     pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);
     check_to_add_state_output_placeholder(contents);
@@ -177,9 +182,6 @@ void finish_for_loop(Term* forTerm)
 
     add_implicit_placeholders(forTerm);
     repoint_terms_to_use_input_placeholders(contents);
-
-    // Add a primary output
-    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
 
     check_to_insert_implicit_inputs(forTerm);
     update_extra_outputs(forTerm);

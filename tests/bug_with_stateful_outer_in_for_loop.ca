@@ -1,0 +1,23 @@
+
+-- This code would produce a bug; if a outer variable was referenced and rebound
+-- in a for loop, the loop would get confused and use the outer variable as the
+-- loop's inlined state.
+
+def othercall()
+  state s = 123
+
+def main()
+  state outer = 1
+
+  for i in [1 2 3]
+
+    -- reference and modify 'outer', this means the for loop must bring in 'outer'
+    -- as an input and an output.
+    outer = outer + 1
+
+    -- also create inlined state
+    othercall()
+
+s = null
+main(state = s)
+print(s)

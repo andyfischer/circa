@@ -7,7 +7,7 @@ c = 3
 d = 4
 e = 5
 
-for i in [1]
+for i in [1 2 3]
     a = 6
     b = 7
     c = 8

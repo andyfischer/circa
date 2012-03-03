@@ -59,7 +59,11 @@ int circa_run_command_line(int argc, const char* args[]);
 caBranch* circa_load_module_from_file(caName module_name, const char* filename);
 
 // Convert a string to a Circa name (an interned string that is referenced by integer).
+// If the name doesn't already exist, it will be created.
 caName circa_name(const char* str);
+
+// Retrieve the string for a name.
+const char* circa_name_string(caName name);
 
 // Evaluation functions
 
@@ -102,6 +106,8 @@ const char* circa_as_string(caValue* container);
 char* circa_to_string(caValue* value);
 
 void circa_get_point(caValue* point, float* xOut, float* yOut);
+void circa_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
+void circa_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
 void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, float* aOut);
 
 // Read an opaque pointer from a caValue

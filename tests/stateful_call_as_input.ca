@@ -2,10 +2,24 @@
 def f(int i)
   state s = i
 
-def g()
-  -- Use state as an input to a function
+-- Use state as an input to a function
+def check1()
   list(f(1) f(2) f(3))
 
 s = null
-g(state = s)
+check1(state = s)
+print(s)
+
+
+-- Use state as a predicate to 'if'
+def sbool() -> bool
+  state s = 5
+  return true
+
+def check2()
+  if sbool()
+    a = 1
+
+s = null
+check2(state = s)
 print(s)

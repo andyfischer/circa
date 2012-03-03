@@ -1,0 +1,35 @@
+
+-- Simple test
+def f(int i)
+  state s = i
+
+def check1()
+  f(3)
+
+s = null
+check1(state = s)
+print(s)
+
+-- Test a function that uses a return value
+def g(int i) -> int
+  state s = i
+  return i + 2
+
+def check2()
+  g(8)
+
+s = null
+check2(state = s)
+print(s)
+
+-- Test a function with a returned value and a stateful call
+def h(int i) -> int
+  f(i)
+  return i + 2
+
+def check3()
+  h(14)
+
+s = null
+check3(state = s)
+print(s)
