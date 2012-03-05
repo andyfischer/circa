@@ -67,7 +67,11 @@ const char* circa_name_string(caName name);
 
 // Evaluation functions
 
+// Retrieve the given input value. This value must not be modified.
 caValue* circa_input(caStack* stack, int index);
+
+// Retrieve the Term corresponding to the given input index, for doing meta-code operations.
+caTerm* circa_input_term(caStack* stack, int index);
 
 // Read the given input index as an integer
 int circa_int_input(caStack* stack, int index);
@@ -164,6 +168,12 @@ void circa_to_string_repr(caValue* value, caValue* out);
 
 // Install an evaluation function to the given named term. Returns the affected Term.
 caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
+
+// Fetch the number of inputs for the given term.
+int circa_term_num_inputs(caTerm* term);
+
+// Fetch the nth input for the given term. May return NULL.
+caTerm* circa_term_get_input(caTerm* term, int index);
 
 // Fetch the Term's declared type.
 caType* circa_term_declared_type(caTerm* term);

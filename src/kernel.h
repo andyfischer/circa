@@ -102,7 +102,7 @@ struct BuiltinFuncs {
     Term* unbounded_loop;
     Term* unbounded_loop_finish;
     Term* unpack_state;
-    Term* unpack_state_list;
+    Term* unpack_state_from_list;
     Term* unpack_state_list_n;
     Term* value;
 };

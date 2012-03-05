@@ -449,7 +449,7 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     if (stateInput == NULL)
         return;
 
-    Term* unpackList = apply(branch, FUNCS.unpack_state_list, TermList(stateInput));
+    Term* unpackList = apply(branch, FUNCS.unpack_state_from_list, TermList(stateInput));
     unpackList->setIntProp("index", index);
     move_after_inputs(unpackList);
 

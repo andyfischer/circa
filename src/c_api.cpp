@@ -26,6 +26,11 @@ caValue* circa_input(caStack* stack, int index)
     return get_input((EvalContext*) stack, index);
 }
 
+caTerm* circa_input_term(caStack* stack, int index)
+{
+    return circa_term_get_input(circa_current_term(stack), index);
+}
+
 int circa_int_input(caStack* stack, int index)
 {
     return circa_as_int(circa_input(stack, index));
@@ -241,6 +246,15 @@ caName circa_name(const char* str)
 const char* circa_name_string(caName name)
 {
     return name_to_string(name);
+}
+
+int circa_term_num_inputs(caTerm* term)
+{
+    return ((Term*) term)->numInputs();
+}
+caTerm* circa_term_get_input(caTerm* term, int index)
+{
+    return (caTerm*) ((Term*) term)->input(index);
 }
 
 caType* circa_term_declared_type(caTerm* term)

@@ -5,20 +5,22 @@
 namespace circa {
 namespace implicit_state_function {
 
-    CA_FUNCTION(unpack_state)
+    // Unpack a state value. Input 1 is the "identifying term" which is used as a key.
+    void unpack_state(caStack* stack)
     {
-        caValue* container = INPUT(0);
-        Term* identifyingTerm = INPUT_TERM(1);
+        caValue* container = circa_input(stack, 0);
+        Term* identifyingTerm = (Term*) circa_input_term(stack, 1);
 
         if (!is_dict(container)) {
-            set_null(OUTPUT);
+            set_null(circa_output(stack, 0));
             return;
         }
 
         const char* fieldName = unique_name(identifyingTerm);
-        copy(dict_insert(container, fieldName), OUTPUT);
+        copy(dict_insert(container, fieldName), circa_output(stack, 0));
     }
 
+    // Pack a state value. Input 2 is the "identifying term" which is used as a key.
     CA_FUNCTION(pack_state)
     {
         copy(INPUT(0), OUTPUT);
@@ -33,8 +35,9 @@ namespace implicit_state_function {
         copy(value, dict_insert(container, fieldName));
     }
 
-    // Used in if_block. The index is built in as a property.
-    CA_FUNCTION(unpack_state_list)
+    // Unpack a value from a list. The index is given as a static property. This call
+    // is used inside if-blocks.
+    CA_FUNCTION(unpack_state_from_list)
     {
         caValue* container = INPUT(0);
         int index = CALLER->intProp("index");
@@ -44,7 +47,8 @@ namespace implicit_state_function {
             copy(list_get(container, index), OUTPUT);
     }
 
-    // Used in if_block. The index is built in as a property.
+    // Pack a value to a list. The index is given as a static property. This call
+    // is used inside if-blocks.
     CA_FUNCTION(pack_state_to_list)
     {
         copy(INPUT(0), OUTPUT);
@@ -63,7 +67,7 @@ namespace implicit_state_function {
         copy(value, list_get(container, index));
     }
 
-    // Used in for_loop
+    // Unpack a state value from a list. This call is used in for-loops.
     CA_FUNCTION(unpack_state_list_n)
     {
         caValue* container = INPUT(0);
@@ -73,7 +77,8 @@ namespace implicit_state_function {
         else
             copy(list_get(container, index), OUTPUT);
     }
-    // Used in for_loop
+
+    // Pack a state value to a list. This call is used in for-loops.
     CA_FUNCTION(pack_state_list_n)
     {
         copy(INPUT(0), OUTPUT);
@@ -91,13 +96,13 @@ namespace implicit_state_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.unpack_state = import_function(kernel, unpack_state,
+        FUNCS.unpack_state = import_function(kernel, (EvaluateFunc) unpack_state,
             "unpack_state(any container, any identifier :meta) -> any");
         FUNCS.pack_state = import_function(kernel, pack_state,
             "pack_state(any container, any value, any identifier :meta) -> any");
 
-        FUNCS.unpack_state_list =
-            import_function(kernel, unpack_state_list, "unpack_state_list(any container) -> any");
+        FUNCS.unpack_state_from_list =
+            import_function(kernel, unpack_state_from_list, "unpack_state_from_list(any container) -> any");
         FUNCS.pack_state_to_list =
             import_function(kernel, pack_state_to_list,
                 "pack_state_to_list(any container, any value :optional) -> any");

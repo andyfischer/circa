@@ -1,0 +1,23 @@
+
+Instead of storing state internally as dictionaries, store it as lists with structured types.
+
+Each branch has a lazily-created state type. This type is a compound type that includes every
+state field.
+
+Whenever the branch is modified, we may need to update the state type.
+
+ - As an optimization, we should actually look at the state type and see if it really needs
+   to be updated. Don't update it if it's not necessary.
+
+To create the state type, we'll need to walk across the branch and look for unpack_state calls.
+The argument to the unpack_state call gives the identifying information.
+
+Then when it comes time to reading the state type, we check to see if the incoming container
+is *exactly* the same type as the Branch's state type. If it is then everything is good.
+ - How do we quickly index values inside the compound state value?
+   - This is a common problem with our compound types. Need to add a lookup hash on every
+     type value.
+
+If the incoming container type is not the exact same type, then do a migration from
+that type to the new type. This migration will use field names to associate slots. This
+operation is slower but it doesn't need to be done as often.

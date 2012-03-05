@@ -20,7 +20,8 @@ namespace declared_state_function {
                 return;
         }
 
-        // We couldn't use the input value, push a frame to evaluate the default value.
+        // We couldn't use the input value. If there is a nested block of code, then push
+        // that to the stack and it will initialize our new value.
         Branch* contents = nested_contents(CALLER);
 
         if (contents->length() > 0) {
@@ -34,25 +35,6 @@ namespace declared_state_function {
             set_null(OUTPUT);
         else
             create(declared_type(CALLER), OUTPUT);
-
-#if 0
-        // Try to use default_value from an input.
-        caValue* defaultValue = INPUT(1);
-        if (defaultValue != NULL) {
-            bool cast_success = cast(defaultValue, declared_type(CALLER), output);
-
-            if (!cast_success) {
-                std::stringstream msg;
-                msg << "Couldn't cast default value to type " <<
-                    declared_type(CALLER)->name;
-                RAISE_ERROR(msg.str().c_str());
-            }
-        } else {
-
-            // Otherwise, reset to the type's default value
-            create(declared_type(CALLER), output);
-        }
-#endif
     }
 
     void formatSource(StyledSource* source, Term* term)
