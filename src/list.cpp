@@ -230,13 +230,6 @@ int list_length(ListData* data)
     return data->count;
 }
 
-void list_set_index(ListData* data, int index, caValue* value)
-{
-    caValue* dest = list_get(data, index);
-    ca_assert(dest != NULL);
-    copy(value, dest);
-}
-
 void list_remove_and_replace_with_last_element(ListData** data, int index)
 {
     *data = list_touch(*data);
@@ -533,25 +526,6 @@ namespace list_t {
     void tv_copy(Type* type, caValue* source, caValue* dest)
     {
         list_copy(source, dest);
-
-#if 0
-        ca_assert(is_list(source));
-        set_null(dest);
-        change_type(dest, type);
-
-        ListData* s = (ListData*) get_pointer(source);
-        set_pointer(dest, list_duplicate(s));
-
-        #if 0
-    #if CIRCA_DISABLE_LIST_SHARING
-        if (d != NULL) list_decref(d);
-    #else
-        if (s != NULL) incref(s);
-        if (d != NULL) list_decref(d);
-        set_pointer(dest, s);
-    #endif
-        #endif
-#endif
     }
 
     bool tv_equals(Type*, caValue* leftcaValue, caValue* right)

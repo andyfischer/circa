@@ -39,7 +39,6 @@ ListData* list_duplicate(ListData* source);
 ListData* list_increase_capacity(ListData* original, int new_capacity);
 ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
-void list_set_index(ListData* data, int index, caValue* value);
 
 // Functions for dealing with a list inside a caValue container
 
