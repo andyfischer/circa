@@ -2,9 +2,11 @@
 
 #include "common_headers.h"
 
-#include "circa_internal.h"
+#include "framework.h"
+#include "token.h"
 
-namespace circa {
+using namespace circa;
+
 namespace tokenizer_tests {
 
 void test_identifiers()
@@ -252,32 +254,6 @@ void test_token_stream()
     test_assert(tstream.nextNonWhitespaceIs(TK_FLOAT, 1));
 }
 
-void test_consume_line()
-{
-    TokenStream tokens("for in $#!$#@ 151 poop \nfin");
-
-    // happily consume 'for' and some whitespace
-    test_assert(tokens.nextIs(TK_FOR));
-    tokens.consume();
-    test_assert(tokens.nextIs(TK_WHITESPACE));
-    tokens.consume();
-
-    int startPosition = tokens.getPosition();
-
-    // happily consume some more stuff
-    test_assert(tokens.nextIs(TK_IN));
-    tokens.consume();
-    test_assert(tokens.nextIs(TK_WHITESPACE));
-    tokens.consume();
-
-    // now freak out
-    std::string errorline = parser::consume_line(tokens, startPosition);
-
-    test_equals(errorline, "in $#!$#@ 151 poop ");
-    test_assert(tokens.nextIs(TK_IDENTIFIER));
-    test_equals(tokens.nextStr(), "fin");
-}
-
 void test_color_literal()
 {
     TokenStream tokens("#faf");
@@ -369,12 +345,12 @@ void test_comment()
     test_assert(tokens.finished());
 }
 
-void test_symbols()
+void test_names()
 {
     TokenStream tokens(":abc :a :1");
-    test_equals(tokens.consumeStr(TK_SYMBOL), ":abc");
+    test_equals(tokens.consumeStr(TK_NAME), ":abc");
     test_equals(tokens.consumeStr(TK_WHITESPACE), " ");
-    test_equals(tokens.consumeStr(TK_SYMBOL), ":a");
+    test_equals(tokens.consumeStr(TK_NAME), ":a");
     test_equals(tokens.consumeStr(TK_WHITESPACE), " ");
     test_equals(tokens.consumeStr(TK_COLON), ":");
     test_equals(tokens.consumeStr(TK_INTEGER), "1");
@@ -390,7 +366,9 @@ void test_number_followed_by_dot_call()
     test_assert(tokens.finished());
 }
 
-void register_tests()
+} // namespace tokenizer_tests
+
+void tokenizer_register_tests()
 {
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers);
     REGISTER_TEST_CASE(tokenizer_tests::test_integers);
@@ -404,15 +382,10 @@ void register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_triple_quote_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
-    REGISTER_TEST_CASE(tokenizer_tests::test_consume_line);
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
     REGISTER_TEST_CASE(tokenizer_tests::test_preceding_indent);
     REGISTER_TEST_CASE(tokenizer_tests::test_comment);
-    REGISTER_TEST_CASE(tokenizer_tests::test_symbols);
+    REGISTER_TEST_CASE(tokenizer_tests::test_names);
     REGISTER_TEST_CASE(tokenizer_tests::test_number_followed_by_dot_call);
 }
-
-} // namespace tokenizer_tests
-
-} // namespace circa
