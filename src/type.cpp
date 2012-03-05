@@ -35,6 +35,12 @@ namespace type_t {
         dest->value_data = source->value_data;
     }
 
+    void type_gc_release(CircaObject* obj)
+    {
+        Type* type = (Type*) obj;
+        delete type;
+    }
+
     void formatSource(StyledSource* source, Term* term)
     {
         append_phrase(source, "type ", term, phrase_type::KEYWORD);
@@ -84,6 +90,7 @@ namespace type_t {
         type->storageType = STORAGE_TYPE_TYPE;
         type->initialize = type_t::initialize;
         type->copy = copy;
+        type->gcRelease = type_gc_release;
         type->formatSource = formatSource;
         type->toString = toString;
     }

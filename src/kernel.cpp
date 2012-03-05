@@ -597,14 +597,14 @@ EXPORT void circa_shutdown()
     clear_type_contents(&TYPE_T);
     clear_type_contents(&VOID_T);
 
-    gc_collect();
-
     delete KERNEL;
     KERNEL = NULL;
 
     memset(&FUNCS, NULL, sizeof(FUNCS));
 
     name_dealloc_global_data();
+
+    gc_collect();
 }
 
 } // namespace circa

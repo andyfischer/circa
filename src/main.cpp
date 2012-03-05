@@ -2,6 +2,10 @@
 
 #include "circa/circa.h"
 
+#include "gc.h"
+#include "type.h"
+using namespace circa;
+
 int main(int argc, const char * args[])
 {
     circa_initialize();

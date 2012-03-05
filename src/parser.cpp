@@ -513,7 +513,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
         std::string typeName = functionName;
         methodType = find_name(branch, typeName.c_str());
-        functionName += "." + tokens.consumeStr(TK_IDENTIFIER);
+        functionName = functionName + "." + tokens.consumeStr(TK_IDENTIFIER);
 
         if (methodType == NULL || !is_type(methodType))
             return compile_error_for_line(branch, tokens, startPosition, "Not a type: " + typeName);
