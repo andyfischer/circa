@@ -34,6 +34,7 @@ ListData* allocate_empty_list(int capacity)
     result->refCount = 1;
     result->count = 0;
     result->capacity = capacity;
+    result->immutable = false;
     memset(result->items, 0, capacity * sizeof(caValue));
     for (int i=0; i < capacity; i++)
         initialize_null(&result->items[i]);
@@ -76,6 +77,11 @@ void free_list(ListData* data)
     debug_unregister_valid_object(data, LIST_OBJECT);
 }
 
+void list_make_immutable(ListData* data)
+{
+    data->immutable = true;
+}
+
 caValue* list_get(ListData* data, int index)
 {
     if (data == NULL)
@@ -89,8 +95,8 @@ ListData* list_touch(ListData* original)
 {
     if (original == NULL)
         return NULL;
-    ca_assert(original->refCount > 0);
-    if (original->refCount == 1)
+
+    if (!original->immutable)
         return original;
 
     ListData* copy = list_duplicate(original);
@@ -100,7 +106,7 @@ ListData* list_touch(ListData* original)
 
 ListData* list_duplicate(ListData* source)
 {
-    if (source == NULL || source->count == 0)
+    if (source == NULL)
         return NULL;
 
     assert_valid_list(source);
@@ -265,6 +271,20 @@ void list_remove_nulls(ListData** dataPtr)
 
 void list_copy(caValue* source, caValue* dest)
 {
+    ca_assert(source->value_type->storageType == STORAGE_TYPE_LIST);
+
+    // prepare 'dest'
+    change_type(dest, source->value_type);
+
+    ListData* sourceData = (ListData*) source->value_data.ptr;
+
+    if (sourceData == NULL)
+        return;
+
+    list_make_immutable(sourceData);
+    list_incref(sourceData);
+
+    dest->value_data.ptr = sourceData;
 }
 
 std::string list_to_string(ListData* value)
@@ -477,54 +497,6 @@ bool is_list_based_type(Type* type)
 
 namespace list_t {
 
-    void clear(ListData** data)
-    {
-        if (*data == NULL) return;
-        list_decref(*data);
-        *data = NULL;
-    }
-
-    caValue* append(ListData** data)
-    {
-        if (*data == NULL) {
-            *data = allocate_empty_list(1);
-        } else {
-            *data = list_touch(*data);
-            
-            if ((*data)->count == (*data)->capacity)
-                *data = list_double_capacity(*data);
-        }
-
-        ListData* d = *data;
-        d->count++;
-        return &d->items[d->count - 1];
-    }
-
-    int num_elements(ListData* list)
-    {
-        if (list == NULL) return 0;
-        return list->count;
-    }
-
-    int refcount(ListData* value)
-    {
-        if (value == NULL) return 0;
-        return value->refCount;
-    }
-
-    caValue* prepend(ListData** data)
-    {
-        append(data);
-
-        ListData* d = *data;
-
-        for (int i=d->count - 1; i >= 1; i--)
-            swap(&d->items[i], &d->items[i - 1]);
-
-        return &d->items[0];
-    }
-
-
     // caValue wrappers
     void tv_touch(caValue* value);
 
@@ -532,23 +504,6 @@ namespace list_t {
     {
         ca_assert(is_list(list));
         set_pointer(list, list_resize((ListData*) get_pointer(list), newSize));
-    }
-
-    void clear(caValue* list)
-    {
-        ca_assert(is_list(list));
-        clear((ListData**) &list->value_data);
-    }
-
-    caValue* append(caValue* list)
-    {
-        ca_assert(is_list(list));
-        return append((ListData**) &list->value_data);
-    }
-    caValue* prepend(caValue* list)
-    {
-        ca_assert(is_list(list));
-        return prepend((ListData**) &list->value_data);
     }
 
     void tv_initialize(Type* type, caValue* value)
@@ -570,12 +525,16 @@ namespace list_t {
     {
         ca_assert(is_list(value));
         ListData* data = (ListData*) get_pointer(value);
-        if (data == NULL) return;
+        if (data == NULL)
+            return;
         list_decref(data);
     }
 
     void tv_copy(Type* type, caValue* source, caValue* dest)
     {
+        list_copy(source, dest);
+
+#if 0
         ca_assert(is_list(source));
         set_null(dest);
         change_type(dest, type);
@@ -592,6 +551,7 @@ namespace list_t {
         set_pointer(dest, s);
     #endif
         #endif
+#endif
     }
 
     bool tv_equals(Type*, caValue* leftcaValue, caValue* right)
@@ -802,7 +762,7 @@ List::List()
 caValue*
 List::append()
 {
-    return list_t::append((caValue*) this);
+    return list_append(this);
 }
 void
 List::append(caValue* val)
@@ -818,13 +778,13 @@ caValue* List::insert(int index)
 caValue*
 List::prepend()
 {
-    return list_t::prepend((caValue*) this);
+    return list_insert(this, 0);
 }
 
 void
 List::clear()
 {
-    list_t::clear((caValue*) this);
+    list_resize(this, 0);
 }
 
 int
@@ -842,19 +802,20 @@ List::empty()
 caValue*
 List::get(int index)
 {
-    return list_get((caValue*) this, index);
+    return list_get(this, index);
 }
 
 void
 List::set(int index, caValue* value)
 {
-    list_t::tv_set_index((caValue*) this, index, value);
+    list_touch(this);
+    copy(value, list_get(this, index));
 }
 
 void
 List::resize(int newSize)
 {
-    list_t::resize(this, newSize); 
+    list_resize(this, newSize); 
 }
 
 caValue*

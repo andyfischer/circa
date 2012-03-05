@@ -12,6 +12,8 @@ struct ListData {
     int refCount;
     int count;
     int capacity;
+    bool immutable;
+    int checksum;
     caValue items[0];
     // items has size [capacity].
 
@@ -26,6 +28,7 @@ ListData* allocate_empty_list(int capacity);
 ListData* allocate_list(int num_elements);
 void list_decref(ListData* data);
 void free_list(ListData* data);
+void list_make_immutable(ListData* data);
 
 caValue* list_get(ListData* data, int index);
 int list_length(ListData* data);
@@ -40,12 +43,32 @@ void list_set_index(ListData* data, int index, caValue* value);
 
 // Functions for dealing with a list inside a caValue container
 
-caValue* list_get(caValue* value, int index);
-caValue* list_get_from_end(caValue* value, int index);
-int list_length(caValue* value);
-caValue* list_append(caValue* list);
-caValue* list_insert(caValue* list, int index);
+// Signal that we are about to start modifying the internals of the list.
+// (for example, modifying a result of list_get). If the value currently
+// holds an immutable shared copy, then this function will create a
+// duplicate list which is safe to modify.
 void list_touch(caValue* list);
+
+// Get an element by index. If the caller plans to modify the returned value,
+// or pass the value somewhere that may modify it (without making a copy),
+// then they must call list_touch before list_get.
+caValue* list_get(caValue* value, int index);
+
+// Get an element by index, counting from the end. For example, asking for
+// element 0 returns the last element. See caveats for list_get.
+caValue* list_get_from_end(caValue* value, int index);
+
+// Return the number of elements in the list.
+int list_length(caValue* value);
+
+// Appends an element to the list and returns it. This function calls
+// list_touch, so the returned value is safe to modify.
+caValue* list_append(caValue* list);
+
+// Inserts a new value at the given index, and returns it. This function
+// calls list_touch, so the returned value is safe to modify.
+caValue* list_insert(caValue* list, int index);
+
 void list_remove_index(caValue* list, int index);
 void list_resize(caValue* list, int size);
 void list_remove_and_replace_with_last_element(caValue* list, int index);
@@ -97,8 +120,6 @@ namespace list_t {
     void setup_type(Type*);
     void tv_initialize(Type*, caValue*);
     std::string tv_to_string(caValue* value);
-    caValue* append(caValue* list);
-    caValue* prepend(caValue* list);
 }
 
 // Wrapper type to use a caValue as a List.

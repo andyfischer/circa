@@ -71,6 +71,7 @@ struct Type
 
     typedef void (*GCListReferences)(CircaObject* object, GCReferenceList* list, GCColor color);
     typedef void (*GCRelease)(CircaObject* object);
+    typedef int (*ChecksumFunc)(caValue* value);
 
     // CircaObject header, must be the first field.
     CircaObject header;
@@ -106,6 +107,7 @@ struct Type
     RemapPointers remapPointers;
     HashFunc hashFunc;
     VisitHeap visitHeap;
+    ChecksumFunc checksum;
 
     GCListReferences gcListReferences;
     GCRelease gcRelease;

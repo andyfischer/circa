@@ -126,6 +126,7 @@ Type::Type() :
     remapPointers(NULL),
     hashFunc(NULL),
     visitHeap(NULL),
+    checksum(NULL),
     gcListReferences(NULL),
     gcRelease(NULL),
     parent(NULL),
