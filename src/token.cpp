@@ -717,7 +717,16 @@ TokenStream::next(int lookahead) const
 
 std::string TokenStream::nextStr(int lookahead) const
 {
-    return _sourceText.substr(next(lookahead).charIndex, next(lookahead).length());
+    int startPos = next(lookahead).charIndex;
+    int length = next(lookahead).length();
+    return std::string(_sourceText.c_str() + startPos, length);
+}
+
+void TokenStream::getNextStr(caValue* value, int lookahead) const
+{
+    int startPos = next(lookahead).charIndex;
+    int length = next(lookahead).length();
+    circa_set_string_size(value, _sourceText.c_str() + startPos, length);
 }
 
 int
@@ -779,6 +788,7 @@ TokenStream::consume(int match)
 
     _position++;
 }
+
 std::string
 TokenStream::consumeStr(int match)
 {
@@ -790,7 +800,7 @@ TokenStream::consumeStr(int match)
 void
 TokenStream::consumeStr(caValue* output, int match)
 {
-    set_string(output, nextStr());
+    getNextStr(output, 0);
     consume(match);
 }
 

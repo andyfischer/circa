@@ -157,6 +157,7 @@ struct TokenStream
 
     Token const& next(int lookahead=0) const;
     std::string nextStr(int lookahead=0) const;
+    void getNextStr(caValue* value, int lookahead) const;
 
     // Returns the position of the next non-whitespace token. Returns -1 if
     // the end of the stream was reached before anything was found.

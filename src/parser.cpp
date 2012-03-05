@@ -493,11 +493,17 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     if (tokens.finished()
             || (!tokens.nextIs(TK_IDENTIFIER)
-            && !token_is_allowed_as_function_name(tokens.next().match)))
+            && !token_is_allowed_as_function_name(tokens.next().match))) {
         return compile_error_for_line(branch, tokens, startPosition, "Expected identifier");
+    }
 
     // Function name
-    std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
+    caValue functionName;
+    tokens.consumeStr(&functionName, TK_IDENTIFIER);
+
+    caValue functionName2;
+    caValue functionName3;
+    caValue functionName4;
 
     bool isMethod = false;
     Term* methodType = NULL;
@@ -511,19 +517,26 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (!tokens.nextIs(TK_IDENTIFIER))
             return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after .");
 
-        std::string typeName = functionName;
-        methodType = find_name(branch, typeName.c_str());
-        functionName = functionName + "." + tokens.consumeStr(TK_IDENTIFIER);
+        caValue typeName;
+        copy(&functionName, &typeName);
+        methodType = find_name(branch, as_cstring(&typeName));
+        string_append(&functionName, ".");
+        string_append(&functionName, tokens.consumeStr(TK_IDENTIFIER).c_str());
 
         if (methodType == NULL || !is_type(methodType))
-            return compile_error_for_line(branch, tokens, startPosition, "Not a type: " + typeName);
+            return compile_error_for_line(branch, tokens, startPosition,
+                      "Not a type: " + as_string(&typeName));
     }
 
-    Term* result = create_function(branch, functionName.c_str());
+    copy(&functionName, &functionName2);
+    copy(&functionName, &functionName3);
+    copy(&functionName, &functionName4);
+
+    Term* result = create_function(branch, as_cstring(&functionName3));
 
     Function* attrs = as_function(result);
     set_starting_source_location(result, startPosition, tokens);
-    attrs->name = functionName;
+    attrs->name = as_string(&functionName2);
 
     if (methodType != NULL)
         result->setBoolProp("syntax:methodDecl", true);
@@ -552,10 +565,12 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     Branch* contents = nested_contents(result);
 
-    int qualifierLoc = find_qualified_name_separator(functionName.c_str());
+    int qualifierLoc = find_qualified_name_separator(as_cstring(&functionName4));
     if (qualifierLoc != -1)
         return compile_error_for_line(branch, tokens, startPosition,
-                "Can't declare function with qualified name: " + functionName);
+                "Can't declare function with qualified name: " + as_string(&functionName4));
+
+    set_null(&functionName);
 
     // Consume input arguments
     int inputIndex = 0;

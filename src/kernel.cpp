@@ -589,7 +589,7 @@ EXPORT void circa_shutdown()
     delete KERNEL;
     KERNEL = NULL;
 
-    memset(&FUNCS, NULL, sizeof(FUNCS));
+    memset(&FUNCS, 0, sizeof(FUNCS));
 
     name_dealloc_global_data();
 

@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sys/stat.h>
 
+#include "common_headers.h"
+
 #include "circa/file.h"
 
 extern "C" {
