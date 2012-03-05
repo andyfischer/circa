@@ -15,7 +15,8 @@ struct ListData {
     caValue items[0];
     // items has size [capacity].
 
-    std::string toStr();
+    // for debugging
+    void dump();
 };
 
 void assert_valid_list(ListData* list);
@@ -30,12 +31,10 @@ ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
 caValue* list_append(ListData** dataPtr);
 caValue* list_insert(ListData** dataPtr, int index);
-int list_size(ListData* data);
+int list_length(ListData* data);
 caValue* list_get_index(ListData* data, int index);
 void list_set_index(ListData* data, int index, caValue* value);
 
-int list_get_length(caValue* value);
-int list_size(caValue* value);
 int list_length(caValue* value);
 caValue* list_get(caValue* value, int index);
 caValue* list_get_index(caValue* value, int index);

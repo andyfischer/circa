@@ -38,7 +38,7 @@ namespace implicit_state_function {
     {
         caValue* container = INPUT(0);
         int index = CALLER->intProp("index");
-        if (!is_list(container) || index >= list_get_length(container))
+        if (!is_list(container) || index >= list_length(container))
             set_null(OUTPUT);
         else
             copy(list_get_index(container, index), OUTPUT);
@@ -68,7 +68,7 @@ namespace implicit_state_function {
     {
         caValue* container = INPUT(0);
         int index = INT_INPUT(1);
-        if (!is_list(container) || index >= list_get_length(container))
+        if (!is_list(container) || index >= list_length(container))
             set_null(OUTPUT);
         else
             copy(list_get_index(container, index), OUTPUT);
@@ -83,7 +83,7 @@ namespace implicit_state_function {
 
         if (!is_list(container))
             set_list(container, index+1);
-        if (list_size(container) <= index)
+        if (list_length(container) <= index)
             list_resize(container, index+1);
 
         copy(value, list_get_index(container, index));

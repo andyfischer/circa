@@ -8,9 +8,10 @@
 
 namespace circa {
 
-std::string ListData::toStr()
+void ListData::dump()
 {
-    return list_to_string(this);
+    std::string s = list_to_string(this);
+    printf("%s\n", s.c_str());
 }
 
 void assert_valid_list(ListData* list)
@@ -37,8 +38,6 @@ ListData* allocate_empty_list(int capacity)
     for (int i=0; i < capacity; i++)
         initialize_null(&result->items[i]);
 
-    //std::cout << "created list " << result << std::endl;
-
     return result;
 }
 
@@ -57,16 +56,12 @@ void list_decref(ListData* data)
 
     if (data->refCount == 0)
         free_list(data);
-
-    //std::cout << "decref " << data << " to " << data->refCount << std::endl;
 }
 
 void list_incref(ListData* data)
 {
     assert_valid_list(data);
     data->refCount++;
-
-    //std::cout << "incref " << data << " to " << data->refCount << std::endl;
 }
 
 void free_list(ListData* data)
@@ -183,6 +178,7 @@ ListData* list_resize(ListData* original, int numElements)
 
     return result;
 }
+
 caValue* list_append(ListData** dataPtr)
 {
     if (*dataPtr == NULL) {
@@ -211,7 +207,8 @@ caValue* list_insert(ListData** dataPtr, int index)
 
     return &data->items[index];
 }
-int list_size(ListData* data)
+
+int list_length(ListData* data)
 {
     if (data == NULL)
         return 0;
@@ -280,13 +277,14 @@ std::string list_to_string(ListData* value)
     return out.str();
 }
 
-int list_size(caValue* value)
+int list_length(caValue* value)
 {
     ListData* s = (ListData*) get_pointer(value);
     if (s == NULL)
         return 0;
     return s->count;
 }
+
 void list_slice(caValue* original, int start, int end, caValue* result)
 {
     if (end < 0)
@@ -299,18 +297,6 @@ void list_slice(caValue* original, int start, int end, caValue* result)
         copy(list_get(original, i + start), list_get(result, i));
 }
 
-int list_get_length(caValue* value)
-{
-    ListData* s = (ListData*) get_pointer(value);
-    if (s == NULL)
-        return 0;
-    return s->count;
-}
-
-int list_length(caValue* value)
-{
-    return list_get_length(value);
-}
 caValue* list_get(caValue* value, int index)
 {
     return list_get_index(value, index);
@@ -400,7 +386,7 @@ ListType list_get_parameter_type(caValue* parameter)
         return LIST_TYPED_UNSIZED;
 
     if (is_list(parameter)) {
-        if ((list_get_length(parameter) == 2) && is_list(list_get_index(parameter, 0)))
+        if ((list_length(parameter) == 2) && is_list(list_get_index(parameter, 0)))
             return LIST_TYPED_SIZED_NAMED;
         else
             return LIST_TYPED_SIZED;
@@ -793,28 +779,11 @@ namespace list_t {
         type->getIndex = list_get_index;
         type->setIndex = tv_set_index;
         type->getField = tv_get_field;
-        type->numElements = list_get_length;
+        type->numElements = list_length;
         type->touch = tv_touch;
         type->staticTypeQuery = tv_static_type_query;
         type->visitHeap = tv_visit_heap;
     }
-
-
-/*
-    CA_FUNCTION(append)
-    {
-        copy(INPUT(0), OUTPUT);
-        List* result = List::checkCast(OUTPUT);
-        caValue* value = INPUT(1);
-        copy(value, result->append());
-    }
-
-    CA_FUNCTION(count)
-    {
-        List* list = List::checkCast(INPUT(0));
-        set_int(OUTPUT, list->length());
-    }
-*/
 
 } // namespace list_t
 
@@ -856,7 +825,7 @@ List::clear()
 int
 List::length()
 {
-    return list_get_length(this);
+    return list_length(this);
 }
 
 bool

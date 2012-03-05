@@ -230,7 +230,7 @@ void Branch::removeNulls()
 {
     if (is_list(&pendingUpdates)) {
         for (int i=0; i < _terms.length(); i++)
-            if ((_terms[i] == NULL) && i < list_get_length(&pendingUpdates))
+            if ((_terms[i] == NULL) && i < list_length(&pendingUpdates))
                 list_remove_index(&pendingUpdates, i);
     }
 
