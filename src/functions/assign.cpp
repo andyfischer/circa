@@ -43,9 +43,9 @@ namespace assign_function {
     {
         Term* set = NULL;
 
-        if (term->function == GET_INDEX_FUNC) {
+        if (term->function == FUNCS.get_index) {
             set = SET_INDEX_FUNC;
-        } else if (term->function == GET_FIELD_FUNC) {
+        } else if (term->function == FUNCS.get_field) {
             set = SET_FIELD_FUNC;
         } else {
             return NULL;

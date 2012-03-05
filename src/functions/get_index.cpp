@@ -63,10 +63,10 @@ namespace get_index_function {
     void setup(Branch* kernel)
     {
         CA_SETUP_FUNCTIONS(kernel);
-        GET_INDEX_FUNC = kernel->get("get_index");
+        FUNCS.get_index = kernel->get("get_index");
         GET_INDEX_FROM_BRANCH_FUNC = kernel->get("get_index_from_branch");
-        as_function(GET_INDEX_FUNC)->specializeType = specializeType;
-        as_function(GET_INDEX_FUNC)->formatSource = formatSource;
+        as_function(FUNCS.get_index)->specializeType = specializeType;
+        as_function(FUNCS.get_index)->formatSource = formatSource;
     }
 }
 }

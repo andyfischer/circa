@@ -14,13 +14,13 @@ void test_comment()
     Branch branch;
     parser::compile(&branch, parser::statement, "-- this is a comment");
 
-    test_assert(branch[0]->function == COMMENT_FUNC);
+    test_assert(branch[0]->function == FUNCS.comment);
     test_equals(branch[0]->stringProp("comment"), "-- this is a comment");
     test_assert(branch.length() == 1);
 
     parser::compile(&branch, parser::statement, "--");
     test_assert(branch.length() == 2);
-    test_assert(branch[1]->function == COMMENT_FUNC);
+    test_assert(branch[1]->function == FUNCS.comment);
     test_equals(branch[1]->stringProp("comment"), "--");
 }
 
@@ -29,7 +29,7 @@ void test_blank_line()
     Branch branch;
     parser::compile(&branch, parser::statement, "\n");
     test_assert(branch.length() == 1);
-    test_assert(branch[0]->function == COMMENT_FUNC);
+    test_assert(branch[0]->function == FUNCS.comment);
     test_equals(branch[0]->stringProp("comment"), "");
 }
 
@@ -280,7 +280,7 @@ void test_implicit_copy_by_identifier()
     Term* a = branch.compile("a = 1");
     Term* b = branch.compile("b = a");
 
-    test_assert(b->function == COPY_FUNC);
+    test_assert(b->function == FUNCS.copy);
     test_assert(b->input(0) == a);
 }
 
@@ -415,7 +415,7 @@ void test_array_index_access()
     evaluate_branch(&branch);
 
     test_assert(b);
-    test_assert(b->function == GET_INDEX_FUNC);
+    test_assert(b->function == FUNCS.get_index);
     test_equals(b->asInt(), 1);
 }
 
@@ -458,7 +458,7 @@ void test_whitespace_after_statement()
     test_assert(branch[0]->asInt() == 1);
     test_assert(branch[0]->name == "a");
     test_equals(branch[0]->stringProp("syntax:lineEnding"), "\n");
-    test_assert(branch[1]->function == COMMENT_FUNC);
+    test_assert(branch[1]->function == FUNCS.comment);
     test_equals(branch[1]->stringProp("comment"), "");
     test_equals(branch[1]->stringProp("syntax:lineEnding"), "\n");
 

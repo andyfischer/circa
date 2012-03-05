@@ -256,14 +256,14 @@ void test_duplicate_get_field_by_name()
     branch.compile("v = mytype()");
     Term* b = branch.compile("b = v.f");
 
-    test_assert(b->function == GET_FIELD_FUNC);
+    test_assert(b->function == FUNCS.get_field);
 
     Branch dupe;
     duplicate_branch(&branch, &dupe);
 
     b = dupe["b"];
 
-    test_assert(b->function == GET_FIELD_FUNC);
+    test_assert(b->function == FUNCS.get_field);
 
     test_assert(&branch);
     test_assert(&dupe);

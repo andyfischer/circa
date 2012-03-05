@@ -49,7 +49,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     Term* term = branch->appendNew();
 
     // Position the term before any output_placeholder terms.
-    if (function != OUTPUT_PLACEHOLDER_FUNC && outputCount > 0)
+    if (function != FUNCS.output && outputCount > 0)
         branch->move(term, branch->length() - outputCount - 1);
 
     if (name != "")
@@ -206,7 +206,7 @@ void change_function(Term* term, Term* function)
     // Don't append user for certain functions. Need to make this more robust.
     if (function != NULL
             && function != FUNCS.value
-            && function != INPUT_PLACEHOLDER_FUNC) {
+            && function != FUNCS.input) {
         append_user(term, function);
     }
 
@@ -476,7 +476,7 @@ Term* get_input_placeholder(Branch* branch, int index)
     if (index >= branch->length())
         return NULL;
     Term* term = branch->get(index);
-    if (term == NULL || term->function != INPUT_PLACEHOLDER_FUNC)
+    if (term == NULL || term->function != FUNCS.input)
         return NULL;
     return term;
 }
@@ -486,7 +486,7 @@ Term* get_output_placeholder(Branch* branch, int index)
     if (index >= branch->length())
         return NULL;
     Term* term = branch->getFromEnd(index);
-    if (term == NULL || term->function != OUTPUT_PLACEHOLDER_FUNC)
+    if (term == NULL || term->function != FUNCS.output)
         return NULL;
     return term;
 }
@@ -507,11 +507,11 @@ int count_output_placeholders(Branch* branch)
 }
 bool is_input_placeholder(Term* term)
 {
-    return term->function == INPUT_PLACEHOLDER_FUNC;
+    return term->function == FUNCS.input;
 }
 bool is_output_placeholder(Term* term)
 {
-    return term->function == OUTPUT_PLACEHOLDER_FUNC;
+    return term->function == FUNCS.output;
 }
 bool has_variable_args(Branch* branch)
 {
@@ -543,20 +543,20 @@ Term* find_output_placeholder_with_name(Branch* branch, const char* name)
 Term* append_input_placeholder(Branch* branch)
 {
     int count = count_input_placeholders(branch);
-    Term* term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
+    Term* term = apply(branch, FUNCS.input, TermList());
     branch->move(term, count);
     return term;
 }
 Term* append_output_placeholder(Branch* branch, Term* result)
 {
     int count = count_output_placeholders(branch);
-    Term* term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
+    Term* term = apply(branch, FUNCS.output, TermList(result));
     branch->move(term, branch->length() - count - 1);
     return term;
 }
 Term* prepend_output_placeholder(Branch* branch, Term* result)
 {
-    return apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
+    return apply(branch, FUNCS.output, TermList(result));
 }
 
 Branch* term_get_function_details(Term* call)
@@ -647,7 +647,7 @@ Term* term_get_input_placeholder(Term* call, int index)
     if (index >= contents->length())
         return NULL;
     Term* term = contents->get(index);
-    if (term->function != INPUT_PLACEHOLDER_FUNC)
+    if (term->function != FUNCS.input)
         return NULL;
     return term;
 }
@@ -671,7 +671,7 @@ Term* term_get_output_placeholder(Term* call, int index)
     if (index >= contents->length())
         return NULL;
     Term* term = contents->getFromEnd(index);
-    if (term->function != OUTPUT_PLACEHOLDER_FUNC)
+    if (term->function != FUNCS.output)
         return NULL;
     return term;
 }
@@ -686,7 +686,7 @@ Term* find_open_state_result(Branch* branch, int position)
         Term* term = branch->get(i);
         if (term == NULL)
             continue;
-        if (term->function == INPUT_PLACEHOLDER_FUNC && function_is_state_input(term))
+        if (term->function == FUNCS.input && function_is_state_input(term))
             return term;
         if (term->function == FUNCS.pack_state
                 || term->function == FUNCS.pack_state_list_n)
@@ -767,7 +767,7 @@ void update_implicit_pack_call(Term* term)
     // a pack_state() call.
     if (term->name != "") {
         Term* firstBinding = branch->findFirstBinding(term->nameSymbol);
-        if (firstBinding->function == DECLARED_STATE_FUNC) {
+        if (firstBinding->function == FUNCS.declared_state) {
             Term* pack = apply(branch, FUNCS.pack_state,
                 TermList(find_open_state_result(branch, branch->length()), term, firstBinding));
             move_after(pack, term);
@@ -844,13 +844,13 @@ Term* find_last_non_comment_expression(Branch* branch)
     for (int i = branch->length() - 1; i >= 0; i--) {
         if (branch->get(i) == NULL)
             continue;
-        if (branch->get(i)->function == OUTPUT_PLACEHOLDER_FUNC)
+        if (branch->get(i)->function == FUNCS.output)
             continue;
-        if (branch->get(i)->function == INPUT_PLACEHOLDER_FUNC)
+        if (branch->get(i)->function == FUNCS.input)
             continue;
         if (branch->get(i)->name == "#outer_rebinds")
             continue;
-        if (branch->get(i)->function != COMMENT_FUNC)
+        if (branch->get(i)->function != FUNCS.comment)
             return branch->get(i);
     }
     return NULL;
@@ -918,7 +918,7 @@ Term* find_state_output(Branch* branch)
 {
     for (int i=branch->length() - 1; i >= 0; i--) {
         Term* placeholder = branch->get(i);
-        if (placeholder->function != OUTPUT_PLACEHOLDER_FUNC)
+        if (placeholder->function != FUNCS.output)
             break;
         if (function_is_state_input(placeholder))
             return placeholder;
@@ -938,7 +938,7 @@ Term* append_state_input(Branch* branch)
 
     int inputCount = count_input_placeholders(branch);
 
-    term = apply(branch, INPUT_PLACEHOLDER_FUNC, TermList());
+    term = apply(branch, FUNCS.input, TermList());
     branch->move(term, inputCount);
     term->setBoolProp("state", true);
     term->setBoolProp("hiddenInput", true);
@@ -956,7 +956,7 @@ Term* insert_state_output(Branch* branch)
         return term;
     }
     
-    term = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(openStateResult));
+    term = apply(branch, FUNCS.output, TermList(openStateResult));
     term->setBoolProp("state", true);
     hide_from_source(term);
     return term;
@@ -1148,7 +1148,7 @@ void check_to_add_state_output_placeholder(Branch* branch)
     if (result == NULL)
         return;
 
-    Term* output = apply(branch, OUTPUT_PLACEHOLDER_FUNC, TermList(result));
+    Term* output = apply(branch, FUNCS.output, TermList(result));
     output->setBoolProp("state", true);
 }
 

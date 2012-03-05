@@ -70,13 +70,13 @@ namespace for_function {
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
         FUNCS.loop_output = import_function(kernel, evaluate_loop_output, "loop_output(int, any)");
 
-        DISCARD_FUNC = import_function(kernel, evaluate_discard, "discard()");
-        as_function(DISCARD_FUNC)->formatSource = discard_formatSource;
-        hide_from_docs(DISCARD_FUNC);
+        FUNCS.discard = import_function(kernel, evaluate_discard, "discard()");
+        as_function(FUNCS.discard)->formatSource = discard_formatSource;
+        hide_from_docs(FUNCS.discard);
 
-        BREAK_FUNC = import_function(kernel, evaluate_break, "break()");
-        as_function(BREAK_FUNC)->formatSource = break_formatSource;
-        hide_from_docs(BREAK_FUNC);
+        FUNCS.break_func = import_function(kernel, evaluate_break, "break()");
+        as_function(FUNCS.break_func)->formatSource = break_formatSource;
+        hide_from_docs(FUNCS.break_func);
 
         CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
         as_function(CONTINUE_FUNC)->formatSource = continue_formatSource;

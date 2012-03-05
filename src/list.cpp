@@ -716,7 +716,7 @@ namespace list_t {
 
         // Special case when looking at a call to list(); look at inputs instead of
         // looking at the result.
-        if (subject && subject->function == LIST_FUNC)
+        if (subject && subject->function == FUNCS.list)
         {
             if (subject->numInputs() != expectedElementTypes.length())
                 return query->fail();

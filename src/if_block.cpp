@@ -182,7 +182,7 @@ Term* if_block_append_case(Term* ifBlock, Term* input)
     for (int i=0; i < contents->length(); i++) {
         Term* term = contents->get(i);
 
-        if (term->function == INPUT_PLACEHOLDER_FUNC)
+        if (term->function == FUNCS.input)
             insertPos = term->index + 1;
 
         // Insert position is right after the last non-default case.
@@ -209,7 +209,7 @@ void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
     if_block_fix_outer_pointers(ifBlock, nested_contents(caseTerm));
 
     // Add an output placeholder
-    apply(nested_contents(caseTerm), OUTPUT_PLACEHOLDER_FUNC,
+    apply(nested_contents(caseTerm), FUNCS.output,
         TermList(find_last_non_comment_expression(nested_contents(caseTerm))));
 
     //std::cout << "finished appended case.." << std::endl;
@@ -395,7 +395,7 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
             // remove names that are already outputs
             for (int i=0; i < names.length(); i++) {
                 Term* existing = contents->get(as_cstring(names[i]));
-                if (existing != NULL && existing->function == OUTPUT_PLACEHOLDER_FUNC)
+                if (existing != NULL && existing->function == FUNCS.output)
                     set_null(names[i]);
             }
 
@@ -499,7 +499,7 @@ void if_block_post_setup(Term* ifCall)
 {
     Branch* contents = nested_contents(ifCall);
     if (get_output_placeholder(contents, 0) == NULL)
-        apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+        apply(contents, FUNCS.output, TermList(NULL));
 }
 
 CA_FUNCTION(evaluate_if_block)
@@ -510,7 +510,7 @@ CA_FUNCTION(evaluate_if_block)
     Branch* acceptedBranch = NULL;
 
     int termIndex = 0;
-    while (contents->get(termIndex)->function == INPUT_PLACEHOLDER_FUNC)
+    while (contents->get(termIndex)->function == FUNCS.input)
         termIndex++;
 
     for (; termIndex < contents->length(); termIndex++) {

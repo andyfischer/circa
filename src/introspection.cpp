@@ -29,7 +29,7 @@ bool is_statement(Term* term)
 
 bool is_comment(Term* term)
 {
-    return term->function == COMMENT_FUNC;
+    return term->function == FUNCS.comment;
 }
 
 bool is_empty_comment(Term* term)
@@ -248,7 +248,7 @@ void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string
 
         // Ignore terms that are just a simple copy
         Term* result = branch->get(name);
-        if (result->function == COPY_FUNC && result->input(0) == outer)
+        if (result->function == FUNCS.copy && result->input(0) == outer)
             continue;
 
         names.push_back(name);

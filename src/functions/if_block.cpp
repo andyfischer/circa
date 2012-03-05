@@ -12,7 +12,7 @@ namespace if_block_function {
         Branch* contents = nested_contents(term);
 
         int index = 0;
-        while (contents->get(index)->function == INPUT_PLACEHOLDER_FUNC)
+        while (contents->get(index)->function == FUNCS.input)
             index++;
 
         bool firstCase = true;

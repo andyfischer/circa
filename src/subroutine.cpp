@@ -98,7 +98,7 @@ Term* find_enclosing_subroutine(Term* term)
 
 int get_input_index_of_placeholder(Term* inputPlaceholder)
 {
-    ca_assert(inputPlaceholder->function == INPUT_PLACEHOLDER_FUNC);
+    ca_assert(inputPlaceholder->function == FUNCS.input);
     return inputPlaceholder->index - 1;
 }
 

@@ -59,9 +59,9 @@ namespace list_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
 
-        LIST_FUNC = kernel->get("list");
+        FUNCS.list = kernel->get("list");
 
-        as_function(LIST_FUNC)->specializeType = specializeType;
+        as_function(FUNCS.list)->specializeType = specializeType;
     }
 }
 }

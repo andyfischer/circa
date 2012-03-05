@@ -25,7 +25,7 @@ void for_loop_fix_state_input(Branch* contents);
 Term* for_loop_get_iterator(Branch* contents)
 {
     for (int i=0; i < contents->length(); i++)
-        if (contents->get(i)->function == GET_INDEX_FUNC)
+        if (contents->get(i)->function == FUNCS.get_index)
             return contents->get(i);
     return NULL;
 }
@@ -55,14 +55,14 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
     Branch* contents = nested_contents(forTerm);
 
     // Add input placeholder for the list input
-    Term* listInput = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList());
+    Term* listInput = apply(contents, FUNCS.input, TermList());
 
     // Add loop_index()
     Term* index = apply(contents, FUNCS.loop_index, TermList(listInput));
     hide_from_source(index);
 
     // Add loop_iterator()
-    Term* iterator = apply(contents, GET_INDEX_FUNC, TermList(listInput, index),
+    Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index),
         iteratorName);
     change_declared_type(iterator, infer_type_of_get_index(forTerm->input(0)));
     hide_from_source(iterator);
@@ -123,7 +123,7 @@ void add_implicit_placeholders(Term* forTerm)
 
         Term* result = contents->get(name);
 
-        Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
+        Term* input = apply(contents, FUNCS.input, TermList(), name);
         change_declared_type(input, original->type);
         contents->move(input, inputIndex);
 
@@ -133,7 +133,7 @@ void add_implicit_placeholders(Term* forTerm)
         for (int i=0; i < contents->length(); i++)
             remap_pointers_quick(contents->get(i), original, input);
 
-        Term* term = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(result), name);
+        Term* term = apply(contents, FUNCS.output, TermList(result), name);
 
         // Move output into the correct output slot
         contents->move(term, contents->length() - 1 - inputIndex);
@@ -173,7 +173,7 @@ void finish_for_loop(Term* forTerm)
     Branch* contents = nested_contents(forTerm);
 
     // Add a primary output
-    apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+    apply(contents, FUNCS.output, TermList(NULL));
 
     pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);

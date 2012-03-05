@@ -12,8 +12,8 @@ namespace comment_function {
 
     void setup(Branch* kernel)
     {
-        COMMENT_FUNC = import_function(kernel, NULL, "comment()");
-        as_function(COMMENT_FUNC)->formatSource = formatSource;
+        FUNCS.comment = import_function(kernel, NULL, "comment()");
+        as_function(FUNCS.comment)->formatSource = formatSource;
     }
 }
 }

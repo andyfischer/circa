@@ -22,7 +22,7 @@ void handle_feedback_event(EvalContext* context, Term* target, caValue* desired)
     // feedback events, or dispatching feedback to multiple sources. All we handle
     // is dispatching across copy/input terms.
 
-    if (target->function == COPY_FUNC) {
+    if (target->function == FUNCS.copy) {
         return handle_feedback_event(context, target->input(0), desired);
     } else if (target->function == FUNCS.value) {
         bool success = cast(desired, declared_type(target), target);
@@ -31,7 +31,7 @@ void handle_feedback_event(EvalContext* context, Term* target, caValue* desired)
                 << name_to_string(desired->value_type->name) << " to "
                 << name_to_string(declared_type(target)->name) << std::endl;
         }
-    } else if (target->function == INPUT_PLACEHOLDER_FUNC) {
+    } else if (target->function == FUNCS.input) {
 
 #if 0 // FIXME
         ca_assert(context != NULL);
@@ -57,7 +57,7 @@ void handle_feedback_event(EvalContext* context, Term* target, caValue* desired)
 
         handle_feedback_event(context, caller->input(input), desired);
 #endif
-    } else if (target->function == LIST_FUNC) {
+    } else if (target->function == FUNCS.list) {
 
         ca_assert(is_list(desired));
 

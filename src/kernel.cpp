@@ -63,12 +63,8 @@ Term* ALIAS_FUNC = NULL;
 Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
 Term* BRANCH_UNEVALUATED_FUNC = NULL;
-Term* BREAK_FUNC = NULL;
-Term* COMMENT_FUNC = NULL;
 Term* CONTINUE_FUNC = NULL;
-Term* COPY_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
-Term* DISCARD_FUNC = NULL;
 Term* DIV_FUNC = NULL;
 Term* DO_ONCE_FUNC = NULL;
 Term* ERRORED_FUNC = NULL;
@@ -76,26 +72,20 @@ Term* EXTRA_OUTPUT_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
 Term* FOR_FUNC = NULL;
-Term* GET_FIELD_FUNC = NULL;
-Term* GET_INDEX_FUNC = NULL;
 Term* GET_INDEX_FROM_BRANCH_FUNC = NULL;
-Term* DECLARED_STATE_FUNC = NULL;
 Term* IF_BLOCK_FUNC = NULL;
 Term* COND_FUNC = NULL;
 Term* INCLUDE_FUNC = NULL;
-Term* INPUT_PLACEHOLDER_FUNC = NULL;
 Term* INSTANCE_FUNC = NULL;
 Term* LAMBDA_FUNC = NULL;
 Term* LENGTH_FUNC = NULL;
 Term* LIST_TYPE = NULL;
-Term* LIST_FUNC = NULL;
 Term* LIST_APPEND_FUNC = NULL;
 Term* LOAD_SCRIPT_FUNC = NULL;
 Term* MULT_FUNC = NULL;
 Term* NAMESPACE_FUNC = NULL;
 Term* NEG_FUNC = NULL;
 Term* NOT_FUNC = NULL;
-Term* OUTPUT_PLACEHOLDER_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
 Term* RANGE_FUNC = NULL;
 Term* REF_FUNC = NULL;
@@ -355,13 +345,13 @@ void bootstrap_kernel()
     create_type_value(kernel, &BRANCH_T, "Branch");
 
     // Setup output_placeholder() function, needed to declare functions properly.
-    OUTPUT_PLACEHOLDER_FUNC = create_value(kernel, &FUNCTION_T, "output_placeholder");
-    function_t::initialize(&FUNCTION_T, OUTPUT_PLACEHOLDER_FUNC);
-    initialize_function(OUTPUT_PLACEHOLDER_FUNC);
-    as_function(OUTPUT_PLACEHOLDER_FUNC)->name = "output_placeholder";
-    as_function(OUTPUT_PLACEHOLDER_FUNC)->evaluate = evaluate_output_placeholder;
-    as_function(OUTPUT_PLACEHOLDER_FUNC)->specializeType = output_placeholder_specializeType;
-    ca_assert(function_get_output_type(OUTPUT_PLACEHOLDER_FUNC, 0) == &ANY_T);
+    FUNCS.output = create_value(kernel, &FUNCTION_T, "output_placeholder");
+    function_t::initialize(&FUNCTION_T, FUNCS.output);
+    initialize_function(FUNCS.output);
+    as_function(FUNCS.output)->name = "output_placeholder";
+    as_function(FUNCS.output)->evaluate = evaluate_output_placeholder;
+    as_function(FUNCS.output)->specializeType = output_placeholder_specializeType;
+    ca_assert(function_get_output_type(FUNCS.output, 0) == &ANY_T);
 
     // Fix some holes in value() function
     Function* attrs = as_function(valueFunc);
@@ -370,11 +360,11 @@ void bootstrap_kernel()
     ca_assert(function_get_output_type(valueFunc, 0) == &ANY_T);
 
     // input_placeholder() is needed before we can declare a function with inputs
-    INPUT_PLACEHOLDER_FUNC = import_function(kernel, NULL, "input_placeholder() -> any");
+    FUNCS.input = import_function(kernel, NULL, "input_placeholder() -> any");
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
-    apply(function_contents(as_function(OUTPUT_PLACEHOLDER_FUNC)),
-        INPUT_PLACEHOLDER_FUNC, TermList())->setBoolProp("optional", true);
+    apply(function_contents(as_function(FUNCS.output)),
+        FUNCS.input, TermList())->setBoolProp("optional", true);
 
     // FileSignature is used in some builtin functions
     TYPES.file_signature = unbox_type(parse_type(kernel,

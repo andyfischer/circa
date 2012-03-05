@@ -20,9 +20,9 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
 {
     clear_branch(out);
 
-    Term* input0 = apply(out, INPUT_PLACEHOLDER_FUNC, TermList(), "in0");
+    Term* input0 = apply(out, FUNCS.input, TermList(), "in0");
     change_declared_type(input0, lhsType);
-    Term* input1 = apply(out, INPUT_PLACEHOLDER_FUNC, TermList(), "in1");
+    Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
     change_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FOR_FUNC, TermList(input0));
@@ -34,16 +34,16 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
 
     finish_for_loop(loop);
 
-    apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(loop));
+    apply(out, FUNCS.output, TermList(loop));
 }
 
 void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type* rhsType)
 {
     clear_branch(out);
 
-    Term* input0 = apply(out, INPUT_PLACEHOLDER_FUNC, TermList(), "in0");
+    Term* input0 = apply(out, FUNCS.input, TermList(), "in0");
     change_declared_type(input0, lhsType);
-    Term* input1 = apply(out, INPUT_PLACEHOLDER_FUNC, TermList(), "in1");
+    Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
     change_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FOR_FUNC, TermList(input0));
@@ -53,12 +53,12 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     Term* iterator = loopContents->get("it");
 
     Term* index = find_term_with_function(loopContents, FUNCS.loop_index);
-    Term* get_index = apply(loopContents, GET_INDEX_FUNC, TermList(input1, index));
+    Term* get_index = apply(loopContents, FUNCS.get_index, TermList(input1, index));
     apply(loopContents, func, TermList(iterator, get_index));
 
     finish_for_loop(loop);
 
-    apply(out, OUTPUT_PLACEHOLDER_FUNC, TermList(loop));
+    apply(out, FUNCS.output, TermList(loop));
 }
 
 Term* create_overloaded_function(Branch* branch, const char* header)
@@ -69,7 +69,7 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     // Box the inputs in a list (used in calls to inputs_fit_function)
     TermList inputPlaceholders;
     input_placeholders_to_list(contents, &inputPlaceholders);
-    Term* inputsAsList = apply(contents, LIST_FUNC, inputPlaceholders);
+    Term* inputsAsList = apply(contents, FUNCS.list, inputPlaceholders);
 
     // Add the switch block
     Term* block = apply(contents, IF_BLOCK_FUNC, TermList());
@@ -92,7 +92,7 @@ void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc
     TermList inputPlaceholders;
     input_placeholders_to_list(overloadedFunc, &inputPlaceholders);
 
-    Term* inputsAsList = find_term_with_function(overloadedFunc, LIST_FUNC);
+    Term* inputsAsList = find_term_with_function(overloadedFunc, FUNCS.list);
     Term* ifBlock = find_term_with_function(overloadedFunc, IF_BLOCK_FUNC);
 
     Term* condition = apply(overloadedFunc, FUNCS.inputs_fit_function,

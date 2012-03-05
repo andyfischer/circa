@@ -128,14 +128,14 @@ void finish_building_function(Function* func, Type* declaredOutputType)
             }
 
             Term* output = apply(contents,
-                OUTPUT_PLACEHOLDER_FUNC, TermList(NULL), input->name);
+                FUNCS.output, TermList(NULL), input->name);
             change_declared_type(output, input->type);
             output->setIntProp("rebindsInput", i);
         }
     }
 
     // Finally, write a final output_placeholder() term for the primary output.
-    Term* output = apply(contents, OUTPUT_PLACEHOLDER_FUNC, TermList(NULL));
+    Term* output = apply(contents, FUNCS.output, TermList(NULL));
     change_declared_type(output, declaredOutputType);
 
     update_exit_points(contents);
@@ -288,7 +288,7 @@ int function_num_inputs(Function* func)
     int count = 0;
     for (int i=0; i < contents->length(); i++) {
         Term* term = contents->get(i);
-        if (term == NULL || term->function != INPUT_PLACEHOLDER_FUNC)
+        if (term == NULL || term->function != FUNCS.input)
             break;
 
         count++;
@@ -303,7 +303,7 @@ int function_num_outputs(Function* func)
     int count = 0;
     for (int i=contents->length() - 1; i >= 0; i--) {
         Term* term = contents->get(i);
-        if (term == NULL || term->function != OUTPUT_PLACEHOLDER_FUNC)
+        if (term == NULL || term->function != FUNCS.output)
             break;
 
         count++;

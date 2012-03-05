@@ -104,10 +104,10 @@ Type* infer_type_of_get_index(Term* input)
 Term* statically_infer_length_func(Branch* branch, Term* term)
 {
     Term* input = term->input(0);
-    if (input->function == COPY_FUNC)
+    if (input->function == FUNCS.copy)
         return statically_infer_length_func(branch, input->input(0));
 
-    if (input->function == LIST_FUNC)
+    if (input->function == FUNCS.list)
         return create_int(branch, input->numInputs());
 
     if (input->function == LIST_APPEND_FUNC) {

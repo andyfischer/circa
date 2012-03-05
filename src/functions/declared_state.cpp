@@ -87,9 +87,9 @@ namespace declared_state_function {
 
     void setup(Branch* kernel)
     {
-        DECLARED_STATE_FUNC = import_function(kernel, get_declared_state,
+        FUNCS.declared_state = import_function(kernel, get_declared_state,
             "declared_state(state any value) -> any");
-        as_function(DECLARED_STATE_FUNC)->formatSource = formatSource;
+        as_function(FUNCS.declared_state)->formatSource = formatSource;
     }
 }
 }

@@ -28,7 +28,7 @@ void create()
 void test_is_callable()
 {
     // normal function
-    test_assert(is_callable(COPY_FUNC));
+    test_assert(is_callable(FUNCS.copy));
 
     // overloaded function
     test_assert(is_callable(FUNCS.add));

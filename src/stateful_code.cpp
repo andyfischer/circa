@@ -19,7 +19,7 @@ namespace circa {
 
 bool is_declared_state(Term* term)
 {
-    return term->function == DECLARED_STATE_FUNC;
+    return term->function == FUNCS.declared_state;
 }
 
 bool has_implicit_state(Term* term)
@@ -57,7 +57,7 @@ void pack_any_open_state_vars(Branch* branch)
         Term* term = branch->get(i);
         if (term == NULL)
             continue;
-        if (term->function == DECLARED_STATE_FUNC) {
+        if (term->function == FUNCS.declared_state) {
             Term* result = branch->get(term->name);
 
             // If this result already has a pack_state() term then leave it alone.

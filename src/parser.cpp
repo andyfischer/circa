@@ -186,7 +186,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
             std::string const& lineEnding = statement->stringProp("syntax:lineEnding");
             bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
 
-            if (statement->function != COMMENT_FUNC)
+            if (statement->function != FUNCS.comment)
                 foundStatementOnSameLine = true;
 
             // If we hit a newline then stop parsing
@@ -258,7 +258,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
         
         Term* statement = parser::statement(branch, tokens, context).term;
 
-        if (statement->function != COMMENT_FUNC) {
+        if (statement->function != FUNCS.comment) {
             indentationLevel = int(statement->stringPropOptional(
                 "syntax:preWhitespace", "").length());
             break;
@@ -442,7 +442,7 @@ ParseResult comment(Branch* branch, TokenStream& tokens, ParserCxt* context)
         tokens.consume();
     }
 
-    Term* result = apply(branch, COMMENT_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.comment, TermList());
     result->setStringProp("comment", commentText);
 
     return ParseResult(result);
@@ -591,7 +591,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         }
 
         // Create an input placeholder term
-        Term* input = apply(contents, INPUT_PLACEHOLDER_FUNC, TermList(), name);
+        Term* input = apply(contents, FUNCS.input, TermList(), name);
 
         if (is_type(typeTerm))
             change_declared_type(input, as_type(typeTerm));
@@ -1079,7 +1079,7 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     }
 
     // Create the declared_state() term.
-    Term* result = apply(branch, DECLARED_STATE_FUNC, TermList(), name);
+    Term* result = apply(branch, FUNCS.declared_state, TermList(), name);
 
     // Possibly consume an expression for the initial value.
     if (tokens.nextIs(TK_EQUALS)) {
@@ -1127,7 +1127,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
     // If the result was just the reuse of an existing identifier, create a Copy
     // term so that source is preserved.
     if (result.isIdentifier())
-        term = apply(branch, COPY_FUNC, TermList(term));
+        term = apply(branch, FUNCS.copy, TermList(term));
 
     // Apply a pending rebind
     if (context->pendingRebind != "") {
@@ -1233,7 +1233,7 @@ ParseResult discard_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
         return compile_error_for_line(branch, tokens, startPosition,
                 "'discard' can only be used inside a for loop");
 
-    Term* result = apply(branch, DISCARD_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.discard, TermList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);
@@ -1250,7 +1250,7 @@ ParseResult break_statement(Branch* branch, TokenStream& tokens, ParserCxt* cont
         return compile_error_for_line(branch, tokens, startPosition,
                 "'break' can only be used inside a for loop");
 
-    Term* result = apply(branch, BREAK_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.break_func, TermList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);
@@ -1290,7 +1290,7 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
         // If the term already has a name (this is the case for method syntax
         // and for unknown_identifier), then make a copy.
         if (term->name != "")
-            term = apply(branch, COPY_FUNC, TermList(term));
+            term = apply(branch, FUNCS.copy, TermList(term));
 
         term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
@@ -1735,7 +1735,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
             tokens.consume(TK_RBRACKET);
 
-            Term* term = apply(branch, GET_INDEX_FUNC, TermList(result.term, subscript));
+            Term* term = apply(branch, FUNCS.get_index, TermList(result.term, subscript));
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             set_input_syntax_hint(term, 1, "preWhitespace", postLbracketWs);
             term->setBoolProp("syntax:brackets", true);
@@ -1757,7 +1757,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             tokens.consume(TK_DOT);
             std::string ident = tokens.consumeStr(TK_IDENTIFIER);
             
-            Term* term = apply(branch, GET_FIELD_FUNC, TermList(result.term, create_string(branch, ident)));
+            Term* term = apply(branch, FUNCS.get_field, TermList(result.term, create_string(branch, ident)));
             set_source_location(term, startPosition, tokens);
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             result = ParseResult(term);
@@ -1821,9 +1821,9 @@ Term* find_lexpr_root(Term* term)
     if (term->name != "")
         return term;
 
-    if (term->function == GET_INDEX_FUNC)
+    if (term->function == FUNCS.get_index)
         return find_lexpr_root(term->input(0));
-    else if (term->function == GET_FIELD_FUNC)
+    else if (term->function == FUNCS.get_field)
         return find_lexpr_root(term->input(0));
     else
         return term;
@@ -2086,7 +2086,7 @@ ParseResult literal_list(Branch* branch, TokenStream& tokens, ParserCxt* context
         return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");
     tokens.consume(TK_RBRACKET);
 
-    Term* term = apply(branch, LIST_FUNC, inputs);
+    Term* term = apply(branch, FUNCS.list, inputs);
     listHints.apply(term);
     check_to_insert_implicit_inputs(term);
 
