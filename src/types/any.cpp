@@ -22,12 +22,17 @@ namespace any_t {
 
         copy(source, dest);
     }
+    caValue* getField(caValue* value, const char* name)
+    {
+        return NULL;
+    }
     void setup_type(Type* type)
     {
         type->name = name_from_string("any");
         type->toString = to_string;
         type->staticTypeQuery = staticTypeQuery;
         type->cast = cast;
+        type->getField = getField;
     }
 
 } // namespace any_t

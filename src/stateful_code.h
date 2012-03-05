@@ -18,4 +18,7 @@ void strip_orphaned_state(caValue* description, caValue* state,
 void strip_orphaned_state(Branch* branch, caValue* state, caValue* trash);
 void strip_orphaned_state(Branch* branch, caValue* state);
 
+void unpack_state(caStack* stack);
+void pack_state(caStack* stack);
+
 } // namespace circa

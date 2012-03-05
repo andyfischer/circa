@@ -266,4 +266,47 @@ void strip_orphaned_state(Branch* branch, caValue* state)
     strip_orphaned_state(&description, state, &trash);
 }
 
+// Unpack a state value. Input 1 is the "identifying term" which is used as a key.
+void unpack_state(caStack* stack)
+{
+    caValue* container = circa_input(stack, 0);
+    Term* identifyingTerm = (Term*) circa_input_term(stack, 1);
+
+    caValue* element = get_field(container, unique_name(identifyingTerm));
+
+    if (element == NULL) {
+        set_null(circa_output(stack, 0));
+    } else {
+        copy(element, circa_output(stack, 0));
+    }
+}
+
+// Pack a state value. Input 2 is the "identifying term" which is used as a key.
+void pack_state(caStack* stack)
+{
+    caValue* container = circa_output(stack, 0);
+    copy(circa_input(stack, 0), container);
+
+    caValue* value = circa_input(stack, 1);
+    Term* identifyingTerm = (Term*) circa_input_term(stack, 2);
+    Branch* branch = identifyingTerm->owningBranch;
+
+    if (is_null(container)) {
+        // Create a new container
+        ca_assert(branch->stateType != NULL);
+        create(branch->stateType, container);
+    } else {
+
+        if (container->value_type != branch->stateType) {
+            // The container's type does not match the branch's state type. Migrate
+            // to the new type.
+            
+            ca_assert(false); // TODO
+        }
+    }
+
+    touch(container);
+    copy(value, get_field(container, unique_name(identifyingTerm)));
+}
+
 } // namespace circa

@@ -1,0 +1,12 @@
+def f()
+    -- Declare a state var. If the bug exists then this will create a state container with
+    -- 'u' set to 'any'.
+    state t = 1
+
+    -- Declare 'u' with type 'any'. (by using type 'any', we won't allow the unpack_state to
+    -- tell that the value was uninitialized by looking at the type)
+    state any u = 1
+
+s = null
+f(state = s)
+print(s)

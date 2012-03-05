@@ -12,11 +12,17 @@ namespace null_t {
         append_phrase(source, "null", term, TK_NULL);
     }
 
+    caValue* getField(caValue* value, const char* field)
+    {
+        return NULL;
+    }
+
     void setup_type(Type* type)
     {
         type->name = name_from_string("null");
         type->toString = toString;
         type->formatSource = formatSource;
+        type->getField = getField;
     }
 }
 }

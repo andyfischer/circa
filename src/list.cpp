@@ -446,10 +446,39 @@ int compound_type_get_field_count(Type* type)
     caValue* types = list_get(&type->parameter, 0);
     return list_length(types);
 }
+const char* compound_type_get_field_name(Type* type, int index)
+{
+    caValue* names = list_get(&type->parameter, 1);
+    return as_cstring(list_get(names, index));
+}
 Type* compound_type_get_field_type(Type* type, int index)
 {
     caValue* types = list_get(&type->parameter, 0);
     return as_type(list_get(types, index));
+}
+
+bool is_compound_type(Type* type)
+{
+    return list_get_parameter_type(&type->parameter) == LIST_TYPED_SIZED_NAMED;
+}
+
+std::string compound_type_to_string(caValue* value)
+{
+    Type* type = value->value_type;
+
+    std::stringstream out;
+    out << "{";
+    for (int i=0; i < compound_type_get_field_count(type); i++) {
+        if (i != 0)
+            out << ", ";
+
+        const char* name = compound_type_get_field_name(type, i);
+        out << name;
+        out << ": ";
+        out << to_string(list_get(value, i));
+    }
+    out << "}";
+    return out.str();
 }
 
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter)
@@ -660,6 +689,9 @@ namespace list_t {
     std::string tv_to_string(caValue* value)
     {
         ca_assert(is_list(value));
+        if (is_compound_type(value->value_type))
+            return compound_type_to_string(value);
+
         return list_to_string((ListData*) get_pointer(value));
     }
 

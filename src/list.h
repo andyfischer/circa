@@ -105,6 +105,8 @@ void compound_type_append_field(Type* type, Type* fieldType, const char* fieldNa
 // For a List-based type, this returns the number of elements.
 int compound_type_get_field_count(Type* type);
 
+const char* compound_type_get_field_name(Type* type, int index);
+
 // For a List-based type, retrieve the type of the given field index.
 Type* compound_type_get_field_type(Type* listType, int index);
 

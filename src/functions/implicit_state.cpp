@@ -4,37 +4,7 @@
 
 namespace circa {
 namespace implicit_state_function {
-
-    // Unpack a state value. Input 1 is the "identifying term" which is used as a key.
-    void unpack_state(caStack* stack)
-    {
-        caValue* container = circa_input(stack, 0);
-        Term* identifyingTerm = (Term*) circa_input_term(stack, 1);
-
-        if (!is_dict(container)) {
-            set_null(circa_output(stack, 0));
-            return;
-        }
-
-        const char* fieldName = unique_name(identifyingTerm);
-        copy(dict_insert(container, fieldName), circa_output(stack, 0));
-    }
-
-    // Pack a state value. Input 2 is the "identifying term" which is used as a key.
-    CA_FUNCTION(pack_state)
-    {
-        copy(INPUT(0), OUTPUT);
-        caValue* container = OUTPUT;
-        caValue* value = INPUT(1);
-        Term* identifyingTerm = INPUT_TERM(2);
-
-        if (!is_dict(container))
-            set_dict(container);
-
-        const char* fieldName = unique_name(identifyingTerm);
-        copy(value, dict_insert(container, fieldName));
-    }
-
+    
     // Unpack a value from a list. The index is given as a static property. This call
     // is used inside if-blocks.
     CA_FUNCTION(unpack_state_from_list)
@@ -98,7 +68,7 @@ namespace implicit_state_function {
     {
         FUNCS.unpack_state = import_function(kernel, (EvaluateFunc) unpack_state,
             "unpack_state(any container, any identifier :meta) -> any");
-        FUNCS.pack_state = import_function(kernel, pack_state,
+        FUNCS.pack_state = import_function(kernel, (EvaluateFunc) pack_state,
             "pack_state(any container, any value, any identifier :meta) -> any");
 
         FUNCS.unpack_state_from_list =
