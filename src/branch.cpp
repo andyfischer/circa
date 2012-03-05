@@ -14,7 +14,7 @@
 #include "function.h"
 #include "importing_macros.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "locals.h"
 #include "parser.h"
 #include "stateful_code.h"

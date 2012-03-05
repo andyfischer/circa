@@ -6,9 +6,10 @@
 
 #include "names.h"
 #include "gc.h"
+#include "list.h"
+#include "tagged_value.h"
 #include "term_list.h"
 #include "term_namespace.h"
-#include "types/list.h"
 
 namespace circa {
 

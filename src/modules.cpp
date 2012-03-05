@@ -5,7 +5,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "filesystem.h"
-#include "list_shared.h"
+#include "list.h"
 #include "kernel.h"
 #include "modules.h"
 #include "names.h"
@@ -13,7 +13,6 @@
 #include "string_type.h"
 #include "tagged_value.h"
 #include "term.h"
-#include "types/list.h"
 
 namespace circa {
 

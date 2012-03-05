@@ -10,7 +10,7 @@
 #include "importing.h"
 #include "introspection.h"
 #include "kernel.h"
-#include "list_shared.h"
+#include "list.h"
 #include "modules.h"
 #include "names.h"
 #include "subroutine.h"

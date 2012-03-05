@@ -7,7 +7,6 @@
 #include "branch.h"
 #include "gc.h"
 #include "term.h"
-#include "types/list.h"
 
 namespace circa {
 

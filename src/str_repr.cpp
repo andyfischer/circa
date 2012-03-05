@@ -4,7 +4,7 @@
 
 #include "circa/circa.h"
 
-#include "list_shared.h"
+#include "list.h"
 #include "names.h"
 #include "parser.h"
 #include "string_type.h"

@@ -3,7 +3,7 @@
 #include "common_headers.h"
 #include "circa/file.h"
 
-#include "list_shared.h"
+#include "list.h"
 #include "tagged_value.h"
 #include "type.h"
 

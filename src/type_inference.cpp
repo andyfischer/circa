@@ -6,13 +6,11 @@
 #include "building.h"
 #include "evaluation.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"
 #include "type_inference.h"
-
-#include "types/list.h"
 
 namespace circa {
 

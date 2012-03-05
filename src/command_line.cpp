@@ -8,7 +8,7 @@
 #include "evaluation.h"
 #include "feedback.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "modules.h"
 #include "parser.h"
 #include "source_repro.h"

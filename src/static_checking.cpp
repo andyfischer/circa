@@ -8,13 +8,12 @@
 #include "kernel.h"
 #include "function.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "static_checking.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"
 
-#include "types/list.h"
 #include "types/ref.h"
 
 namespace circa {

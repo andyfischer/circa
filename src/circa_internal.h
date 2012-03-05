@@ -22,7 +22,7 @@
 #include "importing.h"
 #include "importing_macros.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "locals.h"
 #include "names.h"
 #include "parser.h"

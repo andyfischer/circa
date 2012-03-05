@@ -7,7 +7,6 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "update_cascades.h"
-#include "types/list.h"
 
 namespace circa {
 

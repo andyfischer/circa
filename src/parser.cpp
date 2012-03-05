@@ -10,7 +10,7 @@
 #include "if_block.h"
 #include "handle.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "kernel.h"
 #include "modules.h"
 #include "parser.h"

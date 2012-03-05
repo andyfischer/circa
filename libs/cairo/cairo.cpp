@@ -7,7 +7,7 @@
 
 #include "circa.h"
 
-#include "list_shared.h"
+#include "list.h"
 #include "types/color.h"
 #include "types/rect.h"
 

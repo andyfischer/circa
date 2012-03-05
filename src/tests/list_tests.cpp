@@ -2,7 +2,7 @@
 
 #include <circa_internal.h>
 
-#include "list_shared.h"
+#include "list.h"
 
 namespace circa {
 namespace list_tests {

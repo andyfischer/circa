@@ -4,11 +4,11 @@
 
 #include "common_headers.h"
 #include "dict.h"
+#include "list.h"
 #include "loops.h"
 #include "gc.h"
 #include "tagged_value.h"
 #include "term_list.h"
-#include "types/list.h"
 
 namespace circa {
 

@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "types/list.h"
+#include "list.h"
 
 namespace circa {
 

@@ -5,7 +5,7 @@
 #include "../evaluation.h"
 #include "../names.h"
 #include "../tagged_value.h"
-#include "../types/list.h"
+#include "../list.h"
 
 namespace circa {
 

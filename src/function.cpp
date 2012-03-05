@@ -5,6 +5,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "introspection.h"
+#include "list.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "subroutine.h"
@@ -13,7 +14,6 @@
 #include "term_list.h"
 #include "token.h"
 #include "type.h"
-#include "types/list.h"
 #include "update_cascades.h"
 
 namespace circa {

@@ -16,7 +16,7 @@
 #include "importing.h"
 #include "importing_macros.h"
 #include "kernel.h"
-#include "list_shared.h"
+#include "list.h"
 #include "modules.h"
 #include "parser.h"
 #include "subroutine.h"

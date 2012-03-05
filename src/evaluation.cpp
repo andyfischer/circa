@@ -11,7 +11,7 @@
 #include "function.h"
 #include "introspection.h"
 #include "kernel.h"
-#include "list_shared.h"
+#include "list.h"
 #include "locals.h"
 #include "parser.h"
 #include "stateful_code.h"

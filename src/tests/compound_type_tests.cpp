@@ -4,7 +4,7 @@
 
 #include "circa_internal.h"
 #include "importing_macros.h"
-#include "list_shared.h"
+#include "list.h"
 
 namespace circa {
 namespace compound_type_tests {

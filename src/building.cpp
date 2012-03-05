@@ -9,7 +9,7 @@
 #include "heap_debugging.h"
 #include "kernel.h"
 #include "introspection.h"
-#include "list_shared.h"
+#include "list.h"
 #include "locals.h"
 #include "names.h"
 #include "parser.h"

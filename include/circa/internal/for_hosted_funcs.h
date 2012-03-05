@@ -13,7 +13,7 @@
 #include "../../../src/importing_macros.h"
 #include "../../../src/introspection.h"
 #include "../../../src/kernel.h"
-#include "../../../src/list_shared.h"
+#include "../../../src/list.h"
 #include "../../../src/names.h"
 #include "../../../src/source_repro.h"
 #include "../../../src/static_checking.h"

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "common_headers.h"
-#include "types/list.h"
 
 namespace circa {
 

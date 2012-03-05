@@ -5,7 +5,7 @@
 #include "../common_headers.h"
 #include "../evaluation.h"
 #include "../kernel.h"
-#include "../list_shared.h"
+#include "../list.h"
 #include "../modules.h"
 #include "../parser.h"
 #include "../source_repro.h"
@@ -14,7 +14,6 @@
 #include "../names.h"
 #include "../tagged_value.h"
 #include "../token.h"
-#include "../types/list.h"
 
 namespace circa {
 
