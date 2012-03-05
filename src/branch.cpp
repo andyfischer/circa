@@ -766,7 +766,7 @@ bool branch_state_type_is_out_of_date(Branch* branch)
     int existingFieldCount = 0;
 
     if (branch->stateType != NULL) {
-        existingFieldCount = list_type_get_field_count(branch->stateType);
+        existingFieldCount = compound_type_get_field_count(branch->stateType);
         size_t size = sizeof(bool) * existingFieldCount;
         typeFieldFound = (bool*) malloc(size);
         memset(typeFieldFound, 0, size);
@@ -798,7 +798,7 @@ bool branch_state_type_is_out_of_date(Branch* branch)
             goto return_true;
 
         // If the type doesn't match then that's an update
-        if (list_get_type_for_field_index(branch->stateType, fieldIndex)
+        if (compound_type_get_field_type(branch->stateType, fieldIndex)
                 != declared_type(term))
             goto return_true;
 
@@ -827,8 +827,9 @@ return_true:
 void branch_update_state_type(Branch* branch)
 {
     if (branch_state_type_is_out_of_date(branch)) {
+
         // Recreate the state type
-        Type* type = list_create_compound_type();
+        Type* type = create_compound_type();
 
         // TODO: give this new type a nice name
 
@@ -842,8 +843,7 @@ void branch_update_state_type(Branch* branch)
 
             Term* identifyingTerm = term->input(1);
 
-            list_compound_type_append_field(type, declared_type(term),
-                unique_name(identifyingTerm));
+            compound_type_append_field(type, declared_type(term), unique_name(identifyingTerm));
         }
 
         branch->stateType = type;

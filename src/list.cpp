@@ -418,7 +418,7 @@ bool list_type_has_specific_size(caValue* parameter)
     return is_list(parameter);
 }
 
-Type* list_create_compound_type()
+Type* create_compound_type()
 {
     Type* type = create_type();
 
@@ -429,7 +429,7 @@ Type* list_create_compound_type()
     return type;
 }
 
-void list_compound_type_append_field(Type* type, Type* fieldType, const char* fieldName)
+void compound_type_append_field(Type* type, Type* fieldType, const char* fieldName)
 {
     ca_assert(list_get_parameter_type(&type->parameter) == LIST_TYPED_SIZED_NAMED);
 
@@ -441,12 +441,12 @@ void list_compound_type_append_field(Type* type, Type* fieldType, const char* fi
     set_string(list_append(names), fieldName);
 }
 
-int list_compound_type_get_field_count(Type* type)
+int compound_type_get_field_count(Type* type)
 {
     caValue* types = list_get(&type->parameter, 0);
     return list_length(types);
 }
-Type* list_compound_type_get_field_type(Type* listType, int index)
+Type* compound_type_get_field_type(Type* type, int index)
 {
     caValue* types = list_get(&type->parameter, 0);
     return as_type(list_get(types, index));

@@ -98,15 +98,15 @@ bool list_type_has_specific_size(caValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter);
 
 // Create a new compound type (sized and named)
-Type* list_create_compound_type();
+Type* create_compound_type();
 
-void list_compound_type_append_field(Type* type, Type* fieldType, const char* fieldName);
+void compound_type_append_field(Type* type, Type* fieldType, const char* fieldName);
 
 // For a List-based type, this returns the number of elements.
-int list_compound_type_get_field_count(Type* type);
+int compound_type_get_field_count(Type* type);
 
 // For a List-based type, retrieve the type of the given field index.
-Type* list_compound_type_get_field_type(Type* listType, int index);
+Type* compound_type_get_field_type(Type* listType, int index);
 
 // For a List-based type, this returns the list of types that the elements will
 // have. This result is only valid for fixed-size List types, otherwise it will
