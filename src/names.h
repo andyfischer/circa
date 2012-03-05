@@ -16,8 +16,7 @@ Term* find_local_name(Branch* branch, Name name);
 Term* find_local_name(Branch* branch, const char* name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
-// of the first colon. If the string isn't a qualified name then returns
-// -1.
+// of the first colon. If the string isn't a qualified name then returns -1.
 int find_qualified_name_separator(const char* name);
 
 // Get a named term from the global namespace.
@@ -61,6 +60,9 @@ void set_name(caValue* tv, Name name);
 
 Name name_from_string(const char* str);
 Name name_from_string(caValue* str);
+
+// Deallocate all interned names, this should be called at shutdown
+void name_dealloc_global_data();
 
 const Name name_None = 0;
 const Name name_File = 2;

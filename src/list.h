@@ -15,7 +15,7 @@ struct ListData {
     caValue items[0];
     // items has size [capacity].
 
-    // for debugging
+    // for debugging:
     void dump();
 };
 
@@ -50,6 +50,11 @@ void list_remove_index(caValue* list, int index);
 void list_resize(caValue* list, int size);
 void list_remove_and_replace_with_last_element(caValue* list, int index);
 void list_remove_nulls(caValue* list);
+
+// Set 'dest' to be a copy of 'source'. This will cause 'source' to be immutable
+// (if it wasn't already).
+void list_copy(caValue* source, caValue* dest);
+
 std::string list_to_string(ListData* value);
 void list_slice(caValue* original, int start, int end, caValue* result);
 

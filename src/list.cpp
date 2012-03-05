@@ -263,6 +263,10 @@ void list_remove_nulls(ListData** dataPtr)
     *dataPtr = list_resize(*dataPtr, data->count - numRemoved);
 }
 
+void list_copy(caValue* source, caValue* dest)
+{
+}
+
 std::string list_to_string(ListData* value)
 {
     if (value == NULL)

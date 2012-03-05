@@ -19,10 +19,6 @@
 
 #endif
 
-// Disable value sharing in tvvector data, each reference will have a separate
-// copy of data.
-#define CIRCA_DISABLE_LIST_SHARING 1
-
 // Trigger an assert when internal_error is called. If this is off, the alternative is
 // that an exception is thrown.
 #define CIRCA_ASSERT_ON_ERROR 1

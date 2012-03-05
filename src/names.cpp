@@ -13,6 +13,19 @@
 
 namespace circa {
 
+struct RuntimeName
+{
+    char* str;
+    Name namespaceFirst;
+    Name namespaceRightRemainder;
+};
+
+const int c_maxRuntimeNames = 2000;
+
+RuntimeName g_runtimeNames[c_maxRuntimeNames];
+int g_nextFreeNameIndex = 0;
+std::map<std::string,Name> g_stringToSymbol;
+
 bool exposes_nested_names(Term* term);
 
 Term* find_name(Branch* branch, int location, Name name)
@@ -404,24 +417,11 @@ Term* find_term_from_global_name(const char* name)
     return find_term_from_global_name_recr(searchBranch, name);
 }
 
-const int c_maxRuntimeNames = 2000;
-
-struct RuntimeName
-{
-    std::string str;
-    Name namespaceFirst;
-    Name namespaceRightRemainder;
-};
-
-RuntimeName g_runtimeNames[c_maxRuntimeNames];
-int g_nextFreeNameIndex = 0;
-std::map<std::string,Name> g_stringToSymbol;
-
 const char* name_to_string(Name name)
 {
     // Runtime symbols
     if (name >= c_FirstRuntimeName)
-        return g_runtimeNames[name - c_FirstRuntimeName].str.c_str();
+        return g_runtimeNames[name - c_FirstRuntimeName].str;
 
     // Builtin symbols
     switch (name) {
@@ -493,7 +493,7 @@ Name name_from_string(const char* str)
 
     // Not yet registered; add it to the list.
     Name index = g_nextFreeNameIndex++;
-    g_runtimeNames[index].str = str;
+    g_runtimeNames[index].str = strdup(str);
     g_runtimeNames[index].namespaceFirst = 0;
     g_runtimeNames[index].namespaceRightRemainder = 0;
     Name name = index + c_FirstRuntimeName;
@@ -517,6 +517,13 @@ Name name_from_string(const char* str)
 Name name_from_string(caValue* str)
 {
     return name_from_string(as_cstring(str));
+}
+void name_dealloc_global_data()
+{
+    for (int i=0; i < g_nextFreeNameIndex; i++)
+        free(g_runtimeNames[i].str);
+    g_nextFreeNameIndex = 0;
+    g_stringToSymbol.clear();
 }
 
 } // namespace circa

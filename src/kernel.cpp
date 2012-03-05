@@ -603,6 +603,8 @@ EXPORT void circa_shutdown()
     KERNEL = NULL;
 
     memset(&FUNCS, NULL, sizeof(FUNCS));
+
+    name_dealloc_global_data();
 }
 
 } // namespace circa
