@@ -836,6 +836,9 @@ void set_branch_in_progress(Branch* branch, bool inProgress)
     if (openState != NULL)
         insert_state_output(branch);
 
+    // Update stateType
+    branch_update_state_type(branch);
+
     branch->inProgress = false;
 }
 

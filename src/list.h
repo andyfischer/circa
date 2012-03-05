@@ -97,6 +97,17 @@ ListType list_get_parameter_type(caValue* parameter);
 bool list_type_has_specific_size(caValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter);
 
+// Create a new compound type (sized and named)
+Type* list_create_compound_type();
+
+void list_compound_type_append_field(Type* type, Type* fieldType, const char* fieldName);
+
+// For a List-based type, this returns the number of elements.
+int list_compound_type_get_field_count(Type* type);
+
+// For a List-based type, retrieve the type of the given field index.
+Type* list_compound_type_get_field_type(Type* listType, int index);
+
 // For a List-based type, this returns the list of types that the elements will
 // have. This result is only valid for fixed-size List types, otherwise it will
 // return NULL.
@@ -110,7 +121,10 @@ caValue* list_get_name_list_from_type(Type* type);
 // valid for a typed_unsized list.
 Type* list_get_repeated_type_from_type(Type* type);
 
-int list_find_field_index_by_name(Type* listType, std::string const& name);
+// For a List-based type, this returns the index of the field with the given name.
+// Returns NULL if the field is not found.
+int list_find_field_index_by_name(Type* listType, const char* name);
+
 
 bool is_list_based_type(Type*);
 

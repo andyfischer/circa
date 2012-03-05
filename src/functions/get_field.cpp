@@ -12,7 +12,7 @@ namespace get_field_function {
         for (int nameIndex=1; nameIndex < NUM_INPUTS; nameIndex++) {
             std::string const& name = INPUT(nameIndex)->asString();
 
-            int fieldIndex = list_find_field_index_by_name(head->value_type, name);
+            int fieldIndex = list_find_field_index_by_name(head->value_type, name.c_str());
 
             if (fieldIndex == -1) {
                 std::string msg = "field not found: " + name;
@@ -40,7 +40,7 @@ namespace get_field_function {
 
             std::string const& name = caller->input(1)->asString();
 
-            int fieldIndex = list_find_field_index_by_name(head, name);
+            int fieldIndex = list_find_field_index_by_name(head, name.c_str());
 
             if (fieldIndex == -1)
                 return &ANY_T;

@@ -3,6 +3,7 @@
 #include "heap_debugging.h"
 #include "kernel.h"
 #include "list.h"
+#include "string_type.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -417,6 +418,40 @@ bool list_type_has_specific_size(caValue* parameter)
     return is_list(parameter);
 }
 
+Type* list_create_compound_type()
+{
+    Type* type = create_type();
+
+    list_t::setup_type(type);
+    List* param = set_list(&type->parameter, 2);
+    set_list(param->get(0), 0);
+    set_list(param->get(1), 0);
+    return type;
+}
+
+void list_compound_type_append_field(Type* type, Type* fieldType, const char* fieldName)
+{
+    ca_assert(list_get_parameter_type(&type->parameter) == LIST_TYPED_SIZED_NAMED);
+
+    list_touch(&type->parameter);
+    caValue* types = list_get(&type->parameter, 0);
+    caValue* names = list_get(&type->parameter, 1);
+
+    set_type(list_append(types), fieldType);
+    set_string(list_append(names), fieldName);
+}
+
+int list_compound_type_get_field_count(Type* type)
+{
+    caValue* types = list_get(&type->parameter, 0);
+    return list_length(types);
+}
+Type* list_compound_type_get_field_type(Type* listType, int index)
+{
+    caValue* types = list_get(&type->parameter, 0);
+    return as_type(list_get(types, index));
+}
+
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter)
 {
     List& param = *set_list(parameter, 2);
@@ -470,7 +505,7 @@ Type* list_get_repeated_type_from_type(Type* type)
     ca_assert(is_list_based_type(type));
     return as_type(&type->parameter);
 }
-int list_find_field_index_by_name(Type* listType, std::string const& name)
+int list_find_field_index_by_name(Type* listType, const char* name)
 {
     caValue* nameList = list_get_name_list_from_type(listType);
     if (nameList == NULL)
@@ -478,8 +513,10 @@ int list_find_field_index_by_name(Type* listType, std::string const& name)
 
     List& names = *as_list(nameList);
     for (int i=0; i < names.length(); i++)
-        if (as_string(names[i]) == name)
+        if (string_eq(names[i], name))
             return i;
+
+    // Not found
     return -1;
 }
 

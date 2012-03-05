@@ -44,6 +44,9 @@ struct Branch
     //  [2] int inputIndex (only used for errors related to inputs)
     caValue staticErrors;
 
+    // Compound type object describing our inlined state. May be NULL.
+    Type* stateType;
+
     // This value stores information about pending code changes. This is populated
     // when someone makes a term change that will force other terms to be updated.
     // See update_cascades.cpp
@@ -202,5 +205,9 @@ struct BrokenLinkList
     }
     bool empty() { return links.size() == 0; }
 };
+
+// Update the branch's stateType. Should be called after the code is changed in a way
+// that could add/remove declared state.
+void branch_update_state_type(Branch* branch);
 
 } // namespace circa
