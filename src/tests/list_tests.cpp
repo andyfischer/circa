@@ -220,7 +220,7 @@ void test_prepend()
     test_assert(to_string(&value) == "[1, 2]");
     list_t::prepend(&value);
     test_assert(to_string(&value) == "[null, 1, 2]");
-    set_int(list_get_index(&value, 0), 4);
+    set_int(list_get(&value, 0), 4);
     test_assert(to_string(&value) == "[4, 1, 2]");
 
     reset(&value);
@@ -232,7 +232,7 @@ void test_prepend()
     reset(&value);
 
     list_t::prepend(&value);
-    set_int(list_get_index(&value, 0), 1);
+    set_int(list_get(&value, 0), 1);
     test_assert(to_string(&value) == "[1]");
     list_t::prepend(&value);
     test_assert(to_string(&value) == "[null, 1]");

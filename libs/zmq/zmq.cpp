@@ -341,14 +341,14 @@ namespace zmq_file_source {
         }
 
         // response[0] is address of publisher
-        caValue* publisher_addr = circa_list_get_index(&response, 0);
+        caValue* publisher_addr = circa_list_get(&response, 0);
 
         // response[1] is list of served files
-        caValue* file_list = circa_list_get_index(&response, 1);
+        caValue* file_list = circa_list_get(&response, 1);
 
         // Create a circa FileRecord for each file
         for (int i=0; i < circa_list_length(file_list); i++) {
-            caValue* item = circa_list_get_index(file_index, i);
+            caValue* item = circa_list_get(file_index, i);
             circa_fetch_file_record(circa_as_string(item), fileSource.name);
         }
 
@@ -384,15 +384,15 @@ namespace zmq_file_source {
         zmsg_to_cavalue(&zmsg, &msg);
 
         // msg[0] is the event type
-        caValue* eventType = circa_list_get_index(&msg, 0);
+        caValue* eventType = circa_list_get(&msg, 0);
 
         if (circa_string_eq(eventType, "update")) {
 
             // msg[1] is the filename
-            caValue* filename = circa_list_get_index(&msg, 1);
+            caValue* filename = circa_list_get(&msg, 1);
 
             // msg[2] is the file contents
-            caValue* contents = circa_list_get_index(&msg, 2);
+            caValue* contents = circa_list_get(&msg, 2);
 
             caFileRecord* record = circa_get_file_record(circa_as_string(filename));
 

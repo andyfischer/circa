@@ -34,7 +34,7 @@ static void file_init_globals()
 static int find_index_of_source(caName sourceName)
 {
     for (int i=0; i < list_length(g_fileServices); i++) {
-        caFileSource* source = (caFileSource*) get_pointer(list_get_index(g_fileServices, i));
+        caFileSource* source = (caFileSource*) get_pointer(list_get(g_fileServices, i));
         if (source->name == sourceName)
             return i;
     }
@@ -60,7 +60,7 @@ static caFileSource* get_source_by_precedence(int precedence)
     int index = list_length(g_fileServices) - precedence - 1;
     if (index < 0)
         return NULL;
-    return (caFileSource*) get_pointer(list_get_index(g_fileServices, index));
+    return (caFileSource*) get_pointer(list_get(g_fileServices, index));
 }
 
 static caFileSource* get_source_by_name(caName name)

@@ -19,30 +19,35 @@ struct ListData {
     void dump();
 };
 
+// Functions for dealing directly with a ListData object
+
 void assert_valid_list(ListData* list);
 ListData* allocate_empty_list(int capacity);
 ListData* allocate_list(int num_elements);
 void list_decref(ListData* data);
 void free_list(ListData* data);
+
+caValue* list_get(ListData* data, int index);
+int list_length(ListData* data);
+caValue* list_append(ListData** dataPtr);
+caValue* list_insert(ListData** dataPtr, int index);
 ListData* list_touch(ListData* original);
 ListData* list_duplicate(ListData* source);
 ListData* list_increase_capacity(ListData* original, int new_capacity);
 ListData* list_double_capacity(ListData* original);
 ListData* list_resize(ListData* original, int numElements);
-caValue* list_append(ListData** dataPtr);
-caValue* list_insert(ListData** dataPtr, int index);
-int list_length(ListData* data);
-caValue* list_get_index(ListData* data, int index);
 void list_set_index(ListData* data, int index, caValue* value);
 
-int list_length(caValue* value);
+// Functions for dealing with a list inside a caValue container
+
 caValue* list_get(caValue* value, int index);
-caValue* list_get_index(caValue* value, int index);
-caValue* list_get_index_from_end(caValue* value, int index);
-void list_remove_index(caValue* list, int index);
-void list_resize(caValue* list, int size);
+caValue* list_get_from_end(caValue* value, int index);
+int list_length(caValue* value);
 caValue* list_append(caValue* list);
 caValue* list_insert(caValue* list, int index);
+void list_touch(caValue* list);
+void list_remove_index(caValue* list, int index);
+void list_resize(caValue* list, int size);
 void list_remove_and_replace_with_last_element(caValue* list, int index);
 void list_remove_nulls(caValue* list);
 std::string list_to_string(ListData* value);

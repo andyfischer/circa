@@ -454,8 +454,8 @@ CA_FUNCTION(opengl__shader_quad)
     for (int i=0; i < uniforms.length(); i++) {
         if (!is_list(uniforms[i]))
             return RAISE_ERROR("uniform pair isn't a list");
-        GLuint uniform = as_int(list_get_index(uniforms[i], 0));
-        caValue* value = list_get_index(uniforms[i], 1);
+        GLuint uniform = as_int(list_get(uniforms[i], 0));
+        caValue* value = list_get(uniforms[i], 1);
         if (is_int(value))
             glUniform1i(uniform, as_int(value));
         else if (is_float(value))
@@ -538,8 +538,8 @@ CA_FUNCTION(opengl__generate_frame_buffer)
 {
     gl_ignore_error();
 
-    int width = to_int(list_get_index(INPUT(0), 0));
-    int height = to_int(list_get_index(INPUT(0), 1));
+    int width = to_int(list_get(INPUT(0), 0));
+    int height = to_int(list_get(INPUT(0), 1));
 
     GLenum internalFormat = /*fp ? GL_RGBA16F_ARB :*/ GL_RGBA;
     GLenum type = /*fp ? GL_HALF_FLOAT_ARB :*/ GL_UNSIGNED_BYTE;

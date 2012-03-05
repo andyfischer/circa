@@ -76,6 +76,15 @@ void free_list(ListData* data)
     debug_unregister_valid_object(data, LIST_OBJECT);
 }
 
+caValue* list_get(ListData* data, int index)
+{
+    if (data == NULL)
+        return NULL;
+    if (index >= data->count)
+        return NULL;
+    return &data->items[index];
+}
+
 ListData* list_touch(ListData* original)
 {
     if (original == NULL)
@@ -215,17 +224,9 @@ int list_length(ListData* data)
     return data->count;
 }
 
-caValue* list_get_index(ListData* data, int index)
-{
-    if (data == NULL)
-        return NULL;
-    if (index >= data->count)
-        return NULL;
-    return &data->items[index];
-}
 void list_set_index(ListData* data, int index, caValue* value)
 {
-    caValue* dest = list_get_index(data, index);
+    caValue* dest = list_get(data, index);
     ca_assert(dest != NULL);
     copy(value, dest);
 }
@@ -299,16 +300,11 @@ void list_slice(caValue* original, int start, int end, caValue* result)
 
 caValue* list_get(caValue* value, int index)
 {
-    return list_get_index(value, index);
-}
-
-caValue* list_get_index(caValue* value, int index)
-{
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
-    return list_get_index((ListData*) value->value_data.ptr, index);
+    return list_get((ListData*) value->value_data.ptr, index);
 }
 
-caValue* list_get_index_from_end(caValue* value, int reverseIndex)
+caValue* list_get_from_end(caValue* value, int reverseIndex)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
 
@@ -366,6 +362,11 @@ caValue* list_insert(caValue* list, int index)
     return result;
 }
 
+void list_touch(caValue* list)
+{
+    list->value_data.ptr = (ListData*) list_touch((ListData*) list->value_data.ptr);
+}
+
 void list_remove_and_replace_with_last_element(caValue* value, int index)
 {
     ca_assert(is_list(value));
@@ -386,7 +387,7 @@ ListType list_get_parameter_type(caValue* parameter)
         return LIST_TYPED_UNSIZED;
 
     if (is_list(parameter)) {
-        if ((list_length(parameter) == 2) && is_list(list_get_index(parameter, 0)))
+        if ((list_length(parameter) == 2) && is_list(list_get(parameter, 0)))
             return LIST_TYPED_SIZED_NAMED;
         else
             return LIST_TYPED_SIZED;
@@ -420,7 +421,7 @@ caValue* list_get_type_list_from_type(Type* type)
     case LIST_TYPED_SIZED:
         return parameter;
     case LIST_TYPED_SIZED_NAMED:
-        return list_get_index(parameter, 0);
+        return list_get(parameter, 0);
     case LIST_UNTYPED:
     case LIST_TYPED_UNSIZED:
     case LIST_INVALID_PARAMETER:
@@ -437,7 +438,7 @@ caValue* list_get_name_list_from_type(Type* type)
 
     switch (list_get_parameter_type(parameter)) {
     case LIST_TYPED_SIZED_NAMED:
-        return list_get_index(parameter, 1);
+        return list_get(parameter, 1);
     case LIST_TYPED_SIZED:
     case LIST_UNTYPED:
     case LIST_TYPED_UNSIZED:
@@ -669,8 +670,8 @@ namespace list_t {
     void tv_set_index(caValue* value, int index, caValue* element)
     {
         ca_assert(is_list(value));
-        ListData* s = (ListData*) get_pointer(value);
-        list_set_index(s, index, element);
+        list_touch(value);
+        copy(element, list_get(value, index));
     }
 
     caValue* tv_get_field(caValue* value, const char* fieldName)
@@ -678,7 +679,7 @@ namespace list_t {
         int index = list_find_field_index_by_name(value->value_type, fieldName);
         if (index < 0)
             return NULL;
-        return list_get_index(value, index);
+        return list_get(value, index);
     }
 
     std::string tv_to_string(caValue* value)
@@ -776,7 +777,7 @@ namespace list_t {
         type->toString = tv_to_string;
         type->equals = tv_equals;
         type->cast = tv_cast;
-        type->getIndex = list_get_index;
+        type->getIndex = list_get;
         type->setIndex = tv_set_index;
         type->getField = tv_get_field;
         type->numElements = list_length;
@@ -837,7 +838,7 @@ List::empty()
 caValue*
 List::get(int index)
 {
-    return list_get_index((caValue*) this, index);
+    return list_get((caValue*) this, index);
 }
 
 void

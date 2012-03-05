@@ -58,7 +58,7 @@ namespace dynamic_call_function {
         swap(frame, &finishedFrame);
         stack->pop();
 
-        swap(list_get_index(&finishedFrame, outputIndex), OUTPUT);
+        swap(list_get(&finishedFrame, outputIndex), OUTPUT);
 #endif
     }
 

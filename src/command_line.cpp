@@ -191,7 +191,7 @@ int run_command_line(List* args)
     // Start evaluation loop
     if (string_eq(args->get(0), "-loop")) {
         Branch branch;
-        load_script(&branch, as_cstring(list_get_index(args, 1)));
+        load_script(&branch, as_cstring(list_get(args, 1)));
 
         if (has_static_errors(&branch)) {
             print_static_errors_formatted(&branch, std::cout);

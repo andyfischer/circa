@@ -572,7 +572,7 @@ EXPORT void circa_initialize()
         string_split(&libPathStr, ';', &libPaths);
 
         for (int i=0; i < list_length(&libPaths); i++) {
-            caValue* path = list_get_index(&libPaths, i);
+            caValue* path = list_get(&libPaths, i);
             if (string_eq(path, ""))
                 continue;
             modules_add_search_path(as_cstring(path));

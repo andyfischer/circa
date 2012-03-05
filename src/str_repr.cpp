@@ -110,7 +110,7 @@ extern "C" void circa_to_string_repr(caValue* value, caValue* out)
                 string_append(out, ", ");
 
             caValue elementStr;
-            circa_to_string_repr(list_get_index(value, i), &elementStr);
+            circa_to_string_repr(list_get(value, i), &elementStr);
             string_append(out, &elementStr);
         }
 

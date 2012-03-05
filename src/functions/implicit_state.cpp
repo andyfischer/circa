@@ -41,7 +41,7 @@ namespace implicit_state_function {
         if (!is_list(container) || index >= list_length(container))
             set_null(OUTPUT);
         else
-            copy(list_get_index(container, index), OUTPUT);
+            copy(list_get(container, index), OUTPUT);
     }
 
     // Used in if_block. The index is built in as a property.
@@ -60,7 +60,7 @@ namespace implicit_state_function {
         list_resize(container, 0);
         list_resize(container, index+1);
 
-        copy(value, list_get_index(container, index));
+        copy(value, list_get(container, index));
     }
 
     // Used in for_loop
@@ -71,7 +71,7 @@ namespace implicit_state_function {
         if (!is_list(container) || index >= list_length(container))
             set_null(OUTPUT);
         else
-            copy(list_get_index(container, index), OUTPUT);
+            copy(list_get(container, index), OUTPUT);
     }
     // Used in for_loop
     CA_FUNCTION(pack_state_list_n)
@@ -86,7 +86,7 @@ namespace implicit_state_function {
         if (list_length(container) <= index)
             list_resize(container, index+1);
 
-        copy(value, list_get_index(container, index));
+        copy(value, list_get(container, index));
     }
 
     void setup(Branch* kernel)
