@@ -64,6 +64,7 @@ int run_command_line(List* args)
     bool printSource = false;
     bool printState = false;
     bool dontRunScript = false;
+    bool printTrace = false;
 
     // Prepended options
     while (true) {
@@ -115,6 +116,11 @@ int run_command_line(List* args)
         }
         if (string_eq(args->get(0), "-print-state")) {
             printState = true;
+            list_remove_index(args, 0);
+            continue;
+        }
+        if (string_eq(args->get(0), "-t")) {
+            printTrace = true;
             list_remove_index(args, 0);
             continue;
         }
@@ -216,35 +222,6 @@ int run_command_line(List* args)
     if (string_eq(args->get(0), "-d"))
         return run_debugger_repl(as_cstring(args->get(1)));
 
-    // Do a feedback test (disabled)
-    #if 0
-    if (args[0] == "-f") {
-        Branch branch;
-        load_script(&branch, args[1]);
-
-        Branch &trainable_names = branch["_trainable"]->nestedContents;
-        for (int i=0; i < trainable_names.length(); i++)
-            set_trainable(branch[trainable_names[i]->asString()], true);
-        refresh_training_branch(branch);
-
-        std::cout << std::endl;
-        std::cout << "-- Before evaluation:" << std::endl;
-        print_branch(std::cout, branch);
-
-        evaluate_branch(branch);
-
-        std::cout << std::endl;
-        std::cout << "-- After evaluation:" << std::endl;
-        print_branch(std::cout, branch);
-
-        std::cout << std::endl;
-        std::cout << "-- Code result:" << std::endl;
-        std::cout << get_branch_source_text(branch) << std::endl;
-
-        return 0;
-    }
-    #endif
-
     // Generate cpp headers
     if (string_eq(args->get(0), "-gh")) {
         Branch branch;
@@ -277,7 +254,6 @@ int run_command_line(List* args)
 
     // Build tool
     if (string_eq(args->get(0), "-build")) {
-
         return run_build_tool(args);
     }
 
@@ -331,6 +307,7 @@ int run_command_line(List* args)
     // Default behavior with no flags: load args[0] as a script and run it.
     Branch* main_branch = create_branch(kernel());
     load_script(main_branch, as_cstring(args->get(0)));
+    set_branch_in_progress(main_branch, false);
 
     if (printRawWithProps)
         print_branch_with_properties(std::cout, main_branch);
@@ -347,6 +324,9 @@ int run_command_line(List* args)
         return 0;
 
     EvalContext context;
+
+    if (printTrace)
+        context.trace = true;
 
     // Push any extra command-line arguments to context.argumentList
     List* inputs = set_list(context.argumentList.append());

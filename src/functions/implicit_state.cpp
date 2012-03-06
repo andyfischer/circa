@@ -69,7 +69,7 @@ namespace implicit_state_function {
         FUNCS.unpack_state = import_function(kernel, (EvaluateFunc) unpack_state,
             "unpack_state(any container, any identifier :meta) -> any");
         FUNCS.pack_state = import_function(kernel, (EvaluateFunc) pack_state,
-            "pack_state(any container, any value, any identifier :meta) -> any");
+            "pack_state(any :optional :multiple) -> any");
 
         FUNCS.unpack_state_from_list =
             import_function(kernel, unpack_state_from_list, "unpack_state_from_list(any container) -> any");

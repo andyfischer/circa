@@ -264,6 +264,8 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 
     out << global_id(term);
 
+    out << " " << unique_name(term) << " ";
+
     if (term->name != "")
         out << " '" << term->name << "'";
 

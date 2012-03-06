@@ -15,6 +15,7 @@
 #include "modules.h"
 #include "parser.h"
 #include "source_repro.h"
+#include "stateful_code.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "subroutine.h"
@@ -1221,11 +1222,13 @@ ParseResult return_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 
     Term* output = NULL;
 
-    bool returnscaValue = !is_statement_ending(tokens.next().match) &&
+    bool returnsValue = !is_statement_ending(tokens.next().match) &&
         tokens.next().match != TK_RBRACE;
 
-    if (returnscaValue)
+    if (returnsValue)
         output = expression(branch, tokens, context).term;
+
+    branch_add_pack_state(branch);
 
     Term* result = apply(branch, RETURN_FUNC, TermList(output));
 

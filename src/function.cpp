@@ -110,7 +110,7 @@ void finish_building_function(Function* func, Type* declaredOutputType)
 {
     Branch* contents = function_contents(func);
 
-    pack_any_open_state_vars(contents);
+    // pack_any_open_state_vars(contents);
 
     // Write a list of output_placeholder terms.
 

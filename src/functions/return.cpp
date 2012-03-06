@@ -20,11 +20,13 @@ namespace return_function {
         Branch* branch = top_frame(CONTEXT)->branch;
 
         // Copy values to their output placeholders.
-        for (int i=0; inputs.length(); i++) {
+        for (int i=0; i < inputs.length(); i++) {
             Term* output = get_output_placeholder(branch, i);
+            caValue* out = get_register(CONTEXT, output);
             if (output == NULL)
-                break;
-            move(inputs[i], get_register(CONTEXT, output));
+                set_null(out);
+            else
+                move(inputs[i], out);
         }
 
         // Move PC to end

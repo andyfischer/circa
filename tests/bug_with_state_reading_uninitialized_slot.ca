@@ -5,7 +5,7 @@ def f()
 
     -- Declare 'u' with type 'any'. (by using type 'any', we won't allow the unpack_state to
     -- tell that the value was uninitialized by looking at the type)
-    state any u = 1
+    state any u = 2
 
 s = null
 f(state = s)

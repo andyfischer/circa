@@ -7,10 +7,12 @@ def f() -> int
 f_state = null
 result = f(state = f_state)
 print('should be 1: ' result)
+print('should be {s: 1}: ' f_state)
 
 result = f(state = f_state)
 print('should be 2: ' result)
+print('should be {s: 2}: ' f_state)
 
 result = f(state = f_state)
 print('should be 3: ' result)
-print('should be {s: 3} ' f_state)
+print('should be {s: 3}: ' f_state)

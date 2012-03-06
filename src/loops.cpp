@@ -175,7 +175,7 @@ void finish_for_loop(Term* forTerm)
     // Add a primary output
     apply(contents, FUNCS.output, TermList(NULL));
 
-    pack_any_open_state_vars(contents);
+    // pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);
     check_to_add_state_output_placeholder(contents);
     add_loop_output_term(contents);
@@ -253,6 +253,7 @@ void for_loop_fix_state_input(Branch* contents)
 
     Term* packStateList = apply(contents, FUNCS.pack_state_list_n,
         TermList(stateInput, stateResult, index));
+    packStateList->setBoolProp("final", true);
     move_after(packStateList, stateResult);
 }
 

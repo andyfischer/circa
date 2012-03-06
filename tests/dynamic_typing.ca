@@ -17,6 +17,5 @@ def h() -> any
     return Point([1 2])
 
 p = h()
-assert(to_string(p) == "[1.0, 2.0]")
 assert(p.x == 1.0)
 assert(p.y == 2.0)

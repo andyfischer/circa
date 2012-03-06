@@ -348,7 +348,10 @@ Term* find_from_unique_name(Branch* branch, const char* name)
     // O(n) search, maybe this should be made more efficient.
 
     for (int i=0; i < branch->length(); i++) {
-        if (strcmp(get_unique_name(branch->get(i)), name) == 0) {
+        Term* term = branch->get(i);
+        if (term == NULL)
+            continue;
+        if (strcmp(get_unique_name(term), name) == 0) {
             return branch->get(i);
         }
     }

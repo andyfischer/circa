@@ -25,7 +25,8 @@ namespace circa {
 EvalContext::EvalContext()
  : errorOccurred(false),
    numFrames(0),
-   stack(NULL)
+   stack(NULL),
+   trace(false)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
@@ -219,26 +220,6 @@ void evaluate_single_term(EvalContext* context, Term* term)
     frame->endPc = frame->pc + 1;
 
     run_interpreter(context);
-
-#if 0
-    if (term->function == NULL || !is_function(term->function))
-        return;
-
-    Function* function = as_function(term->function);
-
-    if (function->evaluate == NULL)
-        return;
-
-    #if CIRCA_THROW_ON_ERROR
-    try {
-    #endif
-
-    function->evaluate(context);
-
-    #if CIRCA_THROW_ON_ERROR
-    } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
-    #endif
-#endif
 }
 
 void copy_locals_back_to_terms(Frame* frame, Branch* branch)
@@ -672,6 +653,11 @@ do_instruction:
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
     #endif
+
+    if (context->trace) {
+        print_term(std::cout, term);
+        std::cout << " = " << to_string(get_output(context, 0)) << std::endl;
+    }
 
 #if 0
     // Check the type of the output value of every single call.

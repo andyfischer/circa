@@ -126,6 +126,7 @@ Term* append_state_input(Branch* branch);
 Term* insert_state_output(Branch* branch);
 Term* append_state_output(Branch* branch);
 bool is_state_input(Term* placeholder);
+bool is_state_output(Term* placeholder);
 
 // Search upwards starting at 'term', and returns the parent (or the term itself) found
 // in 'branch'. Returns NULL if not found.
@@ -154,6 +155,7 @@ Term* apply_after(Term* existing, Term* function);
 void move_before(Term* movee, Term* pivot);
 void move_after(Term* movee, Term* position); void move_after_inputs(Term* term);
 void move_before_outputs(Term* term);
+void move_before_final_terms(Term* term);
 void move_to_index(Term* term, int index);
 void transfer_users(Term* from, Term* to);
 

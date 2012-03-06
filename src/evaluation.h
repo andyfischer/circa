@@ -43,6 +43,9 @@ struct EvalContext
     int numFrames;
     Frame* stack;
 
+    // Debugging flag- print all steps to stdout.
+    bool trace;
+
     EvalContext();
     ~EvalContext();
 

@@ -43,14 +43,37 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
         }
     }
 
-    int outputCount = count_output_placeholders(branch);
+    // Figure out the term position; it should be placed before any output() terms.
+    // (unless it's an output term itself).
+    int position = branch->length();
+    if (function != FUNCS.output) {
+        while (position > 0) {
+            Term* preceding = branch->get(position - 1);
+            if (preceding == NULL)
+                break;
+
+            // Position before output() terms.
+            if (preceding->function == FUNCS.output) {
+                position--;
+                continue;
+            }
+
+            // Position before a pack_state() call that is 'final'
+            if (preceding->function == FUNCS.pack_state
+                    && preceding->boolPropOptional("final", false)) {
+                position--;
+                continue;
+            }
+
+            break;
+        }
+    }
 
     // Create the term
     Term* term = branch->appendNew();
 
     // Position the term before any output_placeholder terms.
-    if (function != FUNCS.output && outputCount > 0)
-        branch->move(term, branch->length() - outputCount - 1);
+    branch->move(term, position);
 
     if (name != "")
         rename(term, name);
@@ -64,7 +87,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     update_unique_name(term);
     on_inputs_changed(term);
     update_extra_outputs(term);
-    update_implicit_pack_call(term);
+    // update_implicit_pack_call(term);
 
     // Post-compile steps
 
@@ -115,7 +138,7 @@ void set_inputs(Term* term, TermList const& inputs)
     term->inputs.resize(inputs.length());
     for (int i=0; i < inputs.length(); i++) {
         assert_valid_term(inputs[i]);
-        term->inputs[0] = Term::Input(inputs[i]);
+        term->inputs[i] = Term::Input(inputs[i]);
     }
 
     // Add 'term' as a user to these new inputs
@@ -212,7 +235,7 @@ void change_function(Term* term, Term* function)
 
     // Possibly insert a state input for the enclosing subroutine.
     if (is_function_stateful(function))
-        on_stateful_function_call_created(term);
+        find_or_create_state_input(term->owningBranch);
 }
 
 
@@ -278,7 +301,7 @@ void rename(Term* term, std::string const& name)
     update_unique_name(term);
 
     // A rename can cause us to gain an implicit pack_state
-    update_implicit_pack_call(term);
+    // update_implicit_pack_call(term);
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
@@ -325,18 +348,10 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
 
-    set_branch_in_progress(branch, true);
+    Term *term = apply(branch, FUNCS.value, TermList(), name);
 
-    Term *term = branch->appendNew();
-
-    if (name != "")
-        rename(term, name);
-
-    change_function(term, FUNCS.value);
     change_declared_type(term, type);
     create(type, (caValue*) term);
-    update_unique_name(term);
-    update_implicit_pack_call(term);
 
     return term;
 }
@@ -607,12 +622,6 @@ void update_extra_outputs(Term* term)
         if (function_is_state_input(placeholder))
             extra_output->setBoolProp("state", true);
     }
-
-    // If any extra outputs were added, we might need to now add
-    // an implicit pack_state call.
-    if (anyAdded) {
-        update_implicit_pack_call(term);
-    }
 }
 
 Term* get_extra_output(Term* term, int index)
@@ -700,15 +709,6 @@ Term* find_open_state_result(Term* location)
     return find_open_state_result(location->owningBranch, location->index);
 }
 
-Term* find_or_create_open_state_result(Branch* branch, int position)
-{
-    Term* term = find_open_state_result(branch, position);
-    if (term == NULL)
-        return append_state_input(branch);
-    else
-        return term;
-}
-
 void check_to_insert_implicit_inputs(Term* term)
 {
     if (!is_function(term->function))
@@ -720,7 +720,7 @@ void check_to_insert_implicit_inputs(Term* term)
 
         int inputIndex = stateInput->index;
 
-        Term* container = find_or_create_open_state_result(term->owningBranch, term->index);
+        Term* container = find_or_create_state_input(term->owningBranch);
 
         // Add a unpack_state() call
         Term* unpack = apply(term->owningBranch, FUNCS.unpack_state,
@@ -728,10 +728,13 @@ void check_to_insert_implicit_inputs(Term* term)
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
 
+        // on_stateful_function_call_created(term->owningBranch);
+
         insert_input(term, inputIndex, unpack);
         set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
         set_input_hidden(term, inputIndex, true);
 
+#if 0
         // Add a corresponding pack_state() call
         Term* stateOutput = find_extra_output_for_state(term);
         if (stateOutput != NULL) {
@@ -739,9 +742,11 @@ void check_to_insert_implicit_inputs(Term* term)
                 TermList(container, stateOutput, term));
             hide_from_source(pack);
         }
+#endif
     }
 }
 
+#if 0 // DELETEME
 void update_implicit_pack_call(Term* term)
 {
     if (term->function == NULL)
@@ -774,6 +779,7 @@ void update_implicit_pack_call(Term* term)
         }
     }
 }
+#endif
 
 void set_step(Term* term, float step)
 {
@@ -836,7 +842,7 @@ void set_branch_in_progress(Branch* branch, bool inProgress)
     if (openState != NULL)
         insert_state_output(branch);
 
-    // Update stateType
+    // Update branch's state type
     branch_update_state_type(branch);
 
     branch->inProgress = false;
@@ -976,6 +982,10 @@ bool is_state_input(Term* placeholder)
 {
     return placeholder->boolPropOptional("state", false);
 }
+bool is_state_output(Term* placeholder)
+{
+    return placeholder->boolPropOptional("state", false);
+}
 
 Term* find_parent_term_in_branch(Term* term, Branch* branch)
 {
@@ -1033,10 +1043,17 @@ void move_before(Term* movee, Term* position)
 
 void move_after(Term* movee, Term* position)
 {
-    int pos = position->index + 1;
     Branch* branch = movee->owningBranch;
+    int pos = position->index + 1;
+
+    // Make sure the position is after any extra_output() terms
     while (branch->get(pos) != NULL && branch->get(pos)->function == EXTRA_OUTPUT_FUNC)
         pos++;
+
+    // If 'movee' is currently before 'position', then the desired index is one less
+    if (movee->index < position->index)
+        pos--;
+
     branch->move(movee, pos);
 }
 
@@ -1046,19 +1063,65 @@ void move_after_inputs(Term* term)
     int inputCount = count_input_placeholders(branch);
     branch->move(term, inputCount);
 }
+
+bool term_belongs_at_branch_end(Term* term)
+{
+    if (term == NULL)
+        return false;
+
+    if (term->function == FUNCS.output)
+        return true;
+
+    if (term->boolPropOptional("final", false))
+        return true;
+
+    return false;
+}
+
 void move_before_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
-    int outputCount = count_output_placeholders(branch);
 
-    int desiredIndex = branch->length() - outputCount - 1;
+    // Walk backwards to find the target position
+    int position = branch->length();
+    for (; position > 0; position--) {
+        Term* preceding = branch->get(position - 1);
 
-    // If the term is itself an output, then we can't expect it to go before
-    // all the outputs, so instead make it the first output.
-    if (is_output_placeholder(term))
-        desiredIndex += 1;
+        if (is_output_placeholder(preceding))
+            continue;
 
-    branch->move(term, desiredIndex);
+        break;
+    }
+
+    // We now have the position of the 1st final term. If this term isn't
+    // an output term itself, then move the position back one more.
+    if (!is_output_placeholder(term))
+        position--;
+
+    branch->move(term, position);
+}
+
+void move_before_final_terms(Term* term)
+{
+    Branch* branch = term->owningBranch;
+
+    // Walk backwards to find the target position
+    int position = branch->length();
+    for (; position > 0; position--) {
+        Term* preceding = branch->get(position - 1);
+
+        if (term_belongs_at_branch_end(preceding))
+            continue;
+
+        break;
+    }
+
+    // We now have the position of the 1st final term. If this term isn't
+    // a final term itself, then move the position back one more.
+    if (!term_belongs_at_branch_end(term))
+        position--;
+
+    branch->move(term, position);
 }
 
 void move_to_index(Term* term, int index)

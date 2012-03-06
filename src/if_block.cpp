@@ -449,6 +449,12 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     if (stateInput == NULL)
         return;
 
+    // If the state output is connected directly to state input, then do nothing.
+    Term* stateOutput = find_state_output(branch);
+
+    if (stateOutput->input(0) == stateInput)
+        return;
+
     Term* unpackList = apply(branch, FUNCS.unpack_state_from_list, TermList(stateInput));
     unpackList->setIntProp("index", index);
     move_after_inputs(unpackList);
@@ -460,13 +466,15 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
         remap_pointers_quick(term, stateInput, unpackList);
     }
 
-    Term* stateOutput = find_state_output(branch);
-    ca_assert(stateOutput->input(0) != stateInput);
+    Term* stateResult = stateOutput->input(0);
+    ca_assert(stateResult != NULL);
 
     Term* packList = apply(branch, FUNCS.pack_state_to_list,
-        TermList(stateInput, stateOutput->input(0)));
+        TermList(stateInput, stateResult));
     packList->setIntProp("index", index);
+    packList->setBoolProp("final", true);
     set_input(stateOutput, 0, packList);
+    move_after(packList, stateResult);
 }
 
 void finish_if_block(Term* ifBlock)
@@ -515,9 +523,6 @@ CA_FUNCTION(evaluate_if_block)
 
     for (; termIndex < contents->length(); termIndex++) {
         Term* caseTerm = contents->get(termIndex);
-
-        //std::cout << "checking: " << get_term_to_string_extended(caseTerm) << std::endl;
-        //std::cout << "with stack: " << STACK->toString() << std::endl;
 
         // Look at input
         caValue* caseInput = get_input(context, caseTerm->input(0));
