@@ -51,6 +51,11 @@ namespace type_t {
             append_phrase(source, ":nocopy", term, phrase_type::UNDEFINED);
         }
 
+        if (term->boolPropOptional("handle", false)) {
+            append_phrase(source, " ", term, phrase_type::WHITESPACE);
+            append_phrase(source, ":handle", term, phrase_type::UNDEFINED);
+        }
+
         if (term->boolPropOptional("syntax:semicolon", false)) {
             //append_phrase(source, ";", term, phrase_type::UNDEFINED);
             return;

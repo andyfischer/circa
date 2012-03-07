@@ -766,6 +766,7 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         } else if (s == ":handle") {
             // :handle is a temporary way to declare a handle type
             setup_handle_type(as_type(result));
+            result->setBoolProp("handle", true);
         } else {
             return compile_error_for_line(result, tokens, startPosition,
                 "Unrecognized type attribute: " + s);
@@ -913,7 +914,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     }
 
     // Move the if_block term to be after the condition terms.
-    branch->moveToEnd(result);
+    move_before_final_terms(result);
 
     finish_if_block(result);
     set_source_location(result, startPosition, tokens);

@@ -132,6 +132,16 @@ def list_files_recr(dir):
         for file in files:
             yield os.path.join(root,file)
 
+def list_directory_contents(dir):
+    return [os.path.join(dir, f) for f in os.listdir(dir)]
+
+def all_testable_files():
+    dirs = [TestRoot, TestRoot + '/field', TestRoot + '/bugrepro']
+    for dir in dirs:
+        for f in list_directory_contents(dir):
+            if f.endswith('.ca'):
+                yield f
+
 def run_all_tests():
 
     if 'CIRCA_HOME' in os.environ:
@@ -149,15 +159,13 @@ def run_all_tests():
 
     # Iterate through each test file
     # Future: support test files in subdirectories
-    for file in [os.path.join(TestRoot, f) for f in os.listdir(TestRoot)]:
-        if not file.endswith('.ca'):
-            continue
-
+    for file in all_testable_files():
         if file in disabled_tests:
             totalDisabledTests += 1
             continue
 
         totalTestCount += 1
+        print file
 
         failed = False
         try:

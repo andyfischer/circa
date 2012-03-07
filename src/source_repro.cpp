@@ -112,7 +112,7 @@ void format_term_source(StyledSource* source, Term* term)
                 std::stringstream out;
                 out << "Type " << name_to_string(type->name) <<
                     " doesn't have a formatSource function";
-                throw std::runtime_error(out.str());
+                internal_error(out.str());
             }
 
             type->formatSource(source, term);

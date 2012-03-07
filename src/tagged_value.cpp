@@ -200,8 +200,8 @@ void cast(CastResult* result, caValue* source, Type* type, caValue* dest, bool c
         return;
     }
 
-    // Default case when the type has no handler: only allow the cast if source has the exact
-    // same type
+    // Default case when the type has no cast handler: only allow the cast if source has
+    // the exact same type.
 
     if (source->value_type != type) {
         result->success = false;

@@ -49,6 +49,7 @@ void print_usage()
         "  -check <filename> : Statically check the script for any errors\n"
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
         "  -run-stdin        : Read and execute commands from stdin\n"
+        "  -source-repro     : Compile and reproduce a script's source (for testing)\n"
 #ifdef CIRCA_TEST_BUILD
         "  -test             : Run unit tests\n"
         "  -test <name>      : Run unit test of a certain name\n"

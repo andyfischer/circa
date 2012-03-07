@@ -1,0 +1,15 @@
+
+-- This repros a bug where the if_block call was messing up the position of the
+-- final 'pack_state' call.
+
+def main()
+  state a = 1
+
+  if true
+      a = 2
+
+  state b = 3
+
+s = null
+main(state = s)
+print(s)

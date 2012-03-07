@@ -35,10 +35,10 @@
 #include "types/hashtable.h"
 #include "types/indexable.h"
 #include "types/int.h"
+#include "types/name.h"
 #include "types/number.h"
 #include "types/ref.h"
 #include "types/set.h"
-#include "types/symbol.h"
 #include "types/void.h"
 
 #include "tools/command_reader.h"
@@ -270,11 +270,11 @@ void create_primitive_types()
     // handle_t::setup_type(&HANDLE_T);
     int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);
-    string_setup_type(&STRING_T);
-    symbol_t::setup_type(&NAME_T);
-    ref_t::setup_type(&REF_T);
-    void_t::setup_type(&VOID_T);
+    name_t::setup_type(&NAME_T);
     opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
+    ref_t::setup_type(&REF_T);
+    string_setup_type(&STRING_T);
+    void_t::setup_type(&VOID_T);
     eval_context_setup_type(&EVAL_CONTEXT_T);
 
     // errors are just stored as strings for now

@@ -1,0 +1,228 @@
+
+-- Taken from WeatherApp, there was a bug where state was being lost and textures
+-- were being constantly reloaded. The simplest code that reproduces the bug can
+-- be found at tests/bugrepro/if_block_messing_up_pack_state.ca
+
+type Vec3 {
+  number x
+  number y
+  number z
+}
+
+type Vec4 {
+  number x
+  number y
+  number z
+  number w
+}
+
+type Font :handle;
+type Label :handle;
+type Line :handle;
+type Sprite :handle;
+type Texture :handle;
+type TouchRegion :handle;
+
+def viewport_size() -> Point
+  return [100 100] -> Point
+
+def Label.width(label) -> number
+  return 10.0
+def Label.ascent(label) -> number
+  return 10.0
+def Label.descent(label) -> number
+  return 10.0
+def Label.setPosition(label, Point p)
+def Label.setColor(label, Color c)
+def Label.setText(label, Font font, string text)
+def Label.position(label) -> Point
+  return [100 100] -> Point
+def Label.right(label) -> number
+  return label.position().x + label.width()
+def Label.bottom(label) -> number
+  return label.position().y + label.ascent()
+def Label.left(label) -> number
+  return label.position().x
+
+def create_font(string name, int size) -> Font
+  return create(Font)
+def font(string name, int size) -> Font
+  state f = null
+  if changed([name size])
+    f = create_font(name, size)
+  return f
+
+def create_label() -> Label
+  return create(Label);
+def label(Font font, string text, Point pos) -> Label
+  state l = create_label()
+  if changed([font text])
+    l.setText(font,text)
+  if changed(pos)
+    l.setPosition(pos)
+  return l
+
+def create_line() -> Line
+  return create(Line)
+def Line.set(_, Point a, Point b)
+def Line.setColor(_, Color c)
+
+def create_sprite(Name pass) -> Sprite
+  return create(Sprite)
+def Sprite.loadFromFile(_, string filename)
+  print('loading: ' filename)
+def Sprite.setTexture(_, Texture texture)
+def Sprite.setTexture2(_, Texture texture)
+def Sprite.setBlend(_, number blend)
+def Sprite.setPosition(_, Point p)
+def Sprite.position(_) -> Point
+  return [100 100] -> Point
+def Sprite.size(_) -> Point
+  return [100 100] -> Point
+
+def Sprite.bounds(_) -> Vec4
+  p = _.position()
+  s = _.size()
+  return [p.x, p.y, p.x + s.x, p.y + s.y]
+
+def sprite(string filename, Name pass) -> Sprite
+  state s = create_sprite(pass)
+  if changed(filename)
+    s.loadFromFile(filename)
+  return s
+  
+def sprite_blank(Name pass) -> Sprite
+  state s = create_sprite(pass)
+  return s
+  
+def sprite_from_tex(Texture tex, Name pass) -> Sprite
+  state s = create_sprite(pass)
+  if changed(tex)
+    s.setTexture(tex)
+  return s
+  
+def create_texture() -> Texture
+  return create(Texture)
+def Texture.loadFromFile(_, string filename)
+  
+def texture(string filename) -> Texture
+  state s = create_texture()
+  if changed(filename)
+    s.loadFromFile(filename)
+  return s
+  
+def create_touch_region() -> TouchRegion
+  return create(TouchRegion)
+def TouchRegion.setBounds(_, Vec4 bounds)
+def TouchRegion.checkActivated(_) -> bool
+  return false
+def touch_region(Vec4 bounds) -> bool
+  state s = create_touch_region()
+  s.setBounds(bounds)
+  return s.checkActivated()
+  
+namespace strs
+  -- Generated at runtime by DisplayableStrings
+  
+namespace action
+  def options_menu()
+
+-- Helper functions
+def xline(number x, Color c)
+  state s = create_line()
+  s.set([x 0] [x 2000])
+  s.setColor(c)
+    
+def yline(number y, Color c)
+  state s = create_line()
+  s.set([0 y] [2000 y])
+  s.setColor(c)
+
+
+def main()
+    viewport_width = viewport_size().x
+
+    uiFont1 = font('PetitaMedium.ttf' 40)
+    locationFont = font('PetitaMedium.ttf' 35)
+    nowFont = font('PetitaMedium.ttf' 30)
+    nowTempFont = font('PetitaMedium.ttf' 80)
+    dayLetterFont = font('PetitaMedium.ttf' 30)
+    highTempFont = font('PetitaMedium.ttf' 50)
+    lowTempFont = font('PetitaMedium.ttf' 40)
+
+    textY = 60
+    --yline(textY #f00)
+
+    locationLabel = label(uiFont1, "location" [5, textY])
+
+    locationArrow = sprite("locationMoreArrow.png" :bitmap)
+    locationArrow.setPosition([locationLabel.right() + 5, textY - locationArrow.size().y])
+
+    optionsIcon = sprite("optionsIcon.png" :bitmap)
+    optionsIcon.setPosition([viewport_width - optionsIcon.size().x, 20])
+
+    if touch_region(optionsIcon.bounds())
+      action:options_menu()
+      -- todo: change the icon's color here in reaction to the touch
+
+    -- Daily buttons
+    dailyButtonTopY = 500
+    numDays = 7
+
+    -- Now area
+    nowAreaY = 90.0
+    nowAreaButton = sprite("nowAreaButtonVertSelected.png" :bitmap)
+    nowAreaButton.setPosition([0 nowAreaY])
+
+    dateLabel = label(nowFont "date" [10 nowAreaY + 50])
+    timeLabel = label(nowFont "time" [10 dateLabel.bottom() + 45])
+    feelsLabel = label(nowFont "FEELS" [0 0])
+    likeLabel = label(nowFont "time" [0 0])
+
+    feelsLikeLeft = viewport_width - max(feelsLabel.width() likeLabel.width()) - 15
+
+    feelsLabel.setPosition([feelsLikeLeft, nowAreaY + feelsLabel.ascent() + 35])
+    likeLabel.setPosition([feelsLikeLeft, feelsLabel.bottom() + likeLabel.ascent() + 10])
+
+    nowTempLabel = label(nowTempFont "temp" [0 0])
+    nowTempLabel.setPosition([feelsLikeLeft - nowTempLabel.width() - 20,
+        nowAreaY + nowTempLabel.ascent() + 40])
+    shortForecastLabel = label(nowFont "forecast" [0 0])
+    shortForecastLabel.setPosition([nowTempLabel.left() - shortForecastLabel.width() - 20, nowAreaY + shortForecastLabel.ascent() + 35])
+
+    calButtonVert = texture('calButtonVert.png')
+    calButtonVertSelect = texture('calButtonVertSelect.png')
+
+    for i in 0..numDays
+      state selected = false
+      
+      back = sprite_blank(:bitmap)
+      back.setTexture(calButtonVertSelect)
+      back.setTexture2(calButtonVert)
+      --back.setBlend(i / numDays)
+      
+      y = dailyButtonTopY
+      x = i / numDays * viewport_width
+      back.setPosition([x y])
+      
+      if touch_region([x, y, x + back.size().x, y + back.size().y])
+        selectedDay = i
+        print('touched ' i)
+        selected = not(selected)
+        
+      back.setBlend(cond(selected 0.0 1.0))
+      
+      dayLetter = ['M' 'T' 'W' 'T' 'F' 'S' 'S'][i]
+      highTemp = '71'
+      lowTemp = '51'
+      
+      l1 = label(dayLetterFont dayLetter [x + 5, y + 33])
+      l2 = label(highTempFont highTemp [x + 10, y + 80])
+      l3 = label(lowTempFont lowTemp [x + 20, y + 120])
+
+s = null
+
+-- Run three times
+main(state = s)
+main(state = s)
+main(state = s)

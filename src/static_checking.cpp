@@ -56,8 +56,11 @@ void check_input_for_static_error(List* errors, Term* term, int index)
     }
 
     // Check type
+    // Disabled for now
+#if 0
     if (term_output_never_satisfies_type(input, type))
         append_static_error_for_input(errors, term, "type_mismatch", index);
+#endif
 }
 
 void check_term_for_static_error(List* errors, Term* term)
