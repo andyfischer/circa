@@ -262,9 +262,13 @@ caType* circa_term_declared_type(caTerm* term)
     return (caType*) ((Term*) term)->type;
 }
 
-caStack* circa_new_stack()
+caStack* circa_alloc_stack()
 {
     return (caStack*) new EvalContext();
+}
+void circa_dealloc_stack(caStack* stack)
+{
+    delete (EvalContext*) stack;
 }
 
 void circa_run_module(caStack* stack, caName moduleName)
@@ -292,6 +296,7 @@ void circa_print_error_to_stdout(caStack* stack)
     EvalContext* context = (EvalContext*) stack;
     context_print_error_stack(std::cout, context);
 }
+
 caTerm* circa_get_term(caBranch* branch, int index)
 {
     return (caTerm*) ((Branch*) branch)->get(index);

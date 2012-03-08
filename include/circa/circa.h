@@ -9,10 +9,12 @@
 extern "C" {
 #endif
 
+// -- Circa Types --
+
+// a Name is an interned string that is referenced by integer.
 typedef int caName;
 
-// a Stack holds the current state of execution, including the list of activation records,
-// and some other data.
+// a Stack holds the interpreter's current state, including a list of activation records.
 typedef struct caStack caStack;
 
 // a Value is a variant value. It holds two pointers, one pointer to the Type object and one
@@ -20,33 +22,37 @@ typedef struct caStack caStack;
 // holds the actual value and not a pointer.
 typedef struct caValue caValue;
 
-// a Branch is a section of compiled code, it contains a list of Terms and some other metadata.
-// Each Term may contain a 'nested' Branch.
+// a Branch is a section of compiled code. It contains a list of Terms and some other metadata.
+// Each Term may itself contain a nested Branch.
 typedef struct caBranch caBranch;
 
-// a Term is one unit of compiled code. It consists of a function Term and a list of input Terms.
+// a Term is one unit of compiled code. Each term has a function and a list of inputs. A term
+// may also have a nested Branch.
 typedef struct caTerm caTerm;
 
-// a Type holds data for a single Circa type.
+// a Type holds data for a single Circa type, including a name, handlers for initialization
+// and destruction, and various other handlers and metadata.
 typedef struct caType caType;
 
-// Function object
+// a Function holds data for a single Circa function, including a name, the function's definition
+// (stored as a Branch), and various other metadata. Each Function has an EvaluateFunc which
+// is triggered when the function is called.
 typedef struct caFunction caFunction;
 
 // EvaluateFunc is the signature for a C evaluation function. The function will access the stack
-// to read inputs (if any), perform some action (sometimes), and write output values back to the
-// stack (if it has any outputs).
+// to read inputs (if any), possibly perform some action, and write output values (if any) back
+// to the stack.
 typedef void (*caEvaluateFunc)(caStack* stack);
 
 // ReleaseFunc is the signature for a C function that runs when a user object is about to be
 // destroyed.
 typedef void (*caReleaseFunc)(caValue* value);
 
-// Initialize Circa, should be called at startup before any other Circa functions.
+// Initialize Circa. This should be called at startup, before any other Circa functions.
 void circa_initialize();
 
-// Shutdown Circa, should be called when shutting down. This isn't required but calling it will
-// make memory-leak checking tools happier.
+// Shutdown Circa, this should be called before quitting. This isn't required, but calling
+// it will make memory-leak checking tools happier.
 void circa_shutdown();
 
 // Add a module search path, used when processing 'import' statements.
@@ -65,13 +71,30 @@ caName circa_name(const char* str);
 // Retrieve the string for a name.
 const char* circa_name_string(caName name);
 
-// Evaluation functions
+// -- Controlling the Interpreter --
 
-// Retrieve the given input value. This value must not be modified.
+// Allocate a new Stack object.
+caStack* circa_alloc_stack();
+
+// Deallocate a Stack object.
+void circa_dealloc_stack(caStack* stack);
+
+// Execute the named module.
+void circa_run_module(caStack* stack, caName moduleName);
+
+// Return whether a runtime error occurred.
+bool circa_has_error(caStack* stack);
+
+// Clear a runtime error from the stack.
+void circa_clear_error(caStack* stack);
+
+// Print a human-readable description of the stack's error to stdout.
+void circa_print_error_to_stdout(caStack* stack);
+
+// -- Fetching Inputs & Outputs --
+
+// Retrieve the given input value. This value may not be modified.
 caValue* circa_input(caStack* stack, int index);
-
-// Retrieve the Term corresponding to the given input index, for doing meta-code operations.
-caTerm* circa_input_term(caStack* stack, int index);
 
 // Read the given input index as an integer
 int circa_int_input(caStack* stack, int index);
@@ -91,6 +114,15 @@ caTerm* circa_current_term(caStack* stack);
 
 // Fetch the Branch for the function that is currently being evaluated
 caBranch* circa_callee_branch(caStack* stack);
+
+// -- Working With Tagged Values --
+
+// Allocate a new caValue container on the heap. This will call circa_init_value for you.
+caValue* circa_alloc_value();
+
+// Initialize a newly allocated caValue container. This must be called before any set()
+// functions.
+void circa_init_value(caValue* container);
 
 bool circa_is_int(caValue* container);
 bool circa_is_float(caValue* container);
@@ -117,34 +149,45 @@ void circa_get_color(caValue* color, float* rOut, float* gOut, float* bOut, floa
 // Read an opaque pointer from a caValue
 void* circa_as_pointer(caValue* container);
 
-// Initialize a newly allocated caValue container. This must be called before any set()
-// functions.
-void circa_init_value(caValue* container);
-
-// Allocate a new caValue container on the heap. This will call circa_init_value for you.
-caValue* circa_alloc_value();
-
-// Assign an integer to a caValue
-void circa_set_int(caValue* container, int value);
-
-void circa_set_float(caValue* container, float value);
-
-void circa_set_bool(caValue* container, bool value);
-
-// Assign an opaque pointer to a caValue
-void circa_set_pointer(caValue* container, void* ptr);
-
-void circa_set_string(caValue* container, const char* str);
-void circa_set_string_size(caValue* container, const char* str, int size);
-void circa_string_append(caValue* container, const char* str);
-
-void circa_set_list(caValue* list, int numElements);
-caValue* circa_list_append(caValue* list);
-void circa_set_point(caValue* point, float x, float y);
-
+// Assign a null value
 void circa_set_null(caValue* container);
 
+// Assign an integer
+void circa_set_int(caValue* container, int value);
+
+// Assign a float
+void circa_set_float(caValue* container, float value);
+
+// Assign a boolean
+void circa_set_bool(caValue* container, bool value);
+
+// Assign an opaque pointer
+void circa_set_pointer(caValue* container, void* ptr);
+
+// Assign a string
+void circa_set_string(caValue* container, const char* str);
+
+// Assign a string with the given length ('str' does not need to be null-terminated)
+void circa_set_string_size(caValue* container, const char* str, int size);
+
+// Append a value to a string
+void circa_string_append(caValue* container, const char* str);
+
+// Assign a list. The container will have length 'numElements' and each element will be NULL
+void circa_set_list(caValue* container, int numElements);
+
+// Append a value to a list and return it. The returned Value may be modified.
+caValue* circa_list_append(caValue* list);
+
+// Assign a point.
+void circa_set_point(caValue* point, float x, float y);
+
+// -- Handle Values --
+
+// Retrive a value from a Handle
 caValue* circa_handle_get_value(caValue* handle);
+
+// Assign a value to a Handle
 void circa_handle_set(caValue* container, caValue* value, caReleaseFunc releaseFunc);
 
 void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc);
@@ -157,8 +200,9 @@ void circa_create_value(caValue* value, caType* type);
 // Signal that an error has occurred
 void circa_raise_error(caStack* stack, const char* msg);
 
+// -- String Representation --
+
 // Load a Circa value from a string representation. The result will be written to 'out'.
-// 
 // If there is a parsing error, an error value will be saved to 'out'. (the caller should
 // check for this).
 void circa_parse_string(const char* str, caValue* out);
@@ -166,8 +210,28 @@ void circa_parse_string(const char* str, caValue* out);
 // Write a string representation of 'value' to 'out'.
 void circa_to_string_repr(caValue* value, caValue* out);
 
-// Install an evaluation function to the given named term. Returns the affected Term.
-caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
+// -- Code Reflection --
+
+// Retrive the nth input Term for the stack's current Term. May return NULL.
+// This is equivalent to: circa_term_get_input(circa_current_term(stack), index)
+caTerm* circa_input_term(caStack* stack, int index);
+
+// Get a Term from a Branch by index.
+caTerm* circa_get_term(caBranch* branch, int index);
+
+// Get the Branch contents for a given Term. This may return NULL.
+caBranch* circa_nested_branch(caTerm* term);
+
+// Get the Branch contents for a term with the given name.
+caBranch* circa_get_nested_branch(caBranch* branch, const char* name);
+
+// Get the Branch contents for a function
+caBranch* circa_function_contents(caFunction* func);
+
+// Access the fixed value of a value() Term. Returns NULL if Term is not a value.
+caValue* circa_term_value(caTerm* term);
+
+int circa_term_get_index(caTerm* term);
 
 // Fetch the number of inputs for the given term.
 int circa_term_num_inputs(caTerm* term);
@@ -178,38 +242,23 @@ caTerm* circa_term_get_input(caTerm* term, int index);
 // Fetch the Term's declared type.
 caType* circa_term_declared_type(caTerm* term);
 
-// Create a new Stack object
-caStack* circa_new_stack();
+// -- Code Building --
 
-void circa_run_module(caStack* stack, caName moduleName);
+// Install an evaluation function to the given named function. Returns the container Term.
+// Returns NULL if the name was not found.
+caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
 
-// Return whether a runtime error occurred.
-bool circa_error_occurred(caStack* stack);
-
-// Clear a runtime error from the stack.
-void circa_clear_error(caStack* stack);
-
-// Accessing code data
-
-// Get a Term from a Branch by index.
-caTerm* circa_get_term(caBranch* branch, int index);
-
-caBranch* circa_nested_branch(caTerm* term);
-caBranch* circa_get_nested_branch(caBranch* branch, const char* name);
-
-caBranch* circa_function_contents(caFunction* func);
-
-// Access the fixed value of the given Term.
-caValue* circa_term_value(caTerm* term);
-int circa_term_get_index(caTerm* term);
-
-// Building code
-caFunction* circa_declare_function(caBranch* branch, const char* name);
-caValue* circa_declare_value(caBranch* branch, const char* name);
-
+// Install an evaluation function to the given Function.
 void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate);
 
-// Debugging helpers
+// Create a new Function value with the given name. Returns the created Function.
+caFunction* circa_declare_function(caBranch* branch, const char* name);
+
+// Create a new value() term with the given name. Returns the term's value, which is safe
+// to modify.
+caValue* circa_declare_value(caBranch* branch, const char* name);
+
+// -- Debugging Helpers --
 
 // 'dump' commands will print a representation to stdout
 void circa_dump_s(caStack* stack);
