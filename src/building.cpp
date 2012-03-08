@@ -87,7 +87,6 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     update_unique_name(term);
     on_inputs_changed(term);
     update_extra_outputs(term);
-    // update_implicit_pack_call(term);
 
     // Post-compile steps
 
@@ -299,9 +298,6 @@ void rename(Term* term, std::string const& name)
 
     term->name = name;
     update_unique_name(term);
-
-    // A rename can cause us to gain an implicit pack_state
-    // update_implicit_pack_call(term);
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
@@ -728,58 +724,11 @@ void check_to_insert_implicit_inputs(Term* term)
         hide_from_source(unpack);
         term->owningBranch->move(unpack, term->index);
 
-        // on_stateful_function_call_created(term->owningBranch);
-
         insert_input(term, inputIndex, unpack);
         set_bool(term->inputInfo(inputIndex)->properties.insert("state"), true);
         set_input_hidden(term, inputIndex, true);
-
-#if 0
-        // Add a corresponding pack_state() call
-        Term* stateOutput = find_extra_output_for_state(term);
-        if (stateOutput != NULL) {
-            Term* pack = apply(term->owningBranch, FUNCS.pack_state,
-                TermList(container, stateOutput, term));
-            hide_from_source(pack);
-        }
-#endif
     }
 }
-
-#if 0 // DELETEME
-void update_implicit_pack_call(Term* term)
-{
-    if (term->function == NULL)
-        return;
-
-    Term* existingPack = find_user_with_function(term, FUNCS.pack_state);
-    if (existingPack != NULL)
-        return;
-
-    Branch* branch = term->owningBranch;
-
-    // Possibly append a pack_state() call for a state extra output.
-    Term* stateOutput = find_extra_output_for_state(term);
-    Term* unpack = find_input_with_function(term, FUNCS.unpack_state);
-    if (stateOutput != NULL && unpack != NULL) {
-        Term* container = unpack->input(0);
-        Term* pack = apply(term->owningBranch, FUNCS.pack_state,
-            TermList(container, stateOutput, term));
-        hide_from_source(pack);
-    }
-
-    // If this term rebinds the name of a declared state var, then it also needs
-    // a pack_state() call.
-    if (term->name != "") {
-        Term* firstBinding = branch->findFirstBinding(term->nameSymbol);
-        if (firstBinding->function == FUNCS.declared_state) {
-            Term* pack = apply(branch, FUNCS.pack_state,
-                TermList(find_open_state_result(branch, branch->length()), term, firstBinding));
-            move_after(pack, term);
-        }
-    }
-}
-#endif
 
 void set_step(Term* term, float step)
 {

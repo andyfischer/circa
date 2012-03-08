@@ -16,13 +16,6 @@ Term* branch_add_pack_state(Branch* branch);
 
 bool is_declared_state(Term* term);
 bool has_implicit_state(Term* term);
-void get_type_from_branches_stateful_terms(Branch* branch, Branch* type);
-void describe_state_shape(Branch* branch, caValue* output);
-
-void strip_orphaned_state(caValue* description, caValue* state,
-        caValue* trash);
-void strip_orphaned_state(Branch* branch, caValue* state, caValue* trash);
-void strip_orphaned_state(Branch* branch, caValue* state);
 
 void unpack_state(caStack* stack);
 void pack_state(caStack* stack);
