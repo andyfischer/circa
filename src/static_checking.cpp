@@ -47,7 +47,6 @@ void check_input_for_static_error(List* errors, Term* term, int index)
     Term* placeholder = term_get_input_placeholder(term, effectiveIndex);
     bool meta = placeholder->boolPropOptional("meta", false);
     bool optional = placeholder->boolPropOptional("optional", false);
-    Type* type = placeholder->type;
 
     if (input == NULL) {
         if (!meta && !optional)
@@ -58,6 +57,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
     // Check type
     // Disabled for now
 #if 0
+    Type* type = placeholder->type;
     if (term_output_never_satisfies_type(input, type))
         append_static_error_for_input(errors, term, "type_mismatch", index);
 #endif

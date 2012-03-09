@@ -138,9 +138,6 @@ float get_step(Term* term);
 bool is_lazy_call(Term* term);
 void set_lazy_call(Term* term, bool value);
 
-// Call the term's postCompile handler, if there is one.
-void post_compile_term(Term* term);
-
 void set_branch_in_progress(Branch* branch, bool inProgress);
 
 Term* find_last_non_comment_expression(Branch* branch);

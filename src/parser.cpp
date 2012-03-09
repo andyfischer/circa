@@ -413,9 +413,6 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
     if (initialPosition == tokens.getPosition())
         internal_error("parser::statement is stuck, next token is: " + tokens.nextStr());
 
-    // Some functions have a post-compile step.
-    post_compile_term(result.term);
-
     return result;
 }
 
@@ -870,7 +867,6 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (expectCondition) {
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
-            post_compile_term(condition);
             ca_assert(condition != NULL);
             currentBlock = apply(contents, FUNCS.case_func, TermList(condition));
         } else {
@@ -1003,7 +999,6 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     }
 
     Term* listExpr = infix_expression(branch, tokens, context).term;
-    post_compile_term(listExpr);
 
     std::string name;
     if (rebindListName)
@@ -1589,7 +1584,6 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
         }
 
         Term* term = expression(branch, tokens, context).term;
-        post_compile_term(term);
         inputHints.set(index, "postWhitespace", possible_whitespace_or_newline(tokens));
 
         arguments.append(term);
@@ -2138,6 +2132,8 @@ ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context
     Term* term = apply(branch, LAMBDA_FUNC, TermList());
     set_source_location(term, startPosition, tokens);
     consume_branch_with_braces(nested_contents(term), tokens, context, term);
+
+
     post_parse_branch(nested_contents(term));
     return ParseResult(term);
 }

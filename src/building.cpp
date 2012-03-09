@@ -768,11 +768,6 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
     }
 }
 
-void post_compile_term(Term* term)
-{
-    // TODO: delete me
-}
-
 void set_branch_in_progress(Branch* branch, bool inProgress)
 {
     if ((branch->inProgress && inProgress) || (!branch->inProgress && !inProgress))
