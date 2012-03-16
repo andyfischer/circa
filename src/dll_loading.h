@@ -2,7 +2,6 @@
 
 namespace circa {
 
-//void patch_with_dll(const char* dll_filename, Branch* branch, caValue* errorOut);
 void dll_loading_check_for_patches_on_loaded_branch(Branch* branch);
 
 } // namespace circa

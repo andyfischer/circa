@@ -1,8 +1,9 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "../common_headers.h"
+
 #include "../branch.h"
 #include "../building.h"
-#include "../common_headers.h"
 #include "../evaluation.h"
 #include "../kernel.h"
 #include "../list.h"
@@ -19,6 +20,8 @@ namespace circa {
 
 void read_stdin_line(caValue* line)
 {
+#if CIRCA_ENABLE_STDIN
+
     char* buf = NULL;
     size_t size = 0;
     ssize_t read = getline(&buf, &size, stdin);
@@ -37,6 +40,10 @@ void read_stdin_line(caValue* line)
 
     set_string(line, buf);
     free(buf);
+
+#else // CIRCA_ENABLE_STDIN
+    set_null(line);
+#endif // CIRCA_ENABLE_STDIN
 }
 
 void parse_string_as_argument_list(caValue* str, List* output)

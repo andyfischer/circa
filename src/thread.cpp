@@ -2,41 +2,52 @@
 
 #include "common_headers.h"
 
+#if CIRCA_ENABLE_THREADING
+
 #include <pthread.h>
 
 #include "circa/thread.h"
-
-extern "C" {
 
 typedef struct caMutex {
     pthread_mutex_t mutex;
 } caMutex;
 
-void circa_spawn_thread(caThreadMainFunc func, void* data)
+extern "C" void circa_spawn_thread(caThreadMainFunc func, void* data)
 {
     // TODO
 }
 
-caMutex* circa_create_mutex()
+extern "C" caMutex* circa_create_mutex()
 {
     caMutex* mutex = (caMutex*) malloc(sizeof(caMutex));
     pthread_mutex_init(&mutex->mutex, NULL);
     return mutex;
 }
-void circa_destroy_mutex(caMutex* mutex)
+extern "C" void circa_destroy_mutex(caMutex* mutex)
 {
     pthread_mutex_destroy(&mutex->mutex);
 }
 
 
-void circa_thread_mutex_lock(caMutex* mutex)
+extern "C" void circa_thread_mutex_lock(caMutex* mutex)
 {
     pthread_mutex_lock(&mutex->mutex);
 }
 
-void circa_thread_mutex_unlock(caMutex* mutex)
+extern "C" void circa_thread_mutex_unlock(caMutex* mutex)
 {
     pthread_mutex_unlock(&mutex->mutex);
 }
 
-} // extern "C"
+#else // CIRCA_ENABLE_THREADING
+
+typedef struct caMutex {
+} caMutex;
+
+extern "C" void circa_spawn_thread(caThreadMainFunc func, void* data) { }
+extern "C" caMutex* circa_create_mutex() { return NULL; }
+extern "C" void circa_destroy_mutex(caMutex* mutex) { }
+extern "C" void circa_thread_mutex_lock(caMutex* mutex) { }
+extern "C" void circa_thread_mutex_unlock(caMutex* mutex) { }
+
+#endif // CIRCA_ENABLE_THREADING

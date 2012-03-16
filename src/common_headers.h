@@ -102,3 +102,26 @@ typedef char GCColor;
 void ca_assert_function(bool result, const char* expr, int line, const char* file);
 
 } // namespace circa
+
+// Build flags
+
+// ENABLE_DLL_LOADING - Enables functions that can load shared libraries using dlopen.
+#ifndef CIRCA_ENABLE_DLL_LOADING
+#define CIRCA_ENABLE_DLL_LOADING 1
+#endif
+
+// ENABLE_STDIN - Enables functions that read from STDIN, such as the interactive command line.
+#ifndef CIRCA_ENABLE_STDIN
+#define CIRCA_ENABLE_STDIN 1
+#endif
+
+// ENABLE_FILESYSTEM - Enables functions that look at the filesystem, including getcwd() and
+// fopen()
+#ifndef CIRCA_ENABLE_FILESYSTEM
+#define CIRCA_ENABLE_FILESYSTEM 1
+#endif
+
+// ENABLE_THREADING - Enables functions that wrap around system threading utils
+#ifndef CIRCA_ENABLE_THREADING
+#define CIRCA_ENABLE_THREADING 1
+#endif

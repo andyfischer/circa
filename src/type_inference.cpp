@@ -96,6 +96,7 @@ Type* infer_type_of_get_index(Term* input)
     case LIST_TYPED_SIZED:
     case LIST_TYPED_SIZED_NAMED:
         return find_common_type(as_list(list_get_type_list_from_type(input->type)));
+    case LIST_INVALID_PARAMETER:
     default:
         return &ANY_T;
     }

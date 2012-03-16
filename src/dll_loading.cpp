@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#if CIRCA_ENABLE_DLL_LOADING
+
 #ifdef WINDOWS
 #else
 #include <dlfcn.h>
@@ -224,3 +226,16 @@ void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
 }
 
 } // namespace circa
+
+#else // CIRCA_ENABLE_DLL_LOADING
+
+namespace circa {
+
+void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
+{
+    // No-op
+}
+
+} // namespace circa
+
+#endif // CIRCA_ENABLE_DLL_LOADING

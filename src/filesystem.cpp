@@ -115,7 +115,12 @@ std::string get_absolute_path(std::string const& path)
     if (is_absolute_path(path))
         return path;
 
+#if !CIRCA_ENABLE_FILESYSTEM
+    return path;
+#endif
+
     char buf[512];
+
 #ifdef WINDOWS
     std::string cwd = _getcwd(buf, 512);
 #else

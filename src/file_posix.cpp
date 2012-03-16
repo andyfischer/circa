@@ -1,5 +1,9 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
+#if CIRCA_ENABLE_FILESYSTEM
+
 #include <dirent.h>
 #include <fstream>
 #include <sys/stat.h>
@@ -82,3 +86,12 @@ void install_posix_file_source()
 }
 
 } // extern "C"
+
+#else // CIRCA_ENABLE_FILESYSTEM
+
+extern "C" void install_posix_file_source()
+{
+    internal_error("POSIX file source is unavailable, CIRCA_ENABLE_FILESYSTEM is off");
+}
+
+#endif
