@@ -136,7 +136,11 @@ def list_directory_contents(dir):
     return [os.path.join(dir, f) for f in os.listdir(dir)]
 
 def all_testable_files():
-    dirs = [TestRoot, TestRoot + '/field', TestRoot + '/bugrepro']
+    dirs = [TestRoot,
+        TestRoot + '/field',
+        TestRoot + '/bugrepro',
+        TestRoot + '/for'
+        ]
     for dir in dirs:
         for f in list_directory_contents(dir):
             if f.endswith('.ca'):

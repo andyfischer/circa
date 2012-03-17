@@ -87,7 +87,6 @@ extern "C" void circa_use_standard_filesystem()
     circa_install_file_source(&source);
 }
 
-
 #else // CIRCA_ENABLE_FILESYSTEM
 
 extern "C" void circa_use_standard_filesystem()

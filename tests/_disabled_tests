@@ -1,7 +1,7 @@
 dynamic_function_dispatch.ca
 feedback.ca
-for_continue.ca
-for_index.ca
+for/continue.ca
+for/index.ca
 function_as_value.ca
 handle_type.ca
 local_typedef.ca
