@@ -7,7 +7,7 @@ namespace list_methods_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(append, "List.append(self :implied_rebind, any) -> List")
+    CA_DEFINE_FUNCTION(append, "List.append(self :rebind, any) -> List")
     {
         CONSUME_INPUT(0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
@@ -42,7 +42,7 @@ namespace list_methods_function {
         }
     }
 
-    CA_DEFINE_FUNCTION(extend, "List.extend(self :implied_rebind, List) -> List")
+    CA_DEFINE_FUNCTION(extend, "List.extend(self :rebind, List) -> List")
     {
         CONSUME_INPUT(0, OUTPUT);
         List* result = List::checkCast(OUTPUT);
@@ -68,7 +68,7 @@ namespace list_methods_function {
         set_int(OUTPUT, list->length());
     }
 
-    CA_DEFINE_FUNCTION(insert, "List.insert(self :implied_rebind, int, any) -> List")
+    CA_DEFINE_FUNCTION(insert, "List.insert(self :rebind, int, any) -> List")
     {
         caValue result;
         CONSUME_INPUT(0, &result);

@@ -631,7 +631,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
                 input->setBoolProp("output", true);
             } else if (symbolText == ":multiple") {
                 input->setBoolProp("multiple", true);
-            } else if (symbolText == ":implied_rebind") {
+            } else if (symbolText == ":rebind") {
                 input->setBoolProp("use-as-output", true);
             } else if (symbolText == ":meta") {
                 input->setBoolProp("meta", true);

@@ -1,0 +1,15 @@
+
+-- Test a method that modifies the object contents
+type Object
+{
+    int a
+}
+
+def Object.f(self :rebind) -> Object
+    self.a = 5
+    return self
+
+o = [3] -> Object
+assert(o.a == 3)
+o.f()
+assert(o.a == 5)

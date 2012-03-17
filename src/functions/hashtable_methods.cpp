@@ -43,10 +43,10 @@ namespace hashtable_methods_function {
     void setup(Branch* kernel)
     {
         import_function(kernel, insert,
-                "Map.add(self :implied_rebind, any, any) -> Map");
+                "Map.add(self :rebind, any, any) -> Map");
         import_function(kernel, contains, "Map.contains(self, any) -> bool");
         import_function(kernel, remove,
-                "Map.remove(self :implied_rebind, any) -> Map");
+                "Map.remove(self :rebind, any) -> Map");
         import_function(kernel, get, "Map.get(self, any) -> any");
     }
 }
