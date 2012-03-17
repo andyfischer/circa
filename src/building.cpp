@@ -1267,8 +1267,6 @@ void remap_pointers(Term* term, TermMap const& map)
     term->function = map.getRemapped(term->function);
 
     // TODO, call changeType if our type is changed
-    // This was implemented once, and it caused spurious crash bugs
-    // Term* newType = map.getRemapped(term->type);
     
     Type::RemapPointers remapPointers = term->type->remapPointers;
 
@@ -1307,6 +1305,95 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement)
         if (branch->get(i) == NULL) continue;
         remap_pointers(branch->get(i), map);
     }
+}
+
+
+// For a given 'get' expression, such as:
+//   result = get_field(container, field)
+//
+// This function will create a term that replaces the 'get' result with 'desiredValue'.
+// So for the above example, we would generate:
+//   set_field(container, field, desiredValue)
+//
+// If the term is not a recognized getter then we return NULL
+
+Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredValue)
+{
+    Term* set = NULL;
+
+    if (term->function == FUNCS.get_index) {
+        set = SET_INDEX_FUNC;
+    } else if (term->function == FUNCS.get_field) {
+        set = SET_FIELD_FUNC;
+    } else {
+        return NULL;
+    }
+
+    return apply(branch, set, TermList(term->input(0), term->input(1), desiredValue));
+}
+
+Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Term* desired)
+{
+    /*
+     * Consider the following expression:
+     *
+     * a[i0][i1][i2] = y
+     *
+     * The terms would look like this:
+     * 
+     * a = (some compound type)
+     * i0 = (an integer index)
+     * i1 = (an integer index)
+     * i2 = (an integer index)
+     * a_0 = get_index(a, i0)
+     * a_1 = get_index(a_0, i1)
+     * a_2 = get_index(a_1, i2)
+     * assign(a_2, y)
+     *
+     * (Some names are made up for clarity, the only terms that actually have names
+     * are "a" and "y")
+     *
+     * In order to do the assignment in a pure way, we want to generate the
+     * following terms:
+     *
+     * a_2' = set_index(a_2, i2, y)
+     * a_1' = set_index(a_1, i1, a_2')
+     * a_0' = set_index(a_0, i0, a_1')
+     *
+     * Then we rename the top-level name ("a") to the final result:
+     *
+     * a = a_0'
+     */
+
+    Term* getter = getterRoot;
+
+    while (true) {
+        Term* result = write_setter_from_getter(branch, getter, desired);
+
+        if (result == NULL)
+            break;
+
+        //hide_from_source(result);
+
+        desired = result;
+        getter = getter->input(0);
+
+        if (getter->name != "")
+            break;
+    }
+
+    return desired;
+}
+
+void write_setter_chain_for_assign_term(Term* assignTerm)
+{
+    Branch* contents = nested_contents(assignTerm);
+    clear_branch(contents);
+
+    Term* result = write_setter_chain_from_getter_chain(contents,
+        assignTerm->input(0), assignTerm->input(1));
+
+    append_output_placeholder(contents, result);
 }
 
 } // namespace circa

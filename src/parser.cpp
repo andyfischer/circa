@@ -408,7 +408,6 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
     // Mark this term as a statement
     set_is_statement(result.term, true);
 
-
     // Avoid an infinite loop
     if (initialPosition == tokens.getPosition())
         internal_error("parser::statement is stuck, next token is: " + tokens.nextStr());
@@ -1149,6 +1148,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
         term->setStringProp("syntax:rebindOperator", name);
     }
 
+        /*
     // If the term was an assign() term, then we may need to rebind the root name.
     if (term->function == FUNCS.assign) {
         Term* lexprRoot = find_lexpr_root(term->input(0));
@@ -1157,6 +1157,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
         }
         assign_function::update_assign_contents(term);
     }
+        */
 
     set_source_location(term, startPosition, tokens);
     set_is_statement(term, true);
@@ -1485,7 +1486,8 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 
             bool isRebinding = is_infix_operator_rebinding(operatorStr);
 
-            Term* term = find_and_apply(branch, functionName, TermList(leftExpr.term, rightExpr.term));
+            Term* function = find_name(branch, functionName.c_str());
+            Term* term = apply(branch, function, TermList(leftExpr.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);
 
@@ -1503,6 +1505,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                 else {
                     Term* assignTerm = apply(branch, FUNCS.assign, TermList(leftExpr.term, term));
                     assignTerm->setStringProp("syntax:rebindOperator", operatorStr);
+                    set_is_statement(assignTerm, true);
 
                     // Move an input's post-whitespace to this term.
                     caValue* existingPostWhitespace =
@@ -1511,13 +1514,19 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                     if (existingPostWhitespace != NULL)
                         move(existingPostWhitespace,
                             assignTerm->inputInfo(0)->properties.insert("postWhitespace"));
+
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
-                    if (lexprRoot != NULL && lexprRoot->name != "")
-                        rename(assignTerm, lexprRoot->name);
+                    write_setter_chain_for_assign_term(assignTerm);
+                    rename(assignTerm, lexprRoot->name);
                     
-                    assign_function::update_assign_contents(assignTerm);
                     term = assignTerm;
                 }
+            } else if (function == FUNCS.assign) {
+
+                set_is_statement(term, true);
+                write_setter_chain_for_assign_term(term);
+                Term* lexprRoot = find_lexpr_root(leftExpr.term);
+                rename(term, lexprRoot->name);
             }
 
             result = ParseResult(term);
