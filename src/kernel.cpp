@@ -543,8 +543,10 @@ EXPORT void circa_initialize()
         internal_error("circa fatal: static errors found in kernel");
     }
 
+#if CIRCA_ENABLE_FILESYSTEM
     // Use standard filesystem by default
     circa_use_standard_filesystem();
+#endif
 
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");

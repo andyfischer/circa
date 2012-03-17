@@ -24,10 +24,4 @@ void read_directory(const char* dirname, ReadDirectoryCallback callback,
 
 void read_directory_as_list(const char* dirname, List* result);
 
-void join_path(String* left, String* right);
-
 } // namespace circa
-
-extern "C" {
-    void circa_use_standard_filesystem();
-}

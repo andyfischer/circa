@@ -28,14 +28,3 @@ std::string get_directory_for_filename(std::string const& filename)
 }
 
 } // namespace circa
-
-// defined in filesystem_posix.cpp:
-void install_posix_filesystem_interface();
-
-// defined in file_posix.cpp
-EXPORT void install_posix_file_source();
-
-EXPORT void circa_use_standard_filesystem()
-{
-    install_posix_file_source();
-}

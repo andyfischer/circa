@@ -74,7 +74,9 @@ static caFileRecord* open_file(caFileSource* source, const char* filename)
     return record;
 }
 
-void install_posix_file_source()
+} // extern "C"
+
+extern "C" void circa_use_standard_filesystem()
 {
     caFileSource source;
     memset(&source, 0, sizeof(source));
@@ -85,11 +87,10 @@ void install_posix_file_source()
     circa_install_file_source(&source);
 }
 
-} // extern "C"
 
 #else // CIRCA_ENABLE_FILESYSTEM
 
-extern "C" void install_posix_file_source()
+extern "C" void circa_use_standard_filesystem()
 {
     internal_error("POSIX file source is unavailable, CIRCA_ENABLE_FILESYSTEM is off");
 }

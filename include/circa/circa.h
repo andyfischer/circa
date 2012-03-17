@@ -51,6 +51,8 @@ typedef void (*caReleaseFunc)(caValue* value);
 // Initialize Circa. This should be called at startup, before any other Circa functions.
 void circa_initialize();
 
+void circa_use_standard_filesystem();
+
 // Shutdown Circa, this should be called before quitting. This isn't required, but calling
 // it will make memory-leak checking tools happier.
 void circa_shutdown();
