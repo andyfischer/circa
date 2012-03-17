@@ -600,6 +600,8 @@ Branch* load_script_term(Branch* branch, const char* filename)
     Term* includeFunc = apply(branch, LOAD_SCRIPT_FUNC, TermList(filenameTerm));
     return nested_contents(includeFunc);
 }
+
+#if 0
 void save_script(Branch* branch)
 {
     std::string text = get_branch_source_text(branch);
@@ -616,6 +618,7 @@ void persist_branch_to_file(Branch* branch)
     std::string contents = get_branch_source_text(branch);
     write_text_file(filename.c_str(), contents.c_str());
 }
+#endif
 
 std::string get_source_file_location(Branch* branch)
 {

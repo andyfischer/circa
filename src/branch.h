@@ -153,11 +153,8 @@ Branch* include_script(Branch* branch, const char* filename);
 // branch.
 Branch* load_script_term(Branch* branch, const char* filename);
 
-void save_script(Branch* branch);
-
 Term* find_term_by_id(Branch* branch, unsigned int id);
 
-void persist_branch_to_file(Branch* branch);
 std::string get_source_file_location(Branch* branch);
 
 // Returns a List pointer if the branch has a file origin, NULL if not.

@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include <fstream>
+
 #include "string_type.h"
 
 #include "term.h"
@@ -11,7 +13,7 @@ using namespace circa;
 
 bool circa_is_absolute_path(caValue* path)
 {
-    // TODO: This function is terrible, need to use an existing library for dealing
+    // TODO: This function is bad, need to use an existing library for dealing
     // with paths.
     
     int len = string_length(path);
@@ -25,7 +27,7 @@ bool circa_is_absolute_path(caValue* path)
     
 void circa_get_directory_for_filename(caValue* filename, caValue* result)
 {
-    // TODO: This function is terrible, need to use an existing library for dealing
+    // TODO: This function is bad, need to use an existing library for dealing
     // with paths.
     int last_slash = string_find_char_from_end(filename, '/');
 
@@ -73,3 +75,38 @@ void circa_get_path_relative_to_source(caTerm* relativeTo, caValue* relPath, caV
     string_append(result, relPath);
 }
 
+static bool is_path_seperator(char c)
+{
+    // Not UTF safe.
+    return c == '/' || c == '\\';
+}
+
+void circa_join_path(caValue* left, caValue* right)
+{
+    const char* leftStr = as_cstring(left);
+    const char* rightStr = as_cstring(right);
+    int left_len = strlen(leftStr);
+    int right_len = strlen(leftStr);
+
+    int seperatorCount = 0;
+    if (left_len > 0 && is_path_seperator(leftStr[left_len-1]))
+        seperatorCount++;
+
+    if (right_len > 0 && is_path_seperator(rightStr[0]))
+        seperatorCount++;
+
+    if (seperatorCount == 2)
+        string_resize(left, left_len - 1);
+    else if (seperatorCount == 0)
+        string_append(left, "/");
+
+    string_append(left, right);
+}
+
+void circa_write_text_file(const char* filename, const char* contents)
+{
+    std::ofstream file;
+    file.open(filename, std::ios::out | std::ios::binary);
+    file << contents;
+    file.close();
+}

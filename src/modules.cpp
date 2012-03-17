@@ -2,9 +2,12 @@
 
 #include "common_headers.h"
 
+#include "circa/file.h"
+
 #include "building.h"
 #include "code_iterators.h"
 #include "filesystem.h"
+#include "file_utils.h"
 #include "list.h"
 #include "kernel.h"
 #include "modules.h"
@@ -69,10 +72,10 @@ static bool find_module_file(Name module_name, String* filenameOut)
         // Look under searchPath/moduleName.ca
         String searchPath;
         copy(g_moduleSearchPaths[i], &searchPath);
-        join_path(&searchPath, &module);
+        circa_join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (file_exists(as_cstring(&searchPath))) {
+        if (circa_file_exists(as_cstring(&searchPath))) {
             swap(&searchPath, filenameOut);
             return true;
         }
@@ -80,11 +83,11 @@ static bool find_module_file(Name module_name, String* filenameOut)
         // Look under searchPath/moduleName/moduleName.ca
         copy(g_moduleSearchPaths[i], &searchPath);
 
-        join_path(&searchPath, &module);
-        join_path(&searchPath, &module);
+        circa_join_path(&searchPath, &module);
+        circa_join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (file_exists(as_cstring(&searchPath))) {
+        if (circa_file_exists(as_cstring(&searchPath))) {
             swap(&searchPath, filenameOut);
             return true;
         }

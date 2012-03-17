@@ -173,6 +173,12 @@ const char* circa_read_file(const char* filename)
     return record->data;
 }
 
+bool circa_file_exists(const char* filename)
+{
+    caFileRecord* record = circa_open_file(filename);
+    return record != NULL;
+}
+
 int circa_file_get_version(const char* filename)
 {
     caFileRecord* record = circa_open_file(filename);

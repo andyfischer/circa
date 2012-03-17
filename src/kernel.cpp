@@ -161,13 +161,9 @@ Type* output_placeholder_specializeType(Term* caller)
     return declared_type(caller->input(0));
 }
 
-CA_FUNCTION(file__modified_time)
-{
-    set_int(OUTPUT, get_modified_time(STRING_INPUT(0)));
-}
 CA_FUNCTION(file__exists)
 {
-    set_bool(OUTPUT, file_exists(STRING_INPUT(0)));
+    set_bool(OUTPUT, circa_file_exists(STRING_INPUT(0)));
 }
 CA_FUNCTION(file__version)
 {
@@ -503,7 +499,6 @@ void install_standard_library(Branch* kernel)
 
     // Install each function
     install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
-    install_function(kernel->get("file:modified_time"), file__modified_time);
     install_function(kernel->get("file:version"), file__version);
     install_function(kernel->get("file:exists"), file__exists);
     install_function(kernel->get("file:read_text"), file__read_text);
