@@ -11,6 +11,7 @@
 #include "dll_loading.h"
 #include "evaluation.h"
 #include "filesystem.h"
+#include "file_utils.h"
 #include "function.h"
 #include "importing_macros.h"
 #include "introspection.h"
@@ -619,19 +620,25 @@ void persist_branch_to_file(Branch* branch)
 std::string get_source_file_location(Branch* branch)
 {
     // Search upwards until we find a branch that has source-file defined.
-    Branch* branch_p = branch;
-
-    while (branch_p != NULL && get_branch_source_filename(branch_p) == "") {
-        if (branch_p->owningTerm == NULL)
-            branch_p = NULL;
+    while (branch != NULL && get_branch_source_filename(branch) == "") {
+        if (branch->owningTerm == NULL)
+            branch = NULL;
         else
-            branch_p = branch_p->owningTerm->owningBranch;
+            branch = branch->owningTerm->owningBranch;
     }
 
-    if (branch_p == NULL)
+    if (branch == NULL)
         return "";
 
-    return get_directory_for_filename(get_branch_source_filename(branch_p));
+    caValue* sourceFilename = branch_get_source_filename(branch);
+
+    if (sourceFilename == NULL)
+        return "";
+
+    caValue directory;
+    circa_get_directory_for_filename(sourceFilename, &directory);
+
+    return as_string(&directory);
 }
 
 List* branch_get_file_origin(Branch* branch)

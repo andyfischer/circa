@@ -1,7 +1,10 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
+#include "common_headers.h"
+
 #include "branch.h"
 #include "filesystem.h"
+#include "file_utils.h"
 #include "string_type.h"
 #include "term.h"
 
@@ -98,21 +101,12 @@ std::string get_directory_for_filename(std::string const& filename)
     return result;
 }
 
-bool is_absolute_path(std::string const& path)
-{
-    // TODO: This function is terrible, need to use an existing library for dealing
-    // with paths.
-    
-    if (path.length() >= 1 && path[0] == '/')
-        return true;
-    if (path.length() >= 2 && path[1] == ':')
-        return true;
-    return false;
-}
-
 std::string get_absolute_path(std::string const& path)
 {
-    if (is_absolute_path(path))
+    caValue pathValue;
+    set_string(&pathValue, path.c_str());
+
+    if (circa_is_absolute_path(&pathValue))
         return path;
 
 #if !CIRCA_ENABLE_FILESYSTEM

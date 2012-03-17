@@ -238,6 +238,16 @@ int string_find_char(caValue* s, int start, char c)
     return -1;
 }
 
+int string_find_char_from_end(caValue* s, char c)
+{
+    const char* cstr = as_cstring(s);
+
+    for (int i=strlen(cstr) - 1; i >= 0; i--)
+        if (cstr[i] == c)
+            return i;
+    return -1;
+}
+
 void string_split(caValue* s, char sep, caValue* listOut)
 {
     set_list(listOut, 0);

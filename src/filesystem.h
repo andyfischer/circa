@@ -15,10 +15,6 @@
 
 namespace circa {
 
-std::string get_directory_for_filename(std::string const& filename);
-bool is_absolute_path(std::string const& path);
-std::string get_absolute_path(std::string const& path);
-
 // Callback used in read_text_file(). If the file is read successfully, then
 // 'contents' will contain its full contents. If there is an error, 'contents'
 // will be NULL and 'error' will have a human-readable description of the error.
