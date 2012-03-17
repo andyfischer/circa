@@ -13,3 +13,19 @@ o = [3] -> Object
 assert(o.a == 3)
 o.f()
 assert(o.a == 5)
+
+-- Same test, but with a nested object
+type Object2
+{
+    List list
+}
+
+def Object2.f(self :rebind) -> Object2
+    self.list.append(5)
+    return self
+
+o = create(Object2)
+assert(o.list == [])
+o.f()
+print(o.list)
+assert(o.list == [5])

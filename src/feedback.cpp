@@ -241,27 +241,27 @@ void refresh_training_branch(Branch& branch, Branch& trainingBranch)
             continue;
 
         // Apply feedback function
-        TermList feedbackcaValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
+        TermList feedbackValues = operation.getFeedback(term, DESIRED_VALUE_FEEDBACK);
 
         // TODO: accumulate desired value
-        Term* desiredcaValue = feedbackcaValues[0];
+        Term* desiredValue = feedbackValues[0];
 
         if (term->numInputs() == 0) {
             // Just create a feedback term. This is probably an assign() for a value()
-            apply(trainingBranch, feedbackFunc, TermList(term, desiredcaValue));
+            apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
 
         } else if (term->numInputs() == 1) {
             // Create a feedback term with only 1 output
-            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredcaValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
             operation.sendFeedback(term->input(0), feedback, DESIRED_VALUE_FEEDBACK);
 
         } else if (term->numInputs() > 1) {
 
             // If the term has multiple inputs, then the feedback term will have multiple outputs
 
-            // Inputs to feedback func are [originalTerm, desiredcaValue]
+            // Inputs to feedback func are [originalTerm, desiredValue]
 
-            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredcaValue));
+            Term* feedback = apply(trainingBranch, feedbackFunc, TermList(term, desiredValue));
             // Resize the output of 'feedback' so that there is one output term per input
             resize_list(feedback_output(feedback), term->numInputs(), ANY_TYPE);
 
