@@ -236,6 +236,11 @@ CA_FUNCTION(Branch__dump)
     dump(as_branch(INPUT(0)));
 }
 
+CA_FUNCTION(Function__name)
+{
+    set_string(OUTPUT, as_function(INPUT(0))->name);
+}
+
 CA_FUNCTION(length)
 {
     set_int(OUTPUT, num_elements(INPUT(0)));
@@ -324,6 +329,7 @@ void bootstrap_kernel()
 
     function_t::initialize(&FUNCTION_T, valueFunc);
     initialize_function(valueFunc);
+    as_function(valueFunc)->name = "value";
 
     // Initialize primitive types (this requires value() function)
     BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
@@ -514,6 +520,7 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("sys:module_search_paths"), sys__module_search_paths);
     install_function(kernel->get("sys:do_admin_command"), sys__do_admin_command);
     install_function(kernel->get("Branch.dump"), Branch__dump);
+    install_function(kernel->get("Function.name"), Function__name);
 
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");

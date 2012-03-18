@@ -84,14 +84,6 @@ Branch* function_contents(Function* func)
     return nested_contents(func->declaringTerm);
 }
 
-Function* as_function(Term* func)
-{
-    if (func == NULL)
-        return NULL;
-    ca_assert(is_function(func));
-    return (Function*) get_pointer(func);
-}
-
 std::string get_placeholder_name_for_index(int index)
 {
     std::stringstream sstream;

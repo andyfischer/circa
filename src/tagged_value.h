@@ -159,7 +159,6 @@ Branch*     as_branch(caValue* value);
 const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
 Function*   as_function(caValue* value);
-Term*       as_function_pointer(caValue* value);
 int         as_int(caValue* value);
 List*       as_list(caValue* value);
 void*       as_opaque_pointer(caValue* value);
@@ -171,7 +170,6 @@ void set_bool(caValue* value, bool b);
 void set_branch(caValue* value, Branch* branch);
 Dict* set_dict(caValue* value);
 void set_float(caValue* value, float f);
-void set_function_pointer(caValue* value, Term* function);
 void set_int(caValue* value, int i);
 List* set_list(caValue* value);
 List* set_list(caValue* value, int size);
@@ -179,6 +177,7 @@ void set_opaque_pointer(caValue* value, void* addr);
 void set_string(caValue* value, const char* s);
 void set_string(caValue* value, std::string const& s);
 void set_type(caValue* value, Type* type);
+void set_function(caValue* value, Function* function);
 
 // Complex unboxing functions.
 float to_float(caValue* value);

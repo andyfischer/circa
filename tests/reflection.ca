@@ -13,14 +13,18 @@ for i in 0..4
 a = br.get_term(1)
 b = br.get_term(3)
 
--- names
+-- Names
 assert(a.name() == 'a')
 assert(b.name() == 'b')
 
--- source location
+-- Source location
 assert(a.source_location() == [2, 3, 8, 3])
 
--- inputs
+-- Inputs
 assert(a.num_inputs() == 0)
 assert(b.num_inputs() == 2)
 assert(b.input(0) == a)
+
+-- Function
+assert(a.function().name() == "value")
+assert(b.function().name() == "add")

@@ -494,12 +494,12 @@ void set_type(caValue* value, Type* type)
     value->value_data.ptr = type;
 }
 
-void set_function_pointer(caValue* value, Term* function)
+void set_function(caValue* value, Function* function)
 {
-    change_type(value, &FUNCTION_T);
+    set_null(value);
+    value->value_type = &FUNCTION_T;
     value->value_data.ptr = function;
 }
-
 
 void set_opaque_pointer(caValue* value, void* addr)
 {
@@ -563,11 +563,6 @@ Type* as_type(caValue* value)
 {
     ca_assert(is_type(value));
     return (Type*) value->value_data.ptr;
-}
-Term* as_function_pointer(caValue* value)
-{
-    ca_assert(is_function_pointer(value));
-    return (Term*) value->value_data.ptr;
 }
 List* as_list(caValue* value)
 {

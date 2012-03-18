@@ -31,7 +31,14 @@ namespace term_methods_function {
         Term* t = INPUT(0)->asRef();
         if (t == NULL)
             return RAISE_ERROR("NULL reference");
-        set_ref(OUTPUT, t->function);
+        set_function(OUTPUT, as_function(t->function));
+    }
+    CA_FUNCTION(get_type)
+    {
+        Term* t = INPUT(0)->asRef();
+        if (t == NULL)
+            return RAISE_ERROR("NULL reference");
+        set_type(OUTPUT, t->type);
     }
     CA_FUNCTION(assign)
     {
@@ -178,7 +185,8 @@ namespace term_methods_function {
         import_function(kernel, hosted_to_string, "Term.to_string(_) -> string");
         import_function(kernel, hosted_to_source_string,
                 "Term.to_source_string(_) -> string");
-        import_function(kernel, get_function, "Term.function(_) -> Term");
+        import_function(kernel, get_function, "Term.function(_) -> Function");
+        import_function(kernel, get_type, "Term.get_type(_) -> Type");
         import_function(kernel, assign, "Term.assign(_, any)");
         import_function(kernel, tweak, "Term.tweak(_, number steps)");
         import_function(kernel, asint, "Term.asint(_) -> int");

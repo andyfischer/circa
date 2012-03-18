@@ -13,6 +13,7 @@ namespace list_methods_function {
         List* result = List::checkCast(EXTRA_OUTPUT(0));
         CONSUME_INPUT(1, result->append());
     }
+
     Type* append_specializeType(Term* term)
     {
         Term* listInput = term->input(0);
