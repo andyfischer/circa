@@ -7,10 +7,10 @@ namespace list_methods_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(append, "List.append(self :rebind, any) -> List")
+    CA_DEFINE_FUNCTION(append, "List.append(self :out, any)")
     {
-        CONSUME_INPUT(0, OUTPUT);
-        List* result = List::checkCast(OUTPUT);
+        CONSUME_INPUT(0, EXTRA_OUTPUT(0));
+        List* result = List::checkCast(EXTRA_OUTPUT(0));
         CONSUME_INPUT(1, result->append());
     }
     Type* append_specializeType(Term* term)
@@ -42,10 +42,10 @@ namespace list_methods_function {
         }
     }
 
-    CA_DEFINE_FUNCTION(extend, "List.extend(self :rebind, List) -> List")
+    CA_DEFINE_FUNCTION(extend, "List.extend(self :out, List)")
     {
-        CONSUME_INPUT(0, OUTPUT);
-        List* result = List::checkCast(OUTPUT);
+        CONSUME_INPUT(0, EXTRA_OUTPUT(0));
+        List* result = List::checkCast(EXTRA_OUTPUT(0));
 
         List* additions = List::checkCast(INPUT(1));
 
@@ -68,13 +68,13 @@ namespace list_methods_function {
         set_int(OUTPUT, list->length());
     }
 
-    CA_DEFINE_FUNCTION(insert, "List.insert(self :rebind, int, any) -> List")
+    CA_DEFINE_FUNCTION(insert, "List.insert(self :out, int, any)")
     {
         caValue result;
         CONSUME_INPUT(0, &result);
         caValue* newItem = list_insert(&result, INT_INPUT(1));
         CONSUME_INPUT(2, newItem);
-        swap(&result, OUTPUT);
+        swap(&result, EXTRA_OUTPUT(0));
     }
 
     CA_DEFINE_FUNCTION(slice, "List.slice(self, int start, int fin) -> List")

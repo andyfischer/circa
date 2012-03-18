@@ -237,15 +237,6 @@ bool function_can_rebind_input(Term* func, int index)
     return input->boolPropOptional("output", false);
 }
 
-bool function_implicitly_rebinds_input(Term* function, int index)
-{
-    Function* funcAttrs = as_function(function);
-    Term* input = function_get_input_placeholder(funcAttrs, index);
-    if (input == NULL)
-        return false;
-    return input->boolPropOptional("rebind", false);
-}
-
 bool function_call_rebinds_input(Term* term, int index)
 {
     return get_input_syntax_hint_optional(term, index, "rebindInput", "") == "t";
@@ -405,6 +396,11 @@ std::string function_get_input_name(Function* func, int index)
     if (placeholder == NULL)
         return "";
     return placeholder->name;
+}
+
+bool function_input_is_extra_output(Function* func, int index)
+{
+    return function_get_input_placeholder(func, index)->boolPropOptional("output", false);
 }
 
 std::string function_get_documentation_string(Function* func)

@@ -16,16 +16,16 @@ namespace hashtable_methods_function {
     CA_FUNCTION(insert)
     {
         caValue key, value;
-        CONSUME_INPUT(0, OUTPUT);
+        CONSUME_INPUT(0, EXTRA_OUTPUT(0));
         CONSUME_INPUT(1, &key);
         CONSUME_INPUT(2, &value);
-        hashtable_t::table_insert(OUTPUT, &key, &value, true, true);
+        hashtable_t::table_insert(EXTRA_OUTPUT(0), &key, &value, true, true);
     }
 
     CA_FUNCTION(remove)
     {
-        CONSUME_INPUT(0, OUTPUT);
-        hashtable_t::table_remove(OUTPUT, INPUT(1));
+        CONSUME_INPUT(0, EXTRA_OUTPUT(0));
+        hashtable_t::table_remove(EXTRA_OUTPUT(0), INPUT(1));
     }
 
     CA_FUNCTION(get)
@@ -42,11 +42,9 @@ namespace hashtable_methods_function {
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, insert,
-                "Map.add(self :rebind, any, any) -> Map");
+        import_function(kernel, insert, "Map.add(self :out, any, any)");
         import_function(kernel, contains, "Map.contains(self, any) -> bool");
-        import_function(kernel, remove,
-                "Map.remove(self :rebind, any) -> Map");
+        import_function(kernel, remove, "Map.remove(self :out, any)");
         import_function(kernel, get, "Map.get(self, any) -> any");
     }
 }

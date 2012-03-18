@@ -631,7 +631,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             } else if (symbolText == ":multiple") {
                 input->setBoolProp("multiple", true);
             } else if (symbolText == ":rebind") {
-                input->setBoolProp("rebind", true);
+                internal_error(":rebind arg is old, use :out instead");
             } else if (symbolText == ":meta") {
                 input->setBoolProp("meta", true);
             } else {
@@ -1641,9 +1641,10 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Term* lexprRoot = find_lexpr_root(term->input(0));
 
     // Check if the method call implicitly rebinds this name
-    if (lexprRoot->name != "" && function_implicitly_rebinds_input(function, 0)) {
+    if (lexprRoot->name != "" && function_input_is_extra_output(as_function(function), 0)) {
         // LHS may be a getter-chain
-        Term* lhs = write_setter_chain_from_getter_chain(branch, term->input(0), term);
+        Term* lhs = write_setter_chain_from_getter_chain(branch, term->input(0),
+            get_extra_output(term, 0));
         rename(lhs, lexprRoot->name);
     }
 

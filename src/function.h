@@ -85,10 +85,6 @@ Type* derive_specialized_output_type(Term* function, Term* call);
 // calling code must still opt-in to this rebind.
 bool function_can_rebind_input(Term* function, int index);
 
-// Returns whether the function will implicitly rebind the input at the given
-// index. (in practice, this only happens for some method calls).
-bool function_implicitly_rebinds_input(Term* function, int index);
-
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);
 
@@ -121,6 +117,7 @@ Term* function_get_output_placeholder(Function* func, int index);
 Branch* function_get_contents(Function* func);
 std::string function_get_input_name(Function* func, int index);
 
+bool function_input_is_extra_output(Function* func, int index);
 std::string function_get_documentation_string(Function* func);
 
 const char* get_output_name(Term* term, int outputIndex);

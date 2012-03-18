@@ -5,7 +5,7 @@ type Object
     int a
 }
 
-def Object.f(self :rebind) -> Object
+def Object.f(self :out) -> Object
     self.a = 5
     return self
 
@@ -20,9 +20,8 @@ type Object2
     List list
 }
 
-def Object2.f(self :rebind) -> Object2
+def Object2.f(self :out)
     self.list.append(5)
-    return self
 
 o = create(Object2)
 assert(o.list == [])

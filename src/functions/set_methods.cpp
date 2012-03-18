@@ -9,8 +9,8 @@ namespace set_methods_function {
 
     CA_FUNCTION(hosted_add)
     {
-        copy(INPUT(0), OUTPUT);
-        List* output = List::checkCast(OUTPUT);
+        copy(INPUT(0), EXTRA_OUTPUT(0));
+        List* output = List::checkCast(EXTRA_OUTPUT(0));
         caValue* value = INPUT(1);
         if (!set_t::contains(output, value))
             copy(value, output->append());
@@ -25,8 +25,8 @@ namespace set_methods_function {
 
     CA_FUNCTION(remove)
     {
-        copy(INPUT(0), OUTPUT);
-        List* list = List::checkCast(OUTPUT);
+        copy(INPUT(0), EXTRA_OUTPUT(0));
+        List* list = List::checkCast(EXTRA_OUTPUT(0));
         caValue* value = INPUT(1);
 
         int numElements = list->numElements();
@@ -40,8 +40,8 @@ namespace set_methods_function {
     
     void setup(Branch* kernel)
     {
-        import_function(kernel, hosted_add, "Set.add(self :rebind, any) -> Set");
-        import_function(kernel, remove, "Set.remove(self :rebind, any) -> Set");
+        import_function(kernel, hosted_add, "Set.add(self :out, any)");
+        import_function(kernel, remove, "Set.remove(self :out, any)");
         import_function(kernel, contains, "Set.contains(self, any) -> bool");
     }
 
