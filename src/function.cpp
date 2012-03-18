@@ -242,7 +242,7 @@ bool function_implicitly_rebinds_input(Term* function, int index)
     Term* input = function_get_input_placeholder(funcAttrs, index);
     if (input == NULL)
         return false;
-    return input->boolPropOptional("use-as-output", false);
+    return input->boolPropOptional("rebind", false);
 }
 
 bool function_call_rebinds_input(Term* term, int index)
@@ -524,6 +524,11 @@ void function_format_header_source(StyledSource* source, Function* func)
         if (input->boolPropOptional("meta", false)) {
             append_phrase(source, " ", term, TK_WHITESPACE);
             append_phrase(source, ":meta", term, phrase_type::UNDEFINED);
+        }
+
+        if (input->boolPropOptional("rebind", false)) {
+            append_phrase(source, " ", term, TK_WHITESPACE);
+            append_phrase(source, ":rebind", term, phrase_type::UNDEFINED);
         }
     }
 

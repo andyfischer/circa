@@ -631,7 +631,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             } else if (symbolText == ":multiple") {
                 input->setBoolProp("multiple", true);
             } else if (symbolText == ":rebind") {
-                input->setBoolProp("use-as-output", true);
+                input->setBoolProp("rebind", true);
             } else if (symbolText == ":meta") {
                 input->setBoolProp("meta", true);
             } else {
@@ -1638,8 +1638,14 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     // Create the term
     Term* term = apply(branch, function, inputs);
 
-    if (root.term->name != "" && function_implicitly_rebinds_input(function, 0))
-        rename(term, root.term->name);
+    Term* lexprRoot = find_lexpr_root(term->input(0));
+
+    // Check if the method call implicitly rebinds this name
+    if (lexprRoot->name != "" && function_implicitly_rebinds_input(function, 0)) {
+        // LHS may be a getter-chain
+        Term* lhs = write_setter_chain_from_getter_chain(branch, term->input(0), term);
+        rename(lhs, lexprRoot->name);
+    }
 
     inputHints.apply(term);
     check_to_insert_implicit_inputs(term);

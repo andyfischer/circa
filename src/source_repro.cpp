@@ -292,7 +292,7 @@ bool has_implicit_name_binding(Term* term)
     if (!is_method_call(term))
         return false;
     return function_get_input_placeholder(as_function(term->function), 0)
-        ->boolPropOptional("use-as-output", false);
+        ->boolPropOptional("rebind", false);
 }
 
 void format_name_binding(StyledSource* source, Term* term)

@@ -27,5 +27,21 @@ def Object2.f(self :rebind) -> Object2
 o = create(Object2)
 assert(o.list == [])
 o.f()
-print(o.list)
 assert(o.list == [5])
+o.f()
+assert(o.list == [5 5])
+o.f()
+assert(o.list == [5 5 5])
+
+-- Multiple levels of nesting
+type T1 { List list }
+type T2 { T1 t }
+type T3 { T2 t }
+type T4 { T3 t }
+
+t = create(T4)
+assert(to_string(t) == "{t: {t: {t: {list: []}}}}")
+assert(t.t.t.t.list == [])
+t.t.t.t.list.append(10)
+assert(t.t.t.t.list == [10])
+assert(to_string(t) == "{t: {t: {t: {list: [10]}}}}")
