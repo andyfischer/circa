@@ -36,8 +36,8 @@ namespace file
     def fetch_record(string filename, Name source) -> FileRecord
 
 namespace refactor
-    def rename(Ref r, string s)
-    def change_function(Ref r, Callable func)
+    def rename(Term r, string s)
+    def change_function(Term r, Callable func)
 
 namespace reflect
     def this_branch() -> Branch
@@ -50,7 +50,6 @@ namespace sys
     def do_admin_command(string cmd) -> string
 
 def Branch.dump(b)
-
 
 def toggle(bool tog) -> bool
     <<<

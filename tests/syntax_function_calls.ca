@@ -68,9 +68,6 @@ p = Point(); p.x   = 1.0
 p = Point(); p.x =   1.0
 
 -- More methods
-r = ref(1); r.name()
-r = ref(1); r.asint()
-r = ref(1); r.asint() + 5
 l = []; l.append(1)
 
 t = Point(); t.x

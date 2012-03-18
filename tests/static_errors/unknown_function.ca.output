@@ -1,0 +1,3 @@
+2 static errors:
+[tests/static_errors/unknown_function.ca:2,0] Unknown function: nonexistant_function
+[tests/static_errors/unknown_function.ca:8,0] Unknown function: nonexistantMethod

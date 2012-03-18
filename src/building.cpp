@@ -24,12 +24,14 @@ namespace circa {
 
 Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string const& name)
 {
-    ca_assert(function != NULL);
-
     set_branch_in_progress(branch, true);
 
+    // If function is NULL, use 'unknown_function' instead.
+    if (function == NULL)
+        function = FUNCS.unknown_function;
+
     // If 'function' is actually a type, create a value instead.
-    if (is_type(function)) {
+    if (function != NULL && is_type(function)) {
         if (inputs.length() == 0) {
             Term* term = create_value(branch, as_type(function));
             term->setBoolProp("constructor", true);

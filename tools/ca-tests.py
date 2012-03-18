@@ -139,7 +139,8 @@ def all_testable_files():
     dirs = [TestRoot,
         TestRoot + '/field',
         TestRoot + '/bugrepro',
-        TestRoot + '/for'
+        TestRoot + '/for',
+        TestRoot + '/static_errors'
         ]
     for dir in dirs:
         for f in list_directory_contents(dir):

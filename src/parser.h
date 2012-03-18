@@ -71,7 +71,7 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
 ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserCxt* context,
         int precedence);
 ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* context);
-ParseResult function_call(Branch* branch, ParseResult head, TokenStream& tokens, ParserCxt* context);
+ParseResult function_call(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult literal_integer(Branch* branch, TokenStream& tokens, ParserCxt* context);
@@ -88,6 +88,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
 ParseResult unknown_identifier(Branch* branch, std::string const& name);
 ParseResult identifier(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult identifier_with_rebind(Branch* branch, TokenStream& tokens, ParserCxt* context);
+ParseResult identifier_no_create(Branch* branch, TokenStream& tokens, ParserCxt* context);
 
 // Helper functions:
 void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context);

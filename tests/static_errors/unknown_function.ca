@@ -1,0 +1,8 @@
+
+nonexistant_function()
+
+type RealType {}
+
+RealValue = create(RealType)
+
+RealValue.nonexistantMethod()

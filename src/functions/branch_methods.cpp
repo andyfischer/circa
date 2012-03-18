@@ -59,7 +59,7 @@ namespace branch_methods_function {
 
     // Reflection
 
-    CA_DEFINE_FUNCTION(get_terms, "Branch.get_terms(self) -> List")
+    CA_DEFINE_FUNCTION(terms, "Branch.terms(self) -> List")
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)
@@ -71,7 +71,7 @@ namespace branch_methods_function {
             set_ref(output[i], branch->get(i));
     }
 
-    CA_DEFINE_FUNCTION(get_term, "Branch.get_term(self, int index) -> Ref")
+    CA_DEFINE_FUNCTION(get_term, "Branch.get_term(self, int index) -> Term")
     {
         Branch* branch = as_branch(INPUT(0));
         if (branch == NULL)

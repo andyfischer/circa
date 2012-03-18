@@ -68,6 +68,9 @@ void check_term_for_static_error(List* errors, Term* term)
     if (term->function == NULL)
         return append_static_error(errors, term, "null_function");
 
+    if (term->function == FUNCS.unknown_function)
+        return append_static_error(errors, term, "unknown_function");
+
     if (!is_function(term->function))
         return append_static_error(errors, term, "not_a_function");
 
@@ -172,6 +175,8 @@ void format_static_error(caValue* error, caValue* stringOutput)
                 << term->function->name << " expects " << funcNumInputs;
     } else if (strcmp(type, "null_function") == 0)
         out << "NULL function reference";
+    else if (strcmp(type, "unknown_function") == 0)
+        out << "Unknown function: " << term->stringProp("syntax:functionName");
     else if (strcmp(type, "null_input") == 0)
         out << "NULL input reference for input " << inputIndex;
     else if (strcmp(type, "type_mismatch") == 0) {

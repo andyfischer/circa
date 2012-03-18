@@ -1443,10 +1443,11 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                 return compile_error_for_line(branch, tokens, startPosition);
 
             std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
+            Term* function = find_name(branch, functionName.c_str());
 
-            Term* term = find_and_apply(branch, functionName, TermList(leftExpr.term));
+            Term* term = apply(branch, function, TermList(leftExpr.term));
 
-            if (term->function->name != functionName)
+            if (term->function == NULL || term->function->name != functionName)
                 term->setStringProp("syntax:functionName", functionName);
 
             term->setStringProp("syntax:declarationStyle", "arrow-concat");
@@ -1581,6 +1582,12 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (tokens.nextIs(TK_STATE)) {
             tokens.consume(TK_STATE);
             possible_whitespace(tokens);
+            
+            if (!tokens.nextIs(TK_EQUALS)) {
+                compile_error_for_line(branch, tokens, tokens.getPosition(), "Expected: =");
+                return;
+            }
+
             tokens.consume(TK_EQUALS);
             possible_whitespace(tokens);
             inputHints.set(index, "state", &TrueValue);
@@ -1624,14 +1631,15 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 
     inputs.prepend(root.term);
     inputHints.insert(0);
+    Type* rootType = root.term->type;
 
     // Find the function
-    Term* function = find_method(branch, root.term->type, functionName);
+    Term* function = find_method(branch, rootType, functionName);
 
     if (function == NULL) {
-        Term* func = unknown_identifier(branch, functionName).term;
-        Term* result = apply(branch, func, inputs);
+        Term* result = apply(branch, function, inputs);
         result->setStringProp("syntax:functionName", functionName);
+        result->setStringProp("syntax:declarationStyle", "method-call");
         return ParseResult(result);
     }
 
@@ -1656,9 +1664,13 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     return ParseResult(term);
 }
 
-ParseResult function_call(Branch* branch, ParseResult head, TokenStream& tokens, ParserCxt* context)
+ParseResult function_call(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
+
+    ParseResult functionParseResult = identifier_no_create(branch,tokens,context);
+    Term* function = functionParseResult.term;
+    std::string functionName = functionParseResult.identifierName;
 
     tokens.consume(TK_LPAREN);
 
@@ -1670,19 +1682,17 @@ ParseResult function_call(Branch* branch, ParseResult head, TokenStream& tokens,
     if (!tokens.nextIs(TK_RPAREN))
         return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
     tokens.consume(TK_RPAREN);
-    
-    Term* function = head.term;
 
     Term* result = apply(branch, function, inputs);
 
     // Store the function name that they used, if it wasn't the function's
     // actual name (for example, the function might be inside a namespace).
-    if ((head.identifierName != "")
-            && (result->function->name != head.identifierName))
-        result->setStringProp("syntax:functionName", head.identifierName);
+    if (function == NULL || result->function->name != functionName)
+        result->setStringProp("syntax:functionName", functionName);
 
     inputHints.apply(result);
     check_to_insert_implicit_inputs(result);
+
     return ParseResult(result);
 }
 
@@ -1791,13 +1801,8 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             result = ParseResult(term);
 
-        // Check for a(..), function call.
-        } else if (tokens.nextIs(TK_LPAREN)) {
-
-            // Function call
-            result = function_call(branch, result, tokens, context);
-
         } else {
+            // TODO here: function call of an expression
 
             finished = true;
         }
@@ -1863,8 +1868,12 @@ ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context)
     int startPosition = tokens.getPosition();
     ParseResult result;
 
+    // function call?
+    if (tokens.nextIs(TK_IDENTIFIER) && tokens.nextIs(TK_LPAREN, 1))
+        result = function_call(branch, tokens, context);
+
     // identifier with rebind?
-    if (tokens.nextIs(TK_AT_SIGN) && tokens.nextIs(TK_IDENTIFIER, 1))
+    else if (tokens.nextIs(TK_AT_SIGN) && tokens.nextIs(TK_IDENTIFIER, 1))
         result = identifier_with_rebind(branch, tokens, context);
 
     // identifier?
@@ -2228,6 +2237,17 @@ ParseResult identifier_with_rebind(Branch* branch, TokenStream& tokens, ParserCx
     return result;
 }
 
+// Consume an IDENTIFIER, but if the name is not found, don't create an
+// unknown_identifier() call. Instead just return a ParseResult with
+// a NULL term.
+ParseResult identifier_no_create(Branch* branch, TokenStream& tokens, ParserCxt* context)
+{
+    std::string id = tokens.consumeStr(TK_IDENTIFIER);
+    Term* term = find_name(branch, id.c_str());
+    // term may be NULL
+    return ParseResult(term, id);
+}
+
 // --- More Utility functions ---
 
 void prepend_whitespace(Term* term, std::string const& whitespace)
@@ -2274,18 +2294,6 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     loc.lineEnd = tokens[end].lineEnd;
 
     term->sourceLoc.grow(loc);
-}
-
-Term* find_and_apply(Branch* branch,
-        std::string const& functionName,
-        TermList const& inputs)
-{
-    Term* function = find_name(branch, functionName.c_str());
-
-    if (function == NULL)
-        return unknown_identifier(branch, functionName).term;
-
-    return apply(branch, function, inputs);
 }
 
 Term* find_type(Branch* branch, std::string const& name)

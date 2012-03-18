@@ -333,7 +333,7 @@ void bootstrap_kernel()
     NULL_T_TERM = create_type_value(kernel, &NULL_T, "Null");
     STRING_TYPE = create_type_value(kernel, &STRING_T, "string");
     DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
-    REF_TYPE = create_type_value(kernel, &REF_T, "Ref");
+    REF_TYPE = create_type_value(kernel, &REF_T, "Term");
     VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
     LIST_TYPE = create_type_value(kernel, &LIST_T, "List");
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");

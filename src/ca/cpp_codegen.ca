@@ -6,20 +6,33 @@ type CodeWriter
     List lines
 }
 
-def CodeWriter.writeln(self :rebind, String line)
+def CodeWriter.writeln(self :out, string line)
     self.lines.append(line)
     return self
 
-def write_top_level(CodeWriter w, Branch branch)
+def write_top_level(CodeWriter w :out, Branch branch)
     for term in branch.terms()
         @term -> Term
 
         if term.function() == comment
             w.writeln(concat('// ' term.prop('comment')))
+        else
+            w.writeln(concat(term.name() '()'))
 
 
 def branch_to_cpp_string(Branch b) -> string
     writer = create(CodeWriter)
 
-    write_top_level(writer, b)
-  
+    write_top_level(&writer, b)
+
+    print(writer.lines)
+
+test_branch = {
+    a = 1
+    b = 2
+    -- this is a comment
+    add(a b)
+    print(b)
+}
+
+branch_to_cpp_string(branch_ref(test_branch))

@@ -5,7 +5,7 @@ my_sample_code = {
 }
 
 br = branch_ref(my_sample_code)
-terms = br.get_terms()
+terms = br.terms()
 
 for i in 0..4
     assert(terms[i] == br.get_term(i))

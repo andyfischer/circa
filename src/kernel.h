@@ -101,6 +101,7 @@ struct BuiltinFuncs {
     Term* pack_state_list_n;
     Term* unbounded_loop;
     Term* unbounded_loop_finish;
+    Term* unknown_function;
     Term* unpack_state;
     Term* unpack_state_from_list;
     Term* unpack_state_list_n;
