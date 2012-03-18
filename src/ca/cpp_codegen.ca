@@ -6,8 +6,9 @@ type CodeWriter
     List lines
 }
 
-def CodeWriter.writeln(self, String line)
+def CodeWriter.writeln(self :rebind, String line)
     self.lines.append(line)
+    return self
 
 def write_top_level(CodeWriter w, Branch branch)
     for term in branch.terms()

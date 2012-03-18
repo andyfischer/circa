@@ -127,8 +127,9 @@ void finish_building_function(Function* func, Type* declaredOutputType)
                 continue;
             }
 
+            Term* result = find_name(contents, input->name.c_str());
             Term* output = apply(contents,
-                FUNCS.output, TermList(NULL), input->name);
+                FUNCS.output, TermList(result), input->name);
             change_declared_type(output, input->type);
             output->setIntProp("rebindsInput", i);
         }
