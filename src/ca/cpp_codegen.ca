@@ -15,9 +15,9 @@ def write_top_level(CodeWriter w :out, Branch branch)
         @term -> Term
 
         if term.function() == comment
-            w.writeln(concat('// ' term.prop('comment')))
+            w.writeln(concat('// ' term.property('comment')))
         else
-            w.writeln(concat(term.name() '()'))
+            w.writeln(concat(term.function().name() '()'))
 
 
 def branch_to_cpp_string(Branch b) -> string

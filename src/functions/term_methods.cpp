@@ -161,6 +161,16 @@ namespace term_methods_function {
             return RAISE_ERROR("NULL reference");
         circa::copy(&t->properties, OUTPUT);
     }
+    CA_FUNCTION(property)
+    {
+        Term* t = INPUT(0)->asRef();
+        if (t == NULL)
+            return RAISE_ERROR("NULL reference");
+
+        const char* key = STRING_INPUT(1);
+
+        circa::copy(term_get_property(t, key), OUTPUT);
+    }
 
     void setup(Branch* kernel)
     {
@@ -180,6 +190,7 @@ namespace term_methods_function {
                 "Term.source_location(_) -> Rect_i");
         import_function(kernel, global_id, "Term.global_id(_) -> string");
         import_function(kernel, get_properties, "Term.properties(_) -> Map");
+        import_function(kernel, property, "Term.property(_, string) -> any");
     }
 }
 }
