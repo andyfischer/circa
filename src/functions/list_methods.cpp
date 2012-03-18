@@ -79,14 +79,45 @@ namespace list_methods_function {
 
     CA_DEFINE_FUNCTION(slice, "List.slice(self, int start, int fin) -> List")
     {
-        List* input = List::checkCast(INPUT(0));
+        caValue* input = INPUT(0);
         int start = INT_INPUT(1);
         int end = INT_INPUT(2);
+        caValue* output = OUTPUT;
+
+        if (start < 0)
+            start = 0;
+        else if (start > list_length(input))
+            start = list_length(input);
+
+        if (end > list_length(input))
+            end = list_length(input);
+
+        if (end < start) {
+            set_list(output, 0);
+            return;
+        }
+
         int length = end - start;
-        List* result = List::cast(OUTPUT, length);
+        set_list(output, length);
 
         for (int i=0; i < length; i++)
-            copy(input->get(start + i), result->get(i));
+            copy(list_get(input, start + i), list_get(output, i));
+    }
+
+    CA_DEFINE_FUNCTION(join, "List.join(self, string) -> string")
+    {
+        caValue* input = INPUT(0);
+        caValue* joiner = INPUT(1);
+
+        caValue* out = OUTPUT;
+        set_string(out, "");
+
+        for (int i=0; i < list_length(input); i++) {
+            if (i != 0)
+                string_append(out, joiner);
+
+            string_append(out, list_get(input, i));
+        }
     }
 
     void setup(Branch* kernel)

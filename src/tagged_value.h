@@ -51,6 +51,10 @@ struct caValue
 
 namespace circa {
 
+struct Value : public caValue
+{
+};
+
 // Initialize this caValue to a null value. This should only be used if the caValue
 // contains invalid data, or has a type that does not have a destructor.
 void initialize_null(caValue* value);

@@ -1,0 +1,16 @@
+
+-- Join
+assert([].join("x") == "")
+assert([1].join("x") == "1")
+assert([1, 2].join("x") == "1x2")
+assert([1 2 3].join("-") == "1-2-3")
+assert([1 2 3].join("") == "123")
+assert([1 2 3].join(", ") == "1, 2, 3")
+
+-- Slice
+assert([].slice(0,0) == [])
+assert([].slice(0,-1) == [])
+assert([].slice(-1,0) == [])
+assert([].slice(-1,5) == [])
+assert([0].slice(0,1) == [0])
+assert([0].slice(0,0) == [])

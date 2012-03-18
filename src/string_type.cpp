@@ -162,7 +162,10 @@ void string_setup_type(Type* type)
 
 void string_append(caValue* left, caValue* right)
 {
-    as_std_string(left) += as_string(right);
+    if (is_string(right))
+        as_std_string(left) += as_string(right);
+    else
+        as_std_string(left) += to_string(right);
 }
 void string_append(caValue* left, const char* right)
 {
