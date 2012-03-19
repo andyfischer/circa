@@ -13,25 +13,39 @@ def CodeWriter.writeln(self :out, string line)
     self.output.append(line)
     self.output.append("\n")
 
-def type_name(Term term) -> string
-    circaName = term.get_type().name()
+def write_type_name(CodeWriter w :out, Term term)
+    w.write(term.get_type().name())
 
 def write_top_level(CodeWriter w :out, Branch branch)
     for term in branch.terms()
         @term -> Term
 
-        if term.function().name() == "comment" {
+        if term.property('statement') == true
+            continue
+
+        if term.function() == comment
             commentStr = term.property('comment')
             if commentStr == ""
                 w.writeln('')
             else
                 w.writeln(concat('// ' commentStr))
-        } else {
+        elif term.function() == value
+            -- Value
+            w.write('const ')
+            write_type_name(w, term)
+            w.write(' ')
+            w.write(term.name())
+            w.write(' = ')
+            w.write(term.value() -> to_string)
+            w.writeln('')
+
+        else
+            -- Normal function call
             termName = term.name()
             if termName != ""
                 w.write(concat(termName ' = '))
             w.writeln(concat(term.function().name() '()'))
-        }
+        
 
 
 def branch_to_cpp_string(Branch b) -> string
@@ -45,7 +59,7 @@ test_branch = {
     a = 1
     b = 2
     -- this is a comment
-    add(a b)
+    add(a 3)
     print(b)
 }
 

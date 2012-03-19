@@ -57,6 +57,16 @@ namespace term_methods_function {
 
         circa::copy(source, target);
     }
+    CA_FUNCTION(get_term_value)
+    {
+        Term* target = INPUT(0)->asRef();
+        if (target == NULL) {
+            RAISE_ERROR("NULL reference");
+            return;
+        }
+
+        copy(target, OUTPUT);
+    }
 
     int round(double a) {
         return int(a + 0.5);
@@ -176,7 +186,12 @@ namespace term_methods_function {
 
         const char* key = STRING_INPUT(1);
 
-        circa::copy(term_get_property(t, key), OUTPUT);
+        caValue* value = term_get_property(t, key);
+
+        if (value == NULL)
+            set_null(OUTPUT);
+        else
+            circa::copy(value, OUTPUT);
     }
 
     void setup(Branch* kernel)
@@ -188,6 +203,7 @@ namespace term_methods_function {
         import_function(kernel, get_function, "Term.function(_) -> Function");
         import_function(kernel, get_type, "Term.get_type(_) -> Type");
         import_function(kernel, assign, "Term.assign(_, any)");
+        import_function(kernel, get_term_value, "Term.value(_) -> any");
         import_function(kernel, tweak, "Term.tweak(_, number steps)");
         import_function(kernel, asint, "Term.asint(_) -> int");
         import_function(kernel, asfloat, "Term.asfloat(_) -> number");

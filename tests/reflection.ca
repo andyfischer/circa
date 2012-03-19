@@ -28,3 +28,10 @@ assert(b.input(0) == a)
 -- Function
 assert(a.function().name() == "value")
 assert(b.function().name() == "add")
+
+def myfunc()
+
+x = myfunc()
+
+xr = ref(x)
+assert(xr.function() == myfunc)

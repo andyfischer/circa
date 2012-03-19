@@ -34,11 +34,8 @@ namespace for_function {
     {
         while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
             finish_frame(CONTEXT);
-        
-        Term* index = for_loop_find_index(top_frame(CONTEXT)->branch);
-        caValue* indexVal = get_register(CONTEXT, index);
-        set_int(indexVal, as_int(indexVal) + 1);
-        top_frame(CONTEXT)->nextPc = 0;
+
+        for_loop_finish_iteration(CONTEXT);
     }
     CA_FUNCTION(evaluate_discard)
     {
