@@ -183,12 +183,34 @@ void loop_update_exit_points(Branch* branch)
     }
 }
 
+// Find the term that should be the 'primary' result for this loop.
+Term* loop_get_primary_result(Branch* branch)
+{
+    // Find the term to use for the for-loop output. If the loop iterater name
+    // was rebound then use that.
+    Term* iterator = for_loop_get_iterator(branch);
+
+    Term* lastWithIteratorName = branch->get(iterator->name);
+
+    // For a rebound list, always use the last term that has the iterator's
+    // name, even if it's the iterator itself.
+    if (branch->owningTerm->boolPropOptional("modifyList", false))
+        return lastWithIteratorName;
+    
+    // Otherwise, if the iterator's name was rebound, then use that.
+    if (lastWithIteratorName != iterator)
+        return lastWithIteratorName;
+
+    // Otherwise, use the last expression as the output.
+    return find_last_non_comment_expression(branch);
+}
+
 void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
     // Add a primary output
-    apply(contents, FUNCS.output, TermList(NULL));
+    apply(contents, FUNCS.output, TermList(loop_get_primary_result(contents)));
 
     // pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);

@@ -173,16 +173,18 @@ void finish_frame(EvalContext* context)
     Frame* top = top_frame(context);
     Branch* finishedBranch = top->branch;
 
-    // Copy outputs
+    // Hang on to the register list
     List registers;
     swap(&registers, &top->registers);
-    pop_frame(context);
 
+    // Pop frame
+    pop_frame(context);
+    
     Frame* parentFrame = top_frame(context);
     Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
     List* parentRegisters = &top_frame(context)->registers;
     
-    // Default evaluation, copy output placeholders and advance PC.
+    // Copy outputs to the parent frame, and advance PC.
     for (int i=0;; i++) {
         Term* placeholder = get_output_placeholder(finishedBranch, i);
         if (placeholder == NULL)
