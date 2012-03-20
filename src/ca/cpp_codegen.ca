@@ -17,6 +17,7 @@ def write_type_name(CodeWriter w :out, Term term)
     w.write(term.get_type().name())
 
 def write_top_level(CodeWriter w :out, Branch branch)
+
     for term in branch.terms()
         @term -> Term
 

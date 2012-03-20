@@ -138,9 +138,10 @@ def list_directory_contents(dir):
 def all_testable_files():
     dirs = [TestRoot,
         TestRoot + '/bugrepro',
-        TestRoot + '/list',
+        TestRoot + '/if',
         TestRoot + '/field',
         TestRoot + '/for',
+        TestRoot + '/list',
         TestRoot + '/static_errors'
         ]
     for dir in dirs:

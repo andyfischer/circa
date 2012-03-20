@@ -1282,7 +1282,7 @@ ParseResult continue_statement(Branch* branch, TokenStream& tokens, ParserCxt* c
         return compile_error_for_line(branch, tokens, startPosition,
                 "'continue' can only be used inside a for loop");
 
-    Term* result = apply(branch, CONTINUE_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.continue_func, TermList());
 
     set_source_location(result, startPosition, tokens);
     return ParseResult(result);

@@ -32,8 +32,15 @@ namespace for_function {
     }
     CA_FUNCTION(evaluate_continue)
     {
+        List inputs;
+        consume_inputs_to_list(CONTEXT, &inputs);
+
+        // Pop frames
         while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
             finish_frame(CONTEXT);
+
+        // Copy outputs to placeholders
+        // TODO
 
         for_loop_finish_iteration(CONTEXT);
     }
@@ -71,13 +78,15 @@ namespace for_function {
         as_function(FUNCS.discard)->formatSource = discard_formatSource;
         hide_from_docs(FUNCS.discard);
 
-        FUNCS.break_func = import_function(kernel, evaluate_break, "break()");
+        FUNCS.break_func = import_function(kernel, evaluate_break,
+            "break(any :multiple :optional)");
         as_function(FUNCS.break_func)->formatSource = break_formatSource;
         hide_from_docs(FUNCS.break_func);
 
-        CONTINUE_FUNC = import_function(kernel, evaluate_continue, "continue()");
-        as_function(CONTINUE_FUNC)->formatSource = continue_formatSource;
-        hide_from_docs(CONTINUE_FUNC);
+        FUNCS.continue_func = import_function(kernel, evaluate_continue,
+            "continue(any :multiple :optional)");
+        as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
+        hide_from_docs(FUNCS.continue_func);
 
         FUNCS.unbounded_loop = import_function(kernel, evaluate_unbounded_loop,
             "loop(bool condition)");

@@ -1,0 +1,12 @@
+
+-- Rebinds with 'continue'
+
+x = 'outer'
+
+for i in [1 2 3 4 5]
+    print('start of loop: ' x)
+    if i % 2 == 1
+        continue
+
+    x = concat('inner_' i)
+    print('end of loop: ' x)

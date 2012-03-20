@@ -11,7 +11,6 @@ extern Branch* KERNEL;
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
 extern Term* BRANCH_UNEVALUATED_FUNC;
-extern Term* CONTINUE_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DIV_FUNC;
 extern Term* DO_ONCE_FUNC;
@@ -78,6 +77,7 @@ struct BuiltinFuncs {
     Term* case_func;
     Term* cast;
     Term* comment;
+    Term* continue_func;
     Term* copy;
     Term* declared_state;
     Term* default_case;

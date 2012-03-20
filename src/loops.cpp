@@ -2,9 +2,10 @@
 
 #include "branch.h"
 #include "building.h"
-#include "kernel.h"
+#include "code_iterators.h"
 #include "evaluation.h"
 #include "function.h"
+#include "kernel.h"
 #include "importing_macros.h"
 #include "introspection.h"
 #include "list.h"
@@ -21,6 +22,7 @@
 namespace circa {
 
 void for_loop_fix_state_input(Branch* contents);
+void loop_update_continue_inputs(Branch* branch, Term* continueTerm);
 
 Term* for_loop_get_iterator(Branch* contents)
 {
@@ -168,6 +170,19 @@ void repoint_terms_to_use_input_placeholders(Branch* contents)
     }
 }
 
+void loop_update_exit_points(Branch* branch)
+{
+    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+        Term* term = *it;
+        if (is_major_branch(term))
+            continue;
+
+        if (term->function == FUNCS.continue_func) {
+            loop_update_continue_inputs(branch, term);
+        }
+    }
+}
+
 void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
@@ -185,6 +200,8 @@ void finish_for_loop(Term* forTerm)
 
     check_to_insert_implicit_inputs(forTerm);
     update_extra_outputs(forTerm);
+
+    loop_update_exit_points(contents);
 
     set_branch_in_progress(contents, false);
 }
@@ -367,6 +384,17 @@ CA_FUNCTION(evaluate_loop_output)
     copy(result, list_append(output));
 
     for_loop_finish_iteration(CONTEXT);
+}
+
+void loop_update_continue_inputs(Branch* branch, Term* continueTerm)
+{
+    for (int i=0;; i++) {
+        Term* output = get_output_placeholder(branch, i);
+        if (output == NULL)
+            break;
+        set_input(continueTerm, i,
+            find_intermediate_result_for_output(continueTerm, output));
+    }
 }
 
 void finish_while_loop(Term* whileTerm)

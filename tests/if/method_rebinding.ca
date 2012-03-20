@@ -1,0 +1,28 @@
+
+a = true
+b = false
+
+x = create(List)
+
+if true
+    x.append(1)
+
+x.append(2)
+
+if true
+    x.append(3)
+else
+    x.append('no')
+
+x.append(4)
+
+if true
+    if true
+        x.append(5)
+    else
+        x.append('no')
+
+elif false
+    x.append('no')
+
+print(x)
