@@ -40,7 +40,19 @@ namespace for_function {
             finish_frame(CONTEXT);
 
         // Copy outputs to placeholders
-        // TODO
+        Branch* branch = top_frame(CONTEXT)->branch;
+        for (int i=0;; i++) {
+            Term* output = get_output_placeholder(branch, i);
+            if (output == NULL)
+                break;
+
+            caValue* out = get_register(CONTEXT, output);
+
+            if (i >= list_length(&inputs))
+                set_null(out);
+            else
+                move(inputs[i], out);
+        }
 
         for_loop_finish_iteration(CONTEXT);
     }

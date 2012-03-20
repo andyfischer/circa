@@ -335,14 +335,6 @@ void for_loop_finish_iteration(EvalContext* context)
     Frame* frame = top_frame(context);
     Branch* contents = frame->branch;
 
-    // Hack: make sure the output_placeholder terms have their values
-    for (int i=1;; i++) {
-        Term* output = get_output_placeholder(contents, i);
-        if (output == NULL)
-            break;
-        copy(get_input(context, output->input(0)), get_input(context, output));
-    }
-
     // Find list length
     caValue* listInput = frame->registers[0];
 
@@ -375,6 +367,15 @@ CA_FUNCTION(evaluate_loop_output)
     Term* caller = CALLER;
     Branch* contents = caller->owningBranch;
     Frame* topFrame = top_frame(CONTEXT);
+    EvalContext* context = CONTEXT;
+
+    // Hack: make sure the output_placeholder terms have their values
+    for (int i=1;; i++) {
+        Term* output = get_output_placeholder(contents, i);
+        if (output == NULL)
+            break;
+        copy(get_input(context, output->input(0)), get_input(context, output));
+    }
 
     caValue* result = INPUT(1);
     

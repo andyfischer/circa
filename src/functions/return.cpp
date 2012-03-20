@@ -17,17 +17,22 @@ namespace return_function {
         while (!is_subroutine(top_frame(CONTEXT)->branch->owningTerm))
             finish_frame(CONTEXT);
 
-        Branch* branch = top_frame(CONTEXT)->branch;
-
+#if 0
         // Copy values to their output placeholders.
-        for (int i=0; i < inputs.length(); i++) {
+        Branch* branch = top_frame(CONTEXT)->branch;
+        for (int i=0;; i++) {
             Term* output = get_output_placeholder(branch, i);
-            caValue* out = get_register(CONTEXT, output);
             if (output == NULL)
+                break;
+
+            caValue* out = get_register(CONTEXT, output);
+
+            if (i >= list_length(&inputs))
                 set_null(out);
             else
                 move(inputs[i], out);
         }
+#endif
 
         // Move PC to end
         Frame* top = top_frame(CONTEXT);
