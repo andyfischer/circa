@@ -119,6 +119,7 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     top->nextPc = 0;
     top->startPc = 0;
     top->endPc = branch->length();
+    top->loop = false;
     return top;
 }
 Frame* push_frame(EvalContext* context, Branch* branch)
@@ -172,6 +173,12 @@ void finish_frame(EvalContext* context)
 {
     Frame* top = top_frame(context);
     Branch* finishedBranch = top->branch;
+
+    // Check to loop
+    if (top->loop) {
+        for_loop_finish_frame(context);
+        return;
+    }
 
     // Hang on to the register list
     List registers;
@@ -396,6 +403,12 @@ Term* current_term(EvalContext* context)
 {
     Frame* top = top_frame(context);
     return top->branch->get(top->pc);
+}
+
+Branch* current_branch(EvalContext* context)
+{
+    Frame* top = top_frame(context);
+    return top->branch;
 }
 
 caValue* get_register(EvalContext* context, Term* term)

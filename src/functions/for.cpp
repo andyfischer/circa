@@ -81,10 +81,11 @@ namespace for_function {
         FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
         as_function(FOR_FUNC)->formatSource = formatSource;
 
+        FUNCS.loop_output = import_function(kernel, evaluate_loop_output,
+            "loop_output(any) -> List");
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
-        FUNCS.loop_output = import_function(kernel, evaluate_loop_output, "loop_output(int, any)");
 
         FUNCS.discard = import_function(kernel, evaluate_discard, "discard()");
         as_function(FUNCS.discard)->formatSource = discard_formatSource;

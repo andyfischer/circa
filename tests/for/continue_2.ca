@@ -4,9 +4,9 @@
 x = 'outer'
 
 for i in [1 2 3 4 5]
-    print('start of loop: ' x)
+    print('start of loop ' i ', x = ' x)
     if i % 2 == 1
         continue
 
     x = concat('inner_' i)
-    print('end of loop: ' x)
+    print('end of loop ' i ', x = ' x)

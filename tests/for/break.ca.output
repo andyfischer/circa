@@ -1,4 +1,8 @@
 first loop reached top: 0
+first loop reached top: 1
+first loop reached top: 2
 second loop reached top: 0
 second loop reached bottom: 0
 second loop reached top: 1
+second loop reached top: 2
+second loop reached bottom: 2

@@ -71,33 +71,6 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
     return iterator;
 }
 
-void add_loop_output_term(Branch* branch)
-{
-    Term* result = NULL;
-
-    // Find the term to use for the for-loop output. If the loop iterater name
-    // was rebound then use that.
-    Term* iterator = for_loop_get_iterator(branch);
-
-    Term* lastWithIteratorName = branch->get(iterator->name);
-
-    // For a rebound list, always use the last-with-iterator-name, even if it's
-    // the iterator itself.
-    if (branch->owningTerm->boolPropOptional("modifyList", false))
-        result = lastWithIteratorName;
-    
-    if (result == NULL && lastWithIteratorName != iterator)
-        result = lastWithIteratorName;
-
-    // Otherwise, use the last expression as the output.
-    if (result == NULL)
-        result = find_last_non_comment_expression(branch);
-
-    Term* term = apply(branch, FUNCS.loop_output,
-        TermList(for_loop_find_index(branch), result));
-    move_before_outputs(term);
-}
-
 void add_implicit_placeholders(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
@@ -209,13 +182,16 @@ void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
+    // Add a 'loop_output' term that will collect each iteration's output.
+    Term* loopOutput = apply(contents, FUNCS.loop_output, 
+        TermList(loop_get_primary_result(contents)));
+
     // Add a primary output
-    apply(contents, FUNCS.output, TermList(loop_get_primary_result(contents)));
+    apply(contents, FUNCS.output, TermList(loopOutput));
 
     // pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);
     check_to_add_state_output_placeholder(contents);
-    add_loop_output_term(contents);
 
     add_implicit_placeholders(forTerm);
     repoint_terms_to_use_input_placeholders(contents);
@@ -317,7 +293,7 @@ CA_FUNCTION(evaluate_for_loop)
     }
 
     // Create a stack frame
-    push_frame(context, contents, &registers);
+    Frame* frame = push_frame(context, contents, &registers);
 
     // Set up a blank list for output
     set_list(top_frame(context)->registers[contents->length()-1], 0);
@@ -338,6 +314,8 @@ CA_FUNCTION(evaluate_for_loop)
         return;
     }
 
+    frame->loop = true;
+
     // Walk forward until we find the loop_index() term.
     int loopIndexPos = 0;
     for (; loopIndexPos < contents->length(); loopIndexPos++) {
@@ -346,10 +324,19 @@ CA_FUNCTION(evaluate_for_loop)
     }
     ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
 
-    // Set the loop index
+    // Initialize the loop index
     set_int(top_frame(context)->registers[loopIndexPos], 0);
 
     // Interpreter will run the contents of the branch
+}
+
+CA_FUNCTION(evaluate_loop_output)
+{
+    caValue* output = OUTPUT;
+    if (!is_list(output))
+        set_list(output);
+
+    copy(INPUT(0), list_append(output));
 }
 
 void for_loop_finish_iteration(EvalContext* context)
@@ -366,13 +353,14 @@ void for_loop_finish_iteration(EvalContext* context)
 
     // Check if we are finished
     if (as_int(index) >= list_length(listInput)) {
+        frame->loop = false;
         finish_frame(context);
         return;
     }
 
     // If we're not finished yet, copy rebound outputs back to inputs.
+    List* registers = &frame->registers;
     for (int i=1;; i++) {
-        List* registers = &frame->registers;
         Term* input = get_input_placeholder(contents, i);
         if (input == NULL)
             break;
@@ -381,32 +369,26 @@ void for_loop_finish_iteration(EvalContext* context)
     }
 
     // Return to start of loop body
+    frame->pc = 0;
     frame->nextPc = 0;
 }
 
-CA_FUNCTION(evaluate_loop_output)
+void for_loop_finish_frame(EvalContext* context)
 {
-    Term* caller = CALLER;
-    Branch* contents = caller->owningBranch;
-    Frame* topFrame = top_frame(CONTEXT);
-    EvalContext* context = CONTEXT;
+    //Branch* contents = current_branch(context);
+    //Frame* topFrame = top_frame(context);
 
     // Hack: make sure the output_placeholder terms have their values
+#if 0
     for (int i=1;; i++) {
         Term* output = get_output_placeholder(contents, i);
         if (output == NULL)
             break;
         copy(get_input(context, output->input(0)), get_input(context, output));
     }
+#endif
 
-    caValue* result = INPUT(1);
-    
-    // Copy loop output
-    Term* primaryOutput = get_output_placeholder(contents, 0);
-    caValue* output = topFrame->registers[primaryOutput->index];
-    copy(result, list_append(output));
-
-    for_loop_finish_iteration(CONTEXT);
+    for_loop_finish_iteration(context);
 }
 
 void loop_update_continue_inputs(Branch* branch, Term* continueTerm)

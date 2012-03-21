@@ -20,6 +20,9 @@ struct Frame
     int nextPc;
     int startPc;
     int endPc;
+
+    // Used in for-loop
+    bool loop;
 };
 
 struct EvalContext
@@ -102,6 +105,7 @@ void consume_inputs_to_list(EvalContext* context, List* list);
 caValue* get_output(EvalContext* context, int index);
 
 Term* current_term(EvalContext* context);
+Branch* current_branch(EvalContext* context);
 caValue* get_register(EvalContext* context, Term* term);
 
 // Create an output value for the current term, using the declared type's
