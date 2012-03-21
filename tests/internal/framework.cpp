@@ -15,7 +15,7 @@
 #include "term.h"
 #include "type.h"
 
-#include "testing.h"
+#include "framework.h"
 
 namespace circa {
 

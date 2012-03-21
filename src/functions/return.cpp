@@ -5,9 +5,7 @@
 namespace circa {
 namespace return_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(return_func, "return(any :multiple :optional)")
+    CA_FUNCTION(return_func)
     {
         // Grab input values
         List inputs;
@@ -55,7 +53,7 @@ namespace return_function {
         if (kernel->get("return") != NULL)
             return;
 
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, return_func, "return(any :multiple :optional)");
         RETURN_FUNC = kernel->get("return");
         as_function(RETURN_FUNC)->formatSource = formatSource;
     }

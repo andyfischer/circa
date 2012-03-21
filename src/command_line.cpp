@@ -14,7 +14,6 @@
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "testing.h"
 
 #include "tools/build_tool.h"
 #include "tools/command_reader.h"
@@ -50,11 +49,6 @@ void print_usage()
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
         "  -run-stdin        : Read and execute commands from stdin\n"
         "  -source-repro     : Compile and reproduce a script's source (for testing)\n"
-#ifdef CIRCA_TEST_BUILD
-        "  -test             : Run unit tests\n"
-        "  -test <name>      : Run unit test of a certain name\n"
-        "  -list-tests       : List every unit test name\n"
-#endif
         << std::endl;
 }
 
@@ -141,17 +135,6 @@ int run_command_line(List* args)
 
     // Check to handle args[0] as a dash-command.
 
-#ifdef CIRCA_TEST_BUILD
-    // Run unit tests
-    if (string_eq(args->get(0), "-test")) {
-        if (args->length() > 1)
-            run_tests(as_cstring(args->get(1)));
-        else
-            run_all_tests();
-        return 0;
-    }
-#endif
-
     // Print help
     if (string_eq(args->get(0), "-help")) {
         print_usage();
@@ -174,22 +157,10 @@ int run_command_line(List* args)
         }
 
         Branch workspace;
-        caValue* result = workspace.eval(as_cstring(&command));
+        caValue* result = (caValue*) workspace.eval(as_cstring(&command));
         std::cout << result->toString() << std::endl;
         return 0;
     }
-
-#ifdef CIRCA_TEST_BUILD
-    if (string_eq(args->get(0), "-list-tests")) {
-        std::vector<std::string> testNames = list_all_test_names();
-
-        std::vector<std::string>::const_iterator it;
-        for (it = testNames.begin(); it != testNames.end(); ++it) {
-            std::cout << *it << std::endl;
-        }
-        return 0;
-    }
-#endif
 
     // Start repl
     if (string_eq(args->get(0), "-repl"))

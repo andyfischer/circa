@@ -165,28 +165,3 @@ def use_sdl(env):
     # Append appropriate circa lib, use -force_load
     env.Append(LIBS = [circa_libs[variant_name]])
     env.Append(LINKFLAGS = ["-all_load"])
-
-# Define plastic targets at build/plas_x
-for env in all_envs:
-    env = env.Clone()
-    variantName = env['variant_name']
-    env.VariantDir('build/'+variantName+'/plastic/src', 'plastic/src')
-    use_sdl(env)
-
-    source_files = list_source_files('plastic/src')
-
-    env.Append(CPPDEFINES=['PLASTIC_USE_SDL'])
-
-    binaryName = 'plas'+env['variant_suffix']
-
-    result = env.Program('#build/' + binaryName,
-        source = ['build/'+variantName+'/plastic/src/'+f for f in source_files])
-
-    # On Windows, embed manifest
-    if WINDOWS:
-        env.AddPostAction(result,
-        'mt.exe -nologo -manifest plastic/windows/plastic.manifest -outputresource:$TARGET;1')
-
-    if OSX:
-        env.AddPostAction(result,
-            'install_name_tool -change ./libfmodex.dylib build/deps/fmod/api/lib/libfmodex.dylib $TARGET')
