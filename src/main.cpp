@@ -8,12 +8,12 @@ using namespace circa;
 
 int main(int argc, const char * args[])
 {
-    circa_initialize();
+    circ_initialize();
 
     int result = 0;
-    result = circa_run_command_line(argc, args);
+    result = circ_run_command_line(argc, args);
 
-    circa_shutdown();
+    circ_shutdown();
     
     return 0;
 }

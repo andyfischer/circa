@@ -9,7 +9,7 @@ namespace write_text_file_function {
 
     CA_FUNCTION(evaluate)
     {
-        circa_write_text_file(STRING_INPUT(0), STRING_INPUT(1));
+        circ_write_text_file(STRING_INPUT(0), STRING_INPUT(1));
     }
 
     void setup(Branch* kernel)

@@ -14,7 +14,7 @@ namespace cppbuild_function {
         copy(moduleDir, &filename);
         String build_ca;
         set_string(&build_ca, "build.ca");
-        circa_join_path(&filename, &build_ca);
+        circ_join_path(&filename, &build_ca);
 
         Branch buildFile;
         load_script(&buildFile, as_cstring(&filename));

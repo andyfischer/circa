@@ -10,7 +10,7 @@
 // display everything in that category. In practice, it's very helpful to see the
 // successful cases along side the failing cases.
 
-#include "circa_internal.h"
+#include "circ_internal.h"
 #include "filesystem_dummy.h"
 
 namespace circa {

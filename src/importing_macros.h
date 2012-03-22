@@ -6,26 +6,26 @@
 #include "evaluation.h"
 
 #define CA_START_FUNCTIONS \
-    struct _circa_StaticFuncDeclaration; \
-    static std::vector<_circa_StaticFuncDeclaration*> _circa_START_FUNCTIONS; \
-    struct _circa_StaticFuncDeclaration { \
+    struct _circ_StaticFuncDeclaration; \
+    static std::vector<_circ_StaticFuncDeclaration*> _circ_START_FUNCTIONS; \
+    struct _circ_StaticFuncDeclaration { \
         const char* _header; \
         circa::EvaluateFunc _func; \
-        _circa_StaticFuncDeclaration(const char* header, circa::EvaluateFunc func) \
+        _circ_StaticFuncDeclaration(const char* header, circa::EvaluateFunc func) \
             : _header(header), _func(func) \
-        { _circa_START_FUNCTIONS.push_back(this); } \
+        { _circ_START_FUNCTIONS.push_back(this); } \
     };
 
 
 #define CA_DEFINE_FUNCTION(fname, header) \
     CA_FUNCTION(evaluate_##fname); \
-    static _circa_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
+    static _circ_StaticFuncDeclaration _static_decl_for_##fname(header, evaluate_##fname); \
     CA_FUNCTION(evaluate_##fname)
 
 #define CA_SETUP_FUNCTIONS(branch) {\
-    for (size_t i=0; i < _circa_START_FUNCTIONS.size(); i++) \
-        import_function(branch, _circa_START_FUNCTIONS[i]->_func,\
-                _circa_START_FUNCTIONS[i]->_header);\
+    for (size_t i=0; i < _circ_START_FUNCTIONS.size(); i++) \
+        import_function(branch, _circ_START_FUNCTIONS[i]->_func,\
+                _circ_START_FUNCTIONS[i]->_header);\
     }
 
 #define CALLER (current_term(_cxt))

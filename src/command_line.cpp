@@ -325,7 +325,7 @@ int run_command_line(List* args)
 
 using namespace circa;
 
-EXPORT int circa_run_command_line(int argc, const char* args[])
+EXPORT int circ_run_command_line(int argc, const char* args[])
 {
     List args_v;
     set_list(&args_v, 0);

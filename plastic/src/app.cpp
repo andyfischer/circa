@@ -124,11 +124,11 @@ CA_FUNCTION(trace)
 
 std::string get_home_directory()
 {
-    char* circa_home = getenv("CIRCA_HOME");
-    if (circa_home == NULL) {
+    char* circ_home = getenv("CIRCA_HOME");
+    if (circ_home == NULL) {
         return circa::get_directory_for_filename(g_app->_binaryFilename);
     } else {
-        return std::string(circa_home) + "/plastic";
+        return std::string(circ_home) + "/plastic";
     }
 }
 
@@ -171,7 +171,7 @@ bool load_runtime(circa::Branch& runtime)
 
 bool initialize()
 {
-    circa_initialize();
+    circ_initialize();
 
     get_global_app();
 

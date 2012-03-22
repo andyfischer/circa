@@ -11,7 +11,7 @@
 
 using namespace circa;
 
-bool circa_is_absolute_path(caValue* path)
+bool circ_is_absolute_path(caValue* path)
 {
     // TODO: This function is bad, need to use an existing library for dealing
     // with paths.
@@ -25,7 +25,7 @@ bool circa_is_absolute_path(caValue* path)
     return false;
 }
     
-void circa_get_directory_for_filename(caValue* filename, caValue* result)
+void circ_get_directory_for_filename(caValue* filename, caValue* result)
 {
     // TODO: This function is bad, need to use an existing library for dealing
     // with paths.
@@ -41,10 +41,10 @@ void circa_get_directory_for_filename(caValue* filename, caValue* result)
         return;
     }
 
-    circa_set_string_size(result, as_cstring(filename), last_slash);
+    circ_set_string_size(result, as_cstring(filename), last_slash);
 }
 
-void circa_get_path_relative_to_source(caTerm* relativeTo, caValue* relPath, caValue* result)
+void circ_get_path_relative_to_source(caTerm* relativeTo, caValue* relPath, caValue* result)
 {
     // Don't modify a blank path
     if (string_eq(relPath,"")) {
@@ -58,7 +58,7 @@ void circa_get_path_relative_to_source(caTerm* relativeTo, caValue* relPath, caV
     }
 
     // Don't modify absolute paths
-    if (circa_is_absolute_path(relPath)) {
+    if (circ_is_absolute_path(relPath)) {
         copy(relPath, result);
         return;
     }
@@ -81,7 +81,7 @@ static bool is_path_seperator(char c)
     return c == '/' || c == '\\';
 }
 
-void circa_join_path(caValue* left, caValue* right)
+void circ_join_path(caValue* left, caValue* right)
 {
     const char* leftStr = as_cstring(left);
     const char* rightStr = as_cstring(right);
@@ -103,7 +103,7 @@ void circa_join_path(caValue* left, caValue* right)
     string_append(left, right);
 }
 
-void circa_write_text_file(const char* filename, const char* contents)
+void circ_write_text_file(const char* filename, const char* contents)
 {
     std::ofstream file;
     file.open(filename, std::ios::out | std::ios::binary);

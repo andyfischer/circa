@@ -10,7 +10,7 @@
 // in memory (filesystem_dummy.cpp). The latter is used for testing.
 //
 // To turn on the real filesystem interface, call 
-// circa_use_default_filesystem_interface(). To use the dummy filesystem (for
+// circ_use_default_filesystem_interface(). To use the dummy filesystem (for
 // testing), create a FakeFileSystem object.
 
 namespace circa {

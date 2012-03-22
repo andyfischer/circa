@@ -162,33 +162,33 @@ Type* output_placeholder_specializeType(Term* caller)
 
 CA_FUNCTION(file__exists)
 {
-    set_bool(OUTPUT, circa_file_exists(STRING_INPUT(0)));
+    set_bool(OUTPUT, circ_file_exists(STRING_INPUT(0)));
 }
 CA_FUNCTION(file__version)
 {
-    set_int(OUTPUT, circa_file_get_version(STRING_INPUT(0)));
+    set_int(OUTPUT, circ_file_get_version(STRING_INPUT(0)));
 }
 CA_FUNCTION(file__read_text)
 {
-    set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
+    set_string(OUTPUT, circ_read_file(STRING_INPUT(0)));
 }
 
 CA_FUNCTION(file__fetch_record)
 {
     const char* filename = STRING_INPUT(0);
     Name name = INT_INPUT(1);
-    circa_create_default_output((caStack*) CONTEXT, 0);
-    set_pointer(OUTPUT, circa_fetch_file_record(filename, name));
+    circ_create_default_output((caStack*) CONTEXT, 0);
+    set_pointer(OUTPUT, circ_fetch_file_record(filename, name));
 }
 
 CA_FUNCTION(from_string)
 {
-    circa_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
+    circ_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
 }
 
 CA_FUNCTION(to_string_repr)
 {
-    circa_to_string_repr(INPUT(0), OUTPUT);
+    circ_to_string_repr(INPUT(0), OUTPUT);
 }
 
 CA_FUNCTION(input_func)
@@ -527,7 +527,7 @@ void install_standard_library(Branch* kernel)
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
 }
 
-EXPORT void circa_initialize()
+EXPORT void circ_initialize()
 {
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
@@ -551,7 +551,7 @@ EXPORT void circa_initialize()
 
 #if CIRCA_ENABLE_FILESYSTEM
     // Use standard filesystem by default
-    circa_use_standard_filesystem();
+    circ_use_standard_filesystem();
 #endif
 
     // Load library paths from CIRCA_LIB_PATH
@@ -572,7 +572,7 @@ EXPORT void circa_initialize()
     }
 }
 
-EXPORT void circa_shutdown()
+EXPORT void circ_shutdown()
 {
     SHUTTING_DOWN = true;
 

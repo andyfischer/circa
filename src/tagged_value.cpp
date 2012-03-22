@@ -662,5 +662,88 @@ void cleanup_transient_value(caValue* value)
     initialize_null(value);
 }
 
-
 } // namespace circa
+
+extern "C" {
+
+bool circ_is_bool(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
+bool circ_is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
+bool circ_is_error(caValue* value) { return value->value_type == &ERROR_T; }
+bool circ_is_float(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool circ_is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
+bool circ_is_int(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
+bool circ_is_list(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
+bool circ_is_name(caValue* value) { return value->value_type == &NAME_T; }
+bool circ_is_null(caValue* value)  { return value->value_type == &NULL_T; }
+bool circ_is_number(caValue* value) { return circ_is_int(value) || circ_is_float(value); }
+bool circ_is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
+bool circ_is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
+
+bool circ_get_bool(caValue* value) {
+    ca_assert(circ_is_bool(value));
+    return value->value_data.asbool;
+}
+caBranch* circ_get_branch(caValue* value) {
+    ca_assert(circ_is_branch(value));
+    return (caBranch*) value->value_data.ptr;
+}
+float circ_get_float(caValue* value) {
+    ca_assert(circ_is_float(value));
+    return value->value_data.asfloat;
+}
+caFunction* circ_get_function(caValue* value) {
+    ca_assert(circ_is_function(value));
+    return (caFunction*) value->value_data.ptr;
+}
+int circ_get_int(caValue* value) {
+    ca_assert(circ_is_int(value));
+    return value->value_data.asint;
+}
+const char* circ_get_string(caValue* value) {
+    ca_assert(circ_is_string(value));
+    return as_cstring(value);
+}
+caName circ_get_name(caValue* value) {
+    ca_assert(circ_is_name(value));
+    return (caName) value->value_data.asint;
+}
+
+caType* circ_get_type(caValue* value) {
+    ca_assert(circ_is_type(value));
+    return (caType*) value->value_data.ptr;
+}
+
+float circ_to_float(caValue* value)
+{
+    if (circ_is_int(value))
+        return (float) circ_get_int(value);
+    else if (circ_is_float(value))
+        return circ_get_float(value);
+    else {
+        internal_error("In to_float, type is not an int or float");
+        return 0.0;
+    }
+}
+
+
+void circ_get_vec2(caValue* vec2, float* xOut, float* yOut)
+{
+    *xOut = circ_to_float(get_index(vec2, 0));
+    *yOut = circ_to_float(get_index(vec2, 1));
+}
+void circ_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
+{
+    *xOut = circ_to_float(get_index(vec3, 0));
+    *yOut = circ_to_float(get_index(vec3, 1));
+    *zOut = circ_to_float(get_index(vec3, 2));
+}
+void circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
+{
+    *xOut = circ_to_float(get_index(vec4, 0));
+    *yOut = circ_to_float(get_index(vec4, 1));
+    *zOut = circ_to_float(get_index(vec4, 2));
+    *wOut = circ_to_float(get_index(vec4, 3));
+}
+
+
+}

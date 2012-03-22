@@ -4,7 +4,7 @@
 
 #include "common_headers.h"
 
-#include "circa_internal.h"
+#include "circ_internal.h"
 
 namespace circa {
 namespace for_loop_tests {

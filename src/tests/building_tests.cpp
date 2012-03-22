@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include <circa_internal.h>
+#include <circ_internal.h>
 #include "update_cascades.h"
 
 namespace circa {

@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include <circa_internal.h>
+#include <circ_internal.h>
 
 namespace circa {
 namespace static_errors_tests {

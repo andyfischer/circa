@@ -36,8 +36,8 @@ static void update_file(caFileSource*, caFileRecord* record)
 
     // Check the last modified time to see if we need to reload the file.
     int modifiedTime = get_modified_time2(record->filename);
-    if (circa_is_int(record->sourceMetadata) &&
-        modifiedTime == circa_as_int(record->sourceMetadata)) {
+    if (circ_is_int(record->sourceMetadata) &&
+        modifiedTime == circ_get_int(record->sourceMetadata)) {
 
         return;
     }
@@ -45,7 +45,7 @@ static void update_file(caFileSource*, caFileRecord* record)
     // If we reach this point then we'll read the file
 
     // Store modified time
-    circa_set_int(record->sourceMetadata, modifiedTime);
+    circ_set_int(record->sourceMetadata, modifiedTime);
 
     // Get file size
     fseek(fp, 0, SEEK_END);
@@ -69,27 +69,27 @@ static caFileRecord* open_file(caFileSource* source, const char* filename)
 
     fclose(fp);
 
-    caFileRecord* record = circa_fetch_file_record(filename, source->name);
+    caFileRecord* record = circ_fetch_file_record(filename, source->name);
     update_file(source, record);
     return record;
 }
 
 } // extern "C"
 
-extern "C" void circa_use_standard_filesystem()
+extern "C" void circ_use_standard_filesystem()
 {
     caFileSource source;
     memset(&source, 0, sizeof(source));
     source.openFile = open_file;
     source.updateFile = update_file;
-    source.name = circa_name("builtin:PosixFileSource");
+    source.name = circ_name("builtin:PosixFileSource");
 
-    circa_install_file_source(&source);
+    circ_install_file_source(&source);
 }
 
 #else // CIRCA_ENABLE_FILESYSTEM
 
-extern "C" void circa_use_standard_filesystem()
+extern "C" void circ_use_standard_filesystem()
 {
     internal_error("POSIX file source is unavailable, CIRCA_ENABLE_FILESYSTEM is off");
 }

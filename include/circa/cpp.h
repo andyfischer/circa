@@ -24,11 +24,11 @@ struct Value : public caValue
 {
     Value()
     {
-        circa_init_value(this);
+        circ_init_value(this);
     }
     ~Value()
     {
-        circa_set_null(this);
+        circ_set_null(this);
     }
 };
 

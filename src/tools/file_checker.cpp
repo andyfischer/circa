@@ -41,7 +41,7 @@ void run_file_checker(const char* filename, List* errors)
         caValue fileContents;
         caValue fileReadError;
 
-        const char* contents = circa_read_file(filename);
+        const char* contents = circ_read_file(filename);
         if (contents == NULL) {
             std::stringstream msg;
             msg << "File not found: " << filename;

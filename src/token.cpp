@@ -726,7 +726,7 @@ void TokenStream::getNextStr(caValue* value, int lookahead) const
 {
     int startPos = next(lookahead).charIndex;
     int length = next(lookahead).length();
-    circa_set_string_size(value, _sourceText.c_str() + startPos, length);
+    circ_set_string_size(value, _sourceText.c_str() + startPos, length);
 }
 
 int

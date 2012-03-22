@@ -7,7 +7,7 @@
 
 int main( int argc, char* args[] )
 {
-    circa_use_default_filesystem_interface();
+    circ_use_default_filesystem_interface();
 
     app::get_global_app()._binaryFilename = args[0];
 
@@ -18,7 +18,7 @@ int main( int argc, char* args[] )
 
     int result = plastic_main(argv);
 
-    circa_shutdown();
+    circ_shutdown();
 
     return result;
 }

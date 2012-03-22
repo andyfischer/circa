@@ -22,11 +22,11 @@ static void file_init_globals()
     if (g_fileServices != NULL)
         return;
 
-    g_fileServices = circa_alloc_value();
+    g_fileServices = circ_alloc_value();
     set_list(g_fileServices, 0);
 
     g_fileServiceType = create_type();
-    g_fileServiceType->name = circa_name("FileService");
+    g_fileServiceType->name = circ_name("FileService");
 }
 
 // Find the installed index of the given source name. Higher numbers take precedence.
@@ -41,7 +41,7 @@ static int find_index_of_source(caName sourceName)
     return -1;
 }
 
-void circa_install_file_source(caFileSource* source)
+void circ_install_file_source(caFileSource* source)
 {
     file_init_globals();
 
@@ -75,7 +75,7 @@ static caFileSource* get_source_by_name(caName name)
     return NULL;
 }
 
-caFileRecord* circa_fetch_file_record(const char* filename, caName source)
+caFileRecord* circ_fetch_file_record(const char* filename, caName source)
 {
     file_init_globals();
 
@@ -91,7 +91,7 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source)
         record->source = source;
         record->data = NULL;
         record->filename = strdup(filename);
-        record->sourceMetadata = circa_alloc_value();
+        record->sourceMetadata = circ_alloc_value();
 
         g_fileRecords[filename] = record;
         return record;
@@ -113,13 +113,13 @@ caFileRecord* circa_fetch_file_record(const char* filename, caName source)
             return record;
 
         // Existing record is for a different source; change its ownership.
-        circa_set_null(record->sourceMetadata);
+        circ_set_null(record->sourceMetadata);
         record->source = source;
         return record;
     }
 }
 
-caFileRecord* circa_get_file_record(const char* filename)
+caFileRecord* circ_get_file_record(const char* filename)
 {
     file_init_globals();
 
@@ -132,11 +132,11 @@ caFileRecord* circa_get_file_record(const char* filename)
     return NULL;
 }
 
-static caFileRecord* circa_open_file(const char* filename)
+static caFileRecord* circ_open_file(const char* filename)
 {
     file_init_globals();
 
-    caFileRecord* record = circa_get_file_record(filename);
+    caFileRecord* record = circ_get_file_record(filename);
 
     if (record == NULL) {
         // Record not found. Ask every file source if it can load this new file.
@@ -165,23 +165,23 @@ static caFileRecord* circa_open_file(const char* filename)
     return record;
 }
 
-const char* circa_read_file(const char* filename)
+const char* circ_read_file(const char* filename)
 {
-    caFileRecord* record = circa_open_file(filename);
+    caFileRecord* record = circ_open_file(filename);
     if (record == NULL)
         return NULL;
     return record->data;
 }
 
-bool circa_file_exists(const char* filename)
+bool circ_file_exists(const char* filename)
 {
-    caFileRecord* record = circa_open_file(filename);
+    caFileRecord* record = circ_open_file(filename);
     return record != NULL;
 }
 
-int circa_file_get_version(const char* filename)
+int circ_file_get_version(const char* filename)
 {
-    caFileRecord* record = circa_open_file(filename);
+    caFileRecord* record = circ_open_file(filename);
     if (record == NULL)
         return -1;
     return record->version;
