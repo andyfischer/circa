@@ -87,26 +87,6 @@ void circ_dealloc_value(caValue* value)
     free(value);
 }
 
-void circ_set_int(caValue* container, int value)
-{
-    set_int(container, value);
-}
-void circ_set_float(caValue* container, float value)
-{
-    set_float(container, value);
-}
-void circ_set_bool(caValue* container, bool value)
-{
-    set_bool(container, value);
-}
-void circ_set_string(caValue* container, const char* str)
-{
-    set_string(container, str);
-}
-void circ_set_string_size(caValue* container, const char* str, int size)
-{
-    set_string(container, str, size);
-}
 void circ_string_append(caValue* container, const char* str)
 {
     string_append(container, str);
@@ -126,11 +106,6 @@ void circ_set_point(caValue* point, float x, float y)
     set_float(get_index(point, 0), x);
     set_float(get_index(point, 1), y);
 }
-void circ_set_null(caValue* container)
-{
-    set_null(container);
-}
-
 caValue* circ_handle_get_value(caValue* handle)
 {
     return get_handle_value(handle);
@@ -151,11 +126,6 @@ void circ_handle_set_object(caValue* handle, void* object, caReleaseFunc release
 void* circ_handle_get_object(caValue* handle)
 {
     return circ_as_pointer(circ_handle_get_value(handle));
-}
-
-void circ_set_pointer(caValue* container, void* ptr)
-{
-    set_opaque_pointer(container, ptr);
 }
 
 void circ_create_value(caValue* value, caType* type)

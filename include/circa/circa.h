@@ -162,8 +162,9 @@ caBranch*   circ_get_branch(caValue* value);
 float       circ_get_float(caValue* value);
 caFunction* circ_get_function(caValue* value);
 int         circ_get_int(caValue* value);
-const char* circ_get_string(caValue* value);
 caName      circ_get_name(caValue* value);
+void*       circ_get_pointer(caValue* value);
+const char* circ_get_string(caValue* value);
 caType*     circ_get_type(caValue* value);
 void        circ_get_vec2(caValue* vec2, float* xOut, float* yOut);
 void        circ_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
@@ -191,6 +192,7 @@ void circ_set_bool(caValue* container, bool value);
 void circ_set_float(caValue* container, float value);
 void circ_set_int(caValue* container, int value);
 void circ_set_null(caValue* container);
+void circ_set_pointer(caValue* container, void* ptr);
 void circ_set_string(caValue* container, const char* str);
 
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated

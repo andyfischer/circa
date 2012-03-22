@@ -707,6 +707,10 @@ caName circ_get_name(caValue* value) {
     ca_assert(circ_is_name(value));
     return (caName) value->value_data.asint;
 }
+void* circ_get_pointer(caValue* value)
+{
+    return value->value_data.ptr;
+}
 
 caType* circ_get_type(caValue* value) {
     ca_assert(circ_is_type(value));
@@ -745,5 +749,38 @@ void circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* 
     *wOut = circ_to_float(get_index(vec4, 3));
 }
 
-
+void circ_set_bool(caValue* container, bool b)
+{
+    change_type(container, &BOOL_T);
+    container->value_data.asbool = b;
 }
+void circ_set_float(caValue* container, float f)
+{
+    change_type(container, &FLOAT_T);
+    container->value_data.asfloat = f;
+}
+void circ_set_int(caValue* container, int i)
+{
+    change_type(container, &INT_T);
+    container->value_data.asint = i;
+}
+void circ_set_null(caValue* container)
+{
+    set_null(container);
+}
+void circ_set_pointer(caValue* container, void* ptr)
+{
+    container->value_data.ptr = ptr;
+}
+void circ_set_string(caValue* container, const char* str)
+{
+    create(&STRING_T, container);
+    *((std::string*) container->value_data.ptr) = str;
+}
+void circ_set_string_size(caValue* container, const char* str, int size)
+{
+    create(&STRING_T, container);
+    ((std::string*) container->value_data.ptr)->assign(str, size);
+}
+
+} // extern "C"
