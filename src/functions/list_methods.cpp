@@ -71,7 +71,7 @@ namespace list_methods_function {
 
     CA_DEFINE_FUNCTION(insert, "List.insert(self :out, int, any)")
     {
-        caValue result;
+        Value result;
         CONSUME_INPUT(0, &result);
         caValue* newItem = list_insert(&result, INT_INPUT(1));
         CONSUME_INPUT(2, newItem);

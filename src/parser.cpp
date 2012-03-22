@@ -106,7 +106,7 @@ struct ListSyntaxHints {
     {
         for (int i=0; i < inputs.length(); i++) {
             Dict* dict = as_dict(inputs[i]);
-            caValue it;
+            Value it;
             for (dict->iteratorStart(&it);
                     !dict->iteratorFinished(&it); dict->iteratorNext(&it)) {
                 const char* key;
@@ -495,12 +495,12 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     }
 
     // Function name
-    caValue functionName;
+    Value functionName;
     tokens.consumeStr(&functionName, TK_IDENTIFIER);
 
-    caValue functionName2;
-    caValue functionName3;
-    caValue functionName4;
+    Value functionName2;
+    Value functionName3;
+    Value functionName4;
 
     bool isMethod = false;
     Term* methodType = NULL;
@@ -514,7 +514,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (!tokens.nextIs(TK_IDENTIFIER))
             return compile_error_for_line(branch, tokens, startPosition, "Expected identifier after .");
 
-        caValue typeName;
+        Value typeName;
         copy(&functionName, &typeName);
         methodType = find_name(branch, as_cstring(&typeName));
         string_append(&functionName, ".");
@@ -2004,7 +2004,7 @@ ParseResult literal_string(Branch* branch, TokenStream& tokens, ParserCxt* conte
 
     std::string quoteType = text.substr(0,1);
 
-    caValue escaped;
+    Value escaped;
     unquote_and_unescape_string(text.c_str(), &escaped);
 
     Term* term = create_string(branch, as_cstring(&escaped));

@@ -55,7 +55,7 @@ void parse_string_as_argument_list(caValue* str, List* output)
     TokenStream tokens;
     tokens.reset(as_cstring(str));
     
-    caValue itemInProgress;
+    Value itemInProgress;
     set_string(&itemInProgress, "");
 
     while (!tokens.finished()) {
@@ -215,7 +215,7 @@ void do_admin_command(caValue* input, caValue* reply)
     if (first_space == -1)
         first_space = string_length(input);
 
-    caValue command;
+    Value command;
     string_slice(input, 0, first_space, &command);
 
     set_null(reply);
@@ -244,10 +244,10 @@ void do_admin_command(caValue* input, caValue* reply)
             return;
         }
         
-        caValue branchName;
+        Value branchName;
         string_slice(input, first_space+1, nextSpace, &branchName);
 
-        caValue contents;
+        Value contents;
         string_slice(input, nextSpace+1, -1, &contents);
 
         do_write_branch(&branchName, &contents, reply);
@@ -260,10 +260,10 @@ void do_admin_command(caValue* input, caValue* reply)
             return;
         }
         
-        caValue filename;
+        Value filename;
         string_slice(input, first_space+1, nextSpace, &filename);
 
-        caValue contents;
+        Value contents;
         string_slice(input, nextSpace+1, -1, &contents);
 
         do_update_file(&filename, &contents, reply);
@@ -285,12 +285,12 @@ void do_admin_command(caValue* input, caValue* reply)
 void run_commands_from_stdin()
 {
     while (true) {
-        caValue line;
+        Value line;
         read_stdin_line(&line);
         if (!is_string(&line))
             break;
 
-        caValue reply;
+        Value reply;
         do_admin_command(&line, &reply);
 
         if (is_null(&reply))

@@ -116,7 +116,7 @@ struct Type
     Type* parent;
     
     // Type parameters
-    caValue parameter;
+    Value parameter;
     bool nocopy;
 
     Type();

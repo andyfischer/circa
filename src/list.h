@@ -138,7 +138,7 @@ namespace list_t {
 }
 
 // Wrapper type to use a caValue as a List.
-struct List : caValue
+struct List : Value
 {
     List();
 

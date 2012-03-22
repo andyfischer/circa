@@ -22,7 +22,7 @@ static void file_init_globals()
     if (g_fileServices != NULL)
         return;
 
-    g_fileServices = new caValue();
+    g_fileServices = circa_alloc_value();
     set_list(g_fileServices, 0);
 
     g_fileServiceType = create_type();

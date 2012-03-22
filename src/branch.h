@@ -34,7 +34,7 @@ struct Branch
     // Variant value describing where this branch came from. 
     //   If the branch came from a file, then the value will be of format:
     //     [:file, String filename, int nullable_timestamp]
-    caValue origin;
+    Value origin;
 
     // If this branch has any static errors, then they are listed here. If there
     // are no errors then this value is null.
@@ -42,7 +42,7 @@ struct Branch
     //  [0] int index
     //  [1] string type
     //  [2] int inputIndex (only used for errors related to inputs)
-    caValue staticErrors;
+    Value staticErrors;
 
     // Compound type object describing our inlined state. May be NULL.
     Type* stateType;
@@ -50,7 +50,7 @@ struct Branch
     // This value stores information about pending code changes. This is populated
     // when someone makes a term change that will force other terms to be updated.
     // See update_cascades.cpp
-    caValue pendingUpdates;
+    Value pendingUpdates;
     bool currentlyCascadingUpdates;
 
     Branch();

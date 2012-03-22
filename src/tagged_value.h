@@ -4,6 +4,7 @@
 
 namespace circa {
     struct Type;
+    struct Value;
 }
 
 union caValueData {
@@ -18,11 +19,15 @@ struct caValue
     caValueData value_data;
     circa::Type* value_type;
 
+    // Deprecated constructor
     caValue();
     ~caValue();
     caValue(caValue const&);
-    caValue(circa::Type* type);
+    explicit caValue(circa::Type* type);
     caValue& operator=(caValue const& rhs);
+
+    // Special constructor used by circa::Value to dodge assert.
+    explicit caValue(circa::Value*);
 
     void reset();
     std::string toString();
@@ -51,12 +56,16 @@ struct caValue
 
 namespace circa {
 
-struct Value : public caValue
+// C++ wrapper on caValue. Provides C++-style initialization and destruction.
+struct Value : caValue
 {
+    Value();
+    ~Value();
 };
 
 // Initialize this caValue to a null value. This should only be used if the caValue
-// contains invalid data, or has a type that does not have a destructor.
+// contains invalid data, or has a type that does not have a destructor. Calling this
+// on a caValue that has a valid value may cause a memory leak.
 void initialize_null(caValue* value);
 
 // Call the type's create() function to initialize 'value' to a new instance of the type.

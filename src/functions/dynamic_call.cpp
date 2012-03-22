@@ -54,7 +54,7 @@ namespace dynamic_call_function {
 
         // Save the stack frame and pop. (the OUTPUT macro isn't valid until
         // we restore the stack to its original size).
-        caValue finishedFrame;
+        Value finishedFrame;
         swap(frame, &finishedFrame);
         stack->pop();
 

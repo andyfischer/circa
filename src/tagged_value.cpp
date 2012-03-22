@@ -14,7 +14,13 @@ using namespace circa;
 
 caValue::caValue()
 {
+    ca_assert(false);
     initialize_null(this);
+}
+
+caValue::caValue(circa::Value*)
+{
+    // do nothing, this only used by Value()
 }
 
 caValue::caValue(Type* type)
@@ -147,6 +153,18 @@ caValue caValue::fromBool(bool b)
 }
 
 namespace circa {
+
+Value::Value()
+  : caValue(this)
+{
+    initialize_null(this);
+}
+
+Value::~Value()
+{
+    set_null(this);
+}
+
 
 void initialize_null(caValue* value)
 {

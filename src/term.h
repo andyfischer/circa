@@ -15,7 +15,7 @@ namespace circa {
 
 const int TERM_FLAG_LAZY = 0x1;
 
-struct Term : caValue
+struct Term : Value
 {
     // Fields inherited from caValue:
     //   caValue::Data value_data

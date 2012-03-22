@@ -15,7 +15,7 @@ namespace hashtable_methods_function {
 
     CA_FUNCTION(insert)
     {
-        caValue key, value;
+        Value key, value;
         CONSUME_INPUT(0, EXTRA_OUTPUT(0));
         CONSUME_INPUT(1, &key);
         CONSUME_INPUT(2, &value);

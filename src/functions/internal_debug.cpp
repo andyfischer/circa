@@ -49,7 +49,7 @@ namespace internal_debug_function {
 
     void oracle_send(int i)
     {
-        caValue v;
+        Value v;
         set_int(&v, i);
         oracle_send(&v);
     }

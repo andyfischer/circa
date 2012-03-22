@@ -142,8 +142,8 @@ Type VOID_T;
 
 BuiltinTypes TYPES;
 
-caValue TrueValue;
-caValue FalseValue;
+Value TrueValue;
+Value FalseValue;
 
 namespace cppbuild_function { CA_FUNCTION(build_module); }
 
@@ -557,10 +557,10 @@ EXPORT void circa_initialize()
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");
     if (libPathEnv != NULL) {
-        caValue libPathStr;
+        Value libPathStr;
         set_string(&libPathStr, libPathEnv);
 
-        caValue libPaths;
+        Value libPaths;
         string_split(&libPathStr, ';', &libPaths);
 
         for (int i=0; i < list_length(&libPaths); i++) {

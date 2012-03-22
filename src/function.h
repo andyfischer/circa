@@ -28,7 +28,7 @@ struct Function
 
     std::string name;
     Term* feedbackFunc;
-    caValue parameter;
+    Value parameter;
     bool throws;
 
     // Functions

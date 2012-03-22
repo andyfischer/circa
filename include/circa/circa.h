@@ -122,6 +122,9 @@ caBranch* circa_callee_branch(caStack* stack);
 // Allocate a new caValue container on the heap. This will call circa_init_value for you.
 caValue* circa_alloc_value();
 
+// Deallocate a caValue that was created with circa_alloc_value.
+void circa_dealloc_value(caValue* value);
+
 // Initialize a newly allocated caValue container. This must be called before any set()
 // functions.
 void circa_init_value(caValue* container);

@@ -34,7 +34,7 @@ struct EvalContext
     Term* errorTerm;
 
     // Persistent state
-    caValue state;
+    Value state;
 
     // Intra-program messages
     Dict messages;

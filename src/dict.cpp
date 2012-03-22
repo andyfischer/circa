@@ -444,7 +444,7 @@ void setup_type(Type* type)
 } // namespace dict_t
 
 Dict::Dict()
-  : caValue()
+  : Value()
 {
     create(&DICT_T, this);
 }

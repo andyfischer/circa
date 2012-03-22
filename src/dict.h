@@ -38,7 +38,7 @@ namespace dict_t {
 } // namespace dict_t
 
 // C++ wrapper
-struct Dict : caValue
+struct Dict : Value
 {
     Dict();
 

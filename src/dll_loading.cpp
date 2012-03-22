@@ -212,7 +212,7 @@ void dll_loading_check_for_patches_on_loaded_branch(Branch* branch)
                 continue;
             }
 
-            caValue error;
+            Value error;
             patch_with_dll(as_cstring(&filename), branch, &error);
 
             if (!is_null(&error)) {

@@ -201,7 +201,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
 
 void print_static_error(caValue* value, std::ostream& out)
 {
-    caValue str;
+    Value str;
     format_static_error(value, &str);
     out << as_string(&str);
 }

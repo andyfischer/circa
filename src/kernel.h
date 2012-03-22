@@ -3,6 +3,7 @@
 #pragma once
 
 #include "common_headers.h"
+#include "tagged_value.h"
 
 namespace circa {
 
@@ -139,8 +140,8 @@ struct BuiltinTypes {
 
 extern BuiltinTypes TYPES;
 
-extern caValue TrueValue;
-extern caValue FalseValue;
+extern Value TrueValue;
+extern Value FalseValue;
 
 extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;

@@ -137,9 +137,15 @@ void circa_init_value(caValue* container)
 
 caValue* circa_alloc_value()
 {
-    caValue* value = new caValue();
+    caValue* value = (caValue*) malloc(sizeof(caValue));
     circa_init_value(value);
     return value;
+}
+
+void circa_dealloc_value(caValue* value)
+{
+    circa_set_null(value);
+    free(value);
 }
 
 void circa_set_int(caValue* container, int value)
@@ -198,7 +204,7 @@ void circa_handle_set(caValue* handle, caValue* value, caReleaseFunc releaseFunc
 
 void circa_handle_set_object(caValue* handle, void* object, caReleaseFunc releaseFunc)
 {
-    caValue value;
+    Value value;
     set_opaque_pointer(&value, object);
     circa_handle_set(handle, &value, releaseFunc);
 }

@@ -766,7 +766,7 @@ namespace list_t {
         ListData* data = (ListData*) value->value_data.ptr;
         if (data == NULL)
             return;
-        caValue relativeIdentifier;
+        Value relativeIdentifier;
         for (int i=0; i < data->count; i++) {
             set_int(&relativeIdentifier, i);
             callback(&data->items[i], &relativeIdentifier, context);
@@ -797,7 +797,7 @@ namespace list_t {
 
 
 List::List()
-  : caValue()
+  : Value()
 {
     create(&LIST_T, this);
 }
@@ -887,14 +887,14 @@ List::removeNulls()
 void
 List::appendString(const char* str)
 {
-    caValue val;
+    Value val;
     set_string(&val, str);
     swap(&val, append());
 }
 void
 List::appendString(const std::string& str)
 {
-    caValue val;
+    Value val;
     set_string(&val, str);
     swap(&val, append());
 }

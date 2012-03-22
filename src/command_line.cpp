@@ -255,7 +255,7 @@ int run_command_line(List* args)
 
     // C++ gen
     if (string_eq(args->get(0), "-cppgen")) {
-        caValue remainingArgs;
+        Value remainingArgs;
         list_slice(args, 1, -1, &remainingArgs);
         run_generate_cpp(&remainingArgs);
         return 0;
