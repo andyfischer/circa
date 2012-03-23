@@ -239,6 +239,10 @@ CA_FUNCTION(Function__name)
 {
     set_string(OUTPUT, as_function(INPUT(0))->name);
 }
+CA_FUNCTION(Function__output)
+{
+    set_ref(OUTPUT, function_get_output_placeholder(as_function(INPUT(0)), INT_INPUT(1)));
+}
 
 CA_FUNCTION(length)
 {
@@ -520,6 +524,7 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("sys:do_admin_command"), sys__do_admin_command);
     install_function(kernel->get("Branch.dump"), Branch__dump);
     install_function(kernel->get("Function.name"), Function__name);
+    install_function(kernel->get("Function.output"), Function__output);
 
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");

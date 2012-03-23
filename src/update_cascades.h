@@ -22,6 +22,7 @@ void mark_static_errors_invalid(Branch* branch);
 void finish_update_cascade(Branch* branch);
 void recursively_finish_update_cascade(Branch* branch);
 
+void on_create_call(Term* term);
 void on_inputs_changed(Term* term);
 
 } // namespace circa

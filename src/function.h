@@ -13,6 +13,7 @@ namespace circa {
 struct Function
 {
     typedef void (*StaticTypeQueryFunc)(StaticTypeQuery* query);
+    typedef void (*OnCreateCall)(Term*);
     typedef void (*PostInputChange)(Term*);
     typedef int (*GetOutputCount)(Term*);
     typedef const char* (*GetOutputName)(Term*, int index);
@@ -38,6 +39,7 @@ struct Function
     FormatSource formatSource;
     CheckInvariants checkInvariants;
     StaticTypeQueryFunc staticTypeQuery;
+    OnCreateCall onCreateCall;
     PostInputChange postInputChange;
     GetOutputCount getOutputCount;
     GetOutputName getOutputName;

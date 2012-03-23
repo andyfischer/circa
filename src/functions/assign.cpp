@@ -12,6 +12,11 @@ namespace assign_function {
         push_frame(CONTEXT, contents);
     }
 
+    void onCreateCall(Term* term)
+    {
+        write_setter_chain_for_assign_term(term);
+    }
+
     Type* specializeType(Term* term)
     {
         Branch* contents = nested_contents(term);
@@ -24,8 +29,6 @@ namespace assign_function {
     void formatSource(StyledSource* source, Term* term)
     {
         format_source_for_input(source, term, 0, "", "");
-
-        //append_phrase(source, "$", term, phrase_type::UNDEFINED);
 
         Term* rhs = term->input(1);
 
@@ -45,6 +48,8 @@ namespace assign_function {
     {
         FUNCS.assign = import_function(kernel, assign, "assign(any, any) -> any");
         as_function(FUNCS.assign)->formatSource = formatSource;
+        as_function(FUNCS.assign)->specializeType = specializeType;
+        as_function(FUNCS.assign)->onCreateCall = onCreateCall;
     }
 }
 }

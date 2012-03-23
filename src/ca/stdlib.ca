@@ -52,6 +52,7 @@ namespace sys
 def Branch.dump(b)
 
 def Function.name(_) -> string
+def Function.output(_, int index) -> Term
 
 def toggle(bool tog) -> bool
     <<<

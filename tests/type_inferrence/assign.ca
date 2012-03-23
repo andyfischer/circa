@@ -1,0 +1,9 @@
+
+type CompoundType {
+    int i
+}
+
+t = create(CompoundType)
+assert(type(t) == CompoundType)
+t.i = 1
+assert(type(t) == CompoundType)

@@ -16,7 +16,7 @@ extern "C" {
 // a Name is an interned string that is referenced by integer.
 typedef int caName;
 
-// a Stack holds the interpreter's current state, including a list of activation records.
+// a Stack holds the interpreter's current state, including a list of frames (activation records)
 typedef struct caStack caStack;
 
 // a Value is a variant value. It holds two pointers, one pointer to the Type object and one

@@ -142,7 +142,8 @@ def all_testable_files():
         TestRoot + '/field',
         TestRoot + '/for',
         TestRoot + '/list',
-        TestRoot + '/static_errors'
+        TestRoot + '/static_errors',
+        TestRoot + '/type_inferrence'
         ]
     for dir in dirs:
         for f in list_directory_contents(dir):

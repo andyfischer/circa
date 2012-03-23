@@ -1,0 +1,14 @@
+
+type T
+{
+    int i
+}
+
+def T.f(self) {
+    self.i += 1
+}
+
+t = create(T)
+assert(type(t) == T)
+t.f()
+assert(type(t) == T)

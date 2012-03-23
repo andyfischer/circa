@@ -7,21 +7,56 @@ type CodeWriter
 }
 
 def CodeWriter.write(self :out, string s)
+    if self.needsIndent
+        self.needsIndent = false
+        for i in 0..self.curIndent
+            self.output.write('    ')
     self.output.append(s)
 
 def CodeWriter.writeln(self :out, string line)
-    self.output.append(line)
+    self.write(line)
     self.output.append("\n")
+    self.needsIndent = true
+
+def CodeWriter.indent(self :out)
+    self.curIndent += 1
 
 def write_type_name(CodeWriter w :out, Term term)
     w.write(term.get_type().name())
+
+def write_literal_function(CodeWriter w :out, Term term)
+
+    func = term.value() -> Function
+
+    w.write(func.output(0).get_type().name())
+    w.write(' ')
+    w.write(func.name())
+    w.write('()')
+    w.writeln('')
+    w.writeln('{')
+    w.indent()
+
+def write_value_term(CodeWriter w :out, Term term)
+    v = term.value()
+
+    if is_function(v)
+        write_literal_function(&w, term)
+
+    -- Value
+    w.write('const ')
+    write_type_name(w, term)
+    w.write(' ')
+    w.write(term.name())
+    w.write(' = ')
+    w.write(term.value() -> to_string)
+    w.writeln('')
 
 def write_top_level(CodeWriter w :out, Branch branch)
 
     for term in branch.terms()
         @term -> Term
 
-        if term.property('statement') == true
+        if term.property('statement') == false
             continue
 
         if term.function() == comment
@@ -31,14 +66,7 @@ def write_top_level(CodeWriter w :out, Branch branch)
             else
                 w.writeln(concat('// ' commentStr))
         elif term.function() == value
-            -- Value
-            w.write('const ')
-            write_type_name(w, term)
-            w.write(' ')
-            w.write(term.name())
-            w.write(' = ')
-            w.write(term.value() -> to_string)
-            w.writeln('')
+            write_value_term(&w, term)
 
         else
             -- Normal function call
@@ -57,6 +85,10 @@ def branch_to_cpp_string(Branch b) -> string
     return writer.output.join("")
 
 test_branch = {
+
+    def my_function(int a, int b) -> int
+      return a - b
+
     a = 1
     b = 2
     -- this is a comment

@@ -1148,17 +1148,6 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
         term->setStringProp("syntax:rebindOperator", name);
     }
 
-        /*
-    // If the term was an assign() term, then we may need to rebind the root name.
-    if (term->function == FUNCS.assign) {
-        Term* lexprRoot = find_lexpr_root(term->input(0));
-        if (lexprRoot != NULL && lexprRoot->name != "") {
-            rename(term, lexprRoot->name);
-        }
-        assign_function::update_assign_contents(term);
-    }
-        */
-
     set_source_location(term, startPosition, tokens);
     set_is_statement(term, true);
 
@@ -1517,7 +1506,6 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                             assignTerm->inputInfo(0)->properties.insert("postWhitespace"));
 
                     Term* lexprRoot = find_lexpr_root(leftExpr.term);
-                    write_setter_chain_for_assign_term(assignTerm);
                     rename(assignTerm, lexprRoot->name);
                     
                     term = assignTerm;
@@ -1525,7 +1513,6 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             } else if (function == FUNCS.assign) {
 
                 set_is_statement(term, true);
-                write_setter_chain_for_assign_term(term);
                 Term* lexprRoot = find_lexpr_root(leftExpr.term);
                 rename(term, lexprRoot->name);
             }

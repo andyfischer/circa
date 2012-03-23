@@ -28,6 +28,7 @@ Function::Function()
     formatSource(NULL),
     checkInvariants(NULL),
     staticTypeQuery(NULL),
+    onCreateCall(NULL),
     postInputChange(NULL),
     getOutputCount(NULL),
     getOutputName(NULL),

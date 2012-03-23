@@ -111,12 +111,22 @@ void recursively_finish_update_cascade(Branch* branch)
     }
 }
 
+void on_create_call(Term* term)
+{
+    if (!is_function(term->function))
+        return;
+
+    Function::OnCreateCall func = as_function(term->function)->onCreateCall;
+
+    if (func)
+        func(term);
+}
+
 void on_inputs_changed(Term* term)
 {
     if (!is_function(term->function))
         return;
 
-    // Update function pointer
     Function* attrs = as_function(term->function);
     if (attrs == NULL)
         return;

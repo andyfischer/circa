@@ -225,6 +225,9 @@ void change_function(Term* term, Term* function)
     term->function = function;
 
     possibly_prune_user_list(term, previousFunction);
+
+    on_create_call(term);
+
     respecialize_type(term);
 
     // Don't append user for certain functions. Need to make this more robust.
