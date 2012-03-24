@@ -35,3 +35,17 @@ x = myfunc()
 
 xr = ref(x)
 assert(xr.function() == myfunc)
+
+-- Function inputs & outputs
+def myfunc2(int a, int b, int c) -> number
+  return a + b + c
+
+a = myfunc2.input(0)
+b = myfunc2.input(1)
+c = myfunc2.input(2)
+
+assert(a.name() == "a")
+assert(b.name() == "b")
+assert(c.name() == "c")
+assert(myfunc2.inputs() == [a b c])
+assert(myfunc2.output(0).get_type() == number)

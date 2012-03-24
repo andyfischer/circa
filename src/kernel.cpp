@@ -239,9 +239,33 @@ CA_FUNCTION(Function__name)
 {
     set_string(OUTPUT, as_function(INPUT(0))->name);
 }
+
+CA_FUNCTION(Function__input)
+{
+    set_ref(OUTPUT, function_get_input_placeholder(as_function(INPUT(0)), INT_INPUT(1)));
+}
+
+CA_FUNCTION(Function__inputs)
+{
+    Function* func = as_function(INPUT(0));
+    caValue* output = OUTPUT;
+    set_list(output, 0);
+    for (int i=0;; i++) {
+        Term* term = function_get_input_placeholder(func, i);
+        if (term == NULL)
+            break;
+        set_ref(list_append(output), term);
+    }
+}
+
 CA_FUNCTION(Function__output)
 {
     set_ref(OUTPUT, function_get_output_placeholder(as_function(INPUT(0)), INT_INPUT(1)));
+}
+
+CA_FUNCTION(Function__contents)
+{
+    set_branch(OUTPUT, function_get_contents(as_function(INPUT(0))));
 }
 
 CA_FUNCTION(length)
@@ -524,7 +548,10 @@ void install_standard_library(Branch* kernel)
     install_function(kernel->get("sys:do_admin_command"), sys__do_admin_command);
     install_function(kernel->get("Branch.dump"), Branch__dump);
     install_function(kernel->get("Function.name"), Function__name);
+    install_function(kernel->get("Function.input"), Function__input);
+    install_function(kernel->get("Function.inputs"), Function__inputs);
     install_function(kernel->get("Function.output"), Function__output);
+    install_function(kernel->get("Function.contents"), Function__contents);
 
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");

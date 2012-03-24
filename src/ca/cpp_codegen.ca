@@ -10,7 +10,7 @@ def CodeWriter.write(self :out, string s)
     if self.needsIndent
         self.needsIndent = false
         for i in 0..self.curIndent
-            self.output.write('    ')
+            self.output.append('    ')
     self.output.append(s)
 
 def CodeWriter.writeln(self :out, string line)
@@ -20,6 +20,8 @@ def CodeWriter.writeln(self :out, string line)
 
 def CodeWriter.indent(self :out)
     self.curIndent += 1
+def CodeWriter.unindent(self :out)
+    self.curIndent -= 1
 
 def write_type_name(CodeWriter w :out, Term term)
     w.write(term.get_type().name())
@@ -35,28 +37,32 @@ def write_literal_function(CodeWriter w :out, Term term)
     w.writeln('')
     w.writeln('{')
     w.indent()
+    w.writeln('stuff')
+    --write_branch(&w, func.contents())
+    w.unindent()
+    w.writeln('}')
 
 def write_value_term(CodeWriter w :out, Term term)
     v = term.value()
 
     if is_function(v)
         write_literal_function(&w, term)
-
-    -- Value
-    w.write('const ')
-    write_type_name(w, term)
-    w.write(' ')
-    w.write(term.name())
-    w.write(' = ')
-    w.write(term.value() -> to_string)
-    w.writeln('')
+    else
+        -- Value
+        w.write('const ')
+        write_type_name(w, term)
+        w.write(' ')
+        w.write(term.name())
+        w.write(' = ')
+        w.write(term.value() -> to_string)
+        w.writeln(';')
 
 def write_top_level(CodeWriter w :out, Branch branch)
 
     for term in branch.terms()
         @term -> Term
 
-        if term.property('statement') == false
+        if term.property('statement') != true
             continue
 
         if term.function() == comment
@@ -73,7 +79,8 @@ def write_top_level(CodeWriter w :out, Branch branch)
             termName = term.name()
             if termName != ""
                 w.write(concat(termName ' = '))
-            w.writeln(concat(term.function().name() '()'))
+            w.write(concat(term.function().name() '()'))
+            w.writeln(';')
         
 
 
