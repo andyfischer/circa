@@ -2302,6 +2302,8 @@ void post_parse_branch(Branch* branch)
     branch->removeNulls();
 
     finish_update_cascade(branch);
+
+    fix_forward_function_references(branch);
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)

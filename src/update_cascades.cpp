@@ -1,9 +1,12 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
 #include "branch.h"
+#include "code_iterators.h"
 #include "heap_debugging.h"
 #include "function.h"
+#include "kernel.h"
 #include "locals.h"
+#include "building.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "update_cascades.h"
@@ -148,6 +151,22 @@ void on_repairable_link(Term* term, List& brokenLinks)
 
         Term* fixedLink = find_name_at(term, as_cstring(linkInfo[0]));
         term->setDependency(dependencyIndex, fixedLink);
+    }
+}
+
+void fix_forward_function_references(Branch* branch)
+{
+    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+        Term* term = *it;
+        if (term->function == NULL || term->function == FUNCS.unknown_function) {
+            // See if we can now find this function
+            std::string functionName = term->stringProp("syntax:functionName");
+
+            Term* func = find_name(branch, functionName.c_str());
+            if (func != NULL) {
+                change_function(term, func);
+            }
+        }
     }
 }
 

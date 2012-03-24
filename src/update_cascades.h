@@ -25,4 +25,6 @@ void recursively_finish_update_cascade(Branch* branch);
 void on_create_call(Term* term);
 void on_inputs_changed(Term* term);
 
+void fix_forward_function_references(Branch* branch);
+
 } // namespace circa

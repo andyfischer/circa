@@ -35,15 +35,10 @@ def write_literal_function(CodeWriter w :out, Term term)
     w.write(func.name())
     w.write('(')
 
-    first = true
-    for input in func.inputs()
-        if not(first)
-            w.write(', ')
-        first = false
+    inputs = for input in func.inputs()
         @input -> Term
-        w.write_type_name(input)
-        w.write(' ')
-        w.write(input.name())
+        concat(input.get_type().name() ' ' input.name())
+    w.write(inputs.join(', '))
     w.writeln(')')
     w.writeln('{')
     w.indent()
@@ -66,7 +61,7 @@ def write_value_term(CodeWriter w :out, Term term)
         w.write(term.value() -> to_string)
         w.writeln(';')
 
-def write_top_level(CodeWriter w :out, Branch branch)
+def write_branch(CodeWriter w :out, Branch branch)
 
     for term in branch.terms()
         @term -> Term
@@ -88,14 +83,25 @@ def write_top_level(CodeWriter w :out, Branch branch)
             termName = term.name()
             if termName != ""
                 w.write(concat(termName ' = '))
-            w.write(concat(term.function().name() '()'))
+            w.write(term.function().name())
+            w.write('(')
+            first = true
+            for input in term.inputs()
+                if not(first)
+                    w.write(', ')
+                first = false
+                @input -> Term
+                if input.name() != ""
+                    w.write(input.name())
+
+            w.write(')')
             w.writeln(';')
         
 
 def branch_to_cpp_string(Branch b) -> string
     writer = create(CodeWriter)
 
-    write_top_level(&writer, b)
+    write_branch(&writer, b)
 
     return writer.output.join("")
 
