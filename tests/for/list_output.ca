@@ -1,0 +1,11 @@
+
+output = for i in [0 1 2 3]
+  5
+
+assert(output == [5 5 5 5])
+
+output = for i in [0 1 2 3]
+  i += 3
+  5
+
+assert(output == [5 5 5 5])
