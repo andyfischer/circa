@@ -49,13 +49,44 @@ namespace sys
     def module_search_paths() -> List
     def do_admin_command(string cmd) -> string
 
+def branch_ref(any branch :ignore_error) -> Branch
+
 def Branch.dump(b)
+def Branch.format_source(self) -> StyledSource
+def Branch.has_static_error(self) -> bool
+def Branch.get_static_errors(self) -> List
+def Branch.get_static_errors_formatted(self) -> List
+def Branch.evaluate(self)
+def Branch.terms(self) -> List
+def Branch.get_term(self, int index) -> Term
+def Branch.list_configs(self) -> List
+def Branch.file_signature(self) -> any
 
 def Function.name(_) -> string
 def Function.input(_, int index) -> Term
 def Function.inputs(_) -> List
 def Function.output(_, int index) -> Term
 def Function.contents(_) -> Branch
+
+def Type.name(_) -> string
+
+def Term.name(self) -> string
+def Term.to_string(_) -> string
+def Term.to_source_string(_) -> string
+def Term.function(_) -> Function
+def Term.get_type(_) -> Type
+def Term.assign(_, any)
+def Term.value(_) -> any
+def Term.tweak(_, number steps)
+def Term.asint(_) -> int
+def Term.asfloat(_) -> number
+def Term.input(_, int) -> Term
+def Term.inputs(_) -> List
+def Term.num_inputs(_) -> int
+def Term.source_location(_) -> Rect_i
+def Term.global_id(_) -> string
+def Term.properties(_) -> Map
+def Term.property(_, string) -> any
 
 def toggle(bool tog) -> bool
     <<<

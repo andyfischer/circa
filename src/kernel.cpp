@@ -15,11 +15,14 @@
 #include "generic.h"
 #include "importing.h"
 #include "importing_macros.h"
+#include "introspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"
 #include "parser.h"
 #include "subroutine.h"
+#include "source_repro.h"
+#include "stateful_code.h"
 #include "static_checking.h"
 #include "string_type.h"
 #include "names.h"
@@ -37,6 +40,7 @@
 #include "types/int.h"
 #include "types/name.h"
 #include "types/number.h"
+#include "types/rect_i.h"
 #include "types/ref.h"
 #include "types/set.h"
 #include "types/void.h"
@@ -230,9 +234,130 @@ CA_FUNCTION(sys__do_admin_command)
     do_admin_command(INPUT(0), OUTPUT);
 }
 
+CA_FUNCTION(branch_ref)
+{
+    set_branch(OUTPUT, (INPUT_TERM(0)->nestedContents));
+}
+
 CA_FUNCTION(Branch__dump)
 {
     dump(as_branch(INPUT(0)));
+}
+
+CA_FUNCTION(Branch__format_source)
+{
+    Branch* branch = as_branch(INPUT(0));
+    if (branch == NULL)
+        return RAISE_ERROR("NULL branch");
+
+    List* output = List::cast(OUTPUT, 0);
+    format_branch_source((StyledSource*) output, branch);
+}
+
+CA_FUNCTION(Branch__has_static_error)
+{
+    Branch* branch = as_branch(INPUT(0));
+    set_bool(OUTPUT, has_static_errors_cached(branch));
+}
+
+CA_FUNCTION(Branch__get_static_errors)
+{
+    Branch* branch = as_branch(INPUT(0));
+
+    if (is_null(&branch->staticErrors))
+        set_list(OUTPUT, 0);
+    else
+        copy(&branch->staticErrors, OUTPUT);
+}
+
+CA_FUNCTION(Branch__get_static_errors_formatted)
+{
+    Branch* branch = as_branch(INPUT(0));
+
+    if (is_null(&branch->staticErrors))
+        set_list(OUTPUT, 0);
+
+    List& list = *List::checkCast(&branch->staticErrors);
+    List& out = *List::cast(OUTPUT, list.length());
+    for (int i=0; i < list.length(); i++)
+        format_static_error(list[i], out[i]);
+}
+
+CA_FUNCTION(Branch__evaluate)
+{
+    Branch* branch = as_branch(INPUT(0));
+    push_frame(CONTEXT, branch);
+}
+
+// Reflection
+
+CA_FUNCTION(Branch__terms)
+{
+    Branch* branch = as_branch(INPUT(0));
+    if (branch == NULL)
+        return RAISE_ERROR("NULL branch");
+
+    List& output = *List::cast(OUTPUT, branch->length());
+
+    for (int i=0; i < branch->length(); i++)
+        set_ref(output[i], branch->get(i));
+}
+
+CA_FUNCTION(Branch__get_term)
+{
+    Branch* branch = as_branch(INPUT(0));
+    if (branch == NULL)
+        return RAISE_ERROR("NULL branch");
+
+    int index = INT_INPUT(1);
+    set_ref(OUTPUT, branch->get(index));
+}
+
+bool is_considered_config(Term* term)
+{
+    if (term == NULL) return false;
+    if (term->name == "") return false;
+    if (!is_value(term)) return false;
+    if (is_declared_state(term)) return false;
+    if (is_hidden(term)) return false;
+    if (is_function(term)) return false;
+
+    // ignore branch-based types
+    //if (is_branch(term)) return false;
+    if (is_type(term)) return false;
+
+    return true;
+}
+
+CA_FUNCTION(Branch__list_configs)
+{
+    Branch* branch = as_branch(INPUT(0));
+    if (branch == NULL)
+        return RAISE_ERROR("NULL branch");
+
+    List& output = *List::cast(OUTPUT, 0);
+
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        if (is_considered_config(term))
+            set_ref(output.append(), term);
+    }
+}
+
+CA_FUNCTION(Branch__file_signature)
+{
+    Branch* branch = as_branch(INPUT(0));
+    if (branch == NULL)
+        return RAISE_ERROR("NULL branch");
+    List* fileOrigin = branch_get_file_origin(branch);
+    if (fileOrigin == NULL)
+        set_null(OUTPUT);
+    else
+    {
+        List* output = set_list(OUTPUT, 2);
+        copy(fileOrigin->get(1), output->get(0));
+        copy(fileOrigin->get(2), output->get(1));
+    }
 }
 
 CA_FUNCTION(Function__name)
@@ -266,6 +391,200 @@ CA_FUNCTION(Function__output)
 CA_FUNCTION(Function__contents)
 {
     set_branch(OUTPUT, function_get_contents(as_function(INPUT(0))));
+}
+
+CA_FUNCTION(Type__name)
+{
+    set_string(OUTPUT, name_to_string(as_type(INPUT(0))->name));
+}
+
+CA_FUNCTION(Term__name)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+    set_string(OUTPUT, t->name);
+}
+CA_FUNCTION(Term__to_string)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+    set_string(OUTPUT, circa::to_string(t));
+}
+CA_FUNCTION(Term__to_source_string)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+    set_string(OUTPUT, get_term_source_text(t));
+}
+CA_FUNCTION(Term__function)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+    set_function(OUTPUT, as_function(t->function));
+}
+CA_FUNCTION(Term__type)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+    set_type(OUTPUT, t->type);
+}
+CA_FUNCTION(Term__assign)
+{
+    Term* target = INPUT(0)->asRef();
+    if (target == NULL) {
+        RAISE_ERROR("NULL reference");
+        return;
+    }
+
+    caValue* source = INPUT(1);
+
+    if (!cast_possible(source, declared_type(target))) {
+        RAISE_ERROR("Can't assign, type mismatch");
+        return;
+    }
+
+    circa::copy(source, target);
+}
+CA_FUNCTION(Term__value)
+{
+    Term* target = INPUT(0)->asRef();
+    if (target == NULL) {
+        RAISE_ERROR("NULL reference");
+        return;
+    }
+
+    copy(target, OUTPUT);
+}
+
+int tweak_round(double a) {
+    return int(a + 0.5);
+}
+
+CA_FUNCTION(Term__tweak)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+
+    int steps = tweak_round(INPUT(1)->toFloat());
+
+    if (steps == 0)
+        return;
+
+    if (is_float(t)) {
+        float step = get_step(t);
+
+        // Do the math like this so that rounding errors are not accumulated
+        float new_value = (round(as_float(t) / step) + steps) * step;
+        set_float(t, new_value);
+
+    } else if (is_int(t))
+        set_int(t, as_int(t) + steps);
+    else
+        RAISE_ERROR("Ref is not an int or number");
+}
+
+CA_FUNCTION(Term__asint)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL) {
+        RAISE_ERROR("NULL reference");
+        return;
+    }
+    if (!is_int(t)) {
+        RAISE_ERROR("Not an int");
+        return;
+    }
+    set_int(OUTPUT, as_int(t));
+}
+CA_FUNCTION(Term__asfloat)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL) {
+        RAISE_ERROR("NULL reference");
+        return;
+    }
+    
+    set_float(OUTPUT, to_float(t));
+}
+CA_FUNCTION(Term__input)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL) {
+        RAISE_ERROR("NULL reference");
+        return;
+    }
+    int index = INPUT(1)->asInt();
+    if (index >= t->numInputs())
+        set_ref(OUTPUT, NULL);
+    else
+        set_ref(OUTPUT, t->input(index));
+}
+CA_FUNCTION(Term__inputs)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+
+    List& output = *List::cast(OUTPUT, t->numInputs());
+
+    for (int i=0; i < t->numInputs(); i++)
+        set_ref(output[i], t->input(i));
+}
+CA_FUNCTION(Term__num_inputs)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL) {
+        RAISE_ERROR("NULL reference");
+        return;
+    }
+    set_int(OUTPUT, t->numInputs());
+}
+
+CA_FUNCTION(Term__source_location)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+
+    Rect_i* output = Rect_i::cast(OUTPUT);
+    output->set(t->sourceLoc.col, t->sourceLoc.line,
+            t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
+}
+CA_FUNCTION(Term__global_id)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+
+    set_string(OUTPUT, global_id(t));
+}
+CA_FUNCTION(Term__properties)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+    circa::copy(&t->properties, OUTPUT);
+}
+CA_FUNCTION(Term__property)
+{
+    Term* t = INPUT(0)->asRef();
+    if (t == NULL)
+        return RAISE_ERROR("NULL reference");
+
+    const char* key = STRING_INPUT(1);
+
+    caValue* value = term_get_property(t, key);
+
+    if (value == NULL)
+        set_null(OUTPUT);
+    else
+        circa::copy(value, OUTPUT);
 }
 
 CA_FUNCTION(length)
@@ -530,28 +849,60 @@ void install_standard_library(Branch* kernel)
     // Parse the stdlib script
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 
-    // Install each function
-    install_function(kernel->get("cppbuild:build_module"), cppbuild_function::build_module);
-    install_function(kernel->get("file:version"), file__version);
-    install_function(kernel->get("file:exists"), file__exists);
-    install_function(kernel->get("file:read_text"), file__read_text);
-    install_function(kernel->get("file:fetch_record"), file__fetch_record);
-    install_function(kernel->get("input"), input_func);
-    install_function(kernel->get("length"), length);
-    install_function(kernel->get("from_string"), from_string);
-    install_function(kernel->get("to_string_repr"), to_string_repr);
-    install_function(kernel->get("refactor:rename"), refactor__rename);
-    install_function(kernel->get("refactor:change_function"), refactor__change_function);
-    install_function(kernel->get("reflect:this_branch"), reflect__this_branch);
-    install_function(kernel->get("reflect:kernel"), reflect__kernel);
-    install_function(kernel->get("sys:module_search_paths"), sys__module_search_paths);
-    install_function(kernel->get("sys:do_admin_command"), sys__do_admin_command);
-    install_function(kernel->get("Branch.dump"), Branch__dump);
-    install_function(kernel->get("Function.name"), Function__name);
-    install_function(kernel->get("Function.input"), Function__input);
-    install_function(kernel->get("Function.inputs"), Function__inputs);
-    install_function(kernel->get("Function.output"), Function__output);
-    install_function(kernel->get("Function.contents"), Function__contents);
+    // Install C functions
+    static const ImportRecord records[] = {
+        {"cppbuild:build_module", cppbuild_function::build_module},
+        {"file:version", file__version},
+        {"file:exists", file__exists},
+        {"file:read_text", file__read_text},
+        {"file:fetch_record", file__fetch_record},
+        {"input", input_func},
+        {"length", length},
+        {"from_string", from_string},
+        {"to_string_repr", to_string_repr},
+        {"refactor:rename", refactor__rename},
+        {"refactor:change_function", refactor__change_function},
+        {"reflect:this_branch", reflect__this_branch},
+        {"reflect:kernel", reflect__kernel},
+        {"sys:module_search_paths", sys__module_search_paths},
+        {"sys:do_admin_command", sys__do_admin_command},
+        {"branch_ref", branch_ref},
+        {"Branch.dump", Branch__dump},
+        {"Branch.evaluate", Branch__evaluate},
+        {"Branch.file_signature", Branch__file_signature},
+        {"Branch.format_source", Branch__format_source},
+        {"Branch.get_term", Branch__get_term},
+        {"Branch.get_static_errors", Branch__get_static_errors},
+        {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
+        {"Branch.has_static_error", Branch__has_static_error},
+        {"Branch.list_configs", Branch__list_configs},
+        {"Branch.terms", Branch__terms},
+        {"Function.name", Function__name},
+        {"Function.input", Function__input},
+        {"Function.inputs", Function__inputs},
+        {"Function.output", Function__output},
+        {"Function.contents", Function__contents},
+        {"Type.name", Type__name},
+        {"Term.name", Term__name},
+        {"Term.to_string", Term__to_string},
+        {"Term.to_source_string", Term__to_source_string},
+        {"Term.function", Term__function},
+        {"Term.get_type", Term__type},
+        {"Term.assign", Term__assign},
+        {"Term.value", Term__value},
+        {"Term.tweak", Term__tweak},
+        {"Term.asint", Term__asint},
+        {"Term.asfloat", Term__asfloat},
+        {"Term.input", Term__input},
+        {"Term.inputs", Term__inputs},
+        {"Term.num_inputs", Term__num_inputs},
+        {"Term.source_location", Term__source_location},
+        {"Term.global_id", Term__global_id},
+        {"Term.properties", Term__properties},
+        {"Term.property", Term__property},
+    };
+
+    install_function_list(kernel, records);
 
     LENGTH_FUNC = kernel->get("length");
     TYPE_FUNC = kernel->get("type");

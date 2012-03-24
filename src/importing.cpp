@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "evaluation.h"
 #include "function.h"
+#include "importing.h"
 #include "importing_macros.h"
 #include "parser.h"
 #include "names.h"
@@ -32,8 +33,11 @@ void install_function(Term* function, EvaluateFunc evaluate)
 Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 {
     Term* term = find_name(branch, name);
-    if (term == NULL)
-        internal_error("Name not found in install_function");
+    if (term == NULL) {
+        std::string msg = "Name not found in install_function: ";
+        msg += name;
+        internal_error(msg.c_str());
+    }
     as_function(term)->evaluate = evaluate;
     return term;
 }
@@ -43,6 +47,14 @@ Term* import_type(Branch* branch, Type* type)
     Term* term = create_value(branch, &TYPE_T, name_to_string(type->name));
     set_type(term, type);
     return term;
+}
+
+void install_function_list(Branch* branch, const ImportRecord* list)
+{
+    while (list->functionName != NULL) {
+        install_function(branch, list->functionName, list->evaluate);
+        list++;
+    }
 }
 
 } // namespace circa
