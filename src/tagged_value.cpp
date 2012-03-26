@@ -729,7 +729,6 @@ float circ_to_float(caValue* value)
     }
 }
 
-
 void circ_get_vec2(caValue* vec2, float* xOut, float* yOut)
 {
     *xOut = circ_to_float(get_index(vec2, 0));

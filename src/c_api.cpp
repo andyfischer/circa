@@ -36,6 +36,11 @@ int circ_int_input(caStack* stack, int index)
     return circ_get_int(circ_input(stack, index));
 }
 
+float circ_float_input(caStack* stack, int index)
+{
+    return circ_get_float(circ_input(stack, index));
+}
+
 const char* circ_string_input(caStack* stack, int index)
 {
     return circ_get_string(circ_input(stack, index));
@@ -142,6 +147,13 @@ void circ_raise_error(caStack* stack, const char* msg)
 caTerm* circ_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate)
 {
     return (caTerm*) install_function((Branch*) branch, name, (EvaluateFunc) evaluate);
+}
+void circ_install_function_list(caBranch* branch, caFunctionBinding* list)
+{
+    while (list->name != NULL) {
+        circ_install_function(branch, list->name, list->func);
+        list++;
+    }
 }
 
 void circ_add_module_search_path(const char* path)

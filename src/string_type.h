@@ -6,7 +6,7 @@
 
 namespace circa {
 
-struct String : public caValue
+struct String : public Value
 {
 };
 

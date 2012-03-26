@@ -115,6 +115,10 @@ int circ_int_input(caStack* stack, int index);
 // Equivalent to: circ_get_string(circ_input(stack, index))
 const char* circ_string_input(caStack* stack, int index);
 
+// Read the given input index as a float
+// Equivalent to: circ_get_float(circ_input(stack, index))
+float circ_float_input(caStack* stack, int index);
+
 // Fetch the given output value. This value should be modified.
 caValue* circ_output(caStack* stack, int index);
 
@@ -274,6 +278,16 @@ caType* circ_term_declared_type(caTerm* term);
 // Install an evaluation function to the given named function. Returns the container Term.
 // Returns NULL if the name was not found.
 caTerm* circ_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
+
+typedef struct caFunctionBinding
+{
+    const char* name;
+    caEvaluateFunc func;
+} caFunctionBinding;
+
+// Install a series of C function bindings. This will treat 'bindingList' as an array
+// that is terminanted with a NULL caFunctionBinding.
+void circ_install_function_list(caBranch* branch, caFunctionBinding* bindingList);
 
 // Install an evaluation function to the given Function.
 void circ_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate);
