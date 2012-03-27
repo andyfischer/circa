@@ -67,21 +67,17 @@ Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
 Term* BRANCH_UNEVALUATED_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
-Term* DIV_FUNC = NULL;
 Term* DO_ONCE_FUNC = NULL;
 Term* ERRORED_FUNC = NULL;
 Term* EXTRA_OUTPUT_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
-Term* GET_INDEX_FROM_BRANCH_FUNC = NULL;
 Term* INSTANCE_FUNC = NULL;
 Term* LIST_TYPE = NULL;
 Term* LIST_APPEND_FUNC = NULL;
-Term* LOAD_SCRIPT_FUNC = NULL;
 Term* NAMESPACE_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
 Term* REF_FUNC = NULL;
-Term* RETURN_FUNC = NULL;
 Term* SWITCH_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
 Term* STATIC_ERROR_FUNC = NULL;
@@ -818,7 +814,7 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.mult, mult_s);
 
     Term* div_s = create_function(kernel, "div_s");
-    create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
     // Create some hosted types
     TYPES.point = as_type(parse_type(kernel, "type Point { number x, number y }"));

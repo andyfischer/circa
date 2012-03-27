@@ -1183,7 +1183,7 @@ void update_exit_points(Branch* branch)
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         Term* term = it.current();
 
-        if (term->function == RETURN_FUNC) {
+        if (term->function == FUNCS.return_func) {
             for (int i=1;; i++) {
                 Term* output = get_output_placeholder(branch, i);
                 if (output == NULL)

@@ -54,8 +54,8 @@ namespace return_function {
             return;
 
         import_function(kernel, return_func, "return(any :multiple :optional)");
-        RETURN_FUNC = kernel->get("return");
-        as_function(RETURN_FUNC)->formatSource = formatSource;
+        FUNCS.return_func = kernel->get("return");
+        as_function(FUNCS.return_func)->formatSource = formatSource;
     }
 }
 }

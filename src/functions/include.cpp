@@ -82,9 +82,9 @@ namespace include_function {
                 "include(string filename) -> Branch");
         as_function(FUNCS.include_func)->postCompile = include_post_compile;
 
-        LOAD_SCRIPT_FUNC = import_function(kernel, load_script,
+        FUNCS.load_script = import_function(kernel, load_script,
                 "load_script(string filename) -> Branch");
-        as_function(LOAD_SCRIPT_FUNC)->postCompile = include_post_compile;
+        as_function(FUNCS.load_script)->postCompile = include_post_compile;
 
         FUNCS.import = import_function(kernel, NULL, "import()");
         as_function(FUNCS.import)->formatSource = import_formatSource;

@@ -18,7 +18,7 @@ namespace div_function {
     void setup(Branch* kernel)
     {
         import_function(kernel, div_f, "div_f(number,number) -> number");
-        DIV_FUNC = import_function(kernel, div_f, "div(number,number) -> number");
+        FUNCS.div = import_function(kernel, div_f, "div(number,number) -> number");
         import_function(kernel, div_i, "div_i(int,int) -> int");
     }
 }

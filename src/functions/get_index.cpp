@@ -32,21 +32,6 @@ namespace get_index_function {
         return infer_type_of_get_index(term->input(0));
     }
 
-    CA_DEFINE_FUNCTION(get_index_from_branch, "get_index_from_branch(any, int) -> any")
-    {
-        // Not sure if this function will be permanent
-        int index = as_int(INPUT(1));
-        Branch* branch = INPUT_TERM(0)->nestedContents;
-
-        if (index >= branch->length()) {
-            std::stringstream err;
-            err << "Index out of range: " << index;
-            return RAISE_ERROR(err.str().c_str());
-        }
-
-        copy(branch->get(index), OUTPUT);
-    }
-
     void formatSource(StyledSource* source, Term* term)
     {
         if (term->boolPropOptional("syntax:brackets", false)) {
@@ -64,7 +49,6 @@ namespace get_index_function {
     {
         CA_SETUP_FUNCTIONS(kernel);
         FUNCS.get_index = kernel->get("get_index");
-        GET_INDEX_FROM_BRANCH_FUNC = kernel->get("get_index_from_branch");
         as_function(FUNCS.get_index)->specializeType = specializeType;
         as_function(FUNCS.get_index)->formatSource = formatSource;
     }

@@ -1216,7 +1216,7 @@ ParseResult return_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
 
     branch_add_pack_state(branch);
 
-    Term* result = apply(branch, RETURN_FUNC, TermList(output));
+    Term* result = apply(branch, FUNCS.return_func, TermList(output));
 
     if (postKeywordWs != " ")
         result->setStringProp("syntax:postKeywordWs", postKeywordWs);

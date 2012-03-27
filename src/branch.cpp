@@ -597,7 +597,7 @@ Branch* load_script_term(Branch* branch, const char* filename)
 {
     ca_assert(branch != NULL);
     Term* filenameTerm = create_string(branch, filename);
-    Term* includeFunc = apply(branch, LOAD_SCRIPT_FUNC, TermList(filenameTerm));
+    Term* includeFunc = apply(branch, FUNCS.load_script, TermList(filenameTerm));
     return nested_contents(includeFunc);
 }
 
