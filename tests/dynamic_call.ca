@@ -1,0 +1,9 @@
+
+a = 1
+
+code = {
+    b = add(a a)
+    print(b)
+}
+
+call(code [4])

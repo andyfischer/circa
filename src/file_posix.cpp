@@ -39,7 +39,7 @@ static void update_file(caFileSource*, caFileRecord* record)
     if (circ_is_int(record->sourceMetadata) &&
         modifiedTime == circ_get_int(record->sourceMetadata)) {
 
-        return;
+        goto finish;
     }
 
     // If we reach this point then we'll read the file
@@ -48,15 +48,18 @@ static void update_file(caFileSource*, caFileRecord* record)
     circ_set_int(record->sourceMetadata, modifiedTime);
 
     // Get file size
-    fseek(fp, 0, SEEK_END);
-    size_t size = ftell(fp);
-    rewind(fp);
+    {
+        fseek(fp, 0, SEEK_END);
+        size_t size = ftell(fp);
+        rewind(fp);
 
-    record->data = (char*) realloc(record->data, size + 1);
-    fread(record->data, 1, size, fp);
-    record->data[size] = 0;
-    record->version++;
+        record->data = (char*) realloc(record->data, size + 1);
+        fread(record->data, 1, size, fp);
+        record->data[size] = 0;
+        record->version++;
+    }
 
+finish:
     fclose(fp);
 }
 

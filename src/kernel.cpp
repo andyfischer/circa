@@ -65,7 +65,6 @@ bool SHUTTING_DOWN = false;
 
 Term* APPLY_FEEDBACK = NULL;
 Term* AVERAGE_FUNC = NULL;
-Term* BRANCH_UNEVALUATED_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
 Term* DO_ONCE_FUNC = NULL;
 Term* ERRORED_FUNC = NULL;
@@ -176,6 +175,27 @@ CA_FUNCTION(from_string)
 CA_FUNCTION(to_string_repr)
 {
     circ_to_string_repr(INPUT(0), OUTPUT);
+}
+
+void call_func(caStack* stack)
+{
+    caValue* callable = circ_input(stack, 0);
+    caValue* inputs = circ_input(stack, 1);
+
+    caBranch* branch;
+
+    if (circ_is_branch(callable))
+        branch = circ_get_branch(callable);
+    else if (circ_is_function(callable))
+        branch = circ_function_contents(circ_get_function(callable));
+    else {
+        circ_raise_error(stack, "Input 0 is not callable");
+        return;
+    }
+
+    // switch to C++ mode..
+    EvalContext* context = (EvalContext*) stack;
+    push_frame_with_inputs(context, (Branch*) branch, (List*) inputs);
 }
 
 CA_FUNCTION(input_func)
@@ -843,6 +863,7 @@ void install_standard_library(Branch* kernel)
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
+        {"call", (EvaluateFunc) call_func},
         {"refactor:rename", refactor__rename},
         {"refactor:change_function", refactor__change_function},
         {"reflect:this_branch", reflect__this_branch},

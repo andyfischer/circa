@@ -26,8 +26,8 @@ namespace branch_function {
         FUNCS.branch = import_function(kernel, branch_evaluate, "branch()");
         as_function(FUNCS.branch)->formatSource = format_source;
 
-        BRANCH_UNEVALUATED_FUNC = import_function(kernel, NULL, "branch_unevaluated()");
-        FUNCS.lambda = import_function(kernel, lambda_evaluate, "lambda() -> Branch");
+        FUNCS.branch_unevaluated = import_function(kernel, NULL, "branch_unevaluated()");
+        FUNCS.lambda = import_function(kernel, lambda_evaluate, "lambda(any :multiple) -> Branch");
         as_function(FUNCS.lambda)->formatSource = format_source;
     }
 }

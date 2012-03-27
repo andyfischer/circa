@@ -343,7 +343,7 @@ Branch::eval(std::string const& code)
 
 bool is_namespace(Term* term)
 {
-    return term->function == NAMESPACE_FUNC;
+    return term->function == FUNCS.namespace_func;
 }
 
 bool is_namespace(Branch* branch)

@@ -11,7 +11,6 @@ extern Branch* KERNEL;
 
 extern Term* APPLY_FEEDBACK;
 extern Term* AVERAGE_FUNC;
-extern Term* BRANCH_UNEVALUATED_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DO_ONCE_FUNC;
 extern Term* ERRORED_FUNC;
@@ -22,7 +21,6 @@ extern Term* FREEZE_FUNC;
 extern Term* INSTANCE_FUNC;
 extern Term* LIST_APPEND_FUNC;
 extern Term* MAP_TYPE;
-extern Term* NAMESPACE_FUNC;
 extern Term* OVERLOADED_FUNCTION_FUNC;
 extern Term* REF_FUNC;
 extern Term* SWITCH_FUNC;
@@ -57,6 +55,7 @@ struct BuiltinFuncs {
     Term* add_f;
     Term* assign;
     Term* branch;
+    Term* branch_unevaluated;
     Term* break_func;
     Term* case_func;
     Term* cast;
@@ -87,6 +86,7 @@ struct BuiltinFuncs {
     Term* loop_iterator;
     Term* loop_output;
     Term* mult;
+    Term* namespace_func;
     Term* neg;
     Term* not_func;
     Term* output;

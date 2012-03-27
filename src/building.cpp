@@ -422,11 +422,11 @@ Branch* create_branch(Branch* owner, std::string const& name)
 
 Branch* create_namespace(Branch* branch, std::string const& name)
 {
-    return apply(branch, NAMESPACE_FUNC, TermList(), name)->contents();
+    return apply(branch, FUNCS.namespace_func, TermList(), name)->contents();
 }
 Branch* create_branch_unevaluated(Branch* owner, const char* name)
 {
-    return nested_contents(apply(owner, BRANCH_UNEVALUATED_FUNC, TermList(), name));
+    return nested_contents(apply(owner, FUNCS.branch_unevaluated, TermList(), name));
 }
 
 Term* create_type(Branch* branch, std::string name)
@@ -1399,6 +1399,53 @@ void write_setter_chain_for_assign_term(Term* assignTerm)
         assignTerm->input(0), assignTerm->input(1));
 
     append_output_placeholder(contents, result);
+}
+
+bool term_is_nested_in_branch(Term* term, Branch* branch)
+{
+    while (term != NULL) {
+        if (term->owningBranch == branch)
+            return true;
+
+        term = get_parent_term(term);
+    }
+
+    return false;
+}
+
+void create_inputs_for_outer_references(Term* term)
+{
+    Branch* branch = nested_contents(term);
+    TermMap outerToInnerMap;
+
+    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+        Term* innerTerm = *it;
+        for (int inputIndex=0; inputIndex < innerTerm->numInputs(); inputIndex++) {
+            Term* input = innerTerm->input(inputIndex);
+            if (input == NULL)
+                continue;
+
+            if (!term_is_nested_in_branch(input, branch)) {
+                // This is an outer reference
+
+                // Check if we've already created a placeholder for this one
+                Term* existingPlaceholder = outerToInnerMap[input];
+
+                if (existingPlaceholder != NULL) {
+                    remap_pointers_quick(innerTerm, input, existingPlaceholder);
+
+                } else {
+                    // Need to create a new placeholder
+                    int placeholderIndex = term->numInputs();
+                    Term* placeholder = apply(branch, FUNCS.input, TermList(), input->name);
+                    change_declared_type(placeholder, input->type);
+                    branch->move(placeholder, placeholderIndex);
+                    set_input(term, placeholderIndex, placeholder);
+                    remap_pointers_quick(innerTerm, input, placeholder);
+                }
+            }
+        }
+    }
 }
 
 } // namespace circa

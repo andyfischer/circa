@@ -7,11 +7,15 @@ from glob import glob
 ExecutableName = 'circa_d'
 TestRoot = 'tests'
 
+Quiet = False
+OnlyPrintCommands = False
+
 class CircaProcess:
     def __init__(self):
         self.proc = None
 
     def run(self, cmd):
+
         # Create proc if necessary
         if self.proc is None:
             self.proc = subprocess.Popen("circa_d -run-stdin",
@@ -67,6 +71,10 @@ def diff_command_against_file(process, command, filename):
     an instance of OutputDifference.
     """
 
+    if OnlyPrintCommands:
+        print command
+        return
+
     if not os.path.exists(filename):
         expectedOutput = []
     else:
@@ -89,6 +97,7 @@ def diff_command_against_file(process, command, filename):
             pass
 
         if expectedLine != actualLine:
+            print "\n".join(actualOutput)
             return OutputDifference(actualLine, expectedLine, numLines+1)
         numLines += 1
 
@@ -173,7 +182,9 @@ def run_all_tests():
             continue
 
         totalTestCount += 1
-        print file
+
+        if not Quiet:
+            print file
 
         failed = False
         try:
@@ -193,6 +204,8 @@ def run_all_tests():
         if failed:
             totalFailedTests += 1
 
+    if OnlyPrintCommands:
+        return
 
     print "Ran",totalTestCount,"tests,",totalFailedTests,"failed,",totalDisabledTests,"disabled."
     
@@ -230,15 +243,23 @@ def accept_output_for_test(name):
 
     out = open(outfile, 'w')
     for line in run_command(cmd):
-        print line
+        if not Quiet:
+            print line
         out.write(line + '\n')
 
 if __name__ == '__main__':
     import optparse
     parser = optparse.OptionParser()
     parser.add_option('--accept', dest="accept")
+    parser.add_option('--only-print-commands', action="store_true",
+        dest="only_print_commands")
 
     (options,args) = parser.parse_args()
+
+    OnlyPrintCommands = options.only_print_commands
+
+    if OnlyPrintCommands:
+        Quiet = True
 
     if options.accept:
         accept_output_for_test(options.accept)

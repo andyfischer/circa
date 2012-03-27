@@ -21,8 +21,8 @@ namespace namespace_function {
 
     void early_setup(Branch* kernel)
     {
-        NAMESPACE_FUNC = import_function(kernel, evaluate, "namespace()");
-        as_function(NAMESPACE_FUNC)->formatSource = format_source;
+        FUNCS.namespace_func = import_function(kernel, evaluate, "namespace()");
+        as_function(FUNCS.namespace_func)->formatSource = format_source;
     }
     void setup(Branch* kernel) {}
 }

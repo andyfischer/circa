@@ -1,0 +1,40 @@
+
+type CodeWriter
+{
+    int curIndent
+    bool needsIndent
+    List output
+}
+
+def CodeWriter.write(self :out, string s)
+    if self.needsIndent
+        self.needsIndent = false
+        for i in 0..self.curIndent
+            self.output.append('    ')
+    self.output.append(s)
+
+def CodeWriter.writeln(self :out, string line)
+    self.write(line)
+    self.output.append("\n")
+    self.needsIndent = true
+
+def CodeWriter.indent(self :out)
+    self.curIndent += 1
+def CodeWriter.unindent(self :out)
+    self.curIndent -= 1
+
+def CodeWriter.toString(self) -> string
+    return self.output.join("")
+
+def write_function(CodeWriter writer :out, Function func)
+    
+
+    
+
+def write_bindings(Branch branch) -> string
+    writer = create(CodeWriter)
+
+    for func in branch.list_functions
+        write_function(&writer, func)
+
+    return wr

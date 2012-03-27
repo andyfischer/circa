@@ -2163,9 +2163,8 @@ ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context
     Term* term = apply(branch, FUNCS.lambda, TermList());
     set_source_location(term, startPosition, tokens);
     consume_branch_with_braces(nested_contents(term), tokens, context, term);
-
-
     post_parse_branch(nested_contents(term));
+    create_inputs_for_outer_references(term);
     return ParseResult(term);
 }
 
@@ -2180,7 +2179,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
             "Expected identifier after 'namespace'");
 
     std::string name = tokens.consumeStr(TK_IDENTIFIER);
-    Term* term = apply(branch, NAMESPACE_FUNC, TermList(), name);
+    Term* term = apply(branch, FUNCS.namespace_func, TermList(), name);
     set_starting_source_location(term, startPosition, tokens);
 
     consume_branch(nested_contents(term), tokens, context);

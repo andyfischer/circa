@@ -18,6 +18,9 @@ def changed(any current) -> bool
     prev = current
     return result
 
+def call(any callable, List inputs) -> any
+    "Dynamic function dispatch"
+
 namespace cppbuild
     def build_module(string baseFilename)
 
