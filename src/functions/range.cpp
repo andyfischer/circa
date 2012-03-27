@@ -31,10 +31,10 @@ namespace range_function {
 
     void setup(Branch* kernel)
     {
-        RANGE_FUNC = import_function(kernel, evaluate,
+        FUNCS.range = import_function(kernel, evaluate,
                 "range(int start, int max) -> List;"
                 "'Return a list of integers from start to max-1'");
-        as_function(RANGE_FUNC)->specializeType = specializeType;
+        as_function(FUNCS.range)->specializeType = specializeType;
     }
 }
 } // namespace circa

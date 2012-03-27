@@ -22,32 +22,34 @@ def CodeWriter.indent(self :out)
     self.curIndent += 1
 def CodeWriter.unindent(self :out)
     self.curIndent -= 1
+def CodeWriter.toString(self) -> string
+    return self.output.join("")
 
 def CodeWriter.write_type_name(self :out, Term term)
-    self.write(term.get_type().name())
+    self.write(term.get_type.name)
 
 def write_literal_function(CodeWriter w :out, Term term)
 
-    func = term.value() -> Function
+    func = term.value -> Function
 
-    w.write(func.output(0).get_type().name())
+    w.write(func.output(0).get_type.name)
     w.write(' ')
-    w.write(func.name())
+    w.write(func.name)
     w.write('(')
 
-    inputs = for input in func.inputs()
+    inputs = for input in func.inputs
         @input -> Term
-        concat(input.get_type().name() ' ' input.name())
+        concat(input.get_type.name ' ' input.name)
     w.write(inputs.join(', '))
     w.writeln(')')
     w.writeln('{')
     w.indent()
-    write_branch(&w, func.contents())
+    write_branch(&w, func.contents)
     w.unindent()
     w.writeln('}')
 
 def write_value_term(CodeWriter w :out, Term term)
-    v = term.value()
+    v = term.value
 
     if is_function(v)
         write_literal_function(&w, term)
@@ -56,43 +58,43 @@ def write_value_term(CodeWriter w :out, Term term)
         w.write('const ')
         w.write_type_name(term)
         w.write(' ')
-        w.write(term.name())
+        w.write(term.name)
         w.write(' = ')
-        w.write(term.value() -> to_string)
+        w.write(term.value -> to_string)
         w.writeln(';')
 
 def write_branch(CodeWriter w :out, Branch branch)
 
-    for term in branch.terms()
+    for term in branch.terms
         @term -> Term
 
         if term.property('statement') != true
             continue
 
-        if term.function() == comment
+        if term.function == comment
             commentStr = term.property('comment')
             if commentStr == ""
                 w.writeln('')
             else
                 w.writeln(concat('// ' commentStr))
-        elif term.function() == value
+        elif term.function == value
             write_value_term(&w, term)
 
         else
             -- Normal function call
-            termName = term.name()
+            termName = term.name
             if termName != ""
                 w.write(concat(termName ' = '))
-            w.write(term.function().name())
+            w.write(term.function.name)
             w.write('(')
             first = true
-            for input in term.inputs()
+            for input in term.inputs
                 if not(first)
                     w.write(', ')
                 first = false
                 @input -> Term
-                if input.name() != ""
-                    w.write(input.name())
+                if input.name != ""
+                    w.write(input.name)
 
             w.write(')')
             w.writeln(';')
@@ -103,7 +105,7 @@ def branch_to_cpp_string(Branch b) -> string
 
     write_branch(&writer, b)
 
-    return writer.output.join("")
+    return writer.toString()
 
 test_branch = {
 

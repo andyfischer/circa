@@ -112,7 +112,7 @@ Term* statically_infer_length_func(Branch* branch, Term* term)
         return create_int(branch, input->numInputs());
 
     if (input->function == LIST_APPEND_FUNC) {
-        Term* leftLength = apply(branch, LENGTH_FUNC, TermList(input->input(0)));
+        Term* leftLength = apply(branch, FUNCS.length, TermList(input->input(0)));
         return apply(branch, FUNCS.add, TermList(
                     statically_infer_length_func(branch, leftLength),
                     create_int(branch, 1)));
@@ -126,7 +126,7 @@ Term* statically_infer_length_func(Branch* branch, Term* term)
 
 Term* statically_infer_result(Branch* branch, Term* term)
 {
-    if (term->function == LENGTH_FUNC)
+    if (term->function == FUNCS.length)
         return statically_infer_length_func(branch, term);
 
 #if 0

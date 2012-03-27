@@ -201,7 +201,7 @@ Term* find_enclosing_for_loop(Term* term)
     if (term == NULL)
         return NULL;
 
-    if (term->function == FOR_FUNC)
+    if (term->function == FUNCS.for_func)
         return term;
 
     Branch* branch = term->owningBranch;

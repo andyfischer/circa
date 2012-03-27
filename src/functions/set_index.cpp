@@ -22,9 +22,9 @@ namespace set_index_function {
 
     void setup(Branch* kernel)
     {
-        SET_INDEX_FUNC = import_function(kernel, evaluate,
+        FUNCS.set_index = import_function(kernel, evaluate,
                 "set_index(any, int, any) -> List");
-        function_set_specialize_type_func(SET_INDEX_FUNC, specializeType);
+        function_set_specialize_type_func(FUNCS.set_index, specializeType);
     }
 }
 }

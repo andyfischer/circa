@@ -25,7 +25,7 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
     Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
     change_declared_type(input1, rhsType);
 
-    Term* loop = apply(out, FOR_FUNC, TermList(input0));
+    Term* loop = apply(out, FUNCS.for_func, TermList(input0));
     start_building_for_loop(loop, "it");
     Branch* loopContents = nested_contents(loop);
 
@@ -46,7 +46,7 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
     change_declared_type(input1, rhsType);
 
-    Term* loop = apply(out, FOR_FUNC, TermList(input0));
+    Term* loop = apply(out, FUNCS.for_func, TermList(input0));
     start_building_for_loop(loop, "it");
     Branch* loopContents = nested_contents(loop);
 
@@ -72,7 +72,7 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     Term* inputsAsList = apply(contents, FUNCS.list, inputPlaceholders);
 
     // Add the switch block
-    Term* block = apply(contents, IF_BLOCK_FUNC, TermList());
+    Term* block = apply(contents, FUNCS.if_block, TermList());
 
     // Cases are added with append_to_overloaded_function()
 
@@ -93,7 +93,7 @@ void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc
     input_placeholders_to_list(overloadedFunc, &inputPlaceholders);
 
     Term* inputsAsList = find_term_with_function(overloadedFunc, FUNCS.list);
-    Term* ifBlock = find_term_with_function(overloadedFunc, IF_BLOCK_FUNC);
+    Term* ifBlock = find_term_with_function(overloadedFunc, FUNCS.if_block);
 
     Term* condition = apply(overloadedFunc, FUNCS.inputs_fit_function,
         TermList(inputsAsList, specializedFunc));
@@ -112,7 +112,7 @@ void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
 void specialize_overload_for_call(Term* call)
 {
     Branch* original = function_contents(call->function);
-    Term* switchTerm = find_term_with_function(original, IF_BLOCK_FUNC);
+    Term* switchTerm = find_term_with_function(original, FUNCS.if_block);
     ca_assert(switchTerm != NULL);
     Branch* switchBranch = nested_contents(switchTerm);
 

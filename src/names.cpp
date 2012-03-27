@@ -139,7 +139,7 @@ bool exposes_nested_names(Term* term)
         return false;
     if (nested_contents(term)->length() == 0)
         return false;
-    if (term->function == INCLUDE_FUNC)
+    if (term->function == FUNCS.include_func)
         return true;
     if (term->function == FUNCS.imported_file)
         return true;

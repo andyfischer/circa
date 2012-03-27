@@ -73,31 +73,18 @@ Term* ERRORED_FUNC = NULL;
 Term* EXTRA_OUTPUT_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
-Term* FOR_FUNC = NULL;
 Term* GET_INDEX_FROM_BRANCH_FUNC = NULL;
-Term* IF_BLOCK_FUNC = NULL;
-Term* COND_FUNC = NULL;
-Term* INCLUDE_FUNC = NULL;
 Term* INSTANCE_FUNC = NULL;
-Term* LAMBDA_FUNC = NULL;
-Term* LENGTH_FUNC = NULL;
 Term* LIST_TYPE = NULL;
 Term* LIST_APPEND_FUNC = NULL;
 Term* LOAD_SCRIPT_FUNC = NULL;
-Term* MULT_FUNC = NULL;
 Term* NAMESPACE_FUNC = NULL;
-Term* NEG_FUNC = NULL;
-Term* NOT_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
-Term* RANGE_FUNC = NULL;
 Term* REF_FUNC = NULL;
 Term* RETURN_FUNC = NULL;
-Term* SET_FIELD_FUNC = NULL;
-Term* SET_INDEX_FUNC = NULL;
 Term* SWITCH_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
 Term* STATIC_ERROR_FUNC = NULL;
-Term* SUB_FUNC = NULL;
 Term* TYPE_FUNC = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* UNKNOWN_TYPE_FUNC = NULL;
@@ -787,19 +774,19 @@ void bootstrap_kernel()
     append_to_overloaded_function(mod_func, kernel->get("max_i"));
     append_to_overloaded_function(mod_func, kernel->get("max_f"));
 
-    MULT_FUNC = create_overloaded_function(kernel, "mult(any,any) -> any");
-    //dump(nested_contents(MULT_FUNC));
-    append_to_overloaded_function(MULT_FUNC, kernel->get("mult_i"));
-    append_to_overloaded_function(MULT_FUNC, kernel->get("mult_f"));
+    FUNCS.mult = create_overloaded_function(kernel, "mult(any,any) -> any");
+    //dump(nested_contents(FUNCS.mult));
+    append_to_overloaded_function(FUNCS.mult, kernel->get("mult_i"));
+    append_to_overloaded_function(FUNCS.mult, kernel->get("mult_f"));
 
-    NEG_FUNC = create_overloaded_function(kernel, "neg(any) -> any");
-    append_to_overloaded_function(NEG_FUNC, kernel->get("neg_i"));
-    append_to_overloaded_function(NEG_FUNC, kernel->get("neg_f"));
-    as_function(NEG_FUNC)->formatSource = neg_function::formatSource;
+    FUNCS.neg = create_overloaded_function(kernel, "neg(any) -> any");
+    append_to_overloaded_function(FUNCS.neg, kernel->get("neg_i"));
+    append_to_overloaded_function(FUNCS.neg, kernel->get("neg_f"));
+    as_function(FUNCS.neg)->formatSource = neg_function::formatSource;
 
-    SUB_FUNC = create_overloaded_function(kernel, "sub(any,any) -> any");
-    append_to_overloaded_function(SUB_FUNC, kernel->get("sub_i"));
-    append_to_overloaded_function(SUB_FUNC, kernel->get("sub_f"));
+    FUNCS.sub = create_overloaded_function(kernel, "sub(any,any) -> any");
+    append_to_overloaded_function(FUNCS.sub, kernel->get("sub_i"));
+    append_to_overloaded_function(FUNCS.sub, kernel->get("sub_f"));
 
     // Create vectorized functions
     Term* add_v = create_function(kernel, "add_v");
@@ -814,21 +801,21 @@ void bootstrap_kernel()
     //dump(function_contents(FUNCS.add));
 
     Term* sub_v = create_function(kernel, "sub_v");
-    create_function_vectorized_vv(function_contents(sub_v), SUB_FUNC, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, &LIST_T, &LIST_T);
     Term* sub_s = create_function(kernel, "sub_s");
-    create_function_vectorized_vs(function_contents(sub_s), SUB_FUNC, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(sub_s), FUNCS.sub, &LIST_T, &ANY_T);
     
-    append_to_overloaded_function(SUB_FUNC, sub_v);
-    append_to_overloaded_function(SUB_FUNC, sub_s);
+    append_to_overloaded_function(FUNCS.sub, sub_v);
+    append_to_overloaded_function(FUNCS.sub, sub_s);
 
     // Create vectorized mult() functions
     Term* mult_v = create_function(kernel, "mult_v");
-    create_function_vectorized_vv(function_contents(mult_v), MULT_FUNC, &LIST_T, &LIST_T);
+    create_function_vectorized_vv(function_contents(mult_v), FUNCS.mult, &LIST_T, &LIST_T);
     Term* mult_s = create_function(kernel, "mult_s");
-    create_function_vectorized_vs(function_contents(mult_s), MULT_FUNC, &LIST_T, &ANY_T);
+    create_function_vectorized_vs(function_contents(mult_s), FUNCS.mult, &LIST_T, &ANY_T);
 
-    append_to_overloaded_function(MULT_FUNC, mult_v);
-    append_to_overloaded_function(MULT_FUNC, mult_s);
+    append_to_overloaded_function(FUNCS.mult, mult_v);
+    append_to_overloaded_function(FUNCS.mult, mult_s);
 
     Term* div_s = create_function(kernel, "div_s");
     create_function_vectorized_vs(function_contents(div_s), DIV_FUNC, &LIST_T, &ANY_T);
@@ -904,7 +891,7 @@ void install_standard_library(Branch* kernel)
 
     install_function_list(kernel, records);
 
-    LENGTH_FUNC = kernel->get("length");
+    FUNCS.length = kernel->get("length");
     TYPE_FUNC = kernel->get("type");
 
     FUNCS.dll_patch = kernel->get("sys:dll_patch");

@@ -25,7 +25,7 @@ namespace for_function {
 
     CA_FUNCTION(evaluate_break)
     {
-        while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
+        while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
             finish_frame(CONTEXT);
 
         finish_frame(CONTEXT);
@@ -36,7 +36,7 @@ namespace for_function {
         consume_inputs_to_list(CONTEXT, &inputs);
 
         // Pop frames
-        while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
+        while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
             finish_frame(CONTEXT);
 
         // Copy outputs to placeholders
@@ -58,7 +58,7 @@ namespace for_function {
     }
     CA_FUNCTION(evaluate_discard)
     {
-        while (top_frame(CONTEXT)->branch->owningTerm->function != FOR_FUNC)
+        while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
             finish_frame(CONTEXT);
 
         for_loop_finish_iteration(CONTEXT);
@@ -78,8 +78,8 @@ namespace for_function {
 
     void setup(Branch* kernel)
     {
-        FOR_FUNC = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
-        as_function(FOR_FUNC)->formatSource = formatSource;
+        FUNCS.for_func = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
+        as_function(FUNCS.for_func)->formatSource = formatSource;
 
         FUNCS.loop_output = import_function(kernel, evaluate_loop_output,
             "loop_output(any) -> List");

@@ -46,10 +46,10 @@ OLD_FEEDBACK_IMPL_DISABLED
 
     void setup(Branch* kernel)
     {
-        COND_FUNC = import_function(kernel, cond_evaluate,
+        FUNCS.cond = import_function(kernel, cond_evaluate,
                 "cond(bool condition, any pos :meta, any neg :meta) -> any;"
                 "\"If 'condition' is true, returns 'pos'. Otherwise returns 'neg'.\"");
-        function_set_specialize_type_func(COND_FUNC, specializeType);
+        function_set_specialize_type_func(FUNCS.cond, specializeType);
     }
 }
 }

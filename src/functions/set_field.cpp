@@ -42,10 +42,10 @@ namespace set_field_function {
 
     void setup(Branch* kernel)
     {
-        SET_FIELD_FUNC = import_function(kernel, evaluate,
+        FUNCS.set_field = import_function(kernel, evaluate,
                 "set_field(any, string, any) -> any");
-        as_function(SET_FIELD_FUNC)->specializeType = specializeType;
-        as_function(SET_FIELD_FUNC)->formatSource = formatSource;
+        as_function(FUNCS.set_field)->specializeType = specializeType;
+        as_function(FUNCS.set_field)->formatSource = formatSource;
     }
 }
 }

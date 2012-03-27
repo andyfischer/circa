@@ -831,7 +831,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
-    Term* result = apply(branch, IF_BLOCK_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.if_block, TermList());
     Branch* contents = nested_contents(result);
 
     Term* currentBlock = NULL;
@@ -1003,7 +1003,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     if (rebindListName)
         name = listExpr->name;
 
-    Term* forTerm = apply(branch, FOR_FUNC, TermList(listExpr), name);
+    Term* forTerm = apply(branch, FUNCS.for_func, TermList(listExpr), name);
     Branch* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
     set_input_syntax_hint(forTerm, 0, "postWhitespace", "");
@@ -1174,7 +1174,7 @@ ParseResult include_statement(Branch* branch, TokenStream& tokens, ParserCxt* co
     Term* filenameTerm = create_string(branch, filename);
     hide_from_source(filenameTerm);
 
-    Term* result = apply(branch, INCLUDE_FUNC, TermList(filenameTerm));
+    Term* result = apply(branch, FUNCS.include_func, TermList(filenameTerm));
 
     return ParseResult(result);
 }
@@ -1551,7 +1551,7 @@ ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
             }
         }
 
-        return ParseResult(apply(branch, NEG_FUNC, TermList(expr.term)));
+        return ParseResult(apply(branch, FUNCS.neg, TermList(expr.term)));
     }
 
     return atom_with_subscripts(branch, tokens, context);
@@ -2160,7 +2160,7 @@ ParseResult literal_name(Branch* branch, TokenStream& tokens, ParserCxt* context
 ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
-    Term* term = apply(branch, LAMBDA_FUNC, TermList());
+    Term* term = apply(branch, FUNCS.lambda, TermList());
     set_source_location(term, startPosition, tokens);
     consume_branch_with_braces(nested_contents(term), tokens, context, term);
 

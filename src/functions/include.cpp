@@ -78,9 +78,9 @@ namespace include_function {
 
     void setup(Branch* kernel)
     {
-        INCLUDE_FUNC = import_function(kernel, evaluate_include,
+        FUNCS.include_func = import_function(kernel, evaluate_include,
                 "include(string filename) -> Branch");
-        as_function(INCLUDE_FUNC)->postCompile = include_post_compile;
+        as_function(FUNCS.include_func)->postCompile = include_post_compile;
 
         LOAD_SCRIPT_FUNC = import_function(kernel, load_script,
                 "load_script(string filename) -> Branch");

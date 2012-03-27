@@ -578,9 +578,9 @@ Term* prepend_output_placeholder(Branch* branch, Term* result)
 Branch* term_get_function_details(Term* call)
 {
     // TODO: Shouldn't need to special case these functions.
-    if (call->function == IF_BLOCK_FUNC
-        || call->function == FOR_FUNC
-        || call->function == INCLUDE_FUNC)
+    if (call->function == FUNCS.if_block
+        || call->function == FUNCS.for_func
+        || call->function == FUNCS.include_func)
         return nested_contents(call);
 
     return function_get_contents(as_function(call->function));
@@ -769,7 +769,7 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
 
         Term* pos = outsidePositive ? outerVersion : innerVersion;
         Term* neg = outsidePositive ? innerVersion : outerVersion ;
-        apply(rebinds, COND_FUNC, TermList(rebindCondition, pos, neg), name);
+        apply(rebinds, FUNCS.cond, TermList(rebindCondition, pos, neg), name);
     }
 }
 
@@ -1327,9 +1327,9 @@ Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredValue)
     Term* set = NULL;
 
     if (term->function == FUNCS.get_index) {
-        set = SET_INDEX_FUNC;
+        set = FUNCS.set_index;
     } else if (term->function == FUNCS.get_field) {
-        set = SET_FIELD_FUNC;
+        set = FUNCS.set_field;
     } else {
         return NULL;
     }
