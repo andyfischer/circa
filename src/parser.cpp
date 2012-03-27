@@ -1602,19 +1602,24 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 {
     int startPosition = tokens.getPosition();
 
-    tokens.consume(TK_DOT);
     std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
 
-    tokens.consume(TK_LPAREN);
+    bool hasParens = false;
+    if (tokens.nextIs(TK_LPAREN)) {
+        tokens.consume(TK_LPAREN);
+        hasParens = true;
+    }
 
     TermList inputs;
     ListSyntaxHints inputHints;
 
     // Parse inputs
-    function_call_inputs(branch, tokens, context, inputs, inputHints);
-    if (!tokens.nextIs(TK_RPAREN))
-        return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-    tokens.consume(TK_RPAREN);
+    if (hasParens) {
+        function_call_inputs(branch, tokens, context, inputs, inputHints);
+        if (!tokens.nextIs(TK_RPAREN))
+            return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
+        tokens.consume(TK_RPAREN);
+    }
 
     inputs.prepend(root.term);
     inputHints.insert(0);
@@ -1624,6 +1629,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Term* function = find_method(branch, rootType, functionName);
 
     if (function == NULL) {
+        // Method not found, create a functionless call.
         Term* result = apply(branch, function, inputs);
         result->setStringProp("syntax:functionName", functionName);
         result->setStringProp("syntax:declarationStyle", "method-call");
@@ -1647,6 +1653,8 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     check_to_insert_implicit_inputs(term);
     term->setStringProp("syntax:functionName", functionName);
     term->setStringProp("syntax:declarationStyle", "method-call");
+    if (!hasParens)
+        term->setBoolProp("syntax:no-parens", true);
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
@@ -1770,17 +1778,28 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
         // Check for a.b, field access.
         } else if (tokens.nextIs(TK_DOT)) {
+            tokens.consume(TK_DOT);
 
-            if (!tokens.nextIs(TK_IDENTIFIER, 1))
+            if (!tokens.nextIs(TK_IDENTIFIER))
                 return compile_error_for_line(branch, tokens, startPosition,
                         "Expected identifier after .");
 
-            if (tokens.nextIs(TK_LPAREN, 2)) {
+            // Lookahead for paren. If found, parse as method call.
+            if (tokens.nextIs(TK_LPAREN, 1)) {
                 result = method_call(branch, tokens, context, result);
                 continue;
             }
 
-            tokens.consume(TK_DOT);
+            // Check whether the identifier matches a method. If so, parse as a method
+            // call. TODO This is fragile and we should revisit to reduce the surprising
+            // difference between a method and a field access.
+            Term* rootTerm = result.term;
+            if (find_method(branch, rootTerm->type, tokens.nextStr()) != NULL) {
+                // Method call with no parens
+                result = method_call(branch, tokens, context, result);
+                continue;
+            }
+
             std::string ident = tokens.consumeStr(TK_IDENTIFIER);
             
             Term* term = apply(branch, FUNCS.get_field, TermList(result.term, create_string(branch, ident)));

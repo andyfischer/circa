@@ -1,0 +1,33 @@
+
+Right now, the dot-syntax can mean different things depending on the left-hand side.
+
+In this example:
+
+  a.x
+
+Depending on whether the type of 'a' has a method named 'x', this syntax will either
+result in a method call:
+
+  'A.x'(a)
+
+Or a field access:
+
+  get_field(a, 'x')
+
+There is also this syntax which is unambiguously a method call:
+
+  a.x()
+
+PLAN
+
+The fix I'd like to do is to no longer create get_field() terms here. If people
+want a field access then they can use:
+
+   a['x']
+
+Instead, every type will autocreate an accessor method for every field that it has.
+For a.x, this would create a method call for an autocreated method 'x'.
+
+So, dot syntax would always mean a method call. This is less dynamicy (can't use
+dot syntax to lookup arbitrary fields), but I think if we add method-missing then
+that will all be fine. And anyway, we don't want to be too dynamicy.
