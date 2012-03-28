@@ -7,6 +7,7 @@
 
 #include "branch.h"
 #include "building.h"
+#include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
 #include "filesystem.h"
@@ -344,6 +345,23 @@ CA_FUNCTION(Branch__list_configs)
         Term* term = branch->get(i);
         if (is_considered_config(term))
             set_ref(output.append(), term);
+    }
+}
+
+CA_FUNCTION(Branch__list_functions)
+{
+    Branch* branch = as_branch(INPUT(0));
+    if (branch == NULL)
+        return RAISE_ERROR("NULL branch");
+
+    caValue* output = OUTPUT;
+    set_list(output, 0);
+
+    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+        Term* term = *it;
+        if (is_function(term)) {
+            set_function(list_append(output), as_function(term));
+        }
     }
 }
 
@@ -880,6 +898,7 @@ void install_standard_library(Branch* kernel)
         {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
         {"Branch.has_static_error", Branch__has_static_error},
         {"Branch.list_configs", Branch__list_configs},
+        {"Branch.list_functions", Branch__list_functions},
         {"Branch.terms", Branch__terms},
         {"Function.name", Function__name},
         {"Function.input", Function__input},

@@ -7,6 +7,7 @@
 #include "codegen.h"
 #include "evaluation.h"
 #include "feedback.h"
+#include "file_utils.h"
 #include "introspection.h"
 #include "list.h"
 #include "modules.h"
@@ -275,6 +276,14 @@ int run_command_line(List* args)
         return 0;
     }
 
+    // Rewrite source, this is useful for upgrading old source
+    if (string_eq(args->get(0), "-rewrite-source")) {
+        Branch branch;
+        load_script(&branch, as_cstring(args->get(1)));
+        std::string contents = get_branch_source_text(&branch);
+        circ_write_text_file(as_cstring(args->get(1)), contents.c_str());
+        return 0;
+    }
 
     // Default behavior with no flags: load args[0] as a script and run it.
     Branch* main_branch = create_branch(kernel());

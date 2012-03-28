@@ -63,6 +63,7 @@ def Branch.evaluate(self)
 def Branch.terms(self) -> List
 def Branch.get_term(self, int index) -> Term
 def Branch.list_configs(self) -> List
+def Branch.list_functions(self) -> List
 def Branch.file_signature(self) -> any
 
 def Function.name(_) -> string

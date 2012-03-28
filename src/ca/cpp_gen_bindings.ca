@@ -26,10 +26,18 @@ def CodeWriter.unindent(self :out)
 def CodeWriter.toString(self) -> string
     return self.output.join("")
 
-def write_function(CodeWriter writer :out, Function func)
-    
+def circa_name_to_c_name(string s) -> string
+    return s
 
-    
+def write_function(CodeWriter writer :out, Function func)
+    writer.write('void ')
+    writer.write(func.name -> circa_name_to_c_name)
+    writer.write('(caStack* stack)')
+    writer.writeln('')
+    writer.writeln('{')
+    writer.indent()
+    writer.unindent()
+    writer.writeln('}')
 
 def write_bindings(Branch branch) -> string
     writer = create(CodeWriter)
@@ -37,4 +45,7 @@ def write_bindings(Branch branch) -> string
     for func in branch.list_functions
         write_function(&writer, func)
 
-    return wr
+    return writer.toString
+
+bindings = load_script('canvas/qt.ca')
+write_bindings(bindings) -> print
