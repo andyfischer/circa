@@ -43,7 +43,7 @@ namespace set_field_function {
     void setup(Branch* kernel)
     {
         FUNCS.set_field = import_function(kernel, evaluate,
-                "set_field(any, string, any) -> any");
+                "set_field(any, String, any) -> any");
         as_function(FUNCS.set_field)->specializeType = specializeType;
         as_function(FUNCS.set_field)->formatSource = formatSource;
     }

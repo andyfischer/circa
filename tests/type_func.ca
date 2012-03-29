@@ -1,7 +1,7 @@
 assert(type(1) == int)
 assert(type(1.0) == number)
-assert(type('s') == string)
+assert(type('s') == String)
 
 assert(typename(1) == "int")
 assert(typename(int) == "Type")
-assert(typename('hi') == "string")
+assert(typename('hi') == "String")

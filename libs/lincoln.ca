@@ -150,7 +150,7 @@ def draw_config_list(cairo:Context cr)
     configs = listed_configs
 
     type Layout {
-        string str
+        String str
         Point size
         Ref term
     }
@@ -274,7 +274,7 @@ namespace lincoln
 
     def osc_listen()
         for msg in osc:listen(8000)
-            name = msg[0] -> string
+            name = msg[0] -> String
             value = msg[1] -> number
 
             send('tweak_events', delta(value) * 100)

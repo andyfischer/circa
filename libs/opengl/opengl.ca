@@ -12,19 +12,19 @@ namespace opengl
     def bind_texture(int tex_id)
 
     -- Shaders
-    def load_shader(string vertShaderFile, string fragShaderFile) -> int
-    def load_shader_text(string vertShader, string fragShader) -> int
-    def reload_shader(string vertShaderFile, string fragShaderFile) -> int
+    def load_shader(String vertShaderFile, String fragShaderFile) -> int
+    def load_shader_text(String vertShader, String fragShader) -> int
+    def reload_shader(String vertShaderFile, String fragShaderFile) -> int
         state program = null
         if file_changed(vertShaderFile) or file_changed(fragShaderFile)
             program = load_shader(vertShaderFile, fragShaderFile)
         return program
-    def reload_shader_text(string vertShader, string fragShader) -> int
+    def reload_shader_text(String vertShader, String fragShader) -> int
         state program = null
         if changed(vertShader) or changed(fragShader)
             program = load_shader_text(vertShader, fragShader)
         return program
-    def get_uniform_location(int program, string name) -> int
+    def get_uniform_location(int program, String name) -> int
     def uniform(int program, number value)
     def use_program(int program)
     def shader_quad(int program, Rect quad, List uniforms)

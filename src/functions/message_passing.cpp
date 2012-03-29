@@ -29,8 +29,8 @@ namespace message_passing_function {
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, evaluate_send, "def send(string inbox_name, any)");
-        import_function(kernel, evaluate_receive, "def receive(string inbox_name) -> List");
+        import_function(kernel, evaluate_send, "def send(String inbox_name, any)");
+        import_function(kernel, evaluate_receive, "def receive(String inbox_name) -> List");
     }
 }
 }

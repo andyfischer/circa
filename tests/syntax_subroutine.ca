@@ -15,7 +15,7 @@ def hi(int)  {}
 def hi(int) {}
 def hi(int) {   }
 def hi(int) { 1 }
-def hi(number, string, bool)  {}
+def hi(number, String, bool)  {}
 
 type Point { number x, number y }
 def hi() -> Point { return([0 0]) }

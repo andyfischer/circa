@@ -5,9 +5,9 @@ namespace sdl_img
     type Image;
     type ImageTexture;
 
-    def load_image(string filename) -> Image
+    def load_image(String filename) -> Image
     def load_image_to_texture(Image image) -> ImageTexture
-    def load_file_to_texture(string filename) -> ImageTexture
+    def load_file_to_texture(String filename) -> ImageTexture
         state image
         state texture
         if file_changed(filename)
@@ -22,7 +22,7 @@ namespace sdl_img
         state ImageTexture texture = load_image_to_texture(image)
         texture.draw(p)
 
-    def draw_image(string filename, Point p)
+    def draw_image(String filename, Point p)
         state texture = null
         if file_changed(filename)
             image = load_image(filename)

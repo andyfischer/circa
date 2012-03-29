@@ -498,10 +498,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     Value functionName;
     tokens.consumeStr(&functionName, TK_IDENTIFIER);
 
-    Value functionName2;
-    Value functionName3;
-    Value functionName4;
-
     bool isMethod = false;
     Term* methodType = NULL;
 
@@ -525,15 +521,11 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
                       "Not a type: " + as_string(&typeName));
     }
 
-    copy(&functionName, &functionName2);
-    copy(&functionName, &functionName3);
-    copy(&functionName, &functionName4);
-
-    Term* result = create_function(branch, as_cstring(&functionName3));
+    Term* result = create_function(branch, as_cstring(&functionName));
 
     Function* attrs = as_function(result);
     set_starting_source_location(result, startPosition, tokens);
-    attrs->name = as_string(&functionName2);
+    attrs->name = as_string(&functionName);
 
     if (methodType != NULL)
         result->setBoolProp("syntax:methodDecl", true);
@@ -562,10 +554,10 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     Branch* contents = nested_contents(result);
 
-    int qualifierLoc = find_qualified_name_separator(as_cstring(&functionName4));
+    int qualifierLoc = find_qualified_name_separator(as_cstring(&functionName));
     if (qualifierLoc != -1)
         return compile_error_for_line(branch, tokens, startPosition,
-                "Can't declare function with qualified name: " + as_string(&functionName4));
+                "Can't declare function with qualified name: " + as_string(&functionName));
 
     set_null(&functionName);
 

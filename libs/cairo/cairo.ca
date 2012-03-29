@@ -32,11 +32,11 @@ namespace cairo
     def create_image_surface(Point size) -> Surface
 
     -- Text
-    def Context.select_font_face(self, string family)
+    def Context.select_font_face(self, String family)
     def Context.set_font_size(self, number size)
     def Context.set_font_face(self, FontFace font)
-    def Context.show_text(self, string s)
-    def Context.text_extents(self, string s) -> TextExtents
+    def Context.show_text(self, String s)
+    def Context.text_extents(self, String s) -> TextExtents
 
     -- Paths
     def Context.curve_to(self, Point control1, Point control2, Point p3)

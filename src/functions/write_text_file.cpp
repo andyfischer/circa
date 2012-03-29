@@ -15,7 +15,7 @@ namespace write_text_file_function {
     void setup(Branch* kernel)
     {
         import_function(kernel, evaluate,
-            "write_text_file(string filename, string contents);"
+            "write_text_file(String filename, String contents);"
             "'Write contents to the given filename, overwriting any existing file'");
     }
 }

@@ -149,7 +149,7 @@ namespace string_t {
 void string_setup_type(Type* type)
 {
     reset_type(type);
-    type->name = name_from_string("string");
+    type->name = name_from_string("String");
     type->storageType = STORAGE_TYPE_STRING;
     type->initialize = string_t::initialize;
     type->release = string_t::release;
@@ -193,6 +193,7 @@ bool string_starts_with(caValue* s, const char* beginning)
             return false;
     }
 }
+
 bool string_ends_with(caValue* s, const char* ending)
 {
     int ending_len = strlen(ending);

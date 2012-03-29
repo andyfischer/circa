@@ -7,7 +7,7 @@ namespace concat_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(concat, "concat(any...) -> string;"
+    CA_DEFINE_FUNCTION(concat, "concat(any...) -> String;"
             "'Concatenate each input (converting to a string if necessary).'")
     {
         std::stringstream out;

@@ -34,7 +34,7 @@ def Label.descent(label) -> number
   return 10.0
 def Label.setPosition(label, Point p)
 def Label.setColor(label, Color c)
-def Label.setText(label, Font font, string text)
+def Label.setText(label, Font font, String text)
 def Label.position(label) -> Point
   return [100 100] -> Point
 def Label.right(label) -> number
@@ -44,9 +44,9 @@ def Label.bottom(label) -> number
 def Label.left(label) -> number
   return label.position().x
 
-def create_font(string name, int size) -> Font
+def create_font(String name, int size) -> Font
   return create(Font)
-def font(string name, int size) -> Font
+def font(String name, int size) -> Font
   state f = null
   if changed([name size])
     f = create_font(name, size)
@@ -54,7 +54,7 @@ def font(string name, int size) -> Font
 
 def create_label() -> Label
   return create(Label);
-def label(Font font, string text, Point pos) -> Label
+def label(Font font, String text, Point pos) -> Label
   state l = create_label()
   if changed([font text])
     l.setText(font,text)
@@ -69,7 +69,7 @@ def Line.setColor(_, Color c)
 
 def create_sprite(Name pass) -> Sprite
   return create(Sprite)
-def Sprite.loadFromFile(_, string filename)
+def Sprite.loadFromFile(_, String filename)
   print('loading: ' filename)
 def Sprite.setTexture(_, Texture texture)
 def Sprite.setTexture2(_, Texture texture)
@@ -85,7 +85,7 @@ def Sprite.bounds(_) -> Vec4
   s = _.size()
   return [p.x, p.y, p.x + s.x, p.y + s.y]
 
-def sprite(string filename, Name pass) -> Sprite
+def sprite(String filename, Name pass) -> Sprite
   state s = create_sprite(pass)
   if changed(filename)
     s.loadFromFile(filename)
@@ -103,9 +103,9 @@ def sprite_from_tex(Texture tex, Name pass) -> Sprite
   
 def create_texture() -> Texture
   return create(Texture)
-def Texture.loadFromFile(_, string filename)
+def Texture.loadFromFile(_, String filename)
   
-def texture(string filename) -> Texture
+def texture(String filename) -> Texture
   state s = create_texture()
   if changed(filename)
     s.loadFromFile(filename)

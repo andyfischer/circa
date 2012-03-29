@@ -79,11 +79,11 @@ namespace include_function {
     void setup(Branch* kernel)
     {
         FUNCS.include_func = import_function(kernel, evaluate_include,
-                "include(string filename) -> Branch");
+                "include(String filename) -> Branch");
         as_function(FUNCS.include_func)->postCompile = include_post_compile;
 
         FUNCS.load_script = import_function(kernel, load_script,
-                "load_script(string filename) -> Branch");
+                "load_script(String filename) -> Branch");
         as_function(FUNCS.load_script)->postCompile = include_post_compile;
 
         FUNCS.import = import_function(kernel, NULL, "import()");

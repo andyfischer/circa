@@ -96,7 +96,7 @@ namespace type_check_function {
         FUNCS.overload_error_no_match = import_function(kernel,
             overload_error_no_match, "overload_error_no_match(List)");
         import_function(kernel, typeof_func, "type(any :meta) -> Type");
-        import_function(kernel, typename_func, "typename(any :meta) -> string");
+        import_function(kernel, typename_func, "typename(any :meta) -> String");
     }
 
 } // namespace type_check_function

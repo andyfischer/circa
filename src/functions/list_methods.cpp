@@ -105,7 +105,7 @@ namespace list_methods_function {
             copy(list_get(input, start + i), list_get(output, i));
     }
 
-    CA_DEFINE_FUNCTION(join, "List.join(self, string) -> string")
+    CA_DEFINE_FUNCTION(join, "List.join(self, String) -> String")
     {
         caValue* input = INPUT(0);
         caValue* joiner = INPUT(1);

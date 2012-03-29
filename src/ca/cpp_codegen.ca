@@ -6,14 +6,14 @@ type CodeWriter
     List output
 }
 
-def CodeWriter.write(self :out, string s)
+def CodeWriter.write(self :out, String s)
     if self.needsIndent
         self.needsIndent = false
         for i in 0..self.curIndent
             self.output.append('    ')
     self.output.append(s)
 
-def CodeWriter.writeln(self :out, string line)
+def CodeWriter.writeln(self :out, String line)
     self.write(line)
     self.output.append("\n")
     self.needsIndent = true
@@ -22,7 +22,7 @@ def CodeWriter.indent(self :out)
     self.curIndent += 1
 def CodeWriter.unindent(self :out)
     self.curIndent -= 1
-def CodeWriter.toString(self) -> string
+def CodeWriter.toString(self) -> String
     return self.output.join("")
 
 def CodeWriter.write_type_name(self :out, Term term)
@@ -100,7 +100,7 @@ def write_branch(CodeWriter w :out, Branch branch)
             w.writeln(';')
         
 
-def branch_to_cpp_string(Branch b) -> string
+def branch_to_cpp_string(Branch b) -> String
     writer = create(CodeWriter)
 
     write_branch(&writer, b)

@@ -4,7 +4,7 @@ sys:dll_patch()
 namespace zmq
     type Requester :handle;
 
-    def create_requester(string addr) -> Requester
+    def create_requester(String addr) -> Requester
     def Requester.send(_, any msg)
     def Requester.receive(_) -> any
     def Requester.receive_blocking(_) -> any
@@ -23,9 +23,9 @@ namespace zmq
     type Subscriber :handle;
     def Subscriber.poll(_) -> any
 
-    def create_subscriber(string addr) -> Subscriber
+    def create_subscriber(String addr) -> Subscriber
 
-    def admin_command_subscribe(string addr)
+    def admin_command_subscribe(String addr)
         state sub = create_subscriber(addr)
         msg = sub.poll()
         if msg != null
@@ -33,7 +33,7 @@ namespace zmq
 
     def file_source_update_file(List data, file:FileSource source, file:FileRecord record)
 
-    def install_as_file_source(string addr)
+    def install_as_file_source(String addr)
         req = create_requester(addr)
 
         -- Request manifest

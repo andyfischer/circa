@@ -6,10 +6,10 @@ def input(int index) -> any
 def length(List) -> int
     "Return the number of items in the given list"
 
-def from_string(string s) -> any
+def from_string(String s) -> any
     "Parse a string representation to a Circa value"
 
-def to_string_repr(any val) -> string
+def to_string_repr(any val) -> String
     "Encode a Circa value as a string representation"
 
 def changed(any current) -> bool
@@ -22,24 +22,24 @@ def call(any callable, List inputs) -> any
     "Dynamic function dispatch"
 
 namespace cppbuild
-    def build_module(string baseFilename)
+    def build_module(String baseFilename)
 
 namespace file
-    def exists(string filename) -> bool
-    def version(string filename) -> int
-    def read_text(string filename) -> string
+    def exists(String filename) -> bool
+    def version(String filename) -> int
+    def read_text(String filename) -> String
 
-    def file_changed(string filename) -> bool
+    def file_changed(String filename) -> bool
         ver = version(filename)
         return changed([filename ver])
 
     type FileSource;
     type FileRecord;
 
-    def fetch_record(string filename, Name source) -> FileRecord
+    def fetch_record(String filename, Name source) -> FileRecord
 
 namespace refactor
-    def rename(Term r, string s)
+    def rename(Term r, String s)
     def change_function(Term r, Callable func)
 
 namespace reflect
@@ -47,10 +47,10 @@ namespace reflect
     def kernel() -> Branch
 
 namespace sys
-    def arg(int index) -> string
+    def arg(int index) -> String
     def dll_patch()
     def module_search_paths() -> List
-    def do_admin_command(string cmd) -> string
+    def do_admin_command(String cmd) -> String
 
 def branch_ref(any branch :ignore_error) -> Branch
 
@@ -66,17 +66,17 @@ def Branch.list_configs(self) -> List
 def Branch.list_functions(self) -> List
 def Branch.file_signature(self) -> any
 
-def Function.name(_) -> string
+def Function.name(_) -> String
 def Function.input(_, int index) -> Term
 def Function.inputs(_) -> List
 def Function.output(_, int index) -> Term
 def Function.contents(_) -> Branch
 
-def Type.name(_) -> string
+def Type.name(_) -> String
 
-def Term.name(self) -> string
-def Term.to_string(_) -> string
-def Term.to_source_string(_) -> string
+def Term.name(self) -> String
+def Term.to_string(_) -> String
+def Term.to_source_string(_) -> String
 def Term.function(_) -> Function
 def Term.get_type(_) -> Type
 def Term.assign(_, any)
@@ -88,9 +88,9 @@ def Term.input(_, int) -> Term
 def Term.inputs(_) -> List
 def Term.num_inputs(_) -> int
 def Term.source_location(_) -> Rect_i
-def Term.global_id(_) -> string
+def Term.global_id(_) -> String
 def Term.properties(_) -> Map
-def Term.property(_, string) -> any
+def Term.property(_, String) -> any
 
 def toggle(bool tog) -> bool
     <<<
@@ -145,14 +145,14 @@ def seed() -> number
     return s
 
 -- Message passing functions
-def receive_last(string inbox_name, any default) -> any
+def receive_last(String inbox_name, any default) -> any
     results = receive(inbox_name)
     if results == []
         return default
     else
         return results[length(results)-1]
 
-def receive_stateful(string inbox_name, any initialValue) -> any
+def receive_stateful(String inbox_name, any initialValue) -> any
     state value = initialValue
     receive_last(inbox_name, @value)
     return value

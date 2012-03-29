@@ -3,7 +3,7 @@
 type MyType {
   int a,
   int b,
-  string name,
+  String name,
   number distance
 }
 
@@ -24,8 +24,8 @@ assert(to_string(m) == "{a: 6, b: 3, name: 'Andy', distance: 0.0}")
 
 -- Cast from a plain list
 type MyType2 {
-    string a
-    string b
+    String a
+    String b
     int c
 }
 
@@ -39,7 +39,7 @@ assert(mt2.c == 3)
 type Composite {
   MyType myClass,
   MyType myClass2,
-  string name,
+  String name,
 }
 c = create(Composite)
 assert(to_string(c) == "{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}")

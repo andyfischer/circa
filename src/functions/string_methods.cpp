@@ -74,14 +74,13 @@ namespace string_methods_function {
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, length, "string.length(_) -> int");
-        import_function(kernel, substr, "string.substr(_,int,int) -> string");
-        import_function(kernel, slice, "string.slice(_,int,int) -> string");
-        import_function(kernel, ends_with, "string.ends_with(_,string) -> bool");
-        import_function(kernel, starts_with, "string.starts_with(_,string) -> bool");
-        import_function(kernel, split, "string.split(_,string sep) -> List");
+        import_function(kernel, length, "String.length(_) -> int");
+        import_function(kernel, substr, "String.substr(_,int,int) -> String");
+        import_function(kernel, slice, "String.slice(_,int,int) -> String");
+        import_function(kernel, ends_with, "String.ends_with(_,String) -> bool");
+        import_function(kernel, starts_with, "String.starts_with(_,String) -> bool");
+        import_function(kernel, split, "String.split(_,String sep) -> List");
     }
-
 }
 }
 

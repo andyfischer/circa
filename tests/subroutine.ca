@@ -13,12 +13,12 @@ def return_expr() -> int
     return 1 + 2 + 3
 print('should be 6: ' return_expr())
 
-def with_args(string a, string b)
+def with_args(String a, String b)
     print(a b)
 
 with_args('with ', 'args')
 
-def with_args2(string a, string b) -> string
+def with_args2(String a, String b) -> String
     return concat(b, a)
 
 print(with_args2('args2', 'with '))

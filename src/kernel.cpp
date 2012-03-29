@@ -704,7 +704,7 @@ void bootstrap_kernel()
     INT_TYPE = create_type_value(kernel, &INT_T, "int");
     NAME_TYPE = create_type_value(kernel, &NAME_T, "Name");
     NULL_T_TERM = create_type_value(kernel, &NULL_T, "Null");
-    STRING_TYPE = create_type_value(kernel, &STRING_T, "string");
+    STRING_TYPE = create_type_value(kernel, &STRING_T, "String");
     DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
     REF_TYPE = create_type_value(kernel, &REF_T, "Term");
     VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
@@ -736,7 +736,7 @@ void bootstrap_kernel()
 
     // FileSignature is used in some builtin functions
     TYPES.file_signature = unbox_type(parse_type(kernel,
-            "type FileSignature { string filename, int time_modified }"));
+            "type FileSignature { String filename, int time_modified }"));
 
     namespace_function::early_setup(kernel);
 

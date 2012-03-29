@@ -6,14 +6,14 @@ type CodeWriter
     List output
 }
 
-def CodeWriter.write(self :out, string s)
+def CodeWriter.write(self :out, String s)
     if self.needsIndent
         self.needsIndent = false
         for i in 0..self.curIndent
             self.output.append('    ')
     self.output.append(s)
 
-def CodeWriter.writeln(self :out, string line)
+def CodeWriter.writeln(self :out, String line)
     self.write(line)
     self.output.append("\n")
     self.needsIndent = true
@@ -23,10 +23,10 @@ def CodeWriter.indent(self :out)
 def CodeWriter.unindent(self :out)
     self.curIndent -= 1
 
-def CodeWriter.toString(self) -> string
+def CodeWriter.toString(self) -> String
     return self.output.join("")
 
-def circa_name_to_c_name(string s) -> string
+def circa_name_to_c_name(String s) -> String
     return s
 
 def write_function(CodeWriter writer :out, Function func)
@@ -39,7 +39,7 @@ def write_function(CodeWriter writer :out, Function func)
     writer.unindent()
     writer.writeln('}')
 
-def write_bindings(Branch branch) -> string
+def write_bindings(Branch branch) -> String
     writer = create(CodeWriter)
 
     for func in branch.list_functions

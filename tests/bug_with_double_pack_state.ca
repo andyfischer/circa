@@ -1,5 +1,5 @@
 
-def g(string s) 
+def g(String s) 
 
 def main()
     state a = 'first value'

@@ -14,7 +14,7 @@ namespace rpath_function {
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, rpath, "def rpath(string) -> string");
+        import_function(kernel, rpath, "def rpath(String) -> String");
     }
 }
 }

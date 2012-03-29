@@ -67,7 +67,7 @@ namespace get_field_function {
     void setup(Branch* kernel)
     {
         FUNCS.get_field = import_function(kernel, evaluate,
-                "get_field(any, string...) -> any");
+                "get_field(any, String...) -> any");
         as_function(FUNCS.get_field)->specializeType = specializeType;
         as_function(FUNCS.get_field)->formatSource = formatSource;
     }
