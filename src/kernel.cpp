@@ -409,6 +409,19 @@ CA_FUNCTION(Function__output)
     set_ref(OUTPUT, function_get_output_placeholder(as_function(INPUT(0)), INT_INPUT(1)));
 }
 
+CA_FUNCTION(Function__outputs)
+{
+    Function* func = as_function(INPUT(0));
+    caValue* output = OUTPUT;
+    set_list(output, 0);
+    for (int i=0;; i++) {
+        Term* term = function_get_output_placeholder(func, i);
+        if (term == NULL)
+            break;
+        set_ref(list_append(output), term);
+    }
+}
+
 CA_FUNCTION(Function__contents)
 {
     set_branch(OUTPUT, function_get_contents(as_function(INPUT(0))));
@@ -462,6 +475,59 @@ CA_FUNCTION(String__substr)
     set_string(OUTPUT, s.substr(start, end));
 }
 
+char character_to_lower(char c)
+{
+    if (c >= 'A' && c <= 'Z')
+        return c + 'a' - 'A';
+    return c;
+}
+
+CA_FUNCTION(String__to_camel_case)
+{
+    const char* in = STRING_INPUT(0);
+    set_string(OUTPUT, in);
+
+    char* out = (char*) as_cstring(OUTPUT);
+    if (out[0] == 0)
+        return;
+
+    out[0] = character_to_lower(out[0]);
+}
+
+CA_FUNCTION(String__to_lower)
+{
+    const char* in = STRING_INPUT(0);
+    int len = strlen(in);
+
+    set_string(OUTPUT, in);
+    char* out = (char*) as_cstring(OUTPUT);
+
+    for (int i=0; i < len; i++) {
+        char c = in[i];
+
+        if (c >= 'A' && c <= 'Z')
+            c = c + 'a' - 'A';
+        out[i] = c;
+    }
+}
+
+CA_FUNCTION(String__to_upper)
+{
+    const char* in = STRING_INPUT(0);
+    int len = strlen(in);
+
+    set_string(OUTPUT, in);
+    char* out = (char*) as_cstring(OUTPUT);
+
+    for (int i=0; i < len; i++) {
+        char c = in[i];
+
+        if (c >= 'a' && c <= 'z')
+            c = c + 'A' - 'a';
+        out[i] = c;
+    }
+}
+
 CA_FUNCTION(String__slice)
 {
     int start = INT_INPUT(1);
@@ -504,6 +570,17 @@ CA_FUNCTION(String__split)
 CA_FUNCTION(Type__name)
 {
     set_string(OUTPUT, name_to_string(as_type(INPUT(0))->name));
+}
+
+CA_FUNCTION(Type__property)
+{
+    Type* type = as_type(INPUT(0));
+    const char* str = as_cstring(INPUT(1));
+    caValue* prop = get_type_property(type, str);
+    if (prop == NULL)
+        set_null(OUTPUT);
+    else
+        copy(prop, OUTPUT);
 }
 
 CA_FUNCTION(Term__name)
@@ -991,17 +1068,23 @@ void install_standard_library(Branch* kernel)
         {"Function.input", Function__input},
         {"Function.inputs", Function__inputs},
         {"Function.output", Function__output},
+        {"Function.outputs", Function__outputs},
         {"Function.contents", Function__contents},
 
         {"String.char_at", String__char_at},
+        {"String.ends_with", String__ends_with},
         {"String.length", String__length},
         {"String.substr", String__substr},
         {"String.slice", String__slice},
-        {"String.ends_with", String__ends_with},
         {"String.starts_with", String__starts_with},
         {"String.split", String__split},
+        {"String.to_camel_case", String__to_camel_case},
+        {"String.to_upper", String__to_upper},
+        {"String.to_lower", String__to_lower},
         
         {"Type.name", Type__name},
+        {"Type.property", Type__property},
+
         {"Term.name", Term__name},
         {"Term.to_string", Term__to_string},
         {"Term.to_source_string", Term__to_source_string},

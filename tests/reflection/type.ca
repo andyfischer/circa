@@ -1,0 +1,6 @@
+
+type myType;
+type myHandleType :handle;
+
+assert(myType.property('handle') != true)
+assert(myHandleType.property('handle') == true)

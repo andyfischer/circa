@@ -27,23 +27,112 @@ def CodeWriter.toString(self) -> String
     return self.output.join("")
 
 def circa_name_to_c_name(String s) -> String
-    return s
+    result = ""
 
-def write_function(CodeWriter writer :out, Function func)
+    for c in s.characters
+        if c == '.'
+            result.append('__')
+        elif c == ':'
+            result.append('__')
+        else
+            result.append(c)
+
+    return result
+
+def write_function(CodeWriter writer :out, Function func, String cname :out)
     writer.write('void ')
-    writer.write(func.name -> circa_name_to_c_name)
+    cname = circa_name_to_c_name(func.name)
+    writer.write(cname)
     writer.write('(caStack* stack)')
     writer.writeln('')
     writer.writeln('{')
     writer.indent()
+    index = 0
+    for input in func.inputs
+        @input -> Term
+
+        name = input.name
+
+        -- check if this is a #anonymous name. If so, use the type name, lower cased.
+        if name.char_at(0) == '#' or name == '_'
+            name = input.get_type.name.to_camel_case
+
+        t = input.get_type
+        if t == String
+            writer.write('const char* ')
+            writer.write(name)
+            writer.write(concat(' = circ_get_string(circ_input(stack, ' index '))'))
+            writer.writeln(';')
+        elif t == int
+            writer.write('int ')
+            writer.write(name)
+            writer.write(concat(' = circ_get_int(circ_input(stack, ' index '))'))
+            writer.writeln(';')
+        elif t == number
+            writer.write('float ')
+            writer.write(name)
+            writer.write(concat(' = circ_get_float(circ_input(stack, ' index '))'))
+            writer.writeln(';')
+        elif t.is_handle
+            writer.write(concat(t.name, '* ', name))
+            writer.write(concat(' = (', t.name, '*) circ_get_pointer(circ_handle_get_value('))
+            writer.write(concat('circ_input(stack, ' index ')))'))
+            writer.writeln(';')
+        else
+            writer.write('caValue* ')
+            writer.write(name)
+            writer.write(concat(' = circ_input(stack, ' index ')'))
+            writer.writeln(';')
+
+        index += 1
+
+    index = 0
+    for input in func.outputs
+        @input -> Term
+
+        if input.get_type == void
+            continue
+
+        if index == 0
+            name = 'output'
+        else
+            name = concat('output_' index)
+
+        writer.write('caValue* ')
+        writer.write(name)
+        writer.write(concat(' = circ_output(stack, ' index ')'))
+        writer.writeln(';')
+
+        index += 1
+
+        
     writer.unindent()
     writer.writeln('}')
 
 def write_bindings(Branch branch) -> String
     writer = create(CodeWriter)
 
+    writer.writeln('#include "circa/circa.h"')
+    writer.writeln('')
+
+    bindings = []
+
     for func in branch.list_functions
-        write_function(&writer, func)
+        cname = ""
+        write_function(&writer, func, &cname)
+
+        bindings.append([func, cname])
+
+    -- Import list
+    writer.writeln('static const caFunctionBinding IMPORTS[] = {')
+    writer.indent()
+    for binding in bindings
+        func = binding[0] -> Function
+        cname = binding[1] -> String
+
+        writer.writeln(concat('{"' func.name '", ' cname '},'))
+    writer.unindent()
+    writer.writeln('};')
 
     return writer.toString
 

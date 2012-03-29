@@ -755,6 +755,7 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
             // :handle is a temporary way to declare a handle type
             setup_handle_type(as_type(result));
             result->setBoolProp("handle", true);
+            set_type_property(as_type(result), "handle", &TrueValue);
         } else {
             return compile_error_for_line(result, tokens, startPosition,
                 "Unrecognized type attribute: " + s);

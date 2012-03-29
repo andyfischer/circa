@@ -187,6 +187,16 @@ Type* get_type_of_input(Term* term, int inputIndex)
     return get_output_type(term->input(inputIndex), 0);
 }
 
+caValue* get_type_property(Type* type, const char* name)
+{
+    return type->properties[name];
+}
+
+void set_type_property(Type* type, const char* name, caValue* value)
+{
+    copy(value, type->properties.insert(name));
+}
+
 Type* create_type()
 {
     Type* t = new Type();

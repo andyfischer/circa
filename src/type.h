@@ -114,6 +114,8 @@ struct Type
 
     // Parent type, may be null.
     Type* parent;
+
+    Dict properties;
     
     // Type parameters
     Value parameter;
@@ -182,6 +184,8 @@ Type* declared_type(Term* term);
 Type* get_output_type(Term* term, int outputIndex);
 Type* get_output_type(Term* term);
 Type* get_type_of_input(Term* term, int inputIndex);
+caValue* get_type_property(Type* type, const char* name);
+void set_type_property(Type* type, const char* name, caValue* value);
 
 StaticTypeQuery::Result run_static_type_query(Type* type, Type* subjectType);
 StaticTypeQuery::Result run_static_type_query(Type* type, Term* term);

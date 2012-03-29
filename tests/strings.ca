@@ -26,3 +26,17 @@ assert("abcd".char_at(2) == "c")
 s = "hello"
 s.append(" there")
 assert(s == "hello there")
+
+-- characters
+assert("abcd".characters == ['a' 'b' 'c' 'd'])
+assert("".characters == [])
+
+-- to_lower
+assert("abcd".to_lower == "abcd")
+assert("ABCD".to_lower == "abcd")
+assert("ABcd123eF".to_lower == "abcd123ef")
+
+-- to_upper
+assert("abcd".to_upper == "ABCD")
+assert("ABCD".to_upper == "ABCD")
+assert("ABcd123eF".to_upper == "ABCD123EF")
