@@ -72,6 +72,17 @@ def Function.inputs(_) -> List
 def Function.output(_, int index) -> Term
 def Function.contents(_) -> Branch
 
+def String.append(self :out, String right)
+    self = concat(self, right)
+    
+def String.char_at(_, int index) -> String
+def String.ends_with(_,String) -> bool
+def String.length(_) -> int
+def String.slice(_,int,int) -> String
+def String.starts_with(_,String) -> bool
+def String.split(_,String sep) -> List
+def String.substr(_,int,int) -> String
+
 def Type.name(_) -> String
 
 def Term.name(self) -> String

@@ -414,6 +414,93 @@ CA_FUNCTION(Function__contents)
     set_branch(OUTPUT, function_get_contents(as_function(INPUT(0))));
 }
 
+CA_FUNCTION(String__char_at)
+{
+    const char* str = STRING_INPUT(0);
+    int index = INT_INPUT(1);
+
+    if (index < 0) {
+        RAISE_ERROR("negative index");
+        return;
+    }
+
+    if ((unsigned) index >= strlen(str)) {
+        set_string(OUTPUT, "");
+        return;
+    }
+
+    char output[1];
+    output[0] = str[index];
+    set_string(OUTPUT, output, 1);
+}
+
+CA_FUNCTION(String__length)
+{
+    set_int(OUTPUT, int(INPUT(0)->asString().length()));
+}
+
+CA_FUNCTION(String__substr)
+{
+    int start = INT_INPUT(1);
+    int end = INT_INPUT(2);
+    std::string const& s = as_string(INPUT(0));
+
+    if (start < 0) return RAISE_ERROR("Negative index");
+    if (end < 0) return RAISE_ERROR("Negative index");
+
+    if ((unsigned) start > s.length()) {
+        std::stringstream msg;
+        msg << "Start index is too high: " << start;
+        return RAISE_ERROR(msg.str().c_str());
+    }
+    if ((unsigned) (start+end) > s.length()) {
+        std::stringstream msg;
+        msg << "End index is too high: " << start;
+        return RAISE_ERROR(msg.str().c_str());
+    }
+
+    set_string(OUTPUT, s.substr(start, end));
+}
+
+CA_FUNCTION(String__slice)
+{
+    int start = INT_INPUT(1);
+    int end = INT_INPUT(2);
+    std::string const& s = as_string(INPUT(0));
+
+    // Negative indexes are relatve to end of string
+    if (start < 0) start = s.length() + start;
+    if (end < 0) end = s.length() + end;
+
+    if (start < 0) return set_string(OUTPUT, "");
+    if (end < 0) return set_string(OUTPUT, "");
+
+    if ((unsigned) start > s.length())
+        start = s.length();
+
+    if ((unsigned) end > s.length())
+        end = s.length();
+
+    if (end < start)
+        return set_string(OUTPUT, "");
+
+    set_string(OUTPUT, s.substr(start, end - start));
+}
+
+CA_FUNCTION(String__ends_with)
+{
+    set_bool(OUTPUT, string_ends_with(INPUT(0), as_cstring(INPUT(1))));
+}
+CA_FUNCTION(String__starts_with)
+{
+    set_bool(OUTPUT, string_starts_with(INPUT(0), as_cstring(INPUT(1))));
+}
+
+CA_FUNCTION(String__split)
+{
+    string_split(INPUT(0), string_get(INPUT(1), 0), OUTPUT);
+}
+
 CA_FUNCTION(Type__name)
 {
     set_string(OUTPUT, name_to_string(as_type(INPUT(0))->name));
@@ -905,6 +992,15 @@ void install_standard_library(Branch* kernel)
         {"Function.inputs", Function__inputs},
         {"Function.output", Function__output},
         {"Function.contents", Function__contents},
+
+        {"String.char_at", String__char_at},
+        {"String.length", String__length},
+        {"String.substr", String__substr},
+        {"String.slice", String__slice},
+        {"String.ends_with", String__ends_with},
+        {"String.starts_with", String__starts_with},
+        {"String.split", String__split},
+        
         {"Type.name", Type__name},
         {"Term.name", Term__name},
         {"Term.to_string", Term__to_string},

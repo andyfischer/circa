@@ -14,17 +14,17 @@ namespace qt
     type PaintEvent :handle;
 
     type FontMetrics :handle;
-    def FontMetrics.width(_, string text)
+    def FontMetrics.width(_, String text)
 
     type Font :handle;
-    def create_font(string name, number size) -> Font
+    def create_font(String name, number size) -> Font
     def Font.setPixelSize(_, number size)
     def Font.fontMetrics(_) -> FontMetrics
 
     type PainterPath :handle;
     def PainterPath.moveTo(_, Point p)
     def PainterPath.cubicTo(_, Point a, Point b, Point c)
-    def PainterPath.addText(_, Point p, Font f, string text)
+    def PainterPath.addText(_, Point p, Font f, String text)
 
     type LinearGradient :handle;
     def create_linear_gradient(Point start, Point stop) -> LinearGradient
@@ -38,7 +38,7 @@ namespace qt
     def Painter.rotate(_, number radians)
     def Painter.translate(_, Point delta)
     def Painter.drawEllipse(_, Rect r)
-    def Painter.drawText(_, Rect r, Name align, string text)
+    def Painter.drawText(_, Rect r, Name align, String text)
     def Painter.drawLine(_, Point a, Point b)
     def Painter.drawRect(_, Rect r)
     def Painter.drawPath(_, PainterPath path)

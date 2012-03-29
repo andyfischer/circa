@@ -16,3 +16,13 @@ assert("1 ".split(" ") == ["1", ""])
 assert("1 2".split(" ") == ["1", "2"])
 assert("1 2 3".split(" ") == ["1", "2", "3"])
 assert("1;2;3".split(";") == ["1", "2", "3"])
+
+-- char_at
+assert("1".char_at(0) == "1")
+assert("1".char_at(1) == "")
+assert("abcd".char_at(2) == "c")
+
+-- append
+s = "hello"
+s.append(" there")
+assert(s == "hello there")
