@@ -129,39 +129,3 @@ unit_tester = unit_tester_env.Program('build/circa_test',
     ['tests/internal/' + s for s in unit_tester_sources],
     LIBS=circa_libs['debug'])
 
-########################### Plastic ###############################
-
-def use_sdl(env):
-    if POSIX:
-        # import path so that we will find the correct sdl-config
-        env['ENV']['PATH'] = os.environ['PATH']
-        try:
-            env.ParseConfig('sdl-config --cflags')
-            env.ParseConfig('sdl-config --libs')
-        except OSError:
-            pass
-        env.Append(LIBS = ['SDL_gfx','SDL_image','SDL_ttf'])
-
-        if OSX:
-            env['FRAMEWORKS'] = ['OpenGL']
-            env.Append(CPPDEFINES = ['PLASTIC_OSX'])
-        else:
-            env.Append(LIBS = ['libGL'])
-
-    if WINDOWS:
-        env.Append(LIBS=['opengl32.lib'])
-
-        env.Append(CPPPATH=['deps/include'])
-        env.Append(LIBS=['deps/lib/SDL.lib'])
-        env.Append(LIBS=['deps/lib/SDLmain.lib'])
-        env.Append(LIBS=['deps/lib/SDL_image.lib'])
-        env.Append(LIBS=['deps/lib/SDL_ttf.lib'])
-        env.Append(LIBS=['deps/lib/glew32.lib'])
-
-    env.Append(CPPPATH=['#src'])
-
-    variant_name = env['variant_name']
-
-    # Append appropriate circa lib, use -force_load
-    env.Append(LIBS = [circa_libs[variant_name]])
-    env.Append(LINKFLAGS = ["-all_load"])

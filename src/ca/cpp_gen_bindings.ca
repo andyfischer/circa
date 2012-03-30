@@ -98,10 +98,18 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         else
             name = concat('output_' index)
 
-        writer.write('caValue* ')
-        writer.write(name)
-        writer.write(concat(' = circ_output(stack, ' index ')'))
-        writer.writeln(';')
+        if input.get_type.is_handle
+            writer.write(concat('caValue* out = circ_create_default_output(stack, '
+                index ')'))
+            writer.writeln(';')
+            writer.write(concat('circ_handle_set_object(out, output, '
+                input.get_type.name 'Release)'))
+            writer.writeln(';')
+        else
+            writer.write('caValue* ')
+            writer.write(name)
+            writer.write(concat(' = circ_output(stack, ' index ')'))
+            writer.writeln(';')
 
         index += 1
 

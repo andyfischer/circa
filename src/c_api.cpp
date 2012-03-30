@@ -148,7 +148,7 @@ caTerm* circ_install_function(caBranch* branch, const char* name, caEvaluateFunc
 {
     return (caTerm*) install_function((Branch*) branch, name, (EvaluateFunc) evaluate);
 }
-void circ_install_function_list(caBranch* branch, caFunctionBinding* list)
+void circ_install_function_list(caBranch* branch, const caFunctionBinding* list)
 {
     while (list->name != NULL) {
         circ_install_function(branch, list->name, list->func);

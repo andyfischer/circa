@@ -287,7 +287,7 @@ typedef struct caFunctionBinding
 
 // Install a series of C function bindings. This will treat 'bindingList' as an array
 // that is terminanted with a NULL caFunctionBinding.
-void circ_install_function_list(caBranch* branch, caFunctionBinding* bindingList);
+void circ_install_function_list(caBranch* branch, const caFunctionBinding* bindingList);
 
 // Install an evaluation function to the given Function.
 void circ_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate);
