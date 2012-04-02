@@ -1,0 +1,48 @@
+
+type Point2 {
+    float x
+    float y
+}
+
+type Brush :handle;
+def create_brush() -> Brush
+
+type Pen :handle;
+def create_pen(Color c, number width, Name style) -> Pen
+def Pen.setWidth(_, number width)
+def Pen.setStyle(_, Name style)
+def Pen.setDashPattern(_, List dashes)
+
+type PaintEvent :handle;
+
+type FontMetrics :handle;
+def FontMetrics.width(_, String text) -> number
+
+type Font :handle;
+def create_font(String name, number size) -> Font
+def Font.setPixelSize(_, number size)
+def Font.fontMetrics(_) -> FontMetrics
+
+type PainterPath :handle;
+def PainterPath.moveTo(_, Point2 p)
+def PainterPath.cubicTo(_, Point2 a, Point2 b, Point2 c)
+def PainterPath.addText(_, Point2 p, Font f, String text)
+
+type LinearGradient :handle;
+def create_linear_gradient(Point2 start, Point2 stop) -> LinearGradient
+def LinearGradient.setColorAt(_, number ratio, Color c)
+
+type Painter :handle;
+def Painter.save(_)
+def Painter.restore(_)
+def Painter.setBrush(_, Brush)
+def Painter.setPen(_, Pen)
+def Painter.rotate(_, number radians)
+def Painter.translate(_, Point2 delta)
+def Painter.drawEllipse(_, Rect r)
+def Painter.drawText(_, Rect r, Name align, String text)
+def Painter.drawLine(_, Point2 a, Point2 b)
+def Painter.drawRect(_, Rect r)
+def Painter.drawPath(_, PainterPath path)
+def Painter.drawRoundRect(_, Rect r)
+def Painter.fillRect(_, Rect r, Brush b)
