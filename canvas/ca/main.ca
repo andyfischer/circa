@@ -1,0 +1,4 @@
+
+def onPaintEvent(Painter painter)
+    painter.fillRect([10 10 100 100] #f00)
+    print('onPaintEvent')

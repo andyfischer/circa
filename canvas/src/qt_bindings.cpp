@@ -171,52 +171,52 @@ void LinearGradient__setColorAt(caStack* stack)
 }
 void Painter__save(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     painter->save();
 }
 void Painter__restore(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     painter->restore();
 }
 void Painter__setBrush(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     QBrush* brush = (QBrush*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 1)));
 
     painter->setBrush(*brush);
 }
 void Painter__setPen(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     QPen* pen = (QPen*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 1)));
 
     painter->setPen(*pen);
 }
 void Painter__rotate(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     float radians = circ_get_float(circ_input(stack, 1));
 
     painter->rotate(radians);
 }
 void Painter__translate(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* delta = circ_input(stack, 1);
 
     painter->translate(to_qpoint(delta));
 }
 void Painter__drawEllipse(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* r = circ_input(stack, 1);
 
     painter->drawEllipse(to_qrect(r));
 }
 void Painter__drawText(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* r = circ_input(stack, 1);
     caValue* align = circ_input(stack, 2);
     const char* text = circ_get_string(circ_input(stack, 3));
@@ -225,7 +225,7 @@ void Painter__drawText(caStack* stack)
 }
 void Painter__drawLine(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* a = circ_input(stack, 1);
     caValue* b = circ_input(stack, 2);
 
@@ -233,32 +233,40 @@ void Painter__drawLine(caStack* stack)
 }
 void Painter__drawRect(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* r = circ_input(stack, 1);
 
     painter->drawRect(to_qrect(r));
 }
 void Painter__drawPath(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     QPainterPath* path = (QPainterPath*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 1)));
 
     painter->drawPath(*path);
 }
 void Painter__drawRoundRect(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* r = circ_input(stack, 1);
 
     painter->drawRoundRect(to_qrect(r));
 }
 void Painter__fillRect(caStack* stack)
 {
-    QPainter* painter = (QPainter*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* r = circ_input(stack, 1);
     QBrush* b = (QBrush*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 2)));
 
     painter->fillRect(to_qrect(r), *b);
+}
+void Painter__fillRectColor(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
+    caValue* r = circ_input(stack, 1);
+    caValue* color = circ_input(stack, 2);
+
+    painter->fillRect(to_qrect(r), to_qcolor(color));
 }
 static const caFunctionBinding IMPORTS[] = {
     {"create_brush", create_brush},
@@ -287,7 +295,9 @@ static const caFunctionBinding IMPORTS[] = {
     {"Painter.drawRect", Painter__drawRect},
     {"Painter.drawPath", Painter__drawPath},
     {"Painter.drawRoundRect", Painter__drawRoundRect},
-    {"Painter.fillRect", Painter__fillRect},
+    //{"Painter.fillRect", Painter__fillRect},
+    {"Painter.fillRect", Painter__fillRectColor},
+    {NULL, NULL}
 };
 
 void qt_bindings_install(caBranch* branch)

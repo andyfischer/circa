@@ -139,6 +139,7 @@ def write_bindings(Branch branch) -> String
         cname = binding[1] -> String
 
         writer.writeln(concat('{"' func.name '", ' cname '},'))
+    writer.writeln(concat('{NULL, NULL}'))
     writer.unindent()
     writer.writeln('};')
 

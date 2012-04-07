@@ -32,7 +32,7 @@ type LinearGradient :handle;
 def create_linear_gradient(Point2 start, Point2 stop) -> LinearGradient
 def LinearGradient.setColorAt(_, number ratio, Color c)
 
-type Painter :handle;
+type Painter;
 def Painter.save(_)
 def Painter.restore(_)
 def Painter.setBrush(_, Brush)
@@ -45,4 +45,5 @@ def Painter.drawLine(_, Point2 a, Point2 b)
 def Painter.drawRect(_, Rect r)
 def Painter.drawPath(_, PainterPath path)
 def Painter.drawRoundRect(_, Rect r)
-def Painter.fillRect(_, Rect r, Brush b)
+--def Painter.fillRectBr(_, Rect r, Brush b)
+def Painter.fillRect(_, Rect r, Color c)

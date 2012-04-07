@@ -729,6 +729,11 @@ float circ_to_float(caValue* value)
     }
 }
 
+caValue* circ_get_index(caValue* container, int index)
+{
+    return get_index(container, index);
+}
+
 void circ_get_vec2(caValue* vec2, float* xOut, float* yOut)
 {
     *xOut = circ_to_float(get_index(vec2, 0));
@@ -769,6 +774,12 @@ void circ_set_null(caValue* container)
 }
 void circ_set_pointer(caValue* container, void* ptr)
 {
+    container->value_data.ptr = ptr;
+}
+
+void circ_set_typed_pointer(caValue* container, caType* type, void* ptr)
+{
+    change_type(container, (Type*) type);
     container->value_data.ptr = ptr;
 }
 void circ_set_string(caValue* container, const char* str)

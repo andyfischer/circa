@@ -1,11 +1,13 @@
 
 #include <QtGui>
 
+#include "GLWidget.h"
+
 #include "Window.h"
 
 Window::Window()
 {
-    GLWidget *openGL = new GLWidget(&helper, this);
+    GLWidget *openGL = new GLWidget(this);
 
     QGridLayout *layout = new QGridLayout;
     layout->addWidget(openGL, 0, 0);

@@ -139,29 +139,31 @@ void pop_frame(EvalContext* context)
     context->numFrames--;
 }
 
-void push_frame_with_inputs(EvalContext* context, Branch* branch, List* inputs)
+void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* inputs)
 {
     // Fetch inputs and start preparing the new stack frame.
     List registers;
     registers.resize(get_locals_count(branch));
     
     // Cast inputs into placeholders
-    for (int i=0; i < inputs->length(); i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
-        if (placeholder == NULL)
-            break;
+    if (inputs != NULL) {
+        for (int i=0; i < list_length(inputs); i++) {
+            Term* placeholder = get_input_placeholder(branch, i);
+            if (placeholder == NULL)
+                break;
 
-        caValue* input = inputs->get(i);
+            caValue* input = list_get(inputs, i);
 
-        bool castSuccess = cast(input, placeholder->type, registers[i]);
+            bool castSuccess = cast(input, placeholder->type, registers[i]);
 
-        if (!castSuccess) {
-            std::stringstream msg;
-            msg << "Couldn't cast input " << input->toString()
-                << " (at index " << i << ")"
-                << " to type " << name_to_string(placeholder->type->name);
-            raise_error(context, msg.str().c_str());
-            return;
+            if (!castSuccess) {
+                std::stringstream msg;
+                msg << "Couldn't cast input " << input->toString()
+                    << " (at index " << i << ")"
+                    << " to type " << name_to_string(placeholder->type->name);
+                raise_error(context, msg.str().c_str());
+                return;
+            }
         }
     }
 
@@ -564,6 +566,27 @@ caValue* evaluate(Term* function, List* inputs)
     Branch scratch;
     return evaluate(&scratch, function, inputs);
 }
+
+extern "C" void circ_run_function(caStack* stack, caFunction* func, caValue* inputs)
+{
+    Branch* branch = function_contents((Function*) func);
+    EvalContext* context = (EvalContext*) stack;
+
+    set_branch_in_progress(branch, false);
+
+    push_frame_with_inputs(context, branch, inputs);
+
+    // Check to insert top-level state
+    insert_top_level_state(context, branch);
+
+    run_interpreter(context);
+
+    if (!error_occurred(context)) {
+        save_top_level_state(context, branch);
+        pop_frame(context);
+    }
+}
+
 
 void clear_error(EvalContext* cxt)
 {

@@ -2,7 +2,7 @@
 #pragma once
 
 #include <QWidget>
-#include <QGLWidget>
+#include <QtOpenGL/QGLWidget>
 
 class GLWidget : public QGLWidget
 {
@@ -11,6 +11,7 @@ class GLWidget : public QGLWidget
 public:
     GLWidget(QWidget* parent);
 
-    void animate();
     virtual void paintEvent(QPaintEvent *event);
+
+public slots: void animate();
 };

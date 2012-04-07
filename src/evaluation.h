@@ -66,7 +66,7 @@ Frame* get_frame(EvalContext* context, int depth);
 Frame* get_frame_from_bottom(EvalContext* context, int index);
 Frame* push_frame(EvalContext* context, Branch* branch, List* registers);
 Frame* push_frame(EvalContext* context, Branch* branch);
-void push_frame_with_inputs(EvalContext* context, Branch* branch, List* inputs);
+void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* inputs);
 void pop_frame(EvalContext* context);
 void finish_frame(EvalContext* context);
 Frame* top_frame(EvalContext* context);

@@ -175,6 +175,31 @@ const char* circ_name_string(caName name)
     return name_to_string(name);
 }
 
+caTerm* circ_find_term(caBranch* branch, const char* name)
+{
+    return (caTerm*) find_name((Branch*) branch, circ_name(name));
+}
+caFunction* circ_find_function(caBranch* branch, const char* name)
+{
+    caTerm* term = circ_find_term(branch, name);
+    if (term == NULL)
+        return NULL;
+    caValue* val = circ_term_value(term);
+    if (!circ_is_function(val))
+        return NULL;
+    return circ_get_function(val);
+}
+caType* circ_find_type(caBranch* branch, const char* name)
+{
+    caTerm* term = circ_find_term(branch, name);
+    if (term == NULL)
+        return NULL;
+    caValue* val = circ_term_value(term);
+    if (!circ_is_type(val))
+        return NULL;
+    return circ_get_type(val);
+}
+
 int circ_term_num_inputs(caTerm* term)
 {
     return ((Term*) term)->numInputs();
@@ -205,6 +230,7 @@ void circ_run_module(caStack* stack, caName moduleName)
 
     evaluate_branch(context, branch);
 }
+
 bool circ_has_error(caStack* stack)
 {
     EvalContext* context = (EvalContext*) stack;

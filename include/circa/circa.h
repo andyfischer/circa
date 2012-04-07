@@ -90,6 +90,10 @@ void circ_dealloc_stack(caStack* stack);
 // Execute the named module.
 void circ_run_module(caStack* stack, caName moduleName);
 
+// Execute the given function with the given inputs. 'Inputs' must either be a list,
+// or NULL if there are no inputs.
+void circ_run_function(caStack* stack, caFunction* function, caValue* inputs);
+
 // Signal that an error has occurred.
 void circ_raise_error(caStack* stack, const char* msg);
 
@@ -177,11 +181,10 @@ void        circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, 
 // Fetch a caValue as a float (converting it from an int if necessary)
 float circ_to_float(caValue* value);
 
-// Fetch an element by index. The value must be indexable (such as a List). In general,
-// the returned value must not be modified because the container may be marked
-// immutable. If you want to modify an element, call circ_touch on the container
-// before accessing its elements. Also, the returned caValue pointer may become invalid
-// if the container is resized or touched.
+// Access an element by index. There are certain rules when accessing a container's element:
+//   - The element must not be modified, unless you know that you have a writable copy
+//     of the container. To obtain a writable copy, first call circ_touch on the container.
+//   - The element pointer must be considered invalid when the owning container is resized.
 caValue* circ_get_index(caValue* value, int index);
 
 // -- Writing to a caValue --
@@ -197,6 +200,7 @@ void circ_set_float(caValue* container, float value);
 void circ_set_int(caValue* container, int value);
 void circ_set_null(caValue* container);
 void circ_set_pointer(caValue* container, void* ptr);
+void circ_set_typed_pointer(caValue* container, caType* type, void* ptr);
 void circ_set_string(caValue* container, const char* str);
 
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated
@@ -242,6 +246,15 @@ void circ_parse_string(const char* str, caValue* out);
 void circ_to_string_repr(caValue* value, caValue* out);
 
 // -- Code Reflection --
+
+// Find a Term by name, looking in the given branch.
+caTerm* circ_find_term(caBranch* branch, const char* name);
+
+// Find a Function by name, looking in the given branch.
+caFunction* circ_find_function(caBranch* branch, const char* name);
+
+// Find a Type by name, looking in the given branch.
+caType* circ_find_type(caBranch* branch, const char* name);
 
 // Retrive the nth input Term for the stack's current Term. May return NULL.
 // This is equivalent to: circ_term_get_input(circ_current_term(stack), index)

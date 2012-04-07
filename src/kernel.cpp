@@ -1102,6 +1102,7 @@ void install_standard_library(Branch* kernel)
         {"Term.global_id", Term__global_id},
         {"Term.properties", Term__properties},
         {"Term.property", Term__property},
+        {NULL, NULL}
     };
 
     install_function_list(kernel, records);

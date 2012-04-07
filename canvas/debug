@@ -1,0 +1,2 @@
+
+gdb --args canvas.app/Contents/MacOS/canvas $*
