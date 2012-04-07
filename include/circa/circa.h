@@ -171,12 +171,15 @@ float       circ_get_float(caValue* value);
 caFunction* circ_get_function(caValue* value);
 int         circ_get_int(caValue* value);
 caName      circ_get_name(caValue* value);
-void*       circ_get_pointer(caValue* value);
 const char* circ_get_string(caValue* value);
 caType*     circ_get_type(caValue* value);
 void        circ_get_vec2(caValue* vec2, float* xOut, float* yOut);
 void        circ_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
 void        circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
+
+// Read the pointer value from a caValue. This call will do dereferencing: if the caValue
+// is actually a Handle then we'll dereference the handle.
+void*       circ_get_pointer(caValue* value);
 
 // Fetch a caValue as a float (converting it from an int if necessary)
 float circ_to_float(caValue* value);

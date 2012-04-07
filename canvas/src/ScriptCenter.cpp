@@ -27,4 +27,9 @@ void ScriptCenter::call(const char* functionName, caValue* inputs)
     caFunction* func = circ_find_function(mainBranch, functionName);
 
     circ_run_function(stack, func, inputs);
+
+    if (circ_has_error(stack)) {
+        circ_print_error_to_stdout(stack);
+        circ_clear_error(stack);
+    }
 }

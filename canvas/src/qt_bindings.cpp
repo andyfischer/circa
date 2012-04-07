@@ -74,28 +74,36 @@ void create_pen(caStack* stack)
     caValue* out = circ_create_default_output(stack, 0);
     circ_handle_set_object(out, new QPen(), PenRelease);
 }
+
+void Pen__setColor(caStack* stack)
+{
+    QPen* pen = (QPen*) circ_get_pointer(circ_input(stack, 0));
+    caValue* color = circ_input(stack, 1);
+
+    pen->setColor(to_qcolor(color));
+}
 void Pen__setStyle(caStack* stack)
 {
-    QPen* pen = (QPen*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPen* pen = (QPen*) circ_get_pointer(circ_input(stack, 0));
     caValue* style = circ_input(stack, 1);
 
     pen; style; // TODO: support style
 }
 void Pen__setWidth(caStack* stack)
 {
-    QPen* pen = (QPen*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPen* pen = (QPen*) circ_get_pointer(circ_input(stack, 0));
     float width = circ_get_float(circ_input(stack, 1));
 
     pen->setWidth(width);
 }
 void Pen__setDashPattern(caStack* stack)
 {
-    QPen* pen = (QPen*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPen* pen = (QPen*) circ_get_pointer(circ_input(stack, 0));
     caValue* dashes = circ_input(stack, 1);
 }
 void FontMetrics__width(caStack* stack)
 {
-    QFontMetrics* fontMetrics = (QFontMetrics*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QFontMetrics* fontMetrics = (QFontMetrics*) circ_get_pointer(circ_input(stack, 0));
     const char* text = circ_get_string(circ_input(stack, 1));
 
     circ_set_float(circ_output(stack, 0), fontMetrics->width(text));
@@ -112,14 +120,14 @@ void create_font(caStack* stack)
 }
 void Font__setPixelSize(caStack* stack)
 {
-    QFont* font = (QFont*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QFont* font = (QFont*) circ_get_pointer(circ_input(stack, 0));
     float size = circ_get_float(circ_input(stack, 1));
 
     font->setPixelSize(size);
 }
 void Font__fontMetrics(caStack* stack)
 {
-    QFont* font = (QFont*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QFont* font = (QFont*) circ_get_pointer(circ_input(stack, 0));
 
     QFontMetrics* metrics = new QFontMetrics(*font);
 
@@ -128,14 +136,14 @@ void Font__fontMetrics(caStack* stack)
 }
 void PainterPath__moveTo(caStack* stack)
 {
-    QPainterPath* painterPath = (QPainterPath*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainterPath* painterPath = (QPainterPath*) circ_get_pointer(circ_input(stack, 0));
     caValue* p = circ_input(stack, 1);
 
     painterPath->moveTo(to_qpoint(p));
 }
 void PainterPath__cubicTo(caStack* stack)
 {
-    QPainterPath* painterPath = (QPainterPath*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainterPath* painterPath = (QPainterPath*) circ_get_pointer(circ_input(stack, 0));
     caValue* a = circ_input(stack, 1);
     caValue* b = circ_input(stack, 2);
     caValue* c = circ_input(stack, 3);
@@ -144,9 +152,9 @@ void PainterPath__cubicTo(caStack* stack)
 }
 void PainterPath__addText(caStack* stack)
 {
-    QPainterPath* painterPath = (QPainterPath*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QPainterPath* painterPath = (QPainterPath*) circ_get_pointer(circ_input(stack, 0));
     caValue* p = circ_input(stack, 1);
-    QFont* f = (QFont*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 2)));
+    QFont* f = (QFont*) circ_get_pointer(circ_input(stack, 2));
     const char* text = circ_get_string(circ_input(stack, 3));
 
     painterPath->addText(to_qpoint(p), *f, text);
@@ -163,7 +171,7 @@ void create_linear_gradient(caStack* stack)
 }
 void LinearGradient__setColorAt(caStack* stack)
 {
-    QLinearGradient* linearGradient = (QLinearGradient*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 0)));
+    QLinearGradient* linearGradient = (QLinearGradient*) circ_get_pointer(circ_input(stack, 0));
     float ratio = circ_get_float(circ_input(stack, 1));
     caValue* c = circ_input(stack, 2);
 
@@ -182,14 +190,14 @@ void Painter__restore(caStack* stack)
 void Painter__setBrush(caStack* stack)
 {
     QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
-    QBrush* brush = (QBrush*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 1)));
+    QBrush* brush = (QBrush*) circ_get_pointer(circ_input(stack, 1));
 
     painter->setBrush(*brush);
 }
 void Painter__setPen(caStack* stack)
 {
     QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
-    QPen* pen = (QPen*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 1)));
+    QPen* pen = (QPen*) circ_get_pointer(circ_input(stack, 1));
 
     painter->setPen(*pen);
 }
@@ -241,7 +249,7 @@ void Painter__drawRect(caStack* stack)
 void Painter__drawPath(caStack* stack)
 {
     QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
-    QPainterPath* path = (QPainterPath*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 1)));
+    QPainterPath* path = (QPainterPath*) circ_get_pointer(circ_input(stack, 1));
 
     painter->drawPath(*path);
 }
@@ -256,7 +264,7 @@ void Painter__fillRect(caStack* stack)
 {
     QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     caValue* r = circ_input(stack, 1);
-    QBrush* b = (QBrush*) circ_get_pointer(circ_handle_get_value(circ_input(stack, 2)));
+    QBrush* b = (QBrush*) circ_get_pointer(circ_input(stack, 2));
 
     painter->fillRect(to_qrect(r), *b);
 }
@@ -271,6 +279,7 @@ void Painter__fillRectColor(caStack* stack)
 static const caFunctionBinding IMPORTS[] = {
     {"create_brush", create_brush},
     {"create_pen", create_pen},
+    {"Pen.setColor", Pen__setColor},
     {"Pen.setStyle", Pen__setStyle},
     {"Pen.setWidth", Pen__setWidth},
     {"Pen.setDashPattern", Pen__setDashPattern},

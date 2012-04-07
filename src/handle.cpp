@@ -113,4 +113,16 @@ void handle_set_release_func(caValue* handle, ReleaseFunc releaseFunc)
     container->releaseFunc = releaseFunc;
 }
 
+bool is_handle(caValue* value)
+{
+    return value->value_type->storageType == STORAGE_TYPE_HANDLE;
+}
+
+caValue* dereference_handle(caValue* value)
+{
+    while (is_handle(value))
+        value = get_handle_value(value);
+    return value;
+}
+
 } // namespace circa

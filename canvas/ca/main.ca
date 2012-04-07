@@ -1,4 +1,24 @@
 
+def current_time() -> number
+
+def elapsed() -> number
+    state start_time = current_time()
+    return current_time() - start_time
+
+def fadein(Color c) -> Color
+    -- hack:
+    state frame_count = 0
+    frame_count += 1
+
+    e = frame_count / 100
+    min(@e, 1.0)
+    return [c.r c.g c.b e]
+
 def onPaintEvent(Painter painter)
     painter.fillRect([10 10 100 100] #f00)
-    print('onPaintEvent')
+
+    pen = create_pen(#fff, 1.0, :none)
+    pen.setColor(fadein(#4ff))
+
+    painter.setPen(pen)
+    painter.drawText([10 10 100 100] :none "Hello there")

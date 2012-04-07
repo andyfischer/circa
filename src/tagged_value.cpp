@@ -4,6 +4,7 @@
 
 #include "kernel.h"
 #include "debug.h"
+#include "handle.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -709,6 +710,7 @@ caName circ_get_name(caValue* value) {
 }
 void* circ_get_pointer(caValue* value)
 {
+    value = dereference_handle(value);
     return value->value_data.ptr;
 }
 

@@ -9,6 +9,7 @@ def create_brush() -> Brush
 
 type Pen :handle;
 def create_pen(Color c, number width, Name style) -> Pen
+def Pen.setColor(_, Color color)
 def Pen.setWidth(_, number width)
 def Pen.setStyle(_, Name style)
 def Pen.setDashPattern(_, List dashes)
