@@ -4,12 +4,22 @@
 
 #include <typeinfo>
 
+#include "circa/circa.h"
+
 #include "branch.h"
 #include "heap_debugging.h"
 #include "gc.h"
 #include "term_map.h"
 #include "term.h"
 #include "term_namespace.h"
+
+typedef struct caType {
+    // Opaque type, used by C api.
+
+protected:
+    caType() {} // Disallow construction of this type.
+
+} caType;
 
 namespace circa {
 
@@ -35,7 +45,7 @@ struct CastResult
     CastResult() : success(true) {}
 };
 
-struct Type
+struct Type : public caType
 {
     typedef void (*Initialize)(Type* type, caValue* value);
     typedef void (*Copy)(Type* type, caValue* source, caValue* dest);

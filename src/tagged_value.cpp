@@ -714,7 +714,7 @@ void* circ_get_pointer(caValue* value)
 
 caType* circ_get_type(caValue* value) {
     ca_assert(circ_is_type(value));
-    return (caType*) value->value_data.ptr;
+    return (Type*) value->value_data.ptr;
 }
 
 float circ_to_float(caValue* value)

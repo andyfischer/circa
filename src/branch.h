@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "circa/circa.h"
+
 #include "common_headers.h"
 
 #include "names.h"
@@ -11,11 +13,17 @@
 #include "term_list.h"
 #include "term_namespace.h"
 
+typedef struct caBranch {
+    // Opaque type, used by C api.
+protected:
+    caBranch() {} // Disallow construction of this type.
+} caBranch;
+
 namespace circa {
 
 struct BrokenLinkList;
 
-struct Branch
+struct Branch : caBranch
 {
     CircaObject header;
 

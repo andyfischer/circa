@@ -16,6 +16,11 @@ struct caValue
 {
     caValueData value_data;
     caType* value_type;
+
+#if __cplusplus
+protected:
+    caValue() {} // Disallow construction of this type.
+#endif
 };
 
 namespace circa {
