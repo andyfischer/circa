@@ -19,6 +19,7 @@ type PaintEvent :handle;
 
 type FontMetrics :handle;
 def FontMetrics.width(_, String text) -> number
+def FontMetrics.height(_) -> number
 
 type Font :handle;
 def create_font(String name, number size) -> Font
@@ -50,3 +51,5 @@ def Painter.drawPath(_, PainterPath path)
 def Painter.drawRoundRect(_, Rect r)
 --def Painter.fillRectBr(_, Rect r, Brush b)
 def Painter.fillRect(_, Rect r, Color c)
+def Painter.fontMetrics(_) -> FontMetrics
+def Painter.viewport(_) -> Rect

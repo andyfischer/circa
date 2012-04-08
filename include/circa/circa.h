@@ -190,6 +190,9 @@ float circ_to_float(caValue* value);
 //   - The element pointer must be considered invalid when the owning container is resized.
 caValue* circ_get_index(caValue* value, int index);
 
+// Number of elements in a container
+int circ_count(caValue* container);
+
 // -- Writing to a caValue --
 
 // "Touch" a value, indicating that you are about to start modifying its contents. This
@@ -206,6 +209,9 @@ void circ_set_pointer(caValue* container, void* ptr);
 void circ_set_term(caValue* container, caTerm* term);
 void circ_set_string(caValue* container, const char* str);
 void circ_set_typed_pointer(caValue* container, caType* type, void* ptr);
+void circ_set_vec2(caValue* container, float x, float y);
+void circ_set_vec3(caValue* container, float x, float y, float z);
+void circ_set_vec4(caValue* container, float x, float y, float z, float w);
 
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated
 // here.
@@ -218,8 +224,12 @@ void circ_string_append(caValue* container, const char* str);
 // be NULL.
 void circ_set_list(caValue* container, int numElements);
 
-// Append a value to a list and return it. The caValue that is returned may be modified.
+// Append a value to a list and return the newly appended value. This return value may be
+// modified.
 caValue* circ_append(caValue* list);
+
+// Resize a list.
+void circ_resize(caValue* list, int count);
 
 // Assign a point.
 void circ_set_point(caValue* point, float x, float y);

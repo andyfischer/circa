@@ -735,6 +735,10 @@ caValue* circ_get_index(caValue* container, int index)
 {
     return get_index(container, index);
 }
+int circ_count(caValue* container)
+{
+    return list_length(container);
+}
 
 void circ_get_vec2(caValue* vec2, float* xOut, float* yOut)
 {
@@ -753,6 +757,10 @@ void circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* 
     *yOut = circ_to_float(get_index(vec4, 1));
     *zOut = circ_to_float(get_index(vec4, 2));
     *wOut = circ_to_float(get_index(vec4, 3));
+}
+void circ_touch(caValue* value)
+{
+    touch(value);
 }
 
 void circ_set_bool(caValue* container, bool b)
@@ -787,6 +795,45 @@ void circ_set_typed_pointer(caValue* container, caType* type, void* ptr)
 {
     change_type(container, (Type*) type);
     container->value_data.ptr = ptr;
+}
+void circ_set_vec2(caValue* container, float x, float y)
+{
+    if (!circ_is_list(container))
+        circ_set_list(container, 2);
+    else if (circ_count(container) != 2)
+        circ_resize(container, 2);
+    else
+        circ_touch(container);
+
+    circ_set_float(circ_get_index(container, 0), x);
+    circ_set_float(circ_get_index(container, 1), y);
+}
+void circ_set_vec3(caValue* container, float x, float y, float z)
+{
+    if (!circ_is_list(container))
+        circ_set_list(container, 3);
+    else if (circ_count(container) != 3)
+        circ_resize(container, 3);
+    else
+        circ_touch(container);
+
+    circ_set_float(circ_get_index(container, 0), x);
+    circ_set_float(circ_get_index(container, 1), y);
+    circ_set_float(circ_get_index(container, 2), y);
+}
+void circ_set_vec4(caValue* container, float x, float y, float z, float w)
+{
+    if (!circ_is_list(container))
+        circ_set_list(container, 4);
+    else if (circ_count(container) != 4)
+        circ_resize(container, 4);
+    else
+        circ_touch(container);
+
+    circ_set_float(circ_get_index(container, 0), x);
+    circ_set_float(circ_get_index(container, 1), y);
+    circ_set_float(circ_get_index(container, 2), y);
+    circ_set_float(circ_get_index(container, 3), y);
 }
 void circ_set_string(caValue* container, const char* str)
 {

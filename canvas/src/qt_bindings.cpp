@@ -117,6 +117,12 @@ void FontMetrics__width(caStack* stack)
 
     circ_set_float(circ_output(stack, 0), fontMetrics->width(text));
 }
+void FontMetrics__height(caStack* stack)
+{
+    QFontMetrics* fontMetrics = (QFontMetrics*) circ_get_pointer(circ_input(stack, 0));
+
+    circ_set_float(circ_output(stack, 0), fontMetrics->height());
+}
 void create_font(caStack* stack)
 {
     const char* name = circ_get_string(circ_input(stack, 0));
@@ -292,6 +298,26 @@ void Painter__fillRectColor(caStack* stack)
 
     painter->fillRect(to_qrect(r), to_qcolor(color));
 }
+
+void Painter__fontMetrics(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
+
+    QFontMetrics* metrics = new QFontMetrics(painter->fontMetrics());
+
+    caValue* out = circ_create_default_output(stack, 0);
+    circ_handle_set_object(out, metrics, FontMetricsRelease);
+}
+
+void Painter__viewport(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
+    QRect rect = painter->viewport();
+
+    caValue* out = circ_create_default_output(stack, 0);
+    circ_set_vec4(out, rect.left(), rect.top(), rect.right(), rect.bottom());
+}
+
 static const caFunctionBinding IMPORTS[] = {
     {"create_brush", create_brush},
     {"Brush.setColor", Brush__setColor},
@@ -301,6 +327,7 @@ static const caFunctionBinding IMPORTS[] = {
     {"Pen.setWidth", Pen__setWidth},
     {"Pen.setDashPattern", Pen__setDashPattern},
     {"FontMetrics.width", FontMetrics__width},
+    {"FontMetrics.height", FontMetrics__height},
     {"create_font", create_font},
     {"Font.setPixelSize", Font__setPixelSize},
     {"Font.fontMetrics", Font__fontMetrics},
@@ -324,6 +351,8 @@ static const caFunctionBinding IMPORTS[] = {
     {"Painter.drawRoundRect", Painter__drawRoundRect},
     //{"Painter.fillRect", Painter__fillRect},
     {"Painter.fillRect", Painter__fillRectColor},
+    {"Painter.fontMetrics", Painter__fontMetrics},
+    {"Painter.viewport", Painter__viewport},
     {NULL, NULL}
 };
 

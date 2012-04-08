@@ -3,7 +3,20 @@ type EditorView {
     Branch branch
 }
 
-def EditorView.draw(self, Painter painter)
+def EditorView.draw(self, Painter painter, Rect rect)
+
+    lineIndex = 0
+    currentY = 0.0
+    lineHeight = painter.fontMetrics.height
+
     for statement in branch.statements
         @statement -> Term
+
+        source_text = statement.to_source_text
+
+        painter.drawText([rect.x1, rect.y1, rect.x2, rect.y1 + lineHeight],
+            :none, source_text)
+
+        lineIndex += 1
+        currentY += lineHeight
 

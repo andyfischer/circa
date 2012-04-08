@@ -104,6 +104,10 @@ caValue* circ_append(caValue* list)
 {
     return list_append(list);
 }
+void circ_resize(caValue* list, int count)
+{
+    list_resize(list, count);
+}
 void circ_set_point(caValue* point, float x, float y)
 {
     change_type(point, TYPES.point);
