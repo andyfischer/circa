@@ -51,7 +51,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
         circ_set_list(out, 0);
 
         while (!tokens->nextIs(TK_RBRACKET) && !tokens->finished()) {
-            caValue* element = circ_list_append(out);
+            caValue* element = circ_append(out);
             parse_value(tokens, element);
 
             if (tokens->nextIs(TK_COMMA))

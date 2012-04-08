@@ -57,8 +57,17 @@ QRectF to_qrect(caValue* value)
 
 void create_brush(caStack* stack)
 {
+    caValue* color = circ_input(stack, 0);
     caValue* out = circ_create_default_output(stack, 0);
-    circ_handle_set_object(out, new QBrush(), BrushRelease);
+    circ_handle_set_object(out, new QBrush(to_qcolor(color)), BrushRelease);
+}
+
+void Brush__setColor(caStack* stack)
+{
+    QBrush* brush = (QBrush*) circ_get_pointer(circ_input(stack, 0));
+    caValue* color = circ_input(stack, 1);
+
+    brush->setColor(to_qcolor(color));
 }
 void create_pen(caStack* stack)
 {
@@ -187,6 +196,13 @@ void Painter__restore(caStack* stack)
     QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
     painter->restore();
 }
+void Painter__setBackground(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
+    QBrush* brush = (QBrush*) circ_get_pointer(circ_input(stack, 1));
+
+    painter->setBackground(*brush);
+}
 void Painter__setBrush(caStack* stack)
 {
     QPainter* painter = (QPainter*) circ_get_pointer(circ_input(stack, 0));
@@ -278,6 +294,7 @@ void Painter__fillRectColor(caStack* stack)
 }
 static const caFunctionBinding IMPORTS[] = {
     {"create_brush", create_brush},
+    {"Brush.setColor", Brush__setColor},
     {"create_pen", create_pen},
     {"Pen.setColor", Pen__setColor},
     {"Pen.setStyle", Pen__setStyle},
@@ -294,6 +311,7 @@ static const caFunctionBinding IMPORTS[] = {
     {"LinearGradient.setColorAt", LinearGradient__setColorAt},
     {"Painter.save", Painter__save},
     {"Painter.restore", Painter__restore},
+    {"Painter.setBackground", Painter__setBackground},
     {"Painter.setBrush", Painter__setBrush},
     {"Painter.setPen", Painter__setPen},
     {"Painter.rotate", Painter__rotate},

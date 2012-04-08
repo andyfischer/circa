@@ -1,0 +1,9 @@
+
+type EditorView {
+    Branch branch
+}
+
+def EditorView.draw(self, Painter painter)
+    for statement in branch.statements
+        @statement -> Term
+

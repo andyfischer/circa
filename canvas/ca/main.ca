@@ -15,6 +15,8 @@ def fadein(Color c) -> Color
     return [c.r c.g c.b e]
 
 def onPaintEvent(Painter painter)
+    painter.setBackground(create_brush(#eee))
+
     painter.fillRect([10 10 100 100] #f00)
 
     pen = create_pen(#fff, 1.0, :none)

@@ -49,3 +49,11 @@ assert(b.name() == "b")
 assert(c.name() == "c")
 assert(myfunc2.inputs() == [a b c])
 assert(myfunc2.output(0).get_type() == number)
+
+-- test Branch.statements
+my_branch = { a = (1 + 2) * 3 }
+
+statements = branch_ref(my_branch).statements
+assert(statements.length == 1)
+statement_0 = statements[0] -> Term
+assert(statement_0.function == mult)

@@ -203,8 +203,9 @@ void circ_set_float(caValue* container, float value);
 void circ_set_int(caValue* container, int value);
 void circ_set_null(caValue* container);
 void circ_set_pointer(caValue* container, void* ptr);
-void circ_set_typed_pointer(caValue* container, caType* type, void* ptr);
+void circ_set_term(caValue* container, caTerm* term);
 void circ_set_string(caValue* container, const char* str);
+void circ_set_typed_pointer(caValue* container, caType* type, void* ptr);
 
 // Assign to a string, with the given length. 'str' does not need to be NULL-terminated
 // here.
@@ -217,8 +218,8 @@ void circ_string_append(caValue* container, const char* str);
 // be NULL.
 void circ_set_list(caValue* container, int numElements);
 
-// Append a value to a list and return it. The returned Value may be modified.
-caValue* circ_list_append(caValue* list);
+// Append a value to a list and return it. The caValue that is returned may be modified.
+caValue* circ_append(caValue* list);
 
 // Assign a point.
 void circ_set_point(caValue* point, float x, float y);

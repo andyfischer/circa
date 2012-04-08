@@ -778,6 +778,10 @@ void circ_set_pointer(caValue* container, void* ptr)
 {
     container->value_data.ptr = ptr;
 }
+void circ_set_term(caValue* container, caTerm* term)
+{
+    set_ref(container, (Term*) term);
+}
 
 void circ_set_typed_pointer(caValue* container, caType* type, void* ptr)
 {

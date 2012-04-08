@@ -33,3 +33,4 @@ void ScriptCenter::call(const char* functionName, caValue* inputs)
         circ_clear_error(stack);
     }
 }
+

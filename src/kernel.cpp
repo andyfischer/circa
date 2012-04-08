@@ -381,6 +381,19 @@ CA_FUNCTION(Branch__file_signature)
     }
 }
 
+void Branch__statements(caStack* stack)
+{
+    Branch* branch = (Branch*) circ_get_branch(circ_input(stack, 0));
+
+    caValue* out = circ_output(stack, 0);
+
+    circ_set_list(out, 0);
+
+    for (int i=0; i < branch->length(); i++)
+        if (is_statement(branch->get(i)))
+            circ_set_term(circ_append(out), (caTerm*) branch->get(i));
+}
+
 CA_FUNCTION(Function__name)
 {
     set_string(OUTPUT, as_function(INPUT(0))->name);
@@ -1056,6 +1069,7 @@ void install_standard_library(Branch* kernel)
         {"Branch.dump", Branch__dump},
         {"Branch.evaluate", Branch__evaluate},
         {"Branch.file_signature", Branch__file_signature},
+        {"Branch.statements", (EvaluateFunc) Branch__statements},
         {"Branch.format_source", Branch__format_source},
         {"Branch.get_term", Branch__get_term},
         {"Branch.get_static_errors", Branch__get_static_errors},

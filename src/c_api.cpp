@@ -100,7 +100,7 @@ void circ_set_list(caValue* list, int numElements)
 {
     set_list(list, numElements);
 }
-caValue* circ_list_append(caValue* list)
+caValue* circ_append(caValue* list)
 {
     return list_append(list);
 }
