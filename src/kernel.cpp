@@ -81,7 +81,6 @@ Term* REF_FUNC = NULL;
 Term* SWITCH_FUNC = NULL;
 Term* STATEFUL_VALUE_FUNC = NULL;
 Term* STATIC_ERROR_FUNC = NULL;
-Term* TYPE_FUNC = NULL;
 Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
 Term* UNKNOWN_TYPE_FUNC = NULL;
 Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
@@ -197,15 +196,6 @@ void call_func(caStack* stack)
     // switch to C++ mode..
     EvalContext* context = (EvalContext*) stack;
     push_frame_with_inputs(context, (Branch*) branch, (List*) inputs);
-}
-
-CA_FUNCTION(input_func)
-{
-    int index = INT_INPUT(0);
-    caValue* input = CONTEXT->argumentList.getLast()->getIndex(index);
-    if (input == NULL)
-        return RAISE_ERROR("invalid input index");
-    copy(input, OUTPUT);
 }
 
 CA_FUNCTION(refactor__rename)
@@ -348,7 +338,7 @@ CA_FUNCTION(Branch__list_configs)
     }
 }
 
-CA_FUNCTION(Branch__list_functions)
+CA_FUNCTION(Branch__functions)
 {
     Branch* branch = as_branch(INPUT(0));
     if (branch == NULL)
@@ -1054,7 +1044,6 @@ void install_standard_library(Branch* kernel)
         {"file:exists", file__exists},
         {"file:read_text", file__read_text},
         {"file:fetch_record", file__fetch_record},
-        {"input", input_func},
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
@@ -1076,7 +1065,7 @@ void install_standard_library(Branch* kernel)
         {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
         {"Branch.has_static_error", Branch__has_static_error},
         {"Branch.list_configs", Branch__list_configs},
-        {"Branch.list_functions", Branch__list_functions},
+        {"Branch.functions", Branch__functions},
         {"Branch.terms", Branch__terms},
         {"Function.name", Function__name},
         {"Function.input", Function__input},
@@ -1121,10 +1110,11 @@ void install_standard_library(Branch* kernel)
 
     install_function_list(kernel, records);
 
-    FUNCS.length = kernel->get("length");
-    TYPE_FUNC = kernel->get("type");
-
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
+    FUNCS.length = kernel->get("length");
+    FUNCS.type = kernel->get("type");
+    FUNCS.input_explicit = kernel->get("input");
+    FUNCS.output_explicit = kernel->get("input");
 }
 
 EXPORT void circ_initialize()

@@ -44,6 +44,8 @@ void print_usage()
         "\n"
         "Available commands:\n"
         "  -loop <filename>  : Run the script repeatedly until terminated\n"
+        "  -call <filename> <func name> <args>\n"
+        "                    : Call a function in a script file, print results\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
         "  -e <expression>   : Evaluate an expression on the command line\n"
         "  -check <filename> : Statically check the script for any errors\n"
@@ -53,7 +55,7 @@ void print_usage()
         << std::endl;
 }
 
-int run_command_line(List* args)
+int run_command_line(caValue* args)
 {
     bool printRaw = false;
     bool printRawWithProps = false;
@@ -68,10 +70,10 @@ int run_command_line(List* args)
         if (list_length(args) == 0)
             break;
 
-        if (string_eq(args->get(0), "-break-on")) {
+        if (string_eq(list_get(args, 0), "-break-on")) {
             String name;
             set_string(&name, "$");
-            string_append(&name, (String*) args->get(1));
+            string_append(&name, list_get(args, 1));
             DEBUG_BREAK_ON_TERM = strdup(as_cstring(&name));
 
             list_remove_index(args, 0);
@@ -80,42 +82,42 @@ int run_command_line(List* args)
             continue;
         }
 
-        if (string_eq(args->get(0), "-libpath")) {
+        if (string_eq(list_get(args, 0), "-libpath")) {
             // Add a module path
-            modules_add_search_path(as_cstring(args->get(1)));
+            modules_add_search_path(as_cstring(list_get(args, 1)));
             list_remove_index(args, 0);
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(args->get(0), "-p")) {
+        if (string_eq(list_get(args, 0), "-p")) {
             printRaw = true;
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(args->get(0), "-pp")) {
+        if (string_eq(list_get(args, 0), "-pp")) {
             printRawWithProps = true;
             list_remove_index(args, 0);
             continue;
         }
 
-        if (string_eq(args->get(0), "-s")) {
+        if (string_eq(list_get(args, 0), "-s")) {
             printSource = true;
             list_remove_index(args, 0);
             continue;
         }
-        if (string_eq(args->get(0), "-n")) {
+        if (string_eq(list_get(args, 0), "-n")) {
             dontRunScript = true;
             list_remove_index(args, 0);
             continue;
         }
-        if (string_eq(args->get(0), "-print-state")) {
+        if (string_eq(list_get(args, 0), "-print-state")) {
             printState = true;
             list_remove_index(args, 0);
             continue;
         }
-        if (string_eq(args->get(0), "-t")) {
+        if (string_eq(list_get(args, 0), "-t")) {
             printTrace = true;
             list_remove_index(args, 0);
             continue;
@@ -137,22 +139,22 @@ int run_command_line(List* args)
     // Check to handle args[0] as a dash-command.
 
     // Print help
-    if (string_eq(args->get(0), "-help")) {
+    if (string_eq(list_get(args, 0), "-help")) {
         print_usage();
         return 0;
     }
 
     // Eval mode
-    if (string_eq(args->get(0), "-e")) {
+    if (string_eq(list_get(args, 0), "-e")) {
         list_remove_index(args, 0);
 
         String command;
 
         bool firstArg = true;
-        while (!args->empty()) {
+        while (!list_empty(args)) {
             if (!firstArg)
                 string_append(&command, " ");
-            string_append(&command, args->get(0));
+            string_append(&command, list_get(args, 0));
             list_remove_index(args, 0);
             firstArg = false;
         }
@@ -164,18 +166,20 @@ int run_command_line(List* args)
     }
 
     // Start repl
-    if (string_eq(args->get(0), "-repl"))
+    if (string_eq(list_get(args, 0), "-repl"))
         return run_repl();
 
     // Start evaluation loop
-    if (string_eq(args->get(0), "-loop")) {
+    if (string_eq(list_get(args, 0), "-loop")) {
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
 
+        #if 0
         if (has_static_errors(&branch)) {
             print_static_errors_formatted(&branch, std::cout);
             return -1;
         }
+        #endif
 
         EvalContext context;
 
@@ -191,19 +195,51 @@ int run_command_line(List* args)
         }
     }
 
+    if (string_eq(list_get(args, 0), "-call")) {
+        Branch* branch = create_branch(kernel());
+        load_script(branch, as_cstring(list_get(args, 1)));
+        set_branch_in_progress(branch, false);
+
+        caFunction* func = circ_find_function(branch, as_cstring(list_get(args, 2)));
+
+        if (func == NULL) {
+            std::cout << "Couldn't find function: " << as_cstring(list_get(args, 2)) << std::endl;
+            return -1;
+        }
+
+        Value inputs;
+        set_list(&inputs, 0);
+
+        for (int i=3; i < circ_count(args); i++) {
+            circ_parse_string(as_cstring(list_get(args, i)), circ_append(&inputs));
+        }
+
+        caStack* stack = circ_alloc_stack();
+        circ_run_function(stack, func, &inputs);
+
+        // Print outputs
+        for (int i=0; i < circ_count(&inputs); i++) {
+            std::cout << to_string(list_get(&inputs, i)) << std::endl;
+        }
+        
+        circ_dealloc_stack(stack);
+    }
+
     // Start debugger repl
-    if (string_eq(args->get(0), "-d"))
-        return run_debugger_repl(as_cstring(args->get(1)));
+    if (string_eq(list_get(args, 0), "-d"))
+        return run_debugger_repl(as_cstring(list_get(args, 1)));
 
     // Generate cpp headers
-    if (string_eq(args->get(0), "-gh")) {
+    if (string_eq(list_get(args, 0), "-gh")) {
         Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
+        load_script(&branch, as_cstring(list_get(args, 1)));
 
+#if 0
         if (has_static_errors(&branch)) {
             print_static_errors_formatted(&branch, std::cout);
             return 1;
         }
+#endif
 
         std::cout << generate_cpp_headers(&branch);
 
@@ -211,29 +247,29 @@ int run_command_line(List* args)
     }
 
     // Run file checker
-    if (string_eq(args->get(0), "-check"))
-        return run_file_checker(as_cstring(args->get(1)));
+    if (string_eq(list_get(args, 0), "-check"))
+        return run_file_checker(as_cstring(list_get(args, 1)));
 
     // Export parsed information
-    if (string_eq(args->get(0), "-export")) {
+    if (string_eq(list_get(args, 0), "-export")) {
         const char* filename = "";
         const char* format = "";
-        if (args->length() >= 2)
-            format = as_cstring(args->get(1));
-        if (args->length() >= 3)
-            filename = as_cstring(args->get(2));
+        if (list_length(args) >= 2)
+            format = as_cstring(list_get(args, 1));
+        if (list_length(args) >= 3)
+            filename = as_cstring(list_get(args, 2));
         return run_exporting_parser(format, filename);
     }
 
     // Build tool
-    if (string_eq(args->get(0), "-build")) {
+    if (string_eq(list_get(args, 0), "-build")) {
         return run_build_tool(args);
     }
 
     // Stress test parser
-    if (string_eq(args->get(0), "-parse100")) {
+    if (string_eq(list_get(args, 0), "-parse100")) {
 
-        const char* filename = as_cstring(args->get(1));
+        const char* filename = as_cstring(list_get(args, 1));
 
         for (int i=0; i < 100; i++) {
             Branch branch;
@@ -242,9 +278,9 @@ int run_command_line(List* args)
         }
         return true;
     }
-    if (string_eq(args->get(0), "-parse1000")) {
+    if (string_eq(list_get(args, 0), "-parse1000")) {
 
-        const char* filename = as_cstring(args->get(1));
+        const char* filename = as_cstring(list_get(args, 1));
 
         for (int i=0; i < 1000; i++) {
             Branch branch;
@@ -255,7 +291,7 @@ int run_command_line(List* args)
     }
 
     // C++ gen
-    if (string_eq(args->get(0), "-cppgen")) {
+    if (string_eq(list_get(args, 0), "-cppgen")) {
         Value remainingArgs;
         list_slice(args, 1, -1, &remainingArgs);
         run_generate_cpp(&remainingArgs);
@@ -263,31 +299,31 @@ int run_command_line(List* args)
     }
 
     // Command reader (from stdin)
-    if (string_eq(args->get(0), "-run-stdin")) {
+    if (string_eq(list_get(args, 0), "-run-stdin")) {
         run_commands_from_stdin();
         return 0;
     }
 
     // Reproduce source text
-    if (string_eq(args->get(0), "-source-repro")) {
+    if (string_eq(list_get(args, 0), "-source-repro")) {
         Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
+        load_script(&branch, as_cstring(list_get(args, 1)));
         std::cout << get_branch_source_text(&branch);
         return 0;
     }
 
     // Rewrite source, this is useful for upgrading old source
-    if (string_eq(args->get(0), "-rewrite-source")) {
+    if (string_eq(list_get(args, 0), "-rewrite-source")) {
         Branch branch;
-        load_script(&branch, as_cstring(args->get(1)));
+        load_script(&branch, as_cstring(list_get(args, 1)));
         std::string contents = get_branch_source_text(&branch);
-        circ_write_text_file(as_cstring(args->get(1)), contents.c_str());
+        circ_write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
 
     // Default behavior with no flags: load args[0] as a script and run it.
     Branch* main_branch = create_branch(kernel());
-    load_script(main_branch, as_cstring(args->get(0)));
+    load_script(main_branch, as_cstring(list_get(args, 0)));
     set_branch_in_progress(main_branch, false);
 
     if (printRawWithProps)
@@ -295,11 +331,13 @@ int run_command_line(List* args)
     else if (printRaw)
         print_branch(std::cout, main_branch);
 
+#if 0
     // Don't show static errors if we're only printing source
     if (has_static_errors(main_branch)) {
         print_static_errors_formatted(main_branch, std::cout);
         return 1;
     }
+#endif
 
     if (dontRunScript)
         return 0;
@@ -309,13 +347,10 @@ int run_command_line(List* args)
     if (printTrace)
         context.trace = true;
 
-    // Push any extra command-line arguments to context.argumentList
-    List* inputs = set_list(context.argumentList.append());
 
-    for (int i=1; i < args->length(); i++)
-        copy(args->get(i), inputs->append());
+    push_frame(&context, main_branch);
 
-    evaluate_branch(&context, main_branch);
+    run_interpreter(&context);
 
     if (printState)
         std::cout << context.state.toString() << std::endl;
@@ -332,14 +367,12 @@ int run_command_line(List* args)
 
 } // namespace circa
 
-using namespace circa;
-
 EXPORT int circ_run_command_line(int argc, const char* args[])
 {
-    List args_v;
-    set_list(&args_v, 0);
+    circa::Value args_v;
+    circ_set_list(&args_v, 0);
     for (int i=1; i < argc; i++)
-        set_string(list_append(&args_v), args[i]);
+        circ_set_string(circ_append(&args_v), args[i]);
 
     return circa::run_command_line(&args_v);
 }

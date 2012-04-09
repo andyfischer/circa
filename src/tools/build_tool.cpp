@@ -9,11 +9,11 @@
 
 namespace circa {
 
-int run_build_tool(List* args)
+int run_build_tool(caValue* args)
 {
-    for (int i=0; i < args->length(); i++) {
+    for (int i=0; i < list_length(args); i++) {
 
-        const char* filename = as_cstring(args->get(i));
+        const char* filename = as_cstring(list_get(args, i));
     
         List buildArgs;
         set_string(buildArgs.append(), filename);

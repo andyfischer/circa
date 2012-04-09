@@ -171,6 +171,21 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* input
     push_frame(context, branch, &registers);
 }
 
+void fetch_stack_outputs(EvalContext* context, caValue* outputs)
+{
+    Frame* top = top_frame(context);
+
+    set_list(outputs, 0);
+
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(top->branch, i);
+        if (placeholder == NULL)
+            break;
+
+        copy(top->registers[placeholder->index], circ_append(outputs));
+    }
+}
+
 void finish_frame(EvalContext* context)
 {
     Frame* top = top_frame(context);
@@ -283,8 +298,6 @@ void evaluate_branch(EvalContext* context, Branch* branch)
 
 void evaluate_save_locals(EvalContext* context, Branch* branch)
 {
-    set_branch_in_progress(branch, false);
-
     // Top-level call
     push_frame(context, branch);
 
@@ -305,6 +318,37 @@ void evaluate_branch(Branch* branch)
 {
     EvalContext context;
     evaluate_save_locals(&context, branch);
+}
+
+void insert_explicit_inputs(EvalContext* context, caValue* inputs)
+{
+    Frame* top = top_frame(context);
+
+    int nextInput = 0;
+    for (int i=0; i < top->branch->length(); i++) {
+        if (nextInput > circ_count(inputs))
+            break;
+
+        Term* term = top->branch->get(i);
+        if (term->function != FUNCS.input_explicit)
+            continue;
+
+        copy(circ_index(inputs, nextInput), top->registers[i]);
+        nextInput++;
+    }
+}
+
+void extract_explicit_outputs(EvalContext* context, caValue* inputs)
+{
+    Frame* top = top_frame(context);
+
+    for (int i=0; i < top->branch->length(); i++) {
+        Term* term = top->branch->get(i);
+        if (term->function != FUNCS.output_explicit)
+            continue;
+
+        copy(top->registers[i], list_append(inputs));
+    }
 }
 
 caValue* get_input(EvalContext* context, Term* term)
@@ -580,6 +624,9 @@ extern "C" void circ_run_function(caStack* stack, caFunction* func, caValue* inp
     insert_top_level_state(context, branch);
 
     run_interpreter(context);
+
+    // Save outputs to the user's list.
+    fetch_stack_outputs((EvalContext*) stack, inputs);
 
     if (!error_occurred(context)) {
         save_top_level_state(context, branch);

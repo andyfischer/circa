@@ -304,6 +304,11 @@ int list_length(caValue* value)
     return s->count;
 }
 
+bool list_empty(caValue* value)
+{
+    return list_length(value) == 0;
+}
+
 void list_slice(caValue* original, int start, int end, caValue* result)
 {
     if (end < 0)

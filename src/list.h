@@ -60,6 +60,8 @@ caValue* list_get_from_end(caValue* value, int index);
 // Return the number of elements in the list.
 int list_length(caValue* value);
 
+bool list_empty(caValue* value);
+
 // Appends an element to the list and returns it. This function calls
 // list_touch, so the returned value is safe to modify.
 caValue* list_append(caValue* list);

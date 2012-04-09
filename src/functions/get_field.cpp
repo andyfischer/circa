@@ -12,6 +12,11 @@ namespace get_field_function {
         for (int nameIndex=1; nameIndex < NUM_INPUTS; nameIndex++) {
             std::string const& name = INPUT(nameIndex)->asString();
 
+            if (!is_list_based_type(head->value_type)) {
+                std::string msg = "get_field failed, not a compound type: " + head->toString();
+                return RAISE_ERROR(msg.c_str());
+            }
+
             int fieldIndex = list_find_field_index_by_name(head->value_type, name.c_str());
 
             if (fieldIndex == -1) {

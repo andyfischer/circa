@@ -145,5 +145,5 @@ def write_bindings(Branch branch) -> String
 
     return writer.toString
 
-bindings = load_script('canvas/qt.ca')
-write_bindings(bindings) -> print
+filename = input()
+output(write_bindings(filename))

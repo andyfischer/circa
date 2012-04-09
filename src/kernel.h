@@ -26,7 +26,6 @@ extern Term* REF_FUNC;
 extern Term* SWITCH_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* STATIC_ERROR_FUNC;
-extern Term* TYPE_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
 extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
@@ -77,6 +76,7 @@ struct BuiltinFuncs {
     Term* imported_file;
     Term* include_func;
     Term* input;
+    Term* input_explicit;
     Term* inputs_fit_function;
     Term* lambda;
     Term* length;
@@ -90,6 +90,7 @@ struct BuiltinFuncs {
     Term* neg;
     Term* not_func;
     Term* output;
+    Term* output_explicit;
     Term* overload_error_no_match;
     Term* pack_state;
     Term* pack_state_to_list;
@@ -99,6 +100,7 @@ struct BuiltinFuncs {
     Term* set_index;
     Term* set_field;
     Term* sub;
+    Term* type;
     Term* unbounded_loop;
     Term* unbounded_loop_finish;
     Term* unknown_function;

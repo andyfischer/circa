@@ -2,6 +2,6 @@
 
 namespace circa {
 
-int run_build_tool(List* args);
+int run_build_tool(caValue* args);
 
 }

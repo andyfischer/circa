@@ -64,11 +64,26 @@ void eval_context_setup_type(Type* type);
 // Stack frames
 Frame* get_frame(EvalContext* context, int depth);
 Frame* get_frame_from_bottom(EvalContext* context, int index);
+
+// Push a new frame with the given registers.
 Frame* push_frame(EvalContext* context, Branch* branch, List* registers);
+
 Frame* push_frame(EvalContext* context, Branch* branch);
 void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* inputs);
+
+// Pop the topmost frame and throw it away. This call doesn't preserve the frame's
+// outputs or update PC. You might want to call finish_frame() instead of this.
 void pop_frame(EvalContext* context);
+
+// Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
+// - you call it when the branch is finished evaluating. But instead of passing outputs
+// to the parent frame (like finish_frame does), this copies them to your list.
+void fetch_stack_outputs(EvalContext* context, caValue* outputs);
+
+// Pop the topmost frame and copy all outputs to the next frame on the stack. This is the
+// standard way to finish a frame, such as when 'return' is called.
 void finish_frame(EvalContext* context);
+
 Frame* top_frame(EvalContext* context);
 Branch* top_branch(EvalContext* context);
 void reset_stack(EvalContext* context);
@@ -94,6 +109,9 @@ void evaluate_minimum(EvalContext* context, Term* term, caValue* result);
 caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
 caValue* evaluate(Branch* branch, Term* function, List* inputs);
 caValue* evaluate(Term* function, List* inputs);
+
+void insert_explicit_inputs(EvalContext* context, caValue* inputs);
+void extract_explicit_outputs(EvalContext* context, caValue* inputs);
 
 caValue* get_input(EvalContext* context, Term* term);
 caValue* get_input(EvalContext* context, int index);

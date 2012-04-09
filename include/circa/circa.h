@@ -83,8 +83,9 @@ void circ_dealloc_stack(caStack* stack);
 // Execute the named module.
 void circ_run_module(caStack* stack, const char* moduleName);
 
-// Execute the given function with the given inputs. 'Inputs' must either be a list,
-// or NULL if there are no inputs.
+// Execute the given function with the given inputs. 'inputs' must be a list, these
+// values are used as the function's arguments. The function's outputs are then written
+// back to your 'inputs' list.
 void circ_run_function(caStack* stack, caFunction* function, caValue* inputs);
 
 // Signal that an error has occurred.

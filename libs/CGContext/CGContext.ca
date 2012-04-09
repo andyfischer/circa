@@ -1,0 +1,25 @@
+
+
+namespace OriginalFuncs
+    def CGContextSetStrokeColorWithColor(CGContextRef, Color color)
+    def CGContextMoveToPoint(CGContextRef, float x, float y)
+    def CGContextAddLineToPoint(CGContextRef, float x, float y)
+    def CGContextStrokePath(CGContextRef)
+    def CGContextFillPath(CGContextRef)
+    def CGContextFillRect(CGContextRef, Rect r)
+    def CGContextSetFillColorWithColor(CGContextRef, Color color)
+    def CGContextSaveGState(CGContextRef)
+    def CGContextRestoreGState(CGContextRef)
+
+def generate()
+    original = branch_ref(OriginalFuncs)
+
+    for func in original.functions
+        @func -> Function
+        print(func.name)
+
+
+
+
+
+generate()

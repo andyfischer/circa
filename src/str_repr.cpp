@@ -122,3 +122,4 @@ extern "C" void circ_to_string_repr(caValue* value, caValue* out)
         string_append(out, name_to_string(value->value_type->name));
     }
 }
+
