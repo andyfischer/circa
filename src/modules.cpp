@@ -34,35 +34,28 @@ void modules_add_search_path(const char* str)
     set_string(g_moduleSearchPaths.append(), str);
 }
 
-Term* find_loaded_module(Name name)
+Term* find_loaded_module(const char* name)
 {
-    String nameStr;
-    name_to_string(name, &nameStr);
-
     for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (term->function == FUNCS.imported_file && term->name == as_string(&nameStr))
+        if (term->function == FUNCS.imported_file && term->name == name)
             return term;
     }
     return NULL;
 }
 
-Term* load_module_from_file(Name module_name, const char* filename)
+Term* load_module_from_file(const char* module_name, const char* filename)
 {
-    String name;
-    name_to_string(module_name, &name);
-
-    Term* import = apply(kernel(), FUNCS.imported_file, TermList(),
-        as_cstring(&name));
+    Term* import = apply(kernel(), FUNCS.imported_file, TermList(), module_name);
     load_script(nested_contents(import), filename);
 
     return import;
 }
 
-static bool find_module_file(Name module_name, String* filenameOut)
+static bool find_module_file(const char* module_name, String* filenameOut)
 {
     String module;
-    name_to_string(module_name, &module);
+    set_string(&module, module_name);
 
     int count = list_length(&g_moduleSearchPaths);
     for (int i=0; i < count; i++) {
@@ -95,7 +88,7 @@ static bool find_module_file(Name module_name, String* filenameOut)
     return false;
 }
 
-caName load_module(caName module_name, Term* loadCall)
+caName load_module(const char* module_name, Term* loadCall)
 {
     Term* existing = find_loaded_module(module_name);
     if (existing != NULL)

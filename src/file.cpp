@@ -26,12 +26,12 @@ static void file_init_globals()
     set_list(g_fileServices, 0);
 
     g_fileServiceType = create_type();
-    g_fileServiceType->name = circ_name("FileService");
+    g_fileServiceType->name = name_from_string("FileService");
 }
 
 // Find the installed index of the given source name. Higher numbers take precedence.
 // Returns -1 if no source with that name is installed.
-static int find_index_of_source(caName sourceName)
+static int find_index_of_source(Name sourceName)
 {
     for (int i=0; i < list_length(g_fileServices); i++) {
         caFileSource* source = (caFileSource*) get_pointer(list_get(g_fileServices, i));

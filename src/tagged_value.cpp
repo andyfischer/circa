@@ -450,13 +450,6 @@ bool equals_int(caValue* value, int i)
     return as_int(value) == i;
 }
 
-bool equals_name(caValue* value, Name name)
-{
-    if (!is_name(value))
-        return false;
-    return as_name(value) == name;
-}
-
 void set_bool(caValue* value, bool b)
 {
     change_type(value, &BOOL_T);

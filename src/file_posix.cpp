@@ -12,6 +12,8 @@
 
 #include "circa/file.h"
 
+#include "names.h"
+
 extern "C" {
 
 static int get_modified_time2(const char* filename)
@@ -85,7 +87,7 @@ extern "C" void circ_use_standard_filesystem()
     memset(&source, 0, sizeof(source));
     source.openFile = open_file;
     source.updateFile = update_file;
-    source.name = circ_name("builtin:PosixFileSource");
+    source.name = circa::name_from_string("builtin:PosixFileSource");
 
     circ_install_file_source(&source);
 }

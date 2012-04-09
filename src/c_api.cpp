@@ -165,23 +165,14 @@ void circ_add_module_search_path(const char* path)
     modules_add_search_path(path);
 }
 
-caBranch* circ_load_module_from_file(caName module_name, const char* filename)
+caBranch* circ_load_module_from_file(const char* module_name, const char* filename)
 {
     return (caBranch*) nested_contents(load_module_from_file(module_name, filename));
 }
 
-caName circ_name(const char* str)
-{
-    return name_from_string(str);
-}
-const char* circ_name_string(caName name)
-{
-    return name_to_string(name);
-}
-
 caTerm* circ_find_term(caBranch* branch, const char* name)
 {
-    return (caTerm*) find_name((Branch*) branch, circ_name(name));
+    return (caTerm*) find_name((Branch*) branch, name);
 }
 caFunction* circ_find_function(caBranch* branch, const char* name)
 {
@@ -227,7 +218,7 @@ void circ_dealloc_stack(caStack* stack)
     delete (EvalContext*) stack;
 }
 
-void circ_run_module(caStack* stack, caName moduleName)
+void circ_run_module(caStack* stack, const char* moduleName)
 {
     EvalContext* context = (EvalContext*) stack;
     Branch* branch = nested_contents(get_global(moduleName));

@@ -1189,7 +1189,7 @@ ParseResult import_statement(Branch* branch, TokenStream& tokens, ParserCxt* con
     Term* result = apply(branch, FUNCS.import, TermList());
     result->setStringProp("module", name_to_string(module));
 
-    load_module(module, result);
+    load_module(name_to_string(module), result);
 
     return ParseResult(result);
 }

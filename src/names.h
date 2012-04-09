@@ -4,7 +4,7 @@
 
 namespace circa {
 
-typedef caName Name;
+typedef int Name;
 
 Term* find_name(Branch* branch, Name name);
 Term* find_name(Branch* branch, const char* name);

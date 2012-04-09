@@ -182,7 +182,7 @@ void rewrite_branch(Branch* branch, caValue* contents, caValue* reply)
 
 void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
 {
-    caName name = name_from_string(branchName);
+    Name name = name_from_string(branchName);
 
     Term* term = get_global(name);
 

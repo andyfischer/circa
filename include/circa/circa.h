@@ -13,8 +13,6 @@ extern "C" {
 
 // -- Circa Types --
 
-// a Name is an interned string that is referenced by integer.
-typedef int caName;
 
 // a Stack holds the interpreter's current state, including a list of frames (activation records)
 typedef struct caStack caStack;
@@ -40,6 +38,8 @@ typedef struct caType caType;
 // (stored as a Branch), and various other metadata. Each Function has an EvaluateFunc which
 // is triggered when the function is called.
 typedef struct caFunction caFunction;
+
+typedef int caName;
 
 // EvaluateFunc is the signature for a C evaluation function. The function will access the stack
 // to read inputs (if any), possibly perform some action, and write output values (if any) back
@@ -70,14 +70,7 @@ void circ_add_module_search_path(const char* path);
 int circ_run_command_line(int argc, const char* args[]);
 
 // Load a module by opening the given filename as a source file.
-caBranch* circ_load_module_from_file(caName module_name, const char* filename);
-
-// Convert a string to a Circa name (an interned string that is referenced by integer).
-// If the name doesn't already exist, it will be created.
-caName circ_name(const char* str);
-
-// Retrieve the string for a name.
-const char* circ_name_string(caName name);
+caBranch* circ_load_module_from_file(const char* module_name, const char* filename);
 
 // -- Controlling the Interpreter --
 
@@ -88,7 +81,7 @@ caStack* circ_alloc_stack();
 void circ_dealloc_stack(caStack* stack);
 
 // Execute the named module.
-void circ_run_module(caStack* stack, caName moduleName);
+void circ_run_module(caStack* stack, const char* moduleName);
 
 // Execute the given function with the given inputs. 'Inputs' must either be a list,
 // or NULL if there are no inputs.
@@ -172,7 +165,6 @@ caBranch*   circ_branch(caValue* value);
 float       circ_float(caValue* value);
 caFunction* circ_function(caValue* value);
 int         circ_int(caValue* value);
-caName      circ_name(caValue* value);
 const char* circ_string(caValue* value);
 caType*     circ_type(caValue* value);
 void        circ_vec2(caValue* vec2, float* xOut, float* yOut);
@@ -219,7 +211,7 @@ void circ_set_vec4(caValue* container, float x, float y, float z, float w);
 // here.
 void circ_set_string_size(caValue* container, const char* str, int size);
 
-// Append a value to a string
+// Append to a string
 void circ_string_append(caValue* container, const char* str);
 
 // Initialize a list. The container will have length 'numElements' and each element will
