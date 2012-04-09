@@ -148,48 +148,48 @@ Type* output_placeholder_specializeType(Term* caller)
 
 CA_FUNCTION(file__exists)
 {
-    set_bool(OUTPUT, circ_file_exists(STRING_INPUT(0)));
+    set_bool(OUTPUT, circa_file_exists(STRING_INPUT(0)));
 }
 CA_FUNCTION(file__version)
 {
-    set_int(OUTPUT, circ_file_get_version(STRING_INPUT(0)));
+    set_int(OUTPUT, circa_file_get_version(STRING_INPUT(0)));
 }
 CA_FUNCTION(file__read_text)
 {
-    set_string(OUTPUT, circ_read_file(STRING_INPUT(0)));
+    set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
 }
 
 CA_FUNCTION(file__fetch_record)
 {
     const char* filename = STRING_INPUT(0);
     Name name = INT_INPUT(1);
-    circ_create_default_output((caStack*) CONTEXT, 0);
-    set_pointer(OUTPUT, circ_fetch_file_record(filename, name));
+    circa_create_default_output((caStack*) CONTEXT, 0);
+    set_pointer(OUTPUT, circa_fetch_file_record(filename, name));
 }
 
 CA_FUNCTION(from_string)
 {
-    circ_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
+    circa_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
 }
 
 CA_FUNCTION(to_string_repr)
 {
-    circ_to_string_repr(INPUT(0), OUTPUT);
+    circa_to_string_repr(INPUT(0), OUTPUT);
 }
 
 void call_func(caStack* stack)
 {
-    caValue* callable = circ_input(stack, 0);
-    caValue* inputs = circ_input(stack, 1);
+    caValue* callable = circa_input(stack, 0);
+    caValue* inputs = circa_input(stack, 1);
 
     caBranch* branch;
 
-    if (circ_is_branch(callable))
-        branch = circ_branch(callable);
-    else if (circ_is_function(callable))
-        branch = circ_function_contents(circ_function(callable));
+    if (circa_is_branch(callable))
+        branch = circa_branch(callable);
+    else if (circa_is_function(callable))
+        branch = circa_function_contents(circa_function(callable));
     else {
-        circ_raise_error(stack, "Input 0 is not callable");
+        circa_raise_error(stack, "Input 0 is not callable");
         return;
     }
 
@@ -373,15 +373,15 @@ CA_FUNCTION(Branch__file_signature)
 
 void Branch__statements(caStack* stack)
 {
-    Branch* branch = (Branch*) circ_branch(circ_input(stack, 0));
+    Branch* branch = (Branch*) circa_branch(circa_input(stack, 0));
 
-    caValue* out = circ_output(stack, 0);
+    caValue* out = circa_output(stack, 0);
 
-    circ_set_list(out, 0);
+    circa_set_list(out, 0);
 
     for (int i=0; i < branch->length(); i++)
         if (is_statement(branch->get(i)))
-            circ_set_term(circ_append(out), (caTerm*) branch->get(i));
+            circa_set_term(circa_append(out), (caTerm*) branch->get(i));
 }
 
 CA_FUNCTION(Function__name)
@@ -1117,7 +1117,7 @@ void install_standard_library(Branch* kernel)
     FUNCS.output_explicit = kernel->get("input");
 }
 
-EXPORT void circ_initialize()
+EXPORT void circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
@@ -1141,7 +1141,7 @@ EXPORT void circ_initialize()
 
 #if CIRCA_ENABLE_FILESYSTEM
     // Use standard filesystem by default
-    circ_use_standard_filesystem();
+    circa_use_standard_filesystem();
 #endif
 
     // Load library paths from CIRCA_LIB_PATH
@@ -1162,7 +1162,7 @@ EXPORT void circ_initialize()
     }
 }
 
-EXPORT void circ_shutdown()
+EXPORT void circa_shutdown()
 {
     SHUTTING_DOWN = true;
 

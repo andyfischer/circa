@@ -9,7 +9,7 @@ namespace rpath_function {
 
     CA_FUNCTION(rpath)
     {
-        circ_get_path_relative_to_source((caTerm*) CALLER, INPUT(0), OUTPUT);
+        circa_get_path_relative_to_source((caTerm*) CALLER, INPUT(0), OUTPUT);
     }
 
     void setup(Branch* kernel)

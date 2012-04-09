@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "circ_internal.h"
+#include "circa_internal.h"
 
 namespace circa {
 namespace utils_tests {

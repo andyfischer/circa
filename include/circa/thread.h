@@ -15,11 +15,11 @@ typedef void (*caThreadMainFunc)(void* data);
 
 typedef struct caMutex caMutex;
 
-void circ_spawn_thread(caThreadMainFunc func, void* data);
-caMutex* circ_create_mutex();
-void circ_destroy_mutex(caMutex*);
-void circ_thread_mutex_lock(caMutex* mutex);
-void circ_thread_mutex_unlock(caMutex* mutex);
+void circa_spawn_thread(caThreadMainFunc func, void* data);
+caMutex* circa_create_mutex();
+void circa_destroy_mutex(caMutex*);
+void circa_thread_mutex_lock(caMutex* mutex);
+void circa_thread_mutex_unlock(caMutex* mutex);
 
 #ifdef __cplusplus
 } // extern "C"

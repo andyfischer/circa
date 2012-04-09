@@ -200,7 +200,7 @@ int run_command_line(caValue* args)
         load_script(branch, as_cstring(list_get(args, 1)));
         set_branch_in_progress(branch, false);
 
-        caFunction* func = circ_find_function(branch, as_cstring(list_get(args, 2)));
+        caFunction* func = circa_find_function(branch, as_cstring(list_get(args, 2)));
 
         if (func == NULL) {
             std::cout << "Couldn't find function: " << as_cstring(list_get(args, 2)) << std::endl;
@@ -210,19 +210,19 @@ int run_command_line(caValue* args)
         Value inputs;
         set_list(&inputs, 0);
 
-        for (int i=3; i < circ_count(args); i++) {
-            circ_parse_string(as_cstring(list_get(args, i)), circ_append(&inputs));
+        for (int i=3; i < circa_count(args); i++) {
+            circa_parse_string(as_cstring(list_get(args, i)), circa_append(&inputs));
         }
 
-        caStack* stack = circ_alloc_stack();
-        circ_run_function(stack, func, &inputs);
+        caStack* stack = circa_alloc_stack();
+        circa_run_function(stack, func, &inputs);
 
         // Print outputs
-        for (int i=0; i < circ_count(&inputs); i++) {
+        for (int i=0; i < circa_count(&inputs); i++) {
             std::cout << to_string(list_get(&inputs, i)) << std::endl;
         }
         
-        circ_dealloc_stack(stack);
+        circa_dealloc_stack(stack);
     }
 
     // Start debugger repl
@@ -317,7 +317,7 @@ int run_command_line(caValue* args)
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
         std::string contents = get_branch_source_text(&branch);
-        circ_write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
+        circa_write_text_file(as_cstring(list_get(args, 1)), contents.c_str());
         return 0;
     }
 
@@ -367,12 +367,12 @@ int run_command_line(caValue* args)
 
 } // namespace circa
 
-EXPORT int circ_run_command_line(int argc, const char* args[])
+EXPORT int circa_run_command_line(int argc, const char* args[])
 {
     circa::Value args_v;
-    circ_set_list(&args_v, 0);
+    circa_set_list(&args_v, 0);
     for (int i=1; i < argc; i++)
-        circ_set_string(circ_append(&args_v), args[i]);
+        circa_set_string(circa_append(&args_v), args[i]);
 
     return circa::run_command_line(&args_v);
 }

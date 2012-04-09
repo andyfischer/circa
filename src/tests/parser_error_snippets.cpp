@@ -9,7 +9,7 @@
 // (1) is a pretty common bug, since the parsing code makes liberal use of ca_assert()
 //
 
-#include <circ_internal.h>
+#include <circa_internal.h>
 
 namespace circa {
 namespace parser_error_snippets {

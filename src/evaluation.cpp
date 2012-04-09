@@ -182,7 +182,7 @@ void fetch_stack_outputs(EvalContext* context, caValue* outputs)
         if (placeholder == NULL)
             break;
 
-        copy(top->registers[placeholder->index], circ_append(outputs));
+        copy(top->registers[placeholder->index], circa_append(outputs));
     }
 }
 
@@ -326,14 +326,14 @@ void insert_explicit_inputs(EvalContext* context, caValue* inputs)
 
     int nextInput = 0;
     for (int i=0; i < top->branch->length(); i++) {
-        if (nextInput > circ_count(inputs))
+        if (nextInput > circa_count(inputs))
             break;
 
         Term* term = top->branch->get(i);
         if (term->function != FUNCS.input_explicit)
             continue;
 
-        copy(circ_index(inputs, nextInput), top->registers[i]);
+        copy(circa_index(inputs, nextInput), top->registers[i]);
         nextInput++;
     }
 }
@@ -611,7 +611,7 @@ caValue* evaluate(Term* function, List* inputs)
     return evaluate(&scratch, function, inputs);
 }
 
-extern "C" void circ_run_function(caStack* stack, caFunction* func, caValue* inputs)
+extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Branch* branch = function_contents((Function*) func);
     EvalContext* context = (EvalContext*) stack;

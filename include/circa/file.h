@@ -46,7 +46,7 @@ typedef struct caFileSource {
 } caFileSource;
 
 // Install a file source. This function will make its own copy of 'source'.
-void circ_install_file_source(caFileSource* source);
+void circa_install_file_source(caFileSource* source);
 
 // There is one "file record" object for every file that is loaded. The record stores
 // the file's current version (which callers can keep track of if they are interested
@@ -71,17 +71,17 @@ typedef struct caFileRecord {
 // If the provided source doesn't take precedence over the one that the record is
 // currently using, then this function returns NULL.
 //
-caFileRecord* circ_fetch_file_record(const char* filename, caName source);
+caFileRecord* circa_fetch_file_record(const char* filename, caName source);
 
 // Find the file record with the given filename, returns NULL if the record does not
 // currently exist.
-caFileRecord* circ_get_file_record(const char* filename);
+caFileRecord* circa_get_file_record(const char* filename);
 
-const char* circ_read_file(const char* filename);
+const char* circa_read_file(const char* filename);
 
-bool circ_file_exists(const char* filename);
+bool circa_file_exists(const char* filename);
 
-int circ_file_get_version(const char* filename);
+int circa_file_get_version(const char* filename);
 
 #ifdef __cplusplus
 } // extern "C"

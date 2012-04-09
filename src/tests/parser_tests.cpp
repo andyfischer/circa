@@ -4,7 +4,7 @@
 
 #include "common_headers.h"
 
-#include "circ_internal.h"
+#include "circa_internal.h"
 
 namespace circa {
 namespace parser_tests {

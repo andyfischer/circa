@@ -262,32 +262,32 @@ Term* branch_add_pack_state(Branch* branch)
 // Unpack a state value. Input 1 is the "identifying term" which is used as a key.
 void unpack_state(caStack* stack)
 {
-    caValue* container = circ_input(stack, 0);
-    Term* identifyingTerm = (Term*) circ_input_term(stack, 1);
+    caValue* container = circa_input(stack, 0);
+    Term* identifyingTerm = (Term*) circa_input_term(stack, 1);
 
     caValue* element = get_field(container, unique_name(identifyingTerm));
 
     if (element == NULL) {
-        set_null(circ_output(stack, 0));
+        set_null(circa_output(stack, 0));
     } else {
-        copy(element, circ_output(stack, 0));
+        copy(element, circa_output(stack, 0));
     }
 }
 
 // Pack a state value. Each input will correspond with a slot in the branch's state type.
 void pack_state(caStack* stack)
 {
-    Term* caller = (Term*) circ_current_term(stack);
+    Term* caller = (Term*) circa_current_term(stack);
     Branch* branch = caller->owningBranch;
 
     if (branch->stateType == NULL)
         return;
 
-    caValue* output = circ_output(stack, 0);
+    caValue* output = circa_output(stack, 0);
     create(branch->stateType, output);
 
     for (int i=0; i < caller->numInputs(); i++) {
-        caValue* input = circ_input(stack, i);
+        caValue* input = circa_input(stack, i);
         caValue* dest = list_get(output, i);
         if (input == NULL)
             set_null(dest);

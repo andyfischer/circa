@@ -61,27 +61,27 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         if t == String
             writer.write('const char* ')
             writer.write(name)
-            writer.write(concat(' = circ_string(circ_input(stack, ' index '))'))
+            writer.write(concat(' = circa_string(circa_input(stack, ' index '))'))
             writer.writeln(';')
         elif t == int
             writer.write('int ')
             writer.write(name)
-            writer.write(concat(' = circ_int(circ_input(stack, ' index '))'))
+            writer.write(concat(' = circa_int(circa_input(stack, ' index '))'))
             writer.writeln(';')
         elif t == number
             writer.write('float ')
             writer.write(name)
-            writer.write(concat(' = circ_float(circ_input(stack, ' index '))'))
+            writer.write(concat(' = circa_float(circa_input(stack, ' index '))'))
             writer.writeln(';')
         elif t.is_handle
             writer.write(concat(t.name, '* ', name))
-            writer.write(concat(' = (', t.name, '*) circ_get_pointer(circ_handle_get_value('))
-            writer.write(concat('circ_input(stack, ' index ')))'))
+            writer.write(concat(' = (', t.name, '*) circa_get_pointer(circa_handle_get_value('))
+            writer.write(concat('circa_input(stack, ' index ')))'))
             writer.writeln(';')
         else
             writer.write('caValue* ')
             writer.write(name)
-            writer.write(concat(' = circ_input(stack, ' index ')'))
+            writer.write(concat(' = circa_input(stack, ' index ')'))
             writer.writeln(';')
 
         index += 1
@@ -99,16 +99,16 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
             name = concat('output_' index)
 
         if input.get_type.is_handle
-            writer.write(concat('caValue* out = circ_create_default_output(stack, '
+            writer.write(concat('caValue* out = circa_create_default_output(stack, '
                 index ')'))
             writer.writeln(';')
-            writer.write(concat('circ_handle_set_object(out, output, '
+            writer.write(concat('circa_handle_set_object(out, output, '
                 input.get_type.name 'Release)'))
             writer.writeln(';')
         else
             writer.write('caValue* ')
             writer.write(name)
-            writer.write(concat(' = circ_output(stack, ' index ')'))
+            writer.write(concat(' = circa_output(stack, ' index ')'))
             writer.writeln(';')
 
         index += 1

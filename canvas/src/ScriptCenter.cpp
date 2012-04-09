@@ -12,25 +12,25 @@ ScriptCenter::ScriptCenter()
 
 void ScriptCenter::init()
 {
-    circ_initialize();
+    circa_initialize();
 
-    caBranch* qtModule = circ_load_module_from_file(circ_name("qt"), "ca/qt.ca");
+    caBranch* qtModule = circa_load_module_from_file(circa_name("qt"), "ca/qt.ca");
     qt_bindings_install(qtModule);
 
-    mainBranch = circ_load_module_from_file(circ_name("main"), "ca/main.ca");
+    mainBranch = circa_load_module_from_file(circa_name("main"), "ca/main.ca");
 
-    stack = circ_alloc_stack();
+    stack = circa_alloc_stack();
 }
 
 void ScriptCenter::call(const char* functionName, caValue* inputs)
 {
-    caFunction* func = circ_find_function(mainBranch, functionName);
+    caFunction* func = circa_find_function(mainBranch, functionName);
 
-    circ_run_function(stack, func, inputs);
+    circa_run_function(stack, func, inputs);
 
-    if (circ_has_error(stack)) {
-        circ_print_error_to_stdout(stack);
-        circ_clear_error(stack);
+    if (circa_has_error(stack)) {
+        circa_print_error_to_stdout(stack);
+        circa_clear_error(stack);
     }
 }
 

@@ -555,10 +555,10 @@ Name load_script(Branch* branch, const char* filename)
     List* fileOrigin = set_list(&branch->origin, 3);
     set_name(fileOrigin->get(0), name_File);
     set_string(fileOrigin->get(1), filename);
-    set_int(fileOrigin->get(2), circ_file_get_version(filename));
+    set_int(fileOrigin->get(2), circa_file_get_version(filename));
 
     // Read the text file
-    const char* contents = circ_read_file(filename);
+    const char* contents = circa_read_file(filename);
 
     if (contents == NULL) {
         Term* msg = create_string(branch, "file not found");
@@ -639,7 +639,7 @@ std::string get_source_file_location(Branch* branch)
         return "";
 
     caValue directory;
-    circ_get_directory_for_filename(sourceFilename, &directory);
+    circa_get_directory_for_filename(sourceFilename, &directory);
 
     return as_string(&directory);
 }
@@ -662,7 +662,7 @@ List* branch_get_file_origin(Branch* branch)
 
 bool check_and_update_file_origin(Branch* branch, const char* filename)
 {
-    int version = circ_file_get_version(filename);
+    int version = circa_file_get_version(filename);
 
     List* fileOrigin = branch_get_file_origin(branch);
 

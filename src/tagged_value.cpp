@@ -660,180 +660,180 @@ void cleanup_transient_value(caValue* value)
 
 extern "C" {
 
-bool circ_is_bool(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
-bool circ_is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
-bool circ_is_error(caValue* value) { return value->value_type == &ERROR_T; }
-bool circ_is_float(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
-bool circ_is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
-bool circ_is_int(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
-bool circ_is_list(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
-bool circ_is_name(caValue* value) { return value->value_type == &NAME_T; }
-bool circ_is_null(caValue* value)  { return value->value_type == &NULL_T; }
-bool circ_is_number(caValue* value) { return circ_is_int(value) || circ_is_float(value); }
-bool circ_is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
-bool circ_is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
+bool circa_is_bool(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_BOOL; }
+bool circa_is_branch(caValue* value) { return value->value_type == &BRANCH_T; }
+bool circa_is_error(caValue* value) { return value->value_type == &ERROR_T; }
+bool circa_is_float(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_FLOAT; }
+bool circa_is_function(caValue* value) { return value->value_type == &FUNCTION_T; }
+bool circa_is_int(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_INT; }
+bool circa_is_list(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_LIST; }
+bool circa_is_name(caValue* value) { return value->value_type == &NAME_T; }
+bool circa_is_null(caValue* value)  { return value->value_type == &NULL_T; }
+bool circa_is_number(caValue* value) { return circa_is_int(value) || circa_is_float(value); }
+bool circa_is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
+bool circa_is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
 
-bool circ_bool(caValue* value) {
-    ca_assert(circ_is_bool(value));
+bool circa_bool(caValue* value) {
+    ca_assert(circa_is_bool(value));
     return value->value_data.asbool;
 }
-caBranch* circ_branch(caValue* value) {
-    ca_assert(circ_is_branch(value));
+caBranch* circa_branch(caValue* value) {
+    ca_assert(circa_is_branch(value));
     return (caBranch*) value->value_data.ptr;
 }
-float circ_float(caValue* value) {
-    ca_assert(circ_is_float(value));
+float circa_float(caValue* value) {
+    ca_assert(circa_is_float(value));
     return value->value_data.asfloat;
 }
-caFunction* circ_function(caValue* value) {
-    ca_assert(circ_is_function(value));
+caFunction* circa_function(caValue* value) {
+    ca_assert(circa_is_function(value));
     return (caFunction*) value->value_data.ptr;
 }
-int circ_int(caValue* value) {
-    ca_assert(circ_is_int(value));
+int circa_int(caValue* value) {
+    ca_assert(circa_is_int(value));
     return value->value_data.asint;
 }
-const char* circ_string(caValue* value) {
-    ca_assert(circ_is_string(value));
+const char* circa_string(caValue* value) {
+    ca_assert(circa_is_string(value));
     return as_cstring(value);
 }
-caName circ_name(caValue* value) {
-    ca_assert(circ_is_name(value));
+caName circa_name(caValue* value) {
+    ca_assert(circa_is_name(value));
     return (caName) value->value_data.asint;
 }
-void* circ_get_pointer(caValue* value)
+void* circa_get_pointer(caValue* value)
 {
     value = dereference_handle(value);
     return value->value_data.ptr;
 }
 
-caType* circ_type(caValue* value) {
-    ca_assert(circ_is_type(value));
+caType* circa_type(caValue* value) {
+    ca_assert(circa_is_type(value));
     return (Type*) value->value_data.ptr;
 }
 
-float circ_to_float(caValue* value)
+float circa_to_float(caValue* value)
 {
-    if (circ_is_int(value))
-        return (float) circ_int(value);
-    else if (circ_is_float(value))
-        return circ_float(value);
+    if (circa_is_int(value))
+        return (float) circa_int(value);
+    else if (circa_is_float(value))
+        return circa_float(value);
     else {
         internal_error("In to_float, type is not an int or float");
         return 0.0;
     }
 }
 
-caValue* circ_index(caValue* container, int index)
+caValue* circa_index(caValue* container, int index)
 {
     return get_index(container, index);
 }
-int circ_count(caValue* container)
+int circa_count(caValue* container)
 {
     return list_length(container);
 }
 
-void circ_vec2(caValue* vec2, float* xOut, float* yOut)
+void circa_vec2(caValue* vec2, float* xOut, float* yOut)
 {
-    *xOut = circ_to_float(get_index(vec2, 0));
-    *yOut = circ_to_float(get_index(vec2, 1));
+    *xOut = circa_to_float(get_index(vec2, 0));
+    *yOut = circa_to_float(get_index(vec2, 1));
 }
-void circ_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
+void circa_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
 {
-    *xOut = circ_to_float(get_index(vec3, 0));
-    *yOut = circ_to_float(get_index(vec3, 1));
-    *zOut = circ_to_float(get_index(vec3, 2));
+    *xOut = circa_to_float(get_index(vec3, 0));
+    *yOut = circa_to_float(get_index(vec3, 1));
+    *zOut = circa_to_float(get_index(vec3, 2));
 }
-void circ_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
+void circa_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
 {
-    *xOut = circ_to_float(get_index(vec4, 0));
-    *yOut = circ_to_float(get_index(vec4, 1));
-    *zOut = circ_to_float(get_index(vec4, 2));
-    *wOut = circ_to_float(get_index(vec4, 3));
+    *xOut = circa_to_float(get_index(vec4, 0));
+    *yOut = circa_to_float(get_index(vec4, 1));
+    *zOut = circa_to_float(get_index(vec4, 2));
+    *wOut = circa_to_float(get_index(vec4, 3));
 }
-void circ_touch(caValue* value)
+void circa_touch(caValue* value)
 {
     touch(value);
 }
 
-void circ_set_bool(caValue* container, bool b)
+void circa_set_bool(caValue* container, bool b)
 {
     change_type(container, &BOOL_T);
     container->value_data.asbool = b;
 }
-void circ_set_float(caValue* container, float f)
+void circa_set_float(caValue* container, float f)
 {
     change_type(container, &FLOAT_T);
     container->value_data.asfloat = f;
 }
-void circ_set_int(caValue* container, int i)
+void circa_set_int(caValue* container, int i)
 {
     change_type(container, &INT_T);
     container->value_data.asint = i;
 }
-void circ_set_null(caValue* container)
+void circa_set_null(caValue* container)
 {
     set_null(container);
 }
-void circ_set_pointer(caValue* container, void* ptr)
+void circa_set_pointer(caValue* container, void* ptr)
 {
     container->value_data.ptr = ptr;
 }
-void circ_set_term(caValue* container, caTerm* term)
+void circa_set_term(caValue* container, caTerm* term)
 {
     set_ref(container, (Term*) term);
 }
 
-void circ_set_typed_pointer(caValue* container, caType* type, void* ptr)
+void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)
 {
     change_type(container, (Type*) type);
     container->value_data.ptr = ptr;
 }
-void circ_set_vec2(caValue* container, float x, float y)
+void circa_set_vec2(caValue* container, float x, float y)
 {
-    if (!circ_is_list(container))
-        circ_set_list(container, 2);
-    else if (circ_count(container) != 2)
-        circ_resize(container, 2);
+    if (!circa_is_list(container))
+        circa_set_list(container, 2);
+    else if (circa_count(container) != 2)
+        circa_resize(container, 2);
     else
-        circ_touch(container);
+        circa_touch(container);
 
-    circ_set_float(circ_index(container, 0), x);
-    circ_set_float(circ_index(container, 1), y);
+    circa_set_float(circa_index(container, 0), x);
+    circa_set_float(circa_index(container, 1), y);
 }
-void circ_set_vec3(caValue* container, float x, float y, float z)
+void circa_set_vec3(caValue* container, float x, float y, float z)
 {
-    if (!circ_is_list(container))
-        circ_set_list(container, 3);
-    else if (circ_count(container) != 3)
-        circ_resize(container, 3);
+    if (!circa_is_list(container))
+        circa_set_list(container, 3);
+    else if (circa_count(container) != 3)
+        circa_resize(container, 3);
     else
-        circ_touch(container);
+        circa_touch(container);
 
-    circ_set_float(circ_index(container, 0), x);
-    circ_set_float(circ_index(container, 1), y);
-    circ_set_float(circ_index(container, 2), y);
+    circa_set_float(circa_index(container, 0), x);
+    circa_set_float(circa_index(container, 1), y);
+    circa_set_float(circa_index(container, 2), y);
 }
-void circ_set_vec4(caValue* container, float x, float y, float z, float w)
+void circa_set_vec4(caValue* container, float x, float y, float z, float w)
 {
-    if (!circ_is_list(container))
-        circ_set_list(container, 4);
-    else if (circ_count(container) != 4)
-        circ_resize(container, 4);
+    if (!circa_is_list(container))
+        circa_set_list(container, 4);
+    else if (circa_count(container) != 4)
+        circa_resize(container, 4);
     else
-        circ_touch(container);
+        circa_touch(container);
 
-    circ_set_float(circ_index(container, 0), x);
-    circ_set_float(circ_index(container, 1), y);
-    circ_set_float(circ_index(container, 2), y);
-    circ_set_float(circ_index(container, 3), y);
+    circa_set_float(circa_index(container, 0), x);
+    circa_set_float(circa_index(container, 1), y);
+    circa_set_float(circa_index(container, 2), y);
+    circa_set_float(circa_index(container, 3), y);
 }
-void circ_set_string(caValue* container, const char* str)
+void circa_set_string(caValue* container, const char* str)
 {
     create(&STRING_T, container);
     *((std::string*) container->value_data.ptr) = str;
 }
-void circ_set_string_size(caValue* container, const char* str, int size)
+void circa_set_string_size(caValue* container, const char* str, int size)
 {
     create(&STRING_T, container);
     ((std::string*) container->value_data.ptr)->assign(str, size);

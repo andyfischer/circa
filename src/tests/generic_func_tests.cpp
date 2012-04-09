@@ -2,7 +2,7 @@
 
 #include "common_headers.h"
 
-#include "circ_internal.h"
+#include "circa_internal.h"
 #include "building.h"
 #include "generic.h"
 

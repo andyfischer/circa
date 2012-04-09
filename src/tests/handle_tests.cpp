@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include <circ_internal.h>
+#include <circa_internal.h>
 
 #include "filesystem.h"
 #include "filesystem_dummy.h"

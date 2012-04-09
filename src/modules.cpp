@@ -65,10 +65,10 @@ static bool find_module_file(const char* module_name, String* filenameOut)
         // Look under searchPath/moduleName.ca
         String searchPath;
         copy(g_moduleSearchPaths[i], &searchPath);
-        circ_join_path(&searchPath, &module);
+        circa_join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (circ_file_exists(as_cstring(&searchPath))) {
+        if (circa_file_exists(as_cstring(&searchPath))) {
             swap(&searchPath, filenameOut);
             return true;
         }
@@ -76,11 +76,11 @@ static bool find_module_file(const char* module_name, String* filenameOut)
         // Look under searchPath/moduleName/moduleName.ca
         copy(g_moduleSearchPaths[i], &searchPath);
 
-        circ_join_path(&searchPath, &module);
-        circ_join_path(&searchPath, &module);
+        circa_join_path(&searchPath, &module);
+        circa_join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
 
-        if (circ_file_exists(as_cstring(&searchPath))) {
+        if (circa_file_exists(as_cstring(&searchPath))) {
             swap(&searchPath, filenameOut);
             return true;
         }

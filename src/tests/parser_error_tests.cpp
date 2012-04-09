@@ -1,6 +1,6 @@
 // Copyright (c) Paul Hodge. See LICENSE file for license terms.
 
-#include <circ_internal.h>
+#include <circa_internal.h>
 
 namespace circa {
 namespace parser_error_tests {
