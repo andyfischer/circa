@@ -33,17 +33,17 @@ caTerm* circ_input_term(caStack* stack, int index)
 
 int circ_int_input(caStack* stack, int index)
 {
-    return circ_get_int(circ_input(stack, index));
+    return circ_int(circ_input(stack, index));
 }
 
 float circ_float_input(caStack* stack, int index)
 {
-    return circ_get_float(circ_input(stack, index));
+    return circ_float(circ_input(stack, index));
 }
 
 const char* circ_string_input(caStack* stack, int index)
 {
-    return circ_get_string(circ_input(stack, index));
+    return circ_string(circ_input(stack, index));
 }
 
 caValue* circ_output(caStack* stack, int index)
@@ -191,7 +191,7 @@ caFunction* circ_find_function(caBranch* branch, const char* name)
     caValue* val = circ_term_value(term);
     if (!circ_is_function(val))
         return NULL;
-    return circ_get_function(val);
+    return circ_function(val);
 }
 caType* circ_find_type(caBranch* branch, const char* name)
 {
@@ -201,7 +201,7 @@ caType* circ_find_type(caBranch* branch, const char* name)
     caValue* val = circ_term_value(term);
     if (!circ_is_type(val))
         return NULL;
-    return circ_get_type(val);
+    return circ_type(val);
 }
 
 int circ_term_num_inputs(caTerm* term)

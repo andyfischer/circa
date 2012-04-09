@@ -73,9 +73,9 @@ static void parse_value(TokenStream* tokens, caValue* out)
         parse_value(tokens, out);
 
         if (circ_is_int(out)) {
-            circ_set_int(out, -1 * circ_get_int(out));
+            circ_set_int(out, -1 * circ_int(out));
         } else if (circ_is_float(out)) {
-            circ_set_float(out, -1 * circ_get_float(out));
+            circ_set_float(out, -1 * circ_float(out));
         } else {
             circ_set_string(out, "error, minus sign must preceed number");
         }

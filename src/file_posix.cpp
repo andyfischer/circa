@@ -37,7 +37,7 @@ static void update_file(caFileSource*, caFileRecord* record)
     // Check the last modified time to see if we need to reload the file.
     int modifiedTime = get_modified_time2(record->filename);
     if (circ_is_int(record->sourceMetadata) &&
-        modifiedTime == circ_get_int(record->sourceMetadata)) {
+        modifiedTime == circ_int(record->sourceMetadata)) {
 
         goto finish;
     }

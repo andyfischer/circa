@@ -186,9 +186,9 @@ void call_func(caStack* stack)
     caBranch* branch;
 
     if (circ_is_branch(callable))
-        branch = circ_get_branch(callable);
+        branch = circ_branch(callable);
     else if (circ_is_function(callable))
-        branch = circ_function_contents(circ_get_function(callable));
+        branch = circ_function_contents(circ_function(callable));
     else {
         circ_raise_error(stack, "Input 0 is not callable");
         return;
@@ -383,7 +383,7 @@ CA_FUNCTION(Branch__file_signature)
 
 void Branch__statements(caStack* stack)
 {
-    Branch* branch = (Branch*) circ_get_branch(circ_input(stack, 0));
+    Branch* branch = (Branch*) circ_branch(circ_input(stack, 0));
 
     caValue* out = circ_output(stack, 0);
 

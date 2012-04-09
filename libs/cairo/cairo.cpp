@@ -96,7 +96,7 @@ void cairo__Context_set_source_color(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circ_input(stack, 0));
     float r(0), g(0), b(0), a(0);
-    circ_get_vec4(circ_input(stack, 1), &r, &g, &b, &a);
+    circ_vec4(circ_input(stack, 1), &r, &g, &b, &a);
     cairo_set_source_rgba(context, r, g, b, a);
     circ_set_null(circ_output(stack, 0));
 }
@@ -113,7 +113,7 @@ void cairo__Context_set_operator(caStack* stack)
 void cairo__create_image_surface(caStack* stack)
 {
     float width, height;
-    circ_get_vec2(circ_input(stack, 0), &width, &height);
+    circ_vec2(circ_input(stack, 0), &width, &height);
 
     // user can't currently specify the format
     cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
@@ -153,18 +153,18 @@ void cairo__Context_text_extents(caStack* stack)
     cairo_text_extents(context, circ_string_input(stack, 1), &extents);
 
     caValue* out = circ_create_default_output(stack, 0);
-    circ_set_point(circ_get_index(out, 0), extents.x_bearing, extents.y_bearing);
-    circ_set_point(circ_get_index(out, 1), extents.width, extents.height);
-    circ_set_point(circ_get_index(out, 2), extents.x_advance, extents.y_advance);
+    circ_set_point(circ_index(out, 0), extents.x_bearing, extents.y_bearing);
+    circ_set_point(circ_index(out, 1), extents.width, extents.height);
+    circ_set_point(circ_index(out, 2), extents.x_advance, extents.y_advance);
 }
 
 void cairo__Context_curve_to(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circ_input(stack, 0));
     float x1(0), y1(0), x2(0), y2(0), x3(0), y3(0);
-    circ_get_vec2(circ_input(stack, 1), &x1, &x2);
-    circ_get_vec2(circ_input(stack, 2), &x1, &x2);
-    circ_get_vec2(circ_input(stack, 3), &x1, &x2);
+    circ_vec2(circ_input(stack, 1), &x1, &x2);
+    circ_vec2(circ_input(stack, 2), &x1, &x2);
+    circ_vec2(circ_input(stack, 3), &x1, &x2);
     cairo_curve_to(context, x1, y1, x2, y2, x3, y3);
     circ_set_null(circ_output(stack, 0));
 }
@@ -172,21 +172,21 @@ void cairo__Context_move_to(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circ_input(stack, 0));
     float x(0), y(0);
-    circ_get_vec2(circ_input(stack, 1), &x, &y);
+    circ_vec2(circ_input(stack, 1), &x, &y);
     cairo_move_to(context, x, y);
 }
 void cairo__Context_rectangle(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circ_input(stack, 0));
     float x1(0), y1(0), x2(0), y2(0);
-    circ_get_vec4(circ_input(stack, 1), &x1, &y1, &x2, &y2);
+    circ_vec4(circ_input(stack, 1), &x1, &y1, &x2, &y2);
     cairo_rectangle(context, x1, y1, x2-x1, y2-y1);
 }
 void cairo__Context_line_to(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circ_input(stack, 0));
     float x(0), y(0);
-    circ_get_vec2(circ_input(stack, 1), &x, &y);
+    circ_vec2(circ_input(stack, 1), &x, &y);
     cairo_line_to(context, x, y);
     circ_set_null(circ_output(stack, 0));
 }
@@ -194,7 +194,7 @@ void cairo__Context_arc(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circ_input(stack, 0));
     float center_x(0), center_y(0);
-    circ_get_vec2(circ_input(stack, 1), &center_x, &center_y);
+    circ_vec2(circ_input(stack, 1), &center_x, &center_y);
     cairo_arc(context, center_x, center_y,
         circ_float_input(stack, 2),
         degrees_to_radians(circ_float_input(stack, 3)),

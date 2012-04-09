@@ -61,17 +61,17 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         if t == String
             writer.write('const char* ')
             writer.write(name)
-            writer.write(concat(' = circ_get_string(circ_input(stack, ' index '))'))
+            writer.write(concat(' = circ_string(circ_input(stack, ' index '))'))
             writer.writeln(';')
         elif t == int
             writer.write('int ')
             writer.write(name)
-            writer.write(concat(' = circ_get_int(circ_input(stack, ' index '))'))
+            writer.write(concat(' = circ_int(circ_input(stack, ' index '))'))
             writer.writeln(';')
         elif t == number
             writer.write('float ')
             writer.write(name)
-            writer.write(concat(' = circ_get_float(circ_input(stack, ' index '))'))
+            writer.write(concat(' = circ_float(circ_input(stack, ' index '))'))
             writer.writeln(';')
         elif t.is_handle
             writer.write(concat(t.name, '* ', name))

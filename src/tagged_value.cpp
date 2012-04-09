@@ -680,31 +680,31 @@ bool circ_is_number(caValue* value) { return circ_is_int(value) || circ_is_float
 bool circ_is_string(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_STRING; }
 bool circ_is_type(caValue* value) { return value->value_type->storageType == STORAGE_TYPE_TYPE; }
 
-bool circ_get_bool(caValue* value) {
+bool circ_bool(caValue* value) {
     ca_assert(circ_is_bool(value));
     return value->value_data.asbool;
 }
-caBranch* circ_get_branch(caValue* value) {
+caBranch* circ_branch(caValue* value) {
     ca_assert(circ_is_branch(value));
     return (caBranch*) value->value_data.ptr;
 }
-float circ_get_float(caValue* value) {
+float circ_float(caValue* value) {
     ca_assert(circ_is_float(value));
     return value->value_data.asfloat;
 }
-caFunction* circ_get_function(caValue* value) {
+caFunction* circ_function(caValue* value) {
     ca_assert(circ_is_function(value));
     return (caFunction*) value->value_data.ptr;
 }
-int circ_get_int(caValue* value) {
+int circ_int(caValue* value) {
     ca_assert(circ_is_int(value));
     return value->value_data.asint;
 }
-const char* circ_get_string(caValue* value) {
+const char* circ_string(caValue* value) {
     ca_assert(circ_is_string(value));
     return as_cstring(value);
 }
-caName circ_get_name(caValue* value) {
+caName circ_name(caValue* value) {
     ca_assert(circ_is_name(value));
     return (caName) value->value_data.asint;
 }
@@ -714,7 +714,7 @@ void* circ_get_pointer(caValue* value)
     return value->value_data.ptr;
 }
 
-caType* circ_get_type(caValue* value) {
+caType* circ_type(caValue* value) {
     ca_assert(circ_is_type(value));
     return (Type*) value->value_data.ptr;
 }
@@ -722,16 +722,16 @@ caType* circ_get_type(caValue* value) {
 float circ_to_float(caValue* value)
 {
     if (circ_is_int(value))
-        return (float) circ_get_int(value);
+        return (float) circ_int(value);
     else if (circ_is_float(value))
-        return circ_get_float(value);
+        return circ_float(value);
     else {
         internal_error("In to_float, type is not an int or float");
         return 0.0;
     }
 }
 
-caValue* circ_get_index(caValue* container, int index)
+caValue* circ_index(caValue* container, int index)
 {
     return get_index(container, index);
 }
@@ -740,18 +740,18 @@ int circ_count(caValue* container)
     return list_length(container);
 }
 
-void circ_get_vec2(caValue* vec2, float* xOut, float* yOut)
+void circ_vec2(caValue* vec2, float* xOut, float* yOut)
 {
     *xOut = circ_to_float(get_index(vec2, 0));
     *yOut = circ_to_float(get_index(vec2, 1));
 }
-void circ_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
+void circ_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut)
 {
     *xOut = circ_to_float(get_index(vec3, 0));
     *yOut = circ_to_float(get_index(vec3, 1));
     *zOut = circ_to_float(get_index(vec3, 2));
 }
-void circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
+void circ_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut)
 {
     *xOut = circ_to_float(get_index(vec4, 0));
     *yOut = circ_to_float(get_index(vec4, 1));
@@ -805,8 +805,8 @@ void circ_set_vec2(caValue* container, float x, float y)
     else
         circ_touch(container);
 
-    circ_set_float(circ_get_index(container, 0), x);
-    circ_set_float(circ_get_index(container, 1), y);
+    circ_set_float(circ_index(container, 0), x);
+    circ_set_float(circ_index(container, 1), y);
 }
 void circ_set_vec3(caValue* container, float x, float y, float z)
 {
@@ -817,9 +817,9 @@ void circ_set_vec3(caValue* container, float x, float y, float z)
     else
         circ_touch(container);
 
-    circ_set_float(circ_get_index(container, 0), x);
-    circ_set_float(circ_get_index(container, 1), y);
-    circ_set_float(circ_get_index(container, 2), y);
+    circ_set_float(circ_index(container, 0), x);
+    circ_set_float(circ_index(container, 1), y);
+    circ_set_float(circ_index(container, 2), y);
 }
 void circ_set_vec4(caValue* container, float x, float y, float z, float w)
 {
@@ -830,10 +830,10 @@ void circ_set_vec4(caValue* container, float x, float y, float z, float w)
     else
         circ_touch(container);
 
-    circ_set_float(circ_get_index(container, 0), x);
-    circ_set_float(circ_get_index(container, 1), y);
-    circ_set_float(circ_get_index(container, 2), y);
-    circ_set_float(circ_get_index(container, 3), y);
+    circ_set_float(circ_index(container, 0), x);
+    circ_set_float(circ_index(container, 1), y);
+    circ_set_float(circ_index(container, 2), y);
+    circ_set_float(circ_index(container, 3), y);
 }
 void circ_set_string(caValue* container, const char* str)
 {

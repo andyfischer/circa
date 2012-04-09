@@ -112,15 +112,15 @@ void circ_print_error_to_stdout(caStack* stack);
 caValue* circ_input(caStack* stack, int index);
 
 // Read the given input index as an integer.
-// Equivalent to: circ_get_int(circ_input(stack, index))
+// Equivalent to: circ_int(circ_input(stack, index))
 int circ_int_input(caStack* stack, int index);
 
 // Read the given input index as a string
-// Equivalent to: circ_get_string(circ_input(stack, index))
+// Equivalent to: circ_string(circ_input(stack, index))
 const char* circ_string_input(caStack* stack, int index);
 
 // Read the given input index as a float
-// Equivalent to: circ_get_float(circ_input(stack, index))
+// Equivalent to: circ_float(circ_input(stack, index))
 float circ_float_input(caStack* stack, int index);
 
 // Fetch the given output value. This value should be modified.
@@ -138,7 +138,7 @@ caTerm* circ_current_term(caStack* stack);
 // Fetch the Branch for the function that is currently being evaluated
 caBranch* circ_callee_branch(caStack* stack);
 
-// -- Working With Tagged Values --
+// -- Tagged Values --
 
 // Allocate a new caValue container on the heap. This will call circ_init_value for you.
 caValue* circ_alloc_value();
@@ -149,6 +149,8 @@ void circ_dealloc_value(caValue* value);
 // Initialize a newly allocated caValue container. This must be called if you allocate
 // the caValue yourself. (such as putting it on the stack).
 void circ_init_value(caValue* value);
+
+// -- Accessors --
 
 // Check the type of a caValue.
 bool circ_is_bool(caValue* value);
@@ -165,17 +167,17 @@ bool circ_is_string(caValue* value);
 bool circ_is_type(caValue* value);
 
 // Read the value from a caValue.
-bool        circ_get_bool(caValue* value);
-caBranch*   circ_get_branch(caValue* value);
-float       circ_get_float(caValue* value);
-caFunction* circ_get_function(caValue* value);
-int         circ_get_int(caValue* value);
-caName      circ_get_name(caValue* value);
-const char* circ_get_string(caValue* value);
-caType*     circ_get_type(caValue* value);
-void        circ_get_vec2(caValue* vec2, float* xOut, float* yOut);
-void        circ_get_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
-void        circ_get_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
+bool        circ_bool(caValue* value);
+caBranch*   circ_branch(caValue* value);
+float       circ_float(caValue* value);
+caFunction* circ_function(caValue* value);
+int         circ_int(caValue* value);
+caName      circ_name(caValue* value);
+const char* circ_string(caValue* value);
+caType*     circ_type(caValue* value);
+void        circ_vec2(caValue* vec2, float* xOut, float* yOut);
+void        circ_vec3(caValue* vec3, float* xOut, float* yOut, float* zOut);
+void        circ_vec4(caValue* vec4, float* xOut, float* yOut, float* zOut, float* wOut);
 
 // Read the pointer value from a caValue. This call will do dereferencing: if the caValue
 // is actually a Handle then we'll dereference the handle.
@@ -188,9 +190,9 @@ float circ_to_float(caValue* value);
 //   - The element must not be modified, unless you know that you have a writable copy
 //     of the container. To obtain a writable copy, first call circ_touch on the container.
 //   - The element pointer must be considered invalid when the owning container is resized.
-caValue* circ_get_index(caValue* value, int index);
+caValue* circ_index(caValue* value, int index);
 
-// Number of elements in a container
+// Number of elements in a list value.
 int circ_count(caValue* container);
 
 // -- Writing to a caValue --
