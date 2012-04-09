@@ -15,11 +15,11 @@ void build_compound_type()
 
     compound_type_append_field(type, &STRING_T, "abc");
 
-    test_equals(&type->parameter, "[[<Type string>], ['abc']]");
+    test_equals(&type->parameter, "[[<Type String>], ['abc']]");
 
     compound_type_append_field(type, &INT_T, "def");
 
-    test_equals(&type->parameter, "[[<Type string>, <Type int>], ['abc', 'def']]");
+    test_equals(&type->parameter, "[[<Type String>, <Type int>], ['abc', 'def']]");
 
     test_assert(compound_type_get_field_type(type, 0) == &STRING_T);
     test_assert(compound_type_get_field_type(type, 1) == &INT_T);
