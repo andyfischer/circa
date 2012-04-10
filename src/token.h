@@ -11,14 +11,16 @@ namespace circa {
 struct Token
 {
     int match;
-    int charIndex;
+    int start;
+    int end;
     int lineStart;
     int lineEnd;
     int colStart;
     int colEnd;
     int precedingIndent;
 
-    Token() : match(0), charIndex(0), lineStart(0), lineEnd(0), colStart(0), colEnd(0), precedingIndent(0) {}
+    Token() : match(0), start(0), end(0), lineStart(0), lineEnd(0),
+        colStart(0), colEnd(0), precedingIndent(0) {}
 
     std::string toString() const;
     int length() const;

@@ -144,6 +144,11 @@ def write_bindings(Branch branch) -> String
     writer.writeln('};')
 
     return writer.toString
-
-filename = input()
-output(write_bindings(filename))
+   
+def load_and_write(String filename) -> String
+    print(filename)
+    script = load_script(filename)
+    print(script)
+    out = write_bindings(script)
+    print(out)
+    return out

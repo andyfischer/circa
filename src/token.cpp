@@ -103,7 +103,8 @@ std::string Token::toString() const
 }
 int Token::length() const
 {
-    return colEnd - colStart;
+    ca_assert(end >= start);
+    return end - start;
 }
 
 struct TokenizeContext
@@ -161,7 +162,7 @@ struct TokenizeContext
 
         Token instance;
         instance.match = match;
-        instance.charIndex = this->nextIndex;
+        instance.start = this->nextIndex;
 
         // Record where this token starts
         instance.lineStart = this->linePosition;
@@ -171,6 +172,7 @@ struct TokenizeContext
             advanceChar();
 
         // Record where this token ends
+        instance.end = this->nextIndex;
         instance.lineEnd = this->linePosition;
         instance.colEnd = this->charPosition;
 
@@ -717,14 +719,16 @@ TokenStream::next(int lookahead) const
 
 std::string TokenStream::nextStr(int lookahead) const
 {
-    int startPos = next(lookahead).charIndex;
+    int startPos = next(lookahead).start;
     int length = next(lookahead).length();
+
+    ca_assert(length > 0);
     return std::string(_sourceText.c_str() + startPos, length);
 }
 
 void TokenStream::getNextStr(caValue* value, int lookahead) const
 {
-    int startPos = next(lookahead).charIndex;
+    int startPos = next(lookahead).start;
     int length = next(lookahead).length();
     circa_set_string_size(value, _sourceText.c_str() + startPos, length);
 }
