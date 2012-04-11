@@ -1,0 +1,10 @@
+
+
+-- This had a bug, where the 'functions' call was confused by a temporary
+-- value holding a function.
+
+def hi()
+    def hi2()
+    x = hi2
+
+branch_ref(hi).statements

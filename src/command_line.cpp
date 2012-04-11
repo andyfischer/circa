@@ -197,15 +197,16 @@ int run_command_line(caValue* args)
 
     if (string_eq(list_get(args, 0), "-call")) {
         Branch* branch = create_branch(kernel());
-        load_script(branch, as_cstring(list_get(args, 1)));
+        Name loadResult = load_script(branch, as_cstring(list_get(args, 1)));
+
+        if (loadResult == name_Failure) {
+            std::cout << "Failed to load file: " <<  as_cstring(list_get(args, 1)) << std::endl;
+            return -1;
+        }
+
         set_branch_in_progress(branch, false);
 
         caFunction* func = circa_find_function(branch, as_cstring(list_get(args, 2)));
-
-        if (func == NULL) {
-            std::cout << "Couldn't find function: " << as_cstring(list_get(args, 2)) << std::endl;
-            return -1;
-        }
 
         Value inputs;
         set_list(&inputs, 0);
@@ -216,6 +217,10 @@ int run_command_line(caValue* args)
 
         caStack* stack = circa_alloc_stack();
         circa_run_function(stack, func, &inputs);
+
+        if (circa_has_error(stack)) {
+            circa_print_error_to_stdout(stack);
+        }
 
         // Print outputs
         for (int i=0; i < circa_count(&inputs); i++) {

@@ -244,6 +244,14 @@ void* circa_handle_get_object(caValue* handle);
 // Assign a Value using the Type's default create() handler.
 void circa_create_value(caValue* value, caType* type);
 
+// -- Names --
+
+// Fetch the interned name for the given string. Returns 0 if the name doesn't exist.
+caName circa_name(const char* str);
+
+// Fetch the string for an interned name
+const char* circa_name_to_string(caName name);
+
 // -- String Representation --
 
 // Load a Circa value from a string representation. The result will be written to 'out'.

@@ -48,6 +48,10 @@ void format_branch_source(StyledSource* source, Branch* branch, Term* format)
             newlineNeeded = false;
         }
 
+        // Indentation
+        append_phrase(source, term->stringPropOptional("syntax:preWhitespace", ""),
+            term, phrase_type::WHITESPACE);
+
         format_term_source(source, term);
 
         if (term->hasProperty("syntax:lineEnding")) {
@@ -83,10 +87,6 @@ std::string unformat_rich_source(StyledSource* source)
 void format_term_source(StyledSource* source, Term* term)
 {
     ca_assert(term != NULL);
-
-    // Pre whitespace
-    append_phrase(source, term->stringPropOptional("syntax:preWhitespace", ""),
-            term, phrase_type::WHITESPACE);
 
     // If the function has a formatSource function, use that.
     if (is_function(term->function) &&

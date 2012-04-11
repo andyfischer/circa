@@ -73,6 +73,7 @@ struct BranchIteratorFlat
 
     Term* current();
 
+    Term* operator*() { return current(); }
     bool unfinished() { return !finished(); }
     void operator++() { advance(); }
 };

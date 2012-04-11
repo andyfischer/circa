@@ -697,10 +697,6 @@ const char* circa_string(caValue* value) {
     ca_assert(circa_is_string(value));
     return as_cstring(value);
 }
-caName circa_name(caValue* value) {
-    ca_assert(circa_is_name(value));
-    return (caName) value->value_data.asint;
-}
 void* circa_get_pointer(caValue* value)
 {
     value = dereference_handle(value);

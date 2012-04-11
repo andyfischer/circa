@@ -1,8 +1,3 @@
-"""
-Primary build file for Circa.
-See docs/build_targets.md for more information on the available targets and variants.
-"""
-
 import os, sys, ConfigParser, SCons
 
 def fatal(msg):
@@ -93,11 +88,6 @@ for env in all_envs:
 
     result = env.StaticLibrary(fullPath, sources)
     circa_libs[variant_name] = result[0]
-
-    #if OSX and SHARED_LIBRARY:
-    #    actualFile = 'lib'+baseName+'.dylib'
-    #    env.AddPostAction(result, 'install_name_tool -id @executable_path/'+actualFile
-    #            + ' build/'+actualFile)
 
 # Define command-line app builds at build/circa_x
 circa_cl_apps = {}

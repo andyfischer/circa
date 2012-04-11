@@ -72,7 +72,7 @@ bool is_function(Term* term)
 {
     if (term == NULL)
         return false;
-    return term->type == &FUNCTION_T;
+    return is_value(term) && term->type == &FUNCTION_T;
 }
 
 Branch* function_contents(Term* func)

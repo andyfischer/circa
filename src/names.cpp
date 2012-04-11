@@ -485,14 +485,25 @@ void set_name(caValue* tv, Name val)
     tv->value_data.asint = val;
 }
 
-// Runtime symbols
-Name name_from_string(const char* str)
+Name existing_name_from_string(const char* str)
 {
-    // Check if name is already registered
     std::map<std::string,Name>::const_iterator it;
     it = g_stringToSymbol.find(str);
     if (it != g_stringToSymbol.end())
         return it->second;
+
+    return 0;
+}
+
+// Runtime symbols
+Name name_from_string(const char* str)
+{
+    // Check if name is already registered
+    {
+        Name name = existing_name_from_string(str);
+        if (name != 0)
+            return name;
+    }
 
     // Not yet registered; add it to the list.
     Name index = g_nextFreeNameIndex++;
@@ -530,3 +541,12 @@ void name_dealloc_global_data()
 }
 
 } // namespace circa
+
+extern "C" caName circa_name(const char* str)
+{
+    return circa::existing_name_from_string(str);
+}
+extern "C" const char* circa_name_to_string(caName name)
+{
+    return circa::name_to_string(name);
+}

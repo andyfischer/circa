@@ -47,6 +47,8 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
     writer.writeln('')
     writer.writeln('{')
     writer.indent()
+
+    -- Write each input
     index = 0
     for input in func.inputs
         @input -> Term
@@ -86,6 +88,12 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
 
         index += 1
 
+    -- Function body
+    for statement in func.contents.statements
+        @statement -> Term
+
+        writer.writeln(statement.to_source_string)
+
     index = 0
     for input in func.outputs
         @input -> Term
@@ -118,6 +126,7 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
     writer.writeln('}')
 
 def write_bindings(Branch branch) -> String
+
     writer = create(CodeWriter)
 
     writer.writeln('#include "circa/circa.h"')
@@ -125,7 +134,8 @@ def write_bindings(Branch branch) -> String
 
     bindings = []
 
-    for func in branch.list_functions
+    for func in branch.functions
+        Function(@func)
         cname = ""
         write_function(&writer, func, &cname)
 
@@ -139,16 +149,21 @@ def write_bindings(Branch branch) -> String
         cname = binding[1] -> String
 
         writer.writeln(concat('{"' func.name '", ' cname '},'))
-    writer.writeln(concat('{NULL, NULL}'))
+    writer.writeln(concat('{0, 0}'))
     writer.unindent()
     writer.writeln('};')
+
+    -- Installation function
+    writer.writeln("void Install_xxx(caBranch* branch)")
+    writer.writeln("{")
+    writer.indent()
+    writer.writeln("circa_install_function_list(branch, IMPORTS);")
+    writer.unindent()
+    writer.writeln("}")
 
     return writer.toString
    
 def load_and_write(String filename) -> String
-    print(filename)
     script = load_script(filename)
-    print(script)
     out = write_bindings(script)
-    print(out)
     return out

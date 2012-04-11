@@ -347,7 +347,7 @@ CA_FUNCTION(Branch__functions)
     caValue* output = OUTPUT;
     set_list(output, 0);
 
-    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (is_function(term)) {
             set_function(list_append(output), as_function(term));
