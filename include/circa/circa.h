@@ -98,6 +98,8 @@ void circa_run_module(caStack* stack, const char* moduleName);
 // back to your 'inputs' list.
 void circa_run_function(caStack* stack, caFunction* function, caValue* inputs);
 
+void circa_call_function(caStack* stack, const char* funcName, caValue* inputs);
+
 // Signal that an error has occurred.
 void circa_raise_error(caStack* stack, const char* msg);
 
@@ -157,6 +159,9 @@ void circa_init_value(caValue* value);
 // Copy a value. Some types may implement this as a lightweight copy, so you will need
 // to follow the rules for circa_touch when using the copy.
 void circa_copy(caValue* source, caValue* dest);
+
+// Swap values between caValue containers. This is a very cheap operation.
+void circa_swap(caValue* left, caValue* right);
 
 // "Touch" a value, indicating that you are about to start modifying its contents. This
 // is only necessary when modifying the elements of a container type (such as a List).

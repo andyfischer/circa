@@ -835,4 +835,14 @@ void circa_set_string_size(caValue* container, const char* str, int size)
     ((std::string*) container->value_data.ptr)->assign(str, size);
 }
 
+void circa_copy(caValue* source, caValue* dest)
+{
+    copy(source, dest);
+}
+
+void circa_swap(caValue* left, caValue* right)
+{
+    swap(left, right);
+}
+
 } // extern "C"
