@@ -418,7 +418,7 @@ namespace tagged_value_wrappers {
         DictData* data = (DictData*) value->value_data.ptr;
         if (data == NULL)
             return;
-        caValue relativeIdentifier;
+        Value relativeIdentifier;
         for (int i=0; i < data->capacity; i++) {
             if (data->slots[i].key == NULL)
                 continue;

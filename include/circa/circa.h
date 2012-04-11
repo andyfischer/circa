@@ -13,51 +13,59 @@ extern "C" {
 
 // -- Circa Types --
 
+// a World holds miscellaneous shared runtime information. A process should create one
+// World that is used across the program.
+//
+// (NOTE: Currently, no more than one World can be created per process due to the use of
+// statics, this will be fixed in the future).
+typedef struct caWorld caWorld;
 
-// a Stack holds the interpreter's current state, including a list of frames (activation records)
+// a Stack holds the interpreter's current state, including a list of frames (activation
+// records). Each Stack corresponds to one lightweight thread (not OS thread).
 typedef struct caStack caStack;
 
-// a Value is a variant value. It holds two pointers, one pointer to the Type object and one
-// to the value's data. For some types (such as integers, floats, booleans), the data section
-// holds the actual value and not a pointer.
+// a Value is a variant value. It holds two pointers, one pointer to the Type object and
+// one to the value's data. For some types (such as integers, floats, booleans), the data
+// section holds the actual value and not a pointer.
 typedef struct caValue caValue;
 
-// a Branch is a section of compiled code. It contains a list of Terms and some other metadata.
-// Each Term may itself contain a nested Branch.
+// a Branch is a section of compiled code. It contains a list of Terms and some other
+// metadata. Each Term may itself contain a nested Branch.
 typedef struct caBranch caBranch;
 
-// a Term is one unit of compiled code. Each term has a function and a list of inputs. A term
-// may also have a nested Branch.
+// a Term is one unit of compiled code. Each term has a function and a list of inputs, and
+// some other metadata. A term may also have a nested Branch.
 typedef struct caTerm caTerm;
 
-// a Type holds data for a single Circa type, including a name, handlers for initialization
-// and destruction, and various other handlers and metadata.
+// a Type holds data for a single Circa type, including a name, handlers for
+// initialization and destruction, and various other handlers and metadata.
 typedef struct caType caType;
 
-// a Function holds data for a single Circa function, including a name, the function's definition
-// (stored as a Branch), and various other metadata. Each Function has an EvaluateFunc which
-// is triggered when the function is called.
+// a Function holds data for a single Circa function, including a name, the function's
+// definition (stored as a Branch), and various other metadata. Each Function has an
+// EvaluateFunc which is triggered when the function is called.
 typedef struct caFunction caFunction;
 
+// a Name is an alias for an integer, used to reference an interned string.
 typedef int caName;
 
-// EvaluateFunc is the signature for a C evaluation function. The function will access the stack
-// to read inputs (if any), possibly perform some action, and write output values (if any) back
-// to the stack.
+// EvaluateFunc is the signature for a C evaluation function. The function will access the
+// stack to read inputs (if any), possibly perform some action, and write output values
+// (if any) back to the stack.
 typedef void (*caEvaluateFunc)(caStack* stack);
 
-// ReleaseFunc is the signature for a C function that runs when a user object is about to be
-// destroyed. This is used for 'handle' values.
+// ReleaseFunc is the signature for a C function that runs when a user object is about to
+// be destroyed. This is used for 'handle' values.
 typedef void (*caReleaseFunc)(caValue* value);
 
 // -- Setting up the Circa environment --
 
-// Initialize Circa. This should be called at startup, before any other Circa functions.
-void circa_initialize();
+// Create a caWorld. This should be done once at the start of the program.
+caWorld* circa_initialize();
 
-// Shutdown Circa. This should be called before quitting. This isn't required, but using
-// it will make memory-leak detection tools happier.
-void circa_shutdown();
+// Uninitialize a caWorld. This call is entirely optional, but using it will make memory-
+// leak checking tools happier.
+void circa_shutdown(caWorld*);
 
 // Set up a POSIX file handler as a file source. For more control over file sources, see
 // circa/file.h
@@ -144,6 +152,14 @@ void circa_dealloc_value(caValue* value);
 // the caValue yourself. (such as putting it on the stack).
 void circa_init_value(caValue* value);
 
+// Copy a value. Some types may implement this as a lightweight copy, so you will need
+// to follow the rules for circa_touch when using the copy.
+void circa_copy(caValue* source, caValue* dest);
+
+// "Touch" a value, indicating that you are about to start modifying its contents. This
+// is only necessary when modifying the elements of a container type (such as a List).
+void circa_touch(caValue* value);
+
 // -- Accessors --
 
 // Check the type of a caValue.
@@ -179,10 +195,13 @@ void*       circa_get_pointer(caValue* value);
 // Fetch a caValue as a float (converting it from an int if necessary)
 float circa_to_float(caValue* value);
 
-// Access an element by index. There are certain rules when accessing a container's element:
+// Access an element by index. There are certain rules for using this result:
 //   - The element must not be modified, unless you know that you have a writable copy
-//     of the container. To obtain a writable copy, first call circa_touch on the container.
-//   - The element pointer must be considered invalid when the owning container is resized.
+//     of the container. (Use circa_touch to obtain a writeable copy)
+//   - The element pointer becomes invalid when the owning container is resized.
+//
+// When in doubt, make a copy (circa_copy) of the returned value and use that.
+//
 caValue* circa_index(caValue* value, int index);
 
 // Number of elements in a list value.
@@ -190,10 +209,6 @@ int circa_count(caValue* container);
 
 // -- Writing to a caValue --
 
-// "Touch" a value, indicating that you are about to start modifying its contents. This
-// is only necessary for a container type (such as a List), and it's not necessary if you
-// are the only owner of this value.
-void circa_touch(caValue* value);
 
 // Assign to a caValue.
 void circa_set_bool(caValue* container, bool value);
@@ -307,7 +322,7 @@ caType* circa_term_declared_type(caTerm* term);
 
 // Install an evaluation function to the given named function. Returns the container Term.
 // Returns NULL if the name was not found.
-caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate);
+caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc func);
 
 typedef struct caFunctionBinding
 {

@@ -20,11 +20,15 @@ struct caValue
     circa::Type* value_type;
 
     // Deprecated constructor
+protected:
     caValue();
     ~caValue();
+
+protected:
     caValue(caValue const&);
     explicit caValue(circa::Type* type);
-    caValue& operator=(caValue const& rhs);
+
+public:
 
     // Special constructor used by circa::Value to dodge assert.
     explicit caValue(circa::Value*);
@@ -61,6 +65,7 @@ struct Value : caValue
 {
     Value();
     ~Value();
+    Value& operator=(Value const& rhs);
 };
 
 // Initialize this caValue to a null value. This should only be used if the caValue

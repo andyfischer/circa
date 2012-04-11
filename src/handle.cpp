@@ -103,7 +103,7 @@ void set_handle_value(caValue* handle, caValue* value, ReleaseFunc releaseFunc)
 
 void set_handle_value_opaque_pointer(caValue* handle, Type* type, void* ptr, ReleaseFunc releaseFunc)
 {
-    caValue pointerVal;
+    Value pointerVal;
     set_opaque_pointer(&pointerVal, ptr);
     set_handle_value(handle, type, &pointerVal, releaseFunc);
 }

@@ -245,9 +245,8 @@ void remove(Hashtable* data, caValue* key)
         // this slot.
         if (find_ideal_slot_index(data, &slot->key) != index) {
             Slot* prevSlot = &data->slots[prevIndex];
-            prevSlot->key = slot->key;
-            set_null(&slot->key);
-            swap(&slot->value, &prevSlot->value);
+            move(&slot->key, &prevSlot->key);
+            move(&slot->value, &prevSlot->value);
             continue;
         }
 
@@ -359,7 +358,7 @@ namespace tagged_value_wrappers {
     }
     caValue* get_field(caValue* value, const char* field)
     {
-        caValue fieldStr;
+        Value fieldStr;
         set_string(&fieldStr, field);
         return hashtable_t::get_value((Hashtable*) value->value_data.ptr, &fieldStr);
     }

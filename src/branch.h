@@ -16,7 +16,7 @@
 typedef struct caBranch {
     // Opaque type, used by C api.
 protected:
-    caBranch() {} // Disallow construction of this type.
+    caBranch() {} // Disallow C++ construction of this type.
 } caBranch;
 
 namespace circa {

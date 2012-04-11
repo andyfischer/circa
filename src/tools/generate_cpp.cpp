@@ -29,7 +29,7 @@ struct SourceWriter
     List output;
     int currentIndent;
     bool startNewLine;
-    caValue indentStr;
+    Value indentStr;
 
     SourceWriter() : currentIndent(0), startNewLine(true) {
         repeat_string(" ", currentIndent * kSpacesPerIndent, &indentStr);
@@ -65,7 +65,7 @@ struct SourceWriter
 
     void newline()
     {
-        caValue val;
+        Value val;
         set_name(&val, name_Newline);
         write(&val);
     }
@@ -200,7 +200,7 @@ void write_program(Branch* branch, caValue* out)
 
 void write_program_to_file(Branch* branch, const char* filename)
 {
-    caValue strs;
+    Value strs;
     write_program(branch, &strs);
 
     FILE* file = fopen(filename, "w");

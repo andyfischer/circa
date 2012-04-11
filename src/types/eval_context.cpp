@@ -13,7 +13,7 @@ namespace eval_context_t {
     void visitHeap(Type*, caValue* value, Type::VisitHeapCallback callback, caValue* visitContext)
     {
         EvalContext* context = get(value);
-        caValue relIdent;
+        Value relIdent;
 
         set_string(&relIdent, "state");
         callback(&context->state, &relIdent, visitContext);

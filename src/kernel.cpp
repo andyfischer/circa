@@ -48,6 +48,11 @@
 
 #include "tools/command_reader.h"
 
+typedef struct caWorld {
+    // Opaque type
+    // Currently is empty
+} caWorld;
+
 namespace circa {
 
 Branch* KERNEL = NULL;
@@ -1117,7 +1122,7 @@ void install_standard_library(Branch* kernel)
     FUNCS.output_explicit = kernel->get("input");
 }
 
-EXPORT void circa_initialize()
+EXPORT caWorld* circa_initialize()
 {
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
@@ -1160,9 +1165,12 @@ EXPORT void circa_initialize()
             modules_add_search_path(as_cstring(path));
         }
     }
+
+    // Provide a caWorld, even though this structure is not really used yet.
+    return (caWorld*) malloc(sizeof(caWorld));
 }
 
-EXPORT void circa_shutdown()
+EXPORT void circa_shutdown(caWorld* world)
 {
     SHUTTING_DOWN = true;
 
@@ -1187,6 +1195,8 @@ EXPORT void circa_shutdown()
     name_dealloc_global_data();
 
     gc_collect();
+
+    free(world);
 }
 
 } // namespace circa

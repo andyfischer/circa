@@ -42,12 +42,6 @@ caValue::caValue(caValue const& original)
     copy(&const_cast<caValue&>(original), this);
 }
 
-caValue&
-caValue::operator=(caValue const& rhs)
-{
-    copy(&const_cast<caValue&>(rhs), this);
-    return *this;
-}
 
 void caValue::reset()
 {
@@ -166,6 +160,12 @@ Value::~Value()
     set_null(this);
 }
 
+Value&
+Value::operator=(Value const& rhs)
+{
+    copy(&const_cast<Value&>(rhs), this);
+    return *this;
+}
 
 void initialize_null(caValue* value)
 {

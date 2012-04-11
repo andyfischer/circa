@@ -638,7 +638,7 @@ std::string get_source_file_location(Branch* branch)
     if (sourceFilename == NULL)
         return "";
 
-    caValue directory;
+    Value directory;
     circa_get_directory_for_filename(sourceFilename, &directory);
 
     return as_string(&directory);
