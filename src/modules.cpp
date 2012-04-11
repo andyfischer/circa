@@ -6,6 +6,7 @@
 
 #include "building.h"
 #include "code_iterators.h"
+#include "evaluation.h"
 #include "filesystem.h"
 #include "file_utils.h"
 #include "list.h"
@@ -136,3 +137,23 @@ Branch* find_module_from_filename(const char* filename)
 }
 
 } // namespace circa
+
+using namespace circa;
+
+// Public API
+extern "C" void circa_run_module(caStack* stack, const char* moduleName)
+{
+    circa::Branch* branch = nested_contents(get_global(moduleName));
+
+    evaluate_branch((circa::EvalContext*) stack, branch);
+}
+
+extern "C" void circa_add_module_search_path(caWorld* world, const char* path)
+{
+    modules_add_search_path(path);
+}
+
+extern "C" caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const char* filename)
+{
+    return (caBranch*) nested_contents(load_module_from_file(module_name, filename));
+}

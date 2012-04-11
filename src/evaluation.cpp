@@ -771,3 +771,28 @@ do_instruction:
 }
 
 } // namespace circa
+
+using namespace circa;
+
+// Public API
+
+extern "C" caStack* circa_alloc_stack(caWorld* world)
+{
+    return (caStack*) new EvalContext();
+}
+
+extern "C" void circa_dealloc_stack(caStack* stack)
+{
+    delete (EvalContext*) stack;
+}
+
+extern "C" bool circa_has_error(caStack* stack)
+{
+    EvalContext* context = (EvalContext*) stack;
+    return error_occurred(context);
+}
+extern "C" void circa_clear_error(caStack* stack)
+{
+    EvalContext* context = (EvalContext*) stack;
+    clear_error(context);
+}

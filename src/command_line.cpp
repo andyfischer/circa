@@ -55,7 +55,7 @@ void print_usage()
         << std::endl;
 }
 
-int run_command_line(caValue* args)
+int run_command_line(caWorld* world, caValue* args)
 {
     bool printRaw = false;
     bool printRawWithProps = false;
@@ -215,7 +215,7 @@ int run_command_line(caValue* args)
             circa_parse_string(as_cstring(list_get(args, i)), circa_append(&inputs));
         }
 
-        caStack* stack = circa_alloc_stack();
+        caStack* stack = circa_alloc_stack(world);
         circa_run_function(stack, func, &inputs);
 
         if (circa_has_error(stack)) {
@@ -372,12 +372,12 @@ int run_command_line(caValue* args)
 
 } // namespace circa
 
-EXPORT int circa_run_command_line(int argc, const char* args[])
+EXPORT int circa_run_command_line(caWorld* world, int argc, const char* args[])
 {
     circa::Value args_v;
     circa_set_list(&args_v, 0);
     for (int i=1; i < argc; i++)
         circa_set_string(circa_append(&args_v), args[i]);
 
-    return circa::run_command_line(&args_v);
+    return circa::run_command_line(world, &args_v);
 }

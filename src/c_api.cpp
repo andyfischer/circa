@@ -160,16 +160,6 @@ void circa_install_function_list(caBranch* branch, const caFunctionBinding* list
     }
 }
 
-void circa_add_module_search_path(const char* path)
-{
-    modules_add_search_path(path);
-}
-
-caBranch* circa_load_module_from_file(const char* module_name, const char* filename)
-{
-    return (caBranch*) nested_contents(load_module_from_file(module_name, filename));
-}
-
 caTerm* circa_find_term(caBranch* branch, const char* name)
 {
     return (caTerm*) find_name((Branch*) branch, name);
@@ -209,36 +199,7 @@ caType* circa_term_declared_type(caTerm* term)
     return (caType*) ((Term*) term)->type;
 }
 
-caStack* circa_alloc_stack()
-{
-    return (caStack*) new EvalContext();
-}
-void circa_dealloc_stack(caStack* stack)
-{
-    delete (EvalContext*) stack;
-}
-
-void circa_run_module(caStack* stack, const char* moduleName)
-{
-    EvalContext* context = (EvalContext*) stack;
-    Branch* branch = nested_contents(get_global(moduleName));
-
-    evaluate_branch(context, branch);
-}
-
-bool circa_has_error(caStack* stack)
-{
-    EvalContext* context = (EvalContext*) stack;
-    return error_occurred(context);
-}
-
 // Clear a runtime error from the stack
-void circa_clear_error(caStack* stack)
-{
-    EvalContext* context = (EvalContext*) stack;
-    clear_error(context);
-}
-
 void circa_print_error_to_stdout(caStack* stack)
 {
     EvalContext* context = (EvalContext*) stack;

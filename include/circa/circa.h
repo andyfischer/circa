@@ -69,21 +69,23 @@ void circa_shutdown(caWorld*);
 
 // Set up a POSIX file handler as a file source. For more control over file sources, see
 // circa/file.h
-void circa_use_standard_filesystem();
+void circa_use_standard_filesystem(caWorld* world);
 
 // Add a module search path. This is used when processing 'import' statements.
-void circa_add_module_search_path(const char* path);
+void circa_add_module_search_path(caWorld* world, const char* path);
 
 // Execute the command-line handler with the given arguments.
-int circa_run_command_line(int argc, const char* args[]);
+int circa_run_command_line(caWorld* world, int argc, const char* args[]);
 
 // Load a module by opening the given filename as a source file.
-caBranch* circa_load_module_from_file(const char* module_name, const char* filename);
+caBranch* circa_load_module_from_file(caWorld* world,
+                                      const char* module_name,
+                                      const char* filename);
 
 // -- Controlling the Interpreter --
 
 // Allocate a new Stack object.
-caStack* circa_alloc_stack();
+caStack* circa_alloc_stack(caWorld* world);
 
 // Deallocate a Stack object.
 void circa_dealloc_stack(caStack* stack);

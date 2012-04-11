@@ -1124,6 +1124,8 @@ void install_standard_library(Branch* kernel)
 
 EXPORT caWorld* circa_initialize()
 {
+    caWorld* world = (caWorld*) malloc(sizeof(world));
+
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
 
@@ -1146,7 +1148,7 @@ EXPORT caWorld* circa_initialize()
 
 #if CIRCA_ENABLE_FILESYSTEM
     // Use standard filesystem by default
-    circa_use_standard_filesystem();
+    circa_use_standard_filesystem(world);
 #endif
 
     // Load library paths from CIRCA_LIB_PATH
@@ -1166,8 +1168,7 @@ EXPORT caWorld* circa_initialize()
         }
     }
 
-    // Provide a caWorld, even though this structure is not really used yet.
-    return (caWorld*) malloc(sizeof(caWorld));
+    return world;
 }
 
 EXPORT void circa_shutdown(caWorld* world)

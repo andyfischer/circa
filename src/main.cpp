@@ -11,7 +11,7 @@ int main(int argc, const char * args[])
     caWorld* world = circa_initialize();
 
     int result = 0;
-    result = circa_run_command_line(argc, args);
+    result = circa_run_command_line(world, argc, args);
 
     circa_shutdown(world);
     
