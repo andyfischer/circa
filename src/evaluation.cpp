@@ -634,6 +634,19 @@ extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* in
     }
 }
 
+extern "C" void circa_call_function(caStack* stack, const char* funcName, caValue* inputs)
+{
+    caFunction* func = circa_find_function(NULL, funcName);
+
+    if (func == NULL) {
+        std::string msg = "Function not found: ";
+        msg += funcName;
+        raise_error((EvalContext*) stack, NULL, NULL, msg.c_str());
+        return;
+    }
+
+    circa_run_function(stack, func, inputs);
+}
 
 void clear_error(EvalContext* cxt)
 {
