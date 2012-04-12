@@ -25,6 +25,7 @@ int main(int argc, char** argv)
     circa_move(circa_frame_output(stack, 0), classA);
     circa_pop(stack);
 
+    // Dump to stdout
     circa_push_function(stack, "ClassA.dump");
     circa_copy(classA, circa_frame_input(stack, 0));
     circa_run(stack);
@@ -32,8 +33,8 @@ int main(int argc, char** argv)
         circa_print_error_to_stdout(stack);
     circa_pop(stack);
 
-    // Increment
     for (int i=0; i < 5; i++) {
+        // Increment
         circa_push_function(stack, "ClassA.increment");
         circa_copy(classA, circa_frame_input(stack, 0));
         circa_run(stack);
@@ -52,8 +53,6 @@ int main(int argc, char** argv)
             circa_print_error_to_stdout(stack);
         circa_pop(stack);
     }
-
-    //circa_call_method
 
     circa_dealloc_value(classA);
     circa_dealloc_stack(stack);

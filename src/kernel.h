@@ -27,7 +27,6 @@ extern Term* SWITCH_FUNC;
 extern Term* STATEFUL_VALUE_FUNC;
 extern Term* STATIC_ERROR_FUNC;
 extern Term* UNKNOWN_IDENTIFIER_FUNC;
-extern Term* UNKNOWN_TYPE_FUNC;
 extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
 
 extern Term* ANY_TYPE;

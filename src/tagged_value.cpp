@@ -782,6 +782,8 @@ void circa_set_term(caValue* container, caTerm* term)
 
 void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)
 {
+    if (type == NULL)
+        type = &ANY_T;
     change_type(container, (Type*) type);
     container->value_data.ptr = ptr;
 }

@@ -222,6 +222,8 @@ void finish_frame(EvalContext* context)
 
 Frame* top_frame(EvalContext* context)
 {
+    if (context->numFrames == 0)
+        return NULL;
     return get_frame(context, 0);
 }
 Branch* top_branch(EvalContext* context)
@@ -796,6 +798,10 @@ extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* in
 extern "C" void circa_push_function(caStack* stack, const char* funcName)
 {
     caFunction* func = circa_find_function(NULL, funcName);
+    if (func == NULL) {
+        std::cout << "Function not found: " << funcName << std::endl;
+        return;
+    }
     circa_push_function_ref(stack, func);
 }
 extern "C" void circa_push_function_ref(caStack* stack, caFunction* func)
@@ -812,6 +818,9 @@ extern "C" caValue* circa_frame_input(caStack* stack, int index)
 {
     EvalContext* context = (EvalContext*) stack;
     Frame* top = top_frame(context);
+    
+    if (top == NULL)
+        return NULL;
 
     if (top->branch->get(index)->function != FUNCS.input)
         return NULL;

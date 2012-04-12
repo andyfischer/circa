@@ -1077,9 +1077,6 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         Term* typeTerm = find_type(branch, typeName);
         if (is_type(typeTerm))
             type = as_type(typeTerm);
-        else
-            return compile_error_for_line(branch, tokens, startPosition,
-                "Not a type: "+typeTerm->name);
     }
 
     // Create the declared_state() term.
@@ -2298,11 +2295,8 @@ Term* find_type(Branch* branch, std::string const& name)
 {
     Term* result = find_name(branch, name.c_str());
 
-    if (result == NULL) {
-        result = apply(branch, UNKNOWN_TYPE_FUNC, TermList(), name);
-        //set_source_location(result, startPosition, tokens);
-        ca_assert(result->type == &TYPE_T);
-    }   
+    if (result == NULL || !is_type(result))
+        return ANY_TYPE;
 
     return result;
 }

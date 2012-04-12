@@ -170,7 +170,7 @@ caFunction* circa_find_function(caBranch* branch, const char* name)
     if (term == NULL)
         return NULL;
     caValue* val = circa_term_value(term);
-    if (!circa_is_function(val))
+    if (val == NULL || !circa_is_function(val))
         return NULL;
     return circa_function(val);
 }
@@ -180,7 +180,7 @@ caType* circa_find_type(caBranch* branch, const char* name)
     if (term == NULL)
         return NULL;
     caValue* val = circa_term_value(term);
-    if (!circa_is_type(val))
+    if (val == NULL || !circa_is_type(val))
         return NULL;
     return circa_type(val);
 }
