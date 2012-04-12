@@ -474,12 +474,14 @@ void create_output(EvalContext* context)
 void raise_error(EvalContext* context, Term* term, caValue* output, const char* message)
 {
     // Save the error as this term's output value.
-    set_string(output, message);
-    output->value_type = &ERROR_T;
+    if (output != NULL) {
+        set_string(output, message);
+        output->value_type = &ERROR_T;
+    }
 
     // Check if there is an errored() call listening to this term. If so, then
     // continue execution.
-    if (has_an_error_listener(term))
+    if (term != NULL && has_an_error_listener(term))
         return;
 
     if (DEBUG_TRAP_RAISE_ERROR)
@@ -609,43 +611,6 @@ caValue* evaluate(Term* function, List* inputs)
 {
     Branch scratch;
     return evaluate(&scratch, function, inputs);
-}
-
-extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
-{
-    Branch* branch = function_contents((Function*) func);
-    EvalContext* context = (EvalContext*) stack;
-
-    set_branch_in_progress(branch, false);
-
-    push_frame_with_inputs(context, branch, inputs);
-
-    // Check to insert top-level state
-    insert_top_level_state(context, branch);
-
-    run_interpreter(context);
-
-    // Save outputs to the user's list.
-    fetch_stack_outputs((EvalContext*) stack, inputs);
-
-    if (!error_occurred(context)) {
-        save_top_level_state(context, branch);
-        pop_frame(context);
-    }
-}
-
-extern "C" void circa_call_function(caStack* stack, const char* funcName, caValue* inputs)
-{
-    caFunction* func = circa_find_function(NULL, funcName);
-
-    if (func == NULL) {
-        std::string msg = "Function not found: ";
-        msg += funcName;
-        raise_error((EvalContext*) stack, NULL, NULL, msg.c_str());
-        return;
-    }
-
-    circa_run_function(stack, func, inputs);
 }
 
 void clear_error(EvalContext* cxt)
@@ -808,4 +773,71 @@ extern "C" void circa_clear_error(caStack* stack)
 {
     EvalContext* context = (EvalContext*) stack;
     clear_error(context);
+}
+extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
+{
+    Branch* branch = function_contents((Function*) func);
+    EvalContext* context = (EvalContext*) stack;
+    
+    set_branch_in_progress(branch, false);
+    
+    push_frame_with_inputs(context, branch, inputs);
+    
+    run_interpreter(context);
+    
+    // Save outputs to the user's list.
+    fetch_stack_outputs((EvalContext*) stack, inputs);
+    
+    if (!error_occurred(context)) {
+        pop_frame(context);
+    }
+}
+
+extern "C" void circa_push_function(caStack* stack, const char* funcName)
+{
+    caFunction* func = circa_find_function(NULL, funcName);
+    circa_push_function_ref(stack, func);
+}
+extern "C" void circa_push_function_ref(caStack* stack, caFunction* func)
+{
+    Branch* branch = function_contents((Function*) func);
+    EvalContext* context = (EvalContext*) stack;
+    
+    set_branch_in_progress(branch, false);
+    
+    push_frame(context, branch);
+}
+
+extern "C" caValue* circa_frame_input(caStack* stack, int index)
+{
+    EvalContext* context = (EvalContext*) stack;
+    Frame* top = top_frame(context);
+
+    if (top->branch->get(index)->function != FUNCS.input)
+        return NULL;
+    
+    return top->registers[index];
+}
+
+extern "C" caValue* circa_frame_output(caStack* stack, int index)
+{
+    EvalContext* context = (EvalContext*) stack;
+    Frame* top = top_frame(context);
+
+    int realIndex = top->branch->length() - index - 1;
+
+    if (top->branch->get(realIndex)->function != FUNCS.output)
+        return NULL;
+
+    return top->registers.get(realIndex);
+}
+
+extern "C" void circa_run(caStack* stack)
+{
+    run_interpreter((EvalContext*) stack);
+}
+
+void circa_pop(caStack* stack)
+{
+    pop_frame((EvalContext*) stack);
 }

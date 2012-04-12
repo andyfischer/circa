@@ -93,12 +93,16 @@ void circa_dealloc_stack(caStack* stack);
 // Execute the named module.
 void circa_run_module(caStack* stack, const char* moduleName);
 
-// Execute the given function with the given inputs. 'inputs' must be a list, these
-// values are used as the function's arguments. The function's outputs are then written
-// back to your 'inputs' list.
-void circa_run_function(caStack* stack, caFunction* function, caValue* inputs);
+void circa_push_function(caStack* stack, const char* funcName);
+void circa_push_function_ref(caStack* stack, caFunction* func);
+caValue* circa_frame_input(caStack* stack, int index);
+caValue* circa_frame_output(caStack* stack, int index);
 
-void circa_call_function(caStack* stack, const char* funcName, caValue* inputs);
+void circa_run(caStack* stack);
+
+void circa_pop(caStack* stack);
+
+void circa_call_method(caStack* stack, const char* funcName, caValue* object, caValue* ins, caValue* outs);
 
 // Signal that an error has occurred.
 void circa_raise_error(caStack* stack, const char* msg);
@@ -162,6 +166,10 @@ void circa_copy(caValue* source, caValue* dest);
 
 // Swap values between caValue containers. This is a very cheap operation.
 void circa_swap(caValue* left, caValue* right);
+
+// Move a value from 'source' to 'dest'. The existing value at 'dest' will be deallocated,
+// and 'source' will contain null.
+void circa_move(caValue* source, caValue* dest);
 
 // "Touch" a value, indicating that you are about to start modifying its contents. This
 // is only necessary when modifying the elements of a container type (such as a List).
@@ -285,6 +293,9 @@ void circa_parse_string(const char* str, caValue* out);
 void circa_to_string_repr(caValue* value, caValue* out);
 
 // -- Code Reflection --
+
+// Access the root branch for a caWorld.
+caBranch* circa_kernel(caWorld* world);
 
 // Find a Term by name, looking in the given branch.
 caTerm* circa_find_term(caBranch* branch, const char* name);

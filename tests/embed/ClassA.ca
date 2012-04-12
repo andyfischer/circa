@@ -1,0 +1,17 @@
+
+type ClassA {
+    String dummyString
+    int counter
+}
+
+def create_ClassA() -> ClassA
+    print("Called ClassA")
+    a = create(ClassA)
+    a.dummyString = 'DummyString'
+    return a
+
+def ClassA.increment(self :output)
+    self.counter += 1
+
+def ClassA.dump(self)
+    print("ClassA dump: ", self)

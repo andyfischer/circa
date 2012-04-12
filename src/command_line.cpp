@@ -206,25 +206,31 @@ int run_command_line(caWorld* world, caValue* args)
 
         set_branch_in_progress(branch, false);
 
+        caStack* stack = circa_alloc_stack(world);
+
+        // Push function
         caFunction* func = circa_find_function(branch, as_cstring(list_get(args, 2)));
+        circa_push_function_ref(stack, func);
 
-        Value inputs;
-        set_list(&inputs, 0);
-
-        for (int i=3; i < circa_count(args); i++) {
-            circa_parse_string(as_cstring(list_get(args, i)), circa_append(&inputs));
+        // Push inputs
+        for (int i=3, inputIndex = 0; i < circa_count(args); i++) {
+            caValue* val = circa_frame_input(stack, inputIndex++);
+            circa_parse_string(as_cstring(list_get(args, i)), val);
         }
 
-        caStack* stack = circa_alloc_stack(world);
-        circa_run_function(stack, func, &inputs);
+        circa_run(stack);
 
         if (circa_has_error(stack)) {
             circa_print_error_to_stdout(stack);
         }
 
         // Print outputs
-        for (int i=0; i < circa_count(&inputs); i++) {
-            std::cout << to_string(list_get(&inputs, i)) << std::endl;
+        for (int i=0;; i++) {
+            caValue* out = circa_frame_output(stack, i);
+            if (out == NULL)
+                break;
+
+            std::cout << to_string(circa_frame_output(stack, i)) << std::endl;
         }
         
         circa_dealloc_stack(stack);

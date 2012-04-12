@@ -1201,3 +1201,12 @@ EXPORT void circa_shutdown(caWorld* world)
 }
 
 } // namespace circa
+
+// Public API
+
+using namespace circa;
+
+caBranch* circa_kernel(caWorld*)
+{
+    return KERNEL;
+}

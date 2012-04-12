@@ -114,8 +114,6 @@ Default(circa_cl_apps['release'])
 # Unit tester app
 unit_tester_env = DEBUG.Clone()
 unit_tester_env.Append(CPPPATH=['src','tests/internal'])
-unit_tester_sources = list_source_files('tests/internal')
 unit_tester = unit_tester_env.Program('build/circa_test',
-    ['tests/internal/' + s for s in unit_tester_sources],
+    ['tests/internal/' + s for s in list_source_files('tests/internal')],
     LIBS=circa_libs['debug'])
-

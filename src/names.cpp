@@ -30,8 +30,10 @@ bool exposes_nested_names(Term* term);
 
 Term* find_name(Branch* branch, int location, Name name)
 {
-    if (branch == NULL)
+    if (branch == NULL) {
         branch = KERNEL;
+        location = KERNEL->length();
+    }
 
     Term* result = find_local_name(branch, location, name);
     if (result != NULL)
@@ -42,7 +44,7 @@ Term* find_name(Branch* branch, int location, Name name)
         return NULL;
 
     Term* parent = branch->owningTerm;
-    if (parent == NULL)
+    if (parent == NULL && branch != KERNEL)
         return get_global(name);
 
     // find_name with the parent's location plus one, so that we do look
@@ -58,12 +60,19 @@ Term* find_name(Branch* branch, int location, const char* name)
 
 Term* find_name(Branch* branch, Name name)
 {
-    return find_name(branch, branch->length(), name);
+    int location = 0;
+    if (branch != NULL)
+        location = branch->length();
+        
+    return find_name(branch, location, name);
 }
 
 Term* find_name(Branch* branch, const char* name)
 {
-    return find_name(branch, branch->length(), name);
+    int location = 0;
+    if (branch != NULL)
+        location = branch->length();
+    return find_name(branch, location, name);
 }
 
 Term* find_name_at(Term* location, const char* name)
@@ -143,6 +152,7 @@ bool exposes_nested_names(Term* term)
         return true;
     if (term->function == FUNCS.imported_file)
         return true;
+
     return false;
 }
 

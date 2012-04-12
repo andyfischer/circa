@@ -844,5 +844,9 @@ void circa_swap(caValue* left, caValue* right)
 {
     swap(left, right);
 }
+void circa_move(caValue* source, caValue* dest)
+{
+    move(source, dest);
+}
 
 } // extern "C"
