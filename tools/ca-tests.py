@@ -152,6 +152,7 @@ def all_testable_files():
         TestRoot + '/for',
         TestRoot + '/list',
         TestRoot + '/reflection',
+        TestRoot + '/runtime_typing',
         TestRoot + '/static_errors',
         TestRoot + '/type_inferrence'
         ]

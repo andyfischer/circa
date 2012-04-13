@@ -751,6 +751,10 @@ void circa_touch(caValue* value)
 {
     touch(value);
 }
+caType* circa_type_of(caValue* value)
+{
+    return value->value_type;
+}
 
 void circa_set_bool(caValue* container, bool b)
 {

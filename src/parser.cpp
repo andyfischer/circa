@@ -1619,8 +1619,8 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Term* function = find_method(branch, rootType, functionName);
 
     if (function == NULL) {
-        // Method not found, create a functionless call.
-        Term* result = apply(branch, function, inputs);
+        // Method could not be statically found, create a dynamic call.
+        Term* result = apply(branch, FUNCS.dynamic_method, inputs);
         result->setStringProp("syntax:functionName", functionName);
         result->setStringProp("syntax:declarationStyle", "method-call");
         return ParseResult(result);
@@ -1766,36 +1766,11 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
 
-        // Check for a.b, field access.
+        // Check for a.b, method call
         } else if (tokens.nextIs(TK_DOT)) {
             tokens.consume(TK_DOT);
 
-            if (!tokens.nextIs(TK_IDENTIFIER))
-                return compile_error_for_line(branch, tokens, startPosition,
-                        "Expected identifier after .");
-
-            // Lookahead for paren. If found, parse as method call.
-            if (tokens.nextIs(TK_LPAREN, 1)) {
-                result = method_call(branch, tokens, context, result);
-                continue;
-            }
-
-            // Check whether the identifier matches a method. If so, parse as a method
-            // call. TODO This is fragile and we should revisit to reduce the surprising
-            // difference between a method and a field access.
-            Term* rootTerm = result.term;
-            if (find_method(branch, rootTerm->type, tokens.nextStr()) != NULL) {
-                // Method call with no parens
-                result = method_call(branch, tokens, context, result);
-                continue;
-            }
-
-            std::string ident = tokens.consumeStr(TK_IDENTIFIER);
-            
-            Term* term = apply(branch, FUNCS.get_field, TermList(result.term, create_string(branch, ident)));
-            set_source_location(term, startPosition, tokens);
-            set_input_syntax_hint(term, 0, "postWhitespace", "");
-            result = ParseResult(term);
+            result = method_call(branch, tokens, context, result);
 
         } else {
             // TODO here: function call of an expression

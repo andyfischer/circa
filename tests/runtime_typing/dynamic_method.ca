@@ -1,0 +1,16 @@
+
+def call_blah(any a)
+    print(a.blah())
+    
+
+type A {}
+def A.blah() -> String
+    return "A.blah"
+
+call_blah(create(A))
+
+type B {}
+def B.blah() -> String
+    return "B.blah"
+
+call_blah(create(B))

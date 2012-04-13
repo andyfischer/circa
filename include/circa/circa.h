@@ -196,6 +196,8 @@ void circa_move(caValue* source, caValue* dest);
 // is only necessary when modifying the elements of a container type (such as a List).
 void circa_touch(caValue* value);
 
+caType* circa_type_of(caValue* value);
+
 // -- Accessors --
 
 // Check the type of a caValue.

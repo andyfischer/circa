@@ -181,6 +181,27 @@ CA_FUNCTION(to_string_repr)
     circa_to_string_repr(INPUT(0), OUTPUT);
 }
 
+void dynamic_method(caStack* stack)
+{
+    caValue* object = circa_input(stack, 0);
+
+    Term* term = find_method((Branch*) circa_callee_branch(stack),
+        (Type*) circa_type_of(object),
+        ((Term*) circa_current_term(stack))->stringPropOptional("methodName", ""));
+
+    Function* func = as_function(term);
+        
+    if (term != NULL) {
+        push_frame(stack, nested_contents(func));
+
+        // Evaluate this method
+        // (TODO)
+    }
+
+    // Check if this is a field access
+    // (TODO)
+}
+
 void call_func(caStack* stack)
 {
     caValue* callable = circa_input(stack, 0);
@@ -1036,6 +1057,9 @@ void bootstrap_kernel()
                     "type Color { number r, number g, number b, number a }"));
 
     color_t::setup_type(TYPES.color);
+
+    // Need dynamic_method before any hosted functions
+    FUNCS.dynamic_method = import_function(KERNEL, (EvaluateFunc) dynamic_method, "def dynamic_method(any inputs :multiple) -> any");
 }
 
 void install_standard_library(Branch* kernel)
