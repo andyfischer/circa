@@ -28,109 +28,113 @@ std::map<std::string,Name> g_stringToSymbol;
 
 bool exposes_nested_names(Term* term);
 
-Term* find_name(Branch* branch, int location, Name name)
+bool fits_lookup_type(Term* term, NameLookupType type)
 {
-    if (branch == NULL) {
-        branch = KERNEL;
-        location = KERNEL->length();
+    switch (type) {
+        case NAME_LOOKUP_ANY: return true;
+        case NAME_LOOKUP_TYPE: return is_type(term);
+        case NAME_LOOKUP_FUNCTION: return is_function(term);
     }
+    internal_error("");
+    return false;
+}
 
-    Term* result = find_local_name(branch, location, name);
-    if (result != NULL)
-        return result;
-
-    // Name not found in this branch.
-    if (branch == KERNEL)
+Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lookupType)
+{
+    if (name == 0)
         return NULL;
 
-    Term* parent = branch->owningTerm;
-    if (parent == NULL && branch != KERNEL)
-        return get_global(name);
-
-    // find_name with the parent's location plus one, so that we do look
-    // at the parent's branch (in case our name has a namespace prefix
-    // that refers to this branch).
-    return find_name(parent->owningBranch, parent->index + 1, name);
-}
-
-Term* find_name(Branch* branch, int location, const char* name)
-{
-    return find_name(branch, location, name_from_string(name));
-}
-
-Term* find_name(Branch* branch, Name name)
-{
-    int location = 0;
-    if (branch != NULL)
-        location = branch->length();
-        
-    return find_name(branch, location, name);
-}
-
-Term* find_name(Branch* branch, const char* name)
-{
-    int location = 0;
-    if (branch != NULL)
-        location = branch->length();
-    return find_name(branch, location, name);
-}
-
-Term* find_name_at(Term* location, const char* name)
-{
-    return find_name(location->owningBranch, location->index, name);
-}
-
-Term* find_local_name(Branch* branch, int index, Name name)
-{
     if (branch == NULL)
         return NULL;
 
-    // First, look for an exact match.
-    for (int i = index - 1; i >= 0; i--) {
+    // location can be -1, meaning 'last term'
+    if (location == -1)
+        location = branch->length();
+
+    // Look for an exact match.
+    for (int i = location - 1; i >= 0; i--) {
         Term* term = branch->get(i);
         if (term == NULL)
+            continue;
+
+        if (!fits_lookup_type(term, lookupType))
             continue;
 
         if (term->nameSymbol == name)
             return term;
 
-        if (term->nestedContents && exposes_nested_names(term)) {
-            Term* nested = find_local_name(term->nestedContents, name);
+        if (term->nestedContents != NULL && exposes_nested_names(term)) {
+            Term* nested = find_local_name(term->nestedContents, name, -1, lookupType);
             if (nested != NULL)
                 return nested;
         }
     }
 
-    // Check if 'name' is a qualified name.
+    // Check if the name is a qualified name.
     Name namespacePrefix = name_get_namespace_first(name);
 
     if (namespacePrefix == name_None)
         return NULL;
 
-    Term* nsPrefixTerm = find_local_name(branch, index, namespacePrefix);
+    Term* nsPrefixTerm = find_local_name(branch, namespacePrefix, location, lookupType);
 
     // Give up if prefix not found
     if (nsPrefixTerm == NULL)
         return NULL;
 
     // Recursively search inside the prefix for the qualified suffix.
-    return find_local_name(nested_contents(nsPrefixTerm), name_get_namespace_rr(name));
+    return find_local_name(nested_contents(nsPrefixTerm),
+        name_get_namespace_rr(name), -1, lookupType);
 }
 
-Term* find_local_name(Branch* branch, int index, const char* nameStr)
+Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupType)
+{
+    if (name == 0)
+        return NULL;
+
+    if (branch == NULL) {
+        branch = KERNEL;
+    }
+
+    Term* result = find_local_name(branch, name, location, lookupType);
+    if (result != NULL)
+        return result;
+
+    // Name not found in this branch.
+
+    // Don't continue the search if this is the kernel
+    if (branch == KERNEL)
+        return NULL;
+
+    // Search parent
+    Term* parent = branch->owningTerm;
+    if (parent != NULL) {
+        // find_name with the parent's location plus one, so that we do look
+        // at the parent's branch (in case our name has a namespace prefix
+        // that refers to this branch).
+        return find_name(parent->owningBranch, name, parent->index + 1, lookupType);
+    }
+
+    // No parent, search kernel
+    return get_global(name);
+}
+
+Term* find_name(Branch* branch, const char* nameStr, int location, NameLookupType lookupType)
 {
     Name name = name_from_string(nameStr);
-    return find_local_name(branch, index, name);
+    return find_name(branch, name, location, lookupType);
 }
 
-Term* find_local_name(Branch* branch, Name name)
+// Finds a name in this branch.
+Term* find_local_name(Branch* branch, const char* nameStr, int location, NameLookupType lookupType)
 {
-    return find_local_name(branch, branch->length(), name);
+    Name name = name_from_string(nameStr);
+    return find_local_name(branch, name, location, lookupType);
 }
 
-Term* find_local_name(Branch* branch, const char* name)
+Term* find_name_at(Term* term, const char* name)
 {
-    return find_local_name(branch, branch->length(), name);
+    return find_name(term->owningBranch, name, term->index);
 }
 
 int find_qualified_name_separator(const char* name)

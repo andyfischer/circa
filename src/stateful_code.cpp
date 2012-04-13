@@ -175,7 +175,7 @@ static Term* find_output_term_for_state_field(Branch* branch, const char* fieldN
 
     // For declared state, the result is the last term with the given name
     if (result->function == FUNCS.declared_state) {
-        return find_local_name(branch, position, result->name.c_str());
+        return find_local_name(branch, result->name.c_str(), position);
     }
 
     ca_assert(result != NULL);

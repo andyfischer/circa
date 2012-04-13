@@ -32,7 +32,7 @@ void install_function(Term* function, EvaluateFunc evaluate)
 
 Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 {
-    Term* term = find_name(branch, name);
+    Term* term = find_name(branch, name_from_string(name));
     if (term == NULL) {
         std::string msg = "Name not found in install_function: ";
         msg += name;

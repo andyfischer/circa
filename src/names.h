@@ -6,14 +6,37 @@ namespace circa {
 
 typedef int Name;
 
-Term* find_name(Branch* branch, Name name);
-Term* find_name(Branch* branch, const char* name);
-Term* find_name_at(Term* location, const char* name);
+enum NameLookupType {
+    NAME_LOOKUP_ANY = 1,
+    NAME_LOOKUP_TYPE = 2,
+    NAME_LOOKUP_FUNCTION = 3
+};
 
-Term* find_local_name(Branch* branch, int index, Name name);
-Term* find_local_name(Branch* branch, int location, const char* name);
-Term* find_local_name(Branch* branch, Name name);
-Term* find_local_name(Branch* branch, const char* name);
+// Finds a name in this branch or a visible parent branch.
+Term* find_name(Branch* branch,
+                Name name,
+                int location = -1,
+                NameLookupType lookupType = NAME_LOOKUP_ANY);
+
+// Finds a name in this branch.
+Term* find_local_name(Branch* branch,
+                      Name name,
+                      int location = -1,
+                      NameLookupType lookupType = NAME_LOOKUP_ANY);
+
+// Convenient overloads for using a string as a name
+Term* find_name(Branch* branch,
+                const char* name,
+                int location = -1,
+                NameLookupType lookupType = NAME_LOOKUP_ANY);
+
+// Finds a name in this branch.
+Term* find_local_name(Branch* branch,
+                      const char* name,
+                      int location = -1,
+                      NameLookupType lookupType = NAME_LOOKUP_ANY);
+
+Term* find_name_at(Term* term, const char* name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
 // of the first colon. If the string isn't a qualified name then returns -1.
