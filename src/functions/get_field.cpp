@@ -14,6 +14,7 @@ namespace get_field_function {
 
             if (!is_list_based_type(head->value_type)) {
                 std::string msg = "get_field failed, not a compound type: " + head->toString();
+                msg += ". Field is: " + name;
                 return RAISE_ERROR(msg.c_str());
             }
 

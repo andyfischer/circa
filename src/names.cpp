@@ -57,12 +57,10 @@ Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lo
         if (term == NULL)
             continue;
 
-        if (!fits_lookup_type(term, lookupType))
-            continue;
-
-        if (term->nameSymbol == name)
+        if (term->nameSymbol == name && fits_lookup_type(term, lookupType))
             return term;
 
+        // If this term exposes its names, then search inside the nested branch.
         if (term->nestedContents != NULL && exposes_nested_names(term)) {
             Term* nested = find_local_name(term->nestedContents, name, -1, lookupType);
             if (nested != NULL)
