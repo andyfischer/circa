@@ -15,7 +15,7 @@ namespace circa {
 
 const int TERM_FLAG_LAZY = 0x1;
 
-struct Term : caTerm
+struct Term : public caTerm
 {
     Value value;
 
@@ -71,9 +71,6 @@ struct Term : caTerm
 
     // Code which is nested inside this term. This object is created on-demand.
     Branch* nestedContents;
-
-    // A globally unique ID
-    unsigned int globalID;
 
     // Dynamic properties
     Dict properties;

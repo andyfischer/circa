@@ -501,13 +501,13 @@ void clear_branch(Branch* branch)
     branch->_terms.clear();
 }
 
-Term* find_term_by_id(Branch* branch, unsigned int id)
+Term* find_term_by_id(Branch* branch, int id)
 {
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         if (*it == NULL)
             continue;
 
-        if (it->globalID == id)
+        if (it->id == id)
             return *it;
     }
 

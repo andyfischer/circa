@@ -22,6 +22,31 @@ using namespace circa;
 
 extern "C" {
 
+void caBranch::dump()
+{
+    circa_dump_b(this);
+}
+
+caTerm* caBranch::term(int index)
+{
+    return circa_get_term(this, index);
+}
+
+caTerm* caBranch::owner()
+{
+    return circa_owning_term(this);
+}
+
+void caTerm::dump()
+{
+    circa::dump((Term*) this);
+}
+
+caBranch* caTerm::parent()
+{
+    return circa_parent_branch(this);
+}
+
 caValue* circa_input(caStack* stack, int index)
 {
     return get_input((EvalContext*) stack, index);
@@ -222,6 +247,17 @@ caBranch* circa_get_nested_branch(caBranch* branch, const char* name)
         return NULL;
     return (caBranch*) term->nestedContents;
 }
+caBranch* circa_parent_branch(caTerm* term)
+{
+    return (caBranch*) ((Term*) term)->owningBranch;
+}
+caTerm* circa_owning_term(caBranch* branch)
+{
+    return (caTerm*) ((Branch*) branch)->owningTerm;
+}
+
+// Get the owning Term for a given Branch
+caTerm* circa_owning_term(caBranch*);
 
 caBranch* circa_function_contents(caFunction* func)
 {

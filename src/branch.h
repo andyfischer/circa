@@ -13,12 +13,6 @@
 #include "term_list.h"
 #include "term_namespace.h"
 
-typedef struct caBranch {
-    // Opaque type, used by C api.
-protected:
-    caBranch() {} // Disallow C++ construction of this type.
-} caBranch;
-
 namespace circa {
 
 struct BrokenLinkList;
@@ -161,7 +155,7 @@ Branch* include_script(Branch* branch, const char* filename);
 // branch.
 Branch* load_script_term(Branch* branch, const char* filename);
 
-Term* find_term_by_id(Branch* branch, unsigned int id);
+Term* find_term_by_id(Branch* branch, int id);
 
 std::string get_source_file_location(Branch* branch);
 

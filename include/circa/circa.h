@@ -29,16 +29,34 @@ typedef struct caStack caStack;
 // section holds the actual value and not a pointer.
 typedef struct caValue caValue;
 
+struct caTerm;
+    
 // a Branch is a section of compiled code. It contains a list of Terms and some other
 // metadata. Each Term may itself contain a nested Branch.
-typedef struct caBranch caBranch;
+typedef struct caBranch 
+{
+#ifdef __cplusplus
+    void dump();
+    caTerm* term(int index);
+    caTerm* owner();
+
+    protected: caBranch() {} // Disallow C++ construction of this type.
+#endif
+} caBranch;
 
 // a Term is one unit of compiled code. Each term has a function and a list of inputs, and
 // some other metadata. A term may also have a nested Branch.
 typedef struct caTerm 
 {
-    int id;
-};
+    int id; // Globally unique ID. This is mainly used for debugging.
+
+#ifdef __cplusplus
+    void dump();
+    caBranch* parent();
+
+    protected: caTerm() {} // Disallow C++ construction of this type.
+#endif
+} caTerm;
 
 // a Type holds data for a single Circa type, including a name, handlers for
 // initialization and destruction, and various other handlers and metadata.
@@ -321,6 +339,12 @@ caBranch* circa_nested_branch(caTerm* term);
 
 // Get the Branch contents for a term with the given name.
 caBranch* circa_get_nested_branch(caBranch* branch, const char* name);
+
+// Get the parent Branch for a given Term
+caBranch* circa_parent_branch(caTerm* term);
+
+// Get the owning Term for a given Branch
+caTerm* circa_owning_term(caBranch* branch);
 
 // Get the Branch contents for a function
 caBranch* circa_function_contents(caFunction* func);

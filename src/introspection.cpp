@@ -81,7 +81,7 @@ std::string global_id(Term* term)
         return "NULL";
 
     std::stringstream out;
-    out << "$" << term->globalID;
+    out << "$" << term->id;
     return out.str();
 }
 

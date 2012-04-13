@@ -75,7 +75,7 @@ int run_command_line(caWorld* world, caValue* args)
             String name;
             set_string(&name, "$");
             string_append(&name, list_get(args, 1));
-            DEBUG_BREAK_ON_TERM = strdup(as_cstring(&name));
+            DEBUG_BREAK_ON_TERM = atoi(as_cstring(&name));
 
             list_remove_index(args, 0);
             list_remove_index(args, 0);

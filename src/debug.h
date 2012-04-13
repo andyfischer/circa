@@ -20,7 +20,7 @@ extern bool DEBUG_TRACE_ALL_REF_WRITES;
 
 extern bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS;
 
-extern const char* DEBUG_BREAK_ON_TERM;
+extern int DEBUG_BREAK_ON_TERM;
 
 // Spit out this branch's raw contents to std::cout
 void dump(Branch& branch);

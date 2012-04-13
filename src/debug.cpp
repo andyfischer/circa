@@ -18,7 +18,7 @@ bool DEBUG_TRAP_RAISE_ERROR = false;
 bool DEBUG_TRACE_ALL_REF_WRITES = false;
 bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS = false;
 
-const char* DEBUG_BREAK_ON_TERM = "";
+int DEBUG_BREAK_ON_TERM = -1;
 
 void dump(Branch& branch)
 {

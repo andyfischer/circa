@@ -28,11 +28,11 @@ Term::Term()
     nestedContents(NULL),
     flags(0)
 {
-    globalID = gNextGlobalID++;
+    id = gNextGlobalID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
 
-    if (global_id(this) == DEBUG_BREAK_ON_TERM)
+    if (id == DEBUG_BREAK_ON_TERM)
         ca_debugger_break();
 }
 
