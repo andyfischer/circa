@@ -1529,12 +1529,12 @@ ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
         // If the minus sign is on a literal number, then just negate it in place,
         // rather than introduce a neg() operation.
         if (is_value(expr.term) && expr.term->name == "") {
-            if (is_int(expr.term)) {
-                set_int(expr.term, as_int(expr.term) * -1);
+            if (is_int(term_value(expr.term))) {
+                set_int(term_value(expr.term), as_int(term_value(expr.term)) * -1);
                 return expr;
             }
-            else if (is_float(expr.term)) {
-                set_float(expr.term, as_float(expr.term) * -1.0f);
+            else if (is_float(term_value(expr.term))) {
+                set_float(term_value(expr.term), as_float(term_value(expr.term)) * -1.0f);
                 expr.term->setStringProp("float:original-format",
                     "-" + expr.term->stringProp("float:original-format"));
                 return expr;
@@ -2065,7 +2065,7 @@ ParseResult literal_color(Branch* branch, TokenStream& tokens, ParserCxt* contex
     text = text.substr(1, text.length()-1);
 
     Term* resultTerm = create_value(branch, TYPES.color);
-    List* result = List::checkCast(resultTerm);
+    List* result = List::checkCast(term_value(resultTerm));
 
     float r = 0;
     float g = 0;
@@ -2141,7 +2141,7 @@ ParseResult literal_name(Branch* branch, TokenStream& tokens, ParserCxt* context
     Term* term = create_value(branch, &NAME_T);
 
     // Skip the leading ':' in the name string
-    set_name(term, name_from_string(s.c_str() + 1));
+    set_name(term_value(term), name_from_string(s.c_str() + 1));
     set_source_location(term, startPosition, tokens);
 
     return ParseResult(term);

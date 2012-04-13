@@ -37,13 +37,13 @@ namespace get_field_function {
         for (int nameIndex=1; nameIndex < caller->numInputs(); nameIndex++) {
 
             // Abort if input type is not correct
-            if (!is_string(caller->input(1)))
+            if (!is_string(term_value(caller->input(1))))
                 return &ANY_T;
 
             if (!is_list_based_type(head))
                 return &ANY_T;
 
-            std::string const& name = caller->input(1)->asString();
+            std::string const& name = term_value(caller->input(1))->asString();
 
             int fieldIndex = list_find_field_index_by_name(head, name.c_str());
 
@@ -64,7 +64,7 @@ namespace get_field_function {
         format_source_for_input(source, term, 0);
         for (int i=1; i < term->numInputs(); i++) {
             append_phrase(source, ".", term, TK_DOT);
-            append_phrase(source, term->input(i)->asString(),
+            append_phrase(source, term_value(term->input(i))->asString(),
                     term, TK_IDENTIFIER);
         }
     }

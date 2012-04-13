@@ -138,9 +138,9 @@ namespace string_t {
         std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
         std::string result;
         if (quoteType == "<")
-            result = "<<<" + as_string(term) + ">>>";
+            result = "<<<" + as_string(term_value(term)) + ">>>";
         else
-            result = quoteType + as_string(term) + quoteType;
+            result = quoteType + as_cstring(term_value(term)) + quoteType;
 
         append_phrase(source, result, term, TK_STRING);
     }

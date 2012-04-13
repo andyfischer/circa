@@ -35,7 +35,10 @@ typedef struct caBranch caBranch;
 
 // a Term is one unit of compiled code. Each term has a function and a list of inputs, and
 // some other metadata. A term may also have a nested Branch.
-typedef struct caTerm caTerm;
+typedef struct caTerm 
+{
+    int id;
+};
 
 // a Type holds data for a single Circa type, including a name, handlers for
 // initialization and destruction, and various other handlers and metadata.

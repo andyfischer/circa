@@ -15,8 +15,10 @@ namespace circa {
 
 const int TERM_FLAG_LAZY = 0x1;
 
-struct Term : Value
+struct Term : caTerm
 {
+    Value value;
+
     // Fields inherited from caValue:
     //   caValue::Data value_data
     //   Type* value_type
@@ -149,5 +151,11 @@ void term_remove_property(Term* term, const char* name);
 // Removes the property with the given name from 'source', and assigns that
 // property to 'dest'. Has no effect if 'source' does not have the property.
 void term_move_property(Term* source, Term* dest, const char* propName);
+
+caValue* term_value(Term* term);
+bool is_type(Term* term);
+bool is_function(Term* term);
+Function* as_function(Term* term);
+Type* as_type(Term* term);
 
 } // namespace circa

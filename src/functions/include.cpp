@@ -57,10 +57,10 @@ namespace include_function {
     void include_post_compile(Term* term)
     {
         // Pre-load the contents, if possible
-        if (!is_string(term->input(0)))
+        if (!is_string(term_value(term->input(0))))
             return;
 
-        load_script(NULL, term, as_string(term->input(0)));
+        load_script(NULL, term, as_string(term_value(term->input(0))));
     }
 
     CA_FUNCTION(load_script)

@@ -61,7 +61,6 @@ namespace function_t {
     void setup_type(Type* type);
 }
 
-bool is_function(Term* term);
 bool is_function_attrs(Term* term);
 Branch* function_contents(Term* func);
 Branch* function_contents(Function* func);

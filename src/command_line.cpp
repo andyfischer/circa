@@ -15,6 +15,7 @@
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
+#include "term.h"
 
 #include "tools/build_tool.h"
 #include "tools/command_reader.h"
@@ -160,7 +161,7 @@ int run_command_line(caWorld* world, caValue* args)
         }
 
         Branch workspace;
-        caValue* result = (caValue*) workspace.eval(as_cstring(&command));
+        caValue* result = term_value(workspace.eval(as_cstring(&command)));
         std::cout << result->toString() << std::endl;
         return 0;
     }

@@ -35,7 +35,7 @@ namespace int_t {
         if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
             strm << "0x" << std::hex;
 
-        strm << as_int(term);
+        strm << as_int(term_value(term));
         append_phrase(source, strm.str(), term, TK_INTEGER);
     }
     void setup_type(Type* type)

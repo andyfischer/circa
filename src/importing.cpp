@@ -45,7 +45,7 @@ Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
 Term* import_type(Branch* branch, Type* type)
 {
     Term* term = create_value(branch, &TYPE_T, name_to_string(type->name));
-    set_type(term, type);
+    set_type(term_value(term), type);
     return term;
 }
 

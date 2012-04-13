@@ -120,7 +120,7 @@ Term::contents(const char* name)
 std::string
 Term::toString()
 {
-    return to_string(this);
+    return to_string(term_value(this));
 }
 
 bool Term::hasProperty(std::string const& name)
@@ -259,21 +259,22 @@ static void append_term_invariant_error(List* errors, Term* term,
 
 void term_check_invariants(List* errors, Term* term)
 {
-    if (term->value_type == NULL)
+    // DELETE_THIS ?
+    if (term_value(term)->value_type == NULL)
         append_term_invariant_error(errors, term, "caValue has null type");
 
     if (term->type != NULL) {
 
         bool typeOk = (term->type == &ANY_T)
-            || (term->type == &VOID_T && is_null(term))
-            || cast_possible(term, term->type);
+            || (term->type == &VOID_T && is_null(term_value(term)))
+            || cast_possible(term_value(term), term->type);
 
         if (!typeOk) {
             std::string msg;
             msg += std::string("caValue has wrong type: term->type is ")
                 + name_to_string(term->type->name)
                 + ", tag is "
-                + name_to_string(term->value_type->name);
+                + name_to_string(term_value(term)->value_type->name);
             append_term_invariant_error(errors, term, msg);
         }
     }
@@ -311,6 +312,30 @@ void term_move_property(Term* from, Term* to, const char* propName)
 
     term_set_property(to, propName, term_get_property(from, propName));
     term_remove_property(from, propName);
+}
+
+caValue* term_value(Term* term)
+{
+    return &term->value;
+}
+
+bool is_type(Term* term)
+{
+    return is_value(term) && is_type(&term->value);
+}
+bool is_function(Term* term)
+{
+    if (term == NULL)
+        return false;
+    return is_value(term) && is_function(&term->value);
+}
+Function* as_function(Term* term)
+{
+    return as_function(term_value(term));
+}
+Type* as_type(Term* term)
+{
+    return as_type(term_value(term));
 }
 
 } // namespace circa

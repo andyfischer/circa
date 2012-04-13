@@ -11,7 +11,7 @@ namespace name_t {
     }
     void format_source(StyledSource* source, Term* term)
     {
-        std::string s = name_t::to_string(term);
+        std::string s = name_t::to_string(term_value(term));
         append_phrase(source, s.c_str(), term, TK_NAME);
     }
 

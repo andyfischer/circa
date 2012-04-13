@@ -15,6 +15,7 @@
 #include "names.h"
 #include "subroutine.h"
 #include "string_type.h"
+#include "term.h"
 #include "tagged_value.h"
 
 using namespace circa;
@@ -232,7 +233,7 @@ caValue* circa_term_value(caTerm* term)
 {
     if (!is_value((Term*) term))
         return NULL;
-    return (caValue*) term;
+    return term_value((Term*) term);
 }
 int circa_term_get_index(caTerm* term)
 {
@@ -241,7 +242,7 @@ int circa_term_get_index(caTerm* term)
 
 caFunction* circa_declare_function(caBranch* branch, const char* name)
 {
-    return (caFunction*) as_function(create_function((Branch*) branch, name));
+    return (caFunction*) as_function(term_value(create_function((Branch*) branch, name)));
 }
 
 caValue* circa_declare_value(caBranch* branch, const char* name)
@@ -250,7 +251,7 @@ caValue* circa_declare_value(caBranch* branch, const char* name)
     if (name != NULL)
         nameStr = name;
     Term* term = create_value((Branch*) branch, &ANY_T, nameStr);
-    return (caValue*) term;
+    return term_value(term);
 }
 
 void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate)

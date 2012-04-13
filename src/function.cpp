@@ -68,13 +68,6 @@ namespace function_t {
 
 } // namespace function_t
 
-bool is_function(Term* term)
-{
-    if (term == NULL)
-        return false;
-    return is_value(term) && term->type == &FUNCTION_T;
-}
-
 Branch* function_contents(Term* func)
 {
     return nested_contents(func);
@@ -94,7 +87,7 @@ std::string get_placeholder_name_for_index(int index)
 
 void initialize_function(Term* func)
 {
-    func->value_type = &FUNCTION_T;
+    term_value(func)->value_type = &FUNCTION_T;
     as_function(func)->declaringTerm = func;
     as_function(func)->contents = nested_contents(func);
 }
@@ -174,7 +167,7 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 
     for (int i=0; i < inputs.length(); i++) {
         Type* type = function_get_input_type(func, i);
-        caValue* value = inputs[i];
+        caValue* value = term_value(inputs[i]);
         if (value == NULL)
             continue;
         if (!cast_possible(value, type))
@@ -407,10 +400,12 @@ std::string function_get_documentation_string(Function* func)
     if (expected_index >= contents->length()) return "";
     Term* possibleDocString = contents->get(expected_index);
     if (possibleDocString->name != "") return "";
-    if (!is_string(possibleDocString)) return "";
     if (!is_statement(possibleDocString)) return "";
     if (!is_value(possibleDocString)) return "";
-    return as_string(possibleDocString);
+
+    caValue* val = term_value(possibleDocString);
+    if (!is_string(val)) return "";
+    return as_string(val);
 }    
 
 const char* get_output_name(Term* term, int outputIndex)

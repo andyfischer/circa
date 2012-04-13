@@ -96,7 +96,7 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, "unrecognized_expression");
 
     if (term->function == STATIC_ERROR_FUNC)
-        return append_static_error(errors, term, to_string(term->input(0)).c_str());
+        return append_static_error(errors, term, to_string(term_value(term->input(0))).c_str());
 }
 
 void check_for_static_errors(List* errors, Branch* branch)
@@ -187,7 +187,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
             << name_to_string(function_get_input_type(term->function, inputIndex)->name);
     }
     else if (term->function == STATIC_ERROR_FUNC)
-        out << to_string(term->input(0));
+        out << to_string(term_value(term->input(0)));
     else
         //out << "(unrecognized error type: " << type << ")";
         out << type;

@@ -33,12 +33,12 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // If 'function' is actually a type, create a value instead.
     if (function != NULL && is_type(function)) {
         if (inputs.length() == 0) {
-            Term* term = create_value(branch, as_type(function));
+            Term* term = create_value(branch, as_type(term_value(function)));
             term->setBoolProp("constructor", true);
             return term;
         } else if (inputs.length() == 1) {
             Term* term = apply(branch, FUNCS.cast, inputs);
-            change_declared_type(term, as_type(function));
+            change_declared_type(term, as_type(term_value(function)));
             return term;
         } else {
             internal_error("Constructors with multiple arguments not yet supported.");
@@ -94,7 +94,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
     // Possibly run the function's postCompile handler
     if (is_function(function)) {
-        Function::PostCompile func = as_function(function)->postCompile;
+        Function::PostCompile func = as_function(term_value(function))->postCompile;
 
         if (func != NULL)
             func(term);
@@ -260,10 +260,10 @@ void change_declared_type(Term *term, Type *newType)
 
     term->type = newType;
 
-    set_null((caValue*) term);
+    set_null(term_value(term));
 
     // TODO: Don't call create() here
-    create(newType, term);
+    create(newType, term_value(term));
 
     // TODO: Use update_cascades to update inferred type on all users.
 }
@@ -314,9 +314,9 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, inputs, name);
     change_declared_type(term, original->type);
-    //create(original->value_type, (caValue*) term);
+    //create(original->value_type, term_value(term));
 
-    copy(original, term);
+    copy(term_value(original), term_value(term));
 
     if (copyBranches)
         duplicate_branch(nested_contents(original), nested_contents(term));
@@ -325,10 +325,10 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
     copy(&original->properties, &term->properties);
 
     // Special case for certain types, update declaringType
-    if (is_value(term) && is_type(term))
-        as_type(term)->declaringTerm = term;
-    if (is_value(term) && is_function(term) && as_function(term) != NULL)
-        as_function(term)->declaringTerm = term;
+    if (is_type(term))
+        as_type(term_value(term))->declaringTerm = term;
+    if (is_function(term))
+        as_function(term_value(term))->declaringTerm = term;
 
     return term;
 }
@@ -352,7 +352,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     Term *term = apply(branch, FUNCS.value, TermList(), name);
 
     change_declared_type(term, type);
-    create(type, (caValue*) term);
+    create(type, term_value(term));
 
     return term;
 }
@@ -366,41 +366,41 @@ Term* create_value(Branch* branch, std::string const& typeName, std::string cons
     if (type == NULL)
         internal_error("Couldn't find type: "+typeName);
 
-    return create_value(branch, as_type(type), name);
+    return create_value(branch, as_type(term_value(type)), name);
 }
 
 Term* create_value(Branch* branch, caValue* initialValue, std::string const& name)
 {
     Term* term = create_value(branch, initialValue->value_type, name);
-    copy(initialValue, term);
+    copy(initialValue, term_value(term));
     return term;
 }
 
 Term* create_string(Branch* branch, std::string const& s, std::string const& name)
 {
     Term* term = create_value(branch, &STRING_T, name);
-    set_string(term, s);
+    set_string(term_value(term), s);
     return term;
 }
 
 Term* create_int(Branch* branch, int i, std::string const& name)
 {
     Term* term = create_value(branch, &INT_T, name);
-    set_int(term, i);
+    set_int(term_value(term), i);
     return term;
 }
 
 Term* create_float(Branch* branch, float f, std::string const& name)
 {
     Term* term = create_value(branch, &FLOAT_T, name);
-    set_float(term, f);
+    set_float(term_value(term), f);
     return term;
 }
 
 Term* create_bool(Branch* branch, bool b, std::string const& name)
 {
     Term* term = create_value(branch, &BOOL_T, name);
-    set_bool(term, b);
+    set_bool(term_value(term), b);
     return term;
 }
 
@@ -434,7 +434,7 @@ Term* create_type(Branch* branch, std::string name)
     Term* term = create_value(branch, &TYPE_T);
 
     if (name != "") {
-        as_type(term)->name = name_from_string(name.c_str());
+        as_type(term_value(term))->name = name_from_string(name.c_str());
         rename(term, name);
     }
 
@@ -444,21 +444,21 @@ Term* create_type(Branch* branch, std::string name)
 Term* create_type_value(Branch* branch, Type* value, std::string const& name)
 {
     Term* term = create_value(branch, &TYPE_T, name);
-    set_type(term, value);
+    set_type(term_value(term), value);
     return term;
 }
 
 Term* create_symbol_value(Branch* branch, int value, std::string const& name)
 {
     Term* term = create_value(branch, &NAME_T, name);
-    set_name(term, value);
+    set_name(term_value(term), value);
     return term;
 }
 
 Term* duplicate_value(Branch* branch, Term* term)
 {
     Term* dup = create_value(branch, term->type);
-    copy(term, dup);
+    copy(term_value(term), term_value(dup));
     return dup;
 }
 
@@ -583,7 +583,7 @@ Branch* term_get_function_details(Term* call)
         || call->function == FUNCS.include_func)
         return nested_contents(call);
 
-    return function_get_contents(as_function(call->function));
+    return function_get_contents(as_function(term_value(call->function)));
 }
 
 void update_extra_outputs(Term* term)
@@ -1201,7 +1201,7 @@ void rewrite(Term* term, Term* function, TermList const& inputs)
         set_input(term, i, inputs[i]);
     Type* outputType = function_get_output_type(function, 0);
 
-    Function* attrs = as_function(function);
+    Function* attrs = as_function(term_value(function));
 
     if (attrs->specializeType != NULL)
         outputType = attrs->specializeType(term);
@@ -1276,7 +1276,7 @@ void remap_pointers(Term* term, TermMap const& map)
     Type::RemapPointers remapPointers = term->type->remapPointers;
 
     // Remap on value
-    if ((term->value_data.ptr != NULL)
+    if ((term_value(term)->value_data.ptr != NULL)
             && term->type != NULL
             && (remapPointers)) {
 

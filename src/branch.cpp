@@ -406,12 +406,12 @@ void pre_erase_term(Term* term)
 {
     // If this term declares a Type, then clear the Type.declaringTerm pointer
     // before it becomes invalid.
-    if (is_value(term) && is_type(term) && as_type(term)->declaringTerm == term)
-        as_type(term)->declaringTerm = NULL;
+    if (is_type(term) && as_type(term_value(term))->declaringTerm == term)
+        as_type(term_value(term))->declaringTerm = NULL;
 
     // Ditto for Function
-    if (is_value(term) && is_function(term) && as_function(term)->declaringTerm == term)
-        as_function(term)->declaringTerm = NULL;
+    if (is_function(term) && as_function(term_value(term))->declaringTerm == term)
+        as_function(term_value(term))->declaringTerm = NULL;
 }
 
 void erase_term(Term* term)
@@ -420,7 +420,7 @@ void erase_term(Term* term)
 
     pre_erase_term(term);
 
-    set_null((caValue*) term);
+    set_null(term_value(term));
     set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;

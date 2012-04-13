@@ -123,6 +123,7 @@ void finish_building_subroutine(Term* sub, Term* outputType)
 
 void store_locals(Branch* branch, caValue* storageTv)
 {
+    // DELETE_THIS ?
     touch(storageTv);
     set_list(storageTv);
     List* storage = List::checkCast(storageTv);
@@ -135,12 +136,13 @@ void store_locals(Branch* branch, caValue* storageTv)
         if (term->type == &FUNCTION_ATTRS_T)
             continue;
 
-        copy(term, storage->get(i));
+        copy(term_value(term), storage->get(i));
     }
 }
 
 void restore_locals(caValue* storageTv, Branch* branch)
 {
+    // DELETE_THIS ?
     if (!is_list(storageTv))
         internal_error("storageTv is not a list");
 
@@ -156,7 +158,7 @@ void restore_locals(caValue* storageTv, Branch* branch)
         if (term->type == &FUNCTION_ATTRS_T)
             continue;
 
-        copy(storage->get(i), term);
+        copy(storage->get(i), term_value(term));
     }
 }
 

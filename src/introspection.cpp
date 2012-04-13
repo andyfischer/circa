@@ -307,7 +307,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << name_to_string(term->type->name);
 
     if (is_value(term))
-        out << " val:" << to_string((caValue*) term);
+        out << " val:" << to_string(term_value(term));
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();

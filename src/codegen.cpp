@@ -59,7 +59,7 @@ std::string generate_cpp_headers(Branch* branch)
         Term* term = branch->get(i);
 
         if (is_type(term))
-            out << cpp_accessor_for_type(as_type(term));
+            out << cpp_accessor_for_type(as_type(term_value(term)));
     }
 
     return out.str();

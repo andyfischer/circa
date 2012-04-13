@@ -56,7 +56,7 @@ namespace ref_t {
     }
     void remapPointers(Term* term, TermMap const& map)
     {
-        set_ref(term, map.getRemapped(as_ref(term)));
+        set_ref(term_value(term), map.getRemapped(as_ref(term_value(term))));
     }
 
     void setup_type(Type* type)

@@ -148,7 +148,7 @@ void statically_infer_result(Term* term, caValue* result)
     Term* resultTerm = statically_infer_result(&scratch, term);
 
     if (is_value(resultTerm))
-        copy(resultTerm, result);
+        copy(term_value(resultTerm), result);
     else {
         EvalContext context;
         evaluate_minimum(&context, resultTerm, result);

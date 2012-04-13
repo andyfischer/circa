@@ -58,7 +58,7 @@ void unload_dll(const char* filename)
         if (!is_function(ref))
             continue;
 
-        Function* attrs = as_function(ref);
+        Function* attrs = as_function(term_value(ref));
 
         if (dll->loadedFunctions.find((void*) attrs->evaluate) != dll->loadedFunctions.end())
             attrs->evaluate = NULL;

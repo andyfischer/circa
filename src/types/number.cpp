@@ -61,7 +61,7 @@ namespace number_t {
         // still has the exact same value, then use the original formatting.
         if (term->hasProperty("float:original-format")) {
             std::string const& originalFormat = term->stringProp("float:original-format");
-            float actual = as_float(term);
+            float actual = as_float(term_value(term));
             float original = (float) atof(originalFormat.c_str());
             if (actual == original)
                 return originalFormat;
@@ -70,7 +70,7 @@ namespace number_t {
         // Otherwise, format the current value with naive formatting. This could be
         // improved; we could try harder to recreate some of the original formatting.
         std::stringstream strm;
-        strm << as_float(term);
+        strm << as_float(term_value(term));
 
         if (term->floatPropOptional("mutability", 0.0) > 0.5)
             strm << "?";

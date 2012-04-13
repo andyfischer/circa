@@ -35,7 +35,7 @@ int run_exporting_parser(const char* format, const char* filename)
 
             std::cout << "'" << term->name << "': ";
 
-            caValue* value = term;
+            caValue* value = term_value(term);
             if (is_int(value) || is_float(value) || is_bool(value))
                 std::cout << to_string(value);
             else

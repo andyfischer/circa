@@ -206,13 +206,12 @@ Type* create_type()
 
 Type* unbox_type(Term* term)
 {
-    ca_assert(term->type == &TYPE_T);
-    return (Type*) term->value_data.ptr;
+    return as_type(term);
 }
 
 Type* unbox_type(caValue* val)
 {
-    return (Type*) val->value_data.ptr;
+    return as_type(val);
 }
 
 static void run_static_type_query(StaticTypeQuery* query)
@@ -422,7 +421,7 @@ Term* parse_type(Branch* branch, std::string const& decl)
 void install_type(Term* term, Type* type)
 {
     // Type* oldType = as_type(term);
-    set_type(term, type);
+    set_type(term_value(term), type);
 }
 
 Type* get_declared_type(Branch* branch, const char* name)

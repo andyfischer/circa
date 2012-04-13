@@ -33,7 +33,7 @@ void write_value(CppWriter& writer, Term* term)
 
 void write_function(CppWriter& writer, Term* term)
 {
-    Function* func = as_function(term);
+    Function* func = as_function(term_value(term));
 
     write_type_name(writer, function_get_output_type(func, 0));
     writer.write(" ");

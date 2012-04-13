@@ -258,7 +258,7 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
         if (is_value(term)) continue;
         caValue* val = frame->registers[term->index];
         if (val != NULL)
-            copy(val, branch->get(i));
+            copy(val, term_value(branch->get(i)));
     }
 }
 
@@ -359,7 +359,7 @@ caValue* get_input(EvalContext* context, Term* term)
         return NULL;
 
     if (is_value(term))
-        return (caValue*) term;
+        return term_value(term);
 
     for (int i=0; i < context->numFrames; i++) {
         Frame* frame = get_frame(context, i);
@@ -563,7 +563,7 @@ void evaluate_minimum(EvalContext* context, Term* term, caValue* result)
                 if (input->owningBranch != branch)
                     continue;
                 // don't follow :meta inputs
-                if (function_get_input_meta(as_function(checkTerm->function),
+                if (function_get_input_meta(as_function(term_value(checkTerm->function)),
                             inputIndex))
                     continue;
                 marked[input->index] = true;
@@ -590,7 +590,7 @@ caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input
     int prevHead = branch->length();
     Term* result = parser::compile(branch, parser::statement_list, input);
     evaluate_range(context, branch, prevHead, branch->length() - 1);
-    return result;
+    return term_value(result);
 }
 
 caValue* evaluate(Branch* branch, Term* function, List* inputs)
@@ -606,7 +606,7 @@ caValue* evaluate(Branch* branch, Term* function, List* inputs)
     int prevHead = branch->length();
     Term* result = apply(branch, function, inputTerms);
     evaluate_range(&context, branch, prevHead, branch->length() - 1);
-    return result;
+    return term_value(result);
 }
 
 caValue* evaluate(Term* function, List* inputs)
@@ -702,7 +702,7 @@ do_instruction:
     EvaluateFunc evaluate = NULL;
 
     if (is_function(term->function))
-        evaluate = as_function(term->function)->evaluate;
+        evaluate = as_function(term_value(term->function))->evaluate;
 
     if (evaluate == NULL) {
         frame->pc = frame->nextPc;

@@ -173,7 +173,7 @@ CA_FUNCTION(file__fetch_record)
 
 CA_FUNCTION(from_string)
 {
-    circa_parse_string(STRING_INPUT(0), (caValue*) OUTPUT);
+    circa_parse_string(STRING_INPUT(0), OUTPUT);
 }
 
 CA_FUNCTION(to_string_repr)
@@ -209,7 +209,7 @@ CA_FUNCTION(refactor__rename)
 
 CA_FUNCTION(refactor__change_function)
 {
-    change_function(as_ref(INPUT_TERM(0)), INPUT_TERM(1));
+    change_function(as_ref(INPUT(0)), INPUT_TERM(1));
 }
 
 CA_FUNCTION(reflect__this_branch)
@@ -602,7 +602,7 @@ CA_FUNCTION(Term__to_string)
     Term* t = INPUT(0)->asRef();
     if (t == NULL)
         return RAISE_ERROR("NULL reference");
-    set_string(OUTPUT, circa::to_string(t));
+    set_string(OUTPUT, circa::to_string(term_value(t)));
 }
 CA_FUNCTION(Term__to_source_string)
 {
@@ -640,7 +640,7 @@ CA_FUNCTION(Term__assign)
         return;
     }
 
-    circa::copy(source, target);
+    circa::copy(source, term_value(target));
 }
 CA_FUNCTION(Term__value)
 {
@@ -650,7 +650,7 @@ CA_FUNCTION(Term__value)
         return;
     }
 
-    copy(target, OUTPUT);
+    copy(term_value(target), OUTPUT);
 }
 
 int tweak_round(double a) {
@@ -665,18 +665,20 @@ CA_FUNCTION(Term__tweak)
 
     int steps = tweak_round(INPUT(1)->toFloat());
 
+    caValue* val = term_value(t);
+
     if (steps == 0)
         return;
 
-    if (is_float(t)) {
+    if (is_float(val)) {
         float step = get_step(t);
 
         // Do the math like this so that rounding errors are not accumulated
-        float new_value = (round(as_float(t) / step) + steps) * step;
-        set_float(t, new_value);
+        float new_value = (round(as_float(val) / step) + steps) * step;
+        set_float(val, new_value);
 
-    } else if (is_int(t))
-        set_int(t, as_int(t) + steps);
+    } else if (is_int(val))
+        set_int(val, as_int(val) + steps);
     else
         RAISE_ERROR("Ref is not an int or number");
 }
@@ -688,11 +690,11 @@ CA_FUNCTION(Term__asint)
         RAISE_ERROR("NULL reference");
         return;
     }
-    if (!is_int(t)) {
+    if (!is_int(term_value(t))) {
         RAISE_ERROR("Not an int");
         return;
     }
-    set_int(OUTPUT, as_int(t));
+    set_int(OUTPUT, as_int(term_value(t)));
 }
 CA_FUNCTION(Term__asfloat)
 {
@@ -702,7 +704,7 @@ CA_FUNCTION(Term__asfloat)
         return;
     }
     
-    set_float(OUTPUT, to_float(t));
+    set_float(OUTPUT, to_float(term_value(t)));
 }
 CA_FUNCTION(Term__input)
 {
@@ -837,8 +839,8 @@ void bootstrap_kernel()
     TYPE_TYPE = kernel->appendNew();
     TYPE_TYPE->function = FUNCS.value;
     TYPE_TYPE->type = &TYPE_T;
-    TYPE_TYPE->value_type = &TYPE_T;
-    TYPE_TYPE->value_data.ptr = &TYPE_T;
+    term_value(TYPE_TYPE)->value_type = &TYPE_T;
+    term_value(TYPE_TYPE)->value_data.ptr = &TYPE_T;
     type_t::setup_type(&TYPE_T);
     rename(TYPE_TYPE, "Type");
 
@@ -846,8 +848,8 @@ void bootstrap_kernel()
     ANY_TYPE = kernel->appendNew();
     ANY_TYPE->function = valueFunc;
     ANY_TYPE->type = &TYPE_T;
-    ANY_TYPE->value_type = &TYPE_T;
-    ANY_TYPE->value_data.ptr = &ANY_T;
+    term_value(ANY_TYPE)->value_type = &TYPE_T;
+    term_value(ANY_TYPE)->value_data.ptr = &ANY_T;
     any_t::setup_type(&ANY_T);
     rename(ANY_TYPE, "any");
 
@@ -856,16 +858,16 @@ void bootstrap_kernel()
     FUNCTION_TYPE = kernel->appendNew();
     FUNCTION_TYPE->function = valueFunc;
     FUNCTION_TYPE->type = &TYPE_T;
-    FUNCTION_TYPE->value_type = &TYPE_T;
-    FUNCTION_TYPE->value_data.ptr = &FUNCTION_T;
+    term_value(FUNCTION_TYPE)->value_type = &TYPE_T;
+    term_value(FUNCTION_TYPE)->value_data.ptr = &FUNCTION_T;
     rename(FUNCTION_TYPE, "Function");
 
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;
     valueFunc->function = valueFunc;
-    create(&FUNCTION_T, (caValue*)valueFunc);
+    create(&FUNCTION_T, term_value(valueFunc));
 
-    function_t::initialize(&FUNCTION_T, valueFunc);
+    function_t::initialize(&FUNCTION_T, term_value(valueFunc));
     initialize_function(valueFunc);
     as_function(valueFunc)->name = "value";
 
@@ -885,7 +887,7 @@ void bootstrap_kernel()
 
     // Setup output_placeholder() function, needed to declare functions properly.
     FUNCS.output = create_value(kernel, &FUNCTION_T, "output_placeholder");
-    function_t::initialize(&FUNCTION_T, FUNCS.output);
+    function_t::initialize(&FUNCTION_T, term_value(FUNCS.output));
     initialize_function(FUNCS.output);
     as_function(FUNCS.output)->name = "output_placeholder";
     as_function(FUNCS.output)->evaluate = evaluate_output_placeholder;
@@ -1026,7 +1028,7 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
     // Create some hosted types
-    TYPES.point = as_type(parse_type(kernel, "type Point { number x, number y }"));
+    TYPES.point = as_type(term_value(parse_type(kernel, "type Point { number x, number y }")));
     parse_type(kernel, "type Point_i { int x, int y }");
     parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
 
