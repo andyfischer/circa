@@ -1,5 +1,5 @@
 
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #pragma once
 

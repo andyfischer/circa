@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Paul Hodge. All rights reserved
+// Copyright (c) 2007-2010 Andrew Fischer. All rights reserved
 
 #include "circa/internal/for_hosted_funcs.h"
 

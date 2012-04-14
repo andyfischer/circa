@@ -1,4 +1,4 @@
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 // Various code for debugging purposes. This code shouldn't have an effect on a
 // release build.

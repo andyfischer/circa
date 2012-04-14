@@ -1,4 +1,4 @@
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 // source_repro_snippets.cpp
 //

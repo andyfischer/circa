@@ -1,4 +1,4 @@
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 // The Handle type allows you to have a shared object which is deallocated
 // once all references to it are deleted.

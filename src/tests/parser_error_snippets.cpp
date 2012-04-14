@@ -1,4 +1,4 @@
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 // In this test, we have a bunch of snippets, where we try to reproduce every
 // possible parser error.
