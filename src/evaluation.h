@@ -115,6 +115,7 @@ void extract_explicit_outputs(EvalContext* context, caValue* inputs);
 
 caValue* get_input(EvalContext* context, Term* term);
 caValue* get_input(EvalContext* context, int index);
+caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta);
 void consume_input(EvalContext* context, Term* term, caValue* dest);
 void consume_input(EvalContext* context, int index, caValue* dest);
 bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest);

@@ -1,16 +1,49 @@
 
 def call_blah(any a)
-    print(a.blah())
-    
+    print(a.blah)
 
-type A {}
-def A.blah() -> String
+type A {
+    int x
+}
+def A.blah(self) -> String
     return "A.blah"
 
-call_blah(create(A))
-
-type B {}
-def B.blah() -> String
+type B {
+    int x
+}
+def B.blah(self) -> String
     return "B.blah"
 
+call_blah(create(A))
 call_blah(create(B))
+
+-- Test using an input
+
+def A.blah2(self, String str) -> String
+    return concat("A.blah2: " str)
+def B.blah2(self, String str) -> String
+    return concat("B.blah2: " str)
+
+def call_blah2(any a, String s)
+    print(a.blah2(s))
+
+call_blah2(create(A), 'str1')
+call_blah2(create(B), 'str2')
+
+-- Test accessing the target object
+
+def A.blah3(self, int val) -> String
+    self.x = val
+    return concat('A.blah3: ', self)
+def B.blah3(self, int val) -> String
+    self.x = val
+    return concat('B.blah3: ', self)
+
+def call_blah3(any a :out, int i)
+    print('calling blah3: ' i)
+    print(a.blah3(i))
+
+a = create(A)
+b = create(B)
+call_blah3(a, 11)
+call_blah3(b, 22)

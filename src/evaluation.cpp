@@ -353,6 +353,7 @@ void extract_explicit_outputs(EvalContext* context, caValue* inputs)
     }
 }
 
+// Deprecated in favor of find_stack_value_for_term:
 caValue* get_input(EvalContext* context, Term* term)
 {
     if (term == NULL)
@@ -362,6 +363,24 @@ caValue* get_input(EvalContext* context, Term* term)
         return term_value(term);
 
     for (int i=0; i < context->numFrames; i++) {
+        Frame* frame = get_frame(context, i);
+        if (frame->branch != term->owningBranch)
+            continue;
+        return frame->registers[term->index];
+    }
+
+    return NULL;
+}
+
+caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta)
+{
+    if (term == NULL)
+        return NULL;
+
+    if (is_value(term))
+        return term_value(term);
+
+    for (int i=stackDelta; i < context->numFrames; i++) {
         Frame* frame = get_frame(context, i);
         if (frame->branch != term->owningBranch)
             continue;

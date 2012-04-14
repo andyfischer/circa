@@ -189,13 +189,27 @@ void dynamic_method(caStack* stack)
 
     Term* term = find_method((Branch*) circa_callee_branch(stack),
         (Type*) circa_type_of(object), functionName.c_str());
-        
-    if (term != NULL) {
-        Function* func = as_function(term);
-        //push_frame(stack, nested_contents(func));
 
-        // Evaluate this method
-        // (TODO)
+    if (term != NULL) {
+        // Grab the current term, this will become unavailable after push_frame.
+        Term* callingTerm = (Term*) circa_current_term(stack);
+        
+        Function* func = as_function(term);
+        push_frame((EvalContext*) stack, function_contents(func));
+
+        // Push inputs
+        for (int i=0;; i++) {
+            caValue* input = find_stack_value_for_term((EvalContext*) stack,
+                callingTerm->input(i), 1);
+            if (input == NULL)
+                break;
+            caValue* placeholder = circa_frame_input(stack, i);
+            if (placeholder == NULL)
+                break;
+
+            copy(input, placeholder);
+        }
+
         return;
     }
 
