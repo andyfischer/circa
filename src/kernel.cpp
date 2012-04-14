@@ -184,22 +184,34 @@ CA_FUNCTION(to_string_repr)
 void dynamic_method(caStack* stack)
 {
     caValue* object = circa_input(stack, 0);
+    std::string functionName =
+        ((Term*) circa_current_term(stack))->stringPropOptional("syntax:functionName", "");
 
     Term* term = find_method((Branch*) circa_callee_branch(stack),
-        (Type*) circa_type_of(object),
-        ((Term*) circa_current_term(stack))->stringPropOptional("methodName", ""));
-
-    Function* func = as_function(term);
+        (Type*) circa_type_of(object), functionName.c_str());
         
     if (term != NULL) {
-        push_frame(stack, nested_contents(func));
+        Function* func = as_function(term);
+        //push_frame(stack, nested_contents(func));
 
         // Evaluate this method
         // (TODO)
+        return;
     }
 
     // Check if this is a field access
-    // (TODO)
+    if (is_list_based_type(object->value_type)) {
+        int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
+        if (fieldIndex == -1) {
+            set_null(circa_output(stack, 0));
+            return;
+        }
+        caValue* element = get_index(object, fieldIndex);
+        if (element == NULL)
+            set_null(circa_output(stack, 0));
+        else
+            copy(element, circa_output(stack, 0));
+    }
 }
 
 void call_func(caStack* stack)

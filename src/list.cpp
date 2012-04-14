@@ -541,6 +541,9 @@ Type* list_get_repeated_type_from_type(Type* type)
 }
 int list_find_field_index_by_name(Type* listType, const char* name)
 {
+    if (!is_list_based_type(listType))
+        return -1;
+
     caValue* nameList = list_get_name_list_from_type(listType);
     if (nameList == NULL)
         return -1;

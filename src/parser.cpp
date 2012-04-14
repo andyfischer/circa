@@ -1619,10 +1619,25 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Term* function = find_method(branch, rootType, functionName);
 
     if (function == NULL) {
-        // Method could not be statically found, create a dynamic call.
+        // Method could not be statically found.
+
+        // Temporary behavior, if we can statically resolve to a field access then
+        // create a get_field term. This should be changed to use auto-generated
+        // methods (one for each field).
+        int fieldIndex = list_find_field_index_by_name(rootType, functionName.c_str());
+        if (fieldIndex != -1) {
+            Term* fieldName = create_string(branch, functionName.c_str());
+            Term* term = apply(branch, FUNCS.get_field, TermList(root.term, fieldName));
+            set_input_syntax_hint(term, 0, "postWhitespace", "");
+            return ParseResult(term);
+        }
+
+        // Otherwise create a dynamic_method call.
         Term* result = apply(branch, FUNCS.dynamic_method, inputs);
         result->setStringProp("syntax:functionName", functionName);
         result->setStringProp("syntax:declarationStyle", "method-call");
+        if (!hasParens)
+            result->setBoolProp("syntax:no-parens", true);
         return ParseResult(result);
     }
 
@@ -1829,6 +1844,8 @@ Term* find_lexpr_root(Term* term)
     if (term->function == FUNCS.get_index)
         return find_lexpr_root(term->input(0));
     else if (term->function == FUNCS.get_field)
+        return find_lexpr_root(term->input(0));
+    else if (term->function == FUNCS.dynamic_method)
         return find_lexpr_root(term->input(0));
     else
         return term;

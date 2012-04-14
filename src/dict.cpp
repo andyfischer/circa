@@ -234,6 +234,7 @@ caValue* get_value(DictData* data, const char* key)
 
 caValue* get_index(DictData* data, int index)
 {
+    ca_assert(index >= 0);
     ca_assert(index < data->capacity);
     ca_assert(data->slots[index].key != NULL);
     return &data->slots[index].value;

@@ -1324,17 +1324,17 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement)
 
 Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredValue)
 {
-    Term* set = NULL;
-
     if (term->function == FUNCS.get_index) {
-        set = FUNCS.set_index;
+        return apply(branch, FUNCS.set_index, TermList(term->input(0), term->input(1), desiredValue));
     } else if (term->function == FUNCS.get_field) {
-        set = FUNCS.set_field;
+        return apply(branch, FUNCS.set_field, TermList(term->input(0), term->input(1), desiredValue));
+    } else if (term->function == FUNCS.dynamic_method) {
+        Term* fieldName = create_string(branch, term->stringProp("syntax:functionName"));
+        return apply(branch, FUNCS.set_field, TermList(term->input(0), fieldName, desiredValue));
     } else {
         return NULL;
     }
 
-    return apply(branch, set, TermList(term->input(0), term->input(1), desiredValue));
 }
 
 Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Term* desired)
