@@ -5,8 +5,8 @@
 namespace circa {
 namespace set_t {
 
-    bool contains(List* list, caValue* value);
-    void add(List* list, caValue* value);
+    bool contains(caValue* list, caValue* value);
+    void add(caValue* list, caValue* value);
     void setup_type(Type* type);
 
 } // namespace set_t

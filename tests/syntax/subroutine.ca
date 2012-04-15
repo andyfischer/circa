@@ -1,0 +1,14 @@
+
+def print_success(number)
+    print("Called print_success")
+
+print_success(0.0)
+
+def square(number a) -> number
+    return mult(a,a)
+
+print("Four squared is ", square(4.0))
+
+five_squared = square(5.0)
+
+print("Five squared is ", five_squared)

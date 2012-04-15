@@ -5,29 +5,28 @@
 namespace circa {
 namespace set_t {
 
-    bool contains(List* list, caValue* value)
+    bool contains(caValue* list, caValue* value)
     {
-        int numElements = list->numElements();
+        int numElements = circa_count(list);
         for (int i=0; i < numElements; i++) {
-            if (equals(value, list->get(i)))
+            if (equals(value, circa_index(list,i)))
                 return true;
         }
         return false;
     }
-    void add(List* list, caValue* value)
+    void add(caValue* list, caValue* value)
     {
         if (contains(list, value))
             return;
-        copy(value, list->append());
+        copy(value, circa_append(list));
     }
-    std::string to_string(caValue* value)
+    std::string to_string(caValue* list)
     {
-        List* list = List::checkCast(value);
         std::stringstream output;
         output << "{";
-        for (int i=0; i < list->length(); i++) {
+        for (int i=0; i < circa_count(list); i++) {
             if (i > 0) output << ", ";
-            output << circa::to_string(list->get(i));
+            output << circa::to_string(circa_index(list,i));
         }
         output << "}";
 

@@ -150,10 +150,12 @@ def all_testable_files():
         TestRoot + '/if',
         TestRoot + '/field',
         TestRoot + '/for',
+        TestRoot + '/funcs',
         TestRoot + '/list',
         TestRoot + '/reflection',
         TestRoot + '/runtime_typing',
         TestRoot + '/static_errors',
+        TestRoot + '/syntax',
         TestRoot + '/type_inferrence'
         ]
     for dir in dirs:

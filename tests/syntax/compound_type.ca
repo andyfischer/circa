@@ -1,0 +1,29 @@
+
+type Vector { number x, number y }
+
+type MyClass {
+  int a,
+  int b,
+  String name,
+  number distance
+}
+
+type Composite {
+  MyClass myClass,
+  MyClass myClass2,
+  String name,
+}
+
+c = create(Composite)
+c -> print
+
+v = create(Vector)
+
+-- make sure v has correct type
+v.x = 5.0
+v.y = 6.0
+
+v -> print
+
+print("v.x = " v.x)
+print("v.y = " v.y)

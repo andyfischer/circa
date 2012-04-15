@@ -9,14 +9,14 @@ namespace set_union_function {
 
     CA_FUNCTION(evaluate)
     {
-        List* list = List::checkCast(OUTPUT);
-        list->clear();
+        caValue* result = OUTPUT;
+        set_list(result, 0);
 
         for (int inputIndex=0; inputIndex < NUM_INPUTS; inputIndex++) {
-            List* input = List::checkCast(INPUT(inputIndex));
-            int numElements = input->numElements();
+            caValue* input = INPUT(inputIndex);
+            int numElements = circa_count(input);
             for (int i=0; i < numElements; i++)
-                set_t::add(list, input->get(i));
+                set_t::add(result, circa_index(input,i));
         }
     }
 

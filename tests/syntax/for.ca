@@ -1,0 +1,34 @@
+
+-- simple test
+for i in 0..5
+  i -> print
+
+-- iterate over a collection
+names = ["absalom", "bouffant", "chilton"]
+for name in names
+  name -> print
+
+-- modify an outside value
+x = 10.0
+for i in 0..3
+  x += 2.0
+
+print('should be 16.0: ' x)
+
+-- if statement inside a for loop
+for i in 0..5
+  if i == 3
+    print('if passed')
+
+-- for loop inside an if statement
+if true
+   for i in [1]
+      print('if2 passed')
+
+-- for loop inside a function
+def look_for_3(List numbers)
+  for i in numbers
+    if i == 3
+      print("inside function passed")
+
+look_for_3([1,2,3,4,5])

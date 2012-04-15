@@ -1,0 +1,2 @@
+1 static error:
+[tests/static_errors/unknown_function.ca:2,0] Unknown function: nonexistant_function

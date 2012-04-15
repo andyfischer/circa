@@ -1638,6 +1638,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
         result->setStringProp("syntax:declarationStyle", "method-call");
         if (!hasParens)
             result->setBoolProp("syntax:no-parens", true);
+        inputHints.apply(result);
         return ParseResult(result);
     }
 
