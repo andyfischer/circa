@@ -1,6 +1,0 @@
-
-
-include('subroutine.ca')
-
-print(square(5.0))
-

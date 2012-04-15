@@ -1,2 +1,0 @@
-
-- Looseleaf is losing state for a viewport script. Seems that include() isn't creating a stateful extra output.

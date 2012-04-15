@@ -1,1 +1,0 @@
-scons --directory $CIRCA_HOME build/plas_r && $CIRCA_HOME/build/plas_r $*

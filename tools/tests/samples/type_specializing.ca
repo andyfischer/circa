@@ -1,7 +1,0 @@
-
-a = 1.0
-b = 2.0
-c = if_expr(true, a, b)
-
--- make sure that c has type float. This should be true at compile-time.
-typeof(c) -> print

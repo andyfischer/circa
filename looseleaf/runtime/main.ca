@@ -1,4 +1,0 @@
-
-state window = create_window('../test_script.ca'->rpath)
-if once()
-    window.resize([400 400])

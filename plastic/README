@@ -1,6 +1,0 @@
-
-Plastic is a game engine and prototyping tool that runs Circa scripts using
-SDL.
-
-This was the first shell for Circa but it's currently deprecated, and being
-replaced by the Looseleaf tool.
