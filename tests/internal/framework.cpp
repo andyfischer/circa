@@ -56,7 +56,7 @@ void test_assert_function(Term* term, int line, const char* file)
         declare_current_test_failed();
     }
 
-    if (is_bool(term) && !as_bool(term)) {
+    if (is_bool(term_value(term)) && !as_bool(term_value(term))) {
         std::cout << "Assertion failed: " << get_term_source_text(term) << std::endl;
         std::cout << "Occurred in " << file << ", line " << line << std::endl;
         declare_current_test_failed();
@@ -345,12 +345,12 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
         if (!is_statement(term))
             continue;
 
-        if (!is_bool(term))
+        if (!is_bool(term_value(term)))
             continue;
 
         boolean_statements_found++;
 
-        if (!as_bool(term)) {
+        if (!as_bool(term_value(term))) {
             std::cout << "Assertion failed " << contextStr << std::endl;
             std::cout << "failed: " << get_term_source_text(term) << std::endl;
             declare_current_test_failed();

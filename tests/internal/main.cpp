@@ -15,9 +15,9 @@ int main(int argc, char** argv)
     compound_type_register_tests();
     tokenizer_register_tests();
 
-    circa_initialize();
+    caWorld* world = circa_initialize();
 
     run_all_tests();
 
-    circa_shutdown();
+    circa_shutdown(world);
 }
