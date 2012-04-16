@@ -56,9 +56,9 @@ typedef bool (*TermVisitor)(Term* term, caValue* context);
 
 // Function-related typedefs:
 
-#define CA_FUNCTION(fname) void fname(circa::EvalContext* _cxt)
+#define CA_FUNCTION(fname) void fname(caStack* _stack)
 
-typedef void (*EvaluateFunc)(EvalContext* cxt);
+typedef void (*EvaluateFunc)(caStack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
 typedef void (*FormatSource)(StyledSource* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);

@@ -138,9 +138,13 @@ Value FalseValue;
 namespace cppbuild_function { CA_FUNCTION(build_module); }
 
 // Standard library functions
-CA_FUNCTION(evaluate_output_placeholder)
+void evaluate_output_placeholder(caStack* stack)
 {
-    CONSUME_INPUT(0, OUTPUT);
+    caValue* in = circa_input(stack, 0);
+    if (in == NULL)
+        circa_set_null(circa_output(stack, 0));
+    else
+        circa_copy(in, circa_output(stack, 0));
 }
 
 Type* output_placeholder_specializeType(Term* caller)

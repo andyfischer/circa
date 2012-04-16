@@ -732,7 +732,7 @@ do_instruction:
     try {
     #endif
 
-    evaluate(context);
+    evaluate((caStack*) context);
 
     #if CIRCA_THROW_ON_ERROR
     } catch (std::exception const& e) { return raise_error(context, term, e.what()); }

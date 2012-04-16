@@ -46,6 +46,10 @@ caBranch* caTerm::parent()
 {
     return circa_parent_branch(this);
 }
+int circa_num_inputs(caStack* stack)
+{
+    return num_inputs((EvalContext*) stack);
+}
 
 caValue* circa_input(caStack* stack, int index)
 {
@@ -64,7 +68,11 @@ int circa_int_input(caStack* stack, int index)
 
 float circa_float_input(caStack* stack, int index)
 {
-    return circa_float(circa_input(stack, index));
+    return circa_to_float(circa_input(stack, index));
+}
+float circa_bool_input(caStack* stack, int index)
+{
+    return circa_bool(circa_input(stack, index));
 }
 
 const char* circa_string_input(caStack* stack, int index)

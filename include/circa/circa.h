@@ -139,6 +139,9 @@ void circa_print_error_to_stdout(caStack* stack);
 
 // -- Fetching Inputs & Outputs --
 
+// Get the number of inputs.
+int circa_num_inputs(caStack* stack);
+
 // Retrieve the given input value. This value may not be modified.
 caValue* circa_input(caStack* stack, int index);
 
@@ -151,8 +154,13 @@ int circa_int_input(caStack* stack, int index);
 const char* circa_string_input(caStack* stack, int index);
 
 // Read the given input index as a float
-// Equivalent to: circa_float(circa_input(stack, index))
+// Equivalent to: circa_to_float(circa_input(stack, index))
+// (Note that we use circa_to_float, not circa_float)
 float circa_float_input(caStack* stack, int index);
+
+// Read the given input index as a bool
+// Equivalent to: circa_bool(circa_input(stack, index))
+float circa_bool_input(caStack* stack, int index);
 
 // Fetch the given output value. This value should be modified.
 caValue* circa_output(caStack* stack, int index);
