@@ -6,12 +6,6 @@ namespace circa {
 
 namespace assign_function {
 
-    CA_FUNCTION(assign)
-    {
-        Branch* contents = nested_contents(CALLER);
-        push_frame(CONTEXT, contents);
-    }
-
     void onCreateCall(Term* term)
     {
         write_setter_chain_for_assign_term(term);
@@ -46,7 +40,7 @@ namespace assign_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.assign = import_function(kernel, assign, "assign(any, any) -> any");
+        FUNCS.assign = import_function(kernel, NULL, "assign(any, any) -> any");
         as_function(FUNCS.assign)->formatSource = formatSource;
         as_function(FUNCS.assign)->specializeType = specializeType;
         as_function(FUNCS.assign)->onCreateCall = onCreateCall;

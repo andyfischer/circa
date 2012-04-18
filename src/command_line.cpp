@@ -215,7 +215,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         // Push inputs
         for (int i=3, inputIndex = 0; i < circa_count(args); i++) {
-            caValue* val = circa_frame_input(stack, inputIndex++);
+            caValue* val = circa_input(stack, inputIndex++);
             circa_parse_string(as_cstring(list_get(args, i)), val);
         }
 
@@ -227,11 +227,11 @@ int run_command_line(caWorld* world, caValue* args)
 
         // Print outputs
         for (int i=0;; i++) {
-            caValue* out = circa_frame_output(stack, i);
+            caValue* out = circa_output(stack, i);
             if (out == NULL)
                 break;
 
-            std::cout << to_string(circa_frame_output(stack, i)) << std::endl;
+            std::cout << to_string(circa_output(stack, i)) << std::endl;
         }
         
         circa_dealloc_stack(stack);

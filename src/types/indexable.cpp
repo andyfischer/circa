@@ -14,10 +14,20 @@ namespace indexable_t {
         else
             query->fail();
     }
+    void cast(CastResult* result, caValue* source, Type* type,
+        caValue* dest, bool checkOnly)
+    {
+        // For now, always succeed
+        if (checkOnly)
+            return;
+
+        copy(source, dest);
+    }
     void setup_type(Type* type)
     {
         reset_type(type);
         type->staticTypeQuery = staticTypeQuery;
+        type->cast = cast;
     }
 }
 }

@@ -5,11 +5,20 @@
 namespace circa {
 namespace dynamic_call_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(dynamic_call, "dynamic_call(Function f, List args)")
+    void dynamic_call(caStack* stack)
     {
-#if 0 // FIXME
+        // Grab function & inputs
+        Function* func = as_function(circa_input(stack, 0));
+        Value inputs;
+        circa_swap(circa_input(stack, 1), &inputs);
+
+        // Pop calling frame
+        pop_frame((EvalContext*) stack);
+
+        // Replace it with the callee frame
+        push_frame_with_inputs((EvalContext*) stack, function_contents(func), &inputs);
+
+#if 0 // Old version
         Term* function = as_function_pointer(INPUT(0));
         List* inputs = List::checkCast(INPUT(1));
 
@@ -64,7 +73,7 @@ namespace dynamic_call_function {
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, dynamic_call,  "dynamic_call(Function f, List args)");
     }
 }
 }

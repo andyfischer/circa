@@ -20,4 +20,6 @@ bool has_implicit_state(Term* term);
 void unpack_state(caStack* stack);
 void pack_state(caStack* stack);
 
+void get_declared_state(caStack* stack);
+
 } // namespace circa

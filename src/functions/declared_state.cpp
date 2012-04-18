@@ -5,14 +5,15 @@
 namespace circa {
 namespace declared_state_function {
 
-    CA_FUNCTION(get_declared_state)
+    void get_declared_state(caStack* stack)
     {
-        caValue* value = INPUT(0);
-        caValue* output = OUTPUT;
+        caValue* value = circa_input(stack, 0);
+        caValue* output = circa_output(stack, 0);
+        Term* caller = (Term*) circa_caller_term(stack);
 
         // Try to cast 'value' to the declared type.
         if (value != NULL && !is_null(value)) {
-            bool cast_success = cast(value, declared_type(CALLER), output);
+            bool cast_success = cast(value, declared_type(caller), output);
 
             // If this cast succeeded then we're done. If it failed then continue on
             // to use a default value.
@@ -22,19 +23,22 @@ namespace declared_state_function {
 
         // We couldn't use the input value. If there is a nested block of code, then push
         // that to the stack and it will initialize our new value.
-        Branch* contents = nested_contents(CALLER);
+        Branch* contents = nested_contents(caller);
 
         if (contents->length() > 0) {
-            set_name(OUTPUT, name_InProgress);
-            push_frame(CONTEXT, nested_contents(CALLER));
+            // Remove the frame made for this call
+            pop_frame((EvalContext*) stack);
+
+            // Call the initializer instead
+            push_frame((EvalContext*) stack, nested_contents(caller));
             return;
         }
 
         // Otherwise, reset to the type's default value
-        if (declared_type(CALLER) == &ANY_T)
-            set_null(OUTPUT);
+        if (declared_type(caller) == &ANY_T)
+            set_null(output);
         else
-            create(declared_type(CALLER), OUTPUT);
+            create(declared_type(caller), output);
     }
 
     void formatSource(StyledSource* source, Term* term)

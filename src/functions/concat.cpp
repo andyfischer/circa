@@ -7,12 +7,13 @@ namespace concat_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(concat, "concat(any...) -> String;"
+    CA_DEFINE_FUNCTION(concat, "concat(any :multiple) -> String;"
             "'Concatenate each input (converting to a string if necessary).'")
     {
+        caValue* args = circa_input(STACK, 0);
         std::stringstream out;
-        for (int index=0; index < NUM_INPUTS; index++) {
-            caValue* v = INPUT(index);
+        for (int index=0; index < circa_count(args); index++) {
+            caValue* v = circa_index(args, index);
             if (is_string(v))
                 out << as_string(v);
             else

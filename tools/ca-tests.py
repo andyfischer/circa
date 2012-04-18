@@ -171,7 +171,7 @@ def run_all_tests():
     process = CircaProcess()
 
     totalTestCount = 0
-    totalFailedTests = 0
+    failedTests = []
     totalDisabledTests = 0
 
     # Fetch list of disabled tests
@@ -206,14 +206,18 @@ def run_all_tests():
             failed = True
 
         if failed:
-            totalFailedTests += 1
+            failedTests.append(file)
 
     if OnlyPrintCommands:
         return
 
-    print "Ran",totalTestCount,"tests,",totalFailedTests,"failed,",totalDisabledTests,"disabled."
+    print "Ran",totalTestCount,"tests,",len(failedTests),"failed,",totalDisabledTests,"disabled."
     
-    if totalFailedTests > 0:
+    if failedTests:
+        print "Failed tests:"
+        for test in failedTests:
+            print "  ", test
+
         exit(-1)
 
 def find_test_with_name(name):

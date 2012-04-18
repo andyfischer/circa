@@ -353,6 +353,7 @@ void extract_explicit_outputs(EvalContext* context, caValue* inputs)
     }
 }
 
+#if !NEW_STACK_STRATEGY
 // Deprecated in favor of find_stack_value_for_term:
 caValue* get_input(EvalContext* context, Term* term)
 {
@@ -371,6 +372,7 @@ caValue* get_input(EvalContext* context, Term* term)
 
     return NULL;
 }
+#endif
 
 caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta)
 {
@@ -392,7 +394,11 @@ caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDe
 
 int num_inputs(EvalContext* context)
 {
+#if NEW_STACK_STRATEGY
+    return count_input_placeholders(top_frame(context)->branch);
+#else
     return current_term(context)->numInputs();
+#endif
 }
 
 void consume_inputs_to_list(EvalContext* context, List* list)
@@ -406,7 +412,12 @@ void consume_inputs_to_list(EvalContext* context, List* list)
 
 caValue* get_input(EvalContext* context, int index)
 {
+#if NEW_STACK_STRATEGY
+    return get_frame_register(top_frame(context), index);
+
+#else
     return get_input(context, current_term(context)->input(index));
+#endif
 }
 
 bool can_consume_output(Term* consumer, Term* input)
@@ -419,6 +430,7 @@ bool can_consume_output(Term* consumer, Term* input)
     //return !is_value(input) && input->users.length() == 1;
 }
 
+#if !NEW_STACK_STRATEGY
 void consume_input(EvalContext* context, Term* term, caValue* dest)
 {
     caValue* value = get_input(context, term);
@@ -435,14 +447,20 @@ void consume_input(EvalContext* context, Term* term, caValue* dest)
         copy(value, dest);
     }
 }
+#endif
 
 void consume_input(EvalContext* context, int index, caValue* dest)
 {
-    return consume_input(context, current_term(context)->input(index), dest);
+    // Disable input consuming
+    copy(get_input(context, index), dest);
 }
 
 bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest)
 {
+#if NEW_STACK_STRATEGY
+    caValue* value = get_input(context, index);
+    return cast(value, type, dest);
+#else
     Term* currentTerm = current_term(context);
     Term* term = currentTerm->input(index);
     caValue* value = get_input(context, term);
@@ -458,12 +476,21 @@ bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest)
         // Normal cast
         return cast(value, type, dest);
     }
+#endif
 }
 
 caValue* get_output(EvalContext* context, int index)
 {
+#if NEW_STACK_STRATEGY
+    Frame* frame = top_frame(context);
+    Term* placeholder = get_output_placeholder(frame->branch, index);
+    if (placeholder == NULL)
+        return NULL;
+    return get_frame_register(frame, placeholder->index);
+#else
     Frame* frame = top_frame(context);
     return frame->registers[frame->pc + index];
+#endif
 }
 
 Term* current_term(EvalContext* context)
@@ -476,6 +503,11 @@ Branch* current_branch(EvalContext* context)
 {
     Frame* top = top_frame(context);
     return top->branch;
+}
+
+caValue* get_frame_register(Frame* frame, int index)
+{
+    return frame->registers[index];
 }
 
 caValue* get_register(EvalContext* context, Term* term)
@@ -519,13 +551,8 @@ void raise_error(EvalContext* context, Term* term, caValue* output, const char* 
 
 void raise_error(EvalContext* context, const char* msg)
 {
-    Term* term = current_term(context);
-    raise_error(context, term, get_register(context, term), msg);
-}
-
-void raise_error(EvalContext* context, std::string const& msg)
-{
-    raise_error(context, msg.c_str());
+    Term* term = (Term*) circa_caller_term((caStack*) context);
+    raise_error(context, term, find_stack_value_for_term(context, term, 0), msg);
 }
 
 void print_runtime_error_formatted(EvalContext* context, std::ostream& output)
@@ -646,12 +673,9 @@ std::string context_get_error_message(EvalContext* cxt)
     ca_assert(cxt->errorTerm != NULL);
     ca_assert(cxt->numFrames > 0);
 
-    Frame* frame = top_frame(cxt);
+    caValue* value = find_stack_value_for_term(cxt, cxt->errorTerm, 0);
 
-    if (cxt->errorTerm->owningBranch != frame->branch)
-        internal_error("called context_get_error_message, but the errored frame is gone");
-
-    return as_string(frame->registers[cxt->errorTerm->index]);
+    return as_string(value);
 }
 
 void print_term_on_error_stack(std::ostream& out, EvalContext* context, Term* term)
@@ -683,9 +707,162 @@ void update_context_to_latest_branches(EvalContext* context)
     }
 }
 
+Branch* if_block_choose_branch(EvalContext* context, Term* term)
+{
+    // Find the accepted case
+    Branch* contents = nested_contents(term);
+
+    int termIndex = 0;
+    while (contents->get(termIndex)->function == FUNCS.input)
+        termIndex++;
+
+    for (; termIndex < contents->length(); termIndex++) {
+        Term* caseTerm = contents->get(termIndex);
+        caValue* caseInput = find_stack_value_for_term(context, caseTerm->input(0), 0);
+
+        if (caseTerm->input(0) == NULL || as_bool(caseInput))
+            return nested_contents(caseTerm);
+    }
+    return NULL;
+}
+
+Branch* dynamic_method_choose_branch(caStack* stack, Term* term)
+{
+    caValue* object = find_stack_value_for_term((EvalContext*) stack, term, 0);
+    std::string functionName = term->stringPropOptional("syntax:functionName", "");
+
+    Term* method = find_method((Branch*) top_branch((EvalContext*) stack),
+        (Type*) circa_type_of(object), functionName.c_str());
+
+    if (method != NULL)
+        return function_contents(method);
+
+    return NULL;
+#if 0
+        // Grab the current term, this will become unavailable after push_frame.
+        Term* callerTerm = (Term*) circa_caller_term(stack);
+        
+        Function* func = as_function(term);
+        push_frame((EvalContext*) stack, function_contents(func));
+
+        // Push inputs
+        for (int i=0;; i++) {
+            caValue* input = find_stack_value_for_term((EvalContext*) stack,
+                callerTerm->input(i), 1);
+            if (input == NULL)
+                break;
+            caValue* placeholder = circa_frame_input(stack, i);
+            if (placeholder == NULL)
+                break;
+
+            copy(input, placeholder);
+        }
+
+        return;
+    }
+
+    // Check if this is a field access
+    if (is_list_based_type(object->value_type)) {
+        int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
+        if (fieldIndex == -1) {
+            set_null(circa_output(stack, 0));
+            return;
+        }
+        caValue* element = get_index(object, fieldIndex);
+        if (element == NULL)
+            set_null(circa_output(stack, 0));
+        else
+            copy(element, circa_output(stack, 0));
+    }
+#endif
+}
+
+EvaluateFunc get_override_for_branch(Branch* branch)
+{
+    // This relationship should be simplified.
+    Term* owner = branch->owningTerm;
+    if (owner == NULL)
+        return NULL;
+
+    if (!is_function(owner)) {
+        owner = owner->function;
+        if (!is_function(owner))
+            return NULL;
+    }
+
+    Function* func = as_function(owner);
+
+    // Subroutine no longer acts as an override
+    if (func->evaluate == evaluate_subroutine)
+        return NULL;
+
+/*
+    if (func->evaluate == NULL) {
+        std::cout << "warning, calling a function with NULL evaluate:"
+            << func->name << "(" << owner->name << ")" <<  std::endl;
+    }
+    */
+
+    return func->evaluate;
+}
+
+Branch* get_branch_to_push(EvalContext* context, Term* term)
+{
+    if (is_value(term))
+        return NULL;
+    else if (term->function == FUNCS.if_block)
+        return if_block_choose_branch(context, term);
+        /* dynamic method currently works as an override
+    else if (term->function == FUNCS.dynamic_method)
+        return dynamic_method_choose_branch((caStack*) context, term);
+        */
+    else if (term->function == FUNCS.declared_state)
+        return function_contents(term->function);
+    else if (term->function == FUNCS.lambda)
+        // FUNCS.lambda acts as a branch value
+        return NULL;
+    else if (term->nestedContents != NULL)
+        return term->nestedContents;
+    else if (term->function != NULL)
+        return function_contents(term->function);
+    else
+        return NULL;
+}
+
+#if 0
+void push_function_internal(EvalContext* context, Term* term)
+{
+
+    // Fetch inputs and start preparing the new stack frame.
+    List registers;
+    registers.resize(get_locals_count(branch));
+
+    // Insert inputs into placeholders
+    for (int i=0; i < circa_num_inputs((caStack*) context); i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            break;
+
+        bool castSuccess = consume_cast(context, i, placeholder->type, registers[i]);
+
+        if (!castSuccess) {
+            caValue* input = circa_input((caStack*) context, i);
+            std::stringstream msg;
+            msg << "Couldn't cast input " << input->toString()
+                << " (at index " << i << ")"
+                << " to type " << name_to_string(placeholder->type->name),
+            circa_raise_error((caStack*) context, msg.str().c_str());
+            return;
+        }
+    }
+
+    push_frame(context, branch, &registers);
+}
+#endif
+
 void run_interpreter(EvalContext* context)
 {
-    // Save the topmost branch
+    // Remember the topmost branch
     Branch* topBranch = top_frame(context)->branch;
 
     // Make sure there are no pending code updates.
@@ -694,14 +871,27 @@ void run_interpreter(EvalContext* context)
     // Check if our context needs to be updated following branch modification
     update_context_to_latest_branches(context);
 
+    // TODO: remove this:
     int initialFrameCount = context->numFrames;
+
+    // Now that we're starting a new branch, check if there is a C override for
+    // this branch.
+    EvaluateFunc override = get_override_for_branch(topBranch);
+
+    if (override != NULL) {
+        override((caStack*) context);
+        return;
+    }
 
 do_instruction:
 
-    ca_assert(!error_occurred(context));
+    // Stop on error
+    if (error_occurred(context))
+        return;
 
     Frame* frame = top_frame(context);
     Branch* branch = frame->branch;
+    Branch* nextBranch = NULL;
 
     // Check if we have finished this branch
     if (frame->pc >= frame->endPc) {
@@ -715,55 +905,103 @@ do_instruction:
         goto do_instruction;
     }
 
-    Term* term = branch->get(frame->pc);
+    Term* currentTerm = branch->get(frame->pc);
     frame->nextPc = frame->pc + 1;
 
-    EvaluateFunc evaluate = NULL;
+    // Certain functions must be handled in-place
+    if (currentTerm->function == FUNCS.output) {
 
-    if (is_function(term->function))
-        evaluate = as_function(term_value(term->function))->evaluate;
+        caValue* in = find_stack_value_for_term(context, currentTerm->input(0), 0);
+        caValue* out = get_frame_register(frame, frame->pc);
+        if (in == NULL)
+            circa_set_null(out);
+        else
+            circa_copy(in, out);
 
-    if (evaluate == NULL) {
-        frame->pc = frame->nextPc;
+        goto advance_pc;
+    } else if (currentTerm->function == FUNCS.loop_output) {
+
+        caValue* in = find_stack_value_for_term(context, currentTerm->input(0), 0);
+        caValue* out = get_frame_register(frame, frame->pc);
+
+        if (!is_list(out))
+            set_list(out);
+
+        copy(in, list_append(out));
+
+        goto advance_pc;
+    }
+
+    // Prepare to call this function
+    nextBranch = get_branch_to_push(context, currentTerm);
+
+    // No branch, advance to next term.
+    if (nextBranch == NULL || nextBranch->emptyEvaluation)
+        goto advance_pc;
+
+    // Push new frame
+    push_frame(context, nextBranch);
+
+    // Copy each input to the new frame
+    for (int i=0, destIndex = 0; i < currentTerm->numInputs(); i++) {
+        caValue* inputSlot = circa_input((caStack*) context, destIndex);
+        Term* inputTerm = get_input_placeholder(nextBranch, destIndex);
+
+        if (inputSlot == NULL || inputTerm == NULL)
+            break;
+
+        caValue* input = find_stack_value_for_term(context, currentTerm->input(i), 1);
+
+        if (input == NULL) {
+            set_null(inputSlot);
+            continue;
+        }
+
+        // TODO: More efficient way of checking for multiple inputs
+        bool multiple = inputTerm->boolPropOptional("multiple", false);
+
+        if (multiple) {
+            // This arg accepts multiple inputs: append to a list
+            if (!is_list(inputSlot))
+                set_list(inputSlot, 0);
+
+            copy(input, list_append(inputSlot));
+
+            // Advance to next input, don't change destIndex.
+            continue;
+        }
+
+        cast(input, inputTerm->type, inputSlot);
+
+        destIndex++;
+    }
+
+    // Special case for loops.
+    if (currentTerm->function == FUNCS.for_func) {
+
+        start_for_loop((caStack*) context);
+
         goto do_instruction;
     }
 
-    #if CIRCA_THROW_ON_ERROR
-    try {
-    #endif
+    // Check if there is a C override for this branch.
+    override = get_override_for_branch(top_frame(context)->branch);
 
-    evaluate((caStack*) context);
+    if (override != NULL) {
+        // By default, we'll set nextPc to finish this frame on the next iteration.
+        // The override func is welcome to change nextPc.
+        top_frame(context)->nextPc = top_frame(context)->endPc;
 
-    #if CIRCA_THROW_ON_ERROR
-    } catch (std::exception const& e) { return raise_error(context, term, e.what()); }
-    #endif
+        // Call override
+        override((caStack*) context);
 
-    if (context->trace) {
-        print_term(std::cout, term);
-        std::cout << " = " << to_string(get_output(context, 0)) << std::endl;
+        goto advance_pc;
     }
 
-#if 0
-    // Check the type of the output value of every single call.
-    #ifdef CIRCA_TEST_BUILD
-    if (!context->errorOccurred && !is_value(term)) {
-        Type* outputType = get_output_type(term);
-        caValue* output = get_input(context, term);
+    // Otherwise, we'll start evaluating the new branch.
+    goto do_instruction;
 
-        if (output != NULL && outputType != &VOID_T && !cast_possible(output, outputType)) {
-            std::stringstream msg;
-            msg << "Function " << term->function->name << " produced output "
-                << output->toString() << " which doesn't fit output type "
-                << outputType->name;
-            internal_error(msg.str());
-        }
-    }
-    #endif
-#endif
-    
-    if (error_occurred(context))
-        return;
-
+advance_pc:
     frame = top_frame(context);
     frame->pc = frame->nextPc;
     goto do_instruction;
@@ -775,27 +1013,29 @@ using namespace circa;
 
 // Public API
 
-extern "C" caStack* circa_alloc_stack(caWorld* world)
+extern "C" {
+
+caStack* circa_alloc_stack(caWorld* world)
 {
     return (caStack*) new EvalContext();
 }
 
-extern "C" void circa_dealloc_stack(caStack* stack)
+void circa_dealloc_stack(caStack* stack)
 {
     delete (EvalContext*) stack;
 }
 
-extern "C" bool circa_has_error(caStack* stack)
+bool circa_has_error(caStack* stack)
 {
     EvalContext* context = (EvalContext*) stack;
     return error_occurred(context);
 }
-extern "C" void circa_clear_error(caStack* stack)
+void circa_clear_error(caStack* stack)
 {
     EvalContext* context = (EvalContext*) stack;
     clear_error(context);
 }
-extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
+void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Branch* branch = function_contents((Function*) func);
     EvalContext* context = (EvalContext*) stack;
@@ -814,7 +1054,7 @@ extern "C" void circa_run_function(caStack* stack, caFunction* func, caValue* in
     }
 }
 
-extern "C" void circa_push_function(caStack* stack, const char* funcName)
+void circa_push_function(caStack* stack, const char* funcName)
 {
     caFunction* func = circa_find_function(NULL, funcName);
     if (func == NULL) {
@@ -823,7 +1063,7 @@ extern "C" void circa_push_function(caStack* stack, const char* funcName)
     }
     circa_push_function_ref(stack, func);
 }
-extern "C" void circa_push_function_ref(caStack* stack, caFunction* func)
+void circa_push_function_ref(caStack* stack, caFunction* func)
 {
     Branch* branch = function_contents((Function*) func);
     EvalContext* context = (EvalContext*) stack;
@@ -833,7 +1073,7 @@ extern "C" void circa_push_function_ref(caStack* stack, caFunction* func)
     push_frame(context, branch);
 }
 
-extern "C" caValue* circa_frame_input(caStack* stack, int index)
+caValue* circa_frame_input(caStack* stack, int index)
 {
     EvalContext* context = (EvalContext*) stack;
     Frame* top = top_frame(context);
@@ -847,7 +1087,7 @@ extern "C" caValue* circa_frame_input(caStack* stack, int index)
     return top->registers[index];
 }
 
-extern "C" caValue* circa_frame_output(caStack* stack, int index)
+caValue* circa_frame_output(caStack* stack, int index)
 {
     EvalContext* context = (EvalContext*) stack;
     Frame* top = top_frame(context);
@@ -860,7 +1100,7 @@ extern "C" caValue* circa_frame_output(caStack* stack, int index)
     return top->registers.get(realIndex);
 }
 
-extern "C" void circa_run(caStack* stack)
+void circa_run(caStack* stack)
 {
     run_interpreter((EvalContext*) stack);
 }
@@ -868,4 +1108,78 @@ extern "C" void circa_run(caStack* stack)
 void circa_pop(caStack* stack)
 {
     pop_frame((EvalContext*) stack);
+}
+
+caBranch* circa_top_branch(caStack* stack)
+{
+    return (caBranch*) top_frame((EvalContext*) stack)->branch;
+}
+
+caValue* circa_input(caStack* stack, int index)
+{
+    return get_input((EvalContext*) stack, index);
+}
+int circa_num_inputs(caStack* stack)
+{
+    return num_inputs((EvalContext*) stack);
+}
+int circa_int_input(caStack* stack, int index)
+{
+    return circa_int(circa_input(stack, index));
+}
+
+float circa_float_input(caStack* stack, int index)
+{
+    return circa_to_float(circa_input(stack, index));
+}
+float circa_bool_input(caStack* stack, int index)
+{
+    return circa_bool(circa_input(stack, index));
+}
+
+const char* circa_string_input(caStack* stack, int index)
+{
+    return circa_string(circa_input(stack, index));
+}
+
+caValue* circa_output(caStack* stack, int index)
+{
+    return get_output((EvalContext*) stack, index);
+}
+
+
+caTerm* circa_caller_input_term(caStack* stack, int index)
+{
+    return circa_term_get_input(circa_caller_term(stack), index);
+}
+
+caBranch* circa_caller_branch(caStack* stack)
+{
+#if NEW_STACK_STRATEGY
+    Frame* frame = get_frame((EvalContext*) stack, 1);
+    if (frame == NULL)
+        return NULL;
+    return frame->branch;
+#else
+    Frame* frame = get_frame((EvalContext*) stack, 0);
+    if (frame == NULL)
+        return NULL;
+    return frame->branch;
+#endif
+}
+
+caTerm* circa_caller_term(caStack* stack)
+{
+#if NEW_STACK_STRATEGY
+    EvalContext* cxt = (EvalContext*) stack;
+    if (cxt->numFrames < 2)
+        return NULL;
+    Frame* frame = get_frame(cxt, 1);
+    return frame->branch->get(frame->pc);
+#else
+    Frame* frame = get_frame((EvalContext*) cxt, 0);
+    return frame->branch->get(frame->pc);
+#endif
+}
+
 }

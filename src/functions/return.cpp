@@ -8,8 +8,8 @@ namespace return_function {
     CA_FUNCTION(return_func)
     {
         // Grab input values
-        List inputs;
-        consume_inputs_to_list(CONTEXT, &inputs);
+        Value args;
+        copy(circa_input(STACK, 0), &args);
 
         // Pop frames
         while (!is_subroutine(top_frame(CONTEXT)->branch->owningTerm))
@@ -18,13 +18,13 @@ namespace return_function {
         Branch* branch = top_frame(CONTEXT)->branch;
 
         // Copy values to their output placeholders.
-        for (int i=0; i < inputs.length(); i++) {
+        for (int i=0; i < circa_count(&args); i++) {
             Term* output = get_output_placeholder(branch, i);
             caValue* out = get_register(CONTEXT, output);
             if (output == NULL)
                 set_null(out);
             else
-                move(inputs[i], out);
+                move(circa_index(&args, i), out);
         }
 
         // Move PC to end

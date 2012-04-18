@@ -16,15 +16,13 @@ namespace list_function {
         return as_type(create_tuple_type(&inputTypes));
     }
 
-    CA_DEFINE_FUNCTION(evaluate, "list(any...) -> List")
+    CA_DEFINE_FUNCTION(evaluate, "list(any :multiple) -> List")
     {
-        set_list(OUTPUT);
-        List* result = List::checkCast(OUTPUT);
-
-        result->resize(NUM_INPUTS);
-
-        for (int i=0; i < NUM_INPUTS; i++)
-            copy(INPUT(i), (*result)[i]);
+        // Variadic arg handling will already have turned this into a list
+        caValue* out = circa_output(STACK, 0);
+        circa_copy(circa_input(STACK, 0), out);
+        if (!circa_is_list(out))
+            circa_set_list(out, 0);
     }
 
     CA_DEFINE_FUNCTION(repeat, "repeat(any, int) -> List")

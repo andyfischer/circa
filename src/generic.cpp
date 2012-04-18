@@ -183,9 +183,9 @@ void overload_post_input_change(Term* term)
     specialize_overload_for_call(term);
 }
 
+// DELETE
 bool is_overloaded_function(Function* func)
 {
-    // TODO
     return false;
 }
 

@@ -14,6 +14,7 @@ namespace comment_function {
     {
         FUNCS.comment = import_function(kernel, NULL, "comment()");
         as_function(FUNCS.comment)->formatSource = formatSource;
+        function_set_empty_evaluation(as_function(FUNCS.comment));
     }
 }
 }

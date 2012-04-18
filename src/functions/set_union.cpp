@@ -9,11 +9,12 @@ namespace set_union_function {
 
     CA_FUNCTION(evaluate)
     {
-        caValue* result = OUTPUT;
+        caValue* result = circa_output(STACK, 0);
         set_list(result, 0);
 
-        for (int inputIndex=0; inputIndex < NUM_INPUTS; inputIndex++) {
-            caValue* input = INPUT(inputIndex);
+        caValue* args = circa_input(STACK, 0);
+        for (int inputIndex=0; inputIndex < circa_count(args); inputIndex++) {
+            caValue* input = circa_index(args, inputIndex);
             int numElements = circa_count(input);
             for (int i=0; i < numElements; i++)
                 set_t::add(result, circa_index(input,i));
@@ -22,7 +23,7 @@ namespace set_union_function {
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, evaluate, "set_union(Set...) -> Set");
+        import_function(kernel, evaluate, "set_union(Set :multiple) -> Set");
     }
 }
 }

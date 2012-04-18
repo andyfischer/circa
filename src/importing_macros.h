@@ -28,12 +28,12 @@
                 _circa_START_FUNCTIONS[i]->_header);\
     }
 
-#define CALLER ((Term*) circa_current_term(_stack))
-#define STACK (_stack)
+#define CALLER ((Term*) circa_caller_term(_stack))
 #define CONTEXT ((EvalContext*) _stack)
+#define STACK (_stack)
 #define NUM_INPUTS (circa_num_inputs(_stack))
 #define INPUT(index) (circa_input(_stack, (index)))
-#define INPUT_TERM(index) ((Term*) circa_input_term(_stack, (index)))
+#define INPUT_TERM(index) ((Term*) circa_caller_input_term(_stack, (index)))
 #define FLOAT_INPUT(index) (circa_float_input(_stack, (index)))
 #define BOOL_INPUT(index) (circa_bool_input(_stack, (index)))
 #define STRING_INPUT(index) (circa_string_input(_stack, (index)))

@@ -7,6 +7,8 @@ namespace static_error_function {
     {
         STATIC_ERROR_FUNC = 
             import_function(kernel, NULL, "static_error(any msg)");
+
+        function_set_empty_evaluation(as_function(STATIC_ERROR_FUNC));
     }
 
 }

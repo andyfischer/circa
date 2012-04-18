@@ -53,6 +53,11 @@ void dump(EvalContext* context)
     eval_context_print_multiline(std::cout, context);
 }
 
+void dump(caStack* stack)
+{
+    dump((EvalContext*) stack);
+}
+
 void internal_error(const char* message)
 {
     #if CIRCA_ASSERT_ON_ERROR

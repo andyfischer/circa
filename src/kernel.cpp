@@ -137,16 +137,6 @@ Value FalseValue;
 
 namespace cppbuild_function { CA_FUNCTION(build_module); }
 
-// Standard library functions
-void evaluate_output_placeholder(caStack* stack)
-{
-    caValue* in = circa_input(stack, 0);
-    if (in == NULL)
-        circa_set_null(circa_output(stack, 0));
-    else
-        circa_copy(in, circa_output(stack, 0));
-}
-
 Type* output_placeholder_specializeType(Term* caller)
 {
     if (caller->input(0) == NULL)
@@ -185,39 +175,57 @@ CA_FUNCTION(to_string_repr)
     circa_to_string_repr(INPUT(0), OUTPUT);
 }
 
-void dynamic_method(caStack* stack)
+void dynamic_call_func(caStack* stack)
 {
-    caValue* object = circa_input(stack, 0);
-    std::string functionName =
-        ((Term*) circa_current_term(stack))->stringPropOptional("syntax:functionName", "");
+    caValue* callable = circa_input(stack, 0);
+    Value inputs;
+    circa_swap(circa_input(stack, 1), &inputs);
 
-    Term* term = find_method((Branch*) circa_callee_branch(stack),
-        (Type*) circa_type_of(object), functionName.c_str());
+    caBranch* branch = NULL;
 
-    if (term != NULL) {
-        // Grab the current term, this will become unavailable after push_frame.
-        Term* callingTerm = (Term*) circa_current_term(stack);
-        
-        Function* func = as_function(term);
-        push_frame((EvalContext*) stack, function_contents(func));
+    if (circa_is_branch(callable))
+        branch = circa_branch(callable);
+    else if (circa_is_function(callable))
+        branch = circa_function_contents(circa_function(callable));
+    else
+        branch = (Branch*) circa_nested_branch(circa_caller_input_term(stack, 0));
 
-        // Push inputs
-        for (int i=0;; i++) {
-            caValue* input = find_stack_value_for_term((EvalContext*) stack,
-                callingTerm->input(i), 1);
-            if (input == NULL)
-                break;
-            caValue* placeholder = circa_frame_input(stack, i);
-            if (placeholder == NULL)
-                break;
-
-            copy(input, placeholder);
-        }
-
+    if (branch == NULL) {
+        circa_raise_error(stack, "Input 0 is not callable");
         return;
     }
 
-    // Check if this is a field access
+    // Pop calling frame
+    pop_frame((EvalContext*) stack);
+
+    // Replace it with the callee frame
+    push_frame_with_inputs((EvalContext*) stack, (Branch*) branch, &inputs);
+}
+
+void dynamic_method_call(caStack* stack)
+{
+    caValue* args = circa_input(stack, 0);
+
+    // Lookup method
+    Term* term = (Term*) circa_caller_term(stack);
+    caValue* object = circa_index(args, 0);
+    std::string functionName = term->stringPropOptional("syntax:functionName", "");
+
+    // Find and dispatch method
+    Term* method = find_method((Branch*) top_branch((EvalContext*) stack),
+        (Type*) circa_type_of(object), functionName.c_str());
+
+    if (method != NULL) {
+        // Grab inputs before pop
+        Value inputs;
+        swap(args, &inputs);
+
+        pop_frame((EvalContext*) stack);
+        push_frame_with_inputs((EvalContext*) stack, function_contents(method), &inputs);
+        return;
+    }
+
+    // No method found. Fall back to a field access. This is deprecated behavior.
     if (is_list_based_type(object->value_type)) {
         int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
         if (fieldIndex == -1) {
@@ -230,27 +238,7 @@ void dynamic_method(caStack* stack)
         else
             copy(element, circa_output(stack, 0));
     }
-}
 
-void call_func(caStack* stack)
-{
-    caValue* callable = circa_input(stack, 0);
-    caValue* inputs = circa_input(stack, 1);
-
-    caBranch* branch;
-
-    if (circa_is_branch(callable))
-        branch = circa_branch(callable);
-    else if (circa_is_function(callable))
-        branch = circa_function_contents(circa_function(callable));
-    else {
-        circa_raise_error(stack, "Input 0 is not callable");
-        return;
-    }
-
-    // switch to C++ mode..
-    EvalContext* context = (EvalContext*) stack;
-    push_frame_with_inputs(context, (Branch*) branch, (List*) inputs);
 }
 
 CA_FUNCTION(refactor__rename)
@@ -265,7 +253,7 @@ CA_FUNCTION(refactor__change_function)
 
 CA_FUNCTION(reflect__this_branch)
 {
-    set_branch(OUTPUT, CALLER->owningBranch);
+    set_branch(OUTPUT, (Branch*) circa_caller_branch(_stack));
 }
 
 CA_FUNCTION(reflect__kernel)
@@ -807,7 +795,7 @@ CA_FUNCTION(Term__global_id)
     if (t == NULL)
         return RAISE_ERROR("NULL reference");
 
-    set_string(OUTPUT, global_id(t));
+    set_int(OUTPUT, t->id);
 }
 CA_FUNCTION(Term__properties)
 {
@@ -921,6 +909,7 @@ void bootstrap_kernel()
     function_t::initialize(&FUNCTION_T, term_value(valueFunc));
     initialize_function(valueFunc);
     as_function(valueFunc)->name = "value";
+    function_set_empty_evaluation(as_function(valueFunc));
 
     // Initialize primitive types (this requires value() function)
     BOOL_TYPE = create_type_value(kernel, &BOOL_T, "bool");
@@ -941,7 +930,7 @@ void bootstrap_kernel()
     function_t::initialize(&FUNCTION_T, term_value(FUNCS.output));
     initialize_function(FUNCS.output);
     as_function(FUNCS.output)->name = "output_placeholder";
-    as_function(FUNCS.output)->evaluate = evaluate_output_placeholder;
+    as_function(FUNCS.output)->evaluate = NULL;
     as_function(FUNCS.output)->specializeType = output_placeholder_specializeType;
     ca_assert(function_get_output_type(FUNCS.output, 0) == &ANY_T);
 
@@ -953,6 +942,7 @@ void bootstrap_kernel()
 
     // input_placeholder() is needed before we can declare a function with inputs
     FUNCS.input = import_function(kernel, NULL, "input_placeholder() -> any");
+    function_set_empty_evaluation(as_function(FUNCS.input));
 
     // Now that we have input_placeholder() let's declare one input on output_placeholder()
     apply(function_contents(as_function(FUNCS.output)),
@@ -1089,7 +1079,7 @@ void bootstrap_kernel()
     color_t::setup_type(TYPES.color);
 
     // Need dynamic_method before any hosted functions
-    FUNCS.dynamic_method = import_function(KERNEL, (EvaluateFunc) dynamic_method, "def dynamic_method(any inputs :multiple) -> any");
+    FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
 }
 
 void install_standard_library(Branch* kernel)
@@ -1107,7 +1097,7 @@ void install_standard_library(Branch* kernel)
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
-        {"call", (EvaluateFunc) call_func},
+        {"call", (EvaluateFunc) dynamic_call_func},
         {"refactor:rename", refactor__rename},
         {"refactor:change_function", refactor__change_function},
         {"reflect:this_branch", reflect__this_branch},

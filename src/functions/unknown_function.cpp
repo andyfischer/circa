@@ -8,7 +8,7 @@ namespace unknown_function_function {
     void setup(Branch* kernel)
     {
         FUNCS.unknown_function = import_function(kernel, NULL,
-            "unknown_function(any...) -> any");
+            "unknown_function(any :multiple) -> any");
     }
 }
 }

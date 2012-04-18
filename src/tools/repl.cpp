@@ -54,7 +54,7 @@ void repl_evaluate_line(EvalContext* context, std::string const& input, std::ost
     if (!anyErrors && resultIndex != -1) {
         Term* result = branch->get(resultIndex);
         if (result->type != as_type(VOID_TYPE)) {
-            output << get_input(context, result)->toString() << std::endl;
+            output << find_stack_value_for_term(context, result, 0)->toString() << std::endl;
         }
     }
 

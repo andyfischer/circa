@@ -54,8 +54,9 @@ namespace function_t {
 
     void copy(Type* type, caValue* source, caValue* dest)
     {
-        create(type, dest);
-        *((Function*) get_pointer(dest)) = *((Function*) get_pointer(source));
+        // Shallow copy.
+        change_type(dest, type);
+        dest->value_data = source->value_data;
     }
 
     void setup_type(Type* type)
@@ -533,6 +534,11 @@ void function_format_header_source(StyledSource* source, Function* func)
             name_to_string(function_get_output_type(term, 0)->name),
                 term, phrase_type::TYPE_NAME);
     }
+}
+
+void function_set_empty_evaluation(Function* function)
+{
+    function_contents(function)->emptyEvaluation = true;
 }
 
 } // namespace circa

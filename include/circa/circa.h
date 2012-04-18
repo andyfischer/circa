@@ -116,8 +116,6 @@ void circa_run_module(caStack* stack, const char* moduleName);
 
 void circa_push_function(caStack* stack, const char* funcName);
 void circa_push_function_ref(caStack* stack, caFunction* func);
-caValue* circa_frame_input(caStack* stack, int index);
-caValue* circa_frame_output(caStack* stack, int index);
 
 void circa_run(caStack* stack);
 
@@ -171,11 +169,14 @@ caValue* circa_output(caStack* stack, int index);
 // circa_set_XXX functions.
 caValue* circa_create_default_output(caStack* stack, int index);
 
-// Fetch the Term that is currently being evaluated.
-caTerm* circa_current_term(caStack* stack);
+// Fetch the caller Term, this is the Term that owns the branch which is currently
+// at the top of the stack.
+caTerm* circa_caller_term(caStack* stack);
 
-// Fetch the Branch for the function that is currently being evaluated
-caBranch* circa_callee_branch(caStack* stack);
+// Fetch the Branch that holds the caller Term.
+caBranch* circa_caller_branch(caStack* stack);
+
+caBranch* circa_top_branch(caStack* stack);
 
 // -- Tagged Values --
 
@@ -337,12 +338,18 @@ caFunction* circa_find_function(caBranch* branch, const char* name);
 // Find a Type by name, looking in the given branch.
 caType* circa_find_type(caBranch* branch, const char* name);
 
-// Retrive the nth input Term for the stack's current Term. May return NULL.
-// This is equivalent to: circa_term_get_input(circa_current_term(stack), index)
-caTerm* circa_input_term(caStack* stack, int index);
+// Retreive the nth input Term to the caller Term. May return NULL if the caller term
+// doesn't have that many inputs, or if there is no caller term.
+caTerm* circa_caller_input_term(caStack* stack, int index);
 
 // Get a Term from a Branch by index.
 caTerm* circa_get_term(caBranch* branch, int index);
+
+// Get the nth input placeholder from this branch. Returns NULL if there is no such input.
+caTerm* circa_input_placeholder(caBranch* branch, int index);
+
+// Get the nth output placeholder from this branch. Returns NULL if there is no such output.
+caTerm* circa_output_placeholder(caBranch* branch, int index);
 
 // Get the Branch contents for a given Term. This may return NULL.
 caBranch* circa_nested_branch(caTerm* term);
@@ -362,6 +369,7 @@ caBranch* circa_function_contents(caFunction* func);
 // Access the fixed value of a value() Term. Returns NULL if Term is not a value.
 caValue* circa_term_value(caTerm* term);
 
+// Fetch the term's index (its position inside the parent branch)
 int circa_term_get_index(caTerm* term);
 
 // Fetch the number of inputs for the given term.

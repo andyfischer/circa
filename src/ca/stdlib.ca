@@ -115,7 +115,7 @@ def Term.input(_, int) -> Term
 def Term.inputs(_) -> List
 def Term.num_inputs(_) -> int
 def Term.source_location(_) -> Rect_i
-def Term.global_id(_) -> String
+def Term.global_id(_) -> int
 def Term.properties(_) -> Map
 def Term.property(_, String) -> any
 

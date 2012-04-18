@@ -96,16 +96,20 @@ namespace math_function {
     CA_DEFINE_FUNCTION(average, "average(number...) -> number;"
                 "'Returns the average of all inputs.'")
     {
-        if (NUM_INPUTS == 0) {
-            set_float(OUTPUT, 0);
+        caValue* args = circa_input(STACK, 0);
+        int count = circa_count(args);
+        caValue* out = circa_output(STACK, 0);
+
+        if (count == 0) {
+            set_float(out, 0);
             return;
         }
 
         float sum = 0;
-        for (int i=0; i < NUM_INPUTS; i++)
-            sum += FLOAT_INPUT(i);
+        for (int i=0; i < count; i++)
+            sum += to_float(circa_index(args, i));
 
-        set_float(OUTPUT, sum / NUM_INPUTS);
+        set_float(out, sum / count);
     }
 
     CA_DEFINE_FUNCTION(pow, "pow(int i, int x) -> int; 'Returns i to the power of x'")

@@ -30,6 +30,7 @@ namespace type_t {
     }
     void copy(Type* type, caValue* source, caValue* dest)
     {
+        // Shallow copy
         ca_assert(is_type(source));
         change_type(dest, type);
         dest->value_data = source->value_data;

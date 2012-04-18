@@ -1,3 +1,14 @@
 
-def func(any a)
-    a.f(1 2 3)
+type T {
+    int i
+}
+
+def T.f(t) -> int
+    return t.i
+
+def call_f(any t) -> int
+    return t.f()
+
+t = T([4])
+result = call_f(t)
+assert(result == 4)

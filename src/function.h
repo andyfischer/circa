@@ -132,4 +132,6 @@ void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeT
 
 void function_format_header_source(StyledSource* source, Function* func);
 
+void function_set_empty_evaluation(Function* function);
+
 } // namespace circa

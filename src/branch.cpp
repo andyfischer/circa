@@ -39,7 +39,8 @@ Branch::Branch()
   : owningTerm(NULL),
     inProgress(false),
     stateType(NULL),
-    currentlyCascadingUpdates(false)
+    currentlyCascadingUpdates(false),
+    emptyEvaluation(false)
 {
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
 }

@@ -12,13 +12,15 @@ namespace container_set_function {
         caValue* result = OUTPUT;
         set_list(result, 0);
 
-        for (int index=0; index < NUM_INPUTS; index++)
-            set_t::add(result, INPUT(index));
+        caValue* args = circa_input(STACK, 0);
+
+        for (int index=0; index < circa_count(args); index++)
+            set_t::add(result, circa_index(args, index));
     }
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, evaluate, "set(any...) -> Set");
+        import_function(kernel, evaluate, "set(any :multiple) -> Set");
     }
 }
 }

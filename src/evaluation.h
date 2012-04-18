@@ -10,6 +10,8 @@
 #include "tagged_value.h"
 #include "term_list.h"
 
+#define NEW_STACK_STRATEGY 1
+
 namespace circa {
 
 struct Frame
@@ -113,7 +115,9 @@ caValue* evaluate(Term* function, List* inputs);
 void insert_explicit_inputs(EvalContext* context, caValue* inputs);
 void extract_explicit_outputs(EvalContext* context, caValue* inputs);
 
+#if !NEW_STACK_STRATEGY
 caValue* get_input(EvalContext* context, Term* term);
+#endif
 caValue* get_input(EvalContext* context, int index);
 caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta);
 void consume_input(EvalContext* context, Term* term, caValue* dest);
@@ -125,6 +129,7 @@ caValue* get_output(EvalContext* context, int index);
 
 Term* current_term(EvalContext* context);
 Branch* current_branch(EvalContext* context);
+caValue* get_frame_register(Frame* frame, int index);
 caValue* get_register(EvalContext* context, Term* term);
 
 // Create an output value for the current term, using the declared type's
@@ -134,7 +139,6 @@ void create_output(EvalContext* context);
 // Signal that a runtime error has occurred.
 void raise_error(EvalContext* context, Term* term, caValue* output, const char* msg);
 void raise_error(EvalContext* context, const char* msg);
-void raise_error(EvalContext* context, std::string const& msg);
 
 void print_runtime_error_formatted(EvalContext* context, std::ostream& output);
 

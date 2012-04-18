@@ -15,8 +15,7 @@ void finish_for_loop(Term* forTerm);
 Term* find_enclosing_for_loop(Term* term);
 Branch* find_enclosing_for_loop_contents(Term* term);
 
-CA_FUNCTION(evaluate_for_loop);
-CA_FUNCTION(evaluate_loop_output);
+CA_FUNCTION(start_for_loop);
 void for_loop_finish_iteration(EvalContext* context);
 void for_loop_finish_frame(EvalContext* context);
 

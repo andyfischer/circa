@@ -32,8 +32,9 @@ namespace for_function {
     }
     CA_FUNCTION(evaluate_continue)
     {
-        List inputs;
-        consume_inputs_to_list(CONTEXT, &inputs);
+        // Save args before we pop the frame
+        Value args;
+        circa_copy(circa_input(STACK, 0), &args);
 
         // Pop frames
         while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
@@ -42,16 +43,17 @@ namespace for_function {
         // Copy outputs to placeholders
         Branch* branch = top_frame(CONTEXT)->branch;
         for (int i=0;; i++) {
-            Term* output = get_output_placeholder(branch, i);
+            // Fetch placeholder + 1 (skip the primary output)
+            Term* output = get_output_placeholder(branch, i + 1);
             if (output == NULL)
                 break;
 
             caValue* out = get_register(CONTEXT, output);
 
-            if (i >= list_length(&inputs))
+            if (i >= circa_count(&args))
                 set_null(out);
             else
-                move(inputs[i], out);
+                move(circa_index(&args, i), out);
         }
 
         for_loop_finish_iteration(CONTEXT);
@@ -78,14 +80,14 @@ namespace for_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.for_func = import_function(kernel, evaluate_for_loop, "for(Indexable) -> List");
+        FUNCS.for_func = import_function(kernel, NULL, "for(Indexable) -> List");
         as_function(FUNCS.for_func)->formatSource = formatSource;
 
-        FUNCS.loop_output = import_function(kernel, evaluate_loop_output,
-            "loop_output(any) -> List");
+        FUNCS.loop_output = import_function(kernel, NULL, "loop_output(any) -> List");
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
+        function_set_empty_evaluation(as_function(FUNCS.loop_index));
 
         FUNCS.discard = import_function(kernel, evaluate_discard, "discard()");
         as_function(FUNCS.discard)->formatSource = discard_formatSource;

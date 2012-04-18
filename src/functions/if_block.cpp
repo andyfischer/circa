@@ -47,7 +47,7 @@ namespace if_block_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.if_block = import_function(kernel, evaluate_if_block, "if_block() -> any");
+        FUNCS.if_block = import_function(kernel, NULL, "if_block() -> any");
         as_function(FUNCS.if_block)->formatSource = formatSource;
 
         FUNCS.case_func = import_function(kernel, NULL, "case(bool :optional)");

@@ -46,62 +46,17 @@ caBranch* caTerm::parent()
 {
     return circa_parent_branch(this);
 }
-int circa_num_inputs(caStack* stack)
-{
-    return num_inputs((EvalContext*) stack);
-}
 
-caValue* circa_input(caStack* stack, int index)
-{
-    return get_input((EvalContext*) stack, index);
-}
-
-caTerm* circa_input_term(caStack* stack, int index)
-{
-    return circa_term_get_input(circa_current_term(stack), index);
-}
-
-int circa_int_input(caStack* stack, int index)
-{
-    return circa_int(circa_input(stack, index));
-}
-
-float circa_float_input(caStack* stack, int index)
-{
-    return circa_to_float(circa_input(stack, index));
-}
-float circa_bool_input(caStack* stack, int index)
-{
-    return circa_bool(circa_input(stack, index));
-}
-
-const char* circa_string_input(caStack* stack, int index)
-{
-    return circa_string(circa_input(stack, index));
-}
-
-caValue* circa_output(caStack* stack, int index)
-{
-    return get_output((EvalContext*) stack, index);
-}
 
 caValue* circa_create_default_output(caStack* stack, int index)
 {
     caValue* val = circa_output(stack, index);
-    caTerm* term = circa_current_term(stack);
-    circa_create_value(val, circa_term_declared_type(term));
+    caBranch* top = circa_top_branch(stack);
+    caTerm* placeholder = circa_output_placeholder(top, index);
+    circa_create_value(val, circa_term_declared_type(placeholder));
     return val;
 }
 
-caTerm* circa_current_term(caStack* stack)
-{
-    return (caTerm*) current_term((EvalContext*) stack);
-}
-caBranch* circa_callee_branch(caStack* stack)
-{
-    Term* currentFunction = current_term((EvalContext*) stack)->function;
-    return (caBranch*) function_contents(currentFunction);
-}
 
 void* circa_as_pointer(caValue* container)
 {
@@ -243,6 +198,15 @@ void circa_print_error_to_stdout(caStack* stack)
 caTerm* circa_get_term(caBranch* branch, int index)
 {
     return (caTerm*) ((Branch*) branch)->get(index);
+}
+
+caTerm* circa_input_placeholder(caBranch* branch, int index)
+{
+    return (caTerm*) get_input_placeholder((Branch*)branch, index);
+}
+caTerm* circa_output_placeholder(caBranch* branch, int index)
+{
+    return (caTerm*) get_output_placeholder((Branch*)branch, index);
 }
 caBranch* circa_nested_branch(caTerm* term)
 {

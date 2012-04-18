@@ -264,31 +264,18 @@ void for_loop_fix_state_input(Branch* contents)
     move_after(packStateList, stateResult);
 }
 
-CA_FUNCTION(evaluate_for_loop)
+CA_FUNCTION(start_for_loop)
 {
-    Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch* contents = nested_contents(caller);
 
     caValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
 
-    List registers;
-    registers.resize(get_locals_count(contents));
-
-    // Copy inputs (first time)
-    for (int i=0;; i++) {
-        if (get_input_placeholder(contents, i) != NULL)
-            copy(INPUT(i), registers[i]);
-        else
-            break;
-    }
-
-    // Create a stack frame
-    Frame* frame = push_frame(context, contents, &registers);
+    Frame* frame = top_frame(context);
+    Branch* contents = frame->branch;
 
     // Set up a blank list for output
-    set_list(top_frame(context)->registers[contents->length()-1], 0);
+    set_list(get_frame_register(frame, contents->length()-1), 0);
 
     // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {
@@ -322,25 +309,16 @@ CA_FUNCTION(evaluate_for_loop)
     // Interpreter will run the contents of the branch
 }
 
-CA_FUNCTION(evaluate_loop_output)
-{
-    caValue* output = OUTPUT;
-    if (!is_list(output))
-        set_list(output);
-
-    copy(INPUT(0), list_append(output));
-}
-
 void for_loop_finish_iteration(EvalContext* context)
 {
     Frame* frame = top_frame(context);
     Branch* contents = frame->branch;
 
     // Find list length
-    caValue* listInput = frame->registers[0];
+    caValue* listInput = get_frame_register(frame, 0);
 
     // Increment the loop index
-    caValue* index = frame->registers[for_loop_find_index(contents)->index];
+    caValue* index = get_frame_register(frame, for_loop_find_index(contents)->index);
     set_int(index, as_int(index) + 1);
 
     // Check if we are finished
@@ -351,13 +329,13 @@ void for_loop_finish_iteration(EvalContext* context)
     }
 
     // If we're not finished yet, copy rebound outputs back to inputs.
-    List* registers = &frame->registers;
     for (int i=1;; i++) {
         Term* input = get_input_placeholder(contents, i);
         if (input == NULL)
             break;
         Term* output = get_output_placeholder(contents, i);
-        copy(registers->get(output->index), registers->get(input->index));
+        copy(get_frame_register(frame, output->index),
+            get_frame_register(frame, input->index));
     }
 
     // Return to start of loop body

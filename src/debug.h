@@ -30,6 +30,7 @@ void dump(Term* term);
 void dump(caValue& value);
 void dump(caValue* value);
 void dump(EvalContext* context);
+void dump(caStack* stack);
 
 // Signal that an unexpected error has occurred. Depending on debug settings, this
 // will either throw an exception or trigger an assert().

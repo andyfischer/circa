@@ -510,11 +510,11 @@ void if_block_post_setup(Term* ifCall)
         apply(contents, FUNCS.output, TermList(NULL));
 }
 
+#if 0
 CA_FUNCTION(evaluate_if_block)
 {
-    Term* caller = CALLER;
     EvalContext* context = CONTEXT;
-    Branch* contents = nested_contents(caller);
+    Branch* contents = circa_top_branch(STACK);
     Branch* acceptedBranch = NULL;
 
     int termIndex = 0;
@@ -525,7 +525,11 @@ CA_FUNCTION(evaluate_if_block)
         Term* caseTerm = contents->get(termIndex);
 
         // Look at input
+#if NEW_STACK_STRATEGY
+        caValue* caseInput = get_input(context, 0);
+#else
         caValue* caseInput = get_input(context, caseTerm->input(0));
+#endif
         
         if (caseTerm->input(0) == NULL || as_bool(caseInput)) {
 
@@ -541,5 +545,6 @@ CA_FUNCTION(evaluate_if_block)
         }
     }
 }
+#endif
 
 } // namespace circa

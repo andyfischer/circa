@@ -5,9 +5,10 @@
 namespace circa {
 namespace ref_function {
 
-    CA_FUNCTION(ref)
+    void ref(caStack* stack)
     {
-        set_ref(OUTPUT, INPUT_TERM(0));
+        caTerm* term = circa_caller_input_term(stack, 0);
+        set_ref(circa_output(stack, 0), (Term*) term);
     }
 
     void setup(Branch* kernel)

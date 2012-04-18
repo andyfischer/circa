@@ -7,28 +7,25 @@ namespace get_field_function {
 
     CA_FUNCTION(evaluate)
     {
-        caValue* head = INPUT(0);
-
-        for (int nameIndex=1; nameIndex < NUM_INPUTS; nameIndex++) {
-            std::string const& name = INPUT(nameIndex)->asString();
-
-            if (!is_list_based_type(head->value_type)) {
-                std::string msg = "get_field failed, not a compound type: " + head->toString();
-                msg += ". Field is: " + name;
-                return RAISE_ERROR(msg.c_str());
-            }
-
-            int fieldIndex = list_find_field_index_by_name(head->value_type, name.c_str());
-
-            if (fieldIndex == -1) {
-                std::string msg = "field not found: " + name;
-                return RAISE_ERROR(msg.c_str());
-            }
-
-            head = head->getIndex(fieldIndex);
+        caValue* head = circa_input(STACK, 0);
+        const char* keyStr = circa_string_input(STACK, 1);
+        
+        if (!is_list_based_type(head->value_type)) {
+            std::string msg = "get_field failed, not a compound type: " + head->toString();
+            msg += ". Field is: ";
+            msg += keyStr;
+            return RAISE_ERROR(msg.c_str());
         }
 
-        copy(head, OUTPUT);
+        int fieldIndex = list_find_field_index_by_name(head->value_type, keyStr);
+
+        if (fieldIndex == -1) {
+            std::string msg = "field not found: ";
+            msg += keyStr;
+            return RAISE_ERROR(msg.c_str());
+        }
+
+        copy(circa_index(head, fieldIndex), circa_output(STACK, 0));
     }
 
     Type* specializeType(Term* caller)
@@ -73,7 +70,7 @@ namespace get_field_function {
     void setup(Branch* kernel)
     {
         FUNCS.get_field = import_function(kernel, evaluate,
-                "get_field(any, String...) -> any");
+                "get_field(any, String) -> any");
         as_function(FUNCS.get_field)->specializeType = specializeType;
         as_function(FUNCS.get_field)->formatSource = formatSource;
     }

@@ -30,7 +30,7 @@ struct Branch : caBranch
     Term* owningTerm;
 
     // Whether this branch is "in progress". Certain cleanup actions are suspended
-    // while in this state, this is for more efficient building.
+    // while in this state.
     bool inProgress;
 
     // Variant value describing where this branch came from. 
@@ -54,6 +54,9 @@ struct Branch : caBranch
     // See update_cascades.cpp
     Value pendingUpdates;
     bool currentlyCascadingUpdates;
+
+    // Evaluation advice
+    bool emptyEvaluation;
 
     Branch();
     ~Branch();

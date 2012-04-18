@@ -1,0 +1,29 @@
+
+Old way:
+  A stack frame is not created for every foreign function, they are evaluated "in place"
+  Foreign function uses accessors that find the term's inputs by searching the stack
+
+New way:
+  A stack frame is created for every foreign function
+  Inputs are copied to the new frame (using the stame stack-searching we did before)
+  Foreign function finds input & output slots at the top of the stack
+
+Old way of getting inputs:
+  Number of inputs was associated with each call site
+  Different call sites could have different input counts
+  The receiver function would dynamically access input values (associated with calling code)
+  Input-output passing is more of a protocol. Call-site makes promises and callee accesses
+    the stack with the assumption that promises are held
+
+ - Harder to push a function and run it. A call site must be created.
+ - Too much logic placed in the hands of the foreign function
+
+New way of getting inputs:
+  Number and type of inputs is fixed per-function
+  No varargs, instead multiple inputs need to be wrapped into a list
+    Does list wrapping hurt performance?
+    Does list wrapping hurt reflection? Probably not much. Varargs already tricky to reflect.
+
+ - More restrictive
+ + Probably easier to optimize
+ + Easier to push a function and run it
