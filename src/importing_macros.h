@@ -29,6 +29,7 @@
     }
 
 #define CALLER ((Term*) circa_current_term(_stack))
+#define STACK (_stack)
 #define CONTEXT ((EvalContext*) _stack)
 #define NUM_INPUTS (circa_num_inputs(_stack))
 #define INPUT(index) (circa_input(_stack, (index)))

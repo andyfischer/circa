@@ -7,18 +7,14 @@ namespace add_function {
 
     CA_FUNCTION(add_i_evaluate)
     {
-        int result = 0;
-        for (int i=0; i < NUM_INPUTS; i++)
-            result += INT_INPUT(i);
-        set_int(OUTPUT, result);
+        int sum = circa_int_input(STACK, 0) + circa_int_input(STACK, 1);
+        set_int(circa_output(STACK, 0), sum);
     }
 
     CA_FUNCTION(add_f_evaluate)
     {
-        float result = 0.0;
-        for (int i=0; i < NUM_INPUTS; i++)
-            result += FLOAT_INPUT(i);
-        set_float(OUTPUT, result);
+        float sum = circa_float_input(STACK, 0) + circa_float_input(STACK, 1);
+        set_float(circa_output(STACK, 0), sum);
     }
 
 #if 0
@@ -58,8 +54,8 @@ namespace add_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int...) -> int");
-        FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number...) -> number");
+        FUNCS.add_i = import_function(kernel, add_i_evaluate, "add_i(int, int) -> int");
+        FUNCS.add_f = import_function(kernel, add_f_evaluate, "add_f(number, number) -> number");
     }
 } // namespace add_function
 } // namespace circa

@@ -7,12 +7,14 @@ namespace mult_function {
 
     CA_FUNCTION(evaluate_f)
     {
-        set_float(OUTPUT, FLOAT_INPUT(0) * FLOAT_INPUT(1));
+        float product = circa_float_input(STACK, 0) * circa_float_input(STACK, 1);
+        set_float(circa_output(STACK, 0), product);
     }
 
     CA_FUNCTION(evaluate_i)
     {
-        set_int(OUTPUT, INT_INPUT(0) * INT_INPUT(1));
+        int product = circa_int_input(STACK, 0) * circa_int_input(STACK, 1);
+        set_int(circa_output(STACK, 0), product);
     }
 
     CA_FUNCTION(feedback_evaluate)
