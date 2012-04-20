@@ -101,7 +101,11 @@ for env in all_envs:
     
     result = env.Program(binaryFile, 'build/'+variant_name+'/src/main.cpp',
             LIBS=libs)
-    env.Append(LINKFLAGS = ["-all_load"])
+
+    # Disable -all_load, this flag was needed at one point for dynamically loaded
+    # libraries to find the libcirca symbols. But it's no worky on GCC. (issue #3)
+    # env.Append(LINKFLAGS = ["-all_load"])
+
     circa_cl_apps[variant_name] = result
 
     #if OSX and SHARED_LIBRARY:
