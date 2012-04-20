@@ -20,6 +20,7 @@ syn match circaFloat	"\<\%(0\|[1-9]\d*\%(_\d\+\)*\)\%(\.\d\+\%(_\d\+\)*\)\=\%([e
 syn region circaString   start=+"+ end=+"+ skip=+\\"+
 syn region circaString   start=+'+ end=+'+ skip=+\\'+
 syn region circaString   start=+<<<+ end=+>>>+
+syn region circaMultilineComment start="{-" end="-}" contains=circaMultilineComment
 
 " Keywords
 syn keyword circaKeyword def type begin do end if elif else for state return in true false namespace discard break continue while import
@@ -27,7 +28,6 @@ syn match circaKeyword "\<do\ once\>"
 
 " Comments
 syn region circaLineComment start="--" skip="\\$" end="$"
-syn region circaLineComment start="# " skip="\\$" end="$"
 
 hi def link circaColor          Number
 hi def link circaInteger        Number
@@ -35,6 +35,7 @@ hi def link circaFloat          Number
 hi def link circaString         String
 hi def link circaKeyword        Statement
 hi def link circaLineComment    Comment
+hi def link circaMultilineComment    Comment
 
 let b:current_syntax = "circa"
 

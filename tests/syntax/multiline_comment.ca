@@ -1,0 +1,28 @@
+
+{- this is a comment -}
+
+def this_is_not_a_comment() -> int
+    return 1
+
+{- this
+  is
+  a 
+  comment
+  -}
+
+assert(this_is_not_a_comment() == 1)
+
+{- this
+  is
+  a 
+  {- nested comment -}
+  followed by
+  {- more levels
+      {- of nesting
+      -}
+      -}
+   and then this {--}{--}
+  -}
+
+
+assert(this_is_not_a_comment() == 1)

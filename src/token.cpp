@@ -210,6 +210,7 @@ void consume_identifier(TokenizeContext &context);
 void consume_name(TokenizeContext &context);
 void consume_whitespace(TokenizeContext &context);
 void consume_comment(TokenizeContext& context);
+void consume_multiline_comment(TokenizeContext& context);
 bool match_number(TokenizeContext &context);
 void consume_number(TokenizeContext &context);
 void consume_hex_number(TokenizeContext &context);
@@ -349,6 +350,10 @@ void top_level_consume_token(TokenizeContext &context)
             context.consume(TK_RPAREN, 1);
             return;
         case '{':
+            if (context.next(1) == '-') {
+                consume_multiline_comment(context);
+                return;
+            }
             context.consume(TK_LBRACE, 1);
             return;
         case '}':
@@ -540,6 +545,41 @@ void consume_comment(TokenizeContext& context)
     int lookahead = 0;
     while (context.withinRange(lookahead) && !is_newline(context.next(lookahead)))
         lookahead++;
+
+    context.consume(TK_COMMENT, lookahead);
+}
+
+void consume_multiline_comment(TokenizeContext& context)
+{
+    int lookahead = 0;
+    
+    // Keep track of the current depth, for nested blocks.
+    int depth = 0;
+
+    while (context.withinRange(lookahead)) {
+        if (context.next() == '{' && context.next(1) == '-') {
+
+            // Found a comment opener, increase depth. Also advance lookahead so that
+            // we don't get confused by this: {-}
+            lookahead += 2;
+            depth++;
+            continue;
+        }
+
+        if (context.next() == '-' && context.next(1) == '}') {
+
+            // Found a comment ender.
+            depth--;
+            lookahead += 2;
+
+            if (depth == 0)
+                break;
+
+            continue;
+        }
+
+        lookahead++;
+    }
 
     context.consume(TK_COMMENT, lookahead);
 }
