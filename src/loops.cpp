@@ -345,19 +345,6 @@ void for_loop_finish_iteration(EvalContext* context)
 
 void for_loop_finish_frame(EvalContext* context)
 {
-    //Branch* contents = current_branch(context);
-    //Frame* topFrame = top_frame(context);
-
-    // Hack: make sure the output_placeholder terms have their values
-#if 0
-    for (int i=1;; i++) {
-        Term* output = get_output_placeholder(contents, i);
-        if (output == NULL)
-            break;
-        copy(get_input(context, output->input(0)), get_input(context, output));
-    }
-#endif
-
     for_loop_finish_iteration(context);
 }
 

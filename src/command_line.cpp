@@ -175,13 +175,6 @@ int run_command_line(caWorld* world, caValue* args)
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
 
-        #if 0
-        if (has_static_errors(&branch)) {
-            print_static_errors_formatted(&branch, std::cout);
-            return -1;
-        }
-        #endif
-
         EvalContext context;
 
         while (true) {
@@ -245,13 +238,6 @@ int run_command_line(caWorld* world, caValue* args)
     if (string_eq(list_get(args, 0), "-gh")) {
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
-
-#if 0
-        if (has_static_errors(&branch)) {
-            print_static_errors_formatted(&branch, std::cout);
-            return 1;
-        }
-#endif
 
         std::cout << generate_cpp_headers(&branch);
 
@@ -342,14 +328,6 @@ int run_command_line(caWorld* world, caValue* args)
         print_branch_with_properties(std::cout, main_branch);
     else if (printRaw)
         print_branch(std::cout, main_branch);
-
-#if 0
-    // Don't show static errors if we're only printing source
-    if (has_static_errors(main_branch)) {
-        print_static_errors_formatted(main_branch, std::cout);
-        return 1;
-    }
-#endif
 
     if (dontRunScript)
         return 0;

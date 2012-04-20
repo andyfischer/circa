@@ -55,7 +55,7 @@ void check_input_for_static_error(List* errors, Term* term, int index)
     }
 
     // Check type
-    // Disabled for now
+    // Currently disabled
 #if 0
     Type* type = placeholder->type;
     if (term_output_never_satisfies_type(input, type))

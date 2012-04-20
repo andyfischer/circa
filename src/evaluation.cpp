@@ -353,27 +353,6 @@ void extract_explicit_outputs(EvalContext* context, caValue* inputs)
     }
 }
 
-#if !NEW_STACK_STRATEGY
-// Deprecated in favor of find_stack_value_for_term:
-caValue* get_input(EvalContext* context, Term* term)
-{
-    if (term == NULL)
-        return NULL;
-
-    if (is_value(term))
-        return term_value(term);
-
-    for (int i=0; i < context->numFrames; i++) {
-        Frame* frame = get_frame(context, i);
-        if (frame->branch != term->owningBranch)
-            continue;
-        return frame->registers[term->index];
-    }
-
-    return NULL;
-}
-#endif
-
 caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta)
 {
     if (term == NULL)
@@ -394,11 +373,7 @@ caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDe
 
 int num_inputs(EvalContext* context)
 {
-#if NEW_STACK_STRATEGY
     return count_input_placeholders(top_frame(context)->branch);
-#else
-    return current_term(context)->numInputs();
-#endif
 }
 
 void consume_inputs_to_list(EvalContext* context, List* list)
@@ -412,12 +387,7 @@ void consume_inputs_to_list(EvalContext* context, List* list)
 
 caValue* get_input(EvalContext* context, int index)
 {
-#if NEW_STACK_STRATEGY
     return get_frame_register(top_frame(context), index);
-
-#else
-    return get_input(context, current_term(context)->input(index));
-#endif
 }
 
 bool can_consume_output(Term* consumer, Term* input)
@@ -430,25 +400,6 @@ bool can_consume_output(Term* consumer, Term* input)
     //return !is_value(input) && input->users.length() == 1;
 }
 
-#if !NEW_STACK_STRATEGY
-void consume_input(EvalContext* context, Term* term, caValue* dest)
-{
-    caValue* value = get_input(context, term);
-
-    if (value == NULL) {
-        set_null(dest);
-        return;
-    }
-
-    if (can_consume_output(current_term(context), term)) {
-        move(value, dest);
-        set_name(value, name_Consumed);
-    } else {
-        copy(value, dest);
-    }
-}
-#endif
-
 void consume_input(EvalContext* context, int index, caValue* dest)
 {
     // Disable input consuming
@@ -457,40 +408,17 @@ void consume_input(EvalContext* context, int index, caValue* dest)
 
 bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest)
 {
-#if NEW_STACK_STRATEGY
     caValue* value = get_input(context, index);
     return cast(value, type, dest);
-#else
-    Term* currentTerm = current_term(context);
-    Term* term = currentTerm->input(index);
-    caValue* value = get_input(context, term);
-    if (value == NULL)
-        return false;
-
-    if (can_consume_output(currentTerm, term)) {
-        // Move the value and cast in place
-        move(value, dest);
-        set_name(value, name_Consumed);
-        return cast(dest, type, dest);
-    } else {
-        // Normal cast
-        return cast(value, type, dest);
-    }
-#endif
 }
 
 caValue* get_output(EvalContext* context, int index)
 {
-#if NEW_STACK_STRATEGY
     Frame* frame = top_frame(context);
     Term* placeholder = get_output_placeholder(frame->branch, index);
     if (placeholder == NULL)
         return NULL;
     return get_frame_register(frame, placeholder->index);
-#else
-    Frame* frame = top_frame(context);
-    return frame->registers[frame->pc + index];
-#endif
 }
 
 Term* current_term(EvalContext* context)
@@ -738,43 +666,6 @@ Branch* dynamic_method_choose_branch(caStack* stack, Term* term)
         return function_contents(method);
 
     return NULL;
-#if 0
-        // Grab the current term, this will become unavailable after push_frame.
-        Term* callerTerm = (Term*) circa_caller_term(stack);
-        
-        Function* func = as_function(term);
-        push_frame((EvalContext*) stack, function_contents(func));
-
-        // Push inputs
-        for (int i=0;; i++) {
-            caValue* input = find_stack_value_for_term((EvalContext*) stack,
-                callerTerm->input(i), 1);
-            if (input == NULL)
-                break;
-            caValue* placeholder = circa_frame_input(stack, i);
-            if (placeholder == NULL)
-                break;
-
-            copy(input, placeholder);
-        }
-
-        return;
-    }
-
-    // Check if this is a field access
-    if (is_list_based_type(object->value_type)) {
-        int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
-        if (fieldIndex == -1) {
-            set_null(circa_output(stack, 0));
-            return;
-        }
-        caValue* element = get_index(object, fieldIndex);
-        if (element == NULL)
-            set_null(circa_output(stack, 0));
-        else
-            copy(element, circa_output(stack, 0));
-    }
-#endif
 }
 
 EvaluateFunc get_override_for_branch(Branch* branch)
@@ -828,37 +719,6 @@ Branch* get_branch_to_push(EvalContext* context, Term* term)
     else
         return NULL;
 }
-
-#if 0
-void push_function_internal(EvalContext* context, Term* term)
-{
-
-    // Fetch inputs and start preparing the new stack frame.
-    List registers;
-    registers.resize(get_locals_count(branch));
-
-    // Insert inputs into placeholders
-    for (int i=0; i < circa_num_inputs((caStack*) context); i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
-        if (placeholder == NULL)
-            break;
-
-        bool castSuccess = consume_cast(context, i, placeholder->type, registers[i]);
-
-        if (!castSuccess) {
-            caValue* input = circa_input((caStack*) context, i);
-            std::stringstream msg;
-            msg << "Couldn't cast input " << input->toString()
-                << " (at index " << i << ")"
-                << " to type " << name_to_string(placeholder->type->name),
-            circa_raise_error((caStack*) context, msg.str().c_str());
-            return;
-        }
-    }
-
-    push_frame(context, branch, &registers);
-}
-#endif
 
 void run_interpreter(EvalContext* context)
 {
@@ -1155,31 +1015,19 @@ caTerm* circa_caller_input_term(caStack* stack, int index)
 
 caBranch* circa_caller_branch(caStack* stack)
 {
-#if NEW_STACK_STRATEGY
     Frame* frame = get_frame((EvalContext*) stack, 1);
     if (frame == NULL)
         return NULL;
     return frame->branch;
-#else
-    Frame* frame = get_frame((EvalContext*) stack, 0);
-    if (frame == NULL)
-        return NULL;
-    return frame->branch;
-#endif
 }
 
 caTerm* circa_caller_term(caStack* stack)
 {
-#if NEW_STACK_STRATEGY
     EvalContext* cxt = (EvalContext*) stack;
     if (cxt->numFrames < 2)
         return NULL;
     Frame* frame = get_frame(cxt, 1);
     return frame->branch->get(frame->pc);
-#else
-    Frame* frame = get_frame((EvalContext*) cxt, 0);
-    return frame->branch->get(frame->pc);
-#endif
 }
 
 }

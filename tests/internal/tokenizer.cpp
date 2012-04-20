@@ -335,14 +335,6 @@ void test_comment()
     test_equals(tokens.consumeStr(TK_WHITESPACE), " ");
     test_equals(tokens.consumeStr(TK_COMMENT), "-- this is a comment");
     test_assert(tokens.finished());
-
-    tokens.reset("1 2 # this is a comment");
-    test_equals(tokens.consumeStr(TK_INTEGER), "1");
-    test_equals(tokens.consumeStr(TK_WHITESPACE), " ");
-    test_equals(tokens.consumeStr(TK_INTEGER), "2");
-    test_equals(tokens.consumeStr(TK_WHITESPACE), " ");
-    test_equals(tokens.consumeStr(TK_COMMENT), "# this is a comment");
-    test_assert(tokens.finished());
 }
 
 void test_names()

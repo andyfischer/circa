@@ -39,41 +39,8 @@ namespace subroutine_f {
 
 CA_FUNCTION(evaluate_subroutine)
 {
-    EvalContext* context = CONTEXT;
-    Term* caller = CALLER;
-    Term* function = caller->function;
-
-    Branch* contents = NULL;
-
-    if (caller->nestedContents != NULL)
-        contents = nested_contents(caller);
-    else
-        contents = nested_contents(function);
-    
-    // Fetch inputs and start preparing the new stack frame.
-    List registers;
-    registers.resize(get_locals_count(contents));
-    
-    // Insert inputs into placeholders
-    for (int i=0; i < NUM_INPUTS; i++) {
-        Term* placeholder = get_input_placeholder(contents, i);
-        if (placeholder == NULL)
-            break;
-
-        bool castSuccess = consume_cast(CONTEXT, i, placeholder->type, registers[i]);
-
-        if (!castSuccess) {
-            std::stringstream msg;
-            msg << "Couldn't cast input " << INPUT(i)->toString()
-                << " (at index " << i << ")"
-                << " to type " << name_to_string(placeholder->type->name),
-            RAISE_ERROR(msg.str().c_str());
-            return;
-        }
-    }
-
-    // Push our frame (with inputs) onto the stack
-    push_frame(context, contents, &registers);
+    // This once did something, but now the default function calling behavior
+    // is the same as evaluating a subroutine.
 }
 
 bool is_subroutine(Term* term)
@@ -119,58 +86,6 @@ void initialize_subroutine(Term* sub)
 void finish_building_subroutine(Term* sub, Term* outputType)
 {
     finish_update_cascade(nested_contents(sub));
-}
-
-void store_locals(Branch* branch, caValue* storageTv)
-{
-    // DELETE_THIS ?
-    touch(storageTv);
-    set_list(storageTv);
-    List* storage = List::checkCast(storageTv);
-    storage->resize(branch->length());
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-
-        if (term == NULL) continue;
-
-        if (term->type == &FUNCTION_ATTRS_T)
-            continue;
-
-        copy(term_value(term), storage->get(i));
-    }
-}
-
-void restore_locals(caValue* storageTv, Branch* branch)
-{
-    // DELETE_THIS ?
-    if (!is_list(storageTv))
-        internal_error("storageTv is not a list");
-
-    List* storage = List::checkCast(storageTv);
-
-    // The function branch may be longer than our list of locals. 
-    int numItems = storage->length();
-    for (int i=0; i < numItems; i++) {
-        Term* term = branch->get(i);
-
-        if (term == NULL) continue;
-
-        if (term->type == &FUNCTION_ATTRS_T)
-            continue;
-
-        copy(storage->get(i), term_value(term));
-    }
-}
-
-void call_subroutine(Branch* sub, caValue* inputs, caValue* output,
-                     caValue* error)
-{
-    internal_error("call_subroutine no worky");
-}
-
-void call_subroutine(Term* sub, caValue* inputs, caValue* output, caValue* error)
-{
-    return call_subroutine(nested_contents(sub), inputs, output, error);
 }
 
 } // namespace circa

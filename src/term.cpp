@@ -250,49 +250,6 @@ void dealloc_term(Term* term)
     delete term;
 }
 
-static void append_term_invariant_error(List* errors, Term* term,
-        std::string const& msg)
-{
-    List& error = *List::cast(errors->append(), 1);
-    set_string(error[0], msg);
-}
-
-void term_check_invariants(List* errors, Term* term)
-{
-    // DELETE_THIS ?
-    if (term_value(term)->value_type == NULL)
-        append_term_invariant_error(errors, term, "caValue has null type");
-
-    if (term->type != NULL) {
-
-        bool typeOk = (term->type == &ANY_T)
-            || (term->type == &VOID_T && is_null(term_value(term)))
-            || cast_possible(term_value(term), term->type);
-
-        if (!typeOk) {
-            std::string msg;
-            msg += std::string("caValue has wrong type: term->type is ")
-                + name_to_string(term->type->name)
-                + ", tag is "
-                + name_to_string(term_value(term)->value_type->name);
-            append_term_invariant_error(errors, term, msg);
-        }
-    }
-
-    if (term->nestedContents && term->nestedContents->owningTerm != term)
-        append_term_invariant_error(errors, term,
-                "Term.nestedContents has wrong owningTerm");
-
-    if (term->owningBranch != NULL) {
-        Branch* branch = term->owningBranch;
-        if ((term->index >= branch->length())
-                || (branch->get(term->index) != term)) {
-            append_term_invariant_error(errors, term,
-                    "Term.index doesn't resolve to this term in owningBranch");
-        }
-    }
-}
-
 void term_set_property(Term* term, const char* name, caValue* value)
 {
     swap(value, term->properties.insert(name));
