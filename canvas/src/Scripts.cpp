@@ -38,18 +38,3 @@ void scripts_run()
         circa_clear_error(stack);
     }
 }
-
-/*
-void ScriptCenter::call(const char* functionName, caValue* inputs)
-{
-    caFunction* func = circa_find_function(mainBranch, functionName);
-
-    circa_run_function(stack, func, inputs);
-
-    if (circa_has_error(stack)) {
-        circa_print_error_to_stdout(stack);
-        circa_clear_error(stack);
-    }
-}
-
-*/

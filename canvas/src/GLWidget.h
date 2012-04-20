@@ -17,6 +17,7 @@ public:
 
 private:
     caValue* viewObj;
+    caValue* onPaintEvent;
 
 public slots: void animate();
 };

@@ -17,6 +17,8 @@ GLWidget::GLWidget(QWidget *parent)
     scripts_run();
     circa_move(circa_output(g_mainStack, 0), viewObj);
     circa_pop(g_mainStack);
+
+    onPaintEvent = circa_alloc_value();
 }
 
 void GLWidget::animate()
@@ -33,14 +35,23 @@ void GLWidget::paintEvent(QPaintEvent*)
     painter.setRenderHint(QPainter::Antialiasing);
 
     // call onPaintEvent
-    if (!circa_push_function_by_name(g_mainStack, "View.onPaintEvent"))
+    caStack* stack = g_mainStack;
+    if (!circa_push_function_by_name(stack, "View.onPaintEvent"))
         return;
 
-    circa_copy(viewObj, circa_input(g_mainStack, 0));
-    circa_set_typed_pointer(circa_input(g_mainStack, 1),
+    circa_copy(viewObj, circa_input(stack, 0));
+    circa_set_typed_pointer(circa_input(stack, 1),
         circa_find_type(NULL, "Painter"), &painter);
 
+    // State
+    circa_copy(onPaintEvent, circa_input(stack, 2));
+
     scripts_run();
+
+    // State
+    circa_copy(circa_output(stack, 1), onPaintEvent);
+
+    circa_pop(stack);
 
     painter.end();
 }

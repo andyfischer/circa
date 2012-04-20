@@ -22,7 +22,6 @@ def create_view() -> View
     return create(View)
 
 def View.onPaintEvent(self, Painter painter)
-    print('called onPaintEvent 2 3 43')
     painter.setBackground(create_brush(#eee))
 
     painter.fillRect([10 10 100 100] #f00)

@@ -75,6 +75,13 @@ caValue* circa_alloc_value()
     return value;
 }
 
+caValue* circa_alloc_list(int size)
+{
+    caValue* val = circa_alloc_value();
+    circa_set_list(val, size);
+    return val;
+}
+
 void circa_dealloc_value(caValue* value)
 {
     circa_set_null(value);
