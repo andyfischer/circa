@@ -2,22 +2,14 @@
 #include <qapplication.h>
 #include <qlabel.h>
 
-#include "ScriptCenter.h"
+#include "Scripts.h"
 #include "Window.h"
-
-ScriptCenter* g_scriptCenter = NULL;
-
-ScriptCenter* GetScriptCenter()
-{
-    return g_scriptCenter;
-}
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
+    scripts_initialize();
 
-    g_scriptCenter = new ScriptCenter();
-    g_scriptCenter->init();
+    QApplication app(argc, argv);
 
     Window window;
     window.show();

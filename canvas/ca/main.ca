@@ -1,5 +1,0 @@
-
-import App
-
-def init()
-    app = create(App)

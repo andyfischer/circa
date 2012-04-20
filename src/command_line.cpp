@@ -204,7 +204,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         // Push function
         caFunction* func = circa_find_function(branch, as_cstring(list_get(args, 2)));
-        circa_push_function_ref(stack, func);
+        circa_push_function(stack, func);
 
         // Push inputs
         for (int i=3, inputIndex = 0; i < circa_count(args); i++) {

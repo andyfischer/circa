@@ -914,16 +914,7 @@ void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
     }
 }
 
-void circa_push_function(caStack* stack, const char* funcName)
-{
-    caFunction* func = circa_find_function(NULL, funcName);
-    if (func == NULL) {
-        std::cout << "Function not found: " << funcName << std::endl;
-        return;
-    }
-    circa_push_function_ref(stack, func);
-}
-void circa_push_function_ref(caStack* stack, caFunction* func)
+void circa_push_function(caStack* stack, caFunction* func)
 {
     Branch* branch = function_contents((Function*) func);
     EvalContext* context = (EvalContext*) stack;
@@ -931,6 +922,20 @@ void circa_push_function_ref(caStack* stack, caFunction* func)
     set_branch_in_progress(branch, false);
     
     push_frame(context, branch);
+}
+
+bool circa_push_function_by_name(caStack* stack, const char* name)
+{
+    caFunction* func = circa_find_function(NULL, name);
+
+    if (func == NULL) {
+        // TODO: Save this error on the stack instead of stdout
+        std::cout << "Function not found: " << name << std::endl;
+        return false;
+    }
+
+    circa_push_function(stack, func);
+    return true;
 }
 
 caValue* circa_frame_input(caStack* stack, int index)

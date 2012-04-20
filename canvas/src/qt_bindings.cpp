@@ -37,21 +37,21 @@ void PainterPathRelease(caValue* value)
 QPointF to_qpoint(caValue* value)
 {
     float x,y;
-    circa_get_vec2(value, &x, &y);
+    circa_vec2(value, &x, &y);
     return QPoint(x,y);
 }
 
 QColor to_qcolor(caValue* value)
 {
     float r,g,b,a;
-    circa_get_vec4(value, &r, &g, &b, &a);
+    circa_vec4(value, &r, &g, &b, &a);
     return QColor(r * 255, g * 255, b * 255, a * 255);
 }
 
 QRectF to_qrect(caValue* value)
 {
     float x,y,w,h;
-    circa_get_vec4(value, &x, &y, &w, &h);
+    circa_vec4(value, &x, &y, &w, &h);
     return QRectF(x,y,w,h);
 }
 
@@ -72,7 +72,7 @@ void Brush__setColor(caStack* stack)
 void create_pen(caStack* stack)
 {
     caValue* c = circa_input(stack, 0);
-    float width = circa_get_float(circa_input(stack, 1));
+    float width = circa_float(circa_input(stack, 1));
     caValue* style = circa_input(stack, 2);
 
     QPen* pen = new QPen();
@@ -101,7 +101,7 @@ void Pen__setStyle(caStack* stack)
 void Pen__setWidth(caStack* stack)
 {
     QPen* pen = (QPen*) circa_get_pointer(circa_input(stack, 0));
-    float width = circa_get_float(circa_input(stack, 1));
+    float width = circa_float(circa_input(stack, 1));
 
     pen->setWidth(width);
 }
@@ -113,7 +113,7 @@ void Pen__setDashPattern(caStack* stack)
 void FontMetrics__width(caStack* stack)
 {
     QFontMetrics* fontMetrics = (QFontMetrics*) circa_get_pointer(circa_input(stack, 0));
-    const char* text = circa_get_string(circa_input(stack, 1));
+    const char* text = circa_string(circa_input(stack, 1));
 
     circa_set_float(circa_output(stack, 0), fontMetrics->width(text));
 }
@@ -125,8 +125,8 @@ void FontMetrics__height(caStack* stack)
 }
 void create_font(caStack* stack)
 {
-    const char* name = circa_get_string(circa_input(stack, 0));
-    float size = circa_get_float(circa_input(stack, 1));
+    const char* name = circa_string(circa_input(stack, 0));
+    float size = circa_float(circa_input(stack, 1));
 
     QFont* font = new QFont(name, int(size));
 
@@ -136,7 +136,7 @@ void create_font(caStack* stack)
 void Font__setPixelSize(caStack* stack)
 {
     QFont* font = (QFont*) circa_get_pointer(circa_input(stack, 0));
-    float size = circa_get_float(circa_input(stack, 1));
+    float size = circa_float(circa_input(stack, 1));
 
     font->setPixelSize(size);
 }
@@ -170,7 +170,7 @@ void PainterPath__addText(caStack* stack)
     QPainterPath* painterPath = (QPainterPath*) circa_get_pointer(circa_input(stack, 0));
     caValue* p = circa_input(stack, 1);
     QFont* f = (QFont*) circa_get_pointer(circa_input(stack, 2));
-    const char* text = circa_get_string(circa_input(stack, 3));
+    const char* text = circa_string(circa_input(stack, 3));
 
     painterPath->addText(to_qpoint(p), *f, text);
 }
@@ -187,7 +187,7 @@ void create_linear_gradient(caStack* stack)
 void LinearGradient__setColorAt(caStack* stack)
 {
     QLinearGradient* linearGradient = (QLinearGradient*) circa_get_pointer(circa_input(stack, 0));
-    float ratio = circa_get_float(circa_input(stack, 1));
+    float ratio = circa_float(circa_input(stack, 1));
     caValue* c = circa_input(stack, 2);
 
     linearGradient->setColorAt(ratio, to_qcolor(c));
@@ -226,7 +226,7 @@ void Painter__setPen(caStack* stack)
 void Painter__rotate(caStack* stack)
 {
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
-    float radians = circa_get_float(circa_input(stack, 1));
+    float radians = circa_float(circa_input(stack, 1));
 
     painter->rotate(radians);
 }
@@ -249,7 +249,7 @@ void Painter__drawText(caStack* stack)
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
     caValue* r = circa_input(stack, 1);
     caValue* align = circa_input(stack, 2);
-    const char* text = circa_get_string(circa_input(stack, 3));
+    const char* text = circa_string(circa_input(stack, 3));
 
     painter->drawText(to_qrect(r), 0, text);
 }

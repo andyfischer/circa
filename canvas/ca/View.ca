@@ -14,11 +14,15 @@ def fadein(Color c) -> Color
     return [c.r c.g c.b e]
 
 
-type App {
-    any mainView
+type View {
 }
 
-def App.onPaintEvent(self, Painter painter)
+def create_view() -> View
+    print('called create_view')
+    return create(View)
+
+def View.onPaintEvent(self, Painter painter)
+    print('called onPaintEvent 2')
     painter.setBackground(create_brush(#eee))
 
     painter.fillRect([10 10 100 100] #f00)

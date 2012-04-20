@@ -103,6 +103,9 @@ caBranch* circa_load_module_from_file(caWorld* world,
                                       const char* module_name,
                                       const char* filename);
 
+// Manually reload a module, if the source file is newer.
+void circa_refresh_module(caBranch*);
+
 // -- Controlling the Interpreter --
 
 // Allocate a new Stack object.
@@ -111,12 +114,17 @@ caStack* circa_alloc_stack(caWorld* world);
 // Deallocate a Stack object.
 void circa_dealloc_stack(caStack* stack);
 
-// Execute the named module.
+// Run a whole module.
 void circa_run_module(caStack* stack, const char* moduleName);
 
-void circa_push_function(caStack* stack, const char* funcName);
-void circa_push_function_ref(caStack* stack, caFunction* func);
+// Push a function to the stack.
+void circa_push_function(caStack* stack, caFunction* func);
 
+// Find a function by name and push it to the stack. Returns whether the function
+// name was found.
+bool circa_push_function_by_name(caStack* stack, const char* name);
+
+// Run the current stack.
 void circa_run(caStack* stack);
 
 void circa_pop(caStack* stack);
