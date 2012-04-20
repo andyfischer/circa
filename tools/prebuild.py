@@ -136,7 +136,8 @@ def text_file_to_c_string(sourceFile, variableName):
 
     return "\n".join(out)
 
-os.chdir(os.environ['CIRCA_HOME'])
+if 'CIRCA_HOME' in os.environ:
+    os.chdir(os.environ['CIRCA_HOME'])
 
 mkdir('src/generated')
 

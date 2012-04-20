@@ -1,15 +1,16 @@
 
 Here are instructions for building circa.lib and 'circa' the command-line tool.
 
-(There are other binaries in this repo (such as "plastic" and "looseleaf"); instructions
-for building those can be found in their respective folders.)
-
 # Requirements #
 
 You'll need:
  - A C++ compiler. Tested on GCC on Mac/Linux, and Visual Studio 2008 on Windows.
  - Python
  - Scons
+
+# Environment #
+
+Set the environment variable CIRCA_HOME to the root directory of the project.
 
 # Building #
 
@@ -38,4 +39,4 @@ Available targets are:
 
  - Test (ends in _t). Every assertion in the world is enabled. Unit tests are also included. The slowest option, but is good for checking for correctness.
  - Debug (ends in _d). Some assertions enabled, and optimizations disabled. No unit tests.
- - Release (no suffix). Assertions are disabled and optimizations enabled.
+ - Release (no suffix). Assertions are disabled and optimizations enabled. No unit tests.
