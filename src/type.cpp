@@ -138,7 +138,7 @@ Type::Type() :
     parent(NULL),
     nocopy(false)
 {
-    // Register ourselves. Start out as 'permanent'.
+    // Register ourselves. Start out as 'root'.
     gc_register_new_object((CircaObject*) this, &TYPE_T, true);
 }
 
@@ -201,7 +201,7 @@ void set_type_property(Type* type, const char* name, caValue* value)
 Type* create_type()
 {
     Type* t = new Type();
-    gc_set_object_permanent((CircaObject*) t, false);
+    gc_set_object_is_root((CircaObject*) t, false);
     return t;
 }
 

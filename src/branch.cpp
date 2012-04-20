@@ -371,8 +371,13 @@ void remove_nested_contents(Term* term)
     if (term->nestedContents == NULL)
         return;
 
+    Branch* branch = term->nestedContents;
     clear_branch(term->nestedContents);
-    delete term->nestedContents;
+
+    // Delete this Branch immediately, if it's not referenced.
+    if (!branch->header.referenced)
+        delete term->nestedContents;
+
     term->nestedContents = NULL;
 }
 
@@ -425,11 +430,7 @@ void erase_term(Term* term)
     set_inputs(term, TermList());
     change_function(term, NULL);
     term->type = NULL;
-    if (term->nestedContents) {
-        clear_branch(term->nestedContents);
-        delete term->nestedContents;
-        term->nestedContents = NULL;
-    }
+    remove_nested_contents(term);
 
     // for each user, clear that user's input list of this term
     remove_from_any_user_lists(term);

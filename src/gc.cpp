@@ -58,7 +58,7 @@ void gc_collect()
     // First pass: find root objects, and accumulate their references.
     GCReferenceList toMark;
     for (CircaObject* current = g_first; current != NULL; current = current->next) {
-        if (current->permanent)
+        if (current->root)
             gc_mark(&toMark, current, color);
     }
 
@@ -172,7 +172,7 @@ void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b)
     b->refs = tempRefs;
 }
 
-void gc_register_new_object(CircaObject* obj, Type* type, bool permanent)
+void gc_register_new_object(CircaObject* obj, Type* type, bool isRoot)
 {
     CircaObject* header = (CircaObject*) obj;
 
@@ -183,7 +183,8 @@ void gc_register_new_object(CircaObject* obj, Type* type, bool permanent)
     obj->type = type;
     obj->next = NULL;
     obj->prev = NULL;
-    obj->permanent = permanent;
+    obj->root = isRoot;
+    obj->referenced = false;
     obj->gcColor = 0;
 
     gc_register_object(header);
@@ -198,9 +199,14 @@ void ogc_n_object_deleted(CircaObject* obj)
     gc_on_object_deleted(obj);
 }
 
-void gc_set_object_permanent(CircaObject* obj, bool permanent)
+void gc_set_object_is_root(CircaObject* obj, bool root)
 {
-    obj->permanent = permanent;
+    obj->root = root;
+}
+
+void gc_mark_object_referenced(CircaObject* obj)
+{
+    obj->referenced = true;
 }
 
 } // namespace circa

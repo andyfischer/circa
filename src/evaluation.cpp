@@ -120,6 +120,10 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     top->startPc = 0;
     top->endPc = branch->length();
     top->loop = false;
+
+    // We are now referencing this branch
+    gc_mark_object_referenced(&branch->header);
+
     return top;
 }
 Frame* push_frame(EvalContext* context, Branch* branch)

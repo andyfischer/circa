@@ -13,11 +13,15 @@ struct CircaObject
 
     Type* type;
 
+    // Nearby GCable objects.
     CircaObject* next;
     CircaObject* prev;
 
-    // if 'permanent' is true then this object can't be garbage collected.
-    bool permanent;
+    // If we're 'referenced', then we can only be deleted by a GC pass, not manually.
+    bool referenced;
+
+    // If we're 'root', then we can only be deleted manually, not by GC.
+    bool root;
 
     // Used during GC collection
     GCColor gcColor;
@@ -56,8 +60,9 @@ void gc_dump_live_objects();
 // Swap the contents of 'a' with 'b'
 void gc_ref_list_swap(GCReferenceList* a, GCReferenceList* b);
 
-void gc_register_new_object(CircaObject* obj, Type* type, bool permanent);
+void gc_register_new_object(CircaObject* obj, Type* type, bool isRoot);
 void gc_on_object_deleted(CircaObject* obj);
-void gc_set_object_permanent(CircaObject* obj, bool permanent);
+void gc_set_object_is_root(CircaObject* obj, bool root);
+void gc_mark_object_referenced(CircaObject* obj);
 
 } // namespace circa
