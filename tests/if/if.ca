@@ -48,7 +48,7 @@ elif x == 3
 elif x == 4
     print('error7.3')
 
-# Use brackets
+-- Use brackets
 if 1 != 2 { print('check8') } else { print('error8') }
 
 print('Rebinding locals:')

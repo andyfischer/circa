@@ -22,7 +22,7 @@ if true elif true   else {}
 if 1 > 2 { f() } elif 2 > 3 {}  elif 3 > 4 { f() }
 if true { 1 2 3 }
 if true{1 2 3 }
-if true{ a = 1} else { a = 2 }; b = a # once had a bug
+if true{ a = 1} else { a = 2 }; b = a -- this once had a bug
 
 -- For
 for x in 0..1 {}

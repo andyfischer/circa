@@ -112,7 +112,7 @@ opengl:uniform(u_origTex 0)
 opengl:uniform(u_blurTex 1)
 opengl:draw_quad([0 0 window.width window.height])
 
-# Cleanup
+-- Cleanup
 opengl:use_program(0)
 opengl:activeTexture(1)
 opengl:bind_texture(0)

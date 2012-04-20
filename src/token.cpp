@@ -509,9 +509,6 @@ void top_level_consume_token(TokenizeContext &context)
             return;
 
         case '#':
-            if (context.next(1) == ' ')
-                return consume_comment(context);
-
             consume_color_literal(context);
             return;
     }

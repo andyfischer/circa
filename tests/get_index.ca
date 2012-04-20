@@ -4,5 +4,5 @@ print('l = ' l)
 print('get_index(l, 0) == ', get_index(l, 0))
 print('l[1] == ', l[1])
 
-# try with nested lists
+-- try with nested lists
 print('[[[1]]][0][0][0] == ' [[[1]]][0][0][0])

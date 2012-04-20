@@ -21,7 +21,7 @@ d= add(1 2)
 d=add(1 2)
 d=   add(1 2)
 
-# def f(int a, int b, int c) { state s; }   f(1, 2 3)
+-- def f(int a, int b, int c) { state s; }   f(1, 2 3)
 
 -- Infix
 1.0 + 2.0

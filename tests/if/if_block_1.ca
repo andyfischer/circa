@@ -1,5 +1,5 @@
 
-# Rebind an outer name
+-- Rebind an outer name
 a = 'outer'
 if true
     a = 'inner'

@@ -1,5 +1,5 @@
 
-# Call a function with arguments and a state arg
+-- Call a function with arguments and a state arg
 
 def f(int i, int j) -> int
   state s = j

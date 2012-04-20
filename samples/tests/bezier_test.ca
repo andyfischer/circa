@@ -24,11 +24,11 @@ for p in points
     Point(@p)
     draw_circle(p 3.0 #000)
 
-# grey line between control points
+-- grey line between control points
 line(points[0] points[1] #aaa8)
 line(points[2] points[3] #aaa8)
 
-# draw the actual curve
+-- draw the actual curve
 segments = 40
     
 segment_locations = []
