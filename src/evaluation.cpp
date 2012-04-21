@@ -625,7 +625,11 @@ void context_print_error_stack(std::ostream& out, EvalContext* context)
     for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
         Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
 
-        print_term_on_error_stack(out, context, frame->branch->get(frame->pc));
+        if (frame->pc >= frame->branch->length()) {
+            std::cout << "(end of frame)";
+        } else {
+            print_term_on_error_stack(out, context, frame->branch->get(frame->pc));
+        }
         std::cout << std::endl;
     }
     out << "Error: " << context_get_error_message(context) << std::endl;

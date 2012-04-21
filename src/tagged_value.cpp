@@ -814,7 +814,7 @@ void circa_set_vec3(caValue* container, float x, float y, float z)
 
     circa_set_float(circa_index(container, 0), x);
     circa_set_float(circa_index(container, 1), y);
-    circa_set_float(circa_index(container, 2), y);
+    circa_set_float(circa_index(container, 2), z);
 }
 void circa_set_vec4(caValue* container, float x, float y, float z, float w)
 {
@@ -827,8 +827,8 @@ void circa_set_vec4(caValue* container, float x, float y, float z, float w)
 
     circa_set_float(circa_index(container, 0), x);
     circa_set_float(circa_index(container, 1), y);
-    circa_set_float(circa_index(container, 2), y);
-    circa_set_float(circa_index(container, 3), y);
+    circa_set_float(circa_index(container, 2), z);
+    circa_set_float(circa_index(container, 3), w);
 }
 void circa_set_string(caValue* container, const char* str)
 {

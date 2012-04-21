@@ -12,4 +12,4 @@ void scripts_initialize();
 void scripts_refresh();
 
 // Run the function on g_mainStack. Handles error checking.
-void scripts_run();
+bool scripts_run();

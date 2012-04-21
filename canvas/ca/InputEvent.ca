@@ -1,0 +1,21 @@
+
+MouseDown = 1
+MouseUp = 2
+MouseMove = 3
+MouseDoubleClick = 4
+
+type InputEvent {
+    int eventType
+    Point mousePos
+}
+
+def InputEvent.is_mouse(self) -> bool
+    if self.eventType == MouseDown
+        return true
+    elif self.eventType == MouseUp
+        return true
+    elif self.eventType == MouseMove
+        return true
+    elif self.eventType == MouseDrag
+        return true
+    return false
