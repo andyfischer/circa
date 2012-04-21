@@ -45,6 +45,7 @@ const int TK_LBRACKET = 14;
 const int TK_RBRACKET = 15;
 const int TK_COMMA = 16;
 const int TK_AT_SIGN = 17;
+const int TK_AT_DOT = 78;
 const int TK_DOT = 18;
 const int TK_STAR = 19;
 const int TK_QUESTION = 20;

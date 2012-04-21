@@ -8,11 +8,17 @@ type A {
 def A.blah(self) -> String
     return "A.blah"
 
+def A.modify(self :out)
+    self.x += 1
+
 type B {
     int x
 }
 def B.blah(self) -> String
     return "B.blah"
+
+def B.modify(self :out)
+    self.x += 2
 
 call_blah(create(A))
 call_blah(create(B))
@@ -47,3 +53,15 @@ a = create(A)
 b = create(B)
 call_blah3(a, 11)
 call_blah3(b, 22)
+
+-- Test modifying the target object
+
+def call_modify(any a :out) -> any
+    a@.modify
+
+a = create(A)
+b = create(B)
+call_modify(&a)
+call_modify(&b)
+print(a)
+print(b)

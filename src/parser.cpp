@@ -1592,6 +1592,20 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 {
     int startPosition = tokens.getPosition();
 
+    bool explicitRebindLHS = false;
+
+    if (tokens.nextIs(TK_AT_DOT)) {
+        explicitRebindLHS = true;
+        tokens.consume();
+    } else if (tokens.nextIs(TK_DOT)) {
+        explicitRebindLHS = false;
+        tokens.consume();
+    } else {
+        internal_error("expected . or @. in method_call");
+    }
+    
+    bool rebindLHS = explicitRebindLHS;
+
     std::string functionName = tokens.consumeStr(TK_IDENTIFIER);
 
     bool hasParens = false;
@@ -1633,23 +1647,29 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
         }
 
         // Otherwise create a dynamic_method call.
-        Term* result = apply(branch, FUNCS.dynamic_method, inputs);
-        result->setStringProp("syntax:functionName", functionName);
-        result->setStringProp("syntax:declarationStyle", "method-call");
-        if (!hasParens)
-            result->setBoolProp("syntax:no-parens", true);
-        inputHints.apply(result);
-        return ParseResult(result);
+        function = FUNCS.dynamic_method;
+    }
+
+    // If the function is known, then check if the function wants to rebind the name,
+    // even if the @. operator was not used. (This is not preferred behavior but we're
+    // supporting legacy code while the @. operator is evaluated)
+    if (function_input_is_extra_output(as_function(function), 0)) {
+        rebindLHS = true;
     }
 
     // Create the term
     Term* term = apply(branch, function, inputs);
 
-    Term* lexprRoot = find_lexpr_root(term->input(0));
+    // If the func is dynamic_method and the rebind operator is used, we'll have to create
+    // an extra_output ourselves.
+    if (function == FUNCS.dynamic_method && rebindLHS) {
+        apply(branch, EXTRA_OUTPUT_FUNC, TermList(term));
+    }
 
-    // Check if the method call implicitly rebinds this name
-    if (lexprRoot->name != "" && function_input_is_extra_output(as_function(function), 0)) {
+    // Possibly rebind the left-hand-side
+    if (rebindLHS) {
         // LHS may be a getter-chain
+        Term* lexprRoot = find_lexpr_root(term->input(0));
         Term* lhs = write_setter_chain_from_getter_chain(branch, term->input(0),
             get_extra_output(term, 0));
         rename(lhs, lexprRoot->name);
@@ -1661,6 +1681,9 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     term->setStringProp("syntax:declarationStyle", "method-call");
     if (!hasParens)
         term->setBoolProp("syntax:no-parens", true);
+    if (explicitRebindLHS)
+        term->setStringProp("syntax:operator", "@.");
+
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
 }
@@ -1782,10 +1805,8 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
 
-        // Check for a.b, method call
-        } else if (tokens.nextIs(TK_DOT)) {
-            tokens.consume(TK_DOT);
-
+        // Check for a.b or a@.b, method call
+        } else if (tokens.nextIs(TK_DOT) || tokens.nextIs(TK_AT_DOT)) {
             result = method_call(branch, tokens, context, result);
 
         } else {

@@ -153,11 +153,14 @@ void test_misc2()
 
 void test_misc3()
 {
-    TokenStream tokens("&&!=..::");
+    TokenStream tokens("&&!=..::@..@");
     tokens.consume(TK_DOUBLE_AMPERSAND);
     tokens.consume(TK_NOT_EQUALS);
     tokens.consume(TK_TWO_DOTS);
     tokens.consume(TK_DOUBLE_COLON);
+    tokens.consume(TK_AT_DOT);
+    tokens.consume(TK_DOT);
+    tokens.consume(TK_AT_SIGN);
     test_assert(tokens.finished());
 }
 

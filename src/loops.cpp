@@ -99,7 +99,8 @@ void add_implicit_placeholders(Term* forTerm)
         Term* result = contents->get(name);
 
         Term* input = apply(contents, FUNCS.input, TermList(), name);
-        change_declared_type(input, original->type);
+        Type* type = find_common_type(original->type, result->type);
+        change_declared_type(input, type);
         contents->move(input, inputIndex);
 
         set_input(forTerm, inputIndex, original);

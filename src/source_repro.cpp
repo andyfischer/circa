@@ -172,7 +172,9 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
     } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
-        append_phrase(source, ".", term, phrase_type::UNDEFINED);
+        
+        append_phrase(source, term->stringPropOptional("syntax:operator", "."),
+            term, phrase_type::UNDEFINED);
 
         append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
 

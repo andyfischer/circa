@@ -5,8 +5,7 @@
 namespace circa {
 namespace list_function {
 
-    CA_START_FUNCTIONS;
-
+#if 0 // Generic types are incomplete and disabled
     Type* specializeType(Term* term)
     {
         List inputTypes;
@@ -15,51 +14,50 @@ namespace list_function {
 
         return as_type(create_tuple_type(&inputTypes));
     }
+#endif
 
-    CA_DEFINE_FUNCTION(evaluate, "list(any :multiple) -> List")
+    void make_list(caStack* stack)
     {
         // Variadic arg handling will already have turned this into a list
-        caValue* out = circa_output(STACK, 0);
-        circa_copy(circa_input(STACK, 0), out);
+        caValue* out = circa_output(stack, 0);
+        circa_copy(circa_input(stack, 0), out);
         if (!circa_is_list(out))
             circa_set_list(out, 0);
     }
 
-    CA_DEFINE_FUNCTION(repeat, "repeat(any, int) -> List")
+    void repeat(caStack* stack)
     {
-        set_list(OUTPUT);
-        List* result = List::checkCast(OUTPUT);
-        caValue* source = INPUT(0);
-        int repeatCount = INT_INPUT(1);
+        caValue* source = circa_input(stack, 0);
+        int repeatCount = circa_int_input(stack, 1);
 
-        result->resize(repeatCount);
+        caValue* out = circa_output(stack, 0);
+        circa_set_list(out, repeatCount);
 
         for (int i=0; i < repeatCount; i++)
-            copy(source, result->get(i));
+            copy(source, circa_index(out, i));
     }
 
-    CA_DEFINE_FUNCTION(blank_list, "blank_list(int) -> List")
+    void blank_list(caStack* stack)
     {
-        set_list(OUTPUT);
-        List* result = List::checkCast(OUTPUT);
-        result->resize(0);
-        result->resize(INT_INPUT(0));
+        caValue* out = circa_output(stack, 0);
+        int count = circa_int_input(stack, 0);
+        circa_set_list(out, count);
     }
 
-    CA_DEFINE_FUNCTION(resize, "resize(List, int) -> List")
+    void resize(caStack* stack)
     {
-        copy(INPUT(0), OUTPUT);
-        List* result = List::checkCast(OUTPUT);
-        result->resize(INT_INPUT(1));
+        caValue* out = circa_output(stack, 0);
+        copy(circa_input(stack, 0), out);
+        int count = circa_int_input(stack, 1);
+        circa_resize(out, count);
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
-
-        FUNCS.list = kernel->get("list");
-
-        as_function(FUNCS.list)->specializeType = specializeType;
+        FUNCS.list = import_function(kernel, make_list, "list(any :multiple) -> List");
+        import_function(kernel, repeat,  "repeat(any, int) -> List");
+        import_function(kernel, blank_list, "blank_list(int) -> List");
+        import_function(kernel, resize, "resize(List, int) -> List");
     }
 }
 }

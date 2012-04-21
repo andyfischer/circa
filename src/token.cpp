@@ -20,6 +20,7 @@ const char* get_token_text(int match)
         case TK_RBRACKET: return "]";
         case TK_COMMA: return ",";
         case TK_AT_SIGN: return "@";
+        case TK_AT_DOT: return "@";
         case TK_IDENTIFIER: return "IDENTIFIER";
         case TK_NAME: return "NAME";
         case TK_INTEGER: return "INTEGER";
@@ -369,7 +370,11 @@ void top_level_consume_token(TokenizeContext &context)
             context.consume(TK_COMMA, 1);
             return;
         case '@':
-            context.consume(TK_AT_SIGN, 1);
+            if (context.next(1) == '.') {
+                context.consume(TK_AT_DOT, 2);
+            } else {
+                context.consume(TK_AT_SIGN, 1);
+            }
             return;
         case '=':
             if (context.next(1) == '=') {

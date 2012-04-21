@@ -6,3 +6,5 @@ calling blah3: 11
 A.blah3: {x: 11}
 calling blah3: 22
 B.blah3: {x: 22}
+{x: 1}
+{x: 2}
