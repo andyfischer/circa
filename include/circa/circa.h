@@ -3,7 +3,16 @@
 #ifndef CIRCA_H_INCLUDED
 #define CIRCA_H_INCLUDED
 
+#ifdef _MSC_VER
+
+// No stdbool.h in Visual Studio :(
+typedef int bool;
+
+#else
+
 #include <stdbool.h>
+
+#endif
 
 // Public API
 

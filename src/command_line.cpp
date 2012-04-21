@@ -1,6 +1,10 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "common_headers.h"
+
+// for sleep():
+#include <unistd.h>
+
 #include "branch.h"
 #include "building.h"
 #include "kernel.h"
@@ -185,6 +189,8 @@ int run_command_line(caWorld* world, caValue* args)
 
             evaluate_branch(&context, &branch);
 
+            // Sleep for 1 second before next iteration. This is silly, it should either
+            // iterate more quickly or have a smarter way to know when to loop.
             sleep(1);
         }
     }

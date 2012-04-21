@@ -41,7 +41,6 @@
 #include "types/int.h"
 #include "types/name.h"
 #include "types/number.h"
-#include "types/rect_i.h"
 #include "types/ref.h"
 #include "types/set.h"
 #include "types/void.h"
@@ -785,9 +784,9 @@ CA_FUNCTION(Term__source_location)
     if (t == NULL)
         return RAISE_ERROR("NULL reference");
 
-    Rect_i* output = Rect_i::cast(OUTPUT);
-    output->set(t->sourceLoc.col, t->sourceLoc.line,
-            t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
+    circa_set_vec4(circa_output(STACK, 0),
+        t->sourceLoc.col, t->sourceLoc.line,
+        t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
 }
 CA_FUNCTION(Term__global_id)
 {
