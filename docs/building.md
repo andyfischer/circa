@@ -1,5 +1,39 @@
 
-Here are instructions for building circa.lib and 'circa' the command-line tool.
+# Build Targets #
+
+The SCons build file has a recipe for this target:
+
+Circa command-line:
+  A command-line app with very few dependencies. This app can run scripts, run
+  unit tests, print out debugging info, run a REPL, and other stuff. 
+
+(More targets may be added in the future)
+
+# Variants #
+
+There are three build variants:
+
+Test:
+  As many assertions as possible are enabled, performance is not a concern. Includes
+  such popular assertions as ca_test_assert() and the one that does a runtime type
+  check on every single call.
+
+  Binaries: circa_t
+
+Debug:
+  Some assertions are enabled, but performance-killing assertions are disabled. Symbols
+  are enabled and optimizations are disabled. With this build you should be able to get
+  decent performance, but also get decent diagnostics when something breaks.
+
+  Binaries: circa_d
+
+Release:
+  Assertions disabled and optimizations enabled. This build runs fast and isn't as
+  helpful when diagnosing bugs.
+  
+  Binaries: circa (no suffix)
+
+## Building the command-line tool ##
 
 # Requirements #
 
@@ -22,21 +56,21 @@ the prebuild.py script. Example:
     python tools/prebuild.py
 
 Then, use "scons" to build the target that you want. For example, to build the command-line tool
-in test mode, run:
+in debug mode, run:
 
-    scons build/circa_t
+    scons build/circa_d
 
 Available targets are:
 
  - Command line tool (release variant): build/circa
  - Command line tool (debug variant): build/circa_d
  - Command line tool (test variant): build/circa_t
- - Static library (releaase variant): build/circa.lib
- - Static library (debug variant): build/circa_d.lib
- - Static library (test variant): build/circa_t.lib
-
-# Variants #
-
- - Test (ends in _t). Every assertion in the world is enabled. Unit tests are also included. The slowest option, but is good for checking for correctness.
- - Debug (ends in _d). Some assertions enabled, and optimizations disabled. No unit tests.
- - Release (no suffix). Assertions are disabled and optimizations enabled. No unit tests.
+ - Static library (releaase variant):
+   - On Mac/Linux:
+     build/libcirca.a
+ - Static library (debug variant):
+   - On Mac/Linux:
+     build/libcirca_d.a
+ - Static library (test variant):
+   - On Mac/Linux:
+     build/libcirca_t.a

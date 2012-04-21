@@ -2,25 +2,13 @@
 Getting Started (on the command line)
 -------------------------------------
 
-This document describes how to start using the 'circa' command-line binary. This tool is for running Circa scripts with console output. It's most useful if you want to learn or experiment with Circa syntax. The command-line tool doesn't provide any graphical abilities; for a graphical program use Plastic instead. 
+This document describes how to start using the 'circa' command-line binary. This tool is for running Circa scripts with console output. It's most useful if you want to learn or experiment with Circa syntax. The command-line tool doesn't provide any graphical abilities.
 
-### Downloading
+### Building
 
-To download, find the link for your platform at http://circa-lang.org . Unzip the package somewhere on your machine. This download just contains a single binary, with no install process.
+See [building.md](building.md)
 
-### Running
-
-Open up a command prompt and navigate to the unzipped folder. Now you can enter the command `circa` to execute the binary.
-
-##### Running tests
-
-Calling `circa` with no arguments will execute all its unit tests. You should see output like this:
-
-    Ran 274 tests. All tests passed.
-
-This command is probably only useful if you are developing on Circa.
-
-##### Executing a file
+##### Running a script file
 
 Calling `circa <filename>` will tell it to run the given filename. Try creating a file called 'test.ca' using a text editor, with the following contents:
 
@@ -28,9 +16,7 @@ Calling `circa <filename>` will tell it to run the given filename. Try creating 
 
 Then run it with `circa test.ca`, and you should see the 'Hello world' message.
 
-Now you can expand on that test file and play around with more complicated scripts. All of the scripts run by this tool should probably contain a few calls to print() since that's the easiest way to see the results of your program.
-
-There are a few sample scripts available here (../samples), and this page (syntax.md) has details on the different kinds of syntax you can use.
+Now you can expand on that test file and play around with more complicated scripts. All of the scripts run by this tool should probably contain a few calls to print(), since that's the easiest way to see the results of your program.
 
 ##### REPL
 
@@ -53,9 +39,9 @@ The REPL has a few meta-commands that you can see by typing `/help`. One of thes
     Displaying raw output
     > a = 1 + 2
     3
-    $1920 value() :: int == 1
-    $1925 value() :: int == 2
-    $192a 'a' add_i($1920, $1925) :: int == 3
+    $2465 _value  value() -> int val:1
+    $2466 _value_1  value() -> int val:2
+    $2467 a  'a' add($2465 $2466) -> any
 
 This is useful for debugging.
 
