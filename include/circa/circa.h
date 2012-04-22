@@ -141,7 +141,7 @@ void circa_pop(caStack* stack);
 void circa_call_method(caStack* stack, const char* funcName, caValue* object, caValue* ins, caValue* outs);
 
 // Signal that an error has occurred.
-void circa_raise_error(caStack* stack, const char* msg);
+void circa_output_error(caStack* stack, const char* msg);
 
 // Return whether a runtime error occurred.
 bool circa_has_error(caStack* stack);

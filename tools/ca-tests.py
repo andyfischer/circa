@@ -148,6 +148,7 @@ def all_testable_files():
     dirs = [TestRoot,
         TestRoot + '/bugrepro',
         TestRoot + '/if',
+        TestRoot + '/error',
         TestRoot + '/field',
         TestRoot + '/for',
         TestRoot + '/funcs',

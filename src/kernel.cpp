@@ -190,7 +190,7 @@ void dynamic_call_func(caStack* stack)
         branch = (Branch*) circa_nested_branch(circa_caller_input_term(stack, 0));
 
     if (branch == NULL) {
-        circa_raise_error(stack, "Input 0 is not callable");
+        circa_output_error(stack, "Input 0 is not callable");
         return;
     }
 

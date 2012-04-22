@@ -1,0 +1,3 @@
+Error occurred:
+[tests/error/if_input.ca:1,0] if_block() | 'Expected bool input'
+

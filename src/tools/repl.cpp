@@ -42,7 +42,7 @@ void repl_evaluate_line(EvalContext* context, std::string const& input, std::ost
 
         if (error_occurred(context)) {
             output << "error: ";
-            print_runtime_error_formatted(context, std::cout);
+            print_error_stack(context, std::cout);
             anyErrors = true;
             break;
         }

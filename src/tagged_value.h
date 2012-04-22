@@ -182,6 +182,7 @@ Type*       as_type(caValue* value);
 void set_bool(caValue* value, bool b);
 void set_branch(caValue* value, Branch* branch);
 Dict* set_dict(caValue* value);
+void set_error_string(caValue* value, const char* s);
 void set_float(caValue* value, float f);
 void set_int(caValue* value, int i);
 List* set_list(caValue* value);

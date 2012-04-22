@@ -41,5 +41,5 @@
 #define OUTPUT (circa_output(_stack, 0))
 #define OUTPUT_NTH(index) (circa_output(_stack, (index)))
 #define EXTRA_OUTPUT(index) (circa_output(_stack, 1 + (index)))
-#define RAISE_ERROR(msg) (circa_raise_error(_stack, (msg)))
+#define RAISE_ERROR(msg) (circa_output_error(_stack, (msg)))
 #define CONSUME_INPUT(index, out) (circa_copy(circa_input(_stack, (index)), (out)))

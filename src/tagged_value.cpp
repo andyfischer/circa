@@ -462,6 +462,13 @@ Dict* set_dict(caValue* value)
     return (Dict*) value;
 }
 
+void set_error_string(caValue* value, const char* s)
+{
+    create(&STRING_T, value);
+    *((std::string*) value->value_data.ptr) = s;
+    value->value_type = &ERROR_T;
+}
+
 void set_int(caValue* value, int i)
 {
     change_type(value, &INT_T);
@@ -473,6 +480,7 @@ void set_float(caValue* value, float f)
     change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
 }
+
 
 void set_string(caValue* value, const char* s)
 {

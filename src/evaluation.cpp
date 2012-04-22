@@ -23,10 +23,9 @@
 namespace circa {
 
 EvalContext::EvalContext()
- : errorOccurred(false),
-   numFrames(0),
+ : numFrames(0),
    stack(NULL),
-   trace(false)
+   errorOccurred(false)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
@@ -120,6 +119,7 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     top->startPc = 0;
     top->endPc = branch->length();
     top->loop = false;
+    top->override = false;
 
     // We are now referencing this branch
     gc_mark_object_referenced(&branch->header);
@@ -165,7 +165,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* input
                 msg << "Couldn't cast input " << input->toString()
                     << " (at index " << i << ")"
                     << " to type " << name_to_string(placeholder->type->name);
-                raise_error(context, msg.str().c_str());
+                raise_error_msg(context, msg.str().c_str());
                 return;
             }
         }
@@ -456,41 +456,16 @@ void create_output(EvalContext* context)
     create(caller->type, output);
 }
 
-void raise_error(EvalContext* context, Term* term, caValue* output, const char* message)
+void raise_error(EvalContext* context)
 {
-    // Save the error as this term's output value.
-    if (output != NULL) {
-        set_string(output, message);
-        output->value_type = &ERROR_T;
-    }
-
-    // Check if there is an errored() call listening to this term. If so, then
-    // continue execution.
-    if (term != NULL && has_an_error_listener(term))
-        return;
-
-    if (DEBUG_TRAP_RAISE_ERROR)
-        ca_assert(false);
-
-    if (context == NULL)
-        throw std::runtime_error(message);
-
-    if (!context->errorOccurred) {
-        context->errorOccurred = true;
-        context->errorTerm = term;
-    }
+    context->errorOccurred = true;
 }
-
-void raise_error(EvalContext* context, const char* msg)
+void raise_error_msg(EvalContext* context, const char* msg)
 {
-    Term* term = (Term*) circa_caller_term((caStack*) context);
-    raise_error(context, term, find_stack_value_for_term(context, term, 0), msg);
-}
-
-void print_runtime_error_formatted(EvalContext* context, std::ostream& output)
-{
-    output << get_short_location(context->errorTerm)
-        << " " << context_get_error_message(context);
+    Frame* top = top_frame(context);
+    caValue* slot = get_frame_register(top, top->pc);
+    set_error_string(slot, msg);
+    raise_error(context);
 }
 
 bool error_occurred(EvalContext* context)
@@ -596,43 +571,34 @@ caValue* evaluate(Term* function, List* inputs)
 void clear_error(EvalContext* cxt)
 {
     cxt->errorOccurred = false;
-    cxt->errorTerm = NULL;
 }
 
-std::string context_get_error_message(EvalContext* cxt)
+void print_error_stack(EvalContext* context, std::ostream& out)
 {
-    ca_assert(cxt != NULL);
-    ca_assert(cxt->errorTerm != NULL);
-    ca_assert(cxt->numFrames > 0);
-
-    caValue* value = find_stack_value_for_term(cxt, cxt->errorTerm, 0);
-
-    return as_string(value);
-}
-
-void print_term_on_error_stack(std::ostream& out, EvalContext* context, Term* term)
-{
-    out << get_short_location(term) << " ";
-    if (term->name != "")
-        out << term->name << " = ";
-    out << term->function->name;
-    out << "()";
-}
-
-void context_print_error_stack(std::ostream& out, EvalContext* context)
-{
-    out << "[EvalContext " << context << "]" << std::endl;
     for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
         Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
 
+        if (frame->override) {
+            std::cout << "[override call]";
+            continue;
+        }
+
         if (frame->pc >= frame->branch->length()) {
             std::cout << "(end of frame)";
-        } else {
-            print_term_on_error_stack(out, context, frame->branch->get(frame->pc));
+            continue;
         }
+
+        Term* term = frame->branch->get(frame->pc);
+
+        out << get_short_location(term) << " ";
+        if (term->name != "")
+            out << term->name << " = ";
+        out << term->function->name;
+        out << "()";
+        out << " | ";
+        out << get_frame_register(frame, frame->pc)->toString();
         std::cout << std::endl;
     }
-    out << "Error: " << context_get_error_message(context) << std::endl;
 }
 
 void update_context_to_latest_branches(EvalContext* context)
@@ -656,7 +622,17 @@ Branch* if_block_choose_branch(EvalContext* context, Term* term)
         Term* caseTerm = contents->get(termIndex);
         caValue* caseInput = find_stack_value_for_term(context, caseTerm->input(0), 0);
 
-        if (caseTerm->input(0) == NULL || as_bool(caseInput))
+        // Fallback block has NULL input
+        if (caseTerm->input(0) == NULL)
+            return nested_contents(caseTerm);
+
+        // Check type on caseInput
+        if (!is_bool(caseInput)) {
+            raise_error_msg(context, "Expected bool input");
+            return NULL;
+        }
+
+        if (as_bool(caseInput))
             return nested_contents(caseTerm);
     }
     return NULL;
@@ -705,7 +681,7 @@ EvaluateFunc get_override_for_branch(Branch* branch)
     return func->evaluate;
 }
 
-Branch* get_branch_to_push(EvalContext* context, Term* term)
+Branch* choose_branch(EvalContext* context, Term* term)
 {
     if (is_value(term))
         return NULL;
@@ -764,7 +740,7 @@ do_instruction:
     // Check if we have finished this branch
     if (frame->pc >= frame->endPc) {
 
-        // If we've finished the initial branch then end this interpreter session.
+        // If we've finished the initial branch, then end this interpreter session.
         if (context->numFrames == initialFrameCount)
             return;
 
@@ -800,8 +776,12 @@ do_instruction:
         goto advance_pc;
     }
 
-    // Prepare to call this function
-    nextBranch = get_branch_to_push(context, currentTerm);
+    // Choose the branch to use for the next frame
+    nextBranch = choose_branch(context, currentTerm);
+
+    // if_block_choose_branch can cause error
+    if (error_occurred(context))
+        return;
 
     // No branch, advance to next term.
     if (nextBranch == NULL || nextBranch->emptyEvaluation)
@@ -856,9 +836,12 @@ do_instruction:
     override = get_override_for_branch(top_frame(context)->branch);
 
     if (override != NULL) {
+        Frame* newFrame = top_frame(context);
+        newFrame->override = true;
+
         // By default, we'll set nextPc to finish this frame on the next iteration.
         // The override func is welcome to change nextPc.
-        top_frame(context)->nextPc = top_frame(context)->endPc;
+        newFrame->nextPc = top_frame(context)->endPc;
 
         // Call override
         override((caStack*) context);
@@ -1020,6 +1003,11 @@ caValue* circa_output(caStack* stack, int index)
     return get_output((EvalContext*) stack, index);
 }
 
+void circa_output_error(caStack* stack, const char* msg)
+{
+    set_error_string(circa_output(stack, 0), msg);
+    raise_error((EvalContext*) stack);
+}
 
 caTerm* circa_caller_input_term(caStack* stack, int index)
 {
@@ -1043,4 +1031,10 @@ caTerm* circa_caller_term(caStack* stack)
     return frame->branch->get(frame->pc);
 }
 
+void circa_print_error_to_stdout(caStack* stack)
+{
+    EvalContext* context = (EvalContext*) stack;
+    print_error_stack(context, std::cout);
 }
+
+} // extern "C"

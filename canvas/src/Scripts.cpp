@@ -27,8 +27,8 @@ void scripts_initialize()
 
 void scripts_refresh()
 {
-    circa_refresh_module(g_viewModule);
     circa_refresh_module(g_inputEventModule);
+    circa_refresh_module(g_viewModule);
 }
 
 bool scripts_run()

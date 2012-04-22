@@ -176,7 +176,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         while (true) {
             if (error_occurred(&context)) {
-                print_runtime_error_formatted(&context, std::cout);
+                print_error_stack(&context, std::cout);
                 return -1;
             }
 
@@ -333,10 +333,6 @@ int run_command_line(caWorld* world, caValue* args)
 
     EvalContext context;
 
-    if (printTrace)
-        context.trace = true;
-
-
     push_frame(&context, main_branch);
 
     run_interpreter(&context);
@@ -346,7 +342,7 @@ int run_command_line(caWorld* world, caValue* args)
 
     if (error_occurred(&context)) {
         std::cout << "Error occurred:\n";
-        print_runtime_error_formatted(&context, std::cout);
+        print_error_stack(&context, std::cout);
         std::cout << std::endl;
         return 1;
     }

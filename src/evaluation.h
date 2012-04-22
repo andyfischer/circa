@@ -21,6 +21,8 @@ struct Frame
     int startPc;
     int endPc;
 
+    bool override;
+
     // Used in for-loop
     bool loop;
 };
@@ -29,25 +31,18 @@ struct EvalContext
 {
     CircaObject header;
 
-    // Error information:
-    bool errorOccurred;
-    Term* errorTerm;
-
     // Persistent state
     Value state;
 
     // Intra-program messages
     Dict messages;
 
-    // List of values that are being passed from the EvalContext owner to the script.
-    List argumentList;
-
     // Current execution stack
     int numFrames;
     Frame* stack;
 
-    // Debugging flag- print all steps to stdout.
-    bool trace;
+    // Flag that indicates the most recent run was interrupted by an error
+    bool errorOccurred;
 
     EvalContext();
     ~EvalContext();
@@ -132,10 +127,9 @@ caValue* get_register(EvalContext* context, Term* term);
 void create_output(EvalContext* context);
 
 // Signal that a runtime error has occurred.
-void raise_error(EvalContext* context, Term* term, caValue* output, const char* msg);
-void raise_error(EvalContext* context, const char* msg);
+void raise_error(EvalContext* context);
 
-void print_runtime_error_formatted(EvalContext* context, std::ostream& output);
+void raise_error_msg(EvalContext* context, const char* msg);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.
@@ -143,8 +137,7 @@ bool error_occurred(EvalContext* context);
 
 void clear_error(EvalContext* cxt);
 
-std::string context_get_error_message(EvalContext* cxt);
-void context_print_error_stack(std::ostream& out, EvalContext* cxt);
+void print_error_stack(EvalContext* context, std::ostream& out);
 
 void run_interpreter(EvalContext* context);
 

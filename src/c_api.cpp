@@ -138,11 +138,6 @@ void circa_create_value(caValue* value, caType* type)
     create((Type*) type, value);
 }
 
-void circa_raise_error(caStack* stack, const char* msg)
-{
-    raise_error((EvalContext*) stack, msg);
-}
-
 // Code setup
 caTerm* circa_install_function(caBranch* branch, const char* name, caEvaluateFunc evaluate)
 {
@@ -195,12 +190,6 @@ caType* circa_term_declared_type(caTerm* term)
     return (caType*) ((Term*) term)->type;
 }
 
-// Clear a runtime error from the stack
-void circa_print_error_to_stdout(caStack* stack)
-{
-    EvalContext* context = (EvalContext*) stack;
-    context_print_error_stack(std::cout, context);
-}
 
 caTerm* circa_get_term(caBranch* branch, int index)
 {
