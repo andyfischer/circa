@@ -605,12 +605,11 @@ bool match_number(TokenizeContext &context)
 void consume_number(TokenizeContext &context)
 {
     int lookahead = 0;
-    bool minus_sign = false;
     bool dot_encountered = false;
 
+    // Possibly consume minus sign
     if (context.next(lookahead) == '-') {
         lookahead++;
-        minus_sign = true;
     }
 
     while (true) {

@@ -6,6 +6,7 @@
 
 #ifdef WINDOWS
 #else
+#pragma error hi
 #include <dlfcn.h>
 #endif
 

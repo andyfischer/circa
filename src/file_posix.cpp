@@ -49,8 +49,8 @@ static void update_file(caFileSource*, caFileRecord* record)
     // Store modified time
     circa_set_int(record->sourceMetadata, modifiedTime);
 
-    // Get file size
     {
+	// Get file size
         fseek(fp, 0, SEEK_END);
         size_t size = ftell(fp);
         rewind(fp);

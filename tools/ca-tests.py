@@ -4,7 +4,7 @@ import os,subprocess,sys
 import traceback
 from glob import glob
 
-ExecutableName = 'circa_d'
+ExecutableName = 'build/circa_d'
 TestRoot = 'tests'
 
 Quiet = False
@@ -18,7 +18,7 @@ class CircaProcess:
 
         # Create proc if necessary
         if self.proc is None:
-            self.proc = subprocess.Popen("circa_d -run-stdin",
+            self.proc = subprocess.Popen(ExecutableName + " -run-stdin",
                 shell=True, stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, close_fds=True)
 

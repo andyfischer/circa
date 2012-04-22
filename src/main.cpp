@@ -15,5 +15,5 @@ int main(int argc, const char * args[])
 
     circa_shutdown(world);
     
-    return 0;
+    return result;
 }

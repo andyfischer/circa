@@ -589,7 +589,6 @@ Branch* term_get_function_details(Term* call)
 void update_extra_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
-    bool anyAdded = false;
 
     for (int index=1; ; index++) {
         Term* placeholder = term_get_output_placeholder(term, index);
@@ -615,7 +614,6 @@ void update_extra_outputs(Term* term)
         if (extra_output == NULL) {
             extra_output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
             move_to_index(extra_output, term->index + index);
-            anyAdded = true;
         }
 
         change_declared_type(extra_output, placeholder->type);

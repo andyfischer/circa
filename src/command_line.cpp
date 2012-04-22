@@ -42,7 +42,6 @@ void print_usage()
         "  -libpath <path>     : Add a module search path\n"
         "  -p                  : Print out raw source\n"
         "  -pp                 : Print out raw source with properties\n"
-        "  -s                  : Print out reconstructed source code (for testing)\n"
         "  -n                  : Don't actually run the script (for use with -p, -pp or -s)\n"
         "  -break-on <id>      : Debugger break when term <id> is created\n"
         "  -print-state        : Print state as text after running the script\n"
@@ -64,7 +63,6 @@ int run_command_line(caWorld* world, caValue* args)
 {
     bool printRaw = false;
     bool printRawWithProps = false;
-    bool printSource = false;
     bool printState = false;
     bool dontRunScript = false;
     bool printTrace = false;
@@ -107,11 +105,6 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-s")) {
-            printSource = true;
-            list_remove_index(args, 0);
-            continue;
-        }
         if (string_eq(list_get(args, 0), "-n")) {
             dontRunScript = true;
             list_remove_index(args, 0);
