@@ -83,7 +83,7 @@ void test_assert_function(EvalContext& context, int line, const char* file)
 {
     if (context.errorOccurred) {
         std::cout << "Runtime error at " << file << ", line " << line << std::endl;
-        print_runtime_error_formatted(&context, std::cout);
+        print_error_stack(&context, std::cout);
         declare_current_test_failed();
     }
 }
@@ -173,7 +173,7 @@ bool test_fail_on_runtime_error(EvalContext& context)
 {
     if (context.errorOccurred) {
         std::cout << "Runtime error in " << get_current_test_name() << std::endl;
-        print_runtime_error_formatted(&context, std::cout);
+        print_error_stack(&context, std::cout);
         std::cout << std::endl;
         declare_current_test_failed();
         return true;
@@ -334,7 +334,7 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
 
     if (context.errorOccurred) {
         std::cout << "Runtime error " << contextStr << std::endl;
-        print_runtime_error_formatted(&context, std::cout);
+        print_error_stack(&context, std::cout);
         declare_current_test_failed();
         return;
     }

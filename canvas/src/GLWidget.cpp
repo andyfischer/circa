@@ -109,7 +109,7 @@ void GLWidget::onInputEvent(caValue* event)
         return;
 
     // Save object
-    circa_copy(circa_output(stack, 0), viewObj);
+    circa_copy(circa_output(stack, 1), viewObj);
     circa_pop(stack);
     circa_dealloc_value(event);
 }

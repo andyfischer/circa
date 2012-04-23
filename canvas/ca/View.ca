@@ -38,6 +38,5 @@ def View.onPaintEvent(self, Painter painter)
 
 
 def View.onInputEvent(self :out, InputEvent event)
-    print('input event: ' event)
     if event.is_mouse
-        self.mouse = event.mouse
+        self.mouse = event.mousePos

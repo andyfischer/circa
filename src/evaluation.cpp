@@ -718,6 +718,17 @@ void run_interpreter(EvalContext* context)
     // TODO: remove this:
     int initialFrameCount = context->numFrames;
 
+    // Prepare to start this branch.
+
+    // Cast all inputs, in case they were passed in uncast.
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(topBranch, i);
+        if (placeholder == NULL)
+            break;
+        caValue* slot = get_frame_register(top_frame(context), i);
+        cast(slot, placeholder->type, slot);
+    }
+
     // Now that we're starting a new branch, check if there is a C override for
     // this branch.
     EvaluateFunc override = get_override_for_branch(topBranch);

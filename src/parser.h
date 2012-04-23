@@ -113,10 +113,6 @@ void set_source_location(Term* term, int start, TokenStream& tokens);
 Term* find_and_apply(Branch* branch, std::string const& functionName,
         TermList const& inputs);
 
-// Find a type with the given name, looking in this branch. If the name isn't found,
-// we'll return a call to unknown_type()
-Term* find_type(Branch* branch, std::string const& name);
-
 // Does various cleanup work on a branch that has just been used by a parsing step.
 // This should be done after parsing.
 void post_parse_branch(Branch* branch);

@@ -461,9 +461,16 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
         if (!tokens.nextIs(TK_IDENTIFIER))
             return compile_error_for_line(branch, tokens, startPosition);
 
-        std::string type = tokens.consumeStr();
+        std::string typeName = tokens.consumeStr();
 
-        result = ParseResult(find_type(branch, type), type);
+        Term* typeTerm = find_name(branch, typeName.c_str(), -1, NAME_LOOKUP_TYPE);
+
+        if (typeTerm == NULL) {
+            // TODO: This name lookup failure should be recorded.
+            typeTerm = ANY_TYPE;
+        }
+
+        result = ParseResult(typeTerm, typeName);
     }
 
     return result;
@@ -576,12 +583,13 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             isStateArgument = true;
         }
 
-        // For input0 of a method, don't parse an explicit type name.
         Term* typeTerm = NULL;
-        if (inputIndex == 0 && isMethod)
+        if (inputIndex == 0 && isMethod) {
+            // For input0 of a method, don't parse an explicit type name.
             typeTerm = methodType;
-        else
+        } else {
             typeTerm = type_expr(branch, tokens, context).term;
+        }
 
         possible_whitespace(tokens);
 
@@ -1072,15 +1080,20 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         possible_whitespace(tokens);
     }
 
-    Type* type = &ANY_T;
-    if (typeName != "") {
-        Term* typeTerm = find_type(branch, typeName);
-        if (is_type(typeTerm))
-            type = as_type(typeTerm);
-    }
-
     // Create the declared_state() term.
     Term* result = apply(branch, FUNCS.declared_state, TermList(), name);
+
+    // Lookup the explicit type
+    Type* type = &ANY_T;
+    if (typeName != "") {
+        Term* typeTerm = find_name(branch, typeName.c_str(), -1, NAME_LOOKUP_TYPE);
+
+        if (typeTerm == NULL) {
+            result->setStringProp("error:unknownType", typeName);
+        } else {
+            type = as_type(typeTerm);
+        }
+    }
 
     // Possibly consume an expression for the initial value.
     if (tokens.nextIs(TK_EQUALS)) {
@@ -2303,16 +2316,6 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     loc.lineEnd = tokens[end].lineEnd;
 
     term->sourceLoc.grow(loc);
-}
-
-Term* find_type(Branch* branch, std::string const& name)
-{
-    Term* result = find_name(branch, name.c_str());
-
-    if (result == NULL || !is_type(result))
-        return ANY_TYPE;
-
-    return result;
 }
 
 void post_parse_branch(Branch* branch)
