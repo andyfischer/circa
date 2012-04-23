@@ -51,6 +51,14 @@ Branch::~Branch()
     gc_on_object_deleted((CircaObject*) this);
 }
 
+Branch* alloc_branch_gc()
+{
+    Branch* branch = new Branch();
+    gc_mark_object_referenced(&branch->header);
+    gc_set_object_is_root(&branch->header, false);
+    return branch;
+}
+
 void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
     Branch* branch = (Branch*) object;

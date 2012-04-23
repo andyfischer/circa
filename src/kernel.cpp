@@ -272,12 +272,61 @@ CA_FUNCTION(sys__do_admin_command)
 
 CA_FUNCTION(branch_ref)
 {
-    set_branch(OUTPUT, (INPUT_TERM(0)->nestedContents));
+    Branch* branch = INPUT_TERM(0)->nestedContents;
+    gc_mark_object_referenced(&branch->header);
+    set_branch(OUTPUT, branch);
 }
 
-CA_FUNCTION(Branch__dump)
+void load_script_value(caStack* stack)
 {
-    dump(as_branch(INPUT(0)));
+    const char* filename = circa_string_input(stack, 0);
+    
+    Branch* branch = alloc_branch_gc();
+    load_script(branch, filename);
+
+    set_branch(circa_output(stack, 0), branch);
+}
+
+void Branch__dump(caStack* stack)
+{
+    dump(as_branch(circa_input(stack, 0)));
+}
+
+void Branch__input(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    set_ref(circa_output(stack, 0),
+        get_input_placeholder(branch, circa_int_input(stack, 1)));
+}
+void Branch__inputs(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    caValue* output = circa_output(stack, 0);
+    set_list(output, 0);
+    for (int i=0;; i++) {
+        Term* term = get_input_placeholder(branch, i);
+        if (term == NULL)
+            break;
+        set_ref(list_append(output), term);
+    }
+}
+void Branch__output(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    set_ref(circa_output(stack, 0),
+        get_output_placeholder(branch, circa_int_input(stack, 1)));
+}
+void Branch__outputs(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    caValue* output = circa_output(stack, 0);
+    set_list(output, 0);
+    for (int i=0;; i++) {
+        Term* term = get_output_placeholder(branch, i);
+        if (term == NULL)
+            break;
+        set_ref(list_append(output), term);
+    }
 }
 
 CA_FUNCTION(Branch__format_source)
@@ -426,6 +475,18 @@ void Branch__statements(caStack* stack)
             circa_set_term(circa_append(out), (caTerm*) branch->get(i));
 }
 
+void Frame__branch(caStack* stack)
+{
+}
+
+void Frame__register(caStack* stack)
+{
+}
+
+void Frame__pc(caStack* stack)
+{
+}
+
 CA_FUNCTION(Function__name)
 {
     set_string(OUTPUT, as_function(INPUT(0))->name);
@@ -470,6 +531,23 @@ CA_FUNCTION(Function__outputs)
 CA_FUNCTION(Function__contents)
 {
     set_branch(OUTPUT, function_get_contents(as_function(INPUT(0))));
+}
+
+void make_interpreter(caStack* stack)
+{
+}
+
+void Interpreter__push_frame(caStack* stack)
+{
+}
+void Interpreter__run_step(caStack* stack)
+{
+}
+void Interpreter__run_steps(caStack* stack)
+{
+}
+void Interpreter__frame(caStack* stack)
+{
 }
 
 CA_FUNCTION(String__char_at)
@@ -1104,6 +1182,11 @@ void install_standard_library(Branch* kernel)
         {"sys:module_search_paths", sys__module_search_paths},
         {"sys:do_admin_command", sys__do_admin_command},
         {"branch_ref", branch_ref},
+        {"load_script_value", load_script_value},
+        {"Branch.input", Branch__input},
+        {"Branch.inputs", Branch__inputs},
+        {"Branch.output", Branch__output},
+        {"Branch.outputs", Branch__outputs},
         {"Branch.dump", Branch__dump},
         {"Branch.evaluate", Branch__evaluate},
         {"Branch.file_signature", Branch__file_signature},

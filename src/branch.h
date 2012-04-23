@@ -133,6 +133,8 @@ private:
 void branch_setup_type(Type* type);
 void assert_valid_branch(Branch const* obj);
 
+Branch* alloc_branch_gc();
+
 bool is_namespace(Term* term);
 bool is_namespace(Branch* branch);
 

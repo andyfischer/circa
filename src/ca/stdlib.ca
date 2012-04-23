@@ -56,18 +56,30 @@ namespace sys
 
 def branch_ref(any branch :ignore_error) -> Branch
 
-def Branch.dump(b)
-def Branch.format_source(self) -> StyledSource
-def Branch.has_static_error(self) -> bool
-def Branch.get_static_errors(self) -> List
-def Branch.get_static_errors_formatted(self) -> List
-def Branch.evaluate(self)
-def Branch.terms(self) -> List
-def Branch.get_term(self, int index) -> Term
-def Branch.list_configs(self) -> List
-def Branch.functions(self) -> List
-def Branch.file_signature(self) -> any
-def Branch.statements(self) -> List
+-- Load a Branch from a file.
+def load_script_value(String filename) -> Branch
+
+def Branch.input(_, int index) -> Term
+def Branch.inputs(_) -> List
+def Branch.output(_, int index) -> Term
+def Branch.outputs(_) -> List
+def Branch.format_source(_) -> StyledSource
+def Branch.has_static_error(_) -> bool
+def Branch.get_static_errors(_) -> List
+def Branch.get_static_errors_formatted(_) -> List
+def Branch.evaluate(_)
+def Branch.terms(_) -> List
+def Branch.get_term(_, int index) -> Term
+def Branch.list_configs(_) -> List
+def Branch.functions(_) -> List
+def Branch.file_signature(_) -> any
+def Branch.statements(_) -> List
+def Branch.dump(_)
+
+type Frame;
+def Frame.branch(_) -> Branch
+def Frame.register(_, int) -> any
+def Frame.pc(_) -> int
 
 def Function.name(_) -> String
 def Function.input(_, int index) -> Term
@@ -75,6 +87,14 @@ def Function.inputs(_) -> List
 def Function.output(_, int index) -> Term
 def Function.outputs(_) -> List
 def Function.contents(_) -> Branch
+
+def make_interpreter() -> Interpreter
+
+type Interpreter;
+def Interpreter.push_frame(_, Branch, List inputs)
+def Interpreter.run_step(_)
+def Interpreter.run_steps(_, int steps)
+def Interpreter.frame(_, int depth) -> Frame
 
 def String.append(self :out, String right)
     self = concat(self, right)
