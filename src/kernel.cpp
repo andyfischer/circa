@@ -15,7 +15,6 @@
 #include "gc.h"
 #include "generic.h"
 #include "importing.h"
-#include "importing_macros.h"
 #include "introspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -134,7 +133,7 @@ BuiltinTypes TYPES;
 Value TrueValue;
 Value FalseValue;
 
-namespace cppbuild_function { CA_FUNCTION(build_module); }
+namespace cppbuild_function { void build_module(caStack*); }
 
 Type* output_placeholder_specializeType(Term* caller)
 {
@@ -143,35 +142,35 @@ Type* output_placeholder_specializeType(Term* caller)
     return declared_type(caller->input(0));
 }
 
-CA_FUNCTION(file__exists)
+void file__exists(caStack* stack)
 {
-    set_bool(OUTPUT, circa_file_exists(STRING_INPUT(0)));
+    set_bool(circa_output(stack, 0), circa_file_exists( circa_string_input(stack, 0)));
 }
-CA_FUNCTION(file__version)
+void file__version(caStack* stack)
 {
-    set_int(OUTPUT, circa_file_get_version(STRING_INPUT(0)));
+    set_int(circa_output(stack, 0), circa_file_get_version(circa_string_input(stack, 0)));
 }
-CA_FUNCTION(file__read_text)
+void file__read_text(caStack* stack)
 {
-    set_string(OUTPUT, circa_read_file(STRING_INPUT(0)));
-}
-
-CA_FUNCTION(file__fetch_record)
-{
-    const char* filename = STRING_INPUT(0);
-    Name name = INT_INPUT(1);
-    circa_create_default_output((caStack*) CONTEXT, 0);
-    set_pointer(OUTPUT, circa_fetch_file_record(filename, name));
+    set_string(circa_output(stack, 0), circa_read_file(circa_string_input(stack, 0)));
 }
 
-CA_FUNCTION(from_string)
+void file__fetch_record(caStack* stack)
 {
-    circa_parse_string(STRING_INPUT(0), OUTPUT);
+    const char* filename = circa_string_input(stack, 0);
+    Name name = circa_int_input(stack, 1);
+    circa_create_default_output(stack, 0);
+    set_pointer(circa_output(stack, 0), circa_fetch_file_record(filename, name));
 }
 
-CA_FUNCTION(to_string_repr)
+void from_string(caStack* stack)
 {
-    circa_to_string_repr(INPUT(0), OUTPUT);
+    circa_parse_string(circa_string_input(stack, 0), circa_output(stack, 0));
+}
+
+void to_string_repr(caStack* stack)
+{
+    circa_to_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
 void dynamic_call_func(caStack* stack)
@@ -240,41 +239,43 @@ void dynamic_method_call(caStack* stack)
 
 }
 
-CA_FUNCTION(refactor__rename)
+void refactor__rename(caStack* stack)
 {
-    rename(as_ref(INPUT(0)), as_string(INPUT(1)));
+    rename(as_ref(circa_input(stack, 0)), as_string(circa_input(stack, 1)));
 }
 
-CA_FUNCTION(refactor__change_function)
+void refactor__change_function(caStack* stack)
 {
-    change_function(as_ref(INPUT(0)), INPUT_TERM(1));
+    change_function(as_ref(circa_input(stack, 0)),
+        (Term*) circa_caller_input_term(stack, 1));
 }
 
-CA_FUNCTION(reflect__this_branch)
+void reflect__this_branch(caStack* stack)
 {
-    set_branch(OUTPUT, (Branch*) circa_caller_branch(_stack));
+    set_branch(circa_output(stack, 0), (Branch*) circa_caller_branch(stack));
 }
 
-CA_FUNCTION(reflect__kernel)
+void reflect__kernel(caStack* stack)
 {
-    set_branch(OUTPUT, kernel());
+    set_branch(circa_output(stack, 0), kernel());
 }
 
-CA_FUNCTION(sys__module_search_paths)
+void sys__module_search_paths(caStack* stack)
 {
-    copy(modules_get_search_paths(), OUTPUT);
+    copy(modules_get_search_paths(), circa_output(stack, 0));
 }
 
-CA_FUNCTION(sys__do_admin_command)
+void sys__do_admin_command(caStack* stack)
 {
-    do_admin_command(INPUT(0), OUTPUT);
+    do_admin_command(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-CA_FUNCTION(branch_ref)
+void branch_ref(caStack* stack)
 {
-    Branch* branch = INPUT_TERM(0)->nestedContents;
+    Term* input0 = (Term*) circa_caller_input_term(stack, 0);
+    Branch* branch = input0->nestedContents;
     gc_mark_object_referenced(&branch->header);
-    set_branch(OUTPUT, branch);
+    set_branch(circa_output(stack, 0), branch);
 }
 
 void load_script_value(caStack* stack)
@@ -329,73 +330,70 @@ void Branch__outputs(caStack* stack)
     }
 }
 
-CA_FUNCTION(Branch__format_source)
+void Branch__format_source(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    if (branch == NULL)
-        return RAISE_ERROR("NULL branch");
+    Branch* branch = as_branch(circa_input(stack, 0));
 
-    List* output = List::cast(OUTPUT, 0);
+    caValue* output = circa_output(stack, 0);
+    circa_set_list(output, 0);
     format_branch_source((StyledSource*) output, branch);
 }
 
-CA_FUNCTION(Branch__has_static_error)
+void Branch__has_static_error(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    set_bool(OUTPUT, has_static_errors_cached(branch));
+    Branch* branch = as_branch(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), has_static_errors_cached(branch));
 }
 
-CA_FUNCTION(Branch__get_static_errors)
+void Branch__get_static_errors(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
+    Branch* branch = as_branch(circa_input(stack, 0));
 
     if (is_null(&branch->staticErrors))
-        set_list(OUTPUT, 0);
+        set_list(circa_output(stack, 0), 0);
     else
-        copy(&branch->staticErrors, OUTPUT);
+        copy(&branch->staticErrors, circa_output(stack, 0));
 }
 
-CA_FUNCTION(Branch__get_static_errors_formatted)
+void Branch__get_static_errors_formatted(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
+    Branch* branch = as_branch(circa_input(stack, 0));
 
     if (is_null(&branch->staticErrors))
-        set_list(OUTPUT, 0);
+        set_list(circa_output(stack, 0), 0);
 
-    List& list = *List::checkCast(&branch->staticErrors);
-    List& out = *List::cast(OUTPUT, list.length());
-    for (int i=0; i < list.length(); i++)
-        format_static_error(list[i], out[i]);
+    caValue* errors = &branch->staticErrors;
+    caValue* out = circa_output(stack, 0);
+    set_list(out, circa_count(errors));
+    for (int i=0; i < circa_count(out); i++)
+        format_static_error(circa_index(errors, i), circa_index(out, i));
 }
 
-CA_FUNCTION(Branch__evaluate)
+void Branch__evaluate(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    push_frame(CONTEXT, branch);
+    Branch* branch = as_branch(circa_input(stack, 0));
+    push_frame((EvalContext*) stack, branch);
 }
 
 // Reflection
 
-CA_FUNCTION(Branch__terms)
+void Branch__terms(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    if (branch == NULL)
-        return RAISE_ERROR("NULL branch");
+    Branch* branch = as_branch(circa_input(stack, 0));
 
-    List& output = *List::cast(OUTPUT, branch->length());
+    caValue* out = circa_output(stack, 0);
+    set_list(out, branch->length());
 
     for (int i=0; i < branch->length(); i++)
-        set_ref(output[i], branch->get(i));
+        set_ref(circa_index(out, i), branch->get(i));
 }
 
-CA_FUNCTION(Branch__get_term)
+void Branch__get_term(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    if (branch == NULL)
-        return RAISE_ERROR("NULL branch");
+    Branch* branch = as_branch(circa_input(stack, 0));
 
-    int index = INT_INPUT(1);
-    set_ref(OUTPUT, branch->get(index));
+    int index = circa_int_input(stack, 1);
+    set_ref(circa_output(stack, 0), branch->get(index));
 }
 
 bool is_considered_config(Term* term)
@@ -414,28 +412,24 @@ bool is_considered_config(Term* term)
     return true;
 }
 
-CA_FUNCTION(Branch__list_configs)
+void Branch__list_configs(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    if (branch == NULL)
-        return RAISE_ERROR("NULL branch");
+    Branch* branch = as_branch(circa_input(stack, 0));
 
-    List& output = *List::cast(OUTPUT, 0);
+    caValue* output = circa_output(stack, 0);
 
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_considered_config(term))
-            set_ref(output.append(), term);
+            set_ref(circa_append(output), term);
     }
 }
 
-CA_FUNCTION(Branch__functions)
+void Branch__functions(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    if (branch == NULL)
-        return RAISE_ERROR("NULL branch");
+    Branch* branch = as_branch(circa_input(stack, 0));
 
-    caValue* output = OUTPUT;
+    caValue* output = circa_output(stack, 0);
     set_list(output, 0);
 
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
@@ -446,17 +440,15 @@ CA_FUNCTION(Branch__functions)
     }
 }
 
-CA_FUNCTION(Branch__file_signature)
+void Branch__file_signature(caStack* stack)
 {
-    Branch* branch = as_branch(INPUT(0));
-    if (branch == NULL)
-        return RAISE_ERROR("NULL branch");
+    Branch* branch = as_branch(circa_input(stack, 0));
     List* fileOrigin = branch_get_file_origin(branch);
     if (fileOrigin == NULL)
-        set_null(OUTPUT);
+        set_null(circa_output(stack, 0));
     else
     {
-        List* output = set_list(OUTPUT, 2);
+        List* output = set_list(circa_output(stack, 0), 2);
         copy(fileOrigin->get(1), output->get(0));
         copy(fileOrigin->get(2), output->get(1));
     }
@@ -487,20 +479,21 @@ void Frame__pc(caStack* stack)
 {
 }
 
-CA_FUNCTION(Function__name)
+void Function__name(caStack* stack)
 {
-    set_string(OUTPUT, as_function(INPUT(0))->name);
+    set_string(circa_output(stack, 0), as_function(circa_input(stack, 0))->name);
 }
 
-CA_FUNCTION(Function__input)
+void Function__input(caStack* stack)
 {
-    set_ref(OUTPUT, function_get_input_placeholder(as_function(INPUT(0)), INT_INPUT(1)));
+    int index = circa_int_input(stack, 1);
+    set_ref(circa_output(stack, 0), function_get_input_placeholder(as_function(circa_input(stack, 0)), index));
 }
 
-CA_FUNCTION(Function__inputs)
+void Function__inputs(caStack* stack)
 {
-    Function* func = as_function(INPUT(0));
-    caValue* output = OUTPUT;
+    Function* func = as_function(circa_input(stack, 0));
+    caValue* output = circa_output(stack, 0);
     set_list(output, 0);
     for (int i=0;; i++) {
         Term* term = function_get_input_placeholder(func, i);
@@ -510,15 +503,16 @@ CA_FUNCTION(Function__inputs)
     }
 }
 
-CA_FUNCTION(Function__output)
+void Function__output(caStack* stack)
 {
-    set_ref(OUTPUT, function_get_output_placeholder(as_function(INPUT(0)), INT_INPUT(1)));
+    int index = circa_int_input(stack, 1);
+    set_ref(circa_output(stack, 0), function_get_output_placeholder(as_function(circa_input(stack, 0)), index));
 }
 
-CA_FUNCTION(Function__outputs)
+void Function__outputs(caStack* stack)
 {
-    Function* func = as_function(INPUT(0));
-    caValue* output = OUTPUT;
+    Function* func = as_function(circa_input(stack, 0));
+    caValue* output = circa_output(stack, 0);
     set_list(output, 0);
     for (int i=0;; i++) {
         Term* term = function_get_output_placeholder(func, i);
@@ -528,9 +522,9 @@ CA_FUNCTION(Function__outputs)
     }
 }
 
-CA_FUNCTION(Function__contents)
+void Function__contents(caStack* stack)
 {
-    set_branch(OUTPUT, function_get_contents(as_function(INPUT(0))));
+    set_branch(circa_output(stack, 0), function_get_contents(as_function(circa_input(stack, 0))));
 }
 
 void make_interpreter(caStack* stack)
@@ -550,52 +544,52 @@ void Interpreter__frame(caStack* stack)
 {
 }
 
-CA_FUNCTION(String__char_at)
+void String__char_at(caStack* stack)
 {
-    const char* str = STRING_INPUT(0);
-    int index = INT_INPUT(1);
+    const char* str = circa_string_input(stack, 0);
+    int index = circa_int_input(stack, 1);
 
     if (index < 0) {
-        RAISE_ERROR("negative index");
+        circa_output_error(stack, "negative index");
         return;
     }
 
     if ((unsigned) index >= strlen(str)) {
-        set_string(OUTPUT, "");
+        set_string(circa_output(stack, 0), "");
         return;
     }
 
     char output[1];
     output[0] = str[index];
-    set_string(OUTPUT, output, 1);
+    set_string(circa_output(stack, 0), output, 1);
 }
 
-CA_FUNCTION(String__length)
+void String__length(caStack* stack)
 {
-    set_int(OUTPUT, int(INPUT(0)->asString().length()));
+    set_int(circa_output(stack, 0), int(circa_input(stack, 0)->asString().length()));
 }
 
-CA_FUNCTION(String__substr)
+void String__substr(caStack* stack)
 {
-    int start = INT_INPUT(1);
-    int end = INT_INPUT(2);
-    std::string const& s = as_string(INPUT(0));
+    int start = circa_int_input(stack, 1);
+    int end = circa_int_input(stack, 2);
+    std::string const& s = as_string(circa_input(stack, 0));
 
-    if (start < 0) return RAISE_ERROR("Negative index");
-    if (end < 0) return RAISE_ERROR("Negative index");
+    if (start < 0) return circa_output_error(stack, "Negative index");
+    if (end < 0) return circa_output_error(stack, "Negative index");
 
     if ((unsigned) start > s.length()) {
         std::stringstream msg;
         msg << "Start index is too high: " << start;
-        return RAISE_ERROR(msg.str().c_str());
+        return circa_output_error(stack, msg.str().c_str());
     }
     if ((unsigned) (start+end) > s.length()) {
         std::stringstream msg;
         msg << "End index is too high: " << start;
-        return RAISE_ERROR(msg.str().c_str());
+        return circa_output_error(stack, msg.str().c_str());
     }
 
-    set_string(OUTPUT, s.substr(start, end));
+    set_string(circa_output(stack, 0), s.substr(start, end));
 }
 
 char character_to_lower(char c)
@@ -605,25 +599,25 @@ char character_to_lower(char c)
     return c;
 }
 
-CA_FUNCTION(String__to_camel_case)
+void String__to_camel_case(caStack* stack)
 {
-    const char* in = STRING_INPUT(0);
-    set_string(OUTPUT, in);
+    const char* in = circa_string_input(stack, 0);
+    set_string(circa_output(stack, 0), in);
 
-    char* out = (char*) as_cstring(OUTPUT);
+    char* out = (char*) as_cstring(circa_output(stack, 0));
     if (out[0] == 0)
         return;
 
     out[0] = character_to_lower(out[0]);
 }
 
-CA_FUNCTION(String__to_lower)
+void String__to_lower(caStack* stack)
 {
-    const char* in = STRING_INPUT(0);
+    const char* in = circa_string_input(stack, 0);
     int len = strlen(in);
 
-    set_string(OUTPUT, in);
-    char* out = (char*) as_cstring(OUTPUT);
+    set_string(circa_output(stack, 0), in);
+    char* out = (char*) as_cstring(circa_output(stack, 0));
 
     for (int i=0; i < len; i++) {
         char c = in[i];
@@ -634,13 +628,13 @@ CA_FUNCTION(String__to_lower)
     }
 }
 
-CA_FUNCTION(String__to_upper)
+void String__to_upper(caStack* stack)
 {
-    const char* in = STRING_INPUT(0);
+    const char* in = circa_string_input(stack, 0);
     int len = strlen(in);
 
-    set_string(OUTPUT, in);
-    char* out = (char*) as_cstring(OUTPUT);
+    set_string(circa_output(stack, 0), in);
+    char* out = (char*) as_cstring(circa_output(stack, 0));
 
     for (int i=0; i < len; i++) {
         char c = in[i];
@@ -651,18 +645,18 @@ CA_FUNCTION(String__to_upper)
     }
 }
 
-CA_FUNCTION(String__slice)
+void String__slice(caStack* stack)
 {
-    int start = INT_INPUT(1);
-    int end = INT_INPUT(2);
-    std::string const& s = as_string(INPUT(0));
+    int start = circa_int_input(stack, 1);
+    int end = circa_int_input(stack, 2);
+    std::string const& s = as_string(circa_input(stack, 0));
 
     // Negative indexes are relatve to end of string
     if (start < 0) start = s.length() + start;
     if (end < 0) end = s.length() + end;
 
-    if (start < 0) return set_string(OUTPUT, "");
-    if (end < 0) return set_string(OUTPUT, "");
+    if (start < 0) return set_string(circa_output(stack, 0), "");
+    if (end < 0) return set_string(circa_output(stack, 0), "");
 
     if ((unsigned) start > s.length())
         start = s.length();
@@ -671,115 +665,115 @@ CA_FUNCTION(String__slice)
         end = s.length();
 
     if (end < start)
-        return set_string(OUTPUT, "");
+        return set_string(circa_output(stack, 0), "");
 
-    set_string(OUTPUT, s.substr(start, end - start));
+    set_string(circa_output(stack, 0), s.substr(start, end - start));
 }
 
-CA_FUNCTION(String__ends_with)
+void String__ends_with(caStack* stack)
 {
-    set_bool(OUTPUT, string_ends_with(INPUT(0), as_cstring(INPUT(1))));
+    set_bool(circa_output(stack, 0), string_ends_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
 }
-CA_FUNCTION(String__starts_with)
+void String__starts_with(caStack* stack)
 {
-    set_bool(OUTPUT, string_starts_with(INPUT(0), as_cstring(INPUT(1))));
-}
-
-CA_FUNCTION(String__split)
-{
-    string_split(INPUT(0), string_get(INPUT(1), 0), OUTPUT);
+    set_bool(circa_output(stack, 0), string_starts_with(circa_input(stack, 0), as_cstring(circa_input(stack, 1))));
 }
 
-CA_FUNCTION(Type__name)
+void String__split(caStack* stack)
 {
-    set_string(OUTPUT, name_to_string(as_type(INPUT(0))->name));
+    string_split(circa_input(stack, 0), string_get(circa_input(stack, 1), 0), circa_output(stack, 0));
 }
 
-CA_FUNCTION(Type__property)
+void Type__name(caStack* stack)
 {
-    Type* type = as_type(INPUT(0));
-    const char* str = as_cstring(INPUT(1));
+    set_string(circa_output(stack, 0), name_to_string(as_type(circa_input(stack, 0))->name));
+}
+
+void Type__property(caStack* stack)
+{
+    Type* type = as_type(circa_input(stack, 0));
+    const char* str = as_cstring(circa_input(stack, 1));
     caValue* prop = get_type_property(type, str);
     if (prop == NULL)
-        set_null(OUTPUT);
+        set_null(circa_output(stack, 0));
     else
-        copy(prop, OUTPUT);
+        copy(prop, circa_output(stack, 0));
 }
 
-CA_FUNCTION(Term__name)
+void Term__name(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
-    set_string(OUTPUT, t->name);
+        return circa_output_error(stack, "NULL reference");
+    set_string(circa_output(stack, 0), t->name);
 }
-CA_FUNCTION(Term__to_string)
+void Term__to_string(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
-    set_string(OUTPUT, circa::to_string(term_value(t)));
+        return circa_output_error(stack, "NULL reference");
+    set_string(circa_output(stack, 0), circa::to_string(term_value(t)));
 }
-CA_FUNCTION(Term__to_source_string)
+void Term__to_source_string(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
-    set_string(OUTPUT, get_term_source_text(t));
+        return circa_output_error(stack, "NULL reference");
+    set_string(circa_output(stack, 0), get_term_source_text(t));
 }
-CA_FUNCTION(Term__function)
+void Term__function(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
-    set_function(OUTPUT, as_function(t->function));
+        return circa_output_error(stack, "NULL reference");
+    set_function(circa_output(stack, 0), as_function(t->function));
 }
-CA_FUNCTION(Term__type)
+void Term__type(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
-    set_type(OUTPUT, t->type);
+        return circa_output_error(stack, "NULL reference");
+    set_type(circa_output(stack, 0), t->type);
 }
-CA_FUNCTION(Term__assign)
+void Term__assign(caStack* stack)
 {
-    Term* target = INPUT(0)->asRef();
+    Term* target = circa_input(stack, 0)->asRef();
     if (target == NULL) {
-        RAISE_ERROR("NULL reference");
+        circa_output_error(stack, "NULL reference");
         return;
     }
 
-    caValue* source = INPUT(1);
+    caValue* source = circa_input(stack, 1);
 
     if (!cast_possible(source, declared_type(target))) {
-        RAISE_ERROR("Can't assign, type mismatch");
+        circa_output_error(stack, "Can't assign, type mismatch");
         return;
     }
 
     circa::copy(source, term_value(target));
 }
-CA_FUNCTION(Term__value)
+void Term__value(caStack* stack)
 {
-    Term* target = INPUT(0)->asRef();
+    Term* target = circa_input(stack, 0)->asRef();
     if (target == NULL) {
-        RAISE_ERROR("NULL reference");
+        circa_output_error(stack, "NULL reference");
         return;
     }
 
-    copy(term_value(target), OUTPUT);
+    copy(term_value(target), circa_output(stack, 0));
 }
 
 int tweak_round(double a) {
     return int(a + 0.5);
 }
 
-CA_FUNCTION(Term__tweak)
+void Term__tweak(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
+        return circa_output_error(stack, "NULL reference");
 
-    int steps = tweak_round(INPUT(1)->toFloat());
+    int steps = tweak_round(circa_input(stack, 1)->toFloat());
 
     caValue* val = term_value(t);
 
@@ -796,110 +790,111 @@ CA_FUNCTION(Term__tweak)
     } else if (is_int(val))
         set_int(val, as_int(val) + steps);
     else
-        RAISE_ERROR("Ref is not an int or number");
+        circa_output_error(stack, "Ref is not an int or number");
 }
 
-CA_FUNCTION(Term__asint)
+void Term__asint(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL) {
-        RAISE_ERROR("NULL reference");
+        circa_output_error(stack, "NULL reference");
         return;
     }
     if (!is_int(term_value(t))) {
-        RAISE_ERROR("Not an int");
+        circa_output_error(stack, "Not an int");
         return;
     }
-    set_int(OUTPUT, as_int(term_value(t)));
+    set_int(circa_output(stack, 0), as_int(term_value(t)));
 }
-CA_FUNCTION(Term__asfloat)
+void Term__asfloat(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL) {
-        RAISE_ERROR("NULL reference");
+        circa_output_error(stack, "NULL reference");
         return;
     }
     
-    set_float(OUTPUT, to_float(term_value(t)));
+    set_float(circa_output(stack, 0), to_float(term_value(t)));
 }
-CA_FUNCTION(Term__input)
+void Term__input(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL) {
-        RAISE_ERROR("NULL reference");
+        circa_output_error(stack, "NULL reference");
         return;
     }
-    int index = INPUT(1)->asInt();
+    int index = circa_input(stack, 1)->asInt();
     if (index >= t->numInputs())
-        set_ref(OUTPUT, NULL);
+        set_ref(circa_output(stack, 0), NULL);
     else
-        set_ref(OUTPUT, t->input(index));
+        set_ref(circa_output(stack, 0), t->input(index));
 }
-CA_FUNCTION(Term__inputs)
+void Term__inputs(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
+        return circa_output_error(stack, "NULL reference");
 
-    List& output = *List::cast(OUTPUT, t->numInputs());
+    caValue* output = circa_output(stack, 0);
+    circa_set_list(output, t->numInputs());
 
     for (int i=0; i < t->numInputs(); i++)
-        set_ref(output[i], t->input(i));
+        set_ref(circa_index(output, i), t->input(i));
 }
-CA_FUNCTION(Term__num_inputs)
+void Term__num_inputs(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL) {
-        RAISE_ERROR("NULL reference");
+        circa_output_error(stack, "NULL reference");
         return;
     }
-    set_int(OUTPUT, t->numInputs());
+    set_int(circa_output(stack, 0), t->numInputs());
 }
 
-CA_FUNCTION(Term__source_location)
+void Term__source_location(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
+        return circa_output_error(stack, "NULL reference");
 
-    circa_set_vec4(circa_output(STACK, 0),
+    circa_set_vec4(circa_output(stack, 0),
         t->sourceLoc.col, t->sourceLoc.line,
         t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
 }
-CA_FUNCTION(Term__global_id)
+void Term__global_id(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
+        return circa_output_error(stack, "NULL reference");
 
-    set_int(OUTPUT, t->id);
+    set_int(circa_output(stack, 0), t->id);
 }
-CA_FUNCTION(Term__properties)
+void Term__properties(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
-    circa::copy(&t->properties, OUTPUT);
+        return circa_output_error(stack, "NULL reference");
+    circa::copy(&t->properties, circa_output(stack, 0));
 }
-CA_FUNCTION(Term__property)
+void Term__property(caStack* stack)
 {
-    Term* t = INPUT(0)->asRef();
+    Term* t = circa_input(stack, 0)->asRef();
     if (t == NULL)
-        return RAISE_ERROR("NULL reference");
+        return circa_output_error(stack, "NULL reference");
 
-    const char* key = STRING_INPUT(1);
+    const char* key = circa_string_input(stack, 1);
 
     caValue* value = term_get_property(t, key);
 
     if (value == NULL)
-        set_null(OUTPUT);
+        set_null(circa_output(stack, 0));
     else
-        circa::copy(value, OUTPUT);
+        circa::copy(value, circa_output(stack, 0));
 }
 
-CA_FUNCTION(length)
+void length(caStack* stack)
 {
-    set_int(OUTPUT, num_elements(INPUT(0)));
+    set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
 }
 
 std::string stackVariable_toString(caValue* value)
