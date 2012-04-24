@@ -60,7 +60,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
         if (branch == NULL)
             continue;
 
-        for (int i=frame->startPc; i < frame->endPc; i++) {
+        for (int i=0; i < frame->endPc; i++) {
             Term* term = branch->get(i);
 
             // indent
@@ -116,7 +116,6 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
     top->branch = branch;
     top->pc = 0;
     top->nextPc = 0;
-    top->startPc = 0;
     top->endPc = branch->length();
     top->loop = false;
     top->override = false;
@@ -247,8 +246,8 @@ void reset_stack(EvalContext* context)
 void evaluate_single_term(EvalContext* context, Term* term)
 {
     Frame* frame = push_frame(context, term->owningBranch);
-    frame->startPc = term->index;
     frame->pc = term->index;
+    frame->nextPc = term->index;
     frame->endPc = frame->pc + 1;
 
     run_interpreter(context);
@@ -706,7 +705,6 @@ Branch* choose_branch(EvalContext* context, Term* term)
 
 void run_interpreter(EvalContext* context)
 {
-    // Remember the topmost branch
     Branch* topBranch = top_frame(context)->branch;
 
     // Make sure there are no pending code updates.
@@ -714,9 +712,6 @@ void run_interpreter(EvalContext* context)
 
     // Check if our context needs to be updated following branch modification
     update_context_to_latest_branches(context);
-
-    // TODO: remove this:
-    int initialFrameCount = context->numFrames;
 
     // Prepare to start this branch.
 
@@ -734,6 +729,7 @@ void run_interpreter(EvalContext* context)
     EvaluateFunc override = get_override_for_branch(topBranch);
 
     if (override != NULL) {
+        top_frame(context)->override = true;
         override((caStack*) context);
         return;
     }
@@ -751,8 +747,8 @@ do_instruction:
     // Check if we have finished this branch
     if (frame->pc >= frame->endPc) {
 
-        // If we've finished the initial branch, then end this interpreter session.
-        if (context->numFrames == initialFrameCount)
+        // Exit if we have finished the topmost branch
+        if (context->numFrames == 1)
             return;
 
         // Finish this frame and continue evaluating
@@ -762,6 +758,9 @@ do_instruction:
 
     Term* currentTerm = branch->get(frame->pc);
     frame->nextPc = frame->pc + 1;
+
+    if (currentTerm == NULL)
+        goto advance_pc;
 
     // Certain functions must be handled in-place
     if (currentTerm->function == FUNCS.output) {

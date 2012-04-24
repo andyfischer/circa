@@ -18,9 +18,9 @@ struct Frame
     Branch* branch;
     int pc;
     int nextPc;
-    int startPc;
     int endPc;
 
+    // True if this frame is being evaluated with a C override.
     bool override;
 
     // Used in for-loop

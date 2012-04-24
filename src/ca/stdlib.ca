@@ -92,9 +92,10 @@ def make_interpreter() -> Interpreter
 
 type Interpreter;
 def Interpreter.push_frame(_, Branch, List inputs)
-def Interpreter.run_step(_)
-def Interpreter.run_steps(_, int steps)
+def Interpreter.pop_frame(_)
+def Interpreter.run(_, int steps)
 def Interpreter.frame(_, int depth) -> Frame
+def Interpreter.output(_) -> any
 
 def String.append(self :out, String right)
     self = concat(self, right)

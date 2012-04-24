@@ -529,19 +529,30 @@ void Function__contents(caStack* stack)
 
 void make_interpreter(caStack* stack)
 {
+    EvalContext* newContext = new EvalContext();
+    gc_mark_object_referenced(&newContext->header);
+    gc_set_object_is_root(&newContext->header, false);
+
+    set_pointer(circa_output(stack, 0), newContext);
 }
 
 void Interpreter__push_frame(caStack* stack)
 {
+    EvalContext* self = (EvalContext*) circa_input(stack, 0);
+
 }
-void Interpreter__run_step(caStack* stack)
+void Interpreter__run(caStack* stack)
 {
-}
-void Interpreter__run_steps(caStack* stack)
-{
+    EvalContext* self = (EvalContext*) circa_input(stack, 0);
+    int steps = circa_int_input(stack, 0);
+
+    for (int i=0; i < steps; i++) {
+        // step_interpreter(self);
+    }
 }
 void Interpreter__frame(caStack* stack)
 {
+    EvalContext* self = (EvalContext*) circa_input(stack, 0);
 }
 
 void String__char_at(caStack* stack)
