@@ -1,0 +1,18 @@
+
+namespace ns
+    def f(String str) -> String
+        return concat(str " worked")
+    
+
+def my_calling_func(String str)
+    -- note that we don't use the namespaced name for f, so it will
+    -- not be found by default.
+    s = f(str)
+    print(s)
+
+br = branch_ref(my_calling_func)
+
+-- Link my_calling_func, so that f will be found.
+br.link(branch_ref(ns))
+
+br.call("link")

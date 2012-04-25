@@ -51,6 +51,9 @@ Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lo
     if (location == -1)
         location = branch->length();
 
+    if (location > branch->length())
+        location = branch->length();
+
     // Look for an exact match.
     for (int i = location - 1; i >= 0; i--) {
         Term* term = branch->get(i);

@@ -470,7 +470,10 @@ void Branch__statements(caStack* stack)
 
 void Branch__link(caStack* stack)
 {
-    // TODO
+    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
+    Branch* source = (Branch*) circa_branch(circa_input(stack, 1));
+
+    branch_link_missing_functions(self, source);
 }
 
 void Frame__branch(caStack* stack)

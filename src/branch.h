@@ -221,4 +221,6 @@ struct BrokenLinkList
 // that could add/remove declared state.
 void branch_update_state_type(Branch* branch);
 
+void branch_link_missing_functions(Branch* branch, Branch* source);
+
 } // namespace circa

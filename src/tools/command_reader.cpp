@@ -142,11 +142,6 @@ void do_file_command(List* args, caValue* reply)
     if (printSource)
         std::cout << get_branch_source_text(&branch);
 
-    if (has_static_errors(&branch)) {
-        print_static_errors_formatted(&branch, reply);
-        return;
-    }
-
     if (dontRunScript)
         return;
     

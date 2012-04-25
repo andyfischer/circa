@@ -8,6 +8,4 @@ def my_calling_func(String str)
     print(s)
 
 br = branch_ref(my_calling_func)
-br.link(branch_ref(myfunc))
-
 br.call("call")

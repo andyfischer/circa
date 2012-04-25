@@ -776,4 +776,23 @@ bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
     return false;
 }
 
+void branch_link_missing_functions(Branch* branch, Branch* source)
+{
+    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
+        Term* term = *it;
+        if (term->function == NULL || term->function == FUNCS.unknown_function) {
+            std::string funcName = term->stringPropOptional("syntax:functionName", "");
+
+            if (funcName == "")
+                continue;
+
+            // try to find this function
+            Term* func = find_local_name(source, funcName.c_str(), NAME_LOOKUP_FUNCTION);
+
+            if (func != NULL)
+                change_function(term, func);
+        }
+    }
+}
+
 } // namespace circa
