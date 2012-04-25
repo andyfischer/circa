@@ -41,6 +41,10 @@ struct EvalContext
     int numFrames;
     Frame* stack;
 
+    // Whether the interpreter is currently running. Set to false when an error occurs
+    // or when the branch is completed.
+    bool running;
+
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
 
@@ -140,5 +144,7 @@ void clear_error(EvalContext* cxt);
 void print_error_stack(EvalContext* context, std::ostream& out);
 
 void run_interpreter(EvalContext* context);
+void run_interpreter_step(EvalContext* context);
+void run_interpreter_steps(EvalContext* context, int steps);
 
 } // namespace circa

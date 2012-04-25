@@ -25,6 +25,7 @@ namespace circa {
 EvalContext::EvalContext()
  : numFrames(0),
    stack(NULL),
+   running(false),
    errorOccurred(false)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
@@ -55,6 +56,7 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
         Branch* branch = frame->branch;
         out << " [Frame " << frameIndex << ", branch = " << branch
              << ", pc = " << frame->pc
+             << ", nextPc = " << frame->nextPc
              << "]" << std::endl;
 
         if (branch == NULL)
@@ -457,6 +459,7 @@ void create_output(EvalContext* context)
 
 void raise_error(EvalContext* context)
 {
+    context->running = false;
     context->errorOccurred = true;
 }
 void raise_error_msg(EvalContext* context, const char* msg)
@@ -659,9 +662,7 @@ EvaluateFunc get_override_for_branch(Branch* branch)
         return NULL;
 
     if (!is_function(owner)) {
-        owner = owner->function;
-        if (!is_function(owner))
-            return NULL;
+        return NULL;
     }
 
     Function* func = as_function(owner);
@@ -703,7 +704,7 @@ Branch* choose_branch(EvalContext* context, Term* term)
         return NULL;
 }
 
-void run_interpreter(EvalContext* context)
+void start_interpreter_session(EvalContext* context)
 {
     Branch* topBranch = top_frame(context)->branch;
 
@@ -713,8 +714,6 @@ void run_interpreter(EvalContext* context)
     // Check if our context needs to be updated following branch modification
     update_context_to_latest_branches(context);
 
-    // Prepare to start this branch.
-
     // Cast all inputs, in case they were passed in uncast.
     for (int i=0;; i++) {
         Term* placeholder = get_input_placeholder(topBranch, i);
@@ -723,44 +722,54 @@ void run_interpreter(EvalContext* context)
         caValue* slot = get_frame_register(top_frame(context), i);
         cast(slot, placeholder->type, slot);
     }
+}
 
-    // Now that we're starting a new branch, check if there is a C override for
-    // this branch.
-    EvaluateFunc override = get_override_for_branch(topBranch);
-
-    if (override != NULL) {
-        top_frame(context)->override = true;
-        override((caStack*) context);
-        return;
-    }
-
-do_instruction:
-
-    // Stop on error
-    if (error_occurred(context))
-        return;
-
+void step_interpreter(EvalContext* context)
+{
     Frame* frame = top_frame(context);
     Branch* branch = frame->branch;
-    Branch* nextBranch = NULL;
+
+    // Advance pc to nextPc
+    frame->pc = frame->nextPc;
+    frame->nextPc = frame->pc + 1;
 
     // Check if we have finished this branch
     if (frame->pc >= frame->endPc) {
 
         // Exit if we have finished the topmost branch
-        if (context->numFrames == 1)
+        if (context->numFrames == 1) {
+            context->running = false;
             return;
+        }
 
-        // Finish this frame and continue evaluating
+        // Finish this frame
         finish_frame(context);
-        goto do_instruction;
+        return;
+    }
+
+    if (frame->pc == 0) {
+        // Check if there is a C override for this branch.
+        EvaluateFunc override = get_override_for_branch(branch);
+
+        if (override != NULL) {
+            Frame* newFrame = top_frame(context);
+            newFrame->override = true;
+
+            // By default, we'll set nextPc to finish this frame on the next iteration.
+            // The override func may change nextPc.
+            newFrame->nextPc = top_frame(context)->endPc;
+
+            // Call override
+            override((caStack*) context);
+
+            return;
+        }
     }
 
     Term* currentTerm = branch->get(frame->pc);
-    frame->nextPc = frame->pc + 1;
 
     if (currentTerm == NULL)
-        goto advance_pc;
+        return;
 
     // Certain functions must be handled in-place
     if (currentTerm->function == FUNCS.output) {
@@ -772,7 +781,7 @@ do_instruction:
         else
             circa_copy(in, out);
 
-        goto advance_pc;
+        return;
     } else if (currentTerm->function == FUNCS.loop_output) {
 
         caValue* in = find_stack_value_for_term(context, currentTerm->input(0), 0);
@@ -783,11 +792,11 @@ do_instruction:
 
         copy(in, list_append(out));
 
-        goto advance_pc;
+        return;
     }
 
     // Choose the branch to use for the next frame
-    nextBranch = choose_branch(context, currentTerm);
+    Branch* nextBranch = choose_branch(context, currentTerm);
 
     // if_block_choose_branch can cause error
     if (error_occurred(context))
@@ -795,7 +804,7 @@ do_instruction:
 
     // No branch, advance to next term.
     if (nextBranch == NULL || nextBranch->emptyEvaluation)
-        goto advance_pc;
+        return;
 
     // Push new frame
     push_frame(context, nextBranch);
@@ -834,39 +843,48 @@ do_instruction:
         destIndex++;
     }
 
-    // Special case for loops.
+    // Special case for for-loops.
     if (currentTerm->function == FUNCS.for_func) {
 
         start_for_loop((caStack*) context);
-
-        goto do_instruction;
+        return;
     }
-
-    // Check if there is a C override for this branch.
-    override = get_override_for_branch(top_frame(context)->branch);
-
-    if (override != NULL) {
-        Frame* newFrame = top_frame(context);
-        newFrame->override = true;
-
-        // By default, we'll set nextPc to finish this frame on the next iteration.
-        // The override func is welcome to change nextPc.
-        newFrame->nextPc = top_frame(context)->endPc;
-
-        // Call override
-        override((caStack*) context);
-
-        goto advance_pc;
-    }
-
-    // Otherwise, we'll start evaluating the new branch.
-    goto do_instruction;
-
-advance_pc:
-    frame = top_frame(context);
-    frame->pc = frame->nextPc;
-    goto do_instruction;
 }
+
+void run_interpreter(EvalContext* context)
+{
+    start_interpreter_session(context);
+
+    context->running = true;
+
+    while (context->running) {
+        step_interpreter(context);
+    }
+}
+
+void run_interpreter_step(EvalContext* context)
+{
+    start_interpreter_session(context);
+
+    context->running = true;
+    step_interpreter(context);
+    context->running = false;
+}
+
+void run_interpreter_steps(EvalContext* context, int steps)
+{
+    start_interpreter_session(context);
+
+    context->running = true;
+    step_interpreter(context);
+
+    while (context->running && (steps--) > 0) {
+        step_interpreter(context);
+    }
+
+    context->running = false;
+}
+
 
 } // namespace circa
 

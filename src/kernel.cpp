@@ -524,7 +524,8 @@ void Function__outputs(caStack* stack)
 
 void Function__contents(caStack* stack)
 {
-    set_branch(circa_output(stack, 0), function_get_contents(as_function(circa_input(stack, 0))));
+    Function* func = as_function(circa_input(stack, 0));
+    set_branch(circa_output(stack, 0), function_get_contents(func));
 }
 
 void make_interpreter(caStack* stack)
@@ -533,26 +534,69 @@ void make_interpreter(caStack* stack)
     gc_mark_object_referenced(&newContext->header);
     gc_set_object_is_root(&newContext->header, false);
 
-    set_pointer(circa_output(stack, 0), newContext);
+    set_pointer(circa_create_default_output(stack, 0), newContext);
 }
 
 void Interpreter__push_frame(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) circa_input(stack, 0);
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
 
+    Branch* branch = as_branch(circa_input(stack, 1));
+    ca_assert(branch != NULL);
+    caValue* inputs = circa_input(stack, 2);
+
+    push_frame_with_inputs(self, branch, inputs);
+}
+void Interpreter__pop_frame(caStack* stack)
+{
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    pop_frame(self);
 }
 void Interpreter__run(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) circa_input(stack, 0);
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    run_interpreter(self);
+}
+void Interpreter__run_steps(caStack* stack)
+{
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
     int steps = circa_int_input(stack, 0);
-
-    for (int i=0; i < steps; i++) {
-        // step_interpreter(self);
-    }
+    run_interpreter_steps(self, steps);
 }
 void Interpreter__frame(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) circa_input(stack, 0);
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    int index = circa_int_input(stack, 1);
+    Frame* frame = get_frame(self, index);
+
+    set_pointer(circa_create_default_output(stack, 0), frame);
+}
+void Interpreter__output(caStack* stack)
+{
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    int index = circa_int_input(stack, 1);
+
+    Frame* frame = top_frame(self);
+    Term* output = get_output_placeholder(frame->branch, index);
+    if (output == NULL)
+        set_null(circa_output(stack, 0));
+    else
+        copy(get_frame_register(frame, output->index), circa_output(stack, 0));
+}
+void Interpreter__toString(caStack* stack)
+{
+    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+
+    std::stringstream strm;
+    eval_context_print_multiline(strm, (EvalContext*) self);
+    set_string(circa_output(stack, 0), strm.str().c_str());
 }
 
 void String__char_at(caStack* stack)
@@ -1205,12 +1249,26 @@ void install_standard_library(Branch* kernel)
         {"Branch.list_configs", Branch__list_configs},
         {"Branch.functions", Branch__functions},
         {"Branch.terms", Branch__terms},
+
+        {"Frame.branch", Frame__branch},
+        {"Frame.register", Frame__register},
+        {"Frame.pc", Frame__pc},
+
         {"Function.name", Function__name},
         {"Function.input", Function__input},
         {"Function.inputs", Function__inputs},
         {"Function.output", Function__output},
         {"Function.outputs", Function__outputs},
         {"Function.contents", Function__contents},
+
+        {"make_interpreter", make_interpreter},
+        {"Interpreter.push_frame", Interpreter__push_frame},
+        {"Interpreter.pop_frame", Interpreter__pop_frame},
+        {"Interpreter.run", Interpreter__run},
+        {"Interpreter.run_steps", Interpreter__run_steps},
+        {"Interpreter.frame", Interpreter__frame},
+        {"Interpreter.output", Interpreter__output},
+        {"Interpreter.toString", Interpreter__toString},
 
         {"String.char_at", String__char_at},
         {"String.ends_with", String__ends_with},

@@ -88,14 +88,15 @@ def Function.output(_, int index) -> Term
 def Function.outputs(_) -> List
 def Function.contents(_) -> Branch
 
-def make_interpreter() -> Interpreter
-
 type Interpreter;
+def make_interpreter() -> Interpreter
 def Interpreter.push_frame(_, Branch, List inputs)
 def Interpreter.pop_frame(_)
-def Interpreter.run(_, int steps)
+def Interpreter.run(_)
+def Interpreter.run_steps(_, int steps)
 def Interpreter.frame(_, int depth) -> Frame
-def Interpreter.output(_) -> any
+def Interpreter.output(_, int index) -> any
+def Interpreter.toString(_) -> String
 
 def String.append(self :out, String right)
     self = concat(self, right)
