@@ -256,6 +256,11 @@ Term* branch_add_pack_state(Branch* branch)
 {
     TermList inputs;
     get_list_of_state_outputs(branch, branch->length(), &inputs);
+
+    // Don't create anything if there are no state outputs
+    if (inputs.length() == 0)
+        return NULL;
+
     return apply(branch, FUNCS.pack_state, inputs);
 }
 

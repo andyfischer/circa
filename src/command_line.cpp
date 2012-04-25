@@ -75,9 +75,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         if (string_eq(list_get(args, 0), "-break-on")) {
             String name;
-            set_string(&name, "$");
-            string_append(&name, list_get(args, 1));
-            DEBUG_BREAK_ON_TERM = atoi(as_cstring(&name));
+            DEBUG_BREAK_ON_TERM = atoi(as_cstring(list_get(args, 1)));
 
             list_remove_index(args, 0);
             list_remove_index(args, 0);

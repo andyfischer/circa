@@ -16,11 +16,18 @@ def fadein(Color c) -> Color
 
 type View {
     Point mouse
+    Branch mainScript
 }
 
 def create_view() -> View
     print('called create_view')
-    return create(View)
+
+    def test()
+        print('called test2')
+
+    view = create(View)
+    view.mainScript = branch_ref(test)
+    return view
 
 def View.onPaintEvent(self, Painter painter)
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)
@@ -35,6 +42,8 @@ def View.onPaintEvent(self, Painter painter)
     text = "Hello There"
     text = concat(self.mouse)
     painter.drawText([10 10 100 100] :none text)
+
+    self.mainScript.call()
 
 
 def View.onInputEvent(self :out, InputEvent event)

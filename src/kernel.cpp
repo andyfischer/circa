@@ -358,6 +358,8 @@ void Branch__get_static_errors(caStack* stack)
 void Branch__get_static_errors_formatted(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
 
     if (is_null(&branch->staticErrors))
         set_list(circa_output(stack, 0), 0);
@@ -372,6 +374,9 @@ void Branch__get_static_errors_formatted(caStack* stack)
 void Branch__call(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
+
     caValue* inputs = circa_input(stack, 1);
     push_frame_with_inputs((EvalContext*) stack, branch, inputs);
 }
