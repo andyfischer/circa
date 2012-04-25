@@ -1,0 +1,13 @@
+
+def myfunc(String str) -> String
+    return concat(str " worked")
+    
+
+def my_calling_func(String str)
+    s = myfunc(str)
+    print(s)
+
+br = branch_ref(my_calling_func)
+br.link(branch_ref(myfunc))
+
+br.call("call")

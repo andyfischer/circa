@@ -369,10 +369,11 @@ void Branch__get_static_errors_formatted(caStack* stack)
         format_static_error(circa_index(errors, i), circa_index(out, i));
 }
 
-void Branch__evaluate(caStack* stack)
+void Branch__call(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
-    push_frame((EvalContext*) stack, branch);
+    caValue* inputs = circa_input(stack, 1);
+    push_frame_with_inputs((EvalContext*) stack, branch, inputs);
 }
 
 // Reflection
@@ -467,16 +468,24 @@ void Branch__statements(caStack* stack)
             circa_set_term(circa_append(out), (caTerm*) branch->get(i));
 }
 
+void Branch__link(caStack* stack)
+{
+    // TODO
+}
+
 void Frame__branch(caStack* stack)
 {
+    // TODO
 }
 
 void Frame__register(caStack* stack)
 {
+    // TODO
 }
 
 void Frame__pc(caStack* stack)
 {
+    // TODO
 }
 
 void Function__name(caStack* stack)
@@ -1238,7 +1247,7 @@ void install_standard_library(Branch* kernel)
         {"Branch.output", Branch__output},
         {"Branch.outputs", Branch__outputs},
         {"Branch.dump", Branch__dump},
-        {"Branch.evaluate", Branch__evaluate},
+        {"Branch.call", Branch__call},
         {"Branch.file_signature", Branch__file_signature},
         {"Branch.statements", (EvaluateFunc) Branch__statements},
         {"Branch.format_source", Branch__format_source},
@@ -1249,6 +1258,7 @@ void install_standard_library(Branch* kernel)
         {"Branch.list_configs", Branch__list_configs},
         {"Branch.functions", Branch__functions},
         {"Branch.terms", Branch__terms},
+        {"Branch.link", Branch__link},
 
         {"Frame.branch", Frame__branch},
         {"Frame.register", Frame__register},

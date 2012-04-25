@@ -67,7 +67,7 @@ def Branch.format_source(_) -> StyledSource
 def Branch.has_static_error(_) -> bool
 def Branch.get_static_errors(_) -> List
 def Branch.get_static_errors_formatted(_) -> List
-def Branch.evaluate(_)
+def Branch.call(_, any inputs :multiple)
 def Branch.terms(_) -> List
 def Branch.get_term(_, int index) -> Term
 def Branch.list_configs(_) -> List
@@ -75,6 +75,7 @@ def Branch.functions(_) -> List
 def Branch.file_signature(_) -> any
 def Branch.statements(_) -> List
 def Branch.dump(_)
+def Branch.link(_, Branch lib)
 
 type Frame;
 def Frame.branch(_) -> Branch
