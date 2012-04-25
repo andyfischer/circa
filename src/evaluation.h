@@ -31,11 +31,8 @@ struct EvalContext
 {
     CircaObject header;
 
-    // Persistent state
+    // Top-level state (deprecated)
     Value state;
-
-    // Intra-program messages
-    Dict messages;
 
     // Current execution stack
     int numFrames;

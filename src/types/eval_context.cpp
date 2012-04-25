@@ -17,9 +17,6 @@ namespace eval_context_t {
 
         set_string(&relIdent, "state");
         callback(&context->state, &relIdent, visitContext);
-
-        set_string(&relIdent, "messages");
-        callback(&context->messages, &relIdent, visitContext);
     }
 
     void setup_type(Type* type)
