@@ -641,12 +641,12 @@ Branch* if_block_choose_branch(Stack* context, Term* term)
     return NULL;
 }
 
-Branch* dynamic_method_choose_branch(caStack* stack, Term* term)
+Branch* dynamic_method_choose_branch(Stack* stack, Term* term)
 {
-    caValue* object = find_stack_value_for_term((Stack*) stack, term, 0);
+    caValue* object = find_stack_value_for_term(stack, term, 0);
     std::string functionName = term->stringPropOptional("syntax:functionName", "");
 
-    Term* method = find_method((Branch*) top_branch((Stack*) stack),
+    Term* method = find_method((Branch*) top_branch(stack),
         (Type*) circa_type_of(object), functionName.c_str());
 
     if (method != NULL)
@@ -897,9 +897,9 @@ extern "C" {
 
 caStack* circa_alloc_stack(caWorld* world)
 {
-    Stack* context = new Stack();
-    context->world = world;
-    return (caStack*) context;
+    Stack* stack = new Stack();
+    stack->world = world;
+    return stack;
 }
 
 void circa_dealloc_stack(caStack* stack)
@@ -909,41 +909,37 @@ void circa_dealloc_stack(caStack* stack)
 
 bool circa_has_error(caStack* stack)
 {
-    Stack* context = (Stack*) stack;
-    return error_occurred(context);
+    return error_occurred(stack);
 }
 void circa_clear_error(caStack* stack)
 {
-    Stack* context = (Stack*) stack;
-    clear_error(context);
+    clear_error(stack);
 }
 void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Branch* branch = function_contents((Function*) func);
-    Stack* context = (Stack*) stack;
     
     set_branch_in_progress(branch, false);
     
-    push_frame_with_inputs(context, branch, inputs);
+    push_frame_with_inputs(stack, branch, inputs);
     
-    run_interpreter(context);
+    run_interpreter(stack);
     
     // Save outputs to the user's list.
-    fetch_stack_outputs((Stack*) stack, inputs);
+    fetch_stack_outputs(stack, inputs);
     
-    if (!error_occurred(context)) {
-        pop_frame(context);
+    if (!error_occurred(stack)) {
+        pop_frame(stack);
     }
 }
 
 void circa_push_function(caStack* stack, caFunction* func)
 {
     Branch* branch = function_contents((Function*) func);
-    Stack* context = (Stack*) stack;
     
     set_branch_in_progress(branch, false);
     
-    push_frame(context, branch);
+    push_frame(stack, branch);
 }
 
 bool circa_push_function_by_name(caStack* stack, const char* name)
@@ -962,8 +958,7 @@ bool circa_push_function_by_name(caStack* stack, const char* name)
 
 caValue* circa_frame_input(caStack* stack, int index)
 {
-    Stack* context = (Stack*) stack;
-    Frame* top = top_frame(context);
+    Frame* top = top_frame(stack);
     
     if (top == NULL)
         return NULL;
@@ -976,8 +971,7 @@ caValue* circa_frame_input(caStack* stack, int index)
 
 caValue* circa_frame_output(caStack* stack, int index)
 {
-    Stack* context = (Stack*) stack;
-    Frame* top = top_frame(context);
+    Frame* top = top_frame(stack);
 
     int realIndex = top->branch->length() - index - 1;
 
@@ -989,26 +983,26 @@ caValue* circa_frame_output(caStack* stack, int index)
 
 void circa_run(caStack* stack)
 {
-    run_interpreter((Stack*) stack);
+    run_interpreter(stack);
 }
 
 void circa_pop(caStack* stack)
 {
-    pop_frame((Stack*) stack);
+    pop_frame(stack);
 }
 
 caBranch* circa_top_branch(caStack* stack)
 {
-    return (caBranch*) top_frame((Stack*) stack)->branch;
+    return (caBranch*) top_frame(stack)->branch;
 }
 
 caValue* circa_input(caStack* stack, int index)
 {
-    return get_input((Stack*) stack, index);
+    return get_input(stack, index);
 }
 int circa_num_inputs(caStack* stack)
 {
-    return num_inputs((Stack*) stack);
+    return num_inputs(stack);
 }
 int circa_int_input(caStack* stack, int index)
 {
@@ -1031,13 +1025,13 @@ const char* circa_string_input(caStack* stack, int index)
 
 caValue* circa_output(caStack* stack, int index)
 {
-    return get_output((Stack*) stack, index);
+    return get_output(stack, index);
 }
 
 void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
-    raise_error((Stack*) stack);
+    raise_error(stack);
 }
 
 caTerm* circa_caller_input_term(caStack* stack, int index)
@@ -1047,7 +1041,7 @@ caTerm* circa_caller_input_term(caStack* stack, int index)
 
 caBranch* circa_caller_branch(caStack* stack)
 {
-    Frame* frame = get_frame((Stack*) stack, 1);
+    Frame* frame = get_frame(stack, 1);
     if (frame == NULL)
         return NULL;
     return frame->branch;
@@ -1064,8 +1058,7 @@ caTerm* circa_caller_term(caStack* stack)
 
 void circa_print_error_to_stdout(caStack* stack)
 {
-    Stack* context = (Stack*) stack;
-    print_error_stack(context, std::cout);
+    print_error_stack(stack, std::cout);
 }
 
 } // extern "C"

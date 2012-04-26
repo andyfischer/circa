@@ -13,10 +13,10 @@ namespace dynamic_call_function {
         circa_swap(circa_input(stack, 1), &inputs);
 
         // Pop calling frame
-        pop_frame((Stack*) stack);
+        pop_frame(stack);
 
         // Replace it with the callee frame
-        push_frame_with_inputs((Stack*) stack, function_contents(func), &inputs);
+        push_frame_with_inputs(stack, function_contents(func), &inputs);
 
 #if 0 // Old version
         Term* function = as_function_pointer(INPUT(0));

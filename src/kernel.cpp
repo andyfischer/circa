@@ -191,10 +191,10 @@ void dynamic_call_func(caStack* stack)
     }
 
     // Pop calling frame
-    pop_frame((Stack*) stack);
+    pop_frame(stack);
 
     // Replace it with the callee frame
-    push_frame_with_inputs((Stack*) stack, (Branch*) branch, &inputs);
+    push_frame_with_inputs(stack, (Branch*) branch, &inputs);
 }
 
 void dynamic_method_call(caStack* stack)
@@ -207,7 +207,7 @@ void dynamic_method_call(caStack* stack)
     std::string functionName = term->stringPropOptional("syntax:functionName", "");
 
     // Find and dispatch method
-    Term* method = find_method((Branch*) top_branch((Stack*) stack),
+    Term* method = find_method((Branch*) top_branch(stack),
         (Type*) circa_type_of(object), functionName.c_str());
 
     if (method != NULL) {
@@ -215,8 +215,8 @@ void dynamic_method_call(caStack* stack)
         Value inputs;
         swap(args, &inputs);
 
-        pop_frame((Stack*) stack);
-        push_frame_with_inputs((Stack*) stack, function_contents(method), &inputs);
+        pop_frame(stack);
+        push_frame_with_inputs(stack, function_contents(method), &inputs);
         return;
     }
 
@@ -375,7 +375,7 @@ void Branch__call(caStack* stack)
         return circa_output_error(stack, "NULL branch");
 
     caValue* inputs = circa_input(stack, 1);
-    push_frame_with_inputs((Stack*) stack, branch, inputs);
+    push_frame_with_inputs(stack, branch, inputs);
 }
 
 // Reflection
@@ -609,7 +609,7 @@ void Interpreter__toString(caStack* stack)
     ca_assert(self != NULL);
 
     std::stringstream strm;
-    eval_context_print_multiline(strm, (Stack*) self);
+    eval_context_print_multiline(strm, self);
     set_string(circa_output(stack, 0), strm.str().c_str());
 }
 

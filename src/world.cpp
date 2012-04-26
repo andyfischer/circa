@@ -43,7 +43,7 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     Branch* branch = as_branch(list_get(actor, 1));
     refresh_script(branch);
 
-    push_frame((Stack*) stack, branch);
+    push_frame(stack, branch);
     copy(message, circa_input(stack, 0));
 
     // TODO: state
