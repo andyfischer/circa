@@ -5,8 +5,8 @@ int main(int argc, char** argv)
 {
     caWorld* world = circa_initialize();
 
-    circa_actor_new_from_file(world, "ActorA", "ActorA.ca");
-    circa_actor_new_from_file(world, "ActorB", "ActorB.ca");
+    circa_actor_new_from_file(world, "ActorA", "tests/embed/ActorA.ca");
+    circa_actor_new_from_file(world, "ActorB", "tests/embed/ActorB.ca");
 
     caValue* msg = circa_alloc_value();
     circa_set_int(msg, 0);

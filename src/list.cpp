@@ -311,13 +311,21 @@ bool list_empty(caValue* value)
 
 void list_slice(caValue* original, int start, int end, caValue* result)
 {
+    int originalCount = list_length(original);
+
     if (end < 0)
-        end = list_length(original) - end;
+        end = originalCount - end;
 
-    int count = end - start;
-    set_list(result, count);
+    if (end > originalCount)
+        end = originalCount;
 
-    for (int i=0; i < count; i++)
+    int resultCount = end - start;
+    if (resultCount < 0)
+        resultCount = 0;
+
+    set_list(result, resultCount);
+
+    for (int i=0; i < resultCount; i++)
         copy(list_get(original, i + start), list_get(result, i));
 }
 

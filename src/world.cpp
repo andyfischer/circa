@@ -15,9 +15,9 @@
 
 namespace circa {
 
-caWorld* alloc_world()
+World* alloc_world()
 {
-    caWorld* world = (caWorld*) malloc(sizeof(world));
+    World* world = (World*) malloc(sizeof(*world));
 
     initialize_null(&world->actorList);
     set_list(&world->actorList, 0);
@@ -27,7 +27,7 @@ caWorld* alloc_world()
     return world;
 }
 
-caValue* find_actor(caWorld* world, const char* name)
+caValue* find_actor(World* world, const char* name)
 {
     caValue* actors = &world->actorList;
     for (int i=0; i < list_length(actors); i++) {
@@ -47,6 +47,8 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     copy(message, circa_input(stack, 0));
 
     // TODO: state
+
+    run_interpreter(stack);
 }
 
 } // namespace circa

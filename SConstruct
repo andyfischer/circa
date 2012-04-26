@@ -121,3 +121,12 @@ unit_tester_env.Append(CPPPATH=['src','tests/internal'])
 unit_tester = unit_tester_env.Program('build/circa_test',
     ['tests/internal/' + s for s in list_source_files('tests/internal')],
     LIBS=circa_libs['debug'])
+
+# Embedder tests
+embedder_test_env = DEBUG.Clone()
+for source in list_source_files('tests/embed'):
+    app_name = source
+    if source.endswith('.cpp'):
+        app_name = app_name[:-4]
+    embedder_test_env.Program('build/embed/' + app_name,
+        ['tests/embed/' + source], LIBS=circa_libs['debug'])

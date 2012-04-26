@@ -1,0 +1,4 @@
+
+msg = input()
+
+print('Actor A received message: ' msg)

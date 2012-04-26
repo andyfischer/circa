@@ -8,7 +8,10 @@ namespace input_explicit_function {
 
     void input_explicit(caStack* stack)
     {
-        copy(circa_input(stack, 0), circa_output(stack, 0));
+        Term* inputTerm = (Term*) circa_term_get_input(circa_caller_term(stack), 0);
+        caValue* input = find_stack_value_for_term(stack, inputTerm, 0);
+
+        copy(input, circa_output(stack, 0));
     }
 
     void postCompile(Term* term)

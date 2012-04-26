@@ -24,19 +24,20 @@ extern "C" {
 
 // a World holds miscellaneous shared runtime information. A process should create one
 // World that is used across the program.
-//
-// (NOTE: Currently, no more than one World can be created per process due to the use of
-// statics, this will be fixed in the future).
-typedef struct caWorld caWorld;
 
 // a Stack holds the interpreter's current state, including a list of frames (activation
 // records). Each Stack corresponds to one lightweight thread (not OS thread).
 
 #ifdef __cplusplus
-namespace circa { struct Stack; }
+namespace circa {
+    struct Stack;
+    struct World;
+}
 typedef circa::Stack caStack;
+typedef circa::World caWorld;
 
 #else
+typedef struct caWorld caWorld;
 typedef struct caStack caStack;
 #endif
 

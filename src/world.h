@@ -2,18 +2,18 @@
 
 #pragma once
 
-struct caWorld {
+namespace circa {
+
+struct World {
     circa::Value actorList;
     caStack* mainStack;
 
 protected:
     // Disallow C++ construction
-    caWorld();
-    ~caWorld();
+    World();
+    ~World();
 };
 
-namespace circa {
-
-caWorld* alloc_world();
+World* alloc_world();
 
 } // namespace circa
