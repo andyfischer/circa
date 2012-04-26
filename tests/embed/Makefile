@@ -6,3 +6,6 @@ sample1: sample1.cpp
 
 reload_file: reload_file.c
 	g++ $(CFLAGS) -o reload_file reload_file.c
+
+actors: actors.cpp
+	g++ $(CFLAGS) -o actors actors.cpp

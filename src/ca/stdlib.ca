@@ -1,10 +1,6 @@
 
 -- Builtin functions
 
--- Manual declaration of inputs & outputs (for top level branches)
-def input() -> any
-def output(any)
-
 def length(List) -> int
     "Return the number of items in the given list"
 

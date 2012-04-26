@@ -1226,6 +1226,10 @@ void bootstrap_kernel()
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
 }
 
+void explicitInput_postCompile(Term* term)
+{
+}
+
 void install_standard_library(Branch* kernel)
 {
     // Parse the stdlib script
@@ -1327,8 +1331,7 @@ void install_standard_library(Branch* kernel)
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.length = kernel->get("length");
     FUNCS.type = kernel->get("type");
-    FUNCS.input_explicit = kernel->get("input");
-    FUNCS.output_explicit = kernel->get("input");
+    FUNCS.output_explicit = kernel->get("output");
 }
 
 EXPORT caWorld* circa_initialize()

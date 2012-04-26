@@ -31,8 +31,9 @@ caValue* find_actor(caWorld* world, const char* name)
 {
     caValue* actors = &world->actorList;
     for (int i=0; i < list_length(actors); i++) {
-        if (string_eq(list_get(actors, 0), name))
-            return list_get(actors, 0);
+        caValue* actor = list_get(actors, i);
+        if (string_eq(list_get(actor, 0), name))
+            return actor;
     }
     return NULL;
 }

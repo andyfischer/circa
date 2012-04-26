@@ -58,11 +58,12 @@ struct Dict : Value
     void iteratorDelete(caValue* iterator);
     bool iteratorFinished(caValue* iterator);
 
-    void setString(const char* key, const char* value);
     const char* getString(const char* key, const char* defaultValue);
-    void setInt(const char* key, int value);
+    void setString(const char* key, const char* value);
     int getInt(const char* key, int defaultValue);
+    void setInt(const char* key, int value);
     bool getBool(const char* key, bool defaultValue);
+    void setBool(const char* key, bool value);
 
     static Dict* checkCast(caValue* value);
 

@@ -581,6 +581,11 @@ bool Dict::getBool(const char* key, bool defaultValue)
         return as_bool(val);
     return defaultValue;
 }
+void Dict::setBool(const char* key, bool value)
+{
+    caValue* dest = insert(key);
+    set_bool(dest, value);
+}
 
 bool is_dict(caValue* value)
 {
