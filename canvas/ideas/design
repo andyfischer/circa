@@ -101,32 +101,5 @@ part of the program.
 
 So rather than reach that point, let's codify the message-passing.
 
-Each Interpreter has a list of Actors
 
-Each Actor has:
-  a reference to a code module
-  a list of incoming messages
-  a state value
-
-We can trigger an Actor:
-  Check the list of incoming messages
-    If none, do nothing (maybe still do something?)
-  Pick the first message
-  Evaluate the code module, using the first message as input. Pass in state too.
-    During evaluation, the module may trigger other messages
-  Save the resulting state.
-
-Different ways to trigger an actor:
-  Process only the first message
-  Process every message
-  Process first, and trigger even if empty
-  Process every, and trigger even if empty
-
-What if we want an actor's response immediately?
-  Messages should optionally have a reply-to?
-  call_immediately function
-    Trigger Actor immediately
-    Uses our message as input (disregard queued messages)
-    If an outgoing message is a reply, it should be used as the call_immediately
-    Other outgoing messages should proceed as normal
-  This support could be v2? We can get by with only deferred messages
+Continued in /notes/actors

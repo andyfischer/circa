@@ -225,14 +225,29 @@ static void branch_update_existing_pack_state_calls(Branch* branch)
         if (term == NULL)
             continue;
 
-        if (term->function != FUNCS.pack_state)
-            continue;
+        if (term->function == FUNCS.pack_state) {
+            // Update the inputs for this pack_state call
+            TermList inputs;
+            get_list_of_state_outputs(branch, i, &inputs);
 
-        // Update the inputs for this pack_state call
-        TermList inputs;
-        get_list_of_state_outputs(branch, i, &inputs);
+            set_inputs(term, inputs);
+        }
 
-        set_inputs(term, inputs);
+        if (term->function == FUNCS.return_func) {
+            // Check if we need to add a pack_state call
+            if (term->input(1) == NULL) {
+                TermList inputs;
+                get_list_of_state_outputs(branch, i, &inputs);
+                if (inputs.length() != 0) {
+                    Term* pack_state = apply(branch, FUNCS.pack_state, inputs);
+                    move_before(pack_state, term);
+                    set_input(term, 1, pack_state);
+
+                    // Advance i to compensate for the term just added
+                    i++;
+                }
+            }
+        }
     }
 }
 

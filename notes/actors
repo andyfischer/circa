@@ -1,0 +1,79 @@
+
+Actor model
+
+Each Interpreter has a list of Actors
+
+Each Actor has:
+  a unique identifier
+  a branch reference
+    Branch has file origin information
+  a list of incoming messages (their 'queue')
+  a state value
+ 
+Each Message has:
+  a reply-to address (identifier of sending Actor)
+  a payload
+
+We can 'trigger' an Actor:
+  Check the list of incoming messages
+    If none, do nothing (maybe still do something?)
+  Pick the first message
+  Evaluate the code module, using the first message as input. Pass in state too.
+    During evaluation, the module may trigger other messages
+  Save the resulting state.
+
+  Future: Allow for a special input receiver where the actor can process the whole
+  input list at once
+
+Different ways to trigger an actor:
+  Process only the first message
+  Process every message
+  Process first, and trigger even if empty
+  Process every, and trigger even if empty
+
+  v1: Process every message, no trigger if empty
+
+What if we want an actor's response immediately?
+  Messages should optionally have a reply-to?
+  call_immediately function
+    Trigger Actor immediately
+    Uses our message as input (disregard queued messages)
+    If an outgoing message is a reply, it should be used as the call_immediately
+    Other outgoing messages should proceed as normal
+
+Locality
+  Some Actor models enforce locality, where an actor can only send to mailboxes that
+  have been passed to it.
+  Not a concern to us, allow sending using global names.
+
+Where to store actor list?
+  Need to support introspection, where we can look at the current actors and their state
+  Choices are
+    On the World
+      So, the Actor list is shared across the whole process. This seems too global.
+      Maybe encouraging multiple worlds is okay. It's just a "zone".
+    On the EvalContext
+      Does it make sense to conflate the stack with the actor list?
+      When would a separate EvalContext be created?
+        When we want to run something in a separate "zone", where it won't affect
+          what we are doing.
+        For coroutines (each coroutine gets its own Stack)
+          Maybe we want each Actor to be its own coroutine and run in an infinite loop?
+            This will cause unrepeatable-initialization problems
+        For threads (each thread gets its own Stack)
+    Separately
+      Unnecessary complexity?
+
+Spec
+----
+
+Add "actors" list to World
+
+API:
+  circa_actor_new_from_file(Interpreter, Identifier, Filename)
+  circa_actor_send_message(Interpreter, Identifier, Message)
+  circa_actor_run(Interpreter, Identifier)
+
+Bug fixes
+  Fix the explicit input() func so that it properly creates an input_placeholder
+
