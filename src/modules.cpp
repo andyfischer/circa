@@ -146,7 +146,7 @@ void circa_run_module(caStack* stack, const char* moduleName)
 {
     circa::Branch* branch = nested_contents(get_global(moduleName));
 
-    evaluate_branch((circa::EvalContext*) stack, branch);
+    evaluate_branch((circa::Stack*) stack, branch);
 }
 
 void circa_add_module_search_path(caWorld* world, const char* path)

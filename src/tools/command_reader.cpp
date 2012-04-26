@@ -145,7 +145,7 @@ void do_file_command(List* args, caValue* reply)
     if (dontRunScript)
         return;
     
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     if (printState)

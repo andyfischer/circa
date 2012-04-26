@@ -5,7 +5,7 @@
 namespace circa {
 namespace include_function {
 
-    bool load_script(EvalContext* cxt, Term* caller, const std::string& filename)
+    bool load_script(Stack* cxt, Term* caller, const std::string& filename)
     {
         Branch* contents = nested_contents(caller);
 
@@ -33,7 +33,7 @@ namespace include_function {
 
     CA_FUNCTION(evaluate_include)
     {
-        EvalContext* context = CONTEXT;
+        Stack* context = CONTEXT;
         Branch* contents = nested_contents(CALLER);
 
         bool fileChanged = load_script(CONTEXT, CALLER, STRING_INPUT(0));

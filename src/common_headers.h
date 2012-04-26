@@ -37,7 +37,7 @@ struct BrokenLinkList;
 struct CastResult;
 struct CircaObject;
 struct Dict;
-struct EvalContext;
+struct Stack;
 struct FeedbackOperation;
 struct Function;
 struct GCReferenceList;

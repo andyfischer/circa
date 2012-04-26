@@ -5,14 +5,14 @@
 namespace circa {
 namespace eval_context_t {
 
-    EvalContext* get(caValue* value)
+    Stack* get(caValue* value)
     {
-        return ((EvalContext*) value->value_data.ptr);
+        return ((Stack*) value->value_data.ptr);
     }
 
     void visitHeap(Type*, caValue* value, Type::VisitHeapCallback callback, caValue* visitContext)
     {
-        EvalContext* context = get(value);
+        Stack* context = get(value);
         Value relIdent;
 
         set_string(&relIdent, "state");
@@ -21,7 +21,7 @@ namespace eval_context_t {
 
     void setup_type(Type* type)
     {
-        type->name = name_from_string("EvalContext");
+        type->name = name_from_string("Stack");
         type->visitHeap = visitHeap;
     }
 }

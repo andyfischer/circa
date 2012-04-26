@@ -70,7 +70,7 @@ void test_recursion()
 
 void subroutine_stateful_term()
 {
-    EvalContext context;
+    Stack context;
     Branch branch;
     branch.compile("def mysub() { state a = 0.0 a += 1 }");
 
@@ -105,7 +105,7 @@ void test_recursion_with_state()
 
     test_assert(&branch);
 
-    EvalContext context;
+    Stack context;
 
     internal_debug_function::oracle_clear();
     internal_debug_function::oracle_send(10);
@@ -175,8 +175,8 @@ void bug_with_return()
     Term* input = branch.compile("b = true");
     Term* f = branch.compile("f(b)");
 
-    // there once was a bug where EvalContext.interruptSubroutine was not reset
-    EvalContext context;
+    // there once was a bug where Stack.interruptSubroutine was not reset
+    Stack context;
     evaluate_branch(&context, &branch);
     test_assert(is_int(f));
     test_assert(f->asInt() == 1);

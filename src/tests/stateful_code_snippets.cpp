@@ -15,7 +15,7 @@ void test_snippet(std::string const& source)
     if (test_fail_on_static_error(&branch))
         return;
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     if (test_fail_on_runtime_error(context))
@@ -43,7 +43,7 @@ void test_trimmed_state(std::string const& source, std::string const& dest,
     if (test_fail_on_static_error(&sourceBranch))
         return;
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &sourceBranch);
 
     if (test_fail_on_runtime_error(context))

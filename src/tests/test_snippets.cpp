@@ -69,7 +69,7 @@ void test_snippet(std::string codeStr, std::string assertionsStr)
         return;
     }
 
-    EvalContext result;
+    Stack result;
     evaluate_save_locals(&result, code);
 
     if (result.errorOccurred) {
@@ -148,7 +148,7 @@ void test_snippet_runtime_error(std::string const& str)
         return;
     }
 
-    EvalContext result;
+    Stack result;
     evaluate_branch(&result, &code);
 
     if (!result.errorOccurred) {

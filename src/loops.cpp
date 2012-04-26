@@ -267,7 +267,7 @@ void for_loop_fix_state_input(Branch* contents)
 
 CA_FUNCTION(start_for_loop)
 {
-    EvalContext* context = CONTEXT;
+    Stack* context = CONTEXT;
 
     caValue* inputList = INPUT(0);
     int inputListLength = inputList->numElements();
@@ -310,7 +310,7 @@ CA_FUNCTION(start_for_loop)
     // Interpreter will run the contents of the branch
 }
 
-void for_loop_finish_iteration(EvalContext* context)
+void for_loop_finish_iteration(Stack* context)
 {
     Frame* frame = top_frame(context);
     Branch* contents = frame->branch;
@@ -344,7 +344,7 @@ void for_loop_finish_iteration(EvalContext* context)
     frame->nextPc = 0;
 }
 
-void for_loop_finish_frame(EvalContext* context)
+void for_loop_finish_frame(Stack* context)
 {
     for_loop_finish_iteration(context);
 }
@@ -372,7 +372,7 @@ void finish_while_loop(Term* whileTerm)
 
 CA_FUNCTION(evaluate_unbounded_loop)
 {
-    EvalContext* context = CONTEXT;
+    Stack* context = CONTEXT;
     Branch* contents = nested_contents(CALLER);
 
     // Check for zero evaluations

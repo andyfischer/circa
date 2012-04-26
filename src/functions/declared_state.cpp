@@ -27,10 +27,10 @@ namespace declared_state_function {
 
         if (contents->length() > 0) {
             // Remove the frame made for this call
-            pop_frame((EvalContext*) stack);
+            pop_frame((Stack*) stack);
 
             // Call the initializer instead
-            push_frame((EvalContext*) stack, nested_contents(caller));
+            push_frame((Stack*) stack, nested_contents(caller));
             return;
         }
 

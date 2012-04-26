@@ -150,7 +150,7 @@ void statically_infer_result(Term* term, caValue* result)
     if (is_value(resultTerm))
         copy(term_value(resultTerm), result);
     else {
-        EvalContext context;
+        Stack context;
         evaluate_minimum(&context, resultTerm, result);
     }
 }

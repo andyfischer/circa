@@ -265,7 +265,7 @@ void circa_func_set_evaluate(caFunction* func, caEvaluateFunc evaluate)
 
 void circa_dump_s(caStack* stack)
 {
-    dump((EvalContext*) stack);
+    dump((Stack*) stack);
 }
 
 void circa_dump_b(caBranch* branch)

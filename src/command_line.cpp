@@ -170,7 +170,7 @@ int run_command_line(caWorld* world, caValue* args)
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
 
-        EvalContext context;
+        Stack context;
 
         while (true) {
             if (error_occurred(&context)) {
@@ -329,7 +329,7 @@ int run_command_line(caWorld* world, caValue* args)
     if (dontRunScript)
         return 0;
 
-    EvalContext context;
+    Stack context;
 
     push_frame(&context, main_branch);
 

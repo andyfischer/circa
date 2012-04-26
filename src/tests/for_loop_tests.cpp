@@ -96,7 +96,7 @@ void test_rewrite_input_list()
 void test_state_simple()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
 
     branch.compile("for i in [1 2 3] { state s = i }");
 
@@ -105,7 +105,7 @@ void test_state_simple()
 
     branch.clear();
 
-    EvalContext context2;
+    Stack context2;
 
     branch.compile("l = [1 2 3]; for i in @l { state s = 0; s += i }");
 
@@ -120,7 +120,7 @@ void test_state_simple()
 void test_state_nested()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
 
     branch.compile("for a in [1 2] { for b in [3 4] { for c in [5 6] { state s = c } } }");
     evaluate_branch(&context, &branch);

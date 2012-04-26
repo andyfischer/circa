@@ -9,7 +9,7 @@ void test_error_message()
 {
     Branch branch;
     branch.compile("assert(false)");
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
     test_assert(context.errorOccurred);
     test_equals(context_get_error_message(&context), "Assert failed");

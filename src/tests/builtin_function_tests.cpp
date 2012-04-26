@@ -46,7 +46,7 @@ void test_float()
 void test_do_once()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
 
     Term* x = branch.compile("x = 1");
     Term* t = branch.compile("do_once()");
@@ -69,7 +69,7 @@ void test_do_once()
 void test_changed()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
     Term* x = branch.compile("x = 5");
     Term* changed = branch.compile("changed(x)");
 
@@ -95,7 +95,7 @@ void test_delta()
     Term* i = branch.compile("i = 0");
     Term* delta = branch.compile("delta(i)");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_assert(is_float(delta));
@@ -122,7 +122,7 @@ void test_delta()
 void test_message_passing()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
     Term* inbox = branch.compile("inbox = receive('inbox_name')");
     Term* send = branch.compile("send('inbox_name', 1)");
 
@@ -169,7 +169,7 @@ void test_message_passing2()
         "  last_output = s\n"
         "send_func(2)\n");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_equals(&context.state, "{last_output: 1}");

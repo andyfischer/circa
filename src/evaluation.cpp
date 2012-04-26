@@ -22,7 +22,7 @@
 
 namespace circa {
 
-EvalContext::EvalContext()
+Stack::Stack()
  : numFrames(0),
    stack(NULL),
    running(false),
@@ -32,7 +32,7 @@ EvalContext::EvalContext()
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
 
-EvalContext::~EvalContext()
+Stack::~Stack()
 {
     // clear error so that pop_frame doesn't complain about losing an errored frame.
     clear_error(this);
@@ -49,9 +49,9 @@ void eval_context_list_references(CircaObject* object, GCReferenceList* list, GC
     // todo
 }
 
-void eval_context_print_multiline(std::ostream& out, EvalContext* context)
+void eval_context_print_multiline(std::ostream& out, Stack* context)
 {
-    out << "[EvalContext " << context << "]" << std::endl;
+    out << "[Stack " << context << "]" << std::endl;
     for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
         Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
         Branch* branch = frame->branch;
@@ -92,23 +92,23 @@ void eval_context_print_multiline(std::ostream& out, EvalContext* context)
 
 void eval_context_setup_type(Type* type)
 {
-    type->name = name_from_string("EvalContext");
+    type->name = name_from_string("Stack");
     type->gcListReferences = eval_context_list_references;
 }
 
-Frame* get_frame(EvalContext* context, int depth)
+Frame* get_frame(Stack* context, int depth)
 {
     ca_assert(depth >= 0);
     ca_assert(depth < context->numFrames);
     return &context->stack[context->numFrames - 1 - depth];
 }
-Frame* get_frame_from_bottom(EvalContext* context, int index)
+Frame* get_frame_from_bottom(Stack* context, int index)
 {
     ca_assert(index >= 0);
     ca_assert(index < context->numFrames);
     return &context->stack[index];
 }
-Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
+Frame* push_frame(Stack* context, Branch* branch, List* registers)
 {
     context->numFrames++;
     context->stack = (Frame*) realloc(context->stack, sizeof(Frame) * context->numFrames);
@@ -128,12 +128,12 @@ Frame* push_frame(EvalContext* context, Branch* branch, List* registers)
 
     return top;
 }
-Frame* push_frame(EvalContext* context, Branch* branch)
+Frame* push_frame(Stack* context, Branch* branch)
 {
     List registers;
     return push_frame(context, branch, &registers);
 }
-void pop_frame(EvalContext* context)
+void pop_frame(Stack* context)
 {
     Frame* top = top_frame(context);
 
@@ -145,7 +145,7 @@ void pop_frame(EvalContext* context)
     context->numFrames--;
 }
 
-void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* inputs)
+void push_frame_with_inputs(Stack* context, Branch* branch, caValue* inputs)
 {
     // Fetch inputs and start preparing the new stack frame.
     List registers;
@@ -177,7 +177,7 @@ void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* input
     push_frame(context, branch, &registers);
 }
 
-void fetch_stack_outputs(EvalContext* context, caValue* outputs)
+void fetch_stack_outputs(Stack* context, caValue* outputs)
 {
     Frame* top = top_frame(context);
 
@@ -192,7 +192,7 @@ void fetch_stack_outputs(EvalContext* context, caValue* outputs)
     }
 }
 
-void finish_frame(EvalContext* context)
+void finish_frame(Stack* context)
 {
     Frame* top = top_frame(context);
     Branch* finishedBranch = top->branch;
@@ -226,13 +226,13 @@ void finish_frame(EvalContext* context)
     parentFrame->pc = parentFrame->nextPc;
 }
 
-Frame* top_frame(EvalContext* context)
+Frame* top_frame(Stack* context)
 {
     if (context->numFrames == 0)
         return NULL;
     return get_frame(context, 0);
 }
-Branch* top_branch(EvalContext* context)
+Branch* top_branch(Stack* context)
 {
     Frame* frame = top_frame(context);
     if (frame == NULL)
@@ -240,13 +240,13 @@ Branch* top_branch(EvalContext* context)
     return frame->branch;
 }
 
-void reset_stack(EvalContext* context)
+void reset_stack(Stack* context)
 {
     while (context->numFrames > 0)
         pop_frame(context);
 }
 
-void evaluate_single_term(EvalContext* context, Term* term)
+void evaluate_single_term(Stack* context, Term* term)
 {
     Frame* frame = push_frame(context, term->owningBranch);
     frame->pc = term->index;
@@ -268,7 +268,7 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
     }
 }
 
-void insert_top_level_state(EvalContext* context, Branch* branch)
+void insert_top_level_state(Stack* context, Branch* branch)
 {
     Term* input = find_state_input(branch);
     if (input == NULL)
@@ -277,7 +277,7 @@ void insert_top_level_state(EvalContext* context, Branch* branch)
     copy(&context->state, top_frame(context)->registers[input->index]);
 }
 
-void save_top_level_state(EvalContext* context, Branch* branch)
+void save_top_level_state(Stack* context, Branch* branch)
 {
     Term* output = find_state_output(branch);
     if (output == NULL || output->numInputs() < 1 || output->input(0) == NULL)
@@ -286,7 +286,7 @@ void save_top_level_state(EvalContext* context, Branch* branch)
     move(top_frame(context)->registers[output->input(0)->index], &context->state);
 }
 
-void evaluate_branch(EvalContext* context, Branch* branch)
+void evaluate_branch(Stack* context, Branch* branch)
 {
     set_branch_in_progress(branch, false);
 
@@ -304,7 +304,7 @@ void evaluate_branch(EvalContext* context, Branch* branch)
     }
 }
 
-void evaluate_save_locals(EvalContext* context, Branch* branch)
+void evaluate_save_locals(Stack* context, Branch* branch)
 {
     // Top-level call
     push_frame(context, branch);
@@ -324,11 +324,11 @@ void evaluate_save_locals(EvalContext* context, Branch* branch)
 
 void evaluate_branch(Branch* branch)
 {
-    EvalContext context;
+    Stack context;
     evaluate_save_locals(&context, branch);
 }
 
-void insert_explicit_inputs(EvalContext* context, caValue* inputs)
+void insert_explicit_inputs(Stack* context, caValue* inputs)
 {
     Frame* top = top_frame(context);
 
@@ -346,7 +346,7 @@ void insert_explicit_inputs(EvalContext* context, caValue* inputs)
     }
 }
 
-void extract_explicit_outputs(EvalContext* context, caValue* inputs)
+void extract_explicit_outputs(Stack* context, caValue* inputs)
 {
     Frame* top = top_frame(context);
 
@@ -359,7 +359,7 @@ void extract_explicit_outputs(EvalContext* context, caValue* inputs)
     }
 }
 
-caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta)
+caValue* find_stack_value_for_term(Stack* context, Term* term, int stackDelta)
 {
     if (term == NULL)
         return NULL;
@@ -377,12 +377,12 @@ caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDe
     return NULL;
 }
 
-int num_inputs(EvalContext* context)
+int num_inputs(Stack* context)
 {
     return count_input_placeholders(top_frame(context)->branch);
 }
 
-void consume_inputs_to_list(EvalContext* context, List* list)
+void consume_inputs_to_list(Stack* context, List* list)
 {
     int count = num_inputs(context);
     list->resize(count);
@@ -391,7 +391,7 @@ void consume_inputs_to_list(EvalContext* context, List* list)
     }
 }
 
-caValue* get_input(EvalContext* context, int index)
+caValue* get_input(Stack* context, int index)
 {
     return get_frame_register(top_frame(context), index);
 }
@@ -406,19 +406,19 @@ bool can_consume_output(Term* consumer, Term* input)
     //return !is_value(input) && input->users.length() == 1;
 }
 
-void consume_input(EvalContext* context, int index, caValue* dest)
+void consume_input(Stack* context, int index, caValue* dest)
 {
     // Disable input consuming
     copy(get_input(context, index), dest);
 }
 
-bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest)
+bool consume_cast(Stack* context, int index, Type* type, caValue* dest)
 {
     caValue* value = get_input(context, index);
     return cast(value, type, dest);
 }
 
-caValue* get_output(EvalContext* context, int index)
+caValue* get_output(Stack* context, int index)
 {
     Frame* frame = top_frame(context);
     Term* placeholder = get_output_placeholder(frame->branch, index);
@@ -427,13 +427,13 @@ caValue* get_output(EvalContext* context, int index)
     return get_frame_register(frame, placeholder->index);
 }
 
-Term* current_term(EvalContext* context)
+Term* current_term(Stack* context)
 {
     Frame* top = top_frame(context);
     return top->branch->get(top->pc);
 }
 
-Branch* current_branch(EvalContext* context)
+Branch* current_branch(Stack* context)
 {
     Frame* top = top_frame(context);
     return top->branch;
@@ -444,26 +444,26 @@ caValue* get_frame_register(Frame* frame, int index)
     return frame->registers[index];
 }
 
-caValue* get_register(EvalContext* context, Term* term)
+caValue* get_register(Stack* context, Term* term)
 {
     Frame* frame = top_frame(context);
     ca_assert(term->owningBranch == frame->branch);
     return frame->registers[term->index];
 }
 
-void create_output(EvalContext* context)
+void create_output(Stack* context)
 {
     Term* caller = current_term(context);
     caValue* output = get_output(context, 0);
     create(caller->type, output);
 }
 
-void raise_error(EvalContext* context)
+void raise_error(Stack* context)
 {
     context->running = false;
     context->errorOccurred = true;
 }
-void raise_error_msg(EvalContext* context, const char* msg)
+void raise_error_msg(Stack* context, const char* msg)
 {
     Frame* top = top_frame(context);
     caValue* slot = get_frame_register(top, top->pc);
@@ -471,12 +471,12 @@ void raise_error_msg(EvalContext* context, const char* msg)
     raise_error(context);
 }
 
-bool error_occurred(EvalContext* context)
+bool error_occurred(Stack* context)
 {
     return context->errorOccurred;
 }
 
-void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
+void evaluate_range(Stack* context, Branch* branch, int start, int end)
 {
     set_branch_in_progress(branch, false);
     push_frame(context, branch);
@@ -491,7 +491,7 @@ void evaluate_range(EvalContext* context, Branch* branch, int start, int end)
     pop_frame(context);
 }
 
-void evaluate_minimum(EvalContext* context, Term* term, caValue* result)
+void evaluate_minimum(Stack* context, Term* term, caValue* result)
 {
     // Get a list of every term that this term depends on. Also, limit this
     // search to terms inside the current branch.
@@ -541,7 +541,7 @@ void evaluate_minimum(EvalContext* context, Term* term, caValue* result)
     pop_frame(context);
 }
 
-caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input)
+caValue* evaluate(Stack* context, Branch* branch, std::string const& input)
 {
     int prevHead = branch->length();
     Term* result = parser::compile(branch, parser::statement_list, input);
@@ -551,7 +551,7 @@ caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input
 
 caValue* evaluate(Branch* branch, Term* function, List* inputs)
 {
-    EvalContext context;
+    Stack context;
 
     TermList inputTerms;
     inputTerms.resize(inputs->length());
@@ -571,12 +571,12 @@ caValue* evaluate(Term* function, List* inputs)
     return evaluate(&scratch, function, inputs);
 }
 
-void clear_error(EvalContext* cxt)
+void clear_error(Stack* cxt)
 {
     cxt->errorOccurred = false;
 }
 
-void print_error_stack(EvalContext* context, std::ostream& out)
+void print_error_stack(Stack* context, std::ostream& out)
 {
     for (int frameIndex = 0; frameIndex < context->numFrames; frameIndex++) {
         Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
@@ -604,7 +604,7 @@ void print_error_stack(EvalContext* context, std::ostream& out)
     }
 }
 
-void update_context_to_latest_branches(EvalContext* context)
+void update_context_to_latest_branches(Stack* context)
 {
     for (int i=0; i < context->numFrames; i++) {
         Frame* frame = get_frame(context, i);
@@ -612,7 +612,7 @@ void update_context_to_latest_branches(EvalContext* context)
     }
 }
 
-Branch* if_block_choose_branch(EvalContext* context, Term* term)
+Branch* if_block_choose_branch(Stack* context, Term* term)
 {
     // Find the accepted case
     Branch* contents = nested_contents(term);
@@ -643,10 +643,10 @@ Branch* if_block_choose_branch(EvalContext* context, Term* term)
 
 Branch* dynamic_method_choose_branch(caStack* stack, Term* term)
 {
-    caValue* object = find_stack_value_for_term((EvalContext*) stack, term, 0);
+    caValue* object = find_stack_value_for_term((Stack*) stack, term, 0);
     std::string functionName = term->stringPropOptional("syntax:functionName", "");
 
-    Term* method = find_method((Branch*) top_branch((EvalContext*) stack),
+    Term* method = find_method((Branch*) top_branch((Stack*) stack),
         (Type*) circa_type_of(object), functionName.c_str());
 
     if (method != NULL)
@@ -682,7 +682,7 @@ EvaluateFunc get_override_for_branch(Branch* branch)
     return func->evaluate;
 }
 
-Branch* choose_branch(EvalContext* context, Term* term)
+Branch* choose_branch(Stack* context, Term* term)
 {
     if (is_value(term))
         return NULL;
@@ -705,7 +705,7 @@ Branch* choose_branch(EvalContext* context, Term* term)
         return NULL;
 }
 
-void start_interpreter_session(EvalContext* context)
+void start_interpreter_session(Stack* context)
 {
     Branch* topBranch = top_frame(context)->branch;
 
@@ -725,7 +725,7 @@ void start_interpreter_session(EvalContext* context)
     }
 }
 
-void step_interpreter(EvalContext* context)
+void step_interpreter(Stack* context)
 {
     Frame* frame = top_frame(context);
     Branch* branch = frame->branch;
@@ -852,7 +852,7 @@ void step_interpreter(EvalContext* context)
     }
 }
 
-void run_interpreter(EvalContext* context)
+void run_interpreter(Stack* context)
 {
     start_interpreter_session(context);
 
@@ -863,7 +863,7 @@ void run_interpreter(EvalContext* context)
     }
 }
 
-void run_interpreter_step(EvalContext* context)
+void run_interpreter_step(Stack* context)
 {
     start_interpreter_session(context);
 
@@ -872,7 +872,7 @@ void run_interpreter_step(EvalContext* context)
     context->running = false;
 }
 
-void run_interpreter_steps(EvalContext* context, int steps)
+void run_interpreter_steps(Stack* context, int steps)
 {
     start_interpreter_session(context);
 
@@ -897,30 +897,30 @@ extern "C" {
 
 caStack* circa_alloc_stack(caWorld* world)
 {
-    EvalContext* context = new EvalContext();
+    Stack* context = new Stack();
     context->world = world;
     return (caStack*) context;
 }
 
 void circa_dealloc_stack(caStack* stack)
 {
-    delete (EvalContext*) stack;
+    delete (Stack*) stack;
 }
 
 bool circa_has_error(caStack* stack)
 {
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     return error_occurred(context);
 }
 void circa_clear_error(caStack* stack)
 {
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     clear_error(context);
 }
 void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Branch* branch = function_contents((Function*) func);
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     
     set_branch_in_progress(branch, false);
     
@@ -929,7 +929,7 @@ void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
     run_interpreter(context);
     
     // Save outputs to the user's list.
-    fetch_stack_outputs((EvalContext*) stack, inputs);
+    fetch_stack_outputs((Stack*) stack, inputs);
     
     if (!error_occurred(context)) {
         pop_frame(context);
@@ -939,7 +939,7 @@ void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 void circa_push_function(caStack* stack, caFunction* func)
 {
     Branch* branch = function_contents((Function*) func);
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     
     set_branch_in_progress(branch, false);
     
@@ -962,7 +962,7 @@ bool circa_push_function_by_name(caStack* stack, const char* name)
 
 caValue* circa_frame_input(caStack* stack, int index)
 {
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     Frame* top = top_frame(context);
     
     if (top == NULL)
@@ -976,7 +976,7 @@ caValue* circa_frame_input(caStack* stack, int index)
 
 caValue* circa_frame_output(caStack* stack, int index)
 {
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     Frame* top = top_frame(context);
 
     int realIndex = top->branch->length() - index - 1;
@@ -989,26 +989,26 @@ caValue* circa_frame_output(caStack* stack, int index)
 
 void circa_run(caStack* stack)
 {
-    run_interpreter((EvalContext*) stack);
+    run_interpreter((Stack*) stack);
 }
 
 void circa_pop(caStack* stack)
 {
-    pop_frame((EvalContext*) stack);
+    pop_frame((Stack*) stack);
 }
 
 caBranch* circa_top_branch(caStack* stack)
 {
-    return (caBranch*) top_frame((EvalContext*) stack)->branch;
+    return (caBranch*) top_frame((Stack*) stack)->branch;
 }
 
 caValue* circa_input(caStack* stack, int index)
 {
-    return get_input((EvalContext*) stack, index);
+    return get_input((Stack*) stack, index);
 }
 int circa_num_inputs(caStack* stack)
 {
-    return num_inputs((EvalContext*) stack);
+    return num_inputs((Stack*) stack);
 }
 int circa_int_input(caStack* stack, int index)
 {
@@ -1031,13 +1031,13 @@ const char* circa_string_input(caStack* stack, int index)
 
 caValue* circa_output(caStack* stack, int index)
 {
-    return get_output((EvalContext*) stack, index);
+    return get_output((Stack*) stack, index);
 }
 
 void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
-    raise_error((EvalContext*) stack);
+    raise_error((Stack*) stack);
 }
 
 caTerm* circa_caller_input_term(caStack* stack, int index)
@@ -1047,7 +1047,7 @@ caTerm* circa_caller_input_term(caStack* stack, int index)
 
 caBranch* circa_caller_branch(caStack* stack)
 {
-    Frame* frame = get_frame((EvalContext*) stack, 1);
+    Frame* frame = get_frame((Stack*) stack, 1);
     if (frame == NULL)
         return NULL;
     return frame->branch;
@@ -1055,7 +1055,7 @@ caBranch* circa_caller_branch(caStack* stack)
 
 caTerm* circa_caller_term(caStack* stack)
 {
-    EvalContext* cxt = (EvalContext*) stack;
+    Stack* cxt = (Stack*) stack;
     if (cxt->numFrames < 2)
         return NULL;
     Frame* frame = get_frame(cxt, 1);
@@ -1064,7 +1064,7 @@ caTerm* circa_caller_term(caStack* stack)
 
 void circa_print_error_to_stdout(caStack* stack)
 {
-    EvalContext* context = (EvalContext*) stack;
+    Stack* context = (Stack*) stack;
     print_error_stack(context, std::cout);
 }
 

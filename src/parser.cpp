@@ -51,7 +51,7 @@ Term* evaluate(Branch* branch, ParsingStep step, std::string const& input)
 
     Term* result = compile(branch, step, input);
 
-    EvalContext context;
+    Stack context;
 
     evaluate_range(&context, branch, prevHead, branch->length() - 1);
 
@@ -1457,7 +1457,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             if (!is_function(leftExpr.term))
                 throw std::runtime_error("Left side of <- must be a function");
 
-            EvalContext context;
+            Stack context;
             evaluate_minimum(&context, leftExpr.term, NULL);
 
             Term* function = leftExpr.term;

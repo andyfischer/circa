@@ -170,7 +170,7 @@ namespace internal_debug_function {
 }
 
 namespace file_changed_function {
-    bool check(EvalContext*, Term* caller, caValue* fileSignature,
+    bool check(Stack*, Term* caller, caValue* fileSignature,
             std::string const& filename);
 }
 

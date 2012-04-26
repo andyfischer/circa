@@ -31,7 +31,14 @@ typedef struct caWorld caWorld;
 
 // a Stack holds the interpreter's current state, including a list of frames (activation
 // records). Each Stack corresponds to one lightweight thread (not OS thread).
+
+#ifdef __cplusplus
+namespace circa { struct Stack; }
+typedef circa::Stack caStack;
+
+#else
 typedef struct caStack caStack;
+#endif
 
 // a Value is a variant value. It holds two pointers, one pointer to the Type object and
 // one to the value's data. For some types (such as integers, floats, booleans), the data

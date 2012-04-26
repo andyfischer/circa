@@ -19,7 +19,7 @@ void test_cast_first_inputs()
     branch.compile("type T { int i }");
     Term* f = branch.compile("def f(T t) -> int { return t.i }");
 
-    EvalContext context;
+    Stack context;
     push_frame(&context, function_contents(f));
 
     caValue* in = circa_input((caStack*) &context, 0);

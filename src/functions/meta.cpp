@@ -13,7 +13,7 @@ namespace meta_function {
             if (term->function == FREEZE_FUNC) {
                 Term* input = term->input(0);
 
-                EvalContext context;
+                Stack context;
                 evaluate_minimum(&context, input, NULL);
 
                 change_function(term, FUNCS.value);

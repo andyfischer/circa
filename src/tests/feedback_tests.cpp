@@ -75,7 +75,7 @@ void train_cond()
 
     refresh_training_branch(branch);
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, branch);
     test_assert(context);
 

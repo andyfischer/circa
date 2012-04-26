@@ -191,10 +191,10 @@ void dynamic_call_func(caStack* stack)
     }
 
     // Pop calling frame
-    pop_frame((EvalContext*) stack);
+    pop_frame((Stack*) stack);
 
     // Replace it with the callee frame
-    push_frame_with_inputs((EvalContext*) stack, (Branch*) branch, &inputs);
+    push_frame_with_inputs((Stack*) stack, (Branch*) branch, &inputs);
 }
 
 void dynamic_method_call(caStack* stack)
@@ -207,7 +207,7 @@ void dynamic_method_call(caStack* stack)
     std::string functionName = term->stringPropOptional("syntax:functionName", "");
 
     // Find and dispatch method
-    Term* method = find_method((Branch*) top_branch((EvalContext*) stack),
+    Term* method = find_method((Branch*) top_branch((Stack*) stack),
         (Type*) circa_type_of(object), functionName.c_str());
 
     if (method != NULL) {
@@ -215,8 +215,8 @@ void dynamic_method_call(caStack* stack)
         Value inputs;
         swap(args, &inputs);
 
-        pop_frame((EvalContext*) stack);
-        push_frame_with_inputs((EvalContext*) stack, function_contents(method), &inputs);
+        pop_frame((Stack*) stack);
+        push_frame_with_inputs((Stack*) stack, function_contents(method), &inputs);
         return;
     }
 
@@ -375,7 +375,7 @@ void Branch__call(caStack* stack)
         return circa_output_error(stack, "NULL branch");
 
     caValue* inputs = circa_input(stack, 1);
-    push_frame_with_inputs((EvalContext*) stack, branch, inputs);
+    push_frame_with_inputs((Stack*) stack, branch, inputs);
 }
 
 // Reflection
@@ -544,7 +544,7 @@ void Function__contents(caStack* stack)
 
 void make_interpreter(caStack* stack)
 {
-    EvalContext* newContext = new EvalContext();
+    Stack* newContext = new Stack();
     gc_mark_object_referenced(&newContext->header);
     gc_set_object_is_root(&newContext->header, false);
 
@@ -553,7 +553,7 @@ void make_interpreter(caStack* stack)
 
 void Interpreter__push_frame(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
 
     Branch* branch = as_branch(circa_input(stack, 1));
@@ -564,26 +564,26 @@ void Interpreter__push_frame(caStack* stack)
 }
 void Interpreter__pop_frame(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     pop_frame(self);
 }
 void Interpreter__run(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     run_interpreter(self);
 }
 void Interpreter__run_steps(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int steps = circa_int_input(stack, 0);
     run_interpreter_steps(self, steps);
 }
 void Interpreter__frame(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
     Frame* frame = get_frame(self, index);
@@ -592,7 +592,7 @@ void Interpreter__frame(caStack* stack)
 }
 void Interpreter__output(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
 
@@ -605,11 +605,11 @@ void Interpreter__output(caStack* stack)
 }
 void Interpreter__toString(caStack* stack)
 {
-    EvalContext* self = (EvalContext*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
 
     std::stringstream strm;
-    eval_context_print_multiline(strm, (EvalContext*) self);
+    eval_context_print_multiline(strm, (Stack*) self);
     set_string(circa_output(stack, 0), strm.str().c_str());
 }
 

@@ -12,7 +12,7 @@
 
 namespace circa {
 
-void repl_evaluate_line(EvalContext* context, std::string const& input, std::ostream& output)
+void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& output)
 {
     Branch* branch = top_branch(context);
     int previousHead = branch->length();
@@ -62,7 +62,7 @@ void repl_evaluate_line(EvalContext* context, std::string const& input, std::ost
 
 int run_repl()
 {
-    EvalContext context;
+    Stack context;
     Branch branch;
     bool displayRaw = false;
 

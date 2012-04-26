@@ -31,7 +31,7 @@ void test_the_test()
 
 void test_include_function()
 {
-    EvalContext context;
+    Stack context;
     FakeFileSystem files;
 
     files["file.ca"] = "a = 1";
@@ -74,7 +74,7 @@ void test_include_static_error_after_reload()
     files["file.ca"] = "add(1,1)";
     branch.compile("include('file.ca')");
 
-    EvalContext result;
+    Stack result;
     evaluate_branch(&result, &branch);
 
     test_assert(!result.errorOccurred);
@@ -135,7 +135,7 @@ void test_include_with_state()
     files["file"] = "state b = 2; b += 1";
     branch.compile("include('file')");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_include: {b: 3}, a: 1}");
 
@@ -151,7 +151,7 @@ void test_call_function_from_included_file()
     branch.compile("include('file')");
     Term* hiCall = branch.compile("hi()");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     files.last_modified("file")++;

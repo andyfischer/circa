@@ -19,7 +19,7 @@ void test_vectorize_vs()
 
     test_assert(&branch);
 
-    EvalContext context;
+    Stack context;
     evaluate_save_locals(&context, &branch);
     test_equals(call, "[5, 6, 7]");
 }
@@ -34,7 +34,7 @@ void test_vectorize_vv()
 
     test_assert(&branch);
 
-    EvalContext context;
+    Stack context;
     evaluate_save_locals(&context, &branch);
     test_equals(call, "[3, 4, 6]");
 }

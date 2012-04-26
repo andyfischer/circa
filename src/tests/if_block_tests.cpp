@@ -223,7 +223,7 @@ void test_parse_with_no_line_endings()
 void test_state_simple()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
 
     // Simple test, condition never changes
     Term* block = branch.compile("if true { state i = 0; i += 1 }");
@@ -255,7 +255,7 @@ void test_state_simple()
     // Same test with else
     branch.clear();
 
-    EvalContext context2;
+    Stack context2;
     block = branch.compile("if false {} else { state i = 0; i += 1 }");
     evaluate_branch(&context2, &branch);
     i = context2.state.getField("_if_block")->getIndex(1)->getField("i");
@@ -271,7 +271,7 @@ void test_state_simple()
 void test_state_is_reset_when_if_fails()
 {
     Branch branch;
-    EvalContext context;
+    Stack context;
 
     Term* c = branch.compile("c = true");
     branch.compile("if c { state i = 0; i += 1 } else { 'hi' }");
@@ -312,7 +312,7 @@ void test_state_is_reset_when_if_fails2()
     internal_debug_function::oracle_send(2);
     internal_debug_function::oracle_send(3);
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
     test_equals(&context.state, "{_if_block: [{s: 1}]}");
 

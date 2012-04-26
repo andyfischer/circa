@@ -15,7 +15,7 @@ void blocked_by_error()
     Term *error = branch.compile("e = assert(false)");
     branch.compile("test_spy(2)");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
     test_assert(context.errorOccurred);
     test_assert(context.errorTerm == error);
@@ -28,7 +28,7 @@ void test_errored_function()
     branch.compile("e = assert(false)");
     Term* t = branch.compile("t = errored(e)");
 
-    EvalContext context;
+    Stack context;
     evaluate_save_locals(&context, &branch);
 
     test_assert(!context.errorOccurred);

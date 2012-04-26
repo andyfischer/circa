@@ -27,7 +27,7 @@ struct Frame
     bool loop;
 };
 
-struct EvalContext
+struct Stack
 {
     CircaObject header;
 
@@ -48,103 +48,103 @@ struct EvalContext
     // Owning world
     caWorld* world;
 
-    EvalContext();
-    ~EvalContext();
+    Stack();
+    ~Stack();
 
 private:
     // Disabled calls
-    EvalContext(EvalContext const&) {}
-    EvalContext& operator=(EvalContext const&) { return *this; }
+    Stack(Stack const&) {}
+    Stack& operator=(Stack const&) { return *this; }
 };
 
-void eval_context_print_multiline(std::ostream& out, EvalContext* context);
+void eval_context_print_multiline(std::ostream& out, Stack* context);
 void eval_context_setup_type(Type* type);
 
 // Stack frames
-Frame* get_frame(EvalContext* context, int depth);
-Frame* get_frame_from_bottom(EvalContext* context, int index);
+Frame* get_frame(Stack* context, int depth);
+Frame* get_frame_from_bottom(Stack* context, int index);
 
 // Push a new frame with the given registers.
-Frame* push_frame(EvalContext* context, Branch* branch, List* registers);
+Frame* push_frame(Stack* context, Branch* branch, List* registers);
 
-Frame* push_frame(EvalContext* context, Branch* branch);
-void push_frame_with_inputs(EvalContext* context, Branch* branch, caValue* inputs);
+Frame* push_frame(Stack* context, Branch* branch);
+void push_frame_with_inputs(Stack* context, Branch* branch, caValue* inputs);
 
 // Pop the topmost frame and throw it away. This call doesn't preserve the frame's
 // outputs or update PC. You might want to call finish_frame() instead of this.
-void pop_frame(EvalContext* context);
+void pop_frame(Stack* context);
 
 // Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
 // - you call it when the branch is finished evaluating. But instead of passing outputs
 // to the parent frame (like finish_frame does), this copies them to your list.
-void fetch_stack_outputs(EvalContext* context, caValue* outputs);
+void fetch_stack_outputs(Stack* context, caValue* outputs);
 
 // Pop the topmost frame and copy all outputs to the next frame on the stack. This is the
 // standard way to finish a frame, such as when 'return' is called.
-void finish_frame(EvalContext* context);
+void finish_frame(Stack* context);
 
-Frame* top_frame(EvalContext* context);
-Branch* top_branch(EvalContext* context);
-void reset_stack(EvalContext* context);
+Frame* top_frame(Stack* context);
+Branch* top_branch(Stack* context);
+void reset_stack(Stack* context);
 
 // Evaluate a single term. This is not usually called directly, it's called
 // by the interpreter.
-void evaluate_single_term(EvalContext* context, Term* term);
+void evaluate_single_term(Stack* context, Term* term);
 
-void evaluate_branch(EvalContext* context, Branch* branch);
+void evaluate_branch(Stack* context, Branch* branch);
 
-void evaluate_save_locals(EvalContext* context, Branch* branch);
+void evaluate_save_locals(Stack* context, Branch* branch);
 
-// Shorthand to call evaluate_branch with a new EvalContext:
+// Shorthand to call evaluate_branch with a new Stack:
 void evaluate_branch(Branch* branch);
 
 // Evaluate only the terms between 'start' and 'end'.
-void evaluate_range(EvalContext* context, Branch* branch, int start, int end);
+void evaluate_range(Stack* context, Branch* branch, int start, int end);
 
 // Evaluate 'term' and every term that it depends on.
-void evaluate_minimum(EvalContext* context, Term* term, caValue* result);
+void evaluate_minimum(Stack* context, Term* term, caValue* result);
 
 // Parse input and immediately evaluate it, returning the result value.
-caValue* evaluate(EvalContext* context, Branch* branch, std::string const& input);
+caValue* evaluate(Stack* context, Branch* branch, std::string const& input);
 caValue* evaluate(Branch* branch, Term* function, List* inputs);
 caValue* evaluate(Term* function, List* inputs);
 
-void insert_explicit_inputs(EvalContext* context, caValue* inputs);
-void extract_explicit_outputs(EvalContext* context, caValue* inputs);
+void insert_explicit_inputs(Stack* context, caValue* inputs);
+void extract_explicit_outputs(Stack* context, caValue* inputs);
 
-caValue* get_input(EvalContext* context, int index);
-caValue* find_stack_value_for_term(EvalContext* context, Term* term, int stackDelta);
-void consume_input(EvalContext* context, Term* term, caValue* dest);
-void consume_input(EvalContext* context, int index, caValue* dest);
-bool consume_cast(EvalContext* context, int index, Type* type, caValue* dest);
-int num_inputs(EvalContext* context);
-void consume_inputs_to_list(EvalContext* context, List* list);
-caValue* get_output(EvalContext* context, int index);
+caValue* get_input(Stack* context, int index);
+caValue* find_stack_value_for_term(Stack* context, Term* term, int stackDelta);
+void consume_input(Stack* context, Term* term, caValue* dest);
+void consume_input(Stack* context, int index, caValue* dest);
+bool consume_cast(Stack* context, int index, Type* type, caValue* dest);
+int num_inputs(Stack* context);
+void consume_inputs_to_list(Stack* context, List* list);
+caValue* get_output(Stack* context, int index);
 
-Term* current_term(EvalContext* context);
-Branch* current_branch(EvalContext* context);
+Term* current_term(Stack* context);
+Branch* current_branch(Stack* context);
 caValue* get_frame_register(Frame* frame, int index);
-caValue* get_register(EvalContext* context, Term* term);
+caValue* get_register(Stack* context, Term* term);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.
-void create_output(EvalContext* context);
+void create_output(Stack* context);
 
 // Signal that a runtime error has occurred.
-void raise_error(EvalContext* context);
+void raise_error(Stack* context);
 
-void raise_error_msg(EvalContext* context, const char* msg);
+void raise_error_msg(Stack* context, const char* msg);
 
 // Returns whether evaluation has been interrupted, such as with a 'return' or
 // 'break' statement, or a runtime error.
-bool error_occurred(EvalContext* context);
+bool error_occurred(Stack* context);
 
-void clear_error(EvalContext* cxt);
+void clear_error(Stack* cxt);
 
-void print_error_stack(EvalContext* context, std::ostream& out);
+void print_error_stack(Stack* context, std::ostream& out);
 
-void run_interpreter(EvalContext* context);
-void run_interpreter_step(EvalContext* context);
-void run_interpreter_steps(EvalContext* context, int steps);
+void run_interpreter(Stack* context);
+void run_interpreter_step(Stack* context);
+void run_interpreter_steps(Stack* context, int steps);
 
 } // namespace circa

@@ -109,7 +109,7 @@ void test_with_state()
     branch.compile("alloc_handle(@s)");
     set_branch_in_progress(&branch, false);
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
@@ -132,7 +132,7 @@ void test_deleted_state()
     branch.compile("state t");
     branch.compile("alloc_handle(@t)");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_equals(&g_slots, "[true, true, false]");
@@ -154,7 +154,7 @@ void test_in_subroutine_state()
     branch.compile("alloc_handle(@s)");
     branch.compile("hi(s)");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
@@ -172,7 +172,7 @@ void test_state_inside_if_block()
     branch.compile("state s = null");
     branch.compile("if is_null(s) { s = alloc_handle(s) }");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");
@@ -189,7 +189,7 @@ void test_that_stripping_state_is_recursive()
 
     branch.compile("if true { state a = 1; state s; s = alloc_handle(s) }");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
     test_equals(&g_slots, "[true, false, false]");
 
@@ -210,7 +210,7 @@ void test_included_file_changed()
 
     branch.compile("include('f')");
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     test_equals(&g_slots, "[true, false, false]");

@@ -32,7 +32,7 @@ void test_migration(std::string sourceCode, std::string destinationCode,
         return;
     }
 
-    EvalContext context;
+    Stack context;
 
     evaluate_branch(&context, &source);
 

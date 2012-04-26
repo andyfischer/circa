@@ -11,7 +11,7 @@ namespace circa {
 void test_assert_function(bool condition, int line, const char* file);
 void test_assert_function(Term* term, int line, const char* file);
 void test_assert_function(Branch* branch, int line, const char* file);
-void test_assert_function(EvalContext& context, int line, const char* file);
+void test_assert_function(Stack& context, int line, const char* file);
 void test_fail_function(int line, const char* file);
 void test_equals_function(TermList const& a, TermList const& b,
         const char* aText, const char* bText, int line, const char* file);
@@ -40,7 +40,7 @@ bool test_fail_on_static_error(Branch* branch);
 // If context has recorded a runtime error, then print something to stdout, and
 // declare the current test failed, and return true. If this returns false then
 // there was no error.
-bool test_fail_on_runtime_error(EvalContext& context);
+bool test_fail_on_runtime_error(Stack& context);
 
 struct TestCase {
     typedef void (*TestExecuteFunction)();

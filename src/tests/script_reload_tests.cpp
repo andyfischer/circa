@@ -36,7 +36,7 @@ struct ReloadHelper
 
     Branch branch;
     FakeFileSystem files;
-    EvalContext context;
+    Stack context;
 };
 
 void test_simple()

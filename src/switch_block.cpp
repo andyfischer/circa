@@ -22,7 +22,7 @@ void switch_block_post_compile(Term* term)
 CA_FUNCTION(evaluate_switch)
 {
 #if 0
-    EvalContext* context = CONTEXT;
+    Stack* context = CONTEXT;
     Branch* contents = nested_contents(CALLER);
     caValue* input = INPUT(0);
 

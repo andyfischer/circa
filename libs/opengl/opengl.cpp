@@ -37,7 +37,7 @@ const char* gl_to_string(GLenum glenum)
     return "";
 }
 
-bool gl_check_error(circa::EvalContext* cxt)
+bool gl_check_error(circa::Stack* cxt)
 {
     GLenum errcode = glGetError();
     if (errcode == GL_NO_ERROR)

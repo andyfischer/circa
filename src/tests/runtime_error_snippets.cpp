@@ -18,7 +18,7 @@ void test_input(std::string const& in)
         return;
     }
 
-    EvalContext context;
+    Stack context;
     evaluate_branch(&context, &branch);
 
     if (!context.errorOccurred) {

@@ -16,8 +16,8 @@ Term* find_enclosing_for_loop(Term* term);
 Branch* find_enclosing_for_loop_contents(Term* term);
 
 CA_FUNCTION(start_for_loop);
-void for_loop_finish_iteration(EvalContext* context);
-void for_loop_finish_frame(EvalContext* context);
+void for_loop_finish_iteration(Stack* context);
+void for_loop_finish_frame(Stack* context);
 
 void finish_while_loop(Term* whileTerm);
 CA_FUNCTION(evaluate_unbounded_loop);
