@@ -45,6 +45,9 @@ struct EvalContext
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
 
+    // Owning world
+    caWorld* world;
+
     EvalContext();
     ~EvalContext();
 

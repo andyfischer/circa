@@ -28,6 +28,7 @@
 #include "names.h"
 #include "term.h"
 #include "type.h"
+#include "world.h"
 
 #include "types/any.h"
 #include "types/bool.h"
@@ -46,10 +47,6 @@
 
 #include "tools/command_reader.h"
 
-typedef struct caWorld {
-    // Opaque type
-    // Currently is empty
-} caWorld;
 
 namespace circa {
 
@@ -1092,6 +1089,9 @@ void bootstrap_kernel()
     apply(function_contents(as_function(FUNCS.output)),
         FUNCS.input, TermList())->setBoolProp("optional", true);
 
+    TYPES.actor = unbox_type(parse_type(kernel,
+            "type Actor { String name, Branch branch, List incomingQueue, any stateVal }"));
+
     // FileSignature is used in some builtin functions
     TYPES.file_signature = unbox_type(parse_type(kernel,
             "type FileSignature { String filename, int time_modified }"));
@@ -1333,8 +1333,6 @@ void install_standard_library(Branch* kernel)
 
 EXPORT caWorld* circa_initialize()
 {
-    caWorld* world = (caWorld*) malloc(sizeof(world));
-
     FINISHED_BOOTSTRAP = false;
     STATIC_INITIALIZATION_FINISHED = true;
 
@@ -1354,6 +1352,8 @@ EXPORT caWorld* circa_initialize()
         print_static_errors_formatted(kernel, std::cout);
         internal_error("circa fatal: static errors found in kernel");
     }
+
+    caWorld* world = alloc_world();
 
 #if CIRCA_ENABLE_FILESYSTEM
     // Use standard filesystem by default

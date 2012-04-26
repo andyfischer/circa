@@ -134,6 +134,7 @@ extern Type TYPE_T;
 extern Type VOID_T;
 
 struct BuiltinTypes {
+    Type* actor;
     Type* color;
     Type* file_signature;
     Type* point;

@@ -26,7 +26,8 @@ EvalContext::EvalContext()
  : numFrames(0),
    stack(NULL),
    running(false),
-   errorOccurred(false)
+   errorOccurred(false),
+   world(NULL)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 }
@@ -896,7 +897,9 @@ extern "C" {
 
 caStack* circa_alloc_stack(caWorld* world)
 {
-    return (caStack*) new EvalContext();
+    EvalContext* context = new EvalContext();
+    context->world = world;
+    return (caStack*) context;
 }
 
 void circa_dealloc_stack(caStack* stack)

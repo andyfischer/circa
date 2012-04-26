@@ -45,12 +45,11 @@ Term* find_loaded_module(const char* name)
     return NULL;
 }
 
-Term* load_module_from_file(const char* module_name, const char* filename)
+Branch* load_module_from_file(const char* module_name, const char* filename)
 {
     Term* import = apply(kernel(), FUNCS.imported_file, TermList(), module_name);
     load_script(nested_contents(import), filename);
-
-    return import;
+    return nested_contents(import);
 }
 
 static bool find_module_file(const char* module_name, String* filenameOut)
@@ -101,7 +100,7 @@ caName load_module(const char* module_name, Term* loadCall)
     if (!found)
         return name_FileNotFound;
 
-    Term* import = load_module_from_file(module_name, as_cstring(&filename));
+    Term* import = load_module_from_file(module_name, as_cstring(&filename))->owningTerm;
 
     // If a loadCall is provided, possibly move the new import to be before the loadCall.
     if (loadCall != NULL) {
@@ -157,7 +156,7 @@ void circa_add_module_search_path(caWorld* world, const char* path)
 
 caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const char* filename)
 {
-    return (caBranch*) nested_contents(load_module_from_file(module_name, filename));
+    return (caBranch*) load_module_from_file(module_name, filename);
 }
 
 void circa_refresh_module(caBranch* branch)

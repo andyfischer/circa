@@ -10,7 +10,7 @@ List* modules_get_search_paths();
 
 void modules_add_search_path(const char* str);
 
-Term* load_module_from_file(const char* module_name, const char* filename);
+Branch* load_module_from_file(const char* module_name, const char* filename);
 
 // returns either Success or FileNotFound
 caName load_module(const char* module_name, Term* loadCall);
