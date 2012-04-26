@@ -14,7 +14,7 @@ int main(int argc, char** argv)
     circa_actor_post_message(world, "ActorA", msg);
 
     for (int i=0; i < 10; i++)
-        circa_actor_run_all_queues(world);
+        circa_actor_run_all_queues(world, 10);
 
     return 0;
 }

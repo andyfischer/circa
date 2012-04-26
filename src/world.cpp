@@ -38,6 +38,13 @@ caValue* find_actor(World* world, const char* name)
     return NULL;
 }
 
+void actor_post_message(caValue* actor, caValue* message)
+{
+    caValue* queue = list_get(actor, 2);
+
+    copy(message, list_append(queue));
+}
+
 void actor_run_message(caStack* stack, caValue* actor, caValue* message)
 {
     Branch* branch = as_branch(list_get(actor, 1));
@@ -49,6 +56,34 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     // TODO: state
 
     run_interpreter(stack);
+}
+
+void actor_run_queue(caWorld* world, caValue* actor, int maxMessages)
+{
+    caValue* messages = list_get(actor, 2);
+    caStack* stack = world->mainStack;
+
+    // Iterate once for each message
+    // Note that new messages might be appended to the queue while we are running;
+    // don't run the new messages right now.
+
+    int count = circa_count(messages);
+    if (count == 0)
+        return;
+
+    // Enforce maximum messages per call
+    if (maxMessages > 0 && count >= maxMessages)
+        count = maxMessages;
+
+    for (int i=0; i < count; i++) {
+        caValue* message = list_get(messages, i);
+        actor_run_message(stack, actor, message);
+    }
+
+    // Remove the messages that we handled
+    Value newQueue;
+    list_slice(messages, count, -1, &newQueue);
+    swap(&newQueue, messages);
 }
 
 } // namespace circa
@@ -68,7 +103,6 @@ void circa_actor_new_from_file(caWorld* world, const char* actorName, const char
     set_branch(list_get(actor, 1), module);
 }
 
-
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message)
 {
     caValue* actor = find_actor(world, actorName);
@@ -77,9 +111,7 @@ void circa_actor_post_message(caWorld* world, const char* actorName, caValue* me
         return;
     }
 
-    caValue* queue = list_get(actor, 2);
-
-    copy(message, list_append(queue));
+    actor_post_message(actor, message);
 }
 
 void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message)
@@ -93,31 +125,8 @@ void circa_actor_run_message(caWorld* world, const char* actorName, caValue* mes
     actor_run_message(stack, actor, message);
 }
 
-static void circa_actor_run_queue_internal(caWorld* world, caValue* actor)
-{
-    caValue* messages = list_get(actor, 2);
-    caStack* stack = world->mainStack;
 
-    // Iterate once for each message
-    // Note that new messages might be appended to the queue while we are running;
-    // don't run the new messages right now.
-
-    int count = circa_count(messages);
-    if (count == 0)
-        return;
-
-    for (int i=0; i < count; i++) {
-        caValue* message = list_get(messages, i);
-        actor_run_message(stack, actor, message);
-    }
-
-    // Remove the messages that we handled
-    Value newQueue;
-    list_slice(messages, count, -1, &newQueue);
-    swap(&newQueue, messages);
-}
-
-void circa_actor_run_queue(caWorld* world, const char* actorName)
+void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
 {
     caValue* actor = find_actor(world, actorName);
 
@@ -126,12 +135,12 @@ void circa_actor_run_queue(caWorld* world, const char* actorName)
         return;
     }
 
-    circa_actor_run_queue_internal(world, actor);
+    actor_run_queue(world, actor, maxMessages);
 }
 
-void circa_actor_run_all_queues(caWorld* world)
+void circa_actor_run_all_queues(caWorld* world, int maxMessages)
 {
     for (int i=0; i < list_length(&world->actorList); i++) {
-        circa_actor_run_queue_internal(world, list_get(&world->actorList, i));
+        actor_run_queue(world, list_get(&world->actorList, i), maxMessages);
     }
 }

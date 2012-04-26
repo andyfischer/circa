@@ -233,7 +233,28 @@ void dynamic_method_call(caStack* stack)
         else
             copy(element, circa_output(stack, 0));
     }
+}
 
+void send_func(caStack* stack)
+{
+    const char* actorName = circa_string_input(stack, 0);
+    caValue* msg = circa_input(stack, 1);
+
+    if (stack->world == NULL) {
+        circa_output_error(stack, "Stack was not created with World");
+        return;
+    }
+
+    caValue* actor = find_actor(stack->world, actorName);
+
+    if (actor == NULL) {
+        std::string msg = "Actor not found: ";
+        msg += actorName;
+        circa_output_error(stack, msg.c_str());
+        return;
+    }
+
+    actor_post_message(actor, msg);
 }
 
 void refactor__rename(caStack* stack)
@@ -1245,7 +1266,8 @@ void install_standard_library(Branch* kernel)
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
-        {"call", (EvaluateFunc) dynamic_call_func},
+        {"call", dynamic_call_func},
+        {"send", send_func},
         {"refactor:rename", refactor__rename},
         {"refactor:change_function", refactor__change_function},
         {"reflect:this_branch", reflect__this_branch},
@@ -1261,7 +1283,7 @@ void install_standard_library(Branch* kernel)
         {"Branch.dump", Branch__dump},
         {"Branch.call", Branch__call},
         {"Branch.file_signature", Branch__file_signature},
-        {"Branch.statements", (EvaluateFunc) Branch__statements},
+        {"Branch.statements", Branch__statements},
         {"Branch.format_source", Branch__format_source},
         {"Branch.get_term", Branch__get_term},
         {"Branch.get_static_errors", Branch__get_static_errors},

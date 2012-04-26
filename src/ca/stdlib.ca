@@ -19,6 +19,9 @@ def changed(any current) -> bool
 def call(any callable, List inputs) -> any
     "Dynamic function dispatch"
 
+-- Message passing
+def send(String name, any msg)
+
 namespace cppbuild
     def build_module(String baseFilename)
 

@@ -1,4 +1,7 @@
 
-msg = input()
+msg = input() -> int
 
 print('Actor A received message: ' msg)
+
+send('ActorB', msg + 1)
+send('ActorB', msg + 1)

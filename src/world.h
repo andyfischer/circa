@@ -15,5 +15,7 @@ protected:
 };
 
 World* alloc_world();
+caValue* find_actor(World* world, const char* name);
+void actor_post_message(caValue* actor, caValue* message);
 
 } // namespace circa
