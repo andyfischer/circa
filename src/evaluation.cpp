@@ -121,6 +121,7 @@ Frame* push_frame(Stack* context, Branch* branch, List* registers)
     top->endPc = branch->length();
     top->loop = false;
     top->override = false;
+    top->stop = false;
 
     // We are now referencing this branch
     gc_mark_object_referenced(&branch->header);
@@ -132,12 +133,12 @@ Frame* push_frame(Stack* context, Branch* branch)
     List registers;
     return push_frame(context, branch, &registers);
 }
-void pop_frame(Stack* context)
+void pop_frame(Stack* stack)
 {
-    Frame* top = top_frame(context);
+    Frame* top = top_frame(stack);
 
     set_null(&top->registers);
-    context->numFrames--;
+    stack->numFrames--;
 }
 
 void push_frame_with_inputs(Stack* context, Branch* branch, caValue* inputs)
@@ -170,6 +171,11 @@ void push_frame_with_inputs(Stack* context, Branch* branch, caValue* inputs)
 
     // Push our frame (with inputs) onto the stack
     push_frame(context, branch, &registers);
+}
+
+void frame_set_stop_when_finished(Frame* frame)
+{
+    frame->stop = true;
 }
 
 void fetch_stack_outputs(Stack* context, caValue* outputs)
@@ -729,7 +735,7 @@ void step_interpreter(Stack* context)
     if (frame->pc >= frame->endPc) {
 
         // Exit if we have finished the topmost branch
-        if (context->numFrames == 1) {
+        if (context->numFrames == 1 || frame->stop) {
             context->running = false;
             return;
         }
@@ -877,7 +883,6 @@ void run_interpreter_steps(Stack* context, int steps)
 
     context->running = false;
 }
-
 
 } // namespace circa
 
@@ -1055,6 +1060,15 @@ caTerm* circa_caller_term(caStack* stack)
 void circa_print_error_to_stdout(caStack* stack)
 {
     print_error_stack(stack, std::cout);
+}
+int circa_frame_count(caStack* stack)
+{
+    return stack->numFrames;
+}
+void circa_stack_restore_height(caStack* stack, int height)
+{
+    while (stack->numFrames > height)
+        pop_frame(stack);
 }
 
 } // extern "C"

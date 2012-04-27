@@ -51,7 +51,11 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     Branch* branch = as_branch(list_get(actor, 1));
     refresh_script(branch);
 
-    push_frame(stack, branch);
+    int initialStackHeight = circa_frame_count(stack);
+
+    Frame* frame = push_frame(stack, branch);
+
+    frame_set_stop_when_finished(frame);
     copy(message, circa_input(stack, 0));
 
     // Copy state (if any)
@@ -61,12 +65,17 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
 
     run_interpreter(stack);
 
+    // Preserve state, if found, and if there was no error.
     Term* state_out = find_state_output(branch);
-
     if (!error_occurred(stack) && state_out != NULL) {
         touch(actor);
         copy(get_register(stack, state_out), list_get(actor, 3));
     }
+
+    // TODO: A way of handling errors
+    circa_stack_restore_height(stack, initialStackHeight);
+    stack->running = true;
+    stack->errorOccurred = false;
 }
 
 void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)
@@ -87,6 +96,10 @@ void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)
 
     for (int i=0; i < count; i++) {
         caValue* message = list_get(messages, i);
+
+        // Clean up stack. TODO is an elegant way to preserve error in this case.
+
+
         actor_run_message(stack, actor, message);
     }
 
@@ -160,6 +173,11 @@ void circa_actor_run_all_queues(caStack* stack, int maxMessages)
     for (int i=0; i < list_length(&world->actorList); i++) {
         actor_run_queue(stack, list_get(&world->actorList, i), maxMessages);
     }
+}
+
+void circa_actor_clear_all(caWorld* world)
+{
+    set_list(&world->actorList, 0);
 }
 
 caStack* circa_main_stack(caWorld* world)

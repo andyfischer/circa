@@ -1,9 +1,13 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
+
+#include <cstdio>
 
 #include "circa/circa.h"
 
 int main(int argc, char** argv)
 {
     caWorld* world = circa_initialize();
+    caStack* stack = circa_alloc_stack(world);
 
     circa_actor_new_from_file(world, "ActorA", "tests/embed/ActorA.ca");
     circa_actor_new_from_file(world, "ActorB", "tests/embed/ActorB.ca");
@@ -14,7 +18,18 @@ int main(int argc, char** argv)
     circa_actor_post_message(world, "ActorA", msg);
 
     for (int i=0; i < 10; i++)
-        circa_actor_run_all_queues(world, 10);
+        circa_actor_run_all_queues(stack, 10);
+
+    printf("Resetting and starting actors C and D...\n");
+    circa_actor_clear_all(world);
+
+    circa_actor_new_from_file(world, "ActorC", "tests/embed/ActorC.ca");
+    circa_actor_new_from_file(world, "ActorD", "tests/embed/ActorD.ca");
+
+    circa_actor_post_message(world, "ActorC", msg);
+
+    for (int i=0; i < 10; i++)
+        circa_actor_run_all_queues(stack, 10);
 
     return 0;
 }

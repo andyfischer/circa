@@ -129,6 +129,7 @@ void circa_actor_post_message(caWorld* world, const char* actorName, caValue* me
 void circa_actor_run_message(caStack* stack, const char* actorName, caValue* message);
 void circa_actor_run_queue(caStack* stack, const char* actorName, int maxMessages);
 void circa_actor_run_all_queues(caStack* stack, int maxMessages);
+void circa_actor_clear_all(caWorld* world);
 
 caStack* circa_main_stack(caWorld* world);
 
@@ -154,6 +155,9 @@ bool circa_push_function_by_name(caStack* stack, const char* name);
 void circa_run(caStack* stack);
 
 void circa_pop(caStack* stack);
+
+int circa_frame_count(caStack* stack);
+void circa_stack_restore_height(caStack* stack, int height);
 
 void circa_call_method(caStack* stack, const char* funcName, caValue* object, caValue* ins, caValue* outs);
 

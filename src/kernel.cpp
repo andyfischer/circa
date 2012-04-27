@@ -168,7 +168,7 @@ void to_string_repr(caStack* stack)
     circa_to_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void dynamic_call_func(caStack* stack)
+void call_func(caStack* stack)
 {
     caValue* callable = circa_input(stack, 0);
     Value inputs;
@@ -193,6 +193,32 @@ void dynamic_call_func(caStack* stack)
 
     // Replace it with the callee frame
     push_frame_with_inputs(stack, (Branch*) branch, &inputs);
+}
+
+void call_actor_func(caStack* stack)
+{
+    const char* actorName = circa_string_input(stack, 0);
+    caValue* msg = circa_input(stack, 1);
+
+    if (stack->world == NULL) {
+        circa_output_error(stack, "Stack was not created with World");
+        return;
+    }
+
+    caValue* actor = find_actor(stack->world, actorName);
+
+    if (actor == NULL) {
+        std::string msg = "Actor not found: ";
+        msg += actorName;
+        circa_output_error(stack, msg.c_str());
+        return;
+    }
+
+    int stackHeight = circa_frame_count(stack);
+
+    actor_run_message(stack, actor, msg);
+
+    circa_stack_restore_height(stack, stackHeight);
 }
 
 void dynamic_method_call(caStack* stack)
@@ -1244,7 +1270,8 @@ void install_standard_library(Branch* kernel)
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
-        {"call", dynamic_call_func},
+        {"call", call_func},
+        {"call_actor", call_actor_func},
         {"send", send_func},
         {"refactor:rename", refactor__rename},
         {"refactor:change_function", refactor__change_function},
