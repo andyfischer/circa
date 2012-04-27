@@ -2,13 +2,13 @@
 -- Builtin functions
 
 def length(List) -> int
-    "Return the number of items in the given list"
+    -- Return the number of items in the given list
 
 def from_string(String s) -> any
-    "Parse a string representation to a Circa value"
+    -- Parse a string representation to a Circa value
 
 def to_string_repr(any val) -> String
-    "Encode a Circa value as a string representation"
+    -- Encode a Circa value as a string representation
 
 def changed(any current) -> bool
     state any prev = null
@@ -17,7 +17,7 @@ def changed(any current) -> bool
     return result
 
 def call(any callable, List inputs) -> any
-    "Dynamic function dispatch"
+    -- Dynamic function dispatch
 
 -- Message passing
 def send(String name, any msg)
@@ -151,19 +151,19 @@ type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
 
 def toggle(bool tog) -> bool
-    <<<
+    {-
     Stateful function, returns a boolean status. Every frame the function is called
     with (true), the result flips. Starts out false.
-    >>>
+    -}
     state bool s = false
     if tog { s = not(s) }
     return s
 
 def approach(number target, number maximum_change) -> number
-    <<<
+    {-
     Stateful function, returns a result which approaches 'target'. Each frame, this
     result will change at most by 'maximum_change'
-    >>>
+    -}
     state current = target
     if target > current
         current += min(maximum_change, target - current)
@@ -172,16 +172,18 @@ def approach(number target, number maximum_change) -> number
     return current
 
 def once() -> bool
-    <<<
+    {-
     Stateful function, returns true the first time it's called, and false thereafter.
-    >>>
+    -}
     state bool s = true
     result = s
     s = false
     return result
 
 def cycle(int max) -> int
-    "Stateful function, cycles though the integers starting at 0 and ending before 'max'"
+    {-
+    Stateful function, cycles though the integers starting at 0 and ending before 'max'
+    -}
     state int counter = 0
     if counter >= max
         counter = 0
@@ -190,15 +192,21 @@ def cycle(int max) -> int
     return result
 
 def cycle_elements(List list) -> any
-    "Stateful function, returns each item of 'list' one at a time"
+    {-
+    Stateful function, returns each item of 'list' one at a time
+    -}
     return list[cycle(length(list))]
 
 def random_element(List list) -> any
-    "Return a random element from the given list, with equal probability per element"
+    {-
+    Return a random element from the given list, with equal probability per element.
+    -}
     return list[rand_i() % length(list)]
 
 def seed() -> number
-    "Stateful function, returns a random number 0..1 which doesn't change after initialization"
+    {-
+    Stateful function, returns a random number 0..1 which doesn't change after initialization.
+    -}
     state number s = rand()
     return s
 
@@ -210,33 +218,47 @@ def polar(number angle) -> Point
     return [sin(angle) -cos(angle)]
 
 def magnitude(Point point) -> number
-    "Returns the magnitude, or the distance from [0,0] to this point."
+    {-
+    Returns the magnitude, or the distance from [0,0] to this point.
+    -}
     return sqrt(sqr(point.x) + sqr(point.y))
 
 def point_distance(Point a, Point b) -> number
-    "Returns the distance between a and b."
+    {-
+    Returns the distance between a and b.
+    -}
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 
 def rotate_point(Point p, number rotation) -> Point
-    "Rotate p around [0,0] by the given angle."
+    {-
+    Rotate p around [0,0] by the given angle.
+    -}
     return [p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)]
 
 def random_norm_vector() -> Point
-    "Return a random normalized vector"
+    {-
+    Return a random normalized vector.
+    -}
     angle = rand() * 360
     return [cos(angle) sin(angle)]
 
 def norm(Point v) -> Point
-    "Returns v normalized to be along the unit circle."
+    {-
+    Returns v normalized to be along the unit circle.
+    -}
     m = magnitude(v)
     return [v.x / m, v.y / m]
 
 def perpendicular(Point v) -> Point
-    "Returns a vector that is perpendicular to v, rotated clockwise."
+    {-
+    Returns a vector that is perpendicular to v, rotated clockwise.
+    -}
     return [v.y -v.x]
 
 def expand_rect(Point center, Point size) -> Rect
-    "Return a rectangle with the given center and size"
+    {-
+    Return a rectangle with the given center and size.
+    -}
     width = abs(size.x)
     height = abs(size.y)
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
@@ -252,13 +274,16 @@ def rect(Point topleft, Point bottomright) -> Rect
     return [topleft.x topleft.y bottomright.x bottomright.y]
 
 def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
-    "Return whether the two rectangles intersect."
-    <<<
+    {-
+    Return whether the two rectangles intersect.
+    -}
+    
+    {-
     def unit_tests()
         rect_intersects_rect([0 0 10 10] [1 1 2 2])
         rect_intersects_rect([0 0 2 1] [1 0 3 1])
         rect_intersects_rect([1 0 3 1] [0 0 2 1])
-    >>>
+    -}
 
     intersects_on_x = (rect_a.x2 > rect_b.x1) and (rect_b.x2 > rect_a.x1)
     intersects_on_y = (rect_a.y2 > rect_b.y1) and (rect_b.y2 > rect_a.y1)
@@ -270,14 +295,18 @@ def interp_rect(Rect a, Rect b, number ratio) -> Rect
     return Rect(result)
 
 def bezier3(number t, List points) -> Point
-    "Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1]"
+    {-
+    Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
+    -}
     p0 = points[0] -> Point
     p1 = points[1] -> Point
     p2 = points[2] -> Point
     return p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t)
 
 def bezier4(number t, List points) -> Point
-    "Cubic bezier curve, with 4 control points. t must be in the range of [0, 1]"
+    {-
+    Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
+    -}
     p0 = points[0] -> Point
     p1 = points[1] -> Point
     p2 = points[2] -> Point
@@ -291,12 +320,16 @@ def clamp(number x, number minVal, number maxVal) -> number
     return min(max(x, minVal), maxVal)
 
 def smoothstep(number x, number edge0, number edge1) -> number
-    "Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep"
+    {-
+    Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep
+    -}
     x = clamp((x - edge0)/(edge1-edge0), 0, 1)
     return x*x*(3 - 2*x)
 
 def smootherstep(number x, number edge0, number edge1) -> number
-    "Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep"
+    {-
+    Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep
+    -}
     x = clamp((x - edge0)/(edge1-edge0), 0, 1)
     return x*x*x*(x*(x*6 - 15) + 10)
 
@@ -304,14 +337,15 @@ def random_color() -> Color
     return [rand() rand() rand() 1.0]
 
 def blend_color(Color a, Color b, number ratio) -> Color
-    <<<
+    
+    {-
     def unit_tests()
         blend_color(#abc #123 0.0) == #abc
         blend_color(#abc #123 1.0) == #123
         blend_color(#abc #123 2.0) == #123
         blend_color(#abc #123 -1.0) == #abc
         blend_color(#fff #fff 0.5) == #fff
-    >>>
+    -}
 
     max(@ratio, 0.0)
     min(@ratio, 1.0)
@@ -359,7 +393,9 @@ def hsv_to_rgb(List hsv) -> Color
     return [0 0 0 0]
 
 def delta(number val) -> number
-    "Return the difference between this value and the previous call's value"
+    {-
+    Return the difference between this value and the previous call's value
+    -}
     state number prev = val
     result = val - prev
     prev = val
