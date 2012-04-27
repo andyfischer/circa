@@ -9,7 +9,8 @@ typedef int Name;
 enum NameLookupType {
     NAME_LOOKUP_ANY = 1,
     NAME_LOOKUP_TYPE = 2,
-    NAME_LOOKUP_FUNCTION = 3
+    NAME_LOOKUP_FUNCTION = 3,
+    NAME_LOOKUP_MODULE = 4
 };
 
 // Finds a name in this branch or a visible parent branch.

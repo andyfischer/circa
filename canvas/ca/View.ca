@@ -26,11 +26,10 @@ state Point mouse
 
 msg_name = msg[0]
 
-print('received msg = ' msg)
+--print('received msg = ' msg)
 
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
-    print('paint event: ' painter)
 
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)
     painter.setBackground(create_brush(#eee))
@@ -47,7 +46,6 @@ if msg_name == 'onPaintEvent'
 
 elif msg_name == 'onInputEvent'
     event = msg[1] -> InputEvent
-    print('input event: ' event)
     if event.is_mouse
         mouse = event.mousePos
 else

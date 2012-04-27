@@ -23,12 +23,11 @@ state Point mouse
 
 -- Handle incoming message
 -- Used to be: msg = input() -> List
-msg = ['none']
+msg = ['onPaintEvent' []]
 
 msg_name = msg[0]
 
 if msg_name == 'onPaintEvent'
-    print('paint event: ' event)
     painter = msg[1] -> Painter
 
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)

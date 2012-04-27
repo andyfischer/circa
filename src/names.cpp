@@ -30,10 +30,19 @@ bool exposes_nested_names(Term* term);
 
 bool fits_lookup_type(Term* term, NameLookupType type)
 {
+    // Modules can only be found by NAME_LOOKUP_MODULE
+    if (term->function == FUNCS.imported_file)
+        return type == NAME_LOOKUP_MODULE;
+
     switch (type) {
-        case NAME_LOOKUP_ANY: return true;
-        case NAME_LOOKUP_TYPE: return is_type(term);
-        case NAME_LOOKUP_FUNCTION: return is_function(term);
+        case NAME_LOOKUP_ANY:
+            return true;
+        case NAME_LOOKUP_TYPE:
+            return is_type(term);
+        case NAME_LOOKUP_FUNCTION:
+            return is_function(term);
+        case NAME_LOOKUP_MODULE:
+            return false;
     }
     internal_error("");
     return false;

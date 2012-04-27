@@ -464,6 +464,7 @@ void clear_branch(Branch* branch)
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
     set_null(&branch->pendingUpdates);
+    branch->stateType = NULL;
 
     branch->names.clear();
     branch->inProgress = false;
