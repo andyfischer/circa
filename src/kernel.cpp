@@ -89,7 +89,6 @@ Term* DICT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
 Term* NULL_T_TERM = NULL;
-Term* RECT_I_TYPE_TERM = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
@@ -1008,7 +1007,6 @@ void create_primitive_types()
     dict_t::setup_type(&DICT_T);
     eval_context_t::setup_type(&EVAL_CONTEXT_T);
     number_t::setup_type(&FLOAT_T);
-    // handle_t::setup_type(&HANDLE_T);
     int_t::setup_type(&INT_T);
     list_t::setup_type(&LIST_T);
     name_t::setup_type(&NAME_T);
@@ -1109,13 +1107,6 @@ void bootstrap_kernel()
     apply(function_contents(as_function(FUNCS.output)),
         FUNCS.input, TermList())->setBoolProp("optional", true);
 
-    TYPES.actor = unbox_type(parse_type(kernel,
-            "type Actor { String name, Branch branch, List incomingQueue, any stateVal }"));
-
-    // FileSignature is used in some builtin functions
-    TYPES.file_signature = unbox_type(parse_type(kernel,
-            "type FileSignature { String filename, int time_modified }"));
-
     namespace_function::early_setup(kernel);
 
     // Set up some global constants
@@ -1138,8 +1129,6 @@ void bootstrap_kernel()
     indexable_t::setup_type(unbox_type(indexableType));
 
     callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
-
-    RECT_I_TYPE_TERM = parse_type(kernel, "type Rect_i { int x1, int y1, int x2, int y2 }");
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(kernel);
@@ -1187,7 +1176,6 @@ void bootstrap_kernel()
     append_to_overloaded_function(mod_func, kernel->get("max_f"));
 
     FUNCS.mult = create_overloaded_function(kernel, "mult(any,any) -> any");
-    //dump(nested_contents(FUNCS.mult));
     append_to_overloaded_function(FUNCS.mult, kernel->get("mult_i"));
     append_to_overloaded_function(FUNCS.mult, kernel->get("mult_f"));
 
@@ -1232,15 +1220,6 @@ void bootstrap_kernel()
     Term* div_s = create_function(kernel, "div_s");
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
-    // Create some hosted types
-    TYPES.point = as_type(term_value(parse_type(kernel, "type Point { number x, number y }")));
-    parse_type(kernel, "type Point_i { int x, int y }");
-    parse_type(kernel, "type Rect { number x1, number y1, number x2, number y2 }");
-
-    TYPES.color = unbox_type(parse_type(kernel,
-                    "type Color { number r, number g, number b, number a }"));
-
-    color_t::setup_type(TYPES.color);
 
     // Need dynamic_method before any hosted functions
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
@@ -1353,6 +1332,14 @@ void install_standard_library(Branch* kernel)
     FUNCS.length = kernel->get("length");
     FUNCS.type = kernel->get("type");
     FUNCS.output_explicit = kernel->get("output");
+
+    // Finish setting up some hosted types
+    TYPES.point = as_type(kernel->get("Point"));
+    TYPES.color = as_type(kernel->get("Color"));
+    TYPES.actor = as_type(kernel->get("Actor"));
+    TYPES.file_signature = as_type(kernel->get("FileSignature"));
+
+    color_t::setup_type(TYPES.color);
 }
 
 EXPORT caWorld* circa_initialize()

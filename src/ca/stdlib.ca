@@ -141,6 +141,15 @@ def Term.global_id(_) -> int
 def Term.properties(_) -> Map
 def Term.property(_, String) -> any
 
+-- Builtin types
+type Actor { String name, Branch branch, List incomingQueue, any stateVal }
+type FileSignature { String filename, int time_modified }
+type Color { number r, number g, number b, number a }
+type Point { number x, number y }
+type Point_i { int x, int y }
+type Rect { number x1, number y1, number x2, number y2 }
+type Rect_i { int x1 int y1 int x2 int y2 }
+
 def toggle(bool tog) -> bool
     <<<
     Stateful function, returns a boolean status. Every frame the function is called
