@@ -1,3 +1,4 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #pragma once
 
@@ -25,9 +26,6 @@ public:
 protected:
     // Sends the event to App.onInputEvent, and deallocates the caValue.
     void onInputEvent(caValue* event);
-
-    caValue* viewObj;
-    caValue* onPaintEvent;
 
 public slots: void animate();
 };

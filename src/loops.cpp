@@ -106,8 +106,8 @@ void add_implicit_placeholders(Term* forTerm)
         set_input(forTerm, inputIndex, original);
 
         // Repoint terms to use our new input_placeholder
-        for (int i=0; i < contents->length(); i++)
-            remap_pointers_quick(contents->get(i), original, input);
+        for (BranchIterator it(contents); it.unfinished(); it.advance())
+            remap_pointers_quick(*it, original, input);
 
         Term* term = apply(contents, FUNCS.output, TermList(result), name);
 

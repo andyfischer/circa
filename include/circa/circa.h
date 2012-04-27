@@ -126,9 +126,11 @@ void circa_refresh_module(caBranch*);
 // -- Controlling Actors --
 void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename);
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message);
-void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message);
-void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages);
-void circa_actor_run_all_queues(caWorld* world, int maxMessages);
+void circa_actor_run_message(caStack* stack, const char* actorName, caValue* message);
+void circa_actor_run_queue(caStack* stack, const char* actorName, int maxMessages);
+void circa_actor_run_all_queues(caStack* stack, int maxMessages);
+
+caStack* circa_main_stack(caWorld* world);
 
 // -- Controlling the Interpreter --
 
@@ -161,8 +163,8 @@ void circa_output_error(caStack* stack, const char* msg);
 // Return whether a runtime error occurred.
 bool circa_has_error(caStack* stack);
 
-// Clear a runtime error from the stack.
-void circa_clear_error(caStack* stack);
+// Clear all frames from a Stack.
+void circa_clear_stack(caStack* stack);
 
 // Print a human-readable description of the stack's error to stdout.
 void circa_print_error_to_stdout(caStack* stack);

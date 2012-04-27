@@ -1,3 +1,6 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
+
+#include <cstdio>
 
 #include "Scripts.h"
 
@@ -20,26 +23,29 @@ void scripts_initialize()
     qt_bindings_install(qtModule);
 
     g_inputEventModule = circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
-    g_viewModule = circa_load_module_from_file(g_world, "View", "ca/View.ca");
+
+    circa_actor_new_from_file(g_world, "View", "ca/View.ca");
 
     g_mainStack = circa_alloc_stack(g_world);
 }
 
 void scripts_refresh()
 {
+    // don't refresh Qt module
     circa_refresh_module(g_inputEventModule);
-    circa_refresh_module(g_viewModule);
 }
 
-bool scripts_run()
+void scripts_pre_message_send()
 {
-    caStack* stack = g_mainStack;
-    circa_run(stack);
+    scripts_refresh();
+    circa_actor_run_all_queues(g_mainStack, 10);
+}
 
-    if (circa_has_error(stack)) {
-        circa_print_error_to_stdout(stack);
-        circa_clear_error(stack);
-        return false;
+void scripts_post_message_send()
+{
+    if (circa_has_error(g_mainStack)) {
+        printf("Error occurred:\n");
+        circa_print_error_to_stdout(g_mainStack);
     }
-    return true;
+    circa_clear_stack(g_mainStack);
 }

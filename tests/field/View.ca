@@ -19,18 +19,17 @@ type View {
     Branch mainScript
 }
 
--- Incoming message
-msg = input() -> List
-
 state Point mouse
+
+-- Handle incoming message
+-- Used to be: msg = input() -> List
+msg = ['none']
 
 msg_name = msg[0]
 
-print('received msg = ' msg)
-
 if msg_name == 'onPaintEvent'
+    print('paint event: ' event)
     painter = msg[1] -> Painter
-    print('paint event: ' painter)
 
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)
     painter.setBackground(create_brush(#eee))
@@ -50,5 +49,6 @@ elif msg_name == 'onInputEvent'
     print('input event: ' event)
     if event.is_mouse
         mouse = event.mousePos
+elif msg_name == 'none'
 else
     assert(false)

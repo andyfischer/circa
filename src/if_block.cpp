@@ -88,7 +88,6 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
 
     Term* placeholder = append_input_placeholder(contents);
     rename(placeholder, input->name);
-    ca_assert(placeholder->index == existingInputCount);
     change_declared_type(placeholder, input->type);
 
     set_input(ifBlock, existingInputCount, input);
@@ -97,7 +96,6 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         Branch* caseContents = nested_contents(term);
-        ca_assert(count_input_placeholders(caseContents) == existingInputCount);
         Term* casePlaceholder = append_input_placeholder(caseContents);
         change_declared_type(casePlaceholder, placeholder->type);
         rename(casePlaceholder, input->name);
@@ -280,6 +278,9 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 
 void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
 {
+    // disable this
+    return;
+
     Branch* contents = nested_contents(ifCall);
 
     for (OuterInputIterator it(caseContents); it.unfinished(); ++it) {

@@ -25,7 +25,7 @@ namespace input_explicit_function {
 
     void setup(Branch* kernel)
     {
-        FUNCS.input_explicit = import_function(kernel, input_explicit, "input() -> any");
+        FUNCS.input_explicit = import_function(kernel, input_explicit, "input(any) -> any");
         as_function(FUNCS.input_explicit)->postCompile = postCompile;
         
         FUNCS.output_explicit = import_function(kernel, NULL, "output(any)");

@@ -1,3 +1,4 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #pragma once
 
@@ -11,5 +12,5 @@ void scripts_initialize();
 
 void scripts_refresh();
 
-// Run the function on g_mainStack. Handles error checking.
-bool scripts_run();
+void scripts_pre_message_send();
+void scripts_post_message_send();

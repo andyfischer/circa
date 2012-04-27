@@ -1,3 +1,4 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include <QtGui>
 
@@ -11,15 +12,6 @@ GLWidget::GLWidget(QWidget *parent)
     setFixedSize(600, 600);
     setAutoFillBackground(false);
     setMouseTracking(true);
-
-    // Create View object
-    viewObj = circa_alloc_value();
-    circa_push_function_by_name(g_mainStack, "create_view");
-    scripts_run();
-    circa_move(circa_output(g_mainStack, 0), viewObj);
-    circa_pop(g_mainStack);
-
-    onPaintEvent = circa_alloc_value();
 }
 
 void GLWidget::animate()
@@ -35,24 +27,20 @@ void GLWidget::paintEvent(QPaintEvent*)
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
 
-    // call onPaintEvent
-    caStack* stack = g_mainStack;
-    if (!circa_push_function_by_name(stack, "View.onPaintEvent"))
-        return;
+    scripts_pre_message_send();
 
-    circa_copy(viewObj, circa_input(stack, 0));
-    circa_set_typed_pointer(circa_input(stack, 1),
+    // call onPaintEvent
+    caValue* msg = circa_alloc_list(2);
+
+    circa_set_string(circa_index(msg, 0), "onPaintEvent");
+    circa_set_typed_pointer(circa_index(msg, 1),
         circa_find_type(NULL, "Painter"), &painter);
 
-    // State
-    circa_copy(onPaintEvent, circa_input(stack, 2));
+    circa_actor_run_message(g_mainStack, "View", msg);
 
-    scripts_run();
+    circa_dealloc_value(msg);
 
-    // State
-    circa_copy(circa_output(stack, 1), onPaintEvent);
-
-    circa_pop(stack);
+    scripts_post_message_send();
 
     painter.end();
 }
@@ -97,19 +85,17 @@ void GLWidget::keyReleaseEvent ( QKeyEvent * qevent )
 }
 void GLWidget::onInputEvent(caValue* event)
 {
-    caStack* stack = g_mainStack;
+    scripts_pre_message_send();
 
-    if (!circa_push_function_by_name(stack, "View.onInputEvent"))
-        return;
+    caValue* msg = circa_alloc_list(2);
 
-    circa_copy(viewObj, circa_input(stack, 0));
-    circa_copy(event, circa_input(stack, 1));
+    circa_set_string(circa_index(msg, 0), "onInputEvent");
 
-    if (!scripts_run())
-        return;
-
-    // Save object
-    circa_copy(circa_output(stack, 1), viewObj);
-    circa_pop(stack);
+    circa_move(event, circa_index(msg, 1));
     circa_dealloc_value(event);
+
+    circa_actor_run_message(g_mainStack, "View", msg);
+
+    circa_dealloc_value(msg);
+    scripts_post_message_send();
 }

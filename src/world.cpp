@@ -58,10 +58,9 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     run_interpreter(stack);
 }
 
-void actor_run_queue(caWorld* world, caValue* actor, int maxMessages)
+void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)
 {
     caValue* messages = list_get(actor, 2);
-    caStack* stack = world->mainStack;
 
     // Iterate once for each message
     // Note that new messages might be appended to the queue while we are running;
@@ -114,20 +113,24 @@ void circa_actor_post_message(caWorld* world, const char* actorName, caValue* me
     actor_post_message(actor, message);
 }
 
-void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message)
+void circa_actor_run_message(caStack* stack, const char* actorName, caValue* message)
 {
+    caWorld* world = stack->world;
+    ca_assert(world != NULL);
+
     caValue* actor = find_actor(world, actorName);
     if (actor == NULL) {
         printf("couldn't find actor named: %s\n", actorName);
         return;
     }
-    caStack* stack = world->mainStack;
     actor_run_message(stack, actor, message);
 }
 
-
-void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
+void circa_actor_run_queue(caStack* stack, const char* actorName, int maxMessages)
 {
+    World* world = stack->world;
+    ca_assert(world != NULL);
+
     caValue* actor = find_actor(world, actorName);
 
     if (actor == NULL) {
@@ -135,12 +138,20 @@ void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessage
         return;
     }
 
-    actor_run_queue(world, actor, maxMessages);
+    actor_run_queue(stack, actor, maxMessages);
 }
 
-void circa_actor_run_all_queues(caWorld* world, int maxMessages)
+void circa_actor_run_all_queues(caStack* stack, int maxMessages)
 {
+    World* world = stack->world;
+    ca_assert(world != NULL);
+
     for (int i=0; i < list_length(&world->actorList); i++) {
-        actor_run_queue(world, list_get(&world->actorList, i), maxMessages);
+        actor_run_queue(stack, list_get(&world->actorList, i), maxMessages);
     }
+}
+
+caStack* circa_main_stack(caWorld* world)
+{
+    return world->mainStack;
 }

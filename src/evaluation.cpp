@@ -137,10 +137,6 @@ void pop_frame(Stack* context)
 {
     Frame* top = top_frame(context);
 
-    // Check to make sure we aren't losing a stored runtime error.
-    if (error_occurred(context))
-        internal_error("pop_frame called on an errored context");
-
     set_null(&top->registers);
     context->numFrames--;
 }
@@ -211,16 +207,19 @@ void finish_frame(Stack* context)
     pop_frame(context);
     
     Frame* parentFrame = top_frame(context);
-    Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
-    List* parentRegisters = &top_frame(context)->registers;
-    
-    // Copy outputs to the parent frame, and advance PC.
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(finishedBranch, i);
-        if (placeholder == NULL)
-            break;
 
-        swap(registers[placeholder->index], parentRegisters->get(finishedTerm->index + i));
+    if (parentFrame->pc < parentFrame->branch->length()) {
+        Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+        List* parentRegisters = &top_frame(context)->registers;
+        
+        // Copy outputs to the parent frame, and advance PC.
+        for (int i=0;; i++) {
+            Term* placeholder = get_output_placeholder(finishedBranch, i);
+            if (placeholder == NULL)
+                break;
+
+            swap(registers[placeholder->index], parentRegisters->get(finishedTerm->index + i));
+        }
     }
 
     parentFrame->pc = parentFrame->nextPc;
@@ -582,12 +581,12 @@ void print_error_stack(Stack* context, std::ostream& out)
         Frame* frame = get_frame(context, context->numFrames - 1 - frameIndex);
 
         if (frame->override) {
-            std::cout << "[override call]";
+            std::cout << "[override call]" << std::endl;
             continue;
         }
 
         if (frame->pc >= frame->branch->length()) {
-            std::cout << "(end of frame)";
+            std::cout << "(end of frame)" << std::endl;
             continue;
         }
 
@@ -856,6 +855,7 @@ void run_interpreter(Stack* context)
 {
     start_interpreter_session(context);
 
+    context->errorOccurred = false;
     context->running = true;
 
     while (context->running) {
@@ -914,6 +914,10 @@ bool circa_has_error(caStack* stack)
 void circa_clear_error(caStack* stack)
 {
     clear_error(stack);
+}
+void circa_clear_stack(caStack* stack)
+{
+    reset_stack(stack);
 }
 void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
