@@ -13,7 +13,6 @@
 #include "list.h"
 #include "modules.h"
 #include "names.h"
-#include "subroutine.h"
 #include "string_type.h"
 #include "term.h"
 #include "tagged_value.h"

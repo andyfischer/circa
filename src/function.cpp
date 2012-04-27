@@ -8,7 +8,6 @@
 #include "list.h"
 #include "source_repro.h"
 #include "stateful_code.h"
-#include "subroutine.h"
 #include "names.h"
 #include "term.h"
 #include "term_list.h"
@@ -64,7 +63,7 @@ namespace function_t {
         type->name = name_from_string("Function");
         type->initialize = initialize;
         type->copy = copy;
-        type->formatSource = subroutine_f::format_source;
+        type->formatSource = function_format_source;
     }
 
 } // namespace function_t
@@ -84,6 +83,14 @@ std::string get_placeholder_name_for_index(int index)
     std::stringstream sstream;
     sstream << "#input_" << index;
     return sstream.str();
+}
+
+Term* create_function(Branch* branch, const char* name)
+{
+    Term* term = create_value(branch, &FUNCTION_T, name);
+    initialize_function(term);
+    initialize_subroutine(term);
+    return term;
 }
 
 void initialize_function(Term* func)
@@ -129,34 +136,6 @@ void finish_building_function(Function* func, Type* declaredOutputType)
     update_exit_points(contents);
 }
 
-bool is_callable(Term* term)
-{
-    return (term->type == &FUNCTION_T || term->type == &TYPE_T);
-}
-
-bool inputs_statically_fit_function(Term* func, TermList const& inputs)
-{
-    Function* funcAttrs = as_function(func);
-    bool varArgs = function_has_variable_args(func);
-
-    // Fail if wrong # of inputs
-    if (!varArgs && (function_num_inputs(funcAttrs) != inputs.length()))
-        return false;
-
-    for (int i=0; i < inputs.length(); i++) {
-        Type* type = function_get_input_type(func, i);
-        Term* input = inputs[i];
-        if (input == NULL)
-            continue;
-
-        bool alwaysSatisfiesType = term_output_always_satisfies_type(input, type);
-        if (!alwaysSatisfiesType)
-            return false;
-    }
-
-    return true;
-}
-
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
 {
     Function* funcAttrs = as_function(func);
@@ -169,26 +148,6 @@ bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
     for (int i=0; i < inputs.length(); i++) {
         Type* type = function_get_input_type(func, i);
         caValue* value = term_value(inputs[i]);
-        if (value == NULL)
-            continue;
-        if (!cast_possible(value, type))
-            return false;
-    }
-    return true;
-}
-
-bool values_fit_function_dynamic(Term* func, List* list)
-{
-    Function* funcAttrs = as_function(func);
-    bool varArgs = function_has_variable_args(func);
-
-    // Fail if wrong # of inputs
-    if (!varArgs && (function_num_inputs(funcAttrs) != list->length()))
-        return false;
-
-    for (int i=0; i < list->length(); i++) {
-        Type* type = function_get_input_type(func, i);
-        caValue* value = list->get(i);
         if (value == NULL)
             continue;
         if (!cast_possible(value, type))
@@ -441,11 +400,6 @@ const char* get_output_name(Term* term, int outputIndex)
     return "";
 }
 
-bool is_native_function(Function* func)
-{
-    return func->evaluate != evaluate_subroutine;
-}
-
 void function_set_evaluate_func(Term* function, EvaluateFunc evaluate)
 {
     as_function(function)->evaluate = evaluate;
@@ -536,9 +490,46 @@ void function_format_header_source(StyledSource* source, Function* func)
     }
 }
 
+void function_format_source(StyledSource* source, Term* term)
+{
+    append_phrase(source, "def ", term, TK_DEF);
+
+    Function* func = as_function(term);
+
+    function_format_header_source(source, func);
+
+    format_branch_source(source, nested_contents(term), term);
+}
+
 void function_set_empty_evaluation(Function* function)
 {
     function_contents(function)->emptyEvaluation = true;
 }
+
+void evaluate_subroutine(caStack*)
+{
+    // This once did something, but now the default function calling behavior
+    // is the same as evaluating a subroutine.
+}
+
+bool is_subroutine(Term* term)
+{
+    if (!is_function(term))
+        return false;
+    return as_function(term)->evaluate == evaluate_subroutine;
+}
+
+
+void initialize_subroutine(Term* sub)
+{
+    // Install evaluate function
+    as_function(sub)->evaluate = evaluate_subroutine;
+}
+
+void finish_building_subroutine(Term* sub, Term* outputType)
+{
+    finish_update_cascade(nested_contents(sub));
+}
+
 
 } // namespace circa

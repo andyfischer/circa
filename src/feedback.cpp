@@ -7,7 +7,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
-#include "subroutine.h"
+#include "function.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"

@@ -9,7 +9,6 @@
 #include "if_block.h"
 #include "introspection.h"
 #include "source_repro.h"
-#include "subroutine.h"
 #include "stateful_code.h"
 #include "names.h"
 #include "term.h"

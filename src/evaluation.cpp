@@ -15,7 +15,6 @@
 #include "locals.h"
 #include "parser.h"
 #include "stateful_code.h"
-#include "subroutine.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"
@@ -670,13 +669,6 @@ EvaluateFunc get_override_for_branch(Branch* branch)
     // Subroutine no longer acts as an override
     if (func->evaluate == evaluate_subroutine)
         return NULL;
-
-/*
-    if (func->evaluate == NULL) {
-        std::cout << "warning, calling a function with NULL evaluate:"
-            << func->name << "(" << owner->name << ")" <<  std::endl;
-    }
-    */
 
     return func->evaluate;
 }

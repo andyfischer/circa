@@ -20,7 +20,6 @@
 #include "list.h"
 #include "modules.h"
 #include "parser.h"
-#include "subroutine.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "static_checking.h"

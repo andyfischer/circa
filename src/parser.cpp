@@ -18,7 +18,6 @@
 #include "stateful_code.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "subroutine.h"
 #include "switch_block.h"
 #include "names.h"
 #include "term.h"
@@ -711,7 +710,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     ca_assert(is_value(result));
     ca_assert(is_function(result));
-    ca_assert(is_subroutine(result));
 
     set_source_location(result, startPosition, tokens);
 

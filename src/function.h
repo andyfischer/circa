@@ -69,15 +69,13 @@ Branch* function_contents(Function* func);
 // is used if no name is given.
 std::string get_placeholder_name_for_index(int index);
 
+// Create a declared function
+Term* create_function(Branch* branch, const char* name);
+
 void initialize_function(Term* func);
 void finish_building_function(Function* func, Type* declaredOutputType);
 
-// Returns whether this term can be called as a function
-bool is_callable(Term* term);
-
-bool inputs_statically_fit_function(Term* func, TermList const& inputs);
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs);
-bool values_fit_function_dynamic(Term* func, List* list);
 
 Type* derive_specialized_output_type(Term* function, Term* call);
 
@@ -122,16 +120,21 @@ std::string function_get_documentation_string(Function* func);
 
 const char* get_output_name(Term* term, int outputIndex);
 
-// Returns whether this function is 'native', meaning that it's not a subroutine.
-bool is_native_function(Function* function);
-
 void function_set_evaluate_func(Term* func, EvaluateFunc eval);
 
 // Change the function's EvaluateFunc, and update any terms that are using it.
 void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeType);
 
 void function_format_header_source(StyledSource* source, Function* func);
+void function_format_source(StyledSource* source, Term* term);
 
 void function_set_empty_evaluation(Function* function);
+
+void evaluate_subroutine(caStack*);
+bool is_subroutine(Term* term);
+
+// Perform various steps to finish creating a subroutine
+void initialize_subroutine(Term* sub);
+void finish_building_subroutine(Term* sub, Term* outputType);
 
 } // namespace circa

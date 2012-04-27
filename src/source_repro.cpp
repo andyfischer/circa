@@ -8,7 +8,6 @@
 #include "parser.h"
 #include "source_repro.h"
 #include "stateful_code.h"
-#include "subroutine.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "term.h"

@@ -19,7 +19,6 @@
 #include "../../../src/static_checking.h"
 #include "../../../src/string_type.h"
 #include "../../../src/stateful_code.h"
-#include "../../../src/subroutine.h"
 #include "../../../src/switch_block.h"
 #include "../../../src/tagged_value.h"
 #include "../../../src/term.h"
