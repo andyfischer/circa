@@ -50,9 +50,9 @@ QColor to_qcolor(caValue* value)
 
 QRectF to_qrect(caValue* value)
 {
-    float x,y,w,h;
-    circa_vec4(value, &x, &y, &w, &h);
-    return QRectF(x,y,w,h);
+    float x1,y1,x2,y2;
+    circa_vec4(value, &x1, &y1, &x2, &y2);
+    return QRectF(x1, y1, x2 - x1, y2 - y1);
 }
 
 void create_brush(caStack* stack)

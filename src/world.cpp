@@ -5,6 +5,7 @@
 #include "circa/circa.h"
 
 #include "branch.h"
+#include "building.h"
 #include "evaluation.h"
 #include "kernel.h"
 #include "list.h"
@@ -53,9 +54,19 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     push_frame(stack, branch);
     copy(message, circa_input(stack, 0));
 
-    // TODO: state
+    // Copy state (if any)
+    Term* state_in = find_state_input(branch);
+    if (state_in != NULL)
+        copy(list_get(actor, 3), get_register(stack, state_in));
 
     run_interpreter(stack);
+
+    Term* state_out = find_state_output(branch);
+
+    if (!error_occurred(stack) && state_out != NULL) {
+        touch(actor);
+        copy(get_register(stack, state_out), list_get(actor, 3));
+    }
 }
 
 void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)

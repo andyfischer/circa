@@ -22,7 +22,7 @@ type View {
 -- Incoming message
 msg = input() -> List
 
-state Point mouse
+state mouse
 
 msg_name = msg[0]
 
@@ -34,14 +34,14 @@ if msg_name == 'onPaintEvent'
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)
     painter.setBackground(create_brush(#eee))
 
-    painter.fillRect([10 10 100 100] #f00)
+    painter.fillRect([100 10 mouse.x mouse.y] #f00)
 
     pen = create_pen(#fff, 1.0, :none)
     pen.setColor(fadein(#fff))
 
     painter.setPen(pen)
     text = "Hello There"
-    text = concat(self.mouse)
+    text = concat(mouse)
     painter.drawText([10 10 100 100] :none text)
 
 elif msg_name == 'onInputEvent'

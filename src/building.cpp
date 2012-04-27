@@ -242,7 +242,6 @@ void change_function(Term* term, Term* function)
         find_or_create_state_input(term->owningBranch);
 }
 
-
 void unsafe_change_type(Term *term, Type *type)
 {
     ca_assert(type != NULL);
