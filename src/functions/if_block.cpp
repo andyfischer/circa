@@ -41,6 +41,11 @@ namespace if_block_function {
             else
                 append_phrase(source, "else", caseTerm, phrase_type::UNDEFINED);
 
+            // whitespace following the if/elif/else
+            append_phrase(source,
+                    caseTerm->stringPropOptional("syntax:lineEnding", ""),
+                    caseTerm, TK_WHITESPACE);
+
             format_branch_source(source, nested_contents(caseTerm), caseTerm);
         }
     }
