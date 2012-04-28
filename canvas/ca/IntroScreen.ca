@@ -1,0 +1,8 @@
+
+msg = input() -> List
+
+msg_name = msg[0]
+
+if msg_name == 'onPaintEvent'
+    print('received!')
+

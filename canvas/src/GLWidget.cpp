@@ -36,7 +36,7 @@ void GLWidget::paintEvent(QPaintEvent*)
     circa_set_typed_pointer(circa_index(msg, 1),
         circa_find_type(NULL, "Painter"), &painter);
 
-    circa_actor_run_message(g_mainStack, "View", msg);
+    circa_actor_run_message(g_world, "View", msg);
 
     circa_dealloc_value(msg);
 
@@ -94,7 +94,7 @@ void GLWidget::onInputEvent(caValue* event)
     circa_move(event, circa_index(msg, 1));
     circa_dealloc_value(event);
 
-    circa_actor_run_message(g_mainStack, "View", msg);
+    circa_actor_run_message(g_world, "View", msg);
 
     circa_dealloc_value(msg);
     scripts_post_message_send();

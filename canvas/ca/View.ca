@@ -22,7 +22,7 @@ type View {
 -- Incoming message
 msg = input() -> List
 
-state mouse
+state Point mouse
 
 msg_name = msg[0]
 
@@ -43,6 +43,8 @@ if msg_name == 'onPaintEvent'
     text = "Hello There"
     text = concat(mouse)
     painter.drawText([10 10 100 100] :none text)
+
+    send('IntroScreen' msg)
 
 elif msg_name == 'onInputEvent'
     event = msg[1] -> InputEvent

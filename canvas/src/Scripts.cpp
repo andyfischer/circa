@@ -19,12 +19,12 @@ void scripts_initialize()
 {
     g_world = circa_initialize();
 
+    circa_add_module_search_path(g_world, "ca");
+
     caBranch* qtModule = circa_load_module_from_file(g_world, "qt", "ca/qt.ca");
     qt_bindings_install(qtModule);
 
     g_inputEventModule = circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
-
-    circa_actor_new_from_file(g_world, "View", "ca/View.ca");
 
     g_mainStack = circa_alloc_stack(g_world);
 }
@@ -38,7 +38,7 @@ void scripts_refresh()
 void scripts_pre_message_send()
 {
     scripts_refresh();
-    circa_actor_run_all_queues(g_mainStack, 10);
+    circa_actor_run_all_queues(g_world, 10);
 }
 
 void scripts_post_message_send()
