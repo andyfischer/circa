@@ -35,12 +35,12 @@ void modules_add_search_path(const char* str)
     set_string(g_moduleSearchPaths.append(), str);
 }
 
-Term* find_loaded_module(const char* name)
+Branch* find_loaded_module(const char* name)
 {
     for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.imported_file && term->name == name)
-            return term;
+            return nested_contents(term);
     }
     return NULL;
 }
@@ -88,17 +88,17 @@ static bool find_module_file(const char* module_name, String* filenameOut)
     return false;
 }
 
-caName load_module(const char* module_name, Term* loadCall)
+Branch* load_module(const char* module_name, Term* loadCall)
 {
-    Term* existing = find_loaded_module(module_name);
+    Branch* existing = find_loaded_module(module_name);
     if (existing != NULL)
-        return name_Success;
+        return existing;
     
     String filename;
     bool found = find_module_file(module_name, &filename);
 
     if (!found)
-        return name_FileNotFound;
+        return NULL;
 
     Term* import = load_module_from_file(module_name, as_cstring(&filename))->owningTerm;
 
@@ -113,7 +113,7 @@ caName load_module(const char* module_name, Term* loadCall)
     // If the module has static errors, print them now.
     print_static_errors_formatted(nested_contents(import));
 
-    return name_Success;
+    return nested_contents(import);
 }
 
 Branch* find_module_from_filename(const char* filename)

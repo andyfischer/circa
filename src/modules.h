@@ -12,8 +12,9 @@ void modules_add_search_path(const char* str);
 
 Branch* load_module_from_file(const char* module_name, const char* filename);
 
-// returns either Success or FileNotFound
-caName load_module(const char* module_name, Term* loadCall);
+Branch* load_module(const char* module_name, Term* loadCall);
+
+Branch* find_loaded_module(const char* name);
 
 Branch* find_module_from_filename(const char* filename);
 

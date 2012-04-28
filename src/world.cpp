@@ -36,7 +36,11 @@ caValue* find_actor(World* world, const char* name)
         if (string_eq(list_get(actor, 0), name))
             return actor;
     }
-    return NULL;
+
+    // Not found, try to load it
+    caValue* actor = circa_actor_new_from_module(world, name, name);
+    
+    return actor;
 }
 
 void actor_send_message(caValue* actor, caValue* message)
@@ -74,7 +78,7 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     if (error_occurred(stack)) {
         caValue* actorName = list_get(actor, 0);
         std::cout << "Error occured in actor " << as_string(actorName)
-            << " with message: " << as_string(message) << std::endl;
+            << " with message: " << to_string(message) << std::endl;
         circa_print_error_to_stdout(stack);
     }
 
@@ -124,6 +128,25 @@ void circa_actor_new_from_file(caWorld* world, const char* actorName, const char
     // { String name, Branch branch, List incomingQueue, any stateVal }
     set_string(list_get(actor, 0), actorName);
     set_branch(list_get(actor, 1), module);
+}
+
+caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
+{
+    Branch* module = load_module(moduleName, NULL);
+
+    if (module == NULL) {
+        return NULL;
+    }
+
+    caValue* actor = list_append(&world->actorList);
+    create(TYPES.actor, actor);
+
+    // Actor has shape:
+    // { String name, Branch branch, List incomingQueue, any stateVal }
+    set_string(list_get(actor, 0), actorName);
+    set_branch(list_get(actor, 1), module);
+
+    return actor;
 }
 
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message)

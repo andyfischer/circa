@@ -125,6 +125,7 @@ void circa_refresh_module(caBranch*);
 
 // -- Controlling Actors --
 void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename);
+caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName);
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message);
 void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message);
 void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages);
