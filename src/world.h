@@ -15,8 +15,8 @@ protected:
 };
 
 World* alloc_world();
-caValue* find_actor(World* world, const char* name);
-void actor_send_message(caValue* actor, caValue* message);
-void actor_run_message(caStack* stack, caValue* actor, caValue* message);
+void actor_send_message(ListData* actor, caValue* message);
+void actor_run_message(caStack* stack, ListData* actor, caValue* message);
+ListData* find_actor(World* world, const char* name);
 
 } // namespace circa

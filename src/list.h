@@ -29,6 +29,7 @@ ListData* allocate_list(int num_elements);
 void list_decref(ListData* data);
 void free_list(ListData* data);
 void list_make_immutable(ListData* data);
+ListData* as_list_data(caValue* val);
 
 caValue* list_get(ListData* data, int index);
 int list_length(ListData* data);

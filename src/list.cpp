@@ -82,6 +82,11 @@ void list_make_immutable(ListData* data)
 {
     data->immutable = true;
 }
+ListData* as_list_data(caValue* val)
+{
+    ca_assert(is_list(val));
+    return (ListData*) val->value_data.ptr;
+}
 
 caValue* list_get(ListData* data, int index)
 {

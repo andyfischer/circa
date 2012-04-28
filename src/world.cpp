@@ -28,29 +28,32 @@ World* alloc_world()
     return world;
 }
 
-caValue* find_actor(World* world, const char* name)
+ListData* find_actor(World* world, const char* name)
 {
     caValue* actors = &world->actorList;
     for (int i=0; i < list_length(actors); i++) {
         caValue* actor = list_get(actors, i);
         if (string_eq(list_get(actor, 0), name))
-            return actor;
+            return as_list_data(actor);
     }
 
     // Not found, try to load it
     caValue* actor = circa_actor_new_from_module(world, name, name);
+
+    if (actor != NULL)
+        return as_list_data(actor);
     
-    return actor;
+    return NULL;
 }
 
-void actor_send_message(caValue* actor, caValue* message)
+void actor_send_message(ListData* actor, caValue* message)
 {
     caValue* queue = list_get(actor, 2);
 
     copy(message, list_append(queue));
 }
 
-void actor_run_message(caStack* stack, caValue* actor, caValue* message)
+void actor_run_message(caStack* stack, ListData* actor, caValue* message)
 {
     Branch* branch = as_branch(list_get(actor, 1));
     refresh_script(branch);
@@ -70,7 +73,6 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     // Preserve state, if found, and if there was no error.
     Term* state_out = find_state_output(branch);
     if (!error_occurred(stack) && state_out != NULL) {
-        touch(actor);
         copy(get_register(stack, state_out), list_get(actor, 3));
     }
 
@@ -85,7 +87,7 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
     circa_clear_stack(stack);
 }
 
-void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)
+void actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
 {
     caValue* messages = list_get(actor, 2);
 
@@ -151,7 +153,7 @@ caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, cons
 
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message)
 {
-    caValue* actor = find_actor(world, actorName);
+    ListData* actor = find_actor(world, actorName);
     if (actor == NULL) {
         printf("couldn't find actor named: %s\n", actorName);
         return;
@@ -164,7 +166,7 @@ void circa_actor_run_message(caWorld* world, const char* actorName, caValue* mes
 {
     caStack* stack = world->actorStack;
 
-    caValue* actor = find_actor(world, actorName);
+    ListData* actor = find_actor(world, actorName);
     if (actor == NULL) {
         printf("couldn't find actor named: %s\n", actorName);
         return;
@@ -177,7 +179,7 @@ void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessage
     caStack* stack = world->actorStack;
     ca_assert(world != NULL);
 
-    caValue* actor = find_actor(world, actorName);
+    ListData* actor = find_actor(world, actorName);
 
     if (actor == NULL) {
         printf("couldn't find actor named: %s\n", actorName);
@@ -192,7 +194,8 @@ void circa_actor_run_all_queues(caWorld* world, int maxMessages)
     caStack* stack = world->actorStack;
 
     for (int i=0; i < list_length(&world->actorList); i++) {
-        actor_run_queue(stack, list_get(&world->actorList, i), maxMessages);
+        actor_run_queue(stack, as_list_data(list_get(&world->actorList, i)),
+            maxMessages);
     }
 }
 

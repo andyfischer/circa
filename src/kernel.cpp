@@ -256,7 +256,7 @@ void send_func(caStack* stack)
         return;
     }
 
-    caValue* actor = find_actor(stack->world, actorName);
+    ListData* actor = find_actor(stack->world, actorName);
 
     if (actor == NULL) {
         std::string msg = "Actor not found: ";
