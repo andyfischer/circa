@@ -126,12 +126,10 @@ void circa_refresh_module(caBranch*);
 // -- Controlling Actors --
 void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename);
 void circa_actor_post_message(caWorld* world, const char* actorName, caValue* message);
-void circa_actor_run_message(caStack* stack, const char* actorName, caValue* message);
-void circa_actor_run_queue(caStack* stack, const char* actorName, int maxMessages);
-void circa_actor_run_all_queues(caStack* stack, int maxMessages);
+void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message);
+void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages);
+void circa_actor_run_all_queues(caWorld* world, int maxMessages);
 void circa_actor_clear_all(caWorld* world);
-
-caStack* circa_main_stack(caWorld* world);
 
 // -- Controlling the Interpreter --
 

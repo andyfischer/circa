@@ -205,20 +205,7 @@ void call_actor_func(caStack* stack)
         return;
     }
 
-    caValue* actor = find_actor(stack->world, actorName);
-
-    if (actor == NULL) {
-        std::string msg = "Actor not found: ";
-        msg += actorName;
-        circa_output_error(stack, msg.c_str());
-        return;
-    }
-
-    int stackHeight = circa_frame_count(stack);
-
-    actor_run_message(stack, actor, msg);
-
-    circa_stack_restore_height(stack, stackHeight);
+    circa_actor_run_message(stack->world, actorName, msg);
 }
 
 void dynamic_method_call(caStack* stack)
@@ -278,7 +265,7 @@ void send_func(caStack* stack)
         return;
     }
 
-    actor_post_message(actor, msg);
+    actor_send_message(actor, msg);
 }
 
 void refactor__rename(caStack* stack)

@@ -6,7 +6,7 @@ namespace circa {
 
 struct World {
     circa::Value actorList;
-    caStack* mainStack;
+    caStack* actorStack;
 
 protected:
     // Disallow C++ construction
@@ -16,7 +16,7 @@ protected:
 
 World* alloc_world();
 caValue* find_actor(World* world, const char* name);
-void actor_post_message(caValue* actor, caValue* message);
+void actor_send_message(caValue* actor, caValue* message);
 void actor_run_message(caStack* stack, caValue* actor, caValue* message);
 
 } // namespace circa

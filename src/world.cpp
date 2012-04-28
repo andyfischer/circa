@@ -23,7 +23,7 @@ World* alloc_world()
     initialize_null(&world->actorList);
     set_list(&world->actorList, 0);
 
-    world->mainStack = circa_alloc_stack(world);
+    world->actorStack = circa_alloc_stack(world);
 
     return world;
 }
@@ -39,7 +39,7 @@ caValue* find_actor(World* world, const char* name)
     return NULL;
 }
 
-void actor_post_message(caValue* actor, caValue* message)
+void actor_send_message(caValue* actor, caValue* message)
 {
     caValue* queue = list_get(actor, 2);
 
@@ -50,8 +50,6 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
 {
     Branch* branch = as_branch(list_get(actor, 1));
     refresh_script(branch);
-
-    int initialStackHeight = circa_frame_count(stack);
 
     Frame* frame = push_frame(stack, branch);
 
@@ -72,10 +70,15 @@ void actor_run_message(caStack* stack, caValue* actor, caValue* message)
         copy(get_register(stack, state_out), list_get(actor, 3));
     }
 
-    // TODO: A way of handling errors
-    circa_stack_restore_height(stack, initialStackHeight);
-    stack->running = true;
-    stack->errorOccurred = false;
+    // Do something with an error. TODO is a more robust way of saving errors.
+    if (error_occurred(stack)) {
+        caValue* actorName = list_get(actor, 0);
+        std::cout << "Error occured in actor " << as_string(actorName)
+            << " with message: " << as_string(message) << std::endl;
+        circa_print_error_to_stdout(stack);
+    }
+
+    circa_clear_stack(stack);
 }
 
 void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)
@@ -96,9 +99,6 @@ void actor_run_queue(caStack* stack, caValue* actor, int maxMessages)
 
     for (int i=0; i < count; i++) {
         caValue* message = list_get(messages, i);
-
-        // Clean up stack. TODO is an elegant way to preserve error in this case.
-
 
         actor_run_message(stack, actor, message);
     }
@@ -134,13 +134,12 @@ void circa_actor_post_message(caWorld* world, const char* actorName, caValue* me
         return;
     }
 
-    actor_post_message(actor, message);
+    actor_send_message(actor, message);
 }
 
-void circa_actor_run_message(caStack* stack, const char* actorName, caValue* message)
+void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message)
 {
-    caWorld* world = stack->world;
-    ca_assert(world != NULL);
+    caStack* stack = world->actorStack;
 
     caValue* actor = find_actor(world, actorName);
     if (actor == NULL) {
@@ -150,9 +149,9 @@ void circa_actor_run_message(caStack* stack, const char* actorName, caValue* mes
     actor_run_message(stack, actor, message);
 }
 
-void circa_actor_run_queue(caStack* stack, const char* actorName, int maxMessages)
+void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
 {
-    World* world = stack->world;
+    caStack* stack = world->actorStack;
     ca_assert(world != NULL);
 
     caValue* actor = find_actor(world, actorName);
@@ -165,10 +164,9 @@ void circa_actor_run_queue(caStack* stack, const char* actorName, int maxMessage
     actor_run_queue(stack, actor, maxMessages);
 }
 
-void circa_actor_run_all_queues(caStack* stack, int maxMessages)
+void circa_actor_run_all_queues(caWorld* world, int maxMessages)
 {
-    World* world = stack->world;
-    ca_assert(world != NULL);
+    caStack* stack = world->actorStack;
 
     for (int i=0; i < list_length(&world->actorList); i++) {
         actor_run_queue(stack, list_get(&world->actorList, i), maxMessages);
@@ -178,9 +176,4 @@ void circa_actor_run_all_queues(caStack* stack, int maxMessages)
 void circa_actor_clear_all(caWorld* world)
 {
     set_list(&world->actorList, 0);
-}
-
-caStack* circa_main_stack(caWorld* world)
-{
-    return world->mainStack;
 }
