@@ -65,6 +65,7 @@ struct BuiltinFuncs {
     Term* discard;
     Term* div;
     Term* dll_patch;
+    Term* dynamic_call;
     Term* dynamic_method;
     Term* error;
     Term* for_func;
@@ -136,6 +137,8 @@ struct BuiltinTypes {
     Type* actor;
     Type* color;
     Type* file_signature;
+    Type* dynamicInputs;
+    Type* dynamicOutputs;
     Type* point;
 };
 

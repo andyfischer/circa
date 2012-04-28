@@ -120,6 +120,7 @@ Frame* push_frame(Stack* context, Branch* branch, List* registers)
     top->nextPc = 0;
     top->endPc = branch->length();
     top->loop = false;
+    top->dynamicCall = false;
     top->override = false;
     top->stop = false;
 
@@ -193,14 +194,20 @@ void fetch_stack_outputs(Stack* context, caValue* outputs)
     }
 }
 
-void finish_frame(Stack* context)
+void finish_frame(Stack* stack)
 {
-    Frame* top = top_frame(context);
+    Frame* top = top_frame(stack);
     Branch* finishedBranch = top->branch;
 
     // Check to loop
     if (top->loop) {
-        for_loop_finish_frame(context);
+        for_loop_finish_frame(stack);
+        return;
+    }
+
+    // Check to finish dynamic_call
+    if (top->dynamicCall) {
+        finish_dynamic_call(stack);
         return;
     }
 
@@ -209,13 +216,13 @@ void finish_frame(Stack* context)
     swap(&registers, &top->registers);
 
     // Pop frame
-    pop_frame(context);
+    pop_frame(stack);
     
-    Frame* parentFrame = top_frame(context);
+    Frame* parentFrame = top_frame(stack);
 
     if (parentFrame->pc < parentFrame->branch->length()) {
         Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
-        List* parentRegisters = &top_frame(context)->registers;
+        List* parentRegisters = &top_frame(stack)->registers;
         
         // Copy outputs to the parent frame, and advance PC.
         for (int i=0;; i++) {
@@ -230,24 +237,24 @@ void finish_frame(Stack* context)
     parentFrame->pc = parentFrame->nextPc;
 }
 
-Frame* top_frame(Stack* context)
+Frame* top_frame(Stack* stack)
 {
-    if (context->numFrames == 0)
+    if (stack->numFrames == 0)
         return NULL;
-    return get_frame(context, 0);
+    return get_frame(stack, 0);
 }
-Branch* top_branch(Stack* context)
+Branch* top_branch(Stack* stack)
 {
-    Frame* frame = top_frame(context);
+    Frame* frame = top_frame(stack);
     if (frame == NULL)
         return NULL;
     return frame->branch;
 }
 
-void reset_stack(Stack* context)
+void reset_stack(Stack* stack)
 {
-    while (context->numFrames > 0)
-        pop_frame(context);
+    while (stack->numFrames > 0)
+        pop_frame(stack);
 }
 
 void evaluate_single_term(Stack* context, Term* term)
@@ -882,6 +889,68 @@ void run_interpreter_steps(Stack* context, int steps)
     }
 
     context->running = false;
+}
+
+void dynamic_call_func(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    caValue* inputContainer = circa_input(stack, 1);
+    caValue* normalInputs = circa_index(inputContainer, 0);
+    caValue* stateInput = circa_index(inputContainer, 1);
+
+    Frame* frame = push_frame(stack, branch);
+    frame->dynamicCall = true;
+
+    // Copy inputs to the new frame
+    int normalInputIndex = 0;
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            break;
+        caValue* slot = circa_input(stack, i);
+        if (is_state_input(placeholder))
+            copy(stateInput, slot);
+        else {
+            caValue* normalInput = circa_index(normalInputs, normalInputIndex++);
+
+            if (normalInput != NULL)
+                copy(normalInput, slot);
+            else
+                set_null(slot);
+        }
+    }
+}
+
+void finish_dynamic_call(caStack* stack)
+{
+    // Hang on to registers list
+    Frame* top = top_frame(stack);
+    Branch* branch = top->branch;
+    List registers;
+    swap(&registers, &top->registers);
+
+    pop_frame(stack);
+
+    // Copy outputs to a DynamicOutputs container
+    caValue* out = circa_output(stack, 0);
+    create(TYPES.dynamicOutputs, out);
+    caValue* normalOutputs = circa_index(out, 0);
+    caValue* stateOutput = circa_index(out, 1);
+
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(branch, i);
+        if (placeholder == NULL)
+            break;
+        caValue* slot = registers.get(placeholder->index);
+        if (is_state_output(placeholder))
+            copy(slot, stateOutput);
+        else {
+            caValue* normalInput = circa_append(normalOutputs);
+
+            if (normalInput != NULL)
+                copy(slot, normalInput);
+        }
+    }
 }
 
 } // namespace circa

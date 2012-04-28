@@ -23,6 +23,9 @@ struct Frame
     // True if this frame is being evaluated with a C override.
     bool override;
 
+    // Enabled if this frame is being called by dynamic_call
+    bool dynamicCall;
+
     // Used in for-loop
     bool loop;
     
@@ -131,6 +134,7 @@ Term* current_term(Stack* stack);
 Branch* current_branch(Stack* stack);
 caValue* get_frame_register(Frame* frame, int index);
 caValue* get_register(Stack* stack, Term* term);
+EvaluateFunc get_override_for_branch(Branch* branch);
 
 // Create an output value for the current term, using the declared type's
 // initialize function.
@@ -152,5 +156,9 @@ void print_error_stack(Stack* stack, std::ostream& out);
 void run_interpreter(Stack* stack);
 void run_interpreter_step(Stack* stack);
 void run_interpreter_steps(Stack* stack, int steps);
+
+// Dynamic calls
+void dynamic_call_func(caStack* stack);
+void finish_dynamic_call(caStack* stack);
 
 } // namespace circa

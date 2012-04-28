@@ -19,11 +19,28 @@ def changed(any current) -> bool
 def call(any callable, List inputs) -> any
     -- Dynamic function dispatch
 
+-- Dynamic call, this one supports full protocol.
+type DynamicInputs {
+    List inputs
+    any stateVal
+}
+
+type DynamicOutputs {
+    List outputs
+    any stateVal
+}
+
+def dynamic_call(Branch branch, DynamicInputs inputs) -> DynamicOutputs
+
 -- Pass a message to an actor by name
 def send(String name, any msg)
 
 -- Invoke an actor immediately
 def call_actor(String name, any msg)
+
+def actor_run_message(Actor actor, any msg)
+    b = actor.branch
+    call(b, msg)
 
 namespace cppbuild
     def build_module(String baseFilename)

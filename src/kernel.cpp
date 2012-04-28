@@ -1258,6 +1258,7 @@ void install_standard_library(Branch* kernel)
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
         {"call", call_func},
+        {"dynamic_call", dynamic_call_func},
         {"call_actor", call_actor_func},
         {"send", send_func},
         {"refactor:rename", refactor__rename},
@@ -1268,6 +1269,7 @@ void install_standard_library(Branch* kernel)
         {"sys:do_admin_command", sys__do_admin_command},
         {"branch_ref", branch_ref},
         {"load_script_value", load_script_value},
+
         {"Branch.input", Branch__input},
         {"Branch.inputs", Branch__inputs},
         {"Branch.output", Branch__output},
@@ -1343,14 +1345,17 @@ void install_standard_library(Branch* kernel)
     install_function_list(kernel, records);
 
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
+    FUNCS.dynamic_call = kernel->get("dynamic_call");
     FUNCS.length = kernel->get("length");
     FUNCS.type = kernel->get("type");
     FUNCS.output_explicit = kernel->get("output");
 
     // Finish setting up some hosted types
-    TYPES.point = as_type(kernel->get("Point"));
-    TYPES.color = as_type(kernel->get("Color"));
     TYPES.actor = as_type(kernel->get("Actor"));
+    TYPES.color = as_type(kernel->get("Color"));
+    TYPES.point = as_type(kernel->get("Point"));
+    TYPES.dynamicInputs = as_type(kernel->get("DynamicInputs"));
+    TYPES.dynamicOutputs = as_type(kernel->get("DynamicOutputs"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
 
     color_t::setup_type(TYPES.color);
