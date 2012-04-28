@@ -45,21 +45,21 @@ namespace type_check_function {
     }
     CA_FUNCTION(inputs_fit_function)
     {
-        List* inputs = as_list(INPUT(0));
+        caValue* inputs = INPUT(0);
         Function* function = as_function(INPUT(1));
 
         bool varArgs = function_has_variable_args(function);
 
         // Fail if wrong # of inputs
-        if (!varArgs && (function_num_inputs(function) != inputs->length())) {
+        if (!varArgs && (function_num_inputs(function) != circa_count(inputs))) {
             set_bool(OUTPUT, false);
             return;
         }
 
         // Check each input
-        for (int i=0; i < inputs->length(); i++) {
+        for (int i=0; i < circa_count(inputs); i++) {
             Type* type = function_get_input_type(function, i);
-            caValue* value = inputs->get(i);
+            caValue* value = circa_index(inputs, i);
             if (value == NULL)
                 continue;
             if (!cast_possible(value, type)) {
@@ -72,7 +72,7 @@ namespace type_check_function {
     }
     CA_FUNCTION(overload_error_no_match)
     {
-        List* inputs = as_list(INPUT(0));
+        caValue* inputs = INPUT(0);
 
         Term* caller = CALLER;
         Term* func = get_parent_term(caller, 3);

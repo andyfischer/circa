@@ -14,29 +14,27 @@
 
 namespace circa {
 
-Type* find_common_type(List* typeList)
+Type* find_common_type(caValue* list)
 {
-    List& list = *typeList;
-
-    if (list.length() == 0)
+    if (list_length(list) == 0)
         return &ANY_T;
 
     // Check if every type in this list is the same.
     bool all_equal = true;
-    for (int i=1; i < list.length(); i++) {
-        if (as_type(list[0]) != as_type(list[i])) {
+    for (int i=1; i < list_length(list); i++) {
+        if (as_type(list_get(list,0)) != as_type(list_get(list,i))) {
             all_equal = false;
             break;
         }
     }
 
     if (all_equal)
-        return as_type(list[0]);
+        return as_type(list_get(list,0));
 
     // Special case, allow ints to go into floats
     bool all_are_ints_or_floats = true;
-    for (int i=0; i < list.length(); i++) {
-        if ((as_type(list[i]) != &INT_T) && (as_type(list[i]) != &FLOAT_T)) {
+    for (int i=0; i < list_length(list); i++) {
+        if ((as_type(list_get(list,i)) != &INT_T) && (as_type(list_get(list,i)) != &FLOAT_T)) {
             all_are_ints_or_floats = false;
             break;
         }
@@ -47,8 +45,8 @@ Type* find_common_type(List* typeList)
 
     // Another special case, if all types are lists then use LIST_T
     bool all_are_lists = true;
-    for (int i=0; i < list.length(); i++) {
-        if (!is_list_based_type(as_type(list[i])))
+    for (int i=0; i < list_length(list); i++) {
+        if (!is_list_based_type(as_type(list_get(list,i))))
             all_are_lists = false;
     }
 
@@ -95,7 +93,7 @@ Type* infer_type_of_get_index(Term* input)
         return list_get_repeated_type_from_type(input->type);
     case LIST_TYPED_SIZED:
     case LIST_TYPED_SIZED_NAMED:
-        return find_common_type(as_list(list_get_type_list_from_type(input->type)));
+        return find_common_type(list_get_type_list_from_type(input->type));
     case LIST_INVALID_PARAMETER:
     default:
         return &ANY_T;

@@ -552,13 +552,12 @@ int list_find_field_index_by_name(Type* listType, const char* name)
     if (!is_list_based_type(listType))
         return -1;
 
-    caValue* nameList = list_get_name_list_from_type(listType);
-    if (nameList == NULL)
+    caValue* names = list_get_name_list_from_type(listType);
+    if (names == NULL)
         return -1;
 
-    List& names = *as_list(nameList);
-    for (int i=0; i < names.length(); i++)
-        if (string_eq(names[i], name))
+    for (int i=0; i < circa_count(names); i++)
+        if (string_eq(circa_index(names, i), name))
             return i;
 
     // Not found
@@ -731,18 +730,18 @@ namespace list_t {
                 return query->fail();
         }
 
-        List& expectedElementTypes = *as_list(list_get_type_list_from_type(type));
+        caValue* expectedElementTypes = list_get_type_list_from_type(type);
 
         // Special case when looking at a call to list(); look at inputs instead of
         // looking at the result.
         if (subject && subject->function == FUNCS.list)
         {
-            if (subject->numInputs() != expectedElementTypes.length())
+            if (subject->numInputs() != circa_count(expectedElementTypes))
                 return query->fail();
 
-            for (int i=0; i < expectedElementTypes.length(); i++)
+            for (int i=0; i < circa_count(expectedElementTypes); i++)
                 if (!circa::term_output_always_satisfies_type(
-                            subject->input(i), as_type(expectedElementTypes[i])))
+                            subject->input(i), as_type(circa_index(expectedElementTypes, i))))
                     return query->fail();
 
             return query->succeed();
@@ -752,16 +751,17 @@ namespace list_t {
         if (!list_type_has_specific_size(&subjectType->parameter))
             return query->fail();
 
-        List& subjectElementTypes = *as_list(list_get_type_list_from_type(subjectType));
+        caValue* subjectElementTypes = list_get_type_list_from_type(subjectType);
 
         bool anyUnableToDetermine = false;
 
-        for (int i=0; i < expectedElementTypes.length(); i++) {
-            if (i >= subjectElementTypes.length())
+        for (int i=0; i < circa_count(expectedElementTypes); i++) {
+            if (i >= circa_count(subjectElementTypes))
                 return query->fail();
 
             StaticTypeQuery::Result result = run_static_type_query(
-                    as_type(expectedElementTypes[i]), as_type(subjectElementTypes[i]));
+                    as_type(circa_index(expectedElementTypes,i)),
+                    as_type(circa_index(subjectElementTypes,i)));
 
             // If any of these fail, then fail.
             if (result == StaticTypeQuery::FAIL)

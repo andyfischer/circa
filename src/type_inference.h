@@ -6,7 +6,7 @@ namespace circa {
 
 // Returns a common type, which is guaranteed to hold all the types in this
 // list. Currently, this is not very sophisticated.
-Type* find_common_type(List* list);
+Type* find_common_type(caValue* list);
 
 // Shorthands for finding the common type of a fixed list.
 Type* find_common_type(Type* type1, Type* type2);
