@@ -29,14 +29,13 @@ void scripts_initialize()
 void scripts_refresh()
 {
     // don't refresh Qt module
-    circa_refresh_module(g_inputEventModule);
+    //FIXME circa_refresh_module(g_inputEventModule);
 }
 
 void scripts_pre_message_send()
 {
     scripts_refresh();
 
-    //TODO: repeat while messages are being sent
     circa_actor_run_all_queues(g_world, 10);
 }
 

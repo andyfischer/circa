@@ -227,6 +227,8 @@ void Branch__call(caStack* stack)
 void Branch__terms(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
 
     caValue* out = circa_output(stack, 0);
     set_list(out, branch->length());
@@ -238,6 +240,8 @@ void Branch__terms(caStack* stack)
 void Branch__get_term(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
 
     int index = circa_int_input(stack, 1);
     set_term_ref(circa_output(stack, 0), branch->get(index));

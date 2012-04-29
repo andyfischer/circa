@@ -51,10 +51,18 @@ struct ValueIterator
     void advanceWhileInvalid()
     {
         while (true) {
+            if (_stack.size() == 0)
+                return;
+
             IteratorFrame& frame = _stack.back();
 
             if (frame.index >= list_length(frame.value)) {
                 _stack.pop_back();
+
+                if (_stack.size() > 0)
+                    _stack.back().index++;
+
+                continue;
             }
 
             return;
