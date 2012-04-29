@@ -255,6 +255,8 @@ void reset_stack(Stack* stack)
 {
     while (stack->numFrames > 0)
         pop_frame(stack);
+
+    stack->errorOccurred = false;
 }
 
 void evaluate_single_term(Stack* context, Term* term)

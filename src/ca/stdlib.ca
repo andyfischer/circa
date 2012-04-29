@@ -114,6 +114,7 @@ type Interpreter;
 def make_interpreter() -> Interpreter
 def Interpreter.push_frame(_, Branch, List inputs)
 def Interpreter.pop_frame(_)
+def Interpreter.reset(_)
 def Interpreter.run(_)
 def Interpreter.run_steps(_, int steps)
 def Interpreter.frame(_, int depth) -> Frame

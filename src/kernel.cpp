@@ -403,6 +403,12 @@ void Interpreter__pop_frame(caStack* stack)
     ca_assert(self != NULL);
     pop_frame(self);
 }
+void Interpreter__reset(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    reset_stack(self);
+}
 void Interpreter__run(caStack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
@@ -1005,6 +1011,7 @@ void install_standard_library(Branch* kernel)
         {"make_interpreter", make_interpreter},
         {"Interpreter.push_frame", Interpreter__push_frame},
         {"Interpreter.pop_frame", Interpreter__pop_frame},
+        {"Interpreter.reset", Interpreter__reset},
         {"Interpreter.run", Interpreter__run},
         {"Interpreter.run_steps", Interpreter__run_steps},
         {"Interpreter.frame", Interpreter__frame},
