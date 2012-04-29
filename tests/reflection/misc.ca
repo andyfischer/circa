@@ -33,7 +33,7 @@ def myfunc()
 
 x = myfunc()
 
-xr = ref(x)
+xr = term_ref(x)
 assert(xr.function() == myfunc)
 
 -- Function inputs & outputs

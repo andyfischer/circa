@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "function.h"
 #include "introspection.h"
+#include "metaprogramming.h"
 #include "parser.h"
 #include "source_repro.h"
 #include "stateful_code.h"
@@ -334,7 +335,7 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type)
     List* list = (List*) set_list(source->_phrases.append());
     list->resize(3);
     set_string((*list)[0], str);
-    set_ref((*list)[1], term);
+    set_term_ref((*list)[1], term);
     set_int((*list)[2], type);
 }
 

@@ -338,7 +338,7 @@ void list_reverse(caValue* list)
 {
     int count = list_length(list);
     for (int i=0; i < count/2; i++) {
-        swap(list_get(list, i), list_get(list, count - i));
+        swap(list_get(list, i), list_get(list, count - i - 1));
     }
 }
 

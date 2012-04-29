@@ -14,6 +14,7 @@
 #include "../../../src/introspection.h"
 #include "../../../src/kernel.h"
 #include "../../../src/list.h"
+#include "../../../src/metaprogramming.h"
 #include "../../../src/names.h"
 #include "../../../src/source_repro.h"
 #include "../../../src/static_checking.h"

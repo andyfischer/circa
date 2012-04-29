@@ -8,6 +8,7 @@
 #include "evaluation.h"
 #include "importing.h"
 #include "introspection.h"
+#include "kernel.h"
 #include "metaprogramming.h"
 #include "source_repro.h"
 #include "stateful_code.h"
@@ -17,18 +18,21 @@
 #include "type.h"
 
 namespace circa {
+    
 
-void write_term_link(Term* term, caValue* value)
+void set_branch_ref(caValue* val, Branch* branch)
 {
-    set_list(value, 0);
+}
 
-    while (term != NULL) {
-        set_string(list_append(value), get_unique_name(term));
+void set_term_ref(caValue* val, Term* term)
+{
+    change_type(val, &REF_T);
+    val->value_data.ptr = term;
+}
 
-        term = get_parent_term(term);
-    }
-
-    list_reverse(value);
+Term* as_term_ref(caValue* val)
+{
+    return (Term*) val->value_data.ptr;
 }
 
 void branch_ref(caStack* stack)
@@ -39,10 +43,11 @@ void branch_ref(caStack* stack)
     set_branch(circa_output(stack, 0), branch);
 }
 
+
 void term_ref(caStack* stack)
 {
     caTerm* term = circa_caller_input_term(stack, 0);
-    write_term_link((Term*) term, circa_output(stack, 0));
+    set_term_ref(circa_output(stack, 0), (Term*) term);
 }
 
 void Branch__dump(caStack* stack)
@@ -53,8 +58,8 @@ void Branch__dump(caStack* stack)
 void Branch__input(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
-    write_term_link(get_input_placeholder(branch, circa_int_input(stack, 1)),
-        circa_output(stack, 0));
+    set_term_ref(circa_output(stack, 0),
+        get_input_placeholder(branch, circa_int_input(stack, 1)));
 }
 void Branch__inputs(caStack* stack)
 {
@@ -65,14 +70,14 @@ void Branch__inputs(caStack* stack)
         Term* term = get_input_placeholder(branch, i);
         if (term == NULL)
             break;
-        write_term_link(term, list_append(output));
+        set_term_ref(list_append(output), term);
     }
 }
 void Branch__output(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
-    write_term_link(get_output_placeholder(branch, circa_int_input(stack, 1)),
-        circa_output(stack, 0));
+    set_term_ref(circa_output(stack, 0),
+        get_output_placeholder(branch, circa_int_input(stack, 1)));
 }
 void Branch__outputs(caStack* stack)
 {
@@ -83,7 +88,7 @@ void Branch__outputs(caStack* stack)
         Term* term = get_output_placeholder(branch, i);
         if (term == NULL)
             break;
-        write_term_link(term, list_append(output));
+        set_term_ref(list_append(output), term);
     }
 }
 
@@ -148,7 +153,7 @@ void Branch__terms(caStack* stack)
     set_list(out, branch->length());
 
     for (int i=0; i < branch->length(); i++)
-        write_term_link(branch->get(i), circa_index(out, i));
+        set_term_ref(circa_index(out, i), branch->get(i));
 }
 
 void Branch__get_term(caStack* stack)
@@ -156,7 +161,7 @@ void Branch__get_term(caStack* stack)
     Branch* branch = as_branch(circa_input(stack, 0));
 
     int index = circa_int_input(stack, 1);
-    write_term_link(branch->get(index), circa_output(stack, 0));
+    set_term_ref(circa_output(stack, 0), branch->get(index));
 }
 
 bool is_considered_config(Term* term)
@@ -184,7 +189,7 @@ void Branch__list_configs(caStack* stack)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_considered_config(term))
-            write_term_link(term, circa_append(output));
+            set_term_ref(circa_append(output), term);
     }
 }
 
@@ -363,9 +368,9 @@ void Term__input(caStack* stack)
     }
     int index = circa_input(stack, 1)->asInt();
     if (index >= t->numInputs())
-        write_term_link(NULL, circa_output(stack, 0));
+        set_term_ref(circa_output(stack, 0), NULL);
     else
-        write_term_link(t->input(index), circa_output(stack, 0));
+        set_term_ref(circa_output(stack, 0), t->input(index));
 }
 void Term__inputs(caStack* stack)
 {
@@ -377,7 +382,7 @@ void Term__inputs(caStack* stack)
     circa_set_list(output, t->numInputs());
 
     for (int i=0; i < t->numInputs(); i++)
-        write_term_link(t->input(i), circa_index(output, i));
+        set_term_ref(circa_index(output, i), t->input(i));
 }
 void Term__num_inputs(caStack* stack)
 {

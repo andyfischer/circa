@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "debug.h"
 #include "handle.h"
+#include "metaprogramming.h"
 #include "names.h"
 #include "tagged_value.h"
 #include "type.h"
@@ -116,7 +117,7 @@ bool caValue::asBool()
 
 Term* caValue::asRef()
 {
-    return as_ref(this);
+    return as_term_ref(this);
 }
 
 caValue caValue::fromInt(int i)
@@ -789,7 +790,7 @@ void circa_set_pointer(caValue* container, void* ptr)
 }
 void circa_set_term(caValue* container, caTerm* term)
 {
-    set_ref(container, (Term*) term);
+    set_term_ref(container, (Term*) term);
 }
 
 void circa_set_typed_pointer(caValue* container, caType* type, void* ptr)

@@ -272,12 +272,12 @@ void send_func(caStack* stack)
 
 void refactor__rename(caStack* stack)
 {
-    rename(as_ref(circa_input(stack, 0)), as_string(circa_input(stack, 1)));
+    rename(as_term_ref(circa_input(stack, 0)), as_string(circa_input(stack, 1)));
 }
 
 void refactor__change_function(caStack* stack)
 {
-    change_function(as_ref(circa_input(stack, 0)),
+    change_function(as_term_ref(circa_input(stack, 0)),
         (Term*) circa_caller_input_term(stack, 1));
 }
 
@@ -336,7 +336,7 @@ void Function__name(caStack* stack)
 void Function__input(caStack* stack)
 {
     int index = circa_int_input(stack, 1);
-    set_ref(circa_output(stack, 0), function_get_input_placeholder(as_function(circa_input(stack, 0)), index));
+    set_term_ref(circa_output(stack, 0), function_get_input_placeholder(as_function(circa_input(stack, 0)), index));
 }
 
 void Function__inputs(caStack* stack)
@@ -348,14 +348,14 @@ void Function__inputs(caStack* stack)
         Term* term = function_get_input_placeholder(func, i);
         if (term == NULL)
             break;
-        set_ref(list_append(output), term);
+        set_term_ref(list_append(output), term);
     }
 }
 
 void Function__output(caStack* stack)
 {
     int index = circa_int_input(stack, 1);
-    set_ref(circa_output(stack, 0), function_get_output_placeholder(as_function(circa_input(stack, 0)), index));
+    set_term_ref(circa_output(stack, 0), function_get_output_placeholder(as_function(circa_input(stack, 0)), index));
 }
 
 void Function__outputs(caStack* stack)
@@ -367,7 +367,7 @@ void Function__outputs(caStack* stack)
         Term* term = function_get_output_placeholder(func, i);
         if (term == NULL)
             break;
-        set_ref(list_append(output), term);
+        set_term_ref(list_append(output), term);
     }
 }
 

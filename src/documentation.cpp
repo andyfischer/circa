@@ -5,6 +5,7 @@
 #include "kernel.h"
 #include "generic.h"
 #include "function.h"
+#include "metaprogramming.h"
 #include "source_repro.h"
 #include "names.h"
 #include "term.h"
@@ -80,7 +81,7 @@ void generate_docs_for_function(Term* funcTerm, std::stringstream &out)
         for (int overload=0; overload < overloads.length(); overload++) {
             if (overload != 0)
                 out << ", ";
-            Term* overloadTerm = as_ref(overloads[overload]);
+            Term* overloadTerm = as_term_ref(overloads[overload]);
             out << '"' << overloadTerm->name << '"';
 
             ca_assert(overloadTerm->name != "");
