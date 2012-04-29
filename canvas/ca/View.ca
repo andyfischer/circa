@@ -14,11 +14,6 @@ def fadein(Color c) -> Color
     return [c.r c.g c.b e]
 
 
-type View {
-    Point mouse
-    Branch mainScript
-}
-
 -- Incoming message
 msg = input() -> List
 
@@ -32,9 +27,6 @@ if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
 
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)
-    painter.setBackground(create_brush(#eee))
-
-    painter.fillRect([100 10 mouse.x mouse.y] #f00)
 
     pen = create_pen(#fff, 1.0, :none)
     pen.setColor(fadein(#fff))

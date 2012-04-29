@@ -4,5 +4,14 @@ msg = input() -> List
 msg_name = msg[0]
 
 if msg_name == 'onPaintEvent'
-    print('received!')
+    painter = msg[1] -> Painter
 
+    painter.fillRect(painter.viewport + [0 0 1 1], #11d)
+
+    pen = create_pen(#fff, 1.0, :none)
+    pen.setColor(#fff)
+    painter.setPen(pen)
+
+    font = create_font("Sans Serif", 30)
+    painter.setFont(font)
+    painter.drawText([mouse.x mouse.y 300 100] :none "1. Set up a text editor")

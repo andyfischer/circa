@@ -87,7 +87,7 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message)
     circa_clear_stack(stack);
 }
 
-void actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
+int actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
 {
     caValue* messages = list_get(actor, 2);
 
@@ -97,7 +97,7 @@ void actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
 
     int count = circa_count(messages);
     if (count == 0)
-        return;
+        return 0;
 
     // Enforce maximum messages per call
     if (maxMessages > 0 && count >= maxMessages)
@@ -113,6 +113,8 @@ void actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
     Value newQueue;
     list_slice(messages, count, -1, &newQueue);
     swap(&newQueue, messages);
+
+    return count;
 }
 
 } // namespace circa
@@ -174,7 +176,7 @@ void circa_actor_run_message(caWorld* world, const char* actorName, caValue* mes
     actor_run_message(stack, actor, message);
 }
 
-void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
+int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
 {
     caStack* stack = world->actorStack;
     ca_assert(world != NULL);
@@ -183,20 +185,24 @@ void circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessage
 
     if (actor == NULL) {
         printf("couldn't find actor named: %s\n", actorName);
-        return;
+        return 0;
     }
 
-    actor_run_queue(stack, actor, maxMessages);
+    return actor_run_queue(stack, actor, maxMessages);
 }
 
-void circa_actor_run_all_queues(caWorld* world, int maxMessages)
+int circa_actor_run_all_queues(caWorld* world, int maxMessages)
 {
     caStack* stack = world->actorStack;
 
+    int handledCount = 0;
+
     for (int i=0; i < list_length(&world->actorList); i++) {
-        actor_run_queue(stack, as_list_data(list_get(&world->actorList, i)),
+        handledCount += actor_run_queue(stack, as_list_data(list_get(&world->actorList, i)),
             maxMessages);
     }
+
+    return handledCount;
 }
 
 void circa_actor_clear_all(caWorld* world)

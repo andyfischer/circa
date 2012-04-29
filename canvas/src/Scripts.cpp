@@ -10,7 +10,6 @@
 void qt_bindings_install(caBranch* branch);
 
 caWorld* g_world;
-caStack* g_mainStack;
 
 caBranch* g_viewModule;
 caBranch* g_inputEventModule;
@@ -25,8 +24,6 @@ void scripts_initialize()
     qt_bindings_install(qtModule);
 
     g_inputEventModule = circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
-
-    g_mainStack = circa_alloc_stack(g_world);
 }
 
 void scripts_refresh()
@@ -38,14 +35,13 @@ void scripts_refresh()
 void scripts_pre_message_send()
 {
     scripts_refresh();
+
+    //TODO: repeat while messages are being sent
     circa_actor_run_all_queues(g_world, 10);
 }
 
 void scripts_post_message_send()
 {
-    if (circa_has_error(g_mainStack)) {
-        printf("Error occurred:\n");
-        circa_print_error_to_stdout(g_mainStack);
-    }
-    circa_clear_stack(g_mainStack);
+    //TODO: repeat while messages are being sent
+    circa_actor_run_all_queues(g_world, 10);
 }

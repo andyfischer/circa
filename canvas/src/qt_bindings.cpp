@@ -223,6 +223,13 @@ void Painter__setPen(caStack* stack)
 
     painter->setPen(*pen);
 }
+void Painter__setFont(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
+    QFont* font = (QFont*) circa_get_pointer(circa_input(stack, 1));
+
+    painter->setFont(*font);
+}
 void Painter__rotate(caStack* stack)
 {
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
@@ -340,6 +347,7 @@ static const caFunctionBinding IMPORTS[] = {
     {"Painter.restore", Painter__restore},
     {"Painter.setBackground", Painter__setBackground},
     {"Painter.setBrush", Painter__setBrush},
+    {"Painter.setFont", Painter__setFont},
     {"Painter.setPen", Painter__setPen},
     {"Painter.rotate", Painter__rotate},
     {"Painter.translate", Painter__translate},
