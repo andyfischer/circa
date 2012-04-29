@@ -42,5 +42,6 @@ void scripts_pre_message_send()
 void scripts_post_message_send()
 {
     //TODO: repeat while messages are being sent
-    circa_actor_run_all_queues(g_world, 10);
+    for (int i=0; i < 5; i++)
+        circa_actor_run_all_queues(g_world, 10);
 }

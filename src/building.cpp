@@ -1375,8 +1375,6 @@ Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Ter
         if (result == NULL)
             break;
 
-        //hide_from_source(result);
-
         desired = result;
         getter = getter->input(0);
 

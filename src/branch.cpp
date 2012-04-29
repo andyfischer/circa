@@ -269,11 +269,6 @@ void Branch::removeNameBinding(Term* term)
 
 void Branch::shorten(int newLength)
 {
-    if (newLength == 0) {
-        clear_branch(this);
-        return;
-    }
-
     for (int i=newLength; i < length(); i++)
         set(i, NULL);
 

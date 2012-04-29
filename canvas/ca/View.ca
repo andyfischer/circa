@@ -18,6 +18,7 @@ def fadein(Color c) -> Color
 msg = input() -> List
 
 state Point mouse
+state string currentScreen = 'ScriptView'
 
 msg_name = msg[0]
 
@@ -36,8 +37,9 @@ if msg_name == 'onPaintEvent'
     text = concat(mouse)
     painter.drawText([10 10 100 100] :none text)
 
-    send('CodeViewer' msg)
+    --send('CodeViewer' msg)
     --send('IntroScreen' msg)
+    send(currentScreen msg)
 
 elif msg_name == 'onInputEvent'
     event = msg[1] -> InputEvent
@@ -47,5 +49,7 @@ elif msg_name == 'onInputEvent'
     -- send test branch
     if event.eventType == MouseDown
         send('CodeViewer' ['loadTestBranch'])
+
+    send(currentScreen msg)
 else
     assert(false)

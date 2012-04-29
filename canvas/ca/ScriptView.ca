@@ -1,0 +1,22 @@
+
+msg = input()
+
+        
+def Point.inside(self, Rect rect) -> bool
+    return (self.x >= rect.x1) and (self.x <= rect.x2) and (self.y >= rect.y1) and (self.y <= rect.y2)
+
+
+loadButton = [10 10 100 40]
+
+if msg[0] == 'onPaintEvent'
+    painter = msg[1] -> Painter
+
+    send('ScriptRunner' ['call' painter])
+
+    painter.fillRect(loadButton #f00)
+    painter.drawText(loadButton :none "Load")
+
+elif msg[0] == 'onInputEvent'
+    event = msg[1] -> InputEvent
+    if event.eventType == MouseDown and event.mousePos.inside(loadButton)
+        send('ScriptRunner' ['loadFile' 'Test.ca'])

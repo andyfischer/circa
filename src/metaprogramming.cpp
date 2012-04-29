@@ -70,6 +70,9 @@ void update_all_code_references(caValue* value, Branch* oldBranch, Branch* newBr
             
         } else if (is_branch(val)) {
 
+            if (as_branch(val) == NULL)
+                continue;
+
             Term* oldTerm = as_branch(val)->owningTerm;
             if (oldTerm == NULL)
                 continue;

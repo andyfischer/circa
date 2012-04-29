@@ -1,0 +1,20 @@
+
+msg = input()
+
+state Branch branch
+
+if msg[0] == 'loadFile'
+    print('loading file: ' msg[1])
+    branch = load_script_value(msg[1])
+    branch.dump
+elif msg[0] == 'call'
+
+    if not(branch.is_null)
+
+        --branch.load_latest
+
+
+        branch.call([])
+
+else
+    print("ScriptRunner didn't recognize: " msg)
