@@ -334,6 +334,14 @@ void list_slice(caValue* original, int start, int end, caValue* result)
         copy(list_get(original, i + start), list_get(result, i));
 }
 
+void list_reverse(caValue* list)
+{
+    int count = list_length(list);
+    for (int i=0; i < count/2; i++) {
+        swap(list_get(list, i), list_get(list, count - i));
+    }
+}
+
 caValue* list_get(caValue* value, int index)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);

@@ -83,6 +83,8 @@ void list_copy(caValue* source, caValue* dest);
 std::string list_to_string(ListData* value);
 void list_slice(caValue* original, int start, int end, caValue* result);
 
+void list_reverse(caValue* list);
+
 // Functions for working with List's type parameter. Depending on the parameter,
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.

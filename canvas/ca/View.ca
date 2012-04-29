@@ -36,11 +36,16 @@ if msg_name == 'onPaintEvent'
     text = concat(mouse)
     painter.drawText([10 10 100 100] :none text)
 
-    send('IntroScreen' msg)
+    send('CodeViewer' msg)
+    --send('IntroScreen' msg)
 
 elif msg_name == 'onInputEvent'
     event = msg[1] -> InputEvent
     if event.is_mouse
         mouse = event.mousePos
+
+    -- send test branch
+    if event.eventType == MouseDown
+        send('CodeViewer' ['loadTestBranch'])
 else
     assert(false)

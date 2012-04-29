@@ -18,6 +18,7 @@
 #include "introspection.h"
 #include "kernel.h"
 #include "list.h"
+#include "metaprogramming.h"
 #include "modules.h"
 #include "parser.h"
 #include "source_repro.h"
@@ -26,6 +27,7 @@
 #include "string_type.h"
 #include "names.h"
 #include "term.h"
+#include "type_inference.h"
 #include "type.h"
 #include "world.h"
 
@@ -299,13 +301,6 @@ void sys__do_admin_command(caStack* stack)
     do_admin_command(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void branch_ref(caStack* stack)
-{
-    Term* input0 = (Term*) circa_caller_input_term(stack, 0);
-    Branch* branch = input0->nestedContents;
-    gc_mark_object_referenced(&branch->header);
-    set_branch(circa_output(stack, 0), branch);
-}
 
 void load_script_value(caStack* stack)
 {
@@ -317,198 +312,6 @@ void load_script_value(caStack* stack)
     set_branch(circa_output(stack, 0), branch);
 }
 
-void Branch__dump(caStack* stack)
-{
-    dump(as_branch(circa_input(stack, 0)));
-}
-
-void Branch__input(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    set_ref(circa_output(stack, 0),
-        get_input_placeholder(branch, circa_int_input(stack, 1)));
-}
-void Branch__inputs(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
-    set_list(output, 0);
-    for (int i=0;; i++) {
-        Term* term = get_input_placeholder(branch, i);
-        if (term == NULL)
-            break;
-        set_ref(list_append(output), term);
-    }
-}
-void Branch__output(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    set_ref(circa_output(stack, 0),
-        get_output_placeholder(branch, circa_int_input(stack, 1)));
-}
-void Branch__outputs(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
-    set_list(output, 0);
-    for (int i=0;; i++) {
-        Term* term = get_output_placeholder(branch, i);
-        if (term == NULL)
-            break;
-        set_ref(list_append(output), term);
-    }
-}
-
-void Branch__format_source(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-
-    caValue* output = circa_output(stack, 0);
-    circa_set_list(output, 0);
-    format_branch_source((StyledSource*) output, branch);
-}
-
-void Branch__has_static_error(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), has_static_errors_cached(branch));
-}
-
-void Branch__get_static_errors(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-
-    if (is_null(&branch->staticErrors))
-        set_list(circa_output(stack, 0), 0);
-    else
-        copy(&branch->staticErrors, circa_output(stack, 0));
-}
-
-void Branch__get_static_errors_formatted(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
-
-    if (is_null(&branch->staticErrors))
-        set_list(circa_output(stack, 0), 0);
-
-    caValue* errors = &branch->staticErrors;
-    caValue* out = circa_output(stack, 0);
-    set_list(out, circa_count(errors));
-    for (int i=0; i < circa_count(out); i++)
-        format_static_error(circa_index(errors, i), circa_index(out, i));
-}
-
-void Branch__call(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    if (branch == NULL)
-        return circa_output_error(stack, "NULL branch");
-
-    caValue* inputs = circa_input(stack, 1);
-    push_frame_with_inputs(stack, branch, inputs);
-}
-
-// Reflection
-
-void Branch__terms(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-
-    caValue* out = circa_output(stack, 0);
-    set_list(out, branch->length());
-
-    for (int i=0; i < branch->length(); i++)
-        set_ref(circa_index(out, i), branch->get(i));
-}
-
-void Branch__get_term(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-
-    int index = circa_int_input(stack, 1);
-    set_ref(circa_output(stack, 0), branch->get(index));
-}
-
-bool is_considered_config(Term* term)
-{
-    if (term == NULL) return false;
-    if (term->name == "") return false;
-    if (!is_value(term)) return false;
-    if (is_declared_state(term)) return false;
-    if (is_hidden(term)) return false;
-    if (is_function(term)) return false;
-
-    // ignore branch-based types
-    //if (is_branch(term)) return false;
-    if (is_type(term)) return false;
-
-    return true;
-}
-
-void Branch__list_configs(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-
-    caValue* output = circa_output(stack, 0);
-
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        if (is_considered_config(term))
-            set_ref(circa_append(output), term);
-    }
-}
-
-void Branch__functions(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-
-    caValue* output = circa_output(stack, 0);
-    set_list(output, 0);
-
-    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
-        Term* term = *it;
-        if (is_function(term)) {
-            set_function(list_append(output), as_function(term));
-        }
-    }
-}
-
-void Branch__file_signature(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    List* fileOrigin = branch_get_file_origin(branch);
-    if (fileOrigin == NULL)
-        set_null(circa_output(stack, 0));
-    else
-    {
-        List* output = set_list(circa_output(stack, 0), 2);
-        copy(fileOrigin->get(1), output->get(0));
-        copy(fileOrigin->get(2), output->get(1));
-    }
-}
-
-void Branch__statements(caStack* stack)
-{
-    Branch* branch = (Branch*) circa_branch(circa_input(stack, 0));
-
-    caValue* out = circa_output(stack, 0);
-
-    circa_set_list(out, 0);
-
-    for (int i=0; i < branch->length(); i++)
-        if (is_statement(branch->get(i)))
-            circa_set_term(circa_append(out), (caTerm*) branch->get(i));
-}
-
-void Branch__link(caStack* stack)
-{
-    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
-    Branch* source = (Branch*) circa_branch(circa_input(stack, 1));
-
-    branch_link_missing_functions(self, source);
-}
 
 void Frame__branch(caStack* stack)
 {
@@ -643,6 +446,117 @@ void Interpreter__toString(caStack* stack)
     std::stringstream strm;
     eval_context_print_multiline(strm, self);
     set_string(circa_output(stack, 0), strm.str().c_str());
+}
+
+void List__append(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+    copy(circa_input(stack, 1), list_append(out));
+}
+
+Type* List__append_specializeType(Term* term)
+{
+    Term* listInput = term->input(0);
+    switch (list_get_parameter_type(&listInput->type->parameter)) {
+    case LIST_UNTYPED:
+        return listInput->type;
+    case LIST_TYPED_UNSIZED:
+    {
+        Type* listElementType = list_get_repeated_type_from_type(listInput->type);
+        Type* commonType = find_common_type(listElementType, term->input(1)->type);
+        if (commonType == listElementType)
+            return listInput->type;
+        else
+            return create_typed_unsized_list_type(commonType);
+    }
+    case LIST_TYPED_SIZED:
+    case LIST_TYPED_SIZED_NAMED:
+    {    
+        List elementTypes;
+        copy(list_get_type_list_from_type(listInput->type), &elementTypes);
+        set_type(elementTypes.append(), term->input(1)->type);
+        return create_typed_unsized_list_type(find_common_type(&elementTypes));
+    }
+    case LIST_INVALID_PARAMETER:
+    default:
+        return &ANY_T;
+    }
+}
+
+void List__extend(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+
+    caValue* additions = circa_input(stack, 1);
+
+    int oldLength = list_length(out);
+    int additionsLength = list_length(additions);
+
+    list_resize(out, oldLength + additionsLength);
+    for (int i = 0; i < additionsLength; i++)
+        copy(list_get(additions, i), list_get(out, oldLength + i));
+}
+
+void List__count(caStack* stack)
+{
+    set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
+}
+void List__length(caStack* stack)
+{
+    set_int(circa_output(stack, 0), list_length(circa_input(stack, 0)));
+}
+
+void List__insert(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+
+    copy(circa_input(stack, 1), list_insert(out, circa_int_input(stack, 2)));
+}
+
+void List__slice(caStack* stack)
+{
+    caValue* input = circa_input(stack, 0);
+    int start = circa_int_input(stack, 1);
+    int end = circa_int_input(stack, 2);
+    caValue* output = circa_output(stack, 0);
+
+    if (start < 0)
+        start = 0;
+    else if (start > list_length(input))
+        start = list_length(input);
+
+    if (end > list_length(input))
+        end = list_length(input);
+
+    if (end < start) {
+        set_list(output, 0);
+        return;
+    }
+
+    int length = end - start;
+    set_list(output, length);
+
+    for (int i=0; i < length; i++)
+        copy(list_get(input, start + i), list_get(output, i));
+}
+
+void List__join(caStack* stack)
+{
+    caValue* input = circa_input(stack, 0);
+    caValue* joiner = circa_input(stack, 1);
+
+    caValue* out = circa_output(stack, 0);
+    set_string(out, "");
+
+    for (int i=0; i < list_length(input); i++) {
+        if (i != 0)
+            string_append(out, joiner);
+
+        string_append(out, list_get(input, i));
+    }
 }
 
 void String__char_at(caStack* stack)
@@ -799,198 +713,6 @@ void Type__property(caStack* stack)
         set_null(circa_output(stack, 0));
     else
         copy(prop, circa_output(stack, 0));
-}
-
-void Term__name(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_string(circa_output(stack, 0), t->name);
-}
-void Term__to_string(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_string(circa_output(stack, 0), circa::to_string(term_value(t)));
-}
-void Term__to_source_string(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_string(circa_output(stack, 0), get_term_source_text(t));
-}
-void Term__function(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_function(circa_output(stack, 0), as_function(t->function));
-}
-void Term__type(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_type(circa_output(stack, 0), t->type);
-}
-void Term__assign(caStack* stack)
-{
-    Term* target = circa_input(stack, 0)->asRef();
-    if (target == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
-
-    caValue* source = circa_input(stack, 1);
-
-    if (!cast_possible(source, declared_type(target))) {
-        circa_output_error(stack, "Can't assign, type mismatch");
-        return;
-    }
-
-    circa::copy(source, term_value(target));
-}
-void Term__value(caStack* stack)
-{
-    Term* target = circa_input(stack, 0)->asRef();
-    if (target == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
-
-    copy(term_value(target), circa_output(stack, 0));
-}
-
-int tweak_round(double a) {
-    return int(a + 0.5);
-}
-
-void Term__tweak(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-
-    int steps = tweak_round(circa_input(stack, 1)->toFloat());
-
-    caValue* val = term_value(t);
-
-    if (steps == 0)
-        return;
-
-    if (is_float(val)) {
-        float step = get_step(t);
-
-        // Do the math like this so that rounding errors are not accumulated
-        float new_value = (round(as_float(val) / step) + steps) * step;
-        set_float(val, new_value);
-
-    } else if (is_int(val))
-        set_int(val, as_int(val) + steps);
-    else
-        circa_output_error(stack, "Ref is not an int or number");
-}
-
-void Term__asint(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
-    if (!is_int(term_value(t))) {
-        circa_output_error(stack, "Not an int");
-        return;
-    }
-    set_int(circa_output(stack, 0), as_int(term_value(t)));
-}
-void Term__asfloat(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
-    
-    set_float(circa_output(stack, 0), to_float(term_value(t)));
-}
-void Term__input(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
-    int index = circa_input(stack, 1)->asInt();
-    if (index >= t->numInputs())
-        set_ref(circa_output(stack, 0), NULL);
-    else
-        set_ref(circa_output(stack, 0), t->input(index));
-}
-void Term__inputs(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-
-    caValue* output = circa_output(stack, 0);
-    circa_set_list(output, t->numInputs());
-
-    for (int i=0; i < t->numInputs(); i++)
-        set_ref(circa_index(output, i), t->input(i));
-}
-void Term__num_inputs(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL) {
-        circa_output_error(stack, "NULL reference");
-        return;
-    }
-    set_int(circa_output(stack, 0), t->numInputs());
-}
-
-void Term__source_location(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-
-    circa_set_vec4(circa_output(stack, 0),
-        t->sourceLoc.col, t->sourceLoc.line,
-        t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
-}
-void Term__global_id(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-
-    set_int(circa_output(stack, 0), t->id);
-}
-void Term__properties(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    circa::copy(&t->properties, circa_output(stack, 0));
-}
-void Term__property(caStack* stack)
-{
-    Term* t = circa_input(stack, 0)->asRef();
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-
-    const char* key = circa_string_input(stack, 1);
-
-    caValue* value = term_get_property(t, key);
-
-    if (value == NULL)
-        set_null(circa_output(stack, 0));
-    else
-        circa::copy(value, circa_output(stack, 0));
 }
 
 void length(caStack* stack)
@@ -1267,26 +989,7 @@ void install_standard_library(Branch* kernel)
         {"reflect:kernel", reflect__kernel},
         {"sys:module_search_paths", sys__module_search_paths},
         {"sys:do_admin_command", sys__do_admin_command},
-        {"branch_ref", branch_ref},
         {"load_script_value", load_script_value},
-
-        {"Branch.input", Branch__input},
-        {"Branch.inputs", Branch__inputs},
-        {"Branch.output", Branch__output},
-        {"Branch.outputs", Branch__outputs},
-        {"Branch.dump", Branch__dump},
-        {"Branch.call", Branch__call},
-        {"Branch.file_signature", Branch__file_signature},
-        {"Branch.statements", Branch__statements},
-        {"Branch.format_source", Branch__format_source},
-        {"Branch.get_term", Branch__get_term},
-        {"Branch.get_static_errors", Branch__get_static_errors},
-        {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
-        {"Branch.has_static_error", Branch__has_static_error},
-        {"Branch.list_configs", Branch__list_configs},
-        {"Branch.functions", Branch__functions},
-        {"Branch.terms", Branch__terms},
-        {"Branch.link", Branch__link},
 
         {"Frame.branch", Frame__branch},
         {"Frame.register", Frame__register},
@@ -1308,6 +1011,14 @@ void install_standard_library(Branch* kernel)
         {"Interpreter.output", Interpreter__output},
         {"Interpreter.toString", Interpreter__toString},
 
+        {"List.append", List__append},
+        {"List.extend", List__extend},
+        {"List.count", List__count},
+        {"List.insert", List__insert},
+        {"List.length", List__length},
+        {"List.join", List__join},
+        {"List.slice", List__slice},
+
         {"String.char_at", String__char_at},
         {"String.ends_with", String__ends_with},
         {"String.length", String__length},
@@ -1321,28 +1032,12 @@ void install_standard_library(Branch* kernel)
         
         {"Type.name", Type__name},
         {"Type.property", Type__property},
-
-        {"Term.name", Term__name},
-        {"Term.to_string", Term__to_string},
-        {"Term.to_source_string", Term__to_source_string},
-        {"Term.function", Term__function},
-        {"Term.get_type", Term__type},
-        {"Term.assign", Term__assign},
-        {"Term.value", Term__value},
-        {"Term.tweak", Term__tweak},
-        {"Term.asint", Term__asint},
-        {"Term.asfloat", Term__asfloat},
-        {"Term.input", Term__input},
-        {"Term.inputs", Term__inputs},
-        {"Term.num_inputs", Term__num_inputs},
-        {"Term.source_location", Term__source_location},
-        {"Term.global_id", Term__global_id},
-        {"Term.properties", Term__properties},
-        {"Term.property", Term__property},
         {NULL, NULL}
     };
 
     install_function_list(kernel, records);
+
+    metaprogramming_install_functions(kernel);
 
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
@@ -1359,6 +1054,9 @@ void install_standard_library(Branch* kernel)
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
 
     color_t::setup_type(TYPES.color);
+
+    LIST_APPEND_FUNC = kernel->get("List.append");
+    as_function(LIST_APPEND_FUNC)->specializeType = List__append_specializeType;
 }
 
 EXPORT caWorld* circa_initialize()

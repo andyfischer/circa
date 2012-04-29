@@ -1,64 +1,80 @@
 
-Outline of how the interpreter runs.
+# Outline of interpreter #
 
-Each interpreter is stored as a first-class object called a Stack. The program can have several Stacks at once.
+Each interpreter is stored as a first-class object called a Stack. The program can have
+several Stacks at once.
 
-A Stack has a list of Frames. A Frame is an activation record.
+A Stack has a list of Frames, each one acts as an activation record for a certain Branch.
 
-Each Frame has a Branch and a list of "registers" (a list of Values). A frame also has a PC (program counter) index, which is an index into its Branch. The PC index may be past the last term, in which case the frame is about to finish.
+The Frame contains:
+  A reference to a Branch
+  A list of 'register' values
+  A current PC and a next PC
 
-A Branch is an object that stores compiled code. It does not store data associated with one invocation (usually). A Branch contains a list of Terms.
-
-The Frame's registers are the "local" values. Each one corresponds to a Term, and it's easy to go from Term to register or vice-versa.
+The Frame's registers are the "local" values. Each one corresponds to a Term, and it's
+easy to go from Term to register or vice-versa.
 
 The topmost Frame is the one currently being evaluated.
 
 # STARTING THE INTERPRETER #
 
-The run_interpreter function runs an interpreter until interrupted or finished. This function takes a Stack as input, and this stack must have at least one Frame on it.
+There is some code that invokes the interpreter (calling the run_interpreter function),
+we refer to this as the "caller". When starting an interpreter session, the caller will
+manually push a branch onto the stack (creating a frame). Then, the caller may copy input
+values to the frame's registers. The caller should copy an input for each
+input_placeholder() term.
 
-When starting an interpreter run, the calling code will manually push a branch onto the stack (creating a frame). Then, the calling code will copy input values to the frame's registers. Generally, the calling code should copy an input for every input_placeholder() term.
+The caller executes run_interpreter(). We refer to an "interpreter session", which is the
+duration of the run_interpreter function. When that function exits, the "session" has
+ended.
 
-Once run_interpreter starts, it remembers the original "top" frame. This frame will not be popped, instead if we reach the end of this frame, the run_interpreter function will return. During the course of evaluation, we might push additional frames. And, if an error or interrupt occurs, we might return from run_interpreter with more frames than we started with. But not less.
+During evaluation, the interpreter will evaluate each term in sequence, and save results
+to the frame registers. The stack may grow and shrink with control flow operations.
 
-When finished, the calling code will check to see if there is an error. The caller may examine the error, and they may dispose of it. After making sure to throw away any extra frames that it doesn't care about, the caller may fetch output values from the top frame's registers. Generally, it should fetch the values for each output_placeholder() term.
+The interpreter session terminates either when the end of the topmost branch is reached,
+or the interpreter encounters an error.
 
-The calling code may then decide to reset the PC if it wants to repeat the same frame, or it may toss out the frame, or it may be finished with the entire Stack.
+If the interpreter finishes the topmost branch, it will exit the session and leave the
+topmost frame as is. The caller should read the output values (if any) from this frame
+and then clear the stack.
+
+If there is an error, the stack will be left in its exact state at the time of the error.
+The caller should check for an error once the session ends, and handle the error
+appropriately (such as displaying it to the user). The caller must expect that the stack
+may have more frames than expected.
 
 # THE INTERPRETER LOOP #
 
 The interpreter loop goes as follows:
-
- 1: Check if this branch is overridden by a C function
- 2: Look at PC. If we have reached the end of the frame, then go to finish_frame
- 3: Look at the Term at the current PC.
- 4: If the Term has no evaluation func, do nothing and goto next.
- 5: Fetch the Branch to push. The selection of the Branch depends on the term's function
-     - For an if-block or switch, the Branch will be selected based on the condition or
-       input value
-     - Otherwise, if the term has a nested branch, use that
-     - Otherwise, use the branch corresponding to the term's function
- 6: Push a frame for this branch
-   - Check if this new branch is overridden by a C function
- next:
-   - Advance PC by one
-   - Return to step 2
-
-# BRANCH EVALUATION #
-
-When pushing a new branch to the stack, there are promises made:
-
-  - Caller promises to put input values in the registers for each input_placeholder. This
-      might be done by the interpreter or it might be external code.
-
-  - Callee promises to do all the actions that the branch normally promises
-  - Callee promises to leave output values in the registers for each output_placeholder
-
-# BRANCH OVERRIDING #
-
-Any branch can be overridden by a foreign function. When this happens, the interpreter
-doesn't step through the Terms for the branch. Instead, the override function is called
-once, and it's expected to fulfill all the promises mentioned above.
+ 
+ 1: Advance PC to nextPC, and set nextPC to (PC + 1)
+ 2: Check if we have started a Branch that has an override func. If so:
+       Set nextPC to the last index in this branch
+          Execute the C override
+          If the C override raised an error:
+             Terminate
+          Repeat loop
+ 3: Look at PC. If we have reached the end of the top frame, then:
+       If this is the topmost frame:
+          Terminate the session
+       Otherwise:
+          Copy outputs to above frame
+          Pop the topmost frame
+          Repeat loop
+ 4: Look at the Term at the current PC.
+ 5: If the Term has no evaluation func, or the Branch is emptyEvaluation:
+       Repeat loop
+ 6: Choose the Branch to push. The selection of the Branch depends on the term's function
+       For an if-block or switch, the Branch will be selected based on the condition or
+         input value
+       Otherwise, if the term has a nested branch, use that.
+       Otherwise, use the branch corresponding to the term's function
+ 7: Start a new frame
+       Push a frame using the chosen branch
+       Copy input values to the new frame. Check that values match expected types.
+       If an input doesn't fit the Branch's expected type:
+           Raise error and terminate
+       Repeat loop
 
 # ACCESSING THE STACK #
 
@@ -102,11 +118,6 @@ These functions are intended to be used by evaluation override functions.
 
         Promise: Returns the branch where the current call was made.
         Impl: Returns the branch of the second-to-top frame.
-
-
-
-
-
 
 
 
@@ -183,11 +194,3 @@ At this point, here is what the accessors will return:
     circa_caller_term(stack)   - returns the 'y' term
     circa_caller_input_term(stack, 0) - returns the 'x' term
     circa_caller_branch(stack) - returns BranchA
-
-Temp notes on refactoring:
-
-circa_input_term -> circa_caller_input_term
-circa_frame_input -> circa_input
-circa_frame_output -> circa_output
-circa_current_term -> circa_caller_term
-circa_callee_branch -> circa_caller_branch

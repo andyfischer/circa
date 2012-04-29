@@ -73,11 +73,12 @@ namespace sys
     def module_search_paths() -> List
     def do_admin_command(String cmd) -> String
 
-def branch_ref(any branch :ignore_error) -> Branch
 
 -- Load a Branch from a file.
 def load_script_value(String filename) -> Branch
 
+-- Metaprogramming on Branch
+def branch_ref(any branch :ignore_error) -> Branch
 def Branch.input(_, int index) -> Term
 def Branch.inputs(_) -> List
 def Branch.output(_, int index) -> Term
@@ -118,6 +119,14 @@ def Interpreter.frame(_, int depth) -> Frame
 def Interpreter.output(_, int index) -> any
 def Interpreter.toString(_) -> String
 
+def List.append(self :out, any)
+def List.extend(self :out, List)
+def List.count(self) -> int
+def List.insert(self :out, int, any)
+def List.length(self) -> int
+def List.join(self, String) -> String
+def List.slice(self, int start, int fin) -> List
+
 def String.append(self :out, String right)
     self = concat(self, right)
     
@@ -143,6 +152,8 @@ def Type.property(_, String) -> any
 def Type.is_handle(_) -> bool
     return _.property('handle') == true
 
+-- Metaprogramming on Term
+def term_ref(any :ignore_error) -> Term
 def Term.name(self) -> String
 def Term.to_string(_) -> String
 def Term.to_source_string(_) -> String

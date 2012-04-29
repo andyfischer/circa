@@ -1,0 +1,18 @@
+
+Message passing is pretty nice
+Writing message switches is not the best, but not that bad. Could be improved
+by a mechanism that automatically detects an unhandled message, and offers
+to help write a new case.
+
+Error handling is lacking (I think it's ignoring errors right now?)
+Easy to crash the system with bad type
+  Cast errors should at the very least, prevent the function from being called.
+
+When writing code that references Branches and Terms, we have the problem that
+code reloading causes the old thing to be destroyed.
+
+ - We could fix this so that the old Branch / Term becomes immutable when referenced,
+   so that we can always refer to the old version
+ - But, we don't need this right now. (we might need it some day)
+ - Referring to the old thing will probably be useful some day, but
+

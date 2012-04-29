@@ -1,0 +1,31 @@
+
+msg = input(0)
+
+state Branch branch
+
+def testBranch(int i) -> int
+    i = i + 1
+    print(i)
+    return i
+
+
+if msg[0] == 'setBranch'
+    branch = msg[1] -> Branch
+if msg[0] == 'loadTestBranch'
+    print('test branch!')
+    branch = branch_ref(testBranch)
+elif msg[0] == 'onPaintEvent'
+    painter = msg[1] -> Painter
+
+    painter.fillRect(painter.viewport + [0 0 1 1], #33d)
+
+    if branch == null
+        painter.drawText([10 10 100 100] :none "(null branch)")
+    else
+        y = 0
+
+        for t in branch.terms
+            @t -> Term
+            painter.drawText([10, y, 100, y + 100] :none t.function.name)
+            y += 20
+
