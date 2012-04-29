@@ -79,23 +79,24 @@ def load_script_value(String filename) -> Branch
 
 -- Metaprogramming on Branch
 def branch_ref(any branch :ignore_error) -> Branch
-def Branch.input(_, int index) -> Term
-def Branch.inputs(_) -> List
-def Branch.output(_, int index) -> Term
-def Branch.outputs(_) -> List
+def Branch.call(_, any inputs :multiple)
+def Branch.dump(_)
+def Branch.file_signature(_) -> any
 def Branch.format_source(_) -> StyledSource
-def Branch.has_static_error(_) -> bool
+def Branch.functions(_) -> List
+def Branch.get_term(_, int index) -> Term
 def Branch.get_static_errors(_) -> List
 def Branch.get_static_errors_formatted(_) -> List
-def Branch.call(_, any inputs :multiple)
-def Branch.terms(_) -> List
-def Branch.get_term(_, int index) -> Term
-def Branch.list_configs(_) -> List
-def Branch.functions(_) -> List
-def Branch.file_signature(_) -> any
-def Branch.statements(_) -> List
-def Branch.dump(_)
+def Branch.has_static_error(_) -> bool
+def Branch.input(_, int index) -> Term
+def Branch.is_null(_) -> bool
+def Branch.inputs(_) -> List
 def Branch.link(_, Branch lib)
+def Branch.list_configs(_) -> List
+def Branch.output(_, int index) -> Term
+def Branch.outputs(_) -> List
+def Branch.statements(_) -> List
+def Branch.terms(_) -> List
 
 type Frame;
 def Frame.branch(_) -> Branch

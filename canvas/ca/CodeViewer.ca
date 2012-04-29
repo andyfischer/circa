@@ -18,7 +18,7 @@ elif msg[0] == 'onPaintEvent'
 
     painter.fillRect(painter.viewport + [0 0 1 1], #33d)
 
-    if branch == null
+    if branch.is_null
         painter.drawText([10 10 100 200] :none "(null branch)")
     else
         x = 10

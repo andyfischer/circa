@@ -10,6 +10,7 @@ Window::Window()
     GLWidget *openGL = new GLWidget(this);
 
     QGridLayout *layout = new QGridLayout;
+    layout->setMargin(0);
     layout->addWidget(openGL, 0, 0);
     setLayout(layout);
 

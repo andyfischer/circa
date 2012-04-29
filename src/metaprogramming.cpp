@@ -152,6 +152,11 @@ void Branch__inputs(caStack* stack)
         set_term_ref(list_append(output), term);
     }
 }
+void Branch__is_null(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), branch == NULL);
+}
 void Branch__output(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
@@ -525,6 +530,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"branch_ref", branch_ref},
         {"Branch.input", Branch__input},
         {"Branch.inputs", Branch__inputs},
+        {"Branch.is_null", Branch__is_null},
         {"Branch.output", Branch__output},
         {"Branch.outputs", Branch__outputs},
         {"Branch.dump", Branch__dump},
