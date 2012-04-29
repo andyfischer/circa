@@ -52,6 +52,7 @@ Term* get_parent_term(Term* term);
 Term* get_parent_term(Term* term, int levels);
 bool name_is_reachable_from(Term* term, Branch* branch);
 Branch* find_first_common_branch(Term* left, Term* right);
+bool term_is_child_of_branch(Term* term, Branch* branch);
 
 // Get a name of 'term' which is valid in 'branch'. This might simply return term's name,
 // or if term is inside a namespace or object, this would return a colon-separated name.

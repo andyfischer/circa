@@ -252,6 +252,18 @@ Branch* find_first_common_branch(Term* left, Term* right)
     return NULL;
 }
 
+bool term_is_child_of_branch(Term* term, Branch* branch)
+{
+    while (term != NULL) {
+        if (term->owningBranch == branch)
+            return true;
+
+        term = get_parent_term(term);
+    }
+
+    return false;
+}
+
 // Returns whether or not we succeeded
 bool get_relative_name_recursive(Branch* branch, Term* term, std::stringstream& output)
 {

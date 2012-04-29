@@ -10,11 +10,13 @@ int main(int argc, char** argv)
     void branch_register_tests();
     void compound_type_register_tests();
     void interpreter_register_tests();
+    void metaprogramming_register_tests();
     void tokenizer_register_tests();
 
     branch_register_tests();
     compound_type_register_tests();
     interpreter_register_tests();
+    metaprogramming_register_tests();
     tokenizer_register_tests();
 
     caWorld* world = circa_initialize();

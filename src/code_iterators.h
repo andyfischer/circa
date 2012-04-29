@@ -120,5 +120,4 @@ struct OuterInputIterator
     void operator++() { advance(); }
 };
 
-    
 } // namespace circa

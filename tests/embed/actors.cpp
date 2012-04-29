@@ -10,9 +10,6 @@ int main(int argc, char** argv)
 
     circa_add_module_search_path(world, "tests/embed");
 
-    //circa_actor_new_from_file(world, "ActorA", "tests/embed/ActorA.ca");
-    //circa_actor_new_from_file(world, "ActorB", "tests/embed/ActorB.ca");
-
     caValue* msg = circa_alloc_value();
     circa_set_int(msg, 0);
 
@@ -23,9 +20,6 @@ int main(int argc, char** argv)
 
     printf("Resetting and starting actors C and D...\n");
     circa_actor_clear_all(world);
-
-    //circa_actor_new_from_file(world, "ActorC", "tests/embed/ActorC.ca");
-    //circa_actor_new_from_file(world, "ActorD", "tests/embed/ActorD.ca");
 
     circa_actor_post_message(world, "ActorC", msg);
 

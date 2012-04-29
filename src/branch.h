@@ -179,10 +179,7 @@ List* branch_get_file_origin(Branch* branch);
 // branch's origin. So, if this function true then the branch should be reloaded.
 bool check_and_update_file_origin(Branch* branch, const char* filename);
 
-// If this branch has a file origin, then check the backing file, and if it's
-// newer, update the branch with the latest contents. Returns true if the
-// branch contents were updated.
-bool refresh_script(Branch* branch);
+Branch* load_latest_branch(Branch* branch);
 
 struct BranchInvariantCheck
 {

@@ -9,6 +9,7 @@
 #include "evaluation.h"
 #include "kernel.h"
 #include "list.h"
+#include "metaprogramming.h"
 #include "modules.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -53,11 +54,28 @@ void actor_send_message(ListData* actor, caValue* message)
     copy(message, list_append(queue));
 }
 
-void actor_run_message(caStack* stack, ListData* actor, caValue* message)
+void actor_refresh_script(caWorld* world, ListData* actor)
 {
     Branch* branch = as_branch(list_get(actor, 1));
-    refresh_script(branch);
+    Branch* latest = load_latest_branch(branch);
 
+    if (branch != latest) {
+        set_branch(list_get(actor, 1), latest);
+
+        // Update all held code references
+        for (int i=0; i < list_length(&world->actorList); i++) {
+            caValue* updateActor = list_get(&world->actorList, i);
+            caValue* state = list_get(updateActor, 3);
+            update_all_code_references(state, branch, latest);
+        }
+    }
+}
+
+void actor_run_message(caStack* stack, ListData* actor, caValue* message)
+{
+    actor_refresh_script(stack->world, actor);
+
+    Branch* branch = as_branch(list_get(actor, 1));
     Frame* frame = push_frame(stack, branch);
 
     frame_set_stop_when_finished(frame);

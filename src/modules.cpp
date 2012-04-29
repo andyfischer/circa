@@ -159,9 +159,4 @@ caBranch* circa_load_module_from_file(caWorld*, const char* module_name, const c
     return (caBranch*) load_module_from_file(module_name, filename);
 }
 
-void circa_refresh_module(caBranch* branch)
-{
-    refresh_script((Branch*) branch);
-}
-
 } // extern "C"

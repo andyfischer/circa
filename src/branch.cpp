@@ -699,25 +699,24 @@ bool check_and_update_file_origin(Branch* branch, const char* filename)
     return false;
 }
 
-bool refresh_script(Branch* branch)
+Branch* load_latest_branch(Branch* branch)
 {
     List* fileOrigin = branch_get_file_origin(branch);
     if (fileOrigin == NULL)
-        return false;
+        return branch;
 
     std::string filename = as_string(fileOrigin->get(1));
 
     bool fileChanged = check_and_update_file_origin(branch, filename.c_str());
 
     if (!fileChanged)
-        return false;
+        return branch;
 
-    clear_branch(branch);
-    load_script(branch, filename.c_str());
+    Branch* newBranch = alloc_branch_gc();
+    load_script(newBranch, filename.c_str());
 
-    mark_static_errors_invalid(branch);
-    update_static_error_list(branch);
-    return true;
+    update_static_error_list(newBranch);
+    return newBranch;
 }
 
 void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)
