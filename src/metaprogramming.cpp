@@ -57,9 +57,15 @@ void update_all_code_references_in_value(caValue* value, Branch* oldBranch, Bran
             
         } else if (is_branch(val)) {
 
+            // If this is just a reference to 'oldBranch' then simply update it to 'newBranch'.
+            if (as_branch(val) == oldBranch)
+                set_branch(val, newBranch);
+
+            // Noop on null branch.
             if (as_branch(val) == NULL)
                 continue;
 
+            // Noop if branch has no owner.
             Term* oldTerm = as_branch(val)->owningTerm;
             if (oldTerm == NULL)
                 continue;
@@ -186,6 +192,11 @@ void Branch__terms(caStack* stack)
 
     for (int i=0; i < branch->length(); i++)
         set_term_ref(circa_index(out, i), branch->get(i));
+}
+
+void Branch__version(caStack* stack)
+{
+    circa_output_error(stack, "not implemented");
 }
 
 void Branch__get_term(caStack* stack)
@@ -491,6 +502,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Branch.list_configs", Branch__list_configs},
         {"Branch.functions", Branch__functions},
         {"Branch.terms", Branch__terms},
+        {"Branch.version", Branch__version},
         {"Branch.link", Branch__link},
         {"Term.name", Term__name},
         {"Term.to_string", Term__to_string},

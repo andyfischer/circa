@@ -6,6 +6,7 @@
 
 #include "branch.h"
 #include "building.h"
+#include "code_iterators.h"
 #include "evaluation.h"
 #include "kernel.h"
 #include "list.h"
@@ -13,6 +14,7 @@
 #include "modules.h"
 #include "string_type.h"
 #include "tagged_value.h"
+#include "term.h"
 #include "world.h"
 
 namespace circa {
@@ -25,6 +27,9 @@ World* alloc_world()
     set_list(&world->actorList, 0);
 
     world->actorStack = circa_alloc_stack(world);
+
+    initialize_null(&world->freeModules);
+    set_list(&world->freeModules, 0);
 
     return world;
 }
@@ -54,28 +59,9 @@ void actor_send_message(ListData* actor, caValue* message)
     copy(message, list_append(queue));
 }
 
-void actor_refresh_script(caWorld* world, ListData* actor)
-{
-    Branch* branch = as_branch(list_get(actor, 1));
-    Branch* latest = load_latest_branch(branch);
-
-    if (branch != latest) {
-        set_branch(list_get(actor, 1), latest);
-
-        // Update all held code references
-        for (int i=0; i < list_length(&world->actorList); i++) {
-            caValue* updateActor = list_get(&world->actorList, i);
-            caValue* state = list_get(updateActor, 3);
-            update_all_code_references_in_value(state, branch, latest);
-        }
-    }
-}
-
 void actor_run_message(caStack* stack, ListData* actor, caValue* message)
 {
-    actor_refresh_script(stack->world, actor);
-
-    Branch* branch = as_branch(list_get(actor, 1));
+    Branch* branch = find_loaded_module(as_cstring(list_get(actor, 1)));
     Frame* frame = push_frame(stack, branch);
 
     frame_set_stop_when_finished(frame);
@@ -135,21 +121,96 @@ int actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
     return count;
 }
 
+Branch* create_free_module(caWorld* world)
+{
+    Branch* branch = alloc_branch_gc();
+    set_branch(list_append(&world->freeModules), branch);
+    return branch;
+}
+
+void update_branch_after_module_reload(Branch* target, Branch* oldBranch, Branch* newBranch)
+{
+    // Noop if the target is our new branch
+    if (target == newBranch)
+        return;
+
+    ca_assert(target != oldBranch);
+
+    update_all_code_references(target, oldBranch, newBranch);
+}
+
+void update_world_after_module_reload(caWorld* world, Branch* oldBranch, Branch* newBranch)
+{
+    // Update references in every module
+    for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+        if (term->function == FUNCS.imported_file) {
+            update_branch_after_module_reload(term->nestedContents, oldBranch, newBranch);
+        }
+    }
+
+    // Update references in free modules
+    for (int i=0; i < list_length(&world->freeModules); i++) {
+        caValue* container = list_get(&world->freeModules, i);
+        Branch* existing = as_branch(container);
+        update_branch_after_module_reload(existing, oldBranch, newBranch);
+    }
+
+    // Update top-level state
+    for (int i=0; i < list_length(&world->actorList); i++) {
+        caValue* actor = list_get(&world->actorList, i);
+        caValue* state = list_get(actor, 3);
+        update_all_code_references_in_value(state, oldBranch, newBranch);
+    }
+}
+
+void refresh_all_modules(caWorld* world)
+{
+    // Iterate over top-level modules
+    for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+        if (term->function == FUNCS.imported_file) {
+            
+            Branch* existing = term->nestedContents;
+            Branch* latest = load_latest_branch(existing);
+
+            if (existing != latest) {
+                term->nestedContents = latest;
+
+                update_world_after_module_reload(world, existing, latest);
+            }
+        }
+    }
+
+    // Iterate over free modules
+    for (int i=0; i < list_length(&world->freeModules); i++) {
+        caValue* container = list_get(&world->freeModules, i);
+        Branch* existing = as_branch(container);
+        Branch* latest = load_latest_branch(existing);
+
+        if (existing != latest) {
+            set_branch(container, latest);
+
+            update_world_after_module_reload(world, existing, latest);
+        }
+    }
+}
+
 } // namespace circa
 
 using namespace circa;
 
 void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
 {
-    Branch* module = load_module_from_file(actorName, filename);
+    load_module_from_file(actorName, filename);
 
     caValue* actor = list_append(&world->actorList);
     create(TYPES.actor, actor);
 
     // Actor has shape:
-    // { String name, Branch branch, List incomingQueue, any stateVal }
+    // { String name, String moduleName, List incomingQueue, any stateVal }
     set_string(list_get(actor, 0), actorName);
-    set_branch(list_get(actor, 1), module);
+    set_string(list_get(actor, 1), actorName);
 }
 
 caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, const char* moduleName)
@@ -164,9 +225,9 @@ caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, cons
     create(TYPES.actor, actor);
 
     // Actor has shape:
-    // { String name, Branch branch, List incomingQueue, any stateVal }
+    // { String name, String moduleName, List incomingQueue, any stateVal }
     set_string(list_get(actor, 0), actorName);
-    set_branch(list_get(actor, 1), module);
+    set_string(list_get(actor, 1), actorName);
 
     return actor;
 }
@@ -184,6 +245,9 @@ void circa_actor_post_message(caWorld* world, const char* actorName, caValue* me
 
 void circa_actor_run_message(caWorld* world, const char* actorName, caValue* message)
 {
+    // Refresh all scripts when starting a top-level call
+    refresh_all_modules(world);
+
     caStack* stack = world->actorStack;
 
     ListData* actor = find_actor(world, actorName);
@@ -196,6 +260,9 @@ void circa_actor_run_message(caWorld* world, const char* actorName, caValue* mes
 
 int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages)
 {
+    // Refresh all scripts when starting a top-level call
+    refresh_all_modules(world);
+
     caStack* stack = world->actorStack;
     ca_assert(world != NULL);
 
@@ -211,6 +278,9 @@ int circa_actor_run_queue(caWorld* world, const char* actorName, int maxMessages
 
 int circa_actor_run_all_queues(caWorld* world, int maxMessages)
 {
+    // Refresh all scripts when starting a top-level call
+    refresh_all_modules(world);
+
     caStack* stack = world->actorStack;
 
     int handledCount = 0;

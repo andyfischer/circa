@@ -301,17 +301,15 @@ void sys__do_admin_command(caStack* stack)
     do_admin_command(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-
-void load_script_value(caStack* stack)
+void load_module(caStack* stack)
 {
     const char* filename = circa_string_input(stack, 0);
     
-    Branch* branch = alloc_branch_gc();
+    Branch* branch = create_free_module(stack->world);
     load_script(branch, filename);
 
     set_branch(circa_output(stack, 0), branch);
 }
-
 
 void Frame__branch(caStack* stack)
 {
@@ -995,7 +993,7 @@ void install_standard_library(Branch* kernel)
         {"reflect:kernel", reflect__kernel},
         {"sys:module_search_paths", sys__module_search_paths},
         {"sys:do_admin_command", sys__do_admin_command},
-        {"load_script_value", load_script_value},
+        {"load_module", load_module},
 
         {"Frame.branch", Frame__branch},
         {"Frame.register", Frame__register},

@@ -1,0 +1,12 @@
+
+When a script is modified, here are the steps that need to happen:
+
+Modification check
+  Look at every module
+    If the source filename is changed, load the new branch
+    Keep track of the old branch
+    Update this module reference
+    For every existing module (other than this one)
+      Migrate any references within the reloaded module
+    For every piece of top-level state (actor state)
+      Migrate any references within the reloaded module

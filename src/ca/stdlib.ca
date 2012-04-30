@@ -74,8 +74,8 @@ namespace sys
     def do_admin_command(String cmd) -> String
 
 
--- Load a Branch from a file.
-def load_script_value(String filename) -> Branch
+-- Load a module from a file.
+def load_module(String filename) -> Branch
 
 -- Metaprogramming on Branch
 def branch_ref(any branch :ignore_error) -> Branch
@@ -97,6 +97,8 @@ def Branch.output(_, int index) -> Term
 def Branch.outputs(_) -> List
 def Branch.statements(_) -> List
 def Branch.terms(_) -> List
+def Branch.version(_) -> int
+    -- Monotonically increasing version number, incremented for module reloads.
 
 type Frame;
 def Frame.branch(_) -> Branch
@@ -175,7 +177,7 @@ def Term.properties(_) -> Map
 def Term.property(_, String) -> any
 
 -- Builtin types
-type Actor { String name, Branch branch, List incomingQueue, any stateVal }
+type Actor { String name, String moduleName, List incomingQueue, any stateVal }
 type FileSignature { String filename, int time_modified }
 type Color { number r, number g, number b, number a }
 type Point { number x, number y }
