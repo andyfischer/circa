@@ -66,7 +66,7 @@ void actor_refresh_script(caWorld* world, ListData* actor)
         for (int i=0; i < list_length(&world->actorList); i++) {
             caValue* updateActor = list_get(&world->actorList, i);
             caValue* state = list_get(updateActor, 3);
-            update_all_code_references(state, branch, latest);
+            update_all_code_references_in_value(state, branch, latest);
         }
     }
 }

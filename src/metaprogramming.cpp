@@ -10,6 +10,7 @@
 #include "introspection.h"
 #include "kernel.h"
 #include "metaprogramming.h"
+#include "modules.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "static_checking.h"
@@ -46,21 +47,7 @@ void term_ref(caStack* stack)
     set_term_ref(circa_output(stack, 0), (Term*) term);
 }
 
-// Returns the corresponding term inside newBranch, if found.
-// Returns 'term' if the translation does not apply (term is not found inside
-// oldBranch).
-// Returns NULL if the translation does apply, but a corresponding term cannot be found.
-Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newBranch)
-{
-    if (!term_is_child_of_branch(term, oldBranch))
-        return term;
-
-    Value relativeName;
-    get_relative_name(term, oldBranch, &relativeName);
-    return find_from_relative_name(&relativeName, newBranch);
-}
-
-void update_all_code_references(caValue* value, Branch* oldBranch, Branch* newBranch)
+void update_all_code_references_in_value(caValue* value, Branch* oldBranch, Branch* newBranch)
 {
     for (ValueIterator it(value); it.unfinished(); it.advance()) {
         caValue* val = *it;
@@ -86,50 +73,6 @@ void update_all_code_references(caValue* value, Branch* oldBranch, Branch* newBr
             set_branch(val, newTerm->nestedContents);
         }
     }
-}
-
-void get_relative_name(Term* term, Branch* relativeTo, caValue* nameOutput)
-{
-    set_list(nameOutput, 0);
-
-    // Walk upwards and build the name, stop when we reach relativeTo.
-    // The output list will be reversed but we'll fix that.
-
-    while (true) {
-        set_string(list_append(nameOutput), get_unique_name(term));
-
-        if (term->owningBranch == relativeTo) {
-            break;
-        }
-
-        term = get_parent_term(term);
-
-        // If term is null, then it wasn't really a child of relativeTo
-        if (term == NULL) {
-            set_null(nameOutput);
-            return;
-        }
-    }
-
-    // Fix output list
-    list_reverse(nameOutput);
-}
-
-Term* find_from_relative_name(caValue* name, Branch* relativeTo)
-{
-    if (is_null(name))
-        return NULL;
-
-    Term* term = NULL;
-    for (int index=0; index < list_length(name); index++) {
-        term = find_from_unique_name(relativeTo, as_cstring(list_get(name, index)));
-
-        if (term == NULL)
-            return NULL;
-
-        relativeTo = term->nestedContents;
-    }
-    return term;
 }
 
 void Branch__dump(caStack* stack)

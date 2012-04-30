@@ -135,6 +135,97 @@ Branch* find_module_from_filename(const char* filename)
     return NULL;
 }
 
+void get_relative_name(Term* term, Branch* relativeTo, caValue* nameOutput)
+{
+    set_list(nameOutput, 0);
+
+    // Walk upwards and build the name, stop when we reach relativeTo.
+    // The output list will be reversed but we'll fix that.
+
+    while (true) {
+        set_string(list_append(nameOutput), get_unique_name(term));
+
+        if (term->owningBranch == relativeTo) {
+            break;
+        }
+
+        term = get_parent_term(term);
+
+        // If term is null, then it wasn't really a child of relativeTo
+        if (term == NULL) {
+            set_null(nameOutput);
+            return;
+        }
+    }
+
+    // Fix output list
+    list_reverse(nameOutput);
+}
+
+Term* find_from_relative_name(caValue* name, Branch* relativeTo)
+{
+    if (is_null(name))
+        return NULL;
+
+    Term* term = NULL;
+    for (int index=0; index < list_length(name); index++) {
+        term = find_from_unique_name(relativeTo, as_cstring(list_get(name, index)));
+
+        if (term == NULL)
+            return NULL;
+
+        relativeTo = term->nestedContents;
+    }
+    return term;
+}
+
+// Returns the corresponding term inside newBranch, if found.
+// Returns 'term' if the translation does not apply (term is not found inside
+// oldBranch).
+// Returns NULL if the translation does apply, but a corresponding term cannot be found.
+Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newBranch)
+{
+    if (!term_is_child_of_branch(term, oldBranch))
+        return term;
+
+    Value relativeName;
+    get_relative_name(term, oldBranch, &relativeName);
+    return find_from_relative_name(&relativeName, newBranch);
+}
+
+void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBranch)
+{
+    ca_assert(target != oldBranch);
+    ca_assert(target != newBranch);
+
+    // Store a cache of lookups that we've made in this call.
+    TermMap cache;
+
+    for (BranchIterator it(target); it.unfinished(); it.advance()) {
+
+        Term* term = *it;
+
+        // Iterate through each "dependency", which includes the function & inputs.
+        for (int i=0; i < term->numDependencies(); i++) {
+            Term* ref = term->dependency(i);
+            Term* newRef = NULL;
+
+            if (cache.contains(ref)) {
+                newRef = cache[ref];
+            } else {
+
+                // Lookup and save result in cache
+                newRef = translate_term_across_branches(ref, oldBranch, newBranch);
+                cache[ref] = newRef;
+            }
+
+            // Possibly rebind
+            if (newRef != ref)
+                term->setDependency(i, newRef);
+        }
+    }
+}
+
 } // namespace circa
 
 using namespace circa;
