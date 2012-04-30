@@ -225,37 +225,19 @@ def run_all_tests():
 
         exit(-1)
 
-def find_test_with_name(name):
-    import glob
+def accept_output_for_test(file):
 
-    # find all files containing the substring 'name'
-    files = glob.glob(TestRoot+'/*'+name+'*')
-    files = list(files)
-
-    # prefer an exact match
-    for file in files:
-        if file.endswith(name):
-            return file
-
-    # only look at .ca files
-    files = filter(lambda f: f.endswith('.ca'), files)
-    print files
-
-    try:
-        return files[0]
-    except IndexError:
-        return None
-
-def accept_output_for_test(name):
-    file = find_test_with_name(name)
     outfile = file + '.output'
-    cmd = ExecutablePath+' '+file
+    command = "file " + file
 
-    print 'Running: '+cmd
+    print 'Running: '+command
     print 'Saving results to: '+outfile
 
     out = open(outfile, 'w')
-    for line in run_command(cmd):
+
+    process = CircaProcess()
+    
+    for line in process.run(command):
         if not Quiet:
             print line
         out.write(line + '\n')

@@ -15,6 +15,7 @@
 #include "locals.h"
 #include "parser.h"
 #include "stateful_code.h"
+#include "string_type.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"
@@ -454,7 +455,12 @@ Branch* current_branch(Stack* stack)
 
 caValue* get_frame_register(Frame* frame, int index)
 {
-    return frame->registers[index];
+    return list_get(&frame->registers,index);
+}
+
+caValue* get_frame_register_from_end(Frame* frame, int index)
+{
+    return list_get_from_end(&frame->registers, index);
 }
 
 caValue* get_register(Stack* stack, Term* term)
@@ -594,8 +600,15 @@ void print_error_stack(Stack* stack, std::ostream& out)
     for (int frameIndex = 0; frameIndex < stack->numFrames; frameIndex++) {
         Frame* frame = get_frame(stack, stack->numFrames - 1 - frameIndex);
 
+        bool bottomFrame = frameIndex == (stack->numFrames - 1);
+
         if (frame->override) {
-            std::cout << "[override call]" << std::endl;
+            std::cout << "(override call) | ";
+            caValue* reg = get_frame_register_from_end(frame, 0);
+            if (is_string(reg))
+                out << as_cstring(reg);
+            else
+                out << to_string(reg);
             continue;
         }
 
@@ -606,13 +619,26 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
         Term* term = frame->branch->get(frame->pc);
 
-        out << get_short_location(term) << " ";
-        if (term->name != "")
-            out << term->name << " = ";
-        out << term->function->name;
-        out << "()";
-        out << " | ";
-        out << get_frame_register(frame, frame->pc)->toString();
+        // Print a short location label
+        if (term->function == FUNCS.input) {
+            out << "(input " << term->index << ")";
+        } else {
+            out << get_short_location(term) << " ";
+            if (term->name != "")
+                out << term->name << " = ";
+            out << term->function->name;
+            out << "()";
+        }
+
+        // Print the error value
+        if (bottomFrame) {
+            out << " | ";
+            caValue* reg = get_frame_register(frame, frame->pc);
+            if (is_string(reg))
+                out << as_cstring(reg);
+            else
+                out << to_string(reg);
+        }
         std::cout << std::endl;
     }
 }
@@ -845,7 +871,18 @@ void step_interpreter(Stack* stack)
             continue;
         }
 
-        cast(input, inputTerm->type, inputSlot);
+        bool success = cast(input, inputTerm->type, inputSlot);
+
+        if (!success) {
+            Value msg;
+            set_string(&msg, "Couldn't cast value ");
+            string_append(&msg, to_string(input).c_str());
+            string_append(&msg, " to type ");
+            string_append(&msg, name_to_string(inputTerm->type->name));
+            set_error_string(inputSlot, as_cstring(&msg));
+            raise_error(stack);
+            return;
+        }
 
         destIndex++;
     }

@@ -96,6 +96,14 @@ caValue* list_get(ListData* data, int index)
         return NULL;
     return &data->items[index];
 }
+caValue* list_get_from_end(ListData* data, int index)
+{
+    if (data == NULL)
+        return NULL;
+    if (index >= data->count)
+        return NULL;
+    return &data->items[data->count - index - 1];
+}
 
 ListData* list_touch(ListData* original)
 {
@@ -351,14 +359,7 @@ caValue* list_get(caValue* value, int index)
 caValue* list_get_from_end(caValue* value, int reverseIndex)
 {
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
-
-    ListData* data = (ListData*) value->value_data.ptr;
-
-    int index = data->count - reverseIndex - 1;
-    ca_assert(index >= 0);
-    ca_assert(index < data->count);
-
-    return &data->items[index];
+    return list_get_from_end((ListData*) value->value_data.ptr, reverseIndex);
 }
 
 ListData* list_remove_index(ListData* original, int index)

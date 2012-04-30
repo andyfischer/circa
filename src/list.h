@@ -32,6 +32,7 @@ void list_make_immutable(ListData* data);
 ListData* as_list_data(caValue* val);
 
 caValue* list_get(ListData* data, int index);
+caValue* list_get_from_end(ListData* data, int index);
 int list_length(ListData* data);
 caValue* list_append(ListData** dataPtr);
 caValue* list_insert(ListData** dataPtr, int index);
