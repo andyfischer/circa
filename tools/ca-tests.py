@@ -4,7 +4,10 @@ import os,subprocess,sys
 import traceback
 from glob import glob
 
-ExecutableName = 'build/circa_d'
+# Path for the circa binary to use in testing. This can be overridden by command-line args.
+ExecutablePath = 'build/circa_d'
+
+# Location of test scripts
 TestRoot = 'tests'
 
 Quiet = False
@@ -18,7 +21,7 @@ class CircaProcess:
 
         # Create proc if necessary
         if self.proc is None:
-            self.proc = subprocess.Popen(ExecutableName + " -run-stdin",
+            self.proc = subprocess.Popen(ExecutablePath + " -run-stdin",
                 shell=True, stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE, close_fds=True)
 
@@ -246,7 +249,7 @@ def find_test_with_name(name):
 def accept_output_for_test(name):
     file = find_test_with_name(name)
     outfile = file + '.output'
-    cmd = ExecutableName+' '+file
+    cmd = ExecutablePath+' '+file
 
     print 'Running: '+cmd
     print 'Saving results to: '+outfile
@@ -261,12 +264,16 @@ if __name__ == '__main__':
     import optparse
     parser = optparse.OptionParser()
     parser.add_option('--accept', dest="accept")
+    parser.add_option('-b', '--binary', dest="binaryPath")
     parser.add_option('--only-print-commands', action="store_true",
         dest="only_print_commands")
 
     (options,args) = parser.parse_args()
 
     OnlyPrintCommands = options.only_print_commands
+
+    if options.binaryPath:
+        ExecutablePath = options.binaryPath
 
     if OnlyPrintCommands:
         Quiet = True

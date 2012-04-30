@@ -7,6 +7,8 @@ def fatal(msg):
 POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
 
+EnableDllLoading = False
+
 # Check for a Mac-like environment. On Macs, 'POSIX' is true, so it's mostly the same as
 # a Unix build. But we look under /Library/Frameworks for some dependencies that are
 # provided by Xcode.
@@ -25,7 +27,10 @@ if POSIX:
     for env in all_envs:
         #env.Replace(CXX='clang++')
         env.Append(CPPFLAGS=['-ggdb', '-Wall'])
-        env.Append(LINKFLAGS=['-ldl'])
+        if EnableDllLoading:
+            # If this is enabled, we'll need a fix for this to work on GCC. With GCC,
+            # this library argument needs to be the last thing mentioned in the link call.
+            env.Append(LINKFLAGS=['-ldl'])
 
         env.SetOption('num_jobs', 2)
 
