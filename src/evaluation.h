@@ -23,7 +23,7 @@ struct Frame
     // True if this frame is being evaluated with a C override.
     bool override;
 
-    // Enabled if this frame is being called by dynamic_call
+    // True if this frame is being called by dynamic_call
     bool dynamicCall;
 
     // Used in for-loop
@@ -63,6 +63,8 @@ private:
     Stack(Stack const&) {}
     Stack& operator=(Stack const&) { return *this; }
 };
+
+Stack* alloc_stack(World* world);
 
 void eval_context_print_multiline(std::ostream& out, Stack* stack);
 void eval_context_setup_type(Type* type);

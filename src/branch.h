@@ -29,6 +29,9 @@ struct Branch : caBranch
     // Points to the Term which owns this branch as a value.
     Term* owningTerm;
 
+    // Monotonically increasing version number.
+    int version;
+
     // Whether this branch is "in progress". Certain cleanup actions are suspended
     // while in this state.
     bool inProgress;

@@ -44,6 +44,13 @@ Stack::~Stack()
     gc_on_object_deleted((CircaObject*) this);
 }
 
+Stack* alloc_stack(World* world)
+{
+    Stack* stack = new Stack();
+    stack->world = world;
+    return stack;
+}
+
 void eval_context_list_references(CircaObject* object, GCReferenceList* list, GCColor color)
 {
     // todo
@@ -1002,9 +1009,7 @@ extern "C" {
 
 caStack* circa_alloc_stack(caWorld* world)
 {
-    Stack* stack = new Stack();
-    stack->world = world;
-    return stack;
+    return alloc_stack(world);
 }
 
 void circa_dealloc_stack(caStack* stack)

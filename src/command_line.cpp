@@ -170,15 +170,15 @@ int run_command_line(caWorld* world, caValue* args)
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
 
-        Stack context;
+        Stack* stack = alloc_stack(NULL);
 
         while (true) {
-            if (error_occurred(&context)) {
-                print_error_stack(&context, std::cout);
+            if (error_occurred(stack)) {
+                print_error_stack(stack, std::cout);
                 return -1;
             }
 
-            evaluate_branch(&context, &branch);
+            evaluate_branch(stack, &branch);
 
             // Sleep for 1 second before next iteration. This is silly, it should either
             // iterate more quickly or have a smarter way to know when to loop.
@@ -329,18 +329,18 @@ int run_command_line(caWorld* world, caValue* args)
     if (dontRunScript)
         return 0;
 
-    Stack context;
+    Stack* stack = alloc_stack(NULL);
 
-    push_frame(&context, main_branch);
+    push_frame(stack, main_branch);
 
-    run_interpreter(&context);
+    run_interpreter(stack);
 
     if (printState)
-        std::cout << context.state.toString() << std::endl;
+        std::cout << stack->state.toString() << std::endl;
 
-    if (error_occurred(&context)) {
+    if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";
-        print_error_stack(&context, std::cout);
+        print_error_stack(stack, std::cout);
         std::cout << std::endl;
         return 1;
     }

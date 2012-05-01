@@ -792,6 +792,7 @@ void set_branch_in_progress(Branch* branch, bool inProgress)
     branch_update_state_type(branch);
 
     branch->inProgress = false;
+    branch->version++;
 }
 
 Term* find_last_non_comment_expression(Branch* branch)

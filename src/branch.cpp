@@ -37,6 +37,7 @@ void assert_valid_branch(Branch const* obj)
 
 Branch::Branch()
   : owningTerm(NULL),
+    version(0),
     inProgress(false),
     stateType(NULL),
     currentlyCascadingUpdates(false),
@@ -711,6 +712,10 @@ Branch* load_latest_branch(Branch* branch)
     load_script(newBranch, filename.c_str());
 
     update_static_error_list(newBranch);
+
+    // New branch starts off with the old branch's version, plus 1.
+    newBranch->version = branch->version + 1;
+
     return newBranch;
 }
 

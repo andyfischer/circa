@@ -3,6 +3,7 @@ msg = input()
 
 state Branch branch
 
+
 if msg[0] == 'loadFile'
     print('loading file: ' msg[1])
     branch = load_module(msg[1])
@@ -10,8 +11,8 @@ if msg[0] == 'loadFile'
 elif msg[0] == 'call'
 
     if not(branch.is_null)
+        print('branch version: ' branch.version)
         branch.call([])
-
 
 else
     print("ScriptRunner didn't recognize: " msg)

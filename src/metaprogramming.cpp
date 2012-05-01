@@ -196,7 +196,10 @@ void Branch__terms(caStack* stack)
 
 void Branch__version(caStack* stack)
 {
-    circa_output_error(stack, "not implemented");
+    Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
+    set_int(circa_output(stack, 0), branch->version);
 }
 
 void Branch__get_term(caStack* stack)
