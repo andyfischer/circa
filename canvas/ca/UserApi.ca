@@ -1,0 +1,24 @@
+
+-- User API - This module contains all the functions that the user's scripts will use.
+
+-- Instead of worrying about certain globals (like Painter), we provide functions that
+-- know how to find the globals on their own.
+
+def current_painter() -> Painter
+    -- Modified in-place by ScriptRunner, to provide the Painter object for this frame.
+    painter = null
+    return painter
+
+def background(Color color)
+
+def fill_rect(Rect rect, Color color)
+    painter = current_painter()
+    if painter != null
+        painter.fillRect(rect, color)
+
+def global_mouse() -> Point
+    val = create(Point)
+    return val
+
+def user_print(any a)
+    print(a)

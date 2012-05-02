@@ -37,7 +37,9 @@ void branch_ref(caStack* stack)
 {
     Term* input0 = (Term*) circa_caller_input_term(stack, 0);
     Branch* branch = input0->nestedContents;
-    gc_mark_object_referenced(&branch->header);
+    if (branch != NULL) {
+        gc_mark_object_referenced(&branch->header);
+    }
     set_branch(circa_output(stack, 0), branch);
 }
 
@@ -231,6 +233,8 @@ bool is_considered_config(Term* term)
 void Branch__list_configs(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
 
     caValue* output = circa_output(stack, 0);
 
@@ -244,6 +248,8 @@ void Branch__list_configs(caStack* stack)
 void Branch__functions(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
 
     caValue* output = circa_output(stack, 0);
     set_list(output, 0);
@@ -259,6 +265,9 @@ void Branch__functions(caStack* stack)
 void Branch__file_signature(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
+
     List* fileOrigin = branch_get_file_origin(branch);
     if (fileOrigin == NULL)
         set_null(circa_output(stack, 0));
@@ -270,9 +279,22 @@ void Branch__file_signature(caStack* stack)
     }
 }
 
+void Branch__find_term(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
+
+    Term* term = branch->get(circa_string_input(stack, 1));
+
+    set_term_ref(circa_output(stack, 0), term);
+}
+
 void Branch__statements(caStack* stack)
 {
     Branch* branch = (Branch*) circa_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
 
     caValue* out = circa_output(stack, 0);
 
@@ -336,13 +358,11 @@ void Term__assign(caStack* stack)
 
     caValue* source = circa_input(stack, 1);
 
-    if (!cast_possible(source, declared_type(target))) {
-        circa_output_error(stack, "Can't assign, type mismatch");
-        return;
-    }
-
     circa::copy(source, term_value(target));
+
+    // Probably should update term->type at this point.
 }
+
 void Term__value(caStack* stack)
 {
     Term* target = circa_input(stack, 0)->asRef();
@@ -441,6 +461,15 @@ void Term__num_inputs(caStack* stack)
     }
     set_int(circa_output(stack, 0), t->numInputs());
 }
+void Term__parent(caStack* stack)
+{
+    Term* t = circa_input(stack, 0)->asRef();
+    if (t == NULL) {
+        circa_output_error(stack, "NULL reference");
+        return;
+    }
+    set_branch(circa_output(stack, 0), t->owningBranch);
+}
 
 void Term__source_location(caStack* stack)
 {
@@ -503,27 +532,29 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
         {"Branch.has_static_error", Branch__has_static_error},
         {"Branch.list_configs", Branch__list_configs},
+        {"Branch.find_term", Branch__find_term},
         {"Branch.functions", Branch__functions},
         {"Branch.terms", Branch__terms},
         {"Branch.version", Branch__version},
         {"Branch.link", Branch__link},
-        {"Term.name", Term__name},
-        {"Term.to_string", Term__to_string},
-        {"Term.to_source_string", Term__to_source_string},
-        {"Term.function", Term__function},
-        {"Term.get_type", Term__type},
         {"Term.assign", Term__assign},
-        {"Term.value", Term__value},
-        {"Term.tweak", Term__tweak},
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},
+        {"Term.function", Term__function},
+        {"Term.get_type", Term__type},
+        {"Term.tweak", Term__tweak},
         {"Term.input", Term__input},
         {"Term.inputs", Term__inputs},
+        {"Term.name", Term__name},
         {"Term.num_inputs", Term__num_inputs},
+        {"Term.parent", Term__parent},
         {"Term.source_location", Term__source_location},
         {"Term.global_id", Term__global_id},
+        {"Term.to_string", Term__to_string},
+        {"Term.to_source_string", Term__to_source_string},
         {"Term.properties", Term__properties},
         {"Term.property", Term__property},
+        {"Term.value", Term__value},
     
         {NULL, NULL}
     };

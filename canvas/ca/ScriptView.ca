@@ -11,7 +11,13 @@ loadButton = [10 10 100 40]
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter
 
-    send('ScriptRunner' ['call' painter])
+    send('ScriptRunner' ['onPaintEvent' painter])
+
+    -- post a message to ourselves, draw the overlay on top of script
+    send('ScriptView' ['paintOverlay' painter])
+
+elif msg[0] == 'paintOverlay'
+    painter = msg[1] -> Painter
 
     painter.fillRect(loadButton #f00)
     painter.drawText(loadButton :none "Load")
@@ -20,3 +26,5 @@ elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
     if event.eventType == MouseDown and event.mousePos.inside(loadButton)
         send('ScriptRunner' ['loadFile' 'Test.ca'])
+    else
+        send('ScriptRunner' msg)

@@ -82,6 +82,7 @@ def branch_ref(any branch :ignore_error) -> Branch
 def Branch.call(_, any inputs :multiple)
 def Branch.dump(_)
 def Branch.file_signature(_) -> any
+def Branch.find_term(_, String name) -> Term
 def Branch.format_source(_) -> StyledSource
 def Branch.functions(_) -> List
 def Branch.get_term(_, int index) -> Term
@@ -158,16 +159,17 @@ def Type.is_handle(_) -> bool
 
 -- Metaprogramming on Term
 def term_ref(any :ignore_error) -> Term
+def Term.assign(_, any)
+def Term.asint(_) -> int
+def Term.asfloat(_) -> number
+def Term.parent(_) -> Branch
 def Term.name(self) -> String
 def Term.to_string(_) -> String
 def Term.to_source_string(_) -> String
 def Term.function(_) -> Function
 def Term.get_type(_) -> Type
-def Term.assign(_, any)
 def Term.value(_) -> any
 def Term.tweak(_, number steps)
-def Term.asint(_) -> int
-def Term.asfloat(_) -> number
 def Term.input(_, int) -> Term
 def Term.inputs(_) -> List
 def Term.num_inputs(_) -> int

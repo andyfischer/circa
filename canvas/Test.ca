@@ -1,2 +1,2 @@
 
-myNewMethod(8)
+fill_rect([10 10 100 100] #f00)

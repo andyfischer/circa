@@ -11,9 +11,6 @@ void qt_bindings_install(caBranch* branch);
 
 caWorld* g_world;
 
-caBranch* g_viewModule;
-caBranch* g_inputEventModule;
-
 void scripts_initialize()
 {
     g_world = circa_initialize();
@@ -23,19 +20,12 @@ void scripts_initialize()
     caBranch* qtModule = circa_load_module_from_file(g_world, "qt", "ca/qt.ca");
     qt_bindings_install(qtModule);
 
-    g_inputEventModule = circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
-}
-
-void scripts_refresh()
-{
-    // don't refresh Qt module
-    //FIXME circa_refresh_module(g_inputEventModule);
+    circa_load_module_from_file(g_world, "InputEvent", "ca/InputEvent.ca");
+    circa_load_module_from_file(g_world, "UserApi", "ca/UserApi.ca");
 }
 
 void scripts_pre_message_send()
 {
-    scripts_refresh();
-
     circa_actor_run_all_queues(g_world, 10);
 }
 

@@ -50,7 +50,6 @@ def Painter.drawLine(_, Point2 a, Point2 b)
 def Painter.drawRect(_, Rect r)
 def Painter.drawPath(_, PainterPath path)
 def Painter.drawRoundRect(_, Rect r)
---def Painter.fillRectBr(_, Rect r, Brush b)
 def Painter.fillRect(_, Rect r, Color c)
 def Painter.fontMetrics(_) -> FontMetrics
 def Painter.viewport(_) -> Rect
