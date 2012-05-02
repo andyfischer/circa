@@ -442,6 +442,24 @@ void Interpreter__output(caStack* stack)
     else
         copy(get_frame_register(frame, output->index), circa_output(stack, 0));
 }
+void Interpreter__errored(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), error_occurred(self));
+}
+void Interpreter__error_message(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+
+    Frame* frame = top_frame(self);
+    caValue* errorReg = NULL;
+    if (frame->override)
+        errorReg = get_frame_register_from_end(frame, 0);
+    else
+        errorReg = get_frame_register(frame, frame->pc);
+
+    copy(errorReg, circa_output(stack, 0));
+}
 void Interpreter__toString(caStack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
@@ -1014,6 +1032,8 @@ void install_standard_library(Branch* kernel)
         {"Interpreter.run_steps", Interpreter__run_steps},
         {"Interpreter.frame", Interpreter__frame},
         {"Interpreter.output", Interpreter__output},
+        {"Interpreter.errored", Interpreter__errored},
+        {"Interpreter.error_message", Interpreter__error_message},
         {"Interpreter.toString", Interpreter__toString},
 
         {"List.append", List__append},

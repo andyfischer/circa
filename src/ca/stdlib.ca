@@ -122,6 +122,8 @@ def Interpreter.run(_)
 def Interpreter.run_steps(_, int steps)
 def Interpreter.frame(_, int depth) -> Frame
 def Interpreter.output(_, int index) -> any
+def Interpreter.errored(_) -> bool
+def Interpreter.error_message(_) -> String
 def Interpreter.toString(_) -> String
 
 def List.append(self :out, any)

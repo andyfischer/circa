@@ -17,7 +17,6 @@ def fadein(Color c) -> Color
 -- Incoming message
 msg = input() -> List
 
-state Point mouse
 state string currentScreen = 'ScriptView'
 
 msg_name = msg[0]
@@ -29,26 +28,11 @@ if msg_name == 'onPaintEvent'
 
     painter.fillRect(painter.viewport + [0 0 1 1], #fff)
 
-    pen = create_pen(#fff, 1.0, :none)
-    pen.setColor(fadein(#fff))
-
-    painter.setPen(pen)
-    text = "Hello There"
-    text = concat(mouse)
-    painter.drawText([10 10 100 100] :none text)
-
     --send('CodeViewer' msg)
     --send('IntroScreen' msg)
     send(currentScreen msg)
 
 elif msg_name == 'onInputEvent'
-    event = msg[1] -> InputEvent
-    if event.is_mouse
-        mouse = event.mousePos
-
-    -- send test branch
-    if event.eventType == MouseDown
-        send('CodeViewer' ['loadTestBranch'])
 
     send(currentScreen msg)
 else

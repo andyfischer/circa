@@ -5,7 +5,7 @@
 -- know how to find the globals on their own.
 
 def current_painter() -> Painter
-    -- Modified in-place by ScriptRunner, to provide the Painter object for this frame.
+    -- Modified in-place by ScriptView, to provide the Painter object for this frame.
     painter = null
     return painter
 
@@ -16,8 +16,8 @@ def fill_rect(Rect rect, Color color)
     if painter != null
         painter.fillRect(rect, color)
 
-def global_mouse() -> Point
-    val = create(Point)
+def mouse() -> Point
+    val = null
     return val
 
 def user_print(any a)
