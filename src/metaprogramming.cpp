@@ -395,7 +395,7 @@ void Term__tweak(caStack* stack)
         float step = get_step(t);
 
         // Do the math like this so that rounding errors are not accumulated
-        float new_value = (round(as_float(val) / step) + steps) * step;
+        float new_value = (tweak_round(as_float(val) / step) + steps) * step;
         set_float(val, new_value);
 
     } else if (is_int(val))

@@ -4,7 +4,6 @@
 
 #if CIRCA_ENABLE_FILESYSTEM
 
-#include <dirent.h>
 #include <fstream>
 #include <sys/stat.h>
 

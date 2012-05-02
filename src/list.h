@@ -6,6 +6,14 @@
 #include "gc.h"
 #include "tagged_value.h"
 
+#ifdef _MSC_VER
+
+// Tell visual studio not to complain about zero-length array.
+#pragma warning(disable:4200)
+#pragma warning(disable:4624)
+
+#endif
+
 namespace circa {
 
 struct ListData {

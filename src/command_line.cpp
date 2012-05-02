@@ -2,9 +2,6 @@
 
 #include "common_headers.h"
 
-// for sleep():
-#include <unistd.h>
-
 #include "branch.h"
 #include "building.h"
 #include "kernel.h"
@@ -166,6 +163,7 @@ int run_command_line(caWorld* world, caValue* args)
         return run_repl();
 
     // Start evaluation loop
+#if 0
     if (string_eq(list_get(args, 0), "-loop")) {
         Branch branch;
         load_script(&branch, as_cstring(list_get(args, 1)));
@@ -185,6 +183,7 @@ int run_command_line(caWorld* world, caValue* args)
             sleep(1);
         }
     }
+#endif
 
     if (string_eq(list_get(args, 0), "-call")) {
         Branch* branch = create_branch(kernel());

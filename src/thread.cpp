@@ -2,11 +2,11 @@
 
 #include "common_headers.h"
 
+#include "circa/thread.h"
+
 #if CIRCA_ENABLE_THREADING
 
 #include <pthread.h>
-
-#include "circa/thread.h"
 
 typedef struct caMutex {
     pthread_mutex_t mutex;

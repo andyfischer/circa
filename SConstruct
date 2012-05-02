@@ -8,6 +8,7 @@ POSIX = os.name == 'posix'
 WINDOWS = os.name == 'nt'
 
 EnableDllLoading = False
+EnableClTools = True
 
 # Check for a Mac-like environment. On Macs, 'POSIX' is true, so it's mostly the same as
 # a Unix build. But we look under /Library/Frameworks for some dependencies that are
@@ -42,9 +43,17 @@ if POSIX:
     RELEASE.Append(CPPFLAGS=['-O1'])
 
 if WINDOWS:
+    # Disable command-line tools
+    EnableClTools = False
+
     for env in all_envs:
         env.Append(CPPDEFINES = ['WINDOWS'])
         env.Append(LINKFLAGS='/SUBSYSTEM:CONSOLE /DEBUG'.split())
+
+        # Disable threading
+        env.Append(CPPDEFINES = ['CIRCA_ENABLE_THREADING=0'])
+
+        env.Append(CPPDEFINES = ['CIRCA_ENABLE_CL_TOOLS=0'])
 
     for env in [DEBUG,TEST]:
         env.Append(CPPFLAGS='/EHsc /W3 /MDd /Z7 /TP /Od'.split())
@@ -77,9 +86,11 @@ for env in all_envs:
     generatedFiles = ['generated/'+filename for filename in list_source_files('src/generated')]
 
     source_files = (list_source_files('src')
-        + ['tools/'+filename for filename in list_source_files('src/tools')]
         + ['generated/'+filename for filename in list_source_files('src/generated')])
 
+    if EnableClTools:
+        source_files += ['tools/'+filename for filename in list_source_files('src/tools')]
+        
     source_files.remove('main.cpp')
     source_files.remove('generated/all_source_files.cpp')
 

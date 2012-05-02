@@ -5,8 +5,7 @@
 
 #ifdef _MSC_VER
 
-// No stdbool.h in Visual Studio :(
-typedef int bool;
+// No stdbool on Windows
 
 #else
 
