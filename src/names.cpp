@@ -554,7 +554,11 @@ Name name_from_string(const char* str)
     int len = strlen(str);
     for (int i=0; i < len; i++) {
         if (str[i] == ':') {
-            char* tempstr = strndup(str, i);
+            // Create a temporary string to hold the substring before :
+            char* tempstr = (char*) malloc(i + 1);
+            memcpy(tempstr, str, i);
+            tempstr[i] = 0;
+
             g_runtimeNames[index].namespaceFirst = name_from_string(tempstr);
             g_runtimeNames[index].namespaceRightRemainder = name_from_string(str + i + 1);
             free(tempstr);
