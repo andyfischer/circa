@@ -10,11 +10,10 @@ int main(int argc, char** argv)
 
     circa_add_module_search_path(world, "tests/embed");
 
-    caValue msg;
-    circa_init_value(&msg);
-    circa_set_int(msg, 0);
+    circa::Value msg;
+    circa_set_int(&msg, 0);
 
-    circa_actor_post_message(world, "ActorA", msg);
+    circa_actor_post_message(world, "ActorA", &msg);
 
     for (int i=0; i < 10; i++)
         circa_actor_run_all_queues(world, 10);
@@ -22,7 +21,7 @@ int main(int argc, char** argv)
     printf("Resetting and starting actors C and D...\n");
     circa_actor_clear_all(world);
 
-    circa_actor_post_message(world, "ActorC", msg);
+    circa_actor_post_message(world, "ActorC", &msg);
 
     for (int i=0; i < 10; i++)
         circa_actor_run_all_queues(world, 10);

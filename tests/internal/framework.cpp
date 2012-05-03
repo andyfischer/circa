@@ -154,7 +154,7 @@ void test_equals_function(caValue* a, float b,
         const char* aText, const char* bText,
         int line, const char* file)
 {
-    return test_equals_function(a->toFloat(), b, aText, bText, line, file);
+    return test_equals_function(to_float(a), b, aText, bText, line, file);
 }
 
 bool test_fail_on_static_error(Branch* branch)
