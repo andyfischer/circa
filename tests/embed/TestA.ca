@@ -1,0 +1,6 @@
+
+msg = input()
+
+
+
+print('received: ' msg)
