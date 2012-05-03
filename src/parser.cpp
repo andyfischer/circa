@@ -2119,10 +2119,10 @@ ParseResult literal_color(Branch* branch, TokenStream& tokens, ParserCxt* contex
             a = two_hex_digits_to_number(text[6], text[7]) / 255.0f;
     }
 
-    set_float(result->getIndex(0), r);
-    set_float(result->getIndex(1), g);
-    set_float(result->getIndex(2), b);
-    set_float(result->getIndex(3), a);
+    set_float(list_get(result, 0), r);
+    set_float(list_get(result, 1), g);
+    set_float(list_get(result, 2), b);
+    set_float(list_get(result, 3), a);
 
     resultTerm->setIntProp("syntax:colorFormat", (int) text.length());
 

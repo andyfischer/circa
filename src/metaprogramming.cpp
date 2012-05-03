@@ -315,42 +315,42 @@ void Branch__link(caStack* stack)
 
 void Term__name(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_string(circa_output(stack, 0), t->name);
 }
 void Term__to_string(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_string(circa_output(stack, 0), circa::to_string(term_value(t)));
 }
 void Term__to_source_string(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_string(circa_output(stack, 0), get_term_source_text(t));
 }
 void Term__function(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_function(circa_output(stack, 0), as_function(t->function));
 }
 void Term__type(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_type(circa_output(stack, 0), t->type);
 }
 void Term__assign(caStack* stack)
 {
-    Term* target = circa_input(stack, 0)->asRef();
+    Term* target = as_term_ref(circa_input(stack, 0));
     if (target == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
@@ -365,7 +365,7 @@ void Term__assign(caStack* stack)
 
 void Term__value(caStack* stack)
 {
-    Term* target = circa_input(stack, 0)->asRef();
+    Term* target = as_term_ref(circa_input(stack, 0));
     if (target == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
@@ -380,11 +380,11 @@ int tweak_round(double a) {
 
 void Term__tweak(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
-    int steps = tweak_round(circa_input(stack, 1)->toFloat());
+    int steps = tweak_round(to_float(circa_input(stack, 1)));
 
     caValue* val = term_value(t);
 
@@ -406,7 +406,7 @@ void Term__tweak(caStack* stack)
 
 void Term__asint(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
@@ -419,7 +419,7 @@ void Term__asint(caStack* stack)
 }
 void Term__asfloat(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
@@ -429,12 +429,12 @@ void Term__asfloat(caStack* stack)
 }
 void Term__input(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
     }
-    int index = circa_input(stack, 1)->asInt();
+    int index = circa_int_input(stack, 1);
     if (index >= t->numInputs())
         set_term_ref(circa_output(stack, 0), NULL);
     else
@@ -442,7 +442,7 @@ void Term__input(caStack* stack)
 }
 void Term__inputs(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
@@ -454,7 +454,7 @@ void Term__inputs(caStack* stack)
 }
 void Term__num_inputs(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
@@ -463,7 +463,7 @@ void Term__num_inputs(caStack* stack)
 }
 void Term__parent(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL) {
         circa_output_error(stack, "NULL reference");
         return;
@@ -473,7 +473,7 @@ void Term__parent(caStack* stack)
 
 void Term__source_location(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
@@ -483,7 +483,7 @@ void Term__source_location(caStack* stack)
 }
 void Term__global_id(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 
@@ -491,14 +491,14 @@ void Term__global_id(caStack* stack)
 }
 void Term__properties(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     circa::copy(&t->properties, circa_output(stack, 0));
 }
 void Term__property(caStack* stack)
 {
-    Term* t = circa_input(stack, 0)->asRef();
+    Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
 

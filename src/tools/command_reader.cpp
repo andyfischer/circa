@@ -149,7 +149,7 @@ void do_file_command(List* args, caValue* reply)
     evaluate_branch(&context, &branch);
 
     if (printState)
-        std::cout << context.state.toString() << std::endl;
+        std::cout << to_string(&context.state) << std::endl;
 
     if (error_occurred(&context)) {
         std::cout << "Error occurred:\n";

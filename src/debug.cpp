@@ -41,11 +41,11 @@ void dump(Term* term)
 
 void dump(caValue& value)
 {
-    std::cout << value.toString() << std::endl;
+    std::cout << to_string(&value) << std::endl;
 }
 void dump(caValue* value)
 {
-    std::cout << value->toString() << std::endl;
+    std::cout << to_string(value) << std::endl;
 }
 
 void dump(Stack* context)

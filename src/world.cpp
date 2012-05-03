@@ -65,7 +65,14 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message)
     Frame* frame = push_frame(stack, branch);
 
     frame_set_stop_when_finished(frame);
-    copy(message, circa_input(stack, 0));
+
+    caValue* inputSlot = circa_input(stack, 0);
+    if (inputSlot == NULL) {
+        std::cout << "actor message not received (no input slot): "
+            << to_string(message) << std::endl;
+        return;
+    }
+    copy(message, inputSlot);
 
     // Copy state (if any)
     Term* state_in = find_state_input(branch);
@@ -200,6 +207,8 @@ void refresh_all_modules(caWorld* world)
 
 using namespace circa;
 
+extern "C" {
+
 void circa_actor_new_from_file(caWorld* world, const char* actorName, const char* filename)
 {
     load_module_from_file(actorName, filename);
@@ -297,3 +306,10 @@ void circa_actor_clear_all(caWorld* world)
 {
     set_list(&world->actorList, 0);
 }
+
+void circa_refresh_all_modules(caWorld* world)
+{
+    refresh_all_modules(world);
+}
+
+} // extern "C"

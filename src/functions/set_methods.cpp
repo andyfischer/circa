@@ -29,9 +29,9 @@ namespace set_methods_function {
         List* list = List::checkCast(EXTRA_OUTPUT(0));
         caValue* value = INPUT(1);
 
-        int numElements = list->numElements();
+        int numElements = list_length(list);
         for (int index=0; index < numElements; index++) {
-            if (equals(value, list->get(index))) {
+            if (equals(value, list_get(list, index))) {
                 list_remove_and_replace_with_last_element(list, index);
                 return;
             }

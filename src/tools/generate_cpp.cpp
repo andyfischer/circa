@@ -97,9 +97,9 @@ void write_term_value(SourceWriter* writer, Term* term)
 {
     caValue* val = term_value(term);
     if (is_int(val)) {
-        writer->write(val->toString().c_str());
+        writer->write(as_cstring(val));
     } else if (is_float(val)) {
-        writer->write(val->toString().c_str());
+        writer->write(as_cstring(val));
     } else if (is_string(val)) {
         writer->write("\"");
         writer->write(as_cstring(val));

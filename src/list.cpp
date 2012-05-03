@@ -632,13 +632,13 @@ namespace list_t {
 
         List* left = List::checkCast(leftcaValue);
 
-        int leftCount = left->numElements();
+        int leftCount = list_length(left);
 
-        if (leftCount != right->numElements())
+        if (leftCount != list_length(right))
             return false;
 
         for (int i=0; i < leftCount; i++) {
-            if (!circa::equals(left->get(i), right->getIndex(i)))
+            if (!circa::equals(left->get(i), list_get(right, i)))
                 return false;
         }
         return true;

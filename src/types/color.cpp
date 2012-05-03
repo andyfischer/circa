@@ -18,7 +18,7 @@ namespace color_t {
     {
         caValue* value = term_value(term);
 
-        bool valueHasAlpha = value->getIndex(3)->asFloat() < 1.0;
+        bool valueHasAlpha = as_float(list_get(value,3)) < 1.0;
 
         int specifiedDigits = term->intPropOptional("syntax:colorFormat", 6);
 
@@ -33,7 +33,7 @@ namespace color_t {
             if (c == 3 && !specifyAlpha)
                 break;
 
-            double channel = std::min((double) value->getIndex(c)->asFloat(), 1.0);
+            double channel = std::min((double) as_float(list_get(value, c)), 1.0);
 
             if (digitsPerChannel == 1)
                 out << number_to_hex_digit(int(channel * 15.0));

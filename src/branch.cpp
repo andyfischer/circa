@@ -765,8 +765,8 @@ bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
 
     for (int i=0; i < result.errors.length(); i++) {
         List* error = List::checkCast(result.errors[i]);
-        out << "[" << error->get(1)->asInt() << "] ";
-        out << error->get(2)->asString();
+        out << "[" << as_int(error->get(1)) << "] ";
+        out << as_cstring(error->get(2));
         out << std::endl;
     }
 

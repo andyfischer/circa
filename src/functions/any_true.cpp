@@ -9,11 +9,11 @@ namespace any_true_function {
     {
         caValue* input = INPUT(0);
 
-        int numElements = input->numElements();
+        int numElements = list_length(input);
 
         bool result = false;
         for (int i=0; i < numElements; i++)
-            if (as_bool((*input)[i])) {
+            if (as_bool(list_get(input,i))) {
                 result = true;
                 break;
             }

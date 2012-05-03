@@ -9,13 +9,13 @@ namespace set_field_function {
     {
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
-        const char* name = INPUT(1)->asCString();
+        const char* name = as_cstring(INPUT(1));
         int index = list_find_field_index_by_name(OUTPUT->value_type, name);
         if (index == -1) {
             std::string msg = std::string("field not found: ") + name;
             return RAISE_ERROR(msg.c_str());
         }
-        copy(INPUT(2), OUTPUT->getIndex(index));
+        copy(INPUT(2), list_get(OUTPUT,index));
     }
 
     Type* specializeType(Term* caller)

@@ -154,7 +154,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         Branch workspace;
         caValue* result = term_value(workspace.eval(as_cstring(&command)));
-        std::cout << result->toString() << std::endl;
+        std::cout << to_string(result) << std::endl;
         return 0;
     }
 
@@ -335,7 +335,7 @@ int run_command_line(caWorld* world, caValue* args)
     run_interpreter(stack);
 
     if (printState)
-        std::cout << stack->state.toString() << std::endl;
+        std::cout << to_string(&stack->state) << std::endl;
 
     if (error_occurred(stack)) {
         std::cout << "Error occurred:\n";

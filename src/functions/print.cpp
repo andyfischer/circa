@@ -14,7 +14,7 @@ namespace print_function {
             if (is_string(val))
                 std::cout << as_string(val);
             else
-                std::cout << val->toString();
+                std::cout << to_string(val);
         }
         std::cout << std::endl;
     }

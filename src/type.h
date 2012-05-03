@@ -13,14 +13,6 @@
 #include "term.h"
 #include "term_namespace.h"
 
-typedef struct caType {
-    // Opaque type, used by C api.
-
-protected:
-    caType() {} // Disallow construction of this type.
-
-} caType;
-
 namespace circa {
 
 typedef int StorageType;
@@ -45,7 +37,7 @@ struct CastResult
     CastResult() : success(true) {}
 };
 
-struct Type : public caType
+struct Type
 {
     typedef void (*Initialize)(Type* type, caValue* value);
     typedef void (*Copy)(Type* type, caValue* source, caValue* dest);

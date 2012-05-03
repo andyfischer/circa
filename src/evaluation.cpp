@@ -90,7 +90,7 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
                 if (value == NULL)
                     out << " [<register OOB>]";
                 else
-                    out << "  [" << value->toString() << "]";
+                    out << "  [" << to_string(value) << "]";
             }
             out << std::endl;
         }
@@ -169,7 +169,7 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
 
             if (!castSuccess) {
                 std::stringstream msg;
-                msg << "Couldn't cast input " << input->toString()
+                msg << "Couldn't cast input " << to_string(input)
                     << " (at index " << i << ")"
                     << " to type " << name_to_string(placeholder->type->name);
                 raise_error_msg(stack, msg.str().c_str());
@@ -616,6 +616,8 @@ void print_error_stack(Stack* stack, std::ostream& out)
                 out << as_cstring(reg);
             else
                 out << to_string(reg);
+
+            out << std::endl;
             continue;
         }
 

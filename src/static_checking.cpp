@@ -146,8 +146,8 @@ void format_static_error(caValue* error, caValue* stringOutput)
 {
     List* item = List::checkCast(error);
     Term* term = as_term_ref(item->get(0));
-    const char* type = as_string(item->get(1)).c_str();
-    int inputIndex = item->get(2)->asInt();
+    const char* type = as_cstring(item->get(1));
+    int inputIndex = as_int(item->get(2));
 
     std::stringstream out;
     out << get_short_location(term) << " ";

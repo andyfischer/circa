@@ -84,7 +84,7 @@ namespace type_check_function {
         else
             out << func->name;
         out << ", no func could handle inputs: ";
-        out << inputs->toString();
+        out << to_string(inputs);
         RAISE_ERROR(out.str().c_str());
     }
 

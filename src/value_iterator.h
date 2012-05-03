@@ -33,7 +33,7 @@ struct ValueIterator
     caValue* current()
     {
         IteratorFrame& frame = _stack.back();
-        return _stack.back().value->getIndex(frame.index);
+        return list_get(_stack.back().value, frame.index);
     }
     void advance()
     {

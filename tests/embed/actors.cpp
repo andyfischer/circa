@@ -10,7 +10,8 @@ int main(int argc, char** argv)
 
     circa_add_module_search_path(world, "tests/embed");
 
-    caValue* msg = circa_alloc_value();
+    caValue msg;
+    circa_init_value(&msg);
     circa_set_int(msg, 0);
 
     circa_actor_post_message(world, "ActorA", msg);
@@ -25,6 +26,8 @@ int main(int argc, char** argv)
 
     for (int i=0; i < 10; i++)
         circa_actor_run_all_queues(world, 10);
+
+    circa_shutdown(world);
 
     return 0;
 }

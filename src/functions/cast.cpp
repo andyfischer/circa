@@ -15,7 +15,7 @@ namespace cast_function {
         Type* type = CALLER->type;
         if (!cast_possible(source, type)) {
             std::stringstream message;
-            message << "Can't cast value " << source->toString()
+            message << "Can't cast value " << to_string(source)
                 << " to type " << name_to_string(type->name);
             return RAISE_ERROR(message.str().c_str());
         }

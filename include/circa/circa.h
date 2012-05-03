@@ -21,23 +21,33 @@ extern "C" {
 
 // -- Circa Types --
 
-// a World holds miscellaneous shared runtime information. A process should create one
-// World that is used across the program.
 
-// a Stack holds the interpreter's current state, including a list of frames (activation
-// records). Each Stack corresponds to one lightweight thread (not OS thread).
 
 #ifdef __cplusplus
 namespace circa {
     struct Stack;
+    struct Type;
     struct World;
 }
+
+// a Stack holds the interpreter's current state, including a list of frames (activation
+// records). Each Stack corresponds to one lightweight thread (not OS thread).
 typedef circa::Stack caStack;
+
+// a Type holds data for a single Circa type, including a name, handlers for
+// initialization and destruction, and various other handlers and metadata.
+typedef circa::Type caType;
+
+// a World holds miscellaneous shared runtime information. A process should create one
+// World that is used across the program.
 typedef circa::World caWorld;
 
 #else
-typedef struct caWorld caWorld;
+
 typedef struct caStack caStack;
+typedef struct caType caType;
+typedef struct caWorld caWorld;
+
 #endif
 
 // a Value is a variant value. It holds two pointers, one pointer to the Type object and
@@ -74,9 +84,6 @@ typedef struct caTerm
 #endif
 } caTerm;
 
-// a Type holds data for a single Circa type, including a name, handlers for
-// initialization and destruction, and various other handlers and metadata.
-typedef struct caType caType;
 
 // a Function holds data for a single Circa function, including a name, the function's
 // definition (stored as a Branch), and various other metadata. Each Function has an

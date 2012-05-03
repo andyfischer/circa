@@ -22,7 +22,7 @@ namespace circa {
 std::string
 StyledSource::toString()
 {
-    return _phrases.toString();
+    return to_string(&_phrases);
 }
 
 void format_branch_source(StyledSource* source, Branch* branch, Term* format)
@@ -77,9 +77,9 @@ std::string unformat_rich_source(StyledSource* source)
 {
     std::stringstream strm;
 
-    for (int i=0; i < source->_phrases.numElements(); i++) {
+    for (int i=0; i < list_length(&source->_phrases); i++) {
         caValue* phrase = source->_phrases[i];
-        strm << as_string((*phrase)[0]);
+        strm << as_string(list_get(phrase,0));
     }
     return strm.str();
 }

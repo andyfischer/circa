@@ -10,8 +10,8 @@ namespace filter_function {
         caValue* inputs = INPUT(0);
         caValue* bools = INPUT(1);
 
-        int numInputs = inputs->numElements();
-        int numBools = bools->numElements();
+        int numInputs = num_elements(inputs);
+        int numBools = num_elements(bools);
 
         if (numInputs != numBools)
             return RAISE_ERROR("Lists have different lengths");
@@ -19,7 +19,7 @@ namespace filter_function {
         // Run through once to count # of trues
         int count = 0;
         for (int i=0; i < numInputs; i++)
-            if (bools->getIndex(i)->asBool())
+            if (as_bool(get_index(bools,i)))
                 count++;
         
         List* output = set_list(OUTPUT);
@@ -28,8 +28,8 @@ namespace filter_function {
 
         int write = 0;
         for (int i=0; i < numInputs; i++) {
-            if (bools->getIndex(i)->asBool()) {
-                copy((*inputs)[i], output->getIndex(write++));
+            if (as_bool(get_index(bools,i))) {
+                copy(list_get(inputs,i), get_index(output, write++));
             }
         }
     }

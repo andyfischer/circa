@@ -10,6 +10,10 @@ int main(int argc, const char * args[])
 {
     caWorld* world = circa_initialize();
 
+    {
+        Dict dict;
+    }
+
     int result = 0;
     result = circa_run_command_line(world, argc, args);
 

@@ -270,7 +270,7 @@ CA_FUNCTION(start_for_loop)
     Stack* context = CONTEXT;
 
     caValue* inputList = INPUT(0);
-    int inputListLength = inputList->numElements();
+    int inputListLength = list_length(inputList);
 
     Frame* frame = top_frame(context);
     Branch* contents = frame->branch;

@@ -23,19 +23,19 @@ namespace rand_function {
         set_float(OUTPUT, (float) rand() / RAND_MAX);
     }
 
-    CA_FUNCTION(evaluate_f_range)
+    void evaluate_f_range(caStack* stack)
     {
         seed_if_needed();
         float r = (float) rand() / RAND_MAX;
-        float min = INPUT(0)->toFloat();
-        float max = INPUT(1)->toFloat();
+        float min = circa_float_input(stack, 0);
+        float max = circa_float_input(stack, 1);
 
         if (min >= max) {
-            RAISE_ERROR("min is >= max");
+            circa_output_error(stack, "min is >= max");
             return;
         }
 
-        set_float(OUTPUT, min + r * (max - min));
+        set_float(circa_output(stack, 0), min + r * (max - min));
     }
 
     CA_FUNCTION(evaluate_i)
@@ -47,7 +47,7 @@ namespace rand_function {
     CA_FUNCTION(evaluate_i_i)
     {
         seed_if_needed();
-        int period = INPUT(0)->asInt();
+        int period = as_int(INPUT(0));
 
         // TODO: replace this, builtin rand() does not have good randomness in lower bits.
         set_int(OUTPUT, rand() % period);

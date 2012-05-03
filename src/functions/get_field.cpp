@@ -11,7 +11,7 @@ namespace get_field_function {
         const char* keyStr = circa_string_input(STACK, 1);
         
         if (!is_list_based_type(head->value_type)) {
-            std::string msg = "get_field failed, not a compound type: " + head->toString();
+            std::string msg = "get_field failed, not a compound type: " + to_string(head);
             msg += ". Field is: ";
             msg += keyStr;
             return RAISE_ERROR(msg.c_str());
@@ -41,14 +41,14 @@ namespace get_field_function {
             if (!is_list_based_type(head))
                 return &ANY_T;
 
-            std::string const& name = term_value(caller->input(1))->asString();
+            std::string const& name = as_string(term_value(caller->input(1)));
 
             int fieldIndex = list_find_field_index_by_name(head, name.c_str());
 
             if (fieldIndex == -1)
                 return &ANY_T;
 
-            head = as_type(list_get_type_list_from_type(head)->getIndex(fieldIndex));
+            head = as_type(get_index(list_get_type_list_from_type(head),fieldIndex));
         }
 
         return head;
@@ -62,7 +62,7 @@ namespace get_field_function {
         format_source_for_input(source, term, 0);
         for (int i=1; i < term->numInputs(); i++) {
             append_phrase(source, ".", term, TK_DOT);
-            append_phrase(source, term_value(term->input(i))->asString(),
+            append_phrase(source, as_string(term_value(term->input(i))),
                     term, TK_IDENTIFIER);
         }
     }

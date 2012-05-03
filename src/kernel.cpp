@@ -603,7 +603,8 @@ void String__char_at(caStack* stack)
 
 void String__length(caStack* stack)
 {
-    set_int(circa_output(stack, 0), int(circa_input(stack, 0)->asString().length()));
+    const char* str = circa_string_input(stack, 0);
+    set_int(circa_output(stack, 0), strlen(str));
 }
 
 void String__substr(caStack* stack)
