@@ -90,6 +90,8 @@ for env in all_envs:
 
     if EnableClTools:
         source_files += ['tools/'+filename for filename in list_source_files('src/tools')]
+    else:
+        source_files.remove('command_line.cpp')
         
     source_files.remove('main.cpp')
     source_files.remove('generated/all_source_files.cpp')
@@ -129,7 +131,10 @@ for env in all_envs:
     #            + '@executable_path/libcirca_d.dylib '+binaryFile)
 
 # Default build target is release mode command-line app
-Default(circa_cl_apps['release'])
+if EnableClTools:
+    Default(circa_cl_apps['release'])
+else:
+    Default(circa_libs['release'])
 
 # Unit tester app
 unit_tester_env = DEBUG.Clone()
