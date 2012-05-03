@@ -562,7 +562,7 @@ void consume_multiline_comment(TokenizeContext& context)
     int depth = 0;
 
     while (context.withinRange(lookahead)) {
-        if (context.next() == '{' && context.next(1) == '-') {
+        if (context.next(lookahead) == '{' && context.next(lookahead + 1) == '-') {
 
             // Found a comment opener, increase depth. Also advance lookahead so that
             // we don't get confused by this: {-}
@@ -571,7 +571,7 @@ void consume_multiline_comment(TokenizeContext& context)
             continue;
         }
 
-        if (context.next() == '-' && context.next(1) == '}') {
+        if (context.next(lookahead) == '-' && context.next(lookahead + 1) == '}') {
 
             // Found a comment ender.
             depth--;

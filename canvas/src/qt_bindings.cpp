@@ -81,7 +81,7 @@ void create_pen(caStack* stack)
     style; // TODO: support style
 
     caValue* out = circa_create_default_output(stack, 0);
-    circa_handle_set_object(out, new QPen(), PenRelease);
+    circa_handle_set_object(out, pen, PenRelease);
 }
 
 void Pen__setColor(caStack* stack)
@@ -255,10 +255,10 @@ void Painter__drawText(caStack* stack)
 {
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
     caValue* r = circa_input(stack, 1);
-    caValue* align = circa_input(stack, 2);
+    int flags = circa_int_input(stack, 2);
     const char* text = circa_string(circa_input(stack, 3));
 
-    painter->drawText(to_qrect(r), 0, text);
+    painter->drawText(to_qrect(r), flags, text);
 }
 void Painter__drawLine(caStack* stack)
 {

@@ -14,4 +14,4 @@ if msg_name == 'onPaintEvent'
 
     font = create_font("Sans Serif", 30)
     painter.setFont(font)
-    painter.drawText([mouse.x mouse.y 300 100] :none "1. Set up a text editor")
+    painter.drawText([mouse.x mouse.y 300 100] 0 "1. Set up a text editor")

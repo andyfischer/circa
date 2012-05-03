@@ -10,7 +10,7 @@ def set_global(Branch branch, String name, any value)
     value_ref = branch.find_term(name)
     value_ref.assign(value)
 
-loadButton = MedButton(["Load" [10 10 100 40]])
+loadButton = med_button("Load" [10 10 100 40])
 
 state Branch branch
 state Point mousePos
@@ -42,13 +42,14 @@ if msg[0] == 'onPaintEvent'
     -- Draw error display if necessary
     if interpreter.errored
         msg = interpreter.error_message
-        painter.drawText([0 0 painter.viewport.width 100] :none concat(msg))
+        painter.drawText([0 0 painter.viewport.width 100] 0 concat(msg))
         interpreter_stopped = true
 
     -- Paint the overlay
-    lo
-    painter.fillRect(loadButton #f00)
-    painter.drawText(loadButton :none "Load")
+    loadButton.draw(painter)
+    --painter.fillRect(loadButton #f00)
+    --painter.drawText(loadButton 0 "Load")
+
 
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
@@ -56,7 +57,7 @@ elif msg[0] == 'onInputEvent'
     if event.is_mouse
         mousePos = event.mousePos
 
-    if event.eventType == MouseDown and event.mousePos.inside(loadButton)
+    if event.eventType == MouseDown and event.mousePos.inside(loadButton.rect)
         send('ScriptView' ['loadFile' 'Test.ca'])
 
 elif msg[0] == 'loadFile'

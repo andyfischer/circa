@@ -200,7 +200,8 @@ def toggle(bool tog) -> bool
     with (true), the result flips. Starts out false.
     -}
     state bool s = false
-    if tog { s = not(s) }
+    if tog
+        s = not(s)
     return s
 
 def approach(number target, number maximum_change) -> number
@@ -435,6 +436,20 @@ def hsv_to_rgb(List hsv) -> Color
         return [v p q 1]
 
     return [0 0 0 0]
+
+def lighten(Color c, number factor) -> Color
+    return [
+        min(c.r + factor, 1.0)
+        min(c.g + factor, 1.0)
+        min(c.b + factor, 1.0)
+        c.a]
+        
+def darken(Color c, number factor) -> Color
+    return [
+        max(c.r - factor, 0.0)
+        max(c.g - factor, 0.0)
+        max(c.b - factor, 0.0)
+        c.a]
 
 def delta(number val) -> number
     {-

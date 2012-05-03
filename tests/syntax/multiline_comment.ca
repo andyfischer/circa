@@ -1,8 +1,9 @@
 
+print('check 1')
+
 {- this is a comment -}
 
-def this_is_not_a_comment() -> int
-    return 1
+print('check 2')
 
 {- this
   is
@@ -10,7 +11,7 @@ def this_is_not_a_comment() -> int
   comment
   -}
 
-assert(this_is_not_a_comment() == 1)
+print('check 3')
 
 {- this
   is
@@ -25,4 +26,4 @@ assert(this_is_not_a_comment() == 1)
   -}
 
 
-assert(this_is_not_a_comment() == 1)
+print('check 4')

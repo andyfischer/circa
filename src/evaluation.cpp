@@ -890,6 +890,7 @@ void step_interpreter(Stack* stack)
             string_append(&msg, name_to_string(inputTerm->type->name));
             set_error_string(inputSlot, as_cstring(&msg));
             raise_error(stack);
+            top_frame(stack)->pc = destIndex;
             return;
         }
 

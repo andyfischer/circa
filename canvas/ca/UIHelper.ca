@@ -2,10 +2,26 @@
 type MedButton {
     String label
     Rect rect
+    bool rollover
 }
 
-button_color = #f00
+button_text_color = #fff
+
+def med_button(String label, Rect rect) -> MedButton
+    return MedButton([label rect false])
 
 def MedButton.draw(b, Painter p)
-    p.fillRect(b.size, button_color)
-    p.drawText(b.rect, :centered, b.label)
+    button_color = #afa0d9
+
+    if b.rollover
+        lighten(@button_color)
+
+    p.fillRect(b.rect, button_color)
+
+    p.setFont(create_font('Sans Serif', 16))
+    p.setPen(create_pen(#fff, 1.0, :none))
+    p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
+
+def MedButton.input(b :out, InputEvent e)
+    b.rollover = e.mousePos.inside(b.rect)
+
