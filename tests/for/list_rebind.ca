@@ -1,0 +1,9 @@
+
+l = [1 2 3]
+
+print('list start: ' l)
+
+for i in @l
+    i += 2
+    
+print('list end: ' l)

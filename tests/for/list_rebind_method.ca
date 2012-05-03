@@ -1,0 +1,16 @@
+
+type T {
+    int i
+}
+
+def T.increment(t :out)
+    t.i += 1
+
+items = [T([1]), T([2]), T([3])]
+
+print('items start: ' items)
+
+for i in @items
+    i@.increment
+
+print('items end: ' items)

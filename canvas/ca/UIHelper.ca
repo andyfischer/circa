@@ -1,20 +1,27 @@
 
-type MedButton {
+type Button {
     String label
+    Name action
     Rect rect
     bool rollover
+    bool press
 }
 
 button_text_color = #fff
 
-def med_button(String label, Rect rect) -> MedButton
-    return MedButton([label rect false])
+def button(String label, Rect rect) -> Button
+    b = create(Button)
+    b.label = label
+    b.rect = rect
+    return b
 
-def MedButton.draw(b, Painter p)
+def Button.draw(b, Painter p)
     button_color = #afa0d9
 
-    if b.rollover
-        lighten(@button_color)
+    if b.press
+        darken(@button_color, .1)
+    elif b.rollover
+        lighten(@button_color, .1)
 
     p.fillRect(b.rect, button_color)
 
@@ -22,6 +29,37 @@ def MedButton.draw(b, Painter p)
     p.setPen(create_pen(#fff, 1.0, :none))
     p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
 
-def MedButton.input(b :out, InputEvent e)
+def Button.input(b :out, InputEvent e)
     b.rollover = e.mousePos.inside(b.rect)
+    b.press = b.rollover and (e.eventType == MouseDown)
 
+type ButtonBar {
+    List buttons
+}
+
+def button_bar(List definitions, Rect rect)
+    hspacer = 10
+
+    eachWidth = (rect.width - hspacer * (definitions.length - 1)) / definitions.length
+
+    left = rect.x1
+    buttons = for defi in definitions
+        b = create(Button)
+        b.label = defi[0]
+        b.action = defi[1]
+        b.rect = [left, rect.y1, left+eachWidth, rect.y2]
+        left += eachWidth + hspacer
+        b
+    return ButtonBar([buttons])
+
+def ButtonBar.draw(b, Painter p)
+    for button in b.buttons
+        button.draw(p)
+
+def ButtonBar.input(b :out, InputEvent e)
+    buttons = b.buttons
+    print('input start: ' buttons)
+    for button in @buttons
+        button@.input(e)
+    print('input end: ' buttons)
+    b.buttons = buttons

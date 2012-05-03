@@ -1363,6 +1363,12 @@ Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Ter
     Term* getter = getterRoot;
 
     while (true) {
+
+        // Don't write a setter for a getter that already has a name; if the term has
+        // a name then it's not part of this lexpr.
+        if (getter->name != "")
+            return desired;
+
         Term* result = write_setter_from_getter(branch, getter, desired);
 
         if (result == NULL)
@@ -1370,9 +1376,6 @@ Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Ter
 
         desired = result;
         getter = getter->input(0);
-
-        if (getter->name != "")
-            break;
     }
 
     return desired;
