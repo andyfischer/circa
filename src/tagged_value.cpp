@@ -14,144 +14,9 @@
 
 using namespace circa;
 
-caValue::caValue()
-{
-    ca_assert(false);
-    initialize_null(this);
-}
-
-caValue::caValue(circa::Value*)
-{
-    // do nothing, this only used by Value()
-}
-
-caValue::caValue(Type* type)
-{
-    initialize_null(this);
-    create(type, this);
-}
-
-caValue::~caValue()
-{
-    // Deallocate this value
-    set_null(this);
-}
-
-caValue::caValue(caValue const& original)
-{
-    initialize_null(this);
-    copy(&const_cast<caValue&>(original), this);
-}
-
-
-void caValue::reset()
-{
-    circa::reset(this);
-}
-
-std::string
-caValue::toString()
-{
-    return to_string(this);
-}
-
-caValue*
-caValue::getIndex(int index)
-{
-    return get_index(this, index);
-}
-
-caValue*
-caValue::getField(const char* fieldName)
-{
-    return get_field(this, fieldName);
-}
-
-caValue*
-caValue::getField(std::string const& fieldName)
-{
-    return get_field(this, fieldName.c_str());
-}
-
-int
-caValue::numElements()
-{
-    return num_elements(this);
-}
-
-bool
-caValue::equals(caValue* rhs)
-{
-    return circa::equals(this, rhs);
-}
-
-int caValue::asInt()
-{
-    return as_int(this);
-}
-
-float caValue::asFloat()
-{
-    return as_float(this);
-}
-
-float caValue::toFloat()
-{
-    return to_float(this);
-}
-
-const char* caValue::asCString()
-{
-    return as_string(this).c_str();
-}
-
-std::string const& caValue::asString()
-{
-    return as_string(this);
-}
-
-bool caValue::asBool()
-{
-    return as_bool(this);
-}
-
-Term* caValue::asRef()
-{
-    return as_term_ref(this);
-}
-
-caValue caValue::fromInt(int i)
-{
-    caValue tv;
-    set_int(&tv, i);
-    return tv;
-}
-
-caValue caValue::fromFloat(float f)
-{
-    caValue tv;
-    set_float(&tv, f);
-    return tv;
-}
-
-caValue caValue::fromString(const char* s)
-{
-    caValue tv;
-    set_string(&tv, s);
-    return tv;
-}
-
-caValue caValue::fromBool(bool b)
-{
-    caValue tv;
-    set_bool(&tv, b);
-    return tv;
-}
-
 namespace circa {
 
 Value::Value()
-  : caValue(this)
 {
     initialize_null(this);
 }
@@ -159,6 +24,12 @@ Value::Value()
 Value::~Value()
 {
     set_null(this);
+}
+
+Value::Value(Value const& original)
+{
+    initialize_null(this);
+    copy(&const_cast<Value&>(original), this);
 }
 
 Value&
@@ -347,9 +218,9 @@ std::string to_string_annotated(caValue* value)
 
     if (is_list(value)) {
         out << "[";
-        for (int i=0; i < value->numElements(); i++) {
+        for (int i=0; i < num_elements(value); i++) {
             if (i > 0) out << ", ";
-            out << to_string_annotated(value->getIndex(i));
+            out << to_string_annotated(get_index(value,i));
         }
         out << "]";
     } else {
@@ -666,6 +537,8 @@ void cleanup_transient_value(caValue* value)
 }
 
 } // namespace circa
+
+using namespace circa;
 
 extern "C" {
 

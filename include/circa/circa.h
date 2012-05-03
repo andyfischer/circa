@@ -21,8 +21,6 @@ extern "C" {
 
 // -- Circa Types --
 
-
-
 #ifdef __cplusplus
 namespace circa {
     struct Stack;
@@ -50,10 +48,52 @@ typedef struct caWorld caWorld;
 
 #endif
 
+union caValueData {
+    int asint;
+    float asfloat;
+    bool asbool;
+    void* ptr;
+};
+
 // a Value is a variant value. It holds two pointers, one pointer to the Type object and
 // one to the value's data. For some types (such as integers, floats, booleans), the data
 // section holds the actual value and not a pointer.
-typedef struct caValue caValue;
+//
+// If you allocate caValue yourself then you must call circa_init_value before using it,
+// and call circa_set_null before deallocating it.
+struct caValue
+{
+    caValueData value_data;
+    caType* value_type;
+
+#ifdef __cplusplus
+    // Don't use caValue as a C++ type (use circa::Value instead)
+protected:
+    caValue() {}
+    ~caValue() {}
+
+private:
+    caValue(caValue const&);
+    caValue& operator=(caValue const&);
+#endif
+};
+
+#ifdef __cplusplus
+
+// C++ wrapper on caValue. Provides C++-style initialization and destruction.
+namespace circa {
+
+struct Value : caValue
+{
+    Value();
+    ~Value();
+    Value(Value const&);
+    Value& operator=(Value const&);
+};
+
+} // namespace circa
+
+#endif
 
 struct caTerm;
     
