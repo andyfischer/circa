@@ -1,0 +1,11 @@
+
+type MedButton {
+    String label
+    Rect rect
+}
+
+button_color = #f00
+
+def MedButton.draw(b, Painter p)
+    p.fillRect(b.size, button_color)
+    p.drawText(b.rect, :centered, b.label)

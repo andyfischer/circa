@@ -44,9 +44,9 @@ a = 1.0; -a
 
 -- Methods
 'string'.length()
-Map().add(1,2)
-Map().add(1, 2)
-Point().x = 1.0
+create(Map).add(1,2)
+create(Map).add(1, 2)
+create(Point).x = 1.0
 
 -- Rebinding
 a = 1
@@ -60,20 +60,20 @@ a.x += 1
 a.x   += 1
 a.x +=   1
 
-p = Point(); p.x += 1.0
-p = Point(); p.x   += 1.0
-p = Point(); p.x +=   1.0
-p = Point(); p.x = 1.0
-p = Point(); p.x   = 1.0
-p = Point(); p.x =   1.0
+p = create(Point); p.x += 1.0
+p = create(Point); p.x   += 1.0
+p = create(Point); p.x +=   1.0
+p = create(Point); p.x = 1.0
+p = create(Point); p.x   = 1.0
+p = create(Point); p.x =   1.0
 
 -- More methods
 l = []; l.append(1)
 
-t = Point(); t.x
-t = Point(); t.x = 1.0
-t = Point(); a = t.x
-type A{int z} type B{A y} x = B(); x.y.z
+t = create(Point); t.x
+t = create(Point); t.x = 1.0
+t = create(Point); a = t.x
+type A{int z} type B{A y} x = create(B); x.y.z
 
 -- Index access
 a = [1]; a[0]

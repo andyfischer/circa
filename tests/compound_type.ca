@@ -45,7 +45,7 @@ c = create(Composite)
 assert(to_string(c) == "{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}")
 
 type Vector { number x, number y }
-v = Vector()
+v = create(Vector)
 
 v.x = 5.0
 v.y = 6.0

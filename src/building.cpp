@@ -30,19 +30,11 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     if (function == NULL)
         function = FUNCS.unknown_function;
 
-    // If 'function' is actually a type, create a value instead.
+    // If 'function' is actually a type, create a call to cast().
     if (function != NULL && is_type(function)) {
-        if (inputs.length() == 0) {
-            Term* term = create_value(branch, as_type(term_value(function)));
-            term->setBoolProp("constructor", true);
-            return term;
-        } else if (inputs.length() == 1) {
-            Term* term = apply(branch, FUNCS.cast, inputs);
-            change_declared_type(term, as_type(term_value(function)));
-            return term;
-        } else {
-            internal_error("Constructors with multiple arguments not yet supported.");
-        }
+        Term* term = apply(branch, FUNCS.cast, inputs);
+        change_declared_type(term, as_type(term_value(function)));
+        return term;
     }
 
     // Figure out the term position; it should be placed before any output() terms.

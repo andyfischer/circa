@@ -68,8 +68,12 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message)
 
     caValue* inputSlot = circa_input(stack, 0);
     if (inputSlot == NULL) {
-        std::cout << "actor message not received (no input slot): "
+        std::cout << "actor '"
+            << as_cstring(list_get(actor, 0))
+            << "' could not receive message (no input slot): "
             << to_string(message) << std::endl;
+
+        std::cout << "branch = " << branch << std::endl;
         return;
     }
     copy(message, inputSlot);

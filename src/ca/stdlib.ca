@@ -189,6 +189,11 @@ type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
 
+def Rect.width(self) -> number
+    return self.x2 - self.x1
+def Rect.height(self) -> number
+    return self.y2 - self.y1
+
 def toggle(bool tog) -> bool
     {-
     Stateful function, returns a boolean status. Every frame the function is called

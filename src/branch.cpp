@@ -457,6 +457,7 @@ void erase_term(Term* term)
 
 void clear_branch(Branch* branch)
 {
+    //std::cout << "clear_branch: " << branch << std::endl;
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
     set_null(&branch->pendingUpdates);

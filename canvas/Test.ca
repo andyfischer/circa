@@ -1,6 +1,4 @@
 
-print('running...')
+mouse = mousePos()
 
-fill_rect([10 10 mouse().x 100] #f00)
-
-assert(false)
+fill_rect([10 10 mouse.x 100] #f00)
