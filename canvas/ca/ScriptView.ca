@@ -10,12 +10,22 @@ def set_global(Branch branch, String name, any value)
     value_ref = branch.find_term(name)
     value_ref.assign(value)
 
-state topButtons = button_bar([["Load" :load], ["Exit" :exit]] [0 0 120 30])
+state Branch userBranch
+state any userState
 
-state Branch branch
-state Point mousePos
 state interpreter = make_interpreter()
 state interpreter_stopped = false
+state state_frozen = false
+
+state Point mousePos
+
+state ButtonBar topButtons = button_bar([
+    ["Load" :load],
+    ["Restart" :restart],
+    ["Freeze" :freeze]] [10 10 300 40])
+
+topButtons.setToggled(2, state_frozen)
+topButtons.setLabel(2, cond(state_frozen, "Frozen", "Freeze"))
 
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter
@@ -29,14 +39,15 @@ if msg[0] == 'onPaintEvent'
 
     -- Check if we should run the branch this frame
 
-    if not(branch.is_null)
+    if not(userBranch.is_null)
         -- Automatically un-stop the branch if the file is changed
-        if changed(branch.version)
+        if changed(userBranch.version)
             interpreter_stopped = false
 
-    if not(branch.is_null) and not(interpreter_stopped)
+    if not(userBranch.is_null) and not(interpreter_stopped)
         interpreter.reset
-        interpreter.push_frame(branch, [])
+        interpreter.push_frame(userBranch, [])
+        interpreter.set_state_input(userState)
         interpreter.run
 
     -- Draw error display if necessary
@@ -44,12 +55,11 @@ if msg[0] == 'onPaintEvent'
         msg = interpreter.error_message
         painter.drawText([0 0 painter.viewport.width 100] 0 concat(msg))
         interpreter_stopped = true
+    else
+        userState = interpreter.get_state_output
 
-    -- Paint the overlay
+    -- Paint our menu on top
     topButtons.draw(painter)
-    --painter.fillRect(loadButton #f00)
-    --painter.drawText(loadButton 0 "Load")
-
 
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
@@ -57,8 +67,13 @@ elif msg[0] == 'onInputEvent'
     if event.is_mouse
         mousePos = event.mousePos
 
-    topButtons.input(event)
-    print('in ScriptView: ' topButtons)
+    action = topButtons.input(event)
+
+    if action == :freeze
+        state_frozen = not(state_frozen)
+    elif action != :none
+        print('action: ' action)
+    
 
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])

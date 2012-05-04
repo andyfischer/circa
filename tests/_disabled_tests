@@ -1,6 +1,7 @@
 dynamic_function_dispatch.ca
 feedback.ca
 for/index.ca
+for/infer_with_null_input.ca
 field/View.ca
 function_as_value.ca
 handle_type.ca

@@ -34,7 +34,6 @@ extern Term* BOOL_TYPE;
 extern Term* DICT_TYPE;
 extern Term* FLOAT_TYPE;
 extern Term* INT_TYPE;
-extern Term* NULL_T_TERM;
 extern Term* REF_TYPE;
 extern Term* STRING_TYPE;
 extern Term* COLOR_TYPE;

@@ -105,7 +105,7 @@ void format_term_source(StyledSource* source, Term* term)
             s += "()";
             append_phrase(source, s, term, phrase_type::UNDEFINED);
 
-        // Otherwise use formatSource on type
+        // Otherwise use formatSource on type type.
         } else {
             Type* type = declared_type(term);
             if (type->formatSource == NULL) {

@@ -90,7 +90,6 @@ Term* BOOL_TYPE = NULL;
 Term* DICT_TYPE = NULL;
 Term* FLOAT_TYPE = NULL;
 Term* INT_TYPE = NULL;
-Term* NULL_T_TERM = NULL;
 Term* REF_TYPE = NULL;
 Term* STRING_TYPE = NULL;
 Term* FEEDBACK_TYPE = NULL;
@@ -401,6 +400,60 @@ void Interpreter__pop_frame(caStack* stack)
     ca_assert(self != NULL);
     pop_frame(self);
 }
+void Interpreter__set_state_input(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+
+    if (self->numFrames == 0)
+        return circa_output_error(stack, "No stack frame");
+
+    // find state input
+    Branch* branch = top_frame(self)->branch;
+    caValue* stateSlot = NULL;
+    for (int i=0;; i++) {
+        Term* input = get_input_placeholder(branch, i);
+        if (input == NULL)
+            break;
+        if (is_state_input(input))
+            stateSlot = get_frame_register(top_frame(self), input->index);
+    }
+
+    if (stateSlot == NULL)
+        // Noop if branch doesn't expect state
+        return;
+
+    copy(circa_input(stack, 1), stateSlot);
+}
+
+void Interpreter__get_state_output(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+
+    if (self->numFrames == 0)
+        return circa_output_error(stack, "No stack frame");
+
+    // find state output
+    Branch* branch = top_frame(self)->branch;
+    caValue* stateSlot = NULL;
+    for (int i=0;; i++) {
+        Term* output = get_output_placeholder(branch, i);
+        if (output == NULL)
+            break;
+        if (is_state_output(output))
+            stateSlot = get_frame_register(top_frame(self), output->index);
+    }
+
+    if (stateSlot == NULL) {
+        // Couldn't find outgoing state
+        set_null(circa_output(stack, 0));
+        return;
+    }
+
+    copy(stateSlot, circa_output(stack, 0));
+}
+
 void Interpreter__reset(caStack* stack)
 {
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
@@ -833,7 +886,6 @@ void bootstrap_kernel()
     FLOAT_TYPE = create_type_value(kernel, &FLOAT_T, "number");
     INT_TYPE = create_type_value(kernel, &INT_T, "int");
     NAME_TYPE = create_type_value(kernel, &NAME_T, "Name");
-    NULL_T_TERM = create_type_value(kernel, &NULL_T, "Null");
     STRING_TYPE = create_type_value(kernel, &STRING_T, "String");
     DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
     REF_TYPE = create_type_value(kernel, &REF_T, "Term");
@@ -1028,6 +1080,8 @@ void install_standard_library(Branch* kernel)
         {"make_interpreter", make_interpreter},
         {"Interpreter.push_frame", Interpreter__push_frame},
         {"Interpreter.pop_frame", Interpreter__pop_frame},
+        {"Interpreter.set_state_input", Interpreter__set_state_input},
+        {"Interpreter.get_state_output", Interpreter__get_state_output},
         {"Interpreter.reset", Interpreter__reset},
         {"Interpreter.run", Interpreter__run},
         {"Interpreter.run_steps", Interpreter__run_steps},

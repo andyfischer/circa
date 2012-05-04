@@ -5,6 +5,8 @@ type Button {
     Rect rect
     bool rollover
     bool press
+    bool triggered
+    bool toggled
 }
 
 button_text_color = #fff
@@ -20,6 +22,8 @@ def Button.draw(b, Painter p)
 
     if b.press
         darken(@button_color, .1)
+    elif b.toggled
+        darken(@button_color, .2)
     elif b.rollover
         lighten(@button_color, .1)
 
@@ -31,13 +35,14 @@ def Button.draw(b, Painter p)
 
 def Button.input(b :out, InputEvent e)
     b.rollover = e.mousePos.inside(b.rect)
+    b.triggered = b.rollover and b.press and e.eventType == MouseUp
     b.press = b.rollover and (e.eventType == MouseDown)
 
 type ButtonBar {
     List buttons
 }
 
-def button_bar(List definitions, Rect rect)
+def button_bar(List definitions, Rect rect) -> ButtonBar
     hspacer = 10
 
     eachWidth = (rect.width - hspacer * (definitions.length - 1)) / definitions.length
@@ -50,16 +55,26 @@ def button_bar(List definitions, Rect rect)
         b.rect = [left, rect.y1, left+eachWidth, rect.y2]
         left += eachWidth + hspacer
         b
-    return ButtonBar([buttons])
+    return [buttons]
 
 def ButtonBar.draw(b, Painter p)
     for button in b.buttons
         button.draw(p)
 
-def ButtonBar.input(b :out, InputEvent e)
+def ButtonBar.input(b :out, InputEvent e) -> Name
+    action = :none
     buttons = b.buttons
-    print('input start: ' buttons)
     for button in @buttons
-        button@.input(e)
-    print('input end: ' buttons)
+        Button(@button)
+        button.input(e)
+
+        if action == :none and button.triggered
+            action = button.action
+
     b.buttons = buttons
+    return action
+
+def ButtonBar.setToggled(b :out, int index, bool toggle)
+    b.buttons[index].toggled = toggle
+def ButtonBar.setLabel(b :out, int index, String label)
+    b.buttons[index].label = label
