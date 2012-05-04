@@ -1,4 +1,7 @@
 
 mouse = mousePos()
 
-fill_rect([10 10 mouse.x 100] #f00)
+state i = 0
+i += 1
+
+fill_rect([10 10 100 + i 100] #f00)

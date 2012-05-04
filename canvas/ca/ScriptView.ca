@@ -50,13 +50,14 @@ if msg[0] == 'onPaintEvent'
         interpreter.set_state_input(userState)
         interpreter.run
 
+        if not(interpreter.errored) and not(state_frozen)
+            userState = interpreter.get_state_output
+
     -- Draw error display if necessary
     if interpreter.errored
         msg = interpreter.error_message
         painter.drawText([0 0 painter.viewport.width 100] 0 concat(msg))
         interpreter_stopped = true
-    else
-        userState = interpreter.get_state_output
 
     -- Paint our menu on top
     topButtons.draw(painter)
@@ -71,13 +72,17 @@ elif msg[0] == 'onInputEvent'
 
     if action == :freeze
         state_frozen = not(state_frozen)
+    elif action == :load
+        send('ScriptView' ['loadFile' 'Test.ca'])
+    elif action == :restart
+        userState = null
     elif action != :none
         print('action: ' action)
     
 
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])
-    branch = load_module(msg[1])
-    branch.dump
+    userBranch = load_module(msg[1])
+    userBranch.dump
 else
     print("ScriptView didn't recognize: " msg)
