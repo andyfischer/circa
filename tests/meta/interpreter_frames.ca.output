@@ -1,0 +1,9 @@
+frame 0 location: [$45]
+frame 0 registers: [false, null, 'Assert failed']
+frame 0 pc: 0
+frame 1 location: [tests/meta/interpreter_frames.ca:6,4]
+frame 1 registers: [null, null, null, null, null, null, null]
+frame 1 pc: 4
+frame 2 location: [tests/meta/interpreter_frames.ca:12,4]
+frame 2 registers: [null, null, null, null, null, null]
+frame 2 pc: 3

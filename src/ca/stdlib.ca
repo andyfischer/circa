@@ -104,7 +104,9 @@ def Branch.version(_) -> int
 type Frame;
 def Frame.branch(_) -> Branch
 def Frame.register(_, int) -> any
+def Frame.registers(_) -> List
 def Frame.pc(_) -> int
+def Frame.pc_term(_) -> Term
 
 def Function.name(_) -> String
 def Function.input(_, int index) -> Term
@@ -123,6 +125,9 @@ def Interpreter.reset(_)
 def Interpreter.run(_)
 def Interpreter.run_steps(_, int steps)
 def Interpreter.frame(_, int depth) -> Frame
+def Interpreter.top_frame(_) -> Frame
+    return _.frame(0)
+def Interpreter.frames(_) -> List
 def Interpreter.output(_, int index) -> any
 def Interpreter.errored(_) -> bool
 def Interpreter.error_message(_) -> String
@@ -178,6 +183,7 @@ def Term.input(_, int) -> Term
 def Term.inputs(_) -> List
 def Term.num_inputs(_) -> int
 def Term.source_location(_) -> Rect_i
+def Term.location_string(_) -> String
 def Term.global_id(_) -> int
 def Term.properties(_) -> Map
 def Term.property(_, String) -> any

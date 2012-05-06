@@ -22,10 +22,30 @@ state Point mousePos
 state ButtonBar topButtons = button_bar([
     ["Load" :load],
     ["Restart" :restart],
-    ["Freeze" :freeze]] [10 10 300 40])
+    ["Freeze" :freezeState]] [10 10 300 40])
 
+-- set the state of the Freeze button
 topButtons.setToggled(2, state_frozen)
 topButtons.setLabel(2, cond(state_frozen, "Frozen", "Freeze"))
+
+def to_rect(Point topLeft, Point size)
+    return [topLeft.x topLeft.y topLeft.x+size.x topLeft.x+size.y]
+
+def Interpreter.drawRuntimeError(int, Painter painter)
+    msg = int.error_message
+    left = 10
+    width = painter.viewport.width - left
+    error_y = 50
+    size = [width, 100]
+    painter.drawText(to_rect([left error_y] size) 0 concat(msg))
+
+    -- Draw the stack
+    y = error_y + 20
+    for frame in int.frames
+        Frame(@frame)
+
+        loc = frame.pc_term
+        painter.drawText(to_rect([left y] [width 100]) 0 loc.location_string)
 
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter
@@ -55,8 +75,7 @@ if msg[0] == 'onPaintEvent'
 
     -- Draw error display if necessary
     if interpreter.errored
-        msg = interpreter.error_message
-        painter.drawText([0 0 painter.viewport.width 100] 0 concat(msg))
+        interpreter.drawRuntimeError(painter)
         interpreter_stopped = true
 
     -- Paint our menu on top
@@ -70,15 +89,14 @@ elif msg[0] == 'onInputEvent'
 
     action = topButtons.input(event)
 
-    if action == :freeze
+    if action == :freezeState
         state_frozen = not(state_frozen)
     elif action == :load
-        send('ScriptView' ['loadFile' 'Test.ca'])
+        send('ScriptView' ['loadFile' 'demos/asteroids.ca'])
     elif action == :restart
         userState = null
     elif action != :none
         print('action: ' action)
-    
 
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])

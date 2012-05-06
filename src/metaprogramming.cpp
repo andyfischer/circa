@@ -481,6 +481,14 @@ void Term__source_location(caStack* stack)
         t->sourceLoc.col, t->sourceLoc.line,
         t->sourceLoc.colEnd, t->sourceLoc.lineEnd);
 }
+void Term__location_string(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+
+    set_string(circa_output(stack, 0), get_short_location(t).c_str());
+}
 void Term__global_id(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
@@ -549,6 +557,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Term.num_inputs", Term__num_inputs},
         {"Term.parent", Term__parent},
         {"Term.source_location", Term__source_location},
+        {"Term.location_string", Term__location_string},
         {"Term.global_id", Term__global_id},
         {"Term.to_string", Term__to_string},
         {"Term.to_source_string", Term__to_source_string},

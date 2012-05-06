@@ -136,6 +136,7 @@ struct BuiltinTypes {
     Type* actor;
     Type* color;
     Type* file_signature;
+    Type* frame;
     Type* dynamicInputs;
     Type* dynamicOutputs;
     Type* point;

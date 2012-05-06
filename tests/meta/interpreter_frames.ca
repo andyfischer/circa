@@ -1,0 +1,28 @@
+
+def frame2()
+    c = 1
+
+    -- Cause the interpreter to stop here:
+    assert(false)
+
+def frame1()
+    a = 1
+    b = 2
+
+    frame2()
+
+int = make_interpreter()
+int.push_frame(branch_ref(frame1), [])
+int.run
+
+-- interpreter should now have 'frame1' and 'frame2'
+
+index = 0
+for frame in int.frames
+    Frame(@frame)
+    print('frame ' index ' location: ' frame.pc_term.location_string)
+    print('frame ' index ' registers: ' frame.registers)
+    print('frame ' index ' pc: ' frame.pc)
+    index += 1
+
+top_frame = int.top_frame

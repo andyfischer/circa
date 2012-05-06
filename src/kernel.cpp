@@ -312,17 +312,41 @@ void load_module(caStack* stack)
 
 void Frame__branch(caStack* stack)
 {
-    // TODO
+    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    set_branch(circa_output(stack, 0), self->branch);
 }
 
 void Frame__register(caStack* stack)
 {
-    // TODO
+    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    int index = circa_int_input(stack, 1);
+    copy(get_frame_register(self, index), circa_output(stack, 0));
+}
+void Frame__registers(caStack* stack)
+{
+    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+
+    copy(&self->registers, circa_output(stack, 0));
+
+    // interpreter will unsafely change register list, so use touch to make
+    // sure our output is a safe copy.
+    circa_touch(circa_output(stack, 0));
 }
 
 void Frame__pc(caStack* stack)
 {
-    // TODO
+    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    set_int(circa_output(stack, 0), self->pc);
+}
+void Frame__pc_term(caStack* stack)
+{
+    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    set_term_ref(circa_output(stack, 0), self->branch->get(self->pc));
 }
 
 void Function__name(caStack* stack)
@@ -481,6 +505,17 @@ void Interpreter__frame(caStack* stack)
     Frame* frame = get_frame(self, index);
 
     set_pointer(circa_create_default_output(stack, 0), frame);
+}
+void Interpreter__frames(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    caValue* out = circa_output(stack, 0);
+    set_list(out, self->numFrames);
+    for (int i=0; i < self->numFrames; i++) {
+        change_type(circa_index(out, i), TYPES.frame);
+        set_pointer(circa_index(out, i), get_frame(self, i));
+    }
 }
 void Interpreter__output(caStack* stack)
 {
@@ -1068,7 +1103,9 @@ void install_standard_library(Branch* kernel)
 
         {"Frame.branch", Frame__branch},
         {"Frame.register", Frame__register},
+        {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},
+        {"Frame.pc_term", Frame__pc_term},
 
         {"Function.name", Function__name},
         {"Function.input", Function__input},
@@ -1086,6 +1123,7 @@ void install_standard_library(Branch* kernel)
         {"Interpreter.run", Interpreter__run},
         {"Interpreter.run_steps", Interpreter__run_steps},
         {"Interpreter.frame", Interpreter__frame},
+        {"Interpreter.frames", Interpreter__frames},
         {"Interpreter.output", Interpreter__output},
         {"Interpreter.errored", Interpreter__errored},
         {"Interpreter.error_message", Interpreter__error_message},
@@ -1128,6 +1166,7 @@ void install_standard_library(Branch* kernel)
     // Finish setting up some hosted types
     TYPES.actor = as_type(kernel->get("Actor"));
     TYPES.color = as_type(kernel->get("Color"));
+    TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
     TYPES.dynamicInputs = as_type(kernel->get("DynamicInputs"));
     TYPES.dynamicOutputs = as_type(kernel->get("DynamicOutputs"));

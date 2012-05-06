@@ -49,13 +49,18 @@ static void update_file(caFileSource*, caFileRecord* record)
     circa_set_int(record->sourceMetadata, modifiedTime);
 
     {
-	// Get file size
+	    // Get file size
         fseek(fp, 0, SEEK_END);
         size_t size = ftell(fp);
         rewind(fp);
 
         record->data = (char*) realloc(record->data, size + 1);
-        fread(record->data, 1, size, fp);
+        size_t bytesRead = fread(record->data, 1, size, fp);
+
+        if (bytesRead != size) {
+            printf("file read error, %lu bytes read on %s\n", bytesRead, record->filename);
+        }
+
         record->data[size] = 0;
         record->version++;
     }
