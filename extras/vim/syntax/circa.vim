@@ -23,7 +23,7 @@ syn region circaString   start=+<<<+ end=+>>>+
 syn region circaMultilineComment start="{-" end="-}" contains=circaMultilineComment
 
 " Keywords
-syn keyword circaKeyword def type begin do end if elif else for state return in true false namespace discard break continue while import
+syn keyword circaKeyword def type begin do end if elif else for state return in true false namespace discard break continue while import not and or
 syn match circaKeyword "\<do\ once\>"
 
 " Comments

@@ -1,0 +1,9 @@
+not true = false
+not false = true
+not true or true = true
+not true or false = false
+not true and false = false
+true and not false = true
+not true or not true or not false = true
+not (true or false) or not (false) = true
+not (1 == 3) = true

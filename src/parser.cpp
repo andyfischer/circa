@@ -478,7 +478,7 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
 bool token_is_allowed_as_function_name(int token)
 {
     switch (token) {
-        case TK_FOR: case TK_IF: case TK_INCLUDE: case TK_TYPE:
+        case TK_FOR: case TK_IF: case TK_INCLUDE: case TK_TYPE: case TK_NOT:
             return true;
         default:
             return false;
@@ -1528,7 +1528,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 
 ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
-    // Unary minus
+    // Prefix negation
     if (tokens.nextIs(TK_MINUS)) {
         tokens.consume(TK_MINUS);
         ParseResult expr = atom_with_subscripts(branch, tokens, context);
@@ -1548,7 +1548,20 @@ ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
             }
         }
 
-        return ParseResult(apply(branch, FUNCS.neg, TermList(expr.term)));
+        Term* result = apply(branch, FUNCS.neg, TermList(expr.term));
+        return ParseResult(result);
+    }
+
+    // Prefix 'not'
+    else if (tokens.nextIs(TK_NOT)) {
+        tokens.consume(TK_NOT);
+        std::string postOperatorWs = possible_whitespace(tokens);
+        ParseResult expr = atom_with_subscripts(branch, tokens, context);
+        Term* result = apply(branch, FUNCS.not_func, TermList(expr.term));
+        result->setStringProp("syntax:declarationStyle", "prefix");
+        result->setStringProp("syntax:postFunctionWs", postOperatorWs);
+
+        return ParseResult(result);
     }
 
     return atom_with_subscripts(branch, tokens, context);

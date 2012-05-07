@@ -100,6 +100,7 @@ const int TK_INCLUDE = 66;
 const int TK_IMPORT = 76;
 const int TK_AND = 67;
 const int TK_OR = 68;
+const int TK_NOT = 79;
 const int TK_DISCARD = 69;
 const int TK_NULL = 71;
 const int TK_BREAK = 72;

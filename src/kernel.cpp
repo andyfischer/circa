@@ -1163,6 +1163,7 @@ void install_standard_library(Branch* kernel)
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
     FUNCS.length = kernel->get("length");
+    FUNCS.not_func = kernel->get("not");
     FUNCS.type = kernel->get("type");
     FUNCS.output_explicit = kernel->get("output");
 

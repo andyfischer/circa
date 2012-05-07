@@ -194,6 +194,11 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         format_source_for_input(source, term, 0);
         append_phrase(source, functionName.c_str(), term, phrase_type::INFIX_OPERATOR);
         format_source_for_input(source, term, 1);
+    } else if (declarationStyle == "prefix") {
+        append_phrase(source, functionName.c_str(), term, phrase_type::FUNCTION_NAME);
+        append_phrase(source, term->stringPropOptional("syntax:postFunctionWs", ""),
+            term, phrase_type::WHITESPACE);
+        format_source_for_input(source, term, 0);
     } else if (declarationStyle == "arrow-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);

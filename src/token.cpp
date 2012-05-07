@@ -84,6 +84,7 @@ const char* get_token_text(int match)
         case TK_IMPORT: return "import";
         case TK_AND: return "and";
         case TK_OR: return "or";
+        case TK_NOT: return "not";
         case TK_DISCARD: return "discard";
         case TK_NULL: return "null";
         case TK_BREAK: return "break";
@@ -313,6 +314,7 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, TK_IMPORT)) return;
         if (try_to_consume_keyword(context, TK_AND)) return;
         if (try_to_consume_keyword(context, TK_OR)) return;
+        if (try_to_consume_keyword(context, TK_NOT)) return;
         if (try_to_consume_keyword(context, TK_DISCARD)) return;
         if (try_to_consume_keyword(context, TK_NULL)) return;
         if (try_to_consume_keyword(context, TK_RETURN)) return;
