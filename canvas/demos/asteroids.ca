@@ -5,15 +5,14 @@ bounds = viewportBounds()
 time = currentTime()
 time_delta = delta(time)
 
+def random_location() -> Point
+    return bounds * [rand() rand()]
+
 -- Black background
 background(#000)
 
 -- Temporarily disable stars:
 -- include('shared/drifting_stars.ca' -> rpath)
-
-type Hi {
-}
-
 
 type Ship {
     Point loc
@@ -139,8 +138,6 @@ for bullet in @bullets
     if bullet.lifespan >= bullet_max_lifespan
         discard
 
-print('hi4: ' Hi)
-
 -- Draw bullets
 for bullet in bullets
     Bullet(@bullet)
@@ -150,9 +147,6 @@ for bullet in bullets
                   bullet.loc + [-1 1] * bullet_width,
                   ]
     draw_line_loop(points #fff)
-
-print('hey')
-print('hi5: ' Hi)
 
 type Asteroid {
   List edges
@@ -183,7 +177,13 @@ def generate_asteroid(number size) -> Asteroid
         (polar(angle) * (rand() * size + size/3)) -> Point
 
     rotation = (rand() * .2 - .1) * 360
-    return [edges, random_location(), random_norm_vector()*10, 0, rotation size 0]
+    result = create(Asteroid)
+    result.edges = edges
+    result.location = random_location()
+    result.vel = random_norm_vector()*10
+    result.rotation_vel = rotation
+    result.size = size
+    return result
 
 def generate_child_asteroid(Asteroid parent) -> Asteroid
     size = parent.size / 2
