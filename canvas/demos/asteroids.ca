@@ -25,7 +25,7 @@ type Bullet {
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Point p) -> Point
-    return [mod(p.x, bounds.x) mod(p.y, bounds.y)]
+    return [mod(p.x, bounds.x), mod(p.y, bounds.y)]
 
 def new_ship() -> Ship
     return Ship([[bounds.x/2 bounds.y/2] [0 0] 0])
@@ -117,7 +117,7 @@ if speed > speed_limit
     ship.momentum = ship.momentum * (speed_limit / speed)
 
 -- Move ship
-ship.loc = ship.loc + ship.momentum
+ship.loc += ship.momentum
 ship.loc = wrap_around(ship.loc)
 
 

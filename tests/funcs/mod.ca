@@ -1,0 +1,7 @@
+
+
+for i in -9..10
+    print('mod(' i ',4) = ' mod(i,4))
+for i in -9..10
+    print('remainder(' i ',4) = ' remainder(i,4))
+

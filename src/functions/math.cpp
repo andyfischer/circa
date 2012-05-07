@@ -44,20 +44,23 @@ namespace math_function {
     }
 
     // We compute mod() using floored division. This is different than C and many
-    // C-like languages. See this page for an explanation of the difference:
+    // C-like languages which use truncated division. See this page for an explanation
+    // of the difference:
     // http://en.wikipedia.org/wiki/Modulo_operation
     //
-    // For a function that works the same as C's modulo, use remainder()
+    // For a function that works the same as C's modulo, use remainder() . The % operator
+    // also uses remainder(), so that it works the same as C's % operator.
 
     CA_DEFINE_FUNCTION(mod_i, "mod_i(int,int) -> int")
     {
         int a = INT_INPUT(0);
         int n = INT_INPUT(1);
 
-        if (a >= 0)
-            set_int(OUTPUT, a % n);
-        else
-            set_int(OUTPUT, a % n + n);
+        int out = a % n;
+        if (out < 0)
+            out += n;
+
+        set_int(OUTPUT, out);
     }
 
     CA_DEFINE_FUNCTION(mod_f, "mod_f(number,number) -> number")
@@ -65,10 +68,12 @@ namespace math_function {
         float a = FLOAT_INPUT(0);
         float n = FLOAT_INPUT(1);
 
-        if (a >= 0)
-            set_float(OUTPUT, fmodf(a, n));
-        else
-            set_float(OUTPUT, fmodf(a, n) + n);
+        float out = fmodf(a, n);
+
+        if (out < 0)
+            out += n;
+
+        set_float(OUTPUT, out);
     }
 
     CA_DEFINE_FUNCTION(round, "round(number n) -> int;"

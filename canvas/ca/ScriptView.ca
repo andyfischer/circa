@@ -28,7 +28,7 @@ state ButtonBar topButtons = button_bar([
 topButtons.setToggled(2, state_frozen)
 topButtons.setLabel(2, cond(state_frozen, "Frozen", "Freeze"))
 
-def to_rect(Point topLeft, Point size)
+def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x topLeft.y topLeft.x+size.x topLeft.x+size.y]
 
 def Interpreter.drawRuntimeError(int, Painter painter)

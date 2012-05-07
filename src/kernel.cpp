@@ -546,7 +546,10 @@ void Interpreter__error_message(caStack* stack)
     else
         errorReg = get_frame_register(frame, frame->pc);
 
-    copy(errorReg, circa_output(stack, 0));
+    if (is_string(errorReg))
+        copy(errorReg, circa_output(stack, 0));
+    else
+        set_string(circa_output(stack, 0), to_string(errorReg).c_str());
 }
 void Interpreter__toString(caStack* stack)
 {
@@ -1016,9 +1019,9 @@ void bootstrap_kernel()
     append_to_overloaded_function(remainder_func, kernel->get("remainder_i"));
     append_to_overloaded_function(remainder_func, kernel->get("remainder_f"));
 
-    Term* mod_func = create_overloaded_function(kernel, "max(any,any) -> any");
-    append_to_overloaded_function(mod_func, kernel->get("max_i"));
-    append_to_overloaded_function(mod_func, kernel->get("max_f"));
+    Term* mod_func = create_overloaded_function(kernel, "mod(any,any) -> any");
+    append_to_overloaded_function(mod_func, kernel->get("mod_i"));
+    append_to_overloaded_function(mod_func, kernel->get("mod_f"));
 
     FUNCS.mult = create_overloaded_function(kernel, "mult(any,any) -> any");
     append_to_overloaded_function(FUNCS.mult, kernel->get("mult_i"));
