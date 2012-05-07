@@ -895,6 +895,20 @@ TokenStream::toString() const
     return out.str();
 }
 
+void TokenStream::dump()
+{
+    int lookbehind = 5;
+    int lookahead = 15;
+    for (int i=-lookbehind; i < lookahead; i++) {
+        int index = position() + i;
+        if (index < 0) continue;
+        if (index >= length()) continue;
+
+        std::cout << "[" << i << "] " << get_token_text(next(i).match)
+            << " '" << nextStr(i) << "'" << std::endl;
+    }
+}
+
 void print_remaining_tokens(std::ostream& out, TokenStream& tokens)
 {
     for (int i=0; i < tokens.remaining(); i++) {

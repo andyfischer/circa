@@ -629,8 +629,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
                 input->setBoolProp("output", true);
             } else if (symbolText == ":multiple") {
                 input->setBoolProp("multiple", true);
-            } else if (symbolText == ":rebind") {
-                internal_error(":rebind arg is old, use :out instead");
             } else if (symbolText == ":meta") {
                 input->setBoolProp("meta", true);
             } else {
@@ -689,8 +687,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(result, tokens, startPosition,
                 outputType->name +" is not a type");
 
-    //set_type_list(&attrs->outputTypes, as_type(outputType));
-    //finish_parsing_function_header(result);
     ca_assert(is_value(result));
     ca_assert(is_function(result));
 
@@ -1595,6 +1591,9 @@ void function_call_inputs(Branch* branch, TokenStream& tokens, ParserCxt* contex
         if (tokens.nextIs(TK_COMMA) || tokens.nextIs(TK_SEMICOLON))
             inputHints.append(index, "postWhitespace", tokens.consumeStr());
 
+        // Might be whitespace after the comma as well
+        inputHints.append(index, "postWhitespace", possible_whitespace_or_newline(tokens));
+
         index++;
     }
 }
@@ -1731,54 +1730,6 @@ ParseResult function_call(Branch* branch, TokenStream& tokens, ParserCxt* contex
     return ParseResult(result);
 }
 
-ParseResult function_call2(Branch* branch, Term* function, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-    
-    std::string originalName = function->name;
-
-    Term* result = NULL;
-
-    result = apply(branch, function, TermList());
-
-    tokens.consume(TK_LPAREN);
-    int index = 0;
-    while (!tokens.nextIs(TK_RPAREN) && !tokens.nextIs(TK_RBRACKET) && !tokens.finished()) {
-
-        std::string preWhitespace = possible_whitespace_or_newline(tokens);
-        if (preWhitespace != "")
-            set_input_syntax_hint(result, index, "preWhitespace", preWhitespace);
-
-        if (lookahead_match_rebind_argument(tokens)) {
-            tokens.consume(TK_AMPERSAND);
-            set_input_syntax_hint(result, index, "rebindInput", "t");
-        }
-
-        Term* input = expression(branch, tokens, context).term;
-
-        std::string postWhitespace = possible_whitespace_or_newline(tokens);
-        if (tokens.nextIs(TK_COMMA) || tokens.nextIs(TK_SEMICOLON))
-            postWhitespace += tokens.consumeStr();
-        if (postWhitespace != "")
-            set_input_syntax_hint(result, index, "postWhitespace", postWhitespace);
-
-        set_input(result, index, input);
-
-        index++;
-    }
-    if (!tokens.nextIs(TK_RPAREN))
-        return compile_error_for_line(branch, tokens, startPosition, "Expected: )");
-    tokens.consume(TK_RPAREN);
-
-    if (result->function->name != originalName)
-        result->setStringProp("syntax:functionName", originalName);
-
-    mark_inputs_changed(result);
-    finish_update_cascade(branch);
-
-    return ParseResult(result);
-}
-
 ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     ParseResult result = atom(branch, tokens, context);
@@ -1790,9 +1741,6 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
     bool finished = false;
     while (!finished) {
-
-        //if (has_static_error(result.term))
-        //    return result;
 
         int startPosition = tokens.getPosition();
 

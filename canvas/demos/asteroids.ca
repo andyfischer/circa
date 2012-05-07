@@ -11,6 +11,10 @@ background(#000)
 -- Temporarily disable stars:
 -- include('shared/drifting_stars.ca' -> rpath)
 
+type Hi {
+}
+
+
 type Ship {
     Point loc
     Point momentum
@@ -135,6 +139,8 @@ for bullet in @bullets
     if bullet.lifespan >= bullet_max_lifespan
         discard
 
+print('hi4: ' Hi)
+
 -- Draw bullets
 for bullet in bullets
     Bullet(@bullet)
@@ -145,6 +151,9 @@ for bullet in bullets
                   ]
     draw_line_loop(points #fff)
 
+print('hey')
+print('hi5: ' Hi)
+
 type Asteroid {
   List edges
   Point location
@@ -154,6 +163,7 @@ type Asteroid {
   number size
   number age
 }
+
 
 type Particle {
   number age

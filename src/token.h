@@ -195,6 +195,7 @@ struct TokenStream
     int getPosition() const;
     void resetPosition(int loc); 
     std::string toString() const;
+    void dump();
 };
 
 void print_remaining_tokens(std::ostream& stream, TokenStream& tokens);

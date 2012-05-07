@@ -547,7 +547,7 @@ void Interpreter__error_message(caStack* stack)
         errorReg = get_frame_register(frame, frame->pc);
 
     if (is_string(errorReg))
-        copy(errorReg, circa_output(stack, 0));
+        set_string(circa_output(stack, 0), as_cstring(errorReg));
     else
         set_string(circa_output(stack, 0), to_string(errorReg).c_str());
 }
