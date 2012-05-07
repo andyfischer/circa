@@ -1,0 +1,7 @@
+
+def f() -> Point
+    return [3 4]
+
+p = f()
+print(p.x)
+print(p.y)

@@ -267,12 +267,12 @@ void for_loop_fix_state_input(Branch* contents)
 
 CA_FUNCTION(start_for_loop)
 {
-    Stack* context = CONTEXT;
+    Stack* stack = CONTEXT;
 
     caValue* inputList = INPUT(0);
     int inputListLength = list_length(inputList);
 
-    Frame* frame = top_frame(context);
+    Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;
 
     // Set up a blank list for output
@@ -280,7 +280,7 @@ CA_FUNCTION(start_for_loop)
 
     // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {
-        List* registers = &top_frame(context)->registers;
+        List* registers = &top_frame(stack)->registers;
         for (int i=1;; i++) {
             Term* input = get_input_placeholder(contents, i);
             if (input == NULL)
@@ -290,7 +290,7 @@ CA_FUNCTION(start_for_loop)
                 break;
             copy(registers->get(input->index), registers->get(output->index));
         }
-        finish_frame(context);
+        finish_frame(stack);
         return;
     }
 
@@ -305,14 +305,14 @@ CA_FUNCTION(start_for_loop)
     ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
 
     // Initialize the loop index
-    set_int(top_frame(context)->registers[loopIndexPos], 0);
+    set_int(top_frame(stack)->registers[loopIndexPos], 0);
 
     // Interpreter will run the contents of the branch
 }
 
-void for_loop_finish_iteration(Stack* context)
+void for_loop_finish_iteration(Stack* stack)
 {
-    Frame* frame = top_frame(context);
+    Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;
 
     // Find list length
@@ -325,7 +325,7 @@ void for_loop_finish_iteration(Stack* context)
     // Check if we are finished
     if (as_int(index) >= list_length(listInput)) {
         frame->loop = false;
-        finish_frame(context);
+        finish_frame(stack);
         return;
     }
 
@@ -344,9 +344,9 @@ void for_loop_finish_iteration(Stack* context)
     frame->nextPc = 0;
 }
 
-void for_loop_finish_frame(Stack* context)
+void for_loop_finish_frame(Stack* stack)
 {
-    for_loop_finish_iteration(context);
+    for_loop_finish_iteration(stack);
 }
 
 void loop_update_continue_inputs(Branch* branch, Term* continueTerm)
@@ -372,7 +372,7 @@ void finish_while_loop(Term* whileTerm)
 
 CA_FUNCTION(evaluate_unbounded_loop)
 {
-    Stack* context = CONTEXT;
+    Stack* stack = CONTEXT;
     Branch* contents = nested_contents(CALLER);
 
     // Check for zero evaluations
@@ -380,7 +380,7 @@ CA_FUNCTION(evaluate_unbounded_loop)
         return;
     }
 
-    push_frame(context, contents);
+    push_frame(stack, contents);
 }
 
 CA_FUNCTION(evaluate_unbounded_loop_finish)

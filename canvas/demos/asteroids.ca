@@ -12,8 +12,8 @@ background(#000)
 -- include('shared/drifting_stars.ca' -> rpath)
 
 type Ship {
-    Point loc,
-    Point momentum,
+    Point loc
+    Point momentum
     number facing
 }
 
@@ -25,10 +25,10 @@ type Bullet {
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Point p) -> Point
-    return [mod(p.x, bounds.width) mod(p.y, bounds.height)]
+    return [mod(p.x, bounds.x) mod(p.y, bounds.y)]
 
 def new_ship() -> Ship
-    return [[bounds.width/2 bounds.height/2] [0 0] 0]
+    return Ship([[bounds.x/2 bounds.y/2] [0 0] 0])
 
 state Ship ship = new_ship()
 state List bullets = []

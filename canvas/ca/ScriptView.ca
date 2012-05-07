@@ -45,7 +45,9 @@ def Interpreter.drawRuntimeError(int, Painter painter)
         Frame(@frame)
 
         loc = frame.pc_term
-        painter.drawText(to_rect([left y] [width 100]) 0 loc.location_string)
+        painter.drawText(to_rect([left y] [width y+100]) 0 loc.location_string)
+
+        y += 20
 
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter

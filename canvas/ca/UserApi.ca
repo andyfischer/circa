@@ -31,3 +31,6 @@ def key_pressed(Name key) -> bool
 
 def currentTime() -> number
     return 0.0
+
+def viewportBounds() -> Point
+    return Point([500 500])

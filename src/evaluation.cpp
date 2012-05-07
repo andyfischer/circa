@@ -219,18 +219,11 @@ void finish_frame(Stack* stack)
         return;
     }
 
-    // Hang on to the register list
-    List registers;
-    swap(&registers, &top->registers);
-
-    // Pop frame
-    pop_frame(stack);
-    
-    Frame* parentFrame = top_frame(stack);
+    Frame* topFrame = get_frame(stack, 0);
+    Frame* parentFrame = get_frame(stack, 1);
 
     if (parentFrame->pc < parentFrame->branch->length()) {
         Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
-        List* parentRegisters = &top_frame(stack)->registers;
         
         // Copy outputs to the parent frame, and advance PC.
         for (int i=0;; i++) {
@@ -238,11 +231,31 @@ void finish_frame(Stack* stack)
             if (placeholder == NULL)
                 break;
 
-            swap(registers[placeholder->index], parentRegisters->get(finishedTerm->index + i));
+            caValue* result = get_frame_register(topFrame, placeholder->index);
+            caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
+            bool success = cast(result, placeholder->type, dest);
+
+            if (!success) {
+                Value msg;
+                set_string(&msg, "Couldn't cast value ");
+                string_append(&msg, to_string(result).c_str());
+                string_append(&msg, " to type ");
+                string_append(&msg, name_to_string(placeholder->type->name));
+                set_error_string(dest, as_cstring(&msg));
+                raise_error(stack);
+                topFrame->pc = placeholder->index;
+                return;
+            }
         }
     }
 
-    parentFrame->pc = parentFrame->nextPc;
+    // Pop frame
+    pop_frame(stack);
+
+    // Advance PC
+
+    Frame* newTop = top_frame(stack);
+    newTop->pc = newTop->nextPc;
 }
 
 Frame* top_frame(Stack* stack)
@@ -813,7 +826,7 @@ void step_interpreter(Stack* stack)
     if (currentTerm == NULL)
         return;
 
-    // Certain functions must be handled in-place
+    // Certain functions must currently be handled in-place
     if (currentTerm->function == FUNCS.output) {
 
         caValue* in = find_stack_value_for_term(stack, currentTerm->input(0), 0);

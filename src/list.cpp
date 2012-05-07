@@ -647,14 +647,12 @@ namespace list_t {
     void tv_cast(CastResult* result, caValue* source, Type* type,
         caValue* dest, bool checkOnly)
     {
-        List* sourceList = List::checkCast(source);
-
-        if (sourceList == NULL) {
+        if (!is_list(source)) {
             result->success = false;
             return;
         }
 
-        int sourceLength = sourceList->length();
+        int sourceLength = list_length(source);
 
         // If the destination list type doesn't have a specific size restriction,
         // then just copy the source list and call it a day.
@@ -674,21 +672,18 @@ namespace list_t {
             return;
         }
 
-        List* destList = NULL;
-
         if (!checkOnly) {
-            destList = List::lazyCast(dest);
-            destList->resize(sourceLength);
+            set_list(dest, sourceLength);
             dest->value_type = type;
         }
 
         for (int i=0; i < sourceLength; i++) {
-            caValue* sourceElement = sourceList->get(i);
+            caValue* sourceElement = list_get(source, i);
             Type* expectedType = as_type(destTypes[i]);
 
             caValue* destElement = NULL;
             if (!checkOnly)
-                destElement = destList->get(i);
+                destElement = list_get(dest,i);
         
             cast(result, sourceElement, expectedType, destElement, checkOnly);
 

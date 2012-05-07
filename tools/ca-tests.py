@@ -159,6 +159,7 @@ def all_testable_files():
         TestRoot + '/meta',
         TestRoot + '/reflection',
         TestRoot + '/runtime_typing',
+        TestRoot + '/subroutine',
         TestRoot + '/static_errors',
         TestRoot + '/syntax',
         TestRoot + '/type_inferrence'
