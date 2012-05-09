@@ -1,16 +1,15 @@
 
--- Check 'true' and 'false' constants
-print('should be true: ', true)
-print('should be false: ', false)
+assert(to_string(true) == 'true')
+assert(to_string(false) == 'false')
 
 -- and
-print('and(true,true): ', and(true,true))
-print('and(true,false): ', and(true,false))
-print('and(false,true): ', and(false,true))
-print('and(false,false): ', and(false,false))
+assert(and(true,true) == true)
+assert(and(true,false) == false)
+assert(and(false,true) == false)
+assert(and(false,false) == false)
 
 -- or
-print('or(true,true): ', or(true,true))
-print('or(true,false): ', or(true,false))
-print('or(false,true): ', or(false,true))
-print('or(false,false): ', or(false,false))
+assert(or(true,true) == true)
+assert(or(true,false) == true)
+assert(or(false,true) == true)
+assert(or(false,false) == false)

@@ -162,6 +162,7 @@ def all_testable_files():
         TestRoot + '/subroutine',
         TestRoot + '/static_errors',
         TestRoot + '/syntax',
+        TestRoot + '/types',
         TestRoot + '/type_inferrence'
         ]
     for dir in dirs:
