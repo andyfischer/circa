@@ -36,6 +36,7 @@ void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& 
 
         Frame* frame = top_frame(context);
         frame->pc = i;
+        frame->nextPc = i;
         frame->endPc = i + 1;
         run_interpreter(context);
 

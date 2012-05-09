@@ -1,7 +1,7 @@
 
 type Button {
     String label
-    Name action
+    any action
     Rect rect
     bool rollover
     bool press
@@ -10,6 +10,9 @@ type Button {
 }
 
 button_text_color = #fff
+
+def Point.inside(self, Rect rect) -> bool
+    return (self.x >= rect.x1) and (self.x <= rect.x2) and (self.y >= rect.y1) and (self.y <= rect.y2)
 
 def button(String label, Rect rect) -> Button
     b = create(Button)
@@ -57,18 +60,32 @@ def button_bar(List definitions, Rect rect) -> ButtonBar
         b
     return [buttons]
 
+def button_bar_vert(List definitions, Rect rect) -> ButtonBar
+    vspacer = 10
+    eachHeight = (rect.height - vspacer * (definitions.length - 1)) / definitions.length
+
+    top = rect.y1
+    buttons = for defi in definitions
+        b = create(Button)
+        b.label = defi[0]
+        b.action = defi[1]
+        b.rect = [rect.x1, top, rect.x2, top + eachHeight]
+        top += eachHeight + vspacer
+        b
+    return [buttons]
+
 def ButtonBar.draw(b, Painter p)
     for button in b.buttons
         button.draw(p)
 
-def ButtonBar.input(b :out, InputEvent e) -> Name
-    action = :none
+def ButtonBar.input(b :out, InputEvent e) -> any
+    action = null
     buttons = b.buttons
     for button in @buttons
         Button(@button)
         button.input(e)
 
-        if action == :none and button.triggered
+        if action == null and button.triggered
             action = button.action
 
     b.buttons = buttons

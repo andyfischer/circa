@@ -328,7 +328,7 @@ int run_command_line(caWorld* world, caValue* args)
     if (dontRunScript)
         return 0;
 
-    Stack* stack = alloc_stack(NULL);
+    Stack* stack = alloc_stack(world);
 
     push_frame(stack, main_branch);
 

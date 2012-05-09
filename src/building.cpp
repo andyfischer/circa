@@ -243,6 +243,10 @@ void unsafe_change_type(Term *term, Type *type)
 
 void change_declared_type(Term *term, Type *newType)
 {
+    // Don't allow 'null' to be used as a declared type (use 'any' instead)
+    if (newType == &NULL_T)
+        newType = &ANY_T;
+
     ca_assert(term != NULL);
     ca_assert(newType != NULL);
 

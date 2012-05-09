@@ -1,7 +1,14 @@
 
 msg = input() -> List
 
+import UIHelper
+
 msg_name = msg[0]
+
+state ButtonBar scriptChoices = button_bar_vert([
+        ["Asteroids", "demos/asteroids.ca"],
+        ["Mouse test", "demos/mouse_test.ca"]
+        ], [10 100 200 200])
 
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
@@ -14,4 +21,13 @@ if msg_name == 'onPaintEvent'
 
     font = create_font("Sans Serif", 30)
     painter.setFont(font)
-    painter.drawText([mouse.x mouse.y 300 100] 0 "1. Set up a text editor")
+    painter.drawText([0 0 300 100] 0 "1. Set up a text editor")
+
+    scriptChoices.draw(painter)
+
+elif msg_name == 'onInputEvent'
+    event = msg[1] -> InputEvent
+    choice = scriptChoices@.input(event)
+    if is_string(choice)
+        send('ScriptView' ['loadFile' choice])
+        send('View' ['changeScreen' 'ScriptView'])

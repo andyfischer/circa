@@ -17,7 +17,7 @@ def fadein(Color c) -> Color
 -- Incoming message
 msg = input() -> List
 
-state string currentScreen = 'ScriptView'
+state string currentScreen = 'IntroScreen'
 
 msg_name = msg[0]
 
@@ -33,7 +33,9 @@ if msg_name == 'onPaintEvent'
     send(currentScreen msg)
 
 elif msg_name == 'onInputEvent'
-
     send(currentScreen msg)
+elif msg_name == 'changeScreen'
+    print('changed screen to ' msg[1])
+    currentScreen = msg[1]
 else
     assert(false)

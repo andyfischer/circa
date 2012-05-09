@@ -1,36 +1,42 @@
 
--- User API - This module contains all the functions that the user's scripts will use.
 
--- Instead of worrying about certain globals (like Painter), we provide functions that
--- know how to find the globals on their own.
+type ScriptContext {
+    Painter painter
+    Point mouse
+    number time
+}
 
-def current_painter() -> Painter
-    -- Modified in-place by ScriptView, to provide the Painter object for this frame.
-    painter = null
-    return painter
+def ScriptContext.background(self, Color color)
+    self.painter.fillRect(self.painter.viewport + [0 0 1 1], color)
 
-def background(Color color)
+def ScriptContext.fill_rect(self, Rect rect, Color color)
+    self.painter.fillRect(rect, color)
 
-def fill_rect(Rect rect, Color color)
-    painter = current_painter()
-    if painter != null
-        painter.fillRect(rect, color)
-
-def mouse() -> Point
-    val = null
-    return val
-
-def draw_lines(List points, Color color)
-def draw_line_loop(List points, Color color)
-def draw_circle(Point center, number radius, Color color)
-def draw_points(List points, Color color)
-def key_down(Name key) -> bool
+def ScriptContext.draw_line(self, Point a, Point b, Color color)
+    self.painter.setColor(color)
+    self.painter.drawLine(a,b)
+def ScriptContext.draw_lines(self, List lines, Color color)
+    self.painter.setColor(color)
+    for i in 0..(lines.length - 1)
+        self.painter.drawLine(lines[i], lines[i + 1])
+def ScriptContext.draw_line_loop(self, List lines, Color color)
+    self.painter.setColor(color)
+    for i in 0..(lines.length - 1)
+        self.painter.drawLine(lines[i], lines[i + 1])
+    self.painter.drawLine(lines[lines.length - 1], lines[0])
+def ScriptContext.draw_circle(self, Point center, number radius, Color color)
+    self.painter.setColor(color)
+    self.painter.drawEllipse([center.x - radius, center.y - radius,
+        center.x + radius, center.y + radius])
+def ScriptContext.draw_points(self, List points, Color color)
+    -- todo
+def ScriptContext.draw_text(Rect rect, int flags, String msg)
+    self.painter.drawText(rect, flags, msg)
+def ScriptContext.key_down(self, Name key) -> bool
+    -- todo
     return false
-def key_pressed(Name key) -> bool
+def ScriptContext.mouse_down(self) -> bool
+    -- todo
     return false
-
-def currentTime() -> number
-    return 0.0
-
-def viewportBounds() -> Point
-    return Point([500 500])
+def ScriptContext.bounds(self) -> Point
+    return [self.painter.viewport.width, self.painter.viewport.height]

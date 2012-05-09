@@ -107,7 +107,7 @@ void format_term_source(StyledSource* source, Term* term)
 
         // Otherwise use formatSource on type type.
         } else {
-            Type* type = declared_type(term);
+            Type* type = term_value(term)->value_type;
             if (type->formatSource == NULL) {
                 std::stringstream out;
                 out << "Type " << name_to_string(type->name) <<

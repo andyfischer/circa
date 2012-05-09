@@ -3,12 +3,6 @@ import UIHelper
 
 msg = input()
 
-def Point.inside(self, Rect rect) -> bool
-    return (self.x >= rect.x1) and (self.x <= rect.x2) and (self.y >= rect.y1) and (self.y <= rect.y2)
-
-def set_global(Branch branch, String name, any value)
-    value_ref = branch.find_term(name)
-    value_ref.assign(value)
 
 state Branch userBranch
 state any userState
@@ -20,9 +14,11 @@ state state_frozen = false
 state Point mousePos
 
 state ButtonBar topButtons = button_bar([
-    ["Load" :load],
-    ["Restart" :restart],
-    ["Freeze" :freezeState]] [10 10 300 40])
+    ["Load" :load]
+    ["Restart" :restart]
+    ["Freeze" :freezeState]
+    ["Exit" :exit]
+    ] [10 10 400 40])
 
 -- set the state of the Freeze button
 topButtons.setToggled(2, state_frozen)
@@ -37,6 +33,7 @@ def Interpreter.drawRuntimeError(int, Painter painter)
     width = painter.viewport.width - left
     error_y = 50
     size = [width, 100]
+    painter.setColor(#fff)
     painter.drawText(to_rect([left error_y] size) 0 concat(msg))
 
     -- Draw the stack
@@ -54,11 +51,6 @@ if msg[0] == 'onPaintEvent'
 
     -- Run the user's script to paint
 
-    -- Slightly evil: Inject some values into the global functions used by the user script,
-    -- so that they can access them in a global way.
-    set_global(branch_ref(current_painter), 'painter', painter)
-    set_global(branch_ref(mouse), 'val', mousePos)
-
     -- Check if we should run the branch this frame
 
     if not(userBranch.is_null)
@@ -67,11 +59,21 @@ if msg[0] == 'onPaintEvent'
             interpreter_stopped = false
 
     if not(userBranch.is_null) and not(interpreter_stopped)
+
+        usersContext = create(ScriptContext)
+        usersContext.painter = painter
+        usersContext.mouse = mousePos
+        usersContext.time = 0
+
         interpreter.reset
-        interpreter.push_frame(userBranch, [])
+        interpreter.push_frame(userBranch, [usersContext])
         interpreter.set_state_input(userState)
         interpreter.run
 
+        if interpreter.errored
+            print(interpreter.error_message)
+
+        -- Possibly save their state
         if not(interpreter.errored) and not(state_frozen)
             userState = interpreter.get_state_output
 
@@ -97,7 +99,9 @@ elif msg[0] == 'onInputEvent'
         send('ScriptView' ['loadFile' 'demos/asteroids.ca'])
     elif action == :restart
         userState = null
-    elif action != :none
+    elif action == :exit
+        send('View' ['changeScreen' 'IntroScreen'])
+    elif action != null
         print('action: ' action)
 
 elif msg[0] == 'loadFile'
