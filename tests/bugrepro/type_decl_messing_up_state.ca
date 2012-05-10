@@ -1,0 +1,15 @@
+
+-- The cause of this bug was that type_decl was unnecessarily calling branch->moveToEnd
+-- to reposition the result. This was messing up the generation of pack_state terms.
+
+def f()
+    state a = 1
+
+    type T {
+    }
+
+    state b = 2
+
+s = null
+f(state = s)
+print(s)

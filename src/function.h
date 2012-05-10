@@ -135,6 +135,5 @@ bool is_subroutine(Term* term);
 
 // Perform various steps to finish creating a subroutine
 void initialize_subroutine(Term* sub);
-void finish_building_subroutine(Term* sub, Term* outputType);
 
 } // namespace circa

@@ -778,6 +778,13 @@ void branch_finish_changes(Branch* branch)
 
     // Perform cleanup
 
+    // Remove NULLs
+    branch->removeNulls();
+
+    finish_update_cascade(branch);
+
+    fix_forward_function_references(branch);
+
     // Create an output_placeholder for state, if necessary.
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)

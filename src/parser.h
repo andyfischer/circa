@@ -113,10 +113,6 @@ void set_source_location(Term* term, int start, TokenStream& tokens);
 Term* find_and_apply(Branch* branch, std::string const& functionName,
         TermList const& inputs);
 
-// Does various cleanup work on a branch that has just been used by a parsing step.
-// This should be done after parsing.
-void post_parse_branch(Branch* branch);
-
 // Consume tokens starting at 'start' and ending at something which might
 // be the end of the statement. Return line as string. This should probably
 // only be used for handling parse errrors.

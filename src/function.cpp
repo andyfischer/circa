@@ -104,8 +104,6 @@ void finish_building_function(Function* func, Type* declaredOutputType)
 {
     Branch* contents = function_contents(func);
 
-    // pack_any_open_state_vars(contents);
-
     // Write a list of output_placeholder terms.
 
     // Look at every input declared as :output, these will be used to declare extra outputs.
@@ -519,17 +517,10 @@ bool is_subroutine(Term* term)
     return as_function(term)->evaluate == evaluate_subroutine;
 }
 
-
 void initialize_subroutine(Term* sub)
 {
     // Install evaluate function
     as_function(sub)->evaluate = evaluate_subroutine;
 }
-
-void finish_building_subroutine(Term* sub, Term* outputType)
-{
-    finish_update_cascade(nested_contents(sub));
-}
-
 
 } // namespace circa

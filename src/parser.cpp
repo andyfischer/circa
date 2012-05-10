@@ -23,7 +23,6 @@
 #include "term.h"
 #include "token.h"
 #include "type.h"
-#include "update_cascades.h"
 
 namespace circa {
 namespace parser {
@@ -36,7 +35,6 @@ Term* compile(Branch* branch, ParsingStep step, std::string const& input)
     ParserCxt context;
     Term* result = step(branch, tokens, &context).term;
 
-    post_parse_branch(branch);
     branch_finish_changes(branch);
 
     ca_assert(branch_check_invariants_print_result(branch, std::cout));
@@ -129,7 +127,6 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
     }
 
     branch_finish_changes(branch);
-    post_parse_branch(branch);
     return;
 }
 
@@ -701,7 +698,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // Parse subroutine contents.
     consume_branch(contents, tokens, context);
 
-    finish_building_subroutine(result, outputType);
     finish_building_function(as_function(result), as_type(outputType));
 
     ca_assert(is_value(result));
@@ -805,7 +801,6 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         if (tokens.nextIs(TK_IDENTIFIER))
             fieldName = tokens.consumeStr(TK_IDENTIFIER);
 
-
         Term* field = create_value(contents, as_type(fieldType), fieldName);
 
         field->setStringProp("syntax:preWhitespace", preWs);
@@ -816,8 +811,6 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     tokens.consume(closingToken);
 
     list_initialize_parameter_from_type_decl(contents, &as_type(result)->parameter);
-
-    branch->moveToEnd(result);
 
     return ParseResult(result);
 }
@@ -928,7 +921,7 @@ ParseResult switch_block(Branch* branch, TokenStream& tokens, ParserCxt* context
 
     // case_statement may have appended some terms to our branch, so move this
     // term to compensate.
-    branch->moveToEnd(result);
+    move_before_final_terms(result);
 
     switch_block_post_compile(result);
     set_source_location(result, startPosition, tokens);
@@ -2140,7 +2133,6 @@ ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context
     Branch* resultBranch = nested_contents(term);
     set_source_location(term, startPosition, tokens);
     consume_branch_with_braces(resultBranch, tokens, context, term);
-    post_parse_branch(resultBranch);
     create_inputs_for_outer_references(term);
     branch_finish_changes(resultBranch);
     return ParseResult(term);
@@ -2163,8 +2155,6 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
     consume_branch(nested_contents(term), tokens, context);
 
     branch_finish_changes(nested_contents(term));
-    mark_inputs_changed(term);
-    finish_update_cascade(branch);
 
     return ParseResult(term);
 }
@@ -2277,16 +2267,6 @@ void set_source_location(Term* term, int start, TokenStream& tokens)
     loc.lineEnd = tokens[end].lineEnd;
 
     term->sourceLoc.grow(loc);
-}
-
-void post_parse_branch(Branch* branch)
-{
-    // Remove NULLs
-    branch->removeNulls();
-
-    finish_update_cascade(branch);
-
-    fix_forward_function_references(branch);
 }
 
 std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient)

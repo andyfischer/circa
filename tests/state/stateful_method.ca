@@ -1,0 +1,21 @@
+
+type T {
+}
+
+def T.f(t)
+  state int i = 0
+
+  i += 1
+
+def main()
+  t = create(T)
+
+  t.f()
+
+s = null
+main(state = s)
+print(s)
+main(state = s)
+print(s)
+main(state = s)
+print(s)
