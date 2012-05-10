@@ -1,0 +1,4 @@
+Error occurred:
+[tests/bugrepro/create_null.ca:2,0] create()
+(input 0) | Couldn't cast value null to type Type
+

@@ -439,8 +439,10 @@ void Interpreter__set_state_input(caStack* stack)
         Term* input = get_input_placeholder(branch, i);
         if (input == NULL)
             break;
-        if (is_state_input(input))
+        if (is_state_input(input)) {
             stateSlot = get_frame_register(top_frame(self), input->index);
+            break;
+        }
     }
 
     if (stateSlot == NULL)
@@ -465,8 +467,10 @@ void Interpreter__get_state_output(caStack* stack)
         Term* output = get_output_placeholder(branch, i);
         if (output == NULL)
             break;
-        if (is_state_output(output))
+        if (is_state_output(output)) {
             stateSlot = get_frame_register(top_frame(self), output->index);
+            break;
+        }
     }
 
     if (stateSlot == NULL) {
@@ -546,7 +550,9 @@ void Interpreter__error_message(caStack* stack)
     else
         errorReg = get_frame_register(frame, frame->pc);
 
-    if (is_string(errorReg))
+    if (errorReg == NULL)
+        set_string(circa_output(stack, 0), "(null error)");
+    else if (is_string(errorReg))
         set_string(circa_output(stack, 0), as_cstring(errorReg));
     else
         set_string(circa_output(stack, 0), to_string(errorReg).c_str());

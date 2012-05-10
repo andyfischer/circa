@@ -2137,10 +2137,12 @@ ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context
 {
     int startPosition = tokens.getPosition();
     Term* term = apply(branch, FUNCS.lambda, TermList());
+    Branch* resultBranch = nested_contents(term);
     set_source_location(term, startPosition, tokens);
-    consume_branch_with_braces(nested_contents(term), tokens, context, term);
-    post_parse_branch(nested_contents(term));
+    consume_branch_with_braces(resultBranch, tokens, context, term);
+    post_parse_branch(resultBranch);
     create_inputs_for_outer_references(term);
+    set_branch_in_progress(resultBranch, false);
     return ParseResult(term);
 }
 

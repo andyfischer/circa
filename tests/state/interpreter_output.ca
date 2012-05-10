@@ -1,0 +1,15 @@
+
+b = {
+    a = input()
+    state mouse_was_down = false
+    result = false
+
+    output(a + 1)
+
+    state something = 0.0
+}
+
+int = make_interpreter()
+int.push_frame(branch_ref(b), [1])
+int.run
+print(int.get_state_output)

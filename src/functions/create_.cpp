@@ -16,7 +16,7 @@ namespace create__function {
         if (input == NULL)
             return &ANY_T;
 
-        if (is_value(input))
+        if (is_value(input) && is_type(input))
             return as_type(input);
 
         return &ANY_T;
