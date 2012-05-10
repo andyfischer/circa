@@ -138,7 +138,11 @@ float get_step(Term* term);
 bool is_lazy_call(Term* term);
 void set_lazy_call(Term* term, bool value);
 
-void set_branch_in_progress(Branch* branch, bool inProgress);
+// Set a branch as being 'in progress', meaning that we are actively making changes to it.
+void branch_start_changes(Branch* branch);
+
+// Set the branch as no longer 'in progress', perform any final cleanup actions.
+void branch_finish_changes(Branch* branch);
 
 Term* find_last_non_comment_expression(Branch* branch);
 Term* find_term_with_function(Branch* branch, Term* func);

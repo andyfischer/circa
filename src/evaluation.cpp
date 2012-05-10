@@ -322,7 +322,7 @@ void save_top_level_state(Stack* stack, Branch* branch)
 
 void evaluate_branch(Stack* stack, Branch* branch)
 {
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
 
     // Top-level call
     push_frame(stack, branch);
@@ -517,7 +517,7 @@ bool error_occurred(Stack* stack)
 
 void evaluate_range(Stack* stack, Branch* branch, int start, int end)
 {
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
     push_frame(stack, branch);
 
     for (int i=start; i <= end; i++)
@@ -536,7 +536,7 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
     // search to terms inside the current branch.
     
     Branch* branch = term->owningBranch;
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
 
     push_frame(stack, branch);
 
@@ -764,7 +764,7 @@ void start_interpreter_session(Stack* stack)
     Branch* topBranch = top_frame(stack)->branch;
 
     // Make sure there are no pending code updates.
-    set_branch_in_progress(topBranch, false);
+    branch_finish_changes(topBranch);
 
     // Check if our stack needs to be updated following branch modification
     update_context_to_latest_branches(stack);
@@ -1049,7 +1049,7 @@ void circa_run_function(caStack* stack, caFunction* func, caValue* inputs)
 {
     Branch* branch = function_contents((Function*) func);
     
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
     
     push_frame_with_inputs(stack, branch, inputs);
     
@@ -1067,7 +1067,7 @@ void circa_push_function(caStack* stack, caFunction* func)
 {
     Branch* branch = function_contents((Function*) func);
     
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
     
     push_frame(stack, branch);
 }

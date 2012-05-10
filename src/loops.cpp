@@ -194,7 +194,7 @@ void finish_for_loop(Term* forTerm)
 
     loop_update_exit_points(contents);
 
-    set_branch_in_progress(contents, false);
+    branch_finish_changes(contents);
 }
 
 Term* find_enclosing_for_loop(Term* term)

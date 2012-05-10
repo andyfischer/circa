@@ -30,14 +30,14 @@ namespace parser {
 
 Term* compile(Branch* branch, ParsingStep step, std::string const& input)
 {
-    set_branch_in_progress(branch, true);
+    branch_start_changes(branch);
 
     TokenStream tokens(input);
     ParserCxt context;
     Term* result = step(branch, tokens, &context).term;
 
     post_parse_branch(branch);
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
 
     ca_assert(branch_check_invariants_print_result(branch, std::cout));
 
@@ -128,7 +128,7 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
         consume_branch_with_significant_indentation(branch, tokens, context, parentTerm);
     }
 
-    set_branch_in_progress(branch, false);
+    branch_finish_changes(branch);
     post_parse_branch(branch);
     return;
 }
@@ -872,7 +872,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
         set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
         consume_branch(nested_contents(currentBlock), tokens, context);
-        set_branch_in_progress(nested_contents(currentBlock), false);
+        branch_finish_changes(nested_contents(currentBlock));
 
         if (tokens.nextNonWhitespaceIs(TK_ELIF)
                 || (tokens.nextNonWhitespaceIs(TK_ELSE) && !encounteredElse)) {
@@ -2142,7 +2142,7 @@ ParseResult plain_branch(Branch* branch, TokenStream& tokens, ParserCxt* context
     consume_branch_with_braces(resultBranch, tokens, context, term);
     post_parse_branch(resultBranch);
     create_inputs_for_outer_references(term);
-    set_branch_in_progress(resultBranch, false);
+    branch_finish_changes(resultBranch);
     return ParseResult(term);
 }
 
@@ -2162,7 +2162,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
 
     consume_branch(nested_contents(term), tokens, context);
 
-    set_branch_in_progress(nested_contents(term), false);
+    branch_finish_changes(nested_contents(term));
     mark_inputs_changed(term);
     finish_update_cascade(branch);
 

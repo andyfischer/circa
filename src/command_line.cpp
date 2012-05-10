@@ -194,7 +194,7 @@ int run_command_line(caWorld* world, caValue* args)
             return -1;
         }
 
-        set_branch_in_progress(branch, false);
+        branch_finish_changes(branch);
 
         caStack* stack = circa_alloc_stack(world);
 
@@ -318,7 +318,7 @@ int run_command_line(caWorld* world, caValue* args)
     // Default behavior with no flags: load args[0] as a script and run it.
     Branch* main_branch = create_branch(kernel());
     load_script(main_branch, as_cstring(list_get(args, 0)));
-    set_branch_in_progress(main_branch, false);
+    branch_finish_changes(main_branch);
 
     if (printRawWithProps)
         print_branch_with_properties(std::cout, main_branch);

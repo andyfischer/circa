@@ -24,7 +24,7 @@ namespace circa {
 
 Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string const& name)
 {
-    set_branch_in_progress(branch, true);
+    branch_start_changes(branch);
 
     // If function is NULL, use 'unknown_function' instead.
     if (function == NULL)
@@ -766,18 +766,17 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
     }
 }
 
-void set_branch_in_progress(Branch* branch, bool inProgress)
+void branch_start_changes(Branch* branch)
 {
-    if ((branch->inProgress && inProgress) || (!branch->inProgress && !inProgress))
+    branch->inProgress = true;
+}
+
+void branch_finish_changes(Branch* branch)
+{
+    if (!branch->inProgress)
         return;
 
-    if (inProgress) {
-        // Entering in-progress state
-        branch->inProgress = true;
-        return;
-    }
-
-    // Exiting in-progress state, perform cleanup.
+    // Perform cleanup
 
     // Create an output_placeholder for state, if necessary.
     Term* openState = find_open_state_result(branch, branch->length());
