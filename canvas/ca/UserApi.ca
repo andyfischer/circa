@@ -37,8 +37,12 @@ def ScriptContext.draw_circle(self, Point center, number radius, Color color)
         center.x + radius, center.y + radius])
 def ScriptContext.draw_points(self, List points, Color color)
     -- todo
-def ScriptContext.draw_text(Rect rect, int flags, String msg)
+def ScriptContext.draw_text(self, Rect rect, int flags, String msg)
     self.painter.drawText(rect, flags, msg)
+
+def ScriptContext.draw_poly(self, List points, Color color)
+    self.painter.drawPolygon(points, color)
+
 def ScriptContext.key_down(self, Name key) -> bool
     return self.keysDown.contains(key)
 def ScriptContext.mouse_down(self) -> bool

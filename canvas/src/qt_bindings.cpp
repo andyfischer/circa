@@ -288,6 +288,25 @@ void Painter__drawPath(caStack* stack)
 
     painter->drawPath(*path);
 }
+void Painter__drawPolygon(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
+    caValue* points = circa_input(stack, 1);
+    caValue* color = circa_input(stack, 2);
+
+    int count = circa_count(points);
+    QPolygonF polygon(count);
+
+    for (int i=0; i < count; i++) {
+        float x,y;
+        circa_vec2(circa_index(points, i), &x, &y);
+        polygon[i] = QPointF(x, y);
+    }
+
+    painter->setBrush(QBrush(to_qcolor(color), Qt::SolidPattern));
+    painter->setPen(to_qcolor(color));
+    painter->drawPolygon(polygon);
+}
 void Painter__drawRoundRect(caStack* stack)
 {
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
@@ -363,6 +382,7 @@ static const caFunctionBinding IMPORTS[] = {
     {"Painter.drawLine", Painter__drawLine},
     {"Painter.drawRect", Painter__drawRect},
     {"Painter.drawPath", Painter__drawPath},
+    {"Painter.drawPolygon", Painter__drawPolygon},
     {"Painter.drawRoundRect", Painter__drawRoundRect},
     //{"Painter.fillRect", Painter__fillRect},
     {"Painter.fillRect", Painter__fillRectColor},

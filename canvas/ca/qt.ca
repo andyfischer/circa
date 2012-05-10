@@ -59,6 +59,7 @@ def Painter.drawText(_, Rect r, int flags, String text)
 def Painter.drawLine(_, Point2 a, Point2 b)
 def Painter.drawRect(_, Rect r)
 def Painter.drawPath(_, PainterPath path)
+def Painter.drawPolygon(_, List points, Color c)
 def Painter.drawRoundRect(_, Rect r)
 def Painter.fillRect(_, Rect r, Color c)
 def Painter.fontMetrics(_) -> FontMetrics

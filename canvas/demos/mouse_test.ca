@@ -1,21 +1,10 @@
 
-cxt = input()
+cxt = input() -> ScriptContext
 time = cxt.time
 mouse = cxt.mouse
 bounds = cxt.bounds
 
-print('mwd start: ' mouse_was_down)
-state mouse_was_down = false
-result = false
-
-if cxt.mouse_down
-    mouse_was_down = true
-else
-    result = mouse_was_down
-    mouse_was_down = false
-print(mouse_was_down)
-print('result = ' result)
-
+cxt.draw_poly([[0 0] [100 0] [0 100]] #f00)
 
 type Star {
     Point loc
@@ -23,3 +12,62 @@ type Star {
     number size
 }
 
+star_color = #f39
+global_scale = 1.0
+
+def draw_star(Star star)
+  radius = star.size * global_scale -> number
+  num_points = 5
+
+  rot = star.rot + time/5 * 360
+
+  def draw_tip(int index)
+    angle = index / num_points * 360 + rot
+    l_angle = (index+.5) / num_points * 360 + rot
+    r_angle = (index-.5) / num_points * 360 + rot
+    outer_point = polar(angle)*radius + star.loc
+    l_point = polar(l_angle)*(radius / 2) + star.loc
+    r_point = polar(r_angle)*(radius / 2) + star.loc
+
+    cxt.draw_poly([outer_point l_point star.loc r_point] star_color)
+
+  for t in 0..num_points
+    draw_tip(t)
+
+state List stars = []
+
+-- Draw a black background
+cxt.background(#000)
+
+-- Draw an X where the mouse is
+namespace draw_x
+  cross_color = #f396
+  cross_thickness = 4.0
+  cross_length = 15.0
+
+  def draw_arm(number rot)
+      near_center = polar(rot) * cross_thickness + mouse
+      near_l = polar(rot - 30) * (cross_thickness/2) + near_center
+      near_r = polar(rot + 30) * (cross_thickness/2) + near_center
+      far_center = polar(rot) * cross_length + mouse
+      far_l = polar(rot - 30) * (cross_thickness/2) + far_center
+      far_r = polar(rot + 30) * (cross_thickness/2) + far_center
+      cxt.draw_poly([near_l far_l far_r near_r] cross_color)
+
+  for rot in [0 90 180 270]
+      draw_arm(rot + -time * 360)
+
+
+-- Clicking will create a new spinning star
+if cxt.mouse_clicked
+  -- Check if we clicked on an existing star
+  stars.append([mouse rand() 40])
+
+-- Draw each star
+for star in stars
+  draw_star(star)
+
+-- Draw some text showing the mouse position
+cxt.setColor(#fff)
+cxt.draw_text([10, bounds.y - 40, bounds.x, bounds.y] 0, concat("Mouse location: " mouse.x ' ' mouse.y))
+-- cxt.draw_text(ui_font_medium, concat("Pressed: " mouse_pressed()) #fff [10 bounds.y - 20])
