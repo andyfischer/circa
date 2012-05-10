@@ -37,9 +37,10 @@ def Button.draw(b, Painter p)
     p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
 
 def Button.input(b :out, InputEvent e)
-    b.rollover = e.mousePos.inside(b.rect)
-    b.triggered = b.rollover and b.press and e.eventType == MouseUp
-    b.press = b.rollover and (e.eventType == MouseDown)
+    if e.is_mouse
+        b.rollover = e.mousePos.inside(b.rect)
+        b.triggered = b.rollover and b.press and e.eventType == MouseUp
+        b.press = b.rollover and (e.eventType == MouseDown)
 
 type ButtonBar {
     List buttons

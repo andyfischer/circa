@@ -12,6 +12,7 @@ state interpreter_stopped = false
 state state_frozen = false
 
 state Point mousePos
+state Set keysDown
 
 state ButtonBar topButtons = button_bar([
     ["Load" :load]
@@ -63,6 +64,7 @@ if msg[0] == 'onPaintEvent'
         usersContext = create(ScriptContext)
         usersContext.painter = painter
         usersContext.mouse = mousePos
+        usersContext.keysDown = keysDown
         usersContext.time = 0
 
         interpreter.reset
@@ -90,6 +92,17 @@ elif msg[0] == 'onInputEvent'
 
     if event.is_mouse
         mousePos = event.mousePos
+        if event.eventType == MouseDown
+            keysDown.add(:mouse1)
+        elif event.eventType == MouseUp
+            keysDown.remove(:mouse1)
+    elif event.is_key
+        if event.eventType == KeyDown
+            keysDown.add(event.keyCode)
+            print('pressed ' event.keyCode)
+        else
+            keysDown.remove(event.keyCode)
+            print('released ' event.keyCode)
 
     action = topButtons.input(event)
 

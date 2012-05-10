@@ -1,9 +1,16 @@
 
+namespace key
+    mouse1 = 1
+    up = 2
+    down = 3
+    left = 4
+    right = 5
 
 type ScriptContext {
     Painter painter
     Point mouse
     number time
+    Set keysDown
 }
 
 def ScriptContext.background(self, Color color)
@@ -33,10 +40,22 @@ def ScriptContext.draw_points(self, List points, Color color)
 def ScriptContext.draw_text(Rect rect, int flags, String msg)
     self.painter.drawText(rect, flags, msg)
 def ScriptContext.key_down(self, Name key) -> bool
-    -- todo
-    return false
+    return self.keysDown.contains(key)
 def ScriptContext.mouse_down(self) -> bool
-    -- todo
-    return false
+    return self.keysDown.contains(:mouse1)
 def ScriptContext.bounds(self) -> Point
     return [self.painter.viewport.width, self.painter.viewport.height]
+
+
+def ScriptContext.mouse_clicked(self) -> bool
+    state bool mouse_was_down = false
+    result = false
+
+    if self.mouse_down
+        mouse_was_down = true
+    else
+        result = mouse_was_down
+        mouse_was_down = false
+
+    return result
+    

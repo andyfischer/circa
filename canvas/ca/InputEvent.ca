@@ -3,10 +3,13 @@ MouseDown = 1
 MouseUp = 2
 MouseMove = 3
 MouseDoubleClick = 4
+KeyDown = 5
+KeyUp = 6
 
 type InputEvent {
     int eventType
     Point mousePos
+    int keyCode
 }
 
 def InputEvent.is_mouse(self) -> bool
@@ -18,4 +21,13 @@ def InputEvent.is_mouse(self) -> bool
         return true
     elif self.eventType == MouseDrag
         return true
-    return false
+    else
+        return false
+
+def InputEvent.is_key(self) -> bool
+    if self.eventType == KeyDown
+        return true
+    elif self.eventType == KeyUp
+        return true
+    else
+        return false

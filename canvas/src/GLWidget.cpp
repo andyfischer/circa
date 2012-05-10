@@ -12,6 +12,7 @@ GLWidget::GLWidget(QWidget *parent)
     setFixedSize(600, 600);
     setAutoFillBackground(false);
     setMouseTracking(true);
+    setFocusPolicy(Qt::ClickFocus);
 }
 
 void GLWidget::animate()
@@ -45,55 +46,69 @@ void GLWidget::paintEvent(QPaintEvent*)
 
 void GLWidget::mouseDoubleClickEvent ( QMouseEvent * qevent )
 {
-    caValue* event = circa_alloc_list(2);
-    circa_set_int(circa_index(event, 0), 4);
-    circa_set_vec2(circa_index(event, 1), qevent->x(), qevent->y());
-    onInputEvent(event);
+    circa::Value event;
+    circa_set_list(&event, 3);
+    circa_set_int(circa_index(&event, 0), 4);
+    circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
+    circa_set_int(circa_index(&event, 2), 0);
+    onInputEvent(&event);
 }
 void GLWidget::mouseMoveEvent ( QMouseEvent * qevent )
 {
-    caValue* event = circa_alloc_list(2);
-    circa_set_int(circa_index(event, 0), 3);
-    circa_set_vec2(circa_index(event, 1), qevent->x(), qevent->y());
-    onInputEvent(event);
+    circa::Value event;
+    circa_set_list(&event, 3);
+    circa_set_int(circa_index(&event, 0), 3);
+    circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
+    circa_set_int(circa_index(&event, 2), 0);
+    onInputEvent(&event);
 }
 void GLWidget::mousePressEvent ( QMouseEvent * qevent )
 {
-    caValue* event = circa_alloc_list(2);
-    circa_set_int(circa_index(event, 0), 1);
-    circa_set_vec2(circa_index(event, 1), qevent->x(), qevent->y());
-    onInputEvent(event);
+    circa::Value event;
+    circa_set_list(&event, 3);
+    circa_set_int(circa_index(&event, 0), 1);
+    circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
+    circa_set_int(circa_index(&event, 2), 0);
+    onInputEvent(&event);
 }
 void GLWidget::mouseReleaseEvent ( QMouseEvent * qevent )
 {
-    caValue* event = circa_alloc_list(2);
-    circa_set_int(circa_index(event, 0), 2);
-    circa_set_vec2(circa_index(event, 1), qevent->x(), qevent->y());
-    onInputEvent(event);
+    circa::Value event;
+    circa_set_list(&event, 3);
+    circa_set_int(circa_index(&event, 0), 2);
+    circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
+    circa_set_int(circa_index(&event, 2), 0);
+    onInputEvent(&event);
 }
 void GLWidget::keyPressEvent ( QKeyEvent * qevent )
 {
-    caValue* event = circa_alloc_list(2);
-    onInputEvent(event);
+    circa::Value event;
+    circa_set_list(&event, 3);
+    circa_set_int(circa_index(&event, 0), 5);
+    circa_set_vec2(circa_index(&event, 1), 0, 0);
+    circa_set_int(circa_index(&event, 2), qevent->key());
+    onInputEvent(&event);
 }
 void GLWidget::keyReleaseEvent ( QKeyEvent * qevent )
 {
-    caValue* event = circa_alloc_list(2);
-    onInputEvent(event);
+    circa::Value event;
+    circa_set_list(&event, 3);
+    circa_set_int(circa_index(&event, 0), 6);
+    circa_set_vec2(circa_index(&event, 1), 0, 0);
+    circa_set_int(circa_index(&event, 2), qevent->key());
+    onInputEvent(&event);
 }
 void GLWidget::onInputEvent(caValue* event)
 {
     scripts_pre_message_send();
 
-    caValue* msg = circa_alloc_list(2);
+    circa::Value msg;
+    circa_set_list(&msg, 2);
 
-    circa_set_string(circa_index(msg, 0), "onInputEvent");
+    circa_set_string(circa_index(&msg, 0), "onInputEvent");
+    circa_move(event, circa_index(&msg, 1));
 
-    circa_move(event, circa_index(msg, 1));
-    circa_dealloc_value(event);
+    circa_actor_run_message(g_world, "View", &msg);
 
-    circa_actor_run_message(g_world, "View", msg);
-
-    circa_dealloc_value(msg);
     scripts_post_message_send();
 }

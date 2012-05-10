@@ -39,7 +39,7 @@ struct ValueIterator
     {
         caValue* c = current();
 
-        if (is_list(c)) {
+        if (is_list(c) && list_length(c) > 0) {
             _stack.push_back(IteratorFrame(c, 0));
             return;
         }
