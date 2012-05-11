@@ -3,6 +3,7 @@ cxt = input() -> ScriptContext
 time = cxt.time
 mouse = cxt.mouse
 bounds = cxt.bounds
+time = cxt.time
 
 cxt.draw_poly([[0 0] [100 0] [0 100]] #f00)
 
@@ -19,7 +20,7 @@ def draw_star(Star star)
   radius = star.size * global_scale -> number
   num_points = 5
 
-  rot = star.rot + time/5 * 360
+  rot = star.rot + time/3 * 360
 
   def draw_tip(int index)
     angle = index / num_points * 360 + rot
@@ -70,4 +71,4 @@ for star in stars
 -- Draw some text showing the mouse position
 cxt.setColor(#fff)
 cxt.draw_text([10, bounds.y - 40, bounds.x, bounds.y] 0, concat("Mouse location: " mouse.x ' ' mouse.y))
--- cxt.draw_text(ui_font_medium, concat("Pressed: " mouse_pressed()) #fff [10 bounds.y - 20])
+cxt.draw_text([10, bounds.y - 20, bounds.x, bounds.y] 0, concat("Pressed: " mouse.pressed))

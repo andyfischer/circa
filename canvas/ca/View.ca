@@ -21,21 +21,8 @@ state string currentScreen = 'IntroScreen'
 
 msg_name = msg[0]
 
---print('received msg = ' msg)
-
-if msg_name == 'onPaintEvent'
-    painter = msg[1] -> Painter
-
-    painter.fillRect(painter.viewport + [0 0 1 1], #fff)
-
-    --send('CodeViewer' msg)
-    --send('IntroScreen' msg)
-    send(currentScreen msg)
-
-elif msg_name == 'onInputEvent'
-    send(currentScreen msg)
-elif msg_name == 'changeScreen'
+if msg_name == 'changeScreen'
     print('changed screen to ' msg[1])
     currentScreen = msg[1]
 else
-    assert(false)
+    send(currentScreen msg)

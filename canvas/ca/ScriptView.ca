@@ -13,10 +13,11 @@ state state_frozen = false
 
 state Point mousePos
 state Set keysDown
+state number time
 
 state ButtonBar topButtons = button_bar([
     ["Load" :load]
-    ["Restart" :restart]
+    ["Reset" :reset]
     ["Freeze" :freezeState]
     ["Exit" :exit]
     ] [10 10 400 40])
@@ -65,7 +66,7 @@ if msg[0] == 'onPaintEvent'
         usersContext.painter = painter
         usersContext.mouse = mousePos
         usersContext.keysDown = keysDown
-        usersContext.time = 0
+        usersContext.time = time
 
         interpreter.reset
         interpreter.push_frame(userBranch, [usersContext])
@@ -90,36 +91,37 @@ if msg[0] == 'onPaintEvent'
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
 
-    if event.is_mouse
-        mousePos = event.mousePos
-        if event.eventType == MouseDown
-            keysDown.add(:mouse1)
-        elif event.eventType == MouseUp
-            keysDown.remove(:mouse1)
-    elif event.is_key
-        if event.eventType == KeyDown
-            keysDown.add(event.keyCode)
-            print('pressed ' event.keyCode)
-        else
-            keysDown.remove(event.keyCode)
-            print('released ' event.keyCode)
-
+    handled = false
     action = topButtons.input(event)
 
     if action == :freezeState
         state_frozen = not(state_frozen)
     elif action == :load
         send('ScriptView' ['loadFile' 'demos/asteroids.ca'])
-    elif action == :restart
+    elif action == :reset
         userState = null
     elif action == :exit
         send('View' ['changeScreen' 'IntroScreen'])
     elif action != null
         print('action: ' action)
+    else
+        -- Event not handled by our UI, pass it to the script
+        if event.is_mouse
+            mousePos = event.mousePos
+            if event.eventType == MouseDown
+                keysDown.add(:mouse1)
+            elif event.eventType == MouseUp
+                keysDown.remove(:mouse1)
+        elif event.is_key
+            if event.eventType == KeyDown
+                keysDown.add(event.keyCode)
+            else
+                keysDown.remove(event.keyCode)
+elif msg[0] == 'timeUpdate'
+    time = msg[1] -> number
 
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])
     userBranch = load_module(msg[1])
-    userBranch.dump
 else
     print("ScriptView didn't recognize: " msg)

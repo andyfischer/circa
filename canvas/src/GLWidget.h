@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QtOpenGL/QGLWidget>
+#include <QTime>
 
 class GLWidget : public QGLWidget
 {
@@ -26,6 +27,8 @@ public:
 protected:
     // Sends the event to App.onInputEvent, and deallocates the caValue.
     void onInputEvent(caValue* event);
+
+    QTime elapsedTime;
 
 public slots: void animate();
 };

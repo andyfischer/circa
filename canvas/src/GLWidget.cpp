@@ -13,6 +13,12 @@ GLWidget::GLWidget(QWidget *parent)
     setAutoFillBackground(false);
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
+
+    QTimer *timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(animate()));
+    timer->start(16);
+
+    elapsedTime.start();
 }
 
 void GLWidget::animate()
@@ -22,6 +28,15 @@ void GLWidget::animate()
 
 void GLWidget::paintEvent(QPaintEvent*)
 {
+    // Send a timeUpdate message
+    circa::Value msg;
+    circa_set_list(&msg, 2);
+    circa_set_string(circa_index(&msg, 0), "timeUpdate");
+    circa_set_float(circa_index(&msg, 1), elapsedTime.elapsed() / 1000.0f);
+
+    circa_actor_run_message(g_world, "View", &msg);
+
+    // Send an onPaintEvent message
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
@@ -29,15 +44,13 @@ void GLWidget::paintEvent(QPaintEvent*)
     scripts_pre_message_send();
 
     // call onPaintEvent
-    caValue* msg = circa_alloc_list(2);
+    circa_set_list(&msg, 2);
 
-    circa_set_string(circa_index(msg, 0), "onPaintEvent");
-    circa_set_typed_pointer(circa_index(msg, 1),
+    circa_set_string(circa_index(&msg, 0), "onPaintEvent");
+    circa_set_typed_pointer(circa_index(&msg, 1),
         circa_find_type(NULL, "Painter"), &painter);
 
-    circa_actor_run_message(g_world, "View", msg);
-
-    circa_dealloc_value(msg);
+    circa_actor_run_message(g_world, "View", &msg);
 
     scripts_post_message_send();
 
