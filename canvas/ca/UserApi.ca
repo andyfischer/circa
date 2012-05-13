@@ -45,6 +45,12 @@ def ScriptContext.draw_poly(self, List points, Color color)
 
 def ScriptContext.key_down(self, Name key) -> bool
     return self.keysDown.contains(key)
+def ScriptContext.key_pressed(self, Name key) -> bool
+    down = self.keysDown.contains(key)
+    state wasDown = down
+    result = down and not wasDown
+    wasDown = down
+    return result
 def ScriptContext.mouse_down(self) -> bool
     return self.keysDown.contains(:mouse1)
 def ScriptContext.bounds(self) -> Point

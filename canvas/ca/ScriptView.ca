@@ -10,10 +10,13 @@ state any userState
 state interpreter = make_interpreter()
 state interpreter_stopped = false
 state state_frozen = false
+state number timeWhenFrozen = 0
+
 
 state Point mousePos
 state Set keysDown
 state number time
+state number timeShift = 0
 
 state ButtonBar topButtons = button_bar([
     ["Load" :load]
@@ -66,7 +69,11 @@ if msg[0] == 'onPaintEvent'
         usersContext.painter = painter
         usersContext.mouse = mousePos
         usersContext.keysDown = keysDown
-        usersContext.time = time
+
+        if state_frozen
+            usersContext.time = timeWhenFrozen - timeShift
+        else
+            usersContext.time = time - timeShift
 
         interpreter.reset
         interpreter.push_frame(userBranch, [usersContext])
@@ -96,6 +103,12 @@ elif msg[0] == 'onInputEvent'
 
     if action == :freezeState
         state_frozen = not(state_frozen)
+        if state_frozen
+            -- Remember the time when we started being frozen
+            timeWhenFrozen = time
+        else
+            -- Update the timeShift
+            timeShift += time - timeWhenFrozen
     elif action == :load
         send('ScriptView' ['loadFile' 'demos/asteroids.ca'])
     elif action == :reset

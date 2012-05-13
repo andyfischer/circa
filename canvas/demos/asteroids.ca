@@ -1,13 +1,17 @@
 
 -- Global context, will probably make this implicit in the future.
-cxt = input()
-time_delta = delta(cxt.time)
+env = input() -> ScriptContext
+time = env.time
+mouse = env.mouse
+bounds = env.bounds
+time = env.time
+time_delta = delta(time)
 
 def random_location() -> Point
-    return cxt.bounds * [rand() rand()]
+    return env.bounds * [rand() rand()]
 
 -- Black background
-cxt.background(#000)
+env.background(#000)
 
 -- Temporarily disable stars:
 -- include('shared/drifting_stars.ca' -> rpath)
@@ -26,10 +30,10 @@ type Bullet {
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Point p) -> Point
-    return [mod(p.x, cxt.bounds.x), mod(p.y, cxt.bounds.y)]
+    return [mod(p.x, bounds.x), mod(p.y, bounds.y)]
 
 def new_ship() -> Ship
-    return Ship([[cxt.bounds.x/2, cxt.bounds.y/2] [0 0] 0])
+    return Ship([[env.bounds.x/2, bounds.y/2] [0 0] 0])
 
 state Ship ship = new_ship()
 state List bullets = []
@@ -89,25 +93,25 @@ def draw_ship(Point loc, number facing)
         line_points.append(side[0])
         line_points.append(side[1])
 
-    cxt.draw_lines(line_points #fff)
+    env.draw_lines(line_points #fff)
 
     if draw_intersection_circles
-        cxt.draw_circle(loc, ship_radius, #f00)
+        env.draw_circle(loc, ship_radius, #f00)
 
 -- Ship control
 if gstate == game_state:playing
-    rotation = cond(cxt.key_down(:left), -1, 0)
-    cond(cxt.key_down(:right), 1, @rotation)
+    rotation = cond(env.key_down(:left), -1, 0)
+    cond(env.key_down(:right), 1, @rotation)
     ship.facing = ship.facing + rotation * rotation_speed * time_delta
 
     -- Keyboard controls for acceleration
-    thrust = cond(cxt.key_down(:up), 1, 0)
-    cond(cxt.key_down(:down), -1, @thrust)
+    thrust = cond(env.key_down(:up), 1, 0)
+    cond(env.key_down(:down), -1, @thrust)
 
     ship.momentum += polar(ship.facing) * thrust * accelration_per_s * time_delta
 
     -- Press space to shoot a bullet
-    if cxt.key_pressed(:space)
+    if env.key_pressed(:space)
         bullets.append([0, ship.loc polar(ship.facing)] -> Bullet)
 
 -- Add drag
@@ -145,7 +149,7 @@ for bullet in bullets
                   bullet.loc + [1 1] * bullet_width,
                   bullet.loc + [-1 1] * bullet_width,
                   ]
-    cxt.draw_line_loop(points #fff)
+    env.draw_line_loop(points #fff)
 
 type Asteroid {
   List edges
@@ -222,7 +226,7 @@ for asteroid in asteroids
         rotate_point(@p, asteroid.rotation)
         add(@p, asteroid.location)
 
-    cxt.draw_line_loop(edges, #fff)
+    env.draw_line_loop(edges, #fff)
 
 -- Check for collisions of asteroids and bullets
 spawned = []
@@ -280,7 +284,7 @@ for particle in @particles
     max(@lifespan, 1.0)
     color = #555 + #111 * (lifespan * 9)
 
-    cxt.draw_points([particle.loc], color)
+    env.draw_points([particle.loc], color)
 
     particle.loc = particle.loc + particle.vel * td
     particle.age = particle.age + td

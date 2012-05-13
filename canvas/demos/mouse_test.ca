@@ -1,11 +1,11 @@
 
-cxt = input() -> ScriptContext
-time = cxt.time
-mouse = cxt.mouse
-bounds = cxt.bounds
-time = cxt.time
+env = input() -> ScriptContext
+time = env.time
+mouse = env.mouse
+bounds = env.bounds
+time = env.time
 
-cxt.draw_poly([[0 0] [100 0] [0 100]] #f00)
+env.draw_poly([[0 0] [100 0] [0 100]] #f00)
 
 type Star {
     Point loc
@@ -30,7 +30,7 @@ def draw_star(Star star)
     l_point = polar(l_angle)*(radius / 2) + star.loc
     r_point = polar(r_angle)*(radius / 2) + star.loc
 
-    cxt.draw_poly([outer_point l_point star.loc r_point] star_color)
+    env.draw_poly([outer_point l_point star.loc r_point] star_color)
 
   for t in 0..num_points
     draw_tip(t)
@@ -38,7 +38,7 @@ def draw_star(Star star)
 state List stars = []
 
 -- Draw a black background
-cxt.background(#000)
+env.background(#000)
 
 -- Draw an X where the mouse is
 namespace draw_x
@@ -53,14 +53,14 @@ namespace draw_x
       far_center = polar(rot) * cross_length + mouse
       far_l = polar(rot - 30) * (cross_thickness/2) + far_center
       far_r = polar(rot + 30) * (cross_thickness/2) + far_center
-      cxt.draw_poly([near_l far_l far_r near_r] cross_color)
+      env.draw_poly([near_l far_l far_r near_r] cross_color)
 
   for rot in [0 90 180 270]
       draw_arm(rot + -time * 360)
 
 
 -- Clicking will create a new spinning star
-if cxt.mouse_clicked
+if env.mouse_clicked
   -- Check if we clicked on an existing star
   stars.append([mouse rand() 40])
 
@@ -69,6 +69,6 @@ for star in stars
   draw_star(star)
 
 -- Draw some text showing the mouse position
-cxt.setColor(#fff)
-cxt.draw_text([10, bounds.y - 40, bounds.x, bounds.y] 0, concat("Mouse location: " mouse.x ' ' mouse.y))
-cxt.draw_text([10, bounds.y - 20, bounds.x, bounds.y] 0, concat("Pressed: " mouse.pressed))
+env.setColor(#fff)
+env.draw_text([10, bounds.y - 40, bounds.x, bounds.y] 0, concat("Mouse location: " mouse.x ' ' mouse.y))
+env.draw_text([10, bounds.y - 20, bounds.x, bounds.y] 0, concat("Pressed: " mouse.pressed))
