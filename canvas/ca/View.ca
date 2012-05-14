@@ -13,7 +13,6 @@ def fadein(Color c) -> Color
     min(@e, 1.0)
     return [c.r c.g c.b e]
 
-
 -- Incoming message
 msg = input() -> List
 

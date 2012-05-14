@@ -126,10 +126,11 @@ elif msg[0] == 'onInputEvent'
             elif event.eventType == MouseUp
                 keysDown.remove(:mouse1)
         elif event.is_key
+            en = keycode_to_name(event.keyCode)
             if event.eventType == KeyDown
-                keysDown.add(event.keyCode)
+                keysDown.add(en)
             else
-                keysDown.remove(event.keyCode)
+                keysDown.remove(en)
 elif msg[0] == 'timeUpdate'
     time = msg[1] -> number
 

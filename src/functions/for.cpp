@@ -58,12 +58,16 @@ namespace for_function {
 
         for_loop_finish_iteration(CONTEXT);
     }
-    CA_FUNCTION(evaluate_discard)
+    void evaluate_discard(caStack* stack)
     {
-        while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
-            finish_frame(CONTEXT);
+        while (top_frame(stack)->branch->owningTerm->function != FUNCS.for_func) {
+            finish_frame(stack);
 
-        for_loop_finish_iteration(CONTEXT);
+            //if (error_occurred(stack))
+                //return;
+        }
+
+        for_loop_finish_iteration(stack);
     }
     void break_formatSource(StyledSource* source, Term* term)
     {

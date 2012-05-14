@@ -12,6 +12,21 @@ type InputEvent {
     int keyCode
 }
 
+def keycode_to_name(int key) -> Name
+    if key == 32
+        return :space
+    elif key == 16777235
+        return :up
+    elif key == 16777234
+        return :left
+    elif key == 16777236
+        return :right
+    elif key == 16777237
+        return :down
+    else
+        print('keycode not recognized: ' key)
+        return :none
+
 def InputEvent.is_mouse(self) -> bool
     if self.eventType == MouseDown
         return true
