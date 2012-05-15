@@ -1,4 +1,4 @@
-frame 0 location: [$45]
+frame 0 location: [$57]
 frame 0 registers: [false, null, 'Assert failed']
 frame 0 pc: 0
 frame 1 location: [tests/meta/interpreter_frames.ca:6,4]

@@ -1,0 +1,15 @@
+
+def f() -> int
+    if true
+        if true
+            if true
+                return 1
+            else
+                return 2
+        else
+            return 3
+    else
+        return 4
+
+r = f()
+assert(r == 1)

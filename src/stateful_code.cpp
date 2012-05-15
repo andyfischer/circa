@@ -219,6 +219,8 @@ static void branch_update_existing_pack_state_calls(Branch* branch)
         return;
     }
 
+    int stateOutputIndex = branch->length() - 1 - find_state_output(branch)->index;
+
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (term == NULL)
@@ -232,15 +234,17 @@ static void branch_update_existing_pack_state_calls(Branch* branch)
             set_inputs(term, inputs);
         }
 
-        if (term->function == FUNCS.return_func) {
-            // Check if we need to add a pack_state call
-            if (term->input(1) == NULL) {
+        if (term->function == FUNCS.exit_point) {
+            // Check if we need to insert a pack_state call
+            Term* existing = term->input(stateOutputIndex);
+
+            if (existing == NULL || existing->function != FUNCS.pack_state) {
                 TermList inputs;
                 get_list_of_state_outputs(branch, i, &inputs);
                 if (inputs.length() != 0) {
                     Term* pack_state = apply(branch, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
-                    set_input(term, 1, pack_state);
+                    set_input(term, stateOutputIndex, pack_state);
 
                     // Advance i to compensate for the term just added
                     i++;

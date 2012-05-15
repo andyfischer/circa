@@ -67,6 +67,7 @@ struct BuiltinFuncs {
     Term* dynamic_call;
     Term* dynamic_method;
     Term* error;
+    Term* exit_point;
     Term* for_func;
     Term* get_field;
     Term* get_index;

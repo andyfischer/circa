@@ -1,0 +1,9 @@
+
+a = 0
+L = for i in [1 2 3]
+    a += i
+
+    a
+    
+assert(L == [1 3 6])
+assert(a == 6)

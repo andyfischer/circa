@@ -128,6 +128,7 @@ Frame* push_frame(Stack* stack, Branch* branch, List* registers)
     top->nextPc = 0;
     top->endPc = branch->length();
     top->loop = false;
+    top->discarded = false;
     top->dynamicCall = false;
     top->override = false;
     top->stop = false;
@@ -231,8 +232,14 @@ void finish_frame(Stack* stack)
             if (placeholder == NULL)
                 break;
 
+            // Don't attempt to copy a 'custom' output. This is used in the primary for-loop
+            // output, which is incrementally appended to on every iteration.
+            if (placeholder->boolPropOptional("customOutput", false))
+                continue;
+
             caValue* result = get_frame_register(topFrame, placeholder->index);
             caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
+
             bool success = cast(result, placeholder->type, dest);
 
             if (!success) {
@@ -253,7 +260,6 @@ void finish_frame(Stack* stack)
     pop_frame(stack);
 
     // Advance PC
-
     Frame* newTop = top_frame(stack);
     newTop->pc = newTop->nextPc;
 }
@@ -459,6 +465,12 @@ caValue* get_output(Stack* stack, int index)
     if (placeholder == NULL)
         return NULL;
     return get_frame_register(frame, placeholder->index);
+}
+
+caValue* get_caller_output(Stack* stack, int index)
+{
+    Frame* frame = get_frame(stack, 1);
+    return get_frame_register(frame, frame->pc + index);
 }
 
 Term* current_term(Stack* stack)
@@ -835,17 +847,6 @@ void step_interpreter(Stack* stack)
             circa_set_null(out);
         else
             circa_copy(in, out);
-
-        return;
-    } else if (currentTerm->function == FUNCS.loop_output) {
-
-        caValue* in = find_stack_value_for_term(stack, currentTerm->input(0), 0);
-        caValue* out = get_frame_register(frame, frame->pc);
-
-        if (!is_list(out))
-            set_list(out);
-
-        copy(in, list_append(out));
 
         return;
     }

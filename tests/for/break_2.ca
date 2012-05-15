@@ -1,0 +1,9 @@
+
+
+outer = 1
+
+for i in [2]
+    outer = 2
+    break
+
+assert(outer == 2)

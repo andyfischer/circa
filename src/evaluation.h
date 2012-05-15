@@ -28,6 +28,7 @@ struct Frame
 
     // Used in for-loop
     bool loop;
+    bool discarded;
     
     // If true, the interpreter should stop after completing this frame. The frame
     // will be left on the stack.
@@ -131,6 +132,7 @@ bool consume_cast(Stack* stack, int index, Type* type, caValue* dest);
 int num_inputs(Stack* stack);
 void consume_inputs_to_list(Stack* stack, List* list);
 caValue* get_output(Stack* stack, int index);
+caValue* get_caller_output(Stack* stack, int index);
 
 Term* current_term(Stack* stack);
 Branch* current_branch(Stack* stack);

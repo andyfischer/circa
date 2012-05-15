@@ -1,0 +1,16 @@
+
+results = []
+
+a = 0
+L = for i in [1 2 3 4]
+
+    results.append(concat('start(' i ',' a ')'))
+
+    if i == 2 or i == 4
+        continue
+
+    a += 1
+
+    results.append(concat('end(' i ',' a ')'))
+
+print(results)

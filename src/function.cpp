@@ -1,9 +1,10 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "building.h"
-#include "kernel.h"
+#include "control_flow.h"
 #include "evaluation.h"
 #include "function.h"
+#include "kernel.h"
 #include "introspection.h"
 #include "list.h"
 #include "source_repro.h"

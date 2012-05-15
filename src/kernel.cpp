@@ -7,6 +7,7 @@
 
 #include "branch.h"
 #include "building.h"
+#include "control_flow.h"
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
@@ -983,6 +984,8 @@ void bootstrap_kernel()
     indexable_t::setup_type(unbox_type(indexableType));
 
     callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
+
+    control_flow_setup_funcs(kernel);
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(kernel);

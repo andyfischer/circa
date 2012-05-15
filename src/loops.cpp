@@ -22,7 +22,6 @@
 namespace circa {
 
 void for_loop_fix_state_input(Branch* contents);
-void loop_update_continue_inputs(Branch* branch, Term* continueTerm);
 
 Term* for_loop_get_iterator(Branch* contents)
 {
@@ -144,19 +143,6 @@ void repoint_terms_to_use_input_placeholders(Branch* contents)
     }
 }
 
-void loop_update_exit_points(Branch* branch)
-{
-    for (BranchIterator it(branch); it.unfinished(); it.advance()) {
-        Term* term = *it;
-        if (is_major_branch(term))
-            continue;
-
-        if (term->function == FUNCS.continue_func) {
-            loop_update_continue_inputs(branch, term);
-        }
-    }
-}
-
 // Find the term that should be the 'primary' result for this loop.
 Term* loop_get_primary_result(Branch* branch)
 {
@@ -175,12 +161,9 @@ void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
-    // Add a 'loop_output' term that will collect each iteration's output.
-    Term* loopOutput = apply(contents, FUNCS.loop_output, 
-        TermList(loop_get_primary_result(contents)));
-
     // Add a primary output
-    apply(contents, FUNCS.output, TermList(loopOutput));
+    Term* primaryOutput = apply(contents, FUNCS.output, TermList(loop_get_primary_result(contents)));
+    primaryOutput->setBoolProp("customOutput", true);
 
     // pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);
@@ -191,8 +174,6 @@ void finish_for_loop(Term* forTerm)
 
     check_to_insert_implicit_inputs(forTerm);
     update_extra_outputs(forTerm);
-
-    loop_update_exit_points(contents);
 
     branch_finish_changes(contents);
 }
@@ -276,7 +257,7 @@ CA_FUNCTION(start_for_loop)
     Branch* contents = frame->branch;
 
     // Set up a blank list for output
-    set_list(get_frame_register(frame, contents->length()-1), 0);
+    set_list(get_caller_output(stack, 0), 0);
 
     // For a zero-iteration loop, just copy over inputs to their respective outputs.
     if (inputListLength == 0) {
@@ -322,6 +303,15 @@ void for_loop_finish_iteration(Stack* stack)
     caValue* index = get_frame_register(frame, for_loop_find_index(contents)->index);
     set_int(index, as_int(index) + 1);
 
+    // Preserve list output
+    if (!frame->discarded) {
+        Frame* parentFrame = get_frame(stack, 1);
+        caValue* listOutputSlot = get_frame_register(parentFrame, parentFrame->pc);
+        if (!is_list(listOutputSlot))
+            set_list(listOutputSlot);
+        copy(get_frame_register_from_end(frame, 0), list_append(listOutputSlot));
+    }
+
     // Check if we are finished
     if (as_int(index) >= list_length(listInput)) {
         frame->loop = false;
@@ -342,6 +332,7 @@ void for_loop_finish_iteration(Stack* stack)
     // Return to start of loop body
     frame->pc = 0;
     frame->nextPc = 0;
+    frame->discarded = false;
 }
 
 void for_loop_finish_frame(Stack* stack)
@@ -349,16 +340,6 @@ void for_loop_finish_frame(Stack* stack)
     for_loop_finish_iteration(stack);
 }
 
-void loop_update_continue_inputs(Branch* branch, Term* continueTerm)
-{
-    for (int i=0;; i++) {
-        Term* output = get_output_placeholder(branch, i);
-        if (output == NULL)
-            break;
-        set_input(continueTerm, i,
-            find_intermediate_result_for_output(continueTerm, output));
-    }
-}
 
 void finish_while_loop(Term* whileTerm)
 {

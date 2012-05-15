@@ -1,0 +1,7 @@
+
+def f() -> int
+    for i in [1]
+        return 1
+
+r = f()
+assert(r == 1)

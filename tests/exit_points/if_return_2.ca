@@ -1,0 +1,9 @@
+
+def f() -> int
+    if false
+        return 1
+    else
+        return 2
+
+r = f()
+assert(r == 2)

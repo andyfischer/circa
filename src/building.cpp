@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "code_iterators.h"
+#include "control_flow.h"
 #include "building.h"
 #include "function.h"
 #include "heap_debugging.h"
@@ -531,16 +532,6 @@ bool has_variable_args(Branch* branch)
         return false;
     return input0->boolPropOptional("multiple", false);
 }    
-Term* find_input_placeholder_with_name(Branch* branch, const char* name)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (placeholder->name == name)
-            return placeholder;
-    }
-}
 Term* find_output_placeholder_with_name(Branch* branch, const char* name)
 {
     for (int i=0;; i++) {
@@ -784,6 +775,8 @@ void branch_finish_changes(Branch* branch)
     finish_update_cascade(branch);
 
     fix_forward_function_references(branch);
+
+    update_exit_points(branch);
 
     // Create an output_placeholder for state, if necessary.
     Term* openState = find_open_state_result(branch, branch->length());
@@ -1175,22 +1168,6 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
         return find_name_at(location, output->name.c_str());
     } else {
         return NULL;
-    }
-}
-
-void update_exit_points(Branch* branch)
-{
-    for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
-        Term* term = it.current();
-
-        if (term->function == FUNCS.return_func) {
-            for (int i=1;; i++) {
-                Term* output = get_output_placeholder(branch, i);
-                if (output == NULL)
-                    break;
-                set_input(term, i, find_intermediate_result_for_output(term, output));
-            }
-        }
     }
 }
 

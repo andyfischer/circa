@@ -152,6 +152,7 @@ def all_testable_files():
         TestRoot + '/bugrepro',
         TestRoot + '/if',
         TestRoot + '/error',
+        TestRoot + '/exit_points',
         TestRoot + '/field',
         TestRoot + '/for',
         TestRoot + '/funcs',

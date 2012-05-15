@@ -1,0 +1,9 @@
+
+def f() -> int
+    for i in []
+        return 1
+
+    return 2
+
+r = f()
+assert(r == 2)

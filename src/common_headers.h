@@ -37,6 +37,7 @@ struct BrokenLinkList;
 struct CastResult;
 struct CircaObject;
 struct Dict;
+struct Frame;
 struct Stack;
 struct FeedbackOperation;
 struct Function;

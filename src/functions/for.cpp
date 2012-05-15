@@ -23,65 +23,6 @@ namespace for_function {
             term, TK_WHITESPACE);
     }
 
-    CA_FUNCTION(evaluate_break)
-    {
-        while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
-            finish_frame(CONTEXT);
-
-        finish_frame(CONTEXT);
-    }
-    CA_FUNCTION(evaluate_continue)
-    {
-        // Save args before we pop the frame
-        Value args;
-        circa_copy(circa_input(STACK, 0), &args);
-
-        // Pop frames
-        while (top_frame(CONTEXT)->branch->owningTerm->function != FUNCS.for_func)
-            finish_frame(CONTEXT);
-
-        // Copy outputs to placeholders
-        Branch* branch = top_frame(CONTEXT)->branch;
-        for (int i=0;; i++) {
-            // Fetch placeholder + 1 (skip the primary output)
-            Term* output = get_output_placeholder(branch, i + 1);
-            if (output == NULL)
-                break;
-
-            caValue* out = get_register(CONTEXT, output);
-
-            if (i >= circa_count(&args))
-                set_null(out);
-            else
-                move(circa_index(&args, i), out);
-        }
-
-        for_loop_finish_iteration(CONTEXT);
-    }
-    void evaluate_discard(caStack* stack)
-    {
-        while (top_frame(stack)->branch->owningTerm->function != FUNCS.for_func) {
-            finish_frame(stack);
-
-            //if (error_occurred(stack))
-                //return;
-        }
-
-        for_loop_finish_iteration(stack);
-    }
-    void break_formatSource(StyledSource* source, Term* term)
-    {
-        append_phrase(source, "break", term, phrase_type::KEYWORD);
-    }
-    void continue_formatSource(StyledSource* source, Term* term)
-    {
-        append_phrase(source, "continue", term, phrase_type::KEYWORD);
-    }
-    void discard_formatSource(StyledSource* source, Term* term)
-    {
-        append_phrase(source, "discard", term, phrase_type::KEYWORD);
-    }
-
     void setup(Branch* kernel)
     {
         FUNCS.for_func = import_function(kernel, NULL, "for(Indexable) -> List");
@@ -92,20 +33,6 @@ namespace for_function {
             "loop_iterator(any, any) -> int");
         FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
         function_set_empty_evaluation(as_function(FUNCS.loop_index));
-
-        FUNCS.discard = import_function(kernel, evaluate_discard, "discard()");
-        as_function(FUNCS.discard)->formatSource = discard_formatSource;
-        hide_from_docs(FUNCS.discard);
-
-        FUNCS.break_func = import_function(kernel, evaluate_break,
-            "break(any :multiple :optional)");
-        as_function(FUNCS.break_func)->formatSource = break_formatSource;
-        hide_from_docs(FUNCS.break_func);
-
-        FUNCS.continue_func = import_function(kernel, evaluate_continue,
-            "continue(any :multiple :optional)");
-        as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
-        hide_from_docs(FUNCS.continue_func);
 
         FUNCS.unbounded_loop = import_function(kernel, evaluate_unbounded_loop,
             "loop(bool condition)");
