@@ -244,7 +244,7 @@ static void branch_update_existing_pack_state_calls(Branch* branch)
                 if (inputs.length() != 0) {
                     Term* pack_state = apply(branch, FUNCS.pack_state, inputs);
                     move_before(pack_state, term);
-                    set_input(term, stateOutputIndex, pack_state);
+                    set_input(term, stateOutputIndex + 1, pack_state);
 
                     // Advance i to compensate for the term just added
                     i++;

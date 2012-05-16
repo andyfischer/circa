@@ -759,7 +759,16 @@ void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition
 
 void branch_start_changes(Branch* branch)
 {
+    if (branch->inProgress)
+        return;
+
     branch->inProgress = true;
+
+    // For any minor branch that is inProgress, make sure the parent branch is also
+    // marked inProgress.
+    
+    if (is_minor_branch(branch))
+        branch_start_changes(get_parent_branch(branch));
 }
 
 void branch_finish_changes(Branch* branch)
@@ -771,6 +780,14 @@ void branch_finish_changes(Branch* branch)
 
     // Remove NULLs
     branch->removeNulls();
+
+    // Finish nested minor branches
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+
+        if (term->nestedContents != NULL && is_minor_branch(term->nestedContents))
+            branch_finish_changes(term->nestedContents);
+    }
 
     finish_update_cascade(branch);
 

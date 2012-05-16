@@ -1,0 +1,11 @@
+
+a = 1
+
+for i in [0]
+    if true
+        if true
+            if true
+                a = 2
+                break
+
+print(a)

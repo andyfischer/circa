@@ -482,6 +482,10 @@ const char* name_to_string(Name name)
         case name_Consumed: return "Consumed";
         case name_InProgress: return "InProgress";
         case name_Lazy: return "Lazy";
+        case name_Return: return "Return";
+        case name_Continue: return "Continue";
+        case name_Break: return "Break";
+        case name_Discard: return "Discard";
     }
 
     internal_error("Unknown name in name_to_string");

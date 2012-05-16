@@ -61,9 +61,23 @@ bool is_an_unknown_identifier(Term* term)
     return term->function == UNKNOWN_IDENTIFIER_FUNC;
 }
 
-bool is_major_branch(Term* term)
+bool is_major_branch(Branch* branch)
 {
-    return is_subroutine(term);
+    if (branch->owningTerm == NULL)
+        return true;
+
+    return is_subroutine(branch->owningTerm);
+}
+
+bool is_minor_branch(Branch* branch)
+{
+    if (branch->owningTerm == NULL)
+        return false;
+    
+    Term* owner = branch->owningTerm;
+    return owner->function == FUNCS.if_block
+        || owner->function == FUNCS.case_func
+        || owner->function == FUNCS.for_func;
 }
 
 bool has_an_error_listener(Term* term)

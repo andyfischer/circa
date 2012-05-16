@@ -116,6 +116,11 @@ const Name name_InProgress = 18;
 const Name name_Lazy = 13;
 const Name name_Consumed = 19;
 
+const Name name_Return = 20;
+const Name name_Continue = 21;
+const Name name_Break = 22;
+const Name name_Discard = 23;
+
 const Name c_FirstRuntimeName = 1000;
 
 } // namespace circa

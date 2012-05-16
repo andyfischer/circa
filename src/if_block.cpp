@@ -123,16 +123,20 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     return placeholder;
 }
 
-Term* if_block_append_output(Term* ifBlock)
+Term* if_block_append_output(Term* ifBlock, const char* name)
 {
     Branch* contents = nested_contents(ifBlock);
 
     Term* placeholder = append_output_placeholder(contents, NULL);
+    if (name != NULL)
+        rename(placeholder, name);
 
     // Add a corresponding output placeholder to each case
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Branch* caseContents = nested_contents(it.current());
-        /*Term* casePlaceholder =*/ append_output_placeholder(caseContents, NULL);
+        Term* casePlaceholder = append_output_placeholder(caseContents, NULL);
+        if (name != NULL)
+            rename(casePlaceholder, name);
     }
 
     return placeholder;
@@ -140,18 +144,14 @@ Term* if_block_append_output(Term* ifBlock)
 
 Term* if_block_add_output_for_name(Term* ifCall, const char* name)
 {
-    // Fix the new output placeholders to have the correct name and input.
     Branch* mainBranch = nested_contents(ifCall);
     int outputCount = count_output_placeholders(mainBranch);
-    Term* outputPlaceholder = if_block_append_output(ifCall);
-    rename(outputPlaceholder, name);
+    Term* outputPlaceholder = if_block_append_output(ifCall, name);
 
+    // Fix the new output placeholders to have the correct input.
     for (CaseIterator it(mainBranch); it.unfinished(); it.advance()) {
         Branch* caseContents = nested_contents(it.current());
         Term* casePlaceholder = get_output_placeholder(caseContents, outputCount);
-        ca_assert(casePlaceholder != NULL);
-        ca_assert(casePlaceholder->name == "");
-        rename(casePlaceholder, name);
         set_input(casePlaceholder, 0, find_name_at(casePlaceholder, name));
         respecialize_type(casePlaceholder);
     }

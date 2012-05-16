@@ -8,6 +8,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "importing.h"
+#include "introspection.h"
 #include "documentation.h"
 #include "kernel.h"
 #include "source_repro.h"
@@ -15,15 +16,44 @@
 
 namespace circa {
 
+void evaluate_exit_point(caStack* stack)
+{
+    Frame* frame = get_frame(stack, 1);
+    ca_assert(frame != NULL);
+
+    // TODO: check input 0
+
+    int inputCount = circa_num_inputs(stack);
+    int intermediateOutputCount = inputCount - 1;
+
+    // Copy intermediate values to the frame's output placeholders.
+    for (int i=0; i < intermediateOutputCount; i++) {
+        caValue* result = circa_input(stack, i + 1);
+        caValue* out = get_frame_register_from_end(frame, i);
+        if (result != NULL)
+            copy(result, out);
+        else
+            set_null(out);
+    }
+
+    // Set PC to end
+    frame->nextPc = frame->endPc;
+}
+
 void evaluate_return(caStack* stack)
 {
+    set_name(circa_output(stack, 0), name_Return);
+#if 0
     // Grab the output value
     circa::Value value;
     swap(circa_input(stack, 0), &value);
 
+    // Discard caller branch
+    pop_frame(stack);
+
     // Mark above frames as finished, until we find the enclosing subroutine.
     for (int i=1;; i++) {
-        Frame* frame = get_frame(stack, i);
+        Frame* frame = top_frame(stack);
         ca_assert(frame != NULL);
 
         early_finish_frame(stack, frame);
@@ -36,41 +66,64 @@ void evaluate_return(caStack* stack)
             // Done
             break;
         }
+
+        finish_frame(stack);
     }
+#endif
 }
 
 void evaluate_break(caStack* stack)
 {
+    set_name(circa_output(stack, 0), name_Break);
+#if 0
+    // Discard caller branch
+    pop_frame(stack);
+
     // Mark above frames as finished, until we find the enclosing for loop.
-    for (int i=1;; i++) {
-        Frame* frame = get_frame(stack, i);
+    while (true) {
+        Frame* frame = top_frame(stack);
         ca_assert(frame != NULL);
 
         early_finish_frame(stack, frame);
 
         if (frame->branch->owningTerm->function == FUNCS.for_func)
             break;
-    }
 
+        finish_frame(stack);
+    }
+#endif
 }
 void evaluate_continue(caStack* stack)
 {
+    set_name(circa_output(stack, 0), name_Continue);
+#if 0
+    // Discard caller branch
+    pop_frame(stack);
+
     // Mark above frames as finished, until we find the enclosing for loop.
-    for (int i=1;; i++) {
-        Frame* frame = get_frame(stack, i);
+    while (true) {
+        Frame* frame = top_frame(stack);
         ca_assert(frame != NULL);
 
         early_finish_frame(stack, frame);
 
         if (frame->branch->owningTerm->function == FUNCS.for_func)
             break;
+
+        finish_frame(stack);
     }
+#endif
 }
 void evaluate_discard(caStack* stack)
 {
+    set_name(circa_output(stack, 0), name_Discard);
+#if 0
+    // Discard caller branch
+    pop_frame(stack);
+
     // Mark above frames as finished, until we find the enclosing for loop.
-    for (int i=1;; i++) {
-        Frame* frame = get_frame(stack, i);
+    while (true) {
+        Frame* frame = top_frame(stack);
         ca_assert(frame != NULL);
 
         early_finish_frame(stack, frame);
@@ -79,7 +132,21 @@ void evaluate_discard(caStack* stack)
             frame->discarded = true;
             break;
         }
+
+        finish_frame(stack);
     }
+#endif
+}
+
+void controlFlow_postCompile(Term* term)
+{
+    // Give the name "#control" to the term
+    rename(term, "#control");
+
+    // Add an exit_point after each control-flow term
+    Branch* branch = term->owningBranch;
+    Term* exitPoint = apply(branch, FUNCS.exit_point, TermList(term));
+    hide_from_source(exitPoint);
 }
 
 void break_formatSource(StyledSource* source, Term* term)
@@ -115,21 +182,30 @@ void control_flow_setup_funcs(Branch* kernel)
 {
     ca_assert(kernel->get("return") == NULL);
 
-    FUNCS.exit_point = import_function(kernel, NULL, "exit_point(any :multiple :optional)");
+    FUNCS.exit_point = import_function(kernel, evaluate_exit_point,
+        "exit_point(any :multiple :optional)");
 
-    FUNCS.return_func = import_function(kernel, evaluate_return, "return(any :optional)");
+    FUNCS.return_func = import_function(kernel, evaluate_return,
+        "return(any :optional) -> Name");
     as_function(FUNCS.return_func)->formatSource = return_formatSource;
+    as_function(FUNCS.return_func)->postCompile = controlFlow_postCompile;
 
-    FUNCS.discard = import_function(kernel, evaluate_discard, "discard()");
+    FUNCS.discard = import_function(kernel, evaluate_discard,
+        "discard() -> Name");
     as_function(FUNCS.discard)->formatSource = discard_formatSource;
+    as_function(FUNCS.discard)->postCompile = controlFlow_postCompile;
     hide_from_docs(FUNCS.discard);
 
-    FUNCS.break_func = import_function(kernel, evaluate_break, "break()");
+    FUNCS.break_func = import_function(kernel, evaluate_break,
+        "break() -> Name");
     as_function(FUNCS.break_func)->formatSource = break_formatSource;
+    as_function(FUNCS.break_func)->postCompile = controlFlow_postCompile;
     hide_from_docs(FUNCS.break_func);
 
-    FUNCS.continue_func = import_function(kernel, evaluate_continue, "continue()");
+    FUNCS.continue_func = import_function(kernel, evaluate_continue,
+        "continue() -> Name");
     as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
+    as_function(FUNCS.continue_func)->postCompile = controlFlow_postCompile;
     hide_from_docs(FUNCS.continue_func);
 }
 
@@ -137,24 +213,26 @@ void early_finish_frame(caStack* stack, Frame* frame)
 {
     Branch* branch = frame->branch;
 
-    // Find the preceeding exit_point() call
+    // Find the next exit_point() call
     Term* exitPoint = NULL;
-    for (int i = frame->pc - 1; i >= 0; i--)
+    for (int i = frame->pc; i < branch->length(); i++) {
         if (branch->get(i)->function == FUNCS.exit_point) {
             exitPoint = branch->get(i);
             break;
         }
+    }
 
-    ca_assert(exitPoint != NULL);
-
-    // Copy values to this branch's output placeholders.
-    for (int i=0; i < exitPoint->numInputs(); i++) {
-        caValue* result = find_stack_value_for_term(stack, exitPoint->input(i), 0);
-        caValue* out = get_frame_register_from_end(frame, i);
-        if (result != NULL)
-            copy(result, out);
-        else
-            set_null(out);
+    if (exitPoint != NULL) {
+        // Copy values to this branch's output placeholders.
+        for (int i=0; i < exitPoint->numInputs(); i++) {
+            Term* resultTerm = exitPoint->input(i);
+            caValue* result = find_stack_value_for_term(stack, resultTerm, 0);
+            caValue* out = get_frame_register_from_end(frame, i);
+            if (result != NULL)
+                copy(result, out);
+            else
+                set_null(out);
+        }
     }
 
     // Set PC to end
@@ -174,7 +252,7 @@ Term* find_input_placeholder_with_name(Branch* branch, const char* name)
 
 Term* find_exit_point_for_term(Term* term)
 {
-    // Walk backwards and find the nearest exit_point call. If we pass a named term, then
+    // Walk forward and find the nearest exit_point call. If we pass a named term, then
     // we'll have to return NULL, because it means that this term has no appropriate
     // exit_point().
     //
@@ -185,7 +263,7 @@ Term* find_exit_point_for_term(Term* term)
 
     Branch* branch = term->owningBranch;
 
-    for (int index = term->index - 1; index >= 0; index--) {
+    for (int index = term->index + 1; index < branch->length(); index++) {
         Term* neighbor = branch->get(index);
         if (neighbor == NULL)
             continue;
@@ -209,11 +287,15 @@ bool can_interrupt_control_flow(Term* term)
         return true;
 
     // Check nested minor branches.
-    if (term->function == FUNCS.if_block
-            || term->function == FUNCS.for_func
-            || term->function == FUNCS.case_func) {
+    if (term->nestedContents != NULL && is_minor_branch(term->nestedContents)) {
         Branch* branch = term->nestedContents;
         for (int i=0; i < branch->length(); i++) {
+            // Recurse looking for a nested exit call.
+            //
+            // This could be made more efficient by not recursing - it only needs
+            // to look 1 or 2 levels deep for an exit_point call. (it's 2 levels
+            // deep for an if-block).
+
             if (can_interrupt_control_flow(branch->get(i)))
                 return true;
         }
@@ -224,18 +306,22 @@ bool can_interrupt_control_flow(Term* term)
 
 void update_exit_points(Branch* branch)
 {
+    // Don't insert exit_points inside an if_block
+    if (branch->owningTerm != NULL && branch->owningTerm->function == FUNCS.if_block)
+        return;
+
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         Term* term = it.current();
 
         if (can_interrupt_control_flow(term)) {
 
-            // Make sure that there is an exit_point call that preceeds this term.
+            // Make sure that there is an exit_point call that follows this term.
             Term* exitPoint = find_exit_point_for_term(term);
 
             if (exitPoint == NULL) {
                 // Create a new exit_point()
                 exitPoint = apply(branch, FUNCS.exit_point, TermList());
-                move_before(exitPoint, term);
+                move_after(exitPoint, term);
             }
 
             // For each output in this branch, assign an input to the given term that
@@ -248,7 +334,8 @@ void update_exit_points(Branch* branch)
                     break;
 
                 Term* intermediate = find_intermediate_result_for_output(exitPoint, output);
-                set_input(exitPoint, i, intermediate);
+                // exit_point() uses input 0 for control flow, so assign each input to i+1.
+                set_input(exitPoint, i + 1, intermediate);
             }
         }
     }

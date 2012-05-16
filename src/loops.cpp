@@ -97,6 +97,7 @@ void add_implicit_placeholders(Term* forTerm)
 
         Term* result = contents->get(name);
 
+        // Create input_placeholder
         Term* input = apply(contents, FUNCS.input, TermList(), name);
         Type* type = find_common_type(original->type, result->type);
         change_declared_type(input, type);
@@ -108,6 +109,7 @@ void add_implicit_placeholders(Term* forTerm)
         for (BranchIterator it(contents); it.unfinished(); it.advance())
             remap_pointers_quick(*it, original, input);
 
+        // Create output_placeholder
         Term* term = apply(contents, FUNCS.output, TermList(result), name);
 
         // Move output into the correct output slot
