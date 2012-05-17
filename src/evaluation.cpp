@@ -128,7 +128,7 @@ Frame* push_frame(Stack* stack, Branch* branch, List* registers)
     top->nextPc = 0;
     top->endPc = branch->length();
     top->loop = false;
-    top->discarded = false;
+    top->exitType = name_None;
     top->dynamicCall = false;
     top->override = false;
     top->stop = false;
@@ -875,11 +875,6 @@ void step_interpreter(Stack* stack)
 
         caValue* input = find_stack_value_for_term(stack, currentTerm->input(i), 1);
 
-        if (input == NULL) {
-            set_null(inputSlot);
-            continue;
-        }
-
         // TODO: More efficient way of checking for multiple inputs
         bool multiple = inputTerm->boolPropOptional("multiple", false);
 
@@ -888,9 +883,18 @@ void step_interpreter(Stack* stack)
             if (!is_list(inputSlot))
                 set_list(inputSlot, 0);
 
-            copy(input, list_append(inputSlot));
+            if (input == NULL)
+                set_null(list_append(inputSlot));
+            else
+                copy(input, list_append(inputSlot));
 
             // Advance to next input, don't change destIndex.
+            continue;
+        }
+
+        if (input == NULL) {
+            set_null(inputSlot);
+            destIndex++;
             continue;
         }
 

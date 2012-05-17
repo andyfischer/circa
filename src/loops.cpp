@@ -306,7 +306,7 @@ void for_loop_finish_iteration(Stack* stack)
     set_int(index, as_int(index) + 1);
 
     // Preserve list output
-    if (!frame->discarded) {
+    if (frame->exitType != name_Discard) {
         Frame* parentFrame = get_frame(stack, 1);
         caValue* listOutputSlot = get_frame_register(parentFrame, parentFrame->pc);
         if (!is_list(listOutputSlot))
@@ -315,7 +315,9 @@ void for_loop_finish_iteration(Stack* stack)
     }
 
     // Check if we are finished
-    if (as_int(index) >= list_length(listInput)) {
+    if (as_int(index) >= list_length(listInput)
+            || frame->exitType == name_Break
+            || frame->exitType == name_Return) {
         frame->loop = false;
         finish_frame(stack);
         return;
@@ -334,7 +336,7 @@ void for_loop_finish_iteration(Stack* stack)
     // Return to start of loop body
     frame->pc = 0;
     frame->nextPc = 0;
-    frame->discarded = false;
+    frame->exitType = name_None;
 }
 
 void for_loop_finish_frame(Stack* stack)

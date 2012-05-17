@@ -133,6 +133,7 @@ void finish_building_function(Function* func, Type* declaredOutputType)
     change_declared_type(output, declaredOutputType);
 
     update_exit_points(contents);
+    branch_finish_changes(contents);
 }
 
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
@@ -516,6 +517,11 @@ bool is_subroutine(Term* term)
     if (!is_function(term))
         return false;
     return as_function(term)->evaluate == evaluate_subroutine;
+}
+
+bool is_subroutine(Branch* branch)
+{
+    return branch->owningTerm != NULL && is_subroutine(branch->owningTerm);
 }
 
 void initialize_subroutine(Term* sub)

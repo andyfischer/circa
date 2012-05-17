@@ -76,7 +76,7 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     // Cases are added with append_to_overloaded_function()
 
     // Setup the fallback case
-    Term* elseTerm = if_block_append_case(block, NULL);
+    Term* elseTerm = if_block_append_case(nested_contents(block), NULL);
     apply(nested_contents(elseTerm), FUNCS.overload_error_no_match,
         TermList(inputsAsList));
     if_block_post_setup(block);
@@ -98,7 +98,7 @@ void append_to_overloaded_function(Branch* overloadedFunc, Term* specializedFunc
         TermList(inputsAsList, specializedFunc));
     move_before(condition, ifBlock);
 
-    Term* caseTerm = if_block_append_case(ifBlock, condition);
+    Term* caseTerm = if_block_append_case(nested_contents(ifBlock), condition);
     apply(nested_contents(caseTerm), specializedFunc, inputPlaceholders);
     if_block_finish_appended_case(ifBlock, caseTerm);
 }

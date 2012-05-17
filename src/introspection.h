@@ -37,6 +37,7 @@ bool is_an_unknown_identifier(Term* term);
 // Checks if term->nestedContents is a major branch. A 'major' branch has its own stack
 // frame when executed.
 bool is_major_branch(Term* term);
+bool is_major_branch(Branch* branch);
 bool is_minor_branch(Branch* branch);
 
 bool has_an_error_listener(Term* term);

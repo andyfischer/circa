@@ -132,6 +132,7 @@ void function_set_empty_evaluation(Function* function);
 
 void evaluate_subroutine(caStack*);
 bool is_subroutine(Term* term);
+bool is_subroutine(Branch* branch);
 
 // Perform various steps to finish creating a subroutine
 void initialize_subroutine(Term* sub);

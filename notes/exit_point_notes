@@ -1,0 +1,36 @@
+
+Regular code:
+    Mostly dataflow
+    pack_state calls are sprinkled as needed
+    Name rebindings can result in extra outputs from a minor branch
+
+With exit points
+    In-progress name rebindings must become real outputs
+    pack_state should be after the exiting call (might need to catch extra outputs)
+    exit_point() call must be placed after the exiting call
+    pack_state needs to be run on exit
+
+Maybe an alternate implementation:
+    An exiting call causes a new implicit output, 'exiting'
+
+New plan:
+    
+    When an exiting call is triggered, it passes true to an exit_point call
+    The exit_point checks its 1st parameter, if it's true, then it moves the current
+      frame's PC to the end of the frame, and it copies its inputs to be the frame's
+      outputs.
+
+    For an exit inside a minor branch
+    There is an implicit value #exiting that is added to the if-block
+
+    After the block, there is an exit_point() call that receives the #exiting value.
+
+    If true, this exit_point will finish the current frame, and the #exiting value
+    will propogate upwards.
+
+    If there is implicit state, the pack_state() call can be placed in front of
+    exit_point().
+
+Suggestions:
+    Instead of boolean #exiting, maybe a Name value, so that we can distinguish
+    between break and continue.

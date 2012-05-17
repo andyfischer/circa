@@ -7,6 +7,7 @@
 #include "control_flow.h"
 #include "evaluation.h"
 #include "function.h"
+#include "if_block.h"
 #include "importing.h"
 #include "introspection.h"
 #include "documentation.h"
@@ -21,14 +22,19 @@ void evaluate_exit_point(caStack* stack)
     Frame* frame = get_frame(stack, 1);
     ca_assert(frame != NULL);
 
-    // TODO: check input 0
+    caValue* args = circa_input(stack, 0);
 
-    int inputCount = circa_num_inputs(stack);
-    int intermediateOutputCount = inputCount - 1;
+    caValue* control = circa_index(args, 0);
+
+    // Only exit if the control says we should exit
+    if (is_null(control))
+        return;
+
+    int intermediateOutputCount = circa_count(args) - 1;
 
     // Copy intermediate values to the frame's output placeholders.
     for (int i=0; i < intermediateOutputCount; i++) {
-        caValue* result = circa_input(stack, i + 1);
+        caValue* result = circa_index(args, i + 1);
         caValue* out = get_frame_register_from_end(frame, i);
         if (result != NULL)
             copy(result, out);
@@ -38,114 +44,55 @@ void evaluate_exit_point(caStack* stack)
 
     // Set PC to end
     frame->nextPc = frame->endPc;
+    frame->exitType = as_name(control);
 }
 
 void evaluate_return(caStack* stack)
 {
-    set_name(circa_output(stack, 0), name_Return);
-#if 0
-    // Grab the output value
-    circa::Value value;
-    swap(circa_input(stack, 0), &value);
-
-    // Discard caller branch
-    pop_frame(stack);
-
-    // Mark above frames as finished, until we find the enclosing subroutine.
-    for (int i=1;; i++) {
-        Frame* frame = top_frame(stack);
-        ca_assert(frame != NULL);
-
-        early_finish_frame(stack, frame);
-
-        if (is_subroutine(frame->branch->owningTerm)) {
-
-            // Copy our output
-            copy(&value, get_frame_register_from_end(frame, 0));
-
-            // Done
-            break;
-        }
-
-        finish_frame(stack);
-    }
-#endif
+    copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void evaluate_break(caStack* stack)
+/*
+Name get_interrupt_level(Term* term)
 {
-    set_name(circa_output(stack, 0), name_Break);
-#if 0
-    // Discard caller branch
-    pop_frame(stack);
+    if (term->function == FUNCS.return_func)
+        return name_Return;
+    else if (term->function == FUNCS.break_func)
+        return name_Break;
+    else if (term->function == FUNCS.break_func)
+        return name_Continue;
+    else if (term->function == FUNCS.break_func)
+        return name_Return;
 
-    // Mark above frames as finished, until we find the enclosing for loop.
-    while (true) {
-        Frame* frame = top_frame(stack);
-        ca_assert(frame != NULL);
-
-        early_finish_frame(stack, frame);
-
-        if (frame->branch->owningTerm->function == FUNCS.for_func)
-            break;
-
-        finish_frame(stack);
-    }
-#endif
+    return name_None;
 }
-void evaluate_continue(caStack* stack)
-{
-    set_name(circa_output(stack, 0), name_Continue);
-#if 0
-    // Discard caller branch
-    pop_frame(stack);
-
-    // Mark above frames as finished, until we find the enclosing for loop.
-    while (true) {
-        Frame* frame = top_frame(stack);
-        ca_assert(frame != NULL);
-
-        early_finish_frame(stack, frame);
-
-        if (frame->branch->owningTerm->function == FUNCS.for_func)
-            break;
-
-        finish_frame(stack);
-    }
-#endif
-}
-void evaluate_discard(caStack* stack)
-{
-    set_name(circa_output(stack, 0), name_Discard);
-#if 0
-    // Discard caller branch
-    pop_frame(stack);
-
-    // Mark above frames as finished, until we find the enclosing for loop.
-    while (true) {
-        Frame* frame = top_frame(stack);
-        ca_assert(frame != NULL);
-
-        early_finish_frame(stack, frame);
-
-        if (frame->branch->owningTerm->function == FUNCS.for_func) {
-            frame->discarded = true;
-            break;
-        }
-
-        finish_frame(stack);
-    }
-#endif
-}
+*/
 
 void controlFlow_postCompile(Term* term)
 {
-    // Give the name "#control" to the term
-    rename(term, "#control");
+    // If this is a return() then give it the special name #return
+    if (term->function == FUNCS.return_func)
+        rename(term, "#return");
+
+    // Create a #control value
+    Term* controlTerm = create_value(term->owningBranch, &NAME_T, "#control");
+    hide_from_source(controlTerm);
+
+    Name controlValue = name_None;
+    if (term->function == FUNCS.return_func)
+        controlValue = name_Return;
+    else if (term->function == FUNCS.break_func)
+        controlValue = name_Break;
+    else if (term->function == FUNCS.continue_func)
+        controlValue = name_Continue;
+    else if (term->function == FUNCS.discard)
+        controlValue = name_Discard;
+
+    set_name(term_value(controlTerm), controlValue);
 
     // Add an exit_point after each control-flow term
     Branch* branch = term->owningBranch;
-    Term* exitPoint = apply(branch, FUNCS.exit_point, TermList(term));
+    Term* exitPoint = apply(branch, FUNCS.exit_point, TermList(controlTerm));
     hide_from_source(exitPoint);
 }
 
@@ -161,7 +108,6 @@ void discard_formatSource(StyledSource* source, Term* term)
 {
     append_phrase(source, "discard", term, phrase_type::KEYWORD);
 }
-
 
 void return_formatSource(StyledSource* source, Term* term)
 {
@@ -186,24 +132,21 @@ void control_flow_setup_funcs(Branch* kernel)
         "exit_point(any :multiple :optional)");
 
     FUNCS.return_func = import_function(kernel, evaluate_return,
-        "return(any :optional) -> Name");
+        "return(any :optional) -> any");
     as_function(FUNCS.return_func)->formatSource = return_formatSource;
     as_function(FUNCS.return_func)->postCompile = controlFlow_postCompile;
 
-    FUNCS.discard = import_function(kernel, evaluate_discard,
-        "discard() -> Name");
+    FUNCS.discard = import_function(kernel, NULL, "discard()");
     as_function(FUNCS.discard)->formatSource = discard_formatSource;
     as_function(FUNCS.discard)->postCompile = controlFlow_postCompile;
     hide_from_docs(FUNCS.discard);
 
-    FUNCS.break_func = import_function(kernel, evaluate_break,
-        "break() -> Name");
+    FUNCS.break_func = import_function(kernel, NULL, "break()");
     as_function(FUNCS.break_func)->formatSource = break_formatSource;
     as_function(FUNCS.break_func)->postCompile = controlFlow_postCompile;
     hide_from_docs(FUNCS.break_func);
 
-    FUNCS.continue_func = import_function(kernel, evaluate_continue,
-        "continue() -> Name");
+    FUNCS.continue_func = import_function(kernel, NULL, "continue()");
     as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
     as_function(FUNCS.continue_func)->postCompile = controlFlow_postCompile;
     hide_from_docs(FUNCS.continue_func);
@@ -257,7 +200,7 @@ Term* find_exit_point_for_term(Term* term)
     // exit_point().
     //
     // One property that we must hold:
-    //     Say that term A is the result of find_exit_point_for_term(B).
+    //     Let term A be the result of find_exit_point_for_term(B).
     //     Then, for any term X, find_intermediate_result_for_output(A, X) must equal
     //     find_intermediate_result_for_output(B, X)
 
@@ -271,6 +214,10 @@ Term* find_exit_point_for_term(Term* term)
         if (neighbor->function == FUNCS.exit_point)
             return neighbor;
 
+        // Ignore extra_output and #control terms
+        if (neighbor->name == "#control" || neighbor->function == EXTRA_OUTPUT_FUNC)
+            continue;
+
         if (neighbor->name != "")
             return NULL;
     }
@@ -278,8 +225,11 @@ Term* find_exit_point_for_term(Term* term)
     return NULL;
 }
 
-bool can_interrupt_control_flow(Term* term)
+// Returns whether the given term can interrupt the control flow of this
+// branch.
+bool can_interrupt_control_flow(Term* term, Branch* branch)
 {
+    // An exiting term can always interrupt the branch it is in.
     if (term->function == FUNCS.return_func
             || term->function == FUNCS.continue_func
             || term->function == FUNCS.break_func
@@ -288,20 +238,46 @@ bool can_interrupt_control_flow(Term* term)
 
     // Check nested minor branches.
     if (term->nestedContents != NULL && is_minor_branch(term->nestedContents)) {
-        Branch* branch = term->nestedContents;
-        for (int i=0; i < branch->length(); i++) {
+        Branch* nestedBranch = term->nestedContents;
+        for (int i=0; i < nestedBranch->length(); i++) {
             // Recurse looking for a nested exit call.
             //
             // This could be made more efficient by not recursing - it only needs
             // to look 1 or 2 levels deep for an exit_point call. (it's 2 levels
             // deep for an if-block).
 
-            if (can_interrupt_control_flow(branch->get(i)))
+            if (can_interrupt_control_flow(nestedBranch->get(i), branch))
                 return true;
         }
     }
 
     return false;
+}
+
+void force_term_to_output_to_parent(Term* term)
+{
+    Branch* branch = term->owningBranch;
+    ca_assert(term->name != "");
+
+    // If this term is inside an if-block, then add it as a block output.
+    if (is_case_branch(branch)) {
+        Branch* ifBlock = get_block_for_case_branch(branch);
+        Term* existing = if_block_get_output_by_name(ifBlock, term->name.c_str());
+        if (existing == NULL) {
+            if_block_append_output(ifBlock, term->name.c_str());
+        } else {
+            // Connect to existing output
+            set_input(find_output_placeholder_with_name(branch, term->name.c_str()),
+                0, term);
+        }
+    } else if (is_minor_branch(branch)) {
+
+        Term* existing = find_output_placeholder_with_name(branch, term->name.c_str());
+        if (existing == NULL) {
+            Term* placeholder = append_output_placeholder(branch, term);
+            rename(placeholder, term->name.c_str());
+        }
+    }
 }
 
 void update_exit_points(Branch* branch)
@@ -313,18 +289,40 @@ void update_exit_points(Branch* branch)
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         Term* term = it.current();
 
-        if (can_interrupt_control_flow(term)) {
+        if (term->name == "#return" && !is_output_placeholder(term)) {
+            force_term_to_output_to_parent(term);
+
+            // If this is a subroutine, make sure that the primary output is properly connected.
+            if (is_major_branch(branch)) {
+                Term* output = get_output_placeholder(branch, 0);
+                if (output != NULL) {
+                    set_input(output, 0, term);
+                }
+            }
+        }
+
+        if (can_interrupt_control_flow(term, branch)) {
 
             // Make sure that there is an exit_point call that follows this term.
             Term* exitPoint = find_exit_point_for_term(term);
 
+            Term* controlVar = NULL;
+
             if (exitPoint == NULL) {
                 // Create a new exit_point()
-                exitPoint = apply(branch, FUNCS.exit_point, TermList());
+                controlVar = find_name(branch, "#control");
+                exitPoint = apply(branch, FUNCS.exit_point, TermList(controlVar));
                 move_after(exitPoint, term);
+            } else {
+                controlVar = find_name(branch, "#control");
             }
 
-            // For each output in this branch, assign an input to the given term that
+            // If this exit_point is inside an if-block, then we should add #control as
+            // a block output.
+            if (controlVar != NULL)
+                force_term_to_output_to_parent(controlVar);
+
+            // For each output in this branch, assign an input to the exit_point that
             // has the 'intermediate' result at this term's location. (such as, if the output
             // has a name, use the term at this location with the given name.
 
@@ -334,6 +332,7 @@ void update_exit_points(Branch* branch)
                     break;
 
                 Term* intermediate = find_intermediate_result_for_output(exitPoint, output);
+
                 // exit_point() uses input 0 for control flow, so assign each input to i+1.
                 set_input(exitPoint, i + 1, intermediate);
             }

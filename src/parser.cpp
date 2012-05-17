@@ -126,6 +126,7 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
         consume_branch_with_significant_indentation(branch, tokens, context, parentTerm);
     }
 
+    // Future: can we not call finish_changes here?
     branch_finish_changes(branch);
     return;
 }
@@ -821,8 +822,9 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     Term* result = apply(branch, FUNCS.if_block, TermList());
     Branch* contents = nested_contents(result);
+    if_block_start(contents);
 
-    Term* currentBlock = NULL;
+    Term* caseTerm = NULL;
     bool firstIteration = true;
     bool encounteredElse = false;
 
@@ -855,25 +857,26 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
             possible_whitespace(tokens);
             Term* condition = infix_expression(branch, tokens, context).term;
             ca_assert(condition != NULL);
-            currentBlock = apply(contents, FUNCS.case_func, TermList(condition));
+            caseTerm = if_block_append_case(contents, condition);
         } else {
             // Create an 'else' block
             encounteredElse = true;
-            currentBlock = apply(contents, FUNCS.case_func, TermList(NULL), "else");
+            caseTerm = if_block_append_case(contents, NULL);
+            rename(caseTerm, "else");
         }
 
-        currentBlock->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
-        set_starting_source_location(currentBlock, leadingTokenPosition, tokens);
-        consume_branch(nested_contents(currentBlock), tokens, context);
-        branch_finish_changes(nested_contents(currentBlock));
+        caseTerm->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
+        set_starting_source_location(caseTerm, leadingTokenPosition, tokens);
+        consume_branch(nested_contents(caseTerm), tokens, context);
+        branch_finish_changes(nested_contents(caseTerm));
 
         if (tokens.nextNonWhitespaceIs(TK_ELIF)
                 || (tokens.nextNonWhitespaceIs(TK_ELSE) && !encounteredElse)) {
 
             // If the previous block was multiline, then only parse the next block if
             // it has equal indentation.
-            bool wrongIndent = currentBlock->boolPropOptional("syntax:multiline",false)
-                && (currentBlock->sourceLoc.col != find_indentation_of_next_statement(tokens));
+            bool wrongIndent = caseTerm->boolPropOptional("syntax:multiline",false)
+                && (caseTerm->sourceLoc.col != find_indentation_of_next_statement(tokens));
 
             if (!wrongIndent) {
                 firstIteration = false;
@@ -886,13 +889,14 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // If the last block was marked syntax:multiline, then add a lineEnding, so that
     // we don't parse another one.
-    if (currentBlock->boolPropOptional("syntax:multiline", false)
-            || currentBlock->hasProperty("syntax:lineEnding"))
+    if (caseTerm->boolPropOptional("syntax:multiline", false)
+            || caseTerm->hasProperty("syntax:lineEnding"))
         result->setStringProp("syntax:lineEnding", "");
 
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
-        Term* elseTerm = apply(contents, FUNCS.case_func, TermList(NULL), "else");
+        Term* elseTerm = if_block_append_case(contents, NULL);
+        rename(elseTerm, "else");
         hide_from_source(elseTerm);
     }
 

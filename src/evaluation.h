@@ -28,7 +28,9 @@ struct Frame
 
     // Used in for-loop
     bool loop;
-    bool discarded;
+
+    // When a branch is exited early, this stores the exit type.
+    caName exitType;
     
     // If true, the interpreter should stop after completing this frame. The frame
     // will be left on the stack.

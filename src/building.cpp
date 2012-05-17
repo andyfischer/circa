@@ -1179,13 +1179,22 @@ void check_to_add_state_output_placeholder(Branch* branch)
 
 Term* find_intermediate_result_for_output(Term* location, Term* output)
 {
-    if (is_state_input(output)) {
+    // Check whether the output's connection is valid at this location
+    Term* result = output->input(0);
+    if (result != NULL
+            && result->owningBranch == output->owningBranch
+            && result->index < location->index)
+        return result;
+
+    // State output
+    if (is_state_input(output))
         return find_open_state_result(location);
-    } else if (output->name != "") {
+
+    // Nearest with same name
+    if (output->name != "")
         return find_name_at(location, output->name.c_str());
-    } else {
-        return NULL;
-    }
+
+    return NULL;
 }
 
 void rewrite(Term* term, Term* function, TermList const& inputs)
