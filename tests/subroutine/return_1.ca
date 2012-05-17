@@ -2,4 +2,5 @@
 def f() -> int
   return 1
 
-f() -> print
+r = f()
+assert(r == 1)

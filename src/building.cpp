@@ -793,12 +793,20 @@ void branch_finish_changes(Branch* branch)
 
     fix_forward_function_references(branch);
 
-    update_exit_points(branch);
-
     // Create an output_placeholder for state, if necessary.
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)
         insert_state_output(branch);
+
+    update_exit_points(branch);
+
+    // Make sure primary output is connected
+    if (is_minor_branch(branch)) {
+        Term* output = get_output_placeholder(branch, 0);
+        if (output != NULL && output->input(0) == NULL) {
+            set_input(output, 0, find_last_non_comment_expression(branch));
+        }
+    }
 
     // Update branch's state type
     branch_update_state_type(branch);

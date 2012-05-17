@@ -50,7 +50,7 @@ bool is_hidden(Term* term)
     if (term->name == "")
         return false;
 
-    if (term->name[0] == '#')
+    if (term->name[0] == '#' && term->name != "#return")
         return true;
 
     return false;
