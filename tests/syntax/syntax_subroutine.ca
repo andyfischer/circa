@@ -4,10 +4,10 @@ def hi2() -> int {}
 def hi2()->int {}
 def hi3(int a) {}
 def hi4() -> int
-    return(1)
-def hi()->int{return(1)}
-def hi()->int  {return(1)}
-def hi()->int { return(add(sub(1,1),1)) }
+    return 1
+def hi()->int{return 1}
+def hi()->int  {return 1}
+def hi()->int { return add(sub(1,1),1) }
 def hi() {1}
 def hi()   {}
 def hi() { 1  }
@@ -18,11 +18,9 @@ def hi(int) { 1 }
 def hi(number, String, bool)  {}
 
 type Point { number x, number y }
-def hi() -> Point { return([0 0]) }
+def hi() -> Point { return [0 0] }
 
-def hi() { if true { return(1) } else { return(2) } }
---FIXME:
---def hi() { x = 1 if true { return(x) } else { return(x) }}
+def hi() { if true { return 1 } else { return 2 } }
 def my_func(int...) -> int {}
 
 def f(int i) -> int;
@@ -31,6 +29,5 @@ def f(int i :meta) -> int;
 
 def f() { return 1; }
 def f() { return   1; }
-def f() { return(1) }
 def f() { return }
 def f() { return   }

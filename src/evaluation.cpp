@@ -249,8 +249,8 @@ void finish_frame(Stack* stack)
                 string_append(&msg, " to type ");
                 string_append(&msg, name_to_string(placeholder->type->name));
                 set_error_string(dest, as_cstring(&msg));
-                raise_error(stack);
                 topFrame->pc = placeholder->index;
+                raise_error(stack);
                 return;
             }
         }

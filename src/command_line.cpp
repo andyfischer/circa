@@ -341,6 +341,8 @@ int run_command_line(caWorld* world, caValue* args)
         std::cout << "Error occurred:\n";
         print_error_stack(stack, std::cout);
         std::cout << std::endl;
+        std::cout << "Stack:\n";
+        dump(stack);
         return 1;
     }
 
