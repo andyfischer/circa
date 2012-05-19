@@ -283,11 +283,12 @@ for particle in @particles
     lifespan = particle.age / max_particle_age
     max(@lifespan, 1.0)
     color = #555 + #111 * (lifespan * 9)
+    color[3] = 1.0
 
     env.draw_points([particle.loc], color)
 
-    particle.loc = particle.loc + particle.vel * td
-    particle.age = particle.age + td
+    particle.loc = particle.loc + particle.vel * time_delta
+    particle.age = particle.age + time_delta
 
     if particle.age > max_particle_age
         discard
