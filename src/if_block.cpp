@@ -22,6 +22,8 @@
 
 namespace circa {
 
+static Term* if_block_add_input(Term* ifCall, Term* input);
+
 struct CaseIterator
 {
     BranchIteratorFlat branchIterator;
@@ -67,14 +69,11 @@ struct CaseIterator
     void operator++() { advance(); }
 };
 
-void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm);
-
-int if_block_count_cases(Term* term)
+int if_block_count_cases(Branch* block)
 {
-    Branch* contents = nested_contents(term);
     int result = 0;
-    for (int i=0; i < contents->length(); i++)
-        if (contents->get(i) != NULL && contents->get(i)->function == FUNCS.case_func)
+    for (int i=0; i < block->length(); i++)
+        if (block->get(i) != NULL && block->get(i)->function == FUNCS.case_func)
             result++;
     return result;
 }
@@ -144,15 +143,14 @@ Term* if_block_append_output(Branch* block, const char* name)
     return placeholder;
 }
 
-Term* if_block_get_case(Term* term, int index)
+Term* if_block_get_case(Branch* block, int index)
 {
-    Branch* contents = nested_contents(term);
-    for (int i=0; i < contents->length(); i++) {
-        if (contents->get(i) == NULL || contents->get(i)->function != FUNCS.case_func)
+    for (int i=0; i < block->length(); i++) {
+        if (block->get(i) == NULL || block->get(i)->function != FUNCS.case_func)
             continue;
 
         if (index == 0)
-            return contents->get(i);
+            return block->get(i);
 
         index--;
     }
@@ -222,7 +220,7 @@ Term* if_block_get_output_by_name(Branch* block, const char* name)
     return NULL;
 }
 
-void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
+void if_block_finish_appended_case(Branch* block, Term* caseTerm)
 {
     // Add an output placeholder
     apply(nested_contents(caseTerm), FUNCS.output,
