@@ -12,6 +12,7 @@
 #include "introspection.h"
 #include "list.h"
 #include "locals.h"
+#include "loops.h"
 #include "names.h"
 #include "parser.h"
 #include "names.h"
@@ -796,7 +797,7 @@ void branch_finish_changes(Branch* branch)
     // Create an output_placeholder for state, if necessary.
     Term* openState = find_open_state_result(branch, branch->length());
     if (openState != NULL)
-        insert_state_output(branch);
+        append_state_output(branch);
 
     update_exit_points(branch);
 
@@ -807,6 +808,10 @@ void branch_finish_changes(Branch* branch)
             set_input(output, 0, find_last_non_comment_expression(branch));
         }
     }
+
+    // Refresh for-loop zero branch
+    if (is_for_loop(branch))
+        for_loop_remake_zero_branch(branch);
 
     // Update branch's state type
     branch_update_state_type(branch);
@@ -908,37 +913,26 @@ bool has_state_output(Branch* branch)
 Term* append_state_input(Branch* branch)
 {
     // Make sure that a state input doesn't already exist
-    Term* term = find_state_input(branch);
-    if (term != NULL)
-        return term;
+    Term* existing = find_state_input(branch);
+    if (existing != NULL)
+        return existing;
 
     int inputCount = count_input_placeholders(branch);
 
-    term = apply(branch, FUNCS.input, TermList());
+    Term* term = apply(branch, FUNCS.input, TermList());
     branch->move(term, inputCount);
     term->setBoolProp("state", true);
     term->setBoolProp("hiddenInput", true);
     term->setBoolProp("output", true);
     return term;
 }
-Term* insert_state_output(Branch* branch)
-{
-    // Make sure that a state input doesn't already exist
-    Term* term = find_state_output(branch);
-    Term* openStateResult = find_open_state_result(branch, branch->length());
-
-    if (term != NULL) {
-        set_input(term, 0, openStateResult);
-        return term;
-    }
-    
-    term = apply(branch, FUNCS.output, TermList(openStateResult));
-    term->setBoolProp("state", true);
-    hide_from_source(term);
-    return term;
-}
 Term* append_state_output(Branch* branch)
 {
+    // Make sure that a state input doesn't already exist
+    Term* existing = find_state_output(branch);
+    if (existing != NULL)
+        return existing;
+
     Term* term = append_output_placeholder(branch, 
         find_open_state_result(branch, branch->length()));
     term->setBoolProp("state", true);
@@ -1197,6 +1191,10 @@ Term* find_intermediate_result_for_output(Term* location, Term* output)
     // State output
     if (is_state_input(output))
         return find_open_state_result(location);
+
+    // #return output
+    if (result != NULL && result->name == "#return")
+        return find_name_at(location, "#return");
 
     // Nearest with same name
     if (output->name != "")

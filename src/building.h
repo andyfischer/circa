@@ -123,7 +123,6 @@ bool has_state_input(Branch* branch);
 Term* find_state_output(Branch* branch);
 bool has_state_output(Branch* branch);
 Term* append_state_input(Branch* branch);
-Term* insert_state_output(Branch* branch);
 Term* append_state_output(Branch* branch);
 bool is_state_input(Term* placeholder);
 bool is_state_output(Term* placeholder);

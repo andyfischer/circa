@@ -15,6 +15,10 @@ void finish_for_loop(Term* forTerm);
 Term* find_enclosing_for_loop(Term* term);
 Branch* find_enclosing_for_loop_contents(Term* term);
 
+bool is_for_loop(Branch* branch);
+Branch* for_loop_get_zero_branch(Branch* forContents);
+void for_loop_remake_zero_branch(Branch* forContents);
+
 CA_FUNCTION(start_for_loop);
 void for_loop_finish_iteration(Stack* context);
 void for_loop_finish_frame(Stack* context);

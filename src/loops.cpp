@@ -62,11 +62,15 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
     Term* index = apply(contents, FUNCS.loop_index, TermList(listInput));
     hide_from_source(index);
 
-    // Add loop_iterator()
+    // Add get_index to fetch the list's current element.
     Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index),
         iteratorName);
     change_declared_type(iterator, infer_type_of_get_index(forTerm->input(0)));
     hide_from_source(iterator);
+
+    // Add the zero branch
+    create_branch_unevaluated(contents, "#zero");
+
     return iterator;
 }
 
@@ -202,6 +206,51 @@ Branch* find_enclosing_for_loop_contents(Term* term)
     return nested_contents(loop);
 }
 
+bool is_for_loop(Branch* branch)
+{
+    if (branch->owningTerm == NULL)
+        return false;
+    return branch->owningTerm->function == FUNCS.for_func;
+}
+
+Branch* for_loop_get_zero_branch(Branch* contents)
+{
+    return contents->get("#zero")->contents();
+}
+
+void for_loop_remake_zero_branch(Branch* forContents)
+{
+    Branch* zero = for_loop_get_zero_branch(forContents);
+    clear_branch(zero);
+
+    // Clone inputs
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(forContents, i);
+        if (placeholder == NULL)
+            break;
+        Term* clone = append_input_placeholder(zero);
+        rename(clone, placeholder->name);
+    }
+
+    Term* loopOutput = create_list(zero);
+
+    // Clone outputs
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(forContents, i);
+        if (placeholder == NULL)
+            break;
+
+        // Find the appropriate connection
+        Term* result = find_local_name(zero, placeholder->name.c_str());
+
+        if (i == 0)
+            result = loopOutput;
+
+        Term* clone = append_output_placeholder(zero, result);
+        rename(clone, placeholder->name);
+    }
+}
+
 void for_loop_fix_state_input(Branch* contents)
 {
     // This function will look at the state access inside for-loop contents.
@@ -246,14 +295,15 @@ void for_loop_fix_state_input(Branch* contents)
         TermList(stateInput, stateResult, index));
     packStateList->setBoolProp("final", true);
     move_after(packStateList, stateResult);
+
+    // Make sure the state output uses this result
+    Term* stateOutput = append_state_output(contents);
+    set_input(stateOutput, 0, packStateList);
 }
 
 CA_FUNCTION(start_for_loop)
 {
     Stack* stack = CONTEXT;
-
-    caValue* inputList = INPUT(0);
-    int inputListLength = list_length(inputList);
 
     Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;
@@ -261,21 +311,26 @@ CA_FUNCTION(start_for_loop)
     // Set up a blank list for output
     set_list(get_caller_output(stack, 0), 0);
 
-    // For a zero-iteration loop, just copy over inputs to their respective outputs.
+    // For a zero-iteration loop, use the zero branch.
+#if 0
     if (inputListLength == 0) {
         List* registers = &top_frame(stack)->registers;
         for (int i=1;; i++) {
-            Term* input = get_input_placeholder(contents, i);
-            if (input == NULL)
-                break;
+
             Term* output = get_output_placeholder(contents, i);
             if (output == NULL)
                 break;
+
+            Term* input = get_input_placeholder(contents, i);
+            if (input == NULL)
+                break;
+
             copy(registers->get(input->index), registers->get(output->index));
         }
         finish_frame(stack);
         return;
     }
+#endif
 
     frame->loop = true;
 

@@ -101,7 +101,7 @@ void initialize_function(Term* func)
     as_function(func)->contents = nested_contents(func);
 }
 
-void finish_building_function(Function* func, Type* declaredOutputType)
+void finish_building_function(Function* func)
 {
     Branch* contents = function_contents(func);
 
@@ -115,22 +115,19 @@ void finish_building_function(Function* func, Type* declaredOutputType)
         if (input->boolPropOptional("output", false)) {
 
             if (is_state_input(input)) {
-                Term* term = insert_state_output(contents);
+                Term* term = append_state_output(contents);
                 term->setIntProp("rebindsInput", i);
                 continue;
             }
 
             Term* result = find_name(contents, input->name.c_str());
-            Term* output = apply(contents,
-                FUNCS.output, TermList(result), input->name);
+            
+            Term* output = append_output_placeholder(contents, result);
+            rename(output, input->name.c_str());
             change_declared_type(output, input->type);
             output->setIntProp("rebindsInput", i);
         }
     }
-
-    // Finally, write a final output_placeholder() term for the primary output.
-    Term* output = apply(contents, FUNCS.output, TermList(NULL));
-    change_declared_type(output, declaredOutputType);
 
     update_exit_points(contents);
     branch_finish_changes(contents);

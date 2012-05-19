@@ -4,6 +4,12 @@
 
 namespace circa {
 
+enum ExitRank {
+    EXIT_RANK_NONE = 0,
+    EXIT_RANK_LOOP = 1,
+    EXIT_RANK_SUBROUTINE = 2
+};
+
 // Evaluation helpers
 void early_finish_frame(caStack* stack, Frame* frame);
 void control_flow_setup_funcs(Branch* kernel);

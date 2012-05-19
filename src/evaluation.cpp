@@ -685,6 +685,17 @@ void update_context_to_latest_branches(Stack* stack)
     }
 }
 
+Branch* for_loop_choose_branch(Stack* stack, Term* term)
+{
+    // If there are zero inputs, use the #zero branch.
+    caValue* input = find_stack_value_for_term(stack, term->input(0), 0);
+
+    if (is_list(input) && list_length(input) == 0)
+        return for_loop_get_zero_branch(term->nestedContents);
+
+    return term->nestedContents;
+}
+
 Branch* if_block_choose_branch(Stack* stack, Term* term)
 {
     // Find the accepted case
@@ -754,6 +765,8 @@ Branch* choose_branch(Stack* stack, Term* term)
         return NULL;
     else if (term->function == FUNCS.if_block)
         return if_block_choose_branch(stack, term);
+    else if (term->function == FUNCS.for_func)
+        return for_loop_choose_branch(stack, term);
         /* dynamic method currently works as an override
     else if (term->function == FUNCS.dynamic_method)
         return dynamic_method_choose_branch(stack, term);
@@ -916,7 +929,7 @@ void step_interpreter(Stack* stack)
     }
 
     // Special case for for-loops.
-    if (currentTerm->function == FUNCS.for_func) {
+    if (is_for_loop(nextBranch)) {
 
         start_for_loop(stack);
         return;

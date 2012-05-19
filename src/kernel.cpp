@@ -949,8 +949,12 @@ void bootstrap_kernel()
     ca_assert(function_get_output_type(FUNCS.output, 0) == &ANY_T);
 
     // Fix some holes in value() function
-    Function* attrs = as_function(valueFunc);
-    finish_building_function(attrs, &ANY_T);
+    {
+        Function* attrs = as_function(valueFunc);
+        Term* output = append_output_placeholder(function_contents(attrs), NULL);
+        change_declared_type(output, &ANY_T);
+        finish_building_function(attrs);
+    }
 
     ca_assert(function_get_output_type(valueFunc, 0) == &ANY_T);
 

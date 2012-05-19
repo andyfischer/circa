@@ -1,0 +1,10 @@
+
+def recr(int i) -> int
+    print('recr: ' i)
+    if i > 0
+        sum = i + recr(i - 1)
+        return sum
+
+    return 1
+
+print(recr(3))

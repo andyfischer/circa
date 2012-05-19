@@ -688,9 +688,13 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     ca_assert(is_value(result));
     ca_assert(is_function(result));
 
+    // Create the primary output placeholder
+    Term* primaryOutput = append_output_placeholder(contents, NULL);
+    change_declared_type(primaryOutput, as_type(outputType));
+
     // If we're out of tokens, then stop here. This behavior is used when declaring builtins.
     if (tokens.finished()) {
-        finish_building_function(as_function(result), as_type(outputType));
+        finish_building_function(as_function(result));
         return ParseResult(result);
     }
 
@@ -699,7 +703,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // Parse subroutine contents.
     consume_branch(contents, tokens, context);
 
-    finish_building_function(as_function(result), as_type(outputType));
+    finish_building_function(as_function(result));
 
     ca_assert(is_value(result));
     ca_assert(is_function(result));

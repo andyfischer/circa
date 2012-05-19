@@ -1,0 +1,7 @@
+
+def recr(int i)
+    print('recr: ' i)
+    if i > 0
+        recr(i - 1)
+
+recr(3)
