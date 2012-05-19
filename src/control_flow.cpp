@@ -17,6 +17,11 @@
 
 namespace circa {
 
+static Term* find_exit_point_for_term(Term* term);
+static ExitRank get_exit_level_rank(Name level);
+static Name max_exit_level(Name left, Name right);
+static Name get_highest_exit_level(Branch* branch);
+
 void evaluate_exit_point(caStack* stack)
 {
     Frame* frame = get_frame(stack, 1);
@@ -26,8 +31,8 @@ void evaluate_exit_point(caStack* stack)
 
     caValue* control = circa_index(args, 0);
 
-    // Only exit if the control says we should exit
-    if (is_null(control))
+    // Only exit if the control says we should exit.
+    if (!is_name(control) || as_name(control) == name_None)
         return;
 
     int intermediateOutputCount = circa_count(args) - 1;
@@ -52,7 +57,7 @@ void evaluate_return(caStack* stack)
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-ExitRank get_exit_level_rank(Name level)
+static ExitRank get_exit_level_rank(Name level)
 {
     if (level == name_Return)
         return EXIT_RANK_SUBROUTINE;
@@ -62,7 +67,7 @@ ExitRank get_exit_level_rank(Name level)
         return EXIT_RANK_NONE;
 }
 
-Name max_exit_level(Name left, Name right)
+static Name max_exit_level(Name left, Name right)
 {
     if (get_exit_level_rank(left) >= get_exit_level_rank(right))
         return left;
@@ -154,48 +159,7 @@ void control_flow_setup_funcs(Branch* kernel)
     hide_from_docs(FUNCS.continue_func);
 }
 
-void early_finish_frame(caStack* stack, Frame* frame)
-{
-    Branch* branch = frame->branch;
-
-    // Find the next exit_point() call
-    Term* exitPoint = NULL;
-    for (int i = frame->pc; i < branch->length(); i++) {
-        if (branch->get(i)->function == FUNCS.exit_point) {
-            exitPoint = branch->get(i);
-            break;
-        }
-    }
-
-    if (exitPoint != NULL) {
-        // Copy values to this branch's output placeholders.
-        for (int i=0; i < exitPoint->numInputs(); i++) {
-            Term* resultTerm = exitPoint->input(i);
-            caValue* result = find_stack_value_for_term(stack, resultTerm, 0);
-            caValue* out = get_frame_register_from_end(frame, i);
-            if (result != NULL)
-                copy(result, out);
-            else
-                set_null(out);
-        }
-    }
-
-    // Set PC to end
-    frame->nextPc = frame->endPc;
-}
-
-Term* find_input_placeholder_with_name(Branch* branch, const char* name)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (placeholder->name == name)
-            return placeholder;
-    }
-}
-
-Term* find_exit_point_for_term(Term* term)
+static Term* find_exit_point_for_term(Term* term)
 {
     // Walk forward and find the nearest exit_point call. If we pass a named term, then
     // we'll have to return NULL, because it means that this term has no appropriate
@@ -227,7 +191,7 @@ Term* find_exit_point_for_term(Term* term)
     return NULL;
 }
 
-Name get_highest_exit_level(Branch* branch)
+static Name get_highest_exit_level(Branch* branch)
 {
     Name highest = name_None;
 
@@ -328,7 +292,8 @@ void update_exit_points(Branch* branch)
         if (term->name == "#return" && !is_output_placeholder(term)) {
             force_term_to_output_to_parent(term);
 
-            // If this is a subroutine, make sure that the primary output is properly connected.
+            // If this is a subroutine, make sure that the primary output is properly
+            // connected.
             if (is_major_branch(branch)) {
                 Term* output = get_output_placeholder(branch, 0);
                 if (output != NULL) {
@@ -365,7 +330,6 @@ void update_exit_points(Branch* branch)
             // a block output.
             if (controlVar != NULL)
                 force_term_to_output_to_parent(controlVar);
-
         }
     }
 
@@ -392,7 +356,6 @@ void update_exit_points(Branch* branch)
             // exit_point() uses input 0 for control flow, so assign each input to i+1.
             set_input(exitPoint, i + 1, intermediate);
         }
-        
     }
 }
 

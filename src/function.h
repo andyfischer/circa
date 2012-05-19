@@ -97,7 +97,6 @@ int function_num_inputs(Function* func);
 int function_num_outputs(Function* func);
 
 // Stateful inputs
-bool function_is_state_input(Term* placeholder);
 bool function_is_state_input(Function* func, int index);
 bool function_has_state_input(Function* func);
 Term* function_insert_state_input(Function* func);

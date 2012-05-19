@@ -79,7 +79,6 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     Term* elseTerm = if_block_append_case(nested_contents(block), NULL);
     apply(nested_contents(elseTerm), FUNCS.overload_error_no_match,
         TermList(inputsAsList));
-    if_block_post_setup(block);
     if_block_finish_appended_case(block, elseTerm);
 
     set_input(get_output_placeholder(contents, 0), 0, block);

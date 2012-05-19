@@ -134,9 +134,6 @@ Term* find_parent_term_in_branch(Term* term, Branch* branch);
 void set_step(Term* term, float step);
 float get_step(Term* term);
 
-bool is_lazy_call(Term* term);
-void set_lazy_call(Term* term, bool value);
-
 // Set a branch as being 'in progress', meaning that we are actively making changes to it.
 void branch_start_changes(Branch* branch);
 
@@ -145,6 +142,7 @@ void branch_finish_changes(Branch* branch);
 
 Term* find_last_non_comment_expression(Branch* branch);
 Term* find_term_with_function(Branch* branch, Term* func);
+Term* find_input_placeholder_with_name(Branch* branch, const char* name);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);
 
@@ -165,6 +163,7 @@ void expand_variadic_inputs_for_call(Branch* branch, Term* call);
 int find_input_index_for_pointer(Term* call, Term* input);
 void check_to_add_primary_output_placeholder(Branch* branch);
 void check_to_add_state_output_placeholder(Branch* branch);
+Term* find_intermediate_result_for_output(Term* location, Term* output);
 
 // Refactoring
 

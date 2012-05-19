@@ -605,7 +605,7 @@ void update_extra_outputs(Term* term)
 
         change_declared_type(extra_output, placeholder->type);
 
-        if (function_is_state_input(placeholder))
+        if (is_state_input(placeholder))
             extra_output->setBoolProp("state", true);
     }
 }
@@ -681,7 +681,7 @@ Term* find_open_state_result(Branch* branch, int position)
         Term* term = branch->get(i);
         if (term == NULL)
             continue;
-        if (term->function == FUNCS.input && function_is_state_input(term))
+        if (term->function == FUNCS.input && is_state_input(term))
             return term;
         if (term->function == FUNCS.pack_state
                 || term->function == FUNCS.pack_state_list_n)
@@ -729,34 +729,6 @@ float get_step(Term* term)
 {
     return term->floatPropOptional("step", 1.0);
 }
-bool is_lazy_call(Term* term)
-{
-    return term->flags & TERM_FLAG_LAZY;
-}
-void set_lazy_call(Term* term, bool value)
-{
-    term->setBoolProp("lazy", value);
-    term->flags = (term->flags & ~TERM_FLAG_LAZY) + (value ? TERM_FLAG_LAZY : 0);
-}
-
-void create_rebind_branch(Branch* rebinds, Branch* source, Term* rebindCondition, bool outsidePositive)
-{
-    clear_branch(rebinds);
-
-    std::vector<std::string> reboundNames;
-    list_names_that_this_branch_rebinds(source, reboundNames);
-
-    Branch* outerScope = source->owningTerm->owningBranch;
-    for (unsigned i=0; i < reboundNames.size(); i++) {
-        std::string name = reboundNames[i];
-        Term* outerVersion = find_name(outerScope, name.c_str());
-        Term* innerVersion = source->get(name);
-
-        Term* pos = outsidePositive ? outerVersion : innerVersion;
-        Term* neg = outsidePositive ? innerVersion : outerVersion ;
-        apply(rebinds, FUNCS.cond, TermList(rebindCondition, pos, neg), name);
-    }
-}
 
 void branch_start_changes(Branch* branch)
 {
@@ -782,7 +754,7 @@ void branch_finish_changes(Branch* branch)
     // Remove NULLs
     branch->removeNulls();
 
-    // Finish nested minor branches
+    // Make sure nested minor branches are finished.
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
 
@@ -849,6 +821,17 @@ Term* find_term_with_function(Branch* branch, Term* func)
     return NULL;
 }
 
+Term* find_input_placeholder_with_name(Branch* branch, const char* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (placeholder->name == name)
+            return placeholder;
+    }
+}
+
 Term* find_input_with_function(Term* target, Term* func)
 {
     for (int i=0; i < target->numInputs(); i++) {
@@ -887,7 +870,6 @@ Term* find_state_input(Branch* branch)
         if (is_state_input(placeholder))
             return placeholder;
     }
-    return NULL;
 }
 
 bool has_state_input(Branch* branch)
@@ -897,14 +879,13 @@ bool has_state_input(Branch* branch)
 
 Term* find_state_output(Branch* branch)
 {
-    for (int i=branch->length() - 1; i >= 0; i--) {
-        Term* placeholder = branch->get(i);
-        if (placeholder->function != FUNCS.output)
-            break;
-        if (function_is_state_input(placeholder))
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (is_state_output(placeholder))
             return placeholder;
     }
-    return NULL;
 }
 bool has_state_output(Branch* branch)
 {

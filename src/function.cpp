@@ -246,17 +246,12 @@ int function_num_outputs(Function* func)
     return count;
 }
 
-bool function_is_state_input(Term* placeholder)
-{
-    return placeholder->boolPropOptional("state", false);
-}
-
 bool function_is_state_input(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func,index);
     if (placeholder == NULL)
         return false;
-    return function_is_state_input(placeholder);
+    return is_state_input(placeholder);
 }
 
 bool function_has_state_input(Function* func)
@@ -267,7 +262,7 @@ bool function_has_state_input(Function* func)
         Term* placeholder = function_get_input_placeholder(func, index++);
         if (placeholder == NULL)
             return false;
-        if (function_is_state_input(placeholder))
+        if (is_state_input(placeholder))
             return true;
     }
 }    

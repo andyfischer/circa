@@ -928,7 +928,7 @@ void step_interpreter(Stack* stack)
         destIndex++;
     }
 
-    // Special case for for-loops.
+    // Special case for starting a for-loop.
     if (is_for_loop(nextBranch)) {
 
         start_for_loop(stack);

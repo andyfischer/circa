@@ -167,6 +167,9 @@ void finish_for_loop(Term* forTerm)
 {
     Branch* contents = nested_contents(forTerm);
 
+    // Need to finish here to prevent error
+    branch_finish_changes(contents);
+
     // Add a primary output
     Term* primaryOutput = apply(contents, FUNCS.output, TermList(loop_get_primary_result(contents)));
     primaryOutput->setBoolProp("customOutput", true);

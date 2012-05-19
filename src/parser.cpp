@@ -126,8 +126,6 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
         consume_branch_with_significant_indentation(branch, tokens, context, parentTerm);
     }
 
-    // Future: can we not call finish_changes here?
-    branch_finish_changes(branch);
     return;
 }
 

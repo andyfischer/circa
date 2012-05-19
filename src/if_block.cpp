@@ -68,7 +68,6 @@ struct CaseIterator
 };
 
 void if_block_update_case_placeholders_from_master(Term* ifCall, Term* caseTerm);
-void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents);
 
 int if_block_count_cases(Term* term)
 {
@@ -225,13 +224,9 @@ Term* if_block_get_output_by_name(Branch* block, const char* name)
 
 void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm)
 {
-    if_block_fix_outer_pointers(ifBlock, nested_contents(caseTerm));
-
     // Add an output placeholder
     apply(nested_contents(caseTerm), FUNCS.output,
         TermList(find_last_non_comment_expression(nested_contents(caseTerm))));
-
-    //std::cout << "finished appended case.." << std::endl;
 }
 
 void append_state_placeholders_if_needed(Branch* branch)
@@ -297,11 +292,9 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
     }
 }
 
+#if 0
 void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
 {
-    // disable this
-    return;
-
     Branch* contents = nested_contents(ifCall);
 
     for (OuterInputIterator it(caseContents); it.unfinished(); ++it) {
@@ -344,6 +337,7 @@ void if_block_fix_outer_pointers(Term* ifCall, Branch* caseContents)
         set_input(currentTerm, currentInputIndex, caseLocal);
     }
 }
+#endif
 
 void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBranch)
 {
@@ -513,7 +507,6 @@ void finish_if_block(Term* ifBlock)
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if_block_turn_outer_name_rebinds_into_outputs(ifBlock, nested_contents(term));
-        if_block_fix_outer_pointers(ifBlock, nested_contents(term));
         modify_branch_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
         caseIndex++;
     }
@@ -523,13 +516,6 @@ void finish_if_block(Term* ifBlock)
     if_block_update_output_placeholder_types_from_cases(ifBlock);
     check_to_insert_implicit_inputs(ifBlock);
     update_extra_outputs(ifBlock);
-}
-
-void if_block_post_setup(Term* ifCall)
-{
-    Branch* contents = nested_contents(ifCall);
-    if (get_output_placeholder(contents, 0) == NULL)
-        apply(contents, FUNCS.output, TermList(NULL));
 }
 
 } // namespace circa

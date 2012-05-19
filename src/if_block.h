@@ -16,6 +16,5 @@ Term* if_block_get_output_by_name(Branch* block, const char* name);
 Term* if_block_append_output(Branch* block, const char* name);
 void if_block_finish_appended_case(Term* ifBlock, Term* caseTerm);
 void finish_if_block(Term* ifBlock);
-void if_block_post_setup(Term* ifCall);
 
 } // namespace circa
