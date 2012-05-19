@@ -5,15 +5,17 @@ import UIHelper
 
 msg_name = msg[0]
 
-state ButtonBar scriptChoices = button_bar_vert([
+state ButtonBar scriptChoices = button_bar([
         ["Asteroids", "demos/asteroids.ca"],
         ["Mouse test", "demos/mouse_test.ca"]
-        ], [10 100 200 200])
+        ])
+
+scriptChoices.arrange([30 80 200 180], :vertical)
 
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
 
-    painter.fillRect(painter.viewport + [0 0 1 1], #11d)
+    painter.fillRect(painter.viewport + [0 0 1 1], #eee)
 
     pen = create_pen(#fff, 1.0, :none)
     pen.setColor(#fff)
@@ -21,7 +23,8 @@ if msg_name == 'onPaintEvent'
 
     font = create_font("Sans Serif", 30)
     painter.setFont(font)
-    painter.drawText([0 0 300 100] 0 "1. Set up a text editor")
+    painter.setColor(#000)
+    painter.drawText([20 30 300 100] 0 "Select a demo")
 
     scriptChoices.draw(painter)
 

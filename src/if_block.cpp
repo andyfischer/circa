@@ -405,14 +405,6 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
         if (firstBranch) {
             firstBranch = false;
             write_all_names_to_list(caseBranch, &names);
-
-            // remove names that are already outputs
-            for (int i=0; i < names.length(); i++) {
-                Term* existing = contents->get(as_cstring(names[i]));
-                if (existing != NULL && existing->function == FUNCS.output)
-                    set_null(names[i]);
-            }
-
             continue;
         }
 
@@ -426,10 +418,16 @@ void if_block_turn_common_rebinds_into_outputs(Term* ifCall)
     }
 
     names.removeNulls();
-    // std::cout << names.toString() << std::endl;
 
-    for (int i=0; i < names.length(); i++)
-        if_block_append_output(contents, as_cstring(names[i]));
+    for (int i=0; i < names.length(); i++) {
+        const char* name = as_cstring(names[i]);
+
+        // Skip if name is already bound
+        if (find_output_placeholder_with_name(contents, name) != NULL)
+            continue;
+
+        if_block_append_output(contents, name);
+    }
 }
 
 void if_block_update_output_placeholder_types_from_cases(Term* ifBlock)

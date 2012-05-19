@@ -46,34 +46,39 @@ type ButtonBar {
     List buttons
 }
 
-def button_bar(List definitions, Rect rect) -> ButtonBar
-    hspacer = 10
-
-    eachWidth = (rect.width - hspacer * (definitions.length - 1)) / definitions.length
-
-    left = rect.x1
+def button_bar(List definitions) -> ButtonBar
     buttons = for defi in definitions
         b = create(Button)
         b.label = defi[0]
         b.action = defi[1]
-        b.rect = [left, rect.y1, left+eachWidth, rect.y2]
-        left += eachWidth + hspacer
         b
     return [buttons]
 
-def button_bar_vert(List definitions, Rect rect) -> ButtonBar
-    vspacer = 10
-    eachHeight = (rect.height - vspacer * (definitions.length - 1)) / definitions.length
+def ButtonBar.arrange(self :out, Rect rect, Name orientation)
+    spacer = 10
 
-    top = rect.y1
-    buttons = for defi in definitions
-        b = create(Button)
-        b.label = defi[0]
-        b.action = defi[1]
-        b.rect = [rect.x1, top, rect.x2, top + eachHeight]
-        top += eachHeight + vspacer
-        b
-    return [buttons]
+    count = self.buttons.length
+
+    if orientation == :horizontal
+        eachWidth = (rect.width - spacer * (count - 1)) / count
+
+        left = rect.x1
+        buttons = self.buttons
+        for button in @buttons
+            button.rect = [left, rect.y1, left+eachWidth, rect.y2]
+            left += eachWidth + spacer
+
+        self.buttons = buttons
+    else
+        eachHeight = (rect.height - spacer * (count - 1)) / count
+
+        top = rect.y1
+        buttons = self.buttons
+        for button in @buttons
+            button.rect = [rect.x1, top, rect.x2, top + eachHeight]
+            top += eachHeight + spacer
+
+        self.buttons = buttons
 
 def ButtonBar.draw(b, Painter p)
     for button in b.buttons

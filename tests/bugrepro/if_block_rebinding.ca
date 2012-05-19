@@ -1,0 +1,12 @@
+
+-- This had a bug where the if-block had two output placeholders for 'button'
+
+def f()
+    if true
+        buttons = []
+        for button in @buttons {}
+    else
+        buttons = []
+        for button in @buttons {}
+
+f()
