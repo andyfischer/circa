@@ -27,6 +27,8 @@ namespace implicit_state_function {
 
         int index = CALLER->intProp("index");
 
+        list_touch(container);
+
         if (!is_list(container))
             set_list(container, index+1);
 
@@ -55,6 +57,7 @@ namespace implicit_state_function {
         caValue* container = OUTPUT;
         caValue* value = INPUT(1);
         int index = INT_INPUT(2);
+        list_touch(container);
 
         if (!is_list(container))
             set_list(container, index+1);

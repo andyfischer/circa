@@ -30,7 +30,6 @@ def ScriptContext.draw_circle(self, Point center, number radius, Color color)
     self.painter.drawEllipse([center.x - radius, center.y - radius,
         center.x + radius, center.y + radius])
 def ScriptContext.draw_points(self, List points, Color color)
-    print(color)
     self.painter.setColor(color)
     for point in points
         Point(@point)

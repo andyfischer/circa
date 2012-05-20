@@ -23,7 +23,8 @@ state ButtonBar topButtons = button_bar([
     ["Reset" :reset]
     ["Freeze" :freezeState]
     ["Exit" :exit]
-    ] [10 10 400 40])
+    ])
+topButtons.arrange([10 10 400 40], :horizontal)
 
 -- set the state of the Freeze button
 topButtons.setToggled(2, state_frozen)

@@ -1,0 +1,17 @@
+
+-- pack_state_to_list had a bug that was causing it to violate purity
+def f()
+    for i in [0]
+        state int s
+        s += 1
+
+s = null
+f(state = s)
+
+-- t is a copy of s, it should remain unchanged
+t = s
+print('t (pre)  = ' t)
+f(state = s)
+f(state = s)
+f(state = s)
+print('t (post) = ' t)

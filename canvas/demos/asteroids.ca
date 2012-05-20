@@ -13,8 +13,6 @@ def random_location() -> Point
 -- Black background
 env.background(#000)
 
-
-
 type Ship {
     Point loc
     Point momentum
@@ -66,16 +64,15 @@ def srand() -> number
     state value = rand()
     return value
 
-namespace stars
-    drift = [time time] -> Point
-    num_stars = 100
-    points = for i in 0..num_stars
-        state Point loc = random_location()
-        add(@loc, drift)
-        wrap_around(@loc)
-        loc
-    print(points)
-    --env.draw_points(points, #fff)
+drift = [time / 1000, time / 1000] -> Point
+
+num_stars = 100
+points = for i in 0..num_stars
+    state Point loc = random_location()
+    add(@loc, drift)
+    wrap_around(@loc)
+    loc
+env.draw_points(points, #fff)
 
 def draw_ship(Point loc, number facing)
     def ship_point(number rot, number dist) -> Point
