@@ -1,0 +1,2 @@
+step1, result = [0, 1, 2], s = {result: [{s: 0}, {s: 1}, {s: 2}]}
+step2, result = [0, 2, 4], s = {result: [{s: 0}, {s: 2}, {s: 4}]}

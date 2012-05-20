@@ -1,0 +1,17 @@
+
+-- Test a for-loop with inner state that is used as an expression.
+
+def f() -> List
+    result = for i in [0 1 2]
+        state s = 0
+        s += i
+        s
+
+    return result
+
+s = null
+result = f(state = s)
+print('step1, result = ' result ', s = ' s)
+
+result = f(state = s)
+print('step2, result = ' result ', s = ' s)

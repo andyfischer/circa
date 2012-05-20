@@ -13,8 +13,7 @@ def random_location() -> Point
 -- Black background
 env.background(#000)
 
--- Temporarily disable stars:
--- include('shared/drifting_stars.ca' -> rpath)
+
 
 type Ship {
     Point loc
@@ -66,6 +65,17 @@ state int gstate = game_state:playing
 def srand() -> number
     state value = rand()
     return value
+
+namespace stars
+    drift = [time time] -> Point
+    num_stars = 100
+    points = for i in 0..num_stars
+        state Point loc = random_location()
+        add(@loc, drift)
+        wrap_around(@loc)
+        loc
+    print(points)
+    --env.draw_points(points, #fff)
 
 def draw_ship(Point loc, number facing)
     def ship_point(number rot, number dist) -> Point

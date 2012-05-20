@@ -797,10 +797,15 @@ Term* find_last_non_comment_expression(Branch* branch)
     for (int i = branch->length() - 1; i >= 0; i--) {
         if (branch->get(i) == NULL)
             continue;
-        if (branch->get(i)->function == FUNCS.output)
+
+        // Skip certain special functions
+        Term* func = branch->get(i)->function;
+        if (func == FUNCS.output
+                || func == FUNCS.input 
+                || func == FUNCS.pack_state
+                || func == FUNCS.pack_state_list_n)
             continue;
-        if (branch->get(i)->function == FUNCS.input)
-            continue;
+
         if (branch->get(i)->name == "#outer_rebinds")
             continue;
         if (branch->get(i)->function != FUNCS.comment)
