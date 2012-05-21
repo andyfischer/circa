@@ -1,0 +1,15 @@
+
+def f(bool b)
+    if b
+        state int i = 0
+        i += 1
+
+s = null
+f(true, state = s)
+print(s)
+f(true, state = s)
+print(s)
+f(false, state = s)
+print(s)
+f(true, state = s)
+print(s)

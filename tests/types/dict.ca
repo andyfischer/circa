@@ -1,0 +1,19 @@
+
+d = create(Dict)
+print('d = ' d)
+print('d.count = ' d.count)
+
+d.set('a', 1)
+print('d = ' d)
+print('d.count = ' d.count)
+
+d.set('b', 2)
+print('d = ' d)
+print('d.count = ' d.count)
+
+d.set('b', 3)
+print('d = ' d)
+print('d.count = ' d.count)
+
+print('d[a] = ' d.get('a'))
+print('d[b] = ' d.get('b'))

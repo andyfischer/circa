@@ -1,0 +1,4 @@
+{_if_block: [{i: 1}]}
+{_if_block: [{i: 2}]}
+{_if_block: [null, null]}
+{_if_block: [{i: 1}]}

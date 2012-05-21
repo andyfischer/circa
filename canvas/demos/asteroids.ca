@@ -213,6 +213,7 @@ def generate_particle_burst(List particles, Point loc, Point vel) -> List
 
 state List asteroids = []
 
+-- Initalize starting asteroids
 if once()
     for i in 0..3
         as = generate_asteroid(asteroid_starting_size)
@@ -254,14 +255,14 @@ for asteroid in @asteroids
 
             discard
 
-    if collides
-        discard
-
     if collides and asteroid.size > 10
         spawned.append(generate_child_asteroid(asteroid))
         spawned.append(generate_child_asteroid(asteroid))
         if rand() > .5
             spawned.append(generate_child_asteroid(asteroid))
+
+    if collides
+        discard
 
 for spawn in spawned
     Asteroid(@spawn)
@@ -279,9 +280,7 @@ draw_ship(ship.loc, ship.facing)
 if gstate == game_state:dying
     death_time = env.elapsed
 
-    print('death time: ' death_time)
-
-    if death_time > 3.0
+    if death_time > 1.5
         gstate = game_state:playing
         ship = new_ship()
 

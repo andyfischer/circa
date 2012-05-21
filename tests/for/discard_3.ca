@@ -1,0 +1,12 @@
+
+def f()
+    state a = 1
+    for i in [1]
+        state i
+        discard
+
+    state b = 2
+
+s = null
+f(state = s)
+print(s)

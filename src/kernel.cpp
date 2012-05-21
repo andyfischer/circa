@@ -311,6 +311,31 @@ void load_module(caStack* stack)
     set_branch(circa_output(stack, 0), branch);
 }
 
+void Dict__count(caStack* stack)
+{
+    caValue* dict = circa_input(stack, 0);
+    set_int(circa_output(stack, 0), dict_count(dict));
+}
+
+void Dict__set(caStack* stack)
+{
+    caValue* dict = circa_output(stack, 1);
+    copy(circa_input(stack, 0), dict);
+
+    const char* key = circa_string_input(stack, 1);
+    caValue* value = circa_input(stack, 2);
+
+    copy(value, dict_insert(dict, key));
+}
+
+void Dict__get(caStack* stack)
+{
+    caValue* dict = circa_input(stack, 0);
+    const char* key = circa_string_input(stack, 1);
+
+    copy(dict_get(dict, key), circa_output(stack, 0));
+}
+
 void Frame__branch(caStack* stack)
 {
     Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
@@ -1116,6 +1141,10 @@ void install_standard_library(Branch* kernel)
         {"sys:module_search_paths", sys__module_search_paths},
         {"sys:do_admin_command", sys__do_admin_command},
         {"load_module", load_module},
+
+        {"Dict.count", Dict__count},
+        {"Dict.get", Dict__get},
+        {"Dict.set", Dict__set},
 
         {"Frame.branch", Frame__branch},
         {"Frame.register", Frame__register},

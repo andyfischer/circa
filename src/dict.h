@@ -86,5 +86,6 @@ Dict* as_dict(caValue* value);
 
 caValue* dict_get(caValue* dict, const char* field);
 caValue* dict_insert(caValue* dict, const char* field);
+int dict_count(caValue* dict);
 
 } // namespace circa

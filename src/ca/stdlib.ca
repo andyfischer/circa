@@ -101,6 +101,10 @@ def Branch.terms(_) -> List
 def Branch.version(_) -> int
     -- Monotonically increasing version number, incremented for module reloads.
 
+def Dict.count(_) -> int
+def Dict.set(_ :out, String key, any value)
+def Dict.get(_, String key) -> any
+
 type Frame;
 def Frame.branch(_) -> Branch
 def Frame.register(_, int) -> any

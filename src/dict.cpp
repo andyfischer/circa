@@ -282,6 +282,8 @@ void remove(DictData* data, const char* key)
 
 int count(DictData* data)
 {
+    if (data == NULL)
+        return 0;
     return data->count;
 }
 
@@ -647,6 +649,11 @@ caValue* dict_insert(caValue* dict, const char* field)
 {
     ca_assert(is_dict(dict));
     return dict_insert((DictData**) &dict->value_data.ptr, field);
+}
+int dict_count(caValue* dict)
+{
+    ca_assert(is_dict(dict));
+    return dict_t::count((DictData*) dict->value_data.ptr);
 }
 
 } // namespace circa

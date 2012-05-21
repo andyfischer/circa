@@ -1,0 +1,10 @@
+d = {}
+d.count = 0
+d = {a: 1}
+d.count = 1
+d = {a: 1, b: 2}
+d.count = 2
+d = {a: 1, b: 3}
+d.count = 2
+d[a] = 1
+d[b] = 3

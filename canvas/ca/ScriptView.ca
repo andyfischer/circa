@@ -88,6 +88,8 @@ if msg[0] == 'onPaintEvent'
         if not(interpreter.errored) and not(state_frozen)
             userState = interpreter.get_state_output
 
+        --print('state = ' userState)
+
     -- Draw error display if necessary
     if interpreter.errored
         interpreter.drawRuntimeError(painter)
@@ -113,6 +115,7 @@ elif msg[0] == 'onInputEvent'
     elif action == :load
         send('ScriptView' ['loadFile' 'demos/asteroids.ca'])
     elif action == :reset
+        print('clicked reset')
         userState = null
     elif action == :exit
         send('View' ['changeScreen' 'IntroScreen'])
@@ -138,5 +141,6 @@ elif msg[0] == 'timeUpdate'
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])
     userBranch = load_module(msg[1])
+    userBranch.dump
 else
     print("ScriptView didn't recognize: " msg)
