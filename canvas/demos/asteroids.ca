@@ -35,10 +35,10 @@ def new_ship() -> Ship
 state Ship ship = new_ship()
 state List bullets = []
 
-accelration_per_s = 5.0
+accelration_per_s = 10.0
 rotation_speed = 270.0
 ship_drag = 0.991
-speed_limit = 1.8
+speed_limit = 5.0
 bullet_speed = 200.0
 bullet_width = 2.0
 
@@ -92,8 +92,9 @@ def draw_ship(Point loc, number facing)
         for side in @sides
             a = side[0] -> Point
             b = side[1] -> Point
-            drift = srand()*elapsed()*30
+            drift = srand() * env.elapsed * 30
             side = [a+drift b+drift]
+
 
     line_points = []
     for side in sides
@@ -146,6 +147,7 @@ bullet_max_lifespan = 1.8
 for bullet in @bullets
     Bullet(@bullet)
     if bullet.lifespan >= bullet_max_lifespan
+        print('bullet died..')
         discard
 
 -- Draw bullets
@@ -275,7 +277,9 @@ draw_ship(ship.loc, ship.facing)
 
 -- Update the dying state
 if gstate == game_state:dying
-    death_time = elapsed()
+    death_time = env.elapsed
+
+    print('death time: ' death_time)
 
     if death_time > 3.0
         gstate = game_state:playing

@@ -1,1 +1,1 @@
-scons --directory $CIRCA_HOME build/circa && $CIRCA_HOME/build/circa $*
+scons --directory $CIRCA_HOME build/circa

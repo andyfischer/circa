@@ -69,3 +69,6 @@ def ScriptContext.mouse_clicked(self) -> bool
 
     return result
     
+def ScriptContext.elapsed(self) -> number
+    state time_started = self.time
+    return self.time - time_started

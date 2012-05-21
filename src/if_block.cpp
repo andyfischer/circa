@@ -461,32 +461,43 @@ void modify_branch_so_that_state_access_is_indexed(Branch* branch, int index)
     if (stateInput == NULL)
         return;
 
-    // If the state output is connected directly to state input, then do nothing.
+    // Create a call to unpack_state_from_list. (If the state output is directly connected
+    // to input, then we don't need to do this).
+
     Term* stateOutput = find_state_output(branch);
 
-    if (stateOutput->input(0) == stateInput)
-        return;
+    if (stateOutput->input(0) == stateInput) {
+        // State output is directly connected to input. In this case, the branch should
+        // null out the state field.
+        Term* stateResult = create_value(branch, &NULL_T);
+        Term* packList = apply(branch, FUNCS.pack_state_to_list,
+            TermList(stateInput, stateResult));
+        packList->setIntProp("index", index);
+        set_input(stateOutput, 0, packList);
+    } else {
+        // There are terms between state input & output, bracket them with calls to
+        // unpack_state_from_list and pack_state_to_list.
+        Term* unpackList = apply(branch, FUNCS.unpack_state_from_list, TermList(stateInput));
+        unpackList->setIntProp("index", index);
+        move_after_inputs(unpackList);
 
-    Term* unpackList = apply(branch, FUNCS.unpack_state_from_list, TermList(stateInput));
-    unpackList->setIntProp("index", index);
-    move_after_inputs(unpackList);
+        for (int i=0; i < stateInput->users.length(); i++) {
+            Term* term = stateInput->users[i];
+            if (term == unpackList)
+                continue;
+            remap_pointers_quick(term, stateInput, unpackList);
+        }
 
-    for (int i=0; i < stateInput->users.length(); i++) {
-        Term* term = stateInput->users[i];
-        if (term == unpackList)
-            continue;
-        remap_pointers_quick(term, stateInput, unpackList);
+        Term* stateResult = stateOutput->input(0);
+        ca_assert(stateResult != NULL);
+
+        Term* packList = apply(branch, FUNCS.pack_state_to_list,
+            TermList(stateInput, stateResult));
+        packList->setIntProp("index", index);
+        packList->setBoolProp("final", true);
+        set_input(stateOutput, 0, packList);
+        move_after(packList, stateResult);
     }
-
-    Term* stateResult = stateOutput->input(0);
-    ca_assert(stateResult != NULL);
-
-    Term* packList = apply(branch, FUNCS.pack_state_to_list,
-        TermList(stateInput, stateResult));
-    packList->setIntProp("index", index);
-    packList->setBoolProp("final", true);
-    set_input(stateOutput, 0, packList);
-    move_after(packList, stateResult);
 }
 
 void finish_if_block(Term* ifBlock)
