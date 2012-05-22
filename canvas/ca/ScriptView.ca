@@ -19,16 +19,15 @@ state number time
 state number timeShift = 0
 
 state ButtonBar topButtons = button_bar([
-    ["Load" :load]
     ["Reset" :reset]
     ["Freeze" :freezeState]
     ["Exit" :exit]
     ])
-topButtons.arrange([10 10 400 40], :horizontal)
+topButtons.arrange([10 10 300 40], :horizontal)
 
 -- set the state of the Freeze button
-topButtons.setToggled(2, state_frozen)
-topButtons.setLabel(2, cond(state_frozen, "Frozen", "Freeze"))
+topButtons.setToggled(1, state_frozen)
+topButtons.setLabel(1, cond(state_frozen, "Frozen", "Freeze"))
 
 def to_rect(Point topLeft, Point size) -> Rect
     return [topLeft.x topLeft.y topLeft.x+size.x topLeft.x+size.y]
@@ -139,6 +138,5 @@ elif msg[0] == 'timeUpdate'
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])
     userBranch = load_module(msg[1])
-    userBranch.dump
 else
     print("ScriptView didn't recognize: " msg)

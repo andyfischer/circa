@@ -1,0 +1,19 @@
+
+# Prerequisites #
+
+ - A C++ compiler
+ - Python 2.6 or greater
+ - SCons 2.0 or greater
+
+# Instructions #
+
+0. Open up a command prompt
+
+1. Run "python tools/prebuild.py"
+
+2. Run "scons <target>" , where <target> is one of the following:
+
+  build/libcirca_d.a - Static library (debug mode)
+  build/libcirca.a   - Static library (release mode)
+  build/circa_d      - Command-line binary (debug mode)
+  build/circa        - Command-line binary (release mode)

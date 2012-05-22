@@ -15,7 +15,7 @@ scriptChoices.arrange([30 80 200 180], :vertical)
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
 
-    painter.fillRect(painter.viewport + [0 0 1 1], #eee)
+    painter.fillRect(painter.viewport + [0 0 1 1], #756A95)
 
     pen = create_pen(#fff, 1.0, :none)
     pen.setColor(#fff)
@@ -23,8 +23,12 @@ if msg_name == 'onPaintEvent'
 
     font = create_font("Sans Serif", 30)
     painter.setFont(font)
-    painter.setColor(#000)
-    painter.drawText([20 30 300 100] 0 "Select a demo")
+    painter.setColor(#C9E8E8)
+    painter.drawText([20 30 300 100] 0 "circa")
+    painter.setColor(#E1BC66)
+    painter.drawText([90 30 300 100] 0 "alpha")
+    painter.setColor(#CD7994)
+    painter.drawText([170 30 300 100] 0 "4")
 
     scriptChoices.draw(painter)
 

@@ -39,22 +39,15 @@ projects, or people who don't like bugs, are recommended to wait for a beta rele
 Building
 ========
 
-Instructions for building on a Unixy system:
-
-Make sure you have Python, Scons, and a C++ compiler installed.
-
-From the project's root directory, run:
-
-./make
-
-which will produce a binary at build/circa
-
-For building on Windows, see docs/building.md
+Refer to the BUILDING file.
 
 Documentation
 =============
 
 Refer to the /docs folder.
+
+License
+=======
 
 Unless otherwise specified, the contents of this project are freely available to the
 public under the MIT licence. See the LICENSE file for more information.
