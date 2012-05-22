@@ -1,0 +1,18 @@
+
+# Prerequisites #
+
+ - Qt 4.8 installed
+
+# Instructions #
+
+0. Build the Circa static library in release mode. (refer to ../BUILDING for instructions)
+
+1. Run "qmake -makefile" to generate a makefile
+
+    qmake -makefile
+
+  More information on qmake here:
+
+    http://qt-project.org/doc/qt-4.8/qmake-running.html
+
+2. Run "make"
