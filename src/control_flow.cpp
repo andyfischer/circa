@@ -228,6 +228,10 @@ Name find_highest_escaping_exit_level(Term* term)
     if (branch == NULL)
         return name_None;
 
+    // Don't look at subroutine declaration contents.
+    if (is_major_branch(branch))
+        return name_None;
+
     Name highestLevel = name_None;
 
     if (term->function == FUNCS.if_block) {
@@ -245,7 +249,7 @@ Name find_highest_escaping_exit_level(Term* term)
 
     // Check if this exit level will actually escape.
 
-    // Exit level Loop does not escape the for-loop.
+    // Exit level 'loop' does not escape the for-loop.
     if (term->function == FUNCS.for_func
             && get_exit_level_rank(highestLevel) == EXIT_RANK_LOOP)
         return name_None;

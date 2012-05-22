@@ -37,10 +37,13 @@ def Button.draw(b, Painter p)
     p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
 
 def Button.input(b :out, InputEvent e)
+    print(e)
+    print('b start = ' b)
     if e.is_mouse
         b.rollover = e.mousePos.inside(b.rect)
         b.triggered = b.rollover and b.press and e.eventType == MouseUp
         b.press = b.rollover and (e.eventType == MouseDown)
+    print('b end = ' b)
 
 type ButtonBar {
     List buttons
@@ -85,6 +88,8 @@ def ButtonBar.draw(b, Painter p)
         button.draw(p)
 
 def ButtonBar.input(b :out, InputEvent e) -> any
+    if not e.is_mouse
+        return null
     action = null
     buttons = b.buttons
     for button in @buttons

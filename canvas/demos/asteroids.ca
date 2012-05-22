@@ -147,7 +147,6 @@ bullet_max_lifespan = 1.8
 for bullet in @bullets
     Bullet(@bullet)
     if bullet.lifespan >= bullet_max_lifespan
-        print('bullet died..')
         discard
 
 -- Draw bullets

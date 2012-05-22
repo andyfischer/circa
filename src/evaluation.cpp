@@ -85,7 +85,7 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
             print_term(out, term);
 
             // current value
-            if (!is_value(term)) {
+            if (term != NULL && !is_value(term)) {
                 caValue* value = frame->registers[term->index];
                 if (value == NULL)
                     out << " [<register OOB>]";

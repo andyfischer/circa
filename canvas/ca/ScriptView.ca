@@ -85,10 +85,8 @@ if msg[0] == 'onPaintEvent'
             print(interpreter.error_message)
 
         -- Possibly save their state
-        if not(interpreter.errored) and not(state_frozen)
+        if not interpreter.errored and not state_frozen
             userState = interpreter.get_state_output
-
-        --print('state = ' userState)
 
     -- Draw error display if necessary
     if interpreter.errored
