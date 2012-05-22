@@ -1,7 +1,0 @@
-
-mouse = mousePos()
-
-state i = 0
-i += 1
-
-fill_rect([10 10 100 + i 100] #f00)
