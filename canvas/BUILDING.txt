@@ -5,7 +5,7 @@
 
 # Instructions #
 
-0. Build the Circa static library in release mode. (refer to ../BUILDING for instructions)
+0. Build the Circa static library in release mode. (refer to ../BUILDING.txt for instructions)
 
 1. Run "qmake -makefile" to generate a makefile
 
