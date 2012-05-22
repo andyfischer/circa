@@ -1,6 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "building.h"
+#include "code_iterators.h"
 #include "control_flow.h"
 #include "evaluation.h"
 #include "function.h"
@@ -128,6 +129,17 @@ void finish_building_function(Function* func)
             output->setIntProp("rebindsInput", i);
         }
     }
+
+    // After the output_placeholder terms are created, we might need to update the call
+    // sites of any recursive calls.
+    for (BranchIterator it(contents); it.unfinished(); it.advance()) {
+        Term* term = it.current();
+        if (as_function(term->function) != func)
+            continue;
+        update_extra_outputs(term);
+    }
+
+
 
     update_exit_points(contents);
     branch_finish_changes(contents);

@@ -1,0 +1,8 @@
+f 1, level = 3
+f 2, level = 3
+f 1, level = 2
+f 2, level = 2
+f 1, level = 1
+f 2, level = 1
+f 1, level = 0
+{s: 6, t: 9, _f: {s: 4, t: 6, _f: {s: 2, t: 3, _f: {s: 0, t: null, _f: null}}}}

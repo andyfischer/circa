@@ -1,0 +1,19 @@
+
+def f(int level)
+
+    print('f 1, level = ' level)
+
+    state s = level * 2
+
+    if level == 0
+        return
+        
+    print('f 2, level = ' level)
+
+    state t = level * 3
+
+    f(level - 1)
+
+s = null
+f(3, state = s)
+print(s)

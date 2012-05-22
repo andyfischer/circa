@@ -1,5 +1,13 @@
 
-background(#000)
+-- Global context, will probably make this implicit in the future.
+env = input() -> ScriptContext
+time = env.time
+mouse = env.mouse
+bounds = env.bounds
+time = env.time
+time_delta = delta(time)
+
+env.background(#fff)
 
 type SegmentInput {
   int generation
@@ -27,9 +35,7 @@ def segment(SegmentInput input)
     state wiggle_value = rand() - .5
     state thickness_ratio = 1.0
 
-    generation = input.generation + 1
-
-    age += td
+    age += time_delta
 
     -- length
     target_length = base_grow_rate * age
@@ -52,18 +58,36 @@ def segment(SegmentInput input)
     
     start_pos = input.loc
     end_pos = start_pos + polar(angle) * length
-    line(start_pos end_pos #fff)
+    env.draw_line(start_pos end_pos #0f0)
+
+    nextSeg = create(SegmentInput)
+    nextSeg.generation = input.generation + 1
+    nextSeg.distance_from_base = distance_from_base
+    nextSeg.distance_till_branch = distance_till_branch
+    nextSeg.end_radius = 0
+    nextSeg.loc = end_pos
+    nextSeg.angle = angle
+    nextSeg.bend_value = 0
+
+    print('input = ' input)
+    print('next = ' nextSeg)
+
+    if nextSeg.generation > generation_limit
+        return
 
     -- check to branch
     if distance_till_branch < 0
         for i in 0..2
-            distance_till_next_branch = distance_between_branches_min + seed() * distance_between_branches_var
-            bend_angle = ((i * 2) - 1) * branch_split_angle
-            segment([generation, distance_from_base, distance_till_next_branch, 0, end_pos, angle, bend_angle])
+            seg = nextSeg
+            seg.distance_till_branch = distance_between_branches_min + seed() * distance_between_branches_var
+            seg.bend_value = ((i * 2) - 1) * branch_split_angle
+            print('branch ' i ': ' seg)
+            segment(seg)
 
     -- or sprout a child
-    elif (target_length >= max_segment_length and generation < generation_limit)
-        segment([generation distance_from_base distance_till_branch 0 end_pos angle, 0])
+    elif (target_length >= max_segment_length and nextSeg.generation < generation_limit)
+        print('child: ' nextSeg)
+        segment(nextSeg)
 
 
 root_pos = [300 300]
@@ -72,11 +96,11 @@ segment([0 0 50.0 0 root_pos 0 0])
 def make_plants_with_mouse()
     state roots = []
 
-    if mouse_clicked()
+    if env.mouse_clicked
         roots.append(mouse)
 
     for root in roots
         Point(@root)
         segment([0 0 50.0 0 root 0 0])
 
-make_plants_with_mouse()
+-- make_plants_with_mouse()
