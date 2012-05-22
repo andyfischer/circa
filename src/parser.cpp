@@ -2231,16 +2231,18 @@ ParseResult identifier_no_create(Branch* branch, TokenStream& tokens, ParserCxt*
 
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
-    if (whitespace != "" && term != NULL)
-        term->setStringProp("syntax:preWhitespace", 
-            whitespace + term->stringProp("syntax:preWhitespace"));
+    if (whitespace != "" && term != NULL) {
+        std::string s = whitespace + term->stringProp("syntax:preWhitespace");
+        term->setStringProp("syntax:preWhitespace", s.c_str());
+    }
 }
 
 void append_whitespace(Term* term, std::string const& whitespace)
 {
-    if (whitespace != "" && term != NULL)
-        term->setStringProp("syntax:postWhitespace",
-            term->stringProp("syntax:postWhitespace") + whitespace);
+    if (whitespace != "" && term != NULL) {
+        std::string s = term->stringProp("syntax:postWhitespace") + whitespace;
+        term->setStringProp("syntax:postWhitespace", s.c_str());
+    }
 }
 
 void set_starting_source_location(Term* term, int start, TokenStream& tokens)
@@ -2330,8 +2332,8 @@ ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int star
         change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
     std::string line = consume_line(tokens, start, existing);
 
-    existing->setStringProp("originalText", line);
-    existing->setStringProp("message", message);
+    existing->setStringProp("originalText", line.c_str());
+    existing->setStringProp("message", message.c_str());
 
     ca_assert(has_static_error(existing));
 

@@ -337,7 +337,7 @@ Term* apply(Branch* branch, std::string const& functionName, TermList const& inp
         internal_error("function not found: "+functionName);
 
     Term* result = apply(branch, function, inputs, name);
-    result->setStringProp("syntax:functionName", functionName);
+    result->setStringProp("syntax:functionName", functionName.c_str());
     return result;
 }
 

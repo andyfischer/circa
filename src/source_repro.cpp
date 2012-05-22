@@ -133,7 +133,7 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
             "function-call");
 
     std::string functionName = term->stringPropOptional("syntax:functionName",
-            term->function->name);
+            term->function->name.c_str());
 
     // Check for an infix operator with implicit rebinding (like +=).
     if (declarationStyle == "infix" && 

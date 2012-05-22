@@ -123,18 +123,22 @@ Term::toString()
     return to_string(term_value(this));
 }
 
-bool Term::hasProperty(std::string const& name)
+bool Term::hasProperty(const char* name)
 {
-    return properties.contains(name.c_str());
+    return properties.contains(name);
 }
 
-caValue* Term::addProperty(std::string const& name, Term* type)
+caValue* Term::addProperty(const char* name, Term* type)
 {
-    caValue* prop = properties.insert(name.c_str());
+    caValue* prop = properties.insert(name);
     Type* valueType = unbox_type(type);
 
-    if (!is_null(prop) && prop->value_type != valueType)
-        internal_error("Property "+name+" exists with different type");
+    if (!is_null(prop) && prop->value_type != valueType) {
+        std::string msg = "Property ";
+        msg += name;
+        msg += " exists with different type";
+        internal_error(msg.c_str());
+    }
 
     if (prop->value_type != valueType)
         create(valueType, prop);
@@ -142,27 +146,27 @@ caValue* Term::addProperty(std::string const& name, Term* type)
     return prop;
 }
 
-void Term::removeProperty(std::string const& name)
+void Term::removeProperty(const char* name)
 {
-    properties.remove(name.c_str());
+    properties.remove(name);
 }
 
-bool Term::boolProp(std::string const& name)
+bool Term::boolProp(const char* name)
 {
     caValue* t = addProperty(name, BOOL_TYPE);
     return as_bool(t);
 }
-int Term::intProp(std::string const& name)
+int Term::intProp(const char* name)
 {
     caValue* t = addProperty(name, INT_TYPE);
     return as_int(t);
 }
-float Term::floatProp(std::string const& name)
+float Term::floatProp(const char* name)
 {
     caValue* t = addProperty(name, FLOAT_TYPE);
     return as_float(t);
 }
-std::string const& Term::stringProp(std::string const& name)
+std::string const& Term::stringProp(const char* name)
 {
     caValue* t = addProperty(name, STRING_TYPE);
     return as_string(t);
@@ -174,59 +178,59 @@ void Term::setProp(const char* name, caValue* value)
     copy(value, t);
 }
 
-void Term::setIntProp(std::string const& name, int i)
+void Term::setIntProp(const char* name, int i)
 {
     caValue* t = addProperty(name, INT_TYPE);
     set_int(t, i);
 }
 
-void Term::setFloatProp(std::string const& name, float f)
+void Term::setFloatProp(const char* name, float f)
 {
     caValue* t = addProperty(name, FLOAT_TYPE);
     set_float(t, f);
 }
 
-void Term::setBoolProp(std::string const& name, bool b)
+void Term::setBoolProp(const char* name, bool b)
 {
     caValue* t = addProperty(name, BOOL_TYPE);
     set_bool(t, b);
 }
 
-void Term::setStringProp(std::string const& name, std::string const& s)
+void Term::setStringProp(const char* name, std::string const& s)
 {
     caValue* t = addProperty(name, STRING_TYPE);
     set_string(t, s);
 }
 
-bool Term::boolPropOptional(std::string const& name, bool defaultValue)
+bool Term::boolPropOptional(const char* name, bool defaultValue)
 {
-    caValue* value = term_get_property(this, name.c_str());
+    caValue* value = term_get_property(this, name);
     if (value == NULL)
         return defaultValue;
     else
         return as_bool(value);
 }
 
-float Term::floatPropOptional(std::string const& name, float defaultValue)
+float Term::floatPropOptional(const char* name, float defaultValue)
 {
-    caValue* value = term_get_property(this, name.c_str());
+    caValue* value = term_get_property(this, name);
     if (value == NULL)
         return defaultValue;
     else
         return as_float(value);
 }
 
-int Term::intPropOptional(std::string const& name, int defaultValue)
+int Term::intPropOptional(const char* name, int defaultValue)
 {
-    caValue* value = term_get_property(this, name.c_str());
+    caValue* value = term_get_property(this, name);
     if (value == NULL)
         return defaultValue;
     else
         return as_int(value);
 }
-std::string Term::stringPropOptional(std::string const& name, std::string const& defaultValue)
+std::string Term::stringPropOptional(const char* name, const char* defaultValue)
 {
-    caValue* value = term_get_property(this, name.c_str());
+    caValue* value = term_get_property(this, name);
     if (value == NULL)
         return defaultValue;
     else

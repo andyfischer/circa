@@ -110,25 +110,25 @@ struct Term : public caTerm
 
     std::string toString();
 
-    bool hasProperty(std::string const& name);
-    caValue* addProperty(std::string const& name, Term* type);
-    void removeProperty(std::string const& name);
+    bool hasProperty(const char* name);
+    caValue* addProperty(const char* name, Term* type);
+    void removeProperty(const char* name);
 
-    int intProp(std::string const& name);
-    float floatProp(std::string const& name);
-    bool boolProp(std::string const& name);
-    std::string const& stringProp(std::string const& name);
+    int intProp(const char* name);
+    float floatProp(const char* name);
+    bool boolProp(const char* name);
+    std::string const& stringProp(const char* name);
 
     void setProp(const char* name, caValue* value);
-    void setIntProp(std::string const& name, int i);
-    void setFloatProp(std::string const& name, float f);
-    void setBoolProp(std::string const& name, bool b);
-    void setStringProp(std::string const& name, std::string const& s);
+    void setIntProp(const char* name, int i);
+    void setFloatProp(const char* name, float f);
+    void setBoolProp(const char* name, bool b);
+    void setStringProp(const char* name, std::string const& s);
 
-    int intPropOptional(std::string const& name, int defaultValue);
-    float floatPropOptional(std::string const& name, float defaultValue);
-    bool boolPropOptional(std::string const& name, bool defaultValue);
-    std::string stringPropOptional(std::string const& name, std::string const& defaultValue);
+    int intPropOptional(const char* name, int defaultValue);
+    float floatPropOptional(const char* name, float defaultValue);
+    bool boolPropOptional(const char* name, bool defaultValue);
+    std::string stringPropOptional(const char* name, const char* defaultValue);
 };
 
 // Allocate a new Term object.
