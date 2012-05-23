@@ -71,7 +71,6 @@ namespace sys
     def arg(int index) -> String
     def dll_patch()
     def module_search_paths() -> List
-    def do_admin_command(String cmd) -> String
 
 
 -- Load a module from a file.
