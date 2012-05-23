@@ -22,4 +22,6 @@ void pack_state(caStack* stack);
 
 void get_declared_state(caStack* stack);
 
+void branch_update_existing_pack_state_calls(Branch* branch);
+
 } // namespace circa

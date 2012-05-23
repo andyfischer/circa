@@ -16,7 +16,6 @@
 
 namespace circa {
 
-static void branch_update_existing_pack_state_calls(Branch* branch);
 static void get_list_of_state_outputs(Branch* branch, int position, TermList* output);
 static void append_final_pack_state(Branch* branch);
 
@@ -211,7 +210,7 @@ static void get_list_of_state_outputs(Branch* branch, int position, TermList* ou
     }
 }
 
-static void branch_update_existing_pack_state_calls(Branch* branch)
+void branch_update_existing_pack_state_calls(Branch* branch)
 {
     if (branch->stateType == NULL) {
         // No state type, make sure there's no pack_state call.

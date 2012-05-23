@@ -1,0 +1,20 @@
+Step: 1
+gen = 0, age = 0.1
+gen = 1, age = 0.1
+gen = 2, age = 0.1
+gen = 3, age = 0.1
+Step: 2
+gen = 0, age = 0.2
+gen = 1, age = 0.2
+gen = 2, age = 0.2
+gen = 3, age = 0.2
+Step: 3
+gen = 0, age = 0.3
+gen = 1, age = 0.3
+gen = 2, age = 0.3
+gen = 3, age = 0.3
+Step: 4
+gen = 0, age = 0.4
+gen = 1, age = 0.4
+gen = 2, age = 0.4
+gen = 3, age = 0.4

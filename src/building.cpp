@@ -577,6 +577,8 @@ void update_extra_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
 
+    bool needToUpdatePackState = false;
+
     for (int index=1; ; index++) {
         Term* placeholder = term_get_output_placeholder(term, index);
         if (placeholder == NULL)
@@ -599,8 +601,11 @@ void update_extra_outputs(Term* term)
             extra_output = existingSlot;
         
         if (extra_output == NULL) {
-            extra_output = apply(term->owningBranch, EXTRA_OUTPUT_FUNC, TermList(term), name);
+            extra_output = apply(branch, EXTRA_OUTPUT_FUNC, TermList(term), name);
             move_to_index(extra_output, term->index + index);
+
+            if (is_state_input(placeholder))
+                needToUpdatePackState = true;
         }
 
         change_declared_type(extra_output, placeholder->type);
@@ -608,6 +613,9 @@ void update_extra_outputs(Term* term)
         if (is_state_input(placeholder))
             extra_output->setBoolProp("state", true);
     }
+
+    if (needToUpdatePackState)
+        branch_update_existing_pack_state_calls(branch);
 }
 
 Term* get_extra_output(Term* term, int index)

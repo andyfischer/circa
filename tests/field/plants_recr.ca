@@ -1,13 +1,9 @@
 
--- Global context, will probably make this implicit in the future.
-env = input() -> ScriptContext
-time = env.time
-mouse = env.mouse
-bounds = env.bounds
-time = env.time
-time_delta = delta(time)
 
-env.background(#fff)
+def elapsed() -> number
+    state t = 0.0
+    t += .1
+    return t
 
 base_grow_rate = 200.0
 max_segment_length = 100.0 -- 10 to 30
@@ -31,9 +27,9 @@ type Segment {
 def Segment.step(seg)
     state wiggle_value = rand() - .5
     state thickness_ratio = 1.0
-    age = env.elapsed
+    age = elapsed()
 
-    print('age = ' age)
+    print('gen = ' seg.generation ', age = ' age)
 
     -- length
     target_length = base_grow_rate * age
@@ -50,7 +46,7 @@ def Segment.step(seg)
     tip_l = end_loc + [-1 0] * (thickness/2)
     tip_r = end_loc + [1 0] * (thickness/2)
 
-    env.draw_poly([base_l tip_l tip_r base_r] #0f0)
+    -- env.draw_poly([base_l tip_l tip_r base_r] #0f0)
 
     if seg.generation < generation_limit
 
@@ -61,10 +57,17 @@ def Segment.step(seg)
         child.generation = seg.generation + 1
         child.step
 
+def f()
+    state i = 0
+    i += 1
+    print("Step: " i)
 
+    root = create(Segment)
+    root.base_loc = [300 300]
+    root.step()
 
-
-root = create(Segment)
-root.base_loc = [300 300]
-root.step()
-
+s = null
+f(state = s)
+f(state = s)
+f(state = s)
+f(state = s)

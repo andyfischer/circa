@@ -1,1 +1,1 @@
-scons --directory $CIRCA_HOME build/circa_d
+cd $CIRCA_HOME && make command_line
