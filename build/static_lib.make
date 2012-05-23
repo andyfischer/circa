@@ -24,7 +24,7 @@ ifeq ($(config),debug)
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/libcirca_d.a
   DEFINES   += 
-  INCLUDES  += -I../include -I../include
+  INCLUDES  += -I../include -I../src
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
@@ -46,7 +46,7 @@ ifeq ($(config),release)
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/libcirca.a
   DEFINES   += 
-  INCLUDES  += -I../include -I../include
+  INCLUDES  += -I../include -I../src
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 

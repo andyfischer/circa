@@ -21,7 +21,7 @@ solution "Circa"
             "src/generated/stdlib_script_text.cpp",
             }
         excludes { "src/main.cpp" }
-        includedirs {"include"}
+        includedirs {"src"}
 
         configuration "Debug"
             targetname "circa_d"
@@ -43,5 +43,5 @@ solution "Circa"
         targetdir "build"
         location "build"
         files {"tests/internal/*.cpp"}
+        includedirs {"src"}
         links {"static_lib"}
-
