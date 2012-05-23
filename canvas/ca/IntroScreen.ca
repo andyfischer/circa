@@ -7,7 +7,7 @@ msg_name = msg[0]
 
 state ButtonBar scriptChoices = button_bar([
         ["Asteroids", "demos/asteroids.ca"],
-        ["Plant", "demos/plant.ca"]
+        ["Plants", "demos/plants.ca"]
         ["Mouse test", "demos/mouse_test.ca"]
         ])
 
