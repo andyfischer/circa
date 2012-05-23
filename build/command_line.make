@@ -24,7 +24,7 @@ ifeq ($(config),debug)
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/circa_d
   DEFINES   += 
-  INCLUDES  += -I../include
+  INCLUDES  += -I../include -I../src
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g
   CXXFLAGS  += $(CFLAGS) 
@@ -46,7 +46,7 @@ ifeq ($(config),release)
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/circa
   DEFINES   += 
-  INCLUDES  += -I../include
+  INCLUDES  += -I../include -I../src
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g -O3
   CXXFLAGS  += $(CFLAGS) 
@@ -64,7 +64,12 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/main.o \
+	$(OBJDIR)/build_tool.o \
+	$(OBJDIR)/command_line.o \
+	$(OBJDIR)/debugger_repl.o \
+	$(OBJDIR)/exporting_parser.o \
+	$(OBJDIR)/generate_cpp.o \
+	$(OBJDIR)/repl.o \
 
 RESOURCES := \
 
@@ -125,7 +130,22 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/main.o: ../src/main.cpp
+$(OBJDIR)/build_tool.o: ../src/tools/build_tool.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/command_line.o: ../src/tools/command_line.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/debugger_repl.o: ../src/tools/debugger_repl.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/exporting_parser.o: ../src/tools/exporting_parser.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/generate_cpp.o: ../src/tools/generate_cpp.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/repl.o: ../src/tools/repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

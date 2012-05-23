@@ -69,7 +69,6 @@ OBJECTS := \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/codegen.o \
-	$(OBJDIR)/command_line.o \
 	$(OBJDIR)/control_flow.o \
 	$(OBJDIR)/cpp_codegen.o \
 	$(OBJDIR)/debug.o \
@@ -115,13 +114,6 @@ OBJECTS := \
 	$(OBJDIR)/update_cascades.o \
 	$(OBJDIR)/weak_ptrs.o \
 	$(OBJDIR)/world.o \
-	$(OBJDIR)/build_tool.o \
-	$(OBJDIR)/command_reader.o \
-	$(OBJDIR)/debugger_repl.o \
-	$(OBJDIR)/exporting_parser.o \
-	$(OBJDIR)/file_checker.o \
-	$(OBJDIR)/generate_cpp.o \
-	$(OBJDIR)/repl.o \
 	$(OBJDIR)/all_builtin_functions.o \
 	$(OBJDIR)/all_builtin_types.o \
 	$(OBJDIR)/setup_builtin_functions.o \
@@ -199,9 +191,6 @@ $(OBJDIR)/code_iterators.o: ../src/code_iterators.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/codegen.o: ../src/codegen.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/command_line.o: ../src/command_line.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/control_flow.o: ../src/control_flow.cpp
@@ -337,27 +326,6 @@ $(OBJDIR)/weak_ptrs.o: ../src/weak_ptrs.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/world.o: ../src/world.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/build_tool.o: ../src/tools/build_tool.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/command_reader.o: ../src/tools/command_reader.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/debugger_repl.o: ../src/tools/debugger_repl.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/exporting_parser.o: ../src/tools/exporting_parser.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_checker.o: ../src/tools/file_checker.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/generate_cpp.o: ../src/tools/generate_cpp.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/repl.o: ../src/tools/repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/all_builtin_functions.o: ../src/generated/all_builtin_functions.cpp

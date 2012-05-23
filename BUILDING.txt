@@ -1,19 +1,60 @@
 
 # Prerequisites #
 
- - A C++ compiler
+ - GCC (or a compatible alternative)
  - Python 2.6 or greater
- - SCons 2.0 or greater
 
 # Instructions #
 
-0. Open up a command prompt
+0. Run: python tools/prebuild.py
 
-1. Run "python tools/prebuild.py"
+1. Run: make <optional config> <optional target>
 
-2. Run "scons <target>" , where <target> is one of the following:
+  The configuration can be:
 
-  build/libcirca_d.a - Static library (debug mode)
-  build/libcirca.a   - Static library (release mode)
-  build/circa_d      - Command-line binary (debug mode)
-  build/circa        - Command-line binary (release mode)
+    config=debug
+     - Assertions enabled and optimizations disabled (this is the default)
+
+    config=relase
+     - Assertions disabled and optimizations enabled
+
+  The target can be:
+
+    static_lib
+     - Static library, found at: build/libcirca.a
+       Debug filename ends with _d, as in: libcirca_d.a
+       On Windows the filename is: circa.lib
+
+    command_line
+     - Command-line tool with REPL. Found at: build/circa
+       Debug filename ends with _d, as in: circa_d
+       On Windows the filename is: circa.exe
+
+    unit_tests
+     - Unit testing app. Found at: build/circa_test
+
+Example commands:
+
+  make static_lib config=release 
+   - Build static library in release mode
+
+# Advanced building #
+
+This section has more detail on the build process, if you plan on hacking on the
+code or doing alternative builds.
+
+  Prebuild
+    The script at tools/prebuild.py serves to create some generated C++ files
+    at src/generated/* . This script should be run whenever a file is created
+    or deleted, but it can be skipped when doing repeated builds.
+
+  Makefiles
+    The makefiles are generated using a premake4 script. More info at:
+        http://industriousone.com/premake
+
+    Whenever a source file is added or removed, the makefiles should be
+    regenerated using "premake4 gmake". The makefiles are checked in to Git,
+    so that people can download & make without using premake4.
+
+    premake4 is pretty awesome and supports lots of project types (like visual
+    studio or Xcode), if you are interested in something other than makefiles.

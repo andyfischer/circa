@@ -4,29 +4,309 @@
 
 #include "branch.h"
 #include "building.h"
-#include "kernel.h"
-#include "codegen.h"
 #include "evaluation.h"
-#include "feedback.h"
 #include "file_utils.h"
 #include "introspection.h"
+#include "kernel.h"
 #include "list.h"
 #include "modules.h"
+#include "names.h"
 #include "parser.h"
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
+#include "tagged_value.h"
 #include "term.h"
+#include "token.h"
 
-#include "tools/build_tool.h"
-#include "tools/command_reader.h"
-#include "tools/generate_cpp.h"
-#include "tools/debugger_repl.h"
-#include "tools/exporting_parser.h"
-#include "tools/file_checker.h"
-#include "tools/repl.h"
+#include "circa/file.h"
+#include "build_tool.h"
+#include "codegen.h"
+#include "debugger_repl.h"
+#include "exporting_parser.h"
+#include "generate_cpp.h"
+#include "file_checker.h"
+#include "repl.h"
 
 namespace circa {
+
+void read_stdin_line(caValue* line)
+{
+    char* buf = NULL;
+    size_t size = 0;
+    ssize_t read = getline(&buf, &size, stdin);
+
+    if (read == -1) {
+        set_null(line);
+        free(buf);
+        return;
+    }
+
+    buf[read] = 0;
+
+    // Truncate newline
+    if (read > 0 && buf[read-1] == '\n')
+        buf[read - 1] = 0;
+
+    set_string(line, buf);
+    free(buf);
+}
+
+void parse_string_as_argument_list(caValue* str, List* output)
+{
+    // Read the tokens as a space-seperated list of strings.
+    // TODO is to be more smart about word boundaries: spaces inside
+    // quotes or parentheses shouldn't break apart items.
+
+    TokenStream tokens;
+    tokens.reset(as_cstring(str));
+    
+    Value itemInProgress;
+    set_string(&itemInProgress, "");
+
+    while (!tokens.finished()) {
+
+        if (tokens.nextIs(TK_WHITESPACE)) {
+            if (!equals_string(&itemInProgress, "")) {
+                copy(&itemInProgress, list_append(output));
+                set_string(&itemInProgress, "");
+            }
+
+        } else {
+            string_append(&itemInProgress, tokens.nextStr().c_str());
+        }
+
+        tokens.consume();
+    }
+
+    if (!equals_string(&itemInProgress, "")) {
+        copy(&itemInProgress, list_append(output));
+        set_string(&itemInProgress, "");
+    }
+}
+
+void do_add_lib_path(List* args, caValue* reply)
+{
+    modules_add_search_path(as_cstring(list_get(args, 0)));
+}
+
+void do_echo(List* args, caValue* reply)
+{
+    set_string(reply, to_string(args));
+}
+
+void do_file_command(List* args, caValue* reply)
+{
+    bool printRaw = false;
+    bool printRawWithProps = false;
+    bool printSource = false;
+    bool printState = false;
+    bool dontRunScript = false;
+
+    int argIndex = 1;
+
+    while (true) {
+
+        if (argIndex >= args->length()) {
+            set_string(reply, "No filename found");
+            return;
+        }
+
+        if (string_eq(args->get(argIndex), "-p")) {
+            printRaw = true;
+            argIndex++;
+            continue;
+        }
+
+        if (string_eq(args->get(argIndex), "-pp")) {
+            printRawWithProps = true;
+            argIndex++;
+            continue;
+        }
+
+        if (string_eq(args->get(argIndex), "-s")) {
+            printSource = true;
+            argIndex++;
+            continue;
+        }
+        if (string_eq(args->get(argIndex), "-print-state")) {
+            printState = true;
+            argIndex++;
+            continue;
+        }
+        if (string_eq(args->get(argIndex), "-n")) {
+            dontRunScript = true;
+            argIndex++;
+            continue;
+        }
+        break;
+    }
+
+    Branch branch;
+    load_script(&branch, as_cstring(args->get(argIndex)));
+
+    if (printSource)
+        std::cout << get_branch_source_text(&branch);
+
+    if (dontRunScript)
+        return;
+    
+    Stack context;
+    evaluate_branch(&context, &branch);
+
+    if (printState)
+        std::cout << to_string(&context.state) << std::endl;
+
+    if (error_occurred(&context)) {
+        std::cout << "Error occurred:\n";
+        print_error_stack(&context, std::cout);
+        std::cout << std::endl;
+        return;
+    }
+}
+
+void rewrite_branch(Branch* branch, caValue* contents, caValue* reply)
+{
+    clear_branch(branch);
+    parser::compile(branch, parser::statement_list, as_cstring(contents));
+
+    post_module_load(branch);
+
+    if (has_static_errors(branch)) {
+        std::stringstream errors;
+        print_static_errors_formatted(branch);
+        set_string(reply, errors.str());
+    } else {
+        set_name(reply, name_Success);
+    }
+}
+
+void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
+{
+    Name name = name_from_string(branchName);
+
+    Term* term = get_global(name);
+
+    // Create the branch if needed
+    if (term == NULL) {
+        term = apply(kernel(), FUNCS.branch, TermList(), name_to_string(name));
+    }
+
+    // Import the new branch contents
+    Branch* branch = nested_contents(term);
+    rewrite_branch(branch, contents, reply);
+}
+
+void do_update_file(caValue* filename, caValue* contents, caValue* reply)
+{
+    Branch* branch = find_module_from_filename(as_cstring(filename));
+
+    if (branch == NULL) {
+        set_string(reply, "Module not found");
+        return;
+    }
+
+    rewrite_branch(branch, contents, reply);
+}
+
+void do_admin_command(caValue* input, caValue* reply)
+{
+    // Identify the command
+    int first_space = string_find_char(input, 0, ' ');
+    if (first_space == -1)
+        first_space = string_length(input);
+
+    Value command;
+    string_slice(input, 0, first_space, &command);
+
+    set_null(reply);
+
+    if (equals_string(&command, "add_lib_path")) {
+        //List args;
+        //parse_tokens_as_argument_list(&tokens, &args);
+
+    } else if (equals_string(&command, "file")) {
+
+        List args;
+        parse_string_as_argument_list(input, &args);
+        do_file_command(&args, reply);
+
+    } else if (equals_string(&command, "echo")) {
+
+        List args;
+        parse_string_as_argument_list(input, &args);
+        do_echo(&args, reply);
+
+    } else if (equals_string(&command, "write_branch")) {
+
+        int nextSpace = string_find_char(input, first_space+1, ' ');
+        if (nextSpace == -1) {
+            set_string(reply, "Syntax error, not enough arguments");
+            return;
+        }
+        
+        Value branchName;
+        string_slice(input, first_space+1, nextSpace, &branchName);
+
+        Value contents;
+        string_slice(input, nextSpace+1, -1, &contents);
+
+        do_write_branch(&branchName, &contents, reply);
+
+    } else if (equals_string(&command, "update_file")) {
+
+        int nextSpace = string_find_char(input, first_space+1, ' ');
+        if (nextSpace == -1) {
+            set_string(reply, "Syntax error, not enough arguments");
+            return;
+        }
+        
+        Value filename;
+        string_slice(input, first_space+1, nextSpace, &filename);
+
+        Value contents;
+        string_slice(input, nextSpace+1, -1, &contents);
+
+        do_update_file(&filename, &contents, reply);
+
+    } else if (equals_string(&command, "source_repro")) {
+        List args;
+        parse_string_as_argument_list(input, &args);
+        Branch branch;
+        load_script(&branch, as_cstring(args[1]));
+        std::cout << get_branch_source_text(&branch);
+
+    } else {
+
+        set_string(reply, "Unrecognized command: ");
+        string_append(reply, &command);
+    }
+}
+
+void run_commands_from_stdin()
+{
+    while (true) {
+        Value line;
+        read_stdin_line(&line);
+        if (!is_string(&line))
+            break;
+
+        Value reply;
+        do_admin_command(&line, &reply);
+
+        if (is_null(&reply))
+            ; // no op
+        else if (is_string(&reply))
+            std::cout << as_string(&reply) << std::endl;
+        else
+            std::cout << to_string(&reply) << std::endl;
+
+        // We need to tell the stdout reader that we have finished. The proper
+        // way to do this would probably be to format the entire output as an
+        // escapted string. But, this is what we'll do for now:
+        std::cout << ":done" << std::endl;
+    }
+}
 
 void print_usage()
 {
@@ -349,8 +629,6 @@ int run_command_line(caWorld* world, caValue* args)
     return 0;
 }
 
-} // namespace circa
-
 EXPORT int circa_run_command_line(caWorld* world, int argc, const char* args[])
 {
     circa::Value args_v;
@@ -359,4 +637,18 @@ EXPORT int circa_run_command_line(caWorld* world, int argc, const char* args[])
         circa_set_string(circa_append(&args_v), args[i]);
 
     return circa::run_command_line(world, &args_v);
+}
+
+} // namespace circa
+
+int main(int argc, const char * args[])
+{
+    caWorld* world = circa_initialize();
+
+    int result = 0;
+    result = circa_run_command_line(world, argc, args);
+
+    circa_shutdown(world);
+    
+    return result;
 }

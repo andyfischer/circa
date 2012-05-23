@@ -14,13 +14,11 @@ solution "Circa"
         targetdir "build"
         files {
             "src/*.cpp",
-            "src/tools/*.cpp",
             "src/generated/all_builtin_functions.cpp",
             "src/generated/all_builtin_types.cpp",
             "src/generated/setup_builtin_functions.cpp",
             "src/generated/stdlib_script_text.cpp",
             }
-        excludes { "src/main.cpp" }
         includedirs {"src"}
 
         configuration "Debug"
@@ -31,8 +29,16 @@ solution "Circa"
         targetname "circa"
         targetdir "build"
         location "build"
-        files {"src/main.cpp"}
+        files {
+            "src/tools/build_tool.cpp",
+            "src/tools/command_line.cpp",
+            "src/tools/debugger_repl.cpp",
+            "src/tools/exporting_parser.cpp",
+            "src/tools/generate_cpp.cpp",
+            "src/tools/repl.cpp"
+        }
         links {"static_lib"}
+        includedirs {"src"}
 
         configuration "Debug"
             targetname "circa_d"
