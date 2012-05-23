@@ -288,6 +288,9 @@ void unpack_state(caStack* stack)
     caValue* container = circa_input(stack, 0);
     Term* identifyingTerm = (Term*) circa_caller_input_term(stack, 1);
 
+    if (identifyingTerm == NULL)
+        return circa_output_error(stack, "input 1 is NULL");
+
     caValue* element = get_field(container, unique_name(identifyingTerm));
 
     if (element == NULL) {

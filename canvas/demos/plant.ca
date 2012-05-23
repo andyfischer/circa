@@ -25,22 +25,27 @@ max_segment_radius = 1.0
 max_segment_angle = 1.0 -- .5 - 1
 max_segment_length = 10.0 -- 10 - 30
 wiggle_factor = 0.07 -- 0 - 1
-generation_limit = 21
+generation_limit = 3
 distance_between_branches_min = 30.0 -- 20 - 100
 distance_between_branches_var = 20.0 -- 20 - 100
 branch_split_angle = .1
 
+print('elapsed = ' env.elapsed)
+
+
 def segment(SegmentInput input)
-    state number age = 0.0
     state wiggle_value = rand() - .5
     state thickness_ratio = 1.0
-
-    age += time_delta
+    age = env.elapsed
 
     -- length
     target_length = base_grow_rate * age
     min(@target_length, max_segment_length)
     length = target_length * (1 - (1 / (age + 1)))
+
+    print('age = ' age)
+    print('base_grow_rate = ' base_grow_rate)
+    print('length = ' length)
 
     -- thickness
     -- todo
@@ -74,6 +79,9 @@ def segment(SegmentInput input)
 
     if nextSeg.generation > generation_limit
         return
+
+    -- temp, dont branch
+    distance_till_branch = 100
 
     -- check to branch
     if distance_till_branch < 0
