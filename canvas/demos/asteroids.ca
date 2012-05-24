@@ -64,14 +64,16 @@ def srand() -> number
     state value = rand()
     return value
 
-drift = [time / 1000, time / 1000] -> Point
+drift = [time time] -> Point
+mult(@drift 2)
 
 num_stars = 100
 points = for i in 0..num_stars
-    state Point loc = random_location()
-    add(@loc, drift)
+    state Point original_loc = random_location()
+    loc = add(original_loc, drift)
     wrap_around(@loc)
     loc
+
 env.draw_points(points, #fff)
 
 def draw_ship(Point loc, number facing)
