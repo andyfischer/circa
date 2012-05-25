@@ -218,8 +218,9 @@ Type* unbox_type(caValue* val)
 static void run_static_type_query(StaticTypeQuery* query)
 {
     // Check that the subject term and subjectType match.
-    if (query->subject && query->subjectType)
+    if (query->subject && query->subjectType) {
         ca_assert(query->subjectType == declared_type(query->subject));
+	}
 
     // If the subject has a NULL type then just fail early. This should only
     // happen when deleting terms.

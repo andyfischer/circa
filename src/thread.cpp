@@ -4,6 +4,11 @@
 
 #include "circa/thread.h"
 
+// Currently unsupported on Windows
+#ifdef WINDOWS
+#undef CIRCA_ENABLE_THREADING
+#endif
+
 #if CIRCA_ENABLE_THREADING
 
 #include <pthread.h>

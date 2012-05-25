@@ -24,10 +24,10 @@ struct Hashtable {
 const int INITIAL_SIZE = 10;
 
 // When reallocating a table, how many slots should initially be filled.
-const float INITIAL_LOAD_FACTOR = 0.3;
+const float INITIAL_LOAD_FACTOR = 0.3f;
 
 // The load at which we'll trigger a reallocation.
-const float MAX_LOAD_FACTOR = 0.75;
+const float MAX_LOAD_FACTOR = 0.75f;
 
 int get_hash_value(caValue* value)
 {

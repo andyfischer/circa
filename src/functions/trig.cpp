@@ -5,8 +5,8 @@
 namespace circa {
 namespace trig_function {
 
-    float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
-    float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
+    float radians_to_degrees(float radians) { return radians * 180.0f / M_PI; }
+    float degrees_to_radians(float unit) { return unit * M_PI / 180.0f; }
 
     CA_FUNCTION(evaluate_sin)
     {

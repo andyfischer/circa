@@ -38,7 +38,7 @@ static void parse_value(TokenStream* tokens, caValue* out)
         circa_set_int(out, atoi(tokens->nextStr().c_str()));
         tokens->consume(TK_INTEGER);
     } else if (tokens->nextIs(TK_FLOAT)) {
-        circa_set_float(out, atof(tokens->nextStr().c_str()));
+        circa_set_float(out, (float) atof(tokens->nextStr().c_str()));
         tokens->consume(TK_FLOAT);
     } else if (tokens->nextIs(TK_STRING)) {
         std::string s = tokens->nextStr();

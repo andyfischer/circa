@@ -1,3 +1,9 @@
+
+newoption {
+    trigger = "windows",
+    description = "Build for Windows platform"
+}
+
 solution "Circa"
     configurations { "Debug", "Release" }
     language "C++"
@@ -6,6 +12,9 @@ solution "Circa"
 
     configuration "Release"
         flags { "OptimizeSpeed" }
+
+    configuration "windows"
+        defines { "WINDOWS" }
 
     project "static_lib"
         kind "StaticLib"
