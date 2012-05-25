@@ -250,6 +250,16 @@ void Painter__translate(caStack* stack)
 
     painter->translate(to_qpoint(delta));
 }
+void Painter__boundingRect(caStack* stack)
+{
+    QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
+    caValue* r = circa_input(stack, 1);
+    int flags = circa_int_input(stack, 2);
+    const char* text = circa_string(circa_input(stack, 3));
+
+    QRectF rect = painter->boundingRect(to_qrect(r), flags, text);
+    circa_set_vec4(circa_output(stack, 0), rect.left(), rect.top(), rect.right(), rect.bottom());
+}
 void Painter__drawEllipse(caStack* stack)
 {
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
@@ -265,6 +275,10 @@ void Painter__drawText(caStack* stack)
     const char* text = circa_string(circa_input(stack, 3));
 
     painter->drawText(to_qrect(r), flags, text);
+
+    // Save the bounding rect as output
+    QRectF rect = painter->boundingRect(to_qrect(r), flags, text);
+    circa_set_vec4(circa_output(stack, 0), rect.left(), rect.top(), rect.right(), rect.bottom());
 }
 void Painter__drawLine(caStack* stack)
 {
@@ -377,6 +391,7 @@ static const caFunctionBinding IMPORTS[] = {
     {"Painter.setPen", Painter__setPen},
     {"Painter.rotate", Painter__rotate},
     {"Painter.translate", Painter__translate},
+    {"Painter.boundingRect", Painter__boundingRect},
     {"Painter.drawEllipse", Painter__drawEllipse},
     {"Painter.drawText", Painter__drawText},
     {"Painter.drawLine", Painter__drawLine},

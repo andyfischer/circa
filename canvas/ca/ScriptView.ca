@@ -18,12 +18,14 @@ state Set keysDown
 state number time
 state number timeShift = 0
 
-state ButtonBar topButtons = button_bar([
+buttons = [
     ["Reset" :reset]
     ["Freeze" :freezeState]
     ["Exit" :exit]
-    ])
-topButtons.arrange([10 10 300 40], :horizontal)
+    ["Dump" :dump]
+    ]
+state ButtonBar topButtons = button_bar(buttons)
+topButtons.arrange([10 10 buttons.length*100 40], :horizontal)
 
 -- set the state of the Freeze button
 topButtons.setToggled(1, state_frozen)
@@ -114,6 +116,8 @@ elif msg[0] == 'onInputEvent'
     elif action == :reset
         print('clicked reset')
         userState = null
+    elif action == :dump
+        userBranch.dump
     elif action == :exit
         send('View' ['changeScreen' 'IntroScreen'])
     elif action != null

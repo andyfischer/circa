@@ -29,6 +29,13 @@ namespace parser {
 
 Term* compile(Branch* branch, ParsingStep step, std::string const& input)
 {
+    log_start(0, "parser::compile");
+    log_arg("branch.id", branch->id);
+    log_arg("input", input.c_str());
+    log_finish();
+
+    ca_assert(input != NULL);
+
     branch_start_changes(branch);
 
     TokenStream tokens(input);
@@ -38,6 +45,10 @@ Term* compile(Branch* branch, ParsingStep step, std::string const& input)
     branch_finish_changes(branch);
 
     ca_assert(branch_check_invariants_print_result(branch, std::cout));
+
+    log_start(0, "parser::compile finished");
+    log_arg("branch.length", branch->length());
+    log_finish();
 
     return result;
 }

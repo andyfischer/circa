@@ -1261,6 +1261,8 @@ EXPORT caWorld* circa_initialize()
         }
     }
 
+    log_msg(0, "finished circa_initialize");
+
     return world;
 }
 

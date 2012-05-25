@@ -30,6 +30,8 @@
 
 namespace circa {
 
+static unsigned int g_nextBranchID = 1;
+
 void assert_valid_branch(Branch const* obj)
 {
     // this once did something
@@ -43,6 +45,7 @@ Branch::Branch()
     currentlyCascadingUpdates(false),
     emptyEvaluation(false)
 {
+    id = g_nextBranchID++;
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
 }
 

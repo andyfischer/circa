@@ -10,13 +10,17 @@ time_delta = delta(time)
 env.background(#000)
 
 base_grow_rate = 40.0
-max_segment_length = 30.0 -- 10 to 30
+max_segment_length = 10.0 -- 10 to 30
 max_segment_radius = 1.0
 max_segment_angle = 1.0 -- .5 - 1
 wiggle_factor = 0.07 -- 0 - 1
-generation_limit = 8
-distance_between_branches = 30.0
+generation_limit = 15
+distance_between_branches = 20.0
 distance_between_branches_var = 30.0
+
+def seed() -> number
+    state r = rand()
+    return r
 
 type Segment {
   int generation
@@ -29,17 +33,17 @@ type Segment {
   number growth_rate
 }
 
-def seed() -> number
-    state r = rand()
-    return r
-
-def random_sign() -> number
-    return seed() > 0.5
 
 def Segment.step(seg)
     state wiggle_value = rand() - .5
     state thickness_ratio = 1.0
     age = env.elapsed
+
+    print('step: ' seg)
+    print(age)
+
+    -- whether this is the tip
+    reached_last_gen = seg.generation >= generation_limit
 
     -- length
     target_length = max_segment_length
@@ -56,6 +60,7 @@ def Segment.step(seg)
     else
         growth_finished = false
 
+
     stretched_length = 3 * log(age)
     max(@stretched_length 0)
     min(@stretched_length 10.0)
@@ -67,6 +72,8 @@ def Segment.step(seg)
     thickness = 10.0 * 1 / (seg.generation + 1)
     tip_thickness = 10.0 * 1 / (seg.generation + 2)
 
+    cond(reached_last_gen, 0.0, @tip_thickness)
+
     base_l = seg.base_loc + polar(seg.base_angle - 90) * (thickness/2)
     base_r = seg.base_loc + polar(seg.base_angle + 90) * (thickness/2)
 
@@ -74,15 +81,6 @@ def Segment.step(seg)
     tip_r = end_loc + [1 0] * (tip_thickness/2)
 
     env.draw_poly([base_l tip_l tip_r base_r] #0f0)
-
-    -- angle of curvature
-    target_angle = 5.0
-    angle = target_angle * (1 - (1 / (age + 1)))
-
-    stretched_angle = log(age)
-    angle += stretched_angle
-
-    distance_till_branch = seg.distance_till_branch - target_length
 
     -- Don't grow past generation
     if seg.generation >= generation_limit
@@ -92,12 +90,15 @@ def Segment.step(seg)
     if not growth_finished
         return
 
+    e = elapsed()
+    s = 0.7
+
     -- Check to split
     if reached_branch
 
         -- Branch
         for dir in [-1 1]
-            branch_angle = seed() * 40.0 * dir
+            branch_angle = s * 40.0 * dir
             child = create(Segment)
             child.base_loc = end_loc
             child.base_angle = seg.base_angle + branch_angle
@@ -110,14 +111,15 @@ def Segment.step(seg)
     -- Grow a child segment
     else
         target_angle_delt = (seed() - 0.5) * 10.0
-        angle_delt = min(age target_angle_delt)
+        target_angle_delt = 5.0
+        angle_delt = min(e / 10, target_angle_delt)
         
         child = create(Segment)
         child.base_loc = end_loc
         child.base_angle = seg.base_angle + angle_delt
         child.generation = seg.generation + 1
-        child.distance_till_branch = distance_till_branch
-        child.growth_rate = seg.growth_rate * .9 - seed() * .1
+        child.distance_till_branch = seg.distance_till_branch - target_length
+        child.growth_rate = seg.growth_rate * .9
 
         child.step
 

@@ -25,9 +25,10 @@ if msg_name == 'onPaintEvent'
     font = create_font("Sans Serif", 30)
     painter.setFont(font)
     painter.setColor(#C9E8E8)
-    painter.drawText([20 30 300 100] 0 "circa")
+    right = 10
+    right = painter.drawText([right 30 300 500] 0 "circa").x2 + 5
     painter.setColor(#E1BC66)
-    painter.drawText([90 30 300 100] 0 "alpha")
+    right = painter.drawText([right 30 300 500] 0 "alpha").x2 + 5
     painter.setColor(#CD7994)
     painter.drawText([170 30 300 100] 0 "4")
 

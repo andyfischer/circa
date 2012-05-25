@@ -16,7 +16,7 @@
 
 namespace circa {
 
-static unsigned int gNextGlobalID = 1;
+static unsigned int g_nextTermID = 1;
 
 Term::Term()
   : weakPtr(0),
@@ -28,7 +28,7 @@ Term::Term()
     nestedContents(NULL),
     flags(0)
 {
-    id = gNextGlobalID++;
+    id = g_nextTermID++;
 
     debug_register_valid_object(this, TERM_OBJECT);
 

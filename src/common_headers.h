@@ -130,7 +130,8 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 #define CIRCA_ENABLE_THREADING 1
 #endif
 
-// ENABLE_CL_TOOLS - Enables the separate command-line tools
-#ifndef CIRCA_ENABLE_CL_TOOLS
-#define CIRCA_ENABLE_CL_TOOLS 1
+// ENABLE_LOGGING - Enables internal logging
+#ifndef CIRCA_ENABLE_LOGGING
+#define CIRCA_ENABLE_LOGGING 1
 #endif
+

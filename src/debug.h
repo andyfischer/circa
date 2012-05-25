@@ -39,4 +39,22 @@ void internal_error(std::string const& message);
 
 void ca_debugger_break();
 
+// Internal logging
+#if CIRCA_ENABLE_LOGGING
+
+void log_start(int channel, const char* name);
+void log_arg(const char* key, const char* val);
+void log_arg(const char* key, int val);
+void log_finish();
+void log_msg(int channel, const char* name);
+
+#else
+
+#define log_start(c,n) ;
+#define log_arg(k,v) ;
+#define log_finish() ;
+#define log_msg(c,n) ;
+
+#endif
+
 } // namespace circa

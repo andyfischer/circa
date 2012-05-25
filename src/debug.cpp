@@ -87,4 +87,65 @@ void ca_debugger_break()
 #endif
 }
 
+
+#if CIRCA_ENABLE_LOGGING
+
+FILE* g_logFile = NULL;
+int g_logArgCount = 0;
+int g_logInProgress = false;
+
+void log_start(int channel, const char* name)
+{
+    ca_assert(!g_logInProgress);
+
+    if (g_logFile == NULL)
+        g_logFile = fopen("circa.log", "w");
+
+    // Ignore channel for now
+
+    // Timestamp
+    time_t rawtime;
+    struct tm * timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+
+    char timestamp[100];
+    strftime(timestamp, 100, "%H:%M:%S", timeinfo);
+    fprintf(g_logFile, "%s %s(", timestamp, name);
+
+    g_logArgCount = 0;
+    g_logInProgress = true;
+}
+
+void log_arg(const char* key, const char* val)
+{
+    ca_assert(g_logInProgress);
+    if (g_logArgCount > 0)
+        fprintf(g_logFile, ", ");
+
+    fprintf(g_logFile, "%s = %s", key, val);
+    g_logArgCount++;
+}
+void log_arg(const char* key, int val)
+{
+    char buf[32];
+    sprintf(buf, "%d", val);
+    log_arg(key, buf);
+}
+
+void log_finish()
+{
+    ca_assert(g_logInProgress);
+    fprintf(g_logFile, ")\n");
+    g_logInProgress = false;
+    g_logArgCount = 0;
+}
+void log_msg(int channel, const char* name)
+{
+    log_start(channel, name);
+    log_finish();
+}
+
+#endif
+
 } // namespace circa

@@ -21,6 +21,9 @@ struct Branch : caBranch
 {
     CircaObject header;
 
+    // Globally unique ID. Used for debugging.
+    int id;
+
     // List of content terms. This branch owns all the Term objects in this list.
     TermList _terms;
 
