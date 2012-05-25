@@ -80,7 +80,6 @@ OBJECTS := \
 	$(OBJDIR)/file.o \
 	$(OBJDIR)/file_posix.o \
 	$(OBJDIR)/file_utils.o \
-	$(OBJDIR)/filesystem.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/gc.o \
 	$(OBJDIR)/generic.o \
@@ -224,9 +223,6 @@ $(OBJDIR)/file_posix.o: ../src/file_posix.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_utils.o: ../src/file_utils.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/filesystem.o: ../src/filesystem.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/function.o: ../src/function.cpp

@@ -10,7 +10,6 @@
 #include "code_iterators.h"
 #include "dll_loading.h"
 #include "evaluation.h"
-#include "filesystem.h"
 #include "file_utils.h"
 #include "function.h"
 #include "importing_macros.h"

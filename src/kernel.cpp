@@ -11,7 +11,6 @@
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
-#include "filesystem.h"
 #include "function.h"
 #include "gc.h"
 #include "generic.h"
