@@ -32,4 +32,6 @@ std::string const& as_string(caValue* value);
 
 void set_string(caValue* value, const char* s, int length);
 
+char* circa_strdup(const char* s);
+
 } // namespace circa

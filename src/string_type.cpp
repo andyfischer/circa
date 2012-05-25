@@ -290,4 +290,12 @@ void set_string(caValue* value, const char* s, int length)
     as_std_string(value).assign(s, length);
 }
 
+char* circa_strdup(const char* s)
+{
+    size_t len = strlen(s);
+    char* out = (char*) malloc(len + 1);
+    memcpy(out, s, len + 1);
+    return out;
+}
+
 } // namespace circa

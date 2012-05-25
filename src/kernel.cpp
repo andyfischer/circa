@@ -148,14 +148,6 @@ void file__read_text(caStack* stack)
     set_string(circa_output(stack, 0), circa_read_file(circa_string_input(stack, 0)));
 }
 
-void file__fetch_record(caStack* stack)
-{
-    const char* filename = circa_string_input(stack, 0);
-    Name name = circa_int_input(stack, 1);
-    circa_create_default_output(stack, 0);
-    set_pointer(circa_output(stack, 0), circa_fetch_file_record(filename, name));
-}
-
 void from_string(caStack* stack)
 {
     circa_parse_string(circa_string_input(stack, 0), circa_output(stack, 0));
@@ -1117,7 +1109,6 @@ void install_standard_library(Branch* kernel)
         {"file:version", file__version},
         {"file:exists", file__exists},
         {"file:read_text", file__read_text},
-        {"file:fetch_record", file__fetch_record},
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
@@ -1237,11 +1228,6 @@ EXPORT caWorld* circa_initialize()
     }
 
     caWorld* world = alloc_world();
-
-#if CIRCA_ENABLE_FILESYSTEM
-    // Use standard filesystem by default
-    circa_use_standard_filesystem(world);
-#endif
 
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");

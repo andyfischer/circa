@@ -68,6 +68,7 @@ OBJECTS := \
 	$(OBJDIR)/command_line.o \
 	$(OBJDIR)/debugger_repl.o \
 	$(OBJDIR)/exporting_parser.o \
+	$(OBJDIR)/file_checker.o \
 	$(OBJDIR)/generate_cpp.o \
 	$(OBJDIR)/repl.o \
 
@@ -140,6 +141,9 @@ $(OBJDIR)/debugger_repl.o: ../src/tools/debugger_repl.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/exporting_parser.o: ../src/tools/exporting_parser.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/file_checker.o: ../src/tools/file_checker.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/generate_cpp.o: ../src/tools/generate_cpp.cpp

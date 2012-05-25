@@ -78,7 +78,6 @@ OBJECTS := \
 	$(OBJDIR)/evaluation.o \
 	$(OBJDIR)/feedback.o \
 	$(OBJDIR)/file.o \
-	$(OBJDIR)/file_posix.o \
 	$(OBJDIR)/file_utils.o \
 	$(OBJDIR)/function.o \
 	$(OBJDIR)/gc.o \
@@ -217,9 +216,6 @@ $(OBJDIR)/feedback.o: ../src/feedback.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file.o: ../src/file.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/file_posix.o: ../src/file_posix.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_utils.o: ../src/file_utils.cpp

@@ -34,6 +34,7 @@ solution "Circa"
             "src/tools/command_line.cpp",
             "src/tools/debugger_repl.cpp",
             "src/tools/exporting_parser.cpp",
+            "src/tools/file_checker.cpp",
             "src/tools/generate_cpp.cpp",
             "src/tools/repl.cpp"
         }

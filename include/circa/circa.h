@@ -151,10 +151,6 @@ caWorld* circa_initialize();
 // leak checking tools happier.
 void circa_shutdown(caWorld*);
 
-// Set up a POSIX file handler as a file source. For more control over file sources, see
-// circa/file.h
-void circa_use_standard_filesystem(caWorld* world);
-
 // Add a module search path. This is used when processing 'import' statements.
 void circa_add_module_search_path(caWorld* world, const char* path);
 

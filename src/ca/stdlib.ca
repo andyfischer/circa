@@ -54,11 +54,6 @@ namespace file
         ver = version(filename)
         return changed([filename ver])
 
-    type FileSource;
-    type FileRecord;
-
-    def fetch_record(String filename, Name source) -> FileRecord
-
 namespace refactor
     def rename(Term r, String s)
     def change_function(Term r, Callable func)

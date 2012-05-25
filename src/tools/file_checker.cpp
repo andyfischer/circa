@@ -13,7 +13,6 @@
 #include "../list.h"
 #include "../source_repro.h"
 #include "../static_checking.h"
-#include "../filesystem.h"
 #include "../tagged_value.h"
 
 #include "file_checker.h"
