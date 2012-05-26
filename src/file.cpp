@@ -84,16 +84,17 @@ const char* circa_read_file(const char* filename)
     // Get file size
     fseek(fp, 0, SEEK_END);
     size_t file_size = ftell(fp);
-
     rewind(fp);
 
     entry->contents = (char*) realloc(entry->contents, file_size + 1);
     size_t bytesRead = fread(entry->contents, 1, file_size, fp);
     
-    if (bytesRead != file_size)
-        printf("failed to read entire file: %s", filename);
+    if (bytesRead != file_size) {
+        // Failed to read entire file, respond with failure.
+        return NULL;
+    }
 
-    entry->contents[file_size] = 0;
+    entry->contents[bytesRead] = 0;
     entry->needs_fread = false;
 
     return entry->contents;
