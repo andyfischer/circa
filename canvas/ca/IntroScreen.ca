@@ -24,14 +24,13 @@ if msg_name == 'onPaintEvent'
 
     font = create_font("Sans Serif", 30)
     painter.setFont(font)
-    painter.setColor(#C9E8E8)
-    right = 10
-    right = painter.drawText([right 30 300 500] 0 "circa").x2 + 5
-    painter.setColor(#E1BC66)
-    right = painter.drawText([right 30 300 500] 0 "alpha").x2 + 5
-    painter.setColor(#CD7994)
-    painter.drawText([170 30 300 100] 0 "4")
 
+    right = 10
+    for phrase in [[#C9E8E8 "improv"] [#E1BC66 "alpha"] [#CD7994 "4"]]
+        painter.setColor(phrase[0])
+        rect = painter.drawText([right 30 300 500] 0 phrase[1])
+        right = rect.x2 + 5
+    
     scriptChoices.draw(painter)
 
 elif msg_name == 'onInputEvent'

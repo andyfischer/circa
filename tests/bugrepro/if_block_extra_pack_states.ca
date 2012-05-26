@@ -1,0 +1,27 @@
+
+def f()
+    a = 0
+    b = 0
+    c = 0
+    d = 0
+    e = 0
+    f = 0
+
+    if true
+        state s = 1
+        a = 1
+        b = 1
+        c = 1
+        d = 1
+    elif true
+        state t
+        e = 0
+        f = 0
+    elif true
+    elif true
+    elif true
+    elif true
+
+s = null
+f(state = s)
+print(s)

@@ -1,6 +1,9 @@
 
 -- Builtin functions
 
+def assert(bool condition)
+    -- Raises an error if 'condition' is false.
+
 def length(List) -> int
     -- Return the number of items in the given list
 

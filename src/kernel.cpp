@@ -135,6 +135,12 @@ Type* output_placeholder_specializeType(Term* caller)
     return declared_type(caller->input(0));
 }
 
+void hosted_assert(caStack* stack)
+{
+    if (!circa_bool_input(stack, 0))
+        circa_output_error(stack, "Assert failed");
+}
+
 void file__exists(caStack* stack)
 {
     set_bool(circa_output(stack, 0), circa_file_exists( circa_string_input(stack, 0)));
@@ -1105,6 +1111,7 @@ void install_standard_library(Branch* kernel)
 
     // Install C functions
     static const ImportRecord records[] = {
+        {"assert", hosted_assert},
         {"cppbuild:build_module", cppbuild_function::build_module},
         {"file:version", file__version},
         {"file:exists", file__exists},

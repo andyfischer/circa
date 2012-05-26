@@ -510,10 +510,16 @@ void finish_if_block(Term* ifBlock)
 
     if_block_normalize_state_inputs(ifBlock);
 
-    int caseIndex = 0;
+    // Turn name rebinds into outer name rebinds.
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if_block_turn_outer_name_rebinds_into_outputs(ifBlock, nested_contents(term));
+    }
+
+    // Fix state in each case.
+    int caseIndex = 0;
+    for (CaseIterator it(contents); it.unfinished(); it.advance()) {
+        Term* term = it.current();
         modify_branch_so_that_state_access_is_indexed(nested_contents(term), caseIndex);
         caseIndex++;
     }

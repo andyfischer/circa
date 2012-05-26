@@ -107,6 +107,7 @@ def Segment.step(seg)
             child.growth_rate = seg.growth_rate * .9
 
             child.step
+            assert(true)
 
     -- Grow a child segment
     else
@@ -122,6 +123,8 @@ def Segment.step(seg)
         child.growth_rate = seg.growth_rate * .9
 
         child.step
+
+        assert(true)
 
 
 root = create(Segment)

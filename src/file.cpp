@@ -88,14 +88,16 @@ const char* circa_read_file(const char* filename)
 
     entry->contents = (char*) realloc(entry->contents, file_size + 1);
     size_t bytesRead = fread(entry->contents, 1, file_size, fp);
-    
-    if (bytesRead != file_size) {
-        // Failed to read entire file, respond with failure.
-        return NULL;
-    }
 
     entry->contents[bytesRead] = 0;
     entry->needs_fread = false;
+
+    log_start(0, "read_file");
+    log_arg("filename", filename);
+    log_arg("file_size", file_size);
+    log_arg("bytesRead", bytesRead);
+    log_arg("contents", entry->contents);
+    log_finish();
 
     return entry->contents;
 }
