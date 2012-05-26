@@ -42,7 +42,6 @@
 #include "types/int.h"
 #include "types/name.h"
 #include "types/number.h"
-#include "types/ref.h"
 #include "types/set.h"
 #include "types/void.h"
 
@@ -869,6 +868,12 @@ Branch* kernel()
     return KERNEL;
 }
 
+void ref_setup_type(Type* type)
+{
+    type->name = name_from_string("Term");
+    type->storageType = STORAGE_TYPE_REF;
+}
+
 void create_primitive_types()
 {
     null_t::setup_type(&NULL_T);
@@ -881,7 +886,7 @@ void create_primitive_types()
     list_t::setup_type(&LIST_T);
     name_t::setup_type(&NAME_T);
     opaque_pointer_t::setup_type(&OPAQUE_POINTER_T);
-    ref_t::setup_type(&REF_T);
+    ref_setup_type(&REF_T);
     string_setup_type(&STRING_T);
     void_t::setup_type(&VOID_T);
     eval_context_setup_type(&EVAL_CONTEXT_T);

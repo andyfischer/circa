@@ -15,8 +15,6 @@
 #include "token.h"
 #include "type.h"
 
-#include "types/ref.h"
-
 namespace circa {
 
 std::string

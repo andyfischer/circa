@@ -15,8 +15,6 @@
 #include "term.h"
 #include "type.h"
 
-#include "types/ref.h"
-
 namespace circa {
 
 void append_static_error(List* errors, Term* term, const char* type)

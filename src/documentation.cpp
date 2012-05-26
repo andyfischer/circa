@@ -11,8 +11,6 @@
 #include "term.h"
 #include "type.h"
 
-#include "types/ref.h"
-
 namespace circa {
 
 void escape_string_for_json(std::string s, std::stringstream& out)

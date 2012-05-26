@@ -10,8 +10,6 @@
 #include "tagged_value.h"
 #include "type.h"
 
-#include "types/ref.h"
-
 using namespace circa;
 
 namespace circa {
