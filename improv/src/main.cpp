@@ -42,10 +42,6 @@ int main(int argc, char *argv[])
 
     scripts_initialize();
 
-    QMessageBox msg;
-    msg.setText("Hello");
-    msg.exec();
-
     Window window;
     window.show();
     return app.exec();

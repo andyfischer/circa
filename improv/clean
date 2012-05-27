@@ -1,3 +1,3 @@
 
 rm -rf build/*
-rm -rf canvas.app
+rm -rf improv.app

@@ -1,2 +1,2 @@
-rm -rf canvas.app
+rm -rf improv.app
 make
