@@ -21,8 +21,7 @@ state number timeShift = 0
 buttons = [
     ["Reset" :reset]
     ["Freeze" :freezeState]
-    ["Exit" :exit]
-    ["Dump" :dump]
+    ["Back" :exit]
     ]
 state ButtonBar topButtons = button_bar(buttons)
 topButtons.arrange([10 10 buttons.length*100 40], :horizontal)

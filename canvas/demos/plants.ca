@@ -7,20 +7,29 @@ bounds = env.bounds
 time = env.time
 time_delta = delta(time)
 
-env.background(#000)
+env.background(#eef)
 
+branch_color = #40cc10
+global_scale = 3.0
 base_grow_rate = 40.0
 max_segment_length = 10.0 -- 10 to 30
-max_segment_radius = 1.0
-max_segment_angle = 1.0 -- .5 - 1
-wiggle_factor = 0.07 -- 0 - 1
-generation_limit = 15
+generation_limit = 14
 distance_between_branches = 20.0
 distance_between_branches_var = 30.0
+base_thickness = 7.0
 
 def seed() -> number
     state r = rand()
     return r
+
+def interp(number progress, number limit) -> number
+    if progress >= limit
+        return 1.0
+    return progress / limit
+
+def rotate(Point p, number angle) -> Point
+    p = [cos(angle) * p.x - sin(angle) * p.y, sin(angle) * p.x + cos(angle) * p.y]
+    return p
 
 type Segment {
   int generation
@@ -32,6 +41,29 @@ type Segment {
   number base_angle
   number growth_rate
 }
+
+state number wind = 0
+wind += delta(env.mouse.x) / 20
+wind = wind * .8
+
+--wind = (env.mouse.x - env.bounds.x/2) / 10
+
+def grow_leaf(Point loc, number angle)
+    
+    age = elapsed()
+    growth = interp(age 3.0)
+
+    shape = [[0 0] [1 .5] [0 1] [-1 .5]]
+
+    for v in @shape
+        Point(@v)
+        v.y = v.y * 10.0 * growth
+        v.x = v.x * 2.0 * growth
+        rotate(@v, angle)
+        v += loc
+    
+    env.draw_poly(shape #f80)
+
 
 
 def Segment.step(seg)
@@ -57,17 +89,12 @@ def Segment.step(seg)
     else
         growth_finished = false
 
-
-    stretched_length = 3 * log(age)
-    max(@stretched_length 0)
-    min(@stretched_length 10.0)
-    length += stretched_length
-
+    mult(@length global_scale)
     end_loc = seg.base_loc + polar(seg.base_angle) * length
 
     -- thickness
-    thickness = 10.0 * 1 / (seg.generation + 1)
-    tip_thickness = 10.0 * 1 / (seg.generation + 2)
+    thickness = global_scale * base_thickness * 1 / (seg.generation + 1)
+    tip_thickness = global_scale * base_thickness * 1 / (seg.generation + 2)
 
     cond(reached_last_gen, 0.0, @tip_thickness)
 
@@ -77,7 +104,7 @@ def Segment.step(seg)
     tip_l = end_loc + [-1 0] * (tip_thickness/2)
     tip_r = end_loc + [1 0] * (tip_thickness/2)
 
-    env.draw_poly([base_l tip_l tip_r base_r] #0f0)
+    env.draw_poly([base_l tip_l tip_r base_r] branch_color)
 
     -- Don't grow past generation
     if seg.generation >= generation_limit
@@ -87,46 +114,46 @@ def Segment.step(seg)
     if not growth_finished
         return
 
-    e = elapsed()
-    s = 0.7
+    tip_angle = seg.base_angle
+
+    -- wind influence
+    tip_angle += wind
 
     -- Check to split
     if reached_branch
 
         -- Branch
         for dir in [-1 1]
-            branch_angle = s * 40.0 * dir
+            spread_progress = log(elapsed() + 1)
+            min(@spread_progress 1.0)
+            branch_angle = seed() * 40.0 * dir * spread_progress
             child = create(Segment)
             child.base_loc = end_loc
-            child.base_angle = seg.base_angle + branch_angle
+            child.base_angle = tip_angle + branch_angle
             child.generation = seg.generation + 1
-            child.distance_till_branch = distance_between_branches + seed() * 20.0
+            s = seed()
+            child.distance_till_branch = distance_between_branches + 20.0 * seed()
             child.growth_rate = seg.growth_rate * .9
 
             child.step
-            assert(true)
 
     -- Grow a child segment
     else
-        target_angle_delt = (seed() - 0.5) * 10.0
-        target_angle_delt = 5.0
-        angle_delt = min(e / 10, target_angle_delt)
+        angle_delt = (seed() - 0.5) * 30.0
         
         child = create(Segment)
         child.base_loc = end_loc
-        child.base_angle = seg.base_angle + angle_delt
+        child.base_angle = tip_angle + angle_delt
         child.generation = seg.generation + 1
         child.distance_till_branch = seg.distance_till_branch - target_length
         child.growth_rate = seg.growth_rate * .9
 
         child.step
 
-        assert(true)
-
 
 root = create(Segment)
-root.base_loc = [300 400]
-root.distance_till_branch = distance_between_branches
+root.base_loc = [300 500]
+root.distance_till_branch = 20.0
 root.growth_rate = 1.0
 root.step()
 
