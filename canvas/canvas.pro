@@ -19,3 +19,5 @@ CONFIG += opengl debug
 
 MOC_DIR = build
 OBJECTS_DIR = build
+
+ICON = assets/improv.icns
