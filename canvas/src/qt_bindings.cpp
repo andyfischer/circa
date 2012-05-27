@@ -274,6 +274,9 @@ void Painter__drawText(caStack* stack)
     int flags = circa_int_input(stack, 2);
     const char* text = circa_string(circa_input(stack, 3));
 
+    // always use TextWordWrap
+    flags |= Qt::TextWordWrap;
+
     painter->drawText(to_qrect(r), flags, text);
 
     // Save the bounding rect as output

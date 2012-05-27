@@ -14,5 +14,5 @@ Window::Window()
     layout->addWidget(openGL, 0, 0);
     setLayout(layout);
 
-    setWindowTitle(tr("circaCanvas"));
+    setWindowTitle(tr("Improv Alpha 4"));
 }

@@ -3,7 +3,6 @@ import UIHelper
 
 msg = input()
 
-
 state Branch userBranch
 state any userState
 
@@ -123,23 +122,30 @@ elif msg[0] == 'onInputEvent'
         print('action: ' action)
     else
         -- Event not handled by our UI, pass it to the script
-        if event.is_mouse
-            mousePos = event.mousePos
-            if event.eventType == MouseDown
-                keysDown.add(:mouse1)
-            elif event.eventType == MouseUp
-                keysDown.remove(:mouse1)
-        elif event.is_key
-            en = keycode_to_name(event.keyCode)
-            if event.eventType == KeyDown
-                keysDown.add(en)
-            else
-                keysDown.remove(en)
+
+        -- Block input events in Frozen state
+
+        if not state_frozen
+            if event.is_mouse
+                mousePos = event.mousePos
+                if event.eventType == MouseDown
+                    keysDown.add(:mouse1)
+                elif event.eventType == MouseUp
+                    keysDown.remove(:mouse1)
+            elif event.is_key
+                en = keycode_to_name(event.keyCode)
+                if event.eventType == KeyDown
+                    keysDown.add(en)
+                else
+                    keysDown.remove(en)
 elif msg[0] == 'timeUpdate'
     time = msg[1] -> number
 
 elif msg[0] == 'loadFile'
     print('loading file: ' msg[1])
     userBranch = load_module(msg[1])
+
+    -- reset state when loading a new file
+    userState = null
 else
     print("ScriptView didn't recognize: " msg)

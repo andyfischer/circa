@@ -6,9 +6,9 @@ import UIHelper
 msg_name = msg[0]
 
 state ButtonBar scriptChoices = button_bar([
+        ["Introduction", "demos/intro.ca"]
         ["Asteroids", "demos/asteroids.ca"],
-        ["Plants", "demos/plants.ca"]
-        ["Mouse test", "demos/mouse_test.ca"]
+        ["Garden", "demos/garden.ca"]
         ])
 
 scriptChoices.arrange([30 80 200 220], :vertical)
@@ -26,7 +26,7 @@ if msg_name == 'onPaintEvent'
     painter.setFont(font)
 
     right = 10
-    for phrase in [[#C9E8E8 "improv"] [#E1BC66 "alpha"] [#CD7994 "4"]]
+    for phrase in [[#C9E8E8 "improv"] [#E1BC66 "alpha"] [#ED7D7D "4"]]
         painter.setColor(phrase[0])
         rect = painter.drawText([right 30 300 500] 0 phrase[1])
         right = rect.x2 + 5

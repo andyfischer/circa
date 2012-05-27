@@ -35,7 +35,8 @@ def ScriptContext.draw_points(self, List points, Color color)
         Point(@point)
         self.painter.drawRect([point.x point.y point.x+1 point.y+1])
 
-def ScriptContext.draw_text(self, Rect rect, int flags, String msg)
+def ScriptContext.draw_text(self, Rect rect, int flags, String msg, Color color)
+    self.painter.setColor(color)
     self.painter.drawText(rect, flags, msg)
 
 def ScriptContext.draw_poly(self, List points, Color color)

@@ -1,0 +1,73 @@
+
+-- Global context, will probably make this implicit in the future.
+env = input() -> ScriptContext
+time = env.time
+mouse = env.mouse
+bounds = env.bounds
+time = env.time
+time_delta = delta(time)
+
+env.background(#756a95)
+
+state bigNumberFont = create_font("Arial", 100)
+state infoFont = create_font("Arial", 20)
+state smallInfoFont = create_font("Arial", 16)
+
+def bignumber(Point loc, number opacity, String text)
+    color = #ffb152
+    color.a = opacity
+    env.painter.setFont(bigNumberFont)
+    env.draw_text([loc.x loc.y bounds.x bounds.y] 0 text color)
+
+def infoblock(Rect rect, number opacity, String text)
+    color = #eeeeee
+    color.a = opacity
+    env.painter.setFont(infoFont)
+    env.draw_text(rect 0 text color)
+
+def smallinfoblock(Rect rect, number opacity, String text)
+    color = #eeeeee
+    color.a = opacity
+    env.painter.setFont(smallInfoFont)
+    env.draw_text(rect 0 text color)
+
+def fadein(number delay) -> number
+    e = elapsed()
+    if e < delay
+        return 0.0
+
+    r = (e - delay) * .8
+    min(@r 1.0)
+    return r
+
+y = 60
+
+infoblock([10 y bounds.x - 10, bounds.y], fadein(0),
+    "Welcome to Improv Alpha 4. Here are your instructions:")
+
+y = 110
+textleft = 80
+delay = .5
+bignumber([10 y] fadein(delay) "1")
+
+smallinfoblock([textleft y + 20 bounds.x - 10, bounds.y], fadein(delay),
+    "All scripts (including this menu) can be changed in real time, by editing the .ca file in a separate text editor. Don't worry, in a future version we'll support full editing of scripts inside Improv.")
+
+y += 100
+delay = 1
+bignumber([10 y] fadein(delay) "2")
+smallinfoblock([textleft y + 20 bounds.x - 10, bounds.y], fadein(delay),
+    "Press the \"Reset\" button to reset the script's state. (starting a new game)")
+
+y += 100
+delay = 1.5
+bignumber([10 y] fadein(delay) "3")
+smallinfoblock([textleft y + 20 bounds.x - 10, bounds.y], fadein(delay),
+    "Press the \"Freeze\" button to freeze time, block input events, and make state immutable.")
+
+y += 100
+delay = 2.0
+bignumber([10 y] fadein(delay) "4")
+smallinfoblock([textleft y + 20 bounds.x - 10, bounds.y], fadein(delay),
+    "Have fun, send feedback and report bugs (on Github). We're just getting started!")
+

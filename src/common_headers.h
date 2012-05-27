@@ -130,8 +130,8 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 #define CIRCA_ENABLE_THREADING 1
 #endif
 
-// ENABLE_LOGGING - Enables internal logging
+// ENABLE_LOGGING - Enables internal logging (disabled by default)
 #ifndef CIRCA_ENABLE_LOGGING
-#define CIRCA_ENABLE_LOGGING 1
+#define CIRCA_ENABLE_LOGGING 0
 #endif
 
