@@ -1,0 +1,26 @@
+
+-- Variation of recursion_and_if
+--
+-- In this variation, the subroutine has a top-level stateful var, so it's already
+-- known to be stateful when the recursive call is encountered.
+
+def recr(int depth)
+    state s = depth
+    s = s * 2
+
+    print('reached depth = ' depth)
+    if depth == 0
+        return
+
+    if true
+        state t = depth
+        recr(depth - 1)
+        t = t * 2
+
+s = null
+recr(3, state = s)
+print('after 1st iter: ' s)
+recr(3, state = s)
+print('after 2nd iter: ' s)
+recr(3, state = s)
+print('after 3rd iter: ' s)

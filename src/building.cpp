@@ -233,7 +233,7 @@ void change_function(Term* term, Term* function)
 
     // Possibly insert a state input for the enclosing subroutine.
     if (is_function_stateful(function))
-        find_or_create_state_input(term->owningBranch);
+        find_or_create_state_container(term->owningBranch);
 }
 
 void unsafe_change_type(Term *term, Type *type)
@@ -708,13 +708,13 @@ void check_to_insert_implicit_inputs(Term* term)
     if (!is_function(term->function))
         return;
 
-    Term* stateInput = find_state_input(term_get_function_details(term));
+    Term* stateInput = find_active_state_container(term_get_function_details(term));
 
     if (stateInput != NULL && !term_is_state_input(term, stateInput->index)) {
 
         int inputIndex = stateInput->index;
 
-        Term* container = find_or_create_state_input(term->owningBranch);
+        Term* container = find_or_create_state_container(term->owningBranch);
 
         // Add a unpack_state() call
         Term* unpack = apply(term->owningBranch, FUNCS.unpack_state,

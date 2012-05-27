@@ -1,0 +1,24 @@
+
+-- Bug repro, the bug occurred under the following circumstances:
+--  1) Recursive call to a stateful func
+--  2) Call occurred inside if-block case
+--  3) The case already had a stateful var
+
+def recr(int depth)
+
+    print('reached depth = ' depth)
+    if depth == 0
+        return
+
+    if true
+        state s = depth
+        recr(depth - 1)
+        s = s * 2
+
+s = null
+recr(3, state = s)
+print('after 1st iter: ' s)
+recr(3, state = s)
+print('after 2nd iter: ' s)
+recr(3, state = s)
+print('after 3rd iter: ' s)

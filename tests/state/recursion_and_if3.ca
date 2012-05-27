@@ -1,0 +1,28 @@
+
+-- Variation of bug_with_recursion_and_if
+--
+-- In this variation, the subroutine already has a branch with a state var.
+
+def recr(int depth)
+
+    print('reached depth = ' depth)
+
+    if true
+        state s = depth
+        s = s * 2
+
+    if depth == 0
+        return
+
+    if true
+        state t = depth
+        recr(depth - 1)
+        t = t * 2
+
+s = null
+recr(3, state = s)
+print('after 1st iter: ' s)
+recr(3, state = s)
+print('after 2nd iter: ' s)
+recr(3, state = s)
+print('after 3rd iter: ' s)

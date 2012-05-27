@@ -39,9 +39,6 @@ def Segment.step(seg)
     state thickness_ratio = 1.0
     age = env.elapsed
 
-    print('step: ' seg)
-    print(age)
-
     -- whether this is the tip
     reached_last_gen = seg.generation >= generation_limit
 

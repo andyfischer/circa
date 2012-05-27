@@ -1,0 +1,15 @@
+reached depth = 3
+reached depth = 2
+reached depth = 1
+reached depth = 0
+after 1st iter: {_for: [{s: 6}]}
+reached depth = 3
+reached depth = 2
+reached depth = 1
+reached depth = 0
+after 2nd iter: {_for: [{s: 12}]}
+reached depth = 3
+reached depth = 2
+reached depth = 1
+reached depth = 0
+after 3rd iter: {_for: [{s: 24}]}

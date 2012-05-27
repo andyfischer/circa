@@ -1,0 +1,15 @@
+reached depth = 3
+reached depth = 2
+reached depth = 1
+reached depth = 0
+after 1st iter: {_if_block: [{s: 6}], _for: [{t: 6, _recr: {_if_block: [{s: 4}], _for: [{t: 4, _recr: {_if_block: [{s: 2}], _for: [{t: 2, _recr: {_if_block: [{s: 0}], _for: null}}]}}]}}]}
+reached depth = 3
+reached depth = 2
+reached depth = 1
+reached depth = 0
+after 2nd iter: {_if_block: [{s: 12}], _for: [{t: 12, _recr: {_if_block: [{s: 8}], _for: [{t: 8, _recr: {_if_block: [{s: 4}], _for: [{t: 4, _recr: {_if_block: [{s: 0}], _for: null}}]}}]}}]}
+reached depth = 3
+reached depth = 2
+reached depth = 1
+reached depth = 0
+after 3rd iter: {_if_block: [{s: 24}], _for: [{t: 24, _recr: {_if_block: [{s: 16}], _for: [{t: 16, _recr: {_if_block: [{s: 8}], _for: [{t: 8, _recr: {_if_block: [{s: 0}], _for: null}}]}}]}}]}

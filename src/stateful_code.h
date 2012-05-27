@@ -6,8 +6,8 @@ namespace circa {
 
 bool is_function_stateful(Term* func);
 
-// Find the :state output() for this branch. If one is not found, create it.
-Term* find_or_create_state_input(Branch* branch);
+Term* find_active_state_container(Branch* branch);
+Term* find_or_create_state_container(Branch* branch);
 
 // If the branch has state, this adds a pack_state call that captures state
 // values at the current position. If the branch has no state then this

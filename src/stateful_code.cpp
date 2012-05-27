@@ -253,10 +253,29 @@ void branch_update_existing_pack_state_calls(Branch* branch)
     }
 }
 
-Term* find_or_create_state_input(Branch* branch)
+Term* find_active_state_container(Branch* branch)
 {
-    // check if there is already a stateful input
+    // Check if there is already a stateful input
+
+    // Special case for if-block: Look for a unpack_state_from_list call
+    if (is_case_branch(branch)) {
+        Term* existing = find_term_with_function(branch, FUNCS.unpack_state_from_list);
+        if (existing != NULL)
+            return existing;
+    }
+
+    // Special case for for-block: Look for a unpack_state_from_list call
+
     Term* existing = find_state_input(branch);
+    if (existing != NULL)
+        return existing;
+
+    return NULL;
+}
+
+Term* find_or_create_state_container(Branch* branch)
+{
+    Term* existing = find_active_state_container(branch);
     if (existing != NULL)
         return existing;
 

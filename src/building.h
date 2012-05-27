@@ -110,7 +110,6 @@ bool term_has_variable_args(Term* term);
 
 Term* find_open_state_result(Branch* branch, int position);
 Term* find_open_state_result(Term* location);
-Term* find_or_create_open_state_result(Branch* branch, int position);
 
 // Check the term's inputs to see if it's missing an implicit input (such as the state
 // input). If one is missing, it will be inserted. This should be called after creating
