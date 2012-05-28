@@ -19,6 +19,9 @@ GLWidget::GLWidget(QWidget *parent)
     timer->start(16);
 
     elapsedTime.start();
+
+    // Fixes a font corruption issue on Windows
+    QGL::setPreferredPaintEngine( QPaintEngine::OpenGL );
 }
 
 void GLWidget::animate()
