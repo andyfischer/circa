@@ -15,7 +15,7 @@ SOURCES = src/main.cpp \
           src/qt_bindings.cpp
 
 LIBS += -L../build -lcirca
-CONFIG += opengl debug
+CONFIG += opengl release
 
 MOC_DIR = build
 OBJECTS_DIR = build

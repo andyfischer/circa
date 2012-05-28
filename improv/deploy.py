@@ -29,10 +29,6 @@ def copy(path, dest):
         os.copy2(path,dest)
 
 
-# Setup common dirs
-#copy(AppName, macTempDir)
-#copy('ca', macTempDir)
-#copy('demos', macTempDir)
 
 macZip = zipfile.ZipFile('ImprovAlpha4.zip', 'w')
 
@@ -40,7 +36,10 @@ def add(dir):
     for root, dirnames, filenames in os.walk(dir):
         for file in filenames:
             fullpath = os.path.join(root,file)
-            macZip.write(fullpath, fullpath, zipfile.ZIP_DEFLATED)
+            zipname = fullpath
+            zipname = zipname.replace('improv.app','ImprovAlpha4.app')
+            print 'writing ',fullpath,' as ',zipname
+            macZip.write(fullpath, zipname, zipfile.ZIP_DEFLATED)
 
 add('improv.app')
 add('ca')
