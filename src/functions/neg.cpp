@@ -1,4 +1,4 @@
-// Copyright (c) 2007-2010 Andrew Fischer. All rights reserved
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "circa/internal/for_hosted_funcs.h"
 

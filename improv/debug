@@ -1,2 +1,2 @@
 
-gdb --args canvas.app/Contents/MacOS/canvas $*
+gdb --args improv.app/Contents/MacOS/improv $*
