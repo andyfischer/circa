@@ -123,6 +123,8 @@ ListData* list_duplicate(ListData* source)
     if (source == NULL)
         return NULL;
 
+    INCREMENT_STAT(listHardCopies);
+
     assert_valid_list(source);
 
     ListData* result = allocate_empty_list(source->capacity);
@@ -278,6 +280,8 @@ void list_remove_nulls(ListData** dataPtr)
 
 void list_copy(caValue* source, caValue* dest)
 {
+    INCREMENT_STAT(listSoftCopies);
+
     ca_assert(source->value_type->storageType == STORAGE_TYPE_LIST);
 
     // prepare 'dest'

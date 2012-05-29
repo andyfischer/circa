@@ -45,6 +45,8 @@ void initialize_null(caValue* value)
 
 void create(Type* type, caValue* value)
 {
+    INCREMENT_STAT(valueCreates);
+
     set_null(value);
 
     value->value_type = type;
@@ -84,6 +86,8 @@ void release(caValue* value)
 
 void cast(CastResult* result, caValue* source, Type* type, caValue* dest, bool checkOnly)
 {
+    INCREMENT_STAT(valueCasts);
+
     if (type->cast != NULL) {
         type->cast(result, source, type, dest, checkOnly);
         return;
@@ -120,6 +124,8 @@ bool cast_possible(caValue* source, Type* type)
 
 void copy(caValue* source, caValue* dest)
 {
+    INCREMENT_STAT(valueCopies);
+
     ca_assert(source);
     ca_assert(dest);
 

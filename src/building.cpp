@@ -67,6 +67,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
     // Create the term
     Term* term = branch->appendNew();
+    INCREMENT_STAT(termsCreated);
 
     // Position the term before any output_placeholder terms.
     branch->move(term, position);

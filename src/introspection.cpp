@@ -127,7 +127,7 @@ std::string branch_namespace_to_string(Branch* branch)
 
 void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
 {
-    out << "[Branch " << &branch << "]" << std::endl;
+    out << "[Branch " << branch->id << "(" << &branch << ")]" << std::endl;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 

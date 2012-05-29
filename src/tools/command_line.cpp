@@ -4,6 +4,7 @@
 
 #include "branch.h"
 #include "building.h"
+#include "debug.h"
 #include "evaluation.h"
 #include "file_utils.h"
 #include "introspection.h"
@@ -649,6 +650,9 @@ int main(int argc, const char * args[])
     result = circa_run_command_line(world, argc, args);
 
     circa_shutdown(world);
+
+    // temp
+    // circa::perf_stats_dump();
     
     return result;
 }

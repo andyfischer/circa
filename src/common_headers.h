@@ -33,6 +33,9 @@
 
 namespace circa {
 
+typedef long long int int64;
+typedef long long unsigned int uint64;
+
 struct Branch;
 struct BrokenLinkList;
 struct CastResult;
@@ -136,3 +139,7 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 #define CIRCA_ENABLE_LOGGING 0
 #endif
 
+// ENABLE_PERF_STATS - Enables tracking of internal performance metrics
+#ifndef CIRCA_ENABLE_PERF_STATS
+#define CIRCA_ENABLE_PERF_STATS 1
+#endif

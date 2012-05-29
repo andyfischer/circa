@@ -117,6 +117,8 @@ Frame* get_frame_from_bottom(Stack* stack, int index)
 }
 Frame* push_frame(Stack* stack, Branch* branch, List* registers)
 {
+    INCREMENT_STAT(framesCreated);
+
     stack->numFrames++;
     stack->stack = (Frame*) realloc(stack->stack, sizeof(Frame) * stack->numFrames);
     Frame* top = &stack->stack[stack->numFrames - 1];
@@ -241,6 +243,8 @@ void finish_frame(Stack* stack)
             caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
 
             bool success = cast(result, placeholder->type, dest);
+
+            INCREMENT_STAT(interpreterCastOutputFromFinishedFrame);
 
             if (!success) {
                 Value msg;
@@ -806,6 +810,8 @@ void start_interpreter_session(Stack* stack)
 
 void step_interpreter(Stack* stack)
 {
+    INCREMENT_STAT(stepInterpreter);
+
     Frame* frame = top_frame(stack);
     Branch* branch = frame->branch;
 
@@ -898,8 +904,10 @@ void step_interpreter(Stack* stack)
 
             if (input == NULL)
                 set_null(list_append(inputSlot));
-            else
+            else {
                 copy(input, list_append(inputSlot));
+                INCREMENT_STAT(interpreterCopyInputToNewFrame);
+            }
 
             // Advance to next input, don't change destIndex.
             continue;

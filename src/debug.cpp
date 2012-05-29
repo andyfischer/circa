@@ -20,6 +20,8 @@ bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS = false;
 
 int DEBUG_BREAK_ON_TERM = -1;
 
+uint64 PERF_STATS[NUM_PERFORMANCE_STATS];
+
 void dump(Branch& branch)
 {
     print_branch(std::cout, &branch);
@@ -87,6 +89,43 @@ void ca_debugger_break()
 #endif
 }
 
+static const char* perf_stat_get_name(PerformanceStat stat)
+{
+    switch (stat) {
+        case STAT_termsCreated: return "termsCreated";
+        case STAT_termPropAdded: return "termPropAdded";
+        case STAT_valueCreates: return "valueCreates";
+        case STAT_valueCopies: return "valueCopies";
+        case STAT_valueCasts: return "valueCasts";
+        case STAT_listsCreated: return "listsCreated";
+        case STAT_listsGrown: return "listsGrown";
+        case STAT_listSoftCopies: return "listSoftCopies";
+        case STAT_listHardCopies: return "listHardCopies";
+        case STAT_stepInterpreter: return "stepInterpreter";
+        case STAT_interpreterCopyInputToNewFrame:
+            return "interpreterCopyInputToNewFrame";
+        case STAT_interpreterCastOutputFromFinishedFrame:
+            return "interpreterCastOutputFromFinishedFrame";
+        case STAT_branchNameLookups: return "branchNameLookups";
+        case STAT_framesCreated: return "framesCreated";
+    }
+}
+
+void perf_stats_dump()
+{
+#if CIRCA_ENABLE_PERF_STATS
+    printf("perf_stats_dump:\n");
+    for (int i=0; i < NUM_PERFORMANCE_STATS; i++) {
+        printf("  %s = %llu\n", perf_stat_get_name((PerformanceStat) i), PERF_STATS[i]);
+    }
+#endif
+}
+void perf_stats_reset()
+{
+#if CIRCA_ENABLE_PERF_STATS
+    memset(&PERF_STATS, 0, sizeof(PERF_STATS));
+#endif
+}
 
 #if CIRCA_ENABLE_LOGGING
 

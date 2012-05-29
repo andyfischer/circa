@@ -140,8 +140,10 @@ caValue* Term::addProperty(const char* name, Term* type)
         internal_error(msg.c_str());
     }
 
-    if (prop->value_type != valueType)
+    if (prop->value_type != valueType) {
+        INCREMENT_STAT(termPropAdded);
         create(valueType, prop);
+    }
 
     return prop;
 }

@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "debug.h"
 #include "kernel.h"
 #include "heap_debugging.h"
 #include "if_block.h"
@@ -105,6 +106,8 @@ Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupTy
     if (branch == NULL) {
         branch = KERNEL;
     }
+
+    INCREMENT_STAT(branchNameLookups);
 
     Term* result = find_local_name(branch, name, location, lookupType);
     if (result != NULL)

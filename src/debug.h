@@ -39,6 +39,49 @@ void internal_error(std::string const& message);
 
 void ca_debugger_break();
 
+// Internal performance statistics
+enum PerformanceStat {
+    // Building
+    STAT_termsCreated,
+    STAT_termPropAdded,
+
+    // Values (general)
+    STAT_valueCreates,
+    STAT_valueCopies,
+    STAT_valueCasts,
+
+    // List values
+    STAT_listsCreated,
+    STAT_listsGrown,
+    STAT_listSoftCopies,
+    STAT_listHardCopies,
+
+    // Interpreter
+    STAT_stepInterpreter,
+    STAT_interpreterCopyInputToNewFrame,
+    STAT_interpreterCastOutputFromFinishedFrame,
+    STAT_branchNameLookups,
+    STAT_framesCreated,
+
+    NUM_PERFORMANCE_STATS
+};
+
+
+void perf_stats_dump();
+void perf_stats_reset();
+
+#if CIRCA_ENABLE_PERF_STATS
+
+extern uint64 PERF_STATS[NUM_PERFORMANCE_STATS];
+
+#define INCREMENT_STAT(x) PERF_STATS[STAT_##x]++;
+
+#else
+
+#define INCREMENT_STAT(x) ;
+
+#endif
+
 // Internal logging
 #if CIRCA_ENABLE_LOGGING
 

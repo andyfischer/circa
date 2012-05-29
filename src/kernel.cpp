@@ -288,6 +288,14 @@ void sys__module_search_paths(caStack* stack)
 {
     copy(modules_get_search_paths(), circa_output(stack, 0));
 }
+void sys__perf_stats_reset(caStack* stack)
+{
+    perf_stats_reset();
+}
+void sys__perf_stats_dump(caStack* stack)
+{
+    perf_stats_dump();
+}
 
 void load_module(caStack* stack)
 {
@@ -1133,6 +1141,8 @@ void install_standard_library(Branch* kernel)
         {"reflect:this_branch", reflect__this_branch},
         {"reflect:kernel", reflect__kernel},
         {"sys:module_search_paths", sys__module_search_paths},
+        {"sys:perf_stats_reset", sys__perf_stats_reset},
+        {"sys:perf_stats_dump", sys__perf_stats_dump},
         {"load_module", load_module},
 
         {"Dict.count", Dict__count},
