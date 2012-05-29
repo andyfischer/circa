@@ -54,7 +54,7 @@ StringData* create_str(int length)
 StringData* duplicate(StringData* original)
 {
     StringData* dup = create_str(original->length);
-#ifdef WINDOWS
+#ifdef _MSC_VER
     strncpy_s(original->str, original->length, dup->str, dup->length);
 #else
     strncpy(original->str, dup->str, dup->length);

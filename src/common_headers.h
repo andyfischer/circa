@@ -2,7 +2,8 @@
 
 #pragma once
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
+// Special handling for Windows
 
 #undef max
 #undef min
@@ -11,7 +12,7 @@
 #include <math.h>
 #include <direct.h> 
 
-#endif // WINDOWS
+#endif // Windows
 
 // standard libraries
 #include <cmath>

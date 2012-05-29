@@ -5,7 +5,7 @@
 #include "circa/thread.h"
 
 // Currently unsupported on Windows
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #undef CIRCA_ENABLE_THREADING
 #endif
 

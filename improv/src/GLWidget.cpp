@@ -20,8 +20,10 @@ GLWidget::GLWidget(QWidget *parent)
 
     elapsedTime.start();
 
+#ifdef _MSC_VER
     // Fixes a font corruption issue on Windows
     QGL::setPreferredPaintEngine( QPaintEngine::OpenGL );
+#endif
 }
 
 void GLWidget::animate()

@@ -4,7 +4,7 @@
 
 #if CIRCA_ENABLE_DLL_LOADING
 
-#ifdef WINDOWS
+#ifdef _MSC_VER
 #else
 #include <dlfcn.h>
 #endif
@@ -34,7 +34,7 @@ typedef void (*OnLoadFunc)(Branch* branch);
 typedef std::map<std::string, Dll*> LoadedDllMap;
 LoadedDllMap g_loadedDlls;
 
-#if WINDOWS
+#ifdef _MSC_VER
 const char* DLL_SUFFIX = ".dll";
 #else
 const char* DLL_SUFFIX = ".so";
@@ -65,7 +65,7 @@ void unload_dll(const char* filename)
     }
 
     // Platform specific
-    #ifdef WINDOWS
+    #ifdef _MSC_VER
         // TODO
     #else
         dlclose(dll->module);
@@ -76,7 +76,7 @@ void unload_dll(const char* filename)
 
 void* find_func_in_dll(Dll* dll, const char* funcName)
 {
-    #ifdef WINDOWS
+    #ifdef _MSC_VER
         //TODO
         return NULL;
     #else
@@ -92,7 +92,7 @@ Dll* load_dll(const char* filename, caValue* errorOut)
     char actual_filename[actual_filename_max_len];
 
     // Platform specific
-    #ifdef WINDOWS
+    #ifdef _MSC_VER
         // TODO
         dll->module = NULL;
     #else
@@ -103,7 +103,7 @@ Dll* load_dll(const char* filename, caValue* errorOut)
     if (dll->module == NULL) {
         std::string error("dlopen failed to open ");
         error += actual_filename;
-        #ifdef WINDOWS
+        #ifdef _MSC_VER
             // TODO
         #else
             error += std::string(": \n") + dlerror();
