@@ -25,7 +25,8 @@ void handle_feedback_event(Stack* context, Term* target, caValue* desired)
     if (target->function == FUNCS.copy) {
         return handle_feedback_event(context, target->input(0), desired);
     } else if (target->function == FUNCS.value) {
-        bool success = cast(desired, declared_type(target), term_value(target));
+        copy(desired, term_value(target));
+        bool success = cast(term_value(target), declared_type(target));
         if (!success) {
             std::cout << "in handle_feedback, failed to cast "
                 << name_to_string(desired->value_type->name) << " to "

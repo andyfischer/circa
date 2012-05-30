@@ -21,16 +21,14 @@ void set_null(caValue* value);
 // same type.
 void reset(caValue* value);
 
-// Full version of cast(). Attempt to cast 'source' to 'type' and store the result
-// in 'dest'. If source has a different type, then we'll ask 'type' how to do this
-// conversion. 'result' stores whether the operation succedded.
+// Attempt to cast the value to the given type. Value may be modified in-place.
 //
 // If 'checkOnly' is true, then we won't actually write anything to 'dest', we'll just
 // return whether the operation would have succeeded.
-void cast(CastResult* result, caValue* source, Type* type, caValue* dest, bool checkOnly);
+void cast(CastResult* result, caValue* source, Type* type, bool checkOnly);
 
 // Attempts to cast the value to the given type, returns whether it was successful.
-bool cast(caValue* source, Type* type, caValue* dest);
+bool cast(caValue* source, Type* type);
 
 // Returns whether this value can be cast to the given type.
 bool cast_possible(caValue* value, Type* type);

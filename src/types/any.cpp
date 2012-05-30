@@ -13,14 +13,10 @@ namespace any_t {
     {
         return query->succeed();
     }
-    void cast(CastResult* result, caValue* source, Type* type,
-        caValue* dest, bool checkOnly)
+    void cast(CastResult* result, caValue* source, Type* type, bool checkOnly)
     {
         // casting to 'any' always succeeds.
-        if (checkOnly)
-            return;
-
-        copy(source, dest);
+        result->success = true;
     }
     caValue* getField(caValue* value, const char* name)
     {

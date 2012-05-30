@@ -130,7 +130,6 @@ caValue* get_input(Stack* stack, int index);
 caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta);
 void consume_input(Stack* stack, Term* term, caValue* dest);
 void consume_input(Stack* stack, int index, caValue* dest);
-bool consume_cast(Stack* stack, int index, Type* type, caValue* dest);
 int num_inputs(Stack* stack);
 void consume_inputs_to_list(Stack* stack, List* list);
 caValue* get_output(Stack* stack, int index);

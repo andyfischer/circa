@@ -8,10 +8,9 @@ namespace number_t {
     {
         set_float(value, 0);
     }
-    void cast(CastResult* result, caValue* source, Type* type,
-        caValue* dest, bool checkOnly)
+    void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     {
-        if (!(is_int(source) || is_float(source))) {
+        if (!(is_int(value) || is_float(value))) {
             result->success = false;
             return;
         }
@@ -19,7 +18,7 @@ namespace number_t {
         if (checkOnly)
             return;
 
-        set_float(dest, to_float(source));
+        set_float(value, to_float(value));
     }
 
     bool equals(Type*, caValue* a, caValue* b)

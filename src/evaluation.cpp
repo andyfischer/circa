@@ -168,7 +168,8 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
 
             caValue* input = list_get(inputs, i);
 
-            bool castSuccess = cast(input, placeholder->type, registers[i]);
+            copy(input, registers[i]);
+            bool castSuccess = cast(registers[i], placeholder->type);
 
             if (!castSuccess) {
                 std::stringstream msg;
@@ -242,7 +243,8 @@ void finish_frame(Stack* stack)
             caValue* result = get_frame_register(topFrame, placeholder->index);
             caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
 
-            bool success = cast(result, placeholder->type, dest);
+            copy(result, dest);
+            bool success = cast(dest, placeholder->type);
 
             INCREMENT_STAT(interpreterCastOutputFromFinishedFrame);
 
@@ -454,12 +456,6 @@ void consume_input(Stack* stack, int index, caValue* dest)
 {
     // Disable input consuming
     copy(get_input(stack, index), dest);
-}
-
-bool consume_cast(Stack* stack, int index, Type* type, caValue* dest)
-{
-    caValue* value = get_input(stack, index);
-    return cast(value, type, dest);
 }
 
 caValue* get_output(Stack* stack, int index)
@@ -804,7 +800,7 @@ void start_interpreter_session(Stack* stack)
         if (placeholder == NULL)
             break;
         caValue* slot = get_frame_register(top_frame(stack), i);
-        cast(slot, placeholder->type, slot);
+        cast(slot, placeholder->type);
     }
 }
 
@@ -919,7 +915,8 @@ void step_interpreter(Stack* stack)
             continue;
         }
 
-        bool success = cast(input, inputTerm->type, inputSlot);
+        copy(input, inputSlot);
+        bool success = cast(inputSlot, inputTerm->type);
 
         if (!success) {
             Value msg;

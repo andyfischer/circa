@@ -13,7 +13,8 @@ namespace declared_state_function {
 
         // Try to cast 'value' to the declared type.
         if (value != NULL && !is_null(value)) {
-            bool cast_success = cast(value, declared_type(caller), output);
+            copy(value, output);
+            bool cast_success = cast(output, declared_type(caller));
 
             // If this cast succeeded then we're done. If it failed then continue on
             // to use a default value.

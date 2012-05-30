@@ -8,18 +8,12 @@ namespace void_t {
     {
         return "<void>";
     }
-    void cast(CastResult* result, caValue* source, Type* type,
-        caValue* dest, bool checkOnly)
+    void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     {
-        if (!is_null(source)) {
+        if (!is_null(value)) {
             result->success = false;
             return;
         }
-
-        if (checkOnly)
-            return;
-
-        set_null(dest);
     }
     void setup_type(Type* type)
     {

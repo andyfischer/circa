@@ -44,15 +44,12 @@ struct Type
     typedef void (*Reset)(Type* type, caValue* value);
     typedef bool (*Equals)(Type* type, caValue* lhs, caValue* rhs);
 
-    // Attempts to write a value to 'dest' which is of type 'type', and has a value
-    // that comes from 'source'. If the cast isn't possible, callee will record the
-    // failure in the CastResult.
+    // Attempts to cast 'value' to the given type. If the cast isn't possible, callee will
+    // record the failure in the CastResult.
     //
     // If checkOnly is true, then callee should only record whether the cast is possible,
-    // and not actually write to 'dest'. Caller is allowed to pass NULL for 'dest' when
-    // checkOnly is true.
-    typedef void (*Cast)(CastResult* result, caValue* source, Type* type,
-            caValue* dest, bool checkOnly);
+    // and not actually modify 'dest'.
+    typedef void (*Cast)(CastResult* result, caValue* value, Type* type, bool checkOnly);
 
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef std::string (*ToString)(caValue* value);

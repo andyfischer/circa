@@ -648,23 +648,20 @@ namespace list_t {
         return true;
     }
 
-    void tv_cast(CastResult* result, caValue* source, Type* type,
-        caValue* dest, bool checkOnly)
+    void tv_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     {
-        if (!is_list(source)) {
+        if (!is_list(value)) {
             result->success = false;
             return;
         }
 
-        int sourceLength = list_length(source);
+        int sourceLength = list_length(value);
 
-        // If the destination list type doesn't have a specific size restriction,
-        // then just copy the source list and call it a day.
+        // If the requested type doesn't have a specific size restriction, then
+        // the input data is fine as-is.
         if (!list_type_has_specific_size(&type->parameter)) {
-            if (!checkOnly) {
-                copy(source, dest);
-                dest->value_type = type;
-            }
+            if (!checkOnly)
+                value->value_type = type;
             return;
         }
 
@@ -677,26 +674,19 @@ namespace list_t {
         }
 
         if (!checkOnly) {
-            set_list(dest, sourceLength);
-            dest->value_type = type;
+            list_touch(value);
+            value->value_type = type;
         }
 
         for (int i=0; i < sourceLength; i++) {
-            caValue* sourceElement = list_get(source, i);
+            caValue* sourceElement = list_get(value, i);
             Type* expectedType = as_type(destTypes[i]);
-
-            caValue* destElement = NULL;
-            if (!checkOnly)
-                destElement = list_get(dest,i);
         
-            cast(result, sourceElement, expectedType, destElement, checkOnly);
+            cast(result, sourceElement, expectedType, checkOnly);
 
             if (!result->success)
                 return;
         }
-
-        if (!checkOnly)
-            dest->value_type = type;
     }
 
     void tv_set_index(caValue* value, int index, caValue* element)

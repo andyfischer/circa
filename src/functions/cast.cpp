@@ -21,7 +21,8 @@ namespace cast_function {
         }
 
         //change_type(OUTPUT, type);
-        bool success = cast(source, type, OUTPUT);
+        copy(source, OUTPUT);
+        bool success = cast(OUTPUT, type);
 
         if (!success)
             return RAISE_ERROR("cast failed");

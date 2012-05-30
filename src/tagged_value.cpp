@@ -84,41 +84,36 @@ void release(caValue* value)
     value->value_data.ptr = 0;
 }
 
-void cast(CastResult* result, caValue* source, Type* type, caValue* dest, bool checkOnly)
+void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
 {
     INCREMENT_STAT(valueCasts);
 
+    // Finish early if value already has this exact type.
+    if (value->value_type == type) {
+        result->success = true;
+        return;
+    }
+
     if (type->cast != NULL) {
-        type->cast(result, source, type, dest, checkOnly);
+        type->cast(result, value, type, checkOnly);
         return;
     }
 
-    // Default case when the type has no cast handler: only allow the cast if source has
-    // the exact same type.
-
-    if (source->value_type != type) {
-        result->success = false;
-        return;
-    }
-
-    if (checkOnly)
-        return;
-
-    copy(source, dest);
-    result->success = true;
+    // Type has no 'cast' handler, and the type is not exactly the same, so fail.
+    result->success = false;
 }
 
-bool cast(caValue* source, Type* type, caValue* dest)
+bool cast(caValue* value, Type* type)
 {
     CastResult result;
-    cast(&result, source, type, dest, false);
+    cast(&result, value, type, false);
     return result.success;
 }
 
 bool cast_possible(caValue* source, Type* type)
 {
     CastResult result;
-    cast(&result, source, type, NULL, true);
+    cast(&result, source, type, true);
     return result.success;
 }
 
