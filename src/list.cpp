@@ -123,7 +123,7 @@ ListData* list_duplicate(ListData* source)
     if (source == NULL)
         return NULL;
 
-    INCREMENT_STAT(listHardCopies);
+    INCREMENT_STAT(listHardCopy);
 
     assert_valid_list(source);
 
@@ -131,8 +131,10 @@ ListData* list_duplicate(ListData* source)
 
     result->count = source->count;
 
-    for (int i=0; i < source->count; i++)
+    for (int i=0; i < source->count; i++) {
+        INCREMENT_STAT(copy_listDuplicate);
         copy(&source->items[i], &result->items[i]);
+    }
 
     return result;
 }
@@ -280,7 +282,7 @@ void list_remove_nulls(ListData** dataPtr)
 
 void list_copy(caValue* source, caValue* dest)
 {
-    INCREMENT_STAT(listSoftCopies);
+    INCREMENT_STAT(listSoftCopy);
 
     ca_assert(source->value_type->storageType == STORAGE_TYPE_LIST);
 
@@ -681,7 +683,8 @@ namespace list_t {
         for (int i=0; i < sourceLength; i++) {
             caValue* sourceElement = list_get(value, i);
             Type* expectedType = as_type(destTypes[i]);
-        
+
+            INCREMENT_STAT(cast_listCast);
             cast(result, sourceElement, expectedType, checkOnly);
 
             if (!result->success)

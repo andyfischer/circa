@@ -14,6 +14,7 @@
 namespace circa {
 
 const int TERM_FLAG_LAZY = 0x1;
+const int TERM_FLAG_MULTIPLE = 0x2;
 
 struct Term : public caTerm
 {

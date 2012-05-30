@@ -168,7 +168,10 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
 
             caValue* input = list_get(inputs, i);
 
+            INCREMENT_STAT(copy_pushFrameWithInputs);
             copy(input, registers[i]);
+
+            INCREMENT_STAT(cast_pushFrameWithInputs);
             bool castSuccess = cast(registers[i], placeholder->type);
 
             if (!castSuccess) {
@@ -243,10 +246,9 @@ void finish_frame(Stack* stack)
             caValue* result = get_frame_register(topFrame, placeholder->index);
             caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
 
-            copy(result, dest);
+            move(result, dest);
             bool success = cast(dest, placeholder->type);
-
-            INCREMENT_STAT(interpreterCastOutputFromFinishedFrame);
+            INCREMENT_STAT(cast_finishFrame);
 
             if (!success) {
                 Value msg;
@@ -890,8 +892,8 @@ void step_interpreter(Stack* stack)
 
         caValue* input = find_stack_value_for_term(stack, currentTerm->input(i), 1);
 
-        // TODO: More efficient way of checking for multiple inputs
-        bool multiple = inputTerm->boolPropOptional("multiple", false);
+        //bool multiple = inputTerm->boolPropOptional("multiple", false);
+        bool multiple = inputTerm->flags & TERM_FLAG_MULTIPLE;
 
         if (multiple) {
             // This arg accepts multiple inputs: append to a list
@@ -902,7 +904,7 @@ void step_interpreter(Stack* stack)
                 set_null(list_append(inputSlot));
             else {
                 copy(input, list_append(inputSlot));
-                INCREMENT_STAT(interpreterCopyInputToNewFrame);
+                INCREMENT_STAT(copy_pushedInputMultiNewFrame);
             }
 
             // Advance to next input, don't change destIndex.
@@ -915,6 +917,7 @@ void step_interpreter(Stack* stack)
             continue;
         }
 
+        INCREMENT_STAT(copy_pushedInputNewFrame);
         copy(input, inputSlot);
         bool success = cast(inputSlot, inputTerm->type);
 
@@ -978,6 +981,8 @@ void run_interpreter_steps(Stack* stack, int steps)
 
 void dynamic_call_func(caStack* stack)
 {
+    INCREMENT_STAT(dynamicCall);
+
     Branch* branch = as_branch(circa_input(stack, 0));
     caValue* inputContainer = circa_input(stack, 1);
     caValue* normalInputs = circa_index(inputContainer, 0);

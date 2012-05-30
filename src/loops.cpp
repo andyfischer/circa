@@ -353,6 +353,8 @@ CA_FUNCTION(start_for_loop)
 
 void for_loop_finish_iteration(Stack* stack)
 {
+    INCREMENT_STAT(loopFinishIteration);
+
     Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;
 

@@ -143,6 +143,8 @@ caValue* Term::addProperty(const char* name, Term* type)
     if (prop->value_type != valueType) {
         INCREMENT_STAT(termPropAdded);
         create(valueType, prop);
+    } else {
+        INCREMENT_STAT(termPropAccess);
     }
 
     return prop;
@@ -262,6 +264,7 @@ void term_set_property(Term* term, const char* name, caValue* value)
 }
 caValue* term_get_property(Term* term, const char* name)
 {
+    INCREMENT_STAT(termPropAccess);
     return term->properties[name];
 }
 void term_remove_property(Term* term, const char* name)

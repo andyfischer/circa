@@ -7,8 +7,11 @@ namespace set_field_function {
 
     CA_FUNCTION(evaluate)
     {
+        INCREMENT_STAT(setField);
+
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);
+
         const char* name = as_cstring(INPUT(1));
         int index = list_find_field_index_by_name(OUTPUT->value_type, name);
         if (index == -1) {

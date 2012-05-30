@@ -94,20 +94,30 @@ static const char* perf_stat_get_name(PerformanceStat stat)
     switch (stat) {
         case STAT_termsCreated: return "termsCreated";
         case STAT_termPropAdded: return "termPropAdded";
+        case STAT_termPropAccess: return "termPropAccess";
+        case STAT_copy_pushedInputNewFrame: return "copy_pushedInputNewFrame";
+        case STAT_copy_pushedInputMultiNewFrame: return "copy_pushedInputMultiNewFrame";
+        case STAT_copy_pushFrameWithInputs: return "copy_pushFrameWithInputs";
+        case STAT_copy_listDuplicate: return "copy_listDuplicate";
+        case STAT_cast_listCast: return "cast_listCast";
+        case STAT_cast_pushFrameWithInputs: return "cast_pushFrameWithInputs";
+        case STAT_cast_finishFrame: return "cast_finishFrame";
         case STAT_valueCreates: return "valueCreates";
         case STAT_valueCopies: return "valueCopies";
         case STAT_valueCasts: return "valueCasts";
+        case STAT_valueTouch: return "valueTouch";
         case STAT_listsCreated: return "listsCreated";
         case STAT_listsGrown: return "listsGrown";
-        case STAT_listSoftCopies: return "listSoftCopies";
-        case STAT_listHardCopies: return "listHardCopies";
+        case STAT_listSoftCopy: return "listSoftCopy";
+        case STAT_listHardCopy: return "listHardCopy";
+        case STAT_dictHardCopy: return "dictHardCopy";
         case STAT_stepInterpreter: return "stepInterpreter";
-        case STAT_interpreterCopyInputToNewFrame:
-            return "interpreterCopyInputToNewFrame";
-        case STAT_interpreterCastOutputFromFinishedFrame:
-            return "interpreterCastOutputFromFinishedFrame";
         case STAT_branchNameLookups: return "branchNameLookups";
         case STAT_framesCreated: return "framesCreated";
+        case STAT_loopFinishIteration: return "loopFinishIteration";
+        case STAT_dynamicCall: return "dynamicCall";
+        case STAT_setIndex: return "setIndex";
+        case STAT_setField: return "setField";
     }
 }
 

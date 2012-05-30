@@ -88,6 +88,8 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
 {
     INCREMENT_STAT(valueCasts);
 
+    result->success = true;
+
     // Finish early if value already has this exact type.
     if (value->value_type == type) {
         result->success = true;
@@ -184,6 +186,8 @@ void reset(caValue* value)
 
 void touch(caValue* value)
 {
+    INCREMENT_STAT(valueTouch);
+
     Type::Touch touch = value->value_type->touch;
     if (touch != NULL)
         touch(value);

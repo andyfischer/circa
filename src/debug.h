@@ -44,24 +44,45 @@ enum PerformanceStat {
     // Building
     STAT_termsCreated,
     STAT_termPropAdded,
+    STAT_termPropAccess,
+
+    // Specific reasons for copy()
+    STAT_copy_pushedInputNewFrame,
+    STAT_copy_pushedInputMultiNewFrame,
+    STAT_copy_pushFrameWithInputs,
+    STAT_copy_listDuplicate,
+
+    // Specific reasons for cast()
+    STAT_cast_listCast,
+    STAT_cast_pushFrameWithInputs,
+    STAT_cast_finishFrame,
 
     // Values (general)
     STAT_valueCreates,
     STAT_valueCopies,
     STAT_valueCasts,
+    STAT_valueTouch,
 
     // List values
     STAT_listsCreated,
     STAT_listsGrown,
-    STAT_listSoftCopies,
-    STAT_listHardCopies,
+    STAT_listSoftCopy,
+    STAT_listHardCopy,
+
+    // Dict values
+    STAT_dictHardCopy,
 
     // Interpreter
     STAT_stepInterpreter,
-    STAT_interpreterCopyInputToNewFrame,
     STAT_interpreterCastOutputFromFinishedFrame,
     STAT_branchNameLookups,
     STAT_framesCreated,
+    STAT_loopFinishIteration,
+
+    // Function calls
+    STAT_dynamicCall,
+    STAT_setIndex,
+    STAT_setField,
 
     NUM_PERFORMANCE_STATS
 };
