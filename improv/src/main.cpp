@@ -2,6 +2,7 @@
 #include <qapplication.h>
 #include <qlabel.h>
 #include <QDir>
+#include <QFontDatabase>
 #include <QMessageBox>
 
 #include "Scripts.h"
@@ -39,6 +40,10 @@ int main(int argc, char *argv[])
 
     if (!fix_current_directory())
         return -1;
+
+    // Temp
+    QFontDatabase::addApplicationFont("assets/AlteHaasGroteskBold.ttf");
+    QFontDatabase::addApplicationFont("assets/AlteHaasGroteskRegular.ttf");
 
     scripts_initialize();
 

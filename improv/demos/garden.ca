@@ -1,7 +1,4 @@
 
-sys:perf_stats_dump()
-sys:perf_stats_reset()
-
 
 -- Global context, will probably make this implicit in the future.
 env = input() -> ScriptContext
@@ -11,10 +8,15 @@ bounds = env.bounds
 time = env.time
 time_delta = delta(time)
 
+def random_color() -> Color
+    return [rand() rand() rand() 1.0]
+
 background_color = #eeeeff
 branch_color = #40cc10
 
-env.background(#eef)
+env.background(background_color)
+
+hor_ratio = mouse.x / bounds.x
 
 global_scale = 3.0
 base_grow_rate = 40.0
@@ -23,6 +25,16 @@ generation_limit = 14
 distance_between_branches = 20.0
 distance_between_branches_var = 30.0
 base_thickness = 7.0
+
+if true
+    size = 63
+    bigYellowFont = create_font('AlteHaasGroteskBold', size)
+    env.background(#337)
+    env.painter.setFont(bigYellowFont)
+    env.draw_text([20 60 bounds.x bounds.y] 0 "abcdef" #ff0)
+
+
+return
 
 def seed() -> number
     state r = rand()
@@ -48,28 +60,9 @@ type Segment {
   number growth_rate
 }
 
-state number wind = 0
-wind += delta(env.mouse.x) / 20
-wind = wind * .8
+wind = 0
 
 --wind = (env.mouse.x - env.bounds.x/2) / 10
-
-def grow_leaf(Point loc, number angle)
-    
-    age = elapsed()
-    growth = interp(age 3.0)
-
-    shape = [[0 0] [1 .5] [0 1] [-1 .5]]
-
-    for v in @shape
-        Point(@v)
-        v.y = v.y * 10.0 * growth
-        v.x = v.x * 2.0 * growth
-        rotate(@v, angle)
-        v += loc
-    
-    env.draw_poly(shape #f80)
-
 
 def Segment.step(seg)
     state wiggle_value = rand() - .5
@@ -111,7 +104,7 @@ def Segment.step(seg)
     tip_angle = seg.base_angle
 
     -- wind influence
-    tip_angle += wind
+    -- tip_angle += elapsed() * 50.0
 
     tip_l = end_loc + polar(tip_angle - 90) * (tip_thickness/2)
     tip_r = end_loc + polar(tip_angle + 90) * (tip_thickness/2)
@@ -126,30 +119,29 @@ def Segment.step(seg)
     if not growth_finished
         return
 
-
     -- Check to split
     if reached_branch
 
-        -- Branch
+        -- Grow branches
         splits = [-1 1]
         if seg.generation < 5
             splits = [-1 0 1]
-        for dir in splits
-            spread_progress = log(elapsed() + 1)
+        for direction in splits
+            spread_progress = log(env.elapsed + 1)
             min(@spread_progress 1.0)
-            angle_target = 40.0
-            branch_angle = seed() * angle_target * dir * spread_progress
+            angle_target = 80.0
+            angle_delt = seed() * angle_target * direction * spread_progress
+
             child = create(Segment)
             child.base_loc = end_loc
-            child.base_angle = tip_angle + branch_angle
+            child.base_angle = tip_angle + angle_delt
             child.generation = seg.generation + 1
-            s = seed()
             child.distance_till_branch = distance_between_branches + 20.0 * seed()
             child.growth_rate = seg.growth_rate * .9
 
             child.step
 
-    -- Grow a child segment
+    -- Grow a single child segment
     else
         angle_delt = (seed() - 0.5) * 30.0
         
