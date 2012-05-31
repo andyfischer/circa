@@ -12,6 +12,8 @@ namespace for_function {
         append_phrase(source, for_loop_get_iterator_name(term),
                 term, phrase_type::UNDEFINED);
         append_phrase(source, " in ", term, phrase_type::KEYWORD);
+        if (term->boolPropOptional("modifyList", false))
+            append_phrase(source, "@", term, phrase_type::UNDEFINED);
         format_source_for_input(source, term, 0);
     }
 

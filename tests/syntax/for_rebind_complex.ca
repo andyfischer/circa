@@ -1,0 +1,12 @@
+
+type S {
+    List t
+}
+
+s = create(S)
+s.t = [1 2 3]
+
+for i in @s.t
+    i += 1
+
+print(s.t)

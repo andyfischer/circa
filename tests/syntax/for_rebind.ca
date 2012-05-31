@@ -1,0 +1,7 @@
+
+L = [1 2 3]
+
+for i in @L
+    i += 1
+
+print(L)

@@ -290,14 +290,23 @@ bool is_method_call(Term* term)
     return term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
 }
 
-bool has_implicit_name_binding(Term* term)
+static bool has_implicit_name_binding(Term* term)
 {
     if (term->name == "")
         return false;
-    if (!is_method_call(term))
-        return false;
-    return function_get_input_placeholder(as_function(term->function), 0)
-        ->boolPropOptional("rebind", false);
+
+    if (term->boolPropOptional("syntax:implicitName", false))
+        return true;
+
+    if (term->hasProperty("syntax:rebindOperator"))
+        return true;
+
+    if (is_method_call(term)) {
+        return function_get_input_placeholder(as_function(term->function), 0)
+            ->boolPropOptional("rebind", false);
+    }
+
+    return false;
 }
 
 void format_name_binding(StyledSource* source, Term* term)
@@ -305,8 +314,6 @@ void format_name_binding(StyledSource* source, Term* term)
     if (term->name == "")
         return;
     else if (has_implicit_name_binding(term))
-        return;
-    else if (term->hasProperty("syntax:rebindOperator"))
         return;
     else {
         append_phrase(source, term->name.c_str(), term, phrase_type::UNDEFINED);

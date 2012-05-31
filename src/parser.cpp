@@ -1006,19 +1006,12 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     Term* listExpr = infix_expression(branch, tokens, context).term;
 
-    std::string name;
-    if (rebindListName)
-        name = listExpr->name;
-
-    Term* forTerm = apply(branch, FUNCS.for_func, TermList(listExpr), name);
+    Term* forTerm = apply(branch, FUNCS.for_func, TermList(listExpr));
     Branch* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
     set_input_syntax_hint(forTerm, 0, "postWhitespace", "");
 
     forTerm->setBoolProp("modifyList", rebindListName);
-
-    if (rebindListName)
-        forTerm->setStringProp("syntax:rebindOperator", listExpr->name);
 
     start_building_for_loop(forTerm, iterator_name.c_str());
 
@@ -1026,6 +1019,14 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     finish_for_loop(forTerm);
     set_source_location(forTerm, startPosition, tokens);
+
+    // Wrap up the rebound value, if it's a complex lexpr.
+    if (rebindListName) {
+        Term* lexprRoot = find_lexpr_root(listExpr);
+        Term* result = write_setter_chain_from_getter_chain(branch, listExpr, forTerm);
+        rename(result, lexprRoot->name);
+        result->setBoolProp("syntax:implicitName", true);
+    }
 
     return ParseResult(forTerm);
 }
