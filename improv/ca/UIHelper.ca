@@ -36,7 +36,7 @@ def Button.draw(b, Painter p)
     p.setPen(create_pen(#fff, 1.0, :none))
     p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
 
-def Button.input(b :out, InputEvent e)
+def Button.input(@b, InputEvent e)
     if e.is_mouse
         b.rollover = e.mousePos.inside(b.rect)
         b.triggered = b.rollover and e.eventType == MouseUp
@@ -54,7 +54,7 @@ def button_bar(List definitions) -> ButtonBar
         b
     return [buttons]
 
-def ButtonBar.arrange(self :out, Rect rect, Name orientation)
+def ButtonBar.arrange(@self, Rect rect, Name orientation)
     spacer = 10
 
     count = self.buttons.length
@@ -84,7 +84,7 @@ def ButtonBar.draw(b, Painter p)
     for button in b.buttons
         button.draw(p)
 
-def ButtonBar.input(b :out, InputEvent e) -> any
+def ButtonBar.input(@b, InputEvent e) -> any
     if not e.is_mouse
         return null
     action = null
@@ -99,7 +99,7 @@ def ButtonBar.input(b :out, InputEvent e) -> any
     b.buttons = buttons
     return action
 
-def ButtonBar.setToggled(b :out, int index, bool toggle)
+def ButtonBar.setToggled(@b, int index, bool toggle)
     b.buttons[index].toggled = toggle
-def ButtonBar.setLabel(b :out, int index, String label)
+def ButtonBar.setLabel(@b, int index, String label)
     b.buttons[index].label = label

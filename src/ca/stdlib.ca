@@ -69,6 +69,8 @@ namespace sys
     def arg(int index) -> String
     def dll_patch()
     def module_search_paths() -> List
+    def perf_stats_reset()
+    def perf_stats_dump()
 
 
 -- Load a module from a file.
@@ -98,9 +100,9 @@ def Branch.terms(_) -> List
 def Branch.version(_) -> int
     -- Monotonically increasing version number, incremented for module reloads.
 
-def Dict.count(_) -> int
-def Dict.set(_ :out, String key, any value)
-def Dict.get(_, String key) -> any
+def Dict.count(self) -> int
+def Dict.set(@self, String key, any value)
+def Dict.get(self, String key) -> any
 
 type Frame;
 def Frame.branch(_) -> Branch
@@ -134,15 +136,15 @@ def Interpreter.errored(_) -> bool
 def Interpreter.error_message(_) -> String
 def Interpreter.toString(_) -> String
 
-def List.append(self :out, any)
-def List.extend(self :out, List)
+def List.append(@self, any)
+def List.extend(@self, List)
 def List.count(self) -> int
-def List.insert(self :out, int, any)
+def List.insert(@self, int, any)
 def List.length(self) -> int
 def List.join(self, String) -> String
 def List.slice(self, int start, int fin) -> List
 
-def String.append(self :out, String right)
+def String.append(@self, String right)
     self = concat(self, right)
     
 def String.char_at(_, int index) -> String
