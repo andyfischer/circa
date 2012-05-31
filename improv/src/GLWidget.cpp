@@ -20,8 +20,8 @@ GLWidget::GLWidget(QWidget *parent)
 
     elapsedTime.start();
 
-    // Fixes a font corruption issue on Windows
 #ifdef _MSC_VER
+    // Fixes a font corruption issue on Windows
     QGL::setPreferredPaintEngine( QPaintEngine::OpenGL );
 #endif
 }
@@ -45,7 +45,6 @@ void GLWidget::paintEvent(QPaintEvent*)
     QPainter painter;
     painter.begin(this);
     painter.setRenderHint(QPainter::Antialiasing);
-    painter.setRenderHint(QPainter::TextAntialiasing);
 
     scripts_pre_message_send();
 
