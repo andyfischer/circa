@@ -574,7 +574,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     set_null(&functionName);
 
-    // Consume input arguments
+    // Input arguments
     int inputIndex = 0;
     while (!tokens.nextIs(TK_RPAREN) && !tokens.finished())
     {
@@ -591,13 +591,20 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
         Term* typeTerm = NULL;
         if (inputIndex == 0 && isMethod) {
-            // For input0 of a method, don't parse an explicit type name.
+            // For input0 of a method, don't expect an explicit type name.
             typeTerm = methodType;
         } else {
             typeTerm = type_expr(branch, tokens, context).term;
         }
 
         possible_whitespace(tokens);
+
+        // Optional @, indicating an output.
+        bool rebindSymbol = false;
+        if (tokens.nextIs(TK_AT_SIGN)) {
+            tokens.consume(TK_AT_SIGN);
+            rebindSymbol = true;
+        }
 
         std::string name;
         if (tokens.nextIs(TK_IDENTIFIER)) {
@@ -616,6 +623,11 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
         if (isStateArgument)
             input->setBoolProp("state", true);
+
+        if (rebindSymbol) {
+            input->setBoolProp("output", true);
+            input->setBoolProp("syntax:rebindSymbol", true);
+        }
 
         // Variable args when ... is appended
         if (tokens.nextIs(TK_ELLIPSIS)) {
@@ -1637,7 +1649,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
         explicitRebindLHS = false;
         tokens.consume();
     } else {
-        internal_error("expected . or @. in method_call");
+        internal_error("parser::method_call expected '.' or '@.'");
     }
     
     bool rebindLHS = explicitRebindLHS;

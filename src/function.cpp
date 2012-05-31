@@ -449,18 +449,24 @@ void function_format_header_source(StyledSource* source, Function* func)
         if (i == 0 && term->boolPropOptional("syntax:methodDecl", false))
             showType = false;
 
+        // Type
         if (showType)
             append_phrase(source,
                 name_to_string(function_get_input_type(term, i)->name),
                 term, phrase_type::TYPE_NAME);
 
+        // Name
         if (name != "" && name[0] != '#') {
+            if (input->boolPropOptional("syntax:rebindSymbol", false))
+                append_phrase(source, "@", term, phrase_type::UNDEFINED);
+
             if (showType)
                 append_phrase(source, " ", term, TK_WHITESPACE);
             append_phrase(source, name, term, phrase_type::UNDEFINED);
         }
 
-        if (function_can_rebind_input(term, i)) {
+        if (input->boolPropOptional("output", false)
+                && !input->boolPropOptional("syntax:rebindSymbol", false)) {
             append_phrase(source, " ", term, TK_WHITESPACE);
             append_phrase(source, ":out", term, phrase_type::UNDEFINED);
         }
