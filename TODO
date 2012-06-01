@@ -1,12 +1,10 @@
 
-Parser
-  Member function decl should support @ instead of :out
-
 Source repro
-  Each branch should have base indent level
+  Each branch should store the base indent level (instead of having this data in Term)
 
 Code cleanup
   Remove importing_macros.h
+  Deprecate API using Term* or Function* to reference functions (prefer Branch*)
 
 Big Features
   Proper module system
