@@ -41,7 +41,6 @@ Branch::Branch()
     version(0),
     inProgress(false),
     stateType(NULL),
-    currentlyCascadingUpdates(false),
     emptyEvaluation(false)
 {
     id = g_nextBranchID++;
@@ -242,12 +241,6 @@ void Branch::remove(std::string const& name)
 
 void Branch::removeNulls()
 {
-    if (is_list(&pendingUpdates)) {
-        for (int i=0; i < _terms.length(); i++)
-            if ((_terms[i] == NULL) && i < list_length(&pendingUpdates))
-                list_remove_index(&pendingUpdates, i);
-    }
-
     int numDeleted = 0;
     for (int i=0; i < _terms.length(); i++) {
         if (_terms[i] == NULL) {
@@ -260,10 +253,8 @@ void Branch::removeNulls()
 
     if (numDeleted > 0)
         _terms.resize(_terms.length() - numDeleted);
-
-    if (is_list(&pendingUpdates))
-        List::checkCast(&pendingUpdates)->resize(_terms.length());
 }
+
 void Branch::removeNameBinding(Term* term)
 {
     if (term->name != "" && names[term->name] == term)
@@ -462,7 +453,6 @@ void clear_branch(Branch* branch)
     //std::cout << "clear_branch: " << branch << std::endl;
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
-    set_null(&branch->pendingUpdates);
     branch->stateType = NULL;
 
     branch->names.clear();
@@ -499,7 +489,7 @@ void clear_branch(Branch* branch)
             Term* user = term->users[userIndex];
             for (int depIndex = 0; depIndex < user->numDependencies(); depIndex++) {
                 if (user->dependency(depIndex) == term) {
-                    mark_repairable_link(user, term->name, depIndex);
+                    // mark_repairable_link(user, term->name, depIndex);
                     user->setDependency(depIndex, NULL);
                 }
             }

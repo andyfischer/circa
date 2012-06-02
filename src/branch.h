@@ -55,12 +55,6 @@ struct Branch : caBranch
     // Compound type object describing our inlined state. May be NULL.
     Type* stateType;
 
-    // This value stores information about pending code changes. This is populated
-    // when someone makes a term change that will force other terms to be updated.
-    // See update_cascades.cpp
-    Value pendingUpdates;
-    bool currentlyCascadingUpdates;
-
     // Evaluation advice
     bool emptyEvaluation;
 

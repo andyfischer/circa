@@ -89,7 +89,6 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     change_function(term, function);
 
     update_unique_name(term);
-    on_inputs_changed(term);
     update_extra_outputs(term);
 
     // Post-compile steps
@@ -124,8 +123,6 @@ void set_input(Term* term, int index, Term* input)
 
     // Check if we should remove 'term' from the user list of previousInput
     possibly_prune_user_list(term, previousInput);
-
-    mark_inputs_changed(term);
 }
 
 void set_inputs(Term* term, TermList const& inputs)
@@ -151,8 +148,6 @@ void set_inputs(Term* term, TermList const& inputs)
     // Check to remove 'term' from user list of any previous inputs
     for (size_t i=0; i < previousInputs.size(); i++)
         possibly_prune_user_list(term, previousInputs[i].term);
-
-    mark_inputs_changed(term);
 }
 
 void insert_input(Term* term, Term* input)
@@ -778,8 +773,6 @@ void branch_finish_changes(Branch* branch)
             branch_finish_changes(term->nestedContents);
     }
 
-    finish_update_cascade(branch);
-
     fix_forward_function_references(branch);
 
     // Create an output_placeholder for state, if necessary.
@@ -1251,9 +1244,6 @@ void remove_term(Term* term)
             branch->_terms[i]->index = i;
     }
     branch->_terms.resize(branch->_terms.length()-1);
-
-    if (is_list(&branch->pendingUpdates))
-        list_remove_index(&branch->pendingUpdates, index);
 }
 
 void remap_pointers_quick(Term* term, Term* old, Term* newTerm)
