@@ -24,6 +24,11 @@
 
 namespace circa {
 
+void on_term_created(Term* term)
+{
+    // debugging hook
+}
+
 Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string const& name)
 {
     branch_start_changes(branch);
@@ -68,6 +73,8 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // Create the term
     Term* term = branch->appendNew();
     INCREMENT_STAT(termsCreated);
+
+    on_term_created(term);
 
     // Position the term before any output_placeholder terms.
     branch->move(term, position);

@@ -1,0 +1,22 @@
+
+type T {
+    int i
+}
+
+def T.f(self, int i)
+    state s = 0
+    s += i
+    self.i = i
+    print('called T.f with: ' self ', ' s ', ' i)
+
+
+t = create(T)
+t.i = 2
+
+s = null
+t.f(1, state = s)
+print('s = ' s)
+t.f(2, state = s)
+print('s = ' s)
+t.f(3, state = s)
+print('s = ' s)

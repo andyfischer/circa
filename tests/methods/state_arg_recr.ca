@@ -1,0 +1,27 @@
+
+
+type T {
+    int i
+}
+
+def T.f(self, int i)
+    state s = 0
+    s += i
+    self.i = i
+    print('called T.f with: ' self ', ' s ', ' i)
+
+    if i == 0
+        print('doing recursive call..')
+        state nested
+        self.f(5, state = nested)
+        print('finished recursive call, nested = ' nested)
+
+
+t = create(T)
+t.i = 2
+
+s = null
+t.f(0, state = s)
+print('s = ' s)
+t.f(1, state = s)
+print('s = ' s)

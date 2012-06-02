@@ -1,0 +1,13 @@
+
+
+def f(int i)
+  state a = i
+  print('a = ' a)
+
+  if i == 5
+      recr_s = null
+      f(4, state = recr_s)
+
+s = null
+f(4, state = s)
+print('s = ' s)

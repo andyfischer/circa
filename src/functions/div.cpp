@@ -12,14 +12,16 @@ namespace div_function {
 
     CA_FUNCTION(div_i)
     {
-        set_int(OUTPUT, INT_INPUT(0) / INT_INPUT(1));
+        int a = to_int(circa_input(_stack, 0));
+        int b = to_int(circa_input(_stack, 1));
+        set_int(circa_output(_stack, 0), a / b);
     }
 
     void setup(Branch* kernel)
     {
         import_function(kernel, div_f, "div_f(number,number) -> number");
         FUNCS.div = import_function(kernel, div_f, "div(number,number) -> number");
-        import_function(kernel, div_i, "div_i(int,int) -> int");
+        import_function(kernel, div_i, "div_i(number,number) -> int");
     }
 }
 } // namespace circa

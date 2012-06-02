@@ -158,6 +158,7 @@ def all_testable_files():
         TestRoot + '/funcs',
         TestRoot + '/list',
         TestRoot + '/meta',
+        TestRoot + '/methods',
         TestRoot + '/reflection',
         TestRoot + '/runtime_typing',
         TestRoot + '/state',
