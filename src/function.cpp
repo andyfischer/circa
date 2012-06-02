@@ -132,14 +132,16 @@ void finish_building_function(Function* func)
 
     // After the output_placeholder terms are created, we might need to update the call
     // sites of any recursive calls.
+
     for (BranchIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (as_function(term->function) != func)
             continue;
         update_extra_outputs(term);
+
+        // Update cascade, might need to fix pack_state() calls.
+        branch_update_existing_pack_state_calls(term->owningBranch);
     }
-
-
 
     update_exit_points(contents);
     branch_finish_changes(contents);

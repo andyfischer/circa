@@ -29,6 +29,11 @@ void on_create_call(Term* term)
         func(term);
 }
 
+void on_term_name_changed(Term* term, const char* oldName, const char* newName)
+{
+    // No-op
+}
+
 void fix_forward_function_references(Branch* branch)
 {
     for (BranchIterator it(branch); it.unfinished(); it.advance()) {

@@ -301,8 +301,11 @@ void rename(Term* term, std::string const& name)
         term->owningBranch->bindName(term, name);
     }
 
+    std::string prevName = term->name;
     term->name = name;
     update_unique_name(term);
+
+    on_term_name_changed(term, prevName.c_str(), name.c_str());
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
@@ -579,19 +582,36 @@ Branch* term_get_function_details(Term* call)
 void update_extra_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
+    Branch* function = term_get_function_details(term);
 
     bool needToUpdatePackState = false;
 
     for (int index=1; ; index++) {
-        Term* placeholder = term_get_output_placeholder(term, index);
+        Term* placeholder = get_output_placeholder(function, index);
         if (placeholder == NULL)
             break;
 
         const char* name = "";
 
+        // Find the associated input placeholder (if any).
+        Term* associatedInput = NULL;
+
         int rebindsInput = placeholder->intPropOptional("rebindsInput", -1);
-        if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
-            name = term->input(rebindsInput)->name.c_str();
+
+        if (rebindsInput == -1) {
+
+            // Check if we can find the rebind-input by looking for state input.
+            if (is_state_output(placeholder))
+                rebindsInput = find_state_input(function)->index;
+        }
+
+        // Use the appropriate name
+        if (rebindsInput >= 0) {
+            Term* input = term->input(rebindsInput);
+
+            if (input != NULL)
+                name = input->name.c_str();
+
         } else {
             name = placeholder->name.c_str();
         }

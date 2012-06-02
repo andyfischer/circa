@@ -17,7 +17,7 @@
 namespace circa {
 
 static void get_list_of_state_outputs(Branch* branch, int position, TermList* output);
-static void append_final_pack_state(Branch* branch);
+static Term* append_final_pack_state(Branch* branch);
 
 bool is_declared_state(Term* term)
 {
@@ -158,7 +158,7 @@ void branch_update_state_type(Branch* branch)
     }
 }
 
-static void append_final_pack_state(Branch* branch)
+static Term* append_final_pack_state(Branch* branch)
 {
     TermList inputs;
     get_list_of_state_outputs(branch, branch->length(), &inputs);
@@ -283,7 +283,10 @@ Term* find_or_create_state_container(Branch* branch)
     Term* input = append_state_input(branch);
 
     // Add a final pack_state call too
-    append_final_pack_state(branch);
+    Term* packState = append_final_pack_state(branch);
+
+    // And the state output
+    append_state_output(branch);
 
     return input;
 }

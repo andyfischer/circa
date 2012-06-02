@@ -1,0 +1,7 @@
+called T.f with: {i: 0}, 0, 0
+doing recursive call..
+called T.f with: {i: 5}, 5, 5
+finished recursive call, nested = {s: 5, _if_block: [null, null]}
+s = {s: 0, _if_block: [{nested: {s: 5, _if_block: [null, null]}}]}
+called T.f with: {i: 1}, 1, 1
+s = {s: 1, _if_block: [null, null]}

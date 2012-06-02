@@ -14,7 +14,9 @@ void mark_static_errors_invalid(Branch* branch);
 void finish_update_cascade(Branch* branch);
 void recursively_finish_update_cascade(Branch* branch);
 
+// Events that may cause update cascades
 void on_create_call(Term* term);
+void on_term_name_changed(Term* term, const char* prevName, const char* newName);
 
 void fix_forward_function_references(Branch* branch);
 
