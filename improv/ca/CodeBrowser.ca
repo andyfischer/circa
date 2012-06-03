@@ -1,0 +1,18 @@
+
+type FilteredBranch {
+    Branch branch
+    List filters
+
+    bool needsUpdate
+    List terms  -- derived from branch & filter
+}
+
+
+type CodeBrowser {
+    Map termPosition  -- maps Term to Rect
+    List filters
+
+    Rect positionRect
+}
+
+def position_terms(Rect rect, FilteredBranch filteredBranch) -> Map

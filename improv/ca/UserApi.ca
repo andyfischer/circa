@@ -57,6 +57,17 @@ def ScriptContext.mouse_down(self) -> bool
 def ScriptContext.bounds(self) -> Point
     return [self.painter.viewport.width, self.painter.viewport.height]
 
+def ScriptContext.mouse_pressed(self) -> bool
+    state bool mouse_was_down = false
+    result = false
+    
+    if self.mouse_down
+        result = not mouse_was_down
+        mouse_was_down = true
+    else
+        mouse_was_down = false
+
+    return result
 
 def ScriptContext.mouse_clicked(self) -> bool
     state bool mouse_was_down = false
