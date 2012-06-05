@@ -73,9 +73,23 @@ void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor 
     }
 }
 
+std::string branch_to_string(caValue* val)
+{
+    Branch* branch = as_branch(val);
+    if (branch == NULL)
+        return "Branch#null";
+    else {
+        std::stringstream s;
+        s << "Branch#";
+        s << branch->id;
+        return s.str();
+    }
+}
+
 void branch_setup_type(Type* type)
 {
     type->name = name_from_string("Branch");
+    type->toString = branch_to_string;
     type->gcListReferences = branch_list_references;
 }
 

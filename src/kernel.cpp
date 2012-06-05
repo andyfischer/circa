@@ -876,10 +876,24 @@ Branch* kernel()
     return KERNEL;
 }
 
+std::string ref_toString(caValue* val)
+{
+    Term* t = as_term_ref(val);
+    if (t == NULL)
+        return "Term#null";
+    else {
+        std::stringstream s;
+        s << "Term#";
+        s << t->id;
+        return s.str();
+    }
+}
+
 void ref_setup_type(Type* type)
 {
     type->name = name_from_string("Term");
     type->storageType = STORAGE_TYPE_REF;
+    type->toString = ref_toString;
 }
 
 void create_primitive_types()
