@@ -494,7 +494,7 @@ void function_format_header_source(caValue* source, Branch* function)
     append_phrase(source, ")", term, TK_LPAREN);
 
     Term* primaryOutput = get_output_placeholder(function, 0);
-    if (primaryOutput->type != &VOID_T) {
+    if (primaryOutput != NULL && primaryOutput->type != &VOID_T) {
         append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
                 term, TK_WHITESPACE);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);

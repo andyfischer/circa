@@ -1,0 +1,22 @@
+
+type JsonWriter {
+}
+
+def write_function(Branch func)
+    print('{')
+    print("'type': 'Function',")
+    print("'name': '" func.name "',")
+    print(func.format_function_heading)
+    inputs = for input in func.inputs
+        Term(@input)
+
+    print('},')
+
+print('{')
+for t in reflect:kernel().terms
+    Term(@t)
+
+    if t.is_function
+        write_function(t.contents)
+
+print('}')

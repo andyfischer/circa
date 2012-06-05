@@ -149,7 +149,7 @@ void Branch__format_function_heading(caStack* stack)
     Branch* branch = as_branch(circa_input(stack, 0));
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);
-    // function_format_header_source(output, branch);
+    function_format_header_source(output, branch);
 }
 
 void Branch__has_static_error(caStack* stack)
@@ -565,6 +565,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Branch.file_signature", Branch__file_signature},
         {"Branch.statements", Branch__statements},
         {"Branch.format_source", Branch__format_source},
+        {"Branch.format_function_heading", Branch__format_function_heading},
         {"Branch.get_term", Branch__get_term},
         {"Branch.get_static_errors", Branch__get_static_errors},
         {"Branch.get_static_errors_formatted", Branch__get_static_errors_formatted},
