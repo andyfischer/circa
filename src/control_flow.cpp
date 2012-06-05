@@ -10,7 +10,6 @@
 #include "if_block.h"
 #include "importing.h"
 #include "introspection.h"
-#include "documentation.h"
 #include "kernel.h"
 #include "source_repro.h"
 #include "term.h"
@@ -146,17 +145,14 @@ void control_flow_setup_funcs(Branch* kernel)
     FUNCS.discard = import_function(kernel, NULL, "discard()");
     as_function(FUNCS.discard)->formatSource = discard_formatSource;
     as_function(FUNCS.discard)->postCompile = controlFlow_postCompile;
-    hide_from_docs(FUNCS.discard);
 
     FUNCS.break_func = import_function(kernel, NULL, "break()");
     as_function(FUNCS.break_func)->formatSource = break_formatSource;
     as_function(FUNCS.break_func)->postCompile = controlFlow_postCompile;
-    hide_from_docs(FUNCS.break_func);
 
     FUNCS.continue_func = import_function(kernel, NULL, "continue()");
     as_function(FUNCS.continue_func)->formatSource = continue_formatSource;
     as_function(FUNCS.continue_func)->postCompile = controlFlow_postCompile;
-    hide_from_docs(FUNCS.continue_func);
 }
 
 static Term* find_exit_point_for_term(Term* term)

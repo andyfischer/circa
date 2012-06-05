@@ -129,6 +129,11 @@ void Branch__outputs(caStack* stack)
         set_term_ref(list_append(output), term);
     }
 }
+void Branch__owner(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    set_term_ref(circa_output(stack, 0), branch->owningTerm);
+}
 
 void Branch__format_source(caStack* stack)
 {
@@ -137,6 +142,14 @@ void Branch__format_source(caStack* stack)
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);
     format_branch_source((StyledSource*) output, branch);
+}
+
+void Branch__format_function_heading(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    caValue* output = circa_output(stack, 0);
+    circa_set_list(output, 0);
+    // function_format_header_source(output, branch);
 }
 
 void Branch__has_static_error(caStack* stack)
@@ -341,6 +354,13 @@ void Term__function(caStack* stack)
         return circa_output_error(stack, "NULL reference");
     set_function(circa_output(stack, 0), as_function(t->function));
 }
+void Term__function_contents(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+    set_branch(circa_output(stack, 0), function_contents(as_function(t->function)));
+}
 void Term__type(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
@@ -470,6 +490,15 @@ void Term__parent(caStack* stack)
     }
     set_branch(circa_output(stack, 0), t->owningBranch);
 }
+void Term__contents(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL) {
+        circa_output_error(stack, "NULL reference");
+        return;
+    }
+    set_branch(circa_output(stack, 0), t->nestedContents);
+}
 
 void Term__source_location(caStack* stack)
 {
@@ -530,6 +559,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Branch.is_null", Branch__is_null},
         {"Branch.output", Branch__output},
         {"Branch.outputs", Branch__outputs},
+        {"Branch.owner", Branch__owner},
         {"Branch.dump", Branch__dump},
         {"Branch.call", Branch__call},
         {"Branch.file_signature", Branch__file_signature},
@@ -549,6 +579,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},
         {"Term.function", Term__function},
+        {"Term.function_contents", Term__function_contents},
         {"Term.get_type", Term__type},
         {"Term.tweak", Term__tweak},
         {"Term.input", Term__input},
@@ -556,6 +587,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Term.name", Term__name},
         {"Term.num_inputs", Term__num_inputs},
         {"Term.parent", Term__parent},
+        {"Term.contents", Term__contents},
         {"Term.source_location", Term__source_location},
         {"Term.location_string", Term__location_string},
         {"Term.global_id", Term__global_id},

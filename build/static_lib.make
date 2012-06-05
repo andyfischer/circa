@@ -74,7 +74,6 @@ OBJECTS := \
 	$(OBJDIR)/debug.o \
 	$(OBJDIR)/dict.o \
 	$(OBJDIR)/dll_loading.o \
-	$(OBJDIR)/documentation.o \
 	$(OBJDIR)/evaluation.o \
 	$(OBJDIR)/feedback.o \
 	$(OBJDIR)/file.o \
@@ -204,9 +203,6 @@ $(OBJDIR)/dict.o: ../src/dict.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/dll_loading.o: ../src/dll_loading.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/documentation.o: ../src/documentation.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/evaluation.o: ../src/evaluation.cpp

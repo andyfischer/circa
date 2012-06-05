@@ -124,7 +124,7 @@ void function_set_evaluate_func(Term* func, EvaluateFunc eval);
 // Change the function's EvaluateFunc, and update any terms that are using it.
 void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialzeType);
 
-void function_format_header_source(StyledSource* source, Function* func);
+void function_format_header_source(StyledSource* source, Branch* func);
 void function_format_source(StyledSource* source, Term* term);
 
 void function_set_empty_evaluation(Function* function);

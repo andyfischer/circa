@@ -230,6 +230,7 @@ Type* function_get_output_type(Function* func, int index)
     return placeholder->type;
 }
 
+// TODO: Replace with count_input_placeholders
 int function_num_inputs(Function* func)
 {
     Branch* contents = function_get_contents(func);
@@ -245,6 +246,7 @@ int function_num_inputs(Function* func)
     return count;
 }
 
+// TODO: Replace with count_output_placeholders
 int function_num_outputs(Function* func)
 {
     Branch* contents = function_get_contents(func);
@@ -416,9 +418,10 @@ void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialize
     as_function(func)->specializeType = specializeFunc;
 }
 
-void function_format_header_source(StyledSource* source, Function* func)
+void function_format_header_source(StyledSource* source, Branch* function)
 {
-    Term* term = func->declaringTerm;
+    Term* term = function->owningTerm;
+
     ca_assert(term != NULL);
 
     append_phrase(source, term->name, term, phrase_type::TERM_NAME);
@@ -431,11 +434,12 @@ void function_format_header_source(StyledSource* source, Function* func)
     append_phrase(source, "(", term, TK_LPAREN);
 
     bool first = true;
-    int numInputs = function_num_inputs(func);
+    int numInputs = count_input_placeholders(function);
     for (int i=0; i < numInputs; i++) {
-        std::string name = function_get_input_name(func, i);
 
-        Term* input = function_get_input_placeholder(func, i);
+        Term* input = get_input_placeholder(function, i);
+
+        std::string name = input->name;
 
         if (input->boolPropOptional("hiddenInput", false))
             continue;
@@ -453,8 +457,7 @@ void function_format_header_source(StyledSource* source, Function* func)
 
         // Type
         if (showType)
-            append_phrase(source,
-                name_to_string(function_get_input_type(term, i)->name),
+            append_phrase(source, name_to_string(input->type->name),
                 term, phrase_type::TYPE_NAME);
 
         // Name
@@ -484,21 +487,21 @@ void function_format_header_source(StyledSource* source, Function* func)
         }
     }
 
-    bool varArgs = function_has_variable_args(func);
+    bool varArgs = has_variable_args(function);
     if (varArgs)
         append_phrase(source, "...", term, phrase_type::UNDEFINED);
 
     append_phrase(source, ")", term, TK_LPAREN);
 
-    if (function_get_output_type(term, 0) != &VOID_T) {
+    Term* primaryOutput = get_output_placeholder(function, 0);
+    if (primaryOutput->type != &VOID_T) {
         append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
                 term, TK_WHITESPACE);
         append_phrase(source, "->", term, phrase_type::UNDEFINED);
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
                 term, TK_WHITESPACE);
         append_phrase(source,
-            name_to_string(function_get_output_type(term, 0)->name),
-                term, phrase_type::TYPE_NAME);
+            name_to_string(primaryOutput->type->name), term, phrase_type::TYPE_NAME);
     }
 }
 
@@ -506,11 +509,10 @@ void function_format_source(StyledSource* source, Term* term)
 {
     append_phrase(source, "def ", term, TK_DEF);
 
-    Function* func = as_function(term);
+    Branch* contents = function_contents(term);
 
-    function_format_header_source(source, func);
-
-    format_branch_source(source, nested_contents(term), term);
+    function_format_header_source(source, contents);
+    format_branch_source(source, contents, term);
 }
 
 void function_set_empty_evaluation(Function* function)

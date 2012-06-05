@@ -9,7 +9,7 @@ def frame1()
     a = 1
     b = 2
 
-    frame2()
+    call_frame2 = frame2()
 
 int = make_interpreter()
 int.push_frame(branch_ref(frame1), [])
@@ -20,7 +20,7 @@ int.run
 index = 0
 for frame in int.frames
     Frame(@frame)
-    print('frame ' index ' location: ' frame.pc_term.location_string)
+    print('frame ' index ' name: ' frame.pc_term.name)
     print('frame ' index ' registers: ' frame.registers)
     print('frame ' index ' pc: ' frame.pc)
     index += 1

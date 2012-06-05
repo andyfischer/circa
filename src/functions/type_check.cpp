@@ -35,6 +35,10 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_function(INPUT(0)));
     }
+    CA_DEFINE_FUNCTION(is_type, "is_type(any) -> bool")
+    {
+        set_bool(OUTPUT, is_type(INPUT(0)));
+    }
     CA_FUNCTION(typeof_func)
     {
         set_type(OUTPUT, declared_type(INPUT_TERM(0)));

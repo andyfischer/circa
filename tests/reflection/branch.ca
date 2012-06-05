@@ -1,0 +1,23 @@
+
+testBranch = {
+    a = 1
+    b = 2
+    c = {
+        d = 4
+        e = 5
+    }
+}
+
+br = branch_ref(testBranch)
+
+a = br.find_term('a')
+b = br.find_term('b')
+c = br.find_term('c')
+
+assert(a.parent == br)
+assert(b.parent == br)
+assert(c.parent == br)
+
+c_contents = c.contents
+
+assert(c_contents.owner == c)
