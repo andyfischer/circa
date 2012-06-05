@@ -102,20 +102,20 @@ void controlFlow_postCompile(Term* term)
     hide_from_source(exitPoint);
 }
 
-void break_formatSource(StyledSource* source, Term* term)
+void break_formatSource(caValue* source, Term* term)
 {
     append_phrase(source, "break", term, phrase_type::KEYWORD);
 }
-void continue_formatSource(StyledSource* source, Term* term)
+void continue_formatSource(caValue* source, Term* term)
 {
     append_phrase(source, "continue", term, phrase_type::KEYWORD);
 }
-void discard_formatSource(StyledSource* source, Term* term)
+void discard_formatSource(caValue* source, Term* term)
 {
     append_phrase(source, "discard", term, phrase_type::KEYWORD);
 }
 
-void return_formatSource(StyledSource* source, Term* term)
+void return_formatSource(caValue* source, Term* term)
 {
     if (term->boolPropOptional("syntax:returnStatement", false)) {
         append_phrase(source, "return", term, phrase_type::KEYWORD);

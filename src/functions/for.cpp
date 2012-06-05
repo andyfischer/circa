@@ -5,7 +5,7 @@
 namespace circa {
 namespace for_function {
 
-    void format_heading(StyledSource* source, Term* term)
+    void format_heading(caValue* source, Term* term)
     {
         format_name_binding(source, term);
         append_phrase(source, "for ", term, phrase_type::KEYWORD);
@@ -17,7 +17,7 @@ namespace for_function {
         format_source_for_input(source, term, 0);
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         format_heading(source, term);
         format_branch_source(source, nested_contents(term), term);

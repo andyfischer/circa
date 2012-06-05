@@ -17,7 +17,7 @@ namespace bool_t {
         else
             return "false";
     }
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         append_phrase(source, bool_t::to_string(term_value(term)), term, TK_BOOL);
     }

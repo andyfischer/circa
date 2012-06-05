@@ -29,7 +29,7 @@ namespace int_t {
         strm << as_int(value);
         return strm.str();
     }
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         std::stringstream strm;
         if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")

@@ -42,7 +42,7 @@ namespace type_t {
         delete type;
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "type ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TYPE_NAME);

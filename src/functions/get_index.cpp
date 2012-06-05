@@ -32,7 +32,7 @@ namespace get_index_function {
         return infer_type_of_get_index(term->input(0));
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         if (term->boolPropOptional("syntax:brackets", false)) {
             format_name_binding(source, term);

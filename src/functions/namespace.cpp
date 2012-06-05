@@ -10,7 +10,7 @@ namespace namespace_function {
         push_frame(CONTEXT, nested_contents(CALLER));
     }
 
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
         append_phrase(source, term->name, term, phrase_type::TERM_NAME);

@@ -20,36 +20,22 @@ namespace phrase_type {
     const int UNKNOWN_IDENTIFIER = 220;
 }
 
-struct StyledSource
-{
-    // Each phrase has type:
-    // Phrase {
-    //   string text
-    //   Ref term
-    //   int phrase_type
-    // }
-    
-    List _phrases;
+void format_branch_source(caValue* source, Branch* branch, Term* format=NULL);
+std::string unformat_rich_source(caValue* source);
 
-    std::string toString();
-};
-
-void format_branch_source(StyledSource* source, Branch* branch, Term* format=NULL);
-std::string unformat_rich_source(StyledSource* source);
-
-void format_term_source(StyledSource* source, Term* term);
-void format_term_source_default_formatting(StyledSource* source, Term* term);
+void format_term_source(caValue* source, Term* term);
+void format_term_source_default_formatting(caValue* source, Term* term);
 
 // Formats source for the given input, as used by the term.
-void format_source_for_input(StyledSource* source, Term* term, int inputIndex);
-void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
+void format_source_for_input(caValue* source, Term* term, int inputIndex);
+void format_source_for_input(caValue* source, Term* term, int inputIndex,
         const char* defaultPre, const char* defaultPost);
 
-void format_name_binding(StyledSource* source, Term* term);
+void format_name_binding(caValue* source, Term* term);
 
-void append_phrase(StyledSource* source, const char* str, Term* term, int type);
+void append_phrase(caValue* source, const char* str, Term* term, int type);
 // Convenient overload:
-void append_phrase(StyledSource* source, std::string const& str, Term* term, int type);
+void append_phrase(caValue* source, std::string const& str, Term* term, int type);
 
 std::string get_branch_source_text(Branch* branch);
 std::string get_term_source_text(Term* term);

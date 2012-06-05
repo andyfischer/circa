@@ -42,7 +42,7 @@ namespace declared_state_function {
             create(declared_type(caller), output);
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "state ", term, TK_STATE);
 

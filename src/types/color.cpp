@@ -47,7 +47,7 @@ namespace color_t {
         return out.str();
     }
 
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         append_phrase(source, color_t::to_string(term), term, TK_COLOR);
     }

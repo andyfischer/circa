@@ -5,7 +5,7 @@
 namespace circa {
 namespace comment_function {
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, term->stringProp("comment"), term, TK_COMMENT);
     }

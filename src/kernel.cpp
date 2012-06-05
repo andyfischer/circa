@@ -1008,7 +1008,7 @@ void bootstrap_kernel()
     Term* map_type = parse_type(kernel, "type Map;");
     hashtable_t::setup_type(unbox_type(map_type));
 
-    Term* styledSourceType = parse_type(kernel, "type StyledSource;");
+    Term* styledSourceType = parse_type(kernel, "type caValue;");
     styled_source_t::setup_type(unbox_type(styledSourceType));
 
     Term* indexableType = parse_type(kernel, "type Indexable;");

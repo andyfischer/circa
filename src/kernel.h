@@ -186,7 +186,7 @@ namespace namespace_function {
 }
 
 namespace neg_function {
-    void formatSource(StyledSource* source, Term* term);
+    void formatSource(caValue* source, Term* term);
 }
 
 namespace return_function {

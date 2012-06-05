@@ -54,7 +54,7 @@ namespace get_field_function {
         return head;
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         format_name_binding(source, term);
         //append_phrase(source, get_relative_name(term, term->input(0)),

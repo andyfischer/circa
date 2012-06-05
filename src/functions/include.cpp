@@ -70,7 +70,7 @@ namespace include_function {
         set_branch(OUTPUT, CALLER->nestedContents);
     }
 
-    void import_formatSource(StyledSource* source, Term* term)
+    void import_formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "import ", term, phrase_type::UNDEFINED);
         append_phrase(source, term->stringProp("module"), term, phrase_type::UNDEFINED);

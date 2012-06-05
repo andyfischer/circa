@@ -141,7 +141,7 @@ void Branch__format_source(caStack* stack)
 
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);
-    format_branch_source((StyledSource*) output, branch);
+    format_branch_source((caValue*) output, branch);
 }
 
 void Branch__format_function_heading(caStack* stack)

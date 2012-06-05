@@ -87,7 +87,7 @@ namespace number_t {
         else
             return result;
     }
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         append_phrase(source, number_t::to_source_string(term).c_str(), term, TK_FLOAT);
     }

@@ -5,7 +5,7 @@
 namespace circa {
 namespace branch_function {
 
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         format_name_binding(source, term);
         format_branch_source(source, nested_contents(term), term);

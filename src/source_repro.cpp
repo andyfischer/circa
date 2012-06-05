@@ -17,13 +17,7 @@
 
 namespace circa {
 
-std::string
-StyledSource::toString()
-{
-    return to_string(&_phrases);
-}
-
-void format_branch_source(StyledSource* source, Branch* branch, Term* format)
+void format_branch_source(caValue* source, Branch* branch, Term* format)
 {
     if (format != NULL)
         append_phrase(source, format->stringPropOptional("syntax:postHeadingWs", ""),
@@ -71,18 +65,18 @@ void format_branch_source(StyledSource* source, Branch* branch, Term* format)
         append_phrase(source, "}", format, phrase_type::UNDEFINED);
 }
 
-std::string unformat_rich_source(StyledSource* source)
+std::string unformat_rich_source(caValue* source)
 {
     std::stringstream strm;
 
-    for (int i=0; i < list_length(&source->_phrases); i++) {
-        caValue* phrase = source->_phrases[i];
+    for (int i=0; i < list_length(source); i++) {
+        caValue* phrase = list_get(source, i);
         strm << as_string(list_get(phrase,0));
     }
     return strm.str();
 }
 
-void format_term_source(StyledSource* source, Term* term)
+void format_term_source(caValue* source, Term* term)
 {
     ca_assert(term != NULL);
 
@@ -125,7 +119,7 @@ void format_term_source(StyledSource* source, Term* term)
             term, phrase_type::WHITESPACE);
 }
 
-void format_term_source_default_formatting(StyledSource* source, Term* term)
+void format_term_source_default_formatting(caValue* source, Term* term)
 {
     std::string declarationStyle = term->stringPropOptional("syntax:declarationStyle",
             "function-call");
@@ -220,14 +214,14 @@ void format_term_source_default_formatting(StyledSource* source, Term* term)
         append_phrase(source, ")", term, TK_RPAREN);
 }
 
-void format_source_for_input(StyledSource* source, Term* term, int inputIndex)
+void format_source_for_input(caValue* source, Term* term, int inputIndex)
 {
     const char* defaultPost = (inputIndex+1 < term->numInputs()) ? "," : "";
     const char* defaultPre = inputIndex > 0 ? " " : "";
     format_source_for_input(source, term, inputIndex, defaultPre, defaultPost);
 }
 
-void format_source_for_input(StyledSource* source, Term* term, int inputIndex,
+void format_source_for_input(caValue* source, Term* term, int inputIndex,
         const char* defaultPre, const char* defaultPost)
 {
     Term* input = term->input(inputIndex);
@@ -309,7 +303,7 @@ static bool has_implicit_name_binding(Term* term)
     return false;
 }
 
-void format_name_binding(StyledSource* source, Term* term)
+void format_name_binding(caValue* source, Term* term)
 {
     if (term->name == "")
         return;
@@ -325,7 +319,7 @@ void format_name_binding(StyledSource* source, Term* term)
     }
 }
 
-void append_phrase(StyledSource* source, const char* str, Term* term, int type)
+void append_phrase(caValue* source, const char* str, Term* term, int type)
 {
     // No-op if string is empty
     if (str[0] == 0)
@@ -342,35 +336,35 @@ void append_phrase(StyledSource* source, const char* str, Term* term, int type)
         }
     }
 
-    List* list = (List*) set_list(source->_phrases.append());
+    List* list = (List*) set_list(list_append(source));
     list->resize(3);
     set_string((*list)[0], str);
     set_term_ref((*list)[1], term);
     set_int((*list)[2], type);
 }
 
-void append_phrase(StyledSource* source, std::string const& str, Term* term, int type)
+void append_phrase(caValue* source, std::string const& str, Term* term, int type)
 {
     return append_phrase(source, str.c_str(), term, type);
 }
 
 std::string get_branch_source_text(Branch* branch)
 {
-    StyledSource source;
+    Value source;
     format_branch_source(&source, branch);
     return unformat_rich_source(&source);
 }
 
 std::string get_term_source_text(Term* term)
 {
-    StyledSource source;
+    Value source;
     format_term_source(&source, term);
     return unformat_rich_source(&source);
 }
 
 std::string get_input_source_text(Term* term, int index)
 {
-    StyledSource source;
+    Value source;
     format_source_for_input(&source, term, index);
     return unformat_rich_source(&source);
 }

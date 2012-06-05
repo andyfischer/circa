@@ -8,7 +8,7 @@ namespace switch_function {
     CA_FUNCTION(evaluate_case) { }
     CA_FUNCTION(evaluate_default_case) { }
 
-    void switch_formatSource(StyledSource* source, Term* term)
+    void switch_formatSource(caValue* source, Term* term)
     {
         format_name_binding(source, term);
         append_phrase(source, "switch ", term, phrase_type::KEYWORD);
@@ -54,7 +54,7 @@ namespace switch_function {
         return outerRebinds->get(outputIndex - 1)->type;
     }
 
-    void case_formatSource(StyledSource* source, Term* term)
+    void case_formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "case ", term, phrase_type::KEYWORD);
         format_source_for_input(source, term, 0);

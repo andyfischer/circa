@@ -26,7 +26,7 @@ namespace set_field_function {
         return caller->input(0)->type;
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         format_source_for_input(source, term, 0);
         for (int i=2; i < term->numInputs(); i++) {

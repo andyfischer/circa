@@ -9,7 +9,7 @@ namespace null_t {
     {
         return "null";
     }
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "null", term, TK_NULL);
     }

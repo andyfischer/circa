@@ -418,7 +418,7 @@ void function_set_specialize_type_func(Term* func, SpecializeTypeFunc specialize
     as_function(func)->specializeType = specializeFunc;
 }
 
-void function_format_header_source(StyledSource* source, Branch* function)
+void function_format_header_source(caValue* source, Branch* function)
 {
     Term* term = function->owningTerm;
 
@@ -505,7 +505,7 @@ void function_format_header_source(StyledSource* source, Branch* function)
     }
 }
 
-void function_format_source(StyledSource* source, Term* term)
+void function_format_source(caValue* source, Term* term)
 {
     append_phrase(source, "def ", term, TK_DEF);
 

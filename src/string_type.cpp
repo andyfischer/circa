@@ -127,7 +127,7 @@ namespace string_t {
         return result.str();
     }
 
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         if (term->hasProperty("syntax:originalString")) {
             append_phrase(source, term->stringProp("syntax:originalString"),

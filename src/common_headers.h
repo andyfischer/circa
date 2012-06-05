@@ -52,7 +52,6 @@ struct RawOutputPrefs;
 struct TermMap;
 struct StaticTypeQuery;
 struct String;
-struct StyledSource;
 struct Term;
 struct TermList;
 struct Type;
@@ -65,7 +64,7 @@ typedef bool (*TermVisitor)(Term* term, caValue* context);
 
 typedef void (*EvaluateFunc)(caStack* stack);
 typedef Type* (*SpecializeTypeFunc)(Term* caller);
-typedef void (*FormatSource)(StyledSource* source, Term* term);
+typedef void (*FormatSource)(caValue* source, Term* term);
 typedef bool (*CheckInvariants)(Term* term, std::string* output);
 typedef void (*ReleaseFunc)(caValue* value);
 

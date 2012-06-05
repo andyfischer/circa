@@ -53,7 +53,7 @@ struct Type
 
     typedef void (*StaticTypeQueryFunc)(Type* type, StaticTypeQuery* query);
     typedef std::string (*ToString)(caValue* value);
-    typedef void (*FormatSource)(StyledSource*, Term* term);
+    typedef void (*FormatSource)(caValue*, Term* term);
     typedef void (*Touch)(caValue* value);
     typedef caValue* (*GetIndex)(caValue* value, int index);
     typedef void (*SetIndex)(caValue* value, int index, caValue* element);
@@ -165,7 +165,7 @@ namespace type_t {
     void initialize(Type* type, caValue* value);
     void copy(Type*, caValue* source, caValue* dest);
     std::string to_string(Term *caller);
-    void formatSource(StyledSource* source, Term* term);
+    void formatSource(caValue* source, Term* term);
     void remap_pointers(Term *term, TermMap const& map);
     void setup_type(Type* type);
 

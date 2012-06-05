@@ -20,7 +20,7 @@ namespace assign_function {
             return &ANY_T;
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         format_source_for_input(source, term, 0, "", "");
 

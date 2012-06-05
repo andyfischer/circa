@@ -9,7 +9,7 @@ namespace name_t {
     {
         return std::string(":") + name_to_string(as_int(value));
     }
-    void format_source(StyledSource* source, Term* term)
+    void format_source(caValue* source, Term* term)
     {
         std::string s = name_t::to_string(term_value(term));
         append_phrase(source, s.c_str(), term, TK_NAME);

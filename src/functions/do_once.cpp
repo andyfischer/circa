@@ -5,7 +5,7 @@
 namespace circa {
 namespace do_once_function {
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, "do once", term, phrase_type::KEYWORD);
         format_branch_source(source, nested_contents(term), term);

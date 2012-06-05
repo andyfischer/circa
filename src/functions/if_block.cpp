@@ -5,7 +5,7 @@
 namespace circa {
 namespace if_block_function {
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         format_name_binding(source, term);
 

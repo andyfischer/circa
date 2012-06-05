@@ -9,7 +9,7 @@ namespace unrecognized_expr_function {
     {
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, term->stringProp("originalText"), term, phrase_type::UNDEFINED);
     }

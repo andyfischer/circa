@@ -9,7 +9,7 @@ namespace unknown_identifier_function {
     {
     }
 
-    void formatSource(StyledSource* source, Term* term)
+    void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, term->name, term, phrase_type::UNKNOWN_IDENTIFIER);
     }
