@@ -89,38 +89,4 @@ Name name_from_string(caValue* str);
 // Deallocate all interned names, this should be called at shutdown
 void name_dealloc_global_data();
 
-const Name name_None = 0;
-const Name name_File = 2;
-const Name name_Newline = 3;
-const Name name_Out = 4;
-const Name name_Unknown = 5;
-const Name name_Repeat = 6;
-const Name name_Success = 7;
-const Name name_Failure = 8;
-
-// Misc errors
-const Name name_FileNotFound = 9;
-
-// Static errors
-const Name name_NotEnoughInputs = 10;
-const Name name_TooManyInputs = 11;
-const Name name_ExtraOutputNotFound = 12;
-
-// Evaluation strategies
-const Name name_Default = 15;
-const Name name_ByDemand = 16;
-
-// Temporary register values
-const Name name_Unevaluated = 17;
-const Name name_InProgress = 18;
-const Name name_Lazy = 13;
-const Name name_Consumed = 19;
-
-const Name name_Return = 20;
-const Name name_Continue = 21;
-const Name name_Break = 22;
-const Name name_Discard = 23;
-
-const Name c_FirstRuntimeName = 1000;
-
 } // namespace circa

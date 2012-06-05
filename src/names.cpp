@@ -7,6 +7,7 @@
 #include "kernel.h"
 #include "heap_debugging.h"
 #include "if_block.h"
+#include "names_builtin.h"
 #include "source_repro.h"
 #include "term.h"
 
@@ -21,6 +22,7 @@ struct RuntimeName
     Name namespaceRightRemainder;
 };
 
+const int c_FirstRuntimeName = name_LastBuiltinName + 1;
 const int c_maxRuntimeNames = 2000;
 
 RuntimeName g_runtimeNames[c_maxRuntimeNames];
@@ -461,35 +463,13 @@ Term* find_term_from_global_name(const char* name)
 
 const char* name_to_string(Name name)
 {
+    const char* builtin = builtin_name_to_string(name);
+    if (builtin != NULL)
+        return builtin;
+
     // Runtime symbols
     if (name >= c_FirstRuntimeName)
         return g_runtimeNames[name - c_FirstRuntimeName].str;
-
-    // Builtin symbols
-    switch (name) {
-        case name_None: return "";
-        case name_File: return "File";
-        case name_Newline: return "Newline";
-        case name_Out: return "Out";
-        case name_Unknown: return "Unknown";
-        case name_Repeat: return "Repeat";
-        case name_Success: return "Success";
-        case name_Failure: return "Failure";
-        case name_FileNotFound: return "FileNotFound";
-        case name_NotEnoughInputs: return "NotEnoughInputs";
-        case name_TooManyInputs: return "TooManyInputs";
-        case name_ExtraOutputNotFound: return "ExtraOutputNotFound";
-        case name_Default: return "Default";
-        case name_ByDemand: return "ByDemand";
-        case name_Unevaluated: return "Unevaluated";
-        case name_Consumed: return "Consumed";
-        case name_InProgress: return "InProgress";
-        case name_Lazy: return "Lazy";
-        case name_Return: return "Return";
-        case name_Continue: return "Continue";
-        case name_Break: return "Break";
-        case name_Discard: return "Discard";
-    }
 
     internal_error("Unknown name in name_to_string");
     return "";

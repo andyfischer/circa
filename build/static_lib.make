@@ -93,6 +93,7 @@ OBJECTS := \
 	$(OBJDIR)/metaprogramming.o \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
+	$(OBJDIR)/names_builtin.o \
 	$(OBJDIR)/parser.o \
 	$(OBJDIR)/source_repro.o \
 	$(OBJDIR)/stateful_code.o \
@@ -260,6 +261,9 @@ $(OBJDIR)/modules.o: ../src/modules.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/names.o: ../src/names.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/names_builtin.o: ../src/names_builtin.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/parser.o: ../src/parser.cpp
