@@ -424,12 +424,12 @@ void function_format_header_source(caValue* source, Branch* function)
 
     ca_assert(term != NULL);
 
-    append_phrase(source, term->name, term, phrase_type::TERM_NAME);
+    append_phrase(source, term->name, term, name_TermName);
 
     append_phrase(source, term->stringPropOptional("syntax:postNameWs", ""),
             term, TK_WHITESPACE);
     append_phrase(source, term->stringPropOptional("syntax:properties", ""),
-            term, phrase_type::UNDEFINED);
+            term, name_None);
 
     append_phrase(source, "(", term, TK_LPAREN);
 
@@ -445,10 +445,10 @@ void function_format_header_source(caValue* source, Branch* function)
             continue;
 
         if (input->boolPropOptional("state", false))
-            append_phrase(source, "state ", term, phrase_type::UNDEFINED);
+            append_phrase(source, "state ", term, name_None);
 
         if (!first)
-            append_phrase(source, ", ", term, phrase_type::UNDEFINED);
+            append_phrase(source, ", ", term, name_None);
         first = false;
 
         bool showType = true;
@@ -458,38 +458,38 @@ void function_format_header_source(caValue* source, Branch* function)
         // Type
         if (showType)
             append_phrase(source, name_to_string(input->type->name),
-                term, phrase_type::TYPE_NAME);
+                term, name_TypeName);
 
         // Name
         if (name != "" && name[0] != '#') {
             if (input->boolPropOptional("syntax:rebindSymbol", false))
-                append_phrase(source, "@", term, phrase_type::UNDEFINED);
+                append_phrase(source, "@", term, name_None);
 
             if (showType)
                 append_phrase(source, " ", term, TK_WHITESPACE);
-            append_phrase(source, name, term, phrase_type::UNDEFINED);
+            append_phrase(source, name, term, name_None);
         }
 
         if (input->boolPropOptional("output", false)
                 && !input->boolPropOptional("syntax:rebindSymbol", false)) {
             append_phrase(source, " ", term, TK_WHITESPACE);
-            append_phrase(source, ":out", term, phrase_type::UNDEFINED);
+            append_phrase(source, ":out", term, name_None);
         }
 
         if (input->boolPropOptional("meta", false)) {
             append_phrase(source, " ", term, TK_WHITESPACE);
-            append_phrase(source, ":meta", term, phrase_type::UNDEFINED);
+            append_phrase(source, ":meta", term, name_None);
         }
 
         if (input->boolPropOptional("rebind", false)) {
             append_phrase(source, " ", term, TK_WHITESPACE);
-            append_phrase(source, ":rebind", term, phrase_type::UNDEFINED);
+            append_phrase(source, ":rebind", term, name_None);
         }
     }
 
     bool varArgs = has_variable_args(function);
     if (varArgs)
-        append_phrase(source, "...", term, phrase_type::UNDEFINED);
+        append_phrase(source, "...", term, name_None);
 
     append_phrase(source, ")", term, TK_LPAREN);
 
@@ -497,11 +497,11 @@ void function_format_header_source(caValue* source, Branch* function)
     if (primaryOutput != NULL && primaryOutput->type != &VOID_T) {
         append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
                 term, TK_WHITESPACE);
-        append_phrase(source, "->", term, phrase_type::UNDEFINED);
+        append_phrase(source, "->", term, name_None);
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
                 term, TK_WHITESPACE);
         append_phrase(source,
-            name_to_string(primaryOutput->type->name), term, phrase_type::TYPE_NAME);
+            name_to_string(primaryOutput->type->name), term, name_TypeName);
     }
 }
 

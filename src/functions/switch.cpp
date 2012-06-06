@@ -11,7 +11,7 @@ namespace switch_function {
     void switch_formatSource(caValue* source, Term* term)
     {
         format_name_binding(source, term);
-        append_phrase(source, "switch ", term, phrase_type::KEYWORD);
+        append_phrase(source, "switch ", term, name_Keyword);
         format_source_for_input(source, term, 0);
         format_branch_source(source, nested_contents(term), term);
     }
@@ -56,7 +56,7 @@ namespace switch_function {
 
     void case_formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "case ", term, phrase_type::KEYWORD);
+        append_phrase(source, "case ", term, name_Keyword);
         format_source_for_input(source, term, 0);
         format_branch_source(source, nested_contents(term), term);
     }

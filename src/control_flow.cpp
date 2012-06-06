@@ -104,24 +104,24 @@ void controlFlow_postCompile(Term* term)
 
 void break_formatSource(caValue* source, Term* term)
 {
-    append_phrase(source, "break", term, phrase_type::KEYWORD);
+    append_phrase(source, "break", term, name_Keyword);
 }
 void continue_formatSource(caValue* source, Term* term)
 {
-    append_phrase(source, "continue", term, phrase_type::KEYWORD);
+    append_phrase(source, "continue", term, name_Keyword);
 }
 void discard_formatSource(caValue* source, Term* term)
 {
-    append_phrase(source, "discard", term, phrase_type::KEYWORD);
+    append_phrase(source, "discard", term, name_Keyword);
 }
 
 void return_formatSource(caValue* source, Term* term)
 {
     if (term->boolPropOptional("syntax:returnStatement", false)) {
-        append_phrase(source, "return", term, phrase_type::KEYWORD);
+        append_phrase(source, "return", term, name_Keyword);
         append_phrase(source,
                 term->stringPropOptional("syntax:postKeywordWs", " "),
-                term, phrase_type::WHITESPACE);
+                term, name_Whitespace);
 
         if (term->input(0) != NULL)
             format_source_for_input(source, term, 0, "", "");

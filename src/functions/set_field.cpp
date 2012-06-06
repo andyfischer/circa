@@ -30,16 +30,16 @@ namespace set_field_function {
     {
         format_source_for_input(source, term, 0);
         for (int i=2; i < term->numInputs(); i++) {
-            append_phrase(source, ".", term, phrase_type::UNDEFINED);
+            append_phrase(source, ".", term, name_None);
             caValue* fieldName = term_value(term->input(i));
 
             if (is_string(fieldName))
-                append_phrase(source, as_cstring(fieldName), term, phrase_type::UNDEFINED);
+                append_phrase(source, as_cstring(fieldName), term, name_None);
             else
                 // fieldName isn't a string, this is unexpected
-                append_phrase(source, to_string(fieldName).c_str(), term, phrase_type::UNDEFINED);
+                append_phrase(source, to_string(fieldName).c_str(), term, name_None);
         }
-        append_phrase(source, " =", term, phrase_type::UNDEFINED);
+        append_phrase(source, " =", term, name_None);
         format_source_for_input(source, term, 1);
     }
 

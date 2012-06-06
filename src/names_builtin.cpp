@@ -35,6 +35,13 @@ const char* builtin_name_to_string(int name)
     case name_Continue: return "Continue";
     case name_Break: return "Break";
     case name_Discard: return "Discard";
+    case name_InfixOperator: return "InfixOperator";
+    case name_FunctionName: return "FunctionName";
+    case name_TypeName: return "TypeName";
+    case name_TermName: return "TermName";
+    case name_Keyword: return "Keyword";
+    case name_Whitespace: return "Whitespace";
+    case name_UnknownIdentifier: return "UnknownIdentifier";
     case name_LastBuiltinName: return "LastBuiltinName";
     default: return NULL;
     }

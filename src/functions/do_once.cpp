@@ -7,7 +7,7 @@ namespace do_once_function {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "do once", term, phrase_type::KEYWORD);
+        append_phrase(source, "do once", term, name_Keyword);
         format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, TK_WHITESPACE);

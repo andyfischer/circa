@@ -6,20 +6,6 @@
 
 namespace circa {
 
-namespace phrase_type {
-    // Token enumerations are valid as phrase types. This list has some addtional
-    // types which are not tokens.
-    const int UNDEFINED = 200;
-    const int INFIX_OPERATOR = 201;
-    const int FUNCTION_NAME = 202;
-    const int TYPE_NAME = 203;
-    const int TERM_NAME = 204;
-    const int KEYWORD = 205;
-    const int WHITESPACE = 206;
-
-    const int UNKNOWN_IDENTIFIER = 220;
-}
-
 void format_branch_source(caValue* source, Branch* branch, Term* format=NULL);
 std::string unformat_rich_source(caValue* source);
 
@@ -33,9 +19,9 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
 
 void format_name_binding(caValue* source, Term* term);
 
-void append_phrase(caValue* source, const char* str, Term* term, int type);
+void append_phrase(caValue* source, const char* str, Term* term, Name type);
 // Convenient overload:
-void append_phrase(caValue* source, std::string const& str, Term* term, int type);
+void append_phrase(caValue* source, std::string const& str, Term* term, Name type);
 
 std::string get_branch_source_text(Branch* branch);
 std::string get_term_source_text(Term* term);

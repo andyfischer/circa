@@ -28,10 +28,10 @@ namespace assign_function {
 
         if (term->hasProperty("syntax:rebindOperator")) {
             append_phrase(source, rhs->stringPropOptional("syntax:functionName", ""),
-                rhs, phrase_type::UNDEFINED);
+                rhs, name_None);
             format_source_for_input(source, rhs, 1, "", "");
         } else {
-            append_phrase(source, "=", term, phrase_type::UNDEFINED);
+            append_phrase(source, "=", term, name_None);
             format_source_for_input(source, term, 1, "", "");
         }
     }

@@ -44,21 +44,21 @@ namespace type_t {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "type ", term, phrase_type::KEYWORD);
-        append_phrase(source, term->name, term, phrase_type::TYPE_NAME);
+        append_phrase(source, "type ", term, name_Keyword);
+        append_phrase(source, term->name, term, name_TypeName);
 
         if (as_type(term)->nocopy) {
-            append_phrase(source, " ", term, phrase_type::WHITESPACE);
-            append_phrase(source, ":nocopy", term, phrase_type::UNDEFINED);
+            append_phrase(source, " ", term, name_Whitespace);
+            append_phrase(source, ":nocopy", term, name_None);
         }
 
         if (term->boolPropOptional("handle", false)) {
-            append_phrase(source, " ", term, phrase_type::WHITESPACE);
-            append_phrase(source, ":handle", term, phrase_type::UNDEFINED);
+            append_phrase(source, " ", term, name_Whitespace);
+            append_phrase(source, ":handle", term, name_None);
         }
 
         if (term->boolPropOptional("syntax:semicolon", false)) {
-            //append_phrase(source, ";", term, phrase_type::UNDEFINED);
+            //append_phrase(source, ";", term, name_None);
             return;
         }
 
@@ -75,8 +75,7 @@ namespace type_t {
             ca_assert(field != NULL);
             append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
                     term, TK_WHITESPACE);
-            append_phrase(source, name_to_string(field->type->name),
-                    term, phrase_type::TYPE_NAME);
+            append_phrase(source, name_to_string(field->type->name), term, name_TypeName);
             append_phrase(source, field->stringPropOptional("syntax:postNameWs"," "),
                     term, TK_WHITESPACE);
             append_phrase(source, field->name, term, TK_IDENTIFIER);

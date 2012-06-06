@@ -58,7 +58,7 @@ namespace get_field_function {
     {
         format_name_binding(source, term);
         //append_phrase(source, get_relative_name(term, term->input(0)),
-        //        term, phrase_type::UNDEFINED);
+        //        term, name_None);
         format_source_for_input(source, term, 0);
         for (int i=1; i < term->numInputs(); i++) {
             append_phrase(source, ".", term, TK_DOT);

@@ -72,8 +72,8 @@ namespace include_function {
 
     void import_formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "import ", term, phrase_type::UNDEFINED);
-        append_phrase(source, term->stringProp("module"), term, phrase_type::UNDEFINED);
+        append_phrase(source, "import ", term, name_None);
+        append_phrase(source, term->stringProp("module"), term, name_None);
     }
 
     void setup(Branch* kernel)

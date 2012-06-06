@@ -12,8 +12,8 @@ namespace namespace_function {
 
     void format_source(caValue* source, Term* term)
     {
-        append_phrase(source, "namespace ", term, phrase_type::KEYWORD);
-        append_phrase(source, term->name, term, phrase_type::TERM_NAME);
+        append_phrase(source, "namespace ", term, name_Keyword);
+        append_phrase(source, term->name, term, name_TermName);
         format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
                 term, TK_WHITESPACE);

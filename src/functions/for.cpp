@@ -8,12 +8,11 @@ namespace for_function {
     void format_heading(caValue* source, Term* term)
     {
         format_name_binding(source, term);
-        append_phrase(source, "for ", term, phrase_type::KEYWORD);
-        append_phrase(source, for_loop_get_iterator_name(term),
-                term, phrase_type::UNDEFINED);
-        append_phrase(source, " in ", term, phrase_type::KEYWORD);
+        append_phrase(source, "for ", term, name_Keyword);
+        append_phrase(source, for_loop_get_iterator_name(term), term, name_None);
+        append_phrase(source, " in ", term, name_Keyword);
         if (term->boolPropOptional("modifyList", false))
-            append_phrase(source, "@", term, phrase_type::UNDEFINED);
+            append_phrase(source, "@", term, name_None);
         format_source_for_input(source, term, 0);
     }
 

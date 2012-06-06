@@ -48,11 +48,11 @@ namespace declared_state_function {
 
         if (term->hasProperty("syntax:explicitType")) {
             append_phrase(source, term->stringProp("syntax:explicitType"),
-                    term, phrase_type::TYPE_NAME);
+                    term, name_TypeName);
             append_phrase(source, " ", term, TK_WHITESPACE);
         }
 
-        append_phrase(source, term->name.c_str(), term, phrase_type::TERM_NAME);
+        append_phrase(source, term->name.c_str(), term, name_TermName);
 
         Term* defaultValue = NULL;
 
@@ -63,10 +63,10 @@ namespace declared_state_function {
         }
 
         if (defaultValue != NULL) {
-            append_phrase(source, " = ", term, phrase_type::UNDEFINED);
+            append_phrase(source, " = ", term, name_None);
             if (defaultValue->name != "")
                 append_phrase(source, get_relative_name_at(term, defaultValue),
-                        term, phrase_type::TERM_NAME);
+                        term, name_TermName);
             else
                 format_term_source(source, defaultValue);
         }

@@ -28,7 +28,14 @@ const int name_Return = 18;
 const int name_Continue = 19;
 const int name_Break = 20;
 const int name_Discard = 21;
-const int name_LastBuiltinName = 22;
+const int name_InfixOperator = 22;
+const int name_FunctionName = 23;
+const int name_TypeName = 24;
+const int name_TermName = 25;
+const int name_Keyword = 26;
+const int name_Whitespace = 27;
+const int name_UnknownIdentifier = 28;
+const int name_LastBuiltinName = 29;
 
 const char* builtin_name_to_string(int name);
 

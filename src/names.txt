@@ -7,20 +7,33 @@ Repeat
 Success
 Failure
 
+# Misc errors
 FileNotFound
 NotEnoughInputs
 TooManyInputs
 ExtraOutputNotFound
 
+# Evaluation strategies
 Default
 ByDemand
 
+# Temporary register values
 Unevaluated
 InProgress
 Lazy
 Consumed
 
+# Control flow
 Return
 Continue
 Break
 Discard
+
+# Formatted-source phrase types
+InfixOperator
+FunctionName
+TypeName
+TermName
+Keyword
+Whitespace
+UnknownIdentifier

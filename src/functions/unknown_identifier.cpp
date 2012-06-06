@@ -11,7 +11,7 @@ namespace unknown_identifier_function {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, term->name, term, phrase_type::UNKNOWN_IDENTIFIER);
+        append_phrase(source, term->name, term, name_UnknownIdentifier);
     }
 
     void setup(Branch* kernel)
