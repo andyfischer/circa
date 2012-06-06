@@ -67,7 +67,7 @@ void parse_string_as_argument_list(caValue* str, List* output)
 
     while (!tokens.finished()) {
 
-        if (tokens.nextIs(TK_WHITESPACE)) {
+        if (tokens.nextIs(tok_Whitespace)) {
             if (!equals_string(&itemInProgress, "")) {
                 copy(&itemInProgress, list_append(output));
                 set_string(&itemInProgress, "");

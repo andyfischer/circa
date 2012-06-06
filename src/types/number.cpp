@@ -89,7 +89,7 @@ namespace number_t {
     }
     void format_source(caValue* source, Term* term)
     {
-        append_phrase(source, number_t::to_source_string(term).c_str(), term, TK_FLOAT);
+        append_phrase(source, number_t::to_source_string(term).c_str(), term, tok_Float);
     }
     void setup_type(Type* type)
     {

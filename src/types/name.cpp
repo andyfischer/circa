@@ -12,7 +12,7 @@ namespace name_t {
     void format_source(caValue* source, Term* term)
     {
         std::string s = name_t::to_string(term_value(term));
-        append_phrase(source, s.c_str(), term, TK_NAME);
+        append_phrase(source, s.c_str(), term, tok_Name);
     }
 
     void setup_type(Type* type)

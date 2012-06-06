@@ -44,12 +44,12 @@ namespace declared_state_function {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "state ", term, TK_STATE);
+        append_phrase(source, "state ", term, tok_State);
 
         if (term->hasProperty("syntax:explicitType")) {
             append_phrase(source, term->stringProp("syntax:explicitType"),
                     term, name_TypeName);
-            append_phrase(source, " ", term, TK_WHITESPACE);
+            append_phrase(source, " ", term, tok_Whitespace);
         }
 
         append_phrase(source, term->name.c_str(), term, name_TermName);

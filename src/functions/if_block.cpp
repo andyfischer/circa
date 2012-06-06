@@ -28,7 +28,7 @@ namespace if_block_function {
 
             append_phrase(source,
                     caseTerm->stringPropOptional("syntax:preWhitespace", ""),
-                    caseTerm, TK_WHITESPACE);
+                    caseTerm, tok_Whitespace);
 
             if (firstCase) {
                 append_phrase(source, "if ", caseTerm, name_Keyword);
@@ -44,7 +44,7 @@ namespace if_block_function {
             // whitespace following the if/elif/else
             append_phrase(source,
                     caseTerm->stringPropOptional("syntax:lineEnding", ""),
-                    caseTerm, TK_WHITESPACE);
+                    caseTerm, tok_Whitespace);
 
             format_branch_source(source, nested_contents(caseTerm), caseTerm);
         }

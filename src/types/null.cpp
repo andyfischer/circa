@@ -11,7 +11,7 @@ namespace null_t {
     }
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, "null", term, TK_NULL);
+        append_phrase(source, "null", term, tok_Null);
     }
 
     caValue* getField(caValue* value, const char* field)

@@ -36,7 +36,7 @@ void format_branch_source(caValue* source, Branch* branch, Term* format)
             continue;
 
         if (newlineNeeded) {
-            append_phrase(source, "\n", NULL, TK_NEWLINE);
+            append_phrase(source, "\n", NULL, tok_Newline);
             newlineNeeded = false;
         }
 
@@ -144,7 +144,7 @@ void format_term_source_default_formatting(caValue* source, Term* term)
     // possibly add parens
     int numParens = term->intPropOptional("syntax:parens", 0);
     for (int p=0; p < numParens; p++)
-        append_phrase(source, "(", term, TK_LPAREN);
+        append_phrase(source, "(", term, tok_LParen);
 
     if (declarationStyle == "function-call") {
 
@@ -154,13 +154,13 @@ void format_term_source_default_formatting(caValue* source, Term* term)
             append_phrase(source, functionName.c_str(), term, name_FunctionName);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, "(", term, TK_LPAREN);
+            append_phrase(source, "(", term, tok_LParen);
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, ")", term, TK_RPAREN);
+            append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
@@ -171,13 +171,13 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         append_phrase(source, functionName.c_str(), term, name_FunctionName);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, "(", term, TK_LPAREN);
+            append_phrase(source, "(", term, tok_LParen);
 
         for (int i=1; i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
         if (!term->boolPropOptional("syntax:no-parens", false))
-            append_phrase(source, ")", term, TK_RPAREN);
+            append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "dot-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, ".", term, name_None);
@@ -204,14 +204,14 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         append_phrase(source, "<-", term, name_None);
         format_source_for_input(source, term, 0);
     } else if (declarationStyle == "bracket-list") {
-        append_phrase(source, "[", term, TK_LBRACKET);
+        append_phrase(source, "[", term, tok_LBracket);
         for (int i=0; i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
-        append_phrase(source, "]", term, TK_LBRACKET);
+        append_phrase(source, "]", term, tok_LBracket);
     }
 
     for (int p=0; p < numParens; p++)
-        append_phrase(source, ")", term, TK_RPAREN);
+        append_phrase(source, ")", term, tok_RParen);
 }
 
 void format_source_for_input(caValue* source, Term* term, int inputIndex)
@@ -255,7 +255,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
             && input->name == term->stringPropOptional("syntax:rebindOperator",""))
-        append_phrase(source, "@", term, TK_AT_SIGN);
+        append_phrase(source, "@", term, tok_At);
 
     // Also, possibly insert the & operator.
     if (input->name != ""
@@ -263,7 +263,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
         if (term_is_state_input(term, inputIndex))
             append_phrase(source, "state = ", term, name_None);
         else
-            append_phrase(source, "&", term, TK_AMPERSAND);
+            append_phrase(source, "&", term, tok_Ampersand);
     }
 
     bool byValue = input->name == "";
@@ -313,7 +313,7 @@ void format_name_binding(caValue* source, Term* term)
         append_phrase(source, term->name.c_str(), term, name_None);
         append_phrase(source, term->stringPropOptional("syntax:preEqualsSpace", " "),
                 term, name_Whitespace);
-        append_phrase(source, "=", term, TK_EQUALS);
+        append_phrase(source, "=", term, tok_Equals);
         append_phrase(source, term->stringPropOptional("syntax:postEqualsSpace", " "),
                 term, name_Whitespace);
     }

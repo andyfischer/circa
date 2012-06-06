@@ -22,7 +22,7 @@ struct ParseContext
 
 static void drop_whitespace(TokenStream* tokens)
 {
-    while (tokens->nextIs(TK_WHITESPACE))
+    while (tokens->nextIs(tok_Whitespace))
         tokens->consume();
 }
 
@@ -34,41 +34,41 @@ static void parse_value(TokenStream* tokens, caValue* out)
     if (tokens->finished()) {
         circa_set_string(out, "unexpected end of string");
 
-    } else if (tokens->nextIs(TK_INTEGER)) {
+    } else if (tokens->nextIs(tok_Integer)) {
         circa_set_int(out, atoi(tokens->nextStr().c_str()));
-        tokens->consume(TK_INTEGER);
-    } else if (tokens->nextIs(TK_FLOAT)) {
+        tokens->consume(tok_Integer);
+    } else if (tokens->nextIs(tok_Float)) {
         circa_set_float(out, (float) atof(tokens->nextStr().c_str()));
-        tokens->consume(TK_FLOAT);
-    } else if (tokens->nextIs(TK_STRING)) {
+        tokens->consume(tok_Float);
+    } else if (tokens->nextIs(tok_String)) {
         std::string s = tokens->nextStr();
         parser::unquote_and_unescape_string(s.c_str(), out);
-        tokens->consume(TK_STRING);
-    } else if (tokens->nextIs(TK_LBRACKET)) {
-        tokens->consume(TK_LBRACKET);
+        tokens->consume(tok_String);
+    } else if (tokens->nextIs(tok_LBracket)) {
+        tokens->consume(tok_LBracket);
         drop_whitespace(tokens);
 
         circa_set_list(out, 0);
 
-        while (!tokens->nextIs(TK_RBRACKET) && !tokens->finished()) {
+        while (!tokens->nextIs(tok_RBracket) && !tokens->finished()) {
             caValue* element = circa_append(out);
             parse_value(tokens, element);
 
-            if (tokens->nextIs(TK_COMMA))
-                tokens->consume(TK_COMMA);
+            if (tokens->nextIs(tok_Comma))
+                tokens->consume(tok_Comma);
             drop_whitespace(tokens);
         }
 
         if (!tokens->finished())
-            tokens->consume(TK_RBRACKET);
-    } else if (tokens->nextIs(TK_TRUE)) {
+            tokens->consume(tok_RBracket);
+    } else if (tokens->nextIs(tok_True)) {
         circa_set_bool(out, true);
         tokens->consume();
-    } else if (tokens->nextIs(TK_FALSE)) {
+    } else if (tokens->nextIs(tok_False)) {
         circa_set_bool(out, false);
         tokens->consume();
-    } else if (tokens->nextIs(TK_MINUS)) {
-        tokens->consume(TK_MINUS);
+    } else if (tokens->nextIs(tok_Minus)) {
+        tokens->consume(tok_Minus);
 
         parse_value(tokens, out);
 

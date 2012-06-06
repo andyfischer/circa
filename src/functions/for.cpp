@@ -21,7 +21,7 @@ namespace for_function {
         format_heading(source, term);
         format_branch_source(source, nested_contents(term), term);
         append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
-            term, TK_WHITESPACE);
+            term, tok_Whitespace);
     }
 
     void setup(Branch* kernel)

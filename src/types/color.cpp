@@ -49,7 +49,7 @@ namespace color_t {
 
     void format_source(caValue* source, Term* term)
     {
-        append_phrase(source, color_t::to_string(term), term, TK_COLOR);
+        append_phrase(source, color_t::to_string(term), term, tok_Color);
     }
 
     void setup_type(Type* type)

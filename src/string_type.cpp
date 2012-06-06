@@ -131,7 +131,7 @@ namespace string_t {
     {
         if (term->hasProperty("syntax:originalString")) {
             append_phrase(source, term->stringProp("syntax:originalString"),
-                    term, TK_STRING);
+                    term, tok_String);
             return;
         }
 
@@ -142,7 +142,7 @@ namespace string_t {
         else
             result = quoteType + as_cstring(term_value(term)) + quoteType;
 
-        append_phrase(source, result, term, TK_STRING);
+        append_phrase(source, result, term, tok_String);
     }
 }
 

@@ -7,7 +7,7 @@ namespace comment_function {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, term->stringProp("comment"), term, TK_COMMENT);
+        append_phrase(source, term->stringProp("comment"), term, tok_Comment);
     }
 
     void setup(Branch* kernel)

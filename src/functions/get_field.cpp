@@ -61,9 +61,9 @@ namespace get_field_function {
         //        term, name_None);
         format_source_for_input(source, term, 0);
         for (int i=1; i < term->numInputs(); i++) {
-            append_phrase(source, ".", term, TK_DOT);
+            append_phrase(source, ".", term, tok_Dot);
             append_phrase(source, as_string(term_value(term->input(i))),
-                    term, TK_IDENTIFIER);
+                    term, tok_Identifier);
         }
     }
 

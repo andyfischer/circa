@@ -427,11 +427,11 @@ void function_format_header_source(caValue* source, Branch* function)
     append_phrase(source, term->name, term, name_TermName);
 
     append_phrase(source, term->stringPropOptional("syntax:postNameWs", ""),
-            term, TK_WHITESPACE);
+            term, tok_Whitespace);
     append_phrase(source, term->stringPropOptional("syntax:properties", ""),
             term, name_None);
 
-    append_phrase(source, "(", term, TK_LPAREN);
+    append_phrase(source, "(", term, tok_LParen);
 
     bool first = true;
     int numInputs = count_input_placeholders(function);
@@ -466,23 +466,23 @@ void function_format_header_source(caValue* source, Branch* function)
                 append_phrase(source, "@", term, name_None);
 
             if (showType)
-                append_phrase(source, " ", term, TK_WHITESPACE);
+                append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, name, term, name_None);
         }
 
         if (input->boolPropOptional("output", false)
                 && !input->boolPropOptional("syntax:rebindSymbol", false)) {
-            append_phrase(source, " ", term, TK_WHITESPACE);
+            append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":out", term, name_None);
         }
 
         if (input->boolPropOptional("meta", false)) {
-            append_phrase(source, " ", term, TK_WHITESPACE);
+            append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":meta", term, name_None);
         }
 
         if (input->boolPropOptional("rebind", false)) {
-            append_phrase(source, " ", term, TK_WHITESPACE);
+            append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":rebind", term, name_None);
         }
     }
@@ -491,15 +491,15 @@ void function_format_header_source(caValue* source, Branch* function)
     if (varArgs)
         append_phrase(source, "...", term, name_None);
 
-    append_phrase(source, ")", term, TK_LPAREN);
+    append_phrase(source, ")", term, tok_LParen);
 
     Term* primaryOutput = get_output_placeholder(function, 0);
     if (primaryOutput != NULL && primaryOutput->type != &VOID_T) {
         append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
-                term, TK_WHITESPACE);
+                term, tok_Whitespace);
         append_phrase(source, "->", term, name_None);
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
-                term, TK_WHITESPACE);
+                term, tok_Whitespace);
         append_phrase(source,
             name_to_string(primaryOutput->type->name), term, name_TypeName);
     }
@@ -507,7 +507,7 @@ void function_format_header_source(caValue* source, Branch* function)
 
 void function_format_source(caValue* source, Term* term)
 {
-    append_phrase(source, "def ", term, TK_DEF);
+    append_phrase(source, "def ", term, tok_Def);
 
     Branch* contents = function_contents(term);
 
