@@ -4,11 +4,11 @@ UP = 2
 LEFT = 3
 RIGHT = 4
 SPACE = 5
-def point(any...)
-def line_to(any...)
-def key_down(any...) -> bool
+def point(any :multiple)
+def line_to(any :multiple)
+def key_down(any :multiple) -> bool
     return false
-def key_pressed(any...) -> bool
+def key_pressed(any :multiple) -> bool
     return false
 
 

@@ -572,8 +572,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         return compile_error_for_line(branch, tokens, startPosition,
                 "Can't declare function with qualified name: " + as_string(&functionName));
 
-    set_null(&functionName);
-
     // Input arguments
     int inputIndex = 0;
     while (!tokens.nextIs(tok_RParen) && !tokens.finished())
@@ -631,6 +629,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
         // Variable args when ... is appended
         if (tokens.nextIs(tok_Ellipsis)) {
+            std::cout << "ellipsis used in " << as_cstring(&functionName) << std::endl;
             tokens.consume(tok_Ellipsis);
             input->setBoolProp("multiple", true);
             input->flags |= TERM_FLAG_MULTIPLE;

@@ -7,7 +7,7 @@ namespace internal_debug_function {
 
     CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(dump_parse, "dump_parse(any...)"
+    CA_DEFINE_FUNCTION(dump_parse, "dump_parse(any :multiple)"
         "'For internal debugging. The parser will dump information about all input terms"
         "immediately after this function is parsed")
     {

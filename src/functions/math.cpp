@@ -98,7 +98,7 @@ namespace math_function {
         set_int(OUTPUT, (int) std::ceil(FLOAT_INPUT(0)));
     }
 
-    CA_DEFINE_FUNCTION(average, "average(number...) -> number;"
+    CA_DEFINE_FUNCTION(average, "average(number :multiple) -> number;"
                 "'Returns the average of all inputs.'")
     {
         caValue* args = circa_input(STACK, 0);

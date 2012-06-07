@@ -485,11 +485,12 @@ void function_format_header_source(caValue* source, Branch* function)
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":rebind", term, name_None);
         }
-    }
 
-    bool varArgs = has_variable_args(function);
-    if (varArgs)
-        append_phrase(source, "...", term, name_None);
+        if (input->boolPropOptional("multiple", false)) {
+            append_phrase(source, " ", term, tok_Whitespace);
+            append_phrase(source, ":multiple", term, name_None);
+        }
+    }
 
     append_phrase(source, ")", term, tok_LParen);
 
