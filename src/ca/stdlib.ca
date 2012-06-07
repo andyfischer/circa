@@ -84,6 +84,7 @@ def Branch.file_signature(_) -> any
 def Branch.find_term(_, String name) -> Term
 def Branch.format_source(_) -> StyledSource
 def Branch.format_function_heading(_) -> StyledSource
+def Branch.documentation_str(_) -> String
 def Branch.functions(_) -> List
 def Branch.get_term(_, int index) -> Term
 def Branch.get_static_errors(_) -> List

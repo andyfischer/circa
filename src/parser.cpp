@@ -567,11 +567,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     Branch* contents = nested_contents(result);
 
-    int qualifierLoc = find_qualified_name_separator(as_cstring(&functionName));
-    if (qualifierLoc != -1)
-        return compile_error_for_line(branch, tokens, startPosition,
-                "Can't declare function with qualified name: " + as_string(&functionName));
-
     // Input arguments
     int inputIndex = 0;
     while (!tokens.nextIs(tok_RParen) && !tokens.finished())

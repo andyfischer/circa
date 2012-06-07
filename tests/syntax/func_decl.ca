@@ -1,0 +1,7 @@
+
+-- declare function with a qualified name
+def func:qualified:name() -> int
+  return 5
+
+assert(func:qualified:name() == 5)
+
