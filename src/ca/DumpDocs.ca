@@ -4,19 +4,35 @@ type JsonWriter {
 
 def write_function(Branch func)
     print('{')
-    print("'type': 'Function',")
-    print("'name': '" func.name "',")
-    print(func.format_function_heading)
+    print('"type": "Function",')
+    print('"name": "' func.name '",')
+    print('"term": "' func.owner '",')
+    heading = func.format_function_heading
+    for phrase in @heading
+        for item in @phrase
+            to_string(@item)
+    print('"heading": ' heading)
+
     inputs = for input in func.inputs
         Term(@input)
 
     print('},')
 
-print('{')
+def write_type(Type t)
+    print('{')
+    print('"type": "Type",')
+    print('"name": "' t.name '",')
+    print('"term": "' t.declaringTerm '"')
+
+    print('},')
+
+print('[')
 for t in reflect:kernel().terms
     Term(@t)
 
     if t.is_function
         write_function(t.contents)
+    elif t.is_type
+        write_type(t.value)
 
-print('}')
+print(']')

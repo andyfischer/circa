@@ -857,6 +857,12 @@ void Type__property(caStack* stack)
         copy(prop, circa_output(stack, 0));
 }
 
+void Type__declaringTerm(caStack* stack)
+{
+    Type* type = as_type(circa_input(stack, 0));
+    set_term_ref(circa_output(stack, 0), type->declaringTerm);
+}
+
 void length(caStack* stack)
 {
     set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
@@ -1212,6 +1218,7 @@ void install_standard_library(Branch* kernel)
         
         {"Type.name", Type__name},
         {"Type.property", Type__property},
+        {"Type.declaringTerm", Type__declaringTerm},
         {NULL, NULL}
     };
 

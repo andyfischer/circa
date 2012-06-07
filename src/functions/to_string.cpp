@@ -7,7 +7,12 @@ namespace to_string_function {
 
     CA_FUNCTION(evaluate)
     {
-        set_string(OUTPUT, to_string(INPUT(0)));
+        caValue* in = circa_input(_stack, 0);
+        caValue* out = circa_output(_stack, 0);
+        if (is_string(in))
+            copy(in, out);
+        else
+            set_string(out, to_string(in));
     }
 
     void setup(Branch* kernel)

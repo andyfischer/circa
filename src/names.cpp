@@ -461,6 +461,22 @@ Term* find_term_from_global_name(const char* name)
     return find_term_from_global_name_recr(searchBranch, name);
 }
 
+bool name_is_valid(Name name)
+{
+    if (name < 0)
+        return false;
+
+    const char* builtin = builtin_name_to_string(name);
+    if (builtin != NULL)
+        return true;
+
+    int runtimeIndex = name - c_FirstRuntimeName;
+    if (runtimeIndex < 0 || runtimeIndex >= g_nextFreeNameIndex)
+        return false;
+
+    return true;
+}
+
 const char* name_to_string(Name name)
 {
     const char* builtin = builtin_name_to_string(name);
@@ -503,6 +519,7 @@ Name as_name(caValue* tv)
 
 void set_name(caValue* tv, Name val)
 {
+    ca_assert(name_is_valid(val));
     set_null(tv);
     tv->value_type = &NAME_T;
     tv->value_data.asint = val;

@@ -170,6 +170,7 @@ def Type.name(_) -> String
 def Type.property(_, String) -> any
 def Type.is_handle(_) -> bool
     return _.property('handle') == true
+def Type.declaringTerm(_) -> Term
 
 -- Metaprogramming on Term
 def term_ref(any :ignore_error) -> Term

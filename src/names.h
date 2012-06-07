@@ -75,6 +75,7 @@ std::string find_global_name(Term* term);
 
 Term* find_term_from_global_name(const char* name);
 
+bool name_is_valid(Name index);
 const char* name_to_string(Name name);
 void name_to_string(Name name, String* string);
 Name name_get_namespace_first(Name name);

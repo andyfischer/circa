@@ -458,7 +458,7 @@ void function_format_header_source(caValue* source, Branch* function)
         // Type
         if (showType)
             append_phrase(source, name_to_string(input->type->name),
-                term, name_TypeName);
+                input->type->declaringTerm, name_TypeName);
 
         // Name
         if (name != "" && name[0] != '#') {
