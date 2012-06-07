@@ -8,6 +8,7 @@
 #include "evaluation.h"
 #include "importing.h"
 #include "introspection.h"
+#include "generic.h"
 #include "kernel.h"
 #include "metaprogramming.h"
 #include "modules.h"
@@ -151,6 +152,25 @@ void Branch__format_function_heading(caStack* stack)
     circa_set_list(output, 0);
     function_format_header_source(output, branch);
 }
+
+#if 0
+void Branch__get_documentation(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+
+    caValue* out = circa_output(stack, 0);
+    set_list(out, 0);
+
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        if (is_input_placeholder(term))
+            continue;
+
+        if (is_comment(term))
+            set_string(list_append(out), term->stringProp("comment"));
+    }
+}
+#endif
 
 void Branch__has_static_error(caStack* stack)
 {
@@ -549,6 +569,21 @@ void Term__property(caStack* stack)
         circa::copy(value, circa_output(stack, 0));
 }
 
+void is_overloaded_func(caStack* stack)
+{
+    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), is_overloaded_function(self));
+}
+
+void overload__get_contents(caStack* stack)
+{
+    Branch* self = (Branch*) circa_branch(circa_input(stack, 0));
+    caValue* out = circa_output(stack, 0);
+    set_list(out, 0);
+
+    list_overload_contents(self, out);
+}
+
 void metaprogramming_install_functions(Branch* kernel)
 {
     static const ImportRecord records[] = {
@@ -597,6 +632,9 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Term.properties", Term__properties},
         {"Term.property", Term__property},
         {"Term.value", Term__value},
+
+        {"is_overloaded_func", is_overloaded_func},
+        {"overload:get_contents", overload__get_contents},
     
         {NULL, NULL}
     };

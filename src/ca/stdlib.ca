@@ -1,6 +1,9 @@
 
 -- Builtin functions
 
+def docs:category(Name name)
+    -- Meta function, declares this function to be part of a documentation category.
+
 def assert(bool condition)
     -- Raises an error if 'condition' is false.
 
@@ -22,7 +25,6 @@ def changed(any current) -> bool
 def call(any callable, List inputs) -> any
     -- Dynamic function dispatch
 
--- Dynamic call, this one supports full protocol.
 type DynamicInputs {
     List inputs
     any stateVal
@@ -34,12 +36,13 @@ type DynamicOutputs {
 }
 
 def dynamic_call(Branch branch, DynamicInputs inputs) -> DynamicOutputs
+    -- Dynamic call, supporting the full function protocol.
 
--- Pass a message to an actor by name
 def send(String name, any msg)
+    -- Pass a message to an actor by name
 
--- Invoke an actor immediately
 def call_actor(String name, any msg)
+    -- Invoke an actor immediately
 
 def actor_run_message(Actor actor, any msg)
     b = actor.branch
@@ -78,41 +81,73 @@ def load_module(String filename) -> Branch
 
 -- Metaprogramming on Branch
 def branch_ref(any branch :ignore_error) -> Branch
+    -- Obtain a Branch ref from an expression.
 def Branch.call(_, any inputs :multiple)
+    -- Invoke this Branch with the given inputs.
 def Branch.dump(_)
+    -- Dump this branch's raw contents to stdout.
 def Branch.file_signature(_) -> any
+    -- Return a 'file signature', which contains the filename and last-modified time.
 def Branch.find_term(_, String name) -> Term
-def Branch.format_source(_) -> StyledSource
-def Branch.format_function_heading(_) -> StyledSource
-def Branch.documentation_str(_) -> String
+    -- Find a term inside this Branch with the given name.
+def Branch.format_source(_) -> List
+    -- Return the branch's contents as formatted source.
+def Branch.format_function_heading(_) -> List
+    -- Return a formatted function header for this branch.
 def Branch.functions(_) -> List
+    -- Return a list of functions that occur inside this branch.
 def Branch.get_term(_, int index) -> Term
+    -- Fetch a term by index.
 def Branch.get_static_errors(_) -> List
+    -- Return a raw list of static errors inside this branch.
 def Branch.get_static_errors_formatted(_) -> List
+    -- Return a formatted list of static errors inside this branch.
 def Branch.has_static_error(_) -> bool
+    -- Return whether this branch has any static errors.
 def Branch.input(_, int index) -> Term
+    -- Fetch an input placeholder term by index.
 def Branch.is_null(_) -> bool
+    -- Return whether this is a null Branch reference.
 def Branch.inputs(_) -> List
+    -- Return a list of input placeholder terms.
 def Branch.link(_, Branch lib)
+    -- Iterate through this branch, looking for terms that have missing references.
+    -- For each missing reference, if a term with the expected name is found in 'lib',
+    -- then modify the term to use the named term in 'lib'.
 def Branch.list_configs(_) -> List
+    -- Return a list of Terms that look like configs (named literal values).
 def Branch.output(_, int index) -> Term
+    -- Return an output placeholder term by index.
 def Branch.outputs(_) -> List
+    -- Return a list of all output placeholders.
 def Branch.owner(_) -> Term
+    -- Return the Term that owns this Branch (may be null).
 def Branch.statements(_) -> List
+    -- Return a list of Terms that are statements.
 def Branch.terms(_) -> List
+    -- Return a list of this branch's terms.
 def Branch.version(_) -> int
-    -- Monotonically increasing version number, incremented for module reloads.
+    -- Return the 'version', which is a monotonically increasing number that is
+    -- incremented whenever the branch is modified. Useful for change tracking.
 
 def Dict.count(self) -> int
+    -- Return the number of elements
 def Dict.set(@self, String key, any value)
+    -- Assign a key-value pair.
 def Dict.get(self, String key) -> any
+    -- Retrieve the value for a given key.
 
 type Frame;
 def Frame.branch(_) -> Branch
+    -- Return the Branch associated with this Frame.
 def Frame.register(_, int) -> any
+    -- Fetch the value in the given register index.
 def Frame.registers(_) -> List
+    -- Fetch a list of all register values.
 def Frame.pc(_) -> int
+    -- Fetch the current program counter (the interpreter's current position).
 def Frame.pc_term(_) -> Term
+    -- Fetch the term associated with the current program counter.
 
 def Function.name(_) -> String
 def Function.input(_, int index) -> Term
@@ -124,8 +159,11 @@ def Function.contents(_) -> Branch
 type Interpreter;
 def make_interpreter() -> Interpreter
 def Interpreter.push_frame(_, Branch, List inputs)
+    -- Push a new frame, using the given branch and input list.
 def Interpreter.pop_frame(_)
+    -- Pop the topmost frame.
 def Interpreter.set_state_input(_, any)
+    -- Assign a value to the :state input of the topmost frame (if any)
 def Interpreter.get_state_output(_) -> any
 def Interpreter.reset(_)
 def Interpreter.run(_)
@@ -147,13 +185,24 @@ def List.length(self) -> int
 def List.join(self, String) -> String
 def List.slice(self, int start, int fin) -> List
 
+-- Overloaded functions
+def is_overloaded_func(Branch branch) -> bool
+    -- Return true if this branch is an overloaded function
+    docs:category(:metaprogramming)
+
+def overload:get_contents(Branch branch) -> List
+    -- Get a list of all the functions that this overloaded function uses.
+    docs:category(:metaprogramming)
+
 def String.append(@self, String right)
     self = concat(self, right)
     
 def String.char_at(_, int index) -> String
 
 def String.ends_with(_,String) -> bool
+    -- Return true if this string ends with the given substring.
 def String.length(_) -> int
+    -- Returns the string length.
 def String.slice(_,int,int) -> String
 def String.starts_with(_,String) -> bool
 def String.split(_,String sep) -> List
@@ -168,6 +217,7 @@ def String.characters(self) -> List
     return out
 
 def Type.name(_) -> String
+    -- Returns this Term's local name. May be empty.
 def Type.property(_, String) -> any
 def Type.is_handle(_) -> bool
     return _.property('handle') == true
@@ -221,20 +271,18 @@ def Rect.height(self) -> number
     return self.y2 - self.y1
 
 def toggle(bool tog) -> bool
-    {-
-    Stateful function, returns a boolean status. Every frame the function is called
-    with (true), the result flips. Starts out false.
-    -}
+    -- Stateful function, returns a boolean status. Every frame the function is called
+    -- with (true), the result flips. Starts out false.
+
     state bool s = false
     if tog
         s = not(s)
     return s
 
 def approach(number target, number maximum_change) -> number
-    {-
-    Stateful function, returns a result which approaches 'target'. Each frame, this
-    result will change at most by 'maximum_change'
-    -}
+    -- Stateful function, returns a result which approaches 'target'. Each time the
+    -- function is called, the result will change at most by 'maximum_change'.
+
     state current = target
     if target > current
         current += min(maximum_change, target - current)
@@ -243,18 +291,17 @@ def approach(number target, number maximum_change) -> number
     return current
 
 def once() -> bool
-    {-
-    Stateful function, returns true the first time it's called, and false thereafter.
-    -}
+    -- Stateful function, returns true the first time it's called, and false thereafter.
+
     state bool s = true
     result = s
     s = false
     return result
 
 def cycle(int max) -> int
-    {-
-    Stateful function, cycles though the integers starting at 0 and ending before 'max'
-    -}
+    -- Stateful function, cycles though the integers from 0 to (max - 1). When the maximum
+    -- is reached, the function will start again at 0.
+
     state int counter = 0
     if counter >= max
         counter = 0
@@ -263,91 +310,75 @@ def cycle(int max) -> int
     return result
 
 def cycle_elements(List list) -> any
-    {-
-    Stateful function, returns each item of 'list' one at a time
-    -}
+    -- Stateful function, cycles through each item of 'list' one at a time.
     return list[cycle(length(list))]
 
 def random_element(List list) -> any
-    {-
-    Return a random element from the given list, with equal probability per element.
-    -}
+    -- Return a random element from the given list, with equal probability per element.
     return list[rand_i() % length(list)]
 
 def seed() -> number
-    {-
-    Stateful function, returns a random number 0..1 which doesn't change after initialization.
-    -}
+    -- Stateful function, returns a random number 0..1 which doesn't change after initialization.
     state number s = rand()
     return s
 
 -- Math utility functions
-def to_rect(Point topLeft, Point size) -> Rect
-    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
-
 def polar(number angle) -> Point
+    -- Return a point on the unit circle with the given angle.
     return [sin(angle) -cos(angle)]
 
 def magnitude(Point point) -> number
-    {-
-    Returns the magnitude, or the distance from [0,0] to this point.
-    -}
+    -- Returns the magnitude, or the distance from [0,0] to this point.
     return sqrt(sqr(point.x) + sqr(point.y))
 
 def point_distance(Point a, Point b) -> number
-    {-
-    Returns the distance between a and b.
-    -}
+    -- Returns the distance between a and b.
     return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 
 def rotate_point(Point p, number rotation) -> Point
-    {-
-    Rotate p around [0,0] by the given angle.
-    -}
+    -- Rotate p around [0,0] by the given angle.
     return [p.x*cos(rotation) - p.y*sin(rotation), p.x*sin(rotation)+p.y*cos(rotation)]
 
 def random_norm_vector() -> Point
-    {-
-    Return a random normalized vector.
-    -}
+    -- Return a random normalized vector.
     angle = rand() * 360
     return [cos(angle) sin(angle)]
 
 def norm(Point v) -> Point
-    {-
-    Returns v normalized to be along the unit circle.
-    -}
+    -- Returns v normalized to be along the unit circle.
     m = magnitude(v)
     return [v.x / m, v.y / m]
 
 def perpendicular(Point v) -> Point
-    {-
-    Returns a vector that is perpendicular to v, rotated clockwise.
-    -}
+    -- Returns a vector that is perpendicular to v, rotated clockwise.
     return [v.y -v.x]
 
+def to_rect(Point topLeft, Point size) -> Rect
+    -- Return a Rect with the given top-left coordinate and size.
+    return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
+
 def expand_rect(Point center, Point size) -> Rect
-    {-
-    Return a rectangle with the given center and size.
-    -}
+    -- Return a Rect with the given center coordinate and size.
     width = abs(size.x)
     height = abs(size.y)
     return [center.x - width/2, center.y - height/2, center.x + width / 2, center.y + height/2]
 
-def approach_rect(Rect target, number change) -> Rect
-    return Rect([approach(target.x1,change), approach(target.y1,change),
-        approach(target.x2,change),approach(target.y2,change)])
-
 def grow_rect(Rect r, number amount) -> Rect
+    -- Return a Rect based on r, where each side is moved away from the center by 'amount'.
     return Rect([r.x1 - amount, r.y1 - amount, r.x2 + amount, r.y2 + amount])
 
 def rect(Point topleft, Point bottomright) -> Rect
+    -- Return a Rect with the given top-left and bottom-right coordinates.
     return [topleft.x topleft.y bottomright.x bottomright.y]
 
+def approach_rect(Rect target, number maxChange) -> Rect
+    -- Stateful function, returns a Rect that gradually approaches the target Rect.
+    -- Each coordinate will change by at most 'maxChange' per call.
+    return Rect([approach(target.x1,maxChange), approach(target.y1,maxChange),
+        approach(target.x2,maxChange),approach(target.y2,maxChange)])
+
 def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
-    {-
-    Return whether the two rectangles intersect.
-    -}
+    -- Return whether the two rectangles intersect.
     
     {-
     def unit_tests()
@@ -366,18 +397,14 @@ def interp_rect(Rect a, Rect b, number ratio) -> Rect
     return Rect(result)
 
 def bezier3(number t, List points) -> Point
-    {-
-    Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
-    -}
+    -- Quadratic bezier curve, with 3 control points. t must be in the range of [0, 1].
     p0 = points[0] -> Point
     p1 = points[1] -> Point
     p2 = points[2] -> Point
     return p0 * sqr(1 - t) + p1 * (2 * t * (1 - t)) + p2 * sqr(t)
 
 def bezier4(number t, List points) -> Point
-    {-
-    Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
-    -}
+    -- Cubic bezier curve, with 4 control points. t must be in the range of [0, 1].
     p0 = points[0] -> Point
     p1 = points[1] -> Point
     p2 = points[2] -> Point
@@ -391,23 +418,22 @@ def clamp(number x, number minVal, number maxVal) -> number
     return min(max(x, minVal), maxVal)
 
 def smoothstep(number x, number edge0, number edge1) -> number
-    {-
-    Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep
-    -}
+    -- Smooth interpolation func, see en.wikipedia.org/wiki/Smoothstep
     x = clamp((x - edge0)/(edge1-edge0), 0, 1)
     return x*x*(3 - 2*x)
 
 def smootherstep(number x, number edge0, number edge1) -> number
-    {-
-    Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep
-    -}
+    -- Alternative to smoothstep by Ken Perlin, see en.wikipedia.org/wiki/Smoothstep
     x = clamp((x - edge0)/(edge1-edge0), 0, 1)
     return x*x*x*(x*(x*6 - 15) + 10)
 
 def random_color() -> Color
+    -- Return a color with random RGB components, and full alpha.
     return [rand() rand() rand() 1.0]
 
 def blend_color(Color a, Color b, number ratio) -> Color
+    -- Return a color that is blended between a and b. If ratio is 0.0 we'll
+    -- return 'a', if it's 1.0 we'll return 'b'.
     
     {-
     def unit_tests()
@@ -433,6 +459,8 @@ def blend_color(Color a, Color b, number ratio) -> Color
         return result
 
 def hsv_to_rgb(List hsv) -> Color
+    -- Convert HSV components to an RGB Color
+
     h = hsv[0] -> number
     s = hsv[1] -> number
     v = hsv[2] -> number
@@ -478,9 +506,8 @@ def darken(Color c, number factor) -> Color
         c.a]
 
 def delta(number val) -> number
-    {-
-    Return the difference between this value and the previous call's value
-    -}
+    -- Stateful function, return the difference between this value and the value from
+    -- the previous call.
     state number prev = val
     result = val - prev
     prev = val

@@ -1213,6 +1213,7 @@ void install_standard_library(Branch* kernel)
         {"Type.name", Type__name},
         {"Type.property", Type__property},
         {"Type.declaringTerm", Type__declaringTerm},
+
         {NULL, NULL}
     };
 

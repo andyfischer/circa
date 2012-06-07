@@ -9,6 +9,7 @@
 #include "generic.h"
 #include "if_block.h"
 #include "kernel.h"
+#include "metaprogramming.h"
 #include "parser.h"
 #include "type.h"
 #include "type_inference.h"
@@ -82,6 +83,8 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     if_block_finish_appended_case(elseBranch, elseTerm);
 
     set_input(get_output_placeholder(contents, 0), 0, block);
+
+    function->setBoolProp("overloadedFunc", true);
     return function;
 }
 
@@ -182,10 +185,34 @@ void overload_post_input_change(Term* term)
     specialize_overload_for_call(term);
 }
 
-bool is_overloaded_function(Function* func)
+bool is_overloaded_function(Branch* branch)
 {
-    // Not working; this is needed for documentation generation.
-    return false;
+    if (branch->owningTerm == NULL)
+        return false;
+
+    return branch->owningTerm->boolPropOptional("overloadedFunc", false);
+}
+
+void list_overload_contents(Branch* branch, caValue* output)
+{
+    if (!is_overloaded_function(branch))
+        return;
+
+    Term* ifBlock = find_term_with_function(branch, FUNCS.if_block);
+    Branch* ifContents = nested_contents(ifBlock);
+
+    // iterate across cases
+    for (int caseIndex=0;; caseIndex++) {
+        Term* caseTerm = if_block_get_case(ifContents, caseIndex);
+        if (caseTerm == NULL)
+            break;
+
+        Branch* caseContents = nested_contents(caseTerm);
+
+        Term* call = find_last_non_comment_expression(caseContents);
+
+        set_term_ref(list_append(output), call->function);
+    }
 }
 
 } // namespace circa

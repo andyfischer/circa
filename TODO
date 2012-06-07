@@ -5,6 +5,17 @@ Source repro
 Code cleanup
   Remove importing_macros.h
   Deprecate API using Term* or Function* to reference functions (prefer Branch*)
+  Eliminate hosted Function type, in favor of Branch.
+  Eliminate C++ Function type, in favor of Branch.
+
+Code modification
+  Code modification should go through a more controlled path.
+    Add a CodeModification class that stores a modification in progress
+    Add a global apply_modification() function that invokes it.
+    Alternately, require that modifications must be passed through message-send
+      One goal is that modifications should be able to be sent remotely
 
 Big Features
   Proper module system
+  Possibly get rid of separate 'int' type, and just use numbers. Replace with some other
+    system that can detect when an expression will always be an integer.
