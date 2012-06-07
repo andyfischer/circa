@@ -448,6 +448,10 @@ Term* create_type_value(Branch* branch, Type* value, std::string const& name)
 {
     Term* term = create_value(branch, &TYPE_T, name);
     set_type(term_value(term), value);
+
+    if (value->declaringTerm == NULL)
+        value->declaringTerm = term;
+        
     return term;
 }
 

@@ -207,6 +207,7 @@ def Branch.name(self) -> String
 -- Builtin types
 type Actor { String name, String moduleName, List incomingQueue, any stateVal }
 type FileSignature { String filename, int time_modified }
+type Callable;
 type Color { number r, number g, number b, number a }
 type Point { number x, number y }
 type Point_i { int x, int y }

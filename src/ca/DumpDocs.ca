@@ -1,38 +1,49 @@
 
-type JsonWriter {
+type Writer {
+    bool needsComma
 }
 
-def write_function(Branch func)
-    print('{')
-    print('"type": "Function",')
-    print('"name": "' func.name '",')
-    print('"term": "' func.owner '",')
+def Writer.write(@self, any args :multiple)
+    if self.needsComma
+        print(',')
+        self.needsComma = false
+    
+    print(args.join(''))
+
+def Writer.dump_function(@self, Branch func)
+    self.write('{')
+    self.write('"type": "Function",')
+    self.write('"name": "' func.name '",')
+    self.write('"term": "' func.owner '",')
     heading = func.format_function_heading
     for phrase in @heading
         for item in @phrase
             to_string(@item)
-    print('"heading": ' heading)
+    self.write('"heading": ' heading)
 
     inputs = for input in func.inputs
         Term(@input)
 
-    print('},')
+    self.write('}')
+    self.needsComma = true
 
-def write_type(Type t)
-    print('{')
-    print('"type": "Type",')
-    print('"name": "' t.name '",')
-    print('"term": "' t.declaringTerm '"')
+def Writer.dump_type(@self, Type t)
+    self.write('{')
+    self.write('"type": "Type",')
+    self.write('"name": "' t.name '",')
+    self.write('"term": "' t.declaringTerm '"')
 
-    print('},')
+    self.write('}')
+    self.needsComma = true
 
 print('[')
-for t in reflect:kernel().terms
+writer = create(Writer)
+items = for t in reflect:kernel().terms
     Term(@t)
 
     if t.is_function
-        write_function(t.contents)
+        writer.dump_function(t.contents)
     elif t.is_type
-        write_type(t.value)
+        writer.dump_type(t.value)
 
 print(']')

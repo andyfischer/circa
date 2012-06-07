@@ -1,0 +1,8 @@
+
+def f(any args :multiple)
+    print('args = ' args)
+
+f()
+f(1)
+f(2 3)
+f(4 5 6)

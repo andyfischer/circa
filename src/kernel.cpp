@@ -1034,8 +1034,6 @@ void bootstrap_kernel()
     Term* indexableType = parse_type(kernel, "type Indexable;");
     indexable_t::setup_type(unbox_type(indexableType));
 
-    callable_t::setup_type(unbox_type(parse_type(kernel, "type Callable;")));
-
     control_flow_setup_funcs(kernel);
 
     // Setup all the builtin functions defined in src/functions
@@ -1105,9 +1103,6 @@ void bootstrap_kernel()
     append_to_overloaded_function(FUNCS.add, add_v);
     append_to_overloaded_function(FUNCS.add, add_s);
 
-    //dump(function_contents(add_v));
-    //dump(function_contents(FUNCS.add));
-
     Term* sub_v = create_function(kernel, "sub_v");
     create_function_vectorized_vv(function_contents(sub_v), FUNCS.sub, &LIST_T, &LIST_T);
     Term* sub_s = create_function(kernel, "sub_s");
@@ -1127,7 +1122,6 @@ void bootstrap_kernel()
 
     Term* div_s = create_function(kernel, "div_s");
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
-
 
     // Need dynamic_method before any hosted functions
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
@@ -1236,6 +1230,7 @@ void install_standard_library(Branch* kernel)
     // Finish setting up some hosted types
     TYPES.actor = as_type(kernel->get("Actor"));
     TYPES.color = as_type(kernel->get("Color"));
+    callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
     TYPES.dynamicInputs = as_type(kernel->get("DynamicInputs"));
