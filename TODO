@@ -5,7 +5,6 @@ Source repro
 Code cleanup
   Remove importing_macros.h
   Deprecate API using Term* or Function* to reference functions (prefer Branch*)
-  Eliminate hosted Function type, in favor of Branch.
   Eliminate C++ Function type, in favor of Branch.
 
 Code modification

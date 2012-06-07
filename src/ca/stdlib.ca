@@ -149,13 +149,6 @@ def Frame.pc(_) -> int
 def Frame.pc_term(_) -> Term
     -- Fetch the term associated with the current program counter.
 
-def Function.name(_) -> String
-def Function.input(_, int index) -> Term
-def Function.inputs(_) -> List
-def Function.output(_, int index) -> Term
-def Function.outputs(_) -> List
-def Function.contents(_) -> Branch
-
 type Interpreter;
 def make_interpreter() -> Interpreter
 def Interpreter.push_frame(_, Branch, List inputs)
@@ -233,8 +226,7 @@ def Term.contents(_) -> Branch
 def Term.name(self) -> String
 def Term.to_string(_) -> String
 def Term.to_source_string(_) -> String
-def Term.function(_) -> Function
-def Term.function_contents(_) -> Branch
+def Term.function(_) -> Branch
 def Term.get_type(_) -> Type
 def Term.value(_) -> any
 def Term.tweak(_, number steps)
@@ -250,10 +242,26 @@ def Term.is_function(self) -> bool
     return is_function(self.value)
 def Term.is_type(self) -> bool
     return is_type(self.value)
+def Term.is_input_placeholder(self) -> bool
+    return self.function == term_ref(input_placeholder)
+def Term.is_comment(self) -> bool
+    return self.function == term_ref(comment)
 
 -- workaround, this function must be declared after Term.name:
 def Branch.name(self) -> String
     return self.owner.name
+
+def Branch.get_top_comments(self) -> List
+    out = []
+    for t in self.terms
+        if t.is_input_placeholder
+            continue
+        elif t.is_comment
+            out.append(t.property('comment'))
+        else
+            break
+
+    return out
 
 -- Builtin types
 type Actor { String name, String moduleName, List incomingQueue, any stateVal }

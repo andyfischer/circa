@@ -26,29 +26,31 @@ assert(b.num_inputs() == 2)
 assert(b.input(0) == a)
 
 -- Function
-assert(a.function().name() == "value")
-assert(b.function().name() == "add")
+assert(a.function.name == "value")
+assert(b.function.name == "add")
 
 def myfunc()
 
 x = myfunc()
 
 xr = term_ref(x)
-assert(xr.function() == myfunc)
+assert(xr.function == branch_ref(myfunc))
 
 -- Function inputs & outputs
 def myfunc2(int a, int b, int c) -> number
   return a + b + c
 
-a = myfunc2.input(0)
-b = myfunc2.input(1)
-c = myfunc2.input(2)
+mf2 = branch_ref(myfunc2)
+
+a = mf2.input(0)
+b = mf2.input(1)
+c = mf2.input(2)
 
 assert(a.name() == "a")
 assert(b.name() == "b")
 assert(c.name() == "c")
-assert(myfunc2.inputs() == [a b c])
-assert(myfunc2.output(0).get_type() == number)
+assert(mf2.inputs() == [a b c])
+assert(mf2.output(0).get_type() == number)
 
 -- test Branch.statements
 my_branch = { a = (1 + 2) * 3 }
@@ -56,4 +58,4 @@ my_branch = { a = (1 + 2) * 3 }
 statements = branch_ref(my_branch).statements
 assert(statements.length == 1)
 statement_0 = statements[0] -> Term
-assert(statement_0.function == mult)
+assert(statement_0.function == branch_ref(mult))

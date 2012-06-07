@@ -290,7 +290,7 @@ void Branch__functions(caStack* stack)
     for (BranchIteratorFlat it(branch); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (is_function(term)) {
-            set_function(list_append(output), as_function(term));
+            set_branch(list_append(output), function_contents(as_function(term)));
         }
     }
 }
@@ -368,13 +368,6 @@ void Term__to_source_string(caStack* stack)
     set_string(circa_output(stack, 0), get_term_source_text(t));
 }
 void Term__function(caStack* stack)
-{
-    Term* t = as_term_ref(circa_input(stack, 0));
-    if (t == NULL)
-        return circa_output_error(stack, "NULL reference");
-    set_function(circa_output(stack, 0), as_function(t->function));
-}
-void Term__function_contents(caStack* stack)
 {
     Term* t = as_term_ref(circa_input(stack, 0));
     if (t == NULL)
@@ -615,7 +608,6 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},
         {"Term.function", Term__function},
-        {"Term.function_contents", Term__function_contents},
         {"Term.get_type", Term__type},
         {"Term.tweak", Term__tweak},
         {"Term.input", Term__input},

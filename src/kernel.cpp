@@ -369,55 +369,6 @@ void Frame__pc_term(caStack* stack)
     set_term_ref(circa_output(stack, 0), self->branch->get(self->pc));
 }
 
-void Function__name(caStack* stack)
-{
-    set_string(circa_output(stack, 0), as_function(circa_input(stack, 0))->name);
-}
-
-void Function__input(caStack* stack)
-{
-    int index = circa_int_input(stack, 1);
-    set_term_ref(circa_output(stack, 0), function_get_input_placeholder(as_function(circa_input(stack, 0)), index));
-}
-
-void Function__inputs(caStack* stack)
-{
-    Function* func = as_function(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
-    set_list(output, 0);
-    for (int i=0;; i++) {
-        Term* term = function_get_input_placeholder(func, i);
-        if (term == NULL)
-            break;
-        set_term_ref(list_append(output), term);
-    }
-}
-
-void Function__output(caStack* stack)
-{
-    int index = circa_int_input(stack, 1);
-    set_term_ref(circa_output(stack, 0), function_get_output_placeholder(as_function(circa_input(stack, 0)), index));
-}
-
-void Function__outputs(caStack* stack)
-{
-    Function* func = as_function(circa_input(stack, 0));
-    caValue* output = circa_output(stack, 0);
-    set_list(output, 0);
-    for (int i=0;; i++) {
-        Term* term = function_get_output_placeholder(func, i);
-        if (term == NULL)
-            break;
-        set_term_ref(list_append(output), term);
-    }
-}
-
-void Function__contents(caStack* stack)
-{
-    Function* func = as_function(circa_input(stack, 0));
-    set_branch(circa_output(stack, 0), function_get_contents(func));
-}
-
 void make_interpreter(caStack* stack)
 {
     Stack* newContext = new Stack();
@@ -1161,13 +1112,6 @@ void bootstrap_kernel()
         {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},
         {"Frame.pc_term", Frame__pc_term},
-
-        {"Function.name", Function__name},
-        {"Function.input", Function__input},
-        {"Function.inputs", Function__inputs},
-        {"Function.output", Function__output},
-        {"Function.outputs", Function__outputs},
-        {"Function.contents", Function__contents},
 
         {"make_interpreter", make_interpreter},
         {"Interpreter.push_frame", Interpreter__push_frame},
