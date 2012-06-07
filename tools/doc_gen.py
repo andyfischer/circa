@@ -25,6 +25,14 @@ circaCategory = {'title':'Core','subcategories': [circa_allTypes, circa_allFunct
 improvCategory = {'title':'Improv','subcategories': [improv_allTypes, improv_allFunctions]}
 majorCategories = [circaCategory, improvCategory]
 
+# minor categories:
+# Comparison
+# Internal
+# Math
+# Reflection
+# Stateful
+# Uncategorized
+
 def everySubCategory():
     for cat in majorCategories:
         for subcat in cat['subcategories']:
@@ -74,7 +82,7 @@ def writeFunctionPage(func):
     out.append("layout: docs")
     out.append("---")
     out.append("")
-    out.append("<h3>" + title + "</h3>")
+    out.append("<h3><i>function</i> " + title + "</h3>")
     out.append("")
 
     heading = ""
@@ -115,7 +123,7 @@ def writeTypePage(t):
     out.append("layout: docs")
     out.append("---")
     out.append("")
-    out.append("<h3>" + title + "</h3>")
+    out.append("<h3><i>type</i> " + title + "</h3>")
     out.append("")
     out.append("Methods:")
     out.append("")

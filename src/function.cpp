@@ -501,7 +501,9 @@ void function_format_header_source(caValue* source, Branch* function)
         append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
                 term, tok_Whitespace);
         append_phrase(source,
-            name_to_string(primaryOutput->type->name), term, name_TypeName);
+            name_to_string(primaryOutput->type->name),
+            primaryOutput->type->declaringTerm,
+            name_TypeName);
     }
 }
 

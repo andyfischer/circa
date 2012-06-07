@@ -484,15 +484,3 @@ def delta(number val) -> number
     result = val - prev
     prev = val
     return result
-
-namespace styled_source
-    literal_string = 1
-    literal_number = 4
-    paren = 2
-    comment = 3
-    name = 5
-    keyword = 205
-    type_name = 203
-    function_name = 202
-    infix_operator = 201
-    whitespace = 206
