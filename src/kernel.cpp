@@ -66,12 +66,10 @@ Term* AVERAGE_FUNC = NULL;
 Term* DESIRED_VALUE_FEEDBACK = NULL;
 Term* DO_ONCE_FUNC = NULL;
 Term* ERRORED_FUNC = NULL;
-Term* EXTRA_OUTPUT_FUNC = NULL;
 Term* FEEDBACK_FUNC = NULL;
 Term* FREEZE_FUNC = NULL;
 Term* INSTANCE_FUNC = NULL;
 Term* LIST_TYPE = NULL;
-Term* LIST_APPEND_FUNC = NULL;
 Term* NAMESPACE_FUNC = NULL;
 Term* OVERLOADED_FUNCTION_FUNC = NULL;
 Term* REF_FUNC = NULL;
@@ -1125,14 +1123,9 @@ void bootstrap_kernel()
 
     // Need dynamic_method before any hosted functions
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
-}
 
-void explicitInput_postCompile(Term* term)
-{
-}
+    // Load the standard library from stdlib.ca
 
-void install_standard_library(Branch* kernel)
-{
     // Parse the stdlib script
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 
@@ -1218,15 +1211,16 @@ void install_standard_library(Branch* kernel)
     };
 
     install_function_list(kernel, records);
-
     metaprogramming_install_functions(kernel);
 
+    // Fetch refereneces to certain builtin funcs.
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
     FUNCS.length = kernel->get("length");
     FUNCS.not_func = kernel->get("not");
     FUNCS.type = kernel->get("type");
     FUNCS.output_explicit = kernel->get("output");
+    FUNCS.list_append = kernel->get("List.append");
 
     // Finish setting up some hosted types
     TYPES.actor = as_type(kernel->get("Actor"));
@@ -1240,8 +1234,7 @@ void install_standard_library(Branch* kernel)
 
     color_t::setup_type(TYPES.color);
 
-    LIST_APPEND_FUNC = kernel->get("List.append");
-    as_function(LIST_APPEND_FUNC)->specializeType = List__append_specializeType;
+    as_function(FUNCS.list_append)->specializeType = List__append_specializeType;
 }
 
 EXPORT caWorld* circa_initialize()
@@ -1256,8 +1249,6 @@ EXPORT caWorld* circa_initialize()
     bootstrap_kernel();
 
     Branch* kernel = KERNEL;
-
-    install_standard_library(kernel);
 
     // Make sure there are no static errors. This shouldn't happen.
     if (has_static_errors(kernel)) {

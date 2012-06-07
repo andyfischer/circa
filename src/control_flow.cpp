@@ -177,7 +177,7 @@ static Term* find_exit_point_for_term(Term* term)
             return neighbor;
 
         // Ignore extra_output and #control terms
-        if (neighbor->name == "#control" || neighbor->function == EXTRA_OUTPUT_FUNC)
+        if (neighbor->name == "#control" || neighbor->function == FUNCS.extra_output)
             continue;
 
         if (neighbor->name != "")

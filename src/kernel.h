@@ -14,12 +14,10 @@ extern Term* AVERAGE_FUNC;
 extern Term* DESIRED_VALUE_FEEDBACK;
 extern Term* DO_ONCE_FUNC;
 extern Term* ERRORED_FUNC;
-extern Term* EXTRA_OUTPUT_FUNC;
 extern Term* FEEDBACK_FUNC;
 extern Term* FILE_READ_ERROR_FUNC;
 extern Term* FREEZE_FUNC;
 extern Term* INSTANCE_FUNC;
-extern Term* LIST_APPEND_FUNC;
 extern Term* MAP_TYPE;
 extern Term* OVERLOADED_FUNCTION_FUNC;
 extern Term* REF_FUNC;
@@ -68,6 +66,7 @@ struct BuiltinFuncs {
     Term* dynamic_method;
     Term* error;
     Term* exit_point;
+    Term* extra_output;
     Term* for_func;
     Term* get_field;
     Term* get_index;
@@ -81,6 +80,7 @@ struct BuiltinFuncs {
     Term* lambda;
     Term* length;
     Term* list;
+    Term* list_append;
     Term* load_script;
     Term* loop_index;
     Term* loop_iterator;

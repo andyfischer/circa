@@ -1705,7 +1705,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     // If the func is dynamic_method and the rebind operator is used, we'll have to create
     // an extra_output ourselves.
     if (function == FUNCS.dynamic_method && rebindLHS) {
-        apply(branch, EXTRA_OUTPUT_FUNC, TermList(term));
+        apply(branch, FUNCS.extra_output, TermList(term));
     }
 
     // Possibly rebind the left-hand-side

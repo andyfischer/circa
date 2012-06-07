@@ -624,11 +624,11 @@ void update_extra_outputs(Term* term)
 
         // Check if this extra_output() already exists
         Term* existingSlot = branch->getSafe(term->index + index);
-        if (existingSlot != NULL && existingSlot->function == EXTRA_OUTPUT_FUNC)
+        if (existingSlot != NULL && existingSlot->function == FUNCS.extra_output)
             extra_output = existingSlot;
         
         if (extra_output == NULL) {
-            extra_output = apply(branch, EXTRA_OUTPUT_FUNC, TermList(term), name);
+            extra_output = apply(branch, FUNCS.extra_output, TermList(term), name);
             move_to_index(extra_output, term->index + index);
 
             if (is_state_input(placeholder))
@@ -648,7 +648,7 @@ void update_extra_outputs(Term* term)
 Term* get_extra_output(Term* term, int index)
 {
     Term* position = term->owningBranch->getSafe(term->index + index + 1);
-    if (position != NULL && position->function == EXTRA_OUTPUT_FUNC)
+    if (position != NULL && position->function == FUNCS.extra_output)
         return position;
     return NULL;
 }
@@ -1027,7 +1027,7 @@ void move_after(Term* movee, Term* position)
     int pos = position->index + 1;
 
     // Make sure the position is after any extra_output() terms
-    while (branch->get(pos) != NULL && branch->get(pos)->function == EXTRA_OUTPUT_FUNC)
+    while (branch->get(pos) != NULL && branch->get(pos)->function == FUNCS.extra_output)
         pos++;
 
     // If 'movee' is currently before 'position', then the desired index is one less
