@@ -16,8 +16,4 @@ namespace opaque_pointer_t {
     void setup_type(Type* type);
 } // namespace opaque_pointer_t
 
-namespace styled_source_t {
-    void setup_type(Type* type);
-} // namespace styled_source_t
-
 }

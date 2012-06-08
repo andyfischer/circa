@@ -891,6 +891,7 @@ void bootstrap_kernel()
     TYPE_TYPE->type = &TYPE_T;
     term_value(TYPE_TYPE)->value_type = &TYPE_T;
     term_value(TYPE_TYPE)->value_data.ptr = &TYPE_T;
+    TYPE_T.declaringTerm = TYPE_TYPE;
     type_t::setup_type(&TYPE_T);
     rename(TYPE_TYPE, "Type");
 
@@ -900,6 +901,7 @@ void bootstrap_kernel()
     ANY_TYPE->type = &TYPE_T;
     term_value(ANY_TYPE)->value_type = &TYPE_T;
     term_value(ANY_TYPE)->value_data.ptr = &ANY_T;
+    ANY_T.declaringTerm = ANY_TYPE;
     any_t::setup_type(&ANY_T);
     rename(ANY_TYPE, "any");
 
@@ -908,6 +910,7 @@ void bootstrap_kernel()
     FUNCTION_TYPE = kernel->appendNew();
     FUNCTION_TYPE->function = valueFunc;
     FUNCTION_TYPE->type = &TYPE_T;
+    FUNCTION_T.declaringTerm = FUNCTION_TYPE;
     term_value(FUNCTION_TYPE)->value_type = &TYPE_T;
     term_value(FUNCTION_TYPE)->value_data.ptr = &FUNCTION_T;
     rename(FUNCTION_TYPE, "Function");
@@ -976,9 +979,6 @@ void bootstrap_kernel()
 
     Term* map_type = parse_type(kernel, "type Map;");
     hashtable_t::setup_type(unbox_type(map_type));
-
-    Term* styledSourceType = parse_type(kernel, "type caValue;");
-    styled_source_t::setup_type(unbox_type(styledSourceType));
 
     Term* indexableType = parse_type(kernel, "type Indexable;");
     indexable_t::setup_type(unbox_type(indexableType));

@@ -22,8 +22,10 @@ circaCategory = {'title':'Core','subcategories': [circa_allTypes, circa_allFunct
 improvCategory = {'title':'Improv','subcategories': [improv_allTypes, improv_allFunctions]}
 majorCategories = [circaCategory, improvCategory]
 
-for title in [['Color', 'color_tag'],
-        'Comparison','Entropy','Internal', 'Math', 'Reflection', 'Stateful', 'Uncategorized']:
+for title in [ #['Color', 'color_tag'],
+        'Comparison',
+        'Containers',
+        'Entropy','Internal', 'Math', 'Reflection', 'Stateful', 'Uncategorized']:
 
     if isinstance(title, list):
         name = title[1]
@@ -48,12 +50,20 @@ for entry in everyEntry:
         circa_allTypes['items'].append(entry)
 
     # Assign derived data
+
+    # Fix names that will collide when they are case-insensitive
+    if entry['name'] == 'list':
+        entry['name'] = 'list_func'
+    elif entry['name'] == 'set':
+        entry['name'] = 'set_func'
+
     entry['title'] = entry['name']
     entry['filename'] = DestinationDocs + '/' + entry['name'] + '.md'
     entry['url'] = '/docs/' + entry['name'] + '.html'
     entry['linkHtml'] = '<a href="' + entry['url'] + '">' + entry['title'] + '</a>'
     entry['belongsToCategories'] = []
     entry['overloadEntries'] = []
+    entry['typeMethods'] = []
 
     if 'tags' not in entry:
         entry['tags'] = []
@@ -66,6 +76,7 @@ for entry in everyEntry:
     if 'name' in entry:
         nameToEntry[entry['name']] = entry
 
+# Correlate overloaded functions with their contents
 for entry in everyEntry:
     if 'isOverloaded' in entry and entry['isOverloaded']:
         for overload in entry['overloads']:
@@ -77,6 +88,15 @@ for entry in everyEntry:
             overloadEntry = termToEntry[term]
             entry['overloadEntries'].append(overloadEntry)
 
+# Correlate methods with their owning types
+for entry in everyEntry:
+    if 'isMethod' in entry and entry['isMethod']:
+        owningType = entry['inputTypes'][0]
+        typeEntry = termToEntry[owningType]
+        entry['methodOfType'] = typeEntry
+        typeEntry['typeMethods'].append(entry)
+
+
 # Derived data on categories
 for cat in everySubCategory():
     cat['filename'] = DestinationDocs + '/' + cat['name'] + '.md'
@@ -86,6 +106,7 @@ for cat in everySubCategory():
 def addToCategory(entry, category):
     category['items'].append(entry)
     entry['belongsToCategories'].append(category)
+
 def addNamesToCategory(nameList, categoryName):
     category = nameToEntry[categoryName]
     for name in nameList:
@@ -96,8 +117,8 @@ def addNamesToCategory(nameList, categoryName):
         entry = nameToEntry[name]
         addToCategory(entry, category)
 
-addNamesToCategory(['Color','blend_color','random_color','hsv_to_rgb'], 'color_tag')
-addNamesToCategory(['darken','lighten'], 'color_tag')
+#addNamesToCategory(['Color','blend_color','random_color','hsv_to_rgb'], 'color_tag')
+#addNamesToCategory(['darken','lighten'], 'color_tag')
 
 
 addNamesToCategory(['rand','rand_i','rand_range'], 'Entropy')
@@ -120,6 +141,8 @@ addNamesToCategory(['rand_i','rand_range','random_norm_vector'], 'Math')
 addNamesToCategory(['equals','not_equals','greater_than', 'greater_than_eq'], 'Comparison')
 addNamesToCategory(['less_than','less_than_eq'], 'Comparison')
 
+addNamesToCategory(['Dict','Set','List','list','set'], 'Containers')
+
 addNamesToCategory(['approach','approach_rect','delta','seed','toggle'], 'Stateful')
 addNamesToCategory(['cycle','cycle_elements','once','changed'], 'Stateful')
 
@@ -130,11 +153,13 @@ addNamesToCategory(['unbounded_loop_finish','for'], 'Internal')
 addNamesToCategory(['case','default_case','comment'], 'Internal')
 addNamesToCategory(['input_placeholder','output_placeholder'], 'Internal')
 addNamesToCategory(['test_oracle','test_spy'], 'Internal')
+addNamesToCategory(['branch'], 'Internal')
 addNamesToCategory(['static_error'], 'Internal')
 addNamesToCategory(['switch','namespace','if_block'], 'Internal')
 addNamesToCategory(['continue','break','discard','return'], 'Internal')
 addNamesToCategory(['loop','loop_output','loop_iterator','loop_index'], 'Internal')
 addNamesToCategory(['unrecognized_expr', 'overload_error_no_match'], 'Internal')
+addNamesToCategory(['inputs_fit_function'], 'Internal')
 
 addNamesToCategory(['Branch','Term','Interpreter','Frame'], 'Reflection')
 addNamesToCategory(['make_interpreter','overload:get_contents'], 'Reflection')
@@ -143,15 +168,36 @@ addNamesToCategory(['is_overloaded_func'], 'Reflection')
 
 # For any overloaded function in a category, add its overloads to the same category
 for entry in everyEntry:
-    for category in entry['belongsToCategories']:
-        for overload in entry['overloadEntries']:
+    for overload in entry['overloadEntries']:
+        for category in entry['belongsToCategories']:
             addToCategory(overload, category)
+
+# For any type in a category, add its methods to the same category
+for entry in everyEntry:
+    for method in entry['typeMethods']:
+        for category in entry['belongsToCategories']:
+            addToCategory(method, category)
 
 # Anything uncategorized goes in Uncategorized
 uncategorizedCategory = nameToEntry['Uncategorized']
 for entry in everyEntry:
     if not entry['belongsToCategories']:
         uncategorizedCategory['items'].append(entry)
+
+# Check that no entries have duplicate filenames or urls
+everyFilename = set()
+everyUrl = set()
+
+for entry in everyEntry:
+    filename = entry['filename']
+    url = entry['url']
+    if url in everyUrl:
+        print "duplicate url:", url
+    if filename in everyFilename:
+        print "duplicate filename:", filename
+
+    everyFilename.add(filename)
+    everyUrl.add(url)
 
 def writeEntryPage(entry):
     out = []
