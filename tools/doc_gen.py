@@ -7,14 +7,11 @@ import json,math
 
 # Load dumped data
 docsDumpString = open(DocsDump).read()
-# Hack, fix quote marks
-docsDumpString = docsDumpString.replace('\'', '"')
 everyEntry = json.loads(docsDumpString)
 
 # Correlate data
 termToEntry = {}
-everyFunction = []
-everyType = []
+nameToEntry = {}
 
 circa_allTypes = {'title':'All types', 'name':'all_types', 'items':[]}
 circa_allFunctions = {'title':'All functions', 'name':'all_functions', 'items':[]}
@@ -25,13 +22,19 @@ circaCategory = {'title':'Core','subcategories': [circa_allTypes, circa_allFunct
 improvCategory = {'title':'Improv','subcategories': [improv_allTypes, improv_allFunctions]}
 majorCategories = [circaCategory, improvCategory]
 
-# minor categories:
-# Comparison
-# Internal
-# Math
-# Reflection
-# Stateful
-# Uncategorized
+for title in [['Color', 'color_tag'],
+        'Comparison','Entropy','Internal', 'Math', 'Reflection', 'Stateful', 'Uncategorized']:
+
+    if isinstance(title, list):
+        name = title[1]
+        title = title[0]
+    else:
+        name = title
+
+    category = {'title':title, 'name':name, 'items':[]}
+    circaCategory['subcategories'].append(category)
+
+    nameToEntry[category['name']] = category
 
 def everySubCategory():
     for cat in majorCategories:
@@ -40,93 +43,172 @@ def everySubCategory():
 
 for entry in everyEntry:
     if entry['type'] == 'Function':
-        everyFunction.append(entry)
-
         circa_allFunctions['items'].append(entry)
-
-        # Assign derived data
-        entry['title'] = entry['name']
-        entry['filename'] = DestinationDocs + '/' + entry['name'] + '.md'
-        entry['url'] = '/docs/' + entry['name'] + '.html'
-        entry['linkHtml'] = '<a href="' + entry['url'] + '">' + entry['title'] + '</a>'
-
     elif entry['type'] == 'Type':
-        everyType.append(entry)
-
         circa_allTypes['items'].append(entry)
 
-        entry['title'] = entry['name']
-        entry['filename'] = DestinationDocs + '/' + entry['name'] + '.md'
-        entry['url'] = '/docs/' + entry['name'] + '.html'
-        entry['linkHtml'] = '<a href="' + entry['url'] + '">' + entry['title'] + '</a>'
+    # Assign derived data
+    entry['title'] = entry['name']
+    entry['filename'] = DestinationDocs + '/' + entry['name'] + '.md'
+    entry['url'] = '/docs/' + entry['name'] + '.html'
+    entry['linkHtml'] = '<a href="' + entry['url'] + '">' + entry['title'] + '</a>'
+    entry['belongsToCategories'] = []
+    entry['overloadEntries'] = []
 
-    else:
-        print "Didn't recognize type:", entry
+    if 'tags' not in entry:
+        entry['tags'] = []
 
     if 'term' in entry:
         if entry['term'] == "Term#null":
             continue
         termToEntry[entry['term']] = entry
 
+    if 'name' in entry:
+        nameToEntry[entry['name']] = entry
+
+for entry in everyEntry:
+    if 'isOverloaded' in entry and entry['isOverloaded']:
+        for overload in entry['overloads']:
+            term = overload
+            if term not in termToEntry:
+                print "couldn't find ref", term, "for overloaded func", entry['name']
+                continue
+
+            overloadEntry = termToEntry[term]
+            entry['overloadEntries'].append(overloadEntry)
+
+# Derived data on categories
 for cat in everySubCategory():
     cat['filename'] = DestinationDocs + '/' + cat['name'] + '.md'
     cat['url'] = '/docs/' + cat['name'] + '.html'
 
-def writeFunctionPage(func):
+# Manually put functions into categories.
+def addToCategory(entry, category):
+    category['items'].append(entry)
+    entry['belongsToCategories'].append(category)
+def addNamesToCategory(nameList, categoryName):
+    category = nameToEntry[categoryName]
+    for name in nameList:
+        if name not in nameToEntry:
+            print("couldn't find name:", name)
+            continue
+
+        entry = nameToEntry[name]
+        addToCategory(entry, category)
+
+addNamesToCategory(['Color','blend_color','random_color','hsv_to_rgb'], 'color_tag')
+addNamesToCategory(['darken','lighten'], 'color_tag')
+
+
+addNamesToCategory(['rand','rand_i','rand_range'], 'Entropy')
+addNamesToCategory(['seed','random_color','random_element','random_norm_vector'], 'Entropy')
+
+addNamesToCategory(['abs','add','div','sub','ceil'], 'Math')
+addNamesToCategory(['arcsin', 'arccos', 'arctan', 'average', 'bezier3', 'bezier4'], 'Math')
+addNamesToCategory(['floor', 'log', 'magnitude', 'norm'], 'Math')
+addNamesToCategory(['max','min','mod'], 'Math')
+addNamesToCategory(['mult', 'neg','pow','rand','seed'], 'Math')
+addNamesToCategory(['sin', 'sqr', 'sqrt', 'cos','tan','rotate_point','round'], 'Math')
+addNamesToCategory(['rect_intersects_rect'], 'Math')
+addNamesToCategory(['remainder','clamp','polar', 'point_distance'], 'Math')
+addNamesToCategory(['smoothstep','smootherstep'], 'Math')
+addNamesToCategory(['div_f','div_i','div_s'], 'Math')
+addNamesToCategory(['Point','Point_i','Rect','Rect_i'], 'Math')
+addNamesToCategory(['smooth_in_out','cube','perpendicular'], 'Math')
+addNamesToCategory(['rand_i','rand_range','random_norm_vector'], 'Math')
+
+addNamesToCategory(['equals','not_equals','greater_than', 'greater_than_eq'], 'Comparison')
+addNamesToCategory(['less_than','less_than_eq'], 'Comparison')
+
+addNamesToCategory(['approach','approach_rect','delta','seed','toggle'], 'Stateful')
+addNamesToCategory(['cycle','cycle_elements','once','changed'], 'Stateful')
+
+addNamesToCategory(['extra_output','unknown_function','unknown_identifier'], 'Internal')
+addNamesToCategory(['pack_state','unpack_state','pack_state_list_n','unpack_state_list_n'], 'Internal')
+addNamesToCategory(['unpack_state_from_list','pack_state_to_list'], 'Internal')
+addNamesToCategory(['unbounded_loop_finish','for'], 'Internal')
+addNamesToCategory(['case','default_case','comment'], 'Internal')
+addNamesToCategory(['input_placeholder','output_placeholder'], 'Internal')
+addNamesToCategory(['test_oracle','test_spy'], 'Internal')
+addNamesToCategory(['static_error'], 'Internal')
+addNamesToCategory(['switch','namespace','if_block'], 'Internal')
+addNamesToCategory(['continue','break','discard','return'], 'Internal')
+addNamesToCategory(['loop','loop_output','loop_iterator','loop_index'], 'Internal')
+addNamesToCategory(['unrecognized_expr', 'overload_error_no_match'], 'Internal')
+
+addNamesToCategory(['Branch','Term','Interpreter','Frame'], 'Reflection')
+addNamesToCategory(['make_interpreter','overload:get_contents'], 'Reflection')
+addNamesToCategory(['lookup_branch_ref'], 'Reflection')
+addNamesToCategory(['is_overloaded_func'], 'Reflection')
+
+# For any overloaded function in a category, add its overloads to the same category
+for entry in everyEntry:
+    for category in entry['belongsToCategories']:
+        for overload in entry['overloadEntries']:
+            addToCategory(overload, category)
+
+# Anything uncategorized goes in Uncategorized
+uncategorizedCategory = nameToEntry['Uncategorized']
+for entry in everyEntry:
+    if not entry['belongsToCategories']:
+        uncategorizedCategory['items'].append(entry)
+
+def writeEntryPage(entry):
     out = []
 
-    title = func['title']
+    title = entry['title']
 
     out.append("---")
     out.append("title: "+ title)
     out.append("layout: docs")
     out.append("---")
     out.append("")
-    out.append("<h3><i>function</i> " + title + "</h3>")
+
+    if entry['type'] == 'Function':
+        out.append("<h3><i>function</i> " + title + "</h3>")
+    else:
+        out.append("<h3><i>type</i> " + title + "</h3>")
     out.append("")
 
-    heading = ""
+    if 'heading' in entry:
+        heading = ""
+        for element in entry['heading']:
+            term = element[1]
+            enableLink = False
 
-    if 'heading' not in func:
-        print "missing 'heading' from:", func['name']
-        return []
+            if term != entry['term'] and term in termToEntry:
+                linkedEntry = termToEntry[term]
+                enableLink = True
+                heading += '<a href="' + linkedEntry['url'] + '">'
 
-    for element in func['heading']:
-        term = element[1]
-        enableLink = False
+            heading += element[0]
 
-        if term != func['term'] and term in termToEntry:
-            linkedEntry = termToEntry[term]
-            enableLink = True
-            heading += '<a href="' + linkedEntry['url'] + '">'
+            if enableLink:
+                heading += '</a>'
 
-        heading += element[0]
+        out.append(heading)
+        out.append("")
 
-        if enableLink:
-            heading += '</a>'
+    # Doc comments
+    if 'topComments' in entry:
+        for comment in entry['topComments']:
+            if comment.startswith('--'):
+                comment = comment[2:]
+            comment = comment.strip()
+            out.append("<p>" + comment + "</p>")
+        out.append("")
 
-    out.append(heading)
-    out.append("")
-    out.append("See also:")
-    out.append("")
-    out.append("Labels:")
+    if entry['overloadEntries']:
+        out.append("<h5>Overloaded function, includes these specific functions:</h5>")
 
-    return out
+        for entry in entry['overloadEntries']:
+            out.append('<p>' + entry['linkHtml'] + '</p>')
+        out.append("")
 
-def writeTypePage(t):
-    out = []
-
-    title = t['title']
-
-    out.append("---")
-    out.append("title: "+ title)
-    out.append("layout: docs")
-    out.append("---")
-    out.append("")
-    out.append("<h3><i>type</i> " + title + "</h3>")
-    out.append("")
-    out.append("Methods:")
-    out.append("")
+    if 'tags' in entry and entry['tags']:
+        out.append("Tags:")
+        out.append("")
+    out.append("<p>" + entry['term'] + "</p>")
 
     return out
 
@@ -198,6 +280,10 @@ def writeCategoryPage(category):
 
             item = column[index]
 
+            if 'linkHtml' not in item:
+                print 'no linkHtml in', item['name']
+                continue
+
             out.append('    <td>'+ item['linkHtml'] + '</td>')
         out.append('  </tr>')
     out.append('</table>')
@@ -221,11 +307,6 @@ for cat in everySubCategory():
     writeFile(lines, cat['filename'])
 
 # Function-specific pages
-for func in everyFunction:
-    lines = writeFunctionPage(func)
-    writeFile(lines, func['filename'])
-
-# Type-specific pages
-for t in everyType:
-    lines = writeTypePage(t)
-    writeFile(lines, t['filename'])
+for entry in everyEntry:
+    lines = writeEntryPage(entry)
+    writeFile(lines, entry['filename'])

@@ -3,6 +3,19 @@ type Writer {
     bool needsComma
 }
 
+def to_json_string(any i) -> String
+    if is_string(i)
+        return concat('"' i '"')
+    elif is_list(i)
+        elements = List(i)
+        for e in @elements
+            to_json_string(@e)
+        return concat('[', elements.join(', '), ']')
+    elif is_bool(i)
+        return to_string(i)
+    else
+        return concat('"' to_string(i) '"')
+
 def Writer.write(@self, any args :multiple)
     if self.needsComma
         print(',')
@@ -16,10 +29,12 @@ def Writer.dump_function(@self, Branch func)
     self.write('"name": "' func.name '",')
     self.write('"term": "' func.owner '",')
     heading = func.format_function_heading
-    for phrase in @heading
-        for item in @phrase
-            to_string(@item)
-    self.write('"heading": ' heading)
+    to_json_string(@heading)
+    self.write('"heading": ' heading ',')
+    self.write('"topComments": ' to_json_string(func.get_top_comments) ',')
+    self.write('"isOverloaded": ' is_overloaded_func(func) ',')
+    self.write('"overloads": ' to_json_string(overload:get_contents(func)) ',')
+    self.write('"isMethod": ' func.is_method)
 
     inputs = for input in func.inputs
         Term(@input)

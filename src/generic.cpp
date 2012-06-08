@@ -210,8 +210,12 @@ void list_overload_contents(Branch* branch, caValue* output)
         Branch* caseContents = nested_contents(caseTerm);
 
         Term* call = find_last_non_comment_expression(caseContents);
+        Term* func = call->function;
 
-        set_term_ref(list_append(output), call->function);
+        if (func == FUNCS.overload_error_no_match)
+            continue;
+
+        set_term_ref(list_append(output), func);
     }
 }
 

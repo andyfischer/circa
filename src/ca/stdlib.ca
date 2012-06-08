@@ -1,9 +1,6 @@
 
 -- Builtin functions
 
-def docs:category(Name name)
-    -- Meta function, declares this function to be part of a documentation category.
-
 def assert(bool condition)
     -- Raises an error if 'condition' is false.
 
@@ -181,11 +178,9 @@ def List.slice(self, int start, int fin) -> List
 -- Overloaded functions
 def is_overloaded_func(Branch branch) -> bool
     -- Return true if this branch is an overloaded function
-    docs:category(:metaprogramming)
 
 def overload:get_contents(Branch branch) -> List
     -- Get a list of all the functions that this overloaded function uses.
-    docs:category(:metaprogramming)
 
 def String.append(@self, String right)
     self = concat(self, right)
@@ -243,20 +238,28 @@ def Term.is_function(self) -> bool
 def Term.is_type(self) -> bool
     return is_type(self.value)
 def Term.is_input_placeholder(self) -> bool
-    return self.function == term_ref(input_placeholder)
+    return self.function == branch_ref(input_placeholder)
 def Term.is_comment(self) -> bool
-    return self.function == term_ref(comment)
+    return self.function == branch_ref(comment)
 
--- workaround, this function must be declared after Term.name:
+-- workaround, these functions currently need to be declared after Term:
 def Branch.name(self) -> String
     return self.owner.name
+
+def Branch.is_method(self) -> bool
+    return self.owner.property("syntax:methodDecl") == true
 
 def Branch.get_top_comments(self) -> List
     out = []
     for t in self.terms
+        Term(@t)
         if t.is_input_placeholder
             continue
         elif t.is_comment
+            str = t.property('comment')
+            if str == ""
+                break
+
             out.append(t.property('comment'))
         else
             break
