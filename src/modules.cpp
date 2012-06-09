@@ -51,9 +51,9 @@ Branch* load_module_from_file(const char* module_name, const char* filename)
     return nested_contents(import);
 }
 
-static bool find_module_file(const char* module_name, String* filenameOut)
+static bool find_module_file(const char* module_name, caValue* filenameOut)
 {
-    String module;
+    Value module;
     set_string(&module, module_name);
 
     int count = list_length(&g_moduleSearchPaths);
@@ -62,7 +62,7 @@ static bool find_module_file(const char* module_name, String* filenameOut)
         // For each search path we'll check two places.
 
         // Look under searchPath/moduleName.ca
-        String searchPath;
+        Value searchPath;
         copy(g_moduleSearchPaths[i], &searchPath);
         circa_join_path(&searchPath, &module);
         string_append(&searchPath, ".ca");
@@ -93,7 +93,7 @@ Branch* load_module(const char* module_name, Term* loadCall)
     if (existing != NULL)
         return existing;
     
-    String filename;
+    Value filename;
     bool found = find_module_file(module_name, &filename);
 
     if (!found)

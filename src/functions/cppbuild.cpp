@@ -9,10 +9,10 @@ namespace cppbuild_function {
 
     CA_FUNCTION(build_module)
     {
-        String* moduleDir = (String*) INPUT(0);
-        String filename;
+        caValue* moduleDir = INPUT(0);
+        Value filename;
         copy(moduleDir, &filename);
-        String build_ca;
+        Value build_ca;
         set_string(&build_ca, "build.ca");
         circa_join_path(&filename, &build_ca);
 

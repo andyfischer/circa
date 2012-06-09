@@ -352,7 +352,6 @@ int run_command_line(caWorld* world, caValue* args)
             break;
 
         if (string_eq(list_get(args, 0), "-break-on")) {
-            String name;
             DEBUG_BREAK_ON_TERM = atoi(as_cstring(list_get(args, 1)));
 
             list_remove_index(args, 0);
@@ -422,7 +421,8 @@ int run_command_line(caWorld* world, caValue* args)
     if (string_eq(list_get(args, 0), "-e")) {
         list_remove_index(args, 0);
 
-        String command;
+        Value command;
+        set_string(&command, "");
 
         bool firstArg = true;
         while (!list_empty(args)) {

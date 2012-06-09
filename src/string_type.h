@@ -6,10 +6,6 @@
 
 namespace circa {
 
-struct String : public Value
-{
-};
-
 void string_setup_type(Type* type);
 
 // Append the two strings, saving the result in 'left'.
