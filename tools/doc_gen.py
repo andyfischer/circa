@@ -97,8 +97,7 @@ for entry in everyEntry:
 # Correlate overloaded functions with their contents
 for entry in everyEntry:
     if 'isOverloaded' in entry and entry['isOverloaded']:
-        for overload in entry['overloads']:
-            term = overload
+        for term in entry['overloads']:
             if term not in termToEntry:
                 print "couldn't find ref", term, "for overloaded func", entry['name']
                 continue
