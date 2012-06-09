@@ -15,7 +15,7 @@ namespace namespace_function {
         append_phrase(source, "namespace ", term, name_Keyword);
         append_phrase(source, term->name, term, name_TermName);
         format_branch_source(source, nested_contents(term), term);
-        append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
+        append_phrase(source, term->stringProp("syntax:preEndWs", ""),
                 term, tok_Whitespace);
     }
 

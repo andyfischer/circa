@@ -24,7 +24,7 @@ void set_is_statement(Term* term, bool value)
 
 bool is_statement(Term* term)
 {
-    return term->boolPropOptional("statement", false);
+    return term->boolProp("statement", false);
 }
 
 bool is_comment(Term* term)
@@ -34,7 +34,7 @@ bool is_comment(Term* term)
 
 bool is_empty_comment(Term* term)
 {
-    return is_comment(term) && term->stringProp("comment") == "";
+    return is_comment(term) && term->stringProp("comment","") == "";
 }
 
 bool is_value(Term* term)
@@ -44,7 +44,7 @@ bool is_value(Term* term)
 
 bool is_hidden(Term* term)
 {
-    if (term->boolPropOptional("syntax:hidden", false))
+    if (term->boolProp("syntax:hidden", false))
         return true;
 
     if (term->name == "")
@@ -304,14 +304,14 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     out << ") ";
 
     // Print out certain properties
-    if (term->boolPropOptional("multiple", false))
+    if (term->boolProp("multiple", false))
         out << ":multiple ";
-    if (term->boolPropOptional("output", false))
+    if (term->boolProp("output", false))
         out << ":output ";
-    if (term->boolPropOptional("state", false))
+    if (term->boolProp("state", false))
         out << ":state ";
     if (term->hasProperty("field"))
-        out << ":field(" << term->stringProp("field") << ")";
+        out << ":field(" << term->stringProp("field", "") << ")";
 
     out << "-> ";
     

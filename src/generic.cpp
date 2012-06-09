@@ -172,7 +172,7 @@ void specialize_overload_for_call(Term* call)
 
         ca_assert(localPlaceholder != NULL);
 
-        if (placeholder->boolPropOptional("multiple", false))
+        if (placeholder->boolProp("multiple", false))
             localPlaceholder->setBoolProp("multiple", true);
     }
 
@@ -190,7 +190,7 @@ bool is_overloaded_function(Branch* branch)
     if (branch->owningTerm == NULL)
         return false;
 
-    return branch->owningTerm->boolPropOptional("overloadedFunc", false);
+    return branch->owningTerm->boolProp("overloadedFunc", false);
 }
 
 void list_overload_contents(Branch* branch, caValue* output)

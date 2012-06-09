@@ -155,58 +155,7 @@ void Term::removeProperty(const char* name)
     properties.remove(name);
 }
 
-bool Term::boolProp(const char* name)
-{
-    caValue* t = addProperty(name, BOOL_TYPE);
-    return as_bool(t);
-}
-int Term::intProp(const char* name)
-{
-    caValue* t = addProperty(name, INT_TYPE);
-    return as_int(t);
-}
-float Term::floatProp(const char* name)
-{
-    caValue* t = addProperty(name, FLOAT_TYPE);
-    return as_float(t);
-}
-std::string const& Term::stringProp(const char* name)
-{
-    caValue* t = addProperty(name, STRING_TYPE);
-    return as_string(t);
-}
-
-void Term::setProp(const char* name, caValue* value)
-{
-    caValue* t = addProperty(name, INT_TYPE);
-    copy(value, t);
-}
-
-void Term::setIntProp(const char* name, int i)
-{
-    caValue* t = addProperty(name, INT_TYPE);
-    set_int(t, i);
-}
-
-void Term::setFloatProp(const char* name, float f)
-{
-    caValue* t = addProperty(name, FLOAT_TYPE);
-    set_float(t, f);
-}
-
-void Term::setBoolProp(const char* name, bool b)
-{
-    caValue* t = addProperty(name, BOOL_TYPE);
-    set_bool(t, b);
-}
-
-void Term::setStringProp(const char* name, std::string const& s)
-{
-    caValue* t = addProperty(name, STRING_TYPE);
-    set_string(t, s);
-}
-
-bool Term::boolPropOptional(const char* name, bool defaultValue)
+bool Term::boolProp(const char* name, bool defaultValue)
 {
     caValue* value = term_get_property(this, name);
     if (value == NULL)
@@ -215,7 +164,7 @@ bool Term::boolPropOptional(const char* name, bool defaultValue)
         return as_bool(value);
 }
 
-float Term::floatPropOptional(const char* name, float defaultValue)
+float Term::floatProp(const char* name, float defaultValue)
 {
     caValue* value = term_get_property(this, name);
     if (value == NULL)
@@ -224,7 +173,7 @@ float Term::floatPropOptional(const char* name, float defaultValue)
         return as_float(value);
 }
 
-int Term::intPropOptional(const char* name, int defaultValue)
+int Term::intProp(const char* name, int defaultValue)
 {
     caValue* value = term_get_property(this, name);
     if (value == NULL)
@@ -232,13 +181,43 @@ int Term::intPropOptional(const char* name, int defaultValue)
     else
         return as_int(value);
 }
-std::string Term::stringPropOptional(const char* name, const char* defaultValue)
+std::string Term::stringProp(const char* name, const char* defaultValue)
 {
     caValue* value = term_get_property(this, name);
     if (value == NULL)
         return defaultValue;
     else
         return as_string(value);
+}
+
+void Term::setProp(const char* name, caValue* value)
+{
+    caValue* t = term_insert_property(this, name);
+    copy(value, t);
+}
+
+void Term::setIntProp(const char* name, int i)
+{
+    caValue* t = term_insert_property(this, name);
+    set_int(t, i);
+}
+
+void Term::setFloatProp(const char* name, float f)
+{
+    caValue* t = term_insert_property(this, name);
+    set_float(t, f);
+}
+
+void Term::setBoolProp(const char* name, bool b)
+{
+    caValue* t = term_insert_property(this, name);
+    set_bool(t, b);
+}
+
+void Term::setStringProp(const char* name, std::string const& s)
+{
+    caValue* t = term_insert_property(this, name);
+    set_string(t, s);
 }
 
 Term* alloc_term()
@@ -258,19 +237,27 @@ void dealloc_term(Term* term)
     delete term;
 }
 
+caValue* term_insert_property(Term* term, const char* name)
+{
+    return term->properties.insert(name);
+}
+
 void term_set_property(Term* term, const char* name, caValue* value)
 {
-    swap(value, term->properties.insert(name));
+    swap(value, term_insert_property(term, name));
 }
+
 caValue* term_get_property(Term* term, const char* name)
 {
     INCREMENT_STAT(termPropAccess);
     return term->properties[name];
 }
+
 void term_remove_property(Term* term, const char* name)
 {
     term->properties.remove(name);
 }
+
 void term_move_property(Term* from, Term* to, const char* propName)
 {
     if (!from->hasProperty(propName))

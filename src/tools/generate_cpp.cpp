@@ -149,7 +149,7 @@ void write_term(SourceWriter* writer, Term* term)
             return;
 
         writer->write("// ");
-        writer->write(term->stringProp("comment").c_str());
+        writer->write(term->stringProp("comment","").c_str());
         writer->newline();
         return;
     }

@@ -11,7 +11,7 @@ namespace unrecognized_expr_function {
 
     void formatSource(caValue* source, Term* term)
     {
-        append_phrase(source, term->stringProp("originalText"), term, name_None);
+        append_phrase(source, term->stringProp("originalText",""), term, name_None);
     }
 
     void setup(Branch* kernel)

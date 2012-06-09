@@ -788,7 +788,7 @@ void branch_link_missing_functions(Branch* branch, Branch* source)
     for (BranchIterator it(branch); it.unfinished(); it.advance()) {
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
-            std::string funcName = term->stringPropOptional("syntax:functionName", "");
+            std::string funcName = term->stringProp("syntax:functionName", "");
 
             if (funcName == "")
                 continue;

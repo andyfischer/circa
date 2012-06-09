@@ -240,7 +240,7 @@ void finish_frame(Stack* stack)
 
             // Don't attempt to copy a 'custom' output. This is used in the primary for-loop
             // output, which is incrementally appended to on every iteration.
-            if (placeholder->boolPropOptional("customOutput", false))
+            if (placeholder->boolProp("customOutput", false))
                 continue;
 
             caValue* result = get_frame_register(topFrame, placeholder->index);
@@ -730,7 +730,7 @@ Branch* if_block_choose_branch(Stack* stack, Term* term)
 Branch* dynamic_method_choose_branch(Stack* stack, Term* term)
 {
     caValue* object = find_stack_value_for_term(stack, term, 0);
-    std::string functionName = term->stringPropOptional("syntax:functionName", "");
+    std::string functionName = term->stringProp("syntax:functionName", "");
 
     Term* method = find_method((Branch*) top_branch(stack),
         (Type*) circa_type_of(object), functionName.c_str());
@@ -892,7 +892,7 @@ void step_interpreter(Stack* stack)
 
         caValue* input = find_stack_value_for_term(stack, currentTerm->input(i), 1);
 
-        //bool multiple = inputTerm->boolPropOptional("multiple", false);
+        //bool multiple = inputTerm->boolProp("multiple", false);
         bool multiple = inputTerm->flags & TERM_FLAG_MULTIPLE;
 
         if (multiple) {

@@ -208,7 +208,7 @@ void dynamic_method_call(caStack* stack)
     // Lookup method
     Term* term = (Term*) circa_caller_term(stack);
     caValue* object = circa_index(args, 0);
-    std::string functionName = term->stringPropOptional("syntax:functionName", "");
+    std::string functionName = term->stringProp("syntax:functionName", "");
 
     // Find and dispatch method
     Term* method = find_method((Branch*) top_branch(stack),

@@ -40,7 +40,7 @@ void fix_forward_function_references(Branch* branch)
         Term* term = *it;
         if (term->function == NULL || term->function == FUNCS.unknown_function) {
             // See if we can now find this function
-            std::string functionName = term->stringProp("syntax:functionName");
+            std::string functionName = term->stringProp("syntax:functionName", "");
 
             Term* func = find_name(branch, functionName.c_str());
             if (func != NULL) {

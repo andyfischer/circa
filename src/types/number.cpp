@@ -59,7 +59,7 @@ namespace number_t {
         // First, check if we know how the user formatted this number. If this value
         // still has the exact same value, then use the original formatting.
         if (term->hasProperty("float:original-format")) {
-            std::string const& originalFormat = term->stringProp("float:original-format");
+            std::string const& originalFormat = term->stringProp("float:original-format","");
             float actual = as_float(term_value(term));
             float original = (float) atof(originalFormat.c_str());
             if (actual == original)
@@ -71,7 +71,7 @@ namespace number_t {
         std::stringstream strm;
         strm << as_float(term_value(term));
 
-        if (term->floatPropOptional("mutability", 0.0) > 0.5)
+        if (term->floatProp("mutability", 0.0) > 0.5)
             strm << "?";
 
         std::string result = strm.str();

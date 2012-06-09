@@ -9,7 +9,7 @@ namespace do_once_function {
     {
         append_phrase(source, "do once", term, name_Keyword);
         format_branch_source(source, nested_contents(term), term);
-        append_phrase(source, term->stringPropOptional("syntax:preEndWs", ""),
+        append_phrase(source, term->stringProp("syntax:preEndWs", ""),
                 term, tok_Whitespace);
     }
 

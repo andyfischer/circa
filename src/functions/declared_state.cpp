@@ -47,7 +47,7 @@ namespace declared_state_function {
         append_phrase(source, "state ", term, tok_State);
 
         if (term->hasProperty("syntax:explicitType")) {
-            append_phrase(source, term->stringProp("syntax:explicitType"),
+            append_phrase(source, term->stringProp("syntax:explicitType",""),
                     term, name_TypeName);
             append_phrase(source, " ", term, tok_Whitespace);
         }
@@ -58,7 +58,7 @@ namespace declared_state_function {
 
         if (nested_contents(term)->length() > 0) {
             defaultValue = nested_contents(term)->getFromEnd(0)->input(0);
-            if (defaultValue->boolPropOptional("hidden", false))
+            if (defaultValue->boolProp("hidden", false))
                 defaultValue = defaultValue->input(0);
         }
 

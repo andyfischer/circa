@@ -27,7 +27,7 @@ namespace assign_function {
         Term* rhs = term->input(1);
 
         if (term->hasProperty("syntax:rebindOperator")) {
-            append_phrase(source, rhs->stringPropOptional("syntax:functionName", ""),
+            append_phrase(source, rhs->stringProp("syntax:functionName", ""),
                 rhs, name_None);
             format_source_for_input(source, rhs, 1, "", "");
         } else {

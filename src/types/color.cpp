@@ -20,7 +20,7 @@ namespace color_t {
 
         bool valueHasAlpha = as_float(list_get(value,3)) < 1.0;
 
-        int specifiedDigits = term->intPropOptional("syntax:colorFormat", 6);
+        int specifiedDigits = term->intProp("syntax:colorFormat", 6);
 
         int digitsPerChannel = (specifiedDigits == 6 || specifiedDigits == 8) ? 2 : 1;
         bool specifyAlpha = valueHasAlpha || (specifiedDigits == 4 || specifiedDigits == 8);

@@ -117,10 +117,10 @@ void discard_formatSource(caValue* source, Term* term)
 
 void return_formatSource(caValue* source, Term* term)
 {
-    if (term->boolPropOptional("syntax:returnStatement", false)) {
+    if (term->boolProp("syntax:returnStatement", false)) {
         append_phrase(source, "return", term, name_Keyword);
         append_phrase(source,
-                term->stringPropOptional("syntax:postKeywordWs", " "),
+                term->stringProp("syntax:postKeywordWs", " "),
                 term, name_Whitespace);
 
         if (term->input(0) != NULL)
@@ -198,7 +198,7 @@ static Name get_highest_exit_level(Branch* branch)
             continue;
 
         highest = max_exit_level(highest, 
-            term->intPropOptional("highestExitLevel", name_None));
+            term->intProp("highestExitLevel", name_None));
     }
 
     return highest;

@@ -115,26 +115,24 @@ struct Term : public caTerm
     caValue* addProperty(const char* name, Term* type);
     void removeProperty(const char* name);
 
-    int intProp(const char* name);
-    float floatProp(const char* name);
-    bool boolProp(const char* name);
-    std::string const& stringProp(const char* name);
+    int intProp(const char* name, int defaultValue);
+    float floatProp(const char* name, float defaultValue);
+    bool boolProp(const char* name, bool defaultValue);
+    std::string stringProp(const char* name, const char* defaultValue);
 
     void setProp(const char* name, caValue* value);
     void setIntProp(const char* name, int i);
     void setFloatProp(const char* name, float f);
     void setBoolProp(const char* name, bool b);
     void setStringProp(const char* name, std::string const& s);
-
-    int intPropOptional(const char* name, int defaultValue);
-    float floatPropOptional(const char* name, float defaultValue);
-    bool boolPropOptional(const char* name, bool defaultValue);
-    std::string stringPropOptional(const char* name, const char* defaultValue);
 };
 
 // Allocate a new Term object.
 Term* alloc_term();
 void dealloc_term(Term*);
+
+// Fetches a term property, creating it if it doesn't exist.
+caValue* term_insert_property(Term* term, const char* name);
 
 // Fetches a term property.
 caValue* term_get_property(Term* term, const char* name);

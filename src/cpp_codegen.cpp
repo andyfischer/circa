@@ -60,10 +60,10 @@ void write_expression(CppWriter& writer, Term* term)
 {
     if (is_value(term)) {
         write_value(writer, term);
-    } else if (term->stringProp("syntax:declarationStyle") == "infix") {
+    } else if (term->stringProp("syntax:declarationStyle", "") == "infix") {
         write_expression(writer, term->input(0));
         writer.write(" ");
-        writer.write(term->stringProp("syntax:functionName"));
+        writer.write(term->stringProp("syntax:functionName", ""));
         writer.write(" ");
         write_expression(writer, term->input(1));
     } else {
@@ -82,9 +82,9 @@ void write_expression(CppWriter& writer, Term* term)
 void write_statement(CppWriter& writer, Term* term)
 {
     if (is_comment(term)) {
-        if (term->stringProp("comment") != "") {
+        if (term->stringProp("comment", "") != "") {
             writer.write("//");
-            writer.write(term->stringProp("comment"));
+            writer.write(term->stringProp("comment",""));
         }
     } else if (is_function(term)) {
         write_function(writer, term);
@@ -106,7 +106,7 @@ void write_branch_contents(CppWriter& writer, Branch* branch)
         Term* term = branch->get(i);
         if (!should_print_term_source_line(term))
             continue;
-        if (is_comment(term) && term->stringProp("comment") == "")
+        if (is_comment(term) && term->stringProp("comment","") == "")
             continue;
         write_statement(writer, term);
 

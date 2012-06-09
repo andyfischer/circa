@@ -44,8 +44,8 @@ void check_input_for_static_error(List* errors, Term* term, int index)
 
     Term* input = term->input(index);
     Term* placeholder = term_get_input_placeholder(term, effectiveIndex);
-    bool meta = placeholder->boolPropOptional("meta", false);
-    bool optional = placeholder->boolPropOptional("optional", false);
+    bool meta = placeholder->boolProp("meta", false);
+    bool optional = placeholder->boolProp("optional", false);
 
     if (input == NULL) {
         if (!meta && !optional)
@@ -158,7 +158,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
     else if (strcmp(type, "unknown_identifier") == 0)
         out << "Unknown identifier: " << term->name;
     else if (strcmp(type, "unrecognized_expression") == 0)
-        out << "Unrecognized expression: " << term->stringProp("message");
+        out << "Unrecognized expression: " << term->stringProp("message", "");
     else if (strcmp(type, "wrong_input_count") == 0) {
         int funcNumInputs = term_count_input_placeholders(term);
         int actualCount = term->numInputs();
@@ -171,7 +171,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
     } else if (strcmp(type, "null_function") == 0)
         out << "NULL function reference";
     else if (strcmp(type, "unknown_function") == 0)
-        out << "Unknown function: " << term->stringProp("syntax:functionName");
+        out << "Unknown function: " << term->stringProp("syntax:functionName", "");
     else if (strcmp(type, "null_input") == 0)
         out << "NULL input reference for input " << inputIndex;
     else if (strcmp(type, "type_mismatch") == 0) {

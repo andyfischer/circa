@@ -11,7 +11,7 @@ namespace for_function {
         append_phrase(source, "for ", term, name_Keyword);
         append_phrase(source, for_loop_get_iterator_name(term), term, name_None);
         append_phrase(source, " in ", term, name_Keyword);
-        if (term->boolPropOptional("modifyList", false))
+        if (term->boolProp("modifyList", false))
             append_phrase(source, "@", term, name_None);
         format_source_for_input(source, term, 0);
     }
@@ -20,7 +20,7 @@ namespace for_function {
     {
         format_heading(source, term);
         format_branch_source(source, nested_contents(term), term);
-        append_phrase(source, term->stringPropOptional("syntax:whitespaceBeforeEnd", ""),
+        append_phrase(source, term->stringProp("syntax:whitespaceBeforeEnd", ""),
             term, tok_Whitespace);
     }
 

@@ -119,8 +119,8 @@ bool FeedbackOperation::hasPendingFeedback(Term* target)
 
 bool is_trainable(Term* term)
 {
-    return term->boolPropOptional("trainable", false)
-        || term->boolPropOptional("derived-trainable", false);
+    return term->boolProp("trainable", false)
+        || term->boolProp("derived-trainable", false);
 }
 
 void set_trainable(Term* term, bool value)
@@ -305,7 +305,7 @@ Branch& default_training_branch(Branch& branch)
 
 float get_feedback_weight(Term* term)
 {
-    return term->floatPropOptional("feedback-weight", 0);
+    return term->floatProp("feedback-weight", 0);
 }
 
 void set_feedback_weight(Term* term, float weight)

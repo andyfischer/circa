@@ -32,7 +32,7 @@ namespace int_t {
     void format_source(caValue* source, Term* term)
     {
         std::stringstream strm;
-        if (term->stringPropOptional("syntax:integerFormat", "dec") == "hex")
+        if (term->stringProp("syntax:integerFormat", "dec") == "hex")
             strm << "0x" << std::hex;
 
         strm << as_int(term_value(term));

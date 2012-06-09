@@ -20,10 +20,10 @@ namespace circa {
 void format_branch_source(caValue* source, Branch* branch, Term* format)
 {
     if (format != NULL)
-        append_phrase(source, format->stringPropOptional("syntax:postHeadingWs", ""),
+        append_phrase(source, format->stringProp("syntax:postHeadingWs", ""),
                 format, name_Whitespace);
 
-    bool styleBraces = format && format->stringPropOptional("syntax:branchStyle","") == "braces";
+    bool styleBraces = format && format->stringProp("syntax:branchStyle","") == "braces";
 
     if (styleBraces)
         append_phrase(source, "{", format, name_None);
@@ -41,13 +41,13 @@ void format_branch_source(caValue* source, Branch* branch, Term* format)
         }
 
         // Indentation
-        append_phrase(source, term->stringPropOptional("syntax:preWhitespace", ""),
+        append_phrase(source, term->stringProp("syntax:preWhitespace", ""),
             term, name_Whitespace);
 
         format_term_source(source, term);
 
         if (term->hasProperty("syntax:lineEnding")) {
-            append_phrase(source, term->stringProp("syntax:lineEnding"),
+            append_phrase(source, term->stringProp("syntax:lineEnding", ""),
                 term, name_None);
         } else if (term->hasProperty("syntax:postHeadingWs"))  {
             // no newline needed
@@ -57,7 +57,7 @@ void format_branch_source(caValue* source, Branch* branch, Term* format)
     }
 
     if (format != NULL) {
-        append_phrase(source, format->stringPropOptional("syntax:preEndWs", ""),
+        append_phrase(source, format->stringProp("syntax:preEndWs", ""),
                 format, name_Whitespace);
     }
 
@@ -92,7 +92,7 @@ void format_term_source(caValue* source, Term* term)
             format_name_binding(source, term);
 
         // Special constructor syntax
-        if (term->boolPropOptional("constructor", false)) {
+        if (term->boolProp("constructor", false)) {
             std::string s = name_to_string(term->type->name);
             s += "()";
             append_phrase(source, s, term, name_None);
@@ -115,16 +115,16 @@ void format_term_source(caValue* source, Term* term)
     }
 
     // Post whitespace
-    append_phrase(source, term->stringPropOptional("syntax:postWhitespace", ""),
+    append_phrase(source, term->stringProp("syntax:postWhitespace", ""),
             term, name_Whitespace);
 }
 
 void format_term_source_default_formatting(caValue* source, Term* term)
 {
-    std::string declarationStyle = term->stringPropOptional("syntax:declarationStyle",
+    std::string declarationStyle = term->stringProp("syntax:declarationStyle",
             "function-call");
 
-    std::string functionName = term->stringPropOptional("syntax:functionName",
+    std::string functionName = term->stringProp("syntax:functionName",
             term->function->name.c_str());
 
     // Check for an infix operator with implicit rebinding (like +=).
@@ -142,7 +142,7 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         format_name_binding(source, term);
 
     // possibly add parens
-    int numParens = term->intPropOptional("syntax:parens", 0);
+    int numParens = term->intProp("syntax:parens", 0);
     for (int p=0; p < numParens; p++)
         append_phrase(source, "(", term, tok_LParen);
 
@@ -153,30 +153,30 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         else
             append_phrase(source, functionName.c_str(), term, name_FunctionName);
 
-        if (!term->boolPropOptional("syntax:no-parens", false))
+        if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, "(", term, tok_LParen);
 
         for (int i=get_first_visible_input_index(term); i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
-        if (!term->boolPropOptional("syntax:no-parens", false))
+        if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "method-call") {
 
         format_source_for_input(source, term, 0);
         
-        append_phrase(source, term->stringPropOptional("syntax:operator", "."),
+        append_phrase(source, term->stringProp("syntax:operator", "."),
             term, name_None);
 
         append_phrase(source, functionName.c_str(), term, name_FunctionName);
 
-        if (!term->boolPropOptional("syntax:no-parens", false))
+        if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, "(", term, tok_LParen);
 
         for (int i=1; i < term->numInputs(); i++)
             format_source_for_input(source, term, i);
 
-        if (!term->boolPropOptional("syntax:no-parens", false))
+        if (!term->boolProp("syntax:no-parens", false))
             append_phrase(source, ")", term, tok_RParen);
     } else if (declarationStyle == "dot-concat") {
         format_source_for_input(source, term, 0);
@@ -188,18 +188,18 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         format_source_for_input(source, term, 1);
     } else if (declarationStyle == "prefix") {
         append_phrase(source, functionName.c_str(), term, name_FunctionName);
-        append_phrase(source, term->stringPropOptional("syntax:postFunctionWs", ""),
+        append_phrase(source, term->stringProp("syntax:postFunctionWs", ""),
             term, name_Whitespace);
         format_source_for_input(source, term, 0);
     } else if (declarationStyle == "arrow-concat") {
         format_source_for_input(source, term, 0);
         append_phrase(source, "->", term, name_None);
-        append_phrase(source, term->stringPropOptional("syntax:postOperatorWs", ""),
+        append_phrase(source, term->stringProp("syntax:postOperatorWs", ""),
                 term, name_Whitespace);
         append_phrase(source, functionName.c_str(), term, name_FunctionName);
     } else if (declarationStyle == "left-arrow") {
         append_phrase(source, functionName.c_str(), term, name_FunctionName);
-        append_phrase(source, term->stringPropOptional("syntax:preOperatorWs", ""),
+        append_phrase(source, term->stringProp("syntax:preOperatorWs", ""),
                 term, name_Whitespace);
         append_phrase(source, "<-", term, name_None);
         format_source_for_input(source, term, 0);
@@ -243,7 +243,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     }
 
     bool methodCall =
-        term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
+        term->stringProp("syntax:declarationStyle", "") == "method-call";
 
     if (methodCall && inputIndex == 0)
         defaultPost = "";
@@ -254,7 +254,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
 
     // possibly insert the @ operator. This is pretty flawed, it should be stored by index.
     if (input->name != ""
-            && input->name == term->stringPropOptional("syntax:rebindOperator",""))
+            && input->name == term->stringProp("syntax:rebindOperator",""))
         append_phrase(source, "@", term, tok_At);
 
     // Also, possibly insert the & operator.
@@ -281,7 +281,7 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
 
 bool is_method_call(Term* term)
 {
-    return term->stringPropOptional("syntax:declarationStyle", "") == "method-call";
+    return term->stringProp("syntax:declarationStyle", "") == "method-call";
 }
 
 static bool has_implicit_name_binding(Term* term)
@@ -289,7 +289,7 @@ static bool has_implicit_name_binding(Term* term)
     if (term->name == "")
         return false;
 
-    if (term->boolPropOptional("syntax:implicitName", false))
+    if (term->boolProp("syntax:implicitName", false))
         return true;
 
     if (term->hasProperty("syntax:rebindOperator"))
@@ -297,7 +297,7 @@ static bool has_implicit_name_binding(Term* term)
 
     if (is_method_call(term)) {
         return function_get_input_placeholder(as_function(term->function), 0)
-            ->boolPropOptional("rebind", false);
+            ->boolProp("rebind", false);
     }
 
     return false;
@@ -311,10 +311,10 @@ void format_name_binding(caValue* source, Term* term)
         return;
     else {
         append_phrase(source, term->name.c_str(), term, name_None);
-        append_phrase(source, term->stringPropOptional("syntax:preEqualsSpace", " "),
+        append_phrase(source, term->stringProp("syntax:preEqualsSpace", " "),
                 term, name_Whitespace);
         append_phrase(source, "=", term, tok_Equals);
-        append_phrase(source, term->stringPropOptional("syntax:postEqualsSpace", " "),
+        append_phrase(source, term->stringProp("syntax:postEqualsSpace", " "),
                 term, name_Whitespace);
     }
 }

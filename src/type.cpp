@@ -52,20 +52,20 @@ namespace type_t {
             append_phrase(source, ":nocopy", term, name_None);
         }
 
-        if (term->boolPropOptional("handle", false)) {
+        if (term->boolProp("handle", false)) {
             append_phrase(source, " ", term, name_Whitespace);
             append_phrase(source, ":handle", term, name_None);
         }
 
-        if (term->boolPropOptional("syntax:semicolon", false)) {
+        if (term->boolProp("syntax:semicolon", false)) {
             //append_phrase(source, ";", term, name_None);
             return;
         }
 
-        append_phrase(source, term->stringPropOptional("syntax:preLBracketWhitespace", " "),
+        append_phrase(source, term->stringProp("syntax:preLBracketWhitespace", " "),
                 term, tok_Whitespace);
         append_phrase(source, "{", term, tok_LBracket);
-        append_phrase(source, term->stringPropOptional("syntax:postLBracketWhitespace", " "),
+        append_phrase(source, term->stringProp("syntax:postLBracketWhitespace", " "),
                 term, tok_Whitespace);
 
         Branch* contents = nested_contents(term);
@@ -73,13 +73,13 @@ namespace type_t {
         for (int i=0; i < contents->length(); i++) {
             Term* field = contents->get(i);
             ca_assert(field != NULL);
-            append_phrase(source, field->stringPropOptional("syntax:preWhitespace",""),
+            append_phrase(source, field->stringProp("syntax:preWhitespace",""),
                     term, tok_Whitespace);
             append_phrase(source, name_to_string(field->type->name), term, name_TypeName);
-            append_phrase(source, field->stringPropOptional("syntax:postNameWs"," "),
+            append_phrase(source, field->stringProp("syntax:postNameWs"," "),
                     term, tok_Whitespace);
             append_phrase(source, field->name, term, tok_Identifier);
-            append_phrase(source, field->stringPropOptional("syntax:postWhitespace",""),
+            append_phrase(source, field->stringProp("syntax:postWhitespace",""),
                     term, tok_Whitespace);
         }
         append_phrase(source, "}", term, tok_RBracket);

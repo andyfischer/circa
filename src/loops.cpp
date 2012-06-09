@@ -156,7 +156,7 @@ Term* loop_get_primary_result(Branch* branch)
 
     // For a rebound list, use the last term that has the iterator's
     // name, even if it's the iterator itself.
-    if (branch->owningTerm->boolPropOptional("modifyList", false))
+    if (branch->owningTerm->boolProp("modifyList", false))
         return branch->get(iterator->name);
 
     // Otherwise, use the last expression as the output.

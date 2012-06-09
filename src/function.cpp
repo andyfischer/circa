@@ -113,7 +113,7 @@ void finish_building_function(Function* func)
     for (int i = function_num_inputs(func) - 1; i >= 0; i--) {
         Term* input = function_get_input_placeholder(func, i);
 
-        if (input->boolPropOptional("output", false)) {
+        if (input->boolProp("output", false)) {
 
             if (is_state_input(input)) {
                 Term* term = append_state_output(contents);
@@ -191,7 +191,7 @@ bool function_can_rebind_input(Term* func, int index)
     Term* input = function_get_input_placeholder(funcAttrs, index);
     if (input == NULL)
         return false;
-    return input->boolPropOptional("output", false);
+    return input->boolProp("output", false);
 }
 
 bool function_call_rebinds_input(Term* term, int index)
@@ -290,7 +290,7 @@ Term* function_insert_state_input(Function* func)
 
 bool function_is_multiple_input(Term* placeholder)
 {
-    return placeholder->boolPropOptional("multiple", false);
+    return placeholder->boolProp("multiple", false);
 }
 
 bool function_is_multiple_input(Function* func, int index)
@@ -306,14 +306,14 @@ bool function_get_input_meta(Function* func, int index)
     Term* placeholder = function_get_input_placeholder(func, index);
     if (placeholder == NULL)
         return false;
-    return placeholder->boolPropOptional("meta", false);
+    return placeholder->boolProp("meta", false);
 }
 bool function_get_input_optional(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
     if (placeholder == NULL)
         return false;
-    return placeholder->boolPropOptional("optional", false);
+    return placeholder->boolProp("optional", false);
 }
 bool function_has_variable_args(Function* func)
 {
@@ -354,7 +354,7 @@ std::string function_get_input_name(Function* func, int index)
 
 bool function_input_is_extra_output(Function* func, int index)
 {
-    return function_get_input_placeholder(func, index)->boolPropOptional("output", false);
+    return function_get_input_placeholder(func, index)->boolProp("output", false);
 }
 
 std::string function_get_documentation_string(Function* func)
@@ -397,7 +397,7 @@ const char* get_output_name(Term* term, int outputIndex)
 
     // Default behavior, if the call is rebinding an input name, then use that name.
     Term* outputPlaceholder = function_get_output_placeholder(attrs, outputIndex);
-    int rebindsInput = outputPlaceholder->intPropOptional("rebindsInput", -1);
+    int rebindsInput = outputPlaceholder->intProp("rebindsInput", -1);
     
     if (rebindsInput != -1 && rebindsInput < term->numInputs()) {
         Term* input = term->input(rebindsInput);
@@ -426,9 +426,9 @@ void function_format_header_source(caValue* source, Branch* function)
 
     append_phrase(source, term->name, term, name_TermName);
 
-    append_phrase(source, term->stringPropOptional("syntax:postNameWs", ""),
+    append_phrase(source, term->stringProp("syntax:postNameWs", ""),
             term, tok_Whitespace);
-    append_phrase(source, term->stringPropOptional("syntax:properties", ""),
+    append_phrase(source, term->stringProp("syntax:properties", ""),
             term, name_None);
 
     append_phrase(source, "(", term, tok_LParen);
@@ -441,10 +441,10 @@ void function_format_header_source(caValue* source, Branch* function)
 
         std::string name = input->name;
 
-        if (input->boolPropOptional("hiddenInput", false))
+        if (input->boolProp("hiddenInput", false))
             continue;
 
-        if (input->boolPropOptional("state", false))
+        if (input->boolProp("state", false))
             append_phrase(source, "state ", term, name_None);
 
         if (!first)
@@ -452,7 +452,7 @@ void function_format_header_source(caValue* source, Branch* function)
         first = false;
 
         bool showType = true;
-        if (i == 0 && term->boolPropOptional("syntax:methodDecl", false))
+        if (i == 0 && term->boolProp("syntax:methodDecl", false))
             showType = false;
 
         // Type
@@ -462,7 +462,7 @@ void function_format_header_source(caValue* source, Branch* function)
 
         // Name
         if (name != "" && name[0] != '#') {
-            if (input->boolPropOptional("syntax:rebindSymbol", false))
+            if (input->boolProp("syntax:rebindSymbol", false))
                 append_phrase(source, "@", term, name_None);
 
             if (showType)
@@ -470,23 +470,23 @@ void function_format_header_source(caValue* source, Branch* function)
             append_phrase(source, name, term, name_None);
         }
 
-        if (input->boolPropOptional("output", false)
-                && !input->boolPropOptional("syntax:rebindSymbol", false)) {
+        if (input->boolProp("output", false)
+                && !input->boolProp("syntax:rebindSymbol", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":out", term, name_None);
         }
 
-        if (input->boolPropOptional("meta", false)) {
+        if (input->boolProp("meta", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":meta", term, name_None);
         }
 
-        if (input->boolPropOptional("rebind", false)) {
+        if (input->boolProp("rebind", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":rebind", term, name_None);
         }
 
-        if (input->boolPropOptional("multiple", false)) {
+        if (input->boolProp("multiple", false)) {
             append_phrase(source, " ", term, tok_Whitespace);
             append_phrase(source, ":multiple", term, name_None);
         }
@@ -496,10 +496,10 @@ void function_format_header_source(caValue* source, Branch* function)
 
     Term* primaryOutput = get_output_placeholder(function, 0);
     if (primaryOutput != NULL && primaryOutput->type != &VOID_T) {
-        append_phrase(source, term->stringPropOptional("syntax:whitespacePreColon", ""),
+        append_phrase(source, term->stringProp("syntax:whitespacePreColon", ""),
                 term, tok_Whitespace);
         append_phrase(source, "->", term, name_None);
-        append_phrase(source, term->stringPropOptional("syntax:whitespacePostColon", ""),
+        append_phrase(source, term->stringProp("syntax:whitespacePostColon", ""),
                 term, tok_Whitespace);
         append_phrase(source,
             name_to_string(primaryOutput->type->name),

@@ -130,12 +130,12 @@ namespace string_t {
     void format_source(caValue* source, Term* term)
     {
         if (term->hasProperty("syntax:originalString")) {
-            append_phrase(source, term->stringProp("syntax:originalString"),
+            append_phrase(source, term->stringProp("syntax:originalString", ""),
                     term, tok_String);
             return;
         }
 
-        std::string quoteType = term->stringPropOptional("syntax:quoteType", "'");
+        std::string quoteType = term->stringProp("syntax:quoteType", "'");
         std::string result;
         if (quoteType == "<")
             result = "<<<" + as_string(term_value(term)) + ">>>";

@@ -73,10 +73,10 @@ struct SourceCodePainter
     bool paint(Term* term, std::string& failureMessage)
     {
         std::string termSource = get_term_source_text(term)
-            + term->stringPropOptional("syntax:lineEnding", "");
+            + term->stringProp("syntax:lineEnding", "");
 
         int preWhitespaceLength =
-            term->stringPropOptional("syntax:preWhitespace", "").length();
+            term->stringProp("syntax:preWhitespace", "").length();
 
         bool encounteredError = false;
 

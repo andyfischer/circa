@@ -61,7 +61,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
             // Position before a pack_state() call that is 'final'
             if (preceding->function == FUNCS.pack_state
-                    && preceding->boolPropOptional("final", false)) {
+                    && preceding->boolProp("final", false)) {
                 position--;
                 continue;
             }
@@ -541,7 +541,7 @@ bool has_variable_args(Branch* branch)
     Term* input0 = get_input_placeholder(branch, 0);
     if (input0 == NULL)
         return false;
-    return input0->boolPropOptional("multiple", false);
+    return input0->boolProp("multiple", false);
 }    
 Term* find_output_placeholder_with_name(Branch* branch, const char* name)
 {
@@ -600,7 +600,7 @@ void update_extra_outputs(Term* term)
         // Find the associated input placeholder (if any).
         Term* associatedInput = NULL;
 
-        int rebindsInput = placeholder->intPropOptional("rebindsInput", -1);
+        int rebindsInput = placeholder->intProp("rebindsInput", -1);
 
         if (rebindsInput == -1) {
 
@@ -660,7 +660,7 @@ Term* find_extra_output_for_state(Term* term)
         if (extra_output == NULL)
             break;
 
-        if (extra_output->boolPropOptional("state", false))
+        if (extra_output->boolProp("state", false))
             return extra_output;
     }
     return NULL;
@@ -762,7 +762,7 @@ void set_step(Term* term, float step)
 
 float get_step(Term* term)
 {
-    return term->floatPropOptional("step", 1.0);
+    return term->floatProp("step", 1.0);
 }
 
 void branch_start_changes(Branch* branch)
@@ -960,11 +960,11 @@ Term* append_state_output(Branch* branch)
 }
 bool is_state_input(Term* placeholder)
 {
-    return placeholder->boolPropOptional("state", false);
+    return placeholder->boolProp("state", false);
 }
 bool is_state_output(Term* placeholder)
 {
-    return placeholder->boolPropOptional("state", false);
+    return placeholder->boolProp("state", false);
 }
 
 Term* find_parent_term_in_branch(Term* term, Branch* branch)
@@ -1052,7 +1052,7 @@ bool term_belongs_at_branch_end(Term* term)
     if (term->function == FUNCS.output)
         return true;
 
-    if (term->boolPropOptional("final", false))
+    if (term->boolProp("final", false))
         return true;
 
     return false;
@@ -1140,7 +1140,7 @@ void list_outer_pointers(Branch* branch, TermList* list)
 void expand_variadic_inputs_for_call(Branch* branch, Term* call)
 {
     Term* input0 = get_input_placeholder(branch, 0);
-    if (input0 == NULL || !input0->boolPropOptional("multiple", false))
+    if (input0 == NULL || !input0->boolProp("multiple", false))
         return;
 
     // Add extra input_placeholder term
@@ -1354,7 +1354,7 @@ Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredValue)
     } else if (term->function == FUNCS.get_field) {
         return apply(branch, FUNCS.set_field, TermList(term->input(0), term->input(1), desiredValue));
     } else if (term->function == FUNCS.dynamic_method) {
-        Term* fieldName = create_string(branch, term->stringProp("syntax:functionName"));
+        Term* fieldName = create_string(branch, term->stringProp("syntax:functionName", ""));
         return apply(branch, FUNCS.set_field, TermList(term->input(0), fieldName, desiredValue));
     } else {
         return NULL;

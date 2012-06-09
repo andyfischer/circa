@@ -190,7 +190,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
 
             Term* statement = parser::statement(branch, tokens, context).term;
 
-            std::string const& lineEnding = statement->stringProp("syntax:lineEnding");
+            std::string const& lineEnding = statement->stringProp("syntax:lineEnding","");
             bool hasNewline = lineEnding.find_first_of("\n") != std::string::npos;
 
             if (statement->function != FUNCS.comment)
@@ -207,7 +207,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
                 if (foundStatementOnSameLine) {
 
                     parentTerm->setStringProp("syntax:lineEnding",
-                            statement->stringProp("syntax:lineEnding"));
+                            statement->stringProp("syntax:lineEnding",""));
                     statement->removeProperty("syntax:lineEnding");
                 }
                 return;
@@ -234,7 +234,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
         // Take the line ending that we parsed as postHeadingWs, and move it over
         // to lineEnding instead (so that we don't parse another line ending).
         parentTerm->setStringProp("syntax:lineEnding",
-                parentTerm->stringProp("syntax:postHeadingWs"));
+                parentTerm->stringProp("syntax:postHeadingWs",""));
         parentTerm->removeProperty("syntax:postHeadingWs");
         return;
     }
@@ -266,7 +266,7 @@ void consume_branch_with_significant_indentation(Branch* branch, TokenStream& to
         Term* statement = parser::statement(branch, tokens, context).term;
 
         if (statement->function != FUNCS.comment) {
-            indentationLevel = int(statement->stringPropOptional(
+            indentationLevel = int(statement->stringProp(
                 "syntax:preWhitespace", "").length());
             break;
         }
@@ -556,7 +556,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
         symbolText += possible_whitespace(tokens);
 
-        result->setStringProp("syntax:properties", result->stringProp("syntax:properties")
+        result->setStringProp("syntax:properties", result->stringProp("syntax:properties","")
                 + symbolText);
     }
 
@@ -896,7 +896,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
             // If the previous block was multiline, then only parse the next block if
             // it has equal indentation.
-            bool wrongIndent = caseTerm->boolPropOptional("syntax:multiline",false)
+            bool wrongIndent = caseTerm->boolProp("syntax:multiline",false)
                 && (caseTerm->sourceLoc.col != find_indentation_of_next_statement(tokens));
 
             if (!wrongIndent) {
@@ -910,7 +910,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // If the last block was marked syntax:multiline, then add a lineEnding, so that
     // we don't parse another one.
-    if (caseTerm->boolPropOptional("syntax:multiline", false)
+    if (caseTerm->boolProp("syntax:multiline", false)
             || caseTerm->hasProperty("syntax:lineEnding"))
         result->setStringProp("syntax:lineEnding", "");
 
@@ -1562,7 +1562,7 @@ ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
             else if (is_float(term_value(expr.term))) {
                 set_float(term_value(expr.term), as_float(term_value(expr.term)) * -1.0f);
                 expr.term->setStringProp("float:original-format",
-                    "-" + expr.term->stringProp("float:original-format"));
+                    "-" + expr.term->stringProp("float:original-format",""));
                 return expr;
             }
         }
@@ -1929,7 +1929,7 @@ ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (!tokens.nextIs(tok_RParen))
             return compile_error_for_line(result.term, tokens, startPosition);
         tokens.consume(tok_RParen);
-        result.term->setIntProp("syntax:parens", result.term->intProp("syntax:parens") + 1);
+        result.term->setIntProp("syntax:parens", result.term->intProp("syntax:parens",0) + 1);
     }
     else {
         std::string next;
@@ -2252,7 +2252,7 @@ ParseResult identifier_no_create(Branch* branch, TokenStream& tokens, ParserCxt*
 void prepend_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL) {
-        std::string s = whitespace + term->stringProp("syntax:preWhitespace");
+        std::string s = whitespace + term->stringProp("syntax:preWhitespace","");
         term->setStringProp("syntax:preWhitespace", s.c_str());
     }
 }
@@ -2260,7 +2260,7 @@ void prepend_whitespace(Term* term, std::string const& whitespace)
 void append_whitespace(Term* term, std::string const& whitespace)
 {
     if (whitespace != "" && term != NULL) {
-        std::string s = term->stringProp("syntax:postWhitespace") + whitespace;
+        std::string s = term->stringProp("syntax:postWhitespace","") + whitespace;
         term->setStringProp("syntax:postWhitespace", s.c_str());
     }
 }
@@ -2416,7 +2416,7 @@ std::string possible_statement_ending(TokenStream& tokens)
 
 bool is_multiline_block(Term* term)
 {
-    return term->boolPropOptional("syntax:multiline", false);
+    return term->boolProp("syntax:multiline", false);
 }
 
 int get_number_of_decimal_figures(std::string const& str)

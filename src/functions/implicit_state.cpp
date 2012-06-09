@@ -10,7 +10,7 @@ namespace implicit_state_function {
     CA_FUNCTION(unpack_state_from_list)
     {
         caValue* container = INPUT(0);
-        int index = CALLER->intProp("index");
+        int index = CALLER->intProp("index", 0);
         if (!is_list(container) || index >= list_length(container))
             set_null(OUTPUT);
         else
@@ -25,7 +25,7 @@ namespace implicit_state_function {
         caValue* container = OUTPUT;
         caValue* value = INPUT(1);
 
-        int index = CALLER->intProp("index");
+        int index = CALLER->intProp("index", 0);
 
         list_touch(container);
 
