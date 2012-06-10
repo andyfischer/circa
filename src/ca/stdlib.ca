@@ -79,51 +79,51 @@ def load_module(String filename) -> Branch
 -- Metaprogramming on Branch
 def branch_ref(any branch :ignore_error) -> Branch
     -- Obtain a Branch ref from an expression.
-def Branch.call(_, any inputs :multiple)
+def Branch.call(self, any inputs :multiple)
     -- Invoke this Branch with the given inputs.
-def Branch.dump(_)
+def Branch.dump(self)
     -- Dump this branch's raw contents to stdout.
-def Branch.file_signature(_) -> any
+def Branch.file_signature(self) -> any
     -- Return a 'file signature', which contains the filename and last-modified time.
-def Branch.find_term(_, String name) -> Term
+def Branch.find_term(self, String name) -> Term
     -- Find a term inside this Branch with the given name.
-def Branch.format_source(_) -> List
+def Branch.format_source(self) -> List
     -- Return the branch's contents as formatted source.
-def Branch.format_function_heading(_) -> List
+def Branch.format_function_heading(self) -> List
     -- Return a formatted function header for this branch.
-def Branch.functions(_) -> List
+def Branch.functions(self) -> List
     -- Return a list of functions that occur inside this branch.
-def Branch.get_term(_, int index) -> Term
+def Branch.get_term(self, int index) -> Term
     -- Fetch a term by index.
-def Branch.get_static_errors(_) -> List
+def Branch.get_static_errors(self) -> List
     -- Return a raw list of static errors inside this branch.
-def Branch.get_static_errors_formatted(_) -> List
+def Branch.get_static_errors_formatted(self) -> List
     -- Return a formatted list of static errors inside this branch.
-def Branch.has_static_error(_) -> bool
+def Branch.has_static_error(self) -> bool
     -- Return whether this branch has any static errors.
-def Branch.input(_, int index) -> Term
+def Branch.input(self, int index) -> Term
     -- Fetch an input placeholder term by index.
-def Branch.is_null(_) -> bool
+def Branch.is_null(self) -> bool
     -- Return whether this is a null Branch reference.
-def Branch.inputs(_) -> List
+def Branch.inputs(self) -> List
     -- Return a list of input placeholder terms.
-def Branch.link(_, Branch lib)
+def Branch.link(self, Branch lib)
     -- Iterate through this branch, looking for terms that have missing references.
     -- For each missing reference, if a term with the expected name is found in 'lib',
     -- then modify the term to use the named term in 'lib'.
-def Branch.list_configs(_) -> List
+def Branch.list_configs(self) -> List
     -- Return a list of Terms that look like configs (named literal values).
-def Branch.output(_, int index) -> Term
+def Branch.output(self, int index) -> Term
     -- Return an output placeholder term by index.
-def Branch.outputs(_) -> List
+def Branch.outputs(self) -> List
     -- Return a list of all output placeholders.
-def Branch.owner(_) -> Term
+def Branch.owner(self) -> Term
     -- Return the Term that owns this Branch (may be null).
-def Branch.statements(_) -> List
+def Branch.statements(self) -> List
     -- Return a list of Terms that are statements.
-def Branch.terms(_) -> List
+def Branch.terms(self) -> List
     -- Return a list of this branch's terms.
-def Branch.version(_) -> int
+def Branch.version(self) -> int
     -- Return the 'version', which is a monotonically increasing number that is
     -- incremented whenever the branch is modified. Useful for change tracking.
 
@@ -135,37 +135,37 @@ def Dict.get(self, String key) -> any
     -- Retrieve the value for a given key.
 
 type Frame;
-def Frame.branch(_) -> Branch
+def Frame.branch(self) -> Branch
     -- Return the Branch associated with this Frame.
-def Frame.register(_, int) -> any
+def Frame.register(self, int) -> any
     -- Fetch the value in the given register index.
-def Frame.registers(_) -> List
+def Frame.registers(self) -> List
     -- Fetch a list of all register values.
-def Frame.pc(_) -> int
+def Frame.pc(self) -> int
     -- Fetch the current program counter (the interpreter's current position).
-def Frame.pc_term(_) -> Term
+def Frame.pc_term(self) -> Term
     -- Fetch the term associated with the current program counter.
 
 type Interpreter;
 def make_interpreter() -> Interpreter
-def Interpreter.push_frame(_, Branch, List inputs)
+def Interpreter.push_frame(self, Branch, List inputs)
     -- Push a new frame, using the given branch and input list.
-def Interpreter.pop_frame(_)
+def Interpreter.pop_frame(self)
     -- Pop the topmost frame.
-def Interpreter.set_state_input(_, any)
+def Interpreter.set_state_input(self, any)
     -- Assign a value to the :state input of the topmost frame (if any)
-def Interpreter.get_state_output(_) -> any
-def Interpreter.reset(_)
-def Interpreter.run(_)
-def Interpreter.run_steps(_, int steps)
-def Interpreter.frame(_, int depth) -> Frame
-def Interpreter.top_frame(_) -> Frame
-    _.frame(0)
-def Interpreter.frames(_) -> List
-def Interpreter.output(_, int index) -> any
-def Interpreter.errored(_) -> bool
-def Interpreter.error_message(_) -> String
-def Interpreter.toString(_) -> String
+def Interpreter.get_state_output(self) -> any
+def Interpreter.reset(self)
+def Interpreter.run(self)
+def Interpreter.run_steps(self, int steps)
+def Interpreter.frame(self, int depth) -> Frame
+def Interpreter.top_frame(self) -> Frame
+    self.frame(0)
+def Interpreter.frames(self) -> List
+def Interpreter.output(self, int index) -> any
+def Interpreter.errored(self) -> bool
+def Interpreter.error_message(self) -> String
+def Interpreter.toString(self) -> String
 
 def List.append(@self, any)
 def List.extend(@self, List)
@@ -193,57 +193,57 @@ def overload:get_contents(Branch branch) -> List
 def String.append(@self, String right)
     self = concat(self, right)
     
-def String.char_at(_, int index) -> String
+def String.char_at(self, int index) -> String
 
-def String.ends_with(_,String) -> bool
+def String.ends_with(self,String) -> bool
     -- Return true if this string ends with the given substring.
-def String.length(_) -> int
+def String.length(self) -> int
     -- Returns the string length.
-def String.slice(_,int,int) -> String
-def String.starts_with(_,String) -> bool
-def String.split(_,String sep) -> List
-def String.substr(_,int,int) -> String
-def String.to_camel_case(_) -> String
-def String.to_lower(_) -> String
-def String.to_upper(_) -> String
+def String.slice(self,int,int) -> String
+def String.starts_with(self,String) -> bool
+def String.split(self,String sep) -> List
+def String.substr(self,int,int) -> String
+def String.to_camel_case(self) -> String
+def String.to_lower(self) -> String
+def String.to_upper(self) -> String
 
 def String.characters(self) -> List
     out = for i in 0..(self.length)
         self.char_at(i)
     return out
 
-def Type.name(_) -> String
+def Type.name(self) -> String
     -- Returns this Term's local name. May be empty.
-def Type.property(_, String) -> any
-def Type.is_handle(_) -> bool
-    _.property('handle') == true
-def Type.declaringTerm(_) -> Term
+def Type.property(self, String) -> any
+def Type.is_handle(self) -> bool
+    self.property('handle') == true
+def Type.declaringTerm(self) -> Term
 
 def type(any) -> Type
     -- Returns the runtime type of a value
 
 -- Metaprogramming on Term
 def term_ref(any :ignore_error) -> Term
-def Term.assign(_, any)
-def Term.asint(_) -> int
-def Term.asfloat(_) -> number
-def Term.parent(_) -> Branch
-def Term.contents(_) -> Branch
+def Term.assign(self, any)
+def Term.asint(self) -> int
+def Term.asfloat(self) -> number
+def Term.parent(self) -> Branch
+def Term.contents(self) -> Branch
 def Term.name(self) -> String
-def Term.to_string(_) -> String
-def Term.to_source_string(_) -> String
-def Term.function(_) -> Branch
-def Term.get_type(_) -> Type
-def Term.value(_) -> any
-def Term.tweak(_, number steps)
-def Term.input(_, int) -> Term
-def Term.inputs(_) -> List
-def Term.num_inputs(_) -> int
-def Term.source_location(_) -> Rect_i
-def Term.location_string(_) -> String
-def Term.global_id(_) -> int
-def Term.properties(_) -> Map
-def Term.property(_, String) -> any
+def Term.to_string(self) -> String
+def Term.to_source_string(self) -> String
+def Term.function(self) -> Branch
+def Term.get_type(self) -> Type
+def Term.value(self) -> any
+def Term.tweak(self, number steps)
+def Term.input(self, int) -> Term
+def Term.inputs(self) -> List
+def Term.num_inputs(self) -> int
+def Term.source_location(self) -> Rect_i
+def Term.location_string(self) -> String
+def Term.global_id(self) -> int
+def Term.properties(self) -> Map
+def Term.property(self, String) -> any
 def Term.is_function(self) -> bool
     is_function(self.value)
 def Term.is_type(self) -> bool
