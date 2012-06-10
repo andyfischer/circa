@@ -160,7 +160,7 @@ def Interpreter.run(_)
 def Interpreter.run_steps(_, int steps)
 def Interpreter.frame(_, int depth) -> Frame
 def Interpreter.top_frame(_) -> Frame
-    return _.frame(0)
+    _.frame(0)
 def Interpreter.frames(_) -> List
 def Interpreter.output(_, int index) -> any
 def Interpreter.errored(_) -> bool
@@ -176,12 +176,12 @@ def List.join(self, String) -> String
 def List.slice(self, int start, int fin) -> List
 def List.get(self, index) -> any
 def List.empty(self) -> bool
-    return self.length == 0
+    self.length == 0
 def List.last(self) -> any
     if self.empty
-        return null
+        null
     else
-        return self.get(self.length - 1)
+        self.get(self.length - 1)
 
 -- Overloaded functions
 def is_overloaded_func(Branch branch) -> bool
@@ -216,7 +216,7 @@ def Type.name(_) -> String
     -- Returns this Term's local name. May be empty.
 def Type.property(_, String) -> any
 def Type.is_handle(_) -> bool
-    return _.property('handle') == true
+    _.property('handle') == true
 def Type.declaringTerm(_) -> Term
 
 def type(any) -> Type
@@ -245,22 +245,22 @@ def Term.global_id(_) -> int
 def Term.properties(_) -> Map
 def Term.property(_, String) -> any
 def Term.is_function(self) -> bool
-    return is_function(self.value)
+    is_function(self.value)
 def Term.is_type(self) -> bool
-    return is_type(self.value)
+    is_type(self.value)
 def Term.is_input_placeholder(self) -> bool
-    return self.function == branch_ref(input_placeholder)
+    self.function == branch_ref(input_placeholder)
 def Term.is_comment(self) -> bool
-    return self.function == branch_ref(comment)
+    self.function == branch_ref(comment)
 def Term.is_value(self) -> bool
-    return self.function == branch_ref(value)
+    self.function == branch_ref(value)
 
 -- workaround, these functions currently need to be declared after Term:
 def Branch.name(self) -> String
-    return self.owner.name
+    self.owner.name
 
 def Branch.is_method(self) -> bool
-    return self.owner.property("syntax:methodDecl") == true
+    self.owner.property("syntax:methodDecl") == true
 
 def Branch.get_top_comments(self) -> List
     out = []
@@ -290,9 +290,9 @@ type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
 
 def Rect.width(self) -> number
-    return self.x2 - self.x1
+    self.x2 - self.x1
 def Rect.height(self) -> number
-    return self.y2 - self.y1
+    self.y2 - self.y1
 
 def toggle(bool tog) -> bool
     -- Stateful function, returns a boolean status. Every frame the function is called
