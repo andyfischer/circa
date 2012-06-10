@@ -31,6 +31,11 @@ namespace circa {
 
 static unsigned int g_nextBranchID = 1;
 
+void on_branch_created(Branch* branch)
+{
+    // No-op, used for debugging.
+}
+
 void assert_valid_branch(Branch const* obj)
 {
     // this once did something
@@ -45,6 +50,8 @@ Branch::Branch()
 {
     id = g_nextBranchID++;
     gc_register_new_object((CircaObject*) this, &BRANCH_T, true);
+
+    on_branch_created(this);
 }
 
 Branch::~Branch()

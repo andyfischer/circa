@@ -39,14 +39,6 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_type(INPUT(0)));
     }
-    CA_FUNCTION(typeof_func)
-    {
-        set_type(OUTPUT, declared_type(INPUT_TERM(0)));
-    }
-    CA_FUNCTION(typename_func)
-    {
-        set_string(OUTPUT, name_to_string(declared_type(INPUT_TERM(0))->name));
-    }
     CA_FUNCTION(inputs_fit_function)
     {
         caValue* inputs = INPUT(0);
@@ -99,8 +91,6 @@ namespace type_check_function {
             "inputs_fit_function(List,Function) -> bool");
         FUNCS.overload_error_no_match = import_function(kernel,
             overload_error_no_match, "overload_error_no_match(List)");
-        import_function(kernel, typeof_func, "type(any :meta) -> Type");
-        import_function(kernel, typename_func, "typename(any :meta) -> String");
     }
 
 } // namespace type_check_function

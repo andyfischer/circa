@@ -211,6 +211,9 @@ def Type.is_handle(_) -> bool
     return _.property('handle') == true
 def Type.declaringTerm(_) -> Term
 
+def type(any) -> Type
+    -- Returns the runtime type of a value
+
 -- Metaprogramming on Term
 def term_ref(any :ignore_error) -> Term
 def Term.assign(_, any)

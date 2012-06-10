@@ -812,6 +812,12 @@ void Type__declaringTerm(caStack* stack)
     set_term_ref(circa_output(stack, 0), type->declaringTerm);
 }
 
+void typeof_func(caStack* stack)
+{
+    caValue* in = circa_input(stack, 0);
+    set_type(circa_output(stack, 0), in->value_type);
+}
+
 void length(caStack* stack)
 {
     set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
@@ -1150,6 +1156,7 @@ void bootstrap_kernel()
         {"Type.name", Type__name},
         {"Type.property", Type__property},
         {"Type.declaringTerm", Type__declaringTerm},
+        {"type", typeof_func},
 
         {NULL, NULL}
     };
