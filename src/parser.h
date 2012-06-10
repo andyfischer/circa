@@ -102,10 +102,6 @@ bool lookahead_match_leading_name_binding(TokenStream& tokens);
 bool lookahead_match_rebind_argument(TokenStream& tokens);
 Term* find_lexpr_root(Term* term);
 
-// Check if 'target' is a namespace access; if so, we'll return the original
-// term that it accesses. If not, we'll just return 'target'.
-//Term* statically_resolve_namespace_access(Term* target);
-
 void prepend_whitespace(Term* term, std::string const& whitespace);
 void append_whitespace(Term* term, std::string const& whitespace);
 void set_starting_source_location(Term* term, int start, TokenStream& tokens);

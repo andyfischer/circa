@@ -112,7 +112,6 @@ struct Term : public caTerm
     std::string toString();
 
     bool hasProperty(const char* name);
-    caValue* addProperty(const char* name, Term* type);
     void removeProperty(const char* name);
 
     int intProp(const char* name, int defaultValue);

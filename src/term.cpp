@@ -128,28 +128,6 @@ bool Term::hasProperty(const char* name)
     return properties.contains(name);
 }
 
-caValue* Term::addProperty(const char* name, Term* type)
-{
-    caValue* prop = properties.insert(name);
-    Type* valueType = unbox_type(type);
-
-    if (!is_null(prop) && prop->value_type != valueType) {
-        std::string msg = "Property ";
-        msg += name;
-        msg += " exists with different type";
-        internal_error(msg.c_str());
-    }
-
-    if (prop->value_type != valueType) {
-        INCREMENT_STAT(termPropAdded);
-        create(valueType, prop);
-    } else {
-        INCREMENT_STAT(termPropAccess);
-    }
-
-    return prop;
-}
-
 void Term::removeProperty(const char* name)
 {
     properties.remove(name);
