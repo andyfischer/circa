@@ -111,7 +111,10 @@ static const char* perf_stat_get_name(PerformanceStat stat)
         case STAT_listSoftCopy: return "listSoftCopy";
         case STAT_listHardCopy: return "listHardCopy";
         case STAT_dictHardCopy: return "dictHardCopy";
+        case STAT_stringCopy: return "stringCopy";
+        case STAT_stringCreate: return "stringCreate";
         case STAT_stepInterpreter: return "stepInterpreter";
+        case STAT_interpreterCastOutputFromFinishedFrame: return "interpreterCastOutputFromFinishedFrame";
         case STAT_branchNameLookups: return "branchNameLookups";
         case STAT_framesCreated: return "framesCreated";
         case STAT_loopFinishIteration: return "loopFinishIteration";

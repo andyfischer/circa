@@ -276,6 +276,10 @@ void do_admin_command(caValue* input, caValue* reply)
         Branch branch;
         load_script(&branch, as_cstring(args[1]));
         std::cout << get_branch_source_text(&branch);
+    } else if (equals_string(&command, "dump_stats")) {
+
+        perf_stats_dump();
+        std::cout << ":done" << std::endl;
 
     } else {
 

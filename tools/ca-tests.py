@@ -12,6 +12,7 @@ TestRoot = 'tests'
 
 Quiet = False
 OnlyPrintCommands = False
+DumpStats = False
 
 class CircaProcess:
     def __init__(self):
@@ -223,6 +224,10 @@ def run_all_tests():
         return
 
     print "Ran",totalTestCount,"tests,",len(failedTests),"failed,",totalDisabledTests,"disabled."
+
+    if DumpStats:
+        for line in process.run("dump_stats"):
+            print line
     
     if failedTests:
         print "Failed tests:"
@@ -253,6 +258,7 @@ if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option('--accept', dest="accept")
     parser.add_option('-b', '--binary', dest="binaryPath")
+    parser.add_option('--stats', action="store_true", dest="dumpStats")
     parser.add_option('--only-print-commands', action="store_true",
         dest="only_print_commands")
 
@@ -262,6 +268,9 @@ if __name__ == '__main__':
 
     if options.binaryPath:
         ExecutablePath = options.binaryPath
+
+    if options.dumpStats:
+        DumpStats = True
 
     if OnlyPrintCommands:
         Quiet = True

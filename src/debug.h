@@ -72,6 +72,10 @@ enum PerformanceStat {
     // Dict values
     STAT_dictHardCopy,
 
+    // String values
+    STAT_stringCopy,
+    STAT_stringCreate,
+
     // Interpreter
     STAT_stepInterpreter,
     STAT_interpreterCastOutputFromFinishedFrame,

@@ -141,5 +141,5 @@ void ca_assert_function(bool result, const char* expr, int line, const char* fil
 
 // ENABLE_PERF_STATS - Enables tracking of internal performance metrics
 #ifndef CIRCA_ENABLE_PERF_STATS
-#define CIRCA_ENABLE_PERF_STATS 0
+#define CIRCA_ENABLE_PERF_STATS 1
 #endif
