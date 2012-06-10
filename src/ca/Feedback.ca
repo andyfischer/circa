@@ -1,0 +1,99 @@
+
+type TargetSubElement {
+    List list
+}
+
+def TargetSubElement.top(self) -> List
+    return self.list.last
+
+type Target {
+    Term term
+    List stackPattern
+    TargetSubElement subElement
+}
+
+type Desire {
+    Name name
+    List args
+}
+
+type Request {
+    Target target
+    Desire desire
+}
+
+type Failure {
+    Name name
+    List args
+}
+
+type ChangeOperation {
+    Name name
+    List args
+}
+
+def advance_request(Request request) -> any
+
+    term = request.target.term
+    desireType = request.desire.name
+
+    -- First dispatch on function
+
+    -- value() function
+    if term.function == branch_ref(value)
+
+        -- Accept an :assign request
+        if request.desire.name == :assign
+            result = create(ChangeOperation)
+            result.name = :assign_value
+            result.args = request.desire.args
+            return result
+        else
+            return Failure([:FuncCantHandleRequest request])
+
+    -- copy() function, forward to input
+    elif term.function == branch_ref(copy)
+        -- TODO, need to correct target.stackPattern
+        request.target.term = term.input(0)
+        return request
+
+    -- get_index
+    elif term.function == branch_ref(get_index)
+        -- TODO, handle requests that target the index
+        indexTerm = term.input(1)
+
+        if not indexTerm.is_value
+            return Failure([:NotEnoughInformation request])
+
+        indexValue = term.value()
+
+        request.target.subElement.append([:index indexValue])
+        request.target.term = term.input(0)
+        return request
+
+    -- for-loop
+    elif term.function.name == 'for'
+
+        
+        print('for loop..')
+
+    return :DidNotUnderstand
+
+def resolve_request(Request request) -> any
+
+    print('trying to resolve: ' request)
+    
+    -- TODO, use unbounded loop here when available
+    max_iterations = 100
+    for i in 0..max_iterations
+
+        advanced = advance_request(request)
+
+        print('advanced: ' advanced)
+        
+        if type(advanced) != Request
+            return advanced
+
+        request = advanced
+
+    return :TooManyIterations

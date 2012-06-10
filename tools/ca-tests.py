@@ -153,6 +153,7 @@ def all_testable_files():
         TestRoot + '/if',
         TestRoot + '/error',
         TestRoot + '/exit_points',
+        TestRoot + '/feedback',
         TestRoot + '/field',
         TestRoot + '/for',
         TestRoot + '/funcs',

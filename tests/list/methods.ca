@@ -14,3 +14,14 @@ assert([].slice(-1,0) == [])
 assert([].slice(-1,5) == [])
 assert([0].slice(0,1) == [0])
 assert([0].slice(0,0) == [])
+
+-- Get
+assert([1 2 3].get(0) == 1)
+
+-- Empty
+assert([].empty)
+assert(not [0].empty)
+
+-- Last
+assert([0].last == 0)
+assert([0 1 2].last == 2)

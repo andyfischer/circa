@@ -649,6 +649,13 @@ void List__join(caStack* stack)
     }
 }
 
+void List__get(caStack* stack)
+{
+    caValue* self = circa_input(stack, 0);
+    caValue* index = circa_input(stack, 1);
+    copy(list_get(self, as_int(index)), circa_output(stack, 0));
+}
+
 void String__char_at(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
@@ -1141,6 +1148,7 @@ void bootstrap_kernel()
         {"List.length", List__length},
         {"List.join", List__join},
         {"List.slice", List__slice},
+        {"List.get", List__get},
 
         {"String.char_at", String__char_at},
         {"String.ends_with", String__ends_with},
