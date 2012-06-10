@@ -965,7 +965,7 @@ void bootstrap_kernel()
         Function* attrs = as_function(valueFunc);
         Term* output = append_output_placeholder(function_contents(attrs), NULL);
         change_declared_type(output, &ANY_T);
-        finish_building_function(attrs);
+        finish_building_function(function_contents(attrs));
     }
 
     ca_assert(function_get_output_type(valueFunc, 0) == &ANY_T);

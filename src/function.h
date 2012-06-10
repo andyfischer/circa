@@ -73,7 +73,7 @@ std::string get_placeholder_name_for_index(int index);
 Term* create_function(Branch* branch, const char* name);
 
 void initialize_function(Term* func);
-void finish_building_function(Function* func);
+void finish_building_function(Branch* func);
 
 bool inputs_fit_function_dynamic(Term* func, TermList const& inputs);
 

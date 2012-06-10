@@ -711,7 +711,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     // If we're out of tokens, then stop here. This behavior is used when declaring builtins.
     if (tokens.finished()) {
-        finish_building_function(as_function(result));
+        finish_building_function(contents);
         return ParseResult(result);
     }
 
@@ -720,7 +720,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // Parse subroutine contents.
     consume_branch(contents, tokens, context);
 
-    finish_building_function(as_function(result));
+    finish_building_function(contents);
 
     ca_assert(is_value(result));
     ca_assert(is_function(result));

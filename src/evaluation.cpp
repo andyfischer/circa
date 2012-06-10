@@ -243,6 +243,9 @@ void finish_frame(Stack* stack)
             if (placeholder->boolProp("customOutput", false))
                 continue;
 
+            if (placeholder->type == &VOID_T)
+                continue;
+
             caValue* result = get_frame_register(topFrame, placeholder->index);
             caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
 

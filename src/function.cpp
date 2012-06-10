@@ -102,16 +102,20 @@ void initialize_function(Term* func)
     as_function(func)->contents = nested_contents(func);
 }
 
-void finish_building_function(Function* func)
+void finish_building_function(Branch* contents)
 {
-    Branch* contents = function_contents(func);
+    // Connect the primary output placeholder with the last expression.
+    Term* primaryOutput = get_output_placeholder(contents, 0);
+    ca_assert(primaryOutput->input(0) == NULL);
+    set_input(primaryOutput, 0,
+        find_last_non_comment_expression(contents));
 
     // Write a list of output_placeholder terms.
 
     // Look at every input declared as :output, these will be used to declare extra outputs.
     // TODO is a way to declare extra outputs that are not rebound inputs.
-    for (int i = function_num_inputs(func) - 1; i >= 0; i--) {
-        Term* input = function_get_input_placeholder(func, i);
+    for (int i = count_input_placeholders(contents) - 1; i >= 0; i--) {
+        Term* input = get_input_placeholder(contents, i);
 
         if (input->boolProp("output", false)) {
 
@@ -135,7 +139,7 @@ void finish_building_function(Function* func)
 
     for (BranchIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
-        if (as_function(term->function) != func)
+        if (function_contents(term->function) != contents)
             continue;
         update_extra_outputs(term);
 

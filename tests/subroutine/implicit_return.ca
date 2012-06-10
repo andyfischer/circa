@@ -1,0 +1,19 @@
+
+def f() -> int
+    5
+
+assert(f() == 5)
+
+def g() -> int
+    if true
+        7
+    else
+        9
+
+assert(g() == 7)
+
+def h() -> List
+    for i in [1 2 3]
+        i + 1
+
+assert(h() == [2 3 4])

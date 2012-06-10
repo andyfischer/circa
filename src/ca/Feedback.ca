@@ -5,6 +5,8 @@ type TargetSubElement {
 
 def TargetSubElement.top(self) -> List
     return self.list.last
+def TargetSubElement.empty(self) -> bool
+    return self.list.empty
 
 type Target {
     Term term
