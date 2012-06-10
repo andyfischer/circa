@@ -656,6 +656,43 @@ void List__get(caStack* stack)
     copy(list_get(self, as_int(index)), circa_output(stack, 0));
 }
 
+void Map__contains(caStack* stack)
+{
+    caValue* value = hashtable_t::get_value(circa_input(stack, 0), circa_input(stack, 1));
+    set_bool(circa_output(stack, 0), value != NULL);
+}
+
+void Map__add(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+
+    caValue* key = circa_input(stack, 1);
+    caValue* value = circa_input(stack, 2);
+
+    hashtable_t::table_insert(out, key, value, false, false);
+}
+
+void Map__remove(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+
+    hashtable_t::table_remove(out, circa_input(stack, 1));
+}
+
+void Map__get(caStack* stack)
+{
+    caValue* table = circa_input(stack, 0);
+    caValue* key = circa_input(stack, 1);
+    caValue* value = hashtable_t::get_value(table, key);
+    if (value == NULL) {
+        std::string msg = "Key not found: " + to_string(key);
+        return circa_output_error(stack, msg.c_str());
+    }
+    copy(value, circa_output(stack, 0));
+}
+
 void String__char_at(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
@@ -1149,6 +1186,11 @@ void bootstrap_kernel()
         {"List.join", List__join},
         {"List.slice", List__slice},
         {"List.get", List__get},
+
+        {"Map.contains", Map__contains},
+        {"Map.add", Map__add},
+        {"Map.remove", Map__remove},
+        {"Map.get", Map__get},
 
         {"String.char_at", String__char_at},
         {"String.ends_with", String__ends_with},

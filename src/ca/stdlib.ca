@@ -183,6 +183,11 @@ def List.last(self) -> any
     else
         self.get(self.length - 1)
 
+def Map.add(@self, any, any)
+def Map.contains(self, any) -> bool
+def Map.remove(@self, any)
+def Map.get(self, any) -> any
+
 -- Overloaded functions
 def is_overloaded_func(Branch branch) -> bool
     -- Return true if this branch is an overloaded function
