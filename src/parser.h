@@ -56,7 +56,6 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult switch_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
-ParseResult do_once_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult include_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);

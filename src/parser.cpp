@@ -351,11 +351,6 @@ ParseResult statement(Branch* branch, TokenStream& tokens, ParserCxt* context)
         result = type_decl(branch, tokens, context);
     }
 
-    // Do_once block
-    else if (tokens.nextIs(tok_DoOnce)) {
-        result = do_once_block(branch, tokens, context);
-    }
-
     // Stateful value decl
     else if (tokens.nextIs(tok_State)) {
         result = stateful_value_decl(branch, tokens, context);
@@ -1055,19 +1050,6 @@ ParseResult while_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     finish_while_loop(whileTerm);
     set_source_location(whileTerm, startPosition, tokens);
     return ParseResult(whileTerm);
-}
-
-ParseResult do_once_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-
-    tokens.consume(tok_DoOnce);
-
-    Term* result = apply(branch, DO_ONCE_FUNC, TermList());
-    set_starting_source_location(result, startPosition, tokens);
-    consume_branch(nested_contents(result), tokens, context);
-
-    return ParseResult(result);
 }
 
 ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)

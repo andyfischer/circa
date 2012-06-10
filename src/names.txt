@@ -105,7 +105,6 @@ tok_Return
 tok_In
 tok_True
 tok_False
-tok_DoOnce
 tok_Namespace
 tok_Include
 tok_Import
