@@ -44,20 +44,11 @@ namespace list_function {
         circa_set_list(out, count);
     }
 
-    void resize(caStack* stack)
-    {
-        caValue* out = circa_output(stack, 0);
-        copy(circa_input(stack, 0), out);
-        int count = circa_int_input(stack, 1);
-        circa_resize(out, count);
-    }
-
     void setup(Branch* kernel)
     {
         FUNCS.list = import_function(kernel, make_list, "list(any :multiple) -> List");
         import_function(kernel, repeat,  "repeat(any, int) -> List");
         import_function(kernel, blank_list, "blank_list(int) -> List");
-        import_function(kernel, resize, "resize(List, int) -> List");
     }
 }
 }

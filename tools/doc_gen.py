@@ -210,7 +210,6 @@ addNamesToCategory(['floor', 'log', 'magnitude', 'norm'], 'Math')
 addNamesToCategory(['max','min','mod'], 'Math')
 addNamesToCategory(['mult', 'neg','pow','rand','seed'], 'Math')
 addNamesToCategory(['sin', 'sqr', 'sqrt', 'cos','tan','rotate_point','round'], 'Math')
-addNamesToCategory(['rect_intersects_rect'], 'Math')
 addNamesToCategory(['remainder','clamp','polar', 'point_distance'], 'Math')
 addNamesToCategory(['smoothstep','smootherstep'], 'Math')
 addNamesToCategory(['div_f','div_i','div_s'], 'Math')
@@ -315,9 +314,7 @@ def getHTMLForAlphebetizedEntryList(items):
         out.append("")
         out.append("<p>")
 
-        for item in items:
-            out.append(item['linkHtml'] + " ")
-            out.append("")
+        out.append(", ".join([item['linkHtml'] for item in items]))
 
         out.append("</p>")
 
@@ -455,8 +452,7 @@ def writePage(entry):
 
     if 'belongsToCategories' in entry and entry['belongsToCategories']:
         out.append("<p>tags: ")
-        for category in entry['belongsToCategories']:
-            out.append(category['linkHtml'] + ' ')
+        out.append(", ".join(category['linkHtml'] for category in entry['belongsToCategories']))
         out.append("</p>")
 
     if 'term' in entry:
@@ -466,8 +462,8 @@ def writePage(entry):
     bottomNote = "Page generated at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
     out.append('<div class="bottom_right_note">' + bottomNote + '</div>')
 
-    out.append('<p>')
-    out.append('<p>')
+    out.append('<br>')
+    out.append('<br>')
 
     return out
 
@@ -484,7 +480,6 @@ def writeLeftBar():
     out.append('</div>')
 
     return out
-
 
 def writeFile(lines, file):
     f = open(file, 'w')

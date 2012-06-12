@@ -41,24 +41,18 @@ namespace rand_function {
     CA_FUNCTION(evaluate_i)
     {
         seed_if_needed();
-        set_int(OUTPUT, rand());
-    }
-
-    CA_FUNCTION(evaluate_i_i)
-    {
-        seed_if_needed();
-        int period = as_int(INPUT(0));
+        int range = as_int(INPUT(0));
 
         // TODO: replace this, builtin rand() does not have good randomness in lower bits.
-        set_int(OUTPUT, rand() % period);
+        set_int(OUTPUT, rand() % range);
     }
 
     void setup(Branch* kernel)
     {
-        import_function(kernel, evaluate_f, "rand() -> number");
+        import_function(kernel, evaluate_f, "rand() -> number\n -- Return a random number between 0.0 and 1.0, with a linear distribution.");
         import_function(kernel, evaluate_f_range,
-                "rand_range(number min,number max) -> number");
-        import_function(kernel, evaluate_i, "rand_i() -> int");
+                "rand_range(number min,number max) -> number\n -- Return a random number between the given min and max, with a linear distribution.");
+        import_function(kernel, evaluate_i, "rand_i(int range) -> int\n -- Returns a random integer (with a linear distribution) that is equal to or greater than zero, and less than 'range'. ");
     }
 }
 } // namespace circa

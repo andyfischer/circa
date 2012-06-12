@@ -574,6 +574,14 @@ Type* List__append_specializeType(Term* term)
     }
 }
 
+void List__resize(caStack* stack)
+{
+    caValue* out = circa_output(stack, 1);
+    copy(circa_input(stack, 0), out);
+    int count = circa_int_input(stack, 1);
+    circa_resize(out, count);
+}
+
 void List__extend(caStack* stack)
 {
     caValue* out = circa_output(stack, 1);
@@ -1182,6 +1190,7 @@ void bootstrap_kernel()
 
         {"List.append", List__append},
         {"List.extend", List__extend},
+        {"List.resize", List__resize},
         {"List.count", List__count},
         {"List.insert", List__insert},
         {"List.length", List__length},
