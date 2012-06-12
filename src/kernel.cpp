@@ -620,6 +620,8 @@ void List__slice(caStack* stack)
 
     if (end > list_length(input))
         end = list_length(input);
+    else if (end < 0)
+        end = list_length(input) + end;
 
     if (end < start) {
         set_list(output, 0);
@@ -662,7 +664,7 @@ void Map__contains(caStack* stack)
     set_bool(circa_output(stack, 0), value != NULL);
 }
 
-void Map__add(caStack* stack)
+void Map__set(caStack* stack)
 {
     caValue* out = circa_output(stack, 1);
     copy(circa_input(stack, 0), out);
@@ -1188,9 +1190,9 @@ void bootstrap_kernel()
         {"List.get", List__get},
 
         {"Map.contains", Map__contains},
-        {"Map.add", Map__add},
         {"Map.remove", Map__remove},
         {"Map.get", Map__get},
+        {"Map.set", Map__set},
 
         {"String.char_at", String__char_at},
         {"String.ends_with", String__ends_with},

@@ -148,6 +148,7 @@ def Frame.pc_term(self) -> Term
 
 type Interpreter;
 def make_interpreter() -> Interpreter
+    -- Create a new interpreter
 def Interpreter.push_frame(self, Branch, List inputs)
     -- Push a new frame, using the given branch and input list.
 def Interpreter.pop_frame(self)
@@ -156,37 +157,91 @@ def Interpreter.set_state_input(self, any)
     -- Assign a value to the :state input of the topmost frame (if any)
 def Interpreter.get_state_output(self) -> any
 def Interpreter.reset(self)
+    -- Clear this interpreter's state, including stack frames.
 def Interpreter.run(self)
+    -- Run the interpreter until either the topmost frame is finished, or an error
+    -- is raised.
 def Interpreter.run_steps(self, int steps)
+    -- Run the interpreter for a specific number of steps. If an error occurs then
+    -- evaluation will be stopped.
 def Interpreter.frame(self, int depth) -> Frame
+    -- Return the Frame with the given depth. The top of the stack has depth 0.
 def Interpreter.top_frame(self) -> Frame
+    -- Return the topmost Frame.
     self.frame(0)
 def Interpreter.frames(self) -> List
+    -- Return the list of Frames.
 def Interpreter.output(self, int index) -> any
+    -- Fetch the value in the nth output register.
 def Interpreter.errored(self) -> bool
+    -- Returns true if the interpreter has stopped to due error.
 def Interpreter.error_message(self) -> String
+    -- If there is a recorded error, returns a human-readable description string.
 def Interpreter.toString(self) -> String
 
-def List.append(@self, any)
-def List.extend(@self, List)
+def List.append(@self, any element)
+    -- Append an element to the end of this list.
+def List.extend(@self, List right)
+    -- Extend this list with the given input. Afterwards, 'self' will be the
+    -- concatenation of the old 'self' and 'right'.
 def List.count(self) -> int
+    -- Return the number of elements in this list.
 def List.insert(@self, int, any)
+    -- Insert an element at the given index. If necessary, existing elements will
+    -- be shifted to the right to make room
+    --
+    -- Example:
+    --   a = [1 2 3]
+    --   a.insert(1, 'X')
+    --   -- a now equals [1 'X' 2 3]
+    
 def List.length(self) -> int
-def List.join(self, String) -> String
+    -- Return the number of elements in this list.
+def List.join(self, String joiner) -> String
+    -- Return a string constructed by converting every element to a string, and
+    -- concatenating those strings, each separated by 'joiner'.
+    --
+    -- Example:
+    --  [1 2 3].join(', ')
+    -- 
+    -- Outputs: "1, 2, 3"
+
 def List.slice(self, int start, int fin) -> List
+    -- Return a list constructed from the elements starting from index 'start', and
+    -- ending immediately before index 'fin'.
+    --
+    -- If either 'start' or 'fin' is negative, it's interpreted as an offset from the
+    -- end of the list.
+    --
+    -- Examples:
+    --  [1 2 3 4].slice(1 3)
+    --  Outputs: [2 3]
+    -- 
+    --  [1 2 3 4].slice(0 -1)
+    --  Outputs: [1 2 3]
+
 def List.get(self, index) -> any
+    -- Get an element by index.
 def List.empty(self) -> bool
+    -- Returns whether the list is empty.
     self.length == 0
 def List.last(self) -> any
-    if self.empty
-        null
-    else
-        self.get(self.length - 1)
+    -- Returns the last element
+    self.get(self.length - 1)
+def List.pop(@self) -> any
+    -- Returns the last element, and removes it from the list.
+    result = self.last
+    self = self.slice(0, -1)
+    result
 
-def Map.add(@self, any, any)
-def Map.contains(self, any) -> bool
-def Map.remove(@self, any)
-def Map.get(self, any) -> any
+def Map.contains(self, any key) -> bool
+    -- Returns true if the map contains the given key.
+def Map.remove(@self, any key)
+    -- Removes the given key from the map.
+def Map.get(self, any key) -> any
+    -- Gets the key associated with this value.
+def Map.set(@self, any key, any value)
+    -- Sets the value associated with this key.
 
 -- Overloaded functions
 def is_overloaded_func(Branch branch) -> bool
@@ -196,6 +251,7 @@ def overload:get_contents(Branch branch) -> List
     -- Get a list of all the functions that this overloaded function uses.
 
 def String.append(@self, String right)
+    -- Modify 'self' by appending the given string on the right side.
     self = concat(self, right)
     
 def String.char_at(self, int index) -> String
@@ -205,10 +261,12 @@ def String.ends_with(self,String) -> bool
 def String.length(self) -> int
     -- Returns the string length.
 def String.slice(self,int,int) -> String
-def String.starts_with(self,String) -> bool
+def String.starts_with(self,String prefix) -> bool
+    -- Returns true if the string starts with the given prefix.
 def String.split(self,String sep) -> List
 def String.substr(self,int,int) -> String
 def String.to_camel_case(self) -> String
+    -- Deprecated function
 def String.to_lower(self) -> String
 def String.to_upper(self) -> String
 
@@ -234,21 +292,33 @@ def Term.asint(self) -> int
 def Term.asfloat(self) -> number
 def Term.parent(self) -> Branch
 def Term.contents(self) -> Branch
+    -- Fetch the nested Branch contents of this Term. The format and the meaning
+    -- of these contents is dictated by the term's function.
 def Term.name(self) -> String
+    -- Return this term's local name. May be blank.
 def Term.to_string(self) -> String
 def Term.to_source_string(self) -> String
 def Term.function(self) -> Branch
+    -- Fetch this term's function.
 def Term.get_type(self) -> Type
+    -- Fetch the declared type of this term.
 def Term.value(self) -> any
+    -- For a value term, this fetches the actual value.
 def Term.tweak(self, number steps)
 def Term.input(self, int) -> Term
+    -- Fetch an input term by index.
 def Term.inputs(self) -> List
+    -- Return a list of input terms.
 def Term.num_inputs(self) -> int
+    -- Return the number of inputs.
 def Term.source_location(self) -> Rect_i
+    -- Return a Rect_i that describes where this term occurs in its source file.
 def Term.location_string(self) -> String
 def Term.global_id(self) -> int
+    -- Fetch this term's global identifier.
 def Term.properties(self) -> Map
 def Term.property(self, String) -> any
+    -- Fetch a term property by name.
 def Term.is_function(self) -> bool
     is_function(self.value)
 def Term.is_type(self) -> bool
@@ -421,6 +491,7 @@ def rect_intersects_rect(Rect rect_a, Rect rect_b) -> bool
     return intersects_on_x and intersects_on_y
 
 def interp_rect(Rect a, Rect b, number ratio) -> Rect
+    -- Linearly interpolate between two rectangles.
     min(@ratio, 1.0)
     result = for i in 0..4 { a[i] + (b[i] - a[i]) * ratio }
     return Rect(result)
@@ -444,6 +515,8 @@ def smooth_in_out(number t, number smooth_in, number smooth_out) -> number
     return bezier4(t, [[0 0] [smooth_in, 0] [1 - smooth_out, 1] [1 1]]).y
 
 def clamp(number x, number minVal, number maxVal) -> number
+    -- Return a clamped value. If x is less than 'minVal' then return 'minVal', if it's
+    -- greater than 'maxVal' then return 'maxVal', otherwise return the original 'x'.
     return min(max(x, minVal), maxVal)
 
 def smoothstep(number x, number edge0, number edge1) -> number

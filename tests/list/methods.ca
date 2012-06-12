@@ -14,6 +14,11 @@ assert([].slice(-1,0) == [])
 assert([].slice(-1,5) == [])
 assert([0].slice(0,1) == [0])
 assert([0].slice(0,0) == [])
+assert([1 2 3].slice(0,-1) == [1 2])
+assert([1 2 3].slice(0,2) == [1 2])
+assert([1 2 3].slice(0,3) == [1 2 3])
+assert([1 2 3].slice(2,3) == [3])
+assert([1 2 3].slice(2,0) == [])
 
 -- Get
 assert([1 2 3].get(0) == 1)
@@ -25,3 +30,12 @@ assert(not [0].empty)
 -- Last
 assert([0].last == 0)
 assert([0 1 2].last == 2)
+
+-- Pop
+a = [1 2 3]
+assert(a.pop == 3)
+assert(a == [1 2])
+assert(a.pop == 2)
+assert(a == [1])
+assert(a.pop == 1)
+assert(a == [])

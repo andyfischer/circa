@@ -4,15 +4,34 @@ type TargetSubElement {
 }
 
 def TargetSubElement.top(self) -> List
-    self.list.last
+    if self.list.empty
+        null
+    else
+        self.list.last
+def TargetSubElement.pop(@self)
+    self.list.pop
+def TargetSubElement.append(@self, any subElement)
+    self.list.append(subElement)
 def TargetSubElement.empty(self) -> bool
     self.list.empty
 
 type Target {
     Term term
-    List stackPattern
     TargetSubElement subElement
 }
+
+type ConstraintSet {
+    Map byTerm
+}
+def ConstraintSet.setValue(@self, Term term, any value)
+    self.byTerm.set(term, value)
+def ConstraintSet.getKnowledge(@self, Term term) -> any
+    if self.byTerm.contains(term)
+        self.byTerm.get(term)
+    elif term.is_value
+        term.value
+    else
+        null
 
 type Desire {
     Name name
@@ -21,6 +40,7 @@ type Desire {
 
 type Request {
     Target target
+    ConstraintSet constraints
     Desire desire
 }
 
@@ -37,7 +57,7 @@ type ChangeOperation {
 def advance_request(Request request) -> any
 
     term = request.target.term
-    desireType = request.desire.name
+    desireType = request.desire[0]
 
     -- First dispatch on function
 
@@ -54,17 +74,21 @@ def advance_request(Request request) -> any
             return Failure([:FuncCantHandleRequest request])
 
     -- copy() function, forward to input
-    elif term.function == branch_ref(copy)
-        -- TODO, need to correct target.stackPattern
+    elif term.function == branch_ref(copy) or term.function == branch_ref(output_placeholder)
+        
+        -- TODO, need to correct request.knowledge
         request.target.term = term.input(0)
         return request
 
     -- get_index
     elif term.function == branch_ref(get_index)
-        -- TODO, handle requests that target the index
+        -- TODO, handle requests that target the index value.
         indexTerm = term.input(1)
 
-        if not indexTerm.is_value
+        -- Dispatch based on our knowledge of the index
+        knowledge = request.constraints.getKnowledge(indexTerm)
+
+        if knowledge == null
             return Failure([:NotEnoughInformation request])
 
         indexValue = term.value()
@@ -76,8 +100,22 @@ def advance_request(Request request) -> any
     -- for-loop
     elif term.function.name == 'for'
 
-        
-        print('for loop..')
+        lastElement = request.target.subElement.top
+
+        if lastElement[0] != :index
+            -- Don't know how to target for if the subElement is not an index.
+            return Failure([:FuncCantHandleRequest request])
+
+        forContents = request.target.term.contents
+        loopIndex = forContents.input(1)
+        outputTerm = forContents.output(0)
+
+        newRequest = request
+        newRequest.target.subElement.pop
+        newRequest.constraints.setValue(loopIndex lastElement[1])
+        newRequest.target.term = outputTerm
+
+        return newRequest
 
     return :DidNotUnderstand
 

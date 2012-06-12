@@ -7,6 +7,16 @@ Code cleanup
   Deprecate API using Term* or Function* to reference functions (prefer Branch*)
   Eliminate C++ Function type, in favor of Branch.
 
+Parser
+  In function decl, type should be optional (rather than name being optional)
+
+  Newlines don't work in some infix_expr. Example
+    if (something
+         or something_else)
+    if something or
+         something_else
+
+
 Code modification
   Code modification should go through a more controlled path.
     Add a CodeModification class that stores a modification in progress

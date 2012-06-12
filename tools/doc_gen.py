@@ -15,25 +15,24 @@ nameToEntry = {}
 
 circa_allTypes = {'title':'All types', 'name':'all_types', 'items':[]}
 circa_allFunctions = {'title':'All functions', 'name':'all_functions', 'items':[]}
-improv_allTypes = {'title':'All types','name':'improv_types', 'items':[]}
-improv_allFunctions = {'title':'All functions','name':'improv_functions','items':[]}
-
 circaCategory = {'title':'Core',
     'type':'Category',
     'subcategories': [circa_allTypes, circa_allFunctions]}
+
+improv_allTypes = {'title':'All types','name':'improv_types', 'items':[]}
+improv_allFunctions = {'title':'All functions','name':'improv_functions','items':[]}
 improvCategory = {'title':'Improv',
     'type':'Category',
     'subcategories': [improv_allTypes, improv_allFunctions]}
 #majorCategories = [circaCategory, improvCategory]
 majorCategories = [circaCategory]
 
-
 for title in [ #['Color', 'color_tag'],
         'Containers',
         'Internal',
         'Logical',
         'Math',
-        'Random',
+        'Randomness',
         'Reflection', 'Stateful', 'Uncategorized']:
 
     if isinstance(title, list):
@@ -51,6 +50,7 @@ def everySubCategory():
     for cat in majorCategories:
         for subcat in cat['subcategories']:
             yield subcat
+
 
 for entry in everyEntry:
     if entry['type'] == 'Function':
@@ -122,6 +122,7 @@ for entry in everyEntry:
         crossReferencedHeading = ""
         
         for element in entry['heading']:
+            firstElement = element == entry['heading'][0]
             term = element[1]
             enableLink = False
 
@@ -134,11 +135,18 @@ for entry in everyEntry:
 
             # cross-reference: only first element is a link
             crossReferenceLink = False
-            if element == entry['heading'][0]:
-                crossReferencedHeading += '<a href="' + entry['url'] + '">'
+            if firstElement:
+                linkStart = '<a href="' + entry['url'] + '">'
+                crossReferencedHeading += linkStart
                 crossReferenceLink = True
 
-            crossReferencedHeading += element[0]
+            # if this is a method, then lighten the type name to decrease its importance.
+            if firstElement and entry['isMethod']:
+                split = element[0].split('.')
+                crossReferencedHeading += '<span class="minor">' + split[0] + '</span>'
+                crossReferencedHeading += '.' + split[1]
+            else:
+                crossReferencedHeading += element[0]
 
             if enableLink:
                 heading += '</a>'
@@ -164,7 +172,7 @@ nameToEntry['Rect']['description'] = 'Rect type, stores the position of a rectan
 
 nameToEntry['Internal']['description'] = 'Internally-used functions. These should not be called directly.'
 nameToEntry['Term']['description'] = 'A single unit of code. Each Term has a function, and 0 or more input Terms. A Term may have a local name. Every term has a Branch parent, and a term may optionally have a nested Branch.'
-nameToEntry['Random']['description'] = 'Functions that use randomness.'
+nameToEntry['Randomness']['description'] = 'Functions that use randomness.'
 nameToEntry['Reflection']['description'] = 'Functions and types for inspecting and modifying Circa\'s internals, including the interpreter and code data.'
 nameToEntry['Stateful']['description'] = 'Functions that use inlined state.'
 
@@ -173,6 +181,7 @@ for cat in everySubCategory():
     cat['type'] = 'Category'
     cat['filename'] = DestinationDocs + '/' + cat['name'] + '.md'
     cat['url'] = '/docs/' + cat['name'] + '.html'
+    cat['linkHtml'] = '<a href="' + cat['url'] + '">' + cat['title'] + '</a>'
 
 # Manually put functions into categories.
 def addToCategory(entry, category):
@@ -192,8 +201,8 @@ def addNamesToCategory(nameList, categoryName):
 #addNamesToCategory(['Color','blend_color','random_color','hsv_to_rgb'], 'color_tag')
 #addNamesToCategory(['darken','lighten'], 'color_tag')
 
-addNamesToCategory(['rand','rand_i','rand_range'], 'Random')
-addNamesToCategory(['seed','random_color','random_element','random_norm_vector'], 'Random')
+addNamesToCategory(['rand','rand_i','rand_range'], 'Randomness')
+addNamesToCategory(['seed','random_color','random_element','random_norm_vector'], 'Randomness')
 
 addNamesToCategory(['abs','add','div','sub','ceil'], 'Math')
 addNamesToCategory(['arcsin', 'arccos', 'arctan', 'average', 'bezier3', 'bezier4'], 'Math')
@@ -286,7 +295,42 @@ for entry in everyEntry:
     everyFilename.add(filename)
     everyUrl.add(url)
 
+def getHTMLForAlphebetizedEntryList(items):
+
+    out = []
+
+    buckets = {}
+
+    for item in items:
+        title = item['title'].upper()
+        letter = title[0]
+
+        if letter not in buckets:
+            buckets[letter] = []
+
+        buckets[letter].append(item)
+
+    for letter,items in buckets.items():
+        out.append("<p>" + letter + "</p>")
+        out.append("")
+        out.append("<p>")
+
+        for item in items:
+            out.append(item['linkHtml'] + " ")
+            out.append("")
+
+        out.append("</p>")
+
+    return out
+
 def getTableHTMLForEntryList(items):
+
+    # If we have way too many items then create an alphebetized list instead.
+    MinItemsForAlphebetizedList = 200
+
+    if len(items) >= MinItemsForAlphebetizedList:
+        return getHTMLForAlphebetizedEntryList(items)
+    
     out = []
 
     # Enforce a maximum of 4 columns
@@ -298,7 +342,7 @@ def getTableHTMLForEntryList(items):
 
     maxItemsPerColumn = 0
 
-    # If we can limit each column to 15 items or less, then minimize the column count
+    # If we can limit each column to 10 items or less, then minimize the column count
     if len(items) <= MaxColumns * PreferredLimitPerColumn:
         maxItemsPerColumn = PreferredLimitPerColumn
 
@@ -344,10 +388,6 @@ def writePage(entry):
     out.append("layout: docs")
     out.append("---")
     out.append("")
-
-    import datetime
-    bottomNote = "Page generated at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    out.append('<div class="bottom_right_note">' + bottomNote + '</div>')
 
     if entry['type'] == 'Function':
         out.append('<h3><span class="minor">function</span> ' + title + "</h3>")
@@ -413,13 +453,21 @@ def writePage(entry):
             out.append('<p>' + entry['crossReferencedHeading'] + '</p>')
         out.append("")
 
-    if 'tags' in entry and entry['tags']:
-        out.append("Tags:")
-        out.append("")
+    if 'belongsToCategories' in entry and entry['belongsToCategories']:
+        out.append("<p>tags: ")
+        for category in entry['belongsToCategories']:
+            out.append(category['linkHtml'] + ' ')
+        out.append("</p>")
 
     if 'term' in entry:
         out.append('<p><span class="extra_minor">' + entry['term'] + "</span></p>")
 
+    import datetime
+    bottomNote = "Page generated at " + str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
+    out.append('<div class="bottom_right_note">' + bottomNote + '</div>')
+
+    out.append('<p>')
+    out.append('<p>')
 
     return out
 
@@ -431,9 +479,7 @@ def writeLeftBar():
         out.append('<p><h1>' + majorCategory['title'] + '</h1></p>')
 
         for subcategory in majorCategory['subcategories']:
-            out.append('  <p><h3><a href="' + subcategory['url'] + '">'
-                + subcategory['title']
-                + '</a></h3></p>')
+            out.append('  <p><h3>' + subcategory['linkHtml'] + '</h3></p>')
 
     out.append('</div>')
 
