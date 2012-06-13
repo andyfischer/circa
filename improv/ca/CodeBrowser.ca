@@ -1,18 +1,53 @@
 
-type FilteredBranch {
-    Branch branch
-    List filters
+{-
+  CodeBrowser v1
 
-    bool needsUpdate
-    List terms  -- derived from branch & filter
-}
+  Goals
+    Display code as near-text
+    Support syntax highlight
+    Support independent term position (for animation)
+    Support filters
 
+    positionMap( Term -> Rect )
+    update_position(FilteredBranch) -> PositionMap
+
+    BrowserView
+      positionMap
+      Branch branch
+      List filters
+
+    BrowserView.draw(painter)
+
+-}
 
 type CodeBrowser {
-    Map termPosition  -- maps Term to Rect
+    Map termPositions
+
+    Branch branch
     List filters
+    List terms
 
     Rect positionRect
 }
 
-def position_terms(Rect rect, FilteredBranch filteredBranch) -> Map
+
+def CodeBrowser.updatePositions(@self)
+    self.termPositions = create(Map)
+    if self.branch.is_null
+        return
+
+    curY = 0
+    for Term term in self.terms
+        self.termPositions.set(term, [0 curY])
+
+
+
+def CodeBrowser.draw(Painter painter)
+
+def make_code_browser(Branch branch) -> CodeBrowser
+    browser = create(CodeBrowser)
+    browser.branch = branch
+    browser.terms = branch.terms
+    browser.updatePositions()
+    return browser
+

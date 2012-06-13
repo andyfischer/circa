@@ -904,11 +904,20 @@ std::string ref_toString(caValue* val)
     }
 }
 
+int ref_hashFunc(caValue* val)
+{
+    Term* term = as_term_ref(val);
+    if (term == NULL)
+        return 0;
+    return term->id;
+}
+
 void ref_setup_type(Type* type)
 {
     type->name = name_from_string("Term");
     type->storageType = STORAGE_TYPE_REF;
     type->toString = ref_toString;
+    type->hashFunc = ref_hashFunc;
 }
 
 void create_primitive_types()

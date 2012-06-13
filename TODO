@@ -24,6 +24,8 @@ Parser
     if something or
          something_else
 
+  Can't use comments inside type declaraion?
+
 
 Code modification
   Code modification should go through a more controlled path.

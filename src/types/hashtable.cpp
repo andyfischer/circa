@@ -274,7 +274,7 @@ void clear(Hashtable* data)
 std::string to_string(Hashtable* data)
 {
     std::stringstream strm;
-    strm << "[";
+    strm << "{";
     int count = data == NULL ? 0 : data->capacity;
     bool first = true;
     for (int i=0; i < count; i++) {
@@ -288,7 +288,7 @@ std::string to_string(Hashtable* data)
         strm << circa::to_string(&data->slots[i].key);
         strm << ": " << circa::to_string(&data->slots[i].value);
     }
-    strm << "]";
+    strm << "}";
     return strm.str();
 }
 

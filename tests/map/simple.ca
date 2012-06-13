@@ -1,0 +1,21 @@
+
+
+-- ints as keys
+m = create(Map)
+
+m.set(3,3)
+m.set(4,4)
+assert(to_string(m) == '{3: 3, 4: 4}')
+
+-- references as keys
+a = 1, b = 2
+ra = term_ref(a)
+rb = term_ref(b)
+
+m = create(Map)
+m.set(ra, 'a')
+m.set(rb, 'b')
+assert(m.get(ra) == 'a')
+assert(m.get(rb) == 'b')
+m.remove(ra)
+assert(m.get(rb) == 'b')

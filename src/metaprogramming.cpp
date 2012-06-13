@@ -255,9 +255,6 @@ bool is_considered_config(Term* term)
     if (is_declared_state(term)) return false;
     if (is_hidden(term)) return false;
     if (is_function(term)) return false;
-
-    // ignore branch-based types
-    //if (is_branch(term)) return false;
     if (is_type(term)) return false;
 
     return true;

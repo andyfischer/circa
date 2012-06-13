@@ -1,5 +1,6 @@
 
 import UIHelper
+import CodeBrowser
 
 msg = input()
 
@@ -11,6 +12,7 @@ state interpreter_stopped = false
 state state_frozen = false
 state number timeWhenFrozen = 0
 
+state codeBrowser = null
 
 state Point mousePos
 state Set keysDown
@@ -18,6 +20,7 @@ state number time
 state number timeShift = 0
 
 buttons = [
+    ["Browse" :browse]
     ["Reset" :reset]
     ["Freeze" :freezeState]
     ["Back" :exit]
@@ -26,8 +29,9 @@ state ButtonBar topButtons = button_bar(buttons)
 topButtons.arrange([10 10 buttons.length*100 40], :horizontal)
 
 -- set the state of the Freeze button
-topButtons.setToggled(1, state_frozen)
-topButtons.setLabel(1, cond(state_frozen, "Frozen", "Freeze"))
+freezeIndex = 2
+topButtons.setToggled(freezeIndex, state_frozen)
+topButtons.setLabel(freezeIndex, cond(state_frozen, "Frozen", "Freeze"))
 
 def to_rect(Point topLeft, Point size) -> Rect
     [topLeft.x topLeft.y topLeft.x+size.x topLeft.x+size.y]
@@ -92,6 +96,8 @@ if msg[0] == 'onPaintEvent'
 
     -- Paint our menu on top
     topButtons.draw(painter)
+    if codeBrowser != null
+        codeBrowser.draw(painter)
 
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
@@ -116,6 +122,8 @@ elif msg[0] == 'onInputEvent'
         userBranch.dump
     elif action == :exit
         send('View' ['changeScreen' 'IntroScreen'])
+    elif action == :browse
+        codeBrowser = make_code_browser(userBranch)
     elif action != null
         print('action: ' action)
     else
