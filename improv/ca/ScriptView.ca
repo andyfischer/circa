@@ -30,7 +30,7 @@ topButtons.setToggled(1, state_frozen)
 topButtons.setLabel(1, cond(state_frozen, "Frozen", "Freeze"))
 
 def to_rect(Point topLeft, Point size) -> Rect
-    return [topLeft.x topLeft.y topLeft.x+size.x topLeft.x+size.y]
+    [topLeft.x topLeft.y topLeft.x+size.x topLeft.x+size.y]
 
 def Interpreter.drawRuntimeError(int, Painter painter)
     msg = int.error_message
@@ -43,9 +43,7 @@ def Interpreter.drawRuntimeError(int, Painter painter)
 
     -- Draw the stack
     y = error_y + 20
-    for frame in int.frames
-        Frame(@frame)
-
+    for Frame frame in int.frames
         loc = frame.pc_term
         painter.drawText(to_rect([left y] [width y+100]) 0 loc.location_string)
 

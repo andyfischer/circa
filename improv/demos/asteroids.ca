@@ -138,22 +138,19 @@ ship.loc = wrap_around(ship.loc)
 
 
 -- Move bullets
-for bullet in @bullets
-    Bullet(@bullet)
+for Bullet bullet in @bullets
     loc = bullet.loc + bullet.direction * bullet_speed * time_delta
     wrap_around(@loc)
     bullet = [bullet.lifespan+time_delta, loc, bullet.direction] -> Bullet
 
 -- Remove old bullets
 bullet_max_lifespan = 1.8
-for bullet in @bullets
-    Bullet(@bullet)
+for Bullet bullet in @bullets
     if bullet.lifespan >= bullet_max_lifespan
         discard
 
 -- Draw bullets
-for bullet in bullets
-    Bullet(@bullet)
+for Bullet bullet in bullets
     points = [bullet.loc + [-1 -1] * bullet_width,
                   bullet.loc + [1 -1] * bullet_width,
                   bullet.loc + [1 1] * bullet_width,
@@ -221,19 +218,15 @@ if once()
         asteroids.append(as)
 
 -- move asteroids
-for asteroid in @asteroids
-    Asteroid(@asteroid)
+for Asteroid asteroid in @asteroids
     asteroid.location += asteroid.vel * time_delta * asteroid_speed_modifier
     asteroid.rotation += asteroid.rotation_vel * time_delta * asteroid_speed_modifier
     asteroid.location = wrap_around(asteroid.location)
     asteroid.age += time_delta
 
 -- draw asteroids
-for asteroid in asteroids
-    Asteroid(@asteroid)
-
-    edges = for p in asteroid.edges
-        @p -> Point
+for Asteroid asteroid in asteroids
+    edges = for Point p in asteroid.edges
         rotate_point(@p, asteroid.rotation)
         add(@p, asteroid.location)
 
@@ -242,12 +235,10 @@ for asteroid in asteroids
 -- Check for collisions of asteroids and bullets
 spawned = []
 
-for asteroid in @asteroids
-    Asteroid(@asteroid)
+for Asteroid asteroid in @asteroids
     collides = false
 
-    for bullet in @bullets
-        bullet = bullet -> Bullet
+    for Bullet bullet in @bullets
         if point_distance(asteroid.location, bullet.loc) < asteroid.size
             collides = true
 
@@ -266,12 +257,10 @@ for asteroid in @asteroids
         discard
 
 for spawn in spawned
-    Asteroid(@spawn)
     asteroids.append(spawn)
 
 -- Check for collisions of asteroids and ship
-for asteroid in asteroids
-    asteroid -> Asteroid
+for Asteroid asteroid in asteroids
     if point_distance(asteroid.location, ship.loc) < (asteroid.size + ship_radius)
         gstate = game_state:dying
 
@@ -288,9 +277,7 @@ if gstate == game_state:dying
 max_particle_age = 3.0
 
 -- Draw/update particles
-for particle in @particles
-    Particle(@particle)
-
+for Particle particle in @particles
     lifespan = particle.age / max_particle_age
     max(@lifespan, 1.0)
     color = #555 + #111 * (lifespan * 9)

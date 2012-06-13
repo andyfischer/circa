@@ -9,9 +9,7 @@ def EditorView.draw(self, Painter painter, Rect rect)
     currentY = 0.0
     lineHeight = painter.fontMetrics.height
 
-    for statement in branch.statements
-        @statement -> Term
-
+    for Term statement in branch.statements
         source_text = statement.to_source_text
 
         painter.drawText([rect.x1, rect.y1, rect.x2, rect.y1 + lineHeight],

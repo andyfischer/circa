@@ -343,8 +343,7 @@ def Branch.is_method(self) -> bool
 
 def Branch.get_top_comments(self) -> List
     out = []
-    for t in self.terms
-        Term(@t)
+    for Term t in self.terms
         if t.is_input_placeholder
             continue
         elif t.is_comment

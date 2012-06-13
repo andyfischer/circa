@@ -1,5 +1,4 @@
 
-
 type ScriptContext {
     Painter painter
     Point mouse
@@ -31,8 +30,7 @@ def ScriptContext.draw_circle(self, Point center, number radius, Color color)
         center.x + radius, center.y + radius])
 def ScriptContext.draw_points(self, List points, Color color)
     self.painter.setColor(color)
-    for point in points
-        Point(@point)
+    for Point point in points
         self.painter.drawRect([point.x point.y point.x+1 point.y+1])
 
 def ScriptContext.draw_text(self, Rect rect, int flags, String msg, Color color)
@@ -43,7 +41,7 @@ def ScriptContext.draw_poly(self, List points, Color color)
     self.painter.drawPolygon(points, color)
 
 def ScriptContext.key_down(self, Name key) -> bool
-    return self.keysDown.contains(key)
+    self.keysDown.contains(key)
 
 def ScriptContext.key_pressed(self, Name key) -> bool
     down = self.keysDown.contains(key)
@@ -53,9 +51,9 @@ def ScriptContext.key_pressed(self, Name key) -> bool
     return result
 
 def ScriptContext.mouse_down(self) -> bool
-    return self.keysDown.contains(:mouse1)
+    self.keysDown.contains(:mouse1)
 def ScriptContext.bounds(self) -> Point
-    return [self.painter.viewport.width, self.painter.viewport.height]
+    [self.painter.viewport.width, self.painter.viewport.height]
 
 def ScriptContext.mouse_pressed(self) -> bool
     state bool mouse_was_down = false

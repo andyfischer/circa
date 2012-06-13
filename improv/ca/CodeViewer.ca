@@ -24,9 +24,7 @@ elif msg[0] == 'onPaintEvent'
         x = 10
         y = 10
 
-        for t in branch.terms
-            @t -> Term
-
+        for Term t in branch.terms
             painter.drawText([x, y, 200, 200] 0 concat(t.id))
 
             painter.drawText([x + 40, y, 200, 200] 0 t.function.name)

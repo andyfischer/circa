@@ -50,9 +50,7 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
 
     -- Write each input
     index = 0
-    for input in func.inputs
-        @input -> Term
-
+    for Term input in func.inputs
         name = input.name
 
         -- check if this is a #anonymous name. If so, use the type name, lower cased.
@@ -89,14 +87,11 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         index += 1
 
     -- Function body
-    for statement in func.contents.statements
-        @statement -> Term
-
+    for Term statement in func.contents.statements
         writer.writeln(statement.to_source_string)
 
     index = 0
-    for input in func.outputs
-        @input -> Term
+    for Term input in func.outputs
 
         if input.get_type == void
             continue
@@ -134,8 +129,7 @@ def write_bindings(Branch branch) -> String
 
     bindings = []
 
-    for func in branch.functions
-        Function(@func)
+    for Function func in branch.functions
         cname = ""
         write_function(&writer, func, &cname)
 

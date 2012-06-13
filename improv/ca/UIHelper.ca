@@ -12,13 +12,13 @@ type Button {
 button_text_color = #fff
 
 def Point.inside(self, Rect rect) -> bool
-    return (self.x >= rect.x1) and (self.x <= rect.x2) and (self.y >= rect.y1) and (self.y <= rect.y2)
+    (self.x >= rect.x1) and (self.x <= rect.x2) and (self.y >= rect.y1) and (self.y <= rect.y2)
 
 def button(String label, Rect rect) -> Button
     b = create(Button)
     b.label = label
     b.rect = rect
-    return b
+    b
 
 def Button.draw(b, Painter p)
     button_color = #afa0d9
@@ -89,8 +89,7 @@ def ButtonBar.input(@b, InputEvent e) -> any
         return null
     action = null
     buttons = b.buttons
-    for button in @buttons
-        Button(@button)
+    for Button button in @buttons
         button.input(e)
 
         if action == null and button.triggered
