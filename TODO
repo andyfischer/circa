@@ -1,6 +1,14 @@
 
+Top 5 worst issues
+  - Type inference fails in for-loop
+  - Type inference fails when using add_s or add_v
+  - ...
+
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)
+
+Code reload
+  Bug fix, don't reload if the file has just been written and its size is 0. Maybe have a delay
 
 Code cleanup
   Remove importing_macros.h

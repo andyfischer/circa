@@ -9,6 +9,7 @@ state ButtonBar scriptChoices = button_bar([
         ["Introduction", "demos/intro.ca"]
         ["Asteroids", "demos/asteroids.ca"],
         ["Garden", "demos/garden.ca"]
+        ["Avatar", "demos/avatar.ca"]
         ])
 
 scriptChoices.arrange([30 80 200 220], :vertical)
