@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os,subprocess,sys
+import os,subprocess,sys,re
 import traceback
 from glob import glob
 
@@ -141,39 +141,12 @@ def test_file(process, filename):
     return failures
 
 def list_files_recr(dir):
-    for root, _, files in os.walk(TestRoot):
+    for root, _, files in os.walk(dir):
         for file in files:
             yield os.path.join(root,file)
 
 def list_directory_contents(dir):
     return [os.path.join(dir, f) for f in os.listdir(dir)]
-
-def all_testable_files():
-    dirs = [TestRoot,
-        TestRoot + '/bugrepro',
-        TestRoot + '/if',
-        TestRoot + '/error',
-        TestRoot + '/exit_points',
-        TestRoot + '/feedback',
-        TestRoot + '/field',
-        TestRoot + '/for',
-        TestRoot + '/funcs',
-        TestRoot + '/list',
-        TestRoot + '/meta',
-        TestRoot + '/methods',
-        TestRoot + '/reflection',
-        TestRoot + '/runtime_typing',
-        TestRoot + '/state',
-        TestRoot + '/static_errors',
-        TestRoot + '/subroutine',
-        TestRoot + '/syntax',
-        TestRoot + '/types',
-        TestRoot + '/type_inferrence'
-        ]
-    for dir in dirs:
-        for f in list_directory_contents(dir):
-            if f.endswith('.ca'):
-                yield f
 
 def run_all_tests():
 
@@ -187,14 +160,26 @@ def run_all_tests():
     totalDisabledTests = 0
 
     # Fetch list of disabled tests
-    disabled_tests = [os.path.join(TestRoot,f)
-        for f in read_text_file_as_lines(TestRoot+'/_disabled_tests')]
+    disabled_test_patterns = []
+    for line in read_text_file_as_lines(TestRoot+'/_disabled_tests'):
+        line = os.path.join(TestRoot, line)
+        # print "skip pattern:", line
+        disabled_test_patterns.append(re.compile(line))
 
     # Iterate through each test file
-    # Future: support test files in subdirectories
-    for file in all_testable_files():
-        if file in disabled_tests:
-            totalDisabledTests += 1
+    for file in list_files_recr(TestRoot):
+        if not file.endswith('.ca'):
+            continue
+
+        skip = False
+        for pat in disabled_test_patterns:
+            if pat.match(file):
+                # print 'skipping:', file
+                totalDisabledTests += 1
+                skip = True
+                break
+
+        if skip:
             continue
 
         totalTestCount += 1
