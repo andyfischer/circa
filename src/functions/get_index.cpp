@@ -26,6 +26,7 @@ namespace get_index_function {
         }
 
         copy(result, OUTPUT);
+        cast(OUTPUT, declared_type(CALLER));
     }
     Type* specializeType(Term* term)
     {

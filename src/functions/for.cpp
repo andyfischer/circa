@@ -9,6 +9,11 @@ namespace for_function {
     {
         format_name_binding(source, term);
         append_phrase(source, "for ", term, name_Keyword);
+        std::string explicitTypeName = term->stringProp("syntax:explicitType", "");
+        if (explicitTypeName != "") {
+            append_phrase(source, explicitTypeName, term, name_None);
+            append_phrase(source, " ", term, name_Whitespace);
+        }
         append_phrase(source, for_loop_get_iterator_name(term), term, name_None);
         append_phrase(source, " in ", term, name_Keyword);
         if (term->boolProp("modifyList", false))

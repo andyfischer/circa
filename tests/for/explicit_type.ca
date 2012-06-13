@@ -1,0 +1,3 @@
+
+for Point p in [[0 0]]
+    assert(type(p) == Point)

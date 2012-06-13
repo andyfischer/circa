@@ -70,8 +70,7 @@ def Avatar.draw(self, Painter painter)
         elbow_l + [.1 0],
         elbow_l + [-.1 0]]
 
-    r_arm_points = for p in arm_points
-        Point(@p)
+    r_arm_points = for Point p in arm_points
         p.x = -p.x
 
     figure = [

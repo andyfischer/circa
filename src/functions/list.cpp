@@ -5,16 +5,11 @@
 namespace circa {
 namespace list_function {
 
-#if 0 // Generic types are incomplete and disabled
-    Type* specializeType(Term* term)
+/*
+    Type* list_specializeType(Term* term)
     {
-        List inputTypes;
-        for (int i=0; i < term->numInputs(); i++)
-            set_type(inputTypes.append(), term->input(i)->type);
-
-        return as_type(create_tuple_type(&inputTypes));
     }
-#endif
+    */
 
     void make_list(caStack* stack)
     {
@@ -47,6 +42,8 @@ namespace list_function {
     void setup(Branch* kernel)
     {
         FUNCS.list = import_function(kernel, make_list, "list(any :multiple) -> List");
+        // as_function(FUNCS.list)->specializeType = list_specializeType;
+
         import_function(kernel, repeat,  "repeat(any, int) -> List");
         import_function(kernel, blank_list, "blank_list(int) -> List");
     }

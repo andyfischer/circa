@@ -26,7 +26,7 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
     change_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
-    start_building_for_loop(loop, "it");
+    start_building_for_loop(loop, "it", NULL);
     Branch* loopContents = nested_contents(loop);
 
     Term* iterator = loopContents->get("it");
@@ -47,7 +47,7 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
     change_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
-    start_building_for_loop(loop, "it");
+    start_building_for_loop(loop, "it", NULL);
     Branch* loopContents = nested_contents(loop);
 
     Term* iterator = loopContents->get("it");

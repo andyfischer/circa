@@ -991,6 +991,20 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     std::string iterator_name = tokens.consumeStr(tok_Identifier);
     possible_whitespace(tokens);
 
+    Type* explicitIteratorType = NULL;
+    std::string explicitTypeStr;
+
+    // If there are two identifiers, then the first one is an explicit type and
+    // the second one is the type name.
+    if (tokens.nextIs(tok_Identifier)) {
+        explicitTypeStr = iterator_name;
+        Term* typeTerm = find_name(branch, explicitTypeStr.c_str());
+        if (typeTerm != NULL && is_type(typeTerm))
+            explicitIteratorType = as_type(typeTerm);
+        iterator_name = tokens.consumeStr(tok_Identifier);
+        possible_whitespace(tokens);
+    }
+
     if (!tokens.nextIs(tok_In))
         return compile_error_for_line(branch, tokens, startPosition);
 
@@ -1011,10 +1025,12 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     Branch* contents = nested_contents(forTerm);
     set_starting_source_location(forTerm, startPosition, tokens);
     set_input_syntax_hint(forTerm, 0, "postWhitespace", "");
+    if (explicitTypeStr != "")
+        forTerm->setStringProp("syntax:explicitType", explicitTypeStr.c_str());
 
     forTerm->setBoolProp("modifyList", rebindListName);
 
-    start_building_for_loop(forTerm, iterator_name.c_str());
+    start_building_for_loop(forTerm, iterator_name.c_str(), explicitIteratorType);
 
     consume_branch(contents, tokens, context);
 

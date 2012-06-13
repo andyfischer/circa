@@ -51,7 +51,7 @@ Branch* get_for_loop_outer_rebinds(Term* forTerm)
     return contents->getFromEnd(0)->contents();
 }
 
-Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
+Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* iteratorType)
 {
     Branch* contents = nested_contents(forTerm);
 
@@ -65,7 +65,11 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName)
     // Add get_index to fetch the list's current element.
     Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index),
         iteratorName);
-    change_declared_type(iterator, infer_type_of_get_index(forTerm->input(0)));
+
+    if (iteratorType == NULL)
+        iteratorType = infer_type_of_get_index(forTerm->input(0));
+    
+    change_declared_type(iterator, iteratorType);
     hide_from_source(iterator);
 
     // Add the zero branch
