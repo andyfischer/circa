@@ -39,6 +39,7 @@ type CodeBrowser {
 
 def CodeBrowser.updateLayout(@self)
     
+    {-
     curY = 0
 
     self.layoutTerms = for Term term in self.terms
@@ -47,6 +48,7 @@ def CodeBrowser.updateLayout(@self)
         curY += 1
 
         LayoutTerm([term position])
+        -}
 
 def CodeBrowser.setPosition(@self, Rect rect)
     self.windowPosition = rect

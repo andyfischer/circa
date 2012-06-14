@@ -10,9 +10,10 @@ state ButtonBar scriptChoices = button_bar([
         ["Asteroids", "demos/asteroids.ca"],
         ["Garden", "demos/garden.ca"]
         ["Avatar", "demos/avatar.ca"]
+        ["Skeletal", "demos/skeletal.ca"]
         ])
 
-scriptChoices.arrange([30 80 200 220], :vertical)
+scriptChoices.arrange([30 80 200 300], :vertical)
 
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter

@@ -1,0 +1,84 @@
+
+env = input() -> ScriptContext
+mouse = env.mouse
+
+def Point.to_rect_center(self, Point size) -> Rect
+    size_half = (size * 0.5) -> Point
+    [self.x - size_half.x,
+        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
+
+env.background(#000)
+
+
+type JointDef {
+    Point rel
+    int parent
+    List children
+}
+
+type SkeletonDef {
+    List joints
+}
+
+type JointPos {
+    number rotation
+}
+
+def SkeletonDef.size(self) -> int
+    self.joints.length
+def SkeletonDef.addJoint(@self, Point rel, int parent)
+    self.joints.append(JointDef([rel parent []]))
+def SkeletonDef.getPivots(@self) -> List
+    pivots = []
+    for JointDef joint in self.joints
+        if joint.parent == -1
+            pivot = joint.rel
+        else
+            pivot = pivots[joint.parent] + joint.rel
+
+        pivots.append(Point(pivot))
+
+    pivots
+
+state SkeletonDef skel
+state int selectedJoint
+
+pivots = skel.getPivots()
+
+-- Handle input, figure out action
+action = :none
+
+if env.mouse_pressed and skel.size == 0
+    action = :add_joint
+
+if env.key_pressed(:a)
+    action = :add_joint
+
+if action == :add_joint
+    if skel.size == 0
+        -- No joints yet: create one
+        skel.addJoint(env.mouse, -1)
+        selectedJoint = 0
+    else
+        -- Add joint
+        parent = selectedJoint
+        parent_pivot = pivots[parent]
+        skel.addJoint(env.mouse - parent_pivot, parent)
+
+pivots = skel.getPivots()
+
+-- Draw
+index = 0
+for JointDef joint in skel.joints
+    pivot = pivots[index] -> Point
+    size = 4
+    if index == selectedJoint
+        color = #fff
+        size = 6
+    else
+        color = #ff0
+    env.fill_rect(pivot.to_rect_center([size size]) color)
+    if joint.parent != -1
+        parent_pivot = pivots[joint.parent]
+        env.draw_line(pivot parent_pivot #ff0)
+    index += 1

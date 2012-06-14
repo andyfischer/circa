@@ -36,11 +36,16 @@ def Button.draw(b, Painter p)
     p.setPen(create_pen(#fff, 1.0, :none))
     p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
 
-def Button.input(@b, InputEvent e)
+def Button.input(@b, InputEvent e) -> any
     if e.is_mouse
         b.rollover = e.mousePos.inside(b.rect)
         b.triggered = b.rollover and e.eventType == MouseUp
         b.press = b.rollover and (e.eventType == MouseDown)
+        
+        if b.triggered
+            return b.action
+        elif b.press
+            return :consumed
 
 type ButtonBar {
     List buttons
@@ -89,11 +94,11 @@ def ButtonBar.input(@b, InputEvent e) -> any
         return null
     action = null
     buttons = b.buttons
+    consumed = false
     for Button button in @buttons
-        button.input(e)
-
-        if action == null and button.triggered
-            action = button.action
+        thisAction = button.input(e)
+        if thisAction != null
+            action = thisAction
 
     b.buttons = buttons
     return action

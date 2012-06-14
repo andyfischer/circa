@@ -15,13 +15,29 @@ type InputEvent {
 def keycode_to_name(int key) -> Name
     if key == 32
         return :space
-    elif key == 16777235
+    elif key == 65
+        return :a
+    elif key == 67
+        return :c
+    elif key == 69
+        return :d
+    elif key == 81
+        return :q
+    elif key == 83
+        return :s
+    elif key == 87
+        return :w
+    elif key == 88
+        return :x
+    elif key == 90
+        return :z
+    elif key == 0x1000013
         return :up
-    elif key == 16777234
+    elif key == 0x1000012
         return :left
-    elif key == 16777236
+    elif key == 0x1000014
         return :right
-    elif key == 16777237
+    elif key == 0x1000015
         return :down
     else
         print('keycode not recognized: ' key)

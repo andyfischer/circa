@@ -1,8 +1,7 @@
 
 Top 5 worst issues
-  - Type inference fails in for-loop
   - Type inference fails when using add_s or add_v
-  - ...
+  - Improv sometimes fails to reload
 
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)

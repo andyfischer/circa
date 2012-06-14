@@ -367,18 +367,44 @@ type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
 
+def Point.to_rect_center(self, Point size) -> Rect
+    size_half = (size * 0.5) -> Point
+    [self.x - size_half.x,
+        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
+
+def Point.magnitude(self) -> number
+    return sqrt(sqr(self.x) + sqr(self.y))
+
+def Point.norm(self) -> Point
+    -- Returns v normalized to be along the unit circle.
+    m = magnitude(self)
+    [self.x / m, self.y / m]
+
+def Point.perpendicular(self) -> Point
+    -- Returns a vector that is perpendicular to self, rotated clockwise.
+    [v.y -v.x]
+
 def Rect.width(self) -> number
     self.x2 - self.x1
 def Rect.height(self) -> number
     self.y2 - self.y1
 def Rect.topleft(self) -> Point
     [self.x1 self.y1]
+def Rect.topright(self) -> Point
+    [self.x2 self.y1]
+def Rect.bottomleft(self) -> Point
+    [self.x1 self.y2]
+def Rect.bottomright(self) -> Point
+    [self.x2 self.y2]
 
 def Rect.intersects(self, Rect b) -> bool
     -- Return whether the two rectangles intersect.
     intersects_on_x = (self.x2 > b.x1) and (b.x2 > self.x1)
     intersects_on_y = (self.y2 > b.y1) and (b.y2 > self.y1)
     return intersects_on_x and intersects_on_y
+
+def Rect.translate(self, Point p) -> Rect
+    [self.x1 + p.x, self.y1 + p.y, self.x2 + p.x, self.y2 + p.y]
 
 def toggle(bool tog) -> bool
     -- Stateful function, returns a boolean status. Every frame the function is called
@@ -454,14 +480,7 @@ def random_norm_vector() -> Point
     angle = rand() * 360
     return [cos(angle) sin(angle)]
 
-def norm(Point v) -> Point
-    -- Returns v normalized to be along the unit circle.
-    m = magnitude(v)
-    return [v.x / m, v.y / m]
 
-def perpendicular(Point v) -> Point
-    -- Returns a vector that is perpendicular to v, rotated clockwise.
-    return [v.y -v.x]
 
 def to_rect(Point topLeft, Point size) -> Rect
     -- Return a Rect with the given top-left coordinate and size.

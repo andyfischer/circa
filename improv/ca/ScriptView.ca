@@ -11,6 +11,7 @@ state interpreter = make_interpreter()
 state interpreter_stopped = false
 state state_frozen = false
 state number timeWhenFrozen = 0
+state bool consumedMouseDown = false
 
 state codeBrowser = null
 
@@ -99,11 +100,15 @@ if msg[0] == 'onPaintEvent'
     if codeBrowser != null
         codeBrowser.draw(painter)
 
+
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
 
     handled = false
     action = topButtons.input(event)
+
+    if action != null
+        consumedMouseDown = true
 
     if action == :freezeState
         state_frozen = not(state_frozen)
@@ -124,6 +129,8 @@ elif msg[0] == 'onInputEvent'
         send('View' ['changeScreen' 'IntroScreen'])
     elif action == :browse
         codeBrowser = make_code_browser(userBranch)
+    elif action == :consumed
+        -- noop
     elif action != null
         print('action: ' action)
     else
@@ -132,7 +139,7 @@ elif msg[0] == 'onInputEvent'
         -- Block input events in Frozen state
 
         if not state_frozen
-            if event.is_mouse
+            if event.is_mouse and not consumedMouseDown
                 mousePos = event.mousePos
                 if event.eventType == MouseDown
                     keysDown.add(:mouse1)
@@ -144,6 +151,10 @@ elif msg[0] == 'onInputEvent'
                     keysDown.add(en)
                 else
                     keysDown.remove(en)
+
+    if event.eventType == MouseUp
+        consumedMouseDown = false
+
 elif msg[0] == 'timeUpdate'
     time = msg[1] -> number
 
