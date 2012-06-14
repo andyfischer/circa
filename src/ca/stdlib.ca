@@ -367,13 +367,9 @@ type Point_i { int x, int y }
 type Rect { number x1, number y1, number x2, number y2 }
 type Rect_i { int x1 int y1 int x2 int y2 }
 
-def Point.to_rect_center(self, Point size) -> Rect
-    size_half = (size * 0.5) -> Point
-    [self.x - size_half.x,
-        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
-
 def Point.magnitude(self) -> number
-    return sqrt(sqr(self.x) + sqr(self.y))
+    -- Return the magnitude of this point, or the distance to [0 0].
+    sqrt(sqr(self.x) + sqr(self.y))
 
 def Point.norm(self) -> Point
     -- Returns v normalized to be along the unit circle.
@@ -382,19 +378,44 @@ def Point.norm(self) -> Point
 
 def Point.perpendicular(self) -> Point
     -- Returns a vector that is perpendicular to self, rotated clockwise.
-    [v.y -v.x]
+    [self.y -self.x]
+
+def Point.to_rect_center(self, Point size) -> Rect
+    -- Returns a Rect with this point as the center, and 'size' as the width & height.
+    size_half = (size * 0.5) -> Point
+    [self.x - size_half.x,
+        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
+
+def Point.delta(self) -> Point
+    -- Stateful function, returns the point difference since the last frame.
+    state Point prev = self
+    result = [self.x - prev.x, self.y - prev.y]
+    prev = self
+    result
+
+def Point.distance(self, Point b) -> number
+    -- Returns the distance between self and b.
+    sqrt(sqr(self.x - b.x) + sqr(self.y - b.y))
+
+def Point.rotate(self, number rotation) -> Point
+    -- Return the point rotated around [0 0] by the given angle.
+    [self.x*cos(rotation) - self.y*sin(rotation), self.x*sin(rotation)+self.y*cos(rotation)]
 
 def Rect.width(self) -> number
     self.x2 - self.x1
 def Rect.height(self) -> number
     self.y2 - self.y1
 def Rect.topleft(self) -> Point
+    -- Returns the top-left coordinates as a Point.
     [self.x1 self.y1]
 def Rect.topright(self) -> Point
+    -- Returns the top-rigth coordinates as a Point.
     [self.x2 self.y1]
 def Rect.bottomleft(self) -> Point
+    -- Returns the bottom-left coordinates as a Point.
     [self.x1 self.y2]
 def Rect.bottomright(self) -> Point
+    -- Returns the bottom-right coordinates as a Point.
     [self.x2 self.y2]
 
 def Rect.intersects(self, Rect b) -> bool
@@ -469,7 +490,7 @@ def magnitude(Point point) -> number
 
 def point_distance(Point a, Point b) -> number
     -- Returns the distance between a and b.
-    return sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
+    sqrt(sqr(a.x - b.x) + sqr(a.y - b.y))
 
 def rotate_point(Point p, number rotation) -> Point
     -- Rotate p around [0,0] by the given angle.

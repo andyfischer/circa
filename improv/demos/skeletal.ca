@@ -2,13 +2,7 @@
 env = input() -> ScriptContext
 mouse = env.mouse
 
-def Point.to_rect_center(self, Point size) -> Rect
-    size_half = (size * 0.5) -> Point
-    [self.x - size_half.x,
-        self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
-
 env.background(#000)
-
 
 type JointDef {
     Point rel
@@ -50,9 +44,12 @@ action = :none
 
 if env.mouse_pressed and skel.size == 0
     action = :add_joint
-
-if env.key_pressed(:a)
+elif env.mouse_pressed
+    action = :select
+elif env.key_pressed(:a)
     action = :add_joint
+elif env.mouse_down and selectedJoint != -1
+    action = :drag
 
 if action == :add_joint
     if skel.size == 0
@@ -64,6 +61,26 @@ if action == :add_joint
         parent = selectedJoint
         parent_pivot = pivots[parent]
         skel.addJoint(env.mouse - parent_pivot, parent)
+
+elif action == :select
+    
+    closestDistance = 0.0
+
+    closest = -1
+    selectDistance = 10.0
+
+    index = 0
+    for Point pivot in pivots
+        dist = point_distance(pivot env.mouse)
+
+        if dist < selectDistance and (closest == -1 or dist < selectDistance)
+            closest = index
+            closestDistance = dist
+        index += 1
+
+    selectedJoint = closest
+elif action == :drag
+    skel.joints[selectedJoint].rel += env.mouse.delta
 
 pivots = skel.getPivots()
 
