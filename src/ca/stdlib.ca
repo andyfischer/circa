@@ -371,16 +371,11 @@ def Rect.width(self) -> number
     self.x2 - self.x1
 def Rect.height(self) -> number
     self.y2 - self.y1
+def Rect.topleft(self) -> Point
+    [self.x1 self.y1]
+
 def Rect.intersects(self, Rect b) -> bool
     -- Return whether the two rectangles intersect.
-    
-    {-
-    def unit_tests()
-        rect_intersects_rect([0 0 10 10] [1 1 2 2])
-        rect_intersects_rect([0 0 2 1] [1 0 3 1])
-        rect_intersects_rect([1 0 3 1] [0 0 2 1])
-    -}
-
     intersects_on_x = (self.x2 > b.x1) and (b.x2 > self.x1)
     intersects_on_y = (self.y2 > b.y1) and (b.y2 > self.y1)
     return intersects_on_x and intersects_on_y

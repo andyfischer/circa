@@ -1,39 +1,34 @@
 
-type Point2 {
-    float x
-    float y
-}
-
 type Brush :handle;
 def create_brush(Color c) -> Brush
-def Brush.setColor(_, Color c)
+def Brush.setColor(self, Color c)
 
 type Pen :handle;
 def create_pen(Color c, number width, Name style) -> Pen
-def Pen.setColor(_, Color color)
-def Pen.setWidth(_, number width)
-def Pen.setStyle(_, Name style)
-def Pen.setDashPattern(_, List dashes)
+def Pen.setColor(self, Color color)
+def Pen.setWidth(self, number width)
+def Pen.setStyle(self, Name style)
+def Pen.setDashPattern(self, List dashes)
 
 type PaintEvent :handle;
 
 type FontMetrics :handle;
-def FontMetrics.width(_, String text) -> number
-def FontMetrics.height(_) -> number
+def FontMetrics.width(self, String text) -> number
+def FontMetrics.height(self) -> number
 
 type Font :handle;
 def create_font(String name, number size) -> Font
-def Font.setPixelSize(_, number size)
-def Font.fontMetrics(_) -> FontMetrics
+def Font.setPixelSize(self, number size)
+def Font.fontMetrics(self) -> FontMetrics
 
 type PainterPath :handle;
-def PainterPath.moveTo(_, Point2 p)
-def PainterPath.cubicTo(_, Point2 a, Point2 b, Point2 c)
-def PainterPath.addText(_, Point2 p, Font f, String text)
+def PainterPath.moveTo(self, Point p)
+def PainterPath.cubicTo(self, Point a, Point b, Point c)
+def PainterPath.addText(self, Point p, Font f, String text)
 
 type LinearGradient :handle;
-def create_linear_gradient(Point2 start, Point2 stop) -> LinearGradient
-def LinearGradient.setColorAt(_, number ratio, Color c)
+def create_linear_gradient(Point start, Point stop) -> LinearGradient
+def LinearGradient.setColorAt(self, number ratio, Color c)
 
 -- Alignment flags
 AlignLeft = 1
@@ -45,23 +40,26 @@ AlignBottom = 64
 AlignVCenter = 128
 
 type Painter;
-def Painter.save(_)
-def Painter.restore(_)
-def Painter.setBackground(_, Brush)
-def Painter.setBrush(_, Brush)
-def Painter.setFont(_, Font)
-def Painter.setColor(_, Color)
-def Painter.setPen(_, Pen)
-def Painter.rotate(_, number radians)
-def Painter.translate(_, Point2 delta)
-def Painter.boundingRect(_, Rect rect, int flags, String text) -> Rect
-def Painter.drawEllipse(_, Rect r)
-def Painter.drawText(_, Rect r, int flags, String text) -> Rect
-def Painter.drawLine(_, Point2 a, Point2 b)
-def Painter.drawRect(_, Rect r)
-def Painter.drawPath(_, PainterPath path)
-def Painter.drawPolygon(_, List points, Color c)
-def Painter.drawRoundRect(_, Rect r)
-def Painter.fillRect(_, Rect r, Color c)
-def Painter.fontMetrics(_) -> FontMetrics
-def Painter.viewport(_) -> Rect
+def Painter.save(self)
+def Painter.restore(self)
+def Painter.setBackground(self, Brush)
+def Painter.setBrush(self, Brush)
+def Painter.setFont(self, Font)
+def Painter.setColor(self, Color)
+def Painter.setPen(self, Pen)
+def Painter.rotate(self, number radians)
+def Painter.translate(self, Point delta)
+def Painter.boundingRect(self, Rect rect, int flags, String text) -> Rect
+def Painter.drawEllipse(self, Rect r)
+def Painter.drawText(self, Rect r, int flags, String text) -> Rect
+def Painter.drawLine(self, Point a, Point b)
+def Painter.drawRect(self, Rect r)
+def Painter.drawPath(self, PainterPath path)
+def Painter.drawPolygon(self, List points, Color c)
+def Painter.drawRoundRect(self, Rect r)
+def Painter.fillRect(self, Rect r, Color c)
+def Painter.fontMetrics(self) -> FontMetrics
+def Painter.viewport(self) -> Rect
+
+def Painter.setFontDefaultFixedWidth(@self)
+    self.setFont(create_font("Courier", 12))

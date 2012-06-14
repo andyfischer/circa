@@ -20,34 +20,58 @@
 
 -}
 
+type LayoutTerm {
+    Term term
+    List position
+}
+
 type CodeBrowser {
-    Map termPositions
 
     Branch branch
     List filters
     List terms
 
-    Rect positionRect
+    List layoutTerms
+
+    Rect windowPosition
 }
 
 
-def CodeBrowser.updatePositions(@self)
-    self.termPositions = create(Map)
-    if self.branch.is_null
-        return
-
+def CodeBrowser.updateLayout(@self)
+    
     curY = 0
-    for Term term in self.terms
-        self.termPositions.set(term, [0 curY])
 
+    self.layoutTerms = for Term term in self.terms
 
+        position = [0 curY]
+        curY += 1
 
-def CodeBrowser.draw(Painter painter)
+        LayoutTerm([term position])
+
+def CodeBrowser.setPosition(@self, Rect rect)
+    self.windowPosition = rect
+
+def CodeBrowser.draw(self, Painter painter)
+    -- Enable a fixed width font
+    painter.setFontDefaultFixedWidth()
+
+    -- Find the font's dimensions
+    metrics = painter.fontMetrics
+    letterSize = [metrics.width('A') metrics.height]
+
+    for LayoutTerm lterm in self.layoutTerms
+        term = lterm.term
+        pos = lterm.position
+
+        screenPos = [pos[0] * metrics.x, pos[1] * metrics.y]
+        add(@screenPos, self.windowPosition.topleft)
+
+        painter.drawText([screenPos.x screenPos.y 1000 1000] 0 term.to_source_string)
 
 def make_code_browser(Branch branch) -> CodeBrowser
     browser = create(CodeBrowser)
     browser.branch = branch
     browser.terms = branch.terms
-    browser.updatePositions()
+    browser.updateLayout()
     return browser
 
