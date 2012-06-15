@@ -1,9 +1,5 @@
 
--- Global context, will probably make this implicit in the future.
-env = input() -> ScriptContext
-time = env.time
-mouse = env.mouse
-bounds = env.bounds
+env = input() -> Environment
 time = env.time
 time_delta = delta(time)
 
@@ -27,10 +23,10 @@ type Bullet {
 
 -- Return a point that is wrapped around the playable area
 def wrap_around(Point p) -> Point
-    return [mod(p.x, bounds.x), mod(p.y, bounds.y)]
+    return [mod(p.x, env.bounds.x), mod(p.y, env.bounds.y)]
 
 def new_ship() -> Ship
-    return Ship([[env.bounds.x/2, bounds.y/2] [0 0] 0])
+    return Ship([[env.bounds.x/2, env.bounds.y/2] [0 0] 0])
 
 state Ship ship = new_ship()
 state List bullets = []

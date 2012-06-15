@@ -1,5 +1,5 @@
 
-env = input() -> ScriptContext
+env = input() -> Environment
 mouse = env.mouse
 
 env.background(#000)

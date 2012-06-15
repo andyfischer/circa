@@ -2,6 +2,7 @@
 Top 5 worst issues
   - Type inference fails when using add_s or add_v
   - Improv sometimes fails to reload
+  - Syntax errors don't show up as errors
 
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)
@@ -25,6 +26,9 @@ Parser
 
   Can't use comments inside type declaraion?
 
+Modules
+  When compiling a module, the last value is automatically turned into an output (just
+    like a function). This should probably be explicit for modules.
 
 Code modification
   Code modification should go through a more controlled path.

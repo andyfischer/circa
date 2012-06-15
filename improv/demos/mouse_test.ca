@@ -1,9 +1,8 @@
 
-env = input() -> ScriptContext
+env = input() -> Environment
 time = env.time
 mouse = env.mouse
 bounds = env.bounds
-time = env.time
 
 env.draw_poly([[0 0] [100 0] [0 100]] #f00)
 

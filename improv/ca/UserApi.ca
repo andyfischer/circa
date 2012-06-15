@@ -1,61 +1,61 @@
 
-type ScriptContext {
+type Environment {
     Painter painter
     Point mouse
     number time
     Set keysDown
 }
 
-def ScriptContext.background(self, Color color)
+def Environment.background(self, Color color)
     self.painter.fillRect(self.painter.viewport + [0 0 1 1], color)
 
-def ScriptContext.fill_rect(self, Rect rect, Color color)
+def Environment.fill_rect(self, Rect rect, Color color)
     self.painter.fillRect(rect, color)
 
-def ScriptContext.draw_line(self, Point a, Point b, Color color)
+def Environment.draw_line(self, Point a, Point b, Color color)
     self.painter.setColor(color)
     self.painter.drawLine(a,b)
-def ScriptContext.draw_lines(self, List lines, Color color)
+def Environment.draw_lines(self, List lines, Color color)
     self.painter.setColor(color)
     for i in 0..(lines.length - 1)
         self.painter.drawLine(lines[i], lines[i + 1])
-def ScriptContext.draw_line_loop(self, List lines, Color color)
+def Environment.draw_line_loop(self, List lines, Color color)
     self.painter.setColor(color)
     for i in 0..(lines.length - 1)
         self.painter.drawLine(lines[i], lines[i + 1])
     self.painter.drawLine(lines[lines.length - 1], lines[0])
-def ScriptContext.draw_circle(self, Point center, number radius, Color color)
+def Environment.draw_circle(self, Point center, number radius, Color color)
     self.painter.setColor(color)
     self.painter.drawEllipse([center.x - radius, center.y - radius,
         center.x + radius, center.y + radius])
-def ScriptContext.draw_points(self, List points, Color color)
+def Environment.draw_points(self, List points, Color color)
     self.painter.setColor(color)
     for Point point in points
         self.painter.drawRect([point.x point.y point.x+1 point.y+1])
 
-def ScriptContext.draw_text(self, Rect rect, int flags, String msg, Color color)
+def Environment.draw_text(self, Rect rect, int flags, String msg, Color color)
     self.painter.setColor(color)
     self.painter.drawText(rect, flags, msg)
 
-def ScriptContext.draw_poly(self, List points, Color color)
+def Environment.draw_poly(self, List points, Color color)
     self.painter.drawPolygon(points, color)
 
-def ScriptContext.key_down(self, Name key) -> bool
+def Environment.key_down(self, Name key) -> bool
     self.keysDown.contains(key)
 
-def ScriptContext.key_pressed(self, Name key) -> bool
+def Environment.key_pressed(self, Name key) -> bool
     down = self.keysDown.contains(key)
     state wasDown = down
     result = down and not wasDown
     wasDown = down
     return result
 
-def ScriptContext.mouse_down(self) -> bool
+def Environment.mouse_down(self) -> bool
     self.keysDown.contains(:mouse1)
-def ScriptContext.bounds(self) -> Point
+def Environment.bounds(self) -> Point
     [self.painter.viewport.width, self.painter.viewport.height]
 
-def ScriptContext.mouse_pressed(self) -> bool
+def Environment.mouse_pressed(self) -> bool
     state bool mouse_was_down = false
     result = false
     
@@ -67,7 +67,7 @@ def ScriptContext.mouse_pressed(self) -> bool
 
     return result
 
-def ScriptContext.mouse_clicked(self) -> bool
+def Environment.mouse_clicked(self) -> bool
     state bool mouse_was_down = false
     result = false
 
@@ -79,6 +79,6 @@ def ScriptContext.mouse_clicked(self) -> bool
 
     return result
     
-def ScriptContext.elapsed(self) -> number
+def Environment.elapsed(self) -> number
     state time_started = self.time
     return self.time - time_started

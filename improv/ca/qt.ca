@@ -63,3 +63,4 @@ def Painter.viewport(self) -> Rect
 
 def Painter.setFontDefaultFixedWidth(@self)
     self.setFont(create_font("Courier", 12))
+

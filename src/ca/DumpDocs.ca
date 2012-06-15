@@ -1,6 +1,7 @@
 
 type Writer {
     bool needsComma
+    List output
 }
 
 def to_json_string(any i) -> String
@@ -16,12 +17,20 @@ def to_json_string(any i) -> String
     else
         return concat('"' to_string(i) '"')
 
+def Writer.start(@self)
+    self.output = ['[']
+    self.needsComma = false
+def Writer.finish(@self)
+    self.output.append(']\n')
+def Writer.save(self, String filename)
+    write_text_file(filename, self.output.join("\n"))
+
 def Writer.write(@self, any args :multiple)
     if self.needsComma
-        print(',')
+        self.output.append(',')
         self.needsComma = false
     
-    print(args.join(''))
+    self.output.append(args.join(''))
 
 def Writer.dump_function(@self, Branch func)
     self.write('{')
@@ -55,14 +64,23 @@ def Writer.dump_type(@self, Type t)
     self.write('}')
     self.needsComma = true
 
-print('[')
+def Writer.dump_module(@self, Branch b)
+    for Term t in b.terms
+        if t.is_function
+            self.dump_function(t.contents)
+        elif t.is_type
+            self.dump_type(t.value)
+
 writer = create(Writer)
-items = for t in reflect:kernel().terms
-    Term(@t)
+writer.start
+writer.dump_module(reflect:kernel())
+writer.finish
+writer.save('circa.docs.json')
 
-    if t.is_function
-        writer.dump_function(t.contents)
-    elif t.is_type
-        writer.dump_type(t.value)
-
-print(']')
+writer.start
+writer.dump_module(load_script('improv/ca/qt.ca'))
+writer.dump_module(load_script('improv/ca/InputEvent.ca'))
+writer.dump_module(load_script('improv/ca/UIHelper.ca'))
+writer.dump_module(load_script('improv/ca/UserApi.ca'))
+writer.finish
+writer.save('improv.docs.json')

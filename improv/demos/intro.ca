@@ -1,11 +1,7 @@
 
--- Global context, will probably make this implicit in the future.
-env = input() -> ScriptContext
+env = input() -> Environment
 time = env.time
-mouse = env.mouse
 bounds = env.bounds
-time = env.time
-time_delta = delta(time)
 
 env.background(#756a95)
 

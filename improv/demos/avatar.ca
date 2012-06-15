@@ -1,5 +1,5 @@
 
-env = input() -> ScriptContext
+env = input() -> Environment
 
 def Point.to_rect_center(self, Point size) -> Rect
     size_half = (size * 0.5) -> Point

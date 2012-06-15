@@ -298,6 +298,8 @@ def Term.parent(self) -> Branch
 def Term.contents(self) -> Branch
     -- Fetch the nested Branch contents of this Term. The format and the meaning
     -- of these contents is dictated by the term's function.
+def Term.is_null(self) -> bool
+    -- Returns whether this is a null Term reference.
 def Term.name(self) -> String
     -- Return this term's local name. May be blank.
 def Term.to_string(self) -> String
@@ -323,16 +325,16 @@ def Term.global_id(self) -> int
 def Term.properties(self) -> Map
 def Term.property(self, String) -> any
     -- Fetch a term property by name.
+def Term.is_value(self) -> bool
+    self.function == branch_ref(value)
 def Term.is_function(self) -> bool
-    is_function(self.value)
+    self.is_value and is_function(self.value)
 def Term.is_type(self) -> bool
-    is_type(self.value)
+    self.is_value and is_type(self.value)
 def Term.is_input_placeholder(self) -> bool
     self.function == branch_ref(input_placeholder)
 def Term.is_comment(self) -> bool
     self.function == branch_ref(comment)
-def Term.is_value(self) -> bool
-    self.function == branch_ref(value)
 
 -- workaround, these functions currently need to be declared after Term:
 def Branch.name(self) -> String

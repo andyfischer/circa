@@ -133,6 +133,11 @@ void Branch__outputs(caStack* stack)
 void Branch__owner(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL) {
+        set_term_ref(circa_output(stack, 0), NULL);
+        return;
+    }
+
     set_term_ref(circa_output(stack, 0), branch->owningTerm);
 }
 
@@ -509,6 +514,11 @@ void Term__contents(caStack* stack)
     }
     set_branch(circa_output(stack, 0), t->nestedContents);
 }
+void Term__is_null(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    set_bool(circa_output(stack, 0), t == NULL);
+}
 
 void Term__source_location(caStack* stack)
 {
@@ -613,6 +623,7 @@ void metaprogramming_install_functions(Branch* kernel)
         {"Term.num_inputs", Term__num_inputs},
         {"Term.parent", Term__parent},
         {"Term.contents", Term__contents},
+        {"Term.is_null", Term__is_null},
         {"Term.source_location", Term__source_location},
         {"Term.location_string", Term__location_string},
         {"Term.global_id", Term__global_id},

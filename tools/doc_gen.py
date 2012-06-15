@@ -1,13 +1,21 @@
 
-DocsDump = 'docs.json'
 DestinationDocs = 'gh-pages/docs'
 DestinationIncludes = 'gh-pages/_includes/docs'
 
 import json,math
 
+everyEntry = []
+
 # Load dumped data
-docsDumpString = open(DocsDump).read()
-everyEntry = json.loads(docsDumpString)
+def load_json_file(filename):
+    return json.loads(open(filename).read())
+
+for entry in load_json_file('circa.docs.json'):
+    entry['source'] = 'circa'
+    everyEntry.append(entry)
+for entry in load_json_file('improv.docs.json'):
+    entry['source'] = 'improv'
+    everyEntry.append(entry)
 
 # Correlate data
 termToEntry = {}
@@ -24,26 +32,44 @@ improv_allFunctions = {'title':'All functions','name':'improv_functions','items'
 improvCategory = {'title':'Improv',
     'type':'Category',
     'subcategories': [improv_allTypes, improv_allFunctions]}
-#majorCategories = [circaCategory, improvCategory]
-majorCategories = [circaCategory]
+majorCategories = [circaCategory, improvCategory]
 
-for title in [ #['Color', 'color_tag'],
+for title in [
+        '#circa',
         'Containers',
         'Internal',
-        'Logical',
+        'Logic',
         'Math',
         'Randomness',
-        'Reflection', 'Stateful', 'Uncategorized']:
+        'Reflection',
+        'Stateful',
+        ['Uncategorized', 'core_Uncategorized'],
+        '#improv',
+        'Drawing',
+        'Environment',
+        'Input',
+        'Text',
+        'UI Widgets',
+        ['Uncategorized', 'improv_Uncategorized']
+        ]:
 
-    if isinstance(title, list):
+
+    if type(title) == list:
         name = title[1]
         title = title[0]
     else:
         name = title
 
-    category = {'title':title, 'name':name, 'items':[]}
-    circaCategory['subcategories'].append(category)
+    if title == '#circa':
+        majorCategory = circaCategory
+        continue
+    elif title == '#improv':
+        majorCategory = improvCategory
+        continue
 
+    name = name.replace(' ', '_')
+    category = {'title':title, 'name':name, 'items':[]}
+    majorCategory['subcategories'].append(category)
     nameToEntry[category['name']] = category
 
 def everySubCategory():
@@ -53,10 +79,21 @@ def everySubCategory():
 
 
 for entry in everyEntry:
+
+    # Append to All Functions or All Types
     if entry['type'] == 'Function':
-        circa_allFunctions['items'].append(entry)
+        if entry['source'] == 'circa':
+            category = circa_allFunctions
+        else:
+            category = improv_allFunctions
+
+        category['items'].append(entry)
     elif entry['type'] == 'Type':
-        circa_allTypes['items'].append(entry)
+        if entry['source'] == 'circa':
+            category = circa_allTypes
+        else:
+            category = improv_allTypes
+        category['items'].append(entry)
 
     # Assign derived data
 
@@ -74,6 +111,8 @@ for entry in everyEntry:
         nameForUrl = 'type_func'
     elif entry['name'] == 'rect':
         nameForUrl = 'rect_func'
+    elif entry['name'] == 'button':
+        nameForUrl = 'button_func'
 
     entry['title'] = entry['name']
     entry['filename'] = DestinationDocs + '/' + nameForUrl + '.md'
@@ -198,6 +237,8 @@ def addNamesToCategory(nameList, categoryName):
         entry = nameToEntry[name]
         addToCategory(entry, category)
 
+# Sort items into categories
+
 #addNamesToCategory(['Color','blend_color','random_color','hsv_to_rgb'], 'color_tag')
 #addNamesToCategory(['darken','lighten'], 'color_tag')
 
@@ -206,7 +247,7 @@ addNamesToCategory(['seed','random_color','random_element','random_norm_vector']
 
 addNamesToCategory(['abs','add','div','sub','ceil'], 'Math')
 addNamesToCategory(['arcsin', 'arccos', 'arctan', 'average', 'bezier3', 'bezier4'], 'Math')
-addNamesToCategory(['floor', 'log', 'magnitude', 'norm'], 'Math')
+addNamesToCategory(['floor', 'log', 'magnitude'], 'Math')
 addNamesToCategory(['max','min','mod'], 'Math')
 addNamesToCategory(['mult', 'neg','pow','rand','seed'], 'Math')
 addNamesToCategory(['sin', 'sqr', 'sqrt', 'cos','tan','rotate_point','round'], 'Math')
@@ -214,13 +255,13 @@ addNamesToCategory(['remainder','clamp','polar', 'point_distance'], 'Math')
 addNamesToCategory(['smoothstep','smootherstep'], 'Math')
 addNamesToCategory(['div_f','div_i','div_s'], 'Math')
 addNamesToCategory(['Point','Point_i','Rect','Rect_i'], 'Math')
-addNamesToCategory(['smooth_in_out','cube','perpendicular'], 'Math')
+addNamesToCategory(['smooth_in_out','cube'], 'Math')
 addNamesToCategory(['rand_i','rand_range','random_norm_vector'], 'Math')
 
-addNamesToCategory(['equals','not_equals','greater_than', 'greater_than_eq'], 'Logical')
-addNamesToCategory(['less_than','less_than_eq'], 'Logical')
-addNamesToCategory(['and','or','not'], 'Logical')
-addNamesToCategory(['cond','any_true'], 'Logical')
+addNamesToCategory(['equals','not_equals','greater_than', 'greater_than_eq'], 'Logic')
+addNamesToCategory(['less_than','less_than_eq'], 'Logic')
+addNamesToCategory(['and','or','not'], 'Logic')
+addNamesToCategory(['cond','any_true'], 'Logic')
 
 addNamesToCategory(['Dict','Set','List','list','set'], 'Containers')
 
@@ -250,6 +291,16 @@ addNamesToCategory(['make_interpreter','overload:get_contents'], 'Reflection')
 addNamesToCategory(['lookup_branch_ref','branch_ref','term_ref'], 'Reflection')
 addNamesToCategory(['is_overloaded_func'], 'Reflection')
 
+addNamesToCategory(['Button', 'ButtonBar','button','button_bar'], 'UI_Widgets')
+addNamesToCategory(['Painter', 'PainterPath','PaintEvent','Pen'], 'Drawing')
+addNamesToCategory(['Brush','create_brush','create_linear_gradient'], 'Drawing')
+addNamesToCategory(['Environment'], 'Environment')
+addNamesToCategory(['InputEvent'], 'Input')
+addNamesToCategory(['keycode_to_name'], 'Input')
+addNamesToCategory(['Font','FontMetrics','create_font'], 'Text')
+addNamesToCategory(['Painter.drawText','Painter.setFont'], 'Text')
+
+
 # For any overloaded function in a category, add its overloads to the same category
 for entry in everyEntry:
     for overload in entry['overloadEntries']:
@@ -263,10 +314,15 @@ for entry in everyEntry:
             addToCategory(method, category)
 
 # Anything uncategorized goes in Uncategorized
-uncategorizedCategory = nameToEntry['Uncategorized']
 for entry in everyEntry:
     if not entry['belongsToCategories']:
-        uncategorizedCategory['items'].append(entry)
+
+        if entry['source'] == 'circa':
+            category = nameToEntry['core_Uncategorized']
+        else:
+            category = nameToEntry['improv_Uncategorized']
+
+        category['items'].append(entry)
 
 # Insert the Index page
 indexEntry = {'title':'API Documentation', 'name':'index',
@@ -309,7 +365,11 @@ def getHTMLForAlphebetizedEntryList(items):
 
         buckets[letter].append(item)
 
-    for letter,items in buckets.items():
+    letters = buckets.keys()
+    letters.sort()
+
+    for letter in letters:
+        items = buckets[letter]
         out.append("<p>" + letter + "</p>")
         out.append("")
         out.append("<p>")
@@ -477,6 +537,8 @@ def writeLeftBar():
         for subcategory in majorCategory['subcategories']:
             out.append('  <p><h3>' + subcategory['linkHtml'] + '</h3></p>')
 
+    out.append('<br>')
+    out.append('<br>')
     out.append('</div>')
 
     return out

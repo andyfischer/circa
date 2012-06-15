@@ -68,18 +68,18 @@ if msg[0] == 'onPaintEvent'
 
     if not(userBranch.is_null) and not(interpreter_stopped)
 
-        usersContext = create(ScriptContext)
-        usersContext.painter = painter
-        usersContext.mouse = mousePos
-        usersContext.keysDown = keysDown
+        usersEnv = create(Environment)
+        usersEnv.painter = painter
+        usersEnv.mouse = mousePos
+        usersEnv.keysDown = keysDown
 
         if state_frozen
-            usersContext.time = timeWhenFrozen - timeShift
+            usersEnv.time = timeWhenFrozen - timeShift
         else
-            usersContext.time = time - timeShift
+            usersEnv.time = time - timeShift
 
         interpreter.reset
-        interpreter.push_frame(userBranch, [usersContext])
+        interpreter.push_frame(userBranch, [usersEnv])
         interpreter.set_state_input(userState)
         interpreter.run
 
