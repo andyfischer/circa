@@ -33,7 +33,12 @@ def Environment.draw_points(self, List points, Color color)
     for Point point in points
         self.painter.drawRect([point.x point.y point.x+1 point.y+1])
 
-def Environment.draw_text(self, Rect rect, int flags, String msg, Color color)
+def Environment.draw_text(self, Point loc, int flags, String msg, Color color)
+    self.painter.setColor(color)
+    bounds = self.bounds
+    self.painter.drawText([loc.x loc.y bounds.x bounds.y], flags, msg)
+
+def Environment.draw_text_in_rect(self, Rect rect, int flags, String msg, Color color)
     self.painter.setColor(color)
     self.painter.drawText(rect, flags, msg)
 

@@ -17,10 +17,16 @@ def keycode_to_name(int key) -> Name
         return :space
     elif key == 65
         return :a
+    elif key == 66
+        return :b
     elif key == 67
         return :c
     elif key == 69
         return :d
+    elif key == 70
+        return :e
+    elif key == 80
+        return :p
     elif key == 81
         return :q
     elif key == 83

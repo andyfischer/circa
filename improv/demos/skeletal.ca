@@ -10,21 +10,27 @@ type JointDef {
     List children
 }
 
-type SkeletonDef {
-    List joints
+type SkeletonPose {
+    List jointRotations
+}
+type PoseList {
+    List poses
 }
 
-type JointPos {
-    number rotation
+type Skeleton {
+    List jointDefs
+    PoseList poseList
+    int currentPose
 }
 
-def SkeletonDef.size(self) -> int
-    self.joints.length
-def SkeletonDef.addJoint(@self, Point rel, int parent)
-    self.joints.append(JointDef([rel parent []]))
-def SkeletonDef.getPivots(@self) -> List
+
+def Skeleton.jointCount(self) -> int
+    self.jointDefs.length
+def Skeleton.addJoint(@self, Point rel, int parent)
+    self.jointDefs.append(JointDef([rel parent []]))
+def Skeleton.getPivots(@self) -> List
     pivots = []
-    for JointDef joint in self.joints
+    for JointDef joint in self.jointDefs
         if joint.parent == -1
             pivot = joint.rel
         else
@@ -34,22 +40,38 @@ def SkeletonDef.getPivots(@self) -> List
 
     pivots
 
-state SkeletonDef skel
+state Skeleton skel
 state int selectedJoint
+state mode = :building
+state PoseList poseList
+
+--skeleton = Skeleton([skel poseList
+
 
 pivots = skel.getPivots()
 
--- Handle input, figure out action
+-- Handle input, figure out the next action
 action = :none
 
-if env.mouse_pressed and skel.size == 0
-    action = :add_joint
-elif env.mouse_pressed
-    action = :select
-elif env.key_pressed(:a)
-    action = :add_joint
-elif env.mouse_down and selectedJoint != -1
-    action = :drag
+if env.key_pressed(:p)
+    action = :posing
+elif env.key_pressed(:b)
+    action = :building
+
+elif mode == :building
+    if env.mouse_pressed and skel.jointCount == 0
+        action = :add_joint
+    elif env.mouse_pressed
+        action = :select
+    elif env.key_pressed(:a)
+        action = :add_joint
+    elif env.mouse_down and selectedJoint != -1
+        action = :drag
+elif mode == :posing
+    if env.mouse_pressed
+        action = :select
+    elif env.mouse_down and selectedJoint != -1
+        action = :drag_pose
 
 if action == :add_joint
     if skel.size == 0
@@ -67,26 +89,38 @@ elif action == :select
     closestDistance = 0.0
 
     closest = -1
-    selectDistance = 10.0
+    c_selectDistance = 10.0
 
     index = 0
     for Point pivot in pivots
         dist = point_distance(pivot env.mouse)
 
-        if dist < selectDistance and (closest == -1 or dist < selectDistance)
+        if dist < c_selectDistance and (closest == -1 or dist < c_selectDistance)
             closest = index
             closestDistance = dist
         index += 1
 
     selectedJoint = closest
 elif action == :drag
-    skel.joints[selectedJoint].rel += env.mouse.delta
+    skel.jointDefs[selectedJoint].rel += env.mouse.delta
+elif action == :posing
+    mode = :posing
+elif action == :building
+    mode = :building
 
 pivots = skel.getPivots()
 
 -- Draw
+
+modeLabel = if mode == :building
+                "Building"
+            else
+                "Posing"
+
+-- env.draw_text([10, env.bounds.y - 20] 0, modeLabel, #fff)
+
 index = 0
-for JointDef joint in skel.joints
+for JointDef joint in skel.jointDefs
     pivot = pivots[index] -> Point
     size = 4
     if index == selectedJoint

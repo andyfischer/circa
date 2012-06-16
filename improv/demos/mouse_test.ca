@@ -69,5 +69,5 @@ for star in stars
 
 -- Draw some text showing the mouse position
 env.setColor(#fff)
-env.draw_text([10, bounds.y - 40, bounds.x, bounds.y] 0, concat("Mouse location: " mouse.x ' ' mouse.y))
-env.draw_text([10, bounds.y - 20, bounds.x, bounds.y] 0, concat("Pressed: " mouse.pressed))
+env.draw_text([10, bounds.y - 40] 0, concat("Mouse location: " mouse.x ' ' mouse.y))
+env.draw_text([10, bounds.y - 20] 0, concat("Pressed: " mouse.pressed))
