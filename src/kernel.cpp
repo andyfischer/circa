@@ -227,16 +227,22 @@ void dynamic_method_call(caStack* stack)
     // No method found. Fall back to a field access. This is deprecated behavior.
     if (is_list_based_type(object->value_type)) {
         int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
-        if (fieldIndex == -1) {
-            set_null(circa_output(stack, 0));
-            return;
+        if (fieldIndex != -1) {
+            caValue* element = get_index(object, fieldIndex);
+            if (element != NULL) {
+                copy(element, circa_output(stack, 0));
+                return;
+            }
         }
-        caValue* element = get_index(object, fieldIndex);
-        if (element == NULL)
-            set_null(circa_output(stack, 0));
-        else
-            copy(element, circa_output(stack, 0));
     }
+
+    // Method not found (nor was a field found). Raise error.
+    std::string msg;
+    msg += "Method ";
+    msg += functionName;
+    msg += " not found on type ";
+    msg += name_to_string(circa_type_of(object)->name);
+    circa_output_error(stack, msg.c_str());
 }
 
 void send_func(caStack* stack)

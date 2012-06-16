@@ -44,8 +44,8 @@ a = 1.0; -a
 
 -- Methods
 'string'.length()
-create(Map).add(1,2)
-create(Map).add(1, 2)
+create(Map).set(1,2)
+create(Map).set(1, 2)
 create(Point).x = 1.0
 
 -- Rebinding
