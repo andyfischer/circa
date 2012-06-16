@@ -46,8 +46,8 @@ for title in [
         ['Uncategorized', 'core_Uncategorized'],
         '#improv',
         'Drawing',
-        'Environment',
-        'Input',
+        ['Environment', 'tag_Environment'],
+        ['Input', 'tag_Input'],
         'Text',
         'UI Widgets',
         ['Uncategorized', 'improv_Uncategorized']
@@ -294,9 +294,19 @@ addNamesToCategory(['is_overloaded_func'], 'Reflection')
 addNamesToCategory(['Button', 'ButtonBar','button','button_bar'], 'UI_Widgets')
 addNamesToCategory(['Painter', 'PainterPath','PaintEvent','Pen'], 'Drawing')
 addNamesToCategory(['Brush','create_brush','create_linear_gradient'], 'Drawing')
-addNamesToCategory(['Environment'], 'Environment')
-addNamesToCategory(['InputEvent'], 'Input')
-addNamesToCategory(['keycode_to_name'], 'Input')
+addNamesToCategory(['Environment.background',
+                    'Environment.draw_circle',
+                    'Environment.draw_line',
+                    'Environment.draw_line_loop',
+                    'Environment.draw_points',
+                    'Environment.draw_poly',
+                    ], 'Drawing')
+addNamesToCategory(['Environment'], 'tag_Environment')
+addNamesToCategory(['InputEvent'], 'tag_Input')
+addNamesToCategory(['Environment.key_down','Environment.key_pressed'], 'tag_Input')
+addNamesToCategory(['Environment.mouse_clicked','Environment.mouse_pressed'], 'tag_Input')
+addNamesToCategory(['Environment.mouse_down', 'tag_Input')
+addNamesToCategory(['keycode_to_name'], 'tag_Input')
 addNamesToCategory(['Font','FontMetrics','create_font'], 'Text')
 addNamesToCategory(['Painter.drawText','Painter.setFont'], 'Text')
 
@@ -350,6 +360,60 @@ for entry in everyEntry:
     everyFilename.add(filename)
     everyUrl.add(url)
 
+def sortItemsIntoColumnMajorRows(items, hints):
+    # Sort 'items' in a column-major order, then return the result as a list of rows.
+
+    MaxColumns = hints['MaxColumns']
+    PreferredLimitPerColumn = hints['PreferredLimitPerColumn']
+
+    columns = []
+
+    maxItemsPerColumn = 0
+
+    # If we can limit each column's length to the preferred limit, then minimize the
+    # number of columns.
+    if len(items) <= MaxColumns * PreferredLimitPerColumn:
+        maxItemsPerColumn = PreferredLimitPerColumn
+
+    else:
+        # Otherwise, use the max number of columns, and evenly balance the items per column
+        maxItemsPerColumn = int(math.ceil(1.0 * len(items) / MaxColumns))
+
+    for index in range(len(items)):
+        columnIndex = index / maxItemsPerColumn
+        if columnIndex >= len(columns):
+            columns.append([])
+        columns[columnIndex].append(items[index])
+
+    # Now resort the data into rows
+    rows = []
+    for i in range(maxItemsPerColumn):
+        row = []
+        rows.append(row)
+
+        for column in columns:
+            if i >= len(column):
+                continue
+
+            row.append(column[i])
+
+    return rows
+
+def getTableHTML(items, hints, tdContentFunc):
+    out = []
+
+    out.append('')
+    out.append('<table>')
+
+    for row in sortItemsIntoColumnMajorRows(items, hints):
+        out.append('  <tr>')
+        for item in row:
+            out.append('    <td>'+ tdContentFunc(item) + '</td>')
+        out.append('  </tr>')
+    out.append('</table>')
+    out.append('')
+    return out
+
 def getHTMLForAlphebetizedEntryList(items):
 
     out = []
@@ -374,6 +438,14 @@ def getHTMLForAlphebetizedEntryList(items):
         out.append("")
         out.append("<p>")
 
+        #tableHtml = getTableHTML(items,
+        #    {'MaxColumns':4, 'PreferredLimitPerColumn':0},
+        #    lambda item: item['linkHtml'])
+        # out.extend(tableHtml)
+
+        # Just a comma-separated list for now. Using tables looks bad when each
+        # section has different table dimensions.
+
         out.append(", ".join([item['linkHtml'] for item in items]))
 
         out.append("</p>")
@@ -390,40 +462,14 @@ def getTableHTMLForEntryList(items):
     
     out = []
 
-    # Enforce a maximum of 4 columns
-    MaxColumns = 4
-
-    PreferredLimitPerColumn = 10
-
-    columns = []
-
-    maxItemsPerColumn = 0
-
-    # If we can limit each column to 10 items or less, then minimize the column count
-    if len(items) <= MaxColumns * PreferredLimitPerColumn:
-        maxItemsPerColumn = PreferredLimitPerColumn
-
-    else:
-        # Otherwise, evenly balance the items per column
-        maxItemsPerColumn = int(math.ceil(1.0 * len(items) / MaxColumns))
-
-    for index in range(len(items)):
-        columnIndex = index / maxItemsPerColumn
-        if columnIndex >= len(columns):
-            columns.append([])
-        columns[columnIndex].append(items[index])
-
     out.append('')
     out.append('<table>')
 
-    for index in range(maxItemsPerColumn):
+    hints = {'MaxColumns':4, 'PreferredLimitPerColumn':10}
+
+    for row in sortItemsIntoColumnMajorRows(items, hints):
         out.append('  <tr>')
-        for column in columns:
-            if index >= len(column):
-                continue
-
-            item = column[index]
-
+        for item in row:
             if 'linkHtml' not in item:
                 print 'no linkHtml in', item['name']
                 continue
