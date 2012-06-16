@@ -640,7 +640,7 @@ void print_error_stack(Stack* stack, std::ostream& out)
         bool bottomFrame = frameIndex == (stack->numFrames - 1);
 
         if (frame->override) {
-            std::cout << "(override call) | ";
+            std::cout << "[native] | ";
             caValue* reg = get_frame_register_from_end(frame, 0);
             if (is_string(reg))
                 out << as_cstring(reg);

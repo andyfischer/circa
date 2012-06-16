@@ -24,7 +24,15 @@ Parser
     if something or
          something_else
 
-  Can't use comments inside type declaraion?
+  Can't use comments inside type declaration?
+
+  Problem with sigindent with this input: (else block not recognized?)
+
+      modeLabel = if mode == :building
+                    "Building"
+            else
+                "Posing"
+
 
 Modules
   When compiling a module, the last value is automatically turned into an output (just

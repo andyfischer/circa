@@ -1,0 +1,23 @@
+
+import Feedback
+
+def mySample()
+    a = 1
+
+    mylist = [a]
+    for a in @mylist
+        a = a
+
+    b = mylist[0]
+
+
+br = branch_ref(mySample)
+br.dump
+--print('a is ' br.find_term("a"))
+--print('b is ' br.find_term("b"))
+
+request = create(Request)
+request.target.term = br.find_term("b")
+request.desire = [:assign [2]]
+
+req = resolve_request(request)
