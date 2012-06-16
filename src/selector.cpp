@@ -2,6 +2,8 @@
 
 #include "common_headers.h"
 
+#include "evaluation.h"
+#include "kernel.h"
 #include "importing.h"
 #include "list.h"
 #include "selector.h"
@@ -11,6 +13,49 @@ namespace circa {
 void selector_prepend(caValue* selector, caValue* element)
 {
     copy(element, list_insert(selector, 0));
+}
+
+caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
+{
+    caValue* element = root;
+
+    for (int i=0; i < list_length(selector); i++) {
+
+        caValue* selectorElement = list_get(selector, i);
+
+        if (is_int(selectorElement)) {
+            int selectorIndex = as_int(selectorElement);
+
+            if (!is_list(element)) {
+                std::string msg;
+                msg += "Value is not indexable: ";
+                msg += to_string(element);
+                set_error_string(error, msg.c_str());
+                return NULL;
+            }
+
+            if (selectorIndex >= list_length(element)) {
+                std::stringstream msg;
+                msg << "Index ";
+                msg << selectorIndex;
+                if (list_length(selector) > 1)
+                    msg << " (in selector position " << i << ")";
+
+
+                msg << " is out of range";
+                set_error_string(error, msg.str().c_str());
+                return NULL;
+            }
+
+            element = get_index(element, selectorIndex);
+        }
+        else if (is_string(selectorElement))
+            element = get_field(element, as_cstring(selectorElement));
+        else
+            internal_error("Unrecognized selector element");
+    }
+
+    return element;
 }
 
 /*
@@ -46,9 +91,31 @@ void evaluate_selector(caStack* stack)
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
+void evaluate_get_with_selector(caStack* stack)
+{
+    caValue* root = circa_input(stack, 0);
+    caValue* selector = circa_input(stack, 1);
+
+    circa::Value error;
+
+    caValue* result = get_with_selector(root, selector, &error);
+
+    if (!is_null(&error)) {
+        copy(&error, circa_output(stack, 0));
+        raise_error(stack);
+        return;
+    }
+
+    copy(result, circa_output(stack, 0));
+}
+
 void selector_setup_funcs(Branch* kernel)
 {
-    import_function(kernel, evaluate_selector, "selector(any elements :multiple) -> Selector");
+    FUNCS.selector = 
+        import_function(kernel, evaluate_selector, "selector(any elements :multiple) -> Selector");
+    FUNCS.get_with_selector = 
+        import_function(kernel, evaluate_get_with_selector,
+            "get_with_selector(any object, Selector selector) -> any");
 }
 
 } // namespace circa

@@ -70,6 +70,7 @@ struct BuiltinFuncs {
     Term* for_func;
     Term* get_field;
     Term* get_index;
+    Term* get_with_selector;
     Term* if_block;
     Term* import;
     Term* imported_file;
@@ -97,6 +98,7 @@ struct BuiltinFuncs {
     Term* pack_state_list_n;
     Term* range;
     Term* return_func;
+    Term* selector;
     Term* set_index;
     Term* set_field;
     Term* sub;

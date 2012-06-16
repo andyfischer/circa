@@ -1772,6 +1772,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
     bool finished = false;
     while (!finished) {
 
+        Term* head = result.term;
         int startPosition = tokens.getPosition();
 
         // Check for a[0], array indexing.
@@ -1787,12 +1788,34 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
             tokens.consume(tok_RBracket);
 
-            Term* term = apply(branch, FUNCS.get_index, TermList(result.term, subscript));
+            // This code should result in a get_with_selector() call that uses a selector()
+            // expression. Create these terms if needed.
+
+            if (head->function != FUNCS.get_with_selector) {
+                Term* selector = apply(branch, FUNCS.selector, TermList(subscript));
+                Term* get = apply(branch, FUNCS.get_with_selector, TermList(head, selector));
+                result = ParseResult(get);
+            } else {
+                // Found an existing get_with_selector call. Append this element to the
+                // selector expression.
+                Term* get = head;
+                Term* selector = head->input(1);
+                ca_assert(selector->function == FUNCS.selector);
+
+                set_input(selector, selector->numInputs(), subscript);
+                move_after(selector, subscript);
+                move_after(get, selector);
+                result = ParseResult(get);
+            }
+
+            /*
+            Term* term = apply(branch, FUNCS.get_index, TermList(head, subscript));
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             set_input_syntax_hint(term, 1, "preWhitespace", postLbracketWs);
             term->setBoolProp("syntax:brackets", true);
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
+            */
 
         // Check for a.b or a@.b, method call
         } else if (tokens.nextIs(tok_Dot) || tokens.nextIs(tok_AtDot)) {

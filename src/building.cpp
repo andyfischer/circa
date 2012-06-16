@@ -1027,7 +1027,9 @@ void move_after(Term* movee, Term* position)
     int pos = position->index + 1;
 
     // Make sure the position is after any extra_output() terms
-    while (branch->get(pos) != NULL && branch->get(pos)->function == FUNCS.extra_output)
+    while (pos < branch->length()
+            && branch->get(pos) != NULL
+            && branch->get(pos)->function == FUNCS.extra_output)
         pos++;
 
     // If 'movee' is currently before 'position', then the desired index is one less
