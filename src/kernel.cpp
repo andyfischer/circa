@@ -21,6 +21,7 @@
 #include "metaprogramming.h"
 #include "modules.h"
 #include "parser.h"
+#include "selector.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "static_checking.h"
@@ -1058,7 +1059,11 @@ void bootstrap_kernel()
     Term* indexableType = parse_type(kernel, "type Indexable;");
     indexable_t::setup_type(unbox_type(indexableType));
 
+    TYPES.selector = unbox_type(parse_type(kernel, "type Selector;"));
+    list_t::setup_type(TYPES.selector);
+
     control_flow_setup_funcs(kernel);
+    selector_setup_funcs(kernel);
 
     // Setup all the builtin functions defined in src/functions
     setup_builtin_functions(kernel);

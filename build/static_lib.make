@@ -95,6 +95,7 @@ OBJECTS := \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/names_builtin.o \
 	$(OBJDIR)/parser.o \
+	$(OBJDIR)/selector.o \
 	$(OBJDIR)/source_repro.o \
 	$(OBJDIR)/stateful_code.o \
 	$(OBJDIR)/static_checking.o \
@@ -267,6 +268,9 @@ $(OBJDIR)/names_builtin.o: ../src/names_builtin.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/parser.o: ../src/parser.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/selector.o: ../src/selector.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/source_repro.o: ../src/source_repro.cpp

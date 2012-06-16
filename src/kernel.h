@@ -136,11 +136,12 @@ extern Type VOID_T;
 struct BuiltinTypes {
     Type* actor;
     Type* color;
-    Type* file_signature;
-    Type* frame;
     Type* dynamicInputs;
     Type* dynamicOutputs;
+    Type* file_signature;
+    Type* frame;
     Type* point;
+    Type* selector;
 };
 
 extern BuiltinTypes TYPES;
