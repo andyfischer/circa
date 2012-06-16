@@ -7,6 +7,7 @@
 #include "importing.h"
 #include "list.h"
 #include "selector.h"
+#include "source_repro.h"
 
 namespace circa {
 
@@ -109,6 +110,24 @@ void evaluate_get_with_selector(caStack* stack)
     copy(result, circa_output(stack, 0));
 }
 
+void get_with_selector__formatSource(caValue* source, Term* term)
+{
+    Term* selector = term->input(1);
+    if (selector->function != FUNCS.selector) {
+        format_term_source_default_formatting(source, term);
+        return;
+    }
+
+    format_source_for_input(source, term, 0, "", "");
+
+    // Append subscripts for each selector element
+    for (int i=0; i < selector->numInputs(); i++) {
+        append_phrase(source, "[", term, tok_LBracket);
+        format_source_for_input(source, selector, i, "", "");
+        append_phrase(source, "]", term, tok_LBracket);
+    }
+}
+
 void selector_setup_funcs(Branch* kernel)
 {
     FUNCS.selector = 
@@ -116,6 +135,8 @@ void selector_setup_funcs(Branch* kernel)
     FUNCS.get_with_selector = 
         import_function(kernel, evaluate_get_with_selector,
             "get_with_selector(any object, Selector selector) -> any");
+
+    as_function(FUNCS.get_with_selector)->formatSource = get_with_selector__formatSource;
 }
 
 } // namespace circa
