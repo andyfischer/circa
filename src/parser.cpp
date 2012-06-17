@@ -1504,6 +1504,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
                 if (leftExpr.isIdentifier())
                     rename(term, leftExpr.term->name);
 
+                // TODO: Change this to set_with_selector
                 // Set up an assign() term if left side is complex
                 // Example: a[0] += 1
                 else {

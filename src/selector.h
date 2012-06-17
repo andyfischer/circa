@@ -6,8 +6,8 @@ namespace circa {
 
 void selector_prepend(caValue* selector, caValue* element);
 
-caValue* get_with_selector(caValue* root, caValue* selector);
-void assign_with_selector(caValue* root, caValue* selector, caValue* newValue);
+caValue* get_with_selector(caValue* root, caValue* selector, caValue* error);
+void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caValue* error);
 
 void selector_setup_funcs(Branch* kernel);
 

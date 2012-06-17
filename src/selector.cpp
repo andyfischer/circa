@@ -16,76 +16,67 @@ void selector_prepend(caValue* selector, caValue* element)
     copy(element, list_insert(selector, 0));
 }
 
+caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* error)
+{
+    if (is_int(selectorElement)) {
+        int selectorIndex = as_int(selectorElement);
+
+        if (!is_list(value)) {
+            std::string msg;
+            msg += "Value is not indexable: ";
+            msg += to_string(value);
+            set_error_string(error, msg.c_str());
+            return NULL;
+        }
+
+        if (selectorIndex >= list_length(value)) {
+            std::stringstream msg;
+            msg << "Index ";
+            msg << selectorIndex;
+            msg << " is out of range";
+            set_error_string(error, msg.str().c_str());
+            return NULL;
+        }
+
+        return get_index(value, selectorIndex);
+    }
+    else if (is_string(selectorElement)) {
+        return get_field(value, as_cstring(selectorElement));
+    }
+}
+
 caValue* get_with_selector(caValue* root, caValue* selector, caValue* error)
 {
     caValue* element = root;
+    ca_assert(is_null(error));
 
     for (int i=0; i < list_length(selector); i++) {
-
         caValue* selectorElement = list_get(selector, i);
+        element = selector_advance(element, selectorElement, error);
 
-        if (is_int(selectorElement)) {
-            int selectorIndex = as_int(selectorElement);
-
-            if (!is_list(element)) {
-                std::string msg;
-                msg += "Value is not indexable: ";
-                msg += to_string(element);
-                set_error_string(error, msg.c_str());
-                return NULL;
-            }
-
-            if (selectorIndex >= list_length(element)) {
-                std::stringstream msg;
-                msg << "Index ";
-                msg << selectorIndex;
-                if (list_length(selector) > 1)
-                    msg << " (in selector position " << i << ")";
-
-
-                msg << " is out of range";
-                set_error_string(error, msg.str().c_str());
-                return NULL;
-            }
-
-            element = get_index(element, selectorIndex);
-        }
-        else if (is_string(selectorElement))
-            element = get_field(element, as_cstring(selectorElement));
-        else
-            internal_error("Unrecognized selector element");
+        if (!is_null(error))
+            return NULL;
     }
 
     return element;
 }
 
-/*
-void get_selector_from_getter_chain(Term* getter, caValue* selector)
+void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caValue* error)
 {
-    while (true) {
-        // Don't write a setter for a getter that already has a name; if the term has
-        // a name then it's not part of this lexpr.
-        if (getter->name != "")
+    caValue* element = root;
+    ca_assert(is_null(error));
+
+    for (int i=0; i < list_length(selector); i++) {
+        touch(element);
+        caValue* selectorElement = list_get(selector, i);
+        element = selector_advance(element, selectorElement, error);
+
+        if (!is_null(error))
             return;
-
-        circa::Value element
-        if (getter->function == FUNCS.get_index) {
-            selector_prepend(selector
-            return apply(branch, FUNCS.set_index, TermList(getter->input(0),
-                getter->input(1), desiredValue));
-        } else if (getter->function == FUNCS.get_field) {
-            return apply(branch, FUNCS.set_field, TermList(getter->input(0),
-                getter->input(1), desiredValue));
-        } else if (getter->function == FUNCS.dynamic_method) {
-            Term* fieldName = create_string(branch, getter->stringProp("syntax:functionName", ""));
-            return apply(branch, FUNCS.set_field, TermList(getter->input(0),
-                fieldName, desiredValue));
-        }
-
-        getter = getter->input(0);
     }
+
+    copy(newValue, element);
 }
-*/
 
 void evaluate_selector(caStack* stack)
 {
@@ -108,6 +99,25 @@ void evaluate_get_with_selector(caStack* stack)
     }
 
     copy(result, circa_output(stack, 0));
+}
+
+void evaluate_set_with_selector(caStack* stack)
+{
+    caValue* out = circa_output(stack, 0);
+    copy(circa_input(stack, 0), out);
+    
+    caValue* selector = circa_input(stack, 1);
+    caValue* newValue = circa_input(stack, 2);
+
+    circa::Value error;
+
+    set_with_selector(out, selector, newValue, &error);
+
+    if (!is_null(&error)) {
+        copy(&error, circa_output(stack, 0));
+        raise_error(stack);
+        return;
+    }
 }
 
 void get_with_selector__formatSource(caValue* source, Term* term)
