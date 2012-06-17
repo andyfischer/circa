@@ -43,17 +43,17 @@ void test_integers()
 {
     TokenStream tokens("1 0 1234567890 0x123");
 
-    test_assert(tokens.nextIs(tok_InTEGER));
+    test_assert(tokens.nextIs(tok_Integer));
     test_assert(tokens.nextStr() == "1");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
-    test_assert(tokens.nextIs(tok_InTEGER));
+    test_assert(tokens.nextIs(tok_Integer));
     test_assert(tokens.nextStr() == "0");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
     tokens.consume();
-    test_assert(tokens.nextIs(tok_InTEGER));
+    test_assert(tokens.nextIs(tok_Integer));
     test_assert(tokens.nextStr() == "1234567890");
     tokens.consume();
     test_assert(tokens.nextIs(tok_Whitespace));
@@ -86,7 +86,7 @@ void test_floats()
     test_assert(tokens.nextIs(tok_Float));
     test_assert(tokens.nextStr() == ".123");
     tokens.consume();
-    test_assert(tokens.nextIs(tok_DoT));
+    test_assert(tokens.nextIs(tok_Dot));
     tokens.consume();
     test_assert(tokens.finished());
 
@@ -100,12 +100,12 @@ void test_floats()
     // Make sure that it ignores two dots. There once was a bug where
     // 0..1 would get parsed as 0. and then .1
     tokens.reset("0..1");
-    test_assert(tokens.nextIs(tok_InTEGER));
+    test_assert(tokens.nextIs(tok_Integer));
     test_assert(tokens.nextStr() == "0");
     tokens.consume();
     test_assert(tokens.nextIs(tok_TwoDots));
     tokens.consume();
-    test_assert(tokens.nextIs(tok_InTEGER));
+    test_assert(tokens.nextIs(tok_Integer));
     test_assert(tokens.nextStr() == "1");
     tokens.consume();
     test_assert(tokens.finished());
@@ -146,7 +146,7 @@ void test_misc2()
     tokens.consume(tok_Percent);
     tokens.consume(tok_Ellipsis);
     tokens.consume(tok_LeftArrow);
-    tokens.consume(tok_DoUBLE_SLASH);
+    tokens.consume(tok_DoubleSlash);
     tokens.consume(tok_Ampersand);
     tokens.finished();
 }
@@ -159,7 +159,7 @@ void test_misc3()
     tokens.consume(tok_TwoDots);
     tokens.consume(tok_DoubleColon);
     tokens.consume(tok_AtDot);
-    tokens.consume(tok_DoT);
+    tokens.consume(tok_Dot);
     tokens.consume(tok_At);
     test_assert(tokens.finished());
 }
@@ -252,7 +252,7 @@ void test_token_stream()
 {
     TokenStream tstream("1 2.0");
 
-    test_assert(tstream.nextIs(tok_InTEGER));
+    test_assert(tstream.nextIs(tok_Integer));
     test_assert(tstream.nextIs(tok_Whitespace, 1));
     test_assert(tstream.nextNonWhitespaceIs(tok_Float, 1));
 }
@@ -332,9 +332,9 @@ void test_preceding_indent()
 void test_comment()
 {
     TokenStream tokens("1 2 -- this is a comment");
-    test_equals(tokens.consumeStr(tok_InTEGER), "1");
+    test_equals(tokens.consumeStr(tok_Integer), "1");
     test_equals(tokens.consumeStr(tok_Whitespace), " ");
-    test_equals(tokens.consumeStr(tok_InTEGER), "2");
+    test_equals(tokens.consumeStr(tok_Integer), "2");
     test_equals(tokens.consumeStr(tok_Whitespace), " ");
     test_equals(tokens.consumeStr(tok_Comment), "-- this is a comment");
     test_assert(tokens.finished());
@@ -348,15 +348,15 @@ void test_names()
     test_equals(tokens.consumeStr(tok_Name), ":a");
     test_equals(tokens.consumeStr(tok_Whitespace), " ");
     test_equals(tokens.consumeStr(tok_Colon), ":");
-    test_equals(tokens.consumeStr(tok_InTEGER), "1");
+    test_equals(tokens.consumeStr(tok_Integer), "1");
     test_assert(tokens.finished());
 }
 
 void test_number_followed_by_dot_call()
 {
     TokenStream tokens("1.something");
-    test_equals(tokens.consumeStr(tok_InTEGER), "1");
-    test_equals(tokens.consumeStr(tok_DoT), ".");
+    test_equals(tokens.consumeStr(tok_Integer), "1");
+    test_equals(tokens.consumeStr(tok_Dot), ".");
     test_equals(tokens.consumeStr(tok_Identifier), "something");
     test_assert(tokens.finished());
 }
