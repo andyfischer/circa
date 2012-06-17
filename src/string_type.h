@@ -11,6 +11,14 @@ void string_setup_type(Type* type);
 // Append the two strings, saving the result in 'left'.
 void string_append(caValue* left, caValue* right);
 void string_append(caValue* left, const char* right);
+
+// Convert 'right' to a string (if necessary) and append it. If 'right' is
+// itself a string value, it will appear with quote marks.
+void string_append_quoted(caValue* left, caValue* right);
+
+// Append an integer value as a string.
+void string_append(caValue* left, int value);
+
 void string_resize(caValue* s, int length);
 bool string_eq(caValue* s, const char* str);
 bool string_starts_with(caValue* s, const char* beginning);

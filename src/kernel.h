@@ -101,6 +101,7 @@ struct BuiltinFuncs {
     Term* selector;
     Term* set_index;
     Term* set_field;
+    Term* set_with_selector;
     Term* sub;
     Term* type;
     Term* unbounded_loop;

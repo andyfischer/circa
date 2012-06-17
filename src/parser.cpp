@@ -27,6 +27,8 @@
 namespace circa {
 namespace parser {
 
+bool lookahead_match_equals(TokenStream& tokens);
+
 Term* compile(Branch* branch, ParsingStep step, std::string const& input)
 {
     log_start(0, "parser::compile");
@@ -1293,18 +1295,27 @@ ParseResult continue_statement(Branch* branch, TokenStream& tokens, ParserCxt* c
 
 ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
+    int startPosition = tokens.getPosition();
+
+    bool hasName = false;
+    std::string nameBinding;
+    std::string preEqualsSpace;
+    std::string postEqualsSpace;
+
     // Lookahead for a name binding.
     if (lookahead_match_leading_name_binding(tokens)) {
-        int startPosition = tokens.getPosition();
+        hasName = true;
 
-        std::string nameBinding = tokens.consumeStr(tok_Identifier);
-        std::string preEqualsSpace = possible_whitespace(tokens);
+        nameBinding = tokens.consumeStr(tok_Identifier);
+        preEqualsSpace = possible_whitespace(tokens);
         tokens.consume(tok_Equals);
-        std::string postEqualsSpace = possible_whitespace(tokens);
+        postEqualsSpace = possible_whitespace(tokens);
+    }
 
-        ParseResult result = name_binding_expression(branch, tokens, context);
-        Term* term = result.term;
-        
+    ParseResult result = expression(branch, tokens, context);
+    Term* term = result.term;
+
+    if (hasName) {
         // If the term already has a name (this is the case for method syntax
         // and for unknown_identifier), then make a copy.
         if (term->name != "")
@@ -1315,11 +1326,31 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
 
         rename(term, nameBinding);
         set_source_location(term, startPosition, tokens);
-        return ParseResult(term);
+        result = ParseResult(term);
+    }
+    
+    // Check for <complicated selector> = <expression> syntax.
+    else if (!hasName && lookahead_match_equals(tokens)) {
+        preEqualsSpace = possible_whitespace(tokens);
+        tokens.consume(tok_Equals);
+        postEqualsSpace = possible_whitespace(tokens);
+
+        Term* right = expression(branch, tokens, context).term;
+        Term* head = NULL;
+        Term* selector = write_selector_for_accessor_expression(branch, term, &head);
+
+        Term* set = apply(branch, FUNCS.set_with_selector,
+                TermList(head, selector, right));
+        change_declared_type(set, declared_type(head));
+
+        set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
+        set->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
+
+        rename(set, head->name);
+        result = ParseResult(set);
     }
 
-    // Otherwise, no name binding.
-    return expression(branch, tokens, context);
+    return result;
 }
 
 ParseResult expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
@@ -1370,9 +1401,6 @@ int get_infix_precedence(int match)
         case tok_StarEquals:
         case tok_SlashEquals:
             return 2;
-        case tok_ColonEquals:
-        case tok_Equals:
-            return 0;
         default:
             return -1;
     }
@@ -1393,8 +1421,6 @@ std::string get_function_for_infix(std::string const& infix)
     else if (infix == "==") return "equals";
     else if (infix == "or") return "or";
     else if (infix == "and") return "and";
-    else if (infix == "=") return "assign";
-    else if (infix == ":=") return "unsafe_assign";
     else if (infix == "+=") return "add";
     else if (infix == "-=") return "sub";
     else if (infix == "*=") return "mult";
@@ -1501,35 +1527,34 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             if (isRebinding) {
                 // Just bind the name if left side is an identifier.
                 // Example: a += 1
-                if (leftExpr.isIdentifier())
+                if (leftExpr.isIdentifier()) {
                     rename(term, leftExpr.term->name);
 
-                // TODO: Change this to set_with_selector
-                // Set up an assign() term if left side is complex
-                // Example: a[0] += 1
-                else {
-                    Term* assignTerm = apply(branch, FUNCS.assign, TermList(leftExpr.term, term));
-                    assignTerm->setStringProp("syntax:rebindOperator", operatorStr);
-                    set_is_statement(assignTerm, true);
+                // Otherwise, create a set_with_selector call.
+                } else {
+                    Term* original = NULL;
+                    Term* left = leftExpr.term;
+                    Term* newValue = term;
+                    Term* selector = write_selector_for_accessor_expression(branch,
+                            left, &original);
+
+                    Term* set = apply(branch, FUNCS.set_with_selector,
+                            TermList(original, selector, newValue));
+
+                    set->setStringProp("syntax:rebindOperator", operatorStr);
+                    set_is_statement(set, true);
 
                     // Move an input's post-whitespace to this term.
                     caValue* existingPostWhitespace =
-                        assignTerm->input(1)->inputInfo(0)->properties.get("postWhitespace");
+                        newValue->inputInfo(0)->properties.get("postWhitespace");
 
                     if (existingPostWhitespace != NULL)
                         move(existingPostWhitespace,
-                            assignTerm->inputInfo(0)->properties.insert("postWhitespace"));
+                            set->properties.insert("syntax:preEqualsSpace"));
 
-                    Term* lexprRoot = find_lexpr_root(leftExpr.term);
-                    rename(assignTerm, lexprRoot->name);
-                    
-                    term = assignTerm;
+                    rename(set, original->name);
+                    term = set;
                 }
-            } else if (function == FUNCS.assign) {
-
-                set_is_statement(term, true);
-                Term* lexprRoot = find_lexpr_root(leftExpr.term);
-                rename(term, lexprRoot->name);
             }
 
             result = ParseResult(term);
@@ -1789,34 +1814,12 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
             tokens.consume(tok_RBracket);
 
-            // This code should result in a get_with_selector() call that uses a selector()
-            // expression. Create these terms if needed.
-
-            if (head->function != FUNCS.get_with_selector) {
-                Term* selector = apply(branch, FUNCS.selector, TermList(subscript));
-                Term* get = apply(branch, FUNCS.get_with_selector, TermList(head, selector));
-                result = ParseResult(get);
-            } else {
-                // Found an existing get_with_selector call. Append this element to the
-                // selector expression.
-                Term* get = head;
-                Term* selector = head->input(1);
-                ca_assert(selector->function == FUNCS.selector);
-
-                set_input(selector, selector->numInputs(), subscript);
-                move_after(selector, subscript);
-                move_after(get, selector);
-                result = ParseResult(get);
-            }
-
-            /*
             Term* term = apply(branch, FUNCS.get_index, TermList(head, subscript));
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             set_input_syntax_hint(term, 1, "preWhitespace", postLbracketWs);
             term->setBoolProp("syntax:brackets", true);
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
-            */
 
         // Check for a.b or a@.b, method call
         } else if (tokens.nextIs(tok_Dot) || tokens.nextIs(tok_AtDot)) {
@@ -1845,6 +1848,16 @@ bool lookahead_match_comment_statement(TokenStream& tokens)
     if (tokens.nextIs(tok_Whitespace))
         lookahead++;
     return tokens.nextIs(tok_Comment, lookahead);
+}
+
+bool lookahead_match_equals(TokenStream& tokens)
+{
+    int lookahead = 0;
+    if (tokens.nextIs(tok_Whitespace, lookahead))
+        lookahead++;
+    if (!tokens.nextIs(tok_Equals, lookahead++))
+        return false;
+    return true;
 }
 
 bool lookahead_match_leading_name_binding(TokenStream& tokens)

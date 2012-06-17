@@ -184,6 +184,7 @@ void remap_pointers(Term* term, TermMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void remap_pointers(Branch* branch, Term* original, Term* replacement);
 
+Term* write_selector_for_accessor_expression(Branch* branch, Term* term, Term** headPtr);
 Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Term* desired);
 void write_setter_chain_for_assign_term(Term* assignTerm);
 

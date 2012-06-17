@@ -5,9 +5,11 @@
 #include "evaluation.h"
 #include "kernel.h"
 #include "importing.h"
+#include "introspection.h"
 #include "list.h"
 #include "selector.h"
 #include "source_repro.h"
+#include "string_type.h"
 
 namespace circa {
 
@@ -22,19 +24,15 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
         int selectorIndex = as_int(selectorElement);
 
         if (!is_list(value)) {
-            std::string msg;
-            msg += "Value is not indexable: ";
-            msg += to_string(value);
-            set_error_string(error, msg.c_str());
+            set_error_string(error, "Value is not indexable: ");
+            string_append_quoted(error, value);
             return NULL;
         }
 
         if (selectorIndex >= list_length(value)) {
-            std::stringstream msg;
-            msg << "Index ";
-            msg << selectorIndex;
-            msg << " is out of range";
-            set_error_string(error, msg.str().c_str());
+            set_error_string(error, "Index ");
+            string_append(error, selectorIndex);
+            string_append(error, " is out of range");
             return NULL;
         }
 
@@ -42,6 +40,10 @@ caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* err
     }
     else if (is_string(selectorElement)) {
         return get_field(value, as_cstring(selectorElement));
+    } else {
+        set_error_string(error, "Unrecognized selector element: ");
+        string_append_quoted(error, selectorElement);
+        return NULL;
     }
 }
 
@@ -81,6 +83,25 @@ void set_with_selector(caValue* root, caValue* selector, caValue* newValue, caVa
 void evaluate_selector(caStack* stack)
 {
     copy(circa_input(stack, 0), circa_output(stack, 0));
+}
+
+void selector_format_source(caValue* source, Term* term)
+{
+    // Append subscripts for each selector element
+    for (int i=0; i < term->numInputs(); i++) {
+        Term* input = term->input(i);
+
+        if (is_value(input) && is_string(term_value(input))) {
+            append_phrase(source, ".", input, tok_Dot);
+            append_phrase(source, as_string(term_value(input)),
+                    input, tok_Identifier);
+
+        } else {
+            append_phrase(source, "[", term, tok_LBracket);
+            format_source_for_input(source, term, i, "", "");
+            append_phrase(source, "]", term, tok_LBracket);
+        }
+    }
 }
 
 void evaluate_get_with_selector(caStack* stack)
@@ -128,13 +149,35 @@ void get_with_selector__formatSource(caValue* source, Term* term)
         return;
     }
 
+    format_name_binding(source, term);
+    format_source_for_input(source, term, 0, "", "");
+    selector_format_source(source, selector);
+
+}
+void set_with_selector__formatSource(caValue* source, Term* term)
+{
+    Term* selector = term->input(1);
+    if (selector->function != FUNCS.selector) {
+        format_term_source_default_formatting(source, term);
+        return;
+    }
+
+    // Don't call format_name_binding here
+
     format_source_for_input(source, term, 0, "", "");
 
-    // Append subscripts for each selector element
-    for (int i=0; i < selector->numInputs(); i++) {
-        append_phrase(source, "[", term, tok_LBracket);
-        format_source_for_input(source, selector, i, "", "");
-        append_phrase(source, "]", term, tok_LBracket);
+    selector_format_source(source, selector);
+
+    append_phrase(source, term->stringProp("syntax:preEqualsSpace",""), term, tok_Whitespace);
+
+    if (term->hasProperty("syntax:rebindOperator")) {
+        append_phrase(source, term->stringProp("syntax:rebindOperator",""), term, tok_Equals);
+        append_phrase(source, term->stringProp("syntax:postEqualsSpace",""), term, tok_Whitespace);
+        format_source_for_input(source, term->input(2), 1, "", "");
+    } else {
+        append_phrase(source, "=", term, tok_Equals);
+        append_phrase(source, term->stringProp("syntax:postEqualsSpace",""), term, tok_Whitespace);
+        format_source_for_input(source, term, 2, "", "");
     }
 }
 
@@ -142,11 +185,16 @@ void selector_setup_funcs(Branch* kernel)
 {
     FUNCS.selector = 
         import_function(kernel, evaluate_selector, "selector(any elements :multiple) -> Selector");
+
     FUNCS.get_with_selector = 
         import_function(kernel, evaluate_get_with_selector,
             "get_with_selector(any object, Selector selector) -> any");
-
     as_function(FUNCS.get_with_selector)->formatSource = get_with_selector__formatSource;
+
+    FUNCS.set_with_selector =
+        import_function(kernel, evaluate_set_with_selector,
+            "set_with_selector(any object, Selector selector, any value) -> any");
+    as_function(FUNCS.set_with_selector)->formatSource = set_with_selector__formatSource;
 }
 
 } // namespace circa

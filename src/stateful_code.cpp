@@ -164,6 +164,7 @@ static Term* append_final_pack_state(Branch* branch)
     get_list_of_state_outputs(branch, branch->length(), &inputs);
     Term* term = apply(branch, FUNCS.pack_state, inputs);
     term->setBoolProp("final", true);
+    return term;
 }
 
 // For the given field name

@@ -121,7 +121,9 @@ static const char* perf_stat_get_name(PerformanceStat stat)
         case STAT_dynamicCall: return "dynamicCall";
         case STAT_setIndex: return "setIndex";
         case STAT_setField: return "setField";
+        case NUM_PERFORMANCE_STATS: return "";
     }
+    return "(stat not found)";
 }
 
 void perf_stats_dump()

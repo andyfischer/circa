@@ -173,6 +173,17 @@ void string_append(caValue* left, const char* right)
 {
     as_std_string(left) += right;
 }
+void string_append_quoted(caValue* left, caValue* right)
+{
+    as_std_string(left) += to_string(right);
+}
+void string_append(caValue* left, int value)
+{
+    char buf[64];
+    sprintf(buf, "%d", value);
+    string_append(left, buf);
+
+}
 void string_resize(caValue* s, int length)
 {
     if (length < 0)
@@ -208,6 +219,7 @@ bool string_ends_with(caValue* s, const char* ending)
 
     return true;
 }
+
 char string_get(caValue* s, int index)
 {
     return as_cstring(s)[index];

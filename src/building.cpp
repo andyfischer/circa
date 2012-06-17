@@ -1339,6 +1339,35 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement)
     }
 }
 
+Term* write_selector_for_accessor_expression(Branch* branch, Term* term, Term** headPtr)
+{
+    TermList elements;
+
+    while (true) {
+        if (headPtr != NULL)
+            *headPtr = term;
+
+        // Stop if we find a term with a name.
+        if (term->name != "")
+            break;
+
+        if (term->function == FUNCS.get_index) {
+            elements.prepend(term->input(1));
+            term = term->input(0);
+        } else if (term->function == FUNCS.get_field) {
+            elements.prepend(term->input(1));
+            term = term->input(0);
+        } else if (term->function == FUNCS.dynamic_method) {
+            Term* fieldName = create_string(branch, term->stringProp("syntax:functionName", ""));
+            elements.prepend(fieldName);
+            term = term->input(0);
+        } else {
+            break;
+        }
+    }
+
+    return apply(branch, FUNCS.selector, elements);
+}
 
 // For a given 'get' expression, such as:
 //   result = get_field(container, field)
@@ -1363,6 +1392,7 @@ Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredValue)
     }
 
 }
+
 
 Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Term* desired)
 {

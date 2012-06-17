@@ -131,7 +131,9 @@ void format_term_source_default_formatting(caValue* source, Term* term)
     if (declarationStyle == "infix" && 
             parser::is_infix_operator_rebinding(functionName)) {
         append_phrase(source, term->name.c_str(), term, name_None);
-        append_phrase(source, " ", term, name_Whitespace);
+        append_phrase(source,
+                get_input_syntax_hint_optional(term, 0, "preWhitespace", " "),
+                term, name_Whitespace);
         append_phrase(source, functionName.c_str(), term, name_InfixOperator);
         format_source_for_input(source, term, 1);
         return;
