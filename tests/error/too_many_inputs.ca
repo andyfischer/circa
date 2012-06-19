@@ -4,4 +4,4 @@ def f(int a, int b)
     print('b = ' b)
 
 f(1, 2)
-f(1)
+f(1, 2, 3)

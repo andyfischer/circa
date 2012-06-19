@@ -538,11 +538,14 @@ bool is_output_placeholder(Term* term)
 }
 bool has_variable_args(Branch* branch)
 {
-    Term* input0 = get_input_placeholder(branch, 0);
-    if (input0 == NULL)
-        return false;
-    return input0->boolProp("multiple", false);
-}    
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return false;
+        if (placeholder->boolProp("multiple", false))
+            return true;
+    }
+}
 Term* find_output_placeholder_with_name(Branch* branch, const char* name)
 {
     for (int i=0;; i++) {
@@ -820,6 +823,9 @@ void branch_finish_changes(Branch* branch)
 
     // Update branch's state type
     branch_update_state_type(branch);
+
+    // Update bytecode
+    // (disabled)
 
     branch->inProgress = false;
     branch->version++;

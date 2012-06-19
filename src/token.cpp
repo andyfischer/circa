@@ -78,7 +78,6 @@ const char* get_token_text(int match)
         case tok_In: return "in";
         case tok_True: return "true";
         case tok_False: return "false";
-        case tok_DoOnce: return "do once";
         case tok_Namespace: return "namespace";
         case tok_Include: return "include";
         case tok_Import: return "import";
@@ -306,8 +305,6 @@ void top_level_consume_token(TokenizeContext &context)
         if (try_to_consume_keyword(context, tok_In)) return;
         if (try_to_consume_keyword(context, tok_True)) return;
         if (try_to_consume_keyword(context, tok_False)) return;
-        // check 'do once' before 'do'
-        if (try_to_consume_keyword(context, tok_DoOnce)) return; 
         if (try_to_consume_keyword(context, tok_Do)) return;
         if (try_to_consume_keyword(context, tok_Namespace)) return;
         if (try_to_consume_keyword(context, tok_Include)) return;

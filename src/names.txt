@@ -38,6 +38,18 @@ Keyword
 Whitespace
 UnknownIdentifier
 
+# Evaluation metadata
+SetNull
+InlineCopy
+NoOp
+PushFunctionBranch
+PushNestedBranch
+FireNative
+CaseBlock
+ForLoop
+ErrorNotEnoughInputs
+ErrorTooManyInputs
+
 # Tokens
 tok_Identifier
 tok_Name

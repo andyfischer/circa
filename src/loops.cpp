@@ -308,36 +308,17 @@ void for_loop_fix_state_input(Branch* contents)
     set_input(stateOutput, 0, packStateList);
 }
 
-CA_FUNCTION(start_for_loop)
+void start_for_loop(caStack* stack)
 {
-    Stack* stack = CONTEXT;
-
     Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;
 
+    // Check if top frame actually contains a for-loop (it might be using the #zero branch)
+    if (!is_for_loop(contents))
+        return;
+
     // Set up a blank list for output
     set_list(get_caller_output(stack, 0), 0);
-
-    // For a zero-iteration loop, use the zero branch.
-#if 0
-    if (inputListLength == 0) {
-        List* registers = &top_frame(stack)->registers;
-        for (int i=1;; i++) {
-
-            Term* output = get_output_placeholder(contents, i);
-            if (output == NULL)
-                break;
-
-            Term* input = get_input_placeholder(contents, i);
-            if (input == NULL)
-                break;
-
-            copy(registers->get(input->index), registers->get(output->index));
-        }
-        finish_frame(stack);
-        return;
-    }
-#endif
 
     frame->loop = true;
 

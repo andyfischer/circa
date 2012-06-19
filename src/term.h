@@ -5,6 +5,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "bytecode.h"
 #include "dict.h"
 #include "term_list.h"
 #include "tagged_value.h"
@@ -83,6 +84,8 @@ struct Term : public caTerm
 
     // Location in textual source code.
     TermSourceLocation sourceLoc;
+
+    BytecodeData bytecode;
 
     Term();
     ~Term();

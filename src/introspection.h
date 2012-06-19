@@ -14,9 +14,18 @@ namespace circa {
 
 struct RawOutputPrefs
 {
+    int indentLevel;
     bool showAllIDs;
     bool showProperties;
-    RawOutputPrefs() : showAllIDs(false), showProperties(false) {}
+    bool showBytecode;
+    bool showEvaluationMetadata;
+    RawOutputPrefs() :
+        indentLevel(0),
+        showAllIDs(false),
+        showProperties(false),
+        showBytecode(false),
+        showEvaluationMetadata(false)
+    {}
 };
 
 // Check the function and inputs of 'user', returns whether they are actually

@@ -98,8 +98,8 @@ void do_echo(List* args, caValue* reply)
 
 void do_file_command(List* args, caValue* reply)
 {
+    RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
-    bool printRawWithProps = false;
     bool printSource = false;
     bool printState = false;
     bool dontRunScript = false;
@@ -119,8 +119,23 @@ void do_file_command(List* args, caValue* reply)
             continue;
         }
 
+        if (string_eq(args->get(argIndex), "-pb")) {
+            printRaw = true;
+            rawOutputPrefs.showBytecode = true;
+            argIndex++;
+            continue;
+        }
+
         if (string_eq(args->get(argIndex), "-pp")) {
-            printRawWithProps = true;
+            printRaw = true;
+            rawOutputPrefs.showProperties = true;
+            argIndex++;
+            continue;
+        }
+        
+        if (string_eq(args->get(argIndex), "-pe")) {
+            printRaw = true;
+            rawOutputPrefs.showEvaluationMetadata = true;
             argIndex++;
             continue;
         }
@@ -343,8 +358,8 @@ void print_usage()
 
 int run_command_line(caWorld* world, caValue* args)
 {
+    RawOutputPrefs rawOutputPrefs;
     bool printRaw = false;
-    bool printRawWithProps = false;
     bool printState = false;
     bool dontRunScript = false;
     bool printTrace = false;
@@ -378,8 +393,23 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
+        if (string_eq(list_get(args, 0), "-pb")) {
+            printRaw = true;
+            rawOutputPrefs.showBytecode = true;
+            list_remove_index(args, 0);
+            continue;
+        }
+
         if (string_eq(list_get(args, 0), "-pp")) {
-            printRawWithProps = true;
+            printRaw = true;
+            rawOutputPrefs.showProperties = true;
+            list_remove_index(args, 0);
+            continue;
+        }
+
+        if (string_eq(list_get(args, 0), "-pe")) {
+            printRaw = true;
+            rawOutputPrefs.showEvaluationMetadata = true;
             list_remove_index(args, 0);
             continue;
         }
@@ -605,10 +635,9 @@ int run_command_line(caWorld* world, caValue* args)
     load_script(main_branch, as_cstring(list_get(args, 0)));
     branch_finish_changes(main_branch);
 
-    if (printRawWithProps)
-        print_branch_with_properties(std::cout, main_branch);
-    else if (printRaw)
-        print_branch(std::cout, main_branch);
+    if (printRaw) {
+        print_branch(std::cout, main_branch, &rawOutputPrefs);
+    }
 
     if (dontRunScript)
         return 0;

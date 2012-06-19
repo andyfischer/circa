@@ -1,0 +1,5 @@
+a = 1
+b = [2]
+Error occurred:
+[tests/error/not_enough_inputs_2.ca:7,0] f() | Too few inputs, expected 1 (or more), found 0
+

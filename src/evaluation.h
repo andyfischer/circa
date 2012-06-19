@@ -163,6 +163,8 @@ void run_interpreter(Stack* stack);
 void run_interpreter_step(Stack* stack);
 void run_interpreter_steps(Stack* stack, int steps);
 
+void get_term_eval_metadata(Term* term, caValue* output);
+
 // Dynamic calls
 void dynamic_call_func(caStack* stack);
 void finish_dynamic_call(caStack* stack);

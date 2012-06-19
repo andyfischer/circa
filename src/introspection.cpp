@@ -127,17 +127,21 @@ std::string branch_namespace_to_string(Branch* branch)
 
 void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
 {
-    out << "[Branch " << branch->id << "(" << &branch << ")]" << std::endl;
+    int prevIndent = prefs->indentLevel;
+
+    out << "[Branch#" << branch->id << "]" << std::endl;
     for (BranchIterator it(branch); !it.finished(); it.advance()) {
         Term* term = it.current();
 
         int indent = it.depth();
 
-        for (int i=0; i < indent; i++) out << "  ";
+        prefs->indentLevel = indent;
 
         print_term(out, term, prefs);
         out << std::endl;
     }
+
+    prefs->indentLevel = prevIndent;
 }
 
 std::string get_branch_raw(Branch* branch)
@@ -271,6 +275,9 @@ void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string
 
 void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 {
+    for (int i=0; i < prefs->indentLevel; i++)
+        std::cout << " ";
+
     if (term == NULL) {
         out << "<NULL>";
         return;
@@ -325,6 +332,41 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 
     if (prefs->showProperties)
         out << " " << term->properties.toString();
+
+    if (prefs->showBytecode) {
+        int pos = 0;
+
+        BytecodeData* bytecode = &term->bytecode;
+
+#if 0
+        out << std::endl << "raw: ";
+        for (int i=0; i < bytecode->writePos; i++) {
+            char hex[10];
+            sprintf(hex, "%02x", bytecode->data[i]);
+            out << hex;
+        }
+        out << std::endl;
+#endif
+
+        for (int pos = 0; !bytecode_eof(bytecode, pos); pos = bytecode_advance(bytecode, pos)) {
+            out << std::endl;
+            for (int i=0; i < prefs->indentLevel; i++)
+                std::cout << " ";
+            out << "  ";
+            circa::Value str;
+            bytecode_op_to_string(bytecode, pos, &str);
+            out << as_cstring(&str);
+        }
+    }
+
+    if (prefs->showEvaluationMetadata) {
+        circa::Value value;
+        get_term_eval_metadata(term, &value);
+        out << std::endl;
+        for (int i=0; i < prefs->indentLevel + 2; i++)
+            out << " ";
+        out << to_string(&value);
+    }
 }
 
 void print_term(std::ostream& out, Term* term)

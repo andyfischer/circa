@@ -1,0 +1,20 @@
+
+Outline
+
+  a BranchLite object serves the same role as a Branch, but is more lightweight,
+  it doesn't use full Term objects or real pointers.
+
+Goals
+  Use this data structure for efficient evaluation. Before evaluating we do a quick
+  process generating a BranchLite from Branch, the BranchLite has unnecessary stuff
+  stripped out and derived information added.
+
+  Use this data as a starting point for more layered code generation. We could have
+  a whole chain of:
+    [User's intensional branch] -> [Codegen step] -> [...] -> [Efficient evaluation branch]
+
+Data
+
+BranchLite
+  List of Terms
+  Pointer to base branch

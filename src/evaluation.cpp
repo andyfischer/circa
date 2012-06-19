@@ -5,6 +5,7 @@
 #include "building.h"
 #include "build_options.h"
 #include "branch.h"
+#include "bytecode.h"
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
@@ -13,6 +14,7 @@
 #include "kernel.h"
 #include "list.h"
 #include "locals.h"
+#include "metaprogramming.h"
 #include "parser.h"
 #include "stateful_code.h"
 #include "string_type.h"
@@ -712,7 +714,7 @@ Branch* for_loop_choose_branch(Stack* stack, Term* term)
     return term->nestedContents;
 }
 
-Branch* if_block_choose_branch(Stack* stack, Term* term)
+Branch* case_block_choose_branch(Stack* stack, Term* term)
 {
     // Find the accepted case
     Branch* contents = nested_contents(term);
@@ -741,20 +743,6 @@ Branch* if_block_choose_branch(Stack* stack, Term* term)
     return NULL;
 }
 
-Branch* dynamic_method_choose_branch(Stack* stack, Term* term)
-{
-    caValue* object = find_stack_value_for_term(stack, term, 0);
-    std::string functionName = term->stringProp("syntax:functionName", "");
-
-    Term* method = find_method((Branch*) top_branch(stack),
-        (Type*) circa_type_of(object), functionName.c_str());
-
-    if (method != NULL)
-        return function_contents(method);
-
-    return NULL;
-}
-
 EvaluateFunc get_override_for_branch(Branch* branch)
 {
     // This relationship should be simplified.
@@ -780,13 +768,9 @@ Branch* choose_branch(Stack* stack, Term* term)
     if (is_value(term))
         return NULL;
     else if (term->function == FUNCS.if_block)
-        return if_block_choose_branch(stack, term);
+        return case_block_choose_branch(stack, term);
     else if (term->function == FUNCS.for_func)
         return for_loop_choose_branch(stack, term);
-        /* dynamic method currently works as an override
-    else if (term->function == FUNCS.dynamic_method)
-        return dynamic_method_choose_branch(stack, term);
-        */
     else if (term->function == FUNCS.declared_state)
         return function_contents(term->function);
     else if (term->function == FUNCS.lambda)
@@ -820,6 +804,299 @@ void start_interpreter_session(Stack* stack)
     }
 }
 
+void get_term_eval_metadata(Term* term, caValue* output)
+{
+    set_list(output, 2);
+    caValue* tag = list_get(output, 0);
+    caValue* inputs = list_get(output, 1);
+    set_list(inputs, 0);
+
+    // Check to trigger a C override, if this is the first term in an override branch.
+    Branch* parent = term->owningBranch;
+    if (term->index == 0 && get_override_for_branch(parent) != NULL) {
+
+        set_name(tag, name_FireNative);
+        return;
+    }
+
+    if (term->function == FUNCS.output) {
+        Term* input = term->input(0);
+
+        if (input == NULL) {
+            set_name(tag, name_SetNull);
+        } else {
+            set_name(tag, name_InlineCopy);
+            set_list(inputs, 1);
+            set_term_ref(list_get(inputs, 0), term->input(0));
+        }
+        return;
+    }
+
+    // Choose the next branch
+    Branch* branch = NULL;
+    bool localBranch = false;
+
+    if (is_value(term)) {
+        branch = NULL;
+    } else if (term->function == FUNCS.lambda
+            || term->function == FUNCS.branch_unevaluated) {
+        // These funcs have a nestedContents, but it shouldn't be evaluated.
+        branch = NULL;
+        set_name(tag, name_NoOp);
+    } else if (term->function == FUNCS.declared_state) {
+        // declared_state has a nested branch, but we shouldn't use it.
+        branch = function_contents(term->function);
+        set_name(tag, name_PushFunctionBranch);
+    } else if (term->function == FUNCS.if_block) {
+        branch = term->nestedContents;
+        set_name(tag, name_CaseBlock);
+    } else if (term->function == FUNCS.for_func) {
+        branch = term->nestedContents;
+        set_name(tag, name_ForLoop);
+    } else if (term->nestedContents != NULL) {
+        // Otherwise if the term has nested contents, then use it.
+        branch = term->nestedContents;
+        set_name(tag, name_PushNestedBranch);
+    } else if (term->function != NULL) {
+        // No nested contents, use function.
+        branch = function_contents(term->function);
+        set_name(tag, name_PushFunctionBranch);
+    }
+
+    if (branch == NULL || branch->emptyEvaluation) {
+        // No-op
+        set_name(tag, name_NoOp);
+        return;
+    }
+
+    // Check the input count
+    int inputCount = term->numInputs();
+    int expectedCount = count_input_placeholders(branch);
+    int requiredCount = expectedCount;
+    bool varargs = has_variable_args(branch);
+    if (varargs)
+        requiredCount = expectedCount - 1;
+
+    if (inputCount < requiredCount) {
+        // Fail, not enough inputs.
+        set_name(tag, name_ErrorNotEnoughInputs);
+        return;
+    }
+
+    if (inputCount > expectedCount && !varargs) {
+        // Fail, too many inputs.
+        set_name(tag, name_ErrorTooManyInputs);
+        return;
+    }
+    
+    // Now prepare the list of inputs
+    list_resize(inputs, expectedCount);
+    int inputIndex = 0;
+    for (int placeholderIndex=0;; placeholderIndex++, inputIndex++) {
+        Term* placeholder = get_input_placeholder(branch, placeholderIndex);
+        if (placeholder == NULL)
+            break;
+
+        Term* input = term->input(inputIndex);
+
+        if (input == NULL) {
+            set_null(list_get(inputs, placeholderIndex));
+            continue;
+        }
+
+        if (placeholder->boolProp("multiple", false)) {
+            // Multiple inputs. Take all remaining inputs and put them into a list.
+            
+            caValue* inputsResult = list_get(inputs, placeholderIndex);
+
+            int packCount = inputCount - inputIndex;
+            set_list(inputsResult, packCount);
+
+            for (int i=0; i < packCount; i++)
+                set_term_ref(list_get(inputsResult, i), term->input(i + inputIndex));
+            
+            break;
+        }
+
+        set_term_ref(list_get(inputs, placeholderIndex), input);
+    }
+}
+
+void populate_inputs_with_metadata(Stack* stack, Frame* frame, caValue* inputs)
+{
+    for (int i=0; i < list_length(inputs); i++) {
+        caValue* input = list_get(inputs, i);
+        caValue* placeholder = get_frame_register(frame, i);
+        Term* placeholderTerm = frame->branch->get(i);
+
+        if (is_list(input)) {
+            // Multiple input: create a list in placeholder register.
+            set_list(placeholder, list_length(input));
+            for (int j=0; j < list_length(input); j++) {
+                Term* term = as_term_ref(list_get(input, j));
+                caValue* incomingValue = find_stack_value_for_term(stack, term, 1);
+                caValue* elementValue = list_get(placeholder, j);
+                if (incomingValue != NULL)
+                    copy(incomingValue, elementValue);
+                else
+                    set_null(elementValue);
+            }
+        } else if (is_null(input)) {
+            set_null(placeholder);
+        } else if (is_term_ref(input)) {
+
+            // Standard input copy
+            caValue* inputValue = find_stack_value_for_term(stack, as_term_ref(input), 1);
+            copy(inputValue, placeholder);
+
+            // Cast to declared type
+            Type* declaredType = declared_type(placeholderTerm);
+            bool castSuccess = cast(placeholder, declaredType);
+            if (!castSuccess) {
+                circa::Value msg;
+                set_string(&msg, "Couldn't cast value ");
+                string_append_quoted(&msg, inputValue);
+                string_append(&msg, " to type ");
+                string_append(&msg, name_to_string(declaredType->name));
+                raise_error_msg(stack, as_cstring(&msg));
+            }
+
+        } else {
+            internal_error("Unrecognized element type in populate_inputs_with_metadata");
+        }
+    }
+}
+
+void step_interpreter_action(Stack* stack, caValue* action)
+{
+    Frame* frame = top_frame(stack);
+    Branch* branch = frame->branch;
+    Term* currentTerm = branch->get(frame->pc);
+    caValue* currentRegister = get_frame_register(frame, frame->pc);
+
+    Name tag = as_name(list_get(action, 0));
+    caValue* inputs = list_get(action, 1);
+
+    switch (tag) {
+    case name_NoOp:
+        break;
+    case name_PushNestedBranch: {
+        Branch* branch = currentTerm->nestedContents;
+        Frame* frame = push_frame(stack, branch);
+        populate_inputs_with_metadata(stack, frame, inputs);
+        break;
+    }
+    case name_PushFunctionBranch: {
+        Branch* branch = function_contents(currentTerm->function);
+        Frame* frame = push_frame(stack, branch);
+        populate_inputs_with_metadata(stack, frame, inputs);
+        break;
+    }
+    case name_CaseBlock: {
+        Branch* branch = case_block_choose_branch(stack, currentTerm);
+        if (branch == NULL)
+            return;
+        Frame* frame = push_frame(stack, branch);
+        populate_inputs_with_metadata(stack, frame, inputs);
+        break;
+    }
+    case name_ForLoop: {
+        Branch* branch = for_loop_choose_branch(stack, currentTerm);
+        Frame* frame = push_frame(stack, branch);
+        populate_inputs_with_metadata(stack, frame, inputs);
+        start_for_loop(stack);
+        break;
+    }
+    case name_SetNull:
+        set_null(currentRegister);
+        break;
+    case name_InlineCopy: {
+        caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
+        copy(value, currentRegister);
+        break;
+    }
+    case name_FireNative: {
+        EvaluateFunc override = get_override_for_branch(branch);
+        ca_assert(override != NULL);
+        frame->override = true;
+
+        // By default, we'll set nextPc to finish this frame on the next iteration.
+        // The override func may change nextPc.
+        frame->nextPc = frame->endPc;
+
+        // Call override
+        override(stack);
+
+        break;
+    }
+    case name_ErrorNotEnoughInputs: {
+        circa::Value msg;
+        Branch* func = function_contents(currentTerm->function);
+        int expectedCount = count_input_placeholders(func);
+        if (has_variable_args(func))
+            expectedCount--;
+        int foundCount = currentTerm->numInputs();
+        set_string(&msg, "Too few inputs, expected ");
+        string_append(&msg, expectedCount);
+        if (has_variable_args(func))
+            string_append(&msg, " (or more)");
+        string_append(&msg, ", found ");
+        string_append(&msg, foundCount);
+        raise_error_msg(stack, as_cstring(&msg));
+        break;
+    }
+    case name_ErrorTooManyInputs: {
+        circa::Value msg;
+        Branch* func = function_contents(currentTerm->function);
+        int expectedCount = count_input_placeholders(func);
+        int foundCount = currentTerm->numInputs();
+        set_string(&msg, "Too many inputs, expected ");
+        string_append(&msg, expectedCount);
+        string_append(&msg, ", found ");
+        string_append(&msg, foundCount);
+
+        raise_error_msg(stack, as_cstring(&msg));
+        break;
+    }
+    default:
+        std::cout << "Op not recognized: " << name_to_string(tag) << std::endl;
+        ca_assert(false);
+    }
+}
+
+void step_interpreter(Stack* stack)
+{
+    INCREMENT_STAT(stepInterpreter);
+
+    Frame* frame = top_frame(stack);
+    Branch* branch = frame->branch;
+
+    // Advance pc to nextPc
+    frame->pc = frame->nextPc;
+    frame->nextPc = frame->pc + 1;
+
+    // Check if we have finished this branch
+    if (frame->pc >= frame->endPc) {
+
+        // Exit if we have finished the topmost branch
+        if (stack->numFrames == 1 || frame->stop) {
+            stack->running = false;
+            return;
+        }
+
+        // Finish this frame
+        finish_frame(stack);
+        return;
+    }
+
+    // Fetch action
+    circa::Value action;
+    Term* currentTerm = branch->get(frame->pc);
+    get_term_eval_metadata(currentTerm, &action);
+    step_interpreter_action(stack, &action);
+}
+
+#if 0
 void step_interpreter(Stack* stack)
 {
     INCREMENT_STAT(stepInterpreter);
@@ -885,7 +1162,7 @@ void step_interpreter(Stack* stack)
     // Choose the branch to use for the next frame
     Branch* nextBranch = choose_branch(stack, currentTerm);
 
-    // if_block_choose_branch can cause error
+    // case_block_choose_branch can cause error
     if (error_occurred(stack))
         return;
 
@@ -957,6 +1234,7 @@ void step_interpreter(Stack* stack)
         return;
     }
 }
+#endif
 
 void run_interpreter(Stack* stack)
 {
@@ -966,7 +1244,9 @@ void run_interpreter(Stack* stack)
     stack->running = true;
 
     while (stack->running) {
+        // TEMP
         step_interpreter(stack);
+        //step_interpreter(stack);
     }
 }
 

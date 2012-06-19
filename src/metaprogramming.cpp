@@ -31,7 +31,13 @@ void set_term_ref(caValue* val, Term* term)
 
 Term* as_term_ref(caValue* val)
 {
+    ca_assert(is_term_ref(val));
     return (Term*) val->value_data.ptr;
+}
+
+bool is_term_ref(caValue* val)
+{
+    return val->value_type == &REF_T;
 }
 
 void branch_ref(caStack* stack)
