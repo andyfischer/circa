@@ -63,7 +63,7 @@ def Avatar.draw(self, Painter painter)
     arm_joint_l = shoulder_l + [-.2 0]
     elbow_l = arm_joint_l + [-.2 1.0]
 
-    upper_arm_vector = Point(elbow_l - arm_joint_l).normalize
+    upper_arm_vector = Point(elbow_l - arm_joint_l).norm
 
     arm_points = [arm_joint_l + [-.1 0],
         arm_joint_l + [.1 0],

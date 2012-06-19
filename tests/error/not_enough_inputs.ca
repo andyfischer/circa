@@ -1,0 +1,9 @@
+
+def f(int a, int b)
+    print('a = ' a)
+    print('b = ' b)
+
+-- disabled for now
+-- f(1, 2)
+-- f(1)
+-- f()

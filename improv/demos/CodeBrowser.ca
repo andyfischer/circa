@@ -20,6 +20,9 @@
 
 -}
 
+env = input() -> Environment
+env.background(#448)
+
 type LayoutTerm {
     Term term
     List position
@@ -35,7 +38,6 @@ type CodeBrowser {
 
     Rect windowPosition
 }
-
 
 def CodeBrowser.updateLayout(@self)
     
@@ -54,6 +56,9 @@ def CodeBrowser.setPosition(@self, Rect rect)
     self.windowPosition = rect
 
 def CodeBrowser.draw(self, Painter painter)
+
+    painter.fillRect(self.windowPosition #ccc)
+
     -- Enable a fixed width font
     painter.setFontDefaultFixedWidth()
 
@@ -77,3 +82,7 @@ def make_code_browser(Branch branch) -> CodeBrowser
     browser.updateLayout()
     return browser
 
+
+state browser = make_code_browser(load_script('Avatar.ca' -> rpath))
+browser.setPosition([10 10 300 300])
+browser.draw(env.painter)

@@ -158,30 +158,41 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
     // Fetch inputs and start preparing the new stack frame.
     List registers;
     registers.resize(get_locals_count(branch));
+
+    int inputsLength = list_length(inputs);
     
     // Cast inputs into placeholders
-    if (inputs != NULL) {
-        for (int i=0; i < list_length(inputs); i++) {
-            Term* placeholder = get_input_placeholder(branch, i);
-            if (placeholder == NULL)
-                break;
+    int placeholderIndex = 0;
+    for (placeholderIndex=0;; placeholderIndex++) {
+        Term* placeholder = get_input_placeholder(branch, placeholderIndex);
+        if (placeholder == NULL)
+            break;
 
-            caValue* input = list_get(inputs, i);
+        if (placeholderIndex >= inputsLength) {
+            // Caller did not provide enough inputs
+            break;
+        }
 
-            INCREMENT_STAT(copy_pushFrameWithInputs);
-            copy(input, registers[i]);
+        caValue* input = list_get(inputs, placeholderIndex);
 
-            INCREMENT_STAT(cast_pushFrameWithInputs);
-            bool castSuccess = cast(registers[i], placeholder->type);
+        INCREMENT_STAT(copy_pushFrameWithInputs);
 
-            if (!castSuccess) {
-                std::stringstream msg;
-                msg << "Couldn't cast input " << to_string(input)
-                    << " (at index " << i << ")"
-                    << " to type " << name_to_string(placeholder->type->name);
-                raise_error_msg(stack, msg.str().c_str());
-                return;
-            }
+        copy(input, registers[placeholderIndex]);
+
+        INCREMENT_STAT(cast_pushFrameWithInputs);
+        bool castSuccess = cast(registers[placeholderIndex], placeholder->type);
+
+        if (!castSuccess) {
+            std::stringstream msg;
+            circa::Value error;
+            set_string(&error, "Couldn't cast input ");
+            string_append_quoted(&error, input);
+            string_append(&error, " (at index ");
+            string_append(&error, placeholderIndex);
+            string_append(&error, ") to type");
+            string_append(&error, name_to_string(placeholder->type->name));
+            raise_error_msg(stack, as_cstring(&error));
+            return;
         }
     }
 

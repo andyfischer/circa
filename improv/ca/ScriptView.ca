@@ -1,6 +1,5 @@
 
 import UIHelper
-import CodeBrowser
 
 msg = input()
 
@@ -12,8 +11,6 @@ state interpreter_stopped = false
 state state_frozen = false
 state number timeWhenFrozen = 0
 state bool consumedMouseDown = false
-
-state codeBrowser = null
 
 state Point mousePos
 state Set keysDown
@@ -97,9 +94,6 @@ if msg[0] == 'onPaintEvent'
 
     -- Paint our menu on top
     topButtons.draw(painter)
-    if codeBrowser != null
-        codeBrowser.draw(painter)
-
 
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
@@ -128,7 +122,7 @@ elif msg[0] == 'onInputEvent'
     elif action == :exit
         send('View' ['changeScreen' 'IntroScreen'])
     elif action == :browse
-        codeBrowser = make_code_browser(userBranch)
+        -- noop for now
     elif action == :consumed
         -- noop
     elif action != null

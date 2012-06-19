@@ -174,6 +174,9 @@ Term* find_from_relative_name(caValue* name, Branch* relativeTo)
             return NULL;
 
         relativeTo = term->nestedContents;
+
+        if (relativeTo == NULL)
+            return NULL;
     }
     return term;
 }

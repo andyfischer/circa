@@ -503,8 +503,6 @@ def random_norm_vector() -> Point
     angle = rand() * 360
     return [cos(angle) sin(angle)]
 
-
-
 def to_rect(Point topLeft, Point size) -> Rect
     -- Return a Rect with the given top-left coordinate and size.
     return [topLeft.x, topLeft.y, topLeft.x + size.x, topLeft.y + size.y]
