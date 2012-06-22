@@ -13,6 +13,9 @@ solution "Circa"
     configuration "Release"
         flags { "OptimizeSpeed" }
 
+    configuration "Debug"
+        defines { "DEBUG" }
+
     project "static_lib"
         kind "StaticLib"
         targetname "circa"

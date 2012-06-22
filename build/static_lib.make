@@ -23,7 +23,7 @@ ifeq ($(config),debug)
   OBJDIR     = obj/Debug/static_lib
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/libcirca_d.a
-  DEFINES   += 
+  DEFINES   += -DDEBUG
   INCLUDES  += -I../include -I../src
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g

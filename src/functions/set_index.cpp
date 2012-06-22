@@ -7,7 +7,7 @@ namespace set_index_function {
 
     CA_FUNCTION(evaluate)
     {
-        INCREMENT_STAT(setIndex);
+        INCREMENT_STAT(SetIndex);
 
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);

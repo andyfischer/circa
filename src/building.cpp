@@ -6,6 +6,7 @@
 #include "code_iterators.h"
 #include "control_flow.h"
 #include "building.h"
+#include "evaluation.h"
 #include "function.h"
 #include "heap_debugging.h"
 #include "kernel.h"
@@ -72,7 +73,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
     // Create the term
     Term* term = branch->appendNew();
-    INCREMENT_STAT(termsCreated);
+    INCREMENT_STAT(TermsCreated);
 
     on_term_created(term);
 
@@ -106,6 +107,8 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
 
 void set_input(Term* term, int index, Term* input)
 {
+    branch_start_changes(term->owningBranch);
+
     assert_valid_term(term);
     assert_valid_term(input);
 
@@ -237,6 +240,8 @@ void change_function(Term* term, Term* function)
     // Possibly insert a state input for the enclosing subroutine.
     if (is_function_stateful(function))
         find_or_create_state_container(term->owningBranch);
+
+    dirty_eval_metadata(term->owningBranch);
 }
 
 void unsafe_change_type(Term *term, Type *type)
@@ -824,8 +829,7 @@ void branch_finish_changes(Branch* branch)
     // Update branch's state type
     branch_update_state_type(branch);
 
-    // Update bytecode
-    // (disabled)
+    recalculate_eval_metadata(branch);
 
     branch->inProgress = false;
     branch->version++;

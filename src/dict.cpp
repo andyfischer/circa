@@ -123,7 +123,7 @@ DictData* duplicate(DictData* original)
     if (original == NULL)
         return NULL;
 
-    INCREMENT_STAT(dictHardCopy);
+    INCREMENT_STAT(DictHardCopy);
 
     int new_capacity = int(original->count / INITIAL_LOAD_FACTOR);
     if (new_capacity < INITIAL_SIZE)

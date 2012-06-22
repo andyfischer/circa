@@ -8,6 +8,7 @@
 #include "branch.h"
 #include "evaluation.h"
 #include "introspection.h"
+#include "names_builtin.h"
 
 #include "debug.h"
 
@@ -20,7 +21,7 @@ bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS = false;
 
 int DEBUG_BREAK_ON_TERM = -1;
 
-uint64 PERF_STATS[NUM_PERFORMANCE_STATS];
+uint64 PERF_STATS[c_numPerfStats];
 
 void dump(Branch& branch)
 {
@@ -89,57 +90,26 @@ void ca_debugger_break()
 #endif
 }
 
-static const char* perf_stat_get_name(PerformanceStat stat)
-{
-    switch (stat) {
-        case STAT_termsCreated: return "termsCreated";
-        case STAT_termPropAdded: return "termPropAdded";
-        case STAT_termPropAccess: return "termPropAccess";
-        case STAT_copy_pushedInputNewFrame: return "copy_pushedInputNewFrame";
-        case STAT_copy_pushedInputMultiNewFrame: return "copy_pushedInputMultiNewFrame";
-        case STAT_copy_pushFrameWithInputs: return "copy_pushFrameWithInputs";
-        case STAT_copy_listDuplicate: return "copy_listDuplicate";
-        case STAT_cast_listCast: return "cast_listCast";
-        case STAT_cast_pushFrameWithInputs: return "cast_pushFrameWithInputs";
-        case STAT_cast_finishFrame: return "cast_finishFrame";
-        case STAT_valueCreates: return "valueCreates";
-        case STAT_valueCopies: return "valueCopies";
-        case STAT_valueCasts: return "valueCasts";
-        case STAT_valueTouch: return "valueTouch";
-        case STAT_listsCreated: return "listsCreated";
-        case STAT_listsGrown: return "listsGrown";
-        case STAT_listSoftCopy: return "listSoftCopy";
-        case STAT_listHardCopy: return "listHardCopy";
-        case STAT_dictHardCopy: return "dictHardCopy";
-        case STAT_stringCopy: return "stringCopy";
-        case STAT_stringCreate: return "stringCreate";
-        case STAT_stepInterpreter: return "stepInterpreter";
-        case STAT_interpreterCastOutputFromFinishedFrame: return "interpreterCastOutputFromFinishedFrame";
-        case STAT_branchNameLookups: return "branchNameLookups";
-        case STAT_framesCreated: return "framesCreated";
-        case STAT_loopFinishIteration: return "loopFinishIteration";
-        case STAT_dynamicCall: return "dynamicCall";
-        case STAT_setIndex: return "setIndex";
-        case STAT_setField: return "setField";
-        case NUM_PERFORMANCE_STATS: return "";
-    }
-    return "(stat not found)";
-}
 
 void perf_stats_dump()
 {
 #if CIRCA_ENABLE_PERF_STATS
     printf("perf_stats_dump:\n");
-    for (int i=0; i < NUM_PERFORMANCE_STATS; i++) {
-        printf("  %s = %llu\n", perf_stat_get_name((PerformanceStat) i), PERF_STATS[i]);
-    }
+    for (int i=c_firstStatIndex; i < name_LastStatIndex; i++)
+        printf("  %s = %llu\n", name_to_string(i), PERF_STATS[i - c_firstStatIndex]);
 #endif
 }
 void perf_stats_reset()
 {
 #if CIRCA_ENABLE_PERF_STATS
-    memset(&PERF_STATS, 0, sizeof(PERF_STATS));
+    for (int i = c_firstStatIndex; i < name_LastStatIndex; i++)
+        PERF_STATS[i - c_firstStatIndex] = 0;
 #endif
+}
+
+void perf_stat_inc(int name)
+{
+    PERF_STATS[name - c_firstStatIndex]++;
 }
 
 #if CIRCA_ENABLE_LOGGING

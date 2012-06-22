@@ -334,6 +334,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << " " << term->properties.toString();
 
     if (prefs->showBytecode) {
+#if 0
         int pos = 0;
 
         BytecodeData* bytecode = &term->bytecode;
@@ -357,6 +358,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
             bytecode_op_to_string(bytecode, pos, &str);
             out << as_cstring(&str);
         }
+#endif
     }
 
     if (prefs->showEvaluationMetadata) {
@@ -366,6 +368,11 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         for (int i=0; i < prefs->indentLevel + 2; i++)
             out << " ";
         out << to_string(&value);
+
+        out << std::endl;
+        for (int i=0; i < prefs->indentLevel + 2; i++)
+            out << " ";
+        out << "precomputed: " << to_string(&term->precomputedAction);
     }
 }
 

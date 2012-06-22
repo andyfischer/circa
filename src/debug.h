@@ -39,67 +39,17 @@ void internal_error(std::string const& message);
 
 void ca_debugger_break();
 
-// Internal performance statistics
-enum PerformanceStat {
-    // Building
-    STAT_termsCreated,
-    STAT_termPropAdded,
-    STAT_termPropAccess,
-
-    // Specific reasons for copy()
-    STAT_copy_pushedInputNewFrame,
-    STAT_copy_pushedInputMultiNewFrame,
-    STAT_copy_pushFrameWithInputs,
-    STAT_copy_listDuplicate,
-
-    // Specific reasons for cast()
-    STAT_cast_listCast,
-    STAT_cast_pushFrameWithInputs,
-    STAT_cast_finishFrame,
-
-    // Values (general)
-    STAT_valueCreates,
-    STAT_valueCopies,
-    STAT_valueCasts,
-    STAT_valueTouch,
-
-    // List values
-    STAT_listsCreated,
-    STAT_listsGrown,
-    STAT_listSoftCopy,
-    STAT_listHardCopy,
-
-    // Dict values
-    STAT_dictHardCopy,
-
-    // String values
-    STAT_stringCopy,
-    STAT_stringCreate,
-
-    // Interpreter
-    STAT_stepInterpreter,
-    STAT_interpreterCastOutputFromFinishedFrame,
-    STAT_branchNameLookups,
-    STAT_framesCreated,
-    STAT_loopFinishIteration,
-
-    // Function calls
-    STAT_dynamicCall,
-    STAT_setIndex,
-    STAT_setField,
-
-    NUM_PERFORMANCE_STATS
-};
-
-
 void perf_stats_dump();
 void perf_stats_reset();
+void perf_stat_inc(int name);
 
 #if CIRCA_ENABLE_PERF_STATS
 
-extern uint64 PERF_STATS[NUM_PERFORMANCE_STATS];
+const int c_firstStatIndex = name_FirstStatIndex + 1;
+const int c_numPerfStats = name_LastStatIndex - 1 - c_firstStatIndex;
+extern uint64 PERF_STATS[c_numPerfStats];
 
-#define INCREMENT_STAT(x) PERF_STATS[STAT_##x]++;
+#define INCREMENT_STAT(x) perf_stat_inc(stat_##x);
 
 #else
 

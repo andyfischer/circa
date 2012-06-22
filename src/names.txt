@@ -136,3 +136,57 @@ tok_Newline
 tok_Comment
 tok_Eof
 tok_Unrecognized
+
+# Performance stats
+FirstStatIndex
+
+stat_TermsCreated
+stat_TermPropAdded
+stat_TermPropAccess
+
+# Update cascades
+
+# Copying
+stat_Copy_PushedInputNewFrame
+stat_Copy_PushedInputMultiNewFrame
+stat_Copy_PushFrameWithInputs
+stat_Copy_ListDuplicate
+
+# Casting
+stat_Cast_ListCast
+stat_Cast_PushFrameWithInputs
+stat_Cast_FinishFrame
+
+# Values (general)
+stat_ValueCreates
+stat_ValueCopies
+stat_ValueCasts
+stat_ValueTouch
+
+# List values
+stat_ListsCreated
+stat_ListsGrown
+stat_ListSoftCopy
+stat_ListHardCopy
+
+# Dict values
+stat_DictHardCopy
+
+# String values
+stat_StringCopy
+stat_StringCreate
+
+# Interpreter
+stat_StepInterpreter
+stat_InterpreterCastOutputFromFinishedFrame
+stat_BranchNameLookups
+stat_FramesCreated
+stat_LoopFinishIteration
+stat_GetTermEvalMetadata
+
+# Function calls
+stat_DynamicCall
+stat_SetIndex
+stat_SetField
+
+LastStatIndex

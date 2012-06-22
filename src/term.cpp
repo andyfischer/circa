@@ -227,7 +227,7 @@ void term_set_property(Term* term, const char* name, caValue* value)
 
 caValue* term_get_property(Term* term, const char* name)
 {
-    INCREMENT_STAT(termPropAccess);
+    INCREMENT_STAT(TermPropAccess);
     return term->properties[name];
 }
 

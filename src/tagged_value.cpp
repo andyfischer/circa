@@ -37,6 +37,12 @@ Value::operator=(Value const& rhs)
     return *this;
 }
 
+void
+Value::dump()
+{
+    std::cout << to_string(this) << std::endl;
+}
+
 void initialize_null(caValue* value)
 {
     value->value_type = &NULL_T;
@@ -45,7 +51,7 @@ void initialize_null(caValue* value)
 
 void create(Type* type, caValue* value)
 {
-    INCREMENT_STAT(valueCreates);
+    INCREMENT_STAT(ValueCreates);
 
     set_null(value);
 
@@ -86,7 +92,7 @@ void release(caValue* value)
 
 void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
 {
-    INCREMENT_STAT(valueCasts);
+    INCREMENT_STAT(ValueCasts);
 
     result->success = true;
 
@@ -121,7 +127,7 @@ bool cast_possible(caValue* source, Type* type)
 
 void copy(caValue* source, caValue* dest)
 {
-    INCREMENT_STAT(valueCopies);
+    INCREMENT_STAT(ValueCopies);
 
     ca_assert(source);
     ca_assert(dest);
@@ -186,7 +192,7 @@ void reset(caValue* value)
 
 void touch(caValue* value)
 {
-    INCREMENT_STAT(valueTouch);
+    INCREMENT_STAT(ValueTouch);
 
     Type::Touch touch = value->value_type->touch;
     if (touch != NULL)

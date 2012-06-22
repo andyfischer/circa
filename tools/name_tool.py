@@ -5,7 +5,7 @@ GeneratedHeader = 'src/names_builtin.h'
 GeneratedImpl = 'src/names_builtin.cpp'
 
 def get_c_name(name):
-    if name.startswith('tok_'):
+    if name.startswith('tok_') or name.startswith('stat_'):
         return name
     else:
         return "name_" + name

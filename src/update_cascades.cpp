@@ -2,6 +2,7 @@
 
 #include "branch.h"
 #include "code_iterators.h"
+#include "evaluation.h"
 #include "heap_debugging.h"
 #include "function.h"
 #include "kernel.h"
@@ -47,6 +48,21 @@ void fix_forward_function_references(Branch* branch)
                 change_function(term, func);
             }
         }
+    }
+}
+
+void dirty_eval_metadata(Branch* branch)
+{
+    // For now, just recalculate immediately
+    recalculate_eval_metadata(branch);
+}
+
+void recalculate_eval_metadata(Branch* branch)
+{
+    // Update evaluation metadata
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        get_term_eval_metadata(term, &term->precomputedAction);
     }
 }
 

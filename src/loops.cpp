@@ -338,7 +338,7 @@ void start_for_loop(caStack* stack)
 
 void for_loop_finish_iteration(Stack* stack)
 {
-    INCREMENT_STAT(loopFinishIteration);
+    INCREMENT_STAT(LoopFinishIteration);
 
     Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;

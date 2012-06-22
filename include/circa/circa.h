@@ -89,6 +89,7 @@ struct Value : caValue
     ~Value();
     Value(Value const&);
     Value& operator=(Value const&);
+    void dump();
 };
 
 } // namespace circa

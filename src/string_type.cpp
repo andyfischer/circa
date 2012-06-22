@@ -83,7 +83,7 @@ namespace string_t {
     void initialize(Type* type, caValue* value)
     {
         set_pointer(value, new std::string());
-        INCREMENT_STAT(stringCreate);
+        INCREMENT_STAT(StringCreate);
     }
     void release(caValue* value)
     {
@@ -95,7 +95,7 @@ namespace string_t {
     {
         create(type, dest);
         *((std::string*) dest->value_data.ptr) = as_string(source);
-        INCREMENT_STAT(stringCopy);
+        INCREMENT_STAT(StringCopy);
     }
     void reset(caValue* v)
     {

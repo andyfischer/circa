@@ -13,6 +13,7 @@
 #include "names.h"
 #include "tagged_value.h"
 #include "type.h"
+#include "update_cascades.h"
 
 namespace circa {
 
@@ -21,6 +22,7 @@ Term* import_function(Branch* branch, EvaluateFunc evaluate, std::string const& 
     Term* result = parser::compile(branch, parser::function_decl, header);
 
     as_function(result)->evaluate = evaluate;
+    dirty_eval_metadata(function_contents(as_function(result)));
     return result;
 }
 
@@ -28,6 +30,7 @@ void install_function(Term* function, EvaluateFunc evaluate)
 {
     ca_assert(is_function(function));
     as_function(function)->evaluate = evaluate;
+    dirty_eval_metadata(function_contents(function));
 }
 
 Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
@@ -39,6 +42,7 @@ Term* install_function(Branch* branch, const char* name, EvaluateFunc evaluate)
         internal_error(msg.c_str());
     }
     as_function(term)->evaluate = evaluate;
+    dirty_eval_metadata(function_contents(as_function(term)));
     return term;
 }
 

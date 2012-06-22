@@ -95,6 +95,12 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
                     out << "  [" << to_string(value) << "]";
             }
             out << std::endl;
+
+            // TEMP: eval metadata
+            out << to_string(&term->precomputedAction) << std::endl;
+            circa::Value action;
+            get_term_eval_metadata(term, &action);
+            out << to_string(&action) << std::endl;
         }
     }
 }
@@ -119,7 +125,9 @@ Frame* get_frame_from_bottom(Stack* stack, int index)
 }
 Frame* push_frame(Stack* stack, Branch* branch, List* registers)
 {
-    INCREMENT_STAT(framesCreated);
+    branch_finish_changes(branch);
+
+    INCREMENT_STAT(FramesCreated);
 
     stack->numFrames++;
     stack->stack = (Frame*) realloc(stack->stack, sizeof(Frame) * stack->numFrames);
@@ -177,17 +185,17 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
 
         caValue* input = list_get(inputs, placeholderIndex);
 
-        INCREMENT_STAT(copy_pushFrameWithInputs);
+        INCREMENT_STAT(Copy_PushFrameWithInputs);
 
         copy(input, registers[placeholderIndex]);
 
-        INCREMENT_STAT(cast_pushFrameWithInputs);
+        INCREMENT_STAT(Cast_PushFrameWithInputs);
         bool castSuccess = cast(registers[placeholderIndex], placeholder->type);
 
         if (!castSuccess) {
             std::stringstream msg;
             circa::Value error;
-            set_string(&error, "Couldn't cast input ");
+            set_string(&error, "Couldn't cast input value ");
             string_append_quoted(&error, input);
             string_append(&error, " (at index ");
             string_append(&error, placeholderIndex);
@@ -264,11 +272,11 @@ void finish_frame(Stack* stack)
 
             move(result, dest);
             bool success = cast(dest, placeholder->type);
-            INCREMENT_STAT(cast_finishFrame);
+            INCREMENT_STAT(Cast_FinishFrame);
 
             if (!success) {
                 Value msg;
-                set_string(&msg, "Couldn't cast value ");
+                set_string(&msg, "Couldn't cast output value ");
                 string_append(&msg, to_string(result).c_str());
                 string_append(&msg, " to type ");
                 string_append(&msg, name_to_string(placeholder->type->name));
@@ -763,27 +771,6 @@ EvaluateFunc get_override_for_branch(Branch* branch)
     return func->evaluate;
 }
 
-Branch* choose_branch(Stack* stack, Term* term)
-{
-    if (is_value(term))
-        return NULL;
-    else if (term->function == FUNCS.if_block)
-        return case_block_choose_branch(stack, term);
-    else if (term->function == FUNCS.for_func)
-        return for_loop_choose_branch(stack, term);
-    else if (term->function == FUNCS.declared_state)
-        return function_contents(term->function);
-    else if (term->function == FUNCS.lambda)
-        // FUNCS.lambda acts as a branch value
-        return NULL;
-    else if (term->nestedContents != NULL)
-        return term->nestedContents;
-    else if (term->function != NULL)
-        return function_contents(term->function);
-    else
-        return NULL;
-}
-
 void start_interpreter_session(Stack* stack)
 {
     Branch* topBranch = top_frame(stack)->branch;
@@ -806,6 +793,8 @@ void start_interpreter_session(Stack* stack)
 
 void get_term_eval_metadata(Term* term, caValue* output)
 {
+    INCREMENT_STAT(GetTermEvalMetadata);
+
     set_list(output, 2);
     caValue* tag = list_get(output, 0);
     caValue* inputs = list_get(output, 1);
@@ -1066,7 +1055,7 @@ void step_interpreter_action(Stack* stack, caValue* action)
 
 void step_interpreter(Stack* stack)
 {
-    INCREMENT_STAT(stepInterpreter);
+    INCREMENT_STAT(StepInterpreter);
 
     Frame* frame = top_frame(stack);
     Branch* branch = frame->branch;
@@ -1089,152 +1078,10 @@ void step_interpreter(Stack* stack)
         return;
     }
 
-    // Fetch action
-    circa::Value action;
+    // Run precomputed action
     Term* currentTerm = branch->get(frame->pc);
-    get_term_eval_metadata(currentTerm, &action);
-    step_interpreter_action(stack, &action);
+    step_interpreter_action(stack, &currentTerm->precomputedAction);
 }
-
-#if 0
-void step_interpreter(Stack* stack)
-{
-    INCREMENT_STAT(stepInterpreter);
-
-    Frame* frame = top_frame(stack);
-    Branch* branch = frame->branch;
-
-    // Advance pc to nextPc
-    frame->pc = frame->nextPc;
-    frame->nextPc = frame->pc + 1;
-
-    // Check if we have finished this branch
-    if (frame->pc >= frame->endPc) {
-
-        // Exit if we have finished the topmost branch
-        if (stack->numFrames == 1 || frame->stop) {
-            stack->running = false;
-            return;
-        }
-
-        // Finish this frame
-        finish_frame(stack);
-        return;
-    }
-
-    if (frame->pc == 0) {
-        // Check if there is a C override for this branch.
-        EvaluateFunc override = get_override_for_branch(branch);
-
-        if (override != NULL) {
-            Frame* newFrame = top_frame(stack);
-            newFrame->override = true;
-
-            // By default, we'll set nextPc to finish this frame on the next iteration.
-            // The override func may change nextPc.
-            newFrame->nextPc = top_frame(stack)->endPc;
-
-            // Call override
-            override(stack);
-
-            return;
-        }
-    }
-
-    Term* currentTerm = branch->get(frame->pc);
-
-    if (currentTerm == NULL)
-        return;
-
-    // Certain functions must currently be handled in-place
-    if (currentTerm->function == FUNCS.output) {
-
-        caValue* in = find_stack_value_for_term(stack, currentTerm->input(0), 0);
-        caValue* out = get_frame_register(frame, frame->pc);
-        if (in == NULL)
-            circa_set_null(out);
-        else
-            circa_copy(in, out);
-
-        return;
-    }
-
-    // Choose the branch to use for the next frame
-    Branch* nextBranch = choose_branch(stack, currentTerm);
-
-    // case_block_choose_branch can cause error
-    if (error_occurred(stack))
-        return;
-
-    // No branch, advance to next term.
-    if (nextBranch == NULL || nextBranch->emptyEvaluation)
-        return;
-
-    // Push new frame
-    push_frame(stack, nextBranch);
-
-    // Copy each input to the new frame
-    for (int i=0, destIndex = 0; i < currentTerm->numInputs(); i++) {
-        caValue* inputSlot = circa_input(stack, destIndex);
-        Term* inputTerm = get_input_placeholder(nextBranch, destIndex);
-
-        if (inputSlot == NULL || inputTerm == NULL)
-            break;
-
-        caValue* input = find_stack_value_for_term(stack, currentTerm->input(i), 1);
-
-        //bool multiple = inputTerm->boolProp("multiple", false);
-        bool multiple = inputTerm->flags & TERM_FLAG_MULTIPLE;
-
-        if (multiple) {
-            // This arg accepts multiple inputs: append to a list
-            if (!is_list(inputSlot))
-                set_list(inputSlot, 0);
-
-            if (input == NULL)
-                set_null(list_append(inputSlot));
-            else {
-                copy(input, list_append(inputSlot));
-                INCREMENT_STAT(copy_pushedInputMultiNewFrame);
-            }
-
-            // Advance to next input, don't change destIndex.
-            continue;
-        }
-
-        if (input == NULL) {
-            set_null(inputSlot);
-            destIndex++;
-            continue;
-        }
-
-        INCREMENT_STAT(copy_pushedInputNewFrame);
-        copy(input, inputSlot);
-        bool success = cast(inputSlot, inputTerm->type);
-
-        if (!success) {
-            Value msg;
-            set_string(&msg, "Couldn't cast value ");
-            string_append(&msg, to_string(input).c_str());
-            string_append(&msg, " to type ");
-            string_append(&msg, name_to_string(inputTerm->type->name));
-            set_error_string(inputSlot, as_cstring(&msg));
-            raise_error(stack);
-            top_frame(stack)->pc = destIndex;
-            return;
-        }
-
-        destIndex++;
-    }
-
-    // Special case for starting a for-loop.
-    if (is_for_loop(nextBranch)) {
-
-        start_for_loop(stack);
-        return;
-    }
-}
-#endif
 
 void run_interpreter(Stack* stack)
 {
@@ -1275,7 +1122,7 @@ void run_interpreter_steps(Stack* stack, int steps)
 
 void dynamic_call_func(caStack* stack)
 {
-    INCREMENT_STAT(dynamicCall);
+    INCREMENT_STAT(DynamicCall);
 
     Branch* branch = as_branch(circa_input(stack, 0));
     caValue* inputContainer = circa_input(stack, 1);

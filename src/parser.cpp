@@ -36,8 +36,6 @@ Term* compile(Branch* branch, ParsingStep step, std::string const& input)
     log_arg("input", input.c_str());
     log_finish();
 
-    ca_assert(input != NULL);
-
     branch_start_changes(branch);
 
     TokenStream tokens(input);

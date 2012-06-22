@@ -7,7 +7,7 @@ namespace set_field_function {
 
     CA_FUNCTION(evaluate)
     {
-        INCREMENT_STAT(setField);
+        INCREMENT_STAT(SetField);
 
         copy(INPUT(0), OUTPUT);
         touch(OUTPUT);

@@ -23,7 +23,7 @@ ifeq ($(config),debug)
   OBJDIR     = obj/Debug/command_line
   TARGETDIR  = .
   TARGET     = $(TARGETDIR)/circa_d
-  DEFINES   += 
+  DEFINES   += -DDEBUG
   INCLUDES  += -I../include -I../src
   CPPFLAGS  += -MMD -MP $(DEFINES) $(INCLUDES)
   CFLAGS    += $(CPPFLAGS) $(ARCH) -g

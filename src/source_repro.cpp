@@ -353,6 +353,7 @@ void append_phrase(caValue* source, std::string const& str, Term* term, Name typ
 std::string get_branch_source_text(Branch* branch)
 {
     Value source;
+    set_list(&source, 0);
     format_branch_source(&source, branch);
     return unformat_rich_source(&source);
 }
@@ -360,6 +361,7 @@ std::string get_branch_source_text(Branch* branch)
 std::string get_term_source_text(Term* term)
 {
     Value source;
+    set_list(&source, 0);
     format_term_source(&source, term);
     return unformat_rich_source(&source);
 }
@@ -367,6 +369,7 @@ std::string get_term_source_text(Term* term)
 std::string get_input_source_text(Term* term, int index)
 {
     Value source;
+    set_list(&source, 0);
     format_source_for_input(&source, term, index);
     return unformat_rich_source(&source);
 }

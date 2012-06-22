@@ -20,4 +20,7 @@ void on_term_name_changed(Term* term, const char* prevName, const char* newName)
 
 void fix_forward_function_references(Branch* branch);
 
+void dirty_eval_metadata(Branch* branch);
+void recalculate_eval_metadata(Branch* branch);
+
 } // namespace circa
