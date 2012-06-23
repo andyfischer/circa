@@ -788,8 +788,8 @@ void get_term_eval_metadata(Term* term, caValue* output)
 {
     INCREMENT_STAT(GetTermEvalMetadata);
 
-    set_list(output, 2);
-    caValue* tag = list_get(output, 0);
+    set_list(output, 3);
+    caValue* outputTag = list_get(output, 0);
     caValue* inputs = list_get(output, 1);
     set_list(inputs, 0);
 
@@ -797,17 +797,18 @@ void get_term_eval_metadata(Term* term, caValue* output)
     Branch* parent = term->owningBranch;
     if (term->index == 0 && get_override_for_branch(parent) != NULL) {
 
-        set_name(tag, name_FireNative);
+        set_name(outputTag, name_FireNative);
         return;
     }
 
     if (term->function == FUNCS.output) {
+        // Output function results in either SetNull or InlineCopy
         Term* input = term->input(0);
 
         if (input == NULL) {
-            set_name(tag, name_SetNull);
+            set_name(outputTag, name_SetNull);
         } else {
-            set_name(tag, name_InlineCopy);
+            set_name(outputTag, name_InlineCopy);
             set_list(inputs, 1);
             set_term_ref(list_get(inputs, 0), term->input(0));
         }
@@ -816,40 +817,49 @@ void get_term_eval_metadata(Term* term, caValue* output)
 
     // Choose the next branch
     Branch* branch = NULL;
-    bool localBranch = false;
+    Name tag = 0;
 
     if (is_value(term)) {
         branch = NULL;
+        tag = name_NoOp;
     } else if (term->function == FUNCS.lambda
             || term->function == FUNCS.branch_unevaluated) {
         // These funcs have a nestedContents, but it shouldn't be evaluated.
         branch = NULL;
-        set_name(tag, name_NoOp);
+        tag = name_NoOp;
     } else if (term->function == FUNCS.declared_state) {
         // declared_state has a nested branch, but we shouldn't use it.
         branch = function_contents(term->function);
-        set_name(tag, name_PushFunctionBranch);
+        tag = name_PushBranch;
     } else if (term->function == FUNCS.if_block) {
         branch = term->nestedContents;
-        set_name(tag, name_CaseBlock);
+        tag = name_CaseBlock;
     } else if (term->function == FUNCS.for_func) {
         branch = term->nestedContents;
-        set_name(tag, name_ForLoop);
+        tag = name_ForLoop;
     } else if (term->nestedContents != NULL) {
         // Otherwise if the term has nested contents, then use it.
         branch = term->nestedContents;
-        set_name(tag, name_PushNestedBranch);
+        tag = name_PushBranch;
     } else if (term->function != NULL) {
         // No nested contents, use function.
         branch = function_contents(term->function);
-        set_name(tag, name_PushFunctionBranch);
+        tag = name_PushFunctionBranch;
     }
 
-    if (branch == NULL || branch->emptyEvaluation) {
+    if (tag == name_NoOp || branch == NULL || branch->emptyEvaluation) {
         // No-op
-        set_name(tag, name_NoOp);
+        set_name(outputTag, name_NoOp);
         return;
     }
+    
+    // For PushBranch we need to save the branch pointer
+    if (tag == name_PushBranch) {
+        set_branch(list_get(output, 2), branch);
+    }
+
+    // Save tag
+    set_name(outputTag, tag);
 
     // Check the input count
     int inputCount = term->numInputs();
@@ -861,13 +871,13 @@ void get_term_eval_metadata(Term* term, caValue* output)
 
     if (inputCount < requiredCount) {
         // Fail, not enough inputs.
-        set_name(tag, name_ErrorNotEnoughInputs);
+        set_name(outputTag, name_ErrorNotEnoughInputs);
         return;
     }
 
     if (inputCount > expectedCount && !varargs) {
         // Fail, too many inputs.
-        set_name(tag, name_ErrorTooManyInputs);
+        set_name(outputTag, name_ErrorTooManyInputs);
         return;
     }
     
@@ -962,6 +972,12 @@ void step_interpreter_action(Stack* stack, caValue* action)
     switch (tag) {
     case name_NoOp:
         break;
+    case name_PushBranch: {
+        Branch* branch = as_branch(list_get(action, 2));
+        Frame* frame = push_frame(stack, branch);
+        populate_inputs_with_metadata(stack, frame, inputs);
+        break;
+    }
     case name_PushNestedBranch: {
         Branch* branch = currentTerm->nestedContents;
         Frame* frame = push_frame(stack, branch);
