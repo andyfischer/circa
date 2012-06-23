@@ -9,8 +9,8 @@
 #include "generic.h"
 #include "if_block.h"
 #include "kernel.h"
-#include "metaprogramming.h"
 #include "parser.h"
+#include "reflection.h"
 #include "type.h"
 #include "type_inference.h"
 

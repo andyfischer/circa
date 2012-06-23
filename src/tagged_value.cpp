@@ -5,8 +5,8 @@
 #include "kernel.h"
 #include "debug.h"
 #include "handle.h"
-#include "metaprogramming.h"
 #include "names.h"
+#include "reflection.h"
 #include "tagged_value.h"
 #include "type.h"
 

@@ -18,9 +18,9 @@
 #include "introspection.h"
 #include "kernel.h"
 #include "list.h"
-#include "metaprogramming.h"
 #include "modules.h"
 #include "parser.h"
+#include "reflection.h"
 #include "selector.h"
 #include "source_repro.h"
 #include "stateful_code.h"
@@ -1243,7 +1243,7 @@ void bootstrap_kernel()
     };
 
     install_function_list(kernel, records);
-    metaprogramming_install_functions(kernel);
+    reflection_install_functions(kernel);
 
     // Fetch refereneces to certain builtin funcs.
     FUNCS.dll_patch = kernel->get("sys:dll_patch");

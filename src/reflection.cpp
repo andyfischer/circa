@@ -10,8 +10,8 @@
 #include "introspection.h"
 #include "generic.h"
 #include "kernel.h"
-#include "metaprogramming.h"
 #include "modules.h"
+#include "reflection.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "static_checking.h"
@@ -590,7 +590,7 @@ void overload__get_contents(caStack* stack)
     list_overload_contents(self, out);
 }
 
-void metaprogramming_install_functions(Branch* kernel)
+void reflection_install_functions(Branch* kernel)
 {
     static const ImportRecord records[] = {
         {"term_ref", term_ref},

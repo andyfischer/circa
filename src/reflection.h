@@ -4,7 +4,7 @@
 
 namespace circa {
 
-void metaprogramming_install_functions(Branch* kernel);
+void reflection_install_functions(Branch* kernel);
 
 void update_all_code_references_in_value(caValue* value, Branch* oldBranch, Branch* newBranch);
 
