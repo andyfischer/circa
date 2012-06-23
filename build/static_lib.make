@@ -70,7 +70,6 @@ OBJECTS := \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/codegen.o \
 	$(OBJDIR)/control_flow.o \
-	$(OBJDIR)/cpp_codegen.o \
 	$(OBJDIR)/debug.o \
 	$(OBJDIR)/dict.o \
 	$(OBJDIR)/dll_loading.o \
@@ -193,9 +192,6 @@ $(OBJDIR)/codegen.o: ../src/codegen.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/control_flow.o: ../src/control_flow.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/cpp_codegen.o: ../src/cpp_codegen.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/debug.o: ../src/debug.cpp
