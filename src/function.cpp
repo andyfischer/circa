@@ -134,13 +134,18 @@ void finish_building_function(Branch* contents)
         }
     }
 
-    // After the output_placeholder terms are created, we might need to update the call
-    // sites of any recursive calls.
+    // After the output_placeholder terms are created, we might need to update any
+    // recursive calls.
 
     for (BranchIterator it(contents); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (function_contents(term->function) != contents)
             continue;
+
+        // Check if we need to insert a state input
+        check_to_insert_implicit_inputs(term);
+
+        // Update extra outputs
         update_extra_outputs(term);
 
         // Update cascade, might need to fix pack_state() calls.

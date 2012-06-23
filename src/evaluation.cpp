@@ -118,8 +118,6 @@ Frame* get_frame_from_bottom(Stack* stack, int index)
 }
 Frame* push_frame(Stack* stack, Branch* branch, List* registers)
 {
-    branch_finish_changes(branch);
-
     INCREMENT_STAT(FramesCreated);
 
     stack->numFrames++;

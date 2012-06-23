@@ -2,14 +2,14 @@ reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 1st iter: {_if_block_1: [{s: 6}]}
+after 1st iter: {_if_block_1: [{s: 6, _recr: {_if_block_1: [{s: 4, _recr: {_if_block_1: [{s: 2, _recr: {_if_block_1: null}}]}}]}}]}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 2nd iter: {_if_block_1: [{s: 12}]}
+after 2nd iter: {_if_block_1: [{s: 12, _recr: {_if_block_1: [{s: 8, _recr: {_if_block_1: [{s: 4, _recr: {_if_block_1: null}}]}}]}}]}
 reached depth = 3
 reached depth = 2
 reached depth = 1
 reached depth = 0
-after 3rd iter: {_if_block_1: [{s: 24}]}
+after 3rd iter: {_if_block_1: [{s: 24, _recr: {_if_block_1: [{s: 16, _recr: {_if_block_1: [{s: 8, _recr: {_if_block_1: null}}]}}]}}]}

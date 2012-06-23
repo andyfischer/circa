@@ -953,8 +953,12 @@ Term* append_state_input(Branch* branch)
     term->setBoolProp("state", true);
     term->setBoolProp("hiddenInput", true);
     term->setBoolProp("output", true);
+
+    on_branch_inputs_changed(branch);
+
     return term;
 }
+
 Term* append_state_output(Branch* branch)
 {
     // Make sure that a state input doesn't already exist

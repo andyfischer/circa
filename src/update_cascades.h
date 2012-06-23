@@ -18,6 +18,8 @@ void recursively_finish_update_cascade(Branch* branch);
 void on_create_call(Term* term);
 void on_term_name_changed(Term* term, const char* prevName, const char* newName);
 
+void on_branch_inputs_changed(Branch* branch);
+
 void fix_forward_function_references(Branch* branch);
 
 void dirty_eval_metadata(Branch* branch);
