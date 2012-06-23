@@ -236,27 +236,6 @@ int function_num_outputs(Function* func)
     return count;
 }
 
-bool function_is_state_input(Function* func, int index)
-{
-    Term* placeholder = function_get_input_placeholder(func,index);
-    if (placeholder == NULL)
-        return false;
-    return is_state_input(placeholder);
-}
-
-bool function_has_state_input(Function* func)
-{
-    // Walk through inputs, try to find a stateful input.
-    int index = 0;
-    while (true) {
-        Term* placeholder = function_get_input_placeholder(func, index++);
-        if (placeholder == NULL)
-            return false;
-        if (is_state_input(placeholder))
-            return true;
-    }
-}    
-
 bool function_get_input_meta(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);

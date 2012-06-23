@@ -15,8 +15,6 @@ Term* find_or_create_state_container(Branch* branch);
 Term* branch_add_pack_state(Branch* branch);
 
 bool is_declared_state(Term* term);
-bool has_implicit_state(Term* term);
-
 void unpack_state(caStack* stack);
 void pack_state(caStack* stack);
 

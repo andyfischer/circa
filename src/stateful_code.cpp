@@ -24,11 +24,6 @@ bool is_declared_state(Term* term)
     return term->function == FUNCS.declared_state;
 }
 
-bool has_implicit_state(Term* term)
-{
-    return has_state_input(term_get_function_details(term));
-}
-
 bool is_function_stateful(Term* func)
 {
     if (!is_function(func))
@@ -37,7 +32,8 @@ bool is_function_stateful(Term* func)
     if (attrs == NULL)
         return false;
 
-    return function_has_state_input(attrs);
+    Branch* branch = function_contents(func);
+    return has_state_input(branch);
 }
 
 void pack_any_open_state_vars(Branch* branch)

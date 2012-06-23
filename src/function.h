@@ -90,10 +90,6 @@ Type* function_get_output_type(Function* func, int index);
 int function_num_inputs(Function* func);
 int function_num_outputs(Function* func);
 
-// Stateful inputs
-bool function_is_state_input(Function* func, int index);
-bool function_has_state_input(Function* func);
-
 bool function_get_input_meta(Function* func, int index);
 bool function_has_variable_args(Function* func);
 bool function_has_variable_args(Term* func);
