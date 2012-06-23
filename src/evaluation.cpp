@@ -5,7 +5,6 @@
 #include "building.h"
 #include "build_options.h"
 #include "branch.h"
-#include "bytecode.h"
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"

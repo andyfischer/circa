@@ -333,34 +333,6 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (prefs->showProperties)
         out << " " << term->properties.toString();
 
-    if (prefs->showBytecode) {
-#if 0
-        int pos = 0;
-
-        BytecodeData* bytecode = &term->bytecode;
-
-#if 0
-        out << std::endl << "raw: ";
-        for (int i=0; i < bytecode->writePos; i++) {
-            char hex[10];
-            sprintf(hex, "%02x", bytecode->data[i]);
-            out << hex;
-        }
-        out << std::endl;
-#endif
-
-        for (int pos = 0; !bytecode_eof(bytecode, pos); pos = bytecode_advance(bytecode, pos)) {
-            out << std::endl;
-            for (int i=0; i < prefs->indentLevel; i++)
-                std::cout << " ";
-            out << "  ";
-            circa::Value str;
-            bytecode_op_to_string(bytecode, pos, &str);
-            out << as_cstring(&str);
-        }
-#endif
-    }
-
     if (prefs->showEvaluationMetadata) {
         out << std::endl;
         for (int i=0; i < prefs->indentLevel + 2; i++)

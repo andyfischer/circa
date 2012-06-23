@@ -119,13 +119,6 @@ void do_file_command(List* args, caValue* reply)
             continue;
         }
 
-        if (string_eq(args->get(argIndex), "-pb")) {
-            printRaw = true;
-            rawOutputPrefs.showBytecode = true;
-            argIndex++;
-            continue;
-        }
-
         if (string_eq(args->get(argIndex), "-pp")) {
             printRaw = true;
             rawOutputPrefs.showProperties = true;
@@ -389,13 +382,6 @@ int run_command_line(caWorld* world, caValue* args)
 
         if (string_eq(list_get(args, 0), "-p")) {
             printRaw = true;
-            list_remove_index(args, 0);
-            continue;
-        }
-
-        if (string_eq(list_get(args, 0), "-pb")) {
-            printRaw = true;
-            rawOutputPrefs.showBytecode = true;
             list_remove_index(args, 0);
             continue;
         }
