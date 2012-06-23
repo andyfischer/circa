@@ -25,8 +25,7 @@ Term::Term()
     nameSymbol(name_None),
     owningBranch(NULL),
     index(0),
-    nestedContents(NULL),
-    flags(0)
+    nestedContents(NULL)
 {
     id = g_nextTermID++;
 

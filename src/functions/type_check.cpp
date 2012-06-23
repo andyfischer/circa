@@ -39,16 +39,17 @@ namespace type_check_function {
     {
         set_bool(OUTPUT, is_type(INPUT(0)));
     }
-    CA_FUNCTION(inputs_fit_function)
+    void inputs_fit_function(caStack* stack)
     {
-        caValue* inputs = INPUT(0);
-        Function* function = as_function(INPUT(1));
+        caValue* inputs = circa_input(stack, 0);
+        Function* function = as_function(circa_input(stack, 1));
+        caValue* result = circa_output(stack, 0);
 
         bool varArgs = function_has_variable_args(function);
 
         // Fail if wrong # of inputs
         if (!varArgs && (function_num_inputs(function) != circa_count(inputs))) {
-            set_bool(OUTPUT, false);
+            set_bool(result, false);
             return;
         }
 
@@ -59,18 +60,18 @@ namespace type_check_function {
             if (value == NULL)
                 continue;
             if (!cast_possible(value, type)) {
-                set_bool(OUTPUT, false);
+                set_bool(result, false);
                 return;
             }
         }
 
-        set_bool(OUTPUT, true);
+        set_bool(result, true);
     }
-    CA_FUNCTION(overload_error_no_match)
+    void overload_error_no_match(caStack* stack)
     {
-        caValue* inputs = INPUT(0);
+        caValue* inputs = circa_input(stack, 00);
 
-        Term* caller = CALLER;
+        Term* caller = (Term*) circa_caller_term(stack);
         Term* func = get_parent_term(caller, 3);
 
         std::stringstream out;
@@ -81,7 +82,7 @@ namespace type_check_function {
             out << func->name;
         out << ", no func could handle inputs: ";
         out << to_string(inputs);
-        RAISE_ERROR(out.str().c_str());
+        circa_output_error(stack, out.str().c_str());
     }
 
     void setup(Branch* kernel)

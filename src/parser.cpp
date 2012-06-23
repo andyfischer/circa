@@ -622,7 +622,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             std::cout << "ellipsis used in " << as_cstring(&functionName) << std::endl;
             tokens.consume(tok_Ellipsis);
             input->setBoolProp("multiple", true);
-            input->flags |= TERM_FLAG_MULTIPLE;
         }
 
         // Optional list of qualifiers
@@ -638,7 +637,6 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
                 input->setBoolProp("output", true);
             } else if (symbolText == ":multiple") {
                 input->setBoolProp("multiple", true);
-                input->flags |= TERM_FLAG_MULTIPLE;
             } else if (symbolText == ":meta") {
                 input->setBoolProp("meta", true);
             } else {

@@ -85,6 +85,7 @@ Term* create_overloaded_function(Branch* branch, const char* header)
     set_input(get_output_placeholder(contents, 0), 0, block);
 
     function->setBoolProp("overloadedFunc", true);
+    function->setBoolProp("preferSpecialize", true);
     return function;
 }
 
@@ -111,6 +112,7 @@ void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
     return append_to_overloaded_function(nested_contents(overloadedFunc), specializedFunc);
 }
 
+#if 0
 void specialize_overload_for_call(Term* call)
 {
     Branch* original = function_contents(call->function);
@@ -179,6 +181,7 @@ void specialize_overload_for_call(Term* call)
     expand_variadic_inputs_for_call(nested_contents(call), call);
     change_declared_type(call, get_output_placeholder(nested_contents(call), 0)->type);
 }
+#endif
 
 bool is_overloaded_function(Branch* branch)
 {

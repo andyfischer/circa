@@ -13,9 +13,6 @@
 
 namespace circa {
 
-const int TERM_FLAG_LAZY = 0x1;
-const int TERM_FLAG_MULTIPLE = 0x2;
-
 struct Term : public caTerm
 {
     Value value;
@@ -75,8 +72,6 @@ struct Term : public caTerm
 
     // Dynamic properties
     Dict properties;
-
-    int flags;
 
     // Terms which are using this term as an input.
     TermList users;
