@@ -17,6 +17,8 @@ state Set keysDown
 state number time
 state number timeShift = 0
 
+state showStatView = false
+
 buttons = [
     ["Browse" :browse]
     ["Reset" :reset]
@@ -50,6 +52,20 @@ def Interpreter.drawRuntimeError(int, Painter painter)
         painter.drawText(to_rect([left y] [width y+100]) 0 loc.location_string)
 
         y += 20
+
+def draw_stat_view(Painter painter)
+    painter.fillRect([10 10 500 400] #fff)
+    
+    stats = sys:perf_stats_dump()
+    sys:perf_stats_reset()
+
+    y = 10
+    for List stat in stats
+        str = concat(stat[0] ': ' stat[1])
+        painter.setColor(#000)
+        painter.drawText(to_rect([10 y] [500 y+100]) 0 str)
+        y += 18
+        
 
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter
@@ -95,8 +111,15 @@ if msg[0] == 'onPaintEvent'
     -- Paint our menu on top
     topButtons.draw(painter)
 
+    if showStatView
+        draw_stat_view(painter)
+
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
+
+    -- StatView
+    if event.key_pressed(:t)
+        showStatView = not showStatView
 
     handled = false
     action = topButtons.input(event)

@@ -95,12 +95,6 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
                     out << "  [" << to_string(value) << "]";
             }
             out << std::endl;
-
-            // TEMP: eval metadata
-            out << to_string(&term->precomputedAction) << std::endl;
-            circa::Value action;
-            get_term_eval_metadata(term, &action);
-            out << to_string(&action) << std::endl;
         }
     }
 }
@@ -1091,9 +1085,7 @@ void run_interpreter(Stack* stack)
     stack->running = true;
 
     while (stack->running) {
-        // TEMP
         step_interpreter(stack);
-        //step_interpreter(stack);
     }
 }
 

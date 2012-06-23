@@ -31,6 +31,8 @@ def keycode_to_name(int key) -> Name
         return :q
     elif key == 83
         return :s
+    elif key == 84
+        return :t
     elif key == 87
         return :w
     elif key == 88
@@ -68,3 +70,10 @@ def InputEvent.is_key(self) -> bool
         return true
     else
         return false
+
+def InputEvent.key_pressed(self, Name key) -> bool
+    if self.eventType == KeyDown
+        eventKey = keycode_to_name(self.keyCode)
+        self.eventType == KeyDown and eventKey == key
+    else
+        false

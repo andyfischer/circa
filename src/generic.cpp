@@ -180,11 +180,6 @@ void specialize_overload_for_call(Term* call)
     change_declared_type(call, get_output_placeholder(nested_contents(call), 0)->type);
 }
 
-void overload_post_input_change(Term* term)
-{
-    specialize_overload_for_call(term);
-}
-
 bool is_overloaded_function(Branch* branch)
 {
     if (branch->owningTerm == NULL)

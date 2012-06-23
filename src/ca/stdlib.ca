@@ -70,8 +70,7 @@ namespace sys
     def dll_patch()
     def module_search_paths() -> List
     def perf_stats_reset()
-    def perf_stats_dump()
-
+    def perf_stats_dump() -> List
 
 -- Load a module from a file.
 def load_module(String filename) -> Branch

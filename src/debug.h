@@ -41,6 +41,7 @@ void ca_debugger_break();
 
 void perf_stats_dump();
 void perf_stats_reset();
+void perf_stats_to_list(caValue* list);
 void perf_stat_inc(int name);
 
 #if CIRCA_ENABLE_PERF_STATS

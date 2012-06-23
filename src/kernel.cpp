@@ -299,7 +299,7 @@ void sys__perf_stats_reset(caStack* stack)
 }
 void sys__perf_stats_dump(caStack* stack)
 {
-    perf_stats_dump();
+    perf_stats_to_list(circa_output(stack, 0));
 }
 
 void load_module(caStack* stack)

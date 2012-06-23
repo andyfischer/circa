@@ -6,8 +6,10 @@ state string currentScreen = 'IntroScreen'
 
 msg_name = msg[0]
 
+-- Dispatch message to current screen
 if msg_name == 'changeScreen'
     print('changed screen to ' msg[1])
     currentScreen = msg[1]
 else
     send(currentScreen msg)
+

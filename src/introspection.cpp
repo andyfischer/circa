@@ -362,17 +362,10 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     }
 
     if (prefs->showEvaluationMetadata) {
-        circa::Value value;
-        get_term_eval_metadata(term, &value);
         out << std::endl;
         for (int i=0; i < prefs->indentLevel + 2; i++)
             out << " ";
-        out << to_string(&value);
-
-        out << std::endl;
-        for (int i=0; i < prefs->indentLevel + 2; i++)
-            out << " ";
-        out << "precomputed: " << to_string(&term->precomputedAction);
+        out << to_string(&term->precomputedAction);
     }
 }
 

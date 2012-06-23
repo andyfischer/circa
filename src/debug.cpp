@@ -90,21 +90,30 @@ void ca_debugger_break()
 #endif
 }
 
-
 void perf_stats_dump()
 {
-#if CIRCA_ENABLE_PERF_STATS
     printf("perf_stats_dump:\n");
-    for (int i=c_firstStatIndex; i < name_LastStatIndex; i++)
+    for (int i=c_firstStatIndex; i < name_LastStatIndex-1; i++)
         printf("  %s = %llu\n", name_to_string(i), PERF_STATS[i - c_firstStatIndex]);
-#endif
 }
 void perf_stats_reset()
 {
-#if CIRCA_ENABLE_PERF_STATS
-    for (int i = c_firstStatIndex; i < name_LastStatIndex; i++)
+    for (int i = c_firstStatIndex; i < name_LastStatIndex-1; i++)
         PERF_STATS[i - c_firstStatIndex] = 0;
-#endif
+}
+void perf_stats_to_list(caValue* list)
+{
+    set_list(list, c_numPerfStats);
+    for (int i = c_firstStatIndex; i < name_LastStatIndex-1; i++) {
+        Name name = i;
+        int64 value = PERF_STATS[i - c_firstStatIndex];
+        caValue* element = list_get(list, i - c_firstStatIndex);
+        set_list(element, 2);
+        set_name(list_get(element, 0), name);
+        char buf[100];
+        sprintf(buf, "%llu", value);
+        set_string(list_get(element, 1), buf);
+    }
 }
 
 void perf_stat_inc(int name)
