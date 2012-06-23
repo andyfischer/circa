@@ -285,7 +285,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 
     out << global_id(term);
 
-    out << " " << unique_name(term) << " ";
+    out << " " << unique_name(term);
 
     if (term->name != "")
         out << " '" << term->name << "'";
@@ -294,7 +294,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << " <NULL function>";
     } else {
         out << " " << term->function->name;
-        //out << global_id(term->function);
+        out << global_id(term->function);
     }
 
     // Arguments
@@ -320,7 +320,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (term->hasProperty("field"))
         out << ":field(" << term->stringProp("field", "") << ")";
 
-    out << "-> ";
+    out << "t:";
     
     if (term->type == NULL)
         out << "<NULL type>";

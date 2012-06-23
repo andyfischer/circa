@@ -15,7 +15,7 @@ SOURCES = src/main.cpp \
           src/qt_bindings.cpp
 
 LIBS += -L../build
-LIBS += -lcirca_d
+LIBS += -lcirca
 
 CONFIG += opengl release
 

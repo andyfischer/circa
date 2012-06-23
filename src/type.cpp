@@ -236,13 +236,13 @@ static void run_static_type_query(StaticTypeQuery* query)
     if (query->subjectType == NULL)
         query->subjectType = declared_type(query->subject);
 
-    // Always succeed if types are the same.
-    if (query->subjectType == query->type)
-        return query->succeed();
-
     // If output term is ANY type then we cannot statically determine.
     if (query->subjectType == &ANY_T)
         return query->unableToDetermine();
+
+    // Always succeed if types are the same.
+    if (query->subjectType == query->type)
+        return query->succeed();
 
     // Try using the type's static query func
     Type::StaticTypeQueryFunc staticTypeQueryFunc = query->type->staticTypeQuery;

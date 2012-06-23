@@ -112,29 +112,30 @@ void append_to_overloaded_function(Term* overloadedFunc, Term* specializedFunc)
     return append_to_overloaded_function(nested_contents(overloadedFunc), specializedFunc);
 }
 
-#if 0
-void specialize_overload_for_call(Term* call)
+Term* statically_specialize_overload_for_call(Term* call)
 {
     Branch* original = function_contents(call->function);
     Term* switchTerm = find_term_with_function(original, FUNCS.if_block);
     ca_assert(switchTerm != NULL);
     Branch* switchBranch = nested_contents(switchTerm);
 
+    // Do not try to specialize if any arguments are untyped.
+    for (int i=0; i < call->numInputs(); i++)
+        if (call->input(i) != NULL && declared_type(call->input(i)) == &ANY_T)
+            return NULL;
+
     // Find which case will succeed
-    Branch* successCase = NULL;
     for (int i=0; i < switchBranch->length(); i++) {
-        Term* term = switchBranch->get(i);
-        if (term->function != FUNCS.case_func)
+        Term* caseTerm = switchBranch->get(i);
+        if (caseTerm->function != FUNCS.case_func)
             continue;
 
-        // Check if we have reached the fallback case.
-        if (term->input(0) == NULL) {
-            successCase = NULL;
+        // Stop if we have reached the fallback case.
+        if (caseTerm->input(0) == NULL)
             break;
-        }
 
-        Term* inputCheck = term->input(0);
-        Term* func = inputCheck->input(1);
+        Term* caseCondition = caseTerm->input(0);
+        Term* func = caseCondition->input(1);
 
         // Check if this function statically fits
         bool allInputsFit = true;
@@ -149,39 +150,12 @@ void specialize_overload_for_call(Term* call)
             }
         }
 
-        if (allInputsFit) {
-            successCase = nested_contents(term);
-            break;
-        }
+        if (allInputsFit)
+            return func;
     }
 
-    // If successCase is NULL then no static specialization is possible.
-    if (successCase == NULL) {
-        remove_nested_contents(call);
-        return;
-    }
-
-    // Copy the successful case
-    clear_branch(nested_contents(call));
-    duplicate_branch(successCase, nested_contents(call));
-
-    // Pass along the :multiple property
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(original, i);
-        if (placeholder == NULL)
-            break;
-        Term* localPlaceholder = get_input_placeholder(nested_contents(call), i);
-
-        ca_assert(localPlaceholder != NULL);
-
-        if (placeholder->boolProp("multiple", false))
-            localPlaceholder->setBoolProp("multiple", true);
-    }
-
-    expand_variadic_inputs_for_call(nested_contents(call), call);
-    change_declared_type(call, get_output_placeholder(nested_contents(call), 0)->type);
+    return NULL;
 }
-#endif
 
 bool is_overloaded_function(Branch* branch)
 {

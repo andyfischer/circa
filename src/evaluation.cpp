@@ -9,6 +9,7 @@
 #include "dict.h"
 #include "evaluation.h"
 #include "function.h"
+#include "generic.h"
 #include "introspection.h"
 #include "kernel.h"
 #include "list.h"
@@ -89,9 +90,9 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
             if (term != NULL && !is_value(term)) {
                 caValue* value = frame->registers[term->index];
                 if (value == NULL)
-                    out << " [<register OOB>]";
+                    out << " <register OOB>";
                 else
-                    out << "  [" << to_string(value) << "]";
+                    out << " = " << to_string(value);
             }
             out << std::endl;
         }
@@ -842,7 +843,7 @@ void get_term_eval_metadata(Term* term, caValue* output)
     } else if (term->function != NULL) {
         // No nested contents, use function.
         branch = function_contents(term->function);
-        tag = name_PushFunctionBranch;
+        tag = name_PushBranch;
     }
 
     if (tag == name_NoOp || branch == NULL || branch->emptyEvaluation) {
@@ -909,6 +910,17 @@ void get_term_eval_metadata(Term* term, caValue* output)
         }
 
         set_term_ref(list_get(inputs, placeholderIndex), input);
+    }
+
+    // Do some lightweight optimization
+
+    // Try to statically specialize an overloaded function
+    if (term->function != NULL && term->function->boolProp("preferSpecialize", false)) {
+        Term* specialized = statically_specialize_overload_for_call(term);
+        if (specialized != NULL) {
+            ca_assert(tag == name_PushBranch);
+            set_branch(list_get(output, 2), function_contents(specialized));
+        }
     }
 }
 
