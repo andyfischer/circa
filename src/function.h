@@ -75,13 +75,7 @@ Term* create_function(Branch* branch, const char* name);
 void initialize_function(Term* func);
 void finish_building_function(Branch* func);
 
-bool inputs_fit_function_dynamic(Term* func, TermList const& inputs);
-
 Type* derive_specialized_output_type(Term* function, Term* call);
-
-// Returns whether the given function can rebind the input at 'index'. (The
-// calling code must still opt-in to this rebind.
-bool function_can_rebind_input(Term* function, int index);
 
 // Returns whether this term rebinds the input at 'index'
 bool function_call_rebinds_input(Term* term, int index);
@@ -99,12 +93,8 @@ int function_num_outputs(Function* func);
 // Stateful inputs
 bool function_is_state_input(Function* func, int index);
 bool function_has_state_input(Function* func);
-Term* function_insert_state_input(Function* func);
 
-bool function_is_multiple_input(Term* placeholder);
-bool function_is_multiple_input(Function* func, int index);
 bool function_get_input_meta(Function* func, int index);
-bool function_get_input_optional(Function* func, int index);
 bool function_has_variable_args(Function* func);
 bool function_has_variable_args(Term* func);
 

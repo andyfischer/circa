@@ -151,26 +151,6 @@ void finish_building_function(Branch* contents)
     branch_finish_changes(contents);
 }
 
-bool inputs_fit_function_dynamic(Term* func, TermList const& inputs)
-{
-    Function* funcAttrs = as_function(func);
-    bool varArgs = function_has_variable_args(func);
-
-    // Fail if wrong # of inputs
-    if (!varArgs && (function_num_inputs(funcAttrs) != inputs.length()))
-        return false;
-
-    for (int i=0; i < inputs.length(); i++) {
-        Type* type = function_get_input_type(func, i);
-        caValue* value = term_value(inputs[i]);
-        if (value == NULL)
-            continue;
-        if (!cast_possible(value, type))
-            return false;
-    }
-    return true;
-}
-
 Type* derive_specialized_output_type(Term* function, Term* call)
 {
     if (!FINISHED_BOOTSTRAP)
@@ -186,16 +166,6 @@ Type* derive_specialized_output_type(Term* function, Term* call)
     if (outputType == NULL)
         outputType = &ANY_T;
     return outputType;
-}
-
-bool function_can_rebind_input(Term* func, int index)
-{
-    Function* funcAttrs = as_function(func);
-
-    Term* input = function_get_input_placeholder(funcAttrs, index);
-    if (input == NULL)
-        return false;
-    return input->boolProp("output", false);
 }
 
 bool function_call_rebinds_input(Term* term, int index)
@@ -287,37 +257,12 @@ bool function_has_state_input(Function* func)
     }
 }    
 
-Term* function_insert_state_input(Function* func)
-{
-    return append_state_input(function_contents(func));
-}
-
-bool function_is_multiple_input(Term* placeholder)
-{
-    return placeholder->boolProp("multiple", false);
-}
-
-bool function_is_multiple_input(Function* func, int index)
-{
-    Term* placeholder = function_get_input_placeholder(func, index);
-    if (placeholder == NULL)
-        return false;
-    return function_is_multiple_input(placeholder);
-}
-
 bool function_get_input_meta(Function* func, int index)
 {
     Term* placeholder = function_get_input_placeholder(func, index);
     if (placeholder == NULL)
         return false;
     return placeholder->boolProp("meta", false);
-}
-bool function_get_input_optional(Function* func, int index)
-{
-    Term* placeholder = function_get_input_placeholder(func, index);
-    if (placeholder == NULL)
-        return false;
-    return placeholder->boolProp("optional", false);
 }
 bool function_has_variable_args(Function* func)
 {
