@@ -168,6 +168,9 @@ Term* find_from_relative_name(caValue* name, Branch* relativeTo)
 
     Term* term = NULL;
     for (int index=0; index < list_length(name); index++) {
+        if (relativeTo == NULL)
+            return NULL;
+
         term = find_from_unique_name(relativeTo, as_cstring(list_get(name, index)));
 
         if (term == NULL)
@@ -175,8 +178,7 @@ Term* find_from_relative_name(caValue* name, Branch* relativeTo)
 
         relativeTo = term->nestedContents;
 
-        if (relativeTo == NULL)
-            return NULL;
+        // relativeTo may now be NULL. But if we reached the end of this match, that's ok.
     }
     return term;
 }

@@ -79,8 +79,8 @@ struct Term : public caTerm
     // Location in textual source code.
     TermSourceLocation sourceLoc;
 
-    // Precomputed data used during evaluation:
-    circa::Value precomputedAction;
+    // Precomputed data used during evaluation.
+    circa::Value operationalForm;
 
     Term();
     ~Term();

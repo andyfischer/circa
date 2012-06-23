@@ -7,7 +7,7 @@
 #include "../../src/branch.h"
 #include "../../src/building.h"
 #include "../../src/modules.h"
-#include "../../src/metaprogramming.h"
+#include "../../src/reflection.h"
 
 using namespace circa;
 

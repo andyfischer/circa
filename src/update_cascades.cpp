@@ -55,18 +55,17 @@ void fix_forward_function_references(Branch* branch)
     }
 }
 
-void dirty_eval_metadata(Branch* branch)
+void dirty_operational_form(Branch* branch)
 {
     // For now, just recalculate immediately
-    recalculate_eval_metadata(branch);
+    recalculate_operational_form(branch);
 }
 
-void recalculate_eval_metadata(Branch* branch)
+void recalculate_operational_form(Branch* branch)
 {
-    // Update evaluation metadata
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
-        get_term_eval_metadata(term, &term->precomputedAction);
+        get_term_operational_form(term, &term->operationalForm);
     }
 }
 

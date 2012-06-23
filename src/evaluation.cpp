@@ -783,7 +783,7 @@ void start_interpreter_session(Stack* stack)
     }
 }
 
-void get_term_eval_metadata(Term* term, caValue* output)
+void get_term_operational_form(Term* term, caValue* output)
 {
     INCREMENT_STAT(GetTermEvalMetadata);
 
@@ -1099,7 +1099,7 @@ void step_interpreter(Stack* stack)
 
     // Run precomputed action
     Term* currentTerm = branch->get(frame->pc);
-    step_interpreter_action(stack, &currentTerm->precomputedAction);
+    step_interpreter_action(stack, &currentTerm->operationalForm);
 }
 
 void run_interpreter(Stack* stack)

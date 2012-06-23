@@ -241,7 +241,7 @@ void change_function(Term* term, Term* function)
     if (is_function_stateful(function))
         find_or_create_state_container(term->owningBranch);
 
-    dirty_eval_metadata(term->owningBranch);
+    dirty_operational_form(term->owningBranch);
 }
 
 void unsafe_change_type(Term *term, Type *type)
@@ -829,7 +829,7 @@ void branch_finish_changes(Branch* branch)
     // Update branch's state type
     branch_update_state_type(branch);
 
-    recalculate_eval_metadata(branch);
+    recalculate_operational_form(branch);
 
     branch->inProgress = false;
     branch->version++;
