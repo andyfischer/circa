@@ -271,11 +271,27 @@ void Painter__drawText(caStack* stack)
 {
     QPainter* painter = (QPainter*) circa_get_pointer(circa_input(stack, 0));
     caValue* r = circa_input(stack, 1);
-    int flags = circa_int_input(stack, 2);
+    caValue* options = circa_input(stack, 2);
     const char* text = circa_string(circa_input(stack, 3));
+    int flags = 0;
 
-    // always use TextWordWrap
+    // By default use TextWordWrap
     flags |= Qt::TextWordWrap;
+
+    // Read options
+    for (int i=0; i < circa_count(options); i++) {
+        caName opt = circa_name(circa_index(options, i));
+        if (opt == circa_to_name("NoWrap"))
+            flags = flags & ~Qt::TextWordWrap;
+        else if (opt == circa_to_name("AlignHCenter"))
+            flags |= Qt::AlignHCenter;
+        else if (opt == circa_to_name("AlignVCenter"))
+            flags |= Qt::AlignVCenter;
+        else {
+            circa_output_error(stack, "Unrecognized option");
+            return;
+        }
+    }
 
     painter->drawText(to_qrect(r), flags, text);
 

@@ -43,19 +43,17 @@ def Interpreter.drawRuntimeError(int, Painter painter)
     error_y = 50
     size = [width, 100]
     painter.setColor(#fff)
-    painter.drawText(to_rect([left error_y] size) 0 concat(msg))
+    painter.drawText(to_rect([left error_y] size) [] concat(msg))
 
     -- Draw the stack
     y = error_y + 20
     for Frame frame in int.frames
         loc = frame.pc_term
-        painter.drawText(to_rect([left y] [width y+100]) 0 loc.location_string)
+        painter.drawText(to_rect([left y] [width y+100]) [] loc.location_string)
 
         y += 20
 
 def draw_stat_view(Painter painter)
-    painter.fillRect([10 10 500 400] #fff)
-    
     stats = sys:perf_stats_dump()
     sys:perf_stats_reset()
 
@@ -63,7 +61,7 @@ def draw_stat_view(Painter painter)
     for List stat in stats
         str = concat(stat[0] ': ' stat[1])
         painter.setColor(#000)
-        painter.drawText(to_rect([10 y] [500 y+100]) 0 str)
+        painter.drawText(to_rect([10 y] [500 y+100]) [] str)
         y += 18
         
 
@@ -99,7 +97,7 @@ if msg[0] == 'onPaintEvent'
         if interpreter.errored
             print(interpreter.error_message)
 
-        -- Possibly save their state
+        -- Possibly keep their state
         if not interpreter.errored and not state_frozen
             userState = interpreter.get_state_output
 
@@ -135,6 +133,7 @@ elif msg[0] == 'onInputEvent'
         else
             -- Update the timeShift
             timeShift += time - timeWhenFrozen
+
     elif action == :load
         send('ScriptView' ['loadFile' 'demos/asteroids.ca'])
     elif action == :reset

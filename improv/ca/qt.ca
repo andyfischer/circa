@@ -30,15 +30,6 @@ type LinearGradient :handle;
 def create_linear_gradient(Point start, Point stop) -> LinearGradient
 def LinearGradient.setColorAt(self, number ratio, Color c)
 
--- Alignment flags
-AlignLeft = 1
-AlignRight = 2
-AlignHCenter = 4
-AlignJustify = 8
-AlignTop = 32
-AlignBottom = 64
-AlignVCenter = 128
-
 type Painter;
 def Painter.save(self)
 def Painter.restore(self)
@@ -51,7 +42,7 @@ def Painter.rotate(self, number radians)
 def Painter.translate(self, Point delta)
 def Painter.boundingRect(self, Rect rect, int flags, String text) -> Rect
 def Painter.drawEllipse(self, Rect r)
-def Painter.drawText(self, Rect r, int flags, String text) -> Rect
+def Painter.drawText(self, Rect r, List options, String text) -> Rect
 def Painter.drawLine(self, Point a, Point b)
 def Painter.drawRect(self, Rect r)
 def Painter.drawPath(self, PainterPath path)

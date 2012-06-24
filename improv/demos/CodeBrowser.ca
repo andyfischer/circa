@@ -41,7 +41,6 @@ type CodeBrowser {
 
 def CodeBrowser.updateLayout(@self)
     
-    {-
     curY = 0
 
     self.layoutTerms = for Term term in self.terms
@@ -50,7 +49,6 @@ def CodeBrowser.updateLayout(@self)
         curY += 1
 
         LayoutTerm([term position])
-        -}
 
 def CodeBrowser.setPosition(@self, Rect rect)
     self.windowPosition = rect
@@ -64,16 +62,18 @@ def CodeBrowser.draw(self, Painter painter)
 
     -- Find the font's dimensions
     metrics = painter.fontMetrics
-    letterSize = [metrics.width('A') metrics.height]
+    letterSize = [metrics.width('A') metrics.height] -> Point
 
     for LayoutTerm lterm in self.layoutTerms
         term = lterm.term
         pos = lterm.position
 
-        screenPos = [pos[0] * metrics.x, pos[1] * metrics.y]
+        screenPos = [pos[0] * letterSize.x, pos[1] * letterSize.y] -> Point
         add(@screenPos, self.windowPosition.topleft)
 
-        painter.drawText([screenPos.x screenPos.y 1000 1000] 0 term.to_source_string)
+        Point(@screenPos)
+        painter.drawText([screenPos.x screenPos.y self.windowPosition.x2 self.windowPosition.y2]
+            [] term.to_source_string)
 
 def make_code_browser(Branch branch) -> CodeBrowser
     browser = create(CodeBrowser)
@@ -84,5 +84,5 @@ def make_code_browser(Branch branch) -> CodeBrowser
 
 
 state browser = make_code_browser(load_script('Avatar.ca' -> rpath))
-browser.setPosition([10 10 300 300])
+browser.setPosition([10 50 300 350])
 browser.draw(env.painter)

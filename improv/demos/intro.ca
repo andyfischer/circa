@@ -13,22 +13,22 @@ def bignumber(Point loc, number opacity, String text)
     color = #ffb152
     color.a = opacity
     env.painter.setFont(bigNumberFont)
-    env.draw_text(loc 0 text color)
+    env.draw_text(loc [] text color)
 
 def infoblock(Rect rect, number opacity, String text)
     color = #eeeeee
     color.a = opacity
     env.painter.setFont(infoFont)
-    env.draw_text_in_rect(rect 0 text color)
+    env.draw_text_in_rect(rect [] text color)
 
 def smallinfoblock(Rect rect, number opacity, String text)
     color = #eeeeee
     color.a = opacity
     env.painter.setFont(smallInfoFont)
-    env.draw_text_in_rect(rect 0 text color)
+    env.draw_text_in_rect(rect [] text color)
 
 def fadein(number delay) -> number
-    e = elapsed()
+    e = env.elapsed()
     if e < delay
         return 0.0
 

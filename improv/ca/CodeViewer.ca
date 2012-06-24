@@ -19,14 +19,14 @@ elif msg[0] == 'onPaintEvent'
     painter.fillRect(painter.viewport + [0 0 1 1], #33d)
 
     if branch.is_null
-        painter.drawText([10 10 100 200] 0 "(null branch)")
+        painter.drawText([10 10 100 200] [] "(null branch)")
     else
         x = 10
         y = 10
 
         for Term t in branch.terms
-            painter.drawText([x, y, 200, 200] 0 concat(t.id))
+            painter.drawText([x, y, 200, 200] [] concat(t.id))
 
-            painter.drawText([x + 40, y, 200, 200] 0 t.function.name)
+            painter.drawText([x + 40, y, 200, 200] [] t.function.name)
             y += 14
 

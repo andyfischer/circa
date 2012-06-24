@@ -586,7 +586,7 @@ void name_dealloc_global_data()
 
 } // namespace circa
 
-extern "C" caName circa_name(const char* str)
+extern "C" caName circa_to_name(const char* str)
 {
     return circa::existing_name_from_string(str);
 }

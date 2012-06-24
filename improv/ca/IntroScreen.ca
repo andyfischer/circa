@@ -31,7 +31,7 @@ if msg_name == 'onPaintEvent'
     right = 10
     for phrase in [[#C9E8E8 "improv"] [#E1BC66 "alpha"] [#ED7D7D "4"]]
         painter.setColor(phrase[0])
-        rect = painter.drawText([right 30 300 500] 0 phrase[1])
+        rect = painter.drawText([right 30 300 500] [] phrase[1])
         right = rect.x2 + 5
     
     scriptChoices.draw(painter)

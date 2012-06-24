@@ -34,7 +34,7 @@ def Button.draw(b, Painter p)
 
     p.setFont(create_font('Sans Serif', 16))
     p.setPen(create_pen(#fff, 1.0, :none))
-    p.drawText(b.rect, AlignHCenter + AlignVCenter, b.label)
+    p.drawText(b.rect, [:AlignHCenter :AlignVCenter], b.label)
 
 def Button.input(@b, InputEvent e) -> any
     if e.is_mouse

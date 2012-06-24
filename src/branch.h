@@ -73,14 +73,14 @@ struct Branch : caBranch
 
     // Get a term from a name binding.
     inline Term* get(std::string const& name) {
-        return find_local_name(this, circa_name(name.c_str()));
+        return find_local_name(this, circa_to_name(name.c_str()));
     }
     inline Term* getNamed(const char* name) {
-        return find_local_name(this, circa_name(name));
+        return find_local_name(this, circa_to_name(name));
     }
 
     inline Term* operator[](std::string const& name) {
-        return find_local_name(this, circa_name(name.c_str()));
+        return find_local_name(this, circa_to_name(name.c_str()));
     }
 
     // Returns true if there is a term with the given name

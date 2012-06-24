@@ -306,6 +306,7 @@ caBranch*   circa_branch(caValue* value);
 float       circa_float(caValue* value);
 caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
+caName      circa_name(caValue* value);
 const char* circa_string(caValue* value);
 caType*     circa_type(caValue* value);
 void        circa_vec2(caValue* vec2, float* xOut, float* yOut);
@@ -333,7 +334,6 @@ int circa_count(caValue* container);
 
 // -- Writing to a caValue --
 
-
 // Assign to a caValue.
 void circa_set_bool(caValue* container, bool value);
 void circa_set_float(caValue* container, float value);
@@ -347,8 +347,7 @@ void circa_set_vec2(caValue* container, float x, float y);
 void circa_set_vec3(caValue* container, float x, float y, float z);
 void circa_set_vec4(caValue* container, float x, float y, float z, float w);
 
-// Assign to a string, with the given length. 'str' does not need to be NULL-terminated
-// here.
+// Assign to a string, with the given length. 'str' does not need to be NULL-terminated.
 void circa_set_string_size(caValue* container, const char* str, int size);
 
 // Append to a string
@@ -386,9 +385,9 @@ void circa_create_value(caValue* value, caType* type);
 // -- Names --
 
 // Fetch the interned name for the given string. Returns 0 if the name doesn't exist.
-caName circa_name(const char* str);
+caName circa_to_name(const char* str);
 
-// Fetch the string for an interned name
+// Fetch the string for an interned name.
 const char* circa_name_to_string(caName name);
 
 // -- String Representation --

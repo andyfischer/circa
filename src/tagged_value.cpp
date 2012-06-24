@@ -584,6 +584,11 @@ int circa_int(caValue* value) {
     ca_assert(circa_is_int(value));
     return value->value_data.asint;
 }
+caName circa_name(caValue* value)
+{
+    ca_assert(circa_is_name(value));
+    return value->value_data.asint;
+}
 const char* circa_string(caValue* value) {
     ca_assert(circa_is_string(value));
     return as_cstring(value);

@@ -13,7 +13,7 @@ def EditorView.draw(self, Painter painter, Rect rect)
         source_text = statement.to_source_text
 
         painter.drawText([rect.x1, rect.y1, rect.x2, rect.y1 + lineHeight],
-            0, source_text)
+            [], source_text)
 
         lineIndex += 1
         currentY += lineHeight
