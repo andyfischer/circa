@@ -341,13 +341,13 @@ void type_initialize_kernel(Branch* kernel)
     IMPLICIT_TYPES = create_branch(kernel, "#implicit_types")->owningTerm;
 }
 
-Term* create_tuple_type(List* types)
+Term* create_tuple_type(caValue* types)
 {
     std::stringstream typeName;
     typeName << "Tuple<";
-    for (int i=0; i < types->length(); i++) {
+    for (int i=0; i < list_length(types); i++) {
         if (i != 0) typeName << ",";
-        typeName << name_to_string(as_type(types->get(i))->name);
+        typeName << name_to_string(as_type(list_get(types,i))->name);
     }
     typeName << ">";
 
@@ -356,11 +356,11 @@ Term* create_tuple_type(List* types)
 
     unbox_type(result)->parent = &LIST_T;
 
-    List& parameter = *set_list(&unbox_type(result)->parameter, types->length());
+    caValue* parameter = set_list(&unbox_type(result)->parameter, list_length(types));
 
-    for (int i=0; i < types->length(); i++) {
-        ca_assert(is_type(types->get(i)));
-        set_type(parameter[i], as_type(types->get(i)));
+    for (int i=0; i < list_length(types); i++) {
+        ca_assert(is_type(list_get(types,i)));
+        set_type(list_get(parameter,i), as_type(list_get(types,i)));
     }
     
     return result;
@@ -443,22 +443,22 @@ Type* get_declared_type(Branch* branch, const char* name)
 
 void set_type_list(caValue* value, Type* type1)
 {
-    List* list = set_list(value, 1);
-    set_type(list->get(0), type1);
+    set_list(value, 1);
+    set_type(list_get(value,0), type1);
 }
 
 void set_type_list(caValue* value, Type* type1, Type* type2)
 {
-    List* list = set_list(value, 2);
-    set_type(list->get(0), type1);
-    set_type(list->get(1), type2);
+    set_list(value, 2);
+    set_type(list_get(value,0), type1);
+    set_type(list_get(value,1), type2);
 }
 void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3)
 {
-    List* list = set_list(value, 3);
-    set_type(list->get(0), type1);
-    set_type(list->get(1), type2);
-    set_type(list->get(2), type3);
+    set_list(value, 3);
+    set_type(list_get(value,0), type1);
+    set_type(list_get(value,1), type2);
+    set_type(list_get(value,2), type3);
 }
 
 } // namespace circa
