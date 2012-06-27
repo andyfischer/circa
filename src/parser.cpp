@@ -788,8 +788,9 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
 
     // Parse as compound type
     list_t::setup_type(unbox_type(result));
-    int closingToken = tokens.nextIs(tok_LBrace) ? tok_RBrace : tok_RBracket;
 
+    // Opening brace
+    int closingToken = tokens.nextIs(tok_LBrace) ? tok_RBrace : tok_RBracket;
     tokens.consume();
 
     result->setStringProp("syntax:postLBracketWhitespace",
@@ -803,10 +804,18 @@ ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         if (tokens.nextIs(closingToken))
             break;
 
+        // Look for comment
+        if (tokens.nextIs(tok_Comment)) {
+            Term* commentTerm = comment(contents, tokens, context).term;
+            std::string lineEnding = possible_whitespace_or_newline(tokens);
+            if (lineEnding != "")
+                commentTerm->setStringProp("syntax:lineEnding", lineEnding);
+            continue;
+        }
+
         if (!tokens.nextIs(tok_Identifier))
             return compile_error_for_line(result, tokens, startPosition);
 
-        //std::string fieldTypeName = tokens.consume(tok_Identifier);
         Term* fieldType = type_expr(branch, tokens, context).term;
 
         std::string postNameWs = possible_whitespace(tokens);

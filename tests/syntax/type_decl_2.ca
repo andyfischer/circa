@@ -1,0 +1,11 @@
+
+type T {
+
+    -- this is a comment
+    int a
+
+    int b -- this is another comment
+}
+
+t = create(T)
+print(t)

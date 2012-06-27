@@ -56,6 +56,11 @@ bool is_hidden(Term* term)
     return false;
 }
 
+bool has_empty_name(Term* term)
+{
+    return term->name == "";
+}
+
 bool is_an_unknown_identifier(Term* term)
 {
     return term->function == UNKNOWN_IDENTIFIER_FUNC;

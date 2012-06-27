@@ -2,7 +2,6 @@
 Top 5 worst issues
   - Type inference fails when using add_s or add_v
   - Improv sometimes fails to reload
-  - Syntax errors don't show up as errors
 
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)
@@ -23,8 +22,6 @@ Parser
          or something_else)
     if something or
          something_else
-
-  Can't use comments inside type declaration?
 
   Problem with sigindent with this input: (else block not recognized?)
 

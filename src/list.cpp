@@ -1,6 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "heap_debugging.h"
+#include "introspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "string_type.h"
@@ -516,13 +517,17 @@ std::string compound_type_to_string(caValue* value)
 
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter)
 {
-    List& param = *set_list(parameter, 2);
-    List& types = *set_list(param[0], typeDecl->length());
-    List& names = *set_list(param[1], typeDecl->length());
+    set_list(parameter, 2);
+    caValue* types = set_list(list_get(parameter, 0), 0);
+    caValue* names = set_list(list_get(parameter, 1), 0);
 
     for (int i=0; i < typeDecl->length(); i++) {
-        set_type(types[i], declared_type(typeDecl->get(i)));
-        set_string(names[i], typeDecl->get(i)->name);
+        Term* term = typeDecl->get(i);
+        if (!is_value(term) || has_empty_name(term))
+            continue;
+
+        set_type(list_append(types), declared_type(term));
+        set_string(list_append(names), term->name);
     }
 }
 

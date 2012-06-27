@@ -38,6 +38,7 @@ bool is_comment(Term* term);
 bool is_empty_comment(Term* term);
 bool is_value(Term* term);
 bool is_hidden(Term* term);
+bool has_empty_name(Term* term);
 
 bool is_an_unknown_identifier(Term* term);
 

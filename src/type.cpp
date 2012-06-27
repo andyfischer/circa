@@ -72,6 +72,12 @@ namespace type_t {
 
         for (int i=0; i < contents->length(); i++) {
             Term* field = contents->get(i);
+
+            if (is_comment(field)) {
+                append_phrase(source, field->stringProp("comment",""), field, tok_Comment);
+                append_phrase(source, field->stringProp("syntax:lineEnding",""), field, tok_Whitespace);
+                continue;
+            }
             ca_assert(field != NULL);
             append_phrase(source, field->stringProp("syntax:preWhitespace",""),
                     term, tok_Whitespace);
