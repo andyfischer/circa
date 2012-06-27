@@ -333,10 +333,13 @@ void append_phrase(caValue* source, const char* str, Term* term, Name type)
             std::string leadingStr;
             leadingStr.assign(str, i);
             append_phrase(source, leadingStr.c_str(), term, type);
-            append_phrase(source, "\n", term, type);
+            append_phrase(source, "\n", term, tok_Newline);
             return append_phrase(source, &str[i + 1], term, type);
         }
     }
+
+    if (strcmp(str, "\n") == 0)
+        type = tok_Newline;
 
     List* list = (List*) set_list(list_append(source));
     list->resize(3);

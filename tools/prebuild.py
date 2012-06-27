@@ -143,7 +143,7 @@ mkdir('src/generated')
 
 # generate setup_builtin_functions.cpp and register_all_tests.cpp
 write_text_file('src/generated/setup_builtin_functions.cpp', setup_builtin_functions())
-write_text_file('src/generated/register_all_tests.cpp', register_all_tests())
+# write_text_file('src/generated/register_all_tests.cpp', register_all_tests())
 
 # generate stdlib_script_text.cpp
 write_text_file('src/generated/stdlib_script_text.cpp',
@@ -171,8 +171,8 @@ def include_list(items):
         generated_cpp.append('#include "'+item+'"')
     return "\n".join(generated_cpp)
 
-write_text_file('src/generated/all_tests.cpp',
-    include_list(['../'+file for file in test_cpps()]))
+#write_text_file('src/generated/all_tests.cpp',
+#    include_list(['../'+file for file in test_cpps()]))
 write_text_file('src/generated/all_builtin_functions.cpp',
     include_list(['../'+file for file in builtin_function_cpps()]))
 write_text_file('src/generated/all_builtin_types.cpp',

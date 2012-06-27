@@ -248,6 +248,18 @@ void Branch__version(caStack* stack)
     set_int(circa_output(stack, 0), branch->version);
 }
 
+void Branch__walk_terms(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    if (branch == NULL)
+        return circa_output_error(stack, "NULL branch");
+
+    caValue* out = circa_output(stack, 0);
+    set_list(out, 0);
+    for (BranchIterator it(branch); it.unfinished(); it.advance())
+        set_term_ref(list_append(out), *it);
+}
+
 void Branch__get_term(caStack* stack)
 {
     Branch* branch = as_branch(circa_input(stack, 0));
@@ -374,6 +386,15 @@ void Term__to_source_string(caStack* stack)
     if (t == NULL)
         return circa_output_error(stack, "NULL reference");
     set_string(circa_output(stack, 0), get_term_source_text(t));
+}
+void Term__format_source(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+    caValue* output = circa_output(stack, 0);
+    circa_set_list(output, 0);
+    format_term_source((caValue*) output, t);
 }
 void Term__function(caStack* stack)
 {
@@ -616,10 +637,12 @@ void reflection_install_functions(Branch* kernel)
         {"Branch.functions", Branch__functions},
         {"Branch.terms", Branch__terms},
         {"Branch.version", Branch__version},
+        {"Branch.walk_terms", Branch__walk_terms},
         {"Branch.link", Branch__link},
         {"Term.assign", Term__assign},
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},
+        {"Term.format_source", Term__format_source},
         {"Term.function", Term__function},
         {"Term.get_type", Term__type},
         {"Term.tweak", Term__tweak},

@@ -125,6 +125,8 @@ def Branch.terms(self) -> List
 def Branch.version(self) -> int
     -- Return the 'version', which is a monotonically increasing number that is
     -- incremented whenever the branch is modified. Useful for change tracking.
+def Branch.walk_terms(self) -> List
+    -- Return a list of this branch's terms, and all nested terms.
 
 def Dict.count(self) -> int
     -- Return the number of elements
@@ -303,6 +305,8 @@ def Term.name(self) -> String
     -- Return this term's local name. May be blank.
 def Term.to_string(self) -> String
 def Term.to_source_string(self) -> String
+def Term.format_source(self) -> List
+    -- Return a list of formatted source phrases for this Term
 def Term.function(self) -> Branch
     -- Fetch this term's function.
 def Term.get_type(self) -> Type

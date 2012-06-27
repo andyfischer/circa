@@ -23,32 +23,56 @@
 env = input() -> Environment
 env.background(#448)
 
-type LayoutTerm {
+type PositionedPhrase {
     Term term
     List position
+    String str
 }
 
 type CodeBrowser {
 
     Branch branch
+
     List filters
     List terms
 
-    List layoutTerms
+    int scrollStart
+    int visibleCount
+
+    List positionedPhrases
 
     Rect windowPosition
 }
 
 def CodeBrowser.updateLayout(@self)
     
-    curY = 0
+    phrases = []
+    position = [0 0]
 
-    self.layoutTerms = for Term term in self.terms
+    for int index in (self.scrollStart .. (self.scrollStart+self.visibleCount))
+        term = self.branch.get_term(index)
 
-        position = [0 curY]
-        curY += 1
+        print(term.to_source_string)
+        for phrase in term.format_source()
+            print(phrase)
+            print('start: ' position)
+            str = phrase[0] -> String
+            phrase_term = phrase[1]
+            id = phrase[2]
 
-        LayoutTerm([term position])
+            phrases.append(PositionedPhrase([term position str]))
+
+            if id == :tok_Newline
+                position = [0, position[1] + 1]
+            else
+                position[0] += str.length
+
+            print('fin: ' position)
+
+        position = [0 position[1] + 1]
+        position[1] += 1
+
+    self.positionedPhrases = phrases
 
 def CodeBrowser.setPosition(@self, Rect rect)
     self.windowPosition = rect
@@ -62,23 +86,25 @@ def CodeBrowser.draw(self, Painter painter)
 
     -- Find the font's dimensions
     metrics = painter.fontMetrics
-    letterSize = [metrics.width('A') metrics.height] -> Point
+    letterSize = [metrics.width('AAAAAAAAAA') / 10, metrics.height] -> Point
 
-    for LayoutTerm lterm in self.layoutTerms
-        term = lterm.term
-        pos = lterm.position
+    for PositionedPhrase phrase in self.positionedPhrases
+        term = phrase.term
+        pos = phrase.position
 
         screenPos = [pos[0] * letterSize.x, pos[1] * letterSize.y] -> Point
         add(@screenPos, self.windowPosition.topleft)
 
         Point(@screenPos)
         painter.drawText([screenPos.x screenPos.y self.windowPosition.x2 self.windowPosition.y2]
-            [] term.to_source_string)
+            [:NoWrap] phrase.str)
 
 def make_code_browser(Branch branch) -> CodeBrowser
     browser = create(CodeBrowser)
     browser.branch = branch
     browser.terms = branch.terms
+    browser.scrollStart = 0
+    browser.visibleCount = 10
     browser.updateLayout()
     return browser
 
