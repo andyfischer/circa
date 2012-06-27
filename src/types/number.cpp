@@ -21,7 +21,7 @@ namespace number_t {
         set_float(value, to_float(value));
     }
 
-    bool equals(Type*, caValue* a, caValue* b)
+    bool equals(caValue* a, caValue* b)
     {
         if (!is_float(b) && !is_int(b))
             return false;

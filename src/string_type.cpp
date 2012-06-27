@@ -116,7 +116,7 @@ namespace string_t {
         return result;
     }
 
-    bool equals(Type*, caValue* lhs, caValue* rhs)
+    bool equals(caValue* lhs, caValue* rhs)
     {
         if (!is_string(rhs)) return false;
         return as_string(lhs) == as_string(rhs);

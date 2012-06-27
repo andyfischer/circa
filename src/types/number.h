@@ -5,7 +5,7 @@
 namespace circa {
 namespace number_t {
 
-    bool equals(Type* type, caValue* a, caValue* b);
+    bool equals(caValue* a, caValue* b);
     void setup_type(Type* type);
 
 } // namespace number_t

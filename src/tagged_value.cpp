@@ -307,7 +307,7 @@ bool equals(caValue* lhs, caValue* rhs)
     Type::Equals equals = lhs->value_type->equals;
 
     if (equals != NULL)
-        return equals(lhs->value_type, lhs, rhs);
+        return equals(lhs, rhs);
 
     // Default behavior for different types: return false
     if (lhs->value_type != rhs->value_type)

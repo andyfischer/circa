@@ -42,7 +42,7 @@ struct Type
     typedef void (*Initialize)(Type* type, caValue* value);
     typedef void (*Copy)(Type* type, caValue* source, caValue* dest);
     typedef void (*Reset)(Type* type, caValue* value);
-    typedef bool (*Equals)(Type* type, caValue* lhs, caValue* rhs);
+    typedef bool (*Equals)(caValue* lhs, caValue* rhs);
 
     // Attempts to cast 'value' to the given type. If the cast isn't possible, callee will
     // record the failure in the CastResult.

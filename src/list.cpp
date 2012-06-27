@@ -629,7 +629,7 @@ namespace list_t {
         list_copy(source, dest);
     }
 
-    bool tv_equals(Type*, caValue* leftcaValue, caValue* right)
+    bool tv_equals(caValue* leftcaValue, caValue* right)
     {
         ca_assert(is_list(leftcaValue));
         Type* rhsType = right->value_type;

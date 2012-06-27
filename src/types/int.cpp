@@ -11,10 +11,10 @@ namespace int_t {
         set_int(v, 0);
     }
 
-    bool equals(Type* type, caValue* a, caValue* b)
+    bool equals(caValue* a, caValue* b)
     {
         if (is_float(b))
-            return number_t::equals(type, a, b);
+            return number_t::equals(a, b);
         if (!is_int(b))
             return false;
         return as_int(a) == as_int(b);
