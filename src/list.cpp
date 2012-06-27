@@ -629,14 +629,16 @@ namespace list_t {
         list_copy(source, dest);
     }
 
-    bool tv_equals(caValue* leftcaValue, caValue* right)
+    bool tv_equals(caValue* left, caValue* right)
     {
-        ca_assert(is_list(leftcaValue));
-        Type* rhsType = right->value_type;
-        if (rhsType->numElements == NULL || rhsType->getIndex == NULL)
+        ca_assert(is_list(left));
+
+        if (!is_list_based_type(right->value_type))
             return false;
 
-        List* left = List::checkCast(leftcaValue);
+        // Shortcut: lists are equal if they have the same address.
+        if (left->value_data.ptr == right->value_data.ptr)
+            return true;
 
         int leftCount = list_length(left);
 
@@ -644,7 +646,7 @@ namespace list_t {
             return false;
 
         for (int i=0; i < leftCount; i++) {
-            if (!circa::equals(left->get(i), list_get(right, i)))
+            if (!circa::equals(list_get(left, i), list_get(right, i)))
                 return false;
         }
         return true;
