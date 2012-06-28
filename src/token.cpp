@@ -811,6 +811,8 @@ bool TokenStream::nextIs(int match, int lookahead) const
 {
     if ((this->_position + lookahead) >= tokens.size())
         return false;
+    if ((int(this->_position) + lookahead) < 0)
+        return false;
         
     return next(lookahead).match == match;
 }

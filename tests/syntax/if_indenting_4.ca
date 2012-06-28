@@ -1,0 +1,11 @@
+
+a = 1
+if true
+  if false
+    a = 2
+  else
+    a = 3
+else
+  a = 4
+
+assert(a == 3)

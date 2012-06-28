@@ -97,7 +97,6 @@ void consume_branch_with_braces(Branch* branch, TokenStream& tokens, ParserCxt* 
         Term* parentTerm);
 bool lookahead_match_whitespace_statement(TokenStream& tokens);
 bool lookahead_match_comment_statement(TokenStream& tokens);
-bool lookahead_match_leading_name_binding(TokenStream& tokens);
 bool lookahead_match_rebind_argument(TokenStream& tokens);
 Term* find_lexpr_root(Term* term);
 

@@ -23,14 +23,6 @@ Parser
     if something or
          something_else
 
-  Problem with sigindent with this input: (else block not recognized?)
-
-      modeLabel = if mode == :building
-                    "Building"
-            else
-                "Posing"
-
-
 Modules
   When compiling a module, the last value is automatically turned into an output (just
     like a function). This should probably be explicit for modules.

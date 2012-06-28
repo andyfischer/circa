@@ -27,7 +27,9 @@
 namespace circa {
 namespace parser {
 
-bool lookahead_match_equals(TokenStream& tokens);
+static bool lookahead_match_equals(TokenStream& tokens);
+static bool lookahead_match_leading_name_binding(TokenStream& tokens);
+static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
 
 Term* compile(Branch* branch, ParsingStep step, std::string const& input)
 {
@@ -843,6 +845,15 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
+    // Lookbehind to see if we have a name-binding before the if block. This is needed
+    // to figure out indentation.
+    int nameBindingPos = 0;
+    if (lookbehind_match_leading_name_binding(tokens, &nameBindingPos)) {
+        startPosition = tokens.getPosition() + nameBindingPos;
+    }
+
+    int blockIndent = tokens[startPosition].colStart;
+
     Term* result = apply(branch, FUNCS.if_block, TermList());
     Branch* contents = nested_contents(result);
     if_block_start(contents);
@@ -872,6 +883,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (leadingToken != tok_If && leadingToken != tok_Elif && leadingToken != tok_Else)
             return compile_error_for_line(result, tokens, startPosition,
                     "Expected 'if' or 'elif' or 'else'");
+
         tokens.consume();
 
         bool expectCondition = (leadingToken == tok_If || leadingToken == tok_Elif);
@@ -893,21 +905,21 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         consume_branch(nested_contents(caseTerm), tokens, context);
         branch_finish_changes(nested_contents(caseTerm));
 
-        if (tokens.nextNonWhitespaceIs(tok_Elif)
-                || (tokens.nextNonWhitespaceIs(tok_Else) && !encounteredElse)) {
+        // Figure out whether to iterate to consume another case.
+        
+        // If the next token isn't 'elif' or 'else' then stop here.
+        if (!(tokens.nextNonWhitespaceIs(tok_Elif)
+                || (tokens.nextNonWhitespaceIs(tok_Else) && !encounteredElse)))
+            break;
 
-            // If the previous block was multiline, then only parse the next block if
-            // it has equal indentation.
-            bool wrongIndent = caseTerm->boolProp("syntax:multiline",false)
-                && (caseTerm->sourceLoc.col != find_indentation_of_next_statement(tokens));
+        // If the previous block was multiline, then stop here if the upcoming
+        // indentation is greater than the expected indent.
+        if (caseTerm->boolProp("syntax:multiline",false)
+                && (blockIndent > find_indentation_of_next_statement(tokens)))
+            break;
 
-            if (!wrongIndent) {
-                firstIteration = false;
-                continue;
-            }
-        }
-
-        break;
+        // Iterate to consume the next case.
+        firstIteration = false;
     }
 
     // If the last block was marked syntax:multiline, then add a lineEnding, so that
@@ -1855,7 +1867,7 @@ bool lookahead_match_comment_statement(TokenStream& tokens)
     return tokens.nextIs(tok_Comment, lookahead);
 }
 
-bool lookahead_match_equals(TokenStream& tokens)
+static bool lookahead_match_equals(TokenStream& tokens)
 {
     int lookahead = 0;
     if (tokens.nextIs(tok_Whitespace, lookahead))
@@ -1865,15 +1877,34 @@ bool lookahead_match_equals(TokenStream& tokens)
     return true;
 }
 
-bool lookahead_match_leading_name_binding(TokenStream& tokens)
+static bool lookahead_match_leading_name_binding(TokenStream& tokens)
 {
     int lookahead = 0;
-    if (!tokens.nextIs(tok_Identifier, lookahead++))
+    if (!tokens.nextIs(tok_Identifier, lookahead))
         return false;
+    lookahead++;
     if (tokens.nextIs(tok_Whitespace, lookahead))
         lookahead++;
-    if (!tokens.nextIs(tok_Equals, lookahead++))
+    if (!tokens.nextIs(tok_Equals, lookahead))
         return false;
+    lookahead++;
+    return true;
+}
+
+static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut)
+{
+    int lookbehind = -1;
+    if (tokens.nextIs(tok_Whitespace, lookbehind))
+        lookbehind--;
+    if (!tokens.nextIs(tok_Equals, lookbehind))
+        return false;
+    lookbehind--;
+    if (tokens.nextIs(tok_Whitespace, lookbehind))
+        lookbehind--;
+    if (!tokens.nextIs(tok_Identifier, lookbehind))
+        return false;
+
+    *lookbehindOut = lookbehind;
     return true;
 }
 
