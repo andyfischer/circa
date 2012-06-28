@@ -128,8 +128,7 @@ void format_term_source_default_formatting(caValue* source, Term* term)
             term->function->name.c_str());
 
     // Check for an infix operator with implicit rebinding (like +=).
-    if (declarationStyle == "infix" && 
-            parser::is_infix_operator_rebinding(functionName)) {
+    if (declarationStyle == "infix" && term->boolProp("syntax:rebindingInfix", false)) {
         append_phrase(source, term->name.c_str(), term, name_None);
         append_phrase(source,
                 get_input_syntax_hint_optional(term, 0, "preWhitespace", " "),

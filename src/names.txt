@@ -122,7 +122,7 @@ tok_Namespace
 tok_Include
 tok_Import
 tok_And
-tok_OR
+tok_Or
 tok_Not
 tok_Discard
 tok_Null

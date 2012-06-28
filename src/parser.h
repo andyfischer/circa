@@ -20,6 +20,14 @@ enum BranchSyntax {
 
 struct ParserCxt {
     std::string pendingRebind;
+
+    // Number of open parenthesis on the current expression. This affects whether we'll
+    // consume newlines as part of an expression).
+    int openParens;
+
+    ParserCxt()
+      : openParens(0)
+    {}
 };
 
 struct ParseResult {
@@ -124,7 +132,7 @@ ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int star
         std::string const& message="");
 
 // Helper functions:
-bool is_infix_operator_rebinding(std::string const& infix);
+bool is_infix_operator_rebinding(int match);
 std::string possible_whitespace(TokenStream& tokens);
 std::string possible_newline(TokenStream& tokens);
 std::string possible_whitespace_or_newline(TokenStream& tokens);

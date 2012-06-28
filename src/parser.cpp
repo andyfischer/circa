@@ -1411,7 +1411,7 @@ int get_infix_precedence(int match)
         case tok_NotEquals:
             return 4;
         case tok_And:
-        case tok_OR:
+        case tok_Or:
             return 3;
         case tok_PlusEquals:
         case tok_MinusEquals:
@@ -1423,29 +1423,31 @@ int get_infix_precedence(int match)
     }
 }
 
-std::string get_function_for_infix(std::string const& infix)
+std::string get_function_for_infix_operator(int match)
 {
-    if (infix == "+") return "add";
-    else if (infix == "-") return "sub";
-    else if (infix == "*") return "mult";
-    else if (infix == "/") return "div";
-    else if (infix == "//") return "div_i";
-    else if (infix == "%") return "remainder";
-    else if (infix == "<") return "less_than";
-    else if (infix == "<=") return "less_than_eq";
-    else if (infix == ">") return "greater_than";
-    else if (infix == ">=") return "greater_than_eq";
-    else if (infix == "==") return "equals";
-    else if (infix == "or") return "or";
-    else if (infix == "and") return "and";
-    else if (infix == "+=") return "add";
-    else if (infix == "-=") return "sub";
-    else if (infix == "*=") return "mult";
-    else if (infix == "/=") return "div";
-    else if (infix == "!=") return "not_equals";
-    else if (infix == "<-") return "feedback";
-    else if (infix == "..") return "range";
-    else return "#unrecognized";
+    switch (match) {
+        case tok_Plus: return "add";
+        case tok_Minus: return "sub";
+        case tok_Star: return "mult";
+        case tok_Slash: return "div";
+        case tok_DoubleSlash: return "div_i";
+        case tok_Percent: return "remainder";
+        case tok_LThan: return "less_than";
+        case tok_LThanEq: return "less_than_eq";
+        case tok_GThan: return "greater_than";
+        case tok_GThanEq: return "greater_than_eq";
+        case tok_DoubleEquals: return "equals";
+        case tok_Or: return "or";
+        case tok_And: return "and";
+        case tok_PlusEquals: return "add";
+        case tok_MinusEquals: return "sub";
+        case tok_StarEquals: return "mult";
+        case tok_SlashEquals: return "div";
+        case tok_NotEquals: return "not_equals";
+        case tok_LeftArrow: return "feedback";
+        case tok_TwoDots: return "range";
+        default: return "#unrecognized";
+    }
 }
 
 ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
@@ -1455,10 +1457,10 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
 
 ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserCxt* context, int precedence)
 {
-    int startPosition = tokens.getPosition();
-
     if (precedence > HIGHEST_INFIX_PRECEDENCE)
         return unary_expression(branch, tokens, context);
+
+    int startPosition = tokens.getPosition();
 
     std::string preWhitespace = possible_whitespace(tokens);
 
@@ -1469,14 +1471,20 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
     while (!tokens.finished() && get_infix_precedence(tokens.nextNonWhitespace()) == precedence) {
 
         // Special case: if we have an expression that looks like this:
-        // <lexpr><whitespace><hyphen><non-whitespace>
-        // Then don't parse it as an infix expression.
+        //
+        //   <lexpr><whitespace><hyphen><non-whitespace>
+        //
+        // Then don't parse it as an infix expression. The right side will be parsed
+        // as unary negation.
         
-        if (tokens.nextIs(tok_Whitespace) && tokens.nextIs(tok_Minus, 1) && !tokens.nextIs(tok_Whitespace, 2))
+        if (tokens.nextIs(tok_Whitespace)
+                && tokens.nextIs(tok_Minus, 1)
+                && !tokens.nextIs(tok_Whitespace, 2))
             break;
 
         std::string preOperatorWhitespace = possible_whitespace(tokens);
 
+        int operatorMatch = tokens.next().match;
         std::string operatorStr = tokens.consumeStr();
 
         std::string postOperatorWhitespace = possible_whitespace(tokens);
@@ -1484,7 +1492,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
         ParseResult result;
 
         // Right-apply
-        if (operatorStr == "->") {
+        if (operatorMatch == tok_RightArrow) {
             if (!tokens.nextIs(tok_Identifier))
                 return compile_error_for_line(branch, tokens, startPosition);
 
@@ -1505,14 +1513,14 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             result = ParseResult(term);
 
         // Left-arrow
-        } else if (operatorStr == "<-") {
+        } else if (operatorMatch == tok_LeftArrow) {
             ParseResult rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
 
             if (!is_function(leftExpr.term))
                 throw std::runtime_error("Left side of <- must be a function");
 
-            Stack context;
-            evaluate_minimum(&context, leftExpr.term, NULL);
+            Stack evalStack;
+            evaluate_minimum(&evalStack, leftExpr.term, NULL);
 
             Term* function = leftExpr.term;
 
@@ -1527,16 +1535,19 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
         } else {
             ParseResult rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
 
-            std::string functionName = get_function_for_infix(operatorStr);
+            std::string functionName = get_function_for_infix_operator(operatorMatch);
 
             ca_assert(functionName != "#unrecognized");
 
-            bool isRebinding = is_infix_operator_rebinding(operatorStr);
+            bool isRebinding = is_infix_operator_rebinding(operatorMatch);
 
             Term* function = find_name(branch, functionName.c_str());
             Term* term = apply(branch, function, TermList(leftExpr.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);
+            
+            if (isRebinding)
+                term->setBoolProp("syntax:rebindingInfix", true);
 
             set_input_syntax_hint(term, 0, "postWhitespace", preOperatorWhitespace);
             set_input_syntax_hint(term, 1, "preWhitespace", postOperatorWhitespace);
@@ -1995,7 +2006,13 @@ ParseResult atom(Branch* branch, TokenStream& tokens, ParserCxt* context)
     // parenthesized expression?
     else if (tokens.nextIs(tok_LParen)) {
         tokens.consume(tok_LParen);
+
+        int prevParenCount = context->openParens;
+        context->openParens++;
+
         result = expression(branch, tokens, context);
+
+        context->openParens = prevParenCount;
 
         if (!tokens.nextIs(tok_RParen))
             return compile_error_for_line(result.term, tokens, startPosition);
@@ -2431,9 +2448,18 @@ ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int star
     return ParseResult(existing);
 }
 
-bool is_infix_operator_rebinding(std::string const& infix)
+bool is_infix_operator_rebinding(int match)
 {
-    return (infix == "+=" || infix == "-=" || infix == "*=" || infix == "/=");
+    switch (match) {
+        case tok_PlusEquals:
+        case tok_MinusEquals:
+        case tok_StarEquals:
+        case tok_SlashEquals:
+            return true;
+
+        default:
+            return false;
+    }
 }
 
 std::string possible_whitespace(TokenStream& tokens)
