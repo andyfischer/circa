@@ -75,12 +75,8 @@ struct TokenStream
     std::string nextStr(int lookahead=0) const;
     void getNextStr(caValue* value, int lookahead) const;
 
-    // Returns the position of the next non-whitespace token. Returns -1 if
-    // the end of the stream was reached before anything was found.
-    int findNextNonWhitespace(int lookahead=0) const;
-
-    // Returns the token type of the next non-whitespace token.
-    int nextNonWhitespace(int lookahead=0) const;
+    // Return true if the given lookahead is past the end of the list.
+    bool nextIsEof(int lookahead) const;
 
     bool nextIs(int match, int lookahead=0) const;
 
@@ -97,8 +93,6 @@ struct TokenStream
 
     // Like consume(), but registers the string as a runtime symbol.
     Name consumeName(int match = -1);
-
-    bool nextNonWhitespaceIs(int match, int lookahead=0) const;
 
     bool finished() const
     {

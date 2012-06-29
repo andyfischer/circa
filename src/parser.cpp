@@ -27,6 +27,7 @@
 namespace circa {
 namespace parser {
 
+static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo);
 static bool lookahead_match_equals(TokenStream& tokens);
 static bool lookahead_match_leading_name_binding(TokenStream& tokens);
 static bool lookbehind_match_leading_name_binding(TokenStream& tokens, int* lookbehindOut);
@@ -133,7 +134,7 @@ void consume_branch(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     Term* parentTerm = branch->owningTerm;
 
-    if (tokens.nextNonWhitespaceIs(tok_LBrace)) {
+    if (tok_LBrace == lookahead_next_non_whitespace(tokens, false)) {
         consume_branch_with_braces(branch, tokens, context, parentTerm);
     } else {
         consume_branch_with_significant_indentation(branch, tokens, context, parentTerm);
@@ -667,7 +668,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     tokens.consume(tok_RParen);
 
     // Another optional list of symbols
-    if (tokens.nextNonWhitespaceIs(tok_Name)) {
+    if (tok_Name == lookahead_next_non_whitespace(tokens, false)) {
         possible_whitespace(tokens);
         std::string symbolText = tokens.consumeStr(tok_Name);
         #if 0 // there was once stuff here
@@ -684,7 +685,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // Output type
     Term* outputType = VOID_TYPE;
 
-    if (tokens.nextNonWhitespaceIs(tok_RightArrow)) {
+    if (tok_RightArrow == lookahead_next_non_whitespace(tokens, false)) {
         result->setStringProp("syntax:whitespacePreColon", possible_whitespace(tokens));
         tokens.consume(tok_RightArrow);
         result->setStringProp("syntax:whitespacePostColon", possible_whitespace(tokens));
@@ -908,8 +909,9 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         // Figure out whether to iterate to consume another case.
         
         // If the next token isn't 'elif' or 'else' then stop here.
-        if (!(tokens.nextNonWhitespaceIs(tok_Elif)
-                || (tokens.nextNonWhitespaceIs(tok_Else) && !encounteredElse)))
+        int nextToken = lookahead_next_non_whitespace(tokens, false);
+        if (!(nextToken == tok_Elif
+                || ((nextToken == tok_Else) && !encounteredElse)))
             break;
 
         // If the previous block was multiline, then stop here if the upcoming
@@ -1457,6 +1459,8 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
 
     ParseResult left = unary_expression(branch, tokens, context);
 
+    bool consumeNewlines = context->openParens > 0;
+
     // Loop, consuming as many infix expressions as the minimumPrecedence allows.
     while (true) {
 
@@ -1472,7 +1476,8 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
             return left;
 
         // Check the precedence of the next available token.
-        int operatorPrecedence = get_infix_precedence(tokens.nextNonWhitespace());
+        int lookaheadOperator = lookahead_next_non_whitespace(tokens, consumeNewlines);
+        int operatorPrecedence = get_infix_precedence(lookaheadOperator);
         
         // Don't consume if it's below our minimum. This will happen if this is a recursive
         // call, or if get_infix_precedence returned -1 (next token isn't an operator)
@@ -1480,12 +1485,16 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
             return left;
         
         // Parse an infix expression
-        std::string preOperatorWhitespace = possible_whitespace(tokens);
+        std::string preOperatorWhitespace;
+        if (consumeNewlines)
+            preOperatorWhitespace = possible_whitespace_or_newline(tokens);
+        else
+            preOperatorWhitespace = possible_whitespace(tokens);
 
         int operatorMatch = tokens.next().match;
         std::string operatorStr = tokens.consumeStr();
 
-        std::string postOperatorWhitespace = possible_whitespace(tokens);
+        std::string postOperatorWhitespace = possible_whitespace_or_newline(tokens);
 
         ParseResult result;
 
@@ -1854,6 +1863,20 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
     }
 
     return result;
+}
+
+static int lookahead_next_non_whitespace(TokenStream& tokens, bool skipNewlinesToo)
+{
+    int lookahead = 0;
+    while (tokens.nextIs(tok_Whitespace, lookahead)
+            || (skipNewlinesToo && tokens.nextIs(tok_Newline, lookahead))) {
+        lookahead++;
+    }
+
+    if (tokens.nextIsEof(lookahead))
+        return tok_Eof;
+
+    return tokens.next(lookahead).match;
 }
 
 bool lookahead_match_whitespace_statement(TokenStream& tokens)

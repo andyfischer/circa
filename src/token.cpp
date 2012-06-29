@@ -773,38 +773,10 @@ void TokenStream::getNextStr(caValue* value, int lookahead) const
     circa_set_string_size(value, _sourceText.c_str() + startPos, length);
 }
 
-int
-TokenStream::findNextNonWhitespace(int lookahead) const
+bool TokenStream::nextIsEof(int lookahead) const
 {
-    int index = this->_position;
-
-    while (true) {
-
-        if (index >= (int) tokens.size())
-            return -1;
-
-        if (tokens[index].match == tok_Whitespace) {
-            index++;
-            continue;
-        }
-
-        if (lookahead == 0)
-            return index;
-
-        lookahead--;
-        index++;
-    }
-}
-
-int
-TokenStream::nextNonWhitespace(int lookahead) const
-{
-    int index = findNextNonWhitespace(lookahead);
-
-    if (index == -1)
-        return tok_Eof;
-
-    return tokens[index].match;
+    int i = this->_position + lookahead;
+    return i >= (int) tokens.size();
 }
 
 bool TokenStream::nextIs(int match, int lookahead) const
@@ -856,12 +828,6 @@ TokenStream::consumeName(int match)
     Name value = name_from_string(nextStr().c_str());
     consume(match);
     return value;
-}
-
-bool
-TokenStream::nextNonWhitespaceIs(int match, int lookahead) const
-{
-    return nextNonWhitespace(lookahead) == match;
 }
 
 int

@@ -17,12 +17,6 @@ Code cleanup
 Parser
   In function decl, type should be optional (rather than name being optional)
 
-  Newlines don't work in some infix_expr. Example
-    if (something
-         or something_else)
-    if something or
-         something_else
-
 Modules
   When compiling a module, the last value is automatically turned into an output (just
     like a function). This should probably be explicit for modules.
