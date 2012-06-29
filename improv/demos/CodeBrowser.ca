@@ -37,7 +37,6 @@ type CodeBrowser {
     List terms
 
     int scrollStart
-    int visibleCount
 
     List positionedPhrases
 
@@ -49,25 +48,24 @@ def CodeBrowser.updateLayout(@self)
     phrases = []
     position = [0 0]
 
-    for int index in (self.scrollStart .. (self.scrollStart+self.visibleCount))
+    visibleCount = self.windowPosition.height // 20
+
+    for int index in (self.scrollStart .. (self.scrollStart+visibleCount))
         term = self.branch.get_term(index)
 
-        print(term.to_source_string)
         for phrase in term.format_source()
-            print(phrase)
-            print('start: ' position)
             str = phrase[0] -> String
             phrase_term = phrase[1]
             id = phrase[2]
 
-            phrases.append(PositionedPhrase([term position str]))
+            positioned = PositionedPhrase([term position str])
+            phrases.append(positioned)
 
+            -- Advance 'position', taking newlines into account
             if id == :tok_Newline
                 position = [0, position[1] + 1]
             else
                 position[0] += str.length
-
-            print('fin: ' position)
 
         position = [0 position[1] + 1]
         position[1] += 1
@@ -76,6 +74,7 @@ def CodeBrowser.updateLayout(@self)
 
 def CodeBrowser.setPosition(@self, Rect rect)
     self.windowPosition = rect
+    self.updateLayout
 
 def CodeBrowser.draw(self, Painter painter)
 
@@ -104,11 +103,12 @@ def make_code_browser(Branch branch) -> CodeBrowser
     browser.branch = branch
     browser.terms = branch.terms
     browser.scrollStart = 0
-    browser.visibleCount = 10
     browser.updateLayout()
     return browser
 
 
-state browser = make_code_browser(load_script('Avatar.ca' -> rpath))
-browser.setPosition([10 50 300 350])
+script = load_script('Avatar.ca' -> rpath)
+print('script is: ' script)
+state browser = make_code_browser(script)
+browser.setPosition([10, 50, env.bounds.x - 10, env.bounds.y - 10])
 browser.draw(env.painter)

@@ -117,7 +117,7 @@ modeLabel = if mode == :building
             else
                 "Posing"
 
--- env.draw_text([10, env.bounds.y - 20] 0, modeLabel, #fff)
+env.draw_text([10, env.bounds.y - 20] [], modeLabel, #fff)
 
 index = 0
 for JointDef joint in skel.jointDefs

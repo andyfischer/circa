@@ -67,8 +67,10 @@ void update_all_code_references_in_value(caValue* value, Branch* oldBranch, Bran
         } else if (is_branch(val)) {
 
             // If this is just a reference to 'oldBranch' then simply update it to 'newBranch'.
-            if (as_branch(val) == oldBranch)
+            if (as_branch(val) == oldBranch) {
                 set_branch(val, newBranch);
+                continue;
+            }
 
             // Noop on null branch.
             if (as_branch(val) == NULL)

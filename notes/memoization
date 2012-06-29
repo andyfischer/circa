@@ -1,0 +1,48 @@
+
+State and memoization
+  Every usage of state is a potential problem
+
+  When modifying a function that produced a stateful value, we often want to
+  revisit/recalculate the state value from the change.
+
+  This is the case when state is used for memoizing. But, maybe we shouldn't use
+  state for memoizing.
+
+--
+
+Updating code references
+
+  When state contains references to Term/Branch, we currently, sneakily, update
+  those references to the new version.
+
+  This doesn't work if our new branch has not yet loaded the given script.
+  (However, if all scripts were part of a global registry then this would probably
+  work better).
+
+  This approach will cause errors if an expression was used to find the module.
+  In the new world, we may end up with a reference that's impossible given the
+  expressions used.
+
+State twiddling
+  Whenever a code change is entered in the system, we could construct a dependency
+  network to see what state terms depend on this code change. Then we could find
+  state created from those terms, and update it to the new code (somehow?)
+
+Memoizing
+  Could be a manual memoize() function
+  Returns true if any inputs are changed
+  Also returns true if any relevant code has been changed
+    In first pass.. could return true if any code at all has been changed
+
+Memoize Everything
+  We are a dataflow language after all
+  Memoizing results could be the default
+  Store the last execution result for everything
+  All we need to do at runtime is:
+    Get output values from each function
+    Run effectual functions
+      Does it matter if these calls are done against an accurate stack?
+        For now let's keep the stack accurate
+  Need to annotate native functions as effectual or not
+  Also need to annotate functions as impure
+    Specifically, each output value should be separately annotated as impure
