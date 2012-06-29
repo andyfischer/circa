@@ -1157,6 +1157,7 @@ void bootstrap_kernel()
 
     // Load the standard library from stdlib.ca
 
+
     // Parse the stdlib script
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 

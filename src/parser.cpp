@@ -890,7 +890,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
         if (expectCondition) {
             possible_whitespace(tokens);
-            Term* condition = infix_expression(branch, tokens, context).term;
+            Term* condition = infix_expression(branch, tokens, context, 0).term;
             ca_assert(condition != NULL);
             caseTerm = if_block_append_case(contents, condition);
         } else {
@@ -951,7 +951,7 @@ ParseResult switch_block(Branch* branch, TokenStream& tokens, ParserCxt* context
     tokens.consume(tok_Switch);
     possible_whitespace(tokens);
 
-    Term* input = infix_expression(branch, tokens, context).term;
+    Term* input = infix_expression(branch, tokens, context, 0).term;
 
     Term* result = apply(branch, SWITCH_FUNC, TermList(input));
 
@@ -985,7 +985,7 @@ ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* conte
     Branch* parentBranch = parent->owningBranch;
 
     // Parse the 'case' input, using the branch that the 'switch' is in.
-    Term* input = infix_expression(parentBranch, tokens, context).term;
+    Term* input = infix_expression(parentBranch, tokens, context, 0).term;
 
     Term* result = apply(branch, FUNCS.case_func, TermList(input));
 
@@ -1038,7 +1038,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         possible_whitespace(tokens);
     }
 
-    Term* listExpr = infix_expression(branch, tokens, context).term;
+    Term* listExpr = infix_expression(branch, tokens, context, 0).term;
 
     Term* forTerm = apply(branch, FUNCS.for_func, TermList(listExpr));
     Branch* contents = nested_contents(forTerm);
@@ -1074,7 +1074,7 @@ ParseResult while_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     tokens.consume(tok_While);
     possible_whitespace(tokens);
 
-    Term* conditionExpr = infix_expression(branch, tokens, context).term;
+    Term* conditionExpr = infix_expression(branch, tokens, context, 0).term;
 
     Term* whileTerm = apply(branch, FUNCS.unbounded_loop, TermList(conditionExpr));
     Branch* contents = nested_contents(whileTerm);
@@ -1133,7 +1133,7 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         // If the initial value contains any new expressions, then those live inside
         // the term's nested_contents.
 
-        Term* initialValue = infix_expression(nested_contents(result), tokens, context).term;
+        Term* initialValue = infix_expression(nested_contents(result), tokens, context, 0).term;
 
         if (type != declared_type(initialValue) && type != &ANY_T) {
             initialValue = apply(nested_contents(result), FUNCS.cast, TermList(initialValue));
@@ -1381,7 +1381,7 @@ ParseResult expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
     else if (tokens.nextIs(tok_Switch))
         result = switch_block(branch, tokens, context);
     else
-        result = infix_expression(branch, tokens, context);
+        result = infix_expression(branch, tokens, context, 0);
 
     return result;
 }
@@ -1450,38 +1450,36 @@ std::string get_function_for_infix_operator(int match)
     }
 }
 
-ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
+ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* context,
+        int minimumPrecedence)
 {
-    return infix_expression_nested(branch, tokens, context, 0);
-}
-
-ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserCxt* context, int precedence)
-{
-    if (precedence > HIGHEST_INFIX_PRECEDENCE)
-        return unary_expression(branch, tokens, context);
-
     int startPosition = tokens.getPosition();
 
-    std::string preWhitespace = possible_whitespace(tokens);
+    ParseResult left = unary_expression(branch, tokens, context);
 
-    ParseResult leftExpr = infix_expression_nested(branch, tokens, context, precedence+1);
-
-    prepend_whitespace(leftExpr.term, preWhitespace);
-
-    while (!tokens.finished() && get_infix_precedence(tokens.nextNonWhitespace()) == precedence) {
+    // Loop, consuming as many infix expressions as the minimumPrecedence allows.
+    while (true) {
 
         // Special case: if we have an expression that looks like this:
         //
-        //   <lexpr><whitespace><hyphen><non-whitespace>
+        //   <expr><whitespace><hyphen><non-whitespace>
         //
-        // Then don't parse it as an infix expression. The right side will be parsed
-        // as unary negation.
-        
+        // Then stop and don't parse it as an infix expression. The right side will be
+        // parsed as a subsequent expression that has an unary negation.
         if (tokens.nextIs(tok_Whitespace)
                 && tokens.nextIs(tok_Minus, 1)
                 && !tokens.nextIs(tok_Whitespace, 2))
-            break;
+            return left;
 
+        // Check the precedence of the next available token.
+        int operatorPrecedence = get_infix_precedence(tokens.nextNonWhitespace());
+        
+        // Don't consume if it's below our minimum. This will happen if this is a recursive
+        // call, or if get_infix_precedence returned -1 (next token isn't an operator)
+        if (operatorPrecedence < minimumPrecedence)
+            return left;
+        
+        // Parse an infix expression
         std::string preOperatorWhitespace = possible_whitespace(tokens);
 
         int operatorMatch = tokens.next().match;
@@ -1491,7 +1489,6 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 
         ParseResult result;
 
-        // Right-apply
         if (operatorMatch == tok_RightArrow) {
             if (!tokens.nextIs(tok_Identifier))
                 return compile_error_for_line(branch, tokens, startPosition);
@@ -1499,7 +1496,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             std::string functionName = tokens.consumeStr(tok_Identifier);
             Term* function = find_name(branch, functionName.c_str());
 
-            Term* term = apply(branch, function, TermList(leftExpr.term));
+            Term* term = apply(branch, function, TermList(left.term));
 
             if (term->function == NULL || term->function->name != functionName)
                 term->setStringProp("syntax:functionName", functionName);
@@ -1514,15 +1511,15 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 
         // Left-arrow
         } else if (operatorMatch == tok_LeftArrow) {
-            ParseResult rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
+            ParseResult rightExpr = infix_expression(branch, tokens, context, operatorPrecedence+1);
 
-            if (!is_function(leftExpr.term))
+            if (!is_function(left.term))
                 throw std::runtime_error("Left side of <- must be a function");
 
             Stack evalStack;
-            evaluate_minimum(&evalStack, leftExpr.term, NULL);
+            evaluate_minimum(&evalStack, left.term, NULL);
 
-            Term* function = leftExpr.term;
+            Term* function = left.term;
 
             Term* term = apply(branch, function, TermList(rightExpr.term));
 
@@ -1533,7 +1530,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             result = ParseResult(term);
 
         } else {
-            ParseResult rightExpr = infix_expression_nested(branch, tokens, context, precedence+1);
+            ParseResult rightExpr = infix_expression(branch, tokens, context, operatorPrecedence+1);
 
             std::string functionName = get_function_for_infix_operator(operatorMatch);
 
@@ -1542,7 +1539,7 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             bool isRebinding = is_infix_operator_rebinding(operatorMatch);
 
             Term* function = find_name(branch, functionName.c_str());
-            Term* term = apply(branch, function, TermList(leftExpr.term, rightExpr.term));
+            Term* term = apply(branch, function, TermList(left.term, rightExpr.term));
             term->setStringProp("syntax:declarationStyle", "infix");
             term->setStringProp("syntax:functionName", operatorStr);
             
@@ -1555,16 +1552,16 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
             if (isRebinding) {
                 // Just bind the name if left side is an identifier.
                 // Example: a += 1
-                if (leftExpr.isIdentifier()) {
-                    rename(term, leftExpr.term->name);
+                if (left.isIdentifier()) {
+                    rename(term, left.term->name);
 
                 // Otherwise, create a set_with_selector call.
                 } else {
                     Term* original = NULL;
-                    Term* left = leftExpr.term;
+
                     Term* newValue = term;
                     Term* selector = write_selector_for_accessor_expression(branch,
-                            left, &original);
+                            left.term, &original);
 
                     Term* set = apply(branch, FUNCS.set_with_selector,
                             TermList(original, selector, newValue));
@@ -1587,14 +1584,10 @@ ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserC
 
             result = ParseResult(term);
         }
-
-        leftExpr = result;
+    
+        // Loop, possibly consume another expression.
+        left = result;
     }
-
-    if (!leftExpr.isIdentifier())
-        set_source_location(leftExpr.term, startPosition, tokens);
-
-    return leftExpr;
 }
 
 ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* context)
@@ -1835,7 +1828,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
 
             std::string postLbracketWs = possible_whitespace(tokens);
 
-            Term* subscript = infix_expression(branch, tokens, context).term;
+            Term* subscript = infix_expression(branch, tokens, context, 0).term;
 
             if (!tokens.nextIs(tok_RBracket))
                 return compile_error_for_line(branch, tokens, startPosition, "Expected: ]");

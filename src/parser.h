@@ -74,9 +74,8 @@ ParseResult break_statement(Branch* branch, TokenStream& tokens, ParserCxt* cont
 ParseResult continue_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult expression(Branch* branch, TokenStream& tokens, ParserCxt* context);
-ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* context);
-ParseResult infix_expression_nested(Branch* branch, TokenStream& tokens, ParserCxt* context,
-        int precedence);
+ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* context,
+        int minimumPrecedence);
 ParseResult unary_expression(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult function_call(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt* context);
