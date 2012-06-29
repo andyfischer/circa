@@ -38,14 +38,14 @@ def get_cpp_file_names(dir):
 def setup_builtin_functions():
     dir = 'src/functions'
 
-    namespaces = map(lambda s: s+'_function', get_cpp_file_names(dir))
+    namespaces = list(map(lambda s: s+'_function', get_cpp_file_names(dir)))
     function_decls = '\n'.join(
             sorted(map(lambda n: 'namespace '+n+' { void setup(Branch* kernel); }', namespaces)))
     function_calls = '\n    '.join(
             sorted(map(lambda n: n+'::setup(kernel);', namespaces)))
 
     return """
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 // This file is generated during the build process by prebuild.py .
 // You should probably not edit this file manually.
@@ -77,7 +77,7 @@ def register_all_tests():
             sorted(map(lambda n: n+'::register_tests();', namespaces)))
 
     return """\
-// Copyright (c) Paul Hodge. See LICENSE file for license terms.
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 // This file is generated during the build process by prebuild.py .
 // You should probably not edit this file manually.

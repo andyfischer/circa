@@ -139,7 +139,7 @@ void branch_update_state_type(Branch* branch)
             if (term == NULL)
                 continue;
 
-            if (term->function != FUNCS.unpack_state)
+            if (term->function != FUNCS.unpack_state || FUNCS.unpack_state == NULL)
                 continue;
 
             Term* identifyingTerm = term->input(1);

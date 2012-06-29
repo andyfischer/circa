@@ -335,8 +335,12 @@ void update_unique_name(Term* term)
 
     name.base = term->name;
 
-    if (name.base == "")
-        name.base = "_" + term->function->name;
+    if (name.base == "") {
+        if (term->function == NULL)
+            name.base = "_anon";
+        else
+            name.base = "_" + term->function->name;
+    }
 
     name.name = name.base;
     name.ordinal = 0;

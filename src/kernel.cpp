@@ -1156,9 +1156,6 @@ void bootstrap_kernel()
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
 
     // Load the standard library from stdlib.ca
-
-
-    // Parse the stdlib script
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
 
     // Install C functions
