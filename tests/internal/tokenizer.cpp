@@ -188,7 +188,7 @@ void test_keywords2()
 
     tokens.consume(tok_And);
     tokens.consume(tok_Whitespace);
-    tokens.consume(tok_OR);
+    tokens.consume(tok_Or);
     tokens.consume(tok_Whitespace);
     tokens.consume(tok_Discard);
     tokens.consume(tok_Whitespace);
@@ -244,15 +244,6 @@ void test_triple_quote_string_literal()
     tokens.consume(tok_GThan);
     tokens.consume(tok_GThan);
     test_assert(tokens.finished());
-}
-
-void test_token_stream()
-{
-    TokenStream tstream("1 2.0");
-
-    test_assert(tstream.nextIs(tok_Integer));
-    test_assert(tstream.nextIs(tok_Whitespace, 1));
-    test_assert(tstream.nextNonWhitespaceIs(tok_Float, 1));
 }
 
 void test_color_literal()
@@ -374,7 +365,6 @@ void tokenizer_register_tests()
     REGISTER_TEST_CASE(tokenizer_tests::test_identifiers_that_look_like_keywords);
     REGISTER_TEST_CASE(tokenizer_tests::test_string_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_triple_quote_string_literal);
-    REGISTER_TEST_CASE(tokenizer_tests::test_token_stream);
     REGISTER_TEST_CASE(tokenizer_tests::test_color_literal);
     REGISTER_TEST_CASE(tokenizer_tests::test_keyword_followed_by_lparen);
     REGISTER_TEST_CASE(tokenizer_tests::test_preceding_indent);

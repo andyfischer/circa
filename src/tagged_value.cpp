@@ -7,6 +7,7 @@
 #include "handle.h"
 #include "names.h"
 #include "reflection.h"
+#include "string_type.h"
 #include "tagged_value.h"
 #include "type.h"
 
@@ -345,8 +346,7 @@ Dict* set_dict(caValue* value)
 
 void set_error_string(caValue* value, const char* s)
 {
-    create(&STRING_T, value);
-    *((std::string*) value->value_data.ptr) = s;
+    set_string(value, s);
     value->value_type = &ERROR_T;
 }
 
@@ -360,13 +360,6 @@ void set_float(caValue* value, float f)
 {
     change_type(value, &FLOAT_T);
     value->value_data.asfloat = f;
-}
-
-
-void set_string(caValue* value, const char* s)
-{
-    create(&STRING_T, value);
-    *((std::string*) value->value_data.ptr) = s;
 }
 
 void set_string(caValue* value, std::string const& s)
@@ -728,13 +721,11 @@ void circa_set_vec4(caValue* container, float x, float y, float z, float w)
 }
 void circa_set_string(caValue* container, const char* str)
 {
-    create(&STRING_T, container);
-    *((std::string*) container->value_data.ptr) = str;
+    set_string(container, str);
 }
 void circa_set_string_size(caValue* container, const char* str, int size)
 {
-    create(&STRING_T, container);
-    ((std::string*) container->value_data.ptr)->assign(str, size);
+    set_string(container, str, size);
 }
 
 void circa_copy(caValue* source, caValue* dest)

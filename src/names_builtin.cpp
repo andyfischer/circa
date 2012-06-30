@@ -157,6 +157,7 @@ const char* builtin_name_to_string(int name)
     case stat_DictHardCopy: return "stat_DictHardCopy";
     case stat_StringCopy: return "stat_StringCopy";
     case stat_StringCreate: return "stat_StringCreate";
+    case stat_StringToStd: return "stat_StringToStd";
     case stat_StepInterpreter: return "stat_StepInterpreter";
     case stat_InterpreterCastOutputFromFinishedFrame: return "stat_InterpreterCastOutputFromFinishedFrame";
     case stat_BranchNameLookups: return "stat_BranchNameLookups";

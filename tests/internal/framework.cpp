@@ -9,6 +9,7 @@
 #include "kernel.h"
 #include "source_repro.h"
 #include "static_checking.h"
+#include "string_type.h"
 #include "names.h"
 #include "parser.h"
 #include "tagged_value.h"

@@ -71,7 +71,7 @@ std::string unformat_rich_source(caValue* source)
 
     for (int i=0; i < list_length(source); i++) {
         caValue* phrase = list_get(source, i);
-        strm << as_string(list_get(phrase,0));
+        strm << as_cstring(list_get(phrase,0));
     }
     return strm.str();
 }

@@ -10,6 +10,7 @@
 #include "list.h"
 #include "source_repro.h"
 #include "stateful_code.h"
+#include "string_type.h"
 #include "names.h"
 #include "term.h"
 #include "term_list.h"
@@ -89,6 +90,7 @@ std::string get_placeholder_name_for_index(int index)
 
 Term* create_function(Branch* branch, const char* name)
 {
+    ca_assert(name != NULL);
     Term* term = create_value(branch, &FUNCTION_T, name);
     initialize_function(term);
     initialize_subroutine(term);
@@ -307,7 +309,7 @@ std::string function_get_documentation_string(Function* func)
     caValue* val = term_value(possibleDocString);
     if (!is_string(val)) return "";
     return as_string(val);
-}    
+}
 
 const char* get_output_name(Term* term, int outputIndex)
 {

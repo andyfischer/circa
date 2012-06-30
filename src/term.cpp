@@ -9,6 +9,7 @@
 #include "heap_debugging.h"
 #include "introspection.h"
 #include "names.h"
+#include "string_type.h"
 #include "term.h"
 #include "type.h"
 

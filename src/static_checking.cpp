@@ -198,7 +198,7 @@ void print_static_error(caValue* value, std::ostream& out)
 {
     Value str;
     format_static_error(value, &str);
-    out << as_string(&str);
+    out << as_cstring(&str);
 }
 
 bool print_static_errors_formatted(List* result, std::ostream& out)

@@ -109,7 +109,6 @@ Function*   as_function(caValue* value);
 int         as_int(caValue* value);
 List*       as_list(caValue* value);
 void*       as_opaque_pointer(caValue* value);
-std::string const& as_string(caValue* value);
 Type*       as_type(caValue* value);
 
 // Boxing using builtin types.

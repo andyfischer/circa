@@ -32,8 +32,11 @@ int string_find_char_from_end(caValue* s, char c);
 void string_split(caValue* s, char sep, caValue* listOut);
 
 const char* as_cstring(caValue* value);
-std::string const& as_string(caValue* value);
 
+// Deprecated
+std::string as_string(caValue* value);
+
+void set_string(caValue* value, const char* s);
 void set_string(caValue* value, const char* s, int length);
 
 char* circa_strdup(const char* s);
