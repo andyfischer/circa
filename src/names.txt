@@ -172,8 +172,11 @@ stat_ListHardCopy
 stat_DictHardCopy
 
 # String values
-stat_StringCopy
 stat_StringCreate
+stat_StringDuplicate
+stat_StringResizeInPlace
+stat_StringResizeCreate
+stat_StringSoftCopy
 stat_StringToStd
 
 # Interpreter

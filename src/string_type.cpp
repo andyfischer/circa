@@ -40,6 +40,8 @@ void decref(StringData* data)
 // Create a new blank string with the given length. Starts off with 1 ref.
 StringData* string_create(int length)
 {
+    INCREMENT_STAT(StringCreate);
+
     StringData* result = (StringData*) malloc(sizeof(StringData) + length + 1);
     result->refCount = 1;
     result->length = length;
@@ -50,6 +52,8 @@ StringData* string_create(int length)
 // Creates a hard duplicate of a string. Starts off with 1 ref.
 StringData* string_duplicate(StringData* original)
 {
+    INCREMENT_STAT(StringDuplicate);
+
     StringData* dup = string_create(original->length);
     memcpy(dup->str, original->str, original->length + 1);
     return dup;
@@ -78,11 +82,15 @@ void string_resize(StringData** data, int newLength)
 
     // Perform the same check as touch()
     if ((*data)->refCount == 1) {
+        INCREMENT_STAT(StringResizeInPlace);
+
         // Modify in-place
         *data = (StringData*) realloc(*data, sizeof(StringData) + newLength + 1);
         (*data)->length = newLength;
         return;
     }
+
+    INCREMENT_STAT(StringResizeCreate);
 
     StringData* oldData = *data;
     StringData* newData = string_create(newLength);
@@ -116,6 +124,8 @@ void string_copy(Type* type, caValue* source, caValue* dest)
     if (data != NULL)
         incref(data);
     dest->value_data.ptr = data;
+
+    INCREMENT_STAT(StringSoftCopy);
 }
 
 void string_reset(caValue* val)
@@ -345,6 +355,7 @@ void string_split(caValue* s, char sep, caValue* listOut)
 
 std::string as_string(caValue* value)
 {
+    INCREMENT_STAT(StringToStd);
     return std::string(as_cstring(value));
 }
 

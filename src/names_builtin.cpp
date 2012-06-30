@@ -155,8 +155,11 @@ const char* builtin_name_to_string(int name)
     case stat_ListSoftCopy: return "stat_ListSoftCopy";
     case stat_ListHardCopy: return "stat_ListHardCopy";
     case stat_DictHardCopy: return "stat_DictHardCopy";
-    case stat_StringCopy: return "stat_StringCopy";
     case stat_StringCreate: return "stat_StringCreate";
+    case stat_StringDuplicate: return "stat_StringDuplicate";
+    case stat_StringResizeInPlace: return "stat_StringResizeInPlace";
+    case stat_StringResizeCreate: return "stat_StringResizeCreate";
+    case stat_StringSoftCopy: return "stat_StringSoftCopy";
     case stat_StringToStd: return "stat_StringToStd";
     case stat_StepInterpreter: return "stat_StepInterpreter";
     case stat_InterpreterCastOutputFromFinishedFrame: return "stat_InterpreterCastOutputFromFinishedFrame";
