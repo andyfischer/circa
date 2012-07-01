@@ -54,6 +54,7 @@ def Interpreter.drawRuntimeError(int, Painter painter)
         y += 20
 
 def draw_stat_view(Painter painter)
+    painter.fillRect(painter.viewport, #fffb)
     stats = sys:perf_stats_dump()
     sys:perf_stats_reset()
 

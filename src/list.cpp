@@ -16,6 +16,7 @@ void ListData::dump()
     printf("%s\n", s.c_str());
 }
 
+#if DEBUG
 void assert_valid_list(ListData* list)
 {
     if (list == NULL) return;
@@ -27,6 +28,11 @@ void assert_valid_list(ListData* list)
     }
     ca_assert(list->refCount > 0);
 }
+#else
+
+#define assert_valid_list(x) ;
+
+#endif
 
 ListData* allocate_empty_list(int capacity)
 {
