@@ -1,5 +1,6 @@
 
 import UIHelper
+import FPSTracker
 
 msg = input()
 
@@ -18,6 +19,9 @@ state number time
 state number timeShift = 0
 
 state showStatView = false
+state showFps = false
+
+state fpsTracker = create(FPSTracker)
 
 buttons = [
     ["Browse" :browse]
@@ -113,12 +117,22 @@ if msg[0] == 'onPaintEvent'
     if showStatView
         draw_stat_view(painter)
 
+    if showFps
+        fpsTracker.onFrame(time)
+        painter.setColor(#fff)
+        bounds = painter.viewport
+        painter.drawText([bounds.x2 - 100, bounds.y2 - 20, bounds.x2 bounds.y2]
+            [] concat('FPS:' fpsTracker.recentFps))
+
+
 elif msg[0] == 'onInputEvent'
     event = msg[1] -> InputEvent
 
     -- StatView
     if event.key_pressed(:t)
         showStatView = not showStatView
+    elif event.key_pressed(:f)
+        showFps = not showFps
 
     handled = false
     action = topButtons.input(event)

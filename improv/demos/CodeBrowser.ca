@@ -73,8 +73,9 @@ def CodeBrowser.updateLayout(@self)
     self.positionedPhrases = phrases
 
 def CodeBrowser.setPosition(@self, Rect rect)
-    self.windowPosition = rect
-    self.updateLayout
+    if self.windowPosition != rect
+        self.windowPosition = rect
+        self.updateLayout
 
 def CodeBrowser.draw(self, Painter painter)
 

@@ -21,10 +21,12 @@ def keycode_to_name(int key) -> Name
         return :b
     elif key == 67
         return :c
-    elif key == 69
+    elif key == 68
         return :d
-    elif key == 70
+    elif key == 69
         return :e
+    elif key == 70
+        return :f
     elif key == 80
         return :p
     elif key == 81
