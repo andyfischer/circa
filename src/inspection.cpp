@@ -8,7 +8,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "heap_debugging.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "locals.h"
 #include "names.h"
 #include "term.h"

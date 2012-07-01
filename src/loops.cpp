@@ -7,7 +7,7 @@
 #include "function.h"
 #include "kernel.h"
 #include "importing_macros.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "locals.h"
 #include "source_repro.h"

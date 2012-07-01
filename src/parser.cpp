@@ -9,7 +9,7 @@
 #include "function.h"
 #include "if_block.h"
 #include "handle.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "kernel.h"
 #include "modules.h"

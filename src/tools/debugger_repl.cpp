@@ -4,7 +4,7 @@
 
 #include "../branch.h"
 #include "../evaluation.h"
-#include "../introspection.h"
+#include "../inspection.h"
 #include "../static_checking.h"
 
 namespace circa {

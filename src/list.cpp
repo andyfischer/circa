@@ -1,7 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "heap_debugging.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "string_type.h"

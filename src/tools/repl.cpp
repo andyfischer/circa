@@ -5,7 +5,7 @@
 #include "../branch.h"
 #include "../kernel.h"
 #include "../evaluation.h"
-#include "../introspection.h"
+#include "../inspection.h"
 #include "../parser.h"
 #include "../static_checking.h"
 #include "../term.h"

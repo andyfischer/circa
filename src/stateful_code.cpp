@@ -7,7 +7,7 @@
 #include "kernel.h"
 #include "function.h"
 #include "if_block.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "names.h"

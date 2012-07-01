@@ -9,7 +9,7 @@
 #include "function.h"
 #include "if_block.h"
 #include "importing.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "source_repro.h"
 #include "term.h"

@@ -84,7 +84,7 @@ OBJECTS := \
 	$(OBJDIR)/heap_debugging.o \
 	$(OBJDIR)/if_block.o \
 	$(OBJDIR)/importing.o \
-	$(OBJDIR)/introspection.o \
+	$(OBJDIR)/inspection.o \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/locals.o \
@@ -236,7 +236,7 @@ $(OBJDIR)/if_block.o: ../src/if_block.cpp
 $(OBJDIR)/importing.o: ../src/importing.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/introspection.o: ../src/introspection.cpp
+$(OBJDIR)/inspection.o: ../src/inspection.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/kernel.o: ../src/kernel.cpp

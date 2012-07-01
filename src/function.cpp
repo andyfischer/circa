@@ -6,7 +6,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "kernel.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "source_repro.h"
 #include "stateful_code.h"

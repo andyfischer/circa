@@ -9,7 +9,7 @@
 #include "../../../src/if_block.h"
 #include "../../../src/importing.h"
 #include "../../../src/importing_macros.h"
-#include "../../../src/introspection.h"
+#include "../../../src/inspection.h"
 #include "../../../src/kernel.h"
 #include "../../../src/list.h"
 #include "../../../src/names.h"

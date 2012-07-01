@@ -5,7 +5,7 @@
 #include "branch.h"
 #include "kernel.h"
 #include "function.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "term.h"
 
 #include "locals.h"

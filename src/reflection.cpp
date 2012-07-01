@@ -7,7 +7,7 @@
 #include "code_iterators.h"
 #include "evaluation.h"
 #include "importing.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "generic.h"
 #include "kernel.h"
 #include "modules.h"

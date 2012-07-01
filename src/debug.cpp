@@ -7,7 +7,7 @@
 #include "build_options.h"
 #include "branch.h"
 #include "evaluation.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "names_builtin.h"
 
 #include "debug.h"

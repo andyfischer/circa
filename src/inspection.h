@@ -6,9 +6,9 @@
 
 #pragma once
 
-// introspection.h
+// inspection.h
 //
-// Functions for doing various queries on code.
+// Pure functions for inspecting and performing queries on compiled code.
 
 namespace circa {
 

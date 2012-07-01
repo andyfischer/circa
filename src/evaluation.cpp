@@ -10,7 +10,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "generic.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "locals.h"

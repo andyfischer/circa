@@ -7,7 +7,7 @@
 #include "code_iterators.h"
 #include "kernel.h"
 #include "function.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "static_checking.h"
 #include "reflection.h"

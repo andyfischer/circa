@@ -15,7 +15,7 @@
 #include "gc.h"
 #include "generic.h"
 #include "importing.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"

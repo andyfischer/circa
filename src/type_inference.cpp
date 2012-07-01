@@ -5,7 +5,7 @@
 #include "kernel.h"
 #include "building.h"
 #include "evaluation.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "names.h"
 #include "term.h"

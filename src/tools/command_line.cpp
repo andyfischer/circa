@@ -7,7 +7,7 @@
 #include "debug.h"
 #include "evaluation.h"
 #include "file_utils.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"

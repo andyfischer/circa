@@ -4,7 +4,7 @@
 
 #include "../building.h"
 #include "../function.h"
-#include "../introspection.h"
+#include "../inspection.h"
 #include "../list.h"
 #include "../names.h"
 #include "../names.h"

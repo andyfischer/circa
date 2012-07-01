@@ -10,7 +10,7 @@
 #include "function.h"
 #include "heap_debugging.h"
 #include "kernel.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "locals.h"
 #include "loops.h"

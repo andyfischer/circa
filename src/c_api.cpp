@@ -8,7 +8,7 @@
 #include "evaluation.h"
 #include "handle.h"
 #include "importing.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "list.h"
 #include "modules.h"

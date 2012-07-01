@@ -10,7 +10,7 @@
 #include "building.h"
 #include "evaluation.h"
 #include "importing_macros.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "locals.h"
 #include "stateful_code.h"
 #include "term.h"

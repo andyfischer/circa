@@ -4,7 +4,7 @@
 #include "building.h"
 #include "kernel.h"
 #include "function.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "parser.h"
 #include "reflection.h"
 #include "source_repro.h"

@@ -7,7 +7,7 @@
 #include "kernel.h"
 #include "debug.h"
 #include "heap_debugging.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "names.h"
 #include "string_type.h"
 #include "term.h"

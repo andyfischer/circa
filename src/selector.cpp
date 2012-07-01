@@ -5,7 +5,7 @@
 #include "evaluation.h"
 #include "kernel.h"
 #include "importing.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "list.h"
 #include "selector.h"
 #include "source_repro.h"
