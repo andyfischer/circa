@@ -88,7 +88,7 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
 
             // current value
             if (term != NULL && !is_value(term)) {
-                caValue* value = frame->registers[term->index];
+                caValue* value = get_frame_register(frame, term);
                 if (value == NULL)
                     out << " <register OOB>";
                 else
@@ -218,7 +218,7 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
         if (placeholder == NULL)
             break;
 
-        copy(top->registers[placeholder->index], circa_append(outputs));
+        copy(get_frame_register(top, placeholder), circa_append(outputs));
     }
 }
 
@@ -326,7 +326,7 @@ void copy_locals_back_to_terms(Frame* frame, Branch* branch)
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
         if (is_value(term)) continue;
-        caValue* val = frame->registers[term->index];
+        caValue* val = get_frame_register(frame, term);
         if (val != NULL)
             copy(val, term_value(branch->get(i)));
     }
@@ -338,7 +338,7 @@ void insert_top_level_state(Stack* stack, Branch* branch)
     if (input == NULL)
         return;
 
-    copy(&stack->state, top_frame(stack)->registers[input->index]);
+    copy(&stack->state, get_frame_register(top_frame(stack), input));
 }
 
 void save_top_level_state(Stack* stack, Branch* branch)
@@ -347,7 +347,7 @@ void save_top_level_state(Stack* stack, Branch* branch)
     if (output == NULL || output->numInputs() < 1 || output->input(0) == NULL)
         return;
 
-    move(top_frame(stack)->registers[output->input(0)->index], &stack->state);
+    move(get_frame_register(top_frame(stack), output->input(0)), &stack->state);
 }
 
 void evaluate_branch(Stack* stack, Branch* branch)
@@ -405,7 +405,7 @@ void insert_explicit_inputs(Stack* stack, caValue* inputs)
         if (term->function != FUNCS.input_explicit)
             continue;
 
-        copy(circa_index(inputs, nextInput), top->registers[i]);
+        copy(circa_index(inputs, nextInput), get_frame_register(top, i));
         nextInput++;
     }
 }
@@ -506,6 +506,11 @@ Branch* current_branch(Stack* stack)
 caValue* get_frame_register(Frame* frame, int index)
 {
     return list_get(&frame->registers,index);
+}
+
+caValue* get_frame_register(Frame* frame, Term* term)
+{
+    return list_get(&frame->registers, term->index);
 }
 
 caValue* get_frame_register_from_end(Frame* frame, int index)

@@ -331,7 +331,7 @@ void start_for_loop(caStack* stack)
     ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
 
     // Initialize the loop index
-    set_int(top_frame(stack)->registers[loopIndexPos], 0);
+    set_int(get_frame_register(top_frame(stack), loopIndexPos), 0);
 
     // Interpreter will run the contents of the branch
 }
