@@ -47,7 +47,6 @@ struct BuiltinFuncs {
     Term* add;
     Term* add_i;
     Term* add_f;
-    Term* assign;
     Term* branch;
     Term* branch_unevaluated;
     Term* break_func;

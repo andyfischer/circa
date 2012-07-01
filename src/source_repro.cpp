@@ -138,9 +138,8 @@ void format_term_source_default_formatting(caValue* source, Term* term)
         return;
     }
 
-    // Name binding (but not for assign() terms)
-    if (term->function != FUNCS.assign)
-        format_name_binding(source, term);
+    // Name binding
+    format_name_binding(source, term);
 
     // possibly add parens
     int numParens = term->intProp("syntax:parens", 0);

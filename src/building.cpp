@@ -1327,17 +1327,6 @@ Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Ter
     return desired;
 }
 
-void write_setter_chain_for_assign_term(Term* assignTerm)
-{
-    Branch* contents = nested_contents(assignTerm);
-    clear_branch(contents);
-
-    Term* result = write_setter_chain_from_getter_chain(contents,
-        assignTerm->input(0), assignTerm->input(1));
-
-    append_output_placeholder(contents, result);
-}
-
 bool term_is_nested_in_branch(Term* term, Branch* branch)
 {
     while (term != NULL) {
