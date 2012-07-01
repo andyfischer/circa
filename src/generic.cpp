@@ -8,6 +8,7 @@
 #include "function.h"
 #include "generic.h"
 #include "if_block.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "parser.h"
 #include "reflection.h"

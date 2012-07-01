@@ -17,6 +17,15 @@
 
 namespace circa {
 
+bool is_actually_using(Term* user, Term* usee)
+{
+    for (int i=0; i < user->numDependencies(); i++)
+        if (user->dependency(i) == usee)
+            return true;
+
+    return false;
+}
+
 void set_is_statement(Term* term, bool value)
 {
     term->setBoolProp("statement", value);
@@ -83,6 +92,133 @@ bool is_minor_branch(Branch* branch)
     return owner->function == FUNCS.if_block
         || owner->function == FUNCS.case_func
         || owner->function == FUNCS.for_func;
+}
+
+Term* get_input_placeholder(Branch* branch, int index)
+{
+    if (index >= branch->length())
+        return NULL;
+    Term* term = branch->get(index);
+    if (term == NULL || term->function != FUNCS.input)
+        return NULL;
+    return term;
+}
+
+Term* get_output_placeholder(Branch* branch, int index)
+{
+    if (index >= branch->length())
+        return NULL;
+    Term* term = branch->getFromEnd(index);
+    if (term == NULL || term->function != FUNCS.output)
+        return NULL;
+    return term;
+}
+
+int count_input_placeholders(Branch* branch)
+{
+    int result = 0;
+    while (get_input_placeholder(branch, result) != NULL)
+        result++;
+    return result;
+}
+int count_output_placeholders(Branch* branch)
+{
+    int result = 0;
+    while (get_output_placeholder(branch, result) != NULL)
+        result++;
+    return result;
+}
+bool is_input_placeholder(Term* term)
+{
+    return term->function == FUNCS.input;
+}
+bool is_output_placeholder(Term* term)
+{
+    return term->function == FUNCS.output;
+}
+bool has_variable_args(Branch* branch)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return false;
+        if (placeholder->boolProp("multiple", false))
+            return true;
+    }
+}
+Term* find_output_placeholder_with_name(Branch* branch, const char* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (placeholder->name == name)
+            return placeholder;
+    }
+}
+
+Term* find_last_non_comment_expression(Branch* branch)
+{
+    for (int i = branch->length() - 1; i >= 0; i--) {
+        if (branch->get(i) == NULL)
+            continue;
+
+        // Skip certain special functions
+        Term* func = branch->get(i)->function;
+        if (func == FUNCS.output
+                || func == FUNCS.input 
+                || func == FUNCS.pack_state
+                || func == FUNCS.pack_state_list_n)
+            continue;
+
+        if (branch->get(i)->name == "#outer_rebinds")
+            continue;
+        if (branch->get(i)->function != FUNCS.comment)
+            return branch->get(i);
+    }
+    return NULL;
+}
+
+Term* find_term_with_function(Branch* branch, Term* func)
+{
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->getFromEnd(i);
+        if (term == NULL)
+            continue;
+        if (term->function == func)
+            return term;
+    }
+    return NULL;
+}
+
+Term* find_input_placeholder_with_name(Branch* branch, const char* name)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (placeholder->name == name)
+            return placeholder;
+    }
+}
+
+Term* find_input_with_function(Term* target, Term* func)
+{
+    for (int i=0; i < target->numInputs(); i++) {
+        Term* input = target->input(i);
+        if (input == NULL) continue;
+        if (input->function == func)
+            return input;
+    }
+    return NULL;
+}
+
+Term* find_user_with_function(Term* target, Term* func)
+{
+    for (int i=0; i < target->users.length(); i++)
+        if (target->users[i]->function == func)
+            return target->users[i];
+    return NULL;
 }
 
 bool has_an_error_listener(Term* term)

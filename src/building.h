@@ -25,7 +25,6 @@ void set_input(Term* term, int index, Term* input);
 void set_inputs(Term* term, TermList const& inputs);
 void insert_input(Term* term, Term* input);
 void insert_input(Term* term, int index, Term* input);
-bool is_actually_using(Term* user, Term* usee);
 void append_user(Term* user, Term* usee);
 void possibly_prune_user_list(Term* user, Term* usee);
 
@@ -78,16 +77,6 @@ Term* procure_int(Branch* branch, std::string const& name);
 Term* procure_float(Branch* branch, std::string const& name);
 Term* procure_bool(Branch* branch, std::string const& name);
 
-Term* get_input_placeholder(Branch* branch, int index);
-Term* get_output_placeholder(Branch* branch, int index);
-int count_input_placeholders(Branch* branch);
-int count_output_placeholders(Branch* branch);
-bool is_input_placeholder(Term* term);
-bool is_output_placeholder(Term* term);
-bool has_variable_args(Branch* branch);
-Term* find_input_placeholder_with_name(Branch* branch, const char* name);
-Term* find_output_placeholder_with_name(Branch* branch, const char* name);
-
 // Add an input_placeholder() term after the existing placeholders.
 Term* append_input_placeholder(Branch* branch);
 Term* append_output_placeholder(Branch* branch, Term* result);
@@ -138,12 +127,6 @@ void branch_start_changes(Branch* branch);
 
 // Set the branch as no longer 'in progress', perform any final cleanup actions.
 void branch_finish_changes(Branch* branch);
-
-Term* find_last_non_comment_expression(Branch* branch);
-Term* find_term_with_function(Branch* branch, Term* func);
-Term* find_input_placeholder_with_name(Branch* branch, const char* name);
-Term* find_input_with_function(Term* target, Term* func);
-Term* find_user_with_function(Term* target, Term* func);
 
 // Code modification
 Term* find_user_with_function(Term* term, const char* funcName);
