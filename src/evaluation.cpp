@@ -218,7 +218,7 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs)
         if (placeholder == NULL)
             break;
 
-        copy(get_frame_register(top, placeholder), circa_append(outputs));
+        copy(get_top_register(stack, placeholder), circa_append(outputs));
     }
 }
 
@@ -339,7 +339,7 @@ void insert_top_level_state(Stack* stack, Branch* branch)
     if (input == NULL)
         return;
 
-    copy(&stack->state, get_frame_register(top_frame(stack), input));
+    copy(&stack->state, get_top_register(stack, input));
 }
 
 void save_top_level_state(Stack* stack, Branch* branch)
@@ -348,7 +348,7 @@ void save_top_level_state(Stack* stack, Branch* branch)
     if (output == NULL || output->numInputs() < 1 || output->input(0) == NULL)
         return;
 
-    move(get_frame_register(top_frame(stack), output->input(0)), &stack->state);
+    move(get_top_register(stack, output->input(0)), &stack->state);
 }
 
 void evaluate_branch(Stack* stack, Branch* branch)
@@ -520,7 +520,7 @@ caValue* get_frame_register_from_end(Frame* frame, int index)
     return list_get_from_end(&frame->registers, index);
 }
 
-caValue* get_register(Stack* stack, Term* term)
+caValue* get_top_register(Stack* stack, Term* term)
 {
     Frame* frame = top_frame(stack);
     ca_assert(term->owningBranch == frame->branch);
@@ -541,8 +541,7 @@ void raise_error(Stack* stack)
 }
 void raise_error_msg(Stack* stack, const char* msg)
 {
-    Frame* top = top_frame(stack);
-    caValue* slot = get_frame_register(top, top->pc);
+    caValue* slot = get_top_register(stack, current_term(stack));
     set_error_string(slot, msg);
     raise_error(stack);
 }
@@ -785,7 +784,7 @@ void start_interpreter_session(Stack* stack)
         Term* placeholder = get_input_placeholder(topBranch, i);
         if (placeholder == NULL)
             break;
-        caValue* slot = get_frame_register(top_frame(stack), placeholder);
+        caValue* slot = get_top_register(stack, placeholder);
         cast(slot, placeholder->type);
     }
 }

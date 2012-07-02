@@ -137,10 +137,15 @@ caValue* get_caller_output(Stack* stack, int index);
 
 Term* current_term(Stack* stack);
 Branch* current_branch(Stack* stack);
+
+// Registers
 caValue* get_frame_register(Frame* frame, int index);
 caValue* get_frame_register(Frame* frame, Term* term);
 caValue* get_frame_register_from_end(Frame* frame, int index);
-caValue* get_register(Stack* stack, Term* term);
+
+// Get a register on the topmost frame.
+caValue* get_top_register(Stack* stack, Term* term);
+
 EvaluateFunc get_override_for_branch(Branch* branch);
 
 // Create an output value for the current term, using the declared type's

@@ -81,14 +81,14 @@ void actor_run_message(caStack* stack, ListData* actor, caValue* message)
     // Copy state (if any)
     Term* state_in = find_state_input(branch);
     if (state_in != NULL)
-        copy(list_get(actor, 3), get_register(stack, state_in));
+        copy(list_get(actor, 3), get_top_register(stack, state_in));
 
     run_interpreter(stack);
 
     // Preserve state, if found, and if there was no error.
     Term* state_out = find_state_output(branch);
     if (!error_occurred(stack) && state_out != NULL) {
-        copy(get_register(stack, state_out), list_get(actor, 3));
+        copy(get_top_register(stack, state_out), list_get(actor, 3));
     }
 
     // Do something with an error. TODO is a more robust way of saving errors.

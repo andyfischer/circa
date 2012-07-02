@@ -331,7 +331,7 @@ void start_for_loop(caStack* stack)
     ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
 
     // Initialize the loop index
-    set_int(get_frame_register(top_frame(stack), loopIndexPos), 0);
+    set_int(get_frame_register(frame, loopIndexPos), 0);
 
     // Interpreter will run the contents of the branch
 }
@@ -347,7 +347,7 @@ void for_loop_finish_iteration(Stack* stack)
     caValue* listInput = get_frame_register(frame, 0);
 
     // Increment the loop index
-    caValue* index = get_frame_register(frame, for_loop_find_index(contents)->index);
+    caValue* index = get_top_register(stack, for_loop_find_index(contents));
     set_int(index, as_int(index) + 1);
 
     // Preserve list output

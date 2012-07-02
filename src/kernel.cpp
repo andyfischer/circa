@@ -418,7 +418,7 @@ void Interpreter__set_state_input(caStack* stack)
         if (input == NULL)
             break;
         if (is_state_input(input)) {
-            stateSlot = get_frame_register(top_frame(self), input->index);
+            stateSlot = get_top_register(self, input);
             break;
         }
     }
@@ -446,7 +446,7 @@ void Interpreter__get_state_output(caStack* stack)
         if (output == NULL)
             break;
         if (is_state_output(output)) {
-            stateSlot = get_frame_register(top_frame(self), output->index);
+            stateSlot = get_top_register(self, output);
             break;
         }
     }
