@@ -127,12 +127,12 @@ Frame* push_frame(Stack* stack, Branch* branch)
     stack->stack = (Frame*) realloc(stack->stack, sizeof(Frame) * stack->numFrames);
 
     Frame* top = &stack->stack[stack->numFrames - 1];
-    top->owner = stack;
+    top->stack = stack;
 
+#if 0
     initialize_null(&top->registers);
 
     // swap(registers, &top->registers);
-#if 1
     set_list(&top->registers, get_locals_count(branch));
 
 #else
@@ -161,13 +161,18 @@ Frame* push_frame(Stack* stack, Branch* branch)
 void pop_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
-
-    set_null(&top->registers);
+    list_resize(&stack->registers, top->registerFirst);
     stack->numFrames--;
 }
 
-void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
+void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
 {
+    // Make a local copy of 'inputs', since we're going to touch the stack before
+    // accessing it, and the value might live on the stack.
+    Value inputsLocal;
+    copy(_inputs, &inputsLocal);
+    caValue* inputs = &inputsLocal;
+    
     int inputsLength = list_length(inputs);
 
     // Push new frame
@@ -416,7 +421,7 @@ void insert_explicit_inputs(Stack* stack, caValue* inputs)
     }
 }
 
-void extract_explicit_outputs(Stack* stack, caValue* inputs)
+void extract_explicit_outputs(Stack* stack, caValue* outputs)
 {
     Frame* top = top_frame(stack);
 
@@ -425,7 +430,7 @@ void extract_explicit_outputs(Stack* stack, caValue* inputs)
         if (term->function != FUNCS.output_explicit)
             continue;
 
-        copy(top->registers[i], list_append(inputs));
+        copy(get_top_register(stack, term), list_append(outputs));
     }
 }
 
@@ -441,7 +446,7 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
         Frame* frame = get_frame(stack, i);
         if (frame->branch != term->owningBranch)
             continue;
-        return frame->registers[term->index];
+        return get_frame_register(frame, term);
     }
 
     return NULL;
@@ -512,24 +517,25 @@ Branch* current_branch(Stack* stack)
 
 caValue* get_frame_register(Frame* frame, int index)
 {
-    return list_get(&frame->registers,index);
+    return list_get(&frame->stack->registers, frame->registerFirst + index);
 }
 
 caValue* get_frame_register(Frame* frame, Term* term)
 {
-    return list_get(&frame->registers, term->index);
+    return get_frame_register(frame, term->index);
 }
 
 caValue* get_frame_register_from_end(Frame* frame, int index)
 {
-    return list_get_from_end(&frame->registers, index);
+    return list_get(&frame->stack->registers,
+            frame->registerFirst + frame->registerCount - 1 - index);
 }
 
 caValue* get_top_register(Stack* stack, Term* term)
 {
     Frame* frame = top_frame(stack);
     ca_assert(term->owningBranch == frame->branch);
-    return frame->registers[term->index];
+    return get_frame_register(frame, term);
 }
 
 void create_output(Stack* stack)
@@ -614,7 +620,7 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result)
 
     // Possibly save output
     if (result != NULL)
-        copy(top_frame(stack)->registers[term->index], result);
+        copy(get_top_register(stack, term), result);
 
     delete[] marked;
 
@@ -710,7 +716,9 @@ void update_context_to_latest_branches(Stack* stack)
 {
     for (int i=0; i < stack->numFrames; i++) {
         Frame* frame = get_frame(stack, i);
-        frame->registers.resize(get_locals_count(frame->branch));
+
+        if (frame->registerCount != get_locals_count(frame->branch))
+            internal_error("Trouble: branch locals count doesn't match frame");
     }
 }
 
@@ -1182,12 +1190,16 @@ void dynamic_call_func(caStack* stack)
 
 void finish_dynamic_call(caStack* stack)
 {
-    // Hang on to registers list
+    // Hang on to this frame's registers.
     Frame* top = top_frame(stack);
     Branch* branch = top->branch;
-    List registers;
-    swap(&registers, &top->registers);
+    Value registers;
+    set_list(&registers, top->registerCount);
 
+    for (int i=0; i < top->registerCount; i++)
+        swap(get_frame_register(top, i), list_get(&registers, i));
+
+    // Done with this frame.
     pop_frame(stack);
 
     // Copy outputs to a DynamicOutputs container
@@ -1200,7 +1212,9 @@ void finish_dynamic_call(caStack* stack)
         Term* placeholder = get_output_placeholder(branch, i);
         if (placeholder == NULL)
             break;
-        caValue* slot = registers.get(placeholder->index);
+
+        caValue* slot = list_get(&registers, placeholder->index);
+
         if (is_state_output(placeholder))
             copy(slot, stateOutput);
         else {
@@ -1290,10 +1304,12 @@ caValue* circa_frame_input(caStack* stack, int index)
     if (top == NULL)
         return NULL;
 
-    if (top->branch->get(index)->function != FUNCS.input)
+    Term* term = top->branch->get(index);
+
+    if (term->function != FUNCS.input)
         return NULL;
     
-    return top->registers[index];
+    return get_top_register(stack, term);
 }
 
 caValue* circa_frame_output(caStack* stack, int index)
@@ -1302,10 +1318,11 @@ caValue* circa_frame_output(caStack* stack, int index)
 
     int realIndex = top->branch->length() - index - 1;
 
-    if (top->branch->get(realIndex)->function != FUNCS.output)
+    Term* term = top->branch->get(realIndex);
+    if (term->function != FUNCS.output)
         return NULL;
 
-    return top->registers.get(realIndex);
+    return get_top_register(stack, term);
 }
 
 void circa_run(caStack* stack)

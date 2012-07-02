@@ -15,11 +15,11 @@ namespace circa {
 struct Frame
 {
     // Pointer to owning Stack.
-    Stack* owner;
+    Stack* stack;
 
-    List registers;
+    // List registers;
     int registerFirst;
-    int regsiterCount;
+    int registerCount;
 
     Branch* branch;
     int pc;

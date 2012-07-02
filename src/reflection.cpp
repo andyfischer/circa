@@ -224,6 +224,7 @@ void Branch__call(caStack* stack)
         return circa_output_error(stack, "NULL branch");
 
     caValue* inputs = circa_input(stack, 1);
+    ca_assert(is_list(inputs));
     push_frame_with_inputs(stack, branch, inputs);
 }
 
