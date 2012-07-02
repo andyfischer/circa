@@ -510,7 +510,7 @@ void Interpreter__output(caStack* stack)
     if (output == NULL)
         set_null(circa_output(stack, 0));
     else
-        copy(get_frame_register(frame, output->index), circa_output(stack, 0));
+        copy(get_frame_register(frame, output), circa_output(stack, 0));
 }
 void Interpreter__errored(caStack* stack)
 {

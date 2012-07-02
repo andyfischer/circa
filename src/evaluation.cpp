@@ -126,6 +126,7 @@ Frame* push_frame(Stack* stack, Branch* branch, List* registers)
     Frame* top = &stack->stack[stack->numFrames - 1];
     initialize_null(&top->registers);
     swap(registers, &top->registers);
+    top->owner = stack;
     top->registers.resize(get_locals_count(branch));
     top->branch = branch;
     top->pc = 0;
@@ -284,7 +285,7 @@ void finish_frame(Stack* stack)
     // Pop frame
     pop_frame(stack);
 
-    // Advance PC
+    // Advance PC on the above frame.
     Frame* newTop = top_frame(stack);
     newTop->pc = newTop->nextPc;
 }
@@ -321,7 +322,7 @@ void evaluate_single_term(Stack* stack, Term* term)
     run_interpreter(stack);
 }
 
-void copy_locals_back_to_terms(Frame* frame, Branch* branch)
+void copy_locals_back_to_terms(Stack* stack, Frame* frame, Branch* branch)
 {
     // Copy stack back to the original terms.
     for (int i=0; i < branch->length(); i++) {
@@ -381,7 +382,7 @@ void evaluate_save_locals(Stack* stack, Branch* branch)
 
     save_top_level_state(stack, branch);
 
-    copy_locals_back_to_terms(top_frame(stack), branch);
+    copy_locals_back_to_terms(stack, top_frame(stack), branch);
 
     if (!error_occurred(stack))
         pop_frame(stack);
@@ -562,7 +563,7 @@ void evaluate_range(Stack* stack, Branch* branch, int start, int end)
     if (error_occurred(stack))
         return;
 
-    copy_locals_back_to_terms(top_frame(stack), branch);
+    copy_locals_back_to_terms(stack, top_frame(stack), branch);
     pop_frame(stack);
 }
 

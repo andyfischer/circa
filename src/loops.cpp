@@ -374,8 +374,8 @@ void for_loop_finish_iteration(Stack* stack)
         if (input == NULL)
             break;
         Term* output = get_output_placeholder(contents, i);
-        copy(get_frame_register(frame, output->index),
-            get_frame_register(frame, input->index));
+        copy(get_frame_register(frame, output),
+            get_frame_register(frame, input));
     }
 
     // Return to start of loop body

@@ -14,6 +14,9 @@ namespace circa {
 
 struct Frame
 {
+    // Pointer to owning Stack.
+    Stack* owner;
+
     List registers;
     Branch* branch;
     int pc;
