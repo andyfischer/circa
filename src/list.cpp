@@ -179,42 +179,47 @@ ListData* list_double_capacity(ListData* original)
     return result;
 }
 
-ListData* list_resize(ListData* original, int numElements)
+ListData* list_resize(ListData* original, int newLength)
 {
-    // Check if 'original' is an empty list
+    // Check if 'original' is an empty list.
     if (original == NULL) {
-        if (numElements == 0)
+
+        // If newLength is 0 then no change.
+        if (newLength == 0)
             return NULL;
-        ListData* result = allocate_empty_list(numElements);
-        result->count = numElements;
+
+        // Create a new empty list.
+        ListData* result = allocate_empty_list(newLength);
+        result->count = newLength;
         return result;
     }
 
-    // Check to reduce 'original' to an empty list
-    if (numElements == 0) {
+    // Special case: if newLength is 0 then return an empty list.
+    if (newLength == 0) {
         list_decref(original);
         return NULL;
     }
 
-    // Check if the number of elements doesn't need to change
-    if (original->count == numElements)
+    // Check if the new length is the same as the old length.
+    if (original->count == newLength)
         return original;
 
-    // Check for not enough capacity
-    if (numElements > original->capacity) {
-        ListData* result = list_increase_capacity(original, numElements);
-        result->count = numElements;
+    // Increase capacity if necessary.
+    if (newLength > original->capacity) {
+        ListData* result = list_increase_capacity(original, newLength);
+        result->count = newLength;
         return result;
     }
 
-    // Capacity is good, will need to modify 'count' on list and possibly
-    // set some items to null. This counts as a modification.
+    // At this point the capacity is good, we need to modify list->count, and
+    // discard some rightmost elements.
     ListData* result = list_touch(original);
 
-    // Possibly set extra elements to null, if we are shrinking.
-    for (int i=numElements; i < result->count; i++)
+    // Set rightmost elements to null, if we are shrinking.
+    for (int i=newLength; i < result->count; i++)
         set_null(&result->items[i]);
-    result->count = numElements;
+
+    result->count = newLength;
 
     return result;
 }

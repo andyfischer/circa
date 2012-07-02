@@ -22,8 +22,9 @@ struct ListData {
     int capacity;
     bool immutable;
     int checksum;
-    caValue items[0];
+
     // items has size [capacity].
+    caValue items[0];
 
     // for debugging:
     void dump();

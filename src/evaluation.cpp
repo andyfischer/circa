@@ -50,6 +50,8 @@ Stack* alloc_stack(World* world)
 {
     Stack* stack = new Stack();
     stack->world = world;
+    initialize_null(&stack->registers);
+    set_list(&stack->registers, 0);
     return stack;
 }
 
@@ -117,17 +119,29 @@ Frame* get_frame_from_bottom(Stack* stack, int index)
     ca_assert(index < stack->numFrames);
     return &stack->stack[index];
 }
-Frame* push_frame(Stack* stack, Branch* branch, List* registers)
+Frame* push_frame(Stack* stack, Branch* branch)
 {
     INCREMENT_STAT(FramesCreated);
 
     stack->numFrames++;
     stack->stack = (Frame*) realloc(stack->stack, sizeof(Frame) * stack->numFrames);
+
     Frame* top = &stack->stack[stack->numFrames - 1];
-    initialize_null(&top->registers);
-    swap(registers, &top->registers);
     top->owner = stack;
-    top->registers.resize(get_locals_count(branch));
+
+    initialize_null(&top->registers);
+
+    // swap(registers, &top->registers);
+#if 1
+    set_list(&top->registers, get_locals_count(branch));
+
+#else
+    // Registers
+    top->registerFirst = list_length(&stack->registers);
+    top->registerCount = get_locals_count(branch);
+    list_resize(&stack->registers, top->registerFirst + top->registerCount);
+#endif
+
     top->branch = branch;
     top->pc = 0;
     top->nextPc = 0;
@@ -143,11 +157,7 @@ Frame* push_frame(Stack* stack, Branch* branch, List* registers)
 
     return top;
 }
-Frame* push_frame(Stack* stack, Branch* branch)
-{
-    List registers;
-    return push_frame(stack, branch, &registers);
-}
+
 void pop_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
@@ -158,11 +168,10 @@ void pop_frame(Stack* stack)
 
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
 {
-    // Fetch inputs and start preparing the new stack frame.
-    List registers;
-    registers.resize(get_locals_count(branch));
-
     int inputsLength = list_length(inputs);
+
+    // Push new frame
+    push_frame(stack, branch);
     
     // Cast inputs into placeholders
     int placeholderIndex = 0;
@@ -177,13 +186,11 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
         }
 
         caValue* input = list_get(inputs, placeholderIndex);
+        caValue* slot = get_top_register(stack, placeholder);
 
-        INCREMENT_STAT(Copy_PushFrameWithInputs);
+        copy(input, slot);
 
-        copy(input, registers[placeholderIndex]);
-
-        INCREMENT_STAT(Cast_PushFrameWithInputs);
-        bool castSuccess = cast(registers[placeholderIndex], placeholder->type);
+        bool castSuccess = cast(slot, placeholder->type);
 
         if (!castSuccess) {
             std::stringstream msg;
@@ -198,9 +205,6 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs)
             return;
         }
     }
-
-    // Push our frame (with inputs) onto the stack
-    push_frame(stack, branch, &registers);
 }
 
 void frame_set_stop_when_finished(Frame* frame)

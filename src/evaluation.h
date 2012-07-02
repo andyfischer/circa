@@ -18,6 +18,9 @@ struct Frame
     Stack* owner;
 
     List registers;
+    int registerFirst;
+    int regsiterCount;
+
     Branch* branch;
     int pc;
     int nextPc;
@@ -42,14 +45,15 @@ struct Frame
 
 struct Stack
 {
+    // GCable object header.
     CircaObject header;
-
-    // Top-level state (deprecated)
-    Value state;
 
     // Current execution stack
     int numFrames;
     Frame* stack;
+
+    // Register values. Each Frame owns a section of this list.
+    List registers;
 
     // Whether the interpreter is currently running. Set to false when an error occurs
     // or when the branch is completed.
@@ -58,6 +62,9 @@ struct Stack
     // Flag that indicates the most recent run was interrupted by an error
     bool errorOccurred;
 
+    // Top-level state (deprecated)
+    Value state;
+
     // Owning world
     caWorld* world;
 
@@ -65,7 +72,7 @@ struct Stack
     ~Stack();
 
 private:
-    // Disabled calls
+    // Disabled C++ funcs.
     Stack(Stack const&) {}
     Stack& operator=(Stack const&) { return *this; }
 };
@@ -78,9 +85,6 @@ void eval_context_setup_type(Type* type);
 // Stack frames
 Frame* get_frame(Stack* stack, int depth);
 Frame* get_frame_from_bottom(Stack* stack, int index);
-
-// Push a new frame with the given registers.
-Frame* push_frame(Stack* stack, Branch* branch, List* registers);
 
 Frame* push_frame(Stack* stack, Branch* branch);
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
@@ -104,8 +108,7 @@ Frame* top_frame(Stack* stack);
 Branch* top_branch(Stack* stack);
 void reset_stack(Stack* stack);
 
-// Evaluate a single term. This is not usually called directly, it's called
-// by the interpreter.
+// Evaluate a single term. Deprecated.
 void evaluate_single_term(Stack* stack, Term* term);
 
 void evaluate_branch(Stack* stack, Branch* branch);
