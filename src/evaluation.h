@@ -49,8 +49,9 @@ struct Stack
     CircaObject header;
 
     // Current execution stack
-    int numFrames;
-    Frame* stack;
+    int framesCount;
+    int framesCapacity;
+    Frame* frames;
 
     // Register values. Each Frame owns a section of this list.
     List registers;

@@ -25,13 +25,16 @@
 namespace circa {
 
 Stack::Stack()
- : numFrames(0),
-   stack(NULL),
+ : framesCount(0),
    running(false),
    errorOccurred(false),
    world(NULL)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
+
+    framesCount = 0;
+    framesCapacity = 0;
+    frames = NULL;
 }
 
 Stack::~Stack()
@@ -39,9 +42,10 @@ Stack::~Stack()
     // clear error so that pop_frame doesn't complain about losing an errored frame.
     clear_error(this);
 
-    while (numFrames > 0)
+    while (framesCount > 0)
         pop_frame(this);
-    free(stack);
+
+    free(frames);
 
     gc_on_object_deleted((CircaObject*) this);
 }
@@ -63,8 +67,8 @@ void eval_context_list_references(CircaObject* object, GCReferenceList* list, GC
 void eval_context_print_multiline(std::ostream& out, Stack* stack)
 {
     out << "[Stack " << stack << "]" << std::endl;
-    for (int frameIndex = 0; frameIndex < stack->numFrames; frameIndex++) {
-        Frame* frame = get_frame(stack, stack->numFrames - 1 - frameIndex);
+    for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
+        Frame* frame = get_frame(stack, stack->framesCount - 1 - frameIndex);
         Branch* branch = frame->branch;
         out << " [Frame " << frameIndex << ", branch = " << branch
              << ", pc = " << frame->pc
@@ -110,23 +114,30 @@ void eval_context_setup_type(Type* type)
 Frame* get_frame(Stack* stack, int depth)
 {
     ca_assert(depth >= 0);
-    ca_assert(depth < stack->numFrames);
-    return &stack->stack[stack->numFrames - 1 - depth];
+    ca_assert(depth < stack->framesCount);
+
+    return &stack->frames[stack->framesCount - 1 - depth];
 }
 Frame* get_frame_from_bottom(Stack* stack, int index)
 {
     ca_assert(index >= 0);
-    ca_assert(index < stack->numFrames);
-    return &stack->stack[index];
+    ca_assert(index < stack->framesCount);
+    return &stack->frames[index];
 }
 Frame* push_frame(Stack* stack, Branch* branch)
 {
     INCREMENT_STAT(FramesCreated);
 
-    stack->numFrames++;
-    stack->stack = (Frame*) realloc(stack->stack, sizeof(Frame) * stack->numFrames);
+    // Increase capacity of 'frames' if needed.
+    if ((stack->framesCount + 1) > stack->framesCapacity) {
+        stack->framesCapacity += 100;
+        stack->frames = (Frame*) realloc(stack->frames, sizeof(Frame)
+                * stack->framesCapacity);
+    }
 
-    Frame* top = &stack->stack[stack->numFrames - 1];
+    Frame* top = &stack->frames[stack->framesCount];
+    stack->framesCount += 1;
+
     top->stack = stack;
 
 #if 0
@@ -162,7 +173,7 @@ void pop_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
     list_resize(&stack->registers, top->registerFirst);
-    stack->numFrames--;
+    stack->framesCount--;
 }
 
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
@@ -301,7 +312,7 @@ void finish_frame(Stack* stack)
 
 Frame* top_frame(Stack* stack)
 {
-    if (stack->numFrames == 0)
+    if (stack->framesCount == 0)
         return NULL;
     return get_frame(stack, 0);
 }
@@ -315,7 +326,7 @@ Branch* top_branch(Stack* stack)
 
 void reset_stack(Stack* stack)
 {
-    while (stack->numFrames > 0)
+    while (stack->framesCount > 0)
         pop_frame(stack);
 
     stack->errorOccurred = false;
@@ -442,7 +453,7 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
     if (is_value(term))
         return term_value(term);
 
-    for (int i=stackDelta; i < stack->numFrames; i++) {
+    for (int i=stackDelta; i < stack->framesCount; i++) {
         Frame* frame = get_frame(stack, i);
         if (frame->branch != term->owningBranch)
             continue;
@@ -664,10 +675,10 @@ void clear_error(Stack* cxt)
 
 void print_error_stack(Stack* stack, std::ostream& out)
 {
-    for (int frameIndex = 0; frameIndex < stack->numFrames; frameIndex++) {
-        Frame* frame = get_frame(stack, stack->numFrames - 1 - frameIndex);
+    for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
+        Frame* frame = get_frame(stack, stack->framesCount - 1 - frameIndex);
 
-        bool bottomFrame = frameIndex == (stack->numFrames - 1);
+        bool bottomFrame = frameIndex == (stack->framesCount - 1);
 
         if (frame->override) {
             std::cout << "[native] | ";
@@ -714,7 +725,7 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
 void update_context_to_latest_branches(Stack* stack)
 {
-    for (int i=0; i < stack->numFrames; i++) {
+    for (int i=0; i < stack->framesCount; i++) {
         Frame* frame = get_frame(stack, i);
 
         if (frame->registerCount != get_locals_count(frame->branch))
@@ -1106,7 +1117,7 @@ void step_interpreter(Stack* stack)
     if (frame->pc >= frame->endPc) {
 
         // Exit if we have finished the topmost branch
-        if (stack->numFrames == 1 || frame->stop) {
+        if (stack->framesCount == 1 || frame->stop) {
             stack->running = false;
             return;
         }
@@ -1394,7 +1405,7 @@ caBranch* circa_caller_branch(caStack* stack)
 caTerm* circa_caller_term(caStack* stack)
 {
     Stack* cxt = (Stack*) stack;
-    if (cxt->numFrames < 2)
+    if (cxt->framesCount < 2)
         return NULL;
     Frame* frame = get_frame(cxt, 1);
     return frame->branch->get(frame->pc);
@@ -1406,11 +1417,11 @@ void circa_print_error_to_stdout(caStack* stack)
 }
 int circa_frame_count(caStack* stack)
 {
-    return stack->numFrames;
+    return stack->framesCount;
 }
 void circa_stack_restore_height(caStack* stack, int height)
 {
-    while (stack->numFrames > height)
+    while (stack->framesCount > height)
         pop_frame(stack);
 }
 

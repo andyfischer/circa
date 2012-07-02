@@ -96,8 +96,11 @@ def CodeBrowser.draw(self, Painter painter)
         add(@screenPos, self.windowPosition.topleft)
 
         Point(@screenPos)
+        
         painter.drawText([screenPos.x screenPos.y self.windowPosition.x2 self.windowPosition.y2]
             [:NoWrap] phrase.str)
+
+        
 
 def make_code_browser(Branch branch) -> CodeBrowser
     browser = create(CodeBrowser)

@@ -67,7 +67,7 @@ def draw_stat_view(Painter painter)
         str = concat(stat[0] ': ' stat[1])
         painter.setColor(#000)
         painter.drawText(to_rect([10 y] [500 y+100]) [] str)
-        y += 18
+        y += 17
         
 
 if msg[0] == 'onPaintEvent'

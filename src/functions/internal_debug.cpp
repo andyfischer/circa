@@ -95,7 +95,7 @@ namespace internal_debug_function {
 
     CA_DEFINE_FUNCTION(get_term_stack, "debug_get_term_stack() -> List")
     {
-        int len = CONTEXT->numFrames;
+        int len = CONTEXT->framesCount;
         List& output = *List::cast(OUTPUT, len);
         for (int i=0; i < len; i++)
             set_term_ref(output[i], get_frame_from_bottom(CONTEXT, i)->branch->owningTerm);
