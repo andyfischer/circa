@@ -582,6 +582,14 @@ void update_extra_outputs(Term* term)
         branch_update_existing_pack_state_calls(branch);
 }
 
+Term* get_output_term(Term* term, int index)
+{
+    if (index == 0)
+        return term;
+    else
+        return get_extra_output(term, index - 1);
+}
+
 Term* get_extra_output(Term* term, int index)
 {
     Term* position = term->owningBranch->getSafe(term->index + index + 1);

@@ -259,8 +259,9 @@ void finish_frame(Stack* stack)
             if (placeholder->type == &VOID_T)
                 continue;
 
-            caValue* result = get_frame_register(topFrame, placeholder->index);
-            caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
+            caValue* result = get_frame_register(topFrame, placeholder);
+            Term* outputTerm = get_output_term(finishedTerm, i);
+            caValue* dest = get_frame_register(parentFrame, outputTerm);
 
             move(result, dest);
             bool success = cast(dest, placeholder->type);
@@ -405,7 +406,7 @@ void insert_explicit_inputs(Stack* stack, caValue* inputs)
         if (term->function != FUNCS.input_explicit)
             continue;
 
-        copy(circa_index(inputs, nextInput), get_frame_register(top, i));
+        copy(circa_index(inputs, nextInput), get_frame_register(top, term));
         nextInput++;
     }
 }
@@ -482,13 +483,14 @@ caValue* get_output(Stack* stack, int index)
     Term* placeholder = get_output_placeholder(frame->branch, index);
     if (placeholder == NULL)
         return NULL;
-    return get_frame_register(frame, placeholder->index);
+    return get_frame_register(frame, placeholder);
 }
 
 caValue* get_caller_output(Stack* stack, int index)
 {
     Frame* frame = get_frame(stack, 1);
-    return get_frame_register(frame, frame->pc + index);
+    Term* currentTerm = frame->branch->get(frame->pc);
+    return get_frame_register(frame, get_output_term(currentTerm, index));
 }
 
 Term* current_term(Stack* stack)
@@ -783,7 +785,7 @@ void start_interpreter_session(Stack* stack)
         Term* placeholder = get_input_placeholder(topBranch, i);
         if (placeholder == NULL)
             break;
-        caValue* slot = get_frame_register(top_frame(stack), i);
+        caValue* slot = get_frame_register(top_frame(stack), placeholder);
         cast(slot, placeholder->type);
     }
 }
@@ -929,7 +931,7 @@ void get_term_operational_form(Term* term, caValue* output)
     }
 }
 
-void populate_inputs_with_metadata(Stack* stack, Frame* frame, caValue* inputs)
+void populate_inputs_from_metadata(Stack* stack, Frame* frame, caValue* inputs)
 {
     for (int i=0; i < list_length(inputs); i++) {
         caValue* input = list_get(inputs, i);
@@ -969,7 +971,7 @@ void populate_inputs_with_metadata(Stack* stack, Frame* frame, caValue* inputs)
             }
 
         } else {
-            internal_error("Unrecognized element type in populate_inputs_with_metadata");
+            internal_error("Unrecognized element type in populate_inputs_from_metadata");
         }
     }
 }
@@ -990,19 +992,19 @@ void step_interpreter_action(Stack* stack, caValue* action)
     case name_PushBranch: {
         Branch* branch = as_branch(list_get(action, 2));
         Frame* frame = push_frame(stack, branch);
-        populate_inputs_with_metadata(stack, frame, inputs);
+        populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
     case name_PushNestedBranch: {
         Branch* branch = currentTerm->nestedContents;
         Frame* frame = push_frame(stack, branch);
-        populate_inputs_with_metadata(stack, frame, inputs);
+        populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
     case name_PushFunctionBranch: {
         Branch* branch = function_contents(currentTerm->function);
         Frame* frame = push_frame(stack, branch);
-        populate_inputs_with_metadata(stack, frame, inputs);
+        populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
     case name_CaseBlock: {
@@ -1010,13 +1012,13 @@ void step_interpreter_action(Stack* stack, caValue* action)
         if (branch == NULL)
             return;
         Frame* frame = push_frame(stack, branch);
-        populate_inputs_with_metadata(stack, frame, inputs);
+        populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
     case name_ForLoop: {
         Branch* branch = for_loop_choose_branch(stack, currentTerm);
         Frame* frame = push_frame(stack, branch);
-        populate_inputs_with_metadata(stack, frame, inputs);
+        populate_inputs_from_metadata(stack, frame, inputs);
         start_for_loop(stack);
         break;
     }

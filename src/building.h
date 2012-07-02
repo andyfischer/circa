@@ -85,6 +85,7 @@ Term* prepend_output_placeholder(Branch* branch, Term* result);
 Branch* term_get_function_details(Term* call);
 
 // Extra outputs
+Term* get_output_term(Term* term, int index);
 void update_extra_outputs(Term* term);
 Term* get_extra_output(Term* term, int index);
 Term* find_extra_output_for_state(Term* term);
