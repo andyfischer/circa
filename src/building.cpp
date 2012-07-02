@@ -1218,28 +1218,29 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement)
     }
 }
 
-Term* write_selector_for_accessor_expression(Branch* branch, Term* term, Term** headPtr)
+Term* write_selector_for_accessor_expression(Branch* branch, Term* accessor, Term** headPtr)
 {
     TermList elements;
 
     while (true) {
         if (headPtr != NULL)
-            *headPtr = term;
+            *headPtr = accessor;
 
         // Stop if we find a term with a name.
-        if (term->name != "")
+        if (accessor->name != "")
             break;
 
-        if (term->function == FUNCS.get_index) {
-            elements.prepend(term->input(1));
-            term = term->input(0);
-        } else if (term->function == FUNCS.get_field) {
-            elements.prepend(term->input(1));
-            term = term->input(0);
-        } else if (term->function == FUNCS.dynamic_method) {
-            Term* fieldName = create_string(branch, term->stringProp("syntax:functionName", ""));
+        if (accessor->function == FUNCS.get_index) {
+            elements.prepend(accessor->input(1));
+            accessor = accessor->input(0);
+        } else if (accessor->function == FUNCS.get_field) {
+            elements.prepend(accessor->input(1));
+            accessor = accessor->input(0);
+        } else if (accessor->function == FUNCS.dynamic_method) {
+            Term* fieldName = create_string(branch,
+                    accessor->stringProp("syntax:functionName", ""));
             elements.prepend(fieldName);
-            term = term->input(0);
+            accessor = accessor->input(0);
         } else {
             break;
         }
@@ -1249,6 +1250,22 @@ Term* write_selector_for_accessor_expression(Branch* branch, Term* term, Term** 
         return NULL;
 
     return apply(branch, FUNCS.selector, elements);
+}
+
+Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result)
+{
+    Term* head = NULL;
+    Term* selector = write_selector_for_accessor_expression(branch, accessorExpr, &head);
+    if (selector != NULL) {
+        Term* set = apply(branch, FUNCS.set_with_selector, TermList(head, selector, result));
+        change_declared_type(set, declared_type(head));
+        rename(set, head->name);
+        return set;
+    } else {
+        rename(result, accessorExpr->name);
+        result->setBoolProp("syntax:implicitName", true);
+        return result;
+    }
 }
 
 bool term_is_nested_in_branch(Term* term, Branch* branch)
