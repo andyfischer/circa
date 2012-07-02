@@ -1060,10 +1060,18 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // Wrap up the rebound value, if it's a complex lexpr.
     if (rebindListName) {
-        Term* lexprRoot = find_lexpr_root(listExpr);
-        Term* result = write_setter_chain_from_getter_chain(branch, listExpr, forTerm);
-        rename(result, lexprRoot->name);
-        result->setBoolProp("syntax:implicitName", true);
+        Term* head = NULL;
+        Term* selector = write_selector_for_accessor_expression(branch, listExpr, &head);
+
+        if (selector != NULL) {
+            Term* set = apply(branch, FUNCS.set_with_selector,
+                    TermList(head, selector, forTerm));
+            change_declared_type(set, declared_type(head));
+            rename(set, head->name);
+        } else {
+            rename(forTerm, listExpr->name);
+            forTerm->setBoolProp("syntax:implicitName", true);
+        }
     }
 
     return ParseResult(forTerm);
@@ -1765,10 +1773,18 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     // Possibly rebind the left-hand-side
     if (rebindLHS) {
         // LHS may be a getter-chain
-        Term* lexprRoot = find_lexpr_root(term->input(0));
-        Term* lhs = write_setter_chain_from_getter_chain(branch, term->input(0),
-            get_extra_output(term, 0));
-        rename(lhs, lexprRoot->name);
+        Term* head = NULL;
+        Term* result = get_extra_output(term, 0);
+        Term* selector = write_selector_for_accessor_expression(branch, term->input(0), &head);
+
+        if (selector != NULL) {
+            Term* set = apply(branch, FUNCS.set_with_selector,
+                    TermList(head, selector, result));
+            change_declared_type(set, declared_type(head));
+            rename(set, head->name);
+        } else {
+            rename(result, term->input(0)->name);
+        }
     }
 
     inputHints.apply(term);

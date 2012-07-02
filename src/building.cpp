@@ -1245,86 +1245,10 @@ Term* write_selector_for_accessor_expression(Branch* branch, Term* term, Term** 
         }
     }
 
-    return apply(branch, FUNCS.selector, elements);
-}
-
-// For a given 'get' expression, such as:
-//   result = get_field(container, field)
-//
-// This function will create a term that replaces the 'get' result with 'desiredValue'.
-// So for the above example, we would generate:
-//   set_field(container, field, desiredValue)
-//
-// If the term is not a recognized getter then we return NULL
-
-Term* write_setter_from_getter(Branch* branch, Term* term, Term* desiredValue)
-{
-    if (term->function == FUNCS.get_index) {
-        return apply(branch, FUNCS.set_index, TermList(term->input(0), term->input(1), desiredValue));
-    } else if (term->function == FUNCS.get_field) {
-        return apply(branch, FUNCS.set_field, TermList(term->input(0), term->input(1), desiredValue));
-    } else if (term->function == FUNCS.dynamic_method) {
-        Term* fieldName = create_string(branch, term->stringProp("syntax:functionName", ""));
-        return apply(branch, FUNCS.set_field, TermList(term->input(0), fieldName, desiredValue));
-    } else {
+    if (elements.length() == 0)
         return NULL;
-    }
 
-}
-
-
-Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Term* desired)
-{
-    /*
-     * Consider the following expression:
-     *
-     * a[i0][i1][i2] = y
-     *
-     * The terms would look like this:
-     * 
-     * a = (some compound type)
-     * i0 = (an integer index)
-     * i1 = (an integer index)
-     * i2 = (an integer index)
-     * a_0 = get_index(a, i0)
-     * a_1 = get_index(a_0, i1)
-     * a_2 = get_index(a_1, i2)
-     * assign(a_2, y)
-     *
-     * (Some names are made up for clarity, the only terms that actually have names
-     * are "a" and "y")
-     *
-     * In order to do the assignment in a pure way, we want to generate the
-     * following terms:
-     *
-     * a_2' = set_index(a_2, i2, y)
-     * a_1' = set_index(a_1, i1, a_2')
-     * a_0' = set_index(a_0, i0, a_1')
-     *
-     * Then we rename the top-level name ("a") to the final result:
-     *
-     * a = a_0'
-     */
-
-    Term* getter = getterRoot;
-
-    while (true) {
-
-        // Don't write a setter for a getter that already has a name; if the term has
-        // a name then it's not part of this lexpr.
-        if (getter->name != "")
-            return desired;
-
-        Term* result = write_setter_from_getter(branch, getter, desired);
-
-        if (result == NULL)
-            break;
-
-        desired = result;
-        getter = getter->input(0);
-    }
-
-    return desired;
+    return apply(branch, FUNCS.selector, elements);
 }
 
 bool term_is_nested_in_branch(Term* term, Branch* branch)

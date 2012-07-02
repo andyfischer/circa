@@ -168,7 +168,6 @@ void remap_pointers(Term* term, Term* original, Term* replacement);
 void remap_pointers(Branch* branch, Term* original, Term* replacement);
 
 Term* write_selector_for_accessor_expression(Branch* branch, Term* term, Term** headPtr);
-Term* write_setter_chain_from_getter_chain(Branch* branch, Term* getterRoot, Term* desired);
 
 // Look through the nexted contents of 'term', and find any term references to outer
 // terms (terms outside this branch). For every outer reference, add an input to
