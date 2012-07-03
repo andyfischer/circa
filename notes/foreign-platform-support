@@ -1,0 +1,43 @@
+
+Outline
+
+  Use a foreign VM to run Circa code
+
+Goals
+
+  Good performance
+  Interopability
+  Support multiple platforms
+  Leverage external platform libraries
+
+Strategies
+  In the 1st pass, we definitely want to embed the VM, and rely on native C funcs
+  Send generated source code to VM?
+    This method has other workflow advantages
+  Send something lower level to VM?
+    Speed advantages, but probably not worth the trouble
+
+  We'll regenerate source on first load, and whenever the Circa structures are changed.
+
+Candidates
+  v8
+  Lua
+  Mono
+
+Implementation ideas
+
+  Native functions should receive a Context object or something, which is an
+  interface to the outside world
+  
+  Context provides:
+    Input & Output values
+    Source term (maybe only certain funcs need this?)
+      Term allows access to branch, etc
+    Declared type of inputs & outputs
+    Reflection on interpreter?
+    Is this enough?
+
+  During runtime, we keep a link to a Program object.
+  Each Circa function must be translated into an entity in the Program
+  On each Branch, store some metadata associating it with a Program object
+  If a Circa function is changed then the Program entry is regenerated
