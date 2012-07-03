@@ -34,11 +34,13 @@ namespace for_function {
         FUNCS.for_func = import_function(kernel, NULL, "for(Indexable) -> List");
         as_function(FUNCS.for_func)->formatSource = formatSource;
 
-        FUNCS.loop_output = import_function(kernel, NULL, "loop_output(any) -> List");
         FUNCS.loop_iterator = import_function(kernel, NULL,
             "loop_iterator(any, any) -> int");
-        FUNCS.loop_index = import_function(kernel, NULL, "loop_index(any) -> int");
+        FUNCS.loop_index = import_function(kernel, NULL, "loop_index(int index) -> int");
         function_set_empty_evaluation(as_function(FUNCS.loop_index));
+
+        FUNCS.loop_output_index = import_function(kernel, NULL, "loop_output_index() -> any");
+        function_set_empty_evaluation(as_function(FUNCS.loop_output_index));
 
         FUNCS.unbounded_loop = import_function(kernel, evaluate_unbounded_loop,
             "loop(bool condition)");

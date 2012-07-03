@@ -84,7 +84,7 @@ struct BuiltinFuncs {
     Term* load_script;
     Term* loop_index;
     Term* loop_iterator;
-    Term* loop_output;
+    Term* loop_output_index;
     Term* mult;
     Term* namespace_func;
     Term* neg;

@@ -35,6 +35,10 @@ Term* for_loop_find_index(Branch* contents)
 {
     return find_term_with_function(contents, FUNCS.loop_index);
 }
+Term* for_loop_find_output_index(Branch* contents)
+{
+    return find_term_with_function(contents, FUNCS.loop_output_index);
+}
 
 const char* for_loop_get_iterator_name(Term* forTerm)
 {
@@ -74,6 +78,9 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
 
     // Add the zero branch
     create_branch_unevaluated(contents, "#zero");
+
+    // Add an loop output index
+    Term* loopOutputIndex = apply(contents, FUNCS.loop_output_index, TermList());
 
     return iterator;
 }
@@ -174,9 +181,11 @@ void finish_for_loop(Term* forTerm)
     // Need to finish here to prevent error
     branch_finish_changes(contents);
 
-    // Add a primary output
-    Term* primaryOutput = apply(contents, FUNCS.output, TermList(loop_get_primary_result(contents)));
-    primaryOutput->setBoolProp("customOutput", true);
+    // Add a a primary output
+    Term* primaryOutput = apply(contents, FUNCS.output,
+            TermList(loop_get_primary_result(contents)));
+    primaryOutput->setBoolProp("accumulatingOutput", true);
+    change_declared_type(primaryOutput, &LIST_T);
 
     // pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);
@@ -322,16 +331,13 @@ void start_for_loop(caStack* stack)
 
     frame->loop = true;
 
-    // Walk forward until we find the loop_index() term.
-    int loopIndexPos = 0;
-    for (; loopIndexPos < contents->length(); loopIndexPos++) {
-        if (contents->get(loopIndexPos)->function == FUNCS.loop_index)
-            break;
-    }
-    ca_assert(contents->get(loopIndexPos)->function == FUNCS.loop_index);
-
     // Initialize the loop index
-    set_int(get_frame_register(frame, loopIndexPos), 0);
+    set_int(get_frame_register(frame, for_loop_find_index(contents)), 0);
+    set_int(get_frame_register(frame, for_loop_find_output_index(contents)), 0);
+
+    // Initialize output value
+    caValue* listInput = circa_input(stack, 0);
+    set_list(get_frame_register_from_end(frame, 0), list_length(listInput));
 
     // Interpreter will run the contents of the branch
 }
@@ -351,6 +357,7 @@ void for_loop_finish_iteration(Stack* stack)
     set_int(index, as_int(index) + 1);
 
     // Preserve list output
+#if 0
     if (frame->exitType != name_Discard) {
         Frame* parentFrame = get_frame(stack, 1);
         caValue* listOutputSlot = get_frame_register(parentFrame, parentFrame->pc);
@@ -358,12 +365,37 @@ void for_loop_finish_iteration(Stack* stack)
             set_list(listOutputSlot);
         copy(get_frame_register_from_end(frame, 0), list_append(listOutputSlot));
     }
+#endif
+
+    // Preserve list output (new style)
+    if (frame->exitType != name_Discard) {
+        caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
+
+        Term* outputPlaceholder = get_output_placeholder(contents, 0);
+        caValue* outputList = get_frame_register(frame, outputPlaceholder);
+        caValue* outputValue = find_stack_value_for_term(stack, outputPlaceholder->input(0), 0);
+
+        if (!is_list(outputList))
+            set_list(outputList);
+        list_touch(outputList);
+        copy(outputValue, list_get(outputList, as_int(outputIndex)));
+
+        // Advance output index
+        set_int(outputIndex, as_int(outputIndex) + 1);
+    }
 
     // Check if we are finished
     if (as_int(index) >= list_length(listInput)
             || frame->exitType == name_Break
             || frame->exitType == name_Return) {
         frame->loop = false;
+
+        // Possibly truncate output list, in case any elements were discarded.
+        caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
+        Term* outputPlaceholder = get_output_placeholder(contents, 0);
+        caValue* outputList = get_frame_register(frame, outputPlaceholder);
+        list_resize(outputList, as_int(outputIndex));
+        
         finish_frame(stack);
         return;
     }

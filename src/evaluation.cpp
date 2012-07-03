@@ -831,10 +831,15 @@ void get_term_operational_form(Term* term, caValue* output)
     }
 
     if (term->function == FUNCS.output) {
-        // Output function results in either SetNull or InlineCopy
+        // Output function usually results in either SetNull or InlineCopy.
         Term* input = term->input(0);
 
-        if (input == NULL) {
+        // Special case: don't use InlineCopy for an accumulatingOutput (this is used
+        // in for-loop.
+        if (term->boolProp("accumulatingOutput", false)) {
+            set_name(outputTag, name_NoOp);
+
+        } else if (input == NULL) {
             set_name(outputTag, name_SetNull);
         } else {
             set_name(outputTag, name_InlineCopy);

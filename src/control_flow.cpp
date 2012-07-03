@@ -27,23 +27,34 @@ void evaluate_exit_point(caStack* stack)
     ca_assert(frame != NULL);
 
     caValue* args = circa_input(stack, 0);
-
     caValue* control = circa_index(args, 0);
 
     // Only exit if the control says we should exit.
     if (!is_name(control) || as_name(control) == name_None)
         return;
 
+    Term* term = (Term*) circa_caller_term(stack);
+    Branch* branch = (Branch*) circa_caller_branch(stack);
+
     int intermediateOutputCount = circa_count(args) - 1;
 
     // Copy intermediate values to the frame's output placeholders.
     for (int i=0; i < intermediateOutputCount; i++) {
+
+        // Don't touch this output if it is an accumulatingOutput; it already has
+        // its output value.
+        Term* outputPlaceholder = get_output_placeholder(branch, i);
+        if (outputPlaceholder->boolProp("accumulatingOutput", false))
+            continue;
+
         caValue* result = circa_index(args, i + 1);
         caValue* out = get_frame_register_from_end(frame, i);
-        if (result != NULL)
+
+        if (result != NULL) {
             copy(result, out);
-        else
+        } else {
             set_null(out);
+        }
     }
 
     // Set PC to end
