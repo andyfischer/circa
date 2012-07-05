@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "bytecode_generated.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "evaluation.h"
@@ -478,7 +479,8 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << std::endl;
         for (int i=0; i < prefs->indentLevel + 2; i++)
             out << " ";
-        out << to_string(&term->bytecode);
+        out << bytecode_op_name(as_int(list_get(&term->bytecode, 0)));
+        out << " " << to_string(&term->bytecode);
     }
 }
 

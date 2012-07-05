@@ -10,8 +10,6 @@ const char* bytecode_op_name(char op)
     case op_NoOp: return "NoOp";
     case op_SetNull: return "SetNull";
     case op_InlineCopy: return "InlineCopy";
-    case op_PushFunctionBranch: return "PushFunctionBranch";
-    case op_PushNestedBranch: return "PushNestedBranch";
     case op_PushBranch: return "PushBranch";
     case op_FireNative: return "FireNative";
     case op_CaseBlock: return "CaseBlock";

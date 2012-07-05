@@ -28,8 +28,6 @@ OpNames = [
     'NoOp'
     'SetNull'
     'InlineCopy'
-    'PushFunctionBranch'
-    'PushNestedBranch'
     'PushBranch'
     'FireNative'
     'CaseBlock'

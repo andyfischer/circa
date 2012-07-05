@@ -155,7 +155,7 @@ const char* builtin_name_to_string(int name)
     case stat_BranchNameLookups: return "stat_BranchNameLookups";
     case stat_FramesCreated: return "stat_FramesCreated";
     case stat_LoopFinishIteration: return "stat_LoopFinishIteration";
-    case stat_GetTermEvalMetadata: return "stat_GetTermEvalMetadata";
+    case stat_WriteTermBytecode: return "stat_WriteTermBytecode";
     case stat_DynamicCall: return "stat_DynamicCall";
     case stat_SetIndex: return "stat_SetIndex";
     case stat_SetField: return "stat_SetField";

@@ -803,7 +803,7 @@ void start_interpreter_session(Stack* stack)
 
 void write_term_bytecode(Term* term, caValue* output)
 {
-    INCREMENT_STAT(GetTermEvalMetadata);
+    INCREMENT_STAT(WriteTermBytecode);
 
     set_list(output, 3);
     caValue* outputTag = list_get(output, 0);
@@ -813,8 +813,7 @@ void write_term_bytecode(Term* term, caValue* output)
     // Check to trigger a C override, if this is the first term in an override branch.
     Branch* parent = term->owningBranch;
     if (term->index == 0 && get_override_for_branch(parent) != NULL) {
-
-        set_name(outputTag, op_FireNative);
+        set_int(outputTag, op_FireNative);
         return;
     }
 
@@ -823,14 +822,14 @@ void write_term_bytecode(Term* term, caValue* output)
         Term* input = term->input(0);
 
         // Special case: don't use InlineCopy for an accumulatingOutput (this is used
-        // in for-loop.
+        // in for-loop).
         if (term->boolProp("accumulatingOutput", false)) {
-            set_name(outputTag, op_NoOp);
+            set_int(outputTag, op_NoOp);
 
         } else if (input == NULL) {
-            set_name(outputTag, op_SetNull);
+            set_int(outputTag, op_SetNull);
         } else {
-            set_name(outputTag, op_InlineCopy);
+            set_int(outputTag, op_InlineCopy);
             set_list(inputs, 1);
             set_term_ref(list_get(inputs, 0), term->input(0));
         }
@@ -871,7 +870,7 @@ void write_term_bytecode(Term* term, caValue* output)
 
     if (tag == op_NoOp || branch == NULL || branch->emptyEvaluation) {
         // No-op
-        set_name(outputTag, op_NoOp);
+        set_int(outputTag, op_NoOp);
         return;
     }
     
@@ -881,7 +880,7 @@ void write_term_bytecode(Term* term, caValue* output)
     }
 
     // Save tag
-    set_name(outputTag, tag);
+    set_int(outputTag, tag);
 
     // Check the input count
     int inputCount = term->numInputs();
@@ -893,13 +892,13 @@ void write_term_bytecode(Term* term, caValue* output)
 
     if (inputCount < requiredCount) {
         // Fail, not enough inputs.
-        set_name(outputTag, op_ErrorNotEnoughInputs);
+        set_int(outputTag, op_ErrorNotEnoughInputs);
         return;
     }
 
     if (inputCount > expectedCount && !varargs) {
         // Fail, too many inputs.
-        set_name(outputTag, op_ErrorTooManyInputs);
+        set_int(outputTag, op_ErrorTooManyInputs);
         return;
     }
     
@@ -937,7 +936,7 @@ void write_term_bytecode(Term* term, caValue* output)
 
     // Do some lightweight optimization
 
-    // Try to statically specialize an overloaded function
+    // Try to statically specialize an overloaded function.
     if (term->function != NULL && term->function->boolProp("preferSpecialize", false)) {
         Term* specialized = statically_specialize_overload_for_call(term);
         if (specialized != NULL) {
@@ -999,26 +998,14 @@ void step_interpreter_action(Stack* stack, caValue* action)
     Term* currentTerm = branch->get(frame->pc);
     caValue* currentRegister = get_frame_register(frame, frame->pc);
 
-    Name tag = as_name(list_get(action, 0));
+    int op = as_int(list_get(action, 0));
     caValue* inputs = list_get(action, 1);
 
-    switch (tag) {
+    switch (op) {
     case op_NoOp:
         break;
     case op_PushBranch: {
         Branch* branch = as_branch(list_get(action, 2));
-        Frame* frame = push_frame(stack, branch);
-        populate_inputs_from_metadata(stack, frame, inputs);
-        break;
-    }
-    case op_PushNestedBranch: {
-        Branch* branch = currentTerm->nestedContents;
-        Frame* frame = push_frame(stack, branch);
-        populate_inputs_from_metadata(stack, frame, inputs);
-        break;
-    }
-    case op_PushFunctionBranch: {
-        Branch* branch = function_contents(currentTerm->function);
         Frame* frame = push_frame(stack, branch);
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
@@ -1090,7 +1077,7 @@ void step_interpreter_action(Stack* stack, caValue* action)
         break;
     }
     default:
-        std::cout << "Op not recognized: " << name_to_string(tag) << std::endl;
+        std::cout << "Op not recognized: " << op << std::endl;
         ca_assert(false);
     }
 }
