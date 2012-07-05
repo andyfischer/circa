@@ -1121,7 +1121,7 @@ void step_interpreter(Stack* stack)
 
     // Run precomputed action
     Term* currentTerm = branch->get(frame->pc);
-    step_interpreter_action(stack, &currentTerm->operationalForm);
+    step_interpreter_action(stack, &currentTerm->bytecode);
 }
 
 void run_interpreter(Stack* stack)

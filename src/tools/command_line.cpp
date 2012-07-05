@@ -128,7 +128,7 @@ void do_file_command(List* args, caValue* reply)
         
         if (string_eq(args->get(argIndex), "-pe")) {
             printRaw = true;
-            rawOutputPrefs.showEvaluationMetadata = true;
+            rawOutputPrefs.showBytecode = true;
             argIndex++;
             continue;
         }
@@ -395,7 +395,7 @@ int run_command_line(caWorld* world, caValue* args)
 
         if (string_eq(list_get(args, 0), "-pe")) {
             printRaw = true;
-            rawOutputPrefs.showEvaluationMetadata = true;
+            rawOutputPrefs.showBytecode = true;
             list_remove_index(args, 0);
             continue;
         }

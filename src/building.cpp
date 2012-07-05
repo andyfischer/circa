@@ -232,7 +232,7 @@ void change_function(Term* term, Term* function)
     if (is_function_stateful(function))
         find_or_create_state_container(term->owningBranch);
 
-    dirty_operational_form(term->owningBranch);
+    dirty_bytecode(term->owningBranch);
 }
 
 void unsafe_change_type(Term *term, Type *type)

@@ -80,7 +80,7 @@ struct Term : public caTerm
     TermSourceLocation sourceLoc;
 
     // Precomputed data used during evaluation.
-    circa::Value operationalForm;
+    circa::Value bytecode;
 
     Term();
     ~Term();

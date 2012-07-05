@@ -55,7 +55,7 @@ void fix_forward_function_references(Branch* branch)
     }
 }
 
-void dirty_operational_form(Branch* branch)
+void dirty_bytecode(Branch* branch)
 {
     // For now, just recalculate immediately
     recalculate_operational_form(branch);
@@ -65,7 +65,7 @@ void recalculate_operational_form(Branch* branch)
 {
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
-        get_term_operational_form(term, &term->operationalForm);
+        get_term_operational_form(term, &term->bytecode);
     }
 }
 

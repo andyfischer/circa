@@ -17,12 +17,12 @@ struct RawOutputPrefs
     int indentLevel;
     bool showAllIDs;
     bool showProperties;
-    bool showEvaluationMetadata;
+    bool showBytecode;
     RawOutputPrefs() :
         indentLevel(0),
         showAllIDs(false),
         showProperties(false),
-        showEvaluationMetadata(false)
+        showBytecode(false)
     {}
 };
 

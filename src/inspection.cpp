@@ -474,11 +474,11 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
     if (prefs->showProperties)
         out << " " << term->properties.toString();
 
-    if (prefs->showEvaluationMetadata) {
+    if (prefs->showBytecode) {
         out << std::endl;
         for (int i=0; i < prefs->indentLevel + 2; i++)
             out << " ";
-        out << to_string(&term->operationalForm);
+        out << to_string(&term->bytecode);
     }
 }
 
