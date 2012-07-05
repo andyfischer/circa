@@ -137,16 +137,21 @@ stat_Copy_PushedInputNewFrame
 stat_Copy_PushedInputMultiNewFrame
 stat_Copy_PushFrameWithInputs
 stat_Copy_ListDuplicate
+stat_Copy_LoopCopyRebound
 
 # Casting
-stat_Cast_ListCast
+stat_Cast_ListCastElement
 stat_Cast_PushFrameWithInputs
 stat_Cast_FinishFrame
+
+# Touch
+stat_Touch_ListCast
 
 # Values (general)
 stat_ValueCreates
 stat_ValueCopies
-stat_ValueCasts
+stat_ValueCast
+stat_ValueCastDispatched
 stat_ValueTouch
 
 # List values
@@ -170,12 +175,15 @@ stat_StringToStd
 stat_StepInterpreter
 stat_InterpreterCastOutputFromFinishedFrame
 stat_BranchNameLookups
-stat_FramesCreated
+stat_PushFrame
 stat_LoopFinishIteration
+stat_LoopWriteOutput
 stat_WriteTermBytecode
 
 # Function calls
 stat_DynamicCall
+stat_FinishDynamicCall
+stat_DynamicMethodCall
 stat_SetIndex
 stat_SetField
 

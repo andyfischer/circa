@@ -369,6 +369,8 @@ void for_loop_finish_iteration(Stack* stack)
         list_touch(outputList);
         copy(outputValue, list_get(outputList, as_int(outputIndex)));
 
+        INCREMENT_STAT(LoopWriteOutput);
+
         // Advance output index
         set_int(outputIndex, as_int(outputIndex) + 1);
     }
@@ -397,6 +399,8 @@ void for_loop_finish_iteration(Stack* stack)
         Term* output = get_output_placeholder(contents, i);
         copy(get_frame_register(frame, output),
             get_frame_register(frame, input));
+
+        INCREMENT_STAT(Copy_LoopCopyRebound);
     }
 
     // Return to start of loop body

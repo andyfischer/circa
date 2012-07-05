@@ -93,7 +93,7 @@ void release(caValue* value)
 
 void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
 {
-    INCREMENT_STAT(ValueCasts);
+    INCREMENT_STAT(ValueCast);
 
     result->success = true;
 
@@ -104,6 +104,8 @@ void cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     }
 
     if (type->cast != NULL) {
+        INCREMENT_STAT(ValueCastDispatched);
+
         type->cast(result, value, type, checkOnly);
         return;
     }

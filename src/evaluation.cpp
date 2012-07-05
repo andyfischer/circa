@@ -127,7 +127,7 @@ Frame* get_frame_from_bottom(Stack* stack, int index)
 }
 Frame* push_frame(Stack* stack, Branch* branch)
 {
-    INCREMENT_STAT(FramesCreated);
+    INCREMENT_STAT(PushFrame);
 
     // Increase capacity of 'frames' if needed.
     if ((stack->framesCount + 1) > stack->framesCapacity) {
@@ -1181,6 +1181,8 @@ void dynamic_call_func(caStack* stack)
 
 void finish_dynamic_call(caStack* stack)
 {
+    INCREMENT_STAT(FinishDynamicCall);
+
     // Hang on to this frame's registers.
     Frame* top = top_frame(stack);
     Branch* branch = top->branch;

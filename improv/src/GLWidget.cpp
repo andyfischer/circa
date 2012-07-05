@@ -9,7 +9,7 @@
 GLWidget::GLWidget(QWidget *parent)
      : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
-    setFixedSize(600, 600);
+    setFixedSize(800, 800);
     setAutoFillBackground(false);
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);

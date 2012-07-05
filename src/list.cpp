@@ -694,6 +694,7 @@ namespace list_t {
         }
 
         if (!checkOnly) {
+            INCREMENT_STAT(Touch_ListCast);
             list_touch(value);
             value->value_type = type;
         }
@@ -702,7 +703,7 @@ namespace list_t {
             caValue* sourceElement = list_get(value, i);
             Type* expectedType = as_type(destTypes[i]);
 
-            INCREMENT_STAT(Cast_ListCast);
+            INCREMENT_STAT(Cast_ListCastElement);
             cast(result, sourceElement, expectedType, checkOnly);
 
             if (!result->success)

@@ -209,6 +209,8 @@ void call_actor_func(caStack* stack)
 
 void dynamic_method_call(caStack* stack)
 {
+    INCREMENT_STAT(DynamicMethodCall);
+
     caValue* args = circa_input(stack, 0);
 
     // Lookup method
