@@ -338,7 +338,6 @@ void print_usage()
         "  -break-on <id>      : Debugger break when term <id> is created\n"
         "\n"
         "Available commands:\n"
-        "  -loop <filename>  : Run the script repeatedly until terminated\n"
         "  -call <filename> <func name> <args>\n"
         "                    : Call a function in a script file, print results\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
@@ -463,29 +462,6 @@ int run_command_line(caWorld* world, caValue* args)
     // Start repl
     if (string_eq(list_get(args, 0), "-repl"))
         return run_repl();
-
-    // Start evaluation loop
-#if 0
-    if (string_eq(list_get(args, 0), "-loop")) {
-        Branch branch;
-        load_script(&branch, as_cstring(list_get(args, 1)));
-
-        Stack* stack = alloc_stack(NULL);
-
-        while (true) {
-            if (error_occurred(stack)) {
-                print_error_stack(stack, std::cout);
-                return -1;
-            }
-
-            evaluate_branch(stack, &branch);
-
-            // Sleep for 1 second before next iteration. This is silly, it should either
-            // iterate more quickly or have a smarter way to know when to loop.
-            sleep(1);
-        }
-    }
-#endif
 
     if (string_eq(list_get(args, 0), "-call")) {
         Branch* branch = create_branch(kernel());
