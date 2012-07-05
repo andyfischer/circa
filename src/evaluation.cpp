@@ -801,7 +801,7 @@ void start_interpreter_session(Stack* stack)
     }
 }
 
-void get_term_operational_form(Term* term, caValue* output)
+void write_term_bytecode(Term* term, caValue* output)
 {
     INCREMENT_STAT(GetTermEvalMetadata);
 

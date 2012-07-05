@@ -176,7 +176,7 @@ void run_interpreter(Stack* stack);
 void run_interpreter_step(Stack* stack);
 void run_interpreter_steps(Stack* stack, int steps);
 
-void get_term_operational_form(Term* term, caValue* output);
+void write_term_bytecode(Term* term, caValue* output);
 
 // Dynamic calls
 void dynamic_call_func(caStack* stack);
