@@ -5,6 +5,7 @@
 #include "building.h"
 #include "build_options.h"
 #include "branch.h"
+#include "bytecode_generated.h"
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
@@ -813,7 +814,7 @@ void get_term_operational_form(Term* term, caValue* output)
     Branch* parent = term->owningBranch;
     if (term->index == 0 && get_override_for_branch(parent) != NULL) {
 
-        set_name(outputTag, name_FireNative);
+        set_name(outputTag, op_FireNative);
         return;
     }
 
@@ -824,12 +825,12 @@ void get_term_operational_form(Term* term, caValue* output)
         // Special case: don't use InlineCopy for an accumulatingOutput (this is used
         // in for-loop.
         if (term->boolProp("accumulatingOutput", false)) {
-            set_name(outputTag, name_NoOp);
+            set_name(outputTag, op_NoOp);
 
         } else if (input == NULL) {
-            set_name(outputTag, name_SetNull);
+            set_name(outputTag, op_SetNull);
         } else {
-            set_name(outputTag, name_InlineCopy);
+            set_name(outputTag, op_InlineCopy);
             set_list(inputs, 1);
             set_term_ref(list_get(inputs, 0), term->input(0));
         }
@@ -842,40 +843,40 @@ void get_term_operational_form(Term* term, caValue* output)
 
     if (is_value(term)) {
         branch = NULL;
-        tag = name_NoOp;
+        tag = op_NoOp;
     } else if (term->function == FUNCS.lambda
             || term->function == FUNCS.branch_unevaluated) {
         // These funcs have a nestedContents, but it shouldn't be evaluated.
         branch = NULL;
-        tag = name_NoOp;
+        tag = op_NoOp;
     } else if (term->function == FUNCS.declared_state) {
         // declared_state has a nested branch, but we shouldn't use it.
         branch = function_contents(term->function);
-        tag = name_PushBranch;
+        tag = op_PushBranch;
     } else if (term->function == FUNCS.if_block) {
         branch = term->nestedContents;
-        tag = name_CaseBlock;
+        tag = op_CaseBlock;
     } else if (term->function == FUNCS.for_func) {
         branch = term->nestedContents;
-        tag = name_ForLoop;
+        tag = op_ForLoop;
     } else if (term->nestedContents != NULL) {
         // Otherwise if the term has nested contents, then use it.
         branch = term->nestedContents;
-        tag = name_PushBranch;
+        tag = op_PushBranch;
     } else if (term->function != NULL) {
         // No nested contents, use function.
         branch = function_contents(term->function);
-        tag = name_PushBranch;
+        tag = op_PushBranch;
     }
 
-    if (tag == name_NoOp || branch == NULL || branch->emptyEvaluation) {
+    if (tag == op_NoOp || branch == NULL || branch->emptyEvaluation) {
         // No-op
-        set_name(outputTag, name_NoOp);
+        set_name(outputTag, op_NoOp);
         return;
     }
     
     // For PushBranch we need to save the branch pointer
-    if (tag == name_PushBranch) {
+    if (tag == op_PushBranch) {
         set_branch(list_get(output, 2), branch);
     }
 
@@ -892,13 +893,13 @@ void get_term_operational_form(Term* term, caValue* output)
 
     if (inputCount < requiredCount) {
         // Fail, not enough inputs.
-        set_name(outputTag, name_ErrorNotEnoughInputs);
+        set_name(outputTag, op_ErrorNotEnoughInputs);
         return;
     }
 
     if (inputCount > expectedCount && !varargs) {
         // Fail, too many inputs.
-        set_name(outputTag, name_ErrorTooManyInputs);
+        set_name(outputTag, op_ErrorTooManyInputs);
         return;
     }
     
@@ -940,7 +941,7 @@ void get_term_operational_form(Term* term, caValue* output)
     if (term->function != NULL && term->function->boolProp("preferSpecialize", false)) {
         Term* specialized = statically_specialize_overload_for_call(term);
         if (specialized != NULL) {
-            ca_assert(tag == name_PushBranch);
+            ca_assert(tag == op_PushBranch);
             set_branch(list_get(output, 2), function_contents(specialized));
         }
     }
@@ -1002,27 +1003,27 @@ void step_interpreter_action(Stack* stack, caValue* action)
     caValue* inputs = list_get(action, 1);
 
     switch (tag) {
-    case name_NoOp:
+    case op_NoOp:
         break;
-    case name_PushBranch: {
+    case op_PushBranch: {
         Branch* branch = as_branch(list_get(action, 2));
         Frame* frame = push_frame(stack, branch);
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
-    case name_PushNestedBranch: {
+    case op_PushNestedBranch: {
         Branch* branch = currentTerm->nestedContents;
         Frame* frame = push_frame(stack, branch);
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
-    case name_PushFunctionBranch: {
+    case op_PushFunctionBranch: {
         Branch* branch = function_contents(currentTerm->function);
         Frame* frame = push_frame(stack, branch);
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
-    case name_CaseBlock: {
+    case op_CaseBlock: {
         Branch* branch = case_block_choose_branch(stack, currentTerm);
         if (branch == NULL)
             return;
@@ -1030,22 +1031,22 @@ void step_interpreter_action(Stack* stack, caValue* action)
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
-    case name_ForLoop: {
+    case op_ForLoop: {
         Branch* branch = for_loop_choose_branch(stack, currentTerm);
         Frame* frame = push_frame(stack, branch);
         populate_inputs_from_metadata(stack, frame, inputs);
         start_for_loop(stack);
         break;
     }
-    case name_SetNull:
+    case op_SetNull:
         set_null(currentRegister);
         break;
-    case name_InlineCopy: {
+    case op_InlineCopy: {
         caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
         copy(value, currentRegister);
         break;
     }
-    case name_FireNative: {
+    case op_FireNative: {
         EvaluateFunc override = get_override_for_branch(branch);
         ca_assert(override != NULL);
         frame->override = true;
@@ -1059,7 +1060,7 @@ void step_interpreter_action(Stack* stack, caValue* action)
 
         break;
     }
-    case name_ErrorNotEnoughInputs: {
+    case op_ErrorNotEnoughInputs: {
         circa::Value msg;
         Branch* func = function_contents(currentTerm->function);
         int expectedCount = count_input_placeholders(func);
@@ -1075,7 +1076,7 @@ void step_interpreter_action(Stack* stack, caValue* action)
         raise_error_msg(stack, as_cstring(&msg));
         break;
     }
-    case name_ErrorTooManyInputs: {
+    case op_ErrorTooManyInputs: {
         circa::Value msg;
         Branch* func = function_contents(currentTerm->function);
         int expectedCount = count_input_placeholders(func);

@@ -126,7 +126,7 @@ void do_file_command(List* args, caValue* reply)
             continue;
         }
         
-        if (string_eq(args->get(argIndex), "-pe")) {
+        if (string_eq(args->get(argIndex), "-b")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             argIndex++;
@@ -332,9 +332,10 @@ void print_usage()
         "  -libpath <path>     : Add a module search path\n"
         "  -p                  : Print out raw source\n"
         "  -pp                 : Print out raw source with properties\n"
-        "  -n                  : Don't actually run the script (for use with -p, -pp or -s)\n"
-        "  -break-on <id>      : Debugger break when term <id> is created\n"
+        "  -b                  : Print out raw source with bytecode\n"
+        "  -n                  : Don't actually run the script (for use with -p, -b, etc)\n"
         "  -print-state        : Print state as text after running the script\n"
+        "  -break-on <id>      : Debugger break when term <id> is created\n"
         "\n"
         "Available commands:\n"
         "  -loop <filename>  : Run the script repeatedly until terminated\n"
@@ -342,7 +343,7 @@ void print_usage()
         "                    : Call a function in a script file, print results\n"
         "  -repl             : Start an interactive read-eval-print-loop\n"
         "  -e <expression>   : Evaluate an expression on the command line\n"
-        "  -check <filename> : Statically check the script for any errors\n"
+        "  -check <filename> : Statically check the script for errors\n"
         "  -build <dir>      : Rebuild a module using a build.ca file\n"
         "  -run-stdin        : Read and execute commands from stdin\n"
         "  -source-repro     : Compile and reproduce a script's source (for testing)\n"
@@ -393,7 +394,7 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-pe")) {
+        if (string_eq(list_get(args, 0), "-b")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             list_remove_index(args, 0);

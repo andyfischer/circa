@@ -42,17 +42,6 @@ const char* builtin_name_to_string(int name)
     case name_Keyword: return "Keyword";
     case name_Whitespace: return "Whitespace";
     case name_UnknownIdentifier: return "UnknownIdentifier";
-    case name_SetNull: return "SetNull";
-    case name_InlineCopy: return "InlineCopy";
-    case name_NoOp: return "NoOp";
-    case name_PushFunctionBranch: return "PushFunctionBranch";
-    case name_PushNestedBranch: return "PushNestedBranch";
-    case name_PushBranch: return "PushBranch";
-    case name_FireNative: return "FireNative";
-    case name_CaseBlock: return "CaseBlock";
-    case name_ForLoop: return "ForLoop";
-    case name_ErrorNotEnoughInputs: return "ErrorNotEnoughInputs";
-    case name_ErrorTooManyInputs: return "ErrorTooManyInputs";
     case tok_Identifier: return "tok_Identifier";
     case tok_Name: return "tok_Name";
     case tok_Integer: return "tok_Integer";

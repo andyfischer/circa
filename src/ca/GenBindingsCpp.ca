@@ -6,21 +6,21 @@ type CodeWriter
     List output
 }
 
-def CodeWriter.write(self :out, String s)
+def CodeWriter.write(@self, String s)
     if self.needsIndent
         self.needsIndent = false
         for i in 0..self.curIndent
             self.output.append('    ')
     self.output.append(s)
 
-def CodeWriter.writeln(self :out, String line)
+def CodeWriter.writeln(@self, String line)
     self.write(line)
     self.output.append("\n")
     self.needsIndent = true
 
-def CodeWriter.indent(self :out)
+def CodeWriter.indent(@self)
     self.curIndent += 1
-def CodeWriter.unindent(self :out)
+def CodeWriter.unindent(@self)
     self.curIndent -= 1
 
 def CodeWriter.toString(self) -> String
