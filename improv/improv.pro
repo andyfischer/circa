@@ -15,11 +15,20 @@ SOURCES = src/main.cpp \
           src/qt_bindings.cpp
 
 LIBS += -L../build
-LIBS += -lcirca
 
-CONFIG += opengl release
+CONFIG += opengl
 
 MOC_DIR = build
 OBJECTS_DIR = build
 
 ICON = assets/improv.icns
+
+CONFIG += debug_and_release
+
+CONFIG(debug, debug|release) {
+  LIBS += -lcirca_d
+  TARGET = improv_d
+} else {
+  LIBS += -lcirca
+  TARGET = improv
+}

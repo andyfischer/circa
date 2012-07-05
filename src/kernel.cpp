@@ -128,8 +128,13 @@ namespace cppbuild_function { void build_module(caStack*); }
 
 Type* output_placeholder_specializeType(Term* caller)
 {
+    // Special case: if we're an accumulatingOutput then the output type is List.
+    if (caller->boolProp("accumulatingOutput", false))
+        return &LIST_T;
+
     if (caller->input(0) == NULL)
         return NULL;
+
     return declared_type(caller->input(0));
 }
 

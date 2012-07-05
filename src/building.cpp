@@ -756,6 +756,7 @@ void branch_finish_changes(Branch* branch)
         Term* output = get_output_placeholder(branch, 0);
         if (output != NULL && output->input(0) == NULL) {
             set_input(output, 0, find_last_non_comment_expression(branch));
+            respecialize_type(output);
         }
     }
 

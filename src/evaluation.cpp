@@ -140,18 +140,10 @@ Frame* push_frame(Stack* stack, Branch* branch)
 
     top->stack = stack;
 
-#if 0
-    initialize_null(&top->registers);
-
-    // swap(registers, &top->registers);
-    set_list(&top->registers, get_locals_count(branch));
-
-#else
     // Registers
     top->registerFirst = list_length(&stack->registers);
     top->registerCount = get_locals_count(branch);
     list_resize(&stack->registers, top->registerFirst + top->registerCount);
-#endif
 
     top->branch = branch;
     top->pc = 0;
@@ -271,11 +263,6 @@ void finish_frame(Stack* stack)
             Term* placeholder = get_output_placeholder(finishedBranch, i);
             if (placeholder == NULL)
                 break;
-
-            // Don't attempt to copy a 'custom' output. This is used in the primary for-loop
-            // output, which is incrementally appended to on every iteration.
-            if (placeholder->boolProp("customOutput", false))
-                continue;
 
             if (placeholder->type == &VOID_T)
                 continue;

@@ -1,2 +1,2 @@
-
-gdb --args improv.app/Contents/MacOS/improv $*
+rm -rf improv_d.app
+make debug && gdb --args improv_d.app/Contents/MacOS/improv_d $*

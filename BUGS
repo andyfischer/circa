@@ -1,9 +1,13 @@
 
 Top 5 worst issues
   - Type inference fails when using add_s or add_v
-  - Bad performance
+  - Bad performance in for-loop
   - Improv sometimes fails to reload
 
+Recent
+  Type inferrence fail in extra_output from if-block
+  Runtime will die if it expects to find extra_output that isn't there (such as from dynamic_method)
+  
 Performance
   From perf checking, the #1 optimization would be to fix the interpreter stack:
     Each frame should not be a separate list, have one big list

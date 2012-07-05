@@ -185,7 +185,7 @@ void finish_for_loop(Term* forTerm)
     Term* primaryOutput = apply(contents, FUNCS.output,
             TermList(loop_get_primary_result(contents)));
     primaryOutput->setBoolProp("accumulatingOutput", true);
-    change_declared_type(primaryOutput, &LIST_T);
+    respecialize_type(primaryOutput);
 
     // pack_any_open_state_vars(contents);
     for_loop_fix_state_input(contents);
@@ -357,17 +357,6 @@ void for_loop_finish_iteration(Stack* stack)
     set_int(index, as_int(index) + 1);
 
     // Preserve list output
-#if 0
-    if (frame->exitType != name_Discard) {
-        Frame* parentFrame = get_frame(stack, 1);
-        caValue* listOutputSlot = get_frame_register(parentFrame, parentFrame->pc);
-        if (!is_list(listOutputSlot))
-            set_list(listOutputSlot);
-        copy(get_frame_register_from_end(frame, 0), list_append(listOutputSlot));
-    }
-#endif
-
-    // Preserve list output (new style)
     if (frame->exitType != name_Discard) {
         caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
 
