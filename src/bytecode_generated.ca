@@ -26,6 +26,7 @@ def Writer.save(self, String filename)
 
 OpNames = [
     'NoOp'
+    'Pause'
     'SetNull'
     'InlineCopy'
     'PushBranch'
@@ -44,11 +45,11 @@ Ops = for op_name in OpNames
     op
 
 header = create(Writer)
-header.writeln("// Copyright (c) Andrew Fischer. See LICENSE file for license terms.")
+header.writeln("// This file was generated using bytecode_generated.ca")
 header.writeln('')
 
 impl = create(Writer)
-impl.writeln("// Copyright (c) Andrew Fischer. See LICENSE file for license terms.")
+impl.writeln("// This file was generated using bytecode_generated.ca")
 impl.writeln('')
 impl.writeln('#include "common_headers.h"')
 impl.writeln('')

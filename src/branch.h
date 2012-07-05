@@ -58,6 +58,8 @@ struct Branch : caBranch
     // Evaluation advice
     bool emptyEvaluation;
 
+    Value bytecode;
+
     Branch();
     ~Branch();
 

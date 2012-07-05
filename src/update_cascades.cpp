@@ -57,16 +57,13 @@ void fix_forward_function_references(Branch* branch)
 
 void dirty_bytecode(Branch* branch)
 {
-    // For now, just recalculate immediately
-    rewrite_bytecode(branch);
+    set_null(&branch->bytecode);
 }
 
-void rewrite_bytecode(Branch* branch)
+void refresh_bytecode(Branch* branch)
 {
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        write_term_bytecode(term, &term->bytecode);
-    }
+    if (is_null(&branch->bytecode))
+        write_branch_bytecode(branch, &branch->bytecode);
 }
 
 } // namespace circa

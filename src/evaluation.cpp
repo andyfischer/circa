@@ -5,7 +5,6 @@
 #include "building.h"
 #include "build_options.h"
 #include "branch.h"
-#include "bytecode_generated.h"
 #include "code_iterators.h"
 #include "dict.h"
 #include "evaluation.h"
@@ -22,6 +21,7 @@
 #include "names.h"
 #include "term.h"
 #include "type.h"
+#include "update_cascades.h"
 
 namespace circa {
 
@@ -128,6 +128,9 @@ Frame* get_frame_from_bottom(Stack* stack, int index)
 Frame* push_frame(Stack* stack, Branch* branch)
 {
     INCREMENT_STAT(PushFrame);
+
+    // Make sure the branch's bytecode is up-to-date.
+    refresh_bytecode(branch);
 
     // Increase capacity of 'frames' if needed.
     if ((stack->framesCount + 1) > stack->framesCapacity) {
@@ -813,7 +816,8 @@ void write_term_bytecode(Term* term, caValue* output)
     // Check to trigger a C override, if this is the first term in an override branch.
     Branch* parent = term->owningBranch;
     if (term->index == 0 && get_override_for_branch(parent) != NULL) {
-        set_int(outputTag, op_FireNative);
+        list_resize(output, 1);
+        set_name(list_get(output, 0), op_FireNative);
         return;
     }
 
@@ -824,12 +828,14 @@ void write_term_bytecode(Term* term, caValue* output)
         // Special case: don't use InlineCopy for an accumulatingOutput (this is used
         // in for-loop).
         if (term->boolProp("accumulatingOutput", false)) {
-            set_int(outputTag, op_NoOp);
+            list_resize(output, 1);
+            set_name(list_get(output, 0), op_NoOp);
 
         } else if (input == NULL) {
-            set_int(outputTag, op_SetNull);
+            list_resize(output, 1);
+            set_name(list_get(output, 0), op_SetNull);
         } else {
-            set_int(outputTag, op_InlineCopy);
+            set_name(outputTag, op_InlineCopy);
             set_list(inputs, 1);
             set_term_ref(list_get(inputs, 0), term->input(0));
         }
@@ -870,7 +876,7 @@ void write_term_bytecode(Term* term, caValue* output)
 
     if (tag == op_NoOp || branch == NULL || branch->emptyEvaluation) {
         // No-op
-        set_int(outputTag, op_NoOp);
+        set_name(outputTag, op_NoOp);
         return;
     }
     
@@ -880,7 +886,7 @@ void write_term_bytecode(Term* term, caValue* output)
     }
 
     // Save tag
-    set_int(outputTag, tag);
+    set_name(outputTag, tag);
 
     // Check the input count
     int inputCount = term->numInputs();
@@ -892,13 +898,13 @@ void write_term_bytecode(Term* term, caValue* output)
 
     if (inputCount < requiredCount) {
         // Fail, not enough inputs.
-        set_int(outputTag, op_ErrorNotEnoughInputs);
+        set_name(outputTag, op_ErrorNotEnoughInputs);
         return;
     }
 
     if (inputCount > expectedCount && !varargs) {
         // Fail, too many inputs.
-        set_int(outputTag, op_ErrorTooManyInputs);
+        set_name(outputTag, op_ErrorTooManyInputs);
         return;
     }
     
@@ -944,6 +950,33 @@ void write_term_bytecode(Term* term, caValue* output)
             set_branch(list_get(output, 2), function_contents(specialized));
         }
     }
+}
+
+void write_branch_bytecode(Branch* branch, caValue* output)
+{
+    // Branch bytecode is a list with length + 1 elements.
+    // The first 'length' elements are operations that correspond with
+    // Terms with matching index.
+    // The final element is a 'finish' instruction that usually pops the
+    // branch or something.
+    
+    set_list(output, branch->length() + 1);
+
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        caValue* op = list_get(output, i);
+        if (term == NULL) {
+            set_list(op, 1);
+            set_name(list_get(op, 0), op_NoOp);
+        }
+
+        write_term_bytecode(term, op);
+    }
+
+    // Write the finish operation
+    caValue* finishOp = list_get(output, branch->length());
+    set_list(finishOp, 1);
+    set_name(list_get(finishOp, 0), op_FinishFrame);
 }
 
 void populate_inputs_from_metadata(Stack* stack, Frame* frame, caValue* inputs)
@@ -1107,9 +1140,9 @@ void step_interpreter(Stack* stack)
         return;
     }
 
-    // Run precomputed action
-    Term* currentTerm = branch->get(frame->pc);
-    step_interpreter_action(stack, &currentTerm->bytecode);
+    // Run bytecode step
+    caValue* op = list_get(&branch->bytecode, frame->pc);
+    step_interpreter_action(stack, op);
 }
 
 void run_interpreter(Stack* stack)

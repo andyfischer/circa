@@ -23,6 +23,6 @@ void on_branch_inputs_changed(Branch* branch);
 void fix_forward_function_references(Branch* branch);
 
 void dirty_bytecode(Branch* branch);
-void rewrite_bytecode(Branch* branch);
+void refresh_bytecode(Branch* branch);
 
 } // namespace circa

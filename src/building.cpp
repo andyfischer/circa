@@ -767,7 +767,8 @@ void branch_finish_changes(Branch* branch)
     // Update branch's state type
     branch_update_state_type(branch);
 
-    rewrite_bytecode(branch);
+    dirty_bytecode(branch);
+    refresh_bytecode(branch);
 
     branch->inProgress = false;
     branch->version++;

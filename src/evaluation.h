@@ -177,6 +177,7 @@ void run_interpreter_step(Stack* stack);
 void run_interpreter_steps(Stack* stack, int steps);
 
 void write_term_bytecode(Term* term, caValue* output);
+void write_branch_bytecode(Branch* branch, caValue* output);
 
 // Dynamic calls
 void dynamic_call_func(caStack* stack);

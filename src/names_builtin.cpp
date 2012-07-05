@@ -124,6 +124,17 @@ const char* builtin_name_to_string(int name)
     case tok_Comment: return "tok_Comment";
     case tok_Eof: return "tok_Eof";
     case tok_Unrecognized: return "tok_Unrecognized";
+    case op_NoOp: return "op_NoOp";
+    case op_Pause: return "op_Pause";
+    case op_SetNull: return "op_SetNull";
+    case op_InlineCopy: return "op_InlineCopy";
+    case op_PushBranch: return "op_PushBranch";
+    case op_FireNative: return "op_FireNative";
+    case op_CaseBlock: return "op_CaseBlock";
+    case op_ForLoop: return "op_ForLoop";
+    case op_FinishFrame: return "op_FinishFrame";
+    case op_ErrorNotEnoughInputs: return "op_ErrorNotEnoughInputs";
+    case op_ErrorTooManyInputs: return "op_ErrorTooManyInputs";
     case name_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";

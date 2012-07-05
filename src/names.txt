@@ -125,6 +125,19 @@ tok_Comment
 tok_Eof
 tok_Unrecognized
 
+# Bytecode
+op_NoOp
+op_Pause
+op_SetNull
+op_InlineCopy
+op_PushBranch
+op_FireNative
+op_CaseBlock
+op_ForLoop
+op_FinishFrame
+op_ErrorNotEnoughInputs
+op_ErrorTooManyInputs
+
 # Performance stats
 FirstStatIndex
 

@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "branch.h"
-#include "bytecode_generated.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "evaluation.h"
@@ -283,6 +282,11 @@ void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
         out << std::endl;
     }
 
+    // Possibly print the closing bytecode op
+    if (prefs->showBytecode) {
+        out << to_string(list_get(&branch->bytecode, branch->length())) << std::endl;
+    }
+
     prefs->indentLevel = prevIndent;
 }
 
@@ -418,7 +422,7 @@ void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string
 void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
 {
     for (int i=0; i < prefs->indentLevel; i++)
-        std::cout << " ";
+        out << " ";
 
     if (term == NULL) {
         out << "<NULL>";
@@ -479,8 +483,13 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
         out << std::endl;
         for (int i=0; i < prefs->indentLevel + 2; i++)
             out << " ";
-        out << bytecode_op_name(as_int(list_get(&term->bytecode, 0)));
-        out << " " << to_string(&term->bytecode);
+
+        Branch* branch = term->owningBranch;
+        caValue* op = list_get(&branch->bytecode, term->index);
+        if (op == NULL)
+            out << "(missing bytecode)";
+        else
+            out << to_string(op);
     }
 }
 

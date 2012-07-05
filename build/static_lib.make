@@ -66,7 +66,6 @@ endif
 OBJECTS := \
 	$(OBJDIR)/branch.o \
 	$(OBJDIR)/building.o \
-	$(OBJDIR)/bytecode_generated.o \
 	$(OBJDIR)/c_api.o \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/codegen.o \
@@ -181,9 +180,6 @@ $(OBJDIR)/branch.o: ../src/branch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/building.o: ../src/building.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/bytecode_generated.o: ../src/bytecode_generated.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_api.o: ../src/c_api.cpp

@@ -326,9 +326,6 @@ void start_for_loop(caStack* stack)
     if (!is_for_loop(contents))
         return;
 
-    // Set up a blank list for output
-    set_list(get_caller_output(stack, 0), 0);
-
     frame->loop = true;
 
     // Initialize the loop index
