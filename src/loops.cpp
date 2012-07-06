@@ -403,11 +403,6 @@ void for_loop_finish_iteration(Stack* stack)
     frame->exitType = name_None;
 }
 
-void for_loop_finish_frame(Stack* stack)
-{
-    for_loop_finish_iteration(stack);
-}
-
 void finish_while_loop(Term* whileTerm)
 {
     Branch* branch = nested_contents(whileTerm);

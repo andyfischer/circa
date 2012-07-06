@@ -97,18 +97,16 @@ ListData* as_list_data(caValue* val)
 
 caValue* list_get(ListData* data, int index)
 {
-    if (data == NULL)
-        return NULL;
-    if (index >= data->count)
-        return NULL;
+    ca_assert(data != NULL);
+    ca_assert(index < data->count);
+    ca_assert(index >= 0);
     return &data->items[index];
 }
 caValue* list_get_from_end(ListData* data, int index)
 {
-    if (data == NULL)
-        return NULL;
-    if (index >= data->count)
-        return NULL;
+    ca_assert(data != NULL);
+    ca_assert(index < data->count);
+    ca_assert(index >= 0);
     return &data->items[data->count - index - 1];
 }
 

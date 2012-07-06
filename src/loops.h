@@ -23,7 +23,6 @@ void for_loop_remake_zero_branch(Branch* forContents);
 
 CA_FUNCTION(start_for_loop);
 void for_loop_finish_iteration(Stack* context);
-void for_loop_finish_frame(Stack* context);
 
 void finish_while_loop(Term* whileTerm);
 CA_FUNCTION(evaluate_unbounded_loop);

@@ -1030,40 +1030,46 @@ void step_interpreter_action(Stack* stack, caValue* action)
 {
     Frame* frame = top_frame(stack);
     Branch* branch = frame->branch;
-    Term* currentTerm = branch->get(frame->pc);
-    caValue* currentRegister = get_frame_register(frame, frame->pc);
 
     int op = as_int(list_get(action, 0));
-    caValue* inputs = list_get(action, 1);
 
     switch (op) {
     case op_NoOp:
         break;
     case op_PushBranch: {
         Branch* branch = as_branch(list_get(action, 2));
+        caValue* inputs = list_get(action, 1);
         Frame* frame = push_frame(stack, branch);
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
     case op_CaseBlock: {
+        Term* currentTerm = branch->get(frame->pc);
         Branch* branch = case_block_choose_branch(stack, currentTerm);
         if (branch == NULL)
             return;
         Frame* frame = push_frame(stack, branch);
+        caValue* inputs = list_get(action, 1);
         populate_inputs_from_metadata(stack, frame, inputs);
         break;
     }
     case op_ForLoop: {
+        Term* currentTerm = branch->get(frame->pc);
         Branch* branch = for_loop_choose_branch(stack, currentTerm);
         Frame* frame = push_frame(stack, branch);
+        caValue* inputs = list_get(action, 1);
         populate_inputs_from_metadata(stack, frame, inputs);
         start_for_loop(stack);
         break;
     }
-    case op_SetNull:
+    case op_SetNull: {
+        caValue* currentRegister = get_frame_register(frame, frame->pc);
         set_null(currentRegister);
         break;
+    }
     case op_InlineCopy: {
+        caValue* currentRegister = get_frame_register(frame, frame->pc);
+        caValue* inputs = list_get(action, 1);
         caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
         copy(value, currentRegister);
         break;
@@ -1087,11 +1093,12 @@ void step_interpreter_action(Stack* stack, caValue* action)
         break;
     }
     case op_FinishLoop: {
-        for_loop_finish_frame(stack);
+        for_loop_finish_iteration(stack);
         break;
     }
 
     case op_ErrorNotEnoughInputs: {
+        Term* currentTerm = branch->get(frame->pc);
         circa::Value msg;
         Branch* func = function_contents(currentTerm->function);
         int expectedCount = count_input_placeholders(func);
@@ -1108,6 +1115,7 @@ void step_interpreter_action(Stack* stack, caValue* action)
         break;
     }
     case op_ErrorTooManyInputs: {
+        Term* currentTerm = branch->get(frame->pc);
         circa::Value msg;
         Branch* func = function_contents(currentTerm->function);
         int expectedCount = count_input_placeholders(func);
