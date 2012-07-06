@@ -135,6 +135,7 @@ op_FireNative
 op_CaseBlock
 op_ForLoop
 op_FinishFrame
+op_FinishLoop
 op_ErrorNotEnoughInputs
 op_ErrorTooManyInputs
 

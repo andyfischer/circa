@@ -31,9 +31,6 @@ struct Frame
     // True if this frame is being called by dynamic_call
     bool dynamicCall;
 
-    // Used in for-loop
-    bool loop;
-
     // When a branch is exited early, this stores the exit type.
     caName exitType;
     

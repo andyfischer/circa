@@ -326,8 +326,6 @@ void start_for_loop(caStack* stack)
     if (!is_for_loop(contents))
         return;
 
-    frame->loop = true;
-
     // Initialize the loop index
     set_int(get_frame_register(frame, for_loop_find_index(contents)), 0);
     set_int(get_frame_register(frame, for_loop_find_output_index(contents)), 0);
@@ -376,7 +374,6 @@ void for_loop_finish_iteration(Stack* stack)
     if (as_int(index) >= list_length(listInput)
             || frame->exitType == name_Break
             || frame->exitType == name_Return) {
-        frame->loop = false;
 
         // Possibly truncate output list, in case any elements were discarded.
         caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));

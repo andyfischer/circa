@@ -152,7 +152,6 @@ Frame* push_frame(Stack* stack, Branch* branch)
     top->branch = branch;
     top->pc = 0;
     top->nextPc = 0;
-    top->loop = false;
     top->exitType = name_None;
     top->dynamicCall = false;
     top->override = false;
@@ -246,12 +245,6 @@ void finish_frame(Stack* stack)
     // Exit if we have finished the topmost branch
     if (stack->framesCount == 1 || top->stop) {
         stack->running = false;
-        return;
-    }
-
-    // Check to loop
-    if (top->loop) {
-        for_loop_finish_frame(stack);
         return;
     }
 
@@ -979,8 +972,13 @@ void write_branch_bytecode(Branch* branch, caValue* output)
 
     // Write the finish operation
     caValue* finishOp = list_get(output, branch->length());
-    set_list(finishOp, 1);
-    set_name(list_get(finishOp, 0), op_FinishFrame);
+    if (is_for_loop(branch)) {
+        set_list(finishOp, 1);
+        set_name(list_get(finishOp, 0), op_FinishLoop);
+    } else {
+        set_list(finishOp, 1);
+        set_name(list_get(finishOp, 0), op_FinishFrame);
+    }
 }
 
 void populate_inputs_from_metadata(Stack* stack, Frame* frame, caValue* inputs)
@@ -1085,8 +1083,14 @@ void step_interpreter_action(Stack* stack, caValue* action)
         break;
     }
     case op_FinishFrame: {
+        finish_frame(stack);
         break;
     }
+    case op_FinishLoop: {
+        for_loop_finish_frame(stack);
+        break;
+    }
+
     case op_ErrorNotEnoughInputs: {
         circa::Value msg;
         Branch* func = function_contents(currentTerm->function);
@@ -1133,13 +1137,7 @@ void step_interpreter(Stack* stack)
     frame->pc = frame->nextPc;
     frame->nextPc = frame->pc + 1;
 
-    // Check if we have finished this branch
-    if (frame->pc >= branch->length()) {
-
-        // Finish this frame
-        finish_frame(stack);
-        return;
-    }
+    ca_assert(frame->pc <= branch->length());
 
     // Run bytecode step
     caValue* op = list_get(&branch->bytecode, frame->pc);

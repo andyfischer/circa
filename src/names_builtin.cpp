@@ -133,6 +133,7 @@ const char* builtin_name_to_string(int name)
     case op_CaseBlock: return "op_CaseBlock";
     case op_ForLoop: return "op_ForLoop";
     case op_FinishFrame: return "op_FinishFrame";
+    case op_FinishLoop: return "op_FinishLoop";
     case op_ErrorNotEnoughInputs: return "op_ErrorNotEnoughInputs";
     case op_ErrorTooManyInputs: return "op_ErrorTooManyInputs";
     case name_FirstStatIndex: return "FirstStatIndex";
