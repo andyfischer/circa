@@ -265,6 +265,8 @@ void for_loop_remake_zero_branch(Branch* forContents)
         Term* clone = append_output_placeholder(zero, result);
         rename(clone, placeholder->name);
     }
+
+    branch_finish_changes(zero);
 }
 
 void for_loop_fix_state_input(Branch* contents)
@@ -317,7 +319,7 @@ void for_loop_fix_state_input(Branch* contents)
     set_input(stateOutput, 0, packStateList);
 }
 
-void start_for_loop(caStack* stack)
+void start_for_loop(caStack* stack, bool enableLoopOutput)
 {
     Frame* frame = top_frame(stack);
     Branch* contents = frame->branch;
@@ -328,16 +330,18 @@ void start_for_loop(caStack* stack)
 
     // Initialize the loop index
     set_int(get_frame_register(frame, for_loop_find_index(contents)), 0);
-    set_int(get_frame_register(frame, for_loop_find_output_index(contents)), 0);
 
-    // Initialize output value
-    caValue* listInput = circa_input(stack, 0);
-    set_list(get_frame_register_from_end(frame, 0), list_length(listInput));
+    if (enableLoopOutput) {
+        // Initialize output value
+        set_int(get_frame_register(frame, for_loop_find_output_index(contents)), 0);
+        caValue* listInput = circa_input(stack, 0);
+        set_list(get_frame_register_from_end(frame, 0), list_length(listInput));
+    }
 
     // Interpreter will run the contents of the branch
 }
 
-void for_loop_finish_iteration(Stack* stack)
+void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
 {
     INCREMENT_STAT(LoopFinishIteration);
 
@@ -352,7 +356,7 @@ void for_loop_finish_iteration(Stack* stack)
     set_int(index, as_int(index) + 1);
 
     // Preserve list output
-    if (frame->exitType != name_Discard) {
+    if (enableLoopOutput && frame->exitType != name_Discard) {
         caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
 
         Term* outputPlaceholder = get_output_placeholder(contents, 0);
@@ -376,10 +380,12 @@ void for_loop_finish_iteration(Stack* stack)
             || frame->exitType == name_Return) {
 
         // Possibly truncate output list, in case any elements were discarded.
-        caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
-        Term* outputPlaceholder = get_output_placeholder(contents, 0);
-        caValue* outputList = get_frame_register(frame, outputPlaceholder);
-        list_resize(outputList, as_int(outputIndex));
+        if (enableLoopOutput) {
+            caValue* outputIndex = get_frame_register(frame, for_loop_find_output_index(contents));
+            Term* outputPlaceholder = get_output_placeholder(contents, 0);
+            caValue* outputList = get_frame_register(frame, outputPlaceholder);
+            list_resize(outputList, as_int(outputIndex));
+        }
         
         finish_frame(stack);
         return;
@@ -413,20 +419,19 @@ void finish_while_loop(Term* whileTerm)
     move_before_outputs(term);
 }
 
-CA_FUNCTION(evaluate_unbounded_loop)
+void evaluate_unbounded_loop(caStack* stack)
 {
-    Stack* stack = CONTEXT;
-    Branch* contents = nested_contents(CALLER);
+    Branch* contents = (Branch*) circa_caller_branch(stack);
 
     // Check for zero evaluations
-    if (!as_bool(INPUT(0))) {
+    if (!as_bool(circa_input(stack, 0))) {
         return;
     }
 
     push_frame(stack, contents);
 }
 
-CA_FUNCTION(evaluate_unbounded_loop_finish)
+void evaluate_unbounded_loop_finish(caStack* stack)
 {
 }
 

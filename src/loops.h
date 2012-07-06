@@ -21,8 +21,8 @@ bool is_for_loop(Branch* branch);
 Branch* for_loop_get_zero_branch(Branch* forContents);
 void for_loop_remake_zero_branch(Branch* forContents);
 
-CA_FUNCTION(start_for_loop);
-void for_loop_finish_iteration(Stack* context);
+void start_for_loop(Stack* stack, bool enableLoopOutput);
+void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput);
 
 void finish_while_loop(Term* whileTerm);
 CA_FUNCTION(evaluate_unbounded_loop);

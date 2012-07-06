@@ -167,14 +167,48 @@ void insert_input(Term* term, int index, Term* input)
 
 void append_user(Term* user, Term* usee)
 {
+#if 0
+    if (usee == NULL)
+        return;
+
+    int originalUserCount = user_count(usee);
+#endif
+
     if (usee != NULL && user != NULL)
         usee->users.appendUnique(user);
+
+#if 0
+    // Check if we added the first user.
+    if (originalUserCount == 0 && user_count(usee) > 0) {
+
+        // for-loop bytecode depends on the user count.
+        if (usee->function == FUNCS.for_func)
+            dirty_bytecode(usee->nestedContents);
+    }
+#endif
 }
 
 void possibly_prune_user_list(Term* user, Term* usee)
 {
+#if 0
+    if (usee == NULL)
+        return;
+
+    int originalUserCount = user_count(usee);
+#endif
+
     if (usee != NULL && !is_actually_using(user, usee))
         usee->users.remove(user);
+
+#if 0
+    // Check if we removed the last user.
+    if (originalUserCount > 0 && user_count(usee) == 0) {
+
+        // for-loop bytecode depends on the user count.
+        if (usee->function == FUNCS.for_func)
+            dirty_bytecode(usee->nestedContents);
+    }
+#endif
 }
 
 void remove_from_any_user_lists(Term* term)
@@ -184,7 +218,20 @@ void remove_from_any_user_lists(Term* term)
         assert_valid_term(usee);
         if (usee == NULL)
             continue;
+
+        // int originalUserCount = user_count(usee);
+
         usee->users.remove(term);
+
+#if 0
+        // Check if we removed the last user.
+        if (originalUserCount > 0 && user_count(usee) == 0) {
+
+            // for-loop bytecode depends on the user count.
+            if (usee->function == FUNCS.for_func)
+                dirty_bytecode(usee->nestedContents);
+        }
+#endif
     }
 }
 

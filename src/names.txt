@@ -138,6 +138,7 @@ op_FinishFrame
 op_FinishLoop
 op_ErrorNotEnoughInputs
 op_ErrorTooManyInputs
+op_LoopProduceOutput
 
 # Performance stats
 FirstStatIndex

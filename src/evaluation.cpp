@@ -801,89 +801,10 @@ void start_interpreter_session(Stack* stack)
     }
 }
 
-void write_term_bytecode(Term* term, caValue* output)
+void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
 {
-    INCREMENT_STAT(WriteTermBytecode);
-
-    set_list(output, 3);
-    caValue* outputTag = list_get(output, 0);
-    caValue* inputs = list_get(output, 1);
-    set_list(inputs, 0);
-
-    // Check to trigger a C override, if this is the first term in an override branch.
-    Branch* parent = term->owningBranch;
-    if (term->index == 0 && get_override_for_branch(parent) != NULL) {
-        list_resize(output, 1);
-        set_name(list_get(output, 0), op_FireNative);
-        return;
-    }
-
-    if (term->function == FUNCS.output) {
-        // Output function usually results in either SetNull or InlineCopy.
-        Term* input = term->input(0);
-
-        // Special case: don't use InlineCopy for an accumulatingOutput (this is used
-        // in for-loop).
-        if (term->boolProp("accumulatingOutput", false)) {
-            list_resize(output, 1);
-            set_name(list_get(output, 0), op_NoOp);
-
-        } else if (input == NULL) {
-            list_resize(output, 1);
-            set_name(list_get(output, 0), op_SetNull);
-        } else {
-            set_name(outputTag, op_InlineCopy);
-            set_list(inputs, 1);
-            set_term_ref(list_get(inputs, 0), term->input(0));
-        }
-        return;
-    }
-
-    // Choose the next branch
-    Branch* branch = NULL;
-    Name tag = 0;
-
-    if (is_value(term)) {
-        branch = NULL;
-        tag = op_NoOp;
-    } else if (term->function == FUNCS.lambda
-            || term->function == FUNCS.branch_unevaluated) {
-        // These funcs have a nestedContents, but it shouldn't be evaluated.
-        branch = NULL;
-        tag = op_NoOp;
-    } else if (term->function == FUNCS.declared_state) {
-        // declared_state has a nested branch, but we shouldn't use it.
-        branch = function_contents(term->function);
-        tag = op_PushBranch;
-    } else if (term->function == FUNCS.if_block) {
-        branch = term->nestedContents;
-        tag = op_CaseBlock;
-    } else if (term->function == FUNCS.for_func) {
-        branch = term->nestedContents;
-        tag = op_ForLoop;
-    } else if (term->nestedContents != NULL) {
-        // Otherwise if the term has nested contents, then use it.
-        branch = term->nestedContents;
-        tag = op_PushBranch;
-    } else if (term->function != NULL) {
-        // No nested contents, use function.
-        branch = function_contents(term->function);
-        tag = op_PushBranch;
-    }
-
-    if (tag == op_NoOp || branch == NULL || branch->emptyEvaluation) {
-        // No-op
-        set_name(outputTag, op_NoOp);
-        return;
-    }
-    
-    // For PushBranch we need to save the branch pointer
-    if (tag == op_PushBranch) {
-        set_branch(list_get(output, 2), branch);
-    }
-
-    // Save tag
-    set_name(outputTag, tag);
+    caValue* outputTag = list_get(op, 0);
+    caValue* inputs = list_get(op, 1);
 
     // Check the input count
     int inputCount = term->numInputs();
@@ -936,6 +857,108 @@ void write_term_bytecode(Term* term, caValue* output)
 
         set_term_ref(list_get(inputs, placeholderIndex), input);
     }
+}
+
+void write_term_bytecode(Term* term, caValue* output)
+{
+    INCREMENT_STAT(WriteTermBytecode);
+
+    set_list(output, 3);
+    caValue* outputTag = list_get(output, 0);
+    caValue* inputs = list_get(output, 1);
+    set_list(inputs, 0);
+
+    // Check to trigger a C override, if this is the first term in an override branch.
+    Branch* parent = term->owningBranch;
+    if (term->index == 0 && get_override_for_branch(parent) != NULL) {
+        list_resize(output, 1);
+        set_name(list_get(output, 0), op_FireNative);
+        return;
+    }
+
+    if (term->function == FUNCS.output) {
+        // Output function usually results in either SetNull or InlineCopy.
+        Term* input = term->input(0);
+
+        // Special case: don't use InlineCopy for an accumulatingOutput (this is used
+        // in for-loop).
+        if (term->boolProp("accumulatingOutput", false)) {
+            list_resize(output, 1);
+            set_name(list_get(output, 0), op_NoOp);
+
+        } else if (input == NULL) {
+            list_resize(output, 1);
+            set_name(list_get(output, 0), op_SetNull);
+        } else {
+            set_name(outputTag, op_InlineCopy);
+            set_list(inputs, 1);
+            set_term_ref(list_get(inputs, 0), term->input(0));
+        }
+        return;
+    }
+
+    if (term->function == FUNCS.for_func) {
+        list_resize(output, 4);
+        set_name(list_get(output, 0), op_ForLoop);
+        write_term_input_instructions(term, output, term->nestedContents);
+        set_branch(list_get(output, 2), term->nestedContents);
+
+        // Possibly produce output
+        if (user_count(term) == 0) {
+            set_null(list_get(output, 3));
+        } else {
+            set_name(list_get(output, 3), op_LoopProduceOutput);
+        }
+        return;
+    }
+    
+
+    // Choose the next branch
+    Branch* branch = NULL;
+    Name tag = 0;
+
+    if (is_value(term)) {
+        branch = NULL;
+        tag = op_NoOp;
+    } else if (term->function == FUNCS.lambda
+            || term->function == FUNCS.branch_unevaluated) {
+        // These funcs have a nestedContents, but it shouldn't be evaluated.
+        branch = NULL;
+        tag = op_NoOp;
+    } else if (term->function == FUNCS.declared_state) {
+        // declared_state has a nested branch, but we shouldn't use it.
+        branch = function_contents(term->function);
+        tag = op_PushBranch;
+    } else if (term->function == FUNCS.if_block) {
+        branch = term->nestedContents;
+        tag = op_CaseBlock;
+
+    } else if (term->nestedContents != NULL) {
+        // Otherwise if the term has nested contents, then use it.
+        branch = term->nestedContents;
+        tag = op_PushBranch;
+    } else if (term->function != NULL) {
+        // No nested contents, use function.
+        branch = function_contents(term->function);
+        tag = op_PushBranch;
+    }
+
+    if (tag == op_NoOp || branch == NULL || branch->emptyEvaluation) {
+        // No-op
+        set_name(outputTag, op_NoOp);
+        return;
+    }
+    
+    // For PushBranch we need to save the branch pointer
+    if (tag == op_PushBranch) {
+        set_branch(list_get(output, 2), branch);
+    }
+
+    // Save tag
+    set_name(outputTag, tag);
+
+    // Write input instructions
+    write_term_input_instructions(term, output, branch);
 
     // Do some lightweight optimization
 
@@ -973,12 +996,21 @@ void write_branch_bytecode(Branch* branch, caValue* output)
     // Write the finish operation
     caValue* finishOp = list_get(output, branch->length());
     if (is_for_loop(branch)) {
-        set_list(finishOp, 1);
+        set_list(finishOp, 2);
         set_name(list_get(finishOp, 0), op_FinishLoop);
-    } else {
-        set_list(finishOp, 1);
-        set_name(list_get(finishOp, 0), op_FinishFrame);
+
+        // Possibly produce output
+        if ((branch->owningTerm != NULL) && user_count(branch->owningTerm) > 0) {
+            set_name(list_get(finishOp, 1), op_LoopProduceOutput);
+        } else {
+            set_null(list_get(finishOp, 1));
+        }
+
+        return;
     }
+
+    set_list(finishOp, 1);
+    set_name(list_get(finishOp, 0), op_FinishFrame);
 }
 
 void populate_inputs_from_metadata(Stack* stack, Frame* frame, caValue* inputs)
@@ -1059,7 +1091,10 @@ void step_interpreter_action(Stack* stack, caValue* action)
         Frame* frame = push_frame(stack, branch);
         caValue* inputs = list_get(action, 1);
         populate_inputs_from_metadata(stack, frame, inputs);
-        start_for_loop(stack);
+        bool enableLoopOutput = as_name(list_get(action, 3)) == op_LoopProduceOutput;
+        // temp
+        enableLoopOutput = true;
+        start_for_loop(stack, enableLoopOutput);
         break;
     }
     case op_SetNull: {
@@ -1093,7 +1128,10 @@ void step_interpreter_action(Stack* stack, caValue* action)
         break;
     }
     case op_FinishLoop: {
-        for_loop_finish_iteration(stack);
+        bool enableLoopOutput = as_name(list_get(action, 1)) == op_LoopProduceOutput;
+        // temp
+        enableLoopOutput = true;
+        for_loop_finish_iteration(stack, enableLoopOutput);
         break;
     }
 

@@ -30,6 +30,8 @@ struct RawOutputPrefs
 // using 'usee'.
 bool is_actually_using(Term* user, Term* usee);
 
+int user_count(Term* term);
+
 // Set / get whether this term is a 'statement'. This affects source code reproduction.
 void set_is_statement(Term* term, bool value);
 bool is_statement(Term* term);

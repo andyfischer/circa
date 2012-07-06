@@ -377,6 +377,12 @@ caValue* list_get_from_end(caValue* value, int reverseIndex)
     ca_assert(value->value_type->storageType == STORAGE_TYPE_LIST);
     return list_get_from_end((ListData*) value->value_data.ptr, reverseIndex);
 }
+caValue* list_get_safe(caValue* value, int index)
+{
+    if (!is_list(value) || index < 0 || index >= list_length(value))
+        return NULL;
+    return list_get(value, index);
+}
 
 ListData* list_remove_index(ListData* original, int index)
 {

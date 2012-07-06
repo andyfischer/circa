@@ -68,6 +68,8 @@ caValue* list_get(caValue* value, int index);
 // element 0 returns the last element. See caveats for list_get.
 caValue* list_get_from_end(caValue* value, int index);
 
+caValue* list_get_safe(caValue* value, int index);
+
 // Return the number of elements in the list.
 int list_length(caValue* value);
 

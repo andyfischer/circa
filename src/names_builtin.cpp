@@ -136,6 +136,7 @@ const char* builtin_name_to_string(int name)
     case op_FinishLoop: return "op_FinishLoop";
     case op_ErrorNotEnoughInputs: return "op_ErrorNotEnoughInputs";
     case op_ErrorTooManyInputs: return "op_ErrorTooManyInputs";
+    case op_LoopProduceOutput: return "op_LoopProduceOutput";
     case name_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";

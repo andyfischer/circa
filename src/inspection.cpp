@@ -26,6 +26,11 @@ bool is_actually_using(Term* user, Term* usee)
     return false;
 }
 
+int user_count(Term* term)
+{
+    return term->users.length();
+}
+
 void set_is_statement(Term* term, bool value)
 {
     term->setBoolProp("statement", value);
@@ -280,11 +285,15 @@ void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
 
         print_term(out, term, prefs);
         out << std::endl;
-    }
 
-    // Possibly print the closing bytecode op
-    if (prefs->showBytecode) {
-        out << to_string(list_get(&branch->bytecode, branch->length())) << std::endl;
+        // Possibly print the closing bytecode op.
+        if (prefs->showBytecode
+                && term->index == (term->owningBranch->length() - 1)) {
+
+            for (int i=0; i < prefs->indentLevel; i++)
+                out << " ";
+            out << to_string(list_get(&branch->bytecode, branch->length())) << std::endl;
+        }
     }
 
     prefs->indentLevel = prevIndent;
@@ -485,7 +494,7 @@ void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs)
             out << " ";
 
         Branch* branch = term->owningBranch;
-        caValue* op = list_get(&branch->bytecode, term->index);
+        caValue* op = list_get_safe(&branch->bytecode, term->index);
         if (op == NULL)
             out << "(missing bytecode)";
         else
