@@ -79,7 +79,7 @@ void eval_context_print_multiline(std::ostream& out, Stack* stack)
         if (branch == NULL)
             continue;
 
-        for (int i=0; i < frame->endPc; i++) {
+        for (int i=0; i < frame->branch->length(); i++) {
             Term* term = branch->get(i);
 
             // indent
@@ -152,7 +152,6 @@ Frame* push_frame(Stack* stack, Branch* branch)
     top->branch = branch;
     top->pc = 0;
     top->nextPc = 0;
-    top->endPc = branch->length();
     top->loop = false;
     top->exitType = name_None;
     top->dynamicCall = false;
@@ -244,6 +243,12 @@ void finish_frame(Stack* stack)
     Frame* top = top_frame(stack);
     Branch* finishedBranch = top->branch;
 
+    // Exit if we have finished the topmost branch
+    if (stack->framesCount == 1 || top->stop) {
+        stack->running = false;
+        return;
+    }
+
     // Check to loop
     if (top->loop) {
         for_loop_finish_frame(stack);
@@ -328,7 +333,6 @@ void evaluate_single_term(Stack* stack, Term* term)
     Frame* frame = push_frame(stack, term->owningBranch);
     frame->pc = term->index;
     frame->nextPc = term->index;
-    frame->endPc = frame->pc + 1;
 
     run_interpreter(stack);
 }
@@ -1073,11 +1077,14 @@ void step_interpreter_action(Stack* stack, caValue* action)
 
         // By default, we'll set nextPc to finish this frame on the next iteration.
         // The override func may change nextPc.
-        frame->nextPc = frame->endPc;
+        frame->nextPc = frame->branch->length();
 
         // Call override
         override(stack);
 
+        break;
+    }
+    case op_FinishFrame: {
         break;
     }
     case op_ErrorNotEnoughInputs: {
@@ -1127,13 +1134,7 @@ void step_interpreter(Stack* stack)
     frame->nextPc = frame->pc + 1;
 
     // Check if we have finished this branch
-    if (frame->pc >= frame->endPc) {
-
-        // Exit if we have finished the topmost branch
-        if (stack->framesCount == 1 || frame->stop) {
-            stack->running = false;
-            return;
-        }
+    if (frame->pc >= branch->length()) {
 
         // Finish this frame
         finish_frame(stack);

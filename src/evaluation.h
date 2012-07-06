@@ -24,7 +24,6 @@ struct Frame
     Branch* branch;
     int pc;
     int nextPc;
-    int endPc;
 
     // True if this frame is being evaluated with a C override.
     bool override;

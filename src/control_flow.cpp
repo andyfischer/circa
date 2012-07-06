@@ -58,7 +58,7 @@ void evaluate_exit_point(caStack* stack)
     }
 
     // Set PC to end
-    frame->nextPc = frame->endPc;
+    frame->nextPc = branch->length();
     frame->exitType = as_name(control);
 }
 
