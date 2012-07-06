@@ -1,0 +1,74 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
+
+#if 0
+#include "Font.h"
+#include "EngineBindings.h"
+#include "TextTexture.h"
+#include "TextVbo.h"
+
+struct TextLabel : NSObject
+{
+    TextContainer* container;
+    TextInstance* instance;
+}
+
+void TextLabelRelease(caValue* value)
+{
+    TextLabel* label = (__bridge TextLabel*) circa_as_pointer(value);
+    // TODO: release TextLabel
+    //[label release];
+}
+
+void create_font(caStack* stack)
+{
+    const char* filename = circa_string_input(stack, 0);
+    int size = circa_int_input(stack, 1);
+    int fontIndex = font_load(filename, size);
+    
+    caValue* out = circa_create_default_output(stack, 0);
+    circa_set_int(circa_handle_get_value(out), fontIndex);
+}
+
+void create_label(caStack* stack)
+{
+    TextLabel* label = [[TextLabel alloc] init];
+    
+    label->container = [[TextContainer alloc] init];
+    label->instance = [[TextInstance alloc] init];
+    
+    label->instance->textContainer = label->container;
+    
+    caValue* out = circa_create_default_output(stack, 0);
+    circa_handle_set_object(out, (__bridge_retained void*) label, TextLabelRelease);
+}
+
+void Label_width(caStack* stack)
+{
+    TextLabel* label = (__bridge TextLabel*)
+        circa_handle_get_object(circa_input(stack, 0));
+    float width = label->container->sizeX;
+    circa_set_float(circa_output(stack, 0), width);
+    
+}
+void Label_setPosition(caStack* stack)
+{
+    float x,y;
+    circa_get_point(circa_input(stack, 0), &x, &y);
+}
+void Label_setColor(caStack* stack)
+{
+    float r,g,b,a;
+    circa_get_color(circa_input(stack, 0), &r, &g, &b, &a);
+    // TODO
+    //[instance setColor
+}
+
+void engine_setup_bindings(caBranch* branch)
+{
+    circa_install_function(branch, "create_font", create_font);
+    circa_install_function(branch, "create_label", create_label);
+    circa_install_function(branch, "Label.width", Label_width);
+    circa_install_function(branch, "Label.setPosition", Label_setPosition);
+    circa_install_function(branch, "Label.setColor", Label_setColor);
+}
+#endif
