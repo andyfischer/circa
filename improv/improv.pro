@@ -8,13 +8,14 @@ HEADERS = \
           src/Window.h \
           src/Scripts.h
 
+
 SOURCES = src/main.cpp \
           src/GLWidget.cpp \
           src/Window.cpp \
-          src/Scripts.cpp \
-          src/qt_bindings.cpp
+          src/Scripts.cpp
 
 LIBS += -L../build
+LIBS += -lfreetype
 
 CONFIG += opengl
 

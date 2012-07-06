@@ -336,6 +336,7 @@ int circa_count(caValue* container);
 
 // Assign to a caValue.
 void circa_set_bool(caValue* container, bool value);
+void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);
 void circa_set_int(caValue* container, int value);
 void circa_set_null(caValue* container);
@@ -352,6 +353,8 @@ void circa_set_string_size(caValue* container, const char* str, int size);
 
 // Append to a string
 void circa_string_append(caValue* container, const char* str);
+
+bool circa_string_equals(caValue* container, const char* str);
 
 // Initialize a list. The container will have length 'numElements' and each element will
 // be NULL.

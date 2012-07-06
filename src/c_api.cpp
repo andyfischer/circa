@@ -91,6 +91,11 @@ void circa_string_append(caValue* container, const char* str)
 {
     string_append(container, str);
 }
+
+bool circa_string_equals(caValue* container, const char* str)
+{
+    return string_eq(container, str);
+}
 void circa_set_list(caValue* list, int numElements)
 {
     set_list(list, numElements);

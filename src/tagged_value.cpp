@@ -652,6 +652,10 @@ void circa_set_bool(caValue* container, bool b)
     change_type(container, &BOOL_T);
     container->value_data.asbool = b;
 }
+void circa_set_error(caValue* container, const char* msg)
+{
+    set_error_string(container, msg);
+}
 void circa_set_float(caValue* container, float f)
 {
     change_type(container, &FLOAT_T);
