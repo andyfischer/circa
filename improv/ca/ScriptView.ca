@@ -121,8 +121,10 @@ if msg[0] == 'onPaintEvent'
         fpsTracker.onFrame(time)
         painter.setColor(#fff)
         bounds = painter.viewport
-        painter.drawText([bounds.x2 - 100, bounds.y2 - 20, bounds.x2 bounds.y2]
+        painter.drawText([bounds.x2 - 150, bounds.y2 - 20, bounds.x2 bounds.y2]
             [] concat('FPS:' fpsTracker.recentFps))
+        painter.drawText([bounds.x2 - 150, bounds.y2 - 40, bounds.x2 bounds.y2]
+            [] concat('PerFrame:' fpsTracker.recentDelay))
 
 
 elif msg[0] == 'onInputEvent'

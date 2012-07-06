@@ -385,6 +385,10 @@ void for_loop_finish_iteration(Stack* stack, bool enableLoopOutput)
             Term* outputPlaceholder = get_output_placeholder(contents, 0);
             caValue* outputList = get_frame_register(frame, outputPlaceholder);
             list_resize(outputList, as_int(outputIndex));
+        } else {
+            Term* outputPlaceholder = get_output_placeholder(contents, 0);
+            caValue* outputList = get_frame_register(frame, outputPlaceholder);
+            set_list(outputList, 0);
         }
         
         finish_frame(stack);

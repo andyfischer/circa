@@ -167,17 +167,14 @@ void insert_input(Term* term, int index, Term* input)
 
 void append_user(Term* user, Term* usee)
 {
-#if 0
     if (usee == NULL)
         return;
 
     int originalUserCount = user_count(usee);
-#endif
 
     if (usee != NULL && user != NULL)
         usee->users.appendUnique(user);
 
-#if 0
     // Check if we added the first user.
     if (originalUserCount == 0 && user_count(usee) > 0) {
 
@@ -185,22 +182,18 @@ void append_user(Term* user, Term* usee)
         if (usee->function == FUNCS.for_func)
             dirty_bytecode(usee->nestedContents);
     }
-#endif
 }
 
 void possibly_prune_user_list(Term* user, Term* usee)
 {
-#if 0
     if (usee == NULL)
         return;
 
     int originalUserCount = user_count(usee);
-#endif
 
     if (usee != NULL && !is_actually_using(user, usee))
         usee->users.remove(user);
 
-#if 0
     // Check if we removed the last user.
     if (originalUserCount > 0 && user_count(usee) == 0) {
 
@@ -208,7 +201,6 @@ void possibly_prune_user_list(Term* user, Term* usee)
         if (usee->function == FUNCS.for_func)
             dirty_bytecode(usee->nestedContents);
     }
-#endif
 }
 
 void remove_from_any_user_lists(Term* term)
@@ -219,11 +211,10 @@ void remove_from_any_user_lists(Term* term)
         if (usee == NULL)
             continue;
 
-        // int originalUserCount = user_count(usee);
+        int originalUserCount = user_count(usee);
 
         usee->users.remove(term);
 
-#if 0
         // Check if we removed the last user.
         if (originalUserCount > 0 && user_count(usee) == 0) {
 
@@ -231,7 +222,6 @@ void remove_from_any_user_lists(Term* term)
             if (usee->function == FUNCS.for_func)
                 dirty_bytecode(usee->nestedContents);
         }
-#endif
     }
 }
 
@@ -773,8 +763,11 @@ void branch_start_changes(Branch* branch)
 
 void branch_finish_changes(Branch* branch)
 {
-    if (!branch->inProgress)
+    if (!branch->inProgress) {
+        // If nothing else, make sure bytecode is up to date.
+        refresh_bytecode(branch);
         return;
+    }
 
     // Perform cleanup
 

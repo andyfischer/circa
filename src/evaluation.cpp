@@ -1092,8 +1092,6 @@ void step_interpreter_action(Stack* stack, caValue* action)
         caValue* inputs = list_get(action, 1);
         populate_inputs_from_metadata(stack, frame, inputs);
         bool enableLoopOutput = as_name(list_get(action, 3)) == op_LoopProduceOutput;
-        // temp
-        enableLoopOutput = true;
         start_for_loop(stack, enableLoopOutput);
         break;
     }
@@ -1129,8 +1127,6 @@ void step_interpreter_action(Stack* stack, caValue* action)
     }
     case op_FinishLoop: {
         bool enableLoopOutput = as_name(list_get(action, 1)) == op_LoopProduceOutput;
-        // temp
-        enableLoopOutput = true;
         for_loop_finish_iteration(stack, enableLoopOutput);
         break;
     }

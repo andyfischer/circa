@@ -1,21 +1,14 @@
 
 type FPSTracker {
-    number recentFps
+    number lastCheckTime
 
-    int samples
-    number timeStart
+    number recentDelay
+    number recentFps
 }
 
 def FPSTracker.onFrame(@self, number time)
-    SampleCount = 60
+    lastCheckTime = self.lastCheckTime
+    self.lastCheckTime = time
 
-    timeSinceStart = time - self.timeStart
-
-    if self.samples == 0
-        self.timeStart = time
-        self.samples = 1
-    elif self.samples >= SampleCount or timeSinceStart > 1.0
-        self.recentFps = self.samples / timeSinceStart
-        self.samples = 0
-    else
-        self.samples += 1
+    self.recentDelay = time - lastCheckTime
+    self.recentFps = 1 / self.recentDelay

@@ -290,9 +290,12 @@ void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
         if (prefs->showBytecode
                 && term->index == (term->owningBranch->length() - 1)) {
 
+            Branch* nested = term->owningBranch;
+
             for (int i=0; i < prefs->indentLevel; i++)
                 out << " ";
-            out << to_string(list_get(&branch->bytecode, branch->length())) << std::endl;
+
+            out << to_string(list_get(&nested->bytecode, nested->length())) << std::endl;
         }
     }
 
