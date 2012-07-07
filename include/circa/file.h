@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-const char* circa_read_file(const char* filename);
+void circa_read_file(const char* filename, caValue* contentsOut);
 
 bool circa_file_exists(const char* filename);
 

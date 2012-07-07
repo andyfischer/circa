@@ -154,7 +154,7 @@ void file__version(caStack* stack)
 }
 void file__read_text(caStack* stack)
 {
-    set_string(circa_output(stack, 0), circa_read_file(circa_string_input(stack, 0)));
+    circa_read_file(circa_string_input(stack, 0), circa_output(stack, 0));
 }
 
 void from_string(caStack* stack)

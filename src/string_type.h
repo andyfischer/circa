@@ -33,6 +33,10 @@ void string_split(caValue* s, char sep, caValue* listOut);
 
 const char* as_cstring(caValue* value);
 
+// Initialize a string with the given length, and return the address. This value
+// can be safely modified until it's shared (copied).
+char* string_initialize(caValue* value, int length);
+
 // Deprecated
 std::string as_string(caValue* value);
 

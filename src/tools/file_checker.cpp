@@ -40,14 +40,14 @@ void run_file_checker(const char* filename, List* errors)
         Value fileContents;
         Value fileReadError;
 
-        const char* contents = circa_read_file(filename);
-        if (contents == NULL) {
+        circa_read_file(filename, &fileContents);
+        if (is_null(&fileContents)) {
             std::stringstream msg;
             msg << "File not found: " << filename;
             errors->appendString(msg.str());
             return;
         }
-        actualSource = contents;
+        actualSource = as_cstring(&fileContents);
     }
 
     // Run a source-repro test

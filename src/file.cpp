@@ -16,7 +16,7 @@ extern "C" {
 
 struct CachedFile {
     char* filename;
-    char* contents;
+    circa::Value contents;
     bool needs_fread;
     int version;
     int last_known_mtime;
@@ -43,7 +43,7 @@ static CachedFile* create_file_entry(const char* filename)
     // Create a new entry
     entry = (CachedFile*) malloc(sizeof(*entry));
     entry->filename = circa_strdup(filename);
-    entry->contents = NULL;
+    initialize_null(&entry->contents);
     entry->needs_fread = false;
     entry->version = 0;
     entry->last_known_mtime = 0;
@@ -68,28 +68,30 @@ static void update_version_from_mtime(CachedFile* entry)
     }
 }
 
-const char* circa_read_file(const char* filename)
+void circa_read_file(const char* filename, caValue* contentsOut)
 {
     CachedFile* entry = create_file_entry(filename);
     update_version_from_mtime(entry);
 
     if (!entry->needs_fread)
-        return entry->contents;
+        copy(&entry->contents, contentsOut);
 
     // Read the data
     FILE* fp = fopen(filename, "r");
-    if (fp == NULL)
-        return NULL;
+    if (fp == NULL) {
+        set_null(contentsOut);
+        return;
+    }
 
     // Get file size
     fseek(fp, 0, SEEK_END);
     size_t file_size = ftell(fp);
     rewind(fp);
 
-    entry->contents = (char*) realloc(entry->contents, file_size + 1);
-    size_t bytesRead = fread(entry->contents, 1, file_size, fp);
+    char* contentsData = string_initialize(&entry->contents, file_size + 1);
+    size_t bytesRead = fread(contentsData, 1, file_size, fp);
 
-    entry->contents[bytesRead] = 0;
+    contentsData[bytesRead] = 0;
     entry->needs_fread = false;
 
     log_start(0, "read_file");
@@ -98,8 +100,6 @@ const char* circa_read_file(const char* filename)
     log_arg("bytesRead", bytesRead);
     log_arg("contents", entry->contents);
     log_finish();
-
-    return entry->contents;
 }
 
 bool circa_file_exists(const char* filename)

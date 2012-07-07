@@ -579,15 +579,16 @@ Name load_script(Branch* branch, const char* filename)
     set_int(fileOrigin->get(2), circa_file_get_version(filename));
 
     // Read the text file
-    const char* contents = circa_read_file(filename);
+    circa::Value contents;
+    circa_read_file(filename, &contents);
 
-    if (contents == NULL) {
+    if (is_null(&contents)) {
         Term* msg = create_string(branch, "file not found");
         apply(branch, STATIC_ERROR_FUNC, TermList(msg));
         return name_Failure;
     }
 
-    parser::compile(branch, parser::statement_list, contents);
+    parser::compile(branch, parser::statement_list, as_cstring(&contents));
 
     post_module_load(branch);
 

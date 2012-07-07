@@ -361,6 +361,14 @@ std::string as_string(caValue* value)
     return std::string(as_cstring(value));
 }
 
+char* string_initialize(caValue* value, int length)
+{
+    create(&STRING_T, value);
+    StringData* data = string_create(length);
+    value->value_data.ptr = data;
+    return data->str;
+}
+
 void set_string(caValue* value, const char* s)
 {
     create(&STRING_T, value);

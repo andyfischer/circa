@@ -5,7 +5,7 @@
 #include "branch.h"
 #include "evaluation.h"
 #include "heap_debugging.h"
-#include "introspection.h"
+#include "inspection.h"
 #include "kernel.h"
 #include "source_repro.h"
 #include "static_checking.h"
