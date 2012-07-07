@@ -8,6 +8,9 @@
 #include <QtOpenGL/QGLWidget>
 #include <QTime>
 
+#include "engine/RenderList.h"
+#include "engine/TextSprite.h"
+
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -15,7 +18,8 @@ class GLWidget : public QGLWidget
 public:
     GLWidget(QWidget* parent);
 
-    virtual void paintEvent(QPaintEvent *event);
+    virtual void initializeGL();
+    virtual void paintGL();
 
     virtual void mouseDoubleClickEvent ( QMouseEvent * event );
     virtual void mouseMoveEvent ( QMouseEvent * event );
@@ -23,6 +27,10 @@ public:
     virtual void mouseReleaseEvent ( QMouseEvent * event );
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void keyReleaseEvent ( QKeyEvent * event );
+
+    // Temp for testing
+    RenderList renderList;
+    TextSprite* textSprite;
 
 protected:
     // Sends the event to App.onInputEvent, and deallocates the caValue.

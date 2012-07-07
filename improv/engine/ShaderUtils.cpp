@@ -8,7 +8,7 @@ void compile_shader(GLenum type, caValue* contents, caValue* shaderOut);
 bool link_program(GLuint prog);
 bool validate_program(GLuint prog);
 
-bool load_shaders(Program* programStruct, ResourceManager* resources, const char* baseFilename)
+bool load_shaders(ResourceManager* resources, const char* baseFilename, Program* programStruct)
 {
     Log("Loading shader: %s", baseFilename);
     

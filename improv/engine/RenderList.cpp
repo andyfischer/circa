@@ -8,8 +8,9 @@
 const bool CHECK_GL_ERROR = true;
 
 void
-RenderList::setup()
+RenderList::setup(ResourceManager* resourceManager)
 {
+    load_shaders(resourceManager, "main", &program);
 }
 
 void
@@ -34,6 +35,12 @@ RenderList::render()
         
         check_gl_error();
     }
+}
+
+Program*
+RenderList::currentProgram()
+{
+    return &program;
 }
 
 void check_gl_error()

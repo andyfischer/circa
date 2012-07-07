@@ -50,7 +50,7 @@ Line::render(RenderList* target)
     const int floatsPerVertex = 3;
     const int numVertices = 2;
     
-    GLuint attribVertex = target->curProgram->attributes.vertex;
+    GLuint attribVertex = target->currentProgram()->attributes.vertex;
     
     glBindBuffer(GL_ARRAY_BUFFER, bufid);
     glEnableVertexAttribArray(attribVertex);
@@ -58,7 +58,7 @@ Line::render(RenderList* target)
                           GL_FLOAT, GL_FALSE,
                           0, BUFFER_OFFSET(0));
     
-    glUniform4f(target->curProgram->uniforms.color,
+    glUniform4f(target->currentProgram()->uniforms.color,
                 color.r,color.g,color.b,color.a);
     
     glDrawArrays(GL_LINES, 0, numVertices);

@@ -15,13 +15,12 @@ struct TextSprite
     TextTexture* textTexture;
     TextVbo* textVbo;
     circa::Value _text;
-    int _width;
     int _font;
 
     void init(RenderList* rl, int font);
     ~TextSprite();
 
     void setFont(int font);
-    void setText(const char* str, int width);
+    void setText(const char* str);
     void setPosition(int x, int y);
 };

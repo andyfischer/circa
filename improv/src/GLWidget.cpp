@@ -4,7 +4,8 @@
 
 #include "GLWidget.h"
 #include "Scripts.h"
-#include "main.h"
+#include "engine/FontBitmap.h"
+#include "engine/ResourceManager.h"
 
 GLWidget::GLWidget(QWidget *parent)
      : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -20,6 +21,7 @@ GLWidget::GLWidget(QWidget *parent)
 
     elapsedTime.start();
 
+
 #ifdef _MSC_VER
     // Fixes a font corruption issue on Windows
     QGL::setPreferredPaintEngine( QPaintEngine::OpenGL );
@@ -31,6 +33,7 @@ void GLWidget::animate()
     repaint();
 }
 
+#if 0
 void GLWidget::paintEvent(QPaintEvent*)
 {
     // Send a timeUpdate message
@@ -60,6 +63,40 @@ void GLWidget::paintEvent(QPaintEvent*)
     scripts_post_message_send();
 
     painter.end();
+}
+#endif
+
+void GLWidget::initializeGL()
+{
+    glDisable(GL_DEPTH_TEST);
+    glActiveTexture(GL_TEXTURE0);
+
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    check_gl_error();
+
+    ResourceManager resourceManager;
+
+    renderList.setup(&resourceManager);
+
+    // Temp for testing
+    int font = font_load("assets/jackinput.ttf", 24);
+    textSprite = new TextSprite();
+    textSprite->init(&renderList, font);
+    textSprite->setText("hello");
+    textSprite->setPosition(10, 10);
+    check_gl_error();
+}
+
+void GLWidget::paintGL()
+{
+    check_gl_error();
+
+    glClearColor(1,1,1,1);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    renderList.render();
 }
 
 void GLWidget::mouseDoubleClickEvent ( QMouseEvent * qevent )

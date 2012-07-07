@@ -47,13 +47,15 @@ void Sprite::size(float* x, float* y)
     }
 }
 
-void Sprite::position(float* x, float* y)
+void
+Sprite::position(float* x, float* y)
 {
     *x = posX;
     *y = posY;
 }
 
-void Sprite::updateVbo()
+void
+Sprite::updateVbo()
 {
     float sizeX,sizeY;
     size(&sizeX, &sizeY);
@@ -105,8 +107,8 @@ void Sprite::render(RenderList* target)
     
     const int floatsPerVertex = 5;
     
-    GLuint attribVertex = target->curProgram->attributes.vertex;
-    GLuint attribTexCoord = target->curProgram->attributes.tex_coord;
+    GLuint attribVertex = target->currentProgram()->attributes.vertex;
+    GLuint attribTexCoord = target->currentProgram()->attributes.tex_coord;
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(attribVertex);
@@ -118,19 +120,19 @@ void Sprite::render(RenderList* target)
     // Bind texture 1
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture->tex);
-    glUniform1i(target->curProgram->uniforms.sampler, 0);
+    glUniform1i(target->currentProgram()->uniforms.sampler, 0);
     
     // Bind texture 2
-    if (texture2 != NULL && target->curProgram->uniforms.sampler2 != -1) {
+    if (texture2 != NULL && target->currentProgram()->uniforms.sampler2 != -1) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2->tex);
-        glUniform1i(target->curProgram->uniforms.sampler2, 1);
+        glUniform1i(target->currentProgram()->uniforms.sampler2, 1);
     }
     
     // Color
-    glUniform4f(target->curProgram->uniforms.color,
+    glUniform4f(target->currentProgram()->uniforms.color,
                 color.r,color.g,color.b,color.a);
-    glUniform1f(target->curProgram->uniforms.blend, blend);
+    glUniform1f(target->currentProgram()->uniforms.blend, blend);
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     

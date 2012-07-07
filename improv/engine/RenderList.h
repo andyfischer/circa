@@ -12,6 +12,7 @@
 struct RenderCommand;
 struct RenderData;
 struct RenderList;
+struct ResourceManager;
 
 struct AttributeList {
     GLuint vertex;
@@ -38,16 +39,18 @@ struct RenderList
     std::vector<RenderData*> renderData;
     std::vector<RenderCommand*> commands;
     
-    // Current state
-    Program* curProgram;
+    Program program;
     
     glm::mat4 modelViewProjectionMatrix;
     glm::mat3 normalMatrix;
 
-    void setup();
     void appendRenderData(RenderData* data);
     void appendCommand(RenderCommand* command);
+    void setup(ResourceManager* resourceManager);
+
     void render();
+
+    Program* currentProgram();
 };
 
 void check_gl_error();

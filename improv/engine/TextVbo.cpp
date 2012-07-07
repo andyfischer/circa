@@ -82,8 +82,8 @@ TextVbo::render(RenderList* renderList)
     check_gl_error();
     const int floatsPerVertex = 5;
     
-    GLuint attribVertex = renderList->curProgram->attributes.vertex;
-    GLuint attribTexCoord = renderList->curProgram->attributes.tex_coord;
+    GLuint attribVertex = renderList->currentProgram()->attributes.vertex;
+    GLuint attribTexCoord = renderList->currentProgram()->attributes.tex_coord;
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glEnableVertexAttribArray(attribVertex);
@@ -96,8 +96,8 @@ TextVbo::render(RenderList* renderList)
     glBindTexture(GL_TEXTURE_2D, textTexture->texid);
     check_gl_error();
     
-    glUniform1i(renderList->curProgram->uniforms.sampler, 0);
-    glUniform4f(renderList->curProgram->uniforms.color,
+    glUniform1i(renderList->currentProgram()->uniforms.sampler, 0);
+    glUniform4f(renderList->currentProgram()->uniforms.color,
                 color.r, color.g, color.b, color.a);
     check_gl_error();
     

@@ -2,7 +2,9 @@
 
 #include "ResourceManager.h"
 
-void loadAsText(caValue* filename, caValue* result)
+void ResourceManager::loadAsText(caValue* filename, caValue* result)
 {
-    // TODO
+
+    
+    
 }

@@ -24,4 +24,6 @@ solution "ImprovEngine"
         includedirs {"/usr/X11/include", "/usr/X11/include/freetype2"}
 
         configuration "Debug"
-            targetname "circa_d"
+            targetname "improvengine_d"
+        configuration "Release"
+            targetname "improvengine"

@@ -266,6 +266,8 @@ void string_resize(caValue* s, int length)
 }
 bool string_eq(caValue* s, const char* str)
 {
+    if (!is_string(s))
+        return false;
     return strcmp(as_cstring(s), str) == 0;
 }
 

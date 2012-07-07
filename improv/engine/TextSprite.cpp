@@ -15,7 +15,6 @@ TextSprite::init(RenderList* renderList, int font)
     
     textVbo->textTexture = textTexture;
     
-    _width = 0;
     _font = font;
 }
 
@@ -32,13 +31,12 @@ TextSprite::setFont(int f)
 }
 
 void
-TextSprite::setText(const char* text, int width)
+TextSprite::setText(const char* text)
 {
-    if (circa_string_equals(&_text, text) && width == _width)
+    if (circa_string_equals(&_text, text))
         return;
     
     circa_set_string(&_text, text);
-    _width = width;
     textTexture->rasterize(&_text, _font);
 }
 

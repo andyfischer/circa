@@ -2,4 +2,6 @@
 
 #pragma once
 
-bool load_shaders(Program* programStruct, const char* filename);
+struct ResourceManager;
+
+bool load_shaders(ResourceManager* resources, const char* baseFilename, Program* programStruct);
