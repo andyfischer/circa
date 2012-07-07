@@ -69,7 +69,12 @@ void GLWidget::paintEvent(QPaintEvent*)
 void GLWidget::initializeGL()
 {
     glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+
+    glEnable(GL_TEXTURE_2D);
     glActiveTexture(GL_TEXTURE0);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -85,16 +90,18 @@ void GLWidget::initializeGL()
     textSprite = new TextSprite();
     textSprite->init(&renderList, font);
     textSprite->setText("hello");
-    textSprite->setPosition(10, 10);
+    textSprite->setPosition(100, 100);
     textSprite->setColor(Color(0,0,1,1));
     check_gl_error();
 }
 
+void GLWidget::resizeGL(int w, int h)
+{
+    renderList.setViewportSize(w, h);
+}
+
 void GLWidget::paintGL()
 {
-    check_gl_error();
-
-    glClearColor(1,1,1,1);
     glClear(GL_COLOR_BUFFER_BIT);
 
     renderList.render();
@@ -117,6 +124,8 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * qevent )
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
+
+    textSprite->setPosition(qevent->x(), qevent->y());
 }
 void GLWidget::mousePressEvent ( QMouseEvent * qevent )
 {
@@ -126,6 +135,13 @@ void GLWidget::mousePressEvent ( QMouseEvent * qevent )
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
+
+    circa::Value value;
+    static int count = 0;
+    char buf[30];
+    sprintf(buf, "%d", count);
+    count++;
+    textSprite->setText(buf);
 }
 void GLWidget::mouseReleaseEvent ( QMouseEvent * qevent )
 {

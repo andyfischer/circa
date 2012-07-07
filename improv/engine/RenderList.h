@@ -48,6 +48,7 @@ struct RenderList
     void appendCommand(RenderCommand* command);
     void setup(ResourceManager* resourceManager);
 
+    void setViewportSize(int w, int h);
     void render();
 
     Program* currentProgram();

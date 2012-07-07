@@ -6,15 +6,14 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-// precision mediump float;
+precision mediump float;
 
-uniform sampler2D sampler;
 uniform vec4 color;
+uniform sampler2D sampler;
 
-varying vec2 TexCoordToFrag;
+varying lowp vec2 TexCoordToFrag;
 
 void main()
 {
-    gl_FragColor = color * texture2D(sampler, TexCoordToFrag).a;
-    
+    gl_FragColor = color * texture2D(sampler, TexCoordToFrag);
 }

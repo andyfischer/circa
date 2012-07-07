@@ -3,6 +3,7 @@
 #pragma once
 
 #include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #include <glm/glm.hpp>
 #include "circa/circa.h"
 

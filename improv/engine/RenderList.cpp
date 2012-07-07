@@ -1,5 +1,8 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "RenderCommand.h"
 #include "RenderData.h"
 #include "RenderList.h"
@@ -10,7 +13,7 @@ const bool CHECK_GL_ERROR = true;
 void
 RenderList::setup(ResourceManager* resourceManager)
 {
-    load_shaders(resourceManager, "assets/main", &program);
+    load_shaders(resourceManager, "assets/shaders/Text", &program);
 }
 
 void
@@ -26,11 +29,21 @@ RenderList::appendRenderData(RenderData* command)
 }
 
 void
+RenderList::setViewportSize(int w, int h)
+{
+    modelViewProjectionMatrix = glm::ortho(0.0, double(w), double(h), 0.0, -1.0, 100.0);
+}
+
+void
 RenderList::render()
 {
     check_gl_error();
 
+    // Setup render state
     glUseProgram(program.program);
+
+    glUniformMatrix4fv(program.uniforms.modelViewProjectionMatrix,
+            1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
 
     for (size_t i=0; i < commands.size(); i++) {
         RenderCommand* command = commands[i];

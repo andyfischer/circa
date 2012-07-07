@@ -33,6 +33,7 @@ TextVbo::setPosition(float x, float y)
 {
     posX = x;
     posY = y;
+    vboNeedsUpdate = true;
 }
 
 void
@@ -106,9 +107,8 @@ TextVbo::render(RenderList* renderList)
     check_gl_error();
     
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    
+
     // cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     check_gl_error();
 }
-
