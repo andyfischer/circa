@@ -10,5 +10,5 @@
 
 struct ResourceManager
 {
-    virtual void loadAsText(caValue* filename, caValue* result);
+    virtual void loadAsText(const char* filename, caValue* result);
 };

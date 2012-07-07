@@ -38,12 +38,6 @@ Value::operator=(Value const& rhs)
     return *this;
 }
 
-void
-Value::dump()
-{
-    std::cout << to_string(this) << std::endl;
-}
-
 void initialize_null(caValue* value)
 {
     value->value_type = &NULL_T;

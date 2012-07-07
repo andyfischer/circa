@@ -45,3 +45,9 @@ TextSprite::setPosition(int x, int y)
 {
     textVbo->setPosition(x, y);
 }
+void
+TextSprite::setColor(Color color)
+{
+    textVbo->color = color;
+}
+

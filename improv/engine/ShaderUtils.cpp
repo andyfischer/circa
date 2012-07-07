@@ -24,9 +24,9 @@ bool load_shaders(ResourceManager* resources, const char* baseFilename, Program*
     circa_string_append(&vertShaderPathname, ".vsh");
 
     circa::Value vertShader;
-    resources->loadAsText(&vertShaderPathname, &vertShader);
+    resources->loadAsText(circa_string(&vertShaderPathname), &vertShader);
 
-    if (circa_is_error(&vertShader)) {
+    if (circa_is_error(&vertShader) || !circa_is_string(&vertShader)) {
         Log("Failed to load vertex shader: %v", &vertShaderPathname);
         return false;
     }
@@ -36,7 +36,7 @@ bool load_shaders(ResourceManager* resources, const char* baseFilename, Program*
     compile_shader(GL_VERTEX_SHADER, &vertShader, &vertShaderIndex);
 
     if (circa_is_error(&vertShaderIndex)) {
-        Log("Failed to compile vertex shader: %v", &vertShaderPathname);
+        Log("Failed to compile vertex shader:", &vertShaderPathname);
         return false;
     }
 
@@ -46,29 +46,29 @@ bool load_shaders(ResourceManager* resources, const char* baseFilename, Program*
     circa_string_append(&fragShaderPathname, ".fsh");
 
     circa::Value fragShader;
-    resources->loadAsText(&fragShaderPathname, &fragShader);
+    resources->loadAsText(circa_string(&fragShaderPathname), &fragShader);
 
-    if (circa_is_error(&fragShader)) {
-        Log("Failed to load fragment shader: %v", &fragShaderPathname);
+    if (circa_is_error(&fragShader) || !circa_is_string(&fragShader)) {
+        Log("Failed to load fragment shader:", &fragShaderPathname);
         return false;
     }
 
     // Compile fragment shader
     circa::Value fragShaderIndex;
     compile_shader(GL_FRAGMENT_SHADER, &fragShader, &fragShaderIndex);
+    check_gl_error();
 
     if (circa_is_error(&fragShaderIndex)) {
         Log("Failed to compile frag shader: %v", &fragShaderPathname);
         return false;
     }
     
-    check_gl_error();
-
-    int vertShaderHandle = circa_int(&vertShader);
-    int fragShaderHandle = circa_int(&fragShader);
+    int vertShaderHandle = circa_int(&vertShaderIndex);
+    int fragShaderHandle = circa_int(&fragShaderIndex);
     
     // Attach vertex shader to program.
     glAttachShader(program, vertShaderHandle);
+    check_gl_error();
     
     // Attach fragment shader to program.
     glAttachShader(program, fragShaderHandle);
@@ -91,10 +91,8 @@ bool load_shaders(ResourceManager* resources, const char* baseFilename, Program*
     check_gl_error();
     
     // Get attribute locations
-    programStruct->attributes.vertex =
-        glGetAttribLocation(program, "vertex");
-    programStruct->attributes.tex_coord =
-        glGetAttribLocation(program, "tex_coord");
+    programStruct->attributes.vertex = glGetAttribLocation(program, "vertex");
+    programStruct->attributes.tex_coord = glGetAttribLocation(program, "tex_coord");
     check_gl_error();
     
     // Get uniform locations.
@@ -122,27 +120,27 @@ void compile_shader(GLenum type, caValue* contents, caValue* shaderOut)
     glCompileShader(shader);
     check_gl_error();
     
-#if 0
 #if defined(DEBUG)
     GLint logLength;
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
     if (logLength > 0) {
         GLchar *log = (GLchar *)malloc(logLength);
         glGetShaderInfoLog(shader, logLength, &logLength, log);
-        Log("Shader compile log for %@:\n%s", file, log);
+        printf("Shader compile log: %s\n", log);
         free(log);
     }
-#endif
 #endif
     
     glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
     if (status == 0) {
         glDeleteShader(shader);
         circa_set_error(shaderOut, "Failed to compile");
+        return;
     }
 
     check_gl_error();
     circa_set_int(shaderOut, shader);
+    Log("successfully compiled shader, index: ", shaderOut);
 }
 
 bool link_program(GLuint prog)

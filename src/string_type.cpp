@@ -256,6 +256,13 @@ void string_append(caValue* left, int value)
     sprintf(buf, "%d", value);
     string_append(left, buf);
 }
+void string_append_char(caValue* left, char c)
+{
+    char buf[2];
+    buf[0] = c;
+    buf[1] = 0;
+    string_append(left, buf);
+}
 void string_resize(caValue* s, int length)
 {
     if (length < 0)

@@ -6,12 +6,12 @@
 //  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
 //
 
-precision mediump float;
+// precision mediump float;
 
 uniform sampler2D sampler;
 uniform vec4 color;
 
-varying lowp vec2 TexCoordToFrag;
+varying vec2 TexCoordToFrag;
 
 void main()
 {

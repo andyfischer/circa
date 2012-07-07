@@ -2,9 +2,22 @@
 
 #include <cstdio>
 
-void Log(const char* fmt, ...)
+#include "Common.h"
+
+void Log(const char* msg)
 {
-    printf("%s", fmt);
+    printf("%s\n", msg);
+}
+
+void Log(const char* msg, caValue* arg1)
+{
+    circa::Value arg1str;
+    circa_to_string_repr(arg1, &arg1str);
+    printf("%s%s\n", msg, circa_string(&arg1str));
+}
+void Log(const char* msg, const char* arg1)
+{
+    printf("%s%s\n", msg, arg1);
 }
 
 int NextPowerOfTwo(int i)

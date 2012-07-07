@@ -7,6 +7,8 @@
 
 #include "circa/circa.h"
 
+#include "Common.h"
+
 struct TextTexture;
 struct TextVbo;
 
@@ -23,4 +25,5 @@ struct TextSprite
     void setFont(int font);
     void setText(const char* str);
     void setPosition(int x, int y);
+    void setColor(Color color);
 };

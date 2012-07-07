@@ -4,6 +4,7 @@
 
 #include "GLWidget.h"
 #include "Scripts.h"
+#include "engine/Common.h"
 #include "engine/FontBitmap.h"
 #include "engine/ResourceManager.h"
 
@@ -20,7 +21,6 @@ GLWidget::GLWidget(QWidget *parent)
     timer->start(16);
 
     elapsedTime.start();
-
 
 #ifdef _MSC_VER
     // Fixes a font corruption issue on Windows
@@ -86,6 +86,7 @@ void GLWidget::initializeGL()
     textSprite->init(&renderList, font);
     textSprite->setText("hello");
     textSprite->setPosition(10, 10);
+    textSprite->setColor(Color(0,0,1,1));
     check_gl_error();
 }
 

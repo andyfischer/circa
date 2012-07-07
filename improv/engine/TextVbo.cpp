@@ -86,11 +86,15 @@ TextVbo::render(RenderList* renderList)
     GLuint attribTexCoord = renderList->currentProgram()->attributes.tex_coord;
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    check_gl_error();
+
     glEnableVertexAttribArray(attribVertex);
     glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, floatsPerVertex*4, BUFFER_OFFSET(0));
+    check_gl_error();
     
     glEnableVertexAttribArray(attribTexCoord);
     glVertexAttribPointer(attribTexCoord, 2, GL_FLOAT, GL_FALSE, floatsPerVertex*4, BUFFER_OFFSET(12));
+    check_gl_error();
     
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, textTexture->texid);

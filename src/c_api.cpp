@@ -21,6 +21,12 @@ using namespace circa;
 
 extern "C" {
 
+void
+caValue::dump()
+{
+    std::cout << to_string(this) << std::endl;
+}
+
 void caBranch::dump()
 {
     circa_dump_b(this);
@@ -90,6 +96,11 @@ void circa_dealloc_value(caValue* value)
 void circa_string_append(caValue* container, const char* str)
 {
     string_append(container, str);
+}
+
+void circa_string_append_char(caValue* container, char c)
+{
+    string_append(container, c);
 }
 
 bool circa_string_equals(caValue* container, const char* str)

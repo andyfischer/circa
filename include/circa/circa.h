@@ -67,8 +67,11 @@ struct caValue
     caType* value_type;
 
 #ifdef __cplusplus
-    // Don't use caValue as a C++ type (use circa::Value instead)
+    // For debugging:
+    void dump();
+
 protected:
+    // Don't use caValue as a C++ type (use circa::Value instead)
     caValue() {}
     ~caValue() {}
 
@@ -89,7 +92,6 @@ struct Value : caValue
     ~Value();
     Value(Value const&);
     Value& operator=(Value const&);
-    void dump();
 };
 
 } // namespace circa
@@ -353,6 +355,7 @@ void circa_set_string_size(caValue* container, const char* str, int size);
 
 // Append to a string
 void circa_string_append(caValue* container, const char* str);
+void circa_string_append_char(caValue* container, char c);
 
 bool circa_string_equals(caValue* container, const char* str);
 

@@ -10,7 +10,7 @@ const bool CHECK_GL_ERROR = true;
 void
 RenderList::setup(ResourceManager* resourceManager)
 {
-    load_shaders(resourceManager, "main", &program);
+    load_shaders(resourceManager, "assets/main", &program);
 }
 
 void
@@ -28,6 +28,10 @@ RenderList::appendRenderData(RenderData* command)
 void
 RenderList::render()
 {
+    check_gl_error();
+
+    glUseProgram(program.program);
+
     for (size_t i=0; i < commands.size(); i++) {
         RenderCommand* command = commands[i];
     

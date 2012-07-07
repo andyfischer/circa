@@ -19,6 +19,8 @@ void string_append_quoted(caValue* left, caValue* right);
 // Append an integer value as a string.
 void string_append(caValue* left, int value);
 
+void string_append_char(caValue* left, char c);
+
 void string_resize(caValue* s, int length);
 bool string_eq(caValue* s, const char* str);
 bool string_starts_with(caValue* s, const char* beginning);

@@ -94,6 +94,8 @@ void circa_read_file(const char* filename, caValue* contentsOut)
     contentsData[bytesRead] = 0;
     entry->needs_fread = false;
 
+    copy(&entry->contents, contentsOut);
+
     log_start(0, "read_file");
     log_arg("filename", filename);
     log_arg("file_size", file_size);
