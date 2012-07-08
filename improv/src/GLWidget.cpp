@@ -1,6 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include <QtGui>
+#include <QtCore>
 
 #include "GLWidget.h"
 #include "Scripts.h"
@@ -33,39 +34,6 @@ void GLWidget::animate()
     repaint();
 }
 
-#if 0
-void GLWidget::paintEvent(QPaintEvent*)
-{
-    // Send a timeUpdate message
-    circa::Value msg;
-    circa_set_list(&msg, 2);
-    circa_set_string(circa_index(&msg, 0), "timeUpdate");
-    circa_set_float(circa_index(&msg, 1), elapsedTime.elapsed() / 1000.0f);
-
-    circa_actor_run_message(g_world, "View", &msg);
-
-    // Send an onPaintEvent message
-    QPainter painter;
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    scripts_pre_message_send();
-
-    // call onPaintEvent
-    circa_set_list(&msg, 2);
-
-    circa_set_string(circa_index(&msg, 0), "onPaintEvent");
-    circa_set_typed_pointer(circa_index(&msg, 1),
-        circa_find_type(NULL, "Painter"), &painter);
-
-    circa_actor_run_message(g_world, "View", &msg);
-
-    scripts_post_message_send();
-
-    painter.end();
-}
-#endif
-
 void GLWidget::initializeGL()
 {
     glDisable(GL_DEPTH_TEST);
@@ -83,12 +51,12 @@ void GLWidget::initializeGL()
 
     ResourceManager resourceManager;
 
-    renderList.setup(&resourceManager);
+    renderTarget.setup(&resourceManager);
 
     // Temp for testing
     int font = font_load("assets/jackinput.ttf", 24);
-    textSprite = new TextSprite();
-    textSprite->init(&renderList, font);
+    textSprite = TextSprite::create(&renderTarget);
+    textSprite->setFont(font);
     textSprite->setText("hello");
     textSprite->setPosition(100, 100);
     textSprite->setColor(Color(0,0,1,1));
@@ -97,14 +65,42 @@ void GLWidget::initializeGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
-    renderList.setViewportSize(w, h);
+    renderTarget.setViewportSize(w, h);
 }
 
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    renderList.render();
+    // Send a timeUpdate message
+    circa::Value msg;
+    circa_set_list(&msg, 2);
+    circa_set_string(circa_index(&msg, 0), "timeUpdate");
+    circa_set_float(circa_index(&msg, 1), elapsedTime.elapsed() / 1000.0f);
+
+    circa_actor_run_message(g_world, "Main", &msg);
+
+    // Send a paintGL message
+    QPainter painter;
+    painter.begin(this);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    scripts_pre_message_send();
+
+    circa_set_list(&msg, 2);
+
+    circa_set_string(circa_index(&msg, 0), "paintGL");
+    circa_set_typed_pointer(circa_index(&msg, 1),
+        circa_find_type(NULL, "RenderTarget"), &renderTarget);
+
+    circa_actor_run_message(g_world, "Main", &msg);
+
+    scripts_post_message_send();
+
+    painter.end();
+    
+    // Execute GL commands
+    renderTarget.render();
 }
 
 void GLWidget::mouseDoubleClickEvent ( QMouseEvent * qevent )
@@ -180,7 +176,7 @@ void GLWidget::onInputEvent(caValue* event)
     circa_set_string(circa_index(&msg, 0), "onInputEvent");
     circa_move(event, circa_index(&msg, 1));
 
-    circa_actor_run_message(g_world, "View", &msg);
+    circa_actor_run_message(g_world, "Main", &msg);
 
     scripts_post_message_send();
 }

@@ -5,7 +5,7 @@
 #include "Common.h"
 #include "Texture.h"
 
-void Texture::init(RenderList* target)
+void Texture::init(RenderTarget* target)
 {
     glGenTextures(1, &tex);
     hasTexture = false;

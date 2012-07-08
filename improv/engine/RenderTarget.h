@@ -10,8 +10,8 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 struct RenderCommand;
-struct RenderData;
-struct RenderList;
+struct RenderEntity;
+struct RenderTarget;
 struct ResourceManager;
 
 struct AttributeList {
@@ -34,17 +34,22 @@ struct Program {
     UniformList uniforms;
 };
 
-struct RenderList
+struct RenderTarget
 {
-    std::vector<RenderData*> renderData;
+    // RenderCommands are pending commands to the device, they are run on every frame.
+    // These objects are owned by RenderTarget.
     std::vector<RenderCommand*> commands;
+
+    // RenderEntities store objects/data that is actively being used for drawing (and
+    // may be referenced by RenderCommands). These objects are owned by RenderTarget.
+    std::vector<RenderEntity*> entities;
     
     Program program;
     
     glm::mat4 modelViewProjectionMatrix;
     glm::mat3 normalMatrix;
 
-    void appendRenderData(RenderData* data);
+    void appendEntity(RenderEntity* entity);
     void appendCommand(RenderCommand* command);
     void setup(ResourceManager* resourceManager);
 

@@ -8,7 +8,7 @@
 #include <QtOpenGL/QGLWidget>
 #include <QTime>
 
-#include "engine/RenderList.h"
+#include "engine/RenderTarget.h"
 #include "engine/TextSprite.h"
 
 class GLWidget : public QGLWidget
@@ -30,7 +30,7 @@ public:
     virtual void keyReleaseEvent ( QKeyEvent * event );
 
     // Temp for testing
-    RenderList renderList;
+    RenderTarget renderTarget;
     TextSprite* textSprite;
 
 protected:

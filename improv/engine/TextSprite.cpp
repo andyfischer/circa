@@ -7,21 +7,33 @@
 
 #include "TextSprite.h"
 
-void
-TextSprite::init(RenderList* renderList, int font)
+TextSprite*
+TextSprite::create(RenderTarget* target)
 {
-    textTexture = TextTexture::init(renderList);
-    textVbo = TextVbo::init(renderList);
+    TextSprite* obj = new TextSprite();
+
+    obj->textTexture = TextTexture::create(target);
+    obj->textVbo = TextVbo::create(target);
     
-    textVbo->textTexture = textTexture;
-    
-    _font = font;
+    obj->textVbo->textTexture = obj->textTexture;
+
+    obj->_font = 0;
+    return obj;
 }
 
-TextSprite::~TextSprite()
+void
+TextSprite::destroy()
 {
     textTexture->destroy();
     textVbo->destroy();
+    textTexture = NULL;
+    textVbo = NULL;
+}
+
+bool
+TextSprite::destroyed()
+{
+    return textTexture = NULL;
 }
 
 void

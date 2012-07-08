@@ -3,21 +3,20 @@
 // TextTexture
 //
 // Object that holds a texture id for a rendered piece of text.
-//
 
 #pragma once
 
-#include "RenderData.h"
+#include "RenderEntity.h"
 #include "FontBitmap.h"
 
-struct TextTexture : RenderData
+struct TextTexture : RenderEntity
 {
     GLuint texid;
 
     FontBitmap metrics;
     int version;
 
-    static TextTexture* init(RenderList* renderList);
+    static TextTexture* create(RenderTarget* renderList);
     void rasterize(caValue* str, int font);
 
     virtual void destroy();

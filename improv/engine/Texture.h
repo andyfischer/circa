@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "RenderData.h"
+#include "RenderEntity.h"
 
-struct Texture : RenderData
+struct Texture : RenderEntity
 {
     GLuint tex;
     
@@ -13,9 +13,9 @@ struct Texture : RenderData
 
     bool hasTexture;
 
-    void init(RenderList* target);
-    void destroy();
-    bool destroyed();
+    void init(RenderTarget* target);
+    virtual void destroy();
+    virtual bool destroyed();
 
     void loadFromFile(const char* filename);
     void loadCheckerPattern(int w, int h);

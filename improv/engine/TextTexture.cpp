@@ -2,13 +2,13 @@
 
 #include "Common.h"
 #include "TextTexture.h"
-#include "RenderList.h"
+#include "RenderTarget.h"
 
 TextTexture*
-TextTexture::init(RenderList* renderList)
+TextTexture::create(RenderTarget* renderList)
 {
     TextTexture* obj = new TextTexture();
-    renderList->appendRenderData(obj);
+    renderList->appendEntity(obj);
 
     glGenTextures(1, &obj->texid);
     obj->version = 1;

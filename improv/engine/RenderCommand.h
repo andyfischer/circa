@@ -2,13 +2,12 @@
 
 #pragma once
 
-#include "RenderList.h"
-
-struct RenderList;
+struct RenderTarget;
 
 struct RenderCommand
 {
-    virtual void render(RenderList* renderList) = 0;
+    virtual ~RenderCommand() {}
+    virtual void render(RenderTarget* renderList) = 0;
     virtual void destroy() = 0;
     virtual bool destroyed() = 0;
 };

@@ -4,38 +4,38 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "RenderCommand.h"
-#include "RenderData.h"
-#include "RenderList.h"
+#include "RenderEntity.h"
+#include "RenderTarget.h"
 #include "ShaderUtils.h"
 
 const bool CHECK_GL_ERROR = true;
 
 void
-RenderList::setup(ResourceManager* resourceManager)
+RenderTarget::setup(ResourceManager* resourceManager)
 {
     load_shaders(resourceManager, "assets/shaders/Text", &program);
 }
 
 void
-RenderList::appendCommand(RenderCommand* command)
+RenderTarget::appendCommand(RenderCommand* command)
 {
     commands.push_back(command);
 }
 
 void
-RenderList::appendRenderData(RenderData* command)
+RenderTarget::appendEntity(RenderEntity* command)
 {
-    renderData.push_back(command);
+    entities.push_back(command);
 }
 
 void
-RenderList::setViewportSize(int w, int h)
+RenderTarget::setViewportSize(int w, int h)
 {
     modelViewProjectionMatrix = glm::ortho(0.0, double(w), double(h), 0.0, -1.0, 100.0);
 }
 
 void
-RenderList::render()
+RenderTarget::render()
 {
     check_gl_error();
 
@@ -45,17 +45,47 @@ RenderList::render()
     glUniformMatrix4fv(program.uniforms.modelViewProjectionMatrix,
             1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
 
+    // Cleanup destroyed entities
+    {
+        int numDestroyed = 0;
+        for (size_t i=0; i < entities.size(); i++) {
+            RenderEntity* entity = entities[i];
+            if (entity->destroyed()) {
+                delete entity;
+                numDestroyed++;
+                continue;
+            }
+
+            if (numDestroyed > 0)
+                entities[i - numDestroyed] = entity;
+        }
+        entities.resize(entities.size() - numDestroyed);
+    }
+
+    // Run commands (cleaning up destroyed ones as we go)
+    int numDestroyed = 0;
     for (size_t i=0; i < commands.size(); i++) {
         RenderCommand* command = commands[i];
+
+        if (command->destroyed()) {
+            delete command;
+            numDestroyed++;
+            continue;
+        }
+
+        if (numDestroyed > 0)
+            commands[i - numDestroyed] = command;
     
         command->render(this);
         
         check_gl_error();
     }
+
+    commands.resize(commands.size() - numDestroyed);
 }
 
 Program*
-RenderList::currentProgram()
+RenderTarget::currentProgram()
 {
     return &program;
 }

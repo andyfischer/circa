@@ -584,7 +584,6 @@ const char* circa_string(caValue* value) {
 }
 void* circa_get_pointer(caValue* value)
 {
-    value = dereference_handle(value);
     return value->value_data.ptr;
 }
 

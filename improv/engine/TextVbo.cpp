@@ -1,9 +1,10 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "TextVbo.h"
+#include "RenderTarget.h"
 
 TextVbo*
-TextVbo::init(RenderList* target)
+TextVbo::create(RenderTarget* target)
 {
     TextVbo* obj = new TextVbo();
     target->appendCommand(obj);
@@ -75,7 +76,7 @@ TextVbo::updateVbo()
 }
 
 void
-TextVbo::render(RenderList* renderList)
+TextVbo::render(RenderTarget* renderList)
 {
     if (vboNeedsUpdate || textTexture->version != textContainerVersionUsed)
         updateVbo();

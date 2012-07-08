@@ -1,9 +1,13 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include "Common.h"
+
+#include "RenderTarget.h"
+
 #include "Line.h"
 
 Line*
-Line::init(RenderList* target)
+Line::init(RenderTarget* target)
 {
     Line* obj = new Line();
     target->appendCommand(obj);
@@ -42,7 +46,7 @@ Line::setPosition(float x1, float y1, float x2, float y2)
 }
 
 void
-Line::render(RenderList* target)
+Line::render(RenderTarget* target)
 {
     if (!hasPosition)
         return;

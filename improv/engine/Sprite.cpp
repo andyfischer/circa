@@ -2,8 +2,9 @@
 
 #include "Common.h"
 #include "Sprite.h"
+#include "RenderTarget.h"
 
-Sprite* Sprite::init(RenderList* target)
+Sprite* Sprite::init(RenderTarget* target)
 {
     Sprite* obj = new Sprite();
 
@@ -32,7 +33,7 @@ Sprite::destroyed()
 void Sprite::loadFromFile(const char* filename)
 {
     // TODO
-    //texture = [[Texture alloc] init:[RenderList instance]];
+    //texture = [[Texture alloc] init:[RenderTarget instance]];
     //[texture loadFromFile:filename];
 }
 
@@ -97,7 +98,7 @@ void Sprite::setSize(float w, float h)
     vboNeedsUpdate = true;
 }
 
-void Sprite::render(RenderList* target)
+void Sprite::render(RenderTarget* target)
 {
     if (texture == NULL || !texture->hasTexture)
         return;

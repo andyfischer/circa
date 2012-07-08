@@ -1,4 +1,5 @@
 
+{-
 type Brush :handle;
 def create_brush(Color c) -> Brush
 def Brush.setColor(self, Color c)
@@ -55,3 +56,4 @@ def Painter.viewport(self) -> Rect
 def Painter.setFontDefaultFixedWidth(@self)
     self.setFont(create_font("Courier", 12))
 
+-}

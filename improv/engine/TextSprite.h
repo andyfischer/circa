@@ -8,19 +8,21 @@
 #include "circa/circa.h"
 
 #include "Common.h"
+#include "RenderEntity.h"
 
 struct TextTexture;
 struct TextVbo;
 
-struct TextSprite
+struct TextSprite : RenderEntity
 {
     TextTexture* textTexture;
     TextVbo* textVbo;
     circa::Value _text;
     int _font;
 
-    void init(RenderList* rl, int font);
-    ~TextSprite();
+    static TextSprite* create(RenderTarget* target);
+    virtual void destroy();
+    virtual bool destroyed();
 
     void setFont(int font);
     void setText(const char* str);

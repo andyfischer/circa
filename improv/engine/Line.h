@@ -12,10 +12,10 @@ struct Line : RenderCommand
     
     Color color;
 
-    static Line* init(RenderList* target);
+    static Line* init(RenderTarget* target);
     void setPosition(float x1, float y1, float x2, float y2);
 
-    virtual void render(RenderList* target);
+    virtual void render(RenderTarget* target);
     virtual void destroy();
     virtual bool destroyed();
 };

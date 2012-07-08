@@ -10,6 +10,10 @@ msg_name = msg[0]
 if msg_name == 'changeScreen'
     print('changed screen to ' msg[1])
     currentScreen = msg[1]
+elif msg_name == 'paintGL'
+    painter = create(Painter)
+    painter.target = msg[1]
+
+    send(currentScreen ['onPaintEvent' painter])
 else
     send(currentScreen msg)
-

@@ -1,7 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "Common.h"
-#include "RenderList.h"
+#include "RenderTarget.h"
 #include "ResourceManager.h"
 
 void compile_shader(GLenum type, caValue* contents, caValue* shaderOut);

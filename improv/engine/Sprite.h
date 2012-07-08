@@ -17,7 +17,7 @@ struct Sprite : RenderCommand
     GLuint vbo;
     bool vboNeedsUpdate;
 
-    static Sprite* init(RenderList* target);
+    static Sprite* init(RenderTarget* target);
 
     void loadFromFile(const char* filename);
     void setPosition(float x, float y);
@@ -26,7 +26,7 @@ struct Sprite : RenderCommand
     void position(float* x, float* y);
     void updateVbo();
 
-    virtual void render(RenderList* target);
+    virtual void render(RenderTarget* target);
     virtual void destroy();
     virtual bool destroyed();
 };

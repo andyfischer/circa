@@ -26,8 +26,8 @@ struct TextVbo : RenderCommand
     void setPosition(float x, float y);
     void updateVbo();
 
-    static TextVbo* init(RenderList* target);
+    static TextVbo* create(RenderTarget* target);
     virtual void destroy();
     virtual bool destroyed();
-    virtual void render(RenderList* renderList);
+    virtual void render(RenderTarget* renderList);
 };
