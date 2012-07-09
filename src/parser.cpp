@@ -743,19 +743,11 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         std::string s = tokens.consumeStr();
 
         if (s == ":nocopy") {
+            // :nocopy is deprecated
             as_type(result)->nocopy = true;
-        } else if (s == ":global") {
-
-            // :handle is a temporary way to declare that a type belongs in TYPE_REGISTRY
-            Type* existing = find_type_in_global_registry(name.c_str());
-            if (existing == NULL) {
-                add_type_to_global_registry(name.c_str(), as_type(result));
-            } else {
-                set_type(term_value(result), existing);
-            }
-
         } else if (s == ":handle") {
             // :handle is a temporary way to declare a handle type
+            // :handle is deprecated
             setup_handle_type(as_type(result));
             result->setBoolProp("handle", true);
             set_type_property(as_type(result), "handle", &TrueValue);

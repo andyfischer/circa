@@ -95,8 +95,6 @@ Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* OPAQUE_POINTER_TYPE = NULL;
 
-std::map<std::string, Type*> TYPE_REGISTRY;
-
 // New style for builtin function pointers
 BuiltinFuncs FUNCS;
 

@@ -148,8 +148,6 @@ struct BuiltinTypes {
 
 extern BuiltinTypes TYPES;
 
-extern std::map<std::string, Type*> TYPE_REGISTRY;
-
 extern Value TrueValue;
 extern Value FalseValue;
 

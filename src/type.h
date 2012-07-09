@@ -217,7 +217,4 @@ void set_type_list(caValue* value, Type* type1);
 void set_type_list(caValue* value, Type* type1, Type* type2);
 void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3);
 
-Type* find_type_in_global_registry(const char* name);
-void add_type_to_global_registry(const char* name, Type* type);
-
 } // namespace circa

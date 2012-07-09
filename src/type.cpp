@@ -466,18 +466,6 @@ void set_type_list(caValue* value, Type* type1, Type* type2, Type* type3)
     set_type(list_get(value,2), type3);
 }
 
-Type* find_type_in_global_registry(const char* name)
-{
-    std::map<std::string, Type*>::const_iterator it = TYPE_REGISTRY.find(name);
-    if (it == TYPE_REGISTRY.end())
-        return NULL;
-    return it->second;
-}
-void add_type_to_global_registry(const char* name, Type* type)
-{
-    TYPE_REGISTRY[name] = type;
-}
-
 } // namespace circa
 
 void circa_setup_int_type(caType* type)
