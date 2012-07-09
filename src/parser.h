@@ -59,7 +59,6 @@ ParseResult comment(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult blank_line(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context);
-ParseResult anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult switch_block(Branch* branch, TokenStream& tokens, ParserCxt* context);
 ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* context);
