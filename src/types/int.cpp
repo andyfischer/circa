@@ -40,8 +40,8 @@ namespace int_t {
     }
     void setup_type(Type* type)
     {
-        reset_type(type);
-        type->name = name_from_string("int");
+        if (type->name == name_None)
+            type->name = name_from_string("int");
         type->storageType = STORAGE_TYPE_INT;
         type->reset = reset;
         type->equals = equals;

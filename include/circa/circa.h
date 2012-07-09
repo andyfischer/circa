@@ -489,6 +489,12 @@ caFunction* circa_declare_function(caBranch* branch, const char* name);
 // to modify.
 caValue* circa_declare_value(caBranch* branch, const char* name);
 
+// Configure a Circa type so that each value holds an integer.
+void circa_setup_int_type(caType* type);
+
+// Configure a Circa type so that each value holds an opaque pointer.
+void circa_setup_pointer_type(caType* type);
+
 // -- Debugging Helpers --
 
 // 'dump' commands will print a representation to stdout

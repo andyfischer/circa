@@ -17,6 +17,9 @@
 #include "token.h"
 #include "type.h"
 
+#include "types/int.h"
+#include "types/common.h"
+
 namespace circa {
 
 Term* IMPLICIT_TYPES = NULL;
@@ -475,3 +478,13 @@ void add_type_to_global_registry(const char* name, Type* type)
 }
 
 } // namespace circa
+
+void circa_setup_int_type(caType* type)
+{
+    circa::int_t::setup_type(type);
+}
+
+void circa_setup_pointer_type(caType* type)
+{
+    circa::opaque_pointer_t::setup_type(type);
+}

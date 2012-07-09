@@ -627,11 +627,11 @@ namespace list_t {
         // If the parameter has a fixed size list, then initialize to that.
         if (list_type_has_specific_size(&type->parameter)) {
             caValue* typeList = list_get_type_list_from_type(type);
-            List& types = *List::checkCast(typeList);
-            List& result = *List::checkCast(value);
-            result.resize(types.length());
-            for (int i=0; i < types.length(); i++)
-                create(as_type(types[i]), result[i]);
+            int count = list_length(typeList);
+
+            list_resize(value, count);
+            for (int i=0; i < count; i++)
+                create(as_type(list_get(typeList, i)), list_get(value, i));
         }
     }
 
