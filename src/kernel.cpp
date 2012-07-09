@@ -934,8 +934,9 @@ void ref_setup_type(Type* type)
     type->hashFunc = ref_hashFunc;
 }
 
-void create_primitive_types()
+void bootstrap_kernel()
 {
+    // Initialize global type objects
     null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
     branch_setup_type(&BRANCH_T);
@@ -950,14 +951,9 @@ void create_primitive_types()
     string_setup_type(&STRING_T);
     void_t::setup_type(&VOID_T);
     eval_context_setup_type(&EVAL_CONTEXT_T);
+    string_setup_type(&ERROR_T); // errors are just stored as strings for now
 
-    // errors are just stored as strings for now
-    string_setup_type(&ERROR_T);
-}
-
-void bootstrap_kernel()
-{
-    // Create the very first building blocks. These elements need to be in place
+    // Create the very first code building blocks. These elements need to be in place
     // before we can parse code in the proper way.
 
     KERNEL = new Branch();
@@ -1056,17 +1052,17 @@ void bootstrap_kernel()
 
     FINISHED_BOOTSTRAP = true;
 
-    // Initialize compound types
-    Term* set_type = parse_type(kernel, "type Set;");
+    // Initialize a few more types
+    Term* set_type = create_value(kernel, &TYPE_T, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-    Term* map_type = parse_type(kernel, "type Map;");
+    Term* map_type = create_value(kernel, &TYPE_T, "Map");
     hashtable_t::setup_type(unbox_type(map_type));
 
-    Term* indexableType = parse_type(kernel, "type Indexable;");
+    Term* indexableType = create_value(kernel, &TYPE_T, "Indexable");
     indexable_t::setup_type(unbox_type(indexableType));
 
-    TYPES.selector = unbox_type(parse_type(kernel, "type Selector;"));
+    TYPES.selector = unbox_type(create_value(kernel, &TYPE_T, "Selector"));
     list_t::setup_type(TYPES.selector);
 
     control_flow_setup_funcs(kernel);
@@ -1282,12 +1278,11 @@ EXPORT caWorld* circa_initialize()
     memset(&FUNCS, 0, sizeof(FUNCS));
     memset(&TYPES, 0, sizeof(TYPES));
 
-    create_primitive_types();
     bootstrap_kernel();
 
     Branch* kernel = KERNEL;
 
-    // Make sure there are no static errors. This shouldn't happen.
+    // Make sure there are no static errors in the kernel. This shouldn't happen.
     if (has_static_errors(kernel)) {
         std::cout << "Static errors found in kernel:" << std::endl;
         print_static_errors_formatted(kernel, std::cout);

@@ -732,8 +732,6 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
     std::string name = tokens.consumeStr(tok_Identifier);
 
     Term* result = create_value(branch, &TYPE_T, name);
-    as_type(result)->name = name_from_string(name.c_str());
-    as_type(result)->declaringTerm = result;
 
     // Attributes
     result->setStringProp("syntax:preLBracketWhitespace",

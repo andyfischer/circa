@@ -425,11 +425,6 @@ Term* find_method(Branch* branch, Type* type, std::string const& name)
     return NULL;
 }
 
-Term* parse_type(Branch* branch, std::string const& decl)
-{
-    return parser::compile(branch, parser::type_decl, decl);
-}
-
 void install_type(Term* term, Type* type)
 {
     // Type* oldType = as_type(term);
