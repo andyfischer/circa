@@ -130,6 +130,7 @@ void* circa_create_object_output(caStack* stack, int output)
 }
 void circa_setup_object_type(caType* type, size_t objectSize, caObjectReleaseFunc release)
 {
+    ca_assert(!type->inUse);
     setup_object_type(type, objectSize, release);
 }
 

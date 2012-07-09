@@ -122,6 +122,9 @@ struct Type
     bool nocopy;
     int objectSize;
 
+    // Flag, if true then at least one value has been created using this type.
+    bool inUse;
+
     Type();
     ~Type();
 

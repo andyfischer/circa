@@ -145,7 +145,8 @@ Type::Type() :
     gcRelease(NULL),
     parent(NULL),
     nocopy(false),
-    objectSize(0)
+    objectSize(0),
+    inUse(false)
 {
     // Register ourselves. Start out as 'root'.
     gc_register_new_object((CircaObject*) this, &TYPE_T, true);
@@ -481,10 +482,12 @@ void add_type_to_global_registry(const char* name, Type* type)
 
 void circa_setup_int_type(caType* type)
 {
+    ca_assert(!type->inUse);
     circa::int_t::setup_type(type);
 }
 
 void circa_setup_pointer_type(caType* type)
 {
+    ca_assert(!type->inUse);
     circa::opaque_pointer_t::setup_type(type);
 }

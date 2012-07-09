@@ -53,6 +53,8 @@ void create(Type* type, caValue* value)
 
     if (type->initialize != NULL)
         type->initialize(type, value);
+
+    type->inUse = true;
 }
 
 void change_type(caValue* v, Type* t)
