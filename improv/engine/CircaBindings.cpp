@@ -8,10 +8,9 @@
 #include "RenderCommand.h"
 #include "TextSprite.h"
 
-void CommandRelease(caValue* value)
+struct TextSpriteReference
 {
-    ((RenderCommand*) circa_get_pointer(value))->destroy();
-}
+};
 void EntityRelease(caValue* value)
 {
     ((RenderEntity*) circa_get_pointer(value))->destroy();

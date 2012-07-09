@@ -92,6 +92,7 @@ OBJECTS := \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
 	$(OBJDIR)/names_builtin.o \
+	$(OBJDIR)/object.o \
 	$(OBJDIR)/parser.o \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/selector.o \
@@ -258,6 +259,9 @@ $(OBJDIR)/names.o: ../src/names.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/names_builtin.o: ../src/names_builtin.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/object.o: ../src/object.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/parser.o: ../src/parser.cpp

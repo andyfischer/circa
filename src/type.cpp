@@ -141,7 +141,8 @@ Type::Type() :
     gcListReferences(NULL),
     gcRelease(NULL),
     parent(NULL),
-    nocopy(false)
+    nocopy(false),
+    objectSize(0)
 {
     // Register ourselves. Start out as 'root'.
     gc_register_new_object((CircaObject*) this, &TYPE_T, true);

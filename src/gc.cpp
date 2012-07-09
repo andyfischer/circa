@@ -192,7 +192,7 @@ void gc_register_new_object(CircaObject* obj, Type* type, bool isRoot)
     ca_assert(type != NULL);
 }
 
-void ogc_n_object_deleted(CircaObject* obj)
+void on_object_deleted(CircaObject* obj)
 {
     memset(obj->magicalHeader, 0, 6);
 

@@ -4,28 +4,9 @@
 
 #include "common_headers.h"
 
+#include "object.h"
+
 namespace circa {
-
-// Header used for any objects that participate in GC
-struct CircaObject
-{
-    char magicalHeader[6];
-
-    Type* type;
-
-    // Nearby GCable objects.
-    CircaObject* next;
-    CircaObject* prev;
-
-    // If we're 'referenced', then we can only be deleted by a GC pass, not manually.
-    bool referenced;
-
-    // If we're 'root', then we can only be deleted manually, not by GC.
-    bool root;
-
-    // Used during GC collection
-    GCColor gcColor;
-};
 
 // Structure used during GC traversal
 struct GCReferenceList

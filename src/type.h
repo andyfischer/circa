@@ -27,6 +27,7 @@ const int STORAGE_TYPE_OPAQUE_POINTER = 6;
 const int STORAGE_TYPE_TYPE = 7;
 const int STORAGE_TYPE_REF = 8;
 const int STORAGE_TYPE_HANDLE = 9;
+const int STORAGE_TYPE_OBJECT = 10;
 
 extern Term* IMPLICIT_TYPES;
 
@@ -119,6 +120,7 @@ struct Type
     // Type parameters
     Value parameter;
     bool nocopy;
+    int objectSize;
 
     Type();
     ~Type();
