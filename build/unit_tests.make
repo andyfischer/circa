@@ -65,6 +65,7 @@ endif
 
 OBJECTS := \
 	$(OBJDIR)/branch.o \
+	$(OBJDIR)/c_objects.o \
 	$(OBJDIR)/compound_type.o \
 	$(OBJDIR)/framework.o \
 	$(OBJDIR)/interpreter.o \
@@ -132,6 +133,9 @@ $(GCH): $(PCH)
 endif
 
 $(OBJDIR)/branch.o: ../tests/internal/branch.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/c_objects.o: ../tests/internal/c_objects.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/compound_type.o: ../tests/internal/compound_type.cpp

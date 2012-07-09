@@ -295,9 +295,6 @@ void change_declared_type(Term *term, Type *newType)
 
     set_null(term_value(term));
 
-    // TODO: Don't call create() here
-    create(newType, term_value(term));
-
     // TODO: Use update_cascades to update inferred type on all users.
 }
 

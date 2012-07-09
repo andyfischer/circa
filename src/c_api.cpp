@@ -52,7 +52,6 @@ caBranch* caTerm::parent()
     return circa_parent_branch(this);
 }
 
-
 caValue* circa_create_default_output(caStack* stack, int index)
 {
     caValue* val = circa_output(stack, index);
@@ -61,7 +60,6 @@ caValue* circa_create_default_output(caStack* stack, int index)
     circa_create_value(val, circa_term_declared_type(placeholder));
     return val;
 }
-
 
 void* circa_as_pointer(caValue* container)
 {

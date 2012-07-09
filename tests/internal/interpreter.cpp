@@ -19,16 +19,16 @@ void test_cast_first_inputs()
     branch.compile("type T { int i }");
     Term* f = branch.compile("def f(T t) -> int { return t.i }");
 
-    Stack context;
-    push_frame(&context, function_contents(f));
+    Stack stack;
+    push_frame(&stack, function_contents(f));
 
-    caValue* in = circa_input((caStack*) &context, 0);
+    caValue* in = circa_input((caStack*) &stack, 0);
     circa_set_list(in, 1);
     circa_set_int(circa_index(in, 0), 5);
 
-    run_interpreter(&context);
+    run_interpreter(&stack);
 
-    test_assert(circa_int(circa_output((caStack*) &context, 0)) == 5);
+    test_assert(circa_int(circa_output((caStack*) &stack, 0)) == 5);
 }
 
 }

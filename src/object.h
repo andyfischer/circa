@@ -25,10 +25,15 @@ struct CircaObject
 
     // Used during GC collection
     GCColor gcColor;
+
+    // The object's body will be contiguous in memory.
+    char body[0];
 };
 
 bool is_object(caValue* value);
+CircaObject* as_object(caValue* value);
+void* object_get_body(caValue* value);
 
-void setup_object_type(Type* type, int objectSize);
+void setup_object_type(Type* type, int objectSize, caObjectReleaseFunc releaseFunc);
 
 } // namespace circa

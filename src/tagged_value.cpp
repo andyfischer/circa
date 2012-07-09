@@ -4,7 +4,6 @@
 
 #include "kernel.h"
 #include "debug.h"
-#include "handle.h"
 #include "names.h"
 #include "reflection.h"
 #include "string_type.h"
