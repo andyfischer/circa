@@ -717,17 +717,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     return ParseResult(result);
 }
 
-Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context);
-
 ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
-{
-    int startPosition = tokens.getPosition();
-
-    Term* result = anonymous_type_decl(branch, tokens, context);
-    return ParseResult(result);
-}
-
-Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
 {
     int startPosition = tokens.getPosition();
 
@@ -737,7 +727,7 @@ Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     possible_whitespace(tokens);
 
     if (!tokens.nextIs(tok_Identifier))
-        return compile_error_for_line(branch, tokens, startPosition).term;
+        return compile_error_for_line(branch, tokens, startPosition);
 
     std::string name = tokens.consumeStr(tok_Identifier);
 
@@ -761,7 +751,7 @@ Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
             set_type_property(as_type(result), "handle", &TrueValue);
         } else {
             return compile_error_for_line(result, tokens, startPosition,
-                "Unrecognized type attribute: " + s).term;
+                "Unrecognized type attribute: " + s);
         }
 
         possible_whitespace_or_newline(tokens);
@@ -770,11 +760,11 @@ Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     // if there's a semicolon, then finish it as an empty type.
     if (tokens.nextIs(tok_Semicolon)) {
         result->setBoolProp("syntax:semicolon", true);
-        return result;
+        return ParseResult(result);
     }
 
     if (!tokens.nextIs(tok_LBrace) && !tokens.nextIs(tok_LBracket))
-        return compile_error_for_line(result, tokens, startPosition).term;
+        return compile_error_for_line(result, tokens, startPosition);
 
     // Parse as compound type
     list_t::setup_type(unbox_type(result));
@@ -804,7 +794,7 @@ Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         }
 
         if (!tokens.nextIs(tok_Identifier))
-            return compile_error_for_line(result, tokens, startPosition).term;
+            return compile_error_for_line(result, tokens, startPosition);
 
         Term* fieldType = type_expr(branch, tokens, context).term;
 
@@ -826,7 +816,7 @@ Term* anonymous_type_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     list_initialize_parameter_from_type_decl(contents, &as_type(result)->parameter);
 
-    return result;
+    return ParseResult(result);
 }
 
 ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
