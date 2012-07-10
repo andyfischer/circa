@@ -18,6 +18,7 @@ TextTexture::create(RenderTarget* renderList)
 void
 TextTexture::destroy()
 {
+    printf("destroying textTexture with id %d", texid);
     glDeleteTextures(1, &texid);
     texid = 0;
 }
@@ -31,6 +32,11 @@ TextTexture::destroyed()
 void
 TextTexture::rasterize(caValue* str, int font)
 {
+    if (font == 0) {
+        Log("TextTexture::rasterize called with null font");
+        return;
+    }
+
     metrics.str = circa_string(str);
     metrics.face = font;
     

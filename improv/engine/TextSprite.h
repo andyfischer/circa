@@ -10,6 +10,7 @@
 #include "Common.h"
 #include "RenderEntity.h"
 
+struct FontBitmap;
 struct TextTexture;
 struct TextVbo;
 
@@ -28,4 +29,5 @@ struct TextSprite : RenderEntity
     void setText(const char* str);
     void setPosition(int x, int y);
     void setColor(Color color);
+    FontBitmap* getMetrics();
 };

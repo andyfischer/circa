@@ -62,4 +62,9 @@ TextSprite::setColor(Color color)
 {
     textVbo->color = color;
 }
+FontBitmap*
+TextSprite::getMetrics()
+{
+    return &textTexture->metrics;
+}
 

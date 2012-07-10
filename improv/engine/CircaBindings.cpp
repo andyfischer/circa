@@ -8,10 +8,17 @@
 #include "FontBitmap.h"
 #include "RenderCommand.h"
 #include "TextSprite.h"
+#include "TextTexture.h"
+#include "TextVbo.h"
 
 struct RenderEntityRef
 {
     RenderEntity* entity;
+};
+
+struct FontRef
+{
+    int font_id;
 };
 
 void RenderEntityRelease(void* obj)
@@ -33,8 +40,8 @@ void create_font(caStack* stack)
     float size = circa_float(circa_input(stack, 1));
     int font = font_load(name, size);
 
-    caValue* out = circa_create_default_output(stack, 0);
-    circa_set_int(circa_index(out, 0), font);
+    FontRef* ref = (FontRef*) circa_create_object_output(stack, 0);
+    ref->font_id = font;
 }
 
 void create_text_sprite(caStack* stack)
@@ -56,8 +63,8 @@ void TextSprite__setFont(caStack* stack)
 {
     RenderEntityRef* ref = (RenderEntityRef*) circa_object_input(stack, 0);
     TextSprite* sprite = (TextSprite*) ref->entity;
-    int font = circa_int(circa_index(circa_input(stack, 1), 0));
-    sprite->setFont(font);
+    FontRef* fontRef = (FontRef*) circa_object_input(stack, 1);
+    sprite->setFont(fontRef->font_id);
 }
 void TextSprite__setPosition(caStack* stack)
 {
@@ -74,6 +81,21 @@ void TextSprite__setColor(caStack* stack)
     sprite->setColor(unpack_color(circa_input(stack, 1)));
 }
 
+void TextSprite__getRect(caStack* stack)
+{
+    RenderEntityRef* ref = (RenderEntityRef*) circa_object_input(stack, 0);
+    TextSprite* sprite = (TextSprite*) ref->entity;
+
+    // Save the rectangle in the result.
+    FontBitmap* metrics = sprite->getMetrics();
+
+    circa_set_vec4(circa_output(stack, 0),
+            sprite->textVbo->posX,
+            sprite->textVbo->posY,
+            sprite->textVbo->posX + metrics->textWidth,
+            sprite->textVbo->posY + metrics->descent + metrics->ascent);
+}
+
 static const caFunctionBinding g_imports[] = {
     {"create_font", create_font},
     {"create_text_sprite", create_text_sprite},
@@ -81,13 +103,15 @@ static const caFunctionBinding g_imports[] = {
     {"TextSprite.setFont", TextSprite__setFont},
     {"TextSprite.setPosition", TextSprite__setPosition},
     {"TextSprite.setColor", TextSprite__setColor},
+    {"TextSprite.getRect", TextSprite__getRect},
     {NULL, NULL}
 };
 
 void engine_bindings_install(caBranch* branch)
 {
     circa_setup_pointer_type(circa_find_type(branch, "RenderTarget"));
-    circa_setup_int_type(circa_find_type(branch, "Font"));
+    circa_setup_object_type(circa_find_type(branch, "Font"),
+                sizeof(FontRef), NULL);
     circa_setup_object_type(circa_find_type(branch, "TextSprite"),
                 sizeof(RenderEntityRef), RenderEntityRelease);
     circa_setup_object_type(circa_find_type(branch, "LineList"),

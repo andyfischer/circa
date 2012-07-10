@@ -271,6 +271,11 @@ void finish_frame(Stack* stack)
 
             caValue* result = get_frame_register(topFrame, placeholder);
             Term* outputTerm = get_output_term(finishedTerm, i);
+
+            // dynamic_method requires us to check outputTerm for NULL here.
+            if (outputTerm == NULL)
+                continue;
+
             caValue* dest = get_frame_register(parentFrame, outputTerm);
 
             move(result, dest);

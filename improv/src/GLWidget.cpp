@@ -53,13 +53,6 @@ void GLWidget::initializeGL()
 
     renderTarget.setup(&resourceManager);
 
-    // Temp for testing
-    int font = font_load("assets/jackinput.ttf", 24);
-    textSprite = TextSprite::create(&renderTarget);
-    textSprite->setFont(font);
-    textSprite->setText("hello");
-    textSprite->setPosition(100, 100);
-    textSprite->setColor(Color(0,0,1,1));
     check_gl_error();
 }
 
@@ -120,8 +113,6 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * qevent )
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
-
-    textSprite->setPosition(qevent->x(), qevent->y());
 }
 void GLWidget::mousePressEvent ( QMouseEvent * qevent )
 {
@@ -137,7 +128,6 @@ void GLWidget::mousePressEvent ( QMouseEvent * qevent )
     char buf[30];
     sprintf(buf, "%d", count);
     count++;
-    textSprite->setText(buf);
 }
 void GLWidget::mouseReleaseEvent ( QMouseEvent * qevent )
 {

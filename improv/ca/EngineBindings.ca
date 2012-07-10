@@ -1,9 +1,6 @@
 
 type RenderTarget;
-
-type Font {
-    int handle
-}
+type Font;
 
 def create_font(String name, number size) -> Font
 
@@ -13,7 +10,7 @@ def TextSprite.setText(self, String text)
 def TextSprite.setFont(self, Font font)
 def TextSprite.setPosition(self, Point position)
 def TextSprite.setColor(self, Color color)
-def TextSprite.getSize(self) -> Point
+def TextSprite.getRect(self) -> Rect
 
 type LineList;
 def create_line_list(RenderTarget target) -> LineList
@@ -28,16 +25,20 @@ def font(String name, number size) -> Font
 
 type Painter {
     RenderTarget target
-    Point viewport
+    Rect viewport
 
     Font currentFont
 }
 
 def Painter.setFont(@self, Font font)
     self.currentFont = font
-def Painter.text(self, Point position, String text, Color c, List args)
+def Painter.text(self, Point position, String text, Color c, List args) -> Rect
     state sprite = create_text_sprite(self.target)
     sprite.setFont(self.currentFont)
     sprite.setText(text)
     sprite.setPosition(position)
     sprite.setColor(c)
+    return sprite.getRect()
+
+def Painter.fillRect(self, Rect r, Color c)
+    -- todo

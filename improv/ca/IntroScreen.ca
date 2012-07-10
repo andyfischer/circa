@@ -21,7 +21,7 @@ if msg_name == 'onPaintEvent'
 
     painter.fillRect(painter.viewport + [0 0 1 1], #756A95)
 
-    painter.setFont(font("Sans Serif", 30))
+    painter.setFont(font("assets/jackinput.TTF", 30))
 
     right = 10
     for phrase in [[#C9E8E8 "improv"] [#E1BC66 "alpha"] [#ED7D7D "4"]]
@@ -36,4 +36,4 @@ elif msg_name == 'onInputEvent'
     choice = scriptChoices@.input(event)
     if is_string(choice)
         send('ScriptView' ['loadFile' choice])
-        send('View' ['changeScreen' 'ScriptView'])
+        send('Main' ['changeScreen' 'ScriptView'])

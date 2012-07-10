@@ -1,5 +1,8 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include <string>
+#include <map>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
@@ -18,8 +21,24 @@ typedef struct Font
     FT_Face face;
 } Font;
 
-int g_nextTableIndex = 1; // Deliberately skip font index 0
+int g_nextFontId = 1; // Deliberately skip font id 0
 Font g_fontTable[MAX_FONTS];
+
+struct FontCacheKey
+{
+    std::string filename;
+    int size;
+
+    bool operator<(FontCacheKey const& rhs) const
+    {
+        if (filename != rhs.filename)
+            return filename < rhs.filename;
+        else
+            return size < rhs.size;
+    }
+};
+
+std::map<FontCacheKey, int> g_fontCache;
 
 FT_Face get_ft_face(FontBitmap* op)
 {
@@ -28,6 +47,14 @@ FT_Face get_ft_face(FontBitmap* op)
 
 int font_load(const char* filename, int pixelHeight)
 {
+    FontCacheKey cacheKey;
+    cacheKey.filename = filename;
+    cacheKey.size = pixelHeight;
+
+    std::map<FontCacheKey, int>::const_iterator it = g_fontCache.find(cacheKey);
+    if (it != g_fontCache.end())
+        return it->second;
+
     FT_Error error;
 
     // Load the library if necessary
@@ -53,13 +80,17 @@ int font_load(const char* filename, int pixelHeight)
         return -1;
     }
     
-    int index = g_nextTableIndex++;
-    Font* fontEntry = &g_fontTable[index];
+    int fontId = g_nextFontId++;
+    Font* fontEntry = &g_fontTable[fontId];
     fontEntry->face = face;
     
     FT_Set_Pixel_Sizes(face, 0, pixelHeight);
+
+    printf("Loaded font from file %s, with id %d\n", filename, fontId);
+
+    g_fontCache[cacheKey] = fontId;
     
-    return index;
+    return fontId;
 }
 
 int font_get_face_height(FontFace face)
@@ -86,6 +117,11 @@ void load_glyph(FontBitmap* op, int charIndex)
 void font_update_metrics(FontBitmap* op)
 {
     FT_Face face = get_ft_face(op);
+
+    if (face == NULL) {
+        Log("font_update_metrics called with NULL font");
+        return;
+    }
 
     int overallWidth = 0;
     int highestBearingY = 0;

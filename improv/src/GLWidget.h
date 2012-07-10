@@ -29,9 +29,7 @@ public:
     virtual void keyPressEvent ( QKeyEvent * event );
     virtual void keyReleaseEvent ( QKeyEvent * event );
 
-    // Temp for testing
     RenderTarget renderTarget;
-    TextSprite* textSprite;
 
 protected:
     // Sends the event to App.onInputEvent, and deallocates the caValue.
