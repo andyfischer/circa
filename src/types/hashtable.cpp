@@ -29,17 +29,6 @@ const float INITIAL_LOAD_FACTOR = 0.3f;
 // The load at which we'll trigger a reallocation.
 const float MAX_LOAD_FACTOR = 0.75f;
 
-int get_hash_value(caValue* value)
-{
-    Type::HashFunc f = value->value_type->hashFunc;
-    if (f == NULL) {
-        std::string msg;
-        msg += std::string("No hash function for type ") + name_to_string(value->value_type->name);
-        internal_error(msg);
-    }
-    return f(value);
-}
-
 Hashtable* create_table(int capacity)
 {
     ca_assert(capacity > 0);

@@ -93,6 +93,12 @@ void* object_get_body(caValue* value)
     return (void*) object->body;
 }
 
+int object_hash(caValue* value)
+{
+    // Objects are only equal by identity.
+    return value->value_data.asint;
+}
+
 void setup_object_type(Type* type, int objectSize, caObjectReleaseFunc releaseFunc)
 {
     type->storageType = STORAGE_TYPE_OBJECT;
@@ -100,6 +106,7 @@ void setup_object_type(Type* type, int objectSize, caObjectReleaseFunc releaseFu
     type->copy = object_copy;
     type->release = object_release;
     type->objectSize = objectSize;
+    type->hashFunc = object_hash;
 
     set_list(&type->parameter, 1);
     set_opaque_pointer(list_get(&type->parameter, 0), (void*) releaseFunc);

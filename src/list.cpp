@@ -746,6 +746,16 @@ namespace list_t {
         ListData* data = (ListData*) get_pointer(value);
         set_pointer(value, list_touch(data));
     }
+    
+    int list_hash(caValue* value)
+    {
+        int hash = 0;
+        int count = list_length(value);
+        for (int i=0; i < count; i++) {
+            hash ^= get_hash_value(list_get(value, i));
+        }
+        return hash;
+    }
 
     void tv_static_type_query(Type* type, StaticTypeQuery* query)
     {
@@ -835,6 +845,7 @@ namespace list_t {
         type->getField = tv_get_field;
         type->numElements = list_length;
         type->touch = tv_touch;
+        type->hashFunc = list_hash;
         type->staticTypeQuery = tv_static_type_query;
         type->visitHeap = tv_visit_heap;
     }

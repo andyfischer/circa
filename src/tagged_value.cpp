@@ -298,6 +298,17 @@ int num_elements(caValue* value)
     return numElements(value);
 }
 
+int get_hash_value(caValue* value)
+{
+    Type::HashFunc f = value->value_type->hashFunc;
+    if (f == NULL) {
+        std::string msg;
+        msg += std::string("No hash function for type ") + name_to_string(value->value_type->name);
+        internal_error(msg);
+    }
+    return f(value);
+}
+
 bool equals(caValue* lhs, caValue* rhs)
 {
     ca_assert(lhs->value_type != NULL);
@@ -670,7 +681,7 @@ void circa_set_null(caValue* container)
 }
 void circa_set_pointer(caValue* container, void* ptr)
 {
-    container->value_data.ptr = ptr;
+    set_opaque_pointer(container, ptr);
 }
 void circa_set_term(caValue* container, caTerm* term)
 {
