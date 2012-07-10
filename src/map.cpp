@@ -12,7 +12,7 @@ extern "C" {
 
 using namespace circa;
 
-void circa_map_set(caValue* map)
+void circa_set_map(caValue* map)
 {
     create(TYPES.map, map);
 }

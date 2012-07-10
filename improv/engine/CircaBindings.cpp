@@ -7,7 +7,7 @@
 
 #include "FontBitmap.h"
 #include "RenderCommand.h"
-#include "TextTexture.h"
+#include "RenderTarget.h"
 #include "TextTexture.h"
 #include "TextVbo.h"
 

@@ -14,6 +14,8 @@ RenderTarget::RenderTarget()
   : viewportWidth(0),
     viewportHeight(0)
 {
+    circa_set_map(&textRenderCache);
+    circa_set_list(&incomingCommands, 0);
 }
 
 void

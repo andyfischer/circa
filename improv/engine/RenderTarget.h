@@ -4,6 +4,7 @@
 
 #include <OpenGL/gl.h>
 #include <glm/glm.hpp>
+#include "circa/circa.h"
 
 #include <vector>
 
@@ -49,6 +50,9 @@ struct RenderTarget
     int viewportWidth, viewportHeight;
     glm::mat4 modelViewProjectionMatrix;
     glm::mat3 normalMatrix;
+
+    circa::Value textRenderCache;
+    circa::Value incomingCommands;
 
     RenderTarget();
     void setup(ResourceManager* resourceManager);
