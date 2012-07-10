@@ -542,12 +542,14 @@ Name existing_name_from_string(const char* str)
 // Runtime symbols
 Name name_from_string(const char* str)
 {
+    // Empty string is name_None
+    if (str[0] == 0)
+        return name_None;
+
     // Check if name is already registered
-    {
-        Name name = existing_name_from_string(str);
-        if (name != 0)
-            return name;
-    }
+    Name existing = existing_name_from_string(str);
+    if (existing != name_None)
+        return existing;
 
     // Not yet registered; add it to the list.
     Name index = g_nextFreeNameIndex++;
@@ -575,6 +577,10 @@ Name name_from_string(const char* str)
     }
 
     return name;
+}
+Name name_from_string(std::string const& str)
+{
+    return name_from_string(str.c_str());
 }
 Name name_from_string(caValue* str)
 {

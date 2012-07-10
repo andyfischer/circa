@@ -198,7 +198,7 @@ void do_write_branch(caValue* branchName, caValue* contents, caValue* reply)
 
     // Create the branch if needed
     if (term == NULL) {
-        term = apply(kernel(), FUNCS.branch, TermList(), name_to_string(name));
+        term = apply(kernel(), FUNCS.branch, TermList(), name);
     }
 
     // Import the new branch contents

@@ -85,7 +85,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
     int existingInputCount = ifBlock->numInputs();
 
     Term* placeholder = append_input_placeholder(contents);
-    rename(placeholder, input->name);
+    rename(placeholder, input->nameSymbol);
     change_declared_type(placeholder, input->type);
 
     set_input(ifBlock, existingInputCount, input);
@@ -96,7 +96,7 @@ Term* if_block_add_input(Term* ifBlock, Term* input)
         Branch* caseContents = nested_contents(term);
         Term* casePlaceholder = append_input_placeholder(caseContents);
         change_declared_type(casePlaceholder, placeholder->type);
-        rename(casePlaceholder, input->name);
+        rename(casePlaceholder, input->nameSymbol);
     }
 
     return placeholder;
@@ -113,7 +113,7 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
         Term* result = find_last_non_comment_expression(caseContents);
 
         // If the last term already has a name then don't make it the default output.
-        if (result != NULL && result->name != "")
+        if (result != NULL && !has_empty_name(result))
             result = NULL;
 
         prepend_output_placeholder(nested_contents(it.current()), result);
@@ -121,10 +121,12 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     return placeholder;
 }
 
-Term* if_block_append_output(Branch* block, const char* name)
+Term* if_block_append_output(Branch* block, const char* nameString)
 {
+    Name name = name_from_string(nameString);
+
     Term* placeholder = append_output_placeholder(block, NULL);
-    if (name != NULL)
+    if (name != name_None)
         rename(placeholder, name);
 
     // Add a corresponding output placeholder to each case
@@ -136,7 +138,7 @@ Term* if_block_append_output(Branch* block, const char* name)
         Term* result = find_name(caseContents, name);
 
         Term* casePlaceholder = append_output_placeholder(caseContents, result);
-        if (name != NULL)
+        if (name != name_None)
             rename(casePlaceholder, name);
     }
 
@@ -186,7 +188,7 @@ Term* if_block_append_case(Branch* block, Term* input)
         if (placeholder == NULL) break;
         Term* localPlaceholder = append_input_placeholder(nested_contents(newCase));
         change_declared_type(localPlaceholder, placeholder->type);
-        rename(localPlaceholder, placeholder->name);
+        rename(localPlaceholder, placeholder->nameSymbol);
     }
 
     // Add existing output placeholders to this case
@@ -195,7 +197,7 @@ Term* if_block_append_case(Branch* block, Term* input)
         if (placeholder == NULL) break;
         Term* localPlaceholder = append_output_placeholder(nested_contents(newCase), NULL);
         change_declared_type(localPlaceholder, placeholder->type);
-        rename(localPlaceholder, placeholder->name);
+        rename(localPlaceholder, placeholder->nameSymbol);
     }
 
     return newCase;
@@ -281,7 +283,7 @@ void if_block_create_input_placeholders_for_outer_pointers(Term* ifCall)
 
         set_input(ifCall, i, outer);
         Term* placeholder = append_input_placeholder(nested_contents(ifCall));
-        rename(placeholder, outer->name);
+        rename(placeholder, outer->nameSymbol);
 
         // Go through each case and repoint to this new placeholder
         for (CaseIterator it(contents); it.unfinished(); it.advance()) {
@@ -347,7 +349,8 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBra
         if (term->name == "")
             continue;
 
-        const char* name = term->name.c_str();
+        Name name = term->nameSymbol;
+
         Term* outer = find_name(outerBranch, name);
         if (outer == NULL)
             continue;
@@ -357,7 +360,7 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBra
         // First, bring in the outer name as an input to the branch.
 
         // Check if we already have an output for this name.
-        Term* inputPlaceholder = find_input_placeholder_with_name(mainBranch, name);
+        Term* inputPlaceholder = find_input_placeholder_with_name(mainBranch, name_to_string(name));
 
         // Create it if necessary
         if (inputPlaceholder == NULL) {
@@ -375,10 +378,10 @@ void if_block_turn_outer_name_rebinds_into_outputs(Term* ifCall, Branch *caseBra
         }
 
         // Now make sure there is an output placeholder for this name.
-        Term* outputPlaceholder = find_output_placeholder_with_name(mainBranch, name);
+        Term* outputPlaceholder = find_output_placeholder_with_name(mainBranch, name_to_string(name));
 
         if (outputPlaceholder == NULL)
-            outputPlaceholder = if_block_append_output(mainBranch, name);
+            outputPlaceholder = if_block_append_output(mainBranch, name_to_string(name));
     }
 }
 

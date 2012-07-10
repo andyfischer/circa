@@ -157,6 +157,12 @@ Type::~Type()
     gc_on_object_deleted((CircaObject*) this);
 }
 
+const char*
+Type::nameStr()
+{
+    return name_to_string(this->name);
+}
+
 Type* declared_type(Term* term)
 {
     if (term->type == NULL)

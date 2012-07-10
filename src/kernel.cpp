@@ -277,7 +277,8 @@ void send_func(caStack* stack)
 
 void refactor__rename(caStack* stack)
 {
-    rename(as_term_ref(circa_input(stack, 0)), as_string(circa_input(stack, 1)));
+    rename(as_term_ref(circa_input(stack, 0)),
+            name_from_string(circa_input(stack, 1)));
 }
 
 void refactor__change_function(caStack* stack)
@@ -961,7 +962,7 @@ void bootstrap_kernel()
 
     // Create value function
     Term* valueFunc = kernel->appendNew();
-    rename(valueFunc, "value");
+    rename(valueFunc, name_from_string("value"));
     FUNCS.value = valueFunc;
 
     // Create Type type
@@ -972,7 +973,7 @@ void bootstrap_kernel()
     term_value(TYPE_TYPE)->value_data.ptr = &TYPE_T;
     TYPE_T.declaringTerm = TYPE_TYPE;
     type_t::setup_type(&TYPE_T);
-    rename(TYPE_TYPE, "Type");
+    rename(TYPE_TYPE, name_from_string("Type"));
 
     // Create Any type
     ANY_TYPE = kernel->appendNew();
@@ -982,7 +983,7 @@ void bootstrap_kernel()
     term_value(ANY_TYPE)->value_data.ptr = &ANY_T;
     ANY_T.declaringTerm = ANY_TYPE;
     any_t::setup_type(&ANY_T);
-    rename(ANY_TYPE, "any");
+    rename(ANY_TYPE, name_from_string("any"));
 
     // Create Function type
     function_t::setup_type(&FUNCTION_T);
@@ -992,7 +993,7 @@ void bootstrap_kernel()
     FUNCTION_T.declaringTerm = FUNCTION_TYPE;
     term_value(FUNCTION_TYPE)->value_type = &TYPE_T;
     term_value(FUNCTION_TYPE)->value_data.ptr = &FUNCTION_T;
-    rename(FUNCTION_TYPE, "Function");
+    rename(FUNCTION_TYPE, name_from_string("Function"));
 
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;

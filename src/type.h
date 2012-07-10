@@ -76,7 +76,6 @@ struct Type
     // CircaObject header, must be the first field.
     CircaObject header;
 
-    std::string nameStr;
     Name name;
 
     StorageType storageType;
@@ -127,6 +126,8 @@ struct Type
 
     Type();
     ~Type();
+
+    const char* nameStr();
 
     // Disallow copy constructor
 private:

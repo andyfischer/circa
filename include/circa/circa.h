@@ -96,7 +96,7 @@ struct Value : caValue
 
 } // namespace circa
 
-#endif
+#endif // __cplusplus
 
 struct caTerm;
     

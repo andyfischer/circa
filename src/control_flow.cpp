@@ -89,7 +89,7 @@ void controlFlow_postCompile(Term* term)
 {
     // If this is a return() then give it the special name #return
     if (term->function == FUNCS.return_func)
-        rename(term, "#return");
+        rename(term, name_from_string("#return"));
 
     // Create a #control value
     Term* controlTerm = create_value(term->owningBranch, &NAME_T, "#control");
@@ -286,7 +286,7 @@ void force_term_to_output_to_parent(Term* term)
         Term* existing = find_output_placeholder_with_name(branch, term->name.c_str());
         if (existing == NULL) {
             Term* placeholder = append_output_placeholder(branch, term);
-            rename(placeholder, term->name.c_str());
+            rename(placeholder, term->nameSymbol);
         }
     }
 }

@@ -85,6 +85,7 @@ Name as_name(caValue* tv);
 void set_name(caValue* tv, Name name);
 
 Name name_from_string(const char* str);
+Name name_from_string(std::string const& str);
 Name name_from_string(caValue* str);
 
 // Deallocate all interned names, this should be called at shutdown

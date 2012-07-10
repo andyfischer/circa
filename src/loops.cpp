@@ -68,7 +68,7 @@ Term* start_building_for_loop(Term* forTerm, const char* iteratorName, Type* ite
 
     // Add get_index to fetch the list's current element.
     Term* iterator = apply(contents, FUNCS.get_index, TermList(listInput, index),
-        iteratorName);
+        name_from_string(iteratorName));
 
     if (iteratorType == NULL)
         iteratorType = infer_type_of_get_index(forTerm->input(0));
@@ -113,7 +113,7 @@ void add_implicit_placeholders(Term* forTerm)
         Term* result = contents->get(name);
 
         // Create input_placeholder
-        Term* input = apply(contents, FUNCS.input, TermList(), name);
+        Term* input = apply(contents, FUNCS.input, TermList(), name_from_string(name));
         Type* type = find_common_type(original->type, result->type);
         change_declared_type(input, type);
         contents->move(input, inputIndex);
@@ -125,7 +125,7 @@ void add_implicit_placeholders(Term* forTerm)
             remap_pointers_quick(*it, original, input);
 
         // Create output_placeholder
-        Term* term = apply(contents, FUNCS.output, TermList(result), name);
+        Term* term = apply(contents, FUNCS.output, TermList(result), name_from_string(name));
 
         // Move output into the correct output slot
         contents->move(term, contents->length() - 1 - inputIndex);
@@ -245,7 +245,7 @@ void for_loop_remake_zero_branch(Branch* forContents)
         if (placeholder == NULL)
             break;
         Term* clone = append_input_placeholder(zero);
-        rename(clone, placeholder->name);
+        rename(clone, placeholder->nameSymbol);
     }
 
     Term* loopOutput = create_list(zero);
@@ -263,7 +263,7 @@ void for_loop_remake_zero_branch(Branch* forContents)
             result = loopOutput;
 
         Term* clone = append_output_placeholder(zero, result);
-        rename(clone, placeholder->name);
+        rename(clone, placeholder->nameSymbol);
     }
 
     branch_finish_changes(zero);

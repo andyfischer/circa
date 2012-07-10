@@ -46,7 +46,7 @@ Branch* find_loaded_module(const char* name)
 
 Branch* load_module_from_file(const char* module_name, const char* filename)
 {
-    Term* import = apply(kernel(), FUNCS.imported_file, TermList(), module_name);
+    Term* import = apply(kernel(), FUNCS.imported_file, TermList(), name_from_string(module_name));
     load_script(nested_contents(import), filename);
     return nested_contents(import);
 }

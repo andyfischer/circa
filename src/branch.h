@@ -113,7 +113,7 @@ struct Branch : caBranch
     void clear();
 
     // Bind a name to a term
-    void bindName(Term* term, std::string name);
+    void bindName(Term* term, Name name);
 
     // Remap pointers
     void remapPointers(TermMap const& map);

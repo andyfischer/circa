@@ -3,16 +3,17 @@
 #pragma once
 
 #include "common_headers.h"
+#include "names.h"
 
 namespace circa {
 
 // Examine 'function' and 'inputs' and returns a result term.
 Term* apply(Branch* branch, Term* function, TermList const& inputs,
-    std::string const& name="");
+        Name name = name_None);
 
 // Find the named function in this branch, and then call the above apply.
-Term* apply(Branch* branch, std::string const& functionName, 
-                 TermList const& inputs, std::string const& name="");
+Term* apply(Branch* branch, std::string const& functionName,
+                 TermList const& inputs, Name name = name_None);
 
 // Create a duplicate of the given term. Doesn't duplicate nestedContents.
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name="");
@@ -42,7 +43,7 @@ void change_declared_type(Term* term, Type* type);
 void respecialize_type(Term* term);
 
 // Rename term, modify the name binding of the owning branch if necessary
-void rename(Term* term, std::string const& name);
+void rename(Term* term, Name name);
 
 // Create a new value term with the given type.
 Term* create_value(Branch* branch, Type* type, std::string const& name="");

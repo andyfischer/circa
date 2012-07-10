@@ -30,7 +30,7 @@ void on_term_created(Term* term)
     // debugging hook
 }
 
-Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string const& name)
+Term* apply(Branch* branch, Term* function, TermList const& inputs, Name name)
 {
     branch_start_changes(branch);
 
@@ -80,7 +80,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     // Position the term before any output_placeholder terms.
     branch->move(term, position);
 
-    if (name != "")
+    if (name != name_None)
         rename(term, name);
 
     for (int i=0; i < inputs.length(); i++)
@@ -297,13 +297,13 @@ void respecialize_type(Term* term)
         change_declared_type(term, outputType);
 }
 
-void rename(Term* term, std::string const& name)
+void rename(Term* term, Name name)
 {
-    if (term->name == name)
+    if (term->nameSymbol == name)
         return;
 
     if (term->owningBranch != NULL) {
-        if (term->name != "") {
+        if (!has_empty_name(term)) {
             term->owningBranch->names.remove(term->name);
             term->name = "";
         }
@@ -311,10 +311,10 @@ void rename(Term* term, std::string const& name)
     }
 
     std::string prevName = term->name;
-    term->name = name;
+    term->name = name_to_string(name);
     update_unique_name(term);
 
-    on_term_name_changed(term, prevName.c_str(), name.c_str());
+    on_term_name_changed(term, prevName.c_str(), name_to_string(name));
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name)
@@ -324,7 +324,7 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name)
     TermList inputs;
     original->inputsToList(inputs);
 
-    Term* term = apply(branch, original->function, inputs, name);
+    Term* term = apply(branch, original->function, inputs, name_from_string(name));
     change_declared_type(term, original->type);
 
     copy(term_value(original), term_value(term));
@@ -347,7 +347,7 @@ Term* apply(Branch* branch, std::string const& functionName, TermList const& inp
     if (function == NULL)
         internal_error("function not found: "+functionName);
 
-    Term* result = apply(branch, function, inputs, name);
+    Term* result = apply(branch, function, inputs, name_from_string(name));
     result->setStringProp("syntax:functionName", functionName.c_str());
     return result;
 }
@@ -357,7 +357,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     // This function is safe to call while bootstrapping.
     ca_assert(type != NULL);
 
-    Term *term = apply(branch, FUNCS.value, TermList(), name);
+    Term *term = apply(branch, FUNCS.value, TermList(), name_from_string(name));
 
     change_declared_type(term, type);
     create(type, term_value(term));
@@ -430,24 +430,25 @@ Term* create_list(Branch* branch, std::string const& name)
 
 Branch* create_branch(Branch* owner, std::string const& name)
 {
-    return apply(owner, FUNCS.branch, TermList(), name)->contents();
+    return apply(owner, FUNCS.branch, TermList(), name_from_string(name))->contents();
 }
 
 Branch* create_namespace(Branch* branch, std::string const& name)
 {
-    return apply(branch, FUNCS.namespace_func, TermList(), name)->contents();
+    return apply(branch, FUNCS.namespace_func, TermList(), name_from_string(name))->contents();
 }
 Branch* create_branch_unevaluated(Branch* owner, const char* name)
 {
-    return nested_contents(apply(owner, FUNCS.branch_unevaluated, TermList(), name));
+    return nested_contents(apply(owner, FUNCS.branch_unevaluated, TermList(), name_from_string(name)));
 }
 
-Term* create_type(Branch* branch, std::string name)
+Term* create_type(Branch* branch, std::string nameStr)
 {
     Term* term = create_value(branch, &TYPE_T);
 
-    if (name != "") {
-        as_type(term_value(term))->name = name_from_string(name.c_str());
+    if (nameStr != "") {
+        Name name = name_from_string(nameStr);
+        as_type(term_value(term))->name = name;
         rename(term, name);
     }
 
@@ -521,7 +522,7 @@ void update_extra_outputs(Term* term)
         if (placeholder == NULL)
             break;
 
-        const char* name = "";
+        Name name = name_None;
 
         // Find the associated input placeholder (if any).
         Term* associatedInput = NULL;
@@ -540,10 +541,10 @@ void update_extra_outputs(Term* term)
             Term* input = term->input(rebindsInput);
 
             if (input != NULL)
-                name = input->name.c_str();
+                name = input->nameSymbol;
 
         } else {
-            name = placeholder->name.c_str();
+            name = placeholder->nameSymbol;
         }
 
         Term* extra_output = NULL;
@@ -1261,10 +1262,10 @@ Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result
     if (selector != NULL) {
         Term* set = apply(branch, FUNCS.set_with_selector, TermList(head, selector, result));
         change_declared_type(set, declared_type(head));
-        rename(set, head->name);
+        rename(set, head->nameSymbol);
         return set;
     } else {
-        rename(result, accessorExpr->name);
+        rename(result, accessorExpr->nameSymbol);
         result->setBoolProp("syntax:implicitName", true);
         return result;
     }
@@ -1306,7 +1307,7 @@ void create_inputs_for_outer_references(Term* term)
                 } else {
                     // Need to create a new placeholder
                     int placeholderIndex = term->numInputs();
-                    Term* placeholder = apply(branch, FUNCS.input, TermList(), input->name);
+                    Term* placeholder = apply(branch, FUNCS.input, TermList(), input->nameSymbol);
                     change_declared_type(placeholder, input->type);
                     branch->move(placeholder, placeholderIndex);
                     set_input(term, placeholderIndex, placeholder);

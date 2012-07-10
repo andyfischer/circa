@@ -278,7 +278,7 @@ void Branch::removeNulls()
 
 void Branch::removeNameBinding(Term* term)
 {
-    if (term->name != "" && names[term->name] == term)
+    if (!has_empty_name(term) && names[term->name] == term)
         names.remove(term->name);
 }
 
@@ -308,17 +308,16 @@ Term* Branch::findFirstBinding(Name name)
     return NULL;
 }
 
-void Branch::bindName(Term* term, std::string name)
+void Branch::bindName(Term* term, Name name)
 {
     assert_valid_term(term);
-    if (term->name != "" && term->name != name)
-        throw std::runtime_error("term already has name: "+term->name);
+    if (!has_empty_name(term) && term->nameSymbol != name) {
+        internal_error(std::string("term already has a name: ") + term->nameStr());
+    }
 
-    names.bind(term, name);
-#ifndef TERM_HAS_SYMBOL
-    term->name = name;
-#endif
-    term->nameSymbol = name_from_string(name.c_str());
+    names.bind(term, name_to_string(name));
+    term->nameSymbol = name;
+    term->name = name_to_string(name);
     update_unique_name(term);
 }
 
@@ -340,8 +339,8 @@ std::string Branch::toString()
     for (int i=0; i < length(); i++) {
         Term* term = get(i);
         if (i > 0) out << ", ";
-        if (term->name != "")
-            out << term->name << ": ";
+        if (!has_empty_name(term))
+            out << term->nameStr() << ": ";
         out << term->toString();
     }
     out << "]";

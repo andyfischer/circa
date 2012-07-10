@@ -21,9 +21,9 @@ void create_function_vectorized_vs(Branch* out, Term* func, Type* lhsType, Type*
 {
     clear_branch(out);
 
-    Term* input0 = apply(out, FUNCS.input, TermList(), "in0");
+    Term* input0 = apply(out, FUNCS.input, TermList(), name_from_string("in0"));
     change_declared_type(input0, lhsType);
-    Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
+    Term* input1 = apply(out, FUNCS.input, TermList(), name_from_string("in1"));
     change_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));
@@ -42,9 +42,9 @@ void create_function_vectorized_vv(Branch* out, Term* func, Type* lhsType, Type*
 {
     clear_branch(out);
 
-    Term* input0 = apply(out, FUNCS.input, TermList(), "in0");
+    Term* input0 = apply(out, FUNCS.input, TermList(), name_from_string("in0"));
     change_declared_type(input0, lhsType);
-    Term* input1 = apply(out, FUNCS.input, TermList(), "in1");
+    Term* input1 = apply(out, FUNCS.input, TermList(), name_from_string("in1"));
     change_declared_type(input1, rhsType);
 
     Term* loop = apply(out, FUNCS.for_func, TermList(input0));

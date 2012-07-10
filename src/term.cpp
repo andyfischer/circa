@@ -42,6 +42,12 @@ Term::~Term()
     weak_ptr_set_null(weakPtr);
 }
 
+const char*
+Term::nameStr()
+{
+    return name_to_string(this->nameSymbol);
+}
+
 Term*
 Term::input(int index) const
 {

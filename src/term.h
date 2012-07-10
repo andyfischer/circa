@@ -17,9 +17,8 @@ struct Term : public caTerm
 {
     Value value;
 
-    // Fields inherited from caValue:
-    //   caValue::Data value_data
-    //   Type* value_type
+    // Inherited from caTerm:
+    // int id; // Globally unique ID. This is mainly used for debugging.
 
     // A WeakPtr to this object, this is lazily initialized.
     WeakPtr weakPtr;
@@ -43,12 +42,9 @@ struct Term : public caTerm
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
-    Name nameSymbol;
-
     // Our name binding.
-#ifndef TERM_HAS_SYMBOL
+    Name nameSymbol;
     std::string name;
-#endif
 
     // A name which is unique across this branch.
     struct UniqueName
@@ -81,6 +77,8 @@ struct Term : public caTerm
 
     Term();
     ~Term();
+
+    const char* nameStr();
 
     Term* input(int index) const;
     Input* inputInfo(int index);

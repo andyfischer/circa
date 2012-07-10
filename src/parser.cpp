@@ -598,7 +598,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         }
 
         // Create an input placeholder term
-        Term* input = apply(contents, FUNCS.input, TermList(), name);
+        Term* input = apply(contents, FUNCS.input, TermList(), name_from_string(name));
 
         if (is_type(typeTerm))
             change_declared_type(input, as_type(typeTerm));
@@ -806,7 +806,7 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
             fieldName = tokens.consumeStr(tok_Identifier);
 
         ca_assert(FUNCS.declare_field != NULL);
-        Term* field = apply(contents, FUNCS.declare_field, TermList(), fieldName.c_str());
+        Term* field = apply(contents, FUNCS.declare_field, TermList(), name_from_string(fieldName));
         change_declared_type(field, as_type(fieldType));
 
         field->setStringProp("syntax:preWhitespace", preWs);
@@ -877,7 +877,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
             // Create an 'else' block
             encounteredElse = true;
             caseTerm = if_block_append_case(contents, NULL);
-            rename(caseTerm, "else");
+            rename(caseTerm, name_from_string("else"));
         }
 
         caseTerm->setStringProp("syntax:preWhitespace", preKeywordWhitespace);
@@ -912,7 +912,7 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
     // If we didn't encounter an 'else' block, then create an empty one.
     if (!encounteredElse) {
         Term* elseTerm = if_block_append_case(contents, NULL);
-        rename(elseTerm, "else");
+        rename(elseTerm, name_from_string("else"));
         hide_from_source(elseTerm);
     }
 
@@ -1089,7 +1089,7 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     }
 
     // Create the declared_state() term.
-    Term* result = apply(branch, FUNCS.declared_state, TermList(), name);
+    Term* result = apply(branch, FUNCS.declared_state, TermList(), name_from_string(name));
 
     // Lookup the explicit type
     Type* type = &ANY_T;
@@ -1155,7 +1155,7 @@ ParseResult expression_statement(Branch* branch, TokenStream& tokens, ParserCxt*
     if (context->pendingRebind != "") {
         std::string name = context->pendingRebind;
         context->pendingRebind = "";
-        rename(term, name);
+        rename(term, name_from_string(name));
         term->setStringProp("syntax:rebindOperator", name);
     }
 
@@ -1313,13 +1313,13 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
     if (hasName) {
         // If the term already has a name (this is the case for method syntax
         // and for unknown_identifier), then make a copy.
-        if (term->name != "")
+        if (!has_empty_name(term))
             term = apply(branch, FUNCS.copy, TermList(term));
 
         term->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         term->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-        rename(term, nameBinding);
+        rename(term, name_from_string(nameBinding));
         set_source_location(term, startPosition, tokens);
         result = ParseResult(term);
     }
@@ -1341,7 +1341,7 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
         set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         set->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-        rename(set, head->name);
+        rename(set, head->nameSymbol);
         result = ParseResult(set);
     }
 
@@ -1538,7 +1538,7 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
                 // Just bind the name if left side is an identifier.
                 // Example: a += 1
                 if (left.isIdentifier()) {
-                    rename(term, left.term->name);
+                    rename(term, left.term->nameSymbol);
 
                 // Otherwise, create a set_with_selector call.
                 } else {
@@ -1562,7 +1562,7 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
                         move(existingPostWhitespace,
                             set->properties.insert("syntax:preEqualsSpace"));
 
-                    rename(set, original->name);
+                    rename(set, original->nameSymbol);
                     term = set;
                 }
             }
@@ -2251,7 +2251,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
         return compile_error_for_line(branch, tokens, startPosition,
             "Expected identifier after 'namespace'");
 
-    std::string name = tokens.consumeStr(tok_Identifier);
+    Name name = tokens.consumeName(tok_Identifier);
     Term* term = apply(branch, FUNCS.namespace_func, TermList(), name);
     set_starting_source_location(term, startPosition, tokens);
 
@@ -2264,7 +2264,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
 
 ParseResult unknown_identifier(Branch* branch, std::string const& name)
 {
-    Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, TermList(), name);
+    Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, TermList(), name_from_string(name));
     set_is_statement(term, false);
     term->setStringProp("message", name);
     return ParseResult(term);

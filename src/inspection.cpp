@@ -72,7 +72,7 @@ bool is_hidden(Term* term)
 
 bool has_empty_name(Term* term)
 {
-    return term->name == "";
+    return term->nameSymbol == name_None;
 }
 
 bool is_an_unknown_identifier(Term* term)
