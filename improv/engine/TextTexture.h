@@ -13,11 +13,18 @@ struct TextTexture : RenderEntity
 {
     GLuint texid;
 
-    FontBitmap metrics;
+    int font;
+    circa::Value text;
+    bool needsRasterize;
     int version;
+    FontBitmap metrics;
 
     static TextTexture* create(RenderTarget* renderList);
-    void rasterize(caValue* str, int font);
+
+    void setFont(int font);
+    void setText(caValue* text);
+
+    void update();
 
     virtual void destroy();
     virtual bool destroyed();

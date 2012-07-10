@@ -11,14 +11,35 @@ TextTexture::create(RenderTarget* renderList)
     renderList->appendEntity(obj);
 
     glGenTextures(1, &obj->texid);
+
+    obj->font = 0;
+    set_null(&obj->text);
+    obj->needsRasterize = false;
     obj->version = 1;
     return obj;
+}
+void
+TextTexture::setFont(int font)
+{
+    if (this->font == font)
+        return;
+    this->font = font;
+    needsRasterize = true;
+}
+
+void
+TextTexture::setText(caValue* text)
+{
+    if (circa_equals(this->text, text))
+        return;
+
+    circa_copy(text, this->text);
+    needsRasterize = true;
 }
 
 void
 TextTexture::destroy()
 {
-    printf("destroying textTexture with id %d", texid);
     glDeleteTextures(1, &texid);
     texid = 0;
 }
