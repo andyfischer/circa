@@ -11,7 +11,6 @@
 #include "evaluation.h"
 #include "importing_macros.h"
 #include "inspection.h"
-#include "locals.h"
 #include "stateful_code.h"
 #include "term.h"
 #include "type.h"

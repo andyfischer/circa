@@ -6,7 +6,6 @@
 #include <map>
 #endif
 
-#include "build_options.h"
 #include "kernel.h"
 #include "heap_debugging.h"
 #include "term.h"

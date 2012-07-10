@@ -1,16 +1,16 @@
 
+type FontRender {
+    int id
+    Point size
+}
+
 type RenderTarget;
+def RenderTarget.getFontRender(self, List args) -> FontRender
+def RenderTarget.sendCommand(self, List command)
+def RenderTarget.getViewportSize(self) -> Point
+
 type Font;
-
 def create_font(String name, number size) -> Font
-
-type TextSprite;
-def create_text_sprite(RenderTarget target) -> TextSprite
-def TextSprite.setText(self, String text)
-def TextSprite.setFont(self, Font font)
-def TextSprite.setPosition(self, Point position)
-def TextSprite.setColor(self, Color color)
-def TextSprite.getRect(self) -> Rect
 
 type LineList;
 def create_line_list(RenderTarget target) -> LineList
@@ -22,7 +22,6 @@ def font(String name, number size) -> Font
         f = create_font(name size)
     return f
 
-
 type Painter {
     RenderTarget target
     Rect viewport
@@ -32,13 +31,13 @@ type Painter {
 
 def Painter.setFont(@self, Font font)
     self.currentFont = font
-def Painter.text(self, Point position, String text, Color c, List args) -> Rect
-    state sprite = create_text_sprite(self.target)
-    sprite.setFont(self.currentFont)
-    sprite.setText(text)
-    sprite.setPosition(position)
-    sprite.setColor(c)
-    return sprite.getRect()
+
+def Painter.text(self, Point position, String text, Color color, List args) -> Rect
+    font = self.currentFont
+    fontRender = self.target.getFontRender([text font])
+    self.target.sendCommand([:textSprite fontRender.id position color])
+    rect = [position.x position.y fontRender.size.x fontRender.size.y]
+    return rect
 
 def Painter.fillRect(self, Rect r, Color c)
-    -- todo
+    self.target.sendCommand([:rect r color])

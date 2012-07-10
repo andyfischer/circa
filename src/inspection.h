@@ -50,6 +50,9 @@ bool is_major_branch(Term* term);
 bool is_major_branch(Branch* branch);
 bool is_minor_branch(Branch* branch);
 
+int get_output_count(Term* term);
+int get_locals_count(Branch* branch);
+
 Term* get_input_placeholder(Branch* branch, int index);
 Term* get_output_placeholder(Branch* branch, int index);
 int count_input_placeholders(Branch* branch);

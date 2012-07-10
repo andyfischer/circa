@@ -3,7 +3,6 @@
 #pragma once
 
 #include "common_headers.h"
-#include "build_options.h"
 
 namespace circa {
 

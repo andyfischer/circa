@@ -4,7 +4,6 @@
 
 #include <cassert>
 
-#include "build_options.h"
 #include "branch.h"
 #include "evaluation.h"
 #include "inspection.h"

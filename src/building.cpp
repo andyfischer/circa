@@ -12,7 +12,6 @@
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
-#include "locals.h"
 #include "loops.h"
 #include "names.h"
 #include "parser.h"

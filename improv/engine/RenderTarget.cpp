@@ -10,6 +10,12 @@
 
 const bool CHECK_GL_ERROR = true;
 
+RenderTarget::RenderTarget()
+  : viewportWidth(0),
+    viewportHeight(0)
+{
+}
+
 void
 RenderTarget::setup(ResourceManager* resourceManager)
 {
@@ -31,6 +37,8 @@ RenderTarget::appendEntity(RenderEntity* command)
 void
 RenderTarget::setViewportSize(int w, int h)
 {
+    viewportWidth = w;
+    viewportHeight = h;
     modelViewProjectionMatrix = glm::ortho(0.0, double(w), double(h), 0.0, -1.0, 100.0);
 }
 

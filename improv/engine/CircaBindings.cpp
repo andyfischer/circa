@@ -34,6 +34,23 @@ Color unpack_color(caValue* value)
     return c;
 }
 
+void RenderTarget__getFontRender(caStack* stack)
+{
+    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    caValue* args = circa_input(stack, 1);
+    // output {int id, Point size}
+}
+void RenderTarget__sendCommand(caStack* stack)
+{
+    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    caValue* command = circa_input(stack, 1);
+}
+void RenderTarget__getViewportSize(caStack* stack)
+{
+    RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
+    circa_set_vec2(circa_output(stack, 0), target->viewportWidth, target->viewportHeight);
+}
+
 void create_font(caStack* stack)
 {
     const char* name = circa_string(circa_input(stack, 0));
@@ -44,6 +61,7 @@ void create_font(caStack* stack)
     ref->font_id = font;
 }
 
+#if 0
 void create_text_sprite(caStack* stack)
 {
     RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));
@@ -95,15 +113,18 @@ void TextTexture__getRect(caStack* stack)
             sprite->textVbo->posX + metrics->textWidth,
             sprite->textVbo->posY + metrics->descent + metrics->ascent);
 }
+#endif
 
 static const caFunctionBinding g_imports[] = {
     {"create_font", create_font},
+#if 0
     {"create_text_sprite", create_text_sprite},
     {"TextTexture.setText", TextTexture__setText},
     {"TextTexture.setFont", TextTexture__setFont},
     {"TextTexture.setPosition", TextTexture__setPosition},
     {"TextTexture.setColor", TextTexture__setColor},
     {"TextTexture.getRect", TextTexture__getRect},
+#endif
     {NULL, NULL}
 };
 

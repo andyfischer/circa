@@ -3,7 +3,6 @@
 #include "common_headers.h"
 
 #include "building.h"
-#include "build_options.h"
 #include "branch.h"
 #include "code_iterators.h"
 #include "dict.h"
@@ -13,7 +12,6 @@
 #include "inspection.h"
 #include "kernel.h"
 #include "list.h"
-#include "locals.h"
 #include "parser.h"
 #include "reflection.h"
 #include "stateful_code.h"

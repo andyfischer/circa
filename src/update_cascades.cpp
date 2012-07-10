@@ -1,13 +1,12 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "branch.h"
+#include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
-#include "heap_debugging.h"
 #include "function.h"
+#include "heap_debugging.h"
 #include "kernel.h"
-#include "locals.h"
-#include "building.h"
 #include "tagged_value.h"
 #include "term.h"
 #include "update_cascades.h"

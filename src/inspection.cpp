@@ -9,7 +9,6 @@
 #include "function.h"
 #include "heap_debugging.h"
 #include "inspection.h"
-#include "locals.h"
 #include "names.h"
 #include "term.h"
 #include "term_list.h"
@@ -97,6 +96,36 @@ bool is_minor_branch(Branch* branch)
     return owner->function == FUNCS.if_block
         || owner->function == FUNCS.case_func
         || owner->function == FUNCS.for_func;
+}
+
+int get_output_count(Term* term)
+{
+    if (!FINISHED_BOOTSTRAP)
+        return 1;
+
+    // check if the function has overridden getOutputCount
+    Function::GetOutputCount getOutputCount = NULL;
+
+    if (term->function == NULL)
+        return 1;
+
+    Function* attrs = as_function(term->function);
+
+    if (attrs == NULL)
+        return 1;
+    
+    getOutputCount = attrs->getOutputCount;
+
+    if (getOutputCount != NULL)
+        return getOutputCount(term);
+
+    // Default behavior, if Function was found.
+    return function_num_outputs(attrs);
+}
+
+int get_locals_count(Branch* branch)
+{
+    return branch->length();
 }
 
 Term* get_input_placeholder(Branch* branch, int index)

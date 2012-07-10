@@ -46,12 +46,14 @@ struct RenderTarget
     
     Program program;
     
+    int viewportWidth, viewportHeight;
     glm::mat4 modelViewProjectionMatrix;
     glm::mat3 normalMatrix;
 
+    RenderTarget();
+    void setup(ResourceManager* resourceManager);
     void appendEntity(RenderEntity* entity);
     void appendCommand(RenderCommand* command);
-    void setup(ResourceManager* resourceManager);
 
     void setViewportSize(int w, int h);
     void render();

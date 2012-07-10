@@ -87,7 +87,6 @@ OBJECTS := \
 	$(OBJDIR)/inspection.o \
 	$(OBJDIR)/kernel.o \
 	$(OBJDIR)/list.o \
-	$(OBJDIR)/locals.o \
 	$(OBJDIR)/loops.o \
 	$(OBJDIR)/modules.o \
 	$(OBJDIR)/names.o \
@@ -244,9 +243,6 @@ $(OBJDIR)/kernel.o: ../src/kernel.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/list.o: ../src/list.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/locals.o: ../src/locals.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/loops.o: ../src/loops.cpp

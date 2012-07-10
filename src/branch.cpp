@@ -15,7 +15,6 @@
 #include "importing_macros.h"
 #include "inspection.h"
 #include "list.h"
-#include "locals.h"
 #include "parser.h"
 #include "stateful_code.h"
 #include "source_repro.h"
