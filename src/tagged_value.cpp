@@ -636,6 +636,10 @@ void circa_touch(caValue* value)
 {
     touch(value);
 }
+bool circa_equals(caValue* left, caValue* right)
+{
+    return equals(left, right);
+}
 caType* circa_type_of(caValue* value)
 {
     return value->value_type;

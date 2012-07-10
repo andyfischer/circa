@@ -16,7 +16,7 @@ void iterator_next(Hashtable* data, caValue* iterator);
 
 bool is_hashtable(caValue* value);
 caValue* get_value(caValue* table, caValue* key);
-caValue* table_insert(caValue* table, caValue* key, caValue* value, bool consumeKey);
+caValue* table_insert(caValue* table, caValue* key, bool consumeKey);
 void table_remove(caValue* tableTv, caValue* key);
 
 void setup_type(Type* type);

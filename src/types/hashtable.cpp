@@ -376,7 +376,7 @@ caValue* get_value(caValue* table, caValue* key)
     return get_value((Hashtable*) table->value_data.ptr, key);
 }
 
-caValue* table_insert(caValue* tableTv, caValue* key, caValue* value, bool consumeKey)
+caValue* table_insert(caValue* tableTv, caValue* key, bool consumeKey)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;

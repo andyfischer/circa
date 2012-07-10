@@ -695,7 +695,7 @@ void Map__set(caStack* stack)
     caValue* key = circa_input(stack, 1);
     caValue* value = circa_input(stack, 2);
 
-    copy(value, hashtable_t::table_insert(out, key, value, false));
+    copy(value, hashtable_t::table_insert(out, key, false));
 }
 
 void Map__remove(caStack* stack)

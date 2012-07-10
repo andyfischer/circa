@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "kernel.h"
 #include "map.h"
 #include "types/hashtable.h"
 
@@ -17,13 +18,13 @@ void circa_set_map(caValue* map)
     create(TYPES.map, map);
 }
 
-void circa_map_insert(caValue* map, caValue* key, caValue* value)
+caValue* circa_map_insert(caValue* map, caValue* key)
 {
     return circa::hashtable_t::table_insert(map, key, false);
 }
-void circa_map_get(caValue* map, caValue* key, caValue* valueOut)
+caValue* circa_map_get(caValue* map, caValue* key)
 {
-    return circa::hashtable_t::table_get(map, key);
+    return circa::hashtable_t::get_value(map, key);
 }
 
 }
