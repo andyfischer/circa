@@ -179,19 +179,12 @@ List* branch_get_file_origin(Branch* branch);
 // branch's origin. So, if this function true then the branch should be reloaded.
 bool check_and_update_file_origin(Branch* branch, const char* filename);
 
+// Using the branch origin, this checks the filesystem to see if there is a new
+// version of this branch available. If so, the new version is loaded and returned.
+// If not, the exisiting Branch is returned.
 Branch* load_latest_branch(Branch* branch);
 
-struct BranchInvariantCheck
-{
-    List errors;
-
-    // Structure of each error:
-    // [0] int type
-    // [1] int index
-    // [2] string message
-};
-
-void branch_check_invariants(BranchInvariantCheck* result, Branch* branch);
+void branch_check_invariants(caValue* result, Branch* branch);
 bool branch_check_invariants_print_result(Branch* branch, std::ostream& out);
 
 // Update the branch's stateType. Should be called after the code is changed in a way

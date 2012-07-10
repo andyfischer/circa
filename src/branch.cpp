@@ -734,18 +734,20 @@ Branch* load_latest_branch(Branch* branch)
     return newBranch;
 }
 
-void append_internal_error(BranchInvariantCheck* result, int index, std::string const& message)
+void append_internal_error(caValue* result, int index, std::string const& message)
 {
     const int INTERNAL_ERROR_TYPE = 1;
 
-    List& error = *set_list(result->errors.append(), 3);
+    List& error = *set_list(list_append(result), 3);
     set_int(error[0], INTERNAL_ERROR_TYPE);
     set_int(error[1], index);
     set_string(error[2], message);
 }
 
-void branch_check_invariants(BranchInvariantCheck* result, Branch* branch)
+void branch_check_invariants(caValue* result, Branch* branch)
 {
+    set_list(result, 0);
+
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
 
@@ -769,17 +771,17 @@ void branch_check_invariants(BranchInvariantCheck* result, Branch* branch)
 
 bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
 {
-    BranchInvariantCheck result;
+    circa::Value result;
     branch_check_invariants(&result, branch);
 
-    if (result.errors.length() == 0)
+    if (list_length(&result) == 0)
         return true;
 
-    out << result.errors.length() << " errors found in branch " << &branch
+    out << list_length(&result) << " errors found in branch " << &branch
         << std::endl;
 
-    for (int i=0; i < result.errors.length(); i++) {
-        List* error = List::checkCast(result.errors[i]);
+    for (int i=0; i < list_length(&result); i++) {
+        List* error = List::checkCast(list_get(&result,i));
         out << "[" << as_int(error->get(1)) << "] ";
         out << as_cstring(error->get(2));
         out << std::endl;
