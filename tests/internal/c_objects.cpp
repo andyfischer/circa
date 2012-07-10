@@ -3,6 +3,7 @@
 #include "framework.h"
 #include "object.h"
 
+#include "type.h"
 #include "evaluation.h"
 
 using namespace circa;
@@ -87,9 +88,43 @@ void test_custom_object()
     test_equals(g_totalAllocated, 1);
 }
 
+void test_type_not_prematurely_used()
+{
+    // Verify that a circa-defined type is not used until interpreter time. Modifying
+    // a type's release() handler after there are already instances of it, is not good.
+    
+    Branch branch;
+    branch.compile(
+        "type MyType; \n"
+        "def f() -> MyType\n"
+        "def g(MyType t)\n"
+        "s = f()\n"
+        "g(s)\n"
+        "l = [s s s]\n"
+        "type MyCompoundType {\n"
+        "  MyType t\n"
+        "}\n"
+        "state MyType st\n"
+        "state MyType st2 = create(MyType)\n"
+        );
+
+    Type* myType = (Type*) circa_find_type(&branch, "MyType");
+    Type* myCompoundType = (Type*) circa_find_type(&branch, "MyCompoundType");
+    test_assert(!myType->inUse);
+    test_assert(!myCompoundType->inUse);
+
+    circa::Value value1, value2;
+    create(myType, &value1);
+    create(myCompoundType, &value2);
+
+    test_assert(myType->inUse);
+    test_assert(myCompoundType->inUse);
+}
+
 } // namespace c_objects
 
 void c_objects_register_tests()
 {
     REGISTER_TEST_CASE(c_objects::test_custom_object);
+    REGISTER_TEST_CASE(c_objects::test_type_not_prematurely_used);
 }
