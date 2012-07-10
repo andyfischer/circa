@@ -373,6 +373,17 @@ void circa_resize(caValue* list, int count);
 // Assign a point.
 void circa_set_point(caValue* point, float x, float y);
 
+// Initialize a value with an empty Map.
+void circa_map_set(caValue* map);
+
+// Find a value in a Map. The result may not be modified, unless you have a writeable
+// copy of the map. Returns NULL if the map doesn't contain the key.
+caValue* circa_map_get(caValue* map, caValue* key);
+
+// Insert a key into a map, returning the associated value container. The result value
+// may be modified.
+caValue* circa_map_insert(caValue* map, caValue* key);
+
 // -- Handle Values --
 
 // Retrive a value from a Handle

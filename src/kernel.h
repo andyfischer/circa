@@ -143,6 +143,7 @@ struct BuiltinTypes {
     Type* dynamicOutputs;
     Type* file_signature;
     Type* frame;
+    Type* map;
     Type* point;
     Type* selector;
 };

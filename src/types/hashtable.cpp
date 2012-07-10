@@ -138,7 +138,7 @@ int find_ideal_slot_index(Hashtable* data, caValue* key)
 // Insert the given key into the dictionary, returns the index.
 // This may create a new Hashtable* object, so don't use the old Hashtable* pointer after
 // calling this.
-int table_insert(Hashtable** dataPtr, caValue* key, bool swapKey)
+int table_insert(Hashtable** dataPtr, caValue* key, bool consumeKey)
 {
     if (*dataPtr == NULL)
         *dataPtr = create_table();
@@ -169,7 +169,7 @@ int table_insert(Hashtable** dataPtr, caValue* key, bool swapKey)
 
     Slot* slot = &data->slots[index];
 
-    if (swapKey)
+    if (consumeKey)
         swap(key, &slot->key);
     else
         copy(key, &slot->key);
@@ -376,18 +376,14 @@ caValue* get_value(caValue* table, caValue* key)
     return get_value((Hashtable*) table->value_data.ptr, key);
 }
 
-void table_insert(caValue* tableTv, caValue* key, caValue* value,
-        bool swapKey, bool swapcaValue)
+caValue* table_insert(caValue* tableTv, caValue* key, caValue* value, bool consumeKey)
 {
     ca_assert(is_hashtable(tableTv));
     Hashtable*& table = (Hashtable*&) tableTv->value_data.ptr;
-    int index = table_insert(&table, key, swapKey);
+    int index = table_insert(&table, key, consumeKey);
 
     caValue* slot = &table->slots[index].value;
-    if (swapKey)
-        swap(value, slot);
-    else
-        copy(value, slot);
+    return slot;
 }
 
 void table_remove(caValue* tableTv, caValue* key)

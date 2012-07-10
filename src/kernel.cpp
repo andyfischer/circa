@@ -695,7 +695,7 @@ void Map__set(caStack* stack)
     caValue* key = circa_input(stack, 1);
     caValue* value = circa_input(stack, 2);
 
-    hashtable_t::table_insert(out, key, value, false, false);
+    copy(value, hashtable_t::table_insert(out, key, value, false));
 }
 
 void Map__remove(caStack* stack)
@@ -1085,8 +1085,8 @@ void bootstrap_kernel()
     Term* set_type = create_value(kernel, &TYPE_T, "Set");
     set_t::setup_type(unbox_type(set_type));
 
-    Term* map_type = create_value(kernel, &TYPE_T, "Map");
-    hashtable_t::setup_type(unbox_type(map_type));
+    TYPES.map = unbox_type(create_value(kernel, &TYPE_T, "Map"));
+    hashtable_t::setup_type(TYPES.map);
 
     Term* indexableType = create_value(kernel, &TYPE_T, "Indexable");
     indexable_t::setup_type(unbox_type(indexableType));
