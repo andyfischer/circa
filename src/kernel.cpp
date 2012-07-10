@@ -1046,6 +1046,9 @@ void bootstrap_kernel()
 
     namespace_function::early_setup(kernel);
 
+    // Setup declare_field() function, needed to represent compound types.
+    FUNCS.declare_field = import_function(kernel, NULL, "declare_field() -> any");
+
     // Set up some global constants
     set_bool(&TrueValue, true);
     set_bool(&FalseValue, false);

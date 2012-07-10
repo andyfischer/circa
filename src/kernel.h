@@ -56,6 +56,7 @@ struct BuiltinFuncs {
     Term* cond;
     Term* continue_func;
     Term* copy;
+    Term* declare_field;
     Term* declared_state;
     Term* default_case;
     Term* discard;

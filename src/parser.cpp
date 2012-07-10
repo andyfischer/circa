@@ -805,7 +805,9 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (tokens.nextIs(tok_Identifier))
             fieldName = tokens.consumeStr(tok_Identifier);
 
-        Term* field = create_value(contents, as_type(fieldType), fieldName);
+        ca_assert(FUNCS.declare_field != NULL);
+        Term* field = apply(contents, FUNCS.declare_field, TermList(), fieldName.c_str());
+        change_declared_type(field, as_type(fieldType));
 
         field->setStringProp("syntax:preWhitespace", preWs);
         field->setStringProp("syntax:postNameWs", postNameWs);

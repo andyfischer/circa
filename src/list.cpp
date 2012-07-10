@@ -538,7 +538,8 @@ void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* paramet
 
     for (int i=0; i < typeDecl->length(); i++) {
         Term* term = typeDecl->get(i);
-        if (!is_value(term) || has_empty_name(term))
+
+        if (term->function != FUNCS.declare_field)
             continue;
 
         set_type(list_append(types), declared_type(term));
