@@ -14,11 +14,8 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs,
 Term* apply(Branch* branch, std::string const& functionName, 
                  TermList const& inputs, std::string const& name="");
 
-// Create a duplicate of the given term.
-// If 'copyBranches' is false, don't copy branch state. It's assumed that the
-// caller will do this. This functionality is used by duplicate_branch
-Term* create_duplicate(Branch* branch, Term* original, std::string const& name="",
-        bool copyBranches=true);
+// Create a duplicate of the given term. Doesn't duplicate nestedContents.
+Term* create_duplicate(Branch* branch, Term* original, std::string const& name="");
 
 // Inputs and user lists:
 void set_input(Term* term, int index, Term* input);
@@ -41,10 +38,8 @@ void clear_from_dependencies_of_users(Term* term);
 void change_function(Term* term, Term* function);
 
 // Change a term's declared type
-void unsafe_change_type(Term* term, Type* type);
 void change_declared_type(Term* term, Type* type);
 void respecialize_type(Term* term);
-void specialize_type(Term* term, Type* type);
 
 // Rename term, modify the name binding of the owning branch if necessary
 void rename(Term* term, std::string const& name);
@@ -54,7 +49,6 @@ Term* create_value(Branch* branch, Type* type, std::string const& name="");
 Term* create_value(Branch* branch, std::string const& typeName, std::string const& name="");
 Term* create_value(Branch* branch, caValue* initialValue, std::string const& name="");
 
-// Create values with a specified value.
 Term* create_string(Branch* branch, std::string const& s, std::string const& name="");
 Term* create_int(Branch* branch, int i, std::string const& name="");
 Term* create_float(Branch* branch, float f, std::string const& name="");
@@ -68,14 +62,6 @@ Term* create_type(Branch* branch, std::string name="");
 Term* create_type_value(Branch* branch, Type* value, std::string const& name="");
 Term* create_symbol_value(Branch* branch, int value, std::string const& name="");
 Term* duplicate_value(Branch* branch, Term* term);
-
-// In this context, "procure" means "return the existing thing if it already exists, and
-// create it if it doesn't exist." Procure functions are idempotent.
-Term* procure_value(Branch* branch, Type* type, std::string const& name);
-
-Term* procure_int(Branch* branch, std::string const& name);
-Term* procure_float(Branch* branch, std::string const& name);
-Term* procure_bool(Branch* branch, std::string const& name);
 
 // Add an input_placeholder() term after the existing placeholders.
 Term* append_input_placeholder(Branch* branch);

@@ -86,7 +86,7 @@ Term* apply(Branch* branch, Term* function, TermList const& inputs, std::string 
     for (int i=0; i < inputs.length(); i++)
         set_input(term, i, inputs[i]);
 
-    // change_function will also update the declared type.
+    // update term->function, change_function will also update the declared type.
     change_function(term, function);
 
     update_unique_name(term);
@@ -184,15 +184,11 @@ void append_user(Term* user, Term* usee)
     }
 }
 
-void possibly_prune_user_list(Term* user, Term* usee)
+static void remove_user(Term* usee, Term* user)
 {
-    if (usee == NULL)
-        return;
-
     int originalUserCount = user_count(usee);
 
-    if (usee != NULL && !is_actually_using(user, usee))
-        usee->users.remove(user);
+    usee->users.remove(user);
 
     // Check if we removed the last user.
     if (originalUserCount > 0 && user_count(usee) == 0) {
@@ -201,6 +197,16 @@ void possibly_prune_user_list(Term* user, Term* usee)
         if (usee->function == FUNCS.for_func)
             dirty_bytecode(usee->nestedContents);
     }
+    
+}
+
+void possibly_prune_user_list(Term* user, Term* usee)
+{
+    if (usee == NULL)
+        return;
+
+    if (!is_actually_using(user, usee))
+        remove_user(usee, user);
 }
 
 void remove_from_any_user_lists(Term* term)
@@ -211,17 +217,7 @@ void remove_from_any_user_lists(Term* term)
         if (usee == NULL)
             continue;
 
-        int originalUserCount = user_count(usee);
-
-        usee->users.remove(term);
-
-        // Check if we removed the last user.
-        if (originalUserCount > 0 && user_count(usee) == 0) {
-
-            // for-loop bytecode depends on the user count.
-            if (usee->function == FUNCS.for_func)
-                dirty_bytecode(usee->nestedContents);
-        }
+        remove_user(usee, term);
     }
 }
 
@@ -272,13 +268,6 @@ void change_function(Term* term, Term* function)
     dirty_bytecode(term->owningBranch);
 }
 
-void unsafe_change_type(Term *term, Type *type)
-{
-    ca_assert(type != NULL);
-
-    term->type = type;
-}
-
 void change_declared_type(Term *term, Type *newType)
 {
     // Don't allow 'null' to be used as a declared type (use 'any' instead)
@@ -308,16 +297,6 @@ void respecialize_type(Term* term)
         change_declared_type(term, outputType);
 }
 
-void specialize_type(Term *term, Type *type)
-{
-    if (term->type == type)
-        return;
-
-    ca_assert(term->type == &ANY_T);
-
-    change_declared_type(term, type);
-}
-
 void rename(Term* term, std::string const& name)
 {
     if (term->name == name)
@@ -338,7 +317,7 @@ void rename(Term* term, std::string const& name)
     on_term_name_changed(term, prevName.c_str(), name.c_str());
 }
 
-Term* create_duplicate(Branch* branch, Term* original, std::string const& name, bool copyBranches)
+Term* create_duplicate(Branch* branch, Term* original, std::string const& name)
 {
     ca_assert(original != NULL);
 
@@ -347,17 +326,13 @@ Term* create_duplicate(Branch* branch, Term* original, std::string const& name, 
 
     Term* term = apply(branch, original->function, inputs, name);
     change_declared_type(term, original->type);
-    //create(original->value_type, term_value(term));
 
     copy(term_value(original), term_value(term));
-
-    if (copyBranches)
-        duplicate_branch(nested_contents(original), nested_contents(term));
 
     term->sourceLoc = original->sourceLoc;
     copy(&original->properties, &term->properties);
 
-    // Special case for certain types, update declaringType
+    // Special case for certain types, update declaringTerm
     if (is_type(term))
         as_type(term_value(term))->declaringTerm = term;
     if (is_function(term))
@@ -502,31 +477,6 @@ Term* duplicate_value(Branch* branch, Term* term)
     Term* dup = create_value(branch, term->type);
     copy(term_value(term), term_value(dup));
     return dup;
-}
-
-Term* procure_value(Branch* branch, Type* type, std::string const& name)
-{
-    Term* existing = branch->get(name);
-    if (existing == NULL)
-        existing = create_value(branch, type, name);
-    else
-        change_declared_type(existing, type);
-    return existing;
-}
-
-Term* procure_int(Branch* branch, std::string const& name)
-{
-    return procure_value(branch, &INT_T, name);
-}
-
-Term* procure_float(Branch* branch, std::string const& name)
-{
-    return procure_value(branch, &FLOAT_T, name);
-}
-
-Term* procure_bool(Branch* branch, std::string const& name)
-{
-    return procure_value(branch, &BOOL_T, name);
 }
 
 Term* append_input_placeholder(Branch* branch)

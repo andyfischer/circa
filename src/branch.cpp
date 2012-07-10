@@ -471,7 +471,6 @@ void erase_term(Term* term)
 
 void clear_branch(Branch* branch)
 {
-    //std::cout << "clear_branch: " << branch << std::endl;
     assert_valid_branch(branch);
     set_null(&branch->staticErrors);
     branch->stateType = NULL;
@@ -541,7 +540,7 @@ void duplicate_branch_nested(TermMap& newTermMap, Branch* source, Branch* dest)
     for (int index=0; index < source->length(); index++) {
         Term* source_term = source->get(index);
 
-        Term* dest_term = create_duplicate(dest, source_term, source_term->name, false);
+        Term* dest_term = create_duplicate(dest, source_term, source_term->name);
 
         newTermMap[source_term] = dest_term;
 

@@ -25,6 +25,7 @@ struct Branch : caBranch
     // List of content terms. This branch owns all the Term objects in this list.
     TermList _terms;
 
+    // Name bindings.
     TermNamespace names;
 
     // Points to the Term which owns this branch as a value.
@@ -56,6 +57,7 @@ struct Branch : caBranch
     // Evaluation advice
     bool emptyEvaluation;
 
+    // Compiled interpreter instructions.
     Value bytecode;
 
     Branch();
