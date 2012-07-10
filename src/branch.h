@@ -15,8 +15,6 @@
 
 namespace circa {
 
-struct BrokenLinkList;
-
 struct Branch : caBranch
 {
     CircaObject header;
@@ -126,8 +124,8 @@ struct Branch : caBranch
 
     std::string toString();
 
-    // Disallow copy constructor
 private:
+    // Disallow copy constructor
     Branch(Branch const&) { internal_error(""); }
     Branch& operator=(Branch const&) { internal_error(""); return *this; }
 };
@@ -195,26 +193,6 @@ struct BranchInvariantCheck
 
 void branch_check_invariants(BranchInvariantCheck* result, Branch* branch);
 bool branch_check_invariants_print_result(Branch* branch, std::ostream& out);
-
-struct BrokenLinkList
-{
-    struct Link {
-        std::string relativeName;
-        Term* user;
-        int depIndex;
-        Link(std::string _relativeName, Term* _user, int _depIndex)
-            : relativeName(_relativeName), user(_user), depIndex(_depIndex)
-        {}
-    };
-
-    std::vector<Link> links;
-
-    void append(std::string relativeName, Term* user, int depIndex)
-    {
-        links.push_back(Link(relativeName, user, depIndex));
-    }
-    bool empty() { return links.size() == 0; }
-};
 
 // Update the branch's stateType. Should be called after the code is changed in a way
 // that could add/remove declared state.

@@ -15,11 +15,6 @@ extern bool DEBUG_TRAP_NAME_LOOKUP;
 // Setting this to true will make us abort trap on the next call to raise_error()
 extern bool DEBUG_TRAP_RAISE_ERROR;
 
-// Setting this to true will write to stdout for every write to a Ref value.
-extern bool DEBUG_TRACE_ALL_REF_WRITES;
-
-extern bool DEBUG_TRACE_ALL_TERM_DESTRUCTORS;
-
 extern int DEBUG_BREAK_ON_TERM;
 
 // Spit out this branch's raw contents to std::cout

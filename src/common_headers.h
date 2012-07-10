@@ -39,7 +39,6 @@ typedef long long int int64;
 typedef long long unsigned int uint64;
 
 struct Branch;
-struct BrokenLinkList;
 struct CastResult;
 struct CircaObject;
 struct Dict;
