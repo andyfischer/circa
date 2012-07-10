@@ -10,7 +10,7 @@ Line*
 Line::init(RenderTarget* target)
 {
     Line* obj = new Line();
-    target->appendCommand(obj);
+    // target->appendCommand(obj);
     glGenBuffers(1, &obj->bufid);
     obj->hasPosition = false;
     return obj;

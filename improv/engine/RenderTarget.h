@@ -10,7 +10,6 @@
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
-struct RenderCommand;
 struct RenderEntity;
 struct RenderTarget;
 struct ResourceManager;
@@ -37,10 +36,6 @@ struct Program {
 
 struct RenderTarget
 {
-    // RenderCommands are pending commands to the device, they are run on every frame.
-    // These objects are owned by RenderTarget.
-    std::vector<RenderCommand*> commands;
-
     // RenderEntities store objects/data that is actively being used for drawing (and
     // may be referenced by RenderCommands). These objects are owned by RenderTarget.
     std::vector<RenderEntity*> entities;
@@ -57,12 +52,18 @@ struct RenderTarget
     RenderTarget();
     void setup(ResourceManager* resourceManager);
     void appendEntity(RenderEntity* entity);
-    void appendCommand(RenderCommand* command);
+    void sendCommand(caValue* command);
+
+    caValue* getTextRender(caValue* args);
 
     void setViewportSize(int w, int h);
     void render();
+    void flushDestroyedEntities();
 
     Program* currentProgram();
+
+    caName name_textSprite;
+    caName name_rect;
 };
 
 void check_gl_error();

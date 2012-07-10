@@ -1,5 +1,7 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "circa/circa.h"
+#pragma once
 
-void engine_setup_bindings(caBranch* branch);
+#include "Common.h"
+
+Color unpack_color(caValue* value);

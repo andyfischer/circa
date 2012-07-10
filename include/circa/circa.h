@@ -281,6 +281,9 @@ void circa_move(caValue* source, caValue* dest);
 // is only necessary when modifying the elements of a container type (such as a List).
 void circa_touch(caValue* value);
 
+// Check two values for equality.
+bool circa_equals(caValue* left, caValue* right);
+
 // Allocate a new list value, with the given initial size.
 caValue* circa_alloc_list(int size);
 

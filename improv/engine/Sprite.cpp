@@ -8,7 +8,7 @@ Sprite* Sprite::init(RenderTarget* target)
 {
     Sprite* obj = new Sprite();
 
-    target->appendCommand(obj);
+    // target->appendCommand(obj);
 
     glGenBuffers(1, &obj->vbo);
     obj->vboNeedsUpdate = true;

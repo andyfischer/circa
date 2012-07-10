@@ -13,7 +13,7 @@ TextTexture::create(RenderTarget* renderList)
     glGenTextures(1, &obj->texid);
 
     obj->font = 0;
-    set_null(&obj->text);
+    circa_set_null(&obj->text);
     obj->needsRasterize = false;
     obj->version = 1;
     return obj;
@@ -30,11 +30,17 @@ TextTexture::setFont(int font)
 void
 TextTexture::setText(caValue* text)
 {
-    if (circa_equals(this->text, text))
+    if (circa_equals(&this->text, text))
         return;
 
-    circa_copy(text, this->text);
+    circa_copy(text, &this->text);
     needsRasterize = true;
+}
+
+void
+TextTexture::getSize(caValue* point)
+{
+    circa_set_vec2(point, metrics.textWidth, metrics.ascent + metrics.descent);
 }
 
 void
@@ -51,14 +57,14 @@ TextTexture::destroyed()
 }
 
 void
-TextTexture::rasterize(caValue* str, int font)
+TextTexture::update()
 {
     if (font == 0) {
         Log("TextTexture::rasterize called with null font");
         return;
     }
 
-    metrics.str = circa_string(str);
+    metrics.str = circa_string(&text);
     metrics.face = font;
     
     font_update_metrics(&metrics);

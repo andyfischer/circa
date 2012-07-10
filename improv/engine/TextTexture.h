@@ -24,6 +24,8 @@ struct TextTexture : RenderEntity
     void setFont(int font);
     void setText(caValue* text);
 
+    void getSize(caValue* point);
+
     void update();
 
     virtual void destroy();

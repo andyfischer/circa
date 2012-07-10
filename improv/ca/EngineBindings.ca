@@ -1,11 +1,11 @@
 
-type FontRender {
-    int id
+type TextRender {
+    any object
     Point size
 }
 
 type RenderTarget;
-def RenderTarget.getFontRender(self, List args) -> FontRender
+def RenderTarget.getTextRender(self, List args) -> TextRender
 def RenderTarget.sendCommand(self, List command)
 def RenderTarget.getViewportSize(self) -> Point
 
@@ -34,9 +34,9 @@ def Painter.setFont(@self, Font font)
 
 def Painter.text(self, Point position, String text, Color color, List args) -> Rect
     font = self.currentFont
-    fontRender = self.target.getFontRender([text font])
-    self.target.sendCommand([:textSprite fontRender.id position color])
-    rect = [position.x position.y fontRender.size.x fontRender.size.y]
+    textRender = self.target.getTextRender([text font])
+    self.target.sendCommand([:textSprite textRender.object position color])
+    rect = [position.x position.y textRender.size.x textRender.size.y]
     return rect
 
 def Painter.fillRect(self, Rect r, Color c)

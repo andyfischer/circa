@@ -49,7 +49,7 @@ TextSprite::setText(const char* text)
         return;
     
     circa_set_string(&_text, text);
-    textTexture->rasterize(&_text, _font);
+    // textTexture->rasterize(&_text, _font);
 }
 
 void

@@ -7,7 +7,6 @@ TextVbo*
 TextVbo::create(RenderTarget* target)
 {
     TextVbo* obj = new TextVbo();
-    target->appendCommand(obj);
 
     glGenBuffers(1, &obj->vbo);
     

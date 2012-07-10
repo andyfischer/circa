@@ -3,9 +3,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "RenderCommand.h"
+#include "CircaBindings.h"
 #include "RenderEntity.h"
 #include "RenderTarget.h"
+#include "TextTexture.h"
+#include "TextVbo.h"
 #include "ShaderUtils.h"
 
 const bool CHECK_GL_ERROR = true;
@@ -16,6 +18,9 @@ RenderTarget::RenderTarget()
 {
     circa_set_map(&textRenderCache);
     circa_set_list(&incomingCommands, 0);
+
+    name_rect = circa_to_name("rect");
+    name_textSprite = circa_to_name("textSprite");
 }
 
 void
@@ -25,9 +30,30 @@ RenderTarget::setup(ResourceManager* resourceManager)
 }
 
 void
-RenderTarget::appendCommand(RenderCommand* command)
+RenderTarget::sendCommand(caValue* command)
 {
-    commands.push_back(command);
+    circa_copy(command, circa_append(&incomingCommands));
+}
+
+caValue*
+RenderTarget::getTextRender(caValue* args)
+{
+    caValue* value = circa_map_insert(&textRenderCache, args);
+
+    if (circa_is_null(value)) {
+        // Value doesn't exist in cache.
+        TextTexture* texture = TextTexture::create(this);
+
+        texture->setText(circa_index(args, 0));
+        texture->setFont(1); // FIXME
+        texture->update();
+
+        circa_set_list(value, 2);
+        circa_set_pointer(circa_index(value, 0), texture);
+        texture->getSize(circa_index(value, 1));
+    }
+
+    return value;
 }
 
 void
@@ -55,43 +81,55 @@ RenderTarget::render()
     glUniformMatrix4fv(program.uniforms.modelViewProjectionMatrix,
             1, GL_FALSE, glm::value_ptr(modelViewProjectionMatrix));
 
-    // Cleanup destroyed entities
-    {
-        int numDestroyed = 0;
-        for (size_t i=0; i < entities.size(); i++) {
-            RenderEntity* entity = entities[i];
-            if (entity->destroyed()) {
-                delete entity;
-                numDestroyed++;
-                continue;
-            }
+    // Run incoming commands
+    for (size_t i=0; i < circa_count(&incomingCommands); i++) {
+        caValue* command = circa_index(&incomingCommands, i);
+        caName commandName = circa_name(circa_index(command, 0));
 
-            if (numDestroyed > 0)
-                entities[i - numDestroyed] = entity;
+        if (commandName == name_textSprite) {
+            TextTexture* texture = (TextTexture*) circa_get_pointer(circa_index(command, 1));
+
+            caValue* position = circa_index(command, 2);
+            caValue* color = circa_index(command, 3);
+
+            TextVbo* textVbo = TextVbo::create(this);
+            textVbo->textTexture = texture;
+            textVbo->color = unpack_color(color);
+            float x,y;
+            circa_vec2(position, &x, &y);
+            textVbo->setPosition(x,y);
+            textVbo->render(this);
+
+            delete textVbo;
+        } else if (commandName == name_rect) {
+            // TODO
+        } else {
+            printf("unrecognized command name: %s\n", circa_name_to_string(commandName));
         }
-        entities.resize(entities.size() - numDestroyed);
+        
+        check_gl_error();
     }
 
-    // Run commands (cleaning up destroyed ones as we go)
-    int numDestroyed = 0;
-    for (size_t i=0; i < commands.size(); i++) {
-        RenderCommand* command = commands[i];
+    circa_set_list(&incomingCommands, 0);
+}
 
-        if (command->destroyed()) {
-            delete command;
+void
+RenderTarget::flushDestroyedEntities()
+{
+    // Cleanup destroyed entities
+    int numDestroyed = 0;
+    for (size_t i=0; i < entities.size(); i++) {
+        RenderEntity* entity = entities[i];
+        if (entity->destroyed()) {
+            delete entity;
             numDestroyed++;
             continue;
         }
 
         if (numDestroyed > 0)
-            commands[i - numDestroyed] = command;
-    
-        command->render(this);
-        
-        check_gl_error();
+            entities[i - numDestroyed] = entity;
     }
-
-    commands.resize(commands.size() - numDestroyed);
+    entities.resize(entities.size() - numDestroyed);
 }
 
 Program*
