@@ -34,6 +34,7 @@ bool is_object(caValue* value);
 CircaObject* as_object(caValue* value);
 void* object_get_body(caValue* value);
 
+void object_initialize(Type* type, caValue* value);
 void setup_object_type(Type* type, int objectSize, caObjectReleaseFunc releaseFunc);
 
 } // namespace circa

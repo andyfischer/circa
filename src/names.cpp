@@ -531,6 +531,8 @@ void set_name(caValue* tv, Name val)
 
 Name existing_name_from_string(const char* str)
 {
+    INCREMENT_STAT(InternedNameLookup);
+
     std::map<std::string,Name>::const_iterator it;
     it = g_stringToSymbol.find(str);
     if (it != g_stringToSymbol.end())
@@ -552,6 +554,8 @@ Name name_from_string(const char* str)
         return existing;
 
     // Not yet registered; add it to the list.
+    INCREMENT_STAT(InternedNameCreate);
+
     Name index = g_nextFreeNameIndex++;
     g_runtimeNames[index].str = strdup(str);
     g_runtimeNames[index].namespaceFirst = 0;

@@ -718,6 +718,31 @@ void Map__get(caStack* stack)
     copy(value, circa_output(stack, 0));
 }
 
+void Mutable__get(caStack* stack)
+{
+    caValue* val = (caValue*) circa_object_input(stack, 0);
+    copy(val, circa_output(stack, 0));
+}
+
+void Mutable__set(caStack* stack)
+{
+    caValue* val = (caValue*) circa_object_input(stack, 0);
+    copy(circa_input(stack, 1), val);
+}
+
+void MutableInitialize(Type* type, caValue* value)
+{
+    object_initialize(type, value);
+    caValue* val = (caValue*) object_get_body(value);
+    initialize_null(val);
+}
+
+void MutableRelease(void* object)
+{
+    caValue* val = (caValue*) object;
+    set_null(val);
+}
+
 void String__char_at(caStack* stack)
 {
     const char* str = circa_string_input(stack, 0);
@@ -1228,6 +1253,9 @@ void bootstrap_kernel()
         {"Map.get", Map__get},
         {"Map.set", Map__set},
 
+        {"Mutable.get", Mutable__get},
+        {"Mutable.set", Mutable__set},
+
         {"String.char_at", String__char_at},
         {"String.ends_with", String__ends_with},
         {"String.length", String__length},
@@ -1268,6 +1296,10 @@ void bootstrap_kernel()
     TYPES.dynamicInputs = as_type(kernel->get("DynamicInputs"));
     TYPES.dynamicOutputs = as_type(kernel->get("DynamicOutputs"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
+
+    Type* mutableType = as_type(kernel->get("Mutable"));
+    circa_setup_object_type(mutableType, sizeof(Value), MutableRelease);
+    mutableType->initialize = MutableInitialize;
 
     color_t::setup_type(TYPES.color);
 

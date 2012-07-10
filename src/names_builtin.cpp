@@ -141,6 +141,8 @@ const char* builtin_name_to_string(int name)
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";
     case stat_TermPropAccess: return "stat_TermPropAccess";
+    case stat_InternedNameLookup: return "stat_InternedNameLookup";
+    case stat_InternedNameCreate: return "stat_InternedNameCreate";
     case stat_Copy_PushedInputNewFrame: return "stat_Copy_PushedInputNewFrame";
     case stat_Copy_PushedInputMultiNewFrame: return "stat_Copy_PushedInputMultiNewFrame";
     case stat_Copy_PushFrameWithInputs: return "stat_Copy_PushFrameWithInputs";

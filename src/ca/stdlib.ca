@@ -45,6 +45,10 @@ def actor_run_message(Actor actor, any msg)
     b = actor.branch
     call(b, msg)
 
+type Mutable;
+def Mutable.set(self, any val)
+def Mutable.get(self) -> any
+
 namespace cppbuild
     def build_module(String baseFilename)
 

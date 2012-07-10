@@ -147,6 +147,9 @@ stat_TermsCreated
 stat_TermPropAdded
 stat_TermPropAccess
 
+stat_InternedNameLookup
+stat_InternedNameCreate
+
 # Copying
 stat_Copy_PushedInputNewFrame
 stat_Copy_PushedInputMultiNewFrame
