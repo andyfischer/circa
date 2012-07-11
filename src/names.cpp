@@ -602,7 +602,7 @@ void name_dealloc_global_data()
 
 extern "C" caName circa_to_name(const char* str)
 {
-    return circa::existing_name_from_string(str);
+    return circa::name_from_string(str);
 }
 extern "C" const char* circa_name_to_string(caName name)
 {

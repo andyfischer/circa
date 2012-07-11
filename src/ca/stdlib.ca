@@ -426,6 +426,9 @@ def Rect.bottomleft(self) -> Point
 def Rect.bottomright(self) -> Point
     -- Returns the bottom-right coordinates as a Point.
     [self.x2 self.y2]
+def Rect.center(self) -> Point
+    -- Returns the rectangle's center as a Point
+    [(self.x1 + self.x2) / 2, (self.y1 + self.y2) / 2]
 
 def Rect.intersects(self, Rect b) -> bool
     -- Return whether the two rectangles intersect.
