@@ -6,10 +6,8 @@
 #include "circa/objects.h"
 
 #include "FontBitmap.h"
-#include "RenderCommand.h"
 #include "RenderTarget.h"
 #include "TextTexture.h"
-#include "TextVbo.h"
 
 #include "CircaBindings.h"
 

@@ -9,7 +9,6 @@
 #include <QTime>
 
 #include "engine/RenderTarget.h"
-#include "engine/TextSprite.h"
 
 class GLWidget : public QGLWidget
 {
