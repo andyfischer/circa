@@ -13,9 +13,9 @@ TextSprite::create(RenderTarget* target)
     TextSprite* obj = new TextSprite();
 
     obj->textTexture = TextTexture::create(target);
-    obj->textVbo = TextVbo::create(target);
+    // obj->textVbo = TextVbo::create(target);
     
-    obj->textVbo->textTexture = obj->textTexture;
+    // obj->textVbo->textTexture = obj->textTexture;
 
     obj->_font = 0;
     return obj;
@@ -25,7 +25,7 @@ void
 TextSprite::destroy()
 {
     textTexture->destroy();
-    textVbo->destroy();
+    // textVbo->destroy();
     textTexture = NULL;
     textVbo = NULL;
 }
@@ -55,12 +55,12 @@ TextSprite::setText(const char* text)
 void
 TextSprite::setPosition(int x, int y)
 {
-    textVbo->setPosition(x, y);
+    // textVbo->setPosition(x, y);
 }
 void
 TextSprite::setColor(Color color)
 {
-    textVbo->color = color;
+    // textVbo->color = color;
 }
 FontBitmap*
 TextSprite::getMetrics()

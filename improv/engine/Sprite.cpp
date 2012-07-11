@@ -100,6 +100,7 @@ void Sprite::setSize(float w, float h)
 
 void Sprite::render(RenderTarget* target)
 {
+#if 0
     if (texture == NULL || !texture->hasTexture)
         return;
     
@@ -143,4 +144,5 @@ void Sprite::render(RenderTarget* target)
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     check_gl_error();
+#endif
 }

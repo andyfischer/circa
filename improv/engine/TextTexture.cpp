@@ -37,10 +37,15 @@ TextTexture::setText(caValue* text)
     needsRasterize = true;
 }
 
-void
-TextTexture::getSize(caValue* point)
+float
+TextTexture::width()
 {
-    circa_set_vec2(point, metrics.textWidth, metrics.ascent + metrics.descent);
+    return metrics.textWidth;
+}
+float
+TextTexture::height()
+{
+    return metrics.ascent + metrics.descent;
 }
 
 void

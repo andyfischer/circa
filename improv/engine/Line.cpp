@@ -48,6 +48,7 @@ Line::setPosition(float x1, float y1, float x2, float y2)
 void
 Line::render(RenderTarget* target)
 {
+#if 0
     if (!hasPosition)
         return;
     
@@ -70,4 +71,5 @@ Line::render(RenderTarget* target)
     
     // Cleaup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
 }

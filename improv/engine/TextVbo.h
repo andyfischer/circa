@@ -7,27 +7,17 @@
 #pragma once
 
 #include "Common.h"
-#include "RenderCommand.h"
 #include "TextTexture.h"
 
-struct TextVbo : RenderCommand
+struct Program;
+
+struct TextVbo
 {
-    TextTexture* textTexture;
-    int textContainerVersionUsed;
-    
     GLuint vbo;
-    bool vboNeedsUpdate;
-    
-    float posX;
-    float posY;
-    
-    Color color;
 
-    void setPosition(float x, float y);
-    void updateVbo();
+    void update(TextTexture* texture, float posX, float posY);
+    void render(Program* currentProgram, Color color);
 
-    static TextVbo* create(RenderTarget* target);
-    virtual void destroy();
-    virtual bool destroyed();
-    virtual void render(RenderTarget* renderList);
+    TextVbo();
+    ~TextVbo();
 };

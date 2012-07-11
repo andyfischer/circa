@@ -22,11 +22,6 @@ GLWidget::GLWidget(QWidget *parent)
     timer->start(16);
 
     elapsedTime.start();
-
-#ifdef _MSC_VER
-    // Fixes a font corruption issue on Windows
-    QGL::setPreferredPaintEngine( QPaintEngine::OpenGL );
-#endif
 }
 
 void GLWidget::animate()
@@ -47,6 +42,8 @@ void GLWidget::initializeGL()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    glClearColor(0.0,0.0,0.0,0.0);
+
     check_gl_error();
 
     ResourceManager resourceManager;
@@ -63,6 +60,9 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::paintGL()
 {
+    glClear(GL_COLOR_BUFFER_BIT);
+    scripts_pre_message_send();
+
     // Send a timeUpdate message
     circa::Value msg;
     circa_set_list(&msg, 2);
@@ -72,12 +72,6 @@ void GLWidget::paintGL()
     circa_actor_run_message(g_world, "Main", &msg);
 
     // Send a paintGL message
-    QPainter painter;
-    painter.begin(this);
-    painter.setRenderHint(QPainter::Antialiasing);
-
-    scripts_pre_message_send();
-
     circa_set_list(&msg, 2);
 
     circa_set_string(circa_index(&msg, 0), "paintGL");
@@ -88,8 +82,6 @@ void GLWidget::paintGL()
 
     scripts_post_message_send();
 
-    painter.end();
-    
     // Execute GL commands
     renderTarget.render();
 }

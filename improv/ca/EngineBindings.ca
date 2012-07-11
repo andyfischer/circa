@@ -35,9 +35,9 @@ def Painter.setFont(@self, Font font)
 def Painter.text(self, Point position, String text, Color color, List args) -> Rect
     font = self.currentFont
     textRender = self.target.getTextRender([text font])
-    self.target.sendCommand([:textSprite textRender.object position color])
-    rect = [position.x position.y textRender.size.x textRender.size.y]
+    self.target.sendCommand([:textSprite textRender.object position color args])
+    rect = [position.x, position.y, position.x + textRender.size.x, position.y + textRender.size.y]
     return rect
 
 def Painter.fillRect(self, Rect r, Color c)
-    self.target.sendCommand([:rect r color])
+    self.target.sendCommand([:rect r c])

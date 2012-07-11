@@ -33,7 +33,8 @@ def Button.draw(b, Painter p)
     p.fillRect(b.rect, button_color)
 
     p.setFont(font('assets/jackinput.TTF', 16))
-    p.text(b.rect.topleft, b.label, #fff, [:AlignHCenter :AlignVCenter])
+    p.text(b.rect.center, b.label, #fff, [:AlignHCenter :AlignVCenter])
+
 
 def Button.input(@b, InputEvent e) -> any
     if e.is_mouse

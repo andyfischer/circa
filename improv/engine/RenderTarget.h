@@ -40,7 +40,9 @@ struct RenderTarget
     // may be referenced by RenderCommands). These objects are owned by RenderTarget.
     std::vector<RenderEntity*> entities;
     
-    Program program;
+    Program textProgram;
+    Program geomProgram;
+    Program* currentProgram;
     
     int viewportWidth, viewportHeight;
     glm::mat4 modelViewProjectionMatrix;
@@ -57,13 +59,14 @@ struct RenderTarget
     caValue* getTextRender(caValue* args);
 
     void setViewportSize(int w, int h);
+    void switchProgram(Program* program);
     void render();
     void flushDestroyedEntities();
 
-    Program* currentProgram();
-
     caName name_textSprite;
     caName name_rect;
+    caName name_AlignHCenter;
+    caName name_AlignVCenter;
 };
 
 void check_gl_error();
