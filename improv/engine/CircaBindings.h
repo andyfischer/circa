@@ -9,5 +9,5 @@ struct FontRef
     int font_id;
 };
 
-
 Color unpack_color(caValue* value);
+caName get_tag(caValue* value);

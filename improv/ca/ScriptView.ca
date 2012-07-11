@@ -46,14 +46,13 @@ def Interpreter.drawRuntimeError(int, Painter painter)
     width = painter.viewport.width - left
     error_y = 50
     size = [width, 100]
-    painter.setColor(#fff)
-    painter.drawText(to_rect([left error_y] size) [] concat(msg))
+    painter.text([left error_y] concat(msg) #fff [])
 
     -- Draw the stack
     y = error_y + 20
     for Frame frame in int.frames
         loc = frame.pc_term
-        painter.drawText(to_rect([left y] [width y+100]) [] loc.location_string)
+        painter.text([left y] loc.location_string #fff [])
 
         y += 20
 
@@ -65,8 +64,7 @@ def draw_stat_view(Painter painter)
     y = 10
     for List stat in stats
         str = concat(stat[0] ': ' stat[1])
-        painter.setColor(#000)
-        painter.drawText(to_rect([10 y] [500 y+100]) [] str)
+        painter.text([10 y] str #fff [])
         y += 17
         
 
@@ -119,12 +117,11 @@ if msg[0] == 'onPaintEvent'
 
     if showFps
         fpsTracker.onFrame(time)
-        painter.setColor(#fff)
         bounds = painter.viewport
-        painter.drawText([bounds.x2 - 150, bounds.y2 - 20, bounds.x2 bounds.y2]
-            [] concat('FPS:' fpsTracker.recentFps))
-        painter.drawText([bounds.x2 - 150, bounds.y2 - 40, bounds.x2 bounds.y2]
-            [] concat('PerFrame:' fpsTracker.recentDelay))
+        painter.text([bounds.x2 - 150, bounds.y2 - 20]
+            concat('FPS:' fpsTracker.recentFps) [] #fff)
+        painter.text([bounds.x2 - 150, bounds.y2 - 40]
+            concat('PerFrame:' fpsTracker.recentDelay) [] #fff)
 
 
 elif msg[0] == 'onInputEvent'

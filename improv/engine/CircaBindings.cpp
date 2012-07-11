@@ -18,6 +18,16 @@ Color unpack_color(caValue* value)
     return c;
 }
 
+caName get_tag(caValue* value)
+{
+    if (circa_is_name(value))
+        return circa_name(value);
+    else if (circa_is_list(value))
+        return get_tag(circa_index(value, 0));
+    else
+        return 0;
+}
+
 void RenderTarget__getTextRender(caStack* stack)
 {
     RenderTarget* target = (RenderTarget*) circa_get_pointer(circa_input(stack, 0));

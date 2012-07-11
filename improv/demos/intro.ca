@@ -5,9 +5,9 @@ bounds = env.bounds
 
 env.background(#756a95)
 
-state bigNumberFont = create_font("Arial", 100)
-state infoFont = create_font("Arial", 20)
-state smallInfoFont = create_font("Arial", 16)
+state bigNumberFont = create_font("assets/MODENINE.TTF", 100)
+state infoFont = create_font("assets/MODENINE.TTF", 20)
+state smallInfoFont = create_font("assets/MODENINE.TTF", 16)
 
 def bignumber(Point loc, number opacity, String text)
     color = #ffb152

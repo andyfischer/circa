@@ -117,7 +117,7 @@ RenderTarget::render()
 
             // Handle extra arguments
             for (int i=0; i < circa_count(args); i++) {
-                caName tag = circa_name(circa_index(args, i));
+                caName tag = get_tag(circa_index(args, i));
                 if (tag == name_AlignHCenter) {
                     posX -= texture->width() / 2;
                 } else if (tag == name_AlignVCenter) {
