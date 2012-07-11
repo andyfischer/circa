@@ -55,5 +55,5 @@ solution "Improv"
             targetname "improv_d"
 
         configuration "Release"
-            links { "circa_d" }
+            links { "circa" }
             targetname "improv"

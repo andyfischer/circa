@@ -31,7 +31,7 @@ GLWidget::GLWidget(QWidget *parent)
 
 void GLWidget::animate()
 {
-    repaint();
+    updateGL();
 }
 
 void GLWidget::initializeGL()
@@ -63,8 +63,6 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::paintGL()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
-
     // Send a timeUpdate message
     circa::Value msg;
     circa_set_list(&msg, 2);
@@ -122,12 +120,6 @@ void GLWidget::mousePressEvent ( QMouseEvent * qevent )
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
-
-    circa::Value value;
-    static int count = 0;
-    char buf[30];
-    sprintf(buf, "%d", count);
-    count++;
 }
 void GLWidget::mouseReleaseEvent ( QMouseEvent * qevent )
 {

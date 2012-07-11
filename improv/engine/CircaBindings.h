@@ -4,4 +4,10 @@
 
 #include "Common.h"
 
+struct FontRef
+{
+    int font_id;
+};
+
+
 Color unpack_color(caValue* value);

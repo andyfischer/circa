@@ -45,7 +45,8 @@ RenderTarget::getTextRender(caValue* args)
         TextTexture* texture = TextTexture::create(this);
 
         texture->setText(circa_index(args, 0));
-        texture->setFont(1); // FIXME
+        FontRef* font = (FontRef*) circa_object(circa_index(args, 1));
+        texture->setFont(font->font_id);
         texture->update();
 
         circa_set_list(value, 2);

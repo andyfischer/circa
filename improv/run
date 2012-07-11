@@ -1,2 +1,2 @@
-
-improv.app/Contents/MacOS/improv $*
+rm -rf build/improv.app
+make config=release && build/improv.app/Contents/MacOS/improv $*

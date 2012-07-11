@@ -2,6 +2,7 @@
 msg = input() -> List
 
 import UIHelper
+import FPSTracker
 
 msg_name = msg[0]
 
@@ -13,6 +14,9 @@ state ButtonBar scriptChoices = button_bar([
         ["Skeletal anim", "demos/skeletal.ca"]
         ["Code Browser", "demos/CodeBrowser.ca"]
         ])
+
+state fpsTracker = create(FPSTracker)
+state number time
 
 scriptChoices.arrange([30 80 200 370], :vertical)
 
@@ -31,9 +35,14 @@ if msg_name == 'onPaintEvent'
     
     scriptChoices.draw(painter)
 
+    fpsTracker.onFrame(time)
+    print(fpsTracker.recentFps)
+
 elif msg_name == 'onInputEvent'
     event = msg[1] -> InputEvent
     choice = scriptChoices@.input(event)
     if is_string(choice)
         send('ScriptView' ['loadFile' choice])
         send('Main' ['changeScreen' 'ScriptView'])
+elif msg[0] == 'timeUpdate'
+    time = msg[1] -> number

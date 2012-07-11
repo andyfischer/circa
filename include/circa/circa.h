@@ -312,6 +312,7 @@ float       circa_float(caValue* value);
 caFunction* circa_function(caValue* value);
 int         circa_int(caValue* value);
 caName      circa_name(caValue* value);
+void*       circa_object(caValue* value);
 const char* circa_string(caValue* value);
 caType*     circa_type(caValue* value);
 void        circa_vec2(caValue* vec2, float* xOut, float* yOut);

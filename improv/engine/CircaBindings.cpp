@@ -11,10 +11,7 @@
 #include "TextTexture.h"
 #include "TextVbo.h"
 
-struct FontRef
-{
-    int font_id;
-};
+#include "CircaBindings.h"
 
 Color unpack_color(caValue* value)
 {
