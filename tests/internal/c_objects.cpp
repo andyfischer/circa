@@ -88,6 +88,7 @@ void test_custom_object()
     test_equals(g_totalAllocated, 1);
 }
 
+
 void test_type_not_prematurely_used()
 {
     // Verify that a circa-defined type is not used until interpreter time. Modifying

@@ -117,11 +117,12 @@ if msg[0] == 'onPaintEvent'
 
     if showFps
         fpsTracker.onFrame(time)
-        bounds = painter.viewport
+        bounds = painter.viewport -> Rect
+        print(bounds)
         painter.text([bounds.x2 - 150, bounds.y2 - 20]
-            concat('FPS:' fpsTracker.recentFps) [] #fff)
+            concat('FPS:' fpsTracker.recentFps) #fff [])
         painter.text([bounds.x2 - 150, bounds.y2 - 40]
-            concat('PerFrame:' fpsTracker.recentDelay) [] #fff)
+            concat('PerFrame:' fpsTracker.recentDelay) #fff [])
 
 
 elif msg[0] == 'onInputEvent'
@@ -156,7 +157,7 @@ elif msg[0] == 'onInputEvent'
     elif action == :dump
         userBranch.dump
     elif action == :exit
-        send('View' ['changeScreen' 'IntroScreen'])
+        send('Main' ['changeScreen' 'IntroScreen'])
     elif action == :browse
         -- noop for now
     elif action == :consumed

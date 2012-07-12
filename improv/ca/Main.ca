@@ -13,6 +13,8 @@ if msg_name == 'changeScreen'
 elif msg_name == 'paintGL'
     painter = create(Painter)
     painter.target = msg[1]
+    viewportSize = painter.target.getViewportSize
+    painter.viewport = [0 0 viewportSize.x viewportSize.y]
 
     send(currentScreen ['onPaintEvent' painter])
 else

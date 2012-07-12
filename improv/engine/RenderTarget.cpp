@@ -15,6 +15,8 @@ void TextVbo_Update(GLuint vbo, TextTexture* texture, float posX, float posY);
 void TextVbo_Render(GLuint vbo, Program* program, TextTexture* texture, Color color);
 void Rect_Update(GLuint vbo, float x1, float y1, float x2, float y2);
 void Rect_Render(GLuint vbo, Program* program, Color color);
+void Lines_Update(GLuint vbo, caValue* points);
+void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color);
 
 RenderTarget::RenderTarget()
   : viewportWidth(0),
@@ -25,6 +27,7 @@ RenderTarget::RenderTarget()
 
     name_rect = circa_to_name("rect");
     name_textSprite = circa_to_name("textSprite");
+    name_lines = circa_to_name("lines");
     name_AlignHCenter = circa_to_name("AlignHCenter");
     name_AlignVCenter = circa_to_name("AlignVCenter");
 }
@@ -43,17 +46,20 @@ RenderTarget::sendCommand(caValue* command)
 }
 
 caValue*
-RenderTarget::getTextRender(caValue* args)
+RenderTarget::getTextRender(caValue* key)
 {
-    caValue* value = circa_map_insert(&textRenderCache, args);
+    caValue* value = circa_map_insert(&textRenderCache, key);
 
     if (circa_is_null(value)) {
+        printf("Re-rendering text with key: ");
+        key->dump();
+        
         // Value doesn't exist in cache.
         TextTexture* texture = TextTexture::create(this);
 
-        texture->setText(circa_index(args, 0));
-        FontRef* font = (FontRef*) circa_object(circa_index(args, 1));
-        texture->setFont(font->font_id);
+        texture->setText(circa_index(key, 0));
+        int font_id = circa_int(circa_index(key, 1));
+        texture->setFont(font_id);
         texture->update();
 
         circa_set_list(value, 2);
@@ -140,6 +146,18 @@ RenderTarget::render()
 
             Rect_Update(vbo, x1, y1, x2, y2);
             Rect_Render(vbo, currentProgram, unpack_color(color));
+            glDeleteBuffers(1, &vbo);
+        } else if (commandName == name_lines) {
+            // Draw a list of lines.
+            switchProgram(&geomProgram);
+            GLuint vbo;
+            caValue* points = circa_index(command, 1);
+            caValue* color = circa_index(command, 2);
+            int count = circa_count(points);
+
+            Lines_Update(vbo, points);
+            Lines_Render(vbo, currentProgram, count, unpack_color(color));
+
             glDeleteBuffers(1, &vbo);
 
         } else {
@@ -236,6 +254,7 @@ void TextVbo_Render(GLuint vbo, Program* program, TextTexture* textTexture, Colo
 {
     check_gl_error();
     const int floatsPerVertex = 5;
+    const int vertexCount = 4;
     
     GLuint attribVertex = program->attributes.vertex;
     GLuint attribTexCoord = program->attributes.tex_coord;
@@ -244,11 +263,13 @@ void TextVbo_Render(GLuint vbo, Program* program, TextTexture* textTexture, Colo
     check_gl_error();
 
     glEnableVertexAttribArray(attribVertex);
-    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, floatsPerVertex*4, BUFFER_OFFSET(0));
+    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE,
+            floatsPerVertex*vertexCount, BUFFER_OFFSET(0));
     check_gl_error();
     
     glEnableVertexAttribArray(attribTexCoord);
-    glVertexAttribPointer(attribTexCoord, 2, GL_FLOAT, GL_FALSE, floatsPerVertex*4, BUFFER_OFFSET(12));
+    glVertexAttribPointer(attribTexCoord, 2, GL_FLOAT, GL_FALSE,
+            floatsPerVertex*vertexCount, BUFFER_OFFSET(12));
     check_gl_error();
     
     glActiveTexture(GL_TEXTURE0);
@@ -259,7 +280,7 @@ void TextVbo_Render(GLuint vbo, Program* program, TextTexture* textTexture, Colo
     glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
     check_gl_error();
     
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
 
     // cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -285,18 +306,60 @@ void Rect_Update(GLuint vbo, float x1, float y1, float x2, float y2)
 void Rect_Render(GLuint vbo, Program* program, Color color)
 {
     const int floatsPerVertex = 5;
+    const int vertexCount = 4;
 
     GLuint attribVertex = program->attributes.vertex;
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     glEnableVertexAttribArray(attribVertex);
-    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, floatsPerVertex*4, BUFFER_OFFSET(0));
+    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE,
+            floatsPerVertex*vertexCount, BUFFER_OFFSET(0));
     check_gl_error();
     
     glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, vertexCount);
+
+    // cleanup
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Lines_Update(GLuint vbo, caValue* points)
+{
+    int count = circa_count(points);
+    const int floatsPerVertex = 3;
+
+    int verticesSize = sizeof(GLfloat) * floatsPerVertex * count;
+    GLfloat* vertices = (GLfloat*) malloc(verticesSize);
+
+    for (int i=0; i < count; i++) {
+        float x,y;
+        circa_vec2(circa_index(points, i), &x, &y);
+        vertices[i*3 + 0] = x;
+        vertices[i*3 + 1] = y;
+        vertices[i*3 + 2] = 0.0;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    free(vertices);
+}
+void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color)
+{
+    const int floatsPerVertex = 3;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    GLuint attribVertex = program->attributes.vertex;
+    glEnableVertexAttribArray(attribVertex);
+    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE,
+            0, BUFFER_OFFSET(0));
+    check_gl_error();
+    
+    glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
+
+    glDrawArrays(GL_LINES, 0, vertexCount);
 
     // cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);

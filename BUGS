@@ -1,7 +1,7 @@
 
 Top 5 worst issues
-  - Type inference fails when using add_s or add_v
-  - Bad performance in for-loop
+  - Static error reporting is missing (such as misspelled/nonexistant variable names)
+  - If a native function outputs wrong error type, the error message is confusing
   - Improv sometimes fails to reload
 
 Recent

@@ -41,3 +41,15 @@ def Painter.text(self, Point position, String text, Color color, List args) -> R
 
 def Painter.fillRect(self, Rect r, Color c)
     self.target.sendCommand([:rect r c])
+
+def Painter.drawLines(self, List points, Color c)
+    self.target.sendCommand([:lines points c])
+
+def Painter.lineLoop(self, List points, Color c)
+    line_points = []
+    for i in 0..(points.length-1)
+        line_points.append(points[i])
+        line_points.append(points[i+1])
+    line_points.append(points.last)
+    line_points.append(points.first)
+    self.target.sendCommand([:lines line_points c])

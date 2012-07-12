@@ -234,6 +234,9 @@ def List.get(self, index) -> any
 def List.empty(self) -> bool
     -- Returns whether the list is empty.
     self.length == 0
+def List.first(self) -> any
+    -- Returns the first element
+    self.get(0)
 def List.last(self) -> any
     -- Returns the last element
     self.get(self.length - 1)

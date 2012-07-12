@@ -93,13 +93,12 @@ def draw_ship(Point loc, number facing)
             drift = srand() * env.elapsed * 30
             side = [a+drift b+drift]
 
-
-    line_points = []
+    lines = []
     for side in sides
-        line_points.append(side[0])
-        line_points.append(side[1])
+        lines.append(side[0])
+        lines.append(side[1])
 
-    env.draw_lines(line_points #fff)
+    env.draw_lines(lines #fff)
 
     if draw_intersection_circles
         env.draw_circle(loc, ship_radius, #f00)
@@ -220,13 +219,15 @@ for Asteroid asteroid in @asteroids
     asteroid.location = wrap_around(asteroid.location)
     asteroid.age += time_delta
 
+
 -- draw asteroids
 for Asteroid asteroid in asteroids
-    edges = for Point p in asteroid.edges
+    points = for Point p in asteroid.edges
         rotate_point(@p, asteroid.rotation)
         add(@p, asteroid.location)
+        p
 
-    env.draw_line_loop(edges, #fff)
+    env.painter.lineLoop(points, #fff)
 
 -- Check for collisions of asteroids and bullets
 spawned = []

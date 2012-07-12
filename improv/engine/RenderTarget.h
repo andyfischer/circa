@@ -56,7 +56,7 @@ struct RenderTarget
     void appendEntity(RenderEntity* entity);
     void sendCommand(caValue* command);
 
-    caValue* getTextRender(caValue* args);
+    caValue* getTextRender(caValue* key);
 
     void setViewportSize(int w, int h);
     void switchProgram(Program* program);
@@ -65,6 +65,7 @@ struct RenderTarget
 
     caName name_textSprite;
     caName name_rect;
+    caName name_lines;
     caName name_AlignHCenter;
     caName name_AlignVCenter;
 };
