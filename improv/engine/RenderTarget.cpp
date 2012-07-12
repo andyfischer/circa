@@ -9,7 +9,11 @@
 #include "TextTexture.h"
 #include "ShaderUtils.h"
 
+#ifdef DEBUG
 const bool CHECK_GL_ERROR = true;
+#else
+const bool CHECK_GL_ERROR = false;
+#endif
 
 void TextVbo_Update(GLuint vbo, TextTexture* texture, float posX, float posY);
 void TextVbo_Render(GLuint vbo, Program* program, TextTexture* texture, Color color);
@@ -37,6 +41,9 @@ RenderTarget::setup(ResourceManager* resourceManager)
 {
     load_shaders(resourceManager, "assets/shaders/Text", &textProgram);
     load_shaders(resourceManager, "assets/shaders/Geom", &geomProgram);
+
+    glGenBuffers(1, &textVbo);
+    glGenBuffers(1, &geomVbo);
 }
 
 void
@@ -111,7 +118,6 @@ RenderTarget::render()
             // Draw a text label
             switchProgram(&textProgram);
 
-            GLuint vbo;
             TextTexture* texture = (TextTexture*) circa_get_pointer(circa_index(command, 1));
 
             caValue* position = circa_index(command, 2);
@@ -131,34 +137,28 @@ RenderTarget::render()
                 }
             }
 
-            TextVbo_Update(vbo, texture, posX, posY);
-            TextVbo_Render(vbo, currentProgram, texture, unpack_color(color));
-            glDeleteBuffers(1, &vbo);
+            TextVbo_Update(textVbo, texture, posX, posY);
+            TextVbo_Render(textVbo, currentProgram, texture, unpack_color(color));
 
         } else if (commandName == name_rect) {
             // Draw a solid rectangle
             switchProgram(&geomProgram);
-            GLuint vbo;
             caValue* pos = circa_index(command, 1);
             caValue* color = circa_index(command, 2);
             float x1, y1, x2, y2;
             circa_vec4(pos, &x1, &y1, &x2, &y2);
 
-            Rect_Update(vbo, x1, y1, x2, y2);
-            Rect_Render(vbo, currentProgram, unpack_color(color));
-            glDeleteBuffers(1, &vbo);
+            Rect_Update(geomVbo, x1, y1, x2, y2);
+            Rect_Render(geomVbo, currentProgram, unpack_color(color));
         } else if (commandName == name_lines) {
             // Draw a list of lines.
             switchProgram(&geomProgram);
-            GLuint vbo;
             caValue* points = circa_index(command, 1);
             caValue* color = circa_index(command, 2);
             int count = circa_count(points);
 
-            Lines_Update(vbo, points);
-            Lines_Render(vbo, currentProgram, count, unpack_color(color));
-
-            glDeleteBuffers(1, &vbo);
+            Lines_Update(geomVbo, points);
+            Lines_Render(geomVbo, currentProgram, count, unpack_color(color));
 
         } else {
             printf("unrecognized command name: %s\n", circa_name_to_string(commandName));

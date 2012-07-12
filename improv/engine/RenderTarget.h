@@ -51,6 +51,10 @@ struct RenderTarget
     circa::Value textRenderCache;
     circa::Value incomingCommands;
 
+    // Current gpu state
+    GLuint textVbo;
+    GLuint geomVbo;
+
     RenderTarget();
     void setup(ResourceManager* resourceManager);
     void appendEntity(RenderEntity* entity);

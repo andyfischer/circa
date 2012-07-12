@@ -50,6 +50,8 @@ void GLWidget::initializeGL()
 
     renderTarget.setup(&resourceManager);
 
+    
+
     check_gl_error();
 }
 

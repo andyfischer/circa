@@ -71,6 +71,8 @@ def draw_stat_view(Painter painter)
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter
 
+    painter.setFont(font("assets/AlteHaasGroteskBold.ttf", 18))
+
     -- Run the user's script to paint
 
     -- Check if we should run the branch this frame
@@ -118,7 +120,6 @@ if msg[0] == 'onPaintEvent'
     if showFps
         fpsTracker.onFrame(time)
         bounds = painter.viewport -> Rect
-        print(bounds)
         painter.text([bounds.x2 - 150, bounds.y2 - 20]
             concat('FPS:' fpsTracker.recentFps) #fff [])
         painter.text([bounds.x2 - 150, bounds.y2 - 40]
