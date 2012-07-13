@@ -87,7 +87,7 @@ def Avatar.draw(self, Painter painter)
         for point in @points
             mult(@point self.scale)
             add(@point self.loc)
-        painter.drawPolygon(points poly.color)
+        painter.polygon(points poly.color)
 
 env.background(#000)
 guy = create(Avatar)

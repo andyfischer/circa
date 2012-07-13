@@ -71,7 +71,7 @@ def draw_stat_view(Painter painter)
 if msg[0] == 'onPaintEvent'
     painter = msg[1] -> Painter
 
-    painter.setFont(font("assets/AlteHaasGroteskBold.ttf", 18))
+    painter.setFont(font("assets/MgOpenModernaRegular.ttf", 18))
 
     -- Run the user's script to paint
 

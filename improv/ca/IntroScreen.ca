@@ -25,12 +25,12 @@ if msg_name == 'onPaintEvent'
 
     painter.fillRect(painter.viewport + [0 0 1 1], #756A95)
 
-    painter.setFont(font("assets/AlteHaasGroteskBold.ttf", 30))
+    painter.setFont(font("assets/MgOpenModernaRegular.ttf", 30))
 
     right = 10
     for phrase in [[#C9E8E8 "improv"] [#E1BC66 "alpha"] [#ED7D7D "4"]]
         color = phrase[0]
-        rect = painter.text([right 30] phrase[1] color [])
+        rect = painter.text([right 50] phrase[1] color [])
         right = rect.x2 + 5
     
     scriptChoices.draw(painter)

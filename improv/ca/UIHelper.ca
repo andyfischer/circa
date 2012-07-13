@@ -21,8 +21,7 @@ def button(String label, Rect rect) -> Button
     b
 
 def Button.draw(b, Painter p)
-    --button_color = #afa0d9
-    button_color = #000
+    button_color = #afa0d9
 
     if b.press
         darken(@button_color, .1)
@@ -33,8 +32,8 @@ def Button.draw(b, Painter p)
 
     p.fillRect(b.rect, button_color)
 
-    p.setFont(font("assets/AlteHaasGroteskBold.ttf", 18))
-    p.text(b.rect.center, b.label, #fff, [:AlignHCenter :AlignVCenter])
+    p.setFont(p.mediumSans)
+    p.text(b.rect.center + [0 3], b.label, #fff, [:AlignHCenter :AlignVCenter])
 
 
 def Button.input(@b, InputEvent e) -> any

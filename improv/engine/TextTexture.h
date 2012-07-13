@@ -13,7 +13,7 @@ struct TextTexture : RenderEntity
 {
     GLuint texid;
 
-    int font;
+    FontFace* font;
     circa::Value text;
     bool needsRasterize;
     int version;
@@ -21,7 +21,7 @@ struct TextTexture : RenderEntity
 
     static TextTexture* create(RenderTarget* renderList);
 
-    void setFont(int font);
+    void setFont(FontFace* font);
     void setText(caValue* text);
 
     float width();

@@ -19,7 +19,7 @@ TextTexture::create(RenderTarget* renderList)
     return obj;
 }
 void
-TextTexture::setFont(int font)
+TextTexture::setFont(FontFace* font)
 {
     if (this->font == font)
         return;

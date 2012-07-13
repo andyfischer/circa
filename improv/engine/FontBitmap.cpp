@@ -16,13 +16,13 @@ FT_Library g_library = NULL;
 // Font table
 const int MAX_FONTS = 200;
 
-typedef struct Font
+struct FontFace
 {
     FT_Face face;
-} Font;
+};
 
 int g_nextFontId = 1; // Deliberately skip font id 0
-Font g_fontTable[MAX_FONTS];
+FontFace g_fontTable[MAX_FONTS];
 
 struct FontCacheKey
 {
@@ -38,20 +38,15 @@ struct FontCacheKey
     }
 };
 
-std::map<FontCacheKey, int> g_fontCache;
+std::map<FontCacheKey, FontFace*> g_fontCache;
 
-FT_Face get_ft_face(FontBitmap* op)
-{
-    return g_fontTable[op->face].face;
-}
-
-int font_load(const char* filename, int pixelHeight)
+FontFace* font_load(const char* filename, int pixelHeight)
 {
     FontCacheKey cacheKey;
     cacheKey.filename = filename;
     cacheKey.size = pixelHeight;
 
-    std::map<FontCacheKey, int>::const_iterator it = g_fontCache.find(cacheKey);
+    std::map<FontCacheKey, FontFace*>::const_iterator it = g_fontCache.find(cacheKey);
     if (it != g_fontCache.end())
         return it->second;
 
@@ -62,7 +57,7 @@ int font_load(const char* filename, int pixelHeight)
         error = FT_Init_FreeType( &g_library );
         if (error) {
             Log("Failed to initialize FreeType");
-            return -1;
+            return NULL;
         }
         
         memset(g_fontTable, 0, sizeof(g_fontTable));
@@ -73,32 +68,32 @@ int font_load(const char* filename, int pixelHeight)
     
     if ( error == FT_Err_Unknown_File_Format ) {
         Log("FreeType failed to load font file %s (unknown file format)", filename);
-        return -1;
+        return NULL;
     }
     else if ( error ) {
         Log("FreeType failed to load font file %s", filename);
-        return -1;
+        return NULL;
     }
     
     int fontId = g_nextFontId++;
-    Font* fontEntry = &g_fontTable[fontId];
-    fontEntry->face = face;
+    FontFace* fontFace = &g_fontTable[fontId];
+    fontFace->face = face;
     
     FT_Set_Pixel_Sizes(face, 0, pixelHeight);
 
     printf("Loaded font from file %s, with id %d\n", filename, fontId);
 
-    g_fontCache[cacheKey] = fontId;
+    g_fontCache[cacheKey] = fontFace;
     
-    return fontId;
+    return fontFace;
 }
 
-int font_get_face_height(FontFace face)
+int font_get_face_height(FontFace* face)
 {
-    if (face == -1)
+    if (face == NULL)
         return 0;
     
-    FT_Face ftface = g_fontTable[face].face;
+    FT_Face ftface = face->face;
     return (ftface->ascender >> 6) + ((-ftface->descender) >> 6);
 }
 
@@ -106,7 +101,7 @@ void load_glyph(FontBitmap* op, int charIndex)
 {
     FT_UInt glyph_index;
     
-    FT_Face face = get_ft_face(op);
+    FT_Face face = op->face->face;
     
     glyph_index = FT_Get_Char_Index( face, op->str[charIndex] );
     
@@ -116,7 +111,7 @@ void load_glyph(FontBitmap* op, int charIndex)
 
 void font_update_metrics(FontBitmap* op)
 {
-    FT_Face face = get_ft_face(op);
+    FT_Face face = op->face->face;
 
     if (face == NULL) {
         Log("font_update_metrics called with NULL font");
@@ -158,12 +153,12 @@ void font_update_metrics(FontBitmap* op)
 
 bool font_render(FontBitmap* op)
 {
-    if (op->face == -1)
+    if (op->face == NULL)
         return false;
     if (op->str == NULL)
         return false;
     
-    FT_Face face = get_ft_face(op);
+    FT_Face face = op->face->face;
     FT_Error error;
 
     int bitmapSize = op->bitmapSizeX * op->bitmapSizeY;

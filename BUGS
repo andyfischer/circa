@@ -6,7 +6,7 @@ Top 5 worst issues
 
 Recent
   Type inferrence fail in extra_output from if-block
-  Runtime will die if it expects to find extra_output that isn't there (such as from dynamic_method)
+  Crash with: state font = font('assets/jackinput.ttf')
   
 Performance
   From perf checking, the #1 optimization would be to fix the interpreter stack:

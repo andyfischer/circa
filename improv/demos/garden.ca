@@ -85,7 +85,7 @@ def Segment.step(seg)
     tip_l = end_loc + polar(tip_angle - 90) * (tip_thickness/2)
     tip_r = end_loc + polar(tip_angle + 90) * (tip_thickness/2)
 
-    env.draw_poly([base_l tip_l tip_r base_r] branch_color)
+    env.painter.polygon([base_l tip_l tip_r base_r] branch_color)
 
     -- Don't grow past generation
     if seg.generation >= generation_limit

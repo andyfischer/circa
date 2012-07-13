@@ -1,4 +1,8 @@
 // From http://www.flipcode.com/archives/Efficient_Polygon_Triangulation.shtml
+//
+// Modified from the original by andyf:
+//  - Use Circa-based container instead of std::vectors
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,16 +13,19 @@
 
 static const float EPSILON=0.0000000001f;
 
-float Triangulate::Area(const Vector2dVector &contour)
+float Triangulate::Area(caValue* contour)
 {
 
-  int n = contour.size();
+  int n = circa_count(contour);
 
   float A=0.0f;
 
   for(int p=n-1,q=0; q<n; p=q++)
   {
-    A+= contour[p].GetX()*contour[q].GetY() - contour[q].GetX()*contour[p].GetY();
+      float p_x, p_y, q_x, q_y;
+      circa_vec2(circa_index(contour, p), &p_x, &p_y);
+      circa_vec2(circa_index(contour, q), &q_x, &q_y);
+      A+= p_x * q_y - q_x * p_y;
   }
   return A*0.5f;
 }
@@ -50,11 +57,16 @@ bool Triangulate::InsideTriangle(float Ax, float Ay,
   return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
 };
 
-bool Triangulate::Snip(const Vector2dVector &contour,int u,int v,int w,int n,int *V)
+bool Triangulate::Snip(caValue* contour,int u,int v,int w,int n,int *V)
 {
   int p;
   float Ax, Ay, Bx, By, Cx, Cy, Px, Py;
 
+  circa_vec2(circa_index(contour, V[u]), &Ax, &Ay);
+  circa_vec2(circa_index(contour, V[v]), &Bx, &By);
+  circa_vec2(circa_index(contour, V[w]), &Cx, &Cy);
+
+  /*
   Ax = contour[V[u]].GetX();
   Ay = contour[V[u]].GetY();
 
@@ -63,25 +75,29 @@ bool Triangulate::Snip(const Vector2dVector &contour,int u,int v,int w,int n,int
 
   Cx = contour[V[w]].GetX();
   Cy = contour[V[w]].GetY();
+  */
 
   if ( EPSILON > (((Bx-Ax)*(Cy-Ay)) - ((By-Ay)*(Cx-Ax))) ) return false;
 
   for (p=0;p<n;p++)
   {
     if( (p == u) || (p == v) || (p == w) ) continue;
+    circa_vec2(circa_index(contour, V[p]), &Px, &Py);
+    /*
     Px = contour[V[p]].GetX();
     Py = contour[V[p]].GetY();
+    */
     if (InsideTriangle(Ax,Ay,Bx,By,Cx,Cy,Px,Py)) return false;
   }
 
   return true;
 }
 
-bool Triangulate::Process(const Vector2dVector &contour,Vector2dVector &result)
+bool Triangulate::Process(caValue* contour, caValue* output)
 {
   /* allocate and initialize list of Vertices in polygon */
 
-  int n = contour.size();
+  int n = circa_count(contour);
   if ( n < 3 ) return false;
 
   int *V = new int[n];
@@ -104,6 +120,7 @@ bool Triangulate::Process(const Vector2dVector &contour,Vector2dVector &result)
     if (0 >= (count--))
     {
       //** Triangulate: ERROR - probable bad polygon!
+      delete V; // <-- added by andyf
       return false;
     }
 
@@ -120,9 +137,11 @@ bool Triangulate::Process(const Vector2dVector &contour,Vector2dVector &result)
       a = V[u]; b = V[v]; c = V[w];
 
       /* output Triangle */
-      result.push_back( contour[a] );
-      result.push_back( contour[b] );
-      result.push_back( contour[c] );
+      int outputIndex = circa_count(output);
+      circa_resize(output, circa_count(output) + 3);
+      circa_copy(circa_index(contour, a), circa_index(output, outputIndex));
+      circa_copy(circa_index(contour, b), circa_index(output, outputIndex + 1));
+      circa_copy(circa_index(contour, c), circa_index(output, outputIndex + 2));
 
       m++;
 
@@ -133,8 +152,6 @@ bool Triangulate::Process(const Vector2dVector &contour,Vector2dVector &result)
       count = 2*nv;
     }
   }
-
-
 
   delete V;
 

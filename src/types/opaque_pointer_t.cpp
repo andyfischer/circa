@@ -2,6 +2,8 @@
 
 #include "circa/internal/for_hosted_funcs.h"
 
+#include "common.h"
+
 namespace circa {
 namespace opaque_pointer_t {
 
@@ -18,6 +20,7 @@ namespace opaque_pointer_t {
             type->name = name_from_string("opaque_pointer");
         type->storageType = STORAGE_TYPE_OPAQUE_POINTER;
         type->toString = toString;
+        type->hashFunc = common_type_callbacks::shallow_hash_func;
     }
 
 } // namespace opaque_pointer_t

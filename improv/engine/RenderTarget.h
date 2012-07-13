@@ -70,6 +70,7 @@ struct RenderTarget
     caName name_textSprite;
     caName name_rect;
     caName name_lines;
+    caName name_polygon;
     caName name_AlignHCenter;
     caName name_AlignVCenter;
 };

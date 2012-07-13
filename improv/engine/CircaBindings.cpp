@@ -51,9 +51,9 @@ void create_font(caStack* stack)
 {
     const char* name = circa_string(circa_input(stack, 0));
     float size = circa_float(circa_input(stack, 1));
-    int font = font_load(name, size);
+    FontFace* font = font_load(name, size);
 
-    circa_create_default_output(stack, 0)->value_data.asint = font;
+    circa_create_default_output(stack, 0)->value_data.ptr = font;
 }
 
 static const caFunctionBinding g_imports[] = {
@@ -67,6 +67,6 @@ static const caFunctionBinding g_imports[] = {
 void engine_bindings_install(caBranch* branch)
 {
     circa_setup_pointer_type(circa_find_type(branch, "RenderTarget"));
-    circa_setup_int_type(circa_find_type(branch, "Font"));
+    circa_setup_pointer_type(circa_find_type(branch, "Font"));
     circa_install_function_list(branch, g_imports);
 }

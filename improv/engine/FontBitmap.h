@@ -2,11 +2,11 @@
 
 #pragma once
 
-typedef int FontFace;
+struct FontFace;
 
 struct FontBitmap
 {
-    FontFace face;    // Font index (input)
+    FontFace* face;    // Font index (input)
     const char* str;  // String to render (input)
 
     int bitmapSizeX;
@@ -23,8 +23,8 @@ struct FontBitmap
     char* bitmap;
 };
 
-FontFace font_load(const char* filename, int pixelHeight);
-int font_get_face_height(FontFace face);
+FontFace* font_load(const char* filename, int pixelHeight);
+int font_get_face_height(FontFace* face);
 
 // Update metric values using the input font and string.
 void font_update_metrics(FontBitmap* op);

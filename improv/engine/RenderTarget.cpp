@@ -8,6 +8,7 @@
 #include "RenderTarget.h"
 #include "TextTexture.h"
 #include "ShaderUtils.h"
+#include "triangulate.h"
 
 #ifdef DEBUG
 const bool CHECK_GL_ERROR = true;
@@ -21,6 +22,8 @@ void Rect_Update(GLuint vbo, float x1, float y1, float x2, float y2);
 void Rect_Render(GLuint vbo, Program* program, Color color);
 void Lines_Update(GLuint vbo, caValue* points);
 void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color);
+int Ngon_Update(GLuint vbo, caValue* points);
+void Triangles_Render(GLuint vbo, Program* program, int vertexCount, Color color);
 
 RenderTarget::RenderTarget()
   : viewportWidth(0),
@@ -32,6 +35,7 @@ RenderTarget::RenderTarget()
     name_rect = circa_to_name("rect");
     name_textSprite = circa_to_name("textSprite");
     name_lines = circa_to_name("lines");
+    name_polygon = circa_to_name("polygon");
     name_AlignHCenter = circa_to_name("AlignHCenter");
     name_AlignVCenter = circa_to_name("AlignVCenter");
 }
@@ -65,8 +69,7 @@ RenderTarget::getTextRender(caValue* key)
         TextTexture* texture = TextTexture::create(this);
 
         texture->setText(circa_index(key, 0));
-        int font_id = circa_int(circa_index(key, 1));
-        texture->setFont(font_id);
+        texture->setFont((FontFace*) circa_get_pointer(circa_index(key, 1)));
         texture->update();
 
         circa_set_list(value, 2);
@@ -159,6 +162,14 @@ RenderTarget::render()
 
             Lines_Update(geomVbo, points);
             Lines_Render(geomVbo, currentProgram, count, unpack_color(color));
+        } else if (commandName == name_polygon) {
+            // Triangulate and draw an N-gon.
+            switchProgram(&geomProgram);
+            caValue* points = circa_index(command, 1);
+            caValue* color = circa_index(command, 2);
+            
+            int count = Ngon_Update(geomVbo, points);
+            Triangles_Render(geomVbo, currentProgram, count, unpack_color(color));
 
         } else {
             printf("unrecognized command name: %s\n", circa_name_to_string(commandName));
@@ -353,13 +364,59 @@ void Lines_Render(GLuint vbo, Program* program, int vertexCount, Color color)
 
     GLuint attribVertex = program->attributes.vertex;
     glEnableVertexAttribArray(attribVertex);
-    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE,
-            0, BUFFER_OFFSET(0));
+    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
     check_gl_error();
     
     glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
 
     glDrawArrays(GL_LINES, 0, vertexCount);
+
+    // cleanup
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+int Ngon_Update(GLuint vbo, caValue* points)
+{
+    // Triangulate
+    circa::Value triangulatedPoints;
+    circa_set_list(&triangulatedPoints, 0);
+    Triangulate::Process(points, &triangulatedPoints);
+
+    // Upload vertices
+    int count = circa_count(&triangulatedPoints);
+    const int floatsPerVertex = 3;
+
+    int verticesSize = sizeof(GLfloat) * floatsPerVertex * count;
+    GLfloat* vertices = (GLfloat*) malloc(verticesSize);
+
+    for (int i=0; i < count; i++) {
+        float x,y;
+        circa_vec2(circa_index(&triangulatedPoints, i), &x, &y);
+        vertices[i*3 + 0] = x;
+        vertices[i*3 + 1] = y;
+        vertices[i*3 + 2] = 0.0;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, verticesSize, vertices, GL_DYNAMIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    free(vertices);
+
+    return count;
+}
+void Triangles_Render(GLuint vbo, Program* program, int vertexCount, Color color)
+{
+    const int floatsPerVertex = 3;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+    GLuint attribVertex = program->attributes.vertex;
+    glEnableVertexAttribArray(attribVertex);
+    glVertexAttribPointer(attribVertex, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
+    check_gl_error();
+    
+    glUniform4f(program->uniforms.color, color.r, color.g, color.b, color.a);
+
+    glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
     // cleanup
     glBindBuffer(GL_ARRAY_BUFFER, 0);

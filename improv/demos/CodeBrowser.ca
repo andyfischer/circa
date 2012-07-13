@@ -82,7 +82,7 @@ def CodeBrowser.draw(self, Painter painter)
     painter.fillRect(self.windowPosition #ccc)
 
     -- Enable a fixed width font
-    painter.setFontDefaultFixedWidth()
+    painter.setFont(font('assets/jackinput.ttf', 18))
 
     -- Find the font's dimensions
     metrics = painter.fontMetrics

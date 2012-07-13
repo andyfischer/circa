@@ -11,22 +11,26 @@ def RenderTarget.getViewportSize(self) -> Point
 
 type Font;
 def create_font(String name, number size) -> Font
+def Font.height(self)
+def Font.width(self, String text)
 
 type LineList;
 def create_line_list(RenderTarget target) -> LineList
 
 -- Wrappers
 def font(String name, number size) -> Font
-    state f = 0
+    state Font f
     if changed([name size])
         f = create_font(name size)
-    return f
+    f
 
 type Painter {
     RenderTarget target
     Rect viewport
 
     Font currentFont
+
+    Font mediumSans
 }
 
 def Painter.setFont(@self, Font font)
@@ -53,3 +57,6 @@ def Painter.lineLoop(self, List points, Color c)
     line_points.append(points.last)
     line_points.append(points.first)
     self.target.sendCommand([:lines line_points c])
+
+def Painter.polygon(self, List points, Color c)
+    self.target.sendCommand([:polygon points c])

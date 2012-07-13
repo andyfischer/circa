@@ -37,7 +37,9 @@
 /** whatever your own Vector implementation might be.           **/
 /*****************************************************************/
 
+#include <circa/circa.h>
 
+/*
 #include <vector>  // Include STL vector class.
 
 class Vector2d
@@ -65,30 +67,30 @@ private:
 // Typedef an STL vector of vertices which are used to represent
 // a polygon/contour and a series of triangles.
 typedef std::vector< Vector2d > Vector2dVector;
+*/
 
+
+typedef void (*TriangulateCallback)(void* context, caValue* pointA, caValue* pointB, caValue* pointC);
 
 class Triangulate
 {
 public:
 
-  // triangulate a contour/polygon, places results in STL vector
-  // as series of triangles.
-  static bool Process(const Vector2dVector &contour,
-                      Vector2dVector &result);
+    static bool Process(caValue* contour, caValue* output);
 
-  // compute area of a contour/polygon
-  static float Area(const Vector2dVector &contour);
+    // compute area of a contour/polygon
+    static float Area(caValue* contour);
 
-  // decide if point Px/Py is inside triangle defined by
-  // (Ax,Ay) (Bx,By) (Cx,Cy)
-  static bool InsideTriangle(float Ax, float Ay,
+    // decide if point Px/Py is inside triangle defined by
+    // (Ax,Ay) (Bx,By) (Cx,Cy)
+    static bool InsideTriangle(float Ax, float Ay,
                       float Bx, float By,
                       float Cx, float Cy,
                       float Px, float Py);
 
 
 private:
-  static bool Snip(const Vector2dVector &contour,int u,int v,int w,int n,int *V);
+    static bool Snip(caValue* contour,int u,int v,int w,int n,int *V);
 
 };
 
