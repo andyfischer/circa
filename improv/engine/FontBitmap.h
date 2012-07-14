@@ -6,8 +6,8 @@ struct FontFace;
 
 struct FontBitmap
 {
-    FontFace* face;    // Font index (input)
-    const char* str;  // String to render (input)
+    FontFace* face;    // Font face, input. 
+    const char* str;  // String to render, input.
 
     int bitmapSizeX;
     int bitmapSizeY;

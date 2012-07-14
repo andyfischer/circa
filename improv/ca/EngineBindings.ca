@@ -11,8 +11,8 @@ def RenderTarget.getViewportSize(self) -> Point
 
 type Font;
 def create_font(String name, number size) -> Font
-def Font.height(self)
-def Font.width(self, String text)
+def Font.height(self) -> number
+def Font.width(self, String text) -> number
 
 type LineList;
 def create_line_list(RenderTarget target) -> LineList
