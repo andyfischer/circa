@@ -288,6 +288,7 @@ void finish_frame(Stack* stack)
                 string_append(&msg, name_to_string(placeholder->type->name));
                 set_error_string(dest, as_cstring(&msg));
                 topFrame->pc = placeholder->index;
+                parentFrame->pc = outputTerm->index;
                 raise_error(stack);
                 return;
             }
@@ -647,9 +648,9 @@ void print_error_stack(Stack* stack, std::ostream& out)
         }
 
         // Print the error value
-        if (bottomFrame) {
+        caValue* reg = get_frame_register(frame, frame->pc);
+        if (bottomFrame || is_error(reg)) {
             out << " | ";
-            caValue* reg = get_frame_register(frame, frame->pc);
             if (is_string(reg))
                 out << as_cstring(reg);
             else
