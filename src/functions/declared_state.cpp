@@ -22,16 +22,18 @@ namespace declared_state_function {
                 return;
         }
 
-        // We couldn't use the input value. If there is a nested block of code, then push
-        // that to the stack and it will initialize our new value.
-        Branch* contents = nested_contents(caller);
+        // We couldn't use the input value. If there is an initializer, then push that
+        // to the stack.
+        Branch* initializer = NULL;
+        if (caller->input(1) != NULL)
+            initializer = caller->input(1)->nestedContents;
 
-        if (contents->length() > 0) {
+        if (initializer != NULL) {
             // Remove the frame made for this call
             pop_frame(stack);
 
             // Call the initializer instead
-            push_frame(stack, nested_contents(caller));
+            push_frame(stack, initializer);
             return;
         }
 
@@ -55,9 +57,13 @@ namespace declared_state_function {
         append_phrase(source, term->name.c_str(), term, name_TermName);
 
         Term* defaultValue = NULL;
+        Branch* initializer = NULL;
 
-        if (nested_contents(term)->length() > 0) {
-            defaultValue = nested_contents(term)->getFromEnd(0)->input(0);
+        if (term->input(1) != NULL)
+            initializer = term->input(1)->nestedContents;
+
+        if (initializer != NULL) {
+            defaultValue = initializer->getFromEnd(0)->input(0);
             if (defaultValue->boolProp("hidden", false))
                 defaultValue = defaultValue->input(0);
         }
@@ -75,7 +81,7 @@ namespace declared_state_function {
     void setup(Branch* kernel)
     {
         FUNCS.declared_state = import_function(kernel, get_declared_state,
-            "declared_state(state any value) -> any");
+            "declared_state(state any value, any initializer :optional) -> any");
         as_function(FUNCS.declared_state)->formatSource = formatSource;
     }
 }

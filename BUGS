@@ -6,7 +6,6 @@ Top 5 worst issues
 
 Recent
   Type inferrence fail in extra_output from if-block
-  Crash with: state font = font('assets/jackinput.ttf')
 
   This code had an error with no source location:
     letterSize = [painter.currentFont.width('AAAAAAAAAA') / 10, painter.currentFont.height] -> Point

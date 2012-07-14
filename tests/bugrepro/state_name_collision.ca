@@ -1,0 +1,5 @@
+
+something = 1
+state something = something + 1
+
+assert(something == 2)

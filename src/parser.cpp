@@ -1088,38 +1088,39 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         possible_whitespace(tokens);
     }
 
-    // Create the declared_state() term.
-    Term* result = apply(branch, FUNCS.declared_state, TermList(), name_from_string(name));
-
     // Lookup the explicit type
     Type* type = &ANY_T;
+    bool unknownType = false;
     if (typeName != "") {
         Term* typeTerm = find_name(branch, typeName.c_str(), -1, NAME_LOOKUP_TYPE);
 
         if (typeTerm == NULL) {
-            result->setStringProp("error:unknownType", typeName);
+            unknownType = true;
         } else {
             type = as_type(typeTerm);
         }
     }
 
-    // Possibly consume an expression for the initial value.
+    // Possibly consume an expression for the initial value. Do this before creating the
+    // declared_state() call.
+    
+    Term* initializer = NULL;
     if (tokens.nextIs(tok_Equals)) {
         tokens.consume();
         possible_whitespace(tokens);
 
-        // If the initial value contains any new expressions, then those live inside
-        // the term's nested_contents.
+        // Create a lambda block for any new expressions.
+        initializer = apply(branch, FUNCS.lambda, TermList());
+        Term* initialValue = infix_expression(nested_contents(initializer), tokens, context, 0).term;
 
-        Term* initialValue = infix_expression(nested_contents(result), tokens, context, 0).term;
-
+        // Possibly add a cast()
         if (type != declared_type(initialValue) && type != &ANY_T) {
-            initialValue = apply(nested_contents(result), FUNCS.cast, TermList(initialValue));
+            initialValue = apply(nested_contents(initializer), FUNCS.cast, TermList(initialValue));
             initialValue->setBoolProp("hidden", true);
             change_declared_type(initialValue, type);
         }
 
-        append_output_placeholder(nested_contents(result), initialValue);
+        append_output_placeholder(nested_contents(initializer), initialValue);
 
         // If an initial value was used and no specific type was mentioned, use
         // the initial value's type.
@@ -1128,8 +1129,15 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
         }
     }
 
+    // Create the declared_state() term.
+    Term* result = apply(branch, FUNCS.declared_state, TermList(), name_from_string(name));
+
+    if (unknownType)
+        result->setStringProp("error:unknownType", typeName);
+
     check_to_insert_implicit_inputs(result);
     change_declared_type(result, type);
+    set_input(result, 1, initializer);
     
     if (typeName != "")
         result->setStringProp("syntax:explicitType", typeName);
