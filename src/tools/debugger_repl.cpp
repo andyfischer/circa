@@ -45,7 +45,8 @@ int run_debugger_repl(std::string const& filename)
         }
 
         if (input == "e") {
-            evaluate_branch(&branch);
+            Stack stack;
+            evaluate_branch(&stack, &branch);
             continue;
         }
 

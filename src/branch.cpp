@@ -598,12 +598,6 @@ void post_module_load(Branch* branch)
     dll_loading_check_for_patches_on_loaded_branch(branch);
 }
 
-void evaluate_script(Branch* branch, const char* filename)
-{
-    load_script(branch, filename);
-    evaluate_branch(branch);
-}
-
 Branch* include_script(Branch* branch, const char* filename)
 {
     ca_assert(branch != NULL);

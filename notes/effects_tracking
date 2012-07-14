@@ -1,0 +1,17 @@
+
+For each branch, track whether it's 'effectual' or not.
+
+We can separate branches into these groups:
+
+  Implicitly no-effect
+    Empty or contains only calls to no-effect functions
+    Does not contain a C override
+
+  Explicitly no-effect
+    Annotated with an explicit 'no-effect' label
+    May contain a C override
+
+  Effectual branches
+    Contains a call to an effectual function
+    Or, contains a C override, and does not have a no-effect label.
+

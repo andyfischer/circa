@@ -110,11 +110,6 @@ void evaluate_single_term(Stack* stack, Term* term);
 
 void evaluate_branch(Stack* stack, Branch* branch);
 
-void evaluate_save_locals(Stack* stack, Branch* branch);
-
-// Shorthand to call evaluate_branch with a new Stack:
-void evaluate_branch(Branch* branch);
-
 // Evaluate only the terms between 'start' and 'end'.
 void evaluate_range(Stack* stack, Branch* branch, int start, int end);
 
@@ -125,9 +120,6 @@ void evaluate_minimum(Stack* stack, Term* term, caValue* result);
 caValue* evaluate(Stack* stack, Branch* branch, std::string const& input);
 caValue* evaluate(Branch* branch, Term* function, List* inputs);
 caValue* evaluate(Term* function, List* inputs);
-
-void insert_explicit_inputs(Stack* stack, caValue* inputs);
-void extract_explicit_outputs(Stack* stack, caValue* inputs);
 
 caValue* get_input(Stack* stack, int index);
 caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta);

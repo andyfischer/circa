@@ -57,6 +57,9 @@ struct Branch : caBranch
     // Evaluation advice
     bool emptyEvaluation;
 
+    // Whether this branch is effectual or contains any effectual calls.
+    bool effectual;
+
     // Compiled interpreter instructions.
     Value bytecode;
 
@@ -158,7 +161,6 @@ void duplicate_branch(Branch* source, Branch* dest);
 
 Name load_script(Branch* branch, const char* filename);
 void post_module_load(Branch* branch);
-void evaluate_script(Branch* branch, const char* filename);
 
 // Create an include() call that loads the given file. Returns the included
 // branch.

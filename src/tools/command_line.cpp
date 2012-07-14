@@ -160,15 +160,15 @@ void do_file_command(List* args, caValue* reply)
     if (dontRunScript)
         return;
     
-    Stack context;
-    evaluate_branch(&context, &branch);
+    Stack stack;
+    evaluate_branch(&stack, &branch);
 
     if (printState)
-        std::cout << to_string(&context.state) << std::endl;
+        std::cout << to_string(&stack.state) << std::endl;
 
-    if (error_occurred(&context)) {
+    if (error_occurred(&stack)) {
         std::cout << "Error occurred:\n";
-        print_error_stack(&context, std::cout);
+        print_error_stack(&stack, std::cout);
         std::cout << std::endl;
         return;
     }
@@ -536,30 +536,6 @@ int run_command_line(caWorld* world, caValue* args)
     // Build tool
     if (string_eq(list_get(args, 0), "-build")) {
         return run_build_tool(args);
-    }
-
-    // Stress test parser
-    if (string_eq(list_get(args, 0), "-parse100")) {
-
-        const char* filename = as_cstring(list_get(args, 1));
-
-        for (int i=0; i < 100; i++) {
-            Branch branch;
-            load_script(&branch, filename);
-            evaluate_branch(&branch);
-        }
-        return true;
-    }
-    if (string_eq(list_get(args, 0), "-parse1000")) {
-
-        const char* filename = as_cstring(list_get(args, 1));
-
-        for (int i=0; i < 1000; i++) {
-            Branch branch;
-            load_script(&branch, filename);
-            evaluate_branch(&branch);
-        }
-        return true;
     }
 
     // C++ gen

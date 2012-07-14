@@ -381,61 +381,6 @@ void evaluate_branch(Stack* stack, Branch* branch)
     }
 }
 
-void evaluate_save_locals(Stack* stack, Branch* branch)
-{
-    // Top-level call
-    push_frame(stack, branch);
-
-    // Check to insert top-level state
-    insert_top_level_state(stack, branch);
-
-    run_interpreter(stack);
-
-    save_top_level_state(stack, branch);
-
-    copy_locals_back_to_terms(stack, top_frame(stack), branch);
-
-    if (!error_occurred(stack))
-        pop_frame(stack);
-}
-
-void evaluate_branch(Branch* branch)
-{
-    Stack stack;
-    evaluate_save_locals(&stack, branch);
-}
-
-void insert_explicit_inputs(Stack* stack, caValue* inputs)
-{
-    Frame* top = top_frame(stack);
-
-    int nextInput = 0;
-    for (int i=0; i < top->branch->length(); i++) {
-        if (nextInput > circa_count(inputs))
-            break;
-
-        Term* term = top->branch->get(i);
-        if (term->function != FUNCS.input_explicit)
-            continue;
-
-        copy(circa_index(inputs, nextInput), get_frame_register(top, term));
-        nextInput++;
-    }
-}
-
-void extract_explicit_outputs(Stack* stack, caValue* outputs)
-{
-    Frame* top = top_frame(stack);
-
-    for (int i=0; i < top->branch->length(); i++) {
-        Term* term = top->branch->get(i);
-        if (term->function != FUNCS.output_explicit)
-            continue;
-
-        copy(get_top_register(stack, term), list_append(outputs));
-    }
-}
-
 caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
 {
     if (term == NULL)
