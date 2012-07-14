@@ -233,13 +233,13 @@ void format_source_for_input(caValue* source, Term* term, int inputIndex,
     if (term->inputInfo(inputIndex)->properties.getBool("hidden", false))
         return;
 
-    // Prevent infinite recursion; don't try to format input source when the input
-    // occurs later in the code than the term. Forward-references should all be
-    // hidden.
+    // Prevent infinite recursion; don't directly format the input source
+    // for a forward reference. The caller did a bad thing by asking us
+    // to format this source, because forward references shouldn't be made
+    // by regular calls, only by certain implicit calls that should be hidden.
     if (input->owningBranch == term->owningBranch
             && input->index > term->index) {
-        internal_error("Caught forward reference in format_source_for_input. "
-                       "(forward references should be hidden from source");
+        append_phrase(source, "<!forward_reference>", term, name_None);
     }
 
     bool methodCall =

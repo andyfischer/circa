@@ -108,8 +108,8 @@ def make_code_browser(Branch branch) -> CodeBrowser
     return browser
 
 
-script = load_script('asteroids.ca' -> rpath)
+script = load_script('intro.ca' -> rpath)
 print('script is: ' script)
-state browser = make_code_browser(script)
+browser = make_code_browser(script)
 browser.setPosition([10, 50, env.bounds.x - 10, env.bounds.y - 10])
 browser.draw(env.painter)
