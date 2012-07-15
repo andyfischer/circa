@@ -143,9 +143,14 @@ Frame* push_frame(Stack* stack, Branch* branch)
     top->stack = stack;
 
     // Registers
+#if 0 // shared register list
     top->registerFirst = list_length(&stack->registers);
     top->registerCount = get_locals_count(branch);
     list_resize(&stack->registers, top->registerFirst + top->registerCount);
+#else
+    initialize_null(&top->registers);
+    set_list(&top->registers, get_locals_count(branch));
+#endif
 
     top->branch = branch;
     top->pc = 0;
@@ -164,7 +169,11 @@ Frame* push_frame(Stack* stack, Branch* branch)
 void pop_frame(Stack* stack)
 {
     Frame* top = top_frame(stack);
+#if 0 // shared register list
     list_resize(&stack->registers, top->registerFirst);
+#else
+    set_null(&top->registers);
+#endif
     stack->framesCount--;
 }
 
@@ -465,7 +474,11 @@ Branch* current_branch(Stack* stack)
 
 caValue* get_frame_register(Frame* frame, int index)
 {
+#if 0 // shared register list
     return list_get(&frame->stack->registers, frame->registerFirst + index);
+#else
+    return list_get(&frame->registers, index);
+#endif
 }
 
 caValue* get_frame_register(Frame* frame, Term* term)
@@ -473,10 +486,14 @@ caValue* get_frame_register(Frame* frame, Term* term)
     return get_frame_register(frame, term->index);
 }
 
+static int get_frame_register_count(Frame* frame)
+{
+    return list_length(&frame->registers);
+}
+
 caValue* get_frame_register_from_end(Frame* frame, int index)
 {
-    return list_get(&frame->stack->registers,
-            frame->registerFirst + frame->registerCount - 1 - index);
+    return list_get(&frame->registers, get_frame_register_count(frame) - 1 - index);
 }
 
 caValue* get_top_register(Stack* stack, Term* term)
@@ -665,7 +682,7 @@ void update_context_to_latest_branches(Stack* stack)
     for (int i=0; i < stack->framesCount; i++) {
         Frame* frame = get_frame(stack, i);
 
-        if (frame->registerCount != get_locals_count(frame->branch))
+        if (get_frame_register_count(frame) != get_locals_count(frame->branch))
             internal_error("Trouble: branch locals count doesn't match frame");
     }
 }
@@ -948,7 +965,7 @@ void write_branch_bytecode(Branch* branch, caValue* output)
         set_list(finishOp, 2);
         set_name(list_get(finishOp, 0), op_FinishLoop);
 
-        // Possibly produce output
+        // Possibly produce output, depending on if this term is used.
         if ((branch->owningTerm != NULL) && user_count(branch->owningTerm) > 0) {
             set_name(list_get(finishOp, 1), op_LoopProduceOutput);
         } else {
@@ -1210,9 +1227,9 @@ void finish_dynamic_call(caStack* stack)
     Frame* top = top_frame(stack);
     Branch* branch = top->branch;
     Value registers;
-    set_list(&registers, top->registerCount);
+    set_list(&registers, get_frame_register_count(top));
 
-    for (int i=0; i < top->registerCount; i++)
+    for (int i=0; i < get_frame_register_count(top); i++)
         swap(get_frame_register(top, i), list_get(&registers, i));
 
     // Done with this frame.
@@ -1240,6 +1257,24 @@ void finish_dynamic_call(caStack* stack)
                 copy(slot, normalInput);
         }
     }
+}
+
+void Frame__registers(caStack* stack)
+{
+    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+
+#if 0 // shared register list
+    caValue* out = circa_output(stack, 0);
+
+    set_list(out, self->registerCount);
+    for (int i=0; i < self->registerCount; i++)
+        copy(get_frame_register(self, i), list_get(out, i));
+#else
+    caValue* out = circa_output(stack, 0);
+    copy(&self->registers, out);
+    touch(out);
+#endif
 }
 
 } // namespace circa

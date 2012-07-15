@@ -17,9 +17,16 @@ struct Frame
     // Pointer to owning Stack.
     Stack* stack;
 
-    // List registers;
-    int registerFirst;
-    int registerCount;
+    // Frame ID, this is unique across the Stack.
+    int id;
+
+    // ID of this frame's parent.
+    int parentId;
+
+    // Next free frame id within the Stack. Part of a linked list of free items.
+    int nextFreeId;
+
+    List registers;
 
     Branch* branch;
     int pc;
@@ -48,6 +55,9 @@ struct Stack
     int framesCount;
     int framesCapacity;
     Frame* frames;
+
+    // Frame ID of the first free entry.
+    int firstFreeFrame;
 
     // Register values. Each Frame owns a section of this list.
     List registers;
@@ -170,5 +180,8 @@ void write_branch_bytecode(Branch* branch, caValue* output);
 // Dynamic calls
 void dynamic_call_func(caStack* stack);
 void finish_dynamic_call(caStack* stack);
+
+// Hosted functions
+void Frame__registers(caStack* stack);
 
 } // namespace circa

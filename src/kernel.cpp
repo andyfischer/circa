@@ -359,17 +359,6 @@ void Frame__register(caStack* stack)
     int index = circa_int_input(stack, 1);
     copy(get_frame_register(self, index), circa_output(stack, 0));
 }
-void Frame__registers(caStack* stack)
-{
-    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
-    ca_assert(self != NULL);
-
-    caValue* out = circa_output(stack, 0);
-
-    set_list(out, self->registerCount);
-    for (int i=0; i < self->registerCount; i++)
-        copy(get_frame_register(self, i), list_get(out, i));
-}
 
 void Frame__pc(caStack* stack)
 {
