@@ -23,7 +23,7 @@ static Name get_highest_exit_level(Branch* branch);
 
 void evaluate_exit_point(caStack* stack)
 {
-    Frame* frame = get_frame(stack, 1);
+    Frame* frame = top_frame_parent(stack);
     ca_assert(frame != NULL);
 
     caValue* args = circa_input(stack, 0);

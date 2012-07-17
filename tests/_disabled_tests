@@ -8,6 +8,7 @@ for/infer_with_null_input.ca
 field/View.ca
 function_as_value.ca
 meta/misc.ca
+meta/interpreter_frames.ca
 syntax/local_typedef.ca
 syntax/namespace.ca
 recursion_tree.ca

@@ -1,0 +1,14 @@
+
+
+def recur(int count) -> int
+    if count == 0
+        return 0
+    else
+        return 1 + recur(count - 1)
+
+
+print('recur(5) = ' recur(5))
+print('recur(50) = ' recur(50))
+print('recur(100) = ' recur(100))
+print('recur(1000) = ' recur(1000))
+print('recur(10000) = ' recur(10000))

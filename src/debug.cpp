@@ -48,9 +48,9 @@ void dump(caValue* value)
     std::cout << to_string(value) << std::endl;
 }
 
-void dump(Stack* context)
+void dump(Stack* stack)
 {
-    eval_context_print_multiline(std::cout, context);
+    print_stack(stack, std::cout);
 }
 
 void internal_error(const char* message)

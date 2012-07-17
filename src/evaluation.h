@@ -12,6 +12,8 @@
 
 namespace circa {
 
+typedef int FrameId;
+
 struct Frame
 {
     // Pointer to owning Stack.
@@ -22,9 +24,6 @@ struct Frame
 
     // ID of this frame's parent.
     int parentId;
-
-    // Next free frame id within the Stack. Part of a linked list of free items.
-    int nextFreeId;
 
     List registers;
 
@@ -51,13 +50,16 @@ struct Stack
     // GCable object header.
     CircaObject header;
 
-    // Current execution stack
-    int framesCount;
+    // Frame list
     int framesCapacity;
     Frame* frames;
 
-    // Frame ID of the first free entry.
-    int firstFreeFrame;
+    // Topmost frame in the current execution state.
+    FrameId top;
+
+    // First free frame entry. In the frame list, there is a shadow list of free frames.
+    FrameId firstFreeFrame;
+    FrameId lastFreeFrame;
 
     // Register values. Each Frame owns a section of this list.
     List registers;
@@ -86,12 +88,7 @@ private:
 
 Stack* alloc_stack(World* world);
 
-void eval_context_print_multiline(std::ostream& out, Stack* stack);
 void eval_context_setup_type(Type* type);
-
-// Stack frames
-Frame* get_frame(Stack* stack, int depth);
-Frame* get_frame_from_bottom(Stack* stack, int index);
 
 Frame* push_frame(Stack* stack, Branch* branch);
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
@@ -99,6 +96,9 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
 // Pop the topmost frame and throw it away. This call doesn't preserve the frame's
 // outputs or update PC. You might want to call finish_frame() instead of this.
 void pop_frame(Stack* stack);
+
+// Get the frame with the given depth, this function is O(n).
+Frame* frame_by_depth(Stack* stack, int depth);
 
 void frame_set_stop_when_finished(Frame* frame);
 
@@ -112,6 +112,7 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs);
 void finish_frame(Stack* stack);
 
 Frame* top_frame(Stack* stack);
+Frame* top_frame_parent(Stack* stack);
 Branch* top_branch(Stack* stack);
 void reset_stack(Stack* stack);
 
@@ -168,6 +169,7 @@ bool error_occurred(Stack* stack);
 
 void clear_error(Stack* cxt);
 
+void print_stack(Stack* stack, std::ostream& out);
 void print_error_stack(Stack* stack, std::ostream& out);
 
 void run_interpreter(Stack* stack);
@@ -183,5 +185,6 @@ void finish_dynamic_call(caStack* stack);
 
 // Hosted functions
 void Frame__registers(caStack* stack);
+void Interpreter__frames(caStack* stack);
 
 } // namespace circa

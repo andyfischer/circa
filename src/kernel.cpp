@@ -404,7 +404,7 @@ void Interpreter__set_state_input(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
 
-    if (self->framesCount == 0)
+    if (top_frame(self) == NULL)
         return circa_output_error(stack, "No stack frame");
 
     // find state input
@@ -432,7 +432,7 @@ void Interpreter__get_state_output(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
 
-    if (self->framesCount == 0)
+    if (top_frame(stack) == NULL)
         return circa_output_error(stack, "No stack frame");
 
     // find state output
@@ -481,20 +481,9 @@ void Interpreter__frame(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
-    Frame* frame = get_frame(self, index);
+    Frame* frame = frame_by_depth(self, index);
 
     set_pointer(circa_create_default_output(stack, 0), frame);
-}
-void Interpreter__frames(caStack* stack)
-{
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    caValue* out = circa_output(stack, 0);
-    set_list(out, self->framesCount);
-    for (int i=0; i < self->framesCount; i++) {
-        change_type(circa_index(out, i), TYPES.frame);
-        set_pointer(circa_index(out, i), get_frame(self, i));
-    }
 }
 void Interpreter__output(caStack* stack)
 {
@@ -538,7 +527,7 @@ void Interpreter__toString(caStack* stack)
     ca_assert(self != NULL);
 
     std::stringstream strm;
-    eval_context_print_multiline(strm, self);
+    print_stack(self, strm);
     set_string(circa_output(stack, 0), strm.str().c_str());
 }
 

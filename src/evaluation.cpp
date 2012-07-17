@@ -23,17 +23,20 @@
 
 namespace circa {
 
+void dump_frames_raw(Stack* stack);
+
 Stack::Stack()
- : framesCount(0),
-   running(false),
+ : running(false),
    errorOccurred(false),
    world(NULL)
 {
     gc_register_new_object((CircaObject*) this, &EVAL_CONTEXT_T, true);
 
-    framesCount = 0;
     framesCapacity = 0;
     frames = NULL;
+    top = 0;
+    firstFreeFrame = 0;
+    lastFreeFrame = 0;
 }
 
 Stack::~Stack()
@@ -41,8 +44,7 @@ Stack::~Stack()
     // clear error so that pop_frame doesn't complain about losing an errored frame.
     clear_error(this);
 
-    while (framesCount > 0)
-        pop_frame(this);
+    reset_stack(this);
 
     free(frames);
 
@@ -63,66 +65,102 @@ void eval_context_list_references(CircaObject* object, GCReferenceList* list, GC
     // todo
 }
 
-void eval_context_print_multiline(std::ostream& out, Stack* stack)
-{
-    out << "[Stack " << stack << "]" << std::endl;
-    for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
-        Frame* frame = get_frame(stack, stack->framesCount - 1 - frameIndex);
-        Branch* branch = frame->branch;
-        out << " [Frame " << frameIndex << ", branch = " << branch
-             << ", pc = " << frame->pc
-             << ", nextPc = " << frame->nextPc
-             << "]" << std::endl;
-
-        if (branch == NULL)
-            continue;
-
-        for (int i=0; i < frame->branch->length(); i++) {
-            Term* term = branch->get(i);
-
-            // indent
-            for (int x = 0; x < frameIndex+1; x++)
-                out << " ";
-
-            if (frame->pc == i)
-                out << ">";
-            else
-                out << " ";
-
-            print_term(out, term);
-
-            // current value
-            if (term != NULL && !is_value(term)) {
-                caValue* value = get_frame_register(frame, term);
-                if (value == NULL)
-                    out << " <register OOB>";
-                else
-                    out << " = " << to_string(value);
-            }
-            out << std::endl;
-        }
-    }
-}
-
 void eval_context_setup_type(Type* type)
 {
     type->name = name_from_string("Stack");
     type->gcListReferences = eval_context_list_references;
 }
 
-Frame* get_frame(Stack* stack, int depth)
+static Frame* frame_by_id(Stack* stack, int id)
 {
-    ca_assert(depth >= 0);
-    ca_assert(depth < stack->framesCount);
+    ca_assert(id != 0);
+    return &stack->frames[id - 1];
+}
 
-    return &stack->frames[stack->framesCount - 1 - depth];
-}
-Frame* get_frame_from_bottom(Stack* stack, int index)
+Frame* frame_by_depth(Stack* stack, int depth)
 {
-    ca_assert(index >= 0);
-    ca_assert(index < stack->framesCount);
-    return &stack->frames[index];
+    Frame* frame = top_frame(stack);
+
+    while (depth > 0) {
+        if (frame->parentId == 0)
+            return NULL;
+        frame = frame_by_id(stack, frame->parentId);
+        depth--;
+    }
+    return frame;
 }
+
+static void resize_frame_list(Stack* stack, int newCapacity)
+{
+    // Currently, the frame list can only be grown.
+    ca_assert(newCapacity > stack->framesCapacity);
+
+    int oldCapacity = stack->framesCapacity;
+    stack->framesCapacity = newCapacity;
+    stack->frames = (Frame*) realloc(stack->frames, sizeof(Frame) * stack->framesCapacity);
+
+    for (int i = oldCapacity; i < newCapacity; i++) {
+
+        // Initialize new frame
+        Frame* frame = &stack->frames[i];
+        frame->id = i + 1;
+        frame->stack = stack;
+        initialize_null(&frame->registers);
+
+        // Except for the last element, this parentId is updated on next iteration.
+        frame->parentId = 0;
+
+        // Connect to free list. In the free list, the 'parent' is used as the 'next free'.
+        // Newly allocated frames go on the end of the free list.
+        if (stack->lastFreeFrame != 0)
+            frame_by_id(stack, stack->lastFreeFrame)->parentId = frame->id;
+        stack->lastFreeFrame = frame->id;
+        if (stack->firstFreeFrame == 0)
+            stack->firstFreeFrame = frame->id;
+    }
+}
+
+static Frame* take_next_free_frame(Stack* stack, FrameId parent)
+{
+    // Check to grow the frames list.
+    if (stack->firstFreeFrame == 0) {
+        const int growthRate = 500;
+        //printf("pre resize:\n");
+        //dump_frames_raw(stack);
+        resize_frame_list(stack, stack->framesCapacity + growthRate);
+
+        // TEMP
+        //printf("post resize:\n");
+        //dump_frames_raw(stack);
+    }
+
+    Frame* next = frame_by_id(stack, stack->firstFreeFrame);
+
+    // Update free list.
+    if (next->parentId == 0) {
+        stack->firstFreeFrame = 0;
+        stack->lastFreeFrame = 0;
+    } else {
+        stack->firstFreeFrame = next->parentId;
+    }
+
+    next->parentId = parent;
+    return next;
+}
+
+static void release_frame(Stack* stack, Frame* frame)
+{
+    // Newly freed frames go to the front of the free list.
+    if (stack->firstFreeFrame == 0) {
+        stack->firstFreeFrame = frame->id;
+        stack->lastFreeFrame = frame->id;
+        frame->parentId = 0;
+    } else {
+        frame->parentId = stack->firstFreeFrame;
+        stack->firstFreeFrame = frame->id;
+    }
+}
+
 Frame* push_frame(Stack* stack, Branch* branch)
 {
     INCREMENT_STAT(PushFrame);
@@ -130,40 +168,30 @@ Frame* push_frame(Stack* stack, Branch* branch)
     // Make sure the branch's bytecode is up-to-date.
     refresh_bytecode(branch);
 
-    // Increase capacity of 'frames' if needed.
-    if ((stack->framesCount + 1) > stack->framesCapacity) {
-        stack->framesCapacity += 100;
-        stack->frames = (Frame*) realloc(stack->frames, sizeof(Frame)
-                * stack->framesCapacity);
-    }
-
-    Frame* top = &stack->frames[stack->framesCount];
-    stack->framesCount += 1;
-
-    top->stack = stack;
+    Frame* frame = take_next_free_frame(stack, stack->top);
+    stack->top = frame->id;
 
     // Registers
 #if 0 // shared register list
-    top->registerFirst = list_length(&stack->registers);
-    top->registerCount = get_locals_count(branch);
-    list_resize(&stack->registers, top->registerFirst + top->registerCount);
+    frame->registerFirst = list_length(&stack->registers);
+    frame->registerCount = get_locals_count(branch);
+    list_resize(&stack->registers, frame->registerFirst + frame->registerCount);
 #else
-    initialize_null(&top->registers);
-    set_list(&top->registers, get_locals_count(branch));
+    set_list(&frame->registers, get_locals_count(branch));
 #endif
 
-    top->branch = branch;
-    top->pc = 0;
-    top->nextPc = 0;
-    top->exitType = name_None;
-    top->dynamicCall = false;
-    top->override = false;
-    top->stop = false;
+    frame->branch = branch;
+    frame->pc = 0;
+    frame->nextPc = 0;
+    frame->exitType = name_None;
+    frame->dynamicCall = false;
+    frame->override = false;
+    frame->stop = false;
 
     // We are now referencing this branch
     gc_mark_object_referenced(&branch->header);
 
-    return top;
+    return frame;
 }
 
 void pop_frame(Stack* stack)
@@ -174,7 +202,13 @@ void pop_frame(Stack* stack)
 #else
     set_null(&top->registers);
 #endif
-    stack->framesCount--;
+
+    if (top->parentId == 0)
+        stack->top = NULL;
+    else
+        stack->top = top->parentId;
+
+    release_frame(stack, top);
 }
 
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
@@ -250,7 +284,7 @@ void finish_frame(Stack* stack)
     Branch* finishedBranch = top->branch;
 
     // Exit if we have finished the topmost branch
-    if (stack->framesCount == 1 || top->stop) {
+    if (top->parentId == 0 || top->stop) {
         stack->running = false;
         return;
     }
@@ -261,8 +295,8 @@ void finish_frame(Stack* stack)
         return;
     }
 
-    Frame* topFrame = get_frame(stack, 0);
-    Frame* parentFrame = get_frame(stack, 1);
+    Frame* topFrame = top_frame(stack);
+    Frame* parentFrame = top_frame_parent(stack);
 
     if (parentFrame->pc < parentFrame->branch->length()) {
         Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
@@ -314,9 +348,16 @@ void finish_frame(Stack* stack)
 
 Frame* top_frame(Stack* stack)
 {
-    if (stack->framesCount == 0)
+    if (stack->top == 0)
         return NULL;
-    return get_frame(stack, 0);
+    return frame_by_id(stack, stack->top);
+}
+Frame* top_frame_parent(Stack* stack)
+{
+    Frame* top = top_frame(stack);
+    if (top == NULL || top->parentId == 0)
+        return NULL;
+    return frame_by_id(stack, top->parentId);
 }
 Branch* top_branch(Stack* stack)
 {
@@ -328,10 +369,22 @@ Branch* top_branch(Stack* stack)
 
 void reset_stack(Stack* stack)
 {
-    while (stack->framesCount > 0)
-        pop_frame(stack);
-
+    stack->top = NULL;
     stack->errorOccurred = false;
+
+    // Deallocate registers
+    for (int i=0; i < stack->framesCapacity; i++) {
+        Frame* frame = &stack->frames[i];
+        set_null(&frame->registers);
+
+        if (i + 1 == stack->framesCapacity)
+            frame->parentId = 0;
+        else
+            frame->parentId = stack->frames[i+1].id;
+    }
+
+    stack->firstFreeFrame = stack->framesCapacity > 0 ? 1 : 0;
+    stack->lastFreeFrame = stack->framesCapacity;
 }
 
 void evaluate_single_term(Stack* stack, Term* term)
@@ -399,14 +452,19 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
     if (is_value(term))
         return term_value(term);
 
-    for (int i=stackDelta; i < stack->framesCount; i++) {
-        Frame* frame = get_frame(stack, i);
-        if (frame->branch != term->owningBranch)
-            continue;
-        return get_frame_register(frame, term);
-    }
+    Frame* frame = top_frame(stack);
+    int distance = 0;
 
-    return NULL;
+    while (true) {
+        if (distance >= stackDelta && frame->branch == term->owningBranch)
+            return get_frame_register(frame, term);
+
+        if (frame->parentId == 0)
+            return NULL;
+
+        frame = frame_by_id(stack, frame->parentId);
+        distance++;
+    }
 }
 
 int num_inputs(Stack* stack)
@@ -455,7 +513,7 @@ caValue* get_output(Stack* stack, int index)
 
 caValue* get_caller_output(Stack* stack, int index)
 {
-    Frame* frame = get_frame(stack, 1);
+    Frame* frame = top_frame_parent(stack);
     Term* currentTerm = frame->branch->get(frame->pc);
     return get_frame_register(frame, get_output_term(currentTerm, index));
 }
@@ -627,12 +685,95 @@ void clear_error(Stack* cxt)
     cxt->errorOccurred = false;
 }
 
+static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
+{
+    // Build a list of stack IDs, starting at the top.
+    set_list(output, 0);
+
+    while (true) {
+        set_int(list_append(output), frame->id);
+
+        if (frame->parentId == 0)
+            break;
+
+        frame = frame_by_id(stack, frame->parentId);
+    }
+
+    // Now reverse the output to start at the bottom.
+    list_reverse(output);
+}
+
+void print_stack(Stack* stack, std::ostream& out)
+{
+    circa::Value stackTrace;
+    get_stack_trace(stack, top_frame(stack), &stackTrace);
+
+    out << "[Stack " << stack << "]" << std::endl;
+    for (int frameIndex = 0; frameIndex < list_length(&stackTrace); frameIndex++) {
+        Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, frameIndex)));
+        int depth = list_length(&stackTrace) - frameIndex - 1;
+        Branch* branch = frame->branch;
+        out << " [Frame #" << frame->id
+             << ", depth = " << depth
+             << ", branch = " << branch
+             << ", pc = " << frame->pc
+             << ", nextPc = " << frame->nextPc
+             << "]" << std::endl;
+
+        if (branch == NULL)
+            continue;
+
+        for (int i=0; i < frame->branch->length(); i++) {
+            Term* term = branch->get(i);
+
+            // indent
+            for (int x = 0; x < frameIndex+1; x++)
+                out << " ";
+
+            if (frame->pc == i)
+                out << ">";
+            else
+                out << " ";
+
+            print_term(out, term);
+
+            // current value
+            if (term != NULL && !is_value(term)) {
+                caValue* value = get_frame_register(frame, term);
+                if (value == NULL)
+                    out << " <register OOB>";
+                else
+                    out << " = " << to_string(value);
+            }
+            out << std::endl;
+        }
+    }
+}
+
+void dump_frames_raw(Stack* stack)
+{
+    std::cout << "[Stack " << stack
+        << ", framesCapacity = " << stack->framesCapacity
+        << ", top = " << stack->top
+        << ", firstFree = " << stack->firstFreeFrame
+        << ", lastFree = " << stack->lastFreeFrame
+        << std::cout;
+
+    for (int i=0; i < stack->framesCapacity; i++) {
+        Frame* frame = &stack->frames[i];
+        std::cout << " Frame #" << frame->id << ", parentId = " << frame->parentId << std::endl;
+    }
+}
+
 void print_error_stack(Stack* stack, std::ostream& out)
 {
-    for (int frameIndex = 0; frameIndex < stack->framesCount; frameIndex++) {
-        Frame* frame = get_frame(stack, stack->framesCount - 1 - frameIndex);
+    circa::Value stackTrace;
+    get_stack_trace(stack, top_frame(stack), &stackTrace);
 
-        bool bottomFrame = frameIndex == (stack->framesCount - 1);
+    for (int i = 0; i < list_length(&stackTrace); i++) {
+        Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, i)));
+
+        bool lastFrame = i == list_length(&stackTrace) - 1;
 
         if (frame->override) {
             std::cout << "[native] | ";
@@ -666,7 +807,7 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
         // Print the error value
         caValue* reg = get_frame_register(frame, frame->pc);
-        if (bottomFrame || is_error(reg)) {
+        if (lastFrame || is_error(reg)) {
             out << " | ";
             if (is_string(reg))
                 out << as_cstring(reg);
@@ -679,11 +820,16 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
 void update_context_to_latest_branches(Stack* stack)
 {
-    for (int i=0; i < stack->framesCount; i++) {
-        Frame* frame = get_frame(stack, i);
+    Frame* frame = top_frame(stack);
 
+    while (true) {
         if (get_frame_register_count(frame) != get_locals_count(frame->branch))
             internal_error("Trouble: branch locals count doesn't match frame");
+
+        if (frame->parentId == 0)
+            return;
+
+        frame = frame_by_id(stack, frame->parentId);
     }
 }
 
@@ -1277,6 +1423,25 @@ void Frame__registers(caStack* stack)
 #endif
 }
 
+void Interpreter__frames(caStack* stack)
+{
+    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    ca_assert(self != NULL);
+    caValue* out = circa_output(stack, 0);
+
+    circa::Value stackTrace;
+    get_stack_trace(self, top_frame(stack), &stackTrace);
+    set_list(out, list_length(&stackTrace));
+
+    dump(stack);
+
+    for (int i=0; i < list_length(&stackTrace); i++) {
+        Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, i)));
+        change_type(circa_index(out, i), TYPES.frame);
+        set_pointer(circa_index(out, i), frame);
+    }
+}
+
 } // namespace circa
 
 using namespace circa;
@@ -1436,7 +1601,7 @@ caTerm* circa_caller_input_term(caStack* stack, int index)
 
 caBranch* circa_caller_branch(caStack* stack)
 {
-    Frame* frame = get_frame(stack, 1);
+    Frame* frame = top_frame_parent(stack);
     if (frame == NULL)
         return NULL;
     return frame->branch;
@@ -1444,25 +1609,13 @@ caBranch* circa_caller_branch(caStack* stack)
 
 caTerm* circa_caller_term(caStack* stack)
 {
-    Stack* cxt = (Stack*) stack;
-    if (cxt->framesCount < 2)
-        return NULL;
-    Frame* frame = get_frame(cxt, 1);
+    Frame* frame = top_frame_parent(stack);
     return frame->branch->get(frame->pc);
 }
 
 void circa_print_error_to_stdout(caStack* stack)
 {
     print_error_stack(stack, std::cout);
-}
-int circa_frame_count(caStack* stack)
-{
-    return stack->framesCount;
-}
-void circa_stack_restore_height(caStack* stack, int height)
-{
-    while (stack->framesCount > height)
-        pop_frame(stack);
 }
 
 } // extern "C"

@@ -194,9 +194,6 @@ void circa_run(caStack* stack);
 
 void circa_pop(caStack* stack);
 
-int circa_frame_count(caStack* stack);
-void circa_stack_restore_height(caStack* stack, int height);
-
 void circa_call_method(caStack* stack, const char* funcName, caValue* object, caValue* ins, caValue* outs);
 
 // Signal that an error has occurred.

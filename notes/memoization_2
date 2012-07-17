@@ -1,0 +1,26 @@
+
+Here's the plan.
+
+The Stack data type will be modified to be more of a call-stack tree. It can have neighboring
+branches instead of one linear stack frame.
+
+This ability will be used for dynamic code reasoning, but we're also going to use it for
+memoization.
+
+When calling a function:
+
+  Check if we have memoized this call, and check if the memoized inputs are equal to our
+  current inputs.
+    If so, use the memoized result.
+    And, we're done
+
+  Otherwise
+    Run the function as normal
+
+    If the function is no-effect:
+      Discard the finished frame
+      If the caller frame will be preserved
+        Memoize the function's results
+    Otherwise, if the function has effects:
+      The function's frame will be preserved. Keep a reference in the caller frame.
+
