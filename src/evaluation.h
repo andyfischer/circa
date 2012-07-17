@@ -20,10 +20,10 @@ struct Frame
     Stack* stack;
 
     // Frame ID, this is unique across the Stack.
-    int id;
+    FrameId id;
 
     // ID of this frame's parent.
-    int parentId;
+    FrameId parent;
 
     List registers;
 

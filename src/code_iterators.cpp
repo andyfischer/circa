@@ -19,7 +19,7 @@ void BranchIterator::reset(Branch* branch)
     _stack.clear();
     if (branch->length() != 0) {
         int firstIndex = _backwards ? branch->length() - 1 : 0;
-        _stack.push_back(Frame(branch, firstIndex));
+        _stack.push_back(IteratorFrame(branch, firstIndex));
     }
 }
 
@@ -31,7 +31,7 @@ bool BranchIterator::finished()
 Term* BranchIterator::current()
 {
     ca_assert(!finished());
-    Frame& frame = _stack.back();
+    IteratorFrame& frame = _stack.back();
     return frame.branch->get(frame.index);
 }
 
@@ -50,7 +50,7 @@ void BranchIterator::advance()
     if (term && term->nestedContents && term->contents()->length() > 0) {
         Branch* contents = nested_contents(term);
         int firstIndex = _backwards ? contents->length() - 1 : 0;
-        _stack.push_back(Frame(contents, firstIndex));
+        _stack.push_back(IteratorFrame(contents, firstIndex));
         return;
     }
 

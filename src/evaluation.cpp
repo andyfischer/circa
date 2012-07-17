@@ -82,9 +82,9 @@ Frame* frame_by_depth(Stack* stack, int depth)
     Frame* frame = top_frame(stack);
 
     while (depth > 0) {
-        if (frame->parentId == 0)
+        if (frame->parent == 0)
             return NULL;
-        frame = frame_by_id(stack, frame->parentId);
+        frame = frame_by_id(stack, frame->parent);
         depth--;
     }
     return frame;
@@ -107,13 +107,13 @@ static void resize_frame_list(Stack* stack, int newCapacity)
         frame->stack = stack;
         initialize_null(&frame->registers);
 
-        // Except for the last element, this parentId is updated on next iteration.
-        frame->parentId = 0;
+        // Except for the last element, this id is updated on next iteration.
+        frame->parent = 0;
 
         // Connect to free list. In the free list, the 'parent' is used as the 'next free'.
         // Newly allocated frames go on the end of the free list.
         if (stack->lastFreeFrame != 0)
-            frame_by_id(stack, stack->lastFreeFrame)->parentId = frame->id;
+            frame_by_id(stack, stack->lastFreeFrame)->parent = frame->id;
         stack->lastFreeFrame = frame->id;
         if (stack->firstFreeFrame == 0)
             stack->firstFreeFrame = frame->id;
@@ -137,14 +137,14 @@ static Frame* take_next_free_frame(Stack* stack, FrameId parent)
     Frame* next = frame_by_id(stack, stack->firstFreeFrame);
 
     // Update free list.
-    if (next->parentId == 0) {
+    if (next->parent == 0) {
         stack->firstFreeFrame = 0;
         stack->lastFreeFrame = 0;
     } else {
-        stack->firstFreeFrame = next->parentId;
+        stack->firstFreeFrame = next->parent;
     }
 
-    next->parentId = parent;
+    next->parent = parent;
     return next;
 }
 
@@ -154,9 +154,9 @@ static void release_frame(Stack* stack, Frame* frame)
     if (stack->firstFreeFrame == 0) {
         stack->firstFreeFrame = frame->id;
         stack->lastFreeFrame = frame->id;
-        frame->parentId = 0;
+        frame->parent = 0;
     } else {
-        frame->parentId = stack->firstFreeFrame;
+        frame->parent = stack->firstFreeFrame;
         stack->firstFreeFrame = frame->id;
     }
 }
@@ -203,10 +203,10 @@ void pop_frame(Stack* stack)
     set_null(&top->registers);
 #endif
 
-    if (top->parentId == 0)
+    if (top->parent == 0)
         stack->top = NULL;
     else
-        stack->top = top->parentId;
+        stack->top = top->parent;
 
     release_frame(stack, top);
 }
@@ -284,7 +284,7 @@ void finish_frame(Stack* stack)
     Branch* finishedBranch = top->branch;
 
     // Exit if we have finished the topmost branch
-    if (top->parentId == 0 || top->stop) {
+    if (top->parent == 0 || top->stop) {
         stack->running = false;
         return;
     }
@@ -355,9 +355,9 @@ Frame* top_frame(Stack* stack)
 Frame* top_frame_parent(Stack* stack)
 {
     Frame* top = top_frame(stack);
-    if (top == NULL || top->parentId == 0)
+    if (top == NULL || top->parent == 0)
         return NULL;
-    return frame_by_id(stack, top->parentId);
+    return frame_by_id(stack, top->parent);
 }
 Branch* top_branch(Stack* stack)
 {
@@ -378,9 +378,9 @@ void reset_stack(Stack* stack)
         set_null(&frame->registers);
 
         if (i + 1 == stack->framesCapacity)
-            frame->parentId = 0;
+            frame->parent = 0;
         else
-            frame->parentId = stack->frames[i+1].id;
+            frame->parent = stack->frames[i+1].id;
     }
 
     stack->firstFreeFrame = stack->framesCapacity > 0 ? 1 : 0;
@@ -459,10 +459,10 @@ caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta)
         if (distance >= stackDelta && frame->branch == term->owningBranch)
             return get_frame_register(frame, term);
 
-        if (frame->parentId == 0)
+        if (frame->parent == 0)
             return NULL;
 
-        frame = frame_by_id(stack, frame->parentId);
+        frame = frame_by_id(stack, frame->parent);
         distance++;
     }
 }
@@ -693,10 +693,10 @@ static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
     while (true) {
         set_int(list_append(output), frame->id);
 
-        if (frame->parentId == 0)
+        if (frame->parent == 0)
             break;
 
-        frame = frame_by_id(stack, frame->parentId);
+        frame = frame_by_id(stack, frame->parent);
     }
 
     // Now reverse the output to start at the bottom.
@@ -761,7 +761,7 @@ void dump_frames_raw(Stack* stack)
 
     for (int i=0; i < stack->framesCapacity; i++) {
         Frame* frame = &stack->frames[i];
-        std::cout << " Frame #" << frame->id << ", parentId = " << frame->parentId << std::endl;
+        std::cout << " Frame #" << frame->id << ", parent = " << frame->parent << std::endl;
     }
 }
 
@@ -826,10 +826,10 @@ void update_context_to_latest_branches(Stack* stack)
         if (get_frame_register_count(frame) != get_locals_count(frame->branch))
             internal_error("Trouble: branch locals count doesn't match frame");
 
-        if (frame->parentId == 0)
+        if (frame->parent == 0)
             return;
 
-        frame = frame_by_id(stack, frame->parentId);
+        frame = frame_by_id(stack, frame->parent);
     }
 }
 
@@ -1176,13 +1176,24 @@ void populate_inputs_from_metadata(Stack* stack, Frame* frame, caValue* inputs)
     }
 }
 
-void step_interpreter_action(Stack* stack, caValue* action)
+void step_interpreter(Stack* stack)
 {
+    INCREMENT_STAT(StepInterpreter);
+
     Frame* frame = top_frame(stack);
     Branch* branch = frame->branch;
 
+    // Advance pc to nextPc
+    frame->pc = frame->nextPc;
+    frame->nextPc = frame->pc + 1;
+
+    ca_assert(frame->pc <= branch->length());
+
+    // Grab action
+    caValue* action = list_get(&branch->bytecode, frame->pc);
     int op = as_int(list_get(action, 0));
 
+    // Dispatch op
     switch (op) {
     case op_NoOp:
         break;
@@ -1273,7 +1284,6 @@ void step_interpreter_action(Stack* stack, caValue* action)
         // Set PC to end
         frame->exitType = as_name(control);
         frame->nextPc = branch->length();
-        
         break;
     }
     case op_FinishFrame: {
@@ -1321,24 +1331,6 @@ void step_interpreter_action(Stack* stack, caValue* action)
         std::cout << "Op not recognized: " << op << std::endl;
         ca_assert(false);
     }
-}
-
-void step_interpreter(Stack* stack)
-{
-    INCREMENT_STAT(StepInterpreter);
-
-    Frame* frame = top_frame(stack);
-    Branch* branch = frame->branch;
-
-    // Advance pc to nextPc
-    frame->pc = frame->nextPc;
-    frame->nextPc = frame->pc + 1;
-
-    ca_assert(frame->pc <= branch->length());
-
-    // Run bytecode step
-    caValue* op = list_get(&branch->bytecode, frame->pc);
-    step_interpreter_action(stack, op);
 }
 
 void run_interpreter(Stack* stack)

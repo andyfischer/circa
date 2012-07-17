@@ -10,14 +10,14 @@ namespace circa {
 
 struct BranchIterator
 {
-    struct Frame {
+    struct IteratorFrame {
         Branch* branch;
         int index;
 
-        Frame(Branch* b, int i) : branch(b), index(i) {}
+        IteratorFrame(Branch* b, int i) : branch(b), index(i) {}
     };
 
-    std::vector<Frame> _stack;
+    std::vector<IteratorFrame> _stack;
     bool _backwards;
     bool _skipNextBranch;
 

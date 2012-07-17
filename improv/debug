@@ -1,2 +1,2 @@
 rm -rf build/improv_d.app
-make && gdb --args build/improv_d.app/Contents/MacOS/improv_d $*
+ca-d && make && gdb --args build/improv_d.app/Contents/MacOS/improv_d $*
