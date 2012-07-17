@@ -83,10 +83,12 @@ private:
     Stack& operator=(Stack const&) { return *this; }
 };
 
+// Allocate a new Stack object.
 Stack* alloc_stack(World* world);
 
 void eval_context_setup_type(Type* type);
 
+// Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Branch* branch);
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
 
@@ -94,9 +96,8 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
 // outputs or update PC. You might want to call finish_frame() instead of this.
 void pop_frame(Stack* stack);
 
-// Get the frame with the given depth, this function is O(n).
-Frame* frame_by_depth(Stack* stack, int depth);
 
+// Flag this frame to stop the interpreter when finished.
 void frame_set_stop_when_finished(Frame* frame);
 
 // Copy all of the outputs from the topmost frame. This is an alternative to finish_frame
@@ -108,10 +109,15 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs);
 // standard way to finish a frame, such as when 'return' is called.
 void finish_frame(Stack* stack);
 
+void reset_stack(Stack* stack);
+
+// Access the stack.
 Frame* top_frame(Stack* stack);
 Frame* top_frame_parent(Stack* stack);
 Branch* top_branch(Stack* stack);
-void reset_stack(Stack* stack);
+
+// Retrieve the frame with the given depth, this function is O(n).
+Frame* frame_by_depth(Stack* stack, int depth);
 
 // Evaluate a single term. Deprecated.
 void evaluate_single_term(Stack* stack, Term* term);

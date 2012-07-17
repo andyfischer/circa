@@ -698,7 +698,7 @@ static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
         frame = frame_by_id(stack, frame->parent);
     }
 
-    // Now reverse the output to start at the bottom.
+    // Now reverse the output so that the bottom frame is first.
     list_reverse(output);
 }
 
@@ -1023,6 +1023,7 @@ void write_term_bytecode(Term* term, caValue* output)
     Name tag = 0;
 
     if (is_value(term)) {
+        // Value terms are no-ops.
         branch = NULL;
         tag = op_NoOp;
     } else if (term->function == FUNCS.lambda
@@ -1030,10 +1031,6 @@ void write_term_bytecode(Term* term, caValue* output)
         // These funcs have a nestedContents, but it shouldn't be evaluated.
         branch = NULL;
         tag = op_NoOp;
-    } else if (term->function == FUNCS.declared_state) {
-        // declared_state has a nested branch, but we shouldn't use it.
-        branch = function_contents(term->function);
-        tag = op_PushBranch;
     } else if (term->function == FUNCS.if_block) {
         branch = term->nestedContents;
         tag = op_CaseBlock;
