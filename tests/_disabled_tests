@@ -13,3 +13,4 @@ syntax/local_typedef.ca
 syntax/namespace.ca
 recursion_tree.ca
 simple_state.ca
+assert_failure.ca

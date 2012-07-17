@@ -185,7 +185,6 @@ Frame* push_frame(Stack* stack, Branch* branch)
     frame->nextPc = 0;
     frame->exitType = name_None;
     frame->dynamicCall = false;
-    frame->override = false;
     frame->stop = false;
 
     // We are now referencing this branch
@@ -775,18 +774,6 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
         bool lastFrame = i == list_length(&stackTrace) - 1;
 
-        if (frame->override) {
-            std::cout << "[native] | ";
-            caValue* reg = get_frame_register_from_end(frame, 0);
-            if (is_string(reg))
-                out << as_cstring(reg);
-            else
-                out << to_string(reg);
-
-            out << std::endl;
-            continue;
-        }
-
         if (frame->pc >= frame->branch->length()) {
             std::cout << "(end of frame)" << std::endl;
             continue;
@@ -1239,7 +1226,6 @@ void step_interpreter(Stack* stack)
     case op_FireNative: {
         EvaluateFunc override = get_override_for_branch(branch);
         ca_assert(override != NULL);
-        frame->override = true;
 
         // By default, we'll set nextPc to finish this frame on the next iteration.
         // The override func may change nextPc.
@@ -1626,6 +1612,7 @@ caValue* circa_output(caStack* stack, int index)
 void circa_output_error(caStack* stack, const char* msg)
 {
     set_error_string(circa_output(stack, 0), msg);
+    top_frame(stack)->pc = top_frame(stack)->branch->length() - 1;
     raise_error(stack);
 }
 

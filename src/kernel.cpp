@@ -508,11 +508,7 @@ void Interpreter__error_message(caStack* stack)
     Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
 
     Frame* frame = top_frame(self);
-    caValue* errorReg = NULL;
-    if (frame->override)
-        errorReg = get_frame_register_from_end(frame, 0);
-    else
-        errorReg = get_frame_register(frame, frame->pc);
+    caValue* errorReg = get_frame_register(frame, frame->pc);
 
     if (errorReg == NULL)
         set_string(circa_output(stack, 0), "(null error)");

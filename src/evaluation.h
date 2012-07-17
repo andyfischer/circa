@@ -31,9 +31,6 @@ struct Frame
     int pc;
     int nextPc;
 
-    // True if this frame is being evaluated with a C override.
-    bool override;
-
     // True if this frame is being called by dynamic_call
     bool dynamicCall;
 
