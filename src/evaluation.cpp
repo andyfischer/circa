@@ -1023,8 +1023,14 @@ void write_term_bytecode(Term* term, caValue* output)
         }
         return;
     }
-    
 
+    if (term->function == FUNCS.exit_point) {
+        list_get(output, 2);
+        set_name(list_get(output, 0), op_ExitPoint);
+        write_term_input_instructions(term, output, function_contents(term->function));
+        return;
+    }
+    
     // Choose the next branch
     Branch* branch = NULL;
     Name tag = 0;
@@ -1231,6 +1237,43 @@ void step_interpreter_action(Stack* stack, caValue* action)
         // Call override
         override(stack);
 
+        break;
+    }
+    case op_ExitPoint: {
+        Frame* frame = top_frame(stack);
+        Term* currentTerm = branch->get(frame->pc);
+
+        caValue* control = find_stack_value_for_term(stack, currentTerm->input(0), 0);
+
+        // Only exit if the control says we should exit.
+        if (!is_name(control) || as_name(control) == name_None)
+            return;
+
+        int intermediateOutputCount = currentTerm->numInputs() - 1;
+
+        // Copy intermediate values to the frame's output placeholders.
+        for (int i=0; i < intermediateOutputCount; i++) {
+
+            // Don't touch this output if it is an accumulatingOutput; it already has
+            // its output value.
+            Term* outputPlaceholder = get_output_placeholder(branch, i);
+            if (outputPlaceholder->boolProp("accumulatingOutput", false))
+                continue;
+
+            caValue* result = find_stack_value_for_term(stack, currentTerm->input(i + 1), 0);
+            caValue* out = get_frame_register_from_end(frame, i);
+
+            if (result != NULL) {
+                copy(result, out);
+            } else {
+                set_null(out);
+            }
+        }
+
+        // Set PC to end
+        frame->exitType = as_name(control);
+        frame->nextPc = branch->length();
+        
         break;
     }
     case op_FinishFrame: {

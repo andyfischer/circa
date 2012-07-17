@@ -21,47 +21,6 @@ static ExitRank get_exit_level_rank(Name level);
 static Name max_exit_level(Name left, Name right);
 static Name get_highest_exit_level(Branch* branch);
 
-void evaluate_exit_point(caStack* stack)
-{
-    Frame* frame = top_frame_parent(stack);
-    ca_assert(frame != NULL);
-
-    caValue* args = circa_input(stack, 0);
-    caValue* control = circa_index(args, 0);
-
-    // Only exit if the control says we should exit.
-    if (!is_name(control) || as_name(control) == name_None)
-        return;
-
-    Term* term = (Term*) circa_caller_term(stack);
-    Branch* branch = (Branch*) circa_caller_branch(stack);
-
-    int intermediateOutputCount = circa_count(args) - 1;
-
-    // Copy intermediate values to the frame's output placeholders.
-    for (int i=0; i < intermediateOutputCount; i++) {
-
-        // Don't touch this output if it is an accumulatingOutput; it already has
-        // its output value.
-        Term* outputPlaceholder = get_output_placeholder(branch, i);
-        if (outputPlaceholder->boolProp("accumulatingOutput", false))
-            continue;
-
-        caValue* result = circa_index(args, i + 1);
-        caValue* out = get_frame_register_from_end(frame, i);
-
-        if (result != NULL) {
-            copy(result, out);
-        } else {
-            set_null(out);
-        }
-    }
-
-    // Set PC to end
-    frame->nextPc = branch->length();
-    frame->exitType = as_name(control);
-}
-
 void evaluate_return(caStack* stack)
 {
     copy(circa_input(stack, 0), circa_output(stack, 0));
@@ -145,8 +104,7 @@ void control_flow_setup_funcs(Branch* kernel)
 {
     ca_assert(kernel->get("return") == NULL);
 
-    FUNCS.exit_point = import_function(kernel, evaluate_exit_point,
-        "exit_point(any :multiple :optional)");
+    FUNCS.exit_point = import_function(kernel, NULL, "exit_point(any :multiple :optional)");
 
     FUNCS.return_func = import_function(kernel, evaluate_return,
         "return(any :optional) -> any");

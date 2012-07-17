@@ -134,6 +134,7 @@ op_PushBranch
 op_FireNative
 op_CaseBlock
 op_ForLoop
+op_ExitPoint
 op_FinishFrame
 op_FinishLoop
 op_ErrorNotEnoughInputs

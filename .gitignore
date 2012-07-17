@@ -23,6 +23,7 @@ z.ca
 *.dSYM
 *.dylib
 *.o
+*.trace
 
 # Windows build artifacts
 *.opensdf

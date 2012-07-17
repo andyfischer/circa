@@ -132,6 +132,7 @@ const char* builtin_name_to_string(int name)
     case op_FireNative: return "op_FireNative";
     case op_CaseBlock: return "op_CaseBlock";
     case op_ForLoop: return "op_ForLoop";
+    case op_ExitPoint: return "op_ExitPoint";
     case op_FinishFrame: return "op_FinishFrame";
     case op_FinishLoop: return "op_FinishLoop";
     case op_ErrorNotEnoughInputs: return "op_ErrorNotEnoughInputs";
