@@ -120,7 +120,7 @@ static void resize_frame_list(Stack* stack, int newCapacity)
     }
 }
 
-static Frame* take_next_free_frame(Stack* stack, FrameId parent)
+static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branch* branch)
 {
     // Check to grow the frames list.
     if (stack->firstFreeFrame == 0) {
@@ -134,18 +134,33 @@ static Frame* take_next_free_frame(Stack* stack, FrameId parent)
         //dump_frames_raw(stack);
     }
 
-    Frame* next = frame_by_id(stack, stack->firstFreeFrame);
+    Frame* frame = frame_by_id(stack, stack->firstFreeFrame);
 
-    // Update free list.
-    if (next->parent == 0) {
+    if (frame->parent == 0) {
+        // We just took the last element off of the free list.
         stack->firstFreeFrame = 0;
         stack->lastFreeFrame = 0;
     } else {
-        stack->firstFreeFrame = next->parent;
+        // Advance the firstFree pointer.
+        stack->firstFreeFrame = frame->parent;
     }
 
-    next->parent = parent;
-    return next;
+    // Initialize frame
+    frame->branch = branch;
+    frame->pc = 0;
+    frame->nextPc = 0;
+    frame->exitType = name_None;
+    frame->dynamicCall = false;
+    frame->stop = false;
+
+    // Associate with parent
+    frame->parent = parent;
+    frame->parentPc = parentPc;
+
+    // Initialize registers
+    set_list(&frame->registers, get_locals_count(branch));
+
+    return frame;
 }
 
 static void release_frame(Stack* stack, Frame* frame)
@@ -161,6 +176,50 @@ static void release_frame(Stack* stack, Frame* frame)
     }
 }
 
+#if 0
+static void insert_frame_in_expansion_list(Stack* stack, Frame* newFrame, Frame* parent)
+{
+    ca_assert(newFrame->parent == parent->id);
+
+    // Check if parent's expansion list is empty.
+    if (parent->firstExpansion == 0) {
+        parent->firstExpansion = newFrame->id;
+        newFrame->neighborExpansion = 0;
+        return;
+    }
+
+    // Insert the new frame, sorted by parent PC.
+    Frame* neighbor = frame_by_id(stack, parent->firstExpansion);
+    Frame* previousNeighbor = NULL;
+
+    while (true) {
+        if (newFrame->parentPc <= neighbor->parentPc) {
+            // Insert newFrame before neighbor.
+
+            // Check if this is the new first
+            if (previousNeighbor == NULL)
+                parent->firstExpansion = newFrame->id;
+            else
+                previousNeighbor->neighborExpansion = newFrame->id;
+
+            newFrame->neighborExpansion = neighbor->id;
+            return;
+        }
+
+        // Check if this is the last in the expansion list
+        if (neighbor->neighborExpansion == 0) {
+            neighbor->neighborExpansion = newFrame->id;
+            newFrame->neighborExpansion = 0;
+            return;
+        }
+
+        // Advance down the list and iterate.
+        previousNeighbor = neighbor;
+        neighbor = frame_by_id(stack, neighbor->neighborExpansion);
+    }
+}
+#endif
+
 Frame* push_frame(Stack* stack, Branch* branch)
 {
     INCREMENT_STAT(PushFrame);
@@ -168,27 +227,14 @@ Frame* push_frame(Stack* stack, Branch* branch)
     // Make sure the branch's bytecode is up-to-date.
     refresh_bytecode(branch);
 
-    Frame* frame = take_next_free_frame(stack, stack->top);
+    int parentPc = 0;
+    if (stack->top != 0)
+        parentPc = top_frame(stack)->pc;
+
+    Frame* frame = initialize_frame(stack, stack->top, parentPc, branch);
+
+    // Update 'top'
     stack->top = frame->id;
-
-    // Registers
-#if 0 // shared register list
-    frame->registerFirst = list_length(&stack->registers);
-    frame->registerCount = get_locals_count(branch);
-    list_resize(&stack->registers, frame->registerFirst + frame->registerCount);
-#else
-    set_list(&frame->registers, get_locals_count(branch));
-#endif
-
-    frame->branch = branch;
-    frame->pc = 0;
-    frame->nextPc = 0;
-    frame->exitType = name_None;
-    frame->dynamicCall = false;
-    frame->stop = false;
-
-    // We are now referencing this branch
-    gc_mark_object_referenced(&branch->header);
 
     return frame;
 }
@@ -208,6 +254,9 @@ void pop_frame(Stack* stack)
         stack->top = top->parent;
 
     release_frame(stack, top);
+
+    // TODO: orphan all expansions?
+    // TODO: add a 'retention' flag
 }
 
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
@@ -255,6 +304,10 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
             return;
         }
     }
+}
+
+void stack_create_expansion(Stack* stack, Frame* parent, Term* term)
+{
 }
 
 void frame_set_stop_when_finished(Frame* frame)

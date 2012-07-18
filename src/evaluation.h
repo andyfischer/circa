@@ -16,18 +16,29 @@ typedef int FrameId;
 
 struct Frame
 {
-    // Pointer to owning Stack.
-    Stack* stack;
-
     // Frame ID, this is unique across the Stack.
     FrameId id;
 
-    // ID of this frame's parent.
+    // Pointer to owning Stack.
+    Stack* stack;
+
+    // ID of this frame's parent. The bottommost frame has parent 0. In the free list, this
+    // field masquarades as the "next free frame id".
     FrameId parent;
 
+    // PC (in the parent frame) that this frame was expanded from. Invalid for bottom frame.
+    int parentPc;
+
+    // The role or state of this frame.
+    caName role;
+
+    // Register values.
     List registers;
 
+    // Source branch
     Branch* branch;
+
+    // Current program counter
     int pc;
     int nextPc;
 
@@ -110,6 +121,9 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs);
 void finish_frame(Stack* stack);
 
 void reset_stack(Stack* stack);
+
+// Stack expansions. These are frames which aren't on the current trace.
+Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);
 
 // Access the stack.
 Frame* top_frame(Stack* stack);
