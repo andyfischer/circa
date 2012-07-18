@@ -200,8 +200,6 @@ void write_branch_bytecode(Branch* branch, caValue* output);
 void dynamic_call_func(caStack* stack);
 void finish_dynamic_call(caStack* stack);
 
-// Hosted functions
-void Frame__registers(caStack* stack);
-void Interpreter__frames(caStack* stack);
+void interpreter_install_functions(Branch* branch);
 
 } // namespace circa
