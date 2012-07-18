@@ -535,6 +535,15 @@ int to_int(caValue* value)
         throw std::runtime_error("In to_float, type is not an int or float");
 }
 
+caName leading_name(caValue* value)
+{
+    if (is_name(value))
+        return as_name(value);
+    if (is_list(value))
+        return leading_name(list_get(value, 0));
+    return name_None;
+}
+
 void set_transient_value(caValue* value, void* data, Type* type)
 {
     set_null(value);

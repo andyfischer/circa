@@ -24,6 +24,7 @@
 namespace circa {
 
 void dump_frames_raw(Stack* stack);
+static Branch* find_pushed_branch_for_action(caValue* action);
 
 Stack::Stack()
  : running(false),
@@ -256,7 +257,7 @@ void pop_frame(Stack* stack)
     release_frame(stack, top);
 
     // TODO: orphan all expansions?
-    // TODO: add a 'retention' flag
+    // TODO: add a 'retention' flag?
 }
 
 void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
@@ -306,8 +307,13 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
     }
 }
 
-void stack_create_expansion(Stack* stack, Frame* parent, Term* term)
+Frame* stack_create_expansion(Stack* stack, Frame* parent, Term* term)
 {
+    circa::Value action;
+    write_term_bytecode(term, &action);
+    Branch* branch = find_pushed_branch_for_action(&action);
+    Frame* frame = initialize_frame(stack, parent->id, term->index, branch);
+    return frame;
 }
 
 void frame_set_stop_when_finished(Frame* frame)
@@ -1213,7 +1219,17 @@ void populate_inputs_from_metadata(Stack* stack, Frame* frame, caValue* inputs)
     }
 }
 
-void step_interpreter(Stack* stack)
+static Branch* find_pushed_branch_for_action(caValue* action)
+{
+    switch (leading_name(action)) {
+    case op_PushBranch:
+        return as_branch(list_get(action, 2));
+    default:
+        return NULL;
+    }
+}
+
+static void step_interpreter(Stack* stack)
 {
     INCREMENT_STAT(StepInterpreter);
 

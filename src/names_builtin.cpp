@@ -35,9 +35,6 @@ const char* builtin_name_to_string(int name)
     case name_Continue: return "Continue";
     case name_Break: return "Break";
     case name_Discard: return "Discard";
-    case name_FrameRoleUnused: return "FrameRoleUnused";
-    case name_FrameRoleCurrentTrace: return "FrameRoleCurrentTrace";
-    case name_FrameRoleExpansion: return "FrameRoleExpansion";
     case name_InfixOperator: return "InfixOperator";
     case name_FunctionName: return "FunctionName";
     case name_TypeName: return "TypeName";
