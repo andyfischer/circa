@@ -397,7 +397,16 @@ void Term__format_source(caStack* stack)
         return circa_output_error(stack, "NULL reference");
     caValue* output = circa_output(stack, 0);
     circa_set_list(output, 0);
-    format_term_source((caValue*) output, t);
+    format_term_source(output, t);
+}
+void Term__format_source_normal(caStack* stack)
+{
+    Term* t = as_term_ref(circa_input(stack, 0));
+    if (t == NULL)
+        return circa_output_error(stack, "NULL reference");
+    caValue* output = circa_output(stack, 0);
+    circa_set_list(output, 0);
+    format_term_source_normal(output, t);
 }
 void Term__function(caStack* stack)
 {
@@ -646,6 +655,7 @@ void reflection_install_functions(Branch* kernel)
         {"Term.asint", Term__asint},
         {"Term.asfloat", Term__asfloat},
         {"Term.format_source", Term__format_source},
+        {"Term.format_source_normal", Term__format_source_normal},
         {"Term.function", Term__function},
         {"Term.get_type", Term__type},
         {"Term.tweak", Term__tweak},

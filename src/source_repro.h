@@ -11,6 +11,7 @@ std::string unformat_rich_source(caValue* source);
 
 void format_term_source(caValue* source, Term* term);
 void format_term_source_default_formatting(caValue* source, Term* term);
+void format_term_source_normal(caValue* source, Term* term);
 
 // Formats source for the given input, as used by the term.
 void format_source_for_input(caValue* source, Term* term, int inputIndex);

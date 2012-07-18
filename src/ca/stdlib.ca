@@ -314,6 +314,10 @@ def Term.to_string(self) -> String
 def Term.to_source_string(self) -> String
 def Term.format_source(self) -> List
     -- Return a list of formatted source phrases for this Term
+def Term.format_source_normal(self) -> List
+    -- Return a list of formatted source phrases for this Term. This formatting is 'normal',
+    -- meaning that it doesn't include the source for inputs (inputs are referred to by name
+    -- or by id), and special syntax is not used.
 def Term.function(self) -> Branch
     -- Fetch this term's function.
 def Term.get_type(self) -> Type

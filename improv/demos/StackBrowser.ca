@@ -1,0 +1,72 @@
+
+env = input() -> Environment
+
+fgcolor = #fff
+bgcolor = #848
+
+type FrameLine {
+    Term term
+    Rect rect
+}
+
+def FrameLine.handleEvent(@self, any event) -> actions
+def FrameLine.draw(self, Painter painter)
+    text = self.term.format_source_simple
+    painter.text(self.rect.topleft, text, fgcolor, [])
+
+type FrameBubble {
+    List lines
+    Rect rect
+    Frame frame
+}
+
+def FrameBubble.initializeFromBranch(@self, Branch branch)
+    self.lines = for Term term in branch.terms
+        line = create(FrameLine)
+        line.term = term
+
+def FrameBubble.draw(self, Painter painter)
+    -- background
+    painter.fillRect(self.rect, bgcolor)
+
+def FrameBubble.lineCount(self) -> int
+
+type StackBrowser {
+    List bubbles
+    Name currentLayoutType
+    Branch targetProgram
+}
+
+def StackBrowser.initializeLayout(@self, Branch branch)
+    -- Create a top-level bubble for the branch.
+    bubble = create(FrameBubble)
+    -- initialize rect
+    bubble.initializeFromBranch(branch)
+    self.bubbles = [bubble]
+
+def StackBrowser.handleEvent(@self, InputEvent event)
+def StackBrowser.draw(self, Painter painter)
+    for FrameBubble bubble in self.bubbles
+        bubble.draw(painter)
+
+def stack_browser(Branch branch) -> StackBrowser
+    browser = create(StackBrowser)
+    browser.branch = branch
+    browser.layout
+    browser
+
+
+testBranch = {
+    num_stars = 100
+    points = for i in 0..num_stars
+        state Point original_loc = [rand() rand()] * 300
+        loc = add(original_loc, drift)
+        loc
+    env.draw_points(points, #fff)
+}
+
+env.background(#339)
+
+browser = stack_browser(branch_ref(testBranch))
+browser.updateLayout([10 10 600 600])
+browser.draw(env.painter)

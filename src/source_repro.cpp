@@ -76,6 +76,27 @@ std::string unformat_rich_source(caValue* source)
     return strm.str();
 }
 
+static void format_value(caValue* source, Term* valueTerm)
+{
+    // Special constructor syntax
+    if (valueTerm->boolProp("constructor", false)) {
+        append_phrase(source, name_to_string(valueTerm->type->name), valueTerm, name_None);
+        append_phrase(source, "()", valueTerm, name_None);
+
+    // Otherwise use formatSource on type type.
+    } else {
+        Type* type = term_value(valueTerm)->value_type;
+        if (type->formatSource == NULL) {
+            std::stringstream out;
+            out << "Type " << name_to_string(type->name) <<
+                " doesn't have a formatSource function";
+            internal_error(out.str());
+        }
+
+        type->formatSource(source, valueTerm);
+    }
+}
+
 void format_term_source(caValue* source, Term* term)
 {
     ca_assert(term != NULL);
@@ -91,24 +112,8 @@ void format_term_source(caValue* source, Term* term)
         if (term->type != &FUNCTION_T && term->type != &TYPE_T)
             format_name_binding(source, term);
 
-        // Special constructor syntax
-        if (term->boolProp("constructor", false)) {
-            std::string s = name_to_string(term->type->name);
-            s += "()";
-            append_phrase(source, s, term, name_None);
+        format_value(source, term);
 
-        // Otherwise use formatSource on type type.
-        } else {
-            Type* type = term_value(term)->value_type;
-            if (type->formatSource == NULL) {
-                std::stringstream out;
-                out << "Type " << name_to_string(type->name) <<
-                    " doesn't have a formatSource function";
-                internal_error(out.str());
-            }
-
-            type->formatSource(source, term);
-        }
     // Last option; a function call with default formatting.
     } else {
         format_term_source_default_formatting(source, term);
@@ -117,6 +122,11 @@ void format_term_source(caValue* source, Term* term)
     // Post whitespace
     append_phrase(source, term->stringProp("syntax:postWhitespace", ""),
             term, name_Whitespace);
+}
+
+void format_term_source_normal(caValue* source, Term* term)
+{
+    format_name_binding(source, term);
 }
 
 void format_term_source_default_formatting(caValue* source, Term* term)
