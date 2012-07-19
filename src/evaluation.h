@@ -107,7 +107,6 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
 // outputs or update PC. You might want to call finish_frame() instead of this.
 void pop_frame(Stack* stack);
 
-
 // Flag this frame to stop the interpreter when finished.
 void frame_set_stop_when_finished(Frame* frame);
 

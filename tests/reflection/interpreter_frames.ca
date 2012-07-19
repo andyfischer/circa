@@ -8,6 +8,7 @@ def frame2()
 def frame1()
     a = 1
     b = 2
+    concat('dummy ' 'temp ' 'value')
 
     call_frame2 = frame2()
 
@@ -18,11 +19,11 @@ int.run
 -- interpreter should now have 'frame1' and 'frame2'
 
 index = 0
-for frame in int.frames
-    Frame(@frame)
+for Frame frame in int.frames
     print('frame ' index ' name: ' frame.pc_term.name)
     print('frame ' index ' registers: ' frame.registers)
     print('frame ' index ' pc: ' frame.pc)
+    print('frame ' index ' parentPc: ' frame.parentPc)
     index += 1
 
 top_frame = int.top_frame

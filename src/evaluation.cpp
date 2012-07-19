@@ -126,10 +126,18 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branc
 {
     // Check to grow the frames list.
     if (stack->firstFreeFrame == 0) {
-        const int growthRate = 500;
+
+        int growth = 0;
+        if (stack->framesCapacity < 20)
+            growth = 20;
+        else if (stack->framesCapacity < 100)
+            growth = 80;
+        else
+            growth = 200;
+
         //printf("pre resize:\n");
         //dump_frames_raw(stack);
-        resize_frame_list(stack, stack->framesCapacity + growthRate);
+        resize_frame_list(stack, stack->framesCapacity + growth);
 
         // TEMP
         //printf("post resize:\n");
@@ -767,7 +775,9 @@ void print_stack(Stack* stack, std::ostream& out)
     circa::Value stackTrace;
     get_stack_trace(stack, top_frame(stack), &stackTrace);
 
-    out << "[Stack " << stack << "]" << std::endl;
+    out << "[Stack " << stack
+        << ", top = #" << top_frame(stack)->id
+        << "]" << std::endl;
     for (int frameIndex = 0; frameIndex < list_length(&stackTrace); frameIndex++) {
         Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, frameIndex)));
         int depth = list_length(&stackTrace) - frameIndex - 1;
@@ -1510,85 +1520,85 @@ void set_frame_ref(caValue* value, Stack* stack, Frame* frame)
     set_int(list_get(value, 1), frame->id);
 }
 
-void Frame__registers(caStack* stack)
+void Frame__registers(caStack* callerStack)
 {
-    Frame* self = as_frame_ref(circa_input(stack, 0));
-    ca_assert(self != NULL);
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    ca_assert(frame != NULL);
 
-#if 0 // shared register list
-    caValue* out = circa_output(stack, 0);
+    caValue* out = circa_output(callerStack, 0);
+    copy(&frame->registers, out);
 
-    set_list(out, self->registerCount);
-    for (int i=0; i < self->registerCount; i++)
-        copy(get_frame_register(self, i), list_get(out, i));
-#else
-    caValue* out = circa_output(stack, 0);
-    copy(&self->registers, out);
+    // Touch 'output', as the interpreter may violate immutability.
     touch(out);
-#endif
 }
 
-void Frame__branch(caStack* stack)
+void Frame__branch(caStack* callerStack)
 {
-    Frame* self = as_frame_ref(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    set_branch(circa_output(stack, 0), self->branch);
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    ca_assert(frame != NULL);
+    set_branch(circa_output(callerStack, 0), frame->branch);
 }
 
-void Frame__register(caStack* stack)
+void Frame__register(caStack* callerStack)
 {
-    Frame* self = as_frame_ref(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    int index = circa_int_input(stack, 1);
-    copy(get_frame_register(self, index), circa_output(stack, 0));
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    ca_assert(frame != NULL);
+    int index = circa_int_input(callerStack, 1);
+    copy(get_frame_register(frame, index), circa_output(callerStack, 0));
 }
 
-void Frame__pc(caStack* stack)
+void Frame__pc(caStack* callerStack)
 {
-    Frame* self = as_frame_ref(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    set_int(circa_output(stack, 0), self->pc);
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    ca_assert(frame != NULL);
+    set_int(circa_output(callerStack, 0), frame->pc);
 }
-void Frame__pc_term(caStack* stack)
+void Frame__parentPc(caStack* callerStack)
 {
-    Frame* self = as_frame_ref(circa_input(stack, 0));
-    ca_assert(self != NULL);
-    set_term_ref(circa_output(stack, 0), self->branch->get(self->pc));
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    ca_assert(frame != NULL);
+    set_int(circa_output(callerStack, 0), frame->parentPc);
+}
+void Frame__pc_term(caStack* callerStack)
+{
+    Frame* frame = as_frame_ref(circa_input(callerStack, 0));
+    ca_assert(frame != NULL);
+    set_term_ref(circa_output(callerStack, 0), frame->branch->get(frame->pc));
 }
 
-void make_interpreter(caStack* stack)
+void make_interpreter(caStack* callerStack)
 {
     Stack* newContext = new Stack();
     gc_mark_object_referenced(&newContext->header);
     gc_set_object_is_root(&newContext->header, false);
 
-    set_pointer(circa_create_default_output(stack, 0), newContext);
+    set_pointer(circa_create_default_output(callerStack, 0), newContext);
 }
 
-void Interpreter__push_frame(caStack* stack)
+void Interpreter__push_frame(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
-    Branch* branch = as_branch(circa_input(stack, 1));
+    Branch* branch = as_branch(circa_input(callerStack, 1));
     ca_assert(branch != NULL);
-    caValue* inputs = circa_input(stack, 2);
+    caValue* inputs = circa_input(callerStack, 2);
 
     push_frame_with_inputs(self, branch, inputs);
 }
-void Interpreter__pop_frame(caStack* stack)
+void Interpreter__pop_frame(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     pop_frame(self);
 }
-void Interpreter__set_state_input(caStack* stack)
+void Interpreter__set_state_input(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
     if (top_frame(self) == NULL)
-        return circa_output_error(stack, "No stack frame");
+        return circa_output_error(callerStack, "No stack frame");
 
     // find state input
     Branch* branch = top_frame(self)->branch;
@@ -1607,16 +1617,16 @@ void Interpreter__set_state_input(caStack* stack)
         // No-op if branch doesn't expect state
         return;
 
-    copy(circa_input(stack, 1), stateSlot);
+    copy(circa_input(callerStack, 1), stateSlot);
 }
 
-void Interpreter__get_state_output(caStack* stack)
+void Interpreter__get_state_output(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
-    if (top_frame(stack) == NULL)
-        return circa_output_error(stack, "No stack frame");
+    if (top_frame(self) == NULL)
+        return circa_output_error(callerStack, "No stack frame");
 
     // find state output
     Branch* branch = top_frame(self)->branch;
@@ -1633,95 +1643,95 @@ void Interpreter__get_state_output(caStack* stack)
 
     if (stateSlot == NULL) {
         // Couldn't find outgoing state
-        set_null(circa_output(stack, 0));
+        set_null(circa_output(callerStack, 0));
         return;
     }
 
-    copy(stateSlot, circa_output(stack, 0));
+    copy(stateSlot, circa_output(callerStack, 0));
 }
 
-void Interpreter__reset(caStack* stack)
+void Interpreter__reset(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     reset_stack(self);
 }
-void Interpreter__run(caStack* stack)
+void Interpreter__run(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
     run_interpreter(self);
 }
-void Interpreter__run_steps(caStack* stack)
+void Interpreter__run_steps(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
-    int steps = circa_int_input(stack, 0);
+    int steps = circa_int_input(callerStack, 0);
     run_interpreter_steps(self, steps);
 }
-void Interpreter__frame(caStack* stack)
+void Interpreter__frame(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
-    int index = circa_int_input(stack, 1);
+    int index = circa_int_input(callerStack, 1);
     Frame* frame = frame_by_depth(self, index);
 
-    set_frame_ref(circa_output(stack, 0), self, frame);
+    set_frame_ref(circa_output(callerStack, 0), self, frame);
 }
-void Interpreter__output(caStack* stack)
+void Interpreter__output(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
-    int index = circa_int_input(stack, 1);
+    int index = circa_int_input(callerStack, 1);
 
     Frame* frame = top_frame(self);
     Term* output = get_output_placeholder(frame->branch, index);
     if (output == NULL)
-        set_null(circa_output(stack, 0));
+        set_null(circa_output(callerStack, 0));
     else
-        copy(get_frame_register(frame, output), circa_output(stack, 0));
+        copy(get_frame_register(frame, output), circa_output(callerStack, 0));
 }
-void Interpreter__errored(caStack* stack)
+void Interpreter__errored(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
-    set_bool(circa_output(stack, 0), error_occurred(self));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
+    set_bool(circa_output(callerStack, 0), error_occurred(self));
 }
-void Interpreter__error_message(caStack* stack)
+void Interpreter__error_message(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
 
     Frame* frame = top_frame(self);
     caValue* errorReg = get_frame_register(frame, frame->pc);
 
     if (errorReg == NULL)
-        set_string(circa_output(stack, 0), "(null error)");
+        set_string(circa_output(callerStack, 0), "(null error)");
     else if (is_string(errorReg))
-        set_string(circa_output(stack, 0), as_cstring(errorReg));
+        set_string(circa_output(callerStack, 0), as_cstring(errorReg));
     else
-        set_string(circa_output(stack, 0), to_string(errorReg).c_str());
+        set_string(circa_output(callerStack, 0), to_string(errorReg).c_str());
 }
-void Interpreter__toString(caStack* stack)
+void Interpreter__toString(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
 
     std::stringstream strm;
     print_stack(self, strm);
-    set_string(circa_output(stack, 0), strm.str().c_str());
+    set_string(circa_output(callerStack, 0), strm.str().c_str());
 }
 
-void Interpreter__frames(caStack* stack)
+void Interpreter__frames(caStack* callerStack)
 {
-    Stack* self = (Stack*) get_pointer(circa_input(stack, 0));
+    Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
     ca_assert(self != NULL);
-    caValue* out = circa_output(stack, 0);
+    caValue* out = circa_output(callerStack, 0);
 
     circa::Value stackTrace;
-    get_stack_trace(self, top_frame(stack), &stackTrace);
+    get_stack_trace(self, top_frame(self), &stackTrace);
     set_list(out, list_length(&stackTrace));
 
     for (int i=0; i < list_length(&stackTrace); i++) {
-        Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, i)));
+        Frame* frame = frame_by_id(self, as_int(list_get(&stackTrace, i)));
         set_frame_ref(circa_index(out, i), self, frame);
     }
 }
@@ -1733,6 +1743,7 @@ void interpreter_install_functions(Branch* kernel)
         {"Frame.register", Frame__register},
         {"Frame.registers", Frame__registers},
         {"Frame.pc", Frame__pc},
+        {"Frame.parentPc", Frame__parentPc},
         {"Frame.pc_term", Frame__pc_term},
 
         {"make_interpreter", make_interpreter},

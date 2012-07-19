@@ -148,6 +148,7 @@ def Frame.registers(self) -> List
     -- Fetch a list of all register values.
 def Frame.pc(self) -> int
     -- Fetch the current program counter (the interpreter's current position).
+def Frame.parentPc(self) -> int
 def Frame.pc_term(self) -> Term
     -- Fetch the term associated with the current program counter.
 
