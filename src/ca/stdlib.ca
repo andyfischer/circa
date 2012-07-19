@@ -447,6 +447,9 @@ def Rect.intersects(self, Rect b) -> bool
 def Rect.translate(self, Point p) -> Rect
     [self.x1 + p.x, self.y1 + p.y, self.x2 + p.x, self.y2 + p.y]
 
+def Rect.contains(self, Point p) -> bool
+    p.x >= self.x1 and p.y >= self.y1 and p.x < self.x2 and p.y < self.y2
+
 def toggle(bool tog) -> bool
     -- Stateful function, returns a boolean status. Every frame the function is called
     -- with (true), the result flips. Starts out false.

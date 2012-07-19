@@ -12,6 +12,7 @@ state interpreter_stopped = false
 state state_frozen = false
 state number timeWhenFrozen = 0
 state bool consumedMouseDown = false
+state List eventsToScript = []
 
 state Point mousePos
 state Set keysDown
@@ -88,6 +89,7 @@ if msg[0] == 'onPaintEvent'
         usersEnv.painter = painter
         usersEnv.mouse = mousePos
         usersEnv.keysDown = keysDown
+        usersEnv.events = eventsToScript
 
         if state_frozen
             usersEnv.time = timeWhenFrozen - timeShift
@@ -124,6 +126,8 @@ if msg[0] == 'onPaintEvent'
             concat('FPS:' fpsTracker.recentFps) #fff [])
         painter.text([bounds.x2 - 150, bounds.y2 - 40]
             concat('PerFrame:' fpsTracker.recentDelay) #fff [])
+
+    eventsToScript = []
 
 
 elif msg[0] == 'onInputEvent'
@@ -183,6 +187,8 @@ elif msg[0] == 'onInputEvent'
                     keysDown.add(en)
                 else
                     keysDown.remove(en)
+
+            eventsToScript.append(event)
 
     if event.eventType == MouseUp
         consumedMouseDown = false

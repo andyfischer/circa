@@ -4,6 +4,7 @@ type Environment {
     Point mouse
     number time
     Set keysDown
+    List events
 }
 
 def Environment.background(self, Color color)

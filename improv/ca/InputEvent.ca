@@ -65,6 +65,12 @@ def InputEvent.is_mouse(self) -> bool
     else
         return false
 
+def InputEvent.mouseDownIn(self, Rect rect) -> bool
+    if self.eventType == MouseDown
+        rect.contains(self.mousePos)
+    else
+        false
+
 def InputEvent.is_key(self) -> bool
     if self.eventType == KeyDown
         return true
