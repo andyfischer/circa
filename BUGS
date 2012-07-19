@@ -4,6 +4,10 @@ Top 5 worst issues
   - Improv sometimes fails to reload
 
 Recent
+  Dynamic method doesn't rewrite 1st input
+
+  For-loop index would be pretty nice
+
   Type inferrence fail in extra_output from if-block
 
   This code had an error with no source location:

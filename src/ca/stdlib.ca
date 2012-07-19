@@ -652,19 +652,19 @@ def hsv_to_rgb(List hsv) -> Color
 
     return [0 0 0 0]
 
-def lighten(Color c, number factor) -> Color
-    return [
-        min(c.r + factor, 1.0)
-        min(c.g + factor, 1.0)
-        min(c.b + factor, 1.0)
-        c.a]
+def Color.lighten(@self, number factor)
+    self = [
+        min(self.r + factor, 1.0)
+        min(self.g + factor, 1.0)
+        min(self.b + factor, 1.0)
+        self.a]
         
-def darken(Color c, number factor) -> Color
-    return [
-        max(c.r - factor, 0.0)
-        max(c.g - factor, 0.0)
-        max(c.b - factor, 0.0)
-        c.a]
+def Color.darken(@self, number factor)
+    self = [
+        max(self.r - factor, 0.0)
+        max(self.g - factor, 0.0)
+        max(self.b - factor, 0.0)
+        self.a]
 
 def delta(number val) -> number
     -- Stateful function, return the difference between this value and the value from

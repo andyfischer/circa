@@ -45,10 +45,10 @@ def FrameBubble.draw(self, Painter painter)
 
     index = 0
     for FrameLine line in self.lines
-        bgcolor = colors[index % 2]
+        bgcolor = colors[index % 2] -> Color
         
         if index == self.highlightedLine
-            bgcolor.lighten(.1)
+            bgcolor.lighten(.2)
 
         painter.fillRect(line.rect, bgcolor)
         line.draw(painter)
