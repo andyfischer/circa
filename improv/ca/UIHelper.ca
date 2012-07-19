@@ -39,8 +39,8 @@ def Button.draw(b, Painter p)
 def Button.input(@b, InputEvent e) -> any
     if e.is_mouse
         b.rollover = e.mousePos.inside(b.rect)
-        b.triggered = b.rollover and e.eventType == MouseUp
-        b.press = b.rollover and (e.eventType == MouseDown)
+        b.triggered = b.rollover and e.eventType == :MouseUp
+        b.press = b.rollover and e.eventType == :MouseDown
         
         if b.triggered
             return b.action

@@ -309,21 +309,29 @@ int get_hash_value(caValue* value)
     return f(value);
 }
 
+bool shallow_equals(caValue* lhs, caValue* rhs)
+{
+    return lhs->value_data.ptr == rhs->value_data.ptr;
+}
+
 bool equals(caValue* lhs, caValue* rhs)
 {
     ca_assert(lhs->value_type != NULL);
 
+    // Check for a type-specific handler.
     Type::Equals equals = lhs->value_type->equals;
 
     if (equals != NULL)
         return equals(lhs, rhs);
 
-    // Default behavior for different types: return false
+    // No handler, default behavior.
+    
+    // If types are different, return false.
     if (lhs->value_type != rhs->value_type)
         return false;
 
-    // Default behavor for same types: shallow comparison
-    return lhs->value_data.asint == rhs->value_data.asint;
+    // Otherwise, rely on shallow comparison
+    return shallow_equals(lhs, rhs);
 }
 
 bool equals_string(caValue* value, const char* s)
@@ -687,6 +695,10 @@ void circa_set_int(caValue* container, int i)
 {
     change_type(container, &INT_T);
     container->value_data.asint = i;
+}
+void circa_set_name(caValue* container, caName value)
+{
+    set_name(container, value);
 }
 void circa_set_null(caValue* container)
 {

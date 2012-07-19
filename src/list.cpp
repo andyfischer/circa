@@ -429,6 +429,48 @@ caValue* list_insert(caValue* list, int index)
     return result;
 }
 
+bool list_equals(caValue* left, caValue* right)
+{
+    ca_assert(is_list(left));
+
+    if (!is_list_based_type(right->value_type))
+        return false;
+
+    // Shortcut: lists are equal if they have the same address.
+    if (left->value_data.ptr == right->value_data.ptr)
+        return true;
+
+    int leftCount = list_length(left);
+
+    // Not equal if lengths differ.
+    if (leftCount != list_length(right))
+        return false;
+
+    // Check every element.
+    for (int i=0; i < leftCount; i++) {
+        if (!equals(list_get(left, i), list_get(right, i)))
+            return false;
+    }
+
+#if 0
+    // Sneaky optimization. We just verified that 'left' and 'right' are deeply
+    // equal, so no one will notice if they actually use the same data.
+    //
+    // TODO: This optimization can't be turned on as long as integers and numbers can
+    // compare equal. Ditto for lists that have equal contents but different type tags.
+    // 
+    // The best thing to do is probably have this function return two types of equality:
+    // 'loose' and 'exact'. We can do the sneaky optimization iff there is exact equality.
+    //
+    // Also, don't forget to preserve the type tag for 'right'.
+    //
+    set_null(right);
+    list_copy(left, right);
+#endif
+
+    return true;
+}
+
 void list_touch(caValue* list)
 {
     list->value_data.ptr = (ListData*) list_touch((ListData*) list->value_data.ptr);
@@ -651,28 +693,6 @@ namespace list_t {
         list_copy(source, dest);
     }
 
-    bool tv_equals(caValue* left, caValue* right)
-    {
-        ca_assert(is_list(left));
-
-        if (!is_list_based_type(right->value_type))
-            return false;
-
-        // Shortcut: lists are equal if they have the same address.
-        if (left->value_data.ptr == right->value_data.ptr)
-            return true;
-
-        int leftCount = list_length(left);
-
-        if (leftCount != list_length(right))
-            return false;
-
-        for (int i=0; i < leftCount; i++) {
-            if (!circa::equals(list_get(left, i), list_get(right, i)))
-                return false;
-        }
-        return true;
-    }
 
     void tv_cast(CastResult* result, caValue* value, Type* type, bool checkOnly)
     {
@@ -839,7 +859,7 @@ namespace list_t {
         type->release = tv_release;
         type->copy = tv_copy;
         type->toString = tv_to_string;
-        type->equals = tv_equals;
+        type->equals = list_equals;
         type->cast = tv_cast;
         type->getIndex = list_get;
         type->setIndex = tv_set_index;

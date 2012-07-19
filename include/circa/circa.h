@@ -342,6 +342,7 @@ void circa_set_bool(caValue* container, bool value);
 void circa_set_error(caValue* container, const char* msg);
 void circa_set_float(caValue* container, float value);
 void circa_set_int(caValue* container, int value);
+void circa_set_name(caValue* container, caName value);
 void circa_set_null(caValue* container);
 void circa_set_pointer(caValue* container, void* ptr);
 void circa_set_term(caValue* container, caTerm* term);

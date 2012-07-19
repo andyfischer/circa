@@ -114,3 +114,5 @@ browser.draw(env.painter)
 
 for event in env.events
     browser.handleEvent(event)
+
+env.events -> print

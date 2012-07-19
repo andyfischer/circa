@@ -92,7 +92,7 @@ void GLWidget::mouseDoubleClickEvent ( QMouseEvent * qevent )
 {
     circa::Value event;
     circa_set_list(&event, 3);
-    circa_set_int(circa_index(&event, 0), 4);
+    circa_set_name(circa_index(&event, 0), circa_to_name("MouseDoubleClick"));
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
@@ -101,7 +101,7 @@ void GLWidget::mouseMoveEvent ( QMouseEvent * qevent )
 {
     circa::Value event;
     circa_set_list(&event, 3);
-    circa_set_int(circa_index(&event, 0), 3);
+    circa_set_name(circa_index(&event, 0), circa_to_name("MouseMove"));
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
@@ -110,7 +110,14 @@ void GLWidget::mousePressEvent ( QMouseEvent * qevent )
 {
     circa::Value event;
     circa_set_list(&event, 3);
-    circa_set_int(circa_index(&event, 0), 1);
+
+    if (qevent->button() == Qt::LeftButton)
+        circa_set_name(circa_index(&event, 0), circa_to_name("MouseDown"));
+    else if (qevent->button() == Qt::RightButton)
+        circa_set_name(circa_index(&event, 0), circa_to_name("RightMouseDown"));
+    else
+        return;
+
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
@@ -119,7 +126,14 @@ void GLWidget::mouseReleaseEvent ( QMouseEvent * qevent )
 {
     circa::Value event;
     circa_set_list(&event, 3);
-    circa_set_int(circa_index(&event, 0), 2);
+
+    if (qevent->button() == Qt::LeftButton)
+        circa_set_name(circa_index(&event, 0), circa_to_name("MouseUp"));
+    else if (qevent->button() == Qt::RightButton)
+        circa_set_name(circa_index(&event, 0), circa_to_name("RightMouseUp"));
+    else
+        return;
+
     circa_set_vec2(circa_index(&event, 1), qevent->x(), qevent->y());
     circa_set_int(circa_index(&event, 2), 0);
     onInputEvent(&event);
@@ -128,7 +142,7 @@ void GLWidget::keyPressEvent ( QKeyEvent * qevent )
 {
     circa::Value event;
     circa_set_list(&event, 3);
-    circa_set_int(circa_index(&event, 0), 5);
+    circa_set_name(circa_index(&event, 0), circa_to_name("KeyDown"));
     circa_set_vec2(circa_index(&event, 1), 0, 0);
     circa_set_int(circa_index(&event, 2), qevent->key());
     onInputEvent(&event);
@@ -137,7 +151,7 @@ void GLWidget::keyReleaseEvent ( QKeyEvent * qevent )
 {
     circa::Value event;
     circa_set_list(&event, 3);
-    circa_set_int(circa_index(&event, 0), 6);
+    circa_set_name(circa_index(&event, 0), circa_to_name("KeyUp"));
     circa_set_vec2(circa_index(&event, 1), 0, 0);
     circa_set_int(circa_index(&event, 2), qevent->key());
     onInputEvent(&event);

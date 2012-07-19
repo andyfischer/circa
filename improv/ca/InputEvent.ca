@@ -1,13 +1,6 @@
 
-MouseDown = 1
-MouseUp = 2
-MouseMove = 3
-MouseDoubleClick = 4
-KeyDown = 5
-KeyUp = 6
-
 type InputEvent {
-    int eventType
+    Name eventType
     Point mousePos
     int keyCode
 }
@@ -54,34 +47,34 @@ def keycode_to_name(int key) -> Name
         return :none
 
 def InputEvent.is_mouse(self) -> bool
-    if self.eventType == MouseDown
+    if self.eventType == :MouseDown
         return true
-    elif self.eventType == MouseUp
+    elif self.eventType == :MouseUp
         return true
-    elif self.eventType == MouseMove
+    elif self.eventType == :MouseMove
         return true
-    elif self.eventType == MouseDrag
+    elif self.eventType == :MouseDrag
         return true
     else
         return false
 
 def InputEvent.mouseDownIn(self, Rect rect) -> bool
-    if self.eventType == MouseDown
+    if self.eventType == :MouseDown
         rect.contains(self.mousePos)
     else
         false
 
 def InputEvent.is_key(self) -> bool
-    if self.eventType == KeyDown
+    if self.eventType == :KeyDown
         return true
-    elif self.eventType == KeyUp
+    elif self.eventType == :KeyUp
         return true
     else
         return false
 
 def InputEvent.key_pressed(self, Name key) -> bool
-    if self.eventType == KeyDown
+    if self.eventType == :KeyDown
         eventKey = keycode_to_name(self.keyCode)
-        self.eventType == KeyDown and eventKey == key
+        self.eventType == :KeyDown and eventKey == key
     else
         false

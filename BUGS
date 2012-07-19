@@ -2,11 +2,14 @@
 Top 5 worst issues
   - Static error reporting is missing (such as misspelled/nonexistant variable names)
   - Improv sometimes fails to reload
+   - Still happening 7/18
 
 Recent
   Dynamic method doesn't rewrite 1st input
 
   For-loop index would be pretty nice
+
+  Improv needs clipping rects
 
   Type inferrence fail in extra_output from if-block
 

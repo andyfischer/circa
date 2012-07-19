@@ -142,7 +142,7 @@ def Dict.get(self, String key) -> any
 type Frame;
 def Frame.branch(self) -> Branch
     -- Return the Branch associated with this Frame.
-def Frame.register(self, int) -> any
+def Frame.register(self, ) -> any
     -- Fetch the value in the given register index.
 def Frame.registers(self) -> List
     -- Fetch a list of all register values.
@@ -151,6 +151,17 @@ def Frame.pc(self) -> int
 def Frame.parentPc(self) -> int
 def Frame.pc_term(self) -> Term
     -- Fetch the term associated with the current program counter.
+def Frame.create_expansion(self, Term) -> Frame
+    -- Create an expansion frame using the given Term.
+    -- Errors if the Term is not part of this frame's branch.
+def Frame.inputs(self) -> List
+    -- Returns a list of input register values
+def Frame.input(self, int nth) -> any
+    -- Returns the nth input register value
+def Frame.outputs(self) -> List
+    -- Returns a list of output register values
+def Frame.output(self, int nth) -> any
+    -- Returns the nth output register value
 
 type Interpreter;
 def make_interpreter() -> Interpreter
