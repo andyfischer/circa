@@ -11,7 +11,8 @@ type FrameLine {
 
 def FrameLine.handleEvent(@self, any event) -> actions
 def FrameLine.draw(self, Painter painter)
-    text = self.term.format_source_simple
+    formatted = self.term.format_source_simple
+    text = (for element in formatted { element[0] }).join('')
     painter.text(self.rect.topleft, text, fgcolor, [])
 
 type FrameBubble {

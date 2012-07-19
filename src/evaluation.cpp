@@ -816,7 +816,7 @@ void dump_frames_raw(Stack* stack)
         << ", top = " << stack->top
         << ", firstFree = " << stack->firstFreeFrame
         << ", lastFree = " << stack->lastFreeFrame
-        << std::cout;
+        << std::endl;
 
     for (int i=0; i < stack->framesCapacity; i++) {
         Frame* frame = &stack->frames[i];
@@ -1493,9 +1493,26 @@ void finish_dynamic_call(caStack* stack)
     }
 }
 
+Frame* as_frame_ref(caValue* value)
+{
+    ca_assert(value != NULL);
+    if (!is_list(value) || list_length(value) != 2)
+        return NULL;
+    Stack* stack = (Stack*) as_opaque_pointer(list_get(value, 0));
+    int frameId = as_int(list_get(value, 1));
+    return frame_by_id(stack, frameId);
+}
+
+void set_frame_ref(caValue* value, Stack* stack, Frame* frame)
+{
+    set_list(value, 2);
+    set_opaque_pointer(list_get(value, 0), stack);
+    set_int(list_get(value, 1), frame->id);
+}
+
 void Frame__registers(caStack* stack)
 {
-    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    Frame* self = as_frame_ref(circa_input(stack, 0));
     ca_assert(self != NULL);
 
 #if 0 // shared register list
@@ -1513,14 +1530,14 @@ void Frame__registers(caStack* stack)
 
 void Frame__branch(caStack* stack)
 {
-    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    Frame* self = as_frame_ref(circa_input(stack, 0));
     ca_assert(self != NULL);
     set_branch(circa_output(stack, 0), self->branch);
 }
 
 void Frame__register(caStack* stack)
 {
-    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    Frame* self = as_frame_ref(circa_input(stack, 0));
     ca_assert(self != NULL);
     int index = circa_int_input(stack, 1);
     copy(get_frame_register(self, index), circa_output(stack, 0));
@@ -1528,13 +1545,13 @@ void Frame__register(caStack* stack)
 
 void Frame__pc(caStack* stack)
 {
-    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    Frame* self = as_frame_ref(circa_input(stack, 0));
     ca_assert(self != NULL);
     set_int(circa_output(stack, 0), self->pc);
 }
 void Frame__pc_term(caStack* stack)
 {
-    Frame* self = (Frame*) get_pointer(circa_input(stack, 0));
+    Frame* self = as_frame_ref(circa_input(stack, 0));
     ca_assert(self != NULL);
     set_term_ref(circa_output(stack, 0), self->branch->get(self->pc));
 }
@@ -1587,7 +1604,7 @@ void Interpreter__set_state_input(caStack* stack)
     }
 
     if (stateSlot == NULL)
-        // Noop if branch doesn't expect state
+        // No-op if branch doesn't expect state
         return;
 
     copy(circa_input(stack, 1), stateSlot);
@@ -1649,7 +1666,7 @@ void Interpreter__frame(caStack* stack)
     int index = circa_int_input(stack, 1);
     Frame* frame = frame_by_depth(self, index);
 
-    set_pointer(circa_create_default_output(stack, 0), frame);
+    set_frame_ref(circa_output(stack, 0), self, frame);
 }
 void Interpreter__output(caStack* stack)
 {
@@ -1703,12 +1720,9 @@ void Interpreter__frames(caStack* stack)
     get_stack_trace(self, top_frame(stack), &stackTrace);
     set_list(out, list_length(&stackTrace));
 
-    dump(stack);
-
     for (int i=0; i < list_length(&stackTrace); i++) {
         Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, i)));
-        change_type(circa_index(out, i), TYPES.frame);
-        set_pointer(circa_index(out, i), frame);
+        set_frame_ref(circa_index(out, i), self, frame);
     }
 }
 
@@ -1740,6 +1754,9 @@ void interpreter_install_functions(Branch* kernel)
     };
 
     install_function_list(kernel, records);
+
+    TYPES.frame = circa_find_type(kernel, "Frame");
+    list_t::setup_type(TYPES.frame);
 }
 
 } // namespace circa

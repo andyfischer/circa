@@ -375,18 +375,18 @@ void set_string(caValue* value, std::string const& s)
     set_string(value, s.c_str());
 }
 
-List* set_list(caValue* value)
+caValue* set_list(caValue* value)
 {
     set_null(value);
     create(&LIST_T, value);
-    return List::checkCast(value);
+    return value;
 }
 
-List* set_list(caValue* value, int size)
+caValue* set_list(caValue* value, int size)
 {
-    List* list = set_list(value);
-    list->resize(size);
-    return list;
+    set_list(value);
+    list_resize(value, size);
+    return value;
 }
 
 void set_type(caValue* value, Type* type)

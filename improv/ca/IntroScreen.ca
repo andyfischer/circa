@@ -13,6 +13,7 @@ state ButtonBar scriptChoices = button_bar([
         ["Avatar", "demos/avatar.ca"]
         ["Skeletal anim", "demos/skeletal.ca"]
         ["Code Browser", "demos/CodeBrowser.ca"]
+        ["Stack Browser", "demos/StackBrowser.ca"]
         ])
 
 state fpsTracker = create(FPSTracker)

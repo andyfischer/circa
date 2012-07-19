@@ -19,19 +19,19 @@ namespace circa {
 
 void append_static_error(List* errors, Term* term, const char* type)
 {
-    List* item = set_list(errors->append(), 3);
-    set_term_ref(item->get(0), term);
-    set_string(item->get(1), type);
-    set_int(item->get(2), -1);
+    caValue* item = set_list(errors->append(), 3);
+    set_term_ref(list_get(item, 0), term);
+    set_string(list_get(item, 1), type);
+    set_int(list_get(item, 2), -1);
 }
 
 void append_static_error_for_input(List* errors, Term* term, const char* type,
         int inputIndex)
 {
-    List* item = set_list(errors->append(), 3);
-    set_term_ref(item->get(0), term);
-    set_string(item->get(1), type);
-    set_int(item->get(2), inputIndex);
+    caValue* item = set_list(errors->append(), 3);
+    set_term_ref(list_get(item, 0), term);
+    set_string(list_get(item, 1), type);
+    set_int(list_get(item, 2), inputIndex);
 }
 
 void check_input_for_static_error(List* errors, Term* term, int index)

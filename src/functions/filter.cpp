@@ -22,9 +22,7 @@ namespace filter_function {
             if (as_bool(get_index(bools,i)))
                 count++;
         
-        List* output = set_list(OUTPUT);
-        output->resize(count);
-        touch(output);
+        caValue* output = set_list(OUTPUT, count);
 
         int write = 0;
         for (int i=0; i < numInputs; i++) {

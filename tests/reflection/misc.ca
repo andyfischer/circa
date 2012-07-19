@@ -1,61 +1,52 @@
 
-my_sample_code = {
-  a = 1
-  b = add(a 2)
-}
+def f(int i, int j) -> int
+  return i + j
 
-br = branch_ref(my_sample_code)
-terms = br.terms()
+-- Introspect on output
+assert(f.output.function.name == "add")
+assert(f.output.type.name == "int")
+assert(f.output.inputs[0].name == "i")
+assert(f.output.inputs[1].name == "j")
+assert(f.output.inputs[1] == f.inputs[0])
 
-for i in 0..4
-    assert(terms[i] == br.get_term(i))
+-- Test rename
+assert(f.output.inputs[0].name == "i")
+def f(int i, int j) -> int
+  return i + j
 
-a = br.get_term(1)
-b = br.get_term(3)
+f.rename("i", "k")
 
--- Names
-assert(a.name() == 'a')
-assert(b.name() == 'b')
+print(f.to_source)
 
--- Source location
-assert(a.source_location() == [2, 3, 8, 3])
+-- Walk up a dataflow chain
+def g(int i) -> int
+  add(@i 1)
+  add(@i 2)
+  add(@i 3)
+  return i
+  
+def walk(f) -> Set
+  searched = new(Set)
+  searching = [f.output]
+  while !searching.empty()
+      next_searching = []
+      for s in searching
+          for i in s.inputs
+              if !searched.contains(i)
+                  next_searching.append(i)
+          searched.insert(s)
+      searching = next_searching
+  return searched
 
--- Inputs
-assert(a.num_inputs() == 0)
-assert(b.num_inputs() == 2)
-assert(b.input(0) == a)
+walk(g)
 
--- Function
-assert(a.function.name == "value")
-assert(b.function.name == "add")
+-- Concatenate two functions
+def f1(int i) -> int
+  return i + 3
+def f2(int j) -> int
+  return j // 2
 
-def myfunc()
-
-x = myfunc()
-
-xr = term_ref(x)
-assert(xr.function == branch_ref(myfunc))
-
--- Function inputs & outputs
-def myfunc2(int a, int b, int c) -> number
-  return a + b + c
-
-mf2 = branch_ref(myfunc2)
-
-a = mf2.input(0)
-b = mf2.input(1)
-c = mf2.input(2)
-
-assert(a.name() == "a")
-assert(b.name() == "b")
-assert(c.name() == "c")
-assert(mf2.inputs() == [a b c])
-assert(mf2.output(0).get_type() == number)
-
--- test Branch.statements
-my_branch = { a = (1 + 2) * 3 }
-
-statements = branch_ref(my_branch).statements
-assert(statements.length == 1)
-statement_0 = statements[0] -> Term
-assert(statement_0.function == branch_ref(mult))
+f3 = concat(f1 f2)
+assert(f3(3) == 2)
+assert(f3(7) == 5)
+assert(f3(-1) == 1)

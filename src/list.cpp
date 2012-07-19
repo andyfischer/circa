@@ -472,9 +472,10 @@ Type* create_compound_type()
     Type* type = create_type();
 
     list_t::setup_type(type);
-    List* param = set_list(&type->parameter, 2);
-    set_list(param->get(0), 0);
-    set_list(param->get(1), 0);
+    caValue* param = &type->parameter;
+    set_list(param, 2);
+    set_list(list_get(param, 0), 0);
+    set_list(list_get(param, 1), 0);
     return type;
 }
 
@@ -607,7 +608,7 @@ int list_find_field_index_by_name(Type* listType, const char* name)
 
 bool is_list_based_type(Type* type)
 {
-    return type->initialize == list_t::tv_initialize;
+    return type->storageType == STORAGE_TYPE_LIST;
 }
 
 namespace list_t {

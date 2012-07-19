@@ -570,10 +570,11 @@ void duplicate_branch(Branch* source, Branch* dest)
 Name load_script(Branch* branch, const char* filename)
 {
     // Store the file origin
-    List* fileOrigin = set_list(&branch->origin, 3);
-    set_name(fileOrigin->get(0), name_File);
-    set_string(fileOrigin->get(1), filename);
-    set_int(fileOrigin->get(2), circa_file_get_version(filename));
+    caValue* origin = &branch->origin;
+    set_list(origin, 3);
+    set_name(list_get(origin, 0), name_File);
+    set_string(list_get(origin, 1), filename);
+    set_int(list_get(origin, 2), circa_file_get_version(filename));
 
     // Read the text file
     circa::Value contents;
@@ -677,24 +678,27 @@ bool check_and_update_file_origin(Branch* branch, const char* filename)
 {
     int version = circa_file_get_version(filename);
 
-    List* fileOrigin = branch_get_file_origin(branch);
+    caValue* origin = branch_get_file_origin(branch);
 
-    if (fileOrigin == NULL) {
-        fileOrigin = set_list(&branch->origin, 3);
-        set_name(fileOrigin->get(0), name_File);
-        set_string(fileOrigin->get(1), filename);
-        set_int(fileOrigin->get(2), version);
+    if (origin == NULL) {
+        origin = &branch->origin;
+        set_list(origin, 3);
+        set_name(list_get(origin, 0), name_File);
+        set_string(list_get(origin, 1), filename);
+        set_int(list_get(origin, 2), version);
         return true;
     }
 
-    if (!equals_string(fileOrigin->get(1), filename)) {
-        set_string(fileOrigin->get(1), filename);
-        set_int(fileOrigin->get(2), version);
+    if (!equals_string(list_get(origin, 1), filename)) {
+        touch(origin);
+        set_string(list_get(origin, 1), filename);
+        set_int(list_get(origin, 2), version);
         return true;
     }
 
-    if (!equals_int(fileOrigin->get(2), version)) {
-        set_int(fileOrigin->get(2), version);
+    if (!equals_int(list_get(origin, 2), version)) {
+        touch(origin);
+        set_int(list_get(origin, 2), version);
         return true;
     }
 
@@ -703,11 +707,11 @@ bool check_and_update_file_origin(Branch* branch, const char* filename)
 
 Branch* load_latest_branch(Branch* branch)
 {
-    List* fileOrigin = branch_get_file_origin(branch);
+    caValue* fileOrigin = branch_get_file_origin(branch);
     if (fileOrigin == NULL)
         return branch;
 
-    std::string filename = as_string(fileOrigin->get(1));
+    std::string filename = as_string(list_get(fileOrigin, 1));
 
     bool fileChanged = check_and_update_file_origin(branch, filename.c_str());
 
@@ -729,10 +733,11 @@ void append_internal_error(caValue* result, int index, std::string const& messag
 {
     const int INTERNAL_ERROR_TYPE = 1;
 
-    List& error = *set_list(list_append(result), 3);
-    set_int(error[0], INTERNAL_ERROR_TYPE);
-    set_int(error[1], index);
-    set_string(error[2], message);
+    caValue* error = list_append(result);
+    set_list(error, 3);
+    set_int(list_get(error, 0), INTERNAL_ERROR_TYPE);
+    set_int(list_get(error, 1), index);
+    set_string(list_get(error, 2), message);
 }
 
 void branch_check_invariants(caValue* result, Branch* branch)

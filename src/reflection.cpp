@@ -329,9 +329,9 @@ void Branch__file_signature(caStack* stack)
         set_null(circa_output(stack, 0));
     else
     {
-        List* output = set_list(circa_output(stack, 0), 2);
-        copy(fileOrigin->get(1), output->get(0));
-        copy(fileOrigin->get(2), output->get(1));
+        caValue* output = set_list(circa_output(stack, 0), 2);
+        copy(fileOrigin->get(1), list_get(output, 0));
+        copy(fileOrigin->get(2), list_get(output, 1));
     }
 }
 

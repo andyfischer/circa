@@ -76,7 +76,7 @@ std::string unformat_rich_source(caValue* source)
     return strm.str();
 }
 
-static void format_value(caValue* source, Term* valueTerm)
+static void format_value_term(caValue* source, Term* valueTerm)
 {
     // Special constructor syntax
     if (valueTerm->boolProp("constructor", false)) {
@@ -112,7 +112,7 @@ void format_term_source(caValue* source, Term* term)
         if (term->type != &FUNCTION_T && term->type != &TYPE_T)
             format_name_binding(source, term);
 
-        format_value(source, term);
+        format_value_term(source, term);
 
     // Last option; a function call with default formatting.
     } else {
@@ -127,6 +127,29 @@ void format_term_source(caValue* source, Term* term)
 void format_term_source_normal(caValue* source, Term* term)
 {
     format_name_binding(source, term);
+
+    if (is_value(term)) {
+        format_value_term(source, term);
+        return;
+    }
+
+    append_phrase(source, term->function->name.c_str(), term, name_FunctionName);
+    append_phrase(source, "(", term, name_None);
+
+    for (int i=0; i < term->numInputs(); i++) {
+        if (i > 0)
+            append_phrase(source, " ", term, name_None);
+
+        Term* input = term->input(i);
+        if (input == NULL)
+            append_phrase(source, "null", NULL, name_None);
+        else if (has_empty_name(input))
+            append_phrase(source, global_id(term).c_str(), input, name_None);
+        else
+            append_phrase(source, input->name, input, name_None);
+    }
+
+    append_phrase(source, ")", term, name_None);
 }
 
 void format_term_source_default_formatting(caValue* source, Term* term)
