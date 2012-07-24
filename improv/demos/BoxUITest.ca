@@ -1,0 +1,20 @@
+
+env = input() -> Environment
+
+import BoxUI
+
+menu = vertical_menu([
+    label("Item 1", env.painter.mediumSans)
+    label("Item 2", env.painter.mediumSans)
+    label("Item 3", env.painter.mediumSans)
+    ])
+
+def UIElement.layout(@self, Point position)
+    size = self.getSize
+
+    self.rect = position.to_rect_topleft(size)
+
+
+print(menu)
+menu.layout([40 40])
+menu.draw(env.painter)

@@ -1,0 +1,41 @@
+
+type PopupMenu {
+    List elements
+    number lineHeight
+
+    -- Set by user:
+    Point location
+
+    -- Updated by .draw:
+    Rect rect
+}
+
+def PopupMenu.setElements(@self, List elements)
+    count = elements.length
+    self.elements = elements
+
+def PopupMenu.setLocation(@self, Point p)
+    self.location = p
+
+def PopupMenu.draw(@self, Painter painter)
+
+    painter.fillRect(self.rect, #830)
+
+    x = self.location.x
+    y = self.location.y
+
+    font = painter.mediumSans
+    lineHeight = font.height
+    maxWidth = 0
+    count = self.elements.length
+
+    for List element in self.elements
+        text = element[0] -> String
+        action = element[1]
+
+        size = painter.text([x y] text #000 [])
+        max(@maxWidth, size.width)
+
+        y += lineHeight
+
+    self.rect = self.location.to_rect_topleft([maxWidth lineHeight*count])
