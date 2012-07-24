@@ -1,6 +1,8 @@
 
 env = input() -> Environment
 
+import PopupMenu
+
 fgcolor = #fff
 bgcolor = #848
 frame_line_bgcolor_1 = #848
@@ -115,4 +117,8 @@ browser.draw(env.painter)
 for event in env.events
     browser.handleEvent(event)
 
-env.events -> print
+
+state popupMenu = create(PopupMenu)
+popupMenu.setElements([['Item 1' :item1] ['Item 2' :item2]])
+popupMenu.setLocation([300 300])
+popupMenu.draw(env.painter)

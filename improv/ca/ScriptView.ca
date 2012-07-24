@@ -45,7 +45,7 @@ def Interpreter.drawRuntimeError(int, Painter painter)
     msg = int.error_message
     left = 10
     width = painter.viewport.width - left
-    error_y = 50
+    error_y = 70
     size = [width, 100]
     painter.text([left error_y] concat(msg) #fff [])
 

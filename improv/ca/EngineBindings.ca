@@ -13,6 +13,8 @@ type Font;
 def create_font(String name, number size) -> Font
 def Font.height(self) -> number
 def Font.width(self, String text) -> number
+def Font.textSize(self, String text) -> Point
+    [self.width(text) self.height]
 
 type LineList;
 def create_line_list(RenderTarget target) -> LineList

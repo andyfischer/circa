@@ -1701,6 +1701,12 @@ void Interpreter__error_message(caStack* callerStack)
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
 
     Frame* frame = top_frame(self);
+
+    // If an output_placeholder threw the error, then the message is actually stored
+    // one frame higher.
+    if (frame->branch->get(frame->pc)->function == FUNCS.output)
+        frame = top_frame_parent(self);
+
     caValue* errorReg = get_frame_register(frame, frame->pc);
 
     if (errorReg == NULL)

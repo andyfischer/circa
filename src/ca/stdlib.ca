@@ -142,7 +142,7 @@ def Dict.get(self, String key) -> any
 type Frame;
 def Frame.branch(self) -> Branch
     -- Return the Branch associated with this Frame.
-def Frame.register(self, ) -> any
+def Frame.register(self, int index) -> any
     -- Fetch the value in the given register index.
 def Frame.registers(self) -> List
     -- Fetch a list of all register values.
@@ -409,10 +409,14 @@ def Point.perpendicular(self) -> Point
     [self.y -self.x]
 
 def Point.to_rect_center(self, Point size) -> Rect
-    -- Returns a Rect with this point as the center, and 'size' as the width & height.
+    -- Returns a Rect with this point as the center, and the given size.
     size_half = (size * 0.5) -> Point
     [self.x - size_half.x,
         self.y - size_half.y, self.x + size_half.x, self.y + size_half.y]
+
+def Point.to_rect_topleft(self, Point size) -> Rect
+    -- Returns a Rect with this point as the top-left, and the given size.
+    [self.x, self.y, self.x + size.x, self.y + size.y]
 
 def Point.delta(self) -> Point
     -- Stateful function, returns the point difference since the last frame.
