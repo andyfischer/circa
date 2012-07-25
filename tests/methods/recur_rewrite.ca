@@ -1,0 +1,28 @@
+
+type T {
+    int total
+}
+
+def T.f(@self, int i) -> int
+  if i <= 0
+      return 0
+  self.total += i
+  return 1 + self.f(i - 1)
+
+t = create(T)
+assert(t.total == 0)
+
+assert(t.f(1) == 1)
+assert(t.total == 1)
+
+t.total = 0
+assert(t.f(2) == 3)
+assert(t.total == 3)
+
+t.total = 0
+assert(t.f(3) == 6)
+assert(t.total == 6)
+
+t.total = 0
+assert(t.f(4) == 10)
+assert(t.total == 10)

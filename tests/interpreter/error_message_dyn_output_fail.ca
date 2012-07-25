@@ -1,0 +1,15 @@
+
+int = make_interpreter()
+
+testBranch = {
+
+    type T {}
+
+    t.hello()
+}
+
+int.push_frame(branch_ref(testBranch), [])
+int.run
+
+print(int.error_message)
+

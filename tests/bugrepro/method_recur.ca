@@ -1,0 +1,32 @@
+
+type UIElement {
+    Name tag
+    List args
+    Rect rect
+    bool rollover
+    bool pressed
+}
+
+def UIElement.getSize(self) -> Point
+    return [50 50]
+
+def UIElement.layoutInRect(@self, Rect rect)
+    self.rect = rect
+
+    if self.tag == :VerticalList
+        elements = self.args[0] -> List
+        topY = self.rect.y1
+        elements = self.args[0] -> List
+        for UIElement element in @elements
+            elementSize = element.getSize()
+
+            elementRect = [rect.x1 topY].to_rect_topleft(elementSize)
+
+            topY = rect.y2
+
+            element.layoutInRect(elementRect)
+
+        self.args[0] = elements
+
+element = create(UIElement)
+element.layoutInRect([0 0 100 100])
