@@ -1,0 +1,3 @@
+f1 args = []
+f2 firstArg = 5
+f2 args = []

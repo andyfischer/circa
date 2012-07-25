@@ -1003,13 +1003,6 @@ void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
         if (placeholder == NULL)
             break;
 
-        Term* input = term->input(inputIndex);
-
-        if (input == NULL) {
-            set_null(list_get(inputs, placeholderIndex));
-            continue;
-        }
-
         if (placeholder->boolProp("multiple", false)) {
             // Multiple inputs. Take all remaining inputs and put them into a list.
             
@@ -1022,6 +1015,14 @@ void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
                 set_term_ref(list_get(inputsResult, i), term->input(i + inputIndex));
             
             break;
+        }
+
+        Term* input = term->input(inputIndex);
+
+        // Check for no input provided. (this check must be after the check for :multiple).
+        if (input == NULL) {
+            set_null(list_get(inputs, placeholderIndex));
+            continue;
         }
 
         set_term_ref(list_get(inputs, placeholderIndex), input);

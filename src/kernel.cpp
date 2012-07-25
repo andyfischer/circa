@@ -211,21 +211,24 @@ void dynamic_method_call(caStack* stack)
 {
     INCREMENT_STAT(DynamicMethodCall);
 
-    caValue* args = circa_input(stack, 0);
+    caValue* object = circa_input(stack, 0);
+    caValue* args = circa_input(stack, 1);
 
     // Lookup method
     Term* term = (Term*) circa_caller_term(stack);
-    caValue* object = circa_index(args, 0);
     std::string functionName = term->stringProp("syntax:functionName", "");
 
     // Find and dispatch method
-    Term* method = find_method((Branch*) top_branch(stack),
+    Term* method = find_method((Branch*) circa_caller_branch(stack),
         (Type*) circa_type_of(object), functionName.c_str());
+
+    // copy(object, circa_output(stack, 1));
 
     if (method != NULL) {
         // Grab inputs before pop
         Value inputs;
         swap(args, &inputs);
+        copy(object, list_insert(&inputs, 0));
 
         pop_frame(stack);
         push_frame_with_inputs(stack, function_contents(method), &inputs);
@@ -977,7 +980,8 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
     // Need dynamic_method before any hosted functions
-    FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call, "def dynamic_method(any inputs :multiple) -> any");
+    FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call,
+            "def dynamic_method(any @obj, any inputs :multiple) -> any");
 
     // Load the standard library from stdlib.ca
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);

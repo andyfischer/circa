@@ -1,0 +1,12 @@
+
+
+def int.plusone(self) -> int
+    return self + 1
+
+
+x = 4 -> any
+
+assert(x.plusone == 5)
+
+-- Make sure 'x' is not affected by the call.
+assert(x == 4)

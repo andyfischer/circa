@@ -1,0 +1,11 @@
+
+def f1(any args :multiple)
+    print('f1 args = ' args)
+
+f1()
+
+def f2(int firstArg, any args :multiple)
+    print('f2 firstArg = ' firstArg)
+    print('f2 args = ' args)
+
+f2(5)

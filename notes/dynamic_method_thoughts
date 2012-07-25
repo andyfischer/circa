@@ -1,0 +1,18 @@
+
+dynamic_method currently has some problems
+
+The question is, how do we dynamically call a method that wants to rebind the 1st input?
+
+This is pretty common.
+
+We could assume that the dot.syntax is a clue meaning, "the left-hand side of the dot is always
+available to be rebound". (like the @ symbol in other contexts)
+
+So dynamic_method is always assumed to rebind the 1st arg. The call-site will always have the
+extra_output term.
+
+What if dynamic_method ends up calling a method that *doesn't* rebind 1st arg? Somebody needs
+to copy the 1st input to the extra_output. Who will do this?
+
+We can introduce bytecode that helps out with managing outputs. It would work just like
+the input instruction list. In this bytecode, one of the options is to copy an input.
