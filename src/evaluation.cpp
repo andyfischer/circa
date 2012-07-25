@@ -396,7 +396,7 @@ void finish_frame(Stack* stack)
                 string_append(&msg, to_string(result).c_str());
                 string_append(&msg, " to type ");
                 string_append(&msg, name_to_string(placeholder->type->name));
-                set_error_string(dest, as_cstring(&msg));
+                set_error_string(result, as_cstring(&msg));
                 topFrame->pc = placeholder->index;
                 parentFrame->pc = outputTerm->index;
                 raise_error(stack);
@@ -1701,11 +1701,6 @@ void Interpreter__error_message(caStack* callerStack)
     Stack* self = (Stack*) get_pointer(circa_input(callerStack, 0));
 
     Frame* frame = top_frame(self);
-
-    // If an output_placeholder threw the error, then the message is actually stored
-    // one frame higher.
-    if (frame->branch->get(frame->pc)->function == FUNCS.output)
-        frame = top_frame_parent(self);
 
     caValue* errorReg = get_frame_register(frame, frame->pc);
 

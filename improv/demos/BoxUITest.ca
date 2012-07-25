@@ -4,9 +4,9 @@ env = input() -> Environment
 import BoxUI
 
 menu = vertical_menu([
-    label("Item 1", env.painter.mediumSans)
-    label("Item 2", env.painter.mediumSans)
-    label("Item 3", env.painter.mediumSans)
+    label("Item 1", env.painter.mediumSans, #fff)
+    label("Item 2", env.painter.mediumSans, #fff)
+    label("Item 3", env.painter.mediumSans, #fff)
     ])
 
 def UIElement.layout(@self, Point position)

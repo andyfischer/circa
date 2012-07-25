@@ -8,10 +8,10 @@ type UIElement {
     bool pressed
 }
 
-def label(String text, Font font) -> UIElement
+def label(String text, Font font, Color color) -> UIElement
     element = create(UIElement)
     element.tag = :Label
-    element.args = [text font]
+    element.args = [text font color]
     element
 
 def vertical_menu(List elements) -> UIElement
@@ -22,9 +22,16 @@ def vertical_menu(List elements) -> UIElement
 
 def UIElement.draw(self, Painter painter)
     if self.tag == :VerticalList
-    elements = self.args[0] -> List
-    for UIElement element in elements
-        element.draw(painter)
+        elements = self.args[0] -> List
+        for UIElement element in elements
+            element.draw(painter)
+    elif self.tag == :Label
+        str = self.args[0] -> String
+        font = self.args[1] -> Font
+        color = self.args[2] -> Color
+        painter.setFont(font)
+        painter.text(self.rect.topleft, str, color, [])
+        print('text ' str ' at ' self.rect.topleft)
 
 def UIElement.handleEvent(@self, InputEvent e) -> Name
     if e.is_mouse
@@ -44,9 +51,9 @@ def UIElement.getSize(self) -> Point
     if self.tag == :Label
         str = self.args[0] -> String
         font = self.args[1] -> Font
-        font.textSize(str)
-    else if self.tag == :VerticalList
-        minimum = [0 0]
+        return font.textSize(str)
+    elif self.tag == :VerticalList
+        minimum = [0 0] -> Point
         elements = self.args[0] -> List
         for UIElement element in elements
             print(element)
@@ -54,13 +61,33 @@ def UIElement.getSize(self) -> Point
             print('size = ' elementSize)
             minimum.y += elementSize.y
             minimum.x = max(minimum.y, elementSize.y)
-        minimum
+        return minimum
+    else
+        error('unknown tag: ' self.tag)
+        return [0 0]
+
+def UIElement.layoutInRect(@self, Rect rect)
+    self.rect = rect
+
+    if self.tag == :VerticalList
+        elements = self.args[0] -> List
+        topY = self.rect.y1
+        elements = self.args[0] -> List
+        for UIElement element in @elements
+            elementSize = element.getSize()
+
+            elementRect = [rect.x1 topY].to_rect_topleft(elementSize)
+
+            topY = rect.y2
+
+            element.layoutInRect(elementRect)
+
+        self.args[0] = elements
 
 def UIElement.layout(@self, Point position)
     size = self.getSize
 
-    self.rect = position.to_rect_topleft(size)
-    
+    self.layoutInRect(position.to_rect_topleft(size))
 
 def UIElement.handleEvents(@self, List events) -> List
     -- Returns a list of unhandled events.
