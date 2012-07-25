@@ -128,7 +128,7 @@ const char* builtin_name_to_string(int name)
     case op_Pause: return "op_Pause";
     case op_SetNull: return "op_SetNull";
     case op_InlineCopy: return "op_InlineCopy";
-    case op_PushBranch: return "op_PushBranch";
+    case op_CallBranch: return "op_CallBranch";
     case op_FireNative: return "op_FireNative";
     case op_CaseBlock: return "op_CaseBlock";
     case op_ForLoop: return "op_ForLoop";
