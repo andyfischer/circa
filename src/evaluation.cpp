@@ -365,6 +365,10 @@ void finish_frame(Stack* stack)
     Frame* topFrame = top_frame(stack);
     Frame* parentFrame = top_frame_parent(stack);
 
+    ca_assert(parentFrame->pc < parentFrame->branch->length());
+
+    Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+
     if (parentFrame->pc < parentFrame->branch->length()) {
         Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
         
@@ -376,17 +380,14 @@ void finish_frame(Stack* stack)
 
             if (placeholder->type == &VOID_T)
                 continue;
-
+ 
             caValue* result = get_frame_register(topFrame, placeholder);
             Term* outputTerm = get_output_term(finishedTerm, i);
-
+ 
             // dynamic_method requires us to check outputTerm for NULL here.
-            // (deprecated)
             if (outputTerm == NULL)
                 continue;
-
             caValue* dest = get_frame_register(parentFrame, outputTerm);
-
             move(result, dest);
             bool success = cast(dest, placeholder->type);
             INCREMENT_STAT(Cast_FinishFrame);
@@ -1030,12 +1031,29 @@ void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
     }
 }
 
-void write_term_output_instructions(Term* term, caValue* op, Branch* branch)
+void write_term_output_instructions(Term* term, caValue* op, Branch* finishingBranch)
 {
+    ca_assert(finishingBranch != NULL);
+
     caValue* outputs = list_get(op, 2);
 
-    // Todo
     set_list(outputs, 0);
+
+    for (int i=0;; i++) {
+        Term* outputTerm = get_output_term(term, i);
+        if (outputTerm == NULL)
+            break;
+
+        caValue* outputIsn = list_append(outputs);
+
+        Term* placeholder = get_output_placeholder(finishingBranch, i);
+        if (placeholder == NULL || placeholder->type == &VOID_T) {
+            set_null(outputIsn);
+            continue;
+        }
+
+        set_int(outputIsn, i);
+    }
 }
 
 void write_term_bytecode(Term* term, caValue* result)
@@ -1149,7 +1167,7 @@ void write_term_bytecode(Term* term, caValue* result)
 
     // Write input & output instructions
     write_term_input_instructions(term, result, branch);
-    write_term_output_instructions(term, result, term->nestedContents);
+    write_term_output_instructions(term, result, branch);
 
     // Finally, do some lightweight optimization.
 
@@ -1158,7 +1176,7 @@ void write_term_bytecode(Term* term, caValue* result)
         Term* specialized = statically_specialize_overload_for_call(term);
         if (specialized != NULL) {
             ca_assert(tag == op_CallBranch);
-            set_branch(list_get(result, 2), function_contents(specialized));
+            set_branch(list_get(result, 3), function_contents(specialized));
         }
     }
 }

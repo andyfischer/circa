@@ -9,6 +9,7 @@
 #include "evaluation.h"
 #include "function.h"
 #include "heap_debugging.h"
+#include "if_block.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
@@ -743,10 +744,12 @@ void branch_finish_changes(Branch* branch)
 
     update_exit_points(branch);
 
-    // Make sure primary output is connected
+    // Make sure the primary output is connected.
     if (is_minor_branch(branch)) {
         Term* output = get_output_placeholder(branch, 0);
-        if (output != NULL && output->input(0) == NULL) {
+
+        // Don't mess with the primary if-block output.
+        if (output != NULL && output->input(0) == NULL && !is_if_block(output->owningBranch)) {
             set_input(output, 0, find_last_non_comment_expression(branch));
             respecialize_type(output);
         }

@@ -10,6 +10,7 @@ function_as_value.ca
 meta/misc.ca
 syntax/local_typedef.ca
 syntax/namespace.ca
+reflection/misc.ca
 recursion_tree.ca
 simple_state.ca
 assert_failure.ca

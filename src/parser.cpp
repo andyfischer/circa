@@ -1686,6 +1686,10 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     
     bool rebindLHS = explicitRebindLHS;
 
+    if (!tokens.nextIs(tok_Identifier)) {
+        internal_error("parser::method_call expected identifier after dot");
+    }
+
     std::string functionName = tokens.consumeStr(tok_Identifier);
 
     bool hasParens = false;
@@ -1739,6 +1743,12 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 
     // Create the term
     Term* term = apply(branch, function, inputs);
+
+    // If the func is dynamic_method and the rebind operator is used, we'll have to create
+    // an extra_output ourselves.
+    if (function == FUNCS.dynamic_method && rebindLHS) {
+        apply(branch, FUNCS.extra_output, TermList(term));
+    }
 
     // Possibly rebind the left-hand-side
     if (rebindLHS) {

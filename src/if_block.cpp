@@ -106,6 +106,8 @@ Term* if_block_prepend_primary_output(Term* ifBlock)
     Branch* contents = nested_contents(ifBlock);
 
     Term* placeholder = prepend_output_placeholder(contents, NULL);
+
+    // Insert a corresponding output in each case.
     for (CaseIterator it(contents); it.unfinished(); it.advance()) {
         Branch* caseContents = nested_contents(it.current());
 
@@ -204,6 +206,10 @@ Term* if_block_append_case(Branch* block, Term* input)
 bool is_case_branch(Branch* branch)
 {
     return branch->owningTerm != NULL && branch->owningTerm->function == FUNCS.case_func;
+}
+bool is_if_block(Branch* branch)
+{
+    return branch->owningTerm != NULL && branch->owningTerm->function == FUNCS.if_block;
 }
 Branch* get_block_for_case_branch(Branch* branch)
 {

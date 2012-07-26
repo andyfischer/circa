@@ -4,7 +4,7 @@ def f(int i, int j) -> int
 
 -- Introspect on output
 assert(f.output.function.name == "add")
-assert(f.output.type.name == "int")
+assert(f.output.get_type.name == "int")
 assert(f.output.inputs[0].name == "i")
 assert(f.output.inputs[1].name == "j")
 assert(f.output.inputs[1] == f.inputs[0])
@@ -40,7 +40,8 @@ def walk(f) -> Set
 
 walk(g)
 
--- Concatenate two functions
+-- Concatenate two functions (future)
+{-
 def f1(int i) -> int
   return i + 3
 def f2(int j) -> int
@@ -50,3 +51,4 @@ f3 = concat(f1 f2)
 assert(f3(3) == 2)
 assert(f3(7) == 5)
 assert(f3(-1) == 1)
+-}

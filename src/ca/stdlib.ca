@@ -308,6 +308,8 @@ def Type.declaringTerm(self) -> Term
 
 def type(any) -> Type
     -- Returns the runtime type of a value
+def static_type(any :meta) -> Type
+    -- Returns the static type of a value
 
 -- Metaprogramming on Term
 def term_ref(any :ignore_error) -> Term

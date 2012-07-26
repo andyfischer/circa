@@ -211,8 +211,13 @@ void dynamic_method_call(caStack* stack)
 {
     INCREMENT_STAT(DynamicMethodCall);
 
+#if NEW_DYNAMIC_METHOD
     caValue* object = circa_input(stack, 0);
     caValue* args = circa_input(stack, 1);
+#else
+    caValue* args = circa_input(stack, 0);
+    caValue* object = circa_index(args, 0);
+#endif
 
     // Lookup method
     Term* term = (Term*) circa_caller_term(stack);
@@ -228,7 +233,9 @@ void dynamic_method_call(caStack* stack)
         // Grab inputs before pop
         Value inputs;
         swap(args, &inputs);
+#if NEW_DYNAMIC_METHOD
         copy(object, list_insert(&inputs, 0));
+#endif
 
         pop_frame(stack);
         push_frame_with_inputs(stack, function_contents(method), &inputs);
@@ -707,6 +714,13 @@ void typeof_func(caStack* stack)
     set_type(circa_output(stack, 0), in->value_type);
 }
 
+void static_type_func(caStack* stack)
+{
+    Term* caller = (Term*) circa_caller_term(stack);
+    Term* input = caller->input(0);
+    set_type(circa_output(stack, 0), input->type);
+}
+
 void length(caStack* stack)
 {
     set_int(circa_output(stack, 0), num_elements(circa_input(stack, 0)));
@@ -980,8 +994,13 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
     // Need dynamic_method before any hosted functions
+#if NEW_DYNAMIC_METHOD
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call,
             "def dynamic_method(any @obj, any inputs :multiple) -> any");
+#else
+    FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call,
+            "def dynamic_method(any inputs :multiple) -> any");
+#endif
 
     // Load the standard library from stdlib.ca
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);
@@ -1046,6 +1065,7 @@ void bootstrap_kernel()
         {"Type.property", Type__property},
         {"Type.declaringTerm", Type__declaringTerm},
         {"type", typeof_func},
+        {"static_type", static_type_func},
 
         {NULL, NULL}
     };

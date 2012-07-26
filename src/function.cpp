@@ -5,6 +5,7 @@
 #include "control_flow.h"
 #include "evaluation.h"
 #include "function.h"
+#include "generic.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
@@ -172,6 +173,12 @@ Type* derive_specialized_output_type(Term* function, Term* call)
         outputType = attrs->specializeType(call);
     if (outputType == NULL)
         outputType = &ANY_T;
+
+    if (function->boolProp("preferSpecialize", false)) {
+        Term* specialized = statically_specialize_overload_for_call(call);
+        if (specialized != NULL)
+            return function_get_output_type(specialized, 0);
+    }
     return outputType;
 }
 
