@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os,subprocess,sys,re
+import itertools
 import traceback
 from glob import glob
 
@@ -37,8 +38,9 @@ class CircaProcess:
             yield line[:-1]
 
     def kill(self):
-        self.proc.kill()
-        self.proc = None
+        if self.proc is not None:
+            self.proc.kill()
+            self.proc = None
 
 
 class OutputDifference(object):
@@ -85,7 +87,6 @@ def diff_command_against_file(process, command, filename):
         expectedOutput = read_text_file_as_lines(filename)
 
     numLines = 0
-    expectedOutput = expectedOutput.__iter__()
 
     try:
         actualOutput = list(process.run(command))
@@ -93,13 +94,7 @@ def diff_command_against_file(process, command, filename):
         process.kill()
         raise e
 
-    for actualLine in actualOutput:
-        expectedLine = ""
-        try:
-            expectedLine = expectedOutput.next()
-        except StopIteration:
-            pass
-
+    for actualLine,expectedLine in itertools.izip_longest(actualOutput,expectedOutput, fillvalue=""):
         if expectedLine != actualLine:
             print "\n".join(actualOutput)
             return OutputDifference(actualLine, expectedLine, numLines+1)
@@ -115,6 +110,7 @@ def test_file(process, filename):
         diff = diff_command_against_file(process, "file "+filename, filename + ".output")
     except Exception,e:
         traceback.print_exc()
+        process.kill()
         failures.append(TestFailure(["Exception running file"], filename))
         return failures
 
@@ -123,12 +119,14 @@ def test_file(process, filename):
         desc.append('  Expected: "'+diff.fromFile+'"')
         desc.append('  Observed: "'+diff.fromCommand+'"')
         failures.append(TestFailure(desc, filename))
+        process.kill()
 
     # Source repro test
     try:
         diff = diff_command_against_file(process, "source_repro "+filename, filename)
     except Exception,e:
         traceback.print_exc()
+        process.kill()
         failures.append(TestFailure(["Exception running source repro"], filename))
         return failures
 
@@ -137,6 +135,7 @@ def test_file(process, filename):
         desc.append(' Expected: '+diff.fromFile)
         desc.append(' Observed: '+diff.fromCommand)
         failures.append(TestFailure(desc, filename))
+        process.kill()
 
     return failures
 
