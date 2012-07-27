@@ -5,6 +5,10 @@ Top 5 worst issues
    - Still happening 7/18
 
 Recent
+  Move output casting to a different spot. Currently it happens twice - once when a value
+  is copied by output_placeholder (this is the correct spot), and again in finish_frame.
+  It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
+   
   Dynamic method doesn't rewrite 1st input
 
   For-loop index would be pretty nice
@@ -32,6 +36,9 @@ Code cleanup
   Remove importing_macros.h
   Deprecate API using Term* or Function* to reference functions (prefer Branch*)
   Eliminate C++ Function type, in favor of Branch.
+
+Runtime reflection
+  Functions have type Function, we should get rid of that and just use Branch everywhere
 
 Parser
   In function decl, type should be optional (rather than name being optional)

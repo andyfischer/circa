@@ -48,6 +48,7 @@ struct BuiltinFuncs {
     Term* add_i;
     Term* add_f;
     Term* branch;
+    Term* branch_dynamic_call;
     Term* branch_unevaluated;
     Term* break_func;
     Term* case_func;
@@ -139,8 +140,6 @@ extern Type VOID_T;
 struct BuiltinTypes {
     Type* actor;
     Type* color;
-    Type* dynamicInputs;
-    Type* dynamicOutputs;
     Type* file_signature;
     Type* frame;
     Type* map;

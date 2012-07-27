@@ -19,21 +19,8 @@ def changed(any current) -> bool
     prev = current
     return result
 
-def call(any callable, List inputs) -> any
+def dynamic_call(Branch branch, List inputs) -> List
     -- Dynamic function dispatch
-
-type DynamicInputs {
-    List inputs
-    any stateVal
-}
-
-type DynamicOutputs {
-    List outputs
-    any stateVal
-}
-
-def dynamic_call(Branch branch, DynamicInputs inputs) -> DynamicOutputs
-    -- Dynamic call, supporting the full function protocol.
 
 def send(String name, any msg)
     -- Pass a message to an actor by name
@@ -43,7 +30,7 @@ def call_actor(String name, any msg)
 
 def actor_run_message(Actor actor, any msg)
     b = actor.branch
-    call(b, msg)
+    dynamic_call(b, msg)
 
 type Mutable;
 def Mutable.set(self, any val)
@@ -82,7 +69,7 @@ def load_module(String filename) -> Branch
 -- Metaprogramming on Branch
 def branch_ref(any branch :ignore_error) -> Branch
     -- Obtain a Branch ref from an expression.
-def Branch.call(self, any inputs :multiple)
+def Branch.call(self, any inputs :multiple) -> List
     -- Invoke this Branch with the given inputs.
 def Branch.dump(self)
     -- Dump this branch's raw contents to stdout.
@@ -162,6 +149,8 @@ def Frame.outputs(self) -> List
     -- Returns a list of output register values
 def Frame.output(self, int nth) -> any
     -- Returns the nth output register value
+
+def Function.branch(self) -> Branch
 
 type Interpreter;
 def make_interpreter() -> Interpreter

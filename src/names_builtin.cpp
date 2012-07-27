@@ -129,6 +129,7 @@ const char* builtin_name_to_string(int name)
     case op_SetNull: return "op_SetNull";
     case op_InlineCopy: return "op_InlineCopy";
     case op_CallBranch: return "op_CallBranch";
+    case op_DynamicCall: return "op_DynamicCall";
     case op_FireNative: return "op_FireNative";
     case op_CaseBlock: return "op_CaseBlock";
     case op_ForLoop: return "op_ForLoop";
@@ -137,7 +138,11 @@ const char* builtin_name_to_string(int name)
     case op_FinishLoop: return "op_FinishLoop";
     case op_ErrorNotEnoughInputs: return "op_ErrorNotEnoughInputs";
     case op_ErrorTooManyInputs: return "op_ErrorTooManyInputs";
-    case op_LoopProduceOutput: return "op_LoopProduceOutput";
+    case name_LoopProduceOutput: return "LoopProduceOutput";
+    case name_FlatOutputs: return "FlatOutputs";
+    case name_OutputsToList: return "OutputsToList";
+    case name_Multiple: return "Multiple";
+    case name_Cast: return "Cast";
     case name_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";

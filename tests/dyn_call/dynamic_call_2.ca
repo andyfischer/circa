@@ -21,7 +21,7 @@ dispatch_result = []
 step = 0
 
 for f in function_list
-    dispatch_result = call(f, [dispatch_result step])
+    dispatch_result = dynamic_call(f.branch, [dispatch_result step])[0]
     step += 1
 
 print(dispatch_result)

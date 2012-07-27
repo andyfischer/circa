@@ -6,4 +6,4 @@ code = {
     print(b)
 }
 
-call(code [4])
+dynamic_call(branch_ref(code) [4])

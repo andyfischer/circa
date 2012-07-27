@@ -167,33 +167,6 @@ void to_string_repr(caStack* stack)
     circa_to_string_repr(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-void call_func(caStack* stack)
-{
-    caValue* callable = circa_input(stack, 0);
-    Value inputs;
-    circa_swap(circa_input(stack, 1), &inputs);
-
-    caBranch* branch = NULL;
-
-    if (circa_is_branch(callable))
-        branch = circa_branch(callable);
-    else if (circa_is_function(callable))
-        branch = circa_function_contents(circa_function(callable));
-    else
-        branch = (Branch*) circa_nested_branch(circa_caller_input_term(stack, 0));
-
-    if (branch == NULL) {
-        circa_output_error(stack, "Input 0 is not callable");
-        return;
-    }
-
-    // Pop calling frame
-    pop_frame(stack);
-
-    // Replace it with the callee frame
-    push_frame_with_inputs(stack, (Branch*) branch, &inputs);
-}
-
 void call_actor_func(caStack* stack)
 {
     const char* actorName = circa_string_input(stack, 0);
@@ -206,6 +179,16 @@ void call_actor_func(caStack* stack)
 
     circa_actor_run_message(stack->world, actorName, msg);
 }
+
+#if 0
+void dynamic_call(caStack* stack)
+{
+    Branch* branch = as_branch(circa_input(stack, 0));
+    caValue* inputs = circa_input(stack, 1);
+
+    push_frame_with_inputs(stack, branch, inputs);
+}
+#endif
 
 void dynamic_method_call(caStack* stack)
 {
@@ -353,6 +336,12 @@ void Dict__get(caStack* stack)
     const char* key = circa_string_input(stack, 1);
 
     copy(dict_get(dict, key), circa_output(stack, 0));
+}
+
+void Function__branch(caStack* stack)
+{
+    Function* function = as_function(circa_input(stack, 0));
+    set_branch(circa_output(stack, 0), function_get_contents(function));
 }
 
 void List__append(caStack* stack)
@@ -1009,14 +998,13 @@ void bootstrap_kernel()
     static const ImportRecord records[] = {
         {"assert", hosted_assert},
         {"cppbuild:build_module", cppbuild_function::build_module},
+        // {"dynamic_call", dynamic_call},
         {"file:version", file__version},
         {"file:exists", file__exists},
         {"file:read_text", file__read_text},
         {"length", length},
         {"from_string", from_string},
         {"to_string_repr", to_string_repr},
-        {"call", call_func},
-        {"dynamic_call", dynamic_call_func},
         {"call_actor", call_actor_func},
         {"send", send_func},
         {"refactor:rename", refactor__rename},
@@ -1028,9 +1016,13 @@ void bootstrap_kernel()
         {"sys:perf_stats_dump", sys__perf_stats_dump},
         {"load_module", load_module},
 
+        // {"Branch.call", dynamic_call},
+
         {"Dict.count", Dict__count},
         {"Dict.get", Dict__get},
         {"Dict.set", Dict__set},
+
+        {"Function.branch", Function__branch},
 
         {"List.append", List__append},
         {"List.extend", List__extend},
@@ -1077,6 +1069,7 @@ void bootstrap_kernel()
     // Fetch refereneces to certain builtin funcs.
     FUNCS.dll_patch = kernel->get("sys:dll_patch");
     FUNCS.dynamic_call = kernel->get("dynamic_call");
+    FUNCS.branch_dynamic_call = kernel->get("Branch.call");
     FUNCS.length = kernel->get("length");
     FUNCS.not_func = kernel->get("not");
     FUNCS.type = kernel->get("type");
@@ -1089,8 +1082,6 @@ void bootstrap_kernel()
     callable_t::setup_type(as_type(kernel->get("Callable")));
     TYPES.frame = as_type(kernel->get("Frame"));
     TYPES.point = as_type(kernel->get("Point"));
-    TYPES.dynamicInputs = as_type(kernel->get("DynamicInputs"));
-    TYPES.dynamicOutputs = as_type(kernel->get("DynamicOutputs"));
     TYPES.file_signature = as_type(kernel->get("FileSignature"));
 
     Type* mutableType = as_type(kernel->get("Mutable"));

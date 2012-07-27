@@ -27,6 +27,9 @@ namespace circa {
 void dump_frames_raw(Stack* stack);
 static Branch* find_pushed_branch_for_action(caValue* action);
 
+const int BytecodeIndex_Inputs = 1;
+const int BytecodeIndex_Output = 2;
+
 Stack::Stack()
  : running(false),
    errorOccurred(false),
@@ -160,7 +163,6 @@ static Frame* initialize_frame(Stack* stack, FrameId parent, int parentPc, Branc
     frame->pc = 0;
     frame->nextPc = 0;
     frame->exitType = name_None;
-    frame->dynamicCall = false;
     frame->stop = false;
 
     // Associate with parent
@@ -269,7 +271,7 @@ void pop_frame(Stack* stack)
     // TODO: add a 'retention' flag?
 }
 
-void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
+Frame* push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
 {
     // Make a local copy of 'inputs', since we're going to touch the stack before
     // accessing it, and the value might live on the stack.
@@ -280,7 +282,7 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
     int inputsLength = list_length(inputs);
 
     // Push new frame
-    push_frame(stack, branch);
+    Frame* frame = push_frame(stack, branch);
     
     // Cast inputs into placeholders
     int placeholderIndex = 0;
@@ -308,12 +310,14 @@ void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* _inputs)
             string_append_quoted(&error, input);
             string_append(&error, " (at index ");
             string_append(&error, placeholderIndex);
-            string_append(&error, ") to type");
+            string_append(&error, ") to type ");
             string_append(&error, name_to_string(placeholder->type->name));
             raise_error_msg(stack, as_cstring(&error));
-            return;
+            return frame;
         }
     }
+
+    return frame;
 }
 
 Frame* stack_create_expansion(Stack* stack, Frame* parent, Term* term)
@@ -356,38 +360,33 @@ void finish_frame(Stack* stack)
         return;
     }
 
-    // Check to finish dynamic_call (deprecatd)
-    if (top->dynamicCall) {
-        finish_dynamic_call(stack);
-        return;
-    }
-
     Frame* topFrame = top_frame(stack);
     Frame* parentFrame = top_frame_parent(stack);
 
     ca_assert(parentFrame->pc < parentFrame->branch->length());
 
-    Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+    caValue* callerBytecode = list_get(&parentFrame->branch->bytecode, parentFrame->pc);
+    caValue* outputAction = list_get(callerBytecode, 2);
 
-    if (parentFrame->pc < parentFrame->branch->length()) {
+    // Copy outputs
+
+    if (as_name(outputAction) == name_FlatOutputs) {
+
         Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
-        
+        int outputSlotCount = count_actual_output_terms(finishedTerm);
+
         // Copy outputs to the parent frame, and advance PC.
-        for (int i=0;; i++) {
+        for (int i=0; i < outputSlotCount; i++) {
             Term* placeholder = get_output_placeholder(finishedBranch, i);
             if (placeholder == NULL)
                 break;
 
             if (placeholder->type == &VOID_T)
                 continue;
- 
+
             caValue* result = get_frame_register(topFrame, placeholder);
-            Term* outputTerm = get_output_term(finishedTerm, i);
- 
-            // dynamic_method requires us to check outputTerm for NULL here.
-            if (outputTerm == NULL)
-                continue;
-            caValue* dest = get_frame_register(parentFrame, outputTerm);
+            caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
+
             move(result, dest);
             bool success = cast(dest, placeholder->type);
             INCREMENT_STAT(Cast_FinishFrame);
@@ -400,11 +399,29 @@ void finish_frame(Stack* stack)
                 string_append(&msg, name_to_string(placeholder->type->name));
                 set_error_string(result, as_cstring(&msg));
                 topFrame->pc = placeholder->index;
-                parentFrame->pc = outputTerm->index;
+                parentFrame->pc = finishedTerm->index + i;
                 raise_error(stack);
                 return;
             }
         }
+    } else if (as_name(outputAction) == name_OutputsToList) {
+        Term* finishedTerm = parentFrame->branch->get(parentFrame->pc);
+        caValue* dest = get_frame_register(parentFrame, finishedTerm->index);
+
+        int count = count_output_placeholders(finishedBranch);
+        set_list(dest, count);
+
+        for (int i=0; i < count; i++) {
+            move(get_frame_register_from_end(topFrame, i), list_get(dest, i));
+        }
+
+    } else {
+        Value msg;
+        set_string(&msg, "Unrecognized output action: ");
+        string_append_quoted(&msg, outputAction);
+        set_error_string(get_frame_register(parentFrame, parentFrame->pc), as_cstring(&msg));
+        raise_error(stack);
+        return;
     }
 
     // Pop frame
@@ -759,6 +776,9 @@ static void get_stack_trace(Stack* stack, Frame* frame, caValue* output)
     // Build a list of stack IDs, starting at the top.
     set_list(output, 0);
 
+    if (frame == NULL)
+        return;
+
     while (true) {
         set_int(list_append(output), frame->id);
 
@@ -777,8 +797,10 @@ void print_stack(Stack* stack, std::ostream& out)
     circa::Value stackTrace;
     get_stack_trace(stack, top_frame(stack), &stackTrace);
 
+    int topId = top_frame(stack) == NULL ? 0 : top_frame(stack)->id;
+
     out << "[Stack " << stack
-        << ", top = #" << top_frame(stack)->id
+        << ", top = #" << topId
         << "]" << std::endl;
     for (int frameIndex = 0; frameIndex < list_length(&stackTrace); frameIndex++) {
         Frame* frame = frame_by_id(stack, as_int(list_get(&stackTrace, frameIndex)));
@@ -1007,53 +1029,50 @@ void write_term_input_instructions(Term* term, caValue* op, Branch* branch)
 
         if (placeholder->boolProp("multiple", false)) {
             // Multiple inputs. Take all remaining inputs and put them into a list.
+            // This list starts with a tag and looks like:
+            //   [:multiple arg0 arg1 ...]
             
             caValue* inputsResult = list_get(inputs, placeholderIndex);
 
             int packCount = inputCount - inputIndex;
-            set_list(inputsResult, packCount);
+            set_list(inputsResult, packCount + 1);
+
+            set_name(list_get(inputsResult, 0), name_Multiple);
 
             for (int i=0; i < packCount; i++)
-                set_term_ref(list_get(inputsResult, i), term->input(i + inputIndex));
+                set_term_ref(list_get(inputsResult, i + 1), term->input(i + inputIndex));
             
             break;
         }
 
         Term* input = term->input(inputIndex);
+        caValue* action = list_get(inputs, placeholderIndex);
 
         // Check for no input provided. (this check must be after the check for :multiple).
         if (input == NULL) {
-            set_null(list_get(inputs, placeholderIndex));
-            continue;
+            set_null(action);
+        }
+        
+        // Check if a cast is necessary
+        else if (input->type != placeholder->type && placeholder->type != &ANY_T) {
+            set_list(action, 3);
+            set_name(list_get(action, 0), name_Cast);
+            set_term_ref(list_get(action, 1), input);
+            set_type(list_get(action, 2), placeholder->type);
         }
 
-        set_term_ref(list_get(inputs, placeholderIndex), input);
+        // Otherwise, plain copy.
+        else {
+            set_term_ref(action, input);
+        }
     }
 }
 
 void write_term_output_instructions(Term* term, caValue* op, Branch* finishingBranch)
 {
-    ca_assert(finishingBranch != NULL);
+    caValue* action = list_get(op, 2);
 
-    caValue* outputs = list_get(op, 2);
-
-    set_list(outputs, 0);
-
-    for (int i=0;; i++) {
-        Term* outputTerm = get_output_term(term, i);
-        if (outputTerm == NULL)
-            break;
-
-        caValue* outputIsn = list_append(outputs);
-
-        Term* placeholder = get_output_placeholder(finishingBranch, i);
-        if (placeholder == NULL || placeholder->type == &VOID_T) {
-            set_null(outputIsn);
-            continue;
-        }
-
-        set_int(outputIsn, i);
-    }
+    set_name(action, name_FlatOutputs);
 }
 
 void write_term_bytecode(Term* term, caValue* result)
@@ -1074,6 +1093,12 @@ void write_term_bytecode(Term* term, caValue* result)
     if (term->index == 0 && get_override_for_branch(parent) != NULL) {
         list_resize(result, 1);
         set_name(list_get(result, 0), op_FireNative);
+
+        if (get_parent_term(term) == FUNCS.dynamic_call) {
+            list_resize(result, 3);
+            set_name(list_get(result, 2), name_OutputsToList);
+            
+        }
         return;
     }
 
@@ -1111,7 +1136,7 @@ void write_term_bytecode(Term* term, caValue* result)
         if (user_count(term) == 0) {
             set_null(list_get(result, 3));
         } else {
-            set_name(list_get(result, 3), op_LoopProduceOutput);
+            set_name(list_get(result, 3), name_LoopProduceOutput);
         }
         return;
     }
@@ -1120,6 +1145,15 @@ void write_term_bytecode(Term* term, caValue* result)
         list_get(result, 2);
         set_name(list_get(result, 0), op_ExitPoint);
         write_term_input_instructions(term, result, function_contents(term->function));
+        return;
+    }
+
+    if (term->function == FUNCS.dynamic_call
+            || term->function == FUNCS.branch_dynamic_call) {
+        list_resize(result, 3);
+        set_name(list_get(result, 0), op_DynamicCall);
+        write_term_input_instructions(term, result, function_contents(term->function));
+        set_name(list_get(result, 2), name_OutputsToList);
         return;
     }
     
@@ -1210,7 +1244,7 @@ void write_branch_bytecode(Branch* branch, caValue* output)
 
         // Possibly produce output, depending on if this term is used.
         if ((branch->owningTerm != NULL) && user_count(branch->owningTerm) > 0) {
-            set_name(list_get(finishOp, 1), op_LoopProduceOutput);
+            set_name(list_get(finishOp, 1), name_LoopProduceOutput);
         } else {
             set_null(list_get(finishOp, 1));
         }
@@ -1222,44 +1256,65 @@ void write_branch_bytecode(Branch* branch, caValue* output)
     set_name(list_get(finishOp, 0), op_FinishFrame);
 }
 
-void populate_inputs_from_bytecode(Stack* stack, Frame* frame, caValue* inputs)
+void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue* outputList,
+        int stackDelta)
 {
-    for (int i=0; i < list_length(inputs); i++) {
-        caValue* input = list_get(inputs, i);
-        caValue* placeholder = get_frame_register(frame, i);
-        Term* placeholderTerm = frame->branch->get(i);
+    for (int i=0; i < list_length(inputActions); i++) {
+        caValue* action = list_get(inputActions, i);
+        caValue* dest = list_get(outputList, i);
 
-        if (is_list(input)) {
-            // Multiple input: create a list in placeholder register.
-            set_list(placeholder, list_length(input));
-            for (int j=0; j < list_length(input); j++) {
-                Term* term = as_term_ref(list_get(input, j));
-                caValue* incomingValue = find_stack_value_for_term(stack, term, 1);
-                caValue* elementValue = list_get(placeholder, j);
-                if (incomingValue != NULL)
-                    copy(incomingValue, elementValue);
-                else
-                    set_null(elementValue);
+        if (is_list(action)) {
+
+            // Tagged list
+
+            caName tag = as_name(list_get(action, 0));
+
+            switch (tag) {
+            case name_Multiple: {
+
+                // Multiple input: create a list in dest register.
+                int inputCount = list_length(action) - 1;
+                set_list(dest, inputCount);
+                for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
+
+                    Term* term = as_term_ref(list_get(action, inputIndex + 1));
+                    caValue* incomingValue = find_stack_value_for_term(stack, term, 1);
+                    caValue* elementValue = list_get(dest, inputIndex);
+                    if (incomingValue != NULL)
+                        copy(incomingValue, elementValue);
+                    else
+                        set_null(elementValue);
+                }
+                break;
             }
-        } else if (is_null(input)) {
-            set_null(placeholder);
-        } else if (is_term_ref(input)) {
+            case name_Cast: {
 
-            // Standard input copy
-            caValue* inputValue = find_stack_value_for_term(stack, as_term_ref(input), 1);
-            copy(inputValue, placeholder);
-
-            // Cast to declared type
-            Type* declaredType = declared_type(placeholderTerm);
-            bool castSuccess = cast(placeholder, declaredType);
-            if (!castSuccess) {
-                circa::Value msg;
-                set_string(&msg, "Couldn't cast value ");
-                string_append_quoted(&msg, inputValue);
-                string_append(&msg, " to type ");
-                string_append(&msg, name_to_string(declaredType->name));
-                raise_error_msg(stack, as_cstring(&msg));
+                // Cast action: copy and cast to type.
+                Term* term = as_term_ref(list_get(action, 1));
+                Type* type = as_type(list_get(action, 2));
+                caValue* inputValue = find_stack_value_for_term(stack, term, 1);
+                copy(inputValue, dest);
+                bool castSuccess = cast(dest, type);
+                if (!castSuccess) {
+                    circa::Value msg;
+                    set_string(&msg, "Couldn't cast value ");
+                    string_append_quoted(&msg, inputValue);
+                    string_append(&msg, " to type ");
+                    string_append(&msg, name_to_string(type->name));
+                    raise_error_msg(stack, as_cstring(&msg));
+                }
+                break;
             }
+            }
+
+        } else if (is_null(action)) {
+            set_null(dest);
+        } else if (is_term_ref(action)) {
+
+            // Standard copy
+            caValue* inputValue = find_stack_value_for_term(stack,
+                    as_term_ref(action), stackDelta);
+            copy(inputValue, dest);
 
         } else {
             internal_error("Unrecognized element type in populate_inputs_from_bytecode");
@@ -1300,28 +1355,42 @@ static void step_interpreter(Stack* stack)
         break;
     case op_CallBranch: {
         Branch* branch = as_branch(list_get(action, 3));
-        caValue* inputs = list_get(action, 1);
+        caValue* inputActions = list_get(action, 1);
         Frame* frame = push_frame(stack, branch);
-        populate_inputs_from_bytecode(stack, frame, inputs);
+        populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
         break;
     }
+    case op_DynamicCall: {
+        circa::Value incomingInputs;
+        caValue* inputActions = list_get(action, 1);
+        set_list(&incomingInputs, list_length(inputActions));
+        populate_inputs_from_bytecode(stack, inputActions, &incomingInputs, 0);
+        // May have a runtime type error.
+        if (error_occurred(stack))
+            return;
+        Branch* branch = as_branch(list_get(&incomingInputs, 0));
+        caValue* unpackedInputs = list_get(&incomingInputs, 1);
+        push_frame_with_inputs(stack, branch, unpackedInputs);
+        break;
+    }
+
     case op_CaseBlock: {
         Term* currentTerm = branch->get(frame->pc);
         Branch* branch = case_block_choose_branch(stack, currentTerm);
         if (branch == NULL)
             return;
         Frame* frame = push_frame(stack, branch);
-        caValue* inputs = list_get(action, 1);
-        populate_inputs_from_bytecode(stack, frame, inputs);
+        caValue* inputActions = list_get(action, 1);
+        populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
         break;
     }
     case op_ForLoop: {
         Term* currentTerm = branch->get(frame->pc);
         Branch* branch = for_loop_choose_branch(stack, currentTerm);
         Frame* frame = push_frame(stack, branch);
-        caValue* inputs = list_get(action, 1);
-        populate_inputs_from_bytecode(stack, frame, inputs);
-        bool enableLoopOutput = as_name(list_get(action, 3)) == op_LoopProduceOutput;
+        caValue* inputActions = list_get(action, 1);
+        populate_inputs_from_bytecode(stack, inputActions, &frame->registers, 1);
+        bool enableLoopOutput = as_name(list_get(action, 3)) == name_LoopProduceOutput;
         start_for_loop(stack, enableLoopOutput);
         break;
     }
@@ -1332,8 +1401,8 @@ static void step_interpreter(Stack* stack)
     }
     case op_InlineCopy: {
         caValue* currentRegister = get_frame_register(frame, frame->pc);
-        caValue* inputs = list_get(action, 1);
-        caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputs, 0)), 0);
+        caValue* inputActions = list_get(action, 1);
+        caValue* value = find_stack_value_for_term(stack, as_term_ref(list_get(inputActions, 0)), 0);
         copy(value, currentRegister);
         break;
     }
@@ -1391,7 +1460,7 @@ static void step_interpreter(Stack* stack)
         break;
     }
     case op_FinishLoop: {
-        bool enableLoopOutput = as_name(list_get(action, 1)) == op_LoopProduceOutput;
+        bool enableLoopOutput = as_name(list_get(action, 1)) == name_LoopProduceOutput;
         for_loop_finish_iteration(stack, enableLoopOutput);
         break;
     }
@@ -1466,78 +1535,6 @@ void run_interpreter_steps(Stack* stack, int steps)
     }
 
     stack->running = false;
-}
-
-void dynamic_call_func(caStack* stack)
-{
-    INCREMENT_STAT(DynamicCall);
-
-    Branch* branch = as_branch(circa_input(stack, 0));
-    caValue* inputContainer = circa_input(stack, 1);
-    caValue* normalInputs = circa_index(inputContainer, 0);
-    caValue* stateInput = circa_index(inputContainer, 1);
-
-    Frame* frame = push_frame(stack, branch);
-    frame->dynamicCall = true;
-
-    // Copy inputs to the new frame
-    int normalInputIndex = 0;
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
-        if (placeholder == NULL)
-            break;
-        caValue* slot = circa_input(stack, i);
-        if (is_state_input(placeholder))
-            copy(stateInput, slot);
-        else {
-            caValue* normalInput = circa_index(normalInputs, normalInputIndex++);
-
-            if (normalInput != NULL)
-                copy(normalInput, slot);
-            else
-                set_null(slot);
-        }
-    }
-}
-
-void finish_dynamic_call(caStack* stack)
-{
-    INCREMENT_STAT(FinishDynamicCall);
-
-    // Hang on to this frame's registers.
-    Frame* top = top_frame(stack);
-    Branch* branch = top->branch;
-    Value registers;
-    set_list(&registers, get_frame_register_count(top));
-
-    for (int i=0; i < get_frame_register_count(top); i++)
-        swap(get_frame_register(top, i), list_get(&registers, i));
-
-    // Done with this frame.
-    pop_frame(stack);
-
-    // Copy outputs to a DynamicOutputs container
-    caValue* out = circa_output(stack, 0);
-    create(TYPES.dynamicOutputs, out);
-    caValue* normalOutputs = circa_index(out, 0);
-    caValue* stateOutput = circa_index(out, 1);
-
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(branch, i);
-        if (placeholder == NULL)
-            break;
-
-        caValue* slot = list_get(&registers, placeholder->index);
-
-        if (is_state_output(placeholder))
-            copy(slot, stateOutput);
-        else {
-            caValue* normalInput = circa_append(normalOutputs);
-
-            if (normalInput != NULL)
-                copy(slot, normalInput);
-        }
-    }
 }
 
 Frame* as_frame_ref(caValue* value)

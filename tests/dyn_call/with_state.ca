@@ -1,0 +1,11 @@
+
+def f(int i) -> int
+    state int s
+
+    print('called f with i= ' i ', s = ' s)
+    s += 5
+    return 3
+
+
+out = dynamic_call(branch_ref(f) [5 null])
+print('out = ' out)

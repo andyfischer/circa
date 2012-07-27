@@ -42,9 +42,6 @@ struct Frame
     int pc;
     int nextPc;
 
-    // True if this frame is being called by dynamic_call
-    bool dynamicCall;
-
     // When a branch is exited early, this stores the exit type.
     caName exitType;
     
@@ -101,7 +98,7 @@ void eval_context_setup_type(Type* type);
 
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Branch* branch);
-void push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
+Frame* push_frame_with_inputs(Stack* stack, Branch* branch, caValue* inputs);
 
 // Pop the topmost frame and throw it away. This call doesn't preserve the frame's
 // outputs or update PC. You might want to call finish_frame() instead of this.
@@ -194,10 +191,6 @@ void run_interpreter_steps(Stack* stack, int steps);
 
 void write_term_bytecode(Term* term, caValue* output);
 void write_branch_bytecode(Branch* branch, caValue* output);
-
-// Dynamic calls
-void dynamic_call_func(caStack* stack);
-void finish_dynamic_call(caStack* stack);
 
 void interpreter_install_functions(Branch* branch);
 

@@ -3,7 +3,7 @@ type T {
 }
 
 def T.f(@self, Rect rect)
-    if true
+    if false
         self.f([0 0 100 100])
 
 element = create(T)

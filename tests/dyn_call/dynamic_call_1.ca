@@ -1,0 +1,9 @@
+
+def func(int i) -> int
+    print('func: ' i)
+    return i + 1
+
+
+outputs = dynamic_call(func.branch, [1])
+
+print('outputs = ' outputs)

@@ -3,6 +3,7 @@
 #include "common_headers.h"
 
 #include "branch.h"
+#include "building.h"
 #include "code_iterators.h"
 #include "kernel.h"
 #include "evaluation.h"
@@ -162,6 +163,15 @@ int count_output_placeholders(Branch* branch)
         result++;
     return result;
 }
+
+int count_actual_output_terms(Term* term)
+{
+    int count = 0;
+    while (get_extra_output(term, count) != NULL)
+        count++;
+    return count + 1;
+}
+
 bool is_input_placeholder(Term* term)
 {
     return term->function == FUNCS.input;

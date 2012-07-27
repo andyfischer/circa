@@ -1751,7 +1751,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     }
 
     // Possibly rebind the left-hand-side
-    if (rebindLHS) {
+    if (rebindLHS && get_extra_output(term, 0) != NULL) {
         // LHS may be a getter-chain
         write_set_selector_result(branch, term->input(0), get_extra_output(term, 0));
     }

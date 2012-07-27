@@ -83,13 +83,3 @@ a = [1]; b = a[0]
 number(1)
 Point([4 3])
 1 -> number
-
--- Left arrow
-def f(any);
-
-f <- 1
-f    <- 1
-f <-   1
-f <- {
-    1 1 1 }
-

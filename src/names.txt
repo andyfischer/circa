@@ -125,12 +125,13 @@ tok_Comment
 tok_Eof
 tok_Unrecognized
 
-# Bytecode
+# Bytecode ops
 op_NoOp
 op_Pause
 op_SetNull
 op_InlineCopy
 op_CallBranch
+op_DynamicCall
 op_FireNative
 op_CaseBlock
 op_ForLoop
@@ -139,7 +140,13 @@ op_FinishFrame
 op_FinishLoop
 op_ErrorNotEnoughInputs
 op_ErrorTooManyInputs
-op_LoopProduceOutput
+
+# Other names used in bytecode
+LoopProduceOutput
+FlatOutputs
+OutputsToList
+Multiple
+Cast
 
 # Performance stats
 FirstStatIndex
