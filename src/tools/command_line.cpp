@@ -19,6 +19,7 @@
 #include "tagged_value.h"
 #include "term.h"
 #include "token.h"
+#include "update_cascades.h"
 
 #include "circa/file.h"
 #include "build_tool.h"
@@ -126,7 +127,7 @@ void do_file_command(List* args, caValue* reply)
             continue;
         }
         
-        if (string_eq(args->get(argIndex), "-b")) {
+        if (string_eq(args->get(argIndex), "-b") || string_eq(args->get(argIndex), "-pb")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             argIndex++;
@@ -393,7 +394,7 @@ int run_command_line(caWorld* world, caValue* args)
             continue;
         }
 
-        if (string_eq(list_get(args, 0), "-b")) {
+        if (string_eq(list_get(args, 0), "-b") || string_eq(list_get(args, 0), "-pb")) {
             printRaw = true;
             rawOutputPrefs.showBytecode = true;
             list_remove_index(args, 0);
@@ -573,6 +574,7 @@ int run_command_line(caWorld* world, caValue* args)
     Branch* main_branch = create_branch(kernel());
     load_script(main_branch, as_cstring(list_get(args, 0)));
     branch_finish_changes(main_branch);
+    refresh_bytecode(main_branch);
 
     if (printRaw) {
         print_branch(std::cout, main_branch, &rawOutputPrefs);

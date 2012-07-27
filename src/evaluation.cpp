@@ -1078,8 +1078,8 @@ void write_term_output_instructions(Term* term, caValue* op, Branch* finishingBr
 void write_term_bytecode(Term* term, caValue* result)
 {
     // Each action has a tag in index 0.
-    // Actions which take inputs, have a list of input instructions in index 1.
-    // Actions which push a branch, have a list of output instructions in index 2.
+    // Actions which take inputs have a list of input instructions in index 1.
+    // Actions which push a branch have a list of output instructions in index 2.
     
     INCREMENT_STAT(WriteTermBytecode);
 

@@ -46,6 +46,8 @@
 #include "types/set.h"
 #include "types/void.h"
 
+#define NEW_DYNAMIC_METHOD 1
+
 namespace circa {
 
 Branch* KERNEL = NULL;

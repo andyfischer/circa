@@ -327,7 +327,10 @@ void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs)
 
         // Possibly print the closing bytecode op.
         if (prefs->showBytecode
-                && term->index == (term->owningBranch->length() - 1)) {
+                && term->index == (term->owningBranch->length() - 1)
+                && term->owningBranch != NULL
+                && !is_null(&term->owningBranch->bytecode)
+                ) {
 
             Branch* nested = term->owningBranch;
 
