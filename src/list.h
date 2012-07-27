@@ -79,6 +79,9 @@ bool list_empty(caValue* value);
 // list_touch, so the returned value is safe to modify.
 caValue* list_append(caValue* list);
 
+// Appends each element from the given right-hand-side.
+void list_extend(caValue* list, caValue* rhsList);
+
 // Inserts a new value at the given index, and returns it. This function
 // calls list_touch, so the returned value is safe to modify.
 caValue* list_insert(caValue* list, int index);
@@ -95,6 +98,7 @@ void list_copy(caValue* source, caValue* dest);
 std::string list_to_string(ListData* value);
 void list_slice(caValue* original, int start, int end, caValue* result);
 
+// Reverse the list.
 void list_reverse(caValue* list);
 
 // Functions for working with List's type parameter. Depending on the parameter,

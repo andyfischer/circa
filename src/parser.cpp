@@ -14,6 +14,7 @@
 #include "kernel.h"
 #include "modules.h"
 #include "parser.h"
+#include "selector.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "static_checking.h"
@@ -778,6 +779,7 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     Branch* contents = nested_contents(result);
 
+    int fieldIndex = 0;
     while (!tokens.nextIs(closingToken)) {
         std::string preWs = possible_whitespace_or_newline(tokens);
 
@@ -805,13 +807,22 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (tokens.nextIs(tok_Identifier))
             fieldName = tokens.consumeStr(tok_Identifier);
 
-        ca_assert(FUNCS.declare_field != NULL);
-        Term* field = apply(contents, FUNCS.declare_field, TermList(), name_from_string(fieldName));
-        change_declared_type(field, as_type(fieldType));
+        Term* accessor = create_function(contents, fieldName.c_str());
+        Branch* accessorContents = nested_contents(accessor);
+        Term* accessorInput = append_input_placeholder(accessorContents);
+        Term* accessorIndex = create_int(accessorContents, fieldIndex, "");
+        Term* accessorGetIndex = apply(accessorContents, FUNCS.get_index,
+                TermList(accessorInput, accessorIndex));
+        Term* accessorOutput = append_output_placeholder(accessorContents, accessorGetIndex);
+        change_declared_type(accessorOutput, as_type(fieldType));
 
-        field->setStringProp("syntax:preWhitespace", preWs);
-        field->setStringProp("syntax:postNameWs", postNameWs);
-        field->setStringProp("syntax:postWhitespace", possible_statement_ending(tokens));
+        //Term* field = apply(contents, FUNCS.declare_field, TermList(), name_from_string(fieldName));
+        //change_declared_type(field, as_type(fieldType));
+
+        accessor->setStringProp("syntax:preWhitespace", preWs);
+        accessor->setStringProp("syntax:postNameWs", postNameWs);
+        accessor->setStringProp("syntax:postWhitespace", possible_statement_ending(tokens));
+        fieldIndex++;
     }
 
     tokens.consume(closingToken);
@@ -1339,8 +1350,8 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
         postEqualsSpace = possible_whitespace(tokens);
 
         Term* right = expression(branch, tokens, context).term;
-        Term* head = NULL;
-        Term* selector = write_selector_for_accessor_expression(branch, term, &head);
+        Term* head = find_accessor_head_term(term);
+        Term* selector = apply(branch, FUNCS.selector_reflect, TermList(term));
 
         Term* set = apply(branch, FUNCS.set_with_selector,
                 TermList(head, selector, right));
@@ -1550,11 +1561,10 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
 
                 // Otherwise, create a set_with_selector call.
                 } else {
-                    Term* original = NULL;
+                    Term* original = find_accessor_head_term(left.term);
 
                     Term* newValue = term;
-                    Term* selector = write_selector_for_accessor_expression(branch,
-                            left.term, &original);
+                    Term* selector = apply(branch, FUNCS.selector_reflect, TermList(left.term));
 
                     Term* set = apply(branch, FUNCS.set_with_selector,
                             TermList(original, selector, newValue));
@@ -1719,6 +1729,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     if (function == NULL) {
         // Method could not be statically found.
 
+#if 0
         // Temporary behavior, if we can statically resolve to a field access then
         // create a get_field term. This should be changed to use auto-generated
         // methods (one for each field).
@@ -1729,6 +1740,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
             set_input_syntax_hint(term, 0, "postWhitespace", "");
             return ParseResult(term);
         }
+#endif
 
         // Otherwise create a dynamic_method call.
         function = FUNCS.dynamic_method;
@@ -1743,12 +1755,6 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 
     // Create the term
     Term* term = apply(branch, function, inputs);
-
-    // If the func is dynamic_method and the rebind operator is used, we'll have to create
-    // an extra_output ourselves.
-    if (function == FUNCS.dynamic_method && rebindLHS) {
-        apply(branch, FUNCS.extra_output, TermList(term));
-    }
 
     // Possibly rebind the left-hand-side
     if (rebindLHS && get_extra_output(term, 0) != NULL) {

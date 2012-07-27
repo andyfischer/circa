@@ -1,0 +1,10 @@
+
+type T {
+    int i
+}
+
+t = create(T)
+
+t.i = 9
+
+assert(t == [9])

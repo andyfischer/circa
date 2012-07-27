@@ -17,6 +17,7 @@
 #include "names.h"
 #include "parser.h"
 #include "names.h"
+#include "selector.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "term.h"
@@ -557,6 +558,9 @@ void update_extra_outputs(Term* term)
         if (extra_output == NULL) {
             extra_output = apply(branch, FUNCS.extra_output, TermList(term), name);
             move_to_index(extra_output, term->index + index);
+
+            if (rebindsInput >= 0)
+                extra_output->setIntProp("rebindsInput", rebindsInput);
 
             if (is_state_input(placeholder))
                 needToUpdatePackState = true;
@@ -1223,6 +1227,7 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement)
     }
 }
 
+#if 0
 Term* write_selector_for_accessor_expression(Branch* branch, Term* accessor, Term** headPtr)
 {
     TermList elements;
@@ -1251,26 +1256,18 @@ Term* write_selector_for_accessor_expression(Branch* branch, Term* accessor, Ter
         }
     }
 
-    if (elements.length() == 0)
-        return NULL;
-
     return apply(branch, FUNCS.selector, elements);
 }
+#endif
 
 Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result)
 {
-    Term* head = NULL;
-    Term* selector = write_selector_for_accessor_expression(branch, accessorExpr, &head);
-    if (selector != NULL) {
-        Term* set = apply(branch, FUNCS.set_with_selector, TermList(head, selector, result));
-        change_declared_type(set, declared_type(head));
-        rename(set, head->nameSymbol);
-        return set;
-    } else {
-        rename(result, accessorExpr->nameSymbol);
-        result->setBoolProp("syntax:implicitName", true);
-        return result;
-    }
+    Term* head = find_accessor_head_term(accessorExpr);
+    Term* selector = apply(branch, FUNCS.selector_reflect, TermList(accessorExpr));
+    Term* set = apply(branch, FUNCS.set_with_selector, TermList(head, selector, result));
+    change_declared_type(set, declared_type(head));
+    rename(set, head->nameSymbol);
+    return set;
 }
 
 bool term_is_nested_in_branch(Term* term, Branch* branch)

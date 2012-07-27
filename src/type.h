@@ -192,6 +192,8 @@ Type* get_type_of_input(Term* term, int inputIndex);
 caValue* get_type_property(Type* type, const char* name);
 void set_type_property(Type* type, const char* name, caValue* value);
 
+Branch* type_declaration_branch(Type* type);
+
 StaticTypeQuery::Result run_static_type_query(Type* type, Type* subjectType);
 StaticTypeQuery::Result run_static_type_query(Type* type, Term* term);
 bool term_output_always_satisfies_type(Term* term, Type* type);

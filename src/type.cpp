@@ -214,6 +214,13 @@ void set_type_property(Type* type, const char* name, caValue* value)
     copy(value, type->properties.insert(name));
 }
 
+Branch* type_declaration_branch(Type* type)
+{
+    if (type->declaringTerm == NULL)
+        return NULL;
+    return type->declaringTerm->nestedContents;
+}
+
 Type* create_type()
 {
     Type* t = new Type();
@@ -411,6 +418,15 @@ Term* find_method(Branch* branch, Type* type, std::string const& name)
     if (type->name == 0)
         return NULL;
 
+    // First, look inside the type definition.
+    Branch* typeDef = type_declaration_branch(type);
+    if (typeDef != NULL) {
+        Term* func = find_local_name(typeDef, name_from_string(name.c_str()));
+        if (func != NULL && is_function(func))
+            return func;
+    }
+
+    // Next, construct the search name, which looks like TypeName.functionName.
     std::string searchName = std::string(name_to_string(type->name)) + "." + name;
 
     Term* result = find_method_with_search_name(branch, type, searchName);

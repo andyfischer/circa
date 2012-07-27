@@ -97,7 +97,7 @@ Term* TYPE_TYPE = NULL;
 Term* VOID_TYPE = NULL;
 Term* OPAQUE_POINTER_TYPE = NULL;
 
-// New style for builtin function pointers
+// Structure of pointers to builtin functions.
 BuiltinFuncs FUNCS;
 
 // Builtin type objects:
@@ -227,6 +227,7 @@ void dynamic_method_call(caStack* stack)
         return;
     }
 
+#if 0
     // No method found. Fall back to a field access. This is deprecated behavior.
     if (is_list_based_type(object->value_type)) {
         int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
@@ -238,6 +239,7 @@ void dynamic_method_call(caStack* stack)
             }
         }
     }
+#endif
 
     // Method not found (nor was a field found). Raise error.
     std::string msg;

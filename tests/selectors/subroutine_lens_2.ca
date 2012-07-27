@@ -1,0 +1,7 @@
+
+def lens(any i) -> any
+  i[0][0]
+
+accessor = lens(lens([[[[0]]]]))
+
+assert(selector_reflect(accessor) == [0 0 0 0])

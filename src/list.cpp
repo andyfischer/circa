@@ -1,5 +1,6 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
+#include "function.h"
 #include "heap_debugging.h"
 #include "inspection.h"
 #include "kernel.h"
@@ -420,6 +421,13 @@ caValue* list_append(caValue* list)
     list->value_data.ptr = data;
     return result;
 }
+
+void list_extend(caValue* list, caValue* rhsList)
+{
+    for (int i=0; i < list_length(rhsList); i++)
+        copy(list_get(rhsList, i), list_append(list));
+}
+
 caValue* list_insert(caValue* list, int index)
 {
     ca_assert(list->value_type->storageType == STORAGE_TYPE_LIST);
@@ -579,13 +587,16 @@ void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* paramet
     caValue* types = set_list(list_get(parameter, 0), 0);
     caValue* names = set_list(list_get(parameter, 1), 0);
 
+    // Iterate through the type definition.
     for (int i=0; i < typeDecl->length(); i++) {
         Term* term = typeDecl->get(i);
 
-        if (term->function != FUNCS.declare_field)
+        if (!is_function(term))
             continue;
 
-        set_type(list_append(types), declared_type(term));
+        Type* type = function_get_output_type(term, 0);
+
+        set_type(list_append(types), type);
         set_string(list_append(names), term->name);
     }
 }

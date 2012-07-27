@@ -143,6 +143,7 @@ const char* builtin_name_to_string(int name)
     case name_OutputsToList: return "OutputsToList";
     case name_Multiple: return "Multiple";
     case name_Cast: return "Cast";
+    case name_DynamicMethodOutput: return "DynamicMethodOutput";
     case name_FirstStatIndex: return "FirstStatIndex";
     case stat_TermsCreated: return "stat_TermsCreated";
     case stat_TermPropAdded: return "stat_TermPropAdded";

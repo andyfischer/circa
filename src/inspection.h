@@ -41,6 +41,7 @@ bool is_empty_comment(Term* term);
 bool is_value(Term* term);
 bool is_hidden(Term* term);
 bool has_empty_name(Term* term);
+bool is_copying_call(Term* term);
 
 bool is_an_unknown_identifier(Term* term);
 
@@ -57,6 +58,7 @@ Term* get_input_placeholder(Branch* branch, int index);
 Term* get_output_placeholder(Branch* branch, int index);
 int count_input_placeholders(Branch* branch);
 int count_output_placeholders(Branch* branch);
+int input_placeholder_index(Term* inputPlaceholder);
 
 // Return a count of 'actual' output terms (includes the term plus any adjacent
 // extra_output terms).

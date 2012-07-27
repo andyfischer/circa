@@ -147,6 +147,7 @@ FlatOutputs
 OutputsToList
 Multiple
 Cast
+DynamicMethodOutput
 
 # Performance stats
 FirstStatIndex

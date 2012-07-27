@@ -377,15 +377,29 @@ void finish_frame(Stack* stack)
 
         // Copy outputs to the parent frame, and advance PC.
         for (int i=0; i < outputSlotCount; i++) {
+
+            caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
+
             Term* placeholder = get_output_placeholder(finishedBranch, i);
-            if (placeholder == NULL)
+            if (placeholder == NULL) {
+
+                // Placeholder not found for this extra_output. If this output is supposed
+                // to rebind an input, then just copy the input.
+                Term* extraOutput = get_output_term(finishedTerm, i);
+                if (extraOutput->hasProperty("rebindsInput")) {
+                    int inputIndex = extraOutput->intProp("rebindsInput", 0);
+                    copy(find_stack_value_for_term(stack, finishedTerm->input(inputIndex), 1),
+                            dest);
+                }
+
                 break;
+            }
+
 
             if (placeholder->type == &VOID_T)
                 continue;
 
             caValue* result = get_frame_register(topFrame, placeholder);
-            caValue* dest = get_frame_register(parentFrame, finishedTerm->index + i);
 
             move(result, dest);
             bool success = cast(dest, placeholder->type);

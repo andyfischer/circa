@@ -75,6 +75,12 @@ bool has_empty_name(Term* term)
     return term->nameSymbol == name_None;
 }
 
+bool is_copying_call(Term* term)
+{
+    return term->function == FUNCS.output
+        || term->function == FUNCS.copy;
+}
+
 bool is_an_unknown_identifier(Term* term)
 {
     return term->function == UNKNOWN_IDENTIFIER_FUNC;
@@ -162,6 +168,10 @@ int count_output_placeholders(Branch* branch)
     while (get_output_placeholder(branch, result) != NULL)
         result++;
     return result;
+}
+int input_placeholder_index(Term* inputPlaceholder)
+{
+    return inputPlaceholder->index;
 }
 
 int count_actual_output_terms(Term* term)

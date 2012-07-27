@@ -100,6 +100,7 @@ struct BuiltinFuncs {
     Term* range;
     Term* return_func;
     Term* selector;
+    Term* selector_reflect;
     Term* set_index;
     Term* set_field;
     Term* set_with_selector;
