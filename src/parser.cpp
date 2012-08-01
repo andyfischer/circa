@@ -1050,7 +1050,7 @@ ParseResult for_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
 
     // Wrap up the rebound value, if it's a complex lexpr.
     if (rebindListName) {
-        write_set_selector_result(branch, listExpr, forTerm);
+        rebind_possible_accessor(branch, listExpr, forTerm);
     }
 
     return ParseResult(forTerm);
@@ -1351,7 +1351,7 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
 
         Term* right = expression(branch, tokens, context).term;
 
-        Term* set = write_set_selector_result(branch, term, right);
+        Term* set = rebind_possible_accessor(branch, term, right);
 
         set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         set->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
@@ -1558,7 +1558,7 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
                 } else {
                     Term* newValue = term;
 
-                    Term* set = write_set_selector_result(branch, left.term, newValue);
+                    Term* set = rebind_possible_accessor(branch, left.term, newValue);
 
                     set->setStringProp("syntax:rebindOperator", operatorStr);
                     set_is_statement(set, true);
@@ -1749,8 +1749,7 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     // Possibly rebind the left-hand-side
     if (rebindLHS && get_extra_output(term, 0) != NULL) {
         // LHS may be an accessor.
-        if (term->input(0)->name != get_extra_output(term, 0)->name)
-            write_set_selector_result(branch, term->input(0), get_extra_output(term, 0));
+        rebind_possible_accessor(branch, term->input(0), get_extra_output(term, 0));
     }
 
     inputHints.apply(term);

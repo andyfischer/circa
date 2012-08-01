@@ -156,19 +156,24 @@ void trace_selector_from_accessor(SelectorFromAccessorTrace* result, Term* acces
     list_reverse(&result->selectors);
 }
 
-Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result)
+Term* rebind_possible_accessor(Branch* branch, Term* possibleAccessor, Term* result)
 {
     SelectorFromAccessorTrace trace;
-    trace_selector_from_accessor(&trace, accessorExpr);
+    trace_selector_from_accessor(&trace, possibleAccessor);
+
+    // Check if this isn't a recognized accessor.
+    if (list_length(&trace.selectors) == 0 || !has_empty_name(possibleAccessor)) {
+        // Just create a named copy of 'result'.
+        return apply(branch, FUNCS.copy, TermList(result), possibleAccessor->nameSymbol);
+    }
 
     Term* head = trace.head;
-    Term* selector = apply(branch, FUNCS.selector_reflect, TermList(accessorExpr));
+    Term* selector = apply(branch, FUNCS.selector_reflect, TermList(possibleAccessor));
 
     Term* set = apply(branch, FUNCS.set_with_selector,
-            TermList(head, accessorExpr, selector, result));
+            TermList(head, possibleAccessor, selector, result), head->nameSymbol);
 
     change_declared_type(set, declared_type(head));
-    rename(set, head->nameSymbol);
     return set;
 }
 
