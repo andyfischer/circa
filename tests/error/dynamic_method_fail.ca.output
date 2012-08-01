@@ -1,4 +1,4 @@
 Error occurred:
 [tests/error/dynamic_method_fail.ca:2,0] dynamic_method()
-[$891] output_placeholder() | Method hello not found on type int
+[$896] output_placeholder() | Method hello not found on type int
 

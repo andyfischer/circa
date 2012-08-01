@@ -160,10 +160,6 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement);
 // function will return NULL if there are no selector elements.
 Term* write_selector_for_accessor_expression(Branch* branch, Term* accessor, Term** headPtr);
 
-// Write a set_with_selector expression that creates a selector() from 'accessor', and
-// assigns 'result' to the subelement. If the accessor has no selector then we simply
-// rename 'result' to have 'accessor's name.
-Term* write_set_selector_result(Branch* branch, Term* accessor, Term* result);
 
 // Look through the nexted contents of 'term', and find any term references to outer
 // terms (terms outside this branch). For every outer reference, add an input to

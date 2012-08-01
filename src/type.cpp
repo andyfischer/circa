@@ -165,13 +165,6 @@ Type::nameStr()
     return name_to_string(this->name);
 }
 
-Type* declared_type(Term* term)
-{
-    if (term->type == NULL)
-        return NULL;
-    return term->type;
-}
-
 Type* get_output_type(Term* term, int outputIndex)
 {
     if (outputIndex == 0)

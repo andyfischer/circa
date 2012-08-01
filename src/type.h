@@ -184,7 +184,6 @@ Type* create_type();
 
 Type* unbox_type(Term* type);
 Type* unbox_type(caValue* val);
-Type* declared_type(Term* term);
 
 Type* get_output_type(Term* term, int outputIndex);
 Type* get_output_type(Term* term);

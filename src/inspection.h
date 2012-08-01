@@ -32,6 +32,9 @@ bool is_actually_using(Term* user, Term* usee);
 
 int user_count(Term* term);
 
+// Return the static type of 'term'.
+Type* declared_type(Term* term);
+
 // Set / get whether this term is a 'statement'. This affects source code reproduction.
 void set_is_statement(Term* term, bool value);
 bool is_statement(Term* term);

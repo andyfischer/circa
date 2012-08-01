@@ -2,6 +2,7 @@
 
 #include "common_headers.h"
 
+#include "building.h"
 #include "evaluation.h"
 #include "kernel.h"
 #include "importing.h"
@@ -150,6 +151,22 @@ void trace_selector_from_accessor(SelectorFromAccessorTrace* result, Term* acces
     }
 
     result->head = accessor;
+}
+
+Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result)
+{
+    SelectorFromAccessorTrace trace;
+    trace_selector_from_accessor(&trace, accessorExpr);
+
+    Term* head = trace.head;
+    Term* selector = apply(branch, FUNCS.selector_reflect, TermList(accessorExpr));
+
+    Term* set = apply(branch, FUNCS.set_with_selector,
+            TermList(head, accessorExpr, selector, result));
+
+    change_declared_type(set, declared_type(head));
+    rename(set, head->nameSymbol);
+    return set;
 }
 
 void evaluate_selector_reflect(caStack* stack)

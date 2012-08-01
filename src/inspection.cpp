@@ -31,6 +31,13 @@ int user_count(Term* term)
     return term->users.length();
 }
 
+Type* declared_type(Term* term)
+{
+    if (term->type == NULL)
+        return NULL;
+    return term->type;
+}
+
 void set_is_statement(Term* term, bool value)
 {
     term->setBoolProp("statement", value);

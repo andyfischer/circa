@@ -1350,17 +1350,12 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
         postEqualsSpace = possible_whitespace(tokens);
 
         Term* right = expression(branch, tokens, context).term;
-        Term* head = find_accessor_head_term(term);
-        Term* selector = apply(branch, FUNCS.selector_reflect, TermList(term));
 
-        Term* set = apply(branch, FUNCS.set_with_selector,
-                TermList(head, term, selector, right));
-        change_declared_type(set, declared_type(head));
+        Term* set = write_set_selector_result(branch, term, right);
 
         set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
         set->setStringProp("syntax:postEqualsSpace", postEqualsSpace);
 
-        rename(set, head->nameSymbol);
         result = ParseResult(set);
     }
 
@@ -1561,13 +1556,9 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
 
                 // Otherwise, create a set_with_selector call.
                 } else {
-                    Term* original = find_accessor_head_term(left.term);
-
                     Term* newValue = term;
-                    Term* selector = apply(branch, FUNCS.selector_reflect, TermList(left.term));
 
-                    Term* set = apply(branch, FUNCS.set_with_selector,
-                            TermList(original, left.term, selector, newValue));
+                    Term* set = write_set_selector_result(branch, left.term, newValue);
 
                     set->setStringProp("syntax:rebindOperator", operatorStr);
                     set_is_statement(set, true);
@@ -1580,7 +1571,6 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
                         move(existingPostWhitespace,
                             set->properties.insert("syntax:preEqualsSpace"));
 
-                    rename(set, original->nameSymbol);
                     term = set;
                 }
             }
