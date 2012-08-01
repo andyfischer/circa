@@ -84,7 +84,9 @@ namespace type_t {
             ca_assert(field != NULL);
             append_phrase(source, field->stringProp("syntax:preWhitespace",""),
                     term, tok_Whitespace);
-            append_phrase(source, name_to_string(field->type->name), term, name_TypeName);
+
+            Type* fieldType = function_get_output_type(field, 0);
+            append_phrase(source, name_to_string(fieldType->name), term, name_TypeName);
             append_phrase(source, field->stringProp("syntax:postNameWs"," "),
                     term, tok_Whitespace);
             append_phrase(source, field->name, term, tok_Identifier);

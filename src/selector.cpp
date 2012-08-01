@@ -203,8 +203,8 @@ void evaluate_set_with_selector(caStack* stack)
     caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
     
-    caValue* selector = circa_input(stack, 1);
-    caValue* newValue = circa_input(stack, 2);
+    caValue* selector = circa_input(stack, 2);
+    caValue* newValue = circa_input(stack, 3);
 
     circa::Value error;
 
@@ -232,28 +232,21 @@ void get_with_selector__formatSource(caValue* source, Term* term)
 }
 void set_with_selector__formatSource(caValue* source, Term* term)
 {
-    Term* selector = term->input(1);
-    if (selector->function != FUNCS.selector) {
-        format_term_source_default_formatting(source, term);
-        return;
-    }
-
     // Don't call format_name_binding here
 
-    format_source_for_input(source, term, 0, "", "");
-
-    selector_format_source(source, selector);
+    // Left-hand-side
+    format_source_for_input(source, term, 1, "", "");
 
     append_phrase(source, term->stringProp("syntax:preEqualsSpace",""), term, tok_Whitespace);
 
     if (term->hasProperty("syntax:rebindOperator")) {
         append_phrase(source, term->stringProp("syntax:rebindOperator",""), term, tok_Equals);
         append_phrase(source, term->stringProp("syntax:postEqualsSpace",""), term, tok_Whitespace);
-        format_source_for_input(source, term->input(2), 1, "", "");
+        format_source_for_input(source, term->input(3), 1, "", "");
     } else {
         append_phrase(source, "=", term, tok_Equals);
         append_phrase(source, term->stringProp("syntax:postEqualsSpace",""), term, tok_Whitespace);
-        format_source_for_input(source, term, 2, "", "");
+        format_source_for_input(source, term, 3, "", "");
     }
 }
 
@@ -272,7 +265,7 @@ void selector_setup_funcs(Branch* kernel)
 
     FUNCS.set_with_selector =
         import_function(kernel, evaluate_set_with_selector,
-            "set_with_selector(any object, Selector selector, any value) -> any");
+            "set_with_selector(any object, any lhs :meta, Selector selector, any value) -> any");
     as_function(FUNCS.set_with_selector)->formatSource = set_with_selector__formatSource;
 }
 

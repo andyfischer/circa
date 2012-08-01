@@ -1354,7 +1354,7 @@ ParseResult name_binding_expression(Branch* branch, TokenStream& tokens, ParserC
         Term* selector = apply(branch, FUNCS.selector_reflect, TermList(term));
 
         Term* set = apply(branch, FUNCS.set_with_selector,
-                TermList(head, selector, right));
+                TermList(head, term, selector, right));
         change_declared_type(set, declared_type(head));
 
         set->setStringProp("syntax:preEqualsSpace", preEqualsSpace);
@@ -1567,7 +1567,7 @@ ParseResult infix_expression(Branch* branch, TokenStream& tokens, ParserCxt* con
                     Term* selector = apply(branch, FUNCS.selector_reflect, TermList(left.term));
 
                     Term* set = apply(branch, FUNCS.set_with_selector,
-                            TermList(original, selector, newValue));
+                            TermList(original, left.term, selector, newValue));
 
                     set->setStringProp("syntax:rebindOperator", operatorStr);
                     set_is_statement(set, true);

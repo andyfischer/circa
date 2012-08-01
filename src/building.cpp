@@ -1264,7 +1264,8 @@ Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result
 {
     Term* head = find_accessor_head_term(accessorExpr);
     Term* selector = apply(branch, FUNCS.selector_reflect, TermList(accessorExpr));
-    Term* set = apply(branch, FUNCS.set_with_selector, TermList(head, selector, result));
+    Term* set = apply(branch, FUNCS.set_with_selector,
+            TermList(head, accessorExpr, selector, result));
     change_declared_type(set, declared_type(head));
     rename(set, head->nameSymbol);
     return set;
