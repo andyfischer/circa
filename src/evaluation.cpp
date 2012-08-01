@@ -1292,7 +1292,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
                 for (int inputIndex=0; inputIndex < inputCount; inputIndex++) {
 
                     Term* term = as_term_ref(list_get(action, inputIndex + 1));
-                    caValue* incomingValue = find_stack_value_for_term(stack, term, 1);
+                    caValue* incomingValue = find_stack_value_for_term(stack, term, stackDelta);
                     caValue* elementValue = list_get(dest, inputIndex);
                     if (incomingValue != NULL)
                         copy(incomingValue, elementValue);
@@ -1306,7 +1306,7 @@ void populate_inputs_from_bytecode(Stack* stack, caValue* inputActions, caValue*
                 // Cast action: copy and cast to type.
                 Term* term = as_term_ref(list_get(action, 1));
                 Type* type = as_type(list_get(action, 2));
-                caValue* inputValue = find_stack_value_for_term(stack, term, 1);
+                caValue* inputValue = find_stack_value_for_term(stack, term, stackDelta);
                 copy(inputValue, dest);
                 bool castSuccess = cast(dest, type);
                 if (!castSuccess) {
