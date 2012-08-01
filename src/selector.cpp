@@ -151,6 +151,9 @@ void trace_selector_from_accessor(SelectorFromAccessorTrace* result, Term* acces
     }
 
     result->head = accessor;
+
+    // Selector list was built from the bottom-up, reverse so that it's top-down.
+    list_reverse(&result->selectors);
 }
 
 Term* write_set_selector_result(Branch* branch, Term* accessorExpr, Term* result)

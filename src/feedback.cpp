@@ -8,6 +8,7 @@
 #include "code_iterators.h"
 #include "evaluation.h"
 #include "function.h"
+#include "inspection.h"
 #include "names.h"
 #include "term.h"
 #include "type.h"

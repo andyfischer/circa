@@ -1748,8 +1748,9 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 
     // Possibly rebind the left-hand-side
     if (rebindLHS && get_extra_output(term, 0) != NULL) {
-        // LHS may be a getter-chain
-        write_set_selector_result(branch, term->input(0), get_extra_output(term, 0));
+        // LHS may be an accessor.
+        if (term->input(0)->name != get_extra_output(term, 0)->name)
+            write_set_selector_result(branch, term->input(0), get_extra_output(term, 0));
     }
 
     inputHints.apply(term);
