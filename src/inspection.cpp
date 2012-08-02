@@ -189,6 +189,15 @@ int count_actual_output_terms(Term* term)
     return count + 1;
 }
 
+Term* preceding_term(Term* term)
+{
+    return term->owningBranch->getSafe(term->index - 1);
+}
+Term* following_term(Term* term)
+{
+    return term->owningBranch->getSafe(term->index + 1);
+}
+
 bool is_input_placeholder(Term* term)
 {
     return term->function == FUNCS.input;

@@ -16,7 +16,6 @@ void recursively_finish_update_cascade(Branch* branch);
 
 // Events that may cause update cascades
 void on_create_call(Term* term);
-void on_term_name_changed(Term* term, const char* prevName, const char* newName);
 
 void on_branch_inputs_changed(Branch* branch);
 

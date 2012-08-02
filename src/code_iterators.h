@@ -120,4 +120,43 @@ struct OuterInputIterator
     void operator++() { advance(); }
 };
 
+struct BranchIterator2
+{
+    Term* _current;
+    Branch* _topBranch;
+
+    BranchIterator2();
+    BranchIterator2(Branch* branch);
+    void startAt(Term* term);
+
+    Term* current() { return _current; }
+    void advance();
+    bool finished() { return _current == NULL; }
+    bool unfinished() { return !finished(); }
+    void stop() { _current = NULL; _topBranch = NULL; }
+
+    Term* operator*() { return current(); }
+    Term* operator->() { return current(); }
+    void operator++() { advance(); }
+};
+
+struct NameVisibleIterator
+{
+    // For a term T, iterates across all the terms where T is name-visible.
+
+    BranchIterator2 _iterator;
+    Term* _target;
+
+    NameVisibleIterator(Term* term);
+
+    Term* current() { return _iterator.current(); }
+    void advance();
+    bool finished() { return _iterator.finished(); }
+    bool unfinished() { return !finished(); }
+
+    Term* operator*() { return current(); }
+    Term* operator->() { return current(); }
+    void operator++() { advance(); }
+};
+
 } // namespace circa

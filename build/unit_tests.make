@@ -66,6 +66,8 @@ endif
 OBJECTS := \
 	$(OBJDIR)/branch.o \
 	$(OBJDIR)/c_objects.o \
+	$(OBJDIR)/cascading.o \
+	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/compound_type.o \
 	$(OBJDIR)/framework.o \
 	$(OBJDIR)/interpreter.o \
@@ -136,6 +138,12 @@ $(OBJDIR)/branch.o: ../tests/internal/branch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_objects.o: ../tests/internal/c_objects.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/cascading.o: ../tests/internal/cascading.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/code_iterators.o: ../tests/internal/code_iterators.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/compound_type.o: ../tests/internal/compound_type.cpp

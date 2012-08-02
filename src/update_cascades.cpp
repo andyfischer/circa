@@ -29,11 +29,6 @@ void on_create_call(Term* term)
         func(term);
 }
 
-void on_term_name_changed(Term* term, const char* oldName, const char* newName)
-{
-    // No-op for now
-}
-
 void on_branch_inputs_changed(Branch* branch)
 {
 }

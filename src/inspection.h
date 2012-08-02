@@ -67,6 +67,9 @@ int input_placeholder_index(Term* inputPlaceholder);
 // extra_output terms).
 int count_actual_output_terms(Term* term);
 
+Term* preceding_term(Term* term);
+Term* following_term(Term* term);
+
 bool is_input_placeholder(Term* term);
 bool is_output_placeholder(Term* term);
 bool has_variable_args(Branch* branch);

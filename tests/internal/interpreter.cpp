@@ -1,3 +1,4 @@
+// Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
 #include "framework.h"
 
@@ -31,7 +32,7 @@ void test_cast_first_inputs()
     test_assert(circa_int(circa_output((caStack*) &stack, 0)) == 5);
 }
 
-}
+} // namespace interpreter
 
 void interpreter_register_tests()
 {

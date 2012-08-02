@@ -298,24 +298,63 @@ void respecialize_type(Term* term)
         change_declared_type(term, outputType);
 }
 
-void rename(Term* term, Name name)
+void rename(Term* termToRename, Name name)
 {
-    if (term->nameSymbol == name)
+    if (termToRename->nameSymbol == name)
         return;
 
-    if (term->owningBranch != NULL) {
-        if (!has_empty_name(term)) {
-            term->owningBranch->names.remove(term->name);
-            term->name = "";
+    if (termToRename->owningBranch != NULL) {
+        if (!has_empty_name(termToRename)) {
+            termToRename->owningBranch->names.remove(termToRename->name);
+            termToRename->name = "";
+            termToRename->nameSymbol = name_None;
         }
-        term->owningBranch->bindName(term, name);
+        termToRename->owningBranch->bindName(termToRename, name);
     }
 
-    std::string prevName = term->name;
-    term->name = name_to_string(name);
-    update_unique_name(term);
+    Name prevName = termToRename->nameSymbol;
+    termToRename->name = name_to_string(name);
+    update_unique_name(termToRename);
 
-    on_term_name_changed(term, prevName.c_str(), name_to_string(name));
+    // We might look up the shadowed name binding at termToRename, but only if needed.
+    bool foundShadowedNameBinding = false;
+    Term* shadowedNameBinding = NULL;
+
+    // Handle change cascades.
+    
+    if (name != name_None) {
+        // The new name may have shadowed an existing name.
+        for (NameVisibleIterator it(termToRename); it.unfinished(); ++it) {
+            Term* possibleUser = it.current();
+            for (int i=0; i < possibleUser->numInputs(); i++) {
+
+                // Only look at inputs that have our name binding.
+                if (possibleUser->input(i) == NULL)
+                    continue;
+                if (possibleUser->input(i)->nameSymbol != name)
+                    continue;
+
+                if (!foundShadowedNameBinding) {
+                    foundShadowedNameBinding = true;
+                    shadowedNameBinding = find_name_at(termToRename, name);
+                    // shadowedNameBinding might still be NULL.
+                }
+
+                // We found a term that is using the name that we just rebound,
+                // and the term is at a location where our new name should be visible.
+                // So, this term is a candidate for a rebinding from shadowing.
+                //
+                // We're going to be conservative, and only touch bindings that were
+                // bound to the previous name binding at this location. There probably
+                // shouldn't be any other kind of binding, but we're still refining
+                // things.
+                
+                if (possibleUser->input(i) == shadowedNameBinding) {
+                    remap_pointers_quick(possibleUser, possibleUser->input(i), termToRename);
+                }
+            }
+        }
+    }
 }
 
 Term* create_duplicate(Branch* branch, Term* original, std::string const& name)

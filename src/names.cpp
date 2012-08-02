@@ -152,6 +152,11 @@ Term* find_name_at(Term* term, const char* name)
     return find_name(term->owningBranch, name, term->index);
 }
 
+Term* find_name_at(Term* term, Name name)
+{
+    return find_name(term->owningBranch, name, term->index);
+}
+
 int find_qualified_name_separator(const char* name)
 {
     for (int i=0; name[i] != 0; i++) {

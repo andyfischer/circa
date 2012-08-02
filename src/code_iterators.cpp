@@ -4,6 +4,7 @@
 #include "term.h"
 
 #include "code_iterators.h"
+#include "inspection.h"
 
 namespace circa {
 
@@ -278,5 +279,101 @@ int OuterInputIterator::currentInputIndex()
     return branchInputIterator.currentInputIndex();
 }
 
-} // namespace circa
+BranchIterator2::BranchIterator2()
+{
+    _current = NULL;
+    _topBranch = NULL;
+}
+BranchIterator2::BranchIterator2(Branch* branch)
+{
+    _current = branch->get(0);
+    _topBranch = branch;
+}
 
+void BranchIterator2::startAt(Term* term)
+{
+    if (term == NULL) {
+        _current = NULL;
+        _topBranch = NULL;
+        return;
+    }
+
+    _current = term;
+    _topBranch = term->owningBranch;
+}
+
+void BranchIterator2::advance()
+{
+    // Possibly iterate through the contents of this branch.
+    if (has_nested_contents(_current) && nested_contents(_current)->length() > 0) {
+        _current = nested_contents(_current)->get(0);
+        return;
+    }
+
+    // Advance to next index.
+    Branch* branch = _current->owningBranch;
+    int index = _current->index + 1;
+
+    // Possibly loop as we pop out of finished branches.
+    possibly_invalid:
+
+    if (index >= branch->length() || branch == NULL) {
+        // Finished this branch.
+
+        if (branch == _topBranch || branch == NULL) {
+            // Finished the iteration.
+            _current = NULL;
+            _topBranch = NULL;
+            return;
+        }
+
+        // Advance to the next term in the parent branch.
+        Term* parentTerm = branch->owningTerm;
+        if (parentTerm == NULL) {
+            // No branch parent. It's weird that we hit this case before we reached
+            // the topBranch, but anyway, finish the iteration.
+            _current = NULL;
+            _topBranch = NULL;
+            return;
+        }
+
+        branch = parentTerm->owningBranch;
+        index = parentTerm->index + 1;
+        goto possibly_invalid;
+    }
+
+    // Skip over NULL terms.
+    if (branch->get(index) == NULL) {
+        index++;
+        goto possibly_invalid;
+    }
+
+    // Index is valid. Save the position as a Term*.
+    _current = branch->get(index);
+}
+
+NameVisibleIterator::NameVisibleIterator(Term* term)
+{
+    _target = term;
+
+    // Start at the term immediately after the target.
+    _iterator.startAt(following_term(_target));
+}
+
+
+void NameVisibleIterator::advance()
+{
+    _iterator.advance();
+
+    if (_iterator.finished())
+        return;
+
+    // If we reach a term with the same name binding as our target, then stop.
+    // Our target term is no longer visible.
+    if (_iterator.current()->nameSymbol == _target->nameSymbol) {
+        _iterator.stop();
+        return;
+    }
+}
+
+} // namespace circa

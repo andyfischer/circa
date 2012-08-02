@@ -38,6 +38,7 @@ Term* find_local_name(Branch* branch,
                       NameLookupType lookupType = NAME_LOOKUP_ANY);
 
 Term* find_name_at(Term* term, const char* name);
+Term* find_name_at(Term* term, Name name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
 // of the first colon. If the string isn't a qualified name then returns -1.
