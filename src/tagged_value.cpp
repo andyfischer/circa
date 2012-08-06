@@ -265,11 +265,8 @@ caValue* get_field(caValue* value, const char* field)
 {
     Type::GetField getField = value->value_type->getField;
 
-    if (getField == NULL) {
-        std::string msg = std::string("No getField function available on type ")
-            + name_to_string(value->value_type->name);
-        internal_error(msg.c_str());
-    }
+    if (getField == NULL)
+        return NULL;
 
     return getField(value, field);
 }

@@ -1,4 +1,4 @@
 Error occurred:
 [tests/static_errors/unknown_function.ca:2,0] unknown_function()
-[$532] output_placeholder() | Unknown function: nonexistant_function
+[$531] output_placeholder() | Unknown function: nonexistant_function
 

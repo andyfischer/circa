@@ -1,0 +1,13 @@
+
+type T {
+    int i
+}
+
+t = create(T)
+t = any(t)
+
+print(t)
+
+t.i = 3
+
+print(t)

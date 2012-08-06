@@ -1266,39 +1266,6 @@ void remap_pointers(Branch* branch, Term* original, Term* replacement)
     }
 }
 
-#if 0
-Term* write_selector_for_accessor_expression(Branch* branch, Term* accessor, Term** headPtr)
-{
-    TermList elements;
-
-    while (true) {
-        if (headPtr != NULL)
-            *headPtr = accessor;
-
-        // Stop if we find a term with a name.
-        if (accessor->name != "")
-            break;
-
-        if (accessor->function == FUNCS.get_index) {
-            elements.prepend(accessor->input(1));
-            accessor = accessor->input(0);
-        } else if (accessor->function == FUNCS.get_field) {
-            elements.prepend(accessor->input(1));
-            accessor = accessor->input(0);
-        } else if (accessor->function == FUNCS.dynamic_method) {
-            Term* fieldName = create_string(branch,
-                    accessor->stringProp("syntax:functionName", ""));
-            elements.prepend(fieldName);
-            accessor = accessor->input(0);
-        } else {
-            break;
-        }
-    }
-
-    return apply(branch, FUNCS.selector, elements);
-}
-#endif
-
 bool term_is_nested_in_branch(Term* term, Branch* branch)
 {
     while (term != NULL) {

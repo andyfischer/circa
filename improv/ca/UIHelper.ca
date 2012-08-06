@@ -20,7 +20,7 @@ def button(String label, Rect rect) -> Button
     b.rect = rect
     b
 
-def Button.draw(b, Painter p)
+def Button.paint(b, Painter p)
     button_color = #afa0d9
 
     if b.press
@@ -83,11 +83,16 @@ def ButtonBar.arrange(@self, Rect rect, Name orientation)
             button.rect = [rect.x1, top, rect.x2, top + eachHeight]
             top += eachHeight + spacer
 
+            print('button: ' button)
+            print('rect should be: ' [rect.x1, top, rect.x2, top + eachHeight])
+
         self.buttons = buttons
 
-def ButtonBar.draw(b, Painter p)
+    print('finished arrange: ' self)
+
+def ButtonBar.paint(b, Painter p)
     for button in b.buttons
-        button.draw(p)
+        button.paint(p)
 
 def ButtonBar.input(@b, InputEvent e) -> any
     if not e.is_mouse

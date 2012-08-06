@@ -47,6 +47,7 @@ struct BuiltinFuncs {
     Term* add;
     Term* add_i;
     Term* add_f;
+    Term* assign_to_element;
     Term* branch;
     Term* branch_dynamic_call;
     Term* branch_unevaluated;
@@ -103,7 +104,6 @@ struct BuiltinFuncs {
     Term* selector_reflect;
     Term* set_index;
     Term* set_field;
-    Term* set_with_selector;
     Term* sub;
     Term* type;
     Term* unbounded_loop;

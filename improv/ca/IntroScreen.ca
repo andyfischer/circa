@@ -21,6 +21,7 @@ state fpsTracker = create(FPSTracker)
 state number time
 
 scriptChoices.arrange([30 80 200 370], :vertical)
+print(scriptChoices)
 
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
@@ -34,8 +35,8 @@ if msg_name == 'onPaintEvent'
         color = phrase[0]
         rect = painter.text([right 50] phrase[1] color [])
         right = rect.x2 + 5
-    
-    scriptChoices.draw(painter)
+
+    scriptChoices.paint(painter)
 
     fpsTracker.onFrame(time)
     print(fpsTracker.recentFps)

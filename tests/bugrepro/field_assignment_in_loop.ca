@@ -1,0 +1,12 @@
+
+type T {
+    int i
+}
+
+tlist = [create(T) create(T) create(T)]
+
+for t in @tlist
+    t.i = 2
+    print('t = ' t)
+
+print('tlist = ' tlist)
