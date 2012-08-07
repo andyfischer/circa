@@ -56,8 +56,8 @@ tok_LBracket
 tok_RBracket
 tok_Comma
 tok_At
-tok_AtDot
 tok_Dot
+tok_DotAt
 tok_Star
 tok_Question
 tok_Slash

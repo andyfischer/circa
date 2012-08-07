@@ -46,8 +46,6 @@
 #include "types/set.h"
 #include "types/void.h"
 
-#define NEW_DYNAMIC_METHOD 1
-
 namespace circa {
 
 Branch* KERNEL = NULL;
@@ -182,27 +180,12 @@ void call_actor_func(caStack* stack)
     circa_actor_run_message(stack->world, actorName, msg);
 }
 
-#if 0
-void dynamic_call(caStack* stack)
-{
-    Branch* branch = as_branch(circa_input(stack, 0));
-    caValue* inputs = circa_input(stack, 1);
-
-    push_frame_with_inputs(stack, branch, inputs);
-}
-#endif
-
 void dynamic_method_call(caStack* stack)
 {
     INCREMENT_STAT(DynamicMethodCall);
 
-#if NEW_DYNAMIC_METHOD
-    caValue* object = circa_input(stack, 0);
-    caValue* args = circa_input(stack, 1);
-#else
     caValue* args = circa_input(stack, 0);
     caValue* object = circa_index(args, 0);
-#endif
 
     // Lookup method
     Term* term = (Term*) circa_caller_term(stack);
@@ -218,30 +201,13 @@ void dynamic_method_call(caStack* stack)
         // Grab inputs before pop
         Value inputs;
         swap(args, &inputs);
-#if NEW_DYNAMIC_METHOD
-        copy(object, list_insert(&inputs, 0));
-#endif
 
         pop_frame(stack);
         push_frame_with_inputs(stack, function_contents(method), &inputs);
         return;
     }
 
-#if 0
-    // No method found. Fall back to a field access. This is deprecated behavior.
-    if (is_list_based_type(object->value_type)) {
-        int fieldIndex = list_find_field_index_by_name(object->value_type, functionName.c_str());
-        if (fieldIndex != -1) {
-            caValue* element = get_index(object, fieldIndex);
-            if (element != NULL) {
-                copy(element, circa_output(stack, 0));
-                return;
-            }
-        }
-    }
-#endif
-
-    // Method not found (nor was a field found). Raise error.
+    // Method not found. Raise error.
     std::string msg;
     msg += "Method ";
     msg += functionName;
@@ -987,13 +953,8 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
     // Need dynamic_method before any hosted functions
-#if NEW_DYNAMIC_METHOD
-    FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call,
-            "def dynamic_method(any @obj, any inputs :multiple) -> any");
-#else
     FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call,
             "def dynamic_method(any inputs :multiple) -> any");
-#endif
 
     // Load the standard library from stdlib.ca
     parser::compile(kernel, parser::statement_list, STDLIB_CA_TEXT);

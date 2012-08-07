@@ -58,8 +58,8 @@ const char* builtin_name_to_string(int name)
     case tok_RBracket: return "tok_RBracket";
     case tok_Comma: return "tok_Comma";
     case tok_At: return "tok_At";
-    case tok_AtDot: return "tok_AtDot";
     case tok_Dot: return "tok_Dot";
+    case tok_DotAt: return "tok_DotAt";
     case tok_Star: return "tok_Star";
     case tok_Question: return "tok_Question";
     case tok_Slash: return "tok_Slash";

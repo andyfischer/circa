@@ -57,7 +57,7 @@ call_blah3(b, 22)
 -- Test modifying the target object
 
 def call_modify(any a :out) -> any
-    a@.modify
+    a.@modify
 
 a = create(A)
 b = create(B)

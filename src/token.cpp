@@ -20,7 +20,6 @@ const char* get_token_text(int match)
         case tok_RBracket: return "]";
         case tok_Comma: return ",";
         case tok_At: return "@";
-        case tok_AtDot: return "@";
         case tok_Identifier: return "IDENTIFIER";
         case tok_Name: return "NAME";
         case tok_Integer: return "INTEGER";
@@ -30,6 +29,7 @@ const char* get_token_text(int match)
         case tok_Color: return "COLOR";
         case tok_Comment: return "COMMENT";
         case tok_Dot: return ".";
+        case tok_DotAt: return ".@";
         case tok_Star: return "*";
         case tok_Question: return "?";
         case tok_Slash: return "/";
@@ -369,11 +369,7 @@ void top_level_consume_token(TokenizeContext &context)
             context.consume(tok_Comma, 1);
             return;
         case '@':
-            if (context.next(1) == '.') {
-                context.consume(tok_AtDot, 2);
-            } else {
-                context.consume(tok_At, 1);
-            }
+            context.consume(tok_At, 1);
             return;
         case '=':
             if (context.next(1) == '=') {
@@ -397,6 +393,8 @@ void top_level_consume_token(TokenizeContext &context)
                 } else {
                     context.consume(tok_TwoDots, 2);
                 }
+            } else if (context.next(1) == '@') {
+                context.consume(tok_DotAt, 2);
             } else {
                 context.consume(tok_Dot, 1);
             }

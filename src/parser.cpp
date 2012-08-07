@@ -1672,19 +1672,19 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
 {
     int startPosition = tokens.getPosition();
 
-    bool explicitRebindLHS = false;
+    bool forceRebindLHS = false;
 
-    if (tokens.nextIs(tok_AtDot)) {
-        explicitRebindLHS = true;
+    if (tokens.nextIs(tok_DotAt)) {
+        forceRebindLHS = true;
         tokens.consume();
     } else if (tokens.nextIs(tok_Dot)) {
-        explicitRebindLHS = false;
+        forceRebindLHS = false;
         tokens.consume();
     } else {
         internal_error("parser::method_call expected '.' or '@.'");
     }
     
-    bool rebindLHS = explicitRebindLHS;
+    bool rebindLHS = forceRebindLHS;
 
     if (!tokens.nextIs(tok_Identifier)) {
         internal_error("parser::method_call expected identifier after dot");
@@ -1717,34 +1717,24 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     Term* function = find_method(branch, rootType, functionName);
 
     if (function == NULL) {
-        // Method could not be statically found.
-
-#if 0
-        // Temporary behavior, if we can statically resolve to a field access then
-        // create a get_field term. This should be changed to use auto-generated
-        // methods (one for each field).
-        int fieldIndex = list_find_field_index_by_name(rootType, functionName.c_str());
-        if (fieldIndex != -1) {
-            Term* fieldName = create_string(branch, functionName.c_str());
-            Term* term = apply(branch, FUNCS.get_field, TermList(root.term, fieldName));
-            set_input_syntax_hint(term, 0, "postWhitespace", "");
-            return ParseResult(term);
-        }
-#endif
-
-        // Otherwise create a dynamic_method call.
+        // Method could not be statically found. Create a dynamic_method call.
         function = FUNCS.dynamic_method;
     }
 
     // If the function is known, then check if the function wants to rebind the name,
-    // even if the @. operator was not used. (This is not preferred behavior but we're
-    // supporting legacy code while the @. operator is evaluated)
+    // even if the .@ operator was not used.
     if (function_input_is_extra_output(as_function(function), 0)) {
         rebindLHS = true;
     }
 
     // Create the term
     Term* term = apply(branch, function, inputs);
+
+    // Possibly introduce an extra_output
+    if (forceRebindLHS && function == FUNCS.dynamic_method
+            && get_extra_output(term, 0) == NULL) {
+        apply(branch, FUNCS.extra_output, TermList(term));
+    }
 
     // Possibly rebind the left-hand-side
     if (rebindLHS && get_extra_output(term, 0) != NULL) {
@@ -1758,8 +1748,8 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     term->setStringProp("syntax:declarationStyle", "method-call");
     if (!hasParens)
         term->setBoolProp("syntax:no-parens", true);
-    if (explicitRebindLHS)
-        term->setStringProp("syntax:operator", "@.");
+    if (forceRebindLHS)
+        term->setStringProp("syntax:operator", ".@");
 
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
@@ -1833,7 +1823,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             result = ParseResult(term);
 
         // Check for a.b or a@.b, method call
-        } else if (tokens.nextIs(tok_Dot) || tokens.nextIs(tok_AtDot)) {
+        } else if (tokens.nextIs(tok_Dot) || tokens.nextIs(tok_DotAt)) {
             result = method_call(branch, tokens, context, result);
 
         } else {

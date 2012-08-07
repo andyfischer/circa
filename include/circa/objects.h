@@ -5,6 +5,10 @@
 
 typedef void (*caObjectReleaseFunc)(void* object);
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 bool circa_is_object(caValue* value);
 
 // Access the contents of an object value
@@ -19,5 +23,9 @@ void* circa_create_object_output(caStack* stack, int output);
 
 // Configure the given type as an object-based type.
 void circa_setup_object_type(caType* type, size_t objectSize, caObjectReleaseFunc release);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif

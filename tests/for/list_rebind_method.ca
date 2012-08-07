@@ -10,7 +10,7 @@ items = [T([1]), T([2]), T([3])]
 
 print('items start: ' items)
 
-for i in @items
-    i@.increment
+for T t in @items
+    t.increment
 
 print('items end: ' items)

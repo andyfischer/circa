@@ -261,7 +261,7 @@ void pop_frame(Stack* stack)
 #endif
 
     if (top->parent == 0)
-        stack->top = NULL;
+        stack->top = 0;
     else
         stack->top = top->parent;
 
@@ -469,7 +469,7 @@ Branch* top_branch(Stack* stack)
 
 void reset_stack(Stack* stack)
 {
-    stack->top = NULL;
+    stack->top = 0;
     stack->errorOccurred = false;
 
     // Deallocate registers
