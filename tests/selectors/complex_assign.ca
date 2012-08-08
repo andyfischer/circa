@@ -1,0 +1,24 @@
+
+type Button {
+    String label
+    any action
+    Rect rect
+    bool rollover
+    bool press
+    bool triggered
+    bool toggled
+}
+
+type ButtonBar {
+    List buttons
+}
+
+def ButtonBar.setToggled(@b, int index, bool toggle)
+    --b.buttons[index].toggled = toggle
+
+    print(selector_reflect(b.buttons[index].toggled))
+
+
+bar = create(ButtonBar)
+bar.buttons = [create(Button)]
+bar.setToggled(0, true)

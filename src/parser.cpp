@@ -1673,12 +1673,19 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     int startPosition = tokens.getPosition();
 
     bool forceRebindLHS = false;
+    Name dotOperator = name_None;
 
     if (tokens.nextIs(tok_DotAt)) {
         forceRebindLHS = true;
+        dotOperator = tok_DotAt;
+        tokens.consume();
+    } else if (tokens.nextIs(tok_At)) {
+        forceRebindLHS = true;
+        dotOperator = tok_At;
         tokens.consume();
     } else if (tokens.nextIs(tok_Dot)) {
         forceRebindLHS = false;
+        dotOperator = tok_Dot;
         tokens.consume();
     } else {
         internal_error("parser::method_call expected '.' or '@.'");
@@ -1687,7 +1694,8 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     bool rebindLHS = forceRebindLHS;
 
     if (!tokens.nextIs(tok_Identifier)) {
-        internal_error("parser::method_call expected identifier after dot");
+        return compile_error_for_line(branch, tokens, startPosition,
+                "Expected identifier after dot");
     }
 
     std::string functionName = tokens.consumeStr(tok_Identifier);
@@ -1748,8 +1756,9 @@ ParseResult method_call(Branch* branch, TokenStream& tokens, ParserCxt* context,
     term->setStringProp("syntax:declarationStyle", "method-call");
     if (!hasParens)
         term->setBoolProp("syntax:no-parens", true);
+
     if (forceRebindLHS)
-        term->setStringProp("syntax:operator", ".@");
+        term->setStringProp("syntax:operator", get_token_text(dotOperator));
 
     set_source_location(term, startPosition, tokens);
     return ParseResult(term);
@@ -1822,8 +1831,11 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             set_source_location(term, startPosition, tokens);
             result = ParseResult(term);
 
-        // Check for a.b or a@.b, method call
-        } else if (tokens.nextIs(tok_Dot) || tokens.nextIs(tok_DotAt)) {
+        // Check for a.b or a.@b, method call
+        } else if (tokens.nextIs(tok_Dot)
+                    || tokens.nextIs(tok_DotAt)
+                    || tokens.nextIs(tok_At)) {
+
             result = method_call(branch, tokens, context, result);
 
         } else {

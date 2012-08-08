@@ -21,7 +21,6 @@ state fpsTracker = create(FPSTracker)
 state number time
 
 scriptChoices.arrange([30 80 200 370], :vertical)
-print(scriptChoices)
 
 if msg_name == 'onPaintEvent'
     painter = msg[1] -> Painter
@@ -39,11 +38,11 @@ if msg_name == 'onPaintEvent'
     scriptChoices.paint(painter)
 
     fpsTracker.onFrame(time)
-    print(fpsTracker.recentFps)
+    print('fps: ', fpsTracker.recentFps)
 
 elif msg_name == 'onInputEvent'
     event = msg[1] -> InputEvent
-    choice = scriptChoices@.input(event)
+    choice = scriptChoices.@input(event)
     if is_string(choice)
         send('ScriptView' ['loadFile' choice])
         send('Main' ['changeScreen' 'ScriptView'])

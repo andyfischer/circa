@@ -135,6 +135,7 @@ void trace_selector_from_accessor(Term* head, Term* accessor, caValue* selectorO
             // (as long as it's a plain value)
             
             Term* indexTerm = accessor->input(1);
+            // TODO: Need to handle non-value indices
             if (!is_value(indexTerm))
                 break;
 

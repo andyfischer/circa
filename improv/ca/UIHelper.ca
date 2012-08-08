@@ -83,12 +83,7 @@ def ButtonBar.arrange(@self, Rect rect, Name orientation)
             button.rect = [rect.x1, top, rect.x2, top + eachHeight]
             top += eachHeight + spacer
 
-            print('button: ' button)
-            print('rect should be: ' [rect.x1, top, rect.x2, top + eachHeight])
-
         self.buttons = buttons
-
-    print('finished arrange: ' self)
 
 def ButtonBar.paint(b, Painter p)
     for button in b.buttons
