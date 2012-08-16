@@ -582,7 +582,7 @@ Name load_script(Branch* branch, const char* filename)
 
     if (is_null(&contents)) {
         Term* msg = create_string(branch, "file not found");
-        apply(branch, STATIC_ERROR_FUNC, TermList(msg));
+        apply(branch, FUNCS.static_error, TermList(msg));
         return name_Failure;
     }
 

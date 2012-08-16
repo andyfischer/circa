@@ -63,11 +63,11 @@ namespace switch_function {
 
     void setup(Branch* kernel)
     {
-        SWITCH_FUNC = import_function(kernel, evaluate_switch, "switch(any input) -> any");
-        as_function(SWITCH_FUNC)->formatSource = switch_formatSource;
-        as_function(SWITCH_FUNC)->getOutputCount = switch_getOutputCount;
-        as_function(SWITCH_FUNC)->getOutputName = switch_getOutputName;
-        as_function(SWITCH_FUNC)->getOutputType = switch_getOutputType;
+        FUNCS.switch_func = import_function(kernel, evaluate_switch, "switch(any input) -> any");
+        as_function(FUNCS.switch_func)->formatSource = switch_formatSource;
+        as_function(FUNCS.switch_func)->getOutputCount = switch_getOutputCount;
+        as_function(FUNCS.switch_func)->getOutputName = switch_getOutputName;
+        as_function(FUNCS.switch_func)->getOutputType = switch_getOutputType;
 
         //FUNCS.case_func = import_function(kernel, evaluate_case, "case(any input)");
         //as_function(FUNCS.case_func)->formatSource = case_formatSource;

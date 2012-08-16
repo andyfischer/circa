@@ -87,14 +87,14 @@ void check_term_for_static_error(List* errors, Term* term)
         return append_static_error(errors, term, "not_a_function");
 
     // Unknown identifier
-    if (term->function == UNKNOWN_IDENTIFIER_FUNC)
+    if (term->function == FUNCS.unknown_identifier)
         return append_static_error(errors, term, "unknown_identifier");
 
     // Unrecognized expression
-    if (term->function == UNRECOGNIZED_EXPRESSION_FUNC)
+    if (term->function == FUNCS.unrecognized_expression)
         return append_static_error(errors, term, "unrecognized_expression");
 
-    if (term->function == STATIC_ERROR_FUNC)
+    if (term->function == FUNCS.static_error)
         return append_static_error(errors, term, to_string(term_value(term->input(0))).c_str());
 }
 
@@ -185,7 +185,7 @@ void format_static_error(caValue* error, caValue* stringOutput)
             << term->function->name << " expects type "
             << name_to_string(function_get_input_type(term->function, inputIndex)->name);
     }
-    else if (term->function == STATIC_ERROR_FUNC)
+    else if (term->function == FUNCS.static_error)
         out << to_string(term_value(term->input(0)));
     else
         //out << "(unrecognized error type: " << type << ")";

@@ -90,7 +90,7 @@ bool is_copying_call(Term* term)
 
 bool is_an_unknown_identifier(Term* term)
 {
-    return term->function == UNKNOWN_IDENTIFIER_FUNC;
+    return term->function == FUNCS.unknown_identifier;
 }
 
 bool is_major_branch(Branch* branch)
@@ -294,7 +294,7 @@ Term* find_user_with_function(Term* target, Term* func)
 bool has_an_error_listener(Term* term)
 {
     for (int i=0; i < term->users.length(); i++) {
-        if (term->users[i] && term->users[i]->function == ERRORED_FUNC)
+        if (term->users[i] && term->users[i]->function == FUNCS.errored)
             return true;
     }
     return false;

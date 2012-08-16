@@ -5,10 +5,6 @@
 namespace circa {
 namespace unrecognized_expr_function {
 
-    CA_FUNCTION(evaluate)
-    {
-    }
-
     void formatSource(caValue* source, Term* term)
     {
         append_phrase(source, term->stringProp("originalText",""), term, name_None);
@@ -16,8 +12,8 @@ namespace unrecognized_expr_function {
 
     void setup(Branch* kernel)
     {
-        UNRECOGNIZED_EXPRESSION_FUNC = import_function(kernel, evaluate, "unrecognized_expr(any :multiple)");
-        as_function(UNRECOGNIZED_EXPRESSION_FUNC)->formatSource = formatSource;
+        FUNCS.unrecognized_expression = import_function(kernel, NULL, "unrecognized_expr(any :multiple)");
+        as_function(FUNCS.unrecognized_expression)->formatSource = formatSource;
     }
 }
 }

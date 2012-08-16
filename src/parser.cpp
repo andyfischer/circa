@@ -945,7 +945,7 @@ ParseResult switch_block(Branch* branch, TokenStream& tokens, ParserCxt* context
 
     Term* input = infix_expression(branch, tokens, context, 0).term;
 
-    Term* result = apply(branch, SWITCH_FUNC, TermList(input));
+    Term* result = apply(branch, FUNCS.switch_func, TermList(input));
 
     set_starting_source_location(result, startPosition, tokens);
     consume_branch(nested_contents(result), tokens, context);
@@ -969,7 +969,7 @@ ParseResult case_statement(Branch* branch, TokenStream& tokens, ParserCxt* conte
 
     // Find the parent 'switch' block.
     Term* parent = branch->owningTerm;
-    if (parent == NULL || parent->function != SWITCH_FUNC) {
+    if (parent == NULL || parent->function != FUNCS.switch_func) {
         return compile_error_for_line(branch, tokens, startPosition,
             "'case' keyword must occur inside 'switch' block");
     }
@@ -2274,7 +2274,7 @@ ParseResult namespace_block(Branch* branch, TokenStream& tokens, ParserCxt* cont
 
 ParseResult unknown_identifier(Branch* branch, std::string const& name)
 {
-    Term* term = apply(branch, UNKNOWN_IDENTIFIER_FUNC, TermList(), name_from_string(name));
+    Term* term = apply(branch, FUNCS.unknown_identifier, TermList(), name_from_string(name));
     set_is_statement(term, false);
     term->setStringProp("message", name);
     return ParseResult(term);
@@ -2419,7 +2419,7 @@ std::string consume_line(TokenStream &tokens, int start, Term* positionRecepient
 Term* insert_compile_error(Branch* branch, TokenStream& tokens,
         std::string const& message)
 {
-    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.unrecognized_expression, TermList());
     result->setStringProp("message", message);
     set_source_location(result, tokens.getPosition(), tokens);
     return result;
@@ -2428,15 +2428,15 @@ Term* insert_compile_error(Branch* branch, TokenStream& tokens,
 ParseResult compile_error_for_line(Branch* branch, TokenStream& tokens, int start,
         std::string const& message)
 {
-    Term* result = apply(branch, UNRECOGNIZED_EXPRESSION_FUNC, TermList());
+    Term* result = apply(branch, FUNCS.unrecognized_expression, TermList());
     return compile_error_for_line(result, tokens, start, message);
 }
 
 ParseResult compile_error_for_line(Term* existing, TokenStream &tokens, int start,
         std::string const& message)
 {
-    if (existing->function != UNRECOGNIZED_EXPRESSION_FUNC)
-        change_function(existing, UNRECOGNIZED_EXPRESSION_FUNC);
+    if (existing->function != FUNCS.unrecognized_expression)
+        change_function(existing, FUNCS.unrecognized_expression);
     std::string line = consume_line(tokens, start, existing);
 
     existing->setStringProp("originalText", line.c_str());

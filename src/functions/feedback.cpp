@@ -12,7 +12,7 @@ namespace feedback_function {
 
     void setup(Branch* kernel)
     {
-        FEEDBACK_FUNC = import_function(kernel, evaluate, "feedback(any :meta,any)");
+        FUNCS.feedback = import_function(kernel, evaluate, "feedback(any :meta,any)");
     }
 }
 }

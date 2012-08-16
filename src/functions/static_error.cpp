@@ -7,10 +7,10 @@ namespace static_error_function {
 
     void setup(Branch* kernel)
     {
-        STATIC_ERROR_FUNC = 
+        FUNCS.static_error = 
             import_function(kernel, NULL, "static_error(any msg)");
 
-        function_set_empty_evaluation(as_function(STATIC_ERROR_FUNC));
+        function_set_empty_evaluation(as_function(FUNCS.static_error));
     }
 
 }

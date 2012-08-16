@@ -62,24 +62,6 @@ bool STATIC_INITIALIZATION_FINISHED = false;
 bool FINISHED_BOOTSTRAP = false;
 bool SHUTTING_DOWN = false;
 
-Term* APPLY_FEEDBACK = NULL;
-Term* AVERAGE_FUNC = NULL;
-Term* DESIRED_VALUE_FEEDBACK = NULL;
-Term* DO_ONCE_FUNC = NULL;
-Term* ERRORED_FUNC = NULL;
-Term* FEEDBACK_FUNC = NULL;
-Term* FREEZE_FUNC = NULL;
-Term* INSTANCE_FUNC = NULL;
-Term* LIST_TYPE = NULL;
-Term* NAMESPACE_FUNC = NULL;
-Term* OVERLOADED_FUNCTION_FUNC = NULL;
-Term* REF_FUNC = NULL;
-Term* SWITCH_FUNC = NULL;
-Term* STATEFUL_VALUE_FUNC = NULL;
-Term* STATIC_ERROR_FUNC = NULL;
-Term* UNKNOWN_IDENTIFIER_FUNC = NULL;
-Term* UNRECOGNIZED_EXPRESSION_FUNC = NULL;
-
 Term* ANY_TYPE = NULL;
 Term* BOOL_TYPE = NULL;
 Term* DICT_TYPE = NULL;
@@ -807,7 +789,7 @@ void bootstrap_kernel()
     DICT_TYPE = create_type_value(kernel, &DICT_T, "Dict");
     REF_TYPE = create_type_value(kernel, &REF_T, "Term");
     VOID_TYPE = create_type_value(kernel, &VOID_T, "void");
-    LIST_TYPE = create_type_value(kernel, &LIST_T, "List");
+    TYPES.list = unbox_type(create_type_value(kernel, &LIST_T, "List"));
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
     create_type_value(kernel, &BRANCH_T, "Branch");
 

@@ -9,24 +9,6 @@ namespace circa {
 
 extern Branch* KERNEL;
 
-extern Term* APPLY_FEEDBACK;
-extern Term* AVERAGE_FUNC;
-extern Term* DESIRED_VALUE_FEEDBACK;
-extern Term* DO_ONCE_FUNC;
-extern Term* ERRORED_FUNC;
-extern Term* FEEDBACK_FUNC;
-extern Term* FILE_READ_ERROR_FUNC;
-extern Term* FREEZE_FUNC;
-extern Term* INSTANCE_FUNC;
-extern Term* MAP_TYPE;
-extern Term* OVERLOADED_FUNCTION_FUNC;
-extern Term* REF_FUNC;
-extern Term* SWITCH_FUNC;
-extern Term* STATEFUL_VALUE_FUNC;
-extern Term* STATIC_ERROR_FUNC;
-extern Term* UNKNOWN_IDENTIFIER_FUNC;
-extern Term* UNRECOGNIZED_EXPRESSION_FUNC;
-
 extern Term* ANY_TYPE;
 extern Term* BOOL_TYPE;
 extern Term* DICT_TYPE;
@@ -37,7 +19,6 @@ extern Term* STRING_TYPE;
 extern Term* COLOR_TYPE;
 extern Term* FEEDBACK_TYPE;
 extern Term* FUNCTION_TYPE;
-extern Term* LIST_TYPE;
 extern Term* NAME_TYPE;
 extern Term* TYPE_TYPE;
 extern Term* VOID_TYPE;
@@ -67,8 +48,11 @@ struct BuiltinFuncs {
     Term* dynamic_call;
     Term* dynamic_method;
     Term* error;
+    Term* errored;
     Term* exit_point;
     Term* extra_output;
+    Term* feedback;
+    Term* freeze;
     Term* for_func;
     Term* get_field;
     Term* get_index;
@@ -104,14 +88,18 @@ struct BuiltinFuncs {
     Term* selector_reflect;
     Term* set_index;
     Term* set_field;
+    Term* static_error;
     Term* sub;
+    Term* switch_func;
     Term* type;
     Term* unbounded_loop;
     Term* unbounded_loop_finish;
     Term* unknown_function;
+    Term* unknown_identifier;
     Term* unpack_state;
     Term* unpack_state_from_list;
     Term* unpack_state_list_n;
+    Term* unrecognized_expression;
     Term* value;
 };
 
@@ -140,12 +128,19 @@ extern Type VOID_T;
 
 struct BuiltinTypes {
     Type* actor;
+    Type* any;
+    Type* branch;
     Type* color;
+    Type* dict;
+    Type* error;
     Type* file_signature;
     Type* frame;
+    Type* float_type;
+    Type* list;
     Type* map;
     Type* point;
     Type* selector;
+    Type* void_type;
 };
 
 extern BuiltinTypes TYPES;

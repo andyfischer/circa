@@ -10,7 +10,7 @@ namespace meta_function {
         for (int i=0; i < branch->length(); i++) {
             Term* term = branch->get(i);
             if (term == NULL) continue;
-            if (term->function == FREEZE_FUNC) {
+            if (term->function == FUNCS.freeze) {
                 Term* input = term->input(0);
 
                 Stack context;
@@ -37,8 +37,8 @@ namespace meta_function {
     {
         #if 0
         FIXME
-        FREEZE_FUNC = import_function(kernel, copy_function::evaluate, "freeze(any) -> any");
-        function_t::get_specialize_type(FREEZE_FUNC) = freeze_specializeType;
+        FUNCS.freeze = import_function(kernel, copy_function::evaluate, "freeze(any) -> any");
+        function_t::get_specialize_type(FUNCS.freeze) = freeze_specializeType;
 
         import_function(kernel, lift_closure_evaluate, "lift_closure(Branch) -> Branch");
         #endif
