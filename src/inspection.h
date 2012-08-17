@@ -57,11 +57,26 @@ bool is_minor_branch(Branch* branch);
 int get_output_count(Term* term);
 int get_locals_count(Branch* branch);
 
+// Input & output placeholders
 Term* get_input_placeholder(Branch* branch, int index);
 Term* get_output_placeholder(Branch* branch, int index);
 int count_input_placeholders(Branch* branch);
 int count_output_placeholders(Branch* branch);
 int input_placeholder_index(Term* inputPlaceholder);
+
+// Extra outputs
+Term* get_output_term(Term* term, int index);
+Term* get_extra_output(Term* term, int index);
+Term* find_extra_output_for_state(Term* term);
+
+// State inputs & outputs
+bool term_is_state_input(Term* term, int index);
+Term* find_state_input(Branch* branch);
+bool has_state_input(Branch* branch);
+Term* find_state_output(Branch* branch);
+bool has_state_output(Branch* branch);
+bool is_state_input(Term* placeholder);
+bool is_state_output(Term* placeholder);
 
 // Return a count of 'actual' output terms (includes the term plus any adjacent
 // extra_output terms).

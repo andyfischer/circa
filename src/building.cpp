@@ -539,6 +539,40 @@ Term* prepend_output_placeholder(Branch* branch, Term* result)
     return apply(branch, FUNCS.output, TermList(result));
 }
 
+Term* append_state_input(Branch* branch)
+{
+    // Make sure that a state input doesn't already exist
+    Term* existing = find_state_input(branch);
+    if (existing != NULL)
+        return existing;
+
+    int inputCount = count_input_placeholders(branch);
+
+    Term* term = apply(branch, FUNCS.input, TermList());
+    branch->move(term, inputCount);
+    term->setBoolProp("state", true);
+    term->setBoolProp("hiddenInput", true);
+    term->setBoolProp("output", true);
+
+    on_branch_inputs_changed(branch);
+
+    return term;
+}
+
+Term* append_state_output(Branch* branch)
+{
+    // Make sure that a state input doesn't already exist
+    Term* existing = find_state_output(branch);
+    if (existing != NULL)
+        return existing;
+
+    Term* term = append_output_placeholder(branch, 
+        find_open_state_result(branch, branch->length()));
+    term->setBoolProp("state", true);
+    hide_from_source(term);
+    return term;
+}
+
 Branch* term_get_function_details(Term* call)
 {
     // TODO: Shouldn't need to special case these functions.
@@ -613,35 +647,6 @@ void update_extra_outputs(Term* term)
 
     if (needToUpdatePackState)
         branch_update_existing_pack_state_calls(branch);
-}
-
-Term* get_output_term(Term* term, int index)
-{
-    if (index == 0)
-        return term;
-    else
-        return get_extra_output(term, index - 1);
-}
-
-Term* get_extra_output(Term* term, int index)
-{
-    Term* position = term->owningBranch->getSafe(term->index + index + 1);
-    if (position != NULL && position->function == FUNCS.extra_output)
-        return position;
-    return NULL;
-}
-
-Term* find_extra_output_for_state(Term* term)
-{
-    for (int i=0;; i++) {
-        Term* extra_output = get_extra_output(term, i);
-        if (extra_output == NULL)
-            break;
-
-        if (extra_output->boolProp("state", false))
-            return extra_output;
-    }
-    return NULL;
 }
 
 Term* term_get_input_placeholder(Term* call, int index)
@@ -810,88 +815,6 @@ void branch_finish_changes(Branch* branch)
 
     branch->inProgress = false;
     branch->version++;
-}
-
-bool term_is_state_input(Term* term, int index)
-{
-    if (index >= term->numInputs())
-        return false;
-    caValue* prop = term->inputInfo(index)->properties.get("state");
-    if (prop == NULL)
-        return false;
-    return as_bool(prop);
-}
-
-Term* find_state_input(Branch* branch)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_input_placeholder(branch, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (is_state_input(placeholder))
-            return placeholder;
-    }
-}
-
-bool has_state_input(Branch* branch)
-{
-    return find_state_input(branch) != NULL;
-}
-
-Term* find_state_output(Branch* branch)
-{
-    for (int i=0;; i++) {
-        Term* placeholder = get_output_placeholder(branch, i);
-        if (placeholder == NULL)
-            return NULL;
-        if (is_state_output(placeholder))
-            return placeholder;
-    }
-}
-bool has_state_output(Branch* branch)
-{
-    return find_state_output(branch) != NULL;
-}
-Term* append_state_input(Branch* branch)
-{
-    // Make sure that a state input doesn't already exist
-    Term* existing = find_state_input(branch);
-    if (existing != NULL)
-        return existing;
-
-    int inputCount = count_input_placeholders(branch);
-
-    Term* term = apply(branch, FUNCS.input, TermList());
-    branch->move(term, inputCount);
-    term->setBoolProp("state", true);
-    term->setBoolProp("hiddenInput", true);
-    term->setBoolProp("output", true);
-
-    on_branch_inputs_changed(branch);
-
-    return term;
-}
-
-Term* append_state_output(Branch* branch)
-{
-    // Make sure that a state input doesn't already exist
-    Term* existing = find_state_output(branch);
-    if (existing != NULL)
-        return existing;
-
-    Term* term = append_output_placeholder(branch, 
-        find_open_state_result(branch, branch->length()));
-    term->setBoolProp("state", true);
-    hide_from_source(term);
-    return term;
-}
-bool is_state_input(Term* placeholder)
-{
-    return placeholder->boolProp("state", false);
-}
-bool is_state_output(Term* placeholder)
-{
-    return placeholder->boolProp("state", false);
 }
 
 Term* find_parent_term_in_branch(Term* term, Branch* branch)

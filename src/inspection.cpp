@@ -181,6 +181,84 @@ int input_placeholder_index(Term* inputPlaceholder)
     return inputPlaceholder->index;
 }
 
+Term* get_output_term(Term* term, int index)
+{
+    if (index == 0)
+        return term;
+    else
+        return get_extra_output(term, index - 1);
+}
+
+Term* get_extra_output(Term* term, int index)
+{
+    Term* position = term->owningBranch->getSafe(term->index + index + 1);
+    if (position != NULL && position->function == FUNCS.extra_output)
+        return position;
+    return NULL;
+}
+
+Term* find_extra_output_for_state(Term* term)
+{
+    for (int i=0;; i++) {
+        Term* extra_output = get_extra_output(term, i);
+        if (extra_output == NULL)
+            break;
+
+        if (extra_output->boolProp("state", false))
+            return extra_output;
+    }
+    return NULL;
+}
+
+bool term_is_state_input(Term* term, int index)
+{
+    if (index >= term->numInputs())
+        return false;
+    caValue* prop = term->inputInfo(index)->properties.get("state");
+    if (prop == NULL)
+        return false;
+    return as_bool(prop);
+}
+
+Term* find_state_input(Branch* branch)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_input_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (is_state_input(placeholder))
+            return placeholder;
+    }
+}
+
+bool has_state_input(Branch* branch)
+{
+    return find_state_input(branch) != NULL;
+}
+
+Term* find_state_output(Branch* branch)
+{
+    for (int i=0;; i++) {
+        Term* placeholder = get_output_placeholder(branch, i);
+        if (placeholder == NULL)
+            return NULL;
+        if (is_state_output(placeholder))
+            return placeholder;
+    }
+}
+bool has_state_output(Branch* branch)
+{
+    return find_state_output(branch) != NULL;
+}
+bool is_state_input(Term* placeholder)
+{
+    return placeholder->boolProp("state", false);
+}
+bool is_state_output(Term* placeholder)
+{
+    return placeholder->boolProp("state", false);
+}
+
 int count_actual_output_terms(Term* term)
 {
     int count = 0;

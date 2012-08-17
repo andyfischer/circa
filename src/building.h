@@ -68,14 +68,13 @@ Term* duplicate_value(Branch* branch, Term* term);
 Term* append_input_placeholder(Branch* branch);
 Term* append_output_placeholder(Branch* branch, Term* result);
 Term* prepend_output_placeholder(Branch* branch, Term* result);
+Term* append_state_input(Branch* branch);
+Term* append_state_output(Branch* branch);
 
 Branch* term_get_function_details(Term* call);
 
 // Extra outputs
-Term* get_output_term(Term* term, int index);
 void update_extra_outputs(Term* term);
-Term* get_extra_output(Term* term, int index);
-Term* find_extra_output_for_state(Term* term);
 
 // Fetch the nth output_placeholder for this call. The placeholder term is sometimes
 // found inside the function definition, but for 'if' and 'for' blocks the placeholder
@@ -93,15 +92,6 @@ Term* find_open_state_result(Term* location);
 // a term and updating the input properties.
 void check_to_insert_implicit_inputs(Term* term);
 void update_implicit_pack_call(Term* term);
-bool term_is_state_input(Term* term, int index);
-Term* find_state_input(Branch* branch);
-bool has_state_input(Branch* branch);
-Term* find_state_output(Branch* branch);
-bool has_state_output(Branch* branch);
-Term* append_state_input(Branch* branch);
-Term* append_state_output(Branch* branch);
-bool is_state_input(Term* placeholder);
-bool is_state_output(Term* placeholder);
 
 // Search upwards starting at 'term', and returns the parent (or the term itself) found
 // in 'branch'. Returns NULL if not found.
