@@ -8,6 +8,7 @@
 #include "code_iterators.h"
 #include "evaluation.h"
 #include "file_utils.h"
+#include "inspection.h"
 #include "list.h"
 #include "kernel.h"
 #include "modules.h"

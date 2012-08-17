@@ -12,19 +12,6 @@
 
 namespace circa {
 
-struct RawOutputPrefs
-{
-    int indentLevel;
-    bool showAllIDs;
-    bool showProperties;
-    bool showBytecode;
-    RawOutputPrefs() :
-        indentLevel(0),
-        showAllIDs(false),
-        showProperties(false),
-        showBytecode(false)
-    {}
-};
 
 // Check the function and inputs of 'user', returns whether they are actually
 // using 'usee'.
@@ -39,6 +26,7 @@ Type* declared_type(Term* term);
 void set_is_statement(Term* term, bool value);
 bool is_statement(Term* term);
 
+// Various queries on a call site.
 bool is_comment(Term* term);
 bool is_empty_comment(Term* term);
 bool is_value(Term* term);
@@ -54,7 +42,7 @@ bool is_major_branch(Term* term);
 bool is_major_branch(Branch* branch);
 bool is_minor_branch(Branch* branch);
 
-int get_output_count(Term* term);
+bool has_variable_args(Branch* branch);
 int get_locals_count(Branch* branch);
 
 // Input & output placeholders
@@ -63,13 +51,15 @@ Term* get_output_placeholder(Branch* branch, int index);
 int count_input_placeholders(Branch* branch);
 int count_output_placeholders(Branch* branch);
 int input_placeholder_index(Term* inputPlaceholder);
+bool is_input_placeholder(Term* term);
+bool is_output_placeholder(Term* term);
 
 // Extra outputs
 Term* get_output_term(Term* term, int index);
 Term* get_extra_output(Term* term, int index);
 Term* find_extra_output_for_state(Term* term);
 
-// State inputs & outputs
+// Stateful inputs & outputs
 bool term_is_state_input(Term* term, int index);
 Term* find_state_input(Branch* branch);
 bool has_state_input(Branch* branch);
@@ -78,16 +68,24 @@ bool has_state_output(Branch* branch);
 bool is_state_input(Term* placeholder);
 bool is_state_output(Term* placeholder);
 
+// Accessors that use a term's 'details' branch, which may be the nested branch,
+// or it might be the function's branch, depending on the function.
+Branch* term_get_function_details(Term* call);
+Term* term_get_input_placeholder(Term* call, int index);
+int term_count_input_placeholders(Term* term);
+Term* term_get_output_placeholder(Term* call, int index);
+bool term_has_variable_args(Term* term);
+
 // Return a count of 'actual' output terms (includes the term plus any adjacent
 // extra_output terms).
 int count_actual_output_terms(Term* term);
 
+// Preceding term in the same branch (may be NULL).
 Term* preceding_term(Term* term);
+
+// Following term in the same branch (may be NULL).
 Term* following_term(Term* term);
 
-bool is_input_placeholder(Term* term);
-bool is_output_placeholder(Term* term);
-bool has_variable_args(Branch* branch);
 Term* find_input_placeholder_with_name(Branch* branch, const char* name);
 Term* find_output_placeholder_with_name(Branch* branch, const char* name);
 
@@ -96,6 +94,10 @@ Term* find_term_with_function(Branch* branch, Term* func);
 Term* find_input_placeholder_with_name(Branch* branch, const char* name);
 Term* find_input_with_function(Term* target, Term* func);
 Term* find_user_with_function(Term* target, Term* func);
+
+// Search upwards starting at 'term', and returns the parent (or the term itself) found
+// in 'branch'. Returns NULL if not found.
+Term* find_parent_term_in_branch(Term* term, Branch* branch);
 
 bool has_an_error_listener(Term* term);
 
@@ -110,6 +112,17 @@ std::string get_short_local_name(Term* term);
 std::string branch_namespace_to_string(Branch* branch);
 
 // Print compiled code in a raw format
+struct RawOutputPrefs
+{
+    int indentLevel;
+    bool showAllIDs;
+    bool showProperties;
+    bool showBytecode;
+    RawOutputPrefs() : indentLevel(0), showAllIDs(false), showProperties(false),
+        showBytecode(false) {}
+};
+
+
 void print_branch(std::ostream& out, Branch* branch, RawOutputPrefs* prefs);
 void print_term(std::ostream& out, Term* term, RawOutputPrefs* prefs);
 void print_term(std::ostream& out, Term* term);

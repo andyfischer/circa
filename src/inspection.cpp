@@ -112,31 +112,6 @@ bool is_minor_branch(Branch* branch)
         || owner->function == FUNCS.for_func;
 }
 
-int get_output_count(Term* term)
-{
-    if (!FINISHED_BOOTSTRAP)
-        return 1;
-
-    // check if the function has overridden getOutputCount
-    Function::GetOutputCount getOutputCount = NULL;
-
-    if (term->function == NULL)
-        return 1;
-
-    Function* attrs = as_function(term->function);
-
-    if (attrs == NULL)
-        return 1;
-    
-    getOutputCount = attrs->getOutputCount;
-
-    if (getOutputCount != NULL)
-        return getOutputCount(term);
-
-    // Default behavior, if Function was found.
-    return function_num_outputs(attrs);
-}
-
 int get_locals_count(Branch* branch)
 {
     return branch->length();
@@ -179,6 +154,14 @@ int count_output_placeholders(Branch* branch)
 int input_placeholder_index(Term* inputPlaceholder)
 {
     return inputPlaceholder->index;
+}
+bool is_input_placeholder(Term* term)
+{
+    return term->function == FUNCS.input;
+}
+bool is_output_placeholder(Term* term)
+{
+    return term->function == FUNCS.output;
 }
 
 Term* get_output_term(Term* term, int index)
@@ -259,6 +242,61 @@ bool is_state_output(Term* placeholder)
     return placeholder->boolProp("state", false);
 }
 
+Branch* term_get_function_details(Term* call)
+{
+    // TODO: Shouldn't need to special case these functions.
+    if (call->function == FUNCS.if_block
+        || call->function == FUNCS.for_func
+        || call->function == FUNCS.include_func)
+        return nested_contents(call);
+
+    return function_get_contents(as_function(term_value(call->function)));
+}
+
+Term* term_get_input_placeholder(Term* call, int index)
+{
+    if (!is_function(call->function))
+        return NULL;
+
+    Branch* contents = term_get_function_details(call);
+    if (contents == NULL)
+        return NULL;
+    if (index >= contents->length())
+        return NULL;
+    Term* term = contents->get(index);
+    if (term->function != FUNCS.input)
+        return NULL;
+    return term;
+}
+
+int term_count_input_placeholders(Term* term)
+{
+    int result = 0;
+    while (term_get_input_placeholder(term, result) != NULL)
+        result++;
+    return result;
+}
+
+Term* term_get_output_placeholder(Term* call, int index)
+{
+    if (!is_function(call->function))
+        return NULL;
+
+    Branch* contents = term_get_function_details(call);
+    if (contents == NULL)
+        return NULL;
+    if (index >= contents->length())
+        return NULL;
+    Term* term = contents->getFromEnd(index);
+    if (term->function != FUNCS.output)
+        return NULL;
+    return term;
+}
+bool term_has_variable_args(Term* term)
+{
+    return has_variable_args(term_get_function_details(term));
+}
+
 int count_actual_output_terms(Term* term)
 {
     int count = 0;
@@ -276,14 +314,6 @@ Term* following_term(Term* term)
     return term->owningBranch->getSafe(term->index + 1);
 }
 
-bool is_input_placeholder(Term* term)
-{
-    return term->function == FUNCS.input;
-}
-bool is_output_placeholder(Term* term)
-{
-    return term->function == FUNCS.output;
-}
 bool has_variable_args(Branch* branch)
 {
     for (int i=0;; i++) {
@@ -367,6 +397,19 @@ Term* find_user_with_function(Term* target, Term* func)
         if (target->users[i]->function == func)
             return target->users[i];
     return NULL;
+}
+
+Term* find_parent_term_in_branch(Term* term, Branch* branch)
+{
+    while (true) {
+        if (term == NULL)
+            return NULL;
+
+        if (term->owningBranch == branch)
+            return term;
+
+        term = get_parent_term(term);
+    }
 }
 
 bool has_an_error_listener(Term* term)

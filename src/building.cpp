@@ -573,17 +573,6 @@ Term* append_state_output(Branch* branch)
     return term;
 }
 
-Branch* term_get_function_details(Term* call)
-{
-    // TODO: Shouldn't need to special case these functions.
-    if (call->function == FUNCS.if_block
-        || call->function == FUNCS.for_func
-        || call->function == FUNCS.include_func)
-        return nested_contents(call);
-
-    return function_get_contents(as_function(term_value(call->function)));
-}
-
 void update_extra_outputs(Term* term)
 {
     Branch* branch = term->owningBranch;
@@ -647,50 +636,6 @@ void update_extra_outputs(Term* term)
 
     if (needToUpdatePackState)
         branch_update_existing_pack_state_calls(branch);
-}
-
-Term* term_get_input_placeholder(Term* call, int index)
-{
-    if (!is_function(call->function))
-        return NULL;
-
-    Branch* contents = term_get_function_details(call);
-    if (contents == NULL)
-        return NULL;
-    if (index >= contents->length())
-        return NULL;
-    Term* term = contents->get(index);
-    if (term->function != FUNCS.input)
-        return NULL;
-    return term;
-}
-
-int term_count_input_placeholders(Term* term)
-{
-    int result = 0;
-    while (term_get_input_placeholder(term, result) != NULL)
-        result++;
-    return result;
-}
-
-Term* term_get_output_placeholder(Term* call, int index)
-{
-    if (!is_function(call->function))
-        return NULL;
-
-    Branch* contents = term_get_function_details(call);
-    if (contents == NULL)
-        return NULL;
-    if (index >= contents->length())
-        return NULL;
-    Term* term = contents->getFromEnd(index);
-    if (term->function != FUNCS.output)
-        return NULL;
-    return term;
-}
-bool term_has_variable_args(Term* term)
-{
-    return has_variable_args(term_get_function_details(term));
 }
 
 Term* find_open_state_result(Branch* branch, int position)
@@ -815,19 +760,6 @@ void branch_finish_changes(Branch* branch)
 
     branch->inProgress = false;
     branch->version++;
-}
-
-Term* find_parent_term_in_branch(Term* term, Branch* branch)
-{
-    while (true) {
-        if (term == NULL)
-            return NULL;
-
-        if (term->owningBranch == branch)
-            return term;
-
-        term = get_parent_term(term);
-    }
 }
 
 Term* find_user_with_function(Term* term, const char* funcName)
@@ -986,34 +918,6 @@ void list_outer_pointers(Branch* branch, TermList* list)
     for (BranchInputIterator it(branch); it.unfinished(); it.advance()) {
         if (it.currentInput()->owningBranch != branch)
             list->appendUnique(it.currentInput());
-    }
-}
-
-void expand_variadic_inputs_for_call(Branch* branch, Term* call)
-{
-    Term* input0 = get_input_placeholder(branch, 0);
-    if (input0 == NULL || !input0->boolProp("multiple", false))
-        return;
-
-    // Add extra input_placeholder term
-    int inputCount = call->numInputs();
-    input0->removeProperty("multiple");
-
-    for (int i=1; i < inputCount; i++) {
-        append_input_placeholder(branch);
-    }
-
-    // Modify calls to use these placeholders
-    for (int i=0; i < branch->length(); i++) {
-        Term* term = branch->get(i);
-        for (int inputIndex=0; inputIndex < term->numInputs(); inputIndex++) {
-            if (term->input(inputIndex) == input0) {
-
-                for (int extraInput=1; extraInput < inputCount; extraInput++) {
-                    set_input(term, extraInput, get_input_placeholder(branch, extraInput));
-                }
-            }
-        }
     }
 }
 

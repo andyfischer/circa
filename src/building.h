@@ -71,18 +71,8 @@ Term* prepend_output_placeholder(Branch* branch, Term* result);
 Term* append_state_input(Branch* branch);
 Term* append_state_output(Branch* branch);
 
-Branch* term_get_function_details(Term* call);
-
 // Extra outputs
 void update_extra_outputs(Term* term);
-
-// Fetch the nth output_placeholder for this call. The placeholder term is sometimes
-// found inside the function definition, but for 'if' and 'for' blocks the placeholder
-// is inside nested contents.
-Term* term_get_input_placeholder(Term* call, int index);
-int term_count_input_placeholders(Term* term);
-Term* term_get_output_placeholder(Term* call, int index);
-bool term_has_variable_args(Term* term);
 
 Term* find_open_state_result(Branch* branch, int position);
 Term* find_open_state_result(Term* location);
@@ -92,10 +82,6 @@ Term* find_open_state_result(Term* location);
 // a term and updating the input properties.
 void check_to_insert_implicit_inputs(Term* term);
 void update_implicit_pack_call(Term* term);
-
-// Search upwards starting at 'term', and returns the parent (or the term itself) found
-// in 'branch'. Returns NULL if not found.
-Term* find_parent_term_in_branch(Term* term, Branch* branch);
 
 void set_step(Term* term, float step);
 float get_step(Term* term);
@@ -119,7 +105,6 @@ void transfer_users(Term* from, Term* to);
 
 void input_placeholders_to_list(Branch* branch, TermList* list);
 void list_outer_pointers(Branch* branch, TermList* list);
-void expand_variadic_inputs_for_call(Branch* branch, Term* call);
 int find_input_index_for_pointer(Term* call, Term* input);
 void check_to_add_primary_output_placeholder(Branch* branch);
 void check_to_add_state_output_placeholder(Branch* branch);
@@ -144,12 +129,6 @@ void remap_pointers_quick(Branch* branch, Term* old, Term* newTerm);
 void remap_pointers(Term* term, TermMap const& map);
 void remap_pointers(Term* term, Term* original, Term* replacement);
 void remap_pointers(Branch* branch, Term* original, Term* replacement);
-
-// Examine the 'accessor' term, and walk upwards to construct a selector() expression.
-// Each get_index or get_field expression corresponds to a selector element. This
-// function will return NULL if there are no selector elements.
-Term* write_selector_for_accessor_expression(Branch* branch, Term* accessor, Term** headPtr);
-
 
 // Look through the nexted contents of 'term', and find any term references to outer
 // terms (terms outside this branch). For every outer reference, add an input to
