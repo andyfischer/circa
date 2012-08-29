@@ -92,14 +92,35 @@ void evaluate_selector(caStack* stack)
     copy(circa_input(stack, 0), circa_output(stack, 0));
 }
 
-Term* find_accessor_head_term(Term* accessor)
+bool is_accessor_function(Term* accessor)
+{
+    if (accessor->function == FUNCS.get_index
+            || accessor->function == FUNCS.get_field)
+        return true;
+
+    if (accessor->function == FUNCS.dynamic_method)
+        return true;
+
+    // Future: We should be able to detect if a method behaves as an accessor, without
+    // an explicit property.
+    if (accessor->function->boolProp("fieldAccessor", false))
+        return true;
+    
+    return false;
+}
+
+void trace_accessor_chain(Term* accessor, TermList* chainResult)
 {
     Term* bottomAccessor = accessor;
 
+    chainResult->resize(0);
+
     while (true) {
-        // Stop when we find a named term, unless it's the first term.
-        if (accessor != bottomAccessor && !has_empty_name(accessor))
-            return accessor;
+        chainResult->append(accessor);
+
+        // Stop when we find a named term.
+        if (!has_empty_name(accessor))
+            break;
 
         if (accessor->function == FUNCS.get_index
                 || accessor->function == FUNCS.get_field
@@ -113,90 +134,64 @@ Term* find_accessor_head_term(Term* accessor)
         }
 
         // Accessor search can't continue past this term.
-        return accessor;
+        break;
     }
+
+    chainResult->reverse();
 }
 
-void trace_selector_from_accessor(Term* head, Term* accessor, caValue* selectorOut)
+Term* find_accessor_head_term(Term* accessor)
 {
-    set_list(selectorOut, 0);
+    TermList chain;
+    trace_accessor_chain(accessor, &chain);
 
-    Term* currentTerm = accessor;
+    if (chain.length() == 0)
+        return NULL;
 
-    while (true) {
-        // Stop when we reach the head term
-        if (accessor == head)
-            break;
+    return chain[0];
+}
 
-        if (accessor->function == FUNCS.get_index
-                || accessor->function == FUNCS.get_field) {
+Term* write_selector_for_accessor_chain(Branch* branch, TermList* chain)
+{
+    TermList selectorInputs;
 
-            // Accessor is get_index or get_field. Append the value to our selector
-            // (as long as it's a plain value)
-            
-            Term* indexTerm = accessor->input(1);
-            // TODO: Need to handle non-value indices
-            if (!is_value(indexTerm))
-                break;
+    // Skip index 0 - this is the head term.
+    
+    for (int i=1; i < chain->length(); i++) {
+        Term* term = chain->get(i);
 
-            copy(term_value(indexTerm), list_append(selectorOut));
-            accessor = accessor->input(0);
-            continue;
-        } else if (is_copying_call(accessor)) {
-            accessor = accessor->input(0);
+        if (term->function == FUNCS.get_index
+                || term->function == FUNCS.get_field) {
 
-        } else if (accessor->function == FUNCS.dynamic_method) {
-            // Dynamic method: do a string lookup using function name.
-            copy(term_get_property(accessor, "syntax:functionName"),
-                    list_append(selectorOut));
-            accessor = accessor->input(0);
+            selectorInputs.append(term->input(1));
 
-        } else if (is_subroutine(accessor->function)) {
-            // Recursively look in this function.
-            Branch* branch = function_contents(accessor->function);
-            Term* branchOutput = get_output_placeholder(branch, 0);
-            Term* nestedHead = find_accessor_head_term(branchOutput);
-
-            if (!is_input_placeholder(nestedHead)) {
-                // The nested trace did not reach the subroutine's input, so the subroutine
-                // isn't an accessor that we understand. Stop here.
-                break;
-            }
-
-            // Trace did reach subroutine's input. Append this selector section, and continue
-            // searching from the function's input.
-            circa::Value nestedSelector;
-            trace_selector_from_accessor(nestedHead, branchOutput, &nestedSelector);
-            list_extend(selectorOut, &nestedSelector);
-
-            accessor = accessor->input(input_placeholder_index(nestedHead));
-
-            if (accessor == NULL)
-                break;
-        } else {
-            // This term isn't recognized as an accessor.
-            break;
+        } else if (is_accessor_function(term)) {
+            Term* element = create_string(branch, term->stringProp("syntax:functionName", ""));
+            selectorInputs.append(element);
         }
     }
 
-    // Selector list was built from the bottom-up, reverse so that it's top-down.
-    list_reverse(selectorOut);
+    return apply(branch, FUNCS.selector, selectorInputs);
 }
 
 Term* rebind_possible_accessor(Branch* branch, Term* accessor, Term* result)
 {
-    circa::Value selector;
-
     // Check if this isn't a recognized accessor.
     if (!has_empty_name(accessor)) {
         // Just create a named copy of 'result'.
         return apply(branch, FUNCS.copy, TermList(result), accessor->nameSymbol);
     }
 
-    Term* head = find_accessor_head_term(accessor);
+    TermList accessorChain;
+    trace_accessor_chain(accessor, &accessorChain);
 
-    Term* set = apply(branch, FUNCS.assign_to_element,
-            TermList(head, accessor, result), head->nameSymbol);
+    Term* head = accessorChain[0];
+
+    // Create the selector
+    Term* selector = write_selector_for_accessor_chain(branch, &accessorChain);
+
+    Term* set = apply(branch, FUNCS.set_with_selector,
+            TermList(head, selector, result), head->nameSymbol);
 
     change_declared_type(set, declared_type(head));
     return set;
@@ -208,7 +203,7 @@ void evaluate_selector_reflect(caStack* stack)
 
     Term* head = find_accessor_head_term(accessor);
 
-    trace_selector_from_accessor(head, accessor, circa_output(stack, 0));
+    // FIXME
 }
 
 void selector_format_source(caValue* source, Term* term)
@@ -230,7 +225,7 @@ void selector_format_source(caValue* source, Term* term)
     }
 }
 
-void evaluate_get_with_selector(caStack* stack)
+void get_with_selector_evaluate(caStack* stack)
 {
     caValue* root = circa_input(stack, 0);
     caValue* selector = circa_input(stack, 1);
@@ -248,24 +243,30 @@ void evaluate_get_with_selector(caStack* stack)
     copy(result, circa_output(stack, 0));
 }
 
-void evaluate_assign_to_element(caStack* stack)
+void get_with_selector__formatSource(caValue* source, Term* term)
+{
+    Term* selector = term->input(1);
+    if (selector->function != FUNCS.selector) {
+        // Unusual case; bail out with default formatting.
+        format_term_source_default_formatting(source, term);
+        return;
+    }
+
+    format_name_binding(source, term);
+    format_source_for_input(source, term, 0, "", "");
+    selector_format_source(source, selector);
+}
+
+void set_with_selector_evaluate(caStack* stack)
 {
     caValue* out = circa_output(stack, 0);
     copy(circa_input(stack, 0), out);
     
+    caValue* selector = circa_input(stack, 1);
     caValue* newValue = circa_input(stack, 2);
 
-    Term* caller = (Term*) circa_caller_term(stack);
-    Term* head = caller->input(0);
-    Term* accessor = caller->input(1);
-
-    // Trace the selector on the fly. TODO: Should precache this.
-    circa::Value selector;
-    trace_selector_from_accessor(head, accessor, &selector);
-
     circa::Value error;
-
-    set_with_selector(out, &selector, newValue, &error);
+    set_with_selector(out, selector, newValue, &error);
 
     if (!is_null(&error)) {
         copy(&error, circa_output(stack, 0));
@@ -274,7 +275,7 @@ void evaluate_assign_to_element(caStack* stack)
     }
 }
 
-void get_with_selector__formatSource(caValue* source, Term* term)
+void set_with_selector__formatSource(caValue* source, Term* term)
 {
     Term* selector = term->input(1);
     if (selector->function != FUNCS.selector) {
@@ -282,17 +283,11 @@ void get_with_selector__formatSource(caValue* source, Term* term)
         return;
     }
 
-    format_name_binding(source, term);
-    format_source_for_input(source, term, 0, "", "");
-    selector_format_source(source, selector);
-
-}
-void assign_to_element__formatSource(caValue* source, Term* term)
-{
     // Don't call format_name_binding here
 
-    // Left-hand-side
-    format_source_for_input(source, term, 1, "", "");
+    format_source_for_input(source, term, 0, "", "");
+
+    selector_format_source(source, selector);
 
     append_phrase(source, term->stringProp("syntax:preEqualsSpace",""), term, tok_Whitespace);
 
@@ -316,14 +311,14 @@ void selector_setup_funcs(Branch* kernel)
                 "selector_reflect(any :meta) -> Selector");
 
     FUNCS.get_with_selector = 
-        import_function(kernel, evaluate_get_with_selector,
+        import_function(kernel, get_with_selector_evaluate,
             "get_with_selector(any object, Selector selector) -> any");
     as_function(FUNCS.get_with_selector)->formatSource = get_with_selector__formatSource;
 
-    FUNCS.assign_to_element =
-        import_function(kernel, evaluate_assign_to_element,
-            "assign_to_element(any object, any lhs :meta, any newValue) -> any");
-    as_function(FUNCS.assign_to_element)->formatSource = assign_to_element__formatSource;
+    FUNCS.set_with_selector =
+        import_function(kernel, set_with_selector_evaluate,
+            "set_with_selector(any object, Selector selector, any newValue) -> any");
+    as_function(FUNCS.set_with_selector)->formatSource = set_with_selector__formatSource;
 }
 
 } // namespace circa

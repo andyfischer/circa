@@ -465,7 +465,7 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
     Term* typeTerm = find_name(branch, typeName.c_str(), -1, NAME_LOOKUP_TYPE);
 
     if (typeTerm == NULL) {
-        // TODO: This name lookup failure should be recorded.
+        // Future: This name lookup failure should be recorded.
         typeTerm = ANY_TYPE;
     }
 
@@ -623,7 +623,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
         while (tokens.nextIs(tok_Name)) {
             std::string symbolText = tokens.consumeStr(tok_Name);
 
-            // TODO: store syntax hint
+            // Future: store syntax hint
             if (symbolText == ":ignore_error") {
                 input->setBoolProp("ignore_error", true);
             } else if (symbolText == ":optional") {
@@ -807,7 +807,9 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
         if (tokens.nextIs(tok_Identifier))
             fieldName = tokens.consumeStr(tok_Identifier);
 
+        // Create the accessor function.
         Term* accessor = create_function(contents, fieldName.c_str());
+        accessor->setBoolProp("fieldAccessor", true);
         Branch* accessorContents = nested_contents(accessor);
         Term* accessorInput = append_input_placeholder(accessorContents);
         Term* accessorIndex = create_int(accessorContents, fieldIndex, "");
@@ -1839,7 +1841,7 @@ ParseResult atom_with_subscripts(Branch* branch, TokenStream& tokens, ParserCxt*
             result = method_call(branch, tokens, context, result);
 
         } else {
-            // TODO here: function call of an expression
+            // Future: handle a function call of an expression
 
             finished = true;
         }

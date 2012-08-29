@@ -88,6 +88,7 @@ struct BuiltinFuncs {
     Term* selector_reflect;
     Term* set_index;
     Term* set_field;
+    Term* set_with_selector;
     Term* static_error;
     Term* sub;
     Term* switch_func;

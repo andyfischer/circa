@@ -39,6 +39,7 @@ struct TermList
     void pop();
     void resize(int s);
     void clear();
+    void reverse();
 };
 
 } // namespace circa

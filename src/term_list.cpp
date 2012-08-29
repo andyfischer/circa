@@ -170,6 +170,16 @@ TermList::clear()
     _terms.clear();
 }
 
+void
+TermList::reverse()
+{
+    for (int i=0; i < length() / 2; i++) {
+        Term* temp = _terms[i];
+        _terms[i] = _terms[length() - i - 1];
+        _terms[length() - i - 1] = temp;
+    }
+}
+
 Term*
 TermList::get(int index) const
 {
