@@ -1,5 +1,5 @@
 
-s = create(Set)
+s = make(Set)
 s.add(1)
 
 assert(s.contains(1))

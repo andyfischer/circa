@@ -3,7 +3,7 @@ type T {
     int i
 }
 
-t = create(T)
+t = make(T)
 
 t.i = 9
 

@@ -8,7 +8,7 @@ def T.f(t)
   i += 1
 
 def main()
-  t = create(T)
+  t = make(T)
 
   t.f()
 

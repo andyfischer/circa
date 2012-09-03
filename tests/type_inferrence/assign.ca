@@ -3,7 +3,7 @@ type CompoundType {
     int i
 }
 
-t = create(CompoundType)
+t = make(CompoundType)
 assert(type(t) == CompoundType)
 t.i = 1
 assert(type(t) == CompoundType)

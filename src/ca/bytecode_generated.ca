@@ -44,11 +44,11 @@ Ops = for op_name in OpNames
     index += 1
     op
 
-header = create(Writer)
+header = make(Writer)
 header.writeln("// This file was generated using bytecode_generated.ca")
 header.writeln('')
 
-impl = create(Writer)
+impl = make(Writer)
 impl.writeln("// This file was generated using bytecode_generated.ca")
 impl.writeln('')
 impl.writeln('#include "common_headers.h"')

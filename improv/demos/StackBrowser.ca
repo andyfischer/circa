@@ -14,7 +14,7 @@ type FrameLine {
 }
 
 def FrameLine.handleEvent(@self, any event) -> actions
-def FrameLine.draw(self, Painter painter)
+def FrameLine.paint(self, Painter painter)
     formatted = self.term.format_source_normal
     text = (for element in formatted { element[0] }).join('')
     painter.text(self.rect.bottomleft + [2 -5], text, fgcolor, [])
@@ -41,7 +41,7 @@ def FrameBubble.initializeFromBranch(@self, Branch branch)
         line = create(FrameLine)
         line.term = term
 
-def FrameBubble.draw(self, Painter painter)
+def FrameBubble.paint(self, Painter painter)
     -- background
     colors = [frame_line_bgcolor_1 frame_line_bgcolor_2]
 
@@ -53,7 +53,7 @@ def FrameBubble.draw(self, Painter painter)
             bgcolor.lighten(.2)
 
         painter.fillRect(line.rect, bgcolor)
-        line.draw(painter)
+        line.paint(painter)
 
         index += 1
 
@@ -86,9 +86,9 @@ def StackBrowser.addBubble(@self, Branch branch)
     bubble.highlightedLine = -1
     self.bubbles = [bubble]
 
-def StackBrowser.draw(self, Painter painter)
+def StackBrowser.paint(self, Painter painter)
     for FrameBubble bubble in self.bubbles
-        bubble.draw(painter)
+        bubble.paint(painter)
 
 def stack_browser(Branch branch) -> StackBrowser
     browser = create(StackBrowser)
@@ -112,7 +112,7 @@ env.background(#339)
 
 state browser = stack_browser(branch_ref(testBranch))
 browser.layout([10 50 600 600])
-browser.draw(env.painter)
+browser.paint(env.painter)
 
 for event in env.events
     browser.handleEvent(event)
@@ -121,4 +121,4 @@ for event in env.events
 state popupMenu = create(PopupMenu)
 popupMenu.setElements([['Item 1' :item1] ['Item 2' :item2]])
 popupMenu.setLocation([300 300])
-popupMenu.draw(env.painter)
+popupMenu.paint(env.painter)

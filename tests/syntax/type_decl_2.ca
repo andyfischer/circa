@@ -7,5 +7,5 @@ type T {
     int b -- this is another comment
 }
 
-t = create(T)
+t = make(T)
 print(t)

@@ -6,7 +6,7 @@ type T {
 def T.inc(@self)
     self.i += 1
 
-t = create(T)
+t = make(T)
 any(@t)
 
 

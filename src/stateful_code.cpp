@@ -329,7 +329,7 @@ void pack_state(caStack* stack)
 
     caValue* args = circa_input(stack, 0);
     caValue* output = circa_output(stack, 0);
-    create(branch->stateType, output);
+    make(branch->stateType, output);
 
     for (int i=0; i < circa_count(args); i++) {
         caValue* input = circa_index(args, i);

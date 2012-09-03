@@ -773,7 +773,7 @@ void bootstrap_kernel()
     // Initialize value() func
     valueFunc->type = &FUNCTION_T;
     valueFunc->function = valueFunc;
-    create(&FUNCTION_T, term_value(valueFunc));
+    make(&FUNCTION_T, term_value(valueFunc));
 
     function_t::initialize(&FUNCTION_T, term_value(valueFunc));
     initialize_function(valueFunc);

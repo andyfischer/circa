@@ -1,0 +1,25 @@
+
+Certain styles of coding work better in a live environment than others.
+
+From best to worst:
+
+#1 best : Passing functions as pure data
+
+  After passing a function as a pure value, we can alter the function, and all the
+  referencers of the function will immediately start using the latest version.
+
+#2 best : Passing pure values
+
+  Passing around a pure value is pretty good, but if the code for generating
+  the value is changed, then we'll need to do a dependency analysis to figure out
+  exactly which expressions need to be reevaluated.
+
+Worst : Stateful values
+
+  If we change the code involved in generating a stateful value, it's tricky for the
+  system to know whether it should reevaluate that value, or keep the existing state.
+  And even if we know that a state value is 'dirty', it can be tricky to figure out what
+  the new correct value should be. (since a stateful value may be the result of several
+  iterations).
+
+  Moral: Use stateful values only when absolutely necessary.

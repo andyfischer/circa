@@ -2,7 +2,7 @@
 a = true
 b = false
 
-x = create(List)
+x = make(List)
 
 if true
     x.append(1)

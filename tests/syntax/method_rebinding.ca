@@ -6,7 +6,7 @@ type T {
 def T.add(@t, int i)
     t.i += i
 
-t = create(T)
+t = make(T)
 print(t)
 t.add(3)
 print(t)

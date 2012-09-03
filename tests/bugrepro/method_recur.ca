@@ -28,5 +28,5 @@ def UIElement.layoutInRect(@self, Rect rect)
 
         self.args[0] = elements
 
-element = create(UIElement)
+element = make(UIElement)
 element.layoutInRect([0 0 100 100])

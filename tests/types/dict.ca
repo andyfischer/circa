@@ -1,5 +1,5 @@
 
-d = create(Dict)
+d = make(Dict)
 print('d = ' d)
 print('d.count = ' d.count)
 

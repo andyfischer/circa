@@ -148,7 +148,7 @@ void* circa_handle_get_object(caValue* handle)
 
 void circa_create_value(caValue* value, caType* type)
 {
-    create((Type*) type, value);
+    make((Type*) type, value);
 }
 
 // Code setup

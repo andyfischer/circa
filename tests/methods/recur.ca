@@ -6,7 +6,7 @@ def T.f(self, int i) -> int
       return 0
   return self.f(i - 1) + i
 
-t = create(T)
+t = make(T)
 assert(t.f(1) == 1)
 assert(t.f(2) == 3)
 assert(t.f(3) == 6)

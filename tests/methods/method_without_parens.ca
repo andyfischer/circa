@@ -9,7 +9,7 @@ def T.get_i(_) -> int
 def T.set_i(_ :out, int i)
   _.i = i
 
-t = create(T)
+t = make(T)
 assert(t.get_i == 0)
 t.set_i(5)
 assert(t.get_i == 5)

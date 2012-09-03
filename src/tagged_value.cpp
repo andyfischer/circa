@@ -43,7 +43,7 @@ void initialize_null(caValue* value)
     value->value_data.ptr = NULL;
 }
 
-void create(Type* type, caValue* value)
+void make(Type* type, caValue* value)
 {
     INCREMENT_STAT(ValueCreates);
 
@@ -185,7 +185,7 @@ void reset(caValue* value)
 
     // Default behavior: assign this value to null and create a new one.
     set_null(value);
-    create(type, value);
+    make(type, value);
 }
 
 void touch(caValue* value)
@@ -353,7 +353,7 @@ void set_bool(caValue* value, bool b)
 
 Dict* set_dict(caValue* value)
 {
-    create(&DICT_T, value);
+    make(&DICT_T, value);
     return (Dict*) value;
 }
 
@@ -383,7 +383,7 @@ void set_string(caValue* value, std::string const& s)
 caValue* set_list(caValue* value)
 {
     set_null(value);
-    create(&LIST_T, value);
+    make(&LIST_T, value);
     return value;
 }
 

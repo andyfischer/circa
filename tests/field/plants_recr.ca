@@ -51,7 +51,7 @@ def Segment.step(seg)
     if seg.generation < generation_limit
 
         -- Grow a child segment
-        child = create(Segment)
+        child = make(Segment)
         child.base_loc = end_loc
         child.base_angle = seg.base_angle + 5.0
         child.generation = seg.generation + 1
@@ -62,7 +62,7 @@ def f()
     i += 1
     print("Step: " i)
 
-    root = create(Segment)
+    root = make(Segment)
     root.base_loc = [300 300]
     root.step()
 

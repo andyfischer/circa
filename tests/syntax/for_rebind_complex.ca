@@ -3,7 +3,7 @@ type S {
     List t
 }
 
-s = create(S)
+s = make(S)
 s.t = [1 2 3]
 
 for i in @s.t

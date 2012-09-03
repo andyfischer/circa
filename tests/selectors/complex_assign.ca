@@ -19,6 +19,6 @@ def ButtonBar.setToggled(@b, int index, bool toggle)
     -- print(selector_reflect(b.buttons[index].toggled))
 
 
-bar = create(ButtonBar)
-bar.buttons = [create(Button)]
+bar = make(ButtonBar)
+bar.buttons = [make(Button)]
 bar.setToggled(0, true)

@@ -1,7 +1,27 @@
 
 env = input() -> Environment
 
-import BoxUI
+type TextElement {
+    String text
+    Font font
+    Color fgcolor
+}
+
+type HorizontalGrid {
+    List elements
+}
+
+type VerticalGrid {
+    List elements
+}
+
+type BoxPosition {
+    Rect position
+}
+
+type TopLevelUI {
+    any root
+}
 
 menu = vertical_menu([
     label("Item 1", env.painter.mediumSans, #fff)

@@ -6,7 +6,7 @@ type ClassA {
 
 def create_ClassA() -> ClassA
     print("Called ClassA")
-    a = create(ClassA)
+    a = make(ClassA)
     a.dummyString = 'DummyString'
     return a
 

@@ -219,7 +219,7 @@ void circa_actor_new_from_file(caWorld* world, const char* actorName, const char
     load_module_from_file(actorName, filename);
 
     caValue* actor = list_append(&world->actorList);
-    create(TYPES.actor, actor);
+    make(TYPES.actor, actor);
 
     // Actor has shape:
     // { String name, String moduleName, List incomingQueue, any stateVal }
@@ -236,7 +236,7 @@ caValue* circa_actor_new_from_module(caWorld* world, const char* actorName, cons
     }
 
     caValue* actor = list_append(&world->actorList);
-    create(TYPES.actor, actor);
+    make(TYPES.actor, actor);
 
     // Actor has shape:
     // { String name, String moduleName, List incomingQueue, any stateVal }

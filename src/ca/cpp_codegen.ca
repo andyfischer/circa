@@ -101,7 +101,7 @@ def write_branch(CodeWriter w :out, Branch branch)
         
 
 def branch_to_cpp_string(Branch b) -> String
-    writer = create(CodeWriter)
+    writer = make(CodeWriter)
 
     write_branch(&writer, b)
 

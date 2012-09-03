@@ -6,11 +6,9 @@ Top 5 worst issues
 
 Recent
   Move output casting to a different spot. Currently it happens twice - once when a value
-  is copied by output_placeholder (this is the correct spot), and again in finish_frame.
-  It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
+    is copied by output_placeholder (this is the correct spot), and again in finish_frame.
+    It shouldn't happen in finish_frame, instead we should do the check after FireNative completes.
    
-  Dynamic method doesn't rewrite 1st input
-
   For-loop index would be pretty nice
 
   Improv needs clipping rects
@@ -20,11 +18,6 @@ Recent
   This code had an error with no source location:
     letterSize = [painter.currentFont.width('AAAAAAAAAA') / 10, painter.currentFont.height] -> Point
   (where width & height both returned null)
-  
-Performance
-  From perf checking, the #1 optimization would be to fix the interpreter stack:
-    Each frame should not be a separate list, have one big list
-    Values should be moved/reused when possible
   
 Source repro
   Each branch should store the base indent level (instead of having this data in Term)

@@ -400,7 +400,7 @@ Term* create_value(Branch* branch, Type* type, std::string const& name)
     Term *term = apply(branch, FUNCS.value, TermList(), name_from_string(name));
 
     change_declared_type(term, type);
-    create(type, term_value(term));
+    make(type, term_value(term));
 
     if (type == &TYPE_T) {
         as_type(term)->name = name_from_string(name.c_str());

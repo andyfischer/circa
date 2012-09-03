@@ -8,7 +8,7 @@ type MyType {
 }
 
 -- Create an instance and assign fields
-m = create(MyType)
+m = make(MyType)
 m.name = "Andy"
 m.a = 1
 m.b = m.a + 2
@@ -41,11 +41,11 @@ type Composite {
   MyType myClass2,
   String name,
 }
-c = create(Composite)
+c = make(Composite)
 assert(to_string(c) == "{myClass: {a: 0, b: 0, name: '', distance: 0.0}, myClass2: {a: 0, b: 0, name: '', distance: 0.0}, name: ''}")
 
 type Vector { number x, number y }
-v = create(Vector)
+v = make(Vector)
 
 v.x = 5.0
 v.y = 6.0

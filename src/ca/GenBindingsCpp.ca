@@ -122,7 +122,7 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
 
 def write_bindings(Branch branch) -> String
 
-    writer = create(CodeWriter)
+    writer = make(CodeWriter)
 
     writer.writeln('#include "circa/circa.h"')
     writer.writeln('')

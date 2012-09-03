@@ -665,7 +665,7 @@ void create_output(Stack* stack)
 {
     Term* caller = current_term(stack);
     caValue* output = get_output(stack, 0);
-    create(caller->type, output);
+    make(caller->type, output);
 }
 
 void raise_error(Stack* stack)

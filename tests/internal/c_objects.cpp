@@ -106,7 +106,7 @@ void test_type_not_prematurely_used()
         "  MyType t\n"
         "}\n"
         "state MyType st\n"
-        "state MyType st2 = create(MyType)\n"
+        "state MyType st2 = make(MyType)\n"
         );
 
     Type* myType = (Type*) circa_find_type(&branch, "MyType");
@@ -115,8 +115,8 @@ void test_type_not_prematurely_used()
     test_assert(!myCompoundType->inUse);
 
     circa::Value value1, value2;
-    create(myType, &value1);
-    create(myCompoundType, &value2);
+    make(myType, &value1);
+    make(myCompoundType, &value2);
 
     test_assert(myType->inUse);
     test_assert(myCompoundType->inUse);

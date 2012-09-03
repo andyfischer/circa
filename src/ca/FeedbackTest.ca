@@ -16,7 +16,7 @@ br.dump
 --print('a is ' br.find_term("a"))
 --print('b is ' br.find_term("b"))
 
-request = create(Request)
+request = make(Request)
 request.target.term = br.find_term("b")
 request.desire = [:assign [2]]
 

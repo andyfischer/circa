@@ -17,24 +17,24 @@ def T.f(@self, int i) -> int
 
   return result
 
-t = create(T)
+t = make(T)
 assert(t.calls == 0)
 
 print('top level call: t.f(1)')
 assert(t.f(1) == 1)
 assert(t.calls == 2)
 
-t = create(T)
+t = make(T)
 print('top level call: t.f(2)')
 assert(t.f(2) == 3)
 assert(t.calls == 3)
 
-t = create(T)
+t = make(T)
 print('top level call: t.f(3)')
 assert(t.f(3) == 7)
 assert(t.calls == 4)
 
-t = create(T)
+t = make(T)
 print('top level call: t.f(4)')
 assert(t.f(4) == 15)
 assert(t.calls == 5)

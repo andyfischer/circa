@@ -41,7 +41,7 @@ namespace declared_state_function {
         if (declared_type(caller) == &ANY_T)
             set_null(output);
         else
-            create(declared_type(caller), output);
+            make(declared_type(caller), output);
     }
 
     void formatSource(caValue* source, Term* term)

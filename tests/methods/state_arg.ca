@@ -10,7 +10,7 @@ def T.f(self, int i)
     print('called T.f with: ' self ', ' s ', ' i)
 
 
-t = create(T)
+t = make(T)
 t.i = 2
 
 s = null

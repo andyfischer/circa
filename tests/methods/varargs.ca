@@ -5,7 +5,7 @@ type T {
 def T.f(self, any args :multiple)
     print('args = ' args)
 
-t = create(T)
+t = make(T)
 t.f(1)
 t.f(2 3)
 t.f(4 5 6)

@@ -3,11 +3,11 @@
 #include "circa/internal/for_hosted_funcs.h"
 
 namespace circa {
-namespace create__function {
+namespace make_function {
 
-    CA_FUNCTION(create_func)
+    CA_FUNCTION(make_func)
     {
-        create(as_type(INPUT(0)), OUTPUT);
+        make(as_type(INPUT(0)), OUTPUT);
     }
 
     Type* specializeType(Term* caller)
@@ -24,7 +24,7 @@ namespace create__function {
 
     void setup(Branch* kernel)
     {
-        Term* func = import_function(kernel, create_func, "create(Type) -> any");
+        Term* func = import_function(kernel, make_func, "make(Type) -> any");
         as_function(func)->specializeType = specializeType;
     }
 }

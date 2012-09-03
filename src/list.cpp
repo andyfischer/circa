@@ -686,7 +686,7 @@ namespace list_t {
 
             list_resize(value, count);
             for (int i=0; i < count; i++)
-                create(as_type(list_get(typeList, i)), list_get(value, i));
+                make(as_type(list_get(typeList, i)), list_get(value, i));
         }
     }
 
@@ -888,7 +888,7 @@ namespace list_t {
 List::List()
   : Value()
 {
-    create(&LIST_T, this);
+    make(&LIST_T, this);
 }
 
 caValue*

@@ -119,7 +119,7 @@ void string_release(caValue* value)
 
 void string_copy(Type* type, caValue* source, caValue* dest)
 {
-    create(type, dest);
+    make(type, dest);
     StringData* data = (StringData*) source->value_data.ptr;
     if (data != NULL)
         incref(data);
@@ -370,7 +370,7 @@ std::string as_string(caValue* value)
 
 char* string_initialize(caValue* value, int length)
 {
-    create(&STRING_T, value);
+    make(&STRING_T, value);
     StringData* data = string_create(length);
     value->value_data.ptr = data;
     return data->str;
@@ -378,7 +378,7 @@ char* string_initialize(caValue* value, int length)
 
 void set_string(caValue* value, const char* s)
 {
-    create(&STRING_T, value);
+    make(&STRING_T, value);
     int length = strlen(s);
     StringData* data = string_create(length);
     memcpy(data->str, s, length + 1);
@@ -387,7 +387,7 @@ void set_string(caValue* value, const char* s)
 
 void set_string(caValue* value, const char* s, int length)
 {
-    create(&STRING_T, value);
+    make(&STRING_T, value);
     StringData* data = string_create(length);
     memcpy(data->str, s, length);
     data->str[length] = 0;

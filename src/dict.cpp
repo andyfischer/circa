@@ -451,7 +451,7 @@ void setup_type(Type* type)
 Dict::Dict()
   : Value()
 {
-    create(&DICT_T, this);
+    make(&DICT_T, this);
 }
 
 Dict* Dict::checkCast(caValue* value)
@@ -637,7 +637,7 @@ std::string dict_to_string(DictData* data)
 
 Dict* make_dict(caValue* value)
 {
-    create(&DICT_T, value);
+    make(&DICT_T, value);
     return (Dict*) value;
 }
 

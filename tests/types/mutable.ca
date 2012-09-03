@@ -1,6 +1,6 @@
 
 -- Simple test
-a = create(Mutable)
+a = make(Mutable)
 assert(a.get == null)
 a.set(1)
 assert(a.get == 1)
@@ -10,7 +10,7 @@ type T {
     Mutable m
 }
 
-t = create(T)
+t = make(T)
 
 def T.f(self)
     self.m.set(self.m.get + 1)
@@ -22,7 +22,7 @@ t.f
 assert(t.m.get == 2)
 
 -- Circular reference, this isn't really useful but it's funny.
-a = create(Mutable)
+a = make(Mutable)
 a.set(a)
 assert(a.get == a)
 assert(a.get.get.get.get == a)

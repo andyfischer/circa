@@ -17,7 +17,7 @@ def T.f(self, int i)
         print('finished recursive call, nested = ' nested)
 
 
-t = create(T)
+t = make(T)
 t.i = 2
 
 s = null

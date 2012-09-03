@@ -12,5 +12,5 @@ type U;
 def U.method(t) -> String
     return "called U.method"
 
-print("T.method == " create(T).method())
-print("U.method == " create(U).method())
+print("T.method == " make(T).method())
+print("U.method == " make(U).method())

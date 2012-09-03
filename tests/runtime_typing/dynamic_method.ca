@@ -20,8 +20,8 @@ def B.blah(self) -> String
 def B.modify(self :out)
     self.x += 2
 
-call_blah(create(A))
-call_blah(create(B))
+call_blah(make(A))
+call_blah(make(B))
 
 -- Test using an input
 
@@ -33,8 +33,8 @@ def B.blah2(self, String str) -> String
 def call_blah2(any a, String s)
     print(a.blah2(s))
 
-call_blah2(create(A), 'str1')
-call_blah2(create(B), 'str2')
+call_blah2(make(A), 'str1')
+call_blah2(make(B), 'str2')
 
 -- Test accessing the target object
 
@@ -49,8 +49,8 @@ def call_blah3(any a :out, int i)
     print('calling blah3: ' i)
     print(a.blah3(i))
 
-a = create(A)
-b = create(B)
+a = make(A)
+b = make(B)
 call_blah3(a, 11)
 call_blah3(b, 22)
 
@@ -59,8 +59,8 @@ call_blah3(b, 22)
 def call_modify(any a :out) -> any
     a.@modify
 
-a = create(A)
-b = create(B)
+a = make(A)
+b = make(B)
 call_modify(&a)
 call_modify(&b)
 print(a)

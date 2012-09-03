@@ -9,7 +9,7 @@ def T.inc(@self) -> int
     if true
         return 5
 
-t = create(T)
+t = make(T)
 assert(t == [0])
 t.inc
 assert(t == [1])

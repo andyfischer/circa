@@ -15,7 +15,7 @@ using namespace circa;
 
 void circa_set_map(caValue* map)
 {
-    create(TYPES.map, map);
+    make(TYPES.map, map);
 }
 
 caValue* circa_map_insert(caValue* map, caValue* key)

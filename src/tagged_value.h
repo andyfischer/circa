@@ -9,8 +9,8 @@ namespace circa {
 // on a caValue that has a valid value may cause a memory leak.
 void initialize_null(caValue* value);
 
-// Call the type's create() function to initialize 'value' to a new instance of the type.
-void create(Type* type, caValue* value);
+// Initialize 'value' to a new instance of type 'type'.
+void make(Type* type, caValue* value);
 
 void change_type(caValue* v, Type* t);
 

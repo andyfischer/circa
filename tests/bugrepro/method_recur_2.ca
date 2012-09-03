@@ -6,5 +6,5 @@ def T.f(@self, Rect rect)
     if false
         self.f([0 0 100 100])
 
-element = create(T)
+element = make(T)
 element.f([0 0 100 100])

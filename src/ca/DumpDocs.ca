@@ -71,7 +71,7 @@ def Writer.dump_module(@self, Branch b)
         elif t.is_type
             self.dump_type(t.value)
 
-writer = create(Writer)
+writer = make(Writer)
 writer.start
 writer.dump_module(reflect:kernel())
 writer.finish

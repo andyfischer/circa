@@ -88,16 +88,14 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_dict(inputs.append());
 
-        Dict* dict = as_dict(inputs[index]);
-        set_string(dict->insert(field.c_str()), value.c_str());
+        set_string(dict_insert(inputs[index], field.c_str()), value.c_str());
     }
     void set(int index, const char* field, caValue* value)
     {
         while (index >= inputs.length())
             set_dict(inputs.append());
 
-        Dict* dict = as_dict(inputs[index]);
-        copy(value, dict->insert(field));
+        copy(value, dict_insert(inputs[index], field));
     }
 
     void append(int index, std::string const& field, std::string const& value)
@@ -105,9 +103,7 @@ struct ListSyntaxHints {
         while (index >= inputs.length())
             set_dict(inputs.append());
 
-        Dict* dict = as_dict(inputs[index]);
-
-        caValue* existing = dict->insert(field.c_str());
+        caValue* existing = dict_insert(inputs[index], field.c_str());
         if (!is_string(existing))
             set_string(existing, "");
 

@@ -45,7 +45,7 @@ def Label.left(label) -> number
   return label.position().x
 
 def create_font(String name, int size) -> Font
-  return create(Font)
+  return make(Font)
 def font(String name, int size) -> Font
   state f = null
   if changed([name size])
@@ -53,7 +53,7 @@ def font(String name, int size) -> Font
   return f
 
 def create_label() -> Label
-  return create(Label);
+  return make(Label);
 def label(Font font, String text, Point pos) -> Label
   state l = create_label()
   if changed([font text])
@@ -63,12 +63,12 @@ def label(Font font, String text, Point pos) -> Label
   return l
 
 def create_line() -> Line
-  return create(Line)
+  return make(Line)
 def Line.set(_, Point a, Point b)
 def Line.setColor(_, Color c)
 
 def create_sprite(Name pass) -> Sprite
-  return create(Sprite)
+  return make(Sprite)
 def Sprite.loadFromFile(_, String filename)
   print('loading: ' filename)
 def Sprite.setTexture(_, Texture texture)
@@ -102,7 +102,7 @@ def sprite_from_tex(Texture tex, Name pass) -> Sprite
   return s
   
 def create_texture() -> Texture
-  return create(Texture)
+  return make(Texture)
 def Texture.loadFromFile(_, String filename)
   
 def texture(String filename) -> Texture
@@ -112,7 +112,7 @@ def texture(String filename) -> Texture
   return s
   
 def create_touch_region() -> TouchRegion
-  return create(TouchRegion)
+  return make(TouchRegion)
 def TouchRegion.setBounds(_, Vec4 bounds)
 def TouchRegion.checkActivated(_) -> bool
   return false
