@@ -114,7 +114,7 @@ if msg[0] == 'onPaintEvent'
         interpreter_stopped = true
 
     -- Paint our menu on top
-    topButtons.draw(painter)
+    topButtons.paint(painter)
 
     if showStatView
         draw_stat_view(painter)
@@ -177,20 +177,20 @@ elif msg[0] == 'onInputEvent'
         if not state_frozen
             if event.is_mouse and not consumedMouseDown
                 mousePos = event.mousePos
-                if event.eventType == MouseDown
+                if event.eventType == :MouseDown
                     keysDown.add(:mouse1)
-                elif event.eventType == MouseUp
+                elif event.eventType == :MouseUp
                     keysDown.remove(:mouse1)
             elif event.is_key
                 en = keycode_to_name(event.keyCode)
-                if event.eventType == KeyDown
+                if event.eventType == :KeyDown
                     keysDown.add(en)
                 else
                     keysDown.remove(en)
 
             eventsToScript.append(event)
 
-    if event.eventType == MouseUp
+    if event.eventType == :MouseUp
         consumedMouseDown = false
 
 elif msg[0] == 'timeUpdate'
