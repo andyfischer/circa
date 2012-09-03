@@ -14,11 +14,6 @@
 
 namespace circa {
 
-void selector_prepend(caValue* selector, caValue* element)
-{
-    copy(element, list_insert(selector, 0));
-}
-
 caValue* selector_advance(caValue* value, caValue* selectorElement, caValue* error)
 {
     if (is_int(selectorElement)) {
@@ -197,15 +192,6 @@ Term* rebind_possible_accessor(Branch* branch, Term* accessor, Term* result)
     return set;
 }
 
-void evaluate_selector_reflect(caStack* stack)
-{
-    Term* accessor = ((Term*) circa_caller_term(stack))->input(0);
-
-    Term* head = find_accessor_head_term(accessor);
-
-    // FIXME
-}
-
 void selector_format_source(caValue* source, Term* term)
 {
     // Append subscripts for each selector element
@@ -306,9 +292,6 @@ void selector_setup_funcs(Branch* kernel)
 {
     FUNCS.selector = 
         import_function(kernel, evaluate_selector, "selector(any elements :multiple) -> Selector");
-
-    FUNCS.selector_reflect = import_function(kernel, evaluate_selector_reflect,
-                "selector_reflect(any :meta) -> Selector");
 
     FUNCS.get_with_selector = 
         import_function(kernel, get_with_selector_evaluate,

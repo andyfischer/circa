@@ -1,8 +1,0 @@
-
-l = [0 1 2]
-
-assert(selector_reflect(l[1]) == [1])
-
-l = [[0] [1] [2]]
-
-assert(selector_reflect(l[1][0]) == [1 0])

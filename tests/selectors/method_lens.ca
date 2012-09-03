@@ -10,4 +10,4 @@ def T.lens(self) -> int
 t = T([0 0])
 
 
-assert(selector_reflect(t.lens) == [1])
+-- assert(selector_reflect(t.lens) == [1])

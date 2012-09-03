@@ -14,9 +14,9 @@ type ButtonBar {
 }
 
 def ButtonBar.setToggled(@b, int index, bool toggle)
-    --b.buttons[index].toggled = toggle
+    b.buttons[index].toggled = toggle
 
-    print(selector_reflect(b.buttons[index].toggled))
+    -- print(selector_reflect(b.buttons[index].toggled))
 
 
 bar = create(ButtonBar)

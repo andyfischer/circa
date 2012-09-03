@@ -1,6 +1,0 @@
-
-
-def lens(any i) -> any
-  i[1]
-
-assert(selector_reflect(lens([0 1])) == [1])
