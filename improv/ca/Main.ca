@@ -12,7 +12,7 @@ if msg_name == 'changeScreen'
     currentScreen = msg[1]
 elif msg_name == 'paintGL'
 
-    painter = create(Painter)
+    painter = make(Painter)
     painter.target = msg[1]
     viewportSize = painter.target.getViewportSize
     painter.viewport = [0 0 viewportSize.x viewportSize.y]

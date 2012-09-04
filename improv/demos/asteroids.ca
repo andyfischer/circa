@@ -182,7 +182,7 @@ def generate_asteroid(number size) -> Asteroid
         (polar(angle) * (rand() * size + size/3)) -> Point
 
     rotation = (rand() * .2 - .1) * 360
-    result = create(Asteroid)
+    result = make(Asteroid)
     result.edges = edges
     result.location = random_location()
     result.vel = random_norm_vector()*10

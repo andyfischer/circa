@@ -6,8 +6,6 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#include "circa/circa.h"
-
 #include "Common.h"
 #include "FontBitmap.h"
 

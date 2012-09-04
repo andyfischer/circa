@@ -17,7 +17,7 @@ state ButtonBar scriptChoices = button_bar([
         ["BoxUI Test", "demos/BoxUITest.ca"]
         ])
 
-state fpsTracker = create(FPSTracker)
+state fpsTracker = make(FPSTracker)
 state number time
 
 scriptChoices.arrange([30 80 200 370], :vertical)

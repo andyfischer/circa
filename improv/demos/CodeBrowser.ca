@@ -100,7 +100,7 @@ def CodeBrowser.draw(self, Painter painter)
         
 
 def make_code_browser(Branch branch) -> CodeBrowser
-    browser = create(CodeBrowser)
+    browser = make(CodeBrowser)
     browser.branch = branch
     browser.terms = branch.terms
     browser.scrollStart = 0

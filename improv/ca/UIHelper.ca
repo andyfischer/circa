@@ -15,7 +15,7 @@ def Point.inside(self, Rect rect) -> bool
     (self.x >= rect.x1) and (self.x <= rect.x2) and (self.y >= rect.y1) and (self.y <= rect.y2)
 
 def button(String label, Rect rect) -> Button
-    b = create(Button)
+    b = make(Button)
     b.label = label
     b.rect = rect
     b
@@ -53,7 +53,7 @@ type ButtonBar {
 
 def button_bar(List definitions) -> ButtonBar
     buttons = for defi in definitions
-        b = create(Button)
+        b = make(Button)
         b.label = defi[0]
         b.action = defi[1]
         b

@@ -108,7 +108,7 @@ def Segment.step(seg)
             angle_target = 80.0
             angle_delt = seed() * angle_target * direction * spread_progress
 
-            child = create(Segment)
+            child = make(Segment)
             child.base_loc = end_loc
             child.base_angle = tip_angle + angle_delt
             child.generation = seg.generation + 1
@@ -121,7 +121,7 @@ def Segment.step(seg)
     else
         angle_delt = (seed() - 0.5) * 30.0
         
-        child = create(Segment)
+        child = make(Segment)
         child.base_loc = end_loc
         child.base_angle = tip_angle + angle_delt
         child.generation = seg.generation + 1
@@ -131,7 +131,7 @@ def Segment.step(seg)
         child.step
 
 
-root = create(Segment)
+root = make(Segment)
 root.base_loc = [300 500]
 root.distance_till_branch = 20.0
 root.growth_rate = 1.0

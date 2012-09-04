@@ -38,7 +38,7 @@ def FrameBubble.layout(@self, Rect rect)
 
 def FrameBubble.initializeFromBranch(@self, Branch branch)
     self.lines = for Term term in branch.terms
-        line = create(FrameLine)
+        line = make(FrameLine)
         line.term = term
 
 def FrameBubble.paint(self, Painter painter)
@@ -81,7 +81,7 @@ def StackBrowser.handleEvent(@self, InputEvent event)
         bubble.handleEvent(event)
 
 def StackBrowser.addBubble(@self, Branch branch)
-    bubble = create(FrameBubble)
+    bubble = make(FrameBubble)
     bubble.initializeFromBranch(branch)
     bubble.highlightedLine = -1
     self.bubbles = [bubble]
@@ -91,7 +91,7 @@ def StackBrowser.paint(self, Painter painter)
         bubble.paint(painter)
 
 def stack_browser(Branch branch) -> StackBrowser
-    browser = create(StackBrowser)
+    browser = make(StackBrowser)
     browser.branch = branch
 
     -- add first bubble
@@ -118,7 +118,7 @@ for event in env.events
     browser.handleEvent(event)
 
 
-state popupMenu = create(PopupMenu)
+state popupMenu = make(PopupMenu)
 popupMenu.setElements([['Item 1' :item1] ['Item 2' :item2]])
 popupMenu.setLocation([300 300])
 popupMenu.paint(env.painter)

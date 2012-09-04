@@ -90,7 +90,7 @@ def Avatar.draw(self, Painter painter)
         painter.polygon(points poly.color)
 
 env.background(#000)
-guy = create(Avatar)
+guy = make(Avatar)
 guy.loc = [200 150]
 guy.scale = 100.0
 

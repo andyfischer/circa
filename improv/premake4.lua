@@ -27,6 +27,16 @@ solution "Improv"
         libdirs { "/usr/X11/lib" }
         links { "freetype" }
 
+        -- Cairo
+        includedirs { "/usr/local/Cellar/cairo/1.12.2/include/cairo" }
+        libdirs { "/usr/local/Cellar/cairo/1.12.2/lib" }
+        links { "cairo" }
+
+        -- Pango
+        buildoptions {"`pkg-config --cflags pango`" }
+        linkoptions {"`pkg-config --libs pango`" }
+        links { "pangocairo-1.0.0" }
+
         -- Qt
         includedirs {
             "/usr/local/Cellar/qt/4.8.2/include",

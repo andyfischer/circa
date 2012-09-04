@@ -9,13 +9,13 @@ type UIElement {
 }
 
 def label(String text, Font font, Color color) -> UIElement
-    element = create(UIElement)
+    element = make(UIElement)
     element.tag = :Label
     element.args = [text font color]
     element
 
 def vertical_menu(List elements) -> UIElement
-    element = create(UIElement)
+    element = make(UIElement)
     element.tag = :VerticalList
     element.args = [elements]
     element

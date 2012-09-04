@@ -22,7 +22,7 @@ state number timeShift = 0
 state showStatView = false
 state showFps = false
 
-state fpsTracker = create(FPSTracker)
+state fpsTracker = make(FPSTracker)
 
 buttons = [
     ["Browse" :browse]
@@ -85,7 +85,7 @@ if msg[0] == 'onPaintEvent'
 
     if not(userBranch.is_null) and not(interpreter_stopped)
 
-        usersEnv = create(Environment)
+        usersEnv = make(Environment)
         usersEnv.painter = painter
         usersEnv.mouse = mousePos
         usersEnv.keysDown = keysDown
