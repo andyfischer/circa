@@ -118,7 +118,6 @@ struct Type
     
     // Type parameters
     Value parameter;
-    bool nocopy;
     int objectSize;
 
     // Flag, if true then at least one value has been created using this type.

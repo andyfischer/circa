@@ -16,12 +16,12 @@ type Vec4 {
   number w
 }
 
-type Font :handle;
-type Label :handle;
-type Line :handle;
-type Sprite :handle;
-type Texture :handle;
-type TouchRegion :handle;
+type Font;
+type Label;
+type Line;
+type Sprite;
+type Texture;
+type TouchRegion;
 
 def viewport_size() -> Point
   return [100 100] -> Point

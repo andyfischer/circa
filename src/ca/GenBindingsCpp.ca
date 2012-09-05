@@ -73,11 +73,6 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
             writer.write(name)
             writer.write(concat(' = circa_float(circa_input(stack, ' index '))'))
             writer.writeln(';')
-        elif t.is_handle
-            writer.write(concat(t.name, '* ', name))
-            writer.write(concat(' = (', t.name, '*) circa_get_pointer(circa_handle_get_value('))
-            writer.write(concat('circa_input(stack, ' index ')))'))
-            writer.writeln(';')
         else
             writer.write('caValue* ')
             writer.write(name)
@@ -101,18 +96,10 @@ def write_function(CodeWriter writer :out, Function func, String cname :out)
         else
             name = concat('output_' index)
 
-        if input.get_type.is_handle
-            writer.write(concat('caValue* out = circa_create_default_output(stack, '
-                index ')'))
-            writer.writeln(';')
-            writer.write(concat('circa_handle_set_object(out, output, '
-                input.get_type.name 'Release)'))
-            writer.writeln(';')
-        else
-            writer.write('caValue* ')
-            writer.write(name)
-            writer.write(concat(' = circa_output(stack, ' index ')'))
-            writer.writeln(';')
+        writer.write('caValue* ')
+        writer.write(name)
+        writer.write(concat(' = circa_output(stack, ' index ')'))
+        writer.writeln(';')
 
         index += 1
 

@@ -50,16 +50,6 @@ namespace type_t {
         append_phrase(source, "type ", term, name_Keyword);
         append_phrase(source, term->name, term, name_TypeName);
 
-        if (as_type(term)->nocopy) {
-            append_phrase(source, " ", term, name_Whitespace);
-            append_phrase(source, ":nocopy", term, name_None);
-        }
-
-        if (term->boolProp("handle", false)) {
-            append_phrase(source, " ", term, name_Whitespace);
-            append_phrase(source, ":handle", term, name_None);
-        }
-
         if (term->boolProp("syntax:semicolon", false)) {
             //append_phrase(source, ";", term, name_None);
             return;
@@ -146,7 +136,6 @@ Type::Type() :
     gcListReferences(NULL),
     gcRelease(NULL),
     parent(NULL),
-    nocopy(false),
     objectSize(0),
     inUse(false)
 {

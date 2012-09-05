@@ -737,16 +737,8 @@ ParseResult type_decl(Branch* branch, TokenStream& tokens, ParserCxt* context)
     while (tokens.nextIs(tok_Name)) {
         std::string s = tokens.consumeStr();
 
-        if (s == ":nocopy") {
-            // :nocopy is deprecated
-            as_type(result)->nocopy = true;
-        } else if (s == ":handle") {
-            // :handle is a temporary way to declare a handle type
-            // :handle is deprecated
-            setup_handle_type(as_type(result));
-            result->setBoolProp("handle", true);
-            set_type_property(as_type(result), "handle", &TrueValue);
-        } else {
+        // There were once type attributes here
+        {
             return compile_error_for_line(result, tokens, startPosition,
                 "Unrecognized type attribute: " + s);
         }

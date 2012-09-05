@@ -291,8 +291,6 @@ def String.characters(self) -> List
 def Type.name(self) -> String
     -- Returns this Term's local name. May be empty.
 def Type.property(self, String) -> any
-def Type.is_handle(self) -> bool
-    self.property('handle') == true
 def Type.declaringTerm(self) -> Term
 
 def type(any) -> Type
