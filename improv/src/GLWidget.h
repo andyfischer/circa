@@ -8,7 +8,7 @@
 #include <QtOpenGL/QGLWidget>
 #include <QTime>
 
-#include "engine/RenderTarget.h"
+#include "RenderTarget.h"
 
 class GLWidget : public QGLWidget
 {

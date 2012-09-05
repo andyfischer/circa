@@ -17,7 +17,6 @@ solution "Improv"
         targetdir "build"
         files {
             "src/*.cpp",
-            "engine/*.cpp",
             "build/*.cpp",
             }
         includedirs {".", "../include", "libs"}

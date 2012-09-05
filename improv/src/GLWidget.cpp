@@ -5,9 +5,9 @@
 
 #include "GLWidget.h"
 #include "Scripts.h"
-#include "engine/Common.h"
-#include "engine/FontBitmap.h"
-#include "engine/ResourceManager.h"
+#include "Common.h"
+#include "FontBitmap.h"
+#include "ResourceManager.h"
 
 GLWidget::GLWidget(QWidget *parent)
      : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
