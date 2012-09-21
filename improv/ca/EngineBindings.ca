@@ -16,6 +16,8 @@ def Font.width(self, String text) -> number
 def Font.textSize(self, String text) -> Point
     [self.width(text) self.height]
 
+type Texture;
+
 type LineList;
 def create_line_list(RenderTarget target) -> LineList
 

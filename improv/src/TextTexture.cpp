@@ -5,10 +5,10 @@
 #include "RenderTarget.h"
 
 TextTexture*
-TextTexture::create(RenderTarget* renderList)
+TextTexture::create(RenderTarget* target)
 {
     TextTexture* obj = new TextTexture();
-    renderList->appendEntity(obj);
+    target->appendEntity(obj);
 
     glGenTextures(1, &obj->texid);
 

@@ -13,7 +13,8 @@ struct Texture : RenderEntity
 
     bool hasTexture;
 
-    void init(RenderTarget* target);
+    static Texture* create(RenderTarget* target);
+
     virtual void destroy();
     virtual bool destroyed();
 

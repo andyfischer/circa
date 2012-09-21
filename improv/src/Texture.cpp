@@ -5,12 +5,17 @@
 #include "Common.h"
 #include "Texture.h"
 
-void Texture::init(RenderTarget* target)
+Texture*
+Texture::create(RenderTarget* target)
 {
-    glGenTextures(1, &tex);
-    hasTexture = false;
-    sizeX = 0;
-    sizeY = 0;
+    Texture* obj = new Texture();
+    target->appendEntity(obj);
+
+    glGenTextures(1, &obj->tex);
+    obj->hasTexture = false;
+    obj->sizeX = 0;
+    obj->sizeY = 0;
+    return obj;
 }
 
 void Texture::destroy()
@@ -28,54 +33,7 @@ Texture::destroyed()
 void
 Texture::loadFromFile(const char * filename)
 {
-    //[self loadCheckerPattern:200 h:200];
-    //return;
-    
-#if 0
-    //TODO
-    
-    Log("loading texture from %s", filename);
-    
-    // Load image
-    NSString *path = AssetFilename(filename);
-    NSData *texData = [[NSData alloc] initWithContentsOfFile:path];
-    UIImage *image = [[UIImage alloc] initWithData:texData];
-    if (image == nil) {
-        Log("Failed to load image file: %s", filename);
-        return;
-    }
-    
-    // Uncompress to bitmap
-    GLuint width = CGImageGetWidth(image.CGImage);
-    GLuint height = CGImageGetHeight(image.CGImage);
-    
-    width = NextPowerOfTwo(width);
-    height = NextPowerOfTwo(height);
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    void *imageData = malloc( height * width * 4 );
-    CGContextRef context = CGBitmapContextCreate( imageData, width, height, 8, 4 * width, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big );
-    CGColorSpaceRelease( colorSpace );
-    CGContextClearRect( context, CGRectMake( 0, 0, width, height ) );
-    CGContextTranslateCTM( context, 0, height - height );
-    CGContextDrawImage( context, CGRectMake( 0, 0, width, height ), image.CGImage );
-    
-    // Upload to texture
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
-    
-    CGContextRelease(context);
-    
-    free(imageData);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    
-    sizeX = width;
-    sizeY = height;
-    hasTexture = true;
-#endif
+    // TODO
 }
 
 void

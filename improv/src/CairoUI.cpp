@@ -4,6 +4,12 @@
 
 #include "circa/circa.h"
 
+
+void FreeCairoSurface(void* obj)
+{
+    cairo_surface_destroy((CairoImageSurface*) obj);
+}
+
 void rendertext(cairo_t *cr)
 {
 	PangoLayout *layout;

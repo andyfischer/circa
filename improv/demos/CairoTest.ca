@@ -1,0 +1,38 @@
+
+env = input() -> Environment
+
+-- Cairo surface
+type Surface;
+
+def Surface.to_texture(self) -> Texture
+
+def boxui_to_surface(List boxui) -> Surface
+
+-- BoxUI construction
+
+type Label {
+    String text
+    Rect position
+    Color color
+}
+def label(String text, Rect pos, Color c) -> Label
+    [text pos c]
+
+type Button {
+    String label
+    Rect position
+    Color color
+}
+def button(String label, Rect pos, Color c) -> Button
+    [label pos c]
+
+type Rect {
+    Rect position
+    Color color
+}
+def rect(Rect pos, Color c) -> Rect
+    [pos c]
+    
+myDialog = [
+  rect(
+    

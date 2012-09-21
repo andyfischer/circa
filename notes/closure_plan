@@ -29,3 +29,13 @@ Referring to a function by name must also create a closure:
         print(a)
       return print_a
 
+----
+
+Steps:
+
+1) Add a Func type, which may include a list of closed variables.
+2) Whenever we compile a function, every external reference must be wrapped in a
+   external() term.
+3) When calling a Func, each external() term must be filled in, either from the stack
+   or from the Func's environment.
+4) When returning a Func value, we may need to capture values from the stack.
