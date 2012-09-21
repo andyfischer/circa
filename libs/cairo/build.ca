@@ -1,5 +1,0 @@
-
-name = 'cairo'
-cflags = '-I/usr/local/Cellar/cairo/1.10.2/include'
-linkflags = '-L/usr/local/Cellar/cairo/1.10.2/lib -lcairo'
-

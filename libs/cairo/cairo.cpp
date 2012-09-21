@@ -12,17 +12,17 @@ extern "C" {
 
 cairo_t* as_cairo_context(caValue* value)
 {
-    return (cairo_t*) circa_get_pointer(value);
+    return (cairo_t*) circa_handle_get_object(value);
 }
 
 cairo_surface_t* as_cairo_surface(caValue* value)
 {
-    return (cairo_surface_t*) circa_get_pointer(value);
+    return (cairo_surface_t*) circa_handle_get_object(value);
 }
 
 cairo_font_face_t* as_cairo_font_face(caValue* value)
 {
-    return (cairo_font_face_t*) circa_get_pointer(value);
+    return (cairo_font_face_t*) circa_handle_get_object(value);
 }
 
 void cairoContext_release(caValue* value)
@@ -44,7 +44,7 @@ void cairoFontFace_release(caValue* value)
 float radians_to_degrees(float radians) { return radians * 180.0 / M_PI; }
 float degrees_to_radians(float unit) { return unit * M_PI / 180.0; }
 
-void cairo__create_context_for_surface(caStack* stack)
+void cairo__create_context(caStack* stack)
 {
     cairo_surface_t* surface = as_cairo_surface(circa_input(stack, 0));
 
@@ -122,6 +122,19 @@ void cairo__create_image_surface(caStack* stack)
     caValue* out = circa_create_default_output(stack, 0);
     circa_handle_set_object(out, surface, cairoSurface_release);
 }
+
+void cairo__Surface_write_to_pong(caStack* stack)
+{
+    cairo_surface_t* surface = as_cairo_surface(circa_input(stack, 0));
+    const char* filename = circa_string_input(stack, 1);
+
+    cairo_status_t status = cairo_surface_write_to_png(surface, filename);
+
+    if (status != CAIRO_STATUS_SUCCESS) {
+        circa_output_error(stack, "cairo_surface_write_to_png failed");
+    }
+}
+
 void cairo__Context_select_font_face(caStack* stack)
 {
     cairo_t* context = as_cairo_context(circa_input(stack, 0));

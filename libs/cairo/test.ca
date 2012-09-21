@@ -1,0 +1,13 @@
+
+import cairo
+
+surface = cairo:create_image_surface([200 200])
+
+context = create_context(surface)
+
+context.set_source_color(#f00)
+context.move_to([10 10])
+context.line_to([190 190])
+context.close_path()
+
+surface.write_to_png('test_output.png')

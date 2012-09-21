@@ -1,9 +1,7 @@
 
-import opengl
+-- cairo bindings
 
 sys:dll_patch()
-
--- cairo bindings
 
 namespace cairo
     type Context;
@@ -15,7 +13,7 @@ namespace cairo
     namespace Operator { clear = 0, source = 1, over = 2 }
 
     -- Contexts
-    def create_context_for_surface(Surface s) -> Context
+    def create_context(Surface s) -> Context
 
     def Context.save(self)
     def Context.restore(self)
@@ -26,10 +24,11 @@ namespace cairo
     def Context.reset_clip(self)
     def Context.set_source_color(self, Color color)
     def Context.fill_preserve(self)
-    def Context.set_operator(self, int operator)
+    def Context.set_operator(self, Name operator)
 
     -- Surfaces
     def create_image_surface(Point size) -> Surface
+    def Surface.write_to_png(self, String filename)
 
     -- Text
     def Context.select_font_face(self, String family)
@@ -47,24 +46,3 @@ namespace cairo
     def Context.new_sub_path(self)
     def Context.close_path(self)
     def Context.set_line_width(self, number width)
-
-    -- Rendering
-
-    -- This function will modify the pixels in 'surface' (so that the colors
-    -- are formatted in a way that OpenGL likes).
-    def upload_surface_to_opengl(Surface surface, int texture_id)
-
-    -- Helper functions
-    def use_render_function(any func, Point bufferSize, Point location, bool redraw)
-        state texture = opengl:new_texture_handle()
-
-        if redraw or changed(bufferSize)
-            s = cairo:create_image_surface(bufferSize)
-            cr = cairo:create_context_for_surface(s)
-
-            -- run the draw function
-            dynamic_call(func [cr])
-
-            cairo:upload_surface_to_opengl(s texture)
-
-        opengl:draw_texture_as_quad(texture to_rect(location bufferSize))
