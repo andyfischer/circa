@@ -20,17 +20,24 @@
 
 namespace circa {
 
+struct LoadedDll
+{
+    void* module;
+};
+
 World* alloc_world()
 {
     World* world = (World*) malloc(sizeof(*world));
+
+    world->nativePatches = new std::map<Name, EvaluateFunc>();
 
     initialize_null(&world->actorList);
     set_list(&world->actorList, 0);
 
     world->actorStack = circa_alloc_stack(world);
 
-    initialize_null(&world->freeModules);
-    set_list(&world->freeModules, 0);
+    initialize_null(&world->looseModules);
+    set_list(&world->looseModules, 0);
 
     return world;
 }
@@ -133,10 +140,10 @@ int actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
     return count;
 }
 
-Branch* create_free_module(caWorld* world)
+Branch* create_loose_module(caWorld* world)
 {
     Branch* branch = alloc_branch_gc();
-    set_branch(list_append(&world->freeModules), branch);
+    set_branch(list_append(&world->looseModules), branch);
     return branch;
 }
 
@@ -161,9 +168,9 @@ void update_world_after_module_reload(caWorld* world, Branch* oldBranch, Branch*
         }
     }
 
-    // Update references in free modules
-    for (int i=0; i < list_length(&world->freeModules); i++) {
-        caValue* container = list_get(&world->freeModules, i);
+    // Update references in loose modules
+    for (int i=0; i < list_length(&world->looseModules); i++) {
+        caValue* container = list_get(&world->looseModules, i);
         Branch* existing = as_branch(container);
         update_branch_after_module_reload(existing, oldBranch, newBranch);
     }
@@ -194,9 +201,9 @@ void refresh_all_modules(caWorld* world)
         }
     }
 
-    // Iterate over free modules
-    for (int i=0; i < list_length(&world->freeModules); i++) {
-        caValue* container = list_get(&world->freeModules, i);
+    // Iterate over loose modules
+    for (int i=0; i < list_length(&world->looseModules); i++) {
+        caValue* container = list_get(&world->looseModules, i);
         Branch* existing = as_branch(container);
         Branch* latest = load_latest_branch(existing);
 
@@ -206,6 +213,26 @@ void refresh_all_modules(caWorld* world)
             update_world_after_module_reload(world, existing, latest);
         }
     }
+}
+
+void add_native_patch(World* world, Name name, EvaluateFunc func)
+{
+    world->nativePatches->operator[](name) = func;
+}
+
+EvaluateFunc find_native_patch(World* world, Name name)
+{
+    std::map<Name, EvaluateFunc>::const_iterator it;
+    it = world->nativePatches->find(name);
+
+    if (it == world->nativePatches->end())
+        return NULL;
+
+    return it->second;
+}
+
+void load_native_patch_dll(World* world, const char* filename)
+{
 }
 
 } // namespace circa

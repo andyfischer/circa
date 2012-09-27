@@ -259,7 +259,7 @@ void load_module(caStack* stack)
 {
     const char* filename = circa_string_input(stack, 0);
     
-    Branch* branch = create_free_module(stack->world);
+    Branch* branch = create_loose_module(stack->world);
     load_script(branch, filename);
 
     set_branch(circa_output(stack, 0), branch);
