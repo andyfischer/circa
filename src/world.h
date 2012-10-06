@@ -12,8 +12,7 @@ struct World {
 
     circa::Value looseModules;
 
-    std::map<std::string, LoadedDll*>* loadedDlls;
-    std::map<Name, EvaluateFunc>* nativePatches;
+    NativeModuleWorld* nativeModuleWorld;
 
 protected:
     // Disallow C++ construction
@@ -30,15 +29,5 @@ ListData* find_actor(World* world, const char* name);
 Branch* create_loose_module(caWorld* world);
 
 void refresh_all_modules(caWorld* world);
-
-// Native function patches
-
-// Add the name-func association to the world's table of native patches.
-void add_native_patch(World* world, Name name, EvaluateFunc func);
-
-// Lookup a native patch by name. May return NULL.
-EvaluateFunc find_native_patch(World* world, Name name);
-
-void load_native_patch_dll(World* world, const char* filename);
 
 } // namespace circa

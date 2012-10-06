@@ -12,6 +12,7 @@
 #include "inspection.h"
 #include "list.h"
 #include "modules.h"
+#include "native_modules.h"
 #include "reflection.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -29,7 +30,7 @@ World* alloc_world()
 {
     World* world = (World*) malloc(sizeof(*world));
 
-    world->nativePatches = new std::map<Name, EvaluateFunc>();
+    world->nativeModuleWorld = create_native_module_world();
 
     initialize_null(&world->actorList);
     set_list(&world->actorList, 0);
@@ -213,26 +214,6 @@ void refresh_all_modules(caWorld* world)
             update_world_after_module_reload(world, existing, latest);
         }
     }
-}
-
-void add_native_patch(World* world, Name name, EvaluateFunc func)
-{
-    world->nativePatches->operator[](name) = func;
-}
-
-EvaluateFunc find_native_patch(World* world, Name name)
-{
-    std::map<Name, EvaluateFunc>::const_iterator it;
-    it = world->nativePatches->find(name);
-
-    if (it == world->nativePatches->end())
-        return NULL;
-
-    return it->second;
-}
-
-void load_native_patch_dll(World* world, const char* filename)
-{
 }
 
 } // namespace circa

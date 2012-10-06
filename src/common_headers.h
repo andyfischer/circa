@@ -49,15 +49,19 @@ struct Function;
 struct GCReferenceList;
 struct List;
 struct ListData;
+struct NativeModuleWorld;
+struct NativeModule;
+struct NativePatchFunction;
 struct RawOutputPrefs;
-struct TermMap;
 struct StaticTypeQuery;
 struct String;
 struct Term;
 struct TermList;
+struct TermMap;
 struct Type;
 
 typedef bool (*TermVisitor)(Term* term, caValue* context);
+typedef int Name;
 
 // Function-related typedefs:
 

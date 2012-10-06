@@ -4,8 +4,6 @@
 
 namespace circa {
 
-typedef int Name;
-
 enum NameLookupType {
     NAME_LOOKUP_ANY = 1,
     NAME_LOOKUP_TYPE = 2,
