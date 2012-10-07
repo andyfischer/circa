@@ -5,7 +5,6 @@ gh-pages
 /build
 
 # miscellaneous artifacts:
-.sconsign.dblite
 tags
 
 # generated docs

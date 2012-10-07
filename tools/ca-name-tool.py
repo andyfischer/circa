@@ -1,4 +1,13 @@
 
+"""
+This script generates the contents of src/names_builtin.h and src/names_builtin.cpp, using
+src/names.txt as source.
+
+In Circa land, a 'name' is an integer that has a human-readable string name. Each name can be
+converted to and from a string. (these conversion functions are part of what gets
+auto-generated).
+"""
+
 SymbolList = 'src/names.txt'
 
 GeneratedHeader = 'src/names_builtin.h'

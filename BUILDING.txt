@@ -1,14 +1,12 @@
 
 # Prerequisites #
 
- - GCC (or a compatible alternative)
- - Python 2.6 or greater
+ - For just building, GCC and GNU make are required.
+ - For testing and development, Python2.6 and Premake4 are required.
 
-# Instructions #
+# Build Instructions #
 
-0. Run: python tools/prebuild.py
-
-1. Run: make <optional config> <optional target>
+Run: make <optional config> <optional target>
 
   The configuration can be:
 
@@ -23,20 +21,27 @@
     static_lib
      - Static library, found at: build/libcirca.a
        Debug filename ends with _d, as in: libcirca_d.a
-       On Windows the filename is: circa.lib
+       On Windows the suffix is .lib, as in: circa.lib
 
     command_line
      - Command-line tool with REPL. Found at: build/circa
        Debug filename ends with _d, as in: circa_d
-       On Windows the filename is: circa.exe
+       On Windows the suffix is .exe, as in: circa.exe
 
     unit_tests
-     - Unit testing app. Found at: build/circa_test
+     - Unit testing app, tests internal functions. Creates: build/circa_test
 
 Example commands:
 
   make static_lib config=release 
    - Build static library in release mode
+
+# Testing #
+
+  0. Build everything with 'debug' config.
+  1. Run build/circa_d and verify the help text is shown
+  2. Run tools/ca-tests.py
+  3. Run build/circa_test
 
 # Advanced building #
 
@@ -44,17 +49,22 @@ This section has more detail on the build process, if you plan on hacking on the
 code or doing alternative builds.
 
   Prebuild
-    The script at tools/prebuild.py serves to create some generated C++ files
-    at src/generated/* . This script should be run whenever a file is created
-    or deleted, but it can be skipped when doing repeated builds.
+    The python script at tools/ca-prebuild.py serves to create some generated C++
+    files located at src/generated. The resulting files are checked in to source
+    control, so the project can be built without running this script.
+
+    This script needs to be rerun whenever a cpp file is added or removed from
+    /src/functions or /src/types.
 
   Makefiles
-    The makefiles are generated using a premake4 script. More info at:
+    The makefiles are generated using premake4. More info on this tool at:
         http://industriousone.com/premake
 
-    Whenever a source file is added or removed, the makefiles should be
-    regenerated using "premake4 gmake". The makefiles are checked in to Git,
-    so that people can download & make without using premake4.
+    The resulting generated makefiles are checked in to source control, so
+    that users can build without needing premake4.
 
-    premake4 is pretty awesome and supports lots of project types (like visual
-    studio or Xcode), if you are interested in something other than makefiles.
+    Makefiles need to be regenerated whenever a cpp file is added or removed from /src
+    To regenerate the makefiles, run "premake4 gmake".
+
+    Premake4 is pretty awesome and supports lots of project types (like visual
+    studio or Xcode projects), if you are interested in something other than makefiles.
