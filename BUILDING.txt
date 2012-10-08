@@ -54,7 +54,8 @@ code or doing alternative builds.
     control, so the project can be built without running this script.
 
     This script needs to be rerun whenever a cpp file is added or removed from
-    /src/functions or /src/types.
+    /src/functions or /src/types. It also needs to be run when /src/ca/stdlib.ca
+    is changed.
 
   Makefiles
     The makefiles are generated using premake4. More info on this tool at:

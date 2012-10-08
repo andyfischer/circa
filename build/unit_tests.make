@@ -64,16 +64,16 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/branch.o \
-	$(OBJDIR)/c_objects.o \
-	$(OBJDIR)/cascading.o \
-	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/compound_type.o \
-	$(OBJDIR)/framework.o \
 	$(OBJDIR)/interpreter.o \
-	$(OBJDIR)/main.o \
+	$(OBJDIR)/cascading.o \
 	$(OBJDIR)/migration.o \
+	$(OBJDIR)/main.o \
+	$(OBJDIR)/code_iterators.o \
+	$(OBJDIR)/framework.o \
+	$(OBJDIR)/c_objects.o \
 	$(OBJDIR)/tokenizer.o \
+	$(OBJDIR)/branch.o \
 
 RESOURCES := \
 
@@ -134,34 +134,34 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/branch.o: ../tests/internal/branch.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/c_objects.o: ../tests/internal/c_objects.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/cascading.o: ../tests/internal/cascading.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/code_iterators.o: ../tests/internal/code_iterators.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/compound_type.o: ../tests/internal/compound_type.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/framework.o: ../tests/internal/framework.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/interpreter.o: ../tests/internal/interpreter.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/main.o: ../tests/internal/main.cpp
+$(OBJDIR)/cascading.o: ../tests/internal/cascading.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/migration.o: ../tests/internal/migration.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/main.o: ../tests/internal/main.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/code_iterators.o: ../tests/internal/code_iterators.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/framework.o: ../tests/internal/framework.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/c_objects.o: ../tests/internal/c_objects.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tokenizer.o: ../tests/internal/tokenizer.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/branch.o: ../tests/internal/branch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 

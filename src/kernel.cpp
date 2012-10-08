@@ -106,6 +106,9 @@ BuiltinTypes TYPES;
 Value TrueValue;
 Value FalseValue;
 
+List g_oracleValues;
+List g_spyValues;
+
 namespace cppbuild_function { void build_module(caStack*); }
 
 Type* output_placeholder_specializeType(Term* caller)
@@ -710,6 +713,42 @@ void ref_setup_type(Type* type)
     type->hashFunc = ref_hashFunc;
 }
 
+// Spy & oracle
+void test_spy_clear()
+{
+    set_list(&g_spyValues, 0);
+}
+List* test_spy_get_results()
+{
+    return &g_spyValues;
+}
+void test_oracle_clear()
+{
+    set_list(&g_oracleValues, 0);
+}
+void test_oracle_send(caValue* value)
+{
+    copy(value, list_append(&g_oracleValues));
+}
+void test_oracle_send(int i)
+{
+    set_int(list_append(&g_oracleValues), i);
+}
+void test_oracle(caStack* stack)
+{
+    if (g_oracleValues.length() == 0)
+        set_null(circa_output(stack, 0));
+    else {
+        copy(g_oracleValues[0], circa_output(stack, 0));
+        g_oracleValues.remove(0);
+    }
+}
+
+void test_spy(caStack* stack)
+{
+    copy(circa_input(stack, 0), g_spyValues.append());
+}
+
 void bootstrap_kernel()
 {
     // Initialize global type objects
@@ -954,6 +993,8 @@ void bootstrap_kernel()
         {"to_string_repr", to_string_repr},
         {"call_actor", call_actor_func},
         {"send", send_func},
+        {"test_spy", test_spy},
+        {"test_oracle", test_oracle},
         {"refactor:rename", refactor__rename},
         {"refactor:change_function", refactor__change_function},
         {"reflect:this_branch", reflect__this_branch},

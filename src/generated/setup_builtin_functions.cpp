@@ -1,7 +1,7 @@
 
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-// This file is generated during the build process by prebuild.py .
+// This file is generated during the build process by ca-prebuild.py .
 // You should probably not edit this file manually.
 
 #include "../common_headers.h"

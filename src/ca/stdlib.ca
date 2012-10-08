@@ -32,6 +32,14 @@ def actor_run_message(Actor actor, any msg)
     b = actor.branch
     dynamic_call(b, msg)
 
+def test_oracle() -> any
+    -- For internal testing. This function will output values that are manually
+    -- inserted with the c++ function oracle_send.
+
+def test_spy(any)
+    -- For internal testing. This function will save inputs to a global list which
+    -- can be easily examined from C++ code.
+
 type Mutable;
 def Mutable.set(self, any val)
 def Mutable.get(self) -> any

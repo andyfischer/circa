@@ -60,8 +60,6 @@ Stack* alloc_stack(World* world)
 {
     Stack* stack = new Stack();
     stack->world = world;
-    initialize_null(&stack->registers);
-    set_list(&stack->registers, 0);
     return stack;
 }
 
@@ -70,11 +68,6 @@ void eval_context_list_references(CircaObject* object, GCReferenceList* list, GC
     // todo
 }
 
-void eval_context_setup_type(Type* type)
-{
-    type->name = name_from_string("Stack");
-    type->gcListReferences = eval_context_list_references;
-}
 
 static Frame* frame_by_id(Stack* stack, int id)
 {
@@ -915,11 +908,14 @@ void print_error_stack(Stack* stack, std::ostream& out)
 
 void update_context_to_latest_branches(Stack* stack)
 {
+    // Starting at the top frame, check each frame in the stack to make sure it still
+    // matches the original branch.
     Frame* frame = top_frame(stack);
 
     while (true) {
+        // Resize frame->registers if needed.
         if (get_frame_register_count(frame) != get_locals_count(frame->branch))
-            internal_error("Trouble: branch locals count doesn't match frame");
+            list_resize(&frame->registers, get_locals_count(frame->branch));
 
         if (frame->parent == 0)
             return;
@@ -1783,6 +1779,12 @@ void Interpreter__frames(caStack* callerStack)
         Frame* frame = frame_by_id(self, as_int(list_get(&stackTrace, i)));
         set_frame_ref(circa_index(out, i), self, frame);
     }
+}
+
+void eval_context_setup_type(Type* type)
+{
+    type->name = name_from_string("Stack");
+    type->gcListReferences = eval_context_list_references;
 }
 
 void interpreter_install_functions(Branch* kernel)

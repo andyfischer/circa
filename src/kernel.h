@@ -163,14 +163,6 @@ namespace copy_function {
     CA_FUNCTION(evaluate);
 }
 
-namespace internal_debug_function {
-    void oracle_clear();
-    void oracle_send(caValue* value);
-    void oracle_send(int i);
-    void spy_clear();
-    List* spy_results();
-}
-
 namespace file_changed_function {
     bool check(Stack*, Term* caller, caValue* fileSignature,
             std::string const& filename);
@@ -195,6 +187,13 @@ namespace return_function {
 namespace value_function {
     CA_FUNCTION(evaluate);
 }
+
+// Interact with special debugging functions test_spy() and test_oracle()
+void test_spy_clear();
+List* test_spy_get_results();
+void test_oracle_clear();
+void test_oracle_send(caValue* value);
+void test_oracle_send(int i);
 
 void install_standard_library(Branch* kernel);
 

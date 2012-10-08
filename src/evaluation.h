@@ -66,9 +66,6 @@ struct Stack
     FrameId firstFreeFrame;
     FrameId lastFreeFrame;
 
-    // Register values. Each Frame owns a section of this list.
-    List registers;
-
     // Whether the interpreter is currently running. Set to false when an error occurs
     // or when the branch is completed.
     bool running;
@@ -94,7 +91,46 @@ private:
 // Allocate a new Stack object.
 Stack* alloc_stack(World* world);
 
-void eval_context_setup_type(Type* type);
+// *** High-level Stack manipulation ***
+
+// Access the stack.
+Frame* top_frame(Stack* stack);
+Frame* top_frame_parent(Stack* stack);
+Branch* top_branch(Stack* stack);
+
+// Retrieve the frame with the given depth, this function is O(n).
+Frame* frame_by_depth(Stack* stack, int depth);
+
+// Parse input and immediately evaluate it, returning the result value.
+caValue* evaluate(Stack* stack, Branch* branch, std::string const& input);
+caValue* evaluate(Branch* branch, Term* function, List* inputs);
+caValue* evaluate(Term* function, List* inputs);
+
+// Run the interpreter.
+void run_interpreter(Stack* stack);
+void run_interpreter_step(Stack* stack);
+void run_interpreter_steps(Stack* stack, int steps);
+
+// Evaluate a single term. Deprecated.
+void evaluate_single_term(Stack* stack, Term* term);
+void evaluate_branch(Stack* stack, Branch* branch);
+
+// Evaluate only the terms between 'start' and 'end'.
+void evaluate_range(Stack* stack, Branch* branch, int start, int end);
+
+// Evaluate 'term' and every term that it depends on. 
+void evaluate_minimum(Stack* stack, Term* term, caValue* result);
+
+// Returns whether evaluation has been interrupted, such as with a 'return' or
+// 'break' statement, or a runtime error.
+bool error_occurred(Stack* stack);
+
+void clear_error(Stack* cxt);
+
+// Reset a Stack to its default value.
+void reset_stack(Stack* stack);
+
+// *** Mid-level Stack manipulation ***
 
 // Push a frame onto the stack.
 Frame* push_frame(Stack* stack, Branch* branch);
@@ -116,35 +152,9 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs);
 // standard way to finish a frame, such as when 'return' is called.
 void finish_frame(Stack* stack);
 
-void reset_stack(Stack* stack);
-
 // Stack expansions. These are frames which aren't on the current trace.
 Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);
-
-// Access the stack.
-Frame* top_frame(Stack* stack);
-Frame* top_frame_parent(Stack* stack);
-Branch* top_branch(Stack* stack);
-
-// Retrieve the frame with the given depth, this function is O(n).
-Frame* frame_by_depth(Stack* stack, int depth);
-
-// Evaluate a single term. Deprecated.
-void evaluate_single_term(Stack* stack, Term* term);
-
-void evaluate_branch(Stack* stack, Branch* branch);
-
-// Evaluate only the terms between 'start' and 'end'.
-void evaluate_range(Stack* stack, Branch* branch, int start, int end);
-
-// Evaluate 'term' and every term that it depends on.
-void evaluate_minimum(Stack* stack, Term* term, caValue* result);
-
-// Parse input and immediately evaluate it, returning the result value.
-caValue* evaluate(Stack* stack, Branch* branch, std::string const& input);
-caValue* evaluate(Branch* branch, Term* function, List* inputs);
-caValue* evaluate(Term* function, List* inputs);
-
+// Functions used by eval functions.
 caValue* get_input(Stack* stack, int index);
 caValue* find_stack_value_for_term(Stack* stack, Term* term, int stackDelta);
 void consume_input(Stack* stack, Term* term, caValue* dest);
@@ -173,24 +183,17 @@ void create_output(Stack* stack);
 
 // Signal that a runtime error has occurred.
 void raise_error(Stack* stack);
-
 void raise_error_msg(Stack* stack, const char* msg);
-
-// Returns whether evaluation has been interrupted, such as with a 'return' or
-// 'break' statement, or a runtime error.
-bool error_occurred(Stack* stack);
-
-void clear_error(Stack* cxt);
 
 void print_stack(Stack* stack, std::ostream& out);
 void print_error_stack(Stack* stack, std::ostream& out);
 
-void run_interpreter(Stack* stack);
-void run_interpreter_step(Stack* stack);
-void run_interpreter_steps(Stack* stack, int steps);
-
+// Update bytecode
 void write_term_bytecode(Term* term, caValue* output);
 void write_branch_bytecode(Branch* branch, caValue* output);
+
+// Setup the builtin Stack type.
+void eval_context_setup_type(Type* type);
 
 void interpreter_install_functions(Branch* branch);
 
