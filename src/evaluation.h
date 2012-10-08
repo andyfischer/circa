@@ -152,6 +152,9 @@ void fetch_stack_outputs(Stack* stack, caValue* outputs);
 // standard way to finish a frame, such as when 'return' is called.
 void finish_frame(Stack* stack);
 
+// Move the PC to the end of the frame.
+void frame_pc_move_to_end(Frame* frame);
+
 // Stack expansions. These are frames which aren't on the current trace.
 Frame* stack_expand_call(Stack* stack, Frame* frame, Term* term);
 // Functions used by eval functions.

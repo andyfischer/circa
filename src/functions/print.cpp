@@ -17,6 +17,8 @@ namespace print_function {
                 std::cout << to_string(val);
         }
         std::cout << std::endl;
+
+        set_null(circa_output(_stack, 0));
     }
 
     void setup(Branch* kernel)

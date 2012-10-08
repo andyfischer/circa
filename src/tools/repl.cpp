@@ -21,8 +21,7 @@ void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& 
 
     bool anyErrors = false;
 
-    int resultIndex = -1;
-
+    // Check if this new expression created any errors.
     for (int i=previousHead; i < newHead; i++) {
         Term* result = branch->get(i);
 
@@ -33,25 +32,23 @@ void repl_evaluate_line(Stack* context, std::string const& input, std::ostream& 
             anyErrors = true;
             break;
         }
+    }
 
-        Frame* frame = top_frame(context);
-        frame->pc = i;
-        frame->nextPc = i;
-        run_interpreter(context);
+    // Run the stack to the new end of the branch.
 
-        if (error_occurred(context)) {
-            output << "error: ";
-            print_error_stack(context, std::cout);
-            anyErrors = true;
-            break;
-        }
+    Frame* frame = top_frame(context);
+    run_interpreter(context);
 
-        resultIndex = i;
+    if (error_occurred(context)) {
+        output << "error: ";
+        print_error_stack(context, std::cout);
+        anyErrors = true;
+        frame_pc_move_to_end(frame);
     }
 
     // Print results of the last expression
-    if (!anyErrors && resultIndex != -1) {
-        Term* result = branch->get(resultIndex);
+    if (!anyErrors) {
+        Term* result = branch->get(branch->length() - 1);
         if (result->type != as_type(VOID_TYPE)) {
             output << to_string(find_stack_value_for_term(context, result, 0)) << std::endl;
         }

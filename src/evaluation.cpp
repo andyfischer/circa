@@ -439,6 +439,12 @@ void finish_frame(Stack* stack)
     newTop->pc = newTop->nextPc;
 }
 
+void frame_pc_move_to_end(Frame* frame)
+{
+    frame->pc = frame->branch->length() - 1;
+    frame->nextPc = frame->branch->length();
+}
+
 Frame* top_frame(Stack* stack)
 {
     if (stack->top == 0)
