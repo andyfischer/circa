@@ -196,7 +196,12 @@ Type* function_get_input_type(Function* func, int index)
     bool varArgs = function_has_variable_args(func);
     if (varArgs)
         index = 0;
-    return function_get_input_placeholder(func, index)->type;
+
+    Term* placeholder = function_get_input_placeholder(func, index);
+    if (placeholder == NULL)
+        return NULL;
+
+    return placeholder->type;
 }
 
 Type* function_get_output_type(Term* function, int index)
