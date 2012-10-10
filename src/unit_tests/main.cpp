@@ -1,24 +1,12 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "common_headers.h"
+#include "unit_test_common.h"
 
-#include "branch.h"
 #include "evaluation.h"
-#include "heap_debugging.h"
 #include "inspection.h"
-#include "kernel.h"
 #include "source_repro.h"
 #include "static_checking.h"
 #include "string_type.h"
-#include "names.h"
-#include "parser.h"
-#include "tagged_value.h"
-#include "term.h"
-#include "type.h"
-
-#include "framework.h"
-
-namespace circa {
 
 std::vector<TestCase> gTestCases;
 
@@ -347,4 +335,29 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
     }
 }
 
+int main(int argc, char** argv)
+{
+    void branch_register_tests();
+    void c_objects_register_tests();
+    void cascading_register_tests();
+    void code_iterators_register_tests();
+    void compound_type_register_tests();
+    void interpreter_register_tests();
+    void migration_register_tests();
+    void tokenizer_register_tests();
+
+    branch_register_tests();
+    cascading_register_tests();
+    c_objects_register_tests();
+    code_iterators_register_tests();
+    compound_type_register_tests();
+    interpreter_register_tests();
+    migration_register_tests();
+    tokenizer_register_tests();
+
+    caWorld* world = circa_initialize();
+
+    run_all_tests();
+
+    circa_shutdown(world);
 }

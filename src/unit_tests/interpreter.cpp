@@ -1,14 +1,12 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "framework.h"
+#include "unit_test_common.h"
 
 #include "branch.h"
 #include "evaluation.h"
 #include "kernel.h"
 #include "function.h"
 #include "type.h"
-
-using namespace circa;
 
 namespace interpreter {
 

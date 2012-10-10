@@ -1,11 +1,8 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "common_headers.h"
+#include "unit_test_common.h"
 
-#include "framework.h"
 #include "token.h"
-
-using namespace circa;
 
 namespace tokenizer_tests {
 

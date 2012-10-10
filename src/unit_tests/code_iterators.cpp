@@ -1,12 +1,10 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "framework.h"
+#include "unit_test_common.h"
 
 #include "branch.h"
 #include "code_iterators.h"
 #include "debug.h"
-
-using namespace circa;
 
 namespace code_iterators {
 

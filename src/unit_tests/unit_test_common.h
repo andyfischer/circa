@@ -1,12 +1,11 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-// testing.cpp : A mini-framework for running unit tests.
-
 #pragma once
 
+#include "circa/circa.h"
 #include "term.h"
 
-namespace circa {
+using namespace circa;
 
 void test_assert_function(bool condition, int line, const char* file);
 void test_assert_function(Term* term, int line, const char* file);
@@ -70,5 +69,3 @@ void declare_current_test_failed();
 bool current_test_has_failed();
 
 void test_branch_as_assertions_list(Branch* branch, std::string const& contextStr);
-
-} // namespace circa

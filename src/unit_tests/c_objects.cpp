@@ -1,12 +1,10 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "framework.h"
-#include "object.h"
+#include "unit_test_common.h"
 
-#include "type.h"
 #include "evaluation.h"
-
-using namespace circa;
+#include "object.h"
+#include "type.h"
 
 namespace c_objects {
 

@@ -1,15 +1,11 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include "circa/circa.h"
+#include "unit_test_common.h"
 
-#include "framework.h"
-
-#include "../../src/branch.h"
-#include "../../src/building.h"
-#include "../../src/modules.h"
-#include "../../src/reflection.h"
-
-using namespace circa;
+#include "branch.h"
+#include "building.h"
+#include "modules.h"
+#include "reflection.h"
 
 void translate_terms()
 {

@@ -55,9 +55,9 @@ solution "Circa"
 
     project "unit_tests"
         kind "ConsoleApp"
-        targetname "circa_test"
+        targetname "circa_tests"
         targetdir "build"
         location "build"
-        files {"tests/internal/*.cpp"}
+        files {"src/unit_tests/*.cpp"}
         includedirs {"src"}
         links {"static_lib"}
