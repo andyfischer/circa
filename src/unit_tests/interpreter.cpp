@@ -63,10 +63,10 @@ void run_branch_after_additions()
     test_equals(test_spy_get_results(), "[4, 8]");
 }
 
-} // namespace interpreter
-
-void interpreter_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(interpreter::test_cast_first_inputs);
     REGISTER_TEST_CASE(interpreter::run_branch_after_additions);
 }
+
+} // namespace interpreter

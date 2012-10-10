@@ -7,6 +7,8 @@
 #include "modules.h"
 #include "reflection.h"
 
+namespace migration {
+
 void translate_terms()
 {
     Branch branch1;
@@ -41,8 +43,10 @@ void update_references()
     test_assert(call->function == library2.get("f"));
 }
 
-void migration_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(translate_terms);
     REGISTER_TEST_CASE(update_references);
+}
+
 }

@@ -27,9 +27,9 @@ void test_rename()
     test_assert(d->input(1) == c);
 }
 
-} // namespace cascading
-
-void cascading_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(cascading::test_rename);
 }
+
+} // namespace cascading

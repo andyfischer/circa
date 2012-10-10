@@ -28,6 +28,12 @@ void dump(Branch* branch)
 {
     print_branch(std::cout, branch);
 }
+void dump_bytecode(Branch* branch)
+{
+    RawOutputPrefs prefs;
+    prefs.showBytecode = true;
+    print_branch(std::cout, branch, &prefs);
+}
 
 void dump_with_props(Branch& branch)
 {

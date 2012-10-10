@@ -335,25 +335,25 @@ void test_branch_as_assertions_list(Branch* branch, std::string const& contextSt
     }
 }
 
+namespace branch { void register_tests(); }
+namespace c_objects { void register_tests(); }
+namespace code_iterators { void register_tests(); }
+namespace compound_type { void register_tests(); }
+namespace interpreter { void register_tests(); }
+namespace migration { void register_tests(); }
+namespace native_modules { void register_tests(); }
+namespace tokenizer { void register_tests(); }
+
 int main(int argc, char** argv)
 {
-    void branch_register_tests();
-    void c_objects_register_tests();
-    void cascading_register_tests();
-    void code_iterators_register_tests();
-    void compound_type_register_tests();
-    void interpreter_register_tests();
-    void migration_register_tests();
-    void tokenizer_register_tests();
-
-    branch_register_tests();
-    cascading_register_tests();
-    c_objects_register_tests();
-    code_iterators_register_tests();
-    compound_type_register_tests();
-    interpreter_register_tests();
-    migration_register_tests();
-    tokenizer_register_tests();
+    branch::register_tests();
+    c_objects::register_tests();
+    code_iterators::register_tests();
+    compound_type::register_tests();
+    interpreter::register_tests();
+    migration::register_tests();
+    native_modules::register_tests();
+    tokenizer::register_tests();
 
     caWorld* world = circa_initialize();
 

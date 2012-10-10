@@ -51,11 +51,11 @@ void name_visible_iterator_1()
     test_assert(it.finished());
 }
 
-} // namespace code_iterators
-
-void code_iterators_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(code_iterators::branch_iterator_2);
     REGISTER_TEST_CASE(code_iterators::branch_iterator_2_2);
     REGISTER_TEST_CASE(code_iterators::name_visible_iterator_1);
 }
+
+} // namespace code_iterators

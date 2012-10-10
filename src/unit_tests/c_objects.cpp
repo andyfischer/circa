@@ -120,10 +120,10 @@ void test_type_not_prematurely_used()
     test_assert(myCompoundType->inUse);
 }
 
-} // namespace c_objects
-
-void c_objects_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(c_objects::test_custom_object);
     REGISTER_TEST_CASE(c_objects::test_type_not_prematurely_used);
 }
+
+} // namespace c_objects

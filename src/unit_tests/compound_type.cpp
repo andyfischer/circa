@@ -6,7 +6,7 @@
 #include "list.h"
 #include "type.h"
 
-using namespace circa;
+namespace compound_type {
 
 void build_compound_type()
 {
@@ -26,7 +26,9 @@ void build_compound_type()
     test_assert(compound_type_get_field_type(type, 1) == &INT_T);
 }
 
-void compound_type_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(build_compound_type);
+}
+
 }

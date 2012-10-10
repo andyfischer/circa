@@ -66,6 +66,7 @@ endif
 OBJECTS := \
 	$(OBJDIR)/compound_type.o \
 	$(OBJDIR)/interpreter.o \
+	$(OBJDIR)/native_modules.o \
 	$(OBJDIR)/cascading.o \
 	$(OBJDIR)/migration.o \
 	$(OBJDIR)/main.o \
@@ -137,6 +138,9 @@ $(OBJDIR)/compound_type.o: ../src/unit_tests/compound_type.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/interpreter.o: ../src/unit_tests/interpreter.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/native_modules.o: ../src/unit_tests/native_modules.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/cascading.o: ../src/unit_tests/cascading.cpp

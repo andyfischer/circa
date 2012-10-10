@@ -23,9 +23,9 @@ void test_state_type()
     test_equals(&branch.stateType->parameter, "[[<Type any>, <Type any>], ['a', 'b']]");
 }
 
-} // namespace branch
-
-void branch_register_tests()
+void register_tests()
 {
     REGISTER_TEST_CASE(branch::test_state_type);
+}
+
 }
