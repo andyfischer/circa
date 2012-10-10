@@ -180,8 +180,6 @@ void rewrite_branch(Branch* branch, caValue* contents, caValue* reply)
     clear_branch(branch);
     parser::compile(branch, parser::statement_list, as_cstring(contents));
 
-    post_module_load(branch);
-
     if (has_static_errors(branch)) {
         std::stringstream errors;
         print_static_errors_formatted(branch);

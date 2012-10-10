@@ -18,5 +18,6 @@ void module_patch_function(NativeModule* module, const char* name, EvaluateFunc 
 
 void module_manually_patch_branch(NativeModule* module, Branch* branch);
 
-} // namespace circa
+void module_on_loaded_branch(Branch* branch);
 
+} // namespace circa

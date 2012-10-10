@@ -81,6 +81,8 @@ const char* STDLIB_CA_TEXT =
     "-- Load a module from a file.\n"
     "def load_module(String filename) -> Branch\n"
     "\n"
+    "def load_native_patch(String filename)\n"
+    "\n"
     "-- Metaprogramming on Branch\n"
     "def branch_ref(any branch :ignore_error) -> Branch\n"
     "    -- Obtain a Branch ref from an expression.\n"

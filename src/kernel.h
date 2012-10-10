@@ -67,6 +67,7 @@ struct BuiltinFuncs {
     Term* length;
     Term* list;
     Term* list_append;
+    Term* load_native_patch;
     Term* load_script;
     Term* loop_index;
     Term* loop_iterator;

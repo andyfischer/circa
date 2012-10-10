@@ -21,6 +21,8 @@
 
 namespace circa {
 
+World* g_world = NULL;
+
 struct LoadedDll
 {
     void* module;
@@ -29,6 +31,12 @@ struct LoadedDll
 World* alloc_world()
 {
     World* world = (World*) malloc(sizeof(*world));
+
+    // Currently, only one world is allowed per-process. This restriction might be removed.
+    if (g_world != NULL)
+        internal_error("Can't call alloc_world twice in same process.");
+
+    g_world = world;
 
     world->nativeModuleWorld = create_native_module_world();
 
@@ -41,6 +49,11 @@ World* alloc_world()
     set_list(&world->looseModules, 0);
 
     return world;
+}
+
+World* global_world()
+{
+    return g_world;
 }
 
 ListData* find_actor(World* world, const char* name)

@@ -11,6 +11,7 @@
 #include "native_modules.h"
 #include "term.h"
 #include "update_cascades.h"
+#include "world.h"
 
 namespace circa {
 
@@ -90,4 +91,18 @@ void module_manually_patch_branch(NativeModule* module, Branch* branch)
         dirty_bytecode(branch);
 }
 
+void module_on_loaded_branch(Branch* branch)
+{
+    // Search the script for calls to load_native_patch.
+    
+    // Apply any existing patches.
+    World* world = global_world();
+}
+
 } // namespace circa
+
+// Public functions
+void circa_module_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func)
+{
+    circa::module_patch_function(module, name, func);
+}

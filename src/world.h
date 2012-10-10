@@ -21,6 +21,10 @@ protected:
 };
 
 World* alloc_world();
+
+// Fetch the current global world.
+World* global_world();
+
 void actor_send_message(ListData* actor, caValue* message);
 void actor_run_message(caStack* stack, ListData* actor, caValue* message);
 ListData* find_actor(World* world, const char* name);

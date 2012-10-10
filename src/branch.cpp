@@ -15,6 +15,7 @@
 #include "importing_macros.h"
 #include "inspection.h"
 #include "list.h"
+#include "native_modules.h"
 #include "parser.h"
 #include "stateful_code.h"
 #include "source_repro.h"
@@ -588,15 +589,9 @@ Name load_script(Branch* branch, const char* filename)
 
     parser::compile(branch, parser::statement_list, as_cstring(&contents));
 
-    post_module_load(branch);
+    module_on_loaded_branch(branch);
 
     return name_Success;
-}
-
-void post_module_load(Branch* branch)
-{
-    // Post-load steps
-    dll_loading_check_for_patches_on_loaded_branch(branch);
 }
 
 Branch* include_script(Branch* branch, const char* filename)

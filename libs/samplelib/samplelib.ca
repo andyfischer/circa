@@ -1,9 +1,9 @@
 
 sys:dll_patch()
 
-def sample_a() -> string
+def sample_b() -> string
     return 'a not patched'
 
 namespace ns
-    def b() -> string
-        return 'ns:b not patched'
+    def sample_b() -> string
+        return 'ns:sample_b not patched'

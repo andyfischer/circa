@@ -26,6 +26,7 @@ namespace circa {
     struct Stack;
     struct Type;
     struct World;
+    struct NativeModule;
 }
 
 // a Stack holds the interpreter's current state, including a list of frames (activation
@@ -40,11 +41,14 @@ typedef circa::Type caType;
 // World that is used across the program.
 typedef circa::World caWorld;
 
+typedef circa::NativeModule caNativeModule;
+
 #else
 
 typedef struct caStack caStack;
 typedef struct caType caType;
 typedef struct caWorld caWorld;
+typedef struct caNativeModule caNativeModule;
 
 #endif
 
@@ -126,7 +130,6 @@ typedef struct caTerm
     protected: caTerm() {} // Disallow C++ construction of this type.
 #endif
 } caTerm;
-
 
 // a Function holds data for a single Circa function, including a name, the function's
 // definition (stored as a Branch), and various other metadata. Each Function has an
@@ -507,6 +510,10 @@ void circa_setup_int_type(caType* type);
 
 // Configure a Circa type so that each value holds an opaque pointer.
 void circa_setup_pointer_type(caType* type);
+
+// -- Native Module support --
+
+void circa_module_patch_function(caNativeModule* module, const char* name, caEvaluateFunc func);
 
 // -- Debugging Helpers --
 

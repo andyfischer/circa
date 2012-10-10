@@ -1,25 +1,23 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-#include <circa.h>
-#include <importing_macros.h>
-
-using namespace circa;
+#include <circa/circa.h>
 
 extern "C" {
 
-void on_load(Branch* branch)
+void sample_a(caStack* stack)
 {
-    std::cout << "Called on_load in sampledll" << std::endl;
+    circa_set_string(circa_output(stack, 0), "patched sample_a");
 }
 
-CA_FUNCTION(sample_a)
+void sample_b(caStack* stack)
 {
-    set_string(OUTPUT, "patched function a()");
+    circa_set_string(circa_output(stack, 0), "patched sample_b");
 }
 
-CA_FUNCTION(ns__b)
+void circa_module_load(caNativeModule* module)
 {
-    set_string(OUTPUT, "patched function b()");
+    circa_module_patch_function(module, "sample_a", sample_a);
+    circa_module_patch_function(module, "ns::sample_b", sample_b);
 }
 
 } // extern "C"

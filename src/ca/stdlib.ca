@@ -74,6 +74,8 @@ namespace sys
 -- Load a module from a file.
 def load_module(String filename) -> Branch
 
+def load_native_patch(String filename)
+
 -- Metaprogramming on Branch
 def branch_ref(any branch :ignore_error) -> Branch
     -- Obtain a Branch ref from an expression.
