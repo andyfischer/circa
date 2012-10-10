@@ -9,6 +9,7 @@
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
+#include "native_modules.h"
 #include "source_repro.h"
 #include "stateful_code.h"
 #include "string_type.h"
@@ -18,6 +19,7 @@
 #include "token.h"
 #include "type.h"
 #include "update_cascades.h"
+#include "world.h"
 
 namespace circa {
 
@@ -80,6 +82,11 @@ Branch* function_contents(Term* func)
 Branch* function_contents(Function* func)
 {
     return nested_contents(func->declaringTerm);
+}
+
+Function* get_function_from_branch(Branch* branch)
+{
+    return as_function(branch->owningTerm);
 }
 
 std::string get_placeholder_name_for_index(int index)
@@ -156,6 +163,10 @@ void finish_building_function(Branch* contents)
     }
 
     update_exit_points(contents);
+
+    // Possibly apply a native patch.
+    module_apply_patches_to_function(global_world(), contents);
+
     branch_finish_changes(contents);
 }
 

@@ -64,6 +64,7 @@ namespace function_t {
 bool is_function_attrs(Term* term);
 Branch* function_contents(Term* func);
 Branch* function_contents(Function* func);
+Function* get_function_from_branch(Branch* branch);
 
 // Return the placeholder name for the given input index; this is the name that
 // is used if no name is given.

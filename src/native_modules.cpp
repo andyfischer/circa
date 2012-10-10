@@ -48,6 +48,26 @@ void free_native_module(NativeModule* module)
     delete module;
 }
 
+NativeModule* add_native_module(World* world, Name name)
+{
+    NativeModuleWorld* moduleWorld = world->nativeModuleWorld;
+
+    // Return existing module, if it exists.
+    std::map<Name, NativeModule*>::const_iterator it = moduleWorld->nativeModules.find(name);
+    if (it != moduleWorld->nativeModules.end())
+        return it->second;
+
+    // Create module.
+    NativeModule* module = create_native_module();
+    moduleWorld->nativeModules[name] = module;
+    return module;
+}
+
+void delete_native_module(World* world, Name name)
+{
+    world->nativeModuleWorld->nativeModules.erase(name);
+}
+
 EvaluateFunc module_find_patch_for_name(NativeModule* module, Name name)
 {
     std::map<Name, EvaluateFunc>::const_iterator it = module->patches.find(name);
@@ -89,6 +109,14 @@ void module_manually_patch_branch(NativeModule* module, Branch* branch)
 
     if (anyTouched)
         dirty_bytecode(branch);
+}
+
+void module_apply_patches_to_function(World* world, Branch* functionBranch)
+{
+    Term* term = functionBranch->owningTerm;
+    Function* function = as_function(term);
+
+    // TODO
 }
 
 void module_on_loaded_branch(Branch* branch)

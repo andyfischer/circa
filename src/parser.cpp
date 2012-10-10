@@ -653,6 +653,7 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
 
     if (!tokens.nextIs(tok_RParen))
         return compile_error_for_line(result, tokens, startPosition);
+
     tokens.consume(tok_RParen);
 
     // Another optional list of symbols
@@ -693,17 +694,12 @@ ParseResult function_decl(Branch* branch, TokenStream& tokens, ParserCxt* contex
     Term* primaryOutput = append_output_placeholder(contents, NULL);
     change_declared_type(primaryOutput, as_type(outputType));
 
-    // If we're out of tokens, then stop here. This behavior is used when declaring builtins.
-    if (tokens.finished()) {
-        finish_building_function(contents);
-        return ParseResult(result);
-    }
+    // Consume contents, if there are still tokens left. It's okay to reach EOF here, this
+    // behavior is used when declaring some builtins.
+    if (!tokens.finished())
+        consume_branch(contents, tokens, context);
 
-    // If we reach this point then the function will be a subroutine.
-
-    // Parse subroutine contents.
-    consume_branch(contents, tokens, context);
-
+    // Finish up
     finish_building_function(contents);
 
     ca_assert(is_value(result));
