@@ -35,10 +35,6 @@ Function::Function()
     staticTypeQuery(NULL),
     onCreateCall(NULL),
     postInputChange(NULL),
-    getOutputCount(NULL),
-    getOutputName(NULL),
-    getOutputType(NULL),
-    assignRegisters(NULL),
     postCompile(NULL)
 {
     gc_register_new_object((CircaObject*) this, &FUNCTION_T, true);
@@ -348,12 +344,7 @@ const char* get_output_name(Term* term, int outputIndex)
     if (attrs == NULL)
         return "";
 
-    Function::GetOutputName getOutputName = attrs->getOutputName;
-
-    if (getOutputName != NULL)
-        return getOutputName(term, outputIndex);
-
-    // Default behavior, if the call is rebinding an input name, then use that name.
+    // If the call is rebinding an input name, then use that name.
     Term* outputPlaceholder = function_get_output_placeholder(attrs, outputIndex);
     int rebindsInput = outputPlaceholder->intProp("rebindsInput", -1);
     

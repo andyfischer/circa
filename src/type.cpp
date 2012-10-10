@@ -162,15 +162,6 @@ Type* get_output_type(Term* term, int outputIndex)
     if (term->function == NULL)
         return &ANY_T;
 
-    Function* attrs = as_function(term->function);
-
-    Function::GetOutputType getOutputType = NULL;
-    if (attrs != NULL)
-        getOutputType = attrs->getOutputType;
-
-    if (getOutputType != NULL)
-        return getOutputType(term, outputIndex);
-
     return function_get_output_type(term->function, outputIndex);
 }
 

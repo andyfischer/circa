@@ -41,10 +41,6 @@ struct Function
     StaticTypeQueryFunc staticTypeQuery;
     OnCreateCall onCreateCall;
     PostInputChange postInputChange;
-    GetOutputCount getOutputCount;
-    GetOutputName getOutputName;
-    GetOutputType getOutputType;
-    AssignRegisters assignRegisters;
     PostCompile postCompile;
 
     List parameters;
