@@ -524,7 +524,7 @@ float to_float(caValue* value)
     else if (is_float(value))
         return as_float(value);
     else
-        throw std::runtime_error("In to_float, type is not an int or float");
+        internal_error("In to_float, type is not an int or float");
 }
 
 int to_int(caValue* value)
@@ -534,7 +534,7 @@ int to_int(caValue* value)
     else if (is_float(value))
         return (int) as_float(value);
     else
-        throw std::runtime_error("In to_float, type is not an int or float");
+        internal_error("In to_float, type is not an int or float");
 }
 
 caName leading_name(caValue* value)
@@ -544,17 +544,6 @@ caName leading_name(caValue* value)
     if (is_list(value))
         return leading_name(list_get(value, 0));
     return name_None;
-}
-
-void set_transient_value(caValue* value, void* data, Type* type)
-{
-    set_null(value);
-    value->value_data.ptr = data;
-    value->value_type = type;
-}
-void cleanup_transient_value(caValue* value)
-{
-    initialize_null(value);
 }
 
 } // namespace circa

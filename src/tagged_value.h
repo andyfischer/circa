@@ -137,11 +137,4 @@ int to_int(caValue* value);
 // Returns name_None if a name value was not found.
 caName leading_name(caValue* value);
 
-// A 'transient' value is a tagged value that is not initialized/released by the
-// type. When the caller is finished with it, it must be set to null using
-// cleanup_transient_value(). The caller must guarantee that the value will stay
-// valid in between these two calls.
-void set_transient_value(caValue* value, void* v, Type* t);
-void cleanup_transient_value(caValue* value);
-
 } // namespace circa
