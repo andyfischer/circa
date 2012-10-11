@@ -39,9 +39,6 @@ void world_initialize(World* world)
     set_list(&world->actorList, 0);
 
     world->actorStack = circa_alloc_stack(world);
-
-    initialize_null(&world->looseModules);
-    set_list(&world->looseModules, 0);
 }
 
 ListData* find_actor(World* world, const char* name)
@@ -142,13 +139,6 @@ int actor_run_queue(caStack* stack, ListData* actor, int maxMessages)
     return count;
 }
 
-Branch* create_loose_module(caWorld* world)
-{
-    Branch* branch = alloc_branch_gc();
-    set_branch(list_append(&world->looseModules), branch);
-    return branch;
-}
-
 void update_branch_after_module_reload(Branch* target, Branch* oldBranch, Branch* newBranch)
 {
     // Noop if the target is our new branch
@@ -168,13 +158,6 @@ void update_world_after_module_reload(caWorld* world, Branch* oldBranch, Branch*
         if (term->function == FUNCS.imported_file) {
             update_branch_after_module_reload(term->nestedContents, oldBranch, newBranch);
         }
-    }
-
-    // Update references in loose modules
-    for (int i=0; i < list_length(&world->looseModules); i++) {
-        caValue* container = list_get(&world->looseModules, i);
-        Branch* existing = as_branch(container);
-        update_branch_after_module_reload(existing, oldBranch, newBranch);
     }
 
     // Update top-level state
@@ -200,19 +183,6 @@ void refresh_all_modules(caWorld* world)
 
                 update_world_after_module_reload(world, existing, latest);
             }
-        }
-    }
-
-    // Iterate over loose modules
-    for (int i=0; i < list_length(&world->looseModules); i++) {
-        caValue* container = list_get(&world->looseModules, i);
-        Branch* existing = as_branch(container);
-        Branch* latest = load_latest_branch(existing);
-
-        if (existing != latest) {
-            set_branch(container, latest);
-
-            update_world_after_module_reload(world, existing, latest);
         }
     }
 }
