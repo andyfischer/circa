@@ -1067,7 +1067,7 @@ void bootstrap_kernel()
     FUNCS.dynamic_call = kernel->get("dynamic_call");
     FUNCS.branch_dynamic_call = kernel->get("Branch.call");
     FUNCS.length = kernel->get("length");
-    FUNCS.load_native_patch = kernel->get("load_native_patch");
+    FUNCS.native_patch = kernel->get("native_patch");
     FUNCS.not_func = kernel->get("not");
     FUNCS.type = kernel->get("type");
     FUNCS.output_explicit = kernel->get("output");

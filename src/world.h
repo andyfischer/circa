@@ -4,8 +4,6 @@
 
 namespace circa {
 
-struct LoadedDll;
-
 struct World {
 
     Branch* root;
@@ -14,6 +12,7 @@ struct World {
     caStack* actorStack;
 
     NativeModuleWorld* nativeModuleWorld;
+    FileWatchWorld* fileWatchWorld;
 
 protected:
     // Disallow C++ construction

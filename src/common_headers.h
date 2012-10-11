@@ -45,6 +45,8 @@ struct Dict;
 struct Frame;
 struct Stack;
 struct FeedbackOperation;
+struct FileWatch;
+struct FileWatchWorld;
 struct Function;
 struct GCReferenceList;
 struct List;

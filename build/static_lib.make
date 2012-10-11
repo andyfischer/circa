@@ -99,6 +99,7 @@ OBJECTS := \
 	$(OBJDIR)/weak_ptrs.o \
 	$(OBJDIR)/control_flow.o \
 	$(OBJDIR)/string_type.o \
+	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/world.o \
 	$(OBJDIR)/token.o \
 	$(OBJDIR)/importing.o \
@@ -281,6 +282,9 @@ $(OBJDIR)/control_flow.o: ../src/control_flow.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/string_type.o: ../src/string_type.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/file_watch.o: ../src/file_watch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/world.o: ../src/world.cpp

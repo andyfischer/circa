@@ -8,6 +8,7 @@
 #include "building.h"
 #include "code_iterators.h"
 #include "evaluation.h"
+#include "file_watch.h"
 #include "kernel.h"
 #include "inspection.h"
 #include "list.h"
@@ -21,11 +22,6 @@
 
 namespace circa {
 
-struct LoadedDll
-{
-    void* module;
-};
-
 World* create_world()
 {
     return global_world();
@@ -34,6 +30,7 @@ World* create_world()
 void world_initialize(World* world)
 {
     world->nativeModuleWorld = create_native_module_world();
+    world->fileWatchWorld = create_file_watch_world();
 
     initialize_null(&world->actorList);
     set_list(&world->actorList, 0);

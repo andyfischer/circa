@@ -143,9 +143,11 @@ void module_apply_patches_to_function(World* world, Branch* functionBranch)
 
 void module_on_loaded_branch(Branch* branch)
 {
-    // Search the script for calls to load_native_patch.
+    // Search the script for calls to native_patch.
+    // TODO
     
     // Apply any existing patches.
+    // TODO
     World* world = global_world();
 }
 
