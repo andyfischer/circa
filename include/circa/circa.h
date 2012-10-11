@@ -245,8 +245,7 @@ caValue* circa_output(caStack* stack, int index);
 // circa_set_XXX functions.
 caValue* circa_create_default_output(caStack* stack, int index);
 
-// Fetch the caller Term, this is the Term that owns the branch which is currently
-// at the top of the stack.
+// Fetch the caller Term, this is the term whose function is currently being evaluated.
 caTerm* circa_caller_term(caStack* stack);
 
 // Fetch the Branch that holds the caller Term.

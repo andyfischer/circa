@@ -7,9 +7,10 @@
 namespace circa {
 namespace rpath_function {
 
-    CA_FUNCTION(rpath)
+    void rpath(caStack* stack)
     {
-        circa_get_path_relative_to_source((caTerm*) CALLER, INPUT(0), OUTPUT);
+        caBranch* branch = circa_caller_branch(stack);
+        circa_get_path_relative_to_source(branch, circa_input(stack, 0), circa_output(stack, 0));
     }
 
     void setup(Branch* kernel)

@@ -6,6 +6,7 @@
 #include <map>
 
 #include "branch.h"
+#include "file_utils.h"
 #include "function.h"
 #include "kernel.h"
 #include "names.h"
@@ -144,7 +145,18 @@ void module_apply_patches_to_function(World* world, Branch* functionBranch)
 void module_on_loaded_branch(Branch* branch)
 {
     // Search the script for calls to native_patch.
-    // TODO
+    for (int i=0; i < branch->length(); i++) {
+        Term* term = branch->get(i);
+        if (term->function != FUNCS.native_patch)
+            continue;
+
+        // Load the native module.
+        Value filename;
+        circa_get_path_relative_to_source(branch, term_value(term->input(0)), &filename);
+
+        Value fileWatchAction;
+
+    }
     
     // Apply any existing patches.
     // TODO

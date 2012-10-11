@@ -3,9 +3,13 @@
 /**
  * file_watch.h
  *
- * A 'file watch' is an object that is responsible for 'watching' a single file.
- * Each object has a list of actions. When the file is modified, we run the stored
- * actions.
+ * A FileWatch is an object that is responsible for 'watching' a single file. A watched
+ * file is one that is actively being used by the runtime. Each FileWatch also stores
+ * a list of actions, of things that should be done when the file is modified.
+ *
+ * The FileWatch system is a flexible way for the runtime to instantly react whenever a
+ * relevant file is modified. This is used to instantly reload script files, native
+ * modules, or other things.
  */
 
 namespace circa {
