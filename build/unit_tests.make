@@ -70,8 +70,10 @@ OBJECTS := \
 	$(OBJDIR)/cascading.o \
 	$(OBJDIR)/migration.o \
 	$(OBJDIR)/main.o \
+	$(OBJDIR)/fakefs.o \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/c_objects.o \
+	$(OBJDIR)/file_watch.o \
 	$(OBJDIR)/tokenizer.o \
 	$(OBJDIR)/branch.o \
 
@@ -152,10 +154,16 @@ $(OBJDIR)/migration.o: ../src/unit_tests/migration.cpp
 $(OBJDIR)/main.o: ../src/unit_tests/main.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/fakefs.o: ../src/unit_tests/fakefs.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/code_iterators.o: ../src/unit_tests/code_iterators.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_objects.o: ../src/unit_tests/c_objects.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/file_watch.o: ../src/unit_tests/file_watch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/tokenizer.o: ../src/unit_tests/tokenizer.cpp

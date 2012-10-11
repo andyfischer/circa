@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include "circa/file.h"
 
+#include "fakefs.h"
 #include "list.h"
 #include "string_type.h"
 #include "tagged_value.h"
@@ -53,16 +54,22 @@ static CachedFile* create_file_entry(const char* filename)
 
 static void update_version_from_mtime(CachedFile* entry)
 {
-    struct stat s;
-    s.st_mtime = 0;
+    unsigned mtime = 0;
 
-    ca_assert(entry != NULL);
-    ca_assert(entry->filename != NULL);
+    if (fakefs_enabled()) {
+        mtime = fakefs_get_mtime(entry->filename);
+    } else {
+        struct stat s;
+        s.st_mtime = 0;
 
-    stat(entry->filename, &s);
+        ca_assert(entry != NULL);
+        ca_assert(entry->filename != NULL);
 
-    if (entry->last_known_mtime != s.st_mtime) {
-        entry->last_known_mtime = s.st_mtime;
+        stat(entry->filename, &s);
+    }
+
+    if (entry->last_known_mtime != mtime) {
+        entry->last_known_mtime = mtime;
         entry->version++;
         entry->needs_fread = true;
     }
@@ -70,6 +77,9 @@ static void update_version_from_mtime(CachedFile* entry)
 
 void circa_read_file(const char* filename, caValue* contentsOut)
 {
+    if (fakefs_enabled())
+        return fakefs_read_file(filename, contentsOut);
+    
     CachedFile* entry = create_file_entry(filename);
     update_version_from_mtime(entry);
 
@@ -106,6 +116,9 @@ void circa_read_file(const char* filename, caValue* contentsOut)
 
 bool circa_file_exists(const char* filename)
 {
+    if (fakefs_enabled())
+        return fakefs_file_exists(filename);
+
     FILE* fp = fopen(filename, "r");
     if (fp == NULL)
         return false;

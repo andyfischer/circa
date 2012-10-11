@@ -92,6 +92,7 @@ OBJECTS := \
 	$(OBJDIR)/list.o \
 	$(OBJDIR)/parser.o \
 	$(OBJDIR)/heap_debugging.o \
+	$(OBJDIR)/fakefs.o \
 	$(OBJDIR)/code_iterators.o \
 	$(OBJDIR)/reflection.o \
 	$(OBJDIR)/file_utils.o \
@@ -261,6 +262,9 @@ $(OBJDIR)/parser.o: ../src/parser.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/heap_debugging.o: ../src/heap_debugging.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/fakefs.o: ../src/fakefs.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/code_iterators.o: ../src/code_iterators.cpp

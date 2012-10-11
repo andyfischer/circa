@@ -339,6 +339,8 @@ namespace branch { void register_tests(); }
 namespace c_objects { void register_tests(); }
 namespace code_iterators { void register_tests(); }
 namespace compound_type { void register_tests(); }
+namespace fakefs { void register_tests(); }
+namespace file_watch { void register_tests(); }
 namespace interpreter { void register_tests(); }
 namespace migration { void register_tests(); }
 namespace native_modules { void register_tests(); }
@@ -350,6 +352,8 @@ int main(int argc, char** argv)
     c_objects::register_tests();
     code_iterators::register_tests();
     compound_type::register_tests();
+    fakefs::register_tests();
+    file_watch::register_tests();
     interpreter::register_tests();
     migration::register_tests();
     native_modules::register_tests();

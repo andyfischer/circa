@@ -12,6 +12,8 @@
  * modules, or other things.
  */
 
+#pragma once
+
 namespace circa {
 
 struct FileWatchWorld;
