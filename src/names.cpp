@@ -106,7 +106,7 @@ Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupTy
         return NULL;
 
     if (branch == NULL) {
-        branch = KERNEL;
+        branch = global_root_branch();
     }
 
     INCREMENT_STAT(BranchNameLookups);
@@ -118,7 +118,7 @@ Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupTy
     // Name not found in this branch.
 
     // Don't continue the search if this is the kernel
-    if (branch == KERNEL)
+    if (branch == global_root_branch())
         return NULL;
 
     // Search parent
@@ -182,7 +182,7 @@ bool exposes_nested_names(Term* term)
 
 Term* get_global(Name name)
 {
-    return find_name(KERNEL, name);
+    return find_name(global_root_branch(), name);
 }
 
 Term* get_global(const char* name)
@@ -192,14 +192,14 @@ Term* get_global(const char* name)
 
 Branch* get_parent_branch(Branch* branch)
 {
-    if (branch == KERNEL)
+    if (branch == global_root_branch())
         return NULL;
 
     if (branch->owningTerm == NULL)
-        return KERNEL;
+        return global_root_branch();
 
     if (branch->owningTerm->owningBranch == NULL)
-        return KERNEL;
+        return global_root_branch();
 
     return branch->owningTerm->owningBranch;
 }
@@ -245,10 +245,10 @@ Branch* find_first_common_branch(Term* left, Term* right)
     if (rightParent == NULL) return NULL;
 
     // Walk upwards from left term.
-    while (leftParent != NULL && leftParent != KERNEL) {
+    while (leftParent != NULL && leftParent != global_root_branch()) {
 
         // Walk upwards from right term.
-        while (rightParent != NULL && leftParent != KERNEL) {
+        while (rightParent != NULL && leftParent != global_root_branch()) {
             if (leftParent == rightParent)
                 return leftParent;
 
@@ -321,7 +321,7 @@ std::string get_relative_name(Branch* branch, Term* term)
 std::string get_relative_name_at(Term* location, Term* term)
 {
     if (location == NULL)
-        return get_relative_name(KERNEL, term);
+        return get_relative_name(global_root_branch(), term);
 
     if (location->owningBranch == NULL)
         return term->name;
@@ -418,7 +418,7 @@ bool find_global_name(Term* term, std::string& name)
     while (true) {
         stack.push_back(searchTerm);
 
-        if (searchTerm->owningBranch == kernel())
+        if (searchTerm->owningBranch == global_root_branch())
             break;
 
         searchTerm = get_parent_term(searchTerm);
@@ -466,7 +466,7 @@ Term* find_term_from_global_name_recr(Branch* searchBranch, const char* name)
 
 Term* find_term_from_global_name(const char* name)
 {
-    Branch* searchBranch = kernel();
+    Branch* searchBranch = global_root_branch();
     return find_term_from_global_name_recr(searchBranch, name);
 }
 

@@ -152,7 +152,8 @@ extern bool STATIC_INITIALIZATION_FINISHED;
 extern bool FINISHED_BOOTSTRAP;
 extern bool SHUTTING_DOWN;
 
-Branch* kernel();
+World* global_world();
+Branch* global_root_branch();
 
 void empty_evaluate_function(Term* caller);
 

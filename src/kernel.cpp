@@ -48,7 +48,7 @@
 
 namespace circa {
 
-Branch* KERNEL = NULL;
+World* g_world = NULL;
 
 // STDLIB_CA_TEXT is defined in generated/stdlib_script_text.cpp
 extern "C" {
@@ -242,7 +242,7 @@ void reflect__this_branch(caStack* stack)
 
 void reflect__kernel(caStack* stack)
 {
-    set_branch(circa_output(stack, 0), kernel());
+    set_branch(circa_output(stack, 0), global_root_branch());
 }
 
 void sys__module_search_paths(caStack* stack)
@@ -679,9 +679,14 @@ std::string stackVariable_toString(caValue* value)
     return strm.str();
 }
 
-Branch* kernel()
+World* global_world()
 {
-    return KERNEL;
+    return g_world;
+}
+
+Branch* global_root_branch()
+{
+    return global_world()->root;
 }
 
 std::string ref_toString(caValue* val)
@@ -751,6 +756,9 @@ void test_spy(caStack* stack)
 
 void bootstrap_kernel()
 {
+    // Create global World.
+    g_world = (World*) malloc(sizeof(*g_world));
+
     // Initialize global type objects
     null_t::setup_type(&NULL_T);
     bool_t::setup_type(&BOOL_T);
@@ -768,11 +776,9 @@ void bootstrap_kernel()
     eval_context_setup_type(&EVAL_CONTEXT_T);
     string_setup_type(&ERROR_T); // errors are just stored as strings for now
 
-    // Create the very first code building blocks. These elements need to be in place
-    // before we can parse code in the proper way.
-
-    KERNEL = new Branch();
-    Branch* kernel = KERNEL;
+    // Create root Branch.
+    g_world->root = new Branch();
+    Branch* kernel = g_world->root;
 
     // Create value function
     Term* valueFunc = kernel->appendNew();
@@ -832,6 +838,9 @@ void bootstrap_kernel()
     OPAQUE_POINTER_TYPE = create_type_value(kernel, &OPAQUE_POINTER_T, "opaque_pointer");
     create_type_value(kernel, &BRANCH_T, "Branch");
 
+    // Finish initializing World (this requires List type)
+    world_initialize(g_world);
+
     // Setup output_placeholder() function, needed to declare functions properly.
     FUNCS.output = create_value(kernel, &FUNCTION_T, "output_placeholder");
     function_t::initialize(&FUNCTION_T, term_value(FUNCS.output));
@@ -864,11 +873,11 @@ void bootstrap_kernel()
     // Setup declare_field() function, needed to represent compound types.
     FUNCS.declare_field = import_function(kernel, NULL, "declare_field() -> any");
 
+    FINISHED_BOOTSTRAP = true;
+
     // Set up some global constants
     set_bool(&TrueValue, true);
     set_bool(&FalseValue, false);
-
-    FINISHED_BOOTSTRAP = true;
 
     // Initialize a few more types
     Term* set_type = create_value(kernel, &TYPE_T, "Set");
@@ -974,7 +983,7 @@ void bootstrap_kernel()
     create_function_vectorized_vs(function_contents(div_s), FUNCS.div, &LIST_T, &ANY_T);
 
     // Need dynamic_method before any hosted functions
-    FUNCS.dynamic_method = import_function(KERNEL, dynamic_method_call,
+    FUNCS.dynamic_method = import_function(kernel, dynamic_method_call,
             "def dynamic_method(any inputs :multiple) -> any");
 
     // Load the standard library from stdlib.ca
@@ -1092,7 +1101,9 @@ EXPORT caWorld* circa_initialize()
 
     bootstrap_kernel();
 
-    Branch* kernel = KERNEL;
+    caWorld* world = create_world();
+
+    Branch* kernel = global_root_branch();
 
     // Make sure there are no static errors in the kernel. This shouldn't happen.
     if (has_static_errors(kernel)) {
@@ -1100,8 +1111,6 @@ EXPORT caWorld* circa_initialize()
         print_static_errors_formatted(kernel, std::cout);
         internal_error("circa fatal: static errors found in kernel");
     }
-
-    caWorld* world = alloc_world();
 
     // Load library paths from CIRCA_LIB_PATH
     const char* libPathEnv = getenv("CIRCA_LIB_PATH");
@@ -1142,8 +1151,8 @@ EXPORT void circa_shutdown(caWorld* world)
     clear_type_contents(&TYPE_T);
     clear_type_contents(&VOID_T);
 
-    delete KERNEL;
-    KERNEL = NULL;
+    delete world->root;
+    world->root = NULL;
 
     memset(&FUNCS, 0, sizeof(FUNCS));
 
@@ -1160,7 +1169,7 @@ EXPORT void circa_shutdown(caWorld* world)
 
 using namespace circa;
 
-caBranch* circa_kernel(caWorld*)
+caBranch* circa_kernel(caWorld* world)
 {
-    return KERNEL;
+    return world->root;
 }

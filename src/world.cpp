@@ -21,23 +21,18 @@
 
 namespace circa {
 
-World* g_world = NULL;
-
 struct LoadedDll
 {
     void* module;
 };
 
-World* alloc_world()
+World* create_world()
 {
-    World* world = (World*) malloc(sizeof(*world));
+    return global_world();
+}
 
-    // Currently, only one world is allowed per-process. This restriction might be removed.
-    if (g_world != NULL)
-        internal_error("Can't call alloc_world twice in same process.");
-
-    g_world = world;
-
+void world_initialize(World* world)
+{
     world->nativeModuleWorld = create_native_module_world();
 
     initialize_null(&world->actorList);
@@ -47,13 +42,6 @@ World* alloc_world()
 
     initialize_null(&world->looseModules);
     set_list(&world->looseModules, 0);
-
-    return world;
-}
-
-World* global_world()
-{
-    return g_world;
 }
 
 ListData* find_actor(World* world, const char* name)
@@ -175,7 +163,7 @@ void update_branch_after_module_reload(Branch* target, Branch* oldBranch, Branch
 void update_world_after_module_reload(caWorld* world, Branch* oldBranch, Branch* newBranch)
 {
     // Update references in every module
-    for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
+    for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.imported_file) {
             update_branch_after_module_reload(term->nestedContents, oldBranch, newBranch);
@@ -200,7 +188,7 @@ void update_world_after_module_reload(caWorld* world, Branch* oldBranch, Branch*
 void refresh_all_modules(caWorld* world)
 {
     // Iterate over top-level modules
-    for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
+    for (BranchIteratorFlat it(world->root); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.imported_file) {
             

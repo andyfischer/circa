@@ -608,7 +608,7 @@ void list_names_that_this_branch_rebinds(Branch* branch, std::vector<std::string
             continue;
 
         // Ignore global terms
-        if (outer->owningBranch == KERNEL)
+        if (outer->owningBranch == global_root_branch())
             continue;
 
         // Ignore terms that are just a simple copy

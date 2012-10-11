@@ -7,6 +7,9 @@ namespace circa {
 struct LoadedDll;
 
 struct World {
+
+    Branch* root;
+
     circa::Value actorList;
     caStack* actorStack;
 
@@ -20,10 +23,8 @@ protected:
     ~World();
 };
 
-World* alloc_world();
-
-// Fetch the current global world.
-World* global_world();
+World* create_world();
+void world_initialize(World* world);
 
 void actor_send_message(ListData* actor, caValue* message);
 void actor_run_message(caStack* stack, ListData* actor, caValue* message);

@@ -7,6 +7,7 @@
 
 #include "branch.h"
 #include "function.h"
+#include "kernel.h"
 #include "names.h"
 #include "native_modules.h"
 #include "term.h"
@@ -23,7 +24,7 @@ struct NativeModuleWorld
 struct NativeModule
 {
     std::map<Name, EvaluateFunc> patches;
-    Name affectsNamespace;
+    Name namespaceRoot;
 
     // If this module was loaded from a DLL or shared object, that object is here.
     // May be NULL if the module was created a different way.
@@ -39,7 +40,7 @@ NativeModule* create_native_module()
 {
     NativeModule* module = new NativeModule();
     module->dll = NULL;
-    module->affectsNamespace = name_None;
+    module->namespaceRoot = name_None;
     return module;
 }
 

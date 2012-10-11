@@ -37,7 +37,7 @@ void modules_add_search_path(const char* str)
 
 Branch* find_loaded_module(const char* name)
 {
-    for (BranchIteratorFlat it(kernel()); it.unfinished(); it.advance()) {
+    for (BranchIteratorFlat it(global_root_branch()); it.unfinished(); it.advance()) {
         Term* term = it.current();
         if (term->function == FUNCS.imported_file && term->name == name)
             return nested_contents(term);
@@ -47,7 +47,7 @@ Branch* find_loaded_module(const char* name)
 
 Branch* load_module_from_file(const char* module_name, const char* filename)
 {
-    Term* import = apply(kernel(), FUNCS.imported_file, TermList(), name_from_string(module_name));
+    Term* import = apply(global_root_branch(), FUNCS.imported_file, TermList(), name_from_string(module_name));
     load_script(nested_contents(import), filename);
     return nested_contents(import);
 }
@@ -119,8 +119,8 @@ Branch* load_module(const char* module_name, Term* loadCall)
 Branch* find_module_from_filename(const char* filename)
 {
     // O(n) search for a module with this filename. Could stand to be more efficient.
-    for (int i=0; i < kernel()->length(); i++) {
-        Term* term = kernel()->get(i);
+    for (int i=0; i < global_root_branch()->length(); i++) {
+        Term* term = global_root_branch()->get(i);
         if (term->nestedContents == NULL)
             continue;
 
