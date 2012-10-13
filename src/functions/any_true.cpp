@@ -5,9 +5,9 @@
 namespace circa {
 namespace any_true_function {
 
-    CA_FUNCTION(any_true)
+    void any_true(caStack* stack)
     {
-        caValue* input = INPUT(0);
+        caValue* input = circa_input(stack, 0);
 
         int numElements = list_length(input);
 
@@ -18,7 +18,7 @@ namespace any_true_function {
                 break;
             }
 
-        set_bool(OUTPUT, result);
+        set_bool(circa_output(stack, 0), result);
     }
 
     void setup(Branch* kernel)

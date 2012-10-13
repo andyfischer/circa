@@ -5,26 +5,24 @@
 namespace circa {
 namespace concat_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(concat, "concat(any :multiple) -> String;"
-            "'Concatenate each input (converting to a string if necessary).'")
+    void concat(caStack* stack)
     {
-        caValue* args = circa_input(STACK, 0);
+        caValue* args = circa_input(stack, 0);
         std::stringstream out;
-        for (int index=0; index < circa_count(args); index++) {
+        for (int index=0; index < list_length(args); index++) {
             caValue* v = circa_index(args, index);
             if (is_string(v))
                 out << as_string(v);
             else
                 out << to_string(v);
         }
-        set_string(OUTPUT, out.str());
+        set_string(circa_output(stack, 0), out.str());
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, concat, "concat(any :multiple) -> String;"
+            "'Concatenate each input (converting to a string if necessary).'");
     }
 }
 }

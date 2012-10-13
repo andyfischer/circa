@@ -2143,7 +2143,7 @@ ParseResult literal_color(Branch* branch, TokenStream& tokens, ParserCxt* contex
     text = text.substr(1, text.length()-1);
 
     Term* resultTerm = create_value(branch, TYPES.color);
-    List* result = List::checkCast(term_value(resultTerm));
+    caValue* result = term_value(resultTerm);
 
     float r = 0;
     float g = 0;

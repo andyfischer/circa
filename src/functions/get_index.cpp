@@ -5,28 +5,26 @@
 namespace circa {
 namespace get_index_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(get_index, "get_index(Indexable, int) -> any")
+    void hosted_get_index(caStack* stack)
     {
-        int index = as_int(INPUT(1));
+        int index = circa_int_input(stack, 1);
 
         if (index < 0) {
             char indexStr[40];
             sprintf(indexStr, "Negative index: %d", index);
-            return RAISE_ERROR(indexStr);
+            return circa_output_error(stack, indexStr);
         }
 
-        caValue* result = get_index(INPUT(0), index);
+        caValue* result = get_index(circa_input(stack, 0), index);
 
         if (result == NULL) {
             std::stringstream err;
             err << "Index out of range: " << index;
-            return RAISE_ERROR(err.str().c_str());
+            return circa_output_error(stack, err.str().c_str());
         }
 
-        copy(result, OUTPUT);
-        cast(OUTPUT, declared_type(CALLER));
+        copy(result, circa_output(stack, 0));
+        cast(circa_output(stack, 0), declared_type((Term*) circa_caller_term(stack)));
     }
     Type* specializeType(Term* term)
     {
@@ -48,8 +46,8 @@ namespace get_index_function {
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
-        FUNCS.get_index = kernel->get("get_index");
+        FUNCS.get_index = import_function(kernel, hosted_get_index,
+                "get_index(Indexable, int) -> any");
         as_function(FUNCS.get_index)->specializeType = specializeType;
         as_function(FUNCS.get_index)->formatSource = formatSource;
     }

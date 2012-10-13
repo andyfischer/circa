@@ -19,7 +19,7 @@ namespace circa {
 
 void append_static_error(List* errors, Term* term, const char* type)
 {
-    caValue* item = set_list(errors->append(), 3);
+    caValue* item = set_list(list_append(errors), 3);
     set_term_ref(list_get(item, 0), term);
     set_string(list_get(item, 1), type);
     set_int(list_get(item, 2), -1);
@@ -28,7 +28,7 @@ void append_static_error(List* errors, Term* term, const char* type)
 void append_static_error_for_input(List* errors, Term* term, const char* type,
         int inputIndex)
 {
-    caValue* item = set_list(errors->append(), 3);
+    caValue* item = set_list(list_append(errors), 3);
     set_term_ref(list_get(item, 0), term);
     set_string(list_get(item, 1), type);
     set_int(list_get(item, 2), inputIndex);
@@ -137,15 +137,14 @@ int count_static_errors(Branch* branch)
     update_static_error_list(branch);
     if (is_null(&branch->staticErrors))
         return 0;
-    return List::checkCast(&branch->staticErrors)->length();
+    return list_length(&branch->staticErrors);
 }
 
 void format_static_error(caValue* error, caValue* stringOutput)
 {
-    List* item = List::checkCast(error);
-    Term* term = as_term_ref(item->get(0));
-    const char* type = as_cstring(item->get(1));
-    int inputIndex = as_int(item->get(2));
+    Term* term = as_term_ref(list_get(error, 0));
+    const char* type = as_cstring(list_get(error, 1));
+    int inputIndex = as_int(list_get(error, 2));
 
     std::stringstream out;
     out << get_short_location(term) << " ";
@@ -201,9 +200,9 @@ void print_static_error(caValue* value, std::ostream& out)
     out << as_cstring(&str);
 }
 
-bool print_static_errors_formatted(List* result, std::ostream& out)
+bool print_static_errors_formatted(caValue* result, std::ostream& out)
 {
-    int count = result->length();
+    int count = list_length(result);
 
     if (count == 0)
         return false;
@@ -213,7 +212,7 @@ bool print_static_errors_formatted(List* result, std::ostream& out)
     out << ":\n";
 
     for (int i=0; i < count; i++) {
-        print_static_error(result->get(i), out);
+        print_static_error(list_get(result, i), out);
         out << std::endl;
     }
     return true;
@@ -233,7 +232,7 @@ bool print_static_errors_formatted(Branch* branch, std::ostream& out)
     update_static_error_list(branch);
     if (!is_list(&branch->staticErrors))
         return false;
-    return print_static_errors_formatted(List::checkCast(&branch->staticErrors), out);
+    return print_static_errors_formatted(&branch->staticErrors, out);
 }
 
 bool print_static_errors_formatted(Branch* branch)

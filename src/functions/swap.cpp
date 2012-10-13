@@ -5,17 +5,15 @@
 namespace circa {
 namespace swap_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(swap_func, "swap(any :out, any :out)")
+    void swap(caStack* stack)
     {
-        copy(INPUT(0), EXTRA_OUTPUT(1));
-        copy(INPUT(1), EXTRA_OUTPUT(0));
+        copy(circa_input(stack, 0), circa_output(stack, 2));
+        copy(circa_input(stack, 1), circa_output(stack, 1));
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, swap, "swap(any :out, any :out)");
     }
 }
 }

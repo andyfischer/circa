@@ -7,32 +7,34 @@
 namespace circa {
 namespace set_methods_function {
 
-    CA_FUNCTION(hosted_add)
+    void hosted_add(caStack* stack)
     {
-        copy(INPUT(0), EXTRA_OUTPUT(0));
-        List* output = List::checkCast(EXTRA_OUTPUT(0));
-        caValue* value = INPUT(1);
+        caValue* output = circa_output(stack, 1);
+        copy(circa_input(stack, 0), output);
+
+        caValue* value = circa_input(stack, 1);
         if (!set_t::contains(output, value))
-            copy(value, output->append());
+            copy(value, list_append(output));
     }
 
-    CA_FUNCTION(contains)
+    void contains(caStack* stack)
     {
-        List* list = List::checkCast(INPUT(0));
-        caValue* value = INPUT(1);
-        set_bool(OUTPUT, set_t::contains(list, value));
+        caValue* list = circa_input(stack, 0);
+        caValue* value = circa_input(stack, 1);
+        set_bool(circa_output(stack, 0), set_t::contains(list, value));
     }
 
-    CA_FUNCTION(remove)
+    void remove(caStack* stack)
     {
-        copy(INPUT(0), EXTRA_OUTPUT(0));
-        List* list = List::checkCast(EXTRA_OUTPUT(0));
-        caValue* value = INPUT(1);
+        caValue* output = circa_output(stack, 1);
+        copy(circa_input(stack, 0), output);
 
-        int numElements = list_length(list);
+        caValue* value = circa_input(stack, 1);
+
+        int numElements = list_length(output);
         for (int index=0; index < numElements; index++) {
-            if (equals(value, list_get(list, index))) {
-                list_remove_and_replace_with_last_element(list, index);
+            if (equals(value, list_get(output, index))) {
+                list_remove_and_replace_with_last_element(output, index);
                 return;
             }
         }

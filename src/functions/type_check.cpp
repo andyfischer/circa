@@ -5,39 +5,37 @@
 namespace circa {
 namespace type_check_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(is_list, "is_list(any) -> bool")
+    void hosted_is_list(caStack* stack)
     {
-        set_bool(OUTPUT, circa::is_list(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_list(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_int, "is_int(any) -> bool")
+    void hosted_is_int(caStack* stack)
     {
-        set_bool(OUTPUT, is_int(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_int(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_float, "is_float(any) -> bool")
+    void hosted_is_float(caStack* stack)
     {
-        set_bool(OUTPUT, is_float(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_float(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_bool, "is_bool(any) -> bool")
+    void hosted_is_bool(caStack* stack)
     {
-        set_bool(OUTPUT, is_bool(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_bool(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_string, "is_string(any) -> bool")
+    void hosted_is_string(caStack* stack)
     {
-        set_bool(OUTPUT, is_string(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_string(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_null, "is_null(any) -> bool")
+    void hosted_is_null(caStack* stack)
     {
-        set_bool(OUTPUT, is_null(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_null(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_function, "is_function(any) -> bool")
+    void hosted_is_function(caStack* stack)
     {
-        set_bool(OUTPUT, is_function(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_function(circa_input(stack, 0)));
     }
-    CA_DEFINE_FUNCTION(is_type, "is_type(any) -> bool")
+    void hosted_is_type(caStack* stack)
     {
-        set_bool(OUTPUT, is_type(INPUT(0)));
+        set_bool(circa_output(stack, 0), is_type(circa_input(stack, 0)));
     }
     void inputs_fit_function(caStack* stack)
     {
@@ -87,7 +85,15 @@ namespace type_check_function {
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, hosted_is_list, "is_list(any) -> bool");
+        import_function(kernel, hosted_is_int, "is_int(any) -> bool");
+        import_function(kernel, hosted_is_float, "is_float(any) -> bool");
+        import_function(kernel, hosted_is_bool, "is_bool(any) -> bool");
+        import_function(kernel, hosted_is_string, "is_string(any) -> bool");
+        import_function(kernel, hosted_is_null, "is_null(any) -> bool");
+        import_function(kernel, hosted_is_function, "is_function(any) -> bool");
+        import_function(kernel, hosted_is_type, "is_type(any) -> bool");
+
         FUNCS.inputs_fit_function = import_function(kernel, inputs_fit_function,
             "inputs_fit_function(List,Function) -> bool");
         FUNCS.overload_error_no_match = import_function(kernel,

@@ -5,9 +5,10 @@
 namespace circa {
 namespace namespace_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        push_frame(CONTEXT, nested_contents(CALLER));
+        Term* caller = (Term*) circa_caller_term(stack);
+        push_frame(stack, nested_contents(caller));
     }
 
     void format_source(caValue* source, Term* term)

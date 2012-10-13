@@ -5,20 +5,20 @@
 namespace circa {
 namespace add_function {
 
-    CA_FUNCTION(add_i_evaluate)
+    void add_i_evaluate(caStack* stack)
     {
-        int sum = circa_int_input(STACK, 0) + circa_int_input(STACK, 1);
-        set_int(circa_output(STACK, 0), sum);
+        int sum = circa_int_input(stack, 0) + circa_int_input(stack, 1);
+        set_int(circa_output(stack, 0), sum);
     }
 
-    CA_FUNCTION(add_f_evaluate)
+    void add_f_evaluate(caStack* stack)
     {
-        float sum = circa_float_input(STACK, 0) + circa_float_input(STACK, 1);
-        set_float(circa_output(STACK, 0), sum);
+        float sum = circa_float_input(stack, 0) + circa_float_input(stack, 1);
+        set_float(circa_output(stack, 0), sum);
     }
 
 #if 0
-    CA_FUNCTION(add_dynamic)
+    void add_dynamic(caStack* stack)
     {
         bool allInts = true;
         for (int i=0; i < NUM_INPUTS; i++) {
@@ -33,7 +33,7 @@ namespace add_function {
     }
 #endif
 
-    CA_FUNCTION(add_feedback)
+    void add_feedback(caStack* stack)
     {
         #if 0
         OLD_FEEDBACK_IMPL_DISABLED

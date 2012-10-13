@@ -109,7 +109,6 @@ const char* as_cstring(caValue* value);
 float       as_float(caValue* value);
 Function*   as_function(caValue* value);
 int         as_int(caValue* value);
-List*       as_list(caValue* value);
 void*       as_opaque_pointer(caValue* value);
 Type*       as_type(caValue* value);
 

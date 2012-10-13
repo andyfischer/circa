@@ -4,22 +4,21 @@
 
 namespace circa {
 namespace increment_function {
-    
-    CA_START_FUNCTIONS;
 
-    CA_DEFINE_FUNCTION(increment, "increment(int i) -> int")
+    void increment(caStack* stack)
     {
-        set_int(OUTPUT, INT_INPUT(0) + 1);
+        set_int(circa_output(stack, 0), circa_int_input(stack, 0) + 1);
     }
 
-    CA_DEFINE_FUNCTION(decrement, "decrement(int i) -> int")
+    void decrement(caStack* stack)
     {
-        set_int(OUTPUT, INT_INPUT(0) - 1);
+        set_int(circa_output(stack, 0), circa_int_input(stack, 0) - 1);
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, increment, "increment(int i) -> int");
+        import_function(kernel, decrement, "decrement(int i) -> int");
     }
 }
 }

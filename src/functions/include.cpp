@@ -31,28 +31,28 @@ namespace include_function {
         return false;
     }
 
-    CA_FUNCTION(evaluate_include)
+    void evaluate_include(caStack* stack)
     {
-        Stack* context = CONTEXT;
-        Branch* contents = nested_contents(CALLER);
+        Term* caller = (Term*) circa_caller_term(stack);
+        Branch* contents = nested_contents((Term*) caller);
 
-        bool fileChanged = load_script(CONTEXT, CALLER, STRING_INPUT(0));
+        bool fileChanged = load_script(stack, caller, circa_string_input(stack, 0));
 
-        if (error_occurred(CONTEXT))
+        if (error_occurred(stack))
             return;
 
         if (fileChanged && has_static_errors(contents)) {
             std::string msg = get_static_errors_formatted(contents);
-            return RAISE_ERROR(msg.c_str());
+            return circa_output_error(stack, msg.c_str());
         }
 
         // TODO: strip out state that isn't referenced any more.
 
-        set_branch(OUTPUT, contents);
+        set_branch(circa_output(stack, 0), contents);
 
         List inputs;
-        consume_inputs_to_list(context, &inputs);
-        push_frame_with_inputs(context, contents, &inputs);
+        consume_inputs_to_list(stack, &inputs);
+        push_frame_with_inputs(stack, contents, &inputs);
     }
     void include_post_compile(Term* term)
     {
@@ -63,11 +63,12 @@ namespace include_function {
         load_script(NULL, term, as_string(term_value(term->input(0))));
     }
 
-    CA_FUNCTION(load_script)
+    void load_script(caStack* stack)
     {
-        load_script(CONTEXT, CALLER, STRING_INPUT(0));
+        Term* caller = (Term*) circa_caller_term(stack);
+        load_script(stack, caller, circa_string_input(stack, 0));
 
-        set_branch(OUTPUT, CALLER->nestedContents);
+        set_branch(circa_output(stack, 0), caller->nestedContents);
     }
 
     void import_formatSource(caValue* source, Term* term)

@@ -468,10 +468,6 @@ Type* as_type(caValue* value)
     ca_assert(is_type(value));
     return (Type*) value->value_data.ptr;
 }
-List* as_list(caValue* value)
-{
-    return List::checkCast(value);
-}
 
 void* get_pointer(caValue* value)
 {
@@ -523,8 +519,9 @@ float to_float(caValue* value)
         return (float) as_int(value);
     else if (is_float(value))
         return as_float(value);
-    else
-        internal_error("In to_float, type is not an int or float");
+
+    internal_error("In to_float, type is not an int or float");
+    return 0.0;
 }
 
 int to_int(caValue* value)
@@ -533,8 +530,9 @@ int to_int(caValue* value)
         return as_int(value);
     else if (is_float(value))
         return (int) as_float(value);
-    else
-        internal_error("In to_float, type is not an int or float");
+
+    internal_error("In to_float, type is not an int or float");
+    return 0;
 }
 
 caName leading_name(caValue* value)

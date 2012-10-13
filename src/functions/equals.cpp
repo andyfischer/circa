@@ -5,21 +5,22 @@
 namespace circa {
 namespace equals_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(equals, "equals(any,any) -> bool")
+    void equals_func(caStack* stack)
     {
-        set_bool(OUTPUT, equals(INPUT(0), INPUT(1)));
+        set_bool(circa_output(stack, 0),
+                equals(circa_input(stack, 0), circa_input(stack, 1)));
     }
 
-    CA_DEFINE_FUNCTION(not_equals, "not_equals(any,any) -> bool")
+    void not_equals(caStack* stack)
     {
-        set_bool(OUTPUT, !equals(INPUT(0), INPUT(1)));
+        set_bool(circa_output(stack, 0),
+                !equals(circa_input(stack, 0), circa_input(stack, 1)));
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, equals_func, "equals(any,any) -> bool");
+        import_function(kernel, not_equals, "not_equals(any,any) -> bool");
     }
 }
 }

@@ -83,9 +83,9 @@ void branch_list_references(CircaObject* object, GCReferenceList* list, GCColor 
 std::string branch_to_string(caValue* val)
 {
     Branch* branch = as_branch(val);
-    if (branch == NULL)
+    if (branch == NULL) {
         return "Branch#null";
-    else {
+    } else {
         std::stringstream s;
         s << "Branch#";
         s << branch->id;
@@ -772,9 +772,9 @@ bool branch_check_invariants_print_result(Branch* branch, std::ostream& out)
         << std::endl;
 
     for (int i=0; i < list_length(&result); i++) {
-        List* error = List::checkCast(list_get(&result,i));
-        out << "[" << as_int(error->get(1)) << "] ";
-        out << as_cstring(error->get(2));
+        caValue* error = list_get(&result,i);
+        out << "[" << as_int(list_get(error, 1)) << "] ";
+        out << as_cstring(list_get(error, 2));
         out << std::endl;
     }
 

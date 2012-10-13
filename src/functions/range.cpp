@@ -5,20 +5,19 @@
 namespace circa {
 namespace range_function {
 
-    CA_FUNCTION(evaluate)
+    void evaluate(caStack* stack)
     {
-        int start = INT_INPUT(0);
-        int max = INT_INPUT(1);
+        int start = circa_int_input(stack, 0);
+        int max = circa_int_input(stack, 1);
 
         int count = abs(max-start);
-        set_list(OUTPUT);
-        List* list = List::checkCast(OUTPUT);
-        list->resize(count);
+        caValue* output = circa_output(stack, 0);
+        set_list(output, count);
 
         int val = start;
         int increment = start < max ? 1 : -1;
         for (int i=0; i < count; i++) {
-            set_int(list->get(i), val);
+            set_int(list_get(output, i), val);
             val += increment;
         }
     }

@@ -5,16 +5,14 @@
 namespace circa {
 namespace abs_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(abs, "abs(number n) -> number 'Absolute value'")
+    void abs(caStack* stack)
     {
-        set_float(OUTPUT, std::abs(FLOAT_INPUT(0)));
+        set_float(circa_output(stack, 0), std::abs(circa_float_input(stack, 0)));
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, abs, "abs(number n) -> number 'Absolute value'");
     }
 }
 }

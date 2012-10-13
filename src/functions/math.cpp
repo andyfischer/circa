@@ -7,40 +7,38 @@
 namespace circa {
 namespace math_function {
 
-    CA_START_FUNCTIONS;
-
-    CA_DEFINE_FUNCTION(max_f,
-            "max_f(number,number) -> number; 'Maximum of two numbers'")
+    void max_f(caStack* stack)
     {
-        set_float(OUTPUT, std::max(FLOAT_INPUT(0), FLOAT_INPUT(1)));
+        set_float(circa_output(stack, 0),
+                std::max(circa_float_input(stack, 0), circa_float_input(stack, 1)));
     }
 
-    CA_DEFINE_FUNCTION(max_i,
-            "max_i(int,int) -> int; 'Maximum of two integers'")
+    void max_i(caStack* stack)
     {
-        set_int(OUTPUT, std::max(INT_INPUT(0), INT_INPUT(1)));
+        set_int(circa_output(stack, 0),
+                std::max(circa_int_input(stack, 0), circa_int_input(stack, 1)));
     }
 
-    CA_DEFINE_FUNCTION(min_f,
-            "min_f(number,number) -> number; 'Minimum of two numbers'")
+    void min_f(caStack* stack)
     {
-        set_float(OUTPUT, std::min(FLOAT_INPUT(0), FLOAT_INPUT(1)));
+        set_float(circa_output(stack, 0),
+                std::min(circa_float_input(stack, 0), circa_float_input(stack, 1)));
     }
 
-    CA_DEFINE_FUNCTION(min_i,
-            "min_i(int,int) -> int; 'Minimum of two integers'")
+    void min_i(caStack* stack)
     {
-        set_int(OUTPUT, std::min(INT_INPUT(0), INT_INPUT(1)));
+        set_int(circa_output(stack, 0),
+                std::min(circa_int_input(stack, 0), circa_int_input(stack, 1)));
     }
 
-    CA_DEFINE_FUNCTION(remainder_i, "remainder_i(int,int) -> int")
+    void remainder_i(caStack* stack)
     {
-        set_int(OUTPUT, INT_INPUT(0) % INT_INPUT(1));
+        set_int(circa_output(stack, 0), circa_int_input(stack, 0) % circa_int_input(stack, 1));
     }
 
-    CA_DEFINE_FUNCTION(remainder_f, "remainder_f(number,number) -> number")
+    void remainder_f(caStack* stack)
     {
-        set_float(OUTPUT, fmodf(FLOAT_INPUT(0), FLOAT_INPUT(1)));
+        set_float(circa_output(stack, 0), fmodf(circa_float_input(stack, 0), circa_float_input(stack, 1)));
     }
 
     // We compute mod() using floored division. This is different than C and many
@@ -51,59 +49,55 @@ namespace math_function {
     // For a function that works the same as C's modulo, use remainder() . The % operator
     // also uses remainder(), so that it works the same as C's % operator.
 
-    CA_DEFINE_FUNCTION(mod_i, "mod_i(int,int) -> int")
+    void mod_i(caStack* stack)
     {
-        int a = INT_INPUT(0);
-        int n = INT_INPUT(1);
+        int a = circa_int_input(stack, 0);
+        int n = circa_int_input(stack, 1);
 
         int out = a % n;
         if (out < 0)
             out += n;
 
-        set_int(OUTPUT, out);
+        set_int(circa_output(stack, 0), out);
     }
 
-    CA_DEFINE_FUNCTION(mod_f, "mod_f(number,number) -> number")
+    void mod_f(caStack* stack)
     {
-        float a = FLOAT_INPUT(0);
-        float n = FLOAT_INPUT(1);
+        float a = circa_float_input(stack, 0);
+        float n = circa_float_input(stack, 1);
 
         float out = fmodf(a, n);
 
         if (out < 0)
             out += n;
 
-        set_float(OUTPUT, out);
+        set_float(circa_output(stack, 0), out);
     }
 
-    CA_DEFINE_FUNCTION(round, "round(number n) -> int;"
-        "'Return the integer that is closest to n'")
+    void round(caStack* stack)
     {
-        float input = FLOAT_INPUT(0);
+        float input = circa_float_input(stack, 0);
         if (input > 0.0)
-            set_int(OUTPUT, int(input + 0.5));
+            set_int(circa_output(stack, 0), int(input + 0.5));
         else
-            set_int(OUTPUT, int(input - 0.5));
+            set_int(circa_output(stack, 0), int(input - 0.5));
     }
 
-    CA_DEFINE_FUNCTION(floor, "floor(number n) -> int;"
-        "'Return the closest integer that is less than n'")
+    void floor(caStack* stack)
     {
-        set_int(OUTPUT, (int) std::floor(FLOAT_INPUT(0)));
+        set_int(circa_output(stack, 0), (int) std::floor(circa_float_input(stack, 0)));
     }
 
-    CA_DEFINE_FUNCTION(ceil, "ceil(number n) -> int;"
-        "'Return the closest integer that is greater than n'")
+    void ceil(caStack* stack)
     {
-        set_int(OUTPUT, (int) std::ceil(FLOAT_INPUT(0)));
+        set_int(circa_output(stack, 0), (int) std::ceil(circa_float_input(stack, 0)));
     }
 
-    CA_DEFINE_FUNCTION(average, "average(number :multiple) -> number;"
-                "'Returns the average of all inputs.'")
+    void average(caStack* stack)
     {
-        caValue* args = circa_input(STACK, 0);
+        caValue* args = circa_input(stack, 0);
         int count = circa_count(args);
-        caValue* out = circa_output(STACK, 0);
+        caValue* out = circa_output(stack, 0);
 
         if (count == 0) {
             set_float(out, 0);
@@ -117,35 +111,56 @@ namespace math_function {
         set_float(out, sum / count);
     }
 
-    CA_DEFINE_FUNCTION(pow, "pow(int i, int x) -> int; 'Returns i to the power of x'")
+    void pow(caStack* stack)
     {
-        set_int(OUTPUT, (int) std::pow((float) INT_INPUT(0), INT_INPUT(1)));
+        set_int(circa_output(stack, 0),
+                (int) std::pow((float) circa_int_input(stack, 0), circa_int_input(stack, 1)));
     }
 
-    CA_DEFINE_FUNCTION(sqr, "sqr(number) -> number; 'Square function'")
+    void sqr(caStack* stack)
     {
-        float in = FLOAT_INPUT(0);
-        set_float(OUTPUT, in * in);
+        float in = circa_float_input(stack, 0);
+        set_float(circa_output(stack, 0), in * in);
     }
-    CA_DEFINE_FUNCTION(cube, "cube(number) -> number; 'Cube function'")
+    void cube(caStack* stack)
     {
-        float in = FLOAT_INPUT(0);
-        set_float(OUTPUT, in * in * in);
-    }
-
-    CA_DEFINE_FUNCTION(sqrt, "sqrt(number) -> number; 'Square root'")
-    {
-        set_float(OUTPUT, std::sqrt(FLOAT_INPUT(0)));
+        float in = circa_float_input(stack, 0);
+        set_float(circa_output(stack, 0), in * in * in);
     }
 
-    CA_DEFINE_FUNCTION(log, "log(number) -> number; 'Natural log function'")
+    void sqrt(caStack* stack)
     {
-        set_float(OUTPUT, std::log(FLOAT_INPUT(0)));
+        set_float(circa_output(stack, 0), std::sqrt(circa_float_input(stack, 0)));
+    }
+
+    void log(caStack* stack)
+    {
+        set_float(circa_output(stack, 0), std::log(circa_float_input(stack, 0)));
     }
 
     void setup(Branch* kernel)
     {
-        CA_SETUP_FUNCTIONS(kernel);
+        import_function(kernel, max_f, "max_f(number,number) -> number; 'Maximum of two numbers'");
+        import_function(kernel, max_i, "max_i(int,int) -> int; 'Maximum of two integers'");
+        import_function(kernel, min_f, "min_f(number,number) -> number; 'Minimum of two numbers'");
+        import_function(kernel, min_f, "min_i(int,int) -> int; 'Minimum of two integers'");
+        import_function(kernel, remainder_i, "remainder_i(int,int) -> int");
+        import_function(kernel, remainder_f,  "remainder_f(number,number) -> number");
+        import_function(kernel, mod_i, "mod_i(int,int) -> int");
+        import_function(kernel, mod_f, "mod_f(number,number) -> number");
+        import_function(kernel, round, "round(number n) -> int;"
+            "'Return the integer that is closest to n'");
+        import_function(kernel, floor, "floor(number n) -> int;"
+        "'Return the closest integer that is less than n'");
+        import_function(kernel, ceil, "ceil(number n) -> int;"
+        "'Return the closest integer that is greater than n'");
+        import_function(kernel, average, "average(number :multiple) -> number;"
+                "'Returns the average of all inputs.'");
+        import_function(kernel, pow, "pow(int i, int x) -> int; 'Returns i to the power of x'");
+        import_function(kernel, sqr, "sqr(number) -> number; 'Square function'");
+        import_function(kernel, cube, "cube(number) -> number; 'Cube function'");
+        import_function(kernel, sqrt, "sqrt(number) -> number; 'Square root'");
+        import_function(kernel, log, "log(number) -> number; 'Natural log function'");
     }
 }
 } // namespace circa

@@ -12,7 +12,7 @@ void update_static_error_list(Branch* branch);
 void format_static_error(caValue* error, caValue* stringOutput);
 
 // Print each static error to 'out'. Returns true if there were any static errors.
-bool print_static_errors_formatted(List* result, std::ostream& out);
+bool print_static_errors_formatted(caValue* result, std::ostream& out);
 
 
 bool has_static_error(Term* term);
