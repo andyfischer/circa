@@ -75,7 +75,7 @@ void file_watch_trigger_actions(World* world, const char* filename)
     if (watch == NULL)
         return;
 
-    // TODO - walk through each action.
+    // TODO - walk through each action and execute it.
 }
 
 void file_watch_check_all(World* world)
