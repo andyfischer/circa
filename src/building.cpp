@@ -300,10 +300,14 @@ void respecialize_type(Term* term)
 
 void rename(Term* termToRename, Name name)
 {
+    // No-op if term already has this name.
     if (termToRename->nameSymbol == name)
         return;
 
-    if (termToRename->owningBranch != NULL) {
+    Branch* branch = termToRename->owningBranch;
+
+    // Update binding in the owning branch.
+    if (branch != NULL) {
         if (!has_empty_name(termToRename)) {
             termToRename->owningBranch->names.remove(termToRename->name);
             termToRename->name = "";
@@ -312,15 +316,34 @@ void rename(Term* termToRename, Name name)
         termToRename->owningBranch->bindName(termToRename, name);
     }
 
-    Name prevName = termToRename->nameSymbol;
+    // Update name symbol.
+    termToRename->nameSymbol = name;
     termToRename->name = name_to_string(name);
     update_unique_name(termToRename);
 
-    // We might look up the shadowed name binding at termToRename, but only if needed.
-    bool foundShadowedNameBinding = false;
-    Term* shadowedNameBinding = NULL;
+    // Update unique ordinal. If any neighbor term has the same name, then give this
+    // term a greater ordinal value.
+    termToRename->uniqueOrdinal = 0;
+
+    if (branch != NULL) {
+        for (int i=0; i < branch->length(); i++) {
+            Term* neighbor = branch->get(i);
+            if (neighbor == termToRename)
+                continue;
+            if (neighbor == NULL)
+                continue;
+
+            if (neighbor->nameSymbol == name
+                    && neighbor->uniqueOrdinal >= termToRename->uniqueOrdinal)
+                termToRename->uniqueOrdinal = neighbor->uniqueOrdinal + 1;
+        }
+    }
 
     // Handle change cascades.
+
+    // Possibly store the shadowed name binding (this is only computed if needed)
+    bool foundShadowedNameBinding = false;
+    Term* shadowedNameBinding = NULL;
     
     if (name != name_None) {
         // The new name may have shadowed an existing name.

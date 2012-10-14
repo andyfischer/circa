@@ -77,8 +77,8 @@ Term* find_term_from_global_name(const char* name);
 bool name_is_valid(Name index);
 const char* name_to_string(Name name);
 void name_to_string(Name name, String* string);
-Name name_get_namespace_first(Name name);
-Name name_get_namespace_rr(Name name);
+Name qualified_name_get_first_section(Name name);
+Name qualified_name_get_remainder_after_first_section(Name name);
 
 Name as_name(caValue* tv);
 void set_name(caValue* tv, Name name);

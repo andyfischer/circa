@@ -42,8 +42,13 @@ struct Term : public caTerm
     // Our function: the thing that takes our inputs and produces a value.
     Term* function;
 
-    // Our name binding.
+    // Name binding.
     Name nameSymbol;
+
+    // An ordinal value that is locally unique among terms with the same name.
+    int uniqueOrdinal;
+
+    // (Deprecated) Name binding as string.
     std::string name;
 
     // A name which is unique across this branch.

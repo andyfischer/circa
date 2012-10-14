@@ -24,6 +24,7 @@ Term::Term()
     type(NULL),
     function(NULL),
     nameSymbol(name_None),
+    uniqueOrdinal(0),
     owningBranch(NULL),
     index(0),
     nestedContents(NULL)

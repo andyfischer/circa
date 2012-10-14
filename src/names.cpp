@@ -84,7 +84,7 @@ Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lo
     }
 
     // Check if the name is a qualified name.
-    Name namespacePrefix = name_get_namespace_first(name);
+    Name namespacePrefix = qualified_name_get_first_section(name);
 
     if (namespacePrefix == name_None)
         return NULL;
@@ -97,7 +97,7 @@ Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lo
 
     // Recursively search inside the prefix for the qualified suffix.
     return find_local_name(nested_contents(nsPrefixTerm),
-        name_get_namespace_rr(name), -1, lookupType);
+        qualified_name_get_remainder_after_first_section(name), -1, lookupType);
 }
 
 Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupType)
@@ -395,7 +395,7 @@ const char* get_unique_name(Term* term)
 
 Term* find_from_unique_name(Branch* branch, const char* name)
 {
-    // O(n) search, maybe this should be made more efficient.
+    // O(n) search; this should be made more efficient.
 
     for (int i=0; i < branch->length(); i++) {
         Term* term = branch->get(i);
@@ -505,7 +505,7 @@ void name_to_string(Name name, String* string)
     set_string((caValue*) string, name_to_string(name));
 }
 
-Name name_get_namespace_first(Name name)
+Name qualified_name_get_first_section(Name name)
 {
     if (name < c_FirstRuntimeName)
         return 0;
@@ -513,7 +513,7 @@ Name name_get_namespace_first(Name name)
         return g_runtimeNames[name - c_FirstRuntimeName].namespaceFirst;
 }
 
-Name name_get_namespace_rr(Name name)
+Name qualified_name_get_remainder_after_first_section(Name name)
 {
     if (name < c_FirstRuntimeName)
         return 0;

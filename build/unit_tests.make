@@ -64,18 +64,19 @@ ifeq ($(config),release)
 endif
 
 OBJECTS := \
-	$(OBJDIR)/compound_type.o \
-	$(OBJDIR)/interpreter.o \
-	$(OBJDIR)/native_modules.o \
-	$(OBJDIR)/cascading.o \
-	$(OBJDIR)/migration.o \
-	$(OBJDIR)/main.o \
-	$(OBJDIR)/fakefs.o \
-	$(OBJDIR)/code_iterators.o \
-	$(OBJDIR)/c_objects.o \
-	$(OBJDIR)/file_watch.o \
-	$(OBJDIR)/tokenizer.o \
 	$(OBJDIR)/branch.o \
+	$(OBJDIR)/c_objects.o \
+	$(OBJDIR)/cascading.o \
+	$(OBJDIR)/code_iterators.o \
+	$(OBJDIR)/compound_type.o \
+	$(OBJDIR)/fakefs.o \
+	$(OBJDIR)/file_watch.o \
+	$(OBJDIR)/interpreter.o \
+	$(OBJDIR)/main.o \
+	$(OBJDIR)/migration.o \
+	$(OBJDIR)/names.o \
+	$(OBJDIR)/native_modules.o \
+	$(OBJDIR)/tokenizer.o \
 
 RESOURCES := \
 
@@ -136,40 +137,43 @@ $(GCH): $(PCH)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 endif
 
-$(OBJDIR)/compound_type.o: ../src/unit_tests/compound_type.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/interpreter.o: ../src/unit_tests/interpreter.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/native_modules.o: ../src/unit_tests/native_modules.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/cascading.o: ../src/unit_tests/cascading.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/migration.o: ../src/unit_tests/migration.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/main.o: ../src/unit_tests/main.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/fakefs.o: ../src/unit_tests/fakefs.cpp
-	@echo $(notdir $<)
-	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/code_iterators.o: ../src/unit_tests/code_iterators.cpp
+$(OBJDIR)/branch.o: ../src/unit_tests/branch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/c_objects.o: ../src/unit_tests/c_objects.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/cascading.o: ../src/unit_tests/cascading.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/code_iterators.o: ../src/unit_tests/code_iterators.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/compound_type.o: ../src/unit_tests/compound_type.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/fakefs.o: ../src/unit_tests/fakefs.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 $(OBJDIR)/file_watch.o: ../src/unit_tests/file_watch.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/tokenizer.o: ../src/unit_tests/tokenizer.cpp
+$(OBJDIR)/interpreter.o: ../src/unit_tests/interpreter.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
-$(OBJDIR)/branch.o: ../src/unit_tests/branch.cpp
+$(OBJDIR)/main.o: ../src/unit_tests/main.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/migration.o: ../src/unit_tests/migration.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/names.o: ../src/unit_tests/names.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/native_modules.o: ../src/unit_tests/native_modules.cpp
+	@echo $(notdir $<)
+	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
+$(OBJDIR)/tokenizer.o: ../src/unit_tests/tokenizer.cpp
 	@echo $(notdir $<)
 	$(SILENT) $(CXX) $(CXXFLAGS) -o "$@" -c "$<"
 
