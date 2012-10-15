@@ -496,20 +496,20 @@ void list_remove_nulls(caValue* value)
     list_remove_nulls((ListData**) &value->value_data);
 }
 
-ListType list_get_parameter_type(caValue* parameter)
+Name list_get_parameter_type(caValue* parameter)
 {
     if (is_null(parameter))
-        return LIST_UNTYPED;
+        return name_Untyped;
     if (is_type(parameter))
-        return LIST_TYPED_UNSIZED;
+        return name_UniformListType;
 
     if (is_list(parameter)) {
         if ((list_length(parameter) == 2) && is_list(list_get(parameter, 0)))
-            return LIST_TYPED_SIZED_NAMED;
+            return name_StructType;
         else
-            return LIST_TYPED_SIZED;
+            return name_AnonStructType;
     }
-    return LIST_INVALID_PARAMETER;
+    return name_Invalid;
 }
 
 bool list_type_has_specific_size(caValue* parameter)
@@ -531,7 +531,7 @@ Type* create_compound_type()
 
 void compound_type_append_field(Type* type, Type* fieldType, const char* fieldName)
 {
-    ca_assert(list_get_parameter_type(&type->parameter) == LIST_TYPED_SIZED_NAMED);
+    ca_assert(list_get_parameter_type(&type->parameter) == name_StructType);
 
     list_touch(&type->parameter);
     caValue* types = list_get(&type->parameter, 0);
@@ -559,7 +559,7 @@ Type* compound_type_get_field_type(Type* type, int index)
 
 bool is_compound_type(Type* type)
 {
-    return list_get_parameter_type(&type->parameter) == LIST_TYPED_SIZED_NAMED;
+    return list_get_parameter_type(&type->parameter) == name_StructType;
 }
 
 std::string compound_type_to_string(caValue* value)
@@ -607,13 +607,13 @@ caValue* list_get_type_list_from_type(Type* type)
     caValue* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
-    case LIST_TYPED_SIZED:
+    case name_AnonStructType:
         return parameter;
-    case LIST_TYPED_SIZED_NAMED:
+    case name_StructType:
         return list_get(parameter, 0);
-    case LIST_UNTYPED:
-    case LIST_TYPED_UNSIZED:
-    case LIST_INVALID_PARAMETER:
+    case name_Untyped:
+    case name_UniformListType:
+    case name_Invalid:
         return NULL;
     }
     ca_assert(false);
@@ -626,12 +626,12 @@ caValue* list_get_name_list_from_type(Type* type)
     caValue* parameter = &type->parameter;
 
     switch (list_get_parameter_type(parameter)) {
-    case LIST_TYPED_SIZED_NAMED:
+    case name_StructType:
         return list_get(parameter, 1);
-    case LIST_TYPED_SIZED:
-    case LIST_UNTYPED:
-    case LIST_TYPED_UNSIZED:
-    case LIST_INVALID_PARAMETER:
+    case name_AnonStructType:
+    case name_Untyped:
+    case name_UniformListType:
+    case name_Invalid:
         return NULL;
     }
     ca_assert(false);

@@ -31,27 +31,27 @@ std::map<std::string,Name> g_stringToSymbol;
 
 bool exposes_nested_names(Term* term);
 
-bool fits_lookup_type(Term* term, NameLookupType type)
+bool fits_lookup_type(Term* term, Name type)
 {
-    // Modules can only be found by NAME_LOOKUP_MODULE
+    // Modules can only be found by LookupModule
     if (term->function == FUNCS.imported_file)
-        return type == NAME_LOOKUP_MODULE;
+        return type == name_LookupModule;
 
     switch (type) {
-        case NAME_LOOKUP_ANY:
+        case name_LookupAny:
             return true;
-        case NAME_LOOKUP_TYPE:
+        case name_LookupType:
             return is_type(term);
-        case NAME_LOOKUP_FUNCTION:
+        case name_LookupFunction:
             return is_function(term);
-        case NAME_LOOKUP_MODULE:
+        case name_LookupModule:
             return false;
     }
     internal_error("");
     return false;
 }
 
-Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lookupType)
+Term* find_local_name(Branch* branch, Name name, int location, Name lookupType)
 {
     if (name == 0)
         return NULL;
@@ -100,7 +100,7 @@ Term* find_local_name(Branch* branch, Name name, int location, NameLookupType lo
         qualified_name_get_remainder_after_first_section(name), -1, lookupType);
 }
 
-Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupType)
+Term* find_name(Branch* branch, Name name, int location, Name lookupType)
 {
     if (name == 0)
         return NULL;
@@ -134,14 +134,14 @@ Term* find_name(Branch* branch, Name name, int location, NameLookupType lookupTy
     return get_global(name);
 }
 
-Term* find_name(Branch* branch, const char* nameStr, int location, NameLookupType lookupType)
+Term* find_name(Branch* branch, const char* nameStr, int location, Name lookupType)
 {
     Name name = name_from_string(nameStr);
     return find_name(branch, name, location, lookupType);
 }
 
 // Finds a name in this branch.
-Term* find_local_name(Branch* branch, const char* nameStr, int location, NameLookupType lookupType)
+Term* find_local_name(Branch* branch, const char* nameStr, int location, Name lookupType)
 {
     Name name = name_from_string(nameStr);
     return find_local_name(branch, name, location, lookupType);

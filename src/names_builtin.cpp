@@ -14,6 +14,7 @@ const char* builtin_name_to_string(int name)
 
     switch (name) {
     case name_None: return "None";
+    case name_Invalid: return "Invalid";
     case name_File: return "File";
     case name_Newline: return "Newline";
     case name_Out: return "Out";
@@ -42,6 +43,14 @@ const char* builtin_name_to_string(int name)
     case name_Keyword: return "Keyword";
     case name_Whitespace: return "Whitespace";
     case name_UnknownIdentifier: return "UnknownIdentifier";
+    case name_LookupAny: return "LookupAny";
+    case name_LookupType: return "LookupType";
+    case name_LookupFunction: return "LookupFunction";
+    case name_LookupModule: return "LookupModule";
+    case name_Untyped: return "Untyped";
+    case name_UniformListType: return "UniformListType";
+    case name_AnonStructType: return "AnonStructType";
+    case name_StructType: return "StructType";
     case tok_Identifier: return "tok_Identifier";
     case tok_Name: return "tok_Name";
     case tok_Integer: return "tok_Integer";

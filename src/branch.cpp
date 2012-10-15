@@ -795,7 +795,7 @@ void branch_link_missing_functions(Branch* branch, Branch* source)
                 continue;
 
             // try to find this function
-            Term* func = find_local_name(source, funcName.c_str(), NAME_LOOKUP_FUNCTION);
+            Term* func = find_local_name(source, funcName.c_str(), name_LookupFunction);
 
             if (func != NULL)
                 change_function(term, func);

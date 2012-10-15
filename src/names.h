@@ -4,36 +4,38 @@
 
 namespace circa {
 
-enum NameLookupType {
-    NAME_LOOKUP_ANY = 1,
-    NAME_LOOKUP_TYPE = 2,
-    NAME_LOOKUP_FUNCTION = 3,
-    NAME_LOOKUP_MODULE = 4
+struct NameSearch
+{
+    Branch* branch;
+    Name name;
+    int position;
+    Name lookupType;
 };
+
 
 // Finds a name in this branch or a visible parent branch.
 Term* find_name(Branch* branch,
                 Name name,
                 int location = -1,
-                NameLookupType lookupType = NAME_LOOKUP_ANY);
+                Name lookupType = name_LookupAny);
 
 // Finds a name in this branch.
 Term* find_local_name(Branch* branch,
                       Name name,
                       int location = -1,
-                      NameLookupType lookupType = NAME_LOOKUP_ANY);
+                      Name lookupType = name_LookupAny);
 
 // Convenient overloads for using a string as a name
 Term* find_name(Branch* branch,
                 const char* name,
                 int location = -1,
-                NameLookupType lookupType = NAME_LOOKUP_ANY);
+                Name lookupType = name_LookupAny);
 
 // Finds a name in this branch.
 Term* find_local_name(Branch* branch,
                       const char* name,
                       int location = -1,
-                      NameLookupType lookupType = NAME_LOOKUP_ANY);
+                      Name lookupType = name_LookupAny);
 
 Term* find_name_at(Term* term, const char* name);
 Term* find_name_at(Term* term, Name name);

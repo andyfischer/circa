@@ -1,4 +1,6 @@
+# General purpose
 None
+Invalid
 File
 Newline
 Out
@@ -37,6 +39,18 @@ TermName
 Keyword
 Whitespace
 UnknownIdentifier
+
+# Name search options
+LookupAny
+LookupType
+LookupFunction
+LookupModule
+
+# List-based type enumeration
+Untyped
+UniformListType
+AnonStructType
+StructType
 
 # Tokens
 tok_Identifier

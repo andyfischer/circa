@@ -87,14 +87,14 @@ Type* infer_type_of_get_index(Term* input)
         return &ANY_T;
 
     switch (list_get_parameter_type(&input->type->parameter)) {
-    case LIST_UNTYPED:
+    case name_Untyped:
         return &ANY_T;
-    case LIST_TYPED_UNSIZED:
+    case name_UniformListType:
         return list_get_repeated_type_from_type(input->type);
-    case LIST_TYPED_SIZED:
-    case LIST_TYPED_SIZED_NAMED:
+    case name_StructType:
+    case name_AnonStructType:
         return find_common_type(list_get_type_list_from_type(input->type));
-    case LIST_INVALID_PARAMETER:
+    case name_Invalid:
     default:
         return &ANY_T;
     }

@@ -105,16 +105,7 @@ void list_reverse(caValue* list);
 // the list can be untyped, typed with an arbitrary size, or typed with
 // a specific size.
 
-enum ListType
-{
-    LIST_INVALID_PARAMETER=0,
-    LIST_UNTYPED,
-    LIST_TYPED_UNSIZED,
-    LIST_TYPED_SIZED,
-    LIST_TYPED_SIZED_NAMED
-};
-
-ListType list_get_parameter_type(caValue* parameter);
+Name list_get_parameter_type(caValue* parameter);
 bool list_type_has_specific_size(caValue* parameter);
 void list_initialize_parameter_from_type_decl(Branch* typeDecl, caValue* parameter);
 

@@ -170,7 +170,7 @@ caTerm* circa_find_term(caBranch* branch, const char* name)
 }
 caFunction* circa_find_function(caBranch* branch, const char* name)
 {
-    caTerm* term = find_name((Branch*) branch, name, -1, NAME_LOOKUP_FUNCTION);
+    caTerm* term = find_name((Branch*) branch, name, -1, name_LookupFunction);
     if (term == NULL)
         return NULL;
     caValue* val = circa_term_value(term);
@@ -180,7 +180,7 @@ caFunction* circa_find_function(caBranch* branch, const char* name)
 }
 caType* circa_find_type(caBranch* branch, const char* name)
 {
-    caTerm* term = find_name((Branch*) branch, name, -1, NAME_LOOKUP_TYPE);
+    caTerm* term = find_name((Branch*) branch, name, -1, name_LookupType);
     if (term == NULL)
         return NULL;
     caValue* val = circa_term_value(term);

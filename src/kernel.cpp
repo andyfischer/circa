@@ -309,9 +309,9 @@ Type* List__append_specializeType(Term* term)
 {
     Term* listInput = term->input(0);
     switch (list_get_parameter_type(&listInput->type->parameter)) {
-    case LIST_UNTYPED:
+    case name_Untyped:
         return listInput->type;
-    case LIST_TYPED_UNSIZED:
+    case name_UniformListType:
     {
         Type* listElementType = list_get_repeated_type_from_type(listInput->type);
         Type* commonType = find_common_type(listElementType, term->input(1)->type);
@@ -320,15 +320,15 @@ Type* List__append_specializeType(Term* term)
         else
             return create_typed_unsized_list_type(commonType);
     }
-    case LIST_TYPED_SIZED:
-    case LIST_TYPED_SIZED_NAMED:
+    case name_AnonStructType:
+    case name_StructType:
     {    
         List elementTypes;
         copy(list_get_type_list_from_type(listInput->type), &elementTypes);
         set_type(elementTypes.append(), term->input(1)->type);
         return create_typed_unsized_list_type(find_common_type(&elementTypes));
     }
-    case LIST_INVALID_PARAMETER:
+    case name_Invalid:
     default:
         return &ANY_T;
     }

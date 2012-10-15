@@ -458,7 +458,7 @@ ParseResult type_expr(Branch* branch, TokenStream& tokens,
 
     std::string typeName = tokens.consumeStr();
 
-    Term* typeTerm = find_name(branch, typeName.c_str(), -1, NAME_LOOKUP_TYPE);
+    Term* typeTerm = find_name(branch, typeName.c_str(), -1, name_LookupType);
 
     if (typeTerm == NULL) {
         // Future: This name lookup failure should be recorded.
@@ -1089,7 +1089,7 @@ ParseResult stateful_value_decl(Branch* branch, TokenStream& tokens, ParserCxt* 
     Type* type = &ANY_T;
     bool unknownType = false;
     if (typeName != "") {
-        Term* typeTerm = find_name(branch, typeName.c_str(), -1, NAME_LOOKUP_TYPE);
+        Term* typeTerm = find_name(branch, typeName.c_str(), -1, name_LookupType);
 
         if (typeTerm == NULL) {
             unknownType = true;
