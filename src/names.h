@@ -12,29 +12,31 @@ struct NameSearch
     Name lookupType;
 };
 
+Term* find_name(NameSearch* params);
+Term* find_local_name(NameSearch* params);
 
 // Finds a name in this branch or a visible parent branch.
 Term* find_name(Branch* branch,
                 Name name,
-                int location = -1,
+                int position = -1,
                 Name lookupType = name_LookupAny);
 
 // Finds a name in this branch.
 Term* find_local_name(Branch* branch,
                       Name name,
-                      int location = -1,
+                      int position = -1,
                       Name lookupType = name_LookupAny);
 
 // Convenient overloads for using a string as a name
 Term* find_name(Branch* branch,
                 const char* name,
-                int location = -1,
+                int position = -1,
                 Name lookupType = name_LookupAny);
 
 // Finds a name in this branch.
 Term* find_local_name(Branch* branch,
                       const char* name,
-                      int location = -1,
+                      int position = -1,
                       Name lookupType = name_LookupAny);
 
 Term* find_name_at(Term* term, const char* name);
@@ -85,6 +87,10 @@ Name qualified_name_get_remainder_after_first_section(Name name);
 Name as_name(caValue* tv);
 void set_name(caValue* tv, Name name);
 
+// Returns a name if there is already one with this string, otherwise returns None.
+Name existing_name_from_string(const char* str);
+
+// Return a name from this string, adding it if necessary.
 Name name_from_string(const char* str);
 Name name_from_string(std::string const& str);
 Name name_from_string(caValue* str);

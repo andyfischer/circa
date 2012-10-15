@@ -7,6 +7,17 @@
 
 namespace names {
 
+void find_name()
+{
+    Branch branch;
+    branch.compile("a = 1");
+    branch.compile("namespace ns { a = 2; b = 3; } ");
+
+    test_equals(term_value(find_name(&branch, "a")), "1");
+    test_equals(term_value(find_name(&branch, "ns:a")), "2");
+    test_equals(term_value(find_name(&branch, "ns:b")), "3");
+}
+
 void unique_ordinals()
 {
     Branch branch;
@@ -30,6 +41,7 @@ void unique_ordinals()
 
 void register_tests()
 {
+    REGISTER_TEST_CASE(names::find_name);
     REGISTER_TEST_CASE(names::unique_ordinals);
 }
 
