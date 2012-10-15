@@ -7,13 +7,27 @@ namespace circa {
 struct NameSearch
 {
     Branch* branch;
-    Name name;
-    int position;
-    Name lookupType;
-};
 
-Term* find_name(NameSearch* params);
-Term* find_local_name(NameSearch* params);
+    // Search name.
+    Name name;
+
+    // Search position; the name search will look for bindings at this branch index and
+    // above.
+    // If this is -1, it means the search position should be the end of the branch.
+    int position;
+
+    // Unique ordinal value. The name search will only match terms with this ordinal
+    // (the ordinal is used to distinguish terms that have the same name).
+    // If this is -1, then the name search ignores the unique ordinal.
+    int ordinal;
+
+    // Lookup type, this may specify that we only search for type, function or module
+    // values. This might also be LookupAny, to ignore the term's type.
+    Name lookupType;
+
+    // Whether to search parent branches (if not found in target branch).
+    bool searchParent;
+};
 
 // Finds a name in this branch or a visible parent branch.
 Term* find_name(Branch* branch,
@@ -44,7 +58,13 @@ Term* find_name_at(Term* term, Name name);
 
 // If the string is a qualified name (such as "a:b:c"), returns the index
 // of the first colon. If the string isn't a qualified name then returns -1.
-int find_qualified_name_separator(const char* name);
+int name_find_qualified_separator(const char* name);
+
+// If the name string has an ordinal (such as "a#1"), returns the ordinal value.
+// Otherwise returns -1.
+// endPos is the name's ending index (such as the one returned from
+// name_find_qualified_separator);
+int name_find_ordinal_suffix(const char* str, int* endPos);
 
 // Get a named term from the global namespace.
 Term* get_global(Name name);

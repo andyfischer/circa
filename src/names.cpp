@@ -1,15 +1,5 @@
 // Copyright (c) Andrew Fischer. See LICENSE file for license terms.
 
-/**
- names.cpp
-
- Open issues in this file:
-
-  [1] the find functions should not call name_from_string, instead they should call
-      existing_name_from_string. This currently fails for namespace-name searches,
-      because the namespaced version of the name doesn't exist yet.
-*/
-
 #include "common_headers.h"
 
 #include "branch.h"
@@ -27,6 +17,9 @@ namespace circa {
 
 struct RuntimeName
 {
+    // A RuntimeName is a name created dynamically at runtime (as opposed to a builtin
+    // name, which is predeclared in names_builtin.h).
+
     char* str;
     Name namespaceFirst;
     Name namespaceRightRemainder;
@@ -39,6 +32,10 @@ RuntimeName g_runtimeNames[c_maxRuntimeNames];
 int g_nextFreeNameIndex = 0;
 std::map<std::string,Name> g_stringToSymbol;
 
+// run_name_search: takes a NameSearch object and actually performs the search.
+// There are many variations of find_name and find_local_name which all just wrap
+// around this function.
+Term* run_name_search(NameSearch* params);
 bool exposes_nested_names(Term* term);
 
 bool fits_lookup_type(Term* term, Name type)
@@ -57,11 +54,11 @@ bool fits_lookup_type(Term* term, Name type)
         case name_LookupModule:
             return false;
     }
-    internal_error("");
+    internal_error("unknown type in fits_lookup_type");
     return false;
 }
 
-Term* find_local_name(NameSearch* params)
+Term* run_name_search(NameSearch* params)
 {
     if (params->name == 0)
         return NULL;
@@ -95,8 +92,8 @@ Term* find_local_name(NameSearch* params)
             nestedSearch.name = params->name;
             nestedSearch.position = -1;
             nestedSearch.lookupType = params->lookupType;
-
-            Term* nested = find_local_name(&nestedSearch);
+            nestedSearch.searchParent = false;
+            Term* nested = run_name_search(&nestedSearch);
             if (nested != NULL)
                 return nested;
         }
@@ -105,69 +102,75 @@ Term* find_local_name(NameSearch* params)
     // Check if the name is a qualified name.
     Name namespacePrefix = qualified_name_get_first_section(params->name);
 
-    // If it's not a qualified name, then quit.
-    if (namespacePrefix == name_None)
-        return NULL;
+    // If it's a qualified name, search for the first prefix.
+    if (namespacePrefix != name_None) {
+        NameSearch nsSearch;
+        nsSearch.branch = params->branch;
+        nsSearch.name = namespacePrefix;
+        nsSearch.position = params->position;
+        nsSearch.ordinal = params->ordinal;
+        nsSearch.lookupType = params->lookupType;
+        nsSearch.searchParent = false;
+        Term* nsPrefixTerm = run_name_search(&nsSearch);
 
-    // It is a qualified name, search for the first prefix.
-    NameSearch nsSearch;
-    nsSearch.branch = params->branch;
-    nsSearch.name = namespacePrefix;
-    nsSearch.position = params->position;
-    nsSearch.lookupType = params->lookupType;
-    Term* nsPrefixTerm = find_local_name(&nsSearch);
-
-    // Give up if prefix not found
-    if (nsPrefixTerm == NULL)
-        return NULL;
-
-    // Recursively search inside the prefix for the qualified suffix.
-    NameSearch nestedSearch;
-    nestedSearch.branch = nested_contents(nsPrefixTerm);
-    nestedSearch.name = qualified_name_get_remainder_after_first_section(params->name);
-    nestedSearch.position = -1;
-    nestedSearch.lookupType = params->lookupType;
-    return find_local_name(&nestedSearch);
-}
-
-Term* find_name(NameSearch* params)
-{
-    if (params->name == 0)
-        return NULL;
-
-    Branch* branch = params->branch;
-
-    if (branch == NULL)
-        branch = global_root_branch();
-
-    INCREMENT_STAT(BranchNameLookups);
-
-    Term* result = find_local_name(params);
-    if (result != NULL)
-        return result;
-
-    // Name not found in this branch.
-
-    // Don't continue the search if this is the kernel
-    if (branch == global_root_branch())
-        return NULL;
-
-    // Search parent
-    Term* parent = branch->owningTerm;
-    if (parent != NULL) {
-        // find_name with the parent's location plus one, so that we do look
-        // at the parent's branch (in case our name has a namespace prefix
-        // that refers to this branch).
-        NameSearch parentSearch;
-        parentSearch.branch = parent->owningBranch;
-        parentSearch.name = params->name;
-        parentSearch.position = parent->index + 1;
-        parentSearch.lookupType = params->lookupType;
-        return find_name(&parentSearch);
+        if (nsPrefixTerm != NULL) {
+            // Recursively search inside the prefix for the remainder of the name.
+            NameSearch nestedSearch;
+            nestedSearch.branch = nested_contents(nsPrefixTerm);
+            nestedSearch.name = qualified_name_get_remainder_after_first_section(params->name);
+            nestedSearch.position = -1;
+            nestedSearch.ordinal = params->ordinal;
+            nestedSearch.lookupType = params->lookupType;
+            nestedSearch.searchParent = false;
+            return run_name_search(&nestedSearch);
+        }
     }
 
-    // No parent, search kernel
-    return get_global(params->name);
+    // Possibly continue search to parent branch.
+    if (params->searchParent) {
+
+        // Don't continue the search if we just searched the root.
+        if (branch == global_root_branch())
+            return NULL;
+
+        // Search parent
+
+        // the position is our parent's position plus one, so that we do look
+        // at the parent's branch (in case our name has a namespace prefix
+        // that refers back to the inside of this branch).
+        //
+        // TODO: This has an issue where, if we do have a qualified name that
+        // refers back to this branch as a namespace, the search location will
+        // be wrong later.
+        //
+        // Say we have branch:
+        // namespace ns {
+        //   a = 1
+        //   b = 2  <-- search location
+        //   c = 3
+        // }
+        //
+        // We start at location 'b' and search for ns:c. This will fail at first, then
+        // go to the parent branch which finds 'ns', which searches inside 'ns' to find 'c'.
+        // However, ns:c is not visible at location 'b'.
+        
+        NameSearch parentSearch;
+
+        Term* parentTerm = branch->owningTerm;
+        if (parentTerm != NULL) {
+            parentSearch.branch = parentTerm->owningBranch;
+            parentSearch.position = parentTerm->index + 1;
+        } else {
+            parentSearch.branch = global_root_branch();
+            parentSearch.position = -1;
+        }
+        parentSearch.name = params->name;
+        parentSearch.lookupType = params->lookupType;
+        parentSearch.searchParent = true;
+        return run_name_search(&parentSearch);
+    }
+
+    return NULL;
 }
 
 Term* find_name(Branch* branch, Name name, int position, Name lookupType)
@@ -176,8 +179,10 @@ Term* find_name(Branch* branch, Name name, int position, Name lookupType)
     nameSearch.branch = branch;
     nameSearch.name = name;
     nameSearch.position = position;
+    nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
-    return find_name(&nameSearch);
+    nameSearch.searchParent = true;
+    return run_name_search(&nameSearch);
 }
 
 // Finds a name in this branch.
@@ -187,8 +192,10 @@ Term* find_local_name(Branch* branch, Name name, int position, Name lookupType)
     nameSearch.branch = branch;
     nameSearch.name = name;
     nameSearch.position = position;
+    nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
-    return find_local_name(&nameSearch);
+    nameSearch.searchParent = false;
+    return run_name_search(&nameSearch);
 }
 
 Term* find_name(Branch* branch, const char* nameStr, int position, Name lookupType)
@@ -202,7 +209,8 @@ Term* find_name(Branch* branch, const char* nameStr, int position, Name lookupTy
     nameSearch.name = name;
     nameSearch.position = position;
     nameSearch.lookupType = lookupType;
-    return find_name(&nameSearch);
+    nameSearch.searchParent = true;
+    return run_name_search(&nameSearch);
 }
 
 Term* find_local_name(Branch* branch, const char* nameStr, int position, Name lookupType)
@@ -216,7 +224,8 @@ Term* find_local_name(Branch* branch, const char* nameStr, int position, Name lo
     nameSearch.name = name;
     nameSearch.position = position;
     nameSearch.lookupType = lookupType;
-    return find_local_name(&nameSearch);
+    nameSearch.searchParent = false;
+    return run_name_search(&nameSearch);
 }
 
 Term* find_name_at(Term* term, const char* nameStr)
@@ -230,7 +239,8 @@ Term* find_name_at(Term* term, const char* nameStr)
     nameSearch.name = name;
     nameSearch.position = term->index;
     nameSearch.lookupType = name_LookupAny;
-    return find_name(&nameSearch);
+    nameSearch.searchParent = true;
+    return run_name_search(&nameSearch);
 }
 
 Term* find_name_at(Term* term, Name name)
@@ -240,15 +250,22 @@ Term* find_name_at(Term* term, Name name)
     nameSearch.name = name;
     nameSearch.position = term->index;
     nameSearch.lookupType = name_LookupAny;
-    return find_name(&nameSearch);
+    nameSearch.searchParent = true;
+    return run_name_search(&nameSearch);
 }
 
-int find_qualified_name_separator(const char* name)
+int name_find_qualified_separator(const char* name)
 {
     for (int i=0; name[i] != 0; i++) {
         if (name[i] == ':' && name[i+1] != 0)
             return i;
     }
+    return -1;
+}
+
+int name_find_ordinal_suffix(const char* name, int* endPos)
+{
+    // TODO
     return -1;
 }
 
@@ -538,7 +555,7 @@ std::string find_global_name(Term* term)
 
 Term* find_term_from_global_name_recr(Branch* searchBranch, const char* name)
 {
-    int separator = find_qualified_name_separator(name);
+    int separator = name_find_qualified_separator(name);
     
     if (separator == -1)
         return find_from_unique_name(searchBranch, name);
