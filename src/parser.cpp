@@ -851,10 +851,11 @@ ParseResult if_block(Branch* branch, TokenStream& tokens, ParserCxt* context)
         int leadingToken = tokens.next().match;
 
         // First iteration should always be 'if'
-        if (firstIteration)
+        if (firstIteration) {
             ca_assert(leadingToken == tok_If);
-        else
+        } else {
             ca_assert(leadingToken != tok_If);
+        }
 
         // Otherwise expect 'elif' or 'else'
         if (leadingToken != tok_If && leadingToken != tok_Elif && leadingToken != tok_Else)
