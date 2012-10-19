@@ -463,7 +463,7 @@ int run_command_line(caWorld* world, caValue* args)
         return run_repl();
 
     if (string_eq(list_get(args, 0), "-call")) {
-        Branch* branch = create_branch(global_root_branch());
+        Branch* branch = create_branch(global_root_branch(), "");
         Name loadResult = load_script(branch, as_cstring(list_get(args, 1)));
 
         if (loadResult == name_Failure) {
@@ -569,7 +569,7 @@ int run_command_line(caWorld* world, caValue* args)
     }
 
     // Default behavior with no flags: load args[0] as a script and run it.
-    Branch* main_branch = create_branch(global_root_branch());
+    Branch* main_branch = create_branch(global_root_branch(), "");
     load_script(main_branch, as_cstring(list_get(args, 0)));
     branch_finish_changes(main_branch);
     refresh_bytecode(main_branch);

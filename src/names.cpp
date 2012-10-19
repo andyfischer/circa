@@ -9,7 +9,9 @@
 #include "if_block.h"
 #include "names_builtin.h"
 #include "source_repro.h"
+#include "string_type.h"
 #include "term.h"
+#include "world.h"
 
 #include "names.h"
 
@@ -82,7 +84,9 @@ Term* run_name_search(NameSearch* params)
         if (term == NULL)
             continue;
 
-        if (term->nameSymbol == params->name && fits_lookup_type(term, params->lookupType))
+        if (term->nameSymbol == params->name
+                && fits_lookup_type(term, params->lookupType)
+                && (params->ordinal == -1 || term->uniqueOrdinal == params->ordinal))
             return term;
 
         // If this term exposes its names, then search inside the nested branch.
@@ -91,6 +95,7 @@ Term* run_name_search(NameSearch* params)
             nestedSearch.branch = term->nestedContents;
             nestedSearch.name = params->name;
             nestedSearch.position = -1;
+            nestedSearch.ordinal = -1;
             nestedSearch.lookupType = params->lookupType;
             nestedSearch.searchParent = false;
             Term* nested = run_name_search(&nestedSearch);
@@ -166,6 +171,7 @@ Term* run_name_search(NameSearch* params)
         }
         parentSearch.name = params->name;
         parentSearch.lookupType = params->lookupType;
+        parentSearch.ordinal = -1;
         parentSearch.searchParent = true;
         return run_name_search(&parentSearch);
     }
@@ -185,7 +191,6 @@ Term* find_name(Branch* branch, Name name, int position, Name lookupType)
     return run_name_search(&nameSearch);
 }
 
-// Finds a name in this branch.
 Term* find_local_name(Branch* branch, Name name, int position, Name lookupType)
 {
     NameSearch nameSearch;
@@ -208,6 +213,7 @@ Term* find_name(Branch* branch, const char* nameStr, int position, Name lookupTy
     nameSearch.branch = branch;
     nameSearch.name = name;
     nameSearch.position = position;
+    nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
@@ -223,9 +229,88 @@ Term* find_local_name(Branch* branch, const char* nameStr, int position, Name lo
     nameSearch.branch = branch;
     nameSearch.name = name;
     nameSearch.position = position;
+    nameSearch.ordinal = -1;
     nameSearch.lookupType = lookupType;
     nameSearch.searchParent = false;
     return run_name_search(&nameSearch);
+}
+
+void get_global_name(Term* term, caValue* nameOut)
+{
+    // Walk upwards, find all terms along the way.
+    Term* searchTerm = term;
+
+    std::vector<Term*> stack;
+
+    while (true) {
+        stack.push_back(searchTerm);
+
+        if (searchTerm->owningBranch == global_root_branch())
+            break;
+
+        searchTerm = get_parent_term(searchTerm);
+
+        ca_assert(searchTerm != NULL);
+    }
+
+    // Construct a global qualified name.
+    set_string(nameOut, "");
+    for (int i = stack.size()-1; i >= 0; i--) {
+        Term* subTerm = stack[i];
+
+        // If this term has no name then we can't construct a global name. Bail out.
+        if (subTerm->nameSymbol == name_None) {
+            set_name(nameOut, name_None);
+            return;
+        }
+
+        string_append(nameOut, name_to_string(subTerm->nameSymbol));
+
+        if (subTerm->uniqueOrdinal != 0) {
+            string_append(nameOut, "#");
+            string_append(nameOut, subTerm->uniqueOrdinal);
+        }
+
+        if (i > 0)
+            string_append(nameOut, ":");
+    }
+}
+
+Term* find_from_global_name(World* world, const char* globalName)
+{
+    Branch* branch = world->root;
+
+    // Loop, walking down the (possibly) qualified name.
+    for (int step=0;; step++) {
+
+        ca_assert(branch != NULL);
+
+        int separatorPos = name_find_qualified_separator(globalName);
+        int nameEnd = separatorPos;
+        int ordinal = name_find_ordinal_suffix(globalName, &nameEnd);
+
+        NameSearch nameSearch;
+        nameSearch.name = existing_name_from_string(globalName, nameEnd);
+        nameSearch.branch = branch;
+        nameSearch.position = -1;
+        nameSearch.ordinal = ordinal;
+        nameSearch.lookupType = name_LookupAny;
+        nameSearch.searchParent = false;
+
+        Term* foundTerm = run_name_search(&nameSearch);
+
+        // Stop if this name wasn't found.
+        if (foundTerm == NULL)
+            return NULL;
+
+        // Stop if there's no more qualified sections.
+        if (separatorPos == -1)
+            return foundTerm;
+
+        // Otherwise, continue the search.
+        globalName = globalName + separatorPos + 1;
+        branch = nested_contents(foundTerm);
+    }
 }
 
 Term* find_name_at(Term* term, const char* nameStr)
@@ -238,6 +323,7 @@ Term* find_name_at(Term* term, const char* nameStr)
     nameSearch.branch = term->owningBranch;
     nameSearch.name = name;
     nameSearch.position = term->index;
+    nameSearch.ordinal = -1;
     nameSearch.lookupType = name_LookupAny;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
@@ -249,6 +335,7 @@ Term* find_name_at(Term* term, Name name)
     nameSearch.branch = term->owningBranch;
     nameSearch.name = name;
     nameSearch.position = term->index;
+    nameSearch.ordinal = -1;
     nameSearch.lookupType = name_LookupAny;
     nameSearch.searchParent = true;
     return run_name_search(&nameSearch);
@@ -263,10 +350,48 @@ int name_find_qualified_separator(const char* name)
     return -1;
 }
 
+static bool is_digit(char c)
+{
+    return c >= '0' && c <= '9';
+}
+
 int name_find_ordinal_suffix(const char* name, int* endPos)
 {
-    // TODO
-    return -1;
+    int originalEndPos = *endPos;
+
+    // Walk backwards, see if this name even has an ordinal suffix.
+    int search = *endPos - 1;
+    if (*endPos == -1)
+        search = strlen(name) - 1;
+
+    bool foundADigit = false;
+    bool foundOrdinalSuffix = false;
+
+    while (true) {
+        if (search < 0)
+            break;
+
+        if (is_digit(name[search])) {
+            foundADigit = true;
+            search--;
+            continue;
+        }
+
+        if (foundADigit && name[search] == '#') {
+            // Found a suffix of the form #123.
+            foundOrdinalSuffix = true;
+            *endPos = search;
+            break;
+        }
+
+        break;
+    }
+
+    if (!foundOrdinalSuffix)
+        return -1;
+
+    // Parse and return the ordinal number.
+    return atoi(name + *endPos + 1);
 }
 
 bool exposes_nested_names(Term* term)
@@ -648,6 +773,24 @@ Name existing_name_from_string(const char* str)
 
     std::map<std::string,Name>::const_iterator it;
     it = g_stringToSymbol.find(str);
+    if (it != g_stringToSymbol.end())
+        return it->second;
+
+    return 0;
+}
+
+Name existing_name_from_string(const char* str, int len)
+{
+    INCREMENT_STAT(InternedNameLookup);
+
+    std::string s;
+    if (len == -1)
+        s = str;
+    else
+        s = std::string(str, len);
+
+    std::map<std::string,Name>::const_iterator it;
+    it = g_stringToSymbol.find(s);
     if (it != g_stringToSymbol.end())
         return it->second;
 

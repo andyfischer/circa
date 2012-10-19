@@ -333,9 +333,15 @@ void rename(Term* termToRename, Name name)
             if (neighbor == NULL)
                 continue;
 
-            if (neighbor->nameSymbol == name
-                    && neighbor->uniqueOrdinal >= termToRename->uniqueOrdinal)
-                termToRename->uniqueOrdinal = neighbor->uniqueOrdinal + 1;
+            if (neighbor->nameSymbol == name) {
+                // Check if the neighbor has ordinal value 0 (meaning no name collision).
+                // If so, then promote it to 1 (meaning there is a collision.
+                if (neighbor->uniqueOrdinal == 0)
+                    neighbor->uniqueOrdinal = 1;
+
+                if (neighbor->uniqueOrdinal >= termToRename->uniqueOrdinal)
+                    termToRename->uniqueOrdinal = neighbor->uniqueOrdinal + 1;
+            }
         }
     }
 
@@ -491,9 +497,17 @@ Term* create_list(Branch* branch, std::string const& name)
     return term;
 }
 
-Branch* create_branch(Branch* owner, std::string const& name)
+Branch* create_branch(Branch* owner, const char* name)
 {
-    return apply(owner, FUNCS.branch, TermList(), name_from_string(name))->contents();
+    return nested_contents(apply(owner, FUNCS.branch, TermList(), name_from_string(name)));
+}
+
+Branch* find_or_create_branch(Branch* owner, const char* name)
+{
+    Term* existing = find_local_name(owner, name);
+    if (existing != NULL)
+        return nested_contents(existing);
+    return create_branch(owner, name);
 }
 
 Branch* create_namespace(Branch* branch, std::string const& name)

@@ -676,7 +676,7 @@ void reflection_install_functions(Branch* kernel)
         {"Term.value", Term__value},
 
         {"is_overloaded_func", is_overloaded_func},
-        {"overload:get_contents", overload__get_contents},
+        {"overload_get_contents", overload__get_contents},
     
         {NULL, NULL}
     };

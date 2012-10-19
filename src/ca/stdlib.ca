@@ -271,7 +271,7 @@ def Map.set(@self, any key, any value)
 def is_overloaded_func(Branch branch) -> bool
     -- Return true if this branch is an overloaded function
 
-def overload:get_contents(Branch branch) -> List
+def overload_get_contents(Branch branch) -> List
     -- Get a list of all the functions that this overloaded function uses.
 
 def String.append(@self, String right)

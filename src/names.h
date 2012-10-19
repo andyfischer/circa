@@ -86,10 +86,15 @@ void update_unique_name(Term* term);
 const char* get_unique_name(Term* term);
 
 Term* find_from_unique_name(Branch* branch, const char* name);
+Term* find_from_global_name(World* world, const char* globalName);
+
+// Construct a global name for this term. May return :None if we couldn't create a global name.
+void get_global_name(Term* term, caValue* nameOut);
 
 // Attempts to find a global name for the term. If successful, returns true
 // and writes the result to 'name'. If unsuccessful (for example, if the
 // Branch is locally-allocated), returns false.
+// DEPRECATED, replaced with get_global_name
 bool find_global_name(Term* term, std::string& name);
 
 // Convenience function, calls find_global_name and returns a blank string if
@@ -109,6 +114,7 @@ void set_name(caValue* tv, Name name);
 
 // Returns a name if there is already one with this string, otherwise returns None.
 Name existing_name_from_string(const char* str);
+Name existing_name_from_string(const char* str, int len);
 
 // Return a name from this string, adding it if necessary.
 Name name_from_string(const char* str);

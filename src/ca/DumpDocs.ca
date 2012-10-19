@@ -42,7 +42,7 @@ def Writer.dump_function(@self, Branch func)
     self.write('"heading": ' heading ',')
     self.write('"topComments": ' to_json_string(func.get_top_comments) ',')
     self.write('"isOverloaded": ' is_overloaded_func(func) ',')
-    self.write('"overloads": ' to_json_string(overload:get_contents(func)) ',')
+    self.write('"overloads": ' to_json_string(overload_get_contents(func)) ',')
     self.write('"isMethod": ' func.is_method ',')
 
     inputTypes = for i in func.inputs { i.get_type.declaringTerm }
