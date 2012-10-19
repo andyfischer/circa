@@ -135,55 +135,6 @@ Branch* find_module_from_filename(const char* filename)
     return NULL;
 }
 
-void get_relative_name(Term* term, Branch* relativeTo, caValue* nameOutput)
-{
-    set_list(nameOutput, 0);
-
-    // Walk upwards and build the name, stop when we reach relativeTo.
-    // The output list will be reversed but we'll fix that.
-
-    while (true) {
-        set_string(list_append(nameOutput), get_unique_name(term));
-
-        if (term->owningBranch == relativeTo) {
-            break;
-        }
-
-        term = get_parent_term(term);
-
-        // If term is null, then it wasn't really a child of relativeTo
-        if (term == NULL) {
-            set_null(nameOutput);
-            return;
-        }
-    }
-
-    // Fix output list
-    list_reverse(nameOutput);
-}
-
-Term* find_from_relative_name(caValue* name, Branch* relativeTo)
-{
-    if (is_null(name))
-        return NULL;
-
-    Term* term = NULL;
-    for (int index=0; index < list_length(name); index++) {
-        if (relativeTo == NULL)
-            return NULL;
-
-        term = find_from_unique_name(relativeTo, as_cstring(list_get(name, index)));
-
-        if (term == NULL)
-            return NULL;
-
-        relativeTo = term->nestedContents;
-
-        // relativeTo may now be NULL. But if we reached the end of this match, that's ok.
-    }
-    return term;
-}
-
 // Returns the corresponding term inside newBranch, if found.
 // Returns 'term' if the translation does not apply (term is not found inside
 // oldBranch).
@@ -194,8 +145,8 @@ Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newB
         return term;
 
     Value relativeName;
-    get_relative_name(term, oldBranch, &relativeName);
-    return find_from_relative_name(&relativeName, newBranch);
+    get_relative_name_as_list(term, oldBranch, &relativeName);
+    return find_from_relative_name_list(&relativeName, newBranch);
 }
 
 void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBranch)

@@ -27,7 +27,4 @@ Term* translate_term_across_branches(Term* term, Branch* oldBranch, Branch* newB
 // then the reference will be set to null.
 void update_all_code_references(Branch* target, Branch* oldBranch, Branch* newBranch);
 
-void get_relative_name(Term* term, Branch* relativeTo, caValue* nameOutput);
-Term* find_from_relative_name(caValue* name, Branch* relativeTo);
-
 } // namespace circa

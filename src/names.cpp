@@ -562,6 +562,55 @@ std::string get_relative_name_at(Term* location, Term* term)
         return get_relative_name(location->owningBranch, term);
 }
 
+void get_relative_name_as_list(Term* term, Branch* relativeTo, caValue* nameOutput)
+{
+    set_list(nameOutput, 0);
+
+    // Walk upwards and build the name, stop when we reach relativeTo.
+    // The output list will be reversed but we'll fix that.
+
+    while (true) {
+        set_string(list_append(nameOutput), get_unique_name(term));
+
+        if (term->owningBranch == relativeTo) {
+            break;
+        }
+
+        term = get_parent_term(term);
+
+        // If term is null, then it wasn't really a child of relativeTo
+        if (term == NULL) {
+            set_null(nameOutput);
+            return;
+        }
+    }
+
+    // Fix output list
+    list_reverse(nameOutput);
+}
+
+Term* find_from_relative_name_list(caValue* name, Branch* relativeTo)
+{
+    if (is_null(name))
+        return NULL;
+
+    Term* term = NULL;
+    for (int index=0; index < list_length(name); index++) {
+        if (relativeTo == NULL)
+            return NULL;
+
+        term = find_from_unique_name(relativeTo, as_cstring(list_get(name, index)));
+
+        if (term == NULL)
+            return NULL;
+
+        relativeTo = term->nestedContents;
+
+        // relativeTo may now be NULL. But if we reached the end of this match, that's ok.
+    }
+    return term;
+}
+
 void update_unique_name(Term* term)
 {
     Term::UniqueName& name = term->uniqueName;
@@ -639,68 +688,6 @@ Term* find_from_unique_name(Branch* branch, const char* name)
         }
     }
     return NULL;
-}
-
-bool find_global_name(Term* term, std::string& name)
-{
-    // Search upwards, check if this term even has a global name.
-    Term* searchTerm = term;
-
-    std::vector<Term*> stack;
-
-    while (true) {
-        stack.push_back(searchTerm);
-
-        if (searchTerm->owningBranch == global_root_branch())
-            break;
-
-        searchTerm = get_parent_term(searchTerm);
-
-        if (searchTerm == NULL)
-            return false;
-    }
-
-    // Construct a qualified name.
-    std::stringstream out;
-
-    for (int i = stack.size()-1; i >= 0; i--) {
-        out << stack[i]->uniqueName.name;
-        if (i > 0)
-            out << ":";
-    }
-    name = out.str();
-    return true;
-}
-std::string find_global_name(Term* term)
-{
-    std::string out;
-    find_global_name(term, out);
-    return out;
-}
-
-Term* find_term_from_global_name_recr(Branch* searchBranch, const char* name)
-{
-    int separator = name_find_qualified_separator(name);
-    
-    if (separator == -1)
-        return find_from_unique_name(searchBranch, name);
-
-    std::string namePortion = std::string(name, separator);
-    
-    Term* searchTerm = find_from_unique_name(searchBranch, namePortion.c_str());
-    if (searchTerm == NULL)
-        return NULL;
-    if (searchTerm->nestedContents == NULL)
-        return NULL;
-
-    return find_term_from_global_name_recr(searchTerm->nestedContents,
-            &name[separator+1]);
-}
-
-Term* find_term_from_global_name(const char* name)
-{
-    Branch* searchBranch = global_root_branch();
-    return find_term_from_global_name_recr(searchBranch, name);
 }
 
 bool name_is_valid(Name name)

@@ -81,6 +81,8 @@ bool term_is_child_of_branch(Term* term, Branch* branch);
 // or if term is inside a namespace or object, this would return a colon-separated name.
 std::string get_relative_name(Branch* branch, Term* term);
 std::string get_relative_name_at(Term* location, Term* term);
+void get_relative_name_as_list(Term* term, Branch* relativeTo, caValue* nameOutput);
+Term* find_from_relative_name_list(caValue* name, Branch* relativeTo);
 
 void update_unique_name(Term* term);
 const char* get_unique_name(Term* term);
@@ -90,16 +92,6 @@ Term* find_from_global_name(World* world, const char* globalName);
 
 // Construct a global name for this term. May return :None if we couldn't create a global name.
 void get_global_name(Term* term, caValue* nameOut);
-
-// Attempts to find a global name for the term. If successful, returns true
-// and writes the result to 'name'. If unsuccessful (for example, if the
-// Branch is locally-allocated), returns false.
-// DEPRECATED, replaced with get_global_name
-bool find_global_name(Term* term, std::string& name);
-
-// Convenience function, calls find_global_name and returns a blank string if
-// it wasn't found.
-std::string find_global_name(Term* term);
 
 Term* find_term_from_global_name(const char* name);
 
