@@ -98,15 +98,15 @@ typedef char GCColor;
 
 // Debug build
 #define ca_assert(x) circa::ca_assert_function((x), #x, __LINE__, __FILE__)
-#define ca_test_assert(x) ;
+#define ca_test_assert(x)
 
 #endif
 
 #else
 
 // Release build
-#define ca_assert(x) ;
-#define ca_test_assert(x) ;
+#define ca_assert(x)
+#define ca_test_assert(x)
 
 #endif
 
