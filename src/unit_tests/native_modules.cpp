@@ -81,35 +81,6 @@ void patch_manually_ns()
     free_native_module(module);
 }
 
-void patch_manually_ns_2()
-{
-    // In this test, the module has a namespace prefix.
-    Branch branch;
-    branch.compile("def f() -> int { 1 }");
-    branch.compile("namespace n { "
-                     "def f() -> int { 1 } "
-                     "namespace n { def f() -> int { 1 } } }");
-    branch.compile("test_spy(f())");
-    branch.compile("test_spy(n:f())");
-    branch.compile("test_spy(n:n:f())");
-
-    NativeModule* module = create_native_module();
-    module_set_name_prefix(module, name_from_string("n"));
-
-    // this should only patch the term named 'n:f', not 'f' or 'n:n:f'.
-    module_patch_function(module, "f", my_5);
-    module_manually_patch_branch(module, &branch);
-
-    Stack stack;
-    push_frame(&stack, &branch);
-    test_spy_clear();
-    run_interpreter(&stack);
-
-    test_equals(test_spy_get_results(), "[1, 5, 1]");
-
-    free_native_module(module);
-}
-
 void new_function_patched_by_world()
 {
     // First create the module, as part of the global world.
@@ -133,7 +104,6 @@ void register_tests()
 {
     REGISTER_TEST_CASE(native_modules::patch_manually);
     REGISTER_TEST_CASE(native_modules::patch_manually_ns);
-    REGISTER_TEST_CASE(native_modules::patch_manually_ns_2);
     REGISTER_TEST_CASE(native_modules::new_function_patched_by_world);
 }
 

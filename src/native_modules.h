@@ -20,11 +20,7 @@ void free_native_module(NativeModule* module);
 NativeModule* add_native_module(World* world, Name name);
 void delete_native_module(World* world, Name name);
 
-// Set the name prefix for a module.
-void module_set_name_prefix(NativeModule* module, Name name);
-
 // Add a patch on the given module.
-void module_patch_function(NativeModule* module, Name name, EvaluateFunc func);
 void module_patch_function(NativeModule* module, const char* name, EvaluateFunc func);
 
 // Manually apply a module's patches to the given branch. This function isn't commonly used
