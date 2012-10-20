@@ -90,7 +90,7 @@ void file_watch_trigger_actions(World* world, const char* filename)
         case name_Branch: {
             // Reload this code branch.
             caValue* branchGlobalName = list_get(action, 1);
-            load_branch(world, as_cstring(branchGlobalName), filename);
+            load_branch_from_file(world, as_cstring(branchGlobalName), filename);
             break;
         }
         default:

@@ -42,10 +42,6 @@ bool exposes_nested_names(Term* term);
 
 bool fits_lookup_type(Term* term, Name type)
 {
-    // Modules can only be found by LookupModule
-    if (term->function == FUNCS.imported_file)
-        return type == name_LookupModule;
-
     switch (type) {
         case name_LookupAny:
             return true;
@@ -54,7 +50,7 @@ bool fits_lookup_type(Term* term, Name type)
         case name_LookupFunction:
             return is_function(term);
         case name_LookupModule:
-            return false;
+            return (term->function == FUNCS.imported_file);
     }
     internal_error("unknown type in fits_lookup_type");
     return false;
@@ -250,7 +246,13 @@ void get_global_name(Term* term, caValue* nameOut)
 
         searchTerm = get_parent_term(searchTerm);
 
-        ca_assert(searchTerm != NULL);
+        if (searchTerm == NULL) {
+            // Parent is NULL but we haven't yet reached the global root. This is
+            // a deprecated style of branch that isn't connected to root. No global
+            // name is possible.
+            set_name(nameOut, name_None);
+            return;
+        }
     }
 
     // Construct a global qualified name.

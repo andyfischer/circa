@@ -11,8 +11,6 @@ namespace file_watch {
 
 void test_simple()
 {
-    // Temp disabled
-    return;
     FakeFilesystem files;
 
     World* world = global_world();

@@ -185,7 +185,7 @@ void refresh_all_modules(caWorld* world)
     }
 }
 
-void load_branch(World* world, const char* globalName, const char* filename)
+void load_branch_from_file(World* world, const char* globalName, const char* filename)
 {
     Term* namedTerm = find_from_global_name(world, globalName);
 
@@ -202,7 +202,7 @@ void load_branch(World* world, const char* globalName, const char* filename)
 
     update_static_error_list(newBranch);
 
-    namedTerm->nestedContents = newBranch;
+    branch_graft_as_nested_contents(namedTerm, newBranch);
 
     if (existing != NULL) {
         // New branch starts off with the old branch's version, plus 1.

@@ -147,6 +147,9 @@ bool has_nested_contents(Term* term);
 Branch* nested_contents(Term* term);
 void remove_nested_contents(Term* term);
 
+// Insert this existing branch as the nested contents for this term.
+void branch_graft_as_nested_contents(Term* term, Branch* branch);
+
 caValue* branch_get_source_filename(Branch* branch);
 std::string get_branch_source_filename(Branch* branch);
 Branch* get_outer_scope(Branch* branch);
